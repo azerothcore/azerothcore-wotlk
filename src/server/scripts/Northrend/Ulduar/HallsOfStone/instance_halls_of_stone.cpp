@@ -90,7 +90,14 @@ public:
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
-                if (Encounter[i] == IN_PROGRESS && i != BRANN_BRONZEBEARD)
+                // The escort is not an encounter, it must not keep the instance locked
+                if (i == BRANN_BRONZEBEARD)
+                {
+                    continue;
+                }
+
+                // Krystallus and the Maiden of Grief are tracked through SetData, the rest through boss states
+                if (Encounter[i] == IN_PROGRESS || GetBossState(i) == IN_PROGRESS)
                 {
                     return true;
                 }
@@ -116,7 +123,8 @@ public:
                     break;
                 case GO_ABEDNEUM:
                     goAbedneumGUID = go->GetGUID();
-                    if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
+                    // Encounter[] is toggled back and forth by the post event lore, the boss state is the reliable one
+                    if (GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_MARNAK:
@@ -127,7 +135,7 @@ public:
                     break;
                 case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
-                    if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
+                    if (GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_SJONNIR_CONSOLE:

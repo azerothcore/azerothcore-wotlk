@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "halls_of_stone.h"
@@ -64,13 +65,7 @@ enum BrannMovement
 
 enum ContextGroups
 {
-    CONTEXT_GROUP_KADDRAK       = 1,
-    CONTEXT_GROUP_MARNAK,
-    CONTEXT_GROUP_ABEDNEUM,
-    CONTEXT_GROUP_PROTECTORS,
-    CONTEXT_GROUP_STORMCALLERS,
-    CONTEXT_GROUP_GOLEMS,
-    CONTEXT_GROUP_TRANSITION,
+    CONTEXT_GROUP_TRANSITION    = 1,
 };
 
 enum TalkGroups
@@ -118,9 +113,10 @@ enum GossipIDs
     SJONNIR_END     = 9725,
 };
 
-Position brannEscortDonePoint = { 939.6467f, 375.48926f, 207.41608f, 0.f };
-Position brannTribunalEventDonePoint = { 1199.685f, 667.15497f, 196.32364f, 3.124139f };
-Position brannDoorDone = { 1256.33f, 667.028f, 189.59921f, 0.f };
+Position const brannEscortDonePoint = { 939.6467f, 375.48926f, 207.41608f, 0.f };
+Position const brannTribunalEventDonePoint = { 1199.685f, 667.15497f, 196.32364f, 3.124139f };
+Position const brannDoorDone = { 1256.33f, 667.028f, 189.59921f, 0.f };
+Position const brannSjonnirDone = { 1308.33f, 666.755f, 189.5994f, 0.104719758033752441f };
 
 struct brann_bronzebeard : public ScriptedAI
 {
@@ -133,62 +129,79 @@ struct brann_bronzebeard : public ScriptedAI
     {
         scheduler.CancelAll();
         me->m_Events.KillAllEvents(false);
+        _recentlySpoken = false;
         me->SetRegeneratingHealth(false);
         me->SetGossipMenuId(TRIBUNAL_BEFORE);
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         me->SetReactState(REACT_PASSIVE);
         summons.DespawnAll();
 
-        // Escort to Tribunal of Ages failed, respawn at original location
-        if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
+        if (!instance)
+            return;
+
+        // Escort to Tribunal of Ages still running, he has to be able to defend himself
+        if (instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
         {
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        // Respawn Handling
-        if (instance && instance->GetBossState(BRANN_DOOR) == DONE)
+        // Respawn Handling. Both flags are re-armed above, quest 13207 starts and ends on him
+        // and he is the only one offering it. Only the gossip is dropped again where an event
+        // menu would let the player restart something he already did.
+        if (instance->GetBossState(BOSS_SJONNIR) == DONE)
         {
-            // Past Sjonnir's Door
-            me->NearTeleportTo(brannDoorDone);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            // At Sjonnir's console, everything is over
+            TeleportTo(brannSjonnirDone);
+            me->SetGossipMenuId(SJONNIR_END);
+            me->SetEmoteState(EMOTE_STATE_USE_STANDING);
+            me->SetImmuneToAll(true);
+        }
+        else if (instance->GetBossState(BRANN_DOOR) == DONE)
+        {
+            // Past Sjonnir's Door, no event gossip until Sjonnir is defeated
+            TeleportTo(brannDoorDone);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
             me->SetImmuneToAll(true);
         }
-        else if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
+        else if (instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
         {
             // In front of Sjonnir's Door
-            me->NearTeleportTo(brannTribunalEventDonePoint);
+            TeleportTo(brannTribunalEventDonePoint);
             me->SetGossipMenuId(SJONNIR_DOOR);
             DoCastSelf(SPELL_STEALTH);
             me->SetImmuneToAll(true);
         }
-        else if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == DONE)
+        else if (instance->GetBossState(BRANN_BRONZEBEARD) == DONE)
         {
             // Escort to Tribunal of Ages arena Finished
-            me->NearTeleportTo(brannEscortDonePoint);
+            TeleportTo(brannEscortDonePoint);
             me->SetGossipMenuId(TRIBUNAL_START);
         }
     }
 
-    void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32  /*action*/) override
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
     {
+        uint32 const menuId = me->GetGossipMenuId();
+        CloseGossipMenuFor(player);
         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-        switch (me->GetGossipMenuId())
+
+        switch (menuId)
         {
-        case TRIBUNAL_BEFORE:
-            me->AI()->DoAction(ACTION_START_ESCORT_EVENT);
-            break;
-        case TRIBUNAL_START:
-            me->AI()->DoAction(ACTION_START_TRIBUNAL);
-            break;
-        case TRIBUNAL_END:
-            me->AI()->DoAction(ACTION_GO_TO_SJONNIR);
-            break;
-        case SJONNIR_DOOR:
-            me->AI()->DoAction(ACTION_OPEN_DOOR);
-            break;
-        default:
-            break;
+            case TRIBUNAL_BEFORE:
+                DoAction(ACTION_START_ESCORT_EVENT);
+                break;
+            case TRIBUNAL_START:
+                DoAction(ACTION_START_TRIBUNAL);
+                break;
+            case TRIBUNAL_END:
+                DoAction(ACTION_GO_TO_SJONNIR);
+                break;
+            case SJONNIR_DOOR:
+                DoAction(ACTION_OPEN_DOOR);
+                break;
+            default:
+                break;
         }
     }
 
@@ -196,86 +209,85 @@ struct brann_bronzebeard : public ScriptedAI
     {
         switch (action)
         {
-        case ACTION_START_ESCORT_EVENT: // Received via gossip
-            Talk(SAY_BRANN_ESCORT_START);
-            me->LoadPath(PATH_ESCORT);
-            me->GetMotionMaster()->MoveWaypoint(PATH_ESCORT, false);
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->SetRegeneratingHealth(true);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            instance->SetBossState(BRANN_BRONZEBEARD, IN_PROGRESS);
-            break;
-        case ACTION_START_TRIBUNAL: // Received via gossip
-        {
-            // DoCastSelf 51810 Brann Health Checker
-            me->SetReactState(REACT_PASSIVE);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_CONSOLE, 897.1759f, 331.77386f, 203.70638f);
-            InitializeEvent();
-            break;
-        }
-        case ACTION_GO_TO_SJONNIR: // Received via gossip
-            me->m_Events.KillAllEvents(false);
-            scheduler.CancelAll();
-
-            Talk(SAY_BRANN_ENTRANCE_MEET);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetRegeneratingHealth(true);
-
-            ResetEvent();
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            DoCast(me, SPELL_STEALTH, false);
-            me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
-
-            me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_LEAVE, 935.955f, 371.031f, 207.41751f);
-            break;
-        case ACTION_OPEN_DOOR: // Received via gossip
-            me->RemoveAura(SPELL_STEALTH);
-            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-            me->SetWalk(true);
-            me->GetMotionMaster()->MovePoint(POINT_SJONNIR_DOOR, 1202.91f, 667.049f, 196.23315f);
-            break;
-        case ACTION_START_SJONNIR_FIGHT: // Received by Sjonnir
-            me->GetMotionMaster()->MovePath(PATH_SJONNIR_FIGHT);
-            break;
-        case ACTION_SJONNIR_DEAD: // Received by Sjonnir
-            me->m_Events.KillAllEvents(false);
-            scheduler.CancelAll();
-            me->SetEmoteState(EMOTE_STATE_STAND);
-            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetGossipMenuId(SJONNIR_END);
-            me->SetFacingTo(3.147235631942749023f);
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_VICTORY_SJONNIR_1);
-            }, 10s);
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_VICTORY_SJONNIR_2);
-            }, 22500ms);
-            me->m_Events.AddEventAtOffset([this] {
-                me->GetMotionMaster()->MovePoint(POINT_SJONNIR_DEAD, 1308.33f, 666.755f, 189.5994f);
-            }, 23500ms);
-            break;
-        case ACTION_SJONNIR_WIPE_START: // Received by Sjonnir
-            me->DespawnOrUnsummon(0s, 5s);
-            break;
-        case ACTION_PLAYER_DEATH_IN_TRIBUNAL: // Received via Instance
-            if (!_recentlySpoken)
+            case ACTION_START_ESCORT_EVENT: // Received via gossip
+                Talk(SAY_BRANN_ESCORT_START);
+                me->LoadPath(PATH_ESCORT);
+                me->GetMotionMaster()->MoveWaypoint(PATH_ESCORT, false);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetRegeneratingHealth(true);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                if (instance)
+                    instance->SetBossState(BRANN_BRONZEBEARD, IN_PROGRESS);
+                break;
+            case ACTION_START_TRIBUNAL: // Received via gossip
             {
-                Talk(SAY_BRANN_PLAYER_DEATH);
-                _recentlySpoken = true;
-                me->m_Events.AddEventAtOffset([this] {
-                    _recentlySpoken = false;
-                }, 6s);
+                // DoCastSelf 51810 Brann Health Checker
+                me->SetReactState(REACT_PASSIVE);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_CONSOLE, 897.1759f, 331.77386f, 203.70638f);
+                InitializeEvent();
+                break;
             }
-            break;
-        case ACTION_SKIP_PHASE: // Debug, received by player
-            if (_currentPhase >= 1 && _currentPhase < 3)
-                TransitionToPhase(_currentPhase + 1);
-            else if (_currentPhase == 3)
-                EndTribunalFight();
-            break;
-        default:
-            break;
+            case ACTION_GO_TO_SJONNIR: // Received via gossip
+                Talk(SAY_BRANN_ENTRANCE_MEET);
+                me->SetReactState(REACT_PASSIVE);
+                me->SetRegeneratingHealth(true);
+
+                ResetEvent();
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                DoCastSelf(SPELL_STEALTH);
+                me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
+
+                me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_LEAVE, 935.955f, 371.031f, 207.41751f);
+                break;
+            case ACTION_OPEN_DOOR: // Received via gossip
+                me->RemoveAura(SPELL_STEALTH);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+                me->SetWalk(true);
+                me->GetMotionMaster()->MovePoint(POINT_SJONNIR_DOOR, 1202.91f, 667.049f, 196.23315f);
+                break;
+            case ACTION_START_SJONNIR_FIGHT: // Received by Sjonnir
+                me->GetMotionMaster()->MovePath(PATH_SJONNIR_FIGHT);
+                break;
+            case ACTION_SJONNIR_DEAD: // Received by Sjonnir
+                me->m_Events.KillAllEvents(false);
+                scheduler.CancelAll();
+                _recentlySpoken = false;
+                me->SetEmoteState(EMOTE_STATE_STAND);
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetGossipMenuId(SJONNIR_END);
+                me->SetFacingTo(3.147235631942749023f);
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_VICTORY_SJONNIR_1);
+                }, 10s);
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_VICTORY_SJONNIR_2);
+                }, 22500ms);
+                me->m_Events.AddEventAtOffset([this] {
+                    me->GetMotionMaster()->MovePoint(POINT_SJONNIR_DEAD, brannSjonnirDone);
+                }, 23500ms);
+                break;
+            case ACTION_SJONNIR_WIPE_START: // Received by Sjonnir
+                me->DespawnOrUnsummon(0s, 5s);
+                break;
+            case ACTION_PLAYER_DEATH_IN_TRIBUNAL: // Received via Instance
+                if (!_recentlySpoken)
+                {
+                    Talk(SAY_BRANN_PLAYER_DEATH);
+                    _recentlySpoken = true;
+                    me->m_Events.AddEventAtOffset([this] {
+                        _recentlySpoken = false;
+                    }, 6s);
+                }
+                break;
+            case ACTION_SKIP_PHASE: // Debug, received by player
+                if (_currentPhase >= 1 && _currentPhase < 3)
+                    TransitionToPhase(_currentPhase + 1);
+                else if (_currentPhase == 3)
+                    EndTribunalFight();
+                break;
+            default:
+                break;
         }
     }
 
@@ -295,57 +307,87 @@ struct brann_bronzebeard : public ScriptedAI
         {
             switch (id)
             {
-            case POINT_TRIBUNAL_CONSOLE:
-                me->SetEmoteState(EMOTE_STATE_USE_STANDING);
-                break;
-            case POINT_TRIBUNAL_LORE:
-                me->SetFacingTo(3.926990747451782226f);
-                me->SetGossipMenuId(TRIBUNAL_END);
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                break;
-            case POINT_TRIBUNAL_LEAVE:
-                // Will respawn in front of Sjonnir's Door
-                // Sniff reveals different GUID, same entry
-                me->DespawnOrUnsummon(0s, 5s);
-                break;
-            case POINT_SJONNIR_DOOR:
-                me->SetEmoteState(EMOTE_STATE_USE_STANDING);
-                me->SetWalk(false);
-                me->m_Events.AddEventAtOffset([&] {
-                    me->SetEmoteState(EMOTE_ONESHOT_NONE);
-                    instance->SetBossState(BRANN_DOOR, DONE); // Opens Door to Sjonnir
-                    instance->SetData(BRANN_DOOR, DONE);
-                }, 3200ms);
-                me->m_Events.AddEventAtOffset([&] {
-                    me->GetMotionMaster()->MovePoint(POINT_SJONNIR_FIGHT, 1256.33f, 667.028f, 189.59921);
-                }, 5600ms);
-                break;
-            case POINT_SJONNIR_FIGHT:
-                me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
-                Talk(SAY_BRANN_FRONT_OF_SJONNIR);
-                break;
-            case POINT_SJONNIR_DEAD:
-                me->SetFacingTo(0.104719758033752441f);
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                me->SetGossipMenuId(SJONNIR_END);
-                break;
-            default:
-                break;
+                case POINT_TRIBUNAL_CONSOLE:
+                    me->SetEmoteState(EMOTE_STATE_USE_STANDING);
+                    SetGameObjectState(GO_TRIBUNAL_CONSOLE, GO_STATE_ACTIVE);
+                    break;
+                case POINT_TRIBUNAL_LORE:
+                    me->SetFacingTo(3.926990747451782226f);
+                    me->SetGossipMenuId(TRIBUNAL_END);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    break;
+                case POINT_TRIBUNAL_LEAVE:
+                    // Will respawn in front of Sjonnir's Door
+                    // Sniff reveals different GUID, same entry
+                    me->DespawnOrUnsummon(0s, 5s);
+                    break;
+                case POINT_SJONNIR_DOOR:
+                    me->SetEmoteState(EMOTE_STATE_USE_STANDING);
+                    me->SetWalk(false);
+                    me->m_Events.AddEventAtOffset([this] {
+                        me->SetEmoteState(EMOTE_ONESHOT_NONE);
+                        if (instance)
+                        {
+                            instance->SetBossState(BRANN_DOOR, DONE); // Opens Door to Sjonnir
+                            instance->SetData(BRANN_DOOR, DONE);
+                        }
+                    }, 3200ms);
+                    me->m_Events.AddEventAtOffset([this] {
+                        me->GetMotionMaster()->MovePoint(POINT_SJONNIR_FIGHT, brannDoorDone);
+                    }, 5600ms);
+                    break;
+                case POINT_SJONNIR_FIGHT:
+                    me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
+                    Talk(SAY_BRANN_FRONT_OF_SJONNIR);
+                    break;
+                case POINT_SJONNIR_DEAD:
+                    me->SetFacingTo(brannSjonnirDone.GetOrientation());
+                    me->SetEmoteState(EMOTE_STATE_USE_STANDING);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    me->SetGossipMenuId(SJONNIR_END);
+                    break;
+                default:
+                    break;
             }
         }
     }
 
     void PathEndReached(uint32 pathId) override
     {
-        if (pathId == PATH_ESCORT)
+        switch (pathId)
         {
-            instance->SetBossState(BRANN_BRONZEBEARD, DONE);
-            Talk(SAY_BRANN_EVENT_INTRO_1);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetRegeneratingHealth(false);
-            me->SetGossipMenuId(TRIBUNAL_START);
-            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            case PATH_ESCORT:
+                if (instance)
+                    instance->SetBossState(BRANN_BRONZEBEARD, DONE);
+                Talk(SAY_BRANN_EVENT_INTRO_1);
+                me->SetReactState(REACT_PASSIVE);
+                me->SetRegeneratingHealth(false);
+                me->SetGossipMenuId(TRIBUNAL_START);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                break;
+            case PATH_SJONNIR_FIGHT:
+                // Brann steps back and uses Sjonnir's console
+                me->SetEmoteState(EMOTE_STATE_USE_STANDING);
+                SetGameObjectState(GO_SJONNIR_CONSOLE, GO_STATE_ACTIVE);
+                break;
+            default:
+                break;
         }
+    }
+
+    // Unit::NearTeleportTo takes a non const reference, the respawn positions are constants
+    void TeleportTo(Position const& pos)
+    {
+        me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
+    }
+
+    void SetGameObjectState(uint32 entry, GOState state)
+    {
+        if (!instance)
+            return;
+
+        if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(entry)))
+            go->SetGoState(state);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -371,11 +413,17 @@ struct brann_bronzebeard : public ScriptedAI
         if (cr->GetEntry() == NPC_ABEDNEUM || cr->GetEntry() == NPC_KADDRAK || cr->GetEntry() == NPC_MARNAK)
             cr->SetCanFly(true);
         else
+        {
+            cr->SetInCombatWithZone();
             summons.Summon(cr);
+        }
     }
 
     void InitializeEvent()
     {
+        if (!instance)
+            return;
+
         // There are 3 phases in this event, each transition contains dialogue.
         // Each phase has one additional NPC and one head active.
         // Each phase takes approximately 100s
@@ -399,14 +447,12 @@ struct brann_bronzebeard : public ScriptedAI
 
     void ResetEvent()
     {
-        if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_TRIBUNAL_CONSOLE)))
-            tribunal->SetGoState(GO_STATE_READY);
-
-        if (GameObject* tribunalSkyFloor = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SKY_FLOOR)))
-            tribunalSkyFloor->SetGoState(GO_STATE_READY);
+        SetGameObjectState(GO_TRIBUNAL_CONSOLE, GO_STATE_READY);
+        SetGameObjectState(GO_SKY_FLOOR, GO_STATE_READY);
 
         scheduler.CancelAll();
         me->m_Events.KillAllEvents(false);
+        _recentlySpoken = false;
         summons.DespawnAll();
         DespawnHeads();
 
@@ -481,15 +527,15 @@ struct brann_bronzebeard : public ScriptedAI
     {
         switch (entry)
         {
-        case NPC_DARK_RUNE_PROTECTOR:
-            me->SummonCreatureGroup(0);
-            break;
-        case NPC_DARK_RUNE_STORMCALLER:
-            me->SummonCreatureGroup(1);
-            break;
-        case NPC_IRON_GOLEM_CUSTODIAN:
-            me->SummonCreatureGroup(2);
-            break;
+            case NPC_DARK_RUNE_PROTECTOR:
+                me->SummonCreatureGroup(0);
+                break;
+            case NPC_DARK_RUNE_STORMCALLER:
+                me->SummonCreatureGroup(1);
+                break;
+            case NPC_IRON_GOLEM_CUSTODIAN:
+                me->SummonCreatureGroup(2);
+                break;
         }
     }
 
@@ -507,23 +553,23 @@ struct brann_bronzebeard : public ScriptedAI
         scheduler.CancelGroup(CONTEXT_GROUP_TRANSITION);
         switch (_currentPhase)
         {
-        case 1:
-            scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
-                TransitionToPhase(2);
-            });
-            break;
-        case 2:
-            scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
-                TransitionToPhase(3);
-            });
-            break;
-        case 3:
-            scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
-                EndTribunalFight();
-            });
-            break;
-        default:
-            break;
+            case 1:
+                scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
+                    TransitionToPhase(2);
+                });
+                break;
+            case 2:
+                scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
+                    TransitionToPhase(3);
+                });
+                break;
+            case 3:
+                scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
+                    EndTribunalFight();
+                });
+                break;
+            default:
+                break;
         }
     }
 
@@ -531,143 +577,142 @@ struct brann_bronzebeard : public ScriptedAI
     {
         switch (phase)
         {
-        case 1:
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_EVENT_INTRO_2);
-            }, 0ms, TALK_GROUP_PHASE1);
+            case 1:
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_EVENT_INTRO_2);
+                }, 0ms, TALK_GROUP_PHASE1);
 
-            me->m_Events.AddEventAtOffset([this] {
-                if (Creature* abedneum = GetAbedneum())
-                    abedneum->AI()->Talk(SAY_ABEDNEUM_WARNING);
-            }, 12500ms, TALK_GROUP_PHASE1);
+                me->m_Events.AddEventAtOffset([this] {
+                    if (Creature* abedneum = GetAbedneum())
+                        abedneum->AI()->Talk(SAY_ABEDNEUM_WARNING);
+                }, 12500ms, TALK_GROUP_PHASE1);
 
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_EVENT_A_1);
-            }, 23500ms, TALK_GROUP_PHASE1);
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_EVENT_A_1);
+                }, 23500ms, TALK_GROUP_PHASE1);
 
-            me->m_Events.AddEventAtOffset([this] {
-                if (Creature* kaddrak = GetKaddrak())
-                    kaddrak->AI()->Talk(SAY_KADDRAK_SECURITY);
-            }, 29500ms, TALK_GROUP_PHASE1);
+                me->m_Events.AddEventAtOffset([this] {
+                    if (Creature* kaddrak = GetKaddrak())
+                        kaddrak->AI()->Talk(SAY_KADDRAK_SECURITY);
+                }, 29500ms, TALK_GROUP_PHASE1);
 
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_EVENT_A_3);
-            }, 41500ms, TALK_GROUP_PHASE1);
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_EVENT_A_3);
+                }, 41500ms, TALK_GROUP_PHASE1);
 
-            break;
-        case 2:
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_EVENT_B_1);
-            }, 0ms, TALK_GROUP_PHASE2);
+                break;
+            case 2:
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_EVENT_B_1);
+                }, 0ms, TALK_GROUP_PHASE2);
 
-            me->m_Events.AddEventAtOffset([this] {
-                if (Creature* marnak = GetMarnak())
-                    marnak->AI()->Talk(SAY_MARNAK_THREAT);
-            }, 3s, TALK_GROUP_PHASE2);
+                me->m_Events.AddEventAtOffset([this] {
+                    if (Creature* marnak = GetMarnak())
+                        marnak->AI()->Talk(SAY_MARNAK_THREAT);
+                }, 3s, TALK_GROUP_PHASE2);
 
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_EVENT_B_3);
-            }, 11s, TALK_GROUP_PHASE2);
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_EVENT_B_3);
+                }, 11s, TALK_GROUP_PHASE2);
 
-            break;
-        case 3:
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_EVENT_C_1);
-            }, 0ms, TALK_GROUP_PHASE3);
+                break;
+            case 3:
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_EVENT_C_1);
+                }, 0ms, TALK_GROUP_PHASE3);
 
-            me->m_Events.AddEventAtOffset([this] {
-                if (Creature* abedneum = GetAbedneum())
-                    abedneum->AI()->Talk(SAY_ABEDNEUM_CRITICAL);
-            }, 5s, TALK_GROUP_PHASE3);
+                me->m_Events.AddEventAtOffset([this] {
+                    if (Creature* abedneum = GetAbedneum())
+                        abedneum->AI()->Talk(SAY_ABEDNEUM_CRITICAL);
+                }, 5s, TALK_GROUP_PHASE3);
 
-            me->m_Events.AddEventAtOffset([this] {
-                Talk(SAY_BRANN_EVENT_C_3);
-            }, 12s, TALK_GROUP_PHASE3);
+                me->m_Events.AddEventAtOffset([this] {
+                    Talk(SAY_BRANN_EVENT_C_3);
+                }, 12s, TALK_GROUP_PHASE3);
 
-            break;
+                break;
         }
     }
 
     void SchedulePhaseAbilities(uint8 phase)
     {
+        // Abilities of the previous phases keep running, they are only cancelled when the event ends
         switch (phase)
         {
-        case 1:
-            // Kaddrak head visual activates
-            scheduler.Schedule(30s, [this](TaskContext) {
-                SwitchHeadVisual(0x1, true);
-            });
-            // Kaddrak glare of the tribunal
-            scheduler.Schedule(47s, [this](TaskContext context) {
-                if (Creature* kaddrak = GetKaddrak())
-                    if (Player* plr = SelectTargetFromPlayerList(100.0f))
-                        kaddrak->CastSpell(plr, SPELL_GLARE_OF_THE_TRIBUNAL, true);
-                // Alternate eye position 1s after each glare
-                scheduler.Schedule(1s, [this](TaskContext) {
-                    if (Creature* kaddrak = GetKaddrak())
-                    {
-                        if (_leftEye)
-                            kaddrak->UpdatePosition(923.5f, 326.358f, 219.73332f, 2.28638f, true);
-                        else
-                            kaddrak->UpdatePosition(928.f, 331.276f, 219.73332f, 1.83259f, true);
-                        _leftEye = !_leftEye;
-                        kaddrak->StopMovingOnCurrentPos();
-                    }
+            case 1:
+                // Kaddrak head visual activates
+                scheduler.Schedule(30s, [this](TaskContext) {
+                    SwitchHeadVisual(0x1, true);
                 });
-                context.SetGroup(CONTEXT_GROUP_KADDRAK);
-                context.Repeat(1500ms);
-            });
-            // Protector spawning
-            scheduler.Schedule(52s, [this](TaskContext context) {
-                SummonCreatures(NPC_DARK_RUNE_PROTECTOR);
-                context.SetGroup(CONTEXT_GROUP_PROTECTORS);
-                context.Repeat(me->GetMap()->IsHeroic() ? 23500ms : 32500ms);
-            });
-            break;
-        case 2:
-            // Marnak head visual activates
-            scheduler.Schedule(3s, [this](TaskContext) {
-                SwitchHeadVisual(0x2, true);
-            });
-            // Marnak dark matter
-            scheduler.Schedule(13s, [this](TaskContext context) {
-                DoMarnakDarkMatter();
-                context.SetGroup(CONTEXT_GROUP_MARNAK);
-                context.Repeat(30s);
-            });
-            // Stormcaller spawning
-            scheduler.Schedule(20s, [this](TaskContext context) {
-                SummonCreatures(NPC_DARK_RUNE_STORMCALLER);
-                context.SetGroup(CONTEXT_GROUP_STORMCALLERS);
-                context.Repeat(me->GetMap()->IsHeroic() ? 32s : 41500ms);
-            });
-            break;
-        case 3:
-            // Abedneum head visual activates
-            scheduler.Schedule(6s, [this](TaskContext) {
-                SwitchHeadVisual(0x4, true);
-            });
-            // Abedneum searing gaze
-            scheduler.Schedule(16s, [this](TaskContext context) {
-                DoAbedneumSearingGaze();
-                context.SetGroup(CONTEXT_GROUP_ABEDNEUM);
-                context.Repeat(15s);
-            });
-            // Golem spawning
-            scheduler.Schedule(27s, [this](TaskContext context) {
-                SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN);
-                context.SetGroup(CONTEXT_GROUP_GOLEMS);
-                context.Repeat(me->GetMap()->IsHeroic() ? 32s : 45s);
-            });
-            break;
+                // Kaddrak glare of the tribunal
+                scheduler.Schedule(47s, [this](TaskContext context) {
+                    if (Creature* kaddrak = GetKaddrak())
+                        if (Player* plr = SelectTargetFromPlayerList(100.0f))
+                            kaddrak->CastSpell(plr, SPELL_GLARE_OF_THE_TRIBUNAL, true);
+                    // Alternate eye position 1s after each glare
+                    scheduler.Schedule(1s, [this](TaskContext) {
+                        if (Creature* kaddrak = GetKaddrak())
+                        {
+                            if (_leftEye)
+                                kaddrak->UpdatePosition(923.5f, 326.358f, 219.73332f, 2.28638f, true);
+                            else
+                                kaddrak->UpdatePosition(928.f, 331.276f, 219.73332f, 1.83259f, true);
+                            _leftEye = !_leftEye;
+                            kaddrak->StopMovingOnCurrentPos();
+                        }
+                    });
+                    context.Repeat(1500ms);
+                });
+                // Protector spawning
+                scheduler.Schedule(52s, [this](TaskContext context) {
+                    SummonCreatures(NPC_DARK_RUNE_PROTECTOR);
+                    context.Repeat(me->GetMap()->IsHeroic() ? 23500ms : 32500ms);
+                });
+                break;
+            case 2:
+                // Marnak head visual activates
+                scheduler.Schedule(3s, [this](TaskContext) {
+                    SwitchHeadVisual(0x2, true);
+                });
+                // Marnak dark matter
+                scheduler.Schedule(13s, [this](TaskContext context) {
+                    DoMarnakDarkMatter();
+                    context.Repeat(30s);
+                });
+                // Stormcaller spawning
+                scheduler.Schedule(20s, [this](TaskContext context) {
+                    SummonCreatures(NPC_DARK_RUNE_STORMCALLER);
+                    context.Repeat(me->GetMap()->IsHeroic() ? 32s : 41500ms);
+                });
+                break;
+            case 3:
+                // Abedneum head visual activates
+                scheduler.Schedule(6s, [this](TaskContext) {
+                    SwitchHeadVisual(0x4, true);
+                });
+                // Abedneum searing gaze
+                scheduler.Schedule(16s, [this](TaskContext context) {
+                    DoAbedneumSearingGaze();
+                    context.Repeat(15s);
+                });
+                // Golem spawning
+                scheduler.Schedule(27s, [this](TaskContext context) {
+                    SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN);
+                    context.Repeat(me->GetMap()->IsHeroic() ? 32s : 45s);
+                });
+                break;
         }
     }
 
     void EndTribunalFight()
     {
+        if (!instance)
+            return;
+
         // Stop all combat abilities and spawning
         scheduler.CancelAll();
         me->m_Events.KillAllEvents(false);
+        _recentlySpoken = false;
 
         // Schedule end sequence talks
         me->m_Events.AddEventAtOffset([this] {

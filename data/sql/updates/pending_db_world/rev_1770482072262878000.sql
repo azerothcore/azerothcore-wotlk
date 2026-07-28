@@ -96,6 +96,9 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (30897, 2, 0, 'Unknown. Data suggests that impetus for global combat originated with prime designate Loken, who neutralized all remaining Aesir and Vanir, affecting termination of conflict. Prime designate Loken then initiated stasis of several seed races, including earthen, giants and vrykul, at designated holding facilities.', 14, 0, 100, 0, 0, 13763, 30607, 0, 'marnak SAY_LORE_2'),
 (30897, 3, 0, 'Essentially that is correct.', 14, 0, 100, 0, 0, 13764, 30608, 0, 'marnak SAY_LORE_3');
 
+-- The escort no longer runs on ScriptedEscortAI, the old script_waypoint path is dead
+DELETE FROM `script_waypoint` WHERE `entry` = 28070;
+
 DELETE FROM `waypoint_data` WHERE `id` IN (280701, 280702);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `move_type`) VALUES
 -- Escort

@@ -102,14 +102,13 @@ enum npcs
 
     ACTION_START_ESCORT_EVENT       = 0,
     ACTION_START_TRIBUNAL           = 1,
-    ACTION_TRIBUNAL_WIPE_START      = 2,
-    ACTION_GO_TO_SJONNIR            = 3,
-    ACTION_OPEN_DOOR                = 4,
-    ACTION_START_SJONNIR_FIGHT      = 5,
-    ACTION_SJONNIR_DEAD             = 6,
-    ACTION_SJONNIR_WIPE_START       = 7,
-    ACTION_PLAYER_DEATH_IN_TRIBUNAL = 8,
-    ACTION_SKIP_PHASE               = 9,
+    ACTION_GO_TO_SJONNIR            = 2,
+    ACTION_OPEN_DOOR                = 3,
+    ACTION_START_SJONNIR_FIGHT      = 4,
+    ACTION_SJONNIR_DEAD             = 5,
+    ACTION_SJONNIR_WIPE_START       = 6,
+    ACTION_PLAYER_DEATH_IN_TRIBUNAL = 7,
+    ACTION_SKIP_PHASE               = 8,
 };
 
 template <class AI, class T>
