@@ -1,9 +1,11 @@
 --
 UPDATE `creature_template` SET `ScriptName` = '' WHERE (`entry` = 23784);
 
+DELETE FROM `script_waypoint` WHERE `entry` = 23784;
+
 DELETE FROM `creature_template_addon` WHERE (`entry` = 23784);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(23784, 0, 0, 0, 0, 0, 0, '5680');
+(23784, 0, 0, 0, 1, 0, 0, '5680');
 
 SET @CGUID := 117903;
 SET @PATH := @CGUID * 10;
@@ -55,57 +57,65 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23784;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23784);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(23784, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2378400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Respawn - Run Script'),
-(23784, 0, 1, 0, 1, 0, 100, 0, 30000, 30000, 30000, 30000, 0, 0, 5, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Out of Combat - Play Emote OneShotBeg if Near Lieutenant Celeyne'),
-(23784, 0, 2, 0, 2, 0, 100, 0, 0, 75, 10000, 10000, 0, 0, 11, 17534, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Between 0-75% Health - Cast \'Healing Potion\''),
-(23784, 0, 3, 4, 19, 0, 100, 0, 11241, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Quest \'Trail of Fire\' Taken - Store Targetlist'),
-(23784, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 237840, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Quest \'Trail of Fire\' Taken - Start Path'),
-(23784, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Quest \'Trail of Fire\' Taken - Set Reactstate Aggressive'),
-(23784, 0, 6, 0, 108, 0, 100, 0, 3, 237840, 0, 0, 0, 0, 80, 2378401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 3 of Path 237840 Reached - Run Script'),
-(23784, 0, 7, 0, 108, 0, 100, 0, 14, 237840, 0, 0, 0, 0, 80, 2378402, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 14 of Path 237840 Reached - Run Script'),
-(23784, 0, 8, 0, 108, 0, 100, 0, 20, 237840, 0, 0, 0, 0, 80, 2378403, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 20 of Path 237840 Reached - Run Script'),
-(23784, 0, 9, 0, 108, 0, 100, 0, 21, 237840, 0, 0, 0, 0, 80, 2378404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 21 of Path 237840 Reached - Run Script'),
-(23784, 0, 10, 0, 108, 0, 100, 0, 27, 237840, 0, 0, 0, 0, 80, 2378405, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 27 of Path 237840 Reached - Run Script'),
-(23784, 0, 11, 0, 108, 0, 100, 0, 34, 237840, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 34 of Path 237840 Reached - Say Line 7'),
-(23784, 0, 12, 0, 108, 0, 100, 0, 37, 237840, 0, 0, 0, 0, 80, 2378406, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 37 of Path 237840 Reached - Run Script');
+(23784, 0, 0 , 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2378400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Respawn - Run Script'),
+(23784, 0, 1 , 0, 1, 0, 100, 0, 30000, 30000, 30000, 30000, 0, 0, 5, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Out of Combat - Play Emote OneShotBeg if Near Lieutenant Celeyne'),
+(23784, 0, 2 , 0, 2, 0, 100, 0, 0, 75, 10000, 10000, 0, 0, 11, 17534, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Between 0-75% Health - Cast \'Healing Potion\''),
+(23784, 0, 3 , 0, 19, 0, 100, 0, 11241, 0, 0, 0, 0, 0, 80, 2378401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Quest \'Trail of Fire\' Taken - Run Script'),
+(23784, 0, 4 , 0, 108, 0, 100, 0, 3, 1179030, 0, 0, 0, 0, 80, 2378402, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 3 of Path 237840 Reached - Run Script'),
+(23784, 0, 5 , 0, 108, 0, 100, 0, 14, 1179030, 0, 0, 0, 0, 80, 2378403, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 14 of Path 237840 Reached - Run Script'),
+(23784, 0, 6 , 0, 108, 0, 100, 0, 20, 1179030, 0, 0, 0, 0, 80, 2378404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 20 of Path 237840 Reached - Run Script'),
+(23784, 0, 7 , 0, 108, 0, 100, 0, 21, 1179030, 0, 0, 0, 0, 80, 2378405, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 21 of Path 237840 Reached - Run Script'),
+(23784, 0, 8 , 0, 108, 0, 100, 0, 27, 1179030, 0, 0, 0, 0, 80, 2378406, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 27 of Path 237840 Reached - Run Script'),
+(23784, 0, 9 , 0, 108, 0, 100, 0, 34, 1179030, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 34 of Path 237840 Reached - Say Line 7'),
+(23784, 0, 10, 0, 108, 0, 100, 0, 37, 1179030, 0, 0, 0, 0, 80, 2378407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Point 37 of Path 237840 Reached - Run Script'),
+(23784, 0, 11, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 6, 11241, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Just Died - Fail Quest \'Trail of Fire\''),
+(23784, 0, 12, 0, 19, 0, 100, 0, 11241, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - On Quest \'Trail of Fire\' Taken - Store Targetlist');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378400);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2378400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Set Flag Standstate Kneel'),
-(2378400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Set Reactstate Passive');
+(2378400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Add Npc Flags Questgiver'),
+(2378400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 1933, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Set Faction 1933');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378401);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2378401, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 1'),
-(2378401, 9, 1, 0, 0, 0, 100, 0, 4600, 4600, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 2');
+(2378401, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Remove FlagStandstate Kneel'),
+(2378401, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 0'),
+(2378401, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 232, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Set Faction 232'),
+(2378401, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1179030, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Start Path 1179030');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378402);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2378402, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 11, 42685, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Cast \'Burn\''),
-(2378402, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 3');
+(2378402, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 1'),
+(2378402, 9, 1, 0, 0, 0, 100, 0, 4600, 4600, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 2');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378403);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2378403, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 11, 42685, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Cast \'Burn\'');
+(2378403, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 11, 42685, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Cast \'Burn\''),
+(2378403, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 3');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378404);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2378404, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 11, 42685, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Cast \'Burn\''),
-(2378404, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 4');
+(2378404, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 11, 42685, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Cast \'Burn\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378405);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2378405, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 11, 42685, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Cast \'Burn\''),
-(2378405, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Play Emote 11'),
-(2378405, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 5'),
-(2378405, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 6');
+(2378405, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 4');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378406);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2378406, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Set Orientation Stored'),
-(2378406, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 8'),
-(2378406, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 26, 11241, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Quest Credit \'Trail of Fire\''),
-(2378406, 9, 3, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Despawn Instant');
+(2378406, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 11, 42685, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Cast \'Burn\''),
+(2378406, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Play Emote 11'),
+(2378406, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 5'),
+(2378406, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 6');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378407);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2378407, 9, 0, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Set Orientation Stored'),
+(2378407, 9, 1, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Say Line 8'),
+(2378407, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 26, 11241, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Quest Credit \'Trail of Fire\''),
+(2378407, 9, 3, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Hanes - Actionlist - Despawn Instant');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23968;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23968);
@@ -116,6 +126,6 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 42685, 0, 0, 31, 0, 3, 23968, 0, 0, 0, 0, '', 'Spell \'Burn\' (42685) from \'Trail of Fire\' (11241) Quest Requires Target \'Hanes Fire Trigger\' (23968)');
 
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2) AND (`SourceEntry` = 23784) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 23964) AND (`ConditionValue2` = 5) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2) AND (`SourceEntry` = 23784) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 23964) AND (`ConditionValue2` = 5) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 2, 23784, 0, 0, 29, 0, 23964, 5, 0, 0, 0, 0, '', 'Apothecary Hanes (23784) will only emote Beg when near an alive Lieutenant Celeyne (23964)');
+(22, 2, 23784, 0, 0, 29, 1, 23964, 5, 0, 0, 0, 0, '', 'Apothecary Hanes (23784) will only emote Beg when near an alive Lieutenant Celeyne (23964)');
