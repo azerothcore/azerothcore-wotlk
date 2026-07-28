@@ -2172,14 +2172,17 @@ void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnT
     if (forceRespawnTimer > 0s)
         m_respawnDelay = forceRespawnTimer.count();
 
-    if (IsAlive())
+    bool const wasAlive = IsAlive();
+
+    if (wasAlive)
         setDeathState(DeathState::JustDied, true);
 
     // Xinef: Set new respawn time, ignore corpse decay time...
-    // After setDeathState, m_respawnTime includes m_corpseDelay which we don't
-    // want for a forced respawn. Override it so RemoveCorpse's max() picks ours.
-    if (forceRespawnTimer > 0s)
-        m_respawnTime = GameTime::GetGameTime().count() + forceRespawnTimer.count();
+    // setDeathState(JustDied) folds m_corpseDelay into m_respawnTime, but a creature
+    // despawned while alive never leaves a corpse, so the decay must not be charged.
+    // Recompute so RemoveCorpse's max() has nothing stale to pick up.
+    if (forceRespawnTimer > 0s || wasAlive)
+        m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelay;
 
     RemoveCorpse(true);
 
