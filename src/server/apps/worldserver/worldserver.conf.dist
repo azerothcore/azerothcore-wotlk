@@ -1839,6 +1839,20 @@ PlayerSave.Stats.MinLevel = 0
 PlayerSave.Stats.SaveOnlyOnLogout = 1
 
 #
+#    PlayerSave.AdditionalSaves
+#        Description: Bitmask of player data to save to the database a few seconds after
+#                     important changes instead of waiting for the next periodic save
+#                     (PlayerSaveInterval). Reduces the progress lost on a server crash.
+#                     Combine the values to enable multiple triggers.
+#        Values:      1 - Inventory and gold (after looting an item of rare or better quality)
+#                     2 - Quest status (after quest status changes)
+#                     4 - Achievements (after completing an achievement)
+#        Default:     0 - (Disabled)
+#                     7 - (All of the above)
+
+PlayerSave.AdditionalSaves = 0
+
+#
 #    CleanCharacterDB
 #        Description: Clean out deprecated achievements, skills, spells and talents from the db.
 #        Default:     0 - (Disabled)
