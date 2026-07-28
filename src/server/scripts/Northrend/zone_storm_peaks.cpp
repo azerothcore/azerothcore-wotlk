@@ -1358,15 +1358,6 @@ class spell_riding_jokkum : public AuraScript
 };
 
 // Quest Where Time Went Wrong (13048)
-enum WhereTimeWentWrong
-{
-    SPELL_CORRECT_TIME_PERIOD   = 56796,
-    SPELL_INCORRECT_TIME_PERIOD = 56797,
-
-    SAY_CORRECT_TIME_PERIOD     = 31171,
-    SAY_INCORRECT_TIME_PERIOD   = 31172
-};
-
 class spell_q13048_time_period : public SpellScript
 {
     PrepareSpellScript(spell_q13048_time_period);
@@ -1374,13 +1365,11 @@ class spell_q13048_time_period : public SpellScript
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Player* player = GetHitPlayer();
+
         if (!player)
             return;
 
-        if (GetSpellInfo()->Id == SPELL_CORRECT_TIME_PERIOD)
-            player->Unit::Say(SAY_CORRECT_TIME_PERIOD);
-        else if (GetSpellInfo()->Id == SPELL_INCORRECT_TIME_PERIOD)
-            player->Unit::Say(SAY_INCORRECT_TIME_PERIOD);
+        player->Unit::Say(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
     }
 
     void Register() override
