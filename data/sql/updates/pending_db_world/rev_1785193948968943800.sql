@@ -7,7 +7,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2471300, 9, 1, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Crowleg" Dan - Actionlist - Say Line'),
 (2471300, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 2, 14, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Crowleg" Dan - Actionlist - Set Faction 14'),
 (2471300, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '"Crowleg" Dan - Actionlist - Start Attacking'),
-(2471300, 9, 4, 0, 0, 0, 100, 0, 30000, 30000, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '"Crowleg" Dan - Actionlist - Add Npc Flags Gossip'),
+(2471300, 9, 4, 0, 0, 0, 100, 0, 30000, 30000, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Crowleg" Dan - Actionlist - Add Npc Flags Gossip'),
 (2471300, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 1888, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Crowleg" Dan - Actionlist - Set Faction 1888');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 24713);
