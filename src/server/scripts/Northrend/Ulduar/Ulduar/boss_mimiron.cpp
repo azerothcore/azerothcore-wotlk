@@ -1359,7 +1359,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 _events.Repeat(10s);
                 break;
             case EVENT_SPELL_ROCKET_STRIKE:
-                me->CastSpell(me, _phase == 2 ? SPELL_ROCKET_STRIKE_SINGLE : SPELL_ROCKET_STRIKE_BOTH, true);
+                me->CastSpell(me, _phase == 2 ? SPELL_ROCKET_STRIKE_SINGLE : SPELL_ROCKET_STRIKE_BOTH);
                 _events.Repeat(20s);
                 _events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 10s);
                 break;

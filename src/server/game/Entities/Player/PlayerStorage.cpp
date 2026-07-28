@@ -7254,6 +7254,18 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 }
 
+// flag data to be saved by UpdateAdditionalSaves a moment after an important change,
+// filtered by the PlayerSave.AdditionalSaves config mask
+void Player::AdditionalSavingAddMask(uint8 mask)
+{
+    mask &= sWorld->getIntConfig(CONFIG_ADDITIONAL_SAVES);
+    if (!mask)
+        return;
+
+    m_additionalSaveTimer = 2000;
+    m_additionalSaveMask |= mask;
+}
+
 // fast save function for item/money cheating preventing - save only inventory and money state
 void Player::SaveInventoryAndGoldToDB(CharacterDatabaseTransaction trans)
 {
