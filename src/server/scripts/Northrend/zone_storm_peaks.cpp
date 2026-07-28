@@ -1361,7 +1361,7 @@ class spell_riding_jokkum : public AuraScript
 enum WhereTimeWentWrong
 {
     SPELL_CORRECT_TIME_PERIOD   = 56796,
-    // SPELL_INCORRECT_TIME_PERIOD = 56797,
+    SPELL_INCORRECT_TIME_PERIOD = 56797,
 
     SAY_CORRECT_TIME_PERIOD     = 31171,
     SAY_INCORRECT_TIME_PERIOD   = 31172
