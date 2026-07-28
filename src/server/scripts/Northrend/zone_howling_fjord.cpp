@@ -452,12 +452,15 @@ class spell_q11296_rivenwood_captives : public SpellScript
             return;
 
         uint32 spellId = urand(SPELL_SUMMON_HOSTILE_START, SPELL_SUMMON_HOSTILE_END);
+
         if (GetSpellInfo()->Id == SPELL_CAPTIVES_ON_QUEST && roll_chance_i(50))
+        {
             spellId = SPELL_SUMMON_FREED_SCOUT;
 
-        if (spellId == SPELL_SUMMON_FREED_SCOUT && caster->IsCreature())
-            if (Player* player = caster->ToCreature()->GetLootRecipient())
-                player->RewardPlayerAndGroupAtEvent(NPC_FREED_SCOUT, player);
+            if (Creature* web = caster->ToCreature())
+                if (Player* player = web->GetLootRecipient())
+                    player->RewardPlayerAndGroupAtEvent(NPC_FREED_SCOUT, player);
+        }
 
         caster->CastSpell(caster, spellId, true);
     }
