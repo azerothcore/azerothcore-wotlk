@@ -2235,7 +2235,7 @@ struct DarkFallenAI : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        float const CALL_FOR_HELP_RADIUS = 8.5f;
+        float const CALL_FOR_HELP_RADIUS = 10.0f;
         IsDoingEmotes = false;
         Scheduler.CancelAll();
         ScheduleSpells();
