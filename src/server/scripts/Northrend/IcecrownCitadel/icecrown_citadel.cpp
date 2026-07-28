@@ -329,6 +329,14 @@ enum MovementPoints
     POINT_LAND  = 1,
 };
 
+enum CrimsonHallTrashGuids
+{
+    GUID_DARKFALLEN_ADVISOR      = 201479,
+    GUID_DARKFALLEN_ARCHMAGE     = 201482,
+    GUID_DARKFALLEN_BLOOD_KNIGHT = 201646,
+    GUID_DARKFALLEN_NOBLE        = 201659
+};
+
 class FrostwingVrykulSearcher
 {
 public:
@@ -1986,14 +1994,21 @@ public:
     }
 };
 
+// The four Crimson Hall entrance darkfallen sit up to 13.3yd away from their
+// Empowering Blood Orb, so a 10.0f lookup only ever registered one of them as a
+// minion and the group pull in npc_icc_orb_controller::SetGUID never fired for
+// the other three. Measured from the orb, 15.0f covers the whole pack without
+// reaching the upper level orbs (they are ~33yd higher).
+float const ORB_CONTROLLER_MINION_RANGE = 15.0f;
+
 class ICCOrbControllerMinionSearch
 {
 public:
-    ICCOrbControllerMinionSearch(Unit* owner, bool checkCasting) : _owner(owner), _checkCasting(checkCasting) {}
+    ICCOrbControllerMinionSearch(Unit* owner, bool checkCasting, float range = 10.0f) : _owner(owner), _checkCasting(checkCasting), _range(range) {}
 
     bool operator()(Creature* target) const
     {
-        if (!target->IsAlive() || (_checkCasting && target->HasUnitState(UNIT_STATE_CASTING)) || target->GetWaypointPath() || _owner->GetDistance(target) > 10.0f)
+        if (!target->IsAlive() || (_checkCasting && target->HasUnitState(UNIT_STATE_CASTING)) || target->GetWaypointPath() || _owner->GetDistance(target) > _range)
             return false;
 
         switch (target->GetEntry())
@@ -2013,6 +2028,7 @@ private:
     // Need check to not use polymorph in a casting creature
     Unit* _owner;
     bool _checkCasting;
+    float _range;
 };
 
 std::vector<uint32> DarkFallensEmotes =
@@ -2035,9 +2051,9 @@ struct npc_icc_orb_controller : public ScriptedAI
         _scheduler.Schedule(1s, [this](TaskContext /*initialize*/)
             {
                 std::vector<Creature*> creatures;
-                ICCOrbControllerMinionSearch check(me, false);
+                ICCOrbControllerMinionSearch check(me, false, ORB_CONTROLLER_MINION_RANGE);
                 Acore::CreatureListSearcher<ICCOrbControllerMinionSearch> searcher(me, creatures, check);
-                Cell::VisitObjects(me, searcher, 10.0f);
+                Cell::VisitObjects(me, searcher, ORB_CONTROLLER_MINION_RANGE);
 
                 if (creatures.empty())
                     return;
@@ -2109,11 +2125,22 @@ struct npc_icc_orb_controller : public ScriptedAI
         if (_minionGuids.empty())
             return;
 
-        for (ObjectGuid minionGuid : _minionGuids)
+        // CreatureAI::DoZoneInCombat() replaces "me" with the creature passed in,
+        // so calling it with the puller only re-engaged the puller and left the
+        // rest of the pack out of combat. Assist on its target instead, the same
+        // way CallOfHelpCreatureInRangeDo does.
+        Unit * target = darkfallen->GetVictim();
+        if (!target)
+            target = darkfallen->GetThreatMgr().GetAnyTarget();
+
+        if (target)
         {
-            if (Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid))
-                if (minion->IsAIEnabled && !minion->IsInCombat())
-                    minion->AI()->DoZoneInCombat(darkfallen);
+            for (ObjectGuid minionGuid : _minionGuids)
+            {
+                if (Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid))
+                    if (minion->IsAIEnabled && !minion->IsInCombat())
+                    minion->EngageWithTarget(target);
+            }
         }
 
         if (Unit* minion = ObjectAccessor::GetUnit(*me, Acore::Containers::SelectRandomContainerElement(_minionGuids)))
@@ -2190,11 +2217,29 @@ struct DarkFallenAI : public ScriptedAI
                 });
     }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        switch (me->GetSpawnId())
+        {
+        case GUID_DARKFALLEN_ADVISOR:
+        case GUID_DARKFALLEN_ARCHMAGE:
+        case GUID_DARKFALLEN_BLOOD_KNIGHT:
+        case GUID_DARKFALLEN_NOBLE:
+            if (InstanceScript* instance = me->GetInstanceScript())
+                instance->SetData(DATA_BPC_TRASH_DIED, 1);
+            break;
+        default:
+            break;
+        }
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
+        float const CALL_FOR_HELP_RADIUS = 8.5f;
         IsDoingEmotes = false;
         Scheduler.CancelAll();
         ScheduleSpells();
+        me->CallForHelp(CALL_FOR_HELP_RADIUS);
         if (Unit* trigger = ObjectAccessor::GetUnit(*me, TriggerGuid))
             trigger->GetAI()->SetGUID(me->GetGUID(), ACTION_COMBAT);
     }
