@@ -21,9 +21,11 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "MiscPackets.h"
 #include "ObjectMgr.h"
+#include "Random.h"
 
 class CreatureTextBuilder
 {
@@ -196,6 +198,62 @@ void CreatureTextMgr::LoadCreatureTextLocales()
     LOG_INFO("server.loading", " ");
 }
 
+void CreatureTextMgr::LoadCreatureTextOptions()
+{
+    uint32 oldMSTime = getMSTime();
+
+    mTextOptionsMap.clear();
+
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEXT_OPTIONS);
+    PreparedQueryResult result = WorldDatabase.Query(stmt);
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 creature text options. DB table `creature_text_options` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 creatureId   = fields[0].Get<uint32>();
+        uint8  groupId      = fields[1].Get<uint8>();
+
+        CreatureTextOptions options;
+        options.cooldown     = fields[2].Get<uint32>();
+        options.triggerChance = fields[3].Get<uint8>();
+        options.playerOnly   = fields[4].Get<bool>();
+
+        if (options.triggerChance > 100)
+        {
+            LOG_ERROR("sql.sql", "CreatureTextMgr: Entry {}, Group {} in table `creature_text_options` has TriggerChance {} > 100. Setting to 100.", creatureId, groupId, options.triggerChance);
+            options.triggerChance = 100;
+        }
+
+        mTextOptionsMap[creatureId][groupId] = options;
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Creature Text Options in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+CreatureTextOptions const* CreatureTextMgr::GetTextOptions(uint32 entry, uint8 group) const
+{
+    auto entryItr = mTextOptionsMap.find(entry);
+    if (entryItr == mTextOptionsMap.end())
+        return nullptr;
+
+    auto groupItr = entryItr->second.find(group);
+    if (groupItr == entryItr->second.end())
+        return nullptr;
+
+    return &groupItr->second;
+}
+
 uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject const* target /*= nullptr*/, ChatMsg msgType /*= CHAT_MSG_ADDON*/, Language language /*= LANG_ADDON*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, uint32 sound /*= 0*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/, Player* srcPlr /*= nullptr*/)
 {
     if (!source)
@@ -218,6 +276,21 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
     }
 
     CreatureTextGroup const& textGroupContainer = itr->second;  //has all texts in the group
+
+    // Check creature_text_options for this group
+    CreatureTextOptions const* options = GetTextOptions(source->GetEntry(), textGroup);
+    if (options)
+    {
+        if (options->playerOnly && (!target || !target->IsPlayer()))
+            return 0;
+
+        if (options->triggerChance < 100 && !roll_chance_i(options->triggerChance))
+            return 0;
+
+        if (options->cooldown > 0 && source->IsTextOnCooldown(textGroup))
+            return 0;
+    }
+
     CreatureTextRepeatIds repeatGroup = source->GetTextRepeatGroup(textGroup);//has all textIDs from the group that were already said
     CreatureTextGroup tempGroup;//will use this to talk after sorting repeatGroup
 
@@ -265,6 +338,11 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
     }
 
     source->SetTextRepeatId(textGroup, iter->id);
+
+    // Set cooldown if creature_text_options specifies one
+    if (options && options->cooldown > 0)
+        source->SetTextCooldown(textGroup, options->cooldown);
+
     return iter->duration;
 }
 

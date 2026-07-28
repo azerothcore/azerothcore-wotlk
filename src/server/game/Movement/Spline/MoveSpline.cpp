@@ -119,7 +119,7 @@ namespace Movement
         int32 _time;
     };
 
-    void MoveSpline::init_spline(const MoveSplineInitArgs& args)
+    void MoveSpline::init_spline(MoveSplineInitArgs const& args)
     {
         const SplineBase::EvaluationMode modes[2] = {SplineBase::ModeLinear, SplineBase::ModeCatmullrom};
         if (args.flags.cyclic)

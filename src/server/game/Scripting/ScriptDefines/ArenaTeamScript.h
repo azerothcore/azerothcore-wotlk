@@ -35,7 +35,7 @@ enum ArenaTeamHook
 class ArenaTeamScript : public ScriptObject
 {
 protected:
-    ArenaTeamScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    ArenaTeamScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; };

@@ -66,12 +66,11 @@ enum Misc
 
 struct boss_gurtogg_bloodboil : public BossAI
 {
-    boss_gurtogg_bloodboil(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL), _recentlySpoken(false) { }
+    boss_gurtogg_bloodboil(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL) { }
 
     void Reset() override
     {
         BossAI::Reset();
-        _recentlySpoken = false;
     }
 
     void JustEngagedWith(Unit* who) override
@@ -145,13 +144,7 @@ struct boss_gurtogg_bloodboil : public BossAI
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if (!_recentlySpoken)
-        {
-            Talk(SAY_SLAY);
-            me->m_Events.AddEventAtOffset([&] {
-                _recentlySpoken = false;
-            }, 6s);
-        }
+        Talk(SAY_SLAY);
     }
 
     void JustSummoned(Creature* summon) override
@@ -171,8 +164,6 @@ struct boss_gurtogg_bloodboil : public BossAI
         return me->GetHomePosition().GetExactDist2d(me) > 105.0f;
     }
 
-private:
-    bool _recentlySpoken;
 };
 
 class spell_gurtogg_bloodboil : public SpellScript

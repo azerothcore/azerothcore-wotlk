@@ -23,8 +23,8 @@
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
-#include "ArenaTeamMgr.h"
 #include "ArenaSeasonMgr.h"
+#include "ArenaTeamMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -42,6 +42,7 @@
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
 #include "DBCStores.h"
+#include "DBUpdater.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
@@ -52,14 +53,16 @@
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "IPLocation.h"
 #include "InstanceSaveMgr.h"
+#include "IPLocation.h"
 #include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
 #include "M2Stores.h"
+#include "MailMgr.h"
 #include "MapMgr.h"
 #include "Metric.h"
 #include "MotdMgr.h"
@@ -79,6 +82,7 @@
 #include "SmartAI.h"
 #include "SpellMgr.h"
 #include "TaskScheduler.h"
+#include "TC9Sidecar.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
@@ -264,7 +268,7 @@ void World::LoadConfigSettings(bool reload)
 #if AC_PLATFORM == AC_PLATFORM_UNIX || AC_PLATFORM == AC_PLATFORM_APPLE
     if (dataPath[0] == '~')
     {
-        const char* home = getenv("HOME");
+        char const* home = getenv("HOME");
         if (home)
             dataPath.replace(0, 1, home);
     }
@@ -846,7 +850,7 @@ void World::SetInitialWorldSettings()
     ///- Handle outdated emails (delete/return)
     LOG_INFO("server.loading", "Returning Old Mails...");
     LOG_INFO("server.loading", " ");
-    sObjectMgr->ReturnOrDeleteOldMails(false);
+    sMailMgr->ReturnOrDeleteOldMails(false);
 
     ///- Load AutoBroadCast
     LOG_INFO("server.loading", "Loading Autobroadcasts...");
@@ -867,6 +871,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Creature Texts...");
     sCreatureTextMgr->LoadCreatureTexts();
+
+    LOG_INFO("server.loading", "Loading Creature Text Options...");
+    sCreatureTextMgr->LoadCreatureTextOptions();
 
     LOG_INFO("server.loading", "Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
@@ -1053,6 +1060,13 @@ void World::SetInitialWorldSettings()
     if (sConfigMgr->isDryRun())
     {
         sMapMgr->UnloadAll();
+
+        if (uint32 failed = DBUpdaterUtil::GetFailedUpdateCount())
+        {
+            LOG_FATAL("server.loading", "AzerothCore Dry Run Completed With {} Failed Database Update(s), Terminating.", failed);
+            exit(1);
+        }
+
         LOG_INFO("server.loading", "AzerothCore Dry Run Completed, Terminating.");
         exit(0);
     }
@@ -1192,7 +1206,7 @@ void World::Update(uint32 diff)
 
     if (currentGameTime > _mail_expire_check_timer)
     {
-        sObjectMgr->ReturnOrDeleteOldMails(true);
+        sMailMgr->ReturnOrDeleteOldMails(true);
         _mail_expire_check_timer = currentGameTime + 6h;
     }
 
@@ -1282,6 +1296,12 @@ void World::Update(uint32 diff)
         stmt->SetData(2, realm.Id.Realm);
         stmt->SetData(3, uint32(GameTime::GetStartTime().count()));
         LoginDatabase.Execute(stmt);
+
+        // Re-assert this realm as online in case the offline flag was set externally (e.g. an authserver restart).
+        LoginDatabasePreparedStatement* onlineStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_REALM_ONLINE);
+        onlineStmt->SetData(0, uint8(REALM_FLAG_OFFLINE));
+        onlineStmt->SetData(1, realm.Id.Realm);
+        LoginDatabase.Execute(onlineStmt);
     }
 
     ///- Process Game events when necessary
@@ -1320,6 +1340,24 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update world scripts"));
         sScriptMgr->OnWorldUpdate(diff);
+    }
+
+    if (sToCloud9Sidecar->ClusterModeEnabled())
+    {
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 async tasks"));
+            sToCloud9Sidecar->ProcessAsyncTasks();
+        }
+
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 hooks"));
+            sToCloud9Sidecar->ProcessHooks();
+        }
+
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 gRPC and HTTP requests"));
+            sToCloud9Sidecar->ProcessGrpcOrHttpRequests();
+        }
     }
 
     {
@@ -1450,10 +1488,15 @@ void World::_UpdateGameTime()
         ///- ... and it is overdue, stop the world (set m_stopEvent)
         if (_shutdownTimer <= elapsed.count())
         {
-            if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
-                _stopEvent = true;                         // exist code already set
-            else
-                _shutdownTimer = 1;                        // minimum timer value to wait idle state
+            ///- ... unless a Wintergrasp battle is running and deferral is enabled, in which case the
+            ///  shutdown/restart is pushed past the end of the current battle and the world keeps running
+            if (!RescheduleShutdownForWintergrasp())
+            {
+                if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
+                    _stopEvent = true;                     // exist code already set
+                else
+                    _shutdownTimer = 1;                    // minimum timer value to wait idle state
+            }
         }
         ///- ... else decrease it and if necessary display a shutdown countdown to the users
         else
@@ -1463,6 +1506,38 @@ void World::_UpdateGameTime()
             ShutdownMsg();
         }
     }
+}
+
+/// Defer a pending shutdown/restart if a Wintergrasp battle is currently running.
+/// Returns true when the shutdown timer was extended (world should keep running).
+bool World::RescheduleShutdownForWintergrasp()
+{
+    uint32 const bufferMinutes = getIntConfig(CONFIG_WINTERGRASP_DEFER_SHUTDOWN);
+    if (!bufferMinutes)
+        return false;
+
+    // Idle shutdowns wait for an empty server anyway; don't interfere with them
+    if (_shutdownMask & SHUTDOWN_MASK_IDLE)
+        return false;
+
+    Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+    if (!wg || !wg->IsEnabled() || !wg->IsWarTime())
+        return false;
+
+    // GetTimer() is the battle time remaining in milliseconds
+    _shutdownTimer = wg->GetTimer() / IN_MILLISECONDS + bufferMinutes * MINUTE;
+
+    LOG_INFO("server.worldserver", "Server {} deferred: Wintergrasp battle in progress, rescheduled in {}",
+        (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"), secsToTimeString(_shutdownTimer));
+
+    sWorldSessionMgr->DoForAllOnlinePlayers([](Player* player)
+    {
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+        sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, sObjectMgr->GetAcoreString(LANG_WG_SHUTDOWN_DEFERRED, locale), player);
+    });
+
+    ShutdownMsg(true);
+    return true;
 }
 
 /// Shutdown the server

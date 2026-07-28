@@ -50,12 +50,12 @@ public:
     [[nodiscard]] virtual bool isAfterLoadScript() const { return IsDatabaseBound(); }
     virtual void checkValidity() { }
 
-    [[nodiscard]] const std::string& GetName() const { return _name; }
+    [[nodiscard]] std::string const& GetName() const { return _name; }
 
     [[nodiscard]] uint16 GetTotalAvailableHooks() { return _totalAvailableHooks; }
 
 protected:
-    ScriptObject(const char* name, uint16 totalAvailableHooks = 0) : _name(std::string(name)), _totalAvailableHooks(totalAvailableHooks)
+    ScriptObject(char const* name, uint16 totalAvailableHooks = 0) : _name(std::string(name)), _totalAvailableHooks(totalAvailableHooks)
     {
     }
 

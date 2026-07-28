@@ -27,6 +27,9 @@
 #include <unordered_set>
 #include <vector>
 
+// Realm id packed into bits 32-47 of a player ObjectGuid; 0 means local / non-crossrealm.
+constexpr uint16 DEFAULT_NON_CROSSREALM_REALM_ID = 0;
+
 enum TypeID
 {
     TYPEID_OBJECT        = 0,
@@ -142,6 +145,7 @@ class ObjectGuid
         [[nodiscard]] uint64   GetRawValue() const { return _guid; }
         [[nodiscard]] HighGuid GetHigh() const { return HighGuid((_guid >> 48) & 0x0000FFFF); }
         [[nodiscard]] uint32   GetEntry() const { return HasEntry() ? uint32((_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
+        [[nodiscard]] uint16   GetRealmID() const { return IsPlayer() ? uint16((_guid >> 32) & UI64LIT(0xFFFF)) : 0; }
         [[nodiscard]] LowType  GetCounter()  const
         {
             return HasEntry()
@@ -283,12 +287,13 @@ public:
     ObjectGuidGeneratorBase(ObjectGuid::LowType start = 1) : _nextGuid(start) { }
 
     virtual void Set(ObjectGuid::LowType val) { _nextGuid = val; }
-    virtual ObjectGuid::LowType Generate() = 0;
+    virtual ObjectGuid::LowType Generate(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID) = 0;
     [[nodiscard]] ObjectGuid::LowType GetNextAfterMaxUsed() const { return _nextGuid; }
     virtual ~ObjectGuidGeneratorBase() = default;
 
 protected:
     static void HandleCounterOverflow(HighGuid high);
+    static bool GetClusterGuid(HighGuid high, uint16 realmId, ObjectGuid::LowType& clusterGuid);
     ObjectGuid::LowType _nextGuid;
 };
 
@@ -298,8 +303,12 @@ class ObjectGuidGenerator : public ObjectGuidGeneratorBase
 public:
     explicit ObjectGuidGenerator(ObjectGuid::LowType start = 1) : ObjectGuidGeneratorBase(start) { }
 
-    ObjectGuid::LowType Generate() override
+    ObjectGuid::LowType Generate(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID) override
     {
+        ObjectGuid::LowType clusterGuid = 0;
+        if (GetClusterGuid(high, realmId, clusterGuid))
+            return clusterGuid;
+
         if (_nextGuid >= ObjectGuid::GetMaxCounter(high) - 1)
             HandleCounterOverflow(high);
 

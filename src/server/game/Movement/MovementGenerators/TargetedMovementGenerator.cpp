@@ -104,15 +104,40 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
     if (owner->IsHovering())
         owner->UpdateAllowedPositionZ(x, y, z);
 
-    bool success = i_path->CalculatePath(x, y, z, forceDest);
-    uint32 pathType = i_path->GetPathType();
-    bool pathFailed = !success || (pathType & PATHFIND_NOPATH);
+    auto isPathUsable = [&]()
+    {
+        uint32 pathType = i_path->GetPathType();
+        if (pathType & PATHFIND_NOPATH)
+            return false;
 
-    // For pets, treat incomplete paths as failures to avoid clipping through geometry
-    // Players and Player-controlled units have more erratic movement, skip failure
-    if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer()) && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer())
-        if (pathType & PATHFIND_INCOMPLETE)
-            pathFailed = true;
+        // For pets, treat incomplete paths as failures to avoid clipping through geometry
+        // Players and Player-controlled units have more erratic movement, skip failure
+        if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer())
+            && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer())
+            if (pathType & PATHFIND_INCOMPLETE)
+                return false;
+
+        return true;
+    };
+
+    bool pathFailed = !i_path->CalculatePath(x, y, z, forceDest) || !isPathUsable();
+
+    // Targets with an oversized combat reach can stand entirely over unwalkable space
+    // (e.g. Kologarn) so pathing to their center or to an angled near point (pets chase
+    // to behind the target, which may hang over the void) fails even though the melee
+    // ring covers the navmesh. Retry against the nearest point on the ring, ignoring the
+    // chase angle, via GetNearPoint2D: GetNearPoint's LoS repositioning must be avoided
+    // here, it can rotate the point to the far side of the target.
+    if (pathFailed && (!_range || _range->MaxRange <= CONTACT_DISTANCE)
+        && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer() && GetTarget()->GetCombatReach() > NOMINAL_MELEE_RANGE)
+    {
+        GetTarget()->GetNearPoint2D(owner, x, y, 0.0f, GetTarget()->GetAngle(owner));
+        z = GetTarget()->GetPositionZ();
+        owner->UpdateAllowedPositionZ(x, y, z);
+        pathFailed = !i_path->CalculatePath(x, y, z, forceDest) || !isPathUsable();
+        // the destination already lies on the melee ring, nothing to cut
+        cutPath = false;
+    }
 
     if (pathFailed)
     {
@@ -171,20 +196,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || isStoppedBecauseOfCasting)
     {
+        // Every time a caster mob stops to cast a spell, the leash timer ticks down. Once the timer expires, the mob evades and walks home.
         owner->StopMoving();
         _lastTargetPosition.reset();
+
         if (cOwner)
         {
-            if (isStoppedBecauseOfCasting)
-            {
-                // Don't reset leash timer if it's a spell like Shoot with a short cast time.
-                /// @todo: Research how it should actually work.
-                Spell *spell = cOwner->GetFirstCurrentCastingSpell();
-                bool spellHasLongCast = spell && spell->GetCastTime() > 1 * SECOND * IN_MILLISECONDS;
-                if (spellHasLongCast)
-                    cOwner->UpdateLeashExtensionTime();
-            }
-            else
+            if (!isStoppedBecauseOfCasting)
                 cOwner->UpdateLeashExtensionTime();
 
             cOwner->SetCannotReachTarget();

@@ -27,6 +27,7 @@
 #include "AuthSocketMgr.h"
 #include "Banner.h"
 #include "Config.h"
+#include "DBUpdater.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "GitRevision.h"
@@ -129,6 +130,10 @@ int main(int argc, char** argv)
 
     std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
 
+    // Mark every realm offline on startup; each worldserver clears this flag for its own realm once it is ready.
+    // This prevents realms from appearing online in the realm list when no worldserver is actually running.
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {}", REALM_FLAG_OFFLINE);
+
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
     // Get the list of realms for the server
@@ -145,6 +150,12 @@ int main(int argc, char** argv)
     // Stop auth server if dry run
     if (sConfigMgr->isDryRun())
     {
+        if (uint32 failed = DBUpdaterUtil::GetFailedUpdateCount())
+        {
+            LOG_FATAL("server.authserver", "Dry run completed with {} failed database update(s), terminating.", failed);
+            return 1;
+        }
+
         LOG_INFO("server.authserver", "Dry run completed, terminating.");
         return 0;
     }

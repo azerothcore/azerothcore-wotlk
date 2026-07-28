@@ -630,7 +630,7 @@ public:
                 if (TempSummon* summon = me->ToTempSummon())
                     if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(me->GetEntry());
+                            player->RewardPlayerAndGroupAtEvent(me->GetEntry(), player);
             }
         }
     };

@@ -31,7 +31,7 @@ struct Position
     Position(Position const& loc) { Relocate(loc); }
     /* requried as of C++ 11 */
     Position(Position&&) = default;
-    Position& operator=(const Position&) = default;
+    Position& operator=(Position const&) = default;
     Position& operator=(Position&&) = default;
 
     struct PositionXYStreamer
@@ -95,7 +95,7 @@ struct Position
         m_orientation = orientation;
     }
 
-    void Relocate(const Position& pos)
+    void Relocate(Position const& pos)
     {
         m_positionX = pos.m_positionX;
         m_positionY = pos.m_positionY;
@@ -103,7 +103,7 @@ struct Position
         m_orientation = pos.m_orientation;
     }
 
-    void Relocate(const Position* pos)
+    void Relocate(Position const* pos)
     {
         m_positionX = pos->m_positionX;
         m_positionY = pos->m_positionY;
@@ -112,7 +112,7 @@ struct Position
     }
 
     void RelocatePolarOffset(float angle, float dist, float z = 0.0f);
-    void RelocateOffset(const Position& offset);
+    void RelocateOffset(Position const& offset);
     void SetOrientation(float orientation)
     {
         m_orientation = orientation;
@@ -183,10 +183,10 @@ struct Position
     [[nodiscard]] float GetExactDist(Position const& pos) const { return GetExactDist(pos.m_positionX, pos.m_positionY, pos.m_positionZ); }
     float GetExactDist(Position const* pos) const { return GetExactDist(*pos); }
 
-    void GetPositionOffsetTo(const Position& endPos, Position& retOffset) const;
+    void GetPositionOffsetTo(Position const& endPos, Position& retOffset) const;
     [[nodiscard]] Position GetPositionWithOffset(Position const& offset) const;
 
-    float GetAngle(const Position* pos) const;
+    float GetAngle(Position const* pos) const;
     [[nodiscard]] float GetAngle(float x, float y) const;
     [[nodiscard]] float GetAbsoluteAngle(float x, float y) const
     {
@@ -198,7 +198,7 @@ struct Position
     [[nodiscard]] float GetAbsoluteAngle(Position const& pos) const { return GetAbsoluteAngle(pos.m_positionX, pos.m_positionY); }
     [[nodiscard]] float GetAbsoluteAngle(Position const* pos) const { return GetAbsoluteAngle(*pos); }
 
-    float GetRelativeAngle(const Position* pos) const
+    float GetRelativeAngle(Position const* pos) const
     {
         return NormalizeOrientation(GetAngle(pos) - m_orientation);
     }
@@ -213,7 +213,7 @@ struct Position
         return GetExactDist2dSq(x, y) < dist * dist;
     }
 
-    bool IsInDist2d(const Position* pos, float dist) const
+    bool IsInDist2d(Position const* pos, float dist) const
     {
         return GetExactDist2dSq(pos) < dist * dist;
     }
@@ -223,13 +223,13 @@ struct Position
         return GetExactDistSq(x, y, z) < dist * dist;
     }
 
-    bool IsInDist(const Position* pos, float dist) const
+    bool IsInDist(Position const* pos, float dist) const
     {
         return GetExactDistSq(pos) < dist * dist;
     }
 
-    [[nodiscard]] bool IsWithinBox(const Position& center, float xradius, float yradius, float zradius) const;
-    bool HasInArc(float arcangle, const Position* pos, float targetRadius = 0.0f) const;
+    [[nodiscard]] bool IsWithinBox(Position const& center, float xradius, float yradius, float zradius) const;
+    bool HasInArc(float arcangle, Position const* pos, float targetRadius = 0.0f) const;
     bool HasInLine(Position const* pos, float width) const;
     bool HasInLine(Position const* pos, float objSize, float width) const;
     [[nodiscard]] std::string ToString() const;
@@ -261,7 +261,7 @@ public:
     WorldLocation(uint32 mapId, Position const& position)
             : Position(position), m_mapId(mapId) { }
 
-    void WorldRelocate(const WorldLocation& loc)
+    void WorldRelocate(WorldLocation const& loc)
     {
         m_mapId = loc.GetMapId();
         Relocate(loc);
