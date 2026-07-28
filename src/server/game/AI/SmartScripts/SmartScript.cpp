@@ -1496,11 +1496,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
             {
-                if (IsUnit(target))
+                if (IsCreature(target))
                 {
                     float x, y, z;
-                    target->ToUnit()->GetClosePoint(x, y, z, target->ToUnit()->GetObjectSize() / 3, (float)e.action.moveRandom.distance);
-                    target->ToUnit()->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
+                    target->ToCreature()->GetClosePoint(x, y, z, target->ToCreature()->GetObjectSize() / 3, (float)e.action.moveRandom.distance);
+                    target->ToCreature()->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
                 }
             }
             break;
