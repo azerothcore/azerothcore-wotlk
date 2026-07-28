@@ -1,3 +1,4 @@
+-- DB update 2026_07_26_02 -> 2026_07_28_00
 --
 UPDATE `spell_area` SET `spell` = 44018 WHERE `spell` = 44017 AND `area` = 3990 AND `quest_start` = 11504 AND `aura_spell` = 0 AND `racemask` = 0 AND `gender` = 2;
 
