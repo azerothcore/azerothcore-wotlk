@@ -589,11 +589,12 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
 
         uint32 next_reset = uint32(((resetTime + MINUTE) / DAY * DAY) + period + diff);
         // catch up in one step if the server was offline across more than one reset period.
-        // _ResetSave() below still only needs to run once regardless of how many periods were
-        // skipped: `extended` is a single-shot flag, not a per-period counter, so one pass
-        // still correctly drops it before the actual unbind on the following normal reset.
+        bool missedMultiplePeriods = false;
         while (next_reset <= uint32(now))
+        {
             next_reset += period;
+            missedMultiplePeriods = true;
+        }
         SetResetTimeFor(mapid, difficulty, next_reset);
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
         ScheduleReset(time_t(next_reset - 3600), InstResetEvent(1, mapid, difficulty));
@@ -607,11 +608,21 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
 
         // remove all binds to instances of the given map and delete from db (delete per instance id, no mass deletion!)
         // do this after new reset time is calculated
-        for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(), itr2; itr != m_instanceSaveById.end(); )
+        // extended locks need a second pass to fully clear: PlayerUnbindInstanceNotExtended
+        // (called from _ResetSave) only flips `extended` to false on the first call and
+        // unbinds on the next one, matching a real reset one period later. When more than
+        // one period was missed while offline, run the teardown twice so extended players
+        // end up unbound here too, instead of just losing the extension - `extended` is a
+        // single-shot flag, so two passes are enough no matter how many periods were skipped.
+        uint8 resetPasses = missedMultiplePeriods ? 2 : 1;
+        for (uint8 pass = 0; pass < resetPasses; ++pass)
         {
-            itr2 = itr++;
-            if (itr2->second->GetMapId() == mapid && itr2->second->GetDifficulty() == difficulty)
-                _ResetSave(itr2);
+            for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(), itr2; itr != m_instanceSaveById.end(); )
+            {
+                itr2 = itr++;
+                if (itr2->second->GetMapId() == mapid && itr2->second->GetDifficulty() == difficulty)
+                    _ResetSave(itr2);
+            }
         }
     }
 
