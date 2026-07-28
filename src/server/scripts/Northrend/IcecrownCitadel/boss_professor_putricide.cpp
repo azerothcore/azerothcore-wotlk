@@ -844,6 +844,11 @@ public:
         void CastMainSpell() override
         {
             me->CastSpell(me, SPELL_VOLATILE_OOZE_ADHESIVE, false);
+            // Fix for upstream #26710 (1eb3749b3): channel spells with SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL
+            // no longer set UNIT_STATE_CASTING in SetCurrentCastedSpell, causing ooze AI UpdateAI to
+            // repeatedly trigger SelectNewTarget and interrupt the channel. Manually set the state here;
+            // it is cleared automatically by Spell::cancel() when the channel ends or is interrupted.
+            me->AddUnitState(UNIT_STATE_CASTING);
         }
     };
 
@@ -868,6 +873,9 @@ public:
         void CastMainSpell() override
         {
             me->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, me, false);
+            // Same fix as Volatile Ooze: prevent UpdateAI from repeatedly triggering SelectNewTarget
+            // while the spell is active, which would break Gas Cloud targeting.
+            me->AddUnitState(UNIT_STATE_CASTING);
         }
 
     private:
