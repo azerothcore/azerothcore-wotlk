@@ -1,3 +1,4 @@
+-- DB update 2026_07_28_02 -> 2026_07_28_03
 --
 -- Quest 11529 "Sorlof's Booty": restore the sniffed cannon chain.
 --
