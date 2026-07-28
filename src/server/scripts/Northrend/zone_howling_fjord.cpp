@@ -435,15 +435,15 @@ class spell_q11296_rivenwood_captives : public SpellScript
 {
     PrepareSpellScript(spell_q11296_rivenwood_captives);
 
-bool Validate(SpellInfo const* /*spellInfo*/) override
-{
-    bool valid = ValidateSpellInfo({ SPELL_SUMMON_FREED_SCOUT });
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        bool valid = ValidateSpellInfo({ SPELL_SUMMON_FREED_SCOUT });
 
-    for (uint32 spellId = SPELL_SUMMON_HOSTILE_START; spellId <= SPELL_SUMMON_HOSTILE_END; ++spellId)
-        valid = valid && ValidateSpellInfo({ spellId });
+        for (uint32 spellId = SPELL_SUMMON_HOSTILE_START; spellId <= SPELL_SUMMON_HOSTILE_END; ++spellId)
+            valid = valid && ValidateSpellInfo({ spellId });
 
-    return valid;
-}
+        return valid;
+    }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
