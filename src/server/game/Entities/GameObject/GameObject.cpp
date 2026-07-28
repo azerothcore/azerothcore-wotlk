@@ -2968,6 +2968,7 @@ public:
     explicit GameObjectModelOwnerImpl(GameObject* owner) : _owner(owner) { }
 
     bool IsSpawned() const override { return _owner->isSpawned(); }
+    bool IsTransport() const override { return _owner->IsTransport(); }
     uint32 GetDisplayId() const override { return _owner->GetDisplayId(); }
     uint32 GetPhaseMask() const override { return (_owner->GetGoState() == GO_STATE_READY || _owner->IsTransport()) ? _owner->GetPhaseMask() : 0; }
     G3D::Vector3 GetPosition() const override { return G3D::Vector3(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ()); }
