@@ -5,7 +5,7 @@
 -- -------------------------------------------
 -- Bythius the Flesh-Shaper (Entry 28212, GUID 100735)
 -- Patrol leader
-UPDATE `creature` SET `position_x`= 6093.8193, `position_y`= 3697.6428, `position_z`= 121.3801, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 2 WHERE `guid`= 100735 AND `id` = 28212;
+UPDATE `creature` SET `position_x`= 6093.8193, `position_y`= 3697.6428, `position_z`= 121.3801, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 2 WHERE `guid`= 100735 AND `id`= 28212;
 
 DELETE FROM `creature_addon` WHERE `guid`= 100735;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -29,17 +29,20 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
     (1007350, 14, 6092.3813, 3732.4739, 111.712875, NULL, 0, 0, 0, 0, 0, 100, 0);
 -- Cerberon (Entry 28207, GUID 100431)
 -- Spawns in formation, 15 yd behind Bythius at 165 degrees
-UPDATE `creature` SET `position_x`= 6090.5401, `position_y`= 3683.0056, `position_z`= 126.22, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100431 AND `id` = 28207;
+UPDATE `creature` SET `position_x`= 6090.5401, `position_y`= 3683.0056, `position_z`= 126.22, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100431 AND `id`= 28207;
 -- Glonn (Entry 28211, GUID 100704)
 -- Spawns in formation, 15 yd behind Bythius at 205 degrees
-UPDATE `creature` SET `position_x`= 6100.7147, `position_y`= 3684.3212, `position_z`= 127.55, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100704 AND `id` = 28211;
+UPDATE `creature` SET `position_x`= 6100.7147, `position_y`= 3684.3212, `position_z`= 127.55, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100704 AND `id`= 28211;
 -- Plague-dog pack formation (leader 100735, plague-dogs flank on opposite sides)
+-- point_1/point_2 mirror the follow angle so each hound keeps to the same side of the trail
+-- on the return leg. They are matched against the waypoint Bythius is moving TOWARD, so they
+-- name the leg after each reversal: 2 = leaving waypoint 1 (south end), 9 = leaving waypoint 8 (north end)
 DELETE FROM `creature_formations` WHERE `leaderGUID`= 100735 OR `memberGUID` IN (100735, 100431, 100704);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
     (100735, 100735, 0, 0, 7, 0, 0),
-    (100735, 100431, 15, 165, 519, 1, 8),
-    (100735, 100704, 15, 205, 519, 1, 8);
+    (100735, 100431, 15, 165, 519, 2, 9),
+    (100735, 100704, 15, 205, 519, 2, 9);
 -- Remove Bythius SAI that spawns another set of plague-dogs
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28212;
+UPDATE `creature_template` SET `AIName`= 'SmartAI' WHERE `entry`= 28212;
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28212) AND (`source_type` = 0) AND (`id` IN (0, 1));
+DELETE FROM `smart_scripts` WHERE (`entryorguid`= 28212) AND (`source_type`= 0) AND (`id` IN (0, 1));
