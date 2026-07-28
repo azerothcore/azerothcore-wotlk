@@ -1378,9 +1378,9 @@ class spell_q13048_time_period : public SpellScript
             return;
 
         if (GetSpellInfo()->Id == SPELL_CORRECT_TIME_PERIOD)
-            player->Unit::Say(SAY_CORRECT_TIME_PERIOD, player);
-        else
-            player->Unit::Say(SAY_INCORRECT_TIME_PERIOD, player);
+            player->Unit::Say(SAY_CORRECT_TIME_PERIOD);
+        else if (GetSpellInfo()->Id == SPELL_INCORRECT_TIME_PERIOD)
+            player->Unit::Say(SAY_INCORRECT_TIME_PERIOD);
     }
 
     void Register() override
