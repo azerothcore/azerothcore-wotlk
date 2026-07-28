@@ -542,8 +542,14 @@ struct boss_hodir : public BossAI
         for (uint8 i = 0; i < 8; ++i)
         {
             Creature* helper = GetHelper(i);
-            if (!helper || !helper->IsAlive())
+            if (!helper)
                 continue;
+
+            if (!helper->IsAlive())
+            {
+                helper->DespawnOrUnsummon();
+                continue;
+            }
 
             // Stop combat behavior and start victory emote chain
             helper->AI()->DoAction(ACTION_VICTORY_EMOTE);
