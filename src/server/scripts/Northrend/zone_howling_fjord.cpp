@@ -72,123 +72,6 @@ public:
 };
 
 /*######
-## npc_apothecary_hanes
-######*/
-enum Entries
-{
-    NPC_APOTHECARY_HANES         = 23784,
-    NPC_HANES_FIRE_TRIGGER       = 23968,
-    QUEST_TRAIL_OF_FIRE          = 11241,
-    SPELL_COSMETIC_LOW_POLY_FIRE = 56274,
-    SPELL_HEALING_POTION         = 17534
-};
-
-class npc_apothecary_hanes : public CreatureScript
-{
-public:
-    npc_apothecary_hanes() : CreatureScript("npc_apothecary_hanes") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
-        {
-            creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
-            creature->SetWalk(true);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
-        }
-        return true;
-    }
-
-    struct npc_Apothecary_HanesAI : public npc_escortAI
-    {
-        npc_Apothecary_HanesAI(Creature* creature) : npc_escortAI(creature) { }
-        uint32 PotTimer;
-
-        void Reset() override
-        {
-            SetDespawnAtFar(false);
-            PotTimer = 10000; //10 sec cooldown on potion
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Player* player = GetPlayerForEscort())
-                player->FailQuest(QUEST_TRAIL_OF_FIRE);
-        }
-
-        void UpdateEscortAI(uint32 diff) override
-        {
-            if (HealthBelowPct(75))
-            {
-                if (PotTimer <= diff)
-                {
-                    DoCast(me, SPELL_HEALING_POTION, true);
-                    PotTimer = 10000;
-                }
-                else PotTimer -= diff;
-            }
-            if (GetAttack() && UpdateVictim())
-                DoMeleeAttackIfReady();
-        }
-
-        using CreatureAI::WaypointReached;
-        void WaypointReached(uint32 waypointId) override
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 1:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetWalk(false);
-                    break;
-                case 23:
-                    player->GroupEventHappens(QUEST_TRAIL_OF_FIRE, me);
-                    me->DespawnOrUnsummon();
-                    break;
-                case 5:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    me->SetWalk(true);
-                    break;
-                case 6:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    me->SetWalk(false);
-                    break;
-                case 8:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    me->SetWalk(true);
-                    break;
-                case 9:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    break;
-                case 10:
-                    me->SetWalk(false);
-                    break;
-                case 13:
-                    me->SetWalk(true);
-                    break;
-                case 14:
-                    if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
-                        Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    me->SetWalk(false);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_Apothecary_HanesAI(creature);
-    }
-};
-
-/*######
 ## npc_plaguehound_tracker
 ######*/
 
@@ -683,7 +566,6 @@ class spell_sorlofs_booty_big_gun_assault : public SpellScript
 void AddSC_howling_fjord()
 {
     new npc_attracted_reef_bull();
-    new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     RegisterCreatureAI(npc_rodin_lightning_enabler);
     RegisterSpellScript(spell_hawk_hunting);
