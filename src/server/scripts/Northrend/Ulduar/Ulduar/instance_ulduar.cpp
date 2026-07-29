@@ -997,6 +997,24 @@ public:
             }
             return false;
         }
+
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
+        {
+            if (_SkipCheckRequiredBosses(player))
+                return true;
+
+            switch (bossId)
+            {
+                case BOSS_YOGGSARON:
+                    if (GetBossState(BOSS_VEZAX) != DONE)
+                        return false;
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
+        }
     };
 };
 
