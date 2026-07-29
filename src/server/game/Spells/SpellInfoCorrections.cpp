@@ -5254,6 +5254,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    //mimiron - SUMMON_ROCKET_STRIKE
+    ApplySpellFix({ 63036 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Speed = 24.0f;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
