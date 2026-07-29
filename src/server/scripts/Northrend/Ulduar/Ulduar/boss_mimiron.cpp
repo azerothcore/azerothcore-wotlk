@@ -1906,11 +1906,6 @@ struct npc_ulduar_mimiron_rocket : public NullCreatureAI
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
     }
 
-    void SetData(uint32  /*id*/, uint32  /*value*/) override
-    {
-        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, FORCED_MOVEMENT_NONE, 0.f, false, true);
-    }
-
     void UpdateAI(uint32  /*diff*/) override
     {
         if (!me->GetVehicle())
