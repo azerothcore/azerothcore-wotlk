@@ -174,6 +174,9 @@ enum YoggEvents
     EVENT_YS_DEAFENING_ROAR             = 31,
     EVENT_YS_SUMMON_GUARDIAN            = 32,
     EVENT_YS_SHADOW_BEACON              = 33,
+
+    EVENT_SARA_WIPE_OPEN_DOOR           = 40,
+    EVENT_SARA_WIPE_RESPAWN             = 41,
 };
 
 enum NPCsGOs
@@ -257,6 +260,7 @@ enum Misc
     EVENT_PHASE_ONE                     = 1,
     EVENT_PHASE_TWO                     = 2,
     EVENT_PHASE_THREE                   = 3,
+    EVENT_PHASE_WIPE_RECOVERY           = 4,
 
     CRITERIA_NOT_GETTING_OLDER          = 21001,
 
@@ -388,6 +392,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
     float _summonSpeed;
     uint8 _currentIllusion;
     bool _isIllusionReversed;
+    bool _isWipeRecovering = false;
 
     void AttackStart(Unit*) override { }
     void MoveInLineOfSight(Unit*) override { }
@@ -414,11 +419,10 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (!_EnterEvadeMode(why))
             return;
 
-        Position pos;
-        pos = me->GetHomePosition();
+        Position pos = me->GetHomePosition();
         me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
-        Reset();
-        me->setActive(false);
+
+        HandleWipeRecovery();
     }
 
     void EnableSara(bool apply)
@@ -435,6 +439,18 @@ struct boss_yoggsaron_sara : public ScriptedAI
             me->DisableRotate(true);
             me->AddUnitState(UNIT_STATE_ROOT);
         }
+    }
+
+    void HandleWipeRecovery()
+    {
+        _isWipeRecovering = true;
+        Reset();
+        me->SetVisible(false);
+
+        events.SetPhase(EVENT_PHASE_WIPE_RECOVERY);
+        events.ScheduleEvent(EVENT_SARA_WIPE_OPEN_DOOR, 20s, 0, EVENT_PHASE_WIPE_RECOVERY);
+        events.ScheduleEvent(EVENT_SARA_WIPE_RESPAWN, 30s, 0, EVENT_PHASE_WIPE_RECOVERY);
+        me->setActive(true);
     }
 
     void Reset() override
@@ -455,17 +471,20 @@ struct boss_yoggsaron_sara : public ScriptedAI
         events.Reset();
         summons.DespawnAll();
 
-        me->SetVisible(true);
+        if (!_isWipeRecovering)
+        {
+            me->SetVisible(true);
+            SpawnClouds();
+            UpdateKeeperSpawns();
+        }
+
         me->SetDisplayId(me->GetNativeDisplayId());
         me->SetDisableGravity(true);
         me->SetFaction(FACTION_FRIENDLY);
         me->ClearUnitState(UNIT_STATE_EVADE);
         EnableSara(false);
-        SpawnClouds();
 
         _initFight = 1;
-
-        UpdateKeeperSpawns();
         _summonedGuardiansCount = 0;
         _p2TalkTimer = 0;
         _secondPhase = false;
@@ -479,18 +498,18 @@ struct boss_yoggsaron_sara : public ScriptedAI
             _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
             if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
                 voice->AI()->DoAction(ACTION_VOICE_STOP);
-            _instance->SetBossState(BOSS_YOGGSARON, NOT_STARTED);
-            if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
-                go->SetGoState(GO_STATE_ACTIVE);
+            if (!_isWipeRecovering)
+            {
+                _instance->SetBossState(BOSS_YOGGSARON, NOT_STARTED);
+                if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
+                    go->SetGoState(GO_STATE_ACTIVE);
+            }
         }
     }
 
     void InitFight(Unit* target)
     {
         if (!_instance)
-            return;
-
-        if (_instance->GetBossState(BOSS_VEZAX) != DONE)
             return;
 
         _instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
@@ -724,7 +743,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         // Guardians can be spawned by walking into Ominous Clouds even when InitFight
-        // never ran (e.g. Vezax not defeated); their novas must not start phase 2 then.
         if (!_instance || _instance->GetBossState(BOSS_YOGGSARON) != IN_PROGRESS || !attacker || attacker->GetEntry() != NPC_GUARDIAN_OF_YS || _secondPhase)
         {
             damage = 0;
@@ -769,6 +787,39 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        if (_isWipeRecovering)
+        {
+            events.Update(diff);
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_SARA_WIPE_OPEN_DOOR:
+                        if (_instance)
+                            if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
+                                go->SetGoState(GO_STATE_ACTIVE);
+                        break;
+                    case EVENT_SARA_WIPE_RESPAWN:
+                        if (_instance)
+                        {
+                            if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
+                                go->SetGoState(GO_STATE_ACTIVE);
+
+                            _instance->SetBossState(BOSS_YOGGSARON, NOT_STARTED);
+                        }
+
+                        me->SetVisible(true);
+                        SpawnClouds();
+                        UpdateKeeperSpawns();
+                        events.Reset();
+                        _isWipeRecovering = false;
+                        me->setActive(false);
+                        break;
+                }
+            }
+            return;
+        }
+
         if (_initFight)
         {
             _initFight += diff;
