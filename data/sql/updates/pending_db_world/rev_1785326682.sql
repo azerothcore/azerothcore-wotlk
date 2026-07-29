@@ -3,6 +3,12 @@
 UPDATE `creature_text` SET `Emote` = 1 WHERE (`CreatureID` IN (29032, 29061, 29065, 29067, 29068, 29070, 29071, 29072, 29073, 29074)) AND (`GroupID` IN (0, 2, 3, 4, 5, 6, 7, 8));
 UPDATE `creature_text` SET `Emote` = 25 WHERE (`CreatureID` IN (29032, 29061, 29065, 29067, 29068, 29070, 29071, 29072, 29073, 29074)) AND (`GroupID` IN (1));
 
+-- Deactive RegenHealth.
+UPDATE `creature_template` SET `RegenHealth` = 0 WHERE (`entry` IN (29032, 29061, 29065, 29067, 29068, 29070, 29071, 29072, 29073, 29074));
+
+-- Set Curhealth to 30%.
+UPDATE `creature` SET `curhealth` = 3 WHERE (`id` IN (29032, 29061, 29065, 29067, 29068, 29070, 29071, 29072, 29073, 29074));
+
 -- Remove Script Name and Enable SAI.
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` IN (29032, 29061, 29065, 29067, 29068, 29070, 29071, 29072, 29073, 29074));
 
