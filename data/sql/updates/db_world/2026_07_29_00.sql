@@ -1,3 +1,4 @@
+-- DB update 2026_07_28_05 -> 2026_07_29_00
 --
 UPDATE `creature_template` SET `ScriptName` = '' WHERE (`entry` = 23784);
 
