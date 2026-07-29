@@ -1906,15 +1906,6 @@ struct npc_ulduar_mimiron_rocket : public NullCreatureAI
         me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
     }
-
-    void UpdateAI(uint32  /*diff*/) override
-    {
-        if (!me->GetVehicle())
-        {
-            me->SetSpeed(MOVE_RUN, me->GetSpeedRate(MOVE_RUN) + 0.4f, false);
-            me->SetSpeed(MOVE_FLIGHT, me->GetSpeedRate(MOVE_RUN), false);
-        }
-    }
 };
 
 struct npc_ulduar_bot_summon_trigger : public NullCreatureAI
