@@ -60,6 +60,7 @@ enum SpellData
     SPELL_ROCKET_STRIKE_BOTH                        = 65034, // VX-001 fires both mounted rockets
     SPELL_ROCKET_STRIKE_TARGET                      = 63681, // Cast by a fired rocket; picks the impact target (prefers ranged)
     SPELL_SUMMON_ROCKET_STRIKE                      = 63036, // Summons the ground strike at the chosen target
+    SPELL_ROCKET_STRIKE_DAMAGE                      = 63041,
     NPC_ROCKET_VISUAL                               = 34050,
     NPC_ROCKET_STRIKE_N                             = 34047,
 
@@ -2337,7 +2338,7 @@ struct npc_ulduar_rocket_strike_trigger : public NullCreatureAI
     {
         if (!target || !spell)
             return;
-        if (spell->Id == 63041)
+        if (spell->Id == SPELL_ROCKET_STRIKE_DAMAGE)
         {
             if (target->GetEntry() == NPC_ASSAULT_BOT)
                 me->CastSpell(me, 65040, true); // achievement Not-So-Friendly Fire
