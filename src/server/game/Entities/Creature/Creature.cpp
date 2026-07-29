@@ -1773,7 +1773,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
 
     // SelectLevel() sized the player damage requirement against full health, before curhealth was known
     ResetPlayerDamageReq();
-    
+
     // checked at creature_template loading
     m_defaultMovementType = MovementGeneratorType(data->movementType);
 
