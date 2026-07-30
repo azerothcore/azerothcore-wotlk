@@ -2049,25 +2049,25 @@ class spell_mimiron_magnetic_core_summon : public SpellScript
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
             return instance->GetCreature(DATA_MIMIRON_ACU);
 
-            return nullptr;
+        return nullptr;
     }
 
     SpellCastResult CheckCast()
     {
-        Creature * acu = GetAerialCommandUnit();
+        Creature* acu = GetAerialCommandUnit();
         if (!acu || !acu->IsAlive())
             return SPELL_FAILED_BAD_TARGETS;
 
         if (GetCaster()->GetExactDist2d(acu) > GetSpellInfo()->GetMaxRange(true))
             return SPELL_FAILED_OUT_OF_RANGE;
 
-            return SPELL_CAST_OK;
+        return SPELL_CAST_OK;
     }
 
     void HandleSummon(SpellEffIndex effIndex)
     {
         Unit* caster = GetCaster();
-        Creature * acu = GetAerialCommandUnit();
+        Creature* acu = GetAerialCommandUnit();
         if (!acu)
             return;
 
