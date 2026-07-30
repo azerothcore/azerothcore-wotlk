@@ -2044,17 +2044,50 @@ class spell_mimiron_magnetic_core_summon : public SpellScript
 {
     PrepareSpellScript(spell_mimiron_magnetic_core_summon);
 
-    void ModDest(SpellDestination& dest)
+    Creature* GetAerialCommandUnit()
+    {
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            return instance->GetCreature(DATA_MIMIRON_ACU);
+
+            return nullptr;
+    }
+
+    SpellCastResult CheckCast()
+    {
+        Creature * acu = GetAerialCommandUnit();
+        if (!acu || !acu->IsAlive())
+            return SPELL_FAILED_BAD_TARGETS;
+
+        if (GetCaster()->GetExactDist2d(acu) > GetSpellInfo()->GetMaxRange(true))
+            return SPELL_FAILED_OUT_OF_RANGE;
+
+            return SPELL_CAST_OK;
+    }
+
+    void HandleSummon(SpellEffIndex effIndex)
     {
         Unit* caster = GetCaster();
-        Position pos = caster->GetPosition();
+        Creature * acu = GetAerialCommandUnit();
+        if (!acu)
+            return;
+
+        PreventHitDefaultEffect(effIndex);
+
+        Position pos = acu->GetPosition();
         pos.m_positionZ = caster->GetMap()->GetHeight(pos);
-        dest.Relocate(pos);
+
+        uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
+        if (!entry)
+            entry = NPC_MAGNETIC_CORE;
+
+        int32 duration = GetSpellInfo()->GetDuration();
+        caster->SummonCreature(entry, pos, TEMPSUMMON_TIMED_DESPAWN, duration > 0 ? uint32(duration) : 30 * IN_MILLISECONDS);
     }
 
     void Register() override
     {
-        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_mimiron_magnetic_core_summon::ModDest, EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
+        OnCheckCast += SpellCheckCastFn(spell_mimiron_magnetic_core_summon::CheckCast);
+        OnEffectHit += SpellEffectFn(spell_mimiron_magnetic_core_summon::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
 };
 
