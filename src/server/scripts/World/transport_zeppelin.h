@@ -15,6 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef TRANSPORT_ZEPPELIN_H
+#define TRANSPORT_ZEPPELIN_H
+
 enum ZeppelinEvent
 {
     EVENT_UC_FROM_GROMGOL_ARRIVAL = 15312,
@@ -56,6 +59,11 @@ enum ZeppelinMaster
     NPC_KRENDLE_BIGPOCKETS = 34766,
 };
 
+enum ZeppelinTransport
+{
+    GO_WESTGUARD_ZEPPELIN = 186371,
+};
+
 const float SEARCH_RANGE_ZEPPELIN_MASTER = 32.0f;
 
 enum ZeppelinPassenger
@@ -67,3 +75,5 @@ enum ZeppelinPassenger
     NPC_SKY_CAPTAIN_CABLELAMP   = 25105,
     NPC_WATCHER_UMJIN           = 25107,
 };
+
+#endif
