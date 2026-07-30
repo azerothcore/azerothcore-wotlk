@@ -191,14 +191,20 @@ WestguardZeppelinState GetWestguardZeppelinState(Player* player, Map* map)
     if (!dockArriveTime)
         return ZEPPELIN_STATE_EN_ROUTE;
 
-    uint32 const timer = zeppelin->GetPathProgress() % zeppelin->GetPeriod();
+    uint32 const period = zeppelin->GetPeriod();
+    uint32 const timer = zeppelin->GetPathProgress() % period;
 
-    // the dock is covered by the last and the first stop frame of the path, so being
-    // docked spans the end of one period and the start of the next
-    if (timer >= dockArriveTime || timer < dockDepartTime)
+    // the dock is covered by the last and the first stop frame of the path, so the docked
+    // window normally wraps the end of one period into the start of the next
+    bool const docked = dockArriveTime > dockDepartTime
+        ? timer >= dockArriveTime || timer < dockDepartTime
+        : timer >= dockArriveTime && timer < dockDepartTime;
+
+    if (docked)
         return ZEPPELIN_STATE_DOCKED;
 
-    uint32 const msUntilArrival = dockArriveTime - timer;
+    // modular so it stays correct whichever way around the two stop frames sit
+    uint32 const msUntilArrival = (dockArriveTime + period - timer) % period;
     if (msUntilArrival <= MINUTE * IN_MILLISECONDS)
         return ZEPPELIN_STATE_ARRIVING;
 
