@@ -24,7 +24,6 @@
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "Map.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
@@ -34,13 +33,10 @@
 #include "SmartAI.h"
 #include "SpellAuras.h"
 #include "TaskScheduler.h"
-#include "Transport.h"
-#include "TransportMgr.h"
 #include "WaypointMgr.h"
 #include "World.h"
 #include "WorldState.h"
 #include "WorldStateDefines.h"
-#include "transport_zeppelin.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2692,123 +2688,6 @@ struct npc_traveler_mammoth_vendor : public ScriptedAI
     }
 };
 
-enum WestguardZeppelinGossip
-{
-    GOSSIP_TEXT_PETROV_EN_ROUTE       = 11322,
-    GOSSIP_TEXT_PETROV_ARRIVING       = 11324,
-    GOSSIP_TEXT_HARROWMEISER_DOCKED   = 11328,
-    GOSSIP_TEXT_HARROWMEISER_ARRIVING = 11330,
-    GOSSIP_TEXT_HARROWMEISER_EN_ROUTE = 11332,
-};
-
-// The two "en route" texts above read "in less than $3078w minutes". The client
-// substitutes that token with the world state below, so it renders 0 unless a value
-// has been pushed to the player first.
-enum WestguardZeppelinWorldState
-{
-    WORLD_STATE_ZEPPELIN_ETA = 3078,
-};
-
-enum WestguardZeppelinState
-{
-    ZEPPELIN_STATE_EN_ROUTE,
-    ZEPPELIN_STATE_ARRIVING,
-    ZEPPELIN_STATE_DOCKED,
-};
-
-// Reports where the Westguard Keep zeppelin is in its path. While it is still touring the
-// bay the remaining minutes are pushed to the player as WORLD_STATE_ZEPPELIN_ETA.
-WestguardZeppelinState GetWestguardZeppelinState(Player* player, Map* map)
-{
-    MotionTransport const* zeppelin = nullptr;
-    for (Transport* transport : map->GetAllTransports())
-        if (transport->GetEntry() == GO_WESTGUARD_ZEPPELIN)
-        {
-            zeppelin = transport->ToMotionTransport();
-            break;
-        }
-
-    if (!zeppelin || !zeppelin->GetPeriod())
-        return ZEPPELIN_STATE_EN_ROUTE;
-
-    uint32 dockArriveTime = 0;
-    uint32 dockDepartTime = 0;
-    for (KeyFrame const& frame : zeppelin->GetKeyFrames())
-    {
-        if (frame.Node->arrivalEventID == EVENT_WK_ARRIVAL)
-            dockArriveTime = frame.ArriveTime;
-        else if (frame.Node->departureEventID == EVENT_WK_DEPARTURE)
-            dockDepartTime = frame.DepartureTime;
-    }
-
-    if (!dockArriveTime)
-        return ZEPPELIN_STATE_EN_ROUTE;
-
-    uint32 const timer = zeppelin->GetPathProgress() % zeppelin->GetPeriod();
-
-    // the dock is covered by the last and the first stop frame of the path, so being
-    // docked spans the end of one period and the start of the next
-    if (timer >= dockArriveTime || timer < dockDepartTime)
-        return ZEPPELIN_STATE_DOCKED;
-
-    uint32 const msUntilArrival = dockArriveTime - timer;
-    if (msUntilArrival <= MINUTE * IN_MILLISECONDS)
-        return ZEPPELIN_STATE_ARRIVING;
-
-    // the texts read "less than X minutes", so round up
-    player->SendUpdateWorldState(WORLD_STATE_ZEPPELIN_ETA,
-        (msUntilArrival + MINUTE * IN_MILLISECONDS - 1) / (MINUTE * IN_MILLISECONDS));
-
-    return ZEPPELIN_STATE_EN_ROUTE;
-}
-
-// 23823 Harrowmeiser
-class npc_harrowmeiser : public CreatureScript
-{
-public:
-    npc_harrowmeiser() : CreatureScript("npc_harrowmeiser") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        uint32 textId = GOSSIP_TEXT_HARROWMEISER_EN_ROUTE;
-        switch (GetWestguardZeppelinState(player, creature->GetMap()))
-        {
-            case ZEPPELIN_STATE_DOCKED:
-                textId = GOSSIP_TEXT_HARROWMEISER_DOCKED;
-                break;
-            case ZEPPELIN_STATE_ARRIVING:
-                textId = GOSSIP_TEXT_HARROWMEISER_ARRIVING;
-                break;
-            default:
-                break;
-        }
-
-        SendGossipMenuFor(player, textId, creature->GetGUID());
-        return true;
-    }
-};
-
-// 23895 Bombardier Petrov
-class npc_bombardier_petrov : public CreatureScript
-{
-public:
-    npc_bombardier_petrov() : CreatureScript("npc_bombardier_petrov") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        // he has no docked text of his own, "she's almost here" covers being at the dock too
-        uint32 const textId = GetWestguardZeppelinState(player, creature->GetMap()) == ZEPPELIN_STATE_EN_ROUTE
-            ? GOSSIP_TEXT_PETROV_EN_ROUTE
-            : GOSSIP_TEXT_PETROV_ARRIVING;
-
-        SendGossipMenuFor(player, textId, creature->GetGUID());
-        return true;
-    }
-};
-
 void AddSC_npcs_special()
 {
     new npc_elder_clearwater();
@@ -2836,6 +2715,4 @@ void AddSC_npcs_special()
     RegisterCreatureAI(npc_crashin_thrashin_robot);
     RegisterCreatureAI(npc_controller);
     RegisterCreatureAI(npc_traveler_mammoth_vendor);
-    new npc_harrowmeiser();
-    new npc_bombardier_petrov();
 }
