@@ -17,6 +17,7 @@
 
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
+#include "TaskScheduler.h"
 #include "WorldState.h"
 #include "transport_zeppelin.h"
 
@@ -101,9 +102,41 @@ struct go_transport_the_purple_princess : GameObjectAI
     }
 };
 
+// 186371 Zeppelin - Westguard Keep to Shattered Straits
+struct go_transport_westguard_zeppelin : GameObjectAI
+{
+    go_transport_westguard_zeppelin(GameObject* object) : GameObjectAI(object) { };
+
+    void EventInform(uint32 eventId) override
+    {
+        if (eventId != EVENT_WK_ARRIVAL)
+            return;
+
+        if (Creature* creature = me->FindNearestCreature(NPC_HARROWMEISER, SEARCH_RANGE_ZEPPELIN_MASTER))
+            creature->AI()->Talk(0);
+
+        // the dock is covered by two stop frames of 60s each, so EVENT_WK_DEPARTURE
+        // only fires two minutes later - warn one minute before it does
+        _scheduler.Schedule(1min, [this](TaskContext /*context*/)
+        {
+            if (Creature* creature = me->FindNearestCreature(NPC_HARROWMEISER, SEARCH_RANGE_ZEPPELIN_MASTER))
+                creature->AI()->Talk(1);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 void AddSC_transport_zeppelins()
 {
     RegisterGameObjectAI(go_transport_the_iron_eagle);
     RegisterGameObjectAI(go_transport_the_thundercaller);
     RegisterGameObjectAI(go_transport_the_purple_princess);
+    RegisterGameObjectAI(go_transport_westguard_zeppelin);
 }

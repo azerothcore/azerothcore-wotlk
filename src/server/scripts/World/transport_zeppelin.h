@@ -36,6 +36,7 @@ enum ZeppelinEvent
     EVENT_UC_TO_OG_DEPARTURE      = 15321,
     EVENT_UC_TO_GROMGOL_DEPARTURE = 15313,
     EVENT_GROMGOL_TO_UC_DEPARTURE = 15315,
+    EVENT_WK_DEPARTURE            = 15430,
 };
 
 enum ZeppelinMaster
