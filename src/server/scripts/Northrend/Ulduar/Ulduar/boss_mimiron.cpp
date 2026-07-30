@@ -2066,12 +2066,12 @@ class spell_mimiron_magnetic_core_summon : public SpellScript
 
     void HandleSummon(SpellEffIndex effIndex)
     {
-        Unit* caster = GetCaster();
-        Creature* acu = GetAerialCommandUnit();
-        if (!acu)
-            return;
-
         PreventHitDefaultEffect(effIndex);
+
+        Unit* caster = GetCaster();
+        Creature const* acu = GetAerialCommandUnit();
+        if (!acu || !acu->IsAlive())
+            return;
 
         Position pos = acu->GetPosition();
         pos.m_positionZ = caster->GetMap()->GetHeight(pos);
