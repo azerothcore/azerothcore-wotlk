@@ -4181,8 +4181,11 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
             }
         case CURRENT_CHANNELED_SPELL:
             {
-                // channel spells always break generic non-delayed and any channeled spells
-                InterruptSpell(CURRENT_GENERIC_SPELL, false);
+                // channel spells always break generic non-delayed and any channeled spells,
+                // unless the channel itself is allowed to run alongside other actions
+                if (!pSpell->GetSpellInfo()->IsActionAllowedChannel())
+                    InterruptSpell(CURRENT_GENERIC_SPELL, false);
+
                 InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, bySelf);
 
                 // it also does break autorepeat if not Auto Shot
