@@ -717,6 +717,7 @@ struct boss_mimiron : public BossAI
                     LMK2->InterruptNonMeleeSpells(false);
                     LMK2->AttackStop();
                     LMK2->AI()->SetData(1, 0);
+                    LMK2->AI()->DoAction(1337);
                     LMK2->DespawnOrUnsummon(7s);
                     LMK2->SetReactState(REACT_PASSIVE);
                     VX001->InterruptNonMeleeSpells(false);
@@ -943,7 +944,7 @@ private:
 
 struct npc_ulduar_leviathan_mkii : public ScriptedAI
 {
-    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature)
+    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature), _summons(me)
     {
         instance = me->GetInstanceScript();
         _isEvading = false;
@@ -952,6 +953,7 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
     void Reset() override
     {
         _phase = 0;
+        _summons.DespawnAll();
         if (Unit* c = GetS3())
             c->ExitVehicle(); // this should never happen!
         if (Creature* c = me->SummonCreature(NPC_LEVIATHAN_MKII_CANNON, *me, TEMPSUMMON_MANUAL_DESPAWN))
@@ -973,6 +975,27 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
             me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
         }
+    }
+
+    // The mines are summoned by the MK II, not by Mimiron, so they are not part of
+    // Mimiron's SummonList and have to be cleaned up here.
+    void JustSummoned(Creature * summon) override
+    {
+        // The cannon lives in the vehicle kit and is handled by PassengerBoarded.
+        if (summon->GetEntry() == NPC_PROXIMITY_MINE)
+            _summons.Summon(summon);
+    }
+
+    void SummonedCreatureDespawn(Creature * summon) override
+    {
+        _summons.Despawn(summon);
+    }
+
+    void DoAction(int32 action) override
+    {
+        // Reset() covers the evade path; this covers the encounter being finished.
+        if (action == 1337)
+            _summons.DespawnAll();
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1201,6 +1224,7 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
 private:
     InstanceScript* instance;
     EventMap _events;
+    SummonList _summons;
     bool _isEvading;
     uint8 _phase;
 };
