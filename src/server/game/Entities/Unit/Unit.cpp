@@ -3310,6 +3310,16 @@ int32 Unit::GetMechanicResistChance(SpellInfo const* spell)
     return resist_mech;
 }
 
+namespace
+{
+bool IsWandAutoAttack(SpellInfo const* spellInfo)
+{
+    return spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON
+        && (spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND))
+        && spellInfo->IsAutoRepeatRangedSpell();
+}
+}
+
 // Melee based spells hit result calculations
 SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo)
 {
@@ -3322,7 +3332,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
     // Check damage class instead of attack type to correctly handle judgements
     // - they are meele, but can't be dodged/parried/deflected because of ranged dmg class
-    if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+    if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED || IsWandAutoAttack(spellInfo))
         attType = RANGED_ATTACK;
 
     int32 attackerWeaponSkill;
@@ -3663,6 +3673,9 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         }
     }
 
+    if (IsWandAutoAttack(spell))
+        return MeleeSpellHitResult(victim, spell);
+
     switch (spell->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_RANGED:
@@ -3741,6 +3754,9 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, Spell const* spell, bool CanRef
             return SPELL_MISS_REFLECT;
         }
     }
+
+    if (IsWandAutoAttack(spellInfo))
+        return MeleeSpellHitResult(victim, spellInfo);
 
     switch (spellInfo->DmgClass)
     {
@@ -12719,9 +12735,7 @@ void createProcFlags(SpellInfo const* spellInfo, WeaponAttackType attackType, bo
                 }
                 break;
             default:
-                if (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON &&
-                        spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND)
-                        && spellInfo->HasAttribute(SPELL_ATTR2_AUTO_REPEAT)) // Wands auto attack
+                if (IsWandAutoAttack(spellInfo))
                 {
                     procAttacker = PROC_FLAG_DONE_RANGED_AUTO_ATTACK;
                     procVictim   = PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK;
