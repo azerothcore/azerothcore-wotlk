@@ -1,3 +1,4 @@
+-- DB update 2026_07_30_00 -> 2026_07_31_00
 --
 DELETE FROM `creature_template_model` WHERE (`CreatureID` = 24701);
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
