@@ -1,3 +1,4 @@
+-- DB update 2026_07_31_01 -> 2026_07_31_02
 --
 -- Zeppelin, Alliance - Westguard Keep to Shattered Straits (taxi path 727)
 UPDATE `gameobject_template` SET `ScriptName` = 'go_transport_westguard_zeppelin' WHERE (`entry` = 186371);
