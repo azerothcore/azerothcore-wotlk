@@ -203,38 +203,37 @@ struct boss_vezax : public BossAI
                 Talk(SAY_BERSERK);
                 break;
             case EVENT_SPELL_VEZAX_SHADOW_CRASH:
+            {
+                events.Repeat(10s);
+
+                std::vector<Player*> rangedPlayers;
+                std::vector<Player*> meleePlayers;
+                Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                 {
-                    events.Repeat(10s);
+                    Player* temp = itr->GetSource();
+                    if (!temp || !temp->IsAlive())
+                        continue;
 
-                    std::vector<Player*> players;
-                    std::vector<Player*> meleePlayers;
-                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                    {
-                        Player* temp = itr->GetSource();
-                        if (!temp->IsAlive())
-                            continue;
-
-                        if (temp->GetDistance(me) > 15.0f)
-                            players.push_back(temp);
-                        else
-                            meleePlayers.push_back(temp);
-                    }
-
-                    // Shadow Crash can target melee players if nobody is at range
-                    if (players.empty())
-                        players = std::move(meleePlayers);
-
-                    if (!players.empty())
-                    {
-                        me->setAttackTimer(BASE_ATTACK, 2000);
-                        Player* target = players.at(urand(0, players.size() - 1));
-                        me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
-                        me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
-                        events.ScheduleEvent(EVENT_RESTORE_TARGET, 750ms);
-                    }
+                    if (temp->GetDistance(me) > 15.0f)
+                        rangedPlayers.push_back(temp);
+                    else
+                        meleePlayers.push_back(temp);
                 }
-                break;
+
+                // Shadow Crash can target melee players if nobody is at range
+                std::vector<Player*>& targets = rangedPlayers.empty() ? meleePlayers : rangedPlayers;
+
+                if (!targets.empty())
+                {
+                    me->setAttackTimer(BASE_ATTACK, 2000);
+                    Player* target = targets.at(urand(0, targets.size() - 1));
+                    me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
+                    me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
+                    events.ScheduleEvent(EVENT_RESTORE_TARGET, 750ms);
+                }
+            }
+            break;
             case EVENT_RESTORE_TARGET:
                 if (me->GetVictim())
                     me->SetGuidValue(UNIT_FIELD_TARGET, me->GetVictim()->GetGUID());
