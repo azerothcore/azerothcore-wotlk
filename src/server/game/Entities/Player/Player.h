@@ -988,6 +988,7 @@ enum AdditionalSaving
     ADDITIONAL_SAVING_NONE                      = 0x00,
     ADDITIONAL_SAVING_INVENTORY_AND_GOLD        = 0x01,
     ADDITIONAL_SAVING_QUEST_STATUS              = 0x02,
+    ADDITIONAL_SAVING_ACHIEVEMENTS              = 0x04,
 };
 
 enum PlayerCommandStates
@@ -2622,7 +2623,7 @@ public:
     bool IsFreeFlying() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY); }
 
     // saving
-    void AdditionalSavingAddMask(uint8 mask) { m_additionalSaveTimer = 2000; m_additionalSaveMask |= mask; }
+    void AdditionalSavingAddMask(uint8 mask);
     // arena spectator
     [[nodiscard]] bool IsSpectator() const { return m_ExtraFlags & PLAYER_EXTRA_SPECTATOR_ON; }
     void SetIsSpectator(bool on);
@@ -2820,6 +2821,7 @@ protected:
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
     void _SavePlayerSettings(CharacterDatabaseTransaction trans);
+    void UpdateAdditionalSaves(uint32 p_time);
 
     /*********************************************************/
     /***              ENVIRONMENTAL SYSTEM                 ***/

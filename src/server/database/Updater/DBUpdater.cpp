@@ -64,6 +64,22 @@ std::string& DBUpdaterUtil::corrected_path()
     return path;
 }
 
+uint32& DBUpdaterUtil::failed_updates()
+{
+    static uint32 count = 0;
+    return count;
+}
+
+void DBUpdaterUtil::MarkUpdateFailed()
+{
+    ++failed_updates();
+}
+
+uint32 DBUpdaterUtil::GetFailedUpdateCount()
+{
+    return failed_updates();
+}
+
 // Auth Database
 template<>
 std::string DBUpdater<LoginDatabaseConnection>::GetConfigEntry()
@@ -581,6 +597,10 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
             "You cannot use auto-update system and import sql files from AzerothCore repository with your sql client. "
             "If you are a developer, please fix your sql query.",
             path.generic_string(), pool.GetConnectionInfo()->database);
+
+        // Recorded in both modes. A dry run does not throw below, so it keeps attempting the
+        // remaining files and this count is the only thing left to fail the run on.
+        DBUpdaterUtil::MarkUpdateFailed();
 
         if (!sConfigMgr->isDryRun())
         {

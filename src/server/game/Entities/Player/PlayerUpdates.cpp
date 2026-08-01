@@ -332,6 +332,8 @@ void Player::Update(uint32 p_time)
         }
     }
 
+    UpdateAdditionalSaves(p_time);
+
     // Handle Water/drowning
     HandleDrowning(p_time);
 
@@ -2399,4 +2401,50 @@ void Player::ProcessSpellQueue()
         else // If the first spell can't execute, stop processing
             break;
     }
+}
+
+// save only the data flagged by AdditionalSavingAddMask shortly after
+// important changes, so a crash loses at most a few seconds of them
+void Player::UpdateAdditionalSaves(uint32 p_time)
+{
+    if (!m_additionalSaveTimer || GetSession()->isLogingOut())
+        return;
+
+    if (m_additionalSaveTimer > p_time)
+    {
+        m_additionalSaveTimer -= p_time;
+        return;
+    }
+
+    uint8 mask = m_additionalSaveMask;
+    m_additionalSaveTimer = 0;
+    m_additionalSaveMask = 0;
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    if (mask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD)
+        SaveInventoryAndGoldToDB(trans);
+
+    if (mask & ADDITIONAL_SAVING_QUEST_STATUS)
+    {
+        _SaveQuestStatus(trans);
+
+        // if nothing changed, nothing will happen
+        _SaveDailyQuestStatus(trans);
+        _SaveWeeklyQuestStatus(trans);
+        _SaveSeasonalQuestStatus(trans);
+        _SaveMonthlyQuestStatus(trans);
+    }
+
+    if (mask & ADDITIONAL_SAVING_ACHIEVEMENTS)
+    {
+        m_achievementMgr->SaveToDB(trans);
+
+        // achievements are often earned together with skill or gold changes
+        // (professions, riding, wealth), save those too to keep the DB consistent
+        _SaveSkills(trans);
+        SaveGoldToDB(trans);
+    }
+
+    CharacterDatabase.CommitTransaction(trans);
 }

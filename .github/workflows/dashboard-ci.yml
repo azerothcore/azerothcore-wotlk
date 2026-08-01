@@ -248,18 +248,36 @@ jobs:
         run: |
           ./acore.sh test core
 
+      # This job runs zero-conf, so the core falls back to console-only logging and
+      # writes no Errors.log, which is what the build workflows scrape. The grep is a
+      # second net in case a later change stops the updater from failing the run on a
+      # bad import.
       - name: Test authserver dry-run
         run: |
           source ./acore.sh config load
           cd env/dist/bin
-          timeout 5m ./authserver -dry-run
+          timeout 5m ./authserver -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
+          status=${PIPESTATUS[0]}
+          [ "$status" -eq 0 ] || exit "$status"
+
+          if grep -qE "Applying of file .+ failed!" "$RUNNER_TEMP/authserver-dry-run.log"; then
+            echo "::error::A SQL update failed to apply during the authserver dry run"
+            exit 1
+          fi
         continue-on-error: false
 
       - name: Test worldserver dry-run
         run: |
           source ./acore.sh config load
           cd env/dist/bin
-          timeout 5m ./worldserver -dry-run
+          timeout 5m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/worldserver-dry-run.log"
+          status=${PIPESTATUS[0]}
+          [ "$status" -eq 0 ] || exit "$status"
+
+          if grep -qE "Applying of file .+ failed!" "$RUNNER_TEMP/worldserver-dry-run.log"; then
+            echo "::error::A SQL update failed to apply during the worldserver dry run"
+            exit 1
+          fi
         continue-on-error: false
 
 
@@ -288,6 +306,46 @@ jobs:
           ./acore.sh sm delete authserver
         timeout-minutes: 30
         continue-on-error: false
+
+      # Proves the dry-run steps above actually fail on a bad import.
+      - name: Verify a broken SQL update fails the dry run
+        run: |
+          # Absolute: the trap fires after the cd below.
+          probe="$PWD/data/sql/updates/pending_db_world/rev_9999999999999999999.sql"
+          trap 'rm -f "$probe"' EXIT
+
+          cat > "$probe" <<'EOF'
+          DELETE FROM `ci_gate_probe_table_that_does_not_exist` WHERE `id` = 1;
+          EOF
+
+          source ./acore.sh config load
+          cd env/dist/bin
+
+          # Without this the step fails on a healthy tree as soon as it gains a
+          # `shell: bash`: that turns pipefail on, so errexit aborts on the exit 1 the
+          # assertions below are here to check for.
+          set +o pipefail
+          timeout 5m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/broken-update-dry-run.log"
+          status=${PIPESTATUS[0]}
+
+          # Exactly 1, so a hang (timeout returns 124) does not pass as a detection.
+          if [ "$status" -ne 1 ]; then
+            echo "::error::expected worldserver -dry-run to exit 1 on a broken SQL update, got $status"
+            exit 1
+          fi
+
+          # 1 is also the generic startup failure code, so require the updater to be the one
+          # that failed the run, on the probe file specifically.
+          if ! grep -qE "Applying of file .*rev_9999999999999999999\.sql.* failed!" "$RUNNER_TEMP/broken-update-dry-run.log"; then
+            echo "::error::worldserver -dry-run exited 1 without reporting the broken probe update"
+            exit 1
+          fi
+
+          if ! grep -q "Failed Database Update" "$RUNNER_TEMP/broken-update-dry-run.log"; then
+            echo "::error::the dry run did not terminate on the failed update count"
+            exit 1
+          fi
+        timeout-minutes: 10
 
       # The old "only save on a cache miss" guard is dropped: the per-run key
       # only ever collides on a re-run, since github.run_id is stable across
