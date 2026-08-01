@@ -1778,18 +1778,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
     });
 
-    // Lava Strike damage
-    ApplySpellFix({ 57697 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Lava Strike trigger
-    ApplySpellFix({ 57578 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-    });
-
     // Gift of Twilight Shadow/Fire
     ApplySpellFix({ 57835, 58766 }, [](SpellInfo* spellInfo)
     {
@@ -3298,12 +3286,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100yd
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS);
         spellInfo->Effects[EFFECT_0].MiscValue = 100;
-    });
-
-    // Empowered Blood
-    ApplySpellFix({ 70227, 70232 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AreaGroupId = 2452; // Whole icc instead of Crimson Halls only, remove when area calculation is fixed
     });
 
     ApplySpellFix({ 74509 }, [](SpellInfo* spellInfo)
@@ -5246,6 +5228,18 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 52414 }, [](SpellInfo* spellInfo)
     {
        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+    });
+
+    // Boulder Assault (Sorlof's Booty)
+    ApplySpellFix({ 44966 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+    });
+
+    // Cannon Assault (Sorlof's Booty)
+    ApplySpellFix({ 45008 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

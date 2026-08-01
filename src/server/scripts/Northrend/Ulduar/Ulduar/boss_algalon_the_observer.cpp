@@ -25,6 +25,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
@@ -78,7 +79,7 @@ enum Actions
 {
     //ACTION_INIT_ALGALON       = 1, defined in ulduar.h
     //ACTION_DESPAWN_ALGALON    = 2, defined in ulduar.h
-    ACTION_START_INTRO      = 3,
+    //ACTION_START_INTRO        = 3, defined in ulduar.h
     ACTION_FINISH_INTRO     = 4,
     ACTION_ACTIVATE_STAR    = 5,
     ACTION_BIG_BANG         = 6,
@@ -95,6 +96,7 @@ enum Misc
 
     POINT_ALGALON_LAND          = 1,
     POINT_ALGALON_OUTRO         = 2,
+    POINT_ALGALON_FLOAT         = 3,
 
     EVENT_ID_SUPERMASSIVE_START = 21697,
 
@@ -112,46 +114,51 @@ enum Events
     EVENT_SUMMON_ALGALON            = 3,
     EVENT_BRANN_OUTRO_1             = 4,
     EVENT_BRANN_OUTRO_2             = 5,
+    EVENT_BRANN_REACH_TALK_POINT    = 6,
 
     // Algalon the Observer
-    EVENT_INTRO_1                   = 6,
-    EVENT_INTRO_2                   = 7,
-    EVENT_INTRO_3                   = 8,
-    EVENT_INTRO_FINISH              = 9,
-    EVENT_SAY_ALGALON_AGGRO         = 10,
-    EVENT_INTRO_TIMER_DONE          = 11,
-    EVENT_QUANTUM_STRIKE            = 12,
-    EVENT_PHASE_PUNCH               = 13,
-    EVENT_SUMMON_COLLAPSING_STAR    = 14,
-    EVENT_BIG_BANG                  = 15,
-    EVENT_RESUME_UPDATING           = 16,
-    EVENT_ASCEND_TO_THE_HEAVENS     = 17,
-    EVENT_EVADE                     = 18,
-    EVENT_COSMIC_SMASH              = 19,
-    EVENT_UNLOCK_YELL               = 20,
-    EVENT_OUTRO_START               = 21,
-    EVENT_OUTRO_1                   = 22,
-    EVENT_OUTRO_2                   = 23,
-    EVENT_OUTRO_3                   = 24,
-    EVENT_OUTRO_4                   = 25,
-    EVENT_OUTRO_5                   = 26,
-    EVENT_OUTRO_6                   = 27,
-    EVENT_OUTRO_7                   = 28,
-    EVENT_OUTRO_8                   = 29,
-    EVENT_OUTRO_9                   = 30,
-    EVENT_OUTRO_10                  = 31,
-    EVENT_OUTRO_11                  = 32,
-    EVENT_ACTIVATE_LIVING_CONSTELLATION = 33,
-    EVENT_CHECK_HERALD_ITEMS        = 34,
-    EVENT_ALGALON_IN_PROGRESS       = 35,
-    EVENT_DESPAWN_ALGALON_1         = 36,
-    EVENT_DESPAWN_ALGALON_2         = 37,
-    EVENT_DESPAWN_ALGALON_3         = 38,
-    EVENT_DESPAWN_ALGALON_4         = 39,
-    EVENT_DESPAWN_ALGALON_5         = 40,
+    EVENT_INTRO_1                   = 7,
+    EVENT_INTRO_2                   = 8,
+    EVENT_INTRO_3                   = 9,
+    EVENT_INTRO_FINISH              = 10,
+    EVENT_SAY_ALGALON_AGGRO         = 11,
+    EVENT_INTRO_TIMER_DONE          = 12,
+    EVENT_QUANTUM_STRIKE            = 13,
+    EVENT_PHASE_PUNCH               = 14,
+    EVENT_SUMMON_COLLAPSING_STAR    = 15,
+    EVENT_BIG_BANG                  = 16,
+    EVENT_RESUME_UPDATING           = 17,
+    EVENT_ASCEND_TO_THE_HEAVENS     = 18,
+    EVENT_EVADE                     = 19,
+    EVENT_COSMIC_SMASH              = 20,
+    EVENT_UNLOCK_YELL               = 21,
+    EVENT_OUTRO_START               = 22,
+    EVENT_OUTRO_1                   = 23,
+    EVENT_OUTRO_2                   = 24,
+    EVENT_OUTRO_3                   = 25,
+    EVENT_OUTRO_4                   = 26,
+    EVENT_OUTRO_5                   = 27,
+    EVENT_OUTRO_6                   = 28,
+    EVENT_OUTRO_7                   = 29,
+    EVENT_OUTRO_8                   = 30,
+    EVENT_OUTRO_9                   = 31,
+    EVENT_OUTRO_10                  = 32,
+    EVENT_OUTRO_11                  = 33,
+    EVENT_ACTIVATE_LIVING_CONSTELLATION = 34,
+    EVENT_CHECK_HERALD_ITEMS        = 35,
+    EVENT_ALGALON_IN_PROGRESS       = 36,
+    EVENT_DESPAWN_ALGALON_1         = 37,
+    EVENT_DESPAWN_ALGALON_2         = 38,
+    EVENT_DESPAWN_ALGALON_3         = 39,
+    EVENT_DESPAWN_ALGALON_4         = 40,
+    EVENT_DESPAWN_ALGALON_5         = 41,
+
+    EVENT_INTRO_CHANNEL             = 42,
+    EVENT_INTRO_SUMMON              = 43,
+    EVENT_INTRO_DESCEND             = 44,
 
     // Living Constellation
-    EVENT_ARCANE_BARRAGE            = 41,
+    EVENT_ARCANE_BARRAGE            = 45,
 };
 
 enum EncounterPhases
@@ -204,7 +211,7 @@ Position const BrannIntroWaypoint[MAX_BRANN_WAYPOINTS_INTRO] =
     {1632.676f, -190.5927f, 427.2631f, 0.0f},
     {1631.497f, -214.2221f, 418.1152f, 0.0f},
     {1636.455f, -263.6647f, 417.3213f, 0.0f},
-    {1629.586f, -267.9792f, 417.3219f, 0.0f},
+    {1624.1223f, -267.04172f, 417.3216f, 4.7690268f},
     {1631.497f, -214.2221f, 418.1152f, 0.0f},
     {1632.676f, -190.5927f, 425.8831f, 0.0f},
     {1632.814f, -173.9334f, 427.2621f, 0.0f},
@@ -235,7 +242,8 @@ Position const CollapsingStarPos[COLLAPSING_STAR_COUNT] =
     {1622.451f, -321.1563f, 417.6188f, 4.677482f},
     {1615.060f, -291.6816f, 417.7796f, 3.490659f},
 };
-Position const AlgalonOutroPos = {1633.64f, -317.78f, 417.3211f, 0.0f};
+Position const AlgalonOutroPos = {1633.64f, -317.78f, 417.3211f, 1.605703f};
+Position const AlgalonFloatPos = {1632.668f, -302.7656f, 420.3211f, 1.530165f};
 Position const BrannOutroPos[3] =
 {
     {1632.023f, -243.7434f, 417.9118f, 0.0f},
@@ -369,7 +377,14 @@ struct boss_algalon_the_observer : public ScriptedAI
         if (_instance)
             _instance->SetBossState(BOSS_ALGALON, FAIL);
 
-        ScriptedAI::EnterEvadeMode(why);
+        if (!_EnterEvadeMode(why))
+            return;
+
+        me->GetMotionMaster()->MoveTargetedHome();
+
+        Reset();
+
+        sScriptMgr->OnUnitEnterEvadeMode(me, why);
     }
 
     void Reset() override
@@ -392,6 +407,8 @@ struct boss_algalon_the_observer : public ScriptedAI
             {
                 _firstPull = false;
                 _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
+                _instance->SetData(DATA_RESUMMON_ALGALON, 0);
+                me->DespawnOrUnsummon(1ms);
             }
             _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
         }
@@ -416,15 +433,14 @@ struct boss_algalon_the_observer : public ScriptedAI
                     me->SetDisableGravity(true);
                     me->CastSpell(me, SPELL_ARRIVAL, true);
                     me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
-                    me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
+                    me->GetMotionMaster()->MovePoint(POINT_ALGALON_FLOAT, AlgalonFloatPos);
                     me->SetHomePosition(AlgalonLandPos);
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(AlgalonLandPos.GetPositionX(), AlgalonLandPos.GetPositionY(), AlgalonLandPos.GetPositionZ());
-                    init.SetOrientationFixed(true);
-                    init.Launch();
                     events.Reset();
                     events.SetPhase(PHASE_ROLE_PLAY);
                     events.ScheduleEvent(EVENT_INTRO_1, 5s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_CHANNEL, 6s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_SUMMON, 7s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_DESCEND, 10s, 0, PHASE_ROLE_PLAY);
                     events.ScheduleEvent(EVENT_INTRO_2, 15s, 0, PHASE_ROLE_PLAY);
                     events.ScheduleEvent(EVENT_INTRO_3, 23s, 0, PHASE_ROLE_PLAY);
                     events.ScheduleEvent(EVENT_INTRO_FINISH, 36s, 0, PHASE_ROLE_PLAY);
@@ -525,18 +541,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         if (pointId == POINT_ALGALON_LAND)
             me->SetDisableGravity(false);
         else if (pointId == POINT_ALGALON_OUTRO)
-        {
-            me->SetFacingTo(1.605703f);
-            events.ScheduleEvent(EVENT_OUTRO_3, 1200ms);
-            events.ScheduleEvent(EVENT_OUTRO_4, 2400ms);
-            events.ScheduleEvent(EVENT_OUTRO_5, 8500ms);
-            events.ScheduleEvent(EVENT_OUTRO_6, 15s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_7, 55s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_8, 73s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_9, 85s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_10, 111s);
-            events.ScheduleEvent(EVENT_OUTRO_11, 117s + 500ms);
-        }
+            me->SetFacingTo(AlgalonOutroPos.GetOrientation());
     }
 
     void JustSummoned(Creature* summon) override
@@ -645,14 +650,26 @@ struct boss_algalon_the_observer : public ScriptedAI
         {
             case EVENT_INTRO_1:
                 me->RemoveAurasDueToSpell(SPELL_RIDE_THE_LIGHTNING);
-                Talk(SAY_ALGALON_INTRO_1);
+                if (_firstPull)
+                    Talk(SAY_ALGALON_INTRO_1);
+                break;
+            case EVENT_INTRO_CHANNEL:
+                me->SetEmoteState(EMOTE_STATE_SPELL_CHANNEL_OMNI);
+                break;
+            case EVENT_INTRO_SUMMON:
+                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_AZEROTH, true);
+                me->ClearEmoteState();
+                break;
+            case EVENT_INTRO_DESCEND:
+                me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
                 break;
             case EVENT_INTRO_2:
-                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_AZEROTH, true);
-                Talk(SAY_ALGALON_INTRO_2);
+                if (_firstPull)
+                    Talk(SAY_ALGALON_INTRO_2);
                 break;
             case EVENT_INTRO_3:
-                Talk(SAY_ALGALON_INTRO_3);
+                if (_firstPull)
+                    Talk(SAY_ALGALON_INTRO_3);
                 break;
             case EVENT_INTRO_FINISH:
                 events.Reset();
@@ -755,9 +772,20 @@ struct boss_algalon_the_observer : public ScriptedAI
             {
                 Player* lootRecipent = me->GetLootRecipient();
                 _EnterEvadeMode();
+                me->ClearUnitState(UNIT_STATE_EVADE);
                 // LootRecipent is cleared in _EnterEvadeMode, restore it
                 me->SetLootRecipient(lootRecipent);
+                me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MovePoint(POINT_ALGALON_OUTRO, AlgalonOutroPos);
+                events.ScheduleEvent(EVENT_OUTRO_3, 3200ms);
+                events.ScheduleEvent(EVENT_OUTRO_4, 4400ms);
+                events.ScheduleEvent(EVENT_OUTRO_5, 10500ms);
+                events.ScheduleEvent(EVENT_OUTRO_6, 17s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_7, 57s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_8, 75s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_9, 87s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_10, 113s);
+                events.ScheduleEvent(EVENT_OUTRO_11, 119s + 500ms);
                 break;
             }
             case EVENT_OUTRO_3:
@@ -869,16 +897,12 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
                 delay = 8s;
                 me->SetWalk(true);
                 break;
-            case 6:
-                me->SetFacingTo(4.6156f);
-                me->SetWalk(false);
-                Talk(SAY_BRANN_ALGALON_INTRO_1);
-                events.ScheduleEvent(EVENT_SUMMON_ALGALON, 7500ms);
-                return;
             case 10:
                 me->DespawnOrUnsummon(1ms);
                 return;
             case POINT_BRANN_OUTRO:
+                me->SetFacingTo(4.6528215f);
+                return;
             case POINT_BRANN_OUTRO_END:
                 return;
         }
@@ -895,7 +919,32 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
         {
             case EVENT_BRANN_MOVE_INTRO:
                 if (_currentPoint < MAX_BRANN_WAYPOINTS_INTRO)
-                    me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
+                {
+                    if (_currentPoint == 5 || _currentPoint == 6)
+                    {
+                        Position const& dest = BrannIntroWaypoint[_currentPoint];
+                        Milliseconds travelTime = Milliseconds(uint32(me->GetExactDist2d(dest) / 2.5f * 1000)) + 500ms;
+                        Movement::MoveSplineInit init(me);
+                        init.MoveTo(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
+                        init.Launch();
+                        if (_currentPoint == 6)
+                            events.ScheduleEvent(EVENT_BRANN_REACH_TALK_POINT, travelTime);
+                        else
+                        {
+                            _currentPoint = 6;
+                            events.ScheduleEvent(EVENT_BRANN_MOVE_INTRO, travelTime);
+                        }
+                    }
+                    else
+                        me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
+                }
+                break;
+            case EVENT_BRANN_REACH_TALK_POINT:
+                _currentPoint = 7;
+                me->SetFacingTo(4.7760954f);
+                me->SetWalk(false);
+                Talk(SAY_BRANN_ALGALON_INTRO_1);
+                events.ScheduleEvent(EVENT_SUMMON_ALGALON, 7500ms);
                 break;
             case EVENT_SUMMON_ALGALON:
                 if (me->GetInstanceScript() && !me->GetInstanceScript()->GetCreature(BOSS_ALGALON))

@@ -3416,9 +3416,9 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
         return;
     }
 
-    uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
-    bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
-    bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true, temporary, learnFromSkill);
+    uint8 const specMask = GetLearnSpellSpecMask(spellId);
+
+    bool const added = addSpell(spellId, specMask, true, temporary, learnFromSkill);
     if (added)
     {
         sScriptMgr->OnPlayerLearnSpell(this, spellId);
@@ -3446,6 +3446,47 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
         if (itr2 != m_spells.end() && itr2->second->State != PLAYERSPELL_REMOVED && !itr2->second->IsInSpec(m_activeSpec))
             learnSpell(itr2->first, temporary);
     }
+}
+
+uint8 Player::GetLearnSpellSpecMask(uint32 spellId) const
+{
+    uint32 const firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
+
+    bool const isTalentBasedSpell = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
+
+    // If this spell doesn't require any talents, learn it in all talent specs
+    if (!isTalentBasedSpell)
+        return SPEC_MASK_ALL;
+
+    uint8 specMask = GetActiveSpecMask();
+
+    // If the first rank of a talent-based spell has already been learned in another spec,
+    // the following ranks should also be learned in that spec.
+    if (m_spells.find(firstRankSpellId) != m_spells.end())
+    {
+        specMask |= m_spells.at(firstRankSpellId)->specMask;
+    }
+
+    // When learning a talent-based spell that has other spells as a requirement, it should not only be learned in the current spec,
+    // but also in all other specs that have the required spells.
+    // Example: Greater Blessing of Sanctuary has Blessing of Sanctuary as required spell.
+    auto const spellsRequiredForSpellBounds = sSpellMgr->GetSpellsRequiredForSpellBounds(spellId);
+    bool const spellHasRequiredSpells = (spellsRequiredForSpellBounds.begin() != spellsRequiredForSpellBounds.end());
+    if (spellHasRequiredSpells)
+    {
+        uint8 requiredSpellsSpecMask = SPEC_MASK_ALL;
+        for (SpellRequiredMap::const_iterator itr = spellsRequiredForSpellBounds.begin(); itr != spellsRequiredForSpellBounds.end(); ++itr)
+        {
+            uint32 const requiredSpellId = itr->second;
+            bool const requiredSpellExistsAsPlayerSpell = (m_spells.find(requiredSpellId) != m_spells.end());
+
+            // The required spell should usually exist at least in the current spec, but maybe we are learning a spell via GM command
+            requiredSpellsSpecMask &= requiredSpellExistsAsPlayerSpell ? m_spells.at(requiredSpellId)->specMask : 0;
+        }
+        specMask |= requiredSpellsSpecMask;
+    }
+
+    return specMask;
 }
 
 void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTemporary)
@@ -3742,7 +3783,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
 void Player::_SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_COOLDOWN);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
 
     time_t curTime = GameTime::GetGameTime().count();
@@ -4729,7 +4770,7 @@ void Player::SpawnCorpseBones(bool triggerSave /*= true*/)
 
             // pussywizard: update only ghost flag instead of whole character table entry! data integrity is crucial
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_REMOVE_GHOST);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             trans->Append(stmt);
 
             _SaveAuras(trans, false);
@@ -6414,7 +6455,7 @@ void Player::ModifyHonorPoints(int32 value, CharacterDatabaseTransaction trans)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_HONOR_POINTS);
         stmt->SetData(0, newValue);
-        stmt->SetData(1, GetGUID().GetCounter());
+        stmt->SetData(1, GetGUID().GetRawValue());
         trans->Append(stmt);
     }
 }
@@ -6430,7 +6471,7 @@ void Player::ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_ARENA_POINTS);
         stmt->SetData(0, newValue);
-        stmt->SetData(1, GetGUID().GetCounter());
+        stmt->SetData(1, GetGUID().GetRawValue());
         trans->Append(stmt);
     }
 }
@@ -9283,7 +9324,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
             // Handle removing pet while it is in "temporarily unsummoned" state, for example on mount
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
             stmt->SetData(0, PET_SAVE_NOT_IN_SLOT);
-            stmt->SetData(1, GetGUID().GetCounter());
+            stmt->SetData(1, GetGUID().GetRawValue());
             stmt->SetData(2, m_petStable->CurrentPet->PetNumber);
             CharacterDatabase.Execute(stmt);
 
@@ -11461,7 +11502,7 @@ void Player::LeaveBattleground(Battleground* bg)
         if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, BG_DESERTION_TYPE_LEAVE_BG);
             CharacterDatabase.Execute(stmt);
         }
@@ -13985,7 +14026,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
 
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
 
-                stmt->SetData(0, GetGUID().GetCounter());
+                stmt->SetData(0, GetGUID().GetRawValue());
                 stmt->SetData(1, skill);
 
                 CharacterDatabase.Execute(stmt);
@@ -14930,7 +14971,7 @@ void Player::_SaveEquipmentSets(CharacterDatabaseTransaction trans)
                 stmt->SetData(j++, eqset.IgnoreMask);
                 for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
                     stmt->SetData(j++, eqset.Items[i].GetCounter());
-                stmt->SetData(j++, GetGUID().GetCounter());
+                stmt->SetData(j++, GetGUID().GetRawValue());
                 stmt->SetData(j++, eqset.Guid);
                 stmt->SetData(j, index);
                 trans->Append(stmt);
@@ -14939,7 +14980,7 @@ void Player::_SaveEquipmentSets(CharacterDatabaseTransaction trans)
                 break;
             case EQUIPMENT_SET_NEW:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_EQUIP_SET);
-                stmt->SetData(j++, GetGUID().GetCounter());
+                stmt->SetData(j++, GetGUID().GetRawValue());
                 stmt->SetData(j++, eqset.Guid);
                 stmt->SetData(j++, index);
                 stmt->SetData(j++, eqset.Name.c_str());
@@ -14969,11 +15010,11 @@ void Player::_SaveEntryPoint(CharacterDatabaseTransaction trans)
         return;
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_ENTRY_POINT);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_ENTRY_POINT);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     stmt->SetData (1, m_entryPointData.joinPos.GetPositionX());
     stmt->SetData (2, m_entryPointData.joinPos.GetPositionY());
     stmt->SetData (3, m_entryPointData.joinPos.GetPositionZ());
@@ -15009,7 +15050,7 @@ void Player::RemoveAtLoginFlag(AtLoginFlags flags, bool persist /*= false*/)
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_AT_LOGIN_FLAG);
 
         stmt->SetData(0, uint16(flags));
-        stmt->SetData(1, GetGUID().GetCounter());
+        stmt->SetData(1, GetGUID().GetRawValue());
 
         CharacterDatabase.Execute(stmt);
     }
@@ -15056,7 +15097,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         //! Insert query
         //! TO DO: Filter out more redundant fields that can take their default value at player create
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER);
-        stmt->SetData(index++, GetGUID().GetCounter());
+        stmt->SetData(index++, GetGUID().GetRawValue());
         stmt->SetData(index++, GetSession()->GetAccountId());
         stmt->SetData(index++, GetName());
         stmt->SetData(index++, getRace(true));
@@ -15314,7 +15355,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
 
         stmt->SetData(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
         // Index
-        stmt->SetData(index++, GetGUID().GetCounter());
+        stmt->SetData(index++, GetGUID().GetRawValue());
     }
 
     trans->Append(stmt);
@@ -15349,7 +15390,7 @@ void Player::_SaveGlyphs(CharacterDatabaseTransaction trans)
         return;
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_GLYPHS);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
 
     for (uint8 spec = 0; spec < m_specsCount; ++spec)
@@ -15357,7 +15398,7 @@ void Player::_SaveGlyphs(CharacterDatabaseTransaction trans)
         uint8 index = 0;
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_GLYPHS);
-        stmt->SetData(index++, GetGUID().GetCounter());
+        stmt->SetData(index++, GetGUID().GetRawValue());
         stmt->SetData(index++, spec);
 
         for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
@@ -15404,7 +15445,7 @@ void Player::_SaveTalents(CharacterDatabaseTransaction trans)
         if (itr->second->State == PLAYERSPELL_REMOVED || itr->second->State == PLAYERSPELL_CHANGED)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_TALENT_BY_SPELL);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, itr->first);
             trans->Append(stmt);
         }
@@ -15413,7 +15454,7 @@ void Player::_SaveTalents(CharacterDatabaseTransaction trans)
         if (itr->second->State == PLAYERSPELL_NEW || itr->second->State == PLAYERSPELL_CHANGED)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_TALENT);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, itr->first);
             stmt->SetData(2, itr->second->specMask);
             trans->Append(stmt);
@@ -15586,7 +15627,7 @@ void Player::ActivateSpec(uint8 spec)
     // load them asynchronously
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
-        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(0, GetGUID().GetRawValue());
         stmt->SetData(1, m_activeSpec);
 
         WorldSession* mySess = GetSession();
@@ -16101,7 +16142,7 @@ void Player::SetRandomWinner(bool isWinner)
     if (m_IsBGRandomWinner)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_BATTLEGROUND_RANDOM);
-        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(0, GetGUID().GetRawValue());
         CharacterDatabase.Execute(stmt);
     }
 }
@@ -16218,7 +16259,7 @@ void Player::_LoadBrewOfTheMonth(PreparedQueryResult result)
 
         // Update Event Id
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_BREW_OF_THE_MONTH);
-        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(0, GetGUID().GetRawValue());
         stmt->SetData(1, uint32(eventId));
         trans->Append(stmt);
 

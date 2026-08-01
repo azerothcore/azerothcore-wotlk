@@ -101,11 +101,8 @@ public:
 
     struct boss_maexxnaAI : public BossAI
     {
-        explicit boss_maexxnaAI(Creature* c) : BossAI(c, BOSS_MAEXXNA), summons(me)
+        explicit boss_maexxnaAI(Creature* c) : BossAI(c, BOSS_MAEXXNA)
         {}
-
-        EventMap events;
-        SummonList summons;
 
         GuidList wraps;
 
@@ -117,13 +114,6 @@ public:
                 return false;
             }
             return true;
-        }
-
-        void Reset() override
-        {
-            BossAI::Reset();
-            events.Reset();
-            summons.DespawnAll();
         }
 
         void JustEngagedWith(Unit* who) override
@@ -155,11 +145,6 @@ public:
         {
             if (who->IsPlayer())
                 instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
-        }
-
-        void JustDied(Unit*  killer) override
-        {
-            BossAI::JustDied(killer);
         }
 
         void DoCastWebWrap()

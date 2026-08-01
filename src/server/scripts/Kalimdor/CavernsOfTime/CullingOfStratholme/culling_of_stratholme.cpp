@@ -409,6 +409,7 @@ public:
 
         void JustDied(Unit*) override
         {
+            summons.DespawnAll();
             RemoveEscortState(STATE_ESCORT_ESCORTING);
             if (pInstance)
                 pInstance->SetData(DATA_ARTHAS_REPOSITION, 2);
