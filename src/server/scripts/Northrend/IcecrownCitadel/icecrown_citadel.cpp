@@ -2566,7 +2566,7 @@ class spell_icc_siphon_essence : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_CANCEL)
             return;
 
         if (UnitAI* ai = GetTarget()->GetAI())
