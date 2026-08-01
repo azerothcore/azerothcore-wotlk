@@ -1,3 +1,4 @@
+-- DB update 2026_07_31_02 -> 2026_08_01_00
 --
 UPDATE `creature_template` SET `npcflag` = 3 WHERE (`entry` IN (28070, 31366));
 
