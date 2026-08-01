@@ -207,6 +207,12 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
 template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
+    // Update() and Populate() already guard their ApplyFile calls with this; Create() was the
+    // one caller without it, so a missing/unresolvable MySQL binary surfaced here as the
+    // misleading "please fix your sql query" fatal instead of the proper executable error.
+    if (!DBUpdaterUtil::CheckExecutable())
+        return false;
+
     LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
 
     char const* disableInteractive = std::getenv("AC_DISABLE_INTERACTIVE");
