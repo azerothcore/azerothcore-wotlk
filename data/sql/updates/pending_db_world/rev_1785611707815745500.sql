@@ -4,8 +4,8 @@
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23921;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23921);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(23921, 0, 0, 1, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 11, 42632, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 01 - On Spellhit \'Ever-burning Torch\' - Cast \'Mission: Eternal Flame: Bunny 01 Kill Credit\''),
-(23921, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 01 - On Spellhit \'Ever-burning Torch\' - Summon Gameobject Group');
+(23921, 0, 0, 0, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 11, 42632, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 01 - On Spellhit \'Ever-burning Torch\' - Cast \'Mission: Eternal Flame: Bunny 01 Kill Credit\''),
+(23921, 0, 1, 0, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 01 - On Spellhit \'Ever-burning Torch\' - Summon Gameobject Group');
 
 DELETE FROM `gameobject_summon_groups` WHERE `summonerId` = 23921 AND `summonerType` = 0;
 INSERT INTO `gameobject_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `respawnTime`, `Comment`) VALUES
@@ -22,8 +22,8 @@ INSERT INTO `gameobject_summon_groups` (`summonerId`, `summonerType`, `groupId`,
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23922;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23922);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(23922, 0, 0, 1, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 11, 42633, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 02 - On Spellhit \'Ever-burning Torch\' - Cast \'Mission: Eternal Flame: Bunny 02 Kill Credit\''),
-(23922, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 02 - On Spellhit \'Ever-burning Torch\' - Summon Gameobject Group');
+(23922, 0, 0, 0, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 11, 42633, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 02 - On Spellhit \'Ever-burning Torch\' - Cast \'Mission: Eternal Flame: Bunny 02 Kill Credit\''),
+(23922, 0, 1, 0, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 02 - On Spellhit \'Ever-burning Torch\' - Summon Gameobject Group');
 
 DELETE FROM `gameobject_summon_groups` WHERE `summonerId` = 23922 AND `summonerType` = 0;
 INSERT INTO `gameobject_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `respawnTime`, `Comment`) VALUES
@@ -40,8 +40,8 @@ INSERT INTO `gameobject_summon_groups` (`summonerId`, `summonerType`, `groupId`,
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23923;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23923);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(23923, 0, 0, 1, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 11, 42634, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 03 - On Spellhit \'Ever-burning Torch\' - Cast \'Mission: Eternal Flame: Bunny 03 Kill Credit\''),
-(23923, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 03 - On Spellhit \'Ever-burning Torch\' - Summon Gameobject Group');
+(23923, 0, 0, 0, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 11, 42634, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 03 - On Spellhit \'Ever-burning Torch\' - Cast \'Mission: Eternal Flame: Bunny 03 Kill Credit\''),
+(23923, 0, 1, 0, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 03 - On Spellhit \'Ever-burning Torch\' - Summon Gameobject Group');
 
 DELETE FROM `gameobject_summon_groups` WHERE `summonerId` = 23923 AND `summonerType` = 0;
 INSERT INTO `gameobject_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `respawnTime`, `Comment`) VALUES
@@ -58,8 +58,8 @@ INSERT INTO `gameobject_summon_groups` (`summonerId`, `summonerType`, `groupId`,
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23924;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23924);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(23924, 0, 0, 1, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 11, 42635, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 04 - On Spellhit \'Ever-burning Torch\' - Cast \'Mission: Eternal Flame: Bunny 04 Kill Credit\''),
-(23924, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 04 - On Spellhit \'Ever-burning Torch\' - Summon Gameobject Group');
+(23924, 0, 0, 0, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 11, 42635, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 04 - On Spellhit \'Ever-burning Torch\' - Cast \'Mission: Eternal Flame: Bunny 04 Kill Credit\''),
+(23924, 0, 1, 0, 8, 0, 100, 0, 42564, 0, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Halgrind Torch Bunny 04 - On Spellhit \'Ever-burning Torch\' - Summon Gameobject Group');
 
 DELETE FROM `gameobject_summon_groups` WHERE `summonerId` = 23924 AND `summonerType` = 0;
 INSERT INTO `gameobject_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `respawnTime`, `Comment`) VALUES
