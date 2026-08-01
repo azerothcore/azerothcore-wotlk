@@ -13,7 +13,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (24151, 0, 0, 0, 1, 0, 100, 0, 30000, 90000, 30000, 90000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daegarn - Out of Combat - Say Line'),
 (24151, 0, 1, 0, 60, 0, 100, 0, 60000, 60000, 60000, 60000, 0, 0, 12, 24213, 6, 60000, 0, 0, 0, 8, 0, 0, 0, 0, 799.9138, -4718.5, -96.06109, 3.111555337905884, 'Daegarn - Every Minute - Try Summon Creature \'Firjus the Soul Crusher\' if no Event Creatures are up');
 
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2) AND (`SourceEntry` = 24151);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2) AND (`SourceEntry` = 24151) AND (`SourceId` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 2, 24151, 0, 0, 29, 1, 24213, 100, 0, 1, 0, 0, '', 'Firjus the Soul Crusher will not respawn if any creature of its summon chain is still alive'),
 (22, 2, 24151, 0, 0, 29, 1, 24214, 100, 0, 1, 0, 0, '', 'Firjus the Soul Crusher will not respawn if any creature of its summon chain is still alive'),
