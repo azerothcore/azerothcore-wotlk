@@ -2001,6 +2001,9 @@ public:
 // reaching the upper level orbs (they are ~33yd higher).
 float const ORB_CONTROLLER_MINION_RANGE = 15.0f;
 
+// Every darkfallen entry carried SMART_ACTION_CALL_FOR_HELP with param1 = 19.
+float const CALL_FOR_HELP_RADIUS = 19.0f;
+
 class ICCOrbControllerMinionSearch
 {
 public:
@@ -2129,18 +2132,16 @@ struct npc_icc_orb_controller : public ScriptedAI
         // so calling it with the puller only re-engaged the puller and left the
         // rest of the pack out of combat. Assist on its target instead, the same
         // way CallOfHelpCreatureInRangeDo does.
-        Unit * target = darkfallen->GetVictim();
+        Unit* target = darkfallen->GetVictim();
         if (!target)
             target = darkfallen->GetThreatMgr().GetAnyTarget();
 
         if (target)
         {
             for (ObjectGuid minionGuid : _minionGuids)
-            {
                 if (Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid))
                     if (minion->IsAIEnabled && !minion->IsInCombat())
-                    minion->EngageWithTarget(target);
-            }
+                        minion->EngageWithTarget(target);
         }
 
         if (Unit* minion = ObjectAccessor::GetUnit(*me, Acore::Containers::SelectRandomContainerElement(_minionGuids)))
@@ -2235,13 +2236,14 @@ struct DarkFallenAI : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        float const CALL_FOR_HELP_RADIUS = 10.0f;
         IsDoingEmotes = false;
         Scheduler.CancelAll();
         ScheduleSpells();
-        me->CallForHelp(CALL_FOR_HELP_RADIUS);
+
         if (Unit* trigger = ObjectAccessor::GetUnit(*me, TriggerGuid))
             trigger->GetAI()->SetGUID(me->GetGUID(), ACTION_COMBAT);
+
+        me->CallForHelp(CALL_FOR_HELP_RADIUS);
     }
 
     void DoAction(int32 action) override
@@ -2564,8 +2566,11 @@ class spell_icc_siphon_essence : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_CANCEL)
-            GetTarget()->GetAI()->DoAction(ACTION_SIPHON_INTERRUPTED);
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        if (UnitAI* ai = GetTarget()->GetAI())
+            ai->DoAction(ACTION_SIPHON_INTERRUPTED);
     }
 
     void Register() override
