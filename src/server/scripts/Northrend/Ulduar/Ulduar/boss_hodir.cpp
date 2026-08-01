@@ -26,6 +26,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
+#include <algorithm>
 
 enum HodirSpellData
 {
@@ -136,6 +137,11 @@ enum HodirEvents
     EVENT_MAGE_TOASTY_FIRE              = 18,
     EVENT_MAGE_FIREBALL                 = 19,
     EVENT_MAGE_MELT_ICE                 = 20,
+
+    EVENT_VICTORY_CHEER_2               = 21,
+    EVENT_VICTORY_CHEER_3               = 22,
+    EVENT_VICTORY_DANCE                 = 23,
+    EVENT_VICTORY_DESPAWN               = 24,
 };
 
 enum HodirText
@@ -160,6 +166,11 @@ enum HodirSounds
     SOUND_HODIR_FROZEN_BLOWS            = 15556,
     SOUND_HODIR_DEFEATED                = 15557,
     SOUND_HODIR_BERSERK                 = 15558,
+};
+
+enum HodirHelperActions
+{
+    ACTION_VICTORY_EMOTE                = 1,
 };
 
 struct HodirHelperData
@@ -342,7 +353,15 @@ struct boss_hodir : public BossAI
                 me->RemoveAllAuras();
 
                 events.Reset();
-                summons.DespawnAll();
+
+                // Manually despawn helpers
+                summons.DespawnIf([this](ObjectGuid guid) -> bool
+                {
+                    return std::ranges::none_of(Helpers, [guid](ObjectGuid Helper) { return guid == Helper; });
+                });
+
+                // Start victory emote sequence on surviving helpers
+                DoHelperVictoryEmotes();
 
                 Talk(TEXT_DEATH);
                 scheduler.Schedule(14s, [this](TaskContext /*context*/)
@@ -516,6 +535,36 @@ struct boss_hodir : public BossAI
                     }
                 }
             }
+    }
+
+    void DoHelperVictoryEmotes()
+    {
+        for (uint8 i = 0; i < 8; ++i)
+        {
+            Creature* helper = GetHelper(i);
+            if (!helper)
+                continue;
+
+            if (!helper->IsAlive())
+            {
+                helper->DespawnOrUnsummon();
+                continue;
+            }
+
+            // Stop combat behavior and start victory emote chain
+            helper->AI()->DoAction(ACTION_VICTORY_EMOTE);
+
+            // Thaw if still frozen
+            if (helper->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
+            {
+                helper->RemoveAura(SPELL_FLASH_FREEZE_TRAPPED_NPC);
+                if (Creature* iceBlock = helper->FindNearestCreature(NPC_FLASH_FREEZE_NPC, 5.0f))
+                    iceBlock->DespawnOrUnsummon();
+            }
+
+            // First cheer
+            helper->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+        }
     }
 
     void KilledUnit(Unit* who) override
@@ -753,6 +802,37 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
                     me->CastSpell(victim, SPELL_PRIEST_SMITE, false);
                 events.Repeat(2100ms);
                 break;
+            case EVENT_VICTORY_CHEER_2:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+                events.ScheduleEvent(EVENT_VICTORY_CHEER_3, 3s, 6500ms);
+                break;
+            case EVENT_VICTORY_CHEER_3:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+                events.ScheduleEvent(EVENT_VICTORY_DANCE, 3s, 6500ms);
+                break;
+            case EVENT_VICTORY_DANCE:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
+                events.ScheduleEvent(EVENT_VICTORY_DESPAWN, 15s, 60s);
+                break;
+            case EVENT_VICTORY_DESPAWN:
+                me->DespawnOrUnsummon();
+                break;
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_VICTORY_EMOTE)
+        {
+            events.Reset();
+            me->AttackStop();
+            me->CombatStop(true);
+            me->GetMotionMaster()->Clear();
+
+            events.ScheduleEvent(EVENT_VICTORY_CHEER_2, 3s, 6500ms);
         }
     }
 
@@ -839,6 +919,37 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
                 }
                 events.Repeat(3s);
                 break;
+            case EVENT_VICTORY_CHEER_2:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+                events.ScheduleEvent(EVENT_VICTORY_CHEER_3, 3s, 6500ms);
+                break;
+            case EVENT_VICTORY_CHEER_3:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+                events.ScheduleEvent(EVENT_VICTORY_DANCE, 3s, 6500ms);
+                break;
+            case EVENT_VICTORY_DANCE:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
+                events.ScheduleEvent(EVENT_VICTORY_DESPAWN, 15s, 60s);
+                break;
+            case EVENT_VICTORY_DESPAWN:
+                me->DespawnOrUnsummon();
+                break;
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_VICTORY_EMOTE)
+        {
+            events.Reset();
+            me->AttackStop();
+            me->CombatStop(true);
+            me->GetMotionMaster()->Clear();
+
+            events.ScheduleEvent(EVENT_VICTORY_CHEER_2, 3s, 6500ms);
         }
     }
 
@@ -932,6 +1043,37 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
                     events.Repeat(30s);
                     break;
                 }
+            case EVENT_VICTORY_CHEER_2:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+                events.ScheduleEvent(EVENT_VICTORY_CHEER_3, 3s, 6500ms);
+                break;
+            case EVENT_VICTORY_CHEER_3:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+                events.ScheduleEvent(EVENT_VICTORY_DANCE, 3s, 6500ms);
+                break;
+            case EVENT_VICTORY_DANCE:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
+                events.ScheduleEvent(EVENT_VICTORY_DESPAWN, 15s, 60s);
+                break;
+            case EVENT_VICTORY_DESPAWN:
+                me->DespawnOrUnsummon();
+                break;
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_VICTORY_EMOTE)
+        {
+            events.Reset();
+            me->AttackStop();
+            me->CombatStop(true);
+            me->GetMotionMaster()->Clear();
+
+            events.ScheduleEvent(EVENT_VICTORY_CHEER_2, 3s, 6500ms);
         }
     }
 
@@ -1036,6 +1178,37 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
                     events.Repeat(5s);
                 }
                 break;
+            case EVENT_VICTORY_CHEER_2:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+                events.ScheduleEvent(EVENT_VICTORY_CHEER_3, 3s, 6500ms);
+                break;
+            case EVENT_VICTORY_CHEER_3:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
+                events.ScheduleEvent(EVENT_VICTORY_DANCE, 3s, 6500ms);
+                break;
+            case EVENT_VICTORY_DANCE:
+                if (me->IsAlive())
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
+                events.ScheduleEvent(EVENT_VICTORY_DESPAWN, 15s, 60s);
+                break;
+            case EVENT_VICTORY_DESPAWN:
+                me->DespawnOrUnsummon();
+                break;
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_VICTORY_EMOTE)
+        {
+            events.Reset();
+            me->AttackStop();
+            me->CombatStop(true);
+            me->GetMotionMaster()->Clear();
+
+            events.ScheduleEvent(EVENT_VICTORY_CHEER_2, 3s, 6500ms);
         }
     }
 
