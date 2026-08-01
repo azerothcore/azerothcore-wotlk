@@ -14341,7 +14341,7 @@ void Unit::SetControlled(bool apply, UnitState state, Unit* source /*= nullptr*/
             case UNIT_STATE_ROOT:
                 // Prevent the DB rooted flag from being removed on aura expiration.
                 if (IsCreature())
-                    if (ToCreature()->IsRooted())
+                    if (ToCreature()->GetMovementTemplate().IsRooted())
                         return;
 
                 if (HasRootAura() || GetVehicle())
