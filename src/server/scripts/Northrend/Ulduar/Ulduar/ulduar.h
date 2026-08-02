@@ -89,9 +89,6 @@ enum UlduarData
     DATA_XT002_DOORS                        = 400,
     DATA_XT002_HEART                        = 401,
 
-    // Kologarn
-    DATA_KOLOGARN_DOORS                     = 410,
-
     // Thorim
     DATA_THORIM_LEVER_GATE                  = 500,
     DATA_THORIM_LEVER                       = 501,
@@ -275,7 +272,6 @@ enum UlduarGameObjects
     GO_ARCHIVUM_DOORS                       = 194556,
     GO_ASSEMBLY_DOORS                       = 194554,
     GO_KOLOGARN_BRIDGE                      = 194232,
-    GO_KOLOGARN_DOORS                       = 194553,
     GO_KEEPERS_GATE                         = 194255,
     GO_XT002_DOORS                          = 194631,
 
