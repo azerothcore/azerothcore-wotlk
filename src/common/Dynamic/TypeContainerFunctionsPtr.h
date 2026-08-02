@@ -81,23 +81,23 @@ namespace Acore
     }
 
     // const find functions
-    template<class SPECIFIC_TYPE> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<SPECIFIC_TYPE>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE> const& Find(ContainerMapList<SPECIFIC_TYPE> const& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
         typename CountedPtr<SPECIFIC_TYPE>::iterator iter = elements._element.find(hdl);
         return (iter == elements._element.end() ? NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr) : iter->second);
     };
 
-    template<class SPECIFIC_TYPE> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<TypeNull>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE> CountedPtr<SPECIFIC_TYPE> const& Find(ContainerMapList<TypeNull> const& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
         return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr);
     }
 
-    template<class SPECIFIC_TYPE, class T> const CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<T>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
+    template<class SPECIFIC_TYPE, class T> CountedPtr<SPECIFIC_TYPE> const& Find(ContainerMapList<T> const& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* /*fake*/)
     {
         return NullPtr<SPECIFIC_TYPE>((SPECIFIC_TYPE*)nullptr);
     }
 
-    template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<TypeList<H, T>>& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* fake)
+    template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<TypeList<H, T>> const& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* fake)
     {
         CountedPtr<SPECIFIC_TYPE>& t = Find(elements._elements, hdl, fake);
         if (!t)

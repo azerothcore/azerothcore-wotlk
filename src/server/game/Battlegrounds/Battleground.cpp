@@ -18,12 +18,8 @@
 #include "Battleground.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
-#include "BattlegroundBE.h"
-#include "BattlegroundDS.h"
 #include "BattlegroundMgr.h"
-#include "BattlegroundNA.h"
-#include "BattlegroundRL.h"
-#include "BattlegroundRV.h"
+#include "BattlegroundUtils.h"
 #include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Creature.h"
@@ -39,10 +35,12 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "Realm.h"
 #include "RBAC.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "TC9Sidecar.h"
 #include "Transport.h"
 #include "Util.h"
 #include "World.h"
@@ -247,6 +245,12 @@ Battleground::~Battleground()
         delete itr.second;
 }
 
+uint32 Battleground::GetMinPlayersPerTeam() const
+{
+    uint32 lowLevelsOverride = GetLowLevelsMinPlayersOverride(GetBgTypeID());
+    return (lowLevelsOverride && !isTemplate() && !isMaxLevel() && !isArena()) ? lowLevelsOverride : m_MinPlayersPerTeam;
+}
+
 void Battleground::Update(uint32 diff)
 {
     // pussywizard:
@@ -275,6 +279,12 @@ void Battleground::Update(uint32 diff)
         if (!GetInvitedCount(TEAM_HORDE) && !GetInvitedCount(TEAM_ALLIANCE))
         {
             m_SetDeleteThis = true;
+
+            // Only needed for the sidecar notify inside SetStatus; queue and
+            // spectator code read the status within this manager pass, so do
+            // not change it on non-cluster servers.
+            if (sToCloud9Sidecar->ClusterModeEnabled())
+                SetStatus(STATUS_WAIT_LEAVE);
         }
 
         return;
@@ -533,6 +543,8 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         // Mark setup as completed
         m_SetupCompleted = true;
+
+        sScriptMgr->OnBattlegroundSetup(this);
     }
 
     // First announcement at 120s or 60s (Depending on BG or Arena and configured time)
@@ -558,33 +570,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         if (StartMessageIds[BG_STARTING_EVENT_THIRD])
             SendBroadcastText(StartMessageIds[BG_STARTING_EVENT_THIRD], CHAT_MSG_BG_SYSTEM_NEUTRAL);
-
-        if (isArena())
-            switch (GetBgTypeID())
-            {
-                case BATTLEGROUND_NA:
-                    DelObject(BG_NA_OBJECT_READY_MARKER_1);
-                    DelObject(BG_NA_OBJECT_READY_MARKER_2);
-                    break;
-                case BATTLEGROUND_BE:
-                    DelObject(BG_BE_OBJECT_READY_MARKER_1);
-                    DelObject(BG_BE_OBJECT_READY_MARKER_2);
-                    break;
-                case BATTLEGROUND_RL:
-                    DelObject(BG_RL_OBJECT_READY_MARKER_1);
-                    DelObject(BG_RL_OBJECT_READY_MARKER_2);
-                    break;
-                case BATTLEGROUND_DS:
-                    DelObject(BG_DS_OBJECT_READY_MARKER_1);
-                    DelObject(BG_DS_OBJECT_READY_MARKER_2);
-                    break;
-                case BATTLEGROUND_RV:
-                    DelObject(BG_RV_OBJECT_READY_MARKER_1);
-                    DelObject(BG_RV_OBJECT_READY_MARKER_2);
-                    break;
-                default:
-                    break;
-            }
     }
     // Delay expired (after configured prep time)
     else if (GetStartDelayTime() <= 0 && !(m_Events & BG_STARTING_EVENT_4))
@@ -1094,6 +1079,11 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     // if the player was a match participant
     if (participant)
     {
+        if (sToCloud9Sidecar->ClusterModeEnabled())
+            sToCloud9Sidecar->OnPlayerLeftBattleground(player->GetGUID().GetCounter(),
+                                                       player->GetGUID().GetRealmID(),
+                                                       GetInstanceID());
+
         player->ClearAfkReports();
 
         WorldPacket data;
@@ -1378,22 +1368,6 @@ void Battleground::SpectatorsSendPacket(WorldPacket& data)
 {
     for (SpectatorList::const_iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
         (*itr)->SendDirectMessage(&data);
-}
-
-void Battleground::ReadyMarkerClicked(Player* p)
-{
-    if (!isArena() || GetStatus() >= STATUS_IN_PROGRESS || GetStartDelayTime() <= BG_START_DELAY_15S || (m_Events & BG_STARTING_EVENT_3) || p->IsSpectator())
-        return;
-    readyMarkerClickedSet.insert(p->GetGUID());
-    uint32 count = readyMarkerClickedSet.size();
-    uint32 req = ArenaTeam::GetReqPlayersForType(GetArenaType());
-    ChatHandler(p->GetSession()).SendNotification("You are marked as ready {}/{}", count, req);
-    if (count == req)
-    {
-        m_Events |= BG_STARTING_EVENT_2;
-        m_StartTime += GetStartDelayTime() - BG_START_DELAY_15S;
-        SetStartDelayTime(BG_START_DELAY_15S);
-    }
 }
 
 void Battleground::BuildPvPLogDataPacket(WorldPacket& data)
@@ -1927,4 +1901,12 @@ void Battleground::RewardXPAtKill(Player* killer, Player* victim)
 uint8 Battleground::GetUniqueBracketId() const
 {
     return GetMaxLevel() / 10;
+}
+
+void Battleground::SetStatus(BattlegroundStatus Status)
+{
+    m_Status = Status;
+
+    if (sToCloud9Sidecar->ClusterModeEnabled() && GetInstanceID() != 0)
+        sToCloud9Sidecar->OnBattlegroundStatusChanged(GetInstanceID(), Status);
 }

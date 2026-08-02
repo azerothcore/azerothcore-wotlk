@@ -25,7 +25,7 @@
 class SpellScriptLoader : public ScriptObject
 {
 protected:
-    SpellScriptLoader(const char* name);
+    SpellScriptLoader(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
