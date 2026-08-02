@@ -5858,8 +5858,10 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
         }
     }
 
-    // is needed to push through to the client that the rune is active
-    //player->ResyncRunes(MAX_RUNES);
+    // SMSG_SPELL_GO carries the rune masks, but it is sent before the effects run, so it
+    // still describes the runes as being on cooldown. Without this the client keeps counting
+    // its own timers down and refuses to spend runes the server already handed back.
+    player->ResyncRunes(MAX_RUNES);
     m_caster->CastSpell(m_caster, 47804, true);
 }
 
