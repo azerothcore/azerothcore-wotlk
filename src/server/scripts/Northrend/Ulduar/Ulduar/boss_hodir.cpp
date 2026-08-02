@@ -53,6 +53,7 @@ enum HodirSpellData
 
     SPELL_ICICLE_VISUAL_UNPACKED        = 62234,
     SPELL_ICICLE_VISUAL_PACKED          = 62462,
+    SPELL_ICICLE_PACKED_TBBA            = 62477,
     SPELL_ICICLE_VISUAL_FALLING         = 62453,
     SPELL_ICICLE_FALL_EFFECT_UNPACKED   = 62236,
     SPELL_ICICLE_FALL_EFFECT_PACKED     = 62460,
@@ -417,13 +418,8 @@ struct boss_hodir : public BossAI
                     targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
                     targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
                     Acore::Containers::RandomResize(targets, (RAID_MODE(2,3)));
-                    for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                    {
-                        float prevZ = (*itr)->GetPositionZ();
-                        (*itr)->m_positionZ = 432.7f;
-                        (*itr)->CastSpell((*itr), SPELL_ICICLE_VISUAL_PACKED, true);
-                        (*itr)->m_positionZ = prevZ;
-                    }
+                    for (Unit* target : targets)
+                        me->CastSpell(target, SPELL_ICICLE_PACKED_TBBA, true); // Forces victim to cast Icicle (62462)
 
                     me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
                     me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
