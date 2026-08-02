@@ -2046,10 +2046,7 @@ class spell_mimiron_magnetic_core_summon : public SpellScript
 
     void ModDest(SpellDestination& dest)
     {
-        Unit* caster = GetCaster();
-        Position pos = caster->GetPosition();
-        pos.m_positionZ = caster->GetMap()->GetHeight(pos);
-        dest.Relocate(pos);
+        dest._position.m_positionZ = GetCaster()->GetMap()->GetHeight(dest._position);
     }
 
     void Register() override
