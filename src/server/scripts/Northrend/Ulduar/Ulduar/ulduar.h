@@ -356,6 +356,9 @@ enum UlduarMisc
     EVENT_TOWER_OF_FLAMES_DESTROYED         = 21033,
     EVENT_TOWER_OF_LIFE_DESTROYED           = 21030,
 
+    // Sent by Shatter Chest (62502), triggered by Hodir's hard mode timer missile (62501)
+    EVENT_HODIR_SHATTER_CHEST               = 20907,
+
     ACTION_LEVIATHAN_REFRESH_TOWERS         = -1,
     ACTION_TOWER_OF_STORM_DESTROYED         = 1,
     ACTION_TOWER_OF_FROST_DESTROYED         = 2,
