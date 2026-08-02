@@ -111,6 +111,7 @@ enum UlduarData
     DATA_UNIVERSE_GLOBE                     = 608,
     DATA_ALGALON_TRAPDOOR                   = 609,
     DATA_BRANN_BRONZEBEARD_ALG              = 610,
+    DATA_RESUMMON_ALGALON                   = 611,
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
@@ -355,6 +356,9 @@ enum UlduarMisc
     EVENT_TOWER_OF_FLAMES_DESTROYED         = 21033,
     EVENT_TOWER_OF_LIFE_DESTROYED           = 21030,
 
+    // Sent by Shatter Chest (62502), triggered by Hodir's hard mode timer missile (62501)
+    EVENT_HODIR_SHATTER_CHEST               = 20907,
+
     ACTION_LEVIATHAN_REFRESH_TOWERS         = -1,
     ACTION_TOWER_OF_STORM_DESTROYED         = 1,
     ACTION_TOWER_OF_FROST_DESTROYED         = 2,
@@ -362,9 +366,11 @@ enum UlduarMisc
     ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
 
     EVENT_UPDATE_ALGALON_TIMER              = 1,
+    EVENT_RESUMMON_ALGALON                  = 2,
     ACTION_FEEDS_ON_TEARS_FAILED            = 0,
     ACTION_INIT_ALGALON                     = 1,
     ACTION_DESPAWN_ALGALON                  = 2,
+    ACTION_START_INTRO                      = 3,
 
     TIMER_ALGALON_DEFEATED                  = 300,
     TIMER_ALGALON_TO_SUMMON                 = 200,
