@@ -47,7 +47,8 @@ DoorData const doorData[] =
     { GO_KEEPERS_GATE,                 BOSS_THORIM,    DOOR_TYPE_PASSAGE    },
     { GO_KEEPERS_GATE,                 BOSS_FREYA,     DOOR_TYPE_PASSAGE    },
     { GO_VEZAX_DOOR,                   BOSS_VEZAX,     DOOR_TYPE_PASSAGE    },
-    { GO_YOGG_SARON_DOORS,             BOSS_YOGGSARON, DOOR_TYPE_ROOM       },
+    // GO_YOGG_SARON_DOORS is handled by boss_yoggsaron_sara: it closes 15 seconds
+    // after the pull, not immediately when the encounter enters IN_PROGRESS.
     { GO_DOODAD_UL_SIGILDOOR_03,       BOSS_ALGALON,   DOOR_TYPE_ROOM       },
     { GO_DOODAD_UL_UNIVERSEFLOOR_01,   BOSS_ALGALON,   DOOR_TYPE_ROOM       },
     { GO_DOODAD_UL_UNIVERSEFLOOR_02,   BOSS_ALGALON,   DOOR_TYPE_SPAWN_HOLE },
@@ -113,6 +114,7 @@ ObjectData const creatureData[] =
     // Yogg-Saron helpers
     { NPC_SARA,                     DATA_SARA                   },
     { NPC_BRAIN_OF_YOGG_SARON,      DATA_BRAIN_OF_YOGG_SARON    },
+    { NPC_VOICE_OF_YOGG_SARON,      DATA_VOICE_OF_YOGG_SARON    },
     // Observation Ring Keepers
     { NPC_FREYA_GOSSIP,             DATA_FREYA_GOSSIP           },
     { NPC_HODIR_GOSSIP,             DATA_HODIR_GOSSIP           },
@@ -165,6 +167,12 @@ ObjectData const gameobjectData[] =
     { 0,                                0                               }
 };
 
+ObjectData const summonData[] =
+{
+    { NPC_SARONITE_ANIMUS,  BOSS_VEZAX }, // summoned by a Saronite Vapor, not Vezax
+    { 0,                    0          }
+};
+
 BossBoundaryData const boundaries =
 {
     { BOSS_LEVIATHAN, new RectangleBoundary(130.0f, 450.0f, -170.0f, 110.0f) },
@@ -189,6 +197,7 @@ public:
             SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, gameobjectData);
+            LoadSummonData(summonData);
             LoadBossBoundaries(boundaries);
             Initialize();
         };
@@ -210,6 +219,7 @@ public:
         // Shared
         EventMap _events;
         bool _mimironTramUsed;
+        bool _algalonResummonPending;
 
         void Initialize() override
         {
@@ -225,6 +235,7 @@ public:
             // Shared
             _events.Reset();
             _mimironTramUsed       = false;
+            _algalonResummonPending = false;
         }
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
@@ -270,7 +281,7 @@ public:
 
             uint32 algalonTimer =
                 GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
-            if (!GetObjectGuid(BOSS_ALGALON) && algalonTimer
+            if (!GetObjectGuid(BOSS_ALGALON) && !_algalonResummonPending && algalonTimer
                 && (algalonTimer <= 60
                     || algalonTimer == TIMER_ALGALON_TO_SUMMON))
             {
@@ -315,6 +326,18 @@ public:
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
                 SetData(eventId, 0);
+            else if (eventId == EVENT_HODIR_SHATTER_CHEST)
+            {
+                if (GameObject* go = GetHodirChest(true))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                    scheduler.Schedule(3s, [this](TaskContext /*context*/)
+                    {
+                        if (GetBossState(BOSS_HODIR) != DONE)
+                            SetData(TYPE_HODIR_HM_FAIL, 0);
+                    });
+                }
+            }
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -616,6 +639,17 @@ public:
                     if (GetBossState(BOSS_FREYA) == DONE)
                         gameObject->SetRespawnTime(7 * DAY);
                     break;
+                // Freya Loot
+                case 194324:
+                case 194325:
+                case 194326:
+                case 194327:
+                case 194328:
+                case 194329:
+                case 194330:
+                case 194331:
+                    gameObject->SetLootRecipient(instance);
+                    break;
             }
         }
 
@@ -687,6 +721,10 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 60);
                     StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, 60);
                     _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
+                    return;
+                case DATA_RESUMMON_ALGALON:
+                    _algalonResummonPending = true;
+                    _events.RescheduleEvent(EVENT_RESUMMON_ALGALON, 2s);
                     return;
                 case DATA_ALGALON_SUMMON_STATE:
                 case DATA_ALGALON_DEFEATED:
@@ -911,7 +949,14 @@ public:
                     SetData(DATA_ALGALON_DEFEATED, 1);
                     if (Creature* algalon = GetCreature(BOSS_ALGALON))
                         algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);
+                    break;
                 }
+                case EVENT_RESUMMON_ALGALON:
+                    _algalonResummonPending = false;
+                    if (!GetCreature(BOSS_ALGALON))
+                        if (Creature* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
+                            algalon->AI()->DoAction(ACTION_START_INTRO);
+                    break;
             }
         }
 
@@ -963,6 +1008,24 @@ public:
                     return (mask & (1 << BOSS_YOGGSARON)) == 0;
             }
             return false;
+        }
+
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
+        {
+            if (_SkipCheckRequiredBosses(player))
+                return true;
+
+            switch (bossId)
+            {
+                case BOSS_YOGGSARON:
+                    if (GetBossState(BOSS_VEZAX) != DONE)
+                        return false;
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
         }
     };
 };

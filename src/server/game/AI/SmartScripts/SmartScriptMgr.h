@@ -568,7 +568,7 @@ enum SMART_ACTION
     SMART_ACTION_CALL_GROUPEVENTHAPPENS             = 26,     // QuestID
     SMART_ACTION_COMBAT_STOP                        = 27,     // No Params
     SMART_ACTION_REMOVEAURASFROMSPELL               = 28,     // Spellid (0 removes all auras), charges (0 removes aura)
-    SMART_ACTION_FOLLOW                             = 29,     // Distance (0 = default), Angle (0 = default), EndCreatureEntry, credit, creditType (0monsterkill, 1event)
+    SMART_ACTION_FOLLOW                             = 29,     // Distance (0 = default), Angle (0 = default), EndCreatureEntry, credit, creditType (0monsterkill, 1event), aliveState (0 = creature must be alive, 1 = dead creature can trigger arrival)
     SMART_ACTION_RANDOM_PHASE                       = 30,     // PhaseId1, PhaseId2, PhaseId3...
     SMART_ACTION_RANDOM_PHASE_RANGE                 = 31,     // PhaseMin, PhaseMax
     SMART_ACTION_RESET_GOBJECT                      = 32,     //
@@ -1590,8 +1590,9 @@ enum SMARTAI_TARGETS
     SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry
     SMART_TARGET_INSTANCE_STORAGE               = 205,  // Instance data index, Type (creature (1), gameobject (2))
     SMART_TARGET_FORMATION                      = 206,  // Type (0: members only, 1: leader only, 2: all), CreatureEntry (0: any), ExcludeSelf (0/1)
+    SMART_TARGET_SHARED_OWNER_ENTITIES          = 207,  // Type (creature (1), gameobject (2)), Entry (0: any), MaxDist (0: visibility range)
 
-    SMART_TARGET_AC_END                         = 207   // placeholder
+    SMART_TARGET_AC_END                         = 208   // placeholder
 };
 
 struct SmartTarget
@@ -1779,6 +1780,14 @@ struct SmartTarget
         {
             SAIBool includePets;
         } invokerParty;
+
+        // entities sharing our owner, charmer or summoner, whether they were summoned by it or not
+        struct
+        {
+            uint32 type;        // creature (1), gameobject (2)
+            uint32 entry;       // entry filter, 0 = any
+            uint32 maxDist;     // 0 = visibility range
+        } sharedOwnerEntities;
     };
 };
 

@@ -26,7 +26,7 @@
 #define SIZE_OF_GRIDS            533.3333f
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 19
+#define MMAP_VERSION 20
 
 struct MmapTileRecastConfig
 {
@@ -45,7 +45,7 @@ struct MmapTileRecastConfig
     float cellSizeVertical;
     float maxSimplificationError;
 
-    bool operator==(const MmapTileRecastConfig& b) const {
+    bool operator==(MmapTileRecastConfig const& b) const {
         return walkableSlopeAngle == b.walkableSlopeAngle &&
                walkableRadius == b.walkableRadius &&
                walkableHeight == b.walkableHeight &&

@@ -927,7 +927,7 @@ class spell_warr_heroic_strike : public SpellScript
         bool bonusDamage = false;
         for (AuraEffect* eff : AuraEffectList)
         {
-            const SpellInfo* spellInfo = eff->GetSpellInfo();
+            SpellInfo const* spellInfo = eff->GetSpellInfo();
             if (!spellInfo)
                 continue;
 

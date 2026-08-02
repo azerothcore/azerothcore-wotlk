@@ -47,10 +47,7 @@ enum Texts
 struct boss_anetheron : public BossAI
 {
 public:
-    boss_anetheron(Creature* creature) : BossAI(creature, DATA_ANETHERON)
-    {
-        _recentlySpoken = false;
-    }
+    boss_anetheron(Creature* creature) : BossAI(creature, DATA_ANETHERON) { }
 
     void JustEngagedWith(Unit * who) override
     {
@@ -114,16 +111,8 @@ public:
 
     void KilledUnit(Unit* victim) override
     {
-        if (!_recentlySpoken && victim->IsPlayer() && me->IsAlive())
-        {
-            Talk(SAY_ONSLAY);
-            _recentlySpoken = true;
-
-            scheduler.Schedule(6s, [this](TaskContext)
-                {
-                    _recentlySpoken = false;
-                });
-        }
+        if (me->IsAlive())
+            Talk(SAY_ONSLAY, victim);
     }
 
     void JustDied(Unit * killer) override
@@ -132,8 +121,6 @@ public:
         BossAI::JustDied(killer);
     }
 
-private:
-    bool _recentlySpoken;
 };
 
 class spell_anetheron_sleep : public SpellScript
