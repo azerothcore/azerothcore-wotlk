@@ -3343,8 +3343,11 @@ class spell_item_impale_leviroth : public SpellScript
                 // around 1300-1700 instead of the intended 150-200. Cancel the multiplier out.
                 target->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 150);
                 target->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 200);
+                // BASE_PCT rather than TOTAL_PCT: both multiply in the same place, but
+                // UpdateDamagePctDoneMods rebuilds TOTAL_PCT from scratch whenever a physical
+                // damage-percent aura is applied or removed, which would drop this again.
                 if (float damageModifier = target->GetCreatureTemplate()->DamageModifier)
-                    target->SetStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 1.0f / damageModifier);
+                    target->SetStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, BASE_PCT, 1.0f / damageModifier);
 
                 // none of the above reaches the fields the melee roll reads until stats are
                 // recalculated, and nothing else here would trigger that
