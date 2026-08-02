@@ -46,12 +46,15 @@ enum HodirSpellData
     SPELL_SAFE_AREA                     = 65705,
     SPELL_SAFE_AREA_TRIGGERED           = 62464,
     SPELL_SHATTER_CHEST                 = 62501,
+    SPELL_SHATTER_CHEST_TIMER           = 65272,
 
     SPELL_ICICLE_BOSS_AURA              = 62227,
     SPELL_ICICLE_TBBA                   = 63545,
 
     SPELL_ICICLE_VISUAL_UNPACKED        = 62234,
     SPELL_ICICLE_VISUAL_PACKED          = 62462,
+    SPELL_ICICLE_FORCE_CAST             = 62476,
+    SPELL_ICICLE_FORCE_CAST_H           = 62477,
     SPELL_ICICLE_VISUAL_FALLING         = 62453,
     SPELL_ICICLE_FALL_EFFECT_UNPACKED   = 62236,
     SPELL_ICICLE_FALL_EFFECT_PACKED     = 62460,
@@ -123,8 +126,6 @@ enum HodirEvents
     EVENT_FREEZE                        = 4,
     EVENT_SMALL_ICICLES_ENABLE          = 5,
     EVENT_HARD_MODE_MISSED              = 6,
-    EVENT_DESPAWN_CHEST                 = 7,
-    EVENT_FAIL_HM                       = 8,
 
     EVENT_TRY_FREE_HELPER               = 10,
     EVENT_PRIEST_DISPELL_MAGIC          = 11,
@@ -258,12 +259,13 @@ struct boss_hodir : public BossAI
     void JustEngagedWith(Unit*  /*who*/) override
     {
         me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);
+        // Hard mode timer: periodic dummy aura whose tick shatters the Rare Cache (sniffed on retail)
+        me->CastSpell(me, SPELL_SHATTER_CHEST_TIMER, true);
         SmallIcicles(true);
         events.Reset();
         events.ScheduleEvent(EVENT_FLASH_FREEZE, 48s, 49s);
         events.ScheduleEvent(EVENT_FREEZE, 17s, 20s);
         events.ScheduleEvent(EVENT_BERSERK, 8min);
-        events.ScheduleEvent(EVENT_HARD_MODE_MISSED, 3min);
         Talk(TEXT_AGGRO);
 
         // Helpers spawn IMMUNE_TO_NPC so idle bosses (e.g. Freya's Ground Tremor, #26330) can't tag
@@ -289,14 +291,13 @@ struct boss_hodir : public BossAI
         {
             switch (action)
             {
-                case EVENT_FAIL_HM:
+                case EVENT_HARD_MODE_MISSED:
+                    Talk(TEXT_HM_MISS);
+                    bAchievCacheRare = false;
                     if (instance)
                     {
                         if (GameObject* go = GetHardmodeChest())
-                        {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                            events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3s);
-                        }
+                            me->CastSpell(go, SPELL_SHATTER_CHEST, false);
                     }
                     break;
             }
@@ -409,38 +410,9 @@ struct boss_hodir : public BossAI
                     Talk(TEXT_BERSERK);
                 }
                 break;
-            case EVENT_HARD_MODE_MISSED:
-                {
-                    Talk(TEXT_HM_MISS);
-                    bAchievCacheRare = false;
-                    if (instance)
-                    {
-                        if (GameObject* go = GetHardmodeChest())
-                            me->CastSpell(go, SPELL_SHATTER_CHEST, false);
-                    }
-                }
-                break;
-            case EVENT_DESPAWN_CHEST:
-                if (instance && instance->GetBossState(BOSS_HODIR) != DONE)
-                    instance->SetData(TYPE_HODIR_HM_FAIL, 0);
-                break;
             case EVENT_FLASH_FREEZE:
                 {
-                    std::list<Unit*> targets;
-                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                        targets.push_back(itr->GetSource());
-                    targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                    targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-                    Acore::Containers::RandomResize(targets, (RAID_MODE(2,3)));
-                    for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                    {
-                        float prevZ = (*itr)->GetPositionZ();
-                        (*itr)->m_positionZ = 432.7f;
-                        (*itr)->CastSpell((*itr), SPELL_ICICLE_VISUAL_PACKED, true);
-                        (*itr)->m_positionZ = prevZ;
-                    }
-
+                    DoCastSelf(RAID_MODE(SPELL_ICICLE_FORCE_CAST, SPELL_ICICLE_FORCE_CAST_H), true);
                     me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
                     me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
                     Talk(TEXT_FLASH_FREEZE);
@@ -1225,22 +1197,25 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
     }
 };
 
-class spell_hodir_shatter_chest : public SpellScript
+class spell_hodir_shatter_chest_timer_aura : public AuraScript
 {
-    PrepareSpellScript(spell_hodir_shatter_chest);
+    PrepareAuraScript(spell_hodir_shatter_chest_timer_aura);
 
-    void DestroyWinterCache(SpellEffIndex effIndex)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PreventHitDefaultEffect(effIndex);
+        return ValidateSpellInfo({ SPELL_SHATTER_CHEST });
+    }
 
-        if (Unit* hodir = GetCaster())
-            hodir->GetAI()->DoAction(EVENT_FAIL_HM);
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        if (Unit* hodir = GetTarget())
+            hodir->GetAI()->DoAction(EVENT_HARD_MODE_MISSED);
     }
 
     void Register() override
     {
-        OnEffectHit += SpellEffectFn(spell_hodir_shatter_chest::DestroyWinterCache, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
-    };
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_shatter_chest_timer_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
 };
 
 class spell_hodir_biting_cold_main_aura : public AuraScript
@@ -1352,6 +1327,24 @@ class spell_hodir_periodic_icicle : public SpellScript
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_periodic_icicle::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+// 62476, 62477 - Icicle: force-casts the snowdrift icicle (62462) on the selected players
+class spell_hodir_icicle_force_cast : public SpellScript
+{
+    PrepareSpellScript(spell_hodir_icicle_force_cast);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 2);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_icicle_force_cast::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1599,10 +1592,11 @@ void AddSC_boss_hodir()
     RegisterUlduarCreatureAI(npc_ulduar_hodir_shaman);
     RegisterUlduarCreatureAI(npc_ulduar_hodir_mage);
 
-    RegisterSpellScript(spell_hodir_shatter_chest);
+    RegisterSpellScript(spell_hodir_shatter_chest_timer_aura);
     RegisterSpellScript(spell_hodir_biting_cold_main_aura);
     RegisterSpellScript(spell_hodir_biting_cold_player_aura);
     RegisterSpellScript(spell_hodir_periodic_icicle);
+    RegisterSpellScript(spell_hodir_icicle_force_cast);
     RegisterSpellAndAuraScriptPair(spell_hodir_flash_freeze, spell_hodir_flash_freeze_aura);
     RegisterSpellScript(spell_hodir_storm_power_aura);
     RegisterSpellScript(spell_hodir_storm_cloud_aura);
