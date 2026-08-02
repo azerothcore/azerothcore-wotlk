@@ -695,6 +695,12 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
 
 Spell::~Spell()
 {
+    // FindMap() check: pending spell events are destroyed after the caster has left the map,
+    // where resolving a unit-summoned caster's owner through ObjectAccessor would assert
+    if (Player* modOwner = (m_caster && m_caster->FindMap()) ? m_caster->GetSpellModOwner() : nullptr)
+        if (modOwner->m_spellModTakingSpell == this)
+            modOwner->SetSpellModTakingSpell(this, false);
+
     // unload scripts
     while (!m_loadedScripts.empty())
     {
@@ -1150,7 +1156,11 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
                 if (m_spellInfo->RequiresSpellFocus)
                 {
                     if (focusObject)
-                        m_targets.SetDst(*focusObject);
+                    {
+                        SpellDestination dest(*focusObject);
+                        CallScriptDestinationTargetSelectHandlers(dest, effIndex, targetType);
+                        m_targets.SetDst(dest);
+                    }
                     return;
                 }
                 break;
@@ -1163,13 +1173,17 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
     if (!target)
     {
         LOG_DEBUG("spells.aura", "Spell::SelectImplicitNearbyTargets: cannot find nearby target for spell ID {}, effect {}", m_spellInfo->Id, effIndex);
+        SendCastResult(SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+        finish(false);
         return;
     }
 
     CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
     if (!target)
     {
-        //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id {} set nullptr target, effect {}", m_spellInfo->Id, effIndex);
+        LOG_DEBUG("spells.aura", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id {} set nullptr target, effect {}", m_spellInfo->Id, effIndex);
+        SendCastResult(SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+        finish(false);
         return;
     }
 
@@ -1190,7 +1204,9 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
                 }
                 else
                 {
-                    //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id {} set object of wrong type, expected unit, got {}, effect {}", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
+                    LOG_DEBUG("spells.aura", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id {} set object of wrong type, expected unit, got {}, effect {}", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
+                    SendCastResult(SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+                    finish(false);
                     return;
                 }
                 break;
@@ -1200,13 +1216,19 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
                 AddGOTarget(gobjTarget, effMask);
             else
             {
-                //LOG_DEBUG("spells", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id {} set object of wrong type, expected gameobject, got {}, effect {}", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
+                LOG_DEBUG("spells.aura", "Spell::SelectImplicitNearbyTargets: OnObjectTargetSelect script hook for spell Id {} set object of wrong type, expected gameobject, got {}, effect {}", m_spellInfo->Id, target->GetGUID().GetTypeName(), effMask);
+                SendCastResult(SPELL_FAILED_BAD_IMPLICIT_TARGETS);
+                finish(false);
                 return;
             }
             break;
         case TARGET_OBJECT_TYPE_DEST:
-            m_targets.SetDst(*target);
-            break;
+            {
+                SpellDestination dest(*target);
+                CallScriptDestinationTargetSelectHandlers(dest, effIndex, targetType);
+                m_targets.SetDst(dest);
+                break;
+            }
         default:
             ASSERT(false && "Spell::SelectImplicitNearbyTargets: received not implemented target object type");
             break;
@@ -4468,6 +4490,11 @@ void Spell::finish(bool ok)
     if (m_spellState == SPELL_STATE_FINISHED)
         return;
     m_spellState = SPELL_STATE_FINISHED;
+
+    // FindMap() check: pending spell events are destroyed after the caster has left the map,
+    // where resolving a unit-summoned caster's owner through ObjectAccessor would assert
+    if (Player* modOwner = (m_caster && m_caster->FindMap()) ? m_caster->GetSpellModOwner() : nullptr)
+        modOwner->SetSpellModTakingSpell(this, false);
 
     if (m_spellInfo->IsChanneled())
         m_caster->UpdateInterruptMask();
@@ -9102,7 +9129,7 @@ namespace Acore
 
     bool WorldObjectSpellNearbyTargetCheck::operator()(WorldObject* target)
     {
-        float dist = target->GetDistance(*_position);
+        float dist = target->GetDistance2d(_position->GetPositionX(), _position->GetPositionY());
         if (dist < _range && WorldObjectSpellTargetCheck::operator ()(target))
         {
             _range = dist;
