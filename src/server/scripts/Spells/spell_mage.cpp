@@ -1056,7 +1056,12 @@ class spell_mage_combustion : public AuraScript
             Unit* actor = eventInfo.GetActor();
             actor->m_Events.AddEventAtOffset([actor]()
             {
-                actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+                // An AoE volley procs once per target, all in the same tick, and a target that
+                // crits away the last charge removes Combustion right there - while these
+                // deferred stacks are still queued. Re-applying the buff after that leaves it
+                // up for good: 28682 has no duration, and the aura that removes it is gone.
+                if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                    actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
             }, 1ms);
             return false;
         }
