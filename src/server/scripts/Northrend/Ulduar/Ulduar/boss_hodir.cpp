@@ -177,35 +177,35 @@ enum HodirHelperActions
 struct HodirHelperData
 {
     uint32 id;
-    float x, y;
+    Position pos;
 };
 HodirHelperData hhd[4][4] =
 {
     // Alliance:
     {
-        {NPC_PAN_FIELD_MEDIC_PENNY, 2020.46f, -236.74f},
-        {NPC_DAN_ELLIE_NIGHTFEATHER, 2007.21f, -241.57f},
-        {NPC_SAN_ELEMENTALIST_AVUUN, 1999.14f, -230.69f},
-        {NPC_MAN_MISSY_FLAMECUFFS, 1984.38f, -242.57f}
+        {NPC_PAN_FIELD_MEDIC_PENNY, {1983.75f, -243.36f, 432.767f, 1.5708f}},
+        {NPC_DAN_ELLIE_NIGHTFEATHER, {1999.90f, -230.50f, 432.758f, 1.5359f}},
+        {NPC_SAN_ELEMENTALIST_AVUUN, {2010.06f, -243.46f, 432.767f, 1.3614f}},
+        {NPC_MAN_MISSY_FLAMECUFFS, {2021.12f, -236.65f, 432.767f, 1.9373f}}
     },
     {
-        {NPC_PAH_FIELD_MEDIC_JESSI, 2012.29f, -233.70f},
-        {NPC_DAH_EIVI_NIGHTFEATHER, 1995.75f, -241.32f},
-        {NPC_SAH_ELEMENTALIST_MAHFUUN, 1989.31f, -234.26f},
-        {NPC_MAH_SISSY_FLAMECUFFS, 1977.87f, -233.99f}
+        {NPC_PAH_FIELD_MEDIC_JESSI, {2013.20f, -232.35f, 432.752f, 1.9897f}},
+        {NPC_DAH_EIVI_NIGHTFEATHER, {1976.41f, -235.07f, 432.752f, 0.9250f}},
+        {NPC_SAH_ELEMENTALIST_MAHFUUN, {1988.79f, -234.15f, 432.752f, 1.2043f}},
+        {NPC_MAH_SISSY_FLAMECUFFS, {1997.36f, -241.95f, 432.752f, 1.4835f}}
     },
     // Horde:
     {
-        {NPC_PHN_BATTLEPRIEST_ELIZA, 2020.46f, -236.74f},
-        {NPC_DHN_TOR_GREYCLOUD, 2007.21f, -241.57f},
-        {NPC_SHN_SPIRITWALKER_YONA, 1999.14f, -230.69f},
-        {NPC_MHN_VEESHA_BLAZEWEAVER, 1984.38f, -242.57f}
+        {NPC_PHN_BATTLEPRIEST_ELIZA, {1983.75f, -243.36f, 432.767f, 1.5708f}},
+        {NPC_DHN_TOR_GREYCLOUD, {1999.90f, -230.50f, 432.758f, 1.5359f}},
+        {NPC_SHN_SPIRITWALKER_YONA, {2010.06f, -243.46f, 432.767f, 1.3614f}},
+        {NPC_MHN_VEESHA_BLAZEWEAVER, {2021.12f, -236.65f, 432.767f, 1.9373f}}
     },
     {
-        {NPC_PHH_BATTLEPRIEST_GINA, 2012.29f, -233.70f},
-        {NPC_DHH_KAR_GREYCLOUD, 1995.75f, -241.32f},
-        {NPC_SHH_SPIRITWALKER_TARA, 1989.31f, -234.6f},
-        {NPC_MHH_AMIRA_BLAZEWEAVER, 1977.87f, -233.99f}
+        {NPC_PHH_BATTLEPRIEST_GINA, {2013.20f, -232.35f, 432.752f, 1.9897f}},
+        {NPC_DHH_KAR_GREYCLOUD, {1976.41f, -235.07f, 432.752f, 0.9250f}},
+        {NPC_SHH_SPIRITWALKER_TARA, {1988.79f, -234.15f, 432.752f, 1.2043f}},
+        {NPC_MHH_AMIRA_BLAZEWEAVER, {1997.36f, -241.95f, 432.752f, 1.4835f}}
     }
 };
 
@@ -493,7 +493,7 @@ struct boss_hodir : public BossAI
                     if (!hhd[k][i].id)
                         continue;
 
-                    if (Creature* h_p = me->SummonCreature(hhd[k][i].id, hhd[k][i].x, hhd[k][i].y, 432.69f, M_PI / 2))
+                    if (Creature* h_p = me->SummonCreature(hhd[k][i].id, hhd[k][i].pos))
                     {
                         h_p->SetFaction(1665);
                         if (cnt < 8)
