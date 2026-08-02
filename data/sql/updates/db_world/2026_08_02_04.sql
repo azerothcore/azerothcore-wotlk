@@ -1,3 +1,4 @@
+-- DB update 2026_08_02_03 -> 2026_08_02_04
 
 -- Remove ScriptName & set SAI.
 UPDATE `creature_template` SET `ScriptName` = '', `AIName` = 'SmartAI' WHERE `entry` = 29076;
