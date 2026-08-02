@@ -435,7 +435,7 @@ struct boss_hodir : public BossAI
                     targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
                     Acore::Containers::RandomResize(targets, (RAID_MODE(2,3)));
                     for (Unit* target : targets)
-                        me->CastSpell(target, SPELL_ICICLE_PACKED_TBBA, true); // Force-cast: victim casts Icicle (62462) on themselves
+                        me->CastSpell(target, SPELL_ICICLE_PACKED_TBBA, true); // Forces victim to cast Icicle (62462)
 
                     me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
                     me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
