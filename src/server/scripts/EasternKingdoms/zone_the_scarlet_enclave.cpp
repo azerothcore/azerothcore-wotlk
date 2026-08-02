@@ -2680,7 +2680,6 @@ void AddSC_the_scarlet_enclave()
     RegisterCreatureAI(npc_valkyr_battle_maiden);
     RegisterCreatureAI(npc_scarlet_ghoul);
     RegisterCreatureAI(npc_dkc1_gothik);
-    RegisterCreatureAI(npc_scarlet_courier);
     RegisterCreatureAI(npc_koltira_deathweaver);
     RegisterCreatureAI(npc_acherus_necromancer);
     RegisterCreatureAI(npc_gothik_the_harvester);
