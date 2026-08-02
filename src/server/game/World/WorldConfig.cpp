@@ -168,6 +168,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_INTERVAL_SAVE, "PlayerSaveInterval", 900000);
     SetConfigValue<uint32>(CONFIG_INTERVAL_DISCONNECT_TOLERANCE, "DisconnectToleranceInterval", 0);
     SetConfigValue<bool>(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT, "PlayerSave.Stats.SaveOnlyOnLogout", true);
+    SetConfigValue<uint32>(CONFIG_ADDITIONAL_SAVES, "PlayerSave.AdditionalSaves", 0);
     SetConfigValue<bool>(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS, "ValidateSkillLearnedBySpells", true);
 
     SetConfigValue<uint32>(CONFIG_MIN_LEVEL_STAT_SAVE, "PlayerSave.Stats.MinLevel", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value < MAX_LEVEL; }, "< MAX_LEVEL");
@@ -358,6 +359,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_TRIAL_LEVEL_CAP, "Trial.LevelCap", 20);
     SetConfigValue<uint32>(CONFIG_TRIAL_MONEY_CAP, "Trial.MoneyCap", 100000); // copper, 10 gold
     SetConfigValue<uint32>(CONFIG_TRIAL_TRADE_SKILL_CAP, "Trial.TradeSkillCap", 100);
+
+    SetConfigValue<bool>(CONFIG_CAIS_ENABLED, "CAIS.Enable", false);
 
     SetConfigValue<uint32>(CONFIG_EVENT_ANNOUNCE, "Event.Announce", 0);
 

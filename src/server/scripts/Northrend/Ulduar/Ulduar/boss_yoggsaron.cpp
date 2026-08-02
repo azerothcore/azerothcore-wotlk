@@ -174,6 +174,9 @@ enum YoggEvents
     EVENT_YS_DEAFENING_ROAR             = 31,
     EVENT_YS_SUMMON_GUARDIAN            = 32,
     EVENT_YS_SHADOW_BEACON              = 33,
+
+    EVENT_SARA_WIPE_OPEN_DOOR           = 40,
+    EVENT_SARA_WIPE_RESPAWN             = 41,
 };
 
 enum NPCsGOs
@@ -183,7 +186,6 @@ enum NPCsGOs
     NPC_GUARDIAN_OF_YS                  = 33136,
     NPC_SANITY_WELL                     = 33991,
     NPC_YOGG_SARON                      = 33288,
-    NPC_VOICE_OF_YOGG_SARON             = 33280,
     NPC_YOGG_SARON_VISION               = 33552,
 
     NPC_CRUSHER_TENTACLE                = 33966, // 50 secs ?
@@ -230,6 +232,9 @@ enum NPCsGOs
 
 enum Misc
 {
+    ACTION_ACTIVATE_KEEPER              = -19,
+    ACTION_VOICE_STOP                   = -18,
+    ACTION_VOICE_START                  = -17,
     ACTION_UNSUMMON_CLOUDS              = -16,
     ACTION_DESPAWN_ADDS                 = -15,
     ACTION_START_SUMMONING              = -14,
@@ -255,6 +260,7 @@ enum Misc
     EVENT_PHASE_ONE                     = 1,
     EVENT_PHASE_TWO                     = 2,
     EVENT_PHASE_THREE                   = 3,
+    EVENT_PHASE_WIPE_RECOVERY           = 4,
 
     CRITERIA_NOT_GETTING_OLDER          = 21001,
 
@@ -382,10 +388,11 @@ struct boss_yoggsaron_sara : public ScriptedAI
     uint32 _initFight;
     uint8 _summonedGuardiansCount;
     uint32 _p2TalkTimer;
-    bool _secondPhase;
+    bool _secondPhase = false;
     float _summonSpeed;
     uint8 _currentIllusion;
     bool _isIllusionReversed;
+    bool _isWipeRecovering = false;
 
     void AttackStart(Unit*) override { }
     void MoveInLineOfSight(Unit*) override { }
@@ -412,11 +419,10 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (!_EnterEvadeMode(why))
             return;
 
-        Position pos;
-        pos = me->GetHomePosition();
+        Position pos = me->GetHomePosition();
         me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
-        Reset();
-        me->setActive(false);
+
+        HandleWipeRecovery();
     }
 
     void EnableSara(bool apply)
@@ -435,34 +441,50 @@ struct boss_yoggsaron_sara : public ScriptedAI
         }
     }
 
+    void HandleWipeRecovery()
+    {
+        _isWipeRecovering = true;
+        Reset();
+        me->SetVisible(false);
+
+        events.SetPhase(EVENT_PHASE_WIPE_RECOVERY);
+        events.ScheduleEvent(EVENT_SARA_WIPE_OPEN_DOOR, 20s, 0, EVENT_PHASE_WIPE_RECOVERY);
+        events.ScheduleEvent(EVENT_SARA_WIPE_RESPAWN, 30s, 0, EVENT_PHASE_WIPE_RECOVERY);
+        me->setActive(true);
+    }
+
     void Reset() override
     {
-        if (!_secondPhase) // Phase 1 wipe
+        // Whisper only on a real phase 1 wipe, not on the initial reset
+        if (!_secondPhase && _instance && _instance->GetBossState(BOSS_YOGGSARON) == IN_PROGRESS)
         {
-            me->GetMap()->DoForAllPlayers([&](Player* player)
+            if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
             {
-                if (Creature* voice = me->FindNearestCreature(NPC_VOICE_OF_YOGG_SARON, 10.0f))
+                me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
                     voice->AI()->Talk(WHISPER_VOICE_PHASE_1_WIPE, player);
-                }
-            });
+                });
+            }
         }
 
         summons.DoAction(ACTION_DESPAWN_ADDS);
         events.Reset();
         summons.DespawnAll();
 
-        me->SetVisible(true);
+        if (!_isWipeRecovering)
+        {
+            me->SetVisible(true);
+            SpawnClouds();
+            UpdateKeeperSpawns();
+        }
+
         me->SetDisplayId(me->GetNativeDisplayId());
         me->SetDisableGravity(true);
         me->SetFaction(FACTION_FRIENDLY);
         me->ClearUnitState(UNIT_STATE_EVADE);
         EnableSara(false);
-        SpawnClouds();
 
         _initFight = 1;
-
-        UpdateKeeperSpawns();
         _summonedGuardiansCount = 0;
         _p2TalkTimer = 0;
         _secondPhase = false;
@@ -474,9 +496,14 @@ struct boss_yoggsaron_sara : public ScriptedAI
         {
             _instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
             _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
-            _instance->SetBossState(BOSS_YOGGSARON, NOT_STARTED);
-            if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
-                go->SetGoState(GO_STATE_ACTIVE);
+            if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
+                voice->AI()->DoAction(ACTION_VOICE_STOP);
+            if (!_isWipeRecovering)
+            {
+                _instance->SetBossState(BOSS_YOGGSARON, NOT_STARTED);
+                if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
+                    go->SetGoState(GO_STATE_ACTIVE);
+            }
         }
     }
 
@@ -485,17 +512,19 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (!_instance)
             return;
 
-        if (_instance->GetBossState(BOSS_VEZAX) != DONE)
-            return;
-
         _instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
         _instance->SetBossState(BOSS_YOGGSARON, IN_PROGRESS);
         me->SetInCombatWithZone();
         AttackStart(target);
 
         DespawnGossipKeepers();
-        // Engage Keepers
         summons.DoZoneInCombat();
+
+        if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
+            voice->AI()->DoAction(ACTION_VOICE_START);
+
+        // Keepers are friendly to players and never enter combat, activate them directly
+        ActivateKeepers();
 
         events.ScheduleEvent(EVENT_SARA_P1_DOORS_CLOSE, 15s, 0, EVENT_PHASE_ONE);
         events.ScheduleEvent(EVENT_SARA_P1_BERSERK, 15min, 0, 0);
@@ -532,6 +561,20 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 if (!summons.HasEntry(TABLE_KEEPER_ENTRY[i]))
                     me->SummonCreature(TABLE_KEEPER_ENTRY[i], KeepersPos[i]);
             }
+        }
+    }
+
+    void ActivateKeepers()
+    {
+        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+        {
+            Creature* summon = ObjectAccessor::GetCreature(*me, *itr);
+            if (!summon)
+                continue;
+
+            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; i++)
+                if (summon->GetEntry() == TABLE_KEEPER_ENTRY[i])
+                    summon->AI()->DoAction(ACTION_ACTIVATE_KEEPER);
         }
     }
 
@@ -611,13 +654,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
-    {
-        if (spellInfo->Id == SPELL_SANITY)
-            if (Aura* aur = target->GetAura(SPELL_SANITY))
-                aur->SetStackAmount(100);
-    }
-
     uint32 GetData(uint32 param) const override
     {
         if (param == DATA_GET_KEEPERS_COUNT)
@@ -641,6 +677,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (param == ACTION_SARA_UPDATE_SUMMON_KEEPERS)
         {
             UpdateKeeperSpawns();
+            return;
         }
         else if (param == ACTION_BRAIN_DAMAGED)
         {
@@ -669,7 +706,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
             summons.DespawnEntry(NPC_CRUSHER_TENTACLE);
             summons.DespawnEntry(NPC_CONSTRICTOR_TENTACLE);
             summons.DespawnEntry(NPC_CORRUPTOR_TENTACLE);
-            summons.DespawnEntry(NPC_VOICE_OF_YOGG_SARON);
             summons.DespawnEntry(NPC_BRAIN_OF_YOGG_SARON);
             summons.DespawnEntry(NPC_MIMIRON_GOSSIP);
             summons.DespawnEntry(NPC_HODIR_GOSSIP);
@@ -680,6 +716,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
             summons.DespawnEntry(NPC_FREYA_KEEPER);
             summons.DespawnEntry(NPC_THORIM_KEEPER);
             summons.DespawnEntry(NPC_SANITY_WELL);
+            if (Creature* voice = _instance ? _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON) : nullptr)
+                voice->AI()->DoAction(ACTION_VOICE_STOP);
             me->KillSelf();
             return;
         }
@@ -705,7 +743,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         // Guardians can be spawned by walking into Ominous Clouds even when InitFight
-        // never ran (e.g. Vezax not defeated); their novas must not start phase 2 then.
         if (!_instance || _instance->GetBossState(BOSS_YOGGSARON) != IN_PROGRESS || !attacker || attacker->GetEntry() != NPC_GUARDIAN_OF_YS || _secondPhase)
         {
             damage = 0;
@@ -750,6 +787,39 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        if (_isWipeRecovering)
+        {
+            events.Update(diff);
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_SARA_WIPE_OPEN_DOOR:
+                        if (_instance)
+                            if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
+                                go->SetGoState(GO_STATE_ACTIVE);
+                        break;
+                    case EVENT_SARA_WIPE_RESPAWN:
+                        if (_instance)
+                        {
+                            if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
+                                go->SetGoState(GO_STATE_ACTIVE);
+
+                            _instance->SetBossState(BOSS_YOGGSARON, NOT_STARTED);
+                        }
+
+                        me->SetVisible(true);
+                        SpawnClouds();
+                        UpdateKeeperSpawns();
+                        events.Reset();
+                        _isWipeRecovering = false;
+                        me->setActive(false);
+                        break;
+                }
+            }
+            return;
+        }
+
         if (_initFight)
         {
             _initFight += diff;
@@ -811,9 +881,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_SARA_P1_DOORS_CLOSE:
-                // Whispers of YS
-                me->SummonCreature(NPC_VOICE_OF_YOGG_SARON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-
                 if (_instance)
                     if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
                         go->SetGoState(GO_STATE_READY);
@@ -1680,6 +1747,8 @@ struct boss_yoggsaron_keeper : public NullCreatureAI
             me->CastSpell(me, SPELL_TITANIC_STORM_PASSIVE, false);
         else if (param == ACTION_DESPAWN_ADDS)
             _summons.DespawnAll();
+        else if (param == ACTION_ACTIVATE_KEEPER)
+            Activate();
     }
 
     void JustSummoned(Creature* summon) override
@@ -1687,7 +1756,7 @@ struct boss_yoggsaron_keeper : public NullCreatureAI
         _summons.Summon(summon);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void Activate()
     {
         switch (me->GetEntry())
         {
@@ -2099,8 +2168,21 @@ struct boss_yoggsaron_voice : public NullCreatureAI
 
     void Reset() override
     {
-        DoCastSelf(SPELL_INSANE_PERIODIC, true);
-        DoCastSelf(SPELL_SANITY_BASE, true);
+        events.Reset();
+        _targets.clear();
+        _current = 0;
+        me->RemoveAllAuras();
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_VOICE_START)
+        {
+            DoCastSelf(SPELL_INSANE_PERIODIC, true);
+            DoCastSelf(SPELL_SANITY_BASE, true);
+        }
+        else if (param == ACTION_VOICE_STOP)
+            Reset();
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
@@ -2504,6 +2586,22 @@ class spell_yogg_saron_insane_aura : public AuraScript
     }
 };
 
+// 63050 - Sanity
+class spell_yogg_saron_sanity : public SpellScript
+{
+    PrepareSpellScript(spell_yogg_saron_sanity);
+
+    void ModSanityStacks()
+    {
+        GetSpell()->SetSpellValue(SPELLVALUE_AURA_STACK, 100);
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_yogg_saron_sanity::ModSanityStacks);
+    }
+};
+
 // 64169 - Sanity Well
 class spell_yogg_saron_sanity_well_aura : public AuraScript
 {
@@ -2862,6 +2960,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_empowered_aura);
     RegisterSpellScript(spell_yogg_saron_insane_periodic_trigger);
     RegisterSpellScript(spell_yogg_saron_insane_aura);
+    RegisterSpellScript(spell_yogg_saron_sanity);
     RegisterSpellScript(spell_yogg_saron_sanity_well_aura);
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
     RegisterSpellScript(spell_yogg_saron_sanity_reduce);

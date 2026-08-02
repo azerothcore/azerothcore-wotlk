@@ -1211,7 +1211,7 @@ class spell_anti_air_rocket_bomber : public SpellScript
     void HandleDummy(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        const WorldLocation* loc = GetExplTargetDest();
+        WorldLocation const* loc = GetExplTargetDest();
         GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), GetSpellInfo()->Effects[effIndex].CalcValue(), true);
     }
 
@@ -1532,6 +1532,8 @@ public:
 
         void Reset() override
         {
+            // EnterEvadeMode override leaves UNIT_STATE_EVADE set; clear it so the dummy stays attackable
+            me->ClearUnitState(UNIT_STATE_EVADE);
             me->SetControlled(true, UNIT_STATE_STUNNED);
             isVulnerable = false;
 
