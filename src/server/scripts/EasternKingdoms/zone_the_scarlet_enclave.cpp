@@ -1979,7 +1979,9 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         // Scourge reinforcements march back in from Darion's line instead of popping
         // on the corpse they replace, which used to drop them right on top of whoever
         // just killed the last one. Defenders keep coming from where they fell.
-        Position spawnPos = creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION ? LightOfDawnPos[urand(0, 1)] : creature->GetPosition();
+        Position spawnPos = creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION
+            ? LightOfDawnPos[urand(0, 1)]
+            : creature->GetPosition();
         me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), spawnPos), 3s);
         if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
         {
@@ -2218,7 +2220,8 @@ struct npc_highlord_darion_mograine : public ScriptedAI
 
                         Position pos = LightOfDawnFightPos[urand(0, 9)];
                         summon->SetHomePosition(pos);
-                        summon->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), summon->GetSpeed(MOVE_RUN));
+                        summon->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(),
+                            pos.GetPositionZ(), summon->GetSpeed(MOVE_RUN));
                     }
                 events.ScheduleEvent(EVENT_BATTLE_ENGAGE, 5s);
                 break;
@@ -2231,7 +2234,8 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                         {
-                            if (!summon->IsAlive() || summon->GetVictim() || summon->GetEntry() == NPC_HIGHLORD_TIRION_FORDRING)
+                            if (!summon->IsAlive() || summon->GetVictim()
+                                || summon->GetEntry() == NPC_HIGHLORD_TIRION_FORDRING)
                                 continue;
 
                             if (Creature* enemy = SelectBattleOpponent(summon))
