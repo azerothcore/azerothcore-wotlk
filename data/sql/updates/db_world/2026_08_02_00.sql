@@ -1,3 +1,4 @@
+-- DB update 2026_08_01_03 -> 2026_08_02_00
 
 -- Set Right Emotes.
 UPDATE `creature_text` SET `Emote` = 1 WHERE (`CreatureID` IN (29032, 29061, 29065, 29067, 29068, 29070, 29071, 29072, 29073, 29074)) AND (`GroupID` IN (0, 2, 3, 4, 5, 6, 7, 8));
