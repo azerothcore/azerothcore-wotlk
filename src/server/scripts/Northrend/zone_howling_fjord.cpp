@@ -443,12 +443,12 @@ class spell_q11296_rivenwood_captives : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        bool valid = ValidateSpellInfo({ SPELL_SUMMON_FREED_SCOUT });
+        std::vector<uint32> spellIds = { SPELL_SUMMON_FREED_SCOUT };
 
         for (uint32 spellId = SPELL_SUMMON_HOSTILE_START; spellId <= SPELL_SUMMON_HOSTILE_END; ++spellId)
-            valid = valid && ValidateSpellInfo({ spellId });
+            spellIds.push_back(spellId);
 
-        return valid;
+        return ValidateSpellInfo(spellIds);
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
