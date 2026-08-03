@@ -230,6 +230,7 @@ enum Actions
 {
     DO_DISABLE_AERIAL = 1,
     DO_ENABLE_AERIAL,
+    DO_DESPAWN_SUMMONS,
 };
 
 enum Texts
@@ -717,7 +718,6 @@ struct boss_mimiron : public BossAI
                     LMK2->InterruptNonMeleeSpells(false);
                     LMK2->AttackStop();
                     LMK2->AI()->SetData(1, 0);
-                    LMK2->AI()->DoAction(1337);
                     LMK2->DespawnOrUnsummon(7s);
                     LMK2->SetReactState(REACT_PASSIVE);
                     VX001->InterruptNonMeleeSpells(false);
@@ -735,7 +735,7 @@ struct boss_mimiron : public BossAI
                     me->_ExitVehicle(&exitPos);
                     me->AttackStop();
                     me->GetMotionMaster()->Clear();
-                    summons.DoAction(1337); // despawn summons of summons
+                    summons.DoAction(DO_DESPAWN_SUMMONS); // despawn summons of summons
                     summons.DespawnEntry(NPC_FLAMES_INITIAL);
                     summons.DespawnEntry(33576);
 
@@ -821,7 +821,7 @@ struct boss_mimiron : public BossAI
             c->DespawnOrUnsummon();
         }
 
-        summons.DoAction(1337); // despawn summons of summons
+        summons.DoAction(DO_DESPAWN_SUMMONS); // despawn summons of summons
 
         me->RemoveAllAuras();
         me->ExitVehicle();
@@ -977,25 +977,16 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
         }
     }
 
-    // The mines are summoned by the MK II, not by Mimiron, so they are not part of
-    // Mimiron's SummonList and have to be cleaned up here.
-    void JustSummoned(Creature * summon) override
+    // Mines are summoned by the MK II, not by Mimiron, so they are not in his SummonList.
+    void JustSummoned(Creature* summon) override
     {
-        // The cannon lives in the vehicle kit and is handled by PassengerBoarded.
         if (summon->GetEntry() == NPC_PROXIMITY_MINE)
             _summons.Summon(summon);
     }
 
-    void SummonedCreatureDespawn(Creature * summon) override
+    void SummonedCreatureDespawn(Creature* summon) override
     {
         _summons.Despawn(summon);
-    }
-
-    void DoAction(int32 action) override
-    {
-        // Reset() covers the evade path; this covers the encounter being finished.
-        if (action == 1337)
-            _summons.DespawnAll();
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1304,7 +1295,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1337)
+        if (action == DO_DESPAWN_SUMMONS)
             if (Vehicle* vk = me->GetVehicleKit())
                 for (uint8 i = 0; i < 2; ++i)
                     if (Unit* r = vk->GetPassenger(5 + i))
@@ -1615,7 +1606,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     me->SetReactState(REACT_AGGRESSIVE);
                 }, 2s);
                 break;
-            case 1337:
+            case DO_DESPAWN_SUMMONS:
                 _summons.DespawnAll();
                 break;
         }
@@ -1807,6 +1798,7 @@ struct npc_ulduar_proximity_mine : public ScriptedAI
             {
                 _exploded = true;
                 me->CastSpell(me, SPELL_MINE_EXPLOSION, false);
+                me->DespawnOrUnsummon(2s);
             }
         }
         else
@@ -1819,6 +1811,7 @@ struct npc_ulduar_proximity_mine : public ScriptedAI
             {
                 _exploded = true;
                 me->CastSpell(me, SPELL_MINE_EXPLOSION, false);
+                me->DespawnOrUnsummon(2s);
             }
         }
         else
@@ -2243,7 +2236,7 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1337)
+        if (action == DO_DESPAWN_SUMMONS)
             RemoveAll();
     }
 
