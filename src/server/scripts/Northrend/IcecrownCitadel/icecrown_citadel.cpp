@@ -1994,11 +1994,14 @@ public:
     }
 };
 
-// The four Crimson Hall entrance darkfallen sit up to 13.3yd away from their
-// Empowering Blood Orb, so a 10.0f lookup only ever registered one of them as a
-// minion and the group pull in npc_icc_orb_controller::SetGUID never fired for
-// the other three. Measured from the orb, 15.0f covers the whole pack without
-// reaching the upper level orbs (they are ~33yd higher).
+// 10.0f was not a distance problem: GetDistance subtracts both combat reaches,
+// so all four entrance darkfallen are 6.58 to 9.26 yd effective. The advisor
+// (spawn 201479) was lost to cell granularity - Cell::VisitObjects falls back to
+// the standing cell alone when the area collapses to one, and radius 10 leaves
+// only cell (188, 214) while 201479 sits in (187, 214). 15.0f spans both.
+// Do not raise it: the nearest non-pack creature is 18.76 yd after reaches, and
+// the pack one floor up is 7.7 to 8.8 yd out in 2D, excluded only because
+// GetDistance is 3D.
 float const ORB_CONTROLLER_MINION_RANGE = 15.0f;
 
 // Every darkfallen entry carried SMART_ACTION_CALL_FOR_HELP with param1 = 19.
