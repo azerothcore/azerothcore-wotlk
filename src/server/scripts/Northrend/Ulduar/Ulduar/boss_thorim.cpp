@@ -457,11 +457,11 @@ struct boss_thorim : public BossAI
                 if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
                     go->RemoveGameObjectFlag((GameObjectFlags)48);
 
-                // Iron Ring Guard / Iron Honor Guard spawn with UNIT_FLAG_IMMUNE_TO_PC
+                // Iron Ring Guards spawn with UNIT_FLAG_IMMUNE_TO_PC until the arena event starts
                 summons.DoForAllSummons([](WorldObject* obj)
                 {
                     if (Creature* c = obj->ToCreature())
-                        if (c->GetEntry() == NPC_IRON_RING_GUARD || c->GetEntry() == NPC_IRON_HONOR_GUARD)
+                        if (c->GetEntry() == NPC_IRON_RING_GUARD)
                             c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
                 });
 
