@@ -1,0 +1,22 @@
+-- Combate salvaje no proceaba con Veneno hiriente (issue 26885)
+--
+-- La fila de spell_proc del talento tenia SpellTypeMask = 4, que es
+-- PROC_SPELL_TYPE_NO_DMG_HEAL (ver ProcFlagsSpellType en
+-- src/server/game/Spells/SpellMgr.h): solo hechizos que no hacen dano ni curan.
+--
+-- Veneno hiriente es el unico veneno con debuff que ademas pega dano directo
+-- (13218 y sus rangos llevan un SPELL_EFFECT_SCHOOL_DAMAGE ademas de las auras),
+-- asi que cuenta como PROC_SPELL_TYPE_DAMAGE y la mascara lo rechazaba. Los
+-- demas venenos con debuff (Mortal 2818, Debilitante 3409, Entumecedor 5760)
+-- son solo aura, por eso si funcionaban.
+--
+-- Veneno instantaneo tampoco proceaba por lo mismo, pero como no deja debuff
+-- nadie lo notaba.
+--
+-- 5 = PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_NO_DMG_HEAL. Se deja fuera HEAL
+-- (2), que no aplica aqui.
+--
+-- SpellFamilyMask1 = 524288 ya era correcta: se comprobo contra los cuatro
+-- venenos y todos los que aplican debuff la cumplen, Veneno hiriente incluido.
+
+UPDATE `spell_proc` SET `SpellTypeMask` = 5 WHERE `SpellId` = -51682;
