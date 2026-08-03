@@ -2815,6 +2815,24 @@ class spell_yogg_saron_target_selectors : public SpellScript
 };
 
 // 64132 - Constrictor Tentacle
+class spell_yogg_saron_constrictor_tentacle : public SpellScript
+{
+    PrepareSpellScript(spell_yogg_saron_constrictor_tentacle);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        // The tentacle erupts at the marked player's feet, so skip players below
+        // the platform (illusion realms and brain room).
+        targets.remove_if([](WorldObject* target) { return target->GetPositionZ() < 300.0f; });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_constrictor_tentacle::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+// 64132 - Constrictor Tentacle
 class spell_yogg_saron_constrictor_tentacle_aura : public AuraScript
 {
     PrepareAuraScript(spell_yogg_saron_constrictor_tentacle_aura);
@@ -2967,7 +2985,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_empowering_shadows);
     RegisterSpellScript(spell_yogg_saron_in_the_maws_of_the_old_god);
     RegisterSpellScript(spell_yogg_saron_target_selectors);
-    RegisterSpellScript(spell_yogg_saron_constrictor_tentacle_aura);
+    RegisterSpellAndAuraScriptPair(spell_yogg_saron_constrictor_tentacle, spell_yogg_saron_constrictor_tentacle_aura);
     RegisterSpellScript(spell_yogg_saron_grim_reprisal_aura);
 
     // ACHIEVEMENTS
