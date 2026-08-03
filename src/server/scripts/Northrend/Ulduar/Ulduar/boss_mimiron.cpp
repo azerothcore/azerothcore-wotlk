@@ -735,7 +735,7 @@ struct boss_mimiron : public BossAI
                     me->_ExitVehicle(&exitPos);
                     me->AttackStop();
                     me->GetMotionMaster()->Clear();
-                    summons.DoAction(DO_DESPAWN_SUMMONS); // despawn summons of summons
+                    summons.DoAction(DO_DESPAWN_SUMMONS);
                     summons.DespawnEntry(NPC_FLAMES_INITIAL);
                     summons.DespawnEntry(33576);
 
