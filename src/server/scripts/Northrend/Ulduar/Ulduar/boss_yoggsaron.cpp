@@ -2823,7 +2823,7 @@ class spell_yogg_saron_constrictor_tentacle : public SpellScript
     {
         // The tentacle erupts at the marked player's feet, so skip players below
         // the platform (illusion realms and brain room).
-        targets.remove_if([](WorldObject* target) { return target->GetPositionZ() < 300.0f; });
+        targets.remove_if([](WorldObject* target) { return target->GetPositionZ() <= 300.0f; });
     }
 
     void Register() override
