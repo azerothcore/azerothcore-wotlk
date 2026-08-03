@@ -29,17 +29,17 @@ esac
 $SUDO apt update
 
 # shared deps
-DEBIAN_FRONTEND="noninteractive" $SUDO \
+$SUDO DEBIAN_FRONTEND="noninteractive" \
 apt-get -y install ccache clang cmake curl make unzip jq screen tmux \
   libreadline-dev libbz2-dev git gcc g++ libssl-dev \
   libncurses-dev libboost-all-dev gdb gdbserver expect
 
 # version-specific deps
 if [[ "$UBUNTU_VERSION" == "26.04" ]]; then
-  DEBIAN_FRONTEND="noninteractive" $SUDO \
+  $SUDO DEBIAN_FRONTEND="noninteractive" \
   apt-get -y install libgoogle-perftools-dev default-libmysqlclient-dev
 else
-  DEBIAN_FRONTEND="noninteractive" $SUDO \
+  $SUDO DEBIAN_FRONTEND="noninteractive" \
   apt-get -y install google-perftools libmysqlclient-dev libncurses5-dev libncursesw5-dev
 fi
 
@@ -53,10 +53,10 @@ if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
     wget https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb -P "$VAR_PATH"
     # resolve expired key issue
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A8D3785C
-    DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
+    $SUDO DEBIAN_FRONTEND="noninteractive" dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
     $SUDO apt-get update
   fi
-  DEBIAN_FRONTEND="noninteractive" $SUDO apt-get install -y mysql-server
+  $SUDO DEBIAN_FRONTEND="noninteractive" apt-get install -y mysql-server
 fi
 
 
