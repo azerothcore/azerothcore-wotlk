@@ -32,9 +32,6 @@ class TestSpellEntryHelper
 public:
     TestSpellEntryHelper()
     {
-        // Zero initialize all fields
-        std::memset(&_entry, 0, sizeof(_entry));
-
         // Set safe defaults
         _entry.EquippedItemClass = -1;
         _entry.SchoolMask = SPELL_SCHOOL_MASK_NORMAL;
@@ -128,6 +125,13 @@ public:
         return *this;
     }
 
+    TestSpellEntryHelper& WithEffectMiscValue(uint8 effIndex, int32 miscValue)
+    {
+        if (effIndex < MAX_SPELL_EFFECTS)
+            _entry.EffectMiscValue[effIndex] = miscValue;
+        return *this;
+    }
+
     TestSpellEntryHelper& WithEffectDieSides(uint8 effIndex, int32 dieSides)
     {
         if (effIndex < MAX_SPELL_EFFECTS)
@@ -147,7 +151,7 @@ public:
     }
 
 private:
-    SpellEntry _entry;
+    SpellEntry _entry{};
 };
 
 /**
@@ -230,6 +234,12 @@ public:
     SpellInfoBuilder& WithEffectBasePoints(uint8 effIndex, int32 basePoints)
     {
         _entryHelper.WithEffectBasePoints(effIndex, basePoints);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithEffectMiscValue(uint8 effIndex, int32 miscValue)
+    {
+        _entryHelper.WithEffectMiscValue(effIndex, miscValue);
         return *this;
     }
 
