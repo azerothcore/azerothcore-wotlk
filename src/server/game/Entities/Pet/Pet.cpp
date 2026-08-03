@@ -844,7 +844,14 @@ void Pet::CastPendingSpell()
         else
         {
             if (IsAIEnabled)
-                AI()->PetStopAttack();
+            {
+                // Do not use PetStopAttack here: it interrupts the spell just started above.
+                AttackStop();
+                charmInfo->SetIsCommandAttack(false);
+                charmInfo->SetIsAtStay(false);
+                charmInfo->SetIsFollowing(false);
+                charmInfo->SetIsReturning(false);
+            }
             else
             {
                 charmInfo->SetCommandState(COMMAND_FOLLOW);
