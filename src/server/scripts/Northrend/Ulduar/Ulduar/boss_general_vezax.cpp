@@ -203,27 +203,23 @@ struct boss_vezax : public BossAI
                 Talk(SAY_BERSERK);
                 break;
             case EVENT_SPELL_VEZAX_SHADOW_CRASH:
-                {
-                    events.Repeat(10s);
+            {
+                events.Repeat(10s);
 
-                    std::vector<Player*> players;
-                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                    {
-                        Player* temp = itr->GetSource();
-                        if (temp->IsAlive() && temp->GetDistance(me) > 15.0f)
-                            players.push_back(temp);
-                    }
-                    if (!players.empty())
-                    {
-                        me->setAttackTimer(BASE_ATTACK, 2000);
-                        Player* target = players.at(urand(0, players.size() - 1));
-                        me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
-                        me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
-                        events.ScheduleEvent(EVENT_RESTORE_TARGET, 750ms);
-                    }
+                constexpr float dist = 3.0f; // SelectTarget dist check includes CombatReach
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -dist, true, true, 0);
+                if (!target)
+                    target = SelectTarget(SelectTargetMethod::Random, 0, 0, true, true, 0);
+
+                if (target)
+                {
+                    me->setAttackTimer(BASE_ATTACK, 2000);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
+                    me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
+                    events.ScheduleEvent(EVENT_RESTORE_TARGET, 750ms);
                 }
-                break;
+            }
+            break;
             case EVENT_RESTORE_TARGET:
                 if (me->GetVictim())
                     me->SetGuidValue(UNIT_FIELD_TARGET, me->GetVictim()->GetGUID());
