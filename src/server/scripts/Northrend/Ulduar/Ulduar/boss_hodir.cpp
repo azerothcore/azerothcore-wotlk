@@ -691,17 +691,6 @@ struct npc_ulduar_toasty_fire : public NullCreatureAI
             me->DespawnOrUnsummon(); // this will remove DynObjects
         }
     }
-
-    void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
-    {
-        switch (spell->Id)
-        {
-            case SPELL_ICE_SHARDS_SMALL:
-            case SPELL_ICE_SHARDS_BIG:
-                DoAction(1);
-                break;
-        }
-    }
 };
 
 struct npc_ulduar_hodir_priest : public ScriptedAI
@@ -733,7 +722,7 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
         if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2s);
+            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 1s);
         }
     }
 
@@ -758,7 +747,7 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
                                     ScheduleAbilities();
                                     break;
                                 }
-                    events.Repeat(2s);
+                    events.Repeat(1s);
                 }
                 break;
             case EVENT_PRIEST_DISPELL_MAGIC:
@@ -849,7 +838,7 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
         if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2s);
+            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 1s);
         }
     }
 
@@ -874,7 +863,7 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
                                     ScheduleAbilities();
                                     break;
                                 }
-                    events.Repeat(2s);
+                    events.Repeat(1s);
                 }
                 break;
             case EVENT_DRUID_WRATH:
@@ -958,7 +947,7 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
     void ScheduleAbilities()
     {
         events.ScheduleEvent(EVENT_SHAMAN_LAVA_BURST, 2600ms);
-        events.ScheduleEvent(EVENT_SHAMAN_STORM_CLOUD, 10s);
+        events.ScheduleEvent(EVENT_SHAMAN_STORM_CLOUD, 1s);
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -966,7 +955,7 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
         if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2s);
+            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 1s);
         }
     }
 
@@ -999,7 +988,7 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
                                     ScheduleAbilities();
                                     break;
                                 }
-                    events.Repeat(2s);
+                    events.Repeat(1s);
                 }
                 break;
             case EVENT_SHAMAN_LAVA_BURST:
@@ -1091,7 +1080,7 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
         if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2s);
+            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 1s);
         }
     }
 
@@ -1116,7 +1105,7 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
                                     ScheduleAbilities();
                                     break;
                                 }
-                    events.Repeat(2s);
+                    events.Repeat(1s);
                 }
                 break;
             case EVENT_MAGE_FIREBALL:
@@ -1143,7 +1132,6 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
 
                     if (found)
                     {
-                        events.DelayEvents(2s);
                         events.Repeat(2s);
                         break;
                     }
