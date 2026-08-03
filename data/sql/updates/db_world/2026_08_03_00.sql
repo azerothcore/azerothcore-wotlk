@@ -1,3 +1,4 @@
+-- DB update 2026_08_02_06 -> 2026_08_03_00
 --
 -- The ocean zones around the TBC starting isles live on map 530 (Outland) but have no
 -- WorldMapArea entry, so GetVirtualMapForMapAndZone() falls back to map 530 and
