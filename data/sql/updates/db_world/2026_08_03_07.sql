@@ -1,3 +1,4 @@
+-- DB update 2026_08_03_06 -> 2026_08_03_07
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 64132;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (64132, 'spell_yogg_saron_constrictor_tentacle');
