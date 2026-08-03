@@ -1,3 +1,4 @@
+-- DB update 2026_08_03_05 -> 2026_08_03_06
 --
 UPDATE `spell_dbc` SET `ProcChance` = 101, `Effect_1` = 6, `EffectDieSides_1` = 1, `ImplicitTargetA_1` = 1,  `EffectAura_1` = 23, `EffectAuraPeriod_1` = 1000, `EffectTriggerSpell_1`  = 64208, `EffectBonusMultiplier_1` = 1 WHERE `ID` = 64209;
 
