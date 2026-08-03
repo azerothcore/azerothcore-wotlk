@@ -206,28 +206,14 @@ struct boss_vezax : public BossAI
             {
                 events.Repeat(10s);
 
-                std::vector<Player*> rangedPlayers;
-                std::vector<Player*> meleePlayers;
-                Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                {
-                    Player* temp = itr->GetSource();
-                    if (!temp || !temp->IsAlive())
-                        continue;
+                constexpr float dist = 3.0f; // SelectTarget dist check includes CombatReach
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -dist, true, true, 0);
+                if (!target)
+                    target = SelectTarget(SelectTargetMethod::Random, 0, 0, true, true, 0);
 
-                    if (temp->GetDistance(me) > 15.0f)
-                        rangedPlayers.push_back(temp);
-                    else
-                        meleePlayers.push_back(temp);
-                }
-
-                // Shadow Crash can target melee players if nobody is at range
-                std::vector<Player*>& targets = rangedPlayers.empty() ? meleePlayers : rangedPlayers;
-
-                if (!targets.empty())
+                if (target)
                 {
                     me->setAttackTimer(BASE_ATTACK, 2000);
-                    Player* target = targets.at(urand(0, targets.size() - 1));
                     me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
                     me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
                     events.ScheduleEvent(EVENT_RESTORE_TARGET, 750ms);
