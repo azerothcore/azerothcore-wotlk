@@ -1,3 +1,4 @@
+-- DB update 2026_08_03_03 -> 2026_08_03_04
 -- Fix Archmage Arugal is silend during Shadowfang Keep progression
 -- All voices IDs were taken from Wowhead
 UPDATE `creature_text` SET `Sound` = 5793 WHERE `CreatureID` = 4275 AND `BroadcastTextId` = 6115;
