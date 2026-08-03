@@ -691,17 +691,6 @@ struct npc_ulduar_toasty_fire : public NullCreatureAI
             me->DespawnOrUnsummon(); // this will remove DynObjects
         }
     }
-
-    void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
-    {
-        switch (spell->Id)
-        {
-            case SPELL_ICE_SHARDS_SMALL:
-            case SPELL_ICE_SHARDS_BIG:
-                DoAction(1);
-                break;
-        }
-    }
 };
 
 struct npc_ulduar_hodir_priest : public ScriptedAI
