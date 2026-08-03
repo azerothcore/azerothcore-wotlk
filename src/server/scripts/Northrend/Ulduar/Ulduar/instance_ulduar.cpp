@@ -33,7 +33,6 @@ DoorData const doorData[] =
     { GO_LEVIATHAN_DOORS,              BOSS_LEVIATHAN, DOOR_TYPE_ROOM       },
     { GO_LIGHTNING_WALL1,              BOSS_LEVIATHAN, DOOR_TYPE_PASSAGE    },
     { GO_XT002_DOORS,                  BOSS_XT002,     DOOR_TYPE_ROOM       },
-    { GO_KOLOGARN_DOORS,               BOSS_KOLOGARN,  DOOR_TYPE_ROOM       },
     { GO_ASSEMBLY_DOORS,               BOSS_ASSEMBLY,  DOOR_TYPE_ROOM       },
     { GO_ARCHIVUM_DOORS,               BOSS_ASSEMBLY,  DOOR_TYPE_PASSAGE    },
     { GO_MIMIRON_DOOR_1,               BOSS_MIMIRON,   DOOR_TYPE_ROOM       },
@@ -132,7 +131,6 @@ ObjectData const gameobjectData[] =
     { GO_LIGHTNING_WALL1,               DATA_LIGHTNING_WALL1            },
     { GO_LIGHTNING_WALL2,               DATA_LIGHTNING_WALL2            },
     { GO_XT002_DOORS,                   DATA_XT002_DOORS                },
-    { GO_KOLOGARN_DOORS,                DATA_KOLOGARN_DOORS             },
     { GO_ASSEMBLY_DOORS,                DATA_ASSEMBLY_DOORS             },
     { GO_ARCHIVUM_DOORS,                DATA_ARCHIVUM_DOORS             },
     { GO_MIMIRON_DOOR_1,                DATA_GO_MIMIRON_DOOR_1          },
@@ -326,6 +324,18 @@ public:
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
                 SetData(eventId, 0);
+            else if (eventId == EVENT_HODIR_SHATTER_CHEST)
+            {
+                if (GameObject* go = GetHodirChest(true))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                    scheduler.Schedule(3s, [this](TaskContext /*context*/)
+                    {
+                        if (GetBossState(BOSS_HODIR) != DONE)
+                            SetData(TYPE_HODIR_HM_FAIL, 0);
+                    });
+                }
+            }
         }
 
         bool SetBossState(uint32 type, EncounterState state) override

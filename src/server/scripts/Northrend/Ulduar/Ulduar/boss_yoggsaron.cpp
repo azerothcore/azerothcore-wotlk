@@ -1728,6 +1728,12 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
             me->RemoveAura(SPELL_SHATTERED_ILLUSION);
     }
 
+    void PassengerBoarded(Unit* passenger, int8 /*seatId*/, bool apply) override
+    {
+        if (!apply)
+            passenger->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, passenger));
+    }
+
     void JustDied(Unit*) override
     {
         if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
@@ -2836,6 +2842,26 @@ class spell_yogg_saron_constrictor_tentacle_aura : public AuraScript
     }
 };
 
+// 64125, 64126 - Squeeze
+class spell_yogg_saron_squeeze_aura : public AuraScript
+{
+    PrepareAuraScript(spell_yogg_saron_squeeze_aura);
+
+    // Immunities (Divine Shield, Ice Block, ...) purge this aura; killing the
+    // tentacle on removal is what actually frees the player from the vehicle.
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* vehicle = GetTarget()->GetVehicleBase())
+            if (vehicle->IsAlive())
+                vehicle->KillSelf();
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_squeeze_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 // 63305 - Grim Reprisal
 class spell_yogg_saron_grim_reprisal_aura : public AuraScript
 {
@@ -2968,6 +2994,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_in_the_maws_of_the_old_god);
     RegisterSpellScript(spell_yogg_saron_target_selectors);
     RegisterSpellScript(spell_yogg_saron_constrictor_tentacle_aura);
+    RegisterSpellScript(spell_yogg_saron_squeeze_aura);
     RegisterSpellScript(spell_yogg_saron_grim_reprisal_aura);
 
     // ACHIEVEMENTS

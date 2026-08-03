@@ -759,7 +759,9 @@ void SmartAI::EnterEvadeMode(EvadeReason why)
 
     if (Unit* owner = me->GetCharmerOrOwner())
     {
-        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+        if (!me->IsVehicle()) // vehicles should not follow their owner (passenger)
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+
         me->ClearUnitState(UNIT_STATE_EVADE);
     }
     else if (HasEscortState(SMART_ESCORT_ESCORTING))
