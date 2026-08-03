@@ -1,3 +1,4 @@
+-- DB update 2026_08_03_02 -> 2026_08_03_03
 -- Guardian of Yogg-Saron: Shadow Nova (62714) entry-targeted effect must hit other Guardians (33136),
 -- not Sara, who is already hit by the dedicated Shadow Nova (65719). Fixes double 25k damage on Sara.
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 2) AND (`SourceEntry` = 62714) AND (`SourceId` = 0);
