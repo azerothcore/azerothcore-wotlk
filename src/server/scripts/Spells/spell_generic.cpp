@@ -5278,7 +5278,7 @@ class spell_gen_consumption : public SpellScript
     void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        if (!caster || !caster->ToCreature())
+        if (!caster || !caster->IsCreature())
             return;
 
         int32 damage = 0;
