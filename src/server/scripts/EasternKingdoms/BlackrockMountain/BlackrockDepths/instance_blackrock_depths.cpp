@@ -578,7 +578,8 @@ struct instance_blackrock_depths : public InstanceScript
                             warder->SetReactState(REACT_AGGRESSIVE);
                         }
 
-                    Position pos = {812.15f, -348.91f, -50.579f, 0.7f};
+                    // spawns at the room entrance, not amidst the constructs (position from cmangos)
+                    Position pos = {821.905f, -338.382f, -50.134f, 3.78736f};
                     if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
                         summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
                 }
