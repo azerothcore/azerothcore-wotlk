@@ -532,12 +532,9 @@ void ThreatManager::TauntUpdate()
         else
             pair.second->UpdateTauntState();
 
-        // A reference that just started taunting can never be suppressed
-        // (ShouldBeSuppressed() special-cases IsTaunting()) - but EvaluateSuppressed()
-        // below only refreshes _threatenedByMe (what WE threaten), not this list (what
-        // threatens US), so a reference that was created SUPPRESSED (e.g. the taunter was
-        // already immune to our damage before taunting) never gets cleared there. Do it
-        // here directly instead, right after its taunt state is set.
+        // A taunting reference can never be suppressed, but EvaluateSuppressed below only
+        // refreshes what we threaten, not what threatens us, so one created suppressed would
+        // never be cleared. Do it here instead.
         if (pair.second->IsSuppressed() && !pair.second->ShouldBeSuppressed())
         {
             pair.second->_online = ThreatReference::ONLINE_STATE_ONLINE;
