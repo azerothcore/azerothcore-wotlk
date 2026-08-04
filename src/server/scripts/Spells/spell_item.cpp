@@ -3337,20 +3337,16 @@ class spell_item_impale_leviroth : public SpellScript
             {
                 target->CastSpell(target, SPELL_LEVIROTH_SELF_IMPALE, true);
 
-                // Weapon damage is only the input to the melee roll: Creature::CalculateMinMaxDamage
-                // adds the attack power share and then multiplies the lot by the template's
-                // DamageModifier (7.5 on Northrend elites), so these values on their own landed
-                // around 1300-1700 instead of the intended 150-200. Cancel the multiplier out.
+                // CalculateMinMaxDamage multiplies weapon damage by the template's DamageModifier
+                // (7.5 here), landing around 1300-1700 instead of 150-200. Cancel it out.
                 target->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 150);
                 target->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 200);
-                // BASE_PCT rather than TOTAL_PCT: both multiply in the same place, but
-                // UpdateDamagePctDoneMods rebuilds TOTAL_PCT from scratch whenever a physical
-                // damage-percent aura is applied or removed, which would drop this again.
+                // BASE_PCT, not TOTAL_PCT: the latter is rebuilt from scratch whenever a physical
+                // damage-percent aura changes, which would drop this again.
                 if (float damageModifier = target->GetCreatureTemplate()->DamageModifier)
                     target->SetStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, BASE_PCT, 1.0f / damageModifier);
 
-                // none of the above reaches the fields the melee roll reads until stats are
-                // recalculated, and nothing else here would trigger that
+                // none of the above reaches the melee roll until stats are recalculated
                 target->UpdateDamagePhysical(BASE_ATTACK);
 
                 target->LowerPlayerDamageReq(target->GetMaxHealth());
