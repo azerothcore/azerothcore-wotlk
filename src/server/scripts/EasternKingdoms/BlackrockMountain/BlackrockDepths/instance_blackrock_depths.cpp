@@ -314,16 +314,16 @@ struct instance_blackrock_depths : public InstanceScript
                 // only the four constructs in the Relic Coffer room belong to the vault event, the rest of the Black Vault spawns are regular trash
                 if (creature->GetDistance2d(VaultWarderCenter.GetPositionX(), VaultWarderCenter.GetPositionY()) > 15.0f)
                     break;
-                // frozen until all 12 Relic Coffers have been opened. Their Stoned aura (10255) is a scriptless
-                // dummy, so the actual freeze has to be done through flags here.
+                // frozen until all 12 Relic Coffers have been opened. Stoned is cast here instead of
+                // creature_addon on purpose: addon auras get re-applied on every evade, which would
+                // re-freeze the constructs after the event has started.
                 if (GetData(TYPE_VAULT) == NOT_STARTED)
                 {
+                    creature->CastSpell(creature, SPELL_STONED, true);
                     creature->SetImmuneToPC(true);
                     creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     creature->SetReactState(REACT_PASSIVE);
                 }
-                else
-                    creature->RemoveAurasDueToSpell(SPELL_STONED); // respawned after the event already started
                 [[fallthrough]];
             case NPC_WATCHMAN_DOOMGRIP:
                 VaultWarderGUIDs.push_back(creature->GetGUID());
