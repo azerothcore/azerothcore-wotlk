@@ -1940,9 +1940,8 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
             if (eslot == NULL_SLOT)
                 return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
 
-            // Blizzlike allows swapping gear on a disarmed slot (issue #26426) - you just
-            // can't use the new weapon until Disarm ends. EquipItem()/RemoveItem() keep the
-            // weapon's damage/dependent auras suppressed while the slot stays disarmed.
+            // Swapping gear on a disarmed slot is allowed (issue #26426); the new weapon's
+            // damage stays suppressed until Disarm ends.
 
             res = CanUseItem(pItem, not_loading);
             if (res != EQUIP_ERR_OK)
@@ -2844,12 +2843,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
             _ApplyItemMods(pItem, slot, true);
 
-            // Blizzlike lets you swap weapons while disarmed, you just can't use the new one
-            // until Disarm ends (issue #26426). _ApplyItemMods() above already turned this
-            // weapon's damage/dependent auras on, so suppress them the same way
-            // AuraEffect::HandleAuraModDisarm suppresses whatever was equipped when Disarm
-            // first landed - it undoes this symmetrically once the aura is removed, regardless
-            // of which weapon ends up in the slot by then.
+            // _ApplyItemMods above turned this weapon's damage on, so suppress it the same way
+            // HandleAuraModDisarm does - it undoes this symmetrically when the aura drops.
             WeaponAttackType disarmAttackType;
             if (pProto && GetDisarmedAttackType(slot, disarmAttackType))
             {
@@ -3033,10 +3028,8 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                 if (pProto && pProto->ItemSet)
                     RemoveItemsSetItem(this, pProto);
 
-                // Mirror of the EquipItem() suppression (issue #26426): this weapon's
-                // damage/dependent auras are currently suppressed because the slot is disarmed,
-                // so restore them to normal first - otherwise _ApplyItemMods(false) below would
-                // subtract a second time on top of the suppression and corrupt the stat.
+                // Restore first: the slot is disarmed so this weapon's damage is suppressed, and
+                // _ApplyItemMods(false) below would subtract a second time on top of it.
                 WeaponAttackType disarmAttackType;
                 if (pProto && GetDisarmedAttackType(slot, disarmAttackType))
                 {
