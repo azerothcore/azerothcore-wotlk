@@ -85,23 +85,17 @@ struct boss_leotheras_the_blind : public BossAI
         DoCastSelf(SPELL_DUAL_WIELD, true);
         me->SetReactState(REACT_PASSIVE);
 
-        // Banished by the Greyheart Spellbinders until all 3 are dead. NON_ATTACKABLE is
-        // required alongside NOT_SELECTABLE - without it the client renders the banish visual
-        // transparent (confirmed by isolating the flag from the spell's own effects, which
-        // don't affect it). The corresponding Green Beam targeting miss this reintroduces is
-        // fixed on the spell's own side instead - see the 37626 Speed correction in
-        // SpellInfoCorrections.cpp.
+        // Banished until all 3 Spellbinders are dead. NON_ATTACKABLE goes with NOT_SELECTABLE
+        // or the client draws the banish visual transparent; the Green Beam miss that causes is
+        // fixed on the spell side (37626 in SpellInfoCorrections.cpp).
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
-        // He's immune to the Banish mechanic as a raid boss, so it's briefly dropped just for
-        // this cast - the aura itself is unaffected by immunity toggled back on right after.
-        // -1 (not 0): Creature::LoadTemplateImmunities tags every creature_immunities-sourced
-        // entry with placeholderSpellId=UINT32_MAX, so removal has to match that exact
-        // marker or it silently finds nothing to remove and the cast stays blocked.
-        // Not triggered: a triggered cast skips the normal cast/impact visual broadcast,
-        // which is what shows the demon silhouette this spell is sniffed to display.
-        // Cleared along with everything else by the RemoveAllAuras() below once all 3 are dead.
+        // Raid bosses are immune to Banish, so drop it just for this cast.
+        // -1, not 0: creature_immunities entries are tagged with placeholderSpellId=UINT32_MAX,
+        // and removal has to match that marker or it silently removes nothing.
+        // Not triggered: that would skip the visual broadcast showing the demon silhouette.
+        // Cleared by the RemoveAllAuras() below once all 3 are dead.
         me->ApplySpellImmune(-1, IMMUNITY_MECHANIC, MECHANIC_BANISH, false);
         DoCastSelf(SPELL_BANISH);
         me->ApplySpellImmune(-1, IMMUNITY_MECHANIC, MECHANIC_BANISH, true);
