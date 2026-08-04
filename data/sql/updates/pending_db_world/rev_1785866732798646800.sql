@@ -2,23 +2,39 @@
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 188163;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 188163);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(188163, 1, 0, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 18816300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - On Gameobject State Changed - Run Script');
+(188163, 1, 0, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 18816300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - On Gossip Hello - Run Script');
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 25238);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (25238, 0, 0, 'To the town hall, everyone!  We\'ve brought you weapons!  Arm yourselves and beat the Scourge back!', 14, 0, 100, 5, 0, 0, 25832, 0, 'Gamlen - Call to Arms! Quest');
 
+-- Timers below are sequential deltas (each starts when the previous action fires), derived from the sniff timeline.
+-- Cumulative offsets from the bell being rung: 0 / 0 / 1582 / 2761 / 4048 / 4173 / 5217 / 5217 / 6495 / 16193 / 27112 / 38017
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 18816300);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (18816300, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25238, 3, 20000, 0, 0, 0, 8, 0, 0, 0, 0, 2614.7705, 5263.4736, 39.493538, 2.155400037765503, 'Bell Rope - Actionlist - Summon Creature \'Gamlen\''),
-(18816300, 9, 1, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 25238, 100, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Gamlen Say Line'),
-(18816300, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 6594, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594'),
-(18816300, 9, 3, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 0'),
-(18816300, 9, 4, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 107, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 1'),
-(18816300, 9, 5, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 107, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 2'),
-(18816300, 9, 6, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 107, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 3');
+(18816300, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 6594, 0, 1, 0, 0, 0, 10, 103941, 24921, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594 (1/6)'),
+(18816300, 9, 2, 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 4, 6594, 0, 1, 0, 0, 0, 10, 103941, 24921, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594 (2/6)'),
+(18816300, 9, 3, 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 4, 6594, 0, 1, 0, 0, 0, 10, 103941, 24921, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594 (3/6)'),
+(18816300, 9, 4, 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 4, 6594, 0, 1, 0, 0, 0, 10, 103941, 24921, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594 (4/6)'),
+(18816300, 9, 5, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 25238, 100, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Gamlen Say Line'),
+(18816300, 9, 6, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 0, 4, 6594, 0, 1, 0, 0, 0, 10, 103941, 24921, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594 (5/6)'),
+(18816300, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 0'),
+(18816300, 9, 8, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 0, 4, 6594, 0, 1, 0, 0, 0, 10, 103941, 24921, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594 (6/6)'),
+(18816300, 9, 9, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 0, 107, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 1'),
+(18816300, 9, 10, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 107, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 2'),
+(18816300, 9, 11, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 107, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 3');
 
 /*
+-- 12:56:01.898 Bell Rung (State 0)
+Sound 6594 SMSG_PLAY_OBJECT_SOUND:
+12:56:01.898
+12:56:03.480
+12:56:04.659
+12:56:05.946
+12:56:07.115
+12:56:08.393
+
 -- 12:56:06.071 CHAT
 
 -- 12:56:07.115
