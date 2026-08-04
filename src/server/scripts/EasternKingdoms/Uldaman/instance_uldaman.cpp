@@ -163,7 +163,9 @@ class spell_uldaman_stoned_aura : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->IsCreature() && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
+        // Blackrock Depths uses the same statue aura for the golems around Golem Lord Argelmach
+        return GetUnitOwner()->IsCreature()
+            && (GetUnitOwner()->GetMapId() == MAP_ULDAMAN || GetUnitOwner()->GetMapId() == 230 /*Blackrock Depths*/);
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
