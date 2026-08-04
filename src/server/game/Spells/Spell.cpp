@@ -6264,21 +6264,18 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         bool result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
                         if (m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
                         {
-                            // The limit is on how far you'd have to WALK, so a perfectly reachable spot
-                            // blows it whenever the way round is long - charging up the graveyard bank in
-                            // WSG is ~21yd straight but ~130yd on foot. Re-check reachability without the
-                            // limit, which is what keeps this from reaching somewhere you couldn't walk
-                            // to at all. PATHFIND_SHORT on its own can't answer that: BuildShortcut
-                            // overwrites the NORMAL/INCOMPLETE result before we get to see it.
+                            // The limit is on how far you would have to WALK, so a reachable spot blows
+                            // it whenever the way round is long: the WSG graveyard bank is ~21yd straight
+                            // but ~130yd on foot. Re-check without the limit, since BuildShortcut has
+                            // already overwritten the NORMAL/INCOMPLETE result.
                             PathGenerator reachable(m_caster);
                             bool built = reachable.CalculatePath(
                                 target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
                             if (!built || reachable.GetPathType() != PATHFIND_NORMAL)
                                 return SPELL_FAILED_NOPATH;
 
-                            // Aim at a spot worked out from the target's own footing. Backing off along
-                            // our own line instead, the way the normal path does below, steps back down
-                            // into the slope we just climbed and drops us through it.
+                            // Aim from the target's own footing: backing off along our line would step
+                            // back down into the slope we just climbed.
                             Position land = target->GetFirstCollisionPosition(objSize,
                                 target->GetRelativeAngle(m_caster));
                             m_preGeneratedPath->CalculatePath(land.GetPositionX(), land.GetPositionY(),
@@ -6286,12 +6283,9 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                             if (m_preGeneratedPath->GetPath().size() < 2)
                                 return SPELL_FAILED_NOPATH;
 
-                            // Climb the slope rather than cut a chord through it - a bare two-point line
-                            // runs several yards inside the hill on anything convex, and the client drops
-                            // you out of the world when the spline ends in there. Bails out when there is
-                            // no slope under the line at all, so this can't carry anyone onto a roof.
-                            // Only for the shortcut: if the way to the landing spot did fit the limit we
-                            // have a real navmesh route, and it already ends backed off the target.
+                            // Climb the slope instead of cutting through it, and bail out when there is
+                            // no slope under the line, so this cannot carry anyone onto a roof. Shortcut
+                            // only: a path that fit the limit is a real route and stays as it is.
                             if ((m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
                                 && !m_preGeneratedPath->SnapPathToGround(SMOOTH_PATH_STEP_SIZE, SMOOTH_PATH_STEP_SIZE))
                                 return SPELL_FAILED_NOPATH;

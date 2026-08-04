@@ -1217,10 +1217,8 @@ bool PathGenerator::SnapPathToGround(float stepSize, float maxDrop)
     sampled.reserve(steps + 1);
     sampled.push_back(start);
 
-    // Both ends already sit on real ground, so only the middle needs pinning. Each height query
-    // starts above the previous point rather than on the straight line: the line runs below the
-    // surface across a convex slope, and a query started down there ignores the ground above it
-    // and leaves the point buried - which is what drops the client out of the world.
+    // Only the middle needs pinning. Each query starts above the previous point: on a convex
+    // slope the line runs under the surface, and a query from down there leaves the point buried.
     float previousZ = start.z;
     for (uint32 i = 1; i < steps; ++i)
     {
