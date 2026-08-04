@@ -1976,9 +1976,8 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         if (battleStarted != ENCOUNTER_STATE_FIGHT)
             return;
 
-        // Scourge reinforcements march back in from Darion's line instead of popping
-        // on the corpse they replace, which used to drop them right on top of whoever
-        // just killed the last one. Defenders keep coming from where they fell.
+        // Reinforcements march in from Darion's line instead of popping on the corpse they
+        // replace, right on top of whoever just killed the last one.
         Position spawnPos = creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION
             ? LightOfDawnPos[urand(0, 1)]
             : creature->GetPosition();
@@ -2208,10 +2207,8 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 me->SummonCreatureGroup(5);
                 return;
             case EVENT_BATTLE_CHARGE:
-                // Both armies form up behind their leaders for the speech and, until now,
-                // just stood there once it ended. Send them into the field the same way
-                // reinforcements already arrive, so the Behemoths actually run at the
-                // chapel and the two sides end up within reach of each other.
+                // Both armies just stood there once the speech ended. Send them out the same
+                // way reinforcements arrive, so the two sides end up within reach.
                 for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                     {
@@ -2226,9 +2223,8 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 events.ScheduleEvent(EVENT_BATTLE_ENGAGE, 5s);
                 break;
             case EVENT_BATTLE_ENGAGE:
-                // Nothing ever ordered these to attack - the battle relied on proximity
-                // aggro, which is only evaluated while a creature is relocating, so
-                // anyone who arrived without an enemy in range stayed idle for good.
+                // Nothing ordered these to attack, and proximity aggro is only evaluated while
+                // relocating, so anyone arriving with no enemy in range stayed idle.
                 if (battleStarted == ENCOUNTER_STATE_FIGHT)
                 {
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
