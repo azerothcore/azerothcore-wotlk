@@ -12615,10 +12615,8 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id, uint8 learnDepth /*= 0*/)
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spell_id);
     if (bounds.first == bounds.second)
     {
-        // A spell with no skill line says nothing about who may have it. Spells that exist only
-        // to teach another one (the paladin mount rewards, for one) are like that - the race
-        // restriction sits on what they teach, so judge them by that instead of waving them
-        // through. Depth-capped because nothing stops the data from looping back on itself.
+        // A spell with no skill line says nothing about who may have it. Teaching spells carry the
+        // restriction on what they teach, so follow that. Depth-capped in case the data loops.
         if (learnDepth < MAX_SPELL_LEARN_DEPTH)
             if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id))
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
