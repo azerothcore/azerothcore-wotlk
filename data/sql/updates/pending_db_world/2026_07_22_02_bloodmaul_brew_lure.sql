@@ -1,24 +1,8 @@
--- Issue #26736: Bloodmaul Brutebane Brew (item 29443, GO 184315) should draw the
--- named quest targets (and the Bladespire Shaman/Brute guards) away from their
--- posts so they can be fought without their escort. The trap GO itself has no
--- radius/trigger spell configured (Data2/Data3 = 0) and cannot pull anything on
--- its own, and no comparable "investigate a nearby object" script exists anywhere
--- else in the DB to copy from - this SmartAI is original, not ported from
--- elsewhere in the game. Confirmed working in-game 2026-07-22.
---
--- Pattern per creature: while out of combat, periodically check for the closest
--- Bloodmaul Brew GO within 30y and walk to it (SMART_ACTION_MOVE_TO_POS reads the
--- GO's live position via SMART_TARGET_CLOSEST_GAMEOBJECT, not a fixed spot); the
--- instant it's claimed, a linked row despawns that same GO so no other nearby
--- creature can also react to it; once the creature reaches the spot
--- (SMART_EVENT_MOVEMENTINFORM on the matching pointId) it evades back to its own
--- tracked home position via SMART_ACTION_EVADE, which works correctly per-spawn
--- without hardcoding coordinates (needed since the guard entries have many spawns
--- across the zone).
---
--- Bladespire Sober Defender (21975) was deliberately left out - the reporter
--- confirmed it should not react to the brew.
-
+-- Bloodmaul Brutebane Brew (GO 184315) should lure the quest targets and their guards off
+-- their posts, but the trap GO has no radius or trigger spell and can't pull anything itself.
+-- Out of combat each creature walks to the closest brew within 30y, a linked row despawns it
+-- so only one reacts, and on arrival they evade back to their own home position.
+-- Bladespire Sober Defender (21975) is left out on purpose, it should not react.
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 20731 AND `source_type` = 0 AND `id` IN (4,5,6);
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 20726 AND `source_type` = 0 AND `id` IN (4,5,6);
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 20732 AND `source_type` = 0 AND `id` IN (3,4,5);
