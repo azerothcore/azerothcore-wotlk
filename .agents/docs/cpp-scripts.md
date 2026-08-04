@@ -11,4 +11,9 @@ Then declare and call `AddSC_<name>()` from the regional loader (`Spells/spells_
 
 **Module hooks** (e.g. `OnPlayerLogin`, `OnWorldUpdate`, `OnSpellCast`) are declared in `src/server/game/Scripting/ScriptDefines/*.h`. Implement by inheriting the matching base (`PlayerScript`, `WorldScript`, …) and registering with `new MyClass();` (or its `RegisterXxxScript` macro) inside `AddSC_<name>()`. Full list: https://www.azerothcore.org/wiki/hooks-script.
 
+**Conventions:**
+
+- Script ids (action/event/data/phase) get named enum entries — never raw literals, even when the file already uses them: add the entry and convert that literal's every call site and handler in the same change.
+- Encounter behaviour follows evidence (sniffs, retail research), not symmetry: wipe/evade and kill are distinct paths — don't mirror cleanup (despawns, resets) from one onto the other without evidence.
+
 Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).
