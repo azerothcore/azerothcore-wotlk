@@ -1197,6 +1197,49 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
     _pathPoints.resize(i + 1);
 }
 
+bool PathGenerator::SnapPathToGround(float stepSize, float maxDrop)
+{
+    if (_pathPoints.size() < 2 || stepSize <= 0.0f)
+        return false;
+
+    G3D::Vector3 const start = _pathPoints.front();
+    G3D::Vector3 const end = _pathPoints.back();
+
+    uint32 const steps = std::max<uint32>(1, uint32((end - start).length() / stepSize));
+    if (steps < 2)
+        return true;
+
+    Movement::PointsArray sampled;
+    sampled.reserve(steps + 1);
+    sampled.push_back(start);
+
+    // Both ends already sit on real ground, so only the middle needs pinning. Each height query
+    // starts above the previous point rather than on the straight line: the line runs below the
+    // surface across a convex slope, and a query started down there ignores the ground above it
+    // and leaves the point buried - which is what drops the client out of the world.
+    float previousZ = start.z;
+    for (uint32 i = 1; i < steps; ++i)
+    {
+        G3D::Vector3 point = start + (end - start) * (float(i) / float(steps));
+        float const lineZ = point.z;
+
+        point.z = std::max(point.z, previousZ) + stepSize * 2.0f;
+        _source->UpdateAllowedPositionZ(point.x, point.y, point.z);
+
+        // Nothing under us to climb - the line is crossing a gap or clearing a roof, not running
+        // up a slope. Walking it would leave the mover hanging in mid air halfway along.
+        if (point.z < lineZ - maxDrop)
+            return false;
+
+        previousZ = point.z;
+        sampled.push_back(point);
+    }
+
+    sampled.push_back(end);
+    _pathPoints.swap(sampled);
+    return true;
+}
+
 bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
 {
     return (target->GetPositionZ() - GetActualEndPosition().z) > 5.0f;

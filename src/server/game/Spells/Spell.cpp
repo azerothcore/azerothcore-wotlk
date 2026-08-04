@@ -6263,13 +6263,48 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         // first try with raycast, if it fails fall back to normal path
                         bool result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
                         if (m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
-                            return SPELL_FAILED_NOPATH;
-                        else if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
-                            return SPELL_FAILED_NOPATH;
-                        else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if not in a straight line
-                            return SPELL_FAILED_NOPATH;
+                        {
+                            // The limit is on how far you'd have to WALK, so a perfectly reachable spot
+                            // blows it whenever the way round is long - charging up the graveyard bank in
+                            // WSG is ~21yd straight but ~130yd on foot. Re-check reachability without the
+                            // limit, which is what keeps this from reaching somewhere you couldn't walk
+                            // to at all. PATHFIND_SHORT on its own can't answer that: BuildShortcut
+                            // overwrites the NORMAL/INCOMPLETE result before we get to see it.
+                            PathGenerator reachable(m_caster);
+                            bool built = reachable.CalculatePath(
+                                target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
+                            if (!built || reachable.GetPathType() != PATHFIND_NORMAL)
+                                return SPELL_FAILED_NOPATH;
 
-                        m_preGeneratedPath->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), objSize); // move back
+                            // Aim at a spot worked out from the target's own footing. Backing off along
+                            // our own line instead, the way the normal path does below, steps back down
+                            // into the slope we just climbed and drops us through it.
+                            Position land = target->GetFirstCollisionPosition(objSize,
+                                target->GetRelativeAngle(m_caster));
+                            m_preGeneratedPath->CalculatePath(land.GetPositionX(), land.GetPositionY(),
+                                land.GetPositionZ(), false);
+                            if (m_preGeneratedPath->GetPath().size() < 2)
+                                return SPELL_FAILED_NOPATH;
+
+                            // Climb the slope rather than cut a chord through it - a bare two-point line
+                            // runs several yards inside the hill on anything convex, and the client drops
+                            // you out of the world when the spline ends in there. Bails out when there is
+                            // no slope under the line at all, so this can't carry anyone onto a roof.
+                            if (!m_preGeneratedPath->SnapPathToGround(SMOOTH_PATH_STEP_SIZE, SMOOTH_PATH_STEP_SIZE))
+                                return SPELL_FAILED_NOPATH;
+                        }
+                        else
+                        {
+                            if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
+                                return SPELL_FAILED_NOPATH;
+                            // Check position z, if not in a straight line
+                            else if (m_preGeneratedPath->IsInvalidDestinationZ(target))
+                                return SPELL_FAILED_NOPATH;
+
+                            G3D::Vector3 const targetPos(target->GetPositionX(), target->GetPositionY(),
+                                target->GetPositionZ());
+                            m_preGeneratedPath->ShortenPathUntilDist(targetPos, objSize); // move back
+                        }
                     }
                     if (Player* player = m_caster->ToPlayer())
                         player->SetCanTeleport(true);

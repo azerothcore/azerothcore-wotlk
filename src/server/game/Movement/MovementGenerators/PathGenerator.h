@@ -94,6 +94,13 @@ class PathGenerator
         // shortens the path until the destination is the specified distance from the target point
         void ShortenPathUntilDist(G3D::Vector3 const& point, float dist);
 
+        // re-samples a straight two-point path into evenly spaced points pinned to the ground, so a
+        // shortcut climbs a slope instead of cutting a chord through it - the client puts you inside
+        // the hill otherwise, and drops you out of the world when the spline ends.
+        // Returns false when the ground falls further than maxDrop below the straight line, i.e.
+        // there is nothing to climb and the line only clears a gap or a rooftop.
+        [[nodiscard]] bool SnapPathToGround(float stepSize, float maxDrop);
+
         [[nodiscard]] float getPathLength() const
         {
             float len = 0.0f;
