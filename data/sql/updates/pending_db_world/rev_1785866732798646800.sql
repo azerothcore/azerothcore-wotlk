@@ -2,7 +2,7 @@
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 188163;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 188163);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(188163, 1, 0, 0, 20, 0, 100, 0, 11965, 60000, 60000, 0, 0, 0, 80, 18816300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - On Quest \'Call to Arms!\' Finished - Run Script');
+(188163, 1, 0, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 18816300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - On Gameobject State Changed - Run Script');
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 25238);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -10,13 +10,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 18816300);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18816300, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25238, 3, 20000, 0, 0, 0, 0, 0, 0, 0, 0, 2614.7705, 5263.4736, 39.493538, 2.155400037765503, 'Bell Rope - Actionlist - Summon Creature \'Gamlen\''),
+(18816300, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25238, 3, 20000, 0, 0, 0, 8, 0, 0, 0, 0, 2614.7705, 5263.4736, 39.493538, 2.155400037765503, 'Bell Rope - Actionlist - Summon Creature \'Gamlen\''),
 (18816300, 9, 1, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 25238, 100, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Gamlen Say Line'),
-(18816300, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 6594, 1, 1, 0, 0, 0, 10, 103941, 24291, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594'),
-(18816300, 9, 3, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 241, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 0'),
-(18816300, 9, 4, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 241, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 1'),
-(18816300, 9, 5, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 241, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 2'),
-(18816300, 9, 6, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 241, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 3');
+(18816300, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 6594, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Play Sound 6594'),
+(18816300, 9, 3, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 0'),
+(18816300, 9, 4, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 107, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 1'),
+(18816300, 9, 5, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 107, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 2'),
+(18816300, 9, 6, 0, 0, 0, 100, 0, 11000, 11000, 0, 0, 0, 0, 107, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bell Rope - Actionlist - Summon Farshire Militia Wave 3');
 
 /*
 -- 12:56:06.071 CHAT
@@ -96,7 +96,6 @@ X: 2611.5493 Y: 5261.658 Z: 39.40324
 X: 2604.639 Y: 5274.1016 Z: 37.093304
 X: 2612.1926 Y: 5267.116 Z: 39.414043
 X: 2622.1306 Y: 5257.2104 Z: 38.274437
-X: 2611.987 Y: 5267.545 Z: 39.42648
 
 X: 2608.5396 Y: 5270.824 Z: 38.410854
 X: 2614.004 Y: 5265.765 Z: 39.411907
@@ -146,9 +145,9 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 (25617, 1, 1485, 0, 0, 18019),
 (25617, 2, 25228, 0, 0, 68887),
 (25617, 3, 2178, 0, 0, 68887),
-(25617, 4, 143, 0, 0, 68887),
-(25617, 5, 13160, 0, 0, 68887),
-(25617, 6, 2182, 0, 0, 68887);
+-- (25617, 4, 143, 0, 0, 68887),
+(25617, 4, 13160, 0, 0, 68887),
+(25617, 5, 2182, 0, 0, 68887);
 
 -- Unused between 256170 and 256180
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN 256170 AND 256179;
@@ -167,7 +166,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (256173, 1, 2604.639, 5274.1016, 37.093304, NULL, 1),
 (256173, 2, 2612.1926, 5267.116, 39.414043, NULL, 1),
 (256173, 3, 2622.1306, 5257.2104, 38.274437, NULL, 1),
-(256173, 4, 2611.987, 5267.545, 39.42648, NULL, 1),
 
 (256174, 1, 2608.5396, 5270.824, 38.410854, NULL, 1),
 (256174, 2, 2614.004, 5265.765, 39.411907, NULL, 1),
@@ -203,11 +201,11 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25617;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25617);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25617, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 233, 256170, 256174, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Just Summoned - Start Random Path 256170-256174'),
-(25617, 0, 1, 0, 109, 0, 100, 0, 0, 256170, 0, 0, 0, 0, 88, 2561700, 2561704, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256170 Finished - Run Random Script'),
-(25617, 0, 2, 0, 109, 0, 100, 0, 0, 256171, 0, 0, 0, 0, 88, 2561700, 2561704, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256171 Finished - Run Random Script'),
-(25617, 0, 3, 0, 109, 0, 100, 0, 0, 256172, 0, 0, 0, 0, 88, 2561700, 2561704, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256172 Finished - Run Random Script'),
-(25617, 0, 4, 0, 109, 0, 100, 0, 0, 256173, 0, 0, 0, 0, 88, 2561700, 2561704, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256173 Finished - Run Random Script'),
-(25617, 0, 5, 0, 109, 0, 100, 0, 0, 256174, 0, 0, 0, 0, 88, 2561700, 2561704, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256174 Finished - Run Random Script'),
+(25617, 0, 1, 0, 109, 0, 100, 0, 0, 256170, 0, 0, 0, 0, 88, 2561700, 2561703, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256170 Finished - Run Random Script'),
+(25617, 0, 2, 0, 109, 0, 100, 0, 0, 256171, 0, 0, 0, 0, 88, 2561700, 2561703, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256171 Finished - Run Random Script'),
+(25617, 0, 3, 0, 109, 0, 100, 0, 0, 256172, 0, 0, 0, 0, 88, 2561700, 2561703, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256172 Finished - Run Random Script'),
+(25617, 0, 4, 0, 109, 0, 100, 0, 0, 256173, 0, 0, 0, 0, 88, 2561700, 2561703, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256173 Finished - Run Random Script'),
+(25617, 0, 5, 0, 109, 0, 100, 0, 0, 256174, 0, 0, 0, 0, 88, 2561700, 2561703, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256174 Finished - Run Random Script'),
 
 (25617, 0, 6, 0, 109, 0, 100, 0, 0, 256175, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256175 Finished - Despawn Instant'),
 (25617, 0, 7, 0, 109, 0, 100, 0, 0, 256176, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - On Path 256176 Finished - Despawn Instant'),
@@ -226,7 +224,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2561702, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 233, 256175, 256178, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - Actionlist - Start Random Path 256175-256178'),
 
 (2561703, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 124, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - Actionlist - Load Equipment Id 5'),
-(2561703, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 233, 256175, 256178, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - Actionlist - Start Random Path 256175-256178'),
-
-(2561704, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 124, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - Actionlist - Load Equipment Id 6'),
-(2561704, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 233, 256175, 256178, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - Actionlist - Start Random Path 256175-256178');
+(2561703, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 233, 256175, 256178, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Farshire Militia - Actionlist - Start Random Path 256175-256178');
