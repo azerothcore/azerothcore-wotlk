@@ -6261,17 +6261,11 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if not in a straight line
                             return SPELL_FAILED_NOPATH;
 
-                        // A path can come back as PATHFIND_NORMAL via a raw, unvalidated straight
-                        // line - e.g. while falling toward a target below - without either end
-                        // ever being confirmed on real, walkable navmesh. While falling, it's
-                        // usually the CASTER's own mid-air position that registers as far from a
-                        // polygon (PATHFIND_FARFROMPOLY_START), not the target's - so both flags
-                        // need checking, not just _END. This is what let charging Kologarn while
-                        // jumping carry the caster to his death (issue #26266): the straight line
-                        // ends near his model, over open space rather than the walkway. Rather
-                        // than fail the cast outright, walk the line backward until a point
-                        // confirmed on real navmesh is found and charge only that far - e.g. onto
-                        // the walkway in front of him instead of falling through where he stands.
+                        // A straight line can come back as PATHFIND_NORMAL with neither end on real
+                        // navmesh. While falling it is usually the caster's own position that is far
+                        // from a poly, so both flags need checking - that is what let charging
+                        // Kologarn mid-jump end over open space (issue #26266). Walk the line back
+                        // to confirmed ground and charge only that far.
                         if (m_preGeneratedPath->GetPathType() & PATHFIND_FARFROMPOLY)
                         {
                             m_preGeneratedPath->ShortenPathUntilSafeGround();
@@ -6279,10 +6273,8 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                                 return SPELL_FAILED_NOPATH;
                         }
 
-                        // still back off by the target's combat reach even after safe-ground
-                        // handling above - e.g. only the caster's own mid-air position was far
-                        // from a polygon and the target's spot was already fine, so the path
-                        // wasn't touched and still ends exactly on the target otherwise
+                        // still back off by the target's combat reach: the path above may not have
+                        // been touched at all and would otherwise end exactly on the target
                         G3D::Vector3 const targetPos(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
                         m_preGeneratedPath->ShortenPathUntilDist(targetPos, objSize); // move back
                     }

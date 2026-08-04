@@ -1204,11 +1204,8 @@ bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
 
 bool PathGenerator::HasWalkableNavmeshAt(G3D::Vector3 const& point, G3D::Vector3& snappedPoint) const
 {
-    // findNearestPoly() only proves ground exists SOMEWHERE within the search box - it says
-    // nothing about how far that ground is from the point being tested. A tight vertical extent
-    // is what actually confirms the point itself is near real footing, not merely above some
-    // floor several yards below it (see ShortenPathUntilSafeGround for why that distinction is
-    // the whole fix here).
+    // findNearestPoly only proves ground exists somewhere in the search box. A tight vertical
+    // extent is what confirms the point itself is near footing, not just above a distant floor.
     float const navPoint[VERTEX_SIZE] = { point.y, point.z, point.x };
     float const extents[VERTEX_SIZE] = { 2.5f, 3.0f, 2.5f };
     float closestPoint[VERTEX_SIZE];
@@ -1228,14 +1225,9 @@ void PathGenerator::ShortenPathUntilSafeGround()
 
     G3D::Vector3 const start = _pathPoints[0];
 
-    // NormalizePath() (run while building the raw shortcut in BuildShortcut()) already snapped
-    // _pathPoints' own endpoint down to whatever ground happens to exist anywhere below the
-    // target's XY - which can be a completely different, much lower floor with nothing to do
-    // with the target (e.g. Kologarn's stored position sits over an open gap in the walkway;
-    // the only "ground" below it is a structural floor dozens of yards down). Walking backward
-    // from THAT corrupted point just lands the caster far below the walkway instead of on it.
-    // GetActualEndPosition() is still the original, unsnapped target position, so it's the
-    // correct reference to walk backward from.
+    // BuildShortcut's NormalizePath already snapped the endpoint down to whatever ground sits
+    // below the target's XY, which over a gap is a floor dozens of yards down. Walk back from
+    // GetActualEndPosition instead, still the original unsnapped target.
     G3D::Vector3 const end = GetActualEndPosition();
 
     // nothing to do if the endpoint is already confirmed near real walkable navmesh

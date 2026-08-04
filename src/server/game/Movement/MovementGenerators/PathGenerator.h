@@ -94,10 +94,8 @@ class PathGenerator
         // shortens the path until the destination is the specified distance from the target point
         void ShortenPathUntilDist(G3D::Vector3 const& point, float dist);
 
-        // walks the original (unsnapped) destination backward in small steps, from a path whose
-        // endpoint was never validated against the navmesh (PATHFIND_FARFROMPOLY), until a point
-        // with confirmed real ground close by is found, and truncates there. If no safe point is
-        // found anywhere along the path, it's left with only its starting point.
+        // walks the unsnapped destination backward in small steps until it finds a point with
+        // real ground close by, and truncates there. Leaves only the start point if none is.
         void ShortenPathUntilSafeGround();
 
         [[nodiscard]] float getPathLength() const
