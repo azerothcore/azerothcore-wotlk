@@ -352,13 +352,9 @@ void InstanceSaveMgr::LoadResetTimes()
 
         if (t < now)
         {
-            // The reset fell due while the server was offline. Queue an immediate, non-warning
-            // reset event (type 5) using the lapsed time instead of silently advancing past it -
-            // heroic/raid saves store resettime = 0 in `instance`, so nothing else ever clears
-            // their lockouts for a reset that was missed (see issue #26741). This fires on the
-            // very first Update() tick, by which point LoadInstanceSaves()/LoadCharacterBinds()
-            // have loaded the affected saves and binds, so _ResetOrWarnAll runs the same teardown
-            // a live reset does, including refreshing the in-memory/DB reset time correctly.
+            // Reset fell due while the server was offline. Queue it for the first Update() tick
+            // instead of advancing past it - heroic/raid saves store resettime 0, so nothing else
+            // ever clears a lockout for a missed reset (issue #26741).
             ScheduleReset(t, InstResetEvent(5, mapid, difficulty));
             continue;
         }
@@ -608,12 +604,8 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
 
         // remove all binds to instances of the given map and delete from db (delete per instance id, no mass deletion!)
         // do this after new reset time is calculated
-        // extended locks need a second pass to fully clear: PlayerUnbindInstanceNotExtended
-        // (called from _ResetSave) only flips `extended` to false on the first call and
-        // unbinds on the next one, matching a real reset one period later. When more than
-        // one period was missed while offline, run the teardown twice so extended players
-        // end up unbound here too, instead of just losing the extension - `extended` is a
-        // single-shot flag, so two passes are enough no matter how many periods were skipped.
+        // Extended locks need two passes: the first only clears the extended flag and the
+        // second unbinds. Two is always enough, however many periods were missed.
         uint8 resetPasses = missedMultiplePeriods ? 2 : 1;
         for (uint8 pass = 0; pass < resetPasses; ++pass)
         {
