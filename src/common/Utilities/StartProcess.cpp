@@ -108,11 +108,8 @@ namespace Acore
                 fclose(ptr);
         });
 
-        // Resolve the executable to an absolute path up front - std::filesystem::absolute's
-        // throwing overload can fail on OS-level issues (e.g. an inaccessible current working
-        // directory), and nothing above this call catches std::filesystem_error, so letting it
-        // throw here previously crashed the whole process instead of failing this one process
-        // start cleanly.
+        // absolute()'s throwing overload can fail on OS-level issues and nothing above catches
+        // filesystem_error, so it took the whole process down instead of failing this start.
         std::error_code ec;
         std::string absoluteExecutable = std::filesystem::absolute(executable, ec).string();
         if (ec)
@@ -121,10 +118,8 @@ namespace Acore
             return EXIT_FAILURE;
         }
 
-        // Start the child process. Boost's default error handler throws process_error when the
-        // child can't be launched at all (missing binary, no execute permission, ...), and
-        // nothing between here and main() catches it - so a resolvable-but-unlaunchable
-        // executable crashed the whole process instead of failing this one start cleanly.
+        // Boost throws process_error when the child can't be launched at all, and nothing
+        // between here and main() catches it.
         Optional<child> c;
         try
         {

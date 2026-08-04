@@ -39,10 +39,8 @@ std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 
 bool DBUpdaterUtil::CheckExecutable()
 {
-    // absolute()'s throwing overload can fail on OS-level issues (e.g. an inaccessible current
-    // working directory); nothing above this call catches std::filesystem_error, so the
-    // non-throwing overload is used here instead of crashing the whole process over a path
-    // that couldn't be resolved.
+    // non-throwing overload: nothing above catches filesystem_error, and an unresolvable
+    // path shouldn't take the process down.
     std::error_code ec;
 
     std::filesystem::path const configuredExe(GetCorrectedMySQLExecutable());
@@ -207,9 +205,8 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
 template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
-    // Update() and Populate() already guard their ApplyFile calls with this; Create() was the
-    // one caller without it, so a missing/unresolvable MySQL binary surfaced here as the
-    // misleading "please fix your sql query" fatal instead of the proper executable error.
+    // Update() and Populate() already guard this; Create() didn't, so a missing MySQL binary
+    // surfaced as the misleading "please fix your sql query" fatal.
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
