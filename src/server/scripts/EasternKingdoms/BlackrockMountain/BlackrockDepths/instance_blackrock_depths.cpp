@@ -314,9 +314,16 @@ struct instance_blackrock_depths : public InstanceScript
                 // only the four constructs in the Relic Coffer room belong to the vault event, the rest of the Black Vault spawns are regular trash
                 if (creature->GetDistance2d(VaultWarderCenter.GetPositionX(), VaultWarderCenter.GetPositionY()) > 15.0f)
                     break;
-                // frozen until all 12 Relic Coffers have been opened
+                // frozen until all 12 Relic Coffers have been opened. Their Stoned aura (10255) is a scriptless
+                // dummy, so the actual freeze has to be done through flags here.
                 if (GetData(TYPE_VAULT) == NOT_STARTED)
-                    creature->CastSpell(creature, SPELL_STONED, true);
+                {
+                    creature->SetImmuneToPC(true);
+                    creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetReactState(REACT_PASSIVE);
+                }
+                else
+                    creature->RemoveAurasDueToSpell(SPELL_STONED); // respawned after the event already started
                 [[fallthrough]];
             case NPC_WATCHMAN_DOOMGRIP:
                 VaultWarderGUIDs.push_back(creature->GetGUID());
@@ -564,7 +571,12 @@ struct instance_blackrock_depths : public InstanceScript
                     // awaken the Warbringer Constructs guarding the vault
                     for (ObjectGuid const& warderGUID : VaultWarderGUIDs)
                         if (Creature* warder = instance->GetCreature(warderGUID))
+                        {
                             warder->RemoveAurasDueToSpell(SPELL_STONED);
+                            warder->SetImmuneToPC(false);
+                            warder->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            warder->SetReactState(REACT_AGGRESSIVE);
+                        }
 
                     Position pos = {812.15f, -348.91f, -50.579f, 0.7f};
                     if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
