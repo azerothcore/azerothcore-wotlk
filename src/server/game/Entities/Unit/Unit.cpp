@@ -10781,9 +10781,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
 
-    // CvC case - can attack each other only when one of them is hostile, or when the pairing
-    // was explicitly authorized via ForceAttack() for a scripted/SmartAI-driven combat
-    // sequence between otherwise mutually-neutral creatures (see issue #26659)
+    // CvC: only when one is hostile, or the pairing was authorized via ForceAttack()
     if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
         return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE
             || HasForcedCombatWith(target) || target->HasForcedCombatWith(this);

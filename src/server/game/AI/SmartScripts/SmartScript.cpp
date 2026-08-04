@@ -1552,8 +1552,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (targets.empty())
                 break;
 
-            // authorizes combat even against a mutually non-hostile target (e.g. two Neutral
-            // creatures) - see Unit::ForceAttack() and issue #26659
+            // authorizes combat against a mutually non-hostile target (issue #26659)
             if (Unit* target = Acore::Containers::SelectRandomContainerElement(targets)->ToUnit())
                 if (me->ForceAttack(target))
                     me->GetMotionMaster()->MoveChase(target);
