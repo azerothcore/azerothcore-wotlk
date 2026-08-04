@@ -259,8 +259,6 @@ enum Nerubar
     MAX_FREED_SOLDIERS                      = 3
 };
 
-// A cocoon holds exactly one random captive. If that captive cannot be freed
-// then nothing comes out of it at all.
 uint32 const nerubarCaptiveSpells[4] =
 {
     SPELL_FREED_WARSONG_PEON, SPELL_FREED_WARSONG_WARRIOR, SPELL_FREED_WARSONG_MAGE, SPELL_FREED_WARSONG_SHAMAN
@@ -283,7 +281,6 @@ struct npc_nerubar_victim : public NullCreatureAI
 
         if (captiveSpell == SPELL_FREED_WARSONG_PEON)
         {
-            // peons are only freed while their rescue is still being asked for
             if (player->GetQuestStatus(QUEST_TAKEN_BY_THE_SCOURGE) != QUEST_STATUS_INCOMPLETE)
                 return;
 
@@ -292,8 +289,7 @@ struct npc_nerubar_victim : public NullCreatureAI
             return;
         }
 
-        // freeing a soldier stacks a hidden debuff on the player, one stack per soldier,
-        // and no further ones are freed while it is full
+        // freeing a soldier stacks a hidden debuff on the player, one stack per soldier
         if (Aura const* freedSoldiers = player->GetAura(SPELL_FREED_SOLDIER_DEBUFF))
             if (freedSoldiers->GetStackAmount() >= MAX_FREED_SOLDIERS)
                 return;
@@ -314,7 +310,7 @@ class spell_dispel_freed_soldier_debuff : public SpellScript
 
     void HandleScriptEffect(SpellEffIndex /* effIndex */)
     {
-        // cast by a freed soldier on its summoner when it leaves, giving the slot back
+        // cast by a freed soldier on its summoner when it leaves
         GetHitUnit()->RemoveAuraFromStack(SPELL_FREED_SOLDIER_DEBUFF);
     }
 
