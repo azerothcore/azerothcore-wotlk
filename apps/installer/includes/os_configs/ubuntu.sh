@@ -36,8 +36,11 @@ apt-get -y install ccache clang cmake curl make unzip jq screen tmux \
 
 # version-specific deps
 if [[ "$UBUNTU_VERSION" == "26.04" ]]; then
+  # libstdc++-16-dev: clang 21 links against the GCC 16 toolchain, while the
+  # default g++ is GCC 15 and only brings the GCC 15 C++ dev files, so cmake
+  # fails with "cannot find -lstdc++" without it.
   $SUDO DEBIAN_FRONTEND="noninteractive" \
-  apt-get -y install libgoogle-perftools-dev default-libmysqlclient-dev
+  apt-get -y install libgoogle-perftools-dev default-libmysqlclient-dev libstdc++-16-dev
 else
   $SUDO DEBIAN_FRONTEND="noninteractive" \
   apt-get -y install google-perftools libmysqlclient-dev libncurses5-dev libncursesw5-dev

@@ -76,7 +76,9 @@ runs:
           libboost-all-dev libbz2-dev libmysql++-dev \
           libreadline6-dev libssl-dev libtool openssl zlib1g-dev
         if [[ "$(lsb_release -sr)" == "26.04" ]]; then
-          sudo apt-get -y install libgoogle-perftools-dev default-libmysqlclient-dev
+          # libstdc++-16-dev: clang 21 links against the GCC 16 toolchain, the
+          # default g++ (GCC 15) only brings the GCC 15 C++ dev files
+          sudo apt-get -y install libgoogle-perftools-dev default-libmysqlclient-dev libstdc++-16-dev
         else
           sudo apt-get -y install google-perftools libmysqlclient-dev libncurses5-dev
         fi
