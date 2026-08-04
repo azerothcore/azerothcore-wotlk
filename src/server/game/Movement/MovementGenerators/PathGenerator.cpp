@@ -1199,13 +1199,17 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
 
 bool PathGenerator::SnapPathToGround(float stepSize, float maxDrop)
 {
-    if (_pathPoints.size() < 2 || stepSize <= 0.0f)
+    // Only ever a straight shortcut: anything with a middle already follows real navmesh, and
+    // flattening it into a line here would throw that route away.
+    if (_pathPoints.size() != 2 || stepSize <= 0.0f)
         return false;
 
     G3D::Vector3 const start = _pathPoints.front();
     G3D::Vector3 const end = _pathPoints.back();
 
-    uint32 const steps = std::max<uint32>(1, uint32((end - start).length() / stepSize));
+    // Rounded up, so the gap between samples never grows past stepSize and a dip between two of
+    // them can't go unnoticed.
+    uint32 const steps = std::max<uint32>(1, uint32(std::ceil((end - start).length() / stepSize)));
     if (steps < 2)
         return true;
 

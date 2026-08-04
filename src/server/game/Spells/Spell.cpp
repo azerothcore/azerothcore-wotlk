@@ -6290,7 +6290,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                             // runs several yards inside the hill on anything convex, and the client drops
                             // you out of the world when the spline ends in there. Bails out when there is
                             // no slope under the line at all, so this can't carry anyone onto a roof.
-                            if (!m_preGeneratedPath->SnapPathToGround(SMOOTH_PATH_STEP_SIZE, SMOOTH_PATH_STEP_SIZE))
+                            // Only for the shortcut: if the way to the landing spot did fit the limit we
+                            // have a real navmesh route, and it already ends backed off the target.
+                            if ((m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
+                                && !m_preGeneratedPath->SnapPathToGround(SMOOTH_PATH_STEP_SIZE, SMOOTH_PATH_STEP_SIZE))
                                 return SPELL_FAILED_NOPATH;
                         }
                         else
