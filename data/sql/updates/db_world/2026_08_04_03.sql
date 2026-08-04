@@ -1,3 +1,4 @@
+-- DB update 2026_08_04_02 -> 2026_08_04_03
 --
 DELETE FROM `creature` WHERE `id` = 26231 AND `guid` = 40270;
 DELETE FROM `waypoint_data` WHERE `id` = 402700;
