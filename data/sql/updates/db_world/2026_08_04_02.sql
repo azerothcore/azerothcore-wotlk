@@ -1,3 +1,4 @@
+-- DB update 2026_08_04_01 -> 2026_08_04_02
 --
 UPDATE `creature` SET
 `position_x`  = 4311.212890625,
