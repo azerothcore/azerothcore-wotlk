@@ -167,11 +167,8 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 classMask = player->getClassMask();
 
-        // Player::LearnTalent still enforces cross-tree DependsOn prerequisites even when called
-        // with command=true (only the free-point and tier-row checks are skipped for that flag).
-        // sTalentStore isn't ordered by dependency, so a talent can be visited before the talent
-        // it depends on - repeat passes until nothing new gets learned so those catch up instead
-        // of being silently skipped.
+        // LearnTalent still enforces DependsOn with command=true, and sTalentStore is not ordered
+        // by dependency, so repeat passes until nothing new is learned.
         bool hadNew;
         do
         {
@@ -223,9 +220,8 @@ public:
             }
         } while (hadNew);
 
-        // Picking a single tab also learns all trainer spells, same as ".learn all my class" -
-        // the plain no-arg command stays talents-only. Done after the talent loop so any trainer
-        // spell gated behind a talent from this tab is already available to teach.
+        // Picking a tab also learns trainer spells; after the talent loop so anything gated
+        // behind a talent from this tab is already teachable.
         if (tabArg)
             HandleLearnAllMyTrainerSpellsCommand(handler);
 
