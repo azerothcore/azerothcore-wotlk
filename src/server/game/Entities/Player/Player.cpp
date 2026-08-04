@@ -1476,12 +1476,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             //same map, only remove pet if out of range for new position
             if (pet && !pet->IsWithinDist3d(x, y, z, GetMap()->GetVisibilityRange()))
             {
-                // Duration-limited real Pets have no way to persist their
-                // remaining duration across a full unsummon/resummon
-                // round-trip - character_pet has no duration column, so
-                // UnsummonPetTemporaryIfAny() would just lose them for
-                // good. Relocate the same object directly instead, same
-                // as the guardian/critter handling below.
+                // character_pet has no duration column, so a timed pet cannot survive
+                // an unsummon/resummon round trip. Relocate it directly instead.
                 if (pet->isTemporarySummoned())
                     pet->NearTeleportTo(x, y, z, orientation);
                 else
@@ -1489,15 +1485,9 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             }
         }
 
-        // Guardian-type summons (e.g. a DK's basic Raise Dead ghoul without
-        // Master of Ghouls) aren't real Pets - GetPet() never returns them,
-        // and depending on their exact SummonProperties category, even
-        // GetGuardianPet()/GetPetGUID() might not either. Unit::SetMinion()
-        // unconditionally inserts every minion/guardian into m_Controlled
-        // regardless of category, so iterate that directly instead of
-        // guessing which accessor covers this particular summon type.
-        // Totems don't follow the player and are excluded; the real pet and
-        // critter are already handled separately above/below.
+        // Guardians are not real Pets and the accessors may miss them depending on
+        // category, but SetMinion always inserts them into m_Controlled.
+        // Totems do not follow the player; pet and critter are handled separately.
         for (Unit* controlled : m_Controlled)
         {
             if (controlled->IsTotem())
@@ -1511,11 +1501,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 summon->NearTeleportTo(x, y, z, orientation);
         }
 
-        // vanity/companion critters can't warp back to the player like a
-        // real pet does and area-trigger portals are one-way (a following
-        // creature can't physically walk through them) - if this same-map
-        // teleport puts them out of range, bring them along directly
-        // instead of leaving them stuck on the other side permanently
+        // critters cannot warp back like a real pet and area-trigger portals are
+        // one-way, so bring them along rather than stranding them
         if (Creature* critter = ObjectAccessor::GetCreature(*this, GetCritterGUID()))
             if (!critter->IsWithinDist3d(x, y, z, GetMap()->GetVisibilityRange()))
                 critter->NearTeleportTo(x, y, z, orientation);
