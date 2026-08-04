@@ -87,16 +87,12 @@ public:
                 return;
 
             bool const warTime = bf->IsWarTime();
-            // Treat an already-active war as "timer at 0" so a jump straight
-            // past every threshold (GM-set timer, or a slow tick) still
-            // fires the missed warnings/stoning/kick retroactively instead
-            // of being skipped because IsWarTime() is already true.
+            // Treat an active war as timer 0, so a jump past every threshold still fires the
+            // missed warnings and stoning instead of being skipped.
             uint32 const timer = warTime ? 0 : bf->GetTimer();
 
-            // War just ended: reset for a fresh countdown regardless of how
-            // Wintergrasp.NoBattleTimer is configured (don't rely on the
-            // absolute timer value, which could stay below 15 minutes forever
-            // on a short config and leave the flags stuck true).
+            // War just ended: reset on the transition rather than on an absolute timer value,
+            // which a short NoBattleTimer would never cross.
             if (wasWarTime && !warTime)
             {
                 if (stoned)
