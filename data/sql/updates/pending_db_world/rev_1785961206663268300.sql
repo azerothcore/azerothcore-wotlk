@@ -4,7 +4,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`e
 UPDATE `creature` SET `position_x` = 4414.2227, `position_y` = 5367.2993, `position_z` = -15.494027, `orientation` = 0.366519153118133544, `VerifiedBuild` = 68887, `CreateObject` = 1 WHERE `id` = 25589 AND `guid` = 2017;
 UPDATE `creature_template_addon` SET `bytes1` = 0 WHERE (`entry` = 25589);
 
-DELETE FROM `waypoint_data` WHERE `id`=755430 AND `point`=1;
+DELETE FROM `waypoint_data` WHERE `id` = 20170;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
 (20170, 1, 4417.7495, 5367.4985, -16.15369, NULL, 0),
 (20170, 2, 4428.611, 5368.9023, -16.237024, NULL, 0),
