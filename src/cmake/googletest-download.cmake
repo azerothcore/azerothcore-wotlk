@@ -23,8 +23,13 @@ ExternalProject_Add(
         BINARY_DIR "@GOOGLETEST_DOWNLOAD_ROOT@/googletest-build"
         GIT_REPOSITORY
         https://github.com/google/googletest.git
+        # Pinned to a main-branch commit rather than a tag: gtest-printers.h
+        # converted char8_t/char16_t to char32_t implicitly, which clang-21
+        # rejects under -Werror (-Wcharacter-conversion). Upstream fixed it in
+        # fa8438ae, three weeks after v1.17.0 was cut, so no release carries it
+        # yet. Move back to a tag once one ships that commit.
         GIT_TAG
-        release-1.12.1
+        3940de91897160fea4815998e08d0fa3c2fb077e
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
