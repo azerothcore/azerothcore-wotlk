@@ -75,8 +75,20 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
+          # gcc rather than clang here: the default clang on 26.04 is 21, which
+          # cannot parse the libstdc++ 16 headers it picks up and dies in
+          # <shared_mutex> and <numeric> before reaching any of our code
           - os: ubuntu-26.04
+            compiler:
+              CC: gcc-15
+              CXX: g++-15
     runs-on: ${{ matrix.os }}
+    env:
+      CC: ${{ matrix.compiler.CC }}
+      CXX: ${{ matrix.compiler.CXX }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - name: Checkout repository
@@ -149,9 +161,9 @@ jobs:
       # recent on any ref the run can reach, which is its own and the base
       # branch, and is how a first run inherits master's. Both must use
       # matrix.os to stay in the key's namespace.
-      # The runner.os entries below reach the linux-build action's caches, but
-      # only on the 24.04 leg: on 26.04 this workflow detects clang-21 while
-      # linux-build is passed clang-20, so nothing there lines up.
+      # The runner.os entries below reach the linux-build action's caches, which
+      # now line up on both legs: clang-18 on 24.04 and gcc-15 on 26.04 are both
+      # compilers the core-build workflows already run.
       - name: Restore ccache
         id: restore_ccache
         uses: actions/cache/restore@v4
