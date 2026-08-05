@@ -33,7 +33,6 @@ DoorData const doorData[] =
     { GO_LEVIATHAN_DOORS,              BOSS_LEVIATHAN, DOOR_TYPE_ROOM       },
     { GO_LIGHTNING_WALL1,              BOSS_LEVIATHAN, DOOR_TYPE_PASSAGE    },
     { GO_XT002_DOORS,                  BOSS_XT002,     DOOR_TYPE_ROOM       },
-    { GO_KOLOGARN_DOORS,               BOSS_KOLOGARN,  DOOR_TYPE_ROOM       },
     { GO_ASSEMBLY_DOORS,               BOSS_ASSEMBLY,  DOOR_TYPE_ROOM       },
     { GO_ARCHIVUM_DOORS,               BOSS_ASSEMBLY,  DOOR_TYPE_PASSAGE    },
     { GO_MIMIRON_DOOR_1,               BOSS_MIMIRON,   DOOR_TYPE_ROOM       },
@@ -132,7 +131,6 @@ ObjectData const gameobjectData[] =
     { GO_LIGHTNING_WALL1,               DATA_LIGHTNING_WALL1            },
     { GO_LIGHTNING_WALL2,               DATA_LIGHTNING_WALL2            },
     { GO_XT002_DOORS,                   DATA_XT002_DOORS                },
-    { GO_KOLOGARN_DOORS,                DATA_KOLOGARN_DOORS             },
     { GO_ASSEMBLY_DOORS,                DATA_ASSEMBLY_DOORS             },
     { GO_ARCHIVUM_DOORS,                DATA_ARCHIVUM_DOORS             },
     { GO_MIMIRON_DOOR_1,                DATA_GO_MIMIRON_DOOR_1          },
@@ -219,6 +217,7 @@ public:
         // Shared
         EventMap _events;
         bool _mimironTramUsed;
+        bool _algalonResummonPending;
 
         void Initialize() override
         {
@@ -234,6 +233,7 @@ public:
             // Shared
             _events.Reset();
             _mimironTramUsed       = false;
+            _algalonResummonPending = false;
         }
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
@@ -279,7 +279,7 @@ public:
 
             uint32 algalonTimer =
                 GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
-            if (!GetObjectGuid(BOSS_ALGALON) && algalonTimer
+            if (!GetObjectGuid(BOSS_ALGALON) && !_algalonResummonPending && algalonTimer
                 && (algalonTimer <= 60
                     || algalonTimer == TIMER_ALGALON_TO_SUMMON))
             {
@@ -324,6 +324,18 @@ public:
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
                 SetData(eventId, 0);
+            else if (eventId == EVENT_HODIR_SHATTER_CHEST)
+            {
+                if (GameObject* go = GetHodirChest(true))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                    scheduler.Schedule(3s, [this](TaskContext /*context*/)
+                    {
+                        if (GetBossState(BOSS_HODIR) != DONE)
+                            SetData(TYPE_HODIR_HM_FAIL, 0);
+                    });
+                }
+            }
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -708,6 +720,10 @@ public:
                     StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, 60);
                     _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                     return;
+                case DATA_RESUMMON_ALGALON:
+                    _algalonResummonPending = true;
+                    _events.RescheduleEvent(EVENT_RESUMMON_ALGALON, 2s);
+                    return;
                 case DATA_ALGALON_SUMMON_STATE:
                 case DATA_ALGALON_DEFEATED:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 0);
@@ -931,7 +947,14 @@ public:
                     SetData(DATA_ALGALON_DEFEATED, 1);
                     if (Creature* algalon = GetCreature(BOSS_ALGALON))
                         algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);
+                    break;
                 }
+                case EVENT_RESUMMON_ALGALON:
+                    _algalonResummonPending = false;
+                    if (!GetCreature(BOSS_ALGALON))
+                        if (Creature* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
+                            algalon->AI()->DoAction(ACTION_START_INTRO);
+                    break;
             }
         }
 
@@ -983,6 +1006,24 @@ public:
                     return (mask & (1 << BOSS_YOGGSARON)) == 0;
             }
             return false;
+        }
+
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
+        {
+            if (_SkipCheckRequiredBosses(player))
+                return true;
+
+            switch (bossId)
+            {
+                case BOSS_YOGGSARON:
+                    if (GetBossState(BOSS_VEZAX) != DONE)
+                        return false;
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
         }
     };
 };

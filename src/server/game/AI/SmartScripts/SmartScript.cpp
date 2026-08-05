@@ -44,6 +44,27 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+namespace
+{
+    // Returns the GUID of whoever brought this object into the world: its owner/charmer if any,
+    // its summoner otherwise. Empty for objects that were not summoned by anyone.
+    ObjectGuid GetSummonerOrOwnerGUID(WorldObject const* obj)
+    {
+        if (Creature const* creature = obj->ToCreature())
+        {
+            if (ObjectGuid ownerGUID = creature->GetCharmerOrOwnerGUID())
+                return ownerGUID;
+
+            if (TempSummon const* summon = creature->ToTempSummon())
+                return summon->GetSummonerGUID();
+        }
+        else if (GameObject const* gameObject = obj->ToGameObject())
+            return gameObject->GetOwnerGUID();
+
+        return ObjectGuid::Empty;
+    }
+}
+
 SmartScript::SmartScript()
 {
     go = nullptr;
@@ -4156,6 +4177,49 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     }
                 }
             }
+            break;
+        }
+        case SMART_TARGET_SHARED_OWNER_ENTITIES:
+        {
+            WorldObject* ref = GetBaseObject();
+
+            if (!ref)
+            {
+                LOG_ERROR("scripts.ai.sai", "SMART_TARGET_SHARED_OWNER_ENTITIES: Entry {} SourceType {} Event {} Action {} Target {} is missing base object.",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                break;
+            }
+
+            ObjectGuid ownerGUID = GetSummonerOrOwnerGUID(ref);
+            if (!ownerGUID)
+                break;
+
+            bool const wantGameObject = e.target.sharedOwnerEntities.type == 2;
+            uint32 const entry = e.target.sharedOwnerEntities.entry;
+
+            float const dist = e.target.sharedOwnerEntities.maxDist ? (float)e.target.sharedOwnerEntities.maxDist : ref->GetVisibilityRange();
+
+            ObjectVector units;
+            GetWorldObjectsInDist(units, dist);
+
+            for (WorldObject* unit : units)
+            {
+                // an object is never a sibling of itself
+                if (unit->GetGUID() == ref->GetGUID())
+                    continue;
+
+                if (wantGameObject ? !IsGameObject(unit) : !IsCreature(unit))
+                    continue;
+
+                if (entry && unit->GetEntry() != entry)
+                    continue;
+
+                if (GetSummonerOrOwnerGUID(unit) != ownerGUID)
+                    continue;
+
+                targets.push_back(unit);
+            }
+
             break;
         }
         case SMART_TARGET_NONE:
