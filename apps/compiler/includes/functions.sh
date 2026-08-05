@@ -58,6 +58,33 @@ function comp_ccacheShowStats() {
     ccache -s
 }
 
+# clang builds against the newest GCC toolchain installed on the box. When that
+# toolchain is newer than clang understands, compilation dies inside the standard
+# headers before reaching any of our code: clang 21 with GCC 16 on Ubuntu 26.04
+# fails in <shared_mutex> and <numeric>. Fall back to the newest GCC that clang can
+# actually parse. Does nothing where the default already works.
+function comp_selectGccToolchain() {
+  [[ "$($CCOMPILERCXX --version 2>/dev/null | head -1)" == *clang* ]] || return 0
+
+  local probe="#include <shared_mutex>
+#include <numeric>
+int main() { return 0; }"
+
+  echo "$probe" | "$CCOMPILERCXX" -x c++ -std=c++20 -fsyntax-only - 2>/dev/null && return 0
+
+  local dir
+  for dir in $(ls -d /usr/lib/gcc/*/[0-9]* 2>/dev/null | sort -Vr); do
+    echo "$probe" | "$CCOMPILERCXX" -x c++ -std=c++20 -fsyntax-only "--gcc-install-dir=$dir" - 2>/dev/null || continue
+
+    echo "clang cannot use the default GCC toolchain, falling back to $dir"
+    export CFLAGS="${CFLAGS:+$CFLAGS }--gcc-install-dir=$dir"
+    export CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }--gcc-install-dir=$dir"
+    return 0
+  done
+
+  echo "WARNING: $CCOMPILERCXX cannot parse the standard headers of any installed GCC toolchain"
+}
+
 function comp_configure() {
   CWD=$(pwd)
 
@@ -80,6 +107,7 @@ function comp_configure() {
   fi
 
   comp_ccacheEnable
+  comp_selectGccToolchain
 
   OSOPTIONS=""
 
