@@ -230,6 +230,7 @@ enum Actions
 {
     DO_DISABLE_AERIAL = 1,
     DO_ENABLE_AERIAL,
+    DO_DESPAWN_SUMMONS,
 };
 
 enum Texts
@@ -734,7 +735,7 @@ struct boss_mimiron : public BossAI
                     me->_ExitVehicle(&exitPos);
                     me->AttackStop();
                     me->GetMotionMaster()->Clear();
-                    summons.DoAction(1337); // despawn summons of summons
+                    summons.DoAction(DO_DESPAWN_SUMMONS);
                     summons.DespawnEntry(NPC_FLAMES_INITIAL);
                     summons.DespawnEntry(33576);
 
@@ -820,7 +821,7 @@ struct boss_mimiron : public BossAI
             c->DespawnOrUnsummon();
         }
 
-        summons.DoAction(1337); // despawn summons of summons
+        summons.DoAction(DO_DESPAWN_SUMMONS); // despawn summons of summons
 
         me->RemoveAllAuras();
         me->ExitVehicle();
@@ -943,7 +944,7 @@ private:
 
 struct npc_ulduar_leviathan_mkii : public ScriptedAI
 {
-    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature)
+    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature), _summons(me)
     {
         instance = me->GetInstanceScript();
         _isEvading = false;
@@ -952,6 +953,7 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
     void Reset() override
     {
         _phase = 0;
+        _summons.DespawnAll();
         if (Unit* c = GetS3())
             c->ExitVehicle(); // this should never happen!
         if (Creature* c = me->SummonCreature(NPC_LEVIATHAN_MKII_CANNON, *me, TEMPSUMMON_MANUAL_DESPAWN))
@@ -973,6 +975,18 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
             me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
         }
+    }
+
+    // Mines are summoned by the MK II, not by Mimiron, so they are not in his SummonList.
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_PROXIMITY_MINE)
+            _summons.Summon(summon);
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        _summons.Despawn(summon);
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1201,9 +1215,16 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
 private:
     InstanceScript* instance;
     EventMap _events;
+    SummonList _summons;
     bool _isEvading;
     uint8 _phase;
 };
+
+// Sniffed P3Wx2 Laser Barrage arcs start at a fixed room angle and advance 60 degrees
+// counterclockwise each cycle, independent of the player targeted during Spinning Up.
+// Phase 4 restarts the sequence from the initial angle.
+constexpr float VX001_BARRAGE_ARC_START = 6.17f;
+constexpr float VX001_BARRAGE_ARC_STEP = static_cast<float>(M_PI / 3);
 
 struct npc_ulduar_vx001 : public ScriptedAI
 {
@@ -1218,8 +1239,8 @@ struct npc_ulduar_vx001 : public ScriptedAI
         _phase = 0;
         _fighting = false;
         _leftArm = false;
-        _spinningUpOrientation = 0;
-        _spinningUpTimer = 0;
+        _barrageOrientation = 0;
+        _nextBarrageArc = VX001_BARRAGE_ARC_START;
         me->SetRegeneratingHealth(false);
         _events.Reset();
     }
@@ -1241,6 +1262,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 case 2:
                     _phase = 2;
                     _fighting = true;
+                    _nextBarrageArc = VX001_BARRAGE_ARC_START;
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_SPELL_CAST_OMNI);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     _events.Reset();
@@ -1259,6 +1281,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 case 4:
                     _phase = 4;
                     _fighting = true;
+                    _nextBarrageArc = VX001_BARRAGE_ARC_START;
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3s);
@@ -1275,12 +1298,12 @@ struct npc_ulduar_vx001 : public ScriptedAI
 
     uint32 GetData(uint32  /*id*/) const override
     {
-        return _spinningUpOrientation;
+        return _barrageOrientation;
     }
 
     void DoAction(int32 action) override
     {
-        if (action == 1337)
+        if (action == DO_DESPAWN_SUMMONS)
             if (Vehicle* vk = me->GetVehicleKit())
                 for (uint8 i = 0; i < 2; ++i)
                     if (Unit* r = vk->GetPassenger(5 + i))
@@ -1338,19 +1361,6 @@ struct npc_ulduar_vx001 : public ScriptedAI
             return;
 
         _events.Update(diff);
-
-        if (_spinningUpTimer) // executed about a second after starting casting to ensure players can see the correct direction
-        {
-            if (_spinningUpTimer <= diff)
-            {
-                float angle = (_spinningUpOrientation * 2 * M_PI) / 100.0f;
-                me->SetFacingTo(angle);
-
-                _spinningUpTimer = 0;
-            }
-            else
-                _spinningUpTimer -= diff;
-        }
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -1414,15 +1424,15 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 _events.Repeat(1750ms);
                 break;
             case EVENT_SPELL_SPINNING_UP:
-                _events.Repeat(45s);
-                if (Player* p = SelectTargetFromPlayerList(80.0f))
+                _events.Repeat(60s);
                 {
-                    float angle = me->GetAngle(p);
+                    float arc = _nextBarrageArc;
 
-                    _spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
-                    _spinningUpTimer = 1500;
-                    me->SetFacingTo(angle);
-                    me->CastSpell(p, SPELL_SPINNING_UP, true);
+                    _barrageOrientation = (uint32)((arc * 100.0f) / (2 * M_PI));
+                    _nextBarrageArc = Position::NormalizeOrientation(arc + VX001_BARRAGE_ARC_STEP);
+                    // The beams follow unit facing, so facing the arc start doubles as the telegraph
+                    me->SetFacingTo(arc);
+                    me->CastSpell(me, SPELL_SPINNING_UP, true);
                     if (Unit* vehicle = me->GetVehicleBase())
                     {
                         vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
@@ -1497,8 +1507,8 @@ private:
     bool _isEvading;
     bool _fighting;
     bool _leftArm;
-    uint32 _spinningUpOrientation;
-    uint16 _spinningUpTimer;
+    uint32 _barrageOrientation;
+    float _nextBarrageArc;
     uint8 _phase;
 };
 
@@ -1591,7 +1601,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     me->SetReactState(REACT_AGGRESSIVE);
                 }, 2s);
                 break;
-            case 1337:
+            case DO_DESPAWN_SUMMONS:
                 _summons.DespawnAll();
                 break;
         }
@@ -1783,6 +1793,7 @@ struct npc_ulduar_proximity_mine : public ScriptedAI
             {
                 _exploded = true;
                 me->CastSpell(me, SPELL_MINE_EXPLOSION, false);
+                me->DespawnOrUnsummon(2s);
             }
         }
         else
@@ -1795,6 +1806,7 @@ struct npc_ulduar_proximity_mine : public ScriptedAI
             {
                 _exploded = true;
                 me->CastSpell(me, SPELL_MINE_EXPLOSION, false);
+                me->DespawnOrUnsummon(2s);
             }
         }
         else
@@ -2046,10 +2058,7 @@ class spell_mimiron_magnetic_core_summon : public SpellScript
 
     void ModDest(SpellDestination& dest)
     {
-        Unit* caster = GetCaster();
-        Position pos = caster->GetPosition();
-        pos.m_positionZ = caster->GetMap()->GetHeight(pos);
-        dest.Relocate(pos);
+        dest._position.m_positionZ = GetCaster()->GetMap()->GetHeight(dest._position);
     }
 
     void Register() override
@@ -2219,7 +2228,7 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1337)
+        if (action == DO_DESPAWN_SUMMONS)
             RemoveAll();
     }
 
