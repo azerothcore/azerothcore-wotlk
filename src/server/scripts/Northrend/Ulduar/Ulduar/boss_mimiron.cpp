@@ -1531,6 +1531,27 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
         me->SetDisableGravity(true);
     }
 
+    float GetPlasmaBallChaseOffset() const
+    {
+        float horizontal = 30.0f;
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_PLASMA_BALL_P1))
+            horizontal = std::max(spellInfo->GetMaxRange(false) - 5.0f, 5.0f);
+
+        // Chase compares distances in 3D while spell range is checked in 2D, so the offset
+        // is the hypotenuse of the intended horizontal distance and the hover height.
+        float const hover = me->GetHoverHeight();
+        return std::sqrt(horizontal * horizontal + hover * hover);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (!who || !me->Attack(who, true))
+            return;
+
+        if (_phase != 4)
+            me->GetMotionMaster()->MoveChase(who, GetPlasmaBallChaseOffset());
+    }
+
     void SetData(uint32 id, uint32 value) override
     {
         if (id == 1) // setting phase to start fighting
