@@ -1,7 +1,7 @@
 --
 DELETE FROM `script_waypoint` WHERE `entry` = 25589;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 25589);
-UPDATE `creature` SET `position_x` = 4414.2227, `position_y` = 5367.2993, `position_z` = -15.494027, `orientation` = 0.366519153118133544 WHERE `id` = 25589 AND `guid` = 2017;
+UPDATE `creature` SET `position_x` = 4414.2227, `position_y` = 5367.2993, `position_z` = -15.494027, `orientation` = 0.366519153118133544, `VerifiedBuild` = 68887, `CreateObject` = 1 WHERE `id` = 25589 AND `guid` = 2017;
 UPDATE `creature_template_addon` SET `bytes1` = 0 WHERE (`entry` = 25589);
 
 DELETE FROM `waypoint_data` WHERE `id`=755430 AND `point`=1;
