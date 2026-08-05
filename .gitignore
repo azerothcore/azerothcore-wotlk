@@ -55,6 +55,11 @@ CMakeLists.txt.user
 *.LOCAL.*
 
 #
+# Agents
+#
+.agents/plans/**
+
+#
 # Claude
 #
 .claude/worktrees
@@ -101,6 +106,10 @@ local.properties
 # vcpkg integration
 /vcpkg/
 /vcpkg-ports/
+
+# Python bytecode cache
+__pycache__/
+*.py[cod]
 
 
 # ==================

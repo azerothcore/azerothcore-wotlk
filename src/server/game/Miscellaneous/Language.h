@@ -1400,6 +1400,10 @@ enum AcoreStrings
 
     LANG_LFG_COOLDOWN_CLEARED                     = 11019,
 
+    LANG_COMMAND_SERVER_SET_SECURITY              = 11020,
+    LANG_COMMAND_SERVER_SET_SECURITY_ERROR        = 11021,
+    LANG_COMMAND_SERVER_INFO_SECURITY             = 11022,
+
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 
     // Instant Flight
@@ -1517,6 +1521,30 @@ enum AcoreStrings
 
     // Pet rename command
     LANG_PET_RENAME_INVALID             = 35453,
-    LANG_PET_RENAME_SUCCESS             = 35454
+    LANG_PET_RENAME_SUCCESS             = 35454,
+
+    // Wintergrasp shutdown deferral
+    LANG_WG_SHUTDOWN_DEFERRED           = 35455,
+
+    // npc showloot command
+    LANG_COMMAND_NOT_DEAD_OR_NO_LOOT    = 35456,
+    LANG_COMMAND_NPC_SHOWLOOT_HEADER    = 35457,
+    LANG_COMMAND_NPC_SHOWLOOT_MONEY     = 35458,
+    LANG_COMMAND_NPC_SHOWLOOT_ITEMS     = 35459,
+    LANG_COMMAND_NPC_SHOWLOOT_ENTRY     = 35460,
+    LANG_COMMAND_NPC_SHOWLOOT_QUEST     = 35461,
+
+    // Group invites toggle command
+    LANG_COMMAND_GROUP_INVITES_ACCEPTING = 35462,
+    LANG_COMMAND_GROUP_INVITES_ON        = 35463,
+    LANG_COMMAND_GROUP_INVITES_OFF       = 35464,
+
+    // Account flag command
+    LANG_ACCOUNT_FLAG_LIST_HEADER       = 35465,
+    LANG_ACCOUNT_FLAG_LIST_EMPTY        = 35466,
+    LANG_ACCOUNT_FLAG_INVALID           = 35467,
+    LANG_ACCOUNT_FLAG_RESERVED          = 35468,
+    LANG_ACCOUNT_FLAG_ADDED             = 35469,
+    LANG_ACCOUNT_FLAG_REMOVED           = 35470
 };
 #endif

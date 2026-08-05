@@ -84,6 +84,12 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
         if (_player->GetGuildId())
             return;
 
+        if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_GUILD) && IsTrialAccount())
+        {
+            Guild::SendCommandResult(this, GUILD_COMMAND_CREATE, ERR_GUILD_PERMISSIONS);
+            return;
+        }
+
         charterid = GUILD_CHARTER;
         cost = sWorld->getIntConfig(CONFIG_CHARTER_COST_GUILD);
         type = GUILD_CHARTER_TYPE;
@@ -455,6 +461,12 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
             return;
         }
 
+        if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_GUILD) && IsTrialAccount())
+        {
+            Guild::SendCommandResult(this, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
+            return;
+        }
+
         if (_player->GetGuildId())
         {
             Guild::SendCommandResult(this, GUILD_COMMAND_INVITE, ERR_ALREADY_IN_GUILD_S, _player->GetName());
@@ -678,6 +690,12 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
     // Petition type (guild/arena) specific checks
     if (type == GUILD_CHARTER_TYPE)
     {
+        if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_GUILD) && IsTrialAccount())
+        {
+            Guild::SendCommandResult(this, GUILD_COMMAND_CREATE, ERR_GUILD_PERMISSIONS);
+            return;
+        }
+
         // Check if player is already in a guild
         if (_player->GetGuildId())
         {

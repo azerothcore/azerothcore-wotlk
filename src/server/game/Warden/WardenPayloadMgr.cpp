@@ -40,7 +40,7 @@ uint16 WardenPayloadMgr::GetFreePayloadId()
     return payloadId;
 }
 
-uint16 WardenPayloadMgr::RegisterPayload(const std::string& payload)
+uint16 WardenPayloadMgr::RegisterPayload(std::string const& payload)
 {
     uint16 payloadId = GetFreePayloadId();
 

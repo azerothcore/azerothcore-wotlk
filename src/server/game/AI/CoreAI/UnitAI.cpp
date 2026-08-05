@@ -24,6 +24,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "World.h"
 
 void UnitAI::AttackStart(Unit* victim)
 {
@@ -292,10 +293,14 @@ SpellCastResult UnitAI::DoCastAOE(uint32 spellId, bool triggered)
 
 /**
  * @brief Cast the spell on a random unit from the threat list
+ *
+ * @param aura Optional aura filter forwarded to SelectTarget: a positive value
+ *             requires the aura on the target, a negative value excludes targets
+ *             that already have it.
  */
-SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered, bool withTank)
+SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered, bool withTank, int32 aura)
 {
-    if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly, withTank))
+    if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly, withTank, aura))
     {
         return DoCast(target, spellId, triggered);
     }
@@ -406,6 +411,26 @@ void UnitAI::EvadeTimerExpired()
             {
                 creature->SetCannotReachTarget();
                 return;
+            }
+        }
+    }
+
+    // Retail-like: instance trash teleports to its unreachable target instead of evading
+    if (sWorld->getBoolConfig(CONFIG_CREATURE_INSTANCE_TELEPORT_TO_UNREACHABLE_TARGET)
+        && creature->GetMap()->IsDungeon()
+        && !creature->IsDungeonBoss() && !creature->isWorldBoss()
+        && !creature->IsControlledByPlayer())
+    {
+        if (ObjectGuid targetGuid = creature->GetCannotReachTarget())
+        {
+            if (Unit* target = ObjectAccessor::GetUnit(*creature, targetGuid))
+            {
+                if (target->IsAlive() && creature->IsEngagedBy(target))
+                {
+                    creature->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
+                    creature->SetCannotReachTarget();
+                    return;
+                }
             }
         }
     }
