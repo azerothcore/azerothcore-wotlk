@@ -368,6 +368,7 @@ struct boss_freya : public BossAI
                 Talk(SAY_SUMMON_LASHERS);
                 for (uint8 i = 0; i < 10; ++i)
                     DoCast(SPELL_SUMMON_WAVE_10);
+
                 _aliveAddsCount += 10;
                 break;
         }
@@ -379,6 +380,7 @@ struct boss_freya : public BossAI
         {
             if (--_aliveAddsCount == 0)
                 events.RescheduleEvent(EVENT_FREYA_ADDS_SPAM, 5s, 0, EVENT_PHASE_ADDS);
+
             return;
         }
 
