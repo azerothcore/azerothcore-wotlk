@@ -74,12 +74,6 @@ else()
             IMPORTED_NO_SONAME
               true)
 
-        set_target_properties(libsidecar PROPERTIES
-            IMPORTED_LOCATION_NOCONFIG
-              "${CMAKE_INSTALL_RPATH}/libsidecar.${LIBSIDECAR_EXTENSION}"
-            IMPORTED_SONAME_NOCONFIG
-              "libsidecar.${LIBSIDECAR_EXTENSION}")
-
         # Source-tree dir for BUILD_RPATH only (dev runs from the build tree).
         # Do not put this path on INSTALL_RPATH — that would bake the build
         # machine's source tree into installed binaries.

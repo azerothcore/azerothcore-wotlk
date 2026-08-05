@@ -3,7 +3,10 @@
 
 /* Vendored snapshot of libsidecar-cpp generated version header.
  * Keep in sync with include/tc9_version.h and the linked libsidecar binary.
+ * Built only when USE_REAL_LIBSIDECAR is OFF (static stub, not the real .so/.dll).
  */
+
+#define TC9_LIBSIDECAR_IS_STUB 1
 
 #define TC9_VERSION_MAJOR 1
 #define TC9_VERSION_MINOR 0

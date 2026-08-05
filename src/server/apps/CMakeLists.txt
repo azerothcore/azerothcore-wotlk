@@ -153,8 +153,8 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
     #
     # UNIX/macOS — rpath search order:
     #   BUILD:  deps/libsidecar → next to binary → ../lib
-    #   INSTALL: next to binary → ../lib → ${CMAKE_INSTALL_PREFIX}/lib
-    #            (last entry from global CMAKE_INSTALL_RPATH; no source-tree path)
+    #   INSTALL: target inherits CMAKE_INSTALL_RPATH (${prefix}/lib) first, then
+    #            APPEND next to binary and ../lib (no source-tree path)
     #
     # Windows — no rpath; loader only searches the exe directory (then PATH).
     #   BUILD:  POST_BUILD copy DLL next to worldserver

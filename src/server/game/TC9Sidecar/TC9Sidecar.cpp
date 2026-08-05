@@ -45,38 +45,53 @@ ToCloud9Sidecar::ToCloud9Sidecar() : _clusterModeEnabled(false), _isCrossrealm(f
 {
 }
 
+void ToCloud9Sidecar::CheckLibsidecarAbi()
+{
+    if (!sConfigMgr->GetOption<bool>("Cluster.Enabled", false))
+        return;
+
+    int libMajor = 0;
+    int libMinor = 0;
+    int libPatch = 0;
+    TC9GetVersion(&libMajor, &libMinor, &libPatch);
+    char const* libVersionStr = TC9GetVersionString();
+
+    // Stub reports the same macros as headers; name it so operators know why
+    // TC9InitLib will still panic unless USE_REAL_LIBSIDECAR=ON.
+#if defined(TC9_LIBSIDECAR_IS_STUB)
+    char const* libKind = "stub";
+#else
+    char const* libKind = "shared library";
+#endif
+
+    LOG_INFO("server", "libsidecar ({}) runtime {}.{}.{} ({}) - headers {}.{}.{} ({})",
+        libKind,
+        libMajor, libMinor, libPatch,
+        libVersionStr ? libVersionStr : "?",
+        TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH,
+        TC9_VERSION_STRING);
+
+    if (TC9CheckAbiCompatible(TC9_VERSION_MAJOR, TC9_VERSION_MINOR) != 0)
+    {
+        LOG_ERROR("server",
+            "libsidecar ABI mismatch: worldserver was built for {}.{}.{} (headers {}), "
+            "but loaded library is {}.{}.{} ({}). "
+            "Copy matching headers + library from the same libsidecar build/release.",
+            TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH, TC9_VERSION_STRING,
+            libMajor, libMinor, libPatch,
+            libVersionStr ? libVersionStr : "?");
+        ABORT("libsidecar ABI mismatch (headers {} vs library {})",
+            TC9_VERSION_STRING,
+            libVersionStr ? libVersionStr : "?");
+    }
+}
+
 void ToCloud9Sidecar::Init(uint16 port, int realmId)
 {
     _clusterModeEnabled = sConfigMgr->GetOption<bool>("Cluster.Enabled", false);
 
     if (_clusterModeEnabled)
     {
-        int libMajor = 0;
-        int libMinor = 0;
-        int libPatch = 0;
-        TC9GetVersion(&libMajor, &libMinor, &libPatch);
-        char const* libVersionStr = TC9GetVersionString();
-
-        LOG_INFO("server", "libsidecar runtime {}.{}.{} ({}) — headers {}.{}.{} ({})",
-            libMajor, libMinor, libPatch,
-            libVersionStr ? libVersionStr : "?",
-            TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH,
-            TC9_VERSION_STRING);
-
-        if (TC9CheckAbiCompatible(TC9_VERSION_MAJOR, TC9_VERSION_MINOR) != 0)
-        {
-            LOG_ERROR("server",
-                "libsidecar ABI mismatch: worldserver was built for {}.{}.{} (headers {}), "
-                "but loaded library is {}.{}.{} ({}). "
-                "Copy matching headers + library from the same libsidecar build/release.",
-                TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH, TC9_VERSION_STRING,
-                libMajor, libMinor, libPatch,
-                libVersionStr ? libVersionStr : "?");
-            ABORT("libsidecar ABI mismatch (headers {} vs library {})",
-                TC9_VERSION_STRING,
-                libVersionStr ? libVersionStr : "?");
-        }
-
         uint32 *assignedMaps;
         int assignedMapsSize = 0;
 
