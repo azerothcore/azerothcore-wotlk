@@ -59,7 +59,7 @@ Text: Here we go. (1)
 Start Movement
 
 13:37:15.767 -- Reached End
-Text: Ah, fresh air! I can get myself back to the airstrip from here. Be sure to tell Fizzcrank I'm back and safe. Thanks so much, $n! (1)
+Completion Text (1)
 
 13:37:26.804
 Despawn
