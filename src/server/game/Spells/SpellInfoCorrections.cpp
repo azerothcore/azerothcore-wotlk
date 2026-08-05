@@ -1493,37 +1493,37 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
     });
 
-    // Debris - Debris Visual
+    // Magtheridon - Debris - Debris Visual
     ApplySpellFix({ 36449, 30632 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
     });
 
-    // Soul Channel
+    // Hellfire Channeler - Soul Channel
     ApplySpellFix({ 30531 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Activate Sunblade Protector
+    // Sunblade Scout - Activate Sunblade Protector
     ApplySpellFix({ 46475, 46476 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(14); // 60yd
     });
 
-    // Break Ice
+    // Brutallus - Break Ice
     ApplySpellFix({ 46638 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_ON_PLAYER; // Obvious fail, it targets gameobject...
     });
 
-    // Sinister Reflection Clone
+    // Kil'jaeden - Sinister Reflection Clone
     ApplySpellFix({ 45785 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Speed = 0.0f;
     });
 
-    // Armageddon
+    // Kil'jaeden - Armageddon
     ApplySpellFix({ 45909 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Speed = 8.0f;
@@ -1579,6 +1579,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_WHILE_STUNNED;
     });
 
+    // High Astromancer Solarian - Select True Beam
+    ApplySpellFix({ 33365 }, [](SpellInfo* spellInfo)
+    {
+        // Spell should affect only the explicit target (Spotlight)
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
+        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo();
+    });
+
     // Prince Malchezaar - Amplify Damage
     ApplySpellFix({ 39095 }, [](SpellInfo* spellInfo)
     {
@@ -1611,6 +1619,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Archimonde - Doomfire
     ApplySpellFix({ 31944, 31969 }, [](SpellInfo* spellInfo)
     {
+        // Neither the initial damage nor the DoT should be resistible
         spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
