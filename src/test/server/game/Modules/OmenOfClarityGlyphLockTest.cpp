@@ -32,9 +32,8 @@ using namespace testing;
 namespace
 {
 
-// Constants matching the module's values
-static constexpr uint8  OOC_LOCKED_GLYPH_SLOT = 5;
-static constexpr uint32 OOC_LOCKED_SLOT_BIT   = 0x20;
+// Constant matching the module's value (major glyph slot 5)
+static constexpr uint32 OOC_LOCKED_SLOT_BIT = 0x20;
 
 // Test-local cache mirroring the module's s_oocEnabled
 static std::unordered_set<uint32> s_testOocEnabled;
