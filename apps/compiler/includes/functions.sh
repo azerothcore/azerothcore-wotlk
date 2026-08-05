@@ -76,8 +76,9 @@ int main() { return 0; }"
   for dir in $(ls -d /usr/lib/gcc/*/[0-9]* 2>/dev/null | sort -Vr); do
     echo "$probe" | "$CCOMPILERCXX" -x c++ -std=c++20 -fsyntax-only "--gcc-install-dir=$dir" - 2>/dev/null || continue
 
+    # C++ only: the C compiler is configured separately and never sees libstdc++,
+    # so it must not be handed a flag its own driver may not know
     echo "clang cannot use the default GCC toolchain, falling back to $dir"
-    export CFLAGS="${CFLAGS:+$CFLAGS }--gcc-install-dir=$dir"
     export CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }--gcc-install-dir=$dir"
     return 0
   done
