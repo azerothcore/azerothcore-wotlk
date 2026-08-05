@@ -164,9 +164,14 @@ void Player::Update(uint32 p_time)
             // default combat reach 10
             /// @todo add weapon, skill check
 
+            // A vehicle passenger can neither turn nor move, and their stored position and
+            // orientation can be stale; never fail swing range or facing against the vehicle
+            // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
+            bool const victimIsVehicleBase = GetVehicleBase() == victim;
+
             if (isAttackReady(BASE_ATTACK))
             {
-                if (!IsWithinMeleeRange(victim))
+                if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 1) // send single time (client auto repeat)
@@ -176,7 +181,7 @@ void Player::Update(uint32 p_time)
                     }
                 }
                 // 120 degrees of radiant range, if player is not in boundary radius
-                else if (!IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 2) // send single time (client auto repeat)
@@ -206,9 +211,9 @@ void Player::Update(uint32 p_time)
 
             if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
             {
-                if (!IsWithinMeleeRange(victim))
+                if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
-                else if (!IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
@@ -331,6 +336,8 @@ void Player::Update(uint32 p_time)
             m_nextSave -= p_time;
         }
     }
+
+    UpdateAdditionalSaves(p_time);
 
     // Handle Water/drowning
     HandleDrowning(p_time);
@@ -2398,4 +2405,50 @@ void Player::ProcessSpellQueue()
         else // If the first spell can't execute, stop processing
             break;
     }
+}
+
+// save only the data flagged by AdditionalSavingAddMask shortly after
+// important changes, so a crash loses at most a few seconds of them
+void Player::UpdateAdditionalSaves(uint32 p_time)
+{
+    if (!m_additionalSaveTimer || GetSession()->isLogingOut())
+        return;
+
+    if (m_additionalSaveTimer > p_time)
+    {
+        m_additionalSaveTimer -= p_time;
+        return;
+    }
+
+    uint8 mask = m_additionalSaveMask;
+    m_additionalSaveTimer = 0;
+    m_additionalSaveMask = 0;
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    if (mask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD)
+        SaveInventoryAndGoldToDB(trans);
+
+    if (mask & ADDITIONAL_SAVING_QUEST_STATUS)
+    {
+        _SaveQuestStatus(trans);
+
+        // if nothing changed, nothing will happen
+        _SaveDailyQuestStatus(trans);
+        _SaveWeeklyQuestStatus(trans);
+        _SaveSeasonalQuestStatus(trans);
+        _SaveMonthlyQuestStatus(trans);
+    }
+
+    if (mask & ADDITIONAL_SAVING_ACHIEVEMENTS)
+    {
+        m_achievementMgr->SaveToDB(trans);
+
+        // achievements are often earned together with skill or gold changes
+        // (professions, riding, wealth), save those too to keep the DB consistent
+        _SaveSkills(trans);
+        SaveGoldToDB(trans);
+    }
+
+    CharacterDatabase.CommitTransaction(trans);
 }
