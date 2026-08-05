@@ -953,6 +953,22 @@ void Player::FailQuest(uint32 questId)
     }
 }
 
+void Player::FailQuestsOnSpiritRelease()
+{
+    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 questId = GetQuestSlotQuestId(slot);
+        if (!questId)
+            continue;
+
+        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+        if (!quest || !quest->HasFlag(QUEST_FLAGS_STAY_ALIVE))
+            continue;
+
+        FailQuest(questId);
+    }
+}
+
 void Player::AbandonQuest(uint32 questId)
 {
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))

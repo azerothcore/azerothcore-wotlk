@@ -4539,6 +4539,9 @@ void Player::BuildPlayerRepop()
     StopMirrorTimers(); // disable timers on bars
     SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND); // set and clear other
     sScriptMgr->OnPlayerReleasedGhost(this);
+
+    // Quests flagged QUEST_FLAGS_STAY_ALIVE fail when the spirit is released
+    FailQuestsOnSpiritRelease();
 }
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
