@@ -456,12 +456,6 @@ struct boss_hodir : public BossAI
     {
         if (spellInfo->Id == SPELL_TELEPORT)
         {
-            for (uint32 data : { DATA_HODIR_CHEST_NORMAL, DATA_HODIR_CHEST_NORMAL_HERO,
-                DATA_HODIR_CHEST_HARD, DATA_HODIR_CHEST_HARD_HERO })
-                if (GameObject* go = instance->GetGameObject(data))
-                    if (go->GetOwnerGUID() == me->GetGUID())
-                        me->RemoveGameObject(go, false);
-
             me->DespawnOrUnsummon();
             instance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
         }
