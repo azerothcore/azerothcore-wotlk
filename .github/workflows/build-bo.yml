@@ -1,0 +1,91 @@
+name: Build AzerothCore Standalone (Portable)
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git cmake make gcc g++ clang \
+            libmysqlclient-dev libssl-dev libbz2-dev \
+            libreadline-dev libncurses-dev libboost-all-dev patchelf
+
+      - name: Clone AzerothCore Source
+        run: |
+          git clone https://github.com/azerothcore/azerothcore-wotlk.git --branch master --single-branch azerothcore
+          cd azerothcore
+          git submodule update --init --recursive
+
+      - name: Configure CMake with RPATH
+        run: |
+          mkdir -p azerothcore/build
+          cd azerothcore/build
+          # 说明：
+          # CMAKE_INSTALL_RPATH='$ORIGIN/../lib' 告诉程序去同级目录下的 ../lib 寻找 .so 库
+          cmake .. \
+            -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/ac-dist \
+            -DCMAKE_C_COMPILER=/usr/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+            -DTOOLS_BUILD=all \
+            -DSCRIPTS=static \
+            -DCMAKE_INSTALL_RPATH="\$ORIGIN/../lib" \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE
+
+      - name: Build Core
+        run: |
+          cd azerothcore/build
+          make -j$(nproc)
+
+      - name: Install Core to Staging
+        run: |
+          cd azerothcore/build
+          make install
+
+      - name: Bundle SO Dependencies
+        run: |
+          # 创建 lib 目录存放依赖的 so 文件
+          mkdir -p $GITHUB_WORKSPACE/ac-dist/lib
+          
+          # 提取 authserver 和 worldserver 依赖的所有非系统核心 .so 库
+          cd $GITHUB_WORKSPACE/ac-dist/bin
+          
+          for bin in authserver worldserver; do
+            if [ -f "$bin" ]; then
+              # 使用 ldd 找到依赖项并复制，过滤掉 libc, ld-linux 等系统基础 C 库（防止与宿主系统 glibc 冲突）
+              ldd "$bin" | awk '{print $3}' | grep -v '^(' | grep -E -v 'libc\.so|libm\.so|libpthread\.so|libdl\.so|librt\.so|ld-linux' | while read -r so_path; do
+                if [ -f "$so_path" ]; then
+                  cp -u "$so_path" $GITHUB_WORKSPACE/ac-dist/lib/
+                fi
+              done
+            fi
+          done
+
+      - name: Prepare Deployment Package
+        run: |
+          # 复制数据库 SQL 资源
+          mkdir -p $GITHUB_WORKSPACE/ac-dist/data/sql
+          cp -r azerothcore/data/sql/* $GITHUB_WORKSPACE/ac-dist/data/sql/
+          
+          # 打包 ZIP
+          cd $GITHUB_WORKSPACE
+          zip -r azerothcore-portable-ubuntu2204.zip ac-dist/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: azerothcore-portable-ubuntu2204
+          path: azerothcore-portable-ubuntu2204.zip
+          retention-days: 7
