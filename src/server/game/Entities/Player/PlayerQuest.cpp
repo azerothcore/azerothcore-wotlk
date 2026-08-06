@@ -955,16 +955,16 @@ void Player::FailQuest(uint32 questId)
 
 void Player::FailQuestsOnDeath()
 {
-    for (auto& data : m_QuestStatus)
+    for (auto& [id, statusData] : m_QuestStatus)
     {
-        if (data.second.Status != QUEST_STATUS_INCOMPLETE)
+        if (statusData.Status != QUEST_STATUS_INCOMPLETE)
             continue;
 
-        Quest const* quest = sObjectMgr->GetQuestTemplate(data.first);
+        Quest const* quest = sObjectMgr->GetQuestTemplate(id);
         if (!quest || !quest->HasFlag(QUEST_FLAGS_STAY_ALIVE))
             continue;
 
-        FailQuest(data.first);
+        FailQuest(id);
     }
 }
 
