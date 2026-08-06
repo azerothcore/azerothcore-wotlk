@@ -1394,12 +1394,14 @@ struct npc_dusk : public VehicleAI
         {
             // Dropping the rider uncharms Dusk, and RemoveCharmedBy kills the motion slot
             if (WaypointPath const* path = sWaypointMgr->GetPath(PATH_DUSK))
+            {
                 if (!path->Nodes.empty())
                 {
                     WaypointNode const& last = path->Nodes.back();
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(POINT_DUSK_END, last.X, last.Y, last.Z);
                 }
+            }
         }, 4s);
     }
 
