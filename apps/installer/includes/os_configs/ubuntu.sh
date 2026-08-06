@@ -56,10 +56,10 @@ if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
     wget https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb -P "$VAR_PATH"
     # resolve expired key issue
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A8D3785C
-    $SUDO DEBIAN_FRONTEND="noninteractive" dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
+    $SUDO env DEBIAN_FRONTEND="noninteractive" dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
     $SUDO apt-get update
   fi
-  $SUDO DEBIAN_FRONTEND="noninteractive" apt-get install -y mysql-server
+  $SUDO env DEBIAN_FRONTEND="noninteractive" apt-get install -y mysql-server
 fi
 
 
