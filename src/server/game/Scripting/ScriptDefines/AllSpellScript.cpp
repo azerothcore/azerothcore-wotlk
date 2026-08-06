@@ -24,6 +24,11 @@ void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
     CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_CALC_MAX_DURATION, script->OnCalcMaxDuration(aura, maxDuration));
 }
 
+void ScriptMgr::OnCalcBaseCastTime(SpellInfo const* spellInfo, Spell* spell, Unit* caster, int32& castTime)
+{
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_CALC_BASE_CAST_TIME, script->OnCalcBaseCastTime(spellInfo, spell, caster, castTime));
+}
+
 void ScriptMgr::OnSpellCheckCast(Spell* spell, bool strict, SpellCastResult& res)
 {
     CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_SPELL_CHECK_CAST, script->OnSpellCheckCast(spell, strict, res));
