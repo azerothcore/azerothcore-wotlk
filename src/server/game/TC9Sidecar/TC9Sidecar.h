@@ -34,6 +34,10 @@ private:
 public:
     static ToCloud9Sidecar* instance();
 
+    /// When Cluster.Enabled, log libsidecar version and ABORT on ABI mismatch.
+    /// Call after config and logging are ready, before DB/network startup.
+    void CheckLibsidecarAbi();
+
     void Init(uint16 port, int realmId);
     void Deinit();
 
