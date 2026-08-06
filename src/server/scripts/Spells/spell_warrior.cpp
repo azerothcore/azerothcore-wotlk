@@ -633,7 +633,7 @@ class spell_warr_sweeping_strikes : public AuraScript
 
     bool Load() override
     {
-        _procTarget = nullptr;
+        _procTargetGUID.Clear();
         return true;
     }
 
@@ -664,20 +664,34 @@ class spell_warr_sweeping_strikes : public AuraScript
             }
         }
 
-        _procTarget = actor->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
-        return _procTarget != nullptr;
+        Unit* procTarget = actor->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
+        if (procTarget)
+        {
+            _procTargetGUID = procTarget->GetGUID();
+        }
+
+        return procTarget != nullptr;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+
+        // resolved rather than cached: the target picked in CheckProc can be gone by now,
+        // same crash spell_rog_blade_flurry already carries a note about
+        Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
+        if (!procTarget)
+        {
+            return;
+        }
+
         if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
         {
             SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
-            if (spellInfo && spellInfo->Id == SPELL_WARRIOR_EXECUTE && !_procTarget->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
+            if (spellInfo && spellInfo->Id == SPELL_WARRIOR_EXECUTE && !procTarget->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
             {
                 // If triggered by Execute (while target is not under 20% hp) deals normalized weapon damage
-                GetTarget()->CastSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2, aurEff);
+                GetTarget()->CastSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2, aurEff);
             }
             else
             {
@@ -687,7 +701,7 @@ class spell_warr_sweeping_strikes : public AuraScript
                 }
 
                 int32 damage = damageInfo->GetUnmitigatedDamage();
-                GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, &damage, 0, 0, true, nullptr, aurEff);
+                GetTarget()->CastCustomSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, &damage, 0, 0, true, nullptr, aurEff);
             }
         }
     }
@@ -699,7 +713,7 @@ class spell_warr_sweeping_strikes : public AuraScript
     }
 
 private:
-    Unit* _procTarget = nullptr;
+    ObjectGuid _procTargetGUID;
 };
 
 // 50720 - Vigilance
