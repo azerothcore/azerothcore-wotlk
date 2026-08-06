@@ -953,19 +953,18 @@ void Player::FailQuest(uint32 questId)
     }
 }
 
-void Player::FailQuestsOnSpiritRelease()
+void Player::FailQuestsOnDeath()
 {
-    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    for (auto& data : m_QuestStatus)
     {
-        uint32 questId = GetQuestSlotQuestId(slot);
-        if (!questId)
+        if (data.second.Status != QUEST_STATUS_INCOMPLETE)
             continue;
 
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+        Quest const* quest = sObjectMgr->GetQuestTemplate(data.first);
         if (!quest || !quest->HasFlag(QUEST_FLAGS_STAY_ALIVE))
             continue;
 
-        FailQuest(questId);
+        FailQuest(data.first);
     }
 }
 

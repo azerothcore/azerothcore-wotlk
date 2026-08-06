@@ -1114,6 +1114,8 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH, 1);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH_IN_DUNGEON, 1);
 
+        FailQuestsOnDeath();
+
         // Xinef: reset all death criterias
         ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH, 0);
     }
@@ -4539,9 +4541,6 @@ void Player::BuildPlayerRepop()
     StopMirrorTimers(); // disable timers on bars
     SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND); // set and clear other
     sScriptMgr->OnPlayerReleasedGhost(this);
-
-    // Quests flagged QUEST_FLAGS_STAY_ALIVE fail when the spirit is released
-    FailQuestsOnSpiritRelease();
 }
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
