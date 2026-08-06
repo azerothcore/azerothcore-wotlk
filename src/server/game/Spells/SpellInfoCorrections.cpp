@@ -5245,7 +5245,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     //mimiron - SUMMON_ROCKET_STRIKE
     ApplySpellFix({ 63036 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Speed = 24.0f;
+        spellInfo->Speed = 0.0f;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
