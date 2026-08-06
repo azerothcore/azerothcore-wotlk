@@ -1394,6 +1394,9 @@ bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const
 {
     SpellSpecificType spellSpec1 = GetSpellSpecific();
     SpellSpecificType spellSpec2 = spellInfo->GetSpellSpecific();
+
+    bool isExclusive = false;
+
     switch (spellSpec1)
     {
         case SPELL_SPECIFIC_TRACKER:
@@ -1406,20 +1409,28 @@ bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const
         case SPELL_SPECIFIC_SCROLL:
         case SPELL_SPECIFIC_MAGE_ARCANE_BRILLANCE:
         case SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT:
-            return spellSpec1 == spellSpec2;
+            isExclusive = spellSpec1 == spellSpec2;
+            break;
         case SPELL_SPECIFIC_FOOD:
-            return spellSpec2 == SPELL_SPECIFIC_FOOD
-                   || spellSpec2 == SPELL_SPECIFIC_FOOD_AND_DRINK;
+            isExclusive = spellSpec2 == SPELL_SPECIFIC_FOOD
+                || spellSpec2 == SPELL_SPECIFIC_FOOD_AND_DRINK;
+            break;
         case SPELL_SPECIFIC_DRINK:
-            return spellSpec2 == SPELL_SPECIFIC_DRINK
-                   || spellSpec2 == SPELL_SPECIFIC_FOOD_AND_DRINK;
+            isExclusive = spellSpec2 == SPELL_SPECIFIC_DRINK
+                || spellSpec2 == SPELL_SPECIFIC_FOOD_AND_DRINK;
+            break;
         case SPELL_SPECIFIC_FOOD_AND_DRINK:
-            return spellSpec2 == SPELL_SPECIFIC_FOOD
-                   || spellSpec2 == SPELL_SPECIFIC_DRINK
-                   || spellSpec2 == SPELL_SPECIFIC_FOOD_AND_DRINK;
+            isExclusive = spellSpec2 == SPELL_SPECIFIC_FOOD
+                || spellSpec2 == SPELL_SPECIFIC_DRINK
+                || spellSpec2 == SPELL_SPECIFIC_FOOD_AND_DRINK;
+            break;
         default:
-            return false;
+            break;
     }
+
+    sScriptMgr->OnIsAuraExclusiveBySpecificWith(this, spellInfo, isExclusive);
+
+    return isExclusive;
 }
 
 bool SpellInfo::IsAuraExclusiveBySpecificPerCasterWith(SpellInfo const* spellInfo) const
