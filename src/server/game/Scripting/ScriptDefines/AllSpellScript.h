@@ -24,7 +24,6 @@
 enum AllSpellHook
 {
     ALLSPELLHOOK_ON_CALC_MAX_DURATION,
-    ALLSPELLHOOK_ON_CALC_BASE_CAST_TIME,
     ALLSPELLHOOK_ON_SPELL_CHECK_CAST,
     ALLSPELLHOOK_CAN_PREPARE,
     ALLSPELLHOOK_CAN_SCALING_EVERYTHING,
@@ -38,6 +37,7 @@ enum AllSpellHook
     ALLSPELLHOOK_ON_CAST_CANCEL,
     ALLSPELLHOOK_ON_CAST,
     ALLSPELLHOOK_ON_PREPARE,
+    ALLSPELLHOOK_ON_CALC_BASE_CAST_TIME,
     ALLSPELLHOOK_END
 };
 
@@ -54,9 +54,6 @@ public:
 
     // Calculate max duration in applying aura
     virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
-
-    // Calculate base cast time (castTime is the base value from CastTimeEntry structure)
-    virtual void OnCalcBaseCastTime(SpellInfo const* /*spellInfo*/, Spell* /*spell*/, Unit* /*caster*/, int32& /*castTime*/) { }
 
     virtual void OnSpellCheckCast(Spell* /*spell*/, bool /*strict*/, SpellCastResult& /*res*/) { }
 
@@ -107,6 +104,9 @@ public:
     virtual void OnSpellCast(Spell* /*spell*/, Unit* /*caster*/, SpellInfo const* /*spellInfo*/, bool /*skipCheck*/) { }
 
     virtual void OnSpellPrepare(Spell* /*spell*/, Unit* /*caster*/, SpellInfo const* /*spellInfo*/) { }
+
+    // Calculate base cast time (castTime is the base value from CastTimeEntry structure)
+    virtual void OnCalcBaseCastTime(SpellInfo const* /*spellInfo*/, Spell* /*spell*/, Unit* /*caster*/, int32& /*castTime*/) { }
 };
 
 // Compatibility for old scripts

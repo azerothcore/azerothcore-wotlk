@@ -626,7 +626,6 @@ public: /* Arena Team Script */
 
 public: /* SpellSC */
     void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
-    void OnCalcBaseCastTime(SpellInfo const* spellInfo, Spell* spell, Unit* caster, int32& castTime);
     void OnSpellCheckCast(Spell* spell, bool strict, SpellCastResult& res);
     bool CanPrepare(Spell* spell, SpellCastTargets const* targets, AuraEffect const* triggeredByAura);
     bool CanScalingEverything(Spell* spell);
@@ -640,6 +639,7 @@ public: /* SpellSC */
     void OnSpellCastCancel(Spell* spell, Unit* caster, SpellInfo const* spellInfo, bool bySelf);
     void OnSpellCast(Spell* spell, Unit* caster, SpellInfo const* spellInfo, bool skipCheck);
     void OnSpellPrepare(Spell* spell, Unit* caster, SpellInfo const* spellInfo);
+    void OnCalcBaseCastTime(SpellInfo const* spellInfo, Spell* spell, Unit* caster, int32& castTime);
 
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);
