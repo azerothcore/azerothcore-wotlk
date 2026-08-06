@@ -58,32 +58,54 @@ function comp_ccacheShowStats() {
     ccache -s
 }
 
-# clang builds against the newest GCC toolchain installed on the box. When that
-# toolchain is newer than clang understands, compilation dies inside the standard
-# headers before reaching any of our code: clang 21 with GCC 16 on Ubuntu 26.04
-# fails in <shared_mutex> and <numeric>. Fall back to the newest GCC that clang can
-# actually parse. Does nothing where the default already works.
+# clang builds against the newest GCC toolchain on the box, and that is not always one
+# it can parse: Ubuntu 26.04 defaults to GCC 15 but drags GCC 16 in through libstdc++6,
+# and clang 21 then dies inside <shared_mutex> and <numeric>. When that happens, point it
+# at the toolchain behind the default g++, which is the pairing the distro supports.
+#
+# The probe instantiates rather than only including: these failures live in templates the
+# compiler does not look at until something actually uses them.
 function comp_selectGccToolchain() {
   [[ "$($CCOMPILERCXX --version 2>/dev/null | head -1)" == *clang* ]] || return 0
 
-  local probe="#include <shared_mutex>
+  local probe="#include <chrono>
+#include <memory>
 #include <numeric>
-int main() { return 0; }"
+#include <shared_mutex>
+#include <string>
+#include <vector>
+int main()
+{
+    std::vector<int> values{3, 1, 2};
+    std::shared_timed_mutex mutex;
+    auto text = std::make_unique<std::string>(\"probe\");
+
+    (void)std::reduce(values.begin(), values.end());
+    (void)mutex.try_lock_for(std::chrono::milliseconds(1));
+    return int(text->size() & 0u);
+}"
 
   echo "$probe" | "$CCOMPILERCXX" -x c++ -std=c++20 -fsyntax-only - 2>/dev/null && return 0
 
+  # the default g++ first, then anything else installed, newest first
+  local candidates
+  candidates="$(dirname "$(g++ -print-libgcc-file-name 2>/dev/null)") $(ls -d /usr/lib/gcc/*/[0-9]* 2>/dev/null | sort -Vr)"
+
+  echo "$CCOMPILERCXX cannot use its default GCC toolchain, trying: $candidates"
+
   local dir
-  for dir in $(ls -d /usr/lib/gcc/*/[0-9]* 2>/dev/null | sort -Vr); do
+  for dir in $candidates; do
+    [[ -d "$dir" ]] || continue
     echo "$probe" | "$CCOMPILERCXX" -x c++ -std=c++20 -fsyntax-only "--gcc-install-dir=$dir" - 2>/dev/null || continue
 
     # C++ only: the C compiler is configured separately and never sees libstdc++,
     # so it must not be handed a flag its own driver may not know
-    echo "clang cannot use the default GCC toolchain, falling back to $dir"
+    echo "using GCC toolchain $dir"
     export CXXFLAGS="${CXXFLAGS:+$CXXFLAGS }--gcc-install-dir=$dir"
     return 0
   done
 
-  echo "WARNING: $CCOMPILERCXX cannot parse the standard headers of any installed GCC toolchain"
+  echo "WARNING: no installed GCC toolchain works with $CCOMPILERCXX"
 }
 
 function comp_configure() {
