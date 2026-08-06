@@ -40,7 +40,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 188141;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 188141);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(188141, 1, 0, 0, 71, 0, 100, 0, 17430, 0, 0, 0, 0, 0, 107, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frozen Phylactery - On Event 17430 Inform - Summon Creature Group');
+(188141, 1, 0, 0, 71, 0, 100, 0, 17430, 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frozen Phylactery - On Event 17430 Inform - Summon Creature Group');
 
 DELETE FROM `event_scripts` WHERE `id` = 17430;
 
@@ -49,7 +49,7 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (188141, 1, 0, 26224, 3621.1597, 3648.702, 24.475744, 3.04438328742980957, 4, 60000, 'Frozen Phylactery - Drowned Guardian'),
 (188141, 1, 0, 26224, 3615.5735, 3644.4353, 24.697205, 1.514552116394042968, 4, 60000, 'Frozen Phylactery - Drowned Guardian'),
 (188141, 1, 0, 26224, 3614.929, 3650.7393, 24.34017, 5.270894527435302734, 4, 60000, 'Frozen Phylactery - Drowned Guardian'),
-(188141, 1, 0, 26225, 3616.2922, 3647.6338, 24.34017, 3.193952560424804687, 4, 60000, 'Frozen Phylactery - Drowned Guardian');
+(188141, 1, 0, 26225, 3616.2922, 3647.6338, 24.34017, 3.193952560424804687, 4, 60000, 'Frozen Phylactery - Phylactery Guardian');
 
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|256 WHERE (`entry` = 26225);
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 26225;
