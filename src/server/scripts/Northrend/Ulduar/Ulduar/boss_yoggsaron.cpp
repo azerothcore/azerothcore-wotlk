@@ -271,6 +271,7 @@ enum Misc
     DATA_GET_CURRENT_ILLUSION           = 2,
     DATA_GET_SARA_PHASE                 = 3,
     DATA_GET_DRIVE_ME_CRAZY             = 4,
+    DATA_YOGG_SARON_HEALTH              = 5,
 };
 
 struct LocationsXY
@@ -1254,6 +1255,12 @@ struct boss_yoggsaron : public ScriptedAI
         return 0;
     }
 
+    void SetData(uint32 param, uint32 value) override
+    {
+        if (param == DATA_YOGG_SARON_HEALTH)
+            me->SetHealth(me->GetMaxHealth() * value / 100.0f);
+    }
+
     void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
@@ -1433,6 +1440,13 @@ struct boss_yoggsaron_brain : public NullCreatureAI
 
         // Yogg Vision
         me->SummonCreature(NPC_YOGG_SARON_VISION, 1929.160f, 67.75694f, 221.7322f, 0);
+    }
+
+    void OnSpellCast(SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_INDUCE_MADNESS)
+            if (Creature* yogg = me->GetInstanceScript()->GetCreature(BOSS_YOGGSARON))
+                yogg->AI()->SetData(DATA_YOGG_SARON_HEALTH, static_cast<uint32>(me->GetHealthPct()));
     }
 
     void DoAction(int32 param) override
@@ -2821,6 +2835,24 @@ class spell_yogg_saron_target_selectors : public SpellScript
 };
 
 // 64132 - Constrictor Tentacle
+class spell_yogg_saron_constrictor_tentacle : public SpellScript
+{
+    PrepareSpellScript(spell_yogg_saron_constrictor_tentacle);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        // The tentacle erupts at the marked player's feet, so skip players below
+        // the platform (illusion realms and brain room).
+        targets.remove_if([](WorldObject* target) { return target->GetPositionZ() <= 300.0f; });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_constrictor_tentacle::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+// 64132 - Constrictor Tentacle
 class spell_yogg_saron_constrictor_tentacle_aura : public AuraScript
 {
     PrepareAuraScript(spell_yogg_saron_constrictor_tentacle_aura);
@@ -2993,7 +3025,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_empowering_shadows);
     RegisterSpellScript(spell_yogg_saron_in_the_maws_of_the_old_god);
     RegisterSpellScript(spell_yogg_saron_target_selectors);
-    RegisterSpellScript(spell_yogg_saron_constrictor_tentacle_aura);
+    RegisterSpellAndAuraScriptPair(spell_yogg_saron_constrictor_tentacle, spell_yogg_saron_constrictor_tentacle_aura);
     RegisterSpellScript(spell_yogg_saron_squeeze_aura);
     RegisterSpellScript(spell_yogg_saron_grim_reprisal_aura);
 

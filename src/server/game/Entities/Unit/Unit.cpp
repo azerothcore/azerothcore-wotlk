@@ -2739,7 +2739,9 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
         return;
     }
 
-    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra && !ignoreCasting)
+    // UNIT_STATE_CASTING is checked through IsActionPreventedByCasting() so that channels
+    // flagged as "allow actions during channel" do not block the auto attack
+    if ((HasUnitState(UNIT_STATE_LOST_CONTROL) || IsActionPreventedByCasting()) && !extra && !ignoreCasting)
     {
         return;
     }
@@ -4193,8 +4195,7 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
                         m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
                     InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 
-                if (!pSpell->GetSpellInfo()->IsActionAllowedChannel())
-                    AddUnitState(UNIT_STATE_CASTING);
+                AddUnitState(UNIT_STATE_CASTING);
 
                 break;
             }
@@ -4368,6 +4369,26 @@ bool Unit::IsMovementPreventedByCasting() const
     }
 
     // prohibit movement for all other spell casts
+    return true;
+}
+
+bool Unit::IsActionPreventedByCasting() const
+{
+    // can always act when not casting
+    if (!HasUnitState(UNIT_STATE_CASTING))
+        return false;
+
+    // a regular cast in progress always prevents other actions, even alongside a permissive channel
+    if (Spell* spell = m_currentSpells[CURRENT_GENERIC_SPELL])
+        if (spell->getState() != SPELL_STATE_FINISHED)
+            return true;
+
+    // channeled spells during channel stage (after the initial cast timer) allow actions with a specific spell attribute
+    if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
+        if (spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsActionAllowedChannel())
+            return false;
+
+    // prohibit actions for all other spell casts
     return true;
 }
 
