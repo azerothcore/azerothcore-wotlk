@@ -1,3 +1,4 @@
+-- DB update 2026_08_06_00 -> 2026_08_06_01
 --
 UPDATE `creature_template` SET `faction` = 634, `AIName` = 'SmartAI' WHERE (`entry` = 25431);
 
