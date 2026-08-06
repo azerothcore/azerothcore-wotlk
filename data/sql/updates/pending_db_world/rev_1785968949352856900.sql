@@ -22,17 +22,16 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (281820, 17, 3583.3992, 3758.6902, 36.302624, NULL, 0, 1, 1),
 (281820, 18, 3597.051, 3736.6194, 36.51474, NULL, 0, 1, 1),
 (281820, 19, 3605.6096, 3702.6047, 36.526268, NULL, 0, 1, 1),
-(281820, 20, 3611.8079, 3676.5244, 36.383934, NULL, 5000, 1, 1),
+(281820, 20, 3611.8079, 3676.5244, 36.383934, NULL, 5000, 0, 1),
 (281820, 21, 3622.393, 3666.966, 35.5299, NULL, 0, 1, 0);
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28182;
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_dusk' WHERE `entry` = 28182;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28182);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(28182, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dusk - On Just Summoned - Set Reactstate Passive'),
-(28182, 0, 1, 0, 27, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 281820, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dusk - On Passenger Boarded - Start Path 281820'),
-(28182, 0, 2, 3, 108, 0, 100, 0, 20, 281820, 0, 0, 0, 0, 11, 51254, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dusk - On Point 20 of Path 281820 Reached - Cast \'Dan`s Eject All Passengers\''),
-(28182, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2600, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dusk - On Point 20 of Path 281820 Reached - Say Line 0'),
-(28182, 0, 4, 0, 109, 0, 100, 0, 0, 281820, 0, 0, 0, 0, 41, 1200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dusk - On Path 281820 Finished - Despawn In 1200 ms');
+
+-- 'Dan's Eject All Passengers' Sniffed spell cast
+DELETE FROM `spell_script_names` WHERE `spell_id` = 51254 AND `ScriptName` = 'spell_gen_eject_all_passengers';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(51254, 'spell_gen_eject_all_passengers');
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 28182);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -45,12 +44,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `event_scripts` WHERE `id` = 17430;
 
-DELETE FROM `creature_summon_groups` WHERE `summonerId` = 1557 AND `summonerType` = 1 AND `groupId` = 0;
+DELETE FROM `creature_summon_groups` WHERE `summonerId` = 188141 AND `summonerType` = 1 AND `groupId` = 0;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
-(188141, 1, 0, 26224, 3621.1597, 3648.702, 24.475744, 3.04438328742980957, 4, 10000, 'Frozen Phylactery - Drowned Guardian'),
-(188141, 1, 0, 26224, 3615.5735, 3644.4353, 24.697205, 1.514552116394042968, 4, 10000, 'Frozen Phylactery - Drowned Guardian'),
-(188141, 1, 0, 26224, 3614.929, 3650.7393, 24.34017, 5.270894527435302734, 4, 10000, 'Frozen Phylactery - Drowned Guardian'),
-(188141, 1, 0, 26225, 3616.2922, 3647.6338, 24.34017, 3.193952560424804687, 4, 10000, 'Frozen Phylactery - Drowned Guardian');
+(188141, 1, 0, 26224, 3621.1597, 3648.702, 24.475744, 3.04438328742980957, 4, 60000, 'Frozen Phylactery - Drowned Guardian'),
+(188141, 1, 0, 26224, 3615.5735, 3644.4353, 24.697205, 1.514552116394042968, 4, 60000, 'Frozen Phylactery - Drowned Guardian'),
+(188141, 1, 0, 26224, 3614.929, 3650.7393, 24.34017, 5.270894527435302734, 4, 60000, 'Frozen Phylactery - Drowned Guardian'),
+(188141, 1, 0, 26225, 3616.2922, 3647.6338, 24.34017, 3.193952560424804687, 4, 60000, 'Frozen Phylactery - Drowned Guardian');
 
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|256 WHERE (`entry` = 26225);
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 26225;
