@@ -134,7 +134,8 @@ int main(int argc, char** argv)
     // This prevents realms from appearing online in the realm list when no worldserver is actually running.
     // The loading flag goes with it: no worldserver is up at this point, so one left behind by a worldserver
     // that died while loading only serves to make flag 3, which the realm list query excludes.
-    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {}", REALM_FLAG_VERSION_MISMATCH, REALM_FLAG_OFFLINE);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {}",
+        REALM_FLAG_VERSION_MISMATCH, REALM_FLAG_OFFLINE);
 
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 

@@ -416,7 +416,8 @@ int main(int argc, char** argv)
     // set server offline, dropping the loading flag with it: ORing offline onto a realm that never
     // finished loading leaves flag 3, which the realm list query excludes
     if (!sConfigMgr->GetOption<bool>("Network.UseSocketActivation", false))
-        LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id = '{}'", REALM_FLAG_VERSION_MISMATCH, REALM_FLAG_OFFLINE, realm.Id.Realm);
+        LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id = '{}'",
+            REALM_FLAG_VERSION_MISMATCH, REALM_FLAG_OFFLINE, realm.Id.Realm);
 
     LOG_INFO("server.worldserver", "Halting process...");
 
