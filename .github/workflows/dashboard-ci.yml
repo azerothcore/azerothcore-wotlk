@@ -91,6 +91,12 @@ jobs:
           sudo apt-get install -y ccache
           ccache --version
 
+      # Ahead of the cache, so the detection below sees the toolchain the build will really use.
+      # `acore.sh init` would install these later anyway, by which point the key is already fixed.
+      - name: Install build dependencies
+        shell: bash
+        run: ./acore.sh install-deps
+
       # Detect the compilers that acore.sh / CMake will end up using.
       # We record both the binary name and a short version tag for the cache key.
       - name: Detect compiler
@@ -128,8 +134,23 @@ jobs:
             esac
           }
 
-          echo "cc_id=$(make_ver_id "$CC_BIN")"   >> "$GITHUB_OUTPUT"
-          echo "cxx_id=$(make_ver_id "$CXX_BIN")" >> "$GITHUB_OUTPUT"
+          # clang reads the standard library out of whichever GCC toolchain it selects, so that
+          # choice belongs in the key too. Installing a newer libstdc++-*-dev moves the selection
+          # without touching the clang version, and the cache then serves a precompiled header
+          # holding the old headers to a translation unit compiled against the new ones.
+          gcc_toolchain_id() {
+            local bin="$1"
+            case "$(basename "$bin")" in
+              clang*)
+                local selected
+                selected="$("$bin" -v -x c++ -E /dev/null 2>&1 | sed -n 's/^Selected GCC installation: //p' | head -1)"
+                [[ -n "$selected" ]] && echo "_gcc$(basename "$selected")"
+                ;;
+            esac
+          }
+
+          echo "cc_id=$(make_ver_id "$CC_BIN")$(gcc_toolchain_id "$CC_BIN")"   >> "$GITHUB_OUTPUT"
+          echo "cxx_id=$(make_ver_id "$CXX_BIN")$(gcc_toolchain_id "$CXX_BIN")" >> "$GITHUB_OUTPUT"
           echo "Detected: $CC_BIN, $CXX_BIN"
 
       - name: Prepare ccache dir
