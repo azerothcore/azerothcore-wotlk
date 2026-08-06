@@ -41,6 +41,68 @@ int main()
 }
 " CLANG_HAVE_PROPER_CHARCONV)
 
+# Clang builds against the newest GCC toolchain installed on the box, and that is not always one
+# it can parse: on Ubuntu 26.04 it picks GCC 16 and dies inside <shared_mutex> and <numeric>
+# before reaching any of our code. Fall back to the newest GCC it can actually use.
+# This whole block can go once clang can consume the libstdc++ shipped next to it.
+#
+# The probe instantiates rather than only including: those failures live in templates the
+# compiler does not look at until something uses them.
+if(UNIX AND NOT APPLE)
+  set(CLANG_LIBSTDCXX_PROBE "
+#include <chrono>
+#include <memory>
+#include <numeric>
+#include <shared_mutex>
+#include <string>
+#include <vector>
+int main()
+{
+    std::vector<int> values{3, 1, 2};
+    std::shared_timed_mutex mutex;
+    auto text = std::make_unique<std::string>(\"probe\");
+
+    (void)std::reduce(values.begin(), values.end());
+    (void)mutex.try_lock_for(std::chrono::milliseconds(1));
+    return static_cast<int>(text->size() & 0u);
+}
+")
+
+  check_cxx_source_compiles("${CLANG_LIBSTDCXX_PROBE}" CLANG_DEFAULT_GCC_TOOLCHAIN_USABLE)
+
+  if(NOT CLANG_DEFAULT_GCC_TOOLCHAIN_USABLE)
+    file(GLOB CLANG_GCC_TOOLCHAINS LIST_DIRECTORIES true /usr/lib/gcc/*/*)
+    list(SORT CLANG_GCC_TOOLCHAINS COMPARE NATURAL ORDER DESCENDING)
+
+    foreach(gccToolchain IN LISTS CLANG_GCC_TOOLCHAINS)
+      if(NOT IS_DIRECTORY "${gccToolchain}")
+        continue()
+      endif()
+
+      string(MAKE_C_IDENTIFIER "CLANG_GCC_TOOLCHAIN_USABLE_${gccToolchain}" probeResult)
+
+      set(CMAKE_REQUIRED_FLAGS "--gcc-install-dir=${gccToolchain}")
+      check_cxx_source_compiles("${CLANG_LIBSTDCXX_PROBE}" ${probeResult})
+      unset(CMAKE_REQUIRED_FLAGS)
+
+      if(${probeResult})
+        message(STATUS "Clang: cannot use the default GCC toolchain, falling back to ${gccToolchain}")
+
+        target_compile_options(acore-compile-option-interface INTERFACE --gcc-install-dir=${gccToolchain})
+        target_link_options(acore-compile-option-interface INTERFACE --gcc-install-dir=${gccToolchain})
+
+        set(CLANG_GCC_TOOLCHAIN_SELECTED ON)
+        break()
+      endif()
+    endforeach()
+
+    if(NOT CLANG_GCC_TOOLCHAIN_SELECTED)
+      message(WARNING "Clang: no installed GCC toolchain can be parsed, the build will likely "
+        "fail in the standard headers")
+    endif()
+  endif()
+endif()
+
 if(WITH_WARNINGS)
   target_compile_options(acore-warning-interface
     INTERFACE
