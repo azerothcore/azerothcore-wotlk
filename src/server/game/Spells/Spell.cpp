@@ -3672,7 +3672,8 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
                     caster->AI()->OnSpellStart(GetSpellInfo());
 
         // set target for proper facing
-        if ((m_casttime || m_spellInfo->IsChanneled()) && !HasTriggeredCastFlag(TRIGGERED_IGNORE_SET_FACING))
+        // channels that allow actions must not lock target and facing, the creature keeps fighting while channeling
+        if ((m_casttime || m_spellInfo->IsChanneled()) && !m_spellInfo->IsActionAllowedChannel() && !HasTriggeredCastFlag(TRIGGERED_IGNORE_SET_FACING))
         {
             if (m_caster->IsCreature() && !m_caster->ToCreature()->IsInEvadeMode() &&
                     ((m_targets.GetObjectTarget() && m_caster != m_targets.GetObjectTarget()) || m_spellInfo->IsPositive()))
