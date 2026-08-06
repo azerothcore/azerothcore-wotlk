@@ -688,7 +688,8 @@ class spell_warr_sweeping_strikes : public AuraScript
         if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
         {
             SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
-            if (spellInfo && spellInfo->Id == SPELL_WARRIOR_EXECUTE && !procTarget->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
+            if (spellInfo && spellInfo->Id == SPELL_WARRIOR_EXECUTE
+                && !procTarget->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
             {
                 // If triggered by Execute (while target is not under 20% hp) deals normalized weapon damage
                 GetTarget()->CastSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2, aurEff);
@@ -701,7 +702,8 @@ class spell_warr_sweeping_strikes : public AuraScript
                 }
 
                 int32 damage = damageInfo->GetUnmitigatedDamage();
-                GetTarget()->CastCustomSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, &damage, 0, 0, true, nullptr, aurEff);
+                GetTarget()->CastCustomSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1,
+                    &damage, 0, 0, true, nullptr, aurEff);
             }
         }
     }
