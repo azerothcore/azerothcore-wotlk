@@ -2548,10 +2548,15 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             if (!caster || (caster == victim) || !caster->IsInWorld() || !caster->IsAlive())
                 continue;
 
+            SpellInfo const* splitSpellInfo = (*itr)->GetSpellInfo();
             int32 splitDamage = (*itr)->GetAmount();
 
             // absorb must be smaller than the damage itself
             splitDamage = RoundToInterval(splitDamage, 0, int32(dmgInfo.GetDamage()));
+
+            // Split damage is a hostile interaction for its recipient too.
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
             dmgInfo.AbsorbDamage(splitDamage);
 
@@ -2587,11 +2592,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
 
             if (attacker)
             {
-                attacker->SendSpellNonMeleeDamageLog(caster, (*itr)->GetSpellInfo(), splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
+                attacker->SendSpellNonMeleeDamageLog(caster, splitSpellInfo, splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
             }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*itr)->GetSpellInfo(), false);
+            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo, false);
         }
 
         // We're going to call functions which can modify content of the list during iteration over it's elements
@@ -2621,6 +2626,10 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
 
             // absorb must be smaller than the damage itself
             splitDamage = RoundToInterval(splitDamage, uint32(0), uint32(dmgInfo.GetDamage()));
+
+            // Split damage is a hostile interaction for its recipient too.
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
             // Roar of Sacrifice, dont absorb it
             if (splitSpellInfo->Id != 53480)
