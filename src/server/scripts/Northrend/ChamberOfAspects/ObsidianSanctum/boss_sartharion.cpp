@@ -227,6 +227,12 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
 };
 
+float const LavaStrikePlatformMinX = 3218.86f;
+float const LavaStrikePlatformMaxX = 3275.69f;
+float const LavaStrikePlatformMinY = 484.68f;
+float const LavaStrikePlatformMaxY = 572.4f;
+float const LavaStrikePlatformZ = 57.083332f;
+
 // Patrol waypoints for Vesperon (circular patrol above Sartharion)
 const Position VesperonPatrolPath[8] =
 {
@@ -1392,7 +1398,7 @@ class spell_sartharion_lava_strike : public SpellScript
 
         _dummyFired = true;
 
-        GetCaster()->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE, true);
+        GetCaster()->CastSpell(frand(LavaStrikePlatformMinX, LavaStrikePlatformMaxX), frand(LavaStrikePlatformMinY, LavaStrikePlatformMaxY), LavaStrikePlatformZ, SPELL_LAVA_STRIKE_DUMMY_TRIGGER, true);
     }
 
     void HandleSchoolDamage(SpellEffIndex /*effIndex*/)
