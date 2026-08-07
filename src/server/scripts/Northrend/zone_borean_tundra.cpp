@@ -16,6 +16,7 @@
  */
 
 #include "AreaDefines.h"
+#include "CombatAI.h"
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -28,6 +29,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "WaypointMgr.h"
 
 enum eDrakeHunt
 {
@@ -1333,6 +1335,86 @@ class spell_bloodspore_haze : public SpellScript
     }
 };
 
+enum DuskData
+{
+    SAY_DUSK_PHYLACTERY = 0,
+
+    SPELL_DAN_EJECT     = 51254,
+
+    PATH_DUSK           = 281820,
+
+    NODE_DUSK_EJECT     = 20,
+    POINT_DUSK_END      = 21
+};
+
+// 28182 - Dusk
+struct npc_dusk : public VehicleAI
+{
+    npc_dusk(Creature* creature) : VehicleAI(creature), _ejected(false)
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
+    {
+        if (!who->IsPlayer())
+            return;
+
+        if (!apply)
+        {
+            // Rider bailed out before reaching the water
+            if (!_ejected)
+                me->DespawnOrUnsummon();
+
+            return;
+        }
+
+        // Required to make the waypoints function
+        who->ToPlayer()->SetClientControl(me, 0, true);
+
+        me->m_Events.AddEventAtOffset([this]() {
+            me->LoadPath(PATH_DUSK);
+            me->GetMotionMaster()->MoveWaypoint(PATH_DUSK, false);
+        }, 2200ms);
+    }
+
+    void WaypointReached(uint32 nodeId, uint32 pathId) override
+    {
+        if (pathId != PATH_DUSK || nodeId != NODE_DUSK_EJECT)
+            return;
+
+        _ejected = true;
+        me->CastSpell(me, SPELL_DAN_EJECT);
+
+        me->m_Events.AddEventAtOffset([this]() {
+            Talk(SAY_DUSK_PHYLACTERY);
+        }, 1700ms);
+
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            // Dropping the rider uncharms Dusk, and RemoveCharmedBy kills the motion slot
+            if (WaypointPath const* path = sWaypointMgr->GetPath(PATH_DUSK))
+            {
+                if (!path->Nodes.empty())
+                {
+                    WaypointNode const& last = path->Nodes.back();
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(POINT_DUSK_END, last.X, last.Y, last.Z);
+                }
+            }
+        }, 4s);
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type == POINT_MOTION_TYPE && pointId == POINT_DUSK_END)
+            me->DespawnOrUnsummon(1200ms);
+    }
+
+private:
+    bool _ejected;
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -1350,6 +1432,7 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
     RegisterCreatureAI(npc_jenny);
+    RegisterCreatureAI(npc_dusk);
     RegisterSpellScript(spell_necropolis_beam);
     RegisterSpellScript(spell_soul_deflection);
     RegisterSpellScript(spell_bloodspore_haze);
