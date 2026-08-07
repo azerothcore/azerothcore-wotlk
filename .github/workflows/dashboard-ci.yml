@@ -160,10 +160,9 @@ jobs:
       # recent on any ref the run can reach, which is its own and the base
       # branch, and is how a first run inherits master's. Both must use
       # matrix.os to stay in the key's namespace.
-      # The runner.os entries below reach the linux-build action's caches. Since
-      # cc_id/cxx_id now carry the selected GCC toolchain and linux-build keys on
-      # the bare compiler name, none of them can match any more. They stay until
-      # that action gets the same treatment, at which point they line up again.
+      # The runner.os entries below reach the linux-build action's caches. That action
+      # builds its ids the same way, so the two line up as long as both pick the same
+      # toolchain.
       - name: Restore ccache
         id: restore_ccache
         uses: actions/cache/restore@v4

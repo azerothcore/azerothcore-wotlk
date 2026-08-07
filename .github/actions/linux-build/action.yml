@@ -39,33 +39,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: echo cache key
-      shell: bash
-      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}"
-
-    # The primary key is unique per run (`-${{ github.run_id }}`) so every run
-    # saves a fresh cache. A static key would hit on itself on the second run
-    # and `actions/cache` would then skip the upload, freezing the cache after
-    # the first commit on a branch (and permanently on master). The restore-keys
-    # walk back from the most-recent cache on this branch to progressively
-    # broader fallbacks (branch -> pch variant -> modules variant -> compiler).
-    - name: Cache
-      uses: actions/cache@v6
-      with:
-        path: ${{ github.workspace }}/var/ccache
-        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}
-        restore-keys: |
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}
-
-    # This script moves sql files from "data/sql/updates/pending_$DB" to the
-    # proper folder for the db
-    - name: Process pending sql
-      shell: bash
-      run: bash apps/ci/ci-pending-sql.sh
-
+    # Ahead of the cache key, since libstdc++-*-dev decides which GCC toolchain clang
+    # picks and the key below records that choice.
     - name: Install build dependencies
       shell: bash
       run: |
@@ -82,6 +57,64 @@ runs:
         else
           sudo apt-get -y install google-perftools libmysqlclient-dev libncurses5-dev
         fi
+
+    - name: Detect toolchain
+      id: toolchain
+      shell: bash
+      run: |
+        set -euo pipefail
+        make_ver_id() {
+          local bin="$1"
+          case "$bin" in
+            clang*)
+              # clang reads the standard library out of whichever GCC toolchain it selects,
+              # so that choice belongs in the key too. A newer libstdc++-*-dev moves the
+              # selection without touching the clang version, and the cache then hands a
+              # precompiled header built against the old toolchain to a unit parsed against
+              # the new one, which dies inside libstdc++.
+              gcc_dir="$("$bin" -v -x c++ -E /dev/null 2>&1 | sed -n 's/^Selected GCC installation: //p' | head -1)"
+              echo "$bin${gcc_dir:+_gcc$(basename "$gcc_dir")}"
+              ;;
+            *)
+              # gcc brings its own headers, so its name already pins them
+              echo "$bin"
+              ;;
+          esac
+        }
+        cc_id="$(make_ver_id "${{ inputs.CC }}")"
+        cxx_id="$(make_ver_id "${{ inputs.CXX }}")"
+        echo "cc_id=$cc_id"   >> "$GITHUB_OUTPUT"
+        echo "cxx_id=$cxx_id" >> "$GITHUB_OUTPUT"
+        # ids echoed too: if clang ever stops printing the selected toolchain, the suffix
+        # goes missing and the key quietly reverts to the form that caused this
+        echo "Detected: ${{ inputs.CC }}, ${{ inputs.CXX }} -> $cc_id, $cxx_id"
+
+    - name: echo cache key
+      shell: bash
+      run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.toolchain.outputs.cc_id }}_${{ steps.toolchain.outputs.cxx_id }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}"
+
+    # The primary key is unique per run (`-${{ github.run_id }}`) so every run
+    # saves a fresh cache. A static key would hit on itself on the second run
+    # and `actions/cache` would then skip the upload, freezing the cache after
+    # the first commit on a branch (and permanently on master). The restore-keys
+    # walk back from the most-recent cache on this branch to progressively
+    # broader fallbacks (branch -> pch variant -> modules variant -> compiler).
+    - name: Cache
+      uses: actions/cache@v6
+      with:
+        path: ${{ github.workspace }}/var/ccache
+        key: ccache:${{ runner.os }}:${{ steps.toolchain.outputs.cc_id }}_${{ steps.toolchain.outputs.cxx_id }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}
+        restore-keys: |
+          ccache:${{ runner.os }}:${{ steps.toolchain.outputs.cc_id }}_${{ steps.toolchain.outputs.cxx_id }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-
+          ccache:${{ runner.os }}:${{ steps.toolchain.outputs.cc_id }}_${{ steps.toolchain.outputs.cxx_id }}:${{ inputs.modules }}:pch=${{ inputs.pch }}
+          ccache:${{ runner.os }}:${{ steps.toolchain.outputs.cc_id }}_${{ steps.toolchain.outputs.cxx_id }}:${{ inputs.modules }}
+          ccache:${{ runner.os }}:${{ steps.toolchain.outputs.cc_id }}_${{ steps.toolchain.outputs.cxx_id }}
+
+    # This script moves sql files from "data/sql/updates/pending_$DB" to the
+    # proper folder for the db
+    - name: Process pending sql
+      shell: bash
+      run: bash apps/ci/ci-pending-sql.sh
 
     - name: setup ccache
       shell: bash
