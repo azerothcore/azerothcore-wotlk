@@ -1,3 +1,4 @@
+-- DB update 2026_08_07_02 -> 2026_08_07_03
 -- Override the Templates
 DELETE FROM `creature_addon` WHERE (`guid` IN (100354, 100355, 100356, 100357, 100358, 100359, 100456, 100459));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
