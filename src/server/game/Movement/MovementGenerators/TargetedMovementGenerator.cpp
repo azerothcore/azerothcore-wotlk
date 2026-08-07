@@ -458,6 +458,16 @@ static float GetTargetSpeedInMotion(Unit* target)
     return target->GetSpeed(target->m_movementInfo.GetSpeedType());
 }
 
+// A creature walking a path only carries walk mode on the spline, never in its movement
+// flags, so IsWalking() reads false for it and a follower would run after it and stutter.
+static bool IsTargetWalkingInMotion(Unit* target)
+{
+    if (!target->movespline->Finalized())
+        return target->movespline->IsWalking();
+
+    return target->IsWalking();
+}
+
 static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const& dest, bool playerPet)
 {
     Optional<float> speed = {};
@@ -705,7 +715,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());
         if (_inheritWalkState)
-            init.SetWalk(target->IsWalking());
+            init.SetWalk(IsTargetWalkingInMotion(target));
 
         if (_inheritSpeed)
             if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))

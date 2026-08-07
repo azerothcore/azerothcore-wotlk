@@ -65,6 +65,7 @@ namespace Movement
         float           vertical_acceleration;
         float           initialOrientation;
         float           velocity;
+        bool            walk;
         int32           effect_start_time;
         int32           point_Idx;
         int32           point_Idx_offset;
@@ -87,6 +88,9 @@ namespace Movement
         [[nodiscard]] MySpline const& _Spline() const { return spline; }
         [[nodiscard]] int32 _currentSplineIdx() const { return point_Idx; }
         [[nodiscard]] float Velocity() const { return velocity; }
+        // walk mode is picked per spline and never reaches the unit's movement flags,
+        // so IsWalking() can't answer this for a creature moving along a path
+        [[nodiscard]] bool IsWalking() const { return walk; }
         void _Finalize();
         void _Interrupt() { splineflags.done = true; }
 
