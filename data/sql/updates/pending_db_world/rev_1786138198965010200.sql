@@ -32,6 +32,11 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (17, 0, 47962, 0, 3, 31, 1, 3, 27110, 0, 0, 0, 0, '', 'Requires Injured Soldier');
 
+-- 'Rescue Injured Soldier' no longer hands out the credit on cast: the soldier now reports
+-- the rescue with 'Soldier Rescued' (47968) once it actually got a seat, which then casts
+-- 47967. Leaving the link in place credits every cast a second time.
+DELETE FROM `spell_linked_spell` WHERE (`spell_trigger` = 47962) AND (`spell_effect` = 47967) AND (`type` = 0);
+
 DELETE FROM `spell_script_names` WHERE (`spell_id` IN (47962, 47968));
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (47962, 'spell_q11652_rescue_injured_soldier'),
@@ -58,19 +63,19 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27106);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (27106, 0, 0, 1, 31, 0, 100, 1, 47968, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Warrior - On Target Spellhit \'Soldier Rescued\' - Say Line 0 (No Repeat)'),
 (27106, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 47975, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Warrior - On Target Spellhit \'Soldier Rescued\' - Cast \'Warlord`s Bulwark\' (No Repeat)'),
-(27106, 0, 2, 0, 0, 0, 100, 0, 0, 8000, 8000, 14000, 0, 0, 11, 39047, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Warrior - In Combat - Cast \'Cleave\''),
-(27106, 0, 3, 0, 0, 0, 100, 0, 0, 8000, 8000, 14000, 0, 0, 11, 45026, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Warrior - In Combat - Cast \'Heroic Strike\'');
+(27106, 0, 2, 0, 0, 0, 100, 0, 0, 8000, 8000, 14000, 0, 0, 11, 39047, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Warrior - In Combat - Cast \'Cleave\''),
+(27106, 0, 3, 0, 0, 0, 100, 0, 0, 8000, 8000, 14000, 0, 0, 11, 45026, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Warrior - In Combat - Cast \'Heroic Strike\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27107);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (27107, 0, 0, 0, 31, 0, 100, 1, 47968, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Mage - On Target Spellhit \'Soldier Rescued\' - Say Line (No Repeat)'),
-(27107, 0, 1, 0, 0, 0, 100, 0, 4000, 6000, 8000, 11000, 0, 0, 11, 34933, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Mage - In Combat - Cast \'Arcane Explosion\''),
-(27107, 0, 2, 0, 0, 0, 100, 0, 9000, 16000, 18000, 22000, 0, 0, 11, 17274, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Mage - In Combat - Cast \'Pyroblast\'');
+(27107, 0, 1, 0, 0, 0, 100, 0, 4000, 6000, 8000, 11000, 0, 0, 11, 34933, 0, 0, 0, 0, 0, 5, 10, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Mage - In Combat - Cast \'Arcane Explosion\''),
+(27107, 0, 2, 0, 0, 0, 100, 0, 9000, 16000, 18000, 22000, 0, 0, 11, 17274, 0, 0, 0, 0, 0, 5, 35, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Mage - In Combat - Cast \'Pyroblast\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27108);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(27108, 0, 0, 0, 0, 0, 100, 0, 10000, 14000, 11000, 15000, 0, 0, 11, 25025, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Shaman - In Combat - Cast \'Earth Shock\''),
-(27108, 0, 1, 0, 0, 0, 100, 0, 2000, 8000, 4000, 8000, 0, 0, 11, 16033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Shaman - In Combat - Cast \'Chain Lightning\'');
+(27108, 0, 0, 0, 0, 0, 100, 0, 10000, 14000, 11000, 15000, 0, 0, 11, 25025, 0, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Shaman - In Combat - Cast \'Earth Shock\''),
+(27108, 0, 1, 0, 0, 0, 100, 0, 2000, 8000, 4000, 8000, 0, 0, 11, 16033, 0, 0, 0, 0, 0, 5, 30, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Shaman - In Combat - Cast \'Chain Lightning\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27110);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
