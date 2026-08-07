@@ -39,19 +39,35 @@ std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 
 bool DBUpdaterUtil::CheckExecutable()
 {
-    std::filesystem::path exe(GetCorrectedMySQLExecutable());
+    // non-throwing overload: nothing above catches filesystem_error, and an unresolvable
+    // path shouldn't take the process down.
+    std::error_code ec;
+
+    std::filesystem::path const configuredExe(GetCorrectedMySQLExecutable());
+    std::filesystem::path exe(configuredExe);
     if (!is_regular_file(exe))
     {
         exe = Acore::SearchExecutableInPath("mysql");
         if (!exe.empty() && is_regular_file(exe))
         {
+            std::filesystem::path absoluteExe = absolute(exe, ec);
+            if (ec)
+            {
+                LOG_FATAL("sql.updates", "Failed to resolve absolute path for MySQL executable \'{}\': {}",
+                    exe.generic_string(), ec.message());
+                return false;
+            }
+
             // Correct the path to the cli
-            corrected_path() = absolute(exe).generic_string();
+            corrected_path() = absoluteExe.generic_string();
             return true;
         }
 
-        LOG_FATAL("sql.updates", "Didn't find any executable MySQL binary at \'{}\' or in path, correct the path in the *.conf (\"MySQLExecutable\").",
-            absolute(exe).generic_string());
+        std::filesystem::path absoluteConfiguredExe = absolute(configuredExe, ec);
+        LOG_FATAL("sql.updates",
+            "Didn't find any executable MySQL binary at \'{}\' or in path, correct the path in the "
+            "*.conf (\"MySQLExecutable\").",
+            ec ? configuredExe.generic_string() : absoluteConfiguredExe.generic_string());
 
         return false;
     }
@@ -189,6 +205,11 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
 template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
+    // Update() and Populate() already guard this; Create() didn't, so a missing MySQL binary
+    // surfaced as the misleading "please fix your sql query" fatal.
+    if (!DBUpdaterUtil::CheckExecutable())
+        return false;
+
     LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
 
     char const* disableInteractive = std::getenv("AC_DISABLE_INTERACTIVE");
