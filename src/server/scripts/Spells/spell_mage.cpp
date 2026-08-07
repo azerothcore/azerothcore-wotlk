@@ -1047,6 +1047,12 @@ class spell_mage_combustion : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        // Molten Armor's damage is a reactive proc, not a fire spell the mage cast.
+        // spell_mage_ignite::CheckProc filters it out the same way, for the same reason.
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            if (spellInfo->SpellFamilyFlags[1] & 0x8)
+                return false;
+
         // Do not take charges, add a stack of crit buff
         if (!(eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
         {
