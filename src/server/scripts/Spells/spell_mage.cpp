@@ -1658,7 +1658,8 @@ public:
 
     void Register() override
     {
-        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_mage_conjure_refreshment_table::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(
+            spell_mage_conjure_refreshment_table::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
     }
 
 private:
@@ -1667,8 +1668,10 @@ private:
 
 void AddSC_mage_spell_scripts()
 {
-    RegisterSpellScriptWithArgs(spell_mage_conjure_refreshment_table, "spell_mage_conjure_refreshment_table_r1", GO_MAGE_REFRESHMENT_PORTAL_R1);
-    RegisterSpellScriptWithArgs(spell_mage_conjure_refreshment_table, "spell_mage_conjure_refreshment_table_r2", GO_MAGE_REFRESHMENT_PORTAL_R2);
+    RegisterSpellScriptWithArgs(spell_mage_conjure_refreshment_table,
+        "spell_mage_conjure_refreshment_table_r1", GO_MAGE_REFRESHMENT_PORTAL_R1);
+    RegisterSpellScriptWithArgs(spell_mage_conjure_refreshment_table,
+        "spell_mage_conjure_refreshment_table_r2", GO_MAGE_REFRESHMENT_PORTAL_R2);
     RegisterSpellScript(spell_mage_arcane_blast);
     RegisterSpellScript(spell_mage_arcane_missiles);
     RegisterSpellScript(spell_mage_arcane_potency);
