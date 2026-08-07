@@ -26,7 +26,7 @@ add_executable(
 target_link_libraries(
         unit_tests
         PRIVATE
-        acore-core-interface
+        acore-default-interface
         PUBLIC
         game
         gtest_main
