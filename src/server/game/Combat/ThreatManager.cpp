@@ -531,6 +531,15 @@ void ThreatManager::TauntUpdate()
             pair.second->UpdateTauntState(it->second);
         else
             pair.second->UpdateTauntState();
+
+        // A taunting reference can never be suppressed, but EvaluateSuppressed below only
+        // refreshes what we threaten, not what threatens us, so one created suppressed would
+        // never be cleared. Do it here instead.
+        if (pair.second->IsSuppressed() && !pair.second->ShouldBeSuppressed())
+        {
+            pair.second->_online = ThreatReference::ONLINE_STATE_ONLINE;
+            pair.second->HeapNotifyIncreased();
+        }
     }
 
     // taunt aura update also re-evaluates all suppressed states (retail behavior)
