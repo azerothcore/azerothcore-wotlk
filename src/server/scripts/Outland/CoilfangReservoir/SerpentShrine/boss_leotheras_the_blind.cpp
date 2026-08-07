@@ -70,7 +70,8 @@ enum Misc
 enum Groups
 {
     GROUP_COMBAT                        = 1,
-    GROUP_DEMON                         = 2
+    GROUP_DEMON                         = 2,
+    GROUP_BANISH_VISUAL                 = 3
 };
 
 struct boss_leotheras_the_blind : public BossAI
@@ -83,6 +84,48 @@ struct boss_leotheras_the_blind : public BossAI
         DoCastSelf(SPELL_CLEAR_CONSUMING_MADNESS, true);
         DoCastSelf(SPELL_DUAL_WIELD, true);
         me->SetReactState(REACT_PASSIVE);
+
+        // Banished until all 3 Spellbinders are dead. NON_ATTACKABLE goes with NOT_SELECTABLE
+        // or the client draws the banish visual transparent; the Green Beam miss that causes is
+        // fixed on the spell side (37626 in SpellInfoCorrections.cpp).
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
+        // Raid bosses are immune to Banish, so drop it just for this cast.
+        // -1, not 0: creature_immunities entries are tagged with placeholderSpellId=UINT32_MAX,
+        // and removal has to match that marker or it silently removes nothing.
+        // Not triggered: that would skip the visual broadcast showing the demon silhouette.
+        // Cleared by the RemoveAllAuras() below once all 3 are dead.
+        me->ApplySpellImmune(-1, IMMUNITY_MECHANIC, MECHANIC_BANISH, false);
+        DoCastSelf(SPELL_BANISH);
+        me->ApplySpellImmune(-1, IMMUNITY_MECHANIC, MECHANIC_BANISH, true);
+
+        // The cast above only plays its visual for clients that witness it happen - on the
+        // very first Reset (creature spawn, nobody around yet) nobody does, so it just gets
+        // baked silently into the client's later create snapshot and never shows. A wipe
+        // doesn't need this: by the time Reset runs again, the player is already standing
+        // right there with real line of sight, so that recast is witnessed live and works.
+        // If nobody has real LOS at this exact moment, keep checking until someone does, then
+        // recast once so it's witnessed too. IsWithinLOSInMap does an actual occlusion check
+        // (unlike MoveInLineOfSight's flat-radius trigger, which fires through walls and was
+        // tried and reverted for consuming the cast before anyone could really see it).
+        scheduler.CancelGroup(GROUP_BANISH_VISUAL);
+        if (Player* nearby = me->SelectNearestPlayer(60.0f); !nearby || !me->IsWithinLOSInMap(nearby))
+        {
+            scheduler.Schedule(1s, GROUP_BANISH_VISUAL, [this](TaskContext context)
+            {
+                Player* player = me->SelectNearestPlayer(60.0f);
+                if (!player || !me->IsWithinLOSInMap(player))
+                {
+                    context.Repeat(1s);
+                    return;
+                }
+
+                me->ApplySpellImmune(-1, IMMUNITY_MECHANIC, MECHANIC_BANISH, false);
+                DoCastSelf(SPELL_BANISH);
+                me->ApplySpellImmune(-1, IMMUNITY_MECHANIC, MECHANIC_BANISH, true);
+            });
+        }
 
         ScheduleHealthCheckEvent(15, [&]{
             me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
@@ -143,7 +186,10 @@ struct boss_leotheras_the_blind : public BossAI
             {
                 if (!formation->IsAnyMemberAlive(true))
                 {
+                    scheduler.CancelGroup(GROUP_BANISH_VISUAL);
                     me->RemoveAllAuras();
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->LoadEquipment();
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -218,10 +264,15 @@ struct boss_leotheras_the_blind : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        // Ticked even while out of combat (before the UpdateVictim() bail-out below) - while
+        // banished he's REACT_PASSIVE and never engaged, so UpdateVictim() always returns
+        // false and this would otherwise never run, silently freezing the GROUP_BANISH_VISUAL
+        // recheck scheduled in Reset().
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
 
-        scheduler.Update(diff);
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 

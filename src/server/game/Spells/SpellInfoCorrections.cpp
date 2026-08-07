@@ -5422,6 +5422,14 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
+    // Green Beam is channeled but carries a leftover missile Speed, so it counts as delayed and
+    // gets NON_ATTACKABLE rechecked at impact - which makes it whiff on a banished Leotheras.
+    // Zeroing Speed drops that recheck.
+    ApplySpellFix({ 37626 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Speed = 0.0f;
+    });
+
     LOG_INFO("server.loading", ">> Loading spell dbc data corrections  in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
