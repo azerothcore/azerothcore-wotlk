@@ -5422,6 +5422,17 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
+    // Metamorphosis (issue #26641) buffs Varedis but grants no invulnerability, so he could be
+    // meleed down at 50% HP without the Book of Fel Names. Effect 2 is unused in the DBC, so it
+    // carries the immunity; the existing quest script already strips the whole aura.
+    ApplySpellFix({ 36298 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_SCHOOL_IMMUNITY;
+        spellInfo->Effects[EFFECT_2].MiscValue = 127; // all schools
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
     LOG_INFO("server.loading", ">> Loading spell dbc data corrections  in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
