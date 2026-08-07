@@ -59,6 +59,15 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 2, 25334, 0, 0, 31, 0, 4, 0, 0, 0, 0, 0, '', 'Horde Siege Tank only despawns when the driver leaves, not when a rescued soldier does');
 
+-- HACK: the tank is charmed by whoever drives it, so Unit::GetFactionReactionTo() resolves
+-- everyone's reaction to it from the driver's Warsong Offensive standing (faction 1085, the
+-- rescued soldiers' own faction) instead of comparing faction templates. At Neutral the soldiers
+-- do not see the tank as friendly, so 'Warlord\'s Bulwark' (47975) and 'Tune Up!' (47969) - both
+-- SPELL_EFFECT_APPLY_AREA_AURA_FRIEND - skip it. UNIT_FLAG2_IGNORE_REPUTATION (0x4) forces the
+-- plain faction check. Sniff has Flags2 2048; revert this once the core stops proxying the
+-- driver's reputation onto the vehicle.
+UPDATE `creature_template` SET `unit_flags2` = 2052 WHERE (`entry` = 25334);
+
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27106);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (27106, 0, 0, 1, 31, 0, 100, 1, 47968, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Warrior - On Target Spellhit \'Soldier Rescued\' - Say Line 0 (No Repeat)'),
@@ -84,31 +93,42 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27110, 0, 2, 0, 0, 0, 100, 0, 10000, 14000, 11000, 15000, 0, 0, 11, 44273, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Engineer - In Combat - Cast \'Goblin Dragon Gun\''),
 (27110, 0, 3, 0, 0, 0, 100, 0, 10000, 14000, 42000, 48000, 0, 0, 11, 22742, 0, 0, 0, 0, 0, 5, 30, 0, 0, 0, 0, 0, 0, 0, 'Injured Warsong Engineer - In Combat - Cast \'Chain Lightning\'');
 
-UPDATE `creature` SET `id` = 27106 WHERE `id` IN (27106, 27107, 27108, 27110) AND `guid` IN (117631,117632,117637,117638,117639,117640,117642,117643,117644,117645,117716,117724,117730,117734,117755,117756,117820,117822);
+-- `creature_multispawn` feeds CreatureData::id2/id3, so a spawn point holds the base
+-- `creature`.`id` plus at most 2 variants - ObjectMgr::LoadCreatures() drops any further rows
+-- with an sql.sql error. Listing 27107/27108/27110 against a 27106 base put 27110 last in
+-- (spawnId, entry) order, so the Engineer was the one dropped at every point and could never
+-- spawn. Rotate which of the four each point leaves out instead.
+UPDATE `creature` SET `id` = 27106 WHERE (`id` IN (27106, 27107, 27108, 27110)) AND (`guid` IN (117631,117632,117637,117639,117640,117642,117644,117645,117716,117730,117734,117755,117820,117822));
+UPDATE `creature` SET `id` = 27107 WHERE (`id` IN (27106, 27107, 27108, 27110)) AND (`guid` IN (117638,117643,117724,117756));
 
-DELETE FROM `creature_multispawn` WHERE `spawnId` IN (117631,117632,117637,117638,117639,117640,117642,117643,117644,117645,117716,117724,117730,117734,117755,117756,117820,117822) AND `entry` IN (27107, 27108, 27110);
+-- fwiw we should allow multispawn to have >=4 entries
+DELETE FROM `creature_multispawn` WHERE `spawnId` IN (117631,117632,117637,117638,117639,117640,117642,117643,117644,117645,117716,117724,117730,117734,117755,117756,117820,117822) AND `entry` IN (27106, 27107, 27108, 27110);
 INSERT INTO `creature_multispawn` (`spawnId`, `entry`) VALUES
-(117631, 27107), (117631, 27108), (117631, 27110),
-(117632, 27107), (117632, 27108), (117632, 27110),
-(117637, 27107), (117637, 27108), (117637, 27110),
-(117638, 27107), (117638, 27108), (117638, 27110),
-(117639, 27107), (117639, 27108), (117639, 27110),
-(117640, 27107), (117640, 27108), (117640, 27110),
-(117642, 27107), (117642, 27108), (117642, 27110),
-(117643, 27107), (117643, 27108), (117643, 27110),
-(117644, 27107), (117644, 27108), (117644, 27110),
-(117645, 27107), (117645, 27108), (117645, 27110),
-(117716, 27107), (117716, 27108), (117716, 27110),
-(117724, 27107), (117724, 27108), (117724, 27110),
-(117730, 27107), (117730, 27108), (117730, 27110),
-(117734, 27107), (117734, 27108), (117734, 27110),
-(117755, 27107), (117755, 27108), (117755, 27110),
-(117756, 27107), (117756, 27108), (117756, 27110),
-(117820, 27107), (117820, 27108), (117820, 27110),
-(117822, 27107), (117822, 27108), (117822, 27110);
+-- Warrior / Mage / Shaman
+(117631, 27107), (117631, 27108),
+(117639, 27107), (117639, 27108),
+(117644, 27107), (117644, 27108),
+(117730, 27107), (117730, 27108),
+(117820, 27107), (117820, 27108),
+-- Warrior / Mage / Engineer
+(117632, 27107), (117632, 27110),
+(117640, 27107), (117640, 27110),
+(117645, 27107), (117645, 27110),
+(117734, 27107), (117734, 27110),
+(117822, 27107), (117822, 27110),
+-- Warrior / Shaman / Engineer
+(117637, 27108), (117637, 27110),
+(117642, 27108), (117642, 27110),
+(117716, 27108), (117716, 27110),
+(117755, 27108), (117755, 27110),
+-- Mage / Shaman / Engineer
+(117638, 27108), (117638, 27110),
+(117643, 27108), (117643, 27110),
+(117724, 27108), (117724, 27110),
+(117756, 27108), (117756, 27110);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27064);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(27064, 0, 0, 1, 103, 0, 100, 513, 0, 25334, 1, 2, 1200, 0, 11, 47916, 2, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Abandoned Fuel Tank - On 1 or More Units in Range - Cast \'Fuel\' (No Repeat)'),
+(27064, 0, 0, 1, 103, 0, 100, 513, 0, 25334, 1, 2, 400, 0, 11, 47916, 2, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Abandoned Fuel Tank - On 1 or More Units in Range - Cast \'Fuel\' (No Repeat)'),
 (27064, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 4000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Abandoned Fuel Tank - On 1 or More Units in Range - Despawn In 4000 ms (No Repeat)'),
 (27064, 0, 2, 0, 11, 0, 100, 512, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Abandoned Fuel Tank - On Respawn - Set Reactstate Passive');
