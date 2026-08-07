@@ -1715,7 +1715,7 @@ public:
     void SendRemoveControlBar();
     [[nodiscard]] bool HasSpell(uint32 spell) const override;
     [[nodiscard]] bool HasActiveSpell(uint32 spell) const;            // show in spellbook
-    [[nodiscard]] bool IsSpellFitByClassAndRace(uint32 spell_id) const;
+    [[nodiscard]] bool IsSpellFitByClassAndRace(uint32 spell_id, uint8 learnDepth = 0) const;
     bool IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const;
 
     void SendProficiency(ItemClass itemClass, uint32 itemSubclassMask);
