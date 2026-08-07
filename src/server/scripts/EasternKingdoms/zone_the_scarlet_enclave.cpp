@@ -1371,6 +1371,8 @@ enum LightOfDawnEncounter
     EVENT_START_COUNTDOWN_12,
     EVENT_START_COUNTDOWN_13,
     EVENT_START_COUNTDOWN_14,
+    EVENT_BATTLE_CHARGE,
+    EVENT_BATTLE_ENGAGE,
     // Fight Events
     EVENT_SPELL_ANTI_MAGIC_ZONE,
     EVENT_SPELL_DEATH_STRIKE,
@@ -1646,6 +1648,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
             events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 335s);
             events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337s + 500ms);
             events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345s);
+            events.ScheduleEvent(EVENT_BATTLE_CHARGE, 347s);
         }
     }
 
@@ -1717,7 +1720,12 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         if (battleStarted != ENCOUNTER_STATE_FIGHT)
             return;
 
-        me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), *creature), 3s);
+        // Reinforcements march in from Darion's line instead of popping on the corpse they
+        // replace, right on top of whoever just killed the last one.
+        Position spawnPos = creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION
+            ? LightOfDawnPos[urand(0, 1)]
+            : creature->GetPosition();
+        me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), spawnPos), 3s);
         if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
         {
             --scourgeRemaining;
@@ -1806,6 +1814,29 @@ struct npc_highlord_darion_mograine : public ScriptedAI
 
         SendInitialWorldStates();
         me->SummonCreatureGroup(30);
+    }
+
+    // Closest summon on the other side. Only summons are considered, so the two armies
+    // keep fighting each other and the player still pulls whatever they choose to.
+    Creature* SelectBattleOpponent(Creature* fighter)
+    {
+        Creature* closest = nullptr;
+        float closestDist = 60.0f;
+        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            if (Creature* other = ObjectAccessor::GetCreature(*me, *itr))
+            {
+                if (other == fighter || !other->IsAlive() || !fighter->IsValidAttackTarget(other))
+                    continue;
+
+                float dist = fighter->GetDistance(other);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closest = other;
+                }
+            }
+
+        return closest;
     }
 
     Creature* GetEntryFromSummons(uint32 entry)
@@ -1919,6 +1950,41 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 me->SetImmuneToAll(false);
                 me->SummonCreatureGroup(5);
                 return;
+            case EVENT_BATTLE_CHARGE:
+                // Both armies just stood there once the speech ended. Send them out the same
+                // way reinforcements arrive, so the two sides end up within reach.
+                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                    {
+                        if (!summon->IsAlive() || summon->GetEntry() == NPC_HIGHLORD_TIRION_FORDRING)
+                            continue;
+
+                        Position pos = LightOfDawnFightPos[urand(0, 9)];
+                        summon->SetHomePosition(pos);
+                        summon->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(),
+                            pos.GetPositionZ(), summon->GetSpeed(MOVE_RUN));
+                    }
+                events.ScheduleEvent(EVENT_BATTLE_ENGAGE, 5s);
+                break;
+            case EVENT_BATTLE_ENGAGE:
+                // Nothing ordered these to attack, and proximity aggro is only evaluated while
+                // relocating, so anyone arriving with no enemy in range stayed idle.
+                if (battleStarted == ENCOUNTER_STATE_FIGHT)
+                {
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                        {
+                            if (!summon->IsAlive() || summon->GetVictim()
+                                || summon->GetEntry() == NPC_HIGHLORD_TIRION_FORDRING)
+                                continue;
+
+                            if (Creature* enemy = SelectBattleOpponent(summon))
+                                summon->AI()->AttackStart(enemy);
+                        }
+
+                    events.ScheduleEvent(EVENT_BATTLE_ENGAGE, 3s);
+                }
+                break;
             case EVENT_FINISH_FIGHT_1:
                 summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
                 battleStarted = ENCOUNTER_STATE_OUTRO;
