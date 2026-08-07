@@ -609,7 +609,8 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
         uint8 resetPasses = missedMultiplePeriods ? 2 : 1;
         for (uint8 pass = 0; pass < resetPasses; ++pass)
         {
-            for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(), itr2; itr != m_instanceSaveById.end(); )
+            for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(), itr2;
+                 itr != m_instanceSaveById.end(); )
             {
                 itr2 = itr++;
                 if (itr2->second->GetMapId() == mapid && itr2->second->GetDifficulty() == difficulty)
