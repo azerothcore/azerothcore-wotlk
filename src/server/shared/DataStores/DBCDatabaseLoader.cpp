@@ -29,7 +29,10 @@ DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcForma
       _stringPool(stringPool)
 {
     // Get sql index position
-    _recordSize = DBCFileLoader::GetFormatRecordSize(_dbcFormat, &_sqlIndexPos);
+    int32 indexPos = -1;
+    _recordSize = DBCFileLoader::GetFormatRecordSize(_dbcFormat, &indexPos);
+    if (indexPos >= 0)
+        _sqlIndexPos = indexPos;
 
     ASSERT(_recordSize);
 }
