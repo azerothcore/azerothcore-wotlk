@@ -1887,6 +1887,9 @@ bool SpellInfo::CheckTargetCreatureType(Unit const* target) const
         else
             return true;
     }
+    // Polymorph works on critters in addition to beasts and humanoids
+    if (GetSpellSpecific() == SPELL_SPECIFIC_MAGE_POLYMORPH && target->IsCritter())
+        return true;
     uint32 creatureType = target->GetCreatureTypeMask();
     return !TargetCreatureType || !creatureType || (creatureType & TargetCreatureType);
 }
