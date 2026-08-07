@@ -13739,7 +13739,12 @@ void Player::ResyncRunes(uint8 count)
     for (uint32 i = 0; i < count; ++i)
     {
         data << uint8(GetCurrentRune(i));                   // rune type
-        data << uint8(255 - (GetRuneCooldown(i) * 51));     // passed cooldown time (0-255)
+
+        // How much of the cooldown already elapsed, scaled to 0-255. Cooldowns are stored in
+        // milliseconds, so the old constant overflowed the byte and sent garbage.
+        uint32 baseCd = GetRuneBaseCooldown(i, true);
+        uint32 elapsed = baseCd - std::min<uint32>(GetRuneCooldown(i), baseCd);
+        data << uint8(baseCd ? elapsed * 255 / baseCd : 255);
     }
     SendDirectMessage(&data);
 }
