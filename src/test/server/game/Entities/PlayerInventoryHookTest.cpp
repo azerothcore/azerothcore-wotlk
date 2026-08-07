@@ -119,6 +119,7 @@ protected:
     std::size_t _originalFastTemplateCount = 0;
 };
 
+// cppcheck-suppress syntaxError
 TEST_F(PlayerInventoryHookTest, DispatchesWithSurvivingItemAfterStackMerge)
 {
     TestPlayer* player = CreateTestPlayer();
