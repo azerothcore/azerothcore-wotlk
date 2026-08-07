@@ -305,6 +305,28 @@ void PoolGroup<Pool>::RemoveOneRelation(uint32 child_pool_id)
     }
 }
 
+// Whether the member can physically exist on this map's spawn mode; members
+// failing this must not occupy a roll slot or they block the pool invisibly
+template <class T>
+bool PoolGroup<T>::IsSpawnableOnMap(uint32 /*db_guid_or_pool_id*/, Map* /*map*/)
+{
+    return true;
+}
+
+template <>
+bool PoolGroup<Creature>::IsSpawnableOnMap(uint32 db_guid, Map* map)
+{
+    CreatureData const* data = sObjectMgr->GetCreatureData(db_guid);
+    return data && (data->spawnMask & (1 << map->GetSpawnMode()));
+}
+
+template <>
+bool PoolGroup<GameObject>::IsSpawnableOnMap(uint32 db_guid, Map* map)
+{
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(db_guid);
+    return data && (data->spawnMask & (1 << map->GetSpawnMode()));
+}
+
 template <class T>
 void PoolGroup<T>::SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom)
 {
@@ -334,7 +356,7 @@ void PoolGroup<T>::SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 tri
 
                 // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
                 // so this need explicit check for this case
-                if (roll < 0 && (obj.guid == triggerFrom || !spawns.IsSpawnedObject<T>(obj.guid)))
+                if (roll < 0 && (obj.guid == triggerFrom || (!spawns.IsSpawnedObject<T>(obj.guid) && IsSpawnableOnMap(obj.guid, spawns.GetMap()))))
                 {
                     rolledObjects.push_back(obj);
                     break;
@@ -346,7 +368,7 @@ void PoolGroup<T>::SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 tri
         {
             std::copy_if(EqualChanced.begin(), EqualChanced.end(), std::back_inserter(rolledObjects), [triggerFrom, &spawns](PoolObject const& object)
             {
-                 return object.guid == triggerFrom || !spawns.IsSpawnedObject<T>(object.guid);
+                 return object.guid == triggerFrom || (!spawns.IsSpawnedObject<T>(object.guid) && IsSpawnableOnMap(object.guid, spawns.GetMap()));
             });
 
             Acore::Containers::RandomResize(rolledObjects, count);
@@ -383,11 +405,6 @@ void PoolGroup<Creature>::Spawn1Object(SpawnedPoolData& spawns, PoolObject* obj)
     {
         Map* map = spawns.GetMap();
 
-        // Grid loading enforces spawnMask through the per-difficulty grid data;
-        // spawning directly into an already loaded grid has to check it itself
-        if (!(data->spawnMask & (1 << map->GetSpawnMode())))
-            return;
-
         // Spawn if necessary (loaded grids only)
         // We use spawn coords to spawn
         if (map->IsGridLoaded(data->posX, data->posY))
@@ -410,9 +427,6 @@ void PoolGroup<GameObject>::Spawn1Object(SpawnedPoolData& spawns, PoolObject* ob
     if (GameObjectData const* data = sObjectMgr->GetGameObjectData(obj->guid))
     {
         Map* map = spawns.GetMap();
-
-        if (!(data->spawnMask & (1 << map->GetSpawnMode())))
-            return;
 
         // Spawn if necessary (loaded grids only)
         // We use current coords to unspawn, not spawn coords since creature can have changed grid
@@ -1017,7 +1031,7 @@ void PoolMgr::LoadFromDB()
                 }
             } while (result->NextRow());
 
-            LOG_INFO("pool", "Pool handling system initialized, {} pools will be spawned by default in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server.loading", ">> Pool handling system initialized, {} pools will be spawned by default in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
             LOG_INFO("server.loading", " ");
         }
     }

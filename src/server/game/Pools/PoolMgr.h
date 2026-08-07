@@ -110,6 +110,8 @@ public:
     std::vector<PoolObject> const& GetExplicitlyChanced() const { return ExplicitlyChanced; }
     std::vector<PoolObject> const& GetEqualChanced() const { return EqualChanced; }
 private:
+    static bool IsSpawnableOnMap(uint32 db_guid_or_pool_id, Map* map);
+
     uint32 poolId;
     PoolObjectList ExplicitlyChanced;
     PoolObjectList EqualChanced;
@@ -203,6 +205,8 @@ private:
     SearchMap mQuestSearchMap;
 
     std::unordered_map<uint32, std::vector<uint32>> mAutoSpawnPoolsPerMap;
+
+    // World thread only: mutated on game event start/stop, read on map creation
     std::unordered_set<uint32> mActiveEventPools;
 
     // active state of quest pools; per-map state lives on each Map's SpawnedPoolData
