@@ -6283,7 +6283,8 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
                         // still back off by the target's combat reach: the path above may not have
                         // been touched at all and would otherwise end exactly on the target
-                        G3D::Vector3 const targetPos(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+                        G3D::Vector3 const targetPos(target->GetPositionX(), target->GetPositionY(),
+                            target->GetPositionZ());
                         m_preGeneratedPath->ShortenPathUntilDist(targetPos, objSize); // move back
                     }
                     if (Player* player = m_caster->ToPlayer())
