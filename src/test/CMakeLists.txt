@@ -25,6 +25,9 @@ add_executable(
 
 target_link_libraries(
         unit_tests
+        PRIVATE
+        acore-core-interface
+        PUBLIC
         game
         gtest_main
         gmock_main
@@ -48,7 +51,7 @@ endif()
 
 # Link modules library to tests so module code is available
 if(TARGET modules)
-    target_link_libraries(unit_tests modules)
+    target_link_libraries(unit_tests PUBLIC modules)
 endif()
 
 add_test(
