@@ -2801,24 +2801,6 @@ Item* Player::EquipNewItem(uint16 pos, uint32 item, bool update)
     return EquipItem(pos, _item, update);
 }
 
-bool Player::GetDisarmedAttackType(uint8 slot, WeaponAttackType& attackType) const
-{
-    switch (slot)
-    {
-        case EQUIPMENT_SLOT_MAINHAND:
-            attackType = BASE_ATTACK;
-            return HasUnitFlag(UNIT_FLAG_DISARMED);
-        case EQUIPMENT_SLOT_OFFHAND:
-            attackType = OFF_ATTACK;
-            return HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND);
-        case EQUIPMENT_SLOT_RANGED:
-            attackType = RANGED_ATTACK;
-            return HasUnitFlag2(UNIT_FLAG2_DISARM_RANGED);
-        default:
-            return false;
-    }
-}
-
 Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 {
     AddEnchantmentDurations(pItem);
@@ -2845,12 +2827,12 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
             // _ApplyItemMods above turned this weapon's damage on, so suppress it the same way
             // HandleAuraModDisarm does - it undoes this symmetrically when the aura drops.
-            WeaponAttackType disarmAttackType;
-            if (pProto && GetDisarmedAttackType(slot, disarmAttackType))
+            WeaponAttackType const attackType = Player::GetAttackBySlot(slot);
+            if (pProto && !CanUseAttackType(attackType))
             {
                 ApplyItemDependentAuras(pItem, false);
                 _ApplyWeaponDamage(slot, pProto, nullptr, false);
-                UpdateWeaponDependentAuras(disarmAttackType);
+                UpdateWeaponDependentAuras(attackType);
             }
 
             if (pProto && IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
@@ -3030,8 +3012,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
 
                 // Restore first: the slot is disarmed so this weapon's damage is suppressed, and
                 // _ApplyItemMods(false) below would subtract a second time on top of it.
-                WeaponAttackType disarmAttackType;
-                if (pProto && GetDisarmedAttackType(slot, disarmAttackType))
+                if (pProto && !CanUseAttackType(Player::GetAttackBySlot(slot)))
                 {
                     ApplyItemDependentAuras(pItem, true);
                     _ApplyWeaponDamage(slot, pProto, nullptr, true);
