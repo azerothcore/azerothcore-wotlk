@@ -112,13 +112,14 @@ jobs:
           make_ver_id() {
             local bin="$1"; local base="$(basename "$bin")"
             case "$base" in
-              clang)
+              clang|clang++)
                 maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "$maj" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
-                echo "clang-${maj:-unknown}"
-                ;;
-              clang++)
-                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "$maj" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
-                echo "clang++-${maj:-unknown}"
+                # clang reads the standard library out of whichever GCC toolchain it selects, so
+                # that choice belongs in the key too. A newer libstdc++-*-dev moves the selection
+                # without touching the clang version, and the cache then serves a precompiled
+                # header holding the old headers to a unit compiled against the new ones.
+                gcc_dir="$("$bin" -v -x c++ -E /dev/null 2>&1 | sed -n 's/^Selected GCC installation: //p' | head -1)"
+                echo "$base-${maj:-unknown}${gcc_dir:+_gcc$(basename "$gcc_dir")}"
                 ;;
               gcc)
                 maj="$("$bin" -dumpfullversion -dumpversion 2>/dev/null || "$bin" -dumpversion 2>/dev/null)"; maj="${maj%%.*}"
@@ -134,24 +135,13 @@ jobs:
             esac
           }
 
-          # clang reads the standard library out of whichever GCC toolchain it selects, so that
-          # choice belongs in the key too. Installing a newer libstdc++-*-dev moves the selection
-          # without touching the clang version, and the cache then serves a precompiled header
-          # holding the old headers to a translation unit compiled against the new ones.
-          gcc_toolchain_id() {
-            local bin="$1"
-            case "$(basename "$bin")" in
-              clang*)
-                local selected
-                selected="$("$bin" -v -x c++ -E /dev/null 2>&1 | sed -n 's/^Selected GCC installation: //p' | head -1)"
-                [[ -n "$selected" ]] && echo "_gcc$(basename "$selected")"
-                ;;
-            esac
-          }
-
-          echo "cc_id=$(make_ver_id "$CC_BIN")$(gcc_toolchain_id "$CC_BIN")"   >> "$GITHUB_OUTPUT"
-          echo "cxx_id=$(make_ver_id "$CXX_BIN")$(gcc_toolchain_id "$CXX_BIN")" >> "$GITHUB_OUTPUT"
-          echo "Detected: $CC_BIN, $CXX_BIN"
+          cc_id="$(make_ver_id "$CC_BIN")"
+          cxx_id="$(make_ver_id "$CXX_BIN")"
+          echo "cc_id=$cc_id"   >> "$GITHUB_OUTPUT"
+          echo "cxx_id=$cxx_id" >> "$GITHUB_OUTPUT"
+          # ids echoed too: if clang ever stops printing the selected toolchain, the suffix goes
+          # missing and the key quietly reverts to the form that caused this
+          echo "Detected: $CC_BIN, $CXX_BIN -> $cc_id, $cxx_id"
 
       - name: Prepare ccache dir
         shell: bash
@@ -170,9 +160,10 @@ jobs:
       # recent on any ref the run can reach, which is its own and the base
       # branch, and is how a first run inherits master's. Both must use
       # matrix.os to stay in the key's namespace.
-      # The runner.os entries below reach the linux-build action's caches, but
-      # only on the 24.04 leg: on 26.04 this workflow detects clang-21 while
-      # linux-build is passed clang-20, so nothing there lines up.
+      # The runner.os entries below reach the linux-build action's caches. Since
+      # cc_id/cxx_id now carry the selected GCC toolchain and linux-build keys on
+      # the bare compiler name, none of them can match any more. They stay until
+      # that action gets the same treatment, at which point they line up again.
       - name: Restore ccache
         id: restore_ccache
         uses: actions/cache/restore@v4
