@@ -1521,8 +1521,37 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         {
             //same map, only remove pet if out of range for new position
             if (pet && !pet->IsWithinDist3d(x, y, z, GetMap()->GetVisibilityRange()))
-                UnsummonPetTemporaryIfAny();
+            {
+                // character_pet has no duration column, so a timed pet cannot survive
+                // an unsummon/resummon round trip. Relocate it directly instead.
+                if (pet->isTemporarySummoned())
+                    pet->NearTeleportTo(x, y, z, orientation);
+                else
+                    UnsummonPetTemporaryIfAny();
+            }
         }
+
+        // Guardians are not real Pets and the accessors may miss them depending on
+        // category, but SetMinion always inserts them into m_Controlled.
+        // Totems do not follow the player; pet and critter are handled separately.
+        for (Unit* controlled : m_Controlled)
+        {
+            if (controlled->IsTotem())
+                continue;
+
+            Creature* summon = controlled->ToCreature();
+            if (!summon || summon == pet || summon->GetGUID() == GetCritterGUID())
+                continue;
+
+            if (!summon->IsWithinDist3d(x, y, z, GetMap()->GetVisibilityRange()))
+                summon->NearTeleportTo(x, y, z, orientation);
+        }
+
+        // critters cannot warp back like a real pet and area-trigger portals are
+        // one-way, so bring them along rather than stranding them
+        if (Creature* critter = ObjectAccessor::GetCreature(*this, GetCritterGUID()))
+            if (!critter->IsWithinDist3d(x, y, z, GetMap()->GetVisibilityRange()))
+                critter->NearTeleportTo(x, y, z, orientation);
 
         if (!(options & TELE_TO_NOT_LEAVE_COMBAT))
             CombatStop();
