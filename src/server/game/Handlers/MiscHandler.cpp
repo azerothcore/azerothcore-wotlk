@@ -68,6 +68,9 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
     if (GetPlayer()->HasPreventResurectionAura())
         return; // silently return, client should display the error by itself
 
+    if (GetPlayer()->GetCharm())
+        return;
+
     // the world update order is sessions, players, creatures
     // the netcode runs in parallel with all of these
     // creatures can kill players

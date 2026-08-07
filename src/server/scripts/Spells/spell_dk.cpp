@@ -191,6 +191,10 @@ class spell_dk_raise_ally : public SpellScript
         if (unitTarget->IsAlive()) // not discovered attributeEx5?
             return SPELL_FAILED_TARGET_NOT_DEAD;
 
+        Player* player = unitTarget->ToPlayer();
+        if (player && (player->GetCharm() || player->GetCorpse()))
+            return SPELL_FAILED_TARGET_AURASTATE;
+
         return SPELL_CAST_OK;
     }
 
@@ -198,6 +202,13 @@ class spell_dk_raise_ally : public SpellScript
     {
         if (Player* unitTarget = GetHitPlayer())
         {
+            if (!unitTarget->GetCorpse())
+                unitTarget->BuildPlayerRepop();
+
+            unitTarget->RemovePlayerFlag(PLAYER_FLAGS_GHOST);
+            unitTarget->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+            unitTarget->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+
             unitTarget->CastSpell(unitTarget, GetEffectValue(), true);
             if (Unit* ghoul = unitTarget->GetCharm())
             {
