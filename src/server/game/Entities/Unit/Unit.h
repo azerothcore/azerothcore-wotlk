@@ -899,7 +899,10 @@ public:
     // (issue #26659, Lady Alistra vs Cenarion Scout).
     // In-memory only and cleared in CombatStop(), so it cannot leak into RP sparring.
     bool ForceAttack(Unit* target);
-    [[nodiscard]] bool HasForcedCombatWith(Unit const* target) const { return _forcedCombatTargets.find(target->GetGUID()) != _forcedCombatTargets.end(); }
+    [[nodiscard]] bool HasForcedCombatWith(Unit const* target) const
+    {
+        return _forcedCombatTargets.contains(target->GetGUID());
+    }
 
     void CastStop(uint32 except_spellid = 0, bool withInstant = true);
     bool AttackStop();
