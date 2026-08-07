@@ -14,5 +14,5 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 UPDATE `creature_template` SET `unit_flags` = 32768, `dynamicflags` = 0 WHERE (`entry` IN (26159, 26160));
 
 -- Spell is already cast on Quest Accepted, no need to double it
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 26158;
+UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 26158;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 26158) AND (`source_type` = 0);
