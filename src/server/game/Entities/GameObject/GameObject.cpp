@@ -1314,6 +1314,9 @@ bool GameObject::ActivateToQuest(Player* target) const
     if (target->HasQuestForGO(GetEntry()))
         return true;
 
+    if (!GetGOInfo()->IsGameObjectForQuests())
+        return false;
+
     FactionTemplateEntry const* gameObjectFaction =
         sFactionTemplateStore.LookupEntry(GetUInt32Value(GAMEOBJECT_FACTION));
     FactionTemplateEntry const* playerFaction = target->GetFactionTemplateEntry();
@@ -1326,9 +1329,6 @@ bool GameObject::ActivateToQuest(Player* target) const
         if (isHostile)
             return false;
     }
-
-    if (!GetGOInfo()->IsGameObjectForQuests())
-        return false;
 
     switch (GetGoType())
     {
