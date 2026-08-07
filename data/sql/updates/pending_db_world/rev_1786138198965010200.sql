@@ -5,7 +5,7 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES (4963, 'SmartTr
 DELETE FROM `smart_scripts` WHERE (`source_type` = 2 AND `entryorguid` = 4963);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (4963, 2, 0, 0, 46, 0, 100, 0, 4963, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 107121, 25465, 0, 0, 0, 0, 0, 0, 'Areatrigger - On Trigger - Kel\'Thuzad Say Line'),
-(4963, 2, 1, 0, 46, 0, 100, 0, 4963, 0, 0, 0, 0, 0, 26, 11652, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Areatrigger - On Trigger - Quest Credit \'The Plains of Nasam\'');
+(4963, 2, 1, 0, 46, 0, 100, 0, 4963, 0, 0, 0, 0, 0, 15, 11652, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Areatrigger - On Trigger - Quest Credit \'The Plains of Nasam\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25465);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
