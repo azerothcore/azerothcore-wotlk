@@ -641,9 +641,7 @@ class spell_warr_sweeping_strikes : public AuraScript
     {
         Unit* actor = eventInfo.GetActor();
         if (!actor)
-        {
             return false;
-        }
 
         if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
         {
@@ -654,11 +652,12 @@ class spell_warr_sweeping_strikes : public AuraScript
                 case SPELL_WARRIOR_WHIRLWIND_OFF:
                     return false;
                 case SPELL_WARRIOR_WHIRLWIND_MAIN:
+                {
                     if (actor->HasSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1))
-                    {
                         return false;
-                    }
+
                     break;
+                }
                 default:
                     break;
             }
@@ -666,9 +665,7 @@ class spell_warr_sweeping_strikes : public AuraScript
 
         Unit* procTarget = actor->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
         if (procTarget)
-        {
             _procTargetGUID = procTarget->GetGUID();
-        }
 
         return procTarget != nullptr;
     }
@@ -677,13 +674,9 @@ class spell_warr_sweeping_strikes : public AuraScript
     {
         PreventDefaultAction();
 
-        // resolved rather than cached: the target picked in CheckProc can be gone by now,
-        // same crash spell_rog_blade_flurry already carries a note about
         Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
         if (!procTarget)
-        {
             return;
-        }
 
         if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
         {
@@ -697,13 +690,11 @@ class spell_warr_sweeping_strikes : public AuraScript
             else
             {
                 if (spellInfo && spellInfo->Id == SPELL_WARRIOR_WHIRLWIND_MAIN)
-                {
                     eventInfo.GetActor()->AddSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, 0, 500);
-                }
 
-                int32 damage = damageInfo->GetUnmitigatedDamage();
+                auto damage = static_cast<int32>(damageInfo->GetUnmitigatedDamage());
                 GetTarget()->CastCustomSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1,
-                    &damage, 0, 0, true, nullptr, aurEff);
+                    &damage, nullptr, nullptr, true, nullptr, aurEff);
             }
         }
     }
