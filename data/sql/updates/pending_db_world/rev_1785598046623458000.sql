@@ -100,12 +100,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (23931, 0, 8, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Oluf the Violent - On Just Died - Say Line 1');
 
 -- Prisoners
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2425300);
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2425301);
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2425302);
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2425303);
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2425304);
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2425305);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (2425300, 2425301, 2425302, 2425303, 2425304, 2425305));
 UPDATE `creature_template` SET `AIName` = '' WHERE (`entry` = 24253);
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 24253) AND (`source_type` = 0);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 24254);
@@ -113,4 +108,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (24254, 0, 0, 0, 0, 0, 100, 0, 3000, 5000, 4000, 6000, 0, 0, 11, 9672, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonflayer Prisoner - In Combat - Cast \'Frostbolt\''),
 (24254, 0, 1, 0, 106, 0, 100, 0, 10000, 30000, 20000, 40000, 0, 10, 11, 11831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonflayer Prisoner - On Hostile in Range - Cast \'Frost Nova\'');
 
-UPDATE `creature` SET `unit_flags` = 33536 WHERE `id` IN (24253, 24254) AND `guid` IN (113775, 113776, 113812, 113813, 113814, 113815, 113844, 113845, 113847, 113848, 113849, 113870, 113871);
+UPDATE `creature` SET `unit_flags` = `unit_flags`|32768|512|256 WHERE `id` IN (24253, 24254) AND `guid` IN (113775, 113776, 113812, 113813, 113814, 113815, 113844, 113845, 113847, 113848, 113849, 113870, 113871);
