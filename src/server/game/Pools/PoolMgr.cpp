@@ -972,11 +972,10 @@ void PoolMgr::LoadFromDB()
         }
     }
 
-    // Warn only: empty pools are inert leftovers, unlike the member errors above
     for (auto const& [poolId, templateData] : mPoolTemplate)
     {
         if (IsEmpty(poolId))
-            LOG_WARN("sql.sql", "Pool Id {} is empty (has no creatures, no gameobjects, no quests and no valid child pools). The pool will not be spawned.", poolId);
+            LOG_ERROR("sql.sql", "Pool Id {} is empty (has no creatures, no gameobjects, no quests and no valid child pools). The pool will not be spawned.", poolId);
     }
 
     // The initialize method will spawn all pools not in an event and not in another pool, this is why there is 2 left joins with 2 null checks
