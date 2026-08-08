@@ -1005,13 +1005,15 @@ struct boss_yoggsaron_sara : public ScriptedAI
                     SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
                     SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
 
-                    events.ScheduleEvent(EVENT_SARA_P2_MALADY, 7s, 0, EVENT_PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SARA_P2_PSYCHOSIS, 3s, 0, EVENT_PHASE_TWO);
+                    // Sniffed: Psychosis opens with the tentacle wave, Malady follows at 12s, Death Ray at 20s.
+                    // Brain Link at 18s comes from OG/Classic references (needs two players, absent from solo sniffs)
+                    events.ScheduleEvent(EVENT_SARA_P2_MALADY, 12s, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_PSYCHOSIS, 0ms, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_DEATH_RAY, 20s, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T1, 50s, 60s, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T2, 15s, 20s, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T3, 30s + randtime(0ms, 10s), 0, EVENT_PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SARA_P2_BRAIN_LINK, 0ms, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_BRAIN_LINK, 18s, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_OPEN_PORTALS, 60s, 0, EVENT_PHASE_TWO);
                     break;
                 }
