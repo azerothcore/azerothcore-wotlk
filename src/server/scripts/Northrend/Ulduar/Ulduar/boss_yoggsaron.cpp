@@ -1306,7 +1306,7 @@ struct boss_yoggsaron : public ScriptedAI
                 Talk(SAY_YOGG_SARON_DEAFENING_ROAR);
                 Talk(EMOTE_YOGG_SARON_DEAFENING_ROAR);
                 me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
-                events.Repeat(30s);
+                events.Repeat(1min);
                 break;
             case EVENT_YS_SHADOW_BEACON:
                 events.Repeat(5s);
