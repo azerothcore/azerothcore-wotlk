@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_09 -> 2026_08_08_10
 -- Yogg-Saron Death Ray: bind the ray AI, make it a trigger like TC, let the Death Orb fly
 UPDATE `creature_template` SET `ScriptName` = 'boss_yoggsaron_death_ray', `flags_extra` = `flags_extra` | 128 WHERE `entry` = 33881;
 UPDATE `creature_template_movement` SET `Ground` = 0, `Flight` = 1 WHERE `CreatureId` = 33882;
