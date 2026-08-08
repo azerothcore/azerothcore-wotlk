@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_13 -> 2026_08_08_14
 --
 -- Crimson Hall darkfallen trash: remove SmartAI superseded by ScriptName.
 --
