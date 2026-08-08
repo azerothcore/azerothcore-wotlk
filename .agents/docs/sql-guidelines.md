@@ -8,6 +8,11 @@
 
 Run the linter before claiming a change is done: `python apps/codestyle/codestyle-sql.py` (compares to origin/master).
 
+## Data conventions
+
+- `smart_scripts` edits always rewrite the full `entryorguid` block (`DELETE` + `INSERT` of every row) — never a partial `UPDATE`, not even for a comment-only fix.
+- `creature_immunities`: immunity sets are single-reference. Before minting a new id, check whether an existing set already matches; to extend a creature's immunities, create a superset instead of editing a shared set. Negative ids are curated — don't allocate them.
+
 ## The three databases
 
 - `acore_auth` — accounts, realm list, IP/account bans, session keys. Shared across all realms.
