@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_10 -> 2026_08_08_11
 -- Crusher Tentacle: bind the sniffed Diminsh Power proc aura (64148)
 DELETE FROM `spell_script_names` WHERE `spell_id` = 64148;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
