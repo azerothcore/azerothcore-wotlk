@@ -1941,9 +1941,8 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
             if (eslot == NULL_SLOT)
                 return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
 
-            // Xinef: dont allow to equip items on disarmed slot
-            if (!CanUseAttackType(GetAttackBySlot(eslot)))
-                return EQUIP_ERR_NOT_WHILE_DISARMED;
+            // Swapping gear on a disarmed slot is allowed (issue #26426); the new weapon's
+            // damage stays suppressed until Disarm ends.
 
             res = CanUseItem(pItem, not_loading);
             if (res != EQUIP_ERR_OK)
@@ -2097,9 +2096,7 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
                 return EQUIP_ERR_NOT_DURING_ARENA_MATCH;
     }
 
-    // Xinef: dont allow to unequip items on disarmed slot
-    if (!CanUseAttackType(GetAttackBySlot(pItem->GetSlot())))
-        return EQUIP_ERR_NOT_WHILE_DISARMED;
+    // Blizzlike allows unequipping a disarmed weapon too (issue #26426) - see CanEquipItem().
 
     if (!swap && pItem->IsNotEmptyBag())
         return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
@@ -2829,6 +2826,16 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
             _ApplyItemMods(pItem, slot, true);
 
+            // _ApplyItemMods above turned this weapon's damage on, so suppress it the same way
+            // HandleAuraModDisarm does - it undoes this symmetrically when the aura drops.
+            WeaponAttackType const attackType = Player::GetAttackBySlot(slot);
+            if (pProto && !CanUseAttackType(attackType))
+            {
+                ApplyItemDependentAuras(pItem, false);
+                _ApplyWeaponDamage(slot, pProto, nullptr, false);
+                UpdateWeaponDependentAuras(attackType);
+            }
+
             if (pProto && IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
             {
                 uint32 cooldownSpell = IsClass(CLASS_ROGUE, CLASS_CONTEXT_WEAPON_SWAP) ? 6123 : 6119;
@@ -3003,6 +3010,14 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
 
                 if (pProto && pProto->ItemSet)
                     RemoveItemsSetItem(this, pProto);
+
+                // Restore first: the slot is disarmed so this weapon's damage is suppressed, and
+                // _ApplyItemMods(false) below would subtract a second time on top of it.
+                if (pProto && !CanUseAttackType(Player::GetAttackBySlot(slot)))
+                {
+                    ApplyItemDependentAuras(pItem, true);
+                    _ApplyWeaponDamage(slot, pProto, nullptr, true);
+                }
 
                 _ApplyItemMods(pItem, slot, false);
             }
