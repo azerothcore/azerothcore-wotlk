@@ -1351,6 +1351,31 @@ class spell_algalon_remove_phase_aura : public AuraScript
     }
 };
 
+// 62168 - Black Hole (phase shift)
+// 65250 - Worm Hole (phase shift)
+// 62169 - Black Hole (periodic damage)
+class spell_algalon_black_hole_ignore_pets : public SpellScript
+{
+    PrepareSpellScript(spell_algalon_black_hole_ignore_pets);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        // A minion phased away from its owner fails the InSamePhase() check inside
+        // IsWithinDistInMap and is removed by Pet::Update. Owners carry their minions
+        // in and out through Unit::SetPhaseMask propagation to m_Controlled.
+        targets.remove_if([](WorldObject* obj) -> bool
+            {
+                Unit* unit = obj->ToUnit();
+                return unit && !unit->IsPlayer() && unit->GetOwnerGUID().IsPlayer();
+            });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_black_hole_ignore_pets::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 class spell_algalon_supermassive_fail : public SpellScript
 {
     PrepareSpellScript(spell_algalon_supermassive_fail);
@@ -1411,6 +1436,7 @@ void AddSC_boss_algalon_the_observer()
     RegisterSpellScript(spell_algalon_big_bang);
     RegisterSpellScript(spell_algalon_remove_phase_aura);
     RegisterSpellScript(spell_algalon_supermassive_fail);
+    RegisterSpellScript(spell_algalon_black_hole_ignore_pets);
 
     // Achievements
     new achievement_algalon_he_feeds_on_your_tears();
