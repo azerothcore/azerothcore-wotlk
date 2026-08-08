@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_08 -> 2026_08_08_09
 --
 -- Hodir loot chests: spawn them in DB instead of summoning them from the boss.
 --
