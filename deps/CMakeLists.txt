@@ -10,6 +10,11 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
+# do zlib early: it sets ZLIB_FOUND, which some others check
+if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
+  add_subdirectory(zlib)
+endif()
+
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
   if(USE_MYSQL_SOURCES)
       add_subdirectory(mysqllite)
@@ -31,7 +36,6 @@ if ((APPS_BUILD AND (NOT APPS_BUILD STREQUAL "none")) OR BUILD_TOOLS_DB_IMPORT)
 endif()
 
 if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
-  add_subdirectory(zlib)
   add_subdirectory(g3dlite)
   add_subdirectory(recastnavigation)
 endif()

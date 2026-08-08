@@ -27,8 +27,13 @@ target_include_directories(mpq
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${WIN_EXTRA_INCLUDE}
-    ${CMAKE_SOURCE_DIR}/deps/zlib
     ${CMAKE_SOURCE_DIR}/deps/bzip2)
+
+if(NOT ZLIB_FOUND)
+  target_include_directories(mpq
+    PUBLIC
+      ${CMAKE_SOURCE_DIR}/deps/zlib)
+endif()
 
 target_link_libraries(mpq
   PRIVATE

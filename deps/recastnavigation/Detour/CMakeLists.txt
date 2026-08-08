@@ -19,7 +19,7 @@ set(Detour_STAT_SRCS
     Source/DetourNode.cpp 
 )
 
-if(WIN32)
+if(NOT ZLIB_FOUND)
   include_directories(
     ${CMAKE_SOURCE_DIR}/deps/zlib
   )

@@ -23,7 +23,7 @@ set(Recast_STAT_SRCS
     Source/RecastRegion.cpp 
 )
 
-if(WIN32)
+if(NOT ZLIB_FOUND)
   include_directories(
     ${CMAKE_SOURCE_DIR}/deps/zlib
   )
