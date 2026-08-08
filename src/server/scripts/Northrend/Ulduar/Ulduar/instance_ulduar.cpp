@@ -157,11 +157,11 @@ ObjectData const gameobjectData[] =
     { GO_MIMIRON_CALL_TRAM_MIMIRON,     DATA_MIMIRON_CALL_TRAM_MIMIRON  },
     { GO_DOODAD_UL_TRAIN_TURNAROUND01,  DATA_MIMIRON_TRAM_TURNAROUND_1  },
     { GO_DOODAD_UL_TRAIN_TURNAROUND02,  DATA_MIMIRON_TRAM_TURNAROUND_2  },
-    // Hodir chests (dynamically spawned, one per difficulty)
-    { GO_HODIR_CHEST_NORMAL,             DATA_HODIR_CHEST_NORMAL         },
-    { GO_HODIR_CHEST_NORMAL_HERO,        DATA_HODIR_CHEST_NORMAL_HERO    },
-    { GO_HODIR_CHEST_HARD,               DATA_HODIR_CHEST_HARD           },
-    { GO_HODIR_CHEST_HARD_HERO,          DATA_HODIR_CHEST_HARD_HERO      },
+    // Hodir loot chests (DB-spawned, filtered by spawnMask per difficulty)
+    { GO_HODIR_CHEST_NORMAL,            DATA_HODIR_CHEST_NORMAL         },
+    { GO_HODIR_CHEST_NORMAL_HERO,       DATA_HODIR_CHEST_NORMAL_HERO    },
+    { GO_HODIR_CHEST_HARD,              DATA_HODIR_CHEST_HARD           },
+    { GO_HODIR_CHEST_HARD_HERO,         DATA_HODIR_CHEST_HARD_HERO      },
     { 0,                                0                               }
 };
 
@@ -621,7 +621,7 @@ public:
                     if (GameObject* go = GetHodirChest(true))
                     {
                         _hmHodir = false;
-                        go->Delete();
+                        go->DespawnOrUnsummon(0ms, 7_days);
                     }
                     break;
                 case DATA_MAGE_BARRIER:
