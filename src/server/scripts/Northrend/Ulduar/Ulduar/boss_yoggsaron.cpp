@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -76,6 +77,7 @@ enum YoggSpells
     SPELL_DARK_VOLLEY                   = 63038,
 
     // SARA P2
+    SPELL_RIDE_YOGG_SARON_VEHICLE       = 61791,
     SPELL_SARA_PSYCHOSIS_10             = 63795,
     SPELL_SARA_PSYCHOSIS_25             = 65301,
     SPELL_MALADY_OF_THE_MIND            = 63830,
@@ -84,11 +86,16 @@ enum YoggSpells
     SPELL_BRAIN_LINK_DAMAGE             = 63803,
     SPELL_BRAIN_LINK_OK                 = 63804,
 
+    SPELL_DEATH_RAY                     = 63891,
     SPELL_DEATH_RAY_DAMAGE_VISUAL       = 63886,
     SPELL_DEATH_RAY_ORIGIN_VISUAL       = 63893,
     SPELL_DEATH_RAY_WARNING             = 63882,
     SPELL_DEATH_RAY_DAMAGE              = 63883,
     SPELL_DEATH_RAY_DAMAGE_REAL         = 63884,
+    SPELL_DEATH_RAY_SUMMON_1            = 63887, // serverside, one per ray
+    SPELL_DEATH_RAY_SUMMON_2            = 63888,
+    SPELL_DEATH_RAY_SUMMON_3            = 63889,
+    SPELL_DEATH_RAY_SUMMON_4            = 63890,
 
     // YOGG-SARON P2
     SPELL_SHADOW_BARRIER                = 63894,
@@ -102,6 +109,7 @@ enum YoggSpells
     // CRUSHER TENTACLE
     SPELL_CRUSH                         = 64146,
     SPELL_DIMINISH_POWER                = 64145,
+    SPELL_DIMINISH_POWER_PROC           = 64148,
     SPELL_FOCUSED_ANGER                 = 57688,
 
     // CONSTRICTOR TENTACLE
@@ -175,6 +183,10 @@ enum YoggEvents
     EVENT_YS_SUMMON_GUARDIAN            = 32,
     EVENT_YS_SHADOW_BEACON              = 33,
 
+    EVENT_DEATH_RAY_WARNING             = 35,
+    EVENT_DEATH_RAY_ACTIVE              = 36,
+    EVENT_DEATH_RAY_MOVE                = 37,
+
     EVENT_SARA_WIPE_OPEN_DOOR           = 40,
     EVENT_SARA_WIPE_RESPAWN             = 41,
 };
@@ -193,6 +205,7 @@ enum NPCsGOs
     NPC_CORRUPTOR_TENTACLE              = 33985, // 30-40 secs ?
 
     NPC_INFLUENCE_TENTACLE              = 33943,
+    NPC_DEATH_RAY                       = 33881,
     NPC_DEATH_ORB                       = 33882,
     NPC_DESCEND_INTO_MADNESS            = 34072,
     NPC_LAUGHING_SKULL                  = 33990,
@@ -394,6 +407,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
     uint8 _currentIllusion;
     bool _isIllusionReversed;
     bool _isWipeRecovering = false;
+    bool _deathRayAnnounce = true;
 
     void AttackStart(Unit*) override { }
     void MoveInLineOfSight(Unit*) override { }
@@ -401,6 +415,14 @@ struct boss_yoggsaron_sara : public ScriptedAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
+
+        // Sniffed: the yell accompanies every other Death Ray cast, starting with the first
+        if (summon->GetEntry() == NPC_DEATH_ORB)
+        {
+            if (_deathRayAnnounce)
+                Talk(SAY_SARA_DEATH_RAY);
+            _deathRayAnnounce = !_deathRayAnnounce;
+        }
     }
 
     void SpawnClouds()
@@ -420,6 +442,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (!_EnterEvadeMode(why))
             return;
 
+        // NearTeleportTo does not dismount creatures from vehicles
+        me->ExitVehicle();
         Position pos = me->GetHomePosition();
         me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
 
@@ -489,6 +513,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
         _summonedGuardiansCount = 0;
         _p2TalkTimer = 0;
         _secondPhase = false;
+        _deathRayAnnounce = true;
         _summonSpeed = 1.0f;
         _currentIllusion = urand(1, 3);
         _isIllusionReversed = urand(0, 1);
@@ -612,17 +637,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
         }
     }
 
-    void SummonDeathOrbs()
-    {
-        for (uint8 i = 0; i < 4; ++i)
-        {
-            uint32 dist = urand(38, 48);
-            float o = rand_norm() * M_PI * 2;
-            float Zplus = (dist - 38) / 6.5f;
-            me->SummonCreature(NPC_DEATH_ORB, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
-        }
-    }
-
     void AddPortals()
     {
         _summonSpeed -= 0.1f;
@@ -694,6 +708,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 summons.DoAction(ACTION_YOGG_SARON_HARD_MODE, pred2);
 
             summons.DespawnEntry(NPC_DEATH_ORB);
+            summons.DespawnEntry(NPC_DEATH_RAY);
             events.SetPhase(EVENT_PHASE_THREE);
 
             me->RemoveAllAuras();
@@ -935,9 +950,9 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 events.Repeat(3500ms);
                 break;
             case EVENT_SARA_P2_DEATH_RAY:
-                Talk(SAY_SARA_DEATH_RAY);
-                SummonDeathOrbs();
-                events.Repeat(20s);
+                // Sniffed: the Death Orb is summoned 3 yd above Sara's head
+                me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 3.0f, SPELL_DEATH_RAY, false);
+                events.Repeat(22s);
                 break;
             case EVENT_SARA_P2_SUMMON_T1: // CRUSHER
                 SpawnTentacle(NPC_CRUSHER_TENTACLE);
@@ -970,26 +985,29 @@ struct boss_yoggsaron_sara : public ScriptedAI
                     break;
                 }
             case EVENT_SARA_P2_SPAWN_START_TENTACLES:
-                me->SetOrientation(M_PI);
-                me->SetDisplayId(SARA_TRANSFORM_MODEL);
+                {
+                    me->SetOrientation(M_PI);
+                    me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
-                me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
-                me->SetPosition(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
+                    // Sniffed: Sara rides Yogg-Saron's vehicle for the rest of the fight
+                    if (Creature* yogg = _instance->GetCreature(BOSS_YOGGSARON))
+                        me->CastSpell(yogg, SPELL_RIDE_YOGG_SARON_VEHICLE, true);
 
-                SpawnTentacle(NPC_CRUSHER_TENTACLE);
-                me->CastCustomSpell(SPELL_CONSTRICTOR_TENTACLE, SPELLVALUE_MAX_TARGETS, 1, me, false);
-                SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
-                SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
+                    SpawnTentacle(NPC_CRUSHER_TENTACLE);
+                    me->CastCustomSpell(SPELL_CONSTRICTOR_TENTACLE, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                    SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
+                    SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
 
-                events.ScheduleEvent(EVENT_SARA_P2_MALADY, 7s, 0, EVENT_PHASE_TWO);
-                events.ScheduleEvent(EVENT_SARA_P2_PSYCHOSIS, 3s, 0, EVENT_PHASE_TWO);
-                events.ScheduleEvent(EVENT_SARA_P2_DEATH_RAY, 15s, 0, EVENT_PHASE_TWO);
-                events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T1, 50s, 60s, 0, EVENT_PHASE_TWO);
-                events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T2, 15s, 20s, 0, EVENT_PHASE_TWO);
-                events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T3, 30s + randtime(0ms, 10s), 0, EVENT_PHASE_TWO);
-                events.ScheduleEvent(EVENT_SARA_P2_BRAIN_LINK, 0ms, 0, EVENT_PHASE_TWO);
-                events.ScheduleEvent(EVENT_SARA_P2_OPEN_PORTALS, 60s, 0, EVENT_PHASE_TWO);
-                break;
+                    events.ScheduleEvent(EVENT_SARA_P2_MALADY, 7s, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_PSYCHOSIS, 3s, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_DEATH_RAY, 20s, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T1, 50s, 60s, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T2, 15s, 20s, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T3, 30s + randtime(0ms, 10s), 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_BRAIN_LINK, 0ms, 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_OPEN_PORTALS, 60s, 0, EVENT_PHASE_TWO);
+                    break;
+                }
             case EVENT_SARA_P1_BERSERK:
                 if (me->GetInstanceScript())
                 {
@@ -1547,27 +1565,74 @@ struct boss_yoggsaron_death_orb : public NullCreatureAI
 {
     boss_yoggsaron_death_orb(Creature* creature) : NullCreatureAI(creature)
     {
-        me->CastSpell(me, SPELL_DEATH_RAY_WARNING, true);
-        _startTimer = 1;
+        me->CastSpell(me, SPELL_DEATH_RAY_ORIGIN_VISUAL, true);
     }
 
-    uint32 _startTimer;
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        // Sniffed: each ray comes from its own serverside summon spell, falls from the orb
+        // to the ground below it, and the orb winks out when their damage phase ends
+        for (uint32 spellId = SPELL_DEATH_RAY_SUMMON_1; spellId <= SPELL_DEATH_RAY_SUMMON_4; ++spellId)
+            me->CastSpell(me, spellId, true);
+
+        me->DespawnOrUnsummon(18400ms);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* sara = instance->GetCreature(DATA_SARA))
+                sara->AI()->JustSummoned(summon);
+    }
+};
+
+struct boss_yoggsaron_death_ray : public NullCreatureAI
+{
+    boss_yoggsaron_death_ray(Creature* creature) : NullCreatureAI(creature) { }
+
+    EventMap events;
+    uint8 _movementLegs = 0;
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        me->GetMotionMaster()->MoveFall(0, true);
+        events.ScheduleEvent(EVENT_DEATH_RAY_WARNING, 1200ms);
+        me->DespawnOrUnsummon(19s);
+    }
 
     void UpdateAI(uint32 diff) override
     {
-        if (_startTimer)
+        events.Update(diff);
+        switch (events.ExecuteEvent())
         {
-            _startTimer += diff;
-            if (_startTimer > 4000)
-            {
-                me->CastSpell(me, SPELL_DEATH_RAY_DAMAGE_VISUAL, true);
+            case EVENT_DEATH_RAY_WARNING:
+                me->CastSpell(me, SPELL_DEATH_RAY_WARNING, false);
+                events.ScheduleEvent(EVENT_DEATH_RAY_ACTIVE, 5s);
+                break;
+            case EVENT_DEATH_RAY_ACTIVE:
                 me->CastSpell(me, SPELL_DEATH_RAY_DAMAGE, true);
+                me->CastSpell((Unit*)nullptr, SPELL_DEATH_RAY_DAMAGE_VISUAL, true);
+                events.ScheduleEvent(EVENT_DEATH_RAY_MOVE, 0ms);
+                break;
+            case EVENT_DEATH_RAY_MOVE:
+                {
+                    // Sniffed: 8 straight 9 yd legs on random cardinal axes, one every ~1.6s
+                    float x = me->GetPositionX();
+                    float y = me->GetPositionY();
+                    switch (urand(0, 3))
+                    {
+                        case 0: x += 9.0f; break;
+                        case 1: x -= 9.0f; break;
+                        case 2: y += 9.0f; break;
+                        case 3: y -= 9.0f; break;
+                    }
+                    float z = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, me->GetPositionZ() + 5.0f);
+                    me->GetMotionMaster()->MovePoint(0, x, y, z);
 
-                _startTimer = 0;
-                me->SetSpeed(MOVE_WALK, 2);
-                me->SetSpeed(MOVE_RUN, 2);
-                me->GetMotionMaster()->MoveRandom(20.0f);
-            }
+                    if (++_movementLegs < 8)
+                        events.Repeat(1625ms);
+                    break;
+                }
         }
     }
 };
@@ -1579,6 +1644,7 @@ struct boss_yoggsaron_crusher_tentacle : public ScriptedAI
         me->SetCombatMovement(false);
         me->CastSpell(me, SPELL_CRUSH, true);
         me->CastSpell(me, SPELL_FOCUSED_ANGER, true);
+        me->CastSpell(me, SPELL_DIMINISH_POWER_PROC, true);
         me->CastSpell(me, SPELL_DIMINISH_POWER, false);
     }
 
@@ -1594,7 +1660,6 @@ struct boss_yoggsaron_crusher_tentacle : public ScriptedAI
             DoResetThreatList();
             me->AddThreat(who, 100000);
             AttackStart(who);
-            me->InterruptNonMeleeSpells(false);
         }
     }
 
@@ -2246,24 +2311,39 @@ class spell_yogg_saron_malady_of_the_mind_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_DEATH_RAY_DAMAGE_REAL, SPELL_MALADY_OF_THE_MIND_TRIGGER });
-    }
-
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        GetUnitOwner()->ApplySpellImmune(SPELL_DEATH_RAY_DAMAGE_REAL, IMMUNITY_ID, SPELL_DEATH_RAY_DAMAGE_REAL, true);
+        return ValidateSpellInfo({ SPELL_MALADY_OF_THE_MIND_TRIGGER });
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->ApplySpellImmune(SPELL_DEATH_RAY_DAMAGE_REAL, IMMUNITY_ID, SPELL_DEATH_RAY_DAMAGE_REAL, false);
         GetUnitOwner()->CastCustomSpell(SPELL_MALADY_OF_THE_MIND_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, GetUnitOwner(), true);
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_yogg_saron_malady_of_the_mind_aura::OnApply, EFFECT_1, SPELL_AURA_MOD_FEAR, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_malady_of_the_mind_aura::OnRemove, EFFECT_1, SPELL_AURA_MOD_FEAR, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 64148 - Diminsh Power
+class spell_yogg_saron_diminish_power_aura : public AuraScript
+{
+    PrepareAuraScript(spell_yogg_saron_diminish_power_aura);
+
+    // Serverside proc (no triggered spell in DBC): taken melee hits and melee
+    // abilities break the Diminish Power channel. Sniffed: only the active
+    // channel breaks, the initial 1.5s cast is not interruptible by damage
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        if (Spell* spell = GetTarget()->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            if (spell->getState() == SPELL_STATE_CASTING)
+                GetTarget()->InterruptSpell(CURRENT_CHANNELED_SPELL);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_yogg_saron_diminish_power_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -2995,6 +3075,7 @@ void AddSC_boss_yoggsaron()
     RegisterUlduarCreatureAI(boss_yoggsaron_guardian_of_ys);
     RegisterUlduarCreatureAI(boss_yoggsaron_brain);
     RegisterUlduarCreatureAI(boss_yoggsaron_death_orb);
+    RegisterUlduarCreatureAI(boss_yoggsaron_death_ray);
     RegisterUlduarCreatureAI(boss_yoggsaron_crusher_tentacle);
     RegisterUlduarCreatureAI(boss_yoggsaron_corruptor_tentacle);
     RegisterUlduarCreatureAI(boss_yoggsaron_constrictor_tentacle);
@@ -3009,6 +3090,7 @@ void AddSC_boss_yoggsaron()
 
     // SPELLS
     RegisterSpellScript(spell_yogg_saron_malady_of_the_mind_aura);
+    RegisterSpellScript(spell_yogg_saron_diminish_power_aura);
     RegisterSpellAndAuraScriptPair(spell_yogg_saron_brain_link, spell_yogg_saron_brain_link_aura);
     RegisterSpellScript(spell_yogg_saron_shadow_beacon_aura);
     RegisterSpellScript(spell_yogg_saron_destabilization_matrix);

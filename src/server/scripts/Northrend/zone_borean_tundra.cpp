@@ -255,51 +255,70 @@ enum Nerubar
     SPELL_FREED_WARSONG_MAGE                = 45526,
     SPELL_FREED_WARSONG_SHAMAN              = 45527,
     SPELL_FREED_WARSONG_WARRIOR             = 45514,
-    SPELL_FREED_WARSONG_PEON                = 45532
+    SPELL_FREED_WARSONG_PEON                = 45532,
+    SPELL_FREED_SOLDIER_DEBUFF              = 45523,
+
+    MAX_FREED_SOLDIERS                      = 3
 };
 
-const uint32 nerubarVictims[3] =
+uint32 const nerubarCaptiveSpells[4] =
 {
-    SPELL_FREED_WARSONG_MAGE, SPELL_FREED_WARSONG_SHAMAN, SPELL_FREED_WARSONG_WARRIOR
+    SPELL_FREED_WARSONG_PEON, SPELL_FREED_WARSONG_WARRIOR, SPELL_FREED_WARSONG_MAGE, SPELL_FREED_WARSONG_SHAMAN
 };
 
-class npc_nerubar_victim : public CreatureScript
+struct npc_nerubar_victim : public NullCreatureAI
 {
-public:
-    npc_nerubar_victim() : CreatureScript("npc_nerubar_victim") { }
+    npc_nerubar_victim(Creature* creature) : NullCreatureAI(creature) { }
 
-    struct npc_nerubar_victimAI : public NullCreatureAI
+    void JustDied(Unit* killer) override
     {
-        npc_nerubar_victimAI(Creature* creature) : NullCreatureAI(creature) { }
+        if (!killer)
+            return;
 
-        void JustDied(Unit* killer) override
+        Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!player)
+            return;
+
+        uint32 captiveSpell = nerubarCaptiveSpells[urand(0, 3)];
+
+        if (captiveSpell == SPELL_FREED_WARSONG_PEON)
         {
-            if (!killer || !killer->IsPlayer())
-            {
+            if (player->GetQuestStatus(QUEST_TAKEN_BY_THE_SCOURGE) != QUEST_STATUS_INCOMPLETE)
                 return;
-            }
 
-            Player* player = killer->ToPlayer();
-
-            if (player->GetQuestStatus(QUEST_TAKEN_BY_THE_SCOURGE) == QUEST_STATUS_INCOMPLETE)
-            {
-                uint8 uiRand = urand(0, 99);
-                if (uiRand < 40)
-                {
-                    player->CastSpell(me, SPELL_FREED_WARSONG_PEON, true);
-                    player->KilledMonsterCredit(NPC_WARSONG_PEON);
-                }
-                else if (uiRand < 80)
-                {
-                    player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
-                }
-            }
+            player->CastSpell(me, captiveSpell, true);
+            player->KilledMonsterCredit(NPC_WARSONG_PEON);
+            return;
         }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
+        // freeing a soldier stacks a hidden debuff on the player, one stack per soldier
+        if (Aura const* freedSoldiers = player->GetAura(SPELL_FREED_SOLDIER_DEBUFF))
+            if (freedSoldiers->GetStackAmount() >= MAX_FREED_SOLDIERS)
+                return;
+
+        player->CastSpell(me, captiveSpell, true);
+    }
+};
+
+// 45522 - Dispel Freed Soldier Debuff
+class spell_dispel_freed_soldier_debuff : public SpellScript
+{
+    PrepareSpellScript(spell_dispel_freed_soldier_debuff);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return new npc_nerubar_victimAI(creature);
+        return ValidateSpellInfo({ SPELL_FREED_SOLDIER_DEBUFF });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
+    {
+        // cast by a freed soldier on its summoner when it leaves
+        GetHitUnit()->RemoveAuraFromStack(SPELL_FREED_SOLDIER_DEBUFF);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dispel_freed_soldier_debuff::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -749,88 +768,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mootoo_the_youngerAI(creature);
-    }
-};
-
-/*######
-## npc_bonker_togglevolt
-######*/
-
-enum BonkerTogglevolt
-{
-    NPC_BONKER_TOGGLEVOLT   = 25589,
-    QUEST_GET_ME_OUTA_HERE  = 11673,
-
-    SAY_BONKER_1            = 0,
-    SAY_BONKER_2            = 1
-};
-
-class npc_bonker_togglevolt : public CreatureScript
-{
-public:
-    npc_bonker_togglevolt() : CreatureScript("npc_bonker_togglevolt") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
-        {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->AI()->Talk(SAY_BONKER_2, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
-        }
-        return true;
-    }
-
-    struct npc_bonker_togglevoltAI : public npc_escortAI
-    {
-        npc_bonker_togglevoltAI(Creature* creature) : npc_escortAI(creature) { }
-        uint32 Bonker_agro;
-
-        void Reset() override
-        {
-            Bonker_agro = 0;
-            SetDespawnAtFar(false);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Player* player = GetPlayerForEscort())
-                player->FailQuest(QUEST_GET_ME_OUTA_HERE);
-        }
-
-        void UpdateEscortAI(uint32 /*diff*/) override
-        {
-            if (GetAttack() && UpdateVictim())
-            {
-                if (Bonker_agro == 0)
-                {
-                    Talk(SAY_BONKER_1);
-                    Bonker_agro++;
-                }
-                DoMeleeAttackIfReady();
-            }
-            else Bonker_agro = 0;
-        }
-
-        using CreatureAI::WaypointReached;
-        void WaypointReached(uint32 waypointId) override
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 29:
-                    player->GroupEventHappens(QUEST_GET_ME_OUTA_HERE, me);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_bonker_togglevoltAI(creature);
     }
 };
 
@@ -1483,12 +1420,12 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
-    new npc_nerubar_victim();
+    RegisterCreatureAI(npc_nerubar_victim);
+    RegisterSpellScript(spell_dispel_freed_soldier_debuff);
     new npc_lurgglbr();
     RegisterSpellScript(spell_arcane_chains_character_force_cast);
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
-    new npc_bonker_togglevolt();
     new npc_valiance_keep_cannoneer();
     new npc_warmage_coldarra();
     new npc_hidden_cultist();
