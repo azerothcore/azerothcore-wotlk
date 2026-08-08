@@ -1484,13 +1484,14 @@ class spell_hodir_toasty_fire_aura : public AuraScript
                 target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
-        // Default proc handling tags Singed with the campfire as original caster, so
-        // every new campfire starts a separate stack on Hodir. Cast as the player instead.
+        // The default handler would credit the campfire (the aura caster) as original caster,
+        // freezing the shared Singed stack's duration once it despawns. Credit the player instead.
         PreventDefaultAction();
+        Unit* player = GetTarget();
         if (Unit* target = eventInfo.GetProcTarget())
-            GetTarget()->CastSpell(target, SPELL_SINGED, true);
+            player->CastSpell(target, SPELL_SINGED, true, nullptr, aurEff, player->GetGUID());
     }
 
     void Register() override
