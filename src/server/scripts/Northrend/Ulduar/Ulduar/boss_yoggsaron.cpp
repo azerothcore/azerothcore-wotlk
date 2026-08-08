@@ -1609,7 +1609,7 @@ struct boss_yoggsaron_death_ray : public NullCreatureAI
                 break;
             case EVENT_DEATH_RAY_ACTIVE:
                 me->CastSpell(me, SPELL_DEATH_RAY_DAMAGE, true);
-                me->CastSpell(nullptr, SPELL_DEATH_RAY_DAMAGE_VISUAL, true);
+                me->CastSpell((Unit*)nullptr, SPELL_DEATH_RAY_DAMAGE_VISUAL, true);
                 events.ScheduleEvent(EVENT_DEATH_RAY_MOVE, 0ms);
                 break;
             case EVENT_DEATH_RAY_MOVE:
