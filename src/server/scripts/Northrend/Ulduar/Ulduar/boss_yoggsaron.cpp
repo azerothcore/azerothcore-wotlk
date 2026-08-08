@@ -1641,10 +1641,10 @@ struct boss_yoggsaron_crusher_tentacle : public ScriptedAI
         me->CastSpell(me, SPELL_DIMINISH_POWER_PROC, true);
 
         // Sniffed: the first Diminish Power starts ~6s after the tentacle emerges
-        scheduler.Schedule(6s, [this](TaskContext /*context*/)
+        me->m_Events.AddEventAtOffset([this]()
         {
             _diminishReady = true;
-        });
+        }, 6s);
     }
 
     bool _diminishReady = false;
@@ -1670,12 +1670,10 @@ struct boss_yoggsaron_crusher_tentacle : public ScriptedAI
             me->RemoveAura(SPELL_SHATTERED_ILLUSION);
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
         if (!UpdateVictim())
             return;
-
-        scheduler.Update(diff);
 
         if (me->IsWithinMeleeRange(me->GetVictim()))
         {
