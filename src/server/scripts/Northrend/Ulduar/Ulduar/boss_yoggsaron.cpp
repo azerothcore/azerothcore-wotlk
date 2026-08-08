@@ -268,6 +268,11 @@ enum Misc
     ACTION_ILLUSION_ICECROWN            = 2,
     ACTION_ILLUSION_STORMWIND           = 3,
 
+    // creature_summon_groups for the brain (33890)
+    SUMMON_GROUP_CHAMBER_TENTACLES      = 1,
+    SUMMON_GROUP_ICECROWN_TENTACLES     = 2,
+    SUMMON_GROUP_STORMWIND_TENTACLES    = 3,
+
     // ACTION_SARA_UPDATE_SUMMON_KEEPERS = 4, // defined in ulduar.h
 
     EVENT_PHASE_ONE                     = 1,
@@ -1326,6 +1331,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
     {
         me->SetDisableGravity(true);
         _tentacleCount = 0;
+        _tentacleTotal = 0;
         _activeIllusion = 0;
         _induceTimer = 0;
         _brainDamaged = false;
@@ -1334,6 +1340,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
 
     bool _brainDamaged;
     uint8 _tentacleCount;
+    uint8 _tentacleTotal;
     uint8 _activeIllusion;
     uint32 _induceTimer;
     SummonList summons;
@@ -1343,6 +1350,8 @@ struct boss_yoggsaron_brain : public NullCreatureAI
     {
         if (cr->GetEntry() == NPC_INFLUENCE_TENTACLE)
         {
+            ++_tentacleTotal;
+
             // Dragons Illusion
             if (cr->GetPositionX() > 2000.0f && cr->GetPositionX() < 2150.0f)
                 cr->UpdateEntry(urand(NPC_CONSORT_FIRST, NPC_CONSORT_LAST));
@@ -1364,13 +1373,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
 
     void PrepareChamberIllusion()
     {
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2126.13f, -65.488f, 239.721f, 1.99171f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2141.05f, -50.5146f, 239.751f, 2.72998f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2148.83f, -23.9568f, 239.721f, 3.04807f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2064.39f, -42.0691f, 239.719f, 0.0949586f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2064.29f, -7.13128f, 239.756f, 5.96974f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2117.31f, 14.897f, 239.731f, 4.32041f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2136.7f, 2.43262f, 239.72f, 3.90023f);
+        me->SummonCreatureGroup(SUMMON_GROUP_CHAMBER_TENTACLES);
 
         // Laughing Skulls
         if (urand(0, 1))
@@ -1413,13 +1416,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
             me->SummonCreature(NPC_LAUGHING_SKULL, 1921, -158, 240, 0);
 
         // Influence
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1958.29f, -128.65f, 239.99f, 3.61293f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1957.78f, -134.368f, 239.99f, 3.35375f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1953.04f, -137.843f, 239.99f, 3.55796f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1900.31f, -93.5241f, 239.99f, 4.50043f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1895.03f, -98.0773f, 239.99f, 4.88135f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1895.19f, -104.587f, 239.99f, 5.02271f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1923.31f, -125.98f, 240, 4.2f);
+        me->SummonCreatureGroup(SUMMON_GROUP_ICECROWN_TENTACLES);
 
         // Others
         me->SummonCreature(NPC_LICH_KING, 1906.98f, -153, 240, 4.2f);
@@ -1444,13 +1441,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
         me->SummonCreature(NPC_LAUGHING_SKULL, 1963.68f, 89.7549f, 239.667f, 3.70571f);
 
         // Influence
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1931.41f, 39.0711f, 239.66f, 1.82467f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1908.67f, 45.5867f, 239.666f, 0.72119f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1897.68f, 66.1274f, 239.666f, 6.27395f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1950.73f, 49.3446f, 239.666f, 2.63756f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1923.16f, 97.5586f, 239.666f, 4.74635f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1956.16f, 72.1403f, 239.666f, 3.19518f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1944.81f, 92.3154f, 239.666f, 4.03556f);
+        me->SummonCreatureGroup(SUMMON_GROUP_STORMWIND_TENTACLES);
 
         // Others
         me->SummonCreature(NPC_GARONA, 1928.58f, 65.64f, 242.37f, 2.1f);
@@ -1477,7 +1468,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
         else if (param == ACTION_INFLUENCE_TENTACLE_DIED)
         {
             _tentacleCount++;
-            if (_tentacleCount >= 7 /*TENTACLES COUNT*/)
+            if (_tentacleCount >= _tentacleTotal)
             {
                 // Stun
                 if (me->GetInstanceScript())
@@ -1495,6 +1486,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
             return;
 
         summons.DespawnAll();
+        _tentacleTotal = 0;
         switch (param)
         {
             case ACTION_ILLUSION_STORMWIND:
@@ -1529,7 +1521,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (_tentacleCount < 7) // if all tentacles aren't killed
+        if (!_tentacleTotal || _tentacleCount < _tentacleTotal) // if all tentacles aren't killed
         {
             damage = 0;
             if (who)
