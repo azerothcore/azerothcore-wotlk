@@ -1483,6 +1483,33 @@ class spell_gen_clear_debuffs : public SpellScript
     }
 };
 
+enum ClearDemonicCircle
+{
+    SPELL_DEMONIC_CIRCLE_SUMMON = 48018
+};
+
+// 62037 - Clear Demonic Circle
+class spell_gen_clear_demonic_circle : public SpellScript
+{
+    PrepareSpellScript(spell_gen_clear_demonic_circle);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DEMONIC_CIRCLE_SUMMON });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            target->RemoveAurasDueToSpell(SPELL_DEMONIC_CIRCLE_SUMMON);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_clear_demonic_circle::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 enum CreateLanceSpells
 {
     SPELL_CREATE_LANCE_ALLIANCE = 63914,
@@ -6225,6 +6252,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_burn_brutallus);
     RegisterSpellScript(spell_gen_cannibalize);
     RegisterSpellScript(spell_gen_clear_debuffs);
+    RegisterSpellScript(spell_gen_clear_demonic_circle);
     RegisterSpellScript(spell_gen_create_lance);
     RegisterSpellScript(spell_gen_netherbloom);
     RegisterSpellScript(spell_gen_nightmare_vine);

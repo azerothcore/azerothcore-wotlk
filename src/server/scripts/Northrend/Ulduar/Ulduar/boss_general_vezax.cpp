@@ -41,6 +41,7 @@ enum VezaxSpellData
     SPELL_MARK_OF_THE_FACELESS_AURA             = 63276,
     SPELL_MARK_OF_THE_FACELESS_EFFECT           = 63278,
 
+    SPELL_CLEAR_DEMONIC_CIRCLE                  = 62037,
     SPELL_AURA_OF_DESPAIR_1                     = 62692,
     SPELL_AURA_OF_DESPAIR_2                     = 64848,
     SPELL_CORRUPTED_RAGE                        = 68415,
@@ -145,6 +146,7 @@ struct boss_vezax : public BossAI
 
         Talk(SAY_AGGRO);
 
+        me->CastSpell(me, SPELL_CLEAR_DEMONIC_CIRCLE, true);
         me->CastSpell(me, SPELL_AURA_OF_DESPAIR_1, true);
     }
 
