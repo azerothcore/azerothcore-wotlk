@@ -100,11 +100,8 @@ enum VezaxText
     SAY_EMOTE_ANIMUS                     = 6,
     SAY_EMOTE_BARRIER                    = 7,
     SAY_EMOTE_SURGE_OF_DARKNESS          = 8,
-};
-
-enum VaporsText
-{
-    SAY_EMOTE_VAPORS    = 0,
+    SAY_EMOTE_BARRIER_FADE               = 9,
+    SAY_EMOTE_VAPORS                     = 10,
 };
 
 struct boss_vezax : public BossAI
@@ -158,6 +155,7 @@ struct boss_vezax : public BossAI
                 hardmodeAvailable = false;
                 break;
             case 2:
+                Talk(SAY_EMOTE_BARRIER_FADE);
                 me->RemoveAura(SPELL_SARONITE_BARRIER);
                 me->SetLootMode(3);
                 break;
@@ -269,6 +267,7 @@ struct boss_vezax : public BossAI
                 {
                     vaporsCount++;
                     me->CastSpell(me, SPELL_SUMMON_SARONITE_VAPORS, false);
+                    Talk(SAY_EMOTE_VAPORS);
 
                     if (vaporsCount < 6 || !hardmodeAvailable)
                         events.Repeat(30s);
@@ -353,11 +352,6 @@ struct npc_ulduar_saronite_vapors : public NullCreatureAI
         if (_instance)
             if (Creature* vezax = _instance->GetCreature(BOSS_VEZAX))
                 vezax->AI()->DoAction(1);
-    }
-
-    void IsSummonedBy(WorldObject* /*summoner*/) override
-    {
-        Talk(SAY_EMOTE_VAPORS);
     }
 };
 
