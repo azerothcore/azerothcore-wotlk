@@ -4476,7 +4476,7 @@ class spell_gen_whisper_gulch_yogg_saron_whisper : public AuraScript
     }
 };
 
-// 50630, 68576 - Eject All Passengers
+// 50630, 51254, 68576 - Eject All Passengers
 class spell_gen_eject_all_passengers : public SpellScript
 {
     PrepareSpellScript(spell_gen_eject_all_passengers);
