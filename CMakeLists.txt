@@ -146,16 +146,19 @@ endif()
 CU_RUN_HOOK("AFTER_SRC_LOAD")
 
 if (BUILD_TESTING AND BUILD_APPLICATION_WORLDSERVER)
-    # we use these flags to get code coverage
-    set(UNIT_TEST_CXX_FLAGS "-fprofile-arcs -ftest-coverage -fno-inline")
+    # we use these flags to get code coverage. gcov only, and they land in the global
+    # CMAKE_CXX_FLAGS, so MSVC would get them on every target of the build
+    if ( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" )
+        set(UNIT_TEST_CXX_FLAGS "-fprofile-arcs -ftest-coverage -fno-inline")
 
-    # enable additional flags for GCC.
-    if ( CMAKE_CXX_COMPILER_ID MATCHES GNU )
-        set(UNIT_TEST_CXX_FLAGS "${UNIT_TEST_CXX_FLAGS} -fno-inline-small-functions -fno-default-inline")
+        # enable additional flags for GCC.
+        if ( CMAKE_CXX_COMPILER_ID MATCHES GNU )
+            set(UNIT_TEST_CXX_FLAGS "${UNIT_TEST_CXX_FLAGS} -fno-inline-small-functions -fno-default-inline")
+        endif()
+
+        message("Unit tests code coverage: enabling ${UNIT_TEST_CXX_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${UNIT_TEST_CXX_FLAGS}")
     endif()
-
-    message("Unit tests code coverage: enabling ${UNIT_TEST_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${UNIT_TEST_CXX_FLAGS}")
 
     include(src/cmake/googletest.cmake)
     fetch_googletest(
