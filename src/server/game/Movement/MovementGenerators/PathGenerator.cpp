@@ -1202,6 +1202,64 @@ bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
     return (target->GetPositionZ() - GetActualEndPosition().z) > 5.0f;
 }
 
+bool PathGenerator::HasWalkableNavmeshAt(G3D::Vector3 const& point, G3D::Vector3& snappedPoint) const
+{
+    // findNearestPoly only proves ground exists somewhere in the search box. A tight vertical
+    // extent is what confirms the point itself is near footing, not just above a distant floor.
+    float const navPoint[VERTEX_SIZE] = { point.y, point.z, point.x };
+    float const extents[VERTEX_SIZE] = { 2.5f, 3.0f, 2.5f };
+    float closestPoint[VERTEX_SIZE];
+    dtPolyRef polyRef = INVALID_POLYREF;
+    dtStatus const status = _navMeshQuery->findNearestPoly(navPoint, extents, &_filter, &polyRef, closestPoint);
+    if (!dtStatusSucceed(status) || polyRef == INVALID_POLYREF)
+        return false;
+
+    snappedPoint = G3D::Vector3(closestPoint[2], closestPoint[0], closestPoint[1]);
+    return true;
+}
+
+void PathGenerator::ShortenPathUntilSafeGround()
+{
+    if (GetPathType() == PATHFIND_BLANK || _pathPoints.size() < 2)
+        return;
+
+    G3D::Vector3 const start = _pathPoints[0];
+
+    // BuildShortcut's NormalizePath already snapped the endpoint down to whatever ground sits
+    // below the target's XY, which over a gap is a floor dozens of yards down. Walk back from
+    // GetActualEndPosition instead, still the original unsnapped target.
+    G3D::Vector3 const end = GetActualEndPosition();
+
+    // nothing to do if the endpoint is already confirmed near real walkable navmesh
+    G3D::Vector3 snapped;
+    if (HasWalkableNavmeshAt(end, snapped))
+        return;
+
+    float const totalDist = (end - start).length();
+    if (totalDist < 2.0f)
+    {
+        _pathPoints.resize(1);
+        return;
+    }
+
+    G3D::Vector3 const dir = (end - start).direction();
+    constexpr float step = 2.0f;
+
+    for (float travelled = totalDist - step; travelled > 0.0f; travelled -= step)
+    {
+        G3D::Vector3 const candidate = start + dir * travelled;
+        if (HasWalkableNavmeshAt(candidate, snapped))
+        {
+            _pathPoints.resize(1);
+            _pathPoints.push_back(snapped);
+            return;
+        }
+    }
+
+    // no safe ground found anywhere along the path - don't move the caster at all
+    _pathPoints.resize(1);
+}
+
 void PathGenerator::AddFarFromPolyFlags(bool startFarFromPoly, bool endFarFromPoly)
 {
     if (startFarFromPoly)

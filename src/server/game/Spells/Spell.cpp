@@ -6270,7 +6270,23 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if not in a straight line
                             return SPELL_FAILED_NOPATH;
 
-                        m_preGeneratedPath->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), objSize); // move back
+                        // A straight line can come back as PATHFIND_NORMAL with neither end on real
+                        // navmesh. While falling it is usually the caster's own position that is far
+                        // from a poly, so both flags need checking - that is what let charging
+                        // Kologarn mid-jump end over open space (issue #26266). Walk the line back
+                        // to confirmed ground and charge only that far.
+                        if (m_preGeneratedPath->GetPathType() & PATHFIND_FARFROMPOLY)
+                        {
+                            m_preGeneratedPath->ShortenPathUntilSafeGround();
+                            if (m_preGeneratedPath->GetPath().size() < 2)
+                                return SPELL_FAILED_NOPATH;
+                        }
+
+                        // still back off by the target's combat reach: the path above may not have
+                        // been touched at all and would otherwise end exactly on the target
+                        G3D::Vector3 const targetPos(target->GetPositionX(), target->GetPositionY(),
+                            target->GetPositionZ());
+                        m_preGeneratedPath->ShortenPathUntilDist(targetPos, objSize); // move back
                     }
                     if (Player* player = m_caster->ToPlayer())
                         player->SetCanTeleport(true);
