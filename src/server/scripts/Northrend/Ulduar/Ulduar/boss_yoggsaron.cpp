@@ -274,9 +274,6 @@ enum Misc
     DATA_YOGG_SARON_HEALTH              = 5,
 };
 
-// Cast time of 63147, 63134 and 63138; the P1 spell timer runs cast start to cast start
-constexpr Milliseconds SARA_P1_SPELL_CAST_TIME = 4s;
-
 struct LocationsXY
 {
     float x, y, z;
@@ -912,8 +909,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
                     }
 
                     me->CastCustomSpell(spell, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
-                    // Sniffed: steady ~4.9s start-to-start, the cast plus a ~1s gap
-                    events.Repeat(SARA_P1_SPELL_CAST_TIME + 900ms);
+                    // Sniffed: steady ~4.9s start-to-start, the 4s cast plus a ~1s gap
+                    events.Repeat(4900ms);
                     break;
                 }
             case EVENT_SARA_P2_START:
