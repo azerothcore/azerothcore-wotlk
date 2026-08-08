@@ -271,6 +271,7 @@ enum Misc
     DATA_GET_CURRENT_ILLUSION           = 2,
     DATA_GET_SARA_PHASE                 = 3,
     DATA_GET_DRIVE_ME_CRAZY             = 4,
+    DATA_YOGG_SARON_HEALTH              = 5,
 };
 
 struct LocationsXY
@@ -1254,6 +1255,12 @@ struct boss_yoggsaron : public ScriptedAI
         return 0;
     }
 
+    void SetData(uint32 param, uint32 value) override
+    {
+        if (param == DATA_YOGG_SARON_HEALTH)
+            me->SetHealth(me->GetMaxHealth() * value / 100.0f);
+    }
+
     void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
@@ -1433,6 +1440,13 @@ struct boss_yoggsaron_brain : public NullCreatureAI
 
         // Yogg Vision
         me->SummonCreature(NPC_YOGG_SARON_VISION, 1929.160f, 67.75694f, 221.7322f, 0);
+    }
+
+    void OnSpellCast(SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_INDUCE_MADNESS)
+            if (Creature* yogg = me->GetInstanceScript()->GetCreature(BOSS_YOGGSARON))
+                yogg->AI()->SetData(DATA_YOGG_SARON_HEALTH, static_cast<uint32>(me->GetHealthPct()));
     }
 
     void DoAction(int32 param) override
