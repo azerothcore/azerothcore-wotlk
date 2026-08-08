@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -108,6 +109,7 @@ enum YoggSpells
     // CRUSHER TENTACLE
     SPELL_CRUSH                         = 64146,
     SPELL_DIMINISH_POWER                = 64145,
+    SPELL_DIMINISH_POWER_PROC           = 64148,
     SPELL_FOCUSED_ANGER                 = 57688,
 
     // CONSTRICTOR TENTACLE
@@ -1642,6 +1644,7 @@ struct boss_yoggsaron_crusher_tentacle : public ScriptedAI
         me->SetCombatMovement(false);
         me->CastSpell(me, SPELL_CRUSH, true);
         me->CastSpell(me, SPELL_FOCUSED_ANGER, true);
+        me->CastSpell(me, SPELL_DIMINISH_POWER_PROC, true);
         me->CastSpell(me, SPELL_DIMINISH_POWER, false);
     }
 
@@ -1657,7 +1660,6 @@ struct boss_yoggsaron_crusher_tentacle : public ScriptedAI
             DoResetThreatList();
             me->AddThreat(who, 100000);
             AttackStart(who);
-            me->InterruptNonMeleeSpells(false);
         }
     }
 
@@ -2320,6 +2322,28 @@ class spell_yogg_saron_malady_of_the_mind_aura : public AuraScript
     void Register() override
     {
         OnEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_malady_of_the_mind_aura::OnRemove, EFFECT_1, SPELL_AURA_MOD_FEAR, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 64148 - Diminsh Power
+class spell_yogg_saron_diminish_power_aura : public AuraScript
+{
+    PrepareAuraScript(spell_yogg_saron_diminish_power_aura);
+
+    // Serverside proc (no triggered spell in DBC): taken melee hits and melee
+    // abilities break the Diminish Power channel. Sniffed: only the active
+    // channel breaks, the initial 1.5s cast is not interruptible by damage
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        if (Spell* spell = GetTarget()->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            if (spell->getState() == SPELL_STATE_CASTING)
+                GetTarget()->InterruptSpell(CURRENT_CHANNELED_SPELL);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_yogg_saron_diminish_power_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -3066,6 +3090,7 @@ void AddSC_boss_yoggsaron()
 
     // SPELLS
     RegisterSpellScript(spell_yogg_saron_malady_of_the_mind_aura);
+    RegisterSpellScript(spell_yogg_saron_diminish_power_aura);
     RegisterSpellAndAuraScriptPair(spell_yogg_saron_brain_link, spell_yogg_saron_brain_link_aura);
     RegisterSpellScript(spell_yogg_saron_shadow_beacon_aura);
     RegisterSpellScript(spell_yogg_saron_destabilization_matrix);
