@@ -31,6 +31,12 @@ target_link_libraries(
         game-interface
 )
 
+# unit_tests does not link acore-compile-option-interface, so it misses NOMINMAX
+# and windows.h shadows std::min/std::max in GridDefines.h.
+if(MSVC)
+    target_compile_definitions(unit_tests PRIVATE NOMINMAX)
+endif()
+
 # Add module test sources if any modules registered tests
 get_property(MODULE_TEST_SOURCES GLOBAL PROPERTY ACORE_MODULE_TEST_SOURCES)
 get_property(MODULE_TEST_INCLUDES GLOBAL PROPERTY ACORE_MODULE_TEST_INCLUDES)
