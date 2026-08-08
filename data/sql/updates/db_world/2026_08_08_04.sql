@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_03 -> 2026_08_08_04
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 45522;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (45522, 'spell_dispel_freed_soldier_debuff');
