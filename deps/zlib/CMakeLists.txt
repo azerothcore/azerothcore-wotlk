@@ -10,10 +10,36 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-if(UNIX)
-  # Look for an installed zlib on unix
-  find_package(ZLIB REQUIRED)
+# some Win32 builds of deps that might be needed for other modules will include
+# their own vendored zlib. when that happens, they should also be providing the
+# includes, so we can let the module disable this part of our own build with
+# just the one property that we check for.
+CU_GET_GLOBAL(ZLIB_EXTERNAL_INCLUDE_DIR)
+CU_GET_GLOBAL(ZLIB_EXTERNAL_IMPLIB)
+if(ZLIB_EXTERNAL_INCLUDE_DIR AND ZLIB_EXTERNAL_IMPLIB)
+  add_library(zlib SHARED IMPORTED GLOBAL)
 
+  set_target_properties(zlib
+    PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES
+        "${ZLIB_EXTERNAL_INCLUDE_DIR}"
+      IMPORTED_IMPLIB
+        "${ZLIB_EXTERNAL_IMPLIB}")
+
+  set(ZLIB_FOUND ON PARENT_SCOPE)
+  return()
+endif()
+
+if(UNIX)
+  # Look for an installed zlib on unix, and require it to exist
+  find_package(ZLIB REQUIRED)
+else()
+  # Also look for installed zlib on other platforms, but we can fall back.
+  find_package(ZLIB)
+endif()
+
+set(ZLIB_FOUND ${ZLIB_FOUND} PARENT_SCOPE)
+if(ZLIB_FOUND)
   add_library(zlib SHARED IMPORTED GLOBAL)
 
   set_target_properties(zlib
