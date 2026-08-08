@@ -264,8 +264,8 @@ struct boss_vezax : public BossAI
             case EVENT_SPELL_SUMMON_SARONITE_VAPORS:
                 {
                     vaporsCount++;
-                    Talk(SAY_EMOTE_VAPORS);
                     me->CastSpell(me, SPELL_SUMMON_SARONITE_VAPORS, false);
+                    Talk(SAY_EMOTE_VAPORS);
 
                     if (vaporsCount < 6 || !hardmodeAvailable)
                         events.Repeat(30s);
