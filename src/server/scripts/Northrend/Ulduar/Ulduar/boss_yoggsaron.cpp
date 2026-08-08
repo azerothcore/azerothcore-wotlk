@@ -930,7 +930,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
                     }
 
                     me->CastCustomSpell(spell, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
-                    events.Repeat(me->GetMap()->Is25ManRaid() ? randtime(0ms, 3s) : randtime(4s, 6s));
+                    // Sniffed: steady ~4.9s start-to-start, the 4s cast plus a ~1s gap
+                    events.Repeat(4900ms);
                     break;
                 }
             case EVENT_SARA_P2_START:
