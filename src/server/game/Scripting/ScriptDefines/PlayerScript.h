@@ -90,6 +90,7 @@ enum PlayerHook
     PLAYERHOOK_ON_BEING_CHARMED,
     PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT,
     PLAYERHOOK_ON_AFTER_MOVE_ITEM_FROM_INVENTORY,
+    PLAYERHOOK_ON_AFTER_MOVE_ITEM_TO_INVENTORY,
     PLAYERHOOK_ON_EQUIP,
     PLAYERHOOK_ON_UNEQUIP_ITEM,
     PLAYERHOOK_ON_PLAYER_JOIN_BG,
@@ -406,6 +407,9 @@ public:
 
     // After an item has been moved from inventory
     virtual void OnPlayerAfterMoveItemFromInventory(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
+
+    // After an item has been moved to inventory
+    virtual void OnPlayerAfterMoveItemToInventory(Player* /*player*/, Item* /*it*/, bool /*update*/) { }
 
     // After an item has been equipped
     virtual void OnPlayerEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
