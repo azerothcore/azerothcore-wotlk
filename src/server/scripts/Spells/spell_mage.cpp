@@ -1143,6 +1143,14 @@ class spell_mage_gen_extra_effects : public AuraScript
                 (spellInfo->SpellFamilyFlags[0] & 0x00000800)) // Arcane Missiles
                 return false;
         }
+
+        // T8 4P bonus: chance to keep the proc instead of spending it. Player::RemoveSpellMods
+        // has this too, but it bails out for anything with a spell_proc entry, which these have,
+        // so the charge is spent through the proc system and never reaches that check.
+        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MAGE_T8_4P_BONUS, EFFECT_0))
+            if (roll_chance_i(aurEff->GetAmount()))
+                return false;
+
         return true;
     }
 
