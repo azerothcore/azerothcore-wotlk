@@ -11,9 +11,8 @@
 #
 
 # some Win32 builds of deps that might be needed for other modules will include
-# their own vendored zlib. when that happens, they should also be providing the
-# includes, so we can let the module disable this part of our own build with
-# just the one property that we check for.
+# their own vendored zlib, Node.js being the initial example. to avoid linker
+# conflicts, let them override ours by setting these globals.
 CU_GET_GLOBAL(ZLIB_EXTERNAL_INCLUDE_DIR)
 CU_GET_GLOBAL(ZLIB_EXTERNAL_IMPLIB)
 if(ZLIB_EXTERNAL_INCLUDE_DIR AND ZLIB_EXTERNAL_IMPLIB)
