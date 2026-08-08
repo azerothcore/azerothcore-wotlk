@@ -18,6 +18,7 @@
 #include "GridNotifiers.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -1258,7 +1259,48 @@ class spell_sha_thunderstorm : public SpellScript
     {
         // Glyph of Thunderstorm
         if (GetCaster()->HasAura(SPELL_SHAMAN_GLYPH_OF_THUNDERSTORM))
+        {
             PreventHitDefaultEffect(effIndex);
+            return;
+        }
+
+        Unit* target = GetHitUnit();
+        Player* playerTarget = target ? target->ToPlayer() : nullptr;
+        if (!playerTarget)
+            return;
+
+        constexpr float knockBackSpeedRatio = 0.1f;
+        constexpr float minKnockBackSpeed = 0.1f;
+        float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * knockBackSpeedRatio;
+        float speedZ = float(GetEffectValue()) * knockBackSpeedRatio;
+        if (speedXY <= minKnockBackSpeed || speedZ <= minKnockBackSpeed)
+            return;
+
+        PreventHitDefaultEffect(effIndex);
+
+        if ((target->IsVehicle() && target->GetCreatureType() != CREATURE_TYPE_BEAST) || target->GetVehicle())
+            return;
+
+        if (target->HasUnitState(UNIT_STATE_ROOT))
+            return;
+
+        if (target->IsNonMeleeSpellCast(true))
+            target->InterruptNonMeleeSpells(true);
+
+        // DBC value is 6.0f for generic knowback, but it seems like it's to low for thunderstorm in PVP.
+        constexpr float thunderstormMinPlayerSpeedZ = 8.5f;
+        if (speedZ < thunderstormMinPlayerSpeedZ)
+        {
+            speedXY *= speedZ / thunderstormMinPlayerSpeedZ;
+            speedZ = thunderstormMinPlayerSpeedZ;
+        }
+
+        float x, y;
+        GetCaster()->GetPosition(x, y);
+
+        target->StopMoving();
+        target->KnockbackFrom(x, y, speedXY, speedZ);
+        sScriptMgr->AnticheatSetUnderACKmount(playerTarget);
     }
 
     void Register() override
