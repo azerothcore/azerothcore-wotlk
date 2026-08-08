@@ -157,11 +157,11 @@ ObjectData const gameobjectData[] =
     { GO_MIMIRON_CALL_TRAM_MIMIRON,     DATA_MIMIRON_CALL_TRAM_MIMIRON  },
     { GO_DOODAD_UL_TRAIN_TURNAROUND01,  DATA_MIMIRON_TRAM_TURNAROUND_1  },
     { GO_DOODAD_UL_TRAIN_TURNAROUND02,  DATA_MIMIRON_TRAM_TURNAROUND_2  },
-    // Hodir chests (dynamically spawned, one per difficulty)
-    { GO_HODIR_CHEST_NORMAL,             DATA_HODIR_CHEST_NORMAL         },
-    { GO_HODIR_CHEST_NORMAL_HERO,        DATA_HODIR_CHEST_NORMAL_HERO    },
-    { GO_HODIR_CHEST_HARD,               DATA_HODIR_CHEST_HARD           },
-    { GO_HODIR_CHEST_HARD_HERO,          DATA_HODIR_CHEST_HARD_HERO      },
+    // Hodir loot chests (DB-spawned, filtered by spawnMask per difficulty)
+    { GO_HODIR_CHEST_NORMAL,            DATA_HODIR_CHEST_NORMAL         },
+    { GO_HODIR_CHEST_NORMAL_HERO,       DATA_HODIR_CHEST_NORMAL_HERO    },
+    { GO_HODIR_CHEST_HARD,              DATA_HODIR_CHEST_HARD           },
+    { GO_HODIR_CHEST_HARD_HERO,         DATA_HODIR_CHEST_HARD_HERO      },
     { 0,                                0                               }
 };
 
@@ -208,8 +208,6 @@ public:
 
         // Hodir
         bool _hmHodir;
-        Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
-        Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
         // Ancient Gate
         Position const triggerAncientGatePosition = { 1883.65f, 269.272f, 418.406f };
@@ -412,73 +410,6 @@ public:
             return true;
         }
 
-        void SpawnHodirChests(Difficulty diff, Creature* hodir)
-        {
-            switch (diff)
-            {
-                case RAID_DIFFICULTY_10MAN_NORMAL: // 10 man chest
-                {
-                    if (!GetObjectGuid(DATA_HODIR_CHEST_NORMAL))
-                    {
-                        if (GameObject* go = hodir->SummonGameObject(
-                            GO_HODIR_CHEST_NORMAL,
-                            normalChestPosition.GetPositionX(),
-                            normalChestPosition.GetPositionY(),
-                            normalChestPosition.GetPositionZ(),
-                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                        {
-                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                        }
-                    }
-                    if (!GetObjectGuid(DATA_HODIR_CHEST_HARD))
-                    {
-                        if (GameObject* go = hodir->SummonGameObject(
-                            GO_HODIR_CHEST_HARD,
-                            hardChestPosition.GetPositionX(),
-                            hardChestPosition.GetPositionY(),
-                            hardChestPosition.GetPositionZ(),
-                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                        {
-                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                            _hmHodir = true;
-                        }
-                    }
-                    break;
-                }
-                case RAID_DIFFICULTY_25MAN_NORMAL: // 25 man chest
-                {
-                    if (!GetObjectGuid(DATA_HODIR_CHEST_NORMAL_HERO))
-                    {
-                        if (GameObject* go = hodir->SummonGameObject(
-                            GO_HODIR_CHEST_NORMAL_HERO,
-                            normalChestPosition.GetPositionX(),
-                            normalChestPosition.GetPositionY(),
-                            normalChestPosition.GetPositionZ(),
-                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                        {
-                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                        }
-                    }
-                    if (!GetObjectGuid(DATA_HODIR_CHEST_HARD_HERO))
-                    {
-                        if (GameObject* go = hodir->SummonGameObject(
-                            GO_HODIR_CHEST_HARD_HERO,
-                            hardChestPosition.GetPositionX(),
-                            hardChestPosition.GetPositionY(),
-                            hardChestPosition.GetPositionZ(),
-                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                        {
-                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                            _hmHodir = true;
-                        }
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-
         void OnCreatureCreate(Creature* creature) override
         {
             InstanceScript::OnCreatureCreate(creature);
@@ -492,12 +423,6 @@ public:
                         creature->SetPosition(creature->GetHomePosition());
                         creature->setDeathState(DeathState::JustDied);
                         creature->StopMovingOnCurrentPos();
-                    }
-                    break;
-                case NPC_HODIR:
-                    if (GetBossState(BOSS_HODIR) != DONE)
-                    {
-                        SpawnHodirChests(instance->GetDifficulty(), creature);
                     }
                     break;
                 case NPC_ALGALON:
@@ -602,6 +527,18 @@ public:
                 case GO_SNOW_MOUND:
                     gameObject->EnableCollision(false);
                     break;
+                // Hodir loot chests: spawned locked via gameobject_template_addon,
+                // unlocked by setChestsLootable() when the encounter is defeated
+                case GO_HODIR_CHEST_NORMAL:
+                case GO_HODIR_CHEST_NORMAL_HERO:
+                case GO_HODIR_CHEST_HARD:
+                case GO_HODIR_CHEST_HARD_HERO:
+                    if (GetBossState(BOSS_HODIR) == DONE)
+                    {
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                        gameObject->SetLootRecipient(instance);
+                    }
+                    break;
                 // Mimiron Tram
                 case GO_MIMIRON_TRAM:
                     if (GetBossState(BOSS_MIMIRON) == DONE)
@@ -684,7 +621,7 @@ public:
                     if (GameObject* go = GetHodirChest(true))
                     {
                         _hmHodir = false;
-                        go->Delete();
+                        go->DespawnOrUnsummon(0ms, 7_days);
                     }
                     break;
                 case DATA_MAGE_BARRIER:
