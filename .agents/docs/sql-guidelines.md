@@ -10,8 +10,8 @@ Run the linter before claiming a change is done: `python apps/codestyle/codestyl
 
 ## Data conventions
 
-- `smart_scripts` edits always rewrite the full `entryorguid` block (`DELETE` + `INSERT` of every row) — never a partial `UPDATE`, not even for a comment-only fix.
-- `creature_immunities`: immunity sets are single-reference. Before minting a new id, check whether an existing set already matches; to extend a creature's immunities, create a superset instead of editing a shared set. Negative ids are curated — don't allocate them.
+- `smart_scripts` edits always rewrite the full block — `DELETE` + `INSERT` of every row for the `(entryorguid, source_type)` pair, with the `DELETE` matching both columns — never a partial `UPDATE`, not even for a comment-only fix.
+- `creature_immunities`: negative ids are curated shared sets — reference them via `creature_template.CreatureImmunitiesId`, never edit them or allocate new ones. Positive ids are single-creature sets — reuse an existing set only on an exact match; to extend a creature's immunities, insert a superset under a new id and point the creature's `CreatureImmunitiesId` at it.
 
 ## The three databases
 

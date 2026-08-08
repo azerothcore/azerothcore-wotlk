@@ -17,6 +17,6 @@ Then declare and call `AddSC_<name>()` from the regional loader (`Spells/spells_
 - A `SpellScript`/`AuraScript` without a matching `spell_script_names` row is inert — ship the binding SQL update in the same change as the C++ registration.
 - Never add `UNIT_FLAG*` / `UNIT_FLAG2*` / `UNIT_DYNFLAG*` values without sniff or upstream evidence; the same flag used in another script is not evidence.
 - Trigger NPCs (`creature_template.flags_extra` 0x80) have no threat list — `SelectTarget` / `AddThreat` / `UpdateVictim` chains on them silently do nothing. A never-evading helper NPC left on a boss's threatened-by list also stalls the boss's evade/reset forever; make such helpers `IMMUNE_TO_NPC`.
-- A spell id missing from Wowhead only proves it is not client-side — check the world DB's `spell_dbc` table before concluding a sniffed id doesn't exist.
+- A spell id missing from Wowhead is inconclusive — check the world DB's `spell_dbc` table (server-side spells) before concluding a sniffed id doesn't exist.
 
 Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).
