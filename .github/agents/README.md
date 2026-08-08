@@ -19,18 +19,19 @@ The PR Reviewer agent is configured to review pull requests with deep understand
 - Testing and validation requirements
 - Security and quality standards
 
-**Key Feature**: This agent always references `/AGENTS.md`, the C++ Code Standards wiki, and the SQL Standards wiki before reviewing any PR.
+**Key Feature**: This agent always references `/AGENTS.md`, the matching `.agents/docs/*.md` task guides, the C++ Code Standards wiki, and the SQL Standards wiki before reviewing any PR.
 
 ## How It Works
 
 When an AI tool reviews a PR in this repository:
 
 1. The tool reads the appropriate agent configuration from this directory
-2. The agent configuration instructs it to read `/AGENTS.md` for full project context
-3. For C++ changes, the agent also references the [C++ Code Standards wiki](https://github.com/azerothcore/wiki/blob/master/docs/cpp-code-standards.md)
-4. For SQL changes, the agent also references the [SQL Standards wiki](https://github.com/azerothcore/wiki/blob/master/docs/sql-standards.md)
-5. The agent applies project-specific rules during review
-6. Feedback is provided following the project's conventions and standards
+2. The agent configuration instructs it to read `/AGENTS.md` for project context and per-task routing
+3. Per AGENTS.md's "Mandatory reading per task", it reads the `.agents/docs/*.md` guides matching what the PR touches
+4. For C++ changes, the agent also references the [C++ Code Standards wiki](https://github.com/azerothcore/wiki/blob/master/docs/cpp-code-standards.md)
+5. For SQL changes, the agent also references the [SQL Standards wiki](https://github.com/azerothcore/wiki/blob/master/docs/sql-standards.md)
+6. The agent applies project-specific rules during review
+7. Feedback is provided following the project's conventions and standards
 
 ## For Contributors
 
