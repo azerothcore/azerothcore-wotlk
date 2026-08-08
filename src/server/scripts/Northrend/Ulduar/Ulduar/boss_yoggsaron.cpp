@@ -264,9 +264,6 @@ enum Misc
 
     CRITERIA_NOT_GETTING_OLDER          = 21001,
 
-    // Cast time of 63147, 63134 and 63138; the P1 spell timer runs cast start to cast start
-    SARA_P1_SPELL_CAST_TIME_MS          = 4000,
-
     // YOGG-SARON (laugh)
     YS_P3_LUNATIC_GAZE                  = 15757,
 
@@ -277,6 +274,7 @@ enum Misc
     DATA_YOGG_SARON_HEALTH              = 5,
 };
 
+// Cast time of 63147, 63134 and 63138; the P1 spell timer runs cast start to cast start
 constexpr Milliseconds SARA_P1_SPELL_CAST_TIME = 4s;
 
 struct LocationsXY
@@ -914,7 +912,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
                     }
 
                     me->CastCustomSpell(spell, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
-                    events.Repeat(SARA_P1_SPELL_CAST_TIME + (me->GetMap()->Is25ManRaid() ? 2s : 4s));
+                    // Sniffed: steady ~4.9s start-to-start, the cast plus a ~1s gap
+                    events.Repeat(SARA_P1_SPELL_CAST_TIME + 900ms);
                     break;
                 }
             case EVENT_SARA_P2_START:
