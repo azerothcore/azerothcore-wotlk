@@ -356,11 +356,11 @@ void InstanceSaveMgr::LoadResetTimes()
 
         if (t < now)
         {
-            // assume that expired instances have already been cleaned
-            // calculate the next reset time
-            t = (t / DAY) * DAY;
-            t += ((today - t) / period + 1) * period + diff;
-            CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
+            // Reset fell due while the server was offline. Queue it for the first Update() tick
+            // instead of advancing past it - heroic/raid saves store resettime 0, so nothing else
+            // ever clears a lockout for a missed reset (issue #26741).
+            ScheduleReset(t, InstResetEvent(5, mapid, difficulty));
+            continue;
         }
 
         SetExtendedResetTimeFor(mapid, difficulty, t);
@@ -739,6 +739,13 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
             period = DAY;
 
         uint32 next_reset = uint32(((resetTime + MINUTE) / DAY * DAY) + period + diff);
+        // catch up in one step if the server was offline across more than one reset period.
+        bool missedMultiplePeriods = false;
+        while (next_reset <= uint32(now))
+        {
+            next_reset += period;
+            missedMultiplePeriods = true;
+        }
         SetResetTimeFor(mapid, difficulty, next_reset);
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
         ScheduleReset(time_t(next_reset - 3600), InstResetEvent(1, mapid, difficulty));
@@ -752,11 +759,18 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
 
         // remove all binds to instances of the given map and delete from db (delete per instance id, no mass deletion!)
         // do this after new reset time is calculated
-        for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(), itr2; itr != m_instanceSaveById.end(); )
+        // Extended locks need two passes: the first only clears the extended flag and the
+        // second unbinds. Two is always enough, however many periods were missed.
+        uint8 resetPasses = missedMultiplePeriods ? 2 : 1;
+        for (uint8 pass = 0; pass < resetPasses; ++pass)
         {
-            itr2 = itr++;
-            if (itr2->second->GetMapId() == mapid && itr2->second->GetDifficulty() == difficulty)
-                _ResetSave(itr2);
+            for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(), itr2;
+                 itr != m_instanceSaveById.end(); )
+            {
+                itr2 = itr++;
+                if (itr2->second->GetMapId() == mapid && itr2->second->GetDifficulty() == difficulty)
+                    _ResetSave(itr2);
+            }
         }
     }
 
