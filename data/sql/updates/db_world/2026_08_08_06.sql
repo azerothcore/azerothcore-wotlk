@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_05 -> 2026_08_08_06
 -- Remove pool_template rows that have no members in pool_creature,
 -- pool_gameobject, pool_quest or pool_pool. They date back to the original
 -- DB import, spawn nothing and are referenced by nothing.
