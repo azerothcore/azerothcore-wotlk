@@ -927,12 +927,12 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 events.Repeat(20s);
                 break;
             case EVENT_SARA_P2_PSYCHOSIS:
-                if ((urand(0, 9)) == 0)  // Rarely said (as it's casted every 3.5s)
+                if ((urand(0, 9)) == 0)  // Rarely said
                 {
                     Talk(SAY_SARA_PSYCHOSIS_HIT);
                 }
-                me->CastCustomSpell(SPELL_SARA_PSYCHOSIS_10, SPELLVALUE_MAX_TARGETS, 1, me, false);
-                events.Repeat(3500ms);
+                me->CastCustomSpell(me->GetMap()->Is25ManRaid() ? SPELL_SARA_PSYCHOSIS_25 : SPELL_SARA_PSYCHOSIS_10, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                events.Repeat(me->GetMap()->Is25ManRaid() ? 1000ms : 4900ms);
                 break;
             case EVENT_SARA_P2_DEATH_RAY:
                 Talk(SAY_SARA_DEATH_RAY);
