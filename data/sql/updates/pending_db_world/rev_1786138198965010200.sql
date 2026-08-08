@@ -69,7 +69,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 -- SPELL_EFFECT_APPLY_AREA_AURA_FRIEND - skip it. UNIT_FLAG2_IGNORE_REPUTATION (0x4) forces the
 -- plain faction check. Sniff has Flags2 2048; revert this once the core stops proxying the
 -- driver's reputation onto the vehicle.
-UPDATE `creature_template` SET `unit_flags2` = 2052 WHERE (`entry` = 25334);
+UPDATE `creature_template` SET `unit_flags2` = `unit_flags2`|4 WHERE (`entry` = 25334);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27106);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
