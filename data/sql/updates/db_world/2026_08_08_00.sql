@@ -1,3 +1,4 @@
+-- DB update 2026_08_07_04 -> 2026_08_08_00
 --
 DELETE FROM `script_waypoint` WHERE `entry` = 25589;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 25589);
