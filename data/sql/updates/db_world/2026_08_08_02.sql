@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_01 -> 2026_08_08_02
 -- Takk's Nest and Ravasaur Matriarch's Nest gameobject pools (map 1) reused
 -- pool ids 7001/7002, which belong to the Webbed Crusader creature pools
 -- (map 571). Pools are bound to a single map now, so the nests get own pools.
