@@ -65,6 +65,8 @@ enum GameObjects
     GO_THRONE_ROOM          = 170575, // Throne door
     GO_SPECTRAL_CHALICE     = 164869,
     GO_CHEST_SEVEN          = 169243,
+    GO_SECRET_DOOR          = 174553,
+    GO_SECRET_SAFE          = 161495,
 };
 
 enum MiscData
@@ -146,6 +148,12 @@ struct instance_blackrock_depths : public InstanceScript
 
     GuidList ArgelmachAdds;
     ObjectGuid ArgelmachGUID;
+
+    // The four Warbringer Constructs in the Relic Coffer room and Watchman Doomgrip
+    GuidList VaultWarderGUIDs;
+    ObjectGuid GoSecretDoorGUID;
+    ObjectGuid GoSecretSafeGUID;
+    Position VaultWarderCenter = Position(813.5f, -348.0f);
 
     TempSummon* TempSummonGrimstone = nullptr;
     Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
@@ -302,6 +310,24 @@ struct instance_blackrock_depths : public InstanceScript
                 if (creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()) < (float)DISTANCE_EMPEROR_ROOM)
                     EmperorSenatorsVector.push_back(creature->GetGUID());
                 break;
+            case NPC_WARBRINGER_CONSTRUCT:
+                // only the four constructs in the Relic Coffer room belong to the vault event, the rest of the Black Vault spawns are regular trash
+                if (creature->GetDistance2d(VaultWarderCenter.GetPositionX(), VaultWarderCenter.GetPositionY()) > 15.0f)
+                    break;
+                // frozen until all 12 Relic Coffers have been opened. Stoned is cast here instead of
+                // creature_addon on purpose: addon auras get re-applied on every evade, which would
+                // re-freeze the constructs after the event has started.
+                if (GetData(TYPE_VAULT) == NOT_STARTED)
+                {
+                    creature->CastSpell(creature, SPELL_STONED, true);
+                    creature->SetImmuneToPC(true);
+                    creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetReactState(REACT_PASSIVE);
+                }
+                [[fallthrough]];
+            case NPC_WATCHMAN_DOOMGRIP:
+                VaultWarderGUIDs.push_back(creature->GetGUID());
+                break;
             default:
                 break;
         }
@@ -378,6 +404,17 @@ struct instance_blackrock_depths : public InstanceScript
             case GO_SPECTRAL_CHALICE:
                 GoSpectralChaliceGUID = go->GetGUID();
                 break;
+            case GO_SECRET_DOOR:
+                GoSecretDoorGUID = go->GetGUID();
+                if (GetData(TYPE_VAULT) == DONE)
+                    HandleGameObject(ObjectGuid::Empty, true, go);
+                break;
+            case GO_SECRET_SAFE:
+                GoSecretSafeGUID = go->GetGUID();
+                // non-interactable via gameobject_template_addon flags until the vault event is done
+                if (GetData(TYPE_VAULT) == DONE)
+                    go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                break;
         }
     }
 
@@ -394,6 +431,16 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case NPC_MAGMUS:
                 SetData(TYPE_IRON_HALL, DONE);
+                break;
+            case NPC_WARBRINGER_CONSTRUCT:
+            case NPC_WATCHMAN_DOOMGRIP:
+                if (GetData(TYPE_VAULT) == IN_PROGRESS)
+                {
+                    // regular Black Vault trash shares the entry but is not in the list, remove() is a no-op for it
+                    VaultWarderGUIDs.remove(unit->GetGUID());
+                    if (VaultWarderGUIDs.empty())
+                        SetData(TYPE_VAULT, DONE);
+                }
                 break;
             case NPC_SHADOWFORGE_SENATOR:
                 deadSenators = 1; //hacky, but we cannot count the unit that just died through its state because OnUnitDeath() is called before the state is set.
@@ -458,6 +505,13 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case TYPE_VAULT:
                 encounter[1] = data;
+                if (data == DONE)
+                {
+                    // vault cleared: open the secret door and make the Secret Safe lootable
+                    HandleGameObject(GoSecretDoorGUID, true);
+                    if (GameObject* safe = instance->GetGameObject(GoSecretSafeGUID))
+                        safe->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                }
                 break;
             case TYPE_BAR:
                 if (data == SPECIAL)
@@ -512,7 +566,20 @@ struct instance_blackrock_depths : public InstanceScript
                 OpenedCoofers += 1;
                 if (OpenedCoofers == 12)
                 {
-                    Position pos = {812.15f, -348.91f, -50.579f, 0.7f};
+                    SetData(TYPE_VAULT, IN_PROGRESS);
+
+                    // awaken the Warbringer Constructs guarding the vault
+                    for (ObjectGuid const& warderGUID : VaultWarderGUIDs)
+                        if (Creature* warder = instance->GetCreature(warderGUID))
+                        {
+                            warder->RemoveAurasDueToSpell(SPELL_STONED);
+                            warder->SetImmuneToPC(false);
+                            warder->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            warder->SetReactState(REACT_AGGRESSIVE);
+                        }
+
+                    // spawns at the room entrance, not amidst the constructs (position from cmangos)
+                    Position pos = {821.905f, -338.382f, -50.134f, 3.78736f};
                     if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
                         summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
                 }
