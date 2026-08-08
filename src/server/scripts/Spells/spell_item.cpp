@@ -3336,8 +3336,19 @@ class spell_item_impale_leviroth : public SpellScript
             if (target->GetEntry() == NPC_LEVIROTH && target->HealthAbovePct(94))
             {
                 target->CastSpell(target, SPELL_LEVIROTH_SELF_IMPALE, true);
+
+                // CalculateMinMaxDamage multiplies weapon damage by the template's DamageModifier
+                // (7.5 here), landing around 1300-1700 instead of 150-200. Cancel it out.
                 target->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 150);
                 target->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 200);
+                // BASE_PCT, not TOTAL_PCT: the latter is rebuilt from scratch whenever a physical
+                // damage-percent aura changes, which would drop this again.
+                if (float damageModifier = target->GetCreatureTemplate()->DamageModifier)
+                    target->SetStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, BASE_PCT, 1.0f / damageModifier);
+
+                // none of the above reaches the melee roll until stats are recalculated
+                target->UpdateDamagePhysical(BASE_ATTACK);
+
                 target->LowerPlayerDamageReq(target->GetMaxHealth());
             }
     }
