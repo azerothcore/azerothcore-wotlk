@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -2274,11 +2275,14 @@ class spell_yogg_saron_diminish_power_aura : public AuraScript
     PrepareAuraScript(spell_yogg_saron_diminish_power_aura);
 
     // Serverside proc (no triggered spell in DBC): taken melee hits and melee
-    // abilities break the Diminish Power channel
+    // abilities break the Diminish Power channel. Sniffed: only the active
+    // channel breaks, the initial 1.5s cast is not interruptible by damage
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetTarget()->InterruptNonMeleeSpells(false);
+        if (Spell* spell = GetTarget()->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            if (spell->getState() == SPELL_STATE_CASTING)
+                GetTarget()->InterruptSpell(CURRENT_CHANNELED_SPELL);
     }
 
     void Register() override
