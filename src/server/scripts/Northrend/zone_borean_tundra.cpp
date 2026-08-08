@@ -753,88 +753,6 @@ public:
 };
 
 /*######
-## npc_bonker_togglevolt
-######*/
-
-enum BonkerTogglevolt
-{
-    NPC_BONKER_TOGGLEVOLT   = 25589,
-    QUEST_GET_ME_OUTA_HERE  = 11673,
-
-    SAY_BONKER_1            = 0,
-    SAY_BONKER_2            = 1
-};
-
-class npc_bonker_togglevolt : public CreatureScript
-{
-public:
-    npc_bonker_togglevolt() : CreatureScript("npc_bonker_togglevolt") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
-        {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->AI()->Talk(SAY_BONKER_2, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
-        }
-        return true;
-    }
-
-    struct npc_bonker_togglevoltAI : public npc_escortAI
-    {
-        npc_bonker_togglevoltAI(Creature* creature) : npc_escortAI(creature) { }
-        uint32 Bonker_agro;
-
-        void Reset() override
-        {
-            Bonker_agro = 0;
-            SetDespawnAtFar(false);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Player* player = GetPlayerForEscort())
-                player->FailQuest(QUEST_GET_ME_OUTA_HERE);
-        }
-
-        void UpdateEscortAI(uint32 /*diff*/) override
-        {
-            if (GetAttack() && UpdateVictim())
-            {
-                if (Bonker_agro == 0)
-                {
-                    Talk(SAY_BONKER_1);
-                    Bonker_agro++;
-                }
-                DoMeleeAttackIfReady();
-            }
-            else Bonker_agro = 0;
-        }
-
-        using CreatureAI::WaypointReached;
-        void WaypointReached(uint32 waypointId) override
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 29:
-                    player->GroupEventHappens(QUEST_GET_ME_OUTA_HERE, me);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_bonker_togglevoltAI(creature);
-    }
-};
-
-/*######
 ## Help Those That Cannot Help Themselves, Quest 11876
 ######*/
 
@@ -1425,7 +1343,6 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_arcane_chains_character_force_cast);
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
-    new npc_bonker_togglevolt();
     new npc_valiance_keep_cannoneer();
     new npc_warmage_coldarra();
     new npc_hidden_cultist();
