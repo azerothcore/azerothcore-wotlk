@@ -268,6 +268,11 @@ enum Misc
     ACTION_ILLUSION_ICECROWN            = 2,
     ACTION_ILLUSION_STORMWIND           = 3,
 
+    // creature_summon_groups for the brain (33890)
+    SUMMON_GROUP_CHAMBER_TENTACLES      = 1,
+    SUMMON_GROUP_ICECROWN_TENTACLES     = 2,
+    SUMMON_GROUP_STORMWIND_TENTACLES    = 3,
+
     // ACTION_SARA_UPDATE_SUMMON_KEEPERS = 4, // defined in ulduar.h
 
     EVENT_PHASE_ONE                     = 1,
@@ -1368,15 +1373,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
 
     void PrepareChamberIllusion()
     {
-        // Sniffed positions
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2069.298f, -43.5317f, 239.8006f, 0.47124f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2069.4792f, -5.6997f, 239.8058f, 5.42797f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2113.3298f, -65.7101f, 239.8058f, 1.78024f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2139.8298f, -50.2865f, 239.8058f, 2.46091f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2136.6406f, -1.9965f, 239.8058f, 3.83972f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2116.9307f, 11.375f, 239.8058f, 4.41568f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2146.2395f, -34.4045f, 239.8058f, 3.01942f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 2146.8801f, -17.0313f, 239.8058f, 3.35103f);
+        me->SummonCreatureGroup(SUMMON_GROUP_CHAMBER_TENTACLES);
 
         // Laughing Skulls
         if (urand(0, 1))
@@ -1419,16 +1416,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
             me->SummonCreature(NPC_LAUGHING_SKULL, 1921, -158, 240, 0);
 
         // Influence
-        // Sniffed positions
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1897.3455f, -106.6076f, 240.1444f, 4.93928f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1902.132f, -111.3594f, 240.0698f, 4.85202f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1905.3264f, -104.7865f, 240.0523f, 4.76475f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1912.1285f, -136.934f, 240.073f, 4.18879f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1917.5591f, -135.7448f, 240.073f, 4.18879f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1919.125f, -140.9566f, 240.073f, 3.97935f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1948.4688f, -136.2951f, 240.0707f, 3.4383f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1952.9653f, -130.5295f, 240.1347f, 3.80482f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1956.4445f, -138.4028f, 240.1078f, 3.36849f);
+        me->SummonCreatureGroup(SUMMON_GROUP_ICECROWN_TENTACLES);
 
         // Others
         me->SummonCreature(NPC_LICH_KING, 1906.98f, -153, 240, 4.2f);
@@ -1453,15 +1441,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
         me->SummonCreature(NPC_LAUGHING_SKULL, 1963.68f, 89.7549f, 239.667f, 3.70571f);
 
         // Influence
-        // Sniffed positions
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1897.3435f, 64.3142f, 239.7495f, 0.13963f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1903.3931f, 86.6029f, 239.7495f, 5.61996f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1908.993f, 44.2666f, 239.7495f, 0.92502f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1923.3416f, 98.0123f, 239.7495f, 4.83456f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1931.1404f, 38.4695f, 239.7495f, 1.71042f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1945.4417f, 92.1795f, 239.7495f, 4.04916f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1951.0402f, 49.8888f, 239.7495f, 2.49582f);
-        me->SummonCreature(NPC_INFLUENCE_TENTACLE, 1956.5028f, 72.1946f, 239.7495f, 3.28122f);
+        me->SummonCreatureGroup(SUMMON_GROUP_STORMWIND_TENTACLES);
 
         // Others
         me->SummonCreature(NPC_GARONA, 1928.58f, 65.64f, 242.37f, 2.1f);
