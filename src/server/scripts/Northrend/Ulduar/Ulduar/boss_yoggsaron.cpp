@@ -704,7 +704,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
             EntryCheckPredicate pred3(NPC_THORIM_KEEPER);
             summons.DoAction(ACTION_THORIM_START_STORM, pred3);
 
-            if (me->GetMap()->Is25ManRaid() && (GetData(DATA_GET_KEEPERS_COUNT) > 0))
+            // Deafening Roar: 25 man with at least one Keeper down
+            if (me->GetMap()->Is25ManRaid() && (GetData(DATA_GET_KEEPERS_COUNT) < 4))
                 summons.DoAction(ACTION_YOGG_SARON_HARD_MODE, pred2);
 
             summons.DespawnEntry(NPC_DEATH_ORB);
@@ -1250,7 +1251,7 @@ struct boss_yoggsaron : public ScriptedAI
         }
         else if (param == ACTION_YOGG_SARON_HARD_MODE)
         {
-            events.ScheduleEvent(EVENT_YS_DEAFENING_ROAR, 50s);
+            events.ScheduleEvent(EVENT_YS_DEAFENING_ROAR, 30s);
         }
         else if (param == ACTION_YOGG_SARON_SHADOW_BEACON)
         {
@@ -1305,7 +1306,7 @@ struct boss_yoggsaron : public ScriptedAI
                 Talk(SAY_YOGG_SARON_DEAFENING_ROAR);
                 Talk(EMOTE_YOGG_SARON_DEAFENING_ROAR);
                 me->CastSpell(me, SPELL_DEAFENING_ROAR, false);
-                events.Repeat(50s);
+                events.Repeat(30s);
                 break;
             case EVENT_YS_SHADOW_BEACON:
                 events.Repeat(5s);
