@@ -16,6 +16,7 @@
  */
 
 #include "AreaDefines.h"
+#include "CombatAI.h"
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -28,6 +29,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "WaypointMgr.h"
 
 enum eDrakeHunt
 {
@@ -751,88 +753,6 @@ public:
 };
 
 /*######
-## npc_bonker_togglevolt
-######*/
-
-enum BonkerTogglevolt
-{
-    NPC_BONKER_TOGGLEVOLT   = 25589,
-    QUEST_GET_ME_OUTA_HERE  = 11673,
-
-    SAY_BONKER_1            = 0,
-    SAY_BONKER_2            = 1
-};
-
-class npc_bonker_togglevolt : public CreatureScript
-{
-public:
-    npc_bonker_togglevolt() : CreatureScript("npc_bonker_togglevolt") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_GET_ME_OUTA_HERE)
-        {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->AI()->Talk(SAY_BONKER_2, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
-        }
-        return true;
-    }
-
-    struct npc_bonker_togglevoltAI : public npc_escortAI
-    {
-        npc_bonker_togglevoltAI(Creature* creature) : npc_escortAI(creature) { }
-        uint32 Bonker_agro;
-
-        void Reset() override
-        {
-            Bonker_agro = 0;
-            SetDespawnAtFar(false);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Player* player = GetPlayerForEscort())
-                player->FailQuest(QUEST_GET_ME_OUTA_HERE);
-        }
-
-        void UpdateEscortAI(uint32 /*diff*/) override
-        {
-            if (GetAttack() && UpdateVictim())
-            {
-                if (Bonker_agro == 0)
-                {
-                    Talk(SAY_BONKER_1);
-                    Bonker_agro++;
-                }
-                DoMeleeAttackIfReady();
-            }
-            else Bonker_agro = 0;
-        }
-
-        using CreatureAI::WaypointReached;
-        void WaypointReached(uint32 waypointId) override
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 29:
-                    player->GroupEventHappens(QUEST_GET_ME_OUTA_HERE, me);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_bonker_togglevoltAI(creature);
-    }
-};
-
-/*######
 ## Help Those That Cannot Help Themselves, Quest 11876
 ######*/
 
@@ -1333,6 +1253,86 @@ class spell_bloodspore_haze : public SpellScript
     }
 };
 
+enum DuskData
+{
+    SAY_DUSK_PHYLACTERY = 0,
+
+    SPELL_DAN_EJECT     = 51254,
+
+    PATH_DUSK           = 281820,
+
+    NODE_DUSK_EJECT     = 20,
+    POINT_DUSK_END      = 21
+};
+
+// 28182 - Dusk
+struct npc_dusk : public VehicleAI
+{
+    npc_dusk(Creature* creature) : VehicleAI(creature), _ejected(false)
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
+    {
+        if (!who->IsPlayer())
+            return;
+
+        if (!apply)
+        {
+            // Rider bailed out before reaching the water
+            if (!_ejected)
+                me->DespawnOrUnsummon();
+
+            return;
+        }
+
+        // Required to make the waypoints function
+        who->ToPlayer()->SetClientControl(me, 0, true);
+
+        me->m_Events.AddEventAtOffset([this]() {
+            me->LoadPath(PATH_DUSK);
+            me->GetMotionMaster()->MoveWaypoint(PATH_DUSK, false);
+        }, 2200ms);
+    }
+
+    void WaypointReached(uint32 nodeId, uint32 pathId) override
+    {
+        if (pathId != PATH_DUSK || nodeId != NODE_DUSK_EJECT)
+            return;
+
+        _ejected = true;
+        me->CastSpell(me, SPELL_DAN_EJECT);
+
+        me->m_Events.AddEventAtOffset([this]() {
+            Talk(SAY_DUSK_PHYLACTERY);
+        }, 1700ms);
+
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            // Dropping the rider uncharms Dusk, and RemoveCharmedBy kills the motion slot
+            if (WaypointPath const* path = sWaypointMgr->GetPath(PATH_DUSK))
+            {
+                if (!path->Nodes.empty())
+                {
+                    WaypointNode const& last = path->Nodes.back();
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(POINT_DUSK_END, last.X, last.Y, last.Z);
+                }
+            }
+        }, 4s);
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type == POINT_MOTION_TYPE && pointId == POINT_DUSK_END)
+            me->DespawnOrUnsummon(1200ms);
+    }
+
+private:
+    bool _ejected;
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -1343,13 +1343,13 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_arcane_chains_character_force_cast);
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
-    new npc_bonker_togglevolt();
     new npc_valiance_keep_cannoneer();
     new npc_warmage_coldarra();
     new npc_hidden_cultist();
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
     RegisterCreatureAI(npc_jenny);
+    RegisterCreatureAI(npc_dusk);
     RegisterSpellScript(spell_necropolis_beam);
     RegisterSpellScript(spell_soul_deflection);
     RegisterSpellScript(spell_bloodspore_haze);

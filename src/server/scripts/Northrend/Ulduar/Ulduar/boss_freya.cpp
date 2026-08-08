@@ -201,6 +201,7 @@ enum Misc
     ACTION_REMOVE_2_STACK                       = 2,
     ACTION_RESPAWN_TRIO                         = 1,
     ACTION_LUMBERJACKED                         = -1,
+    ACTION_ADD_DIED                             = -2,
 
     EVENT_PHASE_ADDS                            = 1,
     EVENT_PHASE_FINAL                           = 2,
@@ -237,6 +238,7 @@ struct boss_freya : public BossAI
     bool _respawningTrio;
     bool _backToNature;
     uint8 _deforestation;
+    uint8 _aliveAddsCount;
 
     ObjectGuid _elderGUID[3];
 
@@ -262,6 +264,7 @@ struct boss_freya : public BossAI
         _respawningTrio = false;
         _backToNature = true;
         _deforestation = 0;
+        _aliveAddsCount = 0;
     }
 
     void KilledUnit(Unit* victim) override
@@ -359,17 +362,28 @@ struct boss_freya : public BossAI
             case GROUP_CONSERVATOR:
                 Talk(SAY_SUMMON_CONSERVATOR);
                 DoCast(SPELL_SUMMON_WAVE_1);
+                _aliveAddsCount += 1;
                 break;
             case GROUP_LASHERS:
                 Talk(SAY_SUMMON_LASHERS);
                 for (uint8 i = 0; i < 10; ++i)
                     DoCast(SPELL_SUMMON_WAVE_10);
+
+                _aliveAddsCount += 10;
                 break;
         }
     }
 
     void DoAction(int32 param) override
     {
+        if (param == ACTION_ADD_DIED)
+        {
+            if (--_aliveAddsCount == 0)
+                events.RescheduleEvent(EVENT_FREYA_ADDS_SPAM, 5s, 0, EVENT_PHASE_ADDS);
+
+            return;
+        }
+
         if (param == ACTION_LUMBERJACKED)
         {
             ++_lumberjacked;
@@ -560,6 +574,8 @@ struct boss_freya : public BossAI
                 _respawningTrio = false;
                 if (_trioKilled < 3)
                     summons.DoAction(ACTION_RESPAWN_TRIO);
+                else
+                    events.RescheduleEvent(EVENT_FREYA_ADDS_SPAM, 5s, 0, EVENT_PHASE_ADDS);
 
                 _trioKilled = 0;
                 break;
@@ -1028,6 +1044,8 @@ struct boss_freya_summons : public ScriptedAI
                     freya->AI()->DoAction(ACTION_RESPAWN_TRIO);
                     _hasDied = true;
                 }
+                if (!_isTrio)
+                    freya->AI()->DoAction(ACTION_ADD_DIED);
             }
         }
         if (me->GetEntry() == NPC_DETONATING_LASHER)
