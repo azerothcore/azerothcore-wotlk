@@ -7492,6 +7492,21 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     return true;
 }
 
+bool Unit::ForceAttack(Unit* target)
+{
+    if (!target)
+        return false;
+
+    ObjectGuid const targetGuid = target->GetGUID();
+    bool const inserted = _forcedCombatTargets.insert(targetGuid).second;
+    if (Attack(target, true))
+        return true;
+
+    if (inserted)
+        _forcedCombatTargets.erase(targetGuid);
+    return false;
+}
+
 /**
  * @brief Force the unit to stop attacking. This will clear UNIT_STATE_MELEE_ATTACKING,
  * Interrupt current spell, AI assistance, and call SendMeleeAttackStop() to the client
@@ -7536,6 +7551,7 @@ void Unit::CombatStop(bool includingCast, bool mutualPvP)
 
     AttackStop();
     RemoveAllAttackers();
+    _forcedCombatTargets.clear();
     if (IsPlayer())
         ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
     if (Creature* pCreature = ToCreature())
@@ -10789,9 +10805,10 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
 
-    // CvC case - can attack each other only when one of them is hostile
+    // CvC: only when one is hostile, or the pairing was authorized via ForceAttack()
     if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
-        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
+        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE
+            || HasForcedCombatWith(target) || target->HasForcedCombatWith(this);
 
     // PvP, PvC, CvP case
     // can't attack friendly targets

@@ -790,6 +790,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_VISIBILITY: return sizeof(SmartAction::visibility);
             case SMART_ACTION_SET_ACTIVE: return sizeof(SmartAction::setActive);
             case SMART_ACTION_ATTACK_START: return NO_PARAMS;
+            case SMART_ACTION_FORCE_ATTACK_START: return NO_PARAMS;
             case SMART_ACTION_SUMMON_GO: return sizeof(SmartAction::summonGO);
             case SMART_ACTION_KILL_UNIT: return NO_PARAMS;
             case SMART_ACTION_ACTIVATE_TAXI: return sizeof(SmartAction::taxi);
@@ -2016,6 +2017,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_INVINCIBILITY_HP_LEVEL:
         case SMART_ACTION_RESET_GOBJECT:
         case SMART_ACTION_ATTACK_START:
+        case SMART_ACTION_FORCE_ATTACK_START:
         case SMART_ACTION_THREAT_ALL_PCT:
         case SMART_ACTION_THREAT_SINGLE_PCT:
         case SMART_ACTION_SET_INST_DATA64:

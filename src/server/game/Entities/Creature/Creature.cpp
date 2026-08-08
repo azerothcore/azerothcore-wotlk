@@ -2616,8 +2616,9 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
 
     Unit const* targetVictim = target->getAttackerForHelper();
 
-    // if I'm already fighting target, or I'm hostile towards the target, the target is acceptable
-    if (IsEngagedBy(target) || IsHostileTo(target))
+    // if I'm already fighting target, I'm hostile towards the target, or the pairing was
+    // explicitly authorized via ForceAttack() (see issue #26659), the target is acceptable
+    if (IsEngagedBy(target) || IsHostileTo(target) || HasForcedCombatWith(target) || target->HasForcedCombatWith(this))
         return true;
 
     // if the target's victim is friendly, and the target is neutral, the target is acceptable
