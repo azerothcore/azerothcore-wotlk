@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_06 -> 2026_08_08_07
 --
 DELETE FROM `creature_text` WHERE `CreatureID` = 33271 AND `GroupID` IN (9, 10);
 DELETE FROM `creature_text` WHERE `CreatureID` = 33488;
