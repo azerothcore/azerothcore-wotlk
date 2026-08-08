@@ -1501,7 +1501,7 @@ void GameEventMgr::GameEventSpawn(int16 eventId)
     }
 
     for (IdList::iterator itr = _gameEventPoolIds[internal_event_id].begin(); itr != _gameEventPoolIds[internal_event_id].end(); ++itr)
-        sPoolMgr->SpawnPool(*itr);
+        sPoolMgr->SpawnEventPool(*itr);
 }
 
 void GameEventMgr::GameEventUnspawn(int16 eventId)
@@ -1576,7 +1576,7 @@ void GameEventMgr::GameEventUnspawn(int16 eventId)
 
     for (IdList::iterator itr = _gameEventPoolIds[internal_event_id].begin(); itr != _gameEventPoolIds[internal_event_id].end(); ++itr)
     {
-        sPoolMgr->DespawnPool(*itr);
+        sPoolMgr->DespawnEventPool(*itr);
     }
 }
 
