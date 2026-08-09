@@ -5814,18 +5814,27 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
     // refreshing.
     if (m_spellInfo->Id == 45529)
     {
+        uint32 firstCooldown = player->GetRuneCooldown(0);
+        uint32 secondCooldown = player->GetRuneCooldown(1);
+
         uint8 bloodRune = 0;
-        if (player->GetRuneCooldown(1) && (!player->GetRuneCooldown(0) || player->GetRuneCooldown(1) < player->GetRuneCooldown(0)))
+        if (secondCooldown && (!firstCooldown || secondCooldown < firstCooldown))
             bloodRune = 1;
 
-        player->SetRuneCooldown(bloodRune, 0);
-        player->SetGracePeriod(bloodRune, player->IsInCombat()); // xinef: reset grace period
+        // Leave a rune that is already up alone, or its grace period would be thrown away
+        // and the next one spent from that slot would come back later than it should.
+        if (player->GetRuneCooldown(bloodRune))
+        {
+            player->SetRuneCooldown(bloodRune, 0);
+            player->SetGracePeriod(bloodRune, player->IsInCombat()); // xinef: reset grace period
+        }
     }
     else
     {
         for (uint32 j = 0; j < MAX_RUNES && count > 0; ++j)
         {
-            if (player->GetRuneCooldown(j) && player->GetCurrentRune(j) == RuneType(m_spellInfo->Effects[effIndex].MiscValue))
+            if (player->GetRuneCooldown(j)
+                && player->GetCurrentRune(j) == RuneType(m_spellInfo->Effects[effIndex].MiscValue))
             {
                 player->SetRuneCooldown(j, 0);
                 player->SetGracePeriod(j, player->IsInCombat()); // xinef: reset grace period
