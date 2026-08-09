@@ -1572,7 +1572,7 @@ public:
     /*********************************************************/
     /***            METHODS RELATED TO SPELLS              ***/
     /*********************************************************/
-    [[nodiscard]] Player* GetSpellModOwner() const;
+    [[nodiscard]] Player* GetSpellModOwner() const override;
     [[nodiscard]] Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
     [[nodiscard]] Spell* GetCurrentSpell(uint32 spellType) const { return m_currentSpells[spellType]; }
     [[nodiscard]] Spell* GetFirstCurrentCastingSpell() const;

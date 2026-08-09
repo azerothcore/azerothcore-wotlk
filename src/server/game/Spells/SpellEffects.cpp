@@ -6261,14 +6261,17 @@ void Spell::EffectGameObjectDamage(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectGameObjectRepair(SpellEffIndex /*effIndex*/)
 {
-    Unit* unitCaster = m_caster->ToUnit();
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!gameObjTarget)
         return;
 
-    gameObjTarget->ModifyHealth(damage, unitCaster);
+    Unit* caster = m_originalCaster;
+    if (!caster)
+        return;
+
+    gameObjTarget->ModifyHealth(damage, caster);
 }
 
 void Spell::EffectGameObjectSetDestructionState(SpellEffIndex effIndex)

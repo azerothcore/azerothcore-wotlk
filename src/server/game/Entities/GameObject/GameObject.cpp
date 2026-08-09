@@ -1404,6 +1404,15 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
     return ok;
 }
 
+void GameObject::CastSpell(Unit* target, uint32 spellId)
+{
+    // unlike WorldObject::CastSpell(WorldObject*), a null Unit* here means "no unit target"
+    if (target)
+        WorldObject::CastSpell(target, spellId);
+    else
+        WorldObject::CastSpell(nullptr, spellId);
+}
+
 void GameObject::ResetDoorOrButton()
 {
     if (m_lootState == GO_READY || m_lootState == GO_JUST_DEACTIVATED)

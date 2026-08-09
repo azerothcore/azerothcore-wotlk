@@ -851,7 +851,7 @@ void Spell::SelectExplicitTargets()
                     break;
                 case SPELL_DAMAGE_CLASS_MELEE:
                 case SPELL_DAMAGE_CLASS_RANGED:
-                    redirect = ASSERT_NOTNULL(m_caster->ToUnit())->GetMeleeHitRedirectTarget(target, m_spellInfo);
+                    redirect = m_caster->GetMeleeHitRedirectTarget(target, m_spellInfo);
                     break;
                 default:
                     redirect = nullptr;
@@ -2997,6 +2997,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
                 unitTarget->ToCreature()->EngageWithTarget(unitCaster);
             }
         }
+    }
+    else if (m_healing > 0 && unitTarget && unitTarget->IsAlive())
+    {
+        // pure gameobject cast without an owner: heal anyway, mirroring the damage case below
+        m_healing = Unit::DealHeal(nullptr, unitTarget, uint32(m_healing));
     }
     else if (m_damage > 0 && unitTarget && unitTarget->IsAlive())
     {
@@ -7263,7 +7268,7 @@ bool Spell::CanAutoCast(Unit* target)
 
 SpellCastResult Spell::CheckRange(bool strict)
 {
-    Unit* unitCaster = m_caster->ToUnit();
+    Unit* unitCaster = m_originalCaster ? m_originalCaster : m_caster->ToUnit();
     // Don't check for instant cast spells
     if (!strict && m_casttime == 0)
         return SPELL_CAST_OK;

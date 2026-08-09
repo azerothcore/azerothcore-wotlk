@@ -4074,3 +4074,12 @@ Unit* WorldObject::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spel
 
     return victim;
 }
+
+Unit* WorldObject::GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
+{
+    // non-Unit casters cannot have their spells redirected
+    if (Unit* unitSelf = ToUnit())
+        return unitSelf->GetMeleeHitRedirectTarget(victim, spellInfo);
+
+    return victim;
+}

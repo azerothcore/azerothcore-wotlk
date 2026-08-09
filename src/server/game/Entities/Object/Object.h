@@ -768,7 +768,7 @@ public:
     [[nodiscard]] Unit* GetCharmerOrOwnerOrSelfUnit() const;
     [[nodiscard]] Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
     [[nodiscard]] Player* GetAffectingPlayer() const;
-    [[nodiscard]] Player* GetSpellModOwner() const;
+    [[nodiscard]] virtual Player* GetSpellModOwner() const;
 
     [[nodiscard]] virtual uint32 GetFaction() const { return 0; }
     [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
@@ -783,6 +783,7 @@ public:
     [[nodiscard]] bool IsValidAttackTarget(WorldObject const* target, SpellInfo const* bySpell = nullptr) const;
     [[nodiscard]] bool IsValidAssistTarget(WorldObject const* target, SpellInfo const* bySpell = nullptr) const;
     Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
+    Unit* GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
 
     // Spell calculations usable by any WorldObject caster. Unit-specific
     // bonuses apply when the caster is (or is owned by) a Unit.
