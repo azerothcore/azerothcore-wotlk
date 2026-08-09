@@ -1,6 +1,6 @@
--- Leviroth es IMMUNE_TO_PC, asi que no se le puede sacar aggro antes del tridente:
--- el DamageModifier de 7.5 nunca debio estar ahi. Se corrige en la plantilla y el
--- auto-empalado pasa a SmartAI, con lo que el SpellScript sobra.
+-- Leviroth is IMMUNE_TO_PC, so it cannot be pulled before the trident and the 7.5
+-- DamageModifier on its template was never meant to be there. Fixing the template
+-- and moving the self-impale to SmartAI makes the spell script unnecessary.
 UPDATE `creature_template` SET `DamageModifier` = 1, `flags_extra` = `flags_extra`|2097152, `RegenHealth` = 0 WHERE (`entry` = 26452);
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 26452;
