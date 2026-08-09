@@ -64,9 +64,14 @@ enum FreyaSpells
 
     // ELDERS
     SPELL_DRAINED_OF_POWER                      = 62467,
-    SPELL_STONEBARK_ESSENCE                     = 62483,
-    SPELL_IRONBRANCH_ESSENCE                    = 62484,
-    SPELL_BRIGHTLEAF_ESSENCE                    = 62485,
+    SPELL_STONEBARK_ESSENCE_CHANNEL             = 62483,
+    SPELL_IRONBRANCH_ESSENCE_CHANNEL            = 62484,
+    SPELL_BRIGHTLEAF_ESSENCE_CHANNEL            = 62485,
+    SPELL_STONEBARK_ESSENCE                     = 62386,
+    SPELL_FULL_HEAL                             = 43978,
+    SPELL_GREEN_BANISH_STATE_LARGE              = 62720, // Stonebark
+    SPELL_WHITE_BANISH_STATE_LARGE              = 62718, // Ironbranch
+    SPELL_PURPLE_BANISH_STATE                   = 61014, // Brightleaf
 
     // BRIGHTLEAF
     SPELL_BRIGHTLEAF_FLUX                       = 62239,
@@ -249,6 +254,7 @@ struct boss_freya : public BossAI
     void Reset() override
     {
         _Reset();
+        me->SetCombatMovement(true);
 
         for (uint8 i = 0; i < 3; ++i)
         {
@@ -472,10 +478,6 @@ struct boss_freya : public BossAI
         Creature* elder = instance->GetCreature(DATA_ELDER_STONEBARK);
         if (elder && elder->IsAlive())
         {
-            elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
-            elder->CastSpell(elder, SPELL_STONEBARK_ESSENCE, true);
-            elder->SetInCombatWithZone();
-
             events.ScheduleEvent(EVENT_FREYA_GROUND_TREMOR, 35s);
             _elderGUID[0] = elder->GetGUID();
         }
@@ -483,10 +485,6 @@ struct boss_freya : public BossAI
         elder = instance->GetCreature(DATA_ELDER_IRONBRANCH);
         if (elder && elder->IsAlive())
         {
-            elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
-            elder->CastSpell(elder, SPELL_IRONBRANCH_ESSENCE, true);
-            elder->SetInCombatWithZone();
-
             events.ScheduleEvent(EVENT_FREYA_IRON_ROOT, 20s);
             _elderGUID[1] = elder->GetGUID();
         }
@@ -494,10 +492,6 @@ struct boss_freya : public BossAI
         elder = instance->GetCreature(DATA_ELDER_BRIGHTLEAF);
         if (elder && elder->IsAlive())
         {
-            elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
-            elder->CastSpell(elder, SPELL_BRIGHTLEAF_ESSENCE, true);
-            elder->SetInCombatWithZone();
-
             events.ScheduleEvent(EVENT_FREYA_UNSTABLE_SUN_BEAM, 1min);
             _elderGUID[2] = elder->GetGUID();
         }
@@ -505,6 +499,52 @@ struct boss_freya : public BossAI
         if (_elderGUID[0] || _elderGUID[1] || _elderGUID[2])
         {
             Talk(SAY_AGGRO_WITH_ELDER);
+
+            static constexpr uint32 essenceChannel[3] = { SPELL_STONEBARK_ESSENCE_CHANNEL,
+                SPELL_IRONBRANCH_ESSENCE_CHANNEL, SPELL_BRIGHTLEAF_ESSENCE_CHANNEL };
+            static constexpr uint32 banishState[3] = { SPELL_GREEN_BANISH_STATE_LARGE,
+                SPELL_WHITE_BANISH_STATE_LARGE, SPELL_PURPLE_BANISH_STATE };
+
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                elder = ObjectAccessor::GetCreature(*me, _elderGUID[i]);
+                if (!elder)
+                    continue;
+
+                elder->CastSpell(elder, SPELL_FULL_HEAL, true);
+                elder->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                elder->SetReactState(REACT_PASSIVE);
+                elder->SetInCombatWithZone();
+                elder->CastSpell(me, essenceChannel[i], false);
+                if (essenceChannel[i] == SPELL_STONEBARK_ESSENCE_CHANNEL)
+                    elder->CastSpell(me, SPELL_STONEBARK_ESSENCE, true);
+                elder->CastSpell(elder, banishState[i], true);
+            }
+
+            // Freya stands still while the Elders channel their essences into her.
+            // The motion stop is deferred a tick because the engaging AttackStart
+            // issues its MoveChase after JustEngagedWith returns.
+            me->SetCombatMovement(false);
+            scheduler.Schedule(1ms, [this](TaskContext /*context*/)
+            {
+                // MoveIdle replaces the default waypoint generator (path 1365540),
+                // otherwise her conservatory patrol resumes once the chase is cleared
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                me->StopMoving();
+                if (Unit* victim = me->GetVictim())
+                    me->SetFacingToObject(victim);
+            });
+
+            scheduler.Schedule(5s, [this](TaskContext /*context*/)
+            {
+                me->SetCombatMovement(true);
+                me->ResumeChasingVictim();
+
+                for (ObjectGuid const& elderGuid : _elderGUID)
+                    if (Creature* drained = ObjectAccessor::GetCreature(*me, elderGuid))
+                        drained->CastSpell(drained, SPELL_DRAINED_OF_POWER, false);
+            });
         }
         else
         {
@@ -647,6 +687,8 @@ struct boss_freya_elder_stonebark : public ScriptedAI
     {
         events.Reset();
         _chargesCount = 0;
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
@@ -671,12 +713,15 @@ struct boss_freya_elder_stonebark : public ScriptedAI
 
     void JustEngagedWith(Unit*) override
     {
+        // Pulled into combat silently by Freya's hard mode activation
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            return;
+
         events.ScheduleEvent(EVENT_STONEBARK_FISTS_OF_STONE, 40s);
         events.ScheduleEvent(EVENT_STONEBARK_GROUND_TREMOR, 5s);
         events.ScheduleEvent(EVENT_STONEBARK_PETRIFIED_BARK, 20s);
 
-        if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
-            Talk(SAY_ELDER_AGGRO);
+        Talk(SAY_ELDER_AGGRO);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
@@ -732,6 +777,8 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
     {
         events.Reset();
         summons.DespawnAll();
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
@@ -756,12 +803,15 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
 
     void JustEngagedWith(Unit*) override
     {
+        // Pulled into combat silently by Freya's hard mode activation
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            return;
+
         events.ScheduleEvent(EVENT_BRIGHTLEAF_FLUX, 10s);
         events.ScheduleEvent(EVENT_BRIGHTLEAF_SOLAR_FLARE, 5s);
         events.ScheduleEvent(EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM, 8s);
 
-        if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
-            Talk(SAY_ELDER_AGGRO);
+        Talk(SAY_ELDER_AGGRO);
     }
 
     void UpdateAI(uint32 diff) override
@@ -832,6 +882,8 @@ struct boss_freya_elder_ironbranch : public ScriptedAI
     void Reset() override
     {
         events.Reset();
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
@@ -856,12 +908,15 @@ struct boss_freya_elder_ironbranch : public ScriptedAI
 
     void JustEngagedWith(Unit*) override
     {
+        // Pulled into combat silently by Freya's hard mode activation
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            return;
+
         events.ScheduleEvent(EVENT_IRONBRANCH_IMPALE, 10s);
         events.ScheduleEvent(EVENT_IRONBRANCH_IRON_ROOT, 15s);
         events.ScheduleEvent(EVENT_IRONBRANCH_THORN_SWARM, 3s);
 
-        if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
-            Talk(SAY_ELDER_AGGRO);
+        Talk(SAY_ELDER_AGGRO);
     }
 
     void UpdateAI(uint32 diff) override
