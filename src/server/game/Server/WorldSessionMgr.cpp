@@ -168,13 +168,6 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
                 _offlineSessions.erase(iter);
                 delete tmp;
             }
-            // If the player had already initiated logout, treat a disconnect such as one done by EXIT GAME->EXIT NOW as
-            // intentional, and skip the CONFIG_INTERVAL_DISCONNECT_TOLERANCE grace period.
-            if (pSession->isLogingOut())
-            {
-                delete pSession;
-                continue;
-            }
             pSession->SetOfflineTime(now.count());
             _offlineSessions[pSession->GetAccountId()] = pSession;
             continue;
@@ -210,7 +203,10 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         next = itr;
         ++next;
         WorldSession* pSession = itr->second;
-        if (!pSession->GetPlayer() || pSession->IsKicked() ||
+        // A session with a logout already running leaves when that countdown ends, so closing the client early
+        // with EXIT NOW doesn't shorten it. A client crash (or sudden ALT+F4) waits out the full interval so a
+        // dropped connection can be reclaimed.
+        if (!pSession->GetPlayer() || pSession->IsKicked() || pSession->ShouldLogOut(currTime) ||
             pSession->GetOfflineTime() + sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE) < currTime)
         {
             _offlineSessions.erase(itr);
@@ -367,15 +363,8 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
                 _offlineSessions.erase(iter);
                 delete tmp;
             }
-            // The old session was already logging out. The disconnect was intentional and the
-            // CONFIG_INTERVAL_DISCONNECT_TOLERANCE grace period should be skipped.
-            if (oldSession->isLogingOut())
-                delete oldSession;
-            else
-            {
-                oldSession->SetOfflineTime(GameTime::GetGameTime().count());
-                _offlineSessions[oldSession->GetAccountId()] = oldSession;
-            }
+            oldSession->SetOfflineTime(GameTime::GetGameTime().count());
+            _offlineSessions[oldSession->GetAccountId()] = oldSession;
         }
         else
             delete oldSession;

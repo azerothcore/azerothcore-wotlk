@@ -1043,7 +1043,7 @@ SocketTimeOutTimeActive = 60000
 MaxOverspeedPings = 2
 
 #
-#     DisconnectToleranceInterval
+#    DisconnectToleranceInterval
 #        Description: Allows skipping a potential login queue after being disconnected for a given number of seconds.
 #                     The interval also keeps the session alive and holds the character in world for the period after
 #                     an unwanted disconnection, for seamless reconnection.
