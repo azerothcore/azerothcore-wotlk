@@ -1240,9 +1240,12 @@ class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
         // The aura to reduce (Attuned to Nature) is stored in the effect value
         uint32 auraId = GetEffectValue();
-        Unit* target = GetHitUnit();
         Aura* aura = target->GetAura(auraId);
         if (!aura)
             return;
@@ -1264,9 +1267,11 @@ class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
         aura->ModStackAmount(-doses);
 
         if (!target->HasAura(auraId))
-            if (Creature* freya = target->ToCreature())
-                if (freya->IsAIEnabled)
-                    freya->AI()->DoAction(ACTION_ATTUNED_TO_NATURE_REMOVED);
+        {
+            Creature* freya = target->ToCreature();
+            if (freya && freya->IsAIEnabled)
+                freya->AI()->DoAction(ACTION_ATTUNED_TO_NATURE_REMOVED);
+        }
     }
 
     void Register() override
