@@ -1,3 +1,4 @@
+-- DB update 2026_08_08_14 -> 2026_08_09_00
 -- Thorim: Clash of Thunder factions (sniffed). The captured mercenaries (1692) and the
 -- Jormungar Behemoth (1693) are mutually hostile, driving the pre-encounter mock fight;
 -- the arena Dark Rune Acolyte (2119) is friendly to both sides so it can heal across it.
