@@ -3313,52 +3313,6 @@ class spell_item_complete_raptor_capture : public SpellScript
     }
 };
 
-enum ImpaleLeviroth
-{
-    NPC_LEVIROTH                = 26452,
-    SPELL_LEVIROTH_SELF_IMPALE  = 49882,
-};
-
-class spell_item_impale_leviroth : public SpellScript
-{
-    PrepareSpellScript(spell_item_impale_leviroth);
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        if (!sObjectMgr->GetCreatureTemplate(NPC_LEVIROTH))
-            return false;
-        return true;
-    }
-
-    void HandleDummy(SpellEffIndex /* effIndex */)
-    {
-        if (Creature* target = GetHitCreature())
-            if (target->GetEntry() == NPC_LEVIROTH && target->HealthAbovePct(94))
-            {
-                target->CastSpell(target, SPELL_LEVIROTH_SELF_IMPALE, true);
-
-                // CalculateMinMaxDamage multiplies weapon damage by the template's DamageModifier
-                // (7.5 here), landing around 1300-1700 instead of 150-200. Cancel it out.
-                target->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 150);
-                target->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 200);
-                // BASE_PCT, not TOTAL_PCT: the latter is rebuilt from scratch whenever a physical
-                // damage-percent aura changes, which would drop this again.
-                if (float damageModifier = target->GetCreatureTemplate()->DamageModifier)
-                    target->SetStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, BASE_PCT, 1.0f / damageModifier);
-
-                // none of the above reaches the melee roll until stats are recalculated
-                target->UpdateDamagePhysical(BASE_ATTACK);
-
-                target->LowerPlayerDamageReq(target->GetMaxHealth());
-            }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_impale_leviroth::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
 enum BrewfestMountTransformation
 {
     SPELL_MOUNT_RAM_100                         = 43900,
@@ -6194,7 +6148,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_socrethars_stone);
     RegisterSpellScript(spell_item_demon_broiled_surprise);
     RegisterSpellScript(spell_item_complete_raptor_capture);
-    RegisterSpellScript(spell_item_impale_leviroth);
     RegisterSpellScript(spell_item_brewfest_mount_transformation);
     RegisterSpellScript(spell_item_nitro_boots);
     RegisterSpellScript(spell_item_teach_language);
