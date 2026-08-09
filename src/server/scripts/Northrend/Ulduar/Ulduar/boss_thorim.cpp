@@ -219,7 +219,7 @@ enum ThorimEvents
     EVENT_IH_GUARD_HAMSTRING                = 91,
     EVENT_IH_GUARD_SHIELD_SMASH             = 92,
 
-    EVENT_SIF_START_TALK                    = 100,
+    EVENT_THORIM_SUMMON_SIF                 = 100,
     EVENT_SIF_JOIN_TALK                     = 101,
     EVENT_SIF_FINISH_DOMINION               = 102,
     EVENT_SIF_FROSTBOLT_VALLEY              = 103,
@@ -296,7 +296,6 @@ enum Misc
     ACTION_START_TRASH_DIED     = 1,
     ACTION_ALLOW_HIT            = 2,
     ACTION_SIF_JOIN_FIGHT       = 3,
-    ACTION_SIF_START_TALK       = 4,
     ACTION_SIF_START_DOMINION   = 5,
     ACTION_SIF_TRANSFORM        = 6,
     ACTION_IRON_HONOR_DIED      = 7,
@@ -389,9 +388,6 @@ struct boss_thorim : public BossAI
 
         // Ancient Rune Giant 32873
         me->SummonCreature(NPC_ANCIENT_RUNE_GIANT, 2134.57f, -440.318f, 438.331f, 0.226893f);
-
-        // Sif 33196
-        me->SummonCreature(NPC_SIF, 2147.86f, -301.2f, 438.246f, 2.488f);
     }
 
     void CloseDoors()
@@ -656,13 +652,12 @@ struct boss_thorim : public BossAI
 
                 break;
             case EVENT_THORIM_AGGRO2:
-                {
-                    Talk(SAY_AGGRO_2);
-
-                    EntryCheckPredicate pred(NPC_SIF);
-                    summons.DoAction(ACTION_SIF_START_TALK, pred);
-                    break;
-                }
+                Talk(SAY_AGGRO_2);
+                events.ScheduleEvent(EVENT_THORIM_SUMMON_SIF, 6500ms);
+                break;
+            case EVENT_THORIM_SUMMON_SIF:
+                me->SummonCreature(NPC_SIF, 2148.3f, -297.845f, 438.331f, 2.688f);
+                break;
             case EVENT_THORIM_START_PHASE1:
                 {
                     events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8s, 0, EVENT_PHASE_START);
@@ -806,11 +801,14 @@ struct boss_thorim_sif : public ScriptedAI
             _allowCast = false;
         }
 
+        void IsSummonedBy(WorldObject* /*summoner*/) override
+        {
+            Talk(SAY_SIF_AGGRO);
+        }
+
         void DoAction(int32 param) override
         {
-            if (param == ACTION_SIF_START_TALK)
-                events.ScheduleEvent(EVENT_SIF_START_TALK, 9s);
-            else if (param == ACTION_SIF_START_DOMINION)
+            if (param == ACTION_SIF_START_DOMINION)
             {
                 if (me->GetInstanceScript())
                     if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
@@ -822,7 +820,6 @@ struct boss_thorim_sif : public ScriptedAI
             {
                 me->InterruptNonMeleeSpells(false);
                 events.ScheduleEvent(EVENT_SIF_JOIN_TALK, 9s);
-                events.CancelEvent(EVENT_SIF_START_TALK);
                 events.CancelEvent(EVENT_SIF_FINISH_DOMINION);
             }
             else if (param == ACTION_SIF_TRANSFORM)
@@ -845,9 +842,6 @@ struct boss_thorim_sif : public ScriptedAI
                 case EVENT_SIF_FINISH_DOMINION:
                     Talk(SAY_SIF_HM_MISSED);
                     me->DespawnOrUnsummon(5s);
-                    break;
-                case EVENT_SIF_START_TALK:
-                    Talk(SAY_SIF_AGGRO);
                     break;
                 case EVENT_SIF_JOIN_TALK:
                     Talk(SAY_SIF_HM_REACHED);
