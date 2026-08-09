@@ -112,7 +112,7 @@ private:
     uint32 _maxQueuedSessionCount;
     uint32 _playerCount;
     uint32 _maxPlayerCount;
-    uint32 _accountsPlayHistoryPruneTimer;
+    uint32 _stalePruneTimer;
 };
 
 #define sWorldSessionMgr WorldSessionMgr::Instance()
