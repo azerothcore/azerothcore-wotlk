@@ -89,9 +89,6 @@ enum UlduarData
     DATA_XT002_DOORS                        = 400,
     DATA_XT002_HEART                        = 401,
 
-    // Kologarn
-    DATA_KOLOGARN_DOORS                     = 410,
-
     // Thorim
     DATA_THORIM_LEVER_GATE                  = 500,
     DATA_THORIM_LEVER                       = 501,
@@ -275,7 +272,6 @@ enum UlduarGameObjects
     GO_ARCHIVUM_DOORS                       = 194556,
     GO_ASSEMBLY_DOORS                       = 194554,
     GO_KOLOGARN_BRIDGE                      = 194232,
-    GO_KOLOGARN_DOORS                       = 194553,
     GO_KEEPERS_GATE                         = 194255,
     GO_XT002_DOORS                          = 194631,
 
@@ -355,6 +351,9 @@ enum UlduarMisc
     EVENT_TOWER_OF_FROST_DESTROYED          = 21032,
     EVENT_TOWER_OF_FLAMES_DESTROYED         = 21033,
     EVENT_TOWER_OF_LIFE_DESTROYED           = 21030,
+
+    // Sent by Shatter Chest (62502), triggered by Hodir's hard mode timer missile (62501)
+    EVENT_HODIR_SHATTER_CHEST               = 20907,
 
     ACTION_LEVIATHAN_REFRESH_TOWERS         = -1,
     ACTION_TOWER_OF_STORM_DESTROYED         = 1,
