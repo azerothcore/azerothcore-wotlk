@@ -7268,7 +7268,7 @@ bool Spell::CanAutoCast(Unit* target)
 
 SpellCastResult Spell::CheckRange(bool strict)
 {
-    Unit* unitCaster = m_originalCaster ? m_originalCaster : m_caster->ToUnit();
+    Unit* unitCaster = m_caster->ToUnit();
     // Don't check for instant cast spells
     if (!strict && m_casttime == 0)
         return SPELL_CAST_OK;
@@ -7328,6 +7328,10 @@ SpellCastResult Spell::CheckRange(bool strict)
             if (!targetIsVehicleBase && unitCaster->IsPlayer() && (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !unitCaster->HasInArc(static_cast<float>(M_PI), target) && !unitCaster->IsWithinBoundaryRadius(target))
                 return SPELL_FAILED_UNIT_NOT_INFRONT;
         }
+        // Non-Unit casters (e.g. a GameObject trap) have no combat reach/facing of their own;
+        // just check the target is within the spell's range of the caster's actual position.
+        else if (target != m_caster && !unitCaster && !m_caster->IsWithinDist(target, max_range))
+            return SPELL_FAILED_OUT_OF_RANGE;
 
         // Check min range - for ranged spells, min range is the spell's min range + melee range (no leeway)
         if (unitCaster && range_type == SPELL_RANGE_RANGED)
