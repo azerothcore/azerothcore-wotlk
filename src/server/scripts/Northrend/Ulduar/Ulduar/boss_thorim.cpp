@@ -1277,7 +1277,7 @@ struct boss_thorim_gauntlet_npcs : public ScriptedAI
                 events.ScheduleEvent(EVENT_IR_GUARD_IMPALE, 12s);
                 events.ScheduleEvent(EVENT_IR_GUARD_WHIRL, 5s);
             }
-            else if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I)
+            else if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_G)
             {
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_GH, 10s);
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_HS, 5s);
