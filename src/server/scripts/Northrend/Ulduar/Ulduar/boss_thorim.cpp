@@ -356,7 +356,7 @@ struct boss_thorim : public BossAI
     void SpawnAllNPCs()
     {
         // Jormungar Behemoth 32882
-        me->SummonCreature(NPC_JORMUNGAR_BEHEMOT, 2149.68f, -263.477f, 419.679f, 3.12102f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+        me->SummonCreature(NPC_JORMUNGAR_BEHEMOT, 2146.611f, -266.653f, 419.8175f, 2.70526f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
         // Captured Mercenary Soldier 32885
         me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2127.24f, -251.309f, 419.793f, 5.89921f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
