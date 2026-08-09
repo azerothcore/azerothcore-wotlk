@@ -54,6 +54,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1494, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negolash - On Just Summoned - Set React State Passive'),
 (1494, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negolash - On Just Summoned - Stop Combat Movement'),
 (1494, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 149400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negolash - On Just Summoned - Start Waypoint Path'),
-(1494, 0, 4, 5, 108, 0, 100, 0, 5, 149400, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negolash - On Waypoint 5 Reached - Say Line 1'),
+(1494, 0, 4, 5, 108, 0, 100, 1, 5, 149400, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negolash - On Waypoint 5 Reached - Say Line 1'),
 (1494, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negolash - On Waypoint 5 Reached - Allow Combat Movement'),
 (1494, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Negolash - On Waypoint 5 Reached - Set React State Aggressive');
