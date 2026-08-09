@@ -617,7 +617,7 @@ bool WorldSession::ProcessMovementInfo(MovementInfo& movementInfo, Unit* mover, 
     if (!VerifyMovementInfo(movementInfo, plrMover, mover, opcode))
         return false;
 
-    if (mover->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) || (mover->IsCreature() && mover->HasUnitState(UNIT_STATE_ROOT)))
+    if (mover->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) || (mover->IsCreature() && mover->IsImmobilizedState()))
     {
         movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
 
@@ -1020,7 +1020,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         // Legit unroots clear the state first, so a still immobilized mover was never sent one.
         // This ack bypasses VerifyMovementInfo()'s root check, so accepting it clears
         // MOVEMENTFLAG_ROOT permanently. Creatures only: ResurrectPlayer() unroots packet-only.
-        if (mover->IsCreature() && mover->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+        if (mover->IsCreature() && mover->IsImmobilizedState())
             return;
     }
     else // root case
