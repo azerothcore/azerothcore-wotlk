@@ -59,6 +59,8 @@ We also recommend you read our [Contributor Covenant Code of Conduct](https://gi
 
 Feel free to join our [Discord server](https://discord.gg/gkt4y2x).
 
+🤖 If you use any AI agent to work on AzerothCore, please read our [AI Agentic Engineering guidelines](https://www.azerothcore.org/wiki/agentic-engineering).
+
 Click on the "⭐ Star" button to help us gain more visibility on Github!
 
 ## Authors & Contributors
