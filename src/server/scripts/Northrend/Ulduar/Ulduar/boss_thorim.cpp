@@ -18,6 +18,7 @@
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
+#include "ObjectAccessor.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -61,6 +62,10 @@ enum ThorimSpells
     SPELL_GREATER_HEAL                      = 62334,
     SPELL_HOLY_SMITE                        = 62335,
     SPELL_RENEW                             = 62333,
+    // NPC variants used while healing the arena mock fight
+    SPELL_GREATER_HEAL_RP                   = 61965,
+    SPELL_RENEW_RP                          = 61967,
+    SPELL_CIRCLE_OF_HEALING_RP              = 61964,
 
     // CAPTURED MERCENARY SOLDIER
     SPELL_BARBED_SHOT                       = 62318,
@@ -70,6 +75,8 @@ enum ThorimSpells
     // CAPTURED MERCENARY CAPTAIN
     SPELL_DEVASTATE                         = 62317,
     SPELL_HEROIC_STRIKE                     = 62444,
+    SPELL_SUNDER_ARMOR                      = 57807,
+    SPELL_THREAT                            = 34915, // serverside, keeps the behemoth glued to the captain
 
     // JORMUNGAR BEHEMOTH
     SPELL_ACID_BREATH                       = 62315,
@@ -178,6 +185,9 @@ enum ThorimEvents
     EVENT_DR_ACOLYTE_GH                     = 20,
     EVENT_DR_ACOLYTE_HS                     = 21,
     EVENT_DR_ACOLYTE_R                      = 22,
+    EVENT_DR_ACOLYTE_RP_GH                  = 23,
+    EVENT_DR_ACOLYTE_RP_RENEW               = 24,
+    EVENT_DR_ACOLYTE_RP_COH                 = 25,
 
     EVENT_CM_SOLDIER_BS                     = 30,
     EVENT_CM_SOLDIER_S                      = 31,
@@ -185,6 +195,8 @@ enum ThorimEvents
 
     EVENT_CM_CAPTAIN_D                      = 40,
     EVENT_CM_CAPTAIN_HC                     = 41,
+    EVENT_CM_CAPTAIN_SA                     = 42,
+    EVENT_CM_CAPTAIN_THREAT                 = 43,
 
     EVENT_JB_ACID_BREATH                    = 50,
     EVENT_JB_SWEEP                          = 51,
@@ -288,6 +300,7 @@ enum Misc
     ACTION_SIF_START_DOMINION   = 5,
     ACTION_SIF_TRANSFORM        = 6,
     ACTION_IRON_HONOR_DIED      = 7,
+    ACTION_ENGAGE_PLAYERS       = 8,
 
     EVENT_PHASE_START           = 1,
     EVENT_PHASE_RING            = 2,
@@ -343,7 +356,7 @@ struct boss_thorim : public BossAI
     void SpawnAllNPCs()
     {
         // Jormungar Behemoth 32882
-        me->SummonCreature(NPC_JORMUNGAR_BEHEMOT, 2149.68f, -263.477f, 419.679f, 3.12102f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+        me->SummonCreature(NPC_JORMUNGAR_BEHEMOT, 2146.611f, -266.653f, 419.8175f, 2.70526f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
         // Captured Mercenary Soldier 32885
         me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2127.24f, -251.309f, 419.793f, 5.89921f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
@@ -1022,9 +1035,39 @@ struct boss_thorim_start_npcs : public ScriptedAI
             events.Reset();
             _isCaster = (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I);
             _playerAttack = false;
-            if (me->GetEntry() != NPC_JORMUNGAR_BEHEMOT)
-                if (Creature* cr = me->FindNearestCreature(NPC_JORMUNGAR_BEHEMOT, 30.0f))
-                    AttackStart(cr);
+            StartMockBattle();
+        }
+
+        void JustReachedHome() override
+        {
+            // Reset() runs at evade start, when UNIT_STATE_EVADE still blocks Unit::Attack
+            StartMockBattle();
+        }
+
+        void StartMockBattle()
+        {
+            events.Reset();
+
+            // The acolyte is friendly to both sides and heals the fight from its spawn point
+            if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I)
+            {
+                me->SetReactState(REACT_PASSIVE);
+                events.ScheduleEvent(EVENT_DR_ACOLYTE_RP_GH, 5s);
+                events.ScheduleEvent(EVENT_DR_ACOLYTE_RP_RENEW, 8s);
+                events.ScheduleEvent(EVENT_DR_ACOLYTE_RP_COH, 20s);
+                return;
+            }
+
+            if (me->GetEntry() == NPC_JORMUNGAR_BEHEMOT)
+                return;
+
+            if (Creature* behemoth = me->FindNearestCreature(NPC_JORMUNGAR_BEHEMOT, 60.0f))
+            {
+                if (me->GetEntry() == NPC_CAPTURED_MERCENARY_SOLDIER_ALLY || me->GetEntry() == NPC_CAPTURED_MERCENARY_SOLDIER_HORDE)
+                    AttackStartNoMove(behemoth); // soldiers shoot from their spawn point
+                else
+                    AttackStart(behemoth);
+            }
         }
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
@@ -1040,14 +1083,29 @@ struct boss_thorim_start_npcs : public ScriptedAI
                             thorim->AI()->AttackStart(who);
                         }
                     }
-                _playerAttack = true;
-                me->GetThreatMgr().ResetAllThreat();
-                me->CallForHelp(40.0f);
-                AttackStart(who);
+
+                // The whole pack turns on the raid at once; CallForHelp cannot cross the mock fight's faction split
+                std::list<Creature*> pack;
+                me->GetCreatureListWithEntryInGrid(pack, { NPC_JORMUNGAR_BEHEMOT, NPC_CAPTURED_MERCENARY_SOLDIER_ALLY, NPC_CAPTURED_MERCENARY_SOLDIER_HORDE,
+                    NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY, NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, NPC_DARK_RUNE_ACOLYTE_I }, 100.0f);
+                for (Creature* member : pack)
+                    member->AI()->SetGUID(who->GetGUID(), ACTION_ENGAGE_PLAYERS);
             }
 
             if (!_playerAttack && me->HealthBelowPct(60))
                 me->SetHealth(me->GetMaxHealth());
+        }
+
+        void SetGUID(ObjectGuid const& guid, int32 id) override
+        {
+            if (id != ACTION_ENGAGE_PLAYERS || _playerAttack)
+                return;
+
+            _playerAttack = true;
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->GetThreatMgr().ClearAllThreat();
+            if (Unit* attacker = ObjectAccessor::GetUnit(*me, guid))
+                AttackStart(attacker);
         }
 
         void JustDied(Unit*) override
@@ -1061,6 +1119,8 @@ struct boss_thorim_start_npcs : public ScriptedAI
         {
             if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I)
             {
+                // Entering real combat ends the mock fight heal rotation
+                events.Reset();
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_GH, 10s);
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_HS, 5s);
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_R, 7s);
@@ -1075,6 +1135,8 @@ struct boss_thorim_start_npcs : public ScriptedAI
             {
                 events.ScheduleEvent(EVENT_CM_CAPTAIN_D, 9s);
                 events.ScheduleEvent(EVENT_CM_CAPTAIN_HC, 5s);
+                events.ScheduleEvent(EVENT_CM_CAPTAIN_SA, 8s);
+                events.ScheduleEvent(EVENT_CM_CAPTAIN_THREAT, 1200ms);
             }
             else if (me->GetEntry() == NPC_JORMUNGAR_BEHEMOT)
             {
@@ -1088,7 +1150,39 @@ struct boss_thorim_start_npcs : public ScriptedAI
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
+                // The acolyte tends both sides of the mock fight from outside of combat
+                if (_isCaster && !_playerAttack)
+                {
+                    events.Update(diff);
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
+
+                    switch (events.ExecuteEvent())
+                    {
+                        case EVENT_DR_ACOLYTE_RP_GH:
+                            if (Creature* behemoth = me->FindNearestCreature(NPC_JORMUNGAR_BEHEMOT, 60.0f))
+                                me->CastSpell(behemoth, SPELL_GREATER_HEAL_RP, false);
+                            events.Repeat(23s);
+                            break;
+                        case EVENT_DR_ACOLYTE_RP_RENEW:
+                        {
+                            Creature* captain = me->FindNearestCreature(NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY, 60.0f);
+                            if (!captain)
+                                captain = me->FindNearestCreature(NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, 60.0f);
+                            if (captain)
+                                me->CastSpell(captain, SPELL_RENEW_RP, false);
+                            events.Repeat(23s);
+                            break;
+                        }
+                        case EVENT_DR_ACOLYTE_RP_COH:
+                            me->CastSpell(me, SPELL_CIRCLE_OF_HEALING_RP, false);
+                            events.Repeat(23s);
+                            break;
+                    }
+                }
                 return;
+            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -1117,7 +1211,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
                     break;
                 case EVENT_CM_SOLDIER_BS:
                     me->CastSpell(me->GetVictim(), SPELL_BARBED_SHOT, false);
-                    events.Repeat(9s);
+                    events.Repeat(12s);
                     break;
                 case EVENT_CM_SOLDIER_WC:
                     me->CastSpell(me->GetVictim(), SPELL_WING_CLIP, false);
@@ -1127,7 +1221,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
                     if (me->GetDistance(me->GetVictim()) > 8)
                         me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
 
-                    events.Repeat(1500ms);
+                    events.Repeat(3700ms);
                     break;
                 case EVENT_CM_CAPTAIN_D:
                     me->CastSpell(me->GetVictim(), SPELL_DEVASTATE, false);
@@ -1135,7 +1229,18 @@ struct boss_thorim_start_npcs : public ScriptedAI
                     break;
                 case EVENT_CM_CAPTAIN_HC:
                     me->CastSpell(me->GetVictim(), SPELL_HEROIC_STRIKE, false);
-                    events.Repeat(5s);
+                    events.Repeat(12s);
+                    break;
+                case EVENT_CM_CAPTAIN_SA:
+                    me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
+                    events.Repeat(12s);
+                    break;
+                case EVENT_CM_CAPTAIN_THREAT:
+                    if (!_playerAttack)
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_THREAT, true);
+                        events.Repeat(1200ms);
+                    }
                     break;
                 case EVENT_JB_ACID_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_ACID_BREATH, false);
@@ -1143,7 +1248,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
                     break;
                 case EVENT_JB_SWEEP:
                     me->CastSpell(me->GetVictim(), SPELL_SWEEP, false);
-                    events.Repeat(5s);
+                    events.Repeat(15s);
                     break;
             }
 
@@ -1172,7 +1277,7 @@ struct boss_thorim_gauntlet_npcs : public ScriptedAI
                 events.ScheduleEvent(EVENT_IR_GUARD_IMPALE, 12s);
                 events.ScheduleEvent(EVENT_IR_GUARD_WHIRL, 5s);
             }
-            else if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I)
+            else if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_G)
             {
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_GH, 10s);
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_HS, 5s);
