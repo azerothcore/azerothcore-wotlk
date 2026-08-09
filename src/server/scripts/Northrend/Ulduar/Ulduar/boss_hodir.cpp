@@ -53,7 +53,8 @@ enum HodirSpellData
 
     SPELL_ICICLE_VISUAL_UNPACKED        = 62234,
     SPELL_ICICLE_VISUAL_PACKED          = 62462,
-    SPELL_ICICLE_PACKED_TBBA            = 62477,
+    SPELL_ICICLE_FORCE_CAST             = 62476,
+    SPELL_ICICLE_FORCE_CAST_H           = 62477,
     SPELL_ICICLE_VISUAL_FALLING         = 62453,
     SPELL_ICICLE_FALL_EFFECT_UNPACKED   = 62236,
     SPELL_ICICLE_FALL_EFFECT_PACKED     = 62460,
@@ -176,35 +177,35 @@ enum HodirHelperActions
 struct HodirHelperData
 {
     uint32 id;
-    float x, y;
+    Position pos;
 };
 HodirHelperData hhd[4][4] =
 {
     // Alliance:
     {
-        {NPC_PAN_FIELD_MEDIC_PENNY, 2020.46f, -236.74f},
-        {NPC_DAN_ELLIE_NIGHTFEATHER, 2007.21f, -241.57f},
-        {NPC_SAN_ELEMENTALIST_AVUUN, 1999.14f, -230.69f},
-        {NPC_MAN_MISSY_FLAMECUFFS, 1984.38f, -242.57f}
+        {NPC_PAN_FIELD_MEDIC_PENNY, {1983.75f, -243.36f, 432.767f, 1.5708f}},
+        {NPC_DAN_ELLIE_NIGHTFEATHER, {1999.90f, -230.50f, 432.758f, 1.5359f}},
+        {NPC_SAN_ELEMENTALIST_AVUUN, {2010.06f, -243.46f, 432.767f, 1.3614f}},
+        {NPC_MAN_MISSY_FLAMECUFFS, {2021.12f, -236.65f, 432.767f, 1.9373f}}
     },
     {
-        {NPC_PAH_FIELD_MEDIC_JESSI, 2012.29f, -233.70f},
-        {NPC_DAH_EIVI_NIGHTFEATHER, 1995.75f, -241.32f},
-        {NPC_SAH_ELEMENTALIST_MAHFUUN, 1989.31f, -234.26f},
-        {NPC_MAH_SISSY_FLAMECUFFS, 1977.87f, -233.99f}
+        {NPC_PAH_FIELD_MEDIC_JESSI, {2013.20f, -232.35f, 432.752f, 1.9897f}},
+        {NPC_DAH_EIVI_NIGHTFEATHER, {1976.41f, -235.07f, 432.752f, 0.9250f}},
+        {NPC_SAH_ELEMENTALIST_MAHFUUN, {1988.79f, -234.15f, 432.752f, 1.2043f}},
+        {NPC_MAH_SISSY_FLAMECUFFS, {1997.36f, -241.95f, 432.752f, 1.4835f}}
     },
     // Horde:
     {
-        {NPC_PHN_BATTLEPRIEST_ELIZA, 2020.46f, -236.74f},
-        {NPC_DHN_TOR_GREYCLOUD, 2007.21f, -241.57f},
-        {NPC_SHN_SPIRITWALKER_YONA, 1999.14f, -230.69f},
-        {NPC_MHN_VEESHA_BLAZEWEAVER, 1984.38f, -242.57f}
+        {NPC_PHN_BATTLEPRIEST_ELIZA, {1983.75f, -243.36f, 432.767f, 1.5708f}},
+        {NPC_DHN_TOR_GREYCLOUD, {1999.90f, -230.50f, 432.758f, 1.5359f}},
+        {NPC_SHN_SPIRITWALKER_YONA, {2010.06f, -243.46f, 432.767f, 1.3614f}},
+        {NPC_MHN_VEESHA_BLAZEWEAVER, {2021.12f, -236.65f, 432.767f, 1.9373f}}
     },
     {
-        {NPC_PHH_BATTLEPRIEST_GINA, 2012.29f, -233.70f},
-        {NPC_DHH_KAR_GREYCLOUD, 1995.75f, -241.32f},
-        {NPC_SHH_SPIRITWALKER_TARA, 1989.31f, -234.6f},
-        {NPC_MHH_AMIRA_BLAZEWEAVER, 1977.87f, -233.99f}
+        {NPC_PHH_BATTLEPRIEST_GINA, {2013.20f, -232.35f, 432.752f, 1.9897f}},
+        {NPC_DHH_KAR_GREYCLOUD, {1976.41f, -235.07f, 432.752f, 0.9250f}},
+        {NPC_SHH_SPIRITWALKER_TARA, {1988.79f, -234.15f, 432.752f, 1.2043f}},
+        {NPC_MHH_AMIRA_BLAZEWEAVER, {1997.36f, -241.95f, 432.752f, 1.4835f}}
     }
 };
 
@@ -411,16 +412,7 @@ struct boss_hodir : public BossAI
                 break;
             case EVENT_FLASH_FREEZE:
                 {
-                    std::list<Unit*> targets;
-                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                        targets.push_back(itr->GetSource());
-                    targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-                    targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-                    Acore::Containers::RandomResize(targets, (RAID_MODE(2,3)));
-                    for (Unit* target : targets)
-                        me->CastSpell(target, SPELL_ICICLE_PACKED_TBBA, true); // Forces victim to cast Icicle (62462)
-
+                    DoCastSelf(RAID_MODE(SPELL_ICICLE_FORCE_CAST, SPELL_ICICLE_FORCE_CAST_H), true);
                     me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
                     me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
                     Talk(TEXT_FLASH_FREEZE);
@@ -501,7 +493,7 @@ struct boss_hodir : public BossAI
                     if (!hhd[k][i].id)
                         continue;
 
-                    if (Creature* h_p = me->SummonCreature(hhd[k][i].id, hhd[k][i].x, hhd[k][i].y, 432.69f, M_PI / 2))
+                    if (Creature* h_p = me->SummonCreature(hhd[k][i].id, hhd[k][i].pos))
                     {
                         h_p->SetFaction(1665);
                         if (cnt < 8)
@@ -699,17 +691,6 @@ struct npc_ulduar_toasty_fire : public NullCreatureAI
             me->DespawnOrUnsummon(); // this will remove DynObjects
         }
     }
-
-    void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
-    {
-        switch (spell->Id)
-        {
-            case SPELL_ICE_SHARDS_SMALL:
-            case SPELL_ICE_SHARDS_BIG:
-                DoAction(1);
-                break;
-        }
-    }
 };
 
 struct npc_ulduar_hodir_priest : public ScriptedAI
@@ -741,7 +722,7 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
         if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2s);
+            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 1s);
         }
     }
 
@@ -766,7 +747,7 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
                                     ScheduleAbilities();
                                     break;
                                 }
-                    events.Repeat(2s);
+                    events.Repeat(1s);
                 }
                 break;
             case EVENT_PRIEST_DISPELL_MAGIC:
@@ -857,7 +838,7 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
         if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2s);
+            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 1s);
         }
     }
 
@@ -882,7 +863,7 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
                                     ScheduleAbilities();
                                     break;
                                 }
-                    events.Repeat(2s);
+                    events.Repeat(1s);
                 }
                 break;
             case EVENT_DRUID_WRATH:
@@ -966,7 +947,7 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
     void ScheduleAbilities()
     {
         events.ScheduleEvent(EVENT_SHAMAN_LAVA_BURST, 2600ms);
-        events.ScheduleEvent(EVENT_SHAMAN_STORM_CLOUD, 10s);
+        events.ScheduleEvent(EVENT_SHAMAN_STORM_CLOUD, 1s);
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -974,7 +955,7 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
         if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2s);
+            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 1s);
         }
     }
 
@@ -1007,7 +988,7 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
                                     ScheduleAbilities();
                                     break;
                                 }
-                    events.Repeat(2s);
+                    events.Repeat(1s);
                 }
                 break;
             case EVENT_SHAMAN_LAVA_BURST:
@@ -1099,7 +1080,7 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
         if (spell->Id == SPELL_FLASH_FREEZE_TRAPPED_NPC)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 2s);
+            events.ScheduleEvent(EVENT_TRY_FREE_HELPER, 1s);
         }
     }
 
@@ -1124,7 +1105,7 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
                                     ScheduleAbilities();
                                     break;
                                 }
-                    events.Repeat(2s);
+                    events.Repeat(1s);
                 }
                 break;
             case EVENT_MAGE_FIREBALL:
@@ -1151,7 +1132,6 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
 
                     if (found)
                     {
-                        events.DelayEvents(2s);
                         events.Repeat(2s);
                         break;
                     }
@@ -1338,6 +1318,24 @@ class spell_hodir_periodic_icicle : public SpellScript
     }
 };
 
+// 62476, 62477 - Icicle: force-casts the snowdrift icicle (62462) on the selected players
+class spell_hodir_icicle_force_cast : public SpellScript
+{
+    PrepareSpellScript(spell_hodir_icicle_force_cast);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 2);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_icicle_force_cast::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 class FlashFreezeCheck
 {
 public:
@@ -1474,6 +1472,11 @@ class spell_hodir_toasty_fire_aura : public AuraScript
 {
     PrepareAuraScript(spell_hodir_toasty_fire_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SINGED });
+    }
+
     void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
@@ -1481,9 +1484,20 @@ class spell_hodir_toasty_fire_aura : public AuraScript
                 target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
     }
 
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        // The default handler would credit the campfire (the aura caster) as original caster,
+        // freezing the shared Singed stack's duration once it despawns. Credit the player instead.
+        PreventDefaultAction();
+        Unit* player = GetTarget();
+        if (Unit* target = eventInfo.GetProcTarget())
+            player->CastSpell(target, SPELL_SINGED, true, nullptr, aurEff, player->GetGUID());
+    }
+
     void Register() override
     {
         AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
+        OnEffectProc += AuraEffectProcFn(spell_hodir_toasty_fire_aura::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -1586,6 +1600,7 @@ void AddSC_boss_hodir()
     RegisterSpellScript(spell_hodir_biting_cold_main_aura);
     RegisterSpellScript(spell_hodir_biting_cold_player_aura);
     RegisterSpellScript(spell_hodir_periodic_icicle);
+    RegisterSpellScript(spell_hodir_icicle_force_cast);
     RegisterSpellAndAuraScriptPair(spell_hodir_flash_freeze, spell_hodir_flash_freeze_aura);
     RegisterSpellScript(spell_hodir_storm_power_aura);
     RegisterSpellScript(spell_hodir_storm_cloud_aura);

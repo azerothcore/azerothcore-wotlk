@@ -457,6 +457,14 @@ struct boss_thorim : public BossAI
                 if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
                     go->RemoveGameObjectFlag((GameObjectFlags)48);
 
+                // Iron Ring Guards and the Runic Colossus spawn with UNIT_FLAG_IMMUNE_TO_PC until the arena event starts
+                summons.DoForAllSummons([](WorldObject* obj)
+                {
+                    if (Creature* c = obj->ToCreature())
+                        if (c->EntryEquals(NPC_IRON_RING_GUARD, NPC_RUNIC_COLOSSUS))
+                            c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                });
+
                 events.ScheduleEvent(EVENT_THORIM_AGGRO, 0ms);
                 events.SetPhase(EVENT_PHASE_START);
                 events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20s);
@@ -1280,6 +1288,10 @@ struct boss_thorim_runic_colossus : public ScriptedAI
                 if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                     cr->AI()->Talk(SAY_SPECIAL_2);
             }
+
+            // The Ancient Rune Giant stays immune to players until the colossus falls
+            if (Creature* giant = me->FindNearestCreature(NPC_ANCIENT_RUNE_GIANT, 200.0f))
+                giant->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void JustEngagedWith(Unit*) override

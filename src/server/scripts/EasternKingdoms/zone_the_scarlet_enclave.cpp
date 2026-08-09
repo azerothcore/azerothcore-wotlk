@@ -699,87 +699,6 @@ private:
 };
 
 /*######
-## Npc Scarlet Courier
-## Quest: Ambush At The Overlook
-######*/
-
-enum ScarletCourierEnum
-{
-    SAY_TREE1                          = 0,
-    SAY_TREE2                          = 1,
-    SPELL_SHOOT                        = 52818,
-    GO_INCONSPICUOUS_TREE              = 191144,
-    NPC_SCARLET_COURIER                = 29076
-};
-
-struct npc_scarlet_courier : public ScriptedAI
-{
-    npc_scarlet_courier(Creature* creature) : ScriptedAI(creature) { }
-
-    uint32 uiStage;
-    uint32 uiStage_timer;
-
-    void Reset() override
-    {
-        me->Mount(14338); // not sure about this id
-        uiStage = 1;
-        uiStage_timer = 3000;
-    }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-        Talk(SAY_TREE2);
-        me->Dismount();
-        uiStage = 0;
-    }
-
-    void MovementInform(uint32 type, uint32 id) override
-    {
-        if (type != POINT_MOTION_TYPE)
-            return;
-
-        if (id == 1)
-            uiStage = 2;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (uiStage && !me->IsInCombat())
-        {
-            if (uiStage_timer <= diff)
-            {
-                switch (uiStage)
-                {
-                    case 1:
-                        me->SetWalk(true);
-                        if (GameObject* tree = me->FindNearestGameObject(GO_INCONSPICUOUS_TREE, 40.0f))
-                        {
-                            Talk(SAY_TREE1);
-                            float x, y, z;
-                            tree->GetContactPoint(me, x, y, z);
-                            me->GetMotionMaster()->MovePoint(1, x, y, z);
-                        }
-                        break;
-                    case 2:
-                        if (GameObject* tree = me->FindNearestGameObject(GO_INCONSPICUOUS_TREE, 40.0f))
-                            if (Unit* unit = tree->GetOwner())
-                                AttackStart(unit);
-                        break;
-                }
-                uiStage_timer = 3000;
-                uiStage = 0;
-            }
-            else uiStage_timer -= diff;
-        }
-
-        if (!UpdateVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-/*######
 ## Gothik the Harvester and Acherus Necromancer AI
 ## Phase 4 Internal Mechanics.
 ######*/
@@ -2761,7 +2680,6 @@ void AddSC_the_scarlet_enclave()
     RegisterCreatureAI(npc_valkyr_battle_maiden);
     RegisterCreatureAI(npc_scarlet_ghoul);
     RegisterCreatureAI(npc_dkc1_gothik);
-    RegisterCreatureAI(npc_scarlet_courier);
     RegisterCreatureAI(npc_koltira_deathweaver);
     RegisterCreatureAI(npc_acherus_necromancer);
     RegisterCreatureAI(npc_gothik_the_harvester);
