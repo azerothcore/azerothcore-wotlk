@@ -30,7 +30,7 @@ WHERE `entryorguid` = 2289 AND `source_type` = 1 AND `id` = 0 AND `event_type` =
 --
 -- Path and timings from VMaNGOS (sql/migrations/20211001113141_world.sql): six points
 -- climbing from z -11.249 out at sea up to 0.734 on the sand, with his two lines fired
--- at the first and the fifth. Both texts already exist in broadcast_text, 731 and 763,
+-- at the first and the fifth. Both texts already exist as ids 731 and 763,
 -- so nothing here is written from scratch.
 --
 -- He also has to stay passive until he is ashore: he is hostile and aggroes the moment
