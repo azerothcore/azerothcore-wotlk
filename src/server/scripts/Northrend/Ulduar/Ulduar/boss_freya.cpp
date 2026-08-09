@@ -131,7 +131,7 @@ enum FreyaEvents
     EVENT_FREYA_GROUND_TREMOR                   = 6,
     EVENT_FREYA_IRON_ROOT                       = 7,
     EVENT_FREYA_UNSTABLE_SUN_BEAM               = 8,
-    EVENT_FREYA_RESPAWN_TRIO                    = 9,
+    EVENT_FREYA_TRIO_WAVE_END                   = 9,
 
     // STONEBARK
     EVENT_STONEBARK_FISTS_OF_STONE              = 10,
@@ -179,6 +179,10 @@ enum Texts
     EMOTE_ALLIES_OF_NATURE                       = 9,
     EMOTE_GROUND_TREMOR                          = 10,
     EMOTE_IRON_ROOTS                             = 11,
+
+    // Snaplasher / Storm Lasher / Ancient Water Spirit
+    EMOTE_TRIO_WITHERS                           = 0,
+    EMOTE_TRIO_REGENERATES                       = 1,
 };
 
 enum FreyaNPCs
@@ -207,16 +211,18 @@ enum Misc
     ACTION_REMOVE_10_STACK                      = 10,
     ACTION_REMOVE_25_STACK                      = 25,
     ACTION_REMOVE_2_STACK                       = 2,
-    ACTION_RESPAWN_TRIO                         = 1,
+    ACTION_TRIO_MEMBER_DOWN                     = 1,
     ACTION_ATTUNED_TO_NATURE_REMOVED            = 3,
     ACTION_LUMBERJACKED                         = -1,
     ACTION_ADD_DIED                             = -2,
+    ACTION_TRIO_MEMBER_REVIVED                  = -3,
 
     EVENT_PHASE_ADDS                            = 1,
     EVENT_PHASE_FINAL                           = 2,
 
     DATA_GET_ELDER_COUNT                        = 1,
     DATA_BACK_TO_NATURE                         = 2,
+    DATA_TRIO_DOWN                              = 3,
 
     CRITERIA_LUMBERJACKED                       = 21686,
 
@@ -240,11 +246,10 @@ struct boss_freya : public BossAI
             instance->SetBossState(BOSS_FREYA, DONE);
     }
 
-    uint8 _trioKilled;
+    uint8 _trioDown;
     uint8 _spawnedAmount;
     uint8 _setPermutation;
     uint8 _lumberjacked;
-    bool _respawningTrio;
     bool _backToNature;
     uint8 _deforestation;
     uint8 _aliveAddsCount;
@@ -269,9 +274,8 @@ struct boss_freya : public BossAI
 
         _lumberjacked = 0;
         _spawnedAmount = 0;
-        _trioKilled = 0;
+        _trioDown = 0;
         _setPermutation = urand(0, 5);
-        _respawningTrio = false;
         _backToNature = true;
         _deforestation = 0;
         _aliveAddsCount = 0;
@@ -368,6 +372,7 @@ struct boss_freya : public BossAI
             case GROUP_TRIO:
                 Talk(SAY_SUMMON_TRIO);
                 DoCast(SPELL_SUMMON_WAVE_3);
+                _trioDown = 0;
                 break;
             case GROUP_CONSERVATOR:
                 Talk(SAY_SUMMON_CONSERVATOR);
@@ -404,15 +409,19 @@ struct boss_freya : public BossAI
             return;
         }
 
-        if (param == ACTION_RESPAWN_TRIO)
+        if (param == ACTION_TRIO_MEMBER_DOWN)
         {
-            if (!_respawningTrio)
-            {
-                _respawningTrio = true;
-                events.ScheduleEvent(EVENT_FREYA_RESPAWN_TRIO, 12s);
-            }
+            // Once the whole trio is down none of them can come back, so the wave
+            // is decided here and only waits out the last member's revive window
+            if (++_trioDown >= 3)
+                events.RescheduleEvent(EVENT_FREYA_TRIO_WAVE_END, 11s);
 
-            ++_trioKilled;
+            return;
+        }
+
+        if (param == ACTION_TRIO_MEMBER_REVIVED)
+        {
+            --_trioDown;
             return;
         }
 
@@ -451,6 +460,9 @@ struct boss_freya : public BossAI
         }
         if (param == DATA_BACK_TO_NATURE)
             return _backToNature;
+
+        if (param == DATA_TRIO_DOWN)
+            return _trioDown;
 
         return 0;
     }
@@ -593,15 +605,11 @@ struct boss_freya : public BossAI
                     me->CastSpell(target, SPELL_SUNBEAM, false);
                 events.Repeat(15s, 20s);
                 break;
-            case EVENT_FREYA_RESPAWN_TRIO:
+            case EVENT_FREYA_TRIO_WAVE_END:
+                // _trioDown stays set so a member resolving on this same tick
+                // still sees the trio as wiped and does not come back
                 _deforestation = 0;
-                _respawningTrio = false;
-                if (_trioKilled < 3)
-                    summons.DoAction(ACTION_RESPAWN_TRIO);
-                else
-                    events.RescheduleEvent(EVENT_FREYA_ADDS_SPAM, 5s, 0, EVENT_PHASE_ADDS);
-
-                _trioKilled = 0;
+                events.RescheduleEvent(EVENT_FREYA_ADDS_SPAM, 5s, 0, EVENT_PHASE_ADDS);
                 break;
             case EVENT_FREYA_NATURE_BOMB:
                 {
@@ -1102,8 +1110,16 @@ struct boss_freya_summons : public ScriptedAI
 
                 if (_isTrio)
                 {
-                    freya->AI()->DoAction(ACTION_RESPAWN_TRIO);
+                    freya->AI()->DoAction(ACTION_TRIO_MEMBER_DOWN);
                     _hasDied = true;
+                    Talk(EMOTE_TRIO_WITHERS);
+
+                    // The corpse keeps ticking its events, so each member counts
+                    // down its own revive window instead of sharing one with Freya
+                    me->m_Events.AddEventAtOffset([this]()
+                    {
+                        ReviveWithAllies();
+                    }, 11s);
                 }
                 else
                     freya->AI()->DoAction(ACTION_ADD_DIED);
@@ -1113,19 +1129,24 @@ struct boss_freya_summons : public ScriptedAI
             me->CastSpell(me, SPELL_DETONATE, true);
     }
 
-    void DoAction(int32 param) override
+    void ReviveWithAllies()
     {
-        if (_isTrio && param == ACTION_RESPAWN_TRIO)
-        {
-            // Members still alive when the trio revives are only healed to full
-            if (me->isDead())
-            {
-                me->setDeathState(DeathState::JustRespawned);
-                Reset();
-            }
-            else
-                me->SetFullHealth();
-        }
+        InstanceScript* instance = me->GetInstanceScript();
+        if (!instance)
+            return;
+
+        Creature* freya = instance->GetCreature(BOSS_FREYA);
+        if (!freya)
+            return;
+
+        // A member only comes back while at least one of its allies is still up
+        if (freya->AI()->GetData(DATA_TRIO_DOWN) >= 3)
+            return;
+
+        Talk(EMOTE_TRIO_REGENERATES);
+        me->setDeathState(DeathState::JustRespawned);
+        Reset();
+        freya->AI()->DoAction(ACTION_TRIO_MEMBER_REVIVED);
     }
 
     void JustEngagedWith(Unit*) override
