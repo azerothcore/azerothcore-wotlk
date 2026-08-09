@@ -5808,36 +5808,29 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
 
     uint32 count = damage;
     if (count == 0) count = 1;
-    for (uint32 j = 0; j < MAX_RUNES && count > 0; ++j)
+    // Blood Tap goes by rune slot, not by what the rune is showing: both blood slots count
+    // whether or not they have already turned into death runes. With one of them ready the
+    // other is the one to bring back, and with both spent it takes the one closest to
+    // refreshing.
+    if (m_spellInfo->Id == 45529)
     {
-        if (player->GetRuneCooldown(j) && player->GetCurrentRune(j) == RuneType(m_spellInfo->Effects[effIndex].MiscValue))
-        {
-            if (m_spellInfo->Id == 45529)
-                if (player->GetBaseRune(j) != RuneType(m_spellInfo->Effects[effIndex].MiscValueB))
-                    continue;
-            player->SetRuneCooldown(j, 0);
-            player->SetGracePeriod(j, player->IsInCombat()); // xinef: reset grace period
-            --count;
-        }
-    }
+        uint8 bloodRune = 0;
+        if (player->GetRuneCooldown(1) && (!player->GetRuneCooldown(0) || player->GetRuneCooldown(1) < player->GetRuneCooldown(0)))
+            bloodRune = 1;
 
-    // Blood Tap
-    if (m_spellInfo->Id == 45529 && count > 0)
+        player->SetRuneCooldown(bloodRune, 0);
+        player->SetGracePeriod(bloodRune, player->IsInCombat()); // xinef: reset grace period
+    }
+    else
     {
-        for (uint32 l = 0; l < MAX_RUNES && count > 0; ++l)
+        for (uint32 j = 0; j < MAX_RUNES && count > 0; ++j)
         {
-            // Check if both runes are on cd as that is the only time when this needs to come into effect
-            if ((player->GetRuneCooldown(l) && player->GetCurrentRune(l) == RuneType(m_spellInfo->Effects[effIndex].MiscValueB)) && (player->GetRuneCooldown(l + 1) && player->GetCurrentRune(l + 1) == RuneType(m_spellInfo->Effects[effIndex].MiscValueB)))
+            if (player->GetRuneCooldown(j) && player->GetCurrentRune(j) == RuneType(m_spellInfo->Effects[effIndex].MiscValue))
             {
-                // Should always update the rune with the lowest cd
-                if (player->GetRuneCooldown(l) >= player->GetRuneCooldown(l + 1))
-                    l++;
-                player->SetRuneCooldown(l, 0);
-                player->SetGracePeriod(l, player->IsInCombat()); // xinef: reset grace period
+                player->SetRuneCooldown(j, 0);
+                player->SetGracePeriod(j, player->IsInCombat()); // xinef: reset grace period
                 --count;
             }
-            else
-                break;
         }
     }
 
