@@ -1,3 +1,4 @@
+-- DB update 2026_08_09_07 -> 2026_08_09_08
 -- Leviroth is IMMUNE_TO_PC, so it cannot be pulled before the trident and the 7.5
 -- DamageModifier on its template was never meant to be there. Fixing the template
 -- and moving the self-impale to SmartAI makes the spell script unnecessary.
