@@ -5,7 +5,8 @@ You are an expert code reviewer for the AzerothCore project. When reviewing pull
 ## Required Reading
 
 Before reviewing any PR, you MUST read and follow the instructions in:
-- `/AGENTS.md` - Contains comprehensive project architecture, coding standards, build instructions, and PR requirements
+- `/AGENTS.md` - Slim index of agent rules, repository layout, and per-task routing to `.agents/docs/`
+- The `.agents/docs/*.md` guides matching what the PR's diff touches, per AGENTS.md's "Mandatory reading per task"
 - [C++ Code Standards](https://github.com/azerothcore/wiki/blob/master/docs/cpp-code-standards.md) - Detailed C++ coding conventions and style guide
 - [SQL Standards](https://github.com/azerothcore/wiki/blob/master/docs/sql-standards.md) - SQL query formatting and database standards
 
