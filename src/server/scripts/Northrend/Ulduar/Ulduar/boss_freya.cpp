@@ -36,6 +36,9 @@ enum FreyaSpells
     // FREYA
     SPELL_TOUCH_OF_EONAR                        = 62528,
     SPELL_ATTUNED_TO_NATURE                     = 62519,
+    SPELL_ATTUNED_TO_NATURE_2_DOSE              = 62524,
+    SPELL_ATTUNED_TO_NATURE_10_DOSE             = 62525,
+    SPELL_ATTUNED_TO_NATURE_25_DOSE             = 62521,
     SPELL_LIFEBINDER_TRIGGER_MISSILE            = 62572, // summons Eonar's Gift at the missile impact point
     SPELL_SUMMON_WAVE_1                         = 62685, // Summon Ancient Conservator
     SPELL_SUMMON_WAVE_3                         = 62686, // Summon Trio (Water Spirit, Storm Lasher, Snaplasher)
@@ -200,6 +203,7 @@ enum Misc
     ACTION_REMOVE_25_STACK                      = 25,
     ACTION_REMOVE_2_STACK                       = 2,
     ACTION_RESPAWN_TRIO                         = 1,
+    ACTION_ATTUNED_TO_NATURE_REMOVED            = 3,
     ACTION_LUMBERJACKED                         = -1,
     ACTION_ADD_DIED                             = -2,
 
@@ -399,10 +403,17 @@ struct boss_freya : public BossAI
             if (!_respawningTrio)
             {
                 _respawningTrio = true;
-                events.ScheduleEvent(EVENT_FREYA_RESPAWN_TRIO, 10s);
+                events.ScheduleEvent(EVENT_FREYA_RESPAWN_TRIO, 12s);
             }
 
             ++_trioKilled;
+            return;
+        }
+
+        if (param == ACTION_ATTUNED_TO_NATURE_REMOVED)
+        {
+            events.ScheduleEvent(EVENT_FREYA_NATURE_BOMB, 5s);
+            events.SetPhase(EVENT_PHASE_FINAL);
             return;
         }
 
@@ -415,22 +426,10 @@ struct boss_freya : public BossAI
             // do not return
         }
 
-        if (Aura* aur = me->GetAura(SPELL_ATTUNED_TO_NATURE))
-        {
-            // Back to Nature achievement
-            if (aur->GetStackAmount() - param < 25)
-                _backToNature = false;
-
-            if (aur->GetStackAmount() > param)
-                aur->SetStackAmount(aur->GetStackAmount() - param);
-            else // Aura out of stack
-            {
-                events.ScheduleEvent(EVENT_FREYA_NATURE_BOMB, 5s);
-                events.SetPhase(EVENT_PHASE_FINAL);
-                aur->Remove();
-                return;
-            }
-        }
+        // Back to Nature achievement - the dose reduction spell has already updated the aura
+        Aura* aur = me->GetAura(SPELL_ATTUNED_TO_NATURE);
+        if (!aur || aur->GetStackAmount() < 25)
+            _backToNature = false;
     }
 
     uint32 GetData(uint32 param) const override
@@ -981,13 +980,11 @@ struct boss_freya_summons : public ScriptedAI
     }
 
     EventMap events;
-    uint8 _stackCount;
     bool _hasDied;
     bool _isTrio;
 
     void Reset() override
     {
-        _stackCount = 0;
         events.Reset();
 
         // Detonating Lashers spawn submerged in the ground and stay passive for a
@@ -1023,14 +1020,37 @@ struct boss_freya_summons : public ScriptedAI
             if (Creature* freya = instance->GetCreature(BOSS_FREYA))
             {
                 if (!_hasDied)
-                    freya->AI()->DoAction(_stackCount);
+                {
+                    uint32 doseSpell = 0;
+                    int32 stackAction = 0;
+                    switch (me->GetEntry())
+                    {
+                        case NPC_ANCIENT_CONSERVATOR:
+                            doseSpell = SPELL_ATTUNED_TO_NATURE_25_DOSE;
+                            stackAction = ACTION_REMOVE_25_STACK;
+                            break;
+                        case NPC_ANCIENT_WATER_SPIRIT:
+                        case NPC_STORM_LASHER:
+                        case NPC_SNAPLASHER:
+                            doseSpell = SPELL_ATTUNED_TO_NATURE_10_DOSE;
+                            stackAction = ACTION_REMOVE_10_STACK;
+                            break;
+                        case NPC_DETONATING_LASHER:
+                            doseSpell = SPELL_ATTUNED_TO_NATURE_2_DOSE;
+                            stackAction = ACTION_REMOVE_2_STACK;
+                            break;
+                    }
+
+                    me->CastSpell(freya, doseSpell, true);
+                    freya->AI()->DoAction(stackAction);
+                }
 
                 if (_isTrio)
                 {
                     freya->AI()->DoAction(ACTION_RESPAWN_TRIO);
                     _hasDied = true;
                 }
-                if (!_isTrio)
+                else
                     freya->AI()->DoAction(ACTION_ADD_DIED);
             }
         }
@@ -1042,8 +1062,14 @@ struct boss_freya_summons : public ScriptedAI
     {
         if (_isTrio && param == ACTION_RESPAWN_TRIO)
         {
-            me->setDeathState(DeathState::JustRespawned);
-            Reset();
+            // Members still alive when the trio revives are only healed to full
+            if (me->isDead())
+            {
+                me->setDeathState(DeathState::JustRespawned);
+                Reset();
+            }
+            else
+                me->SetFullHealth();
         }
     }
 
@@ -1054,29 +1080,18 @@ struct boss_freya_summons : public ScriptedAI
             me->CastSpell(me, SPELL_HEALTHY_SPORE_SUMMON, true);
             events.ScheduleEvent(EVENT_ANCIENT_CONSERVATOR_GRIP, 6s);
             events.ScheduleEvent(EVENT_ANCIENT_CONSERVATOR_NATURE_FURY, 14s);
-            _stackCount = ACTION_REMOVE_25_STACK;
         }
         else if (me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT)
-        {
             events.ScheduleEvent(EVENT_WATER_SPIRIT_CHARGE, 12s);
-            _stackCount = ACTION_REMOVE_10_STACK;
-        }
         else if (me->GetEntry() == NPC_STORM_LASHER)
         {
             events.ScheduleEvent(EVENT_STORM_LASHER_LIGHTNING_LASH, 10s);
             events.ScheduleEvent(EVENT_STORM_LASHER_STORMBOLT, 6s);
-            _stackCount = ACTION_REMOVE_10_STACK;
         }
         else if (me->GetEntry() == NPC_DETONATING_LASHER)
-        {
             events.ScheduleEvent(EVENT_DETONATING_LASHER_FLAME_LASH, 10s);
-            _stackCount = ACTION_REMOVE_2_STACK;
-        }
         else if (me->GetEntry() == NPC_SNAPLASHER)
-        {
             me->CastSpell(me, SPELL_HARDENED_BARK, true);
-            _stackCount = ACTION_REMOVE_10_STACK;
-        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -1202,6 +1217,55 @@ private:
     uint32 const _elderCount;
 };
 
+// 62521 - Attuned to Nature 25 Dose Reduction
+// 62524 - Attuned to Nature 2 Dose Reduction
+// 62525 - Attuned to Nature 10 Dose Reduction
+class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
+{
+    PrepareSpellScript(spell_freya_attuned_to_nature_dose_reduction);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        // The aura to reduce (Attuned to Nature) is stored in the effect value
+        uint32 auraId = GetEffectValue();
+        Aura* aura = target->GetAura(auraId);
+        if (!aura)
+            return;
+
+        int32 doses = 0;
+        switch (GetSpellInfo()->Id)
+        {
+            case SPELL_ATTUNED_TO_NATURE_2_DOSE:
+                doses = 2;
+                break;
+            case SPELL_ATTUNED_TO_NATURE_10_DOSE:
+                doses = 10;
+                break;
+            case SPELL_ATTUNED_TO_NATURE_25_DOSE:
+                doses = 25;
+                break;
+        }
+
+        aura->ModStackAmount(-doses);
+
+        if (!target->HasAura(auraId))
+        {
+            Creature* freya = target->ToCreature();
+            if (freya && freya->IsAIEnabled)
+                freya->AI()->DoAction(ACTION_ATTUNED_TO_NATURE_REMOVED);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_freya_attuned_to_nature_dose_reduction::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // 62450 - Unstable Sun Beam
 class spell_freya_unstable_sun_beam : public SpellScript
 {
@@ -1231,6 +1295,7 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_summons);
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
 
+    RegisterSpellScript(spell_freya_attuned_to_nature_dose_reduction);
     RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();
