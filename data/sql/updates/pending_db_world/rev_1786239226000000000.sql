@@ -1,41 +1,17 @@
--- Quest 619 "Enticing Negolash" has no QuestDescription, so its quest log entry
--- shows only the required items. The lifeboat itself does show text, from
--- quest_request_items.CompletionText, so the string already exists in the DB and is
--- the quest's own wording: it is simply never shown in the log.
---
--- Reusing that exact text rather than writing new flavour, so nothing here is
--- invented. The original data leaves QuestDescription empty (checked on Wowhead
--- WotLK and Classic, Warcraft Wiki, TrinityCore and VMaNGOS), so this is a
--- readability change, not a restoration.
+-- 619 shows only its required items in the log because QuestDescription is empty.
+-- Reuses the lifeboat's own wording, already in quest_request_items.
 UPDATE `quest_template` SET
     `QuestDescription` = 'This is an abandoned lifeboat.  Printed along its side in scratched, faded paint are the words:$B$B"Smotts\' Revenge"',
     `LogDescription`   = 'Bring 10 Barbecued Buzzard Wings and 5 Junglevine Wine to the Ruined Lifeboat.'
 WHERE `ID` = 619;
 
--- Negolash is summoned onto the beach right next to the player instead of rising out
--- of the sea, so he never makes the walk towards the boat where the food was laid out
--- (issue #27049). The SmartAI on the Ruined Lifeboat spawns him at z = 1.72, which is
--- above the waterline.
---
--- VMaNGOS, whose data for this vanilla quest is researched down to respawning each
--- buzzard wing, summons him at -14598.6 76.0563 -11.249, well below the surface:
--- sql/migrations/20211001113141_world.sql, "Ruined Lifeboat - Summon Creature Negolash".
+-- Negolash is summoned onto the sand beside the player instead of offshore (#27049).
+-- Position from VMaNGOS, sql/migrations/20211001113141_world.sql.
 UPDATE `smart_scripts` SET `target_x` = -14598.6, `target_y` = 76.0563, `target_z` = -11.249, `target_o` = 0.925025
 WHERE `entryorguid` = 2289 AND `source_type` = 1 AND `id` = 0 AND `event_type` = 20 AND `action_type` = 12;
 
--- The yell and the walk in. Negolash's line sits on SMART_EVENT_UPDATE_OOC (1), a
--- pulse that keeps firing while he is out of combat, so it repeats instead of playing
--- once. He also never moves: he is meant to surface offshore, say his line, wade in
--- towards the food and speak again on arrival.
---
--- Path and timings from VMaNGOS (sql/migrations/20211001113141_world.sql): six points
--- climbing from z -11.249 out at sea up to 0.734 on the sand, with his two lines fired
--- at the first and the fifth. Both texts already exist as ids 731 and 763,
--- so nothing here is written from scratch.
---
--- He also has to stay passive until he is ashore: he is hostile and aggroes the moment
--- he surfaces, and combat movement then overrides the path, leaving him standing in the
--- water unable to reach anyone. React state goes back to aggressive on the last point.
+-- His line is on UPDATE_OOC so it repeats, and he never wades in. Path and both texts
+-- from the same VMaNGOS file; he stays passive until ashore or chase overrides the path.
 DELETE FROM `creature_text` WHERE `CreatureID` = 1494 AND `GroupID` = 1;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `BroadcastTextId`, `comment`) VALUES
 (1494, 1, 0, 'AH, A FEAST!  WHO LEFT THIS HERE...?', 14, 0, 100, 763, 'Negolash - On reaching the lifeboat');
