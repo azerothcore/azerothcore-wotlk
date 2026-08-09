@@ -1,3 +1,4 @@
+-- DB update 2026_08_09_06 -> 2026_08_09_07
 -- --------------------------------------------------------------------------------------------
 -- Sholazar Basin (Northrend, map 571)
 -- The Avalanche sub-Zone Improvements Part 1: Bythius the Flesh-Shaper, Cerberon and Glonn
