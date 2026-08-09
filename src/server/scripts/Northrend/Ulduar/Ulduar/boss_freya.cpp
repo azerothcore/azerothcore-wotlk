@@ -36,7 +36,7 @@ enum FreyaSpells
     // FREYA
     SPELL_TOUCH_OF_EONAR                        = 62528,
     SPELL_ATTUNED_TO_NATURE                     = 62519,
-    SPELL_SUMMON_LIFEBINDER                     = 62572, // triggers a missile that summons Eonar's Gift at the impact point
+    SPELL_LIFEBINDER_TRIGGER_MISSILE            = 62572, // summons Eonar's Gift at the missile impact point
     SPELL_SUMMON_WAVE_1                         = 62685, // Summon Ancient Conservator
     SPELL_SUMMON_WAVE_3                         = 62686, // Summon Trio (Water Spirit, Storm Lasher, Snaplasher)
     SPELL_SUMMON_WAVE_10                        = 62687, // Summon Detonating Lashers
@@ -546,7 +546,7 @@ struct boss_freya : public BossAI
                 break;
             case EVENT_FREYA_LIFEBINDER:
                 Talk(EMOTE_LIFEBINDERS_GIFT);
-                DoCastSelf(SPELL_SUMMON_LIFEBINDER);
+                DoCastSelf(SPELL_LIFEBINDER_TRIGGER_MISSILE);
                 events.Repeat(45s);
                 break;
             case EVENT_FREYA_SUNBEAM:
