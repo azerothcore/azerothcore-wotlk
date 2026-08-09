@@ -36,7 +36,7 @@ enum FreyaSpells
     // FREYA
     SPELL_TOUCH_OF_EONAR                        = 62528,
     SPELL_ATTUNED_TO_NATURE                     = 62519,
-    SPELL_SUMMON_LIFEBINDER                     = 62870,
+    SPELL_LIFEBINDER_TRIGGER_MISSILE            = 62572, // summons Eonar's Gift at the missile impact point
     SPELL_SUMMON_WAVE_1                         = 62685, // Summon Ancient Conservator
     SPELL_SUMMON_WAVE_3                         = 62686, // Summon Trio (Water Spirit, Storm Lasher, Snaplasher)
     SPELL_SUMMON_WAVE_10                        = 62687, // Summon Detonating Lashers
@@ -545,25 +545,10 @@ struct boss_freya : public BossAI
                 events.Repeat(1min);
                 break;
             case EVENT_FREYA_LIFEBINDER:
-                {
-                    Talk(EMOTE_LIFEBINDERS_GIFT);
-                    events.Repeat(45s);
-                    float x, y, z;
-                    for (uint8 i = 0; i < 10; ++i)
-                    {
-                        x = me->GetPositionX() + urand(7, 25);
-                        y = me->GetPositionY() + urand(7, 25);
-                        z = me->GetMapHeight(x, y, me->GetPositionZ());
-                        if (me->IsWithinLOS(x, y, z))
-                        {
-                            me->CastSpell(x, y, z, SPELL_SUMMON_LIFEBINDER, true);
-                            return;
-                        }
-                    }
-
-                    me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_SUMMON_LIFEBINDER, true);
-                    break;
-                }
+                Talk(EMOTE_LIFEBINDERS_GIFT);
+                DoCastSelf(SPELL_LIFEBINDER_TRIGGER_MISSILE);
+                events.Repeat(45s);
+                break;
             case EVENT_FREYA_SUNBEAM:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     me->CastSpell(target, SPELL_SUNBEAM, false);
@@ -935,27 +920,28 @@ struct boss_freya_lifebinder : public NullCreatureAI
     {
     }
 
-    uint32 _healTimer;
-
     void Reset() override
     {
-        me->CastSpell(me, SPELL_LIFEBINDER_VISUAL, true);
-        me->CastSpell(me, SPELL_LIFEBINDER_PHERONOMES, true);
-        me->CastSpell(me, SPELL_AUTO_GROW, true);
-        _healTimer = 0;
+        me->CastSpell(me, SPELL_LIFEBINDER_VISUAL, false);
+        me->CastSpell(me, SPELL_AUTO_GROW, false);
+        me->CastSpell(me, SPELL_LIFEBINDER_PHERONOMES, false);
+
+        _scheduler.CancelAll();
+        _scheduler.Schedule(12s, [this](TaskContext /*context*/)
+        {
+            me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
+            me->CastSpell(me, SPELL_LIFEBINDER_HEAL, false);
+            me->DespawnOrUnsummon(2500ms);
+        });
     }
 
     void UpdateAI(uint32 diff) override
     {
-        _healTimer += diff;
-        if (_healTimer >= 12000)
-        {
-            me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
-            me->CastSpell(me, SPELL_LIFEBINDER_HEAL, true);
-            me->DespawnOrUnsummon(2s);
-            _healTimer = 0;
-        }
+        _scheduler.Update(diff);
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 struct boss_freya_healthy_spore : public NullCreatureAI
