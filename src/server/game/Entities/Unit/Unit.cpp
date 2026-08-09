@@ -1072,6 +1072,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             SpellInfo const* spell = (*i)->GetSpellInfo();
 
             uint32 shareDamage = CalculatePct(damage, (*i)->GetAmount());
+            bool const hasSharedDamage = shareDamage != 0;
 
             uint32 shareAbsorb = 0;
             uint32 shareResist = 0;
@@ -1095,6 +1096,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             {
                 attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, shareResist, damagetype == DIRECT_DAMAGE, 0, false, true);
             }
+
+            // Shared damage is a hostile interaction for its recipient too.
+            if (hasSharedDamage && attacker && !attacker->IsFriendlyTo(shareDamageTarget))
+                attacker->AtTargetAttacked(shareDamageTarget, !spellProto || spellProto->HasInitialAggro());
 
             Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask, spellProto, false, false, damageSpell);
         }
