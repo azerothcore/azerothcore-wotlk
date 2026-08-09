@@ -514,6 +514,7 @@ struct boss_freya : public BossAI
 
                 elder->CastSpell(elder, SPELL_FULL_HEAL, true);
                 elder->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                elder->SetReactState(REACT_PASSIVE);
                 elder->SetInCombatWithZone();
                 elder->CastSpell(me, essenceChannel[i], false);
                 if (essenceChannel[i] == SPELL_STONEBARK_ESSENCE_CHANNEL)
@@ -703,6 +704,7 @@ struct boss_freya_elder_stonebark : public ScriptedAI
         events.Reset();
         _chargesCount = 0;
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
@@ -792,6 +794,7 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
         events.Reset();
         summons.DespawnAll();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
@@ -896,6 +899,7 @@ struct boss_freya_elder_ironbranch : public ScriptedAI
     {
         events.Reset();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
