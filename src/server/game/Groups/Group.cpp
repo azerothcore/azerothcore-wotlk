@@ -1603,6 +1603,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
         if (!roll->playerVote.empty())
         {
             uint8 maxresul = 0;
+            uint32 tiedRolls = 0;
             ObjectGuid maxguid; // pussywizard: start with 0 >_>
             Player* player = nullptr;
 
@@ -1624,6 +1625,19 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                 {
                     maxguid  = itr->first;
                     maxresul = randomN;
+                    tiedRolls = 1;
+                }
+                else if (maxresul == randomN)
+                {
+                    // A tie is settled by a second, invisible roll among the tied players;
+                    // the visible one they were sent above stays as it is. Picking the
+                    // holder with a 1-in-n chance as ties come in gives each of them the
+                    // same odds without having to collect them first. Without this the
+                    // strict comparison kept whoever came first, and playerVote is ordered
+                    // by guid, so the oldest character won every tie.
+                    ++tiedRolls;
+                    if (urand(1, tiedRolls) == 1)
+                        maxguid = itr->first;
                 }
             }
 
@@ -1681,6 +1695,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
         if (!roll->playerVote.empty())
         {
             uint8 maxresul = 0;
+            uint32 tiedRolls = 0;
             ObjectGuid maxguid; // pussywizard: start with 0
             Player* player = nullptr;
             RollVote rollvote = NOT_VALID;
@@ -1705,6 +1720,19 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                     maxguid  = itr->first;
                     maxresul = randomN;
                     rollvote = itr->second;
+                    tiedRolls = 1;
+                }
+                else if (maxresul == randomN)
+                {
+                    // Same invisible tie-break as the need rolls above. rollvote travels
+                    // with the winner: greed and disenchant share this list and decide
+                    // whether the item is handed over or shattered.
+                    ++tiedRolls;
+                    if (urand(1, tiedRolls) == 1)
+                    {
+                        maxguid  = itr->first;
+                        rollvote = itr->second;
+                    }
                 }
             }
 
