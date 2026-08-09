@@ -9996,8 +9996,8 @@ bool Player::IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod
 
     // Glyph of Hurricane turns on the dormant slow sitting in the channelled spell's
     // first effect. The triggered spells that carry Hurricane's damage share its family
-    // mask, and there the same index is direct damage, so the -21 was landing on the
-    // damage instead and costing 20% of it.
+    // mask, and there the same index is direct damage, so the flat -20 was coming off
+    // the damage instead.
     if (mod->spellId == SPELL_DRUID_GLYPH_OF_HURRICANE && !spellInfo->Effects[EFFECT_0].IsAura())
         return false;
 
