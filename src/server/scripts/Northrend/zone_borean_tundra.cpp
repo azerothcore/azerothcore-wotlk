@@ -1272,6 +1272,69 @@ class spell_bloodspore_haze : public SpellScript
     }
 };
 
+enum RescueInjuredSoldier
+{
+    SPELL_SOLDIER_RESCUED           = 47968,
+    SPELL_SOLDIER_RESCUED_CREDIT    = 47967
+};
+
+// 47962 - Rescue Injured Soldier
+class spell_q11652_rescue_injured_soldier : public SpellScript
+{
+    PrepareSpellScript(spell_q11652_rescue_injured_soldier);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->Effects[EFFECT_0].CalcValue()), SPELL_SOLDIER_RESCUED });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* tank = GetCaster();
+        Unit* soldier = GetHitUnit();
+
+        // already riding along, so there is nobody left to pick up here
+        if (!tank->GetVehicleKit() || soldier->GetVehicleBase())
+            return;
+
+        // the soldier climbs aboard by casting 'Ride Vehicle' back at the tank, taking the first free seat
+        soldier->CastSpell(tank, uint32(GetEffectValue()), true);
+
+        // every seat taken - nobody was picked up, so no rescue to report
+        if (soldier->GetVehicleBase() != tank)
+            return;
+
+        soldier->CastSpell(tank, SPELL_SOLDIER_RESCUED, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q11652_rescue_injured_soldier::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 47968 - Soldier Rescued
+class spell_q11652_soldier_rescued : public SpellScript
+{
+    PrepareSpellScript(spell_q11652_soldier_rescued);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SOLDIER_RESCUED_CREDIT });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        // cast by the passenger on the tank, which in turn credits whoever is driving it
+        GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_SOLDIER_RESCUED_CREDIT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q11652_soldier_rescued::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 enum DuskData
 {
     SAY_DUSK_PHYLACTERY = 0,
@@ -1373,4 +1436,6 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_necropolis_beam);
     RegisterSpellScript(spell_soul_deflection);
     RegisterSpellScript(spell_bloodspore_haze);
+    RegisterSpellScript(spell_q11652_rescue_injured_soldier);
+    RegisterSpellScript(spell_q11652_soldier_rescued);
 }
