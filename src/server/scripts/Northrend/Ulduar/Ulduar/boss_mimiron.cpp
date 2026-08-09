@@ -1531,6 +1531,14 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
         me->SetDisableGravity(true);
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (_phase == 3)
+            AttackStartCaster(who, 30.0f);
+        else
+            ScriptedAI::AttackStart(who);
+    }
+
     void SetData(uint32 id, uint32 value) override
     {
         if (id == 1) // setting phase to start fighting
