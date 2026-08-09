@@ -666,7 +666,7 @@ void GameObject::Update(uint32 diff)
                         // respawn timer
                         uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
                         if (poolid)
-                            sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+                            sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
                         else
                             GetMap()->AddToMap(this);
                     }
@@ -971,7 +971,7 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
             // GameObject::Update() will update the pool when the object is ready to respawn.
             if (poolid && !m_respawnTime)
             {
-                sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+                sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
             }
         }
     }
@@ -995,7 +995,7 @@ void GameObject::Delete()
 
     uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
     if (poolid)
-        sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+        sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
     else
         AddObjectToRemoveList();
 }
@@ -2911,6 +2911,7 @@ public:
     explicit GameObjectModelOwnerImpl(GameObject* owner) : _owner(owner) { }
 
     bool IsSpawned() const override { return _owner->isSpawned(); }
+    bool IsTransport() const override { return _owner->IsTransport(); }
     uint32 GetDisplayId() const override { return _owner->GetDisplayId(); }
     uint32 GetPhaseMask() const override { return (_owner->GetGoState() == GO_STATE_READY || _owner->IsTransport()) ? _owner->GetPhaseMask() : 0; }
     G3D::Vector3 GetPosition() const override { return G3D::Vector3(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ()); }

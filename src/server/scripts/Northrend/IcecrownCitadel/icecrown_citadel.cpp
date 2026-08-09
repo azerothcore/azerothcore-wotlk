@@ -329,6 +329,14 @@ enum MovementPoints
     POINT_LAND  = 1,
 };
 
+enum CrimsonHallTrashGuids
+{
+    GUID_DARKFALLEN_ADVISOR      = 201479,
+    GUID_DARKFALLEN_ARCHMAGE     = 201482,
+    GUID_DARKFALLEN_BLOOD_KNIGHT = 201646,
+    GUID_DARKFALLEN_NOBLE        = 201659
+};
+
 class FrostwingVrykulSearcher
 {
 public:
@@ -1986,14 +1994,27 @@ public:
     }
 };
 
+// 10.0f was not a distance problem: GetDistance subtracts both combat reaches,
+// so all four entrance darkfallen are 6.58 to 9.26 yd effective. The advisor
+// (spawn 201479) was lost to cell granularity - Cell::VisitObjects falls back to
+// the standing cell alone when the area collapses to one, and radius 10 leaves
+// only cell (188, 214) while 201479 sits in (187, 214). 15.0f spans both.
+// Do not raise it: the nearest non-pack creature is 18.76 yd after reaches, and
+// the pack one floor up is 7.7 to 8.8 yd out in 2D, excluded only because
+// GetDistance is 3D.
+float const ORB_CONTROLLER_MINION_RANGE = 15.0f;
+
+// Every darkfallen entry carried SMART_ACTION_CALL_FOR_HELP with param1 = 19.
+float const CALL_FOR_HELP_RADIUS = 19.0f;
+
 class ICCOrbControllerMinionSearch
 {
 public:
-    ICCOrbControllerMinionSearch(Unit* owner, bool checkCasting) : _owner(owner), _checkCasting(checkCasting) {}
+    ICCOrbControllerMinionSearch(Unit* owner, bool checkCasting, float range = 10.0f) : _owner(owner), _checkCasting(checkCasting), _range(range) {}
 
     bool operator()(Creature* target) const
     {
-        if (!target->IsAlive() || (_checkCasting && target->HasUnitState(UNIT_STATE_CASTING)) || target->GetWaypointPath() || _owner->GetDistance(target) > 10.0f)
+        if (!target->IsAlive() || (_checkCasting && target->HasUnitState(UNIT_STATE_CASTING)) || target->GetWaypointPath() || _owner->GetDistance(target) > _range)
             return false;
 
         switch (target->GetEntry())
@@ -2013,6 +2034,7 @@ private:
     // Need check to not use polymorph in a casting creature
     Unit* _owner;
     bool _checkCasting;
+    float _range;
 };
 
 std::vector<uint32> DarkFallensEmotes =
@@ -2035,9 +2057,9 @@ struct npc_icc_orb_controller : public ScriptedAI
         _scheduler.Schedule(1s, [this](TaskContext /*initialize*/)
             {
                 std::vector<Creature*> creatures;
-                ICCOrbControllerMinionSearch check(me, false);
+                ICCOrbControllerMinionSearch check(me, false, ORB_CONTROLLER_MINION_RANGE);
                 Acore::CreatureListSearcher<ICCOrbControllerMinionSearch> searcher(me, creatures, check);
-                Cell::VisitObjects(me, searcher, 10.0f);
+                Cell::VisitObjects(me, searcher, ORB_CONTROLLER_MINION_RANGE);
 
                 if (creatures.empty())
                     return;
@@ -2109,11 +2131,20 @@ struct npc_icc_orb_controller : public ScriptedAI
         if (_minionGuids.empty())
             return;
 
-        for (ObjectGuid minionGuid : _minionGuids)
+        // CreatureAI::DoZoneInCombat() replaces "me" with the creature passed in,
+        // so calling it with the puller only re-engaged the puller and left the
+        // rest of the pack out of combat. Assist on its target instead, the same
+        // way CallOfHelpCreatureInRangeDo does.
+        Unit* target = darkfallen->GetVictim();
+        if (!target)
+            target = darkfallen->GetThreatMgr().GetAnyTarget();
+
+        if (target)
         {
-            if (Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid))
-                if (minion->IsAIEnabled && !minion->IsInCombat())
-                    minion->AI()->DoZoneInCombat(darkfallen);
+            for (ObjectGuid minionGuid : _minionGuids)
+                if (Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid))
+                    if (minion->IsAIEnabled && !minion->IsInCombat())
+                        minion->EngageWithTarget(target);
         }
 
         if (Unit* minion = ObjectAccessor::GetUnit(*me, Acore::Containers::SelectRandomContainerElement(_minionGuids)))
@@ -2190,13 +2221,32 @@ struct DarkFallenAI : public ScriptedAI
                 });
     }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        switch (me->GetSpawnId())
+        {
+        case GUID_DARKFALLEN_ADVISOR:
+        case GUID_DARKFALLEN_ARCHMAGE:
+        case GUID_DARKFALLEN_BLOOD_KNIGHT:
+        case GUID_DARKFALLEN_NOBLE:
+            if (InstanceScript* instance = me->GetInstanceScript())
+                instance->SetData(DATA_BPC_TRASH_DIED, 1);
+            break;
+        default:
+            break;
+        }
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         IsDoingEmotes = false;
         Scheduler.CancelAll();
         ScheduleSpells();
+
         if (Unit* trigger = ObjectAccessor::GetUnit(*me, TriggerGuid))
             trigger->GetAI()->SetGUID(me->GetGUID(), ACTION_COMBAT);
+
+        me->CallForHelp(CALL_FOR_HELP_RADIUS);
     }
 
     void DoAction(int32 action) override
@@ -2519,8 +2569,11 @@ class spell_icc_siphon_essence : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_CANCEL)
-            GetTarget()->GetAI()->DoAction(ACTION_SIPHON_INTERRUPTED);
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_CANCEL)
+            return;
+
+        if (UnitAI* ai = GetTarget()->GetAI())
+            ai->DoAction(ACTION_SIPHON_INTERRUPTED);
     }
 
     void Register() override
