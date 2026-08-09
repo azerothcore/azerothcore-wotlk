@@ -22,3 +22,11 @@ WHERE `ID` = 619;
 -- sql/migrations/20211001113141_world.sql, "Ruined Lifeboat - Summon Creature Negolash".
 UPDATE `smart_scripts` SET `target_x` = -14598.6, `target_y` = 76.0563, `target_z` = -11.249, `target_o` = 0.925025
 WHERE `entryorguid` = 2289 AND `source_type` = 1 AND `id` = 0 AND `event_type` = 20 AND `action_type` = 12;
+
+-- And the yell repeats: his line is on SMART_EVENT_UPDATE_OOC (1), which is a pulse
+-- that keeps firing for as long as he is out of combat, so it goes off again every
+-- time the timer comes round rather than once when he shows up. Moved to
+-- SMART_EVENT_JUST_SUMMONED (54) so he announces himself as he rises and then stops.
+UPDATE `smart_scripts` SET `event_type` = 54, `event_param1` = 0, `event_param2` = 0, `event_param3` = 0, `event_param4` = 0,
+    `comment` = 'Negolash - On Just Summoned - Say Line 0'
+WHERE `entryorguid` = 1494 AND `source_type` = 0 AND `id` = 0;
