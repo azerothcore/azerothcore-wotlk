@@ -927,6 +927,95 @@ uint64 Spell::CalculateDelayMomentForDst() const
     return 0;
 }
 
+uint64 Spell::CalculateBatchingDelay() const
+{
+    if (!sWorld->getBoolConfig(CONFIG_SPELL_BATCHING_ENABLED))
+        return 0;
+
+    uint32 const window = sWorld->getIntConfig(CONFIG_SPELL_BATCHING_WINDOW);
+    if (!window)
+        return 0;
+
+    // batch only what a player controls, directly or through a pet
+    if (!m_caster->IsCharmedOwnedByPlayerOrPlayer())
+        return 0;
+
+    // only spells marked hostile are batched; retail batched heals too, left instant deliberately
+    if (m_spellInfo->IsPositive())
+        return 0;
+
+    // projectiles already resolve on arrival
+    if (m_spellInfo->Speed > 0.0f)
+        return 0;
+
+    // a channel resolves in ticks of its own
+    if (m_spellInfo->IsChanneled())
+        return 0;
+
+    // auto shot and melee swings are driven by their own timers
+    if (IsAutoRepeat() || IsNextMeleeSwingSpell())
+        return 0;
+
+    // triggered casts follow their parent's timing, not their own
+    if (IsTriggered() || m_triggeredByAuraSpell)
+        return 0;
+
+    // these have their own delay path, keyed to the destination
+    if (m_targets.HasDst())
+        return 0;
+
+    // these effects already ran, only the rest of the spell would be delayed
+    for (SpellEffectInfo const& effect : m_spellInfo->GetEffects())
+    {
+        switch (effect.Effect)
+        {
+            case SPELL_EFFECT_TRIGGER_SPELL:
+            case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
+            case SPELL_EFFECT_INTERRUPT_CAST:
+            case SPELL_EFFECT_CHARGE:
+            case SPELL_EFFECT_CHARGE_DEST:
+            case SPELL_EFFECT_JUMP:
+            case SPELL_EFFECT_JUMP_DEST:
+            case SPELL_EFFECT_LEAP_BACK:
+            case SPELL_EFFECT_ACTIVATE_RUNE:
+                return 0;
+            default:
+                break;
+        }
+    }
+
+    // only unit targets get the delay, objects would still resolve instantly
+    if (!m_UniqueGOTargetInfo.empty())
+        return 0;
+
+    bool hasVictim = false;
+    for (TargetInfo const& hitInfo : m_UniqueTargetInfo)
+    {
+        if (hitInfo.targetGUID == m_caster->GetGUID())
+            continue;
+
+        // a mob anywhere in the list makes this PvE; only players can race each other, so
+        // delaying those would slow the game down for nothing
+        if (!hitInfo.targetGUID.IsPlayer())
+        {
+            Unit* hitUnit = ObjectAccessor::GetUnit(*m_caster, hitInfo.targetGUID);
+            if (!hitUnit || !hitUnit->IsCharmedOwnedByPlayerOrPlayer())
+                return 0;
+        }
+
+        // the reflect proc is already scheduled for now, delaying the hit would separate them
+        if (hitInfo.missCondition == SPELL_MISS_REFLECT)
+            return 0;
+
+        hasVictim = true;
+    }
+
+    if (!hasVictim)
+        return 0;
+
+    return window - (GameTime::GetGameTimeMS().count() % window);
+}
+
 void Spell::RecalculateDelayMomentForDst()
 {
     m_delayMoment = CalculateDelayMomentForDst();
@@ -2611,15 +2700,21 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         return;
 
     // Absorb delayed projectiles launched before Sanctuary (e.g. Vanish dodging a Frostbolt in flight)
-    if (getState() == SPELL_STATE_DELAYED && !m_spellInfo->IsPositive() &&
+    if (getState() == SPELL_STATE_DELAYED && m_spellInfo->Speed > 0.0f && !m_spellInfo->IsPositive() &&
             (GameTime::GetGameTimeMS().count() - target->timeDelay) <= effectUnit->m_lastSanctuaryTime)
         return;                                             // No missinfo in that case
 
     // Absorb instant hostile spells on application within brief window after Sanctuary
-    if (getState() != SPELL_STATE_DELAYED && !m_spellInfo->IsPositive() &&
-            effectUnit->m_lastSanctuaryTime &&
-            GameTime::GetGameTimeMS().count() <= (effectUnit->m_lastSanctuaryTime + 400))
-        return;                                             // No missinfo in that case
+    if ((getState() != SPELL_STATE_DELAYED || m_spellInfo->Speed == 0.0f) && !m_spellInfo->IsPositive() &&
+            effectUnit->m_lastSanctuaryTime)
+    {
+        // a batched spell resolves a window late, so only a Sanctuary from the same batch absorbs it
+        uint32 const grace = getState() == SPELL_STATE_DELAYED ?
+            sWorld->getIntConfig(CONFIG_SPELL_BATCHING_WINDOW) : 400;
+
+        if (GameTime::GetGameTimeMS().count() <= effectUnit->m_lastSanctuaryTime + grace)
+            return;                                         // No missinfo in that case
+    }
 
     // Get original caster (if exist) and calculate damage/healing from him data
     Unit* caster = m_originalCaster ? m_originalCaster : m_caster;
@@ -2996,7 +3091,8 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         return SPELL_MISS_EVADE;
 
     // For delayed spells immunity may be applied between missile launch and hit - check immunity for that case
-    if (m_spellInfo->Speed && ((m_damage > 0 && unit->IsImmunedToDamage(m_caster, m_spellInfo)) || unit->IsImmunedToSpell(m_spellInfo, this)))
+    if ((m_spellInfo->Speed || getState() == SPELL_STATE_DELAYED) &&
+            ((m_damage > 0 && unit->IsImmunedToDamage(m_caster, m_spellInfo)) || unit->IsImmunedToSpell(m_spellInfo, this)))
     {
         return SPELL_MISS_IMMUNE;
     }
@@ -3046,7 +3142,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     {
         // Recheck  UNIT_FLAG_NON_ATTACKABLE for delayed spells
         // Xinef: Also check evade state
-        if (m_spellInfo->Speed > 0.0f)
+        if (m_spellInfo->Speed > 0.0f || getState() == SPELL_STATE_DELAYED)
         {
             if (unit->IsCreature() && unit->ToCreature()->IsInEvadeMode())
                 return SPELL_MISS_EVADE;
@@ -3063,7 +3159,8 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         {
             // for delayed spells ignore negative spells (after duel end) for friendly targets
             /// @todo: this cause soul transfer bugged
-            if (!IsTriggered() && m_spellInfo->Speed > 0.0f && unit->IsPlayer() && !m_spellInfo->IsPositive())
+            if (!IsTriggered() && (m_spellInfo->Speed > 0.0f || getState() == SPELL_STATE_DELAYED) &&
+                    unit->IsPlayer() && !m_spellInfo->IsPositive())
                 return SPELL_MISS_EVADE;
 
             // assisting case, healing and resurrection
@@ -4004,8 +4101,18 @@ void Spell::_cast(bool skipCheck)
             m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_CAST);
     }
 
+    // Spell batching: the cast is already complete here, so defer only the resolution
+    uint64 const batchDelay = CalculateBatchingDelay();
+    if (batchDelay)
+    {
+        m_delayMoment = batchDelay;
+
+        for (TargetInfo& targetInfo : m_UniqueTargetInfo)
+            targetInfo.timeDelay = batchDelay;
+    }
+
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
-    if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this || m_spellInfo->Id == 14157*/)
+    if (batchDelay || (m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this || m_spellInfo->Id == 14157*/)
     {
         // Remove used for cast item if need (it can be already nullptr after TakeReagents call
         // in case delayed spell remove item at cast delay start
