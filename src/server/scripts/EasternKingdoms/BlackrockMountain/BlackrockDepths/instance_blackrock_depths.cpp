@@ -288,7 +288,9 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case NPC_ARENA_SPECTATOR:
                 ArenaSpectators.push_back(creature->GetGUID());
-                if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                // note: reads GetData, not encounter[TYPE_RING_OF_LAW]: the types are 1-based
+                // while the array is 0-based, so the raw index would hit the vault slot
+                if (GetData(TYPE_RING_OF_LAW) == DONE) // added for crashes
                 {
                     creature->SetFaction(FACTION_NEUTRAL);
                     creature->SetReactState(REACT_DEFENSIVE);
@@ -298,7 +300,9 @@ struct instance_blackrock_depths : public InstanceScript
             case NPC_SHADOWFORCE_CITIZEN: // both do the same
                 if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < (float)RADIUS_RING_OF_LAW)
                     ArenaSpectators.push_back(creature->GetGUID());
-                if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                // note: reads GetData, not encounter[TYPE_RING_OF_LAW]: the types are 1-based
+                // while the array is 0-based, so the raw index would hit the vault slot
+                if (GetData(TYPE_RING_OF_LAW) == DONE) // added for crashes
                 {
                     creature->SetFaction(FACTION_NEUTRAL);
                     creature->SetReactState(REACT_DEFENSIVE);
