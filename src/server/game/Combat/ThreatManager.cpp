@@ -532,13 +532,21 @@ void ThreatManager::TauntUpdate()
         else
             pair.second->UpdateTauntState();
 
-        // A taunting reference can never be suppressed, but EvaluateSuppressed below only
-        // refreshes what we threaten, not what threatens us, so one created suppressed would
-        // never be cleared. Do it here instead.
+        // Re-derive suppression for our own threat list. EvaluateSuppressed below only
+        // refreshes what we threaten, not what threatens us, so a reference created
+        // suppressed would never be cleared - which is what kept a taunt from landing.
+        // Both directions, because the usual reason it stops being suppressed is the taunt
+        // itself: leave out the second half and an immune tank stays on top after the taunt
+        // has already expired, holding the boss on a target it cannot damage.
         if (pair.second->IsSuppressed() && !pair.second->ShouldBeSuppressed())
         {
             pair.second->_online = ThreatReference::ONLINE_STATE_ONLINE;
             pair.second->HeapNotifyIncreased();
+        }
+        else if (pair.second->IsOnline() && pair.second->ShouldBeSuppressed())
+        {
+            pair.second->_online = ThreatReference::ONLINE_STATE_SUPPRESSED;
+            pair.second->HeapNotifyDecreased();
         }
     }
 
