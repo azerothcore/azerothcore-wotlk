@@ -833,7 +833,7 @@ public:
             return false;
         }
 
-        // If gmRealmID is -1, delete access on every realm, else only on the requested one
+        // If gmRealmID is -1, delete access on every realm, else on the requested one and any all-realms row
         LoginDatabasePreparedStatement* stmt;
 
         if (gmRealmID == -1)
