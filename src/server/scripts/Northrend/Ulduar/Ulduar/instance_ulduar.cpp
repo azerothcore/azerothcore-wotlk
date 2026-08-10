@@ -106,6 +106,7 @@ ObjectData const creatureData[] =
     { NPC_MIMIRON_LEVIATHAN_MKII,   DATA_MIMIRON_LEVIATHAN_MKII },
     { NPC_MIMIRON_VX001,            DATA_MIMIRON_VX001          },
     { NPC_MIMIRON_ACU,              DATA_MIMIRON_ACU            },
+    { NPC_MIMIRON_DB_TARGET,        DATA_MIMIRON_DB_TARGET      },
     // Freya elders
     { NPC_ELDER_IRONBRANCH,         DATA_ELDER_IRONBRANCH       },
     { NPC_ELDER_STONEBARK,          DATA_ELDER_STONEBARK        },
