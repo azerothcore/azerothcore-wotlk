@@ -1,3 +1,4 @@
+-- DB update 2026_08_10_00 -> 2026_08_10_01
 -- Flesh Giant Spine (44009) - drop on quest Neutralizing the Plague
 UPDATE `creature_loot_template` SET `QuestRequired` = 0 WHERE `Entry` = 31139 AND `Item` = 44009;
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 1 AND `SourceGroup` = 31139 AND `SourceEntry` = 44009;
