@@ -1,3 +1,4 @@
+-- DB update 2026_08_09_08 -> 2026_08_10_00
 -- Mimiron DB Target: the NPC the P3Wx2 Laser Barrage beams track.
 -- Path, positions and lap time are the creature's sniffed movement spline.
 SET @CGUID := 13395;
