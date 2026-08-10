@@ -4,6 +4,11 @@ Reviewing a changeset or PR, your own before submission or a contributor's. The 
 (`cpp-guidelines.md`, `sql-guidelines.md`, `cpp-scripts.md`) apply as a checklist to every changed
 line, not as background reading.
 
+- A posted review carries findings only: no summary, no praise. Nothing to report means one line
+  saying so.
+- A finding names what is wrong, why it matters and the fix, on the offending line. Findings are
+  bugs, crashes, lifetime and memory errors, data-integrity problems, injection, and violations of
+  a rule written down in AGENTS.md or `.agents/docs/`; taste no rule covers is not a finding.
 - Review codestyle on every changed line, even when style is not the change's subject. Run both
   linters and report violations as findings: `python apps/codestyle/codestyle-cpp.py` and
   `python apps/codestyle/codestyle-sql.py`.

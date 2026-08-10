@@ -1220,11 +1220,29 @@ private:
     uint8 _phase;
 };
 
-// Sniffed P3Wx2 Laser Barrage arcs start at a fixed room angle and advance 60 degrees
-// counterclockwise each cycle, independent of the player targeted during Spinning Up.
-// Phase 4 restarts the sequence from the initial angle.
-constexpr float VX001_BARRAGE_ARC_START = 6.17f;
-constexpr float VX001_BARRAGE_ARC_STEP = static_cast<float>(M_PI / 3);
+// The P3Wx2 Laser Barrage beams track the Mimiron DB Target, which circles the room on a waypoint
+// path that runs from instance load and is never restarted, so the arc carries across barrages,
+// phase changes and wipes. The beams follow caster facing, so aiming at it is what delivers the
+// sweep. Taking the bearing rather than copying an angle also keeps phase 4 right, where VX-001
+// rides the chassis up to 30yd off centre and the bearing shifts by as much as 16 degrees.
+inline void FaceBarrageArc(Unit* caster)
+{
+    InstanceScript* instance = caster->GetInstanceScript();
+    if (!instance)
+        return;
+
+    Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET);
+    if (!dbTarget)
+        return;
+
+    float arc = caster->GetAngle(dbTarget);
+
+    // SetFacingTo drops the transport transform for passengers, so phase 4 needs a seat-local angle
+    if (Unit* vehicle = caster->GetVehicleBase())
+        arc = Position::NormalizeOrientation(arc - vehicle->GetOrientation());
+
+    caster->SetFacingTo(arc);
+}
 
 struct npc_ulduar_vx001 : public ScriptedAI
 {
@@ -1239,8 +1257,6 @@ struct npc_ulduar_vx001 : public ScriptedAI
         _phase = 0;
         _fighting = false;
         _leftArm = false;
-        _barrageOrientation = 0;
-        _nextBarrageArc = VX001_BARRAGE_ARC_START;
         me->SetRegeneratingHealth(false);
         _events.Reset();
     }
@@ -1262,7 +1278,6 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 case 2:
                     _phase = 2;
                     _fighting = true;
-                    _nextBarrageArc = VX001_BARRAGE_ARC_START;
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_SPELL_CAST_OMNI);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     _events.Reset();
@@ -1281,7 +1296,6 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 case 4:
                     _phase = 4;
                     _fighting = true;
-                    _nextBarrageArc = VX001_BARRAGE_ARC_START;
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3s);
@@ -1294,11 +1308,6 @@ struct npc_ulduar_vx001 : public ScriptedAI
                     break;
             }
         }
-    }
-
-    uint32 GetData(uint32  /*id*/) const override
-    {
-        return _barrageOrientation;
     }
 
     void DoAction(int32 action) override
@@ -1425,21 +1434,17 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 break;
             case EVENT_SPELL_SPINNING_UP:
                 _events.Repeat(60s);
+                // Sniffed: the target is parked on the DB Target from the cast until the barrage ends
+                if (Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET))
+                    me->SetTarget(dbTarget->GetGUID());
+                FaceBarrageArc(me);
+                me->CastSpell(me, SPELL_SPINNING_UP, true);
+                if (Unit* vehicle = me->GetVehicleBase())
                 {
-                    float arc = _nextBarrageArc;
-
-                    _barrageOrientation = (uint32)((arc * 100.0f) / (2 * M_PI));
-                    _nextBarrageArc = Position::NormalizeOrientation(arc + VX001_BARRAGE_ARC_STEP);
-                    // The beams follow unit facing, so facing the arc start doubles as the telegraph
-                    me->SetFacingTo(arc);
-                    me->CastSpell(me, SPELL_SPINNING_UP, true);
-                    if (Unit* vehicle = me->GetVehicleBase())
-                    {
-                        vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                        vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
-                    }
-                    _events.RescheduleEvent((_phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14s + 500ms);
+                    vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                    vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                 }
+                _events.RescheduleEvent((_phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14s + 500ms);
                 break;
             case EVENT_FLAME_SUPPRESSION_10:
                 me->CastSpell(me, SPELL_FLAME_SUPPRESSANT_10yd, false);
@@ -1507,8 +1512,6 @@ private:
     bool _isEvading;
     bool _fighting;
     bool _leftArm;
-    uint32 _barrageOrientation;
-    float _nextBarrageArc;
     uint8 _phase;
 };
 
@@ -2145,53 +2148,36 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
     }
 };
 
-enum p3wx2LaserBarrage
-{
-    SPELL_P3WX2_LASER_BARRAGE_1 = 63297,
-    SPELL_P3WX2_LASER_BARRAGE_2 = 64042
-};
-
+// The beams themselves come from the spell chain: effect 2 links 63300, which triggers 63297 and
+// 64042 every 100ms on its own. All this script owns is where the caster is pointing.
 class spell_mimiron_p3wx2_laser_barrage_aura : public AuraScript
 {
     PrepareAuraScript(spell_mimiron_p3wx2_laser_barrage_aura);
 
-    bool Load() override
+    void HandleEffectApply(AuraEffect const*   /*aurEff*/, AuraEffectHandleModes   /*mode*/)
     {
-        _lastMSTime = GameTime::GetGameTimeMS().count();
-        _lastOrientation = -1.0f;
-        return true;
+        if (Unit* caster = GetCaster())
+            FaceBarrageArc(caster);
     }
 
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
-        {
-            if (!caster->IsCreature())
-                return;
-            uint32 diff = getMSTimeDiff(_lastMSTime, GameTime::GetGameTimeMS().count());
-            if (_lastOrientation == -1.0f)
-            {
-                _lastOrientation = (caster->ToCreature()->AI()->GetData(0) * 2 * M_PI) / 100.0f;
-                diff = 0;
-            }
-            float new_o = Position::NormalizeOrientation(_lastOrientation - (M_PI / 60) * (diff / 250.0f));
-            _lastMSTime = GameTime::GetGameTimeMS().count();
-            _lastOrientation = new_o;
-            caster->SetFacingTo(new_o);
+            FaceBarrageArc(caster);
+    }
 
-            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_1, true);
-            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_2, true);
-        }
+    void HandleEffectRemove(AuraEffect const*   /*aurEff*/, AuraEffectHandleModes   /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->SetTarget(ObjectGuid::Empty);
     }
 
     void Register() override
     {
+        AfterEffectApply += AuraEffectApplyFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        AfterEffectRemove += AuraEffectApplyFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
-
-private:
-    uint32 _lastMSTime;
-    float _lastOrientation;
 };
 
 class go_ulduar_do_not_push_this_button : public GameObjectScript
