@@ -3,6 +3,10 @@
 # reviewer enforces project conventions on every PR.
 language: en-US
 
+tone_instructions: |
+  Be terse. State the defect, why it matters and the fix in at most three sentences.
+  No preamble, no praise, no restating the code.
+
 reviews:
   profile: chill
   request_changes_workflow: false
@@ -109,6 +113,12 @@ reviews:
       instructions: |
         This SQL directory is immutable. Changes here should not happen in a normal PR —
         flag any modification. New SQL belongs in data/sql/updates/pending_db_*/.
+
+  tools:
+    # Prose linting on markdown produces capitalisation nits reported as review
+    # findings, each wrapped in a suggestion block and a raw linter dump.
+    languagetool:
+      enabled: false
 
 knowledge_base:
   code_guidelines:
