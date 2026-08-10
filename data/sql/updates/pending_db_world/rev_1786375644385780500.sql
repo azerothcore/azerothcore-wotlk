@@ -1,10 +1,5 @@
 -- Battle for Crusaders' Pinnacle (quest 13141): the Scourge waves now crawl out of the ground on spawn
 -- instead of popping into existence. Emote 449 = EMOTE_ONESHOT_EMERGE.
--- Scourge Drudge's speed_run 0.45714 is sniffed (VerifiedBuild 12340) but an outlier shared by only one
--- other creature in the whole world DB; it is deliberately overridden with the standard 1.14286 so the
--- Drudge keeps pace with the rest of its wave.
-UPDATE `creature_template` SET `speed_run` = 1.14286 WHERE `entry` = 30984;
-
 -- Halof had no AIName, so it resolved to AggressorAI by permit; SmartAI with no combat rows behaves the
 -- same in combat, so this switch only enables the emerge row below.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30989;
