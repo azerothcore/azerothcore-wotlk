@@ -1785,7 +1785,7 @@ public:
                 summon->m_Events.AddEventAtOffset([summon]()
                 {
                     summon->SetReactState(REACT_AGGRESSIVE);
-                }, 2s);
+                }, 5s);
             }
         }
 
