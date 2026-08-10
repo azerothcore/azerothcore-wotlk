@@ -184,20 +184,16 @@ public:
                     events.Repeat(RAID_MODE(110s, 90s));
                     break;
                 case EVENT_SUMMON_ZOMBIE:
+                    // \1 |0 /2 pos
+                    if (Is25ManRaid())
                     {
-                        // \1 |0 /2 pos
-                        if (Is25ManRaid())
-                        {
-                            me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[1]);
-                            me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[2]);
-                        }
-                        else
-                        {
-                            me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[0]);
-                        }
-                        events.Repeat(10s);
-                        break;
+                        me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[1]);
+                        me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[2]);
                     }
+                    else
+                        me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[0]);
+                    events.Repeat(10s);
+                    break;
                 case EVENT_CAN_EAT_ZOMBIE:
                     events.Repeat(1s);
                     if (me->GetVictim()->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinMeleeRange(me->GetVictim()))
