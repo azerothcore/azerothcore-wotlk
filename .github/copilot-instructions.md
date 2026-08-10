@@ -6,5 +6,5 @@ For pull request review, `.agents/docs/code-review.md` defines what counts as a 
 ## Review output
 
 - No overview paragraph, no "Changes" bullet list, no per-file table. The diff is on the same page.
-- Keep the review body empty. Findings belong in inline comments on the offending lines.
-- Post nothing at all when there is nothing to report.
+- Findings belong in inline comments on the offending lines, not in the review body.
+- When there are no findings, post only a single line saying so. No summary, no file list.

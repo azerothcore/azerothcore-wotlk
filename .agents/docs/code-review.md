@@ -5,7 +5,7 @@ Reviewing a changeset or PR, your own before submission or a contributor's. The 
 line, not as background reading.
 
 - A posted review carries findings only: no summary of the change, no restating what it does, no
-  praise. When there is nothing to report, say nothing.
+  praise. When there is nothing to report, say so in one line and stop.
 - A finding names what is wrong, why it matters and the fix, on the offending line. Findings are
   bugs, crashes, lifetime and memory errors, data-integrity problems (most often a `DELETE` whose
   `WHERE` does not match the `INSERT` it precedes), injection, and violations of a rule written down
