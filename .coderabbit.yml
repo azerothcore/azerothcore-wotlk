@@ -4,8 +4,7 @@
 language: en-US
 
 tone_instructions: |
-  Be terse. State the defect, why it matters and the fix in at most three sentences.
-  No preamble, no praise, no restating the code.
+  Be terse: at most three sentences per finding.
 
 reviews:
   profile: chill
@@ -127,6 +126,7 @@ knowledge_base:
     # full guideline doc is always pulled into review context.
     filePatterns:
       - "AGENTS.md"
+      - ".agents/docs/code-review.md"
 
 chat:
   auto_reply: true
