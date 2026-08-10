@@ -108,10 +108,9 @@ Based on AGENTS.md, always verify:
 
 ## Feedback Style
 
-- Report defects only. Do not summarize the PR, restate what a change does, or point out good practices
-- Say nothing when there is nothing to report
-- Put each finding in an inline comment on the offending line: what is wrong, why it matters, and the fix
+- Be constructive and educational
 - Reference specific sections of AGENTS.md, C++ Code Standards, or SQL Standards when applicable
 - Suggest specific fixes with code examples if necessary
+- Highlight both issues and good practices
 - For C++ issues, cite specific rule from C++ Code Standards wiki
 - For SQL issues, cite specific rule from SQL Standards wiki
