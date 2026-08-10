@@ -6,11 +6,50 @@ language: en-US
 reviews:
   profile: chill
   request_changes_workflow: false
+
+  # Keep the bot's output to actionable inline comments only. Everything below
+  # is boilerplate CodeRabbit posts on every PR regardless of findings, which
+  # buries the few real comments and trains maintainers to skip them.
   high_level_summary: false
-  poem: false
-  review_status: false
-  collapse_walkthrough: true
+  changed_files_summary: false
   sequence_diagrams: false
+  estimate_code_review_effort: false
+  assess_linked_issues: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  review_status: false
+  review_details: false
+  in_progress_fortune: false
+  poem: false
+  enable_prompt_for_ai_agents: false
+  collapse_walkthrough: true
+
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+    title:
+      mode: "off"
+    description:
+      mode: "off"
+    issue_assessment:
+      mode: "off"
+
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+    simplify:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+
   auto_review:
     enabled: true
     # Review on PR open only; don't re-post a walkthrough on every push.
