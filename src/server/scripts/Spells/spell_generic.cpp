@@ -5349,14 +5349,18 @@ class spell_gen_sober_up : public AuraScript
 };
 
 // 10255 - Stoned. Statue creatures in Uldaman and Blackrock Depths carry this dummy aura
-// until their event awakens them by removing it.
+// until their event awakens them by removing it. Only Uldaman's statues are unattackable
+// while stoned: sniffs show the aura on the BRD golems around Golem Lord Argelmach too, but
+// classic-era videos show those as attackable (players cleared the Manufactory before the
+// pull), so outside Uldaman the aura is visual-only and any freeze mechanics belong to the
+// event scripts (the BRD vault warders are frozen via flags in instance_blackrock_depths).
 class spell_gen_stoned : public AuraScript
 {
     PrepareAuraScript(spell_gen_stoned);
 
     bool Load() override
     {
-        return GetUnitOwner()->IsCreature();
+        return GetUnitOwner()->IsCreature() && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

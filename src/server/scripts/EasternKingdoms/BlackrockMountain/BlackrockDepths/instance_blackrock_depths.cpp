@@ -311,16 +311,24 @@ struct instance_blackrock_depths : public InstanceScript
                     EmperorSenatorsVector.push_back(creature->GetGUID());
                 break;
             case NPC_WARBRINGER_CONSTRUCT:
-                // only the four constructs in the Relic Coffer room belong to the vault event, the rest of the Black Vault spawns are regular trash
+                // only the four constructs in the Relic Coffer room belong to the vault event,
+                // the rest of the Black Vault spawns are regular trash
                 if (creature->GetDistance2d(VaultWarderCenter.GetPositionX(), VaultWarderCenter.GetPositionY()) > 15.0f)
                     break;
-                // frozen until all 12 Relic Coffers have been opened. Stoned is cast here instead of
-                // creature_addon on purpose: addon auras get re-applied on every evade, which would
-                // re-freeze the constructs after the event has started.
+                // dead spawns with a pending respawn are loaded too: a corpse must not be frozen or
+                // counted, or the restarted event could not complete until its respawn timer expires
+                if (!creature->IsAlive())
+                    break;
+                // frozen until all 12 Relic Coffers have been opened. Stoned (statue visual) is cast
+                // here instead of creature_addon on purpose: addon auras get re-applied on every
+                // evade, which would turn the constructs back into statues after the event has started.
                 if (GetData(TYPE_VAULT) == NOT_STARTED)
                 {
                     creature->CastSpell(creature, SPELL_STONED, true);
                     creature->SetImmuneToPC(true);
+                    // untargetable while inert: the reference video (https://youtu.be/KE1nElNN1YY)
+                    // shows the statues cannot be targeted until activated; vmangos likewise clears
+                    // UNIT_FLAG_NOT_SELECTABLE on them when Doomgrip aggroes
                     creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     creature->SetReactState(REACT_PASSIVE);
                 }
@@ -564,7 +572,9 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case DATA_OPEN_COFFER_DOORS:
                 OpenedCoofers += 1;
-                if (OpenedCoofers == 12)
+                // the coffer doors reset on every map load while the vault state persists: reopening
+                // them after the event has started must not restart it or summon a second Doomgrip
+                if (OpenedCoofers == 12 && GetData(TYPE_VAULT) == NOT_STARTED)
                 {
                     SetData(TYPE_VAULT, IN_PROGRESS);
 
