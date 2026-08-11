@@ -1,3 +1,4 @@
+-- DB update 2026_08_11_05 -> 2026_08_11_06
 --
 -- Spawn the missing Heart of the Mountain object (165554) next to the Secret Safe
 -- in Blackrock Depths and stop its quest item from dropping from the Secret Safe
