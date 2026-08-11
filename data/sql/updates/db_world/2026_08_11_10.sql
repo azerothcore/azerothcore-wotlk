@@ -1,3 +1,4 @@
+-- DB update 2026_08_11_09 -> 2026_08_11_10
 --
 -- Spell focus radius is no longer halved by the core, so the inflated values that compensated for
 -- that go back to their sniffed radius.
