@@ -463,7 +463,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `e
 (@GUID+20, 28815, 595, 4100, 4100, 3, 0, 2263.29, 1174.14, 138.222, 3.24631, 7200, 68974, 1, NULL),
 (@GUID+21, 28960, 595, 4100, 4100, 3, 0, 1665.11, 877.442, 119.916, 6.12611, 7200, 68974, 1, NULL);
 
--- Critters
+-- New Spawns: Critters
 SET @GUID := 134848;
 DELETE FROM `creature` WHERE `map` = 595 AND `id` IN (721, 883, 890, 1933, 4075, 4076, 6368, 14881) AND `guid` BETWEEN @GUID AND @GUID+66;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `VerifiedBuild`, `CreateObject`) VALUES
