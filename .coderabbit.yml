@@ -3,6 +3,9 @@
 # reviewer enforces project conventions on every PR.
 language: en-US
 
+tone_instructions: |
+  Be terse: at most three sentences per finding.
+
 reviews:
   profile: chill
   request_changes_workflow: false
@@ -110,6 +113,12 @@ reviews:
         This SQL directory is immutable. Changes here should not happen in a normal PR —
         flag any modification. New SQL belongs in data/sql/updates/pending_db_*/.
 
+  tools:
+    # Prose linting on markdown produces capitalisation nits reported as review
+    # findings, each wrapped in a suggestion block and a raw linter dump.
+    languagetool:
+      enabled: false
+
 knowledge_base:
   code_guidelines:
     enabled: true
@@ -117,6 +126,7 @@ knowledge_base:
     # full guideline doc is always pulled into review context.
     filePatterns:
       - "AGENTS.md"
+      - ".agents/docs/code-review.md"
 
 chat:
   auto_reply: true
