@@ -3,7 +3,8 @@
 Project-specific rules for
 [/self-review](https://github.com/eai-org/agent-toolkit/blob/main/skills/self-review/SKILL.md).
 Add here rules about reviewing AzerothCore PRs before they are submitted. Generic improvements
-to the review process itself belong to the skill, not here.
+to the review process itself belong to the skill, not here. The [code-review.md](code-review.md)
+rules apply on top.
 
 ## Regression risk
 
