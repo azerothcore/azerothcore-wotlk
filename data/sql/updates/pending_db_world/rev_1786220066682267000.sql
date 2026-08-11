@@ -29,3 +29,12 @@ DELETE FROM `creature_text` WHERE `CreatureID` = 1494;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (1494, 0, 0, 'Mmmh...I SMELL FOOD!', 14, 0, 100, 0, 0, 0, 731, 0, 'Negolash - On Just Summoned'),
 (1494, 1, 0, 'AH, A FEAST!  WHO LEFT THIS HERE...?', 14, 0, 100, 0, 0, 0, 763, 0, 'Negolash - On Waypoint Path Ended');
+
+-- Conditions to avoid double spawns
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` = 2289) AND (`SourceId` = 1) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 1494) AND (`ConditionValue2` = 100) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 2289, 1, 0, 29, 1, 1494, 100, 0, 1, 0, 0, '', 'Don\'t spawn a new Negolash if there\'s one already up.');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2) AND (`SourceEntry` = 2289) AND (`SourceId` = 1) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 30) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 2332) AND (`ConditionValue2` = 20) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 2, 2289, 1, 0, 30, 1, 2332, 20, 0, 1, 0, 0, '', 'Don\'t summon gameobjects in Enticing Negolash if there are already objects nearby');
