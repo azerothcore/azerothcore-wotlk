@@ -5100,7 +5100,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         {
             if (!(e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS))
             {
-                if (me && me->HasUnitState(UNIT_STATE_CASTING))
+                if (me && me->IsActionPreventedByCasting())
                 {
                     RaisePriority(e);
                     return;
@@ -5109,7 +5109,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         }
 
         // Delay flee for assist event if casting
-        if (e.GetActionType() == SMART_ACTION_FLEE_FOR_ASSIST && me && me->HasUnitState(UNIT_STATE_CASTING))
+        if (e.GetActionType() == SMART_ACTION_FLEE_FOR_ASSIST && me && me->IsActionPreventedByCasting())
         {
             e.timer = 1200;
             return;

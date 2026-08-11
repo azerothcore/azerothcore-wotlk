@@ -21,7 +21,7 @@ Hard rules (also enforced by CI with `-Werror`, plus `cppcheck`):
 - **Logging**: `LOG_INFO("category.sub", "msg with {}", arg)` (also `LOG_WARN`/`ERROR`/`DEBUG`/`TRACE`). Categories are hierarchical, dot-separated (`server.loading`, `entities.player`, `sql.dev`). No `printf`-style, no `sLog->`, no `TC_LOG_*`. Macro in `src/common/Logging/Log.h`.
 - **Random**: use helpers in `src/common/Utilities/Random.h` — `urand`, `irand`, `frand`, `rand32`, `rand_chance`, `roll_chance_f`, `roll_chance_i`. Not `std::rand` or `<random>`.
 - **Strings**: `Acore::StringFormat(fmt, args...)` (`{}` placeholders) — `src/common/Utilities/StringFormat.h`.
-- **Config**: `sConfigMgr->GetOption<T>("Name", default)`.
+- **Config**: `sConfigMgr->GetOption<T>("Name", default)` — read once at startup/reload and cache the value; never call it in hot paths or per-call gating checks.
 - **Namespace**: project-wide `Acore::` (no `Trinity::` remnants — rename when porting from upstream forks).
 - **Long-lived references**: don't store a raw `Player*` / `Creature*` / `Unit*` past the current call/tick — the object can be removed (logout, despawn, instance unload) and the pointer dangles. Store the `ObjectGuid` and resolve at use time via `ObjectAccessor::FindPlayer(guid)`, `Map::GetCreature(guid)`, etc.
 - **DB queries**: use `PreparedStatement` (via `WorldDatabase` / `CharacterDatabase` / `LoginDatabase` and the prepared-statement enums), not raw query strings. Non-blocking reads go async: `_queryProcessor.AddCallback(db.AsyncQuery(stmt).WithPreparedCallback(...))` (or `WithCallback`). Multi-statement writes wrap in `SQLTransaction` + `Execute` / `AppendPreparedStatement`.

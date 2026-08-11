@@ -70,6 +70,7 @@ enum UlduarData
     DATA_MIMIRON_LEVIATHAN_MKII             = 301,
     DATA_MIMIRON_VX001                      = 302,
     DATA_MIMIRON_ACU                        = 303,
+    DATA_MIMIRON_DB_TARGET                  = 304,
 
     // Mimiron doors
     DATA_GO_MIMIRON_DOOR_1                  = 311,
@@ -196,6 +197,7 @@ enum UlduarNPCs
     NPC_MIMIRON_LEVIATHAN_MKII              = 33432,
     NPC_MIMIRON_VX001                       = 33651,
     NPC_MIMIRON_ACU                         = 33670,
+    NPC_MIMIRON_DB_TARGET                   = 33576,
 
     // Freya
     NPC_ELDER_BRIGHTLEAF                    = 32915,
