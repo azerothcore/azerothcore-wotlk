@@ -438,7 +438,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- New Spawns
 SET @GUID := 53063;
-DELETE FROM `creature` WHERE `map` = 595 AND `id` IN (20562, 27827, 28815, 28960) AND `guid` BETWEEN @GUID AND @GUID+26;
+DELETE FROM `creature` WHERE `map` = 595 AND `id` IN (20562, 28815, 28960) AND `guid` BETWEEN @GUID AND @GUID+26;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 (@GUID+0 , 20562, 595, 4100, 4100, 3, 0, 2113.52, 1288.01, 136.382, 2.30383, 7200, 68974, 0, NULL),
 (@GUID+1 , 28815, 595, 4100, 4100, 3, 0, 2150.4, 1281.51, 134.292, 0.331613, 7200, 68974, 0, NULL),
