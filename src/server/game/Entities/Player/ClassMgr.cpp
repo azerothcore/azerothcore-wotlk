@@ -19,6 +19,7 @@
 #include "AccountMgr.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
@@ -53,12 +54,18 @@ void ClassMgr::LoadClasses()
         if (!classEntry)
             continue;
 
-        uint8 classId = classEntry->ClassID;
+        uint32 classId = classEntry->ClassID;
+
+        if (classId == 0 || classId > 32)
+        {
+            LOG_ERROR("server.loading", "Invalid class ID {} in ChrClasses.dbc, skipped.", classId);
+            continue;
+        }
 
         if (GetMaxClasses() <= classId)
-            SetMaxClasses(classId + 1);
+            SetMaxClasses(static_cast<uint8>(classId + 1));
 
-        uint32 classBit = (1 << (classId - 1));
+        uint32 classBit = uint32(1) << (classId - 1);
 
         _playableClassMask |= classBit;
     }
