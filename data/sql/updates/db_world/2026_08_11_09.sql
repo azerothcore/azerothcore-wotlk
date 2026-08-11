@@ -1,3 +1,4 @@
+-- DB update 2026_08_11_08 -> 2026_08_11_09
 --
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 188163;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 188163);
