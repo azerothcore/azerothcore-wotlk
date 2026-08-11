@@ -9161,8 +9161,10 @@ namespace Acore
                   || _referenceType == TARGET_REFERENCE_TYPE_TARGET)
             {
                 float effectiveRange = _range;
-                if (_caster->IsControlledByPlayer() && !target->ToUnit()->IsControlledByPlayer())
-                    effectiveRange += target->GetCombatReach();
+                // searcher also visits non-unit objects (corpses, dynobjects) when the spell can target them
+                if (Unit const* unitTarget = target->ToUnit())
+                    if (_caster->IsControlledByPlayer() && !unitTarget->IsControlledByPlayer())
+                        effectiveRange += unitTarget->GetCombatReach();
 
                 if (target->GetExactDist(_position) > effectiveRange)
                     return false;
