@@ -1,3 +1,4 @@
+-- DB update 2026_08_11_07 -> 2026_08_11_08
 --
 -- Quest 619 "Enticing Negolash": Negolash (1494) should not attack the summoner.
 -- He spawns in the sea, yells once and slowly walks a sniffed path towards the Ruined Lifeboat (GO 2289),
