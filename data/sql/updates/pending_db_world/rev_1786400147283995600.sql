@@ -253,6 +253,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2788502, 9, 5, 0, 0, 0, 100, 0, 5887, 5887, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 19, 27884, 30, 0, 0, 0, 0, 0, 0, 'Jena Anderson - Actionlist - Martha Say Line 1');
 
 /* Malcolm Moore and Scruffy
+Entry: 27891
+[2] Position: X: 1604.988 Y: 805.8108 Z: 123.02908
+[2] Orientation: 5.284210681915283203
+Entry: 27892
+[3] Position: X: 1600.7809 Y: 805.67804 Z: 123.83765
+[3] Orientation: 5.471605777740478515
+
 17:19:05.036
 FaceDirection: 2.30383467674255371
 17:19:06.654
