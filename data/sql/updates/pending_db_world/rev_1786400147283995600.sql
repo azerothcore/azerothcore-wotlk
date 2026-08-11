@@ -163,7 +163,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 /* Jena & Martha
 17:17:33.968
 Jena Face Martha
-Text: Martha, I'm out of flour for bread. You wouldn't happen to have any grain from that recent shipment, would you? (6)
+Text: Martha, I'm out of flour for bread. You wouldn't happen to have any grain (...) (6)
 17:17:39.847
 Text: Oh hello, Jena. Of course you can borrow some grain. Help yourself. (1)
 17:17:45.311
