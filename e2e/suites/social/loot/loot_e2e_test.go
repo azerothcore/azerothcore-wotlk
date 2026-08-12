@@ -39,7 +39,8 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 
 	leader.World.ClearActiveLootRolls()
 	mate.World.ClearActiveLootRolls()
-	waitRoll := leader.ArmLootStartRoll()
+	waitRoll, cancelRoll := leader.ArmLootStartRoll()
+	t.Cleanup(cancelRoll)
 
 	items, ok := leader.TryOpenLoot(t, guid, 8*time.Second)
 	if !ok {
@@ -109,7 +110,8 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	leaver.CombatReady(t)
 	leaver.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 
-	waitRoll := leader.ArmLootStartRoll()
+	waitRoll, cancelRoll := leader.ArmLootStartRoll()
+	t.Cleanup(cancelRoll)
 	_, _ = leader.TryOpenLoot(t, guid, 8*time.Second)
 
 	roll, gotRoll := waitRoll(0, 12*time.Second)
@@ -129,30 +131,20 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 
 	wonDone := make(chan client.LootRollWon, 1)
 	allPassed := make(chan client.LootAllPassed, 1)
-	prevWon := leader.World.OnLootRollWon
-	prevAll := leader.World.OnLootAllPassed
-	leader.World.OnLootRollWon = func(r client.LootRollWon) {
-		if prevWon != nil {
-			prevWon(r)
-		}
+	cancelWon := leader.World.AddLootRollWonHook(func(r client.LootRollWon) {
 		select {
 		case wonDone <- r:
 		default:
 		}
-	}
-	leader.World.OnLootAllPassed = func(r client.LootAllPassed) {
-		if prevAll != nil {
-			prevAll(r)
-		}
+	})
+	cancelAll := leader.World.AddLootAllPassedHook(func(r client.LootAllPassed) {
 		select {
 		case allPassed <- r:
 		default:
 		}
-	}
-	defer func() {
-		leader.World.OnLootRollWon = prevWon
-		leader.World.OnLootAllPassed = prevAll
-	}()
+	})
+	defer cancelWon()
+	defer cancelAll()
 	select {
 	case w := <-wonDone:
 		t.Logf("roll awarded winner=0x%X item=%d", w.WinnerGUID, w.ItemID)
@@ -187,7 +179,8 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	mate.CombatReady(t)
 	mate.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 
-	waitRoll := leader.ArmLootStartRoll()
+	waitRoll, cancelRoll := leader.ArmLootStartRoll()
+	t.Cleanup(cancelRoll)
 	items, ok := leader.TryOpenLoot(t, guid, 8*time.Second)
 	if !ok {
 		e2eharness.ProbeWorldAlive(t, leader, 22000)
@@ -203,17 +196,13 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	leader.RollPass(t, roll)
 	mate.RollPass(t, roll)
 	passed := make(chan struct{}, 1)
-	prevAll := leader.World.OnLootAllPassed
-	leader.World.OnLootAllPassed = func(r client.LootAllPassed) {
-		if prevAll != nil {
-			prevAll(r)
-		}
+	cancelAll := leader.World.AddLootAllPassedHook(func(r client.LootAllPassed) {
 		select {
 		case passed <- struct{}{}:
 		default:
 		}
-	}
-	defer func() { leader.World.OnLootAllPassed = prevAll }()
+	})
+	defer cancelAll()
 	select {
 	case <-passed:
 		t.Logf("PASS all-pass packet for item=%d", roll.ItemID)
