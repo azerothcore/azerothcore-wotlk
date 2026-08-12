@@ -54,7 +54,7 @@ func TestSmoke_TeleportPadSuccess(t *testing.T) {
 		Prefix: "SmTele",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	x, y, z, mapID := bot.Pos()
 	if mapID != e2eharness.MapEasternKingdoms {
 		e2eharness.Preconditionf(t, "expected map %d after pad tele, got %d", e2eharness.MapEasternKingdoms, mapID)

@@ -27,7 +27,7 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 	})
 	leader := e2eharness.ByRole(t, bots, "leader")
 	mate := e2eharness.ByRole(t, bots, "mate")
-	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, mate)
+	e2eharness.FormPartyAtPad(t, e2eharness.PadFor(t), leader, mate)
 	// AC minimum valid threshold is Uncommon (2); greys/whites never start group rolls.
 	leader.SetLootMethod(t, client.LootMethodNeedBeforeGreed, 0, e2eharness.LootThresholdUncommon)
 	leader.WaitLootMethod(t, client.LootMethodNeedBeforeGreed, 10*time.Second)
@@ -108,7 +108,7 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	leader := e2eharness.ByRole(t, bots, "leader")
 	leaver := e2eharness.ByRole(t, bots, "leaver")
 	stayer := e2eharness.ByRole(t, bots, "stayer")
-	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, leaver, stayer)
+	e2eharness.FormPartyAtPad(t, e2eharness.PadFor(t), leader, leaver, stayer)
 	leader.SetLootMethod(t, client.LootMethodGroupLoot, 0, e2eharness.LootThresholdUncommon)
 	leader.WaitLootMethod(t, client.LootMethodGroupLoot, 10*time.Second)
 
@@ -174,7 +174,7 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 		Class:         e2eharness.ClassWarrior,
 	})
 	leader, mate := bots[0], bots[1]
-	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, mate)
+	e2eharness.FormPartyAtPad(t, e2eharness.PadFor(t), leader, mate)
 	leader.SetLootMethod(t, client.LootMethodGroupLoot, 0, e2eharness.LootThresholdUncommon)
 	leader.WaitLootMethod(t, client.LootMethodGroupLoot, 10*time.Second)
 
@@ -224,7 +224,7 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 
 	// Persistent spawn with guaranteed loot (15209 crest) — keep alive until after
 	// below-half damage; SpawnKillLootable would kill immediately.
@@ -297,7 +297,7 @@ func TestLoot_MasterLootAssign(t *testing.T) {
 	})
 	master := e2eharness.ByRole(t, bots, "master")
 	member := e2eharness.ByRole(t, bots, "member")
-	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, master, member)
+	e2eharness.FormPartyAtPad(t, e2eharness.PadFor(t), master, member)
 	// Threshold must be Uncommon+ for CMSG_LOOT_METHOD to apply (including master loot).
 	master.SetLootMethod(t, client.LootMethodMasterLoot, master.GUID, e2eharness.LootThresholdUncommon)
 	master.WaitLootMethod(t, client.LootMethodMasterLoot, 10*time.Second)

@@ -35,7 +35,7 @@ func TestPets_SummonWaitDismiss(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.CombatReady(t)
 	pet := summonWarlockPet(t, bot)
 	if pet == 0 {
@@ -59,7 +59,7 @@ func TestPets_PlayerPetGUIDAfterSummon(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.CombatReady(t)
 	pet := summonWarlockPet(t, bot)
 	if pet == 0 {
@@ -83,7 +83,7 @@ func TestPets_DKRaiseDeadOpenWorld(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.AddItem(t, e2eharness.ItemCorpseDust, 5)
 	bot.Learn(t, e2eharness.SpellRaiseDead)
 	bot.CombatReady(t)
@@ -103,7 +103,7 @@ func TestPets_PetAttackCommand(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.CombatReady(t)
 	pet := summonWarlockPet(t, bot)
 	if pet == 0 {
@@ -127,7 +127,7 @@ func TestPets_DismissClearsPet(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.CombatReady(t)
 	pet := summonWarlockPet(t, bot)
 	if pet == 0 {

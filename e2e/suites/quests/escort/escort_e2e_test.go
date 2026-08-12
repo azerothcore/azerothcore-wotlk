@@ -27,7 +27,7 @@ func TestEscort_SpawnAndWaitUnit(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests", "ai"}, Runtime: "short", Category: "quests/escort"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscSp", Level: 80})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	guid := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
 	if guid == 0 {
 		e2eharness.Preconditionf(t, "spawn returned 0")
@@ -48,7 +48,7 @@ func TestEscort_CombatMidPathBaseline(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	u := bot.Spawn(t, e2eharness.CreatureHeroicTrainingDummy, 15*time.Second)
 	bot.CombatReady(t)
 	bot.Engage(t, u, 15*time.Second)
@@ -63,7 +63,7 @@ func TestEscort_LogoutNearUnitWorldAlive(t *testing.T) {
 
 	probe := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscPr", Level: 10})
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscLg", Level: 80})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	_ = bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
 	e2eharness.HardDisconnectAndProbe(t, bot, probe, 0)
 	t.Logf("PASS logout near unit world alive")
@@ -74,7 +74,7 @@ func TestEscort_UnitFindableAfterSpawn(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/escort"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscFd", Level: 80})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	guid := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
 	found := bot.FindUnit(e2eharness.CreatureTargetDummy, 50)
 	if found == 0 {

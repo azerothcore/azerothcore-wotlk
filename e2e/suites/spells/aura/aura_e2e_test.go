@@ -43,7 +43,7 @@ func TestAura_ApplyAndQuery(t *testing.T) {
 		Prefix: "AuraQ",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	if !bot.HasAura(e2eharness.SpellBlendingInAura) {
 		e2eharness.Preconditionf(t, "ApplyAura did not yield aura %d", e2eharness.SpellBlendingInAura)
@@ -59,7 +59,7 @@ func TestAura_MidAuraRelogWorldAlive(t *testing.T) {
 		Prefix: "AuraRl",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	bot.Save(t)
 	bot.Relog(t)
@@ -80,7 +80,7 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 		Level:  80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	// Spawn a dummy and try to apply a breakable aura on self via GM for determinism.
 	// Use a known short stun aura if present; otherwise skip with precondition if apply fails.
 	const spellCheapShot = 1833
@@ -103,7 +103,7 @@ func TestAura_ApplyMultipleDistinctAuras(t *testing.T) {
 		Prefix: "AuraMx",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	bot.ApplyAura(t, e2eharness.SpellBattleStance)
 	if !bot.HasAura(e2eharness.SpellBlendingInAura) {

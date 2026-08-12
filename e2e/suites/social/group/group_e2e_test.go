@@ -24,7 +24,7 @@ func TestGroup_FormPartyBasic(t *testing.T) {
 		Level:  20,
 	})
 	leader, mate := bots[0], bots[1]
-	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, mate)
+	e2eharness.FormPartyAtPad(t, e2eharness.PadFor(t), leader, mate)
 	if !leader.InGroup() || !mate.InGroup() {
 		e2eharness.Preconditionf(t, "expected both in group leader=%v mate=%v", leader.InGroup(), mate.InGroup())
 	}
@@ -40,9 +40,8 @@ func TestGroup_LeaveClearsMembership(t *testing.T) {
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpLeave", Count: 2, Level: 20})
 	leader, mate := bots[0], bots[1]
-	e2eharness.TeleportAll(t, bots,
-		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
-		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+	pad := e2eharness.PadFor(t)
+	e2eharness.TeleportAllPad(t, bots, pad)
 	e2eharness.FormParty(t, leader, mate)
 	mate.LeaveGroup(t)
 	mate.WaitNotInGroup(t, 15*time.Second)
@@ -58,9 +57,8 @@ func TestGroup_SetLeaderTransfer(t *testing.T) {
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpLead", Count: 2, Level: 20})
 	a, b := bots[0], bots[1]
-	e2eharness.TeleportAll(t, bots,
-		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
-		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+	pad := e2eharness.PadFor(t)
+	e2eharness.TeleportAllPad(t, bots, pad)
 	e2eharness.FormParty(t, a, b)
 	a.SetLeader(t, b)
 	b.WaitIsGroupLeader(t, 15*time.Second)
@@ -78,9 +76,8 @@ func TestGroup_RapidInviteDeclineNoCrash(t *testing.T) {
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpFast", Count: 2, Level: 20})
 	a, b := bots[0], bots[1]
-	e2eharness.TeleportAll(t, bots,
-		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
-		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+	pad := e2eharness.PadFor(t)
+	e2eharness.TeleportAllPad(t, bots, pad)
 	for i := 0; i < 5; i++ {
 		// Arm before Invite (no last-invite cache; WaitGroupInvite alone can miss a fast SMSG).
 		waitInv, cancelInv := b.ArmGroupInvite()
@@ -105,9 +102,8 @@ func TestGroup_SetLootMethodNBG(t *testing.T) {
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpLoot", Count: 2, Level: 20})
 	leader, mate := bots[0], bots[1]
-	e2eharness.TeleportAll(t, bots,
-		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
-		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+	pad := e2eharness.PadFor(t)
+	e2eharness.TeleportAllPad(t, bots, pad)
 	e2eharness.FormParty(t, leader, mate)
 	leader.SetLootMethod(t, client.LootMethodNeedBeforeGreed, 0, 2)
 	st := leader.WaitLootMethod(t, client.LootMethodNeedBeforeGreed, 10*time.Second)
@@ -120,9 +116,8 @@ func TestGroup_DisbandParty(t *testing.T) {
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpDis", Count: 2, Level: 20})
 	leader, mate := bots[0], bots[1]
-	e2eharness.TeleportAll(t, bots,
-		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
-		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+	pad := e2eharness.PadFor(t)
+	e2eharness.TeleportAllPad(t, bots, pad)
 	e2eharness.FormParty(t, leader, mate)
 	e2eharness.DisbandParty(t, bots...)
 	leader.WaitNotInGroup(t, 15*time.Second)

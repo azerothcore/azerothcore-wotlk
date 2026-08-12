@@ -25,7 +25,7 @@ func TestEffects_TargetDummySummon(t *testing.T) {
 		Prefix: "FxDummy",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.AddItem(t, e2eharness.ItemTargetDummy, 1)
 	// Use spell summon if item use is awkward: SpellSummonTargetDummy.
 	bot.Learn(t, e2eharness.SpellSummonTargetDummy)
@@ -48,7 +48,7 @@ func TestEffects_ChargeEffect(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	dummy := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
 	// Dummy spawns on player; step back into Charge range.
 	x0, y0, z0, m0 := bot.Pos()
@@ -84,7 +84,7 @@ func TestEffects_SweepingStrikesExecuteNoCrash(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	// Spawn returns first matching entry; second temp spawn tracked for cleanup.
 	d1 := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
 	known := map[uint64]struct{}{d1: {}}
@@ -123,7 +123,7 @@ func TestEffects_GroundingTotemSummon(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PadFor(t))
 	bot.GiveTotems(t)
 	bot.CombatReady(t)
 	_ = bot.CastOrGM(t, e2eharness.SpellGroundingTotem, 0, 10*time.Second)

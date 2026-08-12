@@ -27,7 +27,7 @@ func tradePair(t *testing.T, prefix string) (a, b *e2eharness.ScenarioBot) {
 	a = e2eharness.ByRole(t, bots, "trader_a")
 	b = e2eharness.ByRole(t, bots, "trader_b")
 	// Place both tightly (TRADE_DISTANCE) and combatstop — pad leftovers aggro trades.
-	pad := e2eharness.PadStormwindOutskirts
+	pad := e2eharness.PadFor(t)
 	a.Teleport(t, pad.X, pad.Y, pad.Z, pad.Map)
 	b.Teleport(t, pad.X+1.5, pad.Y, pad.Z, pad.Map)
 	a.CombatStop(t)
@@ -194,8 +194,10 @@ func TestTrade_RapidOpenCloseNoCrash(t *testing.T) {
 	})
 
 	a, b := tradePair(t, "TrdSpm")
+	// One pad for the whole test — do not re-lease each iteration (empties pad pool).
+	pad := e2eharness.PadFor(t)
 	probe := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "TrdPrb", Level: 10})
-	probe.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	probe.TeleportPad(t, pad)
 
 	for i := 0; i < 8; i++ {
 		e2eharness.OpenTrade(t, a, b)
@@ -205,11 +207,10 @@ func TestTrade_RapidOpenCloseNoCrash(t *testing.T) {
 		} else {
 			e2eharness.CompleteTrade(t, a, b)
 		}
-		// Re-seat both on pad without thrashing tele every cycle if already close.
+		// Re-seat both on the same pad without thrashing tele every cycle.
 		if i%2 == 1 {
-			e2eharness.TeleportAllPad(t, []*e2eharness.ScenarioBot{a, b}, e2eharness.PadStormwindOutskirts)
-			b.Teleport(t, e2eharness.PadStormwindOutskirts.X+2, e2eharness.PadStormwindOutskirts.Y,
-				e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+			e2eharness.TeleportAllPad(t, []*e2eharness.ScenarioBot{a, b}, pad)
+			b.Teleport(t, pad.X+2, pad.Y, pad.Z, pad.Map)
 		}
 	}
 	// One OOR abort in the mix (crash surface); cancel if status lags after tele.
