@@ -26,7 +26,7 @@ func TestThreat_EngageSetsTarget(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	dummy := bot.Spawn(t, pullTarget, 15*time.Second)
 	bot.CombatReady(t)
 	bot.Engage(t, dummy, 15*time.Second)
@@ -49,7 +49,7 @@ func TestThreat_TauntSwitchesTarget(t *testing.T) {
 	})
 	tank := e2eharness.ByRole(t, bots, "tank")
 	dps := e2eharness.ByRole(t, bots, "dps")
-	pad := e2eharness.PadFor(t)
+	pad := e2eharness.PadStormwindOutskirts
 	e2eharness.TeleportAll(t, bots, pad.X, pad.Y, pad.Z, pad.Map)
 	// Pad thrash: combatstop both and clear leftover dummies before spawn.
 	for _, b := range bots {
@@ -90,7 +90,7 @@ func TestThreat_KillClearsCombat(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	dummy := bot.Spawn(t, pullTarget, 15*time.Second)
 	bot.CombatReady(t)
 	bot.Engage(t, dummy, 15*time.Second)
@@ -106,7 +106,7 @@ func TestThreat_PartyPullSetup(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "multi_bot"}, Runtime: "short", Category: "combat/threat"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "ThrPty", Count: 2, Level: 80, LearnAllClass: true})
-	pad := e2eharness.PadFor(t)
+	pad := e2eharness.PadStormwindOutskirts
 	e2eharness.TeleportAll(t, bots, pad.X, pad.Y, pad.Z, pad.Map)
 	// Pad thrash: stop combat + clear leftover dummies before party pull.
 	for _, b := range bots {
@@ -133,7 +133,7 @@ func TestThreat_WaitUnitTargetHelper(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	dummy := bot.Spawn(t, pullTarget, 15*time.Second)
 	bot.CombatReady(t)
 	bot.Attack(t, dummy)

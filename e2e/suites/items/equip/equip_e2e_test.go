@@ -19,7 +19,7 @@ func TestEquip_EquipEntryBasic(t *testing.T) {
 		Prefix: "EqBasic",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	// Target dummy is an item that can be in bags; equip a simple known item if possible.
 	// Use engineering dummy item as inventory seed (not necessarily equippable armor).
 	bot.AddItem(t, e2eharness.ItemTargetDummy, 1)
@@ -36,7 +36,7 @@ func TestEquip_AddItemWaitSlot(t *testing.T) {
 		Prefix: "EqSlot",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bag, slot := bot.AddItemWait(t, e2eharness.ItemTargetDummy, 1)
 	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, 1)
 	t.Logf("PASS AddItemWait bag=%d slot=%d inventory>=1", bag, slot)
@@ -50,7 +50,7 @@ func TestEquip_MultipleAddsNoCrash(t *testing.T) {
 		Prefix: "EqMulti",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	for i := 0; i < 3; i++ {
 		bot.AddItem(t, e2eharness.ItemTargetDummy, 1)
 	}
@@ -72,7 +72,7 @@ func TestEquip_EquipEntryHelper(t *testing.T) {
 		Class:  e2eharness.ClassWarrior,
 		Level:  10,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bot.EquipEntry(t, itemDullBlade, 1)
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS EquipEntry helper")

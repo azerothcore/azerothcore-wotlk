@@ -19,8 +19,9 @@ func TestVehicles_MultiBotColocated(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "multi_bot", "deferred"}, Runtime: "short", Category: "combat/vehicles"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "VehCol", Count: 2, Level: 80})
-	pad := e2eharness.PadFor(t)
-	e2eharness.TeleportAllPad(t, bots, pad)
+	e2eharness.TeleportAll(t, bots,
+		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
+		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
 	bots[0].AssertWorldAlive(t)
 	t.Logf("PASS vehicle multi-bot colocation precondition")
 }
@@ -30,7 +31,7 @@ func TestVehicles_RelogAfterTeleBaseline(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "protocol"}, Runtime: "short", Category: "combat/vehicles"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "VehRl", Level: 80})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bot.Save(t)
 	bot.Relog(t)
 	bot.AssertWorldAlive(t)

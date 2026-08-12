@@ -142,7 +142,7 @@ func TestUlduar_DamageKillPathSafe(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	dummy := bot.Spawn(t, e2eharness.CreatureHeroicTrainingDummy, 15*time.Second)
 	bot.CombatReady(t)
 	bot.Engage(t, dummy, 20*time.Second)

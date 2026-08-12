@@ -28,7 +28,7 @@ func TestDeath_DieProducesGhostState(t *testing.T) {
 		Prefix: "DieGh",
 		Level:  30,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bot.DieMust(t, 20*time.Second)
 
 	// Alive() is session usability, not player health. Oracle is Health()==0.
@@ -52,7 +52,7 @@ func TestDeath_ReleaseSpiritWorldAlive(t *testing.T) {
 		Prefix: "DieRel",
 		Level:  30,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bot.DieMust(t, 20*time.Second)
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
@@ -68,7 +68,7 @@ func TestDeath_DieAndRepopCycle(t *testing.T) {
 		Prefix: "DieCyc",
 		Level:  40,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bot.DieMust(t, 20*time.Second)
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
@@ -86,7 +86,7 @@ func TestDeath_DeathDoesNotCrashWorld(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bot.DieMust(t, 20*time.Second)
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
@@ -106,7 +106,7 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 		Level:  30,
 	})
 	// Quiet death setup: combatstop before die (pad thrash); still PvP corpse from .die self-kill.
-	bot.TeleportPad(t, e2eharness.PadFor(t))
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bot.GM(t, ".combatstop")
 	bot.DieMust(t, 25*time.Second)
 	// Corpse sits at death position (capture after Die, before graveyard tele).
