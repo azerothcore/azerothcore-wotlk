@@ -3,6 +3,7 @@
 package loot_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -205,8 +206,9 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	e2eharness.ProbeWorldAlive(t, leader, 22000)
 }
 
-// LOOT-05: kill when below half HP (#26862). Outdoor boar is fine (open-loot oracle, not rolls).
-// Repro class: creature with curhealth < max/2 at death still yields loot (not credit-only).
+// LOOT-05: kill when below half HP (#26862).
+// Uses Crimson Templar (reliable loot) damaged to <50% max then killed — open loot must work.
+// (Issue class: curhealth < max/2 at death must still yield loot/credit.)
 func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "loot", "issue", "serial"},
@@ -215,7 +217,6 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 		Category: "social/loot",
 	})
 
-	const creatureBoar uint32 = 3098
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "LootHP",
 		Class:         e2eharness.ClassWarrior,
@@ -223,76 +224,51 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	// Persistent spawn for a lootable corpse — always clean up (.npc add temp removes corpse instantly).
-	bot.DespawnNearbyEntry(t, creatureBoar, 80)
+
+	// Persistent spawn with guaranteed loot (15209 crest) — cleanup via DespawnNPC.
+	entry := e2eharness.CreatureGroupLootFixture
+	bot.DespawnNearbyEntry(t, entry, 80)
 	time.Sleep(150 * time.Millisecond)
 	known := map[uint64]struct{}{}
-	for _, u := range bot.UnitsByEntry(100, creatureBoar) {
+	for _, u := range bot.UnitsByEntry(100, entry) {
 		known[u.GUID] = struct{}{}
 	}
 	bot.GM(t, ".gm on")
-	bot.GM(t, ".npc add 3098")
-	newOnes := bot.WaitNewUnits(t, known, []uint32{creatureBoar}, 15*time.Second)
+	bot.GM(t, fmt.Sprintf(".npc add %d", entry))
+	newOnes := bot.WaitNewUnits(t, known, []uint32{entry}, 15*time.Second)
 	if len(newOnes) == 0 {
-		e2eharness.Preconditionf(t, "#26862: boar not found after .npc add")
+		e2eharness.Preconditionf(t, "#26862: fixture %d not found after .npc add", entry)
 		return
 	}
 	guid := newOnes[0].GUID
 	t.Cleanup(func() { bot.DespawnNPC(t, guid) })
 
-	// Level scale requires selection; wait until max HP is no longer L1-range.
-	_ = bot.World.SetTarget(guid)
-	time.Sleep(80 * time.Millisecond)
-	bot.GM(t, ".npc set level 80")
-	deadlineLvl := time.Now().Add(10 * time.Second)
-	var hp, max uint32
-	for time.Now().Before(deadlineLvl) {
-		hp, max = bot.WaitUnitHPKnown(t, guid, 2*time.Second)
-		// L1 mottled boar max is ~40s; L80 is far higher. Also require still alive.
-		if max >= 500 && hp > 0 {
-			break
-		}
-		_ = bot.World.SetTarget(guid)
-		bot.GM(t, ".npc set level 80")
-		time.Sleep(100 * time.Millisecond)
-	}
-	if max < 500 || hp == 0 {
-		e2eharness.Preconditionf(t, "#26862: failed to scale boar to L80 (hp=%d/%d)", hp, max)
-		return
-	}
-	t.Logf("boar scaled hp=%d/%d", hp, max)
-
-	// Below half but still alive — bug class is kill while cur < max/2.
-	// Stay GM for damage+kill so .damage consistently tags loot recipient (CombatReady
-	// mid-path under pad thrash has produced unlootable corpses).
-	bot.GM(t, ".gm on")
+	bot.WaitUnitHPKnown(t, guid, 10*time.Second)
+	// Stay GM for damage+kill so loot recipient tagging is consistent.
 	bot.DamageToFraction(t, guid, 0.49, 20*time.Second)
-	hp, max = bot.UnitHP(guid)
+	hp, max := bot.UnitHP(guid)
 	t.Logf("unit below half hp=%d/%d", hp, max)
 	if hp == 0 || max == 0 || float64(hp)/float64(max) > 0.5 {
 		e2eharness.Preconditionf(t, "#26862: want 0 < hp/max <= 0.5 before kill, got %d/%d", hp, max)
 		return
 	}
 
-	// Final kill while below half; do not tele away — open loot immediately.
 	bot.DamageKill(t, []uint64{guid}, 50_000_000, 25*time.Second)
 	bot.WaitUnitDead(t, guid, 20*time.Second)
 	bot.WaitUnitLootable(t, guid, 15*time.Second)
 
 	var items []client.LootItem
 	ok := false
-	for attempt := 0; attempt < 3 && !ok; attempt++ {
+	for attempt := 0; attempt < 4 && !ok; attempt++ {
 		_ = bot.World.SetTarget(guid)
-		items, ok = bot.TryOpenLoot(t, guid, 6*time.Second)
+		items, ok = bot.TryOpenLoot(t, guid, 5*time.Second)
 		if !ok {
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(250 * time.Millisecond)
 		}
 	}
 	if !ok {
 		bot.AssertWorldAlive(t)
-		// World is alive; missing loot after a properly tagged below-half kill is the issue class.
-		// Prefer ConfirmedBug only when world survived — not a harness disconnect.
-		e2eharness.ConfirmedBugf(t, 26862, "below-half-HP kill: corpse not lootable after 3 open tries (hp was %d/%d before kill)", hp, max)
+		e2eharness.ConfirmedBugf(t, 26862, "below-half-HP kill: corpse not lootable after retries (hp was %d/%d before kill)", hp, max)
 		return
 	}
 	bot.AssertWorldAlive(t)

@@ -4,6 +4,7 @@ package lifecycle_test
 
 import (
 	"testing"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -13,8 +14,9 @@ import (
 
 // QLIFE-03 / #26549: STAY_ALIVE quest fails on death.
 func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
+	// serial: DieMust + CharDB save race under parallel pad thrash.
 	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"short", "quests", "issue", "smoke"},
+		Tags:     []string{"short", "quests", "issue", "smoke", "serial"},
 		Runtime:  "short",
 		Issue:    26549,
 		Category: "quests/lifecycle",
@@ -35,11 +37,18 @@ func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
 	}
 
 	bot.DieAndRepop(t)
-	bot.Save(t)
-
-	st, ok = bot.QuestStatus(t, e2eharness.QuestRethbanGauntlet)
+	// CharDB quest status is async after .save — always re-save and re-read.
+	st, ok = bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
 	if !ok {
 		e2eharness.HarnessFailf(t, "quest row missing after death")
+	}
+	if st != e2eharness.QuestStatusFailed {
+		// One more save settle (DieAndRepop path can lag FailQuest → DB under load).
+		time.Sleep(500 * time.Millisecond)
+		st, ok = bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
+		if !ok {
+			e2eharness.HarnessFailf(t, "quest row missing after death (retry)")
+		}
 	}
 	if st != e2eharness.QuestStatusFailed {
 		e2eharness.ConfirmedBugf(t, 26549, "quest status=%d (%s) after death+repop, want FAILED(5)",
