@@ -21,7 +21,7 @@ func TestCharm_ApplyAndCancelAuraOnSelf(t *testing.T) {
 		Prefix: "CharmAu",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	bot.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	if !bot.HasAura(e2eharness.SpellBlendingInAura) {
 		e2eharness.Preconditionf(t, "aura missing after apply")
@@ -42,7 +42,7 @@ func TestCharm_LogoutWhileAuraWorldAlive(t *testing.T) {
 
 	probe := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "CharmPr", Level: 10})
 	victim := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "CharmVc", Level: 80})
-	victim.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	victim.TeleportPad(t, e2eharness.PackagePad(t))
 	victim.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	victim.Save(t)
 	// Clean logout path via Relog of victim would re-enter; instead hard-drop after save.
@@ -90,7 +90,7 @@ func TestCharm_CancelCastSafe(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	// gm off + mana for a real channel (account GM still allows .modify).
 	e2eharness.CombatReady(t, bot.World, e2eharness.CombatReadyOpts{God: false, Power: true})
 	time.Sleep(200 * time.Millisecond) // settle after tele so cast is not interrupted as moving

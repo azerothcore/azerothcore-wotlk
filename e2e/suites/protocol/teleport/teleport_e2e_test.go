@@ -21,7 +21,7 @@ func TestTeleport_CrossMapEasternToNorthrend(t *testing.T) {
 		Prefix: "TeleXM",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	_, _, _, m0 := bot.Pos()
 	bot.Teleport(t, 3758.2554, 3689.5754, 47.241505, e2eharness.MapNorthrend)
 	x, y, z, m1 := bot.Pos()
@@ -62,7 +62,7 @@ func TestTeleport_SpamShortDoesNotCrash(t *testing.T) {
 		Level:  80,
 	})
 	for i := 0; i < 5; i++ {
-		bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+		bot.TeleportPad(t, e2eharness.PackagePad(t))
 		bot.Teleport(t, -8949.95+float32(i), 554.0, 94.0, e2eharness.MapEasternKingdoms)
 	}
 	bot.AssertWorldAlive(t)
@@ -77,7 +77,7 @@ func TestTeleport_PadThenNamed(t *testing.T) {
 		Prefix: "TelePN",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	bot.TeleNamed(t, "Ironforge")
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS pad then named tele")
@@ -91,7 +91,7 @@ func TestTeleport_GoCreatureIDNearSpawn(t *testing.T) {
 		Prefix: "TeleGo",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	guid := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
 	if guid == 0 {
 		e2eharness.Preconditionf(t, "failed to spawn target dummy")

@@ -24,7 +24,7 @@ func TestCast_ChargeSucceedsOnDummy(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	dummy := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
 	// Pull caster back so Charge is in range (spawn lands on the player).
 	dx, dy, dz, dm := bot.Pos()
@@ -53,7 +53,7 @@ func TestCast_FailPathNoCrash(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	// Cast Charge with no target / invalid target GUID.
 	res, err := bot.TryCast(t, e2eharness.SpellCharge, 0, 5*time.Second)
 	_ = res
@@ -81,7 +81,7 @@ func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
 	})
 	dk := e2eharness.ByRole(t, bots, "dk")
 	corpse := e2eharness.ByRole(t, bots, "corpse")
-	e2eharness.TeleportAllPad(t, bots, e2eharness.PadStormwindOutskirts)
+	e2eharness.TeleportAllPad(t, bots, e2eharness.PackagePad(t))
 	// DieMust (not bare Die) — selection settle + retries under pad load.
 	corpse.DieMust(t, 20*time.Second)
 	dk.Learn(t, e2eharness.SpellRaiseDead)
@@ -105,7 +105,7 @@ func TestCast_BattleStanceSelf(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	// Self-cast stance via CastOrGM.
 	_ = bot.CastOrGM(t, e2eharness.SpellBattleStance, 0, 10*time.Second)
 	bot.AssertWorldAlive(t)
@@ -122,7 +122,7 @@ func TestCast_GroundAoENoCrash(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	x, y, z, _ := bot.Pos()
 	_ = bot.CastAtPosition(t, e2eharness.SpellRainOfFire, x, y, z, 10*time.Second)
 	bot.AssertWorldAlive(t)
