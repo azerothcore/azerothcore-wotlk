@@ -1,0 +1,120 @@
+//go:build e2e
+
+package lifecycle_test
+
+import (
+	"testing"
+
+	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
+	"github.com/walkline/AzerothGhost/e2e/e2eharness"
+)
+
+// QLIFE-03 / #26549: STAY_ALIVE quest fails on death.
+func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{
+		Tags:     []string{"short", "quests", "issue", "smoke"},
+		Runtime:  "short",
+		Issue:    26549,
+		Category: "quests/lifecycle",
+	})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "QAlive",
+		Class:  e2eharness.ClassWarrior,
+		Level:  30,
+	})
+	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
+	bot.Teleport(t, -9222.58, -2147.87, 63.814, e2eharness.MapEasternKingdoms)
+
+	st, ok := bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
+	if !ok || st != e2eharness.QuestStatusIncomplete {
+		e2eharness.Preconditionf(t, "quest should be INCOMPLETE, got ok=%v status=%d (%s)",
+			ok, st, e2eharness.QuestStatusName(st))
+	}
+
+	bot.DieAndRepop(t)
+	bot.Save(t)
+
+	st, ok = bot.QuestStatus(t, e2eharness.QuestRethbanGauntlet)
+	if !ok {
+		e2eharness.HarnessFailf(t, "quest row missing after death")
+	}
+	if st != e2eharness.QuestStatusFailed {
+		e2eharness.ConfirmedBugf(t, 26549, "quest status=%d (%s) after death+repop, want FAILED(5)",
+			st, e2eharness.QuestStatusName(st))
+	}
+	t.Logf("PASS quest failed on death (status=%s)", e2eharness.QuestStatusName(st))
+}
+
+// QLIFE-01: AddQuest → incomplete status after save.
+func TestQuest_AddQuestIncomplete(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "QAdd",
+		Level:  30,
+	})
+	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
+	bot.AssertQuestStatus(t, e2eharness.QuestRethbanGauntlet, e2eharness.QuestStatusIncomplete)
+	t.Logf("PASS AddQuest → incomplete")
+}
+
+// QLIFE-02: quest status survives save round-trip.
+func TestQuest_StatusSurvivesSave(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "QSave",
+		Level:  30,
+	})
+	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
+	st, ok := bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
+	if !ok {
+		e2eharness.HarnessFailf(t, "quest missing after save")
+	}
+	if st != e2eharness.QuestStatusIncomplete {
+		e2eharness.Preconditionf(t, "want incomplete after save, got %d", st)
+	}
+	t.Logf("PASS quest status survives save")
+}
+
+// QLIFE-04: quest status after relog still present.
+func TestQuest_StatusSurvivesRelog(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests", "protocol"}, Runtime: "short", Category: "quests/lifecycle"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "QRelog",
+		Level:  30,
+	})
+	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
+	bot.Save(t)
+	bot.Relog(t)
+	bot.AssertWorldAlive(t)
+	st, ok := bot.QuestStatus(t, e2eharness.QuestRethbanGauntlet)
+	if !ok {
+		e2eharness.ConfirmedBugf(t, 0, "quest row missing after relog")
+	}
+	t.Logf("PASS quest after relog status=%s", e2eharness.QuestStatusName(st))
+}
+
+// QLIFE-05: second AddQuest of same ID is safe (no crash).
+func TestQuest_ReAddSameQuestNoCrash(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "QDup",
+		Level:  30,
+	})
+	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
+	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
+	bot.AssertWorldAlive(t)
+	bot.AssertQuestStatus(t, e2eharness.QuestRethbanGauntlet, e2eharness.QuestStatusIncomplete)
+	t.Logf("PASS re-add same quest no crash")
+}

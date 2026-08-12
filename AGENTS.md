@@ -20,6 +20,7 @@ Read the matching doc(s) BEFORE starting the task:
 - Reviewing a changeset or PR → `.agents/docs/code-review.md`
 - Self-reviewing a changeset before submission → also `.agents/docs/self-review-rules.md`
 - Touching a subsystem that has a doc in `.agents/docs/systems/` → read that doc too
+- Writing or changing live-stack e2e (`e2e/`) → `.agents/docs/e2e-policy.md` and AzerothGhost `e2e/LLM_GUIDE.md`
 - Capturing a lesson or adding/updating agent docs → `.agents/docs/README.md`
 
 ## Repository layout
@@ -31,6 +32,7 @@ Read the matching doc(s) BEFORE starting the task:
 - `src/server/shared/` — code shared by auth and world servers.
 - `src/server/apps/{authserver,worldserver}/` — entry points (ports 3724 and 8085).
 - `src/test/` — unit tests + mocks.
+- `e2e/` — live-stack Go e2e (AzerothGhost harness); see `e2e/README.md` and `.agents/plans/e2e-army/`.
 - `data/sql/` — `base/` (historical schema), `updates/db_*/` (merged), `updates/pending_db_*/` (in-flight), `custom/` (gitignored).
 - `modules/` — external modules (see below).
 - `apps/` — helper scripts; `apps/codestyle/` holds the lint scripts.

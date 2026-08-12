@@ -123,3 +123,8 @@ __pycache__/
 #  !modules/yourmodule
 #
 # ==================
+
+# Live-stack e2e private / local tooling
+e2e/local/
+e2e/go.work
+e2e/go.work.sum

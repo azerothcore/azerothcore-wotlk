@@ -1,0 +1,115 @@
+//go:build e2e
+
+package smoke_test
+
+import (
+	"math"
+	"testing"
+	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
+	"github.com/walkline/AzerothGhost/e2e/e2eharness"
+)
+
+// SMOKE-01: valid login → enter world
+func TestSmoke_ValidLoginEnterWorld(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "SmLogin",
+		Level:  10,
+	})
+	if !e2eharness.SessionAlive(bot.Session) {
+		e2eharness.HarnessFailf(t, "session not alive after NewSolo")
+	}
+	if bot.GUID == 0 {
+		e2eharness.Preconditionf(t, "player GUID is 0 after enter world")
+	}
+	x, y, z, mapID := bot.Pos()
+	if math.IsNaN(float64(x)) || math.IsNaN(float64(y)) || math.IsNaN(float64(z)) {
+		e2eharness.HarnessFailf(t, "invalid position after login")
+	}
+	t.Logf("PASS login enter world guid=%d map=%d pos=(%.1f,%.1f,%.1f)", bot.GUID, mapID, x, y, z)
+}
+
+// SMOKE-02: probe world alive after login
+func TestSmoke_ProbeWorldAliveAfterLogin(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short"}, Runtime: "short", Category: "smoke"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "SmProbe",
+		Level:  10,
+	})
+	bot.AssertWorldAlive(t)
+	bot.GM(t, ".gm on")
+	t.Logf("PASS world alive after login")
+}
+
+// SMOKE-03: teleport pad success
+func TestSmoke_TeleportPadSuccess(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "SmTele",
+		Level:  80,
+	})
+	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	x, y, z, mapID := bot.Pos()
+	if mapID != e2eharness.MapEasternKingdoms {
+		e2eharness.Preconditionf(t, "expected map %d after pad tele, got %d", e2eharness.MapEasternKingdoms, mapID)
+	}
+	// Loose radius: pad is Stormwind outskirts; just require finite coords and EK map.
+	if math.IsNaN(float64(x)) || math.IsNaN(float64(y)) || math.IsNaN(float64(z)) {
+		e2eharness.HarnessFailf(t, "invalid pos after pad tele")
+	}
+	if !bot.Alive() {
+		e2eharness.HarnessFailf(t, "session/player not alive after pad tele")
+	}
+	t.Logf("PASS pad tele map=%d pos=(%.1f,%.1f,%.1f)", mapID, x, y, z)
+}
+
+// SMOKE-05: relog same character, world still alive
+func TestSmoke_RelogSameCharacterWorldAlive(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "SmRelog",
+		Level:  20,
+	})
+	guidBefore := bot.GUID
+	bot.Save(t)
+	bot.Relog(t)
+	time.Sleep(500 * time.Millisecond)
+	bot.AssertWorldAlive(t)
+	if bot.GUID != 0 && bot.GUID != guidBefore {
+		// Some relog paths keep GUID; if changed, still require alive session.
+		t.Logf("NOTE guid changed after relog before=%d after=%d", guidBefore, bot.GUID)
+	}
+	t.Logf("PASS relog world alive guid=%d", bot.GUID)
+}
+
+// SMOKE-07: first-time character create path (NewSolo with fresh account always creates)
+func TestSmoke_FirstTimeCharacterCreate(t *testing.T) {
+	t.Parallel()
+	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "SmCreate",
+		Race:   e2eharness.RaceHuman,
+		Class:  e2eharness.ClassWarrior,
+		Level:  1,
+	})
+	if bot.GUID == 0 {
+		e2eharness.Preconditionf(t, "character create/login produced GUID 0")
+	}
+	if !e2eharness.SessionAlive(bot.Session) {
+		e2eharness.HarnessFailf(t, "session dead after character create")
+	}
+	t.Logf("PASS first-time create guid=%d name=%s", bot.GUID, bot.Name)
+}
