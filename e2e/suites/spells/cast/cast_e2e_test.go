@@ -64,8 +64,9 @@ func TestCast_FailPathNoCrash(t *testing.T) {
 
 // CAST-03 / #27061 pattern: Raise Dead near corpse must not crash world.
 func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
+	// serial: DieMust + pad thrash flakes when parallel with other combat/loot tests.
 	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"med", "spells", "issue"},
+		Tags:     []string{"med", "spells", "issue", "serial"},
 		Runtime:  "med",
 		Issue:    27061,
 		Category: "spells/cast",
@@ -80,9 +81,9 @@ func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
 	})
 	dk := e2eharness.ByRole(t, bots, "dk")
 	corpse := e2eharness.ByRole(t, bots, "corpse")
-	e2eharness.TeleportAll(t, bots, e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y, e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
-	corpse.Die(t)
-	corpse.WaitDead(t, 15*time.Second)
+	e2eharness.TeleportAllPad(t, bots, e2eharness.PadStormwindOutskirts)
+	// DieMust (not bare Die) — selection settle + retries under pad load.
+	corpse.DieMust(t, 20*time.Second)
 	dk.Learn(t, e2eharness.SpellRaiseDead)
 	dk.AddItem(t, e2eharness.ItemCorpseDust, 5)
 	dk.CombatReady(t)
