@@ -247,7 +247,19 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
         run: |
           set -euo pipefail
-          sudo mysql -uroot <<'SQL'
+          # After install-deps, root usually has MYSQL_ROOT_PASSWORD set; prefer that.
+          # Fall back to auth_socket (sudo, no password) for bare installs.
+          mysql_root() {
+            if sudo mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e 'SELECT 1' &>/dev/null; then
+              sudo mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" "$@"
+            elif sudo mysql -uroot -e 'SELECT 1' &>/dev/null; then
+              sudo mysql -uroot "$@"
+            else
+              echo '::error::cannot connect to MySQL as root'
+              exit 1
+            fi
+          }
+          mysql_root <<'SQL'
           -- Ensure root can auth with password over TCP (GHA / mysql client -h127.0.0.1).
           ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'root';
           CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY 'root';
@@ -262,6 +274,11 @@ jobs:
           GRANT ALL PRIVILEGES ON `acore_world`.* TO 'acore'@'%' WITH GRANT OPTION;
           GRANT ALL PRIVILEGES ON `acore_characters`.* TO 'acore'@'%' WITH GRANT OPTION;
           GRANT ALL PRIVILEGES ON `acore_auth`.* TO 'acore'@'%' WITH GRANT OPTION;
+          -- Also ensure legacy localhost account still works if create_mysql made it.
+          CREATE USER IF NOT EXISTS 'acore'@'localhost' IDENTIFIED BY 'acore';
+          GRANT ALL PRIVILEGES ON `acore_world`.* TO 'acore'@'localhost' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_characters`.* TO 'acore'@'localhost' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_auth`.* TO 'acore'@'localhost' WITH GRANT OPTION;
           FLUSH PRIVILEGES;
           SQL
           mysql -h127.0.0.1 -uacore -pacore -e 'SELECT USER(), CURRENT_USER();' acore_auth
