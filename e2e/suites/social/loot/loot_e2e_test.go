@@ -206,6 +206,7 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 }
 
 // LOOT-05: kill when below half HP (#26862). Outdoor boar is fine (open-loot oracle, not rolls).
+// Repro class: creature with curhealth < max/2 at death still yields loot (not credit-only).
 func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "loot", "issue", "serial"},
@@ -224,21 +225,53 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	// Persistent spawn for a lootable corpse — always clean up (.npc add temp removes corpse instantly).
 	bot.DespawnNearbyEntry(t, creatureBoar, 80)
+	time.Sleep(150 * time.Millisecond)
+	known := map[uint64]struct{}{}
+	for _, u := range bot.UnitsByEntry(100, creatureBoar) {
+		known[u.GUID] = struct{}{}
+	}
 	bot.GM(t, ".gm on")
 	bot.GM(t, ".npc add 3098")
-	guid := bot.WaitUnit(t, creatureBoar, 15*time.Second)
-	if guid == 0 {
+	newOnes := bot.WaitNewUnits(t, known, []uint32{creatureBoar}, 15*time.Second)
+	if len(newOnes) == 0 {
 		e2eharness.Preconditionf(t, "#26862: boar not found after .npc add")
 		return
 	}
+	guid := newOnes[0].GUID
 	t.Cleanup(func() { bot.DespawnNPC(t, guid) })
+
+	// Level scale requires selection; wait until max HP is no longer L1-range.
+	_ = bot.World.SetTarget(guid)
+	time.Sleep(80 * time.Millisecond)
 	bot.GM(t, ".npc set level 80")
+	deadlineLvl := time.Now().Add(10 * time.Second)
+	var hp, max uint32
+	for time.Now().Before(deadlineLvl) {
+		hp, max = bot.WaitUnitHPKnown(t, guid, 2*time.Second)
+		// L1 mottled boar max is ~40s; L80 is far higher. Also require still alive.
+		if max >= 500 && hp > 0 {
+			break
+		}
+		_ = bot.World.SetTarget(guid)
+		bot.GM(t, ".npc set level 80")
+		time.Sleep(100 * time.Millisecond)
+	}
+	if max < 500 || hp == 0 {
+		e2eharness.Preconditionf(t, "#26862: failed to scale boar to L80 (hp=%d/%d)", hp, max)
+		return
+	}
+	t.Logf("boar scaled hp=%d/%d", hp, max)
 
-	bot.WaitUnitHPKnown(t, guid, 10*time.Second)
+	// Below half but still alive — bug is about kill while cur < max/2.
 	bot.DamageToFraction(t, guid, 0.49, 20*time.Second)
-	hp, max := bot.UnitHP(guid)
+	hp, max = bot.UnitHP(guid)
 	t.Logf("unit below half hp=%d/%d", hp, max)
+	if hp == 0 || max == 0 || float64(hp)/float64(max) > 0.5 {
+		e2eharness.Preconditionf(t, "#26862: want 0 < hp/max <= 0.5 before kill, got %d/%d", hp, max)
+		return
+	}
 
+	// Final kill while below half (normal combat mode).
 	bot.CombatReady(t)
 	bot.DamageKill(t, []uint64{guid}, 50_000_000, 25*time.Second)
 	bot.WaitUnitDead(t, guid, 20*time.Second)
@@ -246,9 +279,9 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 
 	items, ok := bot.TryOpenLoot(t, guid, 8*time.Second)
 	if !ok {
-		// SoftPass disabled: dynflag/open miss after kill path is a precondition failure.
 		bot.AssertWorldAlive(t)
-		e2eharness.Preconditionf(t, "#26862 below-half-HP kill: corpse not lootable after WaitUnitLootable")
+		// Product-class failure if kill-while-low-HP yields no loot window (issue #26862).
+		e2eharness.ConfirmedBugf(t, 26862, "below-half-HP kill: corpse not lootable (hp was %d/%d before kill)", hp, max)
 		return
 	}
 	bot.AssertWorldAlive(t)
