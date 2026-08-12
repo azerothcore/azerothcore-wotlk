@@ -314,8 +314,9 @@ jobs:
         timeout-minutes: 180
 
       # ===================== external =====================
+      # secrets context is not allowed in step if:; map via env and validate below
       - name: Inject external secrets
-        if: needs.preflight.outputs.stack == 'external' && secrets.E2E_AUTH_ADDR != ''
+        if: needs.preflight.outputs.stack == 'external'
         env:
           E2E_AUTH_ADDR: ${{ secrets.E2E_AUTH_ADDR }}
           E2E_AUTH_DSN: ${{ secrets.E2E_AUTH_DSN }}
