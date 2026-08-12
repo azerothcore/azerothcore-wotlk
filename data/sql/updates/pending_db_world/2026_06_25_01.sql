@@ -1,9 +1,7 @@
 -- Dark Portal battle demon wave and defender behavior fixes.
 -- Consolidates final creature tuning, formation, waypoint, SmartAI, and condition updates.
 
-
-UPDATE `creature_template`
-SET `DamageModifier` = CASE `entry`
+UPDATE `creature_template` SET `DamageModifier` = CASE `entry`
     WHEN 18944 THEN 2.4 -- Fel Soldier
     WHEN 18946 THEN 6.7 -- Infernal Siegebreaker
     WHEN 19005 THEN 11  -- Wrath Master
@@ -14,52 +12,37 @@ WHERE `entry` IN (18944, 18946, 19005);
 -- unit_flags, which rooted them in place: they teleported to the path start but
 -- could not walk the escort path (stuck "on the portal"). Clear the flag so they
 -- march with the rest of the battalion. Only these two entries had it set.
-UPDATE `creature_template`
-SET `unit_flags` = `unit_flags` & ~0x4
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` & ~0x4
 WHERE `entry` IN (18949, 18971); -- Stormwind Mage, Undercity Mage
 
 -- Justinius had creature_template_addon.emote = 375 (a combat-ready/attack stance
 -- emote state), which locked him into the melee attack animation even while idle.
 -- Clear it to 0 (matching Melgromm) so he stands normally when not fighting.
-UPDATE `creature_template_addon`
-SET `emote` = 0
+UPDATE `creature_template_addon` SET `emote` = 0
 WHERE `entry` = 18966; -- Justinius the Harbinger
 
 -- -----------------------------------------------------------------------------
 -- 2) Infernal target marker placement + movement behavior
 -- -----------------------------------------------------------------------------
-UPDATE `creature`
-SET `position_x` = -274.3799,
+UPDATE `creature` SET `position_x` = -274.3799,
     `position_y` = 1174.073,
     `position_z` = 83.321175,
     `orientation` = 3.1407077
 WHERE `guid` = 74081;
 
-UPDATE `creature`
-SET `position_x` = -216.51663,
+UPDATE `creature` SET `position_x` = -216.51663,
     `position_y` = 1173.5674,
     `position_z` = 83.321175,
     `orientation` = 4.703648
 WHERE `guid` = 74082;
 
+DELETE FROM `creature_template_movement` WHERE `CreatureId` = 21075;
 INSERT INTO `creature_template_movement`
 (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`)
 VALUES
-(21075, 2, 0, 1, 1, 0, 0, NULL)
-ON DUPLICATE KEY UPDATE
-    `Ground` = VALUES(`Ground`),
-    `Swim` = VALUES(`Swim`),
-    `Flight` = VALUES(`Flight`),
-    `Rooted` = VALUES(`Rooted`),
-    `Chase` = VALUES(`Chase`),
-    `Random` = VALUES(`Random`),
-    `InteractionPauseTimer` = VALUES(`InteractionPauseTimer`);
+(21075, 2, 0, 1, 1, 0, 0, NULL);
 
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` = 18969
-  AND `id` = 73;
-
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 18969 AND `id` = 73;
 INSERT INTO `smart_scripts`
 (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
  `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
@@ -70,11 +53,7 @@ VALUES
 (18969,0,73,0,0,0,100,0,6000,10000,22000,30000,0,0,11,33570,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - In Combat - Cast Strength of the Storm Totem');
 
 -- Darnassian Archer: use bow at range; melee auto-attacks handle close targets.
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` = 18965
-  AND `id` = 10;
-
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 18965 AND `id` = 10;
 INSERT INTO `smart_scripts`
 (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
  `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
@@ -84,45 +63,18 @@ INSERT INTO `smart_scripts`
 VALUES
 (18965,0,10,0,9,0,100,0,0,0,2000,3000,5,30,11,15620,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Darnassian Archer - Within 5-30 Range - Cast Shoot');
 
-
 -- Respawn behavior (final state)
 
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `event_type` = 6
-  AND `action_type` = 41;
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `event_type` = 6 AND `action_type` = 41;
 
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` IN (47, 48, 72);
-
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `id` IN (47, 48, 72);
 
 -- Demon wave control
-UPDATE `smart_scripts`
-SET `action_param1` = 1
+UPDATE `smart_scripts` SET `action_param1` = 1
 WHERE `source_type` = 0
   AND `entryorguid` = 18944
   AND `id` = 13
   AND `action_type` = 101;
-
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (-68311, -68312, -68313, -68314)
-  AND `id` = 20;
-
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
-(-68311, 0, 20, 0, 40, 0, 100, 0, 33, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wrath Master (68311) - On final WP - Set Home Position Here'),
-(-68312, 0, 20, 0, 40, 0, 100, 0, 33, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wrath Master (68312) - On final WP - Set Home Position Here'),
-(-68313, 0, 20, 0, 40, 0, 100, 0, 59, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wrath Master (68313) - On final WP - Set Home Position Here'),
-(-68314, 0, 20, 0, 40, 0, 100, 0, 52, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wrath Master (68314) - On final WP - Set Home Position Here');
 
 -- -----------------------------------------------------------------------------
 -- Remove the redundant/buggy Infernal Relay demon-summon (relay -68744 ids 0-4,
@@ -135,13 +87,9 @@ VALUES
 -- server start -- so multiple waves stacked on the staging point and never moved.
 -- Delete the whole relay summon; only the working Wrath-Master-driven waves remain.
 -- -----------------------------------------------------------------------------
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` = -68744
-  AND `id` IN (0, 1, 2, 3, 4, 44, 45);
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = -68744 AND `id` IN (0, 1, 2, 3, 4, 44, 45);
 
-UPDATE `smart_scripts`
-SET `event_type` = 59,
+UPDATE `smart_scripts` SET `event_type` = 59,
     `event_param1` = 1,
     `event_param2` = 0,
     `event_param3` = 0,
@@ -153,16 +101,14 @@ WHERE `source_type` = 0
   AND `id` = 4
   AND `action_type` = 80;
 
-UPDATE `smart_scripts`
-SET `action_param2` = 5000,
+UPDATE `smart_scripts` SET `action_param2` = 5000,
     `action_param3` = 5000
 WHERE `source_type` = 0
   AND `entryorguid` IN (-68311, -68312, -68313, -68314)
   AND `id` = 3
   AND `action_type` = 67;
 
-UPDATE `smart_scripts`
-SET `action_param1` = 10000
+UPDATE `smart_scripts` SET `action_param1` = 10000
 WHERE `source_type` = 0
   AND `entryorguid` IN (-68311, -68312, -68313, -68314)
   AND `id` = 7
@@ -171,19 +117,14 @@ WHERE `source_type` = 0
 -- id=4 was converted to a standalone Timed Event handler (event_type 59) above, so
 -- id=3 must no longer link to it (a link target must be event_type 61). The timed
 -- event created by id=3 now drives id=4/id=5; clear the dangling link.
-UPDATE `smart_scripts`
-SET `link` = 0
+UPDATE `smart_scripts` SET `link` = 0
 WHERE `source_type` = 0
   AND `entryorguid` IN (-68311, -68312, -68313, -68314)
   AND `id` = 3
   AND `action_type` = 67
   AND `link` = 4;
 
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (-68744, -68745)
-  AND `id` BETWEEN 46 AND 60;
-
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-68744, -68745) AND `id` BETWEEN 46 AND 60;
 INSERT INTO `smart_scripts`
 (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
  `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
@@ -212,8 +153,7 @@ VALUES
 (-68745,0,54,55,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18972,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Orgrimmar Shaman'),
 (-68745,0,55,0,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18986,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Ironforge Paladin');
 
-UPDATE `smart_scripts`
-SET `event_param3` = 50000,
+UPDATE `smart_scripts` SET `event_param3` = 50000,
     `event_param4` = 50000
 WHERE `source_type` = 0
   AND `entryorguid` = 18945
@@ -221,14 +161,7 @@ WHERE `source_type` = 0
   AND `event_type` = 1;
 
 -- Explicitly remove the temporary commander priority override.
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18966, 18969)
-  AND `id` = 46
-  AND `action_type` = 49
-  AND `target_type` = 19
-  AND `target_param1` = 19005;
-
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18966, 18969) AND `id` = 46 AND `action_type` = 49 AND `target_type` = 19 AND `target_param1` = 19005;
 
 -- =============================================================================
 -- Per-role waypoints: all NPCs march the high terrace to the commander plateau
@@ -238,9 +171,7 @@ WHERE `source_type` = 0
 -- the stairs). This spreads them across the markers instead of stacking on one.
 -- =============================================================================
 
-DELETE FROM `waypoints`
-WHERE `entry` IN (920001,920002,920003,920004,920005,920011,920012,920013,920014,920015);
-
+DELETE FROM `waypoints` WHERE `entry` IN (920001,920002,920003,920004,920005,920011,920012,920013,920014,920015);
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
 -- 920001  Stormwind Soldiers : high terrace -> plateau salute (pt11 = last)
 (920001,1,-334.99,968.724,54.284,'Soldiers - terrace'),
@@ -365,18 +296,13 @@ WHERE `source_type`=0 AND `entryorguid`=18970 AND `id`=12 AND `action_type`=53;
 -- Fix the two mage entries.
 -- Root bug: snapshot replaced id=12 with a Linked Start WP, but id=2 (Evade) has link=0
 -- so the chain never reaches id=12. Fix: set link=12 on id=2, update id=12 path.
-UPDATE `smart_scripts`
-SET `link` = 12
+UPDATE `smart_scripts` SET `link` = 12
 WHERE `source_type`=0
   AND `entryorguid` IN (18949, 18971)
   AND `id` = 2
   AND `event_type` = 59;
 
-DELETE FROM `smart_scripts`
-WHERE `source_type`=0
-  AND `entryorguid` IN (18949, 18971)
-  AND `id` = 12;
-
+DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (18949, 18971) AND `id` = 12;
 INSERT INTO `smart_scripts`
 (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,
  `event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,
@@ -387,39 +313,32 @@ VALUES
 (18949,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920004,0,0,0,2,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Linked - Start WP (upper plateau)'),
 (18971,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920014,0,0,0,2,1,0,0,0,0,0,0,0,0,'Undercity Mage - Linked - Start WP (upper plateau)');
 
-
 -- Plateau salute + return-to-spawn (spread).
 -- The base script chain already does: reach point 11 -> emote (id3) -> 2s timer
 -- (id4) -> SET_HOME_POS (id5) -> EVADE (id6). We only need to (a) make the emote
 -- a military salute (66), and (b) make SET_HOME_POS use the unit's SPAWN position
 -- (spawnPos=1) instead of the current plateau spot, so the evade walks each unit
 -- back to its OWN spawn marker (pathfinding down the stairs) rather than stacking.
-UPDATE `smart_scripts`
-SET `action_param1` = 66
+UPDATE `smart_scripts` SET `action_param1` = 66
 WHERE `source_type` = 0
   AND `entryorguid` IN (18948, 18949, 18950, 18965, 18970, 18971, 18972, 18986)
   AND `id` = 3
   AND `action_type` = 5;
 
-UPDATE `smart_scripts`
-SET `action_param1` = 1
+UPDATE `smart_scripts` SET `action_param1` = 1
 WHERE `source_type` = 0
   AND `entryorguid` IN (18948, 18949, 18950, 18965, 18970, 18971, 18972, 18986)
   AND `id` = 5
   AND `action_type` = 101;
 
 -- Remove the earlier duplicate salute (ids 96/97); the base id3 chain handles it.
-DELETE FROM `smart_scripts`
-WHERE `source_type`=0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18970, 18971, 18972, 18986)
-  AND `id` IN (96, 97);
+DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18970, 18971, 18972, 18986) AND `id` IN (96, 97);
 
 -- The two mage entries (18949, 18971) lack the ground units' base id3..id6
 -- salute/return chain, so add it explicitly: on reaching plateau WP 11 -> salute
 -- (emote 66) -> 2s timer -> SET_HOME_POS to spawn (spawnPos=1) -> EVADE, which
 -- walks each mage back to its own spawn marker (spreads them, no stacking).
-DELETE FROM `smart_scripts`
-WHERE `source_type`=0 AND `entryorguid` IN (18949, 18971) AND `id` IN (3, 4, 5, 6);
+DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (18949, 18971) AND `id` IN (3, 4, 5, 6);
 INSERT INTO `smart_scripts`
 (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,
  `event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,
@@ -442,13 +361,11 @@ VALUES
 -- they wandered off-route (climbing terrain) and the salute/evade-home chain never
 -- completed -> REACHED_HOME never fired -> they stayed passive and never fought.
 -- Align them with the ground units so they march cleanly and activate on arrival.
-UPDATE `smart_scripts`
-SET `action_type` = 27, `action_param1` = 0
+UPDATE `smart_scripts` SET `action_type` = 27, `action_param1` = 0
 WHERE `source_type` = 0
   AND `entryorguid` IN (18949, 18971)
   AND `id` = 2
   AND `action_type` = 24;
-
 
 -- Rebuild formations by ROLE/ROW: each unit type occupies the marker row matching
 -- its terrain tier (plateau mages/commanders, ramp archers, mid casters, front melee),
@@ -460,73 +377,66 @@ DROP TEMPORARY TABLE IF EXISTS `tmp_dp_used`;
 
 CREATE TEMPORARY TABLE `tmp_dp_assign` AS
 WITH `mk` AS (
-    SELECT `guid`, `position_x` AS x, `position_y` AS y, `position_z` AS z,
-           CASE WHEN `position_x` <= -250 THEN 'A' ELSE 'H' END AS side,
+    SELECT `guid`, `position_x` AS `x`, `position_y` AS `y`, `position_z` AS `z`,
+           CASE WHEN `position_x` <= -250 THEN 'A' ELSE 'H' END AS `side`,
            CASE WHEN `position_z` >= 52 THEN 'plat'
                 WHEN `position_z` >= 44 THEN 'ramp'
                 WHEN `position_y` >= 1096 THEN 'front'
-                ELSE 'mid' END AS band
+                ELSE 'mid' END AS `band`
     FROM `creature`
     WHERE `map` = 530 AND `id` = 19179
       AND `position_x` BETWEEN -280 AND -220 AND `position_y` BETWEEN 1065 AND 1100
 ), `platrk` AS (
-    SELECT `guid`, x, side,
-           ROW_NUMBER() OVER (PARTITION BY side ORDER BY y) AS prn
-    FROM `mk` WHERE band = 'plat'
+    SELECT
+        `guid`, `x`, `side`,
+        ROW_NUMBER() OVER (PARTITION BY `side` ORDER BY `y`) AS `prn`
+    FROM `mk` WHERE `band` = 'plat'
 ), `mkrole` AS (
-    SELECT `guid`, x, side, CASE WHEN prn = 1 THEN 'cmd' ELSE 'mage' END AS role FROM `platrk`
+    SELECT `guid`, `x`, `side`, CASE WHEN `prn` = 1 THEN 'cmd' ELSE 'mage' END AS `role` FROM `platrk`
     UNION ALL
-    SELECT `guid`, x, side, band FROM `mk` WHERE band IN ('ramp','front','mid')
+    SELECT `guid`, `x`, `side`, `band` FROM `mk` WHERE `band` IN ('ramp','front','mid')
 ), `mkn` AS (
-    SELECT `guid`, side, role, ROW_NUMBER() OVER (PARTITION BY side, role ORDER BY x) AS rn FROM `mkrole`
+    SELECT
+        `guid`, `side`, `role`, ROW_NUMBER() OVER (PARTITION BY `side`, `role` ORDER BY `x`) AS `rn`
+    FROM `mkrole`
 ), `un` AS (
-    SELECT `guid`, `id`, `position_x` AS x,
-           CASE WHEN `position_x` <= -250 THEN 'A' ELSE 'H' END AS side,
+    SELECT `guid`, `id`, `position_x` AS `x`,
+           CASE WHEN `position_x` <= -250 THEN 'A' ELSE 'H' END AS `side`,
            CASE `id`
                 WHEN 18948 THEN 'front' WHEN 18986 THEN 'mid' WHEN 18965 THEN 'ramp'
                 WHEN 18949 THEN 'mage'  WHEN 18966 THEN 'cmd'
                 WHEN 18950 THEN 'front' WHEN 18972 THEN 'mid' WHEN 18970 THEN 'ramp'
-                WHEN 18971 THEN 'mage'  WHEN 18969 THEN 'cmd' END AS role
+                WHEN 18971 THEN 'mage'  WHEN 18969 THEN 'cmd' END AS `role`
     FROM `creature`
     WHERE `map` = 530
       AND `id` IN (18948,18986,18965,18949,18966,18950,18972,18970,18971,18969)
       AND `position_x` BETWEEN -290 AND -210 AND `position_y` BETWEEN 1065 AND 1105
 ), `unflt` AS (
     -- drop the lone boundary grunt on the Alliance side (no Horde-melee marker there)
-    SELECT * FROM `un` WHERE NOT (`id` = 18950 AND side = 'A')
+    SELECT * FROM `un` WHERE NOT (`id` = 18950 AND `side` = 'A')
 ), `unn` AS (
-    SELECT `guid`, side, role, ROW_NUMBER() OVER (PARTITION BY side, role ORDER BY x) AS rn FROM `unflt`
+    SELECT
+        `guid`, `side`, `role`, ROW_NUMBER() OVER (PARTITION BY `side`, `role` ORDER BY `x`) AS `rn`
+    FROM `unflt`
 )
-SELECT u.`guid` AS `member_guid`, m.`guid` AS `marker_guid`
-FROM `unn` u
-JOIN `mkn` m ON u.side = m.side AND u.role = m.role AND u.rn = m.rn;
+SELECT
+    `u`.`guid` AS `member_guid`, `m`.`guid` AS `marker_guid`
+FROM `unn` AS `u`
+JOIN `mkn` AS `m` ON `u`.`side` = `m`.`side` AND `u`.`role` = `m`.`role` AND `u`.`rn` = `m`.`rn`;
 
 -- Markers that actually receive a unit (used as formation leaders).
 CREATE TEMPORARY TABLE `tmp_dp_used` AS
 SELECT DISTINCT `marker_guid` FROM `tmp_dp_assign`;
 
 -- Clear any existing formation rows for these army units and markers.
-DELETE FROM `creature_formations`
-WHERE `memberGUID` IN (
-    SELECT `guid` FROM `creature`
-    WHERE `map` = 530
-      AND `id` IN (18948,18949,18950,18965,18966,18969,18970,18971,18972,18986)
-      AND `position_x` BETWEEN -290 AND -210 AND `position_y` BETWEEN 1065 AND 1105
-);
-
-DELETE FROM `creature_formations`
-WHERE `leaderGUID` IN (
-    SELECT `guid` FROM `creature`
-    WHERE `map` = 530 AND `id` = 19179
-      AND `position_x` BETWEEN -280 AND -220 AND `position_y` BETWEEN 1065 AND 1100
-);
-
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN ( SELECT `guid` FROM `creature` WHERE `map` = 530 AND `id` = 19179 AND `position_x` BETWEEN -280 AND -220 AND `position_y` BETWEEN 1065 AND 1100 );
 -- Leader self-rows (a formation only activates when its leader is present as a member).
 INSERT INTO `creature_formations`
 (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`)
 SELECT `marker_guid`, `marker_guid`, 0, 0, @FORMATION_FLAGS, 0, 0 FROM `tmp_dp_used`;
 
 -- Member rows: each unit pinned (dist 0) onto its own role-matched marker.
+DELETE FROM `creature_formations` WHERE `memberGUID` IN ( SELECT `guid` FROM `creature` WHERE `map` = 530 AND `id` IN (18948,18949,18950,18965,18966,18969,18970,18971,18972,18986) AND `position_x` BETWEEN -290 AND -210 AND `position_y` BETWEEN 1065 AND 1105 );
 INSERT INTO `creature_formations`
 (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`)
 SELECT `marker_guid`, `member_guid`, 0, 0, @FORMATION_FLAGS, 0, 0 FROM `tmp_dp_assign`;
@@ -540,17 +450,10 @@ DROP TEMPORARY TABLE IF EXISTS `tmp_dp_used`;
 -- at their own spawn, so ESCORT_REACHED never fired and they stayed passive);
 -- instead arm a timed event on respawn that flips them aggressive ~15s in, in
 -- step with the demon wave engagement.
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` IN (98, 99, 100, 101, 102);
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `id` IN (98, 99, 100, 101, 102);
 
 -- Drop the commanders' pointless 1-point WP start and clear any prior id=100.
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18966, 18969)
-  AND `id` IN (12, 100);
-
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18966, 18969) AND `id` IN (12, 100);
 INSERT INTO `smart_scripts`
 (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
  `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
@@ -612,15 +515,13 @@ VALUES
 
 -- Mages: keep ally-support radius and retarget scan modest so they do not chase
 -- distant demons forward.
-UPDATE `smart_scripts`
-SET `action_param1` = 90
+UPDATE `smart_scripts` SET `action_param1` = 90
 WHERE `source_type` = 0
   AND `entryorguid` IN (18949, 18971)
   AND `id` = 44
   AND `action_type` = 39;
 
-UPDATE `smart_scripts`
-SET `target_param1` = 25
+UPDATE `smart_scripts` SET `target_param1` = 25
 WHERE `source_type` = 0
   AND `entryorguid` IN (18949, 18971)
   AND `id` = 71
@@ -630,8 +531,7 @@ WHERE `source_type` = 0
 -- In-combat retarget pulse: keep the closest-enemy scan local (25y) for the whole
 -- army so units stay on the demons reaching the stairs instead of running out to
 -- the farthest target and dragging the line into the Pit Lord.
-UPDATE `smart_scripts`
-SET `target_param1` = 25
+UPDATE `smart_scripts` SET `target_param1` = 25
 WHERE `source_type` = 0
   AND `entryorguid` IN (18948, 18950, 18965, 18966, 18969, 18970, 18972, 18986)
   AND `id` = 71
@@ -646,16 +546,14 @@ WHERE `source_type` = 0
 -- (0x40) to both combat spells so a successful cast holds position (only moving on
 -- out-of-range / OOM / LOS). AttackStart() then chases only to _attackDistance
 -- (spell range), not melee.
-UPDATE `smart_scripts`
-SET `action_param2` = 1088 -- SMARTCAST_COMBAT_MOVE | SMARTCAST_MAIN_SPELL
+UPDATE `smart_scripts` SET `action_param2` = 1088 -- SMARTCAST_COMBAT_MOVE | SMARTCAST_MAIN_SPELL
 WHERE `source_type` = 0
   AND `entryorguid` IN (18949, 18971)
   AND `id` = 10
   AND `action_type` = 11
   AND `action_param1` = 33417;
 
-UPDATE `smart_scripts`
-SET `action_param2` = 64 -- SMARTCAST_COMBAT_MOVE
+UPDATE `smart_scripts` SET `action_param2` = 64 -- SMARTCAST_COMBAT_MOVE
 WHERE `source_type` = 0
   AND `entryorguid` IN (18949, 18971)
   AND `id` = 11
@@ -663,11 +561,7 @@ WHERE `source_type` = 0
   AND `action_param1` = 33419;
 
 -- Full ability sets for the two commanders (Justinius the Harbinger / Melgromm Highmountain).
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18966, 18969)
-  AND `id` IN (74, 75, 76, 77, 78);
-
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18966, 18969) AND `id` IN (74, 75, 76, 77, 78);
 INSERT INTO `smart_scripts`
 (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
  `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
@@ -697,17 +591,12 @@ VALUES
 --          nearby allies that share the totem's faction; the totem inherits its
 --          summoner Melgromm's faction via Minion::InitStats).
 --   19222 Magma Flow Totem            -> 33561 (periodic fire damage to enemies).
-DELETE FROM `creature_template_spell`
-WHERE `CreatureID` IN (19222, 19225) AND `Index` = 0;
-
+DELETE FROM `creature_template_spell` WHERE `CreatureID` IN (19222, 19225) AND `Index` = 0;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
 (19225, 0, 33571, NULL),
 (19222, 0, 33561, NULL);
 
-DELETE FROM `conditions`
-WHERE (`SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 18966 AND `SourceGroup` = 75)
-   OR (`SourceTypeOrReferenceId` = 13 AND `SourceEntry` = 33559 AND `SourceGroup` IN (1, 2, 3));
-
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 18966 AND `SourceGroup` = 75) OR (`SourceTypeOrReferenceId` = 13 AND `SourceEntry` = 33559 AND `SourceGroup` IN (1, 2, 3));
 INSERT INTO `conditions`
 (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`,
  `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`,
@@ -727,9 +616,7 @@ INSERT INTO `conditions`
 (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 29381, 0, 0, 32, 0, 16, 0, 0, 1, 0, 0, '', 'Justinius Greater Blessing of Might cannot target players');
 
-
-UPDATE `creature`
-SET `map` = 530,
+UPDATE `creature` SET `map` = 530,
     `zoneId` = 3483,
     `areaId` = 3483,
     `spawnMask` = 1,
@@ -745,8 +632,7 @@ SET `map` = 530,
     `Comment` = 'GUID SAI'
 WHERE `guid` = 68311 AND `id` = 19005;
 
-UPDATE `creature`
-SET `map` = 530,
+UPDATE `creature` SET `map` = 530,
     `zoneId` = 3483,
     `areaId` = 3483,
     `spawnMask` = 1,
@@ -762,8 +648,7 @@ SET `map` = 530,
     `Comment` = 'GUID SAI'
 WHERE `guid` = 68312 AND `id` = 19005;
 
-UPDATE `creature`
-SET `map` = 530,
+UPDATE `creature` SET `map` = 530,
     `zoneId` = 3483,
     `areaId` = 3804,
     `spawnMask` = 1,
@@ -779,8 +664,7 @@ SET `map` = 530,
     `Comment` = 'GUID SAI'
 WHERE `guid` = 68313 AND `id` = 19005;
 
-UPDATE `creature`
-SET `map` = 530,
+UPDATE `creature` SET `map` = 530,
     `zoneId` = 3483,
     `areaId` = 3804,
     `spawnMask` = 1,
@@ -818,60 +702,43 @@ UPDATE `smart_scripts` SET `action_param1` = 1900503
 WHERE `entryorguid` = -68314 AND `source_type` = 0 AND `id` = 4 AND `action_type` = 80;
 
 -- Non-overlapping Fel Soldier summon points around each restored gate.
-UPDATE `smart_scripts`
-SET `target_x` = -298.00, `target_y` = 1529.00, `target_z` = 37.92391, `target_o` = 0.18216586
+UPDATE `smart_scripts` SET `target_x` = -298.00, `target_y` = 1529.00, `target_z` = 37.92391, `target_o` = 0.18216586
 WHERE `entryorguid` = 1900500 AND `source_type` = 9 AND `id` = 0 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -307.00, `target_y` = 1530.00, `target_z` = 37.92391, `target_o` = 0.18216586
+UPDATE `smart_scripts` SET `target_x` = -307.00, `target_y` = 1530.00, `target_z` = 37.92391, `target_o` = 0.18216586
 WHERE `entryorguid` = 1900500 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -297.80, `target_y` = 1520.70, `target_z` = 37.92391, `target_o` = 0.18216586
+UPDATE `smart_scripts` SET `target_x` = -297.80, `target_y` = 1520.70, `target_z` = 37.92391, `target_o` = 0.18216586
 WHERE `entryorguid` = 1900500 AND `source_type` = 9 AND `id` = 4 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -307.40, `target_y` = 1519.90, `target_z` = 37.92391, `target_o` = 0.18216586
+UPDATE `smart_scripts` SET `target_x` = -307.40, `target_y` = 1519.90, `target_z` = 37.92391, `target_o` = 0.18216586
 WHERE `entryorguid` = 1900500 AND `source_type` = 9 AND `id` = 6 AND `action_type` = 12;
 
-UPDATE `smart_scripts`
-SET `target_x` = -142.00, `target_y` = 1514.90, `target_z` = 33.62471, `target_o` = 3.0842154
+UPDATE `smart_scripts` SET `target_x` = -142.00, `target_y` = 1514.90, `target_z` = 33.62471, `target_o` = 3.0842154
 WHERE `entryorguid` = 1900501 AND `source_type` = 9 AND `id` = 0 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -151.10, `target_y` = 1515.40, `target_z` = 33.62471, `target_o` = 3.0842154
+UPDATE `smart_scripts` SET `target_x` = -151.10, `target_y` = 1515.40, `target_z` = 33.62471, `target_o` = 3.0842154
 WHERE `entryorguid` = 1900501 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -141.80, `target_y` = 1506.00, `target_z` = 33.62471, `target_o` = 3.0842154
+UPDATE `smart_scripts` SET `target_x` = -141.80, `target_y` = 1506.00, `target_z` = 33.62471, `target_o` = 3.0842154
 WHERE `entryorguid` = 1900501 AND `source_type` = 9 AND `id` = 4 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -151.40, `target_y` = 1505.20, `target_z` = 33.62471, `target_o` = 3.0842154
+UPDATE `smart_scripts` SET `target_x` = -151.40, `target_y` = 1505.20, `target_z` = 33.62471, `target_o` = 3.0842154
 WHERE `entryorguid` = 1900501 AND `source_type` = 9 AND `id` = 6 AND `action_type` = 12;
 
-UPDATE `smart_scripts`
-SET `target_x` = -80.00, `target_y` = 1886.00, `target_z` = 74.695015, `target_o` = 2.5140123
+UPDATE `smart_scripts` SET `target_x` = -80.00, `target_y` = 1886.00, `target_z` = 74.695015, `target_o` = 2.5140123
 WHERE `entryorguid` = 1900502 AND `source_type` = 9 AND `id` = 0 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -89.20, `target_y` = 1886.50, `target_z` = 74.695015, `target_o` = 2.5140123
+UPDATE `smart_scripts` SET `target_x` = -89.20, `target_y` = 1886.50, `target_z` = 74.695015, `target_o` = 2.5140123
 WHERE `entryorguid` = 1900502 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -79.80, `target_y` = 1877.70, `target_z` = 74.695015, `target_o` = 2.5140123
+UPDATE `smart_scripts` SET `target_x` = -79.80, `target_y` = 1877.70, `target_z` = 74.695015, `target_o` = 2.5140123
 WHERE `entryorguid` = 1900502 AND `source_type` = 9 AND `id` = 4 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -89.60, `target_y` = 1876.90, `target_z` = 74.695015, `target_o` = 2.5140123
+UPDATE `smart_scripts` SET `target_x` = -89.60, `target_y` = 1876.90, `target_z` = 74.695015, `target_o` = 2.5140123
 WHERE `entryorguid` = 1900502 AND `source_type` = 9 AND `id` = 6 AND `action_type` = 12;
 
-UPDATE `smart_scripts`
-SET `target_x` = -414.70, `target_y` = 1851.20, `target_z` = 81.09361, `target_o` = 1.7246842
+UPDATE `smart_scripts` SET `target_x` = -414.70, `target_y` = 1851.20, `target_z` = 81.09361, `target_o` = 1.7246842
 WHERE `entryorguid` = 1900503 AND `source_type` = 9 AND `id` = 0 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -424.30, `target_y` = 1851.80, `target_z` = 81.09361, `target_o` = 1.7246842
+UPDATE `smart_scripts` SET `target_x` = -424.30, `target_y` = 1851.80, `target_z` = 81.09361, `target_o` = 1.7246842
 WHERE `entryorguid` = 1900503 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -414.40, `target_y` = 1842.50, `target_z` = 81.09361, `target_o` = 1.7246842
+UPDATE `smart_scripts` SET `target_x` = -414.40, `target_y` = 1842.50, `target_z` = 81.09361, `target_o` = 1.7246842
 WHERE `entryorguid` = 1900503 AND `source_type` = 9 AND `id` = 4 AND `action_type` = 12;
-UPDATE `smart_scripts`
-SET `target_x` = -425.00, `target_y` = 1841.70, `target_z` = 81.09361, `target_o` = 1.7246842
+UPDATE `smart_scripts` SET `target_x` = -425.00, `target_y` = 1841.70, `target_z` = 81.09361, `target_o` = 1.7246842
 WHERE `entryorguid` = 1900503 AND `source_type` = 9 AND `id` = 6 AND `action_type` = 12;
 
 DELETE FROM `waypoint_data` WHERE `id` IN (68311, 68312, 68313, 68314);
-
 INSERT INTO `waypoint_data`
 (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `velocity`, `delay`, `smoothTransition`, `move_type`, `action`, `action_chance`, `wpguid`)
 VALUES
@@ -907,22 +774,13 @@ VALUES
 (68314, 6, -260.00, 1350.00, 40.00, NULL, 0, 0, 0, 0, 0, 100, 0),
 (68314, 7, -250.00, 1185.00, 47.00, NULL, 0, 0, 0, 0, 0, 100, 0);
 
-
 -- -----------------------------------------------------------------------------
 -- -----------------------------------------------------------------------------
 -- Let Dark Portal army NPCs play their normal death/corpse flow.
 -- The previous On Death -> Respawn Self SmartAI action made them vanish instantly.
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `event_type` = 6
-  AND `action_type` = 70;
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `event_type` = 6 AND `action_type` = 70;
 
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` = 103;
-
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `id` = 103;
 INSERT INTO `smart_scripts`
 (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
  `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
@@ -940,4 +798,3 @@ VALUES
 (18971,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Set corpse delay to 10s'),
 (18972,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Set corpse delay to 10s'),
 (18986,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Set corpse delay to 10s');
-
