@@ -94,8 +94,10 @@ func TestDeath_DeathDoesNotCrashWorld(t *testing.T) {
 }
 
 // DEATH-04: reclaim corpse after death.
-// AC: GHOST flag (release spirit) + within CORPSE_RECLAIM_RADIUS (39) + reclaim delay elapsed.
-// A single CMSG_RECLAIM_CORPSE mid-.go is silently ignored — use ReclaimCorpseMust.
+// Protocol: Die → capture corpse pos → ReleaseSpirit → wait SMSG_CORPSE_RECLAIM_DELAY
+// → .go to corpse (InWorld + within 39yd) → CMSG_RECLAIM_CORPSE.
+// Note: .die is Unit::Kill(self,self) → PvP corpse → server delay (often 30s) when
+// Death.CorpseReclaimDelay.PvP=1; we wait the packet, not a guessed sleep.
 func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "med", "serial"}, Runtime: "med", Category: "combat/death"})
 
@@ -103,14 +105,14 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 		Prefix: "DieRec",
 		Level:  30,
 	})
+	// Quiet death setup: combatstop before die (pad thrash); still PvP corpse from .die self-kill.
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	bot.DieMust(t, 20*time.Second)
+	bot.GM(t, ".combatstop")
+	bot.DieMust(t, 25*time.Second)
 	// Corpse sits at death position (capture after Die, before graveyard tele).
 	deathX, deathY, deathZ, deathMap := bot.Pos()
-	// Must release before reclaim (HandleReclaimCorpseOpcode requires GHOST flag).
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
-	// Graveyard transfer is async — wait until session is stable in-world again.
 	if err := bot.World.WaitForSessionPhase(client.PhaseInWorld, 10*time.Second); err != nil {
 		t.Logf("post-repop WaitInWorld: %v", err)
 	}
@@ -123,12 +125,13 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 		time.Sleep(40 * time.Millisecond)
 	}
 
-	// Teleport to corpse, settle in-world within radius, retry reclaim until alive.
-	bot.ReclaimCorpseMust(t, deathX, deathY, deathZ, deathMap, 30*time.Second)
+	// Wait server delay, then tele+reclaim (see ReclaimCorpseMust).
+	bot.ReclaimCorpseMust(t, deathX, deathY, deathZ, deathMap, 45*time.Second)
 	if bot.World.Health() == 0 {
-		e2eharness.Preconditionf(t, "reclaim finished still dead hp=%d", bot.World.Health())
+		e2eharness.Preconditionf(t, "reclaim finished still dead hp=%d delay_ms=%d",
+			bot.World.Health(), bot.World.CorpseReclaimDelayMs())
 		return
 	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS reclaim corpse → alive (hp=%d)", bot.World.Health())
+	t.Logf("PASS reclaim corpse → alive (hp=%d delay_ms=%d)", bot.World.Health(), bot.World.CorpseReclaimDelayMs())
 }
