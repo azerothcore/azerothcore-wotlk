@@ -94,11 +94,12 @@ func TestCharm_CancelCastSafe(t *testing.T) {
 	if err := bot.World.CastSpellAtPosition(e2eharness.SpellRainOfFire, x, y, z); err != nil {
 		e2eharness.HarnessFailf(t, "CastSpellAtPosition rain: %v", err)
 	}
-	// Wait for channel then cancel; SoftPass if pad noise prevents channel start.
-	canceled := bot.CancelCastWhenChanneling(t, e2eharness.SpellRainOfFire, 3*time.Second)
+	// Wait for channel then cancel. SoftPass is disabled — require observed channel.
+	canceled := bot.CancelCastWhenChanneling(t, e2eharness.SpellRainOfFire, 5*time.Second)
 	if !canceled {
 		bot.CancelCast(t)
-		e2eharness.SoftPass(t, "no_channel", "CancelCast path without observed channel")
+		e2eharness.Preconditionf(t, "CancelCast path: Rain of Fire channel not observed")
+		return
 	}
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS cancel cast path channeling=%v canceled=%v", bot.IsChanneling(), canceled)

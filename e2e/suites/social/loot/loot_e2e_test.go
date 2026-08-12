@@ -85,8 +85,9 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 }
 
 // LOOT-02 / #26894: leave party mid-roll.
-// True issue repro is GO 194821 (chest) after UseGameObject; until that helper exists this
-// uses the same mid-roll leave protocol on a creature roll window (corpse proxy).
+// True issue repro is GO 194821 after UseGameObject. Until then: corpse mid-roll leave with a
+// 3-player party so leave does not disband (2-player leave clears rolls without awarding under
+// ForcedDisband; cluster Disband is also a no-op). Stayer rolls Need; remaining mate Greed.
 func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "loot", "multi_bot", "serial", "issue"},
@@ -100,11 +101,13 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 		Bots: []e2eharness.BotSpec{
 			{Role: "leader", Level: 80, LearnAllClass: true, Class: e2eharness.ClassWarrior},
 			{Role: "leaver", Level: 80, LearnAllClass: true, Class: e2eharness.ClassWarrior},
+			{Role: "stayer", Level: 80, LearnAllClass: true, Class: e2eharness.ClassWarrior},
 		},
 	})
 	leader := e2eharness.ByRole(t, bots, "leader")
 	leaver := e2eharness.ByRole(t, bots, "leaver")
-	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, leaver)
+	stayer := e2eharness.ByRole(t, bots, "stayer")
+	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, leaver, stayer)
 	leader.SetLootMethod(t, client.LootMethodGroupLoot, 0, e2eharness.LootThresholdUncommon)
 	leader.WaitLootMethod(t, client.LootMethodGroupLoot, 10*time.Second)
 
@@ -114,7 +117,9 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 
 	guid := leader.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
 	leaver.CombatReady(t)
+	stayer.CombatReady(t)
 	leaver.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	stayer.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	leader.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 
 	waitRoll, cancelRoll := leader.ArmLootStartRoll()
@@ -133,9 +138,11 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	// Arm outcome before leave+vote so LOOT_ROLL_WON / ALL_PASSED cannot be missed.
 	wonCh, allCh, cancelOut := leader.ArmLootRollOutcome(roll.ItemID)
 	t.Cleanup(cancelOut)
+	// Leave mid-roll while group remains (3→2): RemovePlayerFromRolls must re-count votes.
 	leaver.LeaveGroup(t)
 	leaver.WaitNotInGroup(t, 15*time.Second)
 	leader.RollNeed(t, roll)
+	stayer.RollGreed(t, roll)
 
 	select {
 	case w := <-wonCh:
@@ -143,14 +150,13 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	case <-allCh:
 		t.Logf("all passed")
 	case <-time.After(90 * time.Second):
-		// Corpse proxy of #26894 (chest mid-roll leave). Related class: roll stuck after
-		// party composition change. Full issue surface still needs UseGameObject + GO 194821.
+		// Corpse proxy of #26894. Related class: roll stuck after party composition change.
+		// Full issue surface still needs UseGameObject + GO 194821.
 		e2eharness.ConfirmedBugf(t, 26894,
 			"corpse-proxy mid-roll leave: roll did not resolve (related #26894 class; GO 194821 path incomplete) itemGUID=0x%X",
 			roll.ItemGUID)
 	}
 	e2eharness.ProbeWorldAlive(t, leader, 26894)
-	// After resolution, corpse should still allow follow-up open (or item already awarded).
 	_, _ = leader.TryOpenLoot(t, guid, 8*time.Second)
 	leader.AssertWorldAlive(t)
 	t.Logf("PASS mid-roll leave corpse proxy (issue-incomplete until GO 194821 UseGameObject)")
@@ -236,9 +242,9 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 
 	items, ok := bot.TryOpenLoot(t, guid, 8*time.Second)
 	if !ok {
-		// Soft: dynflag lootable can lag; kill credit path already exercised.
+		// SoftPass disabled: dynflag/open miss after kill path is a precondition failure.
 		bot.AssertWorldAlive(t)
-		e2eharness.SoftPass(t, "no_loot_window", "#26862 below-half-HP kill path (loot soft-miss; world alive)")
+		e2eharness.Preconditionf(t, "#26862 below-half-HP kill: corpse not lootable after WaitUnitLootable")
 		return
 	}
 	bot.AssertWorldAlive(t)
