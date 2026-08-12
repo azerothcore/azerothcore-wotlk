@@ -13,8 +13,7 @@ import (
 
 // SESS-01: position readable after login (seed of inventory/pos load).
 func TestSession_PositionAfterLogin(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SessPos",
@@ -29,8 +28,7 @@ func TestSession_PositionAfterLogin(t *testing.T) {
 
 // SESS-02: item + quest present after load path.
 func TestSession_ItemAndQuestAfterLoad(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SessLoad",
@@ -45,8 +43,7 @@ func TestSession_ItemAndQuestAfterLoad(t *testing.T) {
 
 // SESS-03: mutate gold via GM, save, relog, world still usable.
 func TestSession_MoneyMutateSaveRelog(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SessGold",
@@ -61,8 +58,7 @@ func TestSession_MoneyMutateSaveRelog(t *testing.T) {
 
 // SESS-05 / #25793: GM visibility survives relog.
 func TestSession_GMVisibilitySurvivesRelog(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"short", "protocol", "issue", "smoke"},
 		Runtime:  "short",
 		Issue:    25793,
@@ -117,8 +113,7 @@ func TestSession_GMVisibilitySurvivesRelog(t *testing.T) {
 
 // SESS-06: hard session drop leaves world probeable by another bot.
 func TestSession_HardDropWorldStaysAlive(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol", "serial"}, Runtime: "short", Category: "protocol/session"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol", "serial"}, Runtime: "short", Category: "protocol/session"})
 
 	probe := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SessPrb",
@@ -129,7 +124,6 @@ func TestSession_HardDropWorldStaysAlive(t *testing.T) {
 		Level:  10,
 	})
 	// Hard close without graceful logout path.
-	victim.HardDisconnect(t)
-	e2eharness.ProbeWorldAlive(t, probe, 0)
+	e2eharness.HardDisconnectAndProbe(t, victim, probe, 0)
 	t.Logf("PASS hard drop did not kill world (probe OK)")
 }

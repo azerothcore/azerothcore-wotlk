@@ -40,8 +40,7 @@ func teleDungeonOrPrecondition(t *testing.T, bot *e2eharness.ScenarioBot, name s
 
 // BIND-01: party of 2 formed (instance group precondition).
 func TestBind_PartyFormedForInstance(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "instance", "multi_bot"}, Runtime: "short", Category: "instances/bind_reset"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "instance", "multi_bot"}, Runtime: "short", Category: "instances/bind_reset"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "BindPty", Count: 2, Level: 80})
 	e2eharness.FormParty(t, bots[0], bots[1])
@@ -53,8 +52,7 @@ func TestBind_PartyFormedForInstance(t *testing.T) {
 
 // BIND-02: named dungeon tele (TheStockade) world alive.
 func TestBind_NamedDungeonTele(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "instance"}, Runtime: "med", Category: "instances/bind_reset"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "instance"}, Runtime: "med", Category: "instances/bind_reset"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "BindStk", Level: 80})
 	// AC game_tele is "TheStockade" (not "Stockades"); wrong name hangs TeleNamed ~60s.
@@ -65,8 +63,7 @@ func TestBind_NamedDungeonTele(t *testing.T) {
 
 // BIND-03: group shared tele attempt.
 func TestBind_GroupTeleTogether(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "instance", "multi_bot"}, Runtime: "med", Category: "instances/bind_reset"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "instance", "multi_bot"}, Runtime: "med", Category: "instances/bind_reset"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "BindGrp", Count: 2, Level: 80})
 	e2eharness.FormParty(t, bots[0], bots[1])
@@ -79,7 +76,7 @@ func TestBind_GroupTeleTogether(t *testing.T) {
 
 // BIND-04 / #10708: deferred reset+summon exploit (document).
 func TestBind_ResetSummonExploitDeferred(t *testing.T) {
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instance", "issue", "deferred"},
 		Runtime:  "long",
 		Issue:    10708,
@@ -91,8 +88,7 @@ func TestBind_ResetSummonExploitDeferred(t *testing.T) {
 // BIND-05: character_instance DB read attempt after instance map enter (soft).
 // Exterior TheStockade tele is map 0 — use interior pad for a real instance visit.
 func TestBind_CharacterInstanceQuerySoft(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "instance"}, Runtime: "med", Category: "instances/bind_reset"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "instance"}, Runtime: "med", Category: "instances/bind_reset"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "BindDB", Level: 80})
 	// Enter Stockade instance map (34) so character_instance may record a bind.

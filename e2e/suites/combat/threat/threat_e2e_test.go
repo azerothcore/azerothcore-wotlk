@@ -18,8 +18,7 @@ const pullTarget = e2eharness.CreatureHeroicTrainingDummy
 
 // THREAT-01: engage dummy → unit in combat + targets player.
 func TestThreat_EngageSetsTarget(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/threat"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/threat"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "ThrEng",
@@ -39,8 +38,7 @@ func TestThreat_EngageSetsTarget(t *testing.T) {
 
 // THREAT-02: two bots; taunt switches target when possible.
 func TestThreat_TauntSwitchesTarget(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "combat", "multi_bot"}, Runtime: "med", Category: "combat/threat"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "combat", "multi_bot"}, Runtime: "med", Category: "combat/threat"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
 		Prefix: "ThrTnt",
@@ -71,8 +69,7 @@ func TestThreat_TauntSwitchesTarget(t *testing.T) {
 
 // THREAT-03: kill target clears combat eventually.
 func TestThreat_KillClearsCombat(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/threat"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/threat"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "ThrKill",
@@ -93,8 +90,7 @@ func TestThreat_KillClearsCombat(t *testing.T) {
 
 // THREAT-04: multi-bot form party then pull (setup for threat tables).
 func TestThreat_PartyPullSetup(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat", "multi_bot"}, Runtime: "short", Category: "combat/threat"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "multi_bot"}, Runtime: "short", Category: "combat/threat"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "ThrPty", Count: 2, Level: 80, LearnAllClass: true})
 	e2eharness.TeleportAll(t, bots,
@@ -110,8 +106,7 @@ func TestThreat_PartyPullSetup(t *testing.T) {
 
 // THREAT-05: WaitUnitTarget helper after force-attack.
 func TestThreat_WaitUnitTargetHelper(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/threat"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/threat"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "ThrWait",

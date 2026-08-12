@@ -13,8 +13,7 @@ import (
 
 // EQUIP-01: equip item via EquipEntry; world stays alive.
 func TestEquip_EquipEntryBasic(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "EqBasic",
@@ -31,8 +30,7 @@ func TestEquip_EquipEntryBasic(t *testing.T) {
 
 // EQUIP-02: AddItemWait returns bag/slot.
 func TestEquip_AddItemWaitSlot(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "EqSlot",
@@ -46,8 +44,7 @@ func TestEquip_AddItemWaitSlot(t *testing.T) {
 
 // EQUIP-03: multiple adds without crash.
 func TestEquip_MultipleAddsNoCrash(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "EqMulti",
@@ -64,8 +61,7 @@ func TestEquip_MultipleAddsNoCrash(t *testing.T) {
 
 // EQUIP-04: equip entry helper on a simple weapon if available via GM add+equip.
 func TestEquip_EquipEntryHelper(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
 
 	// Rough-hewn axe style starter or a known L80 weapon; use GM equip if entry known.
 	// Heirloom-ish safe: use Target Dummy equip may fail — use EquipEntry which may GM-equip.
@@ -84,8 +80,7 @@ func TestEquip_EquipEntryHelper(t *testing.T) {
 
 // EQUIP-05: bag seed + relog inventory path stays healthy.
 func TestEquip_ItemSurvivesRelogPath(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "items", "protocol"}, Runtime: "short", Category: "items/equip"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "items", "protocol"}, Runtime: "short", Category: "items/equip"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "EqRelog",

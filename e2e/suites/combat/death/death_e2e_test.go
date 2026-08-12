@@ -18,40 +18,20 @@ const (
 	spellGhostNight = 20584
 )
 
-// dieSelf ensures GM mode, issues .die (with one retry), and waits until Health()==0.
-// Under pad congestion / ToCloud9 load the first .die can be a silent no-op.
-func dieSelf(t *testing.T, bot *e2eharness.ScenarioBot) {
-	t.Helper()
-	bot.GM(t, ".gm on")
-	bot.Die(t)
-	deadline := time.Now().Add(3 * time.Second)
-	for time.Now().Before(deadline) {
-		if bot.World.Health() == 0 {
-			return
-		}
-		time.Sleep(50 * time.Millisecond)
-	}
-	t.Logf("NOTE: first .die left hp=%d/%d — retry", bot.World.Health(), bot.World.MaxHealth())
-	bot.GM(t, ".gm on")
-	bot.Die(t)
-	bot.WaitDead(t, 15*time.Second)
-}
-
 // DEATH-01 / CB-07: die → corpse path; ghost auras present before release.
 func TestDeath_DieProducesGhostState(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/death"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/death"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "DieGh",
 		Level:  30,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	dieSelf(t, bot)
+	bot.DieMust(t, 15*time.Second)
 
 	// Alive() is session usability, not player health. Oracle is Health()==0.
 	if hp := bot.World.Health(); hp != 0 {
-		e2eharness.ConfirmedBugf(t, 0, "player hp=%d after WaitDead (want 0)", hp)
+		e2eharness.Assertf(t, "player hp=%d after DieMust (want 0)", hp)
 	}
 	hasGhost := bot.HasAura(spellGhost) || bot.HasAura(spellGhostNight)
 	if !hasGhost {
@@ -64,15 +44,14 @@ func TestDeath_DieProducesGhostState(t *testing.T) {
 
 // DEATH-02: release spirit reaches graveyard path (session stays usable).
 func TestDeath_ReleaseSpiritWorldAlive(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/death"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/death"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "DieRel",
 		Level:  30,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	dieSelf(t, bot)
+	bot.DieMust(t, 15*time.Second)
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
 	x, y, z, m := bot.Pos()
@@ -81,15 +60,14 @@ func TestDeath_ReleaseSpiritWorldAlive(t *testing.T) {
 
 // DEATH-03: DieAndRepop full cycle + save.
 func TestDeath_DieAndRepopCycle(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/death"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/death"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "DieCyc",
 		Level:  40,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	dieSelf(t, bot)
+	bot.DieMust(t, 15*time.Second)
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
 	bot.Save(t)
@@ -98,8 +76,7 @@ func TestDeath_DieAndRepopCycle(t *testing.T) {
 
 // DEATH-05: death must not crash the worldserver.
 func TestDeath_DeathDoesNotCrashWorld(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/death"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/death"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "DieOk",
@@ -108,7 +85,7 @@ func TestDeath_DeathDoesNotCrashWorld(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	dieSelf(t, bot)
+	bot.DieMust(t, 15*time.Second)
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS death did not crash world")
@@ -118,8 +95,7 @@ func TestDeath_DeathDoesNotCrashWorld(t *testing.T) {
 // AC requires PLAYER_FLAGS_GHOST (release spirit) then proximity to corpse before
 // CMSG_RECLAIM_CORPSE succeeds. Alive() is session usability — use WaitAlive/Health.
 func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat", "med"}, Runtime: "med", Category: "combat/death"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "med"}, Runtime: "med", Category: "combat/death"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "DieRec",
@@ -127,7 +103,7 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	deathX, deathY, deathZ, deathMap := bot.Pos()
-	dieSelf(t, bot)
+	bot.DieMust(t, 15*time.Second)
 	// Must release before reclaim (HandleReclaimCorpseOpcode requires GHOST flag).
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
@@ -142,19 +118,7 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 	// Ghost is at graveyard; return to corpse for reclaim radius.
 	// Teleport waits for map/login settle.
 	bot.Teleport(t, deathX, deathY, deathZ, deathMap)
-	// Soft poll near corpse before reclaim (tele ACK can precede position cache).
-	deadlinePos := time.Now().Add(3 * time.Second)
-	for time.Now().Before(deadlinePos) {
-		x, y, _, m := bot.Pos()
-		if m == deathMap {
-			dx := x - deathX
-			dy := y - deathY
-			if dx*dx+dy*dy < 100*100 {
-				break
-			}
-		}
-		time.Sleep(40 * time.Millisecond)
-	}
+	bot.WaitNear(t, deathX, deathY, deathZ, 100, 5*time.Second)
 	bot.ReclaimCorpse(t)
 	if bot.World.Health() > 0 {
 		bot.WaitAlive(t, 5*time.Second)

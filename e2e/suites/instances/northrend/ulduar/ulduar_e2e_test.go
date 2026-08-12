@@ -27,8 +27,7 @@ var (
 // ULDUAR-01 / #26266 pattern: Charge on Kologarn area stays sane (Z/bridge).
 // Cast fatals on timeout — use TryCast. Charge needs Battle Stance + range.
 func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instances", "issue"},
 		Runtime:  "long",
 		Issue:    26266,
@@ -90,8 +89,7 @@ func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 
 // ULDUAR-02 / #27095 pattern: Freya allies engage smoke (world alive + unit appear).
 func TestUlduar_FreyaEngageSmoke(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instances", "issue"},
 		Runtime:  "long",
 		Issue:    27095,
@@ -121,8 +119,7 @@ func TestUlduar_FreyaEngageSmoke(t *testing.T) {
 
 // ULDUAR-03: Ulduar map enter via named tele stays in-world.
 func TestUlduar_NamedTeleEnter(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "instances"}, Runtime: "med", Category: "instances/northrend/ulduar"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "instances"}, Runtime: "med", Category: "instances/northrend/ulduar"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "UldEnt",
@@ -137,8 +134,7 @@ func TestUlduar_NamedTeleEnter(t *testing.T) {
 // ULDUAR-04: engage + DamageKill path on a trash/dummy (raid helper training).
 // L1 Target Dummy (2673) is oneshot by L80 before combat flag — use HeroicTrainingDummy.
 func TestUlduar_DamageKillPathSafe(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "instances"}, Runtime: "med", Category: "instances/northrend/ulduar"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "instances"}, Runtime: "med", Category: "instances/northrend/ulduar"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "UldDmg",
@@ -157,8 +153,7 @@ func TestUlduar_DamageKillPathSafe(t *testing.T) {
 
 // ULDUAR-05: dual-bot login near Freya does not thrash auth.
 func TestUlduar_MultiBotLoginNearBossPad(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "instances", "multi_bot"}, Runtime: "med", Category: "instances/northrend/ulduar"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "instances", "multi_bot"}, Runtime: "med", Category: "instances/northrend/ulduar"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
 		Prefix: "UldDuo",

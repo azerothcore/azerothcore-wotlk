@@ -22,6 +22,7 @@ type TestMeta struct {
 }
 
 // Gate skips the test when env filters exclude it.
+// Prefer Begin(t, m) which also enforces serial vs t.Parallel policy.
 //
 // Env:
 //
@@ -65,6 +66,23 @@ func Gate(t *testing.T, m TestMeta) {
 			}
 		}
 	}
+}
+
+// HasTag reports whether m.Tags contains tag (case-insensitive).
+func HasTag(m TestMeta, tag string) bool {
+	_, ok := tagSet(m.Tags)[strings.ToLower(strings.TrimSpace(tag))]
+	return ok
+}
+
+// Begin runs Gate then t.Parallel() only when the test is not tagged serial.
+// Prefer this over Gate+t.Parallel so crash-sensitive tests never thrash a shared realm.
+func Begin(t *testing.T, m TestMeta) {
+	t.Helper()
+	Gate(t, m)
+	if HasTag(m, "serial") {
+		return
+	}
+	t.Parallel()
 }
 
 func tagSet(tags []string) map[string]struct{} {

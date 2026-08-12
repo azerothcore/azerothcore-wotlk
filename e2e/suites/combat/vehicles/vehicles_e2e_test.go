@@ -16,8 +16,7 @@ import (
 
 // VEH-01: multi-bot co-located (vehicle board precondition).
 func TestVehicles_MultiBotColocated(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat", "multi_bot", "deferred"}, Runtime: "short", Category: "combat/vehicles"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "multi_bot", "deferred"}, Runtime: "short", Category: "combat/vehicles"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "VehCol", Count: 2, Level: 80})
 	e2eharness.TeleportAll(t, bots,
@@ -29,8 +28,7 @@ func TestVehicles_MultiBotColocated(t *testing.T) {
 
 // VEH-02: relog after pad tele (reconnect stuck-vehicle regression baseline without vehicle).
 func TestVehicles_RelogAfterTeleBaseline(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat", "protocol"}, Runtime: "short", Category: "combat/vehicles"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "protocol"}, Runtime: "short", Category: "combat/vehicles"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "VehRl", Level: 80})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
@@ -42,27 +40,24 @@ func TestVehicles_RelogAfterTeleBaseline(t *testing.T) {
 
 // VEH-03: hard disconnect world probe (passenger disconnect safety baseline).
 func TestVehicles_HardDisconnectWorldAlive(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat", "serial"}, Runtime: "short", Category: "combat/vehicles"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "serial"}, Runtime: "short", Category: "combat/vehicles"})
 
 	probe := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "VehPr", Level: 10})
 	vic := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "VehVc", Level: 80})
 	// HardDisconnect: abrupt socket drop (no logout) — vehicle passenger safety baseline.
-	vic.HardDisconnect(t)
-	probe.AssertWorldAlive(t)
+	e2eharness.HardDisconnectAndProbe(t, vic, probe, 0)
 	t.Logf("PASS hard disconnect world alive")
 }
 
 // VEH-04: deferred EnterVehicle documented.
 func TestVehicles_EnterVehicleDeferred(t *testing.T) {
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "combat", "deferred"}, Runtime: "short", Category: "combat/vehicles"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "deferred"}, Runtime: "short", Category: "combat/vehicles"})
 	t.Skip("EnterVehicle/ExitVehicle/IsOnVehicle deferred — see phase3/A7_HARNESS_GAPS.md")
 }
 
 // VEH-05: Ulduar named tele (vehicle-heavy raid) enter world alive.
 func TestVehicles_UlduarPadWorldAlive(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "combat", "instances"}, Runtime: "med", Category: "combat/vehicles"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "combat", "instances"}, Runtime: "med", Category: "combat/vehicles"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "VehUld", Level: 80})
 	bot.TeleNamed(t, "Ulduar")

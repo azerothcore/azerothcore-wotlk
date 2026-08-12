@@ -13,8 +13,7 @@ import (
 
 // GUILD-01: charter buy path (harness protocol helper).
 func TestGuild_CharterBuy(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "guild"}, Runtime: "med", Category: "guild/charter_bank"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "guild"}, Runtime: "med", Category: "guild/charter_bank"})
 
 	// Mirror Ghost example: multi-bot Alliance login + petition buy near registrar.
 	// Use package-level SetupGuildLeader if available.
@@ -29,7 +28,7 @@ func TestGuild_CharterBuy(t *testing.T) {
 
 // GUILD-02: unique guild name helper.
 func TestGuild_UniqueGuildName(t *testing.T) {
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "guild"}, Runtime: "short", Category: "guild/charter_bank"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "guild"}, Runtime: "short", Category: "guild/charter_bank"})
 	n1 := e2eharness.UniqueGuildName("AcE2E")
 	n2 := e2eharness.UniqueGuildName("AcE2E")
 	if n1 == "" || n1 == n2 {
@@ -41,8 +40,7 @@ func TestGuild_UniqueGuildName(t *testing.T) {
 
 // GUILD-03: multi-bot login for charter signs precondition.
 func TestGuild_MultiBotLogin(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "guild", "multi_bot"}, Runtime: "med", Category: "guild/charter_bank"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "guild", "multi_bot"}, Runtime: "med", Category: "guild/charter_bank"})
 
 	idents := e2eharness.MakeBotIdents("GldSign", 3)
 	e2eharness.OpenTestDBs(t) // ensure DBs
@@ -58,8 +56,7 @@ func TestGuild_MultiBotLogin(t *testing.T) {
 
 // GUILD-04: ModMoney for charter cost.
 func TestGuild_MoneyForCharter(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "guild"}, Runtime: "short", Category: "guild/charter_bank"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "guild"}, Runtime: "short", Category: "guild/charter_bank"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "Gld$", Level: 20})
 	bot.ModMoney(t, e2eharness.GuildCharterCostCopper+1_000_000)
@@ -69,8 +66,7 @@ func TestGuild_MoneyForCharter(t *testing.T) {
 
 // GUILD-05: CleanupGuild state helper exists (no-op safe).
 func TestGuild_CleanupGuildState(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "guild"}, Runtime: "short", Category: "guild/charter_bank"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "guild"}, Runtime: "short", Category: "guild/charter_bank"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "GldCln", Level: 20})
 	e2eharness.CleanupSessionsGuildState(t, bot.CharDB, []*e2eharness.Session{bot.Session})

@@ -14,8 +14,7 @@ import (
 
 // ESCORT-01: quest add baseline (escort content uses same quest APIs).
 func TestEscort_QuestAddBaseline(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/escort"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/escort"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscQ", Level: 30})
 	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
@@ -25,8 +24,7 @@ func TestEscort_QuestAddBaseline(t *testing.T) {
 
 // ESCORT-02: spawn NPC and wait unit (escort start precondition).
 func TestEscort_SpawnAndWaitUnit(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests", "ai"}, Runtime: "short", Category: "quests/escort"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests", "ai"}, Runtime: "short", Category: "quests/escort"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscSp", Level: 80})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
@@ -42,8 +40,7 @@ func TestEscort_SpawnAndWaitUnit(t *testing.T) {
 // Use HeroicTrainingDummy: L1 Target Dummy (2673) is often oneshot by L80 autoattack
 // before UNIT_FLAG_IN_COMBAT is observed (EngageUntilCombat precondition).
 func TestEscort_CombatMidPathBaseline(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests", "combat"}, Runtime: "short", Category: "quests/escort"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests", "combat"}, Runtime: "short", Category: "quests/escort"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "EscCm",
@@ -62,22 +59,19 @@ func TestEscort_CombatMidPathBaseline(t *testing.T) {
 
 // ESCORT-04: logout while nearby unit present (follow despawn #24450 soft).
 func TestEscort_LogoutNearUnitWorldAlive(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "quests", "serial"}, Runtime: "med", Category: "quests/escort"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "quests", "serial"}, Runtime: "med", Category: "quests/escort"})
 
 	probe := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscPr", Level: 10})
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscLg", Level: 80})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	_ = bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	bot.HardDisconnect(t)
-	e2eharness.ProbeWorldAlive(t, probe, 0)
+	e2eharness.HardDisconnectAndProbe(t, bot, probe, 0)
 	t.Logf("PASS logout near unit world alive")
 }
 
 // ESCORT-05: unit still findable after spawn (GUID stability soft).
 func TestEscort_UnitFindableAfterSpawn(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/escort"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/escort"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscFd", Level: 80})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)

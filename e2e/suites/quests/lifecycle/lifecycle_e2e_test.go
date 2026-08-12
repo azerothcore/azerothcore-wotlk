@@ -13,8 +13,7 @@ import (
 
 // QLIFE-03 / #26549: STAY_ALIVE quest fails on death.
 func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"short", "quests", "issue", "smoke"},
 		Runtime:  "short",
 		Issue:    26549,
@@ -51,8 +50,7 @@ func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
 
 // QLIFE-01: AddQuest → incomplete status after save.
 func TestQuest_AddQuestIncomplete(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "QAdd",
@@ -65,8 +63,7 @@ func TestQuest_AddQuestIncomplete(t *testing.T) {
 
 // QLIFE-02: quest status survives save round-trip.
 func TestQuest_StatusSurvivesSave(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "QSave",
@@ -85,8 +82,7 @@ func TestQuest_StatusSurvivesSave(t *testing.T) {
 
 // QLIFE-04: quest status after relog still present.
 func TestQuest_StatusSurvivesRelog(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests", "protocol"}, Runtime: "short", Category: "quests/lifecycle"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests", "protocol"}, Runtime: "short", Category: "quests/lifecycle"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "QRelog",
@@ -98,15 +94,14 @@ func TestQuest_StatusSurvivesRelog(t *testing.T) {
 	bot.AssertWorldAlive(t)
 	st, ok := bot.QuestStatus(t, e2eharness.QuestRethbanGauntlet)
 	if !ok {
-		e2eharness.ConfirmedBugf(t, 0, "quest row missing after relog")
+		e2eharness.Assertf(t, "quest row missing after relog")
 	}
 	t.Logf("PASS quest after relog status=%s", e2eharness.QuestStatusName(st))
 }
 
 // QLIFE-05: second AddQuest of same ID is safe (no crash).
 func TestQuest_ReAddSameQuestNoCrash(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/lifecycle"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "QDup",

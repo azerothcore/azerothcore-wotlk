@@ -27,8 +27,7 @@ func summonWarlockPet(t *testing.T, bot *e2eharness.ScenarioBot) uint64 {
 
 // PET-01: Warlock summon via learn-all + cast; wait player pet; dismiss.
 func TestPets_SummonWaitDismiss(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "combat", "pets"}, Runtime: "med", Category: "combat/pets"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "combat", "pets"}, Runtime: "med", Category: "combat/pets"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "PetSum",
@@ -52,8 +51,7 @@ func TestPets_SummonWaitDismiss(t *testing.T) {
 // WaitPlayerPet accepts UNIT_FIELD_SUMMON or SUMMONEDBY/CREATEDBY fallback — assert the
 // waiter result, not only the field (imp summon often lags UNIT_FIELD_SUMMON updates).
 func TestPets_PlayerPetGUIDAfterSummon(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "combat", "pets"}, Runtime: "med", Category: "combat/pets"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "combat", "pets"}, Runtime: "med", Category: "combat/pets"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "PetGUID",
@@ -72,8 +70,7 @@ func TestPets_PlayerPetGUIDAfterSummon(t *testing.T) {
 
 // PET-03 / #27081 style: DK Raise Dead ready path in open world (not dungeon).
 func TestPets_DKRaiseDeadOpenWorld(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "combat", "pets", "issue"},
 		Runtime:  "med",
 		Issue:    27081,
@@ -98,8 +95,7 @@ func TestPets_DKRaiseDeadOpenWorld(t *testing.T) {
 
 // PET-04: pet attack command does not crash.
 func TestPets_PetAttackCommand(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "combat", "pets"}, Runtime: "med", Category: "combat/pets"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "combat", "pets"}, Runtime: "med", Category: "combat/pets"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "PetAtk",
@@ -123,8 +119,7 @@ func TestPets_PetAttackCommand(t *testing.T) {
 
 // PET-05: dismiss clears pet.
 func TestPets_DismissClearsPet(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "combat", "pets"}, Runtime: "med", Category: "combat/pets"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "combat", "pets"}, Runtime: "med", Category: "combat/pets"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "PetDis",

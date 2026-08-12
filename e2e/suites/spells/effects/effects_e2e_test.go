@@ -14,8 +14,7 @@ import (
 
 // FX-01: summon effect via engineering target dummy item spell (#26774 pattern).
 func TestEffects_TargetDummySummon(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"short", "spells", "issue"},
 		Runtime:  "short",
 		Issue:    26774,
@@ -41,8 +40,7 @@ func TestEffects_TargetDummySummon(t *testing.T) {
 
 // FX-02: Charge effect moves player (warrior).
 func TestEffects_ChargeEffect(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells", "combat"}, Runtime: "short", Category: "spells/effects"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells", "combat"}, Runtime: "short", Category: "spells/effects"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "FxChg",
@@ -73,8 +71,7 @@ func TestEffects_ChargeEffect(t *testing.T) {
 
 // FX-03 / #26997 pattern: Sweeping Strikes + Execute on multi-target must not crash.
 func TestEffects_SweepingStrikesExecuteNoCrash(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells", "issue"},
 		Runtime:  "med",
 		Issue:    26997,
@@ -116,8 +113,7 @@ func TestEffects_SweepingStrikesExecuteNoCrash(t *testing.T) {
 
 // FX-04: grounding totem summon exists (#26584 ecosystem).
 func TestEffects_GroundingTotemSummon(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/effects"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/effects"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "FxTot",
@@ -137,8 +133,7 @@ func TestEffects_GroundingTotemSummon(t *testing.T) {
 
 // FX-05: Create-item / learn path for dummy reagents stays healthy.
 func TestEffects_AddItemCreatePath(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells", "items"}, Runtime: "short", Category: "spells/effects"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells", "items"}, Runtime: "short", Category: "spells/effects"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "FxItem",

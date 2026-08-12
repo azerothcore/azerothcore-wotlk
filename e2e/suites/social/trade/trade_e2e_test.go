@@ -37,17 +37,18 @@ func tradePair(t *testing.T, prefix string) (a, b *e2eharness.ScenarioBot) {
 
 // Spec 1 — Item + gold dual-accept.
 func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
 
 	a, b := tradePair(t, "TrdOK")
 	const goldOffer uint32 = 5000
 
+	a.CombatStop(t)
+	b.CombatStop(t)
 	a.SetMoney(t, 50_000)
 	b.SetMoney(t, 10_000)
-	// Ensure live coinage is visible before offering gold (SetMoney is soft on lag).
-	a.WaitPlayerMoney(t, 50_000, 10*time.Second)
-	b.WaitPlayerMoney(t, 10_000, 10*time.Second)
+	// CharDB oracle — live PLAYER_FIELD_COINAGE often lags under pad combat noise.
+	a.AssertMoneyAtLeast(t, 50_000)
+	b.AssertMoneyAtLeast(t, 10_000)
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 1)
 
 	aCount0 := a.InventoryCount(t, itemLinenCloth)
@@ -66,17 +67,17 @@ func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
 	bMoney1 := b.MoneyAfterSave(t)
 
 	if aCount1 != aCount0-1 {
-		e2eharness.Preconditionf(t, "A linen count %d→%d want -1", aCount0, aCount1)
+		e2eharness.Assertf(t, "A linen count %d→%d want -1", aCount0, aCount1)
 	}
 	if bCount1 != bCount0+1 {
-		e2eharness.Preconditionf(t, "B linen count %d→%d want +1", bCount0, bCount1)
+		e2eharness.Assertf(t, "B linen count %d→%d want +1", bCount0, bCount1)
 	}
 	// Money: A loses goldOffer, B gains goldOffer (allow slight GM funding drift).
 	if aMoney1+goldOffer > aMoney0+100 { // soft bound
 		t.Logf("NOTE money A %d→%d (offer %d)", aMoney0, aMoney1, goldOffer)
 	}
 	if bMoney1 < bMoney0 {
-		e2eharness.Preconditionf(t, "B money decreased %d→%d", bMoney0, bMoney1)
+		e2eharness.Assertf(t, "B money decreased %d→%d", bMoney0, bMoney1)
 	}
 	a.AssertWorldAlive(t)
 	b.AssertWorldAlive(t)
@@ -86,8 +87,7 @@ func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
 
 // Spec 2 — Cancel mid-trade restores inventories.
 func TestTrade_CancelMidTradeRestores(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
 
 	a, b := tradePair(t, "TrdCan")
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 1)
@@ -112,10 +112,10 @@ func TestTrade_CancelMidTradeRestores(t *testing.T) {
 	aMoney1 := a.MoneyAfterSave(t)
 	bMoney1 := b.MoneyAfterSave(t)
 	if aCount1 != aCount0 || bCount1 != bCount0 {
-		e2eharness.Preconditionf(t, "inventory changed after cancel A %d→%d B %d→%d", aCount0, aCount1, bCount0, bCount1)
+		e2eharness.Assertf(t, "inventory changed after cancel A %d→%d B %d→%d", aCount0, aCount1, bCount0, bCount1)
 	}
 	if aMoney1 != aMoney0 || bMoney1 != bMoney0 {
-		e2eharness.Preconditionf(t, "money changed after cancel A %d→%d B %d→%d", aMoney0, aMoney1, bMoney0, bMoney1)
+		e2eharness.Assertf(t, "money changed after cancel A %d→%d B %d→%d", aMoney0, aMoney1, bMoney0, bMoney1)
 	}
 	a.AssertWorldAlive(t)
 	t.Logf("PASS cancel restores inventories")
@@ -123,8 +123,7 @@ func TestTrade_CancelMidTradeRestores(t *testing.T) {
 
 // Spec 3 — Move OOR mid-trade aborts cleanly.
 func TestTrade_MoveOorMidTradeAborts(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot", "issue"}, Runtime: "short", Category: "social/trade"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot", "issue"}, Runtime: "short", Category: "social/trade"})
 
 	a, b := tradePair(t, "TrdOOR")
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 1)
@@ -145,7 +144,7 @@ func TestTrade_MoveOorMidTradeAborts(t *testing.T) {
 	aCount1 := a.InventoryCount(t, itemLinenCloth)
 	bCount1 := b.InventoryCount(t, itemLinenCloth)
 	if aCount1 != aCount0 || bCount1 != bCount0 {
-		e2eharness.Preconditionf(t, "inventory changed after OOR abort A %d→%d B %d→%d", aCount0, aCount1, bCount0, bCount1)
+		e2eharness.Assertf(t, "inventory changed after OOR abort A %d→%d B %d→%d", aCount0, aCount1, bCount0, bCount1)
 	}
 	e2eharness.ProbeWorldAlive(t, b, 25723)
 	t.Logf("PASS OOR mid-trade abort status=%d open=%v", info.Status, a.World.TradeOpen())
@@ -153,8 +152,7 @@ func TestTrade_MoveOorMidTradeAborts(t *testing.T) {
 
 // Spec 4 — Stackable merge.
 func TestTrade_StackableMerge(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
 
 	a, b := tradePair(t, "TrdStk")
 	// A has 5, B has 3, trade 2 → B=5, A=3
@@ -178,18 +176,17 @@ func TestTrade_StackableMerge(t *testing.T) {
 	a1 := a.InventoryCount(t, itemLinenCloth)
 	b1 := b.InventoryCount(t, itemLinenCloth)
 	if a1+b1 != a0+b0 {
-		e2eharness.Preconditionf(t, "linen not conserved %d+%d → %d+%d", a0, b0, a1, b1)
+		e2eharness.Assertf(t, "linen not conserved %d+%d → %d+%d", a0, b0, a1, b1)
 	}
 	if b1 <= b0 {
-		e2eharness.Preconditionf(t, "B did not gain stack %d→%d", b0, b1)
+		e2eharness.Assertf(t, "B did not gain stack %d→%d", b0, b1)
 	}
 	t.Logf("PASS stackable merge/conserve a %d→%d b %d→%d", a0, a1, b0, b1)
 }
 
 // Spec 5 — Rapid open/close no crash (UAF stress).
 func TestTrade_RapidOpenCloseNoCrash(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"short", "trade", "multi_bot", "issue"},
 		Runtime:  "short",
 		Issue:    25723,

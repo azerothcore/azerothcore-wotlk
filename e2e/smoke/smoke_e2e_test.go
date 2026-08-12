@@ -14,8 +14,7 @@ import (
 
 // SMOKE-01: valid login → enter world
 func TestSmoke_ValidLoginEnterWorld(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SmLogin",
@@ -36,8 +35,7 @@ func TestSmoke_ValidLoginEnterWorld(t *testing.T) {
 
 // SMOKE-02: probe world alive after login
 func TestSmoke_ProbeWorldAliveAfterLogin(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short"}, Runtime: "short", Category: "smoke"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short"}, Runtime: "short", Category: "smoke"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SmProbe",
@@ -50,8 +48,7 @@ func TestSmoke_ProbeWorldAliveAfterLogin(t *testing.T) {
 
 // SMOKE-03: teleport pad success
 func TestSmoke_TeleportPadSuccess(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SmTele",
@@ -74,8 +71,7 @@ func TestSmoke_TeleportPadSuccess(t *testing.T) {
 
 // SMOKE-05: relog same character, world still alive
 func TestSmoke_RelogSameCharacterWorldAlive(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SmRelog",
@@ -95,8 +91,7 @@ func TestSmoke_RelogSameCharacterWorldAlive(t *testing.T) {
 
 // SMOKE-07: first-time character create path (NewSolo with fresh account always creates)
 func TestSmoke_FirstTimeCharacterCreate(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol"}, Runtime: "short", Category: "smoke"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SmCreate",

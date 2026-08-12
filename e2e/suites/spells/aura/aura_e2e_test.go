@@ -14,8 +14,7 @@ import (
 
 // AURA-04 / #26130: Blending In aura survives mount.
 func TestAura_SurvivesMount_BlendingIn(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"short", "spells", "issue", "smoke"},
 		Runtime:  "short",
 		Issue:    26130,
@@ -38,8 +37,7 @@ func TestAura_SurvivesMount_BlendingIn(t *testing.T) {
 
 // AURA-05: aura present after apply; gone after death+relog settle path.
 func TestAura_ApplyAndQuery(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/aura"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/aura"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "AuraQ",
@@ -55,8 +53,7 @@ func TestAura_ApplyAndQuery(t *testing.T) {
 
 // AURA-06: mid-aura relog keeps session healthy (duration continuity soft-check).
 func TestAura_MidAuraRelogWorldAlive(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells", "protocol"}, Runtime: "short", Category: "spells/aura"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells", "protocol"}, Runtime: "short", Category: "spells/aura"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "AuraRl",
@@ -73,8 +70,7 @@ func TestAura_MidAuraRelogWorldAlive(t *testing.T) {
 
 // AURA-03: breakable CC removed by damage (use known stun if available via GM aura + damage).
 func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "spells", "combat"}, Runtime: "med", Category: "spells/aura"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "spells", "combat"}, Runtime: "med", Category: "spells/aura"})
 
 	const spellSap = 6770 // Rogue Sap — breakable CC (requires valid target path; use self GM path carefully)
 
@@ -101,8 +97,7 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 
 // AURA-01: exclusive / replace — apply stronger after weaker (soft observational).
 func TestAura_ApplyMultipleDistinctAuras(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/aura"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/aura"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "AuraMx",

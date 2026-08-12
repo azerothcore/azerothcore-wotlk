@@ -16,8 +16,7 @@ import (
 // Charge needs battle stance, charge range (~8–25y), and rage; Cast fatals on
 // timeout so use TryCast + setup that makes a result packet likely.
 func TestCast_ChargeSucceedsOnDummy(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells", "combat"}, Runtime: "short", Category: "spells/cast"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells", "combat"}, Runtime: "short", Category: "spells/cast"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "CastOk",
@@ -46,8 +45,7 @@ func TestCast_ChargeSucceedsOnDummy(t *testing.T) {
 
 // CAST-02: out-of-range / fail path does not crash.
 func TestCast_FailPathNoCrash(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/cast"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/cast"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "CastFl",
@@ -66,8 +64,7 @@ func TestCast_FailPathNoCrash(t *testing.T) {
 
 // CAST-03 / #27061 pattern: Raise Dead near corpse must not crash world.
 func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells", "issue"},
 		Runtime:  "med",
 		Issue:    27061,
@@ -97,8 +94,7 @@ func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
 
 // CAST-04: learn + CastMust battle stance on self.
 func TestCast_BattleStanceSelf(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/cast"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/cast"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "CastBS",
@@ -115,8 +111,7 @@ func TestCast_BattleStanceSelf(t *testing.T) {
 
 // CAST-05: CastAtPosition ground AoE does not crash.
 func TestCast_GroundAoENoCrash(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/cast"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/cast"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "CastAoE",

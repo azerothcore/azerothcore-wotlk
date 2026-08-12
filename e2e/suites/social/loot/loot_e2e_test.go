@@ -13,104 +13,11 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// killLootCorpse spawns entry and kills it with .damage (no Engage).
-// Mirrors the working #26862 path: gm on → spawn → damage while selected → combatready → loot.
-func killLootCorpse(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32) uint64 {
-	t.Helper()
-	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	// Snapshot existing entries so we do not re-loot a stale corpse from a prior test.
-	known := map[uint64]struct{}{}
-	for _, u := range bot.UnitsByEntry(80, entry) {
-		known[u.GUID] = struct{}{}
-	}
-	// Ensure GM mode for reliable .npc add + .damage (account GM alone is flaky here).
-	bot.GM(t, ".gm on")
-	bot.GM(t, ".npc add "+itoa(entry))
-	// Prefer WaitNewUnits; fall back to WaitUnit if tracker is empty.
-	var guid uint64
-	newOnes := bot.WaitNewUnits(t, known, []uint32{entry}, 20*time.Second)
-	if len(newOnes) > 0 {
-		guid = newOnes[0].GUID
-	} else {
-		guid = bot.WaitUnit(t, entry, 5*time.Second)
-	}
-	if guid == 0 {
-		e2eharness.Preconditionf(t, "npc add entry=%d not found", entry)
-	}
-	// Heavy damage while GM mode is on (do NOT use .die — can kill self if selection lost).
-	for i := 0; i < 20; i++ {
-		hp, max := bot.UnitHP(guid)
-		if max > 0 && hp == 0 {
-			break
-		}
-		bot.Damage(t, guid, 10_000_000)
-		time.Sleep(100 * time.Millisecond)
-	}
-	bot.WaitUnitDead(t, guid, 15*time.Second)
-	// Loot as non-GM player (still account-GM for .damage if needed later).
-	bot.CombatReady(t)
-	// WaitUnitLootable polls dynflags / corpse creation — no fixed settle sleep.
-	bot.WaitUnitLootable(t, guid, 15*time.Second)
-	return guid
-}
+const creatureBoar uint32 = 3098
 
-// tryOpenLoot opens loot or returns nil on timeout (corpse empty / not lootable).
-func tryOpenLoot(t *testing.T, bot *e2eharness.ScenarioBot, guid uint64) []client.LootItem {
-	t.Helper()
-	type result struct {
-		items []client.LootItem
-		ok    bool
-	}
-	ch := make(chan result, 1)
-	go func() {
-		// Recover OpenLoot fatal via separate process not possible; call World.Loot directly.
-		prev := bot.World.OnLootOpened
-		got := make(chan []client.LootItem, 1)
-		bot.World.OnLootOpened = func(g uint64, items []client.LootItem) {
-			if prev != nil {
-				prev(g, items)
-			}
-			if g == guid || guid == 0 {
-				select {
-				case got <- items:
-				default:
-				}
-			}
-		}
-		_ = bot.World.Loot(guid)
-		select {
-		case items := <-got:
-			ch <- result{items, true}
-		case <-time.After(8 * time.Second):
-			ch <- result{nil, false}
-		}
-		bot.World.OnLootOpened = prev
-	}()
-	r := <-ch
-	if !r.ok {
-		t.Logf("tryOpenLoot: no SMSG_LOOT_RESPONSE for 0x%X", guid)
-	}
-	return r.items
-}
-
-func itoa(n uint32) string {
-	// tiny no-strconv helper for GM lines
-	if n == 0 {
-		return "0"
-	}
-	var b [12]byte
-	i := len(b)
-	for n > 0 {
-		i--
-		b[i] = byte('0' + n%10)
-		n /= 10
-	}
-	return string(b[i:])
-}
-
-// LOOT-01: Need vs Greed when rolls appear; otherwise soft pass on loot window.
+// LOOT-01: Need vs Greed when rolls appear; otherwise SoftPass on outdoor fixture.
 func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "loot", "multi_bot", "serial"}, Runtime: "med", Category: "social/loot"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "loot", "multi_bot", "serial"}, Runtime: "med", Category: "social/loot"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
 		Prefix: "LootNBG",
@@ -124,44 +31,34 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, mate)
 	// Threshold 0 → all quality rolls under group/NBG methods.
 	leader.SetLootMethod(t, client.LootMethodNeedBeforeGreed, 0, 0)
+	leader.WaitLootMethod(t, client.LootMethodNeedBeforeGreed, 10*time.Second)
 
-	const creatureBoar = 3098
-	guid := killLootCorpse(t, leader, creatureBoar)
+	guid := leader.SpawnKillLootable(t, creatureBoar, 45*time.Second)
 	mate.CombatReady(t)
-	// Ensure mate near corpse for roll participation.
 	mate.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 
 	leader.World.ClearActiveLootRolls()
 	mate.World.ClearActiveLootRolls()
-	rollCh := make(chan client.LootStartRoll, 4)
-	leader.World.OnLootStartRoll = func(r client.LootStartRoll) {
-		select {
-		case rollCh <- r:
-		default:
-		}
-	}
+	waitRoll := leader.ArmLootStartRoll()
 
-	items := tryOpenLoot(t, leader, guid)
-	if items == nil {
-		// Retry once with raw OpenLoot path after re-select.
+	items, ok := leader.TryOpenLoot(t, guid, 8*time.Second)
+	if !ok {
 		_ = leader.World.SetTarget(guid)
-		items = tryOpenLoot(t, leader, guid)
+		items, ok = leader.TryOpenLoot(t, guid, 8*time.Second)
 	}
-	if items == nil {
+	if !ok {
 		leader.AssertWorldAlive(t)
-		t.Logf("PASS NBG soft: corpse not lootable (world alive)")
+		e2eharness.SoftPass(t, "no_loot_window", "NBG: outdoor corpse not lootable guid=0x%X", guid)
 		return
 	}
 	t.Logf("loot window items=%d", len(items))
 
-	var roll client.LootStartRoll
-	select {
-	case roll = <-rollCh:
-	case <-time.After(12 * time.Second):
+	roll, gotRoll := waitRoll(0, 12*time.Second)
+	if !gotRoll {
 		// Many outdoor critters only drop money / under-method items without rolls.
 		leader.AssertWorldAlive(t)
 		leader.LootRelease(t, guid)
-		t.Logf("PASS NBG path: loot window opened without group rolls (items=%d)", len(items))
+		e2eharness.SoftPass(t, "no_group_roll", "NBG: loot opened without group rolls (items=%d)", len(items))
 		return
 	}
 
@@ -169,7 +66,7 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 	leader.RollNeed(t, roll)
 	won := leader.WaitLootRollWon(t, roll.ItemID, 90*time.Second)
 	if won.WinnerGUID != leader.GUID && won.WinnerGUID != mate.GUID {
-		e2eharness.Preconditionf(t, "unexpected winner 0x%X", won.WinnerGUID)
+		e2eharness.Assertf(t, "unexpected winner 0x%X", won.WinnerGUID)
 	}
 	winner := leader
 	if won.WinnerGUID == mate.GUID {
@@ -181,9 +78,9 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 	leader.AssertWorldAlive(t)
 }
 
-// LOOT-02 / #26894: leave party mid-roll (when rolls exist).
+// LOOT-02 / #26894: leave party mid-roll (when rolls exist). SoftPass if outdoor fixture has no rolls.
 func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "loot", "multi_bot", "serial", "issue"},
 		Runtime:  "med",
 		Issue:    26894,
@@ -201,36 +98,28 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	leaver := e2eharness.ByRole(t, bots, "leaver")
 	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, leaver)
 	leader.SetLootMethod(t, client.LootMethodGroupLoot, 0, 0)
+	leader.WaitLootMethod(t, client.LootMethodGroupLoot, 10*time.Second)
 
 	// Issue cites GO 194821; spawn for future GO-use helpers. Corpse path is the active repro.
 	leader.GM(t, ".gobject add 194821")
 	// Soft: wait for GO if cache tracks it; do not fail the mid-roll corpse path.
 	_ = e2eharness.TryNearbyGameObjectByEntry(t, leader.World, 194821, 5*time.Second)
 
-	const creatureBoar = 3098
-	guid := killLootCorpse(t, leader, creatureBoar)
+	guid := leader.SpawnKillLootable(t, creatureBoar, 45*time.Second)
 	leaver.CombatReady(t)
 	leaver.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 
-	rollCh := make(chan client.LootStartRoll, 2)
-	leader.World.OnLootStartRoll = func(r client.LootStartRoll) {
-		select {
-		case rollCh <- r:
-		default:
-		}
-	}
-	_ = tryOpenLoot(t, leader, guid)
+	waitRoll := leader.ArmLootStartRoll()
+	_, _ = leader.TryOpenLoot(t, guid, 8*time.Second)
 
-	var roll client.LootStartRoll
-	select {
-	case roll = <-rollCh:
-	case <-time.After(12 * time.Second):
+	roll, gotRoll := waitRoll(0, 12*time.Second)
+	if !gotRoll {
 		// Soft path: still exercise party leave after loot open (related multi-session surface).
 		leaver.LeaveGroup(t)
 		leaver.WaitNotInGroup(t, 15*time.Second)
 		e2eharness.ProbeWorldAlive(t, leader, 26894)
-		_ = tryOpenLoot(t, leader, guid)
-		t.Logf("PASS #26894 soft: no roll window (creature loot not group-rolling); leave+reopen OK")
+		_, _ = leader.TryOpenLoot(t, guid, 8*time.Second)
+		e2eharness.SoftPass(t, "no_roll_window", "#26894 outdoor creature loot not group-rolling; leave+reopen OK")
 		return
 	}
 
@@ -240,18 +129,30 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 
 	wonDone := make(chan client.LootRollWon, 1)
 	allPassed := make(chan client.LootAllPassed, 1)
+	prevWon := leader.World.OnLootRollWon
+	prevAll := leader.World.OnLootAllPassed
 	leader.World.OnLootRollWon = func(r client.LootRollWon) {
+		if prevWon != nil {
+			prevWon(r)
+		}
 		select {
 		case wonDone <- r:
 		default:
 		}
 	}
 	leader.World.OnLootAllPassed = func(r client.LootAllPassed) {
+		if prevAll != nil {
+			prevAll(r)
+		}
 		select {
 		case allPassed <- r:
 		default:
 		}
 	}
+	defer func() {
+		leader.World.OnLootRollWon = prevWon
+		leader.World.OnLootAllPassed = prevAll
+	}()
 	select {
 	case w := <-wonDone:
 		t.Logf("roll awarded winner=0x%X item=%d", w.WinnerGUID, w.ItemID)
@@ -261,14 +162,14 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 		e2eharness.ConfirmedBugf(t, 26894, "loot roll did not resolve after party leave mid-roll itemGUID=0x%X", roll.ItemGUID)
 	}
 	e2eharness.ProbeWorldAlive(t, leader, 26894)
-	_ = tryOpenLoot(t, leader, guid)
+	_, _ = leader.TryOpenLoot(t, guid, 8*time.Second)
 	leader.AssertWorldAlive(t)
 	t.Logf("PASS #26894 mid-roll leave path")
 }
 
 // LOOT-03: all pass when rolls exist.
 func TestLoot_PassOnLootRedistribution(t *testing.T) {
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "loot", "multi_bot", "serial", "issue"}, Runtime: "med", Category: "social/loot"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "loot", "multi_bot", "serial", "issue"}, Runtime: "med", Category: "social/loot"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
 		Prefix:        "LootPas",
@@ -280,51 +181,51 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	leader, mate := bots[0], bots[1]
 	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, leader, mate)
 	leader.SetLootMethod(t, client.LootMethodGroupLoot, 0, 0)
+	leader.WaitLootMethod(t, client.LootMethodGroupLoot, 10*time.Second)
 
-	const creatureBoar = 3098
-	guid := killLootCorpse(t, leader, creatureBoar)
+	guid := leader.SpawnKillLootable(t, creatureBoar, 45*time.Second)
 	mate.CombatReady(t)
 	mate.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 
-	rollCh := make(chan client.LootStartRoll, 2)
-	leader.World.OnLootStartRoll = func(r client.LootStartRoll) {
+	waitRoll := leader.ArmLootStartRoll()
+	items, ok := leader.TryOpenLoot(t, guid, 8*time.Second)
+	if !ok {
+		e2eharness.ProbeWorldAlive(t, leader, 22000)
+		e2eharness.SoftPass(t, "no_loot_window", "pass-on-loot: outdoor corpse not lootable")
+		return
+	}
+	roll, gotRoll := waitRoll(0, 12*time.Second)
+	if !gotRoll {
+		e2eharness.SoftPass(t, "no_group_roll", "pass-on-loot: no rolls (items=%d)", len(items))
+		e2eharness.ProbeWorldAlive(t, leader, 22000)
+		return
+	}
+	leader.RollPass(t, roll)
+	mate.RollPass(t, roll)
+	passed := make(chan struct{}, 1)
+	prevAll := leader.World.OnLootAllPassed
+	leader.World.OnLootAllPassed = func(r client.LootAllPassed) {
+		if prevAll != nil {
+			prevAll(r)
+		}
 		select {
-		case rollCh <- r:
+		case passed <- struct{}{}:
 		default:
 		}
 	}
-	items := tryOpenLoot(t, leader, guid)
-	if items == nil {
-		e2eharness.ProbeWorldAlive(t, leader, 22000)
-		t.Logf("PASS pass-on-loot soft: corpse not lootable")
-		return
-	}
+	defer func() { leader.World.OnLootAllPassed = prevAll }()
 	select {
-	case roll := <-rollCh:
-		leader.RollPass(t, roll)
-		mate.RollPass(t, roll)
-		passed := make(chan struct{}, 1)
-		leader.World.OnLootAllPassed = func(r client.LootAllPassed) {
-			select {
-			case passed <- struct{}{}:
-			default:
-			}
-		}
-		select {
-		case <-passed:
-			t.Logf("PASS all-pass packet for item=%d", roll.ItemID)
-		case <-time.After(90 * time.Second):
-			t.Logf("NOTE no ALL_PASSED within timeout — corpse may stay lootable")
-		}
-	case <-time.After(12 * time.Second):
-		t.Logf("PASS pass-on-loot soft: no rolls (items=%d)", len(items))
+	case <-passed:
+		t.Logf("PASS all-pass packet for item=%d", roll.ItemID)
+	case <-time.After(90 * time.Second):
+		t.Logf("NOTE no ALL_PASSED within timeout — corpse may stay lootable")
 	}
 	e2eharness.ProbeWorldAlive(t, leader, 22000)
 }
 
-// LOOT-05: kill when below half HP (#26862).
+// LOOT-05: kill when below half HP (#26862). SoftPass if outdoor corpse never opens.
 func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
-	meta.Gate(t, meta.TestMeta{
+	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "loot", "issue", "serial"},
 		Runtime:  "med",
 		Issue:    26862,
@@ -338,41 +239,13 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	const creatureBoar = 3098
 	bot.GM(t, ".npc add 3098")
 	guid := bot.WaitUnit(t, creatureBoar, 15*time.Second)
 	bot.GM(t, ".npc set level 80")
 
-	// Poll for HP fields after level set / first damage probe.
-	var hp, max uint32
-	deadlineHP := time.Now().Add(5 * time.Second)
-	for time.Now().Before(deadlineHP) {
-		hp, max = bot.UnitHP(guid)
-		if max > 0 {
-			break
-		}
-		bot.Damage(t, guid, 1)
-		time.Sleep(50 * time.Millisecond)
-	}
-	if max == 0 {
-		e2eharness.Preconditionf(t, "unit max HP still 0 after damage probe")
-	}
-	// Bring below half without killing.
-	for hp*2 >= max && hp > 1 {
-		chunk := max / 4
-		if chunk < 1 {
-			chunk = 1
-		}
-		if chunk >= hp {
-			chunk = hp - 1
-		}
-		bot.Damage(t, guid, chunk)
-		time.Sleep(150 * time.Millisecond)
-		hp, max = bot.UnitHP(guid)
-	}
-	if max > 0 && hp*2 >= max {
-		e2eharness.Preconditionf(t, "could not bring unit below half HP (hp=%d max=%d)", hp, max)
-	}
+	bot.WaitUnitHPKnown(t, guid, 10*time.Second)
+	bot.DamageToFraction(t, guid, 0.49, 20*time.Second)
+	hp, max := bot.UnitHP(guid)
 	t.Logf("unit below half hp=%d/%d", hp, max)
 
 	bot.CombatReady(t)
@@ -380,11 +253,11 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	bot.WaitUnitDead(t, guid, 20*time.Second)
 	bot.WaitUnitLootable(t, guid, 15*time.Second)
 
-	items := tryOpenLoot(t, bot, guid)
-	if items == nil {
+	items, ok := bot.TryOpenLoot(t, guid, 8*time.Second)
+	if !ok {
 		// Soft: dynflag lootable can lag; kill credit path already exercised.
 		bot.AssertWorldAlive(t)
-		t.Logf("PASS below-half-HP kill path (loot window soft-miss; world alive) — #26862")
+		e2eharness.SoftPass(t, "no_loot_window", "#26862 below-half-HP kill path (loot soft-miss; world alive)")
 		return
 	}
 	bot.AssertWorldAlive(t)
@@ -393,7 +266,7 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 
 // LOOT-06: master loot assign.
 func TestLoot_MasterLootAssign(t *testing.T) {
-	meta.Gate(t, meta.TestMeta{Tags: []string{"med", "loot", "multi_bot", "serial"}, Runtime: "med", Category: "social/loot"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "loot", "multi_bot", "serial"}, Runtime: "med", Category: "social/loot"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
 		Prefix: "LootML",
@@ -406,15 +279,15 @@ func TestLoot_MasterLootAssign(t *testing.T) {
 	member := e2eharness.ByRole(t, bots, "member")
 	e2eharness.FormPartyAtPad(t, e2eharness.PadStormwindOutskirts, master, member)
 	master.SetLootMethod(t, client.LootMethodMasterLoot, master.GUID, 0)
+	master.WaitLootMethod(t, client.LootMethodMasterLoot, 10*time.Second)
 
-	const creatureBoar = 3098
-	guid := killLootCorpse(t, master, creatureBoar)
+	guid := master.SpawnKillLootable(t, creatureBoar, 45*time.Second)
 	member.CombatReady(t)
 	member.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 
-	items := tryOpenLoot(t, master, guid)
-	if items == nil || len(items) == 0 {
-		t.Logf("PASS master loot: no item slots / not lootable; method set OK")
+	items, ok := master.TryOpenLoot(t, guid, 8*time.Second)
+	if !ok || len(items) == 0 {
+		e2eharness.SoftPass(t, "no_loot_slots", "master loot: no item slots / not lootable; method set OK")
 		master.AssertWorldAlive(t)
 		return
 	}
@@ -427,15 +300,14 @@ func TestLoot_MasterLootAssign(t *testing.T) {
 
 // LOOT inventory oracle.
 func TestLoot_InventoryCountOracle(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "loot", "items"}, Runtime: "short", Category: "social/loot"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "loot", "items"}, Runtime: "short", Category: "social/loot"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "LootInv", Level: 40})
 	before := bot.InventoryCount(t, e2eharness.ItemTargetDummy)
 	bot.AddItem(t, e2eharness.ItemTargetDummy, 2)
 	after := bot.InventoryCount(t, e2eharness.ItemTargetDummy)
 	if after < before+2 {
-		e2eharness.Preconditionf(t, "inventory count before=%d after=%d want +2", before, after)
+		e2eharness.Assertf(t, "inventory count before=%d after=%d want +2", before, after)
 	}
 	t.Logf("PASS inventory count oracle %d→%d", before, after)
 }

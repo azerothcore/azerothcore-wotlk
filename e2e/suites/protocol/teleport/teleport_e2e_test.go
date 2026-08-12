@@ -15,8 +15,7 @@ import (
 
 // TELE-01: cross-map teleport (EK → Northrend).
 func TestTeleport_CrossMapEasternToNorthrend(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "TeleXM",
@@ -38,8 +37,7 @@ func TestTeleport_CrossMapEasternToNorthrend(t *testing.T) {
 
 // TELE-02: TeleNamed + world alive.
 func TestTeleport_TeleNamedSafe(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "TeleNm",
@@ -57,8 +55,7 @@ func TestTeleport_TeleNamedSafe(t *testing.T) {
 
 // TELE-03: spam short teleports must not crash world.
 func TestTeleport_SpamShortDoesNotCrash(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "TeleSp",
@@ -74,8 +71,7 @@ func TestTeleport_SpamShortDoesNotCrash(t *testing.T) {
 
 // TELE-04: pad tele then named tele preserves session.
 func TestTeleport_PadThenNamed(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "TelePN",
@@ -89,8 +85,7 @@ func TestTeleport_PadThenNamed(t *testing.T) {
 
 // TELE-05: GoCreatureID lands near entry after spawn.
 func TestTeleport_GoCreatureIDNearSpawn(t *testing.T) {
-	t.Parallel()
-	meta.Gate(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/teleport"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "TeleGo",
