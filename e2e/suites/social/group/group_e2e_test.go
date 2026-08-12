@@ -81,8 +81,15 @@ func TestGroup_RapidInviteDeclineNoCrash(t *testing.T) {
 		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
 		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
 	for i := 0; i < 5; i++ {
+		// Arm before Invite (no last-invite cache; WaitGroupInvite alone can miss a fast SMSG).
+		waitInv, cancelInv := b.ArmGroupInvite()
 		a.Invite(t, b)
-		_ = b.WaitGroupInvite(t, 5*time.Second)
+		if _, ok := waitInv(5 * time.Second); !ok {
+			cancelInv()
+			e2eharness.Assertf(t, "rapid invite loop %d: no SMSG_GROUP_INVITE", i)
+			return
+		}
+		cancelInv()
 		b.DeclineGroup(t)
 		// Decline must leave b out of party before the next invite.
 		b.WaitNotInGroup(t, 5*time.Second)
