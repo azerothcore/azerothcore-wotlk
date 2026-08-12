@@ -29,6 +29,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "TC9Sidecar.h"
 #include "Timer.h"
 #include "Transport.h"
 #include "World.h"
@@ -164,6 +165,9 @@ InstanceSave::~InstanceSave()
 
 void InstanceSave::InsertToDB()
 {
+    if (sToCloud9Sidecar->ClusterModeEnabled() && !sToCloud9Sidecar->IsMapAssigned(GetMapId()))
+        return;
+
     std::string data;
     uint32 completedEncounters = 0;
 
@@ -449,6 +453,157 @@ void InstanceSaveMgr::LoadCharacterBinds()
                     save->SetCanReset(false);
             }
         } while (result->NextRow());
+    }
+
+    lock_instLists = false;
+}
+
+// Runs on a std::async worker thread. Only the two synchronous CharacterDatabase
+// reads happen here (safe: the synch connection pool is mutex-guarded per connection).
+// All manager-state access is deferred to MergeWithNewInstanceSaves on the world thread.
+InstanceMapLoadRows InstanceSaveMgr::LoadInstanceSavesAndBindsForMapIDs(std::vector<uint32> const& mapIDs)
+{
+    InstanceMapLoadRows rows;
+
+    std::stringstream mapIDsStr;
+    for (size_t i = 0; i < mapIDs.size(); ++i)
+    {
+        mapIDsStr << mapIDs[i];
+        if (i < mapIDs.size() - 1)
+            mapIDsStr << ",";
+    }
+
+    QueryResult result = CharacterDatabase.Query("SELECT id, map, resettime, difficulty, completedEncounters, data FROM instance WHERE map IN ({}) ORDER BY id ASC", mapIDsStr.str());
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            InstanceMapLoadRows::InstanceRow row;
+            row.instanceId = fields[0].Get<uint32>();
+            row.mapId = fields[1].Get<uint16>();
+            row.resetTime = time_t(fields[2].Get<uint32>());
+            row.difficulty = fields[3].Get<uint8>();
+            row.completedEncounters = fields[4].Get<uint32>();
+            row.data = fields[5].Get<std::string>();
+            rows.instances.push_back(std::move(row));
+        } while (result->NextRow());
+    }
+
+    result = CharacterDatabase.Query("SELECT guid, instance, permanent, extended FROM character_instance WHERE instance IN (SELECT id FROM instance WHERE map IN ({}))", mapIDsStr.str());
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            InstanceMapLoadRows::BindRow row;
+            row.guidLow = fields[0].Get<uint32>();
+            row.instanceId = fields[1].Get<uint32>();
+            row.perm = fields[2].Get<bool>();
+            row.extended = fields[3].Get<bool>();
+            rows.binds.push_back(row);
+        } while (result->NextRow());
+    }
+
+    return rows;
+}
+
+// Runs on the world thread (TC9 async completion callback). Safe to touch
+// m_instanceSaveById, playerBindStorage, m_resetExtendedTimeByMapDifficulty and MapMgr here.
+void InstanceSaveMgr::MergeWithNewInstanceSaves(InstanceMapLoadRows const& loadResult)
+{
+    // Same guard as LoadCharacterBinds: without it, an unbind cascading into
+    // DeleteInstanceSaveIfNeeded would delete the very DB rows being merged.
+    lock_instLists = true;
+
+    for (InstanceMapLoadRows::InstanceRow const& row : loadResult.instances)
+    {
+        MapEntry const* entry = sMapStore.LookupEntry(row.mapId);
+        if (!entry)
+        {
+            LOG_ERROR("instance.save", "InstanceSaveMgr::MergeWithNewInstanceSaves: wrong mapid = {}, instanceid = {}!", row.mapId, row.instanceId);
+            continue;
+        }
+
+        // Same row validation as AddInstanceSave for rows loaded on reassignment.
+        if (row.instanceId == 0)
+        {
+            LOG_ERROR("instance.save", "InstanceSaveMgr::MergeWithNewInstanceSaves: mapid = {}, wrong instanceid = {}!", row.mapId, row.instanceId);
+            continue;
+        }
+
+        if (row.difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
+        {
+            LOG_ERROR("instance.save", "InstanceSaveMgr::MergeWithNewInstanceSaves: mapid = {}, instanceid = {}, wrong difficulty {}!", row.mapId, row.instanceId, row.difficulty);
+            continue;
+        }
+
+        time_t extendedResetTime = 0;
+        if (entry->IsRaid() || row.difficulty > DUNGEON_DIFFICULTY_NORMAL)
+            extendedResetTime = GetExtendedResetTimeFor(row.mapId, Difficulty(row.difficulty));
+
+        InstanceSave* save = new InstanceSave(row.mapId, row.instanceId, Difficulty(row.difficulty), row.resetTime, extendedResetTime);
+        save->SetCompletedEncounterMask(row.completedEncounters);
+        save->SetInstanceData(row.data);
+        if (row.resetTime > 0)
+            save->SetResetTime(row.resetTime);
+
+        InstanceSaveHashMap::iterator currentSave = m_instanceSaveById.find(row.instanceId);
+        if (currentSave != m_instanceSaveById.end())
+        {
+            InstanceSave* oldSave = currentSave->second;
+
+            // Unbind every player still pointing at the stale save before it is
+            // freed, in-memory only: the DB rows were just refetched and are
+            // rebound below. Iterate a copy, PlayerUnbindInstance mutates the list.
+            GuidList players = oldSave->m_playerList;
+            for (ObjectGuid const& playerGuid : players)
+                PlayerUnbindInstance(playerGuid, oldSave->GetMapId(), oldSave->GetDifficulty(), false);
+
+            m_instanceSaveById.erase(currentSave);
+            delete oldSave;
+        }
+        m_instanceSaveById[row.instanceId] = save;
+    }
+
+    for (InstanceMapLoadRows::BindRow const& row : loadResult.binds)
+    {
+        InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(row.instanceId);
+        InstanceSave* save = itr != m_instanceSaveById.end() ? itr->second : nullptr;
+        if (!save)
+            continue;
+
+        ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(row.guidLow);
+
+        PlayerCreateBoundInstancesMaps(guid);
+        InstancePlayerBind& bind = playerBindStorage[guid]->m[save->GetDifficulty()][save->GetMapId()];
+        if (bind.save) // pussywizard: another bind for the same map and difficulty! may happen because of mysql thread races
+        {
+            if (bind.perm) // already loaded perm -> delete currently checked one from db
+            {
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                stmt->SetData(0, guid.GetCounter());
+                stmt->SetData(1, row.instanceId);
+                CharacterDatabase.Execute(stmt);
+                continue;
+            }
+            else // override temp bind by newest one
+            {
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                stmt->SetData(0, guid.GetCounter());
+                stmt->SetData(1, bind.save->GetInstanceId());
+                CharacterDatabase.Execute(stmt);
+                bind.save->RemovePlayer(guid, this);
+            }
+        }
+        bind.save = save;
+        bind.perm = row.perm;
+        bind.extended = row.extended;
+        save->AddPlayer(guid);
+        if (row.perm)
+            save->SetCanReset(false);
     }
 
     lock_instLists = false;

@@ -134,13 +134,9 @@ public:
                 instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
-        bool SelectPlayerInRoom()
+        Player* SelectPlayerInRoom() const
         {
-            if (me->IsInCombat())
-                return false;
-
-            Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for (auto const& itr : pList)
+            for (auto const& itr : me->GetMap()->GetPlayers())
             {
                 Player* player = itr.GetSource();
                 if (!player || !player->IsAlive())
@@ -149,16 +145,26 @@ public:
                 if (player->GetPositionZ() > 300.0f || me->GetExactDist(player) > 50.0f)
                     continue;
 
-                AttackStart(player);
-                return true;
+                return player;
             }
-            return false;
+            return nullptr;
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictimWithGaze() && !SelectPlayerInRoom())
+            Player* player = SelectPlayerInRoom();
+
+            if (!player)
+            {
+                // prevents an issue where Gluth remains stuck in combat with a zombie chow
+                if (me->IsEngaged())
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+
                 return;
+            }
+
+            if (!UpdateVictimWithGaze())
+                AttackStart(player);
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
