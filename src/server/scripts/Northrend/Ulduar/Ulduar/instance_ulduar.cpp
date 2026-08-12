@@ -33,7 +33,6 @@ DoorData const doorData[] =
     { GO_LEVIATHAN_DOORS,              BOSS_LEVIATHAN, DOOR_TYPE_ROOM       },
     { GO_LIGHTNING_WALL1,              BOSS_LEVIATHAN, DOOR_TYPE_PASSAGE    },
     { GO_XT002_DOORS,                  BOSS_XT002,     DOOR_TYPE_ROOM       },
-    { GO_KOLOGARN_DOORS,               BOSS_KOLOGARN,  DOOR_TYPE_ROOM       },
     { GO_ASSEMBLY_DOORS,               BOSS_ASSEMBLY,  DOOR_TYPE_ROOM       },
     { GO_ARCHIVUM_DOORS,               BOSS_ASSEMBLY,  DOOR_TYPE_PASSAGE    },
     { GO_MIMIRON_DOOR_1,               BOSS_MIMIRON,   DOOR_TYPE_ROOM       },
@@ -107,6 +106,7 @@ ObjectData const creatureData[] =
     { NPC_MIMIRON_LEVIATHAN_MKII,   DATA_MIMIRON_LEVIATHAN_MKII },
     { NPC_MIMIRON_VX001,            DATA_MIMIRON_VX001          },
     { NPC_MIMIRON_ACU,              DATA_MIMIRON_ACU            },
+    { NPC_MIMIRON_DB_TARGET,        DATA_MIMIRON_DB_TARGET      },
     // Freya elders
     { NPC_ELDER_IRONBRANCH,         DATA_ELDER_IRONBRANCH       },
     { NPC_ELDER_STONEBARK,          DATA_ELDER_STONEBARK        },
@@ -132,7 +132,6 @@ ObjectData const gameobjectData[] =
     { GO_LIGHTNING_WALL1,               DATA_LIGHTNING_WALL1            },
     { GO_LIGHTNING_WALL2,               DATA_LIGHTNING_WALL2            },
     { GO_XT002_DOORS,                   DATA_XT002_DOORS                },
-    { GO_KOLOGARN_DOORS,                DATA_KOLOGARN_DOORS             },
     { GO_ASSEMBLY_DOORS,                DATA_ASSEMBLY_DOORS             },
     { GO_ARCHIVUM_DOORS,                DATA_ARCHIVUM_DOORS             },
     { GO_MIMIRON_DOOR_1,                DATA_GO_MIMIRON_DOOR_1          },
@@ -159,11 +158,11 @@ ObjectData const gameobjectData[] =
     { GO_MIMIRON_CALL_TRAM_MIMIRON,     DATA_MIMIRON_CALL_TRAM_MIMIRON  },
     { GO_DOODAD_UL_TRAIN_TURNAROUND01,  DATA_MIMIRON_TRAM_TURNAROUND_1  },
     { GO_DOODAD_UL_TRAIN_TURNAROUND02,  DATA_MIMIRON_TRAM_TURNAROUND_2  },
-    // Hodir chests (dynamically spawned, one per difficulty)
-    { GO_HODIR_CHEST_NORMAL,             DATA_HODIR_CHEST_NORMAL         },
-    { GO_HODIR_CHEST_NORMAL_HERO,        DATA_HODIR_CHEST_NORMAL_HERO    },
-    { GO_HODIR_CHEST_HARD,               DATA_HODIR_CHEST_HARD           },
-    { GO_HODIR_CHEST_HARD_HERO,          DATA_HODIR_CHEST_HARD_HERO      },
+    // Hodir loot chests (DB-spawned, filtered by spawnMask per difficulty)
+    { GO_HODIR_CHEST_NORMAL,            DATA_HODIR_CHEST_NORMAL         },
+    { GO_HODIR_CHEST_NORMAL_HERO,       DATA_HODIR_CHEST_NORMAL_HERO    },
+    { GO_HODIR_CHEST_HARD,              DATA_HODIR_CHEST_HARD           },
+    { GO_HODIR_CHEST_HARD_HERO,         DATA_HODIR_CHEST_HARD_HERO      },
     { 0,                                0                               }
 };
 
@@ -210,8 +209,6 @@ public:
 
         // Hodir
         bool _hmHodir;
-        Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
-        Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
         // Ancient Gate
         Position const triggerAncientGatePosition = { 1883.65f, 269.272f, 418.406f };
@@ -219,6 +216,7 @@ public:
         // Shared
         EventMap _events;
         bool _mimironTramUsed;
+        bool _algalonResummonPending;
 
         void Initialize() override
         {
@@ -234,6 +232,7 @@ public:
             // Shared
             _events.Reset();
             _mimironTramUsed       = false;
+            _algalonResummonPending = false;
         }
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
@@ -279,7 +278,7 @@ public:
 
             uint32 algalonTimer =
                 GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
-            if (!GetObjectGuid(BOSS_ALGALON) && algalonTimer
+            if (!GetObjectGuid(BOSS_ALGALON) && !_algalonResummonPending && algalonTimer
                 && (algalonTimer <= 60
                     || algalonTimer == TIMER_ALGALON_TO_SUMMON))
             {
@@ -324,6 +323,18 @@ public:
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
                 SetData(eventId, 0);
+            else if (eventId == EVENT_HODIR_SHATTER_CHEST)
+            {
+                if (GameObject* go = GetHodirChest(true))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                    scheduler.Schedule(3s, [this](TaskContext /*context*/)
+                    {
+                        if (GetBossState(BOSS_HODIR) != DONE)
+                            SetData(TYPE_HODIR_HM_FAIL, 0);
+                    });
+                }
+            }
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -400,73 +411,6 @@ public:
             return true;
         }
 
-        void SpawnHodirChests(Difficulty diff, Creature* hodir)
-        {
-            switch (diff)
-            {
-                case RAID_DIFFICULTY_10MAN_NORMAL: // 10 man chest
-                {
-                    if (!GetObjectGuid(DATA_HODIR_CHEST_NORMAL))
-                    {
-                        if (GameObject* go = hodir->SummonGameObject(
-                            GO_HODIR_CHEST_NORMAL,
-                            normalChestPosition.GetPositionX(),
-                            normalChestPosition.GetPositionY(),
-                            normalChestPosition.GetPositionZ(),
-                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                        {
-                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                        }
-                    }
-                    if (!GetObjectGuid(DATA_HODIR_CHEST_HARD))
-                    {
-                        if (GameObject* go = hodir->SummonGameObject(
-                            GO_HODIR_CHEST_HARD,
-                            hardChestPosition.GetPositionX(),
-                            hardChestPosition.GetPositionY(),
-                            hardChestPosition.GetPositionZ(),
-                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                        {
-                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                            _hmHodir = true;
-                        }
-                    }
-                    break;
-                }
-                case RAID_DIFFICULTY_25MAN_NORMAL: // 25 man chest
-                {
-                    if (!GetObjectGuid(DATA_HODIR_CHEST_NORMAL_HERO))
-                    {
-                        if (GameObject* go = hodir->SummonGameObject(
-                            GO_HODIR_CHEST_NORMAL_HERO,
-                            normalChestPosition.GetPositionX(),
-                            normalChestPosition.GetPositionY(),
-                            normalChestPosition.GetPositionZ(),
-                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                        {
-                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                        }
-                    }
-                    if (!GetObjectGuid(DATA_HODIR_CHEST_HARD_HERO))
-                    {
-                        if (GameObject* go = hodir->SummonGameObject(
-                            GO_HODIR_CHEST_HARD_HERO,
-                            hardChestPosition.GetPositionX(),
-                            hardChestPosition.GetPositionY(),
-                            hardChestPosition.GetPositionZ(),
-                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
-                        {
-                            go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                            _hmHodir = true;
-                        }
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-
         void OnCreatureCreate(Creature* creature) override
         {
             InstanceScript::OnCreatureCreate(creature);
@@ -480,12 +424,6 @@ public:
                         creature->SetPosition(creature->GetHomePosition());
                         creature->setDeathState(DeathState::JustDied);
                         creature->StopMovingOnCurrentPos();
-                    }
-                    break;
-                case NPC_HODIR:
-                    if (GetBossState(BOSS_HODIR) != DONE)
-                    {
-                        SpawnHodirChests(instance->GetDifficulty(), creature);
                     }
                     break;
                 case NPC_ALGALON:
@@ -590,6 +528,18 @@ public:
                 case GO_SNOW_MOUND:
                     gameObject->EnableCollision(false);
                     break;
+                // Hodir loot chests: spawned locked via gameobject_template_addon,
+                // unlocked by setChestsLootable() when the encounter is defeated
+                case GO_HODIR_CHEST_NORMAL:
+                case GO_HODIR_CHEST_NORMAL_HERO:
+                case GO_HODIR_CHEST_HARD:
+                case GO_HODIR_CHEST_HARD_HERO:
+                    if (GetBossState(BOSS_HODIR) == DONE)
+                    {
+                        gameObject->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                        gameObject->SetLootRecipient(instance);
+                    }
+                    break;
                 // Mimiron Tram
                 case GO_MIMIRON_TRAM:
                     if (GetBossState(BOSS_MIMIRON) == DONE)
@@ -672,7 +622,7 @@ public:
                     if (GameObject* go = GetHodirChest(true))
                     {
                         _hmHodir = false;
-                        go->Delete();
+                        go->DespawnOrUnsummon(0ms, 7_days);
                     }
                     break;
                 case DATA_MAGE_BARRIER:
@@ -707,6 +657,10 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 60);
                     StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, 60);
                     _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
+                    return;
+                case DATA_RESUMMON_ALGALON:
+                    _algalonResummonPending = true;
+                    _events.RescheduleEvent(EVENT_RESUMMON_ALGALON, 2s);
                     return;
                 case DATA_ALGALON_SUMMON_STATE:
                 case DATA_ALGALON_DEFEATED:
@@ -931,7 +885,14 @@ public:
                     SetData(DATA_ALGALON_DEFEATED, 1);
                     if (Creature* algalon = GetCreature(BOSS_ALGALON))
                         algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);
+                    break;
                 }
+                case EVENT_RESUMMON_ALGALON:
+                    _algalonResummonPending = false;
+                    if (!GetCreature(BOSS_ALGALON))
+                        if (Creature* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
+                            algalon->AI()->DoAction(ACTION_START_INTRO);
+                    break;
             }
         }
 
@@ -983,6 +944,24 @@ public:
                     return (mask & (1 << BOSS_YOGGSARON)) == 0;
             }
             return false;
+        }
+
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
+        {
+            if (_SkipCheckRequiredBosses(player))
+                return true;
+
+            switch (bossId)
+            {
+                case BOSS_YOGGSARON:
+                    if (GetBossState(BOSS_VEZAX) != DONE)
+                        return false;
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
         }
     };
 };

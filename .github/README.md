@@ -2,9 +2,7 @@
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 [![CodeFactor](https://www.codefactor.io/repository/github/azerothcore/azerothcore-wotlk/badge)](https://www.codefactor.io/repository/github/azerothcore/azerothcore-wotlk)
-[![StackOverflow](http://img.shields.io/badge/stackoverflow-azerothcore-blue.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/azerothcore?sort=newest "Ask / browse questions here")
 [![Discord](https://img.shields.io/discord/217589275766685707?logo=discord&logoColor=white)](https://discord.gg/gkt4y2x "Our community hub on Discord")
-[![Bounties on BountyHub](https://img.shields.io/badge/Bounties-on%20BountyHub-yellow)](https://www.bountyhub.dev/bounties?repo=azerothcore)
 
 ## Build Status
 
@@ -61,7 +59,9 @@ We also recommend you read our [Contributor Covenant Code of Conduct](https://gi
 
 Feel free to join our [Discord server](https://discord.gg/gkt4y2x).
 
-Click on the "⭐ Star" button to help us gain more visibility on Github!
+🤖 If you use any AI agent to work on AzerothCore, please read our [AI Agentic Engineering guidelines](https://www.azerothcore.org/wiki/agentic-engineering).
+
+Click on the "⭐ Star" button to help us gain more visibility on GitHub!
 
 ## Authors & Contributors
 

@@ -31,6 +31,7 @@
 #include "RBAC.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
+#include "TC9Sidecar.h"
 #include "WorldSession.h"
 
 BossBoundaryData::~BossBoundaryData()
@@ -41,6 +42,9 @@ BossBoundaryData::~BossBoundaryData()
 
 void InstanceScript::SaveToDB()
 {
+    if (sToCloud9Sidecar->ClusterModeEnabled() && !sToCloud9Sidecar->IsMapAssigned(instance->GetEntry()->MapID))
+        return;
+
     std::string data = GetSaveData();
     //if (data.empty()) // pussywizard: encounterMask can be updated and theres no reason to not save
     //    return;
