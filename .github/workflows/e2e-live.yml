@@ -1,7 +1,8 @@
 # On-demand live e2e: native stack setup like dashboard-ci, then go test.
 #
-# stack=native (default) — same *setup* family as dashboard-ci (not -dry-run):
-#   MySQL service → acore.sh init (compile + DB + client-data download)
+# stack=native (default) — same setup family as dashboard-ci (not -dry-run):
+#   acore.sh init installs host MySQL (no GHA services.mysql — that fights
+#   install-deps systemctl start on :3306), compile, DB, client-data
 #   → pm2 sm start auth + world
 #   → go test -tags=e2e against 127.0.0.1
 #
@@ -164,22 +165,10 @@ jobs:
     name: e2e (${{ needs.preflight.outputs.stack }} / ${{ needs.preflight.outputs.scope }})
     needs: preflight
     if: needs.preflight.result == 'success' && needs.preflight.outputs.should_run == 'true'
+    # Host MySQL comes from acore.sh install-deps (dashboard-ci style). Do not
+    # add services.mysql: it binds :3306 and systemctl start mysql.service fails.
     runs-on: ${{ vars.E2E_RUNS_ON || 'ubuntu-latest' }}
     timeout-minutes: 360
-    # MySQL for native stack (same idea as dashboard-ci MYSQL_ROOT_PASSWORD=root)
-    services:
-      mysql:
-        image: mysql:8.4
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=40
     steps:
       - name: Free disk
         if: needs.preflight.outputs.stack == 'native' || needs.preflight.outputs.stack == 'docker'
