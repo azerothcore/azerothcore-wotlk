@@ -218,7 +218,7 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	case <-passed:
 		t.Logf("PASS all-pass packet for item=%d", roll.ItemID)
 	case <-time.After(90 * time.Second):
-		t.Logf("NOTE no ALL_PASSED within timeout — corpse may stay lootable")
+		e2eharness.SoftPass(t, "no_all_passed", "both passed rolls but ALL_PASSED not seen — corpse may stay lootable")
 	}
 	e2eharness.ProbeWorldAlive(t, leader, 22000)
 }
