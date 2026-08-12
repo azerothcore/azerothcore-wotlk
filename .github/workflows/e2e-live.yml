@@ -225,21 +225,72 @@ jobs:
           cat conf/config.sh
           ./acore.sh config show AC_CONFIG_POLICY || true
 
-      - name: Init (deps, compile, database, client-data download)
+      - name: Init (deps, compile, empty DBs, client-data download)
         if: needs.preflight.outputs.stack == 'native'
         env:
           MYSQL_ROOT_PASSWORD: root
           CONTINUOUS_INTEGRATION: true
         run: |
           set -euo pipefail
-          # acore.sh init → install-deps, compile, create DBs, import SQL,
-          # and inst_download_client_data (GitHub wowgaming/client-data zip).
+          # acore.sh init → install-deps, compile, create empty DBs (create_mysql.sql),
+          # and inst_download_client_data. Schema is applied by -dry-run below
+          # (same as dashboard-ci), not by init itself.
           ./acore.sh init
           sudo npm install -g pm2
         timeout-minutes: 180
 
-      # No -dry-run: e2e needs a real listening auth/world. Setup is "like" dashboard-ci
-      # (init + client-data + sm start), not the dry-run gate used only for SQL CI.
+      # create_mysql.sql only creates acore@localhost (unix_socket). Servers and
+      # the harness connect via TCP 127.0.0.1, which needs a separate account host.
+      - name: MySQL TCP grants for acore + root password
+        if: needs.preflight.outputs.stack == 'native'
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        run: |
+          set -euo pipefail
+          sudo mysql -uroot <<'SQL'
+          -- Ensure root can auth with password over TCP (GHA / mysql client -h127.0.0.1).
+          ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'root';
+          CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY 'root';
+          CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'root';
+          GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+          CREATE USER IF NOT EXISTS 'acore'@'127.0.0.1' IDENTIFIED BY 'acore';
+          CREATE USER IF NOT EXISTS 'acore'@'%' IDENTIFIED BY 'acore';
+          GRANT ALL PRIVILEGES ON `acore_world`.* TO 'acore'@'127.0.0.1' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_characters`.* TO 'acore'@'127.0.0.1' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_auth`.* TO 'acore'@'127.0.0.1' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_world`.* TO 'acore'@'%' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_characters`.* TO 'acore'@'%' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_auth`.* TO 'acore'@'%' WITH GRANT OPTION;
+          FLUSH PRIVILEGES;
+          SQL
+          mysql -h127.0.0.1 -uacore -pacore -e 'SELECT USER(), CURRENT_USER();' acore_auth
+
+      # dashboard-ci applies base+updates via auth/world -dry-run before live start.
+      # Without this, acore_auth has no realmlist and servers crash-loop.
+      - name: Apply DB schema (authserver + worldserver dry-run)
+        if: needs.preflight.outputs.stack == 'native'
+        run: |
+          set -euo pipefail
+          source ./acore.sh config load
+          cd env/dist/bin
+          timeout 10m ./authserver -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
+          status=${PIPESTATUS[0]}
+          [ "$status" -eq 0 ] || exit "$status"
+          if grep -qE 'Applying of file .+ failed!' "$RUNNER_TEMP/authserver-dry-run.log"; then
+            echo '::error::authserver dry-run failed to apply a SQL update'
+            exit 1
+          fi
+          timeout 15m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/worldserver-dry-run.log"
+          status=${PIPESTATUS[0]}
+          [ "$status" -eq 0 ] || exit "$status"
+          if grep -qE 'Applying of file .+ failed!' "$RUNNER_TEMP/worldserver-dry-run.log"; then
+            echo '::error::worldserver dry-run failed to apply a SQL update'
+            exit 1
+          fi
+          mysql -h127.0.0.1 -uacore -pacore -e \
+            "SHOW TABLES FROM acore_auth LIKE 'realmlist'; SELECT COUNT(*) AS realm_rows FROM acore_auth.realmlist;"
+        timeout-minutes: 40
 
       - name: Start authserver + worldserver (pm2 service manager)
         if: needs.preflight.outputs.stack == 'native'
@@ -251,14 +302,38 @@ jobs:
           ./acore.sh sm start worldserver
           ./acore.sh sm wait-uptime authserver 10 300
           ./acore.sh sm wait-uptime worldserver 10 600
+          # wait-uptime can race with crash-loops; require low restart count + listening ports
+          pm2 jlist | python3 -c '
+          import json, sys
+          procs = {p["name"]: p for p in json.load(sys.stdin)}
+          for n in ("authserver", "worldserver"):
+              p = procs.get(n)
+              if not p:
+                  raise SystemExit(f"missing {n}")
+              env = p.get("pm2_env") or {}
+              status = env.get("status")
+              restarts = int(env.get("restart_time") or 0)
+              if status != "online":
+                  raise SystemExit(f"{n} not online: {status}")
+              if restarts > 3:
+                  raise SystemExit(f"{n} restart_time={restarts} (crash loop?)")
+          print("pm2 health ok")
+          '
+          for port in 3724 8085; do
+            for i in $(seq 1 60); do
+              (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1 && break
+              sleep 2
+            done
+            (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1 \
+              || { echo "::error::port ${port} not listening"; pm2 logs --nostream --lines 80; exit 1; }
+          done
         timeout-minutes: 30
 
       - name: Realmlist + E2E env (native)
         if: needs.preflight.outputs.stack == 'native'
         run: |
           set -euo pipefail
-          # Zero-conf create_mysql.sql → user acore/acore; conf.dist matches.
-          mysql -h127.0.0.1 -uroot -proot -e \
+          mysql -h127.0.0.1 -uacore -pacore -e \
             "UPDATE acore_auth.realmlist SET address='127.0.0.1', localAddress='127.0.0.1';
              SELECT id,name,address,port FROM acore_auth.realmlist;"
           {

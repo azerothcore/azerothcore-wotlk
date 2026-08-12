@@ -124,7 +124,8 @@ __pycache__/
 #
 # ==================
 
-# Live-stack e2e private / local tooling
-e2e/local/
+# Live-stack e2e private / local tooling (scratch tests stay uncommitted)
+e2e/local/**
+!e2e/local/README.md
 e2e/go.work
 e2e/go.work.sum

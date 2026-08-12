@@ -109,10 +109,24 @@ go test -tags=e2e ./suites/... -run TestPets_SummonWaitDismiss -count=1 -v -time
 | `smoke/` | Fast login / tele / relog guards |
 | `suites/<category>/…` | Hierarchical scenarios (directory = category) |
 | `suites/issues/` | Tracked AC issue regressions (`TestAC_<n>_…`) |
+| `local/` | **Scratch/debug only** — gitignored (except `local/README.md`); never commit throwaways |
 | `internal/meta` | `TestMeta` + env tag filters + `Begin` (Parallel policy) |
 | `internal/fixtures` | Re-exports pads / `PackagePad` for suites that prefer fixtures |
 
 Every live test uses `//go:build e2e` and should call `meta.Begin(t, meta.TestMeta{…})` before expensive setup.
+
+### Scratch / agent debug (`local/`)
+
+When validating a fix on a **live** stack (player-visible combat, protocol, quests, multi-bot), prefer writing a small e2e under **`e2e/local/`** instead of ad-hoc GM spam or long manual checklists. That tree is **not committed**.
+
+```bash
+# create e.g. local/repro/repro_e2e_test.go  (//go:build e2e)
+make e2e-local
+# or:
+go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
+```
+
+If the scenario should stay as a regression, **move** it into `suites/` (or `suites/issues/`) with proper `meta.Begin` tags — see `.agents/docs/e2e-policy.md`.
 
 ### Category map (current tree)
 
@@ -305,74 +319,16 @@ Use `.agents/docs/e2e-policy.md` for decision trees (e2e vs unit, mandatory trig
 
 ---
 
-## On-demand e2e CI
+## CI (opt-in)
 
-Live e2e is **opt-in** (label / manual dispatch). Workflow:
+Live e2e does **not** run on every PR. Details live in the workflow file only:
 [`.github/workflows/e2e-live.yml`](../.github/workflows/e2e-live.yml).
 
-### How to trigger
+| How | Effect |
+|-----|--------|
+| Label **`run-e2e`** on a non-draft PR | Smoke e2e against an in-workflow stack |
+| Actions → **e2e-live** → Run workflow (needs workflow on default branch, or use `gh workflow run … --ref e2e`) | Choose scope/stack |
 
-| Trigger | What runs |
-|---------|-----------|
-| Label **`run-e2e`** on a non-draft PR | **Docker stack** + **smoke** e2e |
-| Keep label + push | Re-run same |
-| Actions → **e2e-live** → Run workflow | Choose `stack`, `scope`, packages, etc. |
+Day-to-day development and agent debugging should use a **local** stack + `e2e/local/` or the committed suites — not CI setup docs.
 
-### Stack modes (`stack` input)
-
-| Mode | What CI starts | What tests connect to |
-|------|----------------|------------------------|
-| **`native` (default)** | Same *setup* as [dashboard-ci](../.github/workflows/dashboard-ci.yml): MySQL → **`./acore.sh init`** (compile + DB + **client-data download**) → **pm2** start auth/world (live, not `-dry-run`) | **`127.0.0.1:3724` / `:8085`**, DSN **`acore:acore@tcp(127.0.0.1:3306)/acore_*`** |
-| **`docker`** | Root [`docker-compose.yml`](../docker-compose.yml) (pull/build + up) | **`127.0.0.1`**, MySQL **`root:password@…`** |
-| **`external`** | Nothing | Secrets / self-hosted `E2E_*` |
-
-#### Native path (default)
-
-1. GitHub **MySQL 8.4** service (`MYSQL_ROOT_PASSWORD=root`).
-2. **`./acore.sh init`** — deps, compile this tree, create/import DBs, and **`inst_download_client_data`** (`data.zip` from [wowgaming/client-data](https://github.com/wowgaming/client-data)).
-3. **`acore.sh sm start`** auth + world (pm2), wait uptime — real listening servers for the harness.
-4. Point realmlist at `127.0.0.1`, export `E2E_*`, run `go test -tags=e2e`.
-5. Stop/delete sm services.
-
-We do **not** run `authserver`/`worldserver -dry-run` for e2e (that only gates SQL and exits; no live ports). Setup is “like dashboard-ci’s install + start,” not the dry-run step.
-
-Bot accounts: harness writes **auth DB** (SRP6). No worldserver console required.
-
-#### Docker path (optional)
-
-Pull `acore/ac-wotlk-*` (or `build_images=true`), `compose up`, realmlist localhost, same go test.
-
-### Optional secrets (external stack only)
-
-| Name | Purpose |
-|------|---------|
-| `E2E_AUTH_ADDR` / `E2E_*_DSN` | Pre-existing realm |
-| `E2E_FORCE_RUN` / `E2E_RUNS_ON` | Self-hosted runner with stack already up |
-| `E2E_HARNESS_REF` / `E2E_HARNESS_TOKEN` | Private / non-default AzerothGhost |
-
-### Command shape
-
-```bash
-# smoke (label run-e2e)
-go test -tags=e2e ./smoke/ -count=1 -timeout 60m -parallel 1 -v
-E2E_TAGS=smoke go test -tags=e2e ./suites/... -count=1 -timeout 60m -parallel 1 -v
-```
-
-### Failure classes (greppable)
-
-| Prefix | Meaning |
-|--------|---------|
-| `precondition:` | Setup never reached a judgeable state |
-| `AC#N CONFIRMED BUG:` | Core wrong for tracked issue N |
-| `harness:` | Infra / timeout / SQL / cache |
-| `WARNING:` | Soft deviation |
-
-### CI follow-ups
-
-1. Pin `github.com/walkline/AzerothGhost` to a **pseudo-version or tag** in
-   `e2e/go.mod` / `go.sum` so CI can eventually drop the path-replace once the
-   harness is on the module proxy (the workflow already falls back to checkout).
-2. Optional nightly schedule once a dedicated realm and runner exist (not
-   enabled by default).
-3. Create the **`run-e2e`** label in the GitHub UI (description e.g.
-   “Run live-stack e2e workflow”).
+Greppable failure prefixes: `precondition:`, `AC#N CONFIRMED BUG:`, `harness:`, `WARNING:`.

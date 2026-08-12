@@ -392,11 +392,12 @@ A test that fails intermittently on a correct core is a **harness/test bug** unt
 - Examples under AzerothGhost `e2e/examples/` are **patterns**; AC regressions live in the consumer suite (or agreed AC-side e2e module).  
 - Periodic prune: merge redundant tests; refresh inventory (§5.3).
 
-### 9.4 CI posture (advisory)
+### 9.4 Local debug vs committed suite
 
-- Live e2e are **opt-in** via `-tags=e2e` and a running stack; unit tests remain the default offline gate.  
-- CI jobs that run e2e SHOULD surface `precondition:` / `CONFIRMED BUG` / `harness:` as distinct failure classes.  
-- Parallelism: start conservative (`-parallel 2`); raise only with isolation confidence.
+- **Scratch / agent exploratory tests** MUST go under **`e2e/local/`** (gitignored except `local/README.md`). NEVER commit throwaways.  
+- When a scratch scenario becomes a real regression, **move** it into `e2e/suites/` (or `suites/issues/`) in the same PR as the fix.  
+- Day-to-day debugging SHOULD prefer live e2e over ad-hoc GM spam when the stack is up (`e2e/README.md`).  
+- CI is opt-in (`-tags=e2e` + workflow); see `.github/workflows/e2e-live.yml` only when changing CI — not required reading for authoring tests.
 
 ---
 

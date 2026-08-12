@@ -9,7 +9,7 @@ COUNT    ?= 1
 
 GOTEST = $(GO) test -tags=$(TAGS) -count=$(COUNT) -timeout $(TIMEOUT)
 
-.PHONY: e2e-smoke e2e-category e2e-sub e2e-issue e2e-tags e2e-full e2e-list e2e-mod
+.PHONY: e2e-smoke e2e-category e2e-sub e2e-issue e2e-tags e2e-full e2e-list e2e-local e2e-mod
 
 e2e-mod:
 	$(GO) mod tidy
@@ -36,6 +36,10 @@ e2e-issue:
 e2e-tags:
 	@test -n "$(TAGS_FILTER)" || (echo "usage: make e2e-tags TAGS_FILTER=smoke,short"; exit 1)
 	E2E_TAGS=$(TAGS_FILTER) $(GOTEST) -v -parallel $(PARALLEL) ./...
+
+# Scratch/debug packages under local/ (gitignored). Does not run smoke/suites.
+e2e-local:
+	$(GOTEST) -v -parallel 1 ./local/...
 
 e2e-full:
 	$(GOTEST) -v -parallel $(PARALLEL) -timeout 120m ./...
