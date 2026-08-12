@@ -31,10 +31,10 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 	leader.SetLootMethod(t, client.LootMethodNeedBeforeGreed, 0, e2eharness.LootThresholdUncommon)
 	leader.WaitLootMethod(t, client.LootMethodNeedBeforeGreed, 10*time.Second)
 
-	guid := leader.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
+	// Mate ready on pad before kill so both are in range for group loot rolls.
 	mate.CombatReady(t)
-	mate.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	leader.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	guid := leader.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
+	// Do not re-teleport after kill — stay on the corpse (tele can drop client loot state).
 
 	leader.World.ClearActiveLootRolls()
 	mate.World.ClearActiveLootRolls()
@@ -115,12 +115,10 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	leader.GM(t, ".gobject add 194821")
 	_ = e2eharness.TryNearbyGameObjectByEntry(t, leader.World, 194821, 5*time.Second)
 
-	guid := leader.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
+	// Party already at pad; combat-ready members before kill, open loot without re-tele.
 	leaver.CombatReady(t)
 	stayer.CombatReady(t)
-	leaver.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	stayer.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	leader.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	guid := leader.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
 
 	waitRoll, cancelRoll := leader.ArmLootStartRoll()
 	t.Cleanup(cancelRoll)
@@ -178,10 +176,8 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	leader.SetLootMethod(t, client.LootMethodGroupLoot, 0, e2eharness.LootThresholdUncommon)
 	leader.WaitLootMethod(t, client.LootMethodGroupLoot, 10*time.Second)
 
-	guid := leader.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
 	mate.CombatReady(t)
-	mate.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	leader.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	guid := leader.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
 
 	waitRoll, cancelRoll := leader.ArmLootStartRoll()
 	t.Cleanup(cancelRoll)
@@ -226,8 +222,16 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	// Persistent spawn for a lootable corpse — always clean up (.npc add temp removes corpse instantly).
+	bot.DespawnNearbyEntry(t, creatureBoar, 80)
+	bot.GM(t, ".gm on")
 	bot.GM(t, ".npc add 3098")
 	guid := bot.WaitUnit(t, creatureBoar, 15*time.Second)
+	if guid == 0 {
+		e2eharness.Preconditionf(t, "#26862: boar not found after .npc add")
+		return
+	}
+	t.Cleanup(func() { bot.DespawnNPC(t, guid) })
 	bot.GM(t, ".npc set level 80")
 
 	bot.WaitUnitHPKnown(t, guid, 10*time.Second)
@@ -269,10 +273,8 @@ func TestLoot_MasterLootAssign(t *testing.T) {
 	master.SetLootMethod(t, client.LootMethodMasterLoot, master.GUID, e2eharness.LootThresholdUncommon)
 	master.WaitLootMethod(t, client.LootMethodMasterLoot, 10*time.Second)
 
-	guid := master.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
 	member.CombatReady(t)
-	member.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	master.TeleportPad(t, e2eharness.PadStormwindOutskirts)
+	guid := master.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
 
 	items, ok := master.TryOpenLoot(t, guid, 8*time.Second)
 	if !ok || len(items) == 0 {
