@@ -15,7 +15,8 @@ import (
 
 // GRP-01: FormParty → both InGroup, leader flag.
 func TestGroup_FormPartyBasic(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot"}, Runtime: "short", Category: "social/group"})
+	// serial: SW pad thrash + concurrent party tests can drop invites under load.
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot", "serial"}, Runtime: "short", Category: "social/group"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
 		Prefix: "GrpForm",
@@ -35,7 +36,7 @@ func TestGroup_FormPartyBasic(t *testing.T) {
 
 // GRP-02: leave group clears membership.
 func TestGroup_LeaveClearsMembership(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot"}, Runtime: "short", Category: "social/group"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot", "serial"}, Runtime: "short", Category: "social/group"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpLeave", Count: 2, Level: 20})
 	leader, mate := bots[0], bots[1]
@@ -53,7 +54,7 @@ func TestGroup_LeaveClearsMembership(t *testing.T) {
 
 // GRP-03: transfer leader.
 func TestGroup_SetLeaderTransfer(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot"}, Runtime: "short", Category: "social/group"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot", "serial"}, Runtime: "short", Category: "social/group"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpLead", Count: 2, Level: 20})
 	a, b := bots[0], bots[1]
@@ -69,7 +70,7 @@ func TestGroup_SetLeaderTransfer(t *testing.T) {
 // GRP-04 / #23459 style: rapid invite/decline loops must not crash world.
 func TestGroup_RapidInviteDeclineNoCrash(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"med", "social", "multi_bot", "issue"},
+		Tags:     []string{"med", "social", "multi_bot", "serial", "issue"},
 		Runtime:  "med",
 		Issue:    23459,
 		Category: "social/group",
@@ -100,7 +101,7 @@ func TestGroup_RapidInviteDeclineNoCrash(t *testing.T) {
 
 // GRP-05: set loot method NeedBeforeGreed.
 func TestGroup_SetLootMethodNBG(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "loot", "multi_bot"}, Runtime: "short", Category: "social/group"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "loot", "multi_bot", "serial"}, Runtime: "short", Category: "social/group"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpLoot", Count: 2, Level: 20})
 	leader, mate := bots[0], bots[1]
@@ -115,7 +116,7 @@ func TestGroup_SetLootMethodNBG(t *testing.T) {
 
 // GRP-06: disband party.
 func TestGroup_DisbandParty(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot"}, Runtime: "short", Category: "social/group"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot", "serial"}, Runtime: "short", Category: "social/group"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpDis", Count: 2, Level: 20})
 	leader, mate := bots[0], bots[1]
