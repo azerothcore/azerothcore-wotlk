@@ -49,13 +49,26 @@ func TestThreat_TauntSwitchesTarget(t *testing.T) {
 	})
 	tank := e2eharness.ByRole(t, bots, "tank")
 	dps := e2eharness.ByRole(t, bots, "dps")
-	e2eharness.TeleportAll(t, bots,
-		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
-		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+	pad := e2eharness.PadStormwindOutskirts
+	e2eharness.TeleportAll(t, bots, pad.X, pad.Y, pad.Z, pad.Map)
+	// Pad thrash: combatstop both and clear leftover dummies before spawn.
+	for _, b := range bots {
+		b.GM(t, ".combatstop")
+		b.GM(t, ".cheat god on")
+	}
+	tank.DespawnNearbyEntry(t, pullTarget, 80)
 	// High-HP dummy so dps Engage does not oneshot before combat flag.
-	// Spawn is observed on tank's cache first — wait until dps also sees the GUID.
+	// Spawn is observed on tank's cache first; re-tele dps for AOI create, then wait GUID.
 	dummy := tank.Spawn(t, pullTarget, 15*time.Second)
-	dps.WaitUnitGUID(t, dummy, 15*time.Second)
+	tx, ty, tz, tm := tank.Pos()
+	dps.Teleport(t, tx, ty, tz, tm)
+	if dps.World.GetObject(dummy) == nil {
+		// Fallback: entry-based wait if exact GUID create was dropped under thrash.
+		seen := dps.WaitUnit(t, pullTarget, 15*time.Second)
+		if seen != 0 {
+			dummy = seen
+		}
+	}
 	dps.CombatReady(t)
 	tank.CombatReady(t)
 	dps.Engage(t, dummy, 15*time.Second)
