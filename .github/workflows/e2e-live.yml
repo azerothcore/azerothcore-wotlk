@@ -1,12 +1,11 @@
-# On-demand live e2e: native stack like dashboard-ci, plus client data + go test.
+# On-demand live e2e: native stack setup like dashboard-ci, then go test.
 #
-# stack=native (default) — same family as dashboard-ci:
+# stack=native (default) — same *setup* family as dashboard-ci (not -dry-run):
 #   MySQL service → acore.sh init (compile + DB + client-data download)
-#   → worldserver/authserver -dry-run (DB updater gate)
 #   → pm2 sm start auth + world
 #   → go test -tags=e2e against 127.0.0.1
 #
-# stack=docker — root docker-compose.yml (pull/build images) [optional]
+# stack=docker — root docker-compose.yml [optional]
 # stack=external — secrets / self-hosted only
 #
 # Triggers: label `run-e2e` (smoke) | workflow_dispatch
@@ -250,23 +249,8 @@ jobs:
           sudo npm install -g pm2
         timeout-minutes: 180
 
-      - name: Dry-run auth + world (DB updater gate)
-        if: needs.preflight.outputs.stack == 'native'
-        run: |
-          set -euo pipefail
-          source ./acore.sh config load
-          cd env/dist/bin
-          timeout 10m ./authserver -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
-          status=${PIPESTATUS[0]}; [ "$status" -eq 0 ] || exit "$status"
-          if grep -qE "Applying of file .+ failed!" "$RUNNER_TEMP/authserver-dry-run.log"; then
-            echo "::error::authserver dry-run SQL failure"; exit 1
-          fi
-          timeout 15m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/worldserver-dry-run.log"
-          status=${PIPESTATUS[0]}; [ "$status" -eq 0 ] || exit "$status"
-          if grep -qE "Applying of file .+ failed!" "$RUNNER_TEMP/worldserver-dry-run.log"; then
-            echo "::error::worldserver dry-run SQL failure"; exit 1
-          fi
-        timeout-minutes: 30
+      # No -dry-run: e2e needs a real listening auth/world. Setup is "like" dashboard-ci
+      # (init + client-data + sm start), not the dry-run gate used only for SQL CI.
 
       - name: Start authserver + worldserver (pm2 service manager)
         if: needs.preflight.outputs.stack == 'native'

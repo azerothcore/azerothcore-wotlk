@@ -322,19 +322,19 @@ Live e2e is **opt-in** (label / manual dispatch). Workflow:
 
 | Mode | What CI starts | What tests connect to |
 |------|----------------|------------------------|
-| **`native` (default)** | Like [dashboard-ci](../.github/workflows/dashboard-ci.yml): MySQL service → **`./acore.sh init`** (compile + DB + **client-data download**) → **`authserver`/`worldserver -dry-run`** → **pm2** start | **`127.0.0.1:3724` / `:8085`**, DSN **`acore:acore@tcp(127.0.0.1:3306)/acore_*`** |
+| **`native` (default)** | Same *setup* as [dashboard-ci](../.github/workflows/dashboard-ci.yml): MySQL → **`./acore.sh init`** (compile + DB + **client-data download**) → **pm2** start auth/world (live, not `-dry-run`) | **`127.0.0.1:3724` / `:8085`**, DSN **`acore:acore@tcp(127.0.0.1:3306)/acore_*`** |
 | **`docker`** | Root [`docker-compose.yml`](../docker-compose.yml) (pull/build + up) | **`127.0.0.1`**, MySQL **`root:password@…`** |
 | **`external`** | Nothing | Secrets / self-hosted `E2E_*` |
 
-#### Native path (default — “dry-run + data + live”)
+#### Native path (default)
 
 1. GitHub **MySQL 8.4** service (`MYSQL_ROOT_PASSWORD=root`).
-2. **`./acore.sh init`** — deps, compile this tree, create/import DBs, and **`inst_download_client_data`** (downloads `data.zip` from [wowgaming/client-data](https://github.com/wowgaming/client-data) into the data dir).  
-   Dry-run alone does **not** download data; init does.
-3. **`./authserver -dry-run`** / **`./worldserver -dry-run`** — same DB-updater gate as dashboard-ci.
-4. **`acore.sh sm start`** auth + world (pm2), wait uptime.
-5. Point realmlist at `127.0.0.1`, export `E2E_*`, run `go test -tags=e2e`.
-6. Stop/delete sm services.
+2. **`./acore.sh init`** — deps, compile this tree, create/import DBs, and **`inst_download_client_data`** (`data.zip` from [wowgaming/client-data](https://github.com/wowgaming/client-data)).
+3. **`acore.sh sm start`** auth + world (pm2), wait uptime — real listening servers for the harness.
+4. Point realmlist at `127.0.0.1`, export `E2E_*`, run `go test -tags=e2e`.
+5. Stop/delete sm services.
+
+We do **not** run `authserver`/`worldserver -dry-run` for e2e (that only gates SQL and exits; no live ports). Setup is “like dashboard-ci’s install + start,” not the dry-run step.
 
 Bot accounts: harness writes **auth DB** (SRP6). No worldserver console required.
 
