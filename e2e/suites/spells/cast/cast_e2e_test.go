@@ -88,6 +88,8 @@ func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
 	dk.AddItem(t, e2eharness.ItemCorpseDust, 5)
 	dk.CombatReady(t)
 	_, _ = dk.TryCast(t, e2eharness.SpellRaiseDead, 0, 10*time.Second)
+	// Dismiss Risen Ghoul (26125) so it does not leak on the pad after the test.
+	dk.CleanupOwnedSummons(t)
 	// Critical: world still responds.
 	e2eharness.ProbeWorldAlive(t, dk, 27061)
 	t.Logf("PASS Raise Dead near corpse did not crash world")

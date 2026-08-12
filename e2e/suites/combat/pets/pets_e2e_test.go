@@ -65,6 +65,7 @@ func TestPets_PlayerPetGUIDAfterSummon(t *testing.T) {
 	if pet == 0 {
 		e2eharness.Preconditionf(t, "no pet after WaitPlayerPet")
 	}
+	bot.CleanupOwnedSummons(t)
 	t.Logf("PASS pet=0x%X field_summon=0x%X", pet, bot.PlayerPetGUID())
 }
 
@@ -89,6 +90,12 @@ func TestPets_DKRaiseDeadOpenWorld(t *testing.T) {
 	bot.CombatReady(t)
 	res := bot.Cast(t, e2eharness.SpellRaiseDead, 0, 15*time.Second)
 	bot.AssertWorldAlive(t)
+	// Explicit dismiss in addition to NewScenario CleanupOwnedSummons (risen ghoul 26125).
+	if pet := bot.PlayerPetGUID(); pet != 0 {
+		bot.DismissPet(t, pet)
+		bot.WaitNoPlayerPet(t, 8*time.Second)
+	}
+	bot.CleanupOwnedSummons(t)
 	// Pet may appear; if cast failed due to reagents/CD still require no crash.
 	t.Logf("PASS Raise Dead open world success=%v pet=0x%X", res.Success, bot.PlayerPetGUID())
 }
@@ -113,6 +120,7 @@ func TestPets_PetAttackCommand(t *testing.T) {
 	// CombatReady again after GM spawn path.
 	bot.CombatReady(t)
 	bot.PetAttack(t, dummy)
+	bot.CleanupOwnedSummons(t)
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS pet attack command pet=0x%X", pet)
 }
