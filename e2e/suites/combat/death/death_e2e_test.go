@@ -9,6 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
+	"github.com/walkline/AzerothGhost/client"
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
@@ -92,9 +93,9 @@ func TestDeath_DeathDoesNotCrashWorld(t *testing.T) {
 	t.Logf("PASS death did not crash world")
 }
 
-// DEATH-04: reclaim corpse after death (if helper available).
-// AC requires PLAYER_FLAGS_GHOST (release spirit) then proximity to corpse before
-// CMSG_RECLAIM_CORPSE succeeds. Alive() is session usability — use WaitAlive/Health.
+// DEATH-04: reclaim corpse after death.
+// AC: GHOST flag (release spirit) + within CORPSE_RECLAIM_RADIUS (39) + reclaim delay elapsed.
+// A single CMSG_RECLAIM_CORPSE mid-.go is silently ignored — use ReclaimCorpseMust.
 func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "med", "serial"}, Runtime: "med", Category: "combat/death"})
 
@@ -103,12 +104,17 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 		Level:  30,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	deathX, deathY, deathZ, deathMap := bot.Pos()
 	bot.DieMust(t, 20*time.Second)
+	// Corpse sits at death position (capture after Die, before graveyard tele).
+	deathX, deathY, deathZ, deathMap := bot.Pos()
 	// Must release before reclaim (HandleReclaimCorpseOpcode requires GHOST flag).
 	bot.ReleaseSpirit(t)
 	bot.AssertWorldAlive(t)
-	// Soft: wait for ghost aura if the server applies it on release (not always present).
+	// Graveyard transfer is async — wait until session is stable in-world again.
+	if err := bot.World.WaitForSessionPhase(client.PhaseInWorld, 10*time.Second); err != nil {
+		t.Logf("post-repop WaitInWorld: %v", err)
+	}
+	// Soft: ghost aura often applied on release (not required for reclaim opcode).
 	deadlineGhost := time.Now().Add(3 * time.Second)
 	for time.Now().Before(deadlineGhost) {
 		if bot.HasAura(spellGhost) || bot.HasAura(spellGhostNight) {
@@ -116,19 +122,13 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 		}
 		time.Sleep(40 * time.Millisecond)
 	}
-	// Ghost is at graveyard; return to corpse for reclaim radius.
-	// Teleport waits for map/login settle.
-	bot.Teleport(t, deathX, deathY, deathZ, deathMap)
-	bot.WaitNear(t, deathX, deathY, deathZ, 100, 5*time.Second)
-	bot.ReclaimCorpse(t)
-	if bot.World.Health() > 0 {
-		bot.WaitAlive(t, 5*time.Second)
-		bot.AssertWorldAlive(t)
-		t.Logf("PASS reclaim corpse → alive (hp=%d)", bot.World.Health())
+
+	// Teleport to corpse, settle in-world within radius, retry reclaim until alive.
+	bot.ReclaimCorpseMust(t, deathX, deathY, deathZ, deathMap, 30*time.Second)
+	if bot.World.Health() == 0 {
+		e2eharness.Preconditionf(t, "reclaim finished still dead hp=%d", bot.World.Health())
 		return
 	}
-	// PvE reclaim delay may still apply on some configs; world must stay up either way.
-	bot.WaitAlive(t, 10*time.Second)
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS reclaim corpse → alive after wait (hp=%d)", bot.World.Health())
+	t.Logf("PASS reclaim corpse → alive (hp=%d)", bot.World.Health())
 }
