@@ -302,3 +302,83 @@ A test that fails intermittently on a **correct** core is a test/harness bug unt
 ## Policy (when to add e2e)
 
 Use `.agents/docs/e2e-policy.md` for decision trees (e2e vs unit, mandatory triggers, MVT). This README is **how to run and structure** the suite; the harness guides are **how to author** scenarios.
+
+---
+
+## On-demand e2e CI
+
+Live e2e is **opt-in**. It does **not** run on every PR (needs a running
+auth + world + MySQL stack and is too heavy for default CI).
+
+Workflow: [`.github/workflows/e2e-live.yml`](../.github/workflows/e2e-live.yml)
+(`e2e-live`).
+
+### How to trigger
+
+| Trigger | Scope | When to use |
+|---------|--------|-------------|
+| Add GitHub label **`run-e2e`** on a non-draft PR | **smoke** (`./smoke/` + `E2E_TAGS=smoke ./suites/...`) | Quick live gate after a risky change |
+| Keep label + push more commits (`synchronize`) | same smoke scope | Re-check while iterating |
+| Actions → **e2e-live** → **Run workflow** | `scope=smoke` or `full` + optional `packages` / `count` / `timeout` / `parallel` / `tags_filter` | Manual full army or package filter |
+
+Remove the `run-e2e` label to stop re-running on later pushes.
+
+Label naming matches existing opt-in builds (`run-build` for docker/tools/macos/windows).
+
+### Secrets and runners
+
+The workflow **soft-skips** (job succeeds with a notice) when connection secrets
+are missing — so default PR CI stays green on forks and on the main repo before
+infra is wired.
+
+| Name | Kind | Purpose |
+|------|------|---------|
+| `E2E_AUTH_ADDR` | secret | Auth listen address (`host:3724`) |
+| `E2E_AUTH_DSN` | secret | MySQL DSN for `acore_auth` |
+| `E2E_CHAR_DSN` | secret | MySQL DSN for `acore_characters` |
+| `E2E_WORLD_DSN` | secret | MySQL DSN for `acore_world` |
+| `E2E_FORCE_RUN` | variable (`1`) | Run without the four secrets; runner must already export `E2E_*` |
+| `E2E_RUNS_ON` | variable | Runner label (default `ubuntu-latest`; use a self-hosted label when the stack is local to that runner) |
+| `E2E_HARNESS_REF` | variable | Default AzerothGhost git ref |
+| `E2E_HARNESS_TOKEN` | secret | PAT if `walkline/AzerothGhost` is private |
+
+Local DSN examples: [`.env.example`](./.env.example).
+
+**GH-hosted runners** do not start AzerothCore for you. Point secrets at a
+**reachable dedicated test realm**, or use a **self-hosted** runner that already
+runs auth/world/MySQL and set `E2E_RUNS_ON` + either secrets or `E2E_FORCE_RUN=1`.
+
+Do not share a human-played realm with CI.
+
+### Command shape (what CI runs)
+
+```bash
+# smoke (label run-e2e, or dispatch scope=smoke)
+go test -tags=e2e ./smoke/ -count=1 -timeout 60m -parallel 1 -v
+E2E_TAGS=smoke go test -tags=e2e ./suites/... -count=1 -timeout 60m -parallel 1 -v
+
+# full / custom (workflow_dispatch)
+go test -tags=e2e <packages> -count=<n> -timeout <t> -parallel <p> -v
+```
+
+CI checks out `walkline/AzerothGhost` beside the tree and `go mod edit -replace`s
+it (equivalent of local `go.work`; see Prerequisites).
+
+### Failure classes (greppable)
+
+| Prefix | Meaning |
+|--------|---------|
+| `precondition:` | Setup never reached a judgeable state |
+| `AC#N CONFIRMED BUG:` | Core wrong for tracked issue N |
+| `harness:` | Infra / timeout / SQL / cache |
+| `WARNING:` | Soft deviation |
+
+### CI follow-ups
+
+1. Pin `github.com/walkline/AzerothGhost` to a **pseudo-version or tag** in
+   `e2e/go.mod` / `go.sum` so CI can eventually drop the path-replace once the
+   harness is on the module proxy (the workflow already falls back to checkout).
+2. Optional nightly schedule once a dedicated realm and runner exist (not
+   enabled by default).
+3. Create the **`run-e2e`** label in the GitHub UI (description e.g.
+   “Run live-stack e2e workflow”).
