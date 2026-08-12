@@ -21,14 +21,7 @@ func summonWarlockPet(t *testing.T, bot *e2eharness.ScenarioBot) uint64 {
 	bot.CombatStop(t)
 	bot.Learn(t, spellSummonImp)
 	_ = bot.CastOrGM(t, spellSummonImp, 0, 20*time.Second)
-	// Soft poll: GM cast may need a moment to create the minion object.
-	deadline := time.Now().Add(8 * time.Second)
-	for time.Now().Before(deadline) {
-		if g := bot.PlayerPetGUID(); g != 0 {
-			return g
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
+	// WaitPlayerPet covers UNIT_FIELD_SUMMON and SUMMONEDBY/CREATEDBY fallback.
 	return bot.WaitPlayerPet(t, 25*time.Second)
 }
 

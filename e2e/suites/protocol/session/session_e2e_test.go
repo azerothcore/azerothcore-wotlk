@@ -4,7 +4,6 @@ package session_test
 
 import (
 	"testing"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -56,7 +55,6 @@ func TestSession_MoneyMutateSaveRelog(t *testing.T) {
 	e2eharness.ModMoney(t, bot.World, 12345)
 	bot.Save(t)
 	bot.Relog(t)
-	time.Sleep(500 * time.Millisecond)
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS money mutate + save + relog")
 }
@@ -93,7 +91,7 @@ func TestSession_GMVisibilitySurvivesRelog(t *testing.T) {
 
 	guid := bot.GUID
 	bot.Relog(t)
-	time.Sleep(500 * time.Millisecond)
+	bot.AssertWorldAlive(t)
 
 	queryGUID := bot.GUID
 	if queryGUID == 0 {
@@ -132,7 +130,6 @@ func TestSession_HardDropWorldStaysAlive(t *testing.T) {
 	})
 	// Hard close without graceful logout path.
 	victim.HardDisconnect(t)
-	time.Sleep(300 * time.Millisecond)
-	probe.AssertWorldAlive(t)
+	e2eharness.ProbeWorldAlive(t, probe, 0)
 	t.Logf("PASS hard drop did not kill world (probe OK)")
 }

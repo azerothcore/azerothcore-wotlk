@@ -66,7 +66,6 @@ func TestAura_MidAuraRelogWorldAlive(t *testing.T) {
 	bot.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	bot.Save(t)
 	bot.Relog(t)
-	time.Sleep(500 * time.Millisecond)
 	bot.AssertWorldAlive(t)
 	// Aura may or may not persist depending on aura type; world alive is hard assert.
 	t.Logf("PASS mid-aura relog world alive has_aura=%v", bot.HasAura(e2eharness.SpellBlendingInAura))

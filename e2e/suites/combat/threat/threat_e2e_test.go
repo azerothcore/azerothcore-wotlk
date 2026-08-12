@@ -123,12 +123,20 @@ func TestThreat_WaitUnitTargetHelper(t *testing.T) {
 	dummy := bot.Spawn(t, pullTarget, 15*time.Second)
 	bot.CombatReady(t)
 	bot.Attack(t, dummy)
-	// Dummy may not set player as target (training dummy). Soft assert via helper if it does.
-	// Use AssertUnitTarget only when target matches; else log.
-	time.Sleep(500 * time.Millisecond)
-	tgt := bot.UnitTarget(dummy)
-	if tgt == bot.GUID {
-		bot.AssertUnitTarget(t, dummy, bot.GUID)
+	// Dummy may not set player as target (training dummy). Soft: poll briefly for target
+	// without fixed settle sleep; assert only if observed.
+	deadline := time.Now().Add(3 * time.Second)
+	var tgt uint64
+	for time.Now().Before(deadline) {
+		tgt = bot.UnitTarget(dummy)
+		if tgt == bot.GUID {
+			bot.AssertUnitTarget(t, dummy, bot.GUID)
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
+	if tgt == 0 {
+		tgt = bot.UnitTarget(dummy)
 	}
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS WaitUnitTarget path target=0x%X", tgt)

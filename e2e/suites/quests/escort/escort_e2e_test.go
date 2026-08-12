@@ -69,11 +69,8 @@ func TestEscort_LogoutNearUnitWorldAlive(t *testing.T) {
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscLg", Level: 80})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	_ = bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	if bot.Session != nil {
-		bot.Session.Close()
-	}
-	time.Sleep(300 * time.Millisecond)
-	probe.AssertWorldAlive(t)
+	bot.HardDisconnect(t)
+	e2eharness.ProbeWorldAlive(t, probe, 0)
 	t.Logf("PASS logout near unit world alive")
 }
 

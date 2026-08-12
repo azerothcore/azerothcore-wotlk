@@ -49,8 +49,7 @@ func killLootCorpse(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32) uin
 	bot.WaitUnitDead(t, guid, 15*time.Second)
 	// Loot as non-GM player (still account-GM for .damage if needed later).
 	bot.CombatReady(t)
-	// Brief settle — dynflags / corpse creation.
-	time.Sleep(400 * time.Millisecond)
+	// WaitUnitLootable polls dynflags / corpse creation — no fixed settle sleep.
 	bot.WaitUnitLootable(t, guid, 15*time.Second)
 	return guid
 }
@@ -172,11 +171,11 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 	if won.WinnerGUID != leader.GUID && won.WinnerGUID != mate.GUID {
 		e2eharness.Preconditionf(t, "unexpected winner 0x%X", won.WinnerGUID)
 	}
-	time.Sleep(500 * time.Millisecond)
 	winner := leader
 	if won.WinnerGUID == mate.GUID {
 		winner = mate
 	}
+	// InventoryCount saves then queries CharDB (post WaitLootRollWon).
 	n := winner.InventoryCount(t, roll.ItemID)
 	t.Logf("PASS need/greed roll item=%d winner=0x%X bag_count=%d", roll.ItemID, won.WinnerGUID, n)
 	leader.AssertWorldAlive(t)
@@ -205,7 +204,8 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 
 	// Issue cites GO 194821; spawn for future GO-use helpers. Corpse path is the active repro.
 	leader.GM(t, ".gobject add 194821")
-	time.Sleep(400 * time.Millisecond)
+	// Soft: wait for GO if cache tracks it; do not fail the mid-roll corpse path.
+	_ = e2eharness.TryNearbyGameObjectByEntry(t, leader.World, 194821, 5*time.Second)
 
 	const creatureBoar = 3098
 	guid := killLootCorpse(t, leader, creatureBoar)
@@ -340,17 +340,19 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	const creatureBoar = 3098
 	bot.GM(t, ".npc add 3098")
-	time.Sleep(500 * time.Millisecond)
 	guid := bot.WaitUnit(t, creatureBoar, 15*time.Second)
 	bot.GM(t, ".npc set level 80")
-	time.Sleep(200 * time.Millisecond)
 
-	hp, max := bot.UnitHP(guid)
-	if max == 0 {
-		// Force values via damage observation after a ping damage
-		bot.Damage(t, guid, 1)
-		time.Sleep(200 * time.Millisecond)
+	// Poll for HP fields after level set / first damage probe.
+	var hp, max uint32
+	deadlineHP := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadlineHP) {
 		hp, max = bot.UnitHP(guid)
+		if max > 0 {
+			break
+		}
+		bot.Damage(t, guid, 1)
+		time.Sleep(50 * time.Millisecond)
 	}
 	if max == 0 {
 		e2eharness.Preconditionf(t, "unit max HP still 0 after damage probe")
@@ -417,7 +419,7 @@ func TestLoot_MasterLootAssign(t *testing.T) {
 		return
 	}
 	master.MasterLootGive(t, guid, items[0].Index, member)
-	time.Sleep(500 * time.Millisecond)
+	// Soft inventory oracle after master assign (Save + CharDB).
 	n := member.InventoryCount(t, items[0].ItemID)
 	t.Logf("PASS master loot give entry=%d member_count=%d", items[0].ItemID, n)
 	master.AssertWorldAlive(t)

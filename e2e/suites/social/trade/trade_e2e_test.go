@@ -26,10 +26,12 @@ func tradePair(t *testing.T, prefix string) (a, b *e2eharness.ScenarioBot) {
 	})
 	a = e2eharness.ByRole(t, bots, "trader_a")
 	b = e2eharness.ByRole(t, bots, "trader_b")
-	e2eharness.TeleportAllPad(t, bots, e2eharness.PadStormwindOutskirts)
-	// Nudge B slightly so both share the pad but are distinct.
-	b.Teleport(t, e2eharness.PadStormwindOutskirts.X+2, e2eharness.PadStormwindOutskirts.Y,
-		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+	// Place both tightly (TRADE_DISTANCE) and combatstop — pad leftovers aggro trades.
+	pad := e2eharness.PadStormwindOutskirts
+	a.Teleport(t, pad.X, pad.Y, pad.Z, pad.Map)
+	b.Teleport(t, pad.X+1.5, pad.Y, pad.Z, pad.Map)
+	a.CombatStop(t)
+	b.CombatStop(t)
 	return a, b
 }
 
@@ -43,6 +45,9 @@ func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
 
 	a.SetMoney(t, 50_000)
 	b.SetMoney(t, 10_000)
+	// Ensure live coinage is visible before offering gold (SetMoney is soft on lag).
+	a.WaitPlayerMoney(t, 50_000, 10*time.Second)
+	b.WaitPlayerMoney(t, 10_000, 10*time.Second)
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 1)
 
 	aCount0 := a.InventoryCount(t, itemLinenCloth)
@@ -99,8 +104,8 @@ func TestTrade_CancelMidTradeRestores(t *testing.T) {
 	a.SetTradeGold(t, 1000)
 	a.CancelTrade(t)
 	_ = a.WaitTradeCancelled(t, 10*time.Second)
-	// B should also see cancel.
-	time.Sleep(200 * time.Millisecond)
+	// B should also observe cancel/close (no fixed settle sleep).
+	_ = b.WaitTradeCancelled(t, 10*time.Second)
 
 	aCount1 := a.InventoryCount(t, itemLinenCloth)
 	bCount1 := b.InventoryCount(t, itemLinenCloth)
@@ -130,9 +135,8 @@ func TestTrade_MoveOorMidTradeAborts(t *testing.T) {
 	a.SetTradeItem(t, 0, bag, slot)
 	// Tele far (cross-map) while trade open — server should drop trade.
 	a.Teleport(t, 3758.2554, 3689.5754, 47.241505, e2eharness.MapNorthrend)
-	// Far transfer often does not emit a clean cancel status; force cancel and
-	// assert inventory integrity + world alive (UAF crash surface).
-	time.Sleep(300 * time.Millisecond)
+	// Far transfer often does not emit a clean cancel status; force cancel if
+	// still open, then wait for terminal cancel (WaitTradeCancelled polls TradeOpen).
 	if a.World.TradeOpen() {
 		a.CancelTrade(t)
 	}

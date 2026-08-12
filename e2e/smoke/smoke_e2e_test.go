@@ -5,7 +5,6 @@ package smoke_test
 import (
 	"math"
 	"testing"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -85,7 +84,7 @@ func TestSmoke_RelogSameCharacterWorldAlive(t *testing.T) {
 	guidBefore := bot.GUID
 	bot.Save(t)
 	bot.Relog(t)
-	time.Sleep(500 * time.Millisecond)
+	// Relog already WaitForLogin; AssertWorldAlive probes the fresh session.
 	bot.AssertWorldAlive(t)
 	if bot.GUID != 0 && bot.GUID != guidBefore {
 		// Some relog paths keep GUID; if changed, still require alive session.

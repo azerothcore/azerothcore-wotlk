@@ -74,7 +74,6 @@ func TestDeath_ReleaseSpiritWorldAlive(t *testing.T) {
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	dieSelf(t, bot)
 	bot.ReleaseSpirit(t)
-	time.Sleep(300 * time.Millisecond)
 	bot.AssertWorldAlive(t)
 	x, y, z, m := bot.Pos()
 	t.Logf("PASS DieAndRepop world alive pos=(%.0f,%.0f,%.0f map=%d)", x, y, z, m)
@@ -92,7 +91,6 @@ func TestDeath_DieAndRepopCycle(t *testing.T) {
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	dieSelf(t, bot)
 	bot.ReleaseSpirit(t)
-	time.Sleep(300 * time.Millisecond)
 	bot.AssertWorldAlive(t)
 	bot.Save(t)
 	t.Logf("PASS die+repop cycle")
@@ -112,7 +110,6 @@ func TestDeath_DeathDoesNotCrashWorld(t *testing.T) {
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	dieSelf(t, bot)
 	bot.ReleaseSpirit(t)
-	time.Sleep(500 * time.Millisecond)
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS death did not crash world")
 }
@@ -133,10 +130,31 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 	dieSelf(t, bot)
 	// Must release before reclaim (HandleReclaimCorpseOpcode requires GHOST flag).
 	bot.ReleaseSpirit(t)
-	time.Sleep(400 * time.Millisecond)
+	bot.AssertWorldAlive(t)
+	// Soft: wait for ghost aura if the server applies it on release (not always present).
+	deadlineGhost := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadlineGhost) {
+		if bot.HasAura(spellGhost) || bot.HasAura(spellGhostNight) {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
 	// Ghost is at graveyard; return to corpse for reclaim radius.
+	// Teleport waits for map/login settle.
 	bot.Teleport(t, deathX, deathY, deathZ, deathMap)
-	time.Sleep(200 * time.Millisecond)
+	// Soft poll near corpse before reclaim (tele ACK can precede position cache).
+	deadlinePos := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadlinePos) {
+		x, y, _, m := bot.Pos()
+		if m == deathMap {
+			dx := x - deathX
+			dy := y - deathY
+			if dx*dx+dy*dy < 100*100 {
+				break
+			}
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
 	bot.ReclaimCorpse(t)
 	if bot.World.Health() > 0 {
 		bot.WaitAlive(t, 5*time.Second)
@@ -145,7 +163,7 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 		return
 	}
 	// PvE reclaim delay may still apply on some configs; world must stay up either way.
-	bot.WaitAlive(t, 8*time.Second)
+	bot.WaitAlive(t, 10*time.Second)
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS reclaim corpse → alive after wait (hp=%d)", bot.World.Health())
 }

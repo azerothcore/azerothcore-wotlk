@@ -65,16 +65,8 @@ func TestGroup_SetLeaderTransfer(t *testing.T) {
 		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
 	e2eharness.FormParty(t, a, b)
 	a.SetLeader(t, b)
-	// Wait for group list update reflecting new leader.
-	deadline := time.Now().Add(15 * time.Second)
-	for time.Now().Before(deadline) {
-		if b.IsGroupLeader() {
-			t.Logf("PASS set leader transfer")
-			return
-		}
-		time.Sleep(200 * time.Millisecond)
-	}
-	e2eharness.Preconditionf(t, "mate never became leader (a=%v b=%v)", a.IsGroupLeader(), b.IsGroupLeader())
+	b.WaitIsGroupLeader(t, 15*time.Second)
+	t.Logf("PASS set leader transfer")
 }
 
 // GRP-04 / #23459 style: rapid invite/decline loops must not crash world.
@@ -96,7 +88,8 @@ func TestGroup_RapidInviteDeclineNoCrash(t *testing.T) {
 		a.Invite(t, b)
 		_ = b.WaitGroupInvite(t, 5*time.Second)
 		b.DeclineGroup(t)
-		time.Sleep(200 * time.Millisecond)
+		// Decline must leave b out of party before the next invite.
+		b.WaitNotInGroup(t, 5*time.Second)
 	}
 	e2eharness.ProbeWorldAlive(t, a, 23459)
 	t.Logf("PASS rapid invite/decline no crash")

@@ -47,12 +47,8 @@ func TestCharm_LogoutWhileAuraWorldAlive(t *testing.T) {
 	victim.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	victim.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	victim.Save(t)
-	// Clean logout path via Relog of victim would re-enter; instead close after save.
-	if victim.Session != nil {
-		// Graceful-ish: Relog ends session then re-enters. For logout-while-charmed use Close after aura.
-		victim.Session.Close()
-	}
-	time.Sleep(500 * time.Millisecond)
+	// Clean logout path via Relog of victim would re-enter; instead hard-drop after save.
+	victim.HardDisconnect(t)
 	e2eharness.ProbeWorldAlive(t, probe, 25506)
 	t.Logf("PASS logout while aura world alive")
 }
@@ -70,10 +66,7 @@ func TestCharm_HardDropWhileAuraNoCrash(t *testing.T) {
 	probe := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "CharmHd", Level: 10})
 	victim := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "CharmHv", Level: 80})
 	victim.ApplyAura(t, e2eharness.SpellBlendingInAura)
-	if victim.Session != nil {
-		victim.Session.Close()
-	}
-	time.Sleep(300 * time.Millisecond)
+	victim.HardDisconnect(t)
 	e2eharness.ProbeWorldAlive(t, probe, 25506)
 	t.Logf("PASS hard drop while aura no crash")
 }
@@ -87,11 +80,8 @@ func TestCharm_MultiBotProbeAfterVictimLeave(t *testing.T) {
 	a, b := bots[0], bots[1]
 	a.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	a.LeaveGroup(t) // no-op if not grouped
-	if a.Session != nil {
-		a.Session.Close()
-	}
-	time.Sleep(300 * time.Millisecond)
-	b.AssertWorldAlive(t)
+	a.HardDisconnect(t)
+	e2eharness.ProbeWorldAlive(t, b, 0)
 	t.Logf("PASS multi-bot probe after victim leave")
 }
 
@@ -107,13 +97,22 @@ func TestCharm_CancelCastSafe(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	// Start rain of fire channel then cancel.
+	// Start rain of fire channel then cancel when channel is observed (or soft path).
 	x, y, z, _ := bot.Pos()
 	go func() {
 		_ = bot.CastAtPosition(t, e2eharness.SpellRainOfFire, x, y, z, 10*time.Second)
 	}()
-	time.Sleep(300 * time.Millisecond)
+	// Soft poll for channel (no fixed sleep); cancel either way. Oracle is world alive —
+	// pad combat noise can leave channel flag sticky or prevent channel entirely.
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		if bot.IsChanneling() {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
 	bot.CancelCast(t)
+	// Soft: do not require WaitNotChanneling (channel cancel can lag under aggro).
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS cancel cast path")
+	t.Logf("PASS cancel cast path channeling=%v", bot.IsChanneling())
 }
