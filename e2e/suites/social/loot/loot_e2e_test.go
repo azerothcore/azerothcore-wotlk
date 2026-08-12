@@ -63,9 +63,18 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 		return
 	}
 
+	// Arm outcome before votes (Arm → Roll → Wait). WaitLootRollWon alone can miss a fast resolve.
+	wonCh, _, cancelOut := leader.ArmLootRollOutcome(roll.ItemID)
+	t.Cleanup(cancelOut)
 	mate.RollGreed(t, roll)
 	leader.RollNeed(t, roll)
-	won := leader.WaitLootRollWon(t, roll.ItemID, 90*time.Second)
+	var won client.LootRollWon
+	select {
+	case won = <-wonCh:
+	case <-time.After(90 * time.Second):
+		e2eharness.Assertf(t, "LOOT_ROLL_WON not seen after Need/Greed item=%d", roll.ItemID)
+		return
+	}
 	if won.WinnerGUID != leader.GUID && won.WinnerGUID != mate.GUID {
 		e2eharness.Assertf(t, "unexpected winner 0x%X", won.WinnerGUID)
 	}
@@ -73,7 +82,7 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 	if won.WinnerGUID == mate.GUID {
 		winner = mate
 	}
-	// InventoryCount saves then queries CharDB (post WaitLootRollWon).
+	// InventoryCount saves then queries CharDB (post roll-won).
 	n := winner.InventoryCount(t, roll.ItemID)
 	t.Logf("PASS need/greed roll item=%d winner=0x%X bag_count=%d", roll.ItemID, won.WinnerGUID, n)
 	leader.AssertWorldAlive(t)
@@ -125,30 +134,17 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 		return
 	}
 
+	// Arm outcome before leave+vote so LOOT_ROLL_WON / ALL_PASSED cannot be missed.
+	wonCh, allCh, cancelOut := leader.ArmLootRollOutcome(roll.ItemID)
+	t.Cleanup(cancelOut)
 	leaver.LeaveGroup(t)
 	leaver.WaitNotInGroup(t, 15*time.Second)
 	leader.RollNeed(t, roll)
 
-	wonDone := make(chan client.LootRollWon, 1)
-	allPassed := make(chan client.LootAllPassed, 1)
-	cancelWon := leader.World.AddLootRollWonHook(func(r client.LootRollWon) {
-		select {
-		case wonDone <- r:
-		default:
-		}
-	})
-	cancelAll := leader.World.AddLootAllPassedHook(func(r client.LootAllPassed) {
-		select {
-		case allPassed <- r:
-		default:
-		}
-	})
-	defer cancelWon()
-	defer cancelAll()
 	select {
-	case w := <-wonDone:
+	case w := <-wonCh:
 		t.Logf("roll awarded winner=0x%X item=%d", w.WinnerGUID, w.ItemID)
-	case <-allPassed:
+	case <-allCh:
 		t.Logf("all passed")
 	case <-time.After(90 * time.Second):
 		e2eharness.ConfirmedBugf(t, 26894, "loot roll did not resolve after party leave mid-roll itemGUID=0x%X", roll.ItemGUID)
@@ -193,21 +189,17 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 		e2eharness.ProbeWorldAlive(t, leader, 22000)
 		return
 	}
+	// Fixture is judgeable once both bots pass — arm before votes; hard-fail if ALL_PASSED missing.
+	_, allCh, cancelOut := leader.ArmLootRollOutcome(roll.ItemID)
+	t.Cleanup(cancelOut)
 	leader.RollPass(t, roll)
 	mate.RollPass(t, roll)
-	passed := make(chan struct{}, 1)
-	cancelAll := leader.World.AddLootAllPassedHook(func(r client.LootAllPassed) {
-		select {
-		case passed <- struct{}{}:
-		default:
-		}
-	})
-	defer cancelAll()
 	select {
-	case <-passed:
+	case <-allCh:
 		t.Logf("PASS all-pass packet for item=%d", roll.ItemID)
 	case <-time.After(90 * time.Second):
-		e2eharness.SoftPass(t, "no_all_passed", "both passed rolls but ALL_PASSED not seen — corpse may stay lootable")
+		// Not SoftPass: both votes were cast; missing SMSG_LOOT_ALL_PASSED is a product/oracle fail.
+		e2eharness.Assertf(t, "LOOT_ALL_PASSED not seen after both pass item=%d itemGUID=0x%X", roll.ItemID, roll.ItemGUID)
 	}
 	e2eharness.ProbeWorldAlive(t, leader, 22000)
 }

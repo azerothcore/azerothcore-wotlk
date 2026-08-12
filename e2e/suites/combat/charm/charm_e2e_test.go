@@ -68,7 +68,7 @@ func TestCharm_HardDropWhileAuraNoCrash(t *testing.T) {
 
 // CHARM-04: multi-bot — one applies aura, other probes after victim leave.
 func TestCharm_MultiBotProbeAfterVictimLeave(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "combat", "multi_bot"}, Runtime: "med", Category: "combat/charm"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "combat", "multi_bot", "serial"}, Runtime: "med", Category: "combat/charm"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "CharmMb", Count: 2, Level: 80})
 	a, b := bots[0], bots[1]
