@@ -40,7 +40,8 @@ func TestEquip_AddItemWaitSlot(t *testing.T) {
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 	bag, slot := bot.AddItemWait(t, e2eharness.ItemTargetDummy, 1)
-	t.Logf("PASS AddItemWait bag=%d slot=%d", bag, slot)
+	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, 1)
+	t.Logf("PASS AddItemWait bag=%d slot=%d inventory>=1", bag, slot)
 }
 
 // EQUIP-03: multiple adds without crash.
@@ -92,7 +93,10 @@ func TestEquip_ItemSurvivesRelogPath(t *testing.T) {
 	})
 	bot.AddItem(t, e2eharness.ItemTargetDummy, 2)
 	bot.Save(t)
+	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, 2)
 	bot.Relog(t)
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS item seed + relog")
+	// Inventory should still be present after relog (CharDB / load path).
+	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, 2)
+	t.Logf("PASS item seed + relog inventory persists")
 }

@@ -47,9 +47,8 @@ func TestVehicles_HardDisconnectWorldAlive(t *testing.T) {
 
 	probe := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "VehPr", Level: 10})
 	vic := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "VehVc", Level: 80})
-	if vic.Session != nil {
-		vic.Session.Close()
-	}
+	// HardDisconnect: abrupt socket drop (no logout) — vehicle passenger safety baseline.
+	vic.HardDisconnect(t)
 	probe.AssertWorldAlive(t)
 	t.Logf("PASS hard disconnect world alive")
 }
