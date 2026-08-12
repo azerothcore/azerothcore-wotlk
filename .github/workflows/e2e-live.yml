@@ -288,7 +288,8 @@ jobs:
       - name: Apply DB schema (authserver + worldserver dry-run)
         if: needs.preflight.outputs.stack == 'native'
         run: |
-          set -euo pipefail
+          # No -u: acore.sh does [ -z "$WITH_ERRORS" ] which fails under nounset.
+          set -eo pipefail
           source ./acore.sh config load
           cd env/dist/bin
           timeout 10m ./authserver -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
