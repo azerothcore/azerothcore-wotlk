@@ -307,62 +307,52 @@ Use `.agents/docs/e2e-policy.md` for decision trees (e2e vs unit, mandatory trig
 
 ## On-demand e2e CI
 
-Live e2e is **opt-in**. It does **not** run on every PR (needs a running
-auth + world + MySQL stack and is too heavy for default CI).
-
-Workflow: [`.github/workflows/e2e-live.yml`](../.github/workflows/e2e-live.yml)
-(`e2e-live`).
+Live e2e is **opt-in** (label / manual dispatch). Workflow:
+[`.github/workflows/e2e-live.yml`](../.github/workflows/e2e-live.yml).
 
 ### How to trigger
 
-| Trigger | Scope | When to use |
-|---------|--------|-------------|
-| Add GitHub label **`run-e2e`** on a non-draft PR | **smoke** (`./smoke/` + `E2E_TAGS=smoke ./suites/...`) | Quick live gate after a risky change |
-| Keep label + push more commits (`synchronize`) | same smoke scope | Re-check while iterating |
-| Actions → **e2e-live** → **Run workflow** | `scope=smoke` or `full` + optional `packages` / `count` / `timeout` / `parallel` / `tags_filter` | Manual full army or package filter |
+| Trigger | What runs |
+|---------|-----------|
+| Label **`run-e2e`** on a non-draft PR | **Docker stack** + **smoke** e2e |
+| Keep label + push | Re-run same |
+| Actions → **e2e-live** → Run workflow | Choose `stack`, `scope`, packages, etc. |
 
-Remove the `run-e2e` label to stop re-running on later pushes.
+### Stack modes (`stack` input)
 
-Label naming matches existing opt-in builds (`run-build` for docker/tools/macos/windows).
+| Mode | What CI starts | What tests connect to |
+|------|----------------|------------------------|
+| **`docker` (default)** | Root [`docker-compose.yml`](../docker-compose.yml): `ac-database` → `ac-db-import` + `ac-client-data-init` → `ac-authserver` + `ac-worldserver` | Host **`127.0.0.1:3724`** / **`:8085`**, MySQL **`root:password@tcp(127.0.0.1:3306)/acore_*`** (compose defaults) |
+| **`external`** | Nothing | Secrets `E2E_AUTH_ADDR` / `E2E_*_DSN` (or self-hosted env + `E2E_FORCE_RUN=1`) |
 
-### Secrets and runners
+Docker path:
 
-The workflow **soft-skips** (job succeeds with a notice) when connection secrets
-are missing — so default PR CI stays green on forks and on the main repo before
-infra is wired.
+1. Prefer **pull** `acore/ac-wotlk-*` images (`DOCKER_IMAGE_TAG`, default `master`).
+2. Optional **`build_images=true`** (or pull failure) → `docker compose build` from the PR tree (slow).
+3. `docker compose up` + wait for ports 3306 / 3724 / 8085.
+4. `UPDATE realmlist SET address='127.0.0.1'` so the harness sees the world on the host.
+5. Export `E2E_*` to those localhost endpoints → `go test -tags=e2e`.
+6. `docker compose down -v` always.
 
-| Name | Kind | Purpose |
-|------|------|---------|
-| `E2E_AUTH_ADDR` | secret | Auth listen address (`host:3724`) |
-| `E2E_AUTH_DSN` | secret | MySQL DSN for `acore_auth` |
-| `E2E_CHAR_DSN` | secret | MySQL DSN for `acore_characters` |
-| `E2E_WORLD_DSN` | secret | MySQL DSN for `acore_world` |
-| `E2E_FORCE_RUN` | variable (`1`) | Run without the four secrets; runner must already export `E2E_*` |
-| `E2E_RUNS_ON` | variable | Runner label (default `ubuntu-latest`; use a self-hosted label when the stack is local to that runner) |
-| `E2E_HARNESS_REF` | variable | Default AzerothGhost git ref |
-| `E2E_HARNESS_TOKEN` | secret | PAT if `walkline/AzerothGhost` is private |
+Accounts/GM: harness creates bot accounts via **auth DB** (SRP6), not worldserver console.
 
-Local DSN examples: [`.env.example`](./.env.example).
+Same compose pieces as [Install with Docker](https://www.azerothcore.org/wiki/install-with-docker) / `apps/docker/`.
 
-**GH-hosted runners** do not start AzerothCore for you. Point secrets at a
-**reachable dedicated test realm**, or use a **self-hosted** runner that already
-runs auth/world/MySQL and set `E2E_RUNS_ON` + either secrets or `E2E_FORCE_RUN=1`.
+### Optional secrets (external stack only)
 
-Do not share a human-played realm with CI.
+| Name | Purpose |
+|------|---------|
+| `E2E_AUTH_ADDR` / `E2E_*_DSN` | Pre-existing realm |
+| `E2E_FORCE_RUN` / `E2E_RUNS_ON` | Self-hosted runner with stack already up |
+| `E2E_HARNESS_REF` / `E2E_HARNESS_TOKEN` | Private / non-default AzerothGhost |
 
-### Command shape (what CI runs)
+### Command shape
 
 ```bash
-# smoke (label run-e2e, or dispatch scope=smoke)
+# smoke (label run-e2e)
 go test -tags=e2e ./smoke/ -count=1 -timeout 60m -parallel 1 -v
 E2E_TAGS=smoke go test -tags=e2e ./suites/... -count=1 -timeout 60m -parallel 1 -v
-
-# full / custom (workflow_dispatch)
-go test -tags=e2e <packages> -count=<n> -timeout <t> -parallel <p> -v
 ```
-
-CI checks out `walkline/AzerothGhost` beside the tree and `go mod edit -replace`s
-it (equivalent of local `go.work`; see Prerequisites).
 
 ### Failure classes (greppable)
 

@@ -1,38 +1,18 @@
-# On-demand live-stack e2e (AzerothGhost harness).
+# On-demand live e2e with an in-workflow AzerothCore stack (Docker Compose).
 #
-# Does NOT run on every PR by default — live auth/world/MySQL is too heavy for
-# default CI and is not available on GH-hosted runners without extra setup.
+# Primary path (stack=docker, default):
+#   docker compose up → MySQL + db-import + client-data + authserver + worldserver
+#   then go test -tags=e2e against 127.0.0.1 (same compose as apps/docker + docker-compose.yml).
 #
-# How to trigger
-# --------------
-# 1) PR label: add `run-e2e` to a non-draft PR (also re-runs on synchronize
-#    while the label remains). Default scope is smoke-only.
-# 2) Actions → "e2e-live" → Run workflow (workflow_dispatch) with optional
-#    packages / count / timeout / parallel / tags_filter / harness_ref.
+# Alternate (stack=external):
+#   no containers; inject E2E_* secrets / self-hosted env (previous behaviour).
 #
-# Same pattern as `run-build` for docker/tools/macos/windows (see those ymls).
+# Triggers
+# --------
+# - Label `run-e2e` on a non-draft PR → smoke tests + docker stack
+# - workflow_dispatch → smoke|full, stack=docker|external, optional image build
 #
-# Secrets / vars (repo or org)
-# ----------------------------
-# Required to actually execute tests (otherwise soft-skip success):
-#   secrets.E2E_AUTH_ADDR   e.g. 127.0.0.1:3724 or host:3724 reachable from runner
-#   secrets.E2E_AUTH_DSN    MySQL DSN for acore_auth
-#   secrets.E2E_CHAR_DSN    MySQL DSN for acore_characters
-#   secrets.E2E_WORLD_DSN   MySQL DSN for acore_world
-#
-# Optional:
-#   vars.E2E_FORCE_RUN=1       run even without the four secrets (self-hosted
-#                              runner must already export E2E_* in its env)
-#   vars.E2E_RUNS_ON           runner label string (default ubuntu-latest).
-#                              Use a self-hosted label when the stack is local
-#                              to that runner, e.g. self-hosted
-#   vars.E2E_HARNESS_REF       default AzerothGhost git ref when input empty
-#   secrets.E2E_HARNESS_TOKEN  PAT if walkline/AzerothGhost is private
-#
-# Follow-ups: pin AzerothGhost in e2e/go.mod (pseudo-version) so CI need not
-# path-replace; document failure classes in e2e/README.md.
-#
-# Docs: e2e/README.md → "On-demand e2e CI"
+# Does NOT run on every PR by default.
 
 name: e2e-live
 
@@ -40,37 +20,52 @@ on:
   workflow_dispatch:
     inputs:
       packages:
-        description: >
-          Go package path(s) under e2e/ (relative, e.g. ./... ./smoke/...
-          ./suites/quests/...). Ignored when scope=smoke.
+        description: 'Go packages under e2e/ (when scope=full), e.g. ./... or ./suites/combat/threat/'
         required: false
         default: './...'
       scope:
-        description: 'smoke (fast gate) | full/custom (use packages input)'
+        description: 'smoke (fast) | full (packages input)'
         required: false
-        default: 'full'
+        default: 'smoke'
         type: choice
         options:
           - smoke
           - full
+      stack:
+        description: 'docker = compose stack in this job | external = use secrets/self-hosted env only'
+        required: false
+        default: 'docker'
+        type: choice
+        options:
+          - docker
+          - external
+      build_images:
+        description: 'docker only: build images from this tree (slow). false = pull acore/* from Docker Hub'
+        required: false
+        default: false
+        type: boolean
+      image_tag:
+        description: 'DOCKER_IMAGE_TAG when pulling (default master)'
+        required: false
+        default: 'master'
       count:
         description: 'go test -count'
         required: false
         default: '1'
       timeout:
-        description: 'go test -timeout (e.g. 30m, 60m)'
+        description: 'go test -timeout'
         required: false
         default: '60m'
       parallel:
-        description: 'go test -parallel (prefer 1–2 against one realm)'
+        description: 'go test -parallel (prefer 1)'
         required: false
         default: '1'
       tags_filter:
-        description: 'Optional E2E_TAGS filter (e.g. smoke,short)'
+        description: 'Optional E2E_TAGS filter'
         required: false
         default: ''
       harness_ref:
-        description: 'AzerothGhost git ref (branch/tag/SHA); empty = default branch or vars.E2E_HARNESS_REF'
+        description: 'AzerothGhost git ref (empty = default branch)'
         required: false
         default: ''
 
@@ -81,21 +76,24 @@ on:
       - reopened
 
 concurrency:
-  # One concurrency group per workflow + ref.
-  #
-  # - PRs use `refs/pull/<PR_NUMBER>/merge`, so new commits cancel older
-  #   in-progress runs for the same PR.
-  # - Branch / workflow_dispatch runs are isolated by ref.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
 
+env:
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  DOCKER_BUILDKIT: 1
+  # Compose defaults match docker-compose.yml (root password "password", ports 3724/8085/3306).
+  DOCKER_DB_ROOT_PASSWORD: password
+  DOCKER_AUTH_EXTERNAL_PORT: '3724'
+  DOCKER_WORLD_EXTERNAL_PORT: '8085'
+  DOCKER_DB_EXTERNAL_PORT: '3306'
+
 jobs:
   # ---------------------------------------------------------------------------
-  # preflight — decide whether a live run is possible; never hard-fail the repo
-  # when secrets / stack are missing (soft-skip instead).
+  # preflight — always allow docker mode; external mode needs secrets or FORCE
   # ---------------------------------------------------------------------------
   preflight:
     name: preflight
@@ -114,11 +112,13 @@ jobs:
       should_run: ${{ steps.check.outputs.should_run }}
       reason: ${{ steps.check.outputs.reason }}
       scope: ${{ steps.check.outputs.scope }}
+      stack: ${{ steps.check.outputs.stack }}
+      build_images: ${{ steps.check.outputs.build_images }}
+      image_tag: ${{ steps.check.outputs.image_tag }}
     steps:
-      - name: Evaluate secrets / opt-in
+      - name: Evaluate
         id: check
         env:
-          # Presence probe only — values are not printed.
           AUTH_ADDR: ${{ secrets.E2E_AUTH_ADDR }}
           AUTH_DSN: ${{ secrets.E2E_AUTH_DSN }}
           CHAR_DSN: ${{ secrets.E2E_CHAR_DSN }}
@@ -127,39 +127,54 @@ jobs:
         run: |
           set -euo pipefail
 
-          # PR label runs are smoke-only; dispatch uses the scope input.
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            scope="${{ github.event.inputs.scope || 'full' }}"
+            scope="${{ github.event.inputs.scope || 'smoke' }}"
+            stack="${{ github.event.inputs.stack || 'docker' }}"
+            build_images="${{ github.event.inputs.build_images || 'false' }}"
+            image_tag="${{ github.event.inputs.image_tag || 'master' }}"
           else
+            # Label runs: smoke + docker stack (no external secrets required).
             scope="smoke"
+            stack="docker"
+            build_images="false"
+            image_tag="master"
           fi
           echo "scope=${scope}" >> "$GITHUB_OUTPUT"
+          echo "stack=${stack}" >> "$GITHUB_OUTPUT"
+          echo "build_images=${build_images}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
 
-          if [[ -n "${FORCE:-}" && "${FORCE}" != "0" && "${FORCE}" != "false" ]]; then
+          if [[ "${stack}" == "docker" ]]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "reason=vars.E2E_FORCE_RUN set (assume runner-local E2E_* env / stack)" >> "$GITHUB_OUTPUT"
+            echo "reason=docker compose stack (in-workflow)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
+          # external stack
+          if [[ -n "${FORCE:-}" && "${FORCE}" != "0" && "${FORCE}" != "false" ]]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "reason=vars.E2E_FORCE_RUN (external / runner-local stack)" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           missing=()
           [[ -z "${AUTH_ADDR:-}" ]] && missing+=(E2E_AUTH_ADDR)
           [[ -z "${AUTH_DSN:-}"  ]] && missing+=(E2E_AUTH_DSN)
           [[ -z "${CHAR_DSN:-}"  ]] && missing+=(E2E_CHAR_DSN)
           [[ -z "${WORLD_DSN:-}" ]] && missing+=(E2E_WORLD_DSN)
-
           if ((${#missing[@]} > 0)); then
             echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "reason=missing secrets: ${missing[*]} — soft-skip (see e2e/README.md On-demand e2e CI)" >> "$GITHUB_OUTPUT"
+            echo "reason=stack=external but missing secrets: ${missing[*]}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
           echo "should_run=true" >> "$GITHUB_OUTPUT"
-          echo "reason=E2E_* secrets present" >> "$GITHUB_OUTPUT"
+          echo "reason=external stack secrets present" >> "$GITHUB_OUTPUT"
 
-      - name: Report preflight
+      - name: Report
         run: |
           echo "should_run=${{ steps.check.outputs.should_run }}"
+          echo "stack=${{ steps.check.outputs.stack }}"
           echo "scope=${{ steps.check.outputs.scope }}"
+          echo "build_images=${{ steps.check.outputs.build_images }}"
           echo "reason=${{ steps.check.outputs.reason }}"
 
   skip-notice:
@@ -172,40 +187,33 @@ jobs:
         run: |
           echo "::notice title=e2e-live soft-skipped::${{ needs.preflight.outputs.reason }}"
           cat <<'EOF'
-          Live e2e did not run (soft-skip = success, not a red X).
+          Live e2e did not run (soft-skip = success).
 
-          To enable:
-            1. Add repository/org secrets:
-                 E2E_AUTH_ADDR, E2E_AUTH_DSN, E2E_CHAR_DSN, E2E_WORLD_DSN
-               pointing at a dedicated test realm reachable from the runner, OR
-            2. Use a self-hosted runner with the stack already up and set:
-                 vars.E2E_FORCE_RUN=1
-                 vars.E2E_RUNS_ON=<your-runner-label>
-               (do not inject empty secrets — they would clobber runner env)
+          Default path is stack=docker (in-workflow compose) — no secrets required.
+          Use stack=external only when pointing at a pre-existing realm via E2E_* secrets.
 
-          Trigger again with label `run-e2e` or workflow_dispatch.
-          Docs: e2e/README.md → "On-demand e2e CI"
+          Docs: e2e/README.md → On-demand e2e CI
           EOF
 
   # ---------------------------------------------------------------------------
-  # e2e — real go test -tags=e2e against the live stack
+  # e2e — start stack (optional) + go test
   # ---------------------------------------------------------------------------
   e2e:
-    name: go-test (${{ needs.preflight.outputs.scope }})
+    name: e2e (${{ needs.preflight.outputs.stack }} / ${{ needs.preflight.outputs.scope }})
     needs: preflight
     if: needs.preflight.result == 'success' && needs.preflight.outputs.should_run == 'true'
     runs-on: ${{ vars.E2E_RUNS_ON || 'ubuntu-latest' }}
-    timeout-minutes: 180
-    defaults:
-      run:
-        working-directory: e2e
+    timeout-minutes: 360
     steps:
+      - name: Free disk (docker builds)
+        if: needs.preflight.outputs.stack == 'docker'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc "$AGENT_TOOLSDIRECTORY" || true
+          df -h
+
       - name: Checkout AzerothCore
         uses: actions/checkout@v7
 
-      # go.mod currently pins AzerothGhost at v0.0.0 for local go.work replace.
-      # CI checks out the harness repo and path-replaces until a real pseudo-version
-      # is committed (see e2e/README.md follow-ups).
       - name: Checkout AzerothGhost harness
         uses: actions/checkout@v7
         with:
@@ -221,23 +229,100 @@ jobs:
           cache-dependency-path: e2e/go.sum
 
       - name: Wire harness module replace
+        working-directory: e2e
         run: |
           set -euo pipefail
           harness="${GITHUB_WORKSPACE}/_deps/AzerothGhost"
-          test -d "${harness}/e2e/e2eharness" || {
-            echo "::error::AzerothGhost checkout missing e2e/e2eharness at ${harness}"
-            exit 1
-          }
-          # go.work is gitignored; path-replace is the portable CI equivalent.
+          test -d "${harness}/e2e/e2eharness"
           go mod edit -replace="github.com/walkline/AzerothGhost=${harness}"
           go mod download
-          go env GOPATH
           go list -m github.com/walkline/AzerothGhost
 
-      # Inject secrets only when set so self-hosted runner env is not clobbered
-      # by empty strings (FORCE_RUN path).
-      - name: Inject E2E connection secrets
-        if: ${{ secrets.E2E_AUTH_ADDR != '' }}
+      # ---- docker stack (compose from repo root) ----
+      - name: Set Docker image tag
+        if: needs.preflight.outputs.stack == 'docker'
+        run: |
+          echo "DOCKER_IMAGE_TAG=${{ needs.preflight.outputs.image_tag }}" >> "$GITHUB_ENV"
+          echo "DOCKER_DB_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD}" >> "$GITHUB_ENV"
+
+      - name: Pull prebuilt images
+        if: needs.preflight.outputs.stack == 'docker' && needs.preflight.outputs.build_images != 'true'
+        run: |
+          set -euo pipefail
+          # Prefer published images (acore/ac-wotlk-*). Build fallback if pull fails.
+          if ! docker compose pull ac-database ac-client-data-init ac-db-import ac-authserver ac-worldserver; then
+            echo "::warning::pull failed — will build from this tree"
+            echo "NEED_BUILD=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build images from tree
+        if: |
+          needs.preflight.outputs.stack == 'docker'
+          && (needs.preflight.outputs.build_images == 'true' || env.NEED_BUILD == '1')
+        run: |
+          set -euo pipefail
+          docker compose build ac-database ac-client-data-init ac-db-import ac-authserver ac-worldserver
+        timeout-minutes: 180
+
+      - name: Start compose stack
+        if: needs.preflight.outputs.stack == 'docker'
+        run: |
+          set -euo pipefail
+          # database → client-data-init + db-import → auth + world (depends_on in compose)
+          docker compose up -d ac-database
+          docker compose up --no-build ac-client-data-init
+          docker compose up --no-build ac-db-import
+          docker compose up -d --no-build ac-authserver ac-worldserver
+          docker compose ps
+        timeout-minutes: 60
+
+      - name: Wait for auth/world ports
+        if: needs.preflight.outputs.stack == 'docker'
+        run: |
+          set -euo pipefail
+          wait_port() {
+            local port=$1 name=$2
+            echo "waiting for ${name} on :${port} ..."
+            for i in $(seq 1 120); do
+              if (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1; then
+                echo "${name} ready after ${i}s"
+                return 0
+              fi
+              sleep 2
+            done
+            echo "::error::timeout waiting for ${name} :${port}"
+            docker compose logs --tail=80 ac-authserver ac-worldserver ac-db-import || true
+            return 1
+          }
+          wait_port 3306 mysql
+          wait_port 3724 authserver
+          wait_port 8085 worldserver
+
+      - name: Point realmlist at localhost
+        if: needs.preflight.outputs.stack == 'docker'
+        run: |
+          set -euo pipefail
+          # Clients (and the e2e harness) run on the host; realm address must be 127.0.0.1.
+          docker exec ac-database mysql -uroot -p"${DOCKER_DB_ROOT_PASSWORD}" -e \
+            "UPDATE acore_auth.realmlist SET address='127.0.0.1', localAddress='127.0.0.1';
+             SELECT id,name,address,localAddress,port FROM acore_auth.realmlist;"
+
+      - name: Export E2E_* for docker stack
+        if: needs.preflight.outputs.stack == 'docker'
+        run: |
+          set -euo pipefail
+          # Host → published compose ports. MySQL user root / password from compose.
+          {
+            echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+            echo "E2E_AUTH_DSN=root:${DOCKER_DB_ROOT_PASSWORD}@tcp(127.0.0.1:3306)/acore_auth"
+            echo "E2E_CHAR_DSN=root:${DOCKER_DB_ROOT_PASSWORD}@tcp(127.0.0.1:3306)/acore_characters"
+            echo "E2E_WORLD_DSN=root:${DOCKER_DB_ROOT_PASSWORD}@tcp(127.0.0.1:3306)/acore_world"
+          } >> "${GITHUB_ENV}"
+          echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+
+      # ---- external stack (optional) ----
+      - name: Inject external E2E secrets
+        if: needs.preflight.outputs.stack == 'external' && secrets.E2E_AUTH_ADDR != ''
         env:
           E2E_AUTH_ADDR: ${{ secrets.E2E_AUTH_ADDR }}
           E2E_AUTH_DSN: ${{ secrets.E2E_AUTH_DSN }}
@@ -252,7 +337,7 @@ jobs:
             echo "E2E_WORLD_DSN=${E2E_WORLD_DSN}"
           } >> "${GITHUB_ENV}"
 
-      - name: Validate runner has E2E_* 
+      - name: Validate E2E_* present
         run: |
           set -euo pipefail
           missing=()
@@ -261,74 +346,59 @@ jobs:
           [[ -z "${E2E_CHAR_DSN:-}"  ]] && missing+=(E2E_CHAR_DSN)
           [[ -z "${E2E_WORLD_DSN:-}" ]] && missing+=(E2E_WORLD_DSN)
           if ((${#missing[@]} > 0)); then
-            echo "::error::E2E env not available on runner: ${missing[*]}"
-            echo "Set secrets or export them on the self-hosted runner (vars.E2E_FORCE_RUN=1)."
+            echo "::error::missing: ${missing[*]}"
             exit 1
           fi
-          # Do not print DSN passwords; only show host-ish auth addr.
           echo "E2E_AUTH_ADDR=${E2E_AUTH_ADDR}"
 
       - name: Run live e2e
+        working-directory: e2e
         env:
           E2E_TAGS: ${{ github.event.inputs.tags_filter || '' }}
         run: |
           set -euo pipefail
-
           count="${{ github.event.inputs.count || '1' }}"
           timeout="${{ github.event.inputs.timeout || '60m' }}"
           parallel="${{ github.event.inputs.parallel || '1' }}"
           scope="${{ needs.preflight.outputs.scope }}"
           packages_raw="${{ github.event.inputs.packages || './...' }}"
 
-          # Inputs are restricted to relative package paths under e2e/.
           if [[ ! "${packages_raw}" =~ ^\./[A-Za-z0-9_./\*+-]*$ ]]; then
-            echo "::error::invalid packages input (must be relative under e2e/): ${packages_raw}"
+            echo "::error::invalid packages: ${packages_raw}"
             exit 1
           fi
-          if [[ ! "${count}" =~ ^[0-9]+$ ]]; then
-            echo "::error::invalid count: ${count}"
-            exit 1
-          fi
-          if [[ ! "${timeout}" =~ ^[0-9]+[smh]$ ]]; then
-            echo "::error::invalid timeout (use e.g. 30m): ${timeout}"
-            exit 1
-          fi
-          if [[ ! "${parallel}" =~ ^[0-9]+$ ]]; then
-            echo "::error::invalid parallel: ${parallel}"
-            exit 1
-          fi
-
-          echo "scope=${scope} count=${count} timeout=${timeout} parallel=${parallel} E2E_TAGS=${E2E_TAGS:-}"
+          [[ "${count}" =~ ^[0-9]+$ ]] || { echo "bad count"; exit 1; }
+          [[ "${timeout}" =~ ^[0-9]+[smh]$ ]] || { echo "bad timeout"; exit 1; }
+          [[ "${parallel}" =~ ^[0-9]+$ ]] || { echo "bad parallel"; exit 1; }
 
           run_go_test() {
             # shellcheck disable=SC2086
             go test -tags=e2e -count="${count}" -timeout="${timeout}" -parallel="${parallel}" -v "$@"
           }
 
+          echo "scope=${scope} stack=${{ needs.preflight.outputs.stack }} count=${count}"
+
           if [[ "${scope}" == "smoke" ]]; then
-            # Mirrors `make e2e-smoke`: dedicated smoke package + tagged suite tests.
-            echo "::group::smoke package"
+            echo "::group::smoke"
             run_go_test ./smoke/
             echo "::endgroup::"
-            echo "::group::suites with E2E_TAGS=smoke"
+            echo "::group::suites E2E_TAGS=smoke"
             E2E_TAGS=smoke run_go_test ./suites/...
             echo "::endgroup::"
           else
             echo "::group::go test ${packages_raw}"
-            # Intentionally unquoted packages_raw only after regex validation above.
             # shellcheck disable=SC2086
             run_go_test ${packages_raw}
             echo "::endgroup::"
           fi
 
-      - name: Hint on failure classes
-        if: failure()
+      - name: Dump stack logs on failure
+        if: failure() && needs.preflight.outputs.stack == 'docker'
         run: |
-          cat <<'EOF'
-          ::notice::Classify failures by harness prefixes:
-            precondition:     setup never reached a judgeable state (infra/content)
-            AC#N CONFIRMED BUG: tracked core bug (product)
-            harness:          timeout / SQL / cache / send (infra)
-            WARNING:          soft deviation (non-fatal)
-          See .agents/docs/e2e-policy.md §9.4 and e2e/README.md.
-          EOF
+          docker compose ps || true
+          docker compose logs --tail=200 ac-authserver ac-worldserver ac-db-import ac-database || true
+
+      - name: Tear down compose
+        if: always() && needs.preflight.outputs.stack == 'docker'
+        run: |
+          docker compose down -v || true
