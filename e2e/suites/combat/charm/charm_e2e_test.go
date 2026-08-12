@@ -78,9 +78,11 @@ func TestCharm_MultiBotProbeAfterVictimLeave(t *testing.T) {
 	t.Logf("PASS multi-bot probe after victim leave")
 }
 
-// CHARM-05: CancelCast helper path — send cast (no wait goroutine), then CancelCastWhenChanneling.
+// CHARM-05: CancelCast helper path — start a self-channel, then CancelCastWhenChanneling.
+// Uses Hellfire (self-channel) instead of ground-targeted Rain of Fire: DEST casts flake on
+// a noisy pad / after tele, and rank-1 RoF is often replaced after `.learn all my class`.
 func TestCharm_CancelCastSafe(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/charm"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "serial"}, Runtime: "short", Category: "combat/charm"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "CharmCc",
@@ -89,18 +91,31 @@ func TestCharm_CancelCastSafe(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	// Start rain of fire at feet without blocking on cast result (no helper goroutine).
-	x, y, z, _ := bot.Pos()
-	if err := bot.World.CastSpellAtPosition(e2eharness.SpellRainOfFire, x, y, z); err != nil {
-		e2eharness.HarnessFailf(t, "CastSpellAtPosition rain: %v", err)
+	// gm off + mana for a real channel (account GM still allows .modify).
+	e2eharness.CombatReady(t, bot.World, e2eharness.CombatReadyOpts{God: false, Power: true})
+	time.Sleep(200 * time.Millisecond) // settle after tele so cast is not interrupted as moving
+
+	// Prefer max-rank Hellfire; fall back to rank 1. Match any channel spell (rank rewrite).
+	channelSpells := []uint32{e2eharness.SpellHellfireMax, e2eharness.SpellHellfire}
+	var canceled bool
+	for attempt := 0; attempt < 3 && !canceled; attempt++ {
+		spell := channelSpells[attempt%len(channelSpells)]
+		if err := bot.World.CastSpell(spell, bot.GUID); err != nil {
+			e2eharness.HarnessFailf(t, "CastSpell hellfire %d: %v", spell, err)
+		}
+		// spellID 0 = any channel (server may channel a different rank than cast id).
+		canceled = bot.CancelCastWhenChanneling(t, 0, 4*time.Second)
+		if !canceled {
+			bot.CancelCast(t)
+			// Top up mana and retry.
+			bot.GM(t, ".modify mana 999999")
+			time.Sleep(100 * time.Millisecond)
+		}
 	}
-	// Wait for channel then cancel. SoftPass is disabled — require observed channel.
-	canceled := bot.CancelCastWhenChanneling(t, e2eharness.SpellRainOfFire, 5*time.Second)
 	if !canceled {
-		bot.CancelCast(t)
-		e2eharness.Preconditionf(t, "CancelCast path: Rain of Fire channel not observed")
+		e2eharness.Preconditionf(t, "CancelCast path: no channel observed after Hellfire retries (channel=%d)", bot.ChannelSpell())
 		return
 	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS cancel cast path channeling=%v canceled=%v", bot.IsChanneling(), canceled)
+	t.Logf("PASS cancel cast path channeling=%v canceled=%v channel_spell=%d", bot.IsChanneling(), canceled, bot.ChannelSpell())
 }
