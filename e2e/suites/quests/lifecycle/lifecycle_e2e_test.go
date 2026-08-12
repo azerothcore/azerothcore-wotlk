@@ -27,18 +27,13 @@ func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
 		Class:  e2eharness.ClassWarrior,
 		Level:  30,
 	})
+	// AddQuest waits for INCOMPLETE in CharDB (async .quest add under thrash).
 	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
 	bot.Teleport(t, -9222.58, -2147.87, 63.814, e2eharness.MapEasternKingdoms)
 
-	st, ok := bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
-	if !ok || st != e2eharness.QuestStatusIncomplete {
-		e2eharness.Preconditionf(t, "quest should be INCOMPLETE, got ok=%v status=%d (%s)",
-			ok, st, e2eharness.QuestStatusName(st))
-	}
-
 	bot.DieAndRepop(t)
 	// CharDB quest status is async after .save — always re-save and re-read.
-	st, ok = bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
+	st, ok := bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
 	if !ok {
 		e2eharness.HarnessFailf(t, "quest row missing after death")
 	}
