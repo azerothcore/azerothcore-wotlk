@@ -310,17 +310,38 @@ jobs:
             "SHOW TABLES FROM acore_auth LIKE 'realmlist'; SELECT COUNT(*) AS realm_rows FROM acore_auth.realmlist;"
         timeout-minutes: 40
 
+      # Authserver refuses realms with flag 3 (OFFLINE|VERSION_MISMATCH). Dry-run / base
+      # import can leave non-zero flags; fix address + flag before live start.
+      - name: Realmlist + E2E env (native)
+        if: needs.preflight.outputs.stack == 'native'
+        run: |
+          set -euo pipefail
+          mysql -h127.0.0.1 -uacore -pacore -e \
+            "UPDATE acore_auth.realmlist
+             SET address='127.0.0.1', localAddress='127.0.0.1', flag=0, port=8085
+             WHERE id=1;
+             SELECT id,name,address,localAddress,port,flag,gamebuild FROM acore_auth.realmlist;"
+          {
+            echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+            echo "E2E_AUTH_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_auth"
+            echo "E2E_CHAR_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_characters"
+            echo "E2E_WORLD_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_world"
+          } >> "$GITHUB_ENV"
+          echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+
       - name: Start authserver + worldserver (pm2 service manager)
         if: needs.preflight.outputs.stack == 'native'
         run: |
           set -euo pipefail
-          ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2
-          ./acore.sh sm create world worldserver --bin-path ./env/dist/bin --provider pm2
+          # on-failure avoids infinite crash loops that hang wait-uptime / pm2 log tail
+          ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2 \
+            --restart-policy on-failure --max-restarts 5
+          ./acore.sh sm create world worldserver --bin-path ./env/dist/bin --provider pm2 \
+            --restart-policy on-failure --max-restarts 5
           ./acore.sh sm start authserver
           ./acore.sh sm start worldserver
-          ./acore.sh sm wait-uptime authserver 10 300
-          ./acore.sh sm wait-uptime worldserver 10 600
-          # wait-uptime can race with crash-loops; require low restart count + listening ports
+          ./acore.sh sm wait-uptime authserver 10 180
+          ./acore.sh sm wait-uptime worldserver 10 300
           pm2 jlist | python3 -c '
           import json, sys
           procs = {p["name"]: p for p in json.load(sys.stdin)}
@@ -333,34 +354,23 @@ jobs:
               restarts = int(env.get("restart_time") or 0)
               if status != "online":
                   raise SystemExit(f"{n} not online: {status}")
-              if restarts > 3:
+              if restarts > 5:
                   raise SystemExit(f"{n} restart_time={restarts} (crash loop?)")
           print("pm2 health ok")
           '
           for port in 3724 8085; do
+            ok=0
             for i in $(seq 1 60); do
-              (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1 && break
+              if (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1; then ok=1; break; fi
               sleep 2
             done
-            (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1 \
-              || { echo "::error::port ${port} not listening"; pm2 logs --nostream --lines 80; exit 1; }
+            if [[ "$ok" -ne 1 ]]; then
+              echo "::error::port ${port} not listening"
+              pm2 logs --nostream --lines 100 || true
+              exit 1
+            fi
           done
-        timeout-minutes: 30
-
-      - name: Realmlist + E2E env (native)
-        if: needs.preflight.outputs.stack == 'native'
-        run: |
-          set -euo pipefail
-          mysql -h127.0.0.1 -uacore -pacore -e \
-            "UPDATE acore_auth.realmlist SET address='127.0.0.1', localAddress='127.0.0.1';
-             SELECT id,name,address,port FROM acore_auth.realmlist;"
-          {
-            echo "E2E_AUTH_ADDR=127.0.0.1:3724"
-            echo "E2E_AUTH_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_auth"
-            echo "E2E_CHAR_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_characters"
-            echo "E2E_WORLD_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_world"
-          } >> "$GITHUB_ENV"
-          echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+        timeout-minutes: 20
 
       # ===================== docker stack (optional) =====================
       - name: Docker pull/build/up
