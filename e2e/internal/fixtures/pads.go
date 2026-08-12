@@ -8,7 +8,11 @@ import "github.com/walkline/AzerothGhost/e2e/e2eharness"
 
 var (
 	PadStormwindOutskirts = e2eharness.PadStormwindOutskirts
+	CombatPads            = e2eharness.CombatPads
 )
+
+// PadFor is e2eharness.PadFor — deterministic isolation pad for parallel packages.
+var PadFor = e2eharness.PadFor
 
 const (
 	MapEasternKingdoms = e2eharness.MapEasternKingdoms

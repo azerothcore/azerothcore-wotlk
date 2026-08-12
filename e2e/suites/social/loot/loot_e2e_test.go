@@ -112,9 +112,10 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	leader.SetLootMethod(t, client.LootMethodGroupLoot, 0, e2eharness.LootThresholdUncommon)
 	leader.WaitLootMethod(t, client.LootMethodGroupLoot, 10*time.Second)
 
-	// Issue cites GO 194821; spawn for future GO-use path. Active oracle is corpse mid-roll leave.
-	leader.GM(t, ".gobject add 194821")
-	_ = e2eharness.TryNearbyGameObjectByEntry(t, leader.World, 194821, 5*time.Second)
+	// Issue cites GO 194821 (Gift of the Observer); spawn with cleanup — bare
+	// `.gobject add` left persistent pad litter (see spawn_cleanup.go).
+	_ = leader.SpawnGameObject(t, e2eharness.GameObjectGiftOfTheObserver)
+	_ = e2eharness.TryNearbyGameObjectByEntry(t, leader.World, e2eharness.GameObjectGiftOfTheObserver, 5*time.Second)
 
 	// Party already at pad; combat-ready members before kill, open loot without re-tele.
 	leaver.CombatReady(t)
@@ -225,7 +226,8 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
 
-	// Persistent spawn with guaranteed loot (15209 crest) — cleanup via DespawnNPC.
+	// Persistent spawn with guaranteed loot (15209 crest) — keep alive until after
+	// below-half damage; SpawnKillLootable would kill immediately.
 	entry := e2eharness.CreatureGroupLootFixture
 	bot.DespawnNearbyEntry(t, entry, 80)
 	time.Sleep(150 * time.Millisecond)
@@ -235,13 +237,20 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	}
 	bot.GM(t, ".gm on")
 	bot.GM(t, fmt.Sprintf(".npc add %d", entry))
+	dbSpawn := bot.CaptureCreatureSpawnID(t, entry)
 	newOnes := bot.WaitNewUnits(t, known, []uint32{entry}, 15*time.Second)
 	if len(newOnes) == 0 {
 		e2eharness.Preconditionf(t, "#26862: fixture %d not found after .npc add", entry)
 		return
 	}
 	guid := newOnes[0].GUID
-	t.Cleanup(func() { bot.DespawnNPC(t, guid) })
+	t.Cleanup(func() {
+		if dbSpawn != 0 {
+			bot.DespawnCreatureSpawn(t, dbSpawn)
+			return
+		}
+		bot.DespawnNPC(t, guid)
+	})
 
 	bot.WaitUnitHPKnown(t, guid, 10*time.Second)
 	// Stay GM for damage+kill so loot recipient tagging is consistent.
