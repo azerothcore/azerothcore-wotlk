@@ -106,12 +106,18 @@ func TestThreat_PartyPullSetup(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "multi_bot"}, Runtime: "short", Category: "combat/threat"})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "ThrPty", Count: 2, Level: 80, LearnAllClass: true})
-	e2eharness.TeleportAll(t, bots,
-		e2eharness.PadStormwindOutskirts.X, e2eharness.PadStormwindOutskirts.Y,
-		e2eharness.PadStormwindOutskirts.Z, e2eharness.PadStormwindOutskirts.Map)
+	pad := e2eharness.PadStormwindOutskirts
+	e2eharness.TeleportAll(t, bots, pad.X, pad.Y, pad.Z, pad.Map)
+	// Pad thrash: stop combat + clear leftover dummies before party pull.
+	for _, b := range bots {
+		b.GM(t, ".combatstop")
+		b.GM(t, ".cheat god on")
+	}
+	bots[0].DespawnNearbyEntry(t, pullTarget, 80)
 	e2eharness.FormParty(t, bots[0], bots[1])
 	dummy := bots[0].Spawn(t, pullTarget, 15*time.Second)
 	bots[0].CombatReady(t)
+	// Engage accepts HP drop on training dummies (IN_COMBAT flag often never sets).
 	bots[0].Engage(t, dummy, 15*time.Second)
 	bots[0].AssertWorldAlive(t)
 	t.Logf("PASS party pull setup")
