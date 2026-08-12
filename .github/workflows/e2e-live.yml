@@ -1,18 +1,15 @@
-# On-demand live e2e with an in-workflow AzerothCore stack (Docker Compose).
+# On-demand live e2e: native stack like dashboard-ci, plus client data + go test.
 #
-# Primary path (stack=docker, default):
-#   docker compose up → MySQL + db-import + client-data + authserver + worldserver
-#   then go test -tags=e2e against 127.0.0.1 (same compose as apps/docker + docker-compose.yml).
+# stack=native (default) — same family as dashboard-ci:
+#   MySQL service → acore.sh init (compile + DB + client-data download)
+#   → worldserver/authserver -dry-run (DB updater gate)
+#   → pm2 sm start auth + world
+#   → go test -tags=e2e against 127.0.0.1
 #
-# Alternate (stack=external):
-#   no containers; inject E2E_* secrets / self-hosted env (previous behaviour).
+# stack=docker — root docker-compose.yml (pull/build images) [optional]
+# stack=external — secrets / self-hosted only
 #
-# Triggers
-# --------
-# - Label `run-e2e` on a non-draft PR → smoke tests + docker stack
-# - workflow_dispatch → smoke|full, stack=docker|external, optional image build
-#
-# Does NOT run on every PR by default.
+# Triggers: label `run-e2e` (smoke) | workflow_dispatch
 
 name: e2e-live
 
@@ -20,60 +17,48 @@ on:
   workflow_dispatch:
     inputs:
       packages:
-        description: 'Go packages under e2e/ (when scope=full), e.g. ./... or ./suites/combat/threat/'
+        description: 'Go packages under e2e/ when scope=full'
         required: false
         default: './...'
       scope:
-        description: 'smoke (fast) | full (packages input)'
+        description: 'smoke | full'
         required: false
         default: 'smoke'
         type: choice
-        options:
-          - smoke
-          - full
+        options: [smoke, full]
       stack:
-        description: 'docker = compose stack in this job | external = use secrets/self-hosted env only'
+        description: 'native = acore.sh init+data+sm | docker = compose | external = secrets'
         required: false
-        default: 'docker'
+        default: 'native'
         type: choice
-        options:
-          - docker
-          - external
+        options: [native, docker, external]
       build_images:
-        description: 'docker only: build images from this tree (slow). false = pull acore/* from Docker Hub'
+        description: 'docker only: build images from tree (slow)'
         required: false
         default: false
         type: boolean
       image_tag:
-        description: 'DOCKER_IMAGE_TAG when pulling (default master)'
+        description: 'docker only: DOCKER_IMAGE_TAG when pulling'
         required: false
         default: 'master'
       count:
-        description: 'go test -count'
         required: false
         default: '1'
       timeout:
-        description: 'go test -timeout'
         required: false
         default: '60m'
       parallel:
-        description: 'go test -parallel (prefer 1)'
         required: false
         default: '1'
       tags_filter:
-        description: 'Optional E2E_TAGS filter'
         required: false
         default: ''
       harness_ref:
-        description: 'AzerothGhost git ref (empty = default branch)'
         required: false
         default: ''
 
   pull_request:
-    types:
-      - labeled
-      - synchronize
-      - reopened
+    types: [labeled, synchronize, reopened]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -83,18 +68,13 @@ permissions:
   contents: read
 
 env:
+  CONTINUOUS_INTEGRATION: true
+  MYSQL_ROOT_PASSWORD: root
   COMPOSE_DOCKER_CLI_BUILD: 1
   DOCKER_BUILDKIT: 1
-  # Compose defaults match docker-compose.yml (root password "password", ports 3724/8085/3306).
   DOCKER_DB_ROOT_PASSWORD: password
-  DOCKER_AUTH_EXTERNAL_PORT: '3724'
-  DOCKER_WORLD_EXTERNAL_PORT: '8085'
-  DOCKER_DB_EXTERNAL_PORT: '3306'
 
 jobs:
-  # ---------------------------------------------------------------------------
-  # preflight — always allow docker mode; external mode needs secrets or FORCE
-  # ---------------------------------------------------------------------------
   preflight:
     name: preflight
     runs-on: ubuntu-latest
@@ -116,8 +96,7 @@ jobs:
       build_images: ${{ steps.check.outputs.build_images }}
       image_tag: ${{ steps.check.outputs.image_tag }}
     steps:
-      - name: Evaluate
-        id: check
+      - id: check
         env:
           AUTH_ADDR: ${{ secrets.E2E_AUTH_ADDR }}
           AUTH_DSN: ${{ secrets.E2E_AUTH_DSN }}
@@ -126,16 +105,14 @@ jobs:
           FORCE: ${{ vars.E2E_FORCE_RUN }}
         run: |
           set -euo pipefail
-
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             scope="${{ github.event.inputs.scope || 'smoke' }}"
-            stack="${{ github.event.inputs.stack || 'docker' }}"
+            stack="${{ github.event.inputs.stack || 'native' }}"
             build_images="${{ github.event.inputs.build_images || 'false' }}"
             image_tag="${{ github.event.inputs.image_tag || 'master' }}"
           else
-            # Label runs: smoke + docker stack (no external secrets required).
             scope="smoke"
-            stack="docker"
+            stack="native"
             build_images="false"
             image_tag="master"
           fi
@@ -144,38 +121,35 @@ jobs:
           echo "build_images=${build_images}" >> "$GITHUB_OUTPUT"
           echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
 
-          if [[ "${stack}" == "docker" ]]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "reason=docker compose stack (in-workflow)" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # external stack
-          if [[ -n "${FORCE:-}" && "${FORCE}" != "0" && "${FORCE}" != "false" ]]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "reason=vars.E2E_FORCE_RUN (external / runner-local stack)" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          missing=()
-          [[ -z "${AUTH_ADDR:-}" ]] && missing+=(E2E_AUTH_ADDR)
-          [[ -z "${AUTH_DSN:-}"  ]] && missing+=(E2E_AUTH_DSN)
-          [[ -z "${CHAR_DSN:-}"  ]] && missing+=(E2E_CHAR_DSN)
-          [[ -z "${WORLD_DSN:-}" ]] && missing+=(E2E_WORLD_DSN)
-          if ((${#missing[@]} > 0)); then
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "reason=stack=external but missing secrets: ${missing[*]}" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "should_run=true" >> "$GITHUB_OUTPUT"
-          echo "reason=external stack secrets present" >> "$GITHUB_OUTPUT"
-
-      - name: Report
-        run: |
-          echo "should_run=${{ steps.check.outputs.should_run }}"
-          echo "stack=${{ steps.check.outputs.stack }}"
-          echo "scope=${{ steps.check.outputs.scope }}"
-          echo "build_images=${{ steps.check.outputs.build_images }}"
-          echo "reason=${{ steps.check.outputs.reason }}"
+          case "${stack}" in
+            native|docker)
+              echo "should_run=true" >> "$GITHUB_OUTPUT"
+              echo "reason=in-workflow stack=${stack}" >> "$GITHUB_OUTPUT"
+              ;;
+            external)
+              if [[ -n "${FORCE:-}" && "${FORCE}" != "0" && "${FORCE}" != "false" ]]; then
+                echo "should_run=true" >> "$GITHUB_OUTPUT"
+                echo "reason=E2E_FORCE_RUN external" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              missing=()
+              [[ -z "${AUTH_ADDR:-}" ]] && missing+=(E2E_AUTH_ADDR)
+              [[ -z "${AUTH_DSN:-}"  ]] && missing+=(E2E_AUTH_DSN)
+              [[ -z "${CHAR_DSN:-}"  ]] && missing+=(E2E_CHAR_DSN)
+              [[ -z "${WORLD_DSN:-}" ]] && missing+=(E2E_WORLD_DSN)
+              if ((${#missing[@]} > 0)); then
+                echo "should_run=false" >> "$GITHUB_OUTPUT"
+                echo "reason=external missing secrets: ${missing[*]}" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              echo "should_run=true" >> "$GITHUB_OUTPUT"
+              echo "reason=external secrets present" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "should_run=false" >> "$GITHUB_OUTPUT"
+              echo "reason=unknown stack=${stack}" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
 
   skip-notice:
     name: soft-skip
@@ -183,30 +157,33 @@ jobs:
     if: needs.preflight.result == 'success' && needs.preflight.outputs.should_run != 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Explain soft-skip
-        run: |
-          echo "::notice title=e2e-live soft-skipped::${{ needs.preflight.outputs.reason }}"
-          cat <<'EOF'
-          Live e2e did not run (soft-skip = success).
+      - run: |
+          echo "::notice::${{ needs.preflight.outputs.reason }}"
+          echo "Use stack=native (default) for in-workflow build+data+servers, or stack=docker."
 
-          Default path is stack=docker (in-workflow compose) — no secrets required.
-          Use stack=external only when pointing at a pre-existing realm via E2E_* secrets.
-
-          Docs: e2e/README.md → On-demand e2e CI
-          EOF
-
-  # ---------------------------------------------------------------------------
-  # e2e — start stack (optional) + go test
-  # ---------------------------------------------------------------------------
   e2e:
     name: e2e (${{ needs.preflight.outputs.stack }} / ${{ needs.preflight.outputs.scope }})
     needs: preflight
     if: needs.preflight.result == 'success' && needs.preflight.outputs.should_run == 'true'
     runs-on: ${{ vars.E2E_RUNS_ON || 'ubuntu-latest' }}
     timeout-minutes: 360
+    # MySQL for native stack (same idea as dashboard-ci MYSQL_ROOT_PASSWORD=root)
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=40
     steps:
-      - name: Free disk (docker builds)
-        if: needs.preflight.outputs.stack == 'docker'
+      - name: Free disk
+        if: needs.preflight.outputs.stack == 'native' || needs.preflight.outputs.stack == 'docker'
         run: |
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc "$AGENT_TOOLSDIRECTORY" || true
           df -h
@@ -236,92 +213,124 @@ jobs:
           test -d "${harness}/e2e/e2eharness"
           go mod edit -replace="github.com/walkline/AzerothGhost=${harness}"
           go mod download
-          go list -m github.com/walkline/AzerothGhost
 
-      # ---- docker stack (compose from repo root) ----
-      - name: Set Docker image tag
-        if: needs.preflight.outputs.stack == 'docker'
+      # ===================== native stack (dashboard-ci style + data) =====================
+      - name: Install ccache
+        if: needs.preflight.outputs.stack == 'native'
         run: |
-          echo "DOCKER_IMAGE_TAG=${{ needs.preflight.outputs.image_tag }}" >> "$GITHUB_ENV"
-          echo "DOCKER_DB_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD}" >> "$GITHUB_ENV"
+          sudo apt-get update
+          sudo apt-get install -y ccache unzip curl
 
-      - name: Pull prebuilt images
-        if: needs.preflight.outputs.stack == 'docker' && needs.preflight.outputs.build_images != 'true'
-        run: |
-          set -euo pipefail
-          # Prefer published images (acore/ac-wotlk-*). Build fallback if pull fails.
-          if ! docker compose pull ac-database ac-client-data-init ac-db-import ac-authserver ac-worldserver; then
-            echo "::warning::pull failed — will build from this tree"
-            echo "NEED_BUILD=1" >> "$GITHUB_ENV"
-          fi
-
-      - name: Build images from tree
-        if: |
-          needs.preflight.outputs.stack == 'docker'
-          && (needs.preflight.outputs.build_images == 'true' || env.NEED_BUILD == '1')
+      - name: Configure AzerothCore (zero-conf CI)
+        if: needs.preflight.outputs.stack == 'native'
         run: |
           set -euo pipefail
-          docker compose build ac-database ac-client-data-init ac-db-import ac-authserver ac-worldserver
+          touch conf/config.sh
+          {
+            echo 'MTHREADS=4'
+            echo 'CBUILD_TESTING=OFF'
+            echo 'AC_ENABLE_ROOT_CMAKE_INSTALL=1'
+            echo 'export AC_CONFIG_POLICY=$AC_CONFIG_POLICY_PRESET_ZERO_CONF'
+            echo 'AC_ENABLE_CONF_COPY_ON_INSTALL=0'
+            echo 'CTYPE=RelWithDebInfo'
+          } >> conf/config.sh
+          cat conf/config.sh
+          ./acore.sh config show AC_CONFIG_POLICY || true
+
+      - name: Init (deps, compile, database, client-data download)
+        if: needs.preflight.outputs.stack == 'native'
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          CONTINUOUS_INTEGRATION: true
+        run: |
+          set -euo pipefail
+          # acore.sh init → install-deps, compile, create DBs, import SQL,
+          # and inst_download_client_data (GitHub wowgaming/client-data zip).
+          ./acore.sh init
+          sudo npm install -g pm2
         timeout-minutes: 180
 
-      - name: Start compose stack
-        if: needs.preflight.outputs.stack == 'docker'
+      - name: Dry-run auth + world (DB updater gate)
+        if: needs.preflight.outputs.stack == 'native'
         run: |
           set -euo pipefail
-          # database → client-data-init + db-import → auth + world (depends_on in compose)
+          source ./acore.sh config load
+          cd env/dist/bin
+          timeout 10m ./authserver -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
+          status=${PIPESTATUS[0]}; [ "$status" -eq 0 ] || exit "$status"
+          if grep -qE "Applying of file .+ failed!" "$RUNNER_TEMP/authserver-dry-run.log"; then
+            echo "::error::authserver dry-run SQL failure"; exit 1
+          fi
+          timeout 15m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/worldserver-dry-run.log"
+          status=${PIPESTATUS[0]}; [ "$status" -eq 0 ] || exit "$status"
+          if grep -qE "Applying of file .+ failed!" "$RUNNER_TEMP/worldserver-dry-run.log"; then
+            echo "::error::worldserver dry-run SQL failure"; exit 1
+          fi
+        timeout-minutes: 30
+
+      - name: Start authserver + worldserver (pm2 service manager)
+        if: needs.preflight.outputs.stack == 'native'
+        run: |
+          set -euo pipefail
+          ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2
+          ./acore.sh sm create world worldserver --bin-path ./env/dist/bin --provider pm2
+          ./acore.sh sm start authserver
+          ./acore.sh sm start worldserver
+          ./acore.sh sm wait-uptime authserver 10 300
+          ./acore.sh sm wait-uptime worldserver 10 600
+        timeout-minutes: 30
+
+      - name: Realmlist + E2E env (native)
+        if: needs.preflight.outputs.stack == 'native'
+        run: |
+          set -euo pipefail
+          # Zero-conf create_mysql.sql → user acore/acore; conf.dist matches.
+          mysql -h127.0.0.1 -uroot -proot -e \
+            "UPDATE acore_auth.realmlist SET address='127.0.0.1', localAddress='127.0.0.1';
+             SELECT id,name,address,port FROM acore_auth.realmlist;"
+          {
+            echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+            echo "E2E_AUTH_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_auth"
+            echo "E2E_CHAR_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_characters"
+            echo "E2E_WORLD_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_world"
+          } >> "$GITHUB_ENV"
+          echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+
+      # ===================== docker stack (optional) =====================
+      - name: Docker pull/build/up
+        if: needs.preflight.outputs.stack == 'docker'
+        env:
+          DOCKER_IMAGE_TAG: ${{ needs.preflight.outputs.image_tag }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ needs.preflight.outputs.build_images }}" == "true" ]]; then
+            docker compose build ac-database ac-client-data-init ac-db-import ac-authserver ac-worldserver
+          else
+            docker compose pull ac-database ac-client-data-init ac-db-import ac-authserver ac-worldserver \
+              || docker compose build ac-database ac-client-data-init ac-db-import ac-authserver ac-worldserver
+          fi
           docker compose up -d ac-database
           docker compose up --no-build ac-client-data-init
           docker compose up --no-build ac-db-import
           docker compose up -d --no-build ac-authserver ac-worldserver
-          docker compose ps
-        timeout-minutes: 60
-
-      - name: Wait for auth/world ports
-        if: needs.preflight.outputs.stack == 'docker'
-        run: |
-          set -euo pipefail
-          wait_port() {
-            local port=$1 name=$2
-            echo "waiting for ${name} on :${port} ..."
+          for port in 3306 3724 8085; do
             for i in $(seq 1 120); do
-              if (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1; then
-                echo "${name} ready after ${i}s"
-                return 0
-              fi
+              (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1 && break
               sleep 2
             done
-            echo "::error::timeout waiting for ${name} :${port}"
-            docker compose logs --tail=80 ac-authserver ac-worldserver ac-db-import || true
-            return 1
-          }
-          wait_port 3306 mysql
-          wait_port 3724 authserver
-          wait_port 8085 worldserver
-
-      - name: Point realmlist at localhost
-        if: needs.preflight.outputs.stack == 'docker'
-        run: |
-          set -euo pipefail
-          # Clients (and the e2e harness) run on the host; realm address must be 127.0.0.1.
+          done
           docker exec ac-database mysql -uroot -p"${DOCKER_DB_ROOT_PASSWORD}" -e \
-            "UPDATE acore_auth.realmlist SET address='127.0.0.1', localAddress='127.0.0.1';
-             SELECT id,name,address,localAddress,port FROM acore_auth.realmlist;"
-
-      - name: Export E2E_* for docker stack
-        if: needs.preflight.outputs.stack == 'docker'
-        run: |
-          set -euo pipefail
-          # Host → published compose ports. MySQL user root / password from compose.
+            "UPDATE acore_auth.realmlist SET address='127.0.0.1', localAddress='127.0.0.1';"
           {
             echo "E2E_AUTH_ADDR=127.0.0.1:3724"
             echo "E2E_AUTH_DSN=root:${DOCKER_DB_ROOT_PASSWORD}@tcp(127.0.0.1:3306)/acore_auth"
             echo "E2E_CHAR_DSN=root:${DOCKER_DB_ROOT_PASSWORD}@tcp(127.0.0.1:3306)/acore_characters"
             echo "E2E_WORLD_DSN=root:${DOCKER_DB_ROOT_PASSWORD}@tcp(127.0.0.1:3306)/acore_world"
-          } >> "${GITHUB_ENV}"
-          echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+          } >> "$GITHUB_ENV"
+        timeout-minutes: 180
 
-      # ---- external stack (optional) ----
-      - name: Inject external E2E secrets
+      # ===================== external =====================
+      - name: Inject external secrets
         if: needs.preflight.outputs.stack == 'external' && secrets.E2E_AUTH_ADDR != ''
         env:
           E2E_AUTH_ADDR: ${{ secrets.E2E_AUTH_ADDR }}
@@ -329,29 +338,22 @@ jobs:
           E2E_CHAR_DSN: ${{ secrets.E2E_CHAR_DSN }}
           E2E_WORLD_DSN: ${{ secrets.E2E_WORLD_DSN }}
         run: |
-          set -euo pipefail
           {
             echo "E2E_AUTH_ADDR=${E2E_AUTH_ADDR}"
             echo "E2E_AUTH_DSN=${E2E_AUTH_DSN}"
             echo "E2E_CHAR_DSN=${E2E_CHAR_DSN}"
             echo "E2E_WORLD_DSN=${E2E_WORLD_DSN}"
-          } >> "${GITHUB_ENV}"
+          } >> "$GITHUB_ENV"
 
-      - name: Validate E2E_* present
+      - name: Validate E2E_*
         run: |
           set -euo pipefail
-          missing=()
-          [[ -z "${E2E_AUTH_ADDR:-}" ]] && missing+=(E2E_AUTH_ADDR)
-          [[ -z "${E2E_AUTH_DSN:-}"  ]] && missing+=(E2E_AUTH_DSN)
-          [[ -z "${E2E_CHAR_DSN:-}"  ]] && missing+=(E2E_CHAR_DSN)
-          [[ -z "${E2E_WORLD_DSN:-}" ]] && missing+=(E2E_WORLD_DSN)
-          if ((${#missing[@]} > 0)); then
-            echo "::error::missing: ${missing[*]}"
-            exit 1
-          fi
+          for v in E2E_AUTH_ADDR E2E_AUTH_DSN E2E_CHAR_DSN E2E_WORLD_DSN; do
+            [[ -n "${!v:-}" ]] || { echo "missing $v"; exit 1; }
+          done
           echo "E2E_AUTH_ADDR=${E2E_AUTH_ADDR}"
 
-      - name: Run live e2e
+      - name: Run go e2e
         working-directory: e2e
         env:
           E2E_TAGS: ${{ github.event.inputs.tags_filter || '' }}
@@ -363,42 +365,40 @@ jobs:
           scope="${{ needs.preflight.outputs.scope }}"
           packages_raw="${{ github.event.inputs.packages || './...' }}"
 
-          if [[ ! "${packages_raw}" =~ ^\./[A-Za-z0-9_./\*+-]*$ ]]; then
-            echo "::error::invalid packages: ${packages_raw}"
-            exit 1
-          fi
-          [[ "${count}" =~ ^[0-9]+$ ]] || { echo "bad count"; exit 1; }
-          [[ "${timeout}" =~ ^[0-9]+[smh]$ ]] || { echo "bad timeout"; exit 1; }
-          [[ "${parallel}" =~ ^[0-9]+$ ]] || { echo "bad parallel"; exit 1; }
+          [[ "${packages_raw}" =~ ^\./[A-Za-z0-9_./\*+-]*$ ]] || { echo "bad packages"; exit 1; }
 
           run_go_test() {
-            # shellcheck disable=SC2086
             go test -tags=e2e -count="${count}" -timeout="${timeout}" -parallel="${parallel}" -v "$@"
           }
 
-          echo "scope=${scope} stack=${{ needs.preflight.outputs.stack }} count=${count}"
-
           if [[ "${scope}" == "smoke" ]]; then
-            echo "::group::smoke"
             run_go_test ./smoke/
-            echo "::endgroup::"
-            echo "::group::suites E2E_TAGS=smoke"
             E2E_TAGS=smoke run_go_test ./suites/...
-            echo "::endgroup::"
           else
-            echo "::group::go test ${packages_raw}"
             # shellcheck disable=SC2086
             run_go_test ${packages_raw}
-            echo "::endgroup::"
           fi
 
-      - name: Dump stack logs on failure
-        if: failure() && needs.preflight.outputs.stack == 'docker'
+      - name: Stop native servers
+        if: always() && needs.preflight.outputs.stack == 'native'
         run: |
-          docker compose ps || true
-          docker compose logs --tail=200 ac-authserver ac-worldserver ac-db-import ac-database || true
+          ./acore.sh sm stop worldserver || true
+          ./acore.sh sm stop authserver || true
+          ./acore.sh sm delete worldserver || true
+          ./acore.sh sm delete authserver || true
 
-      - name: Tear down compose
+      - name: Tear down docker
         if: always() && needs.preflight.outputs.stack == 'docker'
+        run: docker compose down -v || true
+
+      - name: Logs on failure
+        if: failure()
         run: |
-          docker compose down -v || true
+          if [[ "${{ needs.preflight.outputs.stack }}" == "native" ]]; then
+            ls -la env/dist/logs 2>/dev/null || true
+            tail -n 100 env/dist/logs/* 2>/dev/null || true
+            ./acore.sh sm status || true
+          fi
+          if [[ "${{ needs.preflight.outputs.stack }}" == "docker" ]]; then
+            docker compose logs --tail=150 || true
+          fi

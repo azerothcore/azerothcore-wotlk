@@ -322,21 +322,25 @@ Live e2e is **opt-in** (label / manual dispatch). Workflow:
 
 | Mode | What CI starts | What tests connect to |
 |------|----------------|------------------------|
-| **`docker` (default)** | Root [`docker-compose.yml`](../docker-compose.yml): `ac-database` → `ac-db-import` + `ac-client-data-init` → `ac-authserver` + `ac-worldserver` | Host **`127.0.0.1:3724`** / **`:8085`**, MySQL **`root:password@tcp(127.0.0.1:3306)/acore_*`** (compose defaults) |
-| **`external`** | Nothing | Secrets `E2E_AUTH_ADDR` / `E2E_*_DSN` (or self-hosted env + `E2E_FORCE_RUN=1`) |
+| **`native` (default)** | Like [dashboard-ci](../.github/workflows/dashboard-ci.yml): MySQL service → **`./acore.sh init`** (compile + DB + **client-data download**) → **`authserver`/`worldserver -dry-run`** → **pm2** start | **`127.0.0.1:3724` / `:8085`**, DSN **`acore:acore@tcp(127.0.0.1:3306)/acore_*`** |
+| **`docker`** | Root [`docker-compose.yml`](../docker-compose.yml) (pull/build + up) | **`127.0.0.1`**, MySQL **`root:password@…`** |
+| **`external`** | Nothing | Secrets / self-hosted `E2E_*` |
 
-Docker path:
+#### Native path (default — “dry-run + data + live”)
 
-1. Prefer **pull** `acore/ac-wotlk-*` images (`DOCKER_IMAGE_TAG`, default `master`).
-2. Optional **`build_images=true`** (or pull failure) → `docker compose build` from the PR tree (slow).
-3. `docker compose up` + wait for ports 3306 / 3724 / 8085.
-4. `UPDATE realmlist SET address='127.0.0.1'` so the harness sees the world on the host.
-5. Export `E2E_*` to those localhost endpoints → `go test -tags=e2e`.
-6. `docker compose down -v` always.
+1. GitHub **MySQL 8.4** service (`MYSQL_ROOT_PASSWORD=root`).
+2. **`./acore.sh init`** — deps, compile this tree, create/import DBs, and **`inst_download_client_data`** (downloads `data.zip` from [wowgaming/client-data](https://github.com/wowgaming/client-data) into the data dir).  
+   Dry-run alone does **not** download data; init does.
+3. **`./authserver -dry-run`** / **`./worldserver -dry-run`** — same DB-updater gate as dashboard-ci.
+4. **`acore.sh sm start`** auth + world (pm2), wait uptime.
+5. Point realmlist at `127.0.0.1`, export `E2E_*`, run `go test -tags=e2e`.
+6. Stop/delete sm services.
 
-Accounts/GM: harness creates bot accounts via **auth DB** (SRP6), not worldserver console.
+Bot accounts: harness writes **auth DB** (SRP6). No worldserver console required.
 
-Same compose pieces as [Install with Docker](https://www.azerothcore.org/wiki/install-with-docker) / `apps/docker/`.
+#### Docker path (optional)
+
+Pull `acore/ac-wotlk-*` (or `build_images=true`), `compose up`, realmlist localhost, same go test.
 
 ### Optional secrets (external stack only)
 
