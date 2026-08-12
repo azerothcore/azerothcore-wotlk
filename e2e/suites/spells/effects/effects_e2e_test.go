@@ -85,16 +85,9 @@ func TestEffects_SweepingStrikesExecuteNoCrash(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PadStormwindOutskirts)
-	// Spawn returns first matching entry; second temp spawn tracked for cleanup.
-	d1 := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	known := map[uint64]struct{}{d1: {}}
-	bot.GM(t, ".npc add temp 2673")
-	fresh := bot.WaitNewUnits(t, known, []uint32{e2eharness.CreatureTargetDummy}, 15*time.Second)
-	if len(fresh) == 0 {
-		e2eharness.Preconditionf(t, "second target dummy not observed")
-	}
-	d2 := fresh[0].GUID
-	t.Cleanup(func() { bot.DespawnNPC(t, d2) })
+	// Two persistent dummies with SQL cleanup (never .npc add temp — 120s litter).
+	d1, _ := bot.SpawnPersistent(t, e2eharness.CreatureTargetDummy, 15*time.Second)
+	d2, _ := bot.SpawnPersistent(t, e2eharness.CreatureTargetDummy, 15*time.Second)
 	bot.CombatReadyFull(t)
 	_ = bot.CastOrGM(t, e2eharness.SpellBattleStance, 0, 5*time.Second)
 	bot.Face(t, d1)

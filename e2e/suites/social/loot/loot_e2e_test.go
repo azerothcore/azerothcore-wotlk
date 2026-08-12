@@ -3,7 +3,6 @@
 package loot_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -229,28 +228,11 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	// Persistent spawn with guaranteed loot (15209 crest) — keep alive until after
 	// below-half damage; SpawnKillLootable would kill immediately.
 	entry := e2eharness.CreatureGroupLootFixture
-	bot.DespawnNearbyEntry(t, entry, 80)
-	time.Sleep(150 * time.Millisecond)
-	known := map[uint64]struct{}{}
-	for _, u := range bot.UnitsByEntry(100, entry) {
-		known[u.GUID] = struct{}{}
+	guid, dbSpawn := bot.SpawnPersistent(t, entry, 15*time.Second)
+	if dbSpawn == 0 {
+		t.Logf("#26862: dbSpawn=0 for entry=%d (check E2E_WORLD_DSN)", entry)
 	}
-	bot.GM(t, ".gm on")
-	bot.GM(t, fmt.Sprintf(".npc add %d", entry))
-	dbSpawn := bot.CaptureCreatureSpawnID(t, entry)
-	newOnes := bot.WaitNewUnits(t, known, []uint32{entry}, 15*time.Second)
-	if len(newOnes) == 0 {
-		e2eharness.Preconditionf(t, "#26862: fixture %d not found after .npc add", entry)
-		return
-	}
-	guid := newOnes[0].GUID
-	t.Cleanup(func() {
-		if dbSpawn != 0 {
-			bot.DespawnCreatureSpawn(t, dbSpawn)
-			return
-		}
-		bot.DespawnNPC(t, guid)
-	})
+	_ = dbSpawn
 
 	bot.WaitUnitHPKnown(t, guid, 10*time.Second)
 	// Stay GM for damage+kill so loot recipient tagging is consistent.
