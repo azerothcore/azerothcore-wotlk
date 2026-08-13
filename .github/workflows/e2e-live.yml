@@ -342,18 +342,18 @@ jobs:
           [[ -f "${etc}/worldserver.conf" ]] || cp -v "${etc}/worldserver.conf.dist" "${etc}/worldserver.conf"
           # CI-friendly conf: no interactive CLI, no warden (bots are not real clients).
           # Port open is not enough — accept before "World Initialized" returns AUTH_REJECT (14).
-          {
-            echo ''
-            echo '### e2e-live overrides'
-            echo 'Console.Enable = 0'
-            echo 'Warden.Enabled = 0'
-            echo 'BeepAtStart = 0'
-          } >> "${etc}/worldserver.conf"
+          sed -i \
+            -e 's/^Console\.Enable *=.*/Console.Enable = 0/' \
+            -e 's/^Warden\.Enabled *=.*/Warden.Enabled = 0/' \
+            -e 's/^BeepAtStart *=.*/BeepAtStart = 0/' \
+            "${etc}/worldserver.conf"
           ls -la "${etc}"
+          grep -E '^(Console|Warden|Beep)' "${etc}/worldserver.conf" || true
 
           # World first; auth after world is fully up (not just bound).
-          # stdin from /dev/null so CLI cannot spin on EOF.
-          nohup ./worldserver -c "${etc}/worldserver.conf" \
+          # stdbuf -oL: line-buffer logs so wait_log can see "World Initialized" / "Added realm"
+          # (fully-buffered nohup redirects hide those lines until process exit).
+          stdbuf -oL -eL ./worldserver -c "${etc}/worldserver.conf" \
             < /dev/null >"${RUNNER_TEMP}/worldserver.log" 2>&1 &
           echo $! >"${RUNNER_TEMP}/worldserver.pid"
 
@@ -401,10 +401,10 @@ jobs:
           wait_log "${RUNNER_TEMP}/worldserver.log" 'World Initialized' worldserver 300
           wait_port 8085 worldserver 30
 
-          nohup ./authserver -c "${etc}/authserver.conf" \
+          stdbuf -oL -eL ./authserver -c "${etc}/authserver.conf" \
             < /dev/null >"${RUNNER_TEMP}/authserver.log" 2>&1 &
           echo $! >"${RUNNER_TEMP}/authserver.pid"
-          wait_log "${RUNNER_TEMP}/authserver.log" 'Added realm' authserver 60
+          wait_log "${RUNNER_TEMP}/authserver.log" 'Added realm' authserver 90
           wait_port 3724 authserver 30
 
           # Clear OFFLINE bit auth set on start; world also refreshes this.
