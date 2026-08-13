@@ -5,8 +5,8 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 10) AND (`SourceGrou
 
 DELETE FROM `item_loot_template` WHERE (`Entry` = 46007) AND (`Item` IN (48679, 48681, 49667));
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(46007, 49667, 0, 100, 0, 1, 0, 1, 1, 'Bag of Fishing Treasures - Waterlogged Recipe, Starts Non-repeatable Quest 24431'),
-(46007, 48679, 0, 100, 0, 1, 0, 1, 1, 'Bag of Fishing Treasures - Waterlogged Recipe, Starts Repeatable Quest 14203');
+(46007, 49667, 0, 2, 0, 1, 0, 1, 1, 'Bag of Fishing Treasures - Waterlogged Recipe, Starts Non-repeatable Quest 24431'),
+(46007, 48679, 0, 2, 0, 1, 0, 1, 1, 'Bag of Fishing Treasures - Waterlogged Recipe, Starts Repeatable Quest 14203');
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 5) AND (`SourceGroup` = 46007) AND (`SourceEntry` IN (48679, 48681, 49667));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
