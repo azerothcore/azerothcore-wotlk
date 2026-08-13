@@ -11,7 +11,9 @@ import (
 // TestMeta describes cross-cutting filters for a live e2e test.
 // Call Gate at the start of every test (before expensive setup).
 type TestMeta struct {
-	// Tags are comma-free tokens, e.g. "smoke", "short", "multi_bot", "issue", "serial".
+	// Tags are comma-free tokens, e.g. "smoke", "short", "multi_bot", "issue", "parallel".
+	// Live e2e defaults to serial (no t.Parallel) so in-package tests do not thrash
+	// one PackagePad. Opt in with tag "parallel" only when pad-safe.
 	Tags []string
 	// Issue is an optional AC GitHub issue number (0 = none).
 	Issue int
@@ -22,7 +24,7 @@ type TestMeta struct {
 }
 
 // Gate skips the test when env filters exclude it.
-// Prefer Begin(t, m) which also enforces serial vs t.Parallel policy.
+// Prefer Begin(t, m) which also enforces parallel policy (serial by default).
 //
 // Env:
 //
@@ -74,15 +76,17 @@ func HasTag(m TestMeta, tag string) bool {
 	return ok
 }
 
-// Begin runs Gate then t.Parallel() only when the test is not tagged serial.
-// Prefer this over Gate+t.Parallel so crash-sensitive tests never thrash a shared realm.
+// Begin runs Gate then optionally t.Parallel().
+// Default is serial: PackagePad is sticky per package, so in-package parallel
+// would co-locate bots on the same pad. Tag "parallel" to opt in (use only when
+// tests do not share pad placement, or with go test -parallel 1 which no-ops Parallel).
+// Tag "serial" is accepted as an explicit no-op for readability.
 func Begin(t *testing.T, m TestMeta) {
 	t.Helper()
 	Gate(t, m)
-	if HasTag(m, "serial") {
-		return
+	if HasTag(m, "parallel") && !HasTag(m, "serial") {
+		t.Parallel()
 	}
-	t.Parallel()
 }
 
 func tagSet(tags []string) map[string]struct{} {

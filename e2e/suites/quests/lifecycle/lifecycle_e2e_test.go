@@ -16,6 +16,7 @@ import (
 func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
 	// serial: DieMust + CharDB save race under parallel pad thrash.
 	meta.Begin(t, meta.TestMeta{
+		// smoke: fixed on this branch (#26549 STAY_ALIVE fail-on-death).
 		Tags:     []string{"short", "quests", "issue", "smoke", "serial"},
 		Runtime:  "short",
 		Issue:    26549,
@@ -46,7 +47,8 @@ func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
 		}
 	}
 	if st != e2eharness.QuestStatusFailed {
-		e2eharness.ConfirmedBugf(t, 26549, "quest status=%d (%s) after death+repop, want FAILED(5)",
+		// ConfirmedBugf(t, 26549, ...) — core FailQuestsOnDeath is on this branch; hard-fail.
+		e2eharness.Assertf(t, "quest status=%d (%s) after death+repop, want FAILED(5)",
 			st, e2eharness.QuestStatusName(st))
 	}
 	t.Logf("PASS quest failed on death (status=%s)", e2eharness.QuestStatusName(st))

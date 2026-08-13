@@ -955,6 +955,8 @@ void Player::FailQuest(uint32 questId)
 
 void Player::FailQuestsOnDeath()
 {
+    // Collect first: FailQuest mutates m_QuestStatus / items / packets.
+    std::vector<uint32> failIds;
     for (auto const& [id, statusData] : m_QuestStatus)
     {
         if (statusData.Status != QUEST_STATUS_INCOMPLETE)
@@ -964,8 +966,10 @@ void Player::FailQuestsOnDeath()
         if (!quest || !quest->HasFlag(QUEST_FLAGS_STAY_ALIVE))
             continue;
 
-        FailQuest(id);
+        failIds.push_back(id);
     }
+    for (uint32 id : failIds)
+        FailQuest(id);
 }
 
 void Player::AbandonQuest(uint32 questId)

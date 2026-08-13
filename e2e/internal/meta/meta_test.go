@@ -30,11 +30,13 @@ func TestHasTag_Serial(t *testing.T) {
 	}
 }
 
-// TestBegin_SerialDoesNotParallel documents that Begin with serial must not call t.Parallel.
-// We cannot assert Parallel state after the fact, but we can ensure Gate still runs and
-// serial HasTag short-circuits (no panic / skip under default env).
-func TestBegin_SerialDoesNotParallel(t *testing.T) {
+// TestBegin_DefaultSerial documents that Begin does not call t.Parallel by default.
+func TestBegin_DefaultSerial(t *testing.T) {
 	Begin(t, TestMeta{Tags: []string{"unit", "serial"}, Runtime: "short"})
-	// If Begin incorrectly Parallel'd a serial test under a parent that already Parallel'd,
-	// go test would panic. Reaching here means the serial branch returned after Gate.
+	// Reaching here means Gate ran and default serial path did not panic.
+}
+
+// TestBegin_ParallelOptIn allows t.Parallel only when tagged parallel (not serial).
+func TestBegin_ParallelOptIn(t *testing.T) {
+	Begin(t, TestMeta{Tags: []string{"unit", "parallel"}, Runtime: "short"})
 }

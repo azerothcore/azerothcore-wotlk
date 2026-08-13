@@ -151,8 +151,8 @@ If the scenario should stay as a regression, **move** it into `suites/` (or `sui
 
 | Layer | Behaviour |
 |-------|-----------|
-| **Packages** | Go runs different packages in parallel when you pass `-parallel N` (and have enough packages). |
-| **Tests in a package** | With `-parallel 1`, serial. Prefer this for live e2e. |
+| **Packages** | `go test -p N` runs packages concurrently. Default **`P=1`** in the Makefile — IsolationPads has 10 unique pads; more packages than pads **hash-share** and can thrash. Raise `P` only when every concurrent package has a unique preferred pad. |
+| **Tests in a package** | `meta.Begin` is **serial by default** (no `t.Parallel`). Tag `parallel` only if pad-safe. Makefile `PARALLEL=1`. |
 | **Pads** | `e2eharness.PackagePad(t)` is **sticky per suite folder** for the process lifetime. |
 
 Use **`PackagePad`** for combat/social placement — not a shared Stormwind cell for every suite.

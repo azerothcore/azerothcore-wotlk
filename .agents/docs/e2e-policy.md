@@ -1,6 +1,6 @@
 # A2 — E2E Policy (AzerothCore + AzerothGhost harness)
 
-**Status:** phase-0 policy (authoritative for e2e-army work; promote into permanent agent docs when ready — see §10).  
+**Status:** current (AGENTS.md mandatory reading for live-stack e2e).  
 **Audience:** humans and LLMs changing AC core/scripts/SQL and/or writing live-stack tests.  
 **Harness:** [AzerothGhost `e2e/e2eharness`](https://github.com/walkline/AzerothGhost) — import from consumer tests; authoring rules in harness `LLM_GUIDE.md` / `EXAMPLES.md`.  
 **Stack under test:** AzerothCore 3.3.5a (auth + world + MySQL). Optional gateway in front is fine if `E2E_*` points at the client entrypoint.

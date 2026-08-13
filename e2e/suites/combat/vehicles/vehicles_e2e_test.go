@@ -51,7 +51,7 @@ func TestVehicles_HardDisconnectWorldAlive(t *testing.T) {
 // VEH-04: deferred EnterVehicle documented.
 func TestVehicles_EnterVehicleDeferred(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "deferred"}, Runtime: "short", Category: "combat/vehicles"})
-	t.Skip("EnterVehicle/ExitVehicle/IsOnVehicle deferred — see phase3/A7_HARNESS_GAPS.md")
+	t.Skip("EnterVehicle/ExitVehicle/IsOnVehicle deferred — harness gap (AzerothGhost e2eharness)")
 }
 
 // VEH-05: Ulduar named tele (vehicle-heavy raid) enter world alive.

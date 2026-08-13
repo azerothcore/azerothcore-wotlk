@@ -76,12 +76,12 @@ func TestSmoke_TeleportPadSuccess(t *testing.T) {
 		Prefix: "SmTele",
 		Level:  80,
 	})
-	bot.TeleportPad(t, e2eharness.PackagePad(t))
+	pad := e2eharness.PackagePad(t)
+	bot.TeleportPad(t, pad)
 	x, y, z, mapID := bot.Pos()
-	if mapID != e2eharness.MapEasternKingdoms {
-		e2eharness.Preconditionf(t, "expected map %d after pad tele, got %d", e2eharness.MapEasternKingdoms, mapID)
+	if mapID != pad.Map {
+		e2eharness.Preconditionf(t, "expected pad map %d after tele, got %d", pad.Map, mapID)
 	}
-	// Loose radius: pad is Stormwind outskirts; just require finite coords and EK map.
 	if math.IsNaN(float64(x)) || math.IsNaN(float64(y)) || math.IsNaN(float64(z)) {
 		e2eharness.HarnessFailf(t, "invalid pos after pad tele")
 	}

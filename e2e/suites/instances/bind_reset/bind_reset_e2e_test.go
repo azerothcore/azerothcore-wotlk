@@ -82,7 +82,7 @@ func TestBind_ResetSummonExploitDeferred(t *testing.T) {
 		Issue:    10708,
 		Category: "instances/bind_reset",
 	})
-	t.Skip("LeaderResetInstances/AcceptSummon deferred — see A7_HARNESS_GAPS.md (#10708)")
+	t.Skip("LeaderResetInstances/AcceptSummon deferred — harness gap (AzerothGhost e2eharness; AC #10708)")
 }
 
 // BIND-05: character_instance DB read attempt after instance map enter (soft).
