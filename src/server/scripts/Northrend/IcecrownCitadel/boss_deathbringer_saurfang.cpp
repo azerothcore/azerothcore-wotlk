@@ -169,7 +169,6 @@ enum EventTypes
     EVENT_OUTRO_ALLIANCE_18     = 40,
     EVENT_OUTRO_ALLIANCE_19     = 41,
     EVENT_OUTRO_ALLIANCE_20     = 42,
-    EVENT_OUTRO_ALLIANCE_21     = 43,
 
     EVENT_OUTRO_HORDE_1         = 44,
     EVENT_OUTRO_HORDE_3         = 46,
@@ -1360,6 +1359,15 @@ public:
         {
             _index = 0;
             me->SetReactState(REACT_PASSIVE);
+        }
+
+        // The intro draws their weapons, so every reset path - a wipe above all - has to put them
+        // away again, or they hold the combat pose at their posts until the intro is replayed.
+        // _index is deliberately left alone: it is their identity, not encounter state.
+        void Reset() override
+        {
+            me->SetSheath(SHEATH_STATE_UNARMED);
+            me->SetEmoteState(EMOTE_ONESHOT_NONE);
         }
 
         void SetData(uint32 type, uint32 data) override

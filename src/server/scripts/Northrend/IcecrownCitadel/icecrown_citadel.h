@@ -436,8 +436,9 @@ enum GameObjectsIds
     GO_DEATHBRINGER_S_CACHE_25H             = 202241,
     GO_SCOURGE_TRANSPORTER_SAURFANG         = 202244,
     // Victory camp raised on Deathbringer's Rise once Saurfang is defeated.
-    // The forge, bonfire and anvil are faction neutral and already have spawn rows; the tents and
-    // teleporters are faction specific and are summoned by the instance script.
+    // The forge, bonfire and anvil below are the Horde camp's, and already have spawn rows - the
+    // instance script only has to raise them. Everything else, the whole Alliance camp included,
+    // is summoned by the instance script.
     GO_SAURFANG_CAMP_FORGE                  = 1685,
     GO_SAURFANG_CAMP_BONFIRE                = 187852,
     GO_SAURFANG_CAMP_ANVIL                  = 191345,

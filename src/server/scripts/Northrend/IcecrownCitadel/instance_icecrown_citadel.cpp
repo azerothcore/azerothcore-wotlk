@@ -1447,7 +1447,6 @@ public:
                 instance->SummonGameObject(GO_SAURFANG_CAMP_ANVIL_A, SaurfangCampAnvilPosA, 0.0f, 0.0f, 0.0f, 0.0f, WEEK);
                 instance->SummonGameObject(GO_SAURFANG_CAMP_BANNER_A, SaurfangCampBannerPosA, 0.0f, 0.0f, 0.0f, 0.0f, WEEK);
             }
-
         }
 
         // They clear the site before the tent drops, or it lands on top of them.
