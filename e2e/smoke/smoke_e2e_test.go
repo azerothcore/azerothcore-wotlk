@@ -17,8 +17,10 @@ import (
 func TestSmoke_FirstTimeCharacterCreate(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol", "serial"}, Runtime: "short", Category: "smoke"})
 
+	// Prefix must stay short: auth rejects account names >17 chars (closes with EOF).
+	// MakeBotIdents builds Prefix + 2-digit index + 8 hex = Prefix+10; keep Prefix <= 7.
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "SmCreate",
+		Prefix: "SmCre",
 		Race:   e2eharness.RaceHuman,
 		Class:  e2eharness.ClassWarrior,
 		Level:  1,
