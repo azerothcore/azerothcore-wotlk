@@ -191,10 +191,6 @@ void WaypointMovementGenerator<Creature>::ProcessWaypointArrival(Creature* creat
         creature->UpdateCurrentWaypointInfo(0, 0);
 
         if (CreatureAI* AI = creature->AI())
-            AI->PathEndReached(pathId);
-
-        // Re-fetch AI — PathEndReached may have despawned the creature or swapped its AI
-        if (CreatureAI* AI = creature->AI())
             AI->WaypointPathEnded(waypointId, pathId);
     }
 
@@ -441,10 +437,7 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
                 _done = true;
                 _smoothSplineLaunched = false;
                 creature->UpdateCurrentWaypointInfo(0, 0);
-                if (CreatureAI* AI = creature->AI())
-                    AI->PathEndReached(endPathId);
 
-                // Re-fetch AI — PathEndReached may have despawned the creature or swapped its AI
                 if (CreatureAI* AI = creature->AI())
                     AI->WaypointPathEnded(endWpId, endPathId);
             }

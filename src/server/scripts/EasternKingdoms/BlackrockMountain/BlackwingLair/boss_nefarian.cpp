@@ -577,7 +577,7 @@ struct boss_nefarian : public BossAI
         }
     }
 
-    void PathEndReached(uint32 /*pathId*/) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/) override
     {
         me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
         me->SetCanFly(false);

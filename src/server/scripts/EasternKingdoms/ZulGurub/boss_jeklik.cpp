@@ -143,9 +143,9 @@ struct boss_jeklik : public BossAI
         me->GetMotionMaster()->MoveWaypoint(PATH_JEKLIK_INTRO, false);
     }
 
-    void PathEndReached(uint32 pathId) override
+    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
     {
-        BossAI::PathEndReached(pathId);
+        BossAI::WaypointPathEnded(nodeId, pathId);
 
         me->SetDisableGravity(false);
         me->SetCombatMovement(true);

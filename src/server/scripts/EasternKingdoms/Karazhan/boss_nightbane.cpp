@@ -289,9 +289,9 @@ struct boss_nightbane : public BossAI
             ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void PathEndReached(uint32 pathId) override
+    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
     {
-        BossAI::PathEndReached(pathId);
+        BossAI::WaypointPathEnded(nodeId, pathId);
         if (pathId == me->GetEntry()*10) // intro
         {
             me->GetMap()->SetVisibilityRange(DEFAULT_VISIBILITY_INSTANCE); // restore visibility

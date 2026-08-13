@@ -208,8 +208,6 @@ public:
 
     void OnSpellClick(Unit* clicker, bool& result) override;
 
-    void PathEndReached(uint32 pathId) override;
-
     void WaypointPathStarted(uint32 pathId) override;
     void WaypointStarted(uint32 nodeId, uint32 pathId) override;
     void WaypointReached(uint32 nodeId, uint32 pathId) override;

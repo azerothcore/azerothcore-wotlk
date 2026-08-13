@@ -156,7 +156,7 @@ public:
                 hyjal->SetData(DATA_RESET_ALLIANCE, 0);
         }
 
-        void PathEndReached(uint32 /*pathId*/) override
+        void WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/) override
         {
             DoCastSelf(SPELL_MASS_TELEPORT);
             Talk(SAY_TELEPORT);
@@ -501,7 +501,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
         }
     }
 
-    void PathEndReached(uint32 pathId) override
+    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
     {
         // Delay is required because we are calling the movement generator from inside the pathing hook.
         // If we issue another call here, it will be flushed before it is executed.
@@ -615,7 +615,7 @@ struct npc_hyjal_gargoyle : public ScriptedAI
         }
     }
 
-    void PathEndReached(uint32 /* pathId */) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/) override
     {
         // TODO: Do they do something special after finishing the path?
         me->m_Events.AddEventAtOffset([this]()
@@ -681,7 +681,7 @@ struct npc_hyjal_frost_wyrm : public ScriptedAI
         }
     }
 
-    void PathEndReached(uint32 pathId) override
+    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
     {
         if (pathId == FROST_WYRM_FORTRESS)
         {

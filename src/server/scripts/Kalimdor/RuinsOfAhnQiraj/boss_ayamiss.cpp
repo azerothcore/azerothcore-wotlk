@@ -242,7 +242,7 @@ struct npc_hive_zara_swarmer : public ScriptedAI
 {
     npc_hive_zara_swarmer(Creature* creature) : ScriptedAI(creature) { }
 
-    void PathEndReached(uint32 /*pathId*/) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/) override
     {
         // Delay is required because we are calling the movement generator from inside the pathing hook.
         // If we issue another call here, it will be flushed before it is executed.

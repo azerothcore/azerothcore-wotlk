@@ -2102,7 +2102,7 @@ struct dragonmaw_race_npc : public ScriptedAI
         }
     }
 
-    void PathEndReached(uint32 /*pathId*/) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/) override
     {
         Reset();
     }

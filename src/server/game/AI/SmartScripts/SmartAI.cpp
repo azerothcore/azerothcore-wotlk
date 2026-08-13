@@ -1329,12 +1329,6 @@ void SmartAI::OnSpellClick(Unit* clicker, bool&  /*result*/)
     GetScript()->ProcessEventsFor(SMART_EVENT_ON_SPELLCLICK, clicker);
 }
 
-void SmartAI::PathEndReached(uint32 /*pathId*/)
-{
-    GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_ENDED, nullptr, 0, me->GetWaypointPath());
-    me->LoadPath(0);
-}
-
 void SmartAI::WaypointPathStarted(uint32 /*pathId*/)
 {
 }
@@ -1345,6 +1339,9 @@ void SmartAI::WaypointStarted(uint32 /*nodeId*/, uint32 /*pathId*/)
 
 void SmartAI::WaypointReached(uint32 nodeId, uint32 pathId)
 {
+    GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_ENDED, nullptr, 0, me->GetWaypointPath());
+    me->LoadPath(0);
+
     if (!HasEscortState(SMART_ESCORT_ESCORTING))
     {
         GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_REACHED, nullptr, nodeId, pathId);

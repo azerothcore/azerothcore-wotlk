@@ -186,9 +186,6 @@ public:
     // Called at waypoint reached or point movement finished
     virtual void MovementInform(uint32 /*type*/, uint32 /*id*/) {}
 
-    // Called at MovePath End
-    virtual void PathEndReached(uint32 /*pathId*/) {}
-
     /// == Waypoints system =============================
 
     virtual void WaypointPathStarted(uint32 /*pathId*/) { }

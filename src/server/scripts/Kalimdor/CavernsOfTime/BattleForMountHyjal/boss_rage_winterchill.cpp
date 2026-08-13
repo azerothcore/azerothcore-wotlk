@@ -97,7 +97,7 @@ public:
             me->GetMotionMaster()->MoveWaypoint(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
     }
 
-    void PathEndReached(uint32 pathId) override
+    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
     {
         switch (pathId)
         {
