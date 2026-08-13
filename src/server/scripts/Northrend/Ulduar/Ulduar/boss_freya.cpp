@@ -1081,6 +1081,8 @@ struct boss_freya_summons : public ScriptedAI
 
     void IsSummonedBy(WorldObject* summoner) override
     {
+        if (!summoner)
+            return;
         if (Creature* freya = summoner->ToCreature())
         {
             if (freya->GetEntry() == NPC_FREYA)
