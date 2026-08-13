@@ -330,7 +330,7 @@ public:
             // Restoring here, and not only from the gunship exit timer, rescues an instance whose
             // Gunship Battle state was set directly and would otherwise keep them hidden for good.
             if (GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == DONE && !_saurfangOutroRunning)
-                SpawnSaurfangEventNpcs();
+                RestoreHiddenSaurfangEventNpcs();
 
             if (GetBossState(DATA_DEATHBRINGER_SAURFANG) == DONE && !_saurfangOutroRunning)
                 SpawnSaurfangCamp(false);
@@ -833,6 +833,12 @@ public:
                     SaurfangCampGUIDs.push_back(go->GetGUID());
                     if (GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE)
                         go->DespawnOrUnsummon(0ms, Seconds(WEEK));
+                    // That despawn is persisted, so an instance restarted after the outro would come
+                    // back with them hidden for the rest of the lockout. Raising them here catches
+                    // that, whatever state the camp build got to. Horde only - these spawn rows are
+                    // the Horde camp; the Alliance one summons its own props.
+                    else if (GetTeamIdInInstance() == TEAM_HORDE)
+                        go->Respawn();
                     break;
                 case GO_PLAGUE_SIGIL:
                     PlagueSigilGUID = go->GetGUID();
@@ -1342,6 +1348,21 @@ public:
             for (ObjectGuid const& guid : SaurfangEventGuardGUIDs)
                 if (Creature* guard = instance->GetCreature(guid))
                     RestoreSaurfangEventNpc(guard);
+        }
+
+        // Only the ones HideSaurfangEventNpc actually left hidden. A scene in progress - intro,
+        // encounter or outro - has them visible and placed, and teleporting those to their spawn
+        // points would break it mid-run.
+        void RestoreHiddenSaurfangEventNpcs()
+        {
+            if (Creature* captain = instance->GetCreature(DeathbringerSaurfangEventGUID))
+                if (!captain->IsVisible())
+                    RestoreSaurfangEventNpc(captain);
+
+            for (ObjectGuid const& guid : SaurfangEventGuardGUIDs)
+                if (Creature* guard = instance->GetCreature(guid))
+                    if (!guard->IsVisible())
+                        RestoreSaurfangEventNpc(guard);
         }
 
         // The camp is built on screen in stages: teleporters, then workers raising the tents, then

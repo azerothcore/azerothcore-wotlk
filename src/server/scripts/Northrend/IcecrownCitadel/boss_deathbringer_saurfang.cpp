@@ -67,7 +67,7 @@ enum ScriptTexts
     SAY_INTRO_ALLIANCE_1            = 0,
     SAY_INTRO_ALLIANCE_4            = 1,
     SAY_INTRO_ALLIANCE_5            = 2,
-    SAY_OUTRO_ALLIANCE_1            = 3, /// @todo ALLIANCE OUTRO
+    SAY_OUTRO_ALLIANCE_1            = 3,
     SAY_OUTRO_ALLIANCE_2            = 4,
     SAY_OUTRO_ALLIANCE_3            = 5,
     SAY_OUTRO_ALLIANCE_4            = 6,
@@ -203,7 +203,6 @@ enum Actions
     ACTION_CONTINUE_INTRO               = -3781301,
     ACTION_CHARGE                       = -3781302,
     ACTION_START_OUTRO                  = -3781303,
-    ACTION_DESPAWN                      = -3781304,
     ACTION_INTRO_DONE                   = -3781305,
     ACTION_EVADE                        = -3781306,
     ACTION_GAIN_SCENT_OF_BLOOD          = -3781307,
@@ -1170,29 +1169,29 @@ public:
                     _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_11, 6s);
                     break;
                 case EVENT_OUTRO_ALLIANCE_11:
+                {
                     // He carries the rest of the scene. If he is gone the remaining beats would
                     // play to an empty stage, so cut straight to the cleanup instead.
-                    if (!ObjectAccessor::GetCreature(*me, _outroSaurfangGUID))
+                    Creature* saurfang = ObjectAccessor::GetCreature(*me, _outroSaurfangGUID);
+                    if (!saurfang)
                     {
                         _events.ScheduleEvent(EVENT_OUTRO_A_DISMISS, 1s);
                         break;
                     }
 
-                    if (Creature* saurfang = ObjectAccessor::GetCreature(*me, _outroSaurfangGUID))
+                    saurfang->AI()->Talk(SAY_OUTRO_ALLIANCE_12);
+                    saurfang->SetEmoteState(EMOTE_ONESHOT_NONE);
+                    saurfang->SetSheath(SHEATH_STATE_UNARMED);
+                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                     {
-                        saurfang->AI()->Talk(SAY_OUTRO_ALLIANCE_12);
-                        saurfang->SetEmoteState(EMOTE_ONESHOT_NONE);
-                        saurfang->SetSheath(SHEATH_STATE_UNARMED);
-                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
-                        {
-                            float x, y, z;
-                            deathbringer->GetClosePoint(x, y, z, deathbringer->GetObjectSize());
-                            saurfang->SetWalk(true);
-                            saurfang->GetMotionMaster()->MovePoint(POINT_A_CORPSE, x, y, z);
-                        }
+                        float x, y, z;
+                        deathbringer->GetClosePoint(x, y, z, deathbringer->GetObjectSize());
+                        saurfang->SetWalk(true);
+                        saurfang->GetMotionMaster()->MovePoint(POINT_A_CORPSE, x, y, z);
                     }
                     _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_12, 14s);
                     break;
+                }
                 case EVENT_OUTRO_ALLIANCE_12:
                     if (Creature* saurfang = ObjectAccessor::GetCreature(*me, _outroSaurfangGUID))
                     {
@@ -1442,8 +1441,6 @@ public:
                 me->GetHomePosition(x, y, z, o);
                 me->GetMotionMaster()->MovePoint(action == ACTION_OUTRO_RETREAT ? POINT_RETREAT : POINT_A_STAND_DOWN, x, y, z);
             }
-            else if (action == ACTION_DESPAWN)
-                me->DespawnOrUnsummon(1ms);
         }
 
     private:
