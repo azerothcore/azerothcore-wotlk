@@ -12,6 +12,26 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
+// SMOKE-07 first: fresh-account create (run early — late runs saw flaky auth EOF
+// after several login/relog cycles against a cold native stack).
+func TestSmoke_FirstTimeCharacterCreate(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol", "serial"}, Runtime: "short", Category: "smoke"})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "SmCreate",
+		Race:   e2eharness.RaceHuman,
+		Class:  e2eharness.ClassWarrior,
+		Level:  1,
+	})
+	if bot.GUID == 0 {
+		e2eharness.Preconditionf(t, "character create/login produced GUID 0")
+	}
+	if !e2eharness.SessionAlive(bot.Session) {
+		e2eharness.HarnessFailf(t, "session dead after character create")
+	}
+	t.Logf("PASS first-time create guid=%d name=%s", bot.GUID, bot.Name)
+}
+
 // SMOKE-01: valid login → enter world
 func TestSmoke_ValidLoginEnterWorld(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol", "serial"}, Runtime: "short", Category: "smoke"})
@@ -87,23 +107,4 @@ func TestSmoke_RelogSameCharacterWorldAlive(t *testing.T) {
 		t.Logf("NOTE guid changed after relog before=%d after=%d", guidBefore, bot.GUID)
 	}
 	t.Logf("PASS relog world alive guid=%d", bot.GUID)
-}
-
-// SMOKE-07: first-time character create path (NewSolo with fresh account always creates)
-func TestSmoke_FirstTimeCharacterCreate(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"smoke", "short", "protocol", "serial"}, Runtime: "short", Category: "smoke"})
-
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "SmCreate",
-		Race:   e2eharness.RaceHuman,
-		Class:  e2eharness.ClassWarrior,
-		Level:  1,
-	})
-	if bot.GUID == 0 {
-		e2eharness.Preconditionf(t, "character create/login produced GUID 0")
-	}
-	if !e2eharness.SessionAlive(bot.Session) {
-		e2eharness.HarnessFailf(t, "session dead after character create")
-	}
-	t.Logf("PASS first-time create guid=%d name=%s", bot.GUID, bot.Name)
 }
