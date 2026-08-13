@@ -71,8 +71,11 @@ jobs:
           github.event_name == 'pull_request'
           && !github.event.pull_request.draft
           && (
-            contains(github.event.pull_request.labels.*.name, 'run-e2e')
-            || github.event.label.name == 'run-e2e'
+            (github.event.action == 'labeled' && github.event.label.name == 'run-e2e')
+            || (
+              github.event.action != 'labeled'
+              && contains(github.event.pull_request.labels.*.name, 'run-e2e')
+            )
           )
         )
       )
@@ -95,8 +98,9 @@ jobs:
     if: needs.preflight.result == 'success'
     # Host MySQL comes from acore.sh install-deps (dashboard-ci style). Do not
     # add services.mysql: it binds :3306 and systemctl start mysql.service fails.
-    runs-on: ${{ vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
-    timeout-minutes: 360
+    # PRs always GitHub-hosted (untrusted code). Self-hosted only via dispatch + E2E_RUNS_ON.
+    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
+    timeout-minutes: 480
     steps:
       - name: Free disk
         run: |
@@ -105,6 +109,8 @@ jobs:
 
       - name: Checkout AzerothCore
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Checkout AzerothGhost harness
         uses: actions/checkout@v7
@@ -113,6 +119,7 @@ jobs:
           path: _deps/AzerothGhost
           ref: ${{ github.event.inputs.harness_ref || vars.E2E_HARNESS_REF || '' }}
           token: ${{ secrets.E2E_HARNESS_TOKEN || github.token }}
+          persist-credentials: false
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -383,18 +390,31 @@ jobs:
           scope="${E2E_SCOPE}"
           packages_raw="${E2E_PACKAGES}"
 
+          # Packages must stay under e2e/ (no path escape).
+          [[ "${packages_raw}" =~ ^\./[A-Za-z0-9_./\*+-]*$ ]] || { echo "bad packages"; exit 1; }
+          [[ "${packages_raw}" != *..* ]] || { echo "packages must not contain .."; exit 1; }
+          [[ "${count}" =~ ^[1-9][0-9]*$ ]] || { echo "bad count (need >=1)"; exit 1; }
+          [[ "${parallel}" =~ ^[1-9][0-9]*$ ]] || { echo "bad parallel (need >=1)"; exit 1; }
+          [[ "${p}" =~ ^[1-9][0-9]*$ ]] || { echo "bad package_parallel (need >=1)"; exit 1; }
+          if (( parallel > 1 )); then
+            echo "::warning::parallel=${parallel} >1 shares PackagePad within a package; prefer 1"
+          fi
+          if (( p > 1 )); then
+            echo "::warning::package_parallel=${p} >1 may hash-share IsolationPads (only 10 unique)"
+          fi
+          if (( p > 10 )); then
+            echo "package_parallel capped at 10 (IsolationPads size)"
+            p=10
+          fi
           if [[ -n "${E2E_TIMEOUT_INPUT}" ]]; then
+            [[ "${E2E_TIMEOUT_INPUT}" =~ ^[0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h)$ ]] \
+              || { echo "bad timeout duration: ${E2E_TIMEOUT_INPUT}"; exit 1; }
             timeout="${E2E_TIMEOUT_INPUT}"
           elif [[ "${scope}" == "full" ]]; then
             timeout="120m"
           else
             timeout="30m"
           fi
-
-          [[ "${packages_raw}" =~ ^\./[A-Za-z0-9_./\*+-]*$ ]] || { echo "bad packages"; exit 1; }
-          [[ "${count}" =~ ^[0-9]+$ ]] || { echo "bad count"; exit 1; }
-          [[ "${parallel}" =~ ^[0-9]+$ ]] || { echo "bad parallel"; exit 1; }
-          [[ "${p}" =~ ^[0-9]+$ ]] || { echo "bad package_parallel"; exit 1; }
 
           run_go_test() {
             go test -tags=e2e -count="${count}" -timeout="${timeout}" -parallel="${parallel}" -p "${p}" -v "$@"

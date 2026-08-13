@@ -39,11 +39,14 @@ func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
 		e2eharness.HarnessFailf(t, "quest row missing after death")
 	}
 	if st != e2eharness.QuestStatusFailed {
-		// One more save settle (DieAndRepop path can lag FailQuest → DB under load).
-		time.Sleep(500 * time.Millisecond)
-		st, ok = bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
-		if !ok {
-			e2eharness.HarnessFailf(t, "quest row missing after death (retry)")
+		// CharDB lag after FailQuest — poll, do not fixed-sleep once.
+		deadline := time.Now().Add(5 * time.Second)
+		for time.Now().Before(deadline) && st != e2eharness.QuestStatusFailed {
+			time.Sleep(100 * time.Millisecond)
+			st, ok = bot.QuestStatusAfterSave(t, e2eharness.QuestRethbanGauntlet)
+			if !ok {
+				e2eharness.HarnessFailf(t, "quest row missing after death (retry)")
+			}
 		}
 	}
 	if st != e2eharness.QuestStatusFailed {

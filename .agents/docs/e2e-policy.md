@@ -133,7 +133,7 @@ Treat this as a **PR gate**. Every box is MUST unless marked SHOULD.
 - [ ] `//go:build e2e` on live tests so offline `go test` stays clean.  
 - [ ] Imports: `e2e/e2eharness` + blank-import MySQL driver.  
 - [ ] Fixture: `NewSolo` / `NewScenario` (+ `BotSpec` / `ByRole` when roles differ). Prefer `ScenarioBot` methods over raw `Session` except guild charter/bank.  
-- [ ] Unique short `Prefix`; `t.Parallel()` when isolation allows.  
+- [ ] Unique short `Prefix`; use `meta.Begin` (**serial by default**). Tag `parallel` only when pad-safe.  
 - [ ] Name: `TestArea_Behaviour` or `TestAC_<issue>_<ShortName>` for tracked issues.  
 - [ ] Comment links AC issue/PR URL when applicable.
 
@@ -289,7 +289,7 @@ Aligned with harness `LLM_GUIDE.md` / `EXAMPLES.md` / `README.md`.
 | Invent harness APIs | NEVER |
 | `ScenarioBot` for combat/quest/aura/death/relog | SHOULD (default) |
 | Session helpers for guild charter/bank | SHOULD when testing guild protocol |
-| `t.Parallel` when safe | SHOULD |
+| `meta.Begin` serial default; `parallel` tag only when pad-safe | SHOULD |
 
 ### 6.3 Determinism & isolation
 
@@ -326,7 +326,7 @@ An e2e is **mergeable** only if it meets **all** of:
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/NNNNN
 func TestAC_NNNNN_ShortOracle(t *testing.T) {
-	t.Parallel()
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "issue"}, Runtime: "short", Issue: NNNNN})
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "Short", Race: e2eharness.RaceHuman,
 		Class: e2eharness.ClassWarrior, Level: 80, LearnAllClass: true,

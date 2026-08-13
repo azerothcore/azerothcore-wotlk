@@ -65,15 +65,17 @@ Export vars in your shell (or `set -a; source .env; set +a`) before `go test`.
 
 ## How to run
 
-**Recommended full suite** (packages parallel, tests serial within each package):
+**Recommended full suite** (pad-safe defaults: serial tests **and** packages):
 
 ```bash
 cd e2e
 # export E2E_* from .env.example first
-go test -tags=e2e ./... -count=1 -v -timeout 120m -parallel 1
+go test -tags=e2e ./... -count=1 -v -timeout 120m -parallel 1 -p 1
+# or:
+make e2e-full
 ```
 
-`-parallel 1` is intentional: each suite package still runs **concurrently with other packages**, but tests **inside** a package run one at a time and share that package’s sticky isolation pad. Raising in-package parallelism increases pad thrash and flaky combat/loot.
+`-parallel 1` keeps in-package tests serial (`meta.Begin` is serial by default). `-p 1` runs one package at a time so IsolationPads (10 unique) never hash-share. Raising either without a unique preferred pad per concurrent package causes thrash.
 
 ### Make targets
 
@@ -90,7 +92,8 @@ make e2e-list                           # list tests
 Override parallel / timeout:
 
 ```bash
-make e2e-full PARALLEL=1 TIMEOUT=120m
+make e2e-full PARALLEL=1 P=1 TIMEOUT=120m
+# P = go test -p (packages). Keep 1 unless every concurrent suite has a unique preferred pad.
 ```
 
 ### Single test / package
@@ -268,7 +271,7 @@ func TestPets_Example(t *testing.T) {
 Checklist:
 
 1. `//go:build e2e` + MySQL blank import + `e2eharness`.
-2. `meta.Begin` (handles tag filters and `t.Parallel` unless tagged `serial`).
+2. `meta.Begin` (tag filters; **serial by default** — tag `parallel` only if pad-safe).
 3. Unique short `Prefix`; place with **`PackagePad`**.
 4. Flow: fixture → place → setup → `CombatReady` if pull → drive → assert.
 5. Waiters (**Arm → Send → Wait**), not fixed long sleeps.
