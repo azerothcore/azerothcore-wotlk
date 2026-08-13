@@ -10,4 +10,4 @@ require (
 require filippo.io/edwards25519 v1.2.0 // indirect
 
 // Local harness co-dev: use e2e/go.work (gitignored) — see go.work.example.
-// CI should require a real AzerothGhost pseudo-version/tag (no path replace).
+// CI checkouts walkline/AzerothGhost and path-replaces this module (see e2e-live.yml).

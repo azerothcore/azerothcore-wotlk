@@ -34,7 +34,10 @@ cp go.work.example go.work   # gitignored; edit the replace path
 # replace github.com/walkline/AzerothGhost => /path/to/AzerothGhost
 ```
 
-CI should pin a real AzerothGhost module version (no path replace).
+CI checks out the public `walkline/AzerothGhost` repo (optional `harness_ref` /
+repo var `E2E_HARNESS_REF`, else default branch) and `go mod edit -replace`s it
+into `e2e/`. Local `go.mod` may stay at a placeholder version until a Ghost
+release is published; do not rely on the module pin alone for CI determinism.
 
 ---
 
@@ -272,7 +275,8 @@ Checklist:
 
 1. `//go:build e2e` + MySQL blank import + `e2eharness`.
 2. `meta.Begin` (tag filters; **serial by default** — tag `parallel` only if pad-safe).
-3. Unique short `Prefix`; place with **`PackagePad`**.
+3. Unique short `Prefix` (**≤ 7 chars**: account = Prefix + 2 digits + 8 hex, auth max 17);
+   place with **`PackagePad`**.
 4. Flow: fixture → place → setup → `CombatReady` if pull → drive → assert.
 5. Waiters (**Arm → Send → Wait**), not fixed long sleeps.
 6. Severity helpers for fatals; quest DB only after `Save`.

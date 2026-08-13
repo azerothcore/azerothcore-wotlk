@@ -134,7 +134,7 @@ Treat this as a **PR gate**. Every box is MUST unless marked SHOULD.
 - [ ] `//go:build e2e` on live tests so offline `go test` stays clean.  
 - [ ] Imports: `e2e/e2eharness` + blank-import MySQL driver.  
 - [ ] Fixture: `NewSolo` / `NewScenario` (+ `BotSpec` / `ByRole` when roles differ). Prefer `ScenarioBot` methods over raw `Session` except guild charter/bank.  
-- [ ] Unique short `Prefix`; use `meta.Begin` (**serial by default**). Tag `parallel` only when pad-safe.  
+- [ ] Unique short `Prefix` (≤ 7 chars — auth username max 17 = Prefix+10); use `meta.Begin` (**serial by default**). Tag `parallel` only when pad-safe.  
 - [ ] Name: `TestArea_Behaviour` or `TestAC_<issue>_<ShortName>` for tracked issues.  
 - [ ] Comment links AC issue/PR URL when applicable.
 

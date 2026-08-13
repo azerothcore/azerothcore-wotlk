@@ -474,5 +474,8 @@ jobs:
             ${{ runner.temp }}/authserver.log
             ${{ runner.temp }}/authserver-dry-run.log
             ${{ runner.temp }}/worldserver-dry-run.log
+            env/dist/bin/Server.log
+            env/dist/bin/Auth.log
+            env/dist/logs/**
           if-no-files-found: ignore
           retention-days: 7

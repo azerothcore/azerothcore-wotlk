@@ -31,7 +31,7 @@ func TestSession_ItemAndQuestAfterLoad(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "SessLoad",
+		Prefix: "SessLd",
 		Level:  40,
 	})
 	bot.AddItem(t, e2eharness.ItemTargetDummy, 1)
@@ -46,7 +46,7 @@ func TestSession_MoneyMutateSaveRelog(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "SessGold",
+		Prefix: "SessGd",
 		Level:  20,
 	})
 	e2eharness.ModMoney(t, bot.World, 12345)

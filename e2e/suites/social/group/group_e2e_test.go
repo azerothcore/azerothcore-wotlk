@@ -38,7 +38,7 @@ func TestGroup_FormPartyBasic(t *testing.T) {
 func TestGroup_LeaveClearsMembership(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "social", "multi_bot", "serial"}, Runtime: "short", Category: "social/group"})
 
-	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpLeave", Count: 2, Level: 20})
+	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "GrpLv", Count: 2, Level: 20})
 	leader, mate := bots[0], bots[1]
 	pad := e2eharness.PackagePad(t)
 	e2eharness.TeleportAllPad(t, bots, pad)
