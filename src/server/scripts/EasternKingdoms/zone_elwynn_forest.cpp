@@ -119,7 +119,7 @@ struct npc_cameron : public ScriptedAI
         me->GetMotionMaster()->MovePoint(0, MovePosPositions.back());
     }
 
-    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 pathId) override
     {
         switch (pathId)
         {
@@ -390,7 +390,7 @@ struct npc_eastvale_peasent : public ScriptedAI
         }
     }
 
-    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 pathId) override
     {
         if (pathId == _path)
         {

@@ -352,7 +352,7 @@ struct brann_bronzebeard : public ScriptedAI
         }
     }
 
-    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 pathId) override
     {
         switch (pathId)
         {

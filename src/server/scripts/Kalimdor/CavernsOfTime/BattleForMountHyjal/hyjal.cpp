@@ -501,7 +501,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
         }
     }
 
-    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 pathId) override
     {
         // Delay is required because we are calling the movement generator from inside the pathing hook.
         // If we issue another call here, it will be flushed before it is executed.
@@ -681,7 +681,7 @@ struct npc_hyjal_frost_wyrm : public ScriptedAI
         }
     }
 
-    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 pathId) override
     {
         if (pathId == FROST_WYRM_FORTRESS)
         {

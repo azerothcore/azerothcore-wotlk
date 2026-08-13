@@ -136,7 +136,7 @@ struct boss_ambassador_hellmaw : public BossAI
         ScriptedAI::AttackStart(who);
     }
 
-    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 pathId) override
     {
         if (pathId == PATH_ID_START)
         {
