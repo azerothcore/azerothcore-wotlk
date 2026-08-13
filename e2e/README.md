@@ -327,7 +327,7 @@ Live e2e does **not** run on every PR. Details live in the workflow file only:
 | How | Effect |
 |-----|--------|
 | Label **`run-e2e`** on a non-draft PR | Smoke e2e against an in-workflow stack |
-| Actions → **e2e-live** → Run workflow (needs workflow on default branch, or use `gh workflow run … --ref e2e`) | Choose scope/stack |
+| Actions → **e2e-live** → Run workflow (needs workflow on default branch, or use `gh workflow run … --ref e2e`) | Choose scope (smoke/full); native stack only |
 
 Day-to-day development and agent debugging should use a **local** stack + `e2e/local/` or the committed suites — not CI setup docs.
 
