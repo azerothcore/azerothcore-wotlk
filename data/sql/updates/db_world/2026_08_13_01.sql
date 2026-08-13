@@ -1,3 +1,4 @@
+-- DB update 2026_08_13_00 -> 2026_08_13_01
 -- Sifreldar Storm Maiden (29323) - Storm Cloud (57408)
 -- The spell was bound to SMART_EVENT_AGGRO (fires at 0ms) with NOT_REPEATABLE,
 -- so it was cast instantly on pull and never re-applied, even though the aura
