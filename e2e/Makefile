@@ -37,7 +37,8 @@ e2e-sub:
 
 e2e-issue:
 	@test -n "$(N)" || (echo "usage: make e2e-issue N=26549"; exit 1)
-	$(GOTEST) -v -parallel 1 -run 'TestAC_$(N)_|Test.*$(N)' ./suites/...
+	# Prefer TestAC_<n>_* names; E2E_ISSUE also selects by meta.Issue.
+	E2E_ISSUE=$(N) $(GOTEST) -v -parallel 1 -run 'TestAC_$(N)_' ./suites/...
 
 e2e-tags:
 	@test -n "$(TAGS_FILTER)" || (echo "usage: make e2e-tags TAGS_FILTER=smoke,short"; exit 1)

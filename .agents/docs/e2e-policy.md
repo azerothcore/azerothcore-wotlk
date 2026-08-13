@@ -24,8 +24,9 @@ Harness severity markers (MUST use these, not bare `t.Fatalf` for classified out
 | Helper | Prefix / meaning |
 |--------|------------------|
 | `Preconditionf` | `precondition:` — setup never reached a judgeable state |
-| `ConfirmedBugf(t, N, …)` | `AC#N CONFIRMED BUG:` — core behaviour wrong for tracked issue |
-| `HarnessFailf` | `harness:` — infra/timeout/SQL/cache/send failure |
+| `ConfirmedBugf(t, N, …)` | `AC#N CONFIRMED BUG:` — core behaviour wrong for tracked issue (fails CI) |
+| `HarnessFailf` / `Assertf` | `harness:` / `assert:` — infra or fixed-core regression (fails CI) |
+| `KNOWN-OPEN-ISSUE` soft return | Log + `return` (no fail) for **open** bugs when `ConfirmedBugf` is commented — **not** smoke-tagged; see §9.2 |
 | `SoftWarnf` | `WARNING:` — non-fatal soft deviation |
 
 ---
@@ -214,7 +215,7 @@ Redundancy veto: if a new test would pass/fail for the **same root cause and sam
 
 ### 5.3 Track gaps (inventory + backlog)
 
-Maintain a living inventory (path TBD at promotion time; during e2e-army use `e2e-army` plan artifacts or the consumer suite README):
+Maintain a living inventory in **`e2e/README.md`** (layout table + deferred/skip notes) and suite comments. Optional future: `.agents/docs/e2e-coverage.md`.
 
 | Field | Purpose |
 |-------|---------|
@@ -377,12 +378,12 @@ A test that fails intermittently on a correct core is a **harness/test bug** unt
 
 | Core state | Test expectation |
 |------------|------------------|
-| Bug open / unfixed | Test **MUST** fail with `ConfirmedBugf` (documents issue). Do not skip “to go green”. |
-| Bug fixed | Test **MUST** go green and remain as regression guard. Keep issue id in name/comment. |
+| Bug open / unfixed | Prefer `ConfirmedBugf` when the suite is an **issue-only** run. For mainline CI smoke, **open-issue soft return** is allowed: comment out `ConfirmedBugf`, log `KNOWN-OPEN-ISSUE #N: …`, `return` without failing; **MUST NOT** carry the `smoke` tag. |
+| Bug fixed | Test **MUST** go green (`Assertf` / hard assert). Keep issue id in name (`TestAC_<n>_…`) and comment. |
 | Bug invalid / cannot reproduce / wrong issue | Fix or delete test; do not leave lying `ConfirmedBugf`. |
 | Environment cannot run scenario | `Preconditionf` or inventory `blocked-*`; not `ConfirmedBugf`. |
 
-**NEVER** convert a real core bug failure into `t.Skip` to clean CI.  
+**NEVER** soft-return a **fixed** bug (use hard assert).  
 **NEVER** delete a green regression test because the issue is closed — closed issues are why the test stays.
 
 ### 9.3 Ownership & churn
@@ -401,26 +402,9 @@ A test that fails intermittently on a correct core is a **harness/test bug** unt
 
 ---
 
-## 10. Suggested long-term placement (AGENTS.md / `.agents/docs`)
+## 10. Placement (done)
 
-This file is a **phase-0 plan artifact**. When e2e-army graduates from plan to standing practice, split as follows (per `.agents/docs/README.md` taxonomy):
-
-| Content | Promote to | Routing |
-|---------|------------|---------|
-| Decision tree, mandatory triggers, when-not, coverage growth, MVT, priorities, maintenance | **`.agents/docs/e2e-policy.md`** (new root task doc) | Add bullet under AGENTS.md **Mandatory reading per task**: “Writing or modifying live-stack e2e → `.agents/docs/e2e-policy.md`” |
-| LLM authoring checklist + harness MUST/NEVER (thin pointer) | **`.agents/docs/e2e-policy.md`** § checklist; deep API stays in harness `LLM_GUIDE.md` | Link out; do not fork API reference into AC |
-| Review expectations (“PR missing e2e for M1–M7”) | **`.agents/docs/code-review.md`** + **`self-review-rules.md`** | Short bullets + link to e2e-policy |
-| Subsystem-specific oracles (e.g. battlegrounds later) | **`.agents/docs/systems/<name>.md`** | Only when subsystem doc exists/needed |
-| Category inventory / backlog | Consumer suite `README` or `.agents/docs/e2e-coverage.md` (optional living data) | Not AGENTS.md body |
-| Build/run how-to for stack | **`.agents/docs/build.md`** (short pointer) or suite README | Avoid bloating policy |
-
-**AGENTS.md** should only gain:
-
-1. One mandatory-reading bullet for e2e-policy.  
-2. Optional one-liner under layout if an `e2e/` consumer tree is added in-repo.
-
-**Do not** paste harness API tables into AGENTS.md.  
-**Do not** leave this plan file as the only copy after promotion — replace with a pointer: “Superseded by `.agents/docs/e2e-policy.md`”.
+This file **is** the standing policy (routed from AGENTS.md). Deep harness API stays in AzerothGhost `LLM_GUIDE.md` / `EXAMPLES.md`. Inventory lives in `e2e/README.md` (and suite comments). Optional later: short bullets in `code-review.md` / `self-review-rules.md`.
 
 ---
 
@@ -438,7 +422,8 @@ MVT:       one oracle + real client path + severity helpers + no GM mid-fight +
 On change of aura|quest|death|relog|boss AI|spell-summon|guild|crash:
            add/update matching e2e OR record gap
 
-Fail:      Preconditionf | ConfirmedBugf(issue) | HarnessFailf
+Fail:      Preconditionf | ConfirmedBugf(issue) | Assertf | HarnessFailf
+           (open-issue soft return OK if not smoke-tagged — §9.2)
 Docs:      this policy (when) + harness LLM_GUIDE/EXAMPLES (how)
 ```
 
@@ -449,7 +434,6 @@ Docs:      this policy (when) + harness LLM_GUIDE/EXAMPLES (how)
 | Field | Value |
 |-------|-------|
 | ID | A2_E2E_POLICY |
-| Phase | e2e-army / phase0 |
+| Status | current (AGENTS.md mandatory reading) |
 | Depends on | Harness `LLM_GUIDE.md`, `EXAMPLES.md`, `README.md` |
-| Supersedes | — |
-| Next | Promote §10 into `.agents/docs/e2e-policy.md` + AGENTS.md routing when suite lands |
+| Inventory | `e2e/README.md` + suite comments |

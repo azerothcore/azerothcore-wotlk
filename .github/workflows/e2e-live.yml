@@ -49,11 +49,13 @@ on:
     types: [labeled, synchronize, reopened]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  # Cancel superseded PR runs; do not cancel intentional dispatch full suites.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
+  actions: write  # ccache save + failure log artifacts
 
 env:
   CONTINUOUS_INTEGRATION: true
@@ -146,6 +148,7 @@ jobs:
         run: mkdir -p "${{ github.workspace }}/var/ccache"
 
       - name: Restore ccache
+        id: restore_ccache
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/var/ccache
@@ -202,7 +205,7 @@ jobs:
         timeout-minutes: 180
 
       - name: Save ccache
-        if: always()
+        if: ${{ !cancelled() && steps.restore_ccache.outcome == 'success' }}
         uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}/var/ccache
@@ -394,6 +397,10 @@ jobs:
           [[ "${packages_raw}" =~ ^\./[A-Za-z0-9_./\*+-]*$ ]] || { echo "bad packages"; exit 1; }
           [[ "${packages_raw}" != *..* ]] || { echo "packages must not contain .."; exit 1; }
           [[ "${count}" =~ ^[1-9][0-9]*$ ]] || { echo "bad count (need >=1)"; exit 1; }
+          if (( count > 5 )); then
+            echo "count capped at 5 (was ${count})"
+            count=5
+          fi
           [[ "${parallel}" =~ ^[1-9][0-9]*$ ]] || { echo "bad parallel (need >=1)"; exit 1; }
           [[ "${p}" =~ ^[1-9][0-9]*$ ]] || { echo "bad package_parallel (need >=1)"; exit 1; }
           if (( parallel > 1 )); then

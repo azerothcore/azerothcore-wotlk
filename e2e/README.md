@@ -111,7 +111,7 @@ go test -tags=e2e ./suites/... -run TestPets_SummonWaitDismiss -count=1 -v -time
 |------|------|
 | `smoke/` | Fast login / tele / relog guards |
 | `suites/<category>/…` | Hierarchical scenarios (directory = category) |
-| `suites/issues/` | Tracked AC issue regressions (`TestAC_<n>_…`) |
+| `suites/<category>/` | Suites by domain; issue guards named `TestAC_<n>_…` live beside related tests |
 | `local/` | **Scratch/debug only** — gitignored (except `local/README.md`); never commit throwaways |
 | `internal/meta` | `TestMeta` + env tag filters + `Begin` (Parallel policy) |
 | `internal/fixtures` | Re-exports pads / `PackagePad` for suites that prefer fixtures |

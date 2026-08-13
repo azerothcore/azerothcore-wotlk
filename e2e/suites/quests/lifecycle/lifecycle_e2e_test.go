@@ -13,7 +13,7 @@ import (
 )
 
 // QLIFE-03 / #26549: STAY_ALIVE quest fails on death.
-func TestQuest_StayAliveFailsOnDeath(t *testing.T) {
+func TestAC_26549_StayAliveFailsOnDeath(t *testing.T) {
 	// serial: DieMust + CharDB save race under parallel pad thrash.
 	meta.Begin(t, meta.TestMeta{
 		// smoke: fixed on this branch (#26549 STAY_ALIVE fail-on-death).
