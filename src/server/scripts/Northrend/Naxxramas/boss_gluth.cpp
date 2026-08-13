@@ -166,6 +166,9 @@ public:
             if (!UpdateVictimWithGaze())
                 AttackStart(player);
 
+            if (!me->GetVictim())
+                return;
+
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
