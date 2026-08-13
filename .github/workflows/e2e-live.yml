@@ -284,29 +284,50 @@ jobs:
 
       # dashboard-ci applies base+updates via auth/world -dry-run before live start.
       # Without this, acore_auth has no realmlist and servers crash-loop.
+      # Copy .conf from .dist first: AC_ENABLE_CONF_COPY_ON_INSTALL=0 leaves only
+      # .dist installed; zero-conf policy then "skips" the missing .conf and leaves
+      # Logger/Appender empty → "Wrong Loggers configuration" (console only, no Server.log).
       - name: Apply DB schema (authserver + worldserver dry-run)
         if: needs.preflight.outputs.stack == 'native'
         run: |
           # No -u: acore.sh does [ -z "$WITH_ERRORS" ] which fails under nounset.
           set -eo pipefail
           source ./acore.sh config load
+          etc="$(cd env/dist/etc && pwd)"
+          for n in authserver worldserver; do
+            [[ -f "${etc}/${n}.conf" ]] || cp -v "${etc}/${n}.conf.dist" "${etc}/${n}.conf"
+          done
+          # Absolute LogsDir so file appenders are predictable for wait_log later.
+          logs_dir="$(cd env/dist/bin && pwd)"
+          sed -i \
+            -e "s|^LogsDir *=.*|LogsDir = \"${logs_dir}\"|" \
+            "${etc}/authserver.conf" "${etc}/worldserver.conf"
           cd env/dist/bin
-          timeout 10m ./authserver -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
+          timeout 10m ./authserver -c "${etc}/authserver.conf" -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
           status=${PIPESTATUS[0]}
           [ "$status" -eq 0 ] || exit "$status"
           if grep -qE 'Applying of file .+ failed!' "$RUNNER_TEMP/authserver-dry-run.log"; then
             echo '::error::authserver dry-run failed to apply a SQL update'
             exit 1
           fi
-          timeout 15m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/worldserver-dry-run.log"
+          if grep -q 'Wrong Loggers configuration' "$RUNNER_TEMP/authserver-dry-run.log"; then
+            echo '::error::authserver conf loggers not loaded (empty/missing conf?)'
+            exit 1
+          fi
+          timeout 15m ./worldserver -c "${etc}/worldserver.conf" -dry-run 2>&1 | tee "$RUNNER_TEMP/worldserver-dry-run.log"
           status=${PIPESTATUS[0]}
           [ "$status" -eq 0 ] || exit "$status"
           if grep -qE 'Applying of file .+ failed!' "$RUNNER_TEMP/worldserver-dry-run.log"; then
             echo '::error::worldserver dry-run failed to apply a SQL update'
             exit 1
           fi
+          if grep -q 'Wrong Loggers configuration' "$RUNNER_TEMP/worldserver-dry-run.log"; then
+            echo '::error::worldserver conf loggers not loaded (empty/missing conf?)'
+            exit 1
+          fi
           mysql -h127.0.0.1 -uacore -pacore -e \
             "SHOW TABLES FROM acore_auth LIKE 'realmlist'; SELECT COUNT(*) AS realm_rows FROM acore_auth.realmlist;"
+          ls -la "${logs_dir}"/*.log 2>/dev/null || true
         timeout-minutes: 40
 
       # Realmlist load uses WHERE flag <> 3; auth ORs OFFLINE (0x02) on start.
@@ -336,29 +357,29 @@ jobs:
         run: |
           set -euo pipefail
           cd env/dist/bin
-          # Installed confs are under ../etc (not bin/).
+          # Installed confs are under ../etc (not bin/). Dry-run step already copies .dist→.conf.
           etc="$(cd ../etc && pwd)"
           [[ -f "${etc}/authserver.conf" ]] || cp -v "${etc}/authserver.conf.dist" "${etc}/authserver.conf"
           [[ -f "${etc}/worldserver.conf" ]] || cp -v "${etc}/worldserver.conf.dist" "${etc}/worldserver.conf"
-          # CI-friendly conf: no interactive CLI, no warden (bots are not real clients).
-          # Port open is not enough — accept before "World Initialized" returns AUTH_REJECT (14).
+          # CI-friendly conf:
+          # - Console.Enable=0: no interactive CLI thread
+          # - Warden.Enabled=0: bots report non-Win/OSX OS → AUTH_REJECT (14) when warden is on
+          # - BeepAtStart=0: no terminal bell noise
+          # LogsDir set in dry-run step to this bin dir (absolute).
           sed -i \
             -e 's/^Console\.Enable *=.*/Console.Enable = 0/' \
             -e 's/^Warden\.Enabled *=.*/Warden.Enabled = 0/' \
             -e 's/^BeepAtStart *=.*/BeepAtStart = 0/' \
             "${etc}/worldserver.conf"
           ls -la "${etc}"
-          grep -E '^(Console|Warden|Beep)' "${etc}/worldserver.conf" || true
+          grep -E '^(Console|Warden|Beep|LogsDir)' "${etc}/worldserver.conf" "${etc}/authserver.conf" || true
 
-          # Wait on AC file appenders (Server.log / Auth.log): AppenderFile fflush()es every
-          # line. stdout/stderr redirects are fully-buffered when not a TTY, so patterns like
-          # "World Initialized" stay invisible to grep until process exit (stdbuf is a no-op
-          # for our wait purposes here). cwd is bin/ — default relative log paths land here.
-          rm -f Server.log Auth.log
+          # Fresh file logs for wait_log (AppenderFile fflush every line when conf loads).
+          rm -f Server.log Auth.log Errors.log
 
           wait_log() {
             local log="$1" pattern="$2" name="$3" secs="${4:-300}"
-            local i
+            local i size
             for i in $(seq 1 "${secs}"); do
               if [[ -f "${log}" ]] && grep -qE "${pattern}" "${log}" 2>/dev/null; then
                 echo "${name}: matched /${pattern}/ in ${log} at ${i}s"
@@ -370,13 +391,15 @@ jobs:
                 return 1
               fi
               if (( i % 30 == 0 )); then
-                echo "${name}: still waiting for /${pattern}/ (${i}s, log=$(wc -c <"${log}" 2>/dev/null || echo 0)B)"
+                size=0
+                [[ -f "${log}" ]] && size=$(wc -c <"${log}" || echo 0)
+                echo "${name}: still waiting for /${pattern}/ (${i}s, log=${size}B)"
               fi
               sleep 1
             done
-            echo "::error::${name} did not log /${pattern}/ within ${secs}s (file=${log})"
+            echo "${name}: did not log /${pattern}/ within ${secs}s (file=${log})"
             ls -la ./*.log "${RUNNER_TEMP}/${name}.log" 2>/dev/null || true
-            tail -n 150 "${log}" "${RUNNER_TEMP}/${name}.log" 2>/dev/null || true
+            tail -n 80 "${log}" "${RUNNER_TEMP}/${name}.log" 2>/dev/null || true
             return 1
           }
 
@@ -385,13 +408,16 @@ jobs:
             local i
             for i in $(seq 1 "${secs}"); do
               if (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1; then
-                echo "${name} listening on ${port}"
+                echo "${name} listening on ${port} at ${i}s"
                 return 0
               fi
               if ! kill -0 "$(cat "${RUNNER_TEMP}/${name}.pid")" 2>/dev/null; then
                 echo "::error::${name} exited early"
                 tail -n 150 "${RUNNER_TEMP}/${name}.log" Server.log Auth.log 2>/dev/null || true
                 return 1
+              fi
+              if (( i % 30 == 0 )); then
+                echo "${name}: still waiting for port ${port} (${i}s)"
               fi
               sleep 1
             done
@@ -400,26 +426,38 @@ jobs:
             return 1
           }
 
-          # World first; auth after world is fully up (not just bound).
+          # World first. Main.cpp binds :8085 only AFTER SetInitialWorldSettings
+          # ("World Initialized"), so port open ≡ world fully loaded.
           ./worldserver -c "${etc}/worldserver.conf" \
             < /dev/null >"${RUNNER_TEMP}/worldserver.log" 2>&1 &
           echo $! >"${RUNNER_TEMP}/worldserver.pid"
 
-          # Full world load (maps/DB) — do not race AUTH_SESSION against half-ready world.
-          wait_log "$(pwd)/Server.log" 'World Initialized' worldserver 600
-          wait_port 8085 worldserver 30
+          # Prefer Server.log (fflush per line); fall back to port which opens post-init.
+          if ! wait_log "$(pwd)/Server.log" 'World Initialized' worldserver 180; then
+            echo '::warning::Server.log wait failed; falling back to port 8085 (opens after World Initialized)'
+            wait_port 8085 worldserver 300
+          else
+            wait_port 8085 worldserver 30
+          fi
 
           ./authserver -c "${etc}/authserver.conf" \
             < /dev/null >"${RUNNER_TEMP}/authserver.log" 2>&1 &
           echo $! >"${RUNNER_TEMP}/authserver.pid"
-          wait_log "$(pwd)/Auth.log" 'Added realm' authserver 90
-          wait_port 3724 authserver 30
+          if ! wait_log "$(pwd)/Auth.log" 'Added realm' authserver 60; then
+            echo '::warning::Auth.log wait failed; falling back to port 3724'
+            wait_port 3724 authserver 60
+          else
+            wait_port 3724 authserver 30
+          fi
 
-          # Clear OFFLINE bit auth set on start; world also refreshes this.
+          # Clear OFFLINE/VERSION_MISMATCH bits; world clears VERSION_MISMATCH on ready.
           mysql -h127.0.0.1 -uacore -pacore -e \
             "UPDATE acore_auth.realmlist SET flag = flag & ~3 WHERE id=1;
              SELECT id,address,port,flag FROM acore_auth.realmlist;"
           sleep 2
+          # Sanity: both ports still open.
+          (echo >/dev/tcp/127.0.0.1/8085) >/dev/null 2>&1 || { echo '::error::world port lost'; exit 1; }
+          (echo >/dev/tcp/127.0.0.1/3724) >/dev/null 2>&1 || { echo '::error::auth port lost'; exit 1; }
         timeout-minutes: 20
 
       # ===================== docker stack (optional) =====================
