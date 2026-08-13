@@ -115,10 +115,10 @@ jobs:
       - name: Checkout AzerothGhost harness
         uses: actions/checkout@v7
         with:
+          # Public repo — default GITHUB_TOKEN is enough (no E2E_HARNESS_TOKEN).
           repository: walkline/AzerothGhost
           path: _deps/AzerothGhost
           ref: ${{ github.event.inputs.harness_ref || vars.E2E_HARNESS_REF || '' }}
-          token: ${{ secrets.E2E_HARNESS_TOKEN || github.token }}
           persist-credentials: false
 
       - name: Setup Go
