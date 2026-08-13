@@ -3,7 +3,7 @@
 # stack=native (default) — same setup family as dashboard-ci (not -dry-run):
 #   acore.sh init installs host MySQL (no GHA services.mysql — that fights
 #   install-deps systemctl start on :3306), compile, DB, client-data
-#   → pm2 sm start auth + world
+#   → start auth + world (background binaries)
 #   → go test -tags=e2e against 127.0.0.1
 #
 # stack=docker — root docker-compose.yml [optional]
@@ -236,7 +236,6 @@ jobs:
           # and inst_download_client_data. Schema is applied by -dry-run below
           # (same as dashboard-ci), not by init itself.
           ./acore.sh init
-          sudo npm install -g pm2
         timeout-minutes: 180
 
       # create_mysql.sql only creates acore@localhost (unix_socket). Servers and
@@ -310,17 +309,20 @@ jobs:
             "SHOW TABLES FROM acore_auth LIKE 'realmlist'; SELECT COUNT(*) AS realm_rows FROM acore_auth.realmlist;"
         timeout-minutes: 40
 
-      # Authserver refuses realms with flag 3 (OFFLINE|VERSION_MISMATCH). Dry-run / base
-      # import can leave non-zero flags; fix address + flag before live start.
+      # Realmlist load uses WHERE flag <> 3; auth ORs OFFLINE (0x02) on start.
+      # Keep base flags clear so 0|2=2 still loads. PM2/run-engine was failing
+      # realm resolve; start binaries directly (same as dry-run cwd).
       - name: Realmlist + E2E env (native)
         if: needs.preflight.outputs.stack == 'native'
         run: |
           set -euo pipefail
           mysql -h127.0.0.1 -uacore -pacore -e \
             "UPDATE acore_auth.realmlist
-             SET address='127.0.0.1', localAddress='127.0.0.1', flag=0, port=8085
+             SET address='127.0.0.1', localAddress='127.0.0.1',
+                 localSubnetMask='255.255.255.0', flag=0, port=8085, gamebuild=12340
              WHERE id=1;
-             SELECT id,name,address,localAddress,port,flag,gamebuild FROM acore_auth.realmlist;"
+             SELECT id,name,address,localAddress,localSubnetMask,port,flag,gamebuild
+             FROM acore_auth.realmlist\G"
           {
             echo "E2E_AUTH_ADDR=127.0.0.1:3724"
             echo "E2E_AUTH_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_auth"
@@ -329,48 +331,50 @@ jobs:
           } >> "$GITHUB_ENV"
           echo "E2E_AUTH_ADDR=127.0.0.1:3724"
 
-      - name: Start authserver + worldserver (pm2 service manager)
+      - name: Start authserver + worldserver (background)
         if: needs.preflight.outputs.stack == 'native'
         run: |
           set -euo pipefail
-          # on-failure avoids infinite crash loops that hang wait-uptime / pm2 log tail
-          ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2 \
-            --restart-policy on-failure --max-restarts 5
-          ./acore.sh sm create world worldserver --bin-path ./env/dist/bin --provider pm2 \
-            --restart-policy on-failure --max-restarts 5
-          ./acore.sh sm start authserver
-          ./acore.sh sm start worldserver
-          ./acore.sh sm wait-uptime authserver 10 180
-          ./acore.sh sm wait-uptime worldserver 10 300
-          pm2 jlist | python3 -c '
-          import json, sys
-          procs = {p["name"]: p for p in json.load(sys.stdin)}
-          for n in ("authserver", "worldserver"):
-              p = procs.get(n)
-              if not p:
-                  raise SystemExit(f"missing {n}")
-              env = p.get("pm2_env") or {}
-              status = env.get("status")
-              restarts = int(env.get("restart_time") or 0)
-              if status != "online":
-                  raise SystemExit(f"{n} not online: {status}")
-              if restarts > 5:
-                  raise SystemExit(f"{n} restart_time={restarts} (crash loop?)")
-          print("pm2 health ok")
-          '
-          for port in 3724 8085; do
-            ok=0
-            for i in $(seq 1 60); do
-              if (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1; then ok=1; break; fi
-              sleep 2
+          cd env/dist/bin
+          # conf files: dry-run creates them; ensure present for live start
+          [[ -f authserver.conf ]] || cp -v authserver.conf.dist authserver.conf
+          [[ -f worldserver.conf ]] || cp -v worldserver.conf.dist worldserver.conf
+
+          # World first so it can clear OFFLINE once up; then auth.
+          nohup ./worldserver >"${RUNNER_TEMP}/worldserver.log" 2>&1 &
+          echo $! >"${RUNNER_TEMP}/worldserver.pid"
+          nohup ./authserver >"${RUNNER_TEMP}/authserver.log" 2>&1 &
+          echo $! >"${RUNNER_TEMP}/authserver.pid"
+
+          wait_port() {
+            local port="$1" name="$2" secs="${3:-180}"
+            local i
+            for i in $(seq 1 "${secs}"); do
+              if (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1; then
+                echo "${name} listening on ${port}"
+                return 0
+              fi
+              # process died?
+              if ! kill -0 "$(cat "${RUNNER_TEMP}/${name}.pid")" 2>/dev/null; then
+                echo "::error::${name} exited early"
+                tail -n 120 "${RUNNER_TEMP}/${name}.log" || true
+                return 1
+              fi
+              sleep 1
             done
-            if [[ "$ok" -ne 1 ]]; then
-              echo "::error::port ${port} not listening"
-              pm2 logs --nostream --lines 100 || true
-              exit 1
-            fi
-          done
-        timeout-minutes: 20
+            echo "::error::${name} did not open port ${port} within ${secs}s"
+            tail -n 120 "${RUNNER_TEMP}/${name}.log" || true
+            return 1
+          }
+
+          wait_port 8085 worldserver 240
+          wait_port 3724 authserver 120
+
+          # worldserver sets realm online; clear residual mismatch if any
+          mysql -h127.0.0.1 -uacore -pacore -e \
+            "UPDATE acore_auth.realmlist SET flag = flag & ~3 WHERE id=1;
+             SELECT id,address,port,flag FROM acore_auth.realmlist;"
+        timeout-minutes: 15
 
       # ===================== docker stack (optional) =====================
       - name: Docker pull/build/up
@@ -459,10 +463,14 @@ jobs:
       - name: Stop native servers
         if: always() && needs.preflight.outputs.stack == 'native'
         run: |
-          ./acore.sh sm stop worldserver || true
-          ./acore.sh sm stop authserver || true
-          ./acore.sh sm delete worldserver || true
-          ./acore.sh sm delete authserver || true
+          for n in worldserver authserver; do
+            if [[ -f "${RUNNER_TEMP}/${n}.pid" ]]; then
+              kill "$(cat "${RUNNER_TEMP}/${n}.pid")" 2>/dev/null || true
+              sleep 2
+              kill -9 "$(cat "${RUNNER_TEMP}/${n}.pid")" 2>/dev/null || true
+            fi
+            pkill -f "env/dist/bin/${n}" 2>/dev/null || true
+          done
 
       - name: Tear down docker
         if: always() && needs.preflight.outputs.stack == 'docker'
@@ -474,7 +482,10 @@ jobs:
           if [[ "${{ needs.preflight.outputs.stack }}" == "native" ]]; then
             ls -la env/dist/logs 2>/dev/null || true
             tail -n 100 env/dist/logs/* 2>/dev/null || true
-            ./acore.sh sm status || true
+            for f in authserver.log worldserver.log; do
+              echo "==== ${RUNNER_TEMP}/${f} ===="
+              tail -n 150 "${RUNNER_TEMP}/${f}" 2>/dev/null || true
+            done
           fi
           if [[ "${{ needs.preflight.outputs.stack }}" == "docker" ]]; then
             docker compose logs --tail=150 || true
