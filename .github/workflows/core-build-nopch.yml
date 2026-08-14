@@ -39,11 +39,7 @@ jobs:
   build-e2e:
     name: ubuntu-24.04-clang-18-nopch
     runs-on: ubuntu-24.04
-    # walkline fork is temporary so we can dispatch e2e before the official PR.
-    if: |
-      (github.repository == 'azerothcore/azerothcore-wotlk'
-       || github.repository == 'walkline/azerothcore-wotlk')
-      && !github.event.pull_request.draft
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
@@ -91,8 +87,7 @@ jobs:
     needs: build-e2e
     # PR + dispatch only. Master push already ran full on the PR; keep clang-18 build.
     if: |
-      (github.repository == 'azerothcore/azerothcore-wotlk'
-       || github.repository == 'walkline/azerothcore-wotlk')
+      github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && needs.build-e2e.result == 'success'
       && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
