@@ -4,6 +4,7 @@ package charter_bank_test
 
 import (
 	"testing"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -26,11 +27,25 @@ func TestGuild_CharterBuy(t *testing.T) {
 	if setup.PetitionGUID == 0 && setup.ItemLow == 0 {
 		e2eharness.Assertf(t, "SetupGuildLeader missing petition identity (charter buy incomplete)")
 	}
-	// Live guild membership after turn-in.
+	// guild_member insert is async (CharacterDatabase worker) after TURN_IN OK.
+	guid := leader.GUID & 0xffffffff
 	var guildID uint32
-	err := charDB.QueryRow(`SELECT guildid FROM guild_member WHERE guid=?`, leader.GUID).Scan(&guildID)
+	deadline := time.Now().Add(10 * time.Second)
+	var err error
+	for time.Now().Before(deadline) {
+		err = charDB.QueryRow(`SELECT guildid FROM guild_member WHERE guid=?`, guid).Scan(&guildID)
+		if err == nil && guildID != 0 {
+			break
+		}
+		err = charDB.QueryRow(`SELECT guildid FROM guild WHERE leaderguid=?`, guid).Scan(&guildID)
+		if err == nil && guildID != 0 {
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
 	if err != nil || guildID == 0 {
-		e2eharness.Assertf(t, "leader not in guild_member after charter turn-in: err=%v guildid=%d", err, guildID)
+		e2eharness.Assertf(t, "leader not in guild_member/guild after charter turn-in: err=%v guildid=%d guid=%d",
+			err, guildID, guid)
 	}
 	t.Logf("PASS charter buy+turn-in guild=%q id=%d leader=%d petition=0x%X",
 		setup.GuildName, guildID, leader.GUID, setup.PetitionGUID)

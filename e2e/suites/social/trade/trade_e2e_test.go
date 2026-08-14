@@ -3,12 +3,14 @@
 package trade_test
 
 import (
+	"math"
 	"testing"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
+	"github.com/walkline/AzerothGhost/client"
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
@@ -33,6 +35,35 @@ func tradePair(t *testing.T, prefix string) (a, b *e2eharness.ScenarioBot) {
 	a.CombatStop(t)
 	b.CombatStop(t)
 	return a, b
+}
+
+// walkAway sends real movement (start / heartbeat / stop), not a GM tele.
+// Trade range is TRADE_DISTANCE (11.11y); yards should be larger than that.
+func walkAway(t *testing.T, bot *e2eharness.ScenarioBot, from *e2eharness.ScenarioBot, yards float32) {
+	t.Helper()
+	ax, ay, az, _ := bot.Pos()
+	bx, by, _, _ := from.Pos()
+	dx, dy := ax-bx, ay-by
+	if n := float32(math.Hypot(float64(dx), float64(dy))); n < 0.1 {
+		dx, dy = 1, 0
+	} else {
+		dx, dy = dx/n, dy/n
+	}
+	o := float32(math.Atan2(float64(dy), float64(dx)))
+	midX, midY := ax+dx*yards*0.5, ay+dy*yards*0.5
+	destX, destY := ax+dx*yards, ay+dy*yards
+	if err := bot.World.SetFacingAt(ax, ay, az, o); err != nil {
+		e2eharness.HarnessFailf(t, "SetFacing: %v", err)
+	}
+	if err := bot.World.MoveForwardAt(ax, ay, az, o); err != nil {
+		e2eharness.HarnessFailf(t, "MoveForward: %v", err)
+	}
+	if err := bot.World.SendMovementHeartbeatAt(midX, midY, az, o); err != nil {
+		e2eharness.HarnessFailf(t, "heartbeat: %v", err)
+	}
+	if err := bot.World.MoveStopAt(destX, destY, az, o); err != nil {
+		e2eharness.HarnessFailf(t, "MoveStop: %v", err)
+	}
 }
 
 // Spec 1 — Item + gold dual-accept.
@@ -133,11 +164,13 @@ func TestTrade_MoveOorMidTradeAborts(t *testing.T) {
 
 	e2eharness.OpenTrade(t, a, b)
 	a.SetTradeItem(t, 0, bag, slot)
-	// Tele far (cross-map) while trade open — server must drop trade without client cancel.
-	a.Teleport(t, 3758.2554, 3689.5754, 47.241505, e2eharness.MapNorthrend)
-	info := a.WaitTradeCancelled(t, 10*time.Second)
-	if a.World.TradeOpen() {
-		e2eharness.Assertf(t, "trade still open after far tele (server must OOR-abort; do not client-cancel to invent PASS)")
+	// Walk past TRADE_DISTANCE (11.11y). Accept is the server's distance check.
+	walkAway(t, a, b, 15)
+	a.AcceptTrade(t)
+	info := a.WaitTradeStatus(t, client.TradeStatusTargetTooFar, 10*time.Second)
+	if info.Status != client.TradeStatusTargetTooFar {
+		e2eharness.Assertf(t, "want TARGET_TO_FAR after walk-OOR accept, got %s (do not client-cancel to invent PASS)",
+			client.TradeStatusName(info.Status))
 	}
 
 	aCount1 := a.InventoryCount(t, itemLinenCloth)
@@ -146,7 +179,7 @@ func TestTrade_MoveOorMidTradeAborts(t *testing.T) {
 		e2eharness.Assertf(t, "inventory changed after OOR abort A %d→%d B %d→%d", aCount0, aCount1, bCount0, bCount1)
 	}
 	e2eharness.ProbeWorldAlive(t, b, 25723)
-	t.Logf("PASS OOR mid-trade abort status=%d open=%v", info.Status, a.World.TradeOpen())
+	t.Logf("PASS OOR mid-trade abort status=%s open=%v", client.TradeStatusName(info.Status), a.World.TradeOpen())
 }
 
 // Spec 4 — Stackable merge.
@@ -209,12 +242,14 @@ func TestTrade_RapidOpenCloseNoCrash(t *testing.T) {
 			b.Teleport(t, pad.X+2, pad.Y, pad.Z, pad.Map)
 		}
 	}
-	// One OOR abort in the mix (crash surface): server must clear without client cancel.
+	// One walk-OOR accept in the mix (crash surface): TARGET_TO_FAR, no client cancel.
 	e2eharness.OpenTrade(t, a, b)
-	a.Teleport(t, 3758.2554, 3689.5754, 47.241505, e2eharness.MapNorthrend)
-	_ = a.WaitTradeCancelled(t, 10*time.Second)
-	if a.World.TradeOpen() {
-		e2eharness.Assertf(t, "trade still open after far tele in rapid stress (server OOR-abort required)")
+	walkAway(t, a, b, 15)
+	a.AcceptTrade(t)
+	info := a.WaitTradeStatus(t, client.TradeStatusTargetTooFar, 10*time.Second)
+	if info.Status != client.TradeStatusTargetTooFar {
+		e2eharness.Assertf(t, "want TARGET_TO_FAR after walk-OOR in rapid stress, got %s",
+			client.TradeStatusName(info.Status))
 	}
 
 	e2eharness.ProbeWorldAlive(t, probe, 25723)
