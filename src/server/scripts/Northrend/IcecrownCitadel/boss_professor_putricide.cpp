@@ -860,9 +860,8 @@ public:
 
     struct npc_gas_cloudAI : public npc_putricide_oozeAI
     {
-        npc_gas_cloudAI(Creature* creature) : npc_putricide_oozeAI(creature, SPELL_EXPUNGED_GAS)
+        npc_gas_cloudAI(Creature* creature) : npc_putricide_oozeAI(creature, SPELL_EXPUNGED_GAS), _detonated(false)
         {
-            _newTargetSelectTimer = 0;
         }
 
         void CastMainSpell() override
@@ -870,8 +869,28 @@ public:
             me->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, me, false);
         }
 
+        // the detonation consumes the cloud - unlike the Volatile Ooze it does not pick a new target
+        void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+        {
+            if (_detonated || spell->Id != sSpellMgr->GetSpellIdForDifficulty(SPELL_EXPUNGED_GAS, me))
+                return;
+
+            _detonated = true;
+            me->AttackStop();
+            me->GetMotionMaster()->Clear();
+            me->StopMoving();
+            me->DespawnOrUnsummon(2s);    // lingers for a moment instead of blinking out with the damage
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            // a detonated cloud only waits out its despawn - no melee, no new target, no new bloat
+            if (!_detonated)
+                npc_putricide_oozeAI::UpdateAI(diff);
+        }
+
     private:
-        uint32 _newTargetSelectTimer;
+        bool _detonated;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1019,7 +1038,7 @@ class spell_putricide_gaseous_bloat_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_GASEOUS_BLOAT });
+        return ValidateSpellInfo({ SPELL_GASEOUS_BLOAT, SPELL_EXPUNGED_GAS });
     }
 
     void HandleExtraEffect(AuraEffect const* /*aurEff*/)
@@ -1031,9 +1050,31 @@ class spell_putricide_gaseous_bloat_aura : public AuraScript
                 caster->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, caster, false);*/
     }
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // only the Gas Cloud that channelled this Gaseous Bloat detonates on contact
+        return eventInfo.GetActor() && eventInfo.GetActor()->GetGUID() == GetCasterGUID();
+    }
+
+    void HandleProc(ProcEventInfo& eventInfo)
+    {
+        Unit* caster = eventInfo.GetActor();
+        int32 const mod = caster->GetMap()->Is25ManRaid() ? 1500 : 1250;
+        int32 damage = 0;
+        for (uint32 i = 1; i <= GetStackAmount(); ++i)
+            damage += mod * i;
+
+        // the bloat is consumed by the detonation, just like the Volatile Ooze's adhesive
+        GetTarget()->RemoveAurasDueToSpell(GetId(), GetCasterGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
+
+        caster->CastCustomSpell(SPELL_EXPUNGED_GAS, SPELLVALUE_BASE_POINT0, damage, nullptr, true);
+    }
+
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_putricide_gaseous_bloat_aura::HandleExtraEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        DoCheckProc += AuraCheckProcFn(spell_putricide_gaseous_bloat_aura::CheckProc);
+        OnProc += AuraProcFn(spell_putricide_gaseous_bloat_aura::HandleProc);
     }
 };
 

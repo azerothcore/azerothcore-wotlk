@@ -2950,6 +2950,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Professor Putricide, Expunged Gas (Gas Cloud detonation)
+    ApplySpellFix({ 70701 }, [](SpellInfo* spellInfo)
+    {
+        // the sibling detonation Ooze Eruption (70492) has this in the dbc, this one is missing it
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
     ApplySpellFix({
         71412,  // Green Ooze Summon (Professor Putricide)
         71415   // Orange Ooze Summon (Professor Putricide)
