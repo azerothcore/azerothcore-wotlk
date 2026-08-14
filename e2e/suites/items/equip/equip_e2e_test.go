@@ -4,6 +4,7 @@ package equip_test
 
 import (
 	"testing"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -84,9 +85,21 @@ func TestEquip_ItemSurvivesRelogPath(t *testing.T) {
 		Prefix: "EqRelog",
 		Level:  80,
 	})
-	bot.AddItem(t, e2eharness.ItemTargetDummy, 2)
-	bot.Save(t)
-	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, 2)
+	// AddItem is fire-and-forget; CharDB after an immediate .save often still
+	// reads 0 on a fast runner. Wait for the push, then poll the persisted count.
+	bot.AddItemWait(t, e2eharness.ItemTargetDummy, 2)
+	deadline := time.Now().Add(5 * time.Second)
+	var got int
+	for time.Now().Before(deadline) {
+		got = bot.InventoryCount(t, e2eharness.ItemTargetDummy)
+		if got >= 2 {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	if got < 2 {
+		e2eharness.Preconditionf(t, "inventory entry=%d count=%d want>=2 after add", e2eharness.ItemTargetDummy, got)
+	}
 	bot.Relog(t)
 	bot.AssertWorldAlive(t)
 	// Inventory should still be present after relog (CharDB / load path).
