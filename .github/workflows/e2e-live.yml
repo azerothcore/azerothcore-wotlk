@@ -1,8 +1,8 @@
 # Live e2e (native only): start auth + world, then go test.
 #
 #   PR: nopch-build (ubuntu-24.04 clang-18) compiles + dry-run, uploads
-#       binaries; this workflow is called with artifact_run_id (no rebuild).
-#   Dispatch: compile via linux-build, then the same smoke/full run.
+#       binaries; this workflow is called with artifact_run_id, scope=full.
+#   Dispatch: compile via linux-build, or nopch-build -f scope=smoke|full.
 #
 # Triggers: workflow_call (from nopch-build) | workflow_dispatch
 
@@ -14,7 +14,7 @@ on:
       scope:
         description: 'smoke | full'
         type: string
-        default: 'smoke'
+        default: 'full'
       count:
         type: string
         default: '1'
@@ -85,8 +85,8 @@ env:
 
 jobs:
   e2e:
-    name: e2e (native / ${{ inputs.scope || 'smoke' }})
-    if: github.repository == 'azerothcore/azerothcore-wotlk' || vars.E2E_ENABLE == '1'
+    name: e2e (native / ${{ inputs.scope || 'full' }})
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     # workflow_call (PR): ubuntu-24.04 to match the nopch artifact.
     # Dispatch: optional self-hosted via E2E_RUNS_ON.
     runs-on: ${{ github.event_name == 'workflow_call' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
@@ -207,9 +207,12 @@ jobs:
           for n in authserver worldserver; do
             [[ -f "${etc}/${n}.conf" ]] || cp -v "${etc}/${n}.conf.dist" "${etc}/${n}.conf"
           done
+          mkdir -p env/dist/bin env/dist/data
           logs_dir="$(cd env/dist/bin && pwd)"
+          data_dir="$(cd env/dist/data && pwd)"
           {
             echo "AC_LOGS_DIR=${logs_dir}"
+            echo "AC_DATA_DIR=${data_dir}"
             echo "AC_CONSOLE_ENABLE=0"
             echo "AC_WARDEN_ENABLED=0"
             echo "AC_BEEP_AT_START=0"
@@ -230,11 +233,15 @@ jobs:
           # AC_* from GITHUB_ENV (set in Prepare server conf). Re-export for this shell.
           : "${AC_LOGS_DIR:=$(pwd)}"
           export AC_LOGS_DIR
+          # linux-build sets a workspace-relative DataDir; worldserver CWD is bin/.
+          if [[ -n "${AC_DATA_DIR:-}" ]]; then
+            export AC_DATA_DIR
+          fi
           export AC_CONSOLE_ENABLE="${AC_CONSOLE_ENABLE:-0}"
           export AC_WARDEN_ENABLED="${AC_WARDEN_ENABLED:-0}"
           export AC_BEEP_AT_START="${AC_BEEP_AT_START:-0}"
           export AC_REALMS_STATE_UPDATE_DELAY="${AC_REALMS_STATE_UPDATE_DELAY:-1}"
-          echo "AC overrides: LOGS_DIR=${AC_LOGS_DIR} CONSOLE=${AC_CONSOLE_ENABLE} WARDEN=${AC_WARDEN_ENABLED} BEEP=${AC_BEEP_AT_START} REALMS_DELAY=${AC_REALMS_STATE_UPDATE_DELAY}"
+          echo "AC overrides: LOGS_DIR=${AC_LOGS_DIR} DATA_DIR=${AC_DATA_DIR:-} CONSOLE=${AC_CONSOLE_ENABLE} WARDEN=${AC_WARDEN_ENABLED} BEEP=${AC_BEEP_AT_START} REALMS_DELAY=${AC_REALMS_STATE_UPDATE_DELAY}"
 
           wait_port() {
             local port="$1" name="$2" secs="${3:-120}"

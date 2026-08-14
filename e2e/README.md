@@ -132,20 +132,30 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 
 If the scenario should stay as a regression, **move** it into `suites/` (or `suites/issues/`) with proper `meta.Begin` tags — see `.agents/docs/e2e-policy.md`.
 
-### Category map (current tree)
+### Inventory
 
-| Suite path | Typical focus |
-|------------|---------------|
-| `smoke` | Connectivity, pad tele, relog |
-| `suites/combat/{charm,death,pets,threat,vehicles}` | Combat systems |
-| `suites/spells/{aura,cast,effects}` | Cast / aura / spell effects |
-| `suites/social/{group,loot,trade}` | Multi-bot social protocol |
-| `suites/quests/{lifecycle,escort}` | Quest status and escorts |
-| `suites/items/equip` | Equip / inventory |
-| `suites/protocol/{session,teleport}` | Session and tele |
-| `suites/guild/charter_bank` | Charter / bank (Session helpers) |
-| `suites/instances/…` | Bind/reset, Ulduar slices |
-| `suites/issues` | Named AC issue/PR guards |
+| Category | Oracle | Pri | Coverage | Issue |
+|----------|--------|-----|----------|-------|
+| smoke | login / pad tele / relog / world alive | P0 | covered (`TestSmoke_*`) | — |
+| combat/charm | apply/cancel aura; logout/hard-drop while aura | P1 | covered | — |
+| combat/death | die → ghost → release → reclaim | P1 | covered | — |
+| combat/pets | summon / GUID / attack / dismiss | P1 | covered; Raise Dead `blocked-harness` | #27081 |
+| combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
+| combat/vehicles | spellclick steed enter/exit; multi-bot pad | P2 | covered | — |
+| spells/aura | apply/query; CC broken by damage | P1 | covered; mount persist `blocked` | #26130 |
+| spells/cast | Charge on dummy; fail path; stance | P1 | covered; extra Charge pad `blocked` | #27061 |
+| spells/effects | Charge / grounding totem / create-item | P1 | covered; dummy-summon / Execute `blocked` | #26774 #26997 |
+| social/group | form / leave / leader / loot method / disband | P2 | covered | — |
+| social/loot | need/greed / pass / master loot | P1 | covered; chest mid-roll / below-half kill `blocked` | #26894 #26862 |
+| social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
+| quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
+| quests/escort | spawn/wait unit only | P2 | gap (no start→follow escort) | #24450 |
+| items/equip | equip entry; additem slot; survives relog | P2 | covered | — |
+| protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked` | #25793 |
+| protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
+| guild/charter_bank | charter buy+turn-in; unique name | P2 | covered | — |
+| instances/bind_reset | party tele; ritual summon; leader reset | P2 | covered; post-reset summon `blocked` | #10708 |
+| instances/ulduar | named tele; DamageKill path | P2 | covered; Kologarn Charge / Freya `blocked` | #26266 #27095 |
 
 ---
 
@@ -332,9 +342,9 @@ Details live in the workflow files only:
 
 | How | Effect |
 |-----|--------|
-| Non-draft PR in **azerothcore/azerothcore-wotlk** | nopch `ubuntu-24.04`/clang-18 compiles + dry-run, then smoke e2e reuses those binaries |
-| Fork: set Actions variable **`E2E_ENABLE=1`**, then PR or `gh workflow run nopch-build --ref <branch> [-f scope=full]` | Same e2e path on the fork (other nopch matrix cells stay official-only) |
-| Actions → **e2e-live** → Run workflow (needs workflow on default branch, or use `gh workflow run … --ref e2e`) | Compiles on the runner; choose scope (smoke/full) |
+| Non-draft PR in **azerothcore/azerothcore-wotlk** | nopch `ubuntu-24.04`/clang-18 compiles + dry-run, then **full** e2e reuses those binaries |
+| Merge to `master` | clang-18 nopch build only (no second e2e; the PR already ran full) |
+| Actions → **e2e-live** → Run workflow (official repo; needs workflow on default branch, or `gh workflow run … --ref e2e`) | Compiles on the runner; choose scope (smoke/full) |
 
 Day-to-day development and agent debugging should use a **local** stack + `e2e/local/` or the committed suites — not CI setup docs.
 

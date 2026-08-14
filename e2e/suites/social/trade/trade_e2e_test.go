@@ -66,6 +66,48 @@ func walkAway(t *testing.T, bot *e2eharness.ScenarioBot, from *e2eharness.Scenar
 	}
 }
 
+func inventoryCount(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32) int {
+	t.Helper()
+	n := bot.InventoryCount(t, entry)
+	if n > 0 {
+		return n
+	}
+	// Packed ObjectGuid vs character_inventory.guid (low 32).
+	var n2 int
+	err := bot.CharDB.QueryRow(`
+		SELECT COALESCE(SUM(ii.count), 0)
+		FROM character_inventory ci
+		INNER JOIN item_instance ii ON ii.guid = ci.item
+		WHERE ci.guid=? AND ii.itemEntry=?`, bot.GUID&0xffffffff, entry).Scan(&n2)
+	if err != nil {
+		e2eharness.HarnessFailf(t, "inventoryCount low-guid: %v", err)
+	}
+	return n2
+}
+
+func waitInv(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, ok func(int) bool, timeout time.Duration) int {
+	t.Helper()
+	deadline := time.Now().Add(timeout)
+	var n int
+	for time.Now().Before(deadline) {
+		n = inventoryCount(t, bot, entry)
+		if ok(n) {
+			return n
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	return n
+}
+
+func waitInvAtLeast(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, min int, timeout time.Duration) int {
+	t.Helper()
+	n := waitInv(t, bot, entry, func(got int) bool { return got >= min }, timeout)
+	if n < min {
+		e2eharness.Preconditionf(t, "inventory entry=%d count=%d want>=%d", entry, n, min)
+	}
+	return n
+}
+
 // Spec 1 — Item + gold dual-accept.
 func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
@@ -81,8 +123,8 @@ func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
 	a.AssertMoneyAtLeast(t, 50_000)
 	b.AssertMoneyAtLeast(t, 10_000)
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 1)
-
-	aCount0 := a.InventoryCount(t, itemLinenCloth)
+	// CharDB lags the item-push; wait before using counts as the oracle.
+	aCount0 := waitInvAtLeast(t, a, itemLinenCloth, 1, 10*time.Second)
 	bCount0 := b.InventoryCount(t, itemLinenCloth)
 	aMoney0 := a.MoneyAfterSave(t)
 	bMoney0 := b.MoneyAfterSave(t)
@@ -92,8 +134,8 @@ func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
 	a.SetTradeGold(t, goldOffer)
 	e2eharness.CompleteTrade(t, a, b)
 
-	aCount1 := a.InventoryCount(t, itemLinenCloth)
-	bCount1 := b.InventoryCount(t, itemLinenCloth)
+	aCount1 := waitInv(t, a, itemLinenCloth, func(n int) bool { return n == aCount0-1 }, 10*time.Second)
+	bCount1 := waitInv(t, b, itemLinenCloth, func(n int) bool { return n == bCount0+1 }, 10*time.Second)
 	aMoney1 := a.MoneyAfterSave(t)
 	bMoney1 := b.MoneyAfterSave(t)
 

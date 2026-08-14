@@ -168,4 +168,4 @@ Update tests in the same PR as the behaviour change. Harness renames: update con
 
 Scratch MUST be `e2e/local/` (gitignored except `local/README.md`). NEVER commit throwaways. Promote into `e2e/suites/` (or `suites/issues/`) in the same PR as the fix. Prefer live e2e over ad-hoc GM when the stack is up.
 
-Local: `go test -tags=e2e`. Official PR CI: smoke after nopch clang-18 (reuses those binaries). Fork: Actions variable `E2E_ENABLE=1`. Full suite: dispatch. Touch `.github/workflows/e2e-live.yml` only when changing CI.
+Local: `go test -tags=e2e`. Official-repo PR CI: full suite after nopch clang-18 (reuses those binaries). Merge to master does not re-run e2e. Dispatch `-f scope=smoke` for a smaller run. Touch `.github/workflows/e2e-live.yml` only when changing CI.

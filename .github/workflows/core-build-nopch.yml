@@ -39,10 +39,7 @@ jobs:
   build-e2e:
     name: ubuntu-24.04-clang-18-nopch
     runs-on: ubuntu-24.04
-    # Official repo, or any repo with Actions variable E2E_ENABLE=1 (fork CI).
-    if: |
-      (github.repository == 'azerothcore/azerothcore-wotlk' || vars.E2E_ENABLE == '1')
-      && !github.event.pull_request.draft
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
@@ -86,14 +83,16 @@ jobs:
           pch: false
 
   e2e:
-    name: e2e ${{ inputs.scope || 'smoke' }}
+    name: e2e ${{ inputs.scope || 'full' }}
     needs: build-e2e
+    # PR + dispatch only. Master push already ran full on the PR; keep clang-18 build.
     if: |
-      (github.repository == 'azerothcore/azerothcore-wotlk' || vars.E2E_ENABLE == '1')
+      github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && needs.build-e2e.result == 'success'
+      && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
     uses: ./.github/workflows/e2e-live.yml
     with:
-      scope: ${{ inputs.scope || 'smoke' }}
+      scope: ${{ inputs.scope || 'full' }}
       artifact_run_id: ${{ github.run_id }}
     secrets: inherit
