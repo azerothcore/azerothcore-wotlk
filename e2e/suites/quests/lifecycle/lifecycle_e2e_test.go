@@ -16,7 +16,7 @@ import (
 func TestAC_26549_StayAliveFailsOnDeath(t *testing.T) {
 	// serial: DieMust + CharDB save race under parallel pad thrash.
 	meta.Begin(t, meta.TestMeta{
-		// smoke: fixed on this branch (#26549 STAY_ALIVE fail-on-death).
+		// smoke: STAY_ALIVE fail-on-death is in core (#26989 / #26549).
 		Tags:     []string{"short", "quests", "issue", "smoke", "serial"},
 		Runtime:  "short",
 		Issue:    26549,
