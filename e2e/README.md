@@ -333,7 +333,7 @@ Details live in the workflow files only:
 | How | Effect |
 |-----|--------|
 | Non-draft PR in **azerothcore/azerothcore-wotlk** | nopch `ubuntu-24.04`/clang-18 compiles + dry-run, then smoke e2e reuses those binaries |
-| Fork: set Actions variable **`E2E_ENABLE=1`**, then label/PR or `gh workflow run nopch-build --ref <branch>` | Same e2e path on the fork (other nopch matrix cells stay official-only) |
+| Fork: set Actions variable **`E2E_ENABLE=1`**, then PR or `gh workflow run nopch-build --ref <branch> [-f scope=full]` | Same e2e path on the fork (other nopch matrix cells stay official-only) |
 | Actions → **e2e-live** → Run workflow (needs workflow on default branch, or use `gh workflow run … --ref e2e`) | Compiles on the runner; choose scope (smoke/full) |
 
 Day-to-day development and agent debugging should use a **local** stack + `e2e/local/` or the committed suites — not CI setup docs.

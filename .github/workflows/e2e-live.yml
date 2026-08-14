@@ -339,7 +339,7 @@ jobs:
               || { echo "bad timeout duration: ${E2E_TIMEOUT_INPUT}"; exit 1; }
             timeout="${E2E_TIMEOUT_INPUT}"
           elif [[ "${scope}" == "full" ]]; then
-            timeout="120m"
+            timeout="180m"
           else
             timeout="30m"
           fi

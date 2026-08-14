@@ -10,6 +10,13 @@ on:
       - synchronize
       - ready_for_review
   workflow_dispatch:
+    inputs:
+      scope:
+        description: 'e2e scope after the clang-18 build'
+        required: false
+        default: 'smoke'
+        type: choice
+        options: [smoke, full]
 
 concurrency:
   # One concurrency group per workflow + ref.
@@ -79,7 +86,7 @@ jobs:
           pch: false
 
   e2e:
-    name: e2e smoke
+    name: e2e ${{ inputs.scope || 'smoke' }}
     needs: build-e2e
     if: |
       (github.repository == 'azerothcore/azerothcore-wotlk' || vars.E2E_ENABLE == '1')
@@ -87,6 +94,6 @@ jobs:
       && needs.build-e2e.result == 'success'
     uses: ./.github/workflows/e2e-live.yml
     with:
-      scope: smoke
+      scope: ${{ inputs.scope || 'smoke' }}
       artifact_run_id: ${{ github.run_id }}
     secrets: inherit
