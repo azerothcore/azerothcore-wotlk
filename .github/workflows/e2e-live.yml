@@ -312,12 +312,11 @@ jobs:
           scope="${E2E_SCOPE}"
           packages_raw="${E2E_PACKAGES}"
 
-          # Packages must stay under e2e/ (no path escape). Allow Go ./... ; reject ../.
+          # Packages must stay under e2e/. Allow Go ./... ; reject a ../ path segment.
           [[ "${packages_raw}" =~ ^\./[A-Za-z0-9_./\*+-]*$ ]] || { echo "bad packages"; exit 1; }
-          if [[ "${packages_raw}" == *'/..'* || "${packages_raw}" == '..'* ]]; then
-            echo "packages must not contain .."
-            exit 1
-          fi
+          case "${packages_raw}" in
+            ..|../*|*/..|*/../*) echo "packages must not contain ../"; exit 1 ;;
+          esac
           [[ "${count}" =~ ^[1-9][0-9]*$ ]] || { echo "bad count (need >=1)"; exit 1; }
           if (( count > 5 )); then
             echo "count capped at 5 (was ${count})"
