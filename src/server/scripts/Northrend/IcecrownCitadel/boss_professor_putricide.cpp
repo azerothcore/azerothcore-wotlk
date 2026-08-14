@@ -869,7 +869,7 @@ public:
             me->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, me, false);
         }
 
-        // the detonation consumes the cloud - unlike the Volatile Ooze it does not pick a new target
+        // The cloud is consumed after detonation; unlike Volatile Ooze, it does not select a new target.
         void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
         {
             if (_detonated || spell->Id != sSpellMgr->GetSpellIdForDifficulty(SPELL_EXPUNGED_GAS, me))
