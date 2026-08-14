@@ -11,4 +11,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27564, 0, 1, 0, 9, 0, 100, 0, 7000, 9000, 7000, 9000, 0, 5, 11, 29426, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Alliance Conscript - Within 0-5 Range - Cast \'Heroic Strike\''),
 (27564, 0, 2, 0, 1, 0, 100, 0, 0, 5000, 0, 10000, 0, 0, 11, 49329, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Alliance Conscript - Out of Combat - Cast \'Summon Frigid Ghoul Attacker\'');
 
-UPDATE `creature_template` SET `flags_extra` = 2097152 WHERE (`entry` IN (27685, 27686, 27531));
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (27685, 27686, 27531));
