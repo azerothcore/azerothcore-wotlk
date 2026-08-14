@@ -47,7 +47,7 @@ on:
       scope:
         description: 'smoke | full'
         required: false
-        default: 'smoke'
+        default: 'full'
         type: choice
         options: [smoke, full]
       count:

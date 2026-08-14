@@ -14,7 +14,7 @@ on:
       scope:
         description: 'e2e scope after the clang-18 build'
         required: false
-        default: 'smoke'
+        default: 'full'
         type: choice
         options: [smoke, full]
 
