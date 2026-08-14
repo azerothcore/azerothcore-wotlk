@@ -113,20 +113,33 @@ jobs:
         working-directory: e2e
         run: go mod download
 
+      # upload-artifact roots the zip at the common parent (env/dist), so the
+      # archive is bin/authserver + etc/, not env/dist/bin/authserver.
       - name: Download nopch server binaries
         if: ${{ inputs.artifact_run_id != '' }}
         uses: actions/download-artifact@v4
         with:
           name: ac-server-ubuntu-24.04-clang-18
+          path: ${{ runner.temp }}/ac-server
           github-token: ${{ github.token }}
           run-id: ${{ inputs.artifact_run_id }}
 
-      - name: Make downloaded binaries executable
+      - name: Place downloaded binaries
         if: ${{ inputs.artifact_run_id != '' }}
         run: |
           set -euo pipefail
+          root="${RUNNER_TEMP}/ac-server"
+          find "$root" -type f | head -n 50
+          auth=$(find "$root" -type f -name authserver | head -n 1)
+          [[ -n "${auth}" ]] || { echo '::error::authserver missing from artifact'; exit 1; }
+          src=$(dirname "${auth}")
+          mkdir -p env/dist/bin env/dist/etc
+          cp -a "${src}/authserver" "${src}/worldserver" env/dist/bin/
           chmod +x env/dist/bin/authserver env/dist/bin/worldserver
-          ls -l env/dist/bin/authserver env/dist/bin/worldserver
+          etc=$(find "$root" -type d -name etc | head -n 1)
+          [[ -n "${etc}" ]] || { echo '::error::etc/ missing from artifact'; exit 1; }
+          cp -a "${etc}/." env/dist/etc/
+          ls -l env/dist/bin/authserver env/dist/bin/worldserver env/dist/etc
 
       # Runtime only (no compile). install-deps starts MySQL in CI.
       - name: Deps, empty DBs, client-data
