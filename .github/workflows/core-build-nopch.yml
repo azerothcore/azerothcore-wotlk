@@ -8,6 +8,8 @@ on:
       - opened
       - reopened
       - synchronize
+      - ready_for_review
+  workflow_dispatch:
 
 concurrency:
   # One concurrency group per workflow + ref.
@@ -26,15 +28,37 @@ permissions:
   contents: read
 
 jobs:
+  # Split out of the matrix so e2e can needs: this cell only (not gcc/clang-21).
+  build-e2e:
+    name: ubuntu-24.04-clang-18-nopch
+    runs-on: ubuntu-24.04
+    # Official repo, or any repo with Actions variable E2E_ENABLE=1 (fork CI).
+    if: |
+      (github.repository == 'azerothcore/azerothcore-wotlk' || vars.E2E_ENABLE == '1')
+      && !github.event.pull_request.draft
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/linux-build
+        with:
+          CC: clang-18
+          CXX: clang++-18
+          pch: false
+      - name: Upload server binaries for e2e
+        uses: actions/upload-artifact@v4
+        with:
+          name: ac-server-ubuntu-24.04-clang-18
+          path: |
+            env/dist/bin/authserver
+            env/dist/bin/worldserver
+            env/dist/etc/
+          if-no-files-found: error
+          retention-days: 3
+
   build:
     strategy:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-24.04
-            compiler:
-              CC: clang-18
-              CXX: clang++-18
           - os: ubuntu-26.04
             compiler:
               CC: gcc-15
@@ -53,3 +77,16 @@ jobs:
           CC: ${{ matrix.compiler.CC }}
           CXX: ${{ matrix.compiler.CXX }}
           pch: false
+
+  e2e:
+    name: e2e smoke
+    needs: build-e2e
+    if: |
+      (github.repository == 'azerothcore/azerothcore-wotlk' || vars.E2E_ENABLE == '1')
+      && !github.event.pull_request.draft
+      && needs.build-e2e.result == 'success'
+    uses: ./.github/workflows/e2e-live.yml
+    with:
+      scope: smoke
+      artifact_run_id: ${{ github.run_id }}
+    secrets: inherit

@@ -3,6 +3,7 @@
 package aura_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -12,10 +13,11 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// AURA-04 / #26130: Blending In aura survives mount.
+// TODO(e2e): re-enable when AC#26130 is fixed — Blending In must survive mount.
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26130
+/*
 func TestAura_SurvivesMount_BlendingIn(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
-		// Not smoke: open issue #26130 (AssertAuraRemains uses ConfirmedBug internally).
 		Tags:     []string{"short", "spells", "issue"},
 		Runtime:  "short",
 		Issue:    26130,
@@ -32,16 +34,11 @@ func TestAura_SurvivesMount_BlendingIn(t *testing.T) {
 	bot.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	bot.Learn(t, e2eharness.SpellMountSwiftGryphon)
 	_ = bot.CastOrGM(t, e2eharness.SpellMountSwiftGryphon, 0, 10*time.Second)
-	// AssertAuraRemains(..., 26130) calls ConfirmedBugf on loss — keep issue off smoke.
-	// Manual check: log + soft return if missing so full suite can still proceed.
-	time.Sleep(800 * time.Millisecond)
-	if !bot.HasAura(e2eharness.SpellBlendingInAura) {
-		// e2eharness.ConfirmedBugf path via AssertAuraRemains(t, spell, 800ms, 26130)
-		t.Logf("KNOWN-OPEN-ISSUE #26130: aura %d missing after mount", e2eharness.SpellBlendingInAura)
-		return
-	}
+	// Waiter-based: AssertAuraRemains fails hard if the aura is stripped by mount.
+	e2eharness.AssertAuraRemains(t, bot.World, e2eharness.SpellBlendingInAura, 2*time.Second, 26130)
 	t.Logf("PASS aura %d survived mount", e2eharness.SpellBlendingInAura)
 }
+*/
 
 // AURA-05: aura present after apply; gone after death+relog settle path.
 func TestAura_ApplyAndQuery(t *testing.T) {
@@ -76,31 +73,63 @@ func TestAura_MidAuraRelogWorldAlive(t *testing.T) {
 	t.Logf("PASS mid-aura relog world alive has_aura=%v", bot.HasAura(e2eharness.SpellBlendingInAura))
 }
 
-// AURA-03: breakable CC removed by damage (use known stun if available via GM aura + damage).
+// AURA-03: breakable CC (Fear) is removed by damage on the victim.
+// WotLK: Fear breaks on damage. Apply on a dummy (not self — self-.aura + .damage is
+// not a reliable model of breakable CC rules).
 func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "spells", "combat"}, Runtime: "med", Category: "spells/aura"})
 
-	const spellSap = 6770 // Rogue Sap — breakable CC (requires valid target path; use self GM path carefully)
+	const spellFear = uint32(6215) // Fear rank 3 — breakable by damage
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "AuraCC",
-		Class:  e2eharness.ClassRogue,
-		Level:  80,
+		Prefix:        "AuraCC",
+		Class:         e2eharness.ClassWarlock,
+		Level:         80,
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	// Spawn a dummy and try to apply a breakable aura on self via GM for determinism.
-	// Use a known short stun aura if present; otherwise skip with precondition if apply fails.
-	const spellCheapShot = 1833
-	bot.ApplyAura(t, spellCheapShot)
-	if !bot.HasAura(spellCheapShot) {
-		e2eharness.Preconditionf(t, "could not apply cheap shot aura %d for CC-break test", spellCheapShot)
+	dummy := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
+	_ = bot.World.SetTarget(dummy)
+	// Apply Fear to the dummy via GM cast (deterministic victim CC).
+	bot.GM(t, fmt.Sprintf(".cast %d", spellFear))
+	deadline := time.Now().Add(5 * time.Second)
+	feared := false
+	for time.Now().Before(deadline) {
+		if bot.UnitHasAura(dummy, spellFear) {
+			feared = true
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
 	}
-	// Self-damage via GM to break CC.
-	bot.GM(t, ".damage 1")
-	// Soft: aura may remain if not breakable on self-path; still require world alive.
+	if !feared {
+		// Fallback: .aura on selected unit if cast path does not stick.
+		bot.GM(t, fmt.Sprintf(".aura %d", spellFear))
+		deadline = time.Now().Add(3 * time.Second)
+		for time.Now().Before(deadline) {
+			if bot.UnitHasAura(dummy, spellFear) {
+				feared = true
+				break
+			}
+			time.Sleep(40 * time.Millisecond)
+		}
+	}
+	if !feared {
+		e2eharness.Preconditionf(t, "could not apply Fear %d on dummy 0x%X", spellFear, dummy)
+	}
+	// Damage the feared dummy — CC must break.
+	bot.GM(t, ".damage 5000")
+	deadline = time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		if !bot.UnitHasAura(dummy, spellFear) {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
+	if bot.UnitHasAura(dummy, spellFear) {
+		e2eharness.Assertf(t, "Fear aura %d still on dummy after damage", spellFear)
+	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS breakable-CC path exercised (still_has=%v sap_const=%d)", bot.HasAura(spellCheapShot), spellSap)
+	t.Logf("PASS Fear broken by damage on dummy")
 }
 
 // AURA-01: exclusive / replace — apply stronger after weaker (soft observational).

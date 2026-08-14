@@ -48,7 +48,7 @@ func TestTeleport_TeleNamedSafe(t *testing.T) {
 	bot.AssertWorldAlive(t)
 	_, _, _, m := bot.Pos()
 	if m != e2eharness.MapEasternKingdoms {
-		t.Logf("NOTE: TeleNamed Stormwind map=%d (expected EK %d on stock DBs)", m, e2eharness.MapEasternKingdoms)
+		e2eharness.Assertf(t, "TeleNamed Stormwind map=%d want EK %d", m, e2eharness.MapEasternKingdoms)
 	}
 	t.Logf("PASS TeleNamed Stormwind map=%d", m)
 }

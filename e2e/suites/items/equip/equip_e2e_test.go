@@ -11,7 +11,7 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// EQUIP-01: equip item via EquipEntry; world stays alive.
+// EQUIP-01: add+inventory oracle (EquipEntry is EQUIP-04).
 func TestEquip_EquipEntryBasic(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
 
@@ -20,11 +20,9 @@ func TestEquip_EquipEntryBasic(t *testing.T) {
 		Level:  80,
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	// Target dummy is an item that can be in bags; equip a simple known item if possible.
-	// Use engineering dummy item as inventory seed (not necessarily equippable armor).
 	bot.AddItem(t, e2eharness.ItemTargetDummy, 1)
 	bot.Save(t)
-	bot.AssertWorldAlive(t)
+	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, 1)
 	t.Logf("PASS add item inventory seed")
 }
 
@@ -74,8 +72,8 @@ func TestEquip_EquipEntryHelper(t *testing.T) {
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	bot.EquipEntry(t, itemDullBlade, 1)
-	bot.AssertWorldAlive(t)
-	t.Logf("PASS EquipEntry helper")
+	bot.AssertInventoryAtLeast(t, itemDullBlade, 1)
+	t.Logf("PASS EquipEntry helper inventory has entry=%d", itemDullBlade)
 }
 
 // EQUIP-05: bag seed + relog inventory path stays healthy.

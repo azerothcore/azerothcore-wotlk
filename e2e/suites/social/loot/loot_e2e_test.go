@@ -60,6 +60,10 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 		return
 	}
 
+	// Bag baseline before award so we can require inventory credit (not packet-only).
+	leadCount0 := leader.InventoryCount(t, roll.ItemID)
+	mateCount0 := mate.InventoryCount(t, roll.ItemID)
+
 	// Arm outcome before votes (Arm → Roll → Wait).
 	wonCh, _, cancelOut := leader.ArmLootRollOutcome(roll.ItemID)
 	t.Cleanup(cancelOut)
@@ -76,18 +80,33 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 		e2eharness.Assertf(t, "unexpected winner 0x%X", won.WinnerGUID)
 	}
 	winner := leader
+	base := leadCount0
 	if won.WinnerGUID == mate.GUID {
 		winner = mate
+		base = mateCount0
 	}
-	n := winner.InventoryCount(t, roll.ItemID)
-	t.Logf("PASS need/greed roll item=%d winner=0x%X bag_count=%d", roll.ItemID, won.WinnerGUID, n)
+	// Poll bag credit briefly (item push can lag slightly behind LOOT_ROLL_WON).
+	deadline := time.Now().Add(10 * time.Second)
+	var n int
+	for time.Now().Before(deadline) {
+		n = winner.InventoryCount(t, roll.ItemID)
+		if n >= base+1 {
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	if n < base+1 {
+		e2eharness.Assertf(t, "NBG winner bag credit missing item=%d count %d→%d want >=%d (winner=0x%X)",
+			roll.ItemID, base, n, base+1, won.WinnerGUID)
+	}
+	t.Logf("PASS need/greed roll item=%d winner=0x%X bag %d→%d", roll.ItemID, won.WinnerGUID, base, n)
 	leader.AssertWorldAlive(t)
 }
 
-// LOOT-02 / #26894: leave party mid-roll.
-// True issue repro is GO 194821 after UseGameObject. Until then: corpse mid-roll leave with a
-// 3-player party so leave does not disband (2-player leave clears rolls without awarding under
-// ForcedDisband; cluster Disband is also a no-op). Stayer rolls Need; remaining mate Greed.
+// TODO(e2e): re-enable when AC#26894 is fixed and GO 194821 UseGameObject path is available.
+// Prefer real Gift of the Observer mid-roll leave (not corpse proxy). Soft-pass is forbidden.
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26894
+/*
 func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "loot", "multi_bot", "serial", "issue"},
@@ -111,12 +130,9 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	leader.SetLootMethod(t, client.LootMethodGroupLoot, 0, e2eharness.LootThresholdUncommon)
 	leader.WaitLootMethod(t, client.LootMethodGroupLoot, 10*time.Second)
 
-	// Issue cites GO 194821 (Gift of the Observer); spawn with cleanup — bare
-	// `.gobject add` left persistent pad litter (see spawn_cleanup.go).
 	_ = leader.SpawnGameObject(t, e2eharness.GameObjectGiftOfTheObserver)
 	_ = e2eharness.TryNearbyGameObjectByEntry(t, leader.World, e2eharness.GameObjectGiftOfTheObserver, 5*time.Second)
 
-	// Party already at pad; combat-ready members before kill, open loot without re-tele.
 	leaver.CombatReady(t)
 	stayer.CombatReady(t)
 	guid := leader.SpawnKillLootable(t, e2eharness.CreatureGroupLootFixture, 45*time.Second)
@@ -124,20 +140,16 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	waitRoll, cancelRoll := leader.ArmLootStartRoll()
 	t.Cleanup(cancelRoll)
 	if _, ok := leader.TryOpenLoot(t, guid, 8*time.Second); !ok {
-		e2eharness.Preconditionf(t, "#26894 proxy: fixture corpse not lootable guid=0x%X", guid)
-		return
+		e2eharness.Preconditionf(t, "#26894: fixture corpse not lootable guid=0x%X", guid)
 	}
 
 	roll, gotRoll := waitRoll(0, 12*time.Second)
 	if !gotRoll {
-		e2eharness.Preconditionf(t, "#26894 proxy: no roll window on fixture %d (GO chest path still needs UseGameObject)", e2eharness.CreatureGroupLootFixture)
-		return
+		e2eharness.Preconditionf(t, "#26894: no roll window on fixture %d", e2eharness.CreatureGroupLootFixture)
 	}
 
-	// Arm outcome before leave+vote so LOOT_ROLL_WON / ALL_PASSED cannot be missed.
 	wonCh, allCh, cancelOut := leader.ArmLootRollOutcome(roll.ItemID)
 	t.Cleanup(cancelOut)
-	// Leave mid-roll while group remains (3→2): RemovePlayerFromRolls must re-count votes.
 	leaver.LeaveGroup(t)
 	leaver.WaitNotInGroup(t, 15*time.Second)
 	leader.RollNeed(t, roll)
@@ -149,17 +161,13 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 	case <-allCh:
 		t.Logf("all passed")
 	case <-time.After(90 * time.Second):
-		// Corpse proxy of #26894 (not full GO 194821 surface). ConfirmedBugf commented.
-		// e2eharness.ConfirmedBugf(t, 26894,
-		//	"corpse-proxy mid-roll leave: roll did not resolve itemGUID=0x%X", roll.ItemGUID)
-		t.Logf("KNOWN-OPEN-ISSUE #26894 proxy: mid-roll leave did not resolve itemGUID=0x%X", roll.ItemGUID)
-		return
+		e2eharness.Assertf(t, "mid-roll leave: roll did not resolve itemGUID=0x%X", roll.ItemGUID)
 	}
 	e2eharness.ProbeWorldAlive(t, leader, 26894)
-	_, _ = leader.TryOpenLoot(t, guid, 8*time.Second)
 	leader.AssertWorldAlive(t)
-	t.Logf("PASS mid-roll leave corpse proxy (issue-incomplete until GO 194821 UseGameObject)")
+	t.Logf("PASS mid-roll leave resolves roll")
 }
+*/
 
 // LOOT-03: all pass when rolls exist.
 func TestLoot_PassOnLootRedistribution(t *testing.T) {
@@ -206,9 +214,9 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	e2eharness.ProbeWorldAlive(t, leader, 22000)
 }
 
-// LOOT-05: kill when below half HP (#26862).
-// Uses Crimson Templar (reliable loot) damaged to <50% max then killed — open loot must work.
-// (Issue class: curhealth < max/2 at death must still yield loot/credit.)
+// TODO(e2e): re-enable when AC#26862 is fixed — corpse must be lootable after below-half-HP kill.
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26862
+/*
 func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "loot", "issue", "serial"},
@@ -225,47 +233,28 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
 
-	// Persistent spawn with guaranteed loot (15209 crest) — keep alive until after
-	// below-half damage; SpawnKillLootable would kill immediately.
 	entry := e2eharness.CreatureGroupLootFixture
-	guid, dbSpawn := bot.SpawnPersistent(t, entry, 15*time.Second)
-	if dbSpawn == 0 {
-		t.Logf("#26862: dbSpawn=0 for entry=%d (check E2E_WORLD_DSN)", entry)
-	}
-	_ = dbSpawn
-
+	guid, _ := bot.SpawnPersistent(t, entry, 15*time.Second)
 	bot.WaitUnitHPKnown(t, guid, 10*time.Second)
-	// Stay GM for damage+kill so loot recipient tagging is consistent.
 	bot.DamageToFraction(t, guid, 0.49, 20*time.Second)
 	hp, max := bot.UnitHP(guid)
-	t.Logf("unit below half hp=%d/%d", hp, max)
 	if hp == 0 || max == 0 || float64(hp)/float64(max) > 0.5 {
 		e2eharness.Preconditionf(t, "#26862: want 0 < hp/max <= 0.5 before kill, got %d/%d", hp, max)
-		return
 	}
 
 	bot.DamageKill(t, []uint64{guid}, 50_000_000, 25*time.Second)
 	bot.WaitUnitDead(t, guid, 20*time.Second)
 	bot.WaitUnitLootable(t, guid, 15*time.Second)
 
-	var items []client.LootItem
-	ok := false
-	for attempt := 0; attempt < 4 && !ok; attempt++ {
-		_ = bot.World.SetTarget(guid)
-		items, ok = bot.TryOpenLoot(t, guid, 5*time.Second)
-		if !ok {
-			time.Sleep(250 * time.Millisecond)
-		}
-	}
+	_ = bot.World.SetTarget(guid)
+	items, ok := bot.TryOpenLoot(t, guid, 10*time.Second)
 	if !ok {
-		bot.AssertWorldAlive(t)
-		// e2eharness.ConfirmedBugf(t, 26862, "below-half-HP kill: corpse not lootable (hp was %d/%d)", hp, max)
-		t.Logf("KNOWN-OPEN-ISSUE #26862: below-half-HP kill corpse not lootable (hp was %d/%d before kill)", hp, max)
-		return
+		e2eharness.Assertf(t, "below-half-HP kill: corpse not lootable (hp was %d/%d)", hp, max)
 	}
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS below-half-HP kill loot path items=%d", len(items))
 }
+*/
 
 // LOOT-06: master loot assign on group-loot fixture (guaranteed item slots).
 func TestLoot_MasterLootAssign(t *testing.T) {

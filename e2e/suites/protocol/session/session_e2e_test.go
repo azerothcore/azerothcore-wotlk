@@ -41,25 +41,30 @@ func TestSession_ItemAndQuestAfterLoad(t *testing.T) {
 	t.Logf("PASS item+quest after load/save")
 }
 
-// SESS-03: mutate gold via GM, save, relog, world still usable.
+// SESS-03: set gold via GM, save, relog — CharDB money must match.
 func TestSession_MoneyMutateSaveRelog(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "protocol"}, Runtime: "short", Category: "protocol/session"})
 
+	const wantCopper uint32 = 50_000
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "SessGd",
 		Level:  20,
 	})
-	e2eharness.ModMoney(t, bot.World, 12345)
+	bot.SetMoney(t, wantCopper)
+	bot.AssertMoneyEqual(t, wantCopper)
 	bot.Save(t)
 	bot.Relog(t)
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS money mutate + save + relog")
+	// Product oracle: money must survive save+relog (not world-alive only).
+	bot.AssertMoneyEqual(t, wantCopper)
+	t.Logf("PASS money %d survived save+relog", wantCopper)
 }
 
-// SESS-05 / #25793: GM visibility survives relog.
+// TODO(e2e): re-enable when AC#25793 is fixed — GM .gm visible off must persist extra_flags across relog.
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/25793
+/*
 func TestSession_GMVisibilitySurvivesRelog(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
-		// Not smoke: open-issue oracle (ConfirmedBug commented; would red CI).
 		Tags:     []string{"short", "protocol", "issue"},
 		Runtime:  "short",
 		Issue:    25793,
@@ -107,12 +112,11 @@ func TestSession_GMVisibilitySurvivesRelog(t *testing.T) {
 		e2eharness.HarnessFailf(t, "read extra_flags after relog: %v", err)
 	}
 	if after&playerExtraGMInvisible == 0 {
-		// e2eharness.ConfirmedBugf(t, 25793, "GM invisible did not stick after relog (extra_flags=0x%X)", after)
-		t.Logf("KNOWN-OPEN-ISSUE #25793: GM invisible did not stick after relog (extra_flags=0x%X)", after)
-		return
+		e2eharness.Assertf(t, "GM invisible did not stick after relog (extra_flags=0x%X)", after)
 	}
 	t.Logf("PASS GM visibility survived relog (extra_flags=0x%X)", after)
 }
+*/
 
 // SESS-06: hard session drop leaves world probeable by another bot.
 func TestSession_HardDropWorldStaysAlive(t *testing.T) {

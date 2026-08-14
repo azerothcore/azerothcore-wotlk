@@ -88,8 +88,9 @@ func TestGroup_RapidInviteDeclineNoCrash(t *testing.T) {
 			return
 		}
 		cancelInv()
-		b.DeclineGroup(t)
-		// Decline must leave b out of party before the next invite.
+		// Must wait for leader SMSG_GROUP_DECLINE — pending GetGroupInvite is not "in group",
+		// so WaitNotInGroup returns immediately and the next Invite hits ALREADY_IN_GROUP.
+		b.DeclineGroupFrom(t, a)
 		b.WaitNotInGroup(t, 5*time.Second)
 	}
 	e2eharness.ProbeWorldAlive(t, a, 23459)

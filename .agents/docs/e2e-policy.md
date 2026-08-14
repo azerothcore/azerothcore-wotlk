@@ -1,439 +1,171 @@
-# A2 — E2E Policy (AzerothCore + AzerothGhost harness)
+# E2E policy
 
-**Status:** current (AGENTS.md mandatory reading for live-stack e2e).  
-**Audience:** humans and LLMs changing AC core/scripts/SQL and/or writing live-stack tests.  
-**Harness:** [AzerothGhost `e2e/e2eharness`](https://github.com/walkline/AzerothGhost) — import from consumer tests; authoring rules in harness `LLM_GUIDE.md` / `EXAMPLES.md`.  
-**Stack under test:** AzerothCore 3.3.5a (auth + world + MySQL). Optional gateway in front is fine if `E2E_*` points at the client entrypoint.
+Mandatory when writing or changing live-stack e2e (`e2e/`). **When** to write tests. **How:** AzerothGhost `LLM_GUIDE.md` / `EXAMPLES.md` (this file does not replace them). Inventory: `e2e/README.md`. Stack: AC 3.3.5a auth+world+MySQL; `E2E_*` may point at a gateway.
 
-This policy tells **when** to write e2e, **what quality bar** is mandatory, and **how coverage must grow** without dumping unmaintainable duplicates. Wording uses **MUST / SHOULD / NEVER** so LLMs can treat rules as hard gates.
-
----
-
-## 0. Vocabulary
+## Terms
 
 | Term | Meaning |
 |------|---------|
-| **Unit test** | C++ (or pure Go) test of isolated logic; no live auth/world/MySQL. Lives primarily under `src/test/`. |
-| **Integration test** | Multi-component test **inside process** (mocks/stubs, partial fixtures, in-process DB hooks) without a full client login. Still not a live realm. |
-| **E2E / live-stack test** | Go test with `//go:build e2e` that logs protocol bots into a **running** AC stack via `e2eharness`, drives WotLK 3.3.5a packets, asserts on protocol / object cache / DB. |
-| **Player-visible path** | Behaviour a real client can observe: combat, auras, quests, death, loot, mounts, guild, teleport, flags, crashes, wrong packet results. |
-| **Tracked issue** | AC GitHub issue/PR number used with `ConfirmedBugf(t, N, …)`. |
-
-Harness severity markers (MUST use these, not bare `t.Fatalf` for classified outcomes):
-
-| Helper | Prefix / meaning |
-|--------|------------------|
-| `Preconditionf` | `precondition:` — setup never reached a judgeable state |
-| `ConfirmedBugf(t, N, …)` | `AC#N CONFIRMED BUG:` — core behaviour wrong for tracked issue (fails CI) |
-| `HarnessFailf` / `Assertf` | `harness:` / `assert:` — infra or fixed-core regression (fails CI) |
-| `KNOWN-OPEN-ISSUE` soft return | Log + `return` (no fail) for **open** bugs when `ConfirmedBugf` is commented — **not** smoke-tagged; see §9.2 |
-| `SoftWarnf` | `WARNING:` — non-fatal soft deviation |
-
----
-
-## 1. Decision tree — e2e vs unit vs integration
-
-Walk top-down. Stop at the first matching leaf.
-
-```
-Change or bug under consideration
-│
-├─ Pure calculation / pure data transform / no game world needed?
-│    (formulas, bit math, parsers, string/time helpers, RBAC table math, …)
-│    → UNIT test. NEVER e2e.
-│
-├─ Logic expressible with existing AC unit/mocks (SpellProc*, CombatManager*, …)
-│    without requiring login, map, or real DBC/world spawn fidelity?
-│    → UNIT (prefer) or INTEGRATION (in-process fixtures).
-│    → E2E only if unit cannot reach the real code path (see mandatory triggers).
-│
-├─ SQL-only static content with no C++/script behaviour change?
-│    (template numbers, gossip text, loot rows with no script interaction)
-│    → NO automated e2e required. Manual smoke optional. Unit N/A.
-│
-├─ SmartAI / conditions / waypoint data where outcome is only visible in-world
-│    and cannot be asserted by SQL shape alone?
-│    → E2E SHOULD if player-visible and deterministic; else document manual repro.
-│
-├─ Multi-system interaction on a live session?
-│    (spell + aura + combat + death; quest + save + DB; relog + flag; guild protocol;
-│     boss script + threat + evade; client cast vs GM path; crash on cast)
-│    → E2E MUST when player-visible (see §2). Unit MAY still cover pure sub-pieces.
-│
-├─ Protocol-level / client-observed behaviour?
-│    (SMSG_SPELL_GO, aura apply/remove, quest status, item push, teleport, PvP flag)
-│    → E2E MUST (or update existing e2e that already asserts this).
-│
-├─ Bugfix with a clear repro a player can perform?
-│    → E2E MUST as regression guard (prefer ConfirmedBugf until fixed, then keep green).
-│
-└─ Refactor with no intended behaviour change?
-     → Update existing tests that would break; add e2e only if the refactor touches
-       a critical system listed in §5.1 and coverage is missing.
-```
-
-**Default bias (coverage growth):** when uncertain between “unit only” and “unit + e2e”, and the path is player-visible, **prefer adding e2e** *if* a minimum viable test (§7) fits in one focused scenario. When uncertain between “e2e” and “nothing”, and the change is not in §2, **do not invent e2e** — file a backlog gap instead (§5.3).
-
----
-
-## 2. Mandatory e2e triggers (MUST)
-
-An LLM or author **MUST** add a new e2e test, or **update an existing** e2e that already covers the same behaviour, when **any** of the following is true:
-
-| # | Trigger | Notes |
-|---|---------|--------|
-| M1 | **Bugfix with a player-visible path** | Issue has (or PR adds) repro steps a client can perform. Test encodes those steps. |
-| M2 | **Protocol-level behaviour change** | Opcode handling, spell go/fail, aura update, quest status, item push, movement/teleport ack, guild charter/bank packets. |
-| M3 | **Multi-system interaction** | Two or more of: combat, auras, death, quests, loot, mounts, pets, vehicles, instances, PvP, guild, relog, DB persistence after `.save`. |
-| M4 | **Crash / hang / world freeze on a client action** | Cast, engage, relog, zone-in — use `ProbeWorldAlive` / `AssertWorldAlive` where relevant. |
-| M5 | **Regression of a previously e2e-covered behaviour** | Touching code paths already under `TestAC_*` or consumer suite — update assertions, do not delete coverage. |
-| M6 | **Critical-system change with missing e2e** | Paths listed in §5.1 (aura strip/consume, STAY_ALIVE quests, GM visibility/relog, boss evade from GM misuse class of bugs, charge/position, spell-summon ranks, totem absorption, etc.) when no test asserts the behaviour. |
-| M7 | **Fix claimed “blizzlike” for a tracked AC issue/PR** | Test name / comment links the issue; failure mode uses `ConfirmedBugf` on unfixed cores. |
-
-**MUST NOT** claim “tested in-game only” as a substitute for M1–M7 when a minimum viable e2e (§7) is feasible with current harness APIs.
-
-If the harness **cannot** express the scenario yet (missing opcode waiter, no API):
-
-1. Prefer extending harness (or file a harness gap) over skipping forever.  
-2. Until possible: document **gap** in the category inventory (§5.3) with issue id + blocked reason.  
-3. Still add unit/integration coverage for any pure sub-logic.
-
----
-
-## 3. When NOT to write e2e (NEVER / SHOULD NOT)
-
-| # | Situation | Do instead |
-|---|-----------|------------|
-| N1 | Pure math, formulas, sorting, bitflags, calendar math | `src/test/` unit |
-| N2 | Isolated spell-proc pipeline pieces already well covered by `SpellProc*` unit tests, with no new player-visible interaction | extend unit tests |
-| N3 | SQL-only static data with no behavioural branch (text, displayid, non-script loot odds alone) | SQL review + optional manual spot check |
-| N4 | Codestyle, renames, comment-only, pure refactors with no behaviour intent **and** no critical-system touch | existing tests green; no new e2e |
-| N5 | Scenario requires human judgment / non-determinism / hours-long raid lockouts | manual checklist; optional narrow e2e of one deterministic slice |
-| N6 | Duplicate of an existing e2e that already asserts the same oracle (same spell/quest/flag outcome) | extend the existing test or share a helper; see §5.2 |
-| N7 | “Smoke that world boots” without a behaviour oracle | out of scope for feature e2e (infra health checks are separate) |
-| N8 | Testing harness itself or inventing APIs not in `e2eharness` | contribute to harness repo; consumer tests MUST NOT invent fake helpers |
-
-**SHOULD NOT** write e2e solely to exercise a GM command that is not part of the player-visible bug path (setup GM is fine; the assertion must be on player-relevant state).
+| Unit | Isolated C++/Go; no live stack. `src/test/`. |
+| Integration | In-process multi-component; no client login. |
+| E2E | `//go:build e2e` Go test: `e2eharness` bots on a running realm; assert protocol / object cache / DB. |
+| Player-visible | A real client can observe it. |
+| Tracked issue | AC issue/PR id for `ConfirmedBugf`. |
 
----
+## When
 
-## 4. Authoring checklist for LLMs (must-pass gates before PR)
+First match wins:
 
-Treat this as a **PR gate**. Every box is MUST unless marked SHOULD.
+| If | Then |
+|----|------|
+| Pure calc / parse / bit math / no world | UNIT. NEVER e2e. |
+| Covered by existing unit/mocks (`SpellProc*`, …) without login/map/DBC fidelity | UNIT or in-process integration. E2E only if unit cannot reach the path. |
+| SQL-only static (text, displayid, non-script loot) | No e2e. Manual optional. |
+| SmartAI / conditions / waypoints; outcome only in-world | E2E SHOULD if player-visible and deterministic; else document manual repro. |
+| Multi-system on a live session, or protocol/client-observed, or player-repro bugfix | E2E MUST (or update existing). Unit MAY still cover pure pieces. |
+| Refactor, no behaviour intent | Update tests that break. Add e2e only if a critical system below lacks an oracle. |
 
-### 4.1 Policy gates
+Bias: player-visible and MVT fits → prefer e2e over unit-only. Not a MUST trigger and unsure → do not invent e2e; file a gap.
 
-- [ ] Decision tree (§1) applied; e2e is justified by a mandatory trigger (§2) or an explicit coverage-growth rule (§5).  
-- [ ] Not a forbidden case (§3 / N1–N8).  
-- [ ] Existing suite searched for the same issue id / spell / quest / creature / mechanic — no redundant twin (§5.2).  
-- [ ] If change touches a critical system (§5.1), matching e2e added or updated, **or** a tracked gap entry written with owner/issue.
+**MUST add or update e2e** when any of: player-visible bugfix (encode the repro); protocol change; multi-system (combat/aura/death/quest/loot/mount/pet/vehicle/instance/PvP/guild/relog/DB after `.save`); crash/hang/freeze on client action (`ProbeWorldAlive` / `AssertWorldAlive`); existing `TestAC_*` path touched (update, do not drop); critical system with no oracle; claimed blizzlike fix for a tracked issue (`ConfirmedBugf` until fixed).
 
-### 4.2 Structure gates
+**MUST NOT** treat “tested in-game” as a substitute when MVT is feasible.
 
-- [ ] Test lives in the **consumer** module (AC e2e suite / project tests), not only inside AzerothGhost unless contributing to that repo.  
-- [ ] `//go:build e2e` on live tests so offline `go test` stays clean.  
-- [ ] Imports: `e2e/e2eharness` + blank-import MySQL driver.  
-- [ ] Fixture: `NewSolo` / `NewScenario` (+ `BotSpec` / `ByRole` when roles differ). Prefer `ScenarioBot` methods over raw `Session` except guild charter/bank.  
-- [ ] Unique short `Prefix` (≤ 7 chars — auth username max 17 = Prefix+10); use `meta.Begin` (**serial by default**). Tag `parallel` only when pad-safe.  
-- [ ] Name: `TestArea_Behaviour` or `TestAC_<issue>_<ShortName>` for tracked issues.  
-- [ ] Comment links AC issue/PR URL when applicable.
+Harness cannot express it: extend harness or file a harness gap; inventory the gap; still unit-test pure logic.
 
-### 4.3 Scenario flow gates
+**NEVER / do instead**
 
-- [ ] Order: **fixture → place → setup (GM ok) → CombatReady if pull → drive → assert**.  
-- [ ] Place via `Teleport` / `TeleportPad` / `TeleNamed` / `GoCreatureID` as appropriate; melee paths use `GoCreatureID` after named tele.  
-- [ ] Combat: `CombatReady` / `CombatReadyFull` before pulls; **NEVER** leave `.gm on` during aggro.  
-- [ ] Damage: `Damage` / `DamageKill` only — **NEVER** `.gm on` mid-fight for `.damage`.  
-- [ ] Casts: `Cast` / `CastMust` / `CastOrGM` / `CastAtPosition`; report fail with `SpellFailReasonName`.  
-- [ ] Waiters: **Arm → Send → Wait**; never re-arm during Wait; never replace waiters with long fixed sleeps.  
-- [ ] Quest DB: assert only after `Save` / `QuestStatusAfterSave`.  
-- [ ] Spell-summon bugs: **NEVER** `.npc add` as a substitute for the summon spell path.  
-- [ ] Race set correctly so GM lines use the character’s native language (Horde ≠ Common).
+| Situation | Do instead |
+|-----------|------------|
+| Pure math, flags, calendar | `src/test/` |
+| Isolated spell-proc already unit-covered; no new player-visible interaction | extend unit |
+| SQL-only static, no behavioural branch | SQL review |
+| Rename / comments / refactor; no behaviour; not a critical system | existing tests |
+| Human judgment, nondeterminism, hours-long lockouts | manual; optional one deterministic slice |
+| Same oracle as an existing test | extend or share a helper |
+| “World boots” with no behaviour oracle | not feature e2e |
+| Invent harness APIs / test the harness | contribute to AzerothGhost |
 
-### 4.4 Assertion gates
+SHOULD NOT e2e a GM command that is not on the player path (GM setup is fine; assert player-relevant state).
 
-- [ ] Oracle is **behaviour**, not “no error returned”. Prefer protocol / object cache; DB when state is persisted.  
-- [ ] Severity helpers used correctly (§6).  
-- [ ] Tracked wrong-core outcome → `ConfirmedBugf(t, issue, …)`; setup blocked → `Preconditionf`; infra → `HarnessFailf`.  
-- [ ] Final `t.Logf("PASS …")` or equivalent success log SHOULD be present for greppable CI.
+## Authoring (PR gate)
 
-### 4.5 Run gates (when stack available)
+Consumer suite (`e2e/suites/` / `e2e/smoke/`), not only Ghost. `//go:build e2e`. Import `e2eharness` + blank MySQL driver.
 
-- [ ] `go test -tags=e2e … -run TestName -count=1 -v` passes on fixed core (or fails only with expected `CONFIRMED BUG` on intentionally unfixed core).  
-- [ ] Re-run once (`-count=2` or second invocation) SHOULD be stable — no flake from sleeps/races.  
-- [ ] Does not require exclusive realm if `t.Parallel`-safe; document if isolation needed.
+Fixture: `NewSolo` / `NewScenario` (`BotSpec` / `ByRole` if roles differ). Prefer `ScenarioBot` over raw `Session` except guild charter/bank.
 
-### 4.6 Anti-patterns (NEVER)
+`meta.Begin` serial by default. Prefix ≤7 chars (auth name max 17 = Prefix+10). Tag `parallel` only when pad-safe.
 
-- Invent harness APIs or wrap away GM/map state without logs.  
-- Fixed multi-second sleeps as primary sync.  
-- Bare `t.Fatalf("CONFIRMED BUG…")` instead of `ConfirmedBugf`.  
-- `.gm on` mid-fight; bare `.tele` when melee range matters.  
-- Asserting quest status before `.save`.  
-- Copy-pasting entire example files without narrowing the oracle.  
-- One giant test that covers five unrelated issues (split; share setup helpers if needed).
+Name: `TestArea_Behaviour` or `TestAC_<issue>_<Short>`. Comment the issue/PR URL.
 
-Full API surface and templates: harness `LLM_GUIDE.md` + `EXAMPLES.md`. This policy **does not** replace those docs; it decides **when** and **how strictly** to use them.
+Flow: fixture → place → setup (GM ok) → `CombatReady` if pull → drive → assert.
 
----
+Place: `Teleport` / `TeleportPad` / `TeleNamed` / `GoCreatureID`. Melee: `GoCreatureID` after named tele. Tele clears object cache — re-`WaitUnit`.
 
-## 5. Coverage growth enforcement (scales without rot)
+Combat: `CombatReady` / `CombatReadyFull` before pulls. NEVER `.gm on` during aggro. Damage: `Damage` / `DamageKill` only — NEVER `.gm on` mid-fight for `.damage`.
 
-### 5.1 Critical systems — change forces e2e
+Casts: `Cast` / `CastMust` / `CastOrGM` / `CastAtPosition`; fail reason via `SpellFailReasonName`.
 
-If a PR **touches** (implements, fixes, or refactors behaviour in) any row below, the author **MUST** add or update e2e covering that row’s **oracle**, unless an existing test already asserts the same oracle and remains valid.
+Waiters: Arm → Send → Wait. NEVER re-arm during Wait. NEVER replace waiters with long fixed sleeps.
 
-| Critical system | Example oracles (player-visible) | Example paths in AC |
-|-----------------|----------------------------------|---------------------|
-| Aura apply / strip / consume | aura remains after mount; totem effect not consumed by hostile AoE; proc aura consumed by finisher | `src/server/game/Spells`, aura scripts, `spell_*.cpp` |
-| Spell cast results / charge / pathing | charge stays on bridge; cast fail reasons; ground AoE landing | Movement + spell cast |
-| Death / repop / corpse interactions | STAY_ALIVE quest fails; Raise Dead near corpse no crash | Player/Unit death, pet spells |
-| Quest status + persistence | status after death/save; objective progress | Quest system + CharDB |
-| Relog / extra_flags / GM visibility | `.gm vis off` survives relog | Login, `extra_flags` |
-| Combat threat / evade / engage | boss stays in combat after engage; no evade from bad GM mode | Combat/Threat managers, scripts |
-| Spell summon vs `.npc add` | engineering dummy rank levels from **spell** summon | Spell summon effects |
-| Instance boss scripts (player-facing) | wave timers not accelerated; adds target correctly | `src/server/scripts/...` boss AI |
-| Guild charter / bank protocol | charter buy/sign; bank deposit visibility | Guild handlers |
-| Account/realm GM scope | `.account set gmlevel` only target realm | Auth/account access |
-| Crash-prone cast combinations | world still accepts login/probe after cast | Various |
+Quest DB: only after `Save` / `QuestStatusAfterSave`. Spell-summon: NEVER `.npc add` instead of the spell. Set race so GM text uses the character’s language (Horde ≠ Common).
 
-**LLM instruction (machine-checkable wording):**
+Oracle = behaviour (protocol / cache; DB after `Save`), not “no error”. SHOULD `t.Logf("PASS …")`. SHOULD log GUIDs/spell ids/statuses.
 
-> If you change code under a critical system in §5.1, you MUST add or update an e2e test that asserts the player-visible oracle for that change. If harness cannot express it, you MUST open/update a gap entry in the inventory (§5.3) and still add unit tests for pure logic.
-
-### 5.2 Prevent redundant tests
-
-Before adding a file/test:
-
-1. **Search** consumer suite + harness `examples/` + known `TestAC_*` for: issue number, spell id, quest id, creature entry, unique mechanic keywords.  
-2. **Same oracle → same test.** Prefer extending assertions or table-driving cases over a second login/scenario.  
-3. **Same setup, different oracle →** shared helper or subtest (`t.Run`), not a full duplicate login when avoidable.  
-4. **NEVER** duplicate published `examples/` into consumer suite without changing the oracle (examples are patterns, not ownership of AC regression).  
-5. **One tracked issue → one primary e2e** (`TestAC_<id>_…`). Related edge cases SHOULD be `t.Run` under that test or clearly named siblings only if isolation requires it.
-
-Redundancy veto: if a new test would pass/fail for the **same root cause and same assertion surface** as an existing one, **merge** rather than add.
-
-### 5.3 Track gaps (inventory + backlog)
-
-Maintain a living inventory in **`e2e/README.md`** (layout table + deferred/skip notes) and suite comments. Optional future: `.agents/docs/e2e-coverage.md`.
-
-| Field | Purpose |
-|-------|---------|
-| **Category** | e.g. Auras, Quests, Death, BossScripts, Guild, PvP, Relog, Movement, Pets, Vehicles, Instances |
-| **Behaviour / oracle** | One sentence: what “correct” looks like |
-| **Priority** | P0–P3 from §8 |
-| **Coverage** | `covered` (test name) / `gap` / `blocked-harness` / `manual-only` |
-| **Issue links** | AC issue/PR numbers |
-| **Owner / note** | Why blocked; suggested harness API |
-
-**Rules:**
-
-- Closing a **P0/P1 gap** is preferred work when touching that subsystem.  
-- LLMs **MUST** update inventory status when they add coverage or discover a gap.  
-- **Blocked-harness** gaps MUST name the missing capability (opcode, waiter, multi-realm, etc.).
-
-### 5.4 LLM “if you change X you must add/update Y” map
-
-| If you change… | You MUST add/update… |
-|----------------|----------------------|
-| Aura duration/dispel/consume/proc strip logic | E2E: apply → action → `AssertAuraRemains` / `AssertAuraConsumed` / unit aura waiters |
-| Quest fail/complete/objective C++ or script | E2E: `AddQuest` → action → `Save` → `AssertQuestStatus` |
-| Death/repop/corpse use | E2E: `DieAndRepop` (or staged die/wait/release) + surviving system assert |
-| Boss AI timers, spawns, evade, targeting | E2E: place → `CombatReady` → `Engage` → spawn tracker / target observe / interval assert |
-| Spell effect that summons creatures | E2E: cast summon spell (not `.npc add`) + assert summoned unit properties |
-| Client cast fail/success semantics | E2E: `Cast`/`CastMust` + fail reason / `SMSG_SPELL_GO` path |
-| Relog-persisted flags / GM visibility | E2E: set → `Save` → `Relog` → DB or protocol assert |
-| Guild charter/bank handlers | E2E via Session guild helpers (charter/bank patterns) |
-| Account access / realm-scoped GM | E2E multi-realm or DB assert scoped to realm (see existing #27088 style) |
-| Crash fix on cast/use | E2E: repro cast + `ProbeWorldAlive` / `AssertWorldAlive` |
-| Unit-test-only pure helper extracted from above | Unit test for helper **and** keep/adjust e2e for the player path |
-
-### 5.5 Growth rate (practical, not metric theater)
-
-- Prefer **one solid test per merged player-visible bugfix** over bulk speculative scenarios.  
-- Prefer **deepening** critical categories (better oracles, edge `t.Run`s) over new categories with weak sleeps.  
-- Suite size is healthy when every test has a unique oracle and a named owner (issue or feature). Delete or merge tests that no longer map to a behaviour.
-
----
-
-## 6. Test quality bar
-
-Aligned with harness `LLM_GUIDE.md` / `EXAMPLES.md` / `README.md`.
-
-### 6.1 Assertions
-
-- **MUST** assert an observable oracle: packet success/fail, aura presence, unit combat/HP/death, quest status, DB flag, world alive.  
-- **MUST** prefer protocol + object cache; use DB after `Save` for persistence.  
-- **MUST** distinguish severities:
-
-| Situation | Helper |
-|-----------|--------|
-| Setup cannot reach judgeable state (missing NPC, cast setup fail, wrong preconditions) | `Preconditionf` |
-| Core behaviour wrong for tracked issue/PR | `ConfirmedBugf(t, issue, …)` |
-| Timeout, SQL error, empty cache, send failure, waiter infra | `HarnessFailf` |
-| Soft deviation; test may still pass | `SoftWarnf` |
-
-- **NEVER** use bare `t.Fatalf` for those four classes when helpers apply.  
-- **SHOULD** log enough GUIDs/spell ids/statuses to debug without a re-run guess.
-
-### 6.2 Scenario discipline
-
-| Rule | MUST / NEVER |
-|------|----------------|
-| `CombatReady` before real pulls | MUST |
-| `.gm on` mid-fight for `.damage` | NEVER — use `Damage` / `DamageKill` |
-| Pull with GM mode still on | NEVER |
-| Fixed long sleeps as primary sync | NEVER — waiters / cache polls |
-| Re-arm waiter during Wait | NEVER |
-| Bare `.tele` when melee required | NEVER — `GoCreatureID` |
-| `.npc add` when bug is spell-summon | NEVER |
-| Invent harness APIs | NEVER |
-| `ScenarioBot` for combat/quest/aura/death/relog | SHOULD (default) |
-| Session helpers for guild charter/bank | SHOULD when testing guild protocol |
-| `meta.Begin` serial default; `parallel` tag only when pad-safe | SHOULD |
-
-### 6.3 Determinism & isolation
-
-- Prefer unique account `Prefix`; cleanup via harness `t.Cleanup`.  
-- Avoid depending on other tests’ characters, guilds, or instance saves.  
-- Time-based oracles use bounded windows with documented thresholds (see `AssertIntervalNotAccelerated`), not “sleep 60s and hope”.  
-- Map/teleport clears object cache — re-`WaitUnit` after tele.
-
-### 6.4 Comments & traceability
-
-- Tracked issues: link in comment + issue number in `ConfirmedBugf`.  
-- State whether the test expects **green on fixed core** / **CONFIRMED BUG on unfixed**.  
-- Do not claim blizzlike without citing issue, PR, or wowhead/web evidence reviewed by the author.
-
----
-
-## 7. Minimum viable test (MVT)
-
-An e2e is **mergeable** only if it meets **all** of:
-
-1. **Single primary oracle** — one behaviour under test (extra soft checks allowed, not five unrelated bugs).  
-2. **Real path** — drives the same class of action a player/client would (cast, die, relog, engage, quest, etc.), not only SQL edits.  
-3. **Reachability** — setup uses harness fixtures; failures in setup are `Preconditionf`, not silent skips.  
-4. **Correct severity** on the oracle failure (`ConfirmedBugf` / hard assert).  
-5. **No footguns** from §6.2.  
-6. **≤ ~one focused scenario runtime** in the common case (aim minutes, not hours); long boss waves only when the oracle requires them.  
-7. **Runnable** with documented `E2E_*` env against stock AC.  
-8. **Name + comment** sufficient to find the test from the issue or mechanic.
-
-**Skeleton (illustrative):**
+**MVT** (all required or it is not coverage): one primary oracle; real client path; setup failures are `Preconditionf`; correct severity; no footguns above; minutes not hours (long boss waves only if the oracle needs them); runnable with `E2E_*` on stock AC; name+comment findable from issue or mechanic.
 
 ```go
 //go:build e2e
-
-// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/NNNNN
-func TestAC_NNNNN_ShortOracle(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "issue"}, Runtime: "short", Issue: NNNNN})
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/N
+func TestAC_N_ShortOracle(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "issue"}, Runtime: "short", Issue: N})
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "Short", Race: e2eharness.RaceHuman,
 		Class: e2eharness.ClassWarrior, Level: 80, LearnAllClass: true,
 	})
-	// place → setup → (CombatReady) → drive → assert with severity helpers
+	// place → setup → (CombatReady) → drive → assert
 }
 ```
 
-Anything less than MVT is a draft, a gap note, or a harness spike — not coverage.
+Run: `go test -tags=e2e -run TestName -count=1 -v` green on fixed core (or only `CONFIRMED BUG` on unfixed). SHOULD `-count=2` stable. Document if exclusive realm needed.
 
----
+NEVER: invent harness APIs; wrap GM/map without logs; bare `t.Fatalf("CONFIRMED BUG")`; copy whole examples; one test for five issues.
 
-## 8. Regression priority ranking (what to cover first)
+## Fail helpers
 
-When choosing the next e2e (human or LLM backlog work), pick the highest priority with a feasible MVT:
+Use these, not bare `t.Fatalf`, for classified outcomes:
 
-| Priority | Category | Why first |
-|----------|----------|-----------|
-| **P0** | Crashes / world hangs / data corruption on client actions | Stability |
-| **P0** | Already-regressed player bugs with clear repro + issue id | Closes loops; ConfirmedBugf → green documents fix |
-| **P1** | Auras (strip/consume/persist), death+quest, relog flags | High footgun density; harness-strong |
-| **P1** | Combat evade/engage mistakes, charge/position, totem/grounding class bugs | Protocol-visible; frequent regressions |
-| **P1** | Spell-summon correctness (not GM spawn) | Easy to “fix” wrongly with `.npc add` |
-| **P2** | Boss script timers/waves/targeting (single-boss slices) | Valuable but longer/flakier if poorly written |
-| **P2** | Guild charter/bank, multi-bot PvP interactions | Harness support exists; narrower audience |
-| **P2** | Account/realm GM scope, visibility, commands with persisted state | Security/ops adjacent |
-| **P3** | Convenience QoL, pure display, non-deterministic farm content | Manual or backlog |
-| **P3** | Full raid clear simulations | Out of scope for default growth |
+| Helper | Prefix | When |
+|--------|--------|------|
+| `Preconditionf` | `precondition:` | Setup never reached a judgeable state |
+| `ConfirmedBugf(t, N, …)` | `AC#N CONFIRMED BUG:` | Tracked issue; core wrong (fails CI) |
+| `HarnessFailf` / `Assertf` | `harness:` / `assert:` | Infra or fixed-core regression (fails CI) |
+| `SoftWarnf` | `WARNING:` | Non-fatal soft deviation |
+| Open / unfixed issue | — | Comment out the **entire** test: `TODO(e2e): re-enable when AC#N is fixed` + issue URL. Re-enable body MUST hard-fail. NEVER log+return soft-pass. |
 
-**Selection rule for LLMs:** given a PR, implement e2e for the highest-priority trigger the PR activates; do not expand into P3 scenarios in the same change unless asked.
+## Critical systems
 
----
+A PR that implements, fixes, or refactors a row MUST add or update e2e for that oracle, or keep an existing test that still asserts it. If harness cannot: gap in `e2e/README.md` + unit for pure logic.
 
-## 9. Maintenance policy
+| System | Oracle / drive |
+|--------|----------------|
+| Aura apply/strip/consume | apply → action → `AssertAuraRemains` / `AssertAuraConsumed` / aura waiters. Paths: `Spells`, aura scripts, `spell_*.cpp` |
+| Cast / charge / pathing | `Cast`/`CastMust` + fail reason / `SMSG_SPELL_GO`; charge stays on bridge; ground AoE landing |
+| Death / repop / corpse | `DieAndRepop` (or staged) + surviving system (STAY_ALIVE, Raise Dead) |
+| Quest + persistence | `AddQuest` → action → `Save` → `AssertQuestStatus` |
+| Relog / extra_flags / GM vis | set → `Save` → `Relog` → DB or protocol |
+| Threat / evade / engage | `CombatReady` → `Engage` → still in combat; no evade from bad GM |
+| Spell summon | cast the summon spell (not `.npc add`) + summoned unit properties |
+| Instance boss AI | place → `CombatReady` → `Engage` → spawn/target/interval (`AssertIntervalNotAccelerated`) |
+| Guild charter / bank | Session guild helpers |
+| Account / realm GM | `.account set gmlevel` scoped to target realm (#27088 style) |
+| Crash-prone cast | repro + `ProbeWorldAlive` / `AssertWorldAlive` |
+| Pure helper extracted from the above | unit the helper **and** keep e2e on the player path |
 
-### 9.1 Flaky tests
+## Coverage
 
-| Action | Rule |
-|--------|------|
-| Diagnose | Classify: harness/infra (`HarnessFailf` patterns), timing, parallel collision, world state dirt, true race in core |
-| Fix first | Replace sleeps with waiters; fix Arm/Send/Wait; ensure `CombatReady`; unique prefixes; re-wait after tele |
-| Quarantine | Only if flake is environmental and not a core bug; mark clearly (`t.Skip` with reason **SHOULD** be rare and ticketed) |
-| NEVER | Silent retry loops that hide core nondeterminism; raising timeouts endlessly without a waiter |
+Search consumer suite + Ghost `examples/` + `TestAC_*` for issue, spell, quest, creature, mechanic **before** adding.
 
-A test that fails intermittently on a correct core is a **harness/test bug** until proven otherwise.
+Same oracle → same test (extend / table-drive). Same setup, different oracle → helper or `t.Run`, not a second login. NEVER copy Ghost `examples/` without changing the oracle. One tracked issue → one primary `TestAC_<id>_…`; extra edges as `t.Run` or siblings only if isolation requires. Same root cause + same assertion surface → merge.
 
-### 9.2 `ConfirmedBugf` vs fix vs quarantine
+Inventory (`e2e/README.md` + suite comments): category, one-sentence oracle, P0–P3, `covered` (test name) / `gap` / `blocked-harness` / `manual-only`, issue links, note. MUST update when adding coverage or finding a gap. `blocked-harness` MUST name the missing API (opcode, waiter, multi-realm, …). Closing a P0/P1 gap is preferred when touching that subsystem. When pruning, merge redundant tests and refresh the inventory.
 
-| Core state | Test expectation |
-|------------|------------------|
-| Bug open / unfixed | Prefer `ConfirmedBugf` when the suite is an **issue-only** run. For mainline CI smoke, **open-issue soft return** is allowed: comment out `ConfirmedBugf`, log `KNOWN-OPEN-ISSUE #N: …`, `return` without failing; **MUST NOT** carry the `smoke` tag. |
-| Bug fixed | Test **MUST** go green (`Assertf` / hard assert). Keep issue id in name (`TestAC_<n>_…`) and comment. |
-| Bug invalid / cannot reproduce / wrong issue | Fix or delete test; do not leave lying `ConfirmedBugf`. |
-| Environment cannot run scenario | `Preconditionf` or inventory `blocked-*`; not `ConfirmedBugf`. |
+Prefer one solid test per merged player-visible bugfix. Deepen critical categories over new weak ones. Every test: unique oracle + owner (issue or feature). Delete or merge tests that no longer map to a behaviour.
 
-**NEVER** soft-return a **fixed** bug (use hard assert).  
-**NEVER** delete a green regression test because the issue is closed — closed issues are why the test stays.
+## Priority (next test)
 
-### 9.3 Ownership & churn
+Highest feasible MVT:
 
-- Prefer updating tests in the same PR as the behaviour change.  
-- API renames in harness: update consumer tests in the same landing window.  
-- Examples under AzerothGhost `e2e/examples/` are **patterns**; AC regressions live in the consumer suite (or agreed AC-side e2e module).  
-- Periodic prune: merge redundant tests; refresh inventory (§5.3).
+| Pri | Cover |
+|-----|-------|
+| **P0** | Crash / hang / corruption on client action; already-regressed player bug with issue id |
+| **P1** | Aura strip/consume/persist; death+quest; relog flags; evade/engage; charge/position; totem/grounding; spell-summon (not GM spawn) |
+| **P2** | Single-boss timers/waves/targeting; guild charter/bank; multi-bot PvP; realm-scoped GM / persisted visibility |
+| **P3** | QoL, display, nondeterministic farm; full raid clears (out of default growth) |
 
-### 9.4 Local debug vs committed suite
+On a PR: implement e2e for the highest-priority trigger the PR activates. Do not add P3 in the same change unless asked.
 
-- **Scratch / agent exploratory tests** MUST go under **`e2e/local/`** (gitignored except `local/README.md`). NEVER commit throwaways.  
-- When a scratch scenario becomes a real regression, **move** it into `e2e/suites/` (or `suites/issues/`) in the same PR as the fix.  
-- Day-to-day debugging SHOULD prefer live e2e over ad-hoc GM spam when the stack is up (`e2e/README.md`).  
-- CI is opt-in (`-tags=e2e` + workflow); see `.github/workflows/e2e-live.yml` only when changing CI — not required reading for authoring tests.
+## Isolation, comments, flakes
 
----
+Unique `Prefix`; cleanup via `t.Cleanup`. Do not depend on other tests’ characters/guilds/instance saves. Time oracles: bounded windows with documented thresholds, not “sleep 60s”.
 
-## 10. Placement (done)
+Tracked issues: URL in comment + id in `ConfirmedBugf`. State expected green-on-fixed vs CONFIRMED-BUG-on-unfixed. Do not claim blizzlike without issue, PR, or reviewed wowhead/web evidence.
 
-This file **is** the standing policy (routed from AGENTS.md). Deep harness API stays in AzerothGhost `LLM_GUIDE.md` / `EXAMPLES.md`. Inventory lives in `e2e/README.md` (and suite comments). Optional later: short bullets in `code-review.md` / `self-review-rules.md`.
+Flake: classify (infra, timing, pad collision, dirty world, core race). Fix waiters / Arm-Send-Wait / `CombatReady` / unique prefixes / re-wait after tele. Intermittent fail on a correct core is a harness/test bug until proven otherwise. Quarantine (`t.Skip` + reason) only for environmental flake, rare and ticketed. NEVER silent retries or endless timeout bumps.
 
----
+## Open issues
 
-## 11. Quick reference card (LLM)
+| Core | Test |
+|------|------|
+| Unfixed | Comment out the whole test + TODO + URL. Re-enable MUST hard-fail. |
+| Fixed | Uncomment; MUST go green. Keep `TestAC_<n>_` and comment. |
+| Invalid / cannot repro | Delete the disabled block; no lying TODOs. |
+| Env cannot run | `Preconditionf` or inventory `blocked-*`; not a soft PASS. |
 
-```
-MUST e2e:  player-visible bugfix | protocol change | multi-system | crash path |
-           critical system touch without oracle | tracked AC issue fix
+NEVER let a test PASS while the product oracle is wrong. NEVER multi-retry + soft-exit to hide flakes or open bugs. NEVER delete a green regression because the issue closed.
 
-NEVER e2e: pure math | SQL-only static | duplicate oracle | invent harness APIs
+Update tests in the same PR as the behaviour change. Harness renames: update consumers in the same landing window. Ghost `e2e/examples/` are patterns; AC regressions live in the consumer suite.
 
-MVT:       one oracle + real client path + severity helpers + no GM mid-fight +
-           waiters not sleeps + runnable -tags=e2e
+Scratch MUST be `e2e/local/` (gitignored except `local/README.md`). NEVER commit throwaways. Promote into `e2e/suites/` (or `suites/issues/`) in the same PR as the fix. Prefer live e2e over ad-hoc GM when the stack is up.
 
-On change of aura|quest|death|relog|boss AI|spell-summon|guild|crash:
-           add/update matching e2e OR record gap
-
-Fail:      Preconditionf | ConfirmedBugf(issue) | Assertf | HarnessFailf
-           (open-issue soft return OK if not smoke-tagged — §9.2)
-Docs:      this policy (when) + harness LLM_GUIDE/EXAMPLES (how)
-```
-
----
-
-## 12. Document control
-
-| Field | Value |
-|-------|-------|
-| ID | A2_E2E_POLICY |
-| Status | current (AGENTS.md mandatory reading) |
-| Depends on | Harness `LLM_GUIDE.md`, `EXAMPLES.md`, `README.md` |
-| Inventory | `e2e/README.md` + suite comments |
+Local: `go test -tags=e2e`. Official PR CI: smoke after nopch clang-18 (reuses those binaries). Fork: Actions variable `E2E_ENABLE=1`. Full suite: dispatch. Touch `.github/workflows/e2e-live.yml` only when changing CI.

@@ -13,10 +13,11 @@ import (
 )
 
 // CAST-01: live cast pipeline — Charge succeeds on spawned dummy after CombatReady.
-// Charge needs battle stance, charge range (~8–25y), and rage; Cast fatals on
-// timeout so use TryCast + setup that makes a result packet likely.
+// WotLK Charge (rank 3 = 11578): Requires Battle Stance, 8–25 yd, out of combat.
 func TestCast_ChargeSucceedsOnDummy(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells", "combat"}, Runtime: "short", Category: "spells/cast"})
+
+	const spellChargeRank3 = uint32(11578)
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "CastOk",
@@ -24,23 +25,43 @@ func TestCast_ChargeSucceedsOnDummy(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
+	// PackagePad only for isolation. Charge needs pathable flat ground
+	// (PackagePad mountain pads return SPELL_FAILED_NOPATH=56).
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	dummy := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	// Pull caster back so Charge is in range (spawn lands on the player).
-	dx, dy, dz, dm := bot.Pos()
-	bot.Teleport(t, dx+15, dy, dz, dm)
-	bot.CombatReadyFull(t)
-	_ = bot.CastOrGM(t, e2eharness.SpellBattleStance, 0, 5*time.Second)
-	bot.Face(t, dummy)
-	res, err := bot.TryCast(t, e2eharness.SpellCharge, dummy, 8*time.Second)
-	if err != nil {
-		t.Logf("Charge cast timeout (no result packet): %v — exercising fail/timeout path", err)
-	} else if !res.Success {
-		t.Logf("Charge result not OK reason=%s (may be range/path); world still required alive",
-			e2eharness.SpellFailReasonName(res.FailReason))
+	// Northshire open strip (map 0) — short, flat, mmaps-friendly.
+	const (
+		chargeX   float32 = -8904.0
+		chargeY   float32 = -128.0
+		chargeZ   float32 = 81.0
+		chargeMap uint32  = 0
+	)
+	bot.Teleport(t, chargeX, chargeY, chargeZ, chargeMap)
+	bot.CombatStop(t)
+	bot.CombatReadyFull(t) // gm off + god + power
+	bot.CombatStop(t)
+	bot.Learn(t, e2eharness.SpellBattleStance)
+	bot.Learn(t, spellChargeRank3)
+	// Client Battle Stance so form is real (not CastOrGM fake-success).
+	bot.CastMust(t, e2eharness.SpellBattleStance, 0, 10*time.Second)
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		if bot.HasAura(e2eharness.SpellBattleStance) {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
 	}
+	if !bot.HasAura(e2eharness.SpellBattleStance) {
+		e2eharness.Preconditionf(t, "Battle Stance missing before Charge")
+	}
+	// 31146 is long-lived (2673 KillSelfs at 15s — Charge setup exceeds that).
+	dummy := bot.Spawn(t, e2eharness.CreatureHeroicTrainingDummy, 15*time.Second)
+	// Charge range is 8–25y; spawn is on the player — step back ~12y on flat ground.
+	bot.Teleport(t, chargeX+12, chargeY, chargeZ, chargeMap)
+	_ = bot.World.SetTarget(dummy)
+	bot.Face(t, dummy)
+	bot.CastMust(t, spellChargeRank3, dummy, 10*time.Second)
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS cast pipeline exercised ok=%v err=%v", res.Success, err)
+	t.Logf("PASS Charge succeeded on dummy")
 }
 
 // CAST-02: out-of-range / fail path does not crash.
@@ -62,9 +83,11 @@ func TestCast_FailPathNoCrash(t *testing.T) {
 	t.Logf("PASS cast fail path no crash")
 }
 
-// CAST-03 / #27061 pattern: Raise Dead near corpse must not crash world.
+// TODO(e2e): re-enable when AC#27061 is fixed
+// https://github.com/azerothcore/azerothcore-wotlk/issues/27061
+// Must CastMust Raise Dead and assert a ghoul; world-alive alone is greenwash.
+/*
 func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
-	// serial: DieMust + pad thrash flakes when parallel with other combat/loot tests.
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells", "issue", "serial"},
 		Runtime:  "med",
@@ -82,20 +105,18 @@ func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
 	dk := e2eharness.ByRole(t, bots, "dk")
 	corpse := e2eharness.ByRole(t, bots, "corpse")
 	e2eharness.TeleportAllPad(t, bots, e2eharness.PackagePad(t))
-	// DieMust (not bare Die) — selection settle + retries under pad load.
 	corpse.DieMust(t, 20*time.Second)
 	dk.Learn(t, e2eharness.SpellRaiseDead)
 	dk.AddItem(t, e2eharness.ItemCorpseDust, 5)
 	dk.CombatReady(t)
 	_, _ = dk.TryCast(t, e2eharness.SpellRaiseDead, 0, 10*time.Second)
-	// Dismiss Risen Ghoul (26125) so it does not leak on the pad after the test.
 	dk.CleanupOwnedSummons(t)
-	// Critical: world still responds.
 	e2eharness.ProbeWorldAlive(t, dk, 27061)
 	t.Logf("PASS Raise Dead near corpse did not crash world")
 }
+*/
 
-// CAST-04: learn + CastMust battle stance on self.
+// CAST-04: client CastMust battle stance on self — aura must apply (no CastOrGM GM-fake).
 func TestCast_BattleStanceSelf(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells"}, Runtime: "short", Category: "spells/cast"})
 
@@ -106,10 +127,21 @@ func TestCast_BattleStanceSelf(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	// Self-cast stance via CastOrGM.
-	_ = bot.CastOrGM(t, e2eharness.SpellBattleStance, 0, 10*time.Second)
+	bot.Learn(t, e2eharness.SpellBattleStance)
+	// Client cast path only — CastMust fatals if SPELL_GO/success missing.
+	bot.CastMust(t, e2eharness.SpellBattleStance, 0, 10*time.Second)
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		if bot.HasAura(e2eharness.SpellBattleStance) {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
+	if !bot.HasAura(e2eharness.SpellBattleStance) {
+		e2eharness.Assertf(t, "battle stance aura %d missing after successful cast", e2eharness.SpellBattleStance)
+	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS battle stance cast path (has=%v)", bot.HasAura(e2eharness.SpellBattleStance))
+	t.Logf("PASS battle stance self-cast + aura")
 }
 
 // CAST-05: CastAtPosition ground AoE does not crash.

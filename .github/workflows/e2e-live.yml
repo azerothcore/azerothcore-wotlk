@@ -1,15 +1,43 @@
-# On-demand live e2e (native only): dashboard-ci style stack, then go test.
+# Live e2e (native only): start auth + world, then go test.
 #
-#   acore.sh init installs host MySQL (no GHA services.mysql — that fights
-#   install-deps systemctl start on :3306), compile, empty DBs, client-data
-#   → dry-run schema → start auth + world (background binaries)
-#   → go test -tags=e2e against 127.0.0.1
+#   PR: nopch-build (ubuntu-24.04 clang-18) compiles + dry-run, uploads
+#       binaries; this workflow is called with artifact_run_id (no rebuild).
+#   Dispatch: compile via linux-build, then the same smoke/full run.
 #
-# Triggers: label `run-e2e` (smoke) | workflow_dispatch
+# Triggers: workflow_call (from nopch-build) | workflow_dispatch
 
 name: e2e-live
 
 on:
+  workflow_call:
+    inputs:
+      scope:
+        description: 'smoke | full'
+        type: string
+        default: 'smoke'
+      count:
+        type: string
+        default: '1'
+      timeout:
+        type: string
+        default: ''
+      parallel:
+        type: string
+        default: '1'
+      package_parallel:
+        type: string
+        default: '1'
+      packages:
+        type: string
+        default: './...'
+      tags_filter:
+        type: string
+        default: ''
+      artifact_run_id:
+        description: 'Caller run id that uploaded ac-server-ubuntu-24.04-clang-18'
+        type: string
+        default: ''
+
   workflow_dispatch:
     inputs:
       packages:
@@ -41,67 +69,27 @@ on:
         description: 'E2E_TAGS for full scope only'
         required: false
         default: ''
-      harness_ref:
-        required: false
-        default: ''
-
-  pull_request:
-    types: [labeled, synchronize, reopened]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   # Cancel superseded PR runs; do not cancel intentional dispatch full suites.
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 permissions:
   contents: read
-  actions: write  # ccache save + failure log artifacts
+  actions: write  # download caller artifact + failure log upload
 
 env:
   CONTINUOUS_INTEGRATION: true
   MYSQL_ROOT_PASSWORD: root
 
 jobs:
-  preflight:
-    name: preflight
-    runs-on: ubuntu-24.04
-    if: |
-      github.repository == 'walkline/azerothcore-wotlk'
-      && (
-        github.event_name == 'workflow_dispatch'
-        || (
-          github.event_name == 'pull_request'
-          && !github.event.pull_request.draft
-          && (
-            (github.event.action == 'labeled' && github.event.label.name == 'run-e2e')
-            || (
-              github.event.action != 'labeled'
-              && contains(github.event.pull_request.labels.*.name, 'run-e2e')
-            )
-          )
-        )
-      )
-    outputs:
-      scope: ${{ steps.check.outputs.scope }}
-    steps:
-      - id: check
-        run: |
-          set -euo pipefail
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            scope="${{ github.event.inputs.scope || 'smoke' }}"
-          else
-            scope="smoke"
-          fi
-          echo "scope=${scope}" >> "$GITHUB_OUTPUT"
-
   e2e:
-    name: e2e (native / ${{ needs.preflight.outputs.scope }})
-    needs: preflight
-    if: needs.preflight.result == 'success'
-    # Host MySQL comes from acore.sh install-deps (dashboard-ci style). Do not
-    # add services.mysql: it binds :3306 and systemctl start mysql.service fails.
-    # PRs always GitHub-hosted (untrusted code). Self-hosted only via dispatch + E2E_RUNS_ON.
-    runs-on: ${{ github.event_name == 'pull_request' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
+    name: e2e (native / ${{ inputs.scope || 'smoke' }})
+    if: github.repository == 'azerothcore/azerothcore-wotlk' || vars.E2E_ENABLE == '1'
+    # workflow_call (PR): ubuntu-24.04 to match the nopch artifact.
+    # Dispatch: optional self-hosted via E2E_RUNS_ON.
+    runs-on: ${{ github.event_name == 'workflow_call' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
     timeout-minutes: 480
     steps:
       - name: Free disk
@@ -114,102 +102,54 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Checkout AzerothGhost harness
-        uses: actions/checkout@v7
-        with:
-          # Public repo — default GITHUB_TOKEN is enough (no E2E_HARNESS_TOKEN).
-          repository: walkline/AzerothGhost
-          path: _deps/AzerothGhost
-          ref: ${{ github.event.inputs.harness_ref || vars.E2E_HARNESS_REF || '' }}
-          persist-credentials: false
-
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version-file: e2e/go.mod
           cache-dependency-path: e2e/go.sum
 
-      - name: Wire harness module replace
+      # AzerothGhost is a public Go module (e2e/go.mod v1.0.1). go test downloads it.
+      - name: Download e2e modules
         working-directory: e2e
-        run: |
-          set -euo pipefail
-          harness="${GITHUB_WORKSPACE}/_deps/AzerothGhost"
-          test -d "${harness}/e2e/e2eharness"
-          go mod edit -replace="github.com/walkline/AzerothGhost=${harness}"
-          go mod download
+        run: go mod download
 
-      - name: Install ccache
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ccache unzip curl
-          ccache --version
-
-      - name: Prepare ccache dir
-        run: mkdir -p "${{ github.workspace }}/var/ccache"
-
-      - name: Restore ccache
-        id: restore_ccache
-        uses: actions/cache/restore@v4
+      - name: Download nopch server binaries
+        if: ${{ inputs.artifact_run_id != '' }}
+        uses: actions/download-artifact@v4
         with:
-          path: ${{ github.workspace }}/var/ccache
-          key: ccache:e2e-live:ubuntu-24.04:${{ github.ref_name }}-${{ github.run_id }}
-          restore-keys: |
-            ccache:e2e-live:ubuntu-24.04:${{ github.ref_name }}-
-            ccache:e2e-live:ubuntu-24.04:
+          name: ac-server-ubuntu-24.04-clang-18
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.artifact_run_id }}
 
-      - name: Setup ccache env
-        env:
-          CCACHE_DIR: ${{ github.workspace }}/var/ccache
-        run: |
-          mkdir -p "$CCACHE_DIR"
-          cat <<EOF >> "$GITHUB_ENV"
-          CCACHE_BASEDIR=${{ github.workspace }}
-          CCACHE_DIR=${{ github.workspace }}/var/ccache
-          CCACHE_HASHDIR=1
-          CCACHE_MAXSIZE=5G
-          CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
-          CCACHE_COMPRESS=1
-          CCACHE_COMPRESSLEVEL=3
-          CCACHE_COMPILERCHECK=content
-          CMAKE_C_COMPILER_LAUNCHER=ccache
-          CMAKE_CXX_COMPILER_LAUNCHER=ccache
-          EOF
-          ccache -z || true
-
-      - name: Configure AzerothCore (zero-conf CI)
+      - name: Make downloaded binaries executable
+        if: ${{ inputs.artifact_run_id != '' }}
         run: |
           set -euo pipefail
-          touch conf/config.sh
-          {
-            echo 'MTHREADS=4'
-            echo 'CBUILD_TESTING=OFF'
-            echo 'AC_ENABLE_ROOT_CMAKE_INSTALL=1'
-            echo 'export AC_CONFIG_POLICY=$AC_CONFIG_POLICY_PRESET_ZERO_CONF'
-            echo 'AC_ENABLE_CONF_COPY_ON_INSTALL=0'
-            echo 'CTYPE=RelWithDebInfo'
-          } >> conf/config.sh
-          cat conf/config.sh
-          ./acore.sh config show AC_CONFIG_POLICY || true
+          chmod +x env/dist/bin/authserver env/dist/bin/worldserver
+          ls -l env/dist/bin/authserver env/dist/bin/worldserver
 
-      - name: Init (deps, compile, empty DBs, client-data download)
+      # Runtime only (no compile). install-deps starts MySQL in CI.
+      - name: Deps, empty DBs, client-data
+        if: ${{ inputs.artifact_run_id != '' }}
         env:
           MYSQL_ROOT_PASSWORD: root
           CONTINUOUS_INTEGRATION: true
+          DATAPATH: ${{ github.workspace }}/env/dist/data
         run: |
           set -euo pipefail
-          # acore.sh init → install-deps, compile, create empty DBs (create_mysql.sql),
-          # and inst_download_client_data. Schema is applied by -dry-run below
-          # (same as dashboard-ci), not by init itself.
-          ./acore.sh init
-          ccache -s || true
-        timeout-minutes: 180
+          ./acore.sh install-deps
+          ./acore.sh setup-db
+          ./acore.sh client-data
+          echo "AC_DATA_DIR=${DATAPATH}" >> "$GITHUB_ENV"
+        timeout-minutes: 30
 
-      - name: Save ccache
-        if: ${{ !cancelled() && steps.restore_ccache.outcome == 'success' }}
-        uses: actions/cache/save@v4
+      - name: Build (dispatch / no artifact)
+        if: ${{ inputs.artifact_run_id == '' }}
+        uses: ./.github/actions/linux-build
         with:
-          path: ${{ github.workspace }}/var/ccache
-          key: ccache:e2e-live:ubuntu-24.04:${{ github.ref_name }}-${{ github.run_id }}
+          CC: clang-18
+          CXX: clang++-18
+          pch: false
 
       # create_mysql.sql only creates acore@localhost (unix_socket). Servers and
       # the harness connect via TCP 127.0.0.1, which needs a separate account host.
@@ -245,61 +185,22 @@ jobs:
           SQL
           mysql -h127.0.0.1 -uacore -pacore -e 'SELECT USER(), CURRENT_USER();' acore_auth
 
-      # dashboard-ci applies base+updates via auth/world -dry-run before live start.
-      # Copy .conf from .dist first: AC_ENABLE_CONF_COPY_ON_INSTALL=0 leaves only .dist.
-      - name: Apply DB schema (authserver + worldserver dry-run)
+      # Copy .conf from .dist only (no sed). Runtime overrides use AC_* env vars
+      # (ConfigMgr: ini key → AC_UPPER_SNAKE, e.g. Console.Enable → AC_CONSOLE_ENABLE).
+      - name: Prepare server conf + AC_*
         run: |
-          # No -u: acore.sh does [ -z "$WITH_ERRORS" ] which fails under nounset.
-          set -eo pipefail
-          source ./acore.sh config load
+          set -euo pipefail
           etc="$(cd env/dist/etc && pwd)"
           for n in authserver worldserver; do
             [[ -f "${etc}/${n}.conf" ]] || cp -v "${etc}/${n}.conf.dist" "${etc}/${n}.conf"
           done
           logs_dir="$(cd env/dist/bin && pwd)"
-          sed -i \
-            -e "s|^LogsDir *=.*|LogsDir = \"${logs_dir}\"|" \
-            -e 's/^RealmsStateUpdateDelay *=.*/RealmsStateUpdateDelay = 1/' \
-            "${etc}/authserver.conf"
-          sed -i -e "s|^LogsDir *=.*|LogsDir = \"${logs_dir}\"|" "${etc}/worldserver.conf"
-          cd env/dist/bin
-          timeout 10m ./authserver -c "${etc}/authserver.conf" -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
-          status=${PIPESTATUS[0]}
-          [ "$status" -eq 0 ] || exit "$status"
-          if grep -qE 'Applying of file .+ failed!' "$RUNNER_TEMP/authserver-dry-run.log"; then
-            echo '::error::authserver dry-run failed to apply a SQL update'
-            exit 1
-          fi
-          if grep -q 'Wrong Loggers configuration' "$RUNNER_TEMP/authserver-dry-run.log"; then
-            echo '::error::authserver conf loggers not loaded (empty/missing conf?)'
-            exit 1
-          fi
-          timeout 15m ./worldserver -c "${etc}/worldserver.conf" -dry-run 2>&1 | tee "$RUNNER_TEMP/worldserver-dry-run.log"
-          status=${PIPESTATUS[0]}
-          [ "$status" -eq 0 ] || exit "$status"
-          if grep -qE 'Applying of file .+ failed!' "$RUNNER_TEMP/worldserver-dry-run.log"; then
-            echo '::error::worldserver dry-run failed to apply a SQL update'
-            exit 1
-          fi
-          if grep -q 'Wrong Loggers configuration' "$RUNNER_TEMP/worldserver-dry-run.log"; then
-            echo '::error::worldserver conf loggers not loaded (empty/missing conf?)'
-            exit 1
-          fi
-          mysql -h127.0.0.1 -uacore -pacore -e \
-            "SHOW TABLES FROM acore_auth LIKE 'realmlist'; SELECT COUNT(*) AS realm_rows FROM acore_auth.realmlist;"
-        timeout-minutes: 40
-
-      - name: Realmlist + E2E env
-        run: |
-          set -euo pipefail
-          mysql -h127.0.0.1 -uacore -pacore -e \
-            "UPDATE acore_auth.realmlist
-             SET address='127.0.0.1', localAddress='127.0.0.1',
-                 localSubnetMask='255.255.255.0', flag=0, port=8085, gamebuild=12340
-             WHERE id=1;
-             SELECT id,name,address,localAddress,localSubnetMask,port,flag,gamebuild
-             FROM acore_auth.realmlist\G"
           {
+            echo "AC_LOGS_DIR=${logs_dir}"
+            echo "AC_CONSOLE_ENABLE=0"
+            echo "AC_WARDEN_ENABLED=0"
+            echo "AC_BEEP_AT_START=0"
+            echo "AC_REALMS_STATE_UPDATE_DELAY=1"
             echo "E2E_AUTH_ADDR=127.0.0.1:3724"
             echo "E2E_AUTH_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_auth"
             echo "E2E_CHAR_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_characters"
@@ -313,15 +214,14 @@ jobs:
           etc="$(cd ../etc && pwd)"
           [[ -f "${etc}/authserver.conf" ]] || cp -v "${etc}/authserver.conf.dist" "${etc}/authserver.conf"
           [[ -f "${etc}/worldserver.conf" ]] || cp -v "${etc}/worldserver.conf.dist" "${etc}/worldserver.conf"
-          sed -i \
-            -e 's/^Console\.Enable *=.*/Console.Enable = 0/' \
-            -e 's/^Warden\.Enabled *=.*/Warden.Enabled = 0/' \
-            -e 's/^BeepAtStart *=.*/BeepAtStart = 0/' \
-            "${etc}/worldserver.conf"
-          # Auth realm list refresh: 1s so flag clear is visible before smoke.
-          sed -i -e 's/^RealmsStateUpdateDelay *=.*/RealmsStateUpdateDelay = 1/' "${etc}/authserver.conf"
-          grep -E '^(Console|Warden|Beep|LogsDir|RealmsStateUpdateDelay)' \
-            "${etc}/worldserver.conf" "${etc}/authserver.conf" || true
+          # AC_* from GITHUB_ENV (set in Prepare server conf). Re-export for this shell.
+          : "${AC_LOGS_DIR:=$(pwd)}"
+          export AC_LOGS_DIR
+          export AC_CONSOLE_ENABLE="${AC_CONSOLE_ENABLE:-0}"
+          export AC_WARDEN_ENABLED="${AC_WARDEN_ENABLED:-0}"
+          export AC_BEEP_AT_START="${AC_BEEP_AT_START:-0}"
+          export AC_REALMS_STATE_UPDATE_DELAY="${AC_REALMS_STATE_UPDATE_DELAY:-1}"
+          echo "AC overrides: LOGS_DIR=${AC_LOGS_DIR} CONSOLE=${AC_CONSOLE_ENABLE} WARDEN=${AC_WARDEN_ENABLED} BEEP=${AC_BEEP_AT_START} REALMS_DELAY=${AC_REALMS_STATE_UPDATE_DELAY}"
 
           wait_port() {
             local port="$1" name="$2" secs="${3:-120}"
@@ -346,25 +246,31 @@ jobs:
             return 1
           }
 
-          # World first: Main.cpp binds :8085 only after SetInitialWorldSettings.
+          # World first: Main.cpp binds :8085 only after SetInitialWorldSettings
+          # (first boot also applies world/chars schema — can take ~15m).
           ./worldserver -c "${etc}/worldserver.conf" \
             < /dev/null >"${RUNNER_TEMP}/worldserver.log" 2>&1 &
           echo $! >"${RUNNER_TEMP}/worldserver.pid"
-          wait_port 8085 worldserver 300
+          wait_port 8085 worldserver 900
 
           ./authserver -c "${etc}/authserver.conf" \
             < /dev/null >"${RUNNER_TEMP}/authserver.log" 2>&1 &
           echo $! >"${RUNNER_TEMP}/authserver.pid"
-          wait_port 3724 authserver 60
+          wait_port 3724 authserver 300
 
+          # realmlist exists only after first-boot schema apply.
           mysql -h127.0.0.1 -uacore -pacore -e \
-            "UPDATE acore_auth.realmlist SET flag = flag & ~3 WHERE id=1;
-             SELECT id,address,port,flag FROM acore_auth.realmlist;"
+            "UPDATE acore_auth.realmlist
+             SET address='127.0.0.1', localAddress='127.0.0.1',
+                 localSubnetMask='255.255.255.0', flag=0, port=8085, gamebuild=12340
+             WHERE id=1;
+             SELECT id,name,address,localAddress,localSubnetMask,port,flag,gamebuild
+             FROM acore_auth.realmlist\G"
           # >= RealmsStateUpdateDelay (1s) + margin so in-memory realm list drops OFFLINE.
           sleep 3
           (echo >/dev/tcp/127.0.0.1/8085) >/dev/null 2>&1 || { echo '::error::world port lost'; exit 1; }
           (echo >/dev/tcp/127.0.0.1/3724) >/dev/null 2>&1 || { echo '::error::auth port lost'; exit 1; }
-        timeout-minutes: 15
+        timeout-minutes: 40
 
       - name: Validate E2E_*
         run: |
@@ -378,13 +284,13 @@ jobs:
         working-directory: e2e
         env:
           # Inputs via env only — never expand untrusted workflow_dispatch into bash -c text.
-          E2E_SCOPE: ${{ needs.preflight.outputs.scope }}
-          E2E_COUNT: ${{ github.event.inputs.count || '1' }}
-          E2E_TIMEOUT_INPUT: ${{ github.event.inputs.timeout || '' }}
-          E2E_PARALLEL: ${{ github.event.inputs.parallel || '1' }}
-          E2E_P: ${{ github.event.inputs.package_parallel || '1' }}
-          E2E_PACKAGES: ${{ github.event.inputs.packages || './...' }}
-          E2E_TAGS_FILTER: ${{ github.event.inputs.tags_filter || '' }}
+          E2E_SCOPE: ${{ inputs.scope || 'smoke' }}
+          E2E_COUNT: ${{ inputs.count || '1' }}
+          E2E_TIMEOUT_INPUT: ${{ inputs.timeout || '' }}
+          E2E_PARALLEL: ${{ inputs.parallel || '1' }}
+          E2E_P: ${{ inputs.package_parallel || '1' }}
+          E2E_PACKAGES: ${{ inputs.packages || './...' }}
+          E2E_TAGS_FILTER: ${{ inputs.tags_filter || '' }}
         run: |
           set -euo pipefail
           count="${E2E_COUNT}"
@@ -459,7 +365,7 @@ jobs:
             echo "==== ${f} ===="
             tail -n 150 "${f}" 2>/dev/null || true
           done
-          for f in worldserver.log authserver.log authserver-dry-run.log worldserver-dry-run.log; do
+          for f in worldserver.log authserver.log; do
             echo "==== ${RUNNER_TEMP}/${f} ===="
             tail -n 80 "${RUNNER_TEMP}/${f}" 2>/dev/null || true
           done
@@ -472,8 +378,6 @@ jobs:
           path: |
             ${{ runner.temp }}/worldserver.log
             ${{ runner.temp }}/authserver.log
-            ${{ runner.temp }}/authserver-dry-run.log
-            ${{ runner.temp }}/worldserver-dry-run.log
             env/dist/bin/Server.log
             env/dist/bin/Auth.log
             env/dist/logs/**

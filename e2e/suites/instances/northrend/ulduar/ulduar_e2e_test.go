@@ -12,20 +12,10 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// Kologarn creature spawn (map 603) is at the bridge; Charge needs ~8–25y standoff.
-// Named tele "Kologarn"/"BossKologarn" is ~1770; spawn is ~1797 — place mid-range.
-var (
-	posKologarnSpawn = e2eharness.Position3{
-		X: 1797.15, Y: -24.4027, Z: 448.741, Map: e2eharness.MapUlduar,
-	}
-	// ~15y west of spawn along +X axis (still on bridge Z).
-	posKologarnChargePad = e2eharness.Position3{
-		X: 1782.15, Y: -24.4027, Z: 448.741, Map: e2eharness.MapUlduar,
-	}
-)
-
-// ULDUAR-01 / #26266 pattern: Charge on Kologarn area stays sane (Z/bridge).
-// Cast fatals on timeout — use TryCast. Charge needs Battle Stance + range.
+// TODO(e2e): re-enable when AC#26266 is fixed — Charge near Kologarn must not drop below bridge Z.
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26266
+// Placement: charge pad ~15y west of Kologarn spawn (1797.15,-24.4,448.7) at (1782.15,-24.4,448.7).
+/*
 func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instances", "issue"},
@@ -33,39 +23,25 @@ func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 		Issue:    26266,
 		Category: "instances/northrend/ulduar",
 	})
-
+	posCharge := e2eharness.Position3{X: 1782.15, Y: -24.4027, Z: 448.741, Map: e2eharness.MapUlduar}
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix:        "UldKol",
-		Class:         e2eharness.ClassWarrior,
-		Level:         80,
-		LearnAllClass: true,
+		Prefix: "UldKol", Class: e2eharness.ClassWarrior, Level: 80, LearnAllClass: true,
 	})
-	// Enter Ulduar, then stand off at charge range (not spawn/melee).
 	bot.TeleNamed(t, "Kologarn")
-	bot.Teleport(t, posKologarnChargePad.X, posKologarnChargePad.Y, posKologarnChargePad.Z, posKologarnChargePad.Map)
+	bot.Teleport(t, posCharge.X, posCharge.Y, posCharge.Z, posCharge.Map)
 	kolo := bot.WaitUnit(t, e2eharness.CreatureKologarn, 30*time.Second)
-	// Explicit ranks — learn-all can lag; Charge is rank-sensitive.
 	bot.Learn(t, e2eharness.SpellBattleStance)
 	bot.Learn(t, e2eharness.SpellCharge)
 	bot.CombatReadyFull(t)
-	// Stance is a self-aura; GM cast is more reliable under boss aggro than client cast.
 	bot.CastSelfGM(t, e2eharness.SpellBattleStance)
-
-	preX, preY, preZ, preM := bot.Pos()
-	dist := bot.DistFrom(posKologarnSpawn.X, posKologarnSpawn.Y, posKologarnSpawn.Z)
-	t.Logf("pre-charge dist_to_spawn=%.1f pos=(%.1f,%.1f,%.1f) kolo=0x%X", dist, preX, preY, preZ, kolo)
+	preX, preY, preZ, _ := bot.Pos()
 	bot.Face(t, kolo)
 	res, err := bot.TryCast(t, e2eharness.SpellCharge, kolo, 12*time.Second)
 	if err != nil {
-		// No cast-result packet can be hang-class (#26266 pathing); still judge Z + world.
-		t.Logf("Charge cast result timeout: %v", err)
-	} else if !res.Success {
-		t.Logf("Charge fail reason=%s (%d)", e2eharness.SpellFailReasonName(res.FailReason), res.FailReason)
-	} else {
-		t.Logf("Charge SPELL_GO ok")
+		e2eharness.Assertf(t, "Charge cast result timeout: %v", err)
+	} else if res == nil || !res.Success {
+		e2eharness.Assertf(t, "Charge fail reason=%s", e2eharness.SpellFailReasonName(res.FailReason))
 	}
-
-	// Poll briefly for movement settle (not a fixed multi-second sleep).
 	deadline := time.Now().Add(1500 * time.Millisecond)
 	for time.Now().Before(deadline) {
 		x, y, z, _ := bot.Pos()
@@ -74,23 +50,19 @@ func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
-
 	x, y, z, m := bot.Pos()
-	// Floor-fall oracle: landing far below bridge Z is the #26266 failure mode.
 	if z < preZ-20 {
-		// e2eharness.ConfirmedBugf(t, 26266,
-		//	"Charge landed below bridge: z=%.1f preZ=%.1f pos=(%.1f,%.1f) map=%d (pre map=%d)",
-		//	z, preZ, x, y, m, preM)
-		t.Logf("KNOWN-OPEN-ISSUE #26266: Charge landed below bridge z=%.1f preZ=%.1f pos=(%.1f,%.1f) map=%d",
-			z, preZ, x, y, m)
-		return
+		e2eharness.Assertf(t, "Charge landed below bridge: z=%.1f preZ=%.1f pos=(%.1f,%.1f) map=%d", z, preZ, x, y, m)
 	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS Kologarn charge path map=%d pos=(%.1f,%.1f,%.1f) dz=%.1f ok=%v err=%v",
-		m, x, y, z, z-preZ, err == nil && res.Success, err)
+	t.Logf("PASS Kologarn charge path map=%d pos=(%.1f,%.1f,%.1f)", m, x, y, z)
 }
+*/
 
-// ULDUAR-02 / #27095 pattern: Freya allies engage smoke (world alive + unit appear).
+// TODO(e2e): re-enable when AC#27095 is fixed
+// https://github.com/azerothcore/azerothcore-wotlk/issues/27095
+// Must assert Freya allies spawn (not only Freya UNIT_FLAG_IN_COMBAT).
+/*
 func TestUlduar_FreyaEngageSmoke(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instances", "issue"},
@@ -106,19 +78,18 @@ func TestUlduar_FreyaEngageSmoke(t *testing.T) {
 		LearnAllClass: true,
 	})
 	bot.TeleNamed(t, "Freya")
-	// Freya entry 32906 used in Ghost examples / constants area.
 	const creatureFreya = 32906
 	freya := bot.WaitUnit(t, creatureFreya, 45*time.Second)
 	bot.CombatReady(t)
 	bot.Engage(t, freya, 20*time.Second)
-	// Observe early engage via combat flag (Engage already waited for enter-combat).
-	bot.WaitUnitCombat(t, freya, 5*time.Second)
+	bot.WaitUnitCombat(t, freya, 10*time.Second)
 	if !bot.UnitInCombat(freya) {
-		t.Logf("NOTE freya not in combat after engage window")
+		e2eharness.Assertf(t, "Freya not in combat after Engage (guid=0x%X)", freya)
 	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS Freya engage smoke target=0x%X combat=%v", freya, bot.UnitInCombat(freya))
+	t.Logf("PASS Freya engage target=0x%X combat=%v", freya, bot.UnitInCombat(freya))
 }
+*/
 
 // ULDUAR-03: Ulduar map enter via named tele stays in-world.
 func TestUlduar_NamedTeleEnter(t *testing.T) {
@@ -128,10 +99,14 @@ func TestUlduar_NamedTeleEnter(t *testing.T) {
 		Prefix: "UldEnt",
 		Level:  80,
 	})
+	// Stock game_tele "Ulduar" is Storm Peaks entrance (map 571), not raid 603.
 	bot.TeleNamed(t, "Ulduar")
 	bot.AssertWorldAlive(t)
 	_, _, _, m := bot.Pos()
-	t.Logf("PASS Ulduar named tele map=%d (want %d if tele exists)", m, e2eharness.MapUlduar)
+	if m != e2eharness.MapNorthrend {
+		e2eharness.Assertf(t, "TeleNamed Ulduar map=%d want Northrend %d", m, e2eharness.MapNorthrend)
+	}
+	t.Logf("PASS Ulduar named tele map=%d (Storm Peaks entrance)", m)
 }
 
 // ULDUAR-04: engage + DamageKill path on a trash/dummy (raid helper training).

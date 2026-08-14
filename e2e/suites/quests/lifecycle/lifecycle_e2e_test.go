@@ -89,7 +89,7 @@ func TestQuest_StatusSurvivesSave(t *testing.T) {
 	t.Logf("PASS quest status survives save")
 }
 
-// QLIFE-04: quest status after relog still present.
+// QLIFE-04: quest status after relog remains Incomplete (not row-presence only).
 func TestQuest_StatusSurvivesRelog(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests", "protocol"}, Runtime: "short", Category: "quests/lifecycle"})
 
@@ -98,14 +98,13 @@ func TestQuest_StatusSurvivesRelog(t *testing.T) {
 		Level:  30,
 	})
 	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
+	bot.AssertQuestStatus(t, e2eharness.QuestRethbanGauntlet, e2eharness.QuestStatusIncomplete)
 	bot.Save(t)
 	bot.Relog(t)
 	bot.AssertWorldAlive(t)
-	st, ok := bot.QuestStatus(t, e2eharness.QuestRethbanGauntlet)
-	if !ok {
-		e2eharness.Assertf(t, "quest row missing after relog")
-	}
-	t.Logf("PASS quest after relog status=%s", e2eharness.QuestStatusName(st))
+	// Product oracle: status byte must still be Incomplete after relog.
+	bot.AssertQuestStatus(t, e2eharness.QuestRethbanGauntlet, e2eharness.QuestStatusIncomplete)
+	t.Logf("PASS quest incomplete after relog")
 }
 
 // QLIFE-05: second AddQuest of same ID is safe (no crash).

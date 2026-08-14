@@ -12,23 +12,65 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// CHARM-01: apply mind control-like aura via GM on creature and release — world stays up.
-// Uses CancelAura + probe pattern; full MC control is content-dependent.
+// Battle Shout ranks (player-cast, cancelable). Do not use GM .aura / 45614 Blending In
+// (SPELL_ATTR0_NO_AURA_CANCEL → CMSG_CANCEL_AURA is a silent no-op).
+var battleShoutRanks = []uint32{
+	47436, // rank 9 (WotLK)
+	47434, 25289, 11551, 11550, 11549, 6192, 5242, 6673,
+}
+
+func firstBattleShoutAura(bot *e2eharness.ScenarioBot) uint32 {
+	for _, id := range battleShoutRanks {
+		if bot.HasAura(id) {
+			return id
+		}
+	}
+	return 0
+}
+
+// CHARM-01: client-cast a cancelable buff then CMSG_CANCEL_AURA must remove it.
 func TestCharm_ApplyAndCancelAuraOnSelf(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/charm"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "CharmAu",
-		Level:  80,
+		Prefix:        "CharmAu",
+		Class:         e2eharness.ClassWarrior,
+		Level:         80,
+		LearnAllClass: true,
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	bot.ApplyAura(t, e2eharness.SpellBlendingInAura)
-	if !bot.HasAura(e2eharness.SpellBlendingInAura) {
-		e2eharness.Preconditionf(t, "aura missing after apply")
+	// Rage for Battle Shout (SPELL_FAILED_NO_POWER without it).
+	bot.GM(t, ".cheat power on")
+	// Prefer highest rank first (learn-all knows it).
+	castID := battleShoutRanks[0]
+	bot.Learn(t, castID)
+	bot.CastMust(t, castID, 0, 10*time.Second)
+	deadline := time.Now().Add(3 * time.Second)
+	var auraID uint32
+	for time.Now().Before(deadline) {
+		auraID = firstBattleShoutAura(bot)
+		if auraID != 0 {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
 	}
-	bot.CancelAura(t, e2eharness.SpellBlendingInAura)
+	if auraID == 0 {
+		e2eharness.Preconditionf(t, "no Battle Shout aura after cast %d", castID)
+	}
+	bot.CancelAura(t, auraID)
+	// Product oracle: CMSG_CANCEL_AURA must remove a cancelable positive aura.
+	deadline = time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		if firstBattleShoutAura(bot) == 0 {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
+	if still := firstBattleShoutAura(bot); still != 0 {
+		e2eharness.Assertf(t, "aura %d still present after CancelAura", still)
+	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS apply/cancel aura charm-adjacent path")
+	t.Logf("PASS apply/cancel aura %d removed", auraID)
 }
 
 // CHARM-02 / #25506 style: logout while "charmed" aura present must not crash world.

@@ -34,10 +34,8 @@ cp go.work.example go.work   # gitignored; edit the replace path
 # replace github.com/walkline/AzerothGhost => /path/to/AzerothGhost
 ```
 
-CI checks out the public `walkline/AzerothGhost` repo (optional `harness_ref` /
-repo var `E2E_HARNESS_REF`, else default branch) and `go mod edit -replace`s it
-into `e2e/`. Local `go.mod` may stay at a placeholder version until a Ghost
-release is published; do not rely on the module pin alone for CI determinism.
+`e2e/go.mod` pins `github.com/walkline/AzerothGhost v1.0.1` (commit
+`9a2f4bf`; see `go.sum`). `go test` / `go mod download` fetch that module.
 
 ---
 
@@ -326,15 +324,17 @@ Use `.agents/docs/e2e-policy.md` for decision trees (e2e vs unit, mandatory trig
 
 ---
 
-## CI (opt-in)
+## CI
 
-Live e2e does **not** run on every PR. Details live in the workflow file only:
-[`.github/workflows/e2e-live.yml`](../.github/workflows/e2e-live.yml).
+Details live in the workflow files only:
+[`.github/workflows/e2e-live.yml`](../.github/workflows/e2e-live.yml),
+[`.github/workflows/core-build-nopch.yml`](../.github/workflows/core-build-nopch.yml).
 
 | How | Effect |
 |-----|--------|
-| Label **`run-e2e`** on a non-draft PR | Smoke e2e against an in-workflow stack |
-| Actions → **e2e-live** → Run workflow (needs workflow on default branch, or use `gh workflow run … --ref e2e`) | Choose scope (smoke/full); native stack only |
+| Non-draft PR in **azerothcore/azerothcore-wotlk** | nopch `ubuntu-24.04`/clang-18 compiles + dry-run, then smoke e2e reuses those binaries |
+| Fork: set Actions variable **`E2E_ENABLE=1`**, then label/PR or `gh workflow run nopch-build --ref <branch>` | Same e2e path on the fork (other nopch matrix cells stay official-only) |
+| Actions → **e2e-live** → Run workflow (needs workflow on default branch, or use `gh workflow run … --ref e2e`) | Compiles on the runner; choose scope (smoke/full) |
 
 Day-to-day development and agent debugging should use a **local** stack + `e2e/local/` or the committed suites — not CI setup docs.
 

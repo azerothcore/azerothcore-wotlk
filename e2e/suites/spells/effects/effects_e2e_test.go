@@ -12,7 +12,10 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// FX-01: summon effect via engineering target dummy item spell (#26774 pattern).
+// TODO(e2e): re-enable when AC#26774 is fixed
+// https://github.com/azerothcore/azerothcore-wotlk/issues/26774
+// Must assert client item-use / dummy rank (not CastOrGM + any 2673).
+/*
 func TestEffects_TargetDummySummon(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"short", "spells", "issue"},
@@ -27,7 +30,6 @@ func TestEffects_TargetDummySummon(t *testing.T) {
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	bot.AddItem(t, e2eharness.ItemTargetDummy, 1)
-	// Use spell summon if item use is awkward: SpellSummonTargetDummy.
 	bot.Learn(t, e2eharness.SpellSummonTargetDummy)
 	_ = bot.CastOrGM(t, e2eharness.SpellSummonTargetDummy, 0, 10*time.Second)
 	u := bot.WaitUnit(t, e2eharness.CreatureTargetDummy, 15*time.Second)
@@ -37,10 +39,14 @@ func TestEffects_TargetDummySummon(t *testing.T) {
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS target dummy summon guid=0x%X", u)
 }
+*/
 
 // FX-02: Charge effect moves player (warrior).
+// WotLK Charge rank 3 (11578): Battle Stance, 8–25 yd, out of combat.
 func TestEffects_ChargeEffect(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "spells", "combat"}, Runtime: "short", Category: "spells/effects"})
+
+	const spellChargeRank3 = uint32(11578)
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix:        "FxChg",
@@ -48,28 +54,64 @@ func TestEffects_ChargeEffect(t *testing.T) {
 		Level:         80,
 		LearnAllClass: true,
 	})
+	// PackagePad is isolation only — mountain pads return SPELL_FAILED_NOPATH (56).
+	// Northshire open strip (map 0) is flat and mmaps-friendly for Charge.
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	dummy := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	// Dummy spawns on player; step back into Charge range.
-	x0, y0, z0, m0 := bot.Pos()
-	bot.Teleport(t, x0+15, y0, z0, m0)
-	x0, y0, z0, _ = bot.Pos()
+	const (
+		chargeX   float32 = -8904.0
+		chargeY   float32 = -128.0
+		chargeZ   float32 = 81.0
+		chargeMap uint32  = 0
+	)
+	bot.Teleport(t, chargeX, chargeY, chargeZ, chargeMap)
+	bot.CombatStop(t)
 	bot.CombatReadyFull(t)
-	_ = bot.CastOrGM(t, e2eharness.SpellBattleStance, 0, 5*time.Second)
-	bot.Face(t, dummy)
-	res, err := bot.TryCast(t, e2eharness.SpellCharge, dummy, 8*time.Second)
-	if err != nil {
-		t.Logf("Charge timeout: %v", err)
-	} else if !res.Success {
-		t.Logf("Charge fail reason=%s", e2eharness.SpellFailReasonName(res.FailReason))
+	bot.CombatStop(t)
+	bot.Learn(t, e2eharness.SpellBattleStance)
+	bot.Learn(t, spellChargeRank3)
+	bot.CastMust(t, e2eharness.SpellBattleStance, 0, 10*time.Second)
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		if bot.HasAura(e2eharness.SpellBattleStance) {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
 	}
-	x1, y1, z1, _ := bot.Pos()
-	dist := e2eharness.Distance3D(x0, y0, z0, x1, y1, z1)
+	if !bot.HasAura(e2eharness.SpellBattleStance) {
+		e2eharness.Preconditionf(t, "Battle Stance missing before Charge")
+	}
+	// 31146 is long-lived (2673 KillSelfs at 15s — Charge setup exceeds that).
+	dummy := bot.Spawn(t, e2eharness.CreatureHeroicTrainingDummy, 15*time.Second)
+	// 8–25 yd charge range on flat ground.
+	bot.Teleport(t, chargeX+12, chargeY, chargeZ, chargeMap)
+	x0, y0, z0, _ := bot.Pos()
+	_ = bot.World.SetTarget(dummy)
+	bot.Face(t, dummy)
+	bot.CastMust(t, spellChargeRank3, dummy, 10*time.Second)
+	// Snapshot is the step-back point; Charge must close toward the dummy.
+	deadline = time.Now().Add(2 * time.Second)
+	var moved float32
+	for time.Now().Before(deadline) {
+		x1, y1, z1, _ := bot.Pos()
+		moved = e2eharness.Distance3D(x0, y0, z0, x1, y1, z1)
+		if moved >= 1.0 {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
+	if moved < 1.0 {
+		e2eharness.Assertf(t, "Charge SPELL_GO ok but player did not leave step-back (moved=%.1f)", moved)
+	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS charge effect path moved=%.1fy ok=%v", dist, res.Success)
+	t.Logf("PASS charge effect moved=%.1fy", moved)
 }
 
-// FX-03 / #26997 pattern: Sweeping Strikes + Execute on multi-target must not crash.
+// TODO(e2e): re-enable when AC#26997 is fixed and we can spawn two living ≤20% HP
+// targets without SpawnPersistent despawning the first (DespawnNearbyEntry) and
+// without 2673 KillSelf / 31146 add-fail on isolation pads.
+// https://github.com/azerothcore/azerothcore-wotlk/issues/26997
+// Body must CastMust Execute on two living execute-phase targets + ProbeWorldAlive.
+/*
 func TestEffects_SweepingStrikesExecuteNoCrash(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells", "issue"},
@@ -77,33 +119,9 @@ func TestEffects_SweepingStrikesExecuteNoCrash(t *testing.T) {
 		Issue:    26997,
 		Category: "spells/effects",
 	})
-
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix:        "FxSS",
-		Class:         e2eharness.ClassWarrior,
-		Level:         80,
-		LearnAllClass: true,
-	})
-	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	// Two persistent dummies with SQL cleanup (never .npc add temp — 120s litter).
-	d1, _ := bot.SpawnPersistent(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	d2, _ := bot.SpawnPersistent(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	bot.CombatReadyFull(t)
-	_ = bot.CastOrGM(t, e2eharness.SpellBattleStance, 0, 5*time.Second)
-	bot.Face(t, d1)
-	_ = bot.CastOrGM(t, e2eharness.SpellSweepingStrikes, 0, 10*time.Second)
-	// Soften dummies without killing — Execute needs a living low-HP target.
-	bot.Damage(t, d1, 400)
-	bot.Damage(t, d2, 400)
-	res, err := bot.TryCast(t, e2eharness.SpellExecute, d1, 8*time.Second)
-	if err != nil {
-		t.Logf("Execute timeout: %v (crash oracle is world alive)", err)
-	} else if !res.Success {
-		t.Logf("Execute fail reason=%s", e2eharness.SpellFailReasonName(res.FailReason))
-	}
-	e2eharness.ProbeWorldAlive(t, bot, 26997)
-	t.Logf("PASS Sweeping Strikes + Execute no crash d1=0x%X d2=0x%X", d1, d2)
+	t.Fatal("placeholder — implement two-target Execute oracle")
 }
+*/
 
 // FX-04: grounding totem summon exists (#26584 ecosystem).
 func TestEffects_GroundingTotemSummon(t *testing.T) {

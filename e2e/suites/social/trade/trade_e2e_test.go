@@ -72,12 +72,13 @@ func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
 	if bCount1 != bCount0+1 {
 		e2eharness.Assertf(t, "B linen count %d→%d want +1", bCount0, bCount1)
 	}
-	// Money: A loses goldOffer, B gains goldOffer (allow slight GM funding drift).
-	if aMoney1+goldOffer > aMoney0+100 { // soft bound
-		t.Logf("NOTE money A %d→%d (offer %d)", aMoney0, aMoney1, goldOffer)
+	// Money: A loses goldOffer, B gains goldOffer (tight bound after MoneyAfterSave).
+	const moneyTol int64 = 100
+	if int64(aMoney0)-int64(aMoney1) < int64(goldOffer)-moneyTol || int64(aMoney0)-int64(aMoney1) > int64(goldOffer)+moneyTol {
+		e2eharness.Assertf(t, "A money %d→%d want −%d (±%d)", aMoney0, aMoney1, goldOffer, moneyTol)
 	}
-	if bMoney1 < bMoney0 {
-		e2eharness.Assertf(t, "B money decreased %d→%d", bMoney0, bMoney1)
+	if int64(bMoney1)-int64(bMoney0) < int64(goldOffer)-moneyTol || int64(bMoney1)-int64(bMoney0) > int64(goldOffer)+moneyTol {
+		e2eharness.Assertf(t, "B money %d→%d want +%d (±%d)", bMoney0, bMoney1, goldOffer, moneyTol)
 	}
 	a.AssertWorldAlive(t)
 	b.AssertWorldAlive(t)
@@ -132,14 +133,12 @@ func TestTrade_MoveOorMidTradeAborts(t *testing.T) {
 
 	e2eharness.OpenTrade(t, a, b)
 	a.SetTradeItem(t, 0, bag, slot)
-	// Tele far (cross-map) while trade open — server should drop trade.
+	// Tele far (cross-map) while trade open — server must drop trade without client cancel.
 	a.Teleport(t, 3758.2554, 3689.5754, 47.241505, e2eharness.MapNorthrend)
-	// Far transfer often does not emit a clean cancel status; force cancel if
-	// still open, then wait for terminal cancel (WaitTradeCancelled polls TradeOpen).
+	info := a.WaitTradeCancelled(t, 10*time.Second)
 	if a.World.TradeOpen() {
-		a.CancelTrade(t)
+		e2eharness.Assertf(t, "trade still open after far tele (server must OOR-abort; do not client-cancel to invent PASS)")
 	}
-	info := a.WaitTradeCancelled(t, 8*time.Second)
 
 	aCount1 := a.InventoryCount(t, itemLinenCloth)
 	bCount1 := b.InventoryCount(t, itemLinenCloth)
@@ -155,21 +154,19 @@ func TestTrade_StackableMerge(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
 
 	a, b := tradePair(t, "TrdStk")
-	// A has 5, B has 3, trade 2 → B=5, A=3
+	// A has 5, B has 3; partial-stack trade API is not available — trade A's full stack of 5.
+	// After accept: totals conserved and B gains.
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 5)
 	b.AddItem(t, itemLinenCloth, 3)
-	// Force count refresh
 	a.Save(t)
 	b.Save(t)
 	a0 := a.InventoryCount(t, itemLinenCloth)
 	b0 := b.InventoryCount(t, itemLinenCloth)
-	if a0 < 2 || b0 < 1 {
+	if a0 < 5 || b0 < 3 {
 		e2eharness.Preconditionf(t, "seed failed a=%d b=%d", a0, b0)
 	}
 
 	e2eharness.OpenTrade(t, a, b)
-	// Full stack in trade slot (partial stack API not available — trade whole bag stack).
-	// Put the bag stack (5) into trade; after accept totals must conserve.
 	a.SetTradeItem(t, 0, bag, slot)
 	e2eharness.CompleteTrade(t, a, b)
 
@@ -212,14 +209,13 @@ func TestTrade_RapidOpenCloseNoCrash(t *testing.T) {
 			b.Teleport(t, pad.X+2, pad.Y, pad.Z, pad.Map)
 		}
 	}
-	// One OOR abort in the mix (crash surface); cancel if status lags after tele.
+	// One OOR abort in the mix (crash surface): server must clear without client cancel.
 	e2eharness.OpenTrade(t, a, b)
 	a.Teleport(t, 3758.2554, 3689.5754, 47.241505, e2eharness.MapNorthrend)
+	_ = a.WaitTradeCancelled(t, 10*time.Second)
 	if a.World.TradeOpen() {
-		// Server may clear without a clean status; best-effort cancel + probe.
-		a.CancelTrade(t)
+		e2eharness.Assertf(t, "trade still open after far tele in rapid stress (server OOR-abort required)")
 	}
-	_ = a.WaitTradeCancelled(t, 8*time.Second)
 
 	e2eharness.ProbeWorldAlive(t, probe, 25723)
 	a.AssertWorldAlive(t)

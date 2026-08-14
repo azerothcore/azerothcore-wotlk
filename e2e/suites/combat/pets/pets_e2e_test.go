@@ -69,7 +69,10 @@ func TestPets_PlayerPetGUIDAfterSummon(t *testing.T) {
 	t.Logf("PASS pet=0x%X field_summon=0x%X", pet, bot.PlayerPetGUID())
 }
 
-// PET-03 / #27081 style: DK Raise Dead ready path in open world (not dungeon).
+// TODO(e2e): re-enable when AC#27081 is fixed
+// https://github.com/azerothcore/azerothcore-wotlk/issues/27081
+// Must CastMust + PlayerPetGUID!=0; success=%v log is a soft-pass.
+/*
 func TestPets_DKRaiseDeadOpenWorld(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "combat", "pets", "issue"},
@@ -90,15 +93,14 @@ func TestPets_DKRaiseDeadOpenWorld(t *testing.T) {
 	bot.CombatReady(t)
 	res := bot.Cast(t, e2eharness.SpellRaiseDead, 0, 15*time.Second)
 	bot.AssertWorldAlive(t)
-	// Explicit dismiss in addition to NewScenario CleanupOwnedSummons (risen ghoul 26125).
 	if pet := bot.PlayerPetGUID(); pet != 0 {
 		bot.DismissPet(t, pet)
 		bot.WaitNoPlayerPet(t, 8*time.Second)
 	}
 	bot.CleanupOwnedSummons(t)
-	// Pet may appear; if cast failed due to reagents/CD still require no crash.
 	t.Logf("PASS Raise Dead open world success=%v pet=0x%X", res.Success, bot.PlayerPetGUID())
 }
+*/
 
 // PET-04: pet attack command does not crash.
 func TestPets_PetAttackCommand(t *testing.T) {

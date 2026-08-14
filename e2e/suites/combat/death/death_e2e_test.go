@@ -128,9 +128,8 @@ func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
 	// Wait server delay, then tele+reclaim (see ReclaimCorpseMust).
 	bot.ReclaimCorpseMust(t, deathX, deathY, deathZ, deathMap, 45*time.Second)
 	if bot.World.Health() == 0 {
-		e2eharness.Preconditionf(t, "reclaim finished still dead hp=%d delay_ms=%d",
+		e2eharness.Assertf(t, "reclaim finished still dead hp=%d delay_ms=%d",
 			bot.World.Health(), bot.World.CorpseReclaimDelayMs())
-		return
 	}
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS reclaim corpse → alive (hp=%d delay_ms=%d)", bot.World.Health(), bot.World.CorpseReclaimDelayMs())
