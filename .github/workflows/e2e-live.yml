@@ -86,7 +86,9 @@ env:
 jobs:
   e2e:
     name: e2e (native / ${{ inputs.scope || 'full' }})
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: |
+      github.repository == 'azerothcore/azerothcore-wotlk'
+      || github.repository == 'walkline/azerothcore-wotlk'
     # workflow_call (PR): ubuntu-24.04 to match the nopch artifact.
     # Dispatch: optional self-hosted via E2E_RUNS_ON.
     runs-on: ${{ github.event_name == 'workflow_call' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
