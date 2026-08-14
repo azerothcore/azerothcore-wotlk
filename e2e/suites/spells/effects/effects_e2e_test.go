@@ -122,8 +122,10 @@ func TestAC_26997_SweepingStrikesExecuteNoCrash(t *testing.T) {
 
 	const (
 		spellExecuteMax = uint32(47471) // WotLK Execute rank 9
-		defiasCutpurse  = uint32(94)    // no ScriptName / SmartAI; takes real damage
-		raggedYoungWolf = uint32(705)   // different entry — Spawn despawns nearby same-entry
+		// High-HP test dummies with empty ScriptName (they take damage). L1-L6
+		// world mobs die to a L80 autoattack during DamageToFraction.
+		unkillableDummy80      = uint32(32171)
+		unkillableDummy80Armor = uint32(32847) // different entry — Spawn despawns nearby same-entry
 	)
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
@@ -160,8 +162,9 @@ func TestAC_26997_SweepingStrikesExecuteNoCrash(t *testing.T) {
 		e2eharness.Preconditionf(t, "Battle Stance missing before Execute")
 	}
 
-	c1 := arms.Spawn(t, defiasCutpurse, 15*time.Second)
-	c2 := arms.Spawn(t, raggedYoungWolf, 15*time.Second)
+	c1 := arms.Spawn(t, unkillableDummy80, 15*time.Second)
+	c2 := arms.Spawn(t, unkillableDummy80Armor, 15*time.Second)
+	arms.CombatStop(t)
 	if c1 == 0 || c2 == 0 {
 		e2eharness.Preconditionf(t, "failed to spawn Execute targets c1=0x%X c2=0x%X", c1, c2)
 	}
