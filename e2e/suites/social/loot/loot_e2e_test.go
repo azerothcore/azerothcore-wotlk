@@ -214,9 +214,8 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	e2eharness.ProbeWorldAlive(t, leader, 22000)
 }
 
-// TODO(e2e): re-enable when AC#26862 is fixed — corpse must be lootable after below-half-HP kill.
-// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26862
-/*
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/26862
+// Creatures that spawn (or are damaged) below half HP must still grant loot on death.
 func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "loot", "issue", "serial"},
@@ -254,7 +253,6 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS below-half-HP kill loot path items=%d", len(items))
 }
-*/
 
 // LOOT-06: master loot assign on group-loot fixture (guaranteed item slots).
 func TestLoot_MasterLootAssign(t *testing.T) {

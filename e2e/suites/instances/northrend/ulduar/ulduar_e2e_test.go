@@ -59,11 +59,11 @@ func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 }
 */
 
-// TODO(e2e): re-enable when AC#27095 is fixed
-// https://github.com/azerothcore/azerothcore-wotlk/issues/27095
-// Must assert Freya allies spawn (not only Freya UNIT_FLAG_IN_COMBAT).
-/*
-func TestUlduar_FreyaEngageSmoke(t *testing.T) {
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27095
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27113
+// Killing an older Allies of Nature set must not accelerate the next wave
+// (only the current set's death reschedules EVENT_FREYA_ADDS_SPAM to 5s).
+func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instances", "issue"},
 		Runtime:  "long",
@@ -72,24 +72,124 @@ func TestUlduar_FreyaEngageSmoke(t *testing.T) {
 	})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix:        "UldFry",
-		Class:         e2eharness.ClassWarrior,
-		Level:         80,
-		LearnAllClass: true,
+		Prefix: "Freya",
+		Level:  80,
 	})
-	bot.TeleNamed(t, "Freya")
-	const creatureFreya = 32906
-	freya := bot.WaitUnit(t, creatureFreya, 45*time.Second)
-	bot.CombatReady(t)
-	bot.Engage(t, freya, 20*time.Second)
-	bot.WaitUnitCombat(t, freya, 10*time.Second)
-	if !bot.UnitInCombat(freya) {
-		e2eharness.Assertf(t, "Freya not in combat after Engage (guid=0x%X)", freya)
+
+	const (
+		npcFreya10          = uint32(32906)
+		npcFreya25          = uint32(33360)
+		npcStormLasher      = uint32(32919)
+		npcWaterSpirit      = uint32(33202)
+		npcSnaplasher       = uint32(32916)
+		npcConservator      = uint32(33203)
+		npcDetonatingLasher = uint32(32918)
+	)
+	allyEntries := []uint32{
+		npcStormLasher, npcWaterSpirit, npcSnaplasher,
+		npcConservator, npcDetonatingLasher,
 	}
-	bot.AssertWorldAlive(t)
-	t.Logf("PASS Freya engage target=0x%X combat=%v", freya, bot.UnitInCombat(freya))
+	kindName := map[uint32]string{
+		npcStormLasher: "Trio", npcWaterSpirit: "Trio", npcSnaplasher: "Trio",
+		npcConservator: "Conservator", npcDetonatingLasher: "Lashers",
+	}
+	label := func(entry uint32) string {
+		if n, ok := kindName[entry]; ok {
+			return n
+		}
+		return "Unknown"
+	}
+
+	bot.TeleNamed(t, "Freya")
+	bot.GoCreatureID(t, npcFreya10)
+	bot.CombatReady(t)
+
+	freyaGUID := bot.WaitUnitAny(t, 30*time.Second, npcFreya10, npcFreya25)
+	bot.Engage(t, freyaGUID, 15*time.Second)
+
+	tr := e2eharness.NewSpawnSetTracker(allyEntries, 3*time.Second)
+	tr.KindOf = func(entry uint32) string { return label(entry) }
+	sets := tr.WaitSets(t, bot.World, 2, 4*time.Minute)
+	t.Logf("Set1=%s units=%d  Set2=%s units=%d  gap=%s",
+		sets[0].Kind, len(sets[0].Guids),
+		sets[1].Kind, len(sets[1].Guids),
+		sets[1].SpawnT.Sub(sets[0].SpawnT).Round(time.Millisecond))
+
+	// Detonating Lashers explode on death — if Set1 is Lashers, wait for Set3
+	// and kill Set2 (still: older set while a newer set is up).
+	if sets[0].Kind == "Lashers" {
+		sets = tr.WaitSets(t, bot.World, 3, 4*time.Minute)
+	}
+
+	var older, newer e2eharness.SpawnSet
+	if sets[0].Kind == "Lashers" {
+		older, newer = sets[1], sets[2]
+	} else {
+		older, newer = sets[0], sets[1]
+	}
+	if older.Kind == "Lashers" {
+		e2eharness.Preconditionf(t, "cannot find a non-Lasher older set to kill without collateral explosions")
+	}
+
+	time.Sleep(2 * time.Second)
+	tr.Poll(bot.World, time.Now())
+
+	var olderLive []uint64
+	for _, g := range older.Guids {
+		if hp, _ := bot.UnitHP(g); hp > 0 {
+			olderLive = append(olderLive, g)
+		}
+	}
+	if len(olderLive) == 0 {
+		switch older.Kind {
+		case "Trio":
+			olderLive = e2eharness.LivingByEntries(bot.World, 120, npcStormLasher, npcWaterSpirit, npcSnaplasher)
+		case "Conservator":
+			olderLive = e2eharness.LivingByEntries(bot.World, 120, npcConservator)
+		default:
+			olderLive = e2eharness.LivingByEntries(bot.World, 120, older.Entry)
+		}
+	}
+	var newerEntries []uint32
+	switch newer.Kind {
+	case "Trio":
+		newerEntries = []uint32{npcStormLasher, npcWaterSpirit, npcSnaplasher}
+	case "Conservator":
+		newerEntries = []uint32{npcConservator}
+	case "Lashers":
+		newerEntries = []uint32{npcDetonatingLasher}
+	default:
+		newerEntries = []uint32{newer.Entry}
+	}
+	newerN, _ := e2eharness.CountLivingWithRetry(bot.World, 120, newerEntries, 2*time.Second)
+	if len(olderLive) == 0 {
+		e2eharness.Preconditionf(t, "older set (%s) already dead before damage step", older.Kind)
+	}
+	if newerN == 0 {
+		e2eharness.Preconditionf(t, "newer set (%s) already dead before damage step", newer.Kind)
+	}
+
+	bot.DamageKill(t, olderLive, 10_000_000, 10*time.Second)
+	killT := time.Now()
+
+	knownAtKill := tr.Known()
+	for _, s := range bot.UnitsByEntry(120, allyEntries...) {
+		knownAtKill[s.GUID] = struct{}{}
+	}
+	fresh := bot.WaitNewUnits(t, knownAtKill, allyEntries, 90*time.Second)
+	nextT := time.Now()
+	fromNewer := nextT.Sub(newer.SpawnT)
+	fromKill := nextT.Sub(killT)
+	t.Logf("next set=%s units=%d  (Δ from newer spawn=%s, Δ from older kill=%s)",
+		label(fresh[0].Entry), len(fresh),
+		fromNewer.Round(time.Millisecond), fromKill.Round(time.Millisecond))
+
+	e2eharness.AssertIntervalNotAccelerated(t, 27095, fromKill, fromNewer, e2eharness.IntervalBugOpts{
+		MaxFromEvent:    20 * time.Second,
+		MaxFromBaseline: 45 * time.Second,
+	})
+	t.Logf("PASS AC#27095 next set not accelerated by killing older set")
 }
-*/
 
 // ULDUAR-03: Ulduar map enter via named tele stays in-world.
 func TestUlduar_NamedTeleEnter(t *testing.T) {

@@ -34,8 +34,8 @@ cp go.work.example go.work   # gitignored; edit the replace path
 # replace github.com/walkline/AzerothGhost => /path/to/AzerothGhost
 ```
 
-`e2e/go.mod` pins `github.com/walkline/AzerothGhost v1.0.1` (commit
-`9a2f4bf`; see `go.sum`). `go test` / `go mod download` fetch that module.
+`e2e/go.mod` pins `github.com/walkline/AzerothGhost v1.0.3` (commit
+`a8d6595`; see `go.sum`). `go test` / `go mod download` fetch that module.
 
 ---
 
@@ -76,7 +76,7 @@ go test -tags=e2e ./... -count=1 -v -timeout 120m -parallel 1 -p 1
 make e2e-full
 ```
 
-`-parallel 1` keeps in-package tests serial (`meta.Begin` is serial by default). `-p 1` runs one package at a time so IsolationPads (10 unique) never hash-share. Raising either without a unique preferred pad per concurrent package causes thrash.
+`-parallel 1` keeps in-package tests serial (`meta.Begin` is serial by default). `-p 1` runs one package at a time so IsolationPads never hash-share. Raising either without a unique preferred pad per concurrent package causes thrash.
 
 ### Make targets
 
@@ -139,23 +139,23 @@ If the scenario should stay as a regression, **move** it into `suites/` (or `sui
 | smoke | login / pad tele / relog / world alive | P0 | covered (`TestSmoke_*`) | — |
 | combat/charm | apply/cancel aura; logout/hard-drop while aura | P1 | covered | — |
 | combat/death | die → ghost → release → reclaim | P1 | covered | — |
-| combat/pets | summon / GUID / attack / dismiss | P1 | covered; Raise Dead `blocked-harness` | #27081 |
+| combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked` | #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
 | combat/vehicles | spellclick steed enter/exit; multi-bot pad | P2 | covered | — |
-| spells/aura | apply/query; CC broken by damage | P1 | covered; mount persist `blocked` | #26130 |
-| spells/cast | Charge on dummy; fail path; stance | P1 | covered; extra Charge pad `blocked` | #27061 |
-| spells/effects | Charge / grounding totem / create-item | P1 | covered; dummy-summon / Execute `blocked` | #26774 #26997 |
+| spells/aura | apply/query; CC broken by damage; mount persist | P1 | covered (`TestAC_26130_*`) | #26130 |
+| spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
+| spells/effects | Charge / grounding totem / Sweeping Strikes Execute | P1 | covered (`TestAC_26997_*`); dummy-summon `blocked` | #26774 #26997 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
-| social/loot | need/greed / pass / master loot | P1 | covered; chest mid-roll / below-half kill `blocked` | #26894 #26862 |
+| social/loot | need/greed / pass / master loot; below-half kill | P1 | covered (`TestAC_26862_*`); chest mid-roll `blocked` | #26894 #26862 |
 | social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
 | quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
-| quests/escort | spawn/wait unit only | P2 | gap (no start→follow escort) | #24450 |
+| quests/escort | spawn/wait; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
 | items/equip | equip entry; additem slot; survives relog | P2 | covered | — |
 | protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked` | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
 | guild/charter_bank | charter buy+turn-in; unique name | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon; leader reset | P2 | covered; post-reset summon `blocked` | #10708 |
-| instances/ulduar | named tele; DamageKill path | P2 | covered; Kologarn Charge / Freya `blocked` | #26266 #27095 |
+| instances/ulduar | named tele; DamageKill path; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked` | #26266 #27095 |
 
 ---
 
@@ -165,7 +165,7 @@ If the scenario should stay as a regression, **move** it into `suites/` (or `sui
 
 | Layer | Behaviour |
 |-------|-----------|
-| **Packages** | `go test -p N` runs packages concurrently. Default **`P=1`** in the Makefile — IsolationPads has 10 unique pads; more packages than pads **hash-share** and can thrash. Raise `P` only when every concurrent package has a unique preferred pad. |
+| **Packages** | `go test -p N` runs packages concurrently. Default **`P=1`** in the Makefile — IsolationPads has 27 unique pads; more packages than pads **hash-share** and can thrash. Raise `P` only when every concurrent package has a unique preferred pad. |
 | **Tests in a package** | `meta.Begin` is **serial by default** (no `t.Parallel`). Tag `parallel` only if pad-safe. Makefile `PARALLEL=1`. |
 | **Pads** | `e2eharness.PackagePad(t)` is **sticky per suite folder** for the process lifetime. |
 
@@ -197,6 +197,16 @@ Far-apart world locations (operator-captured). Combat-heavy packages have prefer
 | `InMountains1` | Kalimdor (1) | Preferred: `social/trade` |
 | `InMountains2` | Kalimdor (1) | Preferred: `spells/cast` |
 | `InMountains3` | Kalimdor (1) | Preferred: `spells/effects` |
+| `ElwynnRidge` | Eastern Kingdoms (0) | Elwynn cliff |
+| `BurningSteppes` | Eastern Kingdoms (0) | ~300y from ElwynnRidge |
+| `Mulgore1` | Kalimdor (1) | Preferred: `quests/escort` (plains, spawn-safe) |
+| `Mulgore3`–`Mulgore5`, `MulgoreNorth` | Kalimdor (1) | Mulgore / Thunder Bluff mesa |
+| `Boulderslide` | Kalimdor (1) | Stonetalon Boulderslide Ravine |
+| `Stonetalon1`, `Stonetalon2` | Kalimdor (1) | Stonetalon Mountains |
+| `Talondeep` | Kalimdor (1) | Talondeep Path (near Ashenvale1) |
+| `Ashenvale1` | Kalimdor (1) | Ashenvale |
+| `FelwoodSouth`, `MorlosAran` | Kalimdor (1) | Felwood |
+| `HyjalApproach`, `Hyjal1`, `Hyjal2` | Kalimdor (1) | Hyjal |
 
 Unlisted suites (`smoke`, `spells/aura`, protocol, quests, items, instances, guild, …) receive the first free pad, then hash-share if needed. Logs include `PackagePad suite=… pad=…`.
 

@@ -62,7 +62,7 @@ on:
         required: false
         default: '1'
       package_parallel:
-        description: 'go test -p (packages; keep 1 — only 10 unique IsolationPads)'
+        description: 'go test -p (packages; keep 1 unless each concurrent suite has a unique pad)'
         required: false
         default: '1'
       tags_filter:
@@ -86,7 +86,9 @@ env:
 jobs:
   e2e:
     name: e2e (native / ${{ inputs.scope || 'full' }})
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: |
+      github.repository == 'azerothcore/azerothcore-wotlk'
+      || github.repository == 'walkline/azerothcore-wotlk'
     # workflow_call (PR): ubuntu-24.04 to match the nopch artifact.
     # Dispatch: optional self-hosted via E2E_RUNS_ON.
     runs-on: ${{ github.event_name == 'workflow_call' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
@@ -335,11 +337,11 @@ jobs:
             echo "::warning::parallel=${parallel} >1 shares PackagePad within a package; prefer 1"
           fi
           if (( p > 1 )); then
-            echo "::warning::package_parallel=${p} >1 may hash-share IsolationPads (only 10 unique)"
+            echo "::warning::package_parallel=${p} >1 may hash-share IsolationPads if two suites land on the same pad"
           fi
-          if (( p > 10 )); then
-            echo "package_parallel capped at 10 (IsolationPads size)"
-            p=10
+          if (( p > 27 )); then
+            echo "package_parallel capped at 27 (IsolationPads size)"
+            p=27
           fi
           if [[ -n "${E2E_TIMEOUT_INPUT}" ]]; then
             [[ "${E2E_TIMEOUT_INPUT}" =~ ^[0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h)$ ]] \

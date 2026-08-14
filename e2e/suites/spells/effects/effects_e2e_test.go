@@ -106,22 +106,98 @@ func TestEffects_ChargeEffect(t *testing.T) {
 	t.Logf("PASS charge effect moved=%.1fy", moved)
 }
 
-// TODO(e2e): re-enable when AC#26997 is fixed and we can spawn two living ≤20% HP
-// targets without SpawnPersistent despawning the first (DespawnNearbyEntry) and
-// without 2673 KillSelf / 31146 add-fail on isolation pads.
-// https://github.com/azerothcore/azerothcore-wotlk/issues/26997
-// Body must CastMust Execute on two living execute-phase targets + ProbeWorldAlive.
-/*
-func TestEffects_SweepingStrikesExecuteNoCrash(t *testing.T) {
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/26997
+// Sweeping Strikes + Execute on a ≤20% target with a second living ≤20% target
+// nearby must not crash (CheckProc stored a raw Unit* that HandleProc deref'd).
+// Training dummies absorb damage (npc_training_dummy::DamageTaken = 0), so the
+// two execute-phase targets are hostile player bots.
+func TestAC_26997_SweepingStrikesExecuteNoCrash(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"med", "spells", "issue"},
+		Tags:     []string{"med", "spells", "issue", "multi_bot", "serial"},
 		Runtime:  "med",
 		Issue:    26997,
 		Category: "spells/effects",
 	})
-	t.Fatal("placeholder — implement two-target Execute oracle")
+
+	const spellExecuteMax = uint32(47471) // WotLK Execute rank 9
+
+	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
+		Prefix: "SwpEx",
+		Bots: []e2eharness.BotSpec{
+			{Role: "arms", Race: e2eharness.RaceHuman, Class: e2eharness.ClassWarrior, Level: 80, LearnAllClass: true},
+			{Role: "t1", Race: e2eharness.RaceOrc, Class: e2eharness.ClassWarrior, Level: 80},
+			{Role: "t2", Race: e2eharness.RaceOrc, Class: e2eharness.ClassWarrior, Level: 80},
+			{Role: "probe", Level: 10},
+		},
+	})
+	arms := e2eharness.ByRole(t, bots, "arms")
+	t1 := e2eharness.ByRole(t, bots, "t1")
+	t2 := e2eharness.ByRole(t, bots, "t2")
+	probe := e2eharness.ByRole(t, bots, "probe")
+
+	// Northshire strip — flat, melee range for Sweeping Strikes extra attack.
+	const (
+		x, y, z float32 = -8904.0, -128.0, 81.0
+		m       uint32  = 0
+	)
+	arms.Teleport(t, x, y, z, m)
+	t1.Teleport(t, x+2, y, z, m)
+	t2.Teleport(t, x, y+2, z, m)
+	arms.WaitUnitGUID(t, t1.GUID, 10*time.Second)
+	arms.WaitUnitGUID(t, t2.GUID, 10*time.Second)
+
+	for _, v := range []*e2eharness.ScenarioBot{t1, t2} {
+		v.GM(t, ".gm off")
+		v.GM(t, ".cheat god off")
+	}
+	e2eharness.EnableHostilePvP(t, arms, t1)
+	e2eharness.EnableHostilePvP(t, arms, t2)
+
+	arms.CombatReadyFull(t)
+	arms.Learn(t, e2eharness.SpellBattleStance)
+	arms.Learn(t, e2eharness.SpellSweepingStrikes)
+	arms.Learn(t, spellExecuteMax)
+	arms.CastMust(t, e2eharness.SpellBattleStance, 0, 10*time.Second)
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		if arms.HasAura(e2eharness.SpellBattleStance) {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
+	if !arms.HasAura(e2eharness.SpellBattleStance) {
+		e2eharness.Preconditionf(t, "Battle Stance missing before Execute")
+	}
+
+	arms.DamageToFraction(t, t1.GUID, 0.19, 20*time.Second)
+	arms.DamageToFraction(t, t2.GUID, 0.19, 20*time.Second)
+	for _, v := range []struct {
+		name string
+		b    *e2eharness.ScenarioBot
+	}{{"t1", t1}, {"t2", t2}} {
+		hp, max := v.b.World.Health(), v.b.World.MaxHealth()
+		if max == 0 || hp == 0 || float64(hp)/float64(max) > 0.2 {
+			e2eharness.Preconditionf(t, "%s not in execute range (hp=%d/%d)", v.name, hp, max)
+		}
+	}
+
+	arms.CastMust(t, e2eharness.SpellSweepingStrikes, 0, 10*time.Second)
+	if !arms.HasAura(e2eharness.SpellSweepingStrikes) {
+		e2eharness.Preconditionf(t, "Sweeping Strikes aura %d missing", e2eharness.SpellSweepingStrikes)
+	}
+	_ = arms.World.SetTarget(t1.GUID)
+	arms.Face(t, t1.GUID)
+	res, err := arms.TryCast(t, spellExecuteMax, t1.GUID, 15*time.Second)
+	if err != nil {
+		e2eharness.ProbeWorldAlive(t, probe, 26997)
+		e2eharness.HarnessFailf(t, "AC#26997: no Execute cast result: %v", err)
+	}
+	e2eharness.ProbeWorldAlive(t, probe, 26997)
+	if !res.Success {
+		e2eharness.Assertf(t, "Execute failed reason=%s", e2eharness.SpellFailReasonName(res.FailReason))
+	}
+	t.Logf("PASS AC#26997 Sweeping Strikes Execute world alive (t1=0x%X t2=0x%X)", t1.GUID, t2.GUID)
 }
-*/
 
 // FX-04: grounding totem summon exists (#26584 ecosystem).
 func TestEffects_GroundingTotemSummon(t *testing.T) {

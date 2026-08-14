@@ -13,10 +13,10 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// TODO(e2e): re-enable when AC#26130 is fixed — Blending In must survive mount.
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26130
-/*
-func TestAura_SurvivesMount_BlendingIn(t *testing.T) {
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27021
+// Mounting must not strip Blending In (45614) inside the quest area.
+func TestAC_26130_BlendingInSurvivesMount(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"short", "spells", "issue"},
 		Runtime:  "short",
@@ -25,20 +25,23 @@ func TestAura_SurvivesMount_BlendingIn(t *testing.T) {
 	})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "AuraMnt",
+		Prefix: "Blend",
 		Race:   e2eharness.RaceOrc,
 		Class:  e2eharness.ClassWarrior,
 		Level:  78,
 	})
+	bot.AddQuest(t, e2eharness.QuestBlendingIn)
+	// Temple City of En'kilah (issue repro coords).
 	bot.Teleport(t, 3758.2554, 3689.5754, 47.241505, e2eharness.MapNorthrend)
 	bot.ApplyAura(t, e2eharness.SpellBlendingInAura)
+	if !bot.HasAura(e2eharness.SpellBlendingInAura) {
+		e2eharness.Preconditionf(t, "ApplyAura did not yield Blending In %d", e2eharness.SpellBlendingInAura)
+	}
 	bot.Learn(t, e2eharness.SpellMountSwiftGryphon)
 	_ = bot.CastOrGM(t, e2eharness.SpellMountSwiftGryphon, 0, 10*time.Second)
-	// Waiter-based: AssertAuraRemains fails hard if the aura is stripped by mount.
-	e2eharness.AssertAuraRemains(t, bot.World, e2eharness.SpellBlendingInAura, 2*time.Second, 26130)
-	t.Logf("PASS aura %d survived mount", e2eharness.SpellBlendingInAura)
+	bot.AssertAuraRemains(t, e2eharness.SpellBlendingInAura, 800*time.Millisecond, 26130)
+	t.Logf("PASS AC#26130 Blending In aura survived mount")
 }
-*/
 
 // AURA-05: aura present after apply; gone after death+relog settle path.
 func TestAura_ApplyAndQuery(t *testing.T) {

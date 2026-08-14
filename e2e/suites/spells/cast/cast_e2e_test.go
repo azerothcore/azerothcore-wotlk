@@ -83,11 +83,10 @@ func TestCast_FailPathNoCrash(t *testing.T) {
 	t.Logf("PASS cast fail path no crash")
 }
 
-// TODO(e2e): re-enable when AC#27061 is fixed
-// https://github.com/azerothcore/azerothcore-wotlk/issues/27061
-// Must CastMust Raise Dead and assert a ghoul; world-alive alone is greenwash.
-/*
-func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27061
+// Raise Dead near a player corpse must succeed (ghoul) and must not crash
+// WorldObjectSpellAreaTargetCheck on the Corpse grid.
+func TestAC_27061_RaiseDeadNearCorpseNoCrash(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells", "issue", "serial"},
 		Runtime:  "med",
@@ -96,25 +95,41 @@ func TestCast_RaiseDeadNearCorpseNoCrash(t *testing.T) {
 	})
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
-		Prefix: "CastRD",
+		Prefix: "Raise",
 		Bots: []e2eharness.BotSpec{
 			{Role: "dk", Race: e2eharness.RaceHuman, Class: e2eharness.ClassDeathKnight, Level: 80, LearnAllClass: true},
 			{Role: "corpse", Race: e2eharness.RaceHuman, Class: e2eharness.ClassWarrior, Level: 80},
+			{Role: "probe", Level: 10},
 		},
 	})
 	dk := e2eharness.ByRole(t, bots, "dk")
 	corpse := e2eharness.ByRole(t, bots, "corpse")
-	e2eharness.TeleportAllPad(t, bots, e2eharness.PackagePad(t))
+	probe := e2eharness.ByRole(t, bots, "probe")
+	e2eharness.TeleportAllPad(t, []*e2eharness.ScenarioBot{dk, corpse}, e2eharness.PackagePad(t))
 	corpse.DieMust(t, 20*time.Second)
+
 	dk.Learn(t, e2eharness.SpellRaiseDead)
 	dk.AddItem(t, e2eharness.ItemCorpseDust, 5)
 	dk.CombatReady(t)
-	_, _ = dk.TryCast(t, e2eharness.SpellRaiseDead, 0, 10*time.Second)
+	dk.CheatPower(t)
+
+	res, err := dk.TryCast(t, e2eharness.SpellRaiseDead, 0, 20*time.Second)
+	if err != nil {
+		e2eharness.ProbeWorldAlive(t, probe, 27061)
+		e2eharness.HarnessFailf(t, "AC#27061: no Raise Dead cast result (world still up): %v", err)
+	}
+	e2eharness.ProbeWorldAlive(t, probe, 27061)
+	if !res.Success {
+		e2eharness.Assertf(t, "Raise Dead failed reason=%s (need SPELL_GO + ghoul)",
+			e2eharness.SpellFailReasonName(res.FailReason))
+	}
+	pet := dk.WaitPlayerPet(t, 20*time.Second)
+	if pet == 0 {
+		e2eharness.Assertf(t, "Raise Dead SPELL_GO but no ghoul (UNIT_FIELD_SUMMON / SUMMONEDBY)")
+	}
 	dk.CleanupOwnedSummons(t)
-	e2eharness.ProbeWorldAlive(t, dk, 27061)
-	t.Logf("PASS Raise Dead near corpse did not crash world")
+	t.Logf("PASS AC#27061 Raise Dead near corpse spawned pet=0x%X", pet)
 }
-*/
 
 // CAST-04: client CastMust battle stance on self — aura must apply (no CastOrGM GM-fake).
 func TestCast_BattleStanceSelf(t *testing.T) {

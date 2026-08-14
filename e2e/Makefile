@@ -7,9 +7,9 @@ TIMEOUT  ?= 30m
 # In-package test concurrency. Keep 1: PackagePad is sticky per package; parallel
 # tests in the same package share one pad and thrash each other.
 PARALLEL ?= 1
-# Package concurrency (go test -p). IsolationPads has 10 unique pads; more packages
+# Package concurrency (go test -p). IsolationPads has 27 unique pads; more packages
 # than pads hash-share locations. Default 1 = safe unique pad assignment always.
-P        ?= 1
+P        ?= 6
 COUNT    ?= 1
 
 GOTEST = $(GO) test -tags=$(TAGS) -count=$(COUNT) -timeout $(TIMEOUT) -p $(P)
