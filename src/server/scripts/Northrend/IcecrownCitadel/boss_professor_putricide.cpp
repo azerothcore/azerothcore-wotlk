@@ -879,7 +879,7 @@ public:
             me->AttackStop();
             me->GetMotionMaster()->Clear();
             me->StopMoving();
-            me->DespawnOrUnsummon(2s);    // lingers for a moment instead of blinking out with the damage
+            me->DespawnOrUnsummon(1s);    // lingers for a moment instead of blinking out with the damage
         }
 
         void UpdateAI(uint32 diff) override
