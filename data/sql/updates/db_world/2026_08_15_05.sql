@@ -1,3 +1,4 @@
+-- DB update 2026_08_15_04 -> 2026_08_15_05
 --
 DELETE FROM `reference_loot_template` WHERE (`Entry` = 10016) AND (`Item` IN (48679, 48681, 49667));
 
