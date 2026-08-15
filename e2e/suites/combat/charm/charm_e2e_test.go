@@ -41,6 +41,7 @@ func TestCharm_ApplyAndCancelAuraOnSelf(t *testing.T) {
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	// Rage for Battle Shout (SPELL_FAILED_NO_POWER without it).
 	bot.GM(t, ".cheat power on")
+	bot.FlushWorld(t)
 	// Prefer highest rank first (learn-all knows it).
 	castID := battleShoutRanks[0]
 	bot.Learn(t, castID)
@@ -135,7 +136,6 @@ func TestCharm_CancelCastSafe(t *testing.T) {
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	// gm off + mana for a real channel (account GM still allows .modify).
 	e2eharness.CombatReady(t, bot.World, e2eharness.CombatReadyOpts{God: false, Power: true})
-	time.Sleep(200 * time.Millisecond) // settle after tele so cast is not interrupted as moving
 
 	// Prefer max-rank Hellfire; fall back to rank 1. Match any channel spell (rank rewrite).
 	channelSpells := []uint32{e2eharness.SpellHellfireMax, e2eharness.SpellHellfire}
@@ -151,7 +151,7 @@ func TestCharm_CancelCastSafe(t *testing.T) {
 			bot.CancelCast(t)
 			// Top up mana and retry.
 			bot.GM(t, ".modify mana 999999")
-			time.Sleep(100 * time.Millisecond)
+			bot.FlushWorld(t)
 		}
 	}
 	if !canceled {

@@ -67,6 +67,7 @@ func TestEffects_ChargeEffect(t *testing.T) {
 	bot.CombatStop(t)
 	bot.CombatReadyFull(t)
 	bot.CombatStop(t)
+	bot.FlushWorld(t)
 	bot.Learn(t, e2eharness.SpellBattleStance)
 	bot.Learn(t, spellChargeRank3)
 	bot.CastMust(t, e2eharness.SpellBattleStance, 0, 10*time.Second)

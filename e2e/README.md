@@ -34,8 +34,8 @@ cp go.work.example go.work   # gitignored; edit the replace path
 # replace github.com/walkline/AzerothGhost => /path/to/AzerothGhost
 ```
 
-`e2e/go.mod` pins `github.com/walkline/AzerothGhost v1.0.3` (commit
-`a8d6595`; see `go.sum`). `go test` / `go mod download` fetch that module.
+`e2e/go.mod` pins `github.com/walkline/AzerothGhost v1.0.4` (commit
+`db0dd56`; see `go.sum`). `go test` / `go mod download` fetch that module.
 
 ---
 

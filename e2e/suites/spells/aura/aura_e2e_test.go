@@ -128,16 +128,24 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	victim.GM(t, ".cheat god off")
 	e2eharness.EnableHostilePvP(t, lock, victim)
 	lock.WaitUnitGUID(t, victim.GUID, 10*time.Second)
+	lock.WaitUnitPvP(t, victim.GUID, 5*time.Second)
 
 	lock.Learn(t, spellFear)
 	lock.Learn(t, spellShadowBoltMax)
-	if err := lock.World.SetTarget(victim.GUID); err != nil {
-		e2eharness.Preconditionf(t, "SetTarget victim: %v", err)
-	}
+	var last e2eharness.SpellCastResult
 	feared := false
-	for attempt := 0; attempt < 3 && !feared; attempt++ {
+	for attempt := 0; attempt < 5 && !feared; attempt++ {
+		if err := lock.World.SetTarget(victim.GUID); err != nil {
+			e2eharness.Preconditionf(t, "SetTarget victim: %v", err)
+		}
 		lock.Face(t, victim.GUID)
-		lock.CastMust(t, spellFear, victim.GUID, 10*time.Second)
+		last = lock.Cast(t, spellFear, victim.GUID, 10*time.Second)
+		if !last.Success {
+			if e2eharness.SpellFailReasonName(last.FailReason) == "BAD_TARGETS" {
+				e2eharness.EnableHostilePvP(t, lock, victim)
+			}
+			continue
+		}
 		deadline := time.Now().Add(2 * time.Second)
 		for time.Now().Before(deadline) {
 			if victim.HasAura(spellFear) {
@@ -148,7 +156,8 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 		}
 	}
 	if !feared {
-		e2eharness.Preconditionf(t, "Fear %d not on victim after CastMust (resist/miss)", spellFear)
+		e2eharness.Preconditionf(t, "Fear %d not on victim (last success=%v reason=%s)",
+			spellFear, last.Success, e2eharness.SpellFailReasonName(last.FailReason))
 	}
 	victim.ApplyAura(t, spellEntanglingRoots)
 	if !victim.HasAura(spellFear) {

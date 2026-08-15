@@ -67,6 +67,7 @@ Combat: `CombatReady` / `CombatReadyFull` before pulls. NEVER `.gm on` during ag
 Casts: `Cast` / `CastMust` / `CastOrGM` / `CastAtPosition`; fail reason via `SpellFailReasonName`.
 
 Waiters: Arm → Send → Wait. NEVER re-arm during Wait. NEVER replace waiters with long fixed sleeps.
+After fire-and-forget GM that later casts depend on (`.pvp on`, `.gm off`), `FlushWorld` on that bot (world-thread ack) or a state waiter (`WaitUnitPvP`).
 
 Quest DB: only after `Save` / `QuestStatusAfterSave`. Spell-summon: NEVER `.npc add` instead of the spell. Set race so GM text uses the character’s language (Horde ≠ Common).
 

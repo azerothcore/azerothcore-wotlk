@@ -83,6 +83,7 @@ func TestThreat_TauntSwitchesTarget(t *testing.T) {
 	dps.CombatReady(t)
 	tank.CombatReady(t)
 	tank.GM(t, ".cheat power on")
+	tank.FlushWorld(t)
 
 	// Explicit learn — Defensive Stance / Taunt come from the L10 warrior quest, not only learn-all.
 	tank.Learn(t, e2eharness.SpellDefensiveStance)

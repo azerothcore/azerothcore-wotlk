@@ -109,9 +109,8 @@ func partyInStockadeForRitual(t *testing.T, initiator, helper, far *e2eharness.S
 	// Trash near the entrance can peel selection / break portal completion cast 7720.
 	for _, b := range []*e2eharness.ScenarioBot{initiator, helper, far} {
 		b.CombatStop(t)
+		b.FlushWorld(t)
 	}
-	// Brief settle so instance visibility / group state catch up before ritual.
-	time.Sleep(500 * time.Millisecond)
 }
 
 // sendFarOutsideStockade moves far to the exterior entrance (map 0) while leaving a

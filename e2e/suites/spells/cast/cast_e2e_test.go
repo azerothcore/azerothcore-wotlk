@@ -37,8 +37,9 @@ func TestCast_ChargeSucceedsOnDummy(t *testing.T) {
 	)
 	bot.Teleport(t, chargeX, chargeY, chargeZ, chargeMap)
 	bot.CombatStop(t)
-	bot.CombatReadyFull(t) // gm off + god + power
+	bot.CombatReadyFull(t) // gm off + god + power + FlushWorld
 	bot.CombatStop(t)
+	bot.FlushWorld(t)
 	bot.Learn(t, e2eharness.SpellBattleStance)
 	bot.Learn(t, spellChargeRank3)
 	// Client Battle Stance so form is real (not CastOrGM fake-success).
@@ -118,6 +119,7 @@ func TestAC_27061_RaiseDeadNearCorpseNoCrash(t *testing.T) {
 	dk.AddItem(t, e2eharness.ItemCorpseDust, 5)
 	dk.CombatReady(t)
 	dk.CheatPower(t)
+	dk.FlushWorld(t)
 
 	res, err := dk.TryCast(t, e2eharness.SpellRaiseDead, 0, 20*time.Second)
 	if err != nil {
