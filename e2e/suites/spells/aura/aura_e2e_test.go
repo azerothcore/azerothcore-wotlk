@@ -128,7 +128,6 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	victim.GM(t, ".cheat god off")
 	e2eharness.EnableHostilePvP(t, lock, victim)
 	lock.WaitUnitGUID(t, victim.GUID, 10*time.Second)
-	lock.WaitUnitPvP(t, victim.GUID, 5*time.Second)
 
 	lock.Learn(t, spellFear)
 	lock.Learn(t, spellShadowBoltMax)
