@@ -92,10 +92,10 @@ func TestAura_MidAuraRelogWorldAlive(t *testing.T) {
 // Orc: no Every Man for Himself. Entangling Roots after Fear: stay in front.
 //
 // L80 break threshold is warrior BaseHealth/4.75 ≈ 2648 (HandleBreakableCCAuraProc).
-// Shadow Bolt 47809 is a 3s cast; naked hits are often ~500, so 3 bolts cannot
-// reach 2648 before the 10s PvP Fear cap. Ice Lance 42914 is instant. `.cheat
-// cooldown` skips the 1.5s GCD so several real CMSG_CAST_SPELL hits can land
-// in time. Gone before 8s with an HP drop is the proc, not duration expiry.
+// Ice Lance 42914 is instant but often ~320–380 on a naked lock; 8 hits landed
+// 2569 on CI and left Fear up. `.cheat cooldown` skips the 1.5s GCD so we can
+// dump enough real CMSG_CAST_SPELL hits before the 10s PvP cap. Gone before 8s
+// with an HP drop is the proc, not duration expiry.
 func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells", "combat", "multi_bot"},
@@ -108,8 +108,8 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 		spellIceLance        = uint32(42914) // rank 3, instant, no recovery
 		spellEntanglingRoots = uint32(53308) // long root; holds facing
 		itemArchus           = uint32(50731) // best-effort +SP; not required
-		maxLances            = 8
-		postHitWindow        = 400 * time.Millisecond
+		maxLances            = 16
+		postHitWindow        = 250 * time.Millisecond
 		fearBreakDeadline    = 8 * time.Second
 	)
 
@@ -182,7 +182,7 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 
 	hits := 0
 	var brokenAt time.Time
-	for hits = 1; hits <= maxLances; hits++ {
+	for hits < maxLances {
 		if !victim.HasAura(spellFear) {
 			brokenAt = time.Now()
 			break
@@ -192,8 +192,9 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 		}
 		lock.Face(t, victim.GUID)
 		lock.CastMust(t, spellIceLance, victim.GUID, 10*time.Second)
+		hits++
 		hpNow := victim.World.Health()
-		t.Logf("lance %d hp %d→%d fear=%v", hits, hpBefore, hpNow, victim.HasAura(spellFear))
+		t.Logf("lance %d hp %d→%d Δ=%d fear=%v", hits, hpBefore, hpNow, int(hpBefore)-int(hpNow), victim.HasAura(spellFear))
 		if victim.TryWaitAuraGone(t, spellFear, postHitWindow) {
 			brokenAt = time.Now()
 			break
