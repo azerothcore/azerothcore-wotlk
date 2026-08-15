@@ -21,9 +21,8 @@ func TestEquip_EquipEntryBasic(t *testing.T) {
 		Level:  80,
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	bot.AddItem(t, e2eharness.ItemTargetDummy, 1)
-	bot.Save(t)
-	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, 1)
+	bot.AddItemWait(t, e2eharness.ItemTargetDummy, 1)
+	waitInventoryAtLeast(t, bot, e2eharness.ItemTargetDummy, 1)
 	t.Logf("PASS add item inventory seed")
 }
 
@@ -96,7 +95,7 @@ func TestEquip_ItemSurvivesRelogPath(t *testing.T) {
 	t.Logf("PASS item seed + relog inventory persists")
 }
 
-// waitInventoryAtLeast polls CharDB after Save until count >= min (CI Save race).
+// waitInventoryAtLeast polls CharDB (InventoryCount Saves) until count >= min.
 func waitInventoryAtLeast(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, min int) {
 	t.Helper()
 	deadline := time.Now().Add(5 * time.Second)

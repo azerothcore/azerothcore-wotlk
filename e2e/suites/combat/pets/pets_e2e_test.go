@@ -66,6 +66,7 @@ func TestPets_PlayerPetGUIDAfterSummon(t *testing.T) {
 		e2eharness.Preconditionf(t, "no pet after WaitPlayerPet")
 	}
 	bot.CleanupOwnedSummons(t)
+	bot.AssertWorldAlive(t)
 	t.Logf("PASS pet=0x%X field_summon=0x%X", pet, bot.PlayerPetGUID())
 }
 

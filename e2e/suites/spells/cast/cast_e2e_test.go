@@ -77,10 +77,18 @@ func TestCast_FailPathNoCrash(t *testing.T) {
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
 	// Cast Charge with no target / invalid target GUID.
 	res, err := bot.TryCast(t, e2eharness.SpellCharge, 0, 5*time.Second)
-	_ = res
-	_ = err
+	if err != nil {
+		e2eharness.HarnessFailf(t, "TryCast Charge target=0: %v", err)
+	}
+	if res.Success {
+		e2eharness.Assertf(t, "Charge with no target succeeded")
+	}
+	if e2eharness.SpellFailReasonName(res.FailReason) != "BAD_TARGETS" {
+		e2eharness.Assertf(t, "Charge no-target fail reason=%s want BAD_TARGETS",
+			e2eharness.SpellFailReasonName(res.FailReason))
+	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS cast fail path no crash")
+	t.Logf("PASS cast fail path no crash reason=%s", e2eharness.SpellFailReasonName(res.FailReason))
 }
 
 // PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27061

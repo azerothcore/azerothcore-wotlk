@@ -84,7 +84,7 @@ func TestQuest_StatusSurvivesSave(t *testing.T) {
 		e2eharness.HarnessFailf(t, "quest missing after save")
 	}
 	if st != e2eharness.QuestStatusIncomplete {
-		e2eharness.Preconditionf(t, "want incomplete after save, got %d", st)
+		e2eharness.Assertf(t, "want incomplete after save, got %d", st)
 	}
 	t.Logf("PASS quest status survives save")
 }

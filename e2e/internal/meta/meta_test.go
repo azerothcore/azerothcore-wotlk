@@ -5,6 +5,9 @@ import (
 )
 
 func TestGate_NoEnvRuns(t *testing.T) {
+	for _, key := range []string{"E2E_ISSUE", "E2E_RUNTIME", "E2E_SKIP_TAGS", "E2E_TAGS"} {
+		t.Setenv(key, "")
+	}
 	// Should not skip when no filters set.
 	Gate(t, TestMeta{Tags: []string{"smoke", "short"}, Runtime: "short"})
 }

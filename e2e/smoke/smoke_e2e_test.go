@@ -104,9 +104,8 @@ func TestSmoke_RelogSameCharacterWorldAlive(t *testing.T) {
 	bot.Relog(t)
 	// Relog already WaitForLogin; AssertWorldAlive probes the fresh session.
 	bot.AssertWorldAlive(t)
-	if bot.GUID != 0 && bot.GUID != guidBefore {
-		// Some relog paths keep GUID; if changed, still require alive session.
-		t.Logf("NOTE guid changed after relog before=%d after=%d", guidBefore, bot.GUID)
+	if bot.GUID != guidBefore {
+		e2eharness.HarnessFailf(t, "expected GUID %d after relog, got %d", guidBefore, bot.GUID)
 	}
 	t.Logf("PASS relog world alive guid=%d", bot.GUID)
 }

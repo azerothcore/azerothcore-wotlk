@@ -38,7 +38,12 @@ func TestAC_26130_BlendingInSurvivesMount(t *testing.T) {
 		e2eharness.Preconditionf(t, "ApplyAura did not yield Blending In %d", e2eharness.SpellBlendingInAura)
 	}
 	bot.Learn(t, e2eharness.SpellMountSwiftGryphon)
+	// Client mount can fail without riding/CWF; GM fallback still applies the
+	// mount aura, which is the server path that must not strip Blending In.
 	_ = bot.CastOrGM(t, e2eharness.SpellMountSwiftGryphon, 0, 10*time.Second)
+	if !bot.HasAura(e2eharness.SpellMountSwiftGryphon) {
+		e2eharness.Preconditionf(t, "mount aura %d missing after CastOrGM", e2eharness.SpellMountSwiftGryphon)
+	}
 	bot.AssertAuraRemains(t, e2eharness.SpellBlendingInAura, 800*time.Millisecond, 26130)
 	t.Logf("PASS AC#26130 Blending In aura survived mount")
 }
@@ -119,14 +124,19 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	if !feared {
 		e2eharness.Preconditionf(t, "could not apply Fear %d on dummy 0x%X", spellFear, dummy)
 	}
-	// Damage the feared dummy — CC must break.
-	bot.GM(t, ".damage 5000")
+	// Nonlethal hit — npc_target_dummy (2673) can die to a large .damage, which
+	// would drop Fear without proving a damage break.
+	bot.Damage(t, dummy, 1)
 	deadline = time.Now().Add(5 * time.Second)
 	for time.Now().Before(deadline) {
 		if !bot.UnitHasAura(dummy, spellFear) {
 			break
 		}
 		time.Sleep(40 * time.Millisecond)
+	}
+	hp, maxHP := bot.UnitHP(dummy)
+	if maxHP > 0 && hp == 0 {
+		e2eharness.Assertf(t, "dummy 0x%X died; Fear drop is not a damage-break oracle", dummy)
 	}
 	if bot.UnitHasAura(dummy, spellFear) {
 		e2eharness.Assertf(t, "Fear aura %d still on dummy after damage", spellFear)
@@ -148,6 +158,9 @@ func TestAura_ApplyMultipleDistinctAuras(t *testing.T) {
 	bot.ApplyAura(t, e2eharness.SpellBattleStance)
 	if !bot.HasAura(e2eharness.SpellBlendingInAura) {
 		e2eharness.Preconditionf(t, "lost blending-in after second ApplyAura")
+	}
+	if !bot.HasAura(e2eharness.SpellBattleStance) {
+		e2eharness.Assertf(t, "Battle Stance missing after ApplyAura")
 	}
 	t.Logf("PASS multi-aura apply (stance present=%v)", bot.HasAura(e2eharness.SpellBattleStance))
 }

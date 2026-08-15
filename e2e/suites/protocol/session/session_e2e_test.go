@@ -23,6 +23,10 @@ func TestSession_PositionAfterLogin(t *testing.T) {
 	if bot.GUID == 0 {
 		e2eharness.Preconditionf(t, "GUID 0 after login")
 	}
+	if mapID != e2eharness.MapEasternKingdoms {
+		e2eharness.Assertf(t, "login map=%d want %d pos=(%.1f,%.1f,%.1f)",
+			mapID, e2eharness.MapEasternKingdoms, x, y, z)
+	}
 	t.Logf("PASS pos after login map=%d (%.1f,%.1f,%.1f)", mapID, x, y, z)
 }
 
@@ -34,9 +38,10 @@ func TestSession_ItemAndQuestAfterLoad(t *testing.T) {
 		Prefix: "SessLd",
 		Level:  40,
 	})
-	bot.AddItem(t, e2eharness.ItemTargetDummy, 1)
+	bot.AddItemWait(t, e2eharness.ItemTargetDummy, 1)
 	bot.AddQuest(t, e2eharness.QuestRethbanGauntlet)
 	bot.Save(t)
+	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, 1)
 	bot.AssertQuestStatus(t, e2eharness.QuestRethbanGauntlet, e2eharness.QuestStatusIncomplete)
 	t.Logf("PASS item+quest after load/save")
 }

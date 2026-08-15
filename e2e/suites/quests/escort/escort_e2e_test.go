@@ -3,6 +3,7 @@
 package escort_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -84,8 +85,10 @@ func TestAC_24450_FollowDespawnsOnLogout(t *testing.T) {
 	for _, u := range bot.UnitsByEntry(80, npcJonathanFollow) {
 		known[u.GUID] = struct{}{}
 	}
-	_ = bot.World.SetTarget(worldNPC)
-	bot.GM(t, ".cast 50662")
+	if err := bot.World.SetTarget(worldNPC); err != nil {
+		e2eharness.Preconditionf(t, "SetTarget Jonathan 0x%X: %v", worldNPC, err)
+	}
+	bot.GM(t, fmt.Sprintf(".cast %d", spellCrusadersBandage))
 	fresh := bot.WaitNewUnits(t, known, []uint32{npcJonathanFollow}, 20*time.Second)
 	if len(fresh) == 0 {
 		e2eharness.Preconditionf(t, "bandage did not summon a new follow-NPC %d", npcJonathanFollow)

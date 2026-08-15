@@ -9,7 +9,7 @@ TIMEOUT  ?= 30m
 PARALLEL ?= 1
 # Package concurrency (go test -p). IsolationPads has 27 unique pads; more packages
 # than pads hash-share locations. Default 1 = safe unique pad assignment always.
-P        ?= 6
+P        ?= 1
 COUNT    ?= 1
 
 GOTEST = $(GO) test -tags=$(TAGS) -count=$(COUNT) -timeout $(TIMEOUT) -p $(P)

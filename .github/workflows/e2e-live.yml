@@ -108,7 +108,7 @@ jobs:
           go-version-file: e2e/go.mod
           cache-dependency-path: e2e/go.sum
 
-      # AzerothGhost is a public Go module (e2e/go.mod v1.0.1). go test downloads it.
+      # AzerothGhost is a public Go module (e2e/go.mod v1.0.3). go test downloads it.
       - name: Download e2e modules
         working-directory: e2e
         run: go mod download
@@ -129,8 +129,8 @@ jobs:
         run: |
           set -euo pipefail
           root="${RUNNER_TEMP}/ac-server"
-          find "$root" -type f | head -n 50
-          auth=$(find "$root" -type f -name authserver | head -n 1)
+          find "$root" -type f -print | sed -n '1,50p'
+          auth=$(find "$root" -type f -name authserver | sed -n '1p')
           [[ -n "${auth}" ]] || { echo '::error::authserver missing from artifact'; exit 1; }
           src=$(dirname "${auth}")
           mkdir -p env/dist/bin env/dist/etc

@@ -177,6 +177,9 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 		knownAtKill[s.GUID] = struct{}{}
 	}
 	fresh := bot.WaitNewUnits(t, knownAtKill, allyEntries, 90*time.Second)
+	if len(fresh) == 0 {
+		e2eharness.Preconditionf(t, "no new ally set spawned within 90s after older-set kill")
+	}
 	nextT := time.Now()
 	fromNewer := nextT.Sub(newer.SpawnT)
 	fromKill := nextT.Sub(killT)
