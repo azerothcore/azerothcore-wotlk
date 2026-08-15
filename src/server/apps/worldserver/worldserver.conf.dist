@@ -1002,23 +1002,6 @@ Expansion = 2
 ClientCacheVersion = 0
 
 #
-#    SessionAddDelay
-#        Description: Time (in microseconds) that a network thread will sleep after authentication
-#                     protocol handling before adding a connection to the world session map.
-#        Default:     10000 - (10 milliseconds, 0.01 second)
-
-SessionAddDelay = 10000
-
-#
-#    CloseIdleConnections
-#        Description: Automatically close idle connections.
-#                     SocketTimeOutTime and SocketTimeOutTimeActive determine when a connection is considered as idle.
-#        Default:     1 - (enable, Automatically close idle connections)
-#                     0 - (disable, Do not close idle connections)
-
-CloseIdleConnections = 1
-
-#
 #    SocketTimeOutTime
 #        Description: Time (in milliseconds) after which a connection being idle on the character
 #                     selection screen is disconnected.
@@ -1709,18 +1692,6 @@ PlayerStart.CustomSpells = 0
 PlayerStart.MapsExplored = 0
 
 #
-#    InstantLogout
-#        Description: Required security level for instantly logging out everywhere.
-#                     Does not work while in combat, dueling or falling.
-#        Default:     1  - (Enabled, Mods/GMs/Admins)
-#                     0  - (Enabled, Everyone)
-#                     2  - (Enabled, GMs/Admins)
-#                     3  - (Enabled, Admins)
-#                     4  - (Disabled)
-
-InstantLogout = 1
-
-#
 ###################################################################################################
 
 ###################################################################################################
@@ -2215,7 +2186,7 @@ Rate.Talent.Pet = 1
 #    Rate.Focus
 #    Rate.Energy
 #        Description: Multiplier to configure health, mana, incoming rage, loss of rage, focus
-#                     energy and loyalty increase or decrease.
+#                     and energy increase or decrease.
 #        Default:     1 - (Rate.Health)
 #                     1 - (Rate.Mana)
 #                     1 - (Rate.Rage.Income)
@@ -2233,7 +2204,6 @@ Rate.RunicPower.Income = 1
 Rate.RunicPower.Loss   = 1
 Rate.Focus             = 1
 Rate.Energy            = 1
-Rate.Loyalty           = 1
 
 #
 #    Rate.Rest.InGame
@@ -4423,14 +4393,6 @@ Channel.RestrictedLfg = 1
 #                     1 - (Enabled, Join without announcement)
 
 Channel.SilentlyGMJoin = 0
-
-#    Channel.ModerationGMLevel
-#        Description: Min GM account security level required for executing moderator in-game commands in the channels
-#                     This also bypasses password prompts on joining channels which require password
-#                     0 (in-game channel moderator privileges only)
-#        Default:     1 (enabled for moderators and above)
-
-Channel.ModerationGMLevel = 1
 
 #
 #    ChatLevelReq.Channel

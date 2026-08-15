@@ -1114,6 +1114,8 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH, 1);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DEATH_IN_DUNGEON, 1);
 
+        FailQuestsOnDeath();
+
         // Xinef: reset all death criterias
         ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH, 0);
     }

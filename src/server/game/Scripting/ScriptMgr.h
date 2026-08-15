@@ -694,6 +694,7 @@ public: /* ArenaScript */
     void OnArenaStart(Battleground* const bg);
     bool OnBeforeArenaTeamMemberUpdate(ArenaTeam* team, Player* player, bool won, uint32 opponentMatchmakerRating, int32 matchmakerChange);
     bool CanSaveArenaStatsForMember(ArenaTeam* team, ObjectGuid playerGuid);
+    void OnGetStartPersonalRating(ArenaTeam* team, ObjectGuid playerGuid, uint32& personalRating);
 
 public: /* MiscScript */
 

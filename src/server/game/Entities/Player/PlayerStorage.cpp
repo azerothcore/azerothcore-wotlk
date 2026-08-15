@@ -6635,7 +6635,16 @@ void Player::_LoadSpells(PreparedQueryResult result)
             if (CheckSkillLearnedBySpell(spellId))
                 addSpell(spellId, specMask, true);
             else
+            {
+                // Spell was never addSpell()'d, so removeSpell is often a no-op and would
+                // leave an orphan character_spell row (MySQL 1062 on later re-learn/save).
                 removeSpell(spellId, SPEC_MASK_ALL, false);
+
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_BY_SPELL);
+                stmt->SetData(0, GetGUID().GetRawValue());
+                stmt->SetData(1, spellId);
+                CharacterDatabase.Execute(stmt);
+            }
         } while (result->NextRow());
     }
 }

@@ -2117,7 +2117,7 @@ void Creature::Respawn(bool force)
 
                 uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
                 if (poolid)
-                    sPoolMgr->UpdatePool<Creature>(poolid, m_spawnId);
+                    sPoolMgr->UpdatePool<Creature>(GetMap()->GetPoolData(), poolid, m_spawnId);
 
                 //Re-initialize reactstate that could be altered by movementgenerators
                 InitializeReactState();
