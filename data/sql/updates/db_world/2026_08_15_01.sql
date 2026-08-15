@@ -1,3 +1,4 @@
+-- DB update 2026_08_15_00 -> 2026_08_15_01
 -- Lines were misplaced
 DELETE FROM `creature_text` WHERE (`CreatureID` = 28006);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
