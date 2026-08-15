@@ -1,3 +1,4 @@
+-- DB update 2026_08_15_11 -> 2026_08_15_12
 --
 UPDATE `acore_string` SET
 `content_default` = 'In order to complete setup, you\'ll need to set up the device you\'ll be using as your second factor.\nYour 2FA key: {}\nAdd the key to an authenticator app, such as the free and open source FreeOTP (https://freeotp.github.io/), with these settings:\n- Type: Time-based (TOTP)\n- Digits: 6\n- Algorithm: SHA1\n- Interval: 30 seconds\nOnce you have set up your device, confirm by running .account 2fa setup <token> with the generated token.',
