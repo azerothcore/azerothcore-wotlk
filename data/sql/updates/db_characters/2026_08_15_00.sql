@@ -1,3 +1,4 @@
+-- DB update 2026_07_22_00 -> 2026_08_15_00
 --
 -- Pet numbers are recycled across restarts, so rows left behind by a deleted pet get picked up by
 -- whichever pet is later assigned the same number.
