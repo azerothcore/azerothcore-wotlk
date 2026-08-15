@@ -103,7 +103,7 @@ func TestLoot_NeedVsGreedWinnerBag(t *testing.T) {
 	leader.AssertWorldAlive(t)
 }
 
-// TODO(e2e): re-enable when AC#26894 is fixed and GO 194821 UseGameObject path is available.
+// OPEN(e2e): re-enable when AC#26894 is fixed and GO 194821 UseGameObject path is available.
 // Prefer real Gift of the Observer mid-roll leave (not corpse proxy). Soft-pass is forbidden.
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26894
 /*
@@ -236,9 +236,9 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	guid, _ := bot.SpawnPersistent(t, entry, 15*time.Second)
 	bot.WaitUnitHPKnown(t, guid, 10*time.Second)
 	bot.DamageToFraction(t, guid, 0.49, 20*time.Second)
-	hp, max := bot.UnitHP(guid)
-	if hp == 0 || max == 0 || float64(hp)/float64(max) > 0.5 {
-		e2eharness.Preconditionf(t, "#26862: want 0 < hp/max <= 0.5 before kill, got %d/%d", hp, max)
+	hp, maxHP := bot.UnitHP(guid)
+	if hp == 0 || maxHP == 0 || float64(hp)/float64(maxHP) > 0.5 {
+		e2eharness.Preconditionf(t, "#26862: want 0 < hp/max <= 0.5 before kill, got %d/%d", hp, maxHP)
 	}
 
 	bot.DamageKill(t, []uint64{guid}, 50_000_000, 25*time.Second)
@@ -248,7 +248,7 @@ func TestAC_26862_KillCreditLootSpawnBelowHalfHP(t *testing.T) {
 	_ = bot.World.SetTarget(guid)
 	items, ok := bot.TryOpenLoot(t, guid, 10*time.Second)
 	if !ok {
-		e2eharness.Assertf(t, "below-half-HP kill: corpse not lootable (hp was %d/%d)", hp, max)
+		e2eharness.Assertf(t, "below-half-HP kill: corpse not lootable (hp was %d/%d)", hp, maxHP)
 	}
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS below-half-HP kill loot path items=%d", len(items))

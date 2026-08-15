@@ -12,7 +12,7 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// TODO(e2e): re-enable when AC#26266 is fixed — Charge near Kologarn must not drop below bridge Z.
+// OPEN(e2e): re-enable when AC#26266 is fixed — Charge near Kologarn must not drop below bridge Z.
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26266
 // Placement: charge pad ~15y west of Kologarn spawn (1797.15,-24.4,448.7) at (1782.15,-24.4,448.7).
 /*

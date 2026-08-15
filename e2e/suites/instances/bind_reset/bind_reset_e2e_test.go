@@ -171,7 +171,7 @@ func TestBind_RitualSummonAccept(t *testing.T) {
 	t.Logf("PASS ritual summon accept into instance summoner=0x%X farMap=%d", req.SummonerGUID, farMap)
 }
 
-// TODO(e2e): re-enable when AC#10708 is fixed — post-reset AcceptSummon must co-locate maps.
+// OPEN(e2e): re-enable when AC#10708 is fixed — post-reset AcceptSummon must co-locate maps.
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/10708
 /*
 func TestBind_ResetSummonExploit_10708(t *testing.T) {

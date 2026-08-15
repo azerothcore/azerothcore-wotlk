@@ -70,7 +70,7 @@ func TestPets_PlayerPetGUIDAfterSummon(t *testing.T) {
 	t.Logf("PASS pet=0x%X field_summon=0x%X", pet, bot.PlayerPetGUID())
 }
 
-// TODO(e2e): re-enable when AC#27081 is fixed
+// OPEN(e2e): re-enable when AC#27081 is fixed
 // https://github.com/azerothcore/azerothcore-wotlk/issues/27081
 // Must CastMust + PlayerPetGUID!=0; success=%v log is a soft-pass.
 /*

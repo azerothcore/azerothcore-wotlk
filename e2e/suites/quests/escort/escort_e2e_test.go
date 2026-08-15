@@ -13,7 +13,7 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// TODO(e2e): replace this package with a real escort quest fixture (start → follow →
+// OPEN(e2e): replace this package with a real escort quest fixture (start → follow →
 // complete/fail oracle). Until then only keep spawn/cache helpers that have hard asserts.
 
 // ESCORT-01: spawn NPC and wait unit (precondition for future escort start).

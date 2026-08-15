@@ -65,7 +65,7 @@ func TestSession_MoneyMutateSaveRelog(t *testing.T) {
 	t.Logf("PASS money %d survived save+relog", wantCopper)
 }
 
-// TODO(e2e): re-enable when AC#25793 is fixed — GM .gm visible off must persist extra_flags across relog.
+// OPEN(e2e): re-enable when AC#25793 is fixed — GM .gm visible off must persist extra_flags across relog.
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/25793
 /*
 func TestSession_GMVisibilitySurvivesRelog(t *testing.T) {

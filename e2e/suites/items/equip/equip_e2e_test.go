@@ -96,16 +96,16 @@ func TestEquip_ItemSurvivesRelogPath(t *testing.T) {
 }
 
 // waitInventoryAtLeast polls CharDB (InventoryCount Saves) until count >= min.
-func waitInventoryAtLeast(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, min int) {
+func waitInventoryAtLeast(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, least int) {
 	t.Helper()
 	deadline := time.Now().Add(5 * time.Second)
 	var got int
 	for time.Now().Before(deadline) {
 		got = bot.InventoryCount(t, entry)
-		if got >= min {
+		if got >= least {
 			return
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
-	e2eharness.Preconditionf(t, "inventory entry=%d count=%d want>=%d", entry, got, min)
+	e2eharness.Preconditionf(t, "inventory entry=%d count=%d want>=%d", entry, got, least)
 }

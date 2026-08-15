@@ -12,7 +12,7 @@ import (
 	"github.com/walkline/AzerothGhost/e2e/e2eharness"
 )
 
-// TODO(e2e): re-enable when AC#26774 is fixed
+// OPEN(e2e): re-enable when AC#26774 is fixed
 // https://github.com/azerothcore/azerothcore-wotlk/issues/26774
 // Must assert client item-use / dummy rank (not CastOrGM + any 2673).
 /*
@@ -174,9 +174,9 @@ func TestAC_26997_SweepingStrikesExecuteNoCrash(t *testing.T) {
 		name string
 		g    uint64
 	}{{"c1", c1}, {"c2", c2}} {
-		hp, max := arms.UnitHP(v.g)
-		if max == 0 || hp == 0 || float64(hp)/float64(max) > 0.2 {
-			e2eharness.Preconditionf(t, "%s not in execute range (hp=%d/%d guid=0x%X)", v.name, hp, max, v.g)
+		hp, maxHP := arms.UnitHP(v.g)
+		if maxHP == 0 || hp == 0 || float64(hp)/float64(maxHP) > 0.2 {
+			e2eharness.Preconditionf(t, "%s not in execute range (hp=%d/%d guid=0x%X)", v.name, hp, maxHP, v.g)
 		}
 	}
 

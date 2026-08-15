@@ -99,11 +99,11 @@ func waitInv(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, ok func(in
 	return n
 }
 
-func waitInvAtLeast(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, min int, timeout time.Duration) int {
+func waitInvAtLeast(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, least int, timeout time.Duration) int {
 	t.Helper()
-	n := waitInv(t, bot, entry, func(got int) bool { return got >= min }, timeout)
-	if n < min {
-		e2eharness.Preconditionf(t, "inventory entry=%d count=%d want>=%d", entry, n, min)
+	n := waitInv(t, bot, entry, func(got int) bool { return got >= least }, timeout)
+	if n < least {
+		e2eharness.Preconditionf(t, "inventory entry=%d count=%d want>=%d", entry, n, least)
 	}
 	return n
 }
