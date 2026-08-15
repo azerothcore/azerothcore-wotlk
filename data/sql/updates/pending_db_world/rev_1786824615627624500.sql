@@ -6,7 +6,7 @@
 
 -- Gift of the Observer 25-man (3 pools: 5+6+5)
 UPDATE `gameobject_loot_template` SET `MinCount`=1, `MaxCount`=1
-  WHERE `Entry`=26974 AND `Item`=1 AND `Reference`=12023;
+    WHERE `Entry`=26974 AND `Item`=1 AND `Reference`=12023;
 
 -- Pool A (5 items)
 UPDATE `reference_loot_template` SET `GroupId`=1 WHERE `Entry`=12023 AND `Item`=45570; -- Skyforge Crossbow
