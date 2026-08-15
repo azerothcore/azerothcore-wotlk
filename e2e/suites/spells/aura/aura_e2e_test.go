@@ -3,7 +3,6 @@
 package aura_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -88,40 +87,60 @@ func TestAura_MidAuraRelogWorldAlive(t *testing.T) {
 	t.Logf("PASS mid-aura relog world alive has_aura=%v", bot.HasAura(e2eharness.SpellBlendingInAura))
 }
 
-// AURA-03: breakable CC (Fear) is removed by damage on the victim.
-// WotLK: Fear breaks on damage. Apply on a dummy (not self — self-.aura + .damage is
-// not a reliable model of breakable CC rules).
+// AURA-03: Fear is stripped by real spell damage while the victim lives.
+// CastMust (not GM .damage). Player victim (dummies die, absorb, or flee).
+// Orc: no Every Man for Himself. Entangling Roots after Fear: stay in front.
+// PvP Fear 6215 lasts 10s; gone before 8s with an HP drop is the proc.
 func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "spells", "combat"}, Runtime: "med", Category: "spells/aura"})
-
-	const spellFear = uint32(6215) // Fear rank 3 — breakable by damage
-
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix:        "AuraCC",
-		Class:         e2eharness.ClassWarlock,
-		Level:         80,
-		LearnAllClass: true,
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "spells", "combat", "multi_bot"},
+		Runtime:  "med",
+		Category: "spells/aura",
 	})
-	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	dummy := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	_ = bot.World.SetTarget(dummy)
-	// Apply Fear to the dummy via GM cast (deterministic victim CC).
-	bot.GM(t, fmt.Sprintf(".cast %d", spellFear))
-	deadline := time.Now().Add(5 * time.Second)
-	feared := false
-	for time.Now().Before(deadline) {
-		if bot.UnitHasAura(dummy, spellFear) {
-			feared = true
-			break
-		}
-		time.Sleep(40 * time.Millisecond)
+
+	const (
+		spellFear            = uint32(6215)
+		spellShadowBoltMax   = uint32(47809)
+		spellEntanglingRoots = uint32(53308) // long root; Frost Nova 122 expires mid-bolts
+		itemArchus           = uint32(50731) // best-effort +SP; not required
+		maxBolts             = 4
+		postBoltWindow       = time.Second
+		fearBreakDeadline    = 8 * time.Second
+	)
+
+	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
+		Prefix: "AuraCC",
+		Bots: []e2eharness.BotSpec{
+			{Role: "lock", Race: e2eharness.RaceHuman, Class: e2eharness.ClassWarlock, Level: 80},
+			{Role: "victim", Race: e2eharness.RaceOrc, Class: e2eharness.ClassWarrior, Level: 80},
+		},
+	})
+	lock := e2eharness.ByRole(t, bots, "lock")
+	victim := e2eharness.ByRole(t, bots, "victim")
+
+	pad := e2eharness.PackagePad(t)
+	lock.TeleportPad(t, pad)
+	victim.TeleportPad(t, pad)
+	lock.CombatReady(t)
+	lock.CheatPower(t)
+	lock.EquipEntry(t, itemArchus, 1)
+	victim.GM(t, ".gm off")
+	victim.GM(t, ".cheat god off")
+	e2eharness.EnableHostilePvP(t, lock, victim)
+	lock.WaitUnitGUID(t, victim.GUID, 10*time.Second)
+
+	lock.Learn(t, spellFear)
+	lock.Learn(t, spellShadowBoltMax)
+	if err := lock.World.SetTarget(victim.GUID); err != nil {
+		e2eharness.Preconditionf(t, "SetTarget victim: %v", err)
 	}
-	if !feared {
-		// Fallback: .aura on selected unit if cast path does not stick.
-		bot.GM(t, fmt.Sprintf(".aura %d", spellFear))
-		deadline = time.Now().Add(3 * time.Second)
+	feared := false
+	for attempt := 0; attempt < 3 && !feared; attempt++ {
+		lock.Face(t, victim.GUID)
+		lock.CastMust(t, spellFear, victim.GUID, 10*time.Second)
+		deadline := time.Now().Add(2 * time.Second)
 		for time.Now().Before(deadline) {
-			if bot.UnitHasAura(dummy, spellFear) {
+			if victim.HasAura(spellFear) {
 				feared = true
 				break
 			}
@@ -129,22 +148,63 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 		}
 	}
 	if !feared {
-		e2eharness.Preconditionf(t, "could not apply Fear %d on dummy 0x%X", spellFear, dummy)
+		e2eharness.Preconditionf(t, "Fear %d not on victim after CastMust (resist/miss)", spellFear)
 	}
-	// Damage the feared dummy — CC must break.
-	bot.GM(t, ".damage 5000")
-	deadline = time.Now().Add(5 * time.Second)
-	for time.Now().Before(deadline) {
-		if !bot.UnitHasAura(dummy, spellFear) {
+	victim.ApplyAura(t, spellEntanglingRoots)
+	if !victim.HasAura(spellFear) {
+		e2eharness.Preconditionf(t, "Fear %d lost when applying Entangling Roots", spellFear)
+	}
+	if !victim.HasAura(spellEntanglingRoots) {
+		e2eharness.Preconditionf(t, "Entangling Roots %d missing (needed to hold facing)", spellEntanglingRoots)
+	}
+	fearedAt := time.Now()
+
+	hpBefore, maxHP := victim.World.Health(), victim.World.MaxHealth()
+	if maxHP == 0 || hpBefore == 0 {
+		e2eharness.Preconditionf(t, "victim hp unknown (%d/%d)", hpBefore, maxHP)
+	}
+
+	bolts := 0
+	var brokenAt time.Time
+	for bolts = 1; bolts <= maxBolts; bolts++ {
+		if !victim.HasAura(spellFear) {
+			brokenAt = time.Now()
 			break
 		}
-		time.Sleep(40 * time.Millisecond)
+		if err := lock.World.SetTarget(victim.GUID); err != nil {
+			e2eharness.Preconditionf(t, "SetTarget before Shadow Bolt: %v", err)
+		}
+		lock.Face(t, victim.GUID)
+		lock.CastMust(t, spellShadowBoltMax, victim.GUID, 10*time.Second)
+		if victim.TryWaitAuraGone(t, spellFear, postBoltWindow) {
+			brokenAt = time.Now()
+			break
+		}
 	}
-	if bot.UnitHasAura(dummy, spellFear) {
-		e2eharness.Assertf(t, "Fear aura %d still on dummy after damage", spellFear)
+	hpAfter := victim.World.Health()
+	if brokenAt.IsZero() {
+		brokenAt = time.Now()
 	}
-	bot.AssertWorldAlive(t)
-	t.Logf("PASS Fear broken by damage on dummy")
+	elapsed := brokenAt.Sub(fearedAt)
+	if hpAfter == 0 {
+		e2eharness.Assertf(t, "victim died (hp %d→0 / %d) after %d Shadow Bolts — death is not a CC-break proof",
+			hpBefore, maxHP, bolts)
+	}
+	if hpAfter >= hpBefore {
+		e2eharness.Assertf(t, "victim HP did not drop (%d→%d / %d) after %d Shadow Bolts — need real damage",
+			hpBefore, hpAfter, maxHP, bolts)
+	}
+	if elapsed >= fearBreakDeadline {
+		e2eharness.Assertf(t, "Fear dropped after %s (PvP duration 10s) — not a damage proof (hp %d→%d)",
+			elapsed.Round(time.Millisecond), hpBefore, hpAfter)
+	}
+	if victim.HasAura(spellFear) {
+		e2eharness.Assertf(t, "Fear %d still on victim after %d Shadow Bolts in %s (hp %d→%d / %d)",
+			spellFear, bolts, elapsed.Round(time.Millisecond), hpBefore, hpAfter, maxHP)
+	}
+	lock.AssertWorldAlive(t)
+	t.Logf("PASS Fear broken by Shadow Bolt n=%d in %s victim hp %d→%d / %d",
+		bolts, elapsed.Round(time.Millisecond), hpBefore, hpAfter, maxHP)
 }
 
 // AURA-01: exclusive / replace — apply stronger after weaker (soft observational).
