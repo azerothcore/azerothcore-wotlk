@@ -90,7 +90,12 @@ func TestAura_MidAuraRelogWorldAlive(t *testing.T) {
 // AURA-03: Fear is stripped by real spell damage while the victim lives.
 // CastMust (not GM .damage). Player victim (dummies die, absorb, or flee).
 // Orc: no Every Man for Himself. Entangling Roots after Fear: stay in front.
-// PvP Fear 6215 lasts 10s; gone before 8s with an HP drop is the proc.
+//
+// L80 break threshold is warrior BaseHealth/4.75 ≈ 2648 (HandleBreakableCCAuraProc).
+// Shadow Bolt 47809 is a 3s cast; naked hits are often ~500, so 3 bolts cannot
+// reach 2648 before the 10s PvP Fear cap. Ice Lance 42914 is instant. `.cheat
+// cooldown` skips the 1.5s GCD so several real CMSG_CAST_SPELL hits can land
+// in time. Gone before 8s with an HP drop is the proc, not duration expiry.
 func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells", "combat", "multi_bot"},
@@ -100,11 +105,11 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 
 	const (
 		spellFear            = uint32(6215)
-		spellShadowBoltMax   = uint32(47809)
-		spellEntanglingRoots = uint32(53308) // long root; Frost Nova 122 expires mid-bolts
+		spellIceLance        = uint32(42914) // rank 3, instant, no recovery
+		spellEntanglingRoots = uint32(53308) // long root; holds facing
 		itemArchus           = uint32(50731) // best-effort +SP; not required
-		maxBolts             = 4
-		postBoltWindow       = time.Second
+		maxLances            = 8
+		postHitWindow        = 400 * time.Millisecond
 		fearBreakDeadline    = 8 * time.Second
 	)
 
@@ -123,6 +128,9 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	victim.TeleportPad(t, pad)
 	lock.CombatReady(t)
 	lock.CheatPower(t)
+	// GCD is 1.5s; without this, 6 instants race the 10s Fear cap.
+	lock.GM(t, ".cheat cooldown on")
+	lock.FlushWorld(t)
 	lock.EquipEntry(t, itemArchus, 1)
 	victim.GM(t, ".gm off")
 	victim.GM(t, ".cheat god off")
@@ -130,7 +138,7 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	lock.WaitUnitGUID(t, victim.GUID, 10*time.Second)
 
 	lock.Learn(t, spellFear)
-	lock.Learn(t, spellShadowBoltMax)
+	lock.Learn(t, spellIceLance)
 	var last e2eharness.SpellCastResult
 	feared := false
 	for attempt := 0; attempt < 5 && !feared; attempt++ {
@@ -172,19 +180,21 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 		e2eharness.Preconditionf(t, "victim hp unknown (%d/%d)", hpBefore, maxHP)
 	}
 
-	bolts := 0
+	hits := 0
 	var brokenAt time.Time
-	for bolts = 1; bolts <= maxBolts; bolts++ {
+	for hits = 1; hits <= maxLances; hits++ {
 		if !victim.HasAura(spellFear) {
 			brokenAt = time.Now()
 			break
 		}
 		if err := lock.World.SetTarget(victim.GUID); err != nil {
-			e2eharness.Preconditionf(t, "SetTarget before Shadow Bolt: %v", err)
+			e2eharness.Preconditionf(t, "SetTarget before Ice Lance: %v", err)
 		}
 		lock.Face(t, victim.GUID)
-		lock.CastMust(t, spellShadowBoltMax, victim.GUID, 10*time.Second)
-		if victim.TryWaitAuraGone(t, spellFear, postBoltWindow) {
+		lock.CastMust(t, spellIceLance, victim.GUID, 10*time.Second)
+		hpNow := victim.World.Health()
+		t.Logf("lance %d hp %d→%d fear=%v", hits, hpBefore, hpNow, victim.HasAura(spellFear))
+		if victim.TryWaitAuraGone(t, spellFear, postHitWindow) {
 			brokenAt = time.Now()
 			break
 		}
@@ -195,24 +205,24 @@ func TestAura_BreakableCCRemovedByDamage(t *testing.T) {
 	}
 	elapsed := brokenAt.Sub(fearedAt)
 	if hpAfter == 0 {
-		e2eharness.Assertf(t, "victim died (hp %d→0 / %d) after %d Shadow Bolts — death is not a CC-break proof",
-			hpBefore, maxHP, bolts)
+		e2eharness.Assertf(t, "victim died (hp %d→0 / %d) after %d Ice Lance — death is not a CC-break proof",
+			hpBefore, maxHP, hits)
 	}
 	if hpAfter >= hpBefore {
-		e2eharness.Assertf(t, "victim HP did not drop (%d→%d / %d) after %d Shadow Bolts — need real damage",
-			hpBefore, hpAfter, maxHP, bolts)
+		e2eharness.Assertf(t, "victim HP did not drop (%d→%d / %d) after %d Ice Lance — need real damage",
+			hpBefore, hpAfter, maxHP, hits)
 	}
 	if elapsed >= fearBreakDeadline {
 		e2eharness.Assertf(t, "Fear dropped after %s (PvP duration 10s) — not a damage proof (hp %d→%d)",
 			elapsed.Round(time.Millisecond), hpBefore, hpAfter)
 	}
 	if victim.HasAura(spellFear) {
-		e2eharness.Assertf(t, "Fear %d still on victim after %d Shadow Bolts in %s (hp %d→%d / %d)",
-			spellFear, bolts, elapsed.Round(time.Millisecond), hpBefore, hpAfter, maxHP)
+		e2eharness.Assertf(t, "Fear %d still on victim after %d Ice Lance in %s (hp %d→%d / %d)",
+			spellFear, hits, elapsed.Round(time.Millisecond), hpBefore, hpAfter, maxHP)
 	}
 	lock.AssertWorldAlive(t)
-	t.Logf("PASS Fear broken by Shadow Bolt n=%d in %s victim hp %d→%d / %d",
-		bolts, elapsed.Round(time.Millisecond), hpBefore, hpAfter, maxHP)
+	t.Logf("PASS Fear broken by Ice Lance n=%d in %s victim hp %d→%d / %d",
+		hits, elapsed.Round(time.Millisecond), hpBefore, hpAfter, maxHP)
 }
 
 // AURA-01: exclusive / replace — apply stronger after weaker (soft observational).
