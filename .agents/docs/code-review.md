@@ -6,6 +6,8 @@ line, not as background reading.
 
 - A posted review carries findings only: no summary, no praise. Nothing to report means one line
   saying so.
+- Label `To Be Merged` only on a merge-ready PR, approved or not; remove `Ready to be Reviewed` in
+  the same step.
 - A finding names what is wrong, why it matters and the fix, on the offending line. Findings are
   bugs, crashes, lifetime and memory errors, data-integrity problems, injection, and violations of
   a rule written down in AGENTS.md or `.agents/docs/`; taste no rule covers is not a finding.
@@ -18,6 +20,10 @@ line, not as background reading.
 - Never take a claim as fact, neither the PR description's nor a comment's. Verify game-data
   claims (spell/creature/quest ids, mechanics) against the world DB, DBC data, or cited sources;
   verify "fixed in the latest push" against the current diff.
+- When a change touches control flow (early returns, new branches, removed guards), trace the
+  states it can leave behind (null, empty, fall-through) into every consumer of them — including
+  unchanged lines the new flow now reaches — and verify what runs when an acquire/attack/GetX
+  call leaves a null result, not just what enables it.
 - Check the change is still needed against current `master`: the surrounding code may have moved,
   or another change may have landed the same fix.
 - On an existing PR, walk every discussion item one by one: what was raised, whether it was

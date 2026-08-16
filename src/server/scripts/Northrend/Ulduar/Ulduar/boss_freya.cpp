@@ -213,6 +213,8 @@ enum Misc
     ACTION_REMOVE_2_STACK                       = 2,
     ACTION_TRIO_MEMBER_DOWN                     = 1,
     ACTION_ATTUNED_TO_NATURE_REMOVED            = 3,
+    ACTION_TRIO_MEMBER_DOWN_CURRENT             = 5,
+    ACTION_TRIO_MEMBER_REVIVED_CURRENT          = 6,
     ACTION_LUMBERJACKED                         = -1,
     ACTION_ADD_DIED                             = -2,
     ACTION_TRIO_MEMBER_REVIVED                  = -3,
@@ -223,6 +225,7 @@ enum Misc
     DATA_GET_ELDER_COUNT                        = 1,
     DATA_BACK_TO_NATURE                         = 2,
     DATA_TRIO_DOWN                              = 3,
+    DATA_CURRENT_SET_ID                         = 7,
 
     CRITERIA_LUMBERJACKED                       = 21686,
 
@@ -253,6 +256,9 @@ struct boss_freya : public BossAI
     bool _backToNature;
     uint8 _deforestation;
     uint8 _aliveAddsCount;
+    uint8 _currentSetId;
+    uint8 _currentTrioDown;
+    uint8 _trioWaveEndSetId;
 
     ObjectGuid _elderGUID[3];
 
@@ -279,6 +285,9 @@ struct boss_freya : public BossAI
         _backToNature = true;
         _deforestation = 0;
         _aliveAddsCount = 0;
+        _currentSetId = 0;
+        _currentTrioDown = 0;
+        _trioWaveEndSetId = 0;
     }
 
     void KilledUnit(Unit* victim) override
@@ -356,6 +365,8 @@ struct boss_freya : public BossAI
 
     void SpawnWave()
     {
+        ++_currentSetId;
+        _currentTrioDown = 0;
         Talk(EMOTE_ALLIES_OF_NATURE);
 
         static constexpr uint8 permTable[6][3] = {
@@ -372,19 +383,20 @@ struct boss_freya : public BossAI
             case GROUP_TRIO:
                 Talk(SAY_SUMMON_TRIO);
                 DoCast(SPELL_SUMMON_WAVE_3);
+                _aliveAddsCount = 0;
                 _trioDown = 0;
                 break;
             case GROUP_CONSERVATOR:
                 Talk(SAY_SUMMON_CONSERVATOR);
                 DoCast(SPELL_SUMMON_WAVE_1);
-                _aliveAddsCount += 1;
+                _aliveAddsCount = 1;
                 break;
             case GROUP_LASHERS:
                 Talk(SAY_SUMMON_LASHERS);
                 for (uint8 i = 0; i < 10; ++i)
                     DoCast(SPELL_SUMMON_WAVE_10);
 
-                _aliveAddsCount += 10;
+                _aliveAddsCount = 10;
                 break;
         }
     }
@@ -411,17 +423,29 @@ struct boss_freya : public BossAI
 
         if (param == ACTION_TRIO_MEMBER_DOWN)
         {
-            // Once the whole trio is down none of them can come back, so the wave
-            // is decided here and only waits out the last member's revive window
+            // A full wipe must reset Deforestation even if the set is stale;
+            // only the wave acceleration is gated to the current set below.
             if (++_trioDown >= 3)
                 events.RescheduleEvent(EVENT_FREYA_TRIO_WAVE_END, 11s);
+            return;
+        }
 
+        if (param == ACTION_TRIO_MEMBER_DOWN_CURRENT)
+        {
+            if (++_currentTrioDown >= 3)
+                _trioWaveEndSetId = _currentSetId;
             return;
         }
 
         if (param == ACTION_TRIO_MEMBER_REVIVED)
         {
             --_trioDown;
+            return;
+        }
+
+        if (param == ACTION_TRIO_MEMBER_REVIVED_CURRENT)
+        {
+            --_currentTrioDown;
             return;
         }
 
@@ -463,6 +487,9 @@ struct boss_freya : public BossAI
 
         if (param == DATA_TRIO_DOWN)
             return _trioDown;
+
+        if (param == DATA_CURRENT_SET_ID)
+            return _currentSetId;
 
         return 0;
     }
@@ -609,6 +636,10 @@ struct boss_freya : public BossAI
                 // _trioDown stays set so a member resolving on this same tick
                 // still sees the trio as wiped and does not come back
                 _deforestation = 0;
+                // The 1-min fallback may have moved the set on during the 11s revive
+                // window; only the current set's trio wipe may accelerate the next wave
+                if (_trioWaveEndSetId != _currentSetId)
+                    break;
                 events.RescheduleEvent(EVENT_FREYA_ADDS_SPAM, 5s, 0, EVENT_PHASE_ADDS);
                 break;
             case EVENT_FREYA_NATURE_BOMB:
@@ -1040,11 +1071,22 @@ struct boss_freya_summons : public ScriptedAI
     {
         _isTrio = me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT || me->GetEntry() == NPC_STORM_LASHER || me->GetEntry() == NPC_SNAPLASHER;
         _hasDied = false;
+        _setId = 0;
     }
 
     EventMap events;
     bool _hasDied;
     bool _isTrio;
+    uint8 _setId;
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (Creature* freya = summoner->ToCreature())
+        {
+            if (freya->GetEntry() == NPC_FREYA)
+                _setId = freya->AI()->GetData(DATA_CURRENT_SET_ID);
+        }
+    }
 
     void Reset() override
     {
@@ -1082,6 +1124,8 @@ struct boss_freya_summons : public ScriptedAI
         {
             if (Creature* freya = instance->GetCreature(BOSS_FREYA))
             {
+                bool const isCurrentSet = _setId == freya->AI()->GetData(DATA_CURRENT_SET_ID);
+
                 if (!_hasDied)
                 {
                     uint32 doseSpell = 0;
@@ -1111,6 +1155,8 @@ struct boss_freya_summons : public ScriptedAI
                 if (_isTrio)
                 {
                     freya->AI()->DoAction(ACTION_TRIO_MEMBER_DOWN);
+                    if (isCurrentSet)
+                        freya->AI()->DoAction(ACTION_TRIO_MEMBER_DOWN_CURRENT);
                     _hasDied = true;
                     Talk(EMOTE_TRIO_WITHERS);
 
@@ -1121,7 +1167,7 @@ struct boss_freya_summons : public ScriptedAI
                         ReviveWithAllies();
                     }, 11s);
                 }
-                else
+                else if (isCurrentSet)
                     freya->AI()->DoAction(ACTION_ADD_DIED);
             }
         }
@@ -1147,6 +1193,8 @@ struct boss_freya_summons : public ScriptedAI
         me->setDeathState(DeathState::JustRespawned);
         Reset();
         freya->AI()->DoAction(ACTION_TRIO_MEMBER_REVIVED);
+        if (_setId == freya->AI()->GetData(DATA_CURRENT_SET_ID))
+            freya->AI()->DoAction(ACTION_TRIO_MEMBER_REVIVED_CURRENT);
     }
 
     void JustEngagedWith(Unit*) override
@@ -1212,7 +1260,14 @@ struct boss_freya_summons : public ScriptedAI
                 if (Unit* target = SelectTargetFromPlayerList(80))
                     AttackStart(target);
                 else
+                {
+                    // Despawning still counts the add as cleared so the set's wave can accelerate
+                    if (InstanceScript* instance = me->GetInstanceScript())
+                        if (Creature* freya = instance->GetCreature(BOSS_FREYA))
+                            if (_setId == freya->AI()->GetData(DATA_CURRENT_SET_ID))
+                                freya->AI()->DoAction(ACTION_ADD_DIED);
                     me->DespawnOrUnsummon(1ms);
+                }
                 events.Repeat(10s);
                 break;
         }

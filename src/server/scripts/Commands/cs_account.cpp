@@ -107,11 +107,9 @@ public:
 
     static bool HandleAccount2FASetupCommand(ChatHandler* handler, char const* args)
     {
+        // no error message here: the framework then prints the command help, which explains how to get the key
         if (!*args)
-        {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
             return false;
-        }
 
         auto token = Acore::StringTo<uint32>(args);
 
@@ -177,11 +175,9 @@ public:
 
     static bool HandleAccount2FARemoveCommand(ChatHandler* handler, char const* args)
     {
+        // no error message here: the framework then prints the command help, which names the token argument
         if (!*args)
-        {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
             return false;
-        }
 
         auto token = Acore::StringTo<uint32>(args);
 

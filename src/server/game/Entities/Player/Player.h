@@ -1466,6 +1466,7 @@ public:
     void RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true, bool isLFGReward = false);
     void SetRewardedQuest(uint32 quest_id);
     void FailQuest(uint32 quest_id);
+    void FailQuestsOnDeath();
     bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestLevel(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestLog(bool msg);
