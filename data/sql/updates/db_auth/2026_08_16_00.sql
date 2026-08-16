@@ -1,3 +1,4 @@
+-- DB update 2026_07_22_00 -> 2026_08_16_00
 DELETE FROM `rbac_permissions` WHERE `id` = 945;
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
 (945, 'Command: account info');

@@ -1,3 +1,4 @@
+-- DB update 2026_08_15_13 -> 2026_08_16_00
 DELETE FROM `command` WHERE `name` = 'account info';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('account info', 2, 'Syntax: .account info [$account]\nDisplays account level information for $account, given either as an account name or an account id. Defaults to the account of the selected player, or your own account when nothing is selected.');
