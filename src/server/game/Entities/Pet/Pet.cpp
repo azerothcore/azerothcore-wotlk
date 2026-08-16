@@ -1126,28 +1126,35 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     }
     else                                            // not exist in DB, use some default fake data
     {
-        // remove elite bonuses included in DB values
-        CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(petlevel, cinfo->unit_class);
-        // xinef: multiply base values by creature_template factors!
-        float factorHealth = owner->IsPlayer() ? std::min(1.0f, cinfo->ModHealth) : cinfo->ModHealth;
-        float factorMana = owner->IsPlayer() ? std::min(1.0f, cinfo->ModMana) : cinfo->ModMana;
-
-        if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+        if (petType != HUNTER_PET && petType != SUMMON_PET)
         {
-            factorHealth *= _GetHealthMod(cinfo->rank);
+            SelectLevel(petlevel);
         }
+        else
+        {
+            // remove elite bonuses included in DB values
+            CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(petlevel, cinfo->unit_class);
+            // xinef: multiply base values by creature_template factors!
+            float factorHealth = owner->IsPlayer() ? std::min(1.0f, cinfo->ModHealth) : cinfo->ModHealth;
+            float factorMana = owner->IsPlayer() ? std::min(1.0f, cinfo->ModMana) : cinfo->ModMana;
 
-        SetCreateHealth(std::max<uint32>(1, stats->BaseHealth[cinfo->expansion]*factorHealth));
-        SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, GetCreateHealth());
-        SetCreateMana(stats->BaseMana * factorMana);
-        SetStatFlatModifier(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
+            if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+            {
+                factorHealth *= _GetHealthMod(cinfo->rank);
+            }
 
-        // xinef: added some multipliers so debuffs can affect pets in any way...
-        SetCreateStat(STAT_STRENGTH, 22);
-        SetCreateStat(STAT_AGILITY, 22);
-        SetCreateStat(STAT_STAMINA, 25);
-        SetCreateStat(STAT_INTELLECT, 28);
-        SetCreateStat(STAT_SPIRIT, 27);
+            SetCreateHealth(std::max<uint32>(1, stats->BaseHealth[cinfo->expansion] * factorHealth));
+            SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, GetCreateHealth());
+            SetCreateMana(stats->BaseMana * factorMana);
+            SetStatFlatModifier(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
+
+            // xinef: added some multipliers so debuffs can affect pets in any way...
+            SetCreateStat(STAT_STRENGTH, 22);
+            SetCreateStat(STAT_AGILITY, 22);
+            SetCreateStat(STAT_STAMINA, 25);
+            SetCreateStat(STAT_INTELLECT, 28);
+            SetCreateStat(STAT_SPIRIT, 27);
+        }
     }
 
     switch (petType)
