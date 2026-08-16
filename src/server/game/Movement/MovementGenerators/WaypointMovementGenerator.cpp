@@ -508,6 +508,10 @@ bool WaypointMovementGenerator<Creature>::GetResetPosition(float& x, float& y, f
     if (!i_path || i_path->Nodes.empty())
         return false;
 
+    // A finished non-repeating path no longer owns the creature's reset position.
+    if (_done)
+        return false;
+
     ASSERT(i_currentNode < i_path->Nodes.size(), "WaypointMovementGenerator::GetResetPos: tried to reference a node id ({}) which is not included in path ({})", i_currentNode, i_path->Id);
     WaypointNode const& waypoint = i_path->Nodes.at(i_currentNode);
 

@@ -1771,6 +1771,9 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
 
     SetHealth(m_deathState == DeathState::Alive ? curhealth : 0);
 
+    // SelectLevel() sized the player damage requirement against full health, before curhealth was known
+    ResetPlayerDamageReq();
+
     // checked at creature_template loading
     m_defaultMovementType = MovementGeneratorType(data->movementType);
 
@@ -2114,7 +2117,7 @@ void Creature::Respawn(bool force)
 
                 uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
                 if (poolid)
-                    sPoolMgr->UpdatePool<Creature>(poolid, m_spawnId);
+                    sPoolMgr->UpdatePool<Creature>(GetMap()->GetPoolData(), poolid, m_spawnId);
 
                 //Re-initialize reactstate that could be altered by movementgenerators
                 InitializeReactState();

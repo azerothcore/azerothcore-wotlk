@@ -107,11 +107,9 @@ public:
 
     static bool HandleAccount2FASetupCommand(ChatHandler* handler, char const* args)
     {
+        // no error message here: the framework then prints the command help, which explains how to get the key
         if (!*args)
-        {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
             return false;
-        }
 
         auto token = Acore::StringTo<uint32>(args);
 
@@ -177,11 +175,9 @@ public:
 
     static bool HandleAccount2FARemoveCommand(ChatHandler* handler, char const* args)
     {
+        // no error message here: the framework then prints the command help, which names the token argument
         if (!*args)
-        {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
             return false;
-        }
 
         auto token = Acore::StringTo<uint32>(args);
 
@@ -826,14 +822,14 @@ public:
             }
         }
 
-        // Check if provided realm.Id.Realm has a negative value other than -1
+        // Check if provided gmRealmID has a negative value other than -1
         if (gmRealmID < -1)
         {
             handler->SendErrorMessage(LANG_INVALID_REALMID);
             return false;
         }
 
-        // If gmRealmID is -1, delete all values for the account id, else, insert values for the specific realm.Id.Realm
+        // If gmRealmID is -1, delete access on every realm, else on the requested one and any all-realms row
         LoginDatabasePreparedStatement* stmt;
 
         if (gmRealmID == -1)
@@ -845,7 +841,7 @@ public:
         {
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
             stmt->SetData(0, targetAccountId);
-            stmt->SetData(1, realm.Id.Realm);
+            stmt->SetData(1, gmRealmID);
         }
 
         LoginDatabase.Execute(stmt);
