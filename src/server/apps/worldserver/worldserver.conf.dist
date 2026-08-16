@@ -1653,6 +1653,13 @@ DisableWaterBreath = 4
 AllFlightPaths = 0
 
 #
+#    TaxiFlightSpeed
+#        Description: Movement speed used while players travel along taxi flight paths.
+#        Default:     32.0
+
+TaxiFlightSpeed = 32.0
+
+#
 #    InstantFlightPaths
 #        Description: Flight paths will take players to their destination instantly instead
 #                     of making them wait while flying.
