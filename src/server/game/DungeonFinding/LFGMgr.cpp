@@ -753,9 +753,9 @@ namespace lfg
             else
                 players.insert(player->GetGUID());
 
-            // Xinef: Check dungeon cooldown only for random dungeons
-            // Xinef: Moreover check this only if dungeon is not started, afterwards its obvious that players will have the cooldown
-            if (joinData.result == LFG_JOIN_OK && !isContinue && rDungeonId)
+            // Check the dungeon cooldown for every dungeon queue. Declining a proposal applies
+            // this aura regardless of whether the player selected a random or specific dungeon.
+            if (joinData.result == LFG_JOIN_OK && !isContinue)
             {
                 if (player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)) // xinef: added !isContinue
                     joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
