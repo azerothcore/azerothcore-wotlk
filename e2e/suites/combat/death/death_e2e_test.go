@@ -99,7 +99,7 @@ func TestDeath_DeathDoesNotCrashWorld(t *testing.T) {
 // Note: .die is Unit::Kill(self,self) → PvP corpse → server delay (often 30s) when
 // Death.CorpseReclaimDelay.PvP=1; we wait the packet, not a guessed sleep.
 func TestDeath_ReclaimCorpseAfterDeath(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat", "med", "serial"}, Runtime: "med", Category: "combat/death"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"combat", "med", "serial"}, Runtime: "med", Category: "combat/death"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "DieRec",

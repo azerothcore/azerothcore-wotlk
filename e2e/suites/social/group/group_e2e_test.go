@@ -65,12 +65,11 @@ func TestGroup_SetLeaderTransfer(t *testing.T) {
 	t.Logf("PASS set leader transfer")
 }
 
-// GRP-04 / #23459 style: rapid invite/decline loops must not crash world.
+// GRP-04: rapid invite/decline loops must not crash world.
 func TestGroup_RapidInviteDeclineNoCrash(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"med", "social", "multi_bot", "serial", "issue"},
+		Tags:     []string{"med", "social", "multi_bot", "serial"},
 		Runtime:  "med",
-		Issue:    23459,
 		Category: "social/group",
 	})
 
@@ -93,7 +92,7 @@ func TestGroup_RapidInviteDeclineNoCrash(t *testing.T) {
 		b.DeclineGroupFrom(t, a)
 		b.WaitNotInGroup(t, 5*time.Second)
 	}
-	e2eharness.ProbeWorldAlive(t, a, 23459)
+	e2eharness.ProbeWorldAlive(t, a, 0)
 	t.Logf("PASS rapid invite/decline no crash")
 }
 

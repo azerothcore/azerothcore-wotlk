@@ -10,8 +10,8 @@ Authoring rules for new tests live in the harness:
 
 | Doc | Audience |
 |-----|----------|
-| [LLM_GUIDE.md](https://github.com/azerothcore/AzerothGhost/blob/main/e2e/LLM_GUIDE.md) | Compact MUST/NEVER + APIs (LLMs and humans) |
-| [EXAMPLES.md](https://github.com/azerothcore/AzerothGhost/blob/main/e2e/EXAMPLES.md) | Full recipes and skeletons |
+| [LLM_GUIDE.md](https://github.com/azerothcore/AzerothGhost/blob/v1.0.8/e2e/LLM_GUIDE.md) | Compact MUST/NEVER + APIs (LLMs and humans) |
+| [EXAMPLES.md](https://github.com/azerothcore/AzerothGhost/blob/v1.0.8/e2e/EXAMPLES.md) | Full recipes and skeletons |
 | `.agents/docs/e2e-policy.md` | When to add e2e vs unit tests (agent/review policy) |
 
 ---
@@ -34,14 +34,14 @@ cp go.work.example go.work   # gitignored; edit the replace path
 # replace github.com/azerothcore/AzerothGhost => /path/to/AzerothGhost
 ```
 
-`e2e/go.mod` pins `github.com/azerothcore/AzerothGhost v1.0.7` (see `go.sum`).
+`e2e/go.mod` pins `github.com/azerothcore/AzerothGhost v1.0.8` (see `go.sum`).
 `go test` / `go mod download` fetch that module.
 
 ---
 
 ## Environment
 
-Copy and adjust [`e2e/.env.example`](./.env.example). This repo’s local stack often uses `trinity:trinity` credentials.
+Copy and adjust [`e2e/.env.example`](./.env.example). Stock AC and CI use `acore:acore`.
 
 | Variable | Default (harness) | Meaning |
 |----------|-------------------|---------|
@@ -130,32 +130,32 @@ make e2e-local
 go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 ```
 
-If the scenario should stay as a regression, **move** it into `suites/` (or `suites/issues/`) with proper `meta.Begin` tags — see `.agents/docs/e2e-policy.md`.
+If the scenario should stay as a regression, **move** it into `suites/` next to related tests with proper `meta.Begin` tags — see `.agents/docs/e2e-policy.md`.
 
 ### Inventory
 
 | Category | Oracle | Pri | Coverage | Issue |
 |----------|--------|-----|----------|-------|
 | smoke | login / pad tele / relog / world alive | P0 | covered (`TestSmoke_*`) | — |
-| combat/charm | apply/cancel aura; logout/hard-drop while aura | P1 | covered | — |
+| combat/charm | apply/cancel aura | P1 | covered; Yogg MC logout `blocked-harness` (no charm/MC drive) | #25506 |
 | combat/death | die → ghost → release → reclaim | P1 | covered | — |
-| combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked` | #27081 |
+| combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
-| combat/vehicles | spellclick steed enter/exit; multi-bot pad | P2 | covered | — |
+| combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
 | spells/aura | apply/query; CC broken by damage; mount persist | P1 | covered (`TestAC_26130_*`) | #26130 |
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
-| spells/effects | Charge / grounding totem / Sweeping Strikes Execute | P1 | covered (`TestAC_26997_*`); dummy-summon `blocked` | #26774 #26997 |
+| spells/effects | Charge / grounding totem / Sweeping Strikes Execute | P1 | covered (`TestAC_26997_*`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
-| social/loot | need/greed / pass / master loot; below-half kill | P1 | covered (`TestAC_26862_*`); chest mid-roll `blocked` | #26894 #26862 |
+| social/loot | need/greed / master loot; below-half kill | P1 | covered (`TestAC_26862_*`); chest mid-roll `blocked-harness` (GO 194821 UseGameObject); pass-on-loot delete `blocked-harness` (item-survive after ALL_PASSED) | #26894 #26862 #22000 |
 | social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
 | quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
-| quests/escort | spawn/wait; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
-| items/equip | equip entry; additem slot; survives relog | P2 | covered | — |
-| protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked` | #25793 |
+| quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
+| items/equip | visible-item slot after EquipEntry; additem; survives relog | P2 | covered | — |
+| protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked-harness` (extra_flags after relog) | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
-| guild/charter_bank | charter buy+turn-in; unique name | P2 | covered | — |
-| instances/bind_reset | party tele; ritual summon; leader reset | P2 | covered; post-reset summon `blocked` | #10708 |
-| instances/ulduar | named tele; DamageKill path; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked` | #26266 #27095 |
+| guild/charter_bank | charter buy+turn-in | P2 | covered | — |
+| instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
+| instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
 
 ---
 

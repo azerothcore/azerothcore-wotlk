@@ -77,7 +77,7 @@ concurrency:
 
 permissions:
   contents: read
-  actions: write  # download caller artifact + failure log upload
+  actions: read  # download-artifact with run-id
 
 env:
   CONTINUOUS_INTEGRATION: true
@@ -87,9 +87,9 @@ jobs:
   e2e:
     name: e2e (native / ${{ inputs.scope || 'full' }})
     if: github.repository == 'azerothcore/azerothcore-wotlk'
-    # workflow_call (PR): ubuntu-24.04 to match the nopch artifact.
-    # Dispatch: optional self-hosted via E2E_RUNS_ON.
-    runs-on: ${{ github.event_name == 'workflow_call' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
+    # Artifact path (PR nopch): ubuntu-24.04 to match the uploaded binaries.
+    # Dispatch (no artifact): optional self-hosted via E2E_RUNS_ON.
+    runs-on: ${{ inputs.artifact_run_id != '' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
     timeout-minutes: 480
     steps:
       - name: Free disk
@@ -164,6 +164,18 @@ jobs:
           CXX: clang++-18
           pch: false
 
+      # linux-build only clones ac-data (DBC). Real worldserver needs maps/vmaps/mmaps.
+      - name: Client-data (dispatch / no artifact)
+        if: ${{ inputs.artifact_run_id == '' }}
+        env:
+          CONTINUOUS_INTEGRATION: true
+          DATAPATH: ${{ github.workspace }}/env/dist/data
+        run: |
+          set -euo pipefail
+          ./acore.sh client-data
+          echo "AC_DATA_DIR=${DATAPATH}" >> "$GITHUB_ENV"
+        timeout-minutes: 30
+
       # create_mysql.sql only creates acore@localhost (unix_socket). Servers and
       # the harness connect via TCP 127.0.0.1, which needs a separate account host.
       # Grants are loopback-only (no root@% / acore@%) for self-hosted runner safety.
@@ -173,17 +185,19 @@ jobs:
         run: |
           set -euo pipefail
           mysql_root() {
-            if sudo mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e 'SELECT 1' &>/dev/null; then
-              sudo mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" "$@"
-            elif sudo mysql -uroot -e 'SELECT 1' &>/dev/null; then
-              sudo mysql -uroot "$@"
-            else
-              echo '::error::cannot connect to MySQL as root'
-              exit 1
-            fi
+            sudo mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" "$@"
           }
+          # Hosted images often have empty root password. Set it once.
+          # Do not ALTER when root already uses a password (self-hosted).
+          if sudo mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e 'SELECT 1' &>/dev/null; then
+            :
+          elif sudo mysql -uroot -e 'SELECT 1' &>/dev/null; then
+            sudo mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '${MYSQL_ROOT_PASSWORD}';"
+          else
+            echo '::error::cannot connect to MySQL as root'
+            exit 1
+          fi
           mysql_root <<'SQL'
-          ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'root';
           CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY 'root';
           GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
           CREATE USER IF NOT EXISTS 'acore'@'127.0.0.1' IDENTIFIED BY 'acore';

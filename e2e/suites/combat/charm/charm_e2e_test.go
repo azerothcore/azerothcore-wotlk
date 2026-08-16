@@ -74,7 +74,10 @@ func TestCharm_ApplyAndCancelAuraOnSelf(t *testing.T) {
 	t.Logf("PASS apply/cancel aura %d removed", auraID)
 }
 
-// CHARM-02 / #25506 style: logout while "charmed" aura present must not crash world.
+// OPEN(e2e): re-enable when AC#25506 is fixed — Yogg-Saron mind-control disconnect must not crash.
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/25506
+// These bodies were not a Yogg MC repro (Blending In + hard drop). Keep commented until a real charm path exists.
+/*
 func TestCharm_LogoutWhileAuraWorldAlive(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "combat", "issue", "serial"},
@@ -88,12 +91,10 @@ func TestCharm_LogoutWhileAuraWorldAlive(t *testing.T) {
 	victim.TeleportPad(t, e2eharness.PackagePad(t))
 	victim.ApplyAura(t, e2eharness.SpellBlendingInAura)
 	victim.Save(t)
-	// Clean logout path via Relog of victim would re-enter; instead hard-drop after save.
 	e2eharness.HardDisconnectAndProbe(t, victim, probe, 25506)
 	t.Logf("PASS logout while aura world alive")
 }
 
-// CHARM-03: hard drop while aura present.
 func TestCharm_HardDropWhileAuraNoCrash(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "combat", "issue", "serial"},
@@ -108,6 +109,7 @@ func TestCharm_HardDropWhileAuraNoCrash(t *testing.T) {
 	e2eharness.HardDisconnectAndProbe(t, victim, probe, 25506)
 	t.Logf("PASS hard drop while aura no crash")
 }
+*/
 
 // CHARM-04: multi-bot — one applies aura, other probes after victim leave.
 func TestCharm_MultiBotProbeAfterVictimLeave(t *testing.T) {

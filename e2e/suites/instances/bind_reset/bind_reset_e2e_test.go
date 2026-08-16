@@ -45,8 +45,8 @@ func TestBind_PartyFormedForInstance(t *testing.T) {
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "BindPty", Count: 2, Level: 80})
 	e2eharness.FormParty(t, bots[0], bots[1])
-	if !bots[0].InGroup() {
-		e2eharness.Preconditionf(t, "leader not in group")
+	if !bots[0].InGroup() || !bots[1].InGroup() {
+		e2eharness.Assertf(t, "party not formed in0=%v in1=%v", bots[0].InGroup(), bots[1].InGroup())
 	}
 	t.Logf("PASS instance party formed")
 }
@@ -68,11 +68,17 @@ func TestBind_GroupTeleTogether(t *testing.T) {
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{Prefix: "BindGrp", Count: 2, Level: 80})
 	e2eharness.FormParty(t, bots[0], bots[1])
+	var maps []uint32
 	for _, b := range bots {
-		teleDungeonOrPrecondition(t, b, teleTheStockade)
+		maps = append(maps, teleDungeonOrPrecondition(t, b, teleTheStockade))
 	}
-	bots[0].AssertWorldAlive(t)
-	t.Logf("PASS group tele together")
+	if maps[0] != maps[1] {
+		e2eharness.Assertf(t, "group not on same map after named tele leader=%d mate=%d", maps[0], maps[1])
+	}
+	if !bots[0].InGroup() || !bots[1].InGroup() {
+		e2eharness.Assertf(t, "party split after tele in0=%v in1=%v", bots[0].InGroup(), bots[1].InGroup())
+	}
+	t.Logf("PASS group tele together map=%d", maps[0])
 }
 
 // partyInStockadeForRitual places all three bots in the same Stockade instance.
@@ -243,12 +249,4 @@ func TestBind_CharacterInstanceAfterEnter(t *testing.T) {
 	t.Logf("PASS character_instance rows=%d map=%d", n, m)
 }
 
-// BIND-06: solo LeaderResetInstances is a no-op-safe opcode send.
-func TestBind_LeaderResetInstancesSolo(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "instance"}, Runtime: "short", Category: "instances/bind_reset"})
 
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "BindRs", Level: 80})
-	bot.LeaderResetInstances(t, 3*time.Second)
-	bot.AssertWorldAlive(t)
-	t.Logf("PASS LeaderResetInstances solo")
-}

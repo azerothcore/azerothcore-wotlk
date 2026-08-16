@@ -13,7 +13,7 @@ import (
 )
 
 // EQUIP-01: add+inventory oracle (EquipEntry is EQUIP-04).
-func TestEquip_EquipEntryBasic(t *testing.T) {
+func TestEquip_AddItemInventorySeed(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
@@ -61,9 +61,7 @@ func TestEquip_MultipleAddsNoCrash(t *testing.T) {
 func TestEquip_EquipEntryHelper(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "items"}, Runtime: "short", Category: "items/equip"})
 
-	// Rough-hewn axe style starter or a known L80 weapon; use GM equip if entry known.
-	// Heirloom-ish safe: use Target Dummy equip may fail — use EquipEntry which may GM-equip.
-	const itemDullBlade = 25 // low-level sword often present
+	const itemWornShortsword = 25 // Worn Shortsword, main-hand slot 15
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "EqWep",
@@ -71,9 +69,9 @@ func TestEquip_EquipEntryHelper(t *testing.T) {
 		Level:  10,
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	bot.EquipEntry(t, itemDullBlade, 1)
-	waitInventoryAtLeast(t, bot, itemDullBlade, 1)
-	t.Logf("PASS EquipEntry helper inventory has entry=%d", itemDullBlade)
+	bot.EquipEntry(t, itemWornShortsword, 1)
+	slot := bot.WaitEquipped(t, itemWornShortsword, 5*time.Second)
+	t.Logf("PASS EquipEntry helper worn entry=%d visible slot=%d", itemWornShortsword, slot)
 }
 
 // EQUIP-05: bag seed + relog inventory path stays healthy.

@@ -135,7 +135,7 @@ func TestSession_HardDropWorldStaysAlive(t *testing.T) {
 		Prefix: "SessVic",
 		Level:  10,
 	})
-	// Hard close without graceful logout path.
+	// Hard close without graceful logout path. issue=0: no ConfirmedBugf.
 	e2eharness.HardDisconnectAndProbe(t, victim, probe, 0)
 	t.Logf("PASS hard drop did not kill world (probe OK)")
 }

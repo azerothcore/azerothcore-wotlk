@@ -165,8 +165,13 @@ func TestThreat_PartyPullSetup(t *testing.T) {
 	dummy := bots[0].Spawn(t, pullDummy, 15*time.Second)
 	bots[0].CombatReady(t)
 	bots[0].Engage(t, dummy, 15*time.Second)
-	bots[0].AssertWorldAlive(t)
-	t.Logf("PASS party pull setup")
+	if !bots[0].InGroup() || !bots[1].InGroup() {
+		e2eharness.Assertf(t, "party gone after pull in0=%v in1=%v", bots[0].InGroup(), bots[1].InGroup())
+	}
+	if !bots[0].UnitInCombat(dummy) && e2eharness.UnitTargetGUID(bots[0].World, dummy) != bots[0].GUID {
+		e2eharness.Assertf(t, "dummy 0x%X not in combat and not targeting leader after party pull", dummy)
+	}
+	t.Logf("PASS party pull setup dummy=0x%X combat=%v", dummy, bots[0].UnitInCombat(dummy))
 }
 
 // THREAT-05: WaitUnitTarget helper after engage on a real threat AI.

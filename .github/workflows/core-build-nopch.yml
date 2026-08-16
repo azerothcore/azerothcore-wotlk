@@ -95,4 +95,3 @@ jobs:
     with:
       scope: ${{ inputs.scope || 'full' }}
       artifact_run_id: ${{ github.run_id }}
-    secrets: inherit

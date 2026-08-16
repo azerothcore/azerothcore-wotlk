@@ -197,7 +197,7 @@ func TestTrade_CancelMidTradeRestores(t *testing.T) {
 
 // Spec 3 — Move OOR mid-trade aborts cleanly.
 func TestTrade_MoveOorMidTradeAborts(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot", "issue"}, Runtime: "short", Category: "social/trade"})
+	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot", "issue"}, Runtime: "short", Issue: 25723, Category: "social/trade"})
 
 	a, b := tradePair(t, "TrdOOR")
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 1)
@@ -232,9 +232,7 @@ func TestTrade_StackableMerge(t *testing.T) {
 	// A has 5, B has 3; partial-stack trade API is not available — trade A's full stack of 5.
 	// After accept: totals conserved and B gains.
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 5)
-	b.AddItem(t, itemLinenCloth, 3)
-	a.Save(t)
-	b.Save(t)
+	b.AddItemWait(t, itemLinenCloth, 3)
 	a0 := a.InventoryCount(t, itemLinenCloth)
 	b0 := b.InventoryCount(t, itemLinenCloth)
 	if a0 < 5 || b0 < 3 {

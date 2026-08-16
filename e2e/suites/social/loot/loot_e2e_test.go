@@ -169,7 +169,10 @@ func TestAC_26894_ChestLootPartyLeaveMidRoll(t *testing.T) {
 }
 */
 
-// LOOT-03: all pass when rolls exist.
+// OPEN(e2e): re-enable when AC#22000 is fixed — pass-on-loot must redistribute, not delete.
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/22000
+// The ALL_PASSED packet is not that oracle. Keep commented until an item-survive assert exists.
+/*
 func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"med", "loot", "multi_bot", "serial", "issue"}, Runtime: "med", Category: "social/loot", Issue: 22000})
 
@@ -213,6 +216,7 @@ func TestLoot_PassOnLootRedistribution(t *testing.T) {
 	}
 	e2eharness.ProbeWorldAlive(t, leader, 22000)
 }
+*/
 
 // PR: https://github.com/azerothcore/azerothcore-wotlk/pull/26862
 // Creatures that spawn (or are damaged) below half HP must still grant loot on death.
@@ -306,7 +310,8 @@ func TestLoot_InventoryCountOracle(t *testing.T) {
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "LootInv", Level: 40})
 	before := bot.InventoryCount(t, e2eharness.ItemTargetDummy)
-	bot.AddItem(t, e2eharness.ItemTargetDummy, 2)
+	bot.AddItemWait(t, e2eharness.ItemTargetDummy, 2)
+	bot.AssertInventoryAtLeast(t, e2eharness.ItemTargetDummy, before+2)
 	after := bot.InventoryCount(t, e2eharness.ItemTargetDummy)
 	if after < before+2 {
 		e2eharness.Assertf(t, "inventory count before=%d after=%d want +2", before, after)

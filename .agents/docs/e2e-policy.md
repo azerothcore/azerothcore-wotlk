@@ -167,6 +167,6 @@ NEVER let a test PASS while the product oracle is wrong. NEVER multi-retry + sof
 
 Update tests in the same PR as the behaviour change. Harness renames: update consumers in the same landing window. Ghost `e2e/examples/` are patterns; AC regressions live in the consumer suite.
 
-Scratch MUST be `e2e/local/` (gitignored except `local/README.md`). NEVER commit throwaways. Promote into `e2e/suites/` (or `suites/issues/`) in the same PR as the fix. Prefer live e2e over ad-hoc GM when the stack is up.
+Scratch MUST be `e2e/local/` (gitignored except `local/README.md`). NEVER commit throwaways. Promote into `e2e/suites/` next to related tests in the same PR as the fix. Prefer live e2e over ad-hoc GM when the stack is up.
 
-Local: `go test -tags=e2e`. Official-repo PR CI: full suite after nopch clang-18 (reuses those binaries). Merge to master does not re-run e2e. Dispatch `-f scope=smoke` for a smaller run. Touch `.github/workflows/e2e-live.yml` only when changing CI.
+Local (from `e2e/`): `go test -tags=e2e ./...`. Official-repo PR CI: full suite after nopch clang-18 (reuses those binaries). Merge to master does not re-run e2e. Dispatch `-f scope=smoke` for a smaller run. Touch `.github/workflows/e2e-live.yml` only when changing CI.

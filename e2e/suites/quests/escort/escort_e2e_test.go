@@ -16,20 +16,6 @@ import (
 // OPEN(e2e): replace this package with a real escort quest fixture (start → follow →
 // complete/fail oracle). Until then only keep spawn/cache helpers that have hard asserts.
 
-// ESCORT-01: spawn NPC and wait unit (precondition for future escort start).
-func TestEscort_SpawnAndWaitUnit(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests", "ai"}, Runtime: "short", Category: "quests/escort"})
-
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "EscSp", Level: 80})
-	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	guid := bot.Spawn(t, e2eharness.CreatureTargetDummy, 15*time.Second)
-	if guid == 0 {
-		e2eharness.Preconditionf(t, "spawn returned 0")
-	}
-	bot.AssertWorldAlive(t)
-	t.Logf("PASS spawn/wait unit guid=0x%X", guid)
-}
-
 // ESCORT-02: unit still findable after spawn (hard GUID/cache oracle).
 func TestEscort_UnitFindableAfterSpawn(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "quests"}, Runtime: "short", Category: "quests/escort"})

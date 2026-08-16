@@ -25,7 +25,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 go test -tags=e2e ./local/foo -count=1 -v -timeout 15m -parallel 1
 ```
 
-Or: `make -C e2e e2e-local` (if present).
+From the repository root: `make -C e2e e2e-local`. From `e2e/`: `make e2e-local`.
 
 ## Minimal skeleton
 

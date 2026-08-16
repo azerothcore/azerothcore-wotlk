@@ -227,8 +227,7 @@ func TestEffects_AddItemCreatePath(t *testing.T) {
 		Prefix: "FxItem",
 		Level:  80,
 	})
-	bot.AddItem(t, e2eharness.ItemCorpseDust, 3)
-	bot.Save(t)
-	bot.AssertWorldAlive(t)
-	t.Logf("PASS create-item seed path")
+	bot.AddItemWait(t, e2eharness.ItemCorpseDust, 3)
+	bot.AssertInventoryAtLeast(t, e2eharness.ItemCorpseDust, 3)
+	t.Logf("PASS create-item seed path count>=3")
 }

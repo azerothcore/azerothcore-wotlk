@@ -228,8 +228,11 @@ func TestUlduar_DamageKillPathSafe(t *testing.T) {
 	bot.CombatReady(t)
 	bot.Engage(t, dummy, 20*time.Second)
 	bot.DamageKill(t, []uint64{dummy}, 50_000_000, 20*time.Second)
-	bot.AssertWorldAlive(t)
-	t.Logf("PASS DamageKill path (training for raid helpers)")
+	hp, _ := bot.UnitHP(dummy)
+	if hp > 0 {
+		e2eharness.Assertf(t, "dummy 0x%X still alive hp=%d after DamageKill", dummy, hp)
+	}
+	t.Logf("PASS DamageKill path dummy=0x%X dead", dummy)
 }
 
 // ULDUAR-05: dual-bot login near Freya does not thrash auth.
@@ -244,6 +247,10 @@ func TestUlduar_MultiBotLoginNearBossPad(t *testing.T) {
 	for _, b := range bots {
 		b.TeleNamed(t, "Freya")
 	}
-	bots[0].AssertWorldAlive(t)
-	t.Logf("PASS multi-bot Freya pad login n=%d", len(bots))
+	_, _, _, m0 := bots[0].Pos()
+	_, _, _, m1 := bots[1].Pos()
+	if m0 != e2eharness.MapUlduar || m1 != e2eharness.MapUlduar {
+		e2eharness.Assertf(t, "Freya pad maps leader=%d mate=%d want %d", m0, m1, e2eharness.MapUlduar)
+	}
+	t.Logf("PASS multi-bot Freya pad login n=%d map=%d", len(bots), m0)
 }
