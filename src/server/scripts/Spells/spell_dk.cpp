@@ -25,6 +25,8 @@
 #include "SpellScriptLoader.h"
 #include "Totem.h"
 #include "UnitAI.h"
+
+#include <cmath>
 /*
  * Scripts for spells with SPELLFAMILY_DEATHKNIGHT and SPELLFAMILY_GENERIC spells used by deathknight players.
  * Ordered alphabetically using scriptname.
@@ -750,8 +752,9 @@ class spell_dk_dancing_rune_weapon_visual : public AuraScript
         PreventDefaultAction();
         if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
         {
-            GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID));
-            GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_17_ENTRYID));
+            // the owner's visible item entry is negated while the weapon is broken, the rune weapon still mirrors it
+            GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, uint32(std::abs(owner->GetInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID))));
+            GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(std::abs(owner->GetInt32Value(PLAYER_VISIBLE_ITEM_17_ENTRYID))));
             GetUnitOwner()->SetFloatValue(UNIT_FIELD_COMBATREACH, 0.01f);
         }
     }
