@@ -1,5 +1,7 @@
 -- ----------------------------------------------------------------------------
--- Dalaran Dedication of Honor: Lich King Monument
+-- Dalaran (Northrend, map 571)
+-- Dedication of Honor Behavior Implementation
+-- Pre and post Lich King kill on the realm (Normal, Heroic, 10 & 25 players)
 -- ----------------------------------------------------------------------------
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 30 AND `SourceGroup` = 1 AND `SourceEntry` = 202443 AND `SourceId` = 342;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
