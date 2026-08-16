@@ -40,7 +40,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
-	"github.com/walkline/AzerothGhost/e2e/e2eharness"
+	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 )
 
 func TestLocal_Scratch(t *testing.T) {

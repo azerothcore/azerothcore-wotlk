@@ -1,7 +1,7 @@
 // Package fixtures holds AC-specific constants shared across e2e suites.
 package fixtures
 
-import "github.com/walkline/AzerothGhost/e2e/e2eharness"
+import "github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 
 // Re-export isolation pads so suites can depend on internal/fixtures.
 

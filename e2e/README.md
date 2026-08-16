@@ -1,7 +1,7 @@
 # AzerothCore live-stack e2e
 
 Protocol-level regression tests for this repository. They import
-[`github.com/walkline/AzerothGhost/e2e/e2eharness`](https://github.com/walkline/AzerothGhost)
+[`github.com/azerothcore/AzerothGhost/e2e/e2eharness`](https://github.com/azerothcore/AzerothGhost)
 and run against a **live** authserver + worldserver + MySQL.
 
 Offline `go test ./...` (without `-tags=e2e`) skips these packages.
@@ -10,8 +10,8 @@ Authoring rules for new tests live in the harness:
 
 | Doc | Audience |
 |-----|----------|
-| [LLM_GUIDE.md](https://github.com/walkline/AzerothGhost/blob/master/e2e/LLM_GUIDE.md) | Compact MUST/NEVER + APIs (LLMs and humans) |
-| [EXAMPLES.md](https://github.com/walkline/AzerothGhost/blob/master/e2e/EXAMPLES.md) | Full recipes and skeletons |
+| [LLM_GUIDE.md](https://github.com/azerothcore/AzerothGhost/blob/main/e2e/LLM_GUIDE.md) | Compact MUST/NEVER + APIs (LLMs and humans) |
+| [EXAMPLES.md](https://github.com/azerothcore/AzerothGhost/blob/main/e2e/EXAMPLES.md) | Full recipes and skeletons |
 | `.agents/docs/e2e-policy.md` | When to add e2e vs unit tests (agent/review policy) |
 
 ---
@@ -20,7 +20,7 @@ Authoring rules for new tests live in the harness:
 
 1. Running AzerothCore **3.3.5a** authserver + worldserver.
 2. MySQL with `acore_auth`, `acore_characters`, and `acore_world` (world DB is required for spawn cleanup and many fixtures).
-3. Go **1.24+** and network reachability to auth (default `127.0.0.1:3724`).
+3. Go **1.26+** and network reachability to auth (default `127.0.0.1:3724`).
 
 Accounts are created by the harness (GM level 3, password `test`). Do not reuse real player accounts.
 
@@ -31,11 +31,11 @@ For co-development against a local AzerothGhost checkout:
 ```bash
 cd e2e
 cp go.work.example go.work   # gitignored; edit the replace path
-# replace github.com/walkline/AzerothGhost => /path/to/AzerothGhost
+# replace github.com/azerothcore/AzerothGhost => /path/to/AzerothGhost
 ```
 
-`e2e/go.mod` pins `github.com/walkline/AzerothGhost v1.0.6` (commit
-`9a432b7`; see `go.sum`). `go test` / `go mod download` fetch that module.
+`e2e/go.mod` pins `github.com/azerothcore/AzerothGhost v1.0.7` (see `go.sum`).
+`go test` / `go mod download` fetch that module.
 
 ---
 
@@ -267,7 +267,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
-	"github.com/walkline/AzerothGhost/e2e/e2eharness"
+	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 )
 
 func TestPets_Example(t *testing.T) {

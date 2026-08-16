@@ -108,7 +108,7 @@ jobs:
           go-version-file: e2e/go.mod
           cache-dependency-path: e2e/go.sum
 
-      # AzerothGhost is a public Go module (e2e/go.mod v1.0.3). go test downloads it.
+      # AzerothGhost is a public Go module (e2e/go.mod; repo azerothcore/AzerothGhost).
       - name: Download e2e modules
         working-directory: e2e
         run: go mod download
