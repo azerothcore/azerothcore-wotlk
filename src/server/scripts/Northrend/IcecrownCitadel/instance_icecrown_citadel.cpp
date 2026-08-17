@@ -1392,7 +1392,12 @@ public:
         {
             uint32 const teleporter = GetTeamIdInInstance() == TEAM_HORDE ? GO_SAURFANG_CAMP_TELEPORTER_H : GO_SAURFANG_CAMP_TELEPORTER_A;
             for (uint8 i = 0; i < 2; ++i)
-                instance->SummonGameObject(teleporter, SaurfangCampTeleporterPos[i], 0.0f, 0.0f, 0.0f, 0.0f, WEEK);
+            {
+                // Summoned ready, which is the inert model. Activating it is what turns the beam on,
+                // same as the transporter opened once the wing bosses are down.
+                if (GameObject* go = instance->SummonGameObject(teleporter, SaurfangCampTeleporterPos[i], 0.0f, 0.0f, 0.0f, 0.0f, WEEK))
+                    go->SetGoState(GO_STATE_ACTIVE);
+            }
         }
 
         void SpawnSaurfangCampTeleporters()
