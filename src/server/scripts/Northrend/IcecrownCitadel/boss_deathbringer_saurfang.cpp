@@ -249,14 +249,15 @@ Position const chargePos[6] =
     {-509.0040f, 2211.743f, 539.2870f, 0.0f}  // back right
 };
 
+// Grip of Agony hangs the whole group at one height, 12 yards over the floor at 539.287.
 Position const chokePos[6] =
 {
-    {-514.4834f, 2211.334f, 549.2887f, 0.0f}, // High Overlord Saurfang/Muradin Bronzebeard
-    {-510.1081f, 2211.592f, 546.3773f, 0.0f}, // front left
+    {-514.4834f, 2211.334f, 551.2882f, 0.0f}, // High Overlord Saurfang/Muradin Bronzebeard
+    {-510.1081f, 2211.592f, 551.2882f, 0.0f}, // front left
     {-513.3210f, 2211.396f, 551.2882f, 0.0f}, // front right
-    {-507.3684f, 2210.353f, 545.7497f, 0.0f}, // back middle
-    {-507.0486f, 2212.999f, 545.5512f, 0.0f}, // back left
-    {-510.7041f, 2211.069f, 546.5298f, 0.0f}  // back right
+    {-507.3684f, 2210.353f, 551.2882f, 0.0f}, // back middle
+    {-507.0486f, 2212.999f, 551.2882f, 0.0f}, // back left
+    {-510.7041f, 2211.069f, 551.2882f, 0.0f}  // back right
 };
 
 Position const finalPos = {-563.7552f, 2211.328f, 538.7848f, 0.0f};
