@@ -20,7 +20,7 @@ Text: Arthas is prepared to offer you power beyond your imagination.  The puny a
 22:14:42.183
 Text: Behold the Vrykul!   A race that has perfected war and destruction to the point of an art form.  Already they've cast their lot with the Lich King!  Their dwellings surround you and their numbers are easily five times yours.
 22:14:56.756
-Text: The choice is yours, Anselm.  Return to the Lich King's army and fight alongside them or remain loyal to your so-called queen and suffer their wrath as they drive you from their homelands!
+Text: The choice is yours, Anselm.  Return to the Lich King's army and fight alongside them or remain loyal to your so-called queen and suffer their wrath as they drive you * their homelands!
 22:15:02.834
 Text: Is that all you've come to say?
 22:15:12.129
@@ -87,28 +87,29 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2378000);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2378000, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Summon Creature Group 0'),
-(2378000, 9, 1, 0, 0, 0, 100, 0, 5200, 5200, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Set Run Off'),
-(2378000, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1857.6774, -6150.2666, 23.35034, 0, 'High Executor Anselm - Actionlist - Move To Position'),
-(2378000, 9, 3, 0, 0, 0, 100, 0, 2075, 2075, 0, 0, 0, 0, 107, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Summon Creature Group 1'),
-(2378000, 9, 4, 0, 0, 0, 100, 0, 975, 975, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 0'),
-(2378000, 9, 5, 0, 0, 0, 100, 0, 8085, 8085, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 1'),
-(2378000, 9, 6, 0, 0, 0, 100, 0, 9690, 9690, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 0'),
-(2378000, 9, 7, 0, 0, 0, 100, 0, 10420, 10420, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 1'),
-(2378000, 9, 8, 0, 0, 0, 100, 0, 11444, 11444, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 2'),
-(2378000, 9, 9, 0, 0, 0, 100, 0, 12980, 12980, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 3'),
-(2378000, 9, 10, 0, 0, 0, 100, 0, 14570, 14570, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 4'),
-(2378000, 9, 11, 0, 0, 0, 100, 0, 6080, 6080, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 2'),
-(2378000, 9, 12, 0, 0, 0, 100, 0, 9300, 9300, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 3'),
-(2378000, 9, 13, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 0, 86, 42905, 0, 204, 23883, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Time-Warped Shoot\''),
-(2378000, 9, 14, 0, 0, 0, 100, 0, 2100, 2100, 0, 0, 0, 0, 86, 43066, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Cone of Cold\''),
-(2378000, 9, 15, 0, 0, 0, 100, 0, 120, 120, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 5'),
-(2378000, 9, 16, 0, 0, 0, 100, 0, 3080, 3080, 0, 0, 0, 0, 86, 42982, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Vampire Prince Teleport\''),
-(2378000, 9, 17, 0, 0, 0, 100, 0, 3280, 3280, 0, 0, 0, 0, 232, 240412, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Start Path 240412'),
-(2378000, 9, 18, 0, 0, 0, 100, 0, 4850, 4850, 0, 0, 0, 0, 86, 43056, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Vampire Soul Retrieve Channel\''),
-(2378000, 9, 19, 0, 0, 0, 100, 0, 130, 130, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 6'),
-(2378000, 9, 20, 0, 0, 0, 100, 0, 7930, 7930, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 7'),
-(2378000, 9, 21, 0, 0, 0, 100, 0, 6870, 6870, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Despawn');
+(2378000, 9, 0 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Summon Creature Group 0'),
+(2378000, 9, 1 , 0, 0, 0, 100, 0, 5200, 5200, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Set Run Off'),
+(2378000, 9, 2 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1857.6774, -6150.2666, 23.35034, 0, 'High Executor Anselm - Actionlist - Move To Position'),
+(2378000, 9, 3 , 0, 0, 0, 100, 0, 2075, 2075, 0, 0, 0, 0, 107, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Summon Creature Group 1'),
+(2378000, 9, 4 , 0, 0, 0, 100, 0, 975, 975, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 0'),
+(2378000, 9, 5 , 0, 0, 0, 100, 0, 8085, 8085, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 1'),
+(2378000, 9, 6 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Set Orientation \'Prince Keleseth\''),
+(2378000, 9, 7 , 0, 0, 0, 100, 0, 9690, 9690, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 0'),
+(2378000, 9, 8 , 0, 0, 0, 100, 0, 10420, 10420, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 1'),
+(2378000, 9, 9 , 0, 0, 0, 100, 0, 11444, 11444, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 2'),
+(2378000, 9, 10, 0, 0, 0, 100, 0, 12980, 12980, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 3'),
+(2378000, 9, 11, 0, 0, 0, 100, 0, 14570, 14570, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 4'),
+(2378000, 9, 12, 0, 0, 0, 100, 0, 6080, 6080, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 2'),
+(2378000, 9, 13, 0, 0, 0, 100, 0, 9300, 9300, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 3'),
+(2378000, 9, 14, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 0, 86, 42905, 0, 204, 23883, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Time-Warped Shoot\''),
+(2378000, 9, 15, 0, 0, 0, 100, 0, 2100, 2100, 0, 0, 0, 0, 86, 43066, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Cone of Cold\''),
+(2378000, 9, 16, 0, 0, 0, 100, 0, 120, 120, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 5'),
+(2378000, 9, 17, 0, 0, 0, 100, 0, 3080, 3080, 0, 0, 0, 0, 86, 42982, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Vampire Prince Teleport\''),
+(2378000, 9, 18, 0, 0, 0, 100, 0, 3280, 3280, 0, 0, 0, 0, 232, 240412, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Start Path 240412'),
+(2378000, 9, 19, 0, 0, 0, 100, 0, 4850, 4850, 0, 0, 0, 0, 86, 43056, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Vampire Soul Retrieve Channel\''),
+(2378000, 9, 20, 0, 0, 0, 100, 0, 130, 130, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 6'),
+(2378000, 9, 21, 0, 0, 0, 100, 0, 7930, 7930, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 7'),
+(2378000, 9, 22, 0, 0, 0, 100, 0, 6870, 6870, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Despawn');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 24041);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
