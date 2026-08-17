@@ -1638,7 +1638,8 @@ AllFlightPaths = 0
 #
 #    TaxiFlightSpeed
 #        Description: Movement speed used while players travel along taxi flight paths.
-#        Default:     32.0
+#        Default:     32.0 - (Blizzlike)
+#                            50.0  - (Maximum)
 
 TaxiFlightSpeed = 32.0
 
