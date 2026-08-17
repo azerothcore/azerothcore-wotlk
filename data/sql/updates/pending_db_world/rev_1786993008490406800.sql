@@ -101,15 +101,18 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2378000, 9, 11, 0, 0, 0, 100, 0, 14570, 14570, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 4'),
 (2378000, 9, 12, 0, 0, 0, 100, 0, 6080, 6080, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 2'),
 (2378000, 9, 13, 0, 0, 0, 100, 0, 9300, 9300, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Say Line 3'),
-(2378000, 9, 14, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 0, 86, 42905, 0, 204, 23883, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Time-Warped Shoot\''),
-(2378000, 9, 15, 0, 0, 0, 100, 0, 2100, 2100, 0, 0, 0, 0, 86, 43066, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Cone of Cold\''),
-(2378000, 9, 16, 0, 0, 0, 100, 0, 120, 120, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 5'),
-(2378000, 9, 17, 0, 0, 0, 100, 0, 3080, 3080, 0, 0, 0, 0, 86, 42982, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Vampire Prince Teleport\''),
-(2378000, 9, 18, 0, 0, 0, 100, 0, 3280, 3280, 0, 0, 0, 0, 232, 240412, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Start Path 240412'),
-(2378000, 9, 19, 0, 0, 0, 100, 0, 4850, 4850, 0, 0, 0, 0, 86, 43056, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Vampire Soul Retrieve Channel\''),
-(2378000, 9, 20, 0, 0, 0, 100, 0, 130, 130, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 6'),
-(2378000, 9, 21, 0, 0, 0, 100, 0, 7930, 7930, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 7'),
-(2378000, 9, 22, 0, 0, 0, 100, 0, 6870, 6870, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Despawn');
+(2378000, 9, 14, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 375, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Set Emote State 375'),
+(2378000, 9, 15, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 40, 1, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Set Keleseth Sheathe State'),
+(2378000, 9, 16, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 375, 0, 0, 0, 0, 0, 9, 24044, 0, 50, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Set Emote State 375'),
+(2378000, 9, 17, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 0, 86, 42905, 0, 204, 23883, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Time-Warped Shoot\''),
+(2378000, 9, 18, 0, 0, 0, 100, 0, 2100, 2100, 0, 0, 0, 0, 86, 43066, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Cone of Cold\''),
+(2378000, 9, 19, 0, 0, 0, 100, 0, 120, 120, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 5'),
+(2378000, 9, 20, 0, 0, 0, 100, 0, 3080, 3080, 0, 0, 0, 0, 86, 42982, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Vampire Prince Teleport\''),
+(2378000, 9, 21, 0, 0, 0, 100, 0, 3280, 3280, 0, 0, 0, 0, 232, 240412, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Start Path 240412'),
+(2378000, 9, 22, 0, 0, 0, 100, 0, 4850, 4850, 0, 0, 0, 0, 86, 43056, 0, 19, 24041, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Cross Cast \'Vampire Soul Retrieve Channel\''),
+(2378000, 9, 23, 0, 0, 0, 100, 0, 130, 130, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 6'),
+(2378000, 9, 24, 0, 0, 0, 100, 0, 7930, 7930, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Say Line 7'),
+(2378000, 9, 25, 0, 0, 0, 100, 0, 6870, 6870, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 24041, 40, 0, 0, 0, 0, 0, 0, 'High Executor Anselm - Actionlist - Keseleth Despawn');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 24041);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -144,3 +147,11 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (24041, 0, 0, 'Ah, but it is you who intrudes on our master\'s territory.  He could wipe you out in an instant for that transgression alone!  Arthas does not have much love or patience for his escaped slaves.', 12, 0, 100, 11, 0, 0, 22665, 0, 'Prince Keleseth'),
 (24041, 1, 0, 'But... he has learned of your victory over Stormwind\'s North Fleet and thinks you have potential.  Potential to see reason and abandon Sylvanas\' childish rebellion.', 12, 0, 100, 1, 0, 0, 22669, 0, 'Prince Keleseth'),
 (24041, 7, 0, 'This will not be the last you hear of me.  I will return to spit on your corpse after Utgarde\'s armies have descended upon you!', 12, 0, 100, 25, 0, 0, 22764, 0, 'Prince Keleseth');
+
+DELETE FROM `creature_equip_template` WHERE (`CreatureID` = 24041);
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+(24041, 1, 27769, 0, 0, 49822);
+
+DELETE FROM `creature_template_addon` WHERE (`entry` = 24041);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(24041, 0, 0, 0, 0, 0, 0, '');
