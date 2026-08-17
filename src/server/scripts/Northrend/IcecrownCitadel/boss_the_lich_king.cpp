@@ -455,6 +455,30 @@ private:
     Creature const* _source;
 };
 
+struct RagingSpiritTargetSelector
+{
+public:
+    RagingSpiritTargetSelector(Creature* source) : _source(source) { }
+    bool operator()(Unit const* target) const
+    {
+        if (!target)
+            return false;
+        if (!target->IsAlive())
+            return false;
+        if (!target->IsPlayer())
+            return false;
+        if (_source->GetExactDist(target) > 100.0f)
+            return false;
+        // the spirit is summoned at the target's own position, so the target must be on the platform
+        if (!IsValidPlatformTarget(target) || target->GetVehicle())
+            return false;
+        return true;
+    }
+
+private:
+    Creature const* _source;
+};
+
 class FrozenThroneResetWorker
 {
 public:
@@ -1084,7 +1108,7 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 7500ms, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_RAGING_SPIRIT:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, RagingSpiritTargetSelector(me)))
                         me->CastSpell(target, SPELL_RAGING_SPIRIT, false);
                     events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15s : 20s), EVENT_GROUP_ABILITIES);
                     break;

@@ -1804,6 +1804,9 @@ public:
                     if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
                     {
                         platform->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
+                        // the destroyed state is a client side visual only - keep the server side floor,
+                        // or creatures summoned during this window spawn below the platform
+                        platform->EnableCollision(true);
                         Events.ScheduleEvent(EVENT_REBUILD_PLATFORM, 1500ms);
                     }
                     break;
