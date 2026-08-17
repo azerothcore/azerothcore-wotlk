@@ -435,10 +435,8 @@ enum GameObjectsIds
     GO_DEATHBRINGER_S_CACHE_10H             = 202238,
     GO_DEATHBRINGER_S_CACHE_25H             = 202241,
     GO_SCOURGE_TRANSPORTER_SAURFANG         = 202244,
-    // Victory camp raised on Deathbringer's Rise once Saurfang is defeated.
-    // The forge, bonfire and anvil below are the Horde camp's, and already have spawn rows - the
-    // instance script only has to raise them. Everything else, the whole Alliance camp included,
-    // is summoned by the instance script.
+    // Victory camp. Forge, bonfire and anvil are the Horde camp's and have spawn rows - the script
+    // only raises them; everything else, the Alliance camp included, it summons.
     GO_SAURFANG_CAMP_FORGE                  = 1685,
     GO_SAURFANG_CAMP_BONFIRE                = 187852,
     GO_SAURFANG_CAMP_ANVIL                  = 191345,
@@ -449,9 +447,8 @@ enum GameObjectsIds
     GO_SAURFANG_CAMP_TELEPORTER_H           = 201880,
     GO_SAURFANG_CAMP_BANNER_A               = 201869,
     GO_SAURFANG_CAMP_ANVIL_A                = 23303,    // the Alliance camp uses its own anvil
-    // The zeppelin is a real MO_TRANSPORT (type 15, taxi path 1834), created through TransportMgr
-    // like the two gunships. The portal is a scale-2 'Portal to Stormwind'; it is a SPELLCASTER
-    // type, so it is spawned non-selectable to keep players from clicking its spell.
+    // Zeppelin is a MO_TRANSPORT (taxi path 1834) created through TransportMgr, like the gunships.
+    // The portal is a SPELLCASTER, spawned non-selectable so players cannot click its spell.
     GO_SAURFANG_OUTRO_ZEPPELIN              = 201834,
     GO_SAURFANG_OUTRO_PORTAL                = 193207,
 

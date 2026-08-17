@@ -61,7 +61,7 @@ enum ScriptTexts
     SAY_OUTRO_HORDE_2               = 12,
     SAY_OUTRO_HORDE_3               = 13,
     SAY_OUTRO_HORDE_4               = 14,
-    SAY_OUTRO_ALLIANCE_SAURFANG_NOD = 19,   // added by this ticket, no number in the 21-beat list
+    SAY_OUTRO_ALLIANCE_SAURFANG_NOD = 19,   // emote beat, outside the numbered 21
 
     // Muradin Bronzebeard
     SAY_INTRO_ALLIANCE_1            = 0,
@@ -81,7 +81,7 @@ enum ScriptTexts
     // Lady Jaina Proudmoore
     SAY_OUTRO_ALLIANCE_17           = 0,
     SAY_OUTRO_ALLIANCE_19           = 1,
-    SAY_OUTRO_ALLIANCE_JAINA_SMILE  = 2,    // added by this ticket, no number in the 21-beat list
+    SAY_OUTRO_ALLIANCE_JAINA_SMILE  = 2,    // emote beat, outside the numbered 21
 
     // King Varian Wrynn
     SAY_OUTRO_ALLIANCE_11           = 0,
@@ -225,15 +225,15 @@ enum MovePoints
     POINT_CHOKE             = 3781303,
     POINT_CORPSE            = 3781304,
     POINT_FINAL             = 3781305,
-    POINT_TRANSPORTER       = 3781306, // outro: the pause on the Scourge Transporter pad
-    POINT_RETREAT           = 3781307, // outro: the guards falling back to their posts
-    POINT_A_MURADIN_STAND   = 3781308, // Muradin runs out to meet the zeppelin
-    POINT_A_SAURFANG_MEET   = 3781309, // High Overlord Saurfang walks up to Muradin
-    POINT_A_CORPSE          = 3781310, // ... then over to his son's body
-    POINT_A_VARIAN          = 3781311, // ... and carries it to the king
-    POINT_A_EXIT            = 3781312, // ... and back to the zeppelin
-    POINT_A_STAND_DOWN      = 3781313, // outro: the marines jogging back to their posts, in view
-    POINT_A_MURADIN_HOME    = 3781314, // outro: Muradin walking back to his own post
+    POINT_TRANSPORTER       = 3781306,
+    POINT_RETREAT           = 3781307,
+    POINT_A_MURADIN_STAND   = 3781308,
+    POINT_A_SAURFANG_MEET   = 3781309,
+    POINT_A_CORPSE          = 3781310,
+    POINT_A_VARIAN          = 3781311,
+    POINT_A_EXIT            = 3781312,
+    POINT_A_STAND_DOWN      = 3781313,
+    POINT_A_MURADIN_HOME    = 3781314,
 };
 
 Position const deathbringerPos = {-496.3542f, 2211.33f, 541.1138f, 0.0f};
@@ -542,8 +542,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            // The outro revives the corpse to be carried, so a live targetless boss is left on the
-            // platform; evading would roll DONE back to FAIL and re-open the event gossip.
+            // The outro revives the corpse to carry it, so evading here would roll DONE back to FAIL.
             if (_outroStarted)
                 return;
 
@@ -600,7 +599,7 @@ public:
                         if (!deathbringer || deathbringer->IsInEvadeMode())
                             return;
 
-                        // Rebuilt every time: the guards despawn during the outro, so a cached list goes stale.
+                        // Rebuilt each run: the guards despawn during the outro.
                         _guardList.clear();
                         std::list<Creature*> guards;
                         GetCreatureListWithEntryInGrid(guards, me, NPC_SE_KOR_KRON_REAVER, 20.0f);
@@ -807,8 +806,7 @@ public:
                 case EVENT_OUTRO_HORDE_PICKUP:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                     {
-                        // Revive first: Unit::_EnterVehicle bails out on a dead passenger, so
-                        // casting the ride before this silently leaves the corpse on the floor.
+                        // Revive before the cast - Unit::_EnterVehicle refuses a dead passenger.
                         deathbringer->setDeathState(DeathState::Alive);
                         deathbringer->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         deathbringer->CastSpell(me, SPELL_RIDE_VEHICLE, true);
@@ -904,7 +902,7 @@ public:
                         if (!deathbringer || deathbringer->IsInEvadeMode())
                             return;
 
-                        // Rebuilt every time: the guards despawn during the outro, so a cached list goes stale.
+                        // Rebuilt each run: the guards despawn during the outro.
                         _guardList.clear();
                         std::list<Creature*> guards;
                         GetCreatureListWithEntryInGrid(guards, me, NPC_SE_SKYBREAKER_MARINE, 20.0f);
@@ -1100,7 +1098,7 @@ public:
                 case EVENT_OUTRO_ALLIANCE_5:
                     if (_instance->GetData(DATA_SAURFANG_OUTRO_ZEPPELIN) != DONE)
                     {
-                        // Wait for the ship to dock; bounded so a taxi path that never arrives cannot hang the scene.
+                        // Bounded wait for the ship to dock, so a taxi path that never arrives cannot hang the scene.
                         if (++_outroZeppelinWait <= 60)
                         {
                             _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_5, 1s);
@@ -1170,8 +1168,7 @@ public:
                     break;
                 case EVENT_OUTRO_ALLIANCE_11:
                 {
-                    // He carries the rest of the scene. If he is gone the remaining beats would
-                    // play to an empty stage, so cut straight to the cleanup instead.
+                    // He carries the rest of the scene; without him, skip to the cleanup.
                     Creature* saurfang = ObjectAccessor::GetCreature(*me, _outroSaurfangGUID);
                     if (!saurfang)
                     {
@@ -1226,8 +1223,7 @@ public:
                     _events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_15, 9s);
                     break;
                 case EVENT_OUTRO_A_ZEPPELIN_RELEASE:
-                    // The transport is parked on a stop frame and only pulls away ~24s after being released,
-                    // so this fires early enough for the lift-off to land as he boards.
+                    // The transport only pulls away ~24s after release, timed to lift off as he boards.
                     _instance->SetData(DATA_SAURFANG_OUTRO_ZEPPELIN, DONE);
                     break;
                 case EVENT_OUTRO_ALLIANCE_15:
@@ -1362,9 +1358,8 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        // The intro draws their weapons, so every reset path - a wipe above all - has to put them
-        // away again, or they hold the combat pose at their posts until the intro is replayed.
-        // _index is deliberately left alone: it is their identity, not encounter state.
+        // The intro draws their weapons, so every reset path has to put them away again.
+        // _index is left alone: it is their identity, not encounter state.
         void Reset() override
         {
             me->SetSheath(SHEATH_STATE_UNARMED);
@@ -1437,7 +1432,7 @@ public:
             }
             else if (action == ACTION_OUTRO_KNEEL)
             {
-                // Kneeling is a stand state; an emote state would be overridden by the combat-ready pose.
+                // Kneeling is a stand state; the combat-ready emote would override it.
                 me->SetEmoteState(EMOTE_ONESHOT_NONE);
                 me->SetStandState(UNIT_STAND_STATE_KNEEL);
             }
