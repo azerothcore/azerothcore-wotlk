@@ -1308,7 +1308,7 @@ struct boss_yoggsaron : public ScriptedAI
             case EVENT_YS_LUNATIC_GAZE:
                 me->PlayDirectSound(YS_P3_LUNATIC_GAZE);
                 me->CastSpell(me, SPELL_LUNATIC_GAZE_YS, true);
-                events.Repeat(12s);
+                events.Repeat(13s, 22s);
                 break;
             case EVENT_YS_DEAFENING_ROAR:
                 Talk(SAY_YOGG_SARON_DEAFENING_ROAR);
