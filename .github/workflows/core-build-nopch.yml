@@ -85,12 +85,17 @@ jobs:
   e2e:
     name: e2e ${{ inputs.scope || 'full' }}
     needs: build-e2e
-    # PR + dispatch only. Master push already ran full on the PR; keep clang-18 build.
+    # Official PR, master push, and dispatch. Master re-runs full so flakes
+    # and merge-base drift show up after squash, not only on the PR head.
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && needs.build-e2e.result == 'success'
-      && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
+      && (
+        github.event_name == 'pull_request'
+        || github.event_name == 'workflow_dispatch'
+        || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+      )
     uses: ./.github/workflows/e2e-live.yml
     with:
       scope: ${{ inputs.scope || 'full' }}

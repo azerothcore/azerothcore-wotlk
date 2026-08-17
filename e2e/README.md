@@ -353,7 +353,7 @@ Details live in the workflow files only:
 | How | Effect |
 |-----|--------|
 | Non-draft PR in **azerothcore/azerothcore-wotlk** | nopch `ubuntu-24.04`/clang-18 compiles + dry-run, then **full** e2e reuses those binaries |
-| Merge to `master` | clang-18 nopch build only (no second e2e; the PR already ran full) |
+| Merge to `master` | same clang-18 nopch build, then **full** e2e again (flake + merge-base drift) |
 | Actions → **e2e-live** → Run workflow (official repo; needs workflow on default branch, or `gh workflow run … --ref e2e`) | Compiles on the runner; choose scope (smoke/full) |
 
 Day-to-day development and agent debugging should use a **local** stack + `e2e/local/` or the committed suites — not CI setup docs.
