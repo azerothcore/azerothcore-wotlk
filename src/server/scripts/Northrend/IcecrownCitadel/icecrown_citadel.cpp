@@ -1340,7 +1340,11 @@ public:
 
         me->GetMotionMaster()->Clear(false);
         if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+        {
+            // MoveFollow never clears the evade state _EnterEvadeMode sets, unlike MoveTargetedHome
+            me->ClearUnitState(UNIT_STATE_EVADE);
             me->GetMotionMaster()->MoveFollow(crok, FollowDist, FollowAngle, MOTION_SLOT_IDLE);
+        }
         else
             me->GetMotionMaster()->MoveTargetedHome();
 
