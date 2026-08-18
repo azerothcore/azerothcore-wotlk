@@ -817,7 +817,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr5>::ToString(SpellAttr5 value)
         case SPELL_ATTR5_IMPLIED_TARGETING: return { "SPELL_ATTR5_IMPLIED_TARGETING", "Auto-target target of target (client only)", "" };
         case SPELL_ATTR5_MELEE_CHAIN_TARGETING: return { "SPELL_ATTR5_MELEE_CHAIN_TARGETING", "Unknown attribute 12@Attr5", "Cleave related?" };
         case SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC: return { "SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC", "Duration scales with Haste Rating", "" };
-        case SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED: return { "SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED", "Charmed units cannot cast this spell", "" };
+        case SPELL_ATTR5_NOT_AVAILABLE_WHILE_CHARMED: return { "SPELL_ATTR5_NOT_AVAILABLE_WHILE_CHARMED", "Charmed units cannot cast this spell", "" };
         case SPELL_ATTR5_TREAT_AS_AREA_EFFECT: return { "SPELL_ATTR5_TREAT_AS_AREA_EFFECT", "Unknown attribute 15@Attr5", "Related to multi-target spells?" };
         case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM: return { "SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM", "DESCRIPTION this allows spells with EquippedItemClass to affect spells from other items if the required item is equipped", "" };
         case SPELL_ATTR5_ALLOW_WHILE_FLEEING: return { "SPELL_ATTR5_ALLOW_WHILE_FLEEING", "Usable while feared", "" };
@@ -861,7 +861,7 @@ AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(std::size_t index)
         case 11: return SPELL_ATTR5_IMPLIED_TARGETING;
         case 12: return SPELL_ATTR5_MELEE_CHAIN_TARGETING;
         case 13: return SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC;
-        case 14: return SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED;
+        case 14: return SPELL_ATTR5_NOT_AVAILABLE_WHILE_CHARMED;
         case 15: return SPELL_ATTR5_TREAT_AS_AREA_EFFECT;
         case 16: return SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM;
         case 17: return SPELL_ATTR5_ALLOW_WHILE_FLEEING;
@@ -902,7 +902,7 @@ AC_API_EXPORT std::size_t EnumUtils<SpellAttr5>::ToIndex(SpellAttr5 value)
         case SPELL_ATTR5_IMPLIED_TARGETING: return 11;
         case SPELL_ATTR5_MELEE_CHAIN_TARGETING: return 12;
         case SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC: return 13;
-        case SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED: return 14;
+        case SPELL_ATTR5_NOT_AVAILABLE_WHILE_CHARMED: return 14;
         case SPELL_ATTR5_TREAT_AS_AREA_EFFECT: return 15;
         case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM: return 16;
         case SPELL_ATTR5_ALLOW_WHILE_FLEEING: return 17;
