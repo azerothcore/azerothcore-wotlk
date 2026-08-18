@@ -471,15 +471,10 @@ struct npc_phalanx : public ScriptedAI
         if (param == ACTION_BAR_DOOR_BROKEN)
         {
             me->SetHomePosition(PhalanxDoorPos);
+            me->SetFaction(FACTION_MONSTER);
             me->GetMotionMaster()->MovePoint(POINT_BAR_DOOR, PhalanxDoorPos);
             Talk(SAY_BAR_DOOR_BROKEN);
         }
-    }
-
-    void MovementInform(uint32 type, uint32 data) override
-    {
-        if (type == POINT_MOTION_TYPE && data == POINT_BAR_DOOR)
-            me->SetFaction(FACTION_MONSTER);
     }
 
 private:
