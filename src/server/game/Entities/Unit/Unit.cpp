@@ -7273,8 +7273,19 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
                 {
                     // CvP case - check reputation, don't allow state higher than neutral when at war
                     ReputationRank repRank = targetPlayerOwner->GetReputationMgr().GetRank(factionEntry);
-                    if (targetPlayerOwner->GetReputationMgr().IsAtWar(factionEntry))
+                    bool const isAtWar = targetPlayerOwner->GetReputationMgr().IsAtWar(factionEntry);
+                    if (isAtWar)
                         repRank = std::min(REP_NEUTRAL, repRank);
+
+                    // A player in a control seat charms the vehicle, but friendly
+                    // NPCs still react to the vehicle's explicitly allied faction.
+                    // Keep reputation authoritative for hostile and at-war drivers.
+                    if (!isAtWar && repRank == REP_NEUTRAL && target->IsVehicle()
+                            && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->GetCharmerGUID().IsPlayer()
+                            && (factionTemplateEntry->IsFriendlyTo(*targetFactionTemplateEntry)
+                                || targetFactionTemplateEntry->IsFriendlyTo(*factionTemplateEntry)))
+                        return REP_FRIENDLY;
+
                     return repRank;
                 }
             }

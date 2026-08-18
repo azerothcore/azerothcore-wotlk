@@ -24,6 +24,7 @@
 #include "WorldMock.h"
 #include "WorldSession.h"
 #include "DBCStores.h"
+#include "ObjectAccessor.h"
 #include "SharedDefines.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -34,6 +35,9 @@ using namespace testing;
 // Faction template IDs for test creatures
 static constexpr uint32 TEST_FACTION_HOSTILE_TO_MONSTERS = 90001;
 static constexpr uint32 TEST_FACTION_HOSTILE_TO_ALL      = 90002;
+static constexpr uint32 TEST_FACTION_WITH_REPUTATION     = 90003;
+static constexpr uint32 TEST_FACTION_FRIENDLY_VEHICLE    = 90004;
+static constexpr int32 TEST_REPUTATION_LIST_ID           = 127;
 
 class IntegrationTestFixture : public ::testing::Test
 {
@@ -72,6 +76,7 @@ protected:
 
         for (auto* player : _trackedPlayers)
         {
+            ObjectAccessor::RemoveObject(static_cast<Player*>(player));
             if (player->IsInWorld())
                 player->RemoveFromWorld();
         }
@@ -110,6 +115,7 @@ protected:
         player->SetSession(session);
         player->SetMap(_testMap);
         player->AddToWorld();
+        ObjectAccessor::AddObject(static_cast<Player*>(player));
         _trackedPlayers.push_back(player);
 
         return player;
@@ -179,6 +185,29 @@ private:
         f2->friendlyMask = 0x0;  // friendly to none
         f2->hostileMask = 0x1;   // hostile to players
         sFactionTemplateStore.SetEntry(TEST_FACTION_HOSTILE_TO_ALL, f2);
+
+        // Faction 90003: a reputation-bearing NPC faction that explicitly
+        // treats faction 90004 vehicles as friendly.
+        auto* reputationFaction = new FactionEntry();
+        std::memset(reputationFaction, 0, sizeof(FactionEntry));
+        reputationFaction->ID = TEST_FACTION_WITH_REPUTATION;
+        reputationFaction->reputationListID = TEST_REPUTATION_LIST_ID;
+        sFactionStore.SetEntry(TEST_FACTION_WITH_REPUTATION, reputationFaction);
+
+        auto* reputationTemplate = new FactionTemplateEntry();
+        std::memset(reputationTemplate, 0, sizeof(FactionTemplateEntry));
+        reputationTemplate->ID = TEST_FACTION_WITH_REPUTATION;
+        reputationTemplate->faction = TEST_FACTION_WITH_REPUTATION;
+        reputationTemplate->friendFaction[0] = TEST_FACTION_FRIENDLY_VEHICLE;
+        sFactionTemplateStore.SetEntry(TEST_FACTION_WITH_REPUTATION, reputationTemplate);
+
+        // Faction 90004: the explicitly friendly vehicle faction.
+        auto* vehicleTemplate = new FactionTemplateEntry();
+        std::memset(vehicleTemplate, 0, sizeof(FactionTemplateEntry));
+        vehicleTemplate->ID = TEST_FACTION_FRIENDLY_VEHICLE;
+        vehicleTemplate->faction = TEST_FACTION_FRIENDLY_VEHICLE;
+        vehicleTemplate->friendFaction[0] = TEST_FACTION_WITH_REPUTATION;
+        sFactionTemplateStore.SetEntry(TEST_FACTION_FRIENDLY_VEHICLE, vehicleTemplate);
     }
 
     IWorld* _originalWorld = nullptr;
