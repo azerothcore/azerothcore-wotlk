@@ -233,6 +233,11 @@ enum Actions
     DO_DESPAWN_SUMMONS,
 };
 
+enum Data
+{
+    DATA_BARRAGE_HOLD = 2,
+};
+
 enum Texts
 {
     // Mimiron
@@ -948,11 +953,17 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
     {
         instance = me->GetInstanceScript();
         _isEvading = false;
+        _barrageHold = false;
     }
 
     void Reset() override
     {
         _phase = 0;
+        if (_barrageHold)
+        {
+            _barrageHold = false;
+            me->SetControlled(false, UNIT_STATE_ROOT);
+        }
         _summons.DespawnAll();
         if (Unit* c = GetS3())
             c->ExitVehicle(); // this should never happen!
@@ -991,12 +1002,27 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
 
     void SetData(uint32 id, uint32 value) override
     {
+        // Sniffed: the chassis is rooted and stops meleeing while VX-001 winds up and fires the
+        // barrage, so swing animations can't retract the arms-deployed state mid-telegraph
+        if (id == DATA_BARRAGE_HOLD)
+        {
+            _barrageHold = value != 0;
+            me->SetControlled(_barrageHold, UNIT_STATE_ROOT);
+            if (_barrageHold)
+                me->SendMeleeAttackStop();
+            else if (Unit* victim = me->GetVictim())
+                me->SendMeleeAttackStart(victim);
+            return;
+        }
+
         if (id == 1) // setting phase to start fighting
         {
             switch (value)
             {
                 case 0:
                     _phase = 0;
+                    if (_barrageHold)
+                        SetData(DATA_BARRAGE_HOLD, 0);
                     _events.Reset();
                     break;
                 case 1:
@@ -1086,7 +1112,7 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
 
         _events.Update(diff);
 
-        if (!me->HasUnitState(UNIT_STATE_CASTING))
+        if (!me->HasUnitState(UNIT_STATE_CASTING) && !_barrageHold)
         {
             bool wasAttackReady = me->isAttackReady();
             DoMeleeAttackIfReady();
@@ -1217,6 +1243,7 @@ private:
     EventMap _events;
     SummonList _summons;
     bool _isEvading;
+    bool _barrageHold;
     uint8 _phase;
 };
 
@@ -1259,6 +1286,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
         _leftArm = false;
         me->SetRegeneratingHealth(false);
         _events.Reset();
+        scheduler.CancelAll();
     }
 
     void AttackStart(Unit* /*who*/) override {}
@@ -1370,6 +1398,8 @@ struct npc_ulduar_vx001 : public ScriptedAI
             return;
 
         _events.Update(diff);
+        // Runs before the casting guard: the windup facing task must tick while Spinning Up channels
+        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -1439,10 +1469,23 @@ struct npc_ulduar_vx001 : public ScriptedAI
                     me->SetTarget(dbTarget->GetGUID());
                 FaceBarrageArc(me);
                 me->CastSpell(me, SPELL_SPINNING_UP, true);
+                // The DB Target advances ~42 degrees during the 4s windup; keep tracking it or the
+                // barrage opens that far to the right of where the windup pointed
+                scheduler.Schedule(400ms, [this](TaskContext context)
+                {
+                    if (me->FindCurrentSpellBySpellId(SPELL_SPINNING_UP))
+                    {
+                        FaceBarrageArc(me);
+                        context.Repeat();
+                    }
+                });
                 if (Unit* vehicle = me->GetVehicleBase())
                 {
                     vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                     vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+                    // Sniffed: the chassis is rooted and stops melee for the whole windup + barrage
+                    if (Creature* lmk2 = vehicle->ToCreature())
+                        lmk2->AI()->SetData(DATA_BARRAGE_HOLD, 1);
                 }
                 _events.RescheduleEvent((_phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14s + 500ms);
                 break;
@@ -2169,7 +2212,12 @@ class spell_mimiron_p3wx2_laser_barrage_aura : public AuraScript
     void HandleEffectRemove(AuraEffect const*   /*aurEff*/, AuraEffectHandleModes   /*mode*/)
     {
         if (Unit* caster = GetCaster())
+        {
             caster->SetTarget(ObjectGuid::Empty);
+            if (Unit* vehicle = caster->GetVehicleBase())
+                if (Creature* lmk2 = vehicle->ToCreature())
+                    lmk2->AI()->SetData(DATA_BARRAGE_HOLD, 0);
+        }
     }
 
     void Register() override
