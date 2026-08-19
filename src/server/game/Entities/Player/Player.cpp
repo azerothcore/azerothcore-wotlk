@@ -11700,6 +11700,12 @@ void Player::SetGroup(Group* group, int8 subgroup)
 void Player::SendInitialPacketsBeforeAddToMap(bool firstLogin)
 {
     SetClientControl(this, true);
+
+    // cata-js's proven login flow sends SMSG_TUTORIAL_FLAGS as part of this post-login
+    // batch (its #8). This fork only sent it earlier, during account-data setup before
+    // CMSG_PLAYER_LOGIN, so the client entered world without it in the login batch.
+    GetSession()->SendTutorialsData();
+
     SendBindPointUpdate();
 
     WorldPackets::Misc::WorldServerInfo worldServerInfo;
@@ -11744,6 +11750,17 @@ void Player::SendInitialPacketsBeforeAddToMap(bool firstLogin)
 void Player::SendInitialPacketsAfterAddToMap()
 {
     UpdateVisibilityForPlayer(true);
+
+    // cata-js's proven-working Cata login flow sends SMSG_INIT_WORLD_STATES (#21) BEFORE
+    // SMSG_TIME_SYNC_REQ (#22). This fork emitted world states much later, via UpdateZone
+    // further down, so time sync went out first -- and the client never acknowledged it
+    // (no CMSG_TIME_SYNC_RESP), leaving the loading screen up forever. Send the zone's
+    // world states here so the ordering matches the reference before time sync is issued.
+    {
+        uint32 initZone, initArea;
+        GetZoneAndAreaId(initZone, initArea);
+        SendInitWorldStates(initZone, initArea);
+    }
 
     GetSession()->ResetTimeSync();
     GetSession()->SendTimeSync();
