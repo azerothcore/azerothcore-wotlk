@@ -147,6 +147,10 @@ CHARACTER_GUID = 0x01020304
 CHARACTER_NAME = "Cataplan"
 CHARACTER_LIST_POSITION = 7
 CHARACTER_POSITION = (-8949.95, -132.493, 83.5312)
+CHARACTER_RACE = 1
+CHARACTER_CLASS = 1
+CHARACTER_MAP = 0
+CHARACTER_ZONE = 12
 
 
 def plan_number(mode: str) -> str:
@@ -497,8 +501,8 @@ def populated_character_seed_sql() -> str:
         "`facialStyle`,`playerFlags`,`position_x`,`position_y`,`position_z`,`map`,`orientation`,`taximask`,"
         "`at_login`,`zone`,`extra_flags`,`equipmentCache`,`exploredZones`,`knownTitles`,`order`,`innTriggerId`,"
         "`health`) "
-        f"VALUES ({CHARACTER_GUID},{ACCOUNT_ID},'{CHARACTER_NAME}',1,1,0,1,0,0,0,0,0,0,"
-        f"{x},{y},{z},0,0,'',0,12,0,'','','',{CHARACTER_LIST_POSITION},0,10000);"
+        f"VALUES ({CHARACTER_GUID},{ACCOUNT_ID},'{CHARACTER_NAME}',{CHARACTER_RACE},{CHARACTER_CLASS},0,1,0,0,0,0,0,0,"
+        f"{x},{y},{z},{CHARACTER_MAP},0,'',0,{CHARACTER_ZONE},0,'','','',{CHARACTER_LIST_POSITION},0,10000);"
     )
 
 
@@ -508,10 +512,10 @@ def verify_populated_character_seed(manifest: Manifest, generation: Generation) 
         manifest, generation,
         "SELECT COUNT(*) FROM `characters` WHERE "
         f"`guid`={CHARACTER_GUID} AND `account`={ACCOUNT_ID} AND `name`='{CHARACTER_NAME}' "
-        "AND `race`=1 AND `class`=1 AND `gender`=0 AND `level`=1 "
+        f"AND `race`={CHARACTER_RACE} AND `class`={CHARACTER_CLASS} AND `gender`=0 AND `level`=1 "
         "AND `skin`=0 AND `face`=0 AND `hairStyle`=0 AND `hairColor`=0 AND `facialStyle`=0 "
         f"AND ABS(`position_x`-({x}))<0.001 AND ABS(`position_y`-({y}))<0.001 "
-        f"AND ABS(`position_z`-({z}))<0.001 AND `map`=0 AND `zone`=12 AND `orientation`=0 "
+        f"AND ABS(`position_z`-({z}))<0.001 AND `map`={CHARACTER_MAP} AND `zone`={CHARACTER_ZONE} AND `orientation`=0 "
         "AND `playerFlags`=0 AND `at_login`=0 AND `extra_flags`=0 AND COALESCE(`order`,0)=7 "
         "AND `taximask`='' AND `innTriggerId`=0 AND `equipmentCache`='' AND `exploredZones`='' "
         "AND `knownTitles`='' AND `deleteDate` IS NULL;",
@@ -520,8 +524,10 @@ def verify_populated_character_seed(manifest: Manifest, generation: Generation) 
     if matches != "1":
         raise RuntimeError(f"owned populated character seed matched {matches!r} rows instead of one")
     return {
-        "guid_low": CHARACTER_GUID, "name": CHARACTER_NAME, "race": 1, "class": 1, "gender": 0,
-        "level": 1, "map": 0, "zone": 12, "list_position": CHARACTER_LIST_POSITION,
+        "guid_low": CHARACTER_GUID, "name": CHARACTER_NAME, "race": CHARACTER_RACE,
+        "class": CHARACTER_CLASS, "gender": 0,
+        "level": 1, "map": CHARACTER_MAP, "zone": CHARACTER_ZONE,
+        "list_position": CHARACTER_LIST_POSITION,
         "flags": 0, "flags2": 0, "visual_items_nonzero": 0,
     }
 
@@ -537,8 +543,10 @@ def verify_populated_character_identity(manifest: Manifest, generation: Generati
     if matches != "1":
         raise RuntimeError(f"owned selected character matched {matches!r} rows instead of one")
     return {
-        "guid_low": CHARACTER_GUID, "name": CHARACTER_NAME, "race": 1, "class": 1, "gender": 0,
-        "level": 1, "map": 0, "zone": 12, "list_position": CHARACTER_LIST_POSITION,
+        "guid_low": CHARACTER_GUID, "name": CHARACTER_NAME, "race": CHARACTER_RACE,
+        "class": CHARACTER_CLASS, "gender": 0,
+        "level": 1, "map": CHARACTER_MAP, "zone": CHARACTER_ZONE,
+        "list_position": CHARACTER_LIST_POSITION,
         "flags": 0, "flags2": 0, "visual_items_nonzero": 0,
     }
 
@@ -2422,8 +2430,10 @@ four Completed: COP_GET_CHARACTERS result=TRUE
     populated_generation = dict(character_generation)
     populated_generation["mode"] = POPULATED_MODE
     expected_character = {
-        "guid_low": CHARACTER_GUID, "name": CHARACTER_NAME, "race": 1, "class": 1, "gender": 0,
-        "level": 1, "map": 0, "zone": 12, "list_position": CHARACTER_LIST_POSITION,
+        "guid_low": CHARACTER_GUID, "name": CHARACTER_NAME, "race": CHARACTER_RACE,
+        "class": CHARACTER_CLASS, "gender": 0,
+        "level": 1, "map": CHARACTER_MAP, "zone": CHARACTER_ZONE,
+        "list_position": CHARACTER_LIST_POSITION,
         "flags": 0, "flags2": 0, "visual_items_nonzero": 0,
     }
     populated_evidence = sanitized_evidence(
