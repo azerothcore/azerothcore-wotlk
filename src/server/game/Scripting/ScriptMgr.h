@@ -630,6 +630,10 @@ public: /* SpellSC */
     bool CanPrepare(Spell* spell, SpellCastTargets const* targets, AuraEffect const* triggeredByAura);
     bool CanScalingEverything(Spell* spell);
     bool CanSelectSpecTalent(Spell* spell);
+    /// Dispatches to AllSpellScript::HasteAffectsPeriodicDuration.
+    bool HasteAffectsPeriodicDuration(SpellInfo const* spellInfo, Unit* caster);
+    /// Dispatches to AllSpellScript::HasteAffectsAllPeriodicTicks.
+    bool HasteAffectsAllPeriodicTicks(SpellInfo const* spellInfo, Unit* caster);
     void OnScaleAuraUnitAdd(Spell* spell, Unit* target, uint32 effectMask, bool checkIfValid, bool implicit, uint8 auraScaleMask, TargetInfo& targetInfo);
     void OnRemoveAuraScaleTargets(Spell* spell, TargetInfo& targetInfo, uint8 auraScaleMask, bool& needErase);
     void OnBeforeAuraRankForLevel(SpellInfo const* spellInfo, SpellInfo const* latestSpellInfo, uint8 level);
