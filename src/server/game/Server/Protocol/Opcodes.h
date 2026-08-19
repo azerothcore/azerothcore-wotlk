@@ -525,7 +525,6 @@ enum OpcodeClient : uint16
     CMSG_LFG_SET_ROLES                              = 0x0480,
     CMSG_LFG_SET_NEEDS                              = 0x36B,
     CMSG_LFG_SET_BOOT_VOTE                          = 0x04B3,
-    CMSG_LFD_PLAYER_LOCK_INFO_REQUEST               = 0x36E,
     CMSG_LFG_TELEPORT                               = 0x2482,
     CMSG_LFD_PARTY_LOCK_INFO_REQUEST                = 0x371,
     CMSG_SET_TITLE                                  = 0x2117,
