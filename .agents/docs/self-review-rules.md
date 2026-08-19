@@ -6,6 +6,11 @@ Add here rules about reviewing AzerothCore PRs before they are submitted. Generi
 to the review process itself belong to the skill, not here. The [code-review.md](code-review.md)
 rules apply on top.
 
+## Pinned review
+
+The report is pasted into the PR, so it must pin a commit: uncommitted changes (local-only tweaks
+aside) block the run, and fixes from a round are committed before the next one.
+
 ## Regression risk
 
 Automated test coverage is near zero, so this review is the main safety net against regressions.
