@@ -8,8 +8,8 @@ rules apply on top.
 
 ## Pinned review
 
-The report is pasted into the PR, so it must pin a commit: uncommitted changes (local-only tweaks
-aside) block the run, and fixes from a round are committed before the next one.
+The report is pasted into the PR, so it must record the reviewed commit SHA: uncommitted changes (except local-only tweaks)
+block the run, and fixes from a round are committed before the next one.
 
 ## Regression risk
 
