@@ -1,3 +1,4 @@
+-- DB update 2026_08_19_03 -> 2026_08_19_04
 --
 UPDATE `conditions` SET `ElseGroup` = 2 WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 49243) AND (`SourceId` = 0) AND (`ElseGroup` = 1) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 27682) AND (`ConditionValue3` = 0);
 
