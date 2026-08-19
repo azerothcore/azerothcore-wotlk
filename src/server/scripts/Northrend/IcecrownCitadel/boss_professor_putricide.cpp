@@ -892,15 +892,27 @@ struct npc_putricide_mutated_abomination : public VehicleAI
         VehicleAI::UpdateAI(diff);
 
         Player* driver = me->GetCharmer() ? me->GetCharmer()->ToPlayer() : nullptr;
-        Unit* target = driver ? driver->GetSelectedUnit() : nullptr;
-        if (!target || !me->IsValidAttackTarget(target))
+        if (!driver)
         {
             me->AttackStop();
             return;
         }
 
-        me->Attack(target, true);
-        if (!me->IsWithinBoundaryRadius(target) && !me->HasInArc(2 * float(M_PI) / 3, target))
+        // only switch on a new attackable selection, so clearing the target or clicking an ally
+        // doesn't interrupt the swing
+        if (Unit* selection = driver->GetSelectedUnit())
+            if (selection != me->GetVictim() && me->IsValidAttackTarget(selection))
+                me->Attack(selection, true);
+
+        // Attack() can bail out and leave the previous victim in place, so gate on the real one
+        Unit* victim = me->GetVictim();
+        if (!victim || !me->IsValidAttackTarget(victim))
+        {
+            me->AttackStop();
+            return;
+        }
+
+        if (!me->IsWithinBoundaryRadius(victim) && !me->HasInArc(2 * float(M_PI) / 3, victim))
             return;
 
         DoMeleeAttackIfReady();
