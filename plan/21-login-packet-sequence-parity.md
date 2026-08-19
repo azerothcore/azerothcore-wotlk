@@ -2,7 +2,7 @@
 
 Canonical issue: [#43](https://github.com/trolloks/azerothcore-cata/issues/43)
 
-Status: partially complete. Two real ordering/presence defects fixed; the loading screen
+Status: open, in progress. Two real ordering/presence defects fixed; the loading screen
 still does not dismiss. Blocks #27 and #32.
 
 ## Approach
