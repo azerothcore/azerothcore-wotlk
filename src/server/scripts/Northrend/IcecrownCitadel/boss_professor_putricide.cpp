@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CombatAI.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -880,6 +881,32 @@ public:
     }
 };
 
+// The vehicle seat lacks CAN_ATTACK, so the driver cannot send an attack swing, and VehicleAI never
+// melees on its own. Auto-attack the driver's current selection instead.
+struct npc_putricide_mutated_abomination : public VehicleAI
+{
+    explicit npc_putricide_mutated_abomination(Creature* creature) : VehicleAI(creature) { }
+
+    void UpdateAI(uint32 diff) override
+    {
+        VehicleAI::UpdateAI(diff);
+
+        Player* driver = me->GetCharmer() ? me->GetCharmer()->ToPlayer() : nullptr;
+        Unit* target = driver ? driver->GetSelectedUnit() : nullptr;
+        if (!target || !me->IsValidAttackTarget(target))
+        {
+            me->AttackStop();
+            return;
+        }
+
+        me->Attack(target, true);
+        if (!me->IsWithinBoundaryRadius(target) && !me->HasInArc(2 * float(M_PI) / 3, target))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 class spell_putricide_slime_puddle : public SpellScript
 {
     PrepareSpellScript(spell_putricide_slime_puddle);
@@ -1559,6 +1586,7 @@ void AddSC_boss_professor_putricide()
     new boss_professor_putricide();
     new npc_volatile_ooze();
     new npc_gas_cloud();
+    RegisterIcecrownCitadelCreatureAI(npc_putricide_mutated_abomination);
     RegisterSpellScript(spell_putricide_ooze_tank_protection);
     RegisterSpellScript(spell_putricide_slime_puddle);
     RegisterSpellScript(spell_putricide_slime_puddle_spawn);
