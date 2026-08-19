@@ -1,3 +1,4 @@
+-- DB update 2026_08_19_01 -> 2026_08_19_02
 --
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25451) AND (`source_type` = 0) AND (`id` IN (5));
 
