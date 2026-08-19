@@ -408,6 +408,8 @@ public:
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
         // Force the respawn timer: creatures already dead (captains speared by Svalna) keep the
         // m_respawnTime their long corpse delay set, which ForcedDespawn recomputes only when forced.
+        // Under the default dynamic respawn mode RemoveCorpse keeps that stale time (it only ever
+        // pushes it further out), so without the timer they would not come back for a full day.
         creature->DespawnOrUnsummon(0ms, 2s);
 
         creature->SetCorpseDelay(corpseDelay);
