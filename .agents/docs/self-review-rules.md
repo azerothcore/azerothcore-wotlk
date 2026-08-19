@@ -24,4 +24,6 @@ Every change gets the full review; go deeper the farther it can reach:
 PRs are expected to be tested in-game, which the reviewer cannot do. Never guess what the
 author already tested — ask them, and record the answer in the report. Then tell them what
 else to test — especially side effects they might not expect: a fix for X that also reaches Y
-means testing Y too. Invite them to ask questions if anything is unclear.
+means testing Y too. When the author's tested scenario matches the change's main path, probe
+the branches it doesn't take — regressions hide there. Invite them to ask questions if
+anything is unclear.
