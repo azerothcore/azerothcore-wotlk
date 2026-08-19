@@ -80,3 +80,46 @@ header for width/height/`bytes_per_line`/`ncolors`, skip `header_size + ncolors 
 reorder BGRX to RGB. This is how loading-screen progress has been measured objectively
 (comparing progress-bar fill against its track) instead of relying on someone watching the
 screen.
+
+## The exact harness invocation
+
+Recovering these arguments from scratch is slow and they are not stored anywhere the
+`reset` command preserves (`generation.json` is removed by `reset`). Recorded here so a
+future run does not have to reconstruct them:
+
+```bash
+cd /mnt/e1384d9e-bede-40dd-8b1c-be0beb488490/Fun/azerothcore-cata
+M="/mnt/e1384d9e-bede-40dd-8b1c-be0beb488490/Fun/.plan11-runs/auth-15595/manifest.json"
+
+# The binaries must report the current HEAD, so rebuild before every prepare.
+cmake --build var/build-plan7 --target revision.h worldserver authserver -j "$(nproc)"
+
+python3 apps/cata/run_real_client_authentication.py reset --manifest "$M"
+python3 apps/cata/run_real_client_authentication.py prepare --manifest "$M" \
+  --authserver  "$PWD/var/build-plan7/src/server/apps/authserver" \
+  --worldserver "$PWD/var/build-plan7/src/server/apps/worldserver" \
+  --unit-tests  "$PWD/var/build-plan7/src/test/unit_tests" \
+  --client-root "/mnt/f79365ff-6a68-45da-925e-b9ddc6d5da6c/Blizzard Games/Battle.NET/drive_c/Games/Cataclysm-4.3.4.15595-enUS-x64" \
+  --data-root   "/mnt/f79365ff-6a68-45da-925e-b9ddc6d5da6c/Fun/TrinityCore/TrinityCore/data" \
+  --server-dbc-root "/mnt/f79365ff-6a68-45da-925e-b9ddc6d5da6c/Fun/node-dbc-reader/data/dbc" \
+  --wine-runner "/home/trolloks/.var/app/com.usebottles.bottles/data/bottles/runners/ge-proton11-1/files" \
+  --personal-bottle "/mnt/f79365ff-6a68-45da-925e-b9ddc6d5da6c/Blizzard Games/Battle.NET" \
+  --migration "$PWD/data/sql/updates/pending_db_auth/rev_1786964293354831242.sql" \
+  --display ":0" --xauthority "/home/trolloks/.Xauthority" \
+  --mode in-world-control-bootstrap
+python3 apps/cata/run_real_client_authentication.py run --manifest "$M" \
+  --auto-login --stability-seconds 8 --timeout 110
+```
+
+`var/build-plan7` is the build tree the harness uses — not `var/build`, which is not
+configured, nor `var/build-mysql-isolated`, which has no CMake cache.
+
+## Reading opcodes back out of a run
+
+`GetOpcodeNameForLogging` emits a bracketed form, so grep for the bracket or you will get
+no matches and wrongly conclude nothing was logged:
+
+```bash
+G=$(ls -d /mnt/e1384d9e-bede-40dd-8b1c-be0beb488490/Fun/.plan11-runs/auth-15595/generation-* | sort -V | tail -1)
+grep -oE "\[(CMSG|MSG)_[A-Z_0-9]+" "$G/logs/WorldServer.log" | sort | uniq -c | sort -rn
+```
