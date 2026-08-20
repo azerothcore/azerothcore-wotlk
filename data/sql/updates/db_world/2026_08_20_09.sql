@@ -1,3 +1,4 @@
+-- DB update 2026_08_20_08 -> 2026_08_20_09
 --
 -- Hodir's Spear chains: casting dropped the caster's own `Quest Invisibility 2` (54503), so it
 -- could no longer detect the equally invisible anchor and `Spear Chain Beam` (56379) applied no
