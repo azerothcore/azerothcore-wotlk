@@ -776,12 +776,10 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (me->GetHealth() <= damage)
         {
             _secondPhase = true;
-            damage = 0;
+            // leave her at 1 health through the transformation dialogue, the client treats 0 health as dead
+            damage = me->GetHealth() - 1;
 
             events.SetPhase(EVENT_PHASE_TWO);
-            // 1 health shows an empty bar through the transformation dialogue;
-            // SetHealth(0) would make the client treat her as dead
-            me->SetHealth(1);
             me->SetInCombatWithZone();
             me->SetFaction(FACTION_MONSTER_2);
 
