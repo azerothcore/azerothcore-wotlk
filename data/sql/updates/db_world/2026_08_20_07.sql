@@ -1,3 +1,4 @@
+-- DB update 2026_08_20_06 -> 2026_08_20_07
 --
 -- Sartharion (Obsidian Sanctum 25-man) base gear loot pool structure
 -- Splits the single 10-item ilvl 213 gear pool of reference 34166 into the two pools

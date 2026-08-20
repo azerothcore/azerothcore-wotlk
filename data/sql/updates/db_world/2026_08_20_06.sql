@@ -1,3 +1,4 @@
+-- DB update 2026_08_20_05 -> 2026_08_20_06
 --
 -- Malygos (Eye of Eternity 25-man) loot pool structure
 -- Splits the single 20-item gear pool of reference 34175 into the four pools evidenced by

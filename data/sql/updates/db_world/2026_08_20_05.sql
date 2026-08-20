@@ -1,3 +1,4 @@
+-- DB update 2026_08_20_04 -> 2026_08_20_05
 -- Thelsamar Blood Sausages (Quest 418)
 DELETE FROM `creature_questitem` WHERE `CreatureEntry` IN (1184, 1185, 1186, 1188, 1189, 1190, 1191, 1192, 1195, 1225) AND `ItemId` IN (3172, 3173, 3174);
 INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES
