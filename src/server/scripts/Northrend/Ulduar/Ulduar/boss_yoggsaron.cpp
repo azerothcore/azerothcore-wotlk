@@ -511,6 +511,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
         me->SetDisplayId(me->GetNativeDisplayId());
         me->SetDisableGravity(true);
         me->SetFaction(FACTION_FRIENDLY);
+        me->SetFullHealth();
         me->ClearUnitState(UNIT_STATE_EVADE);
         EnableSara(false);
 
@@ -778,7 +779,9 @@ struct boss_yoggsaron_sara : public ScriptedAI
             damage = 0;
 
             events.SetPhase(EVENT_PHASE_TWO);
-            me->SetHealth(me->GetMaxHealth());
+            // 1 health shows an empty bar through the transformation dialogue;
+            // SetHealth(0) would make the client treat her as dead
+            me->SetHealth(1);
             me->SetInCombatWithZone();
             me->SetFaction(FACTION_MONSTER_2);
 
@@ -993,6 +996,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 }
             case EVENT_SARA_P2_SPAWN_START_TENTACLES:
                 {
+                    me->SetFullHealth();
                     me->SetOrientation(M_PI);
                     me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
