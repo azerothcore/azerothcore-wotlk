@@ -7,7 +7,7 @@
 
 -- Sartharion 25-man (2 pools: 5+5)
 UPDATE `creature_loot_template` SET `MinCount`=1, `MaxCount`=1
-  WHERE `Entry`=31311 AND `Item`=1 AND `Reference`=34166;
+    WHERE `Entry`=31311 AND `Item`=1 AND `Reference`=34166;
 
 -- Pool A (5 items)
 UPDATE `reference_loot_template` SET `GroupId`=1 WHERE `Entry`=34166 AND `Item`=40431; -- Fury of the Five Flights
