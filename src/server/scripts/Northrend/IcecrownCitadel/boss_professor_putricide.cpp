@@ -885,11 +885,7 @@ public:
 // AttackStart. VehicleAI has no melee, so deliver the swings here.
 struct npc_putricide_mutated_abomination : public VehicleAI
 {
-    explicit npc_putricide_mutated_abomination(Creature* creature) : VehicleAI(creature)
-    {
-        // only the driver's attack command picks a target, same as PossessedAI
-        me->SetReactState(REACT_PASSIVE);
-    }
+    explicit npc_putricide_mutated_abomination(Creature* creature) : VehicleAI(creature) { }
 
     void AttackStart(Unit* victim) override
     {
@@ -903,10 +899,10 @@ struct npc_putricide_mutated_abomination : public VehicleAI
         VehicleAI::UpdateAI(diff);
 
         Unit* victim = me->GetVictim();
-        if (!victim || !me->GetCharmer())
+        if (!victim)
             return;
 
-        if (!me->IsValidAttackTarget(victim))
+        if (!me->GetCharmer() || !me->IsValidAttackTarget(victim))
         {
             me->AttackStop();
             return;
