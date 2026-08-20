@@ -1363,7 +1363,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
             break;
     }
 
-    SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions, Acore::WorldObjectSpellAreaTargetSearchReason::Area);
+    SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions, Acore::WorldObjectSpellAreaTargetSearchReason::Area, targetType.GetReferenceType());
 
     CallScriptObjectAreaTargetSelectHandlers(targets, effIndex, targetType);
 
@@ -2138,12 +2138,12 @@ WorldObject* Spell::SearchNearbyTarget(float range, SpellTargetObjectTypes objec
     return target;
 }
 
-void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason)
+void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason, SpellTargetReferenceTypes referenceType)
 {
     uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList);
     if (!containerTypeMask)
         return;
-    Acore::WorldObjectSpellAreaTargetCheck check(range, position, m_caster, referer, m_spellInfo, selectionType, condList, searchReason);
+    Acore::WorldObjectSpellAreaTargetCheck check(range, position, m_caster, referer, m_spellInfo, selectionType, condList, searchReason, referenceType);
     Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
     SearchTargets<Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> > (searcher, containerTypeMask, m_caster, position, range);
 }
@@ -3672,7 +3672,8 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
                     caster->AI()->OnSpellStart(GetSpellInfo());
 
         // set target for proper facing
-        if ((m_casttime || m_spellInfo->IsChanneled()) && !HasTriggeredCastFlag(TRIGGERED_IGNORE_SET_FACING))
+        // channels that allow actions must not lock target and facing, the creature keeps fighting while channeling
+        if ((m_casttime || m_spellInfo->IsChanneled()) && !m_spellInfo->IsActionAllowedChannel() && !HasTriggeredCastFlag(TRIGGERED_IGNORE_SET_FACING))
         {
             if (m_caster->IsCreature() && !m_caster->ToCreature()->IsInEvadeMode() &&
                     ((m_targets.GetObjectTarget() && m_caster != m_targets.GetObjectTarget()) || m_spellInfo->IsPositive()))
@@ -9136,8 +9137,8 @@ namespace Acore
     }
 
     WorldObjectSpellAreaTargetCheck::WorldObjectSpellAreaTargetCheck(float range, Position const* position, Unit* caster,
-            Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason)
-        : WorldObjectSpellTargetCheck(caster, referer, spellInfo, selectionType, condList), _range(range), _position(position), _searchReason(searchReason)
+            Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason, SpellTargetReferenceTypes referenceType)
+        : WorldObjectSpellTargetCheck(caster, referer, spellInfo, selectionType, condList), _range(range), _position(position), _searchReason(searchReason), _referenceType(referenceType)
     {
     }
 
@@ -9148,9 +9149,38 @@ namespace Acore
             if (!target->ToGameObject()->IsInRange3d(_position->GetPositionX(), _position->GetPositionY(), _position->GetPositionZ(), _range))
                 return false;
         }
-        else if (!target->IsWithinDist3d(_position, _range))
-            return false;
-        else if (Creature* c = target->ToCreature())
+        else
+        {
+            if (_searchReason == Acore::WorldObjectSpellAreaTargetSearchReason::Chain)
+            {
+                if (!target->IsWithinDist3d(_position, _range))
+                    return false;
+            }
+            else if (_referenceType == TARGET_REFERENCE_TYPE_SRC
+                  || _referenceType == TARGET_REFERENCE_TYPE_DEST
+                  || _referenceType == TARGET_REFERENCE_TYPE_TARGET)
+            {
+                float effectiveRange = _range;
+                // searcher also visits non-unit objects (corpses, dynobjects) when the spell can target them
+                if (Unit const* unitTarget = target->ToUnit())
+                    if (_caster->IsControlledByPlayer() && !unitTarget->IsControlledByPlayer())
+                        effectiveRange += unitTarget->GetCombatReach();
+
+                // override the range check for entry area targets
+                float dist = target->GetExactDist(_position);
+                if (_targetSelectionType == TARGET_CHECK_ENTRY)
+                    dist = target->GetExactDist2d(_position);
+                if (dist > effectiveRange)
+                    return false;
+            }
+            else
+            {
+                if (!target->IsWithinDist3d(_position, _range))
+                    return false;
+            }
+        }
+
+        if (Creature* c = target->ToCreature())
         {
             if (c->IsAvoidingAOE()) // pussywizard
                 return false;

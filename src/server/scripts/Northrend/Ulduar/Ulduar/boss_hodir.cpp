@@ -1472,6 +1472,11 @@ class spell_hodir_toasty_fire_aura : public AuraScript
 {
     PrepareAuraScript(spell_hodir_toasty_fire_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SINGED });
+    }
+
     void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
@@ -1479,9 +1484,20 @@ class spell_hodir_toasty_fire_aura : public AuraScript
                 target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
     }
 
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        // The default handler would credit the campfire (the aura caster) as original caster,
+        // freezing the shared Singed stack's duration once it despawns. Credit the player instead.
+        PreventDefaultAction();
+        Unit* player = GetTarget();
+        if (Unit* target = eventInfo.GetProcTarget())
+            player->CastSpell(target, SPELL_SINGED, true, nullptr, aurEff, player->GetGUID());
+    }
+
     void Register() override
     {
         AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
+        OnEffectProc += AuraEffectProcFn(spell_hodir_toasty_fire_aura::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
