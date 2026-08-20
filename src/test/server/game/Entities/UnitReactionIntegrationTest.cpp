@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CharmInfo.h"
 #include "ReputationMgr.h"
 #include "IntegrationTestFixture.h"
 #include "PassiveAI.h"
@@ -33,6 +34,7 @@ protected:
     void SetPlayerController(TestPlayer* driver, TestCreature* controlled)
     {
         controlled->AIM_Initialize(new NullCreatureAI(controlled));
+        controlled->InitCharmInfo()->InitEmptyActionBar();
         ASSERT_TRUE(controlled->SetCharmedBy(driver, CHARM_TYPE_CHARM));
     }
 
