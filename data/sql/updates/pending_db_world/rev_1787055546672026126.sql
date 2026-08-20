@@ -9,4 +9,5 @@ INSERT INTO `creature_questitem` (`CreatureEntry`, `Idx`, `ItemId`, `VerifiedBui
 (1190, 0, 3172, 0), -- Mountain Boar - Boar Intestines
 (1191, 0, 3172, 0), -- Mangy Mountain Boar - Boar Intestines
 (1192, 0, 3172, 0), -- Elder Mountain Boar - Boar Intestines
-(1195, 1, 3174, 0),(1225, 1, 3173, 0); -- Ol' Sooty - Bear Meat
+(1195, 1, 3174, 0), -- Forest Lurker - Spider Ichor
+(1225, 1, 3173, 0); -- Ol' Sooty - Bear Meat
