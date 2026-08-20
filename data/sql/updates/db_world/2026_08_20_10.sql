@@ -1,3 +1,4 @@
+-- DB update 2026_08_20_09 -> 2026_08_20_10
 --
 -- Algalon the Observer (Ulduar 25-man) loot pool structure
 -- Splits the single 16-item gear pool into the three pools evidenced by recorded retail kills,
