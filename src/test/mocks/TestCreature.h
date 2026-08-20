@@ -64,15 +64,6 @@ public:
     void SetFriendlyFaction() { SetFaction(35); }
     void SetFaction(uint32 faction);
 
-    // Mark the creature as a vehicle without requiring Vehicle.dbc data.
-    void SetVehicleForTest(bool isVehicle)
-    {
-        if (isVehicle)
-            m_unitTypeMask |= UNIT_MASK_VEHICLE;
-        else
-            m_unitTypeMask &= ~UNIT_MASK_VEHICLE;
-    }
-
     // Complete setup for combat/threat testing
     // Sets creature to be alive, in-world, hostile, and initializes managers
     void SetupForCombatTest(Map* map, ObjectGuid::LowType guidLow, uint32 entry);
