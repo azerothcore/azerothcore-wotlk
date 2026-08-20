@@ -490,7 +490,7 @@ void GameObject::Update(uint32 diff)
                             // Bombs
                             if (goInfo->trap.type == 2)
                                 m_cooldownTime = GameTime::GetGameTimeMS().count() + 10 * IN_MILLISECONDS; // Hardcoded tooltip value
-                            else if (GetOwner())
+                            else if (GetOwner() || GetSpellId())
                                 m_cooldownTime = GameTime::GetGameTimeMS().count() + goInfo->trap.startDelay * IN_MILLISECONDS;
 
                             m_lootState = GO_READY;
