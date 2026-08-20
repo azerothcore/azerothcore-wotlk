@@ -7277,14 +7277,16 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
                     if (isAtWar)
                         repRank = std::min(REP_NEUTRAL, repRank);
 
-                    // A player in a control seat charms the vehicle, but friendly
-                    // NPCs still react to the vehicle's explicitly allied faction.
-                    // Keep reputation authoritative for hostile and at-war drivers.
+                    // A player in a control seat replaces the vehicle's live faction.
+                    // Use its saved pre-charm faction only for explicitly friendly reactions,
+                    // while keeping reputation authoritative for hostile and at-war drivers.
                     if (!isAtWar && repRank == REP_NEUTRAL && target->IsVehicle()
-                            && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->GetCharmerGUID().IsPlayer()
-                            && (factionTemplateEntry->IsFriendlyTo(*targetFactionTemplateEntry)
-                                || targetFactionTemplateEntry->IsFriendlyTo(*factionTemplateEntry)))
-                        return REP_FRIENDLY;
+                            && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && target->GetCharmerGUID().IsPlayer())
+                        if (FactionTemplateEntry const* originalTargetFactionTemplateEntry =
+                                sFactionTemplateStore.LookupEntry(target->GetOldFactionId()))
+                            if (factionTemplateEntry->IsFriendlyTo(*originalTargetFactionTemplateEntry)
+                                    || originalTargetFactionTemplateEntry->IsFriendlyTo(*factionTemplateEntry))
+                                return REP_FRIENDLY;
 
                     return repRank;
                 }

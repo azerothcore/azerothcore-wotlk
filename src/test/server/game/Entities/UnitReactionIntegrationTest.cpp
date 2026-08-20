@@ -17,6 +17,7 @@
 
 #include "ReputationMgr.h"
 #include "IntegrationTestFixture.h"
+#include "PassiveAI.h"
 #include "gtest/gtest.h"
 
 #ifndef TEST_F
@@ -31,12 +32,13 @@ class UnitReactionIntegrationTest : public IntegrationTestFixture
 protected:
     void SetPlayerController(TestPlayer* driver, TestCreature* controlled)
     {
-        driver->SetCharm(controlled, true);
+        controlled->AIM_Initialize(new NullCreatureAI(controlled));
+        ASSERT_TRUE(controlled->SetCharmedBy(driver, CHARM_TYPE_CHARM));
     }
 
     void ClearPlayerController(TestPlayer* driver, TestCreature* controlled)
     {
-        driver->SetCharm(controlled, false);
+        controlled->RemoveCharmedBy(driver);
     }
 };
 
@@ -50,6 +52,8 @@ TEST_F(UnitReactionIntegrationTest, NeutralDriverKeepsExplicitlyFriendlyVehicleR
     vehicle->SetVehicleForTest(true);
     SetPlayerController(driver, vehicle);
 
+    ASSERT_EQ(vehicle->GetOldFactionId(), TEST_FACTION_FRIENDLY_VEHICLE);
+    ASSERT_EQ(vehicle->GetFaction(), driver->GetFaction());
     ASSERT_EQ(driver->GetReputationRank(TEST_FACTION_WITH_REPUTATION), REP_NEUTRAL);
     EXPECT_EQ(soldier->GetReactionTo(vehicle), REP_FRIENDLY);
     EXPECT_TRUE(soldier->IsFriendlyTo(vehicle));
