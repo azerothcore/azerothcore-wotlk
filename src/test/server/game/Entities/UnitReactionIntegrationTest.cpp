@@ -35,7 +35,9 @@ protected:
     {
         controlled->AIM_Initialize(new NullCreatureAI(controlled));
         controlled->InitCharmInfo()->InitEmptyActionBar();
-        ASSERT_TRUE(controlled->SetCharmedBy(driver, CHARM_TYPE_CHARM));
+        // The reaction logic only needs the common player-control state. Convert avoids
+        // pet action-bar and follow movement setup that the lightweight TestMap cannot provide.
+        ASSERT_TRUE(controlled->SetCharmedBy(driver, CHARM_TYPE_CONVERT));
     }
 
     void ClearPlayerController(TestPlayer* driver, TestCreature* controlled)
