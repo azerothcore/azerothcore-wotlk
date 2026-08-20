@@ -881,37 +881,38 @@ public:
     }
 };
 
-// The vehicle seat lacks CAN_ATTACK, so the driver cannot send an attack swing, and VehicleAI never
-// melees on its own. Auto-attack the driver's current selection instead.
+// Right-clicking a target while driving sends the pet attack command, which sets the victim through
+// AttackStart. VehicleAI has no melee, so deliver the swings here.
 struct npc_putricide_mutated_abomination : public VehicleAI
 {
-    explicit npc_putricide_mutated_abomination(Creature* creature) : VehicleAI(creature) { }
+    explicit npc_putricide_mutated_abomination(Creature* creature) : VehicleAI(creature)
+    {
+        // only the driver's attack command picks a target, same as PossessedAI
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void AttackStart(Unit* victim) override
+    {
+        // no MoveChase, movement stays with the driver
+        if (victim)
+            me->Attack(victim, true);
+    }
 
     void UpdateAI(uint32 diff) override
     {
         VehicleAI::UpdateAI(diff);
 
-        Player* driver = me->GetCharmer() ? me->GetCharmer()->ToPlayer() : nullptr;
-        if (!driver)
-        {
-            me->AttackStop();
-            return;
-        }
-
-        // only switch on a new attackable selection, so clearing the target or clicking an ally
-        // doesn't interrupt the swing
-        if (Unit* selection = driver->GetSelectedUnit())
-            if (selection != me->GetVictim() && me->IsValidAttackTarget(selection))
-                me->Attack(selection, true);
-
-        // Attack() can bail out and leave the previous victim in place, so gate on the real one
         Unit* victim = me->GetVictim();
-        if (!victim || !me->IsValidAttackTarget(victim))
+        if (!victim || !me->GetCharmer())
+            return;
+
+        if (!me->IsValidAttackTarget(victim))
         {
             me->AttackStop();
             return;
         }
 
+        // driven vehicles don't auto-face, so gate swings like player melee does
         if (!me->IsWithinBoundaryRadius(victim) && !me->HasInArc(2 * float(M_PI) / 3, victim))
             return;
 
