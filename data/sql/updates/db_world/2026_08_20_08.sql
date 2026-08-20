@@ -1,3 +1,4 @@
+-- DB update 2026_08_20_07 -> 2026_08_20_08
 -- Algalon the Observer (Ulduar 10-man) loot pool structure fix
 -- Splits the single 15-item pool of reference 34134 into 3 pools of 5, one item drawn from each,
 -- and lowers the referring row to 1x so the chest yields 3 gear items per kill instead of 2.
