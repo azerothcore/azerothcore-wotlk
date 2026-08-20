@@ -264,7 +264,8 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_alreadyCallForHelp(false), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _gossipMenuId(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f),_sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), m_lastLeashExtensionTime(nullptr),
-    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _highestPlayerAttackerLevel(0), _isCombatMovementAllowed(true)
+    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _highestPlayerAttackerLevel(0), _isCombatMovementAllowed(true),
+    _spawnInitHandledByAIMInitialize(false)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -709,13 +710,17 @@ void Creature::Update(uint32 diff)
     {
         TriggerJustRespawned = false;
 
-        // Skip for temp summons: InitializeAI already reset them, and JustRespawned would clobber state set synchronously during SUMMON.
-        if (!IsSummon())
+        // InitializeAI already runs spawn scripts (AI_INIT, JUST_CREATED, RESET, RESPAWN).
+        // JustRespawned() forces visible/faction and cannot re-apply NOT_REPEATABLE setup
+        // events — skip for summons and after AIM_Initialize (first grid load / reload AI).
+        if (!IsSummon() && !_spawnInitHandledByAIMInitialize)
         {
             if (_respawnCompatibilityMode && m_vehicleKit)
                 m_vehicleKit->Reset();
             AI()->JustRespawned();
         }
+
+        _spawnInitHandledByAIMInitialize = false;
     }
 
     switch (m_deathState)
@@ -1117,6 +1122,7 @@ bool Creature::AIM_Initialize(CreatureAI* ai)
     delete oldAI;
     IsAIEnabled = true;
     i_AI->InitializeAI();
+    _spawnInitHandledByAIMInitialize = true;
 
     return true;
 }
