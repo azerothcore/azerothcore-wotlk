@@ -1,3 +1,4 @@
+-- DB update 2026_08_21_00 -> 2026_08_21_01
 -- Ulduar: Clockwork Sappers see through invisibility and stealth (retail 3.1 hotfix behavior)
 UPDATE `creature_addon` SET `auras` = '18950' WHERE `guid` IN (136586, 136587, 136588, 136589, 136591, 136592);
 
