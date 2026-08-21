@@ -17,7 +17,6 @@
 
 #include "TC9Sidecar.h"
 #include "Config.h"
-#include "Errors.h"
 #include "InstanceSaveMgr.h"
 #include "libsidecar.h"
 #include "Log.h"
@@ -45,10 +44,10 @@ ToCloud9Sidecar::ToCloud9Sidecar() : _clusterModeEnabled(false), _isCrossrealm(f
 {
 }
 
-void ToCloud9Sidecar::CheckLibsidecarAbi()
+bool ToCloud9Sidecar::CheckLibsidecarAbi()
 {
     if (!sConfigMgr->GetOption<bool>("Cluster.Enabled", false))
-        return;
+        return true;
 
     int libMajor = 0;
     int libMinor = 0;
@@ -56,23 +55,40 @@ void ToCloud9Sidecar::CheckLibsidecarAbi()
     TC9GetVersion(&libMajor, &libMinor, &libPatch);
     char const* libVersionStr = TC9GetVersionString();
 
-    // Stub reports the same macros as headers; name it so operators know why
-    // TC9InitLib will still panic unless USE_REAL_LIBSIDECAR=ON.
 #if defined(TC9_LIBSIDECAR_IS_STUB)
     char const* libKind = "stub";
 #else
     char const* libKind = "shared library";
 #endif
 
+#if defined(TC9_LIBSIDECAR_IS_STUB)
+    // Stub always "matches" its own macros; fail here instead of after the realm
+    // is online when TC9InitLib panics.
+    // SetSynchronous first: this runs before the io_context pool starts, so async
+    // LOG_* would never print on early return. Success path leaves async alone.
+    sLog->SetSynchronous();
     LOG_INFO("server", "libsidecar ({}) runtime {}.{}.{} ({}) - headers {}.{}.{} ({})",
         libKind,
         libMajor, libMinor, libPatch,
         libVersionStr ? libVersionStr : "?",
         TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH,
         TC9_VERSION_STRING);
-
+    LOG_ERROR("server",
+        "Cluster.Enabled requires the real libsidecar shared library. "
+        "This worldserver was built with the stub (default). "
+        "Rebuild with -DUSE_REAL_LIBSIDECAR=ON and place matching headers + library "
+        "from the same libsidecar release under deps/libsidecar.");
+    return false;
+#else
     if (TC9CheckAbiCompatible(TC9_VERSION_MAJOR, TC9_VERSION_MINOR) != 0)
     {
+        sLog->SetSynchronous();
+        LOG_INFO("server", "libsidecar ({}) runtime {}.{}.{} ({}) - headers {}.{}.{} ({})",
+            libKind,
+            libMajor, libMinor, libPatch,
+            libVersionStr ? libVersionStr : "?",
+            TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH,
+            TC9_VERSION_STRING);
         LOG_ERROR("server",
             "libsidecar ABI mismatch: worldserver was built for {}.{}.{} (headers {}), "
             "but loaded library is {}.{}.{} ({}). "
@@ -80,10 +96,17 @@ void ToCloud9Sidecar::CheckLibsidecarAbi()
             TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH, TC9_VERSION_STRING,
             libMajor, libMinor, libPatch,
             libVersionStr ? libVersionStr : "?");
-        ABORT("libsidecar ABI mismatch (headers {} vs library {})",
-            TC9_VERSION_STRING,
-            libVersionStr ? libVersionStr : "?");
+        return false;
     }
+
+    LOG_INFO("server", "libsidecar ({}) runtime {}.{}.{} ({}) - headers {}.{}.{} ({})",
+        libKind,
+        libMajor, libMinor, libPatch,
+        libVersionStr ? libVersionStr : "?",
+        TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH,
+        TC9_VERSION_STRING);
+    return true;
+#endif
 }
 
 void ToCloud9Sidecar::Init(uint16 port, int realmId)

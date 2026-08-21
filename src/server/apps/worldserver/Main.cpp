@@ -206,8 +206,9 @@ int main(int argc, char** argv)
         });
 
     // Cluster.Enabled is known from config here. Fail before DB/network if the
-    // loaded libsidecar does not match the headers this binary was built with.
-    sToCloud9Sidecar->CheckLibsidecarAbi();
+    // loaded libsidecar is the stub or does not match the headers we built with.
+    if (!sToCloud9Sidecar->CheckLibsidecarAbi())
+        return 1;
 
     OpenSSLCrypto::threadsSetup();
 
