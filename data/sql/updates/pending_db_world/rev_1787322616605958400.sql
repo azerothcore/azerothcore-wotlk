@@ -11,6 +11,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (429400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 54, 45000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'AshbringerEvent - Actionlist - Pause Waypoint');
 
 -- Update the cooldown time for repeated triggers
-UPDATE `smart_scripts` SET `event_flags`=768,`event_param3` = 45000,
+UPDATE `smart_scripts` SET `event_flags` = (`event_flags` & ~1),
+ `event_param3` = 45000,
  `event_param4` = 45000
 WHERE `source_type` = 0 AND `event_type` = 8 AND `entryorguid` IN (4294,4295,4298,4299,4300,4301,4302,4303,4540);
