@@ -868,17 +868,6 @@ public:
         {
             me->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, me, false);
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            // the bloat ticked down to nothing before the cloud caught up - it fixates on somebody else
-            if (targetGUID)
-                if (Unit* target = ObjectAccessor::GetUnit(*me, targetGUID))
-                    if (!target->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_GASEOUS_BLOAT, me), me->GetGUID()))
-                        SelectNewTarget();
-
-            npc_putricide_oozeAI::UpdateAI(diff);
-        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
