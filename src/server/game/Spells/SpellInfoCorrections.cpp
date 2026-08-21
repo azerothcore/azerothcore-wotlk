@@ -2954,7 +2954,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Professor Putricide, Expunged Gas (Gas Cloud detonation)
     ApplySpellFix({ 70701 }, [](SpellInfo* spellInfo)
     {
-        // the sibling detonation Ooze Eruption (70492) has this in the dbc, this one is missing it
+        // custom: the detonation is an unavoidable raid-wide hit, it must not be resisted away
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 

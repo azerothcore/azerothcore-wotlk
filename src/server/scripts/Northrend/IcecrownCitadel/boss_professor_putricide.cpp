@@ -860,7 +860,7 @@ public:
 
     struct npc_gas_cloudAI : public npc_putricide_oozeAI
     {
-        npc_gas_cloudAI(Creature* creature) : npc_putricide_oozeAI(creature, SPELL_EXPUNGED_GAS), _detonated(false)
+        npc_gas_cloudAI(Creature* creature) : npc_putricide_oozeAI(creature, SPELL_EXPUNGED_GAS)
         {
         }
 
@@ -869,28 +869,16 @@ public:
             me->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, me, false);
         }
 
-        // The cloud is consumed after detonation; unlike Volatile Ooze, it does not select a new target.
-        void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
-        {
-            if (_detonated || spell->Id != sSpellMgr->GetSpellIdForDifficulty(SPELL_EXPUNGED_GAS, me))
-                return;
-
-            _detonated = true;
-            me->AttackStop();
-            me->GetMotionMaster()->Clear();
-            me->StopMoving();
-            me->DespawnOrUnsummon(1s);    // lingers for a moment instead of blinking out with the damage
-        }
-
         void UpdateAI(uint32 diff) override
         {
-            // a detonated cloud only waits out its despawn - no melee, no new target, no new bloat
-            if (!_detonated)
-                npc_putricide_oozeAI::UpdateAI(diff);
-        }
+            // the bloat ticked down to nothing before the cloud caught up - it fixates on somebody else
+            if (targetGUID)
+                if (Unit* target = ObjectAccessor::GetUnit(*me, targetGUID))
+                    if (!target->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_GASEOUS_BLOAT, me), me->GetGUID()))
+                        SelectNewTarget();
 
-    private:
-        bool _detonated;
+            npc_putricide_oozeAI::UpdateAI(diff);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1043,11 +1031,8 @@ class spell_putricide_gaseous_bloat_aura : public AuraScript
 
     void HandleExtraEffect(AuraEffect const* /*aurEff*/)
     {
-        Unit* target = GetTarget();
-        target->RemoveAuraFromStack(GetSpellInfo()->Id, GetCasterGUID());
-        /*if (!target->HasAura(GetId()))
-            if (Unit* caster = GetCaster())
-                caster->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, caster, false);*/
+        // every tick burns one stack, so the debuff decays over 10 ticks if the cloud never reaches its target
+        GetTarget()->RemoveAuraFromStack(GetSpellInfo()->Id, GetCasterGUID());
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
@@ -1058,16 +1043,15 @@ class spell_putricide_gaseous_bloat_aura : public AuraScript
 
     void HandleProc(ProcEventInfo& eventInfo)
     {
-        Unit* caster = eventInfo.GetActor();
-        int32 const mod = caster->GetMap()->Is25ManRaid() ? 1500 : 1250;
-        int32 damage = 0;
-        for (uint32 i = 1; i <= GetStackAmount(); ++i)
-            damage += mod * i;
+        // the raid eats what the target had left: the periodic amount is already perStack * remaining
+        // stacks and carries the difficulty scaling, so no hardcoded per-difficulty values are needed
+        AuraEffect const* bloat = GetEffect(EFFECT_0);
+        int32 const damage = bloat ? bloat->GetAmount() : 0;
 
         // the bloat is consumed by the detonation, just like the Volatile Ooze's adhesive
         GetTarget()->RemoveAurasDueToSpell(GetId(), GetCasterGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
 
-        caster->CastCustomSpell(SPELL_EXPUNGED_GAS, SPELLVALUE_BASE_POINT0, damage, nullptr, true);
+        eventInfo.GetActor()->CastCustomSpell(SPELL_EXPUNGED_GAS, SPELLVALUE_BASE_POINT0, damage, nullptr, true);
     }
 
     void Register() override
