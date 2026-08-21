@@ -1,3 +1,4 @@
+-- DB update 2026_08_20_10 -> 2026_08_21_00
 --
 -- Bomb Bot: detonate on reaching the target instead of after landing melee swings
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 33836);
