@@ -142,6 +142,8 @@ enum AreaTableIDs : uint32
     AREA_NAXXANAR                                            = 4128,
     AREA_MAGISTERS_TERRACE                                   = 4131,
     AREA_WINTERGARDE_KEEP                                    = 4177,
+    AREA_WINTERGARDE_MINE                                    = 4178,
+    AREA_THE_CARRION_FIELDS                                  = 4188,
     AREA_WINTERGRASP                                         = 4197,
     AREA_THE_OCULUS                                          = 4228,
     AREA_ULDUAR                                              = 4273,

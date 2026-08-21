@@ -648,6 +648,7 @@ enum WintergardeGryphon
     EVENT_VEHICLE_GET                           = 1,
     EVENT_TAKE_OFF                              = 2,
     EVENT_GET_VILLAGER                          = 3,
+    EVENT_CHECK_QUEST_AREA                      = 4,
 
     EVENT_PHASE_FEAR                            = 1,
     EVENT_PHASE_VEHICLE                         = 2,
@@ -655,9 +656,25 @@ enum WintergardeGryphon
     POINT_LAND                                  = 1,
     POINT_TAKE_OFF                              = 2,
 
+    SEAT_RIDER                                  = 0,
+    SEAT_VILLAGER                               = 1,
+
     QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER    = 12237,
     GO_TEMP_GRYPHON_STATION                     = 188679
 };
+
+static bool IsInWintergardeQuestZone(WorldObject const* object)
+{
+    switch (object->GetAreaId())
+    {
+        case AREA_WINTERGARDE_KEEP:
+        case AREA_WINTERGARDE_MINE:
+        case AREA_THE_CARRION_FIELDS:
+            return true;
+        default:
+            return false;
+    }
+}
 
 class npc_wintergarde_gryphon : public VehicleAI
 {
@@ -677,6 +694,21 @@ public:
         me->SetFacingToObject(summoner);
         Position pos = summoner->GetPosition();
         me->GetMotionMaster()->MovePoint(POINT_LAND, pos);
+        events.ScheduleEvent(EVENT_CHECK_QUEST_AREA, 1s);
+    }
+
+    // Vehicle::RemovePassenger grants Parachute, so unseating the rider mid-air is safe
+    void DespawnOutOfQuestZone()
+    {
+        if (Vehicle* gryphon = me->GetVehicleKit())
+            if (Unit* villager = gryphon->GetPassenger(SEAT_VILLAGER))
+                if (Creature* seat = villager->ToCreature())
+                {
+                    seat->ExitVehicle();
+                    seat->DespawnOrUnsummon();
+                }
+
+        me->DespawnOrUnsummon();
     }
 
     void MovementInform(uint32 type, uint32 id) override
@@ -687,11 +719,11 @@ public:
 
     void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
     {
-        if (!apply && seatId == 0)
+        if (!apply && seatId == SEAT_RIDER)
         {
             // left the vehicle with a passenger will result in despawn
             if (Vehicle* gryphon = me->GetVehicleKit())
-                if (Unit* villager = gryphon->GetPassenger(1))
+                if (Unit* villager = gryphon->GetPassenger(SEAT_VILLAGER))
                 {
                     if (!villager->IsCreature())
                         return;
@@ -744,6 +776,17 @@ public:
                     }
                     break;
                 }
+                case EVENT_CHECK_QUEST_AREA:
+                {
+                    if (!IsInWintergardeQuestZone(me))
+                    {
+                        DespawnOutOfQuestZone();
+                        return;
+                    }
+
+                    events.ScheduleEvent(EVENT_CHECK_QUEST_AREA, 1s);
+                    break;
+                }
             }
         }
     }
@@ -754,7 +797,7 @@ public:
             return;
 
         if (Vehicle* gryphon = me->GetVehicleKit())
-            if (Unit* villager = gryphon->GetPassenger(1))
+            if (Unit* villager = gryphon->GetPassenger(SEAT_VILLAGER))
             {
                 villager->ExitVehicle();
                 villager->GetMotionMaster()->Clear(false);
@@ -881,12 +924,17 @@ class spell_call_wintergarde_gryphon : public SpellScript
 
     SpellCastResult CheckRequirement()
     {
-        if (Player* playerCaster = GetCaster()->ToPlayer())
-        {
-            if (playerCaster->GetQuestStatus(QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER) == QUEST_STATUS_INCOMPLETE)
-                return SPELL_CAST_OK;
-        }
-        return SPELL_FAILED_DONT_REPORT;
+        Player* playerCaster = GetCaster()->ToPlayer();
+        if (!playerCaster)
+            return SPELL_FAILED_DONT_REPORT;
+
+        if (playerCaster->GetQuestStatus(QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER) != QUEST_STATUS_INCOMPLETE)
+            return SPELL_FAILED_DONT_REPORT;
+
+        if (!IsInWintergardeQuestZone(playerCaster))
+            return SPELL_FAILED_INCORRECT_AREA;
+
+        return SPELL_CAST_OK;
     }
 
     void Register() override
