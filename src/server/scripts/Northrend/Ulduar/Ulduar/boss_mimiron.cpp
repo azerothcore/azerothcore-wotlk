@@ -230,6 +230,7 @@ enum Actions
 {
     DO_DISABLE_AERIAL = 1,
     DO_ENABLE_AERIAL,
+    DO_DESPAWN_SUMMONS,
 };
 
 enum Texts
@@ -734,7 +735,7 @@ struct boss_mimiron : public BossAI
                     me->_ExitVehicle(&exitPos);
                     me->AttackStop();
                     me->GetMotionMaster()->Clear();
-                    summons.DoAction(1337); // despawn summons of summons
+                    summons.DoAction(DO_DESPAWN_SUMMONS);
                     summons.DespawnEntry(NPC_FLAMES_INITIAL);
                     summons.DespawnEntry(33576);
 
@@ -820,7 +821,7 @@ struct boss_mimiron : public BossAI
             c->DespawnOrUnsummon();
         }
 
-        summons.DoAction(1337); // despawn summons of summons
+        summons.DoAction(DO_DESPAWN_SUMMONS); // despawn summons of summons
 
         me->RemoveAllAuras();
         me->ExitVehicle();
@@ -943,7 +944,7 @@ private:
 
 struct npc_ulduar_leviathan_mkii : public ScriptedAI
 {
-    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature)
+    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature), _summons(me)
     {
         instance = me->GetInstanceScript();
         _isEvading = false;
@@ -952,6 +953,7 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
     void Reset() override
     {
         _phase = 0;
+        _summons.DespawnAll();
         if (Unit* c = GetS3())
             c->ExitVehicle(); // this should never happen!
         if (Creature* c = me->SummonCreature(NPC_LEVIATHAN_MKII_CANNON, *me, TEMPSUMMON_MANUAL_DESPAWN))
@@ -973,6 +975,18 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
             me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
         }
+    }
+
+    // Mines are summoned by the MK II, not by Mimiron, so they are not in his SummonList.
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_PROXIMITY_MINE)
+            _summons.Summon(summon);
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        _summons.Despawn(summon);
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1201,9 +1215,34 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
 private:
     InstanceScript* instance;
     EventMap _events;
+    SummonList _summons;
     bool _isEvading;
     uint8 _phase;
 };
+
+// The P3Wx2 Laser Barrage beams track the Mimiron DB Target, which circles the room on a waypoint
+// path that runs from instance load and is never restarted, so the arc carries across barrages,
+// phase changes and wipes. The beams follow caster facing, so aiming at it is what delivers the
+// sweep. Taking the bearing rather than copying an angle also keeps phase 4 right, where VX-001
+// rides the chassis up to 30yd off centre and the bearing shifts by as much as 16 degrees.
+inline void FaceBarrageArc(Unit* caster)
+{
+    InstanceScript* instance = caster->GetInstanceScript();
+    if (!instance)
+        return;
+
+    Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET);
+    if (!dbTarget)
+        return;
+
+    float arc = caster->GetAngle(dbTarget);
+
+    // SetFacingTo drops the transport transform for passengers, so phase 4 needs a seat-local angle
+    if (Unit* vehicle = caster->GetVehicleBase())
+        arc = Position::NormalizeOrientation(arc - vehicle->GetOrientation());
+
+    caster->SetFacingTo(arc);
+}
 
 struct npc_ulduar_vx001 : public ScriptedAI
 {
@@ -1218,8 +1257,6 @@ struct npc_ulduar_vx001 : public ScriptedAI
         _phase = 0;
         _fighting = false;
         _leftArm = false;
-        _spinningUpOrientation = 0;
-        _spinningUpTimer = 0;
         me->SetRegeneratingHealth(false);
         _events.Reset();
     }
@@ -1273,14 +1310,9 @@ struct npc_ulduar_vx001 : public ScriptedAI
         }
     }
 
-    uint32 GetData(uint32  /*id*/) const override
-    {
-        return _spinningUpOrientation;
-    }
-
     void DoAction(int32 action) override
     {
-        if (action == 1337)
+        if (action == DO_DESPAWN_SUMMONS)
             if (Vehicle* vk = me->GetVehicleKit())
                 for (uint8 i = 0; i < 2; ++i)
                     if (Unit* r = vk->GetPassenger(5 + i))
@@ -1338,19 +1370,6 @@ struct npc_ulduar_vx001 : public ScriptedAI
             return;
 
         _events.Update(diff);
-
-        if (_spinningUpTimer) // executed about a second after starting casting to ensure players can see the correct direction
-        {
-            if (_spinningUpTimer <= diff)
-            {
-                float angle = (_spinningUpOrientation * 2 * M_PI) / 100.0f;
-                me->SetFacingTo(angle);
-
-                _spinningUpTimer = 0;
-            }
-            else
-                _spinningUpTimer -= diff;
-        }
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -1414,22 +1433,18 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 _events.Repeat(1750ms);
                 break;
             case EVENT_SPELL_SPINNING_UP:
-                _events.Repeat(45s);
-                if (Player* p = SelectTargetFromPlayerList(80.0f))
+                _events.Repeat(60s);
+                // Sniffed: the target is parked on the DB Target from the cast until the barrage ends
+                if (Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET))
+                    me->SetTarget(dbTarget->GetGUID());
+                FaceBarrageArc(me);
+                me->CastSpell(me, SPELL_SPINNING_UP, true);
+                if (Unit* vehicle = me->GetVehicleBase())
                 {
-                    float angle = me->GetAngle(p);
-
-                    _spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
-                    _spinningUpTimer = 1500;
-                    me->SetFacingTo(angle);
-                    me->CastSpell(p, SPELL_SPINNING_UP, true);
-                    if (Unit* vehicle = me->GetVehicleBase())
-                    {
-                        vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                        vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
-                    }
-                    _events.RescheduleEvent((_phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14s + 500ms);
+                    vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                    vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                 }
+                _events.RescheduleEvent((_phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14s + 500ms);
                 break;
             case EVENT_FLAME_SUPPRESSION_10:
                 me->CastSpell(me, SPELL_FLAME_SUPPRESSANT_10yd, false);
@@ -1497,8 +1512,6 @@ private:
     bool _isEvading;
     bool _fighting;
     bool _leftArm;
-    uint32 _spinningUpOrientation;
-    uint16 _spinningUpTimer;
     uint8 _phase;
 };
 
@@ -1519,6 +1532,14 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
         _summons.DespawnAll();
         me->SetHover(false);
         me->SetDisableGravity(true);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (_phase == 3)
+            AttackStartCaster(who, 30.0f);
+        else
+            ScriptedAI::AttackStart(who);
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1591,7 +1612,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     me->SetReactState(REACT_AGGRESSIVE);
                 }, 2s);
                 break;
-            case 1337:
+            case DO_DESPAWN_SUMMONS:
                 _summons.DespawnAll();
                 break;
         }
@@ -1783,6 +1804,7 @@ struct npc_ulduar_proximity_mine : public ScriptedAI
             {
                 _exploded = true;
                 me->CastSpell(me, SPELL_MINE_EXPLOSION, false);
+                me->DespawnOrUnsummon(2s);
             }
         }
         else
@@ -1795,6 +1817,7 @@ struct npc_ulduar_proximity_mine : public ScriptedAI
             {
                 _exploded = true;
                 me->CastSpell(me, SPELL_MINE_EXPLOSION, false);
+                me->DespawnOrUnsummon(2s);
             }
         }
         else
@@ -2046,10 +2069,7 @@ class spell_mimiron_magnetic_core_summon : public SpellScript
 
     void ModDest(SpellDestination& dest)
     {
-        Unit* caster = GetCaster();
-        Position pos = caster->GetPosition();
-        pos.m_positionZ = caster->GetMap()->GetHeight(pos);
-        dest.Relocate(pos);
+        dest._position.m_positionZ = GetCaster()->GetMap()->GetHeight(dest._position);
     }
 
     void Register() override
@@ -2128,53 +2148,36 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
     }
 };
 
-enum p3wx2LaserBarrage
-{
-    SPELL_P3WX2_LASER_BARRAGE_1 = 63297,
-    SPELL_P3WX2_LASER_BARRAGE_2 = 64042
-};
-
+// The beams themselves come from the spell chain: effect 2 links 63300, which triggers 63297 and
+// 64042 every 100ms on its own. All this script owns is where the caster is pointing.
 class spell_mimiron_p3wx2_laser_barrage_aura : public AuraScript
 {
     PrepareAuraScript(spell_mimiron_p3wx2_laser_barrage_aura);
 
-    bool Load() override
+    void HandleEffectApply(AuraEffect const*   /*aurEff*/, AuraEffectHandleModes   /*mode*/)
     {
-        _lastMSTime = GameTime::GetGameTimeMS().count();
-        _lastOrientation = -1.0f;
-        return true;
+        if (Unit* caster = GetCaster())
+            FaceBarrageArc(caster);
     }
 
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
-        {
-            if (!caster->IsCreature())
-                return;
-            uint32 diff = getMSTimeDiff(_lastMSTime, GameTime::GetGameTimeMS().count());
-            if (_lastOrientation == -1.0f)
-            {
-                _lastOrientation = (caster->ToCreature()->AI()->GetData(0) * 2 * M_PI) / 100.0f;
-                diff = 0;
-            }
-            float new_o = Position::NormalizeOrientation(_lastOrientation - (M_PI / 60) * (diff / 250.0f));
-            _lastMSTime = GameTime::GetGameTimeMS().count();
-            _lastOrientation = new_o;
-            caster->SetFacingTo(new_o);
+            FaceBarrageArc(caster);
+    }
 
-            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_1, true);
-            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_2, true);
-        }
+    void HandleEffectRemove(AuraEffect const*   /*aurEff*/, AuraEffectHandleModes   /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->SetTarget(ObjectGuid::Empty);
     }
 
     void Register() override
     {
+        AfterEffectApply += AuraEffectApplyFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        AfterEffectRemove += AuraEffectApplyFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
-
-private:
-    uint32 _lastMSTime;
-    float _lastOrientation;
 };
 
 class go_ulduar_do_not_push_this_button : public GameObjectScript
@@ -2219,7 +2222,7 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1337)
+        if (action == DO_DESPAWN_SUMMONS)
             RemoveAll();
     }
 

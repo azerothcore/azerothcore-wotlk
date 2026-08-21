@@ -1778,18 +1778,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
     });
 
-    // Lava Strike damage
-    ApplySpellFix({ 57697 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Lava Strike trigger
-    ApplySpellFix({ 57578 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-    });
-
     // Gift of Twilight Shadow/Fire
     ApplySpellFix({ 57835, 58766 }, [](SpellInfo* spellInfo)
     {
@@ -2081,6 +2069,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 62168, 65250, 62169 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER; // pets phased away from their owner get despawned
     });
 
     // Ground Slam
