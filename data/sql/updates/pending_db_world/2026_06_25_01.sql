@@ -15,12 +15,6 @@ WHERE `entry` IN (18944, 18946, 19005);
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` & ~0x4
 WHERE `entry` IN (18949, 18971); -- Stormwind Mage, Undercity Mage
 
--- Justinius had creature_template_addon.emote = 375 (a combat-ready/attack stance
--- emote state), which locked him into the melee attack animation even while idle.
--- Clear it to 0 (matching Melgromm) so he stands normally when not fighting.
-UPDATE `creature_template_addon` SET `emote` = 0
-WHERE `entry` = 18966; -- Justinius the Harbinger
-
 -- -----------------------------------------------------------------------------
 -- 2) Infernal target marker placement + movement behavior
 -- -----------------------------------------------------------------------------
@@ -28,13 +22,13 @@ UPDATE `creature` SET `position_x` = -274.3799,
     `position_y` = 1174.073,
     `position_z` = 83.321175,
     `orientation` = 3.1407077
-WHERE `guid` = 74081;
+WHERE `guid` = 74081 AND `id1` = 21075;
 
 UPDATE `creature` SET `position_x` = -216.51663,
     `position_y` = 1173.5674,
     `position_z` = 83.321175,
     `orientation` = 4.703648
-WHERE `guid` = 74082;
+WHERE `guid` = 74082 AND `id1` = 21075;
 
 DELETE FROM `creature_template_movement` WHERE `CreatureId` = 21075;
 INSERT INTO `creature_template_movement`
@@ -42,7 +36,8 @@ INSERT INTO `creature_template_movement`
 VALUES
 (21075, 2, 0, 1, 1, 0, 0, NULL);
 
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 18969 AND `id` = 73;
+-- Rebuild every touched SmartAI package from its complete final state.
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (-68745, -68744, -68314, -68313, -68312, -68311, 18944, 18945, 18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)) OR (`source_type` = 9 AND `entryorguid` IN (1900500, 1900501, 1900502, 1900503));
 INSERT INTO `smart_scripts`
 (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
  `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
@@ -50,88 +45,25 @@ INSERT INTO `smart_scripts`
  `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
  `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
 VALUES
-(18969,0,73,0,0,0,100,0,6000,10000,22000,30000,0,0,11,33570,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - In Combat - Cast Strength of the Storm Totem');
-
--- Darnassian Archer: use bow at range; melee auto-attacks handle close targets.
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 18965 AND `id` = 10;
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
-(18965,0,10,0,9,0,100,0,0,0,2000,3000,5,30,11,15620,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Darnassian Archer - Within 5-30 Range - Cast Shoot');
-
--- Respawn behavior (final state)
-
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `event_type` = 6 AND `action_type` = 41;
-
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `id` IN (47, 48, 72);
-
--- Demon wave control
-UPDATE `smart_scripts` SET `action_param1` = 1
-WHERE `source_type` = 0
-  AND `entryorguid` = 18944
-  AND `id` = 13
-  AND `action_type` = 101;
-
--- -----------------------------------------------------------------------------
--- Remove the redundant/buggy Infernal Relay demon-summon (relay -68744 ids 0-4,
--- 44, 45). Each permanent Wrath Master (68311-68314) already summons its own four
--- Fel Soldiers AND issues SET_DATA so they follow it, then marches via waypoints
--- (see timed action lists 1900500-1900503 below). The relay duplicated that with a
--- SECOND Wrath Master (entry 19005, which has NO entry-level AI -> stood motionless)
--- plus four un-commanded Fel Soldiers at the SAME coordinates, and it fired the
--- summon on BOTH Just Created (id 44) and Respawn (id 45) -- both of which run at
--- server start -- so multiple waves stacked on the staging point and never moved.
--- Delete the whole relay summon; only the working Wrath-Master-driven waves remain.
--- -----------------------------------------------------------------------------
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = -68744 AND `id` IN (0, 1, 2, 3, 4, 44, 45);
-
-UPDATE `smart_scripts` SET `event_type` = 59,
-    `event_param1` = 1,
-    `event_param2` = 0,
-    `event_param3` = 0,
-    `event_param4` = 0,
-    `event_param5` = 0,
-    `event_param6` = 0
-WHERE `source_type` = 0
-  AND `entryorguid` IN (-68311, -68312, -68313, -68314)
-  AND `id` = 4
-  AND `action_type` = 80;
-
-UPDATE `smart_scripts` SET `action_param2` = 5000,
-    `action_param3` = 5000
-WHERE `source_type` = 0
-  AND `entryorguid` IN (-68311, -68312, -68313, -68314)
-  AND `id` = 3
-  AND `action_type` = 67;
-
-UPDATE `smart_scripts` SET `action_param1` = 10000
-WHERE `source_type` = 0
-  AND `entryorguid` IN (-68311, -68312, -68313, -68314)
-  AND `id` = 7
-  AND `action_type` = 41;
-
--- id=4 was converted to a standalone Timed Event handler (event_type 59) above, so
--- id=3 must no longer link to it (a link target must be event_type 61). The timed
--- event created by id=3 now drives id=4/id=5; clear the dangling link.
-UPDATE `smart_scripts` SET `link` = 0
-WHERE `source_type` = 0
-  AND `entryorguid` IN (-68311, -68312, -68313, -68314)
-  AND `id` = 3
-  AND `action_type` = 67
-  AND `link` = 4;
-
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-68744, -68745) AND `id` BETWEEN 46 AND 60;
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
+(-68745,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Infernal Relay (Hellfire) - On Respawn - Set Active On'),
+(-68745,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Infernal Relay (Hellfire) - On Corpse Removed - Set Active On'),
+(-68745,0,46,47,63,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18948,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Stormwind Soldier'),
+(-68745,0,47,48,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18949,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Stormwind Mage'),
+(-68745,0,48,49,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18950,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Orgrimmar Grunt'),
+(-68745,0,49,50,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18965,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Darnassian Archer'),
+(-68745,0,50,51,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18966,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Justinius'),
+(-68745,0,51,52,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18969,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Melgromm'),
+(-68745,0,52,53,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18970,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Darkspear Axe Thrower'),
+(-68745,0,53,54,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18971,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Undercity Mage'),
+(-68745,0,54,55,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18972,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Orgrimmar Shaman'),
+(-68745,0,55,0,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18986,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Ironforge Paladin'),
+(-68744,0,5,6,61,0,100,0,0,0,0,0,0,0,12,18944,3,600000,0,0,0,8,0,0,0,0,-230.616,1102.52,41.6672,4.24008,'Infernal Relay (Hellfire) - Linked - Summon Fel Soldier (18944)'),
+(-68744,0,6,7,61,0,100,0,0,0,0,0,0,0,12,18944,3,600000,0,0,0,8,0,0,0,0,-256.508,1108.92,41.6667,4.7019,'Infernal Relay (Hellfire) - Linked - Summon Fel Soldier (18944)'),
+(-68744,0,7,8,61,0,100,0,0,0,0,0,0,0,12,18944,3,600000,0,0,0,8,0,0,0,0,-242.871,1108.85,41.6667,4.69012,'Infernal Relay (Hellfire) - Linked - Summon Fel Soldier (18944)'),
+(-68744,0,8,9,61,0,100,0,0,0,0,0,0,0,12,18944,3,600000,0,0,0,8,0,0,0,0,-271.232,1105.23,41.6668,5.0713,'Infernal Relay (Hellfire) - Linked - Summon Fel Soldier (18944)'),
+(-68744,0,9,0,61,0,100,0,0,0,0,0,0,0,12,18944,3,600000,0,0,0,8,0,0,0,0,-231.023,1106.31,41.6668,4.43121,'Infernal Relay (Hellfire) - Linked - Summon Fel Soldier (18944)'),
+(-68744,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Infernal Relay (Hellfire) - On Respawn - Set Active On'),
+(-68744,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Infernal Relay (Hellfire) - On Corpse Removed - Set Active On'),
 (-68744,0,46,47,63,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18948,0,220,2,0,0,0,0,'Infernal Relay - Startup - Respawn dead Stormwind Soldier'),
 (-68744,0,47,48,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18949,0,220,2,0,0,0,0,'Infernal Relay - Startup - Respawn dead Stormwind Mage'),
 (-68744,0,48,49,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18950,0,220,2,0,0,0,0,'Infernal Relay - Startup - Respawn dead Orgrimmar Grunt'),
@@ -142,26 +74,272 @@ VALUES
 (-68744,0,53,54,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18971,0,220,2,0,0,0,0,'Infernal Relay - Startup - Respawn dead Undercity Mage'),
 (-68744,0,54,55,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18972,0,220,2,0,0,0,0,'Infernal Relay - Startup - Respawn dead Orgrimmar Shaman'),
 (-68744,0,55,0,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18986,0,220,2,0,0,0,0,'Infernal Relay - Startup - Respawn dead Ironforge Paladin'),
-(-68745,0,46,47,63,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18948,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Stormwind Soldier'),
-(-68745,0,47,48,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18949,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Stormwind Mage'),
-(-68745,0,48,49,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18950,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Orgrimmar Grunt'),
-(-68745,0,49,50,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18965,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Darnassian Archer'),
-(-68745,0,50,51,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18966,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Justinius'),
-(-68745,0,51,52,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18969,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Melgromm'),
-(-68745,0,52,53,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18970,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Darkspear Axe Thrower'),
-(-68745,0,53,54,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18971,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Undercity Mage'),
-(-68745,0,54,55,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18972,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Orgrimmar Shaman'),
-(-68745,0,55,0,61,0,100,0,0,0,0,0,0,0,70,1,0,0,0,0,0,9,18986,0,220,2,0,0,0,0,'Infernal Relay B - Startup - Respawn dead Ironforge Paladin');
-
-UPDATE `smart_scripts` SET `event_param3` = 50000,
-    `event_param4` = 50000
-WHERE `source_type` = 0
-  AND `entryorguid` = 18945
-  AND `id` IN (12, 13, 14)
-  AND `event_type` = 1;
-
--- Explicitly remove the temporary commander priority override.
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18966, 18969) AND `id` = 46 AND `action_type` = 49 AND `target_type` = 19 AND `target_param1` = 19005;
+(-68314,0,0,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Set Active'),
+(-68314,0,1,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Corpse Removed - Set Active'),
+(-68314,0,2,3,11,0,100,0,0,0,0,0,0,0,11,51347,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Cast Teleport Visual Only'),
+(-68314,0,3,0,61,0,100,512,0,0,0,0,0,0,67,1,5000,5000,0,0,100,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Create Timed Event'),
+(-68314,0,4,0,59,0,100,512,1,0,0,0,0,0,80,1900503,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Run Script'),
+(-68314,0,5,0,59,0,100,512,1,0,0,0,0,0,53,1,68314,0,0,0,2,1,0,0,0,0,0,0,0,0,'Wrath Master - On Timed Event - Start WP'),
+(-68314,0,6,0,17,0,100,512,0,0,0,0,0,0,64,1,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Wrath Master - Just Summoned - Store Target'),
+(-68314,0,7,0,6,0,100,512,0,0,0,0,0,0,41,10000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Death - Despawn'),
+(-68314,0,8,0,4,0,100,0,0,0,0,0,0,0,39,15,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Aggro - Call For Help'),
+(-68314,0,10,0,0,0,100,0,3000,13000,15000,31000,0,0,11,29574,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Wrath Master - In Combat - Cast Rend'),
+(-68314,0,11,0,0,0,100,0,6000,19000,21000,36000,0,0,11,35871,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Wrath Master - In Combat - Cast Spellbreaker'),
+(-68313,0,0,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Set Active'),
+(-68313,0,1,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Corpse Removed - Set Active'),
+(-68313,0,2,3,11,0,100,0,0,0,0,0,0,0,11,51347,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Cast Teleport Visual Only'),
+(-68313,0,3,0,61,0,100,512,0,0,0,0,0,0,67,1,5000,5000,0,0,100,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Create Timed Event'),
+(-68313,0,4,0,59,0,100,512,1,0,0,0,0,0,80,1900502,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Run Script'),
+(-68313,0,5,0,59,0,100,512,1,0,0,0,0,0,53,1,68313,0,0,0,2,1,0,0,0,0,0,0,0,0,'Wrath Master - On Timed Event - Start WP'),
+(-68313,0,6,0,17,0,100,512,0,0,0,0,0,0,64,1,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Wrath Master - Just Summoned - Store Target'),
+(-68313,0,7,0,6,0,100,512,0,0,0,0,0,0,41,10000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Death - Despawn'),
+(-68313,0,8,0,4,0,100,0,0,0,0,0,0,0,39,15,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Aggro - Call For Help'),
+(-68313,0,10,0,0,0,100,0,3000,13000,15000,31000,0,0,11,29574,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Wrath Master - In Combat - Cast Rend'),
+(-68313,0,11,0,0,0,100,0,6000,19000,21000,36000,0,0,11,35871,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Wrath Master - In Combat - Cast Spellbreaker'),
+(-68312,0,0,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Set Active'),
+(-68312,0,1,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Corpse Removed - Set Active'),
+(-68312,0,2,3,11,0,100,0,0,0,0,0,0,0,11,51347,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Cast Teleport Visual Only'),
+(-68312,0,3,0,61,0,100,512,0,0,0,0,0,0,67,1,5000,5000,0,0,100,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Create Timed Event'),
+(-68312,0,4,0,59,0,100,512,1,0,0,0,0,0,80,1900501,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Run Script'),
+(-68312,0,5,0,59,0,100,512,1,0,0,0,0,0,53,1,68312,0,0,0,2,1,0,0,0,0,0,0,0,0,'Wrath Master - On Timed Event - Start WP'),
+(-68312,0,6,0,17,0,100,512,0,0,0,0,0,0,64,1,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Wrath Master - Just Summoned - Store Target'),
+(-68312,0,7,0,6,0,100,512,0,0,0,0,0,0,41,10000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Death - Despawn'),
+(-68312,0,8,0,4,0,100,0,0,0,0,0,0,0,39,15,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Aggro - Call For Help'),
+(-68312,0,10,0,0,0,100,0,3000,13000,15000,31000,0,0,11,29574,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Wrath Master - In Combat - Cast Rend'),
+(-68312,0,11,0,0,0,100,0,6000,19000,21000,36000,0,0,11,35871,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Wrath Master - In Combat - Cast Spellbreaker'),
+(-68311,0,0,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Set Active'),
+(-68311,0,1,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Corpse Removed - Set Active'),
+(-68311,0,2,3,11,0,100,0,0,0,0,0,0,0,11,51347,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Cast Teleport Visual Only'),
+(-68311,0,3,0,61,0,100,512,0,0,0,0,0,0,67,1,5000,5000,0,0,100,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Create Timed Event'),
+(-68311,0,4,0,59,0,100,512,1,0,0,0,0,0,80,1900500,2,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Respawn - Run Script'),
+(-68311,0,5,0,59,0,100,512,1,0,0,0,0,0,53,1,68311,0,0,0,2,1,0,0,0,0,0,0,0,0,'Wrath Master - On Timed Event - Start WP'),
+(-68311,0,6,0,17,0,100,512,0,0,0,0,0,0,64,1,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Wrath Master - Just Summoned - Store Target'),
+(-68311,0,7,0,6,0,100,512,0,0,0,0,0,0,41,10000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Death - Despawn'),
+(-68311,0,8,0,4,0,100,0,0,0,0,0,0,0,39,15,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Wrath Master - On Aggro - Call For Help'),
+(-68311,0,10,0,0,0,100,0,3000,13000,15000,31000,0,0,11,29574,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Wrath Master - In Combat - Cast Rend'),
+(-68311,0,11,0,0,0,100,0,6000,19000,21000,36000,0,0,11,35871,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Wrath Master - In Combat - Cast Spellbreaker'),
+(18944,0,0,0,38,0,100,512,1,1,0,0,0,0,29,1,120,0,0,0,0,23,0,0,0,0,0,0,0,0,'Fel Soldier - On Data Set - Follow'),
+(18944,0,1,0,38,0,100,512,2,2,0,0,0,0,29,6,120,0,0,0,0,23,0,0,0,0,0,0,0,0,'Fel Soldier - On Data Set - Follow'),
+(18944,0,2,0,38,0,100,512,3,3,0,0,0,0,29,1,240,0,0,0,0,23,0,0,0,0,0,0,0,0,'Fel Soldier - On Data Set - Follow'),
+(18944,0,3,0,38,0,100,512,4,4,0,0,0,0,29,6,240,0,0,0,0,23,0,0,0,0,0,0,0,0,'Fel Soldier - On Data Set - Follow'),
+(18944,0,4,5,25,0,100,257,0,0,0,0,0,0,11,51347,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fel Soldier - On Reset - Cast Teleport Visual Only'),
+(18944,0,5,0,61,0,100,512,0,0,0,0,0,0,59,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fel Soldier - On Respawn - Set Run False'),
+(18944,0,10,0,0,0,100,0,3000,12000,9000,15000,0,0,11,15496,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Fel Soldier - In Combat - Cast Cleave'),
+(18944,0,11,0,0,0,100,0,6000,20000,16000,33000,0,0,11,32009,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Fel Soldier - In Combat - Cast Cutdown'),
+(18944,0,12,0,4,0,100,0,0,0,0,0,0,0,39,15,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fel Soldier - On Aggro - Call For Help'),
+(18944,0,13,0,60,0,100,512,5000,5000,5000,5000,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fel Soldier - On Update - Set Home Position'),
+(18944,0,14,0,1,0,100,512,10000,10000,10000,10000,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fel Soldier - On Update - Despawn'),
+(18944,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fel Soldier - On Respawn - Set Active On'),
+(18944,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fel Soldier - On Corpse Removed - Set Active On'),
+(18945,0,0,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - On Respawn - Set Active'),
+(18945,0,1,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - On Corpse Removed - Set Active'),
+(18945,0,2,3,11,0,100,512,0,0,0,0,0,0,211,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - On Respawn - No Phase Event Reset'),
+(18945,0,3,4,61,0,100,512,0,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - On Respawn - Set Event Phase 0'),
+(18945,0,4,0,61,0,100,512,0,0,0,0,0,0,80,1894500,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - On Respawn - Run Script'),
+(18945,0,5,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - On Reached Home - Set Event Phase'),
+(18945,0,7,0,40,0,100,512,43,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - On WP Reached - Set Event Phase'),
+(18945,0,8,0,6,0,100,512,0,0,0,0,0,0,41,10000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - On Death - Despawn'),
+(18945,0,10,0,0,0,100,0,3000,7000,7000,11000,0,0,11,16044,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Pit Commander - In Combat - Cast Cleave'),
+(18945,0,11,0,0,0,100,0,12000,19000,21000,31000,0,0,11,33627,0,0,0,0,0,5,20,0,0,0,0,0,0,0,'Pit Commander - In Combat - Cast Rain of Fire'),
+(18945,0,12,0,1,1,100,0,2000,2000,50000,50000,0,0,11,33393,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit Commander - Out of Combat - Cast Summon Infernals'),
+(18945,0,13,0,1,1,100,512,6000,6000,50000,50000,0,0,45,33637,0,0,0,0,0,10,74081,21075,0,0,0,0,0,0,'Pit Commander - Out of Combat - Set Data'),
+(18945,0,14,0,1,1,100,512,7000,7000,50000,50000,0,0,45,33637,0,0,0,0,0,10,74082,21075,0,0,0,0,0,0,'Pit Commander - Out of Combat - Set Data'),
+(18948,0,0,1,11,0,100,512,0,0,0,0,0,0,67,1,500,6500,0,0,100,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Respawn - Create Timed Event'),
+(18948,0,1,0,61,0,100,512,0,0,0,0,0,0,62,0,0,0,0,0,0,1,0,0,0,0,-337.49,962.62,54.4,1.57,'Stormwind Soldier - On Respawn - Teleport'),
+(18948,0,2,12,59,0,100,0,1,0,0,0,0,0,27,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Timed Event - Stop Combat'),
+(18948,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On WP Reached - Play Emote'),
+(18948,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On WP Reached - Create Timed Event'),
+(18948,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Timed Event - Set Home Position to Respawn'),
+(18948,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Timed Event - Evade'),
+(18948,0,7,0,4,0,100,0,0,0,0,0,0,0,39,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Aggro - Call For Help'),
+(18948,0,10,0,0,0,100,0,3000,9000,8000,13000,0,0,11,33626,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Stormwind Soldier - In Combat - Cast Strike'),
+(18948,0,11,0,0,0,40,0,3000,29000,28000,53000,0,0,11,23511,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - In Combat - Cast Demoralizing Shout'),
+(18948,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920001,0,0,0,2,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - Linked - Start WP'),
+(18948,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Respawn - Set Active On'),
+(18948,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Corpse Removed - Set Active On'),
+(18948,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Respawn - Set Passive while marching'),
+(18948,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On reached home marker - Activate combat'),
+(18948,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On reached home - Enter combat-ready phase'),
+(18948,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Stormwind Soldier - Combat-ready - Engage nearest enemy (hold line)'),
+(18948,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Respawn - Set corpse delay to 10s'),
+(18949,0,0,1,11,0,100,512,0,0,0,0,0,0,67,1,500,1500,0,0,100,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Respawn - Create Timed Event'),
+(18949,0,1,0,61,0,100,512,0,0,0,0,0,0,62,0,0,0,0,0,0,1,0,0,0,0,-337.49,962.62,54.4,1.57,'Stormwind Mage - On Respawn - Teleport'),
+(18949,0,2,12,59,0,100,512,1,0,0,0,0,0,27,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Timed Event - Evade'),
+(18949,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On plateau WP 11 - Salute commanders'),
+(18949,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Linked - Create timed event 2'),
+(18949,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Timed event 2 - Set home to spawn'),
+(18949,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Linked - Evade to spawn marker'),
+(18949,0,10,0,0,0,100,0,1000,2000,3000,5000,0,0,11,33417,1088,0,0,0,0,2,0,0,0,0,0,0,0,0,'Stormwind Mage - In Combat - Cast Fireball'),
+(18949,0,11,0,0,0,100,0,3000,17000,20000,40000,0,0,11,33419,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Stormwind Mage - In Combat - Cast Arcane Missiles'),
+(18949,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920004,0,0,0,2,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Linked - Start WP (upper plateau)'),
+(18949,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Respawn - Set Active On'),
+(18949,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Corpse Removed - Set Active On'),
+(18949,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Respawn - Set Passive while marching'),
+(18949,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On reached home marker - Activate combat'),
+(18949,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On reached home - Enter combat-ready phase'),
+(18949,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,22,0,0,0,0,0,0,0,'Stormwind Mage - Combat-ready - Engage nearest enemy (hold line)'),
+(18949,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Respawn - Set corpse delay to 10s'),
+(18950,0,0,1,11,0,100,512,0,0,0,0,0,0,67,1,500,6500,0,0,100,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Respawn - Create Timed Event'),
+(18950,0,1,0,61,0,100,512,0,0,0,0,0,0,62,0,0,0,0,0,0,1,0,0,0,0,-161.31,965.4,54.4,1.57,'Orgrimmar Grunt - On Respawn - Teleport'),
+(18950,0,2,12,59,0,100,0,1,0,0,0,0,0,27,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Timed Event - Stop Combat'),
+(18950,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On WP Reached - Play Emote'),
+(18950,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On WP Reached - Create Timed Event'),
+(18950,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Timed Event - Set Home Position to Respawn'),
+(18950,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Timed Event - Evade'),
+(18950,0,7,0,4,0,100,0,0,0,0,0,0,0,39,30,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Aggro - Call For Help'),
+(18950,0,10,0,0,0,100,0,3000,9000,8000,13000,0,0,11,33626,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - In Combat - Cast Strike'),
+(18950,0,11,0,0,0,40,0,3000,29000,28000,53000,0,0,11,23511,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - In Combat - Cast Demoralizing Shout'),
+(18950,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920011,0,0,0,2,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - Linked - Start WP'),
+(18950,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Respawn - Set Active On'),
+(18950,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Corpse Removed - Set Active On'),
+(18950,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Respawn - Set Passive while marching'),
+(18950,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On reached home marker - Activate combat'),
+(18950,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On reached home - Enter combat-ready phase'),
+(18950,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Orgrimmar Grunt - Combat-ready - Engage nearest enemy (hold line)'),
+(18950,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Respawn - Set corpse delay to 10s'),
+(18965,0,0,1,11,0,100,512,0,0,0,0,0,0,67,1,500,6500,0,0,100,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Respawn - Create Timed Event'),
+(18965,0,1,0,61,0,100,512,0,0,0,0,0,0,62,0,0,0,0,0,0,1,0,0,0,0,-337.49,962.62,54.4,1.57,'Darnassian Archer - On Respawn - Teleport'),
+(18965,0,2,12,59,0,100,0,1,0,0,0,0,0,27,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Timed Event - Stop Combat'),
+(18965,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On WP Reached - Play Emote'),
+(18965,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On WP Reached - Create Timed Event'),
+(18965,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Timed Event - Set Home Position to Respawn'),
+(18965,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Timed Event - Evade'),
+(18965,0,10,0,9,0,100,0,0,0,2000,3000,5,30,11,15620,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Darnassian Archer - Within 5-30 Range - Cast Shoot'),
+(18965,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920003,0,0,0,2,1,0,0,0,0,0,0,0,0,'Darnassian Archer - Linked - Start WP'),
+(18965,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Respawn - Set Active On'),
+(18965,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Corpse Removed - Set Active On'),
+(18965,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Respawn - Set Passive while marching'),
+(18965,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On reached home marker - Activate combat'),
+(18965,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On reached home - Enter combat-ready phase'),
+(18965,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Darnassian Archer - Combat-ready - Engage nearest enemy (hold line)'),
+(18965,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Respawn - Set corpse delay to 10s'),
+(18966,0,0,0,4,0,100,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - On Aggro - Say Line 0'),
+(18966,0,1,0,0,0,100,0,5000,10000,10000,20000,0,0,11,33554,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Justinius the Harbinger - In Combat - Cast Judgement of Command'),
+(18966,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - On Respawn - Set Active On'),
+(18966,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - On Corpse Removed - Set Active On'),
+(18966,0,74,0,0,0,100,0,7000,11000,12000,18000,0,0,11,20922,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Justinius the Harbinger - In Combat - Cast Consecration (Rank 3)'),
+(18966,0,75,0,2,0,100,0,1,45,8000,14000,0,0,11,37254,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - At 45% HP - Cast Flash of Light'),
+(18966,0,76,0,4,0,100,1,0,0,0,0,0,0,11,29381,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - On Aggro - Cast Greater Blessing of Might'),
+(18966,0,77,0,2,0,100,0,1,15,60000,60000,0,0,11,13874,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - At 15% HP - Cast Divine Shield'),
+(18966,0,78,0,1,0,100,0,2000,2000,30000,30000,0,0,11,29381,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - Out of Combat - Buff allies (Greater Blessing of Might)'),
+(18966,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius - On Respawn - Set Passive while marching'),
+(18966,0,99,0,11,0,100,512,0,0,0,0,0,0,67,9,15000,15000,0,0,100,1,0,0,0,0,0,0,0,0,'Justinius - On Respawn - Arm activation timer (no march)'),
+(18966,0,100,0,59,0,100,512,9,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius - Activation timer 9 - Set aggressive'),
+(18966,0,101,0,59,0,100,512,9,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius - Activation timer 9 - Enter combat-ready phase'),
+(18966,0,102,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Justinius - Combat-ready - Engage nearest enemy (hold line)'),
+(18966,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - On Respawn - Set corpse delay to 10s'),
+(18969,0,0,0,0,0,100,0,5000,10000,10000,20000,0,0,11,33643,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Melgromm Highmountain - In Combat - Cast Chain Lightning'),
+(18969,0,1,0,0,0,100,0,5000,10000,10000,20000,0,0,11,22885,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Melgromm Highmountain - In Combat - Cast Earth Shock'),
+(18969,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - On Respawn - Set Active On'),
+(18969,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - On Corpse Removed - Set Active On'),
+(18969,0,73,0,0,0,100,0,6000,10000,22000,30000,0,0,11,33570,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - In Combat - Cast Strength of the Storm Totem'),
+(18969,0,74,0,2,0,100,0,1,50,7000,12000,0,0,11,33642,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - At 50% HP - Cast Chain Heal'),
+(18969,0,75,0,0,0,100,0,9000,14000,25000,31000,0,0,11,33560,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - In Combat - Cast Magma Flow Totem'),
+(18969,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm - On Respawn - Set Passive while marching'),
+(18969,0,99,0,11,0,100,512,0,0,0,0,0,0,67,9,15000,15000,0,0,100,1,0,0,0,0,0,0,0,0,'Melgromm - On Respawn - Arm activation timer (no march)'),
+(18969,0,100,0,59,0,100,512,9,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm - Activation timer 9 - Set aggressive'),
+(18969,0,101,0,59,0,100,512,9,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm - Activation timer 9 - Enter combat-ready phase'),
+(18969,0,102,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Melgromm - Combat-ready - Engage nearest enemy (hold line)'),
+(18969,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - On Respawn - Set corpse delay to 10s'),
+(18970,0,0,1,11,0,100,512,0,0,0,0,0,0,67,1,500,6500,0,0,100,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Respawn - Create Timed Event'),
+(18970,0,1,0,61,0,100,512,0,0,0,0,0,0,62,0,0,0,0,0,0,1,0,0,0,0,-161.31,965.4,54.4,1.57,'Darkspear Axe Thrower - On Respawn - Teleport'),
+(18970,0,2,12,59,0,100,0,1,0,0,0,0,0,27,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Timed Event - Stop Combat'),
+(18970,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On WP Reached - Play Emote'),
+(18970,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On WP Reached - Create Timed Event'),
+(18970,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Timed Event - Set Home Position to Respawn'),
+(18970,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Timed Event - Evade'),
+(18970,0,10,0,0,0,100,0,0,2000,2300,3900,0,0,11,10277,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - In Combat - Cast Throw'),
+(18970,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920013,0,0,0,2,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - Linked - Start WP'),
+(18970,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Respawn - Set Active On'),
+(18970,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Corpse Removed - Set Active On'),
+(18970,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Respawn - Set Passive while marching'),
+(18970,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On reached home marker - Activate combat'),
+(18970,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On reached home - Enter combat-ready phase'),
+(18970,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Darkspear Axe Thrower - Combat-ready - Engage nearest enemy (hold line)'),
+(18970,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Respawn - Set corpse delay to 10s'),
+(18971,0,0,1,11,0,100,512,0,0,0,0,0,0,67,1,500,1500,0,0,100,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Create Timed Event'),
+(18971,0,1,0,61,0,100,512,0,0,0,0,0,0,62,0,0,0,0,0,0,1,0,0,0,0,-161.31,965.4,54.4,1.57,'Undercity Mage - On Respawn - Teleport'),
+(18971,0,2,12,59,0,100,512,1,0,0,0,0,0,27,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Timed Event - Evade'),
+(18971,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On plateau WP 11 - Salute commanders'),
+(18971,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Undercity Mage - Linked - Create timed event 2'),
+(18971,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - Timed event 2 - Set home to spawn'),
+(18971,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - Linked - Evade to spawn marker'),
+(18971,0,10,0,0,0,100,0,1000,2000,3000,5000,0,0,11,33417,1088,0,0,0,0,2,0,0,0,0,0,0,0,0,'Undercity Mage - In Combat - Cast Fireball'),
+(18971,0,11,0,0,0,100,0,3000,17000,20000,40000,0,0,11,33419,64,0,0,0,0,2,0,0,0,0,0,0,0,0,'Undercity Mage - In Combat - Cast Arcane Missiles'),
+(18971,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920014,0,0,0,2,1,0,0,0,0,0,0,0,0,'Undercity Mage - Linked - Start WP (upper plateau)'),
+(18971,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Set Active On'),
+(18971,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Corpse Removed - Set Active On'),
+(18971,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Set Passive while marching'),
+(18971,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On reached home marker - Activate combat'),
+(18971,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On reached home - Enter combat-ready phase'),
+(18971,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,22,0,0,0,0,0,0,0,'Undercity Mage - Combat-ready - Engage nearest enemy (hold line)'),
+(18971,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Set corpse delay to 10s'),
+(18972,0,0,1,11,0,100,512,0,0,0,0,0,0,67,1,500,6500,0,0,100,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Create Timed Event'),
+(18972,0,1,0,61,0,100,512,0,0,0,0,0,0,62,0,0,0,0,0,0,1,0,0,0,0,-161.31,965.4,54.4,1.57,'Orgrimmar Shaman - On Respawn - Teleport'),
+(18972,0,2,12,59,0,100,0,1,0,0,0,0,0,27,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Timed Event - Stop Combat'),
+(18972,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On WP Reached - Play Emote'),
+(18972,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On WP Reached - Create Timed Event'),
+(18972,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Timed Event - Set Home Position to Respawn'),
+(18972,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Timed Event - Evade'),
+(18972,0,10,0,0,0,100,0,3000,12000,12000,18000,0,0,11,15616,0,0,0,0,0,5,20,0,0,0,0,0,0,0,'Orgrimmar Shaman - In Combat - Cast Flame Shock'),
+(18972,0,11,0,0,0,100,0,0,5000,60000,60000,0,0,11,20545,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - In Combat - Cast Lightning Shield'),
+(18972,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920012,0,0,0,2,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - Linked - Start WP'),
+(18972,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Set Active On'),
+(18972,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Corpse Removed - Set Active On'),
+(18972,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Set Passive while marching'),
+(18972,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On reached home marker - Activate combat'),
+(18972,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On reached home - Enter combat-ready phase'),
+(18972,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Orgrimmar Shaman - Combat-ready - Engage nearest enemy (hold line)'),
+(18972,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Set corpse delay to 10s'),
+(18986,0,0,1,11,0,100,512,0,0,0,0,0,0,67,1,500,6500,0,0,100,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Create Timed Event'),
+(18986,0,1,0,61,0,100,512,0,0,0,0,0,0,62,0,0,0,0,0,0,1,0,0,0,0,-337.49,962.62,54.4,1.57,'Ironforge Paladin - On Respawn - Teleport'),
+(18986,0,2,12,59,0,100,0,1,0,0,0,0,0,27,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Timed Event - Stop Combat'),
+(18986,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On WP Reached - Play Emote'),
+(18986,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On WP Reached - Create Timed Event'),
+(18986,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Timed Event - Set Home Position to Respawn'),
+(18986,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Timed Event - Evade'),
+(18986,0,10,0,0,0,100,0,3000,9000,8000,13000,0,0,11,20696,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Ironforge Paladin - In Combat - Cast Holy Smite'),
+(18986,0,11,0,0,0,40,0,3000,12000,15000,28000,0,0,11,33632,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Ironforge Paladin - In Combat - Cast Exorcism'),
+(18986,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920002,0,0,0,2,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - Linked - Start WP'),
+(18986,0,42,0,11,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Set Active On'),
+(18986,0,43,0,36,0,100,512,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Corpse Removed - Set Active On'),
+(18986,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Set Passive while marching'),
+(18986,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On reached home marker - Activate combat'),
+(18986,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On reached home - Enter combat-ready phase'),
+(18986,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Ironforge Paladin - Combat-ready - Engage nearest enemy (hold line)'),
+(18986,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Set corpse delay to 10s'),
+(1900500,9,0,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-298,1529,37.92391,0.18216586,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900500,9,1,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900500,9,2,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-307,1530,37.92391,0.18216586,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900500,9,3,0,0,0,100,0,0,0,0,0,0,0,45,2,2,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900500,9,4,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-297.8,1520.7,37.92391,0.18216586,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900500,9,5,0,0,0,100,0,0,0,0,0,0,0,45,3,3,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900500,9,6,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-307.4,1519.9,37.92391,0.18216586,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900500,9,7,0,0,0,100,0,0,0,0,0,0,0,45,4,4,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900501,9,0,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-142,1514.9,33.62471,3.0842154,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900501,9,1,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900501,9,2,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-151.1,1515.4,33.62471,3.0842154,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900501,9,3,0,0,0,100,0,0,0,0,0,0,0,45,2,2,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900501,9,4,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-141.8,1506,33.62471,3.0842154,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900501,9,5,0,0,0,100,0,0,0,0,0,0,0,45,3,3,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900501,9,6,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-151.4,1505.2,33.62471,3.0842154,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900501,9,7,0,0,0,100,0,0,0,0,0,0,0,45,4,4,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900502,9,0,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-80,1886,74.695015,2.5140123,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900502,9,1,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900502,9,2,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-89.2,1886.5,74.695015,2.5140123,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900502,9,3,0,0,0,100,0,0,0,0,0,0,0,45,2,2,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900502,9,4,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-79.8,1877.7,74.695015,2.5140123,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900502,9,5,0,0,0,100,0,0,0,0,0,0,0,45,3,3,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900502,9,6,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-89.6,1876.9,74.695015,2.5140123,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900502,9,7,0,0,0,100,0,0,0,0,0,0,0,45,4,4,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900503,9,0,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-414.7,1851.2,81.09361,1.7246842,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900503,9,1,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900503,9,2,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-424.3,1851.8,81.09361,1.7246842,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900503,9,3,0,0,0,100,0,0,0,0,0,0,0,45,2,2,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900503,9,4,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-414.4,1842.5,81.09361,1.7246842,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900503,9,5,0,0,0,100,0,0,0,0,0,0,0,45,3,3,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data'),
+(1900503,9,6,0,0,0,100,0,0,0,0,0,0,0,12,18944,8,0,0,0,0,8,0,0,0,0,-425,1841.7,81.09361,1.7246842,'Wrath Master - On Script - Summon Fel Soldier'),
+(1900503,9,7,0,0,0,100,0,0,0,0,0,0,0,45,4,4,0,0,0,0,12,1,0,0,0,0,0,0,0,'Wrath Master - On Script - Set Data');
 
 -- =============================================================================
 -- Per-role waypoints: all NPCs march the high terrace to the commander plateau
@@ -274,99 +452,6 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 -- 920015  Melgromm (spawns at top already)  -> marker 68616
 (920015,1,-230.394,1072.02,54.391,'Melgromm - top plateau marker');
 
--- Redirect Start WP for the 6 entries that already have id=12 in base.
-UPDATE `smart_scripts` SET `action_param2`=920001
-WHERE `source_type`=0 AND `entryorguid`=18948 AND `id`=12 AND `action_type`=53;
-
-UPDATE `smart_scripts` SET `action_param2`=920002
-WHERE `source_type`=0 AND `entryorguid`=18986 AND `id`=12 AND `action_type`=53;
-
-UPDATE `smart_scripts` SET `action_param2`=920003
-WHERE `source_type`=0 AND `entryorguid`=18965 AND `id`=12 AND `action_type`=53;
-
-UPDATE `smart_scripts` SET `action_param2`=920011
-WHERE `source_type`=0 AND `entryorguid`=18950 AND `id`=12 AND `action_type`=53;
-
-UPDATE `smart_scripts` SET `action_param2`=920012
-WHERE `source_type`=0 AND `entryorguid`=18972 AND `id`=12 AND `action_type`=53;
-
-UPDATE `smart_scripts` SET `action_param2`=920013
-WHERE `source_type`=0 AND `entryorguid`=18970 AND `id`=12 AND `action_type`=53;
-
--- Fix the two mage entries.
--- Root bug: snapshot replaced id=12 with a Linked Start WP, but id=2 (Evade) has link=0
--- so the chain never reaches id=12. Fix: set link=12 on id=2, update id=12 path.
-UPDATE `smart_scripts` SET `link` = 12
-WHERE `source_type`=0
-  AND `entryorguid` IN (18949, 18971)
-  AND `id` = 2
-  AND `event_type` = 59;
-
-DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (18949, 18971) AND `id` = 12;
-INSERT INTO `smart_scripts`
-(`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,
- `event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,
- `action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,
- `target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,
- `target_x`,`target_y`,`target_z`,`target_o`,`comment`)
-VALUES
-(18949,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920004,0,0,0,2,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Linked - Start WP (upper plateau)'),
-(18971,0,12,0,61,0,100,512,0,0,0,0,0,0,53,2,920014,0,0,0,2,1,0,0,0,0,0,0,0,0,'Undercity Mage - Linked - Start WP (upper plateau)');
-
--- Plateau salute + return-to-spawn (spread).
--- The base script chain already does: reach point 11 -> emote (id3) -> 2s timer
--- (id4) -> SET_HOME_POS (id5) -> EVADE (id6). We only need to (a) make the emote
--- a military salute (66), and (b) make SET_HOME_POS use the unit's SPAWN position
--- (spawnPos=1) instead of the current plateau spot, so the evade walks each unit
--- back to its OWN spawn marker (pathfinding down the stairs) rather than stacking.
-UPDATE `smart_scripts` SET `action_param1` = 66
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18970, 18971, 18972, 18986)
-  AND `id` = 3
-  AND `action_type` = 5;
-
-UPDATE `smart_scripts` SET `action_param1` = 1
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18970, 18971, 18972, 18986)
-  AND `id` = 5
-  AND `action_type` = 101;
-
--- Remove the earlier duplicate salute (ids 96/97); the base id3 chain handles it.
-DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18970, 18971, 18972, 18986) AND `id` IN (96, 97);
-
--- The two mage entries (18949, 18971) lack the ground units' base id3..id6
--- salute/return chain, so add it explicitly: on reaching plateau WP 11 -> salute
--- (emote 66) -> 2s timer -> SET_HOME_POS to spawn (spawnPos=1) -> EVADE, which
--- walks each mage back to its own spawn marker (spreads them, no stacking).
-DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (18949, 18971) AND `id` IN (3, 4, 5, 6);
-INSERT INTO `smart_scripts`
-(`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,
- `event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,
- `action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,
- `target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,
- `target_x`,`target_y`,`target_z`,`target_o`,`comment`)
-VALUES
-(18949,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On plateau WP 11 - Salute commanders'),
-(18949,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Linked - Create timed event 2'),
-(18949,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Timed event 2 - Set home to spawn'),
-(18949,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - Linked - Evade to spawn marker'),
-(18971,0,3,4,40,0,100,0,11,0,0,0,0,0,5,66,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On plateau WP 11 - Salute commanders'),
-(18971,0,4,0,61,0,100,512,0,0,0,0,0,0,67,2,2000,2000,0,0,100,1,0,0,0,0,0,0,0,0,'Undercity Mage - Linked - Create timed event 2'),
-(18971,0,5,6,59,0,100,512,2,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - Timed event 2 - Set home to spawn'),
-(18971,0,6,0,61,0,100,512,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - Linked - Evade to spawn marker');
-
--- Route fix: the mages' base id2 ran EVADE (24) on respawn instead of STOP_COMBAT
--- (27) like the ground units. After the teleport to the path start, that EVADE
--- pulled them back toward their plateau spawn while the escort was starting, so
--- they wandered off-route (climbing terrain) and the salute/evade-home chain never
--- completed -> REACHED_HOME never fired -> they stayed passive and never fought.
--- Align them with the ground units so they march cleanly and activate on arrival.
-UPDATE `smart_scripts` SET `action_type` = 27, `action_param1` = 0
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18949, 18971)
-  AND `id` = 2
-  AND `action_type` = 24;
-
 -- Rebuild formations by ROLE/ROW: each unit type occupies the marker row matching
 -- its terrain tier (plateau mages/commanders, ramp archers, mid casters, front melee),
 -- pairing 1 unit -> 1 distinct marker so no two units stack on the same marker.
@@ -384,7 +469,7 @@ WITH `mk` AS (
                 WHEN `position_y` >= 1096 THEN 'front'
                 ELSE 'mid' END AS `band`
     FROM `creature`
-    WHERE `map` = 530 AND `id` = 19179
+    WHERE `map` = 530 AND `id1` = 19179
       AND `position_x` BETWEEN -280 AND -220 AND `position_y` BETWEEN 1065 AND 1100
 ), `platrk` AS (
     SELECT
@@ -400,20 +485,20 @@ WITH `mk` AS (
         `guid`, `side`, `role`, ROW_NUMBER() OVER (PARTITION BY `side`, `role` ORDER BY `x`) AS `rn`
     FROM `mkrole`
 ), `un` AS (
-    SELECT `guid`, `id`, `position_x` AS `x`,
+    SELECT `guid`, `id1`, `position_x` AS `x`,
            CASE WHEN `position_x` <= -250 THEN 'A' ELSE 'H' END AS `side`,
-           CASE `id`
+           CASE `id1`
                 WHEN 18948 THEN 'front' WHEN 18986 THEN 'mid' WHEN 18965 THEN 'ramp'
                 WHEN 18949 THEN 'mage'  WHEN 18966 THEN 'cmd'
                 WHEN 18950 THEN 'front' WHEN 18972 THEN 'mid' WHEN 18970 THEN 'ramp'
                 WHEN 18971 THEN 'mage'  WHEN 18969 THEN 'cmd' END AS `role`
     FROM `creature`
     WHERE `map` = 530
-      AND `id` IN (18948,18986,18965,18949,18966,18950,18972,18970,18971,18969)
+      AND `id1` IN (18948,18986,18965,18949,18966,18950,18972,18970,18971,18969)
       AND `position_x` BETWEEN -290 AND -210 AND `position_y` BETWEEN 1065 AND 1105
 ), `unflt` AS (
     -- drop the lone boundary grunt on the Alliance side (no Horde-melee marker there)
-    SELECT * FROM `un` WHERE NOT (`id` = 18950 AND `side` = 'A')
+    SELECT * FROM `un` WHERE NOT (`id1` = 18950 AND `side` = 'A')
 ), `unn` AS (
     SELECT
         `guid`, `side`, `role`, ROW_NUMBER() OVER (PARTITION BY `side`, `role` ORDER BY `x`) AS `rn`
@@ -429,158 +514,20 @@ CREATE TEMPORARY TABLE `tmp_dp_used` AS
 SELECT DISTINCT `marker_guid` FROM `tmp_dp_assign`;
 
 -- Clear any existing formation rows for these army units and markers.
-DELETE FROM `creature_formations` WHERE `leaderGUID` IN ( SELECT `guid` FROM `creature` WHERE `map` = 530 AND `id` = 19179 AND `position_x` BETWEEN -280 AND -220 AND `position_y` BETWEEN 1065 AND 1100 );
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN ( SELECT `guid` FROM `creature` WHERE `map` = 530 AND `id1` = 19179 AND `position_x` BETWEEN -280 AND -220 AND `position_y` BETWEEN 1065 AND 1100 );
 -- Leader self-rows (a formation only activates when its leader is present as a member).
 INSERT INTO `creature_formations`
 (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`)
 SELECT `marker_guid`, `marker_guid`, 0, 0, @FORMATION_FLAGS, 0, 0 FROM `tmp_dp_used`;
 
 -- Member rows: each unit pinned (dist 0) onto its own role-matched marker.
-DELETE FROM `creature_formations` WHERE `memberGUID` IN ( SELECT `guid` FROM `creature` WHERE `map` = 530 AND `id` IN (18948,18949,18950,18965,18966,18969,18970,18971,18972,18986) AND `position_x` BETWEEN -290 AND -210 AND `position_y` BETWEEN 1065 AND 1105 );
+DELETE FROM `creature_formations` WHERE `memberGUID` IN ( SELECT `guid` FROM `creature` WHERE `map` = 530 AND `id1` IN (18948,18949,18950,18965,18966,18969,18970,18971,18972,18986) AND `position_x` BETWEEN -290 AND -210 AND `position_y` BETWEEN 1065 AND 1105 );
 INSERT INTO `creature_formations`
 (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`)
 SELECT `marker_guid`, `member_guid`, 0, 0, @FORMATION_FLAGS, 0, 0 FROM `tmp_dp_assign`;
 
 DROP TEMPORARY TABLE IF EXISTS `tmp_dp_assign`;
 DROP TEMPORARY TABLE IF EXISTS `tmp_dp_used`;
-
--- March passive; activate on final battalion marker.
--- Marchers (ground + mages) activate on REACHED_HOME after they evade-walk to
--- their own marker. The two commanders do NOT march (their WP is a single point
--- at their own spawn, so ESCORT_REACHED never fired and they stayed passive);
--- instead arm a timed event on respawn that flips them aggressive ~15s in, in
--- step with the demon wave engagement.
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `id` IN (98, 99, 100, 101, 102);
-
--- Drop the commanders' pointless 1-point WP start and clear any prior id=100.
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18966, 18969) AND `id` IN (12, 100);
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
-(18948,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Respawn - Set Passive while marching'),
-(18949,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Respawn - Set Passive while marching'),
-(18950,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Respawn - Set Passive while marching'),
-(18965,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Respawn - Set Passive while marching'),
-(18966,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius - On Respawn - Set Passive while marching'),
-(18969,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm - On Respawn - Set Passive while marching'),
-(18970,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Respawn - Set Passive while marching'),
-(18971,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Set Passive while marching'),
-(18972,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Set Passive while marching'),
-(18986,0,98,0,11,0,100,512,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Set Passive while marching'),
-
-(18948,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On reached home marker - Activate combat'),
-(18986,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On reached home marker - Activate combat'),
-(18965,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On reached home marker - Activate combat'),
-(18949,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On reached home marker - Activate combat'),
-(18966,0,99,0,11,0,100,512,0,0,0,0,0,0,67,9,15000,15000,0,0,100,1,0,0,0,0,0,0,0,0,'Justinius - On Respawn - Arm activation timer (no march)'),
-(18950,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On reached home marker - Activate combat'),
-(18972,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On reached home marker - Activate combat'),
-(18970,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On reached home marker - Activate combat'),
-(18971,0,99,0,21,0,100,0,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On reached home marker - Activate combat'),
-(18969,0,99,0,11,0,100,512,0,0,0,0,0,0,67,9,15000,15000,0,0,100,1,0,0,0,0,0,0,0,0,'Melgromm - On Respawn - Arm activation timer (no march)'),
-(18966,0,100,0,59,0,100,512,9,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius - Activation timer 9 - Set aggressive'),
-(18969,0,100,0,59,0,100,512,9,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm - Activation timer 9 - Set aggressive'),
-
--- Enter a "combat-ready" event phase (1) at the moment each unit activates, so the
--- out-of-combat engage pulse below only runs after arrival (never during the march).
-(18948,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On reached home - Enter combat-ready phase'),
-(18986,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On reached home - Enter combat-ready phase'),
-(18965,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On reached home - Enter combat-ready phase'),
-(18949,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On reached home - Enter combat-ready phase'),
-(18950,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On reached home - Enter combat-ready phase'),
-(18972,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On reached home - Enter combat-ready phase'),
-(18970,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On reached home - Enter combat-ready phase'),
-(18971,0,100,0,21,0,100,0,0,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On reached home - Enter combat-ready phase'),
-(18966,0,101,0,59,0,100,512,9,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius - Activation timer 9 - Enter combat-ready phase'),
-(18969,0,101,0,59,0,100,512,9,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm - Activation timer 9 - Enter combat-ready phase'),
-
--- Out-of-combat engage pulse (phase 1 only): once activated, acquire the nearest
--- hostile within a SHORT radius and charge it. Kept short so the army holds the
--- line near the stairs and lets the demons close the distance, instead of running
--- forward to pull far demons (and the Pit Lord). Melee/casters scan 15y, mages 22y.
-(18948,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Stormwind Soldier - Combat-ready - Engage nearest enemy (hold line)'),
-(18986,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Ironforge Paladin - Combat-ready - Engage nearest enemy (hold line)'),
-(18965,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Darnassian Archer - Combat-ready - Engage nearest enemy (hold line)'),
-(18949,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,22,0,0,0,0,0,0,0,'Stormwind Mage - Combat-ready - Engage nearest enemy (hold line)'),
-(18950,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Orgrimmar Grunt - Combat-ready - Engage nearest enemy (hold line)'),
-(18972,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Orgrimmar Shaman - Combat-ready - Engage nearest enemy (hold line)'),
-(18970,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Darkspear Axe Thrower - Combat-ready - Engage nearest enemy (hold line)'),
-(18971,0,101,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,22,0,0,0,0,0,0,0,'Undercity Mage - Combat-ready - Engage nearest enemy (hold line)'),
-(18966,0,102,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Justinius - Combat-ready - Engage nearest enemy (hold line)'),
-(18969,0,102,0,1,1,100,0,1000,1500,1200,1800,0,0,49,0,0,0,0,0,0,25,15,0,0,0,0,0,0,0,'Melgromm - Combat-ready - Engage nearest enemy (hold line)');
-
--- Mages: keep ally-support radius and retarget scan modest so they do not chase
--- distant demons forward.
-UPDATE `smart_scripts` SET `action_param1` = 90
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18949, 18971)
-  AND `id` = 44
-  AND `action_type` = 39;
-
-UPDATE `smart_scripts` SET `target_param1` = 25
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18949, 18971)
-  AND `id` = 71
-  AND `action_type` = 49
-  AND `target_type` = 25;
-
--- In-combat retarget pulse: keep the closest-enemy scan local (25y) for the whole
--- army so units stay on the demons reaching the stairs instead of running out to
--- the farthest target and dragging the line into the Pit Lord.
-UPDATE `smart_scripts` SET `target_param1` = 25
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18950, 18965, 18966, 18969, 18970, 18972, 18986)
-  AND `id` = 71
-  AND `action_type` = 49
-  AND `target_type` = 25;
-
--- Keep the mages at range: they were running into melee between casts. Their cast
--- rows had castFlags=0, so the AI used the default (melee) chase distance and the
--- retarget pulse (ATTACK_START) chased each new target to melee. Flag the primary
--- spell (Fireball 33417) as SMARTCAST_MAIN_SPELL (0x400) so the creature's chase
--- distance is set to that spell's max range on spawn, and add SMARTCAST_COMBAT_MOVE
--- (0x40) to both combat spells so a successful cast holds position (only moving on
--- out-of-range / OOM / LOS). AttackStart() then chases only to _attackDistance
--- (spell range), not melee.
-UPDATE `smart_scripts` SET `action_param2` = 1088 -- SMARTCAST_COMBAT_MOVE | SMARTCAST_MAIN_SPELL
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18949, 18971)
-  AND `id` = 10
-  AND `action_type` = 11
-  AND `action_param1` = 33417;
-
-UPDATE `smart_scripts` SET `action_param2` = 64 -- SMARTCAST_COMBAT_MOVE
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18949, 18971)
-  AND `id` = 11
-  AND `action_type` = 11
-  AND `action_param1` = 33419;
-
--- Full ability sets for the two commanders (Justinius the Harbinger / Melgromm Highmountain).
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18966, 18969) AND `id` IN (74, 75, 76, 77, 78);
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
--- Justinius the Harbinger (Paladin): Consecration, Flash of Light, Greater Blessing of Might, Divine Shield.
-(18966,0,74,0,0,0,100,0,7000,11000,12000,18000,0,0,11,20922,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Justinius the Harbinger - In Combat - Cast Consecration (Rank 3)'),
-(18966,0,75,0,2,0,100,0,1,45,8000,14000,0,0,11,37254,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - At 45% HP - Cast Flash of Light'),
-(18966,0,76,0,4,0,100,1,0,0,0,0,0,0,11,29381,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - On Aggro - Cast Greater Blessing of Might'),
-(18966,0,77,0,2,0,100,0,1,15,60000,60000,0,0,11,13874,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - At 15% HP - Cast Divine Shield'),
--- Keep allies buffed even while idle/out of combat: re-cast Greater Blessing of
--- Might every 30s. 29381 uses TARGET_UNIT_CASTER_AREA_PARTY, so casting on self
--- radiates the buff to nearby same-faction allies. event_type 1 = UPDATE_OOC.
-(18966,0,78,0,1,0,100,0,2000,2000,30000,30000,0,0,11,29381,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - Out of Combat - Buff allies (Greater Blessing of Might)'),
--- Melgromm Highmountain (Shaman): Chain Heal, Magma Flow Totem.
-(18969,0,74,0,2,0,100,0,1,50,7000,12000,0,0,11,33642,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - At 50% HP - Cast Chain Heal'),
-(18969,0,75,0,0,0,100,0,9000,14000,25000,31000,0,0,11,33560,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - In Combat - Cast Magma Flow Totem');
 
 -- Totem passive spells. The summon spells (33560/33570) only create the totem
 -- creature; the buff/effect comes from the totem auto-casting its own passive on
@@ -630,7 +577,7 @@ UPDATE `creature` SET `map` = 530,
     `MovementType` = 0,
     `curhealth` = 143620,
     `Comment` = 'GUID SAI'
-WHERE `guid` = 68311 AND `id` = 19005;
+WHERE `guid` = 68311 AND `id1` = 19005;
 
 UPDATE `creature` SET `map` = 530,
     `zoneId` = 3483,
@@ -646,7 +593,7 @@ UPDATE `creature` SET `map` = 530,
     `MovementType` = 0,
     `curhealth` = 143620,
     `Comment` = 'GUID SAI'
-WHERE `guid` = 68312 AND `id` = 19005;
+WHERE `guid` = 68312 AND `id1` = 19005;
 
 UPDATE `creature` SET `map` = 530,
     `zoneId` = 3483,
@@ -662,7 +609,7 @@ UPDATE `creature` SET `map` = 530,
     `MovementType` = 0,
     `curhealth` = 143620,
     `Comment` = 'GUID SAI'
-WHERE `guid` = 68313 AND `id` = 19005;
+WHERE `guid` = 68313 AND `id1` = 19005;
 
 UPDATE `creature` SET `map` = 530,
     `zoneId` = 3483,
@@ -678,65 +625,7 @@ UPDATE `creature` SET `map` = 530,
     `MovementType` = 0,
     `curhealth` = 143620,
     `Comment` = 'GUID SAI'
-WHERE `guid` = 68314 AND `id` = 19005;
-
--- Keep the four existing GUID SAI packages wired to the right timed scripts.
-UPDATE `smart_scripts` SET `action_param2` = 68311
-WHERE `entryorguid` = -68311 AND `source_type` = 0 AND `id` = 5 AND `action_type` = 53;
-UPDATE `smart_scripts` SET `action_param1` = 1900500
-WHERE `entryorguid` = -68311 AND `source_type` = 0 AND `id` = 4 AND `action_type` = 80;
-
-UPDATE `smart_scripts` SET `action_param2` = 68312
-WHERE `entryorguid` = -68312 AND `source_type` = 0 AND `id` = 5 AND `action_type` = 53;
-UPDATE `smart_scripts` SET `action_param1` = 1900501
-WHERE `entryorguid` = -68312 AND `source_type` = 0 AND `id` = 4 AND `action_type` = 80;
-
-UPDATE `smart_scripts` SET `action_param2` = 68313
-WHERE `entryorguid` = -68313 AND `source_type` = 0 AND `id` = 5 AND `action_type` = 53;
-UPDATE `smart_scripts` SET `action_param1` = 1900502
-WHERE `entryorguid` = -68313 AND `source_type` = 0 AND `id` = 4 AND `action_type` = 80;
-
-UPDATE `smart_scripts` SET `action_param2` = 68314
-WHERE `entryorguid` = -68314 AND `source_type` = 0 AND `id` = 5 AND `action_type` = 53;
-UPDATE `smart_scripts` SET `action_param1` = 1900503
-WHERE `entryorguid` = -68314 AND `source_type` = 0 AND `id` = 4 AND `action_type` = 80;
-
--- Non-overlapping Fel Soldier summon points around each restored gate.
-UPDATE `smart_scripts` SET `target_x` = -298.00, `target_y` = 1529.00, `target_z` = 37.92391, `target_o` = 0.18216586
-WHERE `entryorguid` = 1900500 AND `source_type` = 9 AND `id` = 0 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -307.00, `target_y` = 1530.00, `target_z` = 37.92391, `target_o` = 0.18216586
-WHERE `entryorguid` = 1900500 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -297.80, `target_y` = 1520.70, `target_z` = 37.92391, `target_o` = 0.18216586
-WHERE `entryorguid` = 1900500 AND `source_type` = 9 AND `id` = 4 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -307.40, `target_y` = 1519.90, `target_z` = 37.92391, `target_o` = 0.18216586
-WHERE `entryorguid` = 1900500 AND `source_type` = 9 AND `id` = 6 AND `action_type` = 12;
-
-UPDATE `smart_scripts` SET `target_x` = -142.00, `target_y` = 1514.90, `target_z` = 33.62471, `target_o` = 3.0842154
-WHERE `entryorguid` = 1900501 AND `source_type` = 9 AND `id` = 0 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -151.10, `target_y` = 1515.40, `target_z` = 33.62471, `target_o` = 3.0842154
-WHERE `entryorguid` = 1900501 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -141.80, `target_y` = 1506.00, `target_z` = 33.62471, `target_o` = 3.0842154
-WHERE `entryorguid` = 1900501 AND `source_type` = 9 AND `id` = 4 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -151.40, `target_y` = 1505.20, `target_z` = 33.62471, `target_o` = 3.0842154
-WHERE `entryorguid` = 1900501 AND `source_type` = 9 AND `id` = 6 AND `action_type` = 12;
-
-UPDATE `smart_scripts` SET `target_x` = -80.00, `target_y` = 1886.00, `target_z` = 74.695015, `target_o` = 2.5140123
-WHERE `entryorguid` = 1900502 AND `source_type` = 9 AND `id` = 0 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -89.20, `target_y` = 1886.50, `target_z` = 74.695015, `target_o` = 2.5140123
-WHERE `entryorguid` = 1900502 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -79.80, `target_y` = 1877.70, `target_z` = 74.695015, `target_o` = 2.5140123
-WHERE `entryorguid` = 1900502 AND `source_type` = 9 AND `id` = 4 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -89.60, `target_y` = 1876.90, `target_z` = 74.695015, `target_o` = 2.5140123
-WHERE `entryorguid` = 1900502 AND `source_type` = 9 AND `id` = 6 AND `action_type` = 12;
-
-UPDATE `smart_scripts` SET `target_x` = -414.70, `target_y` = 1851.20, `target_z` = 81.09361, `target_o` = 1.7246842
-WHERE `entryorguid` = 1900503 AND `source_type` = 9 AND `id` = 0 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -424.30, `target_y` = 1851.80, `target_z` = 81.09361, `target_o` = 1.7246842
-WHERE `entryorguid` = 1900503 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -414.40, `target_y` = 1842.50, `target_z` = 81.09361, `target_o` = 1.7246842
-WHERE `entryorguid` = 1900503 AND `source_type` = 9 AND `id` = 4 AND `action_type` = 12;
-UPDATE `smart_scripts` SET `target_x` = -425.00, `target_y` = 1841.70, `target_z` = 81.09361, `target_o` = 1.7246842
-WHERE `entryorguid` = 1900503 AND `source_type` = 9 AND `id` = 6 AND `action_type` = 12;
+WHERE `guid` = 68314 AND `id1` = 19005;
 
 DELETE FROM `waypoint_data` WHERE `id` IN (68311, 68312, 68313, 68314);
 INSERT INTO `waypoint_data`
@@ -773,28 +662,3 @@ VALUES
 (68314, 5, -285.00, 1500.00, 45.00, NULL, 0, 0, 0, 0, 0, 100, 0),
 (68314, 6, -260.00, 1350.00, 40.00, NULL, 0, 0, 0, 0, 0, 100, 0),
 (68314, 7, -250.00, 1185.00, 47.00, NULL, 0, 0, 0, 0, 0, 100, 0);
-
--- -----------------------------------------------------------------------------
--- -----------------------------------------------------------------------------
--- Let Dark Portal army NPCs play their normal death/corpse flow.
--- The previous On Death -> Respawn Self SmartAI action made them vanish instantly.
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `event_type` = 6 AND `action_type` = 70;
-
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986) AND `id` = 103;
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
-(18948,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Respawn - Set corpse delay to 10s'),
-(18949,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Respawn - Set corpse delay to 10s'),
-(18950,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Respawn - Set corpse delay to 10s'),
-(18965,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Respawn - Set corpse delay to 10s'),
-(18966,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - On Respawn - Set corpse delay to 10s'),
-(18969,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - On Respawn - Set corpse delay to 10s'),
-(18970,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Respawn - Set corpse delay to 10s'),
-(18971,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Set corpse delay to 10s'),
-(18972,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Set corpse delay to 10s'),
-(18986,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Set corpse delay to 10s');
