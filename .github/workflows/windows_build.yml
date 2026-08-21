@@ -63,7 +63,9 @@ jobs:
           # Go through downloads.sourceforge.net, which hands out an https mirror. The
           # master.dl host redirects to a plain-http URL that PowerShell 7.5+ refuses to
           # follow, and an installer we then execute shouldn't travel in the clear anyway.
-          # The plain sourceforge.net /download page serves an HTML interstitial instead.
+          # SourceForge sniffs the user agent: anything starting with Mozilla gets the HTML
+          # download page instead of the file, so send a non-browser one. Note this is the
+          # opposite of what the MySQL archives CDN below wants.
           if (-not (Test-Path 'C:\local\boost_1_87_0\boost'))
           {
               $boostExe = Join-Path $env:RUNNER_TEMP 'boost.exe'
@@ -74,7 +76,7 @@ jobs:
               {
                   try
                   {
-                      Invoke-WebRequest -Uri $boostUrl -OutFile $boostExe
+                      Invoke-WebRequest -Uri $boostUrl -OutFile $boostExe -UserAgent 'azerothcore-ci'
                       break
                   }
                   catch
