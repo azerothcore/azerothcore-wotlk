@@ -32,9 +32,6 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
 
     LOG_DEBUG("network", "WORLD: Recvd CMSG_ATTACKSWING: {}", guid.ToString());
 
-    LOG_ERROR("sql.sql", "CMSG_ATTACKSWING: player {}, target {}, charm {}, onVehicle {}",
-        _player->GetName(), guid.ToString(), _player->GetCharmGUID().ToString(), _player->GetVehicle() != nullptr);
-
     Unit* pEnemy = ObjectAccessor::GetUnit(*_player, guid);
 
     if (!pEnemy)
@@ -60,7 +57,6 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
         ASSERT(seat);
         if (!(seat->m_flags & VEHICLE_SEAT_FLAG_CAN_ATTACK))
         {
-            LOG_ERROR("sql.sql", "CMSG_ATTACKSWING: blocked by missing CAN_ATTACK on seat {}", seat->m_ID);
             _player->SendMeleeAttackStop(pEnemy);
             return;
         }

@@ -70,8 +70,6 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     Unit* pet = ObjectAccessor::GetUnit(*_player, guid1);
     LOG_DEBUG("network.opcode", "HandlePetAction: Pet {} - flag: {}, spellId: {}, target: {}.", guid1.ToString(), uint32(flag), spellId, guid2.ToString());
 
-    LOG_ERROR("sql.sql", "CMSG_PET_ACTION: pet {}, flag {}, spellId {}, target {}", guid1.ToString(), uint32(flag), spellId, guid2.ToString());
-
     if (!pet)
     {
         LOG_ERROR("network.opcode", "HandlePetAction: Pet ({}) doesn't exist for player {}", guid1.ToString(), GetPlayer()->GetName());
