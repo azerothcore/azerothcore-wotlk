@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
@@ -634,13 +635,23 @@ public:
             for (auto itr = begin; itr != end; ++itr)
             {
                 SpawnData const* spawn = itr->second;
-                if (spawn->type != SPAWN_TYPE_CREATURE || !instance->IsGridLoaded(spawn->posX, spawn->posY))
+                if (spawn->type != SPAWN_TYPE_CREATURE)
                     return false;
 
+                bool foundDeadCreature = false;
                 auto bounds = instance->GetCreatureBySpawnIdStore().equal_range(spawn->spawnId);
                 for (auto creatureItr = bounds.first; creatureItr != bounds.second; ++creatureItr)
+                {
                     if (creatureItr->second->IsAlive())
                         return false;
+
+                    foundDeadCreature = true;
+                }
+
+                // An unloaded creature is not dead. Only accept it as such when
+                // the map has a persisted, unexpired respawn time for its spawn.
+                if (!foundDeadCreature && instance->GetRespawnTime(SPAWN_TYPE_CREATURE, spawn->spawnId) <= GameTime::GetGameTime().count())
+                    return false;
             }
 
             return true;
