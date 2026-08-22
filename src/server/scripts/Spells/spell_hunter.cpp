@@ -903,6 +903,12 @@ class spell_hun_misdirection : public AuraScript
         if ((eventInfo.GetProcSpell() && (eventInfo.GetProcSpell()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)) || (eventInfo.GetHealInfo() && (eventInfo.GetHealInfo()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)))
             return false;
 
+        // Do not trigger from either Kill Command aura (IDs 34027 and 58914)
+        if (eventInfo.GetProcSpell() && eventInfo.GetProcSpell()->GetSpellInfo()->Id == 58914)
+            return false;
+        if (eventInfo.GetProcSpell() && eventInfo.GetProcSpell()->GetSpellInfo()->Id == 34027)
+            return false;
+
         return GetTarget()->GetThreatMgr().HasRedirects();
     }
 
