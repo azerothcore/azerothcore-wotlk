@@ -5,14 +5,26 @@ SET @PATH := @CGUID * 10;
 
 DELETE FROM `spawn_group_template` WHERE `groupId` IN (105, 106);
 INSERT INTO `spawn_group_template` (`groupId`, `groupName`, `groupFlags`) VALUES
-    (105, 'Stratholme - Timmy the Cruel trigger', 0),
+    (105, 'Stratholme - Timmy the Cruel - Crusaders Square Scarlet trigger', 0),
     (106, 'Stratholme - Timmy the Cruel', 4);
 
-DELETE FROM `spawn_group` WHERE `groupId` IN (105, 106) OR `spawnId` IN (54075, 54076, 54138, @CGUID);
+DELETE FROM `spawn_group` WHERE `groupId` IN (105, 106) OR `spawnId` IN (54052, 54056, 54069, 54070, 54073, 54074, 54075, 54076, 54079, 54082, 54087, 54117, 54138, 54180, 54207, @CGUID);
 INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
+    (105, 0, 54052),
+    (105, 0, 54056),
+    (105, 0, 54069),
+    (105, 0, 54070),
+    (105, 0, 54073),
+    (105, 0, 54074),
     (105, 0, 54075),
     (105, 0, 54076),
+    (105, 0, 54079),
+    (105, 0, 54082),
+    (105, 0, 54087),
+    (105, 0, 54117),
     (105, 0, 54138),
+    (105, 0, 54180),
+    (105, 0, 54207),
     (106, 0, @CGUID);
 
 UPDATE `creature` SET `position_x` = 3624.6, `position_y` = -3188, `position_z` = 130.579, `orientation` = 2.99341, `MovementType` = 2, `VerifiedBuild` = 53622, `CreateObject` = 2 WHERE `guid` = @CGUID AND `id` = 10808;
