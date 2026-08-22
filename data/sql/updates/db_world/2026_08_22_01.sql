@@ -1,3 +1,4 @@
+-- DB update 2026_08_22_00 -> 2026_08_22_01
 -- Only the summoned entries take the script: GetScriptId() resolves through GetEntry(), not the difficulty row.
 UPDATE `creature_template` SET `ScriptName` = 'npc_putricide_mutated_abomination' WHERE `entry` IN (37672, 38285);
 
