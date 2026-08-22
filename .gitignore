@@ -65,6 +65,8 @@ CMakeLists.txt.user
 .claude/worktrees
 .claude/settings.local.json
 .claude/plans/**
+.claude/.cc-writes/
+CLAUDE.local.md
 
 #
 # IDE & other software
