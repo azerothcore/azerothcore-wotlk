@@ -2721,14 +2721,21 @@ class spell_icc_sprit_alarm : public SpellScript
                 return;
         }
 
-        if (GameObject* trap = GetCaster()->FindNearestGameObject(trapId, 5.0f))
+        // the alarms are ownerless trap gameobjects casting on their own
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
+        if (!caster)
+            return;
+
+        if (GameObject* trap = caster->FindNearestGameObject(trapId, 5.0f))
         {
             trap->SetRespawnTime(trap->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS);
         }
 
         std::list<Creature*> wards;
-        GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
-        wards.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        caster->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
+        wards.sort(Acore::ObjectDistanceOrderPred(caster));
         for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
         {
             if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
@@ -2754,7 +2761,15 @@ class spell_icc_geist_alarm : public SpellScript
     void HandleEvent(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+
+        // the alarms are ownerless trap gameobjects casting on their own
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
+        if (!caster)
+            return;
+
+        if (InstanceScript* instance = caster->GetInstanceScript())
         {
             Position p = {4356.77f, 2971.90f, 360.52f, M_PI / 2};
             if (Creature* l = instance->instance->SummonCreature(NPC_VENGEFUL_FLESHREAPER, p))
