@@ -712,6 +712,9 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
+        // dismounts the player once the gryphon leaves the areas whitelisted in conditions
+        VehicleAI::UpdateAI(diff);
+
         events.Update(diff);
         while (uint32 eventId = events.ExecuteEvent())
         {
