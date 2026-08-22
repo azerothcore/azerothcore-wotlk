@@ -1371,7 +1371,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
             return;
 
         _events.Update(diff);
-        // Runs before the casting guard: the windup facing task must tick while Spinning Up channels
+        // before the casting guard: the windup facing task must tick while Spinning Up channels
         scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -1441,12 +1441,10 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 if (Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET))
                     me->SetTarget(dbTarget->GetGUID());
                 FaceBarrageArc(me);
-                // Cast without an explicit target: the nearby-entry conditions resolve EFFECT_0 to
-                // the DB Target (channel object + barrage chain) and EFFECT_1 to the MK II, which
-                // force-casts 66490 on itself (15s self root + pacify) through phase 4 barrages
+                // untargeted: conditions send EFFECT_0 to the DB Target (channel object, barrage
+                // chain) and EFFECT_1 to the MK II (self-cast 66490 root+pacify for the barrage)
                 me->CastSpell((Unit*)nullptr, SPELL_SPINNING_UP, true);
-                // The DB Target advances ~42 degrees during the 4s windup; keep tracking it or the
-                // barrage opens that far to the right of where the windup pointed
+                // the DB Target moves ~42 degrees during the windup; track it or the barrage opens off the telegraph
                 scheduler.Schedule(400ms, [this](TaskContext context)
                 {
                     if (me->FindCurrentSpellBySpellId(SPELL_SPINNING_UP))
