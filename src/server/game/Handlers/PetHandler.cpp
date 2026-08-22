@@ -456,6 +456,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                     if (pet->isPossessed() || pet->IsVehicle())
                         Spell::SendCastResult(GetPlayer(), spellInfo, 0, result);
+                    else if (charmInfo->HasCommandState(COMMAND_STAY))
+                        spell->SendPetCastResult(result);
                     else if (GetPlayer()->IsFriendlyTo(unit_target) && !haspositiveeffect)
                         spell->SendPetCastResult(SPELL_FAILED_TARGET_FRIENDLY);
                     else
@@ -470,6 +472,13 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                     if (_player->HasPacifyAura())
                         return;
+
+                    if (charmInfo->HasCommandState(COMMAND_STAY))
+                    {
+                        charmInfo->SetForcedSpell(0);
+                        charmInfo->SetForcedTargetGUID();
+                        return;
+                    }
 
                     bool tempspellIsPositive = false;
 
@@ -568,7 +577,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 else
                 {
                     // dont spam alerts
-                    if (!charmInfo->GetForcedSpell())
+                    if (charmInfo->HasCommandState(COMMAND_STAY) || !charmInfo->GetForcedSpell())
                     {
                         if (pet->isPossessed() || pet->IsVehicle())
                             Spell::SendCastResult(GetPlayer(), spellInfo, 0, result);
@@ -583,7 +592,13 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     delete spell;
 
                     // reset specific flags in case of spell fail. AI will reset other flags
-                    pet->PetSpellFail(spellInfo, unit_target, result);
+                    if (charmInfo->HasCommandState(COMMAND_STAY))
+                    {
+                        charmInfo->SetForcedSpell(0);
+                        charmInfo->SetForcedTargetGUID();
+                    }
+                    else
+                        pet->PetSpellFail(spellInfo, unit_target, result);
                 }
                 break;
             }
