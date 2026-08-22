@@ -1027,21 +1027,26 @@ MaxOverspeedPings = 2
 
 #
 #    DisconnectToleranceInterval
-#        Description: Allows to skip queue after being disconnected for a given number of seconds.
-#        Default:     0
+#        Description: Allows skipping a potential login queue after being disconnected for a given number of seconds.
+#                     The interval also keeps the session alive and holds the character in world for the period after
+#                     an unwanted disconnection, for seamless reconnection.
+#                     Minimum value is 20 seconds. Any lower values will fall back to the default value.
+#        Default:     60 - (1 minute)
 
-DisconnectToleranceInterval = 0
+DisconnectToleranceInterval = 60
 
 #
 #    EnableLoginAfterDC
 #        Description: After not logging out properly (clicking Logout and waiting 20 seconds),
-#                     characters stay in game world for a full minute, even if the client connection was closed.
+#                     characters stay in game world for DisconnectToleranceInterval seconds, even if the
+#                     client connection was closed.
 #                     Such behaviour prevents for example exploiting boss encounters by alt+f4
 #                     and skipping crucial boss abilities, or escaping opponents in PvP.
 #                     This setting is used to allow/disallow players to log back into characters that are left in world.
 #        Default:     1 - (by clicking "Enter World" player will log back into a character that is already in world)
-#                     0 - (by clicking "Enter World" player will get an error message when trying to log into a character
-#                         that is left in world, and has to wait a minute for the character to be removed from world)
+#                     0 - (by clicking "Enter World" player will get an error message when trying to log into a
+#                         character that is left in world, and has to wait out DisconnectToleranceInterval for the
+#                         character to be removed from world)
 
 EnableLoginAfterDC = 1
 
