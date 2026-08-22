@@ -27,11 +27,11 @@ INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
     (105, 0, 54207),
     (106, 0, @CGUID);
 
-UPDATE `creature` SET `position_x` = 3624.6, `position_y` = -3188, `position_z` = 130.579, `orientation` = 2.99341, `MovementType` = 2, `VerifiedBuild` = 53622, `CreateObject` = 2 WHERE `guid` = @CGUID AND `id` = 10808;
+UPDATE `creature` SET `position_x` = 3624.6, `position_y` = -3188, `position_z` = 130.579, `orientation` = 2.99341, `MovementType` = 0, `VerifiedBuild` = 53622, `CreateObject` = 2 WHERE `guid` = @CGUID AND `id` = 10808;
 
 DELETE FROM `creature_addon` WHERE `guid` = @CGUID;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-    (@CGUID, @PATH, 0, 0, 1, 0, 3, '12787');
+    (@CGUID, 0, 0, 0, 1, 0, 3, '12787');
 
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `velocity`, `delay`, `smoothTransition`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
@@ -60,17 +60,19 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
     (@PATH, 23, 3623.9392, -3180.2332, 130.64621, NULL, 0, 0, 0, 0, 0, 100, 0);
 
 DELETE FROM `creature_template_spell` WHERE `CreatureID` = 10808;
-INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
-    (10808, 0, 12787, 12340),
-    (10808, 1, 17470, 12340),
-    (10808, 2, 8599, 12340);
+INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`) VALUES
+    (10808, 0, 12787),
+    (10808, 1, 17470),
+    (10808, 2, 8599);
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 10808 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
     (10808, 0, 0, 0, 0, 0, 100, 0, 10000, 15000, 10000, 15000, 0, 0, 11, 17470, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - In Combat - Cast Ravenous Claw'),
     (10808, 0, 1, 0, 2, 0, 100, 1, 0, 50, 0, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Between 0-50% Health - Cast Enrage'),
     (10808, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Aggro - Say Line 0'),
-    (10808, 0, 3, 4, 60, 0, 100, 257, 0, 0, 0, 0, 0, 0, 235, 4000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Update - Pause Movement for Emerge'),
-    (10808, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 50142, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Update - Cast Emerge');
+    (10808, 0, 3, 0, 60, 0, 100, 257, 0, 0, 0, 0, 0, 0, 80, 1080800, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Update - Run Emerge Actionlist');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1080800 AND `source_type` = 9;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+    (1080800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 50142, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Cast Emerge'),
+    (1080800, 9, 1, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 232, @PATH, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Start Repeating Path');
