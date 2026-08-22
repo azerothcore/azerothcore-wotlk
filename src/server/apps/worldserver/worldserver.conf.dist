@@ -2278,6 +2278,28 @@ SpellQueue.Enabled = 1
 SpellQueue.Window = 400
 
 #
+#    SpellBatching.Enabled
+#        Description: Enable blizzlike spell batching. On retail a spell resolved at the
+#                     next batch boundary instead of instantly, so two players acting
+#                     inside the same window both landed their spell.
+#                     Batched: hostile spells cast by a player or a player's pet against
+#                     other players. Everything else resolves instantly, PvE included.
+#                     Only effect resolution is delayed, never the cast itself.
+#        Default:     1 - (Enabled, blizzlike)
+#                     0 - (Disabled, spells resolve instantly)
+
+SpellBatching.Enabled = 1
+
+#
+#    SpellBatching.Window
+#        Description: Length (in milliseconds) of the spell batch window. Retail used 400ms
+#                     in the WotLK era.
+#        Default:     400 - (400ms, blizzlike)
+#        Range:       0 - 400
+
+SpellBatching.Window = 400
+
+#
 ###################################################################################################
 
 ###################################################################################################

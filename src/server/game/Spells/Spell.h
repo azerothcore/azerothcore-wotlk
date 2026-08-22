@@ -585,6 +585,8 @@ public:
     void RecalculateDelayMomentForDst();
     bool IsNeedSendToClient(bool go) const;
 
+    uint64 CalculateBatchingDelay() const;
+
     CurrentSpellTypes GetCurrentContainer() const;
 
     Unit* GetCaster() const { return m_caster; }
