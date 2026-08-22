@@ -56,6 +56,24 @@ namespace lfg
         LFG_GROUP_KICK_VOTES_NEEDED                  = 3
     };
 
+    [[nodiscard]] constexpr bool ShouldApplyDungeonCooldown(bool selectedRandomDungeon, bool testing,
+        bool hasDungeonCooldown)
+    {
+        return selectedRandomDungeon && !testing && !hasDungeonCooldown;
+    }
+
+    [[nodiscard]] constexpr bool IsDungeonQueueBlockedByCooldown(bool isContinue, bool hasDungeonCooldown)
+    {
+        return !isContinue && hasDungeonCooldown;
+    }
+
+    [[nodiscard]] constexpr bool ShouldApplyDungeonDeserter(bool isVoteKick, bool dungeonFinished,
+        bool hasDungeonCooldown, uint8 remainingPlayers, bool castDeserter)
+    {
+        return !isVoteKick && !dungeonFinished && hasDungeonCooldown &&
+            remainingPlayers >= LFG_GROUP_KICK_VOTES_NEEDED && castDeserter;
+    }
+
     enum LfgFlags
     {
         LFG_FLAG_UNK1                                = 0x1,
