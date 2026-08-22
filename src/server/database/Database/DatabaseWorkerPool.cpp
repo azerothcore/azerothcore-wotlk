@@ -390,15 +390,18 @@ bool DatabaseIncompatibleVersion(std::string const mysqlVersion)
     // "1.2.3" => [1, 2, 3]
     auto parse = [](std::string const& input)
     {
+        // Fixed: read full numbers ("11.8.6" => [11, 8, 6]) — the original
+        // char-by-char read broke on 2-digit majors (MariaDB 11.x failed the
+        // >= 8.0 check with [1,1,x] < [8,0,0]).
         std::vector<uint8> result;
         std::istringstream parser(input);
-        result.push_back(parser.get());
-        for (int i = 1; i < 3; i++)
+        int num = 0;
+        char dot = 0;
+        for (int i = 0; i < 3; i++)
         {
-            // Skip period
-            parser.get();
-            // Append int from parser to output
-            result.push_back(parser.get());
+            parser >> num;
+            result.push_back(static_cast<uint8>(num));
+            parser >> dot;
         }
         return result;
     };
