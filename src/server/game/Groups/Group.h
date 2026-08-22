@@ -37,6 +37,7 @@ class Unit;
 class WorldObject;
 class WorldPacket;
 class WorldSession;
+class ToCloud9GroupHooks;
 
 struct MapEntry;
 
@@ -174,6 +175,7 @@ public:
 /** todo: uninvite people that not accepted invite **/
 class Group
 {
+    friend class ToCloud9GroupHooks;
 public:
     struct MemberSlot
     {
@@ -205,7 +207,7 @@ public:
     void   RemoveAllInvites();
     bool   AddLeaderInvite(Player* player);
     bool   AddMember(Player* player, uint8 roles = 0);
-    bool   RemoveMember(ObjectGuid guid, const RemoveMethod& method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, const char* reason = nullptr);
+    bool   RemoveMember(ObjectGuid guid, RemoveMethod const& method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, char const* reason = nullptr);
     void   ChangeLeader(ObjectGuid guid);
     void   SetLootMethod(LootMethod method);
     void   SetLooterGuid(ObjectGuid guid);
@@ -226,7 +228,7 @@ public:
     ObjectGuid GetLeaderGUID() const;
     Player* GetLeader();
     ObjectGuid GetGUID() const;
-    const char* GetLeaderName() const;
+    char const* GetLeaderName() const;
     LootMethod GetLootMethod() const;
     ObjectGuid GetLooterGuid() const;
     ObjectGuid GetMasterLooterGuid() const;
@@ -235,11 +237,11 @@ public:
     // member manipulation methods
     bool IsMember(ObjectGuid guid) const;
     bool IsLeader(ObjectGuid guid) const;
-    ObjectGuid GetMemberGUID(const std::string& name);
+    ObjectGuid GetMemberGUID(std::string const& name);
     bool IsAssistant(ObjectGuid guid) const;
 
     Player* GetInvited(ObjectGuid guid) const;
-    Player* GetInvited(const std::string& name) const;
+    Player* GetInvited(std::string const& name) const;
 
     bool SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const;
     bool SameSubGroup(ObjectGuid guid1, MemberSlot const* slot2) const;
@@ -296,10 +298,11 @@ public:
     /*********************************************************/
 
     bool isRollLootActive() const;
-    void SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r);
+    void SendLootStartRoll(uint32 CountDown, uint32 mapid, Roll const& r);
     void SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p, bool canNeed, Roll const& r);
-    void SendLootRoll(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r, bool autoPass = false);
-    void SendLootRollWon(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r);
+    void SendPendingRollsToPlayer(Player* player, Map* map);
+    void SendLootRoll(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, Roll const& r, bool autoPass = false);
+    void SendLootRollWon(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, Roll const& r);
     void SendLootAllPassed(Roll const& roll);
     void SendLooter(Creature* creature, Player* pLooter);
     void GroupLoot(Loot* loot, WorldObject* pLootedObject);
@@ -347,6 +350,9 @@ protected:
     void SubGroupCounterIncrease(uint8 subgroup);
     void SubGroupCounterDecrease(uint8 subgroup);
     void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);
+
+    void AddMemberWithGuid(ObjectGuid guid);
+    void ForcedDisband(bool hideDestroy = false);
 
     MemberSlotList      m_memberSlots;
     GroupRefMgr     m_memberMgr;

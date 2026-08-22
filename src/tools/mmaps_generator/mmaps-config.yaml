@@ -9,6 +9,24 @@ mmapsConfig:
   # and is also where the "mmaps" folder will be created or located.
   dataDir: "./"
 
+  # Off-mesh connections define manual navigation links that are not part of the generated navmesh.
+  # They are used to connect two arbitrary points in the world where normal pathfinding cannot reach,
+  # such as jumps, ropes, ladders, teleports, elevators, or special scripted movement paths.
+  #
+  # Format:
+  #   mapID tileX,tileY (start_x start_y start_z) (end_x end_y end_z) size
+  #
+  # Fields:
+  #   mapID      - Map identifier where this connection exists.
+  #   tileX,tileY- Navmesh tile coordinates the connection belongs to.
+  #   start      - World position where the connection begins.
+  #   end        - World position where the connection ends.
+  #   size       - Effective radius of the connection (agent clearance / usability width).
+  offmeshConnections:
+    # Make Blades Edge Arena Ropes wider
+    - "562 31,20 (6234.474121 256.563721 11.063726) (6230.162598 251.681976 11.199670) 2.1"
+    - "562 31,20 (6242.273926 266.697540 11.090456) (6246.688965 272.064819 11.235604) 2.1"
+
   meshSettings:
     # Here we have global config for recast navigation.
     # It's possible to override these data on map or tile level (see mapsOverrides).
@@ -22,14 +40,14 @@ mmapsConfig:
     # In RecastDemo, you often work with world units instead of cell units.
     # By default, these cell units are converted to world units using the formula:
     #
-    #     cellSize = MMAP::GRID_SIZE / (vertexPerMapEdge - 1)
+    #     cellSize = MMAP::GRID_SIZE / (verticesPerMapEdge - 1)
     #
     # Where:
     #     MMAP::GRID_SIZE = 533.3333f (the size of one map tile in world units)
-    #     vertexPerMapEdge = number of vertices along one edge of the full map grid
+    #     verticesPerMapEdge = number of vertices along one edge of the full map grid
     #
     # Example:
-    #     If vertexPerMapEdge = 2000, then:
+    #     If verticesPerMapEdge = 2000, then:
     #         cellSize ≈ 533.3333 / (2000 - 1) ≈ 0.2667 world units per cell
     #
     # To convert a value from cell units to world units (e.g., walkableClimb),
@@ -56,13 +74,13 @@ mmapsConfig:
 
     # Number of vertices along one edge of the entire map's navmesh grid.
     # Higher values increase mesh resolution but also CPU/memory usage.
-    vertexPerMapEdge: 2000
+    verticesPerMapEdge: 2000
 
     # Number of vertices along one edge of each tile chunk.
-    # Must divide (vertexPerMapEdge - 1) evenly for seamless tiles.
+    # Must divide (verticesPerMapEdge - 1) evenly for seamless tiles.
     # A higher vertex count per tile means fewer total tiles,
     # reducing runtime work to load, unload, and manage tiles.
-    vertexPerTileEdge: 80
+    verticesPerTileEdge: 80
 
     # Tolerance for how much a polygon can deviate from the original geometry when simplified.
     # Higher values produce simpler (faster) meshes but can reduce accuracy.
@@ -106,9 +124,6 @@ mmapsConfig:
     # All parameters defined globally are eligible for override.
     # Just specify the parameter name and new value in the override section.
     mapsOverrides:
-      "562": # Blade's Edge Arena
-        walkableRadius: 0 # This allows walking on the ropes to the pillars
-
       "48": # Blackfathom Deeps
         cellSizeVertical: 0.5334 # ch*2 = 0.2667 * 2 ≈ 0.5334. Reduce the chance to have underground levels.
 

@@ -14,7 +14,7 @@ jobs:
       contents: write  # 'write-all' is not a valid permission, should specify what is needed
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0

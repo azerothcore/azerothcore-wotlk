@@ -168,6 +168,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_INTERVAL_SAVE, "PlayerSaveInterval", 900000);
     SetConfigValue<uint32>(CONFIG_INTERVAL_DISCONNECT_TOLERANCE, "DisconnectToleranceInterval", 0);
     SetConfigValue<bool>(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT, "PlayerSave.Stats.SaveOnlyOnLogout", true);
+    SetConfigValue<uint32>(CONFIG_ADDITIONAL_SAVES, "PlayerSave.AdditionalSaves", 0);
     SetConfigValue<bool>(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS, "ValidateSkillLearnedBySpells", true);
 
     SetConfigValue<uint32>(CONFIG_MIN_LEVEL_STAT_SAVE, "PlayerSave.Stats.MinLevel", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value < MAX_LEVEL; }, "< MAX_LEVEL");
@@ -178,10 +179,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_PORT_WORLD, "WorldServerPort", 8085, ConfigValueCache::Reloadable::No);
 
-    SetConfigValue<bool>(CONFIG_CLOSE_IDLE_CONNECTIONS, "CloseIdleConnections", true);
     SetConfigValue<uint32>(CONFIG_SOCKET_TIMEOUTTIME, "SocketTimeOutTime", 900000);
     SetConfigValue<uint32>(CONFIG_SOCKET_TIMEOUTTIME_ACTIVE, "SocketTimeOutTimeActive", 60000);
-    SetConfigValue<uint32>(CONFIG_SESSION_ADD_DELAY, "SessionAddDelay", 10000);
 
     SetConfigValue<float>(CONFIG_GROUP_XP_DISTANCE, "MaxGroupXPDistance", 74.0f);
     SetConfigValue<float>(CONFIG_MAX_RECRUIT_A_FRIEND_DISTANCE, "MaxRecruitAFriendBonusDistance", 100.0f);
@@ -359,6 +358,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_TRIAL_MONEY_CAP, "Trial.MoneyCap", 100000); // copper, 10 gold
     SetConfigValue<uint32>(CONFIG_TRIAL_TRADE_SKILL_CAP, "Trial.TradeSkillCap", 100);
 
+    SetConfigValue<bool>(CONFIG_CAIS_ENABLED, "CAIS.Enable", false);
+
     SetConfigValue<uint32>(CONFIG_EVENT_ANNOUNCE, "Event.Announce", 0);
 
     SetConfigValue<float>(CONFIG_CREATURE_LEASH_RADIUS, "CreatureLeashRadius", 30.0f);
@@ -489,8 +490,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_WATER_BREATH_TIMER, "WaterBreath.Timer", 180000, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
     SetConfigValue<uint32>(CONFIG_CLIENTCACHE_VERSION, "ClientCacheVersion", 0);
-
-    SetConfigValue<uint32>(CONFIG_INSTANT_LOGOUT, "InstantLogout", SEC_MODERATOR);
 
     SetConfigValue<uint32>(CONFIG_GUILD_EVENT_LOG_COUNT, "Guild.EventLogRecordsCount", GUILD_EVENTLOG_MAX_RECORDS, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= GUILD_EVENTLOG_MAX_RECORDS; }, "<= GUILD_EVENTLOG_MAX_RECORDS");
     SetConfigValue<uint32>(CONFIG_GUILD_BANK_EVENT_LOG_COUNT, "Guild.BankEventLogRecordsCount", GUILD_BANKLOG_MAX_RECORDS, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= GUILD_BANKLOG_MAX_RECORDS; }, "<= GUILD_BANKLOG_MAX_RECORDS");
@@ -677,8 +676,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_DEBUG_BATTLEGROUND, "Debug.Battleground", false);
     SetConfigValue<bool>(CONFIG_DEBUG_ARENA, "Debug.Arena", false);
     SetConfigValue<bool>(CONFIG_DEBUG_LFG, "Debug.LFG", false);
-
-    SetConfigValue<uint32>(CONFIG_GM_LEVEL_CHANNEL_MODERATION, "Channel.ModerationGMLevel", 1);
 
     SetConfigValue<bool>(CONFIG_SET_BOP_ITEM_TRADEABLE, "Item.SetItemTradeable", true);
 

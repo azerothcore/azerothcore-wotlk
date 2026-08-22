@@ -700,6 +700,12 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_SPELLINFO_EFFECTS                      = 936,
     RBAC_PERM_COMMAND_SPELLINFO_TARGETS                      = 937,
     RBAC_PERM_COMMAND_SPELLINFO_ALL                          = 938,
+    RBAC_PERM_COMMAND_SERVER_SET_SECURITY                    = 939,
+    RBAC_PERM_COMMAND_GROUP_INVITES                          = 940,
+    RBAC_PERM_COMMAND_ACCOUNT_FLAG                           = 941,
+    RBAC_PERM_COMMAND_ACCOUNT_FLAG_LIST                      = 942,
+    RBAC_PERM_COMMAND_ACCOUNT_FLAG_ADD                       = 943,
+    RBAC_PERM_COMMAND_ACCOUNT_FLAG_REMOVE                    = 944,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

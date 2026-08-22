@@ -37,7 +37,7 @@ enum ServerHook
 class ServerScript : public ScriptObject
 {
 protected:
-    ServerScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    ServerScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when reactive socket I/O is started (WorldSocketMgr).

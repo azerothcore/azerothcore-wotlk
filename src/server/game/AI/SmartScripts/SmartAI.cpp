@@ -338,6 +338,8 @@ void SmartAI::StopPath(uint32 DespawnTime, uint32 quest, bool fail)
     if (quest)
         mEscortQuestID = quest;
 
+    mCanRepeatPath = false;
+
     SetDespawnTime(DespawnTime);
 
     if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == ESCORT_MOTION_TYPE)
@@ -594,7 +596,25 @@ void SmartAI::UpdateAI(uint32 diff)
         return;
 
     if (mCanAutoAttack)
+    {
+        UpdateMeleeStance();
         DoMeleeAttackIfReady();
+    }
+}
+
+void SmartAI::UpdateMeleeStance()
+{
+    // Ranged creatures should not switch to melee stance at distance
+    if (!_currentRangeMode || me->IsCrowdControlled())
+        return;
+
+    Unit* victim = me->GetVictim();
+    if (!victim)
+        return;
+
+    bool const canMelee = me->IsWithinMeleeRange(victim);
+    if (canMelee != me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+        me->Attack(victim, canMelee);
 }
 
 bool SmartAI::IsEscortInvokerInRange()
@@ -739,7 +759,9 @@ void SmartAI::EnterEvadeMode(EvadeReason why)
 
     if (Unit* owner = me->GetCharmerOrOwner())
     {
-        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+        if (!me->IsVehicle()) // vehicles should not follow their owner (passenger)
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+
         me->ClearUnitState(UNIT_STATE_EVADE);
     }
     else if (HasEscortState(SMART_ESCORT_ESCORTING))
@@ -876,7 +898,14 @@ void SmartAI::JustEngagedWith(Unit* enemy)
 {
     // Xinef: Interrupt channeled spells
     if (IsAIControlled())
-        me->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+    {
+        if (Spell* spell = me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+        {
+            if (!spell->GetSpellInfo()->IsActionAllowedChannel())
+                me->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+        }
+    }
+
     GetScript()->ProcessEventsFor(SMART_EVENT_AGGRO, enemy);
 }
 
@@ -918,7 +947,7 @@ void SmartAI::AttackStart(Unit* who)
         return;
     }
 
-    if (who && me->Attack(who, mCanAutoAttack))
+    if (who && me->Attack(who, mCanAutoAttack && !_currentRangeMode))
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
@@ -1151,7 +1180,7 @@ void SmartAI::sGossipSelect(Player* player, uint32 sender, uint32 action)
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_SELECT, player, sender, action);
 }
 
-void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/)
+void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/)
 {
 }
 
@@ -1193,7 +1222,12 @@ void SmartAI::SetCurrentRangeMode(bool on, float range)
     _attackDistance = range;
 
     if (Unit* victim = me->GetVictim())
+    {
         me->GetMotionMaster()->MoveChase(victim, _attackDistance);
+
+        if (!on && mCanAutoAttack && !me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+            me->Attack(victim, true);
+    }
 }
 
 void SmartAI::SetMainSpell(uint32 spellId)
@@ -1404,7 +1438,7 @@ bool SmartGameObjectAI::GossipSelect(Player* player, uint32 sender, uint32 actio
 }
 
 // Called when a player selects a gossip with a code in the gameobject's gossip menu.
-bool SmartGameObjectAI::GossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/)
+bool SmartGameObjectAI::GossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/)
 {
     return false;
 }

@@ -45,7 +45,7 @@ struct MmapTileRecastConfig
     float cellSizeVertical;
     float maxSimplificationError;
 
-    bool operator==(const MmapTileRecastConfig& b) const {
+    bool operator==(MmapTileRecastConfig const& b) const {
         return walkableSlopeAngle == b.walkableSlopeAngle &&
                walkableRadius == b.walkableRadius &&
                walkableHeight == b.walkableHeight &&

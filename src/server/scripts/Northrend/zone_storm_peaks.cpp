@@ -1357,6 +1357,27 @@ class spell_riding_jokkum : public AuraScript
     }
 };
 
+// Quest Where Time Went Wrong (13048)
+class spell_q13048_time_period : public SpellScript
+{
+    PrepareSpellScript(spell_q13048_time_period);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Player* player = GetHitPlayer();
+
+        if (!player)
+            return;
+
+        player->Unit::Say(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q13048_time_period::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
@@ -1385,4 +1406,5 @@ void AddSC_storm_peaks()
     RegisterSpellScript(spell_eject_passenger_wild_wyrm);
     RegisterSpellScript(spell_q13010_jokkum_summon);
     RegisterSpellScript(spell_riding_jokkum);
+    RegisterSpellScript(spell_q13048_time_period);
 }

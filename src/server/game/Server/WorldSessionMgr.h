@@ -19,15 +19,23 @@
 #define __WORLDSESSIONMGR_H
 
 #include "Common.h"
+#include "Duration.h"
 #include "IWorld.h"
 #include "LockedQueue.h"
 #include "ObjectGuid.h"
 #include <list>
+#include <map>
 #include <unordered_map>
 
 class Player;
 class WorldPacket;
 class WorldSession;
+
+struct AccountPlayHistory
+{
+    Seconds logoutTime = Seconds::zero();
+    Seconds playedTime = Seconds::zero(); // reset after 5 hours offline time
+};
 
 class WorldSessionMgr
 {
@@ -91,6 +99,7 @@ private:
 
     SessionMap _sessions;
     SessionMap _offlineSessions;
+    std::map<uint32 /*accountId*/, AccountPlayHistory> _accountsPlayHistory;
 
     typedef std::unordered_map<uint32, time_t> DisconnectMap;
     DisconnectMap _disconnects;
@@ -103,6 +112,7 @@ private:
     uint32 _maxQueuedSessionCount;
     uint32 _playerCount;
     uint32 _maxPlayerCount;
+    uint32 _accountsPlayHistoryPruneTimer;
 };
 
 #define sWorldSessionMgr WorldSessionMgr::Instance()
