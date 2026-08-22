@@ -1,3 +1,4 @@
+-- DB update 2026_08_22_01 -> 2026_08_22_02
 -- Sniffed targets of Mimiron's barrage chain: Spinning Up (63414) triggers the barrage on the
 -- DB Target (33576, also the channel object) and force-casts 66490 (15s root+pacify) on the
 -- MK II (33432); the barrage (63274) parks its dummy aura on the DB Target. The DB Target rows
