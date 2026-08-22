@@ -19,6 +19,9 @@
     #endif
 #endif
 
+/* Compile-time version macros (must match the libsidecar you link) */
+#include "tc9_version.h"
+
 /* Include all API headers */
 #include "battleground-api.h"
 #include "events-group.h"
@@ -32,6 +35,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* ABI / package version of the *linked* library (not the caller's headers).
+ * Pass TC9_VERSION_MAJOR / TC9_VERSION_MINOR from the headers you compiled
+ * against into TC9CheckAbiCompatible. Returns 0 if compatible. */
+TC9_API void TC9GetVersion(int* major, int* minor, int* patch);
+TC9_API const char* TC9GetVersionString(void);
+TC9_API int TC9CheckAbiCompatible(int required_major, int required_minor);
 
 /* Main library functions */
 TC9_API void TC9InitLib(uint16_t port, uint32_t realmID, uint8_t isCrossRealm, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize);
