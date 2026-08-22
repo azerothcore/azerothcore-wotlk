@@ -15,7 +15,7 @@ INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
     (105, 0, 54138),
     (106, 0, @CGUID);
 
-UPDATE `creature` SET `position_x` = 3624.6, `position_y` = -3188, `position_z` = 130.579, `orientation` = 2.99341, `MovementType` = 2, `VerifiedBuild` = 53622, `CreateObject` = 2 WHERE `guid` = @CGUID AND `id1` = 10808;
+UPDATE `creature` SET `position_x` = 3624.6, `position_y` = -3188, `position_z` = 130.579, `orientation` = 2.99341, `MovementType` = 2, `VerifiedBuild` = 53622, `CreateObject` = 2 WHERE `guid` = @CGUID AND `id` = 10808;
 
 DELETE FROM `creature_addon` WHERE `guid` = @CGUID;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
