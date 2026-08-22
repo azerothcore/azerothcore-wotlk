@@ -28,9 +28,9 @@ class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementG
 {
 public:
     PointMovementGenerator(uint32 _id, float _x, float _y, float _z, ForcedMovement forcedMovement, float _speed = 0.0f, float orientation = 0.0f, Movement::PointsArray const* _path = nullptr,
-        bool generatePath = false, bool forceDestination = false, std::optional<AnimTier> animTier = std::nullopt, ObjectGuid chargeTargetGUID = ObjectGuid::Empty, bool reverseOrientation = false, ObjectGuid facingTargetGuid = ObjectGuid())
-        : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination), _reverseOrientation(reverseOrientation),
-        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement), _facingTargetGuid(facingTargetGuid), _animTier(animTier)
+        bool generatePath = false, bool forceDestination = false, std::optional<AnimTier> animTier = std::nullopt, ObjectGuid chargeTargetGUID = ObjectGuid::Empty)
+        : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination),
+        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement), _animTier(animTier)
     {
         if (_path)
             m_precomputedPath = *_path;
@@ -61,10 +61,8 @@ private:
     Movement::PointsArray m_precomputedPath;
     bool _generatePath;
     bool _forceDestination;
-    bool _reverseOrientation;
     ObjectGuid _chargeTargetGUID;
     ForcedMovement _forcedMovement;
-    ObjectGuid _facingTargetGuid;
     std::optional<AnimTier> _animTier;
     bool _stalled{};
     bool _hasBeenStalled{};
