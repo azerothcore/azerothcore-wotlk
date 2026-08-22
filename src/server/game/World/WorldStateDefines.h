@@ -611,6 +611,7 @@ enum WorldStateIDs
     WORLD_STATE_CUSTOM_GUILD_DAILY_RESET_TIME                  = 20006, // Next guild cap reset time
     WORLD_STATE_CUSTOM_MONTHLY_QUEST_RESET_TIME                = 20007, // Next monthly reset time
     WORLD_STATE_CUSTOM_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008, // Next daily calendar deletions of old events time
+    WORLD_STATE_CUSTOM_DALARAN_LICH_KING_DEFEATED              = 20009, // Dalaran: realm has defeated the Lich King (gates Runeweaver Square fountain/statue visibility)
 };
 
 #endif
