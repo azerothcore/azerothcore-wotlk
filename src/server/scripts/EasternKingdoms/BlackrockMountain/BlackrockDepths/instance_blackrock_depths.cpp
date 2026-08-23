@@ -19,6 +19,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "SmartAI.h"
 #include "blackrock_depths.h"
 
 constexpr auto MAX_ENCOUNTER = 6;
@@ -33,7 +34,18 @@ enum Timers
 enum Distances
 {
     RADIUS_RING_OF_LAW      = 80,
-    DISTANCE_EMPEROR_ROOM   = 125
+    DISTANCE_EMPEROR_ROOM   = 125,
+    DISTANCE_DARK_IRON_ALE  = 20
+};
+
+enum DarkIronAle
+{
+    GO_DARK_IRON_ALE_MUG       = 165578,
+    NPC_GRIM_PATRON            = 9545,
+    NPC_GUZZLING_PATRON        = 9547,
+    NPC_HAMMERED_PATRON        = 9554,
+    DATA_DARK_IRON_ALE         = 1,
+    DATA_DARK_IRON_ALE_DRINK   = 4
 };
 
 enum PrincessQuests
@@ -311,6 +323,29 @@ struct instance_blackrock_depths : public InstanceScript
     {
         switch (go->GetEntry())
         {
+            case GO_DARK_IRON_ALE_MUG:
+            {
+                std::list<Creature*> patrons;
+                for (uint32 entry : { NPC_GRIM_PATRON, NPC_GUZZLING_PATRON, NPC_HAMMERED_PATRON })
+                    go->GetCreatureListWithEntryInGrid(patrons, entry, DISTANCE_DARK_IRON_ALE);
+
+                SmartAI* closestPatronAI = nullptr;
+                float closestDistance = DISTANCE_DARK_IRON_ALE;
+                for (Creature* patron : patrons)
+                {
+                    SmartAI* patronAI = CAST_AI(SmartAI, patron->AI());
+                    float const distance = go->GetDistance(patron);
+                    if (!patronAI || !patron->IsAlive() || patron->IsInCombat() || patronAI->GetData(DATA_DARK_IRON_ALE) == DATA_DARK_IRON_ALE_DRINK || distance >= closestDistance)
+                        continue;
+
+                    closestPatronAI = patronAI;
+                    closestDistance = distance;
+                }
+
+                if (closestPatronAI)
+                    closestPatronAI->SetData(DATA_DARK_IRON_ALE, DATA_DARK_IRON_ALE_DRINK, go);
+                break;
+            }
             case GO_ARENA1:
                 GoArena1GUID = go->GetGUID();
                 break;
