@@ -547,7 +547,8 @@ Position const NagmaraPatrolPath[] =
 
 Position const NagmaraGreetingPosition = { 887.900f, -197.050f, -43.6204f };
 
-// Keep left of Phalanx (868.97, -224.979) and cross the doorway only after it opens.
+// Keep left of Phalanx (868.97, -224.979), wait for the doorway to open, and
+// follow the lower corner around the ramp masonry instead of cutting across it.
 Position const NagmaraLoversPath[] =
 {
     { 879.334f, -192.750f, -43.7035f },
@@ -559,6 +560,7 @@ Position const NagmaraLoversPath[] =
     { 877.919f, -229.425f, -43.5566f },
     { 882.395f, -225.949f, -46.7405f },
     { 885.895f, -223.699f, -49.2405f },
+    { 880.825f, -221.390f, -49.9599f },
     { 878.178f, -222.066f, -49.9671f }
 };
 
@@ -676,7 +678,7 @@ struct npc_mistress_nagmara : public CreatureAI
             if (_routePoint == NAGMARA_DOOR_WAIT_POINT)
             {
                 _doorOpenAttempts = 0;
-                _events.ScheduleEvent(EVENT_OPEN_BAR_DOOR, 1ms);
+                _events.ScheduleEvent(EVENT_OPEN_BAR_DOOR, 3s);
             }
             else if (++_routePoint < std::size(NagmaraLoversPath))
                 _events.ScheduleEvent(EVENT_MOVE_LOVERS_ROUTE, 1ms);
@@ -727,7 +729,7 @@ struct npc_mistress_nagmara : public CreatureAI
                     if (OpenBarDoor())
                     {
                         _doorOpenedByEvent = true;
-                        _events.ScheduleEvent(EVENT_CONTINUE_AFTER_DOOR, 3s);
+                        _events.ScheduleEvent(EVENT_CONTINUE_AFTER_DOOR, 1ms);
                     }
                     else if (++_doorOpenAttempts < 30)
                         _events.ScheduleEvent(EVENT_OPEN_BAR_DOOR, 1s);
