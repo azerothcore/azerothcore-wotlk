@@ -558,6 +558,8 @@ Position const NagmaraLoversPath[] =
     { 866.826f, -204.465f, -43.7035f },
     { 864.244f, -210.826f, -43.4590f },
     { 866.824f, -220.959f, -43.4472f },
+    // Near side of Bar Door (GO 170571), 2.5 yards along its approach normal.
+    { 869.295f, -226.863f, -43.7523f },
     { 875.050f, -230.300f, -43.7523f },
     { 877.919f, -229.425f, -43.5566f },
     { 882.395f, -225.949f, -46.7405f },
@@ -565,7 +567,7 @@ Position const NagmaraLoversPath[] =
     { 878.178f, -222.066f, -49.9671f }
 };
 
-constexpr uint8 NAGMARA_DOOR_WAIT_POINT = std::size(NagmaraLoversPath) - 1;
+constexpr uint8 NAGMARA_DOOR_WAIT_POINT = 5;
 constexpr float NAGMARA_GREETING_DISTANCE = 14.0f;
 Position const RocknotFinalPosition = { 880.825f, -221.390f, -49.9562f };
 
@@ -742,6 +744,8 @@ struct npc_mistress_nagmara : public CreatureAI
                         AbortLovePotionEvent(true);
                     break;
                 case EVENT_CONTINUE_AFTER_DOOR:
+                    LOG_INFO("scripts", "Nagmara event {} finished waiting for bar door at ({}, {}, {})",
+                        me->GetInstanceId(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                     if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
                         if (rocknot->AI())
                             rocknot->AI()->DoAction(ACTION_RESUME_AFTER_BAR_DOOR);
@@ -888,6 +892,9 @@ private:
         if (!door)
             return false;
 
+        LOG_INFO("scripts", "Nagmara event {} opening bar door at ({}, {}, {}) while stopped at ({}, {}, {})",
+            me->GetInstanceId(), door->GetPositionX(), door->GetPositionY(), door->GetPositionZ(),
+            me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
         door->SetGoState(GO_STATE_ACTIVE);
         return true;
     }
