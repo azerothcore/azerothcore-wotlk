@@ -518,31 +518,35 @@ enum NagmaraGossip
 
 enum NagmaraPoints
 {
-    POINT_APPROACH_ROCKNOT = 100,
-    POINT_LOVERS_ROUTE     = 200,
-    POINT_ROCKNOT_FINAL    = 300
+    POINT_APPROACH_PATROL   = 100,
+    POINT_APPROACH_GREETING = 108,
+    POINT_LOVERS_ROUTE      = 200,
+    POINT_ROCKNOT_FINAL     = 300
 };
 
-// Nagmara's existing patrol points are deliberately reused for the approach so she
-// runs around the furniture instead of taking a straight line through the tables.
-Position const NagmaraApproachPath[] =
+// Follow Nagmara's database patrol in its proven forward order. Reversing or skipping
+// between these points can make the pathfinder choose furniture geometry.
+Position const NagmaraPatrolPath[] =
 {
+    { 868.316f, -202.803f, -43.7035f },
     { 862.011f, -213.808f, -43.7035f },
-    { 866.826f, -204.465f, -43.7035f },
-    { 871.198f, -197.966f, -43.7035f },
+    { 869.180f, -201.151f, -43.7035f },
     { 876.730f, -190.959f, -43.7035f },
-    { 885.185f, -194.007f, -43.7035f },
-    { 887.900f, -197.050f, -43.6204f }
+    { 894.625f, -191.886f, -43.7035f },
+    { 879.334f, -192.750f, -43.7035f },
+    { 871.198f, -197.966f, -43.7035f },
+    { 866.826f, -204.465f, -43.7035f }
 };
+
+Position const NagmaraGreetingPosition = { 887.900f, -197.050f, -43.6204f };
 
 // Keep left of Phalanx (868.97, -224.979) and cross the doorway only after it opens.
 Position const NagmaraLoversPath[] =
 {
-    { 885.185f, -194.007f, -43.7035f },
-    { 876.730f, -190.959f, -43.7035f },
+    { 879.334f, -192.750f, -43.7035f },
     { 871.198f, -197.966f, -43.7035f },
     { 866.826f, -204.465f, -43.7035f },
-    { 862.011f, -213.808f, -43.7035f },
+    { 864.244f, -210.826f, -43.4590f },
     { 866.824f, -220.959f, -43.4472f },
     { 865.300f, -224.700f, -43.5566f },
     { 866.400f, -229.500f, -43.5566f },
@@ -550,7 +554,7 @@ Position const NagmaraLoversPath[] =
     { 877.918f, -229.425f, -43.5566f }
 };
 
-constexpr uint8 NAGMARA_DOOR_WAIT_POINT = 6;
+constexpr uint8 NAGMARA_DOOR_WAIT_POINT = 5;
 Position const RocknotFinalPosition = { 875.050f, -230.300f, -43.5566f };
 
 struct npc_mistress_nagmara : public CreatureAI
@@ -637,13 +641,18 @@ struct npc_mistress_nagmara : public CreatureAI
 
         _events.RescheduleEvent(EVENT_MOVEMENT_TIMEOUT, 45s);
 
-        if (pointId >= POINT_APPROACH_ROCKNOT && pointId < POINT_APPROACH_ROCKNOT + std::size(NagmaraApproachPath))
+        if (pointId == POINT_APPROACH_GREETING)
+            GreetRocknot();
+        else if (pointId >= POINT_APPROACH_PATROL && pointId < POINT_APPROACH_PATROL + std::size(NagmaraPatrolPath))
         {
-            _approachPoint = pointId - POINT_APPROACH_ROCKNOT;
-            if (++_approachPoint < std::size(NagmaraApproachPath))
-                MoveToApproachPoint();
+            _approachPoint = pointId - POINT_APPROACH_PATROL;
+            if (me->GetExactDist2d(&NagmaraGreetingPosition) <= 12.0f)
+                MoveToGreetingPosition();
             else
-                GreetRocknot();
+            {
+                _approachPoint = (_approachPoint + 1) % std::size(NagmaraPatrolPath);
+                MoveToApproachPoint();
+            }
         }
         else if (pointId >= POINT_LOVERS_ROUTE && pointId < POINT_LOVERS_ROUTE + std::size(NagmaraLoversPath))
         {
@@ -748,22 +757,35 @@ private:
     void StartApproach()
     {
         float shortestDistance = std::numeric_limits<float>::max();
-        for (uint8 i = 0; i < std::size(NagmaraApproachPath); ++i)
+        uint8 nearestPoint = 0;
+        for (uint8 i = 0; i < std::size(NagmaraPatrolPath); ++i)
         {
-            float distance = me->GetExactDist2d(&NagmaraApproachPath[i]);
+            float distance = me->GetExactDist2d(&NagmaraPatrolPath[i]);
             if (distance < shortestDistance)
             {
                 shortestDistance = distance;
-                _approachPoint = i;
+                nearestPoint = i;
             }
         }
 
-        MoveToApproachPoint();
+        if (me->GetExactDist2d(&NagmaraGreetingPosition) <= 12.0f)
+            MoveToGreetingPosition();
+        else
+        {
+            _approachPoint = (nearestPoint + 1) % std::size(NagmaraPatrolPath);
+            MoveToApproachPoint();
+        }
     }
 
     void MoveToApproachPoint()
     {
-        me->GetMotionMaster()->MovePoint(POINT_APPROACH_ROCKNOT + _approachPoint, NagmaraApproachPath[_approachPoint]);
+        me->GetMotionMaster()->MovePoint(POINT_APPROACH_PATROL + _approachPoint, NagmaraPatrolPath[_approachPoint],
+            FORCED_MOVEMENT_NONE, 0.0f, false);
+    }
+
+    void MoveToGreetingPosition()
+    {
+        me->GetMotionMaster()->MovePoint(POINT_APPROACH_GREETING, NagmaraGreetingPosition, FORCED_MOVEMENT_NONE, 0.0f, false);
     }
 
     void GreetRocknot()
@@ -784,7 +806,8 @@ private:
 
     void MoveToRoutePoint()
     {
-        me->GetMotionMaster()->MovePoint(POINT_LOVERS_ROUTE + _routePoint, NagmaraLoversPath[_routePoint]);
+        me->GetMotionMaster()->MovePoint(POINT_LOVERS_ROUTE + _routePoint, NagmaraLoversPath[_routePoint],
+            FORCED_MOVEMENT_NONE, 0.0f, false);
     }
 
     bool OpenBarDoor()
