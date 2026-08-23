@@ -1875,14 +1875,16 @@ void GameEventMgr::SendWorldStateUpdate(Player* player, uint16 eventId)
 class GameEventAIHookWorker
 {
 public:
-    GameEventAIHookWorker(Map* map, uint16 eventId, bool activate) : _map(map), _eventId(eventId), _activate(activate) { }
+    GameEventAIHookWorker(Map* map, uint16 eventId, bool activate) :
+        _map(map), _eventId(eventId), _activate(activate) { }
 
     void Visit(std::unordered_map<ObjectGuid, Creature*>& creatureMap)
     {
         for (ObjectGuid const& guid : Snapshot(creatureMap))
         {
             Creature* creature = _map->GetCreature(guid);
-            if (!creature || !creature->IsInWorld() || creature->IsDuringRemoveFromWorld() || !creature->FindMap() || !creature->IsAIEnabled || !creature->AI())
+            if (!creature || !creature->IsInWorld() || creature->IsDuringRemoveFromWorld() ||
+                !creature->FindMap() || !creature->IsAIEnabled || !creature->AI())
                 continue;
 
             creature->AI()->sOnGameEvent(_activate, _eventId);
