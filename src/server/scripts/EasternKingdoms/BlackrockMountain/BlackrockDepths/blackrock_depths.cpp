@@ -565,7 +565,7 @@ Position const NagmaraLoversPath[] =
     { 878.178f, -222.066f, -49.9671f }
 };
 
-constexpr uint8 NAGMARA_DOOR_WAIT_POINT = 5;
+constexpr uint8 NAGMARA_DOOR_WAIT_POINT = std::size(NagmaraLoversPath) - 1;
 constexpr float NAGMARA_GREETING_DISTANCE = 14.0f;
 Position const RocknotFinalPosition = { 880.825f, -221.390f, -49.9562f };
 
@@ -745,8 +745,10 @@ struct npc_mistress_nagmara : public CreatureAI
                     if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
                         if (rocknot->AI())
                             rocknot->AI()->DoAction(ACTION_RESUME_AFTER_BAR_DOOR);
-                    ++_routePoint;
-                    MoveToRoutePoint();
+                    if (++_routePoint < std::size(NagmaraLoversPath))
+                        MoveToRoutePoint();
+                    else
+                        ReachLoversStop();
                     break;
                 case EVENT_KISS_ROCKNOT:
                     if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
