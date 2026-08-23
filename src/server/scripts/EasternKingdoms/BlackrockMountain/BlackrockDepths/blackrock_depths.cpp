@@ -26,6 +26,9 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 
+#include <iterator>
+#include <limits>
+
 enum IronhandData
 {
     IRONHAND_N_GROUPS          = 3,
@@ -470,9 +473,8 @@ enum NagmaraSpells
 
 enum NagmaraTexts
 {
-    SAY_NAGMARA_1 = 0,
-    SAY_NAGMARA_2 = 1,
-    EMOTE_NAGMARA = 2,
+    SAY_NAGMARA_1 = 1,
+    SAY_NAGMARA_2 = 2,
     EMOTE_ROCKNOT = 5
 };
 
@@ -483,10 +485,12 @@ enum NagmaraQuests
 
 enum RocknotActions
 {
-    ACTION_START_LOVE_POTION    = 1,
-    ACTION_CANCEL_LOVE_POTION   = 2,
-    ACTION_BEGIN_LOVERS_ESCORT  = 3,
-    ACTION_COMPLETE_LOVE_POTION = 4
+    ACTION_START_LOVE_POTION          = 1,
+    ACTION_CANCEL_LOVE_POTION         = 2,
+    ACTION_BEGIN_LOVERS_FOLLOW        = 3,
+    ACTION_MOVE_TO_LOVERS_STOP        = 4,
+    ACTION_ROCKNOT_AT_LOVERS_STOP     = 5,
+    ACTION_COMPLETE_LOVE_POTION       = 6
 };
 
 enum RocknotData
@@ -497,11 +501,14 @@ enum RocknotData
 
 enum NagmaraEvents
 {
-    EVENT_CHECK_REACH_ROCKNOT = 1,
-    EVENT_SAY_NAGMARA_2       = 2,
-    EVENT_CAST_LOVE_POTION    = 3,
-    EVENT_KISS_ROCKNOT        = 4,
-    EVENT_APPROACH_TIMEOUT    = 5
+    EVENT_SAY_NAGMARA_2       = 1,
+    EVENT_CAST_LOVE_POTION    = 2,
+    EVENT_START_LOVERS_ROUTE  = 3,
+    EVENT_OPEN_BAR_DOOR       = 4,
+    EVENT_CONTINUE_AFTER_DOOR = 5,
+    EVENT_KISS_ROCKNOT        = 6,
+    EVENT_CLEAR_HEARTS        = 7,
+    EVENT_MOVEMENT_TIMEOUT    = 8
 };
 
 enum NagmaraGossip
@@ -509,15 +516,58 @@ enum NagmaraGossip
     GOSSIP_MENU_NAGMARA = 2076
 };
 
-Position const NagmaraFinalPosition = { 878.1779f, -222.0662f, -49.96714f };
+enum NagmaraPoints
+{
+    POINT_APPROACH_ROCKNOT = 100,
+    POINT_LOVERS_ROUTE     = 200,
+    POINT_ROCKNOT_FINAL    = 300
+};
+
+// Nagmara's existing patrol points are deliberately reused for the approach so she
+// runs around the furniture instead of taking a straight line through the tables.
+Position const NagmaraApproachPath[] =
+{
+    { 862.011f, -213.808f, -43.7035f },
+    { 866.826f, -204.465f, -43.7035f },
+    { 871.198f, -197.966f, -43.7035f },
+    { 876.730f, -190.959f, -43.7035f },
+    { 885.185f, -194.007f, -43.7035f },
+    { 887.900f, -197.050f, -43.6204f }
+};
+
+// Keep left of Phalanx (868.97, -224.979) and cross the doorway only after it opens.
+Position const NagmaraLoversPath[] =
+{
+    { 885.185f, -194.007f, -43.7035f },
+    { 876.730f, -190.959f, -43.7035f },
+    { 871.198f, -197.966f, -43.7035f },
+    { 866.826f, -204.465f, -43.7035f },
+    { 862.011f, -213.808f, -43.7035f },
+    { 866.824f, -220.959f, -43.4472f },
+    { 865.300f, -224.700f, -43.5566f },
+    { 866.400f, -229.500f, -43.5566f },
+    { 871.800f, -231.200f, -43.5566f },
+    { 877.918f, -229.425f, -43.5566f }
+};
+
+constexpr uint8 NAGMARA_DOOR_WAIT_POINT = 6;
+Position const RocknotFinalPosition = { 875.050f, -230.300f, -43.5566f };
 
 struct npc_mistress_nagmara : public CreatureAI
 {
     npc_mistress_nagmara(Creature* creature) : CreatureAI(creature), _instance(creature->GetInstanceScript()),
-        _lovePotionEvent(false) { }
+        _approachPoint(0), _routePoint(0), _doorOpenAttempts(0), _lovePotionEvent(false),
+        _lovePotionComplete(false), _doorOpenedByEvent(false) { }
 
     void Reset() override
     {
+        if (_lovePotionComplete)
+        {
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->GetMotionMaster()->MoveIdle();
+            return;
+        }
+
         if (_lovePotionEvent)
         {
             AbortLovePotionEvent(true);
@@ -526,6 +576,10 @@ struct npc_mistress_nagmara : public CreatureAI
 
         _events.Reset();
         _rocknotGuid.Clear();
+        _approachPoint = 0;
+        _routePoint = 0;
+        _doorOpenAttempts = 0;
+        _doorOpenedByEvent = false;
     }
 
     void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
@@ -535,7 +589,7 @@ struct npc_mistress_nagmara : public CreatureAI
 
         CloseGossipMenuFor(player);
 
-        if (!_instance || _instance->GetData(TYPE_BAR) == DONE || _instance->GetData(TYPE_BAR) == SPECIAL)
+        if (!_instance || _instance->GetData(TYPE_BAR) != NOT_STARTED)
             return;
 
         Creature* rocknot = me->FindNearestCreature(NPC_PRIVATE_ROCKNOT, 100.0f);
@@ -550,19 +604,17 @@ struct npc_mistress_nagmara : public CreatureAI
         _lovePotionEvent = true;
         _rocknotGuid = rocknot->GetGUID();
 
-        me->SetWalk(true);
+        me->SetWalk(false);
         me->GetMotionMaster()->Clear();
-        me->GetMotionMaster()->MoveFollow(rocknot, 2.0f, 0.0f);
-
-        _events.ScheduleEvent(EVENT_CHECK_REACH_ROCKNOT, 1s);
-        _events.ScheduleEvent(EVENT_APPROACH_TIMEOUT, 30s);
+        StartApproach();
+        _events.ScheduleEvent(EVENT_MOVEMENT_TIMEOUT, 45s);
     }
 
     void DoAction(int32 action) override
     {
         if (action == ACTION_CANCEL_LOVE_POTION)
             AbortLovePotionEvent(false);
-        else if (action == ACTION_COMPLETE_LOVE_POTION)
+        else if (action == ACTION_ROCKNOT_AT_LOVERS_STOP && _lovePotionEvent)
         {
             Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid);
             if (!rocknot)
@@ -571,14 +623,41 @@ struct npc_mistress_nagmara : public CreatureAI
                 return;
             }
 
-            _lovePotionEvent = false;
-            _events.Reset();
-            me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MovePoint(0, NagmaraFinalPosition);
-            me->SetHomePosition(NagmaraFinalPosition);
             me->SetFacingToObject(rocknot);
             rocknot->SetFacingToObject(me);
-            _events.ScheduleEvent(EVENT_KISS_ROCKNOT, 5s);
+            _events.CancelEvent(EVENT_MOVEMENT_TIMEOUT);
+            _events.ScheduleEvent(EVENT_KISS_ROCKNOT, 2s);
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type != POINT_MOTION_TYPE || !_lovePotionEvent)
+            return;
+
+        _events.RescheduleEvent(EVENT_MOVEMENT_TIMEOUT, 45s);
+
+        if (pointId >= POINT_APPROACH_ROCKNOT && pointId < POINT_APPROACH_ROCKNOT + std::size(NagmaraApproachPath))
+        {
+            _approachPoint = pointId - POINT_APPROACH_ROCKNOT;
+            if (++_approachPoint < std::size(NagmaraApproachPath))
+                MoveToApproachPoint();
+            else
+                GreetRocknot();
+        }
+        else if (pointId >= POINT_LOVERS_ROUTE && pointId < POINT_LOVERS_ROUTE + std::size(NagmaraLoversPath))
+        {
+            _routePoint = pointId - POINT_LOVERS_ROUTE;
+            if (_routePoint == NAGMARA_DOOR_WAIT_POINT)
+            {
+                me->GetMotionMaster()->MoveIdle();
+                _doorOpenAttempts = 0;
+                _events.ScheduleEvent(EVENT_OPEN_BAR_DOOR, 1ms);
+            }
+            else if (++_routePoint < std::size(NagmaraLoversPath))
+                MoveToRoutePoint();
+            else
+                ReachLoversStop();
         }
     }
 
@@ -590,27 +669,9 @@ struct npc_mistress_nagmara : public CreatureAI
         {
             switch (eventId)
             {
-                case EVENT_CHECK_REACH_ROCKNOT:
-                    if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
-                    {
-                        if (me->IsWithinDistInMap(rocknot, 5.0f))
-                        {
-                            _events.CancelEvent(EVENT_APPROACH_TIMEOUT);
-                            me->GetMotionMaster()->Clear();
-                            me->SetFacingToObject(rocknot);
-                            rocknot->SetFacingToObject(me);
-                            Talk(SAY_NAGMARA_1);
-                            _events.ScheduleEvent(EVENT_SAY_NAGMARA_2, 5s);
-                        }
-                        else
-                            _events.ScheduleEvent(EVENT_CHECK_REACH_ROCKNOT, 1s);
-                    }
-                    else
-                        AbortLovePotionEvent(false);
-                    break;
                 case EVENT_SAY_NAGMARA_2:
                     Talk(SAY_NAGMARA_2);
-                    _events.ScheduleEvent(EVENT_CAST_LOVE_POTION, 4s);
+                    _events.ScheduleEvent(EVENT_CAST_LOVE_POTION, 1s);
                     break;
                 case EVENT_CAST_LOVE_POTION:
                     DoCast(me, SPELL_POTION_LOVE);
@@ -618,27 +679,65 @@ struct npc_mistress_nagmara : public CreatureAI
                     {
                         if (rocknot->AI())
                         {
-                            rocknot->AI()->DoAction(ACTION_BEGIN_LOVERS_ESCORT);
+                            rocknot->AI()->DoAction(ACTION_BEGIN_LOVERS_FOLLOW);
                             if (!rocknot->AI()->GetData(DATA_LOVE_POTION_ACTIVE))
+                            {
                                 AbortLovePotionEvent(false);
+                                break;
+                            }
+
+                            _events.ScheduleEvent(EVENT_START_LOVERS_ROUTE, 1s);
                         }
                     }
                     else
                         AbortLovePotionEvent(false);
+                    break;
+                case EVENT_START_LOVERS_ROUTE:
+                    _routePoint = 0;
+                    MoveToRoutePoint();
+                    break;
+                case EVENT_OPEN_BAR_DOOR:
+                    if (OpenBarDoor())
+                    {
+                        _doorOpenedByEvent = true;
+                        _events.ScheduleEvent(EVENT_CONTINUE_AFTER_DOOR, 3s);
+                    }
+                    else if (++_doorOpenAttempts < 30)
+                        _events.ScheduleEvent(EVENT_OPEN_BAR_DOOR, 1s);
+                    else
+                        AbortLovePotionEvent(true);
+                    break;
+                case EVENT_CONTINUE_AFTER_DOOR:
+                    ++_routePoint;
+                    MoveToRoutePoint();
                     break;
                 case EVENT_KISS_ROCKNOT:
                     if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
                     {
                         me->SetFacingToObject(rocknot);
                         rocknot->SetFacingToObject(me);
-                        Talk(EMOTE_NAGMARA);
                         rocknot->AI()->Talk(EMOTE_ROCKNOT);
                         DoCast(me, SPELL_NAGMARA_ROCKNOT, true);
                         rocknot->CastSpell(rocknot, SPELL_NAGMARA_ROCKNOT, true);
-                        _events.ScheduleEvent(EVENT_KISS_ROCKNOT, 12s);
+                        _events.ScheduleEvent(EVENT_CLEAR_HEARTS, 6s);
+
+                        _lovePotionEvent = false;
+                        _lovePotionComplete = true;
+                        _doorOpenedByEvent = false;
+                        me->SetHomePosition(me->GetPosition());
+                        rocknot->AI()->DoAction(ACTION_COMPLETE_LOVE_POTION);
+                        if (_instance)
+                            _instance->SetData(TYPE_BAR, DONE);
                     }
+                    else
+                        AbortLovePotionEvent(false);
                     break;
-                case EVENT_APPROACH_TIMEOUT:
+                case EVENT_CLEAR_HEARTS:
+                    me->RemoveAurasDueToSpell(SPELL_NAGMARA_ROCKNOT);
+                    if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
+                        rocknot->RemoveAurasDueToSpell(SPELL_NAGMARA_ROCKNOT);
+                    break;
+                case EVENT_MOVEMENT_TIMEOUT:
                     AbortLovePotionEvent(true);
                     break;
             }
@@ -646,12 +745,93 @@ struct npc_mistress_nagmara : public CreatureAI
     }
 
 private:
-    void AbortLovePotionEvent(bool notifyRocknot)
+    void StartApproach()
+    {
+        float shortestDistance = std::numeric_limits<float>::max();
+        for (uint8 i = 0; i < std::size(NagmaraApproachPath); ++i)
+        {
+            float distance = me->GetExactDist2d(&NagmaraApproachPath[i]);
+            if (distance < shortestDistance)
+            {
+                shortestDistance = distance;
+                _approachPoint = i;
+            }
+        }
+
+        MoveToApproachPoint();
+    }
+
+    void MoveToApproachPoint()
+    {
+        me->GetMotionMaster()->MovePoint(POINT_APPROACH_ROCKNOT + _approachPoint, NagmaraApproachPath[_approachPoint]);
+    }
+
+    void GreetRocknot()
     {
         Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid);
+        if (!rocknot || !me->IsWithinDistInMap(rocknot, 6.0f))
+        {
+            AbortLovePotionEvent(true);
+            return;
+        }
+
+        me->GetMotionMaster()->MoveIdle();
+        me->SetFacingToObject(rocknot);
+        rocknot->SetFacingToObject(me);
+        Talk(SAY_NAGMARA_1);
+        _events.ScheduleEvent(EVENT_SAY_NAGMARA_2, 1s);
+    }
+
+    void MoveToRoutePoint()
+    {
+        me->GetMotionMaster()->MovePoint(POINT_LOVERS_ROUTE + _routePoint, NagmaraLoversPath[_routePoint]);
+    }
+
+    bool OpenBarDoor()
+    {
+        if (!_instance)
+            return false;
+
+        GameObject* door = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_BAR_DOOR));
+        if (!door)
+            return false;
+
+        door->SetGoState(GO_STATE_ACTIVE);
+        return true;
+    }
+
+    void ReachLoversStop()
+    {
+        me->GetMotionMaster()->MoveIdle();
+        me->SetHomePosition(me->GetPosition());
+
+        if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
+            if (rocknot->AI())
+            {
+                rocknot->AI()->DoAction(ACTION_MOVE_TO_LOVERS_STOP);
+                return;
+            }
+
+        AbortLovePotionEvent(false);
+    }
+
+    void AbortLovePotionEvent(bool notifyRocknot)
+    {
+        if (_lovePotionComplete)
+            return;
+
+        Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid);
+        if (_doorOpenedByEvent && _instance)
+            if (GameObject* door = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_BAR_DOOR)))
+                door->SetGoState(GO_STATE_READY);
+
         _events.Reset();
         _rocknotGuid.Clear();
         _lovePotionEvent = false;
+        _approachPoint = 0;
+        _routePoint = 0;
+        _doorOpenAttempts = 0;
+        _doorOpenedByEvent = false;
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveTargetedHome();
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -663,7 +843,12 @@ private:
     InstanceScript* _instance;
     EventMap _events;
     ObjectGuid _rocknotGuid;
+    uint8 _approachPoint;
+    uint8 _routePoint;
+    uint8 _doorOpenAttempts;
     bool _lovePotionEvent;
+    bool _lovePotionComplete;
+    bool _doorOpenedByEvent;
 };
 
 // npc_rocknot
@@ -682,15 +867,10 @@ enum RocknotQuests
     QUEST_ALE                          = 4295
 };
 
-enum RocknotEvents
-{
-    EVENT_RETRY_OPEN_BAR_DOOR = 1
-};
-
 struct npc_rocknot : public npc_escortAI
 {
     npc_rocknot(Creature* creature) : npc_escortAI(creature), _instance(creature->GetInstanceScript()),
-        _breakKegTimer(0), _breakDoorTimer(0), _doorOpenAttempts(0), _lovePotionEvent(false),
+        _breakKegTimer(0), _breakDoorTimer(0), _lovePotionEvent(false), _lovePotionComplete(false),
         _aleEventStarted(false) { }
 
     void Reset() override
@@ -698,12 +878,23 @@ struct npc_rocknot : public npc_escortAI
         if (HasEscortState(STATE_ESCORT_ESCORTING))
             return;
 
-        _events.Reset();
+        if (_lovePotionEvent && !_lovePotionComplete)
+        {
+            AbortLovePotionEvent();
+            return;
+        }
+
         _breakKegTimer = 0;
         _breakDoorTimer = 0;
-        _doorOpenAttempts = 0;
-        _lovePotionEvent = false;
+        if (!_lovePotionComplete)
+            _lovePotionEvent = false;
         _aleEventStarted = false;
+
+        if (_lovePotionComplete)
+        {
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->GetMotionMaster()->MoveIdle();
+        }
     }
 
     void DoAction(int32 action) override
@@ -714,11 +905,12 @@ struct npc_rocknot : public npc_escortAI
                 return;
 
             _lovePotionEvent = true;
+            _lovePotionComplete = false;
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
         else if (action == ACTION_CANCEL_LOVE_POTION)
             AbortLovePotionEvent();
-        else if (action == ACTION_BEGIN_LOVERS_ESCORT && _lovePotionEvent)
+        else if (action == ACTION_BEGIN_LOVERS_FOLLOW && _lovePotionEvent)
         {
             if (me->IsInCombat())
             {
@@ -726,17 +918,30 @@ struct npc_rocknot : public npc_escortAI
                 return;
             }
 
-            me->SetWalk(true);
-            Start(false, ObjectGuid::Empty, nullptr, false, false, true);
-            if (!HasEscortState(STATE_ESCORT_ESCORTING) || !SetNextWaypoint(9, false))
+            Creature* nagmara = me->FindNearestCreature(NPC_MISTRESS_NAGMARA, 100.0f);
+            if (!nagmara)
             {
-                RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
                 AbortLovePotionEvent();
                 return;
             }
 
-            if (Creature* nagmara = me->FindNearestCreature(NPC_MISTRESS_NAGMARA, 100.0f))
-                nagmara->GetMotionMaster()->MoveFollow(me, 2.0f, 0.0f);
+            _nagmaraGuid = nagmara->GetGUID();
+            me->SetWalk(false);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveFollow(nagmara, 3.0f, M_PI);
+        }
+        else if (action == ACTION_MOVE_TO_LOVERS_STOP && _lovePotionEvent)
+        {
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MovePoint(POINT_ROCKNOT_FINAL, RocknotFinalPosition);
+        }
+        else if (action == ACTION_COMPLETE_LOVE_POTION && _lovePotionEvent)
+        {
+            _lovePotionEvent = false;
+            _lovePotionComplete = true;
+            me->SetHomePosition(me->GetPosition());
+            me->GetMotionMaster()->MoveIdle();
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
     }
 
@@ -748,6 +953,19 @@ struct npc_rocknot : public npc_escortAI
             return _lovePotionEvent;
 
         return 0;
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type != POINT_MOTION_TYPE || pointId != POINT_ROCKNOT_FINAL || !_lovePotionEvent)
+            return;
+
+        me->GetMotionMaster()->MoveIdle();
+        me->SetHomePosition(me->GetPosition());
+
+        if (Creature* nagmara = ObjectAccessor::GetCreature(*me, _nagmaraGuid))
+            if (nagmara->AI())
+                nagmara->AI()->DoAction(ACTION_ROCKNOT_AT_LOVERS_STOP);
     }
 
     void sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/) override
@@ -807,48 +1025,11 @@ struct npc_rocknot : public npc_escortAI
                 me->HandleEmoteCommand(EMOTE_ONESHOT_KICK);
                 _breakKegTimer = 2000;
                 break;
-            case 16:
-                if (_lovePotionEvent && !OpenBarDoor())
-                {
-                    SetEscortPaused(true);
-                    _doorOpenAttempts = 0;
-                    _events.ScheduleEvent(EVENT_RETRY_OPEN_BAR_DOOR, 1s);
-                }
-                break;
-            case 33:
-                if (_lovePotionEvent)
-                {
-                    _lovePotionEvent = false;
-                    if (_instance)
-                        _instance->SetData(TYPE_BAR, DONE);
-
-                    if (Creature* nagmara = me->FindNearestCreature(NPC_MISTRESS_NAGMARA, 100.0f))
-                        if (nagmara->AI())
-                            nagmara->AI()->DoAction(ACTION_COMPLETE_LOVE_POTION);
-
-                    SetEscortPaused(true);
-                    me->SetHomePosition(*me);
-                }
-                break;
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        _events.Update(diff);
-        while (uint32 eventId = _events.ExecuteEvent())
-        {
-            if (eventId == EVENT_RETRY_OPEN_BAR_DOOR)
-            {
-                if (OpenBarDoor())
-                    SetEscortPaused(false);
-                else if (++_doorOpenAttempts < 30)
-                    _events.ScheduleEvent(EVENT_RETRY_OPEN_BAR_DOOR, 1s);
-                else
-                    AbortLovePotionEvent();
-            }
-        }
-
         // Standard Ale Event Timers
         if (_breakKegTimer)
         {
@@ -889,31 +1070,19 @@ private:
         if (_lovePotionEvent || _aleEventStarted || !_instance || me->IsInCombat())
             return false;
 
-        if (_instance->GetData(TYPE_BAR) == DONE || _instance->GetData(TYPE_BAR) == SPECIAL)
+        if (_instance->GetData(TYPE_BAR) != NOT_STARTED)
             return false;
 
         return _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_BAR_DOOR));
     }
 
-    bool OpenBarDoor()
-    {
-        if (!_instance)
-            return false;
-
-        GameObject* door = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_GO_BAR_DOOR));
-        if (!door)
-            return false;
-
-        door->SetGoState(GO_STATE_ACTIVE);
-        return true;
-    }
-
     void AbortLovePotionEvent()
     {
-        _events.Reset();
-        _doorOpenAttempts = 0;
+        if (_lovePotionComplete)
+            return;
+
         _lovePotionEvent = false;
-        RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
+        _nagmaraGuid.Clear();
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveTargetedHome();
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -924,11 +1093,11 @@ private:
     }
 
     InstanceScript* _instance;
-    EventMap _events;
+    ObjectGuid _nagmaraGuid;
     uint32 _breakKegTimer;
     uint32 _breakDoorTimer;
-    uint8 _doorOpenAttempts;
     bool _lovePotionEvent;
+    bool _lovePotionComplete;
     bool _aleEventStarted;
 };
 
