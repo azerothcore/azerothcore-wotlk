@@ -19,8 +19,7 @@ Read the matching doc(s) BEFORE starting the task:
 - Creating or modifying SQL → `.agents/docs/sql-guidelines.md`
   - SmartAI work (`smart_scripts` data) → also `.agents/docs/cpp-scripts.md`
 - Reviewing a changeset or PR → `.agents/docs/code-review.md`
-- Opening or updating a PR → `.agents/docs/code-review.md` + `.agents/docs/self-review-rules.md`:
-  self-review before submitting; read existing comments, bot reviews included
+- Self-reviewing, or opening or updating a PR → also `.agents/docs/self-review-rules.md`
 - Touching a subsystem that has a doc in `.agents/docs/systems/` → read that doc too
 - Capturing a lesson or adding/updating agent docs → `.agents/docs/README.md`
 
