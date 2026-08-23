@@ -555,14 +555,16 @@ Position const NagmaraLoversPath[] =
     { 866.826f, -204.465f, -43.7035f },
     { 864.244f, -210.826f, -43.4590f },
     { 866.824f, -220.959f, -43.4472f },
-    { 865.300f, -224.700f, -43.5566f },
-    { 866.400f, -229.500f, -43.5566f },
-    { 871.800f, -231.200f, -43.5566f },
-    { 877.918f, -229.425f, -43.5566f }
+    { 875.050f, -230.300f, -43.7523f },
+    { 877.919f, -229.425f, -43.5566f },
+    { 882.395f, -225.949f, -46.7405f },
+    { 885.895f, -223.699f, -49.2405f },
+    { 878.178f, -222.066f, -49.9671f }
 };
 
 constexpr uint8 NAGMARA_DOOR_WAIT_POINT = 5;
-Position const RocknotFinalPosition = { 875.050f, -230.300f, -43.5566f };
+constexpr float NAGMARA_GREETING_DISTANCE = 14.0f;
+Position const RocknotFinalPosition = { 880.825f, -221.390f, -49.9562f };
 
 struct npc_mistress_nagmara : public CreatureAI
 {
@@ -660,7 +662,7 @@ struct npc_mistress_nagmara : public CreatureAI
         else if (pointId >= POINT_APPROACH_PATROL && pointId < POINT_APPROACH_PATROL + std::size(NagmaraPatrolPath))
         {
             _approachPoint = pointId - POINT_APPROACH_PATROL;
-            if (me->GetExactDist2d(&NagmaraGreetingPosition) <= 12.0f)
+            if (me->GetExactDist2d(&NagmaraGreetingPosition) <= NAGMARA_GREETING_DISTANCE)
                 _events.ScheduleEvent(EVENT_MOVE_GREETING, 1ms);
             else
             {
@@ -697,6 +699,12 @@ struct npc_mistress_nagmara : public CreatureAI
                     break;
                 case EVENT_CAST_LOVE_POTION:
                     DoCast(me, SPELL_POTION_LOVE);
+                    if (ObjectAccessor::GetCreature(*me, _rocknotGuid))
+                        _events.ScheduleEvent(EVENT_START_LOVERS_ROUTE, 2s);
+                    else
+                        AbortLovePotionEvent(false);
+                    break;
+                case EVENT_START_LOVERS_ROUTE:
                     if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
                     {
                         if (rocknot->AI())
@@ -708,15 +716,12 @@ struct npc_mistress_nagmara : public CreatureAI
                                 break;
                             }
 
-                            _events.ScheduleEvent(EVENT_START_LOVERS_ROUTE, 1s);
+                            _routePoint = 0;
+                            MoveToRoutePoint();
                         }
                     }
                     else
                         AbortLovePotionEvent(false);
-                    break;
-                case EVENT_START_LOVERS_ROUTE:
-                    _routePoint = 0;
-                    MoveToRoutePoint();
                     break;
                 case EVENT_OPEN_BAR_DOOR:
                     if (OpenBarDoor())
@@ -806,7 +811,7 @@ private:
             }
         }
 
-        if (me->GetExactDist2d(&NagmaraGreetingPosition) <= 12.0f)
+        if (me->GetExactDist2d(&NagmaraGreetingPosition) <= NAGMARA_GREETING_DISTANCE)
             MoveToGreetingPosition();
         else
         {
