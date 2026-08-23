@@ -330,8 +330,8 @@ struct instance_blackrock_depths : public InstanceScript
             case GO_DARK_IRON_ALE_MUG:
             {
                 std::list<Creature*> patrons;
-                for (uint32 entry : { NPC_GRIM_PATRON, NPC_GUZZLING_PATRON, NPC_HAMMERED_PATRON })
-                    go->GetCreatureListWithEntryInGrid(patrons, entry, DISTANCE_DARK_IRON_ALE);
+                go->GetCreatureListWithEntryInGrid(patrons,
+                    { NPC_GRIM_PATRON, NPC_GUZZLING_PATRON, NPC_HAMMERED_PATRON }, DISTANCE_DARK_IRON_ALE);
 
                 SmartAI* closestPatronAI = nullptr;
                 float closestDistance = DISTANCE_DARK_IRON_ALE;
@@ -685,22 +685,17 @@ struct instance_blackrock_depths : public InstanceScript
                 return;
             }
 
-            auto reformPatron = [patron]()
-            {
-                auto formationInfo = sFormationMgr->CreatureGroupMap.find(patron->GetSpawnId());
-                if (!patron->GetFormation() && formationInfo != sFormationMgr->CreatureGroupMap.end())
-                    sFormationMgr->AddCreatureToGroup(formationInfo->second.leaderGUID, patron);
-            };
-
             if (data == DATA_DARK_IRON_ALE_REFORM)
             {
-                reformPatron();
+                if (!patron->GetFormation())
+                    patron->SearchFormation();
                 return;
             }
 
             if (patron->IsAlive() && !patron->IsInCombat())
             {
-                reformPatron();
+                if (!patron->GetFormation())
+                    patron->SearchFormation();
                 patron->RestoreFaction();
                 patron->GetMotionMaster()->MoveTargetedHome(true);
             }
