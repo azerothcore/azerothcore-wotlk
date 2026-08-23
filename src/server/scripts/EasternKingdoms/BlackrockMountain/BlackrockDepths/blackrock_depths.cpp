@@ -510,7 +510,12 @@ enum NagmaraEvents
     EVENT_KISS_ROCKNOT        = 6,
     EVENT_CLEAR_HEARTS        = 7,
     EVENT_MOVEMENT_TIMEOUT    = 8,
-    EVENT_TRACE_MOVEMENT      = 9
+    EVENT_TRACE_MOVEMENT      = 9,
+    EVENT_MOVE_APPROACH       = 10,
+    EVENT_MOVE_GREETING       = 11,
+    EVENT_GREET_ROCKNOT       = 12,
+    EVENT_MOVE_LOVERS_ROUTE   = 13,
+    EVENT_REACH_LOVERS_STOP   = 14
 };
 
 enum NagmaraGossip
@@ -651,16 +656,16 @@ struct npc_mistress_nagmara : public CreatureAI
         _events.RescheduleEvent(EVENT_MOVEMENT_TIMEOUT, 45s);
 
         if (pointId == POINT_APPROACH_GREETING)
-            GreetRocknot();
+            _events.ScheduleEvent(EVENT_GREET_ROCKNOT, 1ms);
         else if (pointId >= POINT_APPROACH_PATROL && pointId < POINT_APPROACH_PATROL + std::size(NagmaraPatrolPath))
         {
             _approachPoint = pointId - POINT_APPROACH_PATROL;
             if (me->GetExactDist2d(&NagmaraGreetingPosition) <= 12.0f)
-                MoveToGreetingPosition();
+                _events.ScheduleEvent(EVENT_MOVE_GREETING, 1ms);
             else
             {
                 _approachPoint = (_approachPoint + 1) % std::size(NagmaraPatrolPath);
-                MoveToApproachPoint();
+                _events.ScheduleEvent(EVENT_MOVE_APPROACH, 1ms);
             }
         }
         else if (pointId >= POINT_LOVERS_ROUTE && pointId < POINT_LOVERS_ROUTE + std::size(NagmaraLoversPath))
@@ -668,14 +673,13 @@ struct npc_mistress_nagmara : public CreatureAI
             _routePoint = pointId - POINT_LOVERS_ROUTE;
             if (_routePoint == NAGMARA_DOOR_WAIT_POINT)
             {
-                me->GetMotionMaster()->MoveIdle();
                 _doorOpenAttempts = 0;
                 _events.ScheduleEvent(EVENT_OPEN_BAR_DOOR, 1ms);
             }
             else if (++_routePoint < std::size(NagmaraLoversPath))
-                MoveToRoutePoint();
+                _events.ScheduleEvent(EVENT_MOVE_LOVERS_ROUTE, 1ms);
             else
-                ReachLoversStop();
+                _events.ScheduleEvent(EVENT_REACH_LOVERS_STOP, 1ms);
         }
     }
 
@@ -767,6 +771,21 @@ struct npc_mistress_nagmara : public CreatureAI
                         static_cast<uint32>(me->GetMotionMaster()->GetCurrentMovementGeneratorType()), _approachPoint, _routePoint);
                     if (_lovePotionEvent)
                         _events.ScheduleEvent(EVENT_TRACE_MOVEMENT, 1s);
+                    break;
+                case EVENT_MOVE_APPROACH:
+                    MoveToApproachPoint();
+                    break;
+                case EVENT_MOVE_GREETING:
+                    MoveToGreetingPosition();
+                    break;
+                case EVENT_GREET_ROCKNOT:
+                    GreetRocknot();
+                    break;
+                case EVENT_MOVE_LOVERS_ROUTE:
+                    MoveToRoutePoint();
+                    break;
+                case EVENT_REACH_LOVERS_STOP:
+                    ReachLoversStop();
                     break;
             }
         }
