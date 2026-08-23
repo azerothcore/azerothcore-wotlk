@@ -90,6 +90,11 @@ jobs:
                   try
                   {
                       Invoke-WebRequest @boostRequest
+                      # A mirror can answer 200 with an error page, which doesn't throw. Size-check
+                      # inside the loop so a bad payload retries onto a different mirror instead of
+                      # failing the job outright. Each attempt re-rolls the mirror.
+                      $boostMB = (Get-Item $boostExe).Length / 1MB
+                      if ($boostMB -lt 50) { throw "got $([int]$boostMB) MB, likely an HTML page." }
                       break
                   }
                   catch
@@ -99,9 +104,7 @@ jobs:
                       Start-Sleep -Seconds 15
                   }
               }
-              $boostMB = (Get-Item $boostExe).Length / 1MB
               Write-Host ("Downloaded Boost installer: {0:N1} MB" -f $boostMB)
-              if ($boostMB -lt 50) { throw "Boost installer download looks wrong ($([int]$boostMB) MB) - likely an HTML page." }
               $boostProc = Start-Process -FilePath $boostExe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/DIR=C:\local\boost_1_87_0' -Wait -PassThru
               if ($boostProc.ExitCode -ne 0) { throw "Boost installer failed with exit code $($boostProc.ExitCode)." }
               # Fail fast if the installer "succeeded" but didn't lay down the expected tree,
