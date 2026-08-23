@@ -61,7 +61,7 @@ jobs:
 
           # --- Boost 1.87.0 (msvc-14.3, 64-bit) prebuilt binaries -> C:\local\boost_1_87_0 (BOOST_ROOT) ---
           # Go through downloads.sourceforge.net, which hands out an https mirror. The
-          # master.dl host redirects to a plain-http URL that PowerShell 7.5+ refuses to
+          # master.dl host redirects to a plain-http URL that PowerShell 7.4+ refuses to
           # follow, and an installer we then execute shouldn't travel in the clear anyway.
           # SourceForge sniffs the user agent: anything starting with Mozilla gets the HTML
           # download page instead of the file, so send a non-browser one. Note this is the
