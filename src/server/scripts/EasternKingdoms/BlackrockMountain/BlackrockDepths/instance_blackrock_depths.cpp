@@ -45,7 +45,8 @@ enum DarkIronAle
     NPC_GUZZLING_PATRON        = 9547,
     NPC_HAMMERED_PATRON        = 9554,
     DATA_DARK_IRON_ALE         = 1,
-    DATA_DARK_IRON_ALE_DRINK   = 4
+    DATA_DARK_IRON_ALE_DRINK   = 4,
+    DATA_DARK_IRON_ALE_HOME    = 100
 };
 
 enum PrincessQuests
@@ -665,6 +666,16 @@ struct instance_blackrock_depths : public InstanceScript
                 return arenaBossToSpawn;
         }
         return 0;
+    }
+
+    void SetGuidData(uint32 data, ObjectGuid guid) override
+    {
+        if (data != DATA_DARK_IRON_ALE_HOME)
+            return;
+
+        if (Creature* patron = instance->GetCreature(guid))
+            if (patron->IsAlive() && !patron->IsInCombat())
+                patron->GetMotionMaster()->MoveTargetedHome(true);
     }
 
     ObjectGuid GetGuidData(uint32 data) const override
