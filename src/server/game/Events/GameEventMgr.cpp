@@ -1875,26 +1875,61 @@ void GameEventMgr::SendWorldStateUpdate(Player* player, uint16 eventId)
 class GameEventAIHookWorker
 {
 public:
-    GameEventAIHookWorker(uint16 eventId, bool activate) : _eventId(eventId), _activate(activate) { }
+    GameEventAIHookWorker(Map* map, uint16 eventId, bool activate) : _map(map), _eventId(eventId), _activate(activate) { }
 
     void Visit(std::unordered_map<ObjectGuid, Creature*>& creatureMap)
     {
-        for (auto const& p : creatureMap)
-            if (p.second->IsInWorld() && !p.second->IsDuringRemoveFromWorld() && p.second->FindMap() && p.second->IsAIEnabled && p.second->AI())
-                p.second->AI()->sOnGameEvent(_activate, _eventId);
+        for (ObjectGuid const& guid : Snapshot(creatureMap))
+        {
+            Creature* creature = _map->GetCreature(guid);
+            if (!creature || !creature->IsInWorld() || creature->IsDuringRemoveFromWorld() || !creature->FindMap() || !creature->IsAIEnabled || !creature->AI())
+                continue;
+
+            creature->AI()->sOnGameEvent(_activate, _eventId);
+        }
     }
 
     void Visit(std::unordered_map<ObjectGuid, GameObject*>& gameObjectMap)
     {
-        for (auto const& p : gameObjectMap)
-            if (p.second->IsInWorld() && p.second->FindMap() && p.second->AI())
-                p.second->AI()->OnGameEvent(_activate, _eventId);
+        for (ObjectGuid const& guid : Snapshot(gameObjectMap))
+        {
+            GameObject* gameObject = _map->GetGameObject(guid);
+            if (!gameObject || !gameObject->IsInWorld() || !gameObject->FindMap() || !gameObject->AI())
+                continue;
+
+            gameObject->AI()->OnGameEvent(_activate, _eventId);
+        }
     }
 
     template<class T>
     void Visit(std::unordered_map<ObjectGuid, T*>&) { }
 
 private:
+    //! A SMART_EVENT_GAME_EVENT_START script can erase its own creature from the map's
+    //! object store while that store is being walked. Confirmed chain (game event 89
+    //! "Leprithus", entry 572, SMART_ACTION_RESPAWN_TARGET on self):
+    //!
+    //!   GameEventAIHookWorker::Visit -> SmartScript::ProcessEventsFor -> ProcessAction
+    //!     -> Creature::Respawn -> Map::AddObjectToRemoveList
+    //!     -> Unit::CleanupBeforeRemoveFromMap -> Creature::RemoveFromWorld
+    //!     -> _objectsStore.Remove<Creature>()
+    //!
+    //! The erase frees the hash node the loop is standing on, so reading the next node
+    //! yields garbage and the following dereference faults. Walk a snapshot of the guids
+    //! and resolve each object again: the store, not a pointer cached across the AI call,
+    //! is the authority on whether the object is still there.
+    template<class T>
+    static std::vector<ObjectGuid> Snapshot(std::unordered_map<ObjectGuid, T*> const& objectMap)
+    {
+        std::vector<ObjectGuid> guids;
+        guids.reserve(objectMap.size());
+        for (auto const& p : objectMap)
+            guids.push_back(p.first);
+
+        return guids;
+    }
+
+    Map* _map;
     uint16 _eventId;
     bool _activate;
 };
@@ -1905,7 +1940,7 @@ void GameEventMgr::RunSmartAIScripts(uint16 eventId, bool activate)
     //! Not entirely sure how this will affect units in non-loaded grids.
     sMapMgr->DoForAllMaps([eventId, activate](Map* map)
     {
-        GameEventAIHookWorker worker(eventId, activate);
+        GameEventAIHookWorker worker(map, eventId, activate);
         TypeContainerVisitor<GameEventAIHookWorker, MapStoredObjectTypesContainer> visitor(worker);
         visitor.Visit(map->GetObjectsStore());
     });
