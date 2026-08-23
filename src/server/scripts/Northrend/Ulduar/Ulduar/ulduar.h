@@ -173,6 +173,7 @@ enum UlduarNPCs
     NPC_HODIR                               = 32845,
     NPC_THORIM                              = 32865,
     NPC_FREYA                               = 32906,
+    NPC_STRENGTHENED_IRON_ROOTS             = 33168,
     NPC_VEZAX                               = 33271,
     NPC_SARONITE_ANIMUS                     = 33524,
     NPC_SARA                                = 33134,

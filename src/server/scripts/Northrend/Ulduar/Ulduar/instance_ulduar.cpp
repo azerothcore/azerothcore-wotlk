@@ -168,8 +168,9 @@ ObjectData const gameobjectData[] =
 
 ObjectData const summonData[] =
 {
-    { NPC_SARONITE_ANIMUS,  BOSS_VEZAX }, // summoned by a Saronite Vapor, not Vezax
-    { 0,                    0          }
+    { NPC_SARONITE_ANIMUS,          BOSS_VEZAX }, // summoned by a Saronite Vapor, not Vezax
+    { NPC_STRENGTHENED_IRON_ROOTS,  BOSS_FREYA }, // summoned by the rooted player, not Freya
+    { 0,                            0          }
 };
 
 BossBoundaryData const boundaries =
