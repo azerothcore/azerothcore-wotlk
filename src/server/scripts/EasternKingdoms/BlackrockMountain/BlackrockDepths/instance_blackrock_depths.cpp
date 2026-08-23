@@ -49,7 +49,8 @@ enum DarkIronAle
     DATA_DARK_IRON_ALE_DRINK   = 4,
     DATA_DARK_IRON_ALE_HOME    = 100,
     DATA_DARK_IRON_ALE_REFORM  = 101,
-    DATA_DARK_IRON_ALE_DISBAND = 102
+    DATA_DARK_IRON_ALE_DISBAND = 102,
+    DATA_DARK_IRON_ALE_EMOTE   = 103
 };
 
 enum PrincessQuests
@@ -333,6 +334,7 @@ struct instance_blackrock_depths : public InstanceScript
                 go->GetCreatureListWithEntryInGrid(patrons,
                     { NPC_GRIM_PATRON, NPC_GUZZLING_PATRON, NPC_HAMMERED_PATRON }, DISTANCE_DARK_IRON_ALE);
 
+                Creature* closestPatron = nullptr;
                 SmartAI* closestPatronAI = nullptr;
                 float closestDistance = DISTANCE_DARK_IRON_ALE;
                 for (Creature* patron : patrons)
@@ -342,12 +344,16 @@ struct instance_blackrock_depths : public InstanceScript
                     if (!patronAI || !patron->IsAlive() || patron->IsInCombat() || patronAI->GetData(DATA_DARK_IRON_ALE) == DATA_DARK_IRON_ALE_DRINK || distance >= closestDistance)
                         continue;
 
+                    closestPatron = patron;
                     closestPatronAI = patronAI;
                     closestDistance = distance;
                 }
 
                 if (closestPatronAI)
+                {
+                    closestPatron->SetEmoteState(EMOTE_STATE_NONE);
                     closestPatronAI->SetData(DATA_DARK_IRON_ALE, DATA_DARK_IRON_ALE_DRINK, go);
+                }
                 break;
             }
             case GO_ARENA1:
@@ -673,11 +679,19 @@ struct instance_blackrock_depths : public InstanceScript
 
     void SetGuidData(uint32 data, ObjectGuid guid) override
     {
-        if (data != DATA_DARK_IRON_ALE_HOME && data != DATA_DARK_IRON_ALE_REFORM && data != DATA_DARK_IRON_ALE_DISBAND)
+        if (data != DATA_DARK_IRON_ALE_HOME && data != DATA_DARK_IRON_ALE_REFORM &&
+            data != DATA_DARK_IRON_ALE_DISBAND && data != DATA_DARK_IRON_ALE_EMOTE)
             return;
 
         if (Creature* patron = instance->GetCreature(guid))
         {
+            if (data == DATA_DARK_IRON_ALE_EMOTE)
+            {
+                if (CreatureAddon const* addon = patron->GetCreatureAddon())
+                    patron->SetEmoteState(static_cast<Emote>(addon->emote));
+                return;
+            }
+
             if (data == DATA_DARK_IRON_ALE_DISBAND)
             {
                 if (CreatureGroup* formation = patron->GetFormation())

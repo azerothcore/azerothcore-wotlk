@@ -1,9 +1,3 @@
--- Dark Iron Ale Mug
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 165578) AND (`source_type` = 1);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(165578, 1, 0, 0, 63, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 14871, 5, 0, 0, 0, 0, 0, 0, 'Dark Iron Ale Mug - On Just Created - Set Data to Morja'),
-(165578, 1, 1, 0, 63, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 15429, 20, 0, 0, 0, 0, 0, 0, 'Dark Iron Ale Mug - On Just Created - Set Data to Disgusting Oozeling');
-
 -- Grim Patron
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 9545) AND (`source_type` = 0);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -17,7 +11,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9545, 0, 7, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 954500, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reached Dark Iron Ale Mug - Run Action List'),
 (9545, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Linked Event - Clear Dark Iron Ale State'),
 (9545, 0, 9, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Linked Event - Restore Faction'),
-(9545, 0, 10, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Reform Patron Group');
+(9545, 0, 10, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Reform Patron Group'),
+(9545, 0, 11, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reached Home - Restore Emote State');
 
 -- Guzzling Patron
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 9547) AND (`source_type` = 0);
@@ -33,7 +28,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9547, 0, 8, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 954700, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Dark Iron Ale Mug - Run Action List'),
 (9547, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Linked Event - Clear Dark Iron Ale State'),
 (9547, 0, 10, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Linked Event - Restore Faction'),
-(9547, 0, 11, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Reform Patron Group');
+(9547, 0, 11, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Reform Patron Group'),
+(9547, 0, 12, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Home - Restore Emote State');
 
 -- Hammered Patron
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 9554) AND (`source_type` = 0);
@@ -47,7 +43,64 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9554, 0, 6, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 955400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Reached Dark Iron Ale Mug - Run Action List'),
 (9554, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Linked Event - Clear Dark Iron Ale State'),
 (9554, 0, 8, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Linked Event - Restore Faction'),
-(9554, 0, 9, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Reset - Reform Patron Group');
+(9554, 0, 9, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Reset - Reform Patron Group'),
+(9554, 0, 10, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Reached Home - Restore Emote State');
+
+-- Grim Patron guid 48172
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -48172) AND (`source_type` = 0);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-48172, 0, 0, 0, 105, 0, 100, 0, 3000, 5000, 5000, 8000, 0, 5, 11, 15610, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - In Combat - Cast \'Kick\''),
+(-48172, 0, 1, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 0, 11, 14822, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - Between 0-30% Health - Cast \'Drunken Rage\' (No Repeat)'),
+(-48172, 0, 2, 0, 1, 0, 55, 0, 7000, 15000, 7000, 15000, 0, 0, 10, 1, 4, 11, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - OOC - Play Random Emotes'),
+(-48172, 0, 3, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 30, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Data Set 1 1 - Start Attack'),
+(-48172, 0, 4, 0, 38, 0, 100, 512, 1, 4, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Data Set 1 4 - Move to Dark Iron Ale Mug'),
+(-48172, 0, 5, 8, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Aggro - Remove Npc Flags Gossip'),
+(-48172, 0, 6, 9, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Add Npc Flags Gossip'),
+(-48172, 0, 7, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 954500, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reached Dark Iron Ale Mug - Run Action List'),
+(-48172, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Linked Event - Clear Dark Iron Ale State'),
+(-48172, 0, 9, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Linked Event - Restore Faction'),
+(-48172, 0, 10, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Reform Patron Group'),
+(-48172, 0, 11, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reached Home - Restore Emote State'),
+(-48172, 0, 12, 13, 1, 0, 100, 0, 30000, 30000, 55000, 60000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - OOC - Say text1'),
+(-48172, 0, 13, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Grim Patron - OOC - Set data');
+
+-- Guzzling Patron guid 90884
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -90884) AND (`source_type` = 0);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-90884, 0, 0, 0, 0, 0, 100, 0, 1000, 2000, 15000, 15000, 0, 0, 11, 14868, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - In Combat - Cast \'Curse of Agony\''),
+(-90884, 0, 1, 0, 0, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 0, 11, 20825, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - In Combat - Cast \'Shadow Bolt\''),
+(-90884, 0, 2, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 0, 11, 14822, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - Between 0-30% Health - Cast \'Drunken Rage\' (No Repeat)'),
+(-90884, 0, 3, 0, 1, 0, 55, 0, 7000, 15000, 7000, 15000, 0, 0, 10, 1, 4, 11, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Play Random Emotes'),
+(-90884, 0, 4, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 30, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Data Set 1 1 - Start Attack'),
+(-90884, 0, 5, 0, 38, 0, 100, 512, 1, 4, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Data Set 1 4 - Move to Dark Iron Ale Mug'),
+(-90884, 0, 6, 9, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Aggro - Remove Npc Flags Gossip'),
+(-90884, 0, 7, 10, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Add Npc Flags Gossip'),
+(-90884, 0, 8, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 954700, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Dark Iron Ale Mug - Run Action List'),
+(-90884, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Linked Event - Clear Dark Iron Ale State'),
+(-90884, 0, 10, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Linked Event - Restore Faction'),
+(-90884, 0, 11, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Reform Patron Group'),
+(-90884, 0, 12, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Home - Restore Emote State'),
+(-90884, 0, 13, 14, 1, 0, 100, 0, 150000, 150000, 12000, 180000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Say text1'),
+(-90884, 0, 14, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Set data');
+
+-- Guzzling Patron guid 91064
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -91064) AND (`source_type` = 0);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-91064, 0, 0, 0, 0, 0, 100, 0, 1000, 2000, 15000, 15000, 0, 0, 11, 14868, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - In Combat - Cast \'Curse of Agony\''),
+(-91064, 0, 1, 0, 0, 0, 100, 0, 3000, 4000, 3000, 4000, 0, 0, 11, 20825, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - In Combat - Cast \'Shadow Bolt\''),
+(-91064, 0, 2, 0, 2, 0, 100, 1, 0, 30, 0, 0, 0, 0, 11, 14822, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - Between 0-30% Health - Cast \'Drunken Rage\' (No Repeat)'),
+(-91064, 0, 3, 0, 1, 0, 55, 0, 7000, 15000, 7000, 15000, 0, 0, 10, 1, 4, 11, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Play Random Emotes'),
+(-91064, 0, 4, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 30, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Data Set 1 1 - Start Attack'),
+(-91064, 0, 5, 0, 38, 0, 100, 512, 1, 4, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Data Set 1 4 - Move to Dark Iron Ale Mug'),
+(-91064, 0, 6, 9, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Aggro - Remove Npc Flags Gossip'),
+(-91064, 0, 7, 10, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Add Npc Flags Gossip'),
+(-91064, 0, 8, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 954700, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Dark Iron Ale Mug - Run Action List'),
+(-91064, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Linked Event - Clear Dark Iron Ale State'),
+(-91064, 0, 10, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Linked Event - Restore Faction'),
+(-91064, 0, 11, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Reform Patron Group'),
+(-91064, 0, 12, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Home - Restore Emote State'),
+(-91064, 0, 13, 14, 1, 0, 100, 0, 200000, 200000, 550000, 600000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Say text1'),
+(-91064, 0, 14, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Set data');
 
 -- Patron drink sequences
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 954500) AND (`source_type` = 9);
