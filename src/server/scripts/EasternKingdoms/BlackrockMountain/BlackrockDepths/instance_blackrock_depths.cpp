@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
@@ -46,7 +47,9 @@ enum DarkIronAle
     NPC_HAMMERED_PATRON        = 9554,
     DATA_DARK_IRON_ALE         = 1,
     DATA_DARK_IRON_ALE_DRINK   = 4,
-    DATA_DARK_IRON_ALE_HOME    = 100
+    DATA_DARK_IRON_ALE_HOME    = 100,
+    DATA_DARK_IRON_ALE_REFORM  = 101,
+    DATA_DARK_IRON_ALE_DISBAND = 102
 };
 
 enum PrincessQuests
@@ -670,12 +673,38 @@ struct instance_blackrock_depths : public InstanceScript
 
     void SetGuidData(uint32 data, ObjectGuid guid) override
     {
-        if (data != DATA_DARK_IRON_ALE_HOME)
+        if (data != DATA_DARK_IRON_ALE_HOME && data != DATA_DARK_IRON_ALE_REFORM && data != DATA_DARK_IRON_ALE_DISBAND)
             return;
 
         if (Creature* patron = instance->GetCreature(guid))
+        {
+            if (data == DATA_DARK_IRON_ALE_DISBAND)
+            {
+                if (CreatureGroup* formation = patron->GetFormation())
+                    sFormationMgr->RemoveCreatureFromGroup(formation, patron);
+                return;
+            }
+
+            auto reformPatron = [patron]()
+            {
+                auto formationInfo = sFormationMgr->CreatureGroupMap.find(patron->GetSpawnId());
+                if (!patron->GetFormation() && formationInfo != sFormationMgr->CreatureGroupMap.end())
+                    sFormationMgr->AddCreatureToGroup(formationInfo->second.leaderGUID, patron);
+            };
+
+            if (data == DATA_DARK_IRON_ALE_REFORM)
+            {
+                reformPatron();
+                return;
+            }
+
             if (patron->IsAlive() && !patron->IsInCombat())
+            {
+                reformPatron();
+                patron->RestoreFaction();
                 patron->GetMotionMaster()->MoveTargetedHome(true);
+            }
+        }
     }
 
     ObjectGuid GetGuidData(uint32 data) const override
