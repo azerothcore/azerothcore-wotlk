@@ -406,19 +406,134 @@ enum PhalanxSpells
     SPELL_MIGHTYBLOW                    = 14099
 };
 
+enum PhalanxTexts
+{
+    SAY_PHALANX_AGGRO                   = 0
+};
+
+enum PhalanxPoints
+{
+    POINT_PHALANX_DOOR                  = 1
+};
+
+enum PhalanxActions
+{
+    ACTION_PHALANX_START_ACTIVATION     = 1
+};
+
+enum PhalanxStates
+{
+    PHALANX_STATE_DORMANT,
+    PHALANX_STATE_MOVING_TO_DOOR,
+    PHALANX_STATE_WAITING_TO_ACTIVATE,
+    PHALANX_STATE_ACTIVE
+};
+
+constexpr UnitFlags PHALANX_STATUE_FLAGS = UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE;
+constexpr uint32 PHALANX_DOOR_MOVE_RETRY_TIMER = 12000;
+constexpr uint8 PHALANX_DOOR_MOVE_MAX_ATTEMPTS = 2;
+constexpr uint32 PHALANX_ACTIVATION_DELAY = 3000;
+
+Position const PhalanxDoorPosition = { 868.122f, -223.884f, -43.695f, 2.06059f };
+
 struct npc_phalanx : public ScriptedAI
 {
-    npc_phalanx(Creature* creature) : ScriptedAI(creature) { }
+    npc_phalanx(Creature* creature) : ScriptedAI(creature),
+        _instance(creature->GetInstanceScript()), _state(PHALANX_STATE_DORMANT),
+        _doorMoveRetryTimer(0), _activationTimer(0), _doorMoveAttempts(0) { }
 
     void Reset() override
     {
         _thunderClapTimer = 12000;
         _fireballVolleyTimer = 0;
         _mightyBlowTimer = 15000;
+
+        if (me->GetFaction() == FACTION_MONSTER || (_instance && _instance->GetData(TYPE_BAR) == DONE))
+        {
+            if (me->GetDistance(PhalanxDoorPosition) > 1.0f)
+                StartActivation();
+            else
+                Activate();
+        }
+        else
+            Deactivate();
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE)
+            return;
+
+        switch (id)
+        {
+            case POINT_PHALANX_DOOR:
+                if (_state == PHALANX_STATE_MOVING_TO_DOOR)
+                    FinishDoorMovement();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_PHALANX_START_ACTIVATION && _state == PHALANX_STATE_DORMANT)
+            StartActivation();
     }
 
     void UpdateAI(uint32 diff) override
     {
+        // Keep the faction-change fallback for legacy activation effects such as
+        // Plugger's death. Rocknot uses DoAction to avoid a transient aggro race.
+        if (_state == PHALANX_STATE_DORMANT)
+        {
+            if (me->GetFaction() != FACTION_MONSTER)
+                return;
+
+            StartActivation();
+        }
+
+        if (_state == PHALANX_STATE_MOVING_TO_DOOR)
+        {
+            // Bar hostility effects can still change Phalanx's faction while the
+            // door event is running. Keep him protected until he reaches his point.
+            me->SetFaction(FACTION_FRIEND);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+
+            if (_doorMoveRetryTimer <= diff)
+            {
+                _doorMoveRetryTimer = 0;
+
+                if (me->GetDistance(PhalanxDoorPosition) <= 1.0f)
+                    FinishDoorMovement();
+                else if (_doorMoveAttempts < PHALANX_DOOR_MOVE_MAX_ATTEMPTS)
+                    MoveToDoor();
+            }
+            else
+                _doorMoveRetryTimer -= diff;
+
+            return;
+        }
+
+        if (_state == PHALANX_STATE_WAITING_TO_ACTIVATE)
+        {
+            me->SetFaction(FACTION_FRIEND);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetUnitFlag(PHALANX_STATUE_FLAGS);
+
+            if (_activationTimer <= diff)
+                Activate();
+            else
+                _activationTimer -= diff;
+
+            return;
+        }
+
+        if (_state != PHALANX_STATE_ACTIVE)
+            return;
+
         if (!UpdateVictim())
             return;
 
@@ -450,6 +565,67 @@ struct npc_phalanx : public ScriptedAI
     }
 
 private:
+    void StartActivation()
+    {
+        _state = PHALANX_STATE_MOVING_TO_DOOR;
+        me->CombatStop(true);
+        me->SetFaction(FACTION_FRIEND);
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(PHALANX_STATUE_FLAGS);
+        me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+        me->SetWalk(true);
+        _doorMoveAttempts = 0;
+        MoveToDoor();
+    }
+
+    void MoveToDoor()
+    {
+        ++_doorMoveAttempts;
+        _doorMoveRetryTimer = PHALANX_DOOR_MOVE_RETRY_TIMER;
+        me->GetMotionMaster()->Clear();
+        me->GetMotionMaster()->MovePoint(POINT_PHALANX_DOOR, PhalanxDoorPosition);
+    }
+
+    void FinishDoorMovement()
+    {
+        _state = PHALANX_STATE_WAITING_TO_ACTIVATE;
+        _doorMoveRetryTimer = 0;
+        _activationTimer = PHALANX_ACTIVATION_DELAY;
+        me->StopMoving();
+        me->SetHomePosition(PhalanxDoorPosition);
+        me->SetFacingTo(PhalanxDoorPosition.GetOrientation());
+        Talk(SAY_PHALANX_AGGRO);
+    }
+
+    void Activate()
+    {
+        _state = PHALANX_STATE_ACTIVE;
+        _activationTimer = 0;
+        me->SetWalk(false);
+        me->SetFaction(FACTION_MONSTER);
+        me->RemoveUnitFlag(PHALANX_STATUE_FLAGS);
+        me->SetReactState(REACT_AGGRESSIVE);
+    }
+
+    void Deactivate()
+    {
+        _state = PHALANX_STATE_DORMANT;
+        _doorMoveRetryTimer = 0;
+        _activationTimer = 0;
+        _doorMoveAttempts = 0;
+        me->CombatStop(true);
+        me->SetFaction(FACTION_FRIEND);
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(PHALANX_STATUE_FLAGS);
+        me->StopMoving();
+        me->GetMotionMaster()->MoveIdle();
+    }
+
+    InstanceScript* _instance;
+    PhalanxStates _state;
+    uint32 _doorMoveRetryTimer;
+    uint32 _activationTimer;
+    uint8 _doorMoveAttempts;
     uint32 _thunderClapTimer;
     uint32 _fireballVolleyTimer;
     uint32 _mightyBlowTimer;
@@ -564,8 +740,8 @@ struct npc_rocknot : public npc_escortAI
                 DoGo(DATA_GO_BAR_KEG_TRAP, 0);               //doesn't work very well, leaving code here for future
                 //spell by trap has effect61, this indicate the bar go hostile
 
-                if (Unit* tmp = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_PHALANX)))
-                    tmp->SetFaction(FACTION_MONSTER);
+                if (Creature* phalanx = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PHALANX)))
+                    phalanx->AI()->DoAction(ACTION_PHALANX_START_ACTIVATION);
 
                 //for later, this event(s) has alot more to it.
                 //optionally, DONE can trigger bar to go hostile.
