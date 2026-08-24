@@ -21,7 +21,6 @@
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "GameTime.h"
-#include "Log.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
@@ -512,7 +511,6 @@ enum NagmaraEvents
     EVENT_KISS_ROCKNOT        = 6,
     EVENT_CLEAR_HEARTS        = 7,
     EVENT_MOVEMENT_TIMEOUT    = 8,
-    EVENT_TRACE_MOVEMENT      = 9,
     EVENT_MOVE_APPROACH       = 10,
     EVENT_MOVE_GREETING       = 11,
     EVENT_GREET_ROCKNOT       = 12,
@@ -581,7 +579,8 @@ struct npc_mistress_nagmara : public CreatureAI
     {
         if (_lovePotionComplete)
         {
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->GetMotionMaster()->MoveIdle();
             return;
         }
@@ -624,12 +623,8 @@ struct npc_mistress_nagmara : public CreatureAI
 
         me->SetWalk(false);
         me->GetMotionMaster()->Clear();
-        LOG_INFO("scripts", "Nagmara event {} started at ({}, {}, {}), Rocknot at ({}, {}, {})",
-            me->GetInstanceId(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(),
-            rocknot->GetPositionX(), rocknot->GetPositionY(), rocknot->GetPositionZ());
         StartApproach();
         _events.ScheduleEvent(EVENT_MOVEMENT_TIMEOUT, 45s);
-        _events.ScheduleEvent(EVENT_TRACE_MOVEMENT, 1s);
     }
 
     void DoAction(int32 action) override
@@ -654,9 +649,6 @@ struct npc_mistress_nagmara : public CreatureAI
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
-        LOG_INFO("scripts", "Nagmara event {} MovementInform type {} point {} at ({}, {}, {})",
-            me->GetInstanceId(), type, pointId, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-
         if (type != POINT_MOTION_TYPE || !_lovePotionEvent)
             return;
 
@@ -744,8 +736,6 @@ struct npc_mistress_nagmara : public CreatureAI
                         AbortLovePotionEvent(true);
                     break;
                 case EVENT_CONTINUE_AFTER_DOOR:
-                    LOG_INFO("scripts", "Nagmara event {} finished waiting for bar door at ({}, {}, {})",
-                        me->GetInstanceId(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                     if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
                         if (rocknot->AI())
                             rocknot->AI()->DoAction(ACTION_RESUME_AFTER_BAR_DOOR);
@@ -755,7 +745,7 @@ struct npc_mistress_nagmara : public CreatureAI
                         ReachLoversStop();
                     break;
                 case EVENT_KISS_ROCKNOT:
-                    if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
+                    if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid); rocknot && rocknot->AI())
                     {
                         me->SetFacingToObject(rocknot);
                         rocknot->SetFacingToObject(me);
@@ -769,6 +759,7 @@ struct npc_mistress_nagmara : public CreatureAI
                         _doorOpenedByEvent = false;
                         me->SetHomePosition(me->GetPosition());
                         rocknot->AI()->DoAction(ACTION_COMPLETE_LOVE_POTION);
+                        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                         if (_instance)
                             _instance->SetData(TYPE_BAR, DONE);
                     }
@@ -781,17 +772,7 @@ struct npc_mistress_nagmara : public CreatureAI
                         rocknot->RemoveAurasDueToSpell(SPELL_NAGMARA_ROCKNOT);
                     break;
                 case EVENT_MOVEMENT_TIMEOUT:
-                    LOG_INFO("scripts", "Nagmara event {} timed out at ({}, {}, {}), motion type {}",
-                        me->GetInstanceId(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(),
-                        static_cast<uint32>(me->GetMotionMaster()->GetCurrentMovementGeneratorType()));
                     AbortLovePotionEvent(true);
-                    break;
-                case EVENT_TRACE_MOVEMENT:
-                    LOG_INFO("scripts", "Nagmara event {} movement at ({}, {}, {}), motion type {}, approach {}, route {}",
-                        me->GetInstanceId(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(),
-                        static_cast<uint32>(me->GetMotionMaster()->GetCurrentMovementGeneratorType()), _approachPoint, _routePoint);
-                    if (_lovePotionEvent)
-                        _events.ScheduleEvent(EVENT_TRACE_MOVEMENT, 1s);
                     break;
                 case EVENT_MOVE_APPROACH:
                     MoveToApproachPoint();
@@ -832,26 +813,18 @@ private:
         else
         {
             _approachPoint = (nearestPoint + 1) % std::size(NagmaraPatrolPath);
-            LOG_INFO("scripts", "Nagmara event {} nearest patrol point {}, starting with point {}",
-                me->GetInstanceId(), nearestPoint, _approachPoint);
             MoveToApproachPoint();
         }
     }
 
     void MoveToApproachPoint()
     {
-        LOG_INFO("scripts", "Nagmara event {} moving to approach point {} ({}, {}, {})",
-            me->GetInstanceId(), _approachPoint, NagmaraPatrolPath[_approachPoint].GetPositionX(),
-            NagmaraPatrolPath[_approachPoint].GetPositionY(), NagmaraPatrolPath[_approachPoint].GetPositionZ());
         me->GetMotionMaster()->MovePoint(POINT_APPROACH_PATROL + _approachPoint, NagmaraPatrolPath[_approachPoint],
             FORCED_MOVEMENT_NONE, 0.0f, false);
     }
 
     void MoveToGreetingPosition()
     {
-        LOG_INFO("scripts", "Nagmara event {} moving to greeting ({}, {}, {})",
-            me->GetInstanceId(), NagmaraGreetingPosition.GetPositionX(), NagmaraGreetingPosition.GetPositionY(),
-            NagmaraGreetingPosition.GetPositionZ());
         me->GetMotionMaster()->MovePoint(POINT_APPROACH_GREETING, NagmaraGreetingPosition, FORCED_MOVEMENT_NONE, 0.0f, false);
     }
 
@@ -860,9 +833,6 @@ private:
         Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid);
         if (!rocknot || !me->IsWithinDistInMap(rocknot, 6.0f))
         {
-            LOG_INFO("scripts", "Nagmara event {} greeting failed at ({}, {}, {}), Rocknot available: {}, distance: {}",
-                me->GetInstanceId(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), rocknot != nullptr,
-                rocknot ? me->GetExactDist2d(rocknot) : -1.0f);
             AbortLovePotionEvent(true);
             return;
         }
@@ -876,9 +846,6 @@ private:
 
     void MoveToRoutePoint()
     {
-        LOG_INFO("scripts", "Nagmara event {} moving to lovers route point {} ({}, {}, {})",
-            me->GetInstanceId(), _routePoint, NagmaraLoversPath[_routePoint].GetPositionX(),
-            NagmaraLoversPath[_routePoint].GetPositionY(), NagmaraLoversPath[_routePoint].GetPositionZ());
         me->GetMotionMaster()->MovePoint(POINT_LOVERS_ROUTE + _routePoint, NagmaraLoversPath[_routePoint],
             FORCED_MOVEMENT_NONE, 0.0f, false);
     }
@@ -892,9 +859,6 @@ private:
         if (!door)
             return false;
 
-        LOG_INFO("scripts", "Nagmara event {} opening bar door at ({}, {}, {}) while stopped at ({}, {}, {})",
-            me->GetInstanceId(), door->GetPositionX(), door->GetPositionY(), door->GetPositionZ(),
-            me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
         door->SetGoState(GO_STATE_ACTIVE);
         return true;
     }
