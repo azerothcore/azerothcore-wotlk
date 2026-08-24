@@ -2069,6 +2069,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 62168, 65250, 62169 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER; // pets phased away from their owner get despawned
     });
 
     // Ground Slam
