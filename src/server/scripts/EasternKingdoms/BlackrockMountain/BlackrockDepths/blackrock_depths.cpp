@@ -17,12 +17,15 @@
 
 #include "blackrock_depths.h"
 #include "AreaTriggerScript.h"
+#include "CreatureGroups.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "GameTime.h"
+#include "MotionMaster.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SmartAI.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 
@@ -34,6 +37,136 @@ enum IronhandData
 
 constexpr Milliseconds IRONHAND_FLAMES_TIMER = 16s;
 constexpr Milliseconds IRONHAND_FLAMES_TIMER_RAND = 3s;
+
+namespace AnvilragePatrol
+{
+constexpr uint32 LongPath = 4778600;
+constexpr uint32 LongPatrolFirstMember = 47787;
+constexpr uint32 LongPatrolLastMember = 47790;
+constexpr float Pi = 3.14159265f;
+
+enum Waypoints
+{
+    POINT_LONG_PATROL_SINGLE_FILE   = 4,
+    POINT_LONG_PATROL_FAN           = 17,
+    POINT_LONG_PATROL_LINE_SOUTH    = 32,
+    POINT_LONG_PATROL_DIAMOND       = 45,
+    POINT_LONG_PATROL_LINE_NORTH    = 61
+};
+
+enum class FormationType : uint8
+{
+    Line,
+    SingleFile,
+    Fan,
+    Diamond
+};
+
+struct FormationOffset
+{
+    float Distance;
+    float Angle;
+};
+
+constexpr FormationOffset FormationOffsets[4][4] =
+{
+    {{ 2.0f, Pi / 2.0f }, { 2.0f, 3.0f * Pi / 2.0f }, { 4.0f, Pi / 2.0f }, { 4.0f, 3.0f * Pi / 2.0f }},
+    {{ 2.0f, Pi }, { 4.0f, Pi }, { 6.0f, Pi }, { 8.0f, Pi }},
+    {{ 2.0f, Pi / 2.0f }, { 2.0f, 3.0f * Pi / 4.0f }, { 2.0f, Pi }, { 2.0f, 5.0f * Pi / 4.0f }},
+    {{ 2.0f, 0.0f }, { 2.0f, Pi / 2.0f }, { 2.0f, Pi }, { 2.0f, 3.0f * Pi / 2.0f }}
+};
+}
+
+struct brd_anvilrage_officer_patrol : public SmartAI
+{
+    brd_anvilrage_officer_patrol(Creature* creature) : SmartAI(creature) { }
+
+    void Reset() override
+    {
+        _formation = AnvilragePatrol::FormationType::Line;
+        _formationUpdatePending = true;
+    }
+
+    void JustReachedHome() override
+    {
+        SmartAI::JustReachedHome();
+        _formation = AnvilragePatrol::FormationType::Line;
+        _formationUpdatePending = true;
+    }
+
+    void WaypointReached(uint32 nodeId, uint32 pathId) override
+    {
+        SmartAI::WaypointReached(nodeId, pathId);
+
+        if (pathId != AnvilragePatrol::LongPath)
+            return;
+
+        switch (nodeId)
+        {
+            case AnvilragePatrol::POINT_LONG_PATROL_SINGLE_FILE:
+                _formation = AnvilragePatrol::FormationType::SingleFile;
+                break;
+            case AnvilragePatrol::POINT_LONG_PATROL_FAN:
+                _formation = AnvilragePatrol::FormationType::Fan;
+                break;
+            case AnvilragePatrol::POINT_LONG_PATROL_LINE_NORTH:
+            case AnvilragePatrol::POINT_LONG_PATROL_LINE_SOUTH:
+                _formation = AnvilragePatrol::FormationType::Line;
+                break;
+            case AnvilragePatrol::POINT_LONG_PATROL_DIAMOND:
+                _formation = AnvilragePatrol::FormationType::Diamond;
+                break;
+            default:
+                return;
+        }
+
+        _formationUpdatePending = !ApplyFormation();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_formationUpdatePending && me->IsAlive() && !me->IsEngaged())
+            _formationUpdatePending = !ApplyFormation();
+
+        SmartAI::UpdateAI(diff);
+    }
+
+private:
+    bool ApplyFormation()
+    {
+        CreatureGroup* formation = me->GetFormation();
+        if (!formation || formation->GetMembers().size() < 5 || formation->IsFormationInCombat())
+            return false;
+
+        for (auto const& memberInfo : formation->GetMembers())
+        {
+            Creature* member = memberInfo.first;
+            if (member && member != me && member->IsAlive() &&
+                (member->IsEngaged() || member->IsInEvadeMode()))
+                return false;
+        }
+
+        auto const& offsets = AnvilragePatrol::FormationOffsets[static_cast<uint8>(_formation)];
+        for (auto const& memberInfo : formation->GetMembers())
+        {
+            Creature* member = memberInfo.first;
+            if (!member || member == me || !member->IsAlive())
+                continue;
+
+            uint32 const spawnId = member->GetSpawnId();
+            if (spawnId < AnvilragePatrol::LongPatrolFirstMember || spawnId > AnvilragePatrol::LongPatrolLastMember)
+                continue;
+
+            AnvilragePatrol::FormationOffset const& offset = offsets[spawnId - AnvilragePatrol::LongPatrolFirstMember];
+            member->GetMotionMaster()->MoveFormation(me, offset.Distance, offset.Angle, 0, 0);
+        }
+
+        return true;
+    }
+
+    AnvilragePatrol::FormationType _formation = AnvilragePatrol::FormationType::Line;
+    bool _formationUpdatePending = true;
+};
 
 struct go_shadowforge_brazier : public GameObjectAI
 {
@@ -588,6 +721,7 @@ private:
 void AddSC_blackrock_depths()
 {
     RegisterBlackrockDepthsGameObjectAI(go_shadowforge_brazier);
+    RegisterBlackrockDepthsCreatureAI(brd_anvilrage_officer_patrol);
     new at_ring_of_law();
     RegisterBlackrockDepthsCreatureAI(npc_grimstone);
     RegisterBlackrockDepthsCreatureAI(npc_phalanx);
