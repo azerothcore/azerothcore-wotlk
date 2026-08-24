@@ -448,7 +448,10 @@ struct npc_phalanx : public ScriptedAI
         _fireballVolleyTimer = 0;
         _mightyBlowTimer = 15000;
 
-        if (me->GetFaction() == FACTION_MONSTER || (_instance && _instance->GetData(TYPE_BAR) == DONE))
+        bool const activationRequested = _state != PHALANX_STATE_DORMANT || me->GetFaction() == FACTION_MONSTER ||
+            (_instance && _instance->GetData(TYPE_BAR) == DONE);
+
+        if (activationRequested)
         {
             if (me->GetDistance(PhalanxDoorPosition) > 1.0f)
                 StartActivation();
@@ -510,6 +513,13 @@ struct npc_phalanx : public ScriptedAI
                     FinishDoorMovement();
                 else if (_doorMoveAttempts < PHALANX_DOOR_MOVE_MAX_ATTEMPTS)
                     MoveToDoor();
+                else
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->NearTeleportTo(PhalanxDoorPosition.GetPositionX(), PhalanxDoorPosition.GetPositionY(),
+                        PhalanxDoorPosition.GetPositionZ(), PhalanxDoorPosition.GetOrientation());
+                    FinishDoorMovement();
+                }
             }
             else
                 _doorMoveRetryTimer -= diff;
