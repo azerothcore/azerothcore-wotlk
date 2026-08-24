@@ -20,12 +20,16 @@ line, not as background reading.
 - Never take a claim as fact, neither the PR description's nor a comment's. Verify game-data
   claims (spell/creature/quest ids, mechanics) against the world DB, DBC data, or cited sources;
   verify "fixed in the latest push" against the current diff.
+- When a change touches control flow (early returns, new branches, removed guards), trace the
+  states it can leave behind (null, empty, fall-through) into every consumer of them — including
+  unchanged lines the new flow now reaches — and verify what runs when an acquire/attack/GetX
+  call leaves a null result, not just what enables it.
 - Check the change is still needed against current `master`: the surrounding code may have moved,
   or another change may have landed the same fix.
-- On an existing PR, walk every discussion item one by one: what was raised, whether it was
-  answered, and whether it still applies to the current head. Never skip one because it looks
-  resolved, old, or minor; this walk overrides any read-comments-lightly default of the reviewing
-  skill. `gh pr view` misses review bodies and inline threads; pull all three:
+- On an existing PR, walk every discussion item one by one, bot reviews included: what was raised,
+  whether it was answered, and whether it still applies to the current head. Never skip one
+  because it looks resolved, old, or minor; this walk overrides any read-comments-lightly default
+  of the reviewing skill. `gh pr view` misses review bodies and inline threads; pull all three:
 
   ```
   gh api repos/azerothcore/azerothcore-wotlk/issues/<N>/comments --paginate  # conversation comments
