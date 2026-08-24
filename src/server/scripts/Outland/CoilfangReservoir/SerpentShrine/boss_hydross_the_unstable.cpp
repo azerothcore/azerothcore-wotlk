@@ -74,6 +74,8 @@ enum Misc
     GROUP_ABILITIES                 = 1,
     GROUP_OOC_PURIFY_ELEMENTALS     = 2,
 
+    CLEANSING_FIELD_RADIUS_MOD      = 11500,
+
     NPC_PURIFIED_WATER_ELEMENTAL    = 21260,
     NPC_PURE_SPAWN_OF_HYDROSS       = 22035,
     NPC_TAINTED_HYDROSS_ELEMENTAL   = 21253
@@ -292,14 +294,17 @@ class spell_hydross_cleansing_field_aura : public AuraScript
     {
         if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
             if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+                // Include the beam helpers' 3-yard combat reach in the 20-yard DBC radius.
+                caster->CastCustomSpell(SPELL_CLEANSING_FIELD, SPELLVALUE_RADIUS_MOD,
+                    CLEANSING_FIELD_RADIUS_MOD, caster, true);
     }
 
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
             if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+                caster->CastCustomSpell(SPELL_CLEANSING_FIELD, SPELLVALUE_RADIUS_MOD,
+                    CLEANSING_FIELD_RADIUS_MOD, caster, true);
     }
 
     void Register() override
