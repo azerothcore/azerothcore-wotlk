@@ -689,6 +689,7 @@ struct instance_blackrock_depths : public InstanceScript
             {
                 if (CreatureAddon const* addon = patron->GetCreatureAddon())
                     patron->SetEmoteState(static_cast<Emote>(addon->emote));
+                
                 return;
             }
 
@@ -696,6 +697,7 @@ struct instance_blackrock_depths : public InstanceScript
             {
                 if (CreatureGroup* formation = patron->GetFormation())
                     sFormationMgr->RemoveCreatureFromGroup(formation, patron);
+                
                 return;
             }
 
@@ -703,6 +705,7 @@ struct instance_blackrock_depths : public InstanceScript
             {
                 if (!patron->GetFormation())
                     patron->SearchFormation();
+                
                 return;
             }
 
@@ -710,6 +713,7 @@ struct instance_blackrock_depths : public InstanceScript
             {
                 if (!patron->GetFormation())
                     patron->SearchFormation();
+                
                 patron->RestoreFaction();
                 patron->GetMotionMaster()->MoveTargetedHome(true);
             }
