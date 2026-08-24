@@ -866,7 +866,6 @@ private:
     void ReachLoversStop()
     {
         me->GetMotionMaster()->MoveIdle();
-        me->SetHomePosition(me->GetPosition());
 
         if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
             if (rocknot->AI())
@@ -1037,7 +1036,6 @@ struct npc_rocknot : public npc_escortAI
             return;
 
         me->GetMotionMaster()->MoveIdle();
-        me->SetHomePosition(me->GetPosition());
 
         if (Creature* nagmara = ObjectAccessor::GetCreature(*me, _nagmaraGuid))
             if (nagmara->AI())
