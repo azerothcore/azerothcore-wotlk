@@ -730,18 +730,13 @@ struct boss_flame_leviathan_seat : public VehicleAI
             {
                 if (apply)
                 {
-                    who->RemoveAurasDueToSpell(SPELL_HOOKSHOT);
-                    who->RemoveAurasDueToSpell(SPELL_HOOKSHOT_AURA);
-                }
-                else
-                    who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
-
-                if (apply)
-                {
                     turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     turret->GetAI()->AttackStart(who);
                     if (Creature* leviathan = me->GetVehicleCreatureBase())
+                    {
                         leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
+                        leviathan->SetInCombatWithZone();
+                    }
                 }
                 else
                 {
@@ -749,6 +744,8 @@ struct boss_flame_leviathan_seat : public VehicleAI
                     turret->SetImmuneToAll(true);
                     if (turret->IsCreature())
                         turret->ToCreature()->AI()->EnterEvadeMode();
+
+                    who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
                 }
             }
             if (Unit* device = me->GetVehicleKit()->GetPassenger(SEAT_DEVICE))
@@ -781,6 +778,13 @@ struct boss_flame_leviathan_defense_turret : public TurretAI
             _setHealth = true;
             damage = 0;
         }
+    }
+
+    void JustEnteredCombat(Unit* /*who*/) override
+    {
+        if (Unit* seat = me->GetVehicleBase())
+            if (Creature* leviathan = seat->GetVehicleCreatureBase())
+                leviathan->SetInCombatWithZone();
     }
 
     void JustDied(Unit* killer) override
@@ -1453,8 +1457,19 @@ class spell_hookshot_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const* aurEff)
     {
+        Unit* owner = GetUnitOwner();
+        if (!owner)
+            return;
+
+        if (owner->GetVehicle())
+        {
+            owner->RemoveAurasDueToSpell(SPELL_HOOKSHOT);
+            owner->RemoveAurasDueToSpell(SPELL_HOOKSHOT_AURA);
+            return;
+        }
+
         PreventDefaultAction();
-        GetUnitOwner()->CastSpell(GetUnitOwner(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        owner->CastSpell(owner, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
     }
 
     void Register() override
