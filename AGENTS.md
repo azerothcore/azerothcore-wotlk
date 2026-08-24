@@ -7,6 +7,7 @@ AzerothCore is a C++ MMORPG server emulator for World of Warcraft 3.3.5a (WotLK)
 - **Do not configure or build unless explicitly asked.** Builds are slow and rarely needed for code changes.
 - **Never edit SQL files outside `data/sql/updates/pending_db_*/` unless explicitly requested.** `data/sql/base/`, `data/sql/archive/`, and `data/sql/updates/db_*/` are immutable.
 - Formatting follows `.editorconfig`: UTF-8, LF, max 120 cols, trailing newline, no trailing whitespace; 4-space indent for C++ (tabs forbidden), 2-space for JSON/YAML/sh/ts/js.
+- Planning docs go in `.agents/plans/<task-slug>/` (gitignored), named `<task-slug>.<TYPE>.md` (`PLAN`, `REQUIREMENTS`, `ANALYSIS`, …).
 
 ## Mandatory reading per task
 
@@ -18,7 +19,7 @@ Read the matching doc(s) BEFORE starting the task:
 - Creating or modifying SQL → `.agents/docs/sql-guidelines.md`
   - SmartAI work (`smart_scripts` data) → also `.agents/docs/cpp-scripts.md`
 - Reviewing a changeset or PR → `.agents/docs/code-review.md`
-- Self-reviewing a changeset before submission → also `.agents/docs/self-review-rules.md`
+- Self-reviewing, or opening or updating a PR → also `.agents/docs/self-review-rules.md`
 - Touching a subsystem that has a doc in `.agents/docs/systems/` → read that doc too
 - Capturing a lesson or adding/updating agent docs → `.agents/docs/README.md`
 
