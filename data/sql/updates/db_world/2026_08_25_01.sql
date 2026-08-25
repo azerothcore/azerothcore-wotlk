@@ -1,3 +1,4 @@
+-- DB update 2026_08_25_00 -> 2026_08_25_01
 -- Nishera the Garden Keeper (27255) patrols the Emerald Dragonshrine on foot instead of
 -- standing at her spawn. Route and coordinates taken from a retail sniff.
 UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 106959 AND `id` = 27255;
