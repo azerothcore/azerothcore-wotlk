@@ -1,3 +1,4 @@
+-- DB update 2026_08_22_03 -> 2026_08_25_00
 --
 -- Add 4 NO_PARRY - creature can't parry
 -- 10m
