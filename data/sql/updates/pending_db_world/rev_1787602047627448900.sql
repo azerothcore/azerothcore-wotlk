@@ -3,8 +3,8 @@
 UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 106959;
 UPDATE `creature_addon` SET `path_id` = 1069590 WHERE `guid` = 106959;
 
--- Walking patrol: south-west tip -> around the pool -> west tip and back, 34 points, ~864 yd,
--- ~6.6 min per cycle, with a 25 s pause at each turn-around (points 5 and 22)
+-- Walking patrol: south-east tip -> around the pool -> south-west tip and back, 34 points,
+-- ~864 yd, ~6.6 min per cycle, with a 25 s pause at each turn-around (points 5 and 22)
 DELETE FROM `waypoint_data` WHERE `id` = 1069590;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `velocity`, `delay`, `smoothTransition`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (1069590, 1, 2804.99, -14.6267, 0.56392, NULL, 0, 0, 0, 0, 0, 100, 0),
