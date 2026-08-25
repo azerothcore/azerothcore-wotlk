@@ -96,6 +96,7 @@ enum GosNpcs
     NPC_FLAME_LEVIATHAN_TURRET          = 33139,
     NPC_SEAT                            = 33114,
     NPC_LIQUID                          = 33189,
+    NPC_POOL_OF_TAR                     = 33090,
 
     // Starting event
     NPC_ULDUAR_COLOSSUS                 = 33237,
@@ -606,6 +607,11 @@ void boss_flame_leviathan::JustDied(Unit*)
     // Despawn Lashers, do before summons clear
     summons.DoAction(ACTION_DESPAWN_ADDS);
     summons.DespawnAll();
+
+    std::list<Creature*> tarPools;
+    me->GetCreatureListWithEntryInGrid(tarPools, NPC_POOL_OF_TAR, 500.0f);
+    for (Creature* creature : tarPools)
+        creature->DespawnOrUnsummon();
 
     instance->SetBossState(BOSS_LEVIATHAN, DONE);
     instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);
