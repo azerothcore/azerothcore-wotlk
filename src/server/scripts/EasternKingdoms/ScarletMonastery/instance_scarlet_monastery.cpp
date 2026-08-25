@@ -41,6 +41,25 @@ enum AshbringerEventMisc
     GO_HIGH_INQUISITOR_DOOR        = 104600
 };
 
+enum AshbringerEventUnrelated
+{
+    //church
+    NPC_RABBIT = 721,
+
+    //cemetery
+    NPC_INTERROGATOR_VISHAS = 3983,
+    NPC_RAT = 4075,
+    NPC_SCARLET_SENTRY = 4283,
+    NPC_SCARLET_SCRYER = 4293,
+    NPC_UNFETTERED_SPIRIT = 4308,
+    NPC_SCARLET_TORTURER = 4306,
+    NPC_ANGUISHED_DEAD = 6426,
+    NPC_HAUNTING_PHANTASM = 6427,
+    NPC_FALLON_CHAMPION = 6488,
+    NPC_BLOODMAGE_THALNOS = 4543,
+    NPC_SUFFERING_VICTIM = 6547,
+};
+
 enum DataTypes
 {
     TYPE_MOGRAINE_AND_WHITE_EVENT = 1,
@@ -96,28 +115,33 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_SCARLET_MYRIDON:
-                case NPC_SCARLET_DEFENDER:
-                case NPC_SCARLET_CENTURION:
-                case NPC_SCARLET_SORCERER:
-                case NPC_SCARLET_WIZARD:
-                case NPC_SCARLET_ABBOT:
-                case NPC_SCARLET_MONK:
-                case NPC_SCARLET_CHAMPION:
-                case NPC_SCARLET_CHAPLAIN:
-                case NPC_FAIRBANKS:
-                    _ashbringerNpcGUID.emplace(creature->GetGUID());
-                    break;
+                //church
+                case NPC_RABBIT:
+
+                //cemetery
+                case NPC_INTERROGATOR_VISHAS:
+                case NPC_RAT:
+                case NPC_SCARLET_SENTRY:
+                case NPC_SCARLET_SCRYER:
+                case NPC_UNFETTERED_SPIRIT:
+                case NPC_SCARLET_TORTURER:
+                case NPC_ANGUISHED_DEAD:
+                case NPC_HAUNTING_PHANTASM:
+                case NPC_FALLON_CHAMPION:
+                case NPC_BLOODMAGE_THALNOS:
+                case NPC_SUFFERING_VICTIM:
+                    return;
                 case NPC_COMMANDER_MOGRAINE:
                     _mograineGUID = creature->GetGUID();
-                    _ashbringerNpcGUID.emplace(creature->GetGUID());
                     break;
                 case NPC_INQUISITOR_WHITEMANE:
-                   _whitemaneGUID = creature->GetGUID();
+                    _whitemaneGUID = creature->GetGUID();
                     break;
                 default:
                     break;
             }
+
+            _ashbringerNpcGUID.emplace(creature->GetGUID());
         }
 
         void SetData(uint32 type, uint32 data) override
