@@ -1814,6 +1814,12 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
     {
         if (!apply)
             passenger->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, passenger));
+
+        // Prevent players from escaping the tentacle's grasp.
+        constexpr uint32 SPELL_BLINK = 1953;
+        constexpr uint32 SPELL_DEMONIC_CIRCLE_TELEPORT = 48020;
+        passenger->ApplySpellImmune(SPELL_BLINK, IMMUNITY_EFFECT, SPELL_EFFECT_APPLY_AURA, apply);
+        passenger->ApplySpellImmune(SPELL_DEMONIC_CIRCLE_TELEPORT, IMMUNITY_EFFECT, SPELL_EFFECT_LEAP, apply);
     }
 
     void JustDied(Unit*) override
