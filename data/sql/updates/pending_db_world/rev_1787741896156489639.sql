@@ -2,12 +2,12 @@
 -- LBRS patrol corrections from 2.5.6.69110 sniff dump_2.5.6.69110_2026-08-26_11-50-34.pkt
 
 -- Correct creatures owning sniff-matched waypoint paths.
-UPDATE `creature` SET `id1` = 9239, `id2` = 0, `id3` = 0, `VerifiedBuild` = 69110 WHERE `guid` = 43527;
-UPDATE `creature` SET `id1` = 9819, `id2` = 0, `id3` = 0, `VerifiedBuild` = 69110 WHERE `guid` = 137933;
-UPDATE `creature` SET `id1` = 10319, `id2` = 0, `id3` = 0, `VerifiedBuild` = 69110 WHERE `guid` = 138002;
-UPDATE `creature` SET `id1` = 10319, `id2` = 0, `id3` = 0, `wander_distance` = 0, `MovementType` = 2, `VerifiedBuild` = 69110 WHERE `guid` = 137992;
-UPDATE `creature` SET `id1` = 9097, `id2` = 0, `id3` = 0, `position_x` = 53.7765, `position_y` = -327.334, `position_z` = 53.916, `orientation` = 1.39626, `wander_distance` = 0, `MovementType` = 0, `VerifiedBuild` = 69110 WHERE `guid` = 138069;
-UPDATE `creature` SET `id1` = 9098, `id2` = 0, `id3` = 0, `position_x` = 82.0901, `position_y` = -286.078, `position_z` = 60.6613, `orientation` = 3.38828, `wander_distance` = 0, `MovementType` = 0, `VerifiedBuild` = 69110 WHERE `guid` = 138047;
+UPDATE `creature` SET `id` = 9239, `VerifiedBuild` = 69110 WHERE `guid` = 43527;
+UPDATE `creature` SET `id` = 9819, `VerifiedBuild` = 69110 WHERE `guid` = 137933;
+UPDATE `creature` SET `id` = 10319, `VerifiedBuild` = 69110 WHERE `guid` = 138002;
+UPDATE `creature` SET `id` = 10319, `wander_distance` = 0, `MovementType` = 2, `VerifiedBuild` = 69110 WHERE `guid` = 137992;
+UPDATE `creature` SET `id` = 9097, `position_x` = 53.7765, `position_y` = -327.334, `position_z` = 53.916, `orientation` = 1.39626, `wander_distance` = 0, `MovementType` = 0, `VerifiedBuild` = 69110 WHERE `guid` = 138069;
+UPDATE `creature` SET `id` = 9098, `position_x` = 82.0901, `position_y` = -286.078, `position_z` = 60.6613, `orientation` = 3.38828, `wander_distance` = 0, `MovementType` = 0, `VerifiedBuild` = 69110 WHERE `guid` = 138047;
 
 -- Remove the duplicate Scarshield Acolyte occupying the Blackhand Iron Guard's home position.
 DELETE FROM `creature_addon` WHERE `guid` IN (137992, 138004, 138047, 138069);
