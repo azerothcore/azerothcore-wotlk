@@ -343,6 +343,8 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case GO_BAR_DOOR:
                 GoBarDoorGUID = go->GetGUID();
+                if (encounter[2] == DONE)
+                    go->SetGoState(GO_STATE_ACTIVE);
                 break;
             case GO_TOMB_ENTER:
                 GoTombEnterGUID = go->GetGUID();
