@@ -1,10 +1,9 @@
---
--- Flame Leviathan: the salvaged vehicles are spawned by the instance script when the raid enters,
--- so Brann no longer respawns them once his intro is over
+
+-- Remove Row 13 in Brann SmartAI and Related Conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` = 14 AND `SourceEntry` = 33579 AND `SourceId` = 0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 33579 AND `source_type` = 0 AND `id` = 13;
 
--- The instance script makes the salvaged vehicles boardable 3 seconds after Archmage Pentarus answers Brann
+-- Add new row (1). Set Instance Data 107 0.
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 3357900 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
     (3357900, 9, 0, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 136281, 33624, 0, 0, 0, 0, 0, 0, 'Brann Bronzebeard - Actionlist - Say Line 0'),
