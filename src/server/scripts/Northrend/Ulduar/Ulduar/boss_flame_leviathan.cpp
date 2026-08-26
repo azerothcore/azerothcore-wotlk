@@ -123,6 +123,7 @@ enum Events
     EVENT_THORIMS_HAMMER                = 9,
     EVENT_SOUND_BEGINNING               = 10,
     EVENT_EJECT_PLAYERS                 = 11,
+    EVENT_CHECK_PLAYERS                 = 12,
 };
 
 enum Texts
@@ -209,6 +210,17 @@ struct boss_flame_leviathan : public BossAI
     void TurnHealStations(bool _apply);
     void ScheduleEvents();
     void SummonTowerHelpers(uint8 towerId);
+
+    bool IsInCombatWithPlayer() const
+    {
+        return std::ranges::any_of(me->GetCombatManager().GetPvECombatRefs(),
+            [this](CombatReference* ref)
+            {
+                Player* player = ref->GetOther(me)->GetCharmerOrOwnerPlayerOrPlayerItself();
+                return player && player->IsAlive();
+            },
+            [](auto const& entry) { return entry.second; });
+    }
 
     void JustReachedHome() override
     {
@@ -432,6 +444,13 @@ struct boss_flame_leviathan : public BossAI
                             if (Unit* player = seatVehicle->GetPassenger(SEAT_PLAYER))
                                 player->ExitVehicle();
                 return;
+            case EVENT_CHECK_PLAYERS:
+                // Empty vehicles keep the boss in combat
+                if (me->IsInCombat() && !IsInCombatWithPlayer())
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+                else
+                    events.Repeat(5s);
+                return;
         }
 
         if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
@@ -552,6 +571,7 @@ void boss_flame_leviathan::TurnHealStations(bool _apply)
 
 void boss_flame_leviathan::ScheduleEvents()
 {
+    events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
     events.RescheduleEvent(EVENT_MISSILE, 5s);
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);
