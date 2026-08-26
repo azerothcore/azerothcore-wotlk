@@ -473,6 +473,7 @@ enum NagmaraSpells
 
 enum NagmaraTexts
 {
+    SAY_NAGMARA_AMBIENT = 0,
     SAY_NAGMARA_1 = 1,
     SAY_NAGMARA_2 = 2,
     EMOTE_ROCKNOT = 5
@@ -481,6 +482,11 @@ enum NagmaraTexts
 enum NagmaraQuests
 {
     QUEST_POTION_LOVE = 4201
+};
+
+enum NagmaraData
+{
+    DATA_AMBIENT_ORDER = 1
 };
 
 enum RocknotActions
@@ -572,8 +578,8 @@ Position const RocknotFinalPosition = { 880.825f, -221.390f, -49.9562f };
 struct npc_mistress_nagmara : public CreatureAI
 {
     npc_mistress_nagmara(Creature* creature) : CreatureAI(creature), _instance(creature->GetInstanceScript()),
-        _approachPoint(0), _routePoint(0), _doorOpenAttempts(0), _lovePotionEvent(false),
-        _lovePotionComplete(false), _doorOpenedByEvent(false) { }
+        _ambientReplyTimer(0), _approachPoint(0), _routePoint(0), _doorOpenAttempts(0),
+        _lovePotionEvent(false), _lovePotionComplete(false), _doorOpenedByEvent(false) { }
 
     void Reset() override
     {
@@ -625,6 +631,12 @@ struct npc_mistress_nagmara : public CreatureAI
         me->GetMotionMaster()->Clear();
         StartApproach();
         _events.ScheduleEvent(EVENT_MOVEMENT_TIMEOUT, 45s);
+    }
+
+    void SetData(uint32 id, uint32 value) override
+    {
+        if (id == DATA_AMBIENT_ORDER && value == 1 && !_ambientReplyTimer)
+            _ambientReplyTimer = 4 * IN_MILLISECONDS;
     }
 
     void DoAction(int32 action) override
@@ -688,6 +700,17 @@ struct npc_mistress_nagmara : public CreatureAI
 
     void UpdateAI(uint32 diff) override
     {
+        if (_ambientReplyTimer && !_lovePotionEvent)
+        {
+            if (_ambientReplyTimer <= diff)
+            {
+                _ambientReplyTimer = 0;
+                Talk(SAY_NAGMARA_AMBIENT);
+            }
+            else
+                _ambientReplyTimer -= diff;
+        }
+
         _events.Update(diff);
 
         while (uint32 eventId = _events.ExecuteEvent())
@@ -905,6 +928,7 @@ private:
     InstanceScript* _instance;
     EventMap _events;
     ObjectGuid _rocknotGuid;
+    uint32 _ambientReplyTimer;
     uint8 _approachPoint;
     uint8 _routePoint;
     uint8 _doorOpenAttempts;
