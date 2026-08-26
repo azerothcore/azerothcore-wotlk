@@ -763,9 +763,19 @@ public:
 
     void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*/) override
     {
-        if (state == GO_JUST_DEACTIVATED)
+        if (state != GO_JUST_DEACTIVATED)
+            return;
+
+        for (LootItem const& item : go->loot.quest_items)
+        {
+            if (item.itemid != ITEM_ENCHANTED_SCARLET_THREAD || !item.is_looted)
+                continue;
+
             if (InstanceScript* instance = go->GetInstanceScript())
                 instance->SetData(DATA_SCARLET_THREAD_LOOTED, go->GetSpawnId());
+
+            return;
+        }
     }
 };
 

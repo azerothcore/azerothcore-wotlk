@@ -83,6 +83,8 @@ enum GameobjectIds
 
 enum MiscIds
 {
+    ITEM_ENCHANTED_SCARLET_THREAD       = 12734,
+
     SAY_BLACK_GUARD_INIT                = 0,
     SAY_BARON_INIT_YELL                 = 0,
     SAY_BRAON_ZIGGURAT_FALL_YELL        = 1,
