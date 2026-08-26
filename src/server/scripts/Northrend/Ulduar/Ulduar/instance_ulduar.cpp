@@ -373,10 +373,16 @@ public:
 
             _leviathanSequenceStarted = true;
 
-            // The crew runs into its formation slots, paired by group row order
+            // The crew runs its sniffed column routes into the formation slots, paired by group row order
+            static uint32 const marchPaths[] =
+            {
+                3414401, 3414402, 3414403, 3414404, 3414405, 3414406,
+                3414501, 3414502, 3414503, 3414504, 3414505, 3414506
+            };
             if (std::vector<TempSummonData> const* formation = sObjectMgr->GetSummonGroup(MAP_ULDUAR, SUMMONER_TYPE_MAP, SUMMON_GROUP_LEVIATHAN_OUTRO))
             {
                 auto slot = formation->begin();
+                uint8 pathIndex = 0;
                 for (ObjectGuid const& guid : _leviathanCrewGUIDs)
                 {
                     Creature* crew = instance->GetCreature(guid);
@@ -384,11 +390,12 @@ public:
                         continue;
                     while (slot != formation->end() && slot->entry != crew->GetEntry())
                         ++slot;
-                    if (slot == formation->end())
+                    if (slot == formation->end() || pathIndex >= sizeof(marchPaths) / sizeof(marchPaths[0]))
                         break;
                     crew->SetHomePosition(slot->pos);
-                    crew->GetMotionMaster()->MovePoint(0, slot->pos, FORCED_MOVEMENT_RUN);
+                    crew->GetMotionMaster()->MovePath(marchPaths[pathIndex], FORCED_MOVEMENT_RUN);
                     ++slot;
+                    ++pathIndex;
                 }
             }
             _leviathanCrewGUIDs.clear();
