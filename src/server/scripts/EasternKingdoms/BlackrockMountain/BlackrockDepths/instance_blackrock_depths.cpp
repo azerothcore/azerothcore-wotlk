@@ -143,6 +143,7 @@ struct instance_blackrock_depths : public InstanceScript
     uint32 TombEventCounter;
     uint32 OpenedCoofers;
     uint32 IronhandCounter;
+    uint32 PhalanxActivationState;
 
     GuidList ArgelmachAdds;
     ObjectGuid ArgelmachGUID;
@@ -215,6 +216,7 @@ struct instance_blackrock_depths : public InstanceScript
         tombResetTimer   = 0;
         OpenedCoofers = 0;
         IronhandCounter  = 0;
+        PhalanxActivationState = NOT_STARTED;
         ArenaSpectators.clear();
 
         // these are linked to the dungeon and not how many times the arena started.
@@ -584,6 +586,9 @@ struct instance_blackrock_depths : public InstanceScript
                 }
                 break;
             }
+            case DATA_PHALANX_ACTIVATED:
+                PhalanxActivationState = data;
+                break;
             default:
                 break;
         }
@@ -594,7 +599,8 @@ struct instance_blackrock_depths : public InstanceScript
 
             std::ostringstream saveStream;
             saveStream << encounter[0] << ' ' << encounter[1] << ' ' << encounter[2] << ' '
-                       << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount;
+                       << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount << ' '
+                       << PhalanxActivationState;
 
             str_data = saveStream.str();
 
@@ -628,6 +634,8 @@ struct instance_blackrock_depths : public InstanceScript
                 return arenaMobsToSpawn;
             case DATA_ARENA_BOSS:
                 return arenaBossToSpawn;
+            case DATA_PHALANX_ACTIVATED:
+                return PhalanxActivationState;
         }
         return 0;
     }
@@ -697,6 +705,8 @@ struct instance_blackrock_depths : public InstanceScript
         std::istringstream loadStream(in);
         loadStream >> encounter[0] >> encounter[1] >> encounter[2] >> encounter[3]
                    >> encounter[4] >> encounter[5] >> GhostKillCount;
+        if (!(loadStream >> PhalanxActivationState))
+            PhalanxActivationState = NOT_STARTED;
 
         for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             if (encounter[i] == IN_PROGRESS)

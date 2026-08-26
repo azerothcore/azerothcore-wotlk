@@ -449,7 +449,8 @@ struct npc_phalanx : public ScriptedAI
         _mightyBlowTimer = 15000;
 
         bool const activationRequested = _state != PHALANX_STATE_DORMANT || me->GetFaction() == FACTION_MONSTER ||
-            (_instance && _instance->GetData(TYPE_BAR) == DONE);
+            (_instance && (_instance->GetData(TYPE_BAR) == DONE ||
+                _instance->GetData(DATA_PHALANX_ACTIVATED) == DONE));
 
         if (activationRequested)
         {
@@ -577,6 +578,9 @@ struct npc_phalanx : public ScriptedAI
 private:
     void StartActivation()
     {
+        if (_instance && _instance->GetData(DATA_PHALANX_ACTIVATED) != DONE)
+            _instance->SetData(DATA_PHALANX_ACTIVATED, DONE);
+
         _state = PHALANX_STATE_MOVING_TO_DOOR;
         me->CombatStop(true);
         me->SetFaction(FACTION_FRIEND);
