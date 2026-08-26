@@ -380,9 +380,11 @@ enum UlduarMisc
     GO_SUMMON_GROUP_LEVIATHAN_TELEPORTER    = 0,
     GO_SUMMON_GROUP_LEVIATHAN_PORTAL        = 1,
 
-    // waypoint_data paths: Brann's walk from the machine to his spot, Rhydian's walk to Brann's side
+    // waypoint_data paths: Brann's walk from the machine to his spot, Rhydian's walk to Brann's side,
+    // and the flying machine's approach arc over the grounds
     PATH_BRANN_FORMATION_GROUNDS            = 341190,
     PATH_RHYDIAN_TO_BRANN                   = 336960,
+    PATH_FLYING_MACHINE_APPROACH            = 341200,
 
     // Gossip Keepers, Kirin Tor Mages: teleport-in flash
     SPELL_SIMPLE_TELEPORT_VISUAL            = 12980,
