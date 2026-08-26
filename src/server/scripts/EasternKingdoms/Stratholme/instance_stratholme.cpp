@@ -776,6 +776,8 @@ public:
 
             return;
         }
+
+        go->SetLootState(GO_READY);
     }
 };
 
