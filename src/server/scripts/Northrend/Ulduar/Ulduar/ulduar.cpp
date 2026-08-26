@@ -77,7 +77,6 @@ enum UldGameObjects
 
 enum UldSpells
 {
-    SPELL_SIMPLE_TELEPORT       = 12980,
     SPELL_KEEPER_TELEPORT       = 62940,
     SPELL_SNOW_MOUND_PARTICLES  = 64615,
     SPELL_ENERGY_SAP_10         = 64740,
@@ -100,7 +99,7 @@ public:
         {
             scheduler.Schedule(250ms, [this](TaskContext /*context*/)
             {
-                DoCastSelf(SPELL_SIMPLE_TELEPORT);
+                DoCastSelf(SPELL_SIMPLE_TELEPORT_VISUAL);
             });
         }
 
