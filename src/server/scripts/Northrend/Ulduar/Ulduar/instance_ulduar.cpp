@@ -335,16 +335,8 @@ public:
             if (justKilled)
             {
                 StartLeviathanOutroSequence();
-                scheduler.Schedule(61s, [this](TaskContext /*context*/)
-                {
-                    instance->SummonCreatureGroup(SUMMON_GROUP_LEVIATHAN_OUTRO_STALKER);
-                    instance->SummonGameObjectGroup(GO_SUMMON_GROUP_LEVIATHAN_TELEPORTER);
-                });
                 return;
             }
-
-            instance->SummonCreatureGroup(SUMMON_GROUP_LEVIATHAN_OUTRO_STALKER);
-            instance->SummonGameObjectGroup(GO_SUMMON_GROUP_LEVIATHAN_TELEPORTER);
 
             // On later visits the landing, march and dialogue replay once someone approaches the Formation Grounds
             scheduler.Schedule(2s, [this](TaskContext context)

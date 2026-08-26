@@ -135,3 +135,11 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 DELETE FROM `creature_template_movement` WHERE `CreatureId` = 34119;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
     (34119, 1, 0, 0, 0, 0, 0, 0);
+
+DELETE FROM `gameobject` WHERE `guid` = 34283;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
+    (34283, 194569, 603, 0, 0, 3, 1, -706.122, -92.6024, 429.876, 0, 0, 0, 0, 1, 180, 255, 1, '', 0, NULL);
+
+DELETE FROM `gameobject_summon_groups` WHERE `summonerId` = 603 AND `summonerType` = 2 AND `groupId` = 0;
+
+DELETE FROM `creature_summon_groups` WHERE `summonerId` = 603 AND `summonerType` = 2 AND `groupId` = 6;
