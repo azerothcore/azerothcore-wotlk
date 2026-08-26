@@ -98,10 +98,7 @@ enum GosNpcs
     NPC_LIQUID                          = 33189,
 
     // Starting event
-    NPC_ULDUAR_COLOSSUS                 = 33237,
     NPC_BRANN_RADIO                     = 34054,
-    NPC_ULDUAR_GAUNTLET_GENERATOR       = 33571,
-    NPC_DEFENDER_GENERATED              = 33572,
 
     // Hard Mode
     NPC_THORIM_HAMMER_TARGET            = 33364,
