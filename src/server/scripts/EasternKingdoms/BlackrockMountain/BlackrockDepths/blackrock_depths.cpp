@@ -517,6 +517,7 @@ enum NagmaraEvents
     EVENT_KISS_ROCKNOT        = 6,
     EVENT_CLEAR_HEARTS        = 7,
     EVENT_MOVEMENT_TIMEOUT    = 8,
+    EVENT_AMBIENT_REPLY       = 9,
     EVENT_MOVE_APPROACH       = 10,
     EVENT_MOVE_GREETING       = 11,
     EVENT_GREET_ROCKNOT       = 12,
@@ -578,8 +579,8 @@ Position const RocknotFinalPosition = { 880.825f, -221.390f, -49.9562f };
 struct npc_mistress_nagmara : public CreatureAI
 {
     npc_mistress_nagmara(Creature* creature) : CreatureAI(creature), _instance(creature->GetInstanceScript()),
-        _ambientReplyTimer(0), _approachPoint(0), _routePoint(0), _doorOpenAttempts(0),
-        _lovePotionEvent(false), _lovePotionComplete(false), _doorOpenedByEvent(false) { }
+        _approachPoint(0), _routePoint(0), _doorOpenAttempts(0), _lovePotionEvent(false),
+        _lovePotionComplete(false), _doorOpenedByEvent(false) { }
 
     void Reset() override
     {
@@ -635,8 +636,8 @@ struct npc_mistress_nagmara : public CreatureAI
 
     void SetData(uint32 id, uint32 value) override
     {
-        if (id == DATA_AMBIENT_ORDER && value == 1 && !_ambientReplyTimer)
-            _ambientReplyTimer = 4 * IN_MILLISECONDS;
+        if (id == DATA_AMBIENT_ORDER && value == 1 && !_ambientEvents.HasTimeUntilEvent(EVENT_AMBIENT_REPLY))
+            _ambientEvents.ScheduleEvent(EVENT_AMBIENT_REPLY, 4s);
     }
 
     void DoAction(int32 action) override
@@ -700,15 +701,11 @@ struct npc_mistress_nagmara : public CreatureAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (_ambientReplyTimer && !_lovePotionEvent)
+        if (!_lovePotionEvent)
         {
-            if (_ambientReplyTimer <= diff)
-            {
-                _ambientReplyTimer = 0;
+            _ambientEvents.Update(diff);
+            if (_ambientEvents.ExecuteEvent() == EVENT_AMBIENT_REPLY)
                 Talk(SAY_NAGMARA_AMBIENT);
-            }
-            else
-                _ambientReplyTimer -= diff;
         }
 
         _events.Update(diff);
@@ -927,8 +924,8 @@ private:
 
     InstanceScript* _instance;
     EventMap _events;
+    EventMap _ambientEvents;
     ObjectGuid _rocknotGuid;
-    uint32 _ambientReplyTimer;
     uint8 _approachPoint;
     uint8 _routePoint;
     uint8 _doorOpenAttempts;
