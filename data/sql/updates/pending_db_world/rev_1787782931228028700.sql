@@ -131,3 +131,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
     (3414506, 7, 225.36526, -70.80455, 409.80365, NULL, 0, 1),
     (3414506, 8, 225.11479, -80.619736, 409.80365, NULL, 0, 1),
     (3414506, 9, 224.91557, -88.427086, 409.80365, NULL, 0, 1);
+
+DELETE FROM `creature_template_movement` WHERE `CreatureId` = 34119;
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+    (34119, 1, 0, 0, 0, 0, 0, 0);
