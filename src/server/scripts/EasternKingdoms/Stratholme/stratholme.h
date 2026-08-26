@@ -30,6 +30,7 @@ enum DataTypes
     TYPE_BARON_FIGHT                    = 4,
     TYPE_MALLOW                         = 5,
     TYPE_BARTHILAS_RUN                  = 6,
+    DATA_SCARLET_THREAD_LOOTED          = 7,
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
@@ -76,6 +77,7 @@ enum GameobjectIds
     GO_PORT_TRAP_GATE_2                 = 175350,  // Gate trap scarlet side
     GO_PORT_TRAP_GATE_3                 = 175355,  // Gate trap undead side
     GO_PORT_TRAP_GATE_4                 = 175354,
+    GO_ENCHANTED_SCARLET_THREAD         = 175966,
     GO_JARIEN_AND_SOTHOS_HEIRLOOMS      = 181083
 };
 

@@ -15,11 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Containers.h"
+#include "GameObjectScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "stratholme.h"
+
+#include <array>
 
 const Position BlackGuardPos[10] =
 {
@@ -53,6 +57,12 @@ Position const MindlessUndeadPos = { 3941.75f, -3393.06f, 119.70f, 0.0f };
 Position const BarthilasPos = { 4068.74f, -3535.97f, 122.825f, 2.478367567062377929f };
 Position const SlaughterPos = { 4032.20f, -3378.06f, 119.75f, 4.67f };
 
+static constexpr uint8 ScarletThreadSpawnCount = 4;
+static constexpr std::array<ObjectGuid::LowType, ScarletThreadSpawnCount> ScarletThreadSpawnIds =
+{
+    20872, 5714446, 5714447, 5714448
+};
+
 // uint32 m_uiGateTrapTimers[2][3] = { {0,0,0}, {0,0,0} };
 
 class instance_stratholme : public InstanceMapScript
@@ -77,6 +87,10 @@ public:
             _slaughterProgress = 0;
             _slaughterNPCs = 0;
             _postboxesOpened = 0;
+
+            _scarletThreadProgress = 0;
+            _scarletThreadOrder = { 0, 1, 2, 3 };
+            Acore::Containers::RandomShuffle(_scarletThreadOrder);
 
             _gateTrapsCooldown[0] = false;
             _gateTrapsCooldown[1] = false;
@@ -250,6 +264,15 @@ public:
                     go->AllowSaveToDB(true);
                     _trapGatesGUIDs[3] = go->GetGUID();
                     break;
+                case GO_ENCHANTED_SCARLET_THREAD:
+                {
+                    uint8 const index = GetScarletThreadIndex(go->GetSpawnId());
+                    if (index < ScarletThreadSpawnCount)
+                        _scarletThreadGUIDs[index] = go->GetGUID();
+
+                    SetScarletThreadState(go, IsActiveScarletThread(index));
+                    break;
+                }
                 default:
                     break;
             }
@@ -362,6 +385,14 @@ public:
                     }
                     _barthilasrunProgress = data;
                     break;
+                case DATA_SCARLET_THREAD_LOOTED:
+                    if (_scarletThreadProgress >= ScarletThreadSpawnCount ||
+                        data != ScarletThreadSpawnIds[_scarletThreadOrder[_scarletThreadProgress]])
+                        return;
+
+                    ++_scarletThreadProgress;
+                    ActivateCurrentScarletThread();
+                    break;
             }
 
             SaveToDB();
@@ -377,6 +408,34 @@ public:
             data >> _slaughterProgress;
             data >> _postboxesOpened;
             data >> _barthilasrunProgress;
+
+            uint32 scarletThreadProgress;
+            std::array<uint32, ScarletThreadSpawnCount> scarletThreadOrder;
+            if (data >> scarletThreadProgress)
+            {
+                bool validState = scarletThreadProgress <= ScarletThreadSpawnCount;
+                std::array<bool, ScarletThreadSpawnCount> seenLocations{};
+
+                for (uint8 i = 0; i < ScarletThreadSpawnCount; ++i)
+                {
+                    if (!(data >> scarletThreadOrder[i]) || scarletThreadOrder[i] >= ScarletThreadSpawnCount || seenLocations[scarletThreadOrder[i]])
+                    {
+                        validState = false;
+                        break;
+                    }
+
+                    seenLocations[scarletThreadOrder[i]] = true;
+                }
+
+                if (validState)
+                {
+                    _scarletThreadProgress = scarletThreadProgress;
+                    for (uint8 i = 0; i < ScarletThreadSpawnCount; ++i)
+                        _scarletThreadOrder[i] = scarletThreadOrder[i];
+                }
+            }
+
+            UpdateScarletThreadStates();
             if (_baronRunTime)
             {
                 events.ScheduleEvent(EVENT_BARON_TIME, 60s);
@@ -397,7 +456,11 @@ public:
                 << _zigguratState3 << ' '
                 << _slaughterProgress << ' '
                 << _postboxesOpened << ' '
-                << _barthilasrunProgress;
+                << _barthilasrunProgress << ' '
+                << uint32(_scarletThreadProgress);
+
+            for (uint8 index : _scarletThreadOrder)
+                data << ' ' << uint32(index);
         }
 
         uint32 GetData(uint32 type) const override
@@ -612,6 +675,57 @@ public:
         ObjectGuid _trappedPlayerGUID;
         ObjectGuid _trapGatesGUIDs[4];
 
+        uint8 _scarletThreadProgress;
+        std::array<uint8, ScarletThreadSpawnCount> _scarletThreadOrder;
+        std::array<ObjectGuid, ScarletThreadSpawnCount> _scarletThreadGUIDs;
+
+        static uint8 GetScarletThreadIndex(ObjectGuid::LowType spawnId)
+        {
+            for (uint8 i = 0; i < ScarletThreadSpawnCount; ++i)
+                if (ScarletThreadSpawnIds[i] == spawnId)
+                    return i;
+
+            return ScarletThreadSpawnCount;
+        }
+
+        bool IsActiveScarletThread(uint8 index) const
+        {
+            return _scarletThreadProgress < ScarletThreadSpawnCount && _scarletThreadOrder[_scarletThreadProgress] == index;
+        }
+
+        static void SetScarletThreadState(GameObject* thread, bool active)
+        {
+            if (active)
+            {
+                thread->GetMap()->RemoveGORespawnTime(thread->GetSpawnId());
+                thread->SetRespawnTime(0);
+                thread->SetRespawnDelay(WEEK);
+                thread->SetLootState(GO_READY);
+            }
+            else
+                thread->SetRespawnTime(WEEK);
+
+            if (thread->IsInWorld())
+                thread->UpdateObjectVisibility(true);
+        }
+
+        void ActivateCurrentScarletThread()
+        {
+            if (_scarletThreadProgress >= ScarletThreadSpawnCount)
+                return;
+
+            uint8 const index = _scarletThreadOrder[_scarletThreadProgress];
+            if (GameObject* thread = instance->GetGameObject(_scarletThreadGUIDs[index]))
+                SetScarletThreadState(thread, true);
+        }
+
+        void UpdateScarletThreadStates()
+        {
+            for (uint8 index = 0; index < ScarletThreadSpawnCount; ++index)
+                if (GameObject* thread = instance->GetGameObject(_scarletThreadGUIDs[index]))
+                    SetScarletThreadState(thread, IsActiveScarletThread(index));
+        }
+
         void gate_delay(int gate)
         {
             if (_trapGatesGUIDs[2 * gate])
@@ -642,7 +756,21 @@ public:
     }
 };
 
+class go_enchanted_scarlet_thread : public GameObjectScript
+{
+public:
+    go_enchanted_scarlet_thread() : GameObjectScript("go_enchanted_scarlet_thread") { }
+
+    void OnLootStateChanged(GameObject* go, uint32 state, Unit* /*unit*/) override
+    {
+        if (state == GO_JUST_DEACTIVATED)
+            if (InstanceScript* instance = go->GetInstanceScript())
+                instance->SetData(DATA_SCARLET_THREAD_LOOTED, go->GetSpawnId());
+    }
+};
+
 void AddSC_instance_stratholme()
 {
     new instance_stratholme();
+    new go_enchanted_scarlet_thread();
 }
