@@ -70,8 +70,11 @@ INSERT INTO `gameobject_summon_groups` (`summonerId`, `summonerType`, `groupId`,
     (603, 2, 0, 194569, -706.122, -92.6024, 429.876, 0, 0, 0, 0, 1, 0, 'Flame Leviathan outro - Expedition Base Camp teleporter'),
     (603, 2, 1, 194481, 235.41939, -138.5261, 409.5674, 0, 0, 0, 0, 1, 0, 'Flame Leviathan outro - Portal to Dalaran');
 
-DELETE FROM `waypoint_data` WHERE `id` = 341190;
+DELETE FROM `waypoint_data` WHERE `id` IN (341190, 336960);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`) VALUES
+    (336960, 1, 243.5128, -126.59239, 409.80365, NULL, 0, 0),
+    (336960, 2, 242.85948, -123.83485, 409.80365, NULL, 0, 0),
+    (336960, 3, 239.31581, -123.64426, 409.80365, NULL, 0, 0),
     (341190, 1, 246.18864, -80.409645, 409.73053, NULL, 0, 0),
     (341190, 2, 243.60237, -79.01533, 409.76364, NULL, 0, 0),
     (341190, 3, 232.66634, -111.32069, 409.80365, NULL, 0, 0),

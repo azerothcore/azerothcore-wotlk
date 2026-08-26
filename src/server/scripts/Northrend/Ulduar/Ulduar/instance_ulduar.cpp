@@ -390,7 +390,14 @@ public:
             }
             _leviathanCrewGUIDs.clear();
 
-            scheduler.Schedule(34s, [this](TaskContext /*context*/)
+            scheduler.Schedule(13s, [this](TaskContext /*context*/)
+            {
+                if (Creature* rhydian = instance->GetCreature(_formationRhydianGUID))
+                {
+                    rhydian->SetHomePosition({ 239.31581f, -123.64426f, 409.80365f, 3.104f });
+                    rhydian->GetMotionMaster()->MovePath(PATH_RHYDIAN_TO_BRANN, FORCED_MOVEMENT_WALK);
+                }
+            }).Schedule(34s, [this](TaskContext /*context*/)
             {
                 std::list<TempSummon*> machine;
                 instance->SummonCreatureGroup(SUMMON_GROUP_LEVIATHAN_OUTRO_MACHINE, &machine);
