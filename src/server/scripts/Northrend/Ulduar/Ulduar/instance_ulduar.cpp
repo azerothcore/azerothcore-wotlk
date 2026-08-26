@@ -464,7 +464,7 @@ public:
         {
             if (IsBossDone(BOSS_LEVIATHAN))
                 SpawnLeviathanOutro(false);
-            // The salvaged vehicles wait for the raid at the Formation Grounds, they are not tied to Brann's intro
+            // The salvaged vehicles wait for the raid at the Expedition Base Camp, they are not tied to Brann's intro
             else if (GetBossState(BOSS_LEVIATHAN) != SPECIAL && _leviathanVehicles.empty())
                 SpawnLeviathanEncounterVehicles(VEHICLE_POS_START);
 
