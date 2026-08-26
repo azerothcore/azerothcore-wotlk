@@ -418,7 +418,9 @@ public:
 
                 for (uint8 i = 0; i < ScarletThreadSpawnCount; ++i)
                 {
-                    if (!(data >> scarletThreadOrder[i]) || scarletThreadOrder[i] >= ScarletThreadSpawnCount || seenLocations[scarletThreadOrder[i]])
+                    if (!(data >> scarletThreadOrder[i]) ||
+                        scarletThreadOrder[i] >= ScarletThreadSpawnCount ||
+                        seenLocations[scarletThreadOrder[i]])
                     {
                         validState = false;
                         break;

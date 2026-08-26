@@ -3,7 +3,7 @@
 SET @OGUID := 5714446;
 
 DELETE FROM `pool_gameobject` WHERE `guid` IN (20872, @OGUID+0, @OGUID+1, @OGUID+2);
-DELETE FROM `gameobject` WHERE `id` = 175966;
+DELETE FROM `gameobject` WHERE `guid` IN (20872, @OGUID+0, @OGUID+1, @OGUID+2);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (20872,    175966, 329, 2017, 2017, 1, 1, 3614.64, -3124.92, 137.012, -2.84489, 0, 0, -0.989016, 0.147808, 604800, 100, 1, '', 0, 'Malor room - table'),
 (@OGUID+0, 175966, 329, 2017, 2017, 1, 1, 3457.50, -3111.17, 137.482,  2.02300, 0, 0,  0.847629, 0.530590, 604800, 100, 1, '', 0, 'Archivist Galford room'),
