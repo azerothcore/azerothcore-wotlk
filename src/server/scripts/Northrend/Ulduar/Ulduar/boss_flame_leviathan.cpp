@@ -232,6 +232,11 @@ struct boss_flame_leviathan : public BossAI
         me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
     }
 
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        CreatureAI::EnterEvadeMode(why);
+    }
+
     void MoveInLineOfSight(Unit*) override {}
     void JustSummoned(Creature* cr)  override
     {
