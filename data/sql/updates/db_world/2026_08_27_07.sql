@@ -1,3 +1,4 @@
+-- DB update 2026_08_27_06 -> 2026_08_27_07
 -- [Howling Fjord] The Delicate Sound of Thunder - Part 1 (flying spline): mark the six Rocket
 -- Jump escort paths as flying so the construct flies along the path instead of falling. The C++
 -- side adds FORCED_MOVEMENT_FLY and EscortMovementGenerator now calls MoveSplineInit::SetFly()

@@ -1,3 +1,4 @@
+-- DB update 2026_08_27_05 -> 2026_08_27_06
 -- [Howling Fjord] The Delicate Sound of Thunder (timing race):
 -- make the Rocket Jump speed buff (44626) atomic with the flight.
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger` = 44608 AND `spell_effect` = 44626;
