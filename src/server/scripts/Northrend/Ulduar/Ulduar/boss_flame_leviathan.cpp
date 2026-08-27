@@ -96,12 +96,10 @@ enum GosNpcs
     NPC_FLAME_LEVIATHAN_TURRET          = 33139,
     NPC_SEAT                            = 33114,
     NPC_LIQUID                          = 33189,
+    NPC_POOL_OF_TAR                     = 33090,
 
     // Starting event
-    NPC_ULDUAR_COLOSSUS                 = 33237,
     NPC_BRANN_RADIO                     = 34054,
-    NPC_ULDUAR_GAUNTLET_GENERATOR       = 33571,
-    NPC_DEFENDER_GENERATED              = 33572,
 
     // Hard Mode
     NPC_THORIM_HAMMER_TARGET            = 33364,
@@ -126,6 +124,7 @@ enum Events
     EVENT_THORIMS_HAMMER                = 9,
     EVENT_SOUND_BEGINNING               = 10,
     EVENT_EJECT_PLAYERS                 = 11,
+    EVENT_CHECK_PLAYERS                 = 12,
 };
 
 enum Texts
@@ -213,6 +212,17 @@ struct boss_flame_leviathan : public BossAI
     void ScheduleEvents();
     void SummonTowerHelpers(uint8 towerId);
 
+    bool IsInCombatWithPlayer() const
+    {
+        return std::ranges::any_of(me->GetCombatManager().GetPvECombatRefs(),
+            [this](CombatReference* ref)
+            {
+                Player* player = ref->GetOther(me)->GetCharmerOrOwnerPlayerOrPlayerItself();
+                return player && player->IsAlive();
+            },
+            [](auto const& entry) { return entry.second; });
+    }
+
     void JustReachedHome() override
     {
         _JustReachedHome();
@@ -222,7 +232,18 @@ struct boss_flame_leviathan : public BossAI
         me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
     }
 
-    void MoveInLineOfSight(Unit*) override {}
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        CreatureAI::EnterEvadeMode(why);
+    }
+
+    void MoveInLineOfSight(Unit* unit) override {
+        if (_startTimer || _speakTimer)
+            return;
+
+        BossAI::MoveInLineOfSight(unit);
+    }
+
     void JustSummoned(Creature* cr)  override
     {
         if (cr->GetEntry() != NPC_FLAME_LEVIATHAN_TURRET && cr->GetEntry() != NPC_SEAT)
@@ -435,6 +456,13 @@ struct boss_flame_leviathan : public BossAI
                             if (Unit* player = seatVehicle->GetPassenger(SEAT_PLAYER))
                                 player->ExitVehicle();
                 return;
+            case EVENT_CHECK_PLAYERS:
+                // Empty vehicles keep the boss in combat
+                if (me->IsInCombat() && !IsInCombatWithPlayer())
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+                else
+                    events.Repeat(5s);
+                return;
         }
 
         if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
@@ -555,6 +583,7 @@ void boss_flame_leviathan::TurnHealStations(bool _apply)
 
 void boss_flame_leviathan::ScheduleEvents()
 {
+    events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
     events.RescheduleEvent(EVENT_MISSILE, 5s);
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);
@@ -606,6 +635,11 @@ void boss_flame_leviathan::JustDied(Unit*)
     // Despawn Lashers, do before summons clear
     summons.DoAction(ACTION_DESPAWN_ADDS);
     summons.DespawnAll();
+
+    std::list<Creature*> tarPools;
+    me->GetCreatureListWithEntryInGrid(tarPools, NPC_POOL_OF_TAR, 500.0f);
+    for (Creature* creature : tarPools)
+        creature->DespawnOrUnsummon();
 
     instance->SetBossState(BOSS_LEVIATHAN, DONE);
     instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);

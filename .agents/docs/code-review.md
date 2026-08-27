@@ -26,10 +26,10 @@ line, not as background reading.
   call leaves a null result, not just what enables it.
 - Check the change is still needed against current `master`: the surrounding code may have moved,
   or another change may have landed the same fix.
-- On an existing PR, walk every discussion item one by one: what was raised, whether it was
-  answered, and whether it still applies to the current head. Never skip one because it looks
-  resolved, old, or minor; this walk overrides any read-comments-lightly default of the reviewing
-  skill. `gh pr view` misses review bodies and inline threads; pull all three:
+- On an existing PR, walk every discussion item one by one, bot reviews included: what was raised,
+  whether it was answered, and whether it still applies to the current head. Never skip one
+  because it looks resolved, old, or minor; this walk overrides any read-comments-lightly default
+  of the reviewing skill. `gh pr view` misses review bodies and inline threads; pull all three:
 
   ```
   gh api repos/azerothcore/azerothcore-wotlk/issues/<N>/comments --paginate  # conversation comments
