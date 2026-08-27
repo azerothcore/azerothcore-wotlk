@@ -489,6 +489,12 @@ enum NagmaraData
     DATA_AMBIENT_ORDER = 1
 };
 
+enum NagmaraCreatures
+{
+    NPC_GRIM_PATRON     = 9545,
+    NPC_GUZZLING_PATRON = 9547
+};
+
 enum RocknotActions
 {
     ACTION_START_LOVE_POTION          = 1,
@@ -662,7 +668,7 @@ struct npc_mistress_nagmara : public CreatureAI
 
     void SetData(uint32 id, uint32 value) override
     {
-        if (id == DATA_AMBIENT_ORDER && value == 1 && !_ambientEvents.HasTimeUntilEvent(EVENT_AMBIENT_REPLY))
+        if (!_lovePotionComplete && id == DATA_AMBIENT_ORDER && value == 1 && !_ambientEvents.HasTimeUntilEvent(EVENT_AMBIENT_REPLY))
             _ambientEvents.ScheduleEvent(EVENT_AMBIENT_REPLY, 4s);
     }
 
@@ -727,11 +733,12 @@ struct npc_mistress_nagmara : public CreatureAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!_lovePotionEvent)
+        if (!_lovePotionEvent && !_lovePotionComplete)
         {
             _ambientEvents.Update(diff);
             if (_ambientEvents.ExecuteEvent() == EVENT_AMBIENT_REPLY)
-                Talk(SAY_NAGMARA_AMBIENT);
+                if (Creature* patron = FindNearestPatron())
+                    Talk(SAY_NAGMARA_AMBIENT, patron);
         }
 
         _events.Update(diff);
@@ -842,6 +849,16 @@ struct npc_mistress_nagmara : public CreatureAI
     }
 
 private:
+    Creature* FindNearestPatron() const
+    {
+        Creature* patron = me->FindNearestCreature(NPC_GRIM_PATRON, 50.0f);
+        if (Creature* guzzlingPatron = me->FindNearestCreature(NPC_GUZZLING_PATRON, 50.0f);
+            guzzlingPatron && (!patron || me->GetExactDist2d(guzzlingPatron) < me->GetExactDist2d(patron)))
+            patron = guzzlingPatron;
+
+        return patron;
+    }
+
     void StartApproach()
     {
         float shortestDistance = std::numeric_limits<float>::max();
