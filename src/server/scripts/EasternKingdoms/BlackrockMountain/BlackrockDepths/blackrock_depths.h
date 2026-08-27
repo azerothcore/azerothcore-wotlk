@@ -82,7 +82,8 @@ enum DataTypes
     DATA_OKTHOR,
     DATA_TIME_RING_FAIL,
     DATA_ARENA_MOBS,
-    DATA_ARENA_BOSS
+    DATA_ARENA_BOSS,
+    DATA_LOVE_POTION_EVENT
 };
 
 enum Creatures

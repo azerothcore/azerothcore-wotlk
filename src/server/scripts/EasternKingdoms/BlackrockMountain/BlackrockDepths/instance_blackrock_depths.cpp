@@ -137,6 +137,7 @@ struct instance_blackrock_depths : public InstanceScript
 
     uint32 BarAleCount;
     uint32 GhostKillCount;
+    uint32 LovePotionEventState;
     ObjectGuid TombBossGUIDs[7];
     uint32 tombResetTimer;
     uint32 TombTimer;
@@ -210,6 +211,7 @@ struct instance_blackrock_depths : public InstanceScript
 
         BarAleCount = 0;
         GhostKillCount = 0;
+        LovePotionEventState = NOT_STARTED;
         TombTimer = TIMER_TOMB_START;
         TombEventCounter = 0;
         tombResetTimer   = 0;
@@ -470,6 +472,11 @@ struct instance_blackrock_depths : public InstanceScript
                 else
                     encounter[2] = data;
                 break;
+            case DATA_LOVE_POTION_EVENT:
+                LovePotionEventState = data;
+                if (data == DONE)
+                    encounter[2] = DONE;
+                break;
             case TYPE_TOMB_OF_SEVEN:
                 encounter[3] = data;
                 switch (data)
@@ -599,7 +606,8 @@ struct instance_blackrock_depths : public InstanceScript
 
             std::ostringstream saveStream;
             saveStream << encounter[0] << ' ' << encounter[1] << ' ' << encounter[2] << ' '
-                       << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount;
+                       << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount << ' '
+                       << LovePotionEventState;
 
             str_data = saveStream.str();
 
@@ -633,6 +641,8 @@ struct instance_blackrock_depths : public InstanceScript
                 return arenaMobsToSpawn;
             case DATA_ARENA_BOSS:
                 return arenaBossToSpawn;
+            case DATA_LOVE_POTION_EVENT:
+                return LovePotionEventState;
         }
         return 0;
     }
@@ -702,6 +712,8 @@ struct instance_blackrock_depths : public InstanceScript
         std::istringstream loadStream(in);
         loadStream >> encounter[0] >> encounter[1] >> encounter[2] >> encounter[3]
                    >> encounter[4] >> encounter[5] >> GhostKillCount;
+        if (!(loadStream >> LovePotionEventState) || LovePotionEventState != DONE)
+            LovePotionEventState = NOT_STARTED;
 
         for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             if (encounter[i] == IN_PROGRESS)
