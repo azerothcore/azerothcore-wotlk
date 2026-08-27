@@ -12,7 +12,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9545, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Linked Event - Clear Dark Iron Ale State'),
 (9545, 0, 9, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Linked Event - Restore Faction'),
 (9545, 0, 10, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Reform Patron Group'),
-(9545, 0, 11, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reached Home - Restore Emote State');
+(9545, 0, 11, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reached Home - Restore Emote State'),
+(9545, 0, 12, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Cancel Drink Sequence'),
+(9545, 0, 13, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Death - Cancel Drink Sequence');
 
 -- Guzzling Patron
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 9547) AND (`source_type` = 0);
@@ -29,7 +31,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9547, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Linked Event - Clear Dark Iron Ale State'),
 (9547, 0, 10, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Linked Event - Restore Faction'),
 (9547, 0, 11, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Reform Patron Group'),
-(9547, 0, 12, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Home - Restore Emote State');
+(9547, 0, 12, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Home - Restore Emote State'),
+(9547, 0, 13, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Cancel Drink Sequence'),
+(9547, 0, 14, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Death - Cancel Drink Sequence');
 
 -- Hammered Patron
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 9554) AND (`source_type` = 0);
@@ -44,7 +48,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9554, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Linked Event - Clear Dark Iron Ale State'),
 (9554, 0, 8, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Linked Event - Restore Faction'),
 (9554, 0, 9, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Reset - Reform Patron Group'),
-(9554, 0, 10, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Reached Home - Restore Emote State');
+(9554, 0, 10, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Reached Home - Restore Emote State'),
+(9554, 0, 11, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Reset - Cancel Drink Sequence'),
+(9554, 0, 12, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hammered Patron - On Death - Cancel Drink Sequence');
 
 -- Grim Patron guid 48172
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = -48172) AND (`source_type` = 0);
@@ -62,7 +68,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-48172, 0, 10, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Reform Patron Group'),
 (-48172, 0, 11, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reached Home - Restore Emote State'),
 (-48172, 0, 12, 13, 1, 0, 100, 0, 30000, 30000, 55000, 60000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - OOC - Say text1'),
-(-48172, 0, 13, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Grim Patron - OOC - Set data');
+(-48172, 0, 13, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Grim Patron - OOC - Set data'),
+(-48172, 0, 14, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Reset - Cancel Drink Sequence'),
+(-48172, 0, 15, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grim Patron - On Death - Cancel Drink Sequence');
 
 -- Guzzling Patron guid 90884
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = -90884) AND (`source_type` = 0);
@@ -81,7 +89,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-90884, 0, 11, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Reform Patron Group'),
 (-90884, 0, 12, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Home - Restore Emote State'),
 (-90884, 0, 13, 14, 1, 0, 100, 0, 150000, 150000, 12000, 180000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Say text1'),
-(-90884, 0, 14, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Set data');
+(-90884, 0, 14, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Set data'),
+(-90884, 0, 15, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Cancel Drink Sequence'),
+(-90884, 0, 16, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Death - Cancel Drink Sequence');
 
 -- Guzzling Patron guid 91064
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = -91064) AND (`source_type` = 0);
@@ -100,7 +110,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-91064, 0, 11, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Reform Patron Group'),
 (-91064, 0, 12, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 35, 103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reached Home - Restore Emote State'),
 (-91064, 0, 13, 14, 1, 0, 100, 0, 200000, 200000, 550000, 600000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Say text1'),
-(-91064, 0, 14, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Set data');
+(-91064, 0, 14, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 9500, 50, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - OOC - Set data'),
+(-91064, 0, 15, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Reset - Cancel Drink Sequence'),
+(-91064, 0, 16, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 0, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Guzzling Patron - On Death - Cancel Drink Sequence');
 
 -- Patron drink sequences
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 954500) AND (`source_type` = 9);
