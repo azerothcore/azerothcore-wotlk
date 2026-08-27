@@ -1,3 +1,4 @@
+-- DB update 2026_08_26_00 -> 2026_08_27_00
 --
 DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` = 34120;
 
