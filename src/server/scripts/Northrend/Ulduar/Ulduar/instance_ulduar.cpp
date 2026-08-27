@@ -295,6 +295,18 @@ public:
             _leviathanBeaconGUIDs.clear();
         }
 
+        void SetLeviathanVehiclesUsable(bool usable)
+        {
+            for (ObjectGuid const& guid : _leviathanVehicles)
+                if (Creature* vehicle = instance->GetCreature(guid))
+                {
+                    if (usable)
+                        vehicle->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+                    else
+                        vehicle->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+                }
+        }
+
         void SpawnLeviathanOutro(bool justKilled)
         {
             if (_leviathanOutroSpawned)
@@ -456,6 +468,9 @@ public:
         {
             if (IsBossDone(BOSS_LEVIATHAN))
                 SpawnLeviathanOutro(false);
+            // The salvaged vehicles wait for the raid at the Expedition Base Camp, they are not tied to Brann's intro
+            else if (GetBossState(BOSS_LEVIATHAN) != SPECIAL && _leviathanVehicles.empty())
+                SpawnLeviathanEncounterVehicles(VEHICLE_POS_START);
 
             // mimiron tram:
             if (GameObject* MimironTram = GetGameObject(DATA_MIMIRON_TRAM))
@@ -903,6 +918,13 @@ public:
                 case DATA_VEHICLE_SPAWN:
                     SpawnLeviathanEncounterVehicles(data);
                     return;
+                case DATA_LEVIATHAN_VEHICLES_USABLE:
+                    // Archmage Pentarus has just answered Brann, the crews get a moment to reach the vehicles
+                    scheduler.Schedule(3s, [this](TaskContext /*context*/)
+                    {
+                        SetLeviathanVehiclesUsable(true);
+                    });
+                    return;
                 case DATA_DESPAWN_ALGALON:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 60);
@@ -1219,25 +1241,25 @@ public:
 
 const Position vehiclePositions[30] =
 {
-    // Start Positions
+    // Start Positions (Sniffed)
     // Siege
     {-814.592f, -64.5436f, 429.927f, 5.96903f},
-    {-784.371f, -33.3111f, 429.927f, 5.09636f},
+    {-784.746f, -33.7638f, 429.926f, 5.09636f},
     {-813.698f, -86.8924f, 430.158f, 6.0912f},
-    {-739.3f, -21.51f, 429.927f, 4.86947f},
+    {-720.126f, -14.5091f, 429.926f, 4.85201f},
     {-756.948f, -27.9419f, 429.927f, 5.07891f},
     // Chopper
-    {-717.556f, -111.2f, 430.157f, 0.0910799f},
+    {-718.451f, -112.609f, 430.231f, 0.1745329f},
     {-717.833f, -106.567f, 430.024f, 0.122173f},
-    {-718.451f, -118.248f, 430.27f, 0.05236f},
-    {-717.337f, -113.591f, 430.279f, 0.0910799f},
-    {-717.076f, -116.456f, 430.361f, 0.0910799f},
+    {-718.451f, -118.248f, 430.2697f, 0.052359f},
+    {-718.307f, -124.421f, 430.1585f, 0.174532f},
+    {-718.000f, -130.715f, 429.9037f, 0.134259f}, // Not Sniffed
     // Demolisher
     {-766.702f, -225.033f, 430.503f, 1.71042f},
-    {-729.545f, -186.269f, 430.128f, 1.90241f},
+    {-729.545f, -186.269f, 430.128f, 2.93406f},
     {-793.69f, -240.574f, 430.981f, 1.64061f},
     {-719.747f, -165.845f, 430.135f, 1.95477f},
-    {-732.267f, -203.694f, 432.463f, 2.07694f},
+    {-746.234f, -211.748f, 431.754f, 1.83259f},
     // Leviathan Positions
     // Siege
     {119.8f, 38.37f, 409.803f, 0.0f},
@@ -1291,6 +1313,10 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
                 _leviathanVehicles.push_back(veh->GetGUID());
             }
         }
+
+        // The raid may look the vehicles over on arrival, but cannot board them until the Kirin Tor say so
+        if (mode == VEHICLE_POS_START && GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) != MAGE_BARRIER_LOWERED)
+            SetLeviathanVehiclesUsable(false);
     }
 }
 
