@@ -8,7 +8,7 @@ INSERT INTO `spawn_group_template` (`groupId`, `groupName`, `groupFlags`) VALUES
     (105, 'Stratholme - Timmy the Cruel - Crusaders Square Scarlet trigger', 0),
     (106, 'Stratholme - Timmy the Cruel', 4);
 
-DELETE FROM `spawn_group` WHERE `groupId` IN (105, 106) OR `spawnId` IN (54052, 54056, 54069, 54070, 54073, 54074, 54075, 54076, 54079, 54082, 54087, 54117, 54138, 54180, 54207, @CGUID);
+DELETE FROM `spawn_group` WHERE `groupId` IN (105, 106) OR (`spawnType` = 0 AND `spawnId` IN (54052, 54056, 54069, 54070, 54073, 54074, 54075, 54076, 54079, 54082, 54087, 54117, 54138, 54180, 54207, @CGUID));
 INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
     (105, 0, 54052),
     (105, 0, 54056),
