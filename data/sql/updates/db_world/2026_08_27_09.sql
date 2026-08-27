@@ -1,3 +1,4 @@
+-- DB update 2026_08_27_08 -> 2026_08_27_09
 
 -- Remove Row 13 in Brann SmartAI and Related Conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` = 14 AND `SourceEntry` = 33579 AND `SourceId` = 0;
