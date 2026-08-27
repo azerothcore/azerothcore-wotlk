@@ -27,6 +27,7 @@
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
+#include "Timer.h"
 #include "MapCollisionData.h"
 #include "MapGridManager.h"
 #include "MapRefMgr.h"
@@ -67,6 +68,7 @@ class StaticTransport;
 class MotionTransport;
 class PathGenerator;
 class WorldSession;
+class SpawnedPoolData;
 
 enum WeatherState : uint32;
 
@@ -325,6 +327,10 @@ public:
 
     void SendToPlayers(WorldPacket const* data) const;
 
+    void StartPlayersRedirectKickTimer();
+    void StopPlayersRedirectKickTimer();
+    bool IsPlayerRedirectKickTimerActive() { return !_redirectKickTimer.Passed(); }
+
     typedef MapRefMgr PlayerList;
     [[nodiscard]] PlayerList const& GetPlayers() const { return m_mapRefMgr; }
 
@@ -374,6 +380,9 @@ public:
 
         return nullptr;
     }
+
+    SpawnedPoolData& GetPoolData() { return *_poolData; }
+    [[nodiscard]] SpawnedPoolData const& GetPoolData() const { return *_poolData; }
 
     MapInstanced* ToMapInstanced() { if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return nullptr;  }
     [[nodiscard]] MapInstanced const* ToMapInstanced() const { if (Instanceable())  return (MapInstanced const*)((MapInstanced*)this); else return nullptr;  }
@@ -585,6 +594,8 @@ private:
 
     void SendObjectUpdates();
 
+    void UpdatePlayersRedirectKickEvent(uint32 diff);
+
 protected:
     // Type specific code for add/remove to/from grid
     template<class T>
@@ -658,6 +669,8 @@ private:
     };
     std::set<RespawnEntry> _respawnQueue;
 
+    std::unique_ptr<SpawnedPoolData> _poolData;
+
     std::unordered_set<uint32> _toggledSpawnGroupIds;
     uint32 _respawnCheckTimer{0};
 
@@ -693,6 +706,9 @@ private:
     PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
     IntervalTimer _updatableObjectListRecheckTimer;
     ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
+
+    TimeTrackerSmall _redirectKickTimer;
+    TimeTrackerSmall _lastAnnounceRedirectKickTimer;
 };
 
 enum InstanceResetMethod

@@ -8,6 +8,15 @@ on:
       - opened
       - reopened
       - synchronize
+      - ready_for_review
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'e2e scope after the clang-18 build'
+        required: false
+        default: 'full'
+        type: choice
+        options: [smoke, full]
 
 concurrency:
   # One concurrency group per workflow + ref.
@@ -26,23 +35,42 @@ permissions:
   contents: read
 
 jobs:
+  # Split out of the matrix so e2e can needs: this cell only (not gcc/clang-21).
+  build-e2e:
+    name: ubuntu-24.04-clang-18-nopch
+    runs-on: ubuntu-24.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/linux-build
+        with:
+          CC: clang-18
+          CXX: clang++-18
+          pch: false
+      - name: Upload server binaries for e2e
+        uses: actions/upload-artifact@v4
+        with:
+          name: ac-server-ubuntu-24.04-clang-18
+          path: |
+            env/dist/bin/authserver
+            env/dist/bin/worldserver
+            env/dist/etc/
+          if-no-files-found: error
+          retention-days: 3
+
   build:
     strategy:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-24.04
-            compiler:
-              CC: clang-18
-              CXX: clang++-18
-          - os: ubuntu-24.04
-            compiler:
-              CC: gcc-14
-              CXX: g++-14
           - os: ubuntu-26.04
             compiler:
-              CC: clang-20
-              CXX: clang++-20
+              CC: gcc-15
+              CXX: g++-15
+          - os: ubuntu-26.04
+            compiler:
+              CC: clang-21
+              CXX: clang++-21
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
@@ -53,3 +81,22 @@ jobs:
           CC: ${{ matrix.compiler.CC }}
           CXX: ${{ matrix.compiler.CXX }}
           pch: false
+
+  e2e:
+    name: e2e ${{ inputs.scope || 'full' }}
+    needs: build-e2e
+    # Official PR, master push, and dispatch. Master re-runs full so flakes
+    # and merge-base drift show up after squash, not only on the PR head.
+    if: |
+      github.repository == 'azerothcore/azerothcore-wotlk'
+      && !github.event.pull_request.draft
+      && needs.build-e2e.result == 'success'
+      && (
+        github.event_name == 'pull_request'
+        || github.event_name == 'workflow_dispatch'
+        || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+      )
+    uses: ./.github/workflows/e2e-live.yml
+    with:
+      scope: ${{ inputs.scope || 'full' }}
+      artifact_run_id: ${{ github.run_id }}
