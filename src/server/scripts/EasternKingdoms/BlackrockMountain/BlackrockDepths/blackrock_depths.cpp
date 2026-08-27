@@ -586,6 +586,8 @@ struct npc_mistress_nagmara : public CreatureAI
     {
         if (_lovePotionComplete)
         {
+            if (!_events.HasTimeUntilEvent(EVENT_CLEAR_HEARTS))
+                me->setActive(false);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->GetMotionMaster()->MoveIdle();
@@ -791,6 +793,7 @@ struct npc_mistress_nagmara : public CreatureAI
                     me->RemoveAurasDueToSpell(SPELL_NAGMARA_ROCKNOT);
                     if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
                         rocknot->RemoveAurasDueToSpell(SPELL_NAGMARA_ROCKNOT);
+                    me->setActive(false);
                     break;
                 case EVENT_MOVEMENT_TIMEOUT:
                     AbortLovePotionEvent(true);
@@ -977,6 +980,7 @@ struct npc_rocknot : public npc_escortAI
 
         if (_lovePotionComplete)
         {
+            me->setActive(false);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->GetMotionMaster()->MoveIdle();
         }
@@ -1041,6 +1045,7 @@ struct npc_rocknot : public npc_escortAI
             me->SetHomePosition(me->GetPosition());
             me->GetMotionMaster()->MoveIdle();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->setActive(false);
         }
     }
 
