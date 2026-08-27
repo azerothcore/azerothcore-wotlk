@@ -1237,8 +1237,8 @@ public:
 
 const Position vehiclePositions[30] =
 {
-    // Start Positions
-    // Siege (Sniffed)
+    // Start Positions (Sniffed)
+    // Siege
     {-814.592f, -64.5436f, 429.927f, 5.96903f},
     {-784.746f, -33.7638f, 429.926f, 5.09636f},
     {-813.698f, -86.8924f, 430.158f, 6.0912f},
