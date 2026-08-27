@@ -627,6 +627,7 @@ struct npc_mistress_nagmara : public CreatureAI
         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         _lovePotionEvent = true;
         _rocknotGuid = rocknot->GetGUID();
+        me->setActive(true);
 
         me->SetWalk(false);
         me->GetMotionMaster()->Clear();
@@ -914,6 +915,7 @@ private:
         _routePoint = 0;
         _doorOpenAttempts = 0;
         _doorOpenedByEvent = false;
+        me->setActive(false);
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveTargetedHome();
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -989,6 +991,7 @@ struct npc_rocknot : public npc_escortAI
 
             _lovePotionEvent = true;
             _lovePotionComplete = false;
+            me->setActive(true);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
         else if (action == ACTION_CANCEL_LOVE_POTION)
@@ -1053,6 +1056,8 @@ struct npc_rocknot : public npc_escortAI
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
+        npc_escortAI::MovementInform(type, pointId);
+
         if (type != POINT_MOTION_TYPE || pointId != POINT_ROCKNOT_FINAL || !_lovePotionEvent)
             return;
 
@@ -1178,6 +1183,7 @@ private:
 
         _lovePotionEvent = false;
         _nagmaraGuid.Clear();
+        me->setActive(false);
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveTargetedHome();
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
