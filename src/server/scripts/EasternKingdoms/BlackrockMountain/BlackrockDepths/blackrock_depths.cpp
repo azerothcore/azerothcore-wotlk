@@ -584,6 +584,16 @@ struct npc_mistress_nagmara : public CreatureAI
 
     void Reset() override
     {
+        if (_lovePotionComplete)
+        {
+            if (!_events.HasTimeUntilEvent(EVENT_CLEAR_HEARTS))
+                me->setActive(false);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+            me->GetMotionMaster()->MoveIdle();
+            return;
+        }
+
         if (_instance && _instance->GetData(DATA_LOVE_POTION_EVENT) == DONE)
         {
             _events.Reset();
@@ -604,16 +614,6 @@ struct npc_mistress_nagmara : public CreatureAI
             me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             me->GetMotionMaster()->MoveIdle();
             me->setActive(false);
-            return;
-        }
-
-        if (_lovePotionComplete)
-        {
-            if (!_events.HasTimeUntilEvent(EVENT_CLEAR_HEARTS))
-                me->setActive(false);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            me->GetMotionMaster()->MoveIdle();
             return;
         }
 
