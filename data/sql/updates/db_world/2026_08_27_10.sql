@@ -1,3 +1,4 @@
+-- DB update 2026_08_27_09 -> 2026_08_27_10
 
 -- Increase Despawn Timer by 6000 ms.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22105;
