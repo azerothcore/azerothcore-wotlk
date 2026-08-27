@@ -237,7 +237,6 @@ struct boss_flame_leviathan : public BossAI
         CreatureAI::EnterEvadeMode(why);
     }
 
-    void MoveInLineOfSight(Unit*) override {}
     void MoveInLineOfSight(Unit* unit) override {
         if (_startTimer || _speakTimer)
             return;
