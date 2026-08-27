@@ -1,3 +1,4 @@
+-- DB update 2026_08_27_03 -> 2026_08_27_04
 -- Gortok Palehoof (Utgarde Pinnacle) aggro line plays no voice sound
 -- creature_text row (CreatureID 26687, GroupID 0, ID 0, SAY_AGGRO) has Sound=0.
 -- Verified against SoundEntries.dbc: ID 13464 = "A_UP_Gortok_Aggro" / UP_Gortok_Aggro.wav
