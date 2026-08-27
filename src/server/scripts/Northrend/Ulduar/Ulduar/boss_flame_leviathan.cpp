@@ -232,7 +232,18 @@ struct boss_flame_leviathan : public BossAI
         me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
     }
 
-    void MoveInLineOfSight(Unit*) override {}
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        CreatureAI::EnterEvadeMode(why);
+    }
+
+    void MoveInLineOfSight(Unit* unit) override {
+        if (_startTimer || _speakTimer)
+            return;
+
+        BossAI::MoveInLineOfSight(unit);
+    }
+
     void JustSummoned(Creature* cr)  override
     {
         if (cr->GetEntry() != NPC_FLAME_LEVIATHAN_TURRET && cr->GetEntry() != NPC_SEAT)
