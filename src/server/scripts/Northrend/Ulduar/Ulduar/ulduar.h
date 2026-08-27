@@ -373,16 +373,16 @@ enum UlduarMisc
     SUMMON_GROUP_LEVIATHAN_OUTRO_MACHINE    = 3, // Brann's Flying Machine, airborne (kill)
     SUMMON_GROUP_LEVIATHAN_OUTRO_BRANN      = 4, // Brann at the landed machine (kill)
     SUMMON_GROUP_LEVIATHAN_OUTRO_MAGES      = 5, // 12 Kirin Tor Mages flanking Brann's spot
-    SUMMON_GROUP_LEVIATHAN_OUTRO_STALKER    = 6, // base camp teleporter visual stalker
     SUMMON_GROUP_LEVIATHAN_OUTRO_BATTLE_MAGES = 7, // 2 sustaining the portal + 1 at the Formation Grounds teleporter
 
-    // gameobject_summon_groups: base camp Ulduar Teleporter (~61s after the kill) and the Dalaran portal
-    GO_SUMMON_GROUP_LEVIATHAN_TELEPORTER    = 0,
+    // gameobject_summon_groups: the Dalaran portal behind the formation
     GO_SUMMON_GROUP_LEVIATHAN_PORTAL        = 1,
 
-    // waypoint_data paths: Brann's walk from the machine to his spot, Rhydian's walk to Brann's side
+    // waypoint_data paths: Brann's walk from the machine to his spot, Rhydian's walk to Brann's side,
+    // and the flying machine's approach arc over the grounds
     PATH_BRANN_FORMATION_GROUNDS            = 341190,
     PATH_RHYDIAN_TO_BRANN                   = 336960,
+    PATH_FLYING_MACHINE_APPROACH            = 341200,
 
     // Gossip Keepers, Kirin Tor Mages: teleport-in flash
     SPELL_SIMPLE_TELEPORT_VISUAL            = 12980,

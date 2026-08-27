@@ -232,6 +232,7 @@ public:
         bool _leviathanOutroSpawned;
         bool _leviathanSequenceStarted;
         ObjectGuid _formationRhydianGUID;
+        ObjectGuid _leviathanMachineGUID;
 
         // Hodir
         bool _hmHodir;
@@ -257,6 +258,7 @@ public:
             _leviathanOutroSpawned = false;
             _leviathanSequenceStarted = false;
             _formationRhydianGUID.Clear();
+            _leviathanMachineGUID.Clear();
 
             // Hodir
             _hmHodir = true; // If players fail the Hardmode then becomes false
@@ -333,16 +335,8 @@ public:
             if (justKilled)
             {
                 StartLeviathanOutroSequence();
-                scheduler.Schedule(61s, [this](TaskContext /*context*/)
-                {
-                    instance->SummonCreatureGroup(SUMMON_GROUP_LEVIATHAN_OUTRO_STALKER);
-                    instance->SummonGameObjectGroup(GO_SUMMON_GROUP_LEVIATHAN_TELEPORTER);
-                });
                 return;
             }
-
-            instance->SummonCreatureGroup(SUMMON_GROUP_LEVIATHAN_OUTRO_STALKER);
-            instance->SummonGameObjectGroup(GO_SUMMON_GROUP_LEVIATHAN_TELEPORTER);
 
             // On later visits the landing, march and dialogue replay once someone approaches the Formation Grounds
             scheduler.Schedule(2s, [this](TaskContext context)
@@ -371,10 +365,16 @@ public:
 
             _leviathanSequenceStarted = true;
 
-            // The crew runs into its formation slots, paired by group row order
+            // The crew runs its sniffed column routes into the formation slots, paired by group row order
+            static uint32 const marchPaths[] =
+            {
+                3414401, 3414402, 3414403, 3414404, 3414405, 3414406,
+                3414501, 3414502, 3414503, 3414504, 3414505, 3414506
+            };
             if (std::vector<TempSummonData> const* formation = sObjectMgr->GetSummonGroup(MAP_ULDUAR, SUMMONER_TYPE_MAP, SUMMON_GROUP_LEVIATHAN_OUTRO))
             {
                 auto slot = formation->begin();
+                uint8 pathIndex = 0;
                 for (ObjectGuid const& guid : _leviathanCrewGUIDs)
                 {
                     Creature* crew = instance->GetCreature(guid);
@@ -382,14 +382,25 @@ public:
                         continue;
                     while (slot != formation->end() && slot->entry != crew->GetEntry())
                         ++slot;
-                    if (slot == formation->end())
+                    if (slot == formation->end() || pathIndex >= sizeof(marchPaths) / sizeof(marchPaths[0]))
                         break;
                     crew->SetHomePosition(slot->pos);
-                    crew->GetMotionMaster()->MovePoint(0, slot->pos, FORCED_MOVEMENT_RUN);
+                    crew->GetMotionMaster()->MovePath(marchPaths[pathIndex], FORCED_MOVEMENT_RUN);
                     ++slot;
+                    ++pathIndex;
                 }
             }
             _leviathanCrewGUIDs.clear();
+
+            // The machine flies its sniffed arc over the grounds and reaches the descent point at ~36s
+            std::list<TempSummon*> machine;
+            instance->SummonCreatureGroup(SUMMON_GROUP_LEVIATHAN_OUTRO_MACHINE, &machine);
+            if (!machine.empty())
+            {
+                _leviathanMachineGUID = machine.front()->GetGUID();
+                machine.front()->SetCanFly(true);
+                machine.front()->GetMotionMaster()->MovePath(PATH_FLYING_MACHINE_APPROACH);
+            }
 
             scheduler.Schedule(13s, [this](TaskContext /*context*/)
             {
@@ -398,17 +409,10 @@ public:
                     rhydian->SetHomePosition({ 239.31581f, -123.64426f, 409.80365f, 3.104f });
                     rhydian->GetMotionMaster()->MovePath(PATH_RHYDIAN_TO_BRANN, FORCED_MOVEMENT_WALK);
                 }
-            }).Schedule(34s, [this](TaskContext /*context*/)
+            }).Schedule(36s, [this](TaskContext /*context*/)
             {
-                std::list<TempSummon*> machine;
-                instance->SummonCreatureGroup(SUMMON_GROUP_LEVIATHAN_OUTRO_MACHINE, &machine);
-                if (!machine.empty())
-                {
-                    Creature* flyingMachine = machine.front();
-                    flyingMachine->SetCanFly(true);
-                    float const groundZ = flyingMachine->GetMapHeight(flyingMachine->GetPositionX(), flyingMachine->GetPositionY(), flyingMachine->GetPositionZ());
-                    flyingMachine->GetMotionMaster()->MoveLand(0, { flyingMachine->GetPositionX(), flyingMachine->GetPositionY(), groundZ });
-                }
+                if (Creature* flyingMachine = instance->GetCreature(_leviathanMachineGUID))
+                    flyingMachine->GetMotionMaster()->MoveLand(0, { 246.4216f, -80.03793f, 409.80365f });
             }).Schedule(39s, [this](TaskContext /*context*/)
             {
                 std::list<TempSummon*> brann;
