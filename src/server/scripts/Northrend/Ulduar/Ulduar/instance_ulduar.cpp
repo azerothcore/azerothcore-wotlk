@@ -483,8 +483,10 @@ public:
         {
             if (IsBossDone(BOSS_LEVIATHAN))
                 SpawnLeviathanOutro(false);
-            // The salvaged vehicles wait for the raid at the Expedition Base Camp, they are not tied to Brann's intro
-            else if (GetBossState(BOSS_LEVIATHAN) != SPECIAL && _leviathanVehicles.empty())
+            // The salvaged vehicles wait for the raid at the Expedition Base Camp, they are not tied to Brann's intro.
+            // Keyed on the mode rather than on the pool being empty: a pool whose wrecks are all pending replacement
+            // is empty too, and respawning over it would leave the camp with a double set once the timers fire.
+            else if (GetBossState(BOSS_LEVIATHAN) != SPECIAL && _leviathanVehicleMode == VEHICLE_POS_NONE)
                 SpawnLeviathanEncounterVehicles(VEHICLE_POS_START);
 
             // mimiron tram:
