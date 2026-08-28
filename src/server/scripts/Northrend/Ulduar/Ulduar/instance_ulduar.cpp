@@ -1343,6 +1343,10 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SummonLeviathanVehicle(
         if (!_leviathanVehiclesUsable)
             veh->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
 
+        // On retail demolishers spawn with full pyrite; the mechanic seat mirrors the parent's pool
+        if (entry == NPC_SALVAGED_DEMOLISHER)
+            veh->SetPower(veh->getPowerType(), veh->GetMaxPower(veh->getPowerType()));
+
         _leviathanVehicles.push_back({ veh->GetGUID(), entry, index });
     }
 }

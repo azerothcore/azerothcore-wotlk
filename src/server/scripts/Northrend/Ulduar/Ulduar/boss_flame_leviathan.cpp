@@ -1207,6 +1207,29 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
     }
 };
 
+// On retail the Salvaged Demolisher and its mechanic seat share a single pyrite pool with
+// the parent demolisher as the source: the repair station's energize targets only the main
+// vehicles, and the one costed seat ability (Speed Boost 62471) already charges the parent
+// itself via its SPELL_EFFECT_POWER_BURN on TARGET_UNIT_VEHICLE - so the seat only needs
+// to mirror the parent's pyrite.
+struct npc_salvaged_demolisher_turret : public VehicleAI
+{
+    npc_salvaged_demolisher_turret(Creature* creature) : VehicleAI(creature) { }
+
+    void UpdateAI(uint32 diff) override
+    {
+        VehicleAI::UpdateAI(diff);
+
+        Unit* parent = me->GetVehicleBase();
+        if (!parent || parent->GetEntry() != NPC_SALVAGED_DEMOLISHER)
+            return;
+
+        Powers powerType = me->getPowerType();
+        if (me->GetPower(powerType) != parent->GetPower(powerType))
+            me->SetPower(powerType, parent->GetPower(powerType));
+    }
+};
+
 class go_ulduar_tower : public GameObjectScript
 {
 public:
@@ -1838,6 +1861,7 @@ void AddSC_boss_flame_leviathan()
     // Helpers
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
+    RegisterUlduarCreatureAI(npc_salvaged_demolisher_turret);
 
     // GOs
     new go_ulduar_tower();
