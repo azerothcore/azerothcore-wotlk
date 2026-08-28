@@ -65,6 +65,7 @@ enum LeviathanSpells
     SPELL_TOWER_OF_LIFE                 = 64482,
 
     SPELL_HODIRS_FURY                   = 62533,
+    SPELL_HODIRS_FURY_STUN              = 62297,
     SPELL_FREYA_WARD                    = 62906, // removed spawn effect
     SPELL_MIMIRONS_INFERNO              = 62909,
     SPELL_THORIMS_HAMMER                = 62911,
@@ -305,6 +306,9 @@ struct boss_flame_leviathan : public BossAI
         summons.DoAction(ACTION_DESPAWN_ADDS);
         summons.DespawnAll();
         events.Reset();
+
+        // The stun lasts 60s and is applied to dead players too, nothing else clears it once the fight ends
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_HODIRS_FURY_STUN);
 
         _shutdown = false;
         _startTimer = 1;
@@ -640,6 +644,8 @@ void boss_flame_leviathan::JustDied(Unit*)
     me->GetCreatureListWithEntryInGrid(tarPools, NPC_POOL_OF_TAR, 500.0f);
     for (Creature* creature : tarPools)
         creature->DespawnOrUnsummon();
+
+    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_HODIRS_FURY_STUN);
 
     instance->SetBossState(BOSS_LEVIATHAN, DONE);
     instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);
