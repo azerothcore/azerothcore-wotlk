@@ -87,9 +87,10 @@ func setUnitEnergy(t *testing.T, bot *e2eharness.ScenarioBot, guid uint64, value
 
 // pairSeatByDrain pairs the discoverable mechanic seat with its parent demolisher.
 // Seats ride the vehicle and carry no usable world position or owner link in the
-// client cache, so the pairing is driven: drain each demolisher and see which one
-// the seat mirrors. Returns with the paired demolisher drained to 0. Doubles as
-// the mirror oracle - a seat that follows no demolisher is the 27313 bug.
+// client cache, so the pairing is driven: set each demolisher to a unique nonzero
+// sentinel and see which one the seat mirrors (a pre-drained seat reads 0 and can
+// never false-match a sentinel). Returns with the paired demolisher drained to 0.
+// Doubles as the mirror oracle - a seat that follows no demolisher is the 27313 bug.
 func pairSeatByDrain(t *testing.T, bot *e2eharness.ScenarioBot) (seat, demo uint64) {
 	t.Helper()
 	seat = bot.WaitUnit(t, npcDemolisherMechSeat, 30*time.Second)
@@ -102,10 +103,15 @@ func pairSeatByDrain(t *testing.T, bot *e2eharness.ScenarioBot) (seat, demo uint
 	// live data. Soft: on an unfixed core the seat reads 0 forever, and the drain
 	// loop still classifies that correctly.
 	waitUnitEnergy(bot, seat, demolisherMaxPyrite, 30*time.Second)
-	for _, d := range demos {
-		setUnitEnergy(t, bot, d.GUID, 0)
-		if waitUnitEnergy(bot, seat, 0, 3*time.Second) {
-			t.Logf("seat 0x%X mirrors demolisher 0x%X", seat, d.GUID)
+	for i, d := range demos {
+		sentinel := uint32(7 + i)
+		if cur, _ := unitEnergy(bot, seat); cur == sentinel {
+			sentinel += 10
+		}
+		setUnitEnergy(t, bot, d.GUID, sentinel)
+		if waitUnitEnergy(bot, seat, sentinel, 3*time.Second) {
+			t.Logf("seat 0x%X mirrors demolisher 0x%X (sentinel %d)", seat, d.GUID, sentinel)
+			setUnitEnergy(t, bot, d.GUID, 0)
 			return seat, d.GUID
 		}
 		setUnitEnergy(t, bot, d.GUID, demolisherMaxPyrite)
