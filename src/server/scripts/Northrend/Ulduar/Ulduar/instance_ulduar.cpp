@@ -197,6 +197,17 @@ BossBoundaryData const boundaries =
     { BOSS_LEVIATHAN, new RectangleBoundary(130.0f, 450.0f, -170.0f, 110.0f) },
 };
 
+// Delay between a salvaged vehicle's wreck decaying and its replacement rolling out of the Expedition Base Camp
+constexpr Seconds LEVIATHAN_VEHICLE_RESPAWN_DELAY = 40s;
+
+// A salvaged vehicle summoned for the Flame Leviathan encounter, kept together with the slot it was summoned into
+struct LeviathanVehicle
+{
+    ObjectGuid guid;
+    uint32 entry;
+    uint32 index;
+};
+
 class instance_ulduar : public InstanceMapScript
 {
 public:
@@ -225,7 +236,9 @@ public:
         ObjectGuid _leviathanVisualTowers[4][2];
         ObjectGuid _repairSGUID[2];
         bool _leviathanTowers[4];
-        GuidList _leviathanVehicles;
+        std::vector<LeviathanVehicle> _leviathanVehicles;
+        uint8 _leviathanVehicleMode;
+        bool _leviathanVehiclesUsable;
         GuidUnorderedSet _leviathanGauntletGUIDs;
         GuidUnorderedSet _leviathanBeaconGUIDs;
         GuidList _leviathanCrewGUIDs;
@@ -252,6 +265,8 @@ public:
                 _leviathanTowers[i] = true;
 
             _leviathanVehicles.clear();
+            _leviathanVehicleMode = VEHICLE_POS_NONE;
+            _leviathanVehiclesUsable = false;
             _leviathanGauntletGUIDs.clear();
             _leviathanBeaconGUIDs.clear();
             _leviathanCrewGUIDs.clear();
@@ -295,16 +310,16 @@ public:
             _leviathanBeaconGUIDs.clear();
         }
 
-        void SetLeviathanVehiclesUsable(bool usable)
+        // Brann only ever unlocks the vehicles, and they must stay unlocked across wipes, respawns and instance
+        // reloads. Locking one back is the job of SummonLeviathanVehicle, which withholds the flag on spawn.
+        void UnlockLeviathanVehicles()
         {
-            for (ObjectGuid const& guid : _leviathanVehicles)
-                if (Creature* vehicle = instance->GetCreature(guid))
-                {
-                    if (usable)
-                        vehicle->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-                    else
-                        vehicle->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-                }
+            _leviathanVehiclesUsable = true;
+            StorePersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE, 1);
+
+            for (LeviathanVehicle const& summoned : _leviathanVehicles)
+                if (Creature* vehicle = instance->GetCreature(summoned.guid))
+                    vehicle->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
         }
 
         void SpawnLeviathanOutro(bool justKilled)
@@ -468,8 +483,10 @@ public:
         {
             if (IsBossDone(BOSS_LEVIATHAN))
                 SpawnLeviathanOutro(false);
-            // The salvaged vehicles wait for the raid at the Expedition Base Camp, they are not tied to Brann's intro
-            else if (GetBossState(BOSS_LEVIATHAN) != SPECIAL && _leviathanVehicles.empty())
+            // The salvaged vehicles wait for the raid at the Expedition Base Camp, they are not tied to Brann's intro.
+            // Keyed on the mode rather than on the pool being empty: a pool whose wrecks are all pending replacement
+            // is empty too, and respawning over it would leave the camp with a double set once the timers fire.
+            else if (GetBossState(BOSS_LEVIATHAN) != SPECIAL && _leviathanVehicleMode == VEHICLE_POS_NONE)
                 SpawnLeviathanEncounterVehicles(VEHICLE_POS_START);
 
             // mimiron tram:
@@ -922,7 +939,7 @@ public:
                     // Archmage Pentarus has just answered Brann, the crews get a moment to reach the vehicles
                     scheduler.Schedule(3s, [this](TaskContext /*context*/)
                     {
-                        SetLeviathanVehiclesUsable(true);
+                        UnlockLeviathanVehicles();
                     });
                     return;
                 case DATA_DESPAWN_ALGALON:
@@ -1053,6 +1070,9 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
+            if (Creature* creature = unit->ToCreature())
+                ScheduleLeviathanVehicleRespawn(creature);
+
             // Feeds on Tears achievement
             if (unit->IsPlayer())
             {
@@ -1170,6 +1190,8 @@ public:
         }
 
         void SpawnLeviathanEncounterVehicles(uint8 mode);
+        void SummonLeviathanVehicle(uint32 entry, uint32 index);
+        void ScheduleLeviathanVehicleRespawn(Creature* vehicle);
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
@@ -1283,40 +1305,75 @@ const Position vehiclePositions[30] =
 
 void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounterVehicles(uint8 mode)
 {
-    if (!_leviathanVehicles.empty())
-    {
-        for (ObjectGuid const& guid : _leviathanVehicles)
-        {
-            if (Creature* cr = instance->GetCreature(guid))
-            {
-                cr->DespawnOrUnsummon();
-            }
-        }
+    // Retire the old set first: despawning it must not queue replacements for a set that is going away
+    std::vector<LeviathanVehicle> retired;
+    retired.swap(_leviathanVehicles);
+    _leviathanVehicleMode = mode;
 
-        _leviathanVehicles.clear();
+    for (LeviathanVehicle const& summoned : retired)
+    {
+        if (Creature* cr = instance->GetCreature(summoned.guid))
+        {
+            cr->DespawnOrUnsummon();
+        }
     }
 
-    if (mode < VEHICLE_POS_NONE)
-    {
-        for (uint8 i = 0; i < (instance->Is25ManRaid() ? 5 : 2); ++i)
-        {
-            if (TempSummon* veh = instance->SummonCreature(NPC_SALVAGED_SIEGE_ENGINE, vehiclePositions[15 * mode + i]))
-            {
-                _leviathanVehicles.push_back(veh->GetGUID());
-            }
-            if (TempSummon* veh = instance->SummonCreature(NPC_VEHICLE_CHOPPER, vehiclePositions[15 * mode + i + 5]))
-            {
-                _leviathanVehicles.push_back(veh->GetGUID());
-            }
-            if (TempSummon* veh = instance->SummonCreature(NPC_SALVAGED_DEMOLISHER, vehiclePositions[15 * mode + i + 10]))
-            {
-                _leviathanVehicles.push_back(veh->GetGUID());
-            }
-        }
+    if (mode >= VEHICLE_POS_NONE)
+        return;
 
-        // The raid may look the vehicles over on arrival, but cannot board them until the Kirin Tor say so
-        if (mode == VEHICLE_POS_START && GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) != MAGE_BARRIER_LOWERED)
-            SetLeviathanVehiclesUsable(false);
+    // The raid may look the vehicles over on arrival, but cannot board them until the Kirin Tor say so.
+    // MAGE_BARRIER_LOWERED covers lockouts saved before the unlock got its own flag.
+    _leviathanVehiclesUsable = mode != VEHICLE_POS_START
+        || GetPersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE) != 0
+        || GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) == MAGE_BARRIER_LOWERED;
+
+    for (uint32 i = 0; i < (instance->Is25ManRaid() ? 5u : 2u); ++i)
+    {
+        SummonLeviathanVehicle(NPC_SALVAGED_SIEGE_ENGINE, 15 * mode + i);
+        SummonLeviathanVehicle(NPC_VEHICLE_CHOPPER, 15 * mode + i + 5);
+        SummonLeviathanVehicle(NPC_SALVAGED_DEMOLISHER, 15 * mode + i + 10);
+    }
+}
+
+void instance_ulduar::instance_ulduar_InstanceMapScript::SummonLeviathanVehicle(uint32 entry, uint32 index)
+{
+    if (TempSummon* veh = instance->SummonCreature(entry, vehiclePositions[index]))
+    {
+        // The vehicle kit hands out the spell click on install, take it back while the barrier is still up
+        if (!_leviathanVehiclesUsable)
+            veh->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+
+        _leviathanVehicles.push_back({ veh->GetGUID(), entry, index });
+    }
+}
+
+void instance_ulduar::instance_ulduar_InstanceMapScript::ScheduleLeviathanVehicleRespawn(Creature* vehicle)
+{
+    // The Expedition Base Camp keeps its motor pool stocked. The trigger that ends it is the pool itself being
+    // relocated to the Formation Grounds on the first Reset() after the boss has been engaged, not the raid
+    // driving up there: for the whole first attempt wrecks are still replaced back at the camp. From the
+    // relocation on, a wreck stays where it fell and only the next reset lays out a fresh set
+    if (_leviathanVehicleMode != VEHICLE_POS_START)
+        return;
+
+    for (auto itr = _leviathanVehicles.begin(); itr != _leviathanVehicles.end(); ++itr)
+    {
+        if (itr->guid != vehicle->GetGUID())
+            continue;
+
+        uint32 entry = itr->entry;
+        uint32 index = itr->index;
+        _leviathanVehicles.erase(itr);
+
+        // A replacement rolls out of the camp 40 seconds after the wreck has decayed
+        Seconds respawnDelay = Seconds(vehicle->GetCorpseDelay()) + LEVIATHAN_VEHICLE_RESPAWN_DELAY;
+        scheduler.Schedule(respawnDelay, [this, entry, index](TaskContext /*context*/)
+        {
+            if (_leviathanVehicleMode == VEHICLE_POS_START)
+                SummonLeviathanVehicle(entry, index);
+        });
+
+        return;
     }
 }
 

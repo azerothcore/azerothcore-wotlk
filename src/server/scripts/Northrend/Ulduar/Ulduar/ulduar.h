@@ -357,6 +357,8 @@ enum UlduarPersistentData
     PERSISTENT_DATA_C_OF_ULDUAR_MASK,
     PERSISTENT_DATA_MAGE_BARRIER,
     PERSISTENT_DATA_ALGALON_FIRST_PULL,
+    // Set when Brann's action list unlocks the salvaged vehicles, they stay boardable for the rest of the lockout
+    PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE,
     MAX_PERSISTENT_DATA
 };
 
