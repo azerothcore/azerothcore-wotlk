@@ -1698,6 +1698,7 @@ public:
     void AddGameObject(GameObject* gameObj);
     void RemoveGameObject(GameObject* gameObj, bool del);
     void RemoveGameObject(uint32 spellid, bool del);
+    void RemoveGameObjectsByType(GameobjectTypes type, bool del);
     void RemoveAllGameObjects();
 
     /*********************************************************/
@@ -1720,6 +1721,7 @@ public:
     [[nodiscard]] float GetHoverHeight() const { return IsHovering() ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f; }
 
     [[nodiscard]] virtual bool IsMovementPreventedByCasting() const;
+    [[nodiscard]] bool IsActionPreventedByCasting() const;
 
     [[nodiscard]] virtual bool CanEnterWater() const = 0;
     [[nodiscard]] virtual bool CanSwim() const;
