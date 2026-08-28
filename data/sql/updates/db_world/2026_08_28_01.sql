@@ -1,3 +1,4 @@
+-- DB update 2026_08_28_00 -> 2026_08_28_01
 -- Guardian of Yogg-Saron: the 25-man Shadow Nova (65209) entry-targeted effect must hit other
 -- Guardians (33136) like its 10-man variant (62714) does since 2026_08_03_03. Its condition still
 -- targeted Sara (33134), dealing her a second 25k per Guardian on top of the dedicated 65719 nova.
