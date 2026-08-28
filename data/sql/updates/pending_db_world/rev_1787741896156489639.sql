@@ -14,17 +14,14 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 -- The sleeping Grunt wakes on aggro and returns to sleep only after reaching home on reset.
 SET @SLEEPING_GRUNT := -(@CGUID + 3);
 
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 134217728 WHERE `entry` = 9259;
 DELETE FROM `creature_addon` WHERE `guid` = @CGUID + 3;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = @SLEEPING_GRUNT AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(@SLEEPING_GRUNT, 0, 0, 1, 2, 0, 100, 2, 0, 30, 30000, 35000, 0, 0, 11, 8269, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - Between 0-30% Health - Cast \'Frenzy\' (Normal Dungeon)'),
-(@SLEEPING_GRUNT, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - Between 0-30% Health - Say Line 0 (Normal Dungeon)'),
-(@SLEEPING_GRUNT, 0, 2, 0, 0, 0, 100, 2, 5000, 5000, 6000, 10000, 0, 0, 11, 13737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - In Combat - Cast \'Mortal Strike\' (Normal Dungeon)'),
-(@SLEEPING_GRUNT, 0, 3, 0, 0, 0, 100, 2, 20000, 20000, 30000, 30000, 0, 0, 11, 15128, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - In Combat - Cast \'Mark of Flames\' (Normal Dungeon)'),
-(@SLEEPING_GRUNT, 0, 4, 5, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16093, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - On Reset - Cast \'Self Visual - Sleep Until Cancelled (DND)\''),
-(@SLEEPING_GRUNT, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - On Reset - Set Stand State Sleep'),
-(@SLEEPING_GRUNT, 0, 6, 7, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 16093, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - On Aggro - Remove Aura \'Self Visual - Sleep Until Cancelled (DND)\''),
-(@SLEEPING_GRUNT, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - On Aggro - Set Stand State Stand');
+(@SLEEPING_GRUNT, 0, 1000, 1001, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16093, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - On Reset - Cast \'Self Visual - Sleep Until Cancelled (DND)\''),
+(@SLEEPING_GRUNT, 0, 1001, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - On Reset - Set Stand State Sleep'),
+(@SLEEPING_GRUNT, 0, 1002, 1003, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 16093, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - On Aggro - Remove Aura \'Self Visual - Sleep Until Cancelled (DND)\''),
+(@SLEEPING_GRUNT, 0, 1003, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firebrand Grunt - On Aggro - Set Stand State Stand');
 
 -- Correct creatures owning sniff-matched waypoint paths.
 UPDATE `creature` SET `id` = 9239, `VerifiedBuild` = 69110 WHERE `guid` = 43527;
