@@ -763,6 +763,8 @@ struct boss_flame_leviathan_seat : public VehicleAI
         who->ApplySpellImmune(63847, IMMUNITY_ID, 63847, apply); // SPELL_FLAME_VENTS_TRIGGER
         who->ApplySpellImmune(SPELL_MISSILE_BARRAGE, IMMUNITY_ID, SPELL_MISSILE_BARRAGE, apply);
         who->ApplySpellImmune(SPELL_BATTERING_RAM, IMMUNITY_ID, SPELL_BATTERING_RAM, apply);
+        // 10yd ground-level AoE that cannot reach the seats ~15yd up on the boss' back
+        who->ApplySpellImmune(SPELL_HODIRS_FURY_STUN, IMMUNITY_ID, SPELL_HODIRS_FURY_STUN, apply);
 
         if (seatId == SEAT_PLAYER)
         {
