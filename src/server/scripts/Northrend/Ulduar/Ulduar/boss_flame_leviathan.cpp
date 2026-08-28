@@ -65,6 +65,7 @@ enum LeviathanSpells
     SPELL_TOWER_OF_LIFE                 = 64482,
 
     SPELL_HODIRS_FURY                   = 62533,
+    SPELL_HODIRS_FURY_STUN              = 62297,
     SPELL_FREYA_WARD                    = 62906, // removed spawn effect
     SPELL_MIMIRONS_INFERNO              = 62909,
     SPELL_THORIMS_HAMMER                = 62911,
