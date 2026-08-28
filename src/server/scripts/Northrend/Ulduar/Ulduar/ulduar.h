@@ -1,0 +1,456 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef DEF_ULDUAR_H
+#define DEF_ULDUAR_H
+
+#include "CreatureAIImpl.h"
+#include "GridNotifiers.h"
+
+#define DataHeader "UU"
+
+#define UlduarScriptName "instance_ulduar"
+
+enum UlduarBossIds
+{
+    // Boss IDs used by SetBossNumber/SetBossState (0-indexed)
+    BOSS_LEVIATHAN                          = 0,
+    BOSS_IGNIS                              = 1,
+    BOSS_RAZORSCALE                         = 2,
+    BOSS_XT002                              = 3,
+    BOSS_ASSEMBLY                           = 4,
+    BOSS_KOLOGARN                           = 5,
+    BOSS_AURIAYA                            = 6,
+    BOSS_FREYA                              = 7,
+    BOSS_HODIR                              = 8,
+    BOSS_MIMIRON                            = 9,
+    BOSS_THORIM                             = 10,
+    BOSS_VEZAX                              = 11,
+    BOSS_YOGGSARON                          = 12,
+    BOSS_ALGALON                            = 13,
+    MAX_ENCOUNTER                           = 14
+};
+
+enum UlduarData
+{
+    // Non-boss encounter data
+    TYPE_WATCHERS                           = 14,
+    TYPE_HODIR_HM_FAIL                      = 15,
+    TYPE_WINTER_CACHE                       = 16,
+
+    // Assembly of Iron
+    DATA_STEELBREAKER                       = 20,
+    DATA_MOLGEIM                            = 21,
+    DATA_BRUNDIR                            = 22,
+
+    // Flame Leviathan
+    DATA_VEHICLE_SPAWN                      = 100,
+    DATA_LIGHTNING_WALL1                    = 101,
+    DATA_LIGHTNING_WALL2                    = 102,
+    DATA_REPAIR_STATION1                    = 103,
+    DATA_REPAIR_STATION2                    = 104,
+    DATA_UNBROKEN_ACHIEVEMENT               = 105,
+    DATA_LEVIATHAN_DOORS                    = 106,
+    DATA_LEVIATHAN_VEHICLES_USABLE          = 107,
+
+    // Mimiron creatures
+    DATA_MIMIRON_LEVIATHAN_MKII             = 301,
+    DATA_MIMIRON_VX001                      = 302,
+    DATA_MIMIRON_ACU                        = 303,
+    DATA_MIMIRON_DB_TARGET                  = 304,
+
+    // Mimiron doors
+    DATA_GO_MIMIRON_DOOR_1                  = 311,
+    DATA_GO_MIMIRON_DOOR_2                  = 312,
+    DATA_GO_MIMIRON_DOOR_3                  = 313,
+
+    // Mimiron tram
+    DATA_MIMIRON_TRAM                       = 320,
+    DATA_MIMIRON_ACTIVATE_TRAM              = 321,
+    DATA_MIMIRON_TRAM_ROCKET_BOOSTER        = 322,
+    DATA_MIMIRON_CALL_TRAM_CENTER           = 323,
+    DATA_MIMIRON_CALL_TRAM_MIMIRON          = 324,
+    DATA_MIMIRON_TRAM_TURNAROUND_1          = 325,
+    DATA_MIMIRON_TRAM_TURNAROUND_2          = 326,
+
+    // XT-002
+    DATA_XT002_DOORS                        = 400,
+    DATA_XT002_HEART                        = 401,
+
+    // Thorim
+    DATA_THORIM_LEVER_GATE                  = 500,
+    DATA_THORIM_LEVER                       = 501,
+    DATA_THORIM_FENCE                       = 502,
+    DATA_THORIM_FIRST_DOORS                 = 503,
+    DATA_THORIM_SECOND_DOORS                = 504,
+
+    // Algalon the Observer
+    DATA_ALGALON_SUMMON_STATE               = 600,
+    DATA_DESPAWN_ALGALON                    = 601,
+    DATA_ALGALON_DEFEATED                   = 602,
+    DATA_SIGILDOOR_01                       = 603,
+    DATA_SIGILDOOR_02                       = 604,
+    DATA_SIGILDOOR_03                       = 605,
+    DATA_UNIVERSE_FLOOR_01                  = 606,
+    DATA_UNIVERSE_FLOOR_02                  = 607,
+    DATA_UNIVERSE_GLOBE                     = 608,
+    DATA_ALGALON_TRAPDOOR                   = 609,
+    DATA_BRANN_BRONZEBEARD_ALG              = 610,
+    DATA_RESUMMON_ALGALON                   = 611,
+
+    // Achievements
+    DATA_DWARFAGEDDON                       = 700,
+    DATA_QUICK_SHAVE                        = 701,
+    DATA_IRON_DWARF_MEDIUM_RARE             = 702,
+
+    // Tram
+    DATA_CALL_TRAM                          = 710,
+
+    // Freya elders
+    DATA_ELDER_IRONBRANCH                   = 750,
+    DATA_ELDER_STONEBARK                    = 751,
+    DATA_ELDER_BRIGHTLEAF                   = 752,
+
+    // Yogg-Saron
+    DATA_SARA                               = 760,
+    DATA_BRAIN_OF_YOGG_SARON               = 761,
+    DATA_YOGG_SARON_DOORS                   = 762,
+    DATA_VOICE_OF_YOGG_SARON                = 763,
+
+    // Middle section
+    DATA_ASSEMBLY_DOORS                     = 770,
+    DATA_ARCHIVUM_DOORS                     = 771,
+    DATA_KEEPERS_GATE                       = 772,
+
+    // Hodir chests (dynamically spawned)
+    DATA_HODIR_CHEST_NORMAL                 = 780,
+    DATA_HODIR_CHEST_HARD                   = 781,
+    DATA_HODIR_CHEST_NORMAL_HERO            = 782,
+    DATA_HODIR_CHEST_HARD_HERO              = 783,
+
+    // Mage Barrier
+    DATA_MAGE_BARRIER                       = 800,
+    DATA_BRANN_MEMOTESAY                    = 801,
+    DATA_BRANN_EASY_MODE                    = 802,
+    DATA_BRANN_BASE_CAMP                    = 803,
+
+    // Observation Ring Keepers
+    DATA_FREYA_GOSSIP                       = 810,
+    DATA_HODIR_GOSSIP                       = 811,
+    DATA_MIMIRON_GOSSIP                     = 812,
+    DATA_THORIM_GOSSIP                      = 813,
+
+    // Flame Leviathan outro
+    DATA_BRANN_FORMATION_GROUNDS            = 814,
+};
+
+enum UlduarNPCs
+{
+    // General
+    NPC_LEVIATHAN                           = 33113,
+    NPC_IGNIS                               = 33118,
+    NPC_RAZORSCALE                          = 33186,
+    NPC_XT002                               = 33293,
+    NPC_XT_TOY_PILE                         = 33337,
+    NPC_XS013_SCRAPBOT                      = 33343,
+    NPC_HEART_OF_DECONSTRUCTOR              = 33329,
+    NPC_STEELBREAKER                        = 32867,
+    NPC_MOLGEIM                             = 32927,
+    NPC_BRUNDIR                             = 32857,
+    NPC_KOLOGARN                            = 32930,
+    NPC_AURIAYA                             = 33515,
+    NPC_MIMIRON                             = 33350,
+    NPC_HODIR                               = 32845,
+    NPC_THORIM                              = 32865,
+    NPC_FREYA                               = 32906,
+    NPC_STRENGTHENED_IRON_ROOTS             = 33168,
+    NPC_VEZAX                               = 33271,
+    NPC_SARONITE_ANIMUS                     = 33524,
+    NPC_SARA                                = 33134,
+    NPC_YOGGSARON                           = 33288,
+    NPC_BRAIN_OF_YOGG_SARON                 = 33890,
+    NPC_ALGALON                             = 32871,
+
+    // Razorscale
+    NPC_HARPOON_FIRE_STATE                  = 33282,
+    NPC_RAZORSCALE_SPAWNER                  = 33245,
+    NPC_RAZORSCALE_CONTROLLER               = 33233,
+    NPC_EXPEDITION_COMMANDER                = 33210,
+    NPC_EXPEDITION_ENGINEER                 = 33287,
+    NPC_EXPEDITION_DEFENDER                 = 33816,
+    NPC_EXPEDITION_TRAPPER                  = 33259,
+    NPC_DARK_RUNE_GUARDIAN                  = 33388,
+    NPC_DARK_RUNE_WATCHER                   = 33453,
+    NPC_DARK_RUNE_SENTINEL                  = 33846,
+    NPC_RAZORSCALE_DEVOURING_FLAME          = 34188,
+
+    // Mimiron
+    NPC_MIMIRON_LEVIATHAN_MKII              = 33432,
+    NPC_MIMIRON_VX001                       = 33651,
+    NPC_MIMIRON_ACU                         = 33670,
+    NPC_MIMIRON_DB_TARGET                   = 33576,
+
+    // Freya
+    NPC_ELDER_BRIGHTLEAF                    = 32915,
+    NPC_ELDER_STONEBARK                     = 32914,
+    NPC_ELDER_IRONBRANCH                    = 32913,
+
+    // Yogg-Saron
+    NPC_VOICE_OF_YOGG_SARON                 = 33280,
+    NPC_FREYA_GOSSIP                        = 33241,
+    NPC_HODIR_GOSSIP                        = 33213,
+    NPC_THORIM_GOSSIP                       = 33242,
+    NPC_MIMIRON_GOSSIP                      = 33244,
+    NPC_FREYA_KEEPER                        = 33410,
+    NPC_HODIR_KEEPER                        = 33411,
+    NPC_MIMIRON_KEEPER                      = 33412,
+    NPC_THORIM_KEEPER                       = 33413,
+
+    // Flame Leviathan
+    NPC_SALVAGED_SIEGE_ENGINE               = 33060,
+    NPC_SALVAGED_SIEGE_ENGINE_TURRET        = 33067,
+    NPC_VEHICLE_CHOPPER                     = 33062,
+    NPC_SALVAGED_DEMOLISHER                 = 33109,
+    NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
+    NPC_BRANN_BASE_CAMP                     = 33579,
+    NPC_STEELFORGED_DEFENDER                = 33236,
+    NPC_ULDUAR_COLOSSUS                     = 33237,
+    NPC_IRONWORK_CANNON                     = 33264,
+    NPC_ULDUAR_GAUNTLET_GENERATOR           = 33571,
+    NPC_DEFENDER_GENERATED                  = 33572,
+    NPC_ARCHMAGE_RHYDIAN                    = 33696,
+    NPC_RUNEFORGED_SENTRY                   = 34234,
+    NPC_BRANN_FORMATION_GROUNDS             = 34119,
+    NPC_BRANN_S_FLYING_MACHINE              = 34120,
+    NPC_EXPEDITION_MERCENARY                = 34144,
+    NPC_EXPEDITION_ENGINEER_FORMATION       = 34145,
+
+    // Algalon the Observer
+    NPC_BRANN_BRONZBEARD_ALG                = 34064,
+    NPC_AZEROTH                             = 34246,
+    NPC_LIVING_CONSTELLATION                = 33052,
+    NPC_ALGALON_STALKER                     = 33086,
+    NPC_COLLAPSING_STAR                     = 32955,
+    NPC_BLACK_HOLE                          = 32953,
+    NPC_WORM_HOLE                           = 34099,
+    NPC_ALGALON_VOID_ZONE_VISUAL_STALKER    = 34100,
+    NPC_ALGALON_STALKER_ASTEROID_TARGET_01  = 33104,
+    NPC_ALGALON_STALKER_ASTEROID_TARGET_02  = 33105,
+    NPC_UNLEASHED_DARK_MATTER               = 34097,
+};
+
+enum UlduarGameObjects
+{
+    // Chests
+    GO_KOLOGARN_CHEST                       = 195046,
+    GO_KOLOGARN_CHEST_HERO                  = 195047,
+    GO_THORIM_CHEST                         = 194312,
+    GO_THORIM_CHEST_HERO                    = 194314,
+    GO_HODIR_CHEST_NORMAL                   = 194307,
+    GO_HODIR_CHEST_NORMAL_HERO              = 194308,
+    GO_HODIR_CHEST_HARD                     = 194200,
+    GO_HODIR_CHEST_HARD_HERO                = 194201,
+    GO_MIMIRON_CHEST                        = 194789,
+    GO_MIMIRON_CHEST_HARD                   = 194957,
+    GO_MIMIRON_CHEST_HERO                   = 194956,
+    GO_MIMIRON_CHEST_HERO_HARD              = 194958,
+    GO_ALGALON_CHEST                        = 194821,
+    GO_ALGALON_CHEST_HERO                   = 194822,
+
+    // Flame Leviathan
+    GO_REPAIR_STATION_TRAP                  = 194262,
+    GO_LEVIATHAN_DOORS                      = 194630,
+    GO_LIGHTNING_WALL1                      = 194905,
+    GO_LIGHTNING_WALL2                      = 194416,
+    GO_MIMIRONS_TARGETTING_CRYSTAL          = 194705,
+    GO_FREYAS_TARGETTING_CRYSTAL            = 194704,
+    GO_HODIRS_TARGETTING_CRYSTAL            = 194707,
+    GO_THORIMS_TARGETTING_CRYSTAL           = 194706,
+    GO_MIMIRONS_GENERATOR                   = 194664,
+    GO_FREYAS_GENERATOR                     = 194663,
+    GO_HODIRS_GENERATOR                     = 194665,
+    GO_THORIMS_GENERATOR                    = 194666,
+    GO_STORM_BEACON_FIRST                   = 194398,
+    GO_STORM_BEACON_LAST                    = 194415,
+    GO_STORM_BEACON_FORMATION_GROUNDS       = 194506,
+
+    // Middle
+    GO_ARCHIVUM_DOORS                       = 194556,
+    GO_ASSEMBLY_DOORS                       = 194554,
+    GO_KOLOGARN_BRIDGE                      = 194232,
+    GO_KEEPERS_GATE                         = 194255,
+    GO_XT002_DOORS                          = 194631,
+
+    // Tram
+    GO_MIMIRON_TRAM                         = 194675,
+    GO_MIMIRON_ACTIVATE_TRAM                = 194437,
+    GO_MIMIRON_CALL_TRAM_CENTER             = 194914,
+    GO_MIMIRON_CALL_TRAM_MIMIRON            = 194912,
+    GO_MIMIRON_TRAM_ROCKET_BOOSTER          = 194904,
+    GO_DOODAD_UL_TRAIN_TURNAROUND01         = 194915, // center
+    GO_DOODAD_UL_TRAIN_TURNAROUND02         = 194913, // mimiron
+
+    // Mimiron, Hodir, Vezax
+    GO_MIMIRON_ELEVATOR                     = 194749,
+    GO_MIMIRON_DOOR_1                       = 194776,
+    GO_MIMIRON_DOOR_2                       = 194774,
+    GO_MIMIRON_DOOR_3                       = 194775,
+    GO_HODIR_FROZEN_DOOR                    = 194441,
+    GO_HODIR_DOOR                           = 194634,
+    GO_HODIR_FRONTDOOR                      = 194442,
+    GO_VEZAX_DOOR                           = 194750,
+
+    GO_SNOW_MOUND                           = 194907,
+
+    // Razorscale
+    GO_RAZOR_HARPOON_1                      = 194519,
+    GO_RAZOR_HARPOON_2                      = 194541,
+    GO_RAZOR_HARPOON_3                      = 194542,
+    GO_RAZOR_HARPOON_4                      = 194543,
+    GO_RAZOR_BROKEN_HARPOON                 = 194565,
+    GO_RAZOR_MOLE_MACHINE                   = 194316,
+
+    // Thorim
+    GO_ARENA_LEVER_GATE                     = 194560,
+    GO_ARENA_LEVER                          = 194264,
+    GO_ARENA_FENCE                          = 194559,
+    GO_FIRST_COLOSSUS_DOORS                 = 194557,
+    GO_SECOND_COLOSSUS_DOORS                = 194558,
+
+    // Yogg-Saron
+    GO_YOGG_SARON_DOORS                     = 194773,
+
+    // Algalon the Observer
+    GO_CELESTIAL_PLANETARIUM_ACCESS_10      = 194628,
+    GO_CELESTIAL_PLANETARIUM_ACCESS_25      = 194752,
+    GO_DOODAD_UL_SIGILDOOR_01               = 194767,
+    GO_DOODAD_UL_SIGILDOOR_02               = 194911,
+    GO_DOODAD_UL_SIGILDOOR_03               = 194910,
+    GO_DOODAD_UL_UNIVERSEFLOOR_01           = 194715,
+    GO_DOODAD_UL_UNIVERSEFLOOR_02           = 194716,
+    GO_DOODAD_UL_UNIVERSEGLOBE01            = 194148,
+    GO_DOODAD_UL_ULDUAR_TRAPDOOR_03         = 194253,
+    GO_GIFT_OF_THE_OBSERVER_10              = 194821,
+    GO_GIFT_OF_THE_OBSERVER_25              = 194822,
+};
+
+enum UlduarPersistentData
+{
+    PERSISTENT_DATA_WATCHERS_MASK           = 0,
+    PERSISTENT_DATA_CONSPEEDATORY,
+    PERSISTENT_DATA_UNBROKEN,
+    PERSISTENT_DATA_ALGALON_TIMER,
+    PERSISTENT_DATA_C_OF_ULDUAR_MASK,
+    PERSISTENT_DATA_MAGE_BARRIER,
+    PERSISTENT_DATA_ALGALON_FIRST_PULL,
+    // Set when Brann's action list unlocks the salvaged vehicles, they stay boardable for the rest of the lockout
+    PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE,
+    MAX_PERSISTENT_DATA
+};
+
+enum UlduarMisc
+{
+    // Flame Leviathan
+    VEHICLE_POS_START                       = 0,
+    VEHICLE_POS_LEVIATHAN                   = 1,
+    VEHICLE_POS_NONE                        = 2,
+
+    // Stored in PERSISTENT_DATA_MAGE_BARRIER by Brann's intro script once the Kirin Tor drop the shield
+    MAGE_BARRIER_LOWERED                    = 3,
+
+    // creature_summon_groups entries for the post-Leviathan outro
+    SUMMON_GROUP_LEVIATHAN_OUTRO            = 0, // Brann + crew in formation (reload; also the march destinations)
+    SUMMON_GROUP_LEVIATHAN_OUTRO_MARCH      = 1, // crew at the gate, runs into formation (kill)
+    SUMMON_GROUP_LEVIATHAN_OUTRO_RHYDIAN    = 2,
+    SUMMON_GROUP_LEVIATHAN_OUTRO_MACHINE    = 3, // Brann's Flying Machine, airborne (kill)
+    SUMMON_GROUP_LEVIATHAN_OUTRO_BRANN      = 4, // Brann at the landed machine (kill)
+    SUMMON_GROUP_LEVIATHAN_OUTRO_MAGES      = 5, // 12 Kirin Tor Mages flanking Brann's spot
+    SUMMON_GROUP_LEVIATHAN_OUTRO_BATTLE_MAGES = 7, // 2 sustaining the portal + 1 at the Formation Grounds teleporter
+
+    // gameobject_summon_groups: the Dalaran portal behind the formation
+    GO_SUMMON_GROUP_LEVIATHAN_PORTAL        = 1,
+
+    // waypoint_data paths: Brann's walk from the machine to his spot, Rhydian's walk to Brann's side,
+    // and the flying machine's approach arc over the grounds
+    PATH_BRANN_FORMATION_GROUNDS            = 341190,
+    PATH_RHYDIAN_TO_BRANN                   = 336960,
+    PATH_FLYING_MACHINE_APPROACH            = 341200,
+
+    // Gossip Keepers, Kirin Tor Mages: teleport-in flash
+    SPELL_SIMPLE_TELEPORT_VISUAL            = 12980,
+
+    // Kirin Tor Battle-Mages sustaining the Dalaran portal
+    SPELL_ARCANE_CHANNELING                 = 39550,
+
+    EVENT_TOWER_OF_STORM_DESTROYED          = 21031,
+    EVENT_TOWER_OF_FROST_DESTROYED          = 21032,
+    EVENT_TOWER_OF_FLAMES_DESTROYED         = 21033,
+    EVENT_TOWER_OF_LIFE_DESTROYED           = 21030,
+
+    // Sent by Shatter Chest (62502), triggered by Hodir's hard mode timer missile (62501)
+    EVENT_HODIR_SHATTER_CHEST               = 20907,
+
+    ACTION_LEVIATHAN_REFRESH_TOWERS         = -1,
+    ACTION_TOWER_OF_STORM_DESTROYED         = 1,
+    ACTION_TOWER_OF_FROST_DESTROYED         = 2,
+    ACTION_TOWER_OF_FLAMES_DESTROYED        = 3,
+    ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
+
+    EVENT_UPDATE_ALGALON_TIMER              = 1,
+    EVENT_RESUMMON_ALGALON                  = 2,
+    ACTION_FEEDS_ON_TEARS_FAILED            = 0,
+    ACTION_INIT_ALGALON                     = 1,
+    ACTION_DESPAWN_ALGALON                  = 2,
+    ACTION_START_INTRO                      = 3,
+
+    TIMER_ALGALON_DEFEATED                  = 300,
+    TIMER_ALGALON_TO_SUMMON                 = 200,
+    TIMER_ALGALON_SUMMONED                  = 100,
+
+    // Algalon the Observer, Freya, Hodir, Mimiron, Thorim, Gossip Keepers
+    SPELL_TELEPORT                          = 62940,
+
+    // Freya, Hodir, Mimiron, Thorim
+    EVENT_KEEPER_TELEPORTED                 = 62941,
+
+    // Ancient Gate
+    NPC_ANCIENT_GATE_WORLD_TRIGGER          = 22515,
+    EMOTE_ANCIENT_GATE_UNLOCKED             = 19,
+
+    // Yogg-Saron
+    ACTION_SARA_UPDATE_SUMMON_KEEPERS       = 4,
+    KEEPER_FREYA                            = 0,
+    KEEPER_HODIR                            = 1,
+    KEEPER_MIMIRON                          = 2,
+    KEEPER_THORIM                           = 3,
+
+    // Achievement
+    SPELL_DWARFAGEDDON                      = 65387, // not exists in dbc
+};
+
+Position const AlgalonSummonPos = {1632.531f, -304.8516f, 450.1123f, 1.530165f};
+Position const AlgalonLandPos   = {1632.668f, -302.7656f, 417.3211f, 1.530165f};
+
+template <class AI, class T>
+inline AI* GetUlduarAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, UlduarScriptName);
+}
+
+#define RegisterUlduarCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetUlduarAI)
+
+#endif
