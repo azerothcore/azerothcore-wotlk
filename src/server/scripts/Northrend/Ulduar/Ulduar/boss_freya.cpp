@@ -281,7 +281,7 @@ struct boss_freya : public BossAI
         _lumberjacked = 0;
         _spawnedAmount = 0;
         _trioDown = 0;
-        _setPermutation = urand(0, 5);
+        _setPermutation = 0;
         _backToNature = true;
         _deforestation = 0;
         _aliveAddsCount = 0;
@@ -368,6 +368,9 @@ struct boss_freya : public BossAI
         ++_currentSetId;
         _currentTrioDown = 0;
         Talk(EMOTE_ALLIES_OF_NATURE);
+
+        if (_spawnedAmount % 3 == 0)
+            _setPermutation = urand(0, 5);
 
         static constexpr uint8 permTable[6][3] = {
             {GROUP_TRIO, GROUP_CONSERVATOR, GROUP_LASHERS},
@@ -993,6 +996,19 @@ struct boss_freya_iron_root : public NullCreatureAI
     boss_freya_iron_root(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
     void JustDied(Unit* /*killer*/) override
+    {
+        ReleaseRootedPlayer();
+    }
+
+    // The root aura is infinite and self-cast by the victim, so nothing engine-side
+    // removes it; a root despawned without being killed must free its victim too
+    void OnDespawn() override
+    {
+        ReleaseRootedPlayer();
+    }
+
+private:
+    void ReleaseRootedPlayer()
     {
         if (!me->IsSummon())
             return;
