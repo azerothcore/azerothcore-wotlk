@@ -2,7 +2,7 @@
 -- LBRS patrol corrections from 2.5.6.69110 sniff dump_2.5.6.69110_2026-08-26_11-50-34.pkt
 
 -- Add the four-creature Firebrand camp missing from the tunnel between the Smolderthorn and Firebrand areas.
-SET @CGUID := 5300679;
+SET @CGUID := 12829;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID AND @CGUID + 3 AND `id` IN (9259, 9261, 9262);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
