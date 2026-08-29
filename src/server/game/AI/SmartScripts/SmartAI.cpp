@@ -1365,7 +1365,7 @@ void SmartAI::WaypointPathEnded(uint32 nodeId, uint32 pathId)
 
 void SmartAI::DistancingEnded()
 {
-    SetCurrentRangeMode(true, _pendingDistancing);
+    SetCurrentRangeMode(_currentRangeMode, _attackDistance);
     _pendingDistancing = 0.f;
 }
 
