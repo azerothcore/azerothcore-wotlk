@@ -20,11 +20,14 @@
 #include "EventMap.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "MapDefines.h"
 #include "Player.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "sunken_temple.h"
+
+static constexpr float EranikusDragonkinAggroRange = SIZE_OF_GRIDS;
 
 class instance_sunken_temple : public InstanceMapScript
 {
@@ -124,12 +127,14 @@ public:
                     }
                     break;
                 case DATA_ERANIKUS_FIGHT:
+                    // The northern dragonkin are beyond the default combat range and may be in an unloaded grid.
+                    if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
+                        instance->LoadGridsInRange(*eranikus, EranikusDragonkinAggroRange);
+
                     for (ObjectGuid const& guid : _dragonkinList)
-                    {
                         if (Creature* creature = instance->GetCreature(guid))
-                            if (instance->IsGridLoaded(creature->GetPositionX(), creature->GetPositionY()))
-                                creature->SetInCombatWithZone();
-                    }
+                            if (creature->IsAIEnabled)
+                                creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
                     break;
                 case TYPE_ATAL_ALARION:
                 case TYPE_JAMMAL_AN:
