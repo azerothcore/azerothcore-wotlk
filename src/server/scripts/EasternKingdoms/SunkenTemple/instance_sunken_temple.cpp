@@ -25,15 +25,18 @@
 #include "Player.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "ThreatManager.h"
 #include "Unit.h"
 #include "sunken_temple.h"
 
 static constexpr float EranikusDragonkinAggroRange = SIZE_OF_GRIDS;
-static constexpr float EranikusDragonkinChaseRange = 60.0f;
+static constexpr float EranikusDragonkinRallySpeed = 12.4f;
+static constexpr float EranikusDragonkinRallyTolerance = 3.0f;
+static Position const EranikusDragonkinRallyPosition = { -659.60144f, -32.0738f, -90.8352f };
 
 enum Events
 {
-    EVENT_ERANIKUS_DRAGONKIN_AGGRO = 1
+    EVENT_ERANIKUS_DRAGONKIN_RALLY = 1
 };
 
 enum Points
@@ -58,6 +61,9 @@ public:
             _statuePhase = 0;
             _defendersKilled = 0;
             memset(&_encounters, 0, sizeof(_encounters));
+            _calledDragonkin.clear();
+            _rallyingDragonkin.clear();
+            _events.Reset();
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -83,6 +89,8 @@ public:
             {
                 unit->setActive(false);
                 _dragonkinList.remove(unit->GetGUID());
+                _calledDragonkin.erase(unit->GetGUID());
+                _rallyingDragonkin.erase(unit->GetGUID());
             }
             if (unit->GetEntry() == NPC_JAMMAL_AN_THE_PROPHET)
             {
@@ -143,15 +151,9 @@ public:
                     break;
                 case DATA_ERANIKUS_FIGHT:
                 {
-                    Creature* eranikus = nullptr;
-                    Unit* target = nullptr;
                     // The northern dragonkin are beyond the default combat range and may be in unloaded grids.
                     LoadDragonkinGrids();
-                    if ((eranikus = instance->GetCreature(_shadeOfEranikusGUID)))
-                        target = eranikus->GetVictim();
-
-                    if (UpdateDragonkinCombat(true, eranikus, target))
-                        _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
+                    StartDragonkinRally();
                     break;
                 }
                 case TYPE_ATAL_ALARION:
@@ -192,21 +194,10 @@ public:
                         instance->SummonGameObject(GO_IDOL_OF_HAKKAR, -476.269317626953125f, 94.4119873046875f, -189.729660034179687f, 1.588248729705810546f, 0.0f, 0.0f, 0.713250160217285156f, 0.700909554958343505f, 0); // VerifiedBuild 50250
 
                     break;
-                case EVENT_ERANIKUS_DRAGONKIN_AGGRO:
-                {
-                    bool engage = false;
-                    Creature* eranikus = nullptr;
-                    Unit* target = nullptr;
-                    if ((eranikus = instance->GetCreature(_shadeOfEranikusGUID)))
-                    {
-                        engage = eranikus->IsEngaged();
-                        target = eranikus->GetVictim();
-                    }
-
-                    if (UpdateDragonkinCombat(engage, eranikus, target))
-                        _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
+                case EVENT_ERANIKUS_DRAGONKIN_RALLY:
+                    if (UpdateDragonkinRally())
+                        _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_RALLY, 1s);
                     break;
-                }
             }
         }
 
@@ -237,6 +228,8 @@ public:
         ObjectGuid _jammalanGUID;
         ObjectGuid _shadeOfEranikusGUID;
         GuidList _dragonkinList;
+        GuidSet _calledDragonkin;
+        GuidSet _rallyingDragonkin;
         EventMap _events;
 
         void LoadDragonkinGrids()
@@ -257,61 +250,116 @@ public:
             }
         }
 
-        bool UpdateDragonkinCombat(bool engage, Creature const* eranikus, Unit* target)
+        void MoveDragonkinToRally(Creature* creature)
         {
-            bool updatePending = false;
+            creature->GetMotionMaster()->MovePoint(POINT_ERANIKUS_DRAGONKIN_RALLY, EranikusDragonkinRallyPosition,
+                FORCED_MOVEMENT_RUN, EranikusDragonkinRallySpeed, true, false);
+        }
 
+        void StartDragonkinRally()
+        {
+            _events.CancelEvent(EVENT_ERANIKUS_DRAGONKIN_RALLY);
             for (ObjectGuid const& guid : _dragonkinList)
             {
                 Creature* creature = instance->GetCreature(guid);
-                if (!creature)
+                if (!creature || !creature->IsAlive() || creature->IsEngaged() || creature->IsInEvadeMode() || !creature->IsAIEnabled)
                     continue;
 
-                if (!creature->IsAlive())
-                {
-                    creature->setActive(false);
-                    continue;
-                }
-
-                if (engage)
-                {
-                    // Active objects continue updating while their grid has no nearby players.
-                    creature->setActive(true);
-                    bool const needsRally = eranikus && creature->GetDistance(eranikus) > EranikusDragonkinChaseRange;
-                    if (needsRally)
-                        creature->AddUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
-                    if (!creature->IsEngaged() && !creature->IsInEvadeMode() && creature->IsAIEnabled)
-                        creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
-                    // DoZoneInCombat seeds threat, but target selection normally waits for the next AI update.
-                    if (!creature->GetVictim() && !creature->IsInEvadeMode() && creature->IsAIEnabled && target && creature->IsValidAttackTarget(target))
-                        creature->AI()->AttackStart(target);
-
-                    if (needsRally && !creature->IsInEvadeMode())
-                    {
-                        // A direct chase through the circular temple can exceed the path generator's
-                        // bounded path. Move along its safe partial paths, then start a normal chase.
-                        if (creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE || creature->movespline->Finalized())
-                            creature->GetMotionMaster()->MovePoint(POINT_ERANIKUS_DRAGONKIN_RALLY, eranikus->GetPosition(), FORCED_MOVEMENT_RUN, 0.0f, true, false);
-                    }
-                    else if (!needsRally)
-                    {
-                        creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
-                        if (target && creature->IsValidAttackTarget(target) && creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
-                            creature->GetMotionMaster()->MoveChase(target);
-                    }
-                    updatePending = true;
-                }
-                else
-                {
-                    creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
-                    if (creature->IsEngaged() || creature->IsInEvadeMode())
-                        updatePending = true;
-                    else
-                        creature->setActive(false);
-                }
+                // The official movement runs to this fixed point beside Eranikus rather than
+                // chasing his current victim. Existing combat must still override the rally.
+                creature->setActive(true);
+                creature->AddUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+                creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
+                MoveDragonkinToRally(creature);
+                _calledDragonkin.insert(guid);
+                _rallyingDragonkin.insert(guid);
             }
 
-            return updatePending;
+            if (!_calledDragonkin.empty())
+                _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_RALLY, 1s);
+        }
+
+        bool WasDragonkinAttacked(Creature* creature) const
+        {
+            if (creature->hasLootRecipient())
+                return true;
+
+            for (ThreatReference const* reference : creature->GetThreatMgr().GetUnsortedThreatList())
+                if (reference->GetThreat() > 0.0f)
+                    return true;
+
+            return false;
+        }
+
+        bool UpdateDragonkinRally()
+        {
+            Creature const* eranikus = instance->GetCreature(_shadeOfEranikusGUID);
+            bool const eranikusEngaged = eranikus && eranikus->IsEngaged();
+
+            for (auto itr = _calledDragonkin.begin(); itr != _calledDragonkin.end();)
+            {
+                ObjectGuid const guid = *itr;
+                Creature* creature = instance->GetCreature(guid);
+                if (!creature || !creature->IsAlive())
+                {
+                    _rallyingDragonkin.erase(guid);
+                    itr = _calledDragonkin.erase(itr);
+                    continue;
+                }
+
+                bool const wasAttacked = WasDragonkinAttacked(creature);
+                bool const isRallying = _rallyingDragonkin.contains(guid);
+
+                if (wasAttacked && isRallying)
+                {
+                    // Damage from a player turns the scripted movement into ordinary combat.
+                    creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+                    _rallyingDragonkin.erase(guid);
+                    if (Unit* victim = creature->GetVictim())
+                        creature->GetMotionMaster()->MoveChase(victim);
+                }
+                else if (!eranikusEngaged && !wasAttacked)
+                {
+                    // Untouched dragonkin evade and resume their original movement after a wipe.
+                    creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+                    _rallyingDragonkin.erase(guid);
+                    if (creature->IsEngaged() && !creature->IsInEvadeMode() && creature->IsAIEnabled)
+                        creature->AI()->EnterEvadeMode(CreatureAI::EVADE_REASON_OTHER);
+                }
+                else if (isRallying)
+                {
+                    if (!creature->IsEngaged() || creature->IsInEvadeMode())
+                    {
+                        creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+                        _rallyingDragonkin.erase(guid);
+                    }
+                    else if (creature->GetDistance(EranikusDragonkinRallyPosition) <= EranikusDragonkinRallyTolerance)
+                    {
+                        creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+                        _rallyingDragonkin.erase(guid);
+                        if (Unit* victim = creature->GetVictim())
+                            creature->GetMotionMaster()->MoveChase(victim);
+                    }
+                    else if (creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE || creature->movespline->Finalized())
+                    {
+                        // Continue from a safe partial path instead of reproducing the looping path seen in the capture.
+                        MoveDragonkinToRally(creature);
+                    }
+                }
+
+                if (!_rallyingDragonkin.contains(guid) && !creature->IsEngaged() && !creature->IsInEvadeMode())
+                {
+                    creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+                    if (creature->isActiveObject())
+                        creature->setActive(false);
+                    itr = _calledDragonkin.erase(itr);
+                    continue;
+                }
+
+                ++itr;
+            }
+
+            return !_calledDragonkin.empty();
         }
     };
 
