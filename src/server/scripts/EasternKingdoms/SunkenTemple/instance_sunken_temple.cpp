@@ -21,6 +21,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "MapDefines.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -137,12 +138,10 @@ public:
                 case DATA_ERANIKUS_FIGHT:
                 {
                     Unit* target = nullptr;
-                    // The northern dragonkin are beyond the default combat range and may be in an unloaded grid.
+                    // The northern dragonkin are beyond the default combat range and may be in unloaded grids.
+                    LoadDragonkinGrids();
                     if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
-                    {
-                        instance->LoadGridsInRange(*eranikus, EranikusDragonkinAggroRange);
                         target = eranikus->GetVictim();
-                    }
 
                     if (UpdateDragonkinCombat(true, target))
                         _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
@@ -231,6 +230,24 @@ public:
         ObjectGuid _shadeOfEranikusGUID;
         GuidList _dragonkinList;
         EventMap _events;
+
+        void LoadDragonkinGrids()
+        {
+            CellObjectGuidsMap const& mapSpawns = sObjectMgr->GetMapObjectGuids(instance->GetId(), instance->GetSpawnMode());
+            for (auto const& mapSpawn : mapSpawns)
+            {
+                for (ObjectGuid::LowType const spawnId : mapSpawn.second.creatures)
+                {
+                    CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
+                    CreatureTemplate const* creatureTemplate = data ? sObjectMgr->GetCreatureTemplate(data->id) : nullptr;
+                    if (!creatureTemplate || creatureTemplate->type != CREATURE_TYPE_DRAGONKIN || creatureTemplate->Entry == NPC_SHADE_OF_ERANIKUS)
+                        continue;
+
+                    instance->LoadGrid(data->posX, data->posY);
+                    break;
+                }
+            }
+        }
 
         bool UpdateDragonkinCombat(bool engage, Unit* target)
         {
