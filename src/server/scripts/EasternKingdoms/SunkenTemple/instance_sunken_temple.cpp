@@ -135,13 +135,19 @@ public:
                     }
                     break;
                 case DATA_ERANIKUS_FIGHT:
+                {
+                    Unit* target = nullptr;
                     // The northern dragonkin are beyond the default combat range and may be in an unloaded grid.
                     if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
+                    {
                         instance->LoadGridsInRange(*eranikus, EranikusDragonkinAggroRange);
+                        target = eranikus->GetVictim();
+                    }
 
-                    if (UpdateDragonkinCombat(true))
+                    if (UpdateDragonkinCombat(true, target))
                         _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
                     break;
+                }
                 case TYPE_ATAL_ALARION:
                 case TYPE_JAMMAL_AN:
                 case TYPE_HAKKAR_EVENT:
@@ -183,10 +189,14 @@ public:
                 case EVENT_ERANIKUS_DRAGONKIN_AGGRO:
                 {
                     bool engage = false;
+                    Unit* target = nullptr;
                     if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
+                    {
                         engage = eranikus->IsEngaged();
+                        target = eranikus->GetVictim();
+                    }
 
-                    if (UpdateDragonkinCombat(engage))
+                    if (UpdateDragonkinCombat(engage, target))
                         _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
                     break;
                 }
@@ -222,7 +232,7 @@ public:
         GuidList _dragonkinList;
         EventMap _events;
 
-        bool UpdateDragonkinCombat(bool engage)
+        bool UpdateDragonkinCombat(bool engage, Unit* target)
         {
             bool updatePending = false;
 
@@ -244,6 +254,9 @@ public:
                     creature->setActive(true);
                     if (!creature->IsEngaged() && !creature->IsInEvadeMode() && creature->IsAIEnabled)
                         creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
+                    // DoZoneInCombat seeds threat, but target selection normally waits for the next AI update.
+                    if (!creature->GetVictim() && !creature->IsInEvadeMode() && creature->IsAIEnabled && target && creature->IsValidAttackTarget(target))
+                        creature->AI()->AttackStart(target);
                     updatePending = true;
                 }
                 else if (creature->IsEngaged() || creature->IsInEvadeMode())
