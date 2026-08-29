@@ -1,11 +1,19 @@
 -- Quest "The Hunter and the Prince" (13361, 13400)
 DELETE FROM `gameobject` WHERE `guid` = 59 AND `id` = 194023;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
-(59, 194023, 571, 0, 0, 1, 1, 6335.5, 2347.8, 477.23, 3.4, 0, 0, -0.99166481, 0.12884449, 120, 255, 1, '', 0, NULL);
+(59, 194023, 571, 0, 0, 1, 1, 6356.605, 2327.435, 473.636, 5.497788906097412, 0, 0, -0.3827, 0.9239, 120, 255, 1, '', 46368, NULL);
 
 DELETE FROM `event_scripts` WHERE `id` = 20723;
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
-(20723, 0, 10, 32588, 60000, 0, 6314.5, 2342.8, 479.4, 0.22);
+
+UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 194023;
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 194023) AND (`source_type` = 1);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(194023, 1, 0, 0, 71, 0, 100, 0, 20723, 0, 0, 0, 0, 0, 12, 32588, 3, 60000, 0, 0, 0, 8, 0, 0, 0, 0, 6314.5, 2342.8, 479.4, 0.22, 'Bloodstained Stone - On Event 20723 Inform - Summon Illidan Stormrage');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` = 194023) AND (`SourceId` = 1) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 32588) AND (`ConditionValue2` = 50) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 194023, 1, 0, 29, 1, 32588, 50, 0, 1, 0, 0, '', 'Bloodstained Stone - Summon Illidan Stormrage if None is Alive Nearby');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 32588) AND (`source_type` = 0);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
