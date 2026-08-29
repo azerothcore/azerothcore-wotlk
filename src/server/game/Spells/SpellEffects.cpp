@@ -2076,9 +2076,8 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
                 return;
 
             case GAMEOBJECT_TYPE_CHEST:
-                // A linked trap belongs to the current loot generation and must not trigger when existing loot is reopened.
-                if (uint32 trapEntry = gameObjTarget->GetGOInfo()->chest.linkedTrapId;
-                    trapEntry && gameObjTarget->getLootState() == GO_READY)
+                // triggering linked GO
+                if (uint32 trapEntry = gameObjTarget->GetGOInfo()->chest.linkedTrapId)
                     gameObjTarget->TriggeringLinkedGameObject(trapEntry, m_caster);
 
             // Don't return, let loots been taken
