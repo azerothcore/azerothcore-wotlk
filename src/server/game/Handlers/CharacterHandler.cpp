@@ -716,11 +716,13 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     // Stock client packets remain guid-only.
     uint32 clusterGuildId = 0;
     uint8 clusterGuildRank = 0;
+    bool hasClusterGuildExtras = false;
     if (sToCloud9Sidecar->ClusterModeEnabled()
         && recvData.rpos() + sizeof(uint32) + sizeof(uint8) <= recvData.size())
     {
         recvData >> clusterGuildId;
         recvData >> clusterGuildRank;
+        hasClusterGuildExtras = true;
     }
 
     // The ownership check is delegated to the gateway in cluster mode, but a
@@ -810,8 +812,9 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
             p->SetSession(this);
             delete p->PlayerTalkClass;
             p->PlayerTalkClass = new PlayerMenu(p->GetSession());
-            // Cluster reconnect: re-stamp guild fields from the login packet.
-            if (sToCloud9Sidecar->ClusterModeEnabled())
+            // Cluster reconnect: re-stamp only when the gateway sent a full guild id+rank tail.
+            // A guid-only or short packet must not wipe live fields with the 0/0 defaults.
+            if (hasClusterGuildExtras)
             {
                 if (clusterGuildRank >= GUILD_RANKS_MAX_COUNT)
                 {
