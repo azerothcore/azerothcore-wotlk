@@ -1,4 +1,4 @@
--- Kirtonos the Herald should always drop two equipment items: one boss rare and either another boss rare or a level-appropriate uncommon item
+-- Kirtonos the Herald should always drop two equipment items.
 DELETE FROM `creature_loot_template` WHERE `Entry` = 10506 AND (`Item` IN (13955, 13956, 13957, 13960, 13967, 13969, 13983, 14024, 16734) OR (`Item` = 1 AND `Reference` = 1025963));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (10506, 13956, 0, 18.44, 0, 1, 1, 1, 1, 'Kirtonos the Herald - Clutch of Andros'),
