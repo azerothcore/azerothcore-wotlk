@@ -29,10 +29,16 @@
 #include "sunken_temple.h"
 
 static constexpr float EranikusDragonkinAggroRange = SIZE_OF_GRIDS;
+static constexpr float EranikusDragonkinChaseRange = 60.0f;
 
 enum Events
 {
     EVENT_ERANIKUS_DRAGONKIN_AGGRO = 1
+};
+
+enum Points
+{
+    POINT_ERANIKUS_DRAGONKIN_RALLY = 1
 };
 
 class instance_sunken_temple : public InstanceMapScript
@@ -137,13 +143,14 @@ public:
                     break;
                 case DATA_ERANIKUS_FIGHT:
                 {
+                    Creature* eranikus = nullptr;
                     Unit* target = nullptr;
                     // The northern dragonkin are beyond the default combat range and may be in unloaded grids.
                     LoadDragonkinGrids();
-                    if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
+                    if ((eranikus = instance->GetCreature(_shadeOfEranikusGUID)))
                         target = eranikus->GetVictim();
 
-                    if (UpdateDragonkinCombat(true, target))
+                    if (UpdateDragonkinCombat(true, eranikus, target))
                         _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
                     break;
                 }
@@ -188,14 +195,15 @@ public:
                 case EVENT_ERANIKUS_DRAGONKIN_AGGRO:
                 {
                     bool engage = false;
+                    Creature* eranikus = nullptr;
                     Unit* target = nullptr;
-                    if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
+                    if ((eranikus = instance->GetCreature(_shadeOfEranikusGUID)))
                     {
                         engage = eranikus->IsEngaged();
                         target = eranikus->GetVictim();
                     }
 
-                    if (UpdateDragonkinCombat(engage, target))
+                    if (UpdateDragonkinCombat(engage, eranikus, target))
                         _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
                     break;
                 }
@@ -249,7 +257,7 @@ public:
             }
         }
 
-        bool UpdateDragonkinCombat(bool engage, Unit* target)
+        bool UpdateDragonkinCombat(bool engage, Creature const* eranikus, Unit* target)
         {
             bool updatePending = false;
 
@@ -269,17 +277,38 @@ public:
                 {
                     // Active objects continue updating while their grid has no nearby players.
                     creature->setActive(true);
+                    bool const needsRally = eranikus && creature->GetDistance(eranikus) > EranikusDragonkinChaseRange;
+                    if (needsRally)
+                        creature->AddUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
                     if (!creature->IsEngaged() && !creature->IsInEvadeMode() && creature->IsAIEnabled)
                         creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
                     // DoZoneInCombat seeds threat, but target selection normally waits for the next AI update.
                     if (!creature->GetVictim() && !creature->IsInEvadeMode() && creature->IsAIEnabled && target && creature->IsValidAttackTarget(target))
                         creature->AI()->AttackStart(target);
+
+                    if (needsRally && !creature->IsInEvadeMode())
+                    {
+                        // A direct chase through the circular temple can exceed the path generator's
+                        // bounded path. Move along its safe partial paths, then start a normal chase.
+                        if (creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE || creature->movespline->Finalized())
+                            creature->GetMotionMaster()->MovePoint(POINT_ERANIKUS_DRAGONKIN_RALLY, eranikus->GetPosition(), FORCED_MOVEMENT_RUN, 0.0f, true, false);
+                    }
+                    else if (!needsRally)
+                    {
+                        creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+                        if (target && creature->IsValidAttackTarget(target) && creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
+                            creature->GetMotionMaster()->MoveChase(target);
+                    }
                     updatePending = true;
                 }
-                else if (creature->IsEngaged() || creature->IsInEvadeMode())
-                    updatePending = true;
                 else
-                    creature->setActive(false);
+                {
+                    creature->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+                    if (creature->IsEngaged() || creature->IsInEvadeMode())
+                        updatePending = true;
+                    else
+                        creature->setActive(false);
+                }
             }
 
             return updatePending;
