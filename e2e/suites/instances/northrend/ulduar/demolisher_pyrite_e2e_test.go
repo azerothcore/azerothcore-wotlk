@@ -50,7 +50,7 @@ func setRaidDifficulty25(t *testing.T, bot *e2eharness.ScenarioBot) {
 	}
 }
 
-func unitEnergy(bot *e2eharness.ScenarioBot, guid uint64) (cur, max uint32) {
+func unitEnergy(bot *e2eharness.ScenarioBot, guid uint64) (cur, maxPower uint32) {
 	obj := bot.World.GetObject(guid)
 	if obj == nil {
 		return 0, 0
@@ -171,18 +171,18 @@ func TestAC_27331_DemolisherSpawnsFullPyrite(t *testing.T) {
 	// no longer judgeable (unsaved solo players share one instance per difficulty).
 	full, empty := 0, 0
 	for _, u := range units {
-		cur, max := unitEnergy(bot, u.GUID)
-		if max != demolisherMaxPyrite {
+		cur, maxPower := unitEnergy(bot, u.GUID)
+		if maxPower != demolisherMaxPyrite {
 			e2eharness.Preconditionf(t, "entry %d 0x%X max pyrite=%d want %d (power type not energy? ScriptName SQL applied?)",
-				u.Entry, u.GUID, max, demolisherMaxPyrite)
+				u.Entry, u.GUID, maxPower, demolisherMaxPyrite)
 		}
 		switch cur {
-		case max:
+		case maxPower:
 			full++
 		case 0:
 			empty++
 		}
-		t.Logf("entry %d 0x%X pyrite %d/%d", u.Entry, u.GUID, cur, max)
+		t.Logf("entry %d 0x%X pyrite %d/%d", u.Entry, u.GUID, cur, maxPower)
 	}
 	if empty == len(units) {
 		e2eharness.ConfirmedBugf(t, 27331, "all %d demolishers and the seat spawned with 0 pyrite, want full", len(demos))
