@@ -29,6 +29,11 @@
 
 static constexpr float EranikusDragonkinAggroRange = SIZE_OF_GRIDS;
 
+enum Events
+{
+    EVENT_ERANIKUS_DRAGONKIN_AGGRO = 1
+};
+
 class instance_sunken_temple : public InstanceMapScript
 {
 public:
@@ -131,10 +136,8 @@ public:
                     if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
                         instance->LoadGridsInRange(*eranikus, EranikusDragonkinAggroRange);
 
-                    for (ObjectGuid const& guid : _dragonkinList)
-                        if (Creature* creature = instance->GetCreature(guid))
-                            if (creature->IsAIEnabled)
-                                creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
+                    if (EngageDragonkin())
+                        _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
                     break;
                 case TYPE_ATAL_ALARION:
                 case TYPE_JAMMAL_AN:
@@ -174,6 +177,11 @@ public:
                         instance->SummonGameObject(GO_IDOL_OF_HAKKAR, -476.269317626953125f, 94.4119873046875f, -189.729660034179687f, 1.588248729705810546f, 0.0f, 0.0f, 0.713250160217285156f, 0.700909554958343505f, 0); // VerifiedBuild 50250
 
                     break;
+                case EVENT_ERANIKUS_DRAGONKIN_AGGRO:
+                    if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
+                        if (eranikus->IsEngaged() && EngageDragonkin())
+                            _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
+                    break;
             }
         }
 
@@ -205,6 +213,29 @@ public:
         ObjectGuid _shadeOfEranikusGUID;
         GuidList _dragonkinList;
         EventMap _events;
+
+        bool EngageDragonkin()
+        {
+            bool retry = false;
+
+            for (ObjectGuid const& guid : _dragonkinList)
+            {
+                Creature* creature = instance->GetCreature(guid);
+                if (!creature || !creature->IsAlive())
+                    continue;
+
+                if (creature->IsInEvadeMode())
+                {
+                    retry = true;
+                    continue;
+                }
+
+                if (creature->IsAIEnabled)
+                    creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
+            }
+
+            return retry;
+        }
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
