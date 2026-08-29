@@ -155,7 +155,7 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
-| instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
+| instances/ulduar | named tele; Freya wave interval; Mechanolift combat drop | P2 | covered (`TestAC_27095_*`, `TestAC_27368_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 #27368 |
 
 ---
 
