@@ -73,7 +73,10 @@ public:
         void OnUnitDeath(Unit* unit) override
         {
             if (unit->IsCreature() && unit->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && unit->GetEntry() != NPC_SHADE_OF_ERANIKUS)
+            {
+                unit->setActive(false);
                 _dragonkinList.remove(unit->GetGUID());
+            }
             if (unit->GetEntry() == NPC_JAMMAL_AN_THE_PROPHET)
             {
                 if (Creature* cr = instance->GetCreature(_shadeOfEranikusGUID))
@@ -136,7 +139,7 @@ public:
                     if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
                         instance->LoadGridsInRange(*eranikus, EranikusDragonkinAggroRange);
 
-                    if (EngageDragonkin())
+                    if (UpdateDragonkinCombat(true))
                         _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
                     break;
                 case TYPE_ATAL_ALARION:
@@ -178,10 +181,15 @@ public:
 
                     break;
                 case EVENT_ERANIKUS_DRAGONKIN_AGGRO:
+                {
+                    bool engage = false;
                     if (Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID))
-                        if (eranikus->IsEngaged() && EngageDragonkin())
-                            _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
+                        engage = eranikus->IsEngaged();
+
+                    if (UpdateDragonkinCombat(engage))
+                        _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_AGGRO, 1s);
                     break;
+                }
             }
         }
 
@@ -214,27 +222,37 @@ public:
         GuidList _dragonkinList;
         EventMap _events;
 
-        bool EngageDragonkin()
+        bool UpdateDragonkinCombat(bool engage)
         {
-            bool retry = false;
+            bool updatePending = false;
 
             for (ObjectGuid const& guid : _dragonkinList)
             {
                 Creature* creature = instance->GetCreature(guid);
-                if (!creature || !creature->IsAlive())
+                if (!creature)
                     continue;
 
-                if (creature->IsInEvadeMode())
+                if (!creature->IsAlive())
                 {
-                    retry = true;
+                    creature->setActive(false);
                     continue;
                 }
 
-                if (creature->IsAIEnabled)
-                    creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
+                if (engage)
+                {
+                    // Active objects continue updating while their grid has no nearby players.
+                    creature->setActive(true);
+                    if (!creature->IsEngaged() && !creature->IsInEvadeMode() && creature->IsAIEnabled)
+                        creature->AI()->DoZoneInCombat(nullptr, EranikusDragonkinAggroRange);
+                    updatePending = true;
+                }
+                else if (creature->IsEngaged() || creature->IsInEvadeMode())
+                    updatePending = true;
+                else
+                    creature->setActive(false);
             }
 
-            return retry;
+            return updatePending;
         }
     };
 
