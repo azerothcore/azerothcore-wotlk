@@ -32,11 +32,13 @@
 static constexpr float EranikusDragonkinAggroRange = SIZE_OF_GRIDS;
 static constexpr float EranikusDragonkinRallySpeed = 12.4f;
 static constexpr float EranikusDragonkinRallyTolerance = 3.0f;
+static constexpr float EranikusWakeDistance = 10.0f;
 static Position const EranikusDragonkinRallyPosition = { -659.60144f, -32.0738f, -90.8352f };
 
 enum Events
 {
-    EVENT_ERANIKUS_DRAGONKIN_RALLY = 1
+    EVENT_ERANIKUS_DRAGONKIN_RALLY = 1,
+    EVENT_ERANIKUS_WAKE_CHECK
 };
 
 enum Points
@@ -64,6 +66,7 @@ public:
             _calledDragonkin.clear();
             _rallyingDragonkin.clear();
             _events.Reset();
+            _events.ScheduleEvent(EVENT_ERANIKUS_WAKE_CHECK, 500ms);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -198,6 +201,10 @@ public:
                     if (UpdateDragonkinRally())
                         _events.ScheduleEvent(EVENT_ERANIKUS_DRAGONKIN_RALLY, 1s);
                     break;
+                case EVENT_ERANIKUS_WAKE_CHECK:
+                    TryWakeEranikus();
+                    _events.ScheduleEvent(EVENT_ERANIKUS_WAKE_CHECK, 500ms);
+                    break;
             }
         }
 
@@ -246,6 +253,32 @@ public:
 
                     instance->LoadGrid(data->posX, data->posY);
                     break;
+                }
+            }
+        }
+
+        void TryWakeEranikus()
+        {
+            Creature* eranikus = instance->GetCreature(_shadeOfEranikusGUID);
+            if (!eranikus || !eranikus->IsAlive() || eranikus->IsEngaged() || eranikus->IsInEvadeMode() || !eranikus->IsAIEnabled || eranikus->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                return;
+
+            for (ObjectGuid const& guid : _dragonkinList)
+            {
+                Creature* dragonkin = instance->GetCreature(guid);
+                if (!dragonkin || !dragonkin->IsAlive() || !dragonkin->IsEngaged() || dragonkin->IsInEvadeMode() || dragonkin->GetDistance(eranikus) > EranikusWakeDistance)
+                    continue;
+
+                Unit* target = dragonkin->GetVictim();
+                if (!target)
+                    target = dragonkin->GetThreatMgr().GetCurrentVictim();
+
+                if (target && eranikus->IsValidAttackTarget(target))
+                {
+                    // In the official capture, Eranikus engages when a fighting dragonkin
+                    // reaches roughly ten yards, then his existing SmartAI calls the others.
+                    eranikus->AI()->AttackStart(target);
+                    return;
                 }
             }
         }
