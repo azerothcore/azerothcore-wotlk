@@ -7,6 +7,8 @@ AzerothCore is a C++ MMORPG server emulator for World of Warcraft 3.3.5a (WotLK)
 - **Do not configure or build unless explicitly asked.** Builds are slow and rarely needed for code changes.
 - **Never edit SQL files outside `data/sql/updates/pending_db_*/` unless explicitly requested.** `data/sql/base/`, `data/sql/archive/`, and `data/sql/updates/db_*/` are immutable.
 - Formatting follows `.editorconfig`: UTF-8, LF, max 120 cols, trailing newline, no trailing whitespace; 4-space indent for C++ (tabs forbidden), 2-space for JSON/YAML/sh/ts/js.
+- **Prefer live-stack e2e to debug/validate player-visible behaviour** when a local auth+world+MySQL stack is available (protocol, combat, quests, loot, death, multi-bot). See `e2e/README.md` and AzerothGhost `e2e/LLM_GUIDE.md`. Do not invent e2e for pure unit-sized logic — see `.agents/docs/e2e-policy.md`.
+- **Scratch e2e only under `e2e/local/`** (gitignored). Never commit throwaway debug tests. Promote keepers into `e2e/suites/` or `e2e/smoke/`.
 - Planning docs go in `.agents/plans/<task-slug>/` (gitignored), named `<task-slug>.<TYPE>.md` (`PLAN`, `REQUIREMENTS`, `ANALYSIS`, …).
 
 ## Mandatory reading per task
@@ -21,6 +23,7 @@ Read the matching doc(s) BEFORE starting the task:
 - Reviewing a changeset or PR → `.agents/docs/code-review.md`
 - Self-reviewing, or opening or updating a PR → also `.agents/docs/self-review-rules.md`
 - Touching a subsystem that has a doc in `.agents/docs/systems/` → read that doc too
+- Writing, debugging, or changing live-stack e2e (`e2e/`) → `e2e/README.md`, `.agents/docs/e2e-policy.md`, and AzerothGhost `e2e/LLM_GUIDE.md` (scratch work → `e2e/local/`)
 - Capturing a lesson or adding/updating agent docs → `.agents/docs/README.md`
 
 ## Repository layout
@@ -32,6 +35,7 @@ Read the matching doc(s) BEFORE starting the task:
 - `src/server/shared/` — code shared by auth and world servers.
 - `src/server/apps/{authserver,worldserver}/` — entry points (ports 3724 and 8085).
 - `src/test/` — unit tests + mocks.
+- `e2e/` — live-stack Go e2e (AzerothGhost harness); see `e2e/README.md`. Scratch/debug tests: `e2e/local/` (gitignored).
 - `data/sql/` — `base/` (historical schema), `updates/db_*/` (merged), `updates/pending_db_*/` (in-flight), `custom/` (gitignored).
 - `modules/` — external modules (see below).
 - `apps/` — helper scripts; `apps/codestyle/` holds the lint scripts.
