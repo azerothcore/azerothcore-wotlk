@@ -139,7 +139,9 @@ void Vehicle::Reset(bool evading /*= false*/)
     else
     {
         ApplyAllImmunities();
-        InstallAllAccessories(evading);
+        // Dead spawns waiting out a respawn timer must not seat live accessories; they are seated on revival.
+        if (_me->IsAlive())
+            InstallAllAccessories(evading);
         if (_usableSeatNum)
             _me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
     }

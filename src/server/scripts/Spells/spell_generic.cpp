@@ -2607,8 +2607,9 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
             default:
             {
                 float totalILvl = player->GetTotalItemLevel();
-                float result = (totalILvl - 2500.0f) / 5.0f / 100.0f;
-                amount = static_cast<int32>(std::max(0.1f, result));
+                float scaling = (totalILvl - 2500.0f) / 5.0f / 100.0f;
+                scaling = std::max(0.1f, scaling);
+                amount = static_cast<int32>(std::round((scaling - 1.0f) * 100.0f));
                 break;
             }
         }
