@@ -21,9 +21,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (32588, 0, 1, 0, 0, 0, 100, 0, 15000, 16000, 15000, 16000, 0, 0, 11, 60744, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - In Combat - Cast \'Immolation\''),
 (32588, 0, 2, 0, 0, 0, 100, 0, 6000, 7000, 6000, 7000, 0, 0, 11, 61101, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - In Combat - Cast \'Pierced Heart\''),
 (32588, 0, 4, 0, 0, 0, 100, 0, 19000, 19000, 19000, 19000, 0, 0, 11, 60742, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - In Combat - Cast \'Shear\''),
-(32588, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 33, 32797, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Quest Credit \'The Prince\'s Destiny\''),
+(32588, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 33, 32797, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Quest Credit \'The Prince\'s Destiny\''),
 (32588, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 61623, 0, 0, 0, 0, 0, 19, 32326, 100, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Remove Aura \'Echoes from the Past\' From Prince Arthas Menethil'),
-(32588, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 61623, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Remove Aura \'Echoes from the Past\' From Loot Recipients');
+(32588, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 61623, 0, 0, 0, 0, 0, 201, 61623, 0, 100, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Remove Aura \'Echoes from the Past\' From Nearby Players');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 32326;
 
