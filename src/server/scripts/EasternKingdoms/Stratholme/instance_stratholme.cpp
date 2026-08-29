@@ -60,7 +60,7 @@ Position const SlaughterPos = { 4032.20f, -3378.06f, 119.75f, 4.67f };
 static constexpr uint8 ScarletThreadSpawnCount = 4;
 static constexpr std::array<ObjectGuid::LowType, ScarletThreadSpawnCount> ScarletThreadSpawnIds =
 {
-    20872, 5714446, 5714447, 5714448
+    238, 239, 240, 241
 };
 
 // uint32 m_uiGateTrapTimers[2][3] = { {0,0,0}, {0,0,0} };
