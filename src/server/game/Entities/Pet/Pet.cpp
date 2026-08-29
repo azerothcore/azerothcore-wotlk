@@ -544,8 +544,14 @@ void Pet::SavePetToDB(PetSaveMode mode)
         trans = CharacterDatabase.BeginTransaction();
         // remove current data
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
+        // Scope the delete to this owner: pet numbers are only as unique as
+        // their number source, and a setup where several worldservers or a
+        // merged/imported database share character_pet can hold colliding
+        // ids — an unscoped DELETE then silently destroys another owner's
+        // pet. Saving a pet may only ever touch this owner's rows.
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID_AND_OWNER);
         stmt->SetData(0, m_charmInfo->GetPetNumber());
+        stmt->SetData(1, ownerLowGUID);
         trans->Append(stmt);
 
         // prevent existence another hunter pet in PET_SAVE_AS_CURRENT and PET_SAVE_NOT_IN_SLOT
