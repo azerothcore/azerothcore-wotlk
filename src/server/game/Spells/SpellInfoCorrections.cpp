@@ -2045,6 +2045,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
+    // Shadow Nova (Sara)
+    ApplySpellFix({ 65719 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
+    });
+
     // Cosmic Smash (Algalon the Observer)
     ApplySpellFix({ 62293 }, [](SpellInfo* spellInfo)
     {
