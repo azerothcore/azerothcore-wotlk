@@ -511,6 +511,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
         me->SetDisplayId(me->GetNativeDisplayId());
         me->SetDisableGravity(true);
         me->SetFaction(FACTION_FRIENDLY);
+        me->SetFullHealth();
         me->ClearUnitState(UNIT_STATE_EVADE);
         EnableSara(false);
 
@@ -775,10 +776,10 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (me->GetHealth() <= damage)
         {
             _secondPhase = true;
-            damage = 0;
+            // leave her at 1 health through the transformation dialogue, the client treats 0 health as dead
+            damage = me->GetHealth() - 1;
 
             events.SetPhase(EVENT_PHASE_TWO);
-            me->SetHealth(me->GetMaxHealth());
             me->SetInCombatWithZone();
             me->SetFaction(FACTION_MONSTER_2);
 
@@ -993,6 +994,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 }
             case EVENT_SARA_P2_SPAWN_START_TENTACLES:
                 {
+                    me->SetFullHealth();
                     me->SetOrientation(M_PI);
                     me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
@@ -1251,7 +1253,7 @@ struct boss_yoggsaron : public ScriptedAI
             me->RemoveAura(SPELL_SHADOW_BARRIER);
 
             events.ScheduleEvent(EVENT_YS_LUNATIC_GAZE, 7s);
-            events.ScheduleEvent(EVENT_YS_SHADOW_BEACON, 20s);
+            events.ScheduleEvent(EVENT_YS_SHADOW_BEACON, 45s);
             events.ScheduleEvent(EVENT_YS_SUMMON_GUARDIAN, 0ms);
             _thirdPhase = true;
 
@@ -1263,7 +1265,7 @@ struct boss_yoggsaron : public ScriptedAI
         }
         else if (param == ACTION_YOGG_SARON_SHADOW_BEACON)
         {
-            events.RescheduleEvent(EVENT_YS_SHADOW_BEACON, 40s);
+            events.RescheduleEvent(EVENT_YS_SHADOW_BEACON, 45s);
         }
         else if (param == ACTION_REMOVE_STUN)
         {
@@ -1308,7 +1310,7 @@ struct boss_yoggsaron : public ScriptedAI
             case EVENT_YS_LUNATIC_GAZE:
                 me->PlayDirectSound(YS_P3_LUNATIC_GAZE);
                 me->CastSpell(me, SPELL_LUNATIC_GAZE_YS, true);
-                events.Repeat(12s);
+                events.Repeat(13s, 22s);
                 break;
             case EVENT_YS_DEAFENING_ROAR:
                 Talk(SAY_YOGG_SARON_DEAFENING_ROAR);
@@ -1814,6 +1816,12 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
     {
         if (!apply)
             passenger->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, passenger));
+
+        // Prevent players from escaping the tentacle's grasp.
+        constexpr uint32 SPELL_BLINK = 1953;
+        constexpr uint32 SPELL_DEMONIC_CIRCLE_TELEPORT = 48020;
+        passenger->ApplySpellImmune(0, IMMUNITY_ID, SPELL_BLINK, apply);
+        passenger->ApplySpellImmune(0, IMMUNITY_ID, SPELL_DEMONIC_CIRCLE_TELEPORT, apply);
     }
 
     void JustDied(Unit*) override
