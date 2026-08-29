@@ -1,7 +1,7 @@
 -- Quest "The Hunter and the Prince" (13361, 13400)
 DELETE FROM `gameobject` WHERE `guid` = 59 AND `id` = 194023;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
-(59, 194023, 571, 0, 0, 1, 1, 6356.605, 2327.435, 473.636, 5.497788906097412, 0, 0, -0.3827, 0.9239, 120, 255, 1, '', 46368, NULL);
+(59, 194023, 571, 0, 0, 1, 1, 6356.605, 2327.435, 473.636, 5.497788906097412, 0, 0, -0.38268280029296875, 0.923879802227020263, 120, 255, 1, '', 46368, NULL);
 
 DELETE FROM `event_scripts` WHERE `id` = 20723;
 
@@ -21,9 +21,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (32588, 0, 1, 0, 0, 0, 100, 0, 15000, 16000, 15000, 16000, 0, 0, 11, 60744, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - In Combat - Cast \'Immolation\''),
 (32588, 0, 2, 0, 0, 0, 100, 0, 6000, 7000, 6000, 7000, 0, 0, 11, 61101, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - In Combat - Cast \'Pierced Heart\''),
 (32588, 0, 4, 0, 0, 0, 100, 0, 19000, 19000, 19000, 19000, 0, 0, 11, 60742, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - In Combat - Cast \'Shear\''),
-(32588, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 33, 32797, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Quest Credit \'The Prince\'s Destiny\''),
+(32588, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 33, 32797, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Quest Credit \'The Prince\'s Destiny\''),
 (32588, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 61623, 0, 0, 0, 0, 0, 19, 32326, 100, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Remove Aura \'Echoes from the Past\' From Prince Arthas Menethil'),
-(32588, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 61623, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Remove Aura \'Echoes from the Past\' From Summoner');
+(32588, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 61623, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidan Stormrage - On Just Died - Remove Aura \'Echoes from the Past\' From Loot Recipients');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 32326;
 
