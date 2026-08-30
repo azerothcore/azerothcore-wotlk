@@ -1200,13 +1200,13 @@ private:
     // sniff fire on a single timestamp, 15-16s apart.
     void ScheduleGhoulSummons()
     {
-        scheduler.Schedule(5s, GROUP_GHOUL, [this](TaskContext context)
+        scheduler.Schedule(15s, 17s, GROUP_GHOUL, [this](TaskContext context)
         {
             // Held while he fights. The sniff volleys land straight through combat, but their
             // ghouls join that same fight, so an ungated volley feeds the wave forever.
             if (me->IsInCombat())
             {
-                context.Repeat(5s);
+                context.Repeat(15s, 17s);
                 return;
             }
 
