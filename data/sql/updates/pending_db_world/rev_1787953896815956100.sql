@@ -56,7 +56,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH, 13, 3925.250000, 727.560974, 104.894997, NULL, 0, 1, 1), -- 82.46y
 (@PATH, 14, 3843.280029, 734.116028, 98.784302, NULL, 0, 1, 1); -- 75.60y back to 1
 
-
 -- Update some creatures
 UPDATE `creature` SET `position_x`=3846.620117, `position_y`=661.976013, `position_z`=60.248100, `orientation`=1.799750, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=50664, `CreateObject`=1 WHERE `guid`=112243 AND `id`=27564;
 UPDATE `creature` SET `position_x`=3852.050049, `position_y`=665.716980, `position_z`=59.091599, `orientation`=2.647580, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=112244 AND `id`=27564;
@@ -614,9 +613,6 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (27751, 0, 9, 27686, 3646.8403, 1125.3961, 89.62334, 2.617993831634521484, 6, 60000, 'HORDE - Geist - path 2768696'),   -- APPROXIMATE: seen 4x, all moving, positions agree to 2.2 yd
 (27751, 0, 9, 27687, 3638.3464, 1119.1643, 84.02678, 1.917418122291564941, 6, 60000, 'HORDE - Necro - path 2768790');   -- APPROXIMATE: seen 1x, all moving, positions agree to 0.0 yd
 
-DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2753100 AND 2753199;
-DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768600 AND 2768699;
-DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768700 AND 2768799;
 -- The shrine garrison never leaves its spawn, so these slots get no path:
 -- path 2753160 (SHRINE Abom) - no approach spline sighted, creature holds at its spawn
 -- path 2768660 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
@@ -627,7 +623,9 @@ DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768700 AND 2768799;
 -- path 2768665 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
 -- path 2768760 (SHRINE Necro) - no approach spline sighted, creature holds at its spawn
 -- path 2768761 (SHRINE Necro) - no approach spline sighted, creature holds at its spawn
-
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2753100 AND 2753199;
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768600 AND 2768699;
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768700 AND 2768799;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `smoothTransition`, `move_type`) VALUES
 -- path 2768600 -- SOUTH Geist from 3626.7517 844.8213
 (2768600, 1, 3604.7288, 784.8661, 71.00964, NULL, 0, 1),
@@ -866,9 +864,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 -- The dragon leaves the moment its line runs out. SMART_EVENT_WAYPOINT_ENDED is filtered on
 -- the path id, so these only ever fire for a strafing run: the Ruby Keeper's own rows for the
 -- Ruby Dragonshrine acorn quest are untouched, and the static dragons never walk a path.
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 26286);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 27530) AND (`id` IN (4, 5, 6));
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 26286);
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 26286);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (27530, 0, 4, 0, 109, 0, 100, 0, 0, 2753000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On East Pass Strafe Ended - Despawn'),
 (27530, 0, 5, 0, 109, 0, 100, 0, 0, 2753001, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On South Pass Strafe Ended - Despawn'),

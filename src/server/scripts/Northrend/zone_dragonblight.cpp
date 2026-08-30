@@ -619,7 +619,6 @@ public:
             uint32 path = me->GetEntry() * 10 + urand(0, 4);
             if (me->GetPositionY() > -1150.0f)
                 path += 5;
-            me->LoadPath(path);
             me->GetMotionMaster()->MoveWaypoint(path, false);
         }
 
