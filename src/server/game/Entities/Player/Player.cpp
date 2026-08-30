@@ -4887,6 +4887,10 @@ void Player::DurabilityPointsLoss(Item* item, int32 points)
         if (pNewDurability > 0 && pOldDurability == 0 && item->IsEquipped())
             _ApplyItemMods(item, item->GetSlot(), true);
 
+        // refresh the model attachment when the item crosses the broken threshold
+        if ((!pNewDurability || !pOldDurability) && item->IsEquipped())
+            SetVisibleItemSlot(item->GetSlot(), item);
+
         item->SetState(ITEM_CHANGED, this);
     }
 }
@@ -4989,7 +4993,11 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
 
     // reapply mods for total broken and repaired item if equipped
     if (IsEquipmentPos(pos) && !curDurability)
+    {
         _ApplyItemMods(item, pos & 255, true);
+        SetVisibleItemSlot(pos & 255, item);
+    }
+
     return TotalCost;
 }
 
@@ -15187,9 +15195,9 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, ss.str());
 
         ss.str("");
-        // cache equipment...
+        // cache equipment... (entry ids are negated for broken weapons, the char enum screen wants the plain entry)
         for (uint32 i = 0; i < EQUIPMENT_SLOT_END * 2; ++i)
-            ss << GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i) << ' ';
+            ss << ((i % 2) ? GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i) : uint32(std::abs(GetInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i)))) << ' ';
 
         // ...and bags for enum opcode
         for (uint32 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
@@ -15327,9 +15335,9 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, ss.str());
 
         ss.str("");
-        // cache equipment...
+        // cache equipment... (entry ids are negated for broken weapons, the char enum screen wants the plain entry)
         for (uint32 i = 0; i < EQUIPMENT_SLOT_END * 2; ++i)
-            ss << GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i) << ' ';
+            ss << ((i % 2) ? GetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i) : uint32(std::abs(GetInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i)))) << ' ';
 
         // ...and bags for enum opcode
         for (uint32 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
