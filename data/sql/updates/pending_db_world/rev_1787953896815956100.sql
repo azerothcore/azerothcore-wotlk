@@ -4,14 +4,14 @@ SET @CGUID := 100871;
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+8 AND `id` IN (27567, 27564);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `VerifiedBuild`, `CreateObject`) VALUES
 (@CGUID+0, 27567, 571, 65, 4254, 1, 1, 1, 3760.0703125, 677.15460205078125, 78.74155426025390625, 1.710422635078430175, 60, 69299, 2), -- Captain Iskandar (27567)
-(@CGUID+1, 27564, 571, 65, 4254, 1, 1, 1, 3759.89404296875, 681.1414794921875, 79.21089935302734375, 4.764749050140380859, 86400, 69299, 2), -- Soldier 1 (27564)
-(@CGUID+2, 27564, 571, 65, 4254, 1, 1, 1, 3765.93017578125, 684.806884765625, 78.933349609375, 4.066617012023925781, 86400, 69299, 2), -- Soldier 2 (27564)
-(@CGUID+3, 27564, 571, 65, 4254, 1, 1, 1, 3765.8017578125, 681.5089111328125, 78.53423309326171875, 3.804817676544189453, 86400, 69299, 2), -- Soldier 3 (27564)
-(@CGUID+4, 27564, 571, 65, 4254, 1, 1, 1, 3770.720458984375, 681.6798095703125, 78.208221435546875, 3.560471534729003906, 86400, 69299, 2), -- Soldier 4 (27564)
-(@CGUID+5, 27564, 571, 65, 4254, 1, 1, 1, 3749.8125, 680.61187744140625, 78.88008880615234375, 5.951572895050048828, 86400, 69299, 2), -- Soldier 5 (27564)
-(@CGUID+6, 27564, 571, 65, 4254, 1, 1, 1, 3754.420654296875, 684.20367431640625, 79.56980133056640625, 5.375614166259765625, 86400, 69299, 2), -- Soldier 6 (27564)
-(@CGUID+7, 27564, 571, 65, 4254, 1, 1, 1, 3759.960205078125, 684.55242919921875, 79.56417083740234375, 4.729842185974121093, 86400, 69299, 2), -- Soldier 7 (27564)
-(@CGUID+8, 27564, 571, 65, 4254, 1, 1, 1, 3754.80419921875, 680.96221923828125, 79.08824920654296875, 5.637413501739501953, 86400, 69299, 2); -- Soldier 8 (27564)
+(@CGUID+1, 27564, 571, 65, 4254, 1, 1, 1, 3759.89404296875, 681.1414794921875, 79.21089935302734375, 4.764749050140380859, 60, 69299, 2), -- Soldier 1 (27564)
+(@CGUID+2, 27564, 571, 65, 4254, 1, 1, 1, 3765.93017578125, 684.806884765625, 78.933349609375, 4.066617012023925781, 60, 69299, 2), -- Soldier 2 (27564)
+(@CGUID+3, 27564, 571, 65, 4254, 1, 1, 1, 3765.8017578125, 681.5089111328125, 78.53423309326171875, 3.804817676544189453, 60, 69299, 2), -- Soldier 3 (27564)
+(@CGUID+4, 27564, 571, 65, 4254, 1, 1, 1, 3770.720458984375, 681.6798095703125, 78.208221435546875, 3.560471534729003906, 60, 69299, 2), -- Soldier 4 (27564)
+(@CGUID+5, 27564, 571, 65, 4254, 1, 1, 1, 3749.8125, 680.61187744140625, 78.88008880615234375, 5.951572895050048828, 60, 69299, 2), -- Soldier 5 (27564)
+(@CGUID+6, 27564, 571, 65, 4254, 1, 1, 1, 3754.420654296875, 684.20367431640625, 79.56980133056640625, 5.375614166259765625, 60, 69299, 2), -- Soldier 6 (27564)
+(@CGUID+7, 27564, 571, 65, 4254, 1, 1, 1, 3759.960205078125, 684.55242919921875, 79.56417083740234375, 4.729842185974121093, 60, 69299, 2), -- Soldier 7 (27564)
+(@CGUID+8, 27564, 571, 65, 4254, 1, 1, 1, 3754.80419921875, 680.96221923828125, 79.08824920654296875, 5.637413501739501953, 60, 69299, 2); -- Soldier 8 (27564)
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+0;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
@@ -68,9 +68,10 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 27749) AND (`source_type` = 0
 -- Summon Frigid Ghoul Attacker (49329) is a volley the captain fires for his whole squad at
 -- once, not a timer each conscript keeps for itself: all 94 volleys in the sniff have every one
 -- of their casts on a single timestamp - span 0.000s, 37 of them with 8 casters and 9 with all 9
--- - landing 15-16s apart. The template row is SMART_EVENT_UPDATE_OOC on top of that, so on a line
--- that is in combat for practically the whole event it never fired at all. npc_heated_battle_captain
--- casts it on every living formation member instead, so the per-conscript row only gets in the way.
+-- - landing 15-16s apart. npc_heated_battle_captain casts it on every living formation member
+-- instead, so the per-conscript row only gets in the way. The script keeps the out of combat
+-- gate this row carried: the ghouls a volley drops join the fight the line is already in, so
+-- summoning through combat only feeds the wave the line is trying to clear.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` IN (27564, 27749)) AND (`id` = 15);
 
 -- Remove Old Alliance Spawns
@@ -791,6 +792,7 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 3, 49197, 0, 0, 31, 0, 3, 27686, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
 (13, 3, 49197, 0, 1, 31, 0, 3, 27531, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
+(13, 3, 49197, 0, 1, 31, 0, 3, 27685, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
 (13, 3, 49197, 0, 2, 31, 0, 3, 27687, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers');
 
 -- The conditions above decide which entries Ruby Arrow may hit, not how many of them it hits at
@@ -799,6 +801,99 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 DELETE FROM `spell_script_names` WHERE (`spell_id` = 49197) AND (`ScriptName` = 'spell_ruby_arrow');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (49197, 'spell_ruby_arrow');
+-- Ruby dragon strafing runs. The dragon flies a fixed spline carrying 49082 / 49209, which
+-- ticks every 1.5s and drops a dummy on the nearest Ruby Strafe Bunny under it; that bunny
+-- lays the fire and, six and a half seconds later, the flame patch. All four spells below
+-- pick their targets by entry, so each one needs its filter spelled out or it resolves to
+-- nothing. Effect 0 in every case, hence SourceGroup 1.
+UPDATE `creature_template` SET `ScriptName` = 'npc_ruby_strafe_bunny' WHERE (`entry` = 27589);
+
+-- The four strafing lines, laid out as (entry * 100) + lane like the attacker routes: the
+-- Ruby Keeper owns 2753000-2753002 and the Emberwyrm 2628600. Every repeat of a route in the
+-- capture was byte-identical to the others, so these are the sniffed splines with the trailing
+-- duplicate terminator the client sends dropped from each. smoothTransition makes the
+-- generator fly the whole line as one catmullrom spline, the way the capture shows it.
+--
+-- No velocity: the dragons fly at their own run speed, which creature_template already has right
+-- at speed_run 2.571428 for both entries - 18 yards a second, the RunSpeed the capture shows on
+-- every strafing dragon. Note that AC times a catmullrom spline as arc over velocity, so at 18 a
+-- run takes about a sixth longer than the durations the capture recorded (21540ms east, 25331ms
+-- south, 32448ms shrine, 42361ms Emberwyrm); the dragon is despawned by the waypoint-ended row
+-- below rather than on a clock, so it always leaves exactly when its line runs out.
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2753000 AND 2753009;
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2628600 AND 2628609;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `smoothTransition`, `move_type`) VALUES
+-- path 2753000 -- Ruby Keeper - east pass lane   (21540 ms, seen 6x)
+(2753000, 1, 3917.0413, 516.1544, 135.3394, 1, 1),
+(2753000, 2, 3882.8125, 568.0230, 119.0785, 1, 1),
+(2753000, 3, 3848.5837, 619.8916, 102.8175, 1, 1),
+(2753000, 4, 3791.4153, 709.6432, 93.4842, 1, 1),
+(2753000, 5, 3764.9592, 761.7096, 95.8453, 1, 1),
+(2753000, 6, 3752.6099, 808.6125, 108.2622, 1, 1),
+(2753000, 7, 3743.6824, 894.3583, 173.4842, 1, 1),
+
+-- path 2753001 -- Ruby Keeper - south pass lane   (25331 ms, seen 2x)
+(2753001, 1, 3511.7253, 541.3858, 141.7672, 1, 1),
+(2753001, 2, 3542.1143, 610.6399, 134.6131, 1, 1),
+(2753001, 3, 3572.5032, 679.8940, 127.4590, 1, 1),
+(2753001, 4, 3601.3853, 744.6108, 100.2088, 1, 1),
+(2753001, 5, 3627.8610, 813.3681, 91.7089, 1, 1),
+(2753001, 6, 3663.3264, 888.3453, 110.6812, 1, 1),
+(2753001, 7, 3658.1768, 1007.1526, 193.2367, 1, 1),
+
+-- path 2753002 -- Ruby Keeper - shrine lane   (32448 ms, seen 2x)
+(2753002, 1, 3623.5344, 1366.4695, 209.6484, 1, 1),
+(2753002, 2, 3626.9695, 1345.0223, 193.3635, 1, 1),
+(2753002, 3, 3630.4045, 1323.5752, 177.0786, 1, 1),
+(2753002, 4, 3631.1704, 1204.4182, 163.9951, 1, 1),
+(2753002, 5, 3631.1750, 1131.3120, 141.8846, 1, 1),
+(2753002, 6, 3635.1562, 1051.5358, 103.3564, 1, 1),
+(2753002, 7, 3615.7034, 994.4870, 103.9676, 1, 1),
+(2753002, 8, 3533.6892, 946.5621, 165.1620, 1, 1),
+(2753002, 9, 3463.0981, 915.4396, 226.6343, 1, 1),
+
+-- path 2628600 -- Emberwyrm - crosses two lanes and loops back out   (42361 ms, seen 3x)
+(2628600, 1, 3712.5650, 1069.8735, 99.2693, 1, 1),
+(2628600, 2, 3698.4565, 1015.8160, 96.9492, 1, 1),
+(2628600, 3, 3684.3481, 961.7584, 94.6290, 1, 1),
+(2628600, 4, 3671.1406, 883.7852, 85.9066, 1, 1),
+(2628600, 5, 3628.2605, 806.7298, 89.4900, 1, 1),
+(2628600, 6, 3580.4880, 737.9226, 100.8790, 1, 1),
+(2628600, 7, 3608.0828, 655.3547, 117.1846, 1, 1),
+(2628600, 8, 3683.7075, 660.5544, 140.4346, 1, 1),
+(2628600, 9, 3680.8594, 942.8113, 188.3308, 1, 1);
+
+-- The dragon leaves the moment its line runs out. SMART_EVENT_WAYPOINT_ENDED is filtered on
+-- the path id, so these only ever fire for a strafing run: the Ruby Keeper's own rows for the
+-- Ruby Dragonshrine acorn quest are untouched, and the static dragons never walk a path.
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 27530) AND (`id` IN (4, 5, 6));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 26286);
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 26286);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(27530, 0, 4, 0, 109, 0, 100, 0, 0, 2753000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On East Pass Strafe Ended - Despawn'),
+(27530, 0, 5, 0, 109, 0, 100, 0, 0, 2753001, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On South Pass Strafe Ended - Despawn'),
+(27530, 0, 6, 0, 109, 0, 100, 0, 0, 2753002, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On Shrine Strafe Ended - Despawn'),
+(26286, 0, 0, 0, 109, 0, 100, 0, 0, 2628600, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Emberwyrm - On Strafe Ended - Despawn');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (49083, 49210, 49080, 49211));
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- the strafe tick only ever landed on a Ruby Strafe Bunny: 298 of 298 and 54 of 54 hits
+(13, 1, 49083, 0, 0, 31, 0, 3, 27589, 0, 0, 0, 0, '', 'Ruby Inferno Strafe Effect only targets Ruby Strafe Bunny'),
+(13, 1, 49210, 0, 0, 31, 0, 3, 27589, 0, 0, 0, 0, '', 'Ember Flame Strafe Effect only targets Ruby Strafe Bunny'),
+
+-- the Ruby Keeper's fire is friendly: Geist x94, Abomination x15, Ghoul x14, Necromancer x1,
+-- and not one defender in the whole capture
+(13, 1, 49080, 0, 0, 31, 0, 3, 27531, 0, 0, 0, 0, '', 'Ruby Inferno only burns the Frigid Attackers'),
+(13, 1, 49080, 0, 1, 31, 0, 3, 27685, 0, 0, 0, 0, '', 'Ruby Inferno only burns the Frigid Attackers'),
+(13, 1, 49080, 0, 2, 31, 0, 3, 27686, 0, 0, 0, 0, '', 'Ruby Inferno only burns the Frigid Attackers'),
+(13, 1, 49080, 0, 3, 31, 0, 3, 27687, 0, 0, 0, 0, '', 'Ruby Inferno only burns the Frigid Attackers'),
+
+-- the Emberwyrm's is the mirror of it and hurts the line instead: Conscript x16, Iskandar x1,
+-- and no Scourge at all. The pull back warning is honest, they just take it standing.
+(13, 1, 49211, 0, 0, 31, 0, 3, 27564, 0, 0, 0, 0, '', 'Ember Flame only burns the defenders'),
+(13, 1, 49211, 0, 1, 31, 0, 3, 27567, 0, 0, 0, 0, '', 'Ember Flame only burns the defenders'),
+(13, 1, 49211, 0, 2, 31, 0, 3, 27749, 0, 0, 0, 0, '', 'Ember Flame only burns the defenders'),
+(13, 1, 49211, 0, 3, 31, 0, 3, 27751, 0, 0, 0, 0, '', 'Ember Flame only burns the defenders');
 
 -- Captain Drayzen formation
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 105167;
@@ -820,4 +915,18 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27687;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27687);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (27687, 0, 0, 0, 60, 0, 100, 0, 3200, 10000, 3200, 10000, 0, 0, 11, 50324, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Necromancer Attacker - On Update - Cast \'Bone Armor\''),
-(27687, 0, 1, 2, 0, 0, 100, 0, 0, 1200, 3600, 4800, 0, 0, 11, 9613, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Necromancer Attacker - In Combat - Cast \'Shadow Bolt\'');
+(27687, 0, 1, 0, 0, 0, 100, 0, 0, 1200, 3600, 4800, 0, 0, 11, 9613, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Necromancer Attacker - In Combat - Cast \'Shadow Bolt\'');
+
+-- Replace the creature_addon from Ruby Watchers
+DELETE FROM `creature_template_addon` WHERE (`entry` = 27530);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(27530, 0, 0, 0, 0, 0, 3, '');
+
+DELETE FROM `creature_addon` WHERE `guid` IN (108311, 108312, 108315, 108316, 108317, 108318);
+INSERT INTO `creature_addon` (`guid`, `bytes2`, `visibilityDistanceType`, `auras`) VALUES
+(108311, 3, 3, '49132 55795 61204'),
+(108312, 3, 3, '49132 55795 61204'),
+(108315, 3, 3, '49132 55795 61204'),
+(108316, 3, 3, '49132 55795 61204'),
+(108317, 3, 3, '49132 55795 61204'),
+(108318, 3, 3, '49132 55795 61204');

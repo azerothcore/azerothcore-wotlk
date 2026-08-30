@@ -619,6 +619,7 @@ public:
             uint32 path = me->GetEntry() * 10 + urand(0, 4);
             if (me->GetPositionY() > -1150.0f)
                 path += 5;
+            me->LoadPath(path);
             me->GetMotionMaster()->MoveWaypoint(path, false);
         }
 
@@ -909,11 +910,9 @@ class spell_call_wintergarde_gryphon : public SpellScript
 ######*/
 
 // Both captains hold a pass below the temple with a formation of conscripts and call in Scourge
-// waves while they do. Iskandar also marches his squad between the southern pass, the eastern
-// pass and the shrine, and which waves spawn depends on where he is standing; Drayzen holds one
-// position for the whole event, so his waves simply never stop. Every squad member walks its own
-// sniffed path, so the state machine lives here instead of in SmartAI - the conscripts keep their
-// guid-scoped SmartAI and the captain drives them by relaying each march as a DoAction().
+// waves. Iskandar also marches his squad between the southern pass, the eastern pass and the
+// shrine, and the waves depend on where he stands; Drayzen never leaves his. The conscripts keep
+// their guid-scoped SmartAI and the captain drives them by relaying each march as a DoAction().
 
 enum HeatedBattleCaptainNpcs
 {
@@ -958,8 +957,7 @@ enum HeatedBattleCaptainStation : uint8
     STATION_SHRINE                  = 3
 };
 
-// creature_summon_groups ids. Iskandar owns 0-6 and Drayzen 7-8 so that a wave path id stays
-// unique across both sides.
+// creature_summon_groups ids, split 0-6 Iskandar / 7-9 Drayzen so wave path ids stay unique.
 enum HeatedBattleWaveGroup : uint8
 {
     WAVE_SOUTH_NECROMANCER          = 0,    // Necromancer + 6 Geists
@@ -974,8 +972,8 @@ enum HeatedBattleWaveGroup : uint8
     WAVE_HORDE_NECROMANCER          = 9     // Necromancer + 7 Geists
 };
 
-// Both captains spend nearly the whole event in combat, so the event timeline and the combat
-// rotation have to survive each other: each owns a scheduler group and only ever cancels its own.
+// The captains fight for most of the event, so the timeline and the melee rotation each own a
+// group and only ever cancel their own.
 enum HeatedBattleCaptainGroup : uint32
 {
     GROUP_COMBAT                    = 1,    // melee rotation, dropped every time combat ends
@@ -983,58 +981,40 @@ enum HeatedBattleCaptainGroup : uint32
     GROUP_GHOUL                     = 3     // ghoul summons, armed once for the captain's life
 };
 
-// The squad's waypoint_data path ids are laid out as (creature.guid * PATH_ID_BLOCK) + march.
-constexpr uint32 PATH_ID_BLOCK = 10;
-
-// An attacker's route belongs to its spawn slot, not to the creature, so its path id is
-// (entry * WAVE_PATH_ENTRY_BLOCK) + (group * WAVE_PATH_GROUP_BLOCK) + index within the group.
-constexpr uint32 WAVE_PATH_ENTRY_BLOCK = 100;
-constexpr uint32 WAVE_PATH_GROUP_BLOCK = 10;
-
-constexpr Seconds DEPLOY_DELAY = 5s;
-// The sniff shows waves landing at a pass roughly every 50s, three of them before the squad
-// moves on. TODO: the real trigger for moving on is unknown - this is just the observed count.
-constexpr Seconds FIRST_WAVE_DELAY = 10s;
+// Waves land ~50s apart, and the strafe that ends the hold rides the same clock.
 constexpr Seconds WAVE_INTERVAL = 50s;
-constexpr uint8 WAVES_PER_STATION = 3;
-// The one push the sniff caught started at 20:03:10, drew the Emberwyrm at 20:05:02 and had the
-// squad back at the camp by 20:06:02 - so roughly a minute and a half at the shrine and a minute
-// before it re-forms.
-constexpr Seconds SHRINE_HOLD_DURATION = 90s;
+
+// The captain warns his line as the dragon spawns and the squad moves 10.5s later, at the shrine
+// as well as at a pass.
+constexpr Milliseconds STRAFE_TO_MARCH_DELAY = 10500ms;
+
 constexpr Seconds RESPAWN_DELAY = 1min;
 
-// From the southern pass the squad either falls back to the eastern one or pushes on to the
-// shrine. TODO: what picks the shrine is unknown. Every pass to pass march in the sniff follows a
-// ruby dragon strafe warning by 10-11s, but the one shrine push did not, so it is on some other
-// trigger; this stands in for it until the dragons are scripted.
-constexpr uint8 SHRINE_PUSH_CHANCE = 33;
-
-// Summon Frigid Ghoul Attacker is a volley the captain fires for his whole squad at once, not a
-// timer each conscript keeps for itself: all 94 volleys in the sniff have every one of their
-// casts on a single timestamp - span 0.000s, 37 of them with 8 casters and 9 with all 9 - and
-// the volleys land 15-16s apart on both sides. It is not gated on being out of combat either;
-// the line is fighting for nearly all of them.
-constexpr Seconds GHOUL_FIRST_DELAY = 5s;
-constexpr Seconds GHOUL_INTERVAL_MIN = 15s;
-constexpr Seconds GHOUL_INTERVAL_MAX = 17s;
-
-// Cleave / Mortal Strike / Whirlwind, kept per captain because the SAI this replaces tuned the
-// two sides differently. Each entry is { initial min, initial max, repeat min, repeat max }.
-struct HeatedBattleCaptainTimers
+// A strafing dragon flies a fixed line carrying a periodic trigger aura. Every 1.5s the aura
+// fires a dummy at the nearest Ruby Strafe Bunny, which drops the fire and then the flame patch.
+enum RubyStrafeNpcs
 {
-    Milliseconds Cleave[4];
-    Milliseconds MortalStrike[4];
-    Milliseconds Whirlwind[4];
+    NPC_RUBY_KEEPER                 = 27530,
+    NPC_EMBERWYRM                   = 26286
 };
 
-constexpr HeatedBattleCaptainTimers ISKANDAR_TIMERS =
+enum RubyStrafeSpells
 {
-    { 3s, 7s, 7s, 11s }, { 11s, 16s, 11s, 16s }, { 11s, 14s, 19s, 22s }
+    SPELL_RUBY_INFERNO_STRAFE       = 49082,    // the aura the Ruby Keeper flies with
+    SPELL_RUBY_INFERNO_EFFECT       = 49083,    // its 1.5s tick, lands on a strafe bunny
+    SPELL_RUBY_INFERNO              = 49080,    // what the bunny drops - Scourge only
+    SPELL_EMBER_FLAME_STRAFE        = 49209,    // the Emberwyrm's mirror of the three above
+    SPELL_EMBER_FLAME_EFFECT        = 49210,
+    SPELL_EMBER_FLAME               = 49211,    // defenders only, and it does hurt them
+    SPELL_SUMMON_DAHLIAS_TEARS      = 57597     // gameobject 192773, the lingering flame patch
 };
 
-constexpr HeatedBattleCaptainTimers DRAYZEN_TIMERS =
+enum RubyStrafeLane : uint8
 {
-    { 5s, 8s, 7s, 10s }, { 3s, 6s, 10s, 14s }, { 11s, 14s, 11s, 14s }
+    LANE_EAST_PASS                  = 0,
+    LANE_SOUTH_PASS                 = 1,
+    LANE_SHRINE                     = 2,
+    LANE_EMBERWYRM                  = 3
 };
 
 struct npc_heated_battle_captain : public ScriptedAI
@@ -1056,10 +1036,8 @@ struct npc_heated_battle_captain : public ScriptedAI
 
     void Reset() override
     {
-        // Reset also runs on evade, and a captain evades every time his line finishes off a wave,
-        // so only the melee rotation may be dropped here. Re-arming the event timeline from Reset
-        // restarted the station at wave 0 on every one of those evades, which left both captains
-        // summoning nothing but their first wave group and never reaching the march.
+        // Reset runs on every evade, and a captain evades each time his line clears a wave, so
+        // only the melee rotation may be dropped here - the station timeline has to survive it.
         scheduler.CancelGroup(GROUP_COMBAT);
         me->SetEmoteState(EMOTE_STATE_READY2H);
 
@@ -1071,16 +1049,45 @@ struct npc_heated_battle_captain : public ScriptedAI
         }
     }
 
+    // GROUP_COMBAT throughout, so the next evade clears the rotation without touching the waves.
+    // The SAI this replaces tuned the two captains differently, so they keep separate timers.
     void JustEngagedWith(Unit* /*who*/) override
     {
-        HeatedBattleCaptainTimers const& timers = Marches() ? ISKANDAR_TIMERS : DRAYZEN_TIMERS;
-        ScheduleCombatSpell(timers.Cleave, [this] { DoCastVictim(SPELL_CLEAVE); });
-        ScheduleCombatSpell(timers.MortalStrike, [this] { DoCastVictim(SPELL_MORTAL_STRIKE); });
-        ScheduleCombatSpell(timers.Whirlwind, [this] { DoCastSelf(SPELL_WHIRLWIND); });
+        if (Marches())
+        {
+            scheduler.Schedule(3s, 7s, GROUP_COMBAT, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_CLEAVE);
+                context.Repeat(7s, 11s);
+            }).Schedule(11s, 16s, GROUP_COMBAT, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_MORTAL_STRIKE);
+                context.Repeat(11s, 16s);
+            }).Schedule(11s, 14s, GROUP_COMBAT, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_WHIRLWIND);
+                context.Repeat(19s, 22s);
+            });
+
+            return;
+        }
+
+        scheduler.Schedule(5s, 8s, GROUP_COMBAT, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CLEAVE);
+            context.Repeat(7s, 10s);
+        }).Schedule(3s, 6s, GROUP_COMBAT, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_MORTAL_STRIKE);
+            context.Repeat(10s, 14s);
+        }).Schedule(11s, 14s, GROUP_COMBAT, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_WHIRLWIND);
+            context.Repeat(11s, 14s);
+        });
     }
 
-    // Marches can also be driven from the outside (SmartAI, a GM command) while the triggers for
-    // them are still being worked out.
+    // Marches can also be driven from outside (SmartAI, a GM command).
     void DoAction(int32 action) override
     {
         switch (action)
@@ -1126,25 +1133,84 @@ private:
     // Only Iskandar walks between the passes; Drayzen holds his line for the whole event.
     [[nodiscard]] bool Marches() const { return me->GetEntry() == NPC_CAPTAIN_ISKANDAR; }
 
-    // { initial min, initial max, repeat min, repeat max }, all in GROUP_COMBAT so that the next
-    // evade clears the rotation without touching the waves.
-    void ScheduleCombatSpell(Milliseconds const (&timer)[4], std::function<void()> cast)
+    // The lane matched the pass the captain stood on in all six sightings. The shrine lane is
+    // inferred - it exists in the data, but no captured run could be tied to a push.
+    [[nodiscard]] static RubyStrafeLane LaneFor(HeatedBattleCaptainMarch march)
     {
-        Milliseconds const repeatMin = timer[2];
-        Milliseconds const repeatMax = timer[3];
-
-        scheduler.Schedule(timer[0], timer[1], GROUP_COMBAT,
-            [cast, repeatMin, repeatMax](TaskContext context)
+        switch (march)
         {
-            cast();
-            context.Repeat(repeatMin, repeatMax);
-        });
+            case MARCH_EAST_TO_SOUTH:
+                return LANE_EAST_PASS;
+            case MARCH_SOUTH_TO_SHRINE:
+                return LANE_SHRINE;
+            case MARCH_SOUTH_TO_EAST:
+            case MARCH_CAMP_TO_SOUTH:
+            default:
+                return LANE_SOUTH_PASS;
+        }
     }
 
+    // Summoned at the head of its lane with the strafe aura already on. Nothing about the flight
+    // is set here - the route, its catmullrom shape and the despawn at the end are all in the
+    // data, and it flies at its own speed_run 2.571428, the RunSpeed 18 the capture shows.
+    void SummonStrafingDragon(RubyStrafeLane lane) const
+    {
+        // waypoint_data at (entry * 100) + lane: 2753000-2753002 for the Ruby Keeper's three
+        // lanes, 2628600 for the Emberwyrm's only one.
+        bool const emberwyrm = lane == LANE_EMBERWYRM;
+        uint32 const entry = emberwyrm ? NPC_EMBERWYRM : NPC_RUBY_KEEPER;
+        uint32 const pathId = entry * 100 + (emberwyrm ? 0 : lane);
+
+        WaypointPath const* path = sWaypointMgr->GetPath(pathId);
+        if (!path || path->Nodes.empty())
+        {
+            LOG_ERROR("sql.sql", "npc_heated_battle_captain: ruby strafe has no waypoint path {}.", pathId);
+            return;
+        }
+
+        // A SMART_EVENT_WAYPOINT_ENDED row despawns it at the end of the line, so this is only
+        // the backstop for a summon whose path never starts.
+        WaypointNode const& head = path->Nodes.front();
+        TempSummon* dragon = me->SummonCreature(entry, head.X, head.Y, head.Z, 0.0f,
+            TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
+        if (!dragon)
+            return;
+
+        // The shrine lane starts some 600 yards from the captain, so the run has to keep
+        // updating whether or not anyone is standing under it yet.
+        dragon->setActive(true);
+
+        // A strafing Keeper carries no unit flags in the capture; the template's STUNNED |
+        // PREVENT_EMOTES belongs to the grounded acorn quest dragons. The Emberwyrm's 320 is its
+        // own template value. Passive is inferred - the default AI would stop mid-run to fight.
+        if (!emberwyrm)
+            dragon->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
+
+        dragon->SetReactState(REACT_PASSIVE);
+
+        // MovementFlags 513 on every sighting - DisableGravity and no CanFly; the generator adds
+        // the flying to the spline because the dragon is airborne.
+        dragon->SetDisableGravity(true);
+        dragon->CastSpell(dragon, emberwyrm ? SPELL_EMBER_FLAME_STRAFE : SPELL_RUBY_INFERNO_STRAFE, true);
+
+        dragon->LoadPath(pathId);
+        dragon->GetMotionMaster()->MoveWaypoint(pathId, false);
+    }
+
+    // One volley for the whole squad rather than a timer per conscript: all 94 volleys in the
+    // sniff fire on a single timestamp, 15-16s apart.
     void ScheduleGhoulSummons()
     {
-        scheduler.Schedule(GHOUL_FIRST_DELAY, GROUP_GHOUL, [this](TaskContext context)
+        scheduler.Schedule(5s, GROUP_GHOUL, [this](TaskContext context)
         {
+            // Held while he fights. The sniff volleys land straight through combat, but their
+            // ghouls join that same fight, so an ungated volley feeds the wave forever.
+            if (me->IsInCombat())
+            {
+                context.Repeat(5s);
+                return;
+            }
+
             DoCastSelf(SPELL_SUMMON_FRIGID_GHOUL, true);
 
             if (CreatureGroup* formation = me->GetFormation())
@@ -1152,13 +1218,14 @@ private:
                     if (itr.first != me && itr.first->IsAlive())
                         itr.first->CastSpell(itr.first, SPELL_SUMMON_FRIGID_GHOUL, true);
 
-            context.Repeat(GHOUL_INTERVAL_MIN, GHOUL_INTERVAL_MAX);
+            context.Repeat(15s, 17s);
         });
     }
 
+    // The squad's waypoint_data path ids are laid out as (creature.guid * 10) + march.
     [[nodiscard]] uint32 PathFor(HeatedBattleCaptainMarch march) const
     {
-        return me->GetSpawnId() * PATH_ID_BLOCK + static_cast<uint32>(march);
+        return me->GetSpawnId() * 10 + static_cast<uint32>(march);
     }
 
     [[nodiscard]] static HeatedBattleCaptainStation DestinationOf(HeatedBattleCaptainMarch march)
@@ -1207,15 +1274,13 @@ private:
         _marching = true;
         _march = march;
 
-        // The garrison is already dug in by the time the squad reaches the shrine, so it is
-        // summoned as the charge starts rather than while the squad is still forming up in camp.
+        // The garrison is dug in before the squad arrives, so it spawns as the charge starts.
         if (march == MARCH_SOUTH_TO_SHRINE)
             SummonWave(WAVE_SHRINE_GARRISON);
 
         Talk(TextFor(DestinationOf(march)));
 
-        // Every conscript owns a guid-scoped SmartAI whose SMART_EVENT_ACTION_DONE rows start
-        // that conscript's own copy of the same march.
+        // Each conscript's guid-scoped SmartAI walks its own copy of the march off this action.
         if (CreatureGroup* formation = me->GetFormation())
             for (auto const& itr : formation->GetMembers())
                 if (itr.first != me && itr.first->IsAlive() && itr.first->AI())
@@ -1232,7 +1297,7 @@ private:
         if (Marches() && _station == STATION_CAMP)
         {
             // The squad forms up in the camp and heads down to the southern pass on its own.
-            scheduler.Schedule(DEPLOY_DELAY, GROUP_STATION, [this](TaskContext /*context*/)
+            scheduler.Schedule(5s, GROUP_STATION, [this](TaskContext /*context*/)
             {
                 BeginMarch(MARCH_CAMP_TO_SOUTH);
             });
@@ -1242,32 +1307,37 @@ private:
 
         if (Marches() && _station == STATION_SHRINE)
         {
-            // Nothing is ever won here: the push ends when a ruby dragon strafes the shrine and
-            // takes the squad off the map with it, and the event forms up at the camp again.
+            // The push is never won: it ends when the Emberwyrm burns the squad off the shrine
+            // and the event forms up at the camp again.
             Talk(SAY_SHRINE_HOLD);
 
-            scheduler.Schedule(SHRINE_HOLD_DURATION, GROUP_STATION, [this](TaskContext /*context*/)
+            scheduler.Schedule(90s, GROUP_STATION, [this](TaskContext context)
             {
+                SummonStrafingDragon(LANE_EMBERWYRM);
                 Talk(SAY_EMBERWYRM);
 
-                if (CreatureGroup* formation = me->GetFormation())
-                    formation->DespawnFormation(0ms, RESPAWN_DELAY);
-                else
-                    me->DespawnOrUnsummon(0s, RESPAWN_DELAY);
+                context.Schedule(STRAFE_TO_MARCH_DELAY, GROUP_STATION, [this](TaskContext /*context*/)
+                {
+                    if (CreatureGroup* formation = me->GetFormation())
+                        formation->DespawnFormation(0ms, RESPAWN_DELAY);
+                    else
+                        me->DespawnOrUnsummon(0s, RESPAWN_DELAY);
+                });
             });
 
             return;
         }
 
-        scheduler.Schedule(FIRST_WAVE_DELAY, GROUP_STATION, [this](TaskContext context)
+        // Three waves at a pass before the squad moves on. TODO: the real trigger is unknown.
+        scheduler.Schedule(10s, GROUP_STATION, [this](TaskContext context)
         {
             SummonWave(WaveGroupFor(_wave));
             ++_wave;
 
             // Drayzen never leaves, so his waves keep coming for as long as he is standing.
-            if (Marches() && _wave >= WAVES_PER_STATION)
+            if (Marches() && _wave >= 3)
             {
-                MarchWhenQuiet();
+                CallStrafe();
                 return;
             }
 
@@ -1285,13 +1355,14 @@ private:
         if (_station == STATION_EAST_PASS)
             return MARCH_EAST_TO_SOUTH;
 
-        return roll_chance_i(SHRINE_PUSH_CHANCE) ? MARCH_SOUTH_TO_SHRINE : MARCH_SOUTH_TO_EAST;
+        // TODO: what picks the shrine is unknown - the capture's one push had no strafe first.
+        return roll_chance_i(33) ? MARCH_SOUTH_TO_SHRINE : MARCH_SOUTH_TO_EAST;
     }
 
-    // TODO: retail moves the squad on when a ruby dragon strafes the pass it is holding - the
-    // captain warns the line and marches 10-11s later, six for six in the sniff. Until the
-    // dragons are scripted this follows the three waves that land before each of those marches.
-    void MarchWhenQuiet()
+    // A pass is never won and never held for a set time: a dragon strafes the lane, the captain
+    // warns his line, and they move. TODO: what schedules the run is open - nine of thirteen
+    // strafes arrived with a wave summon, so the waves counted off here stand in for that clock.
+    void CallStrafe()
     {
         scheduler.Schedule(WAVE_INTERVAL, GROUP_STATION, [this](TaskContext context)
         {
@@ -1302,20 +1373,23 @@ private:
                 return;
             }
 
-            BeginMarch(NextMarch());
+            HeatedBattleCaptainMarch const march = NextMarch();
+            SummonStrafingDragon(LaneFor(march));
+            Talk(SAY_DRAGON_STRAFE);
+
+            context.Schedule(STRAFE_TO_MARCH_DELAY, GROUP_STATION, [this, march](TaskContext /*context*/)
+            {
+                BeginMarch(march);
+            });
         });
     }
 
     [[nodiscard]] uint8 WaveGroupFor(uint8 wave) const
     {
-        // TODO: the Alliance rotations are not complete. The south also fires
-        // WAVE_SOUTH_ABOMINATION_2 on some cycles, and the east has a Necromancer + 4 Geists wave
-        // the sniff never caught stationary, so that one has no spawn coordinates yet.
-        //
-        // The Horde rotation is complete: groups 8 and 9 alternate on a ~3m20s cycle, seven
-        // sightings running B,A,B,A,B,A,B with no exceptions. WAVE_HORDE_GEISTS is deliberately
-        // not in it - its four spawn points are byte-identical to four of group 8's, so it is a
-        // partial sighting of that same wave rather than a wave of its own.
+        // TODO: the Alliance rotations are incomplete - the south also fires
+        // WAVE_SOUTH_ABOMINATION_2, and the east has a Necromancer + 4 Geists wave with no spawn
+        // coordinates yet. The Horde rotation is complete, 8 and 9 alternating over seven
+        // sightings; WAVE_HORDE_GEISTS is left out because its spawns duplicate four of group 8's.
         if (!Marches())
             return (wave % 2) ? WAVE_HORDE_ABOMINATION : WAVE_HORDE_NECROMANCER;
 
@@ -1338,14 +1412,13 @@ private:
         std::list<TempSummon*> summons;
         me->SummonCreatureGroup(group, &summons);
 
-        // creature_summon_groups rows come back in table order and every slot owns a fixed route,
-        // so the nth row of an entry inside a group is the nth path of that entry's block. The
-        // shrine garrison has no paths at all and simply holds its spawn.
+        // A route belongs to the spawn slot, not the creature: (entry * 100) + (group * 10) +
+        // index. creature_summon_groups rows come back in table order, so the nth row of an entry
+        // in a group is the nth path of its block. The shrine garrison has none and holds.
         std::unordered_map<uint32, uint32> slot;
         for (TempSummon* summon : summons)
         {
-            uint32 const pathId = summon->GetEntry() * WAVE_PATH_ENTRY_BLOCK
-                + group * WAVE_PATH_GROUP_BLOCK + slot[summon->GetEntry()]++;
+            uint32 const pathId = summon->GetEntry() * 100 + group * 10 + slot[summon->GetEntry()]++;
 
             if (!sWaypointMgr->GetPath(pathId))
                 continue;
@@ -1361,16 +1434,52 @@ private:
     bool _deployed = false;
     uint8 _wave = 0;
 
-    // TODO: the Emberwyrm interrupt that sets the squad passive and kneeling, and whatever
-    // retail uses to decide the players have won a pass and the push to the shrine can start.
+    // TODO: the Emberwyrm interrupt that sets the squad passive and kneeling.
 };
 
-// 49197 Ruby Arrow is the volley the conscripts on both lines fire at the Scourge, triggered
-// every two seconds by the 49199 aura in their creature_addon. Its damage effect is
-// TARGET_UNIT_CONE_ENTRY, so every attacker standing in the cone is hit by the same shot; the
-// conditions on the spell only decide which entries are eligible, not how many of them are
-// picked. Effect 1 is TARGET_UNIT_NEARBY_ENTRY and already resolves to a single unit, so the
-// cone is trimmed to the nearest target as well and both effects land on the same attacker.
+// The 18 bunnies are already spawned along the marker lanes, each one a piece of ground a
+// passing dragon sets alight: it takes the tick, drops the fire, then plants the flame patch.
+struct npc_ruby_strafe_bunny : public NullCreatureAI
+{
+    npc_ruby_strafe_bunny(Creature* creature) : NullCreatureAI(creature) { }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+    {
+        uint32 fire;
+        switch (spellInfo->Id)
+        {
+            case SPELL_RUBY_INFERNO_EFFECT:
+                fire = SPELL_RUBY_INFERNO;
+                break;
+            case SPELL_EMBER_FLAME_EFFECT:
+                fire = SPELL_EMBER_FLAME;
+                break;
+            default:
+                return;
+        }
+
+        DoCastSelf(fire, true);
+
+        // The patch goes down about six and a half seconds behind the fire.
+        _scheduler.Schedule(6500ms, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_SUMMON_DAHLIAS_TEARS, true);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
+// The conscripts fire 49197 every two seconds off the 49199 aura in their creature_addon. Its
+// damage effect is TARGET_UNIT_CONE_ENTRY, so one shot hits everything in the cone - the spell's
+// conditions pick which entries are eligible, not how many. Effect 1 is TARGET_UNIT_NEARBY_ENTRY
+// and resolves to one unit, so the cone is trimmed to match and both land on the same attacker.
 class spell_ruby_arrow : public SpellScript
 {
     PrepareSpellScript(spell_ruby_arrow);
@@ -2810,6 +2919,7 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_q12237_drop_off_villager);
     RegisterSpellScript(spell_call_wintergarde_gryphon);
     RegisterCreatureAI(npc_heated_battle_captain);
+    RegisterCreatureAI(npc_ruby_strafe_bunny);
     RegisterSpellScript(spell_ruby_arrow);
     RegisterSpellScript(spell_q12478_frostmourne_cavern);
     RegisterSpellScript(spell_q12243_fire_upon_the_waters_aura);
