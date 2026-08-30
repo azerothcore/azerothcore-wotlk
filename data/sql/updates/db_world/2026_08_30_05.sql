@@ -1,3 +1,4 @@
+-- DB update 2026_08_30_04 -> 2026_08_30_05
 -- Modern client builds exceed smallint unsigned (65535); align with the int VerifiedBuild used by other tables
 ALTER TABLE `creature_template_model` MODIFY `VerifiedBuild` int DEFAULT NULL;
 
