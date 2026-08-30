@@ -1219,7 +1219,7 @@ struct boss_yoggsaron : public ScriptedAI
 
         _defeated = true;
         me->InterruptNonMeleeSpells(true);
-        me->CastSpell(me, SPELL_DEATH_ANIMATION, true);
+        DoCastSelf(SPELL_DEATH_ANIMATION, true);
         me->m_Events.AddEventAtOffset([this]()
         {
             me->KillSelf();
