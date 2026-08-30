@@ -416,12 +416,21 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+7), 0, 1005, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Reached Home - Set Emote State 333'),
 (-(@CGUID+8), 0, 1005, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Reached Home - Set Emote State 333');
 
--- Captain Iskandar is driven by npc_captain_iskandar (C++): the marches, the combat rotation,
--- the out of combat ghoul summons and the formation DoAction relays all live there now.
+-- Both captains are driven by npc_heated_battle_captain (C++): the attack waves, the combat
+-- rotation, the out of combat ghoul summons and the formation DoAction relays all live there.
+-- Iskandar additionally marches between the passes; Drayzen holds one position, so his waves
+-- simply never stop.
 -- FactorySelector::SelectAI checks ScriptName before AIName, so AIName is cleared as well to
 -- keep it honest.
-UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_captain_iskandar' WHERE (`entry` = 27567);
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27567);
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_heated_battle_captain' WHERE (`entry` IN (27567, 27751));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (27567, 27751));
+
+-- The wave attackers only ever needed npc_heated_battle to waive the player damage
+-- requirement, which CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ does on its own - the conscripts
+-- do most of the killing, and quest credit has to land anyway. The corpse timer the script also
+-- set is now the summonTime below. 27685 keeps the flag for parity even though nothing spawns it.
+UPDATE `creature_template` SET `ScriptName` = '', `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (27531, 27685));
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (27686, 27687));
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 27567);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -456,14 +465,23 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 -- ==========================================================================
 -- SCOURGE ATTACK WAVES
--- Summoned by Captain Iskandar, one group per wave. Route is a property of the
--- spawn slot: every spawn point sighted more than once ran to a byte-identical
--- destination each time (32/32 in the sniff), so slot N always walks path N.
--- Paths are numbered <entry>*100 + n and run (move_type 1).
--- Groups 1 and 3 legitimately share three spawn points; their duplicate paths
--- are kept separate so the groups stay independent.
+-- Summoned by the captains, one creature_summon_groups group per wave.
+-- Groups 0-6 belong to Captain Iskandar, 7-8 to Captain Drayzen, so a path id stays
+-- unique across both sides.
+--
+-- Route is a property of the spawn slot: every spawn point sighted more than once ran to
+-- a byte-identical destination each time (32/32 in the sniff), and only 2 of 40 routes are
+-- shared between slots. Paths therefore key off the slot and are numbered
+--     <entry> * 100 + <groupId> * 10 + <index of that entry within the group>
+-- which npc_heated_battle_captain derives directly from the summon list. Keep each group's
+-- rows contiguous and in path order: creature_summon_groups has no index, so the order rows
+-- come back in is the order they were inserted.
+--
+-- summonType 6 (TEMPSUMMON_CORPSE_TIMED_DESPAWN) with 60s: a wave stays until it is killed,
+-- then the corpse lingers a minute before it is cleaned up.
+-- move_type 1: the attackers run. Groups 1 and 3 legitimately share three spawn points.
 -- ==========================================================================
-DELETE FROM `creature_summon_groups` WHERE (`summonerId` = 27567) AND (`summonerType` = 0);
+DELETE FROM `creature_summon_groups` WHERE (`summonerId` IN (27567, 27751)) AND (`summonerType` = 0);
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
 -- group 0: SOUTH -- Necromancer + 6 Geists   (seen 7x; coordinates from 19:57:14.559 packet 67301)
 (27567, 0, 0, 27686, 3626.7517, 844.8213, 60.66234, 2.792526721954345703, 6, 60000, 'SOUTH - Geist - path 2768600'),
@@ -474,63 +492,89 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (27567, 0, 0, 27686, 3641.884, 841.3059, 60.24088, 5.532693862915039062, 6, 60000, 'SOUTH - Geist - path 2768605'),
 (27567, 0, 0, 27687, 3635.5405, 845.56226, 60.547443, 4.642575740814208984, 6, 60000, 'SOUTH - Necro - path 2768700'),
 -- group 1: SOUTH -- Abomination + 2 Geists   (seen 4x; coordinates from 19:52:59.670 packet 56130)
-(27567, 0, 1, 27531, 3631.0967, 827.1009, 62.925327, 1.850049018859863281, 6, 60000, 'SOUTH - Abom - path 2753100'),
-(27567, 0, 1, 27686, 3627.7554, 833.6415, 62.412754, 0.733038306236267089, 6, 60000, 'SOUTH - Geist - path 2768606'),
-(27567, 0, 1, 27686, 3636.0417, 830.93506, 62.21592, 2.478367567062377929, 6, 60000, 'SOUTH - Geist - path 2768607'),
+(27567, 0, 1, 27531, 3631.0967, 827.1009, 62.925327, 1.850049018859863281, 6, 60000, 'SOUTH - Abom - path 2753110'),
+(27567, 0, 1, 27686, 3627.7554, 833.6415, 62.412754, 0.733038306236267089, 6, 60000, 'SOUTH - Geist - path 2768610'),
+(27567, 0, 1, 27686, 3636.0417, 830.93506, 62.21592, 2.478367567062377929, 6, 60000, 'SOUTH - Geist - path 2768611'),
 -- group 2: SOUTH -- Abomination + 4 Geists   (seen 3x; coordinates from 19:58:04.741 packet 71046)
-(27567, 0, 2, 27531, 3643.375, 858.74304, 58.42003, 5.393067359924316406, 6, 60000, 'SOUTH - Abom - path 2753101'),
-(27567, 0, 2, 27686, 3639.5256, 862.6922, 57.844265, 6.0737457275390625, 6, 60000, 'SOUTH - Geist - path 2768608'),
-(27567, 0, 2, 27686, 3643.201, 865.0904, 57.08768, 6.0737457275390625, 6, 60000, 'SOUTH - Geist - path 2768609'),
-(27567, 0, 2, 27686, 3649.2886, 860.8603, 57.310757, 4.415682792663574218, 6, 60000, 'SOUTH - Geist - path 2768610'),
-(27567, 0, 2, 27686, 3652.5833, 863.44226, 56.890697, 1.239183783531188964, 6, 60000, 'SOUTH - Geist - path 2768611'),
+(27567, 0, 2, 27531, 3643.375, 858.74304, 58.42003, 5.393067359924316406, 6, 60000, 'SOUTH - Abom - path 2753120'),
+(27567, 0, 2, 27686, 3639.5256, 862.6922, 57.844265, 6.0737457275390625, 6, 60000, 'SOUTH - Geist - path 2768620'),
+(27567, 0, 2, 27686, 3643.201, 865.0904, 57.08768, 6.0737457275390625, 6, 60000, 'SOUTH - Geist - path 2768621'),
+(27567, 0, 2, 27686, 3649.2886, 860.8603, 57.310757, 4.415682792663574218, 6, 60000, 'SOUTH - Geist - path 2768622'),
+(27567, 0, 2, 27686, 3652.5833, 863.44226, 56.890697, 1.239183783531188964, 6, 60000, 'SOUTH - Geist - path 2768623'),
 -- group 3: SOUTH -- Abomination + 6 Geists   (seen 4x; coordinates from 19:58:56.125 packet 74564)
-(27567, 0, 3, 27531, 3631.0967, 827.1009, 62.925327, 1.850049018859863281, 6, 60000, 'SOUTH - Abom - path 2753102'),
-(27567, 0, 3, 27686, 3627.7554, 833.6415, 62.412754, 0.733038306236267089, 6, 60000, 'SOUTH - Geist - path 2768612'),
-(27567, 0, 3, 27686, 3630.396, 853.54175, 59.336708, 3.752457857131958007, 6, 60000, 'SOUTH - Geist - path 2768613'),
-(27567, 0, 3, 27686, 3636.0417, 830.93506, 62.21592, 2.478367567062377929, 6, 60000, 'SOUTH - Geist - path 2768614'),
-(27567, 0, 3, 27686, 3636.1807, 854.2664, 59.609524, 1.396263360977172851, 6, 60000, 'SOUTH - Geist - path 2768615'),
-(27567, 0, 3, 27686, 3639.2942, 850.2552, 59.38392, 4.520402908325195312, 6, 60000, 'SOUTH - Geist - path 2768616'),
-(27567, 0, 3, 27686, 3644.5542, 850.5862, 58.54313, 1.867502331733703613, 6, 60000, 'SOUTH - Geist - path 2768617'),
+(27567, 0, 3, 27531, 3631.0967, 827.1009, 62.925327, 1.850049018859863281, 6, 60000, 'SOUTH - Abom - path 2753130'),
+(27567, 0, 3, 27686, 3627.7554, 833.6415, 62.412754, 0.733038306236267089, 6, 60000, 'SOUTH - Geist - path 2768630'),
+(27567, 0, 3, 27686, 3630.396, 853.54175, 59.336708, 3.752457857131958007, 6, 60000, 'SOUTH - Geist - path 2768631'),
+(27567, 0, 3, 27686, 3636.0417, 830.93506, 62.21592, 2.478367567062377929, 6, 60000, 'SOUTH - Geist - path 2768632'),
+(27567, 0, 3, 27686, 3636.1807, 854.2664, 59.609524, 1.396263360977172851, 6, 60000, 'SOUTH - Geist - path 2768633'),
+(27567, 0, 3, 27686, 3639.2942, 850.2552, 59.38392, 4.520402908325195312, 6, 60000, 'SOUTH - Geist - path 2768634'),
+(27567, 0, 3, 27686, 3644.5542, 850.5862, 58.54313, 1.867502331733703613, 6, 60000, 'SOUTH - Geist - path 2768635'),
 -- group 4: EAST -- 6 Geists   (seen 2x; coordinates from 20:12:40.733 packet 116929)
-(27567, 0, 4, 27686, 3757.7104, 766.1674, 62.890156, 1.884955525398254394, 6, 60000, 'EAST - Geist - path 2768618'),
-(27567, 0, 4, 27686, 3759.6614, 764.02844, 62.288853, 3.665191411972045898, 6, 60000, 'EAST - Geist - path 2768619'),
-(27567, 0, 4, 27686, 3760.1384, 766.6206, 62.589363, 0.069813169538974761, 6, 60000, 'EAST - Geist - path 2768620'),
-(27567, 0, 4, 27686, 3760.7493, 769.15607, 62.795174, 6.195918560028076171, 6, 60000, 'EAST - Geist - path 2768621'),
-(27567, 0, 4, 27686, 3762.303, 764.4466, 61.909737, 2.007128715515136718, 6, 60000, 'EAST - Geist - path 2768622'),
-(27567, 0, 4, 27686, 3762.8386, 766.9697, 62.177036, 4.590215682983398437, 6, 60000, 'EAST - Geist - path 2768623'),
+(27567, 0, 4, 27686, 3757.7104, 766.1674, 62.890156, 1.884955525398254394, 6, 60000, 'EAST - Geist - path 2768640'),
+(27567, 0, 4, 27686, 3759.6614, 764.02844, 62.288853, 3.665191411972045898, 6, 60000, 'EAST - Geist - path 2768641'),
+(27567, 0, 4, 27686, 3760.1384, 766.6206, 62.589363, 0.069813169538974761, 6, 60000, 'EAST - Geist - path 2768642'),
+(27567, 0, 4, 27686, 3760.7493, 769.15607, 62.795174, 6.195918560028076171, 6, 60000, 'EAST - Geist - path 2768643'),
+(27567, 0, 4, 27686, 3762.303, 764.4466, 61.909737, 2.007128715515136718, 6, 60000, 'EAST - Geist - path 2768644'),
+(27567, 0, 4, 27686, 3762.8386, 766.9697, 62.177036, 4.590215682983398437, 6, 60000, 'EAST - Geist - path 2768645'),
 -- group 5: EAST -- Abomination + 7 Geists   (seen 5x; coordinates from 20:37:41.089 packet 172873)
-(27567, 0, 5, 27531, 3767.9536, 759.10095, 59.854744, 1.745329260826110839, 6, 60000, 'EAST - Abom - path 2753103'),   -- POSITION APPROXIMATE (caught mid-move)
-(27567, 0, 5, 27686, 3755.6506, 768.1376, 63.41838, 0.628318548202514648, 6, 60000, 'EAST - Geist - path 2768624'),
-(27567, 0, 5, 27686, 3758.6506, 768.2493, 63.0299, 2.426007747650146484, 6, 60000, 'EAST - Geist - path 2768625'),
-(27567, 0, 5, 27686, 3759.448, 770.4917, 63.152355, 4.310963153839111328, 6, 60000, 'EAST - Geist - path 2768626'),
-(27567, 0, 5, 27686, 3763.317, 761.05493, 61.153877, 5.759586334228515625, 6, 60000, 'EAST - Geist - path 2768627'),
-(27567, 0, 5, 27686, 3766.462, 763.33606, 60.895473, 3.822271108627319335, 6, 60000, 'EAST - Geist - path 2768628'),
-(27567, 0, 5, 27686, 3768.9658, 753.6746, 58.78656, 6.021385669708251953, 6, 60000, 'EAST - Geist - path 2768629'),
-(27567, 0, 5, 27686, 3772.746, 756.7438, 58.82063, 2.809980154037475585, 6, 60000, 'EAST - Geist - path 2768630'),
+(27567, 0, 5, 27531, 3767.9536, 759.10095, 59.854744, 1.745329260826110839, 6, 60000, 'EAST - Abom - path 2753150'),   -- POSITION APPROXIMATE (caught mid-move)
+(27567, 0, 5, 27686, 3755.6506, 768.1376, 63.41838, 0.628318548202514648, 6, 60000, 'EAST - Geist - path 2768650'),
+(27567, 0, 5, 27686, 3758.6506, 768.2493, 63.0299, 2.426007747650146484, 6, 60000, 'EAST - Geist - path 2768651'),
+(27567, 0, 5, 27686, 3759.448, 770.4917, 63.152355, 4.310963153839111328, 6, 60000, 'EAST - Geist - path 2768652'),
+(27567, 0, 5, 27686, 3763.317, 761.05493, 61.153877, 5.759586334228515625, 6, 60000, 'EAST - Geist - path 2768653'),
+(27567, 0, 5, 27686, 3766.462, 763.33606, 60.895473, 3.822271108627319335, 6, 60000, 'EAST - Geist - path 2768654'),
+(27567, 0, 5, 27686, 3768.9658, 753.6746, 58.78656, 6.021385669708251953, 6, 60000, 'EAST - Geist - path 2768655'),
+(27567, 0, 5, 27686, 3772.746, 756.7438, 58.82063, 2.809980154037475585, 6, 60000, 'EAST - Geist - path 2768656'),
 -- group 6: SHRINE -- Abomination + 6 Geists + 2 Necromancers   (seen 3x; coordinates from 19:51:05.404 packet 52279)
-(27567, 0, 6, 27531, 3675.567, 866.78033, 56.26623, 3.857177734375, 6, 60000, 'SHRINE - Abom - path 2753104'),
-(27567, 0, 6, 27686, 3659.7483, 876.86786, 56.944252, 4.921828269958496093, 6, 60000, 'SHRINE - Geist - path 2768631'),
-(27567, 0, 6, 27686, 3664.7622, 876.08655, 56.73396, 4.677482128143310546, 6, 60000, 'SHRINE - Geist - path 2768632'),
-(27567, 0, 6, 27686, 3668.9622, 872.8576, 56.08941, 4.345870018005371093, 6, 60000, 'SHRINE - Geist - path 2768633'),
-(27567, 0, 6, 27686, 3681.2483, 859.9791, 58.60043, 3.525565147399902343, 6, 60000, 'SHRINE - Geist - path 2768634'),
-(27567, 0, 6, 27686, 3684.188, 855.4685, 59.003628, 3.193952560424804687, 6, 60000, 'SHRINE - Geist - path 2768635'),
-(27567, 0, 6, 27686, 3686.5127, 848.71344, 57.36397, 2.792526721954345703, 6, 60000, 'SHRINE - Geist - path 2768636'),
-(27567, 0, 6, 27687, 3666.8298, 880.2456, 57.150173, 4.625122547149658203, 6, 60000, 'SHRINE - Necro - path 2768701'),
-(27567, 0, 6, 27687, 3688.361, 857.3421, 58.671318, 3.246312379837036132, 6, 60000, 'SHRINE - Necro - path 2768702');
+(27567, 0, 6, 27531, 3675.567, 866.78033, 56.26623, 3.857177734375, 6, 60000, 'SHRINE - Abom - path 2753160'),
+(27567, 0, 6, 27686, 3659.7483, 876.86786, 56.944252, 4.921828269958496093, 6, 60000, 'SHRINE - Geist - path 2768660'),
+(27567, 0, 6, 27686, 3664.7622, 876.08655, 56.73396, 4.677482128143310546, 6, 60000, 'SHRINE - Geist - path 2768661'),
+(27567, 0, 6, 27686, 3668.9622, 872.8576, 56.08941, 4.345870018005371093, 6, 60000, 'SHRINE - Geist - path 2768662'),
+(27567, 0, 6, 27686, 3681.2483, 859.9791, 58.60043, 3.525565147399902343, 6, 60000, 'SHRINE - Geist - path 2768663'),
+(27567, 0, 6, 27686, 3684.188, 855.4685, 59.003628, 3.193952560424804687, 6, 60000, 'SHRINE - Geist - path 2768664'),
+(27567, 0, 6, 27686, 3686.5127, 848.71344, 57.36397, 2.792526721954345703, 6, 60000, 'SHRINE - Geist - path 2768665'),
+(27567, 0, 6, 27687, 3666.8298, 880.2456, 57.150173, 4.625122547149658203, 6, 60000, 'SHRINE - Necro - path 2768760'),
+(27567, 0, 6, 27687, 3688.361, 857.3421, 58.671318, 3.246312379837036132, 6, 60000, 'SHRINE - Necro - path 2768761'),
+-- group 7: HORDE -- 4 Geists   (seen 3x; coordinates from 19:53:47.155 packet 57651)
+(27751, 0, 7, 27686, 3637.799, 1113.7489, 80.1781, 2.059488534927368164, 6, 60000, 'HORDE - Geist - path 2768670'),
+(27751, 0, 7, 27686, 3640.551, 1111.3931, 77.90086, 2.600540637969970703, 6, 60000, 'HORDE - Geist - path 2768671'),
+(27751, 0, 7, 27686, 3643.1653, 1117.6732, 81.38985, 2.321287870407104492, 6, 60000, 'HORDE - Geist - path 2768672'),
+(27751, 0, 7, 27686, 3645.316, 1113.3911, 78.04383, 5.462880611419677734, 6, 60000, 'HORDE - Geist - path 2768673'),
+-- group 8: HORDE -- Abomination + 6 Geists   (seen 3x; coordinates from 20:23:08.112 packet 142415)
+(27751, 0, 8, 27531, 3642.0183, 1108.3624, 76.29655, 0.575958669185638427, 6, 60000, 'HORDE - Abom - path 2753180'),
+(27751, 0, 8, 27686, 3634.7134, 1110.0045, 79.1014, 3.455751895904541015, 6, 60000, 'HORDE - Geist - path 2768680'),
+(27751, 0, 8, 27686, 3637.799, 1113.7489, 80.1781, 1.715128064155578613, 6, 60000, 'HORDE - Geist - path 2768681'),   -- POSITION APPROXIMATE (caught mid-move)
+(27751, 0, 8, 27686, 3640.551, 1111.3931, 77.90086, 2.600540637969970703, 6, 60000, 'HORDE - Geist - path 2768682'),
+(27751, 0, 8, 27686, 3643.1653, 1117.6732, 81.38985, 2.321287870407104492, 6, 60000, 'HORDE - Geist - path 2768683'),   -- POSITION APPROXIMATE (caught mid-move)
+(27751, 0, 8, 27686, 3645.316, 1113.3911, 78.04383, 5.462880611419677734, 6, 60000, 'HORDE - Geist - path 2768684'),
+(27751, 0, 8, 27686, 3649.7527, 1117.7316, 80.87788, 2.268928050994873046, 6, 60000, 'HORDE - Geist - path 2768685'),   -- POSITION APPROXIMATE (caught mid-move)
+
+-- group 9: HORDE -- Necromancer + 7 Geists   (seen 4x; coordinates from 20:17:55.950 packet 127399)
+-- This wave alternates with group 8 on a ~3m20s cycle (B,A,B,A,B,A,B at 1m52s / 1m27s), from a
+-- spawn point ~15 yd uphill of group 8's. It was never caught at rest, so every position below
+-- is the least advanced sighting of that slot; the four sightings agree to within 3 yd.
+(27751, 0, 9, 27686, 3580.3958, 1093.16, 151.50317, 1.037295341491699218, 6, 60000, 'HORDE - Geist - path 2768690'),   -- APPROXIMATE: seen 3x, all moving, positions agree to 0.0 yd
+(27751, 0, 9, 27686, 3635.384, 1123.8596, 87.98483, 3.228859186172485351, 6, 60000, 'HORDE - Geist - path 2768691'),   -- APPROXIMATE: seen 4x, all moving, positions agree to 2.6 yd
+(27751, 0, 9, 27686, 3637.5662, 1128.3689, 90.990685, 1.915084242820739746, 6, 60000, 'HORDE - Geist - path 2768692'),   -- APPROXIMATE: seen 4x, all moving, positions agree to 3.0 yd
+(27751, 0, 9, 27686, 3640.5002, 1130.9894, 93.34786, 1.972222089767456054, 6, 60000, 'HORDE - Geist - path 2768693'),   -- APPROXIMATE: seen 4x, all moving, positions agree to 2.4 yd
+(27751, 0, 9, 27686, 3641.3264, 1125.1437, 88.22113, 3.298672199249267578, 6, 60000, 'HORDE - Geist - path 2768694'),   -- APPROXIMATE: seen 4x, all moving, positions agree to 2.9 yd
+(27751, 0, 9, 27686, 3643.1401, 1127.9269, 90.793076, 6.056292533874511718, 6, 60000, 'HORDE - Geist - path 2768695'),   -- APPROXIMATE: seen 4x, all moving, positions agree to 2.4 yd
+(27751, 0, 9, 27686, 3646.8403, 1125.3961, 89.62334, 2.617993831634521484, 6, 60000, 'HORDE - Geist - path 2768696'),   -- APPROXIMATE: seen 4x, all moving, positions agree to 2.2 yd
+(27751, 0, 9, 27687, 3638.3464, 1119.1643, 84.02678, 1.917418122291564941, 6, 60000, 'HORDE - Necro - path 2768790');   -- APPROXIMATE: seen 1x, all moving, positions agree to 0.0 yd
 
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2753100 AND 2753199;
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768600 AND 2768699;
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768700 AND 2768799;
 -- The shrine garrison never leaves its spawn, so these slots get no path:
--- path 2753104 (SHRINE Abom) - no approach spline sighted, creature holds at its spawn
--- path 2768631 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
--- path 2768632 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
--- path 2768633 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
--- path 2768634 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
--- path 2768635 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
--- path 2768636 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
--- path 2768701 (SHRINE Necro) - no approach spline sighted, creature holds at its spawn
--- path 2768702 (SHRINE Necro) - no approach spline sighted, creature holds at its spawn
+-- path 2753160 (SHRINE Abom) - no approach spline sighted, creature holds at its spawn
+-- path 2768660 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768661 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768662 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768663 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768664 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768665 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768760 (SHRINE Necro) - no approach spline sighted, creature holds at its spawn
+-- path 2768761 (SHRINE Necro) - no approach spline sighted, creature holds at its spawn
 
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `smoothTransition`, `move_type`) VALUES
 -- path 2768600 -- SOUTH Geist from 3626.7517 844.8213
@@ -548,72 +592,141 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 -- path 2768700 -- SOUTH Necro from 3635.5405 845.5623
 (2768700, 1, 3625.97, 813.184, 64.27876, NULL, 0, 1),
 (2768700, 2, 3612.4, 773.206, 71.03034, NULL, 0, 1),
--- path 2753100 -- SOUTH Abom from 3631.0967 827.1009
-(2753100, 1, 3614.0564, 778.05914, 70.30283, NULL, 0, 1),
--- path 2768606 -- SOUTH Geist from 3627.7554 833.6415
-(2768606, 1, 3604.3188, 782.0027, 71.27799, NULL, 0, 1),
--- path 2768607 -- SOUTH Geist from 3636.0417 830.9351
-(2768607, 1, 3620.3792, 775.383, 70.29366, NULL, 0, 1),
--- path 2753101 -- SOUTH Abom from 3643.3750 858.7430
-(2753101, 1, 3614.1248, 778.0329, 70.2873, NULL, 0, 1),
--- path 2768608 -- SOUTH Geist from 3639.5256 862.6922
-(2768608, 1, 3604.291, 782.083, 71.22034, NULL, 0, 1),
--- path 2768609 -- SOUTH Geist from 3643.2010 865.0904
-(2768609, 1, 3604.4124, 781.9591, 71.26213, NULL, 0, 1),
--- path 2768610 -- SOUTH Geist from 3649.2886 860.8603
-(2768610, 1, 3620.575, 775.3345, 70.30639, NULL, 0, 1),
--- path 2768611 -- SOUTH Geist from 3652.5833 863.4423
-(2768611, 1, 3620.725, 775.28394, 70.31409, NULL, 0, 1),
--- path 2753102 -- SOUTH Abom from 3631.0967 827.1009
-(2753102, 1, 3614.0564, 778.05914, 70.30283, NULL, 0, 1),
--- path 2768612 -- SOUTH Geist from 3627.7554 833.6415
-(2768612, 1, 3604.3188, 782.0027, 71.27799, NULL, 0, 1),
--- path 2768613 -- SOUTH Geist from 3630.3960 853.5417
-(2768613, 1, 3604.0488, 782.292, 71.4722, NULL, 0, 1),
--- path 2768614 -- SOUTH Geist from 3636.0417 830.9351
-(2768614, 1, 3620.3792, 775.383, 70.29366, NULL, 0, 1),
--- path 2768615 -- SOUTH Geist from 3636.1807 854.2664
-(2768615, 1, 3604.2644, 782.03094, 71.28683, NULL, 0, 1),
--- path 2768616 -- SOUTH Geist from 3639.2942 850.2552
-(2768616, 1, 3620.2837, 775.4213, 70.31531, NULL, 0, 1),
--- path 2768617 -- SOUTH Geist from 3644.5542 850.5862
-(2768617, 1, 3620.574, 775.3278, 70.2943, NULL, 0, 1),
--- path 2768618 -- EAST Geist from 3757.7104 766.1674
-(2768618, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
--- path 2768619 -- EAST Geist from 3759.6614 764.0284
-(2768619, 1, 3858.7815, 677.822, 59.89315, NULL, 0, 1),
--- path 2768620 -- EAST Geist from 3760.1384 766.6206
-(2768620, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
--- path 2768621 -- EAST Geist from 3760.7493 769.1561
-(2768621, 1, 3858.7815, 677.822, 59.89315, NULL, 0, 1),
--- path 2768622 -- EAST Geist from 3762.3030 764.4466
-(2768622, 1, 3851.576, 671.38025, 58.56033, NULL, 0, 1),
--- path 2768623 -- EAST Geist from 3762.8386 766.9697
-(2768623, 1, 3851.624, 671.43243, 58.60671, NULL, 0, 1),
--- path 2753103 -- EAST Abom from 3767.9536 759.1010
-(2753103, 1, 3823.4775, 694.0947, 59.41341, NULL, 0, 1),
-(2753103, 2, 3839.2588, 667.22906, 58.36109, NULL, 0, 1),
--- path 2768624 -- EAST Geist from 3755.6506 768.1376
-(2768624, 1, 3859.2427, 678.4638, 59.9894, NULL, 0, 1),
--- path 2768625 -- EAST Geist from 3758.6506 768.2493
-(2768625, 1, 3851.5723, 671.3806, 58.58128, NULL, 0, 1),
--- path 2768626 -- EAST Geist from 3759.4480 770.4917
-(2768626, 1, 3851.5625, 671.3736, 58.59481, NULL, 0, 1),
--- path 2768627 -- EAST Geist from 3763.3170 761.0549
-(2768627, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
--- path 2768628 -- EAST Geist from 3766.4620 763.3361
-(2768628, 1, 3845.4673, 670.1445, 58.13992, NULL, 0, 1),
--- path 2768629 -- EAST Geist from 3768.9658 753.6746
-(2768629, 1, 3829.3748, 688.6724, 58.76442, NULL, 0, 1),
--- path 2768630 -- EAST Geist from 3772.7460 756.7438
-(2768630, 1, 3838.4294, 681.2864, 58.12796, NULL, 0, 1);
+-- path 2753110 -- SOUTH Abom from 3631.0967 827.1009
+(2753110, 1, 3614.0564, 778.05914, 70.30283, NULL, 0, 1),
+-- path 2768610 -- SOUTH Geist from 3627.7554 833.6415
+(2768610, 1, 3604.3188, 782.0027, 71.27799, NULL, 0, 1),
+-- path 2768611 -- SOUTH Geist from 3636.0417 830.9351
+(2768611, 1, 3620.3792, 775.383, 70.29366, NULL, 0, 1),
+-- path 2753120 -- SOUTH Abom from 3643.3750 858.7430
+(2753120, 1, 3614.1248, 778.0329, 70.2873, NULL, 0, 1),
+-- path 2768620 -- SOUTH Geist from 3639.5256 862.6922
+(2768620, 1, 3604.291, 782.083, 71.22034, NULL, 0, 1),
+-- path 2768621 -- SOUTH Geist from 3643.2010 865.0904
+(2768621, 1, 3604.4124, 781.9591, 71.26213, NULL, 0, 1),
+-- path 2768622 -- SOUTH Geist from 3649.2886 860.8603
+(2768622, 1, 3620.575, 775.3345, 70.30639, NULL, 0, 1),
+-- path 2768623 -- SOUTH Geist from 3652.5833 863.4423
+(2768623, 1, 3620.725, 775.28394, 70.31409, NULL, 0, 1),
+-- path 2753130 -- SOUTH Abom from 3631.0967 827.1009
+(2753130, 1, 3614.0564, 778.05914, 70.30283, NULL, 0, 1),
+-- path 2768630 -- SOUTH Geist from 3627.7554 833.6415
+(2768630, 1, 3604.3188, 782.0027, 71.27799, NULL, 0, 1),
+-- path 2768631 -- SOUTH Geist from 3630.3960 853.5417
+(2768631, 1, 3604.0488, 782.292, 71.4722, NULL, 0, 1),
+-- path 2768632 -- SOUTH Geist from 3636.0417 830.9351
+(2768632, 1, 3620.3792, 775.383, 70.29366, NULL, 0, 1),
+-- path 2768633 -- SOUTH Geist from 3636.1807 854.2664
+(2768633, 1, 3604.2644, 782.03094, 71.28683, NULL, 0, 1),
+-- path 2768634 -- SOUTH Geist from 3639.2942 850.2552
+(2768634, 1, 3620.2837, 775.4213, 70.31531, NULL, 0, 1),
+-- path 2768635 -- SOUTH Geist from 3644.5542 850.5862
+(2768635, 1, 3620.574, 775.3278, 70.2943, NULL, 0, 1),
+-- path 2768640 -- EAST Geist from 3757.7104 766.1674
+(2768640, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
+-- path 2768641 -- EAST Geist from 3759.6614 764.0284
+(2768641, 1, 3858.7815, 677.822, 59.89315, NULL, 0, 1),
+-- path 2768642 -- EAST Geist from 3760.1384 766.6206
+(2768642, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
+-- path 2768643 -- EAST Geist from 3760.7493 769.1561
+(2768643, 1, 3858.7815, 677.822, 59.89315, NULL, 0, 1),
+-- path 2768644 -- EAST Geist from 3762.3030 764.4466
+(2768644, 1, 3851.576, 671.38025, 58.56033, NULL, 0, 1),
+-- path 2768645 -- EAST Geist from 3762.8386 766.9697
+(2768645, 1, 3851.624, 671.43243, 58.60671, NULL, 0, 1),
+-- path 2753150 -- EAST Abom from 3767.9536 759.1010
+(2753150, 1, 3823.4775, 694.0947, 59.41341, NULL, 0, 1),
+(2753150, 2, 3839.2588, 667.22906, 58.36109, NULL, 0, 1),
+-- path 2768650 -- EAST Geist from 3755.6506 768.1376
+(2768650, 1, 3859.2427, 678.4638, 59.9894, NULL, 0, 1),
+-- path 2768651 -- EAST Geist from 3758.6506 768.2493
+(2768651, 1, 3851.5723, 671.3806, 58.58128, NULL, 0, 1),
+-- path 2768652 -- EAST Geist from 3759.4480 770.4917
+(2768652, 1, 3851.5625, 671.3736, 58.59481, NULL, 0, 1),
+-- path 2768653 -- EAST Geist from 3763.3170 761.0549
+(2768653, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
+-- path 2768654 -- EAST Geist from 3766.4620 763.3361
+(2768654, 1, 3845.4673, 670.1445, 58.13992, NULL, 0, 1),
+-- path 2768655 -- EAST Geist from 3768.9658 753.6746
+(2768655, 1, 3829.3748, 688.6724, 58.76442, NULL, 0, 1),
+-- path 2768656 -- EAST Geist from 3772.7460 756.7438
+(2768656, 1, 3838.4294, 681.2864, 58.12796, NULL, 0, 1),
+-- path 2768670 -- HORDE Geist from 3637.7990 1113.7489
+(2768670, 1, 3633.7605, 1141.5234, 101.31105, NULL, 0, 1),
+-- path 2768671 -- HORDE Geist from 3640.5510 1111.3931
+(2768671, 1, 3634.9346, 1137.7861, 98.78249, NULL, 0, 1),
+-- path 2768672 -- HORDE Geist from 3643.1653 1117.6732  (legs taken from another sighting of this spawn point)
+(2768672, 1, 3631.6848, 1148.7568, 106.89459, NULL, 0, 1),
+(2768672, 2, 3637.073, 1186.4427, 125.71338, NULL, 0, 1),
+(2768672, 3, 3644.1736, 1219.997, 133.5263, NULL, 0, 1),
+-- path 2768673 -- HORDE Geist from 3645.3160 1113.3911
+(2768673, 1, 3637.5745, 1137.416, 98.38801, NULL, 0, 1),
+-- path 2753180 -- HORDE Abom from 3642.0183 1108.3624
+(2753180, 1, 3635.76, 1138.0193, 98.79371, NULL, 0, 1),
+(2753180, 2, 3629.212, 1149.0497, 106.53441, NULL, 0, 1),
+(2753180, 3, 3637.1663, 1165.982, 117.88687, NULL, 0, 1),
+(2753180, 4, 3636.7764, 1184.9824, 125.26865, NULL, 0, 1),
+(2753180, 5, 3645.9688, 1216.4242, 132.84203, NULL, 0, 1),
+-- path 2768680 -- HORDE Geist from 3634.7134 1110.0045
+(2768680, 1, 3632.48, 1137.5823, 98.65333, NULL, 0, 1),
+(2768680, 2, 3626.0415, 1153.6621, 108.8643, NULL, 0, 1),
+(2768680, 3, 3632.8687, 1162.8483, 115.6544, NULL, 0, 1),
+(2768680, 4, 3631.8752, 1188.38, 125.47243, NULL, 0, 1),
+-- path 2768681 -- HORDE Geist from 3637.7990 1113.7489
+(2768681, 1, 3634.779, 1163.5603, 116.25324, NULL, 0, 1),
+(2768681, 2, 3635.0266, 1185.8761, 125.15726, NULL, 0, 1),
+-- path 2768682 -- HORDE Geist from 3640.5510 1111.3931
+(2768682, 1, 3634.9346, 1137.7861, 98.78249, NULL, 0, 1),
+(2768682, 2, 3630.6736, 1151.5024, 108.38927, NULL, 0, 1),
+(2768682, 3, 3635.5955, 1166.1969, 117.96056, NULL, 0, 1),
+(2768682, 4, 3635.09, 1189.981, 126.20715, NULL, 0, 1),
+-- path 2768683 -- HORDE Geist from 3643.1653 1117.6732
+(2768683, 1, 3631.6848, 1148.7568, 106.89459, NULL, 0, 1),
+(2768683, 2, 3636.5457, 1164.672, 117.09983, NULL, 0, 1),
+(2768683, 3, 3637.073, 1186.4427, 125.71338, NULL, 0, 1),
+(2768683, 4, 3644.1736, 1219.997, 133.5263, NULL, 0, 1),
+-- path 2768684 -- HORDE Geist from 3645.3160 1113.3911
+(2768684, 1, 3637.5745, 1137.416, 98.38801, NULL, 0, 1),
+(2768684, 2, 3633.48, 1150.3357, 108.38216, NULL, 0, 1),
+(2768684, 3, 3638.8582, 1165.4539, 117.84776, NULL, 0, 1),
+-- path 2768685 -- HORDE Geist from 3649.7527 1117.7316
+(2768685, 1, 3633.8318, 1149.235, 107.83878, NULL, 0, 1),
+(2768685, 2, 3641.8008, 1164.2432, 117.80559, NULL, 0, 1),
+(2768685, 3, 3641.6306, 1186.2717, 127.14329, NULL, 0, 1),
+
+-- path 2768690 -- HORDE Geist from 3580.3958 1093.1600
+(2768690, 1, 3598.924, 1118.5566, 148.73746, NULL, 0, 1),
+(2768690, 2, 3592.9207, 1151.7969, 144.1357, NULL, 0, 1),
+-- path 2768691 -- HORDE Geist from 3635.3840 1123.8596
+(2768691, 1, 3632.8687, 1162.8483, 115.6544, NULL, 0, 1),
+(2768691, 2, 3631.8752, 1188.38, 125.47243, NULL, 0, 1),
+-- path 2768692 -- HORDE Geist from 3637.5662 1128.3689
+(2768692, 1, 3635.7112, 1164.098, 116.69835, NULL, 0, 1),
+(2768692, 2, 3633.8196, 1185.0059, 124.71602, NULL, 0, 1),
+(2768692, 3, 3635.3923, 1207.9268, 130.7355, NULL, 0, 1),
+-- path 2768693 -- HORDE Geist from 3640.5002 1130.9894
+(2768693, 1, 3638.2612, 1163.5366, 116.67506, NULL, 0, 1),
+(2768693, 2, 3637.8162, 1186.8447, 126.01469, NULL, 0, 1),
+(2768693, 3, 3645.3655, 1216.4551, 132.8346, NULL, 0, 1),
+-- path 2768694 -- HORDE Geist from 3641.3264 1125.1437
+(2768694, 1, 3636.4634, 1163.2134, 116.26178, NULL, 0, 1),
+(2768694, 2, 3636.4883, 1188.4065, 126.09148, NULL, 0, 1),
+-- path 2768695 -- HORDE Geist from 3643.1401 1127.9269
+(2768695, 1, 3637.9875, 1164.7682, 117.31805, NULL, 0, 1),
+(2768695, 2, 3638.7454, 1187.7439, 126.53552, NULL, 0, 1),
+-- path 2768696 -- HORDE Geist from 3646.8403 1125.3961
+(2768696, 1, 3637.312, 1159.0553, 113.98731, NULL, 0, 1),
+(2768696, 2, 3640.8872, 1185.2339, 126.60243, NULL, 0, 1),
+-- path 2768790 -- HORDE Necromancer from 3638.3464 1119.1643
+(2768790, 1, 3634.9985, 1168.4827, 119.01706, NULL, 0, 1),
+(2768790, 2, 3633.7864, 1189.277, 125.84503, NULL, 0, 1);
 
 -- Horde Cleanup
-UPDATE `creature` SET `position_x`=3648.959961, `position_y`=1215.579956, `position_z`=132.792007, `orientation`=2.731850, `wander_distance`=10.63, `MovementType`=1, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=105011 AND `id`=27749;
-UPDATE `creature` SET `position_x`=3651.820068, `position_y`=1213.819946, `position_z`=132.641998, `orientation`=4.188790, `wander_distance`=20.79, `MovementType`=1, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `guid`=105024 AND `id`=27749;
-UPDATE `creature` SET `position_x`=3631.699951, `position_y`=1221.650024, `position_z`=134.931000, `orientation`=3.877450, `wander_distance`=5.96, `MovementType`=1, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=104996 AND `id`=27749;
-UPDATE `creature` SET `position_x`=3634.260010, `position_y`=1221.520020, `position_z`=134.399002, `orientation`=4.817110, `wander_distance`=17.80, `MovementType`=1, `VerifiedBuild`=47720, `CreateObject`=2 WHERE `guid`=104998 AND `id`=27749;
-UPDATE `creature` SET `position_x`=3637.129883, `position_y`=1221.699951, `position_z`=134.242996, `orientation`=2.826820, `wander_distance`=14.43, `MovementType`=1, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=105005 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3648.959961, `position_y`=1215.579956, `position_z`=132.792007, `orientation`=2.731850, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=105011 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3651.820068, `position_y`=1213.819946, `position_z`=132.641998, `orientation`=4.188790, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `guid`=105024 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3631.699951, `position_y`=1221.650024, `position_z`=134.931000, `orientation`=3.877450, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=104996 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3634.260010, `position_y`=1221.520020, `position_z`=134.399002, `orientation`=4.817110, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=47720, `CreateObject`=2 WHERE `guid`=104998 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3637.129883, `position_y`=1221.699951, `position_z`=134.242996, `orientation`=2.826820, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=105005 AND `id`=27749;
 UPDATE `creature` SET `position_x`=3619.350098, `position_y`=1198.109985, `position_z`=143.143997, `orientation`=4.922500, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=109986 AND `id`=27542;
 UPDATE `creature` SET `position_x`=3660.879883, `position_y`=1198.310059, `position_z`=145.843002, `orientation`=3.061770, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=109994 AND `id`=27542;
 
@@ -639,3 +752,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (105167, 105024, 3),
 (105167, 105012, 3),
 (105167, 105167, 3);
+
+-- Remove flag 64 from Shoot
+UPDATE `smart_scripts` SET `action_param2` = 0 WHERE `entryorguid` IN (27564, 27749) AND `source_type` = 0 AND `action_type` = 11 AND `action_param1` = 15620;

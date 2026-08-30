@@ -35,6 +35,8 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "WaypointMgr.h"
+#include <list>
+#include <unordered_map>
 
 /********
 QUEST Conversing With the Depths (12032)
@@ -902,48 +904,22 @@ class spell_call_wintergarde_gryphon : public SpellScript
     }
 };
 
-class npc_heated_battle : public CreatureScript
-{
-public:
-    npc_heated_battle() : CreatureScript("npc_heated_battle") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return new npc_heated_battleAI (pCreature);
-    }
-
-    struct npc_heated_battleAI : public CombatAI
-    {
-        npc_heated_battleAI(Creature* c) : CombatAI(c) {}
-
-        void Reset() override
-        {
-            me->SetCorpseDelay(60);
-            CombatAI::Reset();
-            if (Unit* target = me->SelectNearestTarget(50.0f))
-                AttackStart(target);
-        }
-
-        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
-        {
-            if (who && who->IsPlayer())
-            {
-                me->SetLootRecipient(who);
-                me->LowerPlayerDamageReq(me->GetMaxHealth());
-            }
-        }
-    };
-};
-
 /*######
-## npc_captain_iskandar - Wyrmrest Temple, "Heated Battle" (Alliance)
+## npc_heated_battle_captain - Wyrmrest Temple, "Heated Battle"
 ######*/
 
-// Iskandar and his eight Alliance Conscripts hold one of the passes below the temple, fight off
-// three waves of Scourge, then march to the next one. Which wave spawns is gated on where the
-// squad is standing, and every member walks its own sniffed path, so the state machine lives
-// here instead of in SmartAI. The conscripts keep their guid-scoped SmartAI - the captain drives
-// them by relaying each march to the formation as a DoAction().
+// Both captains hold a pass below the temple with a formation of conscripts and call in Scourge
+// waves while they do. Iskandar also marches his squad between the southern pass, the eastern
+// pass and the shrine, and which waves spawn depends on where he is standing; Drayzen holds one
+// position for the whole event, so his waves simply never stop. Every squad member walks its own
+// sniffed path, so the state machine lives here instead of in SmartAI - the conscripts keep their
+// guid-scoped SmartAI and the captain drives them by relaying each march as a DoAction().
+
+enum HeatedBattleCaptainNpcs
+{
+    NPC_CAPTAIN_ISKANDAR            = 27567,
+    NPC_CAPTAIN_DRAYZEN             = 27751
+};
 
 enum HeatedBattleCaptainSpells
 {
@@ -982,25 +958,68 @@ enum HeatedBattleCaptainStation : uint8
     STATION_SHRINE                  = 3
 };
 
+// creature_summon_groups ids. Iskandar owns 0-6 and Drayzen 7-8 so that a wave path id stays
+// unique across both sides.
+enum HeatedBattleWaveGroup : uint8
+{
+    WAVE_SOUTH_NECROMANCER          = 0,    // Necromancer + 6 Geists
+    WAVE_SOUTH_ABOMINATION_2        = 1,    // Abomination + 2 Geists
+    WAVE_SOUTH_ABOMINATION_4        = 2,    // Abomination + 4 Geists
+    WAVE_SOUTH_ABOMINATION_6        = 3,    // Abomination + 6 Geists
+    WAVE_EAST_GEISTS                = 4,    // 6 Geists
+    WAVE_EAST_ABOMINATION           = 5,    // Abomination + 7 Geists
+    WAVE_SHRINE_GARRISON            = 6,    // Abomination + 6 Geists + 2 Necromancers, never moves
+    WAVE_HORDE_GEISTS               = 7,    // 4 Geists - unreferenced, see WaveGroupFor
+    WAVE_HORDE_ABOMINATION          = 8,    // Abomination + 6 Geists
+    WAVE_HORDE_NECROMANCER          = 9     // Necromancer + 7 Geists
+};
+
 // The squad's waypoint_data path ids are laid out as (creature.guid * PATH_ID_BLOCK) + march.
 constexpr uint32 PATH_ID_BLOCK = 10;
 
+// An attacker's route belongs to its spawn slot, not to the creature, so its path id is
+// (entry * WAVE_PATH_ENTRY_BLOCK) + (group * WAVE_PATH_GROUP_BLOCK) + index within the group.
+constexpr uint32 WAVE_PATH_ENTRY_BLOCK = 100;
+constexpr uint32 WAVE_PATH_GROUP_BLOCK = 10;
+
 constexpr Seconds DEPLOY_DELAY = 5s;
-// TODO: placeholder. The squad really holds a pass until its three waves (geists, geists plus a
-// necromancer, then an abomination) are cleared, and marches only once the pass is quiet again.
-constexpr Seconds HOLD_DURATION = 3min;
+// The sniff shows waves landing at a pass roughly every 50s, three of them before the squad
+// moves on. TODO: the real trigger for moving on is unknown - this is just the observed count.
+constexpr Seconds FIRST_WAVE_DELAY = 10s;
+constexpr Seconds WAVE_INTERVAL = 50s;
+constexpr uint8 WAVES_PER_STATION = 3;
 constexpr Seconds SHRINE_HOLD_DURATION = 1min;
 constexpr Seconds RESPAWN_DELAY = 1min;
 
-struct npc_captain_iskandar : public ScriptedAI
+// Cleave / Mortal Strike / Whirlwind, kept per captain because the SAI this replaces tuned the
+// two sides differently. Each entry is { initial min, initial max, repeat min, repeat max }.
+struct HeatedBattleCaptainTimers
 {
-    npc_captain_iskandar(Creature* creature) : ScriptedAI(creature) { }
+    Milliseconds Cleave[4];
+    Milliseconds MortalStrike[4];
+    Milliseconds Whirlwind[4];
+};
+
+constexpr HeatedBattleCaptainTimers ISKANDAR_TIMERS =
+{
+    { 3s, 7s, 7s, 11s }, { 11s, 16s, 11s, 16s }, { 11s, 14s, 19s, 22s }
+};
+
+constexpr HeatedBattleCaptainTimers DRAYZEN_TIMERS =
+{
+    { 5s, 8s, 7s, 10s }, { 3s, 6s, 10s, 14s }, { 11s, 14s, 11s, 14s }
+};
+
+struct npc_heated_battle_captain : public ScriptedAI
+{
+    npc_heated_battle_captain(Creature* creature) : ScriptedAI(creature) { }
 
     void JustRespawned() override
     {
-        _station = STATION_CAMP;
+        _station = Marches() ? STATION_CAMP : STATION_SOUTH_PASS;
         _march = MARCH_CAMP_TO_SOUTH;
         _marching = false;
+        _wave = 0;
 
         ScriptedAI::JustRespawned();
     }
@@ -1028,12 +1047,16 @@ struct npc_captain_iskandar : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        // Drops the hold timer and the out of combat summons; Reset() re-arms both on evade.
+        // Drops the wave timer and the out of combat summons; Reset() re-arms both on evade.
         scheduler.CancelAll();
 
-        ScheduleTimedEvent(3s, 7s, [this] { DoCastVictim(SPELL_CLEAVE); }, 7s, 11s);
-        ScheduleTimedEvent(11s, 16s, [this] { DoCastVictim(SPELL_MORTAL_STRIKE); }, 11s, 16s);
-        ScheduleTimedEvent(11s, 14s, [this] { DoCastSelf(SPELL_WHIRLWIND); }, 19s, 22s);
+        HeatedBattleCaptainTimers const& timers = Marches() ? ISKANDAR_TIMERS : DRAYZEN_TIMERS;
+        ScheduleTimedEvent(timers.Cleave[0], timers.Cleave[1],
+            [this] { DoCastVictim(SPELL_CLEAVE); }, timers.Cleave[2], timers.Cleave[3]);
+        ScheduleTimedEvent(timers.MortalStrike[0], timers.MortalStrike[1],
+            [this] { DoCastVictim(SPELL_MORTAL_STRIKE); }, timers.MortalStrike[2], timers.MortalStrike[3]);
+        ScheduleTimedEvent(timers.Whirlwind[0], timers.Whirlwind[1],
+            [this] { DoCastSelf(SPELL_WHIRLWIND); }, timers.Whirlwind[2], timers.Whirlwind[3]);
     }
 
     // Marches can also be driven from the outside (SmartAI, a GM command) while the triggers for
@@ -1080,6 +1103,9 @@ struct npc_captain_iskandar : public ScriptedAI
     }
 
 private:
+    // Only Iskandar walks between the passes; Drayzen holds his line for the whole event.
+    [[nodiscard]] bool Marches() const { return me->GetEntry() == NPC_CAPTAIN_ISKANDAR; }
+
     [[nodiscard]] uint32 PathFor(HeatedBattleCaptainMarch march) const
     {
         return me->GetSpawnId() * PATH_ID_BLOCK + static_cast<uint32>(march);
@@ -1123,7 +1149,7 @@ private:
         uint32 const pathId = PathFor(march);
         if (!sWaypointMgr->GetPath(pathId))
         {
-            LOG_ERROR("sql.sql", "npc_captain_iskandar: creature {} has no waypoint path {}.",
+            LOG_ERROR("sql.sql", "npc_heated_battle_captain: creature {} has no waypoint path {}.",
                 me->GetGUID().ToString(), pathId);
             return;
         }
@@ -1146,41 +1172,113 @@ private:
 
     void BeginHold()
     {
-        switch (_station)
-        {
-            case STATION_CAMP:
-                // The squad forms up in the camp and heads down to the southern pass on its own.
-                scheduler.Schedule(DEPLOY_DELAY, [this](TaskContext /*context*/)
-                {
-                    BeginMarch(MARCH_CAMP_TO_SOUTH);
-                });
-                break;
-            case STATION_SHRINE:
-                // End of the line: the squad despawns and the whole formation comes back at camp.
-                scheduler.Schedule(SHRINE_HOLD_DURATION, [this](TaskContext /*context*/)
-                {
-                    if (CreatureGroup* formation = me->GetFormation())
-                        formation->DespawnFormation(0ms, RESPAWN_DELAY);
-                    else
-                        me->DespawnOrUnsummon(0s, RESPAWN_DELAY);
-                });
-                break;
-            default:
-                // TODO: run the three waves for this pass here, and march only once they are
-                // cleared. The push to the shrine is not on this timer at all - it needs whatever
-                // retail uses to decide the pass was won, so for now it only comes from DoAction().
-                scheduler.Schedule(HOLD_DURATION, [this](TaskContext context)
-                {
-                    // The captain can be out of combat while its conscripts are still holding.
-                    if (me->GetFormation() && me->GetFormation()->IsFormationInCombat())
-                    {
-                        context.Repeat(5s);
-                        return;
-                    }
+        _wave = 0;
 
-                    BeginMarch(_station == STATION_EAST_PASS ? MARCH_EAST_TO_SOUTH : MARCH_SOUTH_TO_EAST);
-                });
-                break;
+        if (Marches() && _station == STATION_CAMP)
+        {
+            // The squad forms up in the camp and heads down to the southern pass on its own.
+            scheduler.Schedule(DEPLOY_DELAY, [this](TaskContext /*context*/)
+            {
+                SummonWave(WAVE_SHRINE_GARRISON);
+                BeginMarch(MARCH_CAMP_TO_SOUTH);
+            });
+
+            return;
+        }
+
+        if (Marches() && _station == STATION_SHRINE)
+        {
+            // End of the line: the squad despawns and the whole formation comes back at camp.
+            scheduler.Schedule(SHRINE_HOLD_DURATION, [this](TaskContext /*context*/)
+            {
+                if (CreatureGroup* formation = me->GetFormation())
+                    formation->DespawnFormation(0ms, RESPAWN_DELAY);
+                else
+                    me->DespawnOrUnsummon(0s, RESPAWN_DELAY);
+            });
+
+            return;
+        }
+
+        scheduler.Schedule(FIRST_WAVE_DELAY, [this](TaskContext context)
+        {
+            SummonWave(WaveGroupFor(_wave));
+            ++_wave;
+
+            // Drayzen never leaves, so his waves keep coming for as long as he is standing.
+            if (Marches() && _wave >= WAVES_PER_STATION)
+            {
+                MarchWhenQuiet();
+                return;
+            }
+
+            context.Repeat(WAVE_INTERVAL);
+        });
+    }
+
+    // TODO: retail decides some other way that a pass has been held long enough - this just
+    // follows the three waves the sniff shows landing before each march.
+    void MarchWhenQuiet()
+    {
+        scheduler.Schedule(WAVE_INTERVAL, [this](TaskContext context)
+        {
+            // The captain can be out of combat while its conscripts are still holding.
+            if (me->GetFormation() && me->GetFormation()->IsFormationInCombat())
+            {
+                context.Repeat(5s);
+                return;
+            }
+
+            BeginMarch(_station == STATION_EAST_PASS ? MARCH_EAST_TO_SOUTH : MARCH_SOUTH_TO_EAST);
+        });
+    }
+
+    [[nodiscard]] uint8 WaveGroupFor(uint8 wave) const
+    {
+        // TODO: the Alliance rotations are not complete. The south also fires
+        // WAVE_SOUTH_ABOMINATION_2 on some cycles, and the east has a Necromancer + 4 Geists wave
+        // the sniff never caught stationary, so that one has no spawn coordinates yet.
+        //
+        // The Horde rotation is complete: groups 8 and 9 alternate on a ~3m20s cycle, seven
+        // sightings running B,A,B,A,B,A,B with no exceptions. WAVE_HORDE_GEISTS is deliberately
+        // not in it - its four spawn points are byte-identical to four of group 8's, so it is a
+        // partial sighting of that same wave rather than a wave of its own.
+        if (!Marches())
+            return (wave % 2) ? WAVE_HORDE_ABOMINATION : WAVE_HORDE_NECROMANCER;
+
+        if (_station == STATION_EAST_PASS)
+            return (wave % 2) ? WAVE_EAST_ABOMINATION : WAVE_EAST_GEISTS;
+
+        switch (wave % 3)
+        {
+            case 0:
+                return WAVE_SOUTH_NECROMANCER;
+            case 1:
+                return WAVE_SOUTH_ABOMINATION_4;
+            default:
+                return WAVE_SOUTH_ABOMINATION_6;
+        }
+    }
+
+    void SummonWave(uint8 group)
+    {
+        std::list<TempSummon*> summons;
+        me->SummonCreatureGroup(group, &summons);
+
+        // creature_summon_groups rows come back in table order and every slot owns a fixed route,
+        // so the nth row of an entry inside a group is the nth path of that entry's block. The
+        // shrine garrison has no paths at all and simply holds its spawn.
+        std::unordered_map<uint32, uint32> slot;
+        for (TempSummon* summon : summons)
+        {
+            uint32 const pathId = summon->GetEntry() * WAVE_PATH_ENTRY_BLOCK
+                + group * WAVE_PATH_GROUP_BLOCK + slot[summon->GetEntry()]++;
+
+            if (!sWaypointMgr->GetPath(pathId))
+                continue;
+
+            summon->LoadPath(pathId);
+            summon->GetMotionMaster()->MoveWaypoint(pathId, false);
         }
     }
 
@@ -1199,9 +1297,10 @@ private:
     HeatedBattleCaptainStation _station = STATION_CAMP;
     HeatedBattleCaptainMarch _march = MARCH_CAMP_TO_SOUTH;
     bool _marching = false;
+    uint8 _wave = 0;
 
-    // TODO: wave state for the pass currently being held (geists / geists + necromancer /
-    // abomination), plus the Emberwyrm interrupt that sets the squad passive and kneeling.
+    // TODO: the Emberwyrm interrupt that sets the squad passive and kneeling, and whatever
+    // retail uses to decide the players have won a pass and the push to the shrine can start.
 };
 
 enum eFrostmourneCavern
@@ -2622,8 +2721,7 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_q12237_rescue_villager);
     RegisterSpellScript(spell_q12237_drop_off_villager);
     RegisterSpellScript(spell_call_wintergarde_gryphon);
-    new npc_heated_battle();
-    RegisterCreatureAI(npc_captain_iskandar);
+    RegisterCreatureAI(npc_heated_battle_captain);
     RegisterSpellScript(spell_q12478_frostmourne_cavern);
     RegisterSpellScript(spell_q12243_fire_upon_the_waters_aura);
     new npc_q24545_lich_king();
