@@ -65,6 +65,7 @@ enum UlduarData
     DATA_REPAIR_STATION2                    = 104,
     DATA_UNBROKEN_ACHIEVEMENT               = 105,
     DATA_LEVIATHAN_DOORS                    = 106,
+    DATA_LEVIATHAN_VEHICLES_USABLE          = 107,
 
     // Mimiron creatures
     DATA_MIMIRON_LEVIATHAN_MKII             = 301,
@@ -152,6 +153,9 @@ enum UlduarData
     DATA_HODIR_GOSSIP                       = 811,
     DATA_MIMIRON_GOSSIP                     = 812,
     DATA_THORIM_GOSSIP                      = 813,
+
+    // Flame Leviathan outro
+    DATA_BRANN_FORMATION_GROUNDS            = 814,
 };
 
 enum UlduarNPCs
@@ -173,6 +177,7 @@ enum UlduarNPCs
     NPC_HODIR                               = 32845,
     NPC_THORIM                              = 32865,
     NPC_FREYA                               = 32906,
+    NPC_STRENGTHENED_IRON_ROOTS             = 33168,
     NPC_VEZAX                               = 33271,
     NPC_SARONITE_ANIMUS                     = 33524,
     NPC_SARA                                = 33134,
@@ -222,6 +227,17 @@ enum UlduarNPCs
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
     NPC_BRANN_BASE_CAMP                     = 33579,
+    NPC_STEELFORGED_DEFENDER                = 33236,
+    NPC_ULDUAR_COLOSSUS                     = 33237,
+    NPC_IRONWORK_CANNON                     = 33264,
+    NPC_ULDUAR_GAUNTLET_GENERATOR           = 33571,
+    NPC_DEFENDER_GENERATED                  = 33572,
+    NPC_ARCHMAGE_RHYDIAN                    = 33696,
+    NPC_RUNEFORGED_SENTRY                   = 34234,
+    NPC_BRANN_FORMATION_GROUNDS             = 34119,
+    NPC_BRANN_S_FLYING_MACHINE              = 34120,
+    NPC_EXPEDITION_MERCENARY                = 34144,
+    NPC_EXPEDITION_ENGINEER_FORMATION       = 34145,
 
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
@@ -268,7 +284,9 @@ enum UlduarGameObjects
     GO_FREYAS_GENERATOR                     = 194663,
     GO_HODIRS_GENERATOR                     = 194665,
     GO_THORIMS_GENERATOR                    = 194666,
-    GO_STORM_BEACON                         = 194414,
+    GO_STORM_BEACON_FIRST                   = 194398,
+    GO_STORM_BEACON_LAST                    = 194415,
+    GO_STORM_BEACON_FORMATION_GROUNDS       = 194506,
 
     // Middle
     GO_ARCHIVUM_DOORS                       = 194556,
@@ -348,6 +366,33 @@ enum UlduarMisc
     VEHICLE_POS_START                       = 0,
     VEHICLE_POS_LEVIATHAN                   = 1,
     VEHICLE_POS_NONE                        = 2,
+
+    // Stored in PERSISTENT_DATA_MAGE_BARRIER by Brann's intro script once the Kirin Tor drop the shield
+    MAGE_BARRIER_LOWERED                    = 3,
+
+    // creature_summon_groups entries for the post-Leviathan outro
+    SUMMON_GROUP_LEVIATHAN_OUTRO            = 0, // Brann + crew in formation (reload; also the march destinations)
+    SUMMON_GROUP_LEVIATHAN_OUTRO_MARCH      = 1, // crew at the gate, runs into formation (kill)
+    SUMMON_GROUP_LEVIATHAN_OUTRO_RHYDIAN    = 2,
+    SUMMON_GROUP_LEVIATHAN_OUTRO_MACHINE    = 3, // Brann's Flying Machine, airborne (kill)
+    SUMMON_GROUP_LEVIATHAN_OUTRO_BRANN      = 4, // Brann at the landed machine (kill)
+    SUMMON_GROUP_LEVIATHAN_OUTRO_MAGES      = 5, // 12 Kirin Tor Mages flanking Brann's spot
+    SUMMON_GROUP_LEVIATHAN_OUTRO_BATTLE_MAGES = 7, // 2 sustaining the portal + 1 at the Formation Grounds teleporter
+
+    // gameobject_summon_groups: the Dalaran portal behind the formation
+    GO_SUMMON_GROUP_LEVIATHAN_PORTAL        = 1,
+
+    // waypoint_data paths: Brann's walk from the machine to his spot, Rhydian's walk to Brann's side,
+    // and the flying machine's approach arc over the grounds
+    PATH_BRANN_FORMATION_GROUNDS            = 341190,
+    PATH_RHYDIAN_TO_BRANN                   = 336960,
+    PATH_FLYING_MACHINE_APPROACH            = 341200,
+
+    // Gossip Keepers, Kirin Tor Mages: teleport-in flash
+    SPELL_SIMPLE_TELEPORT_VISUAL            = 12980,
+
+    // Kirin Tor Battle-Mages sustaining the Dalaran portal
+    SPELL_ARCANE_CHANNELING                 = 39550,
 
     EVENT_TOWER_OF_STORM_DESTROYED          = 21031,
     EVENT_TOWER_OF_FROST_DESTROYED          = 21032,
