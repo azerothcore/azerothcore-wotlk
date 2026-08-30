@@ -3000,12 +3000,14 @@ class spell_yogg_saron_grim_reprisal_aura : public AuraScript
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
 
         if (!damageInfo || !damageInfo->GetDamage())
-        {
             return;
-        }
+
+        Unit* attacker = damageInfo->GetAttacker();
+        if (!attacker || attacker->IsTotem())
+            return;
 
         int32 damage = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), 60);
-        GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, damageInfo->GetAttacker(), true, nullptr, aurEff);
+        GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, attacker, true, nullptr, aurEff);
     }
 
     void Register() override
