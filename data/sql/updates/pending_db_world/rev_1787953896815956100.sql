@@ -628,3 +628,14 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 3, 49197, 0, 0, 31, 0, 3, 27686, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
 (13, 3, 49197, 0, 1, 31, 0, 3, 27531, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
 (13, 3, 49197, 0, 2, 31, 0, 3, 27687, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers');
+
+-- Captain Drayzen formation
+DELETE FROM `creature_formations` WHERE `leaderGUID` = 105167;
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
+(105167, 104996, 3),
+(105167, 104998, 3),
+(105167, 105005, 3),
+(105167, 105011, 3),
+(105167, 105024, 3),
+(105167, 105012, 3),
+(105167, 105167, 3);
