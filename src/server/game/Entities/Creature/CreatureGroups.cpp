@@ -112,7 +112,9 @@ void FormationMgr::LoadCreatureFormations()
         //If creature is group leader we may skip loading of dist/angle
         if (group_member.leaderGUID != memberGUID)
         {
-            if (!group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
+            // Members can have 0 AI flags, same as the leader: the creature is then only grouped,
+            // without any of the shared assist, evade or follow behaviour
+            if (group_member.groupAI && !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
             {
                 LOG_ERROR("sql.sql", "creature_formations table leader guid {} and member guid {} has unsupported GroupAI flag value ({}). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
                 continue;
@@ -372,6 +374,12 @@ bool CreatureGroup::CanLeaderStartMoving() const
 {
     for (auto const& itr : m_members)
     {
+        // Only a member that follows the leader can hold it back. One that walks its own path or
+        // holds a spawn never rejoins the formation, so waiting on it just stalls the leader for
+        // as long as that member is fighting.
+        if (!itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
+            continue;
+
         if (itr.first && itr.first != m_leader && itr.first->IsAlive())
             if (itr.first->IsEngaged() || itr.first->IsInEvadeMode())
                 return false;

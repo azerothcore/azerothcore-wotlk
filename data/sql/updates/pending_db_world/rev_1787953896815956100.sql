@@ -13,17 +13,20 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (@CGUID+7, 27564, 571, 65, 4254, 1, 1, 1, 3759.960205078125, 684.55242919921875, 79.56417083740234375, 4.729842185974121093, 60, 69299, 2), -- Soldier 7 (27564)
 (@CGUID+8, 27564, 571, 65, 4254, 1, 1, 1, 3754.80419921875, 680.96221923828125, 79.08824920654296875, 5.637413501739501953, 60, 69299, 2); -- Soldier 8 (27564)
 
+-- groupAI 0: the squad is only grouped, so the captain can reach it. Every conscript walks
+-- its own path, so none of them follows, and the assist flags dragged the captain into each
+-- conscript's fight and stopped his march.
 DELETE FROM `creature_formations` WHERE `leaderGUID` = @CGUID+0;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
-(@CGUID+0, @CGUID+0, 3),
-(@CGUID+0, @CGUID+1, 3),
-(@CGUID+0, @CGUID+2, 3),
-(@CGUID+0, @CGUID+3, 3),
-(@CGUID+0, @CGUID+4, 3),
-(@CGUID+0, @CGUID+5, 3),
-(@CGUID+0, @CGUID+6, 3),
-(@CGUID+0, @CGUID+7, 3),
-(@CGUID+0, @CGUID+8, 3);
+(@CGUID+0, @CGUID+0, 0),
+(@CGUID+0, @CGUID+1, 0),
+(@CGUID+0, @CGUID+2, 0),
+(@CGUID+0, @CGUID+3, 0),
+(@CGUID+0, @CGUID+4, 0),
+(@CGUID+0, @CGUID+5, 0),
+(@CGUID+0, @CGUID+6, 0),
+(@CGUID+0, @CGUID+7, 0),
+(@CGUID+0, @CGUID+8, 0);
 
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|134217728 WHERE (`entry` IN (27564, 27567));
 
@@ -790,8 +793,8 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 3, 49197, 0, 0, 31, 0, 3, 27686, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
 (13, 3, 49197, 0, 1, 31, 0, 3, 27531, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
-(13, 3, 49197, 0, 1, 31, 0, 3, 27685, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
-(13, 3, 49197, 0, 2, 31, 0, 3, 27687, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers');
+(13, 3, 49197, 0, 2, 31, 0, 3, 27685, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
+(13, 3, 49197, 0, 3, 31, 0, 3, 27687, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers');
 
 -- The conditions above decide which entries Ruby Arrow may hit, not how many of them it hits at
 -- once: effect 0 is TARGET_UNIT_CONE_ENTRY, so one shot landed on every attacker standing in the
@@ -896,13 +899,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 -- Captain Drayzen formation
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 105167;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
-(105167, 104996, 3),
-(105167, 104998, 3),
-(105167, 105005, 3),
-(105167, 105011, 3),
-(105167, 105024, 3),
-(105167, 105012, 3),
-(105167, 105167, 3);
+(105167, 104996, 0),
+(105167, 104998, 0),
+(105167, 105005, 0),
+(105167, 105011, 0),
+(105167, 105024, 0),
+(105167, 105012, 0),
+(105167, 105167, 0);
 
 -- Remove flag 64 from Shoot
 UPDATE `smart_scripts` SET `action_param2` = 0 WHERE `entryorguid` IN (27564, 27749) AND `source_type` = 0 AND `action_type` = 11 AND `action_param1` = 15620;
