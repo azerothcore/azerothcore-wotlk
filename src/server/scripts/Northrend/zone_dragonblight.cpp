@@ -20,10 +20,12 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
+#include "CreatureGroups.h"
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameObjectScript.h"
 #include "GridNotifiersImpl.h"
+#include "Log.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -32,6 +34,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
+#include "WaypointMgr.h"
 
 /********
 QUEST Conversing With the Depths (12032)
@@ -930,6 +933,275 @@ public:
             }
         }
     };
+};
+
+/*######
+## npc_captain_iskandar - Wyrmrest Temple, "Heated Battle" (Alliance)
+######*/
+
+// Iskandar and his eight Alliance Conscripts hold one of the passes below the temple, fight off
+// three waves of Scourge, then march to the next one. Which wave spawns is gated on where the
+// squad is standing, and every member walks its own sniffed path, so the state machine lives
+// here instead of in SmartAI. The conscripts keep their guid-scoped SmartAI - the captain drives
+// them by relaying each march to the formation as a DoAction().
+
+enum HeatedBattleCaptainSpells
+{
+    SPELL_CLEAVE                    = 42724,
+    SPELL_MORTAL_STRIKE             = 15708,
+    SPELL_WHIRLWIND                 = 38618,
+    SPELL_SUMMON_FRIGID_GHOUL       = 49329
+};
+
+// creature_text groups the lines by where the squad is headed, not by which march runs.
+enum HeatedBattleCaptainTexts
+{
+    SAY_MOVE_TO_SOUTH               = 0,
+    SAY_MOVE_TO_EAST                = 1,
+    SAY_MOVE_TO_SHRINE              = 2,
+    SAY_EMBERWYRM                   = 3,    // TODO: ruby dragon interrupt
+    SAY_BATTLE_COMPLETE             = 4,    // TODO: players broke through to the shrine
+    SAY_DRAGON_STRAFE               = 5     // TODO: ruby dragon strafing run
+};
+
+// A march id is both the offset into the captain's waypoint_data block and the action id the
+// conscripts' guid-scoped SmartAI reacts to through SMART_EVENT_ACTION_DONE.
+enum HeatedBattleCaptainMarch : int32
+{
+    MARCH_SOUTH_TO_EAST             = 0,
+    MARCH_EAST_TO_SOUTH             = 1,
+    MARCH_SOUTH_TO_SHRINE           = 2,
+    MARCH_CAMP_TO_SOUTH             = 3
+};
+
+enum HeatedBattleCaptainStation : uint8
+{
+    STATION_CAMP                    = 0,
+    STATION_SOUTH_PASS              = 1,
+    STATION_EAST_PASS               = 2,
+    STATION_SHRINE                  = 3
+};
+
+// The squad's waypoint_data path ids are laid out as (creature.guid * PATH_ID_BLOCK) + march.
+constexpr uint32 PATH_ID_BLOCK = 10;
+
+constexpr Seconds DEPLOY_DELAY = 5s;
+// TODO: placeholder. The squad really holds a pass until its three waves (geists, geists plus a
+// necromancer, then an abomination) are cleared, and marches only once the pass is quiet again.
+constexpr Seconds HOLD_DURATION = 3min;
+constexpr Seconds SHRINE_HOLD_DURATION = 1min;
+constexpr Seconds RESPAWN_DELAY = 1min;
+
+struct npc_captain_iskandar : public ScriptedAI
+{
+    npc_captain_iskandar(Creature* creature) : ScriptedAI(creature) { }
+
+    void JustRespawned() override
+    {
+        _station = STATION_CAMP;
+        _march = MARCH_CAMP_TO_SOUTH;
+        _marching = false;
+
+        ScriptedAI::JustRespawned();
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetEmoteState(EMOTE_STATE_READY2H);
+
+        // TODO: sniff the real cadence. Only Iskandar's own formation summons these - the generic
+        // Alliance Conscript SmartAI row that used to do it has been removed.
+        ScheduleTimedEvent(30s, 90s, [this]
+        {
+            if (CreatureGroup* formation = me->GetFormation())
+                for (auto const& itr : formation->GetMembers())
+                    if (itr.first->IsAlive() && !itr.first->IsInCombat())
+                        itr.first->CastSpell(itr.first, SPELL_SUMMON_FRIGID_GHOUL, true);
+        }, 30s, 90s);
+
+        // Reset also runs on evade, so pick the cycle back up wherever the squad is standing. A
+        // march in flight keeps its own generator in MOTION_SLOT_IDLE and resumes by itself.
+        if (!_marching)
+            BeginHold();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        // Drops the hold timer and the out of combat summons; Reset() re-arms both on evade.
+        scheduler.CancelAll();
+
+        ScheduleTimedEvent(3s, 7s, [this] { DoCastVictim(SPELL_CLEAVE); }, 7s, 11s);
+        ScheduleTimedEvent(11s, 16s, [this] { DoCastVictim(SPELL_MORTAL_STRIKE); }, 11s, 16s);
+        ScheduleTimedEvent(11s, 14s, [this] { DoCastSelf(SPELL_WHIRLWIND); }, 19s, 22s);
+    }
+
+    // Marches can also be driven from the outside (SmartAI, a GM command) while the triggers for
+    // them are still being worked out.
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+            case MARCH_SOUTH_TO_EAST:
+            case MARCH_EAST_TO_SOUTH:
+            case MARCH_SOUTH_TO_SHRINE:
+            case MARCH_CAMP_TO_SOUTH:
+                BeginMarch(static_cast<HeatedBattleCaptainMarch>(action));
+                break;
+            default:
+                break;
+        }
+    }
+
+    void WaypointPathEnded(uint32 /*nodeId*/, uint32 pathId) override
+    {
+        if (pathId != PathFor(_march))
+            return;
+
+        _marching = false;
+        _station = DestinationOf(_march);
+
+        // Drop the path again so a respawn does not pick the finished march back up.
+        me->LoadPath(0);
+        ApplyFinalFacing(pathId);
+        me->SetEmoteState(EMOTE_STATE_READY2H);
+
+        BeginHold();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    [[nodiscard]] uint32 PathFor(HeatedBattleCaptainMarch march) const
+    {
+        return me->GetSpawnId() * PATH_ID_BLOCK + static_cast<uint32>(march);
+    }
+
+    [[nodiscard]] static HeatedBattleCaptainStation DestinationOf(HeatedBattleCaptainMarch march)
+    {
+        switch (march)
+        {
+            case MARCH_SOUTH_TO_EAST:
+                return STATION_EAST_PASS;
+            case MARCH_SOUTH_TO_SHRINE:
+                return STATION_SHRINE;
+            case MARCH_EAST_TO_SOUTH:
+            case MARCH_CAMP_TO_SOUTH:
+            default:
+                return STATION_SOUTH_PASS;
+        }
+    }
+
+    [[nodiscard]] static uint8 TextFor(HeatedBattleCaptainStation destination)
+    {
+        switch (destination)
+        {
+            case STATION_EAST_PASS:
+                return SAY_MOVE_TO_EAST;
+            case STATION_SHRINE:
+                return SAY_MOVE_TO_SHRINE;
+            case STATION_CAMP:
+            case STATION_SOUTH_PASS:
+            default:
+                return SAY_MOVE_TO_SOUTH;
+        }
+    }
+
+    void BeginMarch(HeatedBattleCaptainMarch march)
+    {
+        if (_marching)
+            return;
+
+        uint32 const pathId = PathFor(march);
+        if (!sWaypointMgr->GetPath(pathId))
+        {
+            LOG_ERROR("sql.sql", "npc_captain_iskandar: creature {} has no waypoint path {}.",
+                me->GetGUID().ToString(), pathId);
+            return;
+        }
+
+        _marching = true;
+        _march = march;
+
+        Talk(TextFor(DestinationOf(march)));
+
+        // Every conscript owns a guid-scoped SmartAI whose SMART_EVENT_ACTION_DONE rows start
+        // that conscript's own copy of the same march.
+        if (CreatureGroup* formation = me->GetFormation())
+            for (auto const& itr : formation->GetMembers())
+                if (itr.first != me && itr.first->IsAlive() && itr.first->AI())
+                    itr.first->AI()->DoAction(march);
+
+        me->LoadPath(pathId);
+        me->GetMotionMaster()->MoveWaypoint(pathId, false);
+    }
+
+    void BeginHold()
+    {
+        switch (_station)
+        {
+            case STATION_CAMP:
+                // The squad forms up in the camp and heads down to the southern pass on its own.
+                scheduler.Schedule(DEPLOY_DELAY, [this](TaskContext /*context*/)
+                {
+                    BeginMarch(MARCH_CAMP_TO_SOUTH);
+                });
+                break;
+            case STATION_SHRINE:
+                // End of the line: the squad despawns and the whole formation comes back at camp.
+                scheduler.Schedule(SHRINE_HOLD_DURATION, [this](TaskContext /*context*/)
+                {
+                    if (CreatureGroup* formation = me->GetFormation())
+                        formation->DespawnFormation(0ms, RESPAWN_DELAY);
+                    else
+                        me->DespawnOrUnsummon(0s, RESPAWN_DELAY);
+                });
+                break;
+            default:
+                // TODO: run the three waves for this pass here, and march only once they are
+                // cleared. The push to the shrine is not on this timer at all - it needs whatever
+                // retail uses to decide the pass was won, so for now it only comes from DoAction().
+                scheduler.Schedule(HOLD_DURATION, [this](TaskContext context)
+                {
+                    // The captain can be out of combat while its conscripts are still holding.
+                    if (me->GetFormation() && me->GetFormation()->IsFormationInCombat())
+                    {
+                        context.Repeat(5s);
+                        return;
+                    }
+
+                    BeginMarch(_station == STATION_EAST_PASS ? MARCH_EAST_TO_SOUTH : MARCH_SOUTH_TO_EAST);
+                });
+                break;
+        }
+    }
+
+    // waypoint_data only applies a node's orientation when that node also carries a delay, so the
+    // facing the squad ends each march on has to be applied by hand.
+    void ApplyFinalFacing(uint32 pathId) const
+    {
+        WaypointPath const* path = sWaypointMgr->GetPath(pathId);
+        if (!path || path->Nodes.empty())
+            return;
+
+        if (std::optional<float> const& orientation = path->Nodes.back().Orientation)
+            me->SetFacingTo(*orientation);
+    }
+
+    HeatedBattleCaptainStation _station = STATION_CAMP;
+    HeatedBattleCaptainMarch _march = MARCH_CAMP_TO_SOUTH;
+    bool _marching = false;
+
+    // TODO: wave state for the pass currently being held (geists / geists + necromancer /
+    // abomination), plus the Emberwyrm interrupt that sets the squad passive and kneeling.
 };
 
 enum eFrostmourneCavern
@@ -2351,6 +2623,7 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_q12237_drop_off_villager);
     RegisterSpellScript(spell_call_wintergarde_gryphon);
     new npc_heated_battle();
+    RegisterCreatureAI(npc_captain_iskandar);
     RegisterSpellScript(spell_q12478_frostmourne_cavern);
     RegisterSpellScript(spell_q12243_fire_upon_the_waters_aura);
     new npc_q24545_lich_king();

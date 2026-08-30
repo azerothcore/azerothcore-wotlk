@@ -362,7 +362,6 @@ INSERT INTO `creature_addon` (`guid`,`bytes2`,`emote`) VALUES
 -- SAI for Waypoints
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` BETWEEN -(@CGUID+8) AND -(@CGUID+0));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-(@CGUID+0), 0, 1000, 0, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, ((@CGUID+0)*10)+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 0 Done - Start Path South Pass to East Pass'),
 (-(@CGUID+1), 0, 1000, 0, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, ((@CGUID+1)*10)+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 0 Done - Start Path South Pass to East Pass'),
 (-(@CGUID+2), 0, 1000, 0, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, ((@CGUID+2)*10)+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 0 Done - Start Path South Pass to East Pass'),
 (-(@CGUID+3), 0, 1000, 0, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, ((@CGUID+3)*10)+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 0 Done - Start Path South Pass to East Pass'),
@@ -372,7 +371,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+7), 0, 1000, 0, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, ((@CGUID+7)*10)+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 0 Done - Start Path South Pass to East Pass'),
 (-(@CGUID+8), 0, 1000, 0, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, ((@CGUID+8)*10)+0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 0 Done - Start Path South Pass to East Pass'),
 
-(-(@CGUID+0), 0, 1001, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 232, ((@CGUID+0)*10)+1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 1 Done - Start Path East Pass to South Pass'),
 (-(@CGUID+1), 0, 1001, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 232, ((@CGUID+1)*10)+1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 1 Done - Start Path East Pass to South Pass'),
 (-(@CGUID+2), 0, 1001, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 232, ((@CGUID+2)*10)+1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 1 Done - Start Path East Pass to South Pass'),
 (-(@CGUID+3), 0, 1001, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 232, ((@CGUID+3)*10)+1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 1 Done - Start Path East Pass to South Pass'),
@@ -382,7 +380,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+7), 0, 1001, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 232, ((@CGUID+7)*10)+1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 1 Done - Start Path East Pass to South Pass'),
 (-(@CGUID+8), 0, 1001, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 232, ((@CGUID+8)*10)+1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 1 Done - Start Path East Pass to South Pass'),
 
-(-(@CGUID+0), 0, 1002, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 232, ((@CGUID+0)*10)+2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 2 Done - Start Path South Pass to Shrine'),
 (-(@CGUID+1), 0, 1002, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 232, ((@CGUID+1)*10)+2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 2 Done - Start Path South Pass to Shrine'),
 (-(@CGUID+2), 0, 1002, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 232, ((@CGUID+2)*10)+2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 2 Done - Start Path South Pass to Shrine'),
 (-(@CGUID+3), 0, 1002, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 232, ((@CGUID+3)*10)+2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 2 Done - Start Path South Pass to Shrine'),
@@ -392,7 +389,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+7), 0, 1002, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 232, ((@CGUID+7)*10)+2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 2 Done - Start Path South Pass to Shrine'),
 (-(@CGUID+8), 0, 1002, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 232, ((@CGUID+8)*10)+2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 2 Done - Start Path South Pass to Shrine'),
 
-(-(@CGUID+0), 0, 1003, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 232, ((@CGUID+0)*10)+3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 3 Done - Start Path Spawn to South Pass'),
 (-(@CGUID+1), 0, 1003, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 232, ((@CGUID+1)*10)+3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 3 Done - Start Path Spawn to South Pass'),
 (-(@CGUID+2), 0, 1003, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 232, ((@CGUID+2)*10)+3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 3 Done - Start Path Spawn to South Pass'),
 (-(@CGUID+3), 0, 1003, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 232, ((@CGUID+3)*10)+3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 3 Done - Start Path Spawn to South Pass'),
@@ -402,7 +398,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+7), 0, 1003, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 232, ((@CGUID+7)*10)+3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 3 Done - Start Path Spawn to South Pass'),
 (-(@CGUID+8), 0, 1003, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 232, ((@CGUID+8)*10)+3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Action 3 Done - Start Path Spawn to South Pass'),
 
-(-(@CGUID+0), 0, 1004, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 375, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Path Finished - Set Emote State 375'),
 (-(@CGUID+1), 0, 1004, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Path Finished - Set Emote State 333'),
 (-(@CGUID+2), 0, 1004, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Path Finished - Set Emote State 333'),
 (-(@CGUID+3), 0, 1004, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Path Finished - Set Emote State 333'),
@@ -412,7 +407,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+7), 0, 1004, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Path Finished - Set Emote State 333'),
 (-(@CGUID+8), 0, 1004, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Path Finished - Set Emote State 333'),
 
-(-(@CGUID+0), 0, 1005, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 375, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Reached Home - Set Emote State 375'),
 (-(@CGUID+1), 0, 1005, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Reached Home - Set Emote State 333'),
 (-(@CGUID+2), 0, 1005, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Reached Home - Set Emote State 333'),
 (-(@CGUID+3), 0, 1005, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Reached Home - Set Emote State 333'),
@@ -422,17 +416,215 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+7), 0, 1005, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Reached Home - Set Emote State 333'),
 (-(@CGUID+8), 0, 1005, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 333, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar or Alliance Conscripts - On Reached Home - Set Emote State 333');
 
--- SAI for march
+-- Captain Iskandar is driven by npc_captain_iskandar (C++): the marches, the combat rotation,
+-- the out of combat ghoul summons and the formation DoAction relays all live there now.
+-- FactorySelector::SelectAI checks ScriptName before AIName, so AIName is cleared as well to
+-- keep it honest.
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_captain_iskandar' WHERE (`entry` = 27567);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27567);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(27567, 0, 0, 0, 0, 0, 100, 0, 3000, 7000, 7000, 11000, 0, 0, 11, 42724, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar - In Combat - Cast \'Cleave\''),
-(27567, 0, 1, 0, 9, 0, 100, 0, 0, 0, 11000, 16000, 0, 5, 11, 15708, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar - Within 0-5 Range - Cast \'Mortal Strike\''),
-(27567, 0, 2, 0, 0, 0, 100, 0, 11000, 14000, 19000, 22000, 0, 0, 11, 38618, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar - In Combat - Cast \'Whirlwind\''),
-(27567, 0, 3, 0, 1, 0, 100, 0, 30000, 90000, 30000, 90000, 0, 0, 86, 49329, 0, 206, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar - Out of Combat - Cross Cast \'Summon Frigid Ghoul Attacker\'');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 27567) AND (`source_type` = 0) AND (`id` IN (4, 5, 6, 7));
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(27567, 0, 4, 0, 72, 0, 100, 0, 10, 0, 0, 0, 0, 0, 223, 0, 0, 0, 0, 0, 0, 206, 2, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar - On Action 10 Done - Do Action ID 0'),
-(27567, 0, 5, 0, 72, 0, 100, 0, 11, 0, 0, 0, 0, 0, 223, 1, 0, 0, 0, 0, 0, 206, 2, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar - On Action 11 Done - Do Action ID 1'),
-(27567, 0, 6, 0, 72, 0, 100, 0, 12, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 206, 2, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar - On Action 12 Done - Do Action ID 2'),
-(27567, 0, 7, 0, 72, 0, 100, 0, 13, 0, 0, 0, 0, 0, 223, 3, 0, 0, 0, 0, 0, 206, 2, 0, 0, 0, 0, 0, 0, 0, 'Captain Iskandar - On Action 13 Done - Do Action ID 3');
+DELETE FROM `creature_text` WHERE (`CreatureID` = 27567);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(27567, 0, 0, 'On the move to the southern pass!', 14, 0, 100, 0, 0, 0, 27559, 0, 'Captain Iskandar - Move to South'),
+(27567, 0, 1, 'They\'re backing off here... get to the south pass! Quickly!', 14, 0, 100, 0, 0, 0, 27560, 0, 'Captain Iskandar - Move to South'),
+(27567, 0, 2, 'They\'re pushing in the south!', 14, 0, 100, 0, 0, 0, 27561, 0, 'Captain Iskandar - Move to South'),
+(27567, 0, 3, 'To the south! Move!', 14, 0, 100, 0, 0, 0, 27562, 0, 'Captain Iskandar - Move to South'),
+(27567, 0, 4, 'There are more to the south!', 14, 0, 100, 0, 0, 0, 27563, 0, 'Captain Iskandar - Move to South'),
+(27567, 0, 5, 'South! Now!', 14, 0, 100, 0, 0, 0, 27564, 0, 'Captain Iskandar - Move to South'),
+(27567, 1, 0, 'On the move back up to the eastern pass!', 14, 0, 100, 0, 0, 0, 27565, 0, 'Captain Iskandar - Move to East'),
+(27567, 1, 1, 'They\'re backing off here... get to the east pass! Quickly!', 14, 0, 100, 0, 0, 0, 27566, 0, 'Captain Iskandar - Move to East'),
+(27567, 1, 2, 'Head back up to the east pass! They\'re pushing hard!', 14, 0, 100, 0, 0, 0, 27567, 0, 'Captain Iskandar - Move to East'),
+(27567, 1, 3, 'Up to the eastern pass! Move!', 14, 0, 100, 0, 0, 0, 27568, 0, 'Captain Iskandar - Move to East'),
+(27567, 1, 4, 'There are more at the east pass!', 14, 0, 100, 0, 0, 0, 27569, 0, 'Captain Iskandar - Move to East'),
+(27567, 1, 5, 'East Pass! Now!', 14, 0, 100, 0, 0, 0, 27570, 0, 'Captain Iskandar - Move to East'),
+(27567, 2, 0, 'This is our chance boys!  Push!', 14, 0, 100, 0, 0, 0, 26898, 0, 'Captain Iskandar - Move to Shrine'),
+(27567, 2, 1, 'Push them back to the shrine!', 14, 0, 100, 0, 0, 0, 26899, 0, 'Captain Iskandar - Move to Shrine'),
+(27567, 2, 2, 'Push them back and crush them!', 14, 0, 100, 0, 0, 0, 26900, 0, 'Captain Iskandar - Move to Shrine'),
+(27567, 2, 3, 'Push!  Make a path to the shrine!', 14, 0, 100, 0, 0, 0, 26901, 0, 'Captain Iskandar - Move to Shrine'),
+(27567, 3, 0, 'Emberwyrm incoming!  Pull back!  Pull back!', 14, 0, 100, 0, 0, 0, 26902, 0, 'Captain Iskandar - Emberwyrm'),
+(27567, 3, 1, 'Incoming!  Get back down the pass!', 14, 0, 100, 0, 0, 0, 26903, 0, 'Captain Iskandar - Emberwyrm'),
+(27567, 3, 2, 'Fall back!  Incoming Emberwyrm!', 14, 0, 100, 0, 0, 0, 26904, 0, 'Captain Iskandar - Emberwyrm'),
+(27567, 4, 0, 'We\'ll hold them here for a moment.  Get into the shrine and stop those necromancers!', 14, 0, 100, 0, 0, 0, 26905, 0, 'Captain Iskandar - Heated Battle Complete'),
+(27567, 4, 1, 'We can\'t hold them for long!  Get inside disrupt their necromancers!', 14, 0, 100, 0, 0, 0, 26906, 0, 'Captain Iskandar - Heated Battle Complete'),
+(27567, 4, 2, 'We\'ll hold them a few more moments!  Get into the shrine while you can!', 14, 0, 100, 0, 0, 0, 26907, 0, 'Captain Iskandar - Heated Battle Complete'),
+(27567, 5, 0, 'Incoming!  Get your heads down!', 14, 0, 100, 0, 0, 0, 26859, 0, 'Captain Iskandar - Ruby Dragon Strafe'),
+(27567, 5, 1, 'Heads up!  Strafe incoming!', 14, 0, 100, 0, 0, 0, 26860, 0, 'Captain Iskandar - Ruby Dragon Strafe'),
+(27567, 5, 2, 'Fire on the way, clear the field!', 14, 0, 100, 0, 0, 0, 26861, 0, 'Captain Iskandar - Ruby Dragon Strafe'),
+(27567, 5, 3, 'Burn, you fiends!', 14, 0, 100, 0, 0, 0, 26862, 0, 'Captain Iskandar - Ruby Dragon Strafe'),
+(27567, 5, 4, 'Make way!  A wyrm is coming to our aid!', 14, 0, 100, 0, 0, 0, 26863, 0, 'Captain Iskandar - Ruby Dragon Strafe'),
+(27567, 5, 5, 'Red dragon incoming!', 14, 0, 100, 0, 0, 0, 26864, 0, 'Captain Iskandar - Ruby Dragon Strafe');
+
+-- ==========================================================================
+-- SCOURGE ATTACK WAVES
+-- Summoned by Captain Iskandar, one group per wave. Route is a property of the
+-- spawn slot: every spawn point sighted more than once ran to a byte-identical
+-- destination each time (32/32 in the sniff), so slot N always walks path N.
+-- Paths are numbered <entry>*100 + n and run (move_type 1).
+-- Groups 1 and 3 legitimately share three spawn points; their duplicate paths
+-- are kept separate so the groups stay independent.
+-- ==========================================================================
+DELETE FROM `creature_summon_groups` WHERE (`summonerId` = 27567) AND (`summonerType` = 0);
+INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
+-- group 0: SOUTH -- Necromancer + 6 Geists   (seen 7x; coordinates from 19:57:14.559 packet 67301)
+(27567, 0, 0, 27686, 3626.7517, 844.8213, 60.66234, 2.792526721954345703, 6, 60000, 'SOUTH - Geist - path 2768600'),
+(27567, 0, 0, 27686, 3630.2288, 848.45966, 60.46936, 5.235987663269042968, 6, 60000, 'SOUTH - Geist - path 2768601'),
+(27567, 0, 0, 27686, 3632.0217, 843.6702, 60.856743, 3.351032257080078125, 6, 60000, 'SOUTH - Geist - path 2768602'),
+(27567, 0, 0, 27686, 3636.2153, 841.21124, 60.656025, 5.270894527435302734, 6, 60000, 'SOUTH - Geist - path 2768603'),
+(27567, 0, 0, 27686, 3639.7668, 845.14954, 59.896584, 6.230825424194335937, 6, 60000, 'SOUTH - Geist - path 2768604'),
+(27567, 0, 0, 27686, 3641.884, 841.3059, 60.24088, 5.532693862915039062, 6, 60000, 'SOUTH - Geist - path 2768605'),
+(27567, 0, 0, 27687, 3635.5405, 845.56226, 60.547443, 4.642575740814208984, 6, 60000, 'SOUTH - Necro - path 2768700'),
+-- group 1: SOUTH -- Abomination + 2 Geists   (seen 4x; coordinates from 19:52:59.670 packet 56130)
+(27567, 0, 1, 27531, 3631.0967, 827.1009, 62.925327, 1.850049018859863281, 6, 60000, 'SOUTH - Abom - path 2753100'),
+(27567, 0, 1, 27686, 3627.7554, 833.6415, 62.412754, 0.733038306236267089, 6, 60000, 'SOUTH - Geist - path 2768606'),
+(27567, 0, 1, 27686, 3636.0417, 830.93506, 62.21592, 2.478367567062377929, 6, 60000, 'SOUTH - Geist - path 2768607'),
+-- group 2: SOUTH -- Abomination + 4 Geists   (seen 3x; coordinates from 19:58:04.741 packet 71046)
+(27567, 0, 2, 27531, 3643.375, 858.74304, 58.42003, 5.393067359924316406, 6, 60000, 'SOUTH - Abom - path 2753101'),
+(27567, 0, 2, 27686, 3639.5256, 862.6922, 57.844265, 6.0737457275390625, 6, 60000, 'SOUTH - Geist - path 2768608'),
+(27567, 0, 2, 27686, 3643.201, 865.0904, 57.08768, 6.0737457275390625, 6, 60000, 'SOUTH - Geist - path 2768609'),
+(27567, 0, 2, 27686, 3649.2886, 860.8603, 57.310757, 4.415682792663574218, 6, 60000, 'SOUTH - Geist - path 2768610'),
+(27567, 0, 2, 27686, 3652.5833, 863.44226, 56.890697, 1.239183783531188964, 6, 60000, 'SOUTH - Geist - path 2768611'),
+-- group 3: SOUTH -- Abomination + 6 Geists   (seen 4x; coordinates from 19:58:56.125 packet 74564)
+(27567, 0, 3, 27531, 3631.0967, 827.1009, 62.925327, 1.850049018859863281, 6, 60000, 'SOUTH - Abom - path 2753102'),
+(27567, 0, 3, 27686, 3627.7554, 833.6415, 62.412754, 0.733038306236267089, 6, 60000, 'SOUTH - Geist - path 2768612'),
+(27567, 0, 3, 27686, 3630.396, 853.54175, 59.336708, 3.752457857131958007, 6, 60000, 'SOUTH - Geist - path 2768613'),
+(27567, 0, 3, 27686, 3636.0417, 830.93506, 62.21592, 2.478367567062377929, 6, 60000, 'SOUTH - Geist - path 2768614'),
+(27567, 0, 3, 27686, 3636.1807, 854.2664, 59.609524, 1.396263360977172851, 6, 60000, 'SOUTH - Geist - path 2768615'),
+(27567, 0, 3, 27686, 3639.2942, 850.2552, 59.38392, 4.520402908325195312, 6, 60000, 'SOUTH - Geist - path 2768616'),
+(27567, 0, 3, 27686, 3644.5542, 850.5862, 58.54313, 1.867502331733703613, 6, 60000, 'SOUTH - Geist - path 2768617'),
+-- group 4: EAST -- 6 Geists   (seen 2x; coordinates from 20:12:40.733 packet 116929)
+(27567, 0, 4, 27686, 3757.7104, 766.1674, 62.890156, 1.884955525398254394, 6, 60000, 'EAST - Geist - path 2768618'),
+(27567, 0, 4, 27686, 3759.6614, 764.02844, 62.288853, 3.665191411972045898, 6, 60000, 'EAST - Geist - path 2768619'),
+(27567, 0, 4, 27686, 3760.1384, 766.6206, 62.589363, 0.069813169538974761, 6, 60000, 'EAST - Geist - path 2768620'),
+(27567, 0, 4, 27686, 3760.7493, 769.15607, 62.795174, 6.195918560028076171, 6, 60000, 'EAST - Geist - path 2768621'),
+(27567, 0, 4, 27686, 3762.303, 764.4466, 61.909737, 2.007128715515136718, 6, 60000, 'EAST - Geist - path 2768622'),
+(27567, 0, 4, 27686, 3762.8386, 766.9697, 62.177036, 4.590215682983398437, 6, 60000, 'EAST - Geist - path 2768623'),
+-- group 5: EAST -- Abomination + 7 Geists   (seen 5x; coordinates from 20:37:41.089 packet 172873)
+(27567, 0, 5, 27531, 3767.9536, 759.10095, 59.854744, 1.745329260826110839, 6, 60000, 'EAST - Abom - path 2753103'),   -- POSITION APPROXIMATE (caught mid-move)
+(27567, 0, 5, 27686, 3755.6506, 768.1376, 63.41838, 0.628318548202514648, 6, 60000, 'EAST - Geist - path 2768624'),
+(27567, 0, 5, 27686, 3758.6506, 768.2493, 63.0299, 2.426007747650146484, 6, 60000, 'EAST - Geist - path 2768625'),
+(27567, 0, 5, 27686, 3759.448, 770.4917, 63.152355, 4.310963153839111328, 6, 60000, 'EAST - Geist - path 2768626'),
+(27567, 0, 5, 27686, 3763.317, 761.05493, 61.153877, 5.759586334228515625, 6, 60000, 'EAST - Geist - path 2768627'),
+(27567, 0, 5, 27686, 3766.462, 763.33606, 60.895473, 3.822271108627319335, 6, 60000, 'EAST - Geist - path 2768628'),
+(27567, 0, 5, 27686, 3768.9658, 753.6746, 58.78656, 6.021385669708251953, 6, 60000, 'EAST - Geist - path 2768629'),
+(27567, 0, 5, 27686, 3772.746, 756.7438, 58.82063, 2.809980154037475585, 6, 60000, 'EAST - Geist - path 2768630'),
+-- group 6: SHRINE -- Abomination + 6 Geists + 2 Necromancers   (seen 3x; coordinates from 19:51:05.404 packet 52279)
+(27567, 0, 6, 27531, 3675.567, 866.78033, 56.26623, 3.857177734375, 6, 60000, 'SHRINE - Abom - path 2753104'),
+(27567, 0, 6, 27686, 3659.7483, 876.86786, 56.944252, 4.921828269958496093, 6, 60000, 'SHRINE - Geist - path 2768631'),
+(27567, 0, 6, 27686, 3664.7622, 876.08655, 56.73396, 4.677482128143310546, 6, 60000, 'SHRINE - Geist - path 2768632'),
+(27567, 0, 6, 27686, 3668.9622, 872.8576, 56.08941, 4.345870018005371093, 6, 60000, 'SHRINE - Geist - path 2768633'),
+(27567, 0, 6, 27686, 3681.2483, 859.9791, 58.60043, 3.525565147399902343, 6, 60000, 'SHRINE - Geist - path 2768634'),
+(27567, 0, 6, 27686, 3684.188, 855.4685, 59.003628, 3.193952560424804687, 6, 60000, 'SHRINE - Geist - path 2768635'),
+(27567, 0, 6, 27686, 3686.5127, 848.71344, 57.36397, 2.792526721954345703, 6, 60000, 'SHRINE - Geist - path 2768636'),
+(27567, 0, 6, 27687, 3666.8298, 880.2456, 57.150173, 4.625122547149658203, 6, 60000, 'SHRINE - Necro - path 2768701'),
+(27567, 0, 6, 27687, 3688.361, 857.3421, 58.671318, 3.246312379837036132, 6, 60000, 'SHRINE - Necro - path 2768702');
+
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2753100 AND 2753199;
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768600 AND 2768699;
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2768700 AND 2768799;
+-- The shrine garrison never leaves its spawn, so these slots get no path:
+-- path 2753104 (SHRINE Abom) - no approach spline sighted, creature holds at its spawn
+-- path 2768631 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768632 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768633 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768634 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768635 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768636 (SHRINE Geist) - no approach spline sighted, creature holds at its spawn
+-- path 2768701 (SHRINE Necro) - no approach spline sighted, creature holds at its spawn
+-- path 2768702 (SHRINE Necro) - no approach spline sighted, creature holds at its spawn
+
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `smoothTransition`, `move_type`) VALUES
+-- path 2768600 -- SOUTH Geist from 3626.7517 844.8213
+(2768600, 1, 3604.7288, 784.8661, 71.00964, NULL, 0, 1),
+-- path 2768601 -- SOUTH Geist from 3630.2288 848.4597
+(2768601, 1, 3612.8433, 778.84894, 70.24953, NULL, 0, 1),
+-- path 2768602 -- SOUTH Geist from 3632.0217 843.6702
+(2768602, 1, 3619.9165, 775.50354, 70.3247, NULL, 0, 1),
+-- path 2768603 -- SOUTH Geist from 3636.2153 841.2112
+(2768603, 1, 3616.293, 784.6094, 68.95116, NULL, 0, 1),
+-- path 2768604 -- SOUTH Geist from 3639.7668 845.1495
+(2768604, 1, 3624.9426, 776.4518, 70.06914, NULL, 0, 1),
+-- path 2768605 -- SOUTH Geist from 3641.8840 841.3059
+(2768605, 1, 3630.5693, 776.441, 70.19949, NULL, 0, 1),
+-- path 2768700 -- SOUTH Necro from 3635.5405 845.5623
+(2768700, 1, 3625.97, 813.184, 64.27876, NULL, 0, 1),
+(2768700, 2, 3612.4, 773.206, 71.03034, NULL, 0, 1),
+-- path 2753100 -- SOUTH Abom from 3631.0967 827.1009
+(2753100, 1, 3614.0564, 778.05914, 70.30283, NULL, 0, 1),
+-- path 2768606 -- SOUTH Geist from 3627.7554 833.6415
+(2768606, 1, 3604.3188, 782.0027, 71.27799, NULL, 0, 1),
+-- path 2768607 -- SOUTH Geist from 3636.0417 830.9351
+(2768607, 1, 3620.3792, 775.383, 70.29366, NULL, 0, 1),
+-- path 2753101 -- SOUTH Abom from 3643.3750 858.7430
+(2753101, 1, 3614.1248, 778.0329, 70.2873, NULL, 0, 1),
+-- path 2768608 -- SOUTH Geist from 3639.5256 862.6922
+(2768608, 1, 3604.291, 782.083, 71.22034, NULL, 0, 1),
+-- path 2768609 -- SOUTH Geist from 3643.2010 865.0904
+(2768609, 1, 3604.4124, 781.9591, 71.26213, NULL, 0, 1),
+-- path 2768610 -- SOUTH Geist from 3649.2886 860.8603
+(2768610, 1, 3620.575, 775.3345, 70.30639, NULL, 0, 1),
+-- path 2768611 -- SOUTH Geist from 3652.5833 863.4423
+(2768611, 1, 3620.725, 775.28394, 70.31409, NULL, 0, 1),
+-- path 2753102 -- SOUTH Abom from 3631.0967 827.1009
+(2753102, 1, 3614.0564, 778.05914, 70.30283, NULL, 0, 1),
+-- path 2768612 -- SOUTH Geist from 3627.7554 833.6415
+(2768612, 1, 3604.3188, 782.0027, 71.27799, NULL, 0, 1),
+-- path 2768613 -- SOUTH Geist from 3630.3960 853.5417
+(2768613, 1, 3604.0488, 782.292, 71.4722, NULL, 0, 1),
+-- path 2768614 -- SOUTH Geist from 3636.0417 830.9351
+(2768614, 1, 3620.3792, 775.383, 70.29366, NULL, 0, 1),
+-- path 2768615 -- SOUTH Geist from 3636.1807 854.2664
+(2768615, 1, 3604.2644, 782.03094, 71.28683, NULL, 0, 1),
+-- path 2768616 -- SOUTH Geist from 3639.2942 850.2552
+(2768616, 1, 3620.2837, 775.4213, 70.31531, NULL, 0, 1),
+-- path 2768617 -- SOUTH Geist from 3644.5542 850.5862
+(2768617, 1, 3620.574, 775.3278, 70.2943, NULL, 0, 1),
+-- path 2768618 -- EAST Geist from 3757.7104 766.1674
+(2768618, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
+-- path 2768619 -- EAST Geist from 3759.6614 764.0284
+(2768619, 1, 3858.7815, 677.822, 59.89315, NULL, 0, 1),
+-- path 2768620 -- EAST Geist from 3760.1384 766.6206
+(2768620, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
+-- path 2768621 -- EAST Geist from 3760.7493 769.1561
+(2768621, 1, 3858.7815, 677.822, 59.89315, NULL, 0, 1),
+-- path 2768622 -- EAST Geist from 3762.3030 764.4466
+(2768622, 1, 3851.576, 671.38025, 58.56033, NULL, 0, 1),
+-- path 2768623 -- EAST Geist from 3762.8386 766.9697
+(2768623, 1, 3851.624, 671.43243, 58.60671, NULL, 0, 1),
+-- path 2753103 -- EAST Abom from 3767.9536 759.1010
+(2753103, 1, 3823.4775, 694.0947, 59.41341, NULL, 0, 1),
+(2753103, 2, 3839.2588, 667.22906, 58.36109, NULL, 0, 1),
+-- path 2768624 -- EAST Geist from 3755.6506 768.1376
+(2768624, 1, 3859.2427, 678.4638, 59.9894, NULL, 0, 1),
+-- path 2768625 -- EAST Geist from 3758.6506 768.2493
+(2768625, 1, 3851.5723, 671.3806, 58.58128, NULL, 0, 1),
+-- path 2768626 -- EAST Geist from 3759.4480 770.4917
+(2768626, 1, 3851.5625, 671.3736, 58.59481, NULL, 0, 1),
+-- path 2768627 -- EAST Geist from 3763.3170 761.0549
+(2768627, 1, 3841.9866, 663.70935, 59.7098, NULL, 0, 1),
+-- path 2768628 -- EAST Geist from 3766.4620 763.3361
+(2768628, 1, 3845.4673, 670.1445, 58.13992, NULL, 0, 1),
+-- path 2768629 -- EAST Geist from 3768.9658 753.6746
+(2768629, 1, 3829.3748, 688.6724, 58.76442, NULL, 0, 1),
+-- path 2768630 -- EAST Geist from 3772.7460 756.7438
+(2768630, 1, 3838.4294, 681.2864, 58.12796, NULL, 0, 1);
+
+-- Horde Cleanup
+UPDATE `creature` SET `position_x`=3648.959961, `position_y`=1215.579956, `position_z`=132.792007, `orientation`=2.731850, `wander_distance`=10.63, `MovementType`=1, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=105011 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3651.820068, `position_y`=1213.819946, `position_z`=132.641998, `orientation`=4.188790, `wander_distance`=20.79, `MovementType`=1, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `guid`=105024 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3631.699951, `position_y`=1221.650024, `position_z`=134.931000, `orientation`=3.877450, `wander_distance`=5.96, `MovementType`=1, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=104996 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3634.260010, `position_y`=1221.520020, `position_z`=134.399002, `orientation`=4.817110, `wander_distance`=17.80, `MovementType`=1, `VerifiedBuild`=47720, `CreateObject`=2 WHERE `guid`=104998 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3637.129883, `position_y`=1221.699951, `position_z`=134.242996, `orientation`=2.826820, `wander_distance`=14.43, `MovementType`=1, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=105005 AND `id`=27749;
+UPDATE `creature` SET `position_x`=3619.350098, `position_y`=1198.109985, `position_z`=143.143997, `orientation`=4.922500, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=109986 AND `id`=27542;
+UPDATE `creature` SET `position_x`=3660.879883, `position_y`=1198.310059, `position_z`=145.843002, `orientation`=3.061770, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=109994 AND `id`=27542;
+
+DELETE FROM `creature` WHERE `guid` IN (99413,99414,99419,99418,99415,99417,99416) AND `id` = 27686;
+UPDATE `creature_addon` SET `emote` = 376 WHERE `guid` = 104997;
+
+-- Ruby Arrow Periodic
+UPDATE `creature_addon` SET `auras` = '49199' WHERE `emote` = 376 AND `bytes2` = 2 AND `guid` IN (SELECT `guid` FROM `creature` WHERE `id` IN (27564, 27749));
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 3) AND (`SourceEntry` = 49197) AND (`ConditionTypeOrReference` = 31);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 3, 49197, 0, 0, 31, 0, 3, 27686, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
+(13, 3, 49197, 0, 1, 31, 0, 3, 27531, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers'),
+(13, 3, 49197, 0, 2, 31, 0, 3, 27687, 0, 0, 0, 0, '', 'Ruby Arrow from Heated Battle Event in Ruby Dragonshrine only targets Frigid Attackers');
