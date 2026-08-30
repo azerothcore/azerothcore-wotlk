@@ -755,3 +755,11 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 
 -- Remove flag 64 from Shoot
 UPDATE `smart_scripts` SET `action_param2` = 0 WHERE `entryorguid` IN (27564, 27749) AND `source_type` = 0 AND `action_type` = 11 AND `action_param1` = 15620;
+
+-- Also remove old stuff
+UPDATE `creature_template` SET `RegenHealth` = 0, `ScriptName` = '' WHERE (`entry` IN (27686, 27687, 27531));
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27687;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27687);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(27687, 0, 0, 0, 60, 0, 100, 0, 3200, 10000, 3200, 10000, 0, 0, 11, 50324, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Necromancer Attacker - On Update - Cast \'Bone Armor\''),
+(27687, 0, 1, 2, 0, 0, 100, 0, 0, 1200, 3600, 4800, 0, 0, 11, 9613, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Necromancer Attacker - In Combat - Cast \'Shadow Bolt\'');
