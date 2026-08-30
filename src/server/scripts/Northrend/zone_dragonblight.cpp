@@ -1355,7 +1355,7 @@ private:
             return MARCH_EAST_TO_SOUTH;
 
         // TODO: what picks the shrine is unknown - the capture's one push had no strafe first.
-        return roll_chance_i(33) ? MARCH_SOUTH_TO_SHRINE : MARCH_SOUTH_TO_EAST;
+        return roll_chance_i(50) ? MARCH_SOUTH_TO_SHRINE : MARCH_SOUTH_TO_EAST;
     }
 
     // A pass is never won and never held for a set time: a dragon strafes the lane, the captain
