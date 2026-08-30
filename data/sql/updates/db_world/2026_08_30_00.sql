@@ -1,3 +1,4 @@
+-- DB update 2026_08_28_02 -> 2026_08_30_00
 --
 -- Thorim: the pre-fight pack, the Dark Rune casters and the Iron Ring/Honor Guards all inherit the shared
 -- boss set -361 (interrupt, every CC and knockback immune) from AC's original base data, and the Dark Rune
