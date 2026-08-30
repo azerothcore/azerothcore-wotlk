@@ -1,3 +1,4 @@
+-- DB update 2026_08_30_02 -> 2026_08_30_03
 -- Quest "The Hunter and the Prince" (13361, 13400)
 DELETE FROM `gameobject` WHERE `guid` = 59 AND `id` = 194023;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
