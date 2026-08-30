@@ -982,8 +982,6 @@ constexpr Seconds WAVE_INTERVAL = 50s;
 // The captain warns his line as the dragon spawns and the squad moves 10.5s later
 constexpr Milliseconds STRAFE_TO_MARCH_DELAY = 10500ms;
 
-constexpr Seconds RESPAWN_DELAY = 1min;
-
 enum RubyStrafeNpcs
 {
     NPC_RUBY_KEEPER                 = 27530,
@@ -1291,9 +1289,9 @@ private:
                 context.Schedule(STRAFE_TO_MARCH_DELAY, GROUP_STATION, [this](TaskContext /*context*/)
                 {
                     if (CreatureGroup* formation = me->GetFormation())
-                        formation->DespawnFormation(0ms, RESPAWN_DELAY);
+                        formation->DespawnFormation(0ms, 60s);
                     else
-                        me->DespawnOrUnsummon(0s, RESPAWN_DELAY);
+                        me->DespawnOrUnsummon(0s, 60s);
                 });
             });
 
