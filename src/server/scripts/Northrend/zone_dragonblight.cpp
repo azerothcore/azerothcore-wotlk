@@ -935,8 +935,8 @@ enum HeatedBattleCaptainTexts
     SAY_MOVE_TO_SOUTH               = 0,
     SAY_MOVE_TO_EAST                = 1,
     SAY_MOVE_TO_SHRINE              = 2,
-    SAY_EMBERWYRM                   = 3,    // TODO: ruby dragon interrupt
-    SAY_BATTLE_COMPLETE             = 4,    // TODO: players broke through to the shrine
+    SAY_EMBERWYRM                   = 3,    // the strafe that ends the push on the shrine
+    SAY_SHRINE_HOLD                 = 4,    // flavour, called while the squad holds the shrine
     SAY_DRAGON_STRAFE               = 5     // TODO: ruby dragon strafing run
 };
 
@@ -974,6 +974,15 @@ enum HeatedBattleWaveGroup : uint8
     WAVE_HORDE_NECROMANCER          = 9     // Necromancer + 7 Geists
 };
 
+// Both captains spend nearly the whole event in combat, so the event timeline and the combat
+// rotation have to survive each other: each owns a scheduler group and only ever cancels its own.
+enum HeatedBattleCaptainGroup : uint32
+{
+    GROUP_COMBAT                    = 1,    // melee rotation, dropped every time combat ends
+    GROUP_STATION                   = 2,    // the wave and march timeline of the current station
+    GROUP_GHOUL                     = 3     // ghoul summons, armed once for the captain's life
+};
+
 // The squad's waypoint_data path ids are laid out as (creature.guid * PATH_ID_BLOCK) + march.
 constexpr uint32 PATH_ID_BLOCK = 10;
 
@@ -988,8 +997,26 @@ constexpr Seconds DEPLOY_DELAY = 5s;
 constexpr Seconds FIRST_WAVE_DELAY = 10s;
 constexpr Seconds WAVE_INTERVAL = 50s;
 constexpr uint8 WAVES_PER_STATION = 3;
-constexpr Seconds SHRINE_HOLD_DURATION = 1min;
+// The one push the sniff caught started at 20:03:10, drew the Emberwyrm at 20:05:02 and had the
+// squad back at the camp by 20:06:02 - so roughly a minute and a half at the shrine and a minute
+// before it re-forms.
+constexpr Seconds SHRINE_HOLD_DURATION = 90s;
 constexpr Seconds RESPAWN_DELAY = 1min;
+
+// From the southern pass the squad either falls back to the eastern one or pushes on to the
+// shrine. TODO: what picks the shrine is unknown. Every pass to pass march in the sniff follows a
+// ruby dragon strafe warning by 10-11s, but the one shrine push did not, so it is on some other
+// trigger; this stands in for it until the dragons are scripted.
+constexpr uint8 SHRINE_PUSH_CHANCE = 33;
+
+// Summon Frigid Ghoul Attacker is a volley the captain fires for his whole squad at once, not a
+// timer each conscript keeps for itself: all 94 volleys in the sniff have every one of their
+// casts on a single timestamp - span 0.000s, 37 of them with 8 casters and 9 with all 9 - and
+// the volleys land 15-16s apart on both sides. It is not gated on being out of combat either;
+// the line is fighting for nearly all of them.
+constexpr Seconds GHOUL_FIRST_DELAY = 5s;
+constexpr Seconds GHOUL_INTERVAL_MIN = 15s;
+constexpr Seconds GHOUL_INTERVAL_MAX = 17s;
 
 // Cleave / Mortal Strike / Whirlwind, kept per captain because the SAI this replaces tuned the
 // two sides differently. Each entry is { initial min, initial max, repeat min, repeat max }.
@@ -1016,9 +1043,12 @@ struct npc_heated_battle_captain : public ScriptedAI
 
     void JustRespawned() override
     {
+        scheduler.CancelAll();
+
         _station = Marches() ? STATION_CAMP : STATION_SOUTH_PASS;
         _march = MARCH_CAMP_TO_SOUTH;
         _marching = false;
+        _deployed = false;
         _wave = 0;
 
         ScriptedAI::JustRespawned();
@@ -1026,37 +1056,27 @@ struct npc_heated_battle_captain : public ScriptedAI
 
     void Reset() override
     {
-        scheduler.CancelAll();
+        // Reset also runs on evade, and a captain evades every time his line finishes off a wave,
+        // so only the melee rotation may be dropped here. Re-arming the event timeline from Reset
+        // restarted the station at wave 0 on every one of those evades, which left both captains
+        // summoning nothing but their first wave group and never reaching the march.
+        scheduler.CancelGroup(GROUP_COMBAT);
         me->SetEmoteState(EMOTE_STATE_READY2H);
 
-        // TODO: sniff the real cadence. Only Iskandar's own formation summons these - the generic
-        // Alliance Conscript SmartAI row that used to do it has been removed.
-        ScheduleTimedEvent(30s, 90s, [this]
+        if (!_deployed)
         {
-            if (CreatureGroup* formation = me->GetFormation())
-                for (auto const& itr : formation->GetMembers())
-                    if (itr.first->IsAlive() && !itr.first->IsInCombat())
-                        itr.first->CastSpell(itr.first, SPELL_SUMMON_FRIGID_GHOUL, true);
-        }, 30s, 90s);
-
-        // Reset also runs on evade, so pick the cycle back up wherever the squad is standing. A
-        // march in flight keeps its own generator in MOTION_SLOT_IDLE and resumes by itself.
-        if (!_marching)
+            _deployed = true;
+            ScheduleGhoulSummons();
             BeginHold();
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        // Drops the wave timer and the out of combat summons; Reset() re-arms both on evade.
-        scheduler.CancelAll();
-
         HeatedBattleCaptainTimers const& timers = Marches() ? ISKANDAR_TIMERS : DRAYZEN_TIMERS;
-        ScheduleTimedEvent(timers.Cleave[0], timers.Cleave[1],
-            [this] { DoCastVictim(SPELL_CLEAVE); }, timers.Cleave[2], timers.Cleave[3]);
-        ScheduleTimedEvent(timers.MortalStrike[0], timers.MortalStrike[1],
-            [this] { DoCastVictim(SPELL_MORTAL_STRIKE); }, timers.MortalStrike[2], timers.MortalStrike[3]);
-        ScheduleTimedEvent(timers.Whirlwind[0], timers.Whirlwind[1],
-            [this] { DoCastSelf(SPELL_WHIRLWIND); }, timers.Whirlwind[2], timers.Whirlwind[3]);
+        ScheduleCombatSpell(timers.Cleave, [this] { DoCastVictim(SPELL_CLEAVE); });
+        ScheduleCombatSpell(timers.MortalStrike, [this] { DoCastVictim(SPELL_MORTAL_STRIKE); });
+        ScheduleCombatSpell(timers.Whirlwind, [this] { DoCastSelf(SPELL_WHIRLWIND); });
     }
 
     // Marches can also be driven from the outside (SmartAI, a GM command) while the triggers for
@@ -1069,6 +1089,7 @@ struct npc_heated_battle_captain : public ScriptedAI
             case MARCH_EAST_TO_SOUTH:
             case MARCH_SOUTH_TO_SHRINE:
             case MARCH_CAMP_TO_SOUTH:
+                scheduler.CancelGroup(GROUP_STATION);
                 BeginMarch(static_cast<HeatedBattleCaptainMarch>(action));
                 break;
             default:
@@ -1086,7 +1107,6 @@ struct npc_heated_battle_captain : public ScriptedAI
 
         // Drop the path again so a respawn does not pick the finished march back up.
         me->LoadPath(0);
-        ApplyFinalFacing(pathId);
         me->SetEmoteState(EMOTE_STATE_READY2H);
 
         BeginHold();
@@ -1105,6 +1125,36 @@ struct npc_heated_battle_captain : public ScriptedAI
 private:
     // Only Iskandar walks between the passes; Drayzen holds his line for the whole event.
     [[nodiscard]] bool Marches() const { return me->GetEntry() == NPC_CAPTAIN_ISKANDAR; }
+
+    // { initial min, initial max, repeat min, repeat max }, all in GROUP_COMBAT so that the next
+    // evade clears the rotation without touching the waves.
+    void ScheduleCombatSpell(Milliseconds const (&timer)[4], std::function<void()> cast)
+    {
+        Milliseconds const repeatMin = timer[2];
+        Milliseconds const repeatMax = timer[3];
+
+        scheduler.Schedule(timer[0], timer[1], GROUP_COMBAT,
+            [cast, repeatMin, repeatMax](TaskContext context)
+        {
+            cast();
+            context.Repeat(repeatMin, repeatMax);
+        });
+    }
+
+    void ScheduleGhoulSummons()
+    {
+        scheduler.Schedule(GHOUL_FIRST_DELAY, GROUP_GHOUL, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SUMMON_FRIGID_GHOUL, true);
+
+            if (CreatureGroup* formation = me->GetFormation())
+                for (auto const& itr : formation->GetMembers())
+                    if (itr.first != me && itr.first->IsAlive())
+                        itr.first->CastSpell(itr.first, SPELL_SUMMON_FRIGID_GHOUL, true);
+
+            context.Repeat(GHOUL_INTERVAL_MIN, GHOUL_INTERVAL_MAX);
+        });
+    }
 
     [[nodiscard]] uint32 PathFor(HeatedBattleCaptainMarch march) const
     {
@@ -1157,6 +1207,11 @@ private:
         _marching = true;
         _march = march;
 
+        // The garrison is already dug in by the time the squad reaches the shrine, so it is
+        // summoned as the charge starts rather than while the squad is still forming up in camp.
+        if (march == MARCH_SOUTH_TO_SHRINE)
+            SummonWave(WAVE_SHRINE_GARRISON);
+
         Talk(TextFor(DestinationOf(march)));
 
         // Every conscript owns a guid-scoped SmartAI whose SMART_EVENT_ACTION_DONE rows start
@@ -1177,9 +1232,8 @@ private:
         if (Marches() && _station == STATION_CAMP)
         {
             // The squad forms up in the camp and heads down to the southern pass on its own.
-            scheduler.Schedule(DEPLOY_DELAY, [this](TaskContext /*context*/)
+            scheduler.Schedule(DEPLOY_DELAY, GROUP_STATION, [this](TaskContext /*context*/)
             {
-                SummonWave(WAVE_SHRINE_GARRISON);
                 BeginMarch(MARCH_CAMP_TO_SOUTH);
             });
 
@@ -1188,9 +1242,14 @@ private:
 
         if (Marches() && _station == STATION_SHRINE)
         {
-            // End of the line: the squad despawns and the whole formation comes back at camp.
-            scheduler.Schedule(SHRINE_HOLD_DURATION, [this](TaskContext /*context*/)
+            // Nothing is ever won here: the push ends when a ruby dragon strafes the shrine and
+            // takes the squad off the map with it, and the event forms up at the camp again.
+            Talk(SAY_SHRINE_HOLD);
+
+            scheduler.Schedule(SHRINE_HOLD_DURATION, GROUP_STATION, [this](TaskContext /*context*/)
             {
+                Talk(SAY_EMBERWYRM);
+
                 if (CreatureGroup* formation = me->GetFormation())
                     formation->DespawnFormation(0ms, RESPAWN_DELAY);
                 else
@@ -1200,7 +1259,7 @@ private:
             return;
         }
 
-        scheduler.Schedule(FIRST_WAVE_DELAY, [this](TaskContext context)
+        scheduler.Schedule(FIRST_WAVE_DELAY, GROUP_STATION, [this](TaskContext context)
         {
             SummonWave(WaveGroupFor(_wave));
             ++_wave;
@@ -1216,11 +1275,25 @@ private:
         });
     }
 
-    // TODO: retail decides some other way that a pass has been held long enough - this just
-    // follows the three waves the sniff shows landing before each march.
+    // The squad walks a fixed graph:
+    //   CAMP        -> SOUTH PASS   (the only camp route in the sniff, twice)
+    //   EAST PASS   -> SOUTH PASS
+    //   SOUTH PASS  -> EAST PASS, or occasionally the push on to the shrine
+    //   SHRINE      -> despawn, and the whole event forms up again at the camp
+    [[nodiscard]] HeatedBattleCaptainMarch NextMarch() const
+    {
+        if (_station == STATION_EAST_PASS)
+            return MARCH_EAST_TO_SOUTH;
+
+        return roll_chance_i(SHRINE_PUSH_CHANCE) ? MARCH_SOUTH_TO_SHRINE : MARCH_SOUTH_TO_EAST;
+    }
+
+    // TODO: retail moves the squad on when a ruby dragon strafes the pass it is holding - the
+    // captain warns the line and marches 10-11s later, six for six in the sniff. Until the
+    // dragons are scripted this follows the three waves that land before each of those marches.
     void MarchWhenQuiet()
     {
-        scheduler.Schedule(WAVE_INTERVAL, [this](TaskContext context)
+        scheduler.Schedule(WAVE_INTERVAL, GROUP_STATION, [this](TaskContext context)
         {
             // The captain can be out of combat while its conscripts are still holding.
             if (me->GetFormation() && me->GetFormation()->IsFormationInCombat())
@@ -1229,7 +1302,7 @@ private:
                 return;
             }
 
-            BeginMarch(_station == STATION_EAST_PASS ? MARCH_EAST_TO_SOUTH : MARCH_SOUTH_TO_EAST);
+            BeginMarch(NextMarch());
         });
     }
 
@@ -1282,25 +1355,40 @@ private:
         }
     }
 
-    // waypoint_data only applies a node's orientation when that node also carries a delay, so the
-    // facing the squad ends each march on has to be applied by hand.
-    void ApplyFinalFacing(uint32 pathId) const
-    {
-        WaypointPath const* path = sWaypointMgr->GetPath(pathId);
-        if (!path || path->Nodes.empty())
-            return;
-
-        if (std::optional<float> const& orientation = path->Nodes.back().Orientation)
-            me->SetFacingTo(*orientation);
-    }
-
     HeatedBattleCaptainStation _station = STATION_CAMP;
     HeatedBattleCaptainMarch _march = MARCH_CAMP_TO_SOUTH;
     bool _marching = false;
+    bool _deployed = false;
     uint8 _wave = 0;
 
     // TODO: the Emberwyrm interrupt that sets the squad passive and kneeling, and whatever
     // retail uses to decide the players have won a pass and the push to the shrine can start.
+};
+
+// 49197 Ruby Arrow is the volley the conscripts on both lines fire at the Scourge, triggered
+// every two seconds by the 49199 aura in their creature_addon. Its damage effect is
+// TARGET_UNIT_CONE_ENTRY, so every attacker standing in the cone is hit by the same shot; the
+// conditions on the spell only decide which entries are eligible, not how many of them are
+// picked. Effect 1 is TARGET_UNIT_NEARBY_ENTRY and already resolves to a single unit, so the
+// cone is trimmed to the nearest target as well and both effects land on the same attacker.
+class spell_ruby_arrow : public SpellScript
+{
+    PrepareSpellScript(spell_ruby_arrow);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.size() <= 1)
+            return;
+
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        targets.resize(1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ruby_arrow::FilterTargets,
+            EFFECT_0, TARGET_UNIT_CONE_ENTRY);
+    }
 };
 
 enum eFrostmourneCavern
@@ -2722,6 +2810,7 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_q12237_drop_off_villager);
     RegisterSpellScript(spell_call_wintergarde_gryphon);
     RegisterCreatureAI(npc_heated_battle_captain);
+    RegisterSpellScript(spell_ruby_arrow);
     RegisterSpellScript(spell_q12478_frostmourne_cavern);
     RegisterSpellScript(spell_q12243_fire_upon_the_waters_aura);
     new npc_q24545_lich_king();
