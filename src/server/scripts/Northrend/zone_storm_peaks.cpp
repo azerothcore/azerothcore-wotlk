@@ -205,17 +205,14 @@ public:
 enum eTimeLost
 {
     NPC_TIME_LOST_PROTO_DRAKE = 32491,
-    NPC_VYRAGOSA = 32630,
+    NPC_VYRAGOSA              = 32630,
 
-    SPELL_TIME_SHIFT = 61084,
-    SPELL_TIME_LAPSE = 51020,
-    SPELL_FROST_BREATH = 47425,
-    SPELL_FROST_CLEAVE = 51857,
-};
+    SPELL_TIME_SHIFT          = 61084,
+    SPELL_TIME_LAPSE          = 51020,
+    SPELL_FROST_BREATH        = 47425,
+    SPELL_FROST_CLEAVE        = 51857,
 
-enum eTLPDActions
-{
-    ACTION_TLPD_REVEAL = 1,
+    ACTION_TLPD_REVEAL        = 1
 };
 
 class npc_time_lost_proto_drake : public CreatureScript
@@ -227,52 +224,35 @@ public:
     {
         npc_time_lost_proto_drakeAI(Creature* creature) : ScriptedAI(creature) {}
 
-        bool _hiddenTimerArmed = false;
-
         void Reset() override
         {
             scheduler.CancelAll();
         }
 
-        // Some respawns reuse this object instead of creating a new one, in
-        // which case InitializeAI() doesn't run - re-arm the hidden state here
-        // instead. The flag stops it from being armed twice when both do fire.
         void JustRespawned() override
         {
             Reset();
-            if (!_hiddenTimerArmed)
-                ArmHiddenState();
+            me->SetAnimTier(AnimTier::Fly);
+            me->setActive(true);
+            ArmHiddenState();
         }
 
         void DoAction(int32 action) override
         {
             if (action == ACTION_TLPD_REVEAL)
             {
-                _hiddenTimerArmed = false;
                 me->SetVisible(true);
                 me->SetImmuneToAll(false);
                 me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
             }
         }
 
-        void InitializeAI() override
-        {
-            ScriptedAI::InitializeAI();
-            me->SetAnimTier(AnimTier::Fly);
-            me->setActive(true);
-            ArmHiddenState();
-        }
-
         void ArmHiddenState()
         {
-            _hiddenTimerArmed = true;
             me->SetVisible(false);
             me->SetImmuneToAll(true);
             me->GetMotionMaster()->MoveIdle();
 
-            // spawntimesecs is 6h, so rolling 0-16h here gives 6-22h total from
-            // death to visibility. On server restart the 0 lower bound gives a
-            // chance of spawning visibly anywhere from 0 seconds to 16 hours later.
             me->m_Events.AddEventAtOffset([&] {
                 DoAction(ACTION_TLPD_REVEAL);
             }, Seconds(urand(0, 60 * 60 * 16)));
