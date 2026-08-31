@@ -3,30 +3,6 @@
 SET @CGUID := 247227;
 SET @PATH := @CGUID * 10;
 
-DELETE FROM `spawn_group_template` WHERE `groupId` IN (105, 106);
-INSERT INTO `spawn_group_template` (`groupId`, `groupName`, `groupFlags`) VALUES
-    (105, 'Stratholme - Timmy the Cruel - Crusaders Square Scarlet trigger', 0),
-    (106, 'Stratholme - Timmy the Cruel', 4);
-
-DELETE FROM `spawn_group` WHERE `groupId` IN (105, 106) OR (`spawnType` = 0 AND `spawnId` IN (54052, 54056, 54069, 54070, 54073, 54074, 54075, 54076, 54079, 54082, 54087, 54117, 54138, 54180, 54207, @CGUID));
-INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
-    (105, 0, 54052),
-    (105, 0, 54056),
-    (105, 0, 54069),
-    (105, 0, 54070),
-    (105, 0, 54073),
-    (105, 0, 54074),
-    (105, 0, 54075),
-    (105, 0, 54076),
-    (105, 0, 54079),
-    (105, 0, 54082),
-    (105, 0, 54087),
-    (105, 0, 54117),
-    (105, 0, 54138),
-    (105, 0, 54180),
-    (105, 0, 54207),
-    (106, 0, @CGUID);
-
 UPDATE `creature` SET `position_x` = 3624.6, `position_y` = -3188, `position_z` = 130.579, `orientation` = 2.99341, `MovementType` = 0, `VerifiedBuild` = 53622, `CreateObject` = 2 WHERE `guid` = @CGUID AND `id` = 10808;
 
 DELETE FROM `creature_addon` WHERE `guid` = @CGUID;
@@ -70,9 +46,22 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
     (10808, 0, 0, 0, 0, 0, 100, 0, 10000, 15000, 10000, 15000, 0, 0, 11, 17470, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - In Combat - Cast Ravenous Claw'),
     (10808, 0, 1, 0, 2, 0, 100, 1, 0, 50, 0, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Between 0-50% Health - Cast Enrage'),
     (10808, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Aggro - Say Line 0'),
-    (10808, 0, 3, 0, 60, 0, 100, 257, 0, 0, 0, 0, 0, 0, 80, 1080800, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Update - Run Emerge Actionlist');
+    (10808, 0, 3, 4, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Respawn - Set Invisible'),
+    (10808, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Respawn - Set Immune to Players and NPCs'),
+    (10808, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - On Respawn - Set Event Phase 1'),
+    (10808, 0, 6, 0, 1, 1, 100, 1, 10000, 10000, 10000, 10000, 0, 0, 80, 1080800, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Out of Combat - Run Emerge Actionlist');
+
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 10808;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+    (22, 7, 10808, 0, 1, 29, 1, 10418, 70, 0, 1, 0, 0, '', 'Timmy the Cruel - Activate if no living Crimson Guardsman is within 70 yards'),
+    (22, 7, 10808, 0, 1, 29, 1, 10419, 70, 0, 1, 0, 0, '', 'Timmy the Cruel - Activate if no living Crimson Conjuror is within 70 yards'),
+    (22, 7, 10808, 0, 1, 29, 1, 10420, 70, 0, 1, 0, 0, '', 'Timmy the Cruel - Activate if no living Crimson Initiate is within 70 yards'),
+    (22, 7, 10808, 0, 1, 29, 1, 10424, 70, 0, 1, 0, 0, '', 'Timmy the Cruel - Activate if no living Crimson Gallant is within 70 yards');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1080800 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-    (1080800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 50142, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Cast Emerge'),
-    (1080800, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, @PATH, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Start Repeating Path');
+    (1080800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Set Visible'),
+    (1080800, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Remove Immunity to Players and NPCs'),
+    (1080800, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Set Event Phase 0'),
+    (1080800, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 50142, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Cast Emerge'),
+    (1080800, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, @PATH, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Start Repeating Path');

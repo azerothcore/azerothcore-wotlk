@@ -101,15 +101,8 @@ enum MiscIds
     EVENT_GATE2_TRAP                    = 9,
     EVENT_GATE2_DELAY                   = 10,
     EVENT_GATE2_CRITTER_DELAY           = 11,
-    EVENT_TIMMY_SPAWN_CHECK             = 12,
 
     SPELL_BARON_ULTIMATUM               = 27861
-};
-
-enum SpawnGroupIds
-{
-    SPAWN_GROUP_TIMMY_TRIGGER           = 105,
-    SPAWN_GROUP_TIMMY                   = 106
 };
 
 template <class AI, class T>

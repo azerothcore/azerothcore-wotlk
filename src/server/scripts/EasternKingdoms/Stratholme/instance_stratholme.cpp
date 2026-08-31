@@ -15,10 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "stratholme.h"
@@ -82,10 +80,8 @@ public:
 
             _gateTrapsCooldown[0] = false;
             _gateTrapsCooldown[1] = false;
-            _timmySpawned = false;
 
             events.Reset();
-            events.ScheduleEvent(EVENT_TIMMY_SPAWN_CHECK, 1s);
         }
 
         void OnPlayerEnter(Player* player) override
@@ -502,15 +498,6 @@ public:
                 case EVENT_GATE2_CRITTER_DELAY:
                     gate_critter_delay(GATE2);
                     break;
-                case EVENT_TIMMY_SPAWN_CHECK:
-                {
-                    if (IsTimmyEntranceClear())
-                        _timmySpawned = instance->SpawnGroupSpawn(SPAWN_GROUP_TIMMY);
-
-                    if (!_timmySpawned)
-                        events.ScheduleEvent(EVENT_TIMMY_SPAWN_CHECK, 1s);
-                    break;
-                }
                 case EVENT_BARON_TIME:
                 {
                     --_baronRunTime;
@@ -622,40 +609,8 @@ public:
         ObjectGuid _barthilasGUID;
 
         bool _gateTrapsCooldown[2];
-        bool _timmySpawned;
         ObjectGuid _trappedPlayerGUID;
         ObjectGuid _trapGatesGUIDs[4];
-
-        bool IsTimmyEntranceClear() const
-        {
-            auto [begin, end] = sObjectMgr->GetSpawnDataForGroup(SPAWN_GROUP_TIMMY_TRIGGER);
-            if (begin == end)
-                return false;
-
-            for (auto itr = begin; itr != end; ++itr)
-            {
-                SpawnData const* spawn = itr->second;
-                if (spawn->type != SPAWN_TYPE_CREATURE)
-                    return false;
-
-                bool foundDeadCreature = false;
-                auto bounds = instance->GetCreatureBySpawnIdStore().equal_range(spawn->spawnId);
-                for (auto creatureItr = bounds.first; creatureItr != bounds.second; ++creatureItr)
-                {
-                    if (creatureItr->second->IsAlive())
-                        return false;
-
-                    foundDeadCreature = true;
-                }
-
-                // An unloaded creature is not dead. Only accept it as such when
-                // the map has a persisted, unexpired respawn time for its spawn.
-                if (!foundDeadCreature && instance->GetRespawnTime(SPAWN_TYPE_CREATURE, spawn->spawnId) <= GameTime::GetGameTime().count())
-                    return false;
-            }
-
-            return true;
-        }
 
         void gate_delay(int gate)
         {
