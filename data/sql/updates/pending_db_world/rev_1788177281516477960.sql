@@ -1,4 +1,5 @@
 -- Link each Dire Maul East Whip Lasher pack so every member assists when one enters combat.
+DELETE FROM `creature_formations` WHERE (`memberGUID` BETWEEN 248314 AND 248355) OR (`memberGUID` BETWEEN 248430 AND 248509) OR `memberGUID` IN (248545,248546,248547,248548,248551,248552,248553,248554,248557,248558,248559,248560);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (248314,248314,0,0,3,0,0),
 (248314,248315,0,0,3,0,0),
