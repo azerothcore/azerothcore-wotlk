@@ -1,3 +1,4 @@
+-- DB update 2026_08_31_03 -> 2026_08_31_04
 
 -- Added Rows 0 and 4 and updated comments for rows 1, 2 and 3.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 33572;
