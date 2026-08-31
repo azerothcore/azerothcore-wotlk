@@ -1,3 +1,4 @@
+-- DB update 2026_08_31_06 -> 2026_08_31_07
 -- Brunnhildar route (Path 1) spawn and route separation.
 -- Spawn position (6821.0693, -1800.8033, 940.85815) is set on the creature only.
 -- Waypoints are fully replaced starting at point 1 (first airborne patrol point).
