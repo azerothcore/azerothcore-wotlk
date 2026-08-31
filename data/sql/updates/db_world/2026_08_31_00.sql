@@ -1,3 +1,4 @@
+-- DB update 2026_08_30_05 -> 2026_08_31_00
 -- Ulduar repair stations (Auto-Repair 62705) must also hit the Salvaged Siege Turret and the
 -- Salvaged Demolisher Mechanic Seat: the seat is a separate vehicle with its own pyrite pool,
 -- so without it the gunner's pyrite bar is never refueled (sniffed: one pulse hits both
