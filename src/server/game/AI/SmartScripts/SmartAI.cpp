@@ -892,6 +892,12 @@ void SmartAI::JustReachedHome()
             me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
     }
 
+    if (_mainSpellId)
+    {
+        SetMainSpell(_mainSpellId);
+        SetCombatMovement(true, false);
+    }
+
     mJustReset = false;
 }
 
@@ -1371,12 +1377,16 @@ void SmartAI::DistancingEnded()
 
 bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
 {
-    if (me->HasSpellCooldown(spellInfo->Id))
+    if (me->IsSpellProhibited(spellInfo->GetSchoolMask()))
         return true;
 
     if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
         return true;
+
     if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+        return true;
+
+    if (spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) > (int32)me->GetPower(POWER_MANA))
         return true;
 
     return false;
@@ -1385,9 +1395,12 @@ bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
 void SmartAI::OnSpellFailed(SpellInfo const* spell)
 {
     CreatureAI::OnSpellFailed(spell);
-    if (_mainSpellId == spell->Id)
-        if (_currentRangeMode && IsMainSpellPrevented(spell))
-            SetCurrentRangeMode(false);
+    SetCombatMovement(true, true);
+
+    uint32 spellIdToCheck = _mainSpellId ? _mainSpellId : spell->Id;
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellIdToCheck);
+    if (spellInfo && _currentRangeMode && IsMainSpellPrevented(spellInfo))
+        SetCurrentRangeMode(false, 0.f);
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
