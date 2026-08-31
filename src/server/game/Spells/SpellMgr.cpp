@@ -3167,7 +3167,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 {
     uint32 const oldMSTime = getMSTime();
     uint32 const customAttrTime = getMSTime();
-    uint32 count;
+    uint32 count = 0;
 
     QueryResult result = WorldDatabase.Query("SELECT spell_id, attributes FROM spell_custom_attr");
 
@@ -3177,7 +3177,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
     }
     else
     {
-        for (count = 0; result->NextRow(); ++count)
+        do
         {
             Field const* fields = result->Fetch();
 
@@ -3237,7 +3237,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             }
 
             spellInfo->AttributesCu |= attributes;
-        }
+            ++count;
+        } while (result->NextRow());
         LOG_INFO("server.loading", ">> Loaded {} spell custom attributes from DB in {} ms", count, GetMSTimeDiffToNow(customAttrTime));
     }
 
