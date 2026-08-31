@@ -947,11 +947,10 @@ struct npc_razorscale_spawner : public ScriptedAI
         scheduler.Schedule(1s, [this](TaskContext) { DoCastSelf(SPELL_SUMMON_MOLE_MACHINE); })
             .Schedule(6s, [this](TaskContext)
         {
-            // A mole machine either spawns a Sentinel alone (30% chance) or a pack of Dark Rune Dwarves
+            DoCastSelf(DwarfSummonSpells[urand(0, 2)]);
+            // Vrykul: RNG-based, independent chance per spawner
             if (roll_chance_i(30))
                 DoCastSelf(SPELL_TRIGGER_SUMMON_IRON_VRYKUL);
-            else
-                DoCastSelf(DwarfSummonSpells[urand(0, 2)]);
         });
     }
 
@@ -1386,13 +1385,10 @@ class spell_razorscale_summon_iron_dwarves : public SpellScript
                 caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_WATCHER, true);
                 break;
             case SPELL_TRIGGER_SUMMON_IRON_DWARVES_2:
-                caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_GUARDIAN, true);
-                caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_WATCHER, true);
-                caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_WATCHER, true);
-                break;
             case SPELL_TRIGGER_SUMMON_IRON_DWARVES_3:
                 caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_GUARDIAN, true);
-                caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_GUARDIAN, true);
+                caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_WATCHER, true);
+                caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_WATCHER, true);
                 break;
         }
     }
