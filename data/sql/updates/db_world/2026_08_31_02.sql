@@ -1,3 +1,4 @@
+-- DB update 2026_08_31_01 -> 2026_08_31_02
 -- Boomer XP-500 (entry 34192) - consolidated patch
 -- - Keeps event 101 (direct contact, without LoS/detection checks) according to observed retail behavior
 -- - Applies Defensive ReactState only to Mimiron Arena Bombots through negative GUID overrides
