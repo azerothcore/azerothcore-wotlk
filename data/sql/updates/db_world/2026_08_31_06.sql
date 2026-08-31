@@ -1,3 +1,4 @@
+-- DB update 2026_08_31_05 -> 2026_08_31_06
 --
 -- Ulduar: Salvaged Chopper - swap "Grab Pyrite" (67372) for "Eject Passenger" (67393)
 -- while the rear seat is occupied.
