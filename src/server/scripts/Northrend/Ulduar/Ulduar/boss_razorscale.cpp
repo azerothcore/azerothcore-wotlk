@@ -261,6 +261,13 @@ struct boss_razorscale : public BossAI
     void ScheduleGroundEvents()
     {
         events.SetPhase(PHASE_PERMA_GROUND);
+        events.CancelEvent(EVENT_FLAME_BREATH);
+        events.CancelEvent(EVENT_WING_BUFFET);
+        events.CancelEvent(EVENT_RESUME_AIR);
+        events.CancelEvent(EVENT_FIREBOLT);
+        events.CancelEvent(EVENT_FIREBALL_AIR);
+        events.CancelEvent(EVENT_SUMMON_MINIONS);
+        events.CancelEvent(EVENT_SUMMON_MINIONS_DELAYED);
         events.ScheduleEvent(EVENT_FIREBOLT, 3s, 0, PHASE_PERMA_GROUND);
         events.ScheduleEvent(EVENT_FUSE_ARMOR, 15s, 0, PHASE_PERMA_GROUND);
         events.ScheduleEvent(EVENT_FLAME_BREATH_GROUNDED, 21s, 0, PHASE_PERMA_GROUND);
@@ -280,6 +287,8 @@ struct boss_razorscale : public BossAI
             case ACTION_GROUND_PHASE:
                 me->InterruptNonMeleeSpells(false);
                 events.SetPhase(PHASE_GROUND);
+                events.CancelEvent(EVENT_SUMMON_MINIONS);
+                events.CancelEvent(EVENT_SUMMON_MINIONS_DELAYED);
                 _harpoonHits = 0;
                 me->SetSpeedRate(MOVE_RUN, 3.0f);
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
@@ -289,6 +298,13 @@ struct boss_razorscale : public BossAI
                 me->RemoveAura(SPELL_STUN_SELF);
                 Talk(EMOTE_PERMA_GROUND);
                 DoCastSelf(SPELL_WING_BUFFET);
+                {
+                    EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
+                    summons.DoAction(ACTION_STOP_CONTROLLERS, trapperPred);
+                    EntryCheckPredicate commanderPred(NPC_EXPEDITION_COMMANDER);
+                    summons.DoAction(ACTION_STOP_CONTROLLERS, commanderPred);
+                    summons.DoAction(ACTION_DESTROY_HARPOONS, commanderPred);
+                }
                 events.ScheduleEvent(EVENT_RESUME_CHASE, 1s);
                 ScheduleGroundEvents();
                 break;
@@ -316,6 +332,14 @@ struct boss_razorscale : public BossAI
                 me->SetDisableGravity(false);
                 if (!_permaGround)
                 {
+                    if (me->GetHealthPct() <= 50.0f)
+                    {
+                        _permaGround = true;
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        DoAction(ACTION_START_PERMA_GROUND);
+                        break;
+                    }
+                    me->SetReactState(REACT_PASSIVE);
                     DoCastSelf(SPELL_STUN_SELF, true);
                     EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
                     summons.DoAction(ACTION_GROUND_PHASE, trapperPred);
@@ -470,10 +494,16 @@ struct boss_razorscale : public BossAI
                     SummonMinions();
                     break;
                 case EVENT_FLAME_BREATH:
+                    me->SetFacingTo(RazorLandPos.GetOrientation());
                     me->RemoveAura(SPELL_STUN_SELF);
                     Talk(EMOTE_BREATH);
-                    if (Unit* victim = me->GetVictim())
-                        DoCast(victim, SPELL_FLAME_BREATH);
+                    {
+                        Unit* target = me->GetVictim();
+                        if (!target)
+                            target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
+                        if (target)
+                            me->CastSpell(target, SPELL_FLAME_BREATH, TRIGGERED_IGNORE_SET_FACING);
+                    }
                     events.ScheduleEvent(EVENT_WING_BUFFET, 2s, 0, PHASE_GROUND);
                     break;
                 case EVENT_FLAME_BREATH_GROUNDED:
@@ -917,10 +947,11 @@ struct npc_razorscale_spawner : public ScriptedAI
         scheduler.Schedule(1s, [this](TaskContext) { DoCastSelf(SPELL_SUMMON_MOLE_MACHINE); })
             .Schedule(6s, [this](TaskContext)
         {
-            DoCastSelf(DwarfSummonSpells[urand(0, 2)]);
-            // Vrykul: RNG-based, independent chance per spawner
+            // A mole machine either spawns a Sentinel alone (30% chance) or a pack of Dark Rune Dwarves
             if (roll_chance_i(30))
                 DoCastSelf(SPELL_TRIGGER_SUMMON_IRON_VRYKUL);
+            else
+                DoCastSelf(DwarfSummonSpells[urand(0, 2)]);
         });
     }
 
@@ -1355,10 +1386,13 @@ class spell_razorscale_summon_iron_dwarves : public SpellScript
                 caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_WATCHER, true);
                 break;
             case SPELL_TRIGGER_SUMMON_IRON_DWARVES_2:
-            case SPELL_TRIGGER_SUMMON_IRON_DWARVES_3:
                 caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_GUARDIAN, true);
                 caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_WATCHER, true);
                 caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_WATCHER, true);
+                break;
+            case SPELL_TRIGGER_SUMMON_IRON_DWARVES_3:
+                caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_GUARDIAN, true);
+                caster->CastSpell(caster, SPELL_SUMMON_IRON_DWARF_GUARDIAN, true);
                 break;
         }
     }
