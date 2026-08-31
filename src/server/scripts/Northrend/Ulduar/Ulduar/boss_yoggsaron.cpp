@@ -150,6 +150,7 @@ enum YoggSpells
     SPELL_LUNATIC_GAZE_YS               = 64163,
     SPELL_DEAFENING_ROAR                = 64189,
     SPELL_SHADOW_BEACON                 = 64465,
+    SPELL_DEATH_ANIMATION               = 64165,
 
     // IMMORTAL GUARDIAN
     SPELL_SIMPLE_TELEPORT               = 64195,
@@ -1161,6 +1162,7 @@ struct boss_yoggsaron : public ScriptedAI
         _instance = me->GetInstanceScript();
         _thirdPhase = false;
         _usedInsane = false;
+        _defeated = false;
         summons.DespawnAll();
         events.Reset();
 
@@ -1184,6 +1186,7 @@ struct boss_yoggsaron : public ScriptedAI
     SummonList summons;
     bool _thirdPhase;
     bool _usedInsane;
+    bool _defeated;
 
     void AttackStart(Unit*) override { }
 
@@ -1195,6 +1198,32 @@ struct boss_yoggsaron : public ScriptedAI
         float o = rand_norm() * M_PI * 2;
         float Zplus = (dist - 38) / 6.5f;
         me->SummonCreature(NPC_IMMORTAL_GUARDIAN, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+    }
+
+    // Never dies from damage: once pushed below 1.5% health he is defeated.
+    // The remaining sliver is not dealt, the death animation plays and the
+    // server kills him half a second later.
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (_defeated)
+        {
+            damage = 0;
+            return;
+        }
+
+        if (damage >= me->GetHealth())
+            damage = me->GetHealth() - 1;
+
+        if (me->GetHealth() - damage >= CalculatePct(me->GetMaxHealth(), 1.5f))
+            return;
+
+        _defeated = true;
+        me->InterruptNonMeleeSpells(true);
+        DoCastSelf(SPELL_DEATH_ANIMATION, true);
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            me->KillSelf();
+        }, 500ms);
     }
 
     void JustDied(Unit*  /*who*/) override
