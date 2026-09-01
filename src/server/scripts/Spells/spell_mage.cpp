@@ -1100,7 +1100,7 @@ class spell_mage_combustion : public AuraScript
     {
         DoCheckProc += AuraCheckProcFn(spell_mage_combustion::CheckProc);
         AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion::OnRemove, EFFECT_0,
-            SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
