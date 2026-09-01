@@ -1060,6 +1060,8 @@ class spell_mage_combustion : public AuraScript
 {
     PrepareAuraScript(spell_mage_combustion);
 
+    std::shared_ptr<bool> _aliveToken = std::make_shared<bool>(true);
+
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION_PROC });
@@ -1075,13 +1077,20 @@ class spell_mage_combustion : public AuraScript
             // invalidate the live iterator (aura containers are flat_multimaps).
             Unit* actor = eventInfo.GetActor();
             ObjectGuid actorGuid = actor->GetGUID();
-            actor->m_Events.AddEventAtOffset([actorGuid]()
+            std::weak_ptr<bool> token = _aliveToken;
+            actor->m_Events.AddEventAtOffset([actorGuid, token]()
             {
-                if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
+                if (auto locked = token.lock())
                 {
-                    if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                    if (*locked)
                     {
-                        actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+                        if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
+                        {
+                            if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                            {
+                                actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+                            }
+                        }
                     }
                 }
             }, 1ms);
@@ -1093,6 +1102,7 @@ class spell_mage_combustion : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        *_aliveToken = false;
         GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_COMBUSTION_PROC);
     }
 
