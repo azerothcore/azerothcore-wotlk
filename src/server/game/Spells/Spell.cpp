@@ -7044,7 +7044,23 @@ bool Spell::CanAutoCast(Unit* target)
         for (Unit::AuraEffectList::const_iterator auraIt = auras.begin(); auraIt != auras.end(); ++auraIt)
         {
             if (GetSpellInfo()->Id == (*auraIt)->GetSpellInfo()->Id)
+            {
+                // Direct-damage attacks (e.g. Acid Spit, Sting, Monstrous Bite) deal primary damage
+                // on each hit and should not be prevented from autocasting by their own debuff.
+                if (m_spellInfo->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE) ||
+                    m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_DAMAGE) ||
+                    m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL) ||
+                    m_spellInfo->HasEffect(SPELL_EFFECT_NORMALIZED_WEAPON_DMG) ||
+                    m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_PERCENT_DAMAGE))
+                    continue;
+
+                // Stacking auras should continue to be cast until maximum stacks are reached
+                if (GetSpellInfo()->StackAmount > 1 &&
+                    (*auraIt)->GetBase()->GetStackAmount() < GetSpellInfo()->StackAmount)
+                    continue;
+
                 return false;
+            }
 
             switch (sSpellMgr->CheckSpellGroupStackRules(GetSpellInfo(), (*auraIt)->GetSpellInfo()))
             {
@@ -7054,7 +7070,7 @@ bool Spell::CanAutoCast(Unit* target)
                     if (GetCaster() == (*auraIt)->GetCaster())
                         return false;
                     break;
-                case SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT: // this one has further checks, but i don't think they're necessary for autocast logic
+                case SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT:
                 case SPELL_GROUP_STACK_RULE_EXCLUSIVE_HIGHEST:
                     if (abs(spellEffectInfo.BasePoints) <= abs((*auraIt)->GetAmount()))
                         return false;
@@ -7066,13 +7082,61 @@ bool Spell::CanAutoCast(Unit* target)
         }
     }
 
+    // Special autocast conditions for pet abilities
+    if (m_caster->IsPet() || m_caster->HasUnitTypeMask(UNIT_MASK_MINION))
+    {
+        uint32 const firstRankSpellId = m_spellInfo->GetFirstRankSpell()->Id;
+        switch (firstRankSpellId)
+        {
+            case 26064: // Shell Shield (Turtle) - only at or below 50% health
+            case 53426: // Lick Your Wounds (Crocolisk) - only at or below 50% health
+                if (m_caster->GetHealthPct() > 50.0f)
+                    return false;
+                break;
+            case 50318: // Serenity Dust (Moth) - only at or below 75% health
+                if (m_caster->GetHealthPct() > 75.0f)
+                    return false;
+                break;
+            case 53480: // Roar of Sacrifice - target must be in combat and at or below 30% health
+                if (!target->IsInCombat() || target->GetHealthPct() > 30.0f)
+                    return false;
+                break;
+            case 53517: // Roar of Recovery - target must have mana and be at or below 20% mana
+                if (target->getPowerType() != POWER_MANA || target->GetPowerPct(POWER_MANA) > 20.0f)
+                    return false;
+                break;
+            case 1742:
+                // Cower - redesigned in 3.3.0+ to a defensive CD with 50% speed penalty; does not autocast
+                return false;
+            case 23145: // Dive
+            case 23146: // Dive (Rank 1 alternative)
+            case 61684: // Dash
+            {
+                // Only autocast to chase target if outside melee range
+                Unit const* chaseTarget = m_caster->GetVictim();
+                if (!chaseTarget)
+                    chaseTarget = m_caster->getAttackerForHelper();
+                if (!chaseTarget)
+                    if (Unit const* owner = m_caster->GetCharmerOrOwner())
+                        chaseTarget = owner->getAttackerForHelper();
+
+                if (!chaseTarget || m_caster->IsWithinMeleeRange(chaseTarget))
+                    return false;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
     SpellCastResult result = CheckPetCast(target);
 
     if (result == SPELL_CAST_OK || result == SPELL_FAILED_UNIT_NOT_INFRONT)
     {
         SelectSpellTargets();
         //check if among target units, our WANTED target is as well (->only self cast spells return false)
-        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin();
+             ihit != m_UniqueTargetInfo.end(); ++ihit)
             if (ihit->targetGUID == targetguid)
                 return true;
     }
