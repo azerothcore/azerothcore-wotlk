@@ -1074,11 +1074,15 @@ class spell_mage_combustion : public AuraScript
             // it (this hook runs from Aura::GetProcEffectMask); defer it so the insert can't
             // invalidate the live iterator (aura containers are flat_multimaps).
             Unit* actor = eventInfo.GetActor();
-            actor->m_Events.AddEventAtOffset([actor]()
+            ObjectGuid actorGuid = actor->GetGUID();
+            actor->m_Events.AddEventAtOffset([actorGuid]()
             {
-                if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
                 {
-                    actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+                    if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                    {
+                        actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+                    }
                 }
             }, 1ms);
             return false;
