@@ -5127,7 +5127,9 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         // delay spell cast for another AI tick if another spell is being cast
         if (e.GetActionType() == SMART_ACTION_CAST || e.GetActionType() == SMART_ACTION_CUSTOM_CAST)
         {
-            uint32 flags = (e.GetActionType() == SMART_ACTION_CAST) ? e.action.cast.castFlags : e.action.castCustom.flags;
+            uint32 flags = (e.GetActionType() == SMART_ACTION_CAST)
+                ? e.action.cast.castFlags
+                : e.action.castCustom.flags;
             if (!(flags & SMARTCAST_INTERRUPT_PREVIOUS))
             {
                 if (me && me->IsActionPreventedByCasting())

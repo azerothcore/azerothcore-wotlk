@@ -1061,8 +1061,9 @@ void SmartAI::InitializeAI()
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (spellInfo && spellInfo->IsPositive())
         {
-            LOG_WARN("scripts.ai", "SmartAI: Creature {} has SMARTCAST_MAIN_SPELL on positive spell {} - positive spells should not be used as main spell",
-                me->GetEntry(), spellId);
+            LOG_WARN("scripts.ai",
+                "SmartAI: Creature {} has SMARTCAST_MAIN_SPELL on positive spell {} - "
+                "positive spells should not be used as main spell", me->GetEntry(), spellId);
             continue;
         }
 
@@ -1257,7 +1258,8 @@ void SmartAI::SetCurrentRangeMode(bool on, float range)
 
     if (Unit* victim = me->GetVictim())
     {
-        if (me->IsCombatMovementAllowed() && !me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT) && !me->IsMovementPreventedByCasting())
+        if (me->IsCombatMovementAllowed() && !me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT)
+            && !me->IsMovementPreventedByCasting())
             me->GetMotionMaster()->MoveChase(victim, _attackDistance);
 
         if (!on && mCanAutoAttack && !me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
