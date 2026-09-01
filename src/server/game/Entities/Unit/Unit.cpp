@@ -11460,14 +11460,14 @@ void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask /*schoolMask*/
 
 void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
 {
+    if (!target->IsEngaged() && !canInitialAggro)
+        return;
+
     if (Creature* cTarget = target->ToCreature())
     {
         if (!cTarget->GetOwnerGUID().IsPlayer())
             cTarget->UpdateLeashExtensionTime();
     }
-
-    if (!target->IsEngaged() && !canInitialAggro)
-        return;
 
     target->EngageWithTarget(this);
     if (Unit* targetOwner = target->GetCharmerOrOwner())
