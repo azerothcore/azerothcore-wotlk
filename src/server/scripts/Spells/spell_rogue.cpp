@@ -1112,7 +1112,10 @@ class spell_rog_cold_blood : public AuraScript
     bool _usedByMutilate = false;
 
 public:
-    bool WasUsedByMutilate() const { return _usedByMutilate; }
+    bool WasUsedByMutilate() const
+    {
+        return _usedByMutilate;
+    }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
@@ -1145,7 +1148,10 @@ class spell_rog_remorseless_attacks : public AuraScript
     bool _usedByMutilate = false;
 
 public:
-    bool WasUsedByMutilate() const { return _usedByMutilate; }
+    bool WasUsedByMutilate() const
+    {
+        return _usedByMutilate;
+    }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
