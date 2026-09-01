@@ -266,8 +266,6 @@ struct boss_razorscale : public BossAI
         events.CancelEvent(EVENT_RESUME_AIR);
         events.CancelEvent(EVENT_FIREBOLT);
         events.CancelEvent(EVENT_FIREBALL_AIR);
-        events.CancelEvent(EVENT_SUMMON_MINIONS);
-        events.CancelEvent(EVENT_SUMMON_MINIONS_DELAYED);
         events.ScheduleEvent(EVENT_FIREBOLT, 3s, 0, PHASE_PERMA_GROUND);
         events.ScheduleEvent(EVENT_FUSE_ARMOR, 15s, 0, PHASE_PERMA_GROUND);
         events.ScheduleEvent(EVENT_FLAME_BREATH_GROUNDED, 21s, 0, PHASE_PERMA_GROUND);
@@ -287,8 +285,6 @@ struct boss_razorscale : public BossAI
             case ACTION_GROUND_PHASE:
                 me->InterruptNonMeleeSpells(false);
                 events.SetPhase(PHASE_GROUND);
-                events.CancelEvent(EVENT_SUMMON_MINIONS);
-                events.CancelEvent(EVENT_SUMMON_MINIONS_DELAYED);
                 _harpoonHits = 0;
                 me->SetSpeedRate(MOVE_RUN, 3.0f);
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
