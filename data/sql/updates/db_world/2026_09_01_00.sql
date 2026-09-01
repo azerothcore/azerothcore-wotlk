@@ -1,3 +1,4 @@
+-- DB update 2026_08_31_07 -> 2026_09_01_00
 -- Mechanolift 304-A (33214) can never fight back, and its default VehicleAI has no
 -- evade logic, so damaging one without killing it kept the attacker in combat with
 -- it until it died. Give it a passive SmartAI that stops combat 10 seconds after
