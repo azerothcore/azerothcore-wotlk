@@ -6261,16 +6261,49 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         m_preGeneratedPath = std::make_unique<PathGenerator>(m_caster);
                         m_preGeneratedPath->SetPathLengthLimit(range);
 
+                        float destX = target->GetPositionX();
+                        float destY = target->GetPositionY();
+                        float destZ = target->GetPositionZ();
+                        bool cutPath = true;
+
+                        // Targets with an oversized combat reach can stand entirely over unwalkable space
+                        // (e.g. Kologarn) so pathing to their center fails or creates a shortcut into the void.
+                        // For these targets, path directly to the nearest point on the melee ring facing the caster.
+                        if (target->GetCombatReach() > NOMINAL_MELEE_RANGE)
+                        {
+                            target->GetNearPoint2D(m_caster, destX, destY, 0.0f, target->GetAngle(m_caster));
+                            destZ = target->GetPositionZ();
+                            m_caster->UpdateAllowedPositionZ(destX, destY, destZ);
+                            cutPath = false;
+                        }
+
                         // first try with raycast, if it fails fall back to normal path
-                        bool result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
-                        if (m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
+                        bool result = m_preGeneratedPath->CalculatePath(destX, destY, destZ, false);
+                        bool pathFailed = !result || (m_preGeneratedPath->GetPathType() &
+                            (PATHFIND_NOPATH | PATHFIND_INCOMPLETE | PATHFIND_SHORT));
+
+                        if (pathFailed && !cutPath)
+                        {
+                            destX = target->GetPositionX();
+                            destY = target->GetPositionY();
+                            destZ = target->GetPositionZ();
+                            cutPath = true;
+
+                            result = m_preGeneratedPath->CalculatePath(destX, destY, destZ, false);
+                            pathFailed = !result || (m_preGeneratedPath->GetPathType() &
+                                (PATHFIND_NOPATH | PATHFIND_INCOMPLETE | PATHFIND_SHORT));
+                        }
+
+                        if (pathFailed)
                             return SPELL_FAILED_NOPATH;
-                        else if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
-                            return SPELL_FAILED_NOPATH;
-                        else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if not in a straight line
+                        else if (cutPath && m_preGeneratedPath->IsInvalidDestinationZ(target))
                             return SPELL_FAILED_NOPATH;
 
-                        m_preGeneratedPath->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), objSize); // move back
+                        if (cutPath)
+                        {
+                            m_preGeneratedPath->ShortenPathUntilDist(
+                                G3D::Vector3(destX, destY, destZ), objSize);
+                        }
                     }
                     if (Player* player = m_caster->ToPlayer())
                         player->SetCanTeleport(true);
