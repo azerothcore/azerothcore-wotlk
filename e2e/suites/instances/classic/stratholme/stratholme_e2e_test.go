@@ -129,6 +129,7 @@ func TestAC_26363_TimmyEmergesAfterSquareCleared(t *testing.T) {
 	if len(triggers) != 15 {
 		e2eharness.Preconditionf(t, "loaded Timmy activation area has %d relevant Scarlets, want 15", len(triggers))
 	}
+	bot.CombatReady(t)
 	if timmy := bot.FindUnit(npcTimmyTheCruel, 100); timmy != 0 {
 		e2eharness.ConfirmedBugf(t, 26363, "Timmy was already present as 0x%X before the Scarlet activation area was cleared", timmy)
 	}
