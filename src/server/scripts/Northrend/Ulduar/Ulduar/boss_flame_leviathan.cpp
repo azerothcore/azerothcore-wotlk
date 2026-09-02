@@ -1291,7 +1291,11 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
                     for (uint8 i = 0; i < toSpawn; ++i)
                     {
                         ++_amount;
-                        if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX() + frand(-3.0f, 3.0f), me->GetPositionY() + frand(-3.0f, 3.0f), me->GetPositionZ() + 1.0f, me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
+                        if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED,
+                            me->GetPositionX() + frand(-3.0f, 3.0f),
+                            me->GetPositionY() + frand(-3.0f, 3.0f),
+                            me->GetPositionZ() + 1.0f, me->GetOrientation(),
+                            TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
                         {
                             cr->SetInCombatWith(target);
                             cr->AddThreat(target, 1000.0f);
@@ -1320,7 +1324,11 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
                     float offsetY = offsetDist * std::sin(offsetAngle);
                     float offsetZ = frand(12.0f, 18.0f);
 
-                    if (Creature* cr = me->SummonCreature(NPC_MECHANOSTRIKER_54_A, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
+                    if (Creature* cr = me->SummonCreature(NPC_MECHANOSTRIKER_54_A,
+                        me->GetPositionX() + offsetX,
+                        me->GetPositionY() + offsetY,
+                        me->GetPositionZ() + offsetZ, me->GetOrientation(),
+                        TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
                     {
                         cr->SetCanFly(true);
                         cr->SetDisableGravity(true);
