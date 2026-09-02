@@ -6,6 +6,12 @@ INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `bytes2`, `em
 (34161, 0, 50331648, 1, 0, 4, NULL),
 (34162, 0, 50331648, 1, 0, 4, NULL);
 
+-- Mechagnome Pilot accessory on Mechanostriker 54-A seat 0
+DELETE FROM `vehicle_template_accessory` WHERE `entry` IN (34161, 34162);
+INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`) VALUES
+(34161, 33216, 0, 1, 'Mechanostriker 54-A - Mechagnome Pilot', 6, 30000),
+(34162, 33216, 0, 1, 'Mechanostriker 54-A (1) - Mechagnome Pilot', 6, 30000);
+
 -- Aerial trash pack spawns in Formation Grounds
 DELETE FROM `creature` WHERE `guid` BETWEEN 1977400 AND 1977423;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `spawnFlags`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `StringId`, `VerifiedBuild`) VALUES
