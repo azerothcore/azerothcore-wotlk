@@ -1,3 +1,4 @@
+-- DB update 2026_09_01_00 -> 2026_09_02_00
 --
 -- Timmy the Cruel
 SET @CGUID := 247227;
