@@ -35,11 +35,38 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      relevant: ${{ steps.filter.outputs.relevant }}
+    steps:
+      # token mode: reads the changed-file list from the API, no checkout needed,
+      # so a PR that only touches docs/labeler config gets a fast, cheap "no" here
+      # instead of paying for a full build just to find out it wasn't needed.
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          filters: |
+            relevant:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+              - '!.github/ISSUE_TEMPLATE/**'
+              - '!.github/FUNDING.yml'
+              - '!.github/labeler.yml'
+
   # Split out of the matrix so e2e can needs: this cell only (not gcc/clang-21).
   build-e2e:
     name: ubuntu-24.04-clang-18-nopch
+    needs: changes
     runs-on: ubuntu-24.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
@@ -73,7 +100,8 @@ jobs:
               CXX: clang++-21
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    needs: changes
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
@@ -84,12 +112,13 @@ jobs:
 
   e2e:
     name: e2e ${{ inputs.scope || 'full' }}
-    needs: build-e2e
+    needs: [changes, build-e2e]
     # Official PR, master push, and dispatch. Master re-runs full so flakes
     # and merge-base drift show up after squash, not only on the PR head.
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
+      && needs.changes.outputs.relevant == 'true'
       && needs.build-e2e.result == 'success'
       && (
         github.event_name == 'pull_request'

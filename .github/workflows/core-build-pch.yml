@@ -26,6 +26,32 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      relevant: ${{ steps.filter.outputs.relevant }}
+    steps:
+      # token mode: reads the changed-file list from the API, no checkout needed,
+      # so a PR that only touches docs/labeler config gets a fast, cheap "no" here
+      # instead of paying for a full build just to find out it wasn't needed.
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          filters: |
+            relevant:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+              - '!.github/ISSUE_TEMPLATE/**'
+              - '!.github/FUNDING.yml'
+              - '!.github/labeler.yml'
+
   build:
     strategy:
       fail-fast: true
@@ -41,7 +67,8 @@ jobs:
               CXX: clang++-21
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-pch
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    needs: changes
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
