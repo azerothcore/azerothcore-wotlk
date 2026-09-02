@@ -1,6 +1,6 @@
 --
 -- BRD Bael'Gar corridor patrols from 2.5.6.69110 sniff
-UPDATE `creature` SET `MovementType` = 2, `ScriptName` = 'brd_anvilrage_officer_patrol' WHERE `guid` = 47786;
+UPDATE `creature` SET `MovementType` = 2, `ScriptName` = '' WHERE `guid` = 47786;
 UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 45852;
 UPDATE `creature` SET `id` = 8893, `curhealth` = 6645, `curmana` = 0 WHERE `guid` = 45855;
 
@@ -21,6 +21,18 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (47786, 47788, 2, 270, 515, 0, 0),
 (47786, 47789, 4, 90, 515, 0, 0),
 (47786, 47790, 4, 270, 515, 0, 0);
+
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 8895 AND `source_type` = 0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(8895, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 9128, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anvilrage Officer - On Aggro - Cast Battle Shout'),
+(8895, 0, 1, 0, 0, 0, 100, 0, 5000, 7000, 9000, 13000, 0, 0, 11, 6253, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anvilrage Officer - In Combat - Cast Backhand'),
+(8895, 0, 2, 0, 14, 0, 100, 0, 3000, 40, 12000, 16000, 0, 0, 11, 13952, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Anvilrage Officer - Friendly At 3000 Health - Cast Holy Light'),
+(8895, 0, 3, 0, 2, 0, 100, 0, 0, 20, 21000, 28000, 0, 0, 11, 13874, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anvilrage Officer - Between 0-15% Health - Cast Divine Shield'),
+(8895, 0, 4, 0, 108, 0, 100, 0, 4, 4778600, 0, 0, 0, 0, 230, 1, 7, 200, 0, 0, 0, 206, 0, 0, 1, 0, 0, 0, 0, 0, 'Anvilrage Officer - On Point 4 of Path 4778600 Reached - Follow in Single File'),
+(8895, 0, 5, 0, 108, 0, 100, 0, 17, 4778600, 0, 0, 0, 0, 230, 1, 2, 200, 0, 0, 0, 206, 0, 0, 1, 0, 0, 0, 0, 0, 'Anvilrage Officer - On Point 17 of Path 4778600 Reached - Follow in Fan Formation'),
+(8895, 0, 6, 0, 108, 0, 100, 0, 32, 4778600, 0, 0, 0, 0, 230, 1, 5, 200, 0, 0, 0, 206, 0, 0, 1, 0, 0, 0, 0, 0, 'Anvilrage Officer - On Point 32 of Path 4778600 Reached - Follow in Line Formation'),
+(8895, 0, 7, 0, 108, 0, 100, 0, 45, 4778600, 0, 0, 0, 0, 230, 1, 1, 200, 0, 0, 0, 206, 0, 0, 1, 0, 0, 0, 0, 0, 'Anvilrage Officer - On Point 45 of Path 4778600 Reached - Follow in Diamond Formation'),
+(8895, 0, 8, 0, 108, 0, 100, 0, 61, 4778600, 0, 0, 0, 0, 230, 1, 5, 200, 0, 0, 0, 206, 0, 0, 1, 0, 0, 0, 0, 0, 'Anvilrage Officer - On Point 61 of Path 4778600 Reached - Follow in Line Formation');
 
 -- These two static packs are duplicate snapshots of the long patrol in the retail sniff.
 DELETE FROM `creature_addon` WHERE `guid` IN (45875, 45876, 45877, 45878, 45879, 47799, 47800, 47801, 47802, 47803);

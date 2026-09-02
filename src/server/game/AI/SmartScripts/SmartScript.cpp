@@ -3190,6 +3190,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
             }
 
+            std::stable_sort(targets.begin(), targets.end(), [](WorldObject const* left, WorldObject const* right)
+            {
+                if (!left->IsCreature())
+                    return false;
+                if (!right->IsCreature())
+                    return true;
+                return left->ToCreature()->GetSpawnId() < right->ToCreature()->GetSpawnId();
+            });
+
             uint8 membCount = targets.size();
             uint8 itr = 1;
             float dist = float(e.action.followGroup.dist / 100);
@@ -3263,6 +3272,18 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (IsCreature(target))
                         {
                             target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist * (((itr - 1) / 2) + 1), itr % 2 ? M_PI - (M_PI / 4) : M_PI + (M_PI / 4));
+                            itr++;
+                        }
+                    }
+                    break;
+                }
+                case FOLLOW_TYPE_SINGLE_FILE:
+                {
+                    for (WorldObject* target : targets)
+                    {
+                        if (IsCreature(target))
+                        {
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist * itr, M_PI);
                             itr++;
                         }
                     }
