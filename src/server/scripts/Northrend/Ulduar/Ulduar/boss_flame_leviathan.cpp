@@ -1140,12 +1140,34 @@ struct npc_pool_of_tar : public NullCreatureAI
     }
 };
 
+enum MechanostrikerSpells
+{
+    SPELL_CUTTING_LASER                 = 49945,
+};
+
 struct npc_mechanostriker_54_a : public ScriptedAI
 {
     npc_mechanostriker_54_a(Creature* creature) : ScriptedAI(creature) { }
 
+    uint32 _laserTimer;
+
     void Reset() override
     {
+        _laserTimer = 1500;
+        me->SetCanFly(true);
+        me->SetDisableGravity(true);
+        me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (me->IsSummon())
+        {
+            me->DespawnOrUnsummon(1s);
+            return;
+        }
+
+        ScriptedAI::EnterEvadeMode();
         me->SetCanFly(true);
         me->SetDisableGravity(true);
         me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
@@ -1158,7 +1180,7 @@ struct npc_mechanostriker_54_a : public ScriptedAI
         me->SetDisableGravity(true);
         me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
         me->AddThreat(target, 1000.0f);
-        me->GetMotionMaster()->MoveChase(target);
+        me->GetMotionMaster()->MoveChase(target, 15.0f);
     }
 
     void AttackStart(Unit* who) override
@@ -1173,7 +1195,7 @@ struct npc_mechanostriker_54_a : public ScriptedAI
             me->SetDisableGravity(true);
             me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
             me->AddThreat(target, 1000.0f);
-            me->GetMotionMaster()->MoveChase(target);
+            me->GetMotionMaster()->MoveChase(target, 15.0f);
         }
     }
 
@@ -1181,6 +1203,17 @@ struct npc_mechanostriker_54_a : public ScriptedAI
     {
         if (!UpdateVictim())
             return;
+
+        _laserTimer += diff;
+        if (_laserTimer >= 3000)
+        {
+            _laserTimer = 0;
+            if (Unit* victim = me->GetVictim())
+            {
+                Unit* target = victim->GetVehicleBase() ? victim->GetVehicleBase() : victim;
+                me->CastSpell(target, SPELL_CUTTING_LASER, false);
+            }
+        }
 
         DoMeleeAttackIfReady();
     }
