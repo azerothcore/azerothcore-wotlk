@@ -92,3 +92,7 @@ MMAPs:
 VMAPs:
 - changed-files:
     - any-glob-to-any-file: 'src/common/Collision/VMapDefinitions.h'
+
+e2e:
+- changed-files:
+     - any-glob-to-any-file: 'e2e/**/*'
