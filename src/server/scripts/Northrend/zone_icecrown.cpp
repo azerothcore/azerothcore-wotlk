@@ -2148,6 +2148,443 @@ class spell_crashing_wave : public SpellScript
     }
 };
 
+/*######
+## Quest 13279/13295 "Basic Chemistry" and its repeatables 13281/13297 "Neutralizing the Plague" -
+## the plague cauldrons of Mord'rethar
+######*/
+
+enum BasicChemistry
+{
+    NPC_PLAGUE_CAULDRON_KC_BUNNY        = 31767,
+    NPC_CAULDRON_TARGET_00              = 31773,
+    NPC_CAULDRON_BUNNY_00               = 31880,
+    NPC_PLAGUE_DRENCHED_GHOUL           = 32176,
+    NPC_RAMPAGING_GHOUL                 = 32178,
+    NPC_CAULDRON_TARGET_01              = 32427,
+    NPC_CAULDRON_BUNNY_01               = 32431,
+    NPC_CAULDRON_TARGET_02              = 32442,
+    NPC_CAULDRON_BUNNY_02               = 32445,
+
+    SPELL_PIERCE_ARMOR                  = 6016,
+    SPELL_ORANGE_RADIATION              = 45797,
+    SPELL_DISEASE_CLOUD                 = 50106,
+    SPELL_NEUTRALIZING_DOSE_APPLIED     = 59659,
+    SPELL_EVENT_TIMER_BUFF              = 59872,
+    SPELL_FLUID_TIMER_BUFF              = 59873,
+    SPELL_CAULDRON_EVENT_FAILED         = 59874,
+    SPELL_CAULDRON_EVENT_COMPLETE       = 59875,
+    SPELL_HUGE_GREEN_SPLASH             = 60059,
+    SPELL_PLAGUE_BITE                   = 60678,
+    SPELL_EMERGE                        = 66947,
+
+    // creature_text of the cauldron targets
+    SAY_CAULDRON_BOILS                  = 0,
+
+    // creature_text of the cauldron bunnies
+    SAY_WAVE_EMERGES                    = 0,
+    SAY_WAVE_EMPTY                      = 1,
+    SAY_EVENT_COMPLETE                  = 2,
+    SAY_FLUID_LOW                       = 3,
+    SAY_FLUID_CRITICAL                  = 4,
+    SAY_EVENT_FAILED                    = 5,
+
+    // creature_summon_groups of the cauldron bunnies
+    GROUP_PLAGUE_SWARM                  = 0,
+    GROUP_GHOUL_AND_PLAGUE              = 1,
+    GROUP_GHOUL_PAIR                    = 2,
+    GROUP_DRENCHED_GHOUL                = 3,
+    GROUP_NOTHING                       = 4,
+
+    ACTION_ADD_FLUID                    = 1,
+    ACTION_EVENT_FAILED                 = 2,
+    ACTION_EVENT_COMPLETE               = 3,
+
+    DATA_GHOUL_JUMP                     = 1,
+
+    POINT_GHOUL_LANDED                  = 1
+};
+
+// Identifies one ghoul spawn slot: which cauldron summoned it, which wave group, and which of that
+// group's ghouls it is. The bunny stamps this on every ghoul it summons and the ghoul looks its own
+// landing point up by it, so the jump follows the `creature_summon_groups` row - which means the
+// two rows of the paired group have to stay in the order they are written in.
+constexpr uint32 GhoulJumpId(uint32 summoner, uint32 group, uint32 slot)
+{
+    return summoner * 100 + group * 10 + slot;
+}
+
+struct GhoulJumpData
+{
+    uint32 id;
+    Position landing;
+    float height;   // arc apex in yards - the ghouls thrown off the sides of the road arc higher
+};
+
+// The landing point is a property of the slot and the pairing held across every activation in the
+// sniff: at all three cauldrons the ghoul on the `+` side of the cauldron lands on the `+` side.
+GhoulJumpData const GhoulJumps[] =
+{
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_00, GROUP_GHOUL_AND_PLAGUE, 0), { 6777.94f, 1611.23f, 389.033f }, 5.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_00, GROUP_GHOUL_PAIR,       0), { 6765.83f, 1621.09f, 389.033f }, 5.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_00, GROUP_GHOUL_PAIR,       1), { 6794.71f, 1623.46f, 389.033f }, 6.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_00, GROUP_DRENCHED_GHOUL,   0), { 6777.03f, 1608.18f, 389.033f }, 5.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_01, GROUP_GHOUL_AND_PLAGUE, 0), { 6773.30f, 1583.22f, 389.033f }, 5.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_01, GROUP_GHOUL_PAIR,       0), { 6763.36f, 1567.51f, 389.033f }, 6.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_01, GROUP_GHOUL_PAIR,       1), { 6761.96f, 1600.88f, 389.033f }, 6.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_01, GROUP_DRENCHED_GHOUL,   0), { 6777.47f, 1583.80f, 389.033f }, 5.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_02, GROUP_GHOUL_AND_PLAGUE, 0), { 6777.73f, 1558.13f, 389.033f }, 5.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_02, GROUP_GHOUL_PAIR,       0), { 6764.14f, 1547.33f, 389.033f }, 6.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_02, GROUP_GHOUL_PAIR,       1), { 6792.88f, 1548.01f, 389.033f }, 6.0f },
+    { GhoulJumpId(NPC_CAULDRON_BUNNY_02, GROUP_DRENCHED_GHOUL,   0), { 6776.98f, 1555.82f, 389.033f }, 5.0f }
+};
+
+GhoulJumpData const* GetGhoulJumpData(uint32 id)
+{
+    for (GhoulJumpData const& jump : GhoulJumps)
+        if (jump.id == id)
+            return &jump;
+
+    return nullptr;
+}
+
+struct WaveChance
+{
+    uint8 group;
+    uint8 chance;
+};
+
+// Waves are drawn at random - the sniff shows every cauldron running every group, in no pattern.
+// The weights are the frequencies observed over its 25 wave ticks (11 / 5 / 4 / 3 / 2); a sample
+// that size cannot separate them from a flat roll, so they are an estimate rather than a fact.
+WaveChance const WaveChances[] =
+{
+    { GROUP_GHOUL_AND_PLAGUE, 44 },
+    { GROUP_PLAGUE_SWARM,     20 },
+    { GROUP_DRENCHED_GHOUL,   16 },
+    { GROUP_GHOUL_PAIR,       12 },
+    { GROUP_NOTHING,           8 }
+};
+
+struct npc_plague_cauldron_target : public ScriptedAI
+{
+    npc_plague_cauldron_target(Creature* creature) : ScriptedAI(creature) { }
+
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id != SPELL_NEUTRALIZING_DOSE_APPLIED)
+            return;
+
+        Player* player = caster ? caster->ToPlayer() : nullptr;
+        if (!player)
+            return;
+
+        // A dose landing on a cauldron that is already boiling only tops the fluid up - retail
+        // sends nothing for those beyond a fresh Fluid Timer Buff on the bunny.
+        if (Creature* bunny = me->FindNearestCreature(GetBunnyEntry(), 5.0f))
+        {
+            bunny->AI()->DoAction(ACTION_ADD_FLUID);
+            return;
+        }
+
+        DoCastSelf(SPELL_ORANGE_RADIATION, true);
+        Talk(SAY_CAULDRON_BOILS, player);
+
+        // Retail hands the summon to the player: the cauldron casts a script effect at them
+        // (59877 / 61001 / 61018 Player Summon Bunny) and they cast the matching Summon PC Bunny
+        // back, which is how 59876 Kill Credit reaches them through TARGET_UNIT_MASTER. Those
+        // summon spells carry SummonProperties 61 (ally / guardian), which here would make the
+        // bunny a player-owned guardian that walks off after them, so the cauldron summons it and
+        // the bunny credits the doser directly instead. The bunny stands in the cauldron itself, a
+        // hand's width above this NPC, and despawns the moment the event resolves - the lifetime
+        // is only there so a cauldron cannot be locked out by a bunny that lost its auras.
+        if (Creature* bunny = me->SummonCreature(GetBunnyEntry(), me->GetPositionX(), me->GetPositionY(),
+            me->GetPositionZ() + 0.0833f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 250 * IN_MILLISECONDS))
+        {
+            bunny->AI()->SetGUID(player->GetGUID());
+        }
+    }
+
+    void SummonedCreatureDespawn(Creature* /*summon*/) override
+    {
+        me->RemoveAurasDueToSpell(SPELL_ORANGE_RADIATION);
+    }
+
+private:
+    uint32 GetBunnyEntry() const
+    {
+        switch (me->GetEntry())
+        {
+            case NPC_CAULDRON_TARGET_01:
+                return NPC_CAULDRON_BUNNY_01;
+            case NPC_CAULDRON_TARGET_02:
+                return NPC_CAULDRON_BUNNY_02;
+            default:
+                return NPC_CAULDRON_BUNNY_00;
+        }
+    }
+};
+
+struct npc_plague_cauldron_bunny : public ScriptedAI
+{
+    npc_plague_cauldron_bunny(Creature* creature) : ScriptedAI(creature)
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
+    {
+        _doserGUID = guid;
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        // The two auras are the event. Four minutes of Event Timer Buff running out is the win,
+        // the seventy seconds of Fluid Timer Buff running out first is the loss.
+        DoCastSelf(SPELL_EVENT_TIMER_BUFF, true);
+        AddFluid();
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+            case ACTION_ADD_FLUID:
+                AddFluid();
+                break;
+            case ACTION_EVENT_FAILED:
+                DoCastSelf(SPELL_CAULDRON_EVENT_FAILED, true);
+                Talk(SAY_EVENT_FAILED, GetDoser());
+                EndEvent();
+                break;
+            case ACTION_EVENT_COMPLETE:
+            {
+                DoCastSelf(SPELL_CAULDRON_EVENT_COMPLETE, true);
+                Talk(SAY_EVENT_COMPLETE, GetDoser());
+
+                // Retail credits the bunny's master, which is the player who summoned it; here the
+                // cauldron owns the summon, so the doser it handed over gets the credit instead.
+                if (Player* doser = GetDoser())
+                    doser->RewardPlayerAndGroupAtEvent(NPC_PLAGUE_CAULDRON_KC_BUNNY, me);
+
+                EndEvent();
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+
+private:
+    // Both endings arrive from an aura expiring, so give the bunny the same short beat retail
+    // leaves between the closing cast and the despawn rather than tearing it down mid-removal.
+    void EndEvent()
+    {
+        scheduler.CancelAll();
+        me->DespawnOrUnsummon(500ms);
+    }
+
+    // Every dose schedules its own pair of waves and its own pair of warnings off the moment it
+    // lands, and replaces whatever the dose before it still had pending. That is the whole
+    // scheduler: the alternating 25s / 29s cadence a sniff appears to show is only these two
+    // offsets seen through a player who re-doses roughly every 54s. All twenty wave ticks in the
+    // sniff land on +5.4s..+6.2s or +30.4s..+31.3s from the dose that armed them, without
+    // exception, and the warnings on +45.8s..+47.0s and +58.0s..+58.5s.
+    void AddFluid()
+    {
+        DoCastSelf(SPELL_FLUID_TIMER_BUFF, true);
+
+        scheduler.CancelAll();
+        scheduler.Schedule(5s, [this](TaskContext /*context*/)
+        {
+            SummonWave();
+        }).Schedule(30s, [this](TaskContext /*context*/)
+        {
+            SummonWave();
+        }).Schedule(46s, [this](TaskContext /*context*/)
+        {
+            Talk(SAY_FLUID_LOW, GetDoser());
+        }).Schedule(58s, [this](TaskContext /*context*/)
+        {
+            Talk(SAY_FLUID_CRITICAL, GetDoser());
+        });
+    }
+
+    void SummonWave()
+    {
+        uint8 const group = RollWaveGroup();
+
+        // A tick that rolls nothing is silent apart from the line - no splash, no summon.
+        if (group == GROUP_NOTHING)
+        {
+            Talk(SAY_WAVE_EMPTY, GetDoser());
+            return;
+        }
+
+        DoCastSelf(SPELL_HUGE_GREEN_SPLASH, true);
+        Talk(SAY_WAVE_EMERGES, GetDoser());
+
+        std::list<TempSummon*> summons;
+        me->SummonCreatureGroup(group, &summons);
+
+        // No group mixes the two ghoul entries, so one counter walking the list in row order is
+        // enough to tell a paired group's two ghouls apart.
+        uint32 slot = 0;
+        for (TempSummon* summon : summons)
+            if (summon->GetEntry() == NPC_RAMPAGING_GHOUL || summon->GetEntry() == NPC_PLAGUE_DRENCHED_GHOUL)
+                summon->AI()->SetData(DATA_GHOUL_JUMP, GhoulJumpId(me->GetEntry(), group, slot++));
+    }
+
+    uint8 RollWaveGroup() const
+    {
+        uint8 roll = urand(0, 99);
+        for (WaveChance const& wave : WaveChances)
+        {
+            if (roll < wave.chance)
+                return wave.group;
+
+            roll -= wave.chance;
+        }
+
+        return GROUP_NOTHING;
+    }
+
+    Player* GetDoser() const
+    {
+        return ObjectAccessor::GetPlayer(*me, _doserGUID);
+    }
+
+    ObjectGuid _doserGUID;
+};
+
+struct npc_plague_cauldron_ghoul : public ScriptedAI
+{
+    npc_plague_cauldron_ghoul(Creature* creature) : ScriptedAI(creature) { }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        // Ghouls surface three yards up, inside the cauldron, and hang there through the emerge
+        // animation - keep the core from settling them onto the ground in the meantime. The
+        // summoner stamps the slot on us right after this returns, so the jump looks it up when
+        // the animation is over rather than now.
+        me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+        me->SetReactState(REACT_PASSIVE);
+        me->SetImmuneToAll(true);
+        DoCastSelf(SPELL_EMERGE, true);
+
+        scheduler.Schedule(3200ms, [this](TaskContext /*context*/)
+        {
+            GhoulJumpData const* jump = GetGhoulJumpData(_jumpId);
+            if (!jump)
+            {
+                Land();
+                return;
+            }
+
+            if (me->GetEntry() == NPC_PLAGUE_DRENCHED_GHOUL)
+                DoCastSelf(SPELL_DISEASE_CLOUD, true);
+
+            me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+            me->GetMotionMaster()->MoveJump(jump->landing, 25.0f,
+                std::sqrt(2.0f * float(Movement::gravity) * jump->height), POINT_GHOUL_LANDED);
+        });
+    }
+
+    void SetData(uint32 id, uint32 value) override
+    {
+        if (id == DATA_GHOUL_JUMP)
+            _jumpId = value;
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type == EFFECT_MOTION_TYPE && pointId == POINT_GHOUL_LANDED)
+            Land();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        if (me->GetEntry() == NPC_PLAGUE_DRENCHED_GHOUL)
+            ScheduleTimedEvent(3800ms, 7s, [this] { DoCastVictim(SPELL_PLAGUE_BITE); }, 11s, 21s);
+        else
+            ScheduleTimedEvent(3800ms, 17s, [this] { DoCastVictim(SPELL_PIERCE_ARMOR); }, 21s, 41s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    // Ghouls wander their landing spot the way the Living Plague wander theirs and pick players up
+    // on detection range. Reaching for the nearest player instead would let one be pulled from
+    // further off than the cauldron itself can be doused from.
+    void Land()
+    {
+        me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+        me->SetImmuneToAll(false);
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->SetHomePosition(me->GetPosition());
+        me->GetMotionMaster()->MoveRandom(13.0f);
+    }
+
+    uint32 _jumpId = 0;
+};
+
+// 59872 - Event Timer Buff
+class spell_cauldron_event_timer_aura : public AuraScript
+{
+    PrepareAuraScript(spell_cauldron_event_timer_aura);
+
+    void HandleExpire(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        Creature* bunny = GetTarget()->ToCreature();
+        if (!bunny || !bunny->AI())
+            return;
+
+        // Surviving the four minutes is the win, as long as the batch never ran dry on the way.
+        bunny->AI()->DoAction(bunny->HasAura(SPELL_FLUID_TIMER_BUFF) ? ACTION_EVENT_COMPLETE : ACTION_EVENT_FAILED);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_cauldron_event_timer_aura::HandleExpire, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 59873 - Fluid Timer Buff
+class spell_cauldron_fluid_timer_aura : public AuraScript
+{
+    PrepareAuraScript(spell_cauldron_fluid_timer_aura);
+
+    void HandleExpire(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        if (Creature* bunny = GetTarget()->ToCreature())
+            if (bunny->AI())
+                bunny->AI()->DoAction(ACTION_EVENT_FAILED);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_cauldron_fluid_timer_aura::HandleExpire, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_icecrown()
 {
     new npc_black_knight_graveyard();
@@ -2168,4 +2605,9 @@ void AddSC_icecrown()
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
     RegisterSpellScript(spell_crashing_wave);
+    RegisterCreatureAI(npc_plague_cauldron_target);
+    RegisterCreatureAI(npc_plague_cauldron_bunny);
+    RegisterCreatureAI(npc_plague_cauldron_ghoul);
+    RegisterSpellScript(spell_cauldron_event_timer_aura);
+    RegisterSpellScript(spell_cauldron_fluid_timer_aura);
 }
