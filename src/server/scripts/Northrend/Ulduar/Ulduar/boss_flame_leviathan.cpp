@@ -1147,13 +1147,22 @@ enum MechanostrikerSpells
 
 struct npc_mechanostriker_54_a : public ScriptedAI
 {
-    npc_mechanostriker_54_a(Creature* creature) : ScriptedAI(creature) { }
+    npc_mechanostriker_54_a(Creature* creature) : ScriptedAI(creature)
+    {
+        _chaseDist = frand(12.0f, 18.0f);
+        _chaseAngle = frand(0.0f, 2.0f * float(M_PI));
+        _laserTimer = urand(1000, 2000);
+    }
 
     uint32 _laserTimer;
+    float _chaseDist;
+    float _chaseAngle;
 
     void Reset() override
     {
-        _laserTimer = 1500;
+        _laserTimer = urand(1000, 2000);
+        _chaseDist = frand(12.0f, 18.0f);
+        _chaseAngle = frand(0.0f, 2.0f * float(M_PI));
         me->SetCanFly(true);
         me->SetDisableGravity(true);
         me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
@@ -1180,7 +1189,7 @@ struct npc_mechanostriker_54_a : public ScriptedAI
         me->SetDisableGravity(true);
         me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
         me->AddThreat(target, 1000.0f);
-        me->GetMotionMaster()->MoveChase(target, 15.0f);
+        me->GetMotionMaster()->MoveChase(target, _chaseDist, _chaseAngle);
     }
 
     void AttackStart(Unit* who) override
@@ -1189,13 +1198,13 @@ struct npc_mechanostriker_54_a : public ScriptedAI
             return;
 
         Unit* target = who->GetVehicleBase() ? who->GetVehicleBase() : who;
-        if (me->Attack(target, true))
+        if (me->Attack(target, false))
         {
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
             me->AddThreat(target, 1000.0f);
-            me->GetMotionMaster()->MoveChase(target, 15.0f);
+            me->GetMotionMaster()->MoveChase(target, _chaseDist, _chaseAngle);
         }
     }
 
@@ -1205,17 +1214,15 @@ struct npc_mechanostriker_54_a : public ScriptedAI
             return;
 
         _laserTimer += diff;
-        if (_laserTimer >= 3000)
+        if (_laserTimer >= 2500)
         {
             _laserTimer = 0;
             if (Unit* victim = me->GetVictim())
             {
                 Unit* target = victim->GetVehicleBase() ? victim->GetVehicleBase() : victim;
-                me->CastSpell(target, SPELL_CUTTING_LASER, false);
+                me->CastSpell(target, SPELL_CUTTING_LASER, true);
             }
         }
-
-        DoMeleeAttackIfReady();
     }
 };
 
@@ -1277,7 +1284,13 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
                     for (uint8 i = 0; i < toSpawn; ++i)
                     {
                         ++_airAmount;
-                        if (Creature* cr = me->SummonCreature(NPC_MECHANOSTRIKER_54_A, me->GetPositionX() + frand(-6.0f, 6.0f), me->GetPositionY() + frand(-6.0f, 6.0f), me->GetPositionZ() + 12.0f, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
+                        float offsetAngle = frand(0.0f, 2.0f * float(M_PI));
+                        float offsetDist = frand(6.0f, 12.0f);
+                        float offsetX = offsetDist * std::cos(offsetAngle);
+                        float offsetY = offsetDist * std::sin(offsetAngle);
+                        float offsetZ = frand(10.0f, 16.0f);
+
+                        if (Creature* cr = me->SummonCreature(NPC_MECHANOSTRIKER_54_A, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
                         {
                             cr->SetCanFly(true);
                             cr->SetDisableGravity(true);
