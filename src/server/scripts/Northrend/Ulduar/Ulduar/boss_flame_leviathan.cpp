@@ -65,6 +65,7 @@ enum LeviathanSpells
     SPELL_TOWER_OF_LIFE                 = 64482,
 
     SPELL_HODIRS_FURY                   = 62533,
+    SPELL_HODIRS_FURY_STUN              = 62297,
     SPELL_FREYA_WARD                    = 62906, // removed spawn effect
     SPELL_MIMIRONS_INFERNO              = 62909,
     SPELL_THORIMS_HAMMER                = 62911,
@@ -305,6 +306,9 @@ struct boss_flame_leviathan : public BossAI
         summons.DoAction(ACTION_DESPAWN_ADDS);
         summons.DespawnAll();
         events.Reset();
+
+        // The stun lasts 60s and is applied to dead players too, nothing else clears it once the fight ends
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_HODIRS_FURY_STUN);
 
         _shutdown = false;
         _startTimer = 1;
@@ -641,6 +645,8 @@ void boss_flame_leviathan::JustDied(Unit*)
     for (Creature* creature : tarPools)
         creature->DespawnOrUnsummon();
 
+    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_HODIRS_FURY_STUN);
+
     instance->SetBossState(BOSS_LEVIATHAN, DONE);
     instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);
 
@@ -757,6 +763,8 @@ struct boss_flame_leviathan_seat : public VehicleAI
         who->ApplySpellImmune(63847, IMMUNITY_ID, 63847, apply); // SPELL_FLAME_VENTS_TRIGGER
         who->ApplySpellImmune(SPELL_MISSILE_BARRAGE, IMMUNITY_ID, SPELL_MISSILE_BARRAGE, apply);
         who->ApplySpellImmune(SPELL_BATTERING_RAM, IMMUNITY_ID, SPELL_BATTERING_RAM, apply);
+        // 10yd ground-level AoE that cannot reach the seats ~15yd up on the boss' back
+        who->ApplySpellImmune(SPELL_HODIRS_FURY_STUN, IMMUNITY_ID, SPELL_HODIRS_FURY_STUN, apply);
 
         if (seatId == SEAT_PLAYER)
         {
@@ -1196,6 +1204,49 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
             me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
             me->SetPosition(x, y, z, 0);
         }
+    }
+};
+
+enum SalvagedChopper
+{
+    SPELL_GRAB_PYRITE                   = 67372,
+    SPELL_EJECT_PASSENGER               = 67393,
+
+    // The chopper's only other seat, carrying either a player or a grabbed pyrite crate.
+    SEAT_CHOPPER_PASSENGER              = 1,
+};
+
+struct npc_salvaged_chopper : public VehicleAI
+{
+    npc_salvaged_chopper(Creature* creature) : VehicleAI(creature) { }
+
+    // While the rear seat is taken, the "Grab Pyrite" button becomes "Eject Passenger".
+    void PassengerBoarded(Unit* /*who*/, int8 seatId, bool apply) override
+    {
+        if (seatId != SEAT_CHOPPER_PASSENGER)
+            return;
+
+        if (apply)
+            SwapActionButton(SPELL_GRAB_PYRITE, SPELL_EJECT_PASSENGER);
+        else
+            SwapActionButton(SPELL_EJECT_PASSENGER, SPELL_GRAB_PYRITE);
+    }
+
+private:
+    void SwapActionButton(uint32 from, uint32 to)
+    {
+        bool swapped = false;
+        for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+            if (me->m_spells[i] == from)
+            {
+                me->m_spells[i] = to;
+                swapped = true;
+            }
+
+        // Resend the vehicle action bar, otherwise the driver keeps seeing the old button.
+        if (swapped)
+            if (Player* driver = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                driver->VehicleSpellInitialize();
     }
 };
 
@@ -1830,6 +1881,7 @@ void AddSC_boss_flame_leviathan()
     // Helpers
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
+    RegisterUlduarCreatureAI(npc_salvaged_chopper);
 
     // GOs
     new go_ulduar_tower();
