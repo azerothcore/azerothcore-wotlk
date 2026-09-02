@@ -1149,9 +1149,9 @@ struct npc_mechanostriker_54_a : public ScriptedAI
 {
     npc_mechanostriker_54_a(Creature* creature) : ScriptedAI(creature)
     {
-        _chaseDist = frand(12.0f, 18.0f);
+        _chaseDist = frand(14.0f, 18.0f);
         _chaseAngle = frand(0.0f, 2.0f * float(M_PI));
-        _laserTimer = urand(1000, 2000);
+        _laserTimer = urand(1500, 2500);
     }
 
     uint32 _laserTimer;
@@ -1160,8 +1160,8 @@ struct npc_mechanostriker_54_a : public ScriptedAI
 
     void Reset() override
     {
-        _laserTimer = urand(1000, 2000);
-        _chaseDist = frand(12.0f, 18.0f);
+        _laserTimer = urand(1500, 2500);
+        _chaseDist = frand(14.0f, 18.0f);
         _chaseAngle = frand(0.0f, 2.0f * float(M_PI));
         me->SetCanFly(true);
         me->SetDisableGravity(true);
@@ -1214,7 +1214,7 @@ struct npc_mechanostriker_54_a : public ScriptedAI
             return;
 
         _laserTimer += diff;
-        if (_laserTimer >= 2500)
+        if (_laserTimer >= 3500)
         {
             _laserTimer = 0;
             if (Unit* victim = me->GetVictim())
@@ -1228,37 +1228,70 @@ struct npc_mechanostriker_54_a : public ScriptedAI
 
 struct npc_storm_beacon_spawn : public NullCreatureAI
 {
-    npc_storm_beacon_spawn(Creature* c) : NullCreatureAI(c)
+    npc_storm_beacon_spawn(Creature* c) : NullCreatureAI(c), summons(c)
     {
         _amount = 0;
-        _checkTimer = 1000;
+        _checkTimer = 2000;
         _airAmount = 0;
-        _airTimer = 2000;
+        _airTimer = 5000;
     }
 
+    SummonList summons;
     uint8 _amount;
     uint32 _checkTimer;
     uint8 _airAmount;
     uint32 _airTimer;
 
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_MECHANOSTRIKER_54_A || summon->GetEntry() == 34162)
+        {
+            if (_airAmount > 0)
+                --_airAmount;
+        }
+        else
+        {
+            if (_amount > 0)
+                --_amount;
+        }
+        summons.Despawn(summon);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        summons.DespawnAll();
+    }
+
+    void Reset() override
+    {
+        summons.DespawnAll();
+        _amount = 0;
+        _airAmount = 0;
+    }
+
     void UpdateAI(uint32 diff) override
     {
         _checkTimer += diff;
-        if (_checkTimer >= 4000)
+        if (_checkTimer >= 15000)
         {
             _checkTimer = 0;
-            if (_amount < 30)
+            if (_amount < 8)
             {
                 if (Unit* target = me->SelectNearestTarget(80.0f))
                 {
                     if (target->GetVehicleBase())
                         target = target->GetVehicleBase();
 
-                    uint8 toSpawn = std::min<uint8>(2, 30 - _amount);
+                    uint8 toSpawn = std::min<uint8>(2, 8 - _amount);
                     for (uint8 i = 0; i < toSpawn; ++i)
                     {
                         ++_amount;
-                        if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX() + frand(-3.0f, 3.0f), me->GetPositionY() + frand(-3.0f, 3.0f), me->GetPositionZ() + 1.0f, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
+                        if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX() + frand(-3.0f, 3.0f), me->GetPositionY() + frand(-3.0f, 3.0f), me->GetPositionZ() + 1.0f, me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
                         {
                             cr->SetInCombatWith(target);
                             cr->AddThreat(target, 1000.0f);
@@ -1270,35 +1303,31 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
         }
 
         _airTimer += diff;
-        if (_airTimer >= 6000)
+        if (_airTimer >= 20000)
         {
             _airTimer = 0;
-            if (_airAmount < 8)
+            if (_airAmount < 2)
             {
                 if (Unit* target = me->SelectNearestTarget(80.0f))
                 {
                     if (target->GetVehicleBase())
                         target = target->GetVehicleBase();
 
-                    uint8 toSpawn = std::min<uint8>(2, 8 - _airAmount);
-                    for (uint8 i = 0; i < toSpawn; ++i)
-                    {
-                        ++_airAmount;
-                        float offsetAngle = frand(0.0f, 2.0f * float(M_PI));
-                        float offsetDist = frand(6.0f, 12.0f);
-                        float offsetX = offsetDist * std::cos(offsetAngle);
-                        float offsetY = offsetDist * std::sin(offsetAngle);
-                        float offsetZ = frand(10.0f, 16.0f);
+                    ++_airAmount;
+                    float offsetAngle = frand(0.0f, 2.0f * float(M_PI));
+                    float offsetDist = frand(8.0f, 16.0f);
+                    float offsetX = offsetDist * std::cos(offsetAngle);
+                    float offsetY = offsetDist * std::sin(offsetAngle);
+                    float offsetZ = frand(12.0f, 18.0f);
 
-                        if (Creature* cr = me->SummonCreature(NPC_MECHANOSTRIKER_54_A, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
-                        {
-                            cr->SetCanFly(true);
-                            cr->SetDisableGravity(true);
-                            cr->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
-                            cr->SetInCombatWith(target);
-                            cr->AddThreat(target, 1000.0f);
-                            cr->AI()->AttackStart(target);
-                        }
+                    if (Creature* cr = me->SummonCreature(NPC_MECHANOSTRIKER_54_A, me->GetPositionX() + offsetX, me->GetPositionY() + offsetY, me->GetPositionZ() + offsetZ, me->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
+                    {
+                        cr->SetCanFly(true);
+                        cr->SetDisableGravity(true);
+                        cr->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+                        cr->SetInCombatWith(target);
+                        cr->AddThreat(target, 1000.0f);
+                        cr->AI()->AttackStart(target);
                     }
                 }
             }
