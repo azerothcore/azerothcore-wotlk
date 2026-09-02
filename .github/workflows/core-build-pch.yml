@@ -36,13 +36,22 @@ jobs:
     outputs:
       relevant: ${{ steps.filter.outputs.relevant }}
     steps:
-      # token mode: reads the changed-file list from the API, no checkout needed,
-      # so a PR that only touches docs/labeler config gets a fast, cheap "no" here
-      # instead of paying for a full build just to find out it wasn't needed.
+      # paths-filter's token mode (no checkout, reads the changed-file list from
+      # the API) only works for pull_request: there's no such API for a push, so
+      # that case needs a real checkout to diff locally instead.
+      - uses: actions/checkout@v7
+        if: github.event_name == 'push'
+        with:
+          fetch-depth: 2
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          # every: a file only counts as excluded if it fails to match ALL
+          # patterns below. The default (some) treats the leading '**' alone
+          # as a match for every file, which made every PR "relevant"
+          # regardless of what actually changed.
+          predicate-quantifier: every
           filters: |
             relevant:
               - '**'

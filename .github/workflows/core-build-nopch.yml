@@ -43,15 +43,30 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
-      relevant: ${{ steps.filter.outputs.relevant }}
+      # workflow_dispatch is a manual "run this now": always treat it as
+      # relevant rather than making a maintainer's explicit request depend on
+      # the changed-files filter.
+      relevant: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.relevant == 'true' }}
     steps:
-      # token mode: reads the changed-file list from the API, no checkout needed,
-      # so a PR that only touches docs/labeler config gets a fast, cheap "no" here
-      # instead of paying for a full build just to find out it wasn't needed.
+      # paths-filter's token mode (no checkout, reads the changed-file list from
+      # the API) only works for pull_request: there's no such API for a push, so
+      # that case needs a real checkout to diff locally instead. workflow_dispatch
+      # has no base to diff against at all, so the filter step is skipped for it
+      # and the output above always reports relevant.
+      - uses: actions/checkout@v7
+        if: github.event_name == 'push'
+        with:
+          fetch-depth: 2
       - uses: dorny/paths-filter@v3
         id: filter
+        if: github.event_name != 'workflow_dispatch'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          # every: a file only counts as excluded if it fails to match ALL
+          # patterns below. The default (some) treats the leading '**' alone
+          # as a match for every file, which made every PR "relevant"
+          # regardless of what actually changed.
+          predicate-quantifier: every
           filters: |
             relevant:
               - '**'
