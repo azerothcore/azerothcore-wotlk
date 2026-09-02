@@ -3211,7 +3211,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (IsCreature(target))
                         {
-                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, angle * itr);
+                            target->ToCreature()->GetMotionMaster()->MoveFollow(me, dist, angle * (itr - 1));
                             itr++;
                         }
                     }
