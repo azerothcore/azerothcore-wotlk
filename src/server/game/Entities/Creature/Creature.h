@@ -511,12 +511,15 @@ protected:
 
     Position m_homePosition;
     Position m_transportHomePosition;
+    Position m_lastMovementFlagsPos; // where UpdateMovementFlags() last ran while wandering (swim/fly flag refresh cadence)
 
     bool DisableReputationReward;
     bool DisableLootReward;
 
     CreatureTemplate const* m_creatureInfo;   // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
+    mutable uint32 m_cachedScriptId = 0;      // GetScriptId() cache
+    mutable uint32 m_cachedScriptIdEntry = 0; // GetEntry() the cache was resolved for (0 = unresolved)
 
     float m_detectionDistance;
     uint16 m_LootMode;  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
