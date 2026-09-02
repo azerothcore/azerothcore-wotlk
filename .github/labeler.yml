@@ -34,7 +34,8 @@ UnitTests:
     - any-glob-to-any-file: 'src/test/**/*'
 
 Documentation:
-- changed-files:
+- all:
+  - changed-files:
     - any-glob-to-any-file: '**/*.md'
     - all-globs-to-all-files: '!e2e/**/*.md'
 
