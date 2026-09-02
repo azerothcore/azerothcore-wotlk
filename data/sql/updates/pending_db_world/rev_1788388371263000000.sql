@@ -1,5 +1,10 @@
--- Ulduar: Mechanostriker 54-A template and addon updates
-UPDATE `creature_template` SET `unit_flags` = 0, `InhabitType` = 5, `ScriptName` = 'npc_mechanostriker_54_a' WHERE `entry` IN (34161, 34162);
+-- Ulduar: Mechanostriker 54-A template and movement updates
+UPDATE `creature_template` SET `unit_flags` = 0, `ScriptName` = 'npc_mechanostriker_54_a' WHERE `entry` IN (34161, 34162);
+
+DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (34161, 34162);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(34161, 1, 0, 1, 0, 0, 0, NULL),
+(34162, 1, 0, 1, 0, 0, 0, NULL);
 
 DELETE FROM `creature_template_addon` WHERE `entry` IN (34161, 34162);
 INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `bytes2`, `emote`, `aiAnimKit`, `auras`) VALUES
