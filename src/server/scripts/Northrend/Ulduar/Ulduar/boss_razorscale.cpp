@@ -493,13 +493,7 @@ struct boss_razorscale : public BossAI
                     me->SetFacingTo(RazorLandPos.GetOrientation());
                     me->RemoveAura(SPELL_STUN_SELF);
                     Talk(EMOTE_BREATH);
-                    {
-                        Unit* target = me->GetVictim();
-                        if (!target)
-                            target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
-                        if (target)
-                            me->CastSpell(target, SPELL_FLAME_BREATH, TRIGGERED_IGNORE_SET_FACING);
-                    }
+                    DoCastAOE(SPELL_FLAME_BREATH);
                     events.ScheduleEvent(EVENT_WING_BUFFET, 2s, 0, PHASE_GROUND);
                     break;
                 case EVENT_FLAME_BREATH_GROUNDED:
