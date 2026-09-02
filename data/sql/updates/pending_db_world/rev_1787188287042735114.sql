@@ -60,8 +60,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1080800 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-    (1080800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Set Visible'),
-    (1080800, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Remove Immunity to Players and NPCs'),
-    (1080800, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Set Event Phase 0'),
-    (1080800, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 50142, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Cast Emerge'),
-    (1080800, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, @PATH, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Start Repeating Path');
+    (1080800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 449, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Set Emerge Emote State'),
+    (1080800, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Set Visible'),
+    (1080800, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Remove Immunity to Players and NPCs'),
+    (1080800, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Set Event Phase 0'),
+    (1080800, 9, 4, 0, 0, 0, 100, 0, 3500, 3500, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Clear Emote State'),
+    (1080800, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, @PATH, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Timmy the Cruel - Actionlist - Start Repeating Path');
