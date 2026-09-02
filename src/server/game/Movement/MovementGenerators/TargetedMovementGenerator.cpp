@@ -258,8 +258,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     // For oversized targets (e.g. Kologarn, Brain of Yogg-Saron), chasing behind the target
-    // is invalid because the rear is off-mesh or inside geometry.
-    if (angle && target->GetCombatReach() > NOMINAL_MELEE_RANGE)
+    // in melee is invalid because the rear is off-mesh or inside geometry.
+    if (angle && (!_range || _range->MaxRange <= CONTACT_DISTANCE) && target->GetCombatReach() > NOMINAL_MELEE_RANGE)
     {
         angle = Optional<ChaseAngle>();
     }
