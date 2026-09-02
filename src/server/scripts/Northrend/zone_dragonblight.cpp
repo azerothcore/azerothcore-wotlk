@@ -1029,16 +1029,19 @@ struct npc_heated_battle_captain : public ScriptedAI
         scheduler.CancelGroup(GROUP_COMBAT);
         me->SetEmoteState(EMOTE_STATE_READY2H);
 
+        ScheduleGhoulSummons();
+
         if (!_deployed)
         {
             _deployed = true;
-            ScheduleGhoulSummons();
             BeginHold();
         }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
+        scheduler.CancelGroup(GROUP_GHOUL);
+
         if (IsIskandar())
         {
             scheduler.Schedule(3s, 7s, GROUP_COMBAT, [this](TaskContext context)
@@ -1171,16 +1174,13 @@ private:
         dragon->GetMotionMaster()->MoveWaypoint(pathId, false);
     }
 
+    // Armed from Reset and dropped again the moment the captain is pulled in, so a volley only
+    // lands between fights - its ghouls would otherwise join the one already running.
     void ScheduleGhoulSummons()
     {
-        scheduler.Schedule(15s, 17s, GROUP_GHOUL, [this](TaskContext context)
+        scheduler.CancelGroup(GROUP_GHOUL);
+        scheduler.Schedule(15s, 20s, GROUP_GHOUL, [this](TaskContext context)
         {
-            if (me->IsInCombat())
-            {
-                context.Repeat(15s, 17s);
-                return;
-            }
-
             DoCastSelf(SPELL_SUMMON_FRIGID_GHOUL, true);
 
             if (CreatureGroup* formation = me->GetFormation())
@@ -1188,7 +1188,7 @@ private:
                     if (itr.first != me && itr.first->IsAlive())
                         itr.first->CastSpell(itr.first, SPELL_SUMMON_FRIGID_GHOUL, true);
 
-            context.Repeat(15s, 17s);
+            context.Repeat(15s, 20s);
         });
     }
 
@@ -1255,6 +1255,9 @@ private:
             for (auto const& itr : formation->GetMembers())
                 if (itr.first != me && itr.first->IsAlive() && itr.first->AI())
                     itr.first->AI()->DoAction(march);
+
+        // Nothing is summoned while the squad is walking.
+        scheduler.DelayGroup(GROUP_GHOUL, 15s, 20s);
 
         me->LoadPath(pathId);
         me->GetMotionMaster()->MoveWaypoint(pathId, false);
