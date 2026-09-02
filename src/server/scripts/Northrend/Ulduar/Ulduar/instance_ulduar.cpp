@@ -150,6 +150,7 @@ ObjectData const gameobjectData[] =
     { GO_LEVIATHAN_DOORS,               DATA_LEVIATHAN_DOORS            },
     { GO_LIGHTNING_WALL1,               DATA_LIGHTNING_WALL1            },
     { GO_LIGHTNING_WALL2,               DATA_LIGHTNING_WALL2            },
+    { GO_ULDUAR_PROTECTIVE_BUBBLE,      DATA_ULDUAR_PROTECTIVE_BUBBLE   },
     { GO_XT002_DOORS,                   DATA_XT002_DOORS                },
     { GO_ASSEMBLY_DOORS,                DATA_ASSEMBLY_DOORS             },
     { GO_ARCHIVUM_DOORS,                DATA_ARCHIVUM_DOORS             },
@@ -797,6 +798,12 @@ public:
                     if (GetBossState(BOSS_LEVIATHAN) >= DONE)
                         gameObject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     break;
+                case GO_ULDUAR_PROTECTIVE_BUBBLE:
+                    if (GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) == MAGE_BARRIER_LOWERED
+                        || GetPersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE) != 0
+                        || IsBossDone(BOSS_LEVIATHAN))
+                        gameObject->DespawnOrUnsummon(0ms, 7_days);
+                    break;
                 case GO_KOLOGARN_BRIDGE:
                     OpenIfDone(BOSS_KOLOGARN, gameObject, GO_STATE_READY);
                     break;
@@ -911,6 +918,9 @@ public:
                 case DATA_MAGE_BARRIER:
                     StorePersistentData(
                         PERSISTENT_DATA_MAGE_BARRIER, data);
+                    if (data == MAGE_BARRIER_LOWERED)
+                        if (GameObject* bubble = GetGameObject(DATA_ULDUAR_PROTECTIVE_BUBBLE))
+                            bubble->DespawnOrUnsummon(0ms, 7_days);
                     break;
                 case EVENT_KEEPER_TELEPORTED:
                     if (Creature* sara = GetCreature(DATA_SARA))
