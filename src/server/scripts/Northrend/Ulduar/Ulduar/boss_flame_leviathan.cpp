@@ -1146,24 +1146,47 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
     {
         _amount = 0;
         _checkTimer = 0;
+        _airAmount = 0;
+        _airTimer = 0;
     }
 
     uint8 _amount;
     uint32 _checkTimer;
+    uint8 _airAmount;
+    uint32 _airTimer;
 
     void UpdateAI(uint32 diff) override
     {
-        if (_amount < 40)
+        _checkTimer += diff;
+        if (_checkTimer >= 4000)
         {
-            _checkTimer += diff;
-            if (_checkTimer >= 4000)
+            _checkTimer = 0;
+            if (_amount < 40)
             {
-                _checkTimer = 0;
                 if (Unit* target = me->SelectNearestTarget(80.0f))
                 {
                     ++_amount;
                     if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 4, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
                         cr->AI()->AttackStart(target);
+                }
+            }
+        }
+
+        _airTimer += diff;
+        if (_airTimer >= 12000)
+        {
+            _airTimer = 0;
+            if (_airAmount < 6)
+            {
+                if (Unit* target = me->SelectNearestTarget(80.0f))
+                {
+                    ++_airAmount;
+                    if (Creature* cr = me->SummonCreature(NPC_MECHANOSTRIKER_54_A, me->GetPositionX() + frand(-5.0f, 5.0f), me->GetPositionY() + frand(-5.0f, 5.0f), me->GetPositionZ() + 15.0f, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
+                    {
+                        cr->SetCanFly(true);
+                        cr->SetDisableGravity(true);
+                        cr->AI()->AttackStart(target);
+                    }
                 }
             }
         }

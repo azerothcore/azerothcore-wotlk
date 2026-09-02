@@ -675,6 +675,7 @@ public:
                 // Gone for good once Flame Leviathan is defeated
                 case NPC_STEELFORGED_DEFENDER:
                 case NPC_DEFENDER_GENERATED:
+                case NPC_MECHANOSTRIKER_54_A:
                 case NPC_ULDUAR_GAUNTLET_GENERATOR:
                 case NPC_IRONWORK_CANNON:
                     if (IsBossDone(BOSS_LEVIATHAN))

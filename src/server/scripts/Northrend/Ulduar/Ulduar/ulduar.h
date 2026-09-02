@@ -232,6 +232,7 @@ enum UlduarNPCs
     NPC_IRONWORK_CANNON                     = 33264,
     NPC_ULDUAR_GAUNTLET_GENERATOR           = 33571,
     NPC_DEFENDER_GENERATED                  = 33572,
+    NPC_MECHANOSTRIKER_54_A                 = 34161,
     NPC_ARCHMAGE_RHYDIAN                    = 33696,
     NPC_RUNEFORGED_SENTRY                   = 34234,
     NPC_BRANN_FORMATION_GROUNDS             = 34119,
