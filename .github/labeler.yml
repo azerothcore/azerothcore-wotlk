@@ -36,6 +36,7 @@ UnitTests:
 Documentation:
 - changed-files:
     - any-glob-to-any-file: '**/*.md'
+    - all-globs-to-all-files: '!e2e/**/*.md'
 
 Bash:
 - changed-files:
