@@ -859,9 +859,9 @@ public:
      * @brief This hook is called after a player takes an item out of a mailbox.
      *
      * @param player Contains information about the Player
-     * @param item Contains information about the Item that was taken. On a merge into an existing
-     *             stack this is the mail's copy, already marked removed, rather than the stack the
-     *             player ends up holding.
+     * @param item The stack the player ends up holding. When the mail's item merges into an
+     *             existing stack this is that destination stack, not the mail's own copy -- the
+     *             latter is marked ITEM_REMOVED and deleted while the inventory is saved.
      * @param count Number of items taken
      */
     virtual void OnPlayerAfterTakeItemFromMail(Player* /*player*/, Item* /*item*/, uint32 /*count*/) {}
