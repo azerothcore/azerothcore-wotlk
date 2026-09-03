@@ -323,14 +323,11 @@ struct boss_razorscale : public BossAI
         {
             case POINT_RAZORSCALE_FLIGHT:
                 me->SetFacingTo(RazorFlightPos.GetOrientation());
-                events.SetPhase(PHASE_AIR);
-                _flyCount++;
-                me->SetSpeedRate(MOVE_RUN, 1.0f);
-                ScheduleAirEvents();
+                DoZoneInCombat();
                 break;
             case POINT_RAZORSCALE_LAND:
-                me->SetSpeedRate(MOVE_RUN, 1.0f);
-                me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_GROUND, RazorGroundPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
+                me->SetFacingTo(RazorLandPos.GetOrientation());
+                me->GetMotionMaster()->MoveLand(POINT_RAZORSCALE_GROUND, RazorGroundPos);
                 break;
             case POINT_RAZORSCALE_GROUND:
                 me->SetDisableGravity(false);
