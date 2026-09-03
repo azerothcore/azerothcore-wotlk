@@ -246,6 +246,7 @@ public:
         bool _leviathanSequenceStarted;
         ObjectGuid _formationRhydianGUID;
         ObjectGuid _leviathanMachineGUID;
+        bool _mechanostrikersSpawned;
 
         // Hodir
         bool _hmHodir;
@@ -274,6 +275,7 @@ public:
             _leviathanSequenceStarted = false;
             _formationRhydianGUID.Clear();
             _leviathanMachineGUID.Clear();
+            _mechanostrikersSpawned = false;
 
             // Hodir
             _hmHodir = true; // If players fail the Hardmode then becomes false
@@ -320,6 +322,51 @@ public:
             for (LeviathanVehicle const& summoned : _leviathanVehicles)
                 if (Creature* vehicle = instance->GetCreature(summoned.guid))
                     vehicle->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+        }
+
+        void SpawnMechanostrikers()
+        {
+            Position const southMechanostrikers[5] =
+            {
+                { 60.0f, -225.0f, 436.0f, 3.14f },
+                { 66.0f, -228.0f, 436.0f, 3.14f },
+                { 72.0f, -231.0f, 436.0f, 3.14f },
+                { 78.0f, -234.0f, 436.0f, 3.14f },
+                { 84.0f, -237.0f, 436.0f, 3.14f },
+            };
+
+            Position const northMechanostrikers[5] =
+            {
+                { 110.0f,  152.0f, 477.0f, 3.14f },
+                { 116.0f,  156.0f, 477.0f, 3.14f },
+                { 122.0f,  160.0f, 477.0f, 3.14f },
+                { 128.0f,  164.0f, 477.0f, 3.14f },
+                { 133.0f,  167.0f, 477.0f, 3.14f },
+            };
+
+            for (Position const& pos : southMechanostrikers)
+            {
+                if (Creature* cr = instance->SummonCreature(NPC_MECHANOSTRIKER_54_A, pos))
+                {
+                    cr->SetCanFly(true);
+                    cr->SetDisableGravity(true);
+                    cr->SetByteFlag(UNIT_FIELD_BYTES_1, 3,
+                        UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+                    _leviathanGauntletGUIDs.insert(cr->GetGUID());
+                }
+            }
+
+            for (Position const& pos : northMechanostrikers)
+            {
+                if (Creature* cr = instance->SummonCreature(NPC_MECHANOSTRIKER_54_A, pos))
+                {
+                    cr->SetCanFly(true);
+                    cr->SetDisableGravity(true);
+                    cr->SetByteFlag(UNIT_FIELD_BYTES_1, 3,
+                        UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+                    _leviathanGauntletGUIDs.insert(cr->GetGUID());
+                }
+            }
         }
 
         void SpawnLeviathanOutro(bool justKilled)
@@ -942,6 +989,13 @@ public:
                     {
                         UnlockLeviathanVehicles();
                     });
+                    return;
+                case DATA_MECHANOSTRIKERS_SPAWN:
+                    if (!_mechanostrikersSpawned && !IsBossDone(BOSS_LEVIATHAN))
+                    {
+                        _mechanostrikersSpawned = true;
+                        SpawnMechanostrikers();
+                    }
                     return;
                 case DATA_DESPAWN_ALGALON:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);

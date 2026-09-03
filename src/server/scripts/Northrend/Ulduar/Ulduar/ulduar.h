@@ -66,6 +66,7 @@ enum UlduarData
     DATA_UNBROKEN_ACHIEVEMENT               = 105,
     DATA_LEVIATHAN_DOORS                    = 106,
     DATA_LEVIATHAN_VEHICLES_USABLE          = 107,
+    DATA_MECHANOSTRIKERS_SPAWN              = 108,
 
     // Mimiron creatures
     DATA_MIMIRON_LEVIATHAN_MKII             = 301,
