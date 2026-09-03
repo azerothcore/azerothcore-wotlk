@@ -1,3 +1,4 @@
+-- DB update 2026_09_03_02 -> 2026_09_03_03
 --
 -- Thorim's script respawns Loken by GUID. In dynamic respawn mode the despawn destroys the spawn,
 -- so the lookup finds nothing. Compatibility mode keeps the object addressable.
