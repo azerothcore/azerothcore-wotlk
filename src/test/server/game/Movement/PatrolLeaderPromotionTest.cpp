@@ -241,4 +241,28 @@ TEST_F(PatrolLeaderPromotionTest, OriginalLeaderReclaimsMovementLeadershipOnResp
     EXPECT_EQ(_group->GetMovementLeader(), _leader);
 }
 
+TEST_F(PatrolLeaderPromotionTest, ReturningOriginalLeaderWaitsForCombatToEnd)
+{
+    CreateFormation(true);
+    _leader->SetAlive(false);
+    ASSERT_TRUE(_group->TryPromotePatrolLeader(_leader));
+
+    TestCreature* target = CreateTestCreature(4, 10004, TEST_FACTION_HOSTILE_TO_MONSTERS);
+    ASSERT_TRUE(_firstFollower->TestGetCombatMgr().SetInCombatWith(target));
+    _firstFollower->GetMotionMaster()->MovePoint(1, 10.0f, 0.0f, 0.0f);
+    ASSERT_FALSE(_firstFollower->movespline->Finalized());
+
+    _group->RemoveMember(_leader);
+    _leader->SetAlive(true);
+    _leader->GetMotionMaster()->Initialize();
+    ASSERT_EQ(_leader->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_IDLE), WAYPOINT_MOTION_TYPE);
+
+    _group->AddMember(_leader);
+    ASSERT_EQ(_group->GetMovementLeader(), _firstFollower);
+    _leader->Motion_Initialize();
+
+    EXPECT_EQ(_leader->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_IDLE), IDLE_MOTION_TYPE);
+    EXPECT_EQ(_group->GetMovementLeader(), _firstFollower);
+}
+
 } // namespace

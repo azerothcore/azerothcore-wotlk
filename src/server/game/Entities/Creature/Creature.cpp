@@ -1136,6 +1136,12 @@ void Creature::Motion_Initialize()
             if (leader->IsAlive() && !leader->movespline->Finalized())
             {
                 m_formation->LeaderStartedMoving();
+
+                // A returning original leader cannot follow itself and must wait until combat ends
+                // before reclaiming movement leadership.
+                if (m_formation->GetLeader() == this)
+                    GetMotionMaster()->MoveIdle();
+
                 return;
             }
         }
