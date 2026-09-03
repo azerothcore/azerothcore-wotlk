@@ -1,3 +1,4 @@
+-- DB update 2026_09_03_04 -> 2026_09_03_05
 
 -- Resolve missing talk from Brann Bronzebeard (target was set on 0).
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 3357901) AND (`source_type` = 9) AND (`id` IN (1));
