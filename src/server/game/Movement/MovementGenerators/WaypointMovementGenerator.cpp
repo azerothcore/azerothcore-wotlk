@@ -29,18 +29,22 @@
 #include "Transport.h"
 #include "SmartScriptMgr.h"
 #include "World.h"
+#include <algorithm>
 
 inline G3D::Vector3 PositionToVector3(Position const& p) { return { p.GetPositionX(), p.GetPositionY(), p.GetPositionZ() }; }
 
-WaypointMovementGenerator<Creature>::WaypointMovementGenerator(uint32 pathId, bool repeating, PathSource pathSource) : PathMovementBase((WaypointPath const*)nullptr),
-    _lastSplineId(0), _pathId(pathId), _waypointDelay(0),
-    _waypointReached(true), _recalculateSpeed(false), _repeating(repeating), _loadedFromDB(true), _stalled(false), _hasBeenStalled(false), _done(false), _pathSource(pathSource),
+WaypointMovementGenerator<Creature>::WaypointMovementGenerator(
+    uint32 pathId, bool repeating, PathSource pathSource, uint32 resumeAfterWaypointId)
+    : PathMovementBase((WaypointPath const*)nullptr), _lastSplineId(0), _pathId(pathId),
+    _resumeAfterWaypointId(resumeAfterWaypointId), _waypointDelay(0), _waypointReached(true),
+    _recalculateSpeed(false), _repeating(repeating), _loadedFromDB(true), _stalled(false),
+    _hasBeenStalled(false), _done(false), _pathSource(pathSource),
     _smoothSplineLaunched(false), _lastPassedSplineIdx(0)
 {
 }
 
 WaypointMovementGenerator<Creature>::WaypointMovementGenerator(WaypointPath& path, bool repeating) : PathMovementBase((WaypointPath const*)nullptr),
-    _lastSplineId(0), _pathId(0), _waypointDelay(0),
+    _lastSplineId(0), _pathId(0), _resumeAfterWaypointId(0), _waypointDelay(0),
     _waypointReached(true), _recalculateSpeed(false), _repeating(repeating), _loadedFromDB(false), _stalled(false), _hasBeenStalled(false), _done(false), _pathSource(PathSource::WAYPOINT_MGR),
     _smoothSplineLaunched(false), _lastPassedSplineIdx(0)
 {
@@ -75,8 +79,21 @@ void WaypointMovementGenerator<Creature>::DoInitialize(Creature* creature)
         return;
     }
 
+    if (_resumeAfterWaypointId)
+    {
+        auto itr = std::ranges::find(i_path->Nodes, _resumeAfterWaypointId, &WaypointNode::Id);
+        if (itr != i_path->Nodes.end())
+        {
+            uint32 const nodeIndex = static_cast<uint32>(std::distance(i_path->Nodes.begin(), itr));
+            i_currentNode = (nodeIndex + 1) % static_cast<uint32>(i_path->Nodes.size());
+        }
+        else
+            LOG_ERROR("movement.waypoint",
+                "Creature {} cannot resume path {} after missing waypoint {}. Starting from the first waypoint.",
+                creature->GetGUID().ToString(), _pathId, _resumeAfterWaypointId);
+    }
     // Determine our first waypoint from the creature's stored waypoint
-    if (CreatureData const* creatureData = creature->GetCreatureData())
+    else if (CreatureData const* creatureData = creature->GetCreatureData())
     {
         if (i_path->Nodes.size() > creatureData->currentwaypoint)
         {

@@ -393,7 +393,7 @@ bool Creature::IsFormationLeader() const
     if (!m_formation)
         return false;
 
-    return m_formation->GetLeader() == this;
+    return m_formation->GetMovementLeader() == this;
 }
 
 void Creature::SignalFormationMovement()
@@ -401,7 +401,7 @@ void Creature::SignalFormationMovement()
     if (!m_formation)
         return;
 
-    if (!m_formation->GetLeader() || m_formation->GetLeader() != this)
+    if (!m_formation->GetMovementLeader() || m_formation->GetMovementLeader() != this)
         return;
 
     m_formation->LeaderStartedMoving();
@@ -1125,16 +1125,13 @@ void Creature::Motion_Initialize()
 {
     if (!m_formation)
         GetMotionMaster()->Initialize();
-    else if (m_formation->GetLeader() == this)
-    {
-        m_formation->FormationReset(false, true);
-        GetMotionMaster()->Initialize();
-    }
+    else if (m_formation->GetMovementLeader() == this)
+        m_formation->InitializeMovementLeader(this);
     else if (m_formation->IsFormed())
     {
         // If the leader is already moving, start following immediately
         // instead of waiting for the next waypoint signal.
-        if (Creature* leader = m_formation->GetLeader())
+        if (Creature* leader = m_formation->GetMovementLeader())
         {
             if (leader->IsAlive() && !leader->movespline->Finalized())
             {
@@ -1978,8 +1975,9 @@ void Creature::setDeathState(DeathState state, bool despawn)
         }
 
         //Dismiss group if is leader
-        if (m_formation && m_formation->GetLeader() == this)
-            m_formation->FormationReset(true, false);
+        if (m_formation && m_formation->GetMovementLeader() == this)
+            if (despawn || !m_formation->TryPromotePatrolLeader(this))
+                m_formation->FormationReset(true, false);
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
         SetHover(false);
@@ -2011,6 +2009,9 @@ void Creature::setDeathState(DeathState state, bool despawn)
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
 
         Unit::setDeathState(DeathState::Alive, despawn);
+
+        if (m_formation)
+            m_formation->MemberRespawned(this);
 
         Motion_Initialize();
         LoadCreaturesAddon(true);
@@ -2923,6 +2924,9 @@ void Creature::AtEngage(Unit* target)
 void Creature::AtDisengage()
 {
     Unit::AtDisengage();
+
+    if (m_formation)
+        m_formation->TryRestoreOriginalLeader();
 
     ClearUnitState(UNIT_STATE_ATTACK_PLAYER);
     if (IsAlive() && HasDynamicFlag(UNIT_DYNFLAG_TAPPED))
@@ -3960,7 +3964,7 @@ bool Creature::IsUpdateNeeded()
     if (HasUnitState(UNIT_STATE_EVADE))
         return true;
 
-    if (m_formation && m_formation->GetLeader() != this)
+    if (m_formation && m_formation->GetMovementLeader() != this)
         return true;
 
     return false;
