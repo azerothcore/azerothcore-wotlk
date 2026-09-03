@@ -1,3 +1,4 @@
+-- DB update 2026_09_03_06 -> 2026_09_03_07
 -- Lost Drakkari Spirit should be neutral. Faction template 634 is the sniffed one.
 -- Arcane Bolt kept the spirit at spell range casting nonstop. It should close in and melee between
 -- casts.
