@@ -45,6 +45,7 @@ public:
 
     // Force initialization without database
     void ForceInitValues(ObjectGuid::LowType guidLow, uint32 entry);
+    void SetTestSpawnId(ObjectGuid::LowType spawnId) { m_spawnId = spawnId; }
 
     // Test control methods
     void SetTestMap(Map* map);
