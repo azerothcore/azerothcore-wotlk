@@ -147,7 +147,6 @@ enum UlduarData
     DATA_BRANN_MEMOTESAY                    = 801,
     DATA_BRANN_EASY_MODE                    = 802,
     DATA_BRANN_BASE_CAMP                    = 803,
-    DATA_ULDUAR_PROTECTIVE_BUBBLE           = 804,
 
     // Observation Ring Keepers
     DATA_FREYA_GOSSIP                       = 810,
