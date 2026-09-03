@@ -18,5 +18,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10391,0,1,0,0,0,100,0,4000,11000,10000,20000,0,0,11,9080,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Skeletal Berserker - In Combat - Cast Hamstring'),
 (10391,0,2,0,0,0,100,0,1000,6000,9000,18000,0,0,11,15496,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Skeletal Berserker - In Combat - Cast Cleave'),
 (10391,0,3,0,105,0,25,0,10000,10000,10000,10000,0,5,11,12555,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Skeletal Berserker - Victim Casting - Cast Pummel'),
-(10391,0,4,0,1,0,100,257,0,0,0,0,0,0,11,29651,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Skeletal Berserker - On Reset - Cast Dual Wield'),
+(10391,0,4,0,25,0,100,1,0,0,0,0,0,0,11,29651,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Skeletal Berserker - On Reset - Cast Dual Wield'),
 (10391,0,5,0,54,0,100,1,0,0,0,0,0,0,89,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Skeletal Berserker - On Just Summoned - Start Random Movement');
