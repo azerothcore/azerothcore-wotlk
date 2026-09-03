@@ -6,8 +6,8 @@ INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
 (1, 0, 1955080);
 
 -- Thorim's walk is split in two so he stops at the top of the stairs to yell at Loken. A SmartAI
--- escort queues every node into one spline and only reports back when the whole thing finishes, so
--- a mid-path stop has to be its own path, not a waypoint delay or an ESCORT_PAUSE.
+-- escort ignores the waypoints.delay column, and an action list can only wait on the clock, never
+-- on a node, so the stop has to be a path boundary.
 DELETE FROM `waypoints` WHERE `entry` = 3039900;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
 (3039900,1,8695.3,-703.023,933.672,NULL,0,'Thorim - The Reckoning'),
@@ -80,8 +80,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Loken lands short of Thorim rather than on top of him: the knockback has just pushed Thorim away
 -- from the throne, so a shorter jump leaves the two facing each other with room between them.
--- Loken walks back to his throne before Say Line 2. MoveTo leaves him facing away from Thorim,
--- hence the separate orientation step.
+-- Loken walks back to his throne before Say Line 2. MoveTo's target_o is the facing he lands on.
 -- The script also never dropped 56696 off Thorim, so he stayed down and despawned lying there.
 -- Now the channel is cut and the aura removed before the quest credit goes out.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3039600);
@@ -93,26 +92,25 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3039600,9,4,0,0,0,100,0,6000,6000,0,0,0,0,101,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Set Home Position'),
 (3039600,9,5,0,0,0,100,0,10500,10500,0,0,0,0,11,10689,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Cast \'Knockback\''),
 (3039600,9,6,0,0,0,100,0,2000,2000,0,0,0,0,69,25,0,0,0,0,0,8,0,0,0,0,8566.083,-581.791,925.559,5.49993,'Loken - On Script - Move To Pos'),
-(3039600,9,7,0,0,0,100,0,7000,7000,0,0,0,0,66,0,0,0,0,0,0,8,0,0,0,0,8566.083,-581.791,925.559,5.49993,'Loken - On Script - Set Orientation'),
-(3039600,9,8,0,0,0,100,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 2'),
-(3039600,9,9,0,0,0,100,0,4000,4000,0,0,0,0,1,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 3'),
-(3039600,9,10,0,0,0,100,0,6000,6000,0,0,0,0,1,3,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 4'),
-(3039600,9,11,0,0,0,100,0,1000,1000,0,0,0,0,11,56696,0,0,0,0,0,10,49141,30399,0,0,0,0,0,0,'Loken - On Script - Cast \'Loken - Defeat Thorim\''),
-(3039600,9,12,0,0,0,100,0,0,0,0,0,0,0,75,56696,0,0,0,0,0,10,49141,30399,0,0,0,0,0,0,'Loken - On Script - Add Aura \'Loken - Defeat Thorim\''),
-(3039600,9,13,0,0,0,100,0,6000,6000,0,0,0,0,1,4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 5'),
-(3039600,9,14,0,0,0,100,0,7000,7000,0,0,0,0,1,5,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 6'),
-(3039600,9,15,0,0,0,100,0,0,0,0,0,0,0,12,30429,1,60000,0,0,0,8,0,0,0,0,8622.84,-605.789,926.286,4.43314,'Loken - On Script - Spawn \'Runeforged Servant\''),
-(3039600,9,16,0,0,0,100,0,0,0,0,0,0,0,12,30429,1,60000,0,0,0,8,0,0,0,0,8586.87,-564.764,925.641,5.16617,'Loken - On Script - Spawn \'Runeforged Servant\''),
-(3039600,9,17,0,0,0,100,0,7000,7000,0,0,0,0,1,6,0,0,0,0,0,21,50,0,0,0,0,0,0,0,'Loken - On Script - Say Line 7'),
-(3039600,9,18,0,0,0,100,0,7000,7000,0,0,0,0,1,7,0,0,0,0,0,21,50,0,0,0,0,0,0,0,'Loken - On Script - Say Line 8'),
-(3039600,9,19,0,0,0,100,0,3000,3000,0,0,0,0,92,1,56696,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Interrupt Spell \'Loken - Defeat Thorim\''),
-(3039600,9,20,0,0,0,100,0,0,0,0,0,0,0,28,56696,0,0,0,0,0,10,49141,30399,0,0,0,0,0,0,'Loken - On Script - Remove Aura \'Loken - Defeat Thorim\''),
-(3039600,9,21,0,0,0,100,0,2000,2000,0,0,0,0,11,56941,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Cast \'Witness the Reckoning\''),
-(3039600,9,22,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,10,49141,30399,0,0,0,0,0,0,'Loken - On Script - Set Data 1 1 to \'Thorim\''),
-(3039600,9,23,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,10,49142,30420,0,0,0,0,0,0,'Loken - On Script - Set Data 1 1 to \'Veranus\''),
-(3039600,9,24,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,9,30429,0,200,0,0,0,0,0,'Loken - On Script - Set Data 1 1 to \'Runeforged Servant\''),
-(3039600,9,25,0,0,0,100,0,0,0,0,0,0,0,11,34427,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Cast \'Ethereal Teleport\''),
-(3039600,9,26,0,0,0,100,0,0,0,0,0,0,0,41,1000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Despawn After 1 Second');
+(3039600,9,7,0,0,0,100,0,7000,7000,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 2'),
+(3039600,9,8,0,0,0,100,0,4000,4000,0,0,0,0,1,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 3'),
+(3039600,9,9,0,0,0,100,0,6000,6000,0,0,0,0,1,3,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 4'),
+(3039600,9,10,0,0,0,100,0,1000,1000,0,0,0,0,11,56696,0,0,0,0,0,10,49141,30399,0,0,0,0,0,0,'Loken - On Script - Cast \'Loken - Defeat Thorim\''),
+(3039600,9,11,0,0,0,100,0,0,0,0,0,0,0,75,56696,0,0,0,0,0,10,49141,30399,0,0,0,0,0,0,'Loken - On Script - Add Aura \'Loken - Defeat Thorim\''),
+(3039600,9,12,0,0,0,100,0,6000,6000,0,0,0,0,1,4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 5'),
+(3039600,9,13,0,0,0,100,0,7000,7000,0,0,0,0,1,5,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Say Line 6'),
+(3039600,9,14,0,0,0,100,0,0,0,0,0,0,0,12,30429,1,60000,0,0,0,8,0,0,0,0,8622.84,-605.789,926.286,4.43314,'Loken - On Script - Spawn \'Runeforged Servant\''),
+(3039600,9,15,0,0,0,100,0,0,0,0,0,0,0,12,30429,1,60000,0,0,0,8,0,0,0,0,8586.87,-564.764,925.641,5.16617,'Loken - On Script - Spawn \'Runeforged Servant\''),
+(3039600,9,16,0,0,0,100,0,7000,7000,0,0,0,0,1,6,0,0,0,0,0,21,50,0,0,0,0,0,0,0,'Loken - On Script - Say Line 7'),
+(3039600,9,17,0,0,0,100,0,7000,7000,0,0,0,0,1,7,0,0,0,0,0,21,50,0,0,0,0,0,0,0,'Loken - On Script - Say Line 8'),
+(3039600,9,18,0,0,0,100,0,3000,3000,0,0,0,0,92,1,56696,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Interrupt Spell \'Loken - Defeat Thorim\''),
+(3039600,9,19,0,0,0,100,0,0,0,0,0,0,0,28,56696,0,0,0,0,0,10,49141,30399,0,0,0,0,0,0,'Loken - On Script - Remove Aura \'Loken - Defeat Thorim\''),
+(3039600,9,20,0,0,0,100,0,2000,2000,0,0,0,0,11,56941,1,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Cast \'Witness the Reckoning\''),
+(3039600,9,21,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,10,49141,30399,0,0,0,0,0,0,'Loken - On Script - Set Data 1 1 to \'Thorim\''),
+(3039600,9,22,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,10,49142,30420,0,0,0,0,0,0,'Loken - On Script - Set Data 1 1 to \'Veranus\''),
+(3039600,9,23,0,0,0,100,0,0,0,0,0,0,0,45,1,1,0,0,0,0,9,30429,0,200,0,0,0,0,0,'Loken - On Script - Set Data 1 1 to \'Runeforged Servant\''),
+(3039600,9,24,0,0,0,100,0,0,0,0,0,0,0,11,34427,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Cast \'Ethereal Teleport\''),
+(3039600,9,25,0,0,0,100,0,0,0,0,0,0,0,41,1000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Loken - On Script - Despawn After 1 Second');
 
 -- Veranus flies to the platform edge as before, then circles it once and hovers facing Thorim's
 -- body. The end of an escort applies no facing of its own, hence the orientation step.
