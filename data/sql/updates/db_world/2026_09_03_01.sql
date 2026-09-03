@@ -1,3 +1,4 @@
+-- DB update 2026_09_03_00 -> 2026_09_03_01
 --
 -- Quest "The Hunter and the Prince" (13361, 13400) - restore the Illidan Stormrage summon
 DELETE FROM `event_scripts` WHERE `id` = 20723;

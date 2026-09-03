@@ -1,3 +1,4 @@
+-- DB update 2026_09_02_00 -> 2026_09_03_00
 -- Durnholde Rifleman: restore Scatter Shot in both normal and heroic Old Hillsbrad.
 -- Target 6 selects a random hostile player other than the top-threat target, and
 -- the 15-yard limit matches Scatter Shot's maximum range. If no eligible non-tank
