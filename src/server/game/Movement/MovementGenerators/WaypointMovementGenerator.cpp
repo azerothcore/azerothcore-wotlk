@@ -31,7 +31,10 @@
 #include "World.h"
 #include <algorithm>
 
-inline G3D::Vector3 PositionToVector3(Position const& p) { return { p.GetPositionX(), p.GetPositionY(), p.GetPositionZ() }; }
+inline G3D::Vector3 PositionToVector3(Position const& p)
+{
+    return { p.GetPositionX(), p.GetPositionY(), p.GetPositionZ() };
+}
 
 WaypointMovementGenerator<Creature>::WaypointMovementGenerator(
     uint32 pathId, bool repeating, PathSource pathSource, uint32 resumeAfterWaypointId)
@@ -43,9 +46,11 @@ WaypointMovementGenerator<Creature>::WaypointMovementGenerator(
 {
 }
 
-WaypointMovementGenerator<Creature>::WaypointMovementGenerator(WaypointPath& path, bool repeating) : PathMovementBase((WaypointPath const*)nullptr),
-    _lastSplineId(0), _pathId(0), _resumeAfterWaypointId(0), _waypointDelay(0),
-    _waypointReached(true), _recalculateSpeed(false), _repeating(repeating), _loadedFromDB(false), _stalled(false), _hasBeenStalled(false), _done(false), _pathSource(PathSource::WAYPOINT_MGR),
+WaypointMovementGenerator<Creature>::WaypointMovementGenerator(WaypointPath& path, bool repeating)
+    : PathMovementBase((WaypointPath const*)nullptr), _lastSplineId(0), _pathId(0),
+    _resumeAfterWaypointId(0), _waypointDelay(0), _waypointReached(true),
+    _recalculateSpeed(false), _repeating(repeating), _loadedFromDB(false), _stalled(false),
+    _hasBeenStalled(false), _done(false), _pathSource(PathSource::WAYPOINT_MGR),
     _smoothSplineLaunched(false), _lastPassedSplineIdx(0)
 {
     i_path = &path;
