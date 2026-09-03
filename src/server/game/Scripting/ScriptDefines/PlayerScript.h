@@ -215,6 +215,7 @@ enum PlayerHook
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN,
+    PLAYERHOOK_ON_AFTER_TAKE_ITEM_FROM_MAIL,
     PLAYERHOOK_END
 };
 
@@ -853,6 +854,17 @@ public:
      * @param level The level that should be used for XP gain calculations
      */
     virtual void OnPlayerBeforeGetLevelForXPGain(Player const* /*player*/, uint8& /*level*/) {}
+
+    /**
+     * @brief This hook is called after a player takes an item out of a mailbox.
+     *
+     * @param player Contains information about the Player
+     * @param item Contains information about the Item that was taken. On a merge into an existing
+     *             stack this is the mail's copy, already marked removed, rather than the stack the
+     *             player ends up holding.
+     * @param count Number of items taken
+     */
+    virtual void OnPlayerAfterTakeItemFromMail(Player* /*player*/, Item* /*item*/, uint32 /*count*/) {}
 };
 
 #endif

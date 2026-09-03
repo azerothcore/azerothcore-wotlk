@@ -623,6 +623,8 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         CharacterDatabase.CommitTransaction(trans);
 
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemLowGuid, count);
+
+        sScriptMgr->OnPlayerAfterTakeItemFromMail(player, it, count);
     }
     else
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);
