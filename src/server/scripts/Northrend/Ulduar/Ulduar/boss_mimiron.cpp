@@ -1612,6 +1612,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
                 me->GetMotionMaster()->MoveFall();
                 me->SetHover(false);
+                _events.DelayEvents(23s);
                 break;
             case DO_ENABLE_AERIAL:
                 if (_isDefeated)
