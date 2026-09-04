@@ -1914,6 +1914,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         float range = (float)e.target.randomPoint.range;
                         Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
+                        if (e.target.randomPoint.self)
+                            srcPos = me->GetPosition();
                         Position randomPoint = me->GetRandomPoint(srcPos, range);
                         me->GetMotionMaster()->MovePoint(
                             e.action.moveToPos.pointId,
