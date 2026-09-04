@@ -9892,8 +9892,9 @@ bool Unit::HasSchoolImmunityForMask(SpellSchoolMask schoolMask, Unit const* cast
     uint32 accumulatedMask = 0;
     for (auto const& [immunitySchoolMask, immunityAuraId] : m_spellImmune[IMMUNITY_SCHOOL])
     {
-        // Skip the spell's own immunity entry
-        if (spellInfo && immunityAuraId == spellInfo->Id)
+        // Beneficial immunities may refresh themselves. Hostile ones (Cyclone, Banish)
+        // must still report immunity when cast again while their aura is active.
+        if (spellInfo && spellInfo->IsPositive() && immunityAuraId == spellInfo->Id)
             continue;
 
         SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
