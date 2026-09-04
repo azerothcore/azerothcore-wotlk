@@ -708,7 +708,8 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
 
         uint8 item_count = uint8(mail->items.size());            // max count is MAX_MAIL_ITEMS (12)
 
-        std::size_t next_mail_size = 2 + 4 + 1 + (mail->messageType == MAIL_NORMAL ? 8 : 4) + 4 * 8 + (mail->subject.size() + 1) + (mail->body.size() + 1) + 1 + item_count * (1 + 4 + 4 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3 * 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1);
+        // The run of fixed-size fields below is six uint32 and one float, not eight of anything
+        std::size_t next_mail_size = 2 + 4 + 1 + (mail->messageType == MAIL_NORMAL ? 8 : 4) + 7 * 4 + (mail->subject.size() + 1) + (mail->body.size() + 1) + 1 + item_count * (1 + 4 + 4 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3 * 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1);
 
         if (data.wpos() + next_mail_size > MAX_NETCLIENT_PACKET_SIZE)
         {
