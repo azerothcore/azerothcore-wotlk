@@ -35,6 +35,7 @@ class AuraScript;
 
 class AuraApplication
 {
+    friend class Aura; // Aura::UpdateTargetMap manages paladin aura effect suppression
     friend void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask);
     friend void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMode);
     friend void Unit::_ApplyAuraEffect(Aura* aura, uint8 effIndex);
