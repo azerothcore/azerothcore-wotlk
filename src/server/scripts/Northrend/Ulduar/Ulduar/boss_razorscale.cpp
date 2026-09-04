@@ -474,8 +474,8 @@ struct boss_razorscale : public BossAI
                 case EVENT_FLAME_BREATH:
                     me->RemoveAura(SPELL_STUN_SELF);
                     Talk(EMOTE_BREATH);
-                    if (Unit* victim = me->GetVictim())
-                        DoCast(victim, SPELL_FLAME_BREATH);
+                    me->SetFacingTo(RazorGroundPos.GetOrientation());
+                    DoCastAOE(SPELL_FLAME_BREATH);
                     events.ScheduleEvent(EVENT_WING_BUFFET, 2s, 0, PHASE_GROUND);
                     break;
                 case EVENT_FLAME_BREATH_GROUNDED:
