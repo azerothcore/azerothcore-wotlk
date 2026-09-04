@@ -65,7 +65,7 @@ struct boss_lieutenant_drake : public BossAI
             {
                 Talk(SAY_SHOUT);
             }
-            DoCastSelf(SPELL_FRIGHTENING_SHOUT);
+            DoCastVictim(SPELL_FRIGHTENING_SHOUT);
             context.Repeat(25s);
         }).Schedule(9s, [this](TaskContext context)
         {

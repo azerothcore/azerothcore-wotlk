@@ -17,6 +17,7 @@
 
 #include "Banner.h"
 #include "Config.h"
+#include "DBUpdater.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "IoContext.h"
@@ -94,6 +95,12 @@ int main(int argc, char** argv)
     std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
 
     LOG_INFO("dbimport", "Halting process...");
+
+    if (uint32 failed = DBUpdaterUtil::GetFailedUpdateCount())
+    {
+        LOG_FATAL("dbimport", "{} update file(s) failed to apply!", failed);
+        return 1;
+    }
 
     return 0;
 }

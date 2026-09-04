@@ -205,12 +205,14 @@ public:
 enum eTimeLost
 {
     NPC_TIME_LOST_PROTO_DRAKE = 32491,
-    NPC_VYRAGOSA = 32630,
+    NPC_VYRAGOSA              = 32630,
 
-    SPELL_TIME_SHIFT = 61084,
-    SPELL_TIME_LAPSE = 51020,
-    SPELL_FROST_BREATH = 47425,
-    SPELL_FROST_CLEAVE = 51857,
+    SPELL_TIME_SHIFT          = 61084,
+    SPELL_TIME_LAPSE          = 51020,
+    SPELL_FROST_BREATH        = 47425,
+    SPELL_FROST_CLEAVE        = 51857,
+
+    ACTION_TLPD_REVEAL        = 1
 };
 
 class npc_time_lost_proto_drake : public CreatureScript
@@ -227,18 +229,33 @@ public:
             scheduler.CancelAll();
         }
 
-        void InitializeAI() override
+        void JustRespawned() override
         {
-            ScriptedAI::InitializeAI();
+            Reset();
             me->SetAnimTier(AnimTier::Fly);
             me->setActive(true);
-            me->SetVisible(false);
-            me->SetImmuneToAll(true);
+            ArmHiddenState();
+        }
 
-            me->m_Events.AddEventAtOffset([&] {
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_TLPD_REVEAL)
+            {
                 me->SetVisible(true);
                 me->SetImmuneToAll(false);
-            }, Hours(urand(6, 22)));
+                me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
+            }
+        }
+
+        void ArmHiddenState()
+        {
+            me->SetVisible(false);
+            me->SetImmuneToAll(true);
+            me->GetMotionMaster()->MoveIdle();
+
+            me->m_Events.AddEventAtOffset([&] {
+                DoAction(ACTION_TLPD_REVEAL);
+            }, Seconds(urand(0, 60 * 60 * 16)));
         }
 
         void JustEngagedWith(Unit* who) override
@@ -1357,6 +1374,27 @@ class spell_riding_jokkum : public AuraScript
     }
 };
 
+// Quest Where Time Went Wrong (13048)
+class spell_q13048_time_period : public SpellScript
+{
+    PrepareSpellScript(spell_q13048_time_period);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Player* player = GetHitPlayer();
+
+        if (!player)
+            return;
+
+        player->Unit::Say(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q13048_time_period::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
@@ -1385,4 +1423,5 @@ void AddSC_storm_peaks()
     RegisterSpellScript(spell_eject_passenger_wild_wyrm);
     RegisterSpellScript(spell_q13010_jokkum_summon);
     RegisterSpellScript(spell_riding_jokkum);
+    RegisterSpellScript(spell_q13048_time_period);
 }

@@ -60,7 +60,7 @@ public:
                     go->CastSpell((Unit*)nullptr, 17646);
                     if (Creature* onyxia = GetCreature(DATA_ONYXIA))
                     {
-                        onyxia->AI()->DoAction(-1);
+                        onyxia->AI()->DoAction(ACTION_WHELP_SUMMONED);
                     }
                     break;
             }
