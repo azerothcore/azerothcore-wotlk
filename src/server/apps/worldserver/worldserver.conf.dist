@@ -4243,6 +4243,22 @@ MaxAllowedMMRDrop = 500
 MailDeliveryDelay = 3600
 
 #
+#    Mail.PushInboxOnDelivery
+#        Description: Send the receiver's inbox to the client whenever mail is delivered to them
+#                     while they are online.
+#                     The client caches its mailbox and will not ask the server for it again for
+#                     about a minute, so a player who opens a mailbox shortly after checking it
+#                     sees a stale list until that minute is up, or until they /reload or relog.
+#                     Pushing the inbox refreshes it in place and works around that.
+#                     This is not something a retail server does, and every delivery then costs
+#                     one inbox packet (up to ~32KB for characters holding many mails), so leave
+#                     it off unless the stale mailbox is a problem on your realm.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Mail.PushInboxOnDelivery = 0
+
+#
 #     LevelReq.Mail
 #        Description: Level requirement for characters to be able to send and receive mails.
 #        Default:     1

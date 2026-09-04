@@ -549,6 +549,7 @@ public:
     void SendShowBank(ObjectGuid guid);
     bool CanOpenMailBox(ObjectGuid guid);
     void SendShowMailBox(ObjectGuid guid);
+    void SendMailList();
     void SendTabardVendorActivate(ObjectGuid guid);
     void SendSpiritResurrect();
     void SendBindPoint(Creature* npc);
