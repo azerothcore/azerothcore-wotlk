@@ -395,9 +395,12 @@ public:
                         active->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     break;
                 case EVENT_RESTART_ESCORT:
-                    CheckCaravan();
-                    SetDespawnAtEnd(false);
-                    Start(true, ObjectGuid::Empty, 0, false, false, true);
+                    if (!IsEscorted())
+                    {
+                        CheckCaravan();
+                        SetDespawnAtEnd(false);
+                        Start(true, ObjectGuid::Empty, 0, false, false, true);
+                    }
                     break;
             }
 

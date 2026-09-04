@@ -15,16 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Player.h"
+#include "TestPlayer.h"
+#include "TestMap.h"
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 #include "WorldMock.h"
 #include "ObjectGuid.h"
-#include "ScriptDefines/MiscScript.h"
 #include "ScriptDefines/PlayerScript.h"
-#include "ScriptDefines/WorldObjectScript.h"
-#include "ScriptDefines/UnitScript.h"
-#include "ScriptDefines/CommandScript.h"
 #include "SharedDefines.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -68,25 +65,12 @@ public:
     inline static AccountTypes LastSecurity = SEC_PLAYER;
 };
 
-class TestPlayer : public Player
-{
-public:
-    using Player::Player;
-
-    void UpdateObjectVisibility(bool /*forced*/ = true, bool /*fromUpdate*/ = false) override { }
-
-    void ForceInitValues(ObjectGuid::LowType guidLow = 1)
-    {
-        Object::_Create(guidLow, uint32(0), HighGuid::Player);
-    }
-};
-
 class GmVisibleCommandTest : public ::testing::Test
 {
 protected:
     void SetUp() override
     {
-        EnsureScriptRegistriesInitialized();
+        TestMap::EnsureDBC();
 
         TestVisibilityScript::EnsureRegistered();
 
@@ -137,20 +121,6 @@ protected:
     void SimulateGmVisibleOn()
     {
         player->SetServerSideVisibility(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
-    }
-
-    static void EnsureScriptRegistriesInitialized()
-    {
-        static bool initialized = false;
-        if (!initialized)
-        {
-            ScriptRegistry<MiscScript>::InitEnabledHooksIfNeeded(MISCHOOK_END);
-            ScriptRegistry<WorldObjectScript>::InitEnabledHooksIfNeeded(WORLDOBJECTHOOK_END);
-            ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
-            ScriptRegistry<PlayerScript>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
-            ScriptRegistry<CommandSC>::InitEnabledHooksIfNeeded(ALLCOMMANDHOOK_END);
-            initialized = true;
-        }
     }
 
     IWorld* originalWorld = nullptr;

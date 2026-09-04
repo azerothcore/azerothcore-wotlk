@@ -17561,7 +17561,7 @@ INSERT INTO `gameobject_loot_template` VALUES
 (25927,43240,0,100,1,1,0,1,1,'Golden Goblet - Golden Goblet'),
 (25928,43241,0,100,1,1,0,1,1,'Jade Statue - Jade Statue'),
 (26094,1,34174,100,0,1,0,2,2,'Alexstrasza\'s Gift - (ReferenceTable)'),
-(26094,43953,0,1,0,1,0,1,1,'Alexstrasza\'s Gift - Reins of the Blue Drake'),
+(26094,43952,0,1,0,1,0,1,1,'Alexstrasza\'s Gift - Reins of the Azure Drake'),
 (26094,47241,0,100,0,1,0,2,2,'Alexstrasza\'s Gift - Emblem of Triumph'),
 (26097,1,34175,100,0,1,0,4,4,'Alexstrasza\'s Gift - (ReferenceTable)'),
 (26097,43952,0,1,0,1,0,1,1,'Alexstrasza\'s Gift - Reins of the Azure Drake'),
@@ -17613,7 +17613,8 @@ INSERT INTO `gameobject_loot_template` VALUES
 (26782,44729,0,100,0,1,0,1,1,'Everfrost Chip - Everfrost Powder'),
 (26852,44921,0,100,1,1,0,1,1,'Gundrak Raptor Egg - Gundrak Raptor Egg'),
 (26859,44650,0,100,1,1,0,1,1,'Heart of Magic - Heart of Magic'),
-(26860,44651,0,100,1,1,0,1,1,'Heart of Magic - Heart of Magic'),
+(26860,44650,0,100,1,1,2,1,1,'Heart of Magic - Heart of Magic - 10m'),
+(26860,44651,0,100,1,1,1,1,1,'Heart of Magic - Heart of Magic - 25m'),
 (26861,1,12904,5,0,1,0,1,1,'Rich Adamantite Deposit - (ReferenceTable)'),
 (26861,2,12902,1,0,1,0,1,1,'Rich Adamantite Deposit - (ReferenceTable)'),
 (26861,22573,0,10,0,1,0,4,8,'Rich Adamantite Deposit - Mote of Earth'),
@@ -18021,4 +18022,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-15 20:38:38
+-- Dump completed on 2026-06-01 22:39:56

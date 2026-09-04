@@ -416,7 +416,7 @@ void Graveyard::LoadGraveyardZones()
     LOG_INFO("server.loading", " ");
 }
 
-GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
+GraveyardStruct const* Graveyard::GetGraveyard(std::string const& name) const
 {
     // explicit name case
     std::wstring wname;
@@ -427,7 +427,7 @@ GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
     wstrToLower(wname);
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
-    const GraveyardStruct* alt = nullptr;
+    GraveyardStruct const* alt = nullptr;
     for (GraveyardContainer::const_iterator itr = _graveyardStore.begin(); itr != _graveyardStore.end(); ++itr)
     {
         if (itr->second.wnameLow == wname)

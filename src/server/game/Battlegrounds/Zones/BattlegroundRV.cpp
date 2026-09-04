@@ -240,12 +240,7 @@ bool BattlegroundRV::SetupBattleground()
             || !AddObject(BG_RV_OBJECT_PILAR_1, BG_RV_OBJECT_TYPE_PILAR_1, 763.632385f, -306.162384f, 25.909504f, 3.141593f, 0, 0, 0, RESPAWN_IMMEDIATELY)
             || !AddObject(BG_RV_OBJECT_PILAR_2, BG_RV_OBJECT_TYPE_PILAR_2, 723.644287f, -284.493256f, 24.648525f, 3.141593f, 0, 0, 0, RESPAWN_IMMEDIATELY)
             || !AddObject(BG_RV_OBJECT_PILAR_3, BG_RV_OBJECT_TYPE_PILAR_3, 763.611145f, -261.856750f, 25.909504f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY)
-            || !AddObject(BG_RV_OBJECT_PILAR_4, BG_RV_OBJECT_TYPE_PILAR_4, 802.211609f, -284.493256f, 24.648525f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY)
-
-            // Arena Ready Marker
-            || !AddObject(BG_RV_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 769.93f, -301.04f, 2.80f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
-            || !AddObject(BG_RV_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 757.02f, -267.30f, 2.80f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
-       )
+            || !AddObject(BG_RV_OBJECT_PILAR_4, BG_RV_OBJECT_TYPE_PILAR_4, 802.211609f, -284.493256f, 24.648525f, 0.000000f, 0, 0, 0, RESPAWN_IMMEDIATELY))
     {
         LOG_ERROR("sql.sql", "BatteGroundRV: Failed to spawn some object!");
         return false;

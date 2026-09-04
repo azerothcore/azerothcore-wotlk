@@ -26,6 +26,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "Mail.h"
+#include "MailMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -116,6 +117,12 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
 
     Player* player = _player;
+
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_MAIL) && IsTrialAccount())
+    {
+        player->SendMailResult(0, MAIL_SEND, MAIL_ERR_DISABLED_FOR_TRIAL_ACC);
+        return;
+    }
 
     if (player->GetLevel() < sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ))
     {
@@ -410,7 +417,7 @@ void WorldSession::HandleMailDelete(WorldPacket& recvData)
     Mail* m = _player->GetMail(mailId);
     Player* player = _player;
     player->m_mailsUpdated = true;
-    if (m)
+    if (m && m->state != MAIL_STATE_DELETED)
     {
         // delete shouldn't show up for COD mails
         if (m->COD)
@@ -421,7 +428,7 @@ void WorldSession::HandleMailDelete(WorldPacket& recvData)
 
         m->state = MAIL_STATE_DELETED;
 
-        sCharacterCache->DecreaseCharacterMailCount(player->GetGUID());
+        sMailMgr->OnMailDeleted(player->GetGUID().GetCounter());
     }
     player->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
@@ -503,7 +510,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
     delete m;                                               //we can deallocate old mail
     player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_OK);
 
-    sCharacterCache->DecreaseCharacterMailCount(player->GetGUID());
+    sMailMgr->OnMailDeleted(player->GetGUID().GetCounter());
 }
 
 //called when player takes item attached in mail

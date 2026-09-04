@@ -16,10 +16,13 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "Containers.h"
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
 #include "GameTime.h"
+#include "GridNotifiers.h"
 #include "MapMgr.h"
+#include "ObjectAccessor.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -47,10 +50,18 @@ enum SpellData
     SPELL_MINE_EXPLOSION                            = 66351,
     SPELL_SUMMON_PROXIMITY_MINE                     = 65347,
 
+    // PHASE 1 -> 2 TRANSITION:
+    SPELL_ELEVATOR_KNOCKBACK                        = 65096, // Self-cast by the world trigger; sweeps players off the elevator as it rises
+
     // PHASE 2:
     SPELL_HEAT_WAVE                                 = 64533,
 
     SPELL_ROCKET_STRIKE_AURA                        = 64064,
+    SPELL_ROCKET_STRIKE_SINGLE                      = 64402, // VX-001 fires one of the two mounted rockets
+    SPELL_ROCKET_STRIKE_BOTH                        = 65034, // VX-001 fires both mounted rockets
+    SPELL_ROCKET_STRIKE_TARGET                      = 63681, // Cast by a fired rocket; picks the impact target (prefers ranged)
+    SPELL_SUMMON_ROCKET_STRIKE                      = 63036, // Summons the ground strike at the chosen target
+    SPELL_ROCKET_STRIKE_DAMAGE                      = 63041,
     NPC_ROCKET_VISUAL                               = 34050,
     NPC_ROCKET_STRIKE_N                             = 34047,
 
@@ -98,6 +109,7 @@ enum NPCs
     NPC_ASSAULT_BOT                                 = 34057,
     NPC_JUNK_BOT                                    = 33855,
     NPC_MAGNETIC_CORE                               = 34068,
+    NPC_WORLD_TRIGGER                               = 21252,
 };
 
 enum GOs
@@ -209,12 +221,16 @@ enum EVENTS
     EVENT_SUMMON_EMERGENCY_FIRE_BOTS                = 68,
     EVENT_EMERGENCY_BOT_CHECK                       = 69,
     EVENT_EMERGENCY_BOT_ATTACK                      = 70,
+
+    // Rocket (Mimiron Visual):
+    EVENT_ROCKET_FIRE                               = 71,
 };
 
 enum Actions
 {
     DO_DISABLE_AERIAL = 1,
     DO_ENABLE_AERIAL,
+    DO_DESPAWN_SUMMONS,
 };
 
 enum Texts
@@ -260,7 +276,8 @@ enum Texts
 #define GetVX001() instance->GetCreature(DATA_MIMIRON_VX001)
 #define GetACU() instance->GetCreature(DATA_MIMIRON_ACU)
 
-Position const ACUSummonPos = { 2742.6265f, 2568.0571f, 377.22076f, 0.0f }; /// @todo: replace with sniffed position
+// Z is above hover height (15y) so that activating hover does not relocate the ACU upwards
+Position const ACUSummonPos = { 2744.650f, 2569.460f, 380.0f, 3.141593f };
 
 struct boss_mimiron : public BossAI
 {
@@ -488,6 +505,8 @@ struct boss_mimiron : public BossAI
                     elevator->SetLootState(GO_READY);
                     elevator->UseDoorOrButton(0, false);
                     elevator->EnableCollision(false);
+                    if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER, elevator->GetPositionX(), elevator->GetPositionY(), elevator->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                        trigger->CastSpell(trigger, SPELL_ELEVATOR_KNOCKBACK);
                 }
                 events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_1, 6s);
                 break;
@@ -716,7 +735,7 @@ struct boss_mimiron : public BossAI
                     me->_ExitVehicle(&exitPos);
                     me->AttackStop();
                     me->GetMotionMaster()->Clear();
-                    summons.DoAction(1337); // despawn summons of summons
+                    summons.DoAction(DO_DESPAWN_SUMMONS);
                     summons.DespawnEntry(NPC_FLAMES_INITIAL);
                     summons.DespawnEntry(33576);
 
@@ -752,10 +771,12 @@ struct boss_mimiron : public BossAI
                 // spawn chest
                 if (uint32 chestId = (_hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                 {
-                    if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
+                    // Summoned by the map, not Mimiron, so the chest survives his despawn during the outro.
+                    if (GameObject* go = me->GetMap()->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
                     {
                         go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                         go->SetLootRecipient(me->GetMap());
+                        go->SetRespawnTime(7 * DAY);
                     }
                 }
                 events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
@@ -780,6 +801,9 @@ struct boss_mimiron : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        // Once Mimiron turns friendly for the defeat RP, don't reset the encounter.
+        if (me->GetFaction() == FACTION_FRIENDLY)
+            return;
         if (_isEvading)
             return;
         _isEvading = true;
@@ -797,7 +821,7 @@ struct boss_mimiron : public BossAI
             c->DespawnOrUnsummon();
         }
 
-        summons.DoAction(1337); // despawn summons of summons
+        summons.DoAction(DO_DESPAWN_SUMMONS); // despawn summons of summons
 
         me->RemoveAllAuras();
         me->ExitVehicle();
@@ -920,7 +944,7 @@ private:
 
 struct npc_ulduar_leviathan_mkii : public ScriptedAI
 {
-    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature)
+    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature), _summons(me)
     {
         instance = me->GetInstanceScript();
         _isEvading = false;
@@ -929,6 +953,7 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
     void Reset() override
     {
         _phase = 0;
+        _summons.DespawnAll();
         if (Unit* c = GetS3())
             c->ExitVehicle(); // this should never happen!
         if (Creature* c = me->SummonCreature(NPC_LEVIATHAN_MKII_CANNON, *me, TEMPSUMMON_MANUAL_DESPAWN))
@@ -939,6 +964,29 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
 
         _events.Reset();
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        ScriptedAI::AttackStart(who);
+        // Unit::Attack clears the emote state on target switch, which would retract VX-001's arms
+        if (_phase == 4)
+        {
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+            me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+        }
+    }
+
+    // Mines are summoned by the MK II, not by Mimiron, so they are not in his SummonList.
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_PROXIMITY_MINE)
+            _summons.Summon(summon);
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        _summons.Despawn(summon);
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -974,6 +1022,8 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
                     if (Unit* target = SelectTargetFromPlayerList(75.0f))
                         AttackStart(target);
                     DoZoneInCombat();
+                    // The assembled V0-L7R-ON animates through its vehicle base; this state keeps VX-001's arms deployed
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, 20s);
                     _events.ScheduleEvent(EVENT_PROXIMITY_MINES_1, 6s);
@@ -1037,7 +1087,15 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
         _events.Update(diff);
 
         if (!me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            bool wasAttackReady = me->isAttackReady();
             DoMeleeAttackIfReady();
+            // Each melee swing knocks the client out of the arms-deployed loop, retracting
+            // VX-001's arms. Field updates with an unchanged value are ignored by the client,
+            // so replay the state emote via SMSG_EMOTE, which is always applied.
+            if (_phase == 4 && wasAttackReady && !me->isAttackReady())
+                me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+        }
 
         Unit* cannon = GetS3();
         if (!cannon || cannon->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitState(UNIT_STATE_CASTING) || me->HasSilenceAura())
@@ -1157,9 +1215,34 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
 private:
     InstanceScript* instance;
     EventMap _events;
+    SummonList _summons;
     bool _isEvading;
     uint8 _phase;
 };
+
+// The P3Wx2 Laser Barrage beams track the Mimiron DB Target, which circles the room on a waypoint
+// path that runs from instance load and is never restarted, so the arc carries across barrages,
+// phase changes and wipes. The beams follow caster facing, so aiming at it is what delivers the
+// sweep. Taking the bearing rather than copying an angle also keeps phase 4 right, where VX-001
+// rides the chassis up to 30yd off centre and the bearing shifts by as much as 16 degrees.
+inline void FaceBarrageArc(Unit* caster)
+{
+    InstanceScript* instance = caster->GetInstanceScript();
+    if (!instance)
+        return;
+
+    Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET);
+    if (!dbTarget)
+        return;
+
+    float arc = caster->GetAngle(dbTarget);
+
+    // SetFacingTo drops the transport transform for passengers, so phase 4 needs a seat-local angle
+    if (Unit* vehicle = caster->GetVehicleBase())
+        arc = Position::NormalizeOrientation(arc - vehicle->GetOrientation());
+
+    caster->SetFacingTo(arc);
+}
 
 struct npc_ulduar_vx001 : public ScriptedAI
 {
@@ -1174,10 +1257,9 @@ struct npc_ulduar_vx001 : public ScriptedAI
         _phase = 0;
         _fighting = false;
         _leftArm = false;
-        _spinningUpOrientation = 0;
-        _spinningUpTimer = 0;
         me->SetRegeneratingHealth(false);
         _events.Reset();
+        scheduler.CancelAll();
     }
 
     void AttackStart(Unit* /*who*/) override {}
@@ -1229,14 +1311,9 @@ struct npc_ulduar_vx001 : public ScriptedAI
         }
     }
 
-    uint32 GetData(uint32  /*id*/) const override
-    {
-        return _spinningUpOrientation;
-    }
-
     void DoAction(int32 action) override
     {
-        if (action == 1337)
+        if (action == DO_DESPAWN_SUMMONS)
             if (Vehicle* vk = me->GetVehicleKit())
                 for (uint8 i = 0; i < 2; ++i)
                     if (Unit* r = vk->GetPassenger(5 + i))
@@ -1294,19 +1371,8 @@ struct npc_ulduar_vx001 : public ScriptedAI
             return;
 
         _events.Update(diff);
-
-        if (_spinningUpTimer) // executed about a second after starting casting to ensure players can see the correct direction
-        {
-            if (_spinningUpTimer <= diff)
-            {
-                float angle = (_spinningUpOrientation * 2 * M_PI) / 100.0f;
-                me->SetFacingTo(angle);
-
-                _spinningUpTimer = 0;
-            }
-            else
-                _spinningUpTimer -= diff;
-        }
+        // before the casting guard: the windup facing task must tick while Spinning Up channels
+        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -1320,38 +1386,19 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 _events.Repeat(10s);
                 break;
             case EVENT_SPELL_ROCKET_STRIKE:
-                if (Vehicle* vk = me->GetVehicleKit())
-                {
-                    for( int i = 0; i < (_phase / 2); ++i )
-                    {
-                        uint8 index = (_phase == 2 ? rand() % 2 : i);
-                        if (Unit* r = vk->GetPassenger(5 + index))
-                            if (Player* temp = SelectTargetFromPlayerList(100.0f))
-                            {
-                                if (Creature* trigger = me->SummonCreature(NPC_ROCKET_STRIKE_N, temp->GetPositionX(), temp->GetPositionY(), temp->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 6000))
-                                    trigger->CastSpell(trigger, SPELL_ROCKET_STRIKE_AURA, true);
-                                Position exitPos = r->GetPosition();
-                                exitPos.m_positionX += cos(me->GetOrientation()) * 2.35f;
-                                exitPos.m_positionY += std::sin(me->GetOrientation()) * 2.35f;
-                                exitPos.m_positionZ += 2.0f * _phase;
-                                r->_ExitVehicle(&exitPos);
-                                me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, r->GetGUID());
-                                if (r->IsCreature())
-                                    r->ToCreature()->AI()->SetData(0, 0);
-                            }
-                    }
-                    _events.Repeat(20s);
-                    _events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 10s);
-                }
+                me->CastSpell(me, _phase == 2 ? SPELL_ROCKET_STRIKE_SINGLE : SPELL_ROCKET_STRIKE_BOTH);
+                _events.Repeat(20s);
+                _events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 10s);
                 break;
             case EVENT_REINSTALL_ROCKETS:
                 if (Vehicle* vk = me->GetVehicleKit())
                 {
                     for (uint8 i = 5; i <= 6; ++i)
-                        if (!vk->GetPassenger(i))
-                            if (TempSummon* accessory = me->SummonCreature(NPC_ROCKET_VISUAL, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 4.0f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
-                                if (!me->HandleSpellClick(accessory, i))
-                                    accessory->UnSummon();
+                        if (Unit* rocket = vk->GetPassenger(i))
+                            rocket->SetDisplayId(rocket->GetNativeDisplayId()); // restore the fired rocket's visual
+                        else if (TempSummon* accessory = me->SummonCreature(NPC_ROCKET_VISUAL, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 4.0f, me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                            if (!me->HandleSpellClick(accessory, i))
+                                accessory->UnSummon();
                 }
                 break;
             case EVENT_SPELL_RAPID_BURST:
@@ -1369,7 +1416,8 @@ struct npc_ulduar_vx001 : public ScriptedAI
                     if (Unit* vb = me->GetVehicleBase())
                     {
                         vb->SendMeleeAttackStop();
-                        vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                        // Keep the arms-deployed state so the model returns to it after the one-shot pulse animation
+                        vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
 
                         if (!_leftArm)
                         {
@@ -1388,22 +1436,29 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 _events.Repeat(1750ms);
                 break;
             case EVENT_SPELL_SPINNING_UP:
-                _events.Repeat(45s);
-                if (Player* p = SelectTargetFromPlayerList(80.0f))
+                _events.Repeat(60s);
+                // Sniffed: the target is parked on the DB Target from the cast until the barrage ends
+                if (Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET))
+                    me->SetTarget(dbTarget->GetGUID());
+                FaceBarrageArc(me);
+                // untargeted: conditions send EFFECT_0 to the DB Target (channel object, barrage
+                // chain) and EFFECT_1 to the MK II (self-cast 66490 root+pacify for the barrage)
+                me->CastSpell((Unit*)nullptr, SPELL_SPINNING_UP, true);
+                // the DB Target moves ~42 degrees during the windup; track it or the barrage opens off the telegraph
+                scheduler.Schedule(400ms, [this](TaskContext context)
                 {
-                    float angle = me->GetAngle(p);
-
-                    _spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
-                    _spinningUpTimer = 1500;
-                    me->SetFacingTo(angle);
-                    me->CastSpell(p, SPELL_SPINNING_UP, true);
-                    if (Unit* vehicle = me->GetVehicleBase())
+                    if (me->FindCurrentSpellBySpellId(SPELL_SPINNING_UP))
                     {
-                        vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                        vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+                        FaceBarrageArc(me);
+                        context.Repeat();
                     }
-                    _events.RescheduleEvent((_phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14s + 500ms);
+                });
+                if (Unit* vehicle = me->GetVehicleBase())
+                {
+                    vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                    vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                 }
+                _events.RescheduleEvent((_phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14s + 500ms);
                 break;
             case EVENT_FLAME_SUPPRESSION_10:
                 me->CastSpell(me, SPELL_FLAME_SUPPRESSANT_10yd, false);
@@ -1471,8 +1526,6 @@ private:
     bool _isEvading;
     bool _fighting;
     bool _leftArm;
-    uint32 _spinningUpOrientation;
-    uint16 _spinningUpTimer;
     uint8 _phase;
 };
 
@@ -1491,7 +1544,16 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
         _isDefeated = false;
         _events.Reset();
         _summons.DespawnAll();
-        me->SetCombatMovement(false); /// @todo: research ACU behaviour
+        me->SetHover(false);
+        me->SetDisableGravity(true);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (_phase == 3)
+            AttackStartCaster(who, 30.0f);
+        else
+            ScriptedAI::AttackStart(who);
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1506,7 +1568,12 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     break;
                 case 3:
                     _phase = 3;
+                    // Hover instead of disabled gravity: chase then keeps the ACU at
+                    // HoverHeight above ground instead of dragging it to ground level.
+                    me->SetDisableGravity(false);
+                    me->SetHover(true);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToPC(false);
                     DoZoneInCombat();
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_SUMMON_BOMB_BOT, 15s);
@@ -1538,18 +1605,28 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 me->CastStop();
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
-                me->SetDisableGravity(false);
+                // Raw flag removal first: MoveFall lands at ground + hover height, which would
+                // keep the ACU airborne, and SetHover(false) would relocate it without a spline.
+                // SetHover(false) afterwards is relocation-free and tells the client to stop
+                // hovering, else it keeps floating the grounded unit back up
+                me->RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
                 me->GetMotionMaster()->MoveFall();
+                me->SetHover(false);
                 _events.DelayEvents(25s);
                 break;
             case DO_ENABLE_AERIAL:
+                if (_isDefeated)
+                    break;
                 me->SetDisableGravity(true);
-                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f);
+                // 16y: above hover height (15y) so SetHover does not relocate it further up
+                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 16.0f);
                 me->m_Events.AddEventAtOffset([&] {
+                    me->SetDisableGravity(false);
+                    me->SetHover(true);
                     me->SetReactState(REACT_AGGRESSIVE);
                 }, 2s);
                 break;
-            case 1337:
+            case DO_DESPAWN_SUMMONS:
                 _summons.DespawnAll();
                 break;
         }
@@ -1577,6 +1654,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     me->InterruptNonMeleeSpells(false);
                     me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
 
+                    me->SetDisableGravity(true);
                     me->GetMotionMaster()->MovePoint(0, 2744.65f, 2569.46f, 381.34f);
 
                     if (Creature* c = GetMimiron())
@@ -1740,6 +1818,7 @@ struct npc_ulduar_proximity_mine : public ScriptedAI
             {
                 _exploded = true;
                 me->CastSpell(me, SPELL_MINE_EXPLOSION, false);
+                me->DespawnOrUnsummon(2s);
             }
         }
         else
@@ -1752,6 +1831,7 @@ struct npc_ulduar_proximity_mine : public ScriptedAI
             {
                 _exploded = true;
                 me->CastSpell(me, SPELL_MINE_EXPLOSION, false);
+                me->DespawnOrUnsummon(2s);
             }
         }
         else
@@ -1782,6 +1862,80 @@ class spell_ulduar_mimiron_mine_explosion : public SpellScript
     }
 };
 
+// 64402, 65034 - Rocket Strike
+class spell_mimiron_rocket_strike : public SpellScript
+{
+    PrepareSpellScript(spell_mimiron_rocket_strike);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+
+        // The single-rocket cast picks just one of the two mounted rockets; the "both" cast keeps both.
+        if (GetSpellInfo()->Id == SPELL_ROCKET_STRIKE_SINGLE && GetCaster()->IsVehicle())
+            if (Unit* rocket = GetCaster()->GetVehicleKit()->GetPassenger(urand(5, 6)))
+            {
+                targets.clear();
+                targets.push_back(rocket);
+            }
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        // The fired rocket resolves its own impact target, keeping VX-001 as the original caster for credit.
+        GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_ROCKET_STRIKE_TARGET, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCaster()->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mimiron_rocket_strike::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_mimiron_rocket_strike::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 63681 - Rocket Strike
+class spell_mimiron_rocket_strike_target_select : public SpellScript
+{
+    PrepareSpellScript(spell_mimiron_rocket_strike_target_select);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([](WorldObject* target) { return !target->IsPlayer(); });
+        if (targets.empty())
+            return;
+
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+
+        // Prefer players out of melee range; only strike someone within 15y if nobody is further out (patch 3.1.3).
+        targets.remove_if(Acore::AllWorldObjectsInRange(GetCaster(), 15.0f));
+
+        if (!targets.empty())
+            target = Acore::Containers::SelectRandomContainerElement(targets);
+
+        targets.clear();
+        targets.push_back(target);
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        // Spawn the strike trigger now, so its warning visual and 5s fuse run while the missile is still to come.
+        // The rocket fires the missile later, timed to land as the fuse expires (see npc_ulduar_mimiron_rocket).
+        if (Creature* rocket = GetCaster()->ToCreature())
+            if (Creature* trigger = rocket->SummonCreature(NPC_ROCKET_STRIKE_N, *GetHitUnit(), TEMPSUMMON_TIMED_DESPAWN, 6000))
+            {
+                rocket->AI()->SetGUID(trigger->GetGUID(), 0);
+                rocket->AI()->SetGUID(GetHitUnit()->GetGUID(), 1);
+            }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mimiron_rocket_strike_target_select::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_mimiron_rocket_strike_target_select::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 struct npc_ulduar_mimiron_rocket : public NullCreatureAI
 {
     npc_ulduar_mimiron_rocket(Creature* creature) : NullCreatureAI(creature) {}
@@ -1799,18 +1953,69 @@ struct npc_ulduar_mimiron_rocket : public NullCreatureAI
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
     }
 
-    void SetData(uint32  /*id*/, uint32  /*value*/) override
+    void SetGUID(ObjectGuid const& guid, int32 id) override
     {
-        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, FORCED_MOVEMENT_NONE, 0.f, false, true);
+        if (id == 0)
+        {
+            _strikeTrigger = guid;
+            // Delay the shot so the 63036 missile (7 yd/s client-side) lands as the strike trigger's 5s fuse expires.
+            _travelMs = 0;
+            if (Creature* trigger = ObjectAccessor::GetCreature(*me, guid))
+                _travelMs = uint32(me->GetExactDist(trigger) / 7.0f * 1000.0f);
+            _events.RescheduleEvent(EVENT_ROCKET_FIRE, Milliseconds(_travelMs < 5000 ? 5000 - _travelMs : 0));
+        }
+        else
+            _strikeVictim = guid;
     }
 
-    void UpdateAI(uint32  /*diff*/) override
+    ObjectGuid GetGUID(int32 /*id*/) const override
     {
-        if (!me->GetVehicle())
+        return _strikeTrigger;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+        if (_events.ExecuteEvent() == EVENT_ROCKET_FIRE)
         {
-            me->SetSpeed(MOVE_RUN, me->GetSpeedRate(MOVE_RUN) + 0.4f, false);
-            me->SetSpeed(MOVE_FLIGHT, me->GetSpeedRate(MOVE_RUN), false);
+            if (Unit* victim = ObjectAccessor::GetUnit(*me, _strikeVictim))
+                me->CastSpell(victim, SPELL_SUMMON_ROCKET_STRIKE, true);
+            if (Creature* trigger = ObjectAccessor::GetCreature(*me, _strikeTrigger))
+                trigger->AI()->SetData(0, _travelMs);
+            me->SetDisplayId(11686); // hide the spent rocket until it is reloaded
         }
+    }
+
+private:
+    EventMap _events;
+    ObjectGuid _strikeTrigger;
+    ObjectGuid _strikeVictim;
+    uint32 _travelMs = 0;
+};
+
+// 63036 - Summon Rocket Strike
+class spell_mimiron_summon_rocket_strike : public SpellScript
+{
+    PrepareSpellScript(spell_mimiron_summon_rocket_strike);
+
+    void SetDest(SpellDestination& dest)
+    {
+        // Land on the pre-spawned strike trigger, not on the target's current position.
+        if (Creature* rocket = GetCaster()->ToCreature())
+            if (Creature* trigger = ObjectAccessor::GetCreature(*rocket, rocket->AI()->GetGUID()))
+                dest.Relocate(*trigger);
+    }
+
+    void PreventSummon(SpellEffIndex effIndex)
+    {
+        // The strike trigger is pre-spawned on target selection; this cast only provides the missile visual.
+        PreventHitDefaultEffect(effIndex);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_mimiron_summon_rocket_strike::SetDest, EFFECT_0, TARGET_DEST_TARGET_ENEMY);
+        OnEffectHit += SpellEffectFn(spell_mimiron_summon_rocket_strike::PreventSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
 };
 
@@ -1878,10 +2083,7 @@ class spell_mimiron_magnetic_core_summon : public SpellScript
 
     void ModDest(SpellDestination& dest)
     {
-        Unit* caster = GetCaster();
-        Position pos = caster->GetPosition();
-        pos.m_positionZ = caster->GetMap()->GetHeight(pos);
-        dest.Relocate(pos);
+        dest._position.m_positionZ = GetCaster()->GetMap()->GetHeight(dest._position);
     }
 
     void Register() override
@@ -1960,53 +2162,36 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
     }
 };
 
-enum p3wx2LaserBarrage
-{
-    SPELL_P3WX2_LASER_BARRAGE_1 = 63297,
-    SPELL_P3WX2_LASER_BARRAGE_2 = 64042
-};
-
+// The beams themselves come from the spell chain: effect 2 links 63300, which triggers 63297 and
+// 64042 every 100ms on its own. All this script owns is where the caster is pointing.
 class spell_mimiron_p3wx2_laser_barrage_aura : public AuraScript
 {
     PrepareAuraScript(spell_mimiron_p3wx2_laser_barrage_aura);
 
-    bool Load() override
+    void HandleEffectApply(AuraEffect const*   /*aurEff*/, AuraEffectHandleModes   /*mode*/)
     {
-        _lastMSTime = GameTime::GetGameTimeMS().count();
-        _lastOrientation = -1.0f;
-        return true;
+        if (Unit* caster = GetCaster())
+            FaceBarrageArc(caster);
     }
 
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
-        {
-            if (!caster->IsCreature())
-                return;
-            uint32 diff = getMSTimeDiff(_lastMSTime, GameTime::GetGameTimeMS().count());
-            if (_lastOrientation == -1.0f)
-            {
-                _lastOrientation = (caster->ToCreature()->AI()->GetData(0) * 2 * M_PI) / 100.0f;
-                diff = 0;
-            }
-            float new_o = Position::NormalizeOrientation(_lastOrientation - (M_PI / 60) * (diff / 250.0f));
-            _lastMSTime = GameTime::GetGameTimeMS().count();
-            _lastOrientation = new_o;
-            caster->SetFacingTo(new_o);
+            FaceBarrageArc(caster);
+    }
 
-            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_1, true);
-            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_2, true);
-        }
+    void HandleEffectRemove(AuraEffect const*   /*aurEff*/, AuraEffectHandleModes   /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->SetTarget(ObjectGuid::Empty);
     }
 
     void Register() override
     {
+        AfterEffectApply += AuraEffectApplyFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        AfterEffectRemove += AuraEffectApplyFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
-
-private:
-    uint32 _lastMSTime;
-    float _lastOrientation;
 };
 
 class go_ulduar_do_not_push_this_button : public GameObjectScript
@@ -2051,7 +2236,7 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1337)
+        if (action == DO_DESPAWN_SUMMONS)
             RemoveAll();
     }
 
@@ -2225,11 +2410,30 @@ struct npc_ulduar_rocket_strike_trigger : public NullCreatureAI
 {
     npc_ulduar_rocket_strike_trigger(Creature* creature) : NullCreatureAI(creature) {}
 
+    void InitializeAI() override
+    {
+        me->CastSpell(me, SPELL_ROCKET_STRIKE_AURA, true);
+        me->DespawnOrUnsummon(6s);
+    }
+
+    void SetData(uint32 /*id*/, uint32 value) override
+    {
+        // Detonate in sync with the incoming missile; the 64064 tick is suppressed (spell_mimiron_rocket_strike_aura).
+        _events.ScheduleEvent(1, Milliseconds(value));
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+        if (_events.ExecuteEvent() == 1)
+            me->CastSpell(me, SPELL_ROCKET_STRIKE_DAMAGE, true);
+    }
+
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (!target || !spell)
             return;
-        if (spell->Id == 63041)
+        if (spell->Id == SPELL_ROCKET_STRIKE_DAMAGE)
         {
             if (target->GetEntry() == NPC_ASSAULT_BOT)
                 me->CastSpell(me, 65040, true); // achievement Not-So-Friendly Fire
@@ -2238,6 +2442,26 @@ struct npc_ulduar_rocket_strike_trigger : public NullCreatureAI
                     if (Creature* c = GetMimiron())
                         c->AI()->SetData(0, 13);
         }
+    }
+
+private:
+    EventMap _events;
+};
+
+// 64064 - Rocket Strike
+class spell_mimiron_rocket_strike_aura : public AuraScript
+{
+    PrepareAuraScript(spell_mimiron_rocket_strike_aura);
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        // No fuse tick: the strike trigger detonates in sync with the missile impact (npc_ulduar_rocket_strike_trigger).
+        PreventDefaultAction();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_rocket_strike_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -2300,6 +2524,10 @@ void AddSC_boss_mimiron()
     RegisterSpellScript(spell_mimiron_rapid_burst_aura);
     RegisterSpellScript(spell_mimiron_p3wx2_laser_barrage_aura);
     RegisterSpellScript(spell_ulduar_mimiron_mine_explosion);
+    RegisterSpellScript(spell_mimiron_rocket_strike);
+    RegisterSpellScript(spell_mimiron_rocket_strike_target_select);
+    RegisterSpellScript(spell_mimiron_summon_rocket_strike);
+    RegisterSpellScript(spell_mimiron_rocket_strike_aura);
     new go_ulduar_do_not_push_this_button();
     RegisterUlduarCreatureAI(npc_ulduar_flames_initial);
     RegisterUlduarCreatureAI(npc_ulduar_flames_spread);

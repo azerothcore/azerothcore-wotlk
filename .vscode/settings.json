@@ -1,4 +1,9 @@
 {
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+        {
+            "file": ".git_commit_template.txt"
+        },
+    ],
     "files.associations": {
         "*.dist": "properties",
         "*.crash": "properties",

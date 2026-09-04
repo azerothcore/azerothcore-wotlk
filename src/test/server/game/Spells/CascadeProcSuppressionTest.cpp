@@ -134,7 +134,7 @@ TEST_F(CascadeProcSuppressionTest, SpellInfo_WithMixedBits_HasAttributeReturnsTr
 
 struct RealSpellTestCase
 {
-    const char* name;
+    char const* name;
     uint32 spellId;
     bool hasAttr;  // Whether the spell has SPELL_ATTR3_INSTANT_TARGET_PROCS
 };

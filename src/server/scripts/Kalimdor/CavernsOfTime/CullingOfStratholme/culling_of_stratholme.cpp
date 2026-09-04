@@ -17,6 +17,7 @@
 
 #include "culling_of_stratholme.h"
 #include "CreatureScript.h"
+#include "GameObject.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -187,6 +188,10 @@ enum Misc
     // Brandon Eiredeck crowd
     NPC_BRANDON_EIREDECK                    = 31023,
     SAY_BRANDON_CROWD_AMBIENT               = 3,
+
+    // Patricia O'Reilly crowd
+    SAY_AGITATED_CITIZEN_AMBIENT           = 2,
+    SAY_AGITATED_RESIDENT_AMBIENT          = 0,
 };
 
 enum Events
@@ -405,6 +410,7 @@ public:
 
         void JustDied(Unit*) override
         {
+            summons.DespawnAll();
             RemoveEscortState(STATE_ESCORT_ESCORTING);
             if (pInstance)
                 pInstance->SetData(DATA_ARTHAS_REPOSITION, 2);
@@ -1373,6 +1379,42 @@ void npc_arthas::npc_arthasAI::SpawnTimeRift()
     timeRiftId++;
 }
 
+enum CrateCitizens
+{
+    // Citizens who react to their own crate being dispelled
+    NPC_SERGEANT_MORIGAN                = 27877,
+    NPC_JENA_ANDERSON                   = 27885,
+    NPC_MALCOLM_MOORE                   = 27891,
+    NPC_SCRUFFY                         = 27892,
+    NPC_ROGER_OWENS                     = 27903,
+    NPC_BARTLEBY_BATTSON                = 27907,
+
+    ACTION_CRATE_DISPELLED              = 1,
+};
+
+enum CrateIds
+{
+    CRATE_PERELLI                       = 0,
+    CRATE_OWENS,
+    CRATE_GOSLIN,
+    CRATE_MOORE,
+    CRATE_BATTSON,
+    MAX_CRATES,
+};
+
+Position const CratePos[MAX_CRATES] =
+{
+    {1570.92f, 669.933f, 102.309f, 0.0f},   // Silvio Perelli's stock, inspected by Sergeant Morigan
+    {1579.42f, 621.446f, 99.7329f, 0.0f},   // Roger Owens
+    {1629.68f, 731.367f, 112.847f, 0.0f},   // Martha Goslin's grain, borrowed by Jena Anderson
+    {1628.98f, 812.142f, 120.689f, 0.0f},   // Malcolm Moore's house
+    {1674.39f, 872.307f, 120.394f, 0.0f}    // Bartleby Battson's cart
+};
+
+// Nobody stands at Malcolm's house until his crate is opened - he and Scruffy walk in from the west
+Position const MalcolmMoorePos = {1604.988f, 805.8108f, 123.02908f, 5.284211f};
+Position const ScruffyPos = {1600.7809f, 805.67804f, 123.83765f, 5.471606f};
+
 class npc_crate_helper : public CreatureScript
 {
 public:
@@ -1394,13 +1436,57 @@ public:
                     instance->SetData(DATA_CRATE_COUNT, 0);
                 if (GameObject* crate = me->FindNearestGameObject(GO_SUSPICIOUS_CRATE, 5.0f))
                 {
-                    crate->SummonGameObject(GO_PLAGUED_CRATE, crate->GetPositionX(), crate->GetPositionY(), crate->GetPositionZ(), crate->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, DAY);
+                    // Carry over the sniffed rotation so the plagued crate sits exactly like the suspicious one it replaces
+                    G3D::Quat const& rotation = crate->GetWorldRotation();
+                    crate->SummonGameObject(GO_PLAGUED_CRATE, crate->GetPositionX(), crate->GetPositionY(), crate->GetPositionZ(), crate->GetOrientation(), rotation.x, rotation.y, rotation.z, rotation.w, DAY);
                     crate->Delete();
                 }
+
+                StartCrateRP();
             }
         }
 
     private:
+        // Every helper sits on its own crate, so its spawn position tells us which role-play to start
+        uint8 GetCrateId() const
+        {
+            for (uint8 i = 0; i < MAX_CRATES; ++i)
+                if (me->GetDistance(CratePos[i]) < 10.0f)
+                    return i;
+
+            return MAX_CRATES;
+        }
+
+        void StartCitizenRP(uint32 entry)
+        {
+            // Jena wanders the furthest from her crate while waiting, at roughly 30 yards
+            if (Creature* citizen = me->FindNearestCreature(entry, 40.0f))
+                citizen->AI()->DoAction(ACTION_CRATE_DISPELLED);
+        }
+
+        void StartCrateRP()
+        {
+            switch (GetCrateId())
+            {
+                case CRATE_PERELLI:
+                    StartCitizenRP(NPC_SERGEANT_MORIGAN);
+                    break;
+                case CRATE_OWENS:
+                    StartCitizenRP(NPC_ROGER_OWENS);
+                    break;
+                case CRATE_GOSLIN:
+                    StartCitizenRP(NPC_JENA_ANDERSON);
+                    break;
+                case CRATE_MOORE:
+                    me->SummonCreature(NPC_MALCOLM_MOORE, MalcolmMoorePos);
+                    me->SummonCreature(NPC_SCRUFFY, ScruffyPos);
+                    break;
+                case CRATE_BATTSON:
+                    StartCitizenRP(NPC_BARTLEBY_BATTSON);
+                    break;
+            }
+        }
+
         bool _marked;
     };
 
@@ -1426,7 +1512,7 @@ class npc_cos_chromie_start : public CreatureScript
 public:
     npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
 
-    bool OnQuestAccept(Player* /*player*/, Creature* creature, const Quest* quest) override
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
             if (InstanceScript* instance = creature->GetInstanceScript())
@@ -1484,7 +1570,7 @@ class npc_cos_chromie_middle : public CreatureScript
 public:
     npc_cos_chromie_middle() : CreatureScript("npc_cos_chromie_middle") { }
 
-    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest) override
+    bool OnQuestAccept(Player*, Creature* creature, Quest const* pQuest) override
     {
         if (pQuest->GetQuestId() == QUEST_A_ROYAL_ESCORT)
             if (InstanceScript* pInstance = creature->GetInstanceScript())
@@ -1541,6 +1627,10 @@ public:
 
             isBrandonCrowd = me->GetDistance(2267.86f, 1144.93f, 138.403f) < 10.0f;
             ambientTalkTimer = isBrandonCrowd ? urand(5000, 15000) : 0;
+
+            isPatriciaCrowd = (me->GetEntry() == NPC_CITY_MAN3 || me->GetEntry() == NPC_CITY_MAN4) && me->GetDistance(2372.0f, 1199.0f, 135.0f) < 20.0f;
+            talkTimer = isPatriciaCrowd ? urand(5000, 10000) : 0;
+            emoteTimer = isPatriciaCrowd ? urand(1000, 3000) : 0;
         }
 
         bool locked;
@@ -1552,6 +1642,9 @@ public:
         uint8 stephanieDialoguePhase;
         bool isBrandonCrowd;
         uint32 ambientTalkTimer;
+        bool isPatriciaCrowd;
+        uint32 talkTimer;
+        uint32 emoteTimer;
 
         void Reset() override
         {
@@ -1665,6 +1758,27 @@ public:
                     ambientTalkTimer -= diff;
 
                 return;
+            }
+
+            // Agitated crowd near Patricia - active as soon as instance is loaded
+            if (isPatriciaCrowd)
+            {
+                if (talkTimer <= diff)
+                {
+                    Talk(me->GetEntry() == NPC_CITY_MAN3 ? SAY_AGITATED_CITIZEN_AMBIENT : SAY_AGITATED_RESIDENT_AMBIENT);
+                    talkTimer = urand(8000, 15000);
+                }
+                else
+                    talkTimer -= diff;
+
+                if (emoteTimer <= diff)
+                {
+                    static uint32 const agitatedEmotes[] = { 1, 5, 6, 14, 15, 25, 273, 274, 396 };
+                    me->HandleEmoteCommand(agitatedEmotes[urand(0, 8)]);
+                    emoteTimer = urand(1500, 2500);
+                }
+                else
+                    emoteTimer -= diff;
             }
 
             if (allowTimer)

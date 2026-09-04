@@ -210,6 +210,36 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
         error_handler = True
         results["INSERT & DELETE safety usage check"] = "Failed"
 
+# Strip a trailing "-- ..." line comment while ignoring any "--" that appears
+# inside a single- or double-quoted string literal (e.g. descriptions).
+def strip_inline_comment(text: str) -> str:
+    in_single_quote = False
+    in_double_quote = False
+    index = 0
+    while index < len(text):
+        char = text[index]
+        # Skip backslash-escaped characters inside string literals (e.g. \')
+        if char == '\\' and (in_single_quote or in_double_quote):
+            index += 2
+            continue
+        if char == "'" and not in_double_quote:
+            in_single_quote = not in_single_quote
+        elif char == '"' and not in_single_quote:
+            in_double_quote = not in_double_quote
+        elif (char == '-' and index + 1 < len(text) and text[index + 1] == '-'
+              and not in_single_quote and not in_double_quote):
+            return text[:index].strip()
+        index += 1
+    return text.strip()
+
+# Count how many parentheses are still open on a line, ignoring any that appear
+# inside string literals. A positive result means a value tuple continues on the
+# following line(s).
+def open_paren_balance(text: str) -> int:
+    without_strings = re.sub(r"'(?:\\.|[^'])*'", "", text)
+    without_strings = re.sub(r'"(?:\\.|[^"])*"', "", without_strings)
+    return without_strings.count('(') - without_strings.count(')')
+
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
 
@@ -255,8 +285,8 @@ def semicolon_check(file: io, file_path: str) -> None:
         if not stripped_line and not inside_values_block:
             continue
 
-        # Remove inline comments after SQL
-        stripped_line = stripped_line.split('--', 1)[0].strip()
+        # Remove inline comments after SQL (ignoring "--" inside string literals)
+        stripped_line = strip_inline_comment(stripped_line)
 
         if stripped_line.upper().startswith("SET") and not stripped_line.endswith(";"):
             print(f"❌ Missing semicolon in {file_path} at line {line_number}")
@@ -266,10 +296,29 @@ def semicolon_check(file: io, file_path: str) -> None:
         if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]):
             query_open = True
 
-        # Detect start of multi-line VALUES block
-        if any(kw in stripped_line.upper() for kw in ["INSERT", "REPLACE"]) and "VALUES" in stripped_line.upper():
-            inside_values_block = True
+        # Detect start of a VALUES block
+        upper_line = stripped_line.upper()
+        if any(kw in upper_line for kw in ["INSERT", "REPLACE"]) and "VALUES" in upper_line:
             query_open = True  # Ensure query is marked open too
+            # Look at whatever follows the VALUES keyword on this same line
+            tail = stripped_line[upper_line.rfind("VALUES") + len("VALUES"):].strip()
+            if not tail or tail.endswith(','):
+                # Multi-line VALUES block: value rows follow on subsequent lines
+                inside_values_block = True
+            elif open_paren_balance(stripped_line) > 0:
+                # A value tuple is still open (row split across lines, or the line
+                # ends with '('); leave the statement open so the terminator is
+                # validated once the tuple closes on a following line.
+                pass
+            elif tail.endswith(';'):
+                # Complete single-line insert
+                query_open = False
+            else:
+                # Inline insert whose value tuple(s) are complete on this same line
+                # but the statement is not terminated with a semicolon
+                print(f"❌ Missing semicolon in {file_path} at line {line_number}")
+                check_failed = True
+                query_open = False
 
         if inside_values_block:
             if not stripped_line:

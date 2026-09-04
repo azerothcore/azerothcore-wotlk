@@ -146,6 +146,7 @@ public:
             { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     rbac::RBAC_PERM_COMMAND_RELOAD_REFERENCE_LOOT_TEMPLATE, Console::Yes },
             { "reserved_name",                 HandleReloadReservedNameCommand,               rbac::RBAC_PERM_COMMAND_RELOAD_RESERVED_NAME, Console::Yes },
             { "profanity_name",                HandleReloadProfanityNameCommand,              rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
+            { "chat_filter",                   HandleReloadChatFilterCommand,                 rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "reputation_reward_rate",        HandleReloadReputationRewardRateCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_REPUTATION_REWARD_RATE, Console::Yes },
             { "reputation_spillover_template", HandleReloadReputationRewardRateCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_SPILLOVER_TEMPLATE, Console::Yes },
             { "skill_discovery_template",      HandleReloadSkillDiscoveryTemplateCommand,     rbac::RBAC_PERM_COMMAND_RELOAD_SKILL_DISCOVERY_TEMPLATE, Console::Yes },
@@ -164,6 +165,7 @@ public:
             { "spell_proc",                    HandleReloadSpellProcsCommand,                 rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_PROC, Console::Yes },
             { "spell_scripts",                 HandleReloadSpellScriptsCommand,               rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "spell_target_position",         HandleReloadSpellTargetPositionCommand,        rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_TARGET_POSITION, Console::Yes },
+            { "spell_cone",                    HandleReloadSpellConeCommand,                  rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_TARGET_POSITION, Console::Yes },
             { "spell_threats",                 HandleReloadSpellThreatsCommand,               rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_THREATS, Console::Yes },
             { "spell_group_stack_rules",       HandleReloadSpellGroupStackRulesCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_GROUP_STACK_RULES, Console::Yes },
             { "player_loot_template",          HandleReloadLootTemplatesPlayerCommand,        rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
@@ -209,6 +211,7 @@ public:
         HandleReloadCommandCommand(handler);
         HandleReloadReservedNameCommand(handler);
         HandleReloadProfanityNameCommand(handler);
+        HandleReloadChatFilterCommand(handler);
         HandleReloadAcoreStringCommand(handler);
         HandleReloadGameTeleCommand(handler);
         HandleReloadCreatureMovementOverrideCommand(handler);
@@ -831,6 +834,14 @@ public:
         return true;
     }
 
+    static bool HandleReloadChatFilterCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading Chat Filter!");
+        sObjectMgr->LoadChatFilter();
+        handler->SendGlobalGMSysMessage("Chat Filter reloaded.");
+        return true;
+    }
+
     static bool HandleReloadReputationRewardRateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading `reputation_reward_rate` Table!" );
@@ -933,6 +944,14 @@ public:
         LOG_INFO("server.loading", "Reloading Spell target coordinates...");
         sSpellMgr->LoadSpellTargetPositions();
         handler->SendGlobalGMSysMessage("DB table `spell_target_position` (destination coordinates for spell targets) reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadSpellConeCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading Spell cone definitions...");
+        sSpellMgr->LoadSpellCones();
+        handler->SendGlobalGMSysMessage("DB table `spell_cone` reloaded.");
         return true;
     }
 

@@ -19,6 +19,7 @@
 #define _BATTLEGROUND_SPAM_PROTECT_H_
 
 #include "Define.h"
+#include "DBCEnums.h"
 
 class Player;
 class Battleground;
@@ -29,6 +30,7 @@ public:
     static BGSpamProtect* instance();
 
     bool CanAnnounce(Player* player, Battleground* bg, uint32 minLevel, uint32 queueTotal);
+    bool CanAnnounce(Battleground* bg, BattlegroundBracketId bracketId, uint32 minLevel, uint32 queueTotal);
 };
 
 #define sBGSpam BGSpamProtect::instance()

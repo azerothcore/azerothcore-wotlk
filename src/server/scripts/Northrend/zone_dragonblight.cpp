@@ -630,7 +630,7 @@ public:
                 if (TempSummon* summon = me->ToTempSummon())
                     if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(me->GetEntry());
+                            player->RewardPlayerAndGroupAtEvent(me->GetEntry(), player);
             }
         }
     };
@@ -712,6 +712,9 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
+        // dismounts the player once the gryphon leaves the areas whitelisted in conditions
+        VehicleAI::UpdateAI(diff);
+
         events.Update(diff);
         while (uint32 eventId = events.ExecuteEvent())
         {

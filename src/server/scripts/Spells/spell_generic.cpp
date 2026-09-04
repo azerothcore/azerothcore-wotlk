@@ -1483,6 +1483,33 @@ class spell_gen_clear_debuffs : public SpellScript
     }
 };
 
+enum ClearDemonicCircle
+{
+    SPELL_DEMONIC_CIRCLE_SUMMON = 48018
+};
+
+// 62037 - Clear Demonic Circle
+class spell_gen_clear_demonic_circle : public SpellScript
+{
+    PrepareSpellScript(spell_gen_clear_demonic_circle);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DEMONIC_CIRCLE_SUMMON });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            target->RemoveAurasDueToSpell(SPELL_DEMONIC_CIRCLE_SUMMON);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_clear_demonic_circle::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 enum CreateLanceSpells
 {
     SPELL_CREATE_LANCE_ALLIANCE = 63914,
@@ -2528,7 +2555,8 @@ class spell_gen_allow_cast_from_item_only : public SpellScript
 
 enum VehicleScaling
 {
-    SPELL_GEAR_SCALING      = 66668
+    SPELL_GEAR_SCALING        = 66668,
+    SPELL_GEAR_SCALING_ULDUAR = 65266,
 };
 
 // 65266, 65635, 65636, 66666, 66667, 66668 - Gear Scaling
@@ -2539,7 +2567,7 @@ class spell_gen_vehicle_scaling : public SpellScript
     SpellCastResult CheckSeat()
     {
         if (Vehicle* veh = GetCaster()->GetVehicle())
-            if (const VehicleSeatEntry* seatEntry = veh->GetSeatForPassenger(GetCaster()))
+            if (VehicleSeatEntry const* seatEntry = veh->GetSeatForPassenger(GetCaster()))
                 if (seatEntry->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
                     return SPELL_CAST_OK;
 
@@ -2563,13 +2591,22 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        Unit* caster = GetCaster();
+        Player* player = GetCaster()->ToPlayer();
+
         float factor;
         uint16 baseItemLevel;
 
         /// @todo Reserach coeffs for different vehicles
         switch (GetId())
         {
+            case SPELL_GEAR_SCALING_ULDUAR:
+            {
+                float totalILvl = player->GetTotalItemLevel();
+                float scaling = (totalILvl - 2500.0f) / 5.0f / 100.0f;
+                scaling = std::max(0.1f, scaling);
+                amount = static_cast<int32>(std::round((scaling - 1.0f) * 100.0f));
+                return;
+            }
             case SPELL_GEAR_SCALING:
                 factor = 1.0f;
                 baseItemLevel = 205;
@@ -2580,7 +2617,7 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
                 break;
         }
 
-        float avgILvl = caster->ToPlayer()->GetAverageItemLevel();
+        float avgILvl = player->GetAverageItemLevel();
         if (avgILvl < baseItemLevel)
             return;                     /// @todo Research possibility of scaling down
 
@@ -4476,7 +4513,7 @@ class spell_gen_whisper_gulch_yogg_saron_whisper : public AuraScript
     }
 };
 
-// 50630, 68576 - Eject All Passengers
+// 50630, 51254, 68576 - Eject All Passengers
 class spell_gen_eject_all_passengers : public SpellScript
 {
     PrepareSpellScript(spell_gen_eject_all_passengers);
@@ -4540,6 +4577,58 @@ class spell_gen_eject_passenger : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_gen_eject_passenger::EjectPassenger, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 50051 - Ethereal Pet Aura (Soultrader Beacon)
+// Triggers when the owner kills an opponent, applying spell 50050 (SPELL_OWNER_KILLED_INFORM) to notify the pet
+class spell_gen_ethereal_pet_aura : public AuraScript
+{
+    PrepareAuraScript(spell_gen_ethereal_pet_aura);
+
+    enum EtherealSoulTrader
+    {
+        NPC_ETHEREAL_SOUL_TRADER        = 27914,
+        SPELL_OWNER_KILLED_INFORM       = 50050,
+        SPELL_STEAL_ESSENCE_VISUAL      = 50101,
+    };
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* procTarget = eventInfo.GetProcTarget();
+        if (!procTarget)
+            return false;
+
+        // Only trigger on players killing creatures that are not grey mobs
+        int32 levelDiff = int32(GetTarget()->GetLevel()) - int32(procTarget->GetLevel());
+        return levelDiff <= 9;
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* procTarget = eventInfo.GetProcTarget();
+        if (!procTarget)
+            return;
+
+        // Get all Ethereal Soul-Trader minions owned by this player
+        std::list<Creature*> minionList;
+        GetUnitOwner()->GetAllMinionsByEntry(minionList, NPC_ETHEREAL_SOUL_TRADER);
+
+        for (Creature* minion : minionList)
+        {
+            // Cast the laser beam visual from the pet to the killed mob
+            minion->CastSpell(procTarget, SPELL_STEAL_ESSENCE_VISUAL);
+            // Notify the pet AI that a valid kill occurred (triggers the pet's SpellHit handler)
+            minion->CastSpell(minion, SPELL_OWNER_KILLED_INFORM, true);
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_gen_ethereal_pet_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_gen_ethereal_pet_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -5217,40 +5306,29 @@ class spell_gen_choking_vines : public AuraScript
     }
 };
 
- // 28865 - Consumption
+// 28865 - Consumption
+// 64208 - Consumption
 class spell_gen_consumption : public SpellScript
 {
     PrepareSpellScript(spell_gen_consumption);
 
-    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
-        Map* map = GetCaster()->GetMap();
-        if (!map)
-        {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsCreature())
             return;
-        }
-        int32 value = 0;
-        if (map->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL) // NAXX25 N
-        {
-            value = urand(4500, 4700);
-        }
-        else if (map->GetId() == 533) // NAXX10 N
-        {
-            value = urand(3000, 3200);
-        }
-        else if (map->GetId() == 532) // Karazhan
-        {
-            value = urand(1110, 1310);
-        }
-        if (value)
-        {
-            SetEffectValue(value);
-        }
+
+        int32 damage = 0;
+        if (SpellInfo const* createdBySpell = sSpellMgr->GetSpellInfo(caster->GetUInt32Value(UNIT_CREATED_BY_SPELL)))
+            damage = createdBySpell->Effects[EFFECT_1].CalcValue();
+
+        if (damage)
+            SetEffectValue(damage);
     }
 
     void Register() override
     {
-        OnEffectLaunchTarget += SpellEffectFn(spell_gen_consumption::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectLaunchTarget += SpellEffectFn(spell_gen_consumption::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -6100,6 +6178,33 @@ class spell_gen_filter_party_level_80 : public SpellScript
     }
 };
 
+// 28819 Submerge Visual
+class spell_gen_submerge_visual : public AuraScript
+{
+    PrepareAuraScript(spell_gen_submerge_visual);
+
+    bool Load() override
+    {
+        return GetUnitOwner()->IsCreature();
+    }
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_submerge_visual::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_submerge_visual::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -6157,6 +6262,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_burn_brutallus);
     RegisterSpellScript(spell_gen_cannibalize);
     RegisterSpellScript(spell_gen_clear_debuffs);
+    RegisterSpellScript(spell_gen_clear_demonic_circle);
     RegisterSpellScript(spell_gen_create_lance);
     RegisterSpellScript(spell_gen_netherbloom);
     RegisterSpellScript(spell_gen_nightmare_vine);
@@ -6236,6 +6342,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_whisper_gulch_yogg_saron_whisper);
     RegisterSpellScript(spell_gen_eject_all_passengers);
     RegisterSpellScript(spell_gen_eject_passenger);
+    RegisterSpellScript(spell_gen_ethereal_pet_aura);
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_contagion_of_rot);
     RegisterSpellScript(spell_gen_holiday_buff_food);
@@ -6287,4 +6394,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_mirrored_soul);
     RegisterSpellScript(spell_gen_black_bow_of_the_betrayer);
     RegisterSpellScript(spell_gen_filter_party_level_80);
+    RegisterSpellScript(spell_gen_submerge_visual);
 }

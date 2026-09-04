@@ -28,6 +28,11 @@
 #include "Util.h"
 #include <algorithm>
 
+enum PowerDisplayIds
+{
+    POWER_DISPLAY_PYRITE = 41
+};
+
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE),
     _accessoriesInstalled(false)
@@ -76,7 +81,14 @@ void Vehicle::Install()
     if (_me->IsCreature())
     {
         if (PowerDisplayEntry const* powerDisplay = sPowerDisplayStore.LookupEntry(_vehicleInfo->m_powerDisplayId))
+        {
             _me->setPowerType(Powers(powerDisplay->PowerType));
+
+            // Pyrite does not regenerate and is only refilled by scripted energizes,
+            // so the Salvaged Demolisher and its Mechanic Seat spawn with a full bar
+            if (_vehicleInfo->m_powerDisplayId == POWER_DISPLAY_PYRITE)
+                _me->SetPower(_me->getPowerType(), _me->GetMaxPower(_me->getPowerType()));
+        }
         else if (_me->IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY))
             _me->setPowerType(POWER_ENERGY);
     }
@@ -139,7 +151,9 @@ void Vehicle::Reset(bool evading /*= false*/)
     else
     {
         ApplyAllImmunities();
-        InstallAllAccessories(evading);
+        // Dead spawns waiting out a respawn timer must not seat live accessories; they are seated on revival.
+        if (_me->IsAlive())
+            InstallAllAccessories(evading);
         if (_usableSeatNum)
             _me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
     }
@@ -359,12 +373,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
             return false;
 
         if (!seat->second.IsEmpty())
-        {
-            if (Unit* passenger = ObjectAccessor::GetUnit(*GetBase(), seat->second.Passenger.Guid))
-                passenger->ExitVehicle();
-
-            seat->second.Passenger.Guid.Clear();
-        }
+            return false;
 
         ASSERT(seat->second.IsEmpty());
     }
@@ -506,8 +515,8 @@ void Vehicle::RemovePassenger(Unit* unit)
 
     seat->second.Passenger.Reset();
 
-    // RemoveCharmedBy() clears MOVEMENTFLAG_FLYING, so cache this before uncharm.
-    bool wasFlying = _me->IsFlying();
+    // RemoveCharmedBy() clears flying movement state, so cache this before uncharm.
+    bool canFly = _me->IsFlying() || _me->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || _me->HasAuraType(SPELL_AURA_FLY);
 
     if (_me->IsCreature() && unit->IsPlayer() && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
         _me->RemoveCharmedBy(unit);
@@ -524,7 +533,7 @@ void Vehicle::RemovePassenger(Unit* unit)
     }
 
     // only for flyable vehicles
-    if (wasFlying && !_me->GetInstanceId() && unit->IsPlayer() && !(unit->ToPlayer()->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT) && _me->GetEntry() != 30275 /*NPC_WILD_WYRM*/)
+    if (canFly && !_me->GetInstanceId() && unit->IsPlayer() && !(unit->ToPlayer()->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT) && _me->GetEntry() != 30275 /*NPC_WILD_WYRM*/)
         _me->CastSpell(unit, VEHICLE_SPELL_PARACHUTE, true);
 
     if (_me->IsCreature())

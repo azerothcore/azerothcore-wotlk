@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -37,8 +38,8 @@ public:
     {
         static ChatCommandTable poolCommandTable =
         {
-            { "info",    HandlePoolInfoCommand,    SEC_GAMEMASTER, Console::Yes },
-            { "lookup",  HandlePoolLookupCommand,  SEC_GAMEMASTER, Console::No  },
+            { "info",    HandlePoolInfoCommand,    rbac::RBAC_PERM_COMMAND_POOL_INFO,   Console::Yes },
+            { "lookup",  HandlePoolLookupCommand,  rbac::RBAC_PERM_COMMAND_POOL_LOOKUP, Console::No  },
         };
         static ChatCommandTable commandTable =
         {
@@ -53,9 +54,28 @@ private:
         return active ? "ACTIVE" : "inactive";
     }
 
+    // Spawn state lives on the pool's map: prefer the invoker's map, else the
+    // loaded base map. Returns nullptr when no matching map is loaded (state
+    // then displays as inactive).
+    static SpawnedPoolData const* GetPoolSpawns(ChatHandler* handler, PoolTemplateData const* tpl)
+    {
+        if (tpl->MapId == -1)
+            return nullptr;
+
+        if (Player* player = handler->GetPlayer())
+            if (player->GetMap()->GetId() == uint32(tpl->MapId))
+                return &player->GetMap()->GetPoolData();
+
+        if (Map* map = sMapMgr->FindMap(uint32(tpl->MapId), 0))
+            if (!map->Instanceable())
+                return &map->GetPoolData();
+
+        return nullptr;
+    }
+
     static void ListPoolMembers(ChatHandler* handler, char const* typeName,
         std::vector<PoolObject> const& explicitly,
-        std::vector<PoolObject> const& equal, bool isCreature)
+        std::vector<PoolObject> const& equal, bool isCreature, SpawnedPoolData const* spawns)
     {
         if (explicitly.empty() && equal.empty())
             return;
@@ -65,9 +85,9 @@ private:
 
         auto printMember = [&](PoolObject const& obj)
         {
-            bool spawned = isCreature
-                ? sPoolMgr->IsSpawnedObject<Creature>(obj.guid)
-                : sPoolMgr->IsSpawnedObject<GameObject>(obj.guid);
+            bool spawned = spawns && (isCreature
+                ? spawns->IsSpawnedObject<Creature>(obj.guid)
+                : spawns->IsSpawnedObject<GameObject>(obj.guid));
 
             std::string name = "Unknown";
             uint32 entry = 0;
@@ -78,7 +98,7 @@ private:
             {
                 if (CreatureData const* data = sObjectMgr->GetCreatureData(obj.guid))
                 {
-                    entry = data->id1;
+                    entry = data->id;
                     mapId = data->mapid;
                     x = data->posX;
                     y = data->posY;
@@ -121,7 +141,12 @@ private:
             return false;
         }
 
-        uint32 activeCount = sPoolMgr->GetSpawnedData().GetActiveObjectCount(poolId);
+        SpawnedPoolData const* spawns = GetPoolSpawns(handler, tpl);
+
+        uint32 activeCount = sPoolMgr->GetQuestSpawnedData().GetSpawnedObjects(poolId);
+        if (spawns)
+            activeCount += spawns->GetSpawnedObjects(poolId);
+
         handler->PSendSysMessage(LANG_POOL_INFO_HEADER, poolId,
             tpl->Description.empty() ? "(none)" : tpl->Description,
             tpl->MaxLimit, activeCount);
@@ -136,7 +161,7 @@ private:
         {
             if (!creGroup->IsEmpty())
                 ListPoolMembers(handler, "Creatures",
-                    creGroup->GetExplicitlyChanced(), creGroup->GetEqualChanced(), true);
+                    creGroup->GetExplicitlyChanced(), creGroup->GetEqualChanced(), true, spawns);
         }
 
         // GameObject members
@@ -144,7 +169,7 @@ private:
         {
             if (!goGroup->IsEmpty())
                 ListPoolMembers(handler, "GameObjects",
-                    goGroup->GetExplicitlyChanced(), goGroup->GetEqualChanced(), false);
+                    goGroup->GetExplicitlyChanced(), goGroup->GetEqualChanced(), false, spawns);
         }
 
         // Sub-pool members
@@ -159,7 +184,7 @@ private:
 
                 auto printSubPool = [&](PoolObject const& obj)
                 {
-                    bool active = sPoolMgr->GetSpawnedData().IsActiveObject<Pool>(obj.guid);
+                    bool active = spawns && spawns->IsSpawnedObject<Pool>(obj.guid);
                     PoolTemplateData const* subTpl = sPoolMgr->GetPoolTemplate(obj.guid);
                     std::string desc = subTpl ? subTpl->Description : "Unknown";
 
@@ -191,7 +216,7 @@ private:
             uint32 poolId = sPoolMgr->GetCreaturePoolId(spawnId);
             if (poolId)
             {
-                bool spawned = sPoolMgr->IsSpawnedObject<Creature>(spawnId);
+                bool spawned = target->GetMap()->GetPoolData().IsSpawnedObject<Creature>(spawnId);
                 handler->PSendSysMessage(LANG_POOL_LOOKUP_IN_POOL,
                     target->GetName(), spawnId, poolId, StatusTag(spawned));
                 handler->PSendSysMessage(LANG_POOL_LOOKUP_USE_INFO, poolId);
@@ -211,7 +236,7 @@ private:
             uint32 poolId = sPoolMgr->GetGameObjectPoolId(spawnId);
             if (poolId)
             {
-                bool spawned = sPoolMgr->IsSpawnedObject<GameObject>(spawnId);
+                bool spawned = goTarget->GetMap()->GetPoolData().IsSpawnedObject<GameObject>(spawnId);
                 handler->PSendSysMessage(LANG_POOL_LOOKUP_IN_POOL,
                     goTarget->GetName(), spawnId, poolId, StatusTag(spawned));
                 handler->PSendSysMessage(LANG_POOL_LOOKUP_USE_INFO, poolId);

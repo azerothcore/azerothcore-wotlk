@@ -76,18 +76,13 @@ public:
 
     struct boss_gluthAI : public BossAI
     {
-        explicit boss_gluthAI(Creature* c) : BossAI(c, BOSS_GLUTH), summons(me)
+        explicit boss_gluthAI(Creature* c) : BossAI(c, BOSS_GLUTH)
         {}
-
-        EventMap events;
-        SummonList summons;
 
         void Reset() override
         {
             BossAI::Reset();
             me->ApplySpellImmune(SPELL_INFECTED_WOUND, IMMUNITY_ID, SPELL_INFECTED_WOUND, true);
-            events.Reset();
-            summons.DespawnAll();
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -139,19 +134,9 @@ public:
                 instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
-        void JustDied(Unit*  killer) override
+        Player* SelectPlayerInRoom() const
         {
-            BossAI::JustDied(killer);
-            summons.DespawnAll();
-        }
-
-        bool SelectPlayerInRoom()
-        {
-            if (me->IsInCombat())
-                return false;
-
-            Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for (auto const& itr : pList)
+            for (auto const& itr : me->GetMap()->GetPlayers())
             {
                 Player* player = itr.GetSource();
                 if (!player || !player->IsAlive())
@@ -160,15 +145,28 @@ public:
                 if (player->GetPositionZ() > 300.0f || me->GetExactDist(player) > 50.0f)
                     continue;
 
-                AttackStart(player);
-                return true;
+                return player;
             }
-            return false;
+            return nullptr;
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictimWithGaze() && !SelectPlayerInRoom())
+            Player* player = SelectPlayerInRoom();
+
+            if (!player)
+            {
+                // prevents an issue where Gluth remains stuck in combat with a zombie chow
+                if (me->IsEngaged())
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+
+                return;
+            }
+
+            if (!UpdateVictimWithGaze())
+                AttackStart(player);
+
+            if (!me->GetVictim())
                 return;
 
             events.Update(diff);

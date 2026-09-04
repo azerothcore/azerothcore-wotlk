@@ -1,0 +1,92 @@
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
+--
+-- Host: localhost    Database: acore_world
+-- ------------------------------------------------------
+-- Server version	8.4.3
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `spawn_group`
+--
+
+DROP TABLE IF EXISTS `spawn_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `spawn_group` (
+  `groupId` int unsigned NOT NULL,
+  `spawnType` tinyint unsigned NOT NULL,
+  `spawnId` int unsigned NOT NULL,
+  PRIMARY KEY (`groupId`,`spawnType`,`spawnId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `spawn_group`
+--
+
+LOCK TABLES `spawn_group` WRITE;
+/*!40000 ALTER TABLE `spawn_group` DISABLE KEYS */;
+INSERT INTO `spawn_group` VALUES
+(1,0,153154),
+(1,0,153155),
+(1,0,153156),
+(1,0,153157),
+(1,0,300000),
+(100,0,52417),
+(100,0,52418),
+(100,0,52419),
+(100,0,52420),
+(100,0,52421),
+(100,0,52422),
+(100,0,52423),
+(100,0,52424),
+(100,0,52425),
+(100,0,52426),
+(101,0,52427),
+(101,0,52428),
+(101,0,52429),
+(101,0,52430),
+(101,0,52431),
+(101,0,52432),
+(101,0,52433),
+(101,0,52434),
+(101,0,52435),
+(102,0,52437),
+(102,0,52438),
+(102,0,52439),
+(102,0,52440),
+(102,0,52441),
+(102,0,52442),
+(102,0,52443),
+(102,0,52444),
+(102,0,52445),
+(102,0,52446),
+(103,0,52447),
+(103,0,52448),
+(103,0,52449),
+(103,0,52450),
+(103,0,52451),
+(103,0,52452),
+(103,0,52453),
+(103,0,52454),
+(103,0,52455);
+/*!40000 ALTER TABLE `spawn_group` ENABLE KEYS */;
+UNLOCK TABLES;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-06-01 22:40:35

@@ -18,6 +18,8 @@
 #include "InstanceMapScript.h"
 #include "scarletmonastery.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 enum AshbringerEventMisc
 {
@@ -39,15 +41,23 @@ enum AshbringerEventMisc
     GO_HIGH_INQUISITOR_DOOR        = 104600
 };
 
-enum AshbringerSpell
+enum AshbringerEventUnrelated
 {
-    //Highlord Mograine Spells
-    //Needs Fix: Increased the visual effect of spells on hit
-    SPELL_FORGIVENESS               = 28697,
+    //church
+    NPC_RABBIT = 721,
 
-    //High Inquisitor Fairbanks
-    //Needs Fix: Increased the visual effect of spells on hit
-    SPELL_TRANSFORM_GHOST           = 28443
+    //cemetery
+    NPC_INTERROGATOR_VISHAS = 3983,
+    NPC_RAT = 4075,
+    NPC_SCARLET_SENTRY = 4283,
+    NPC_SCARLET_SCRYER = 4293,
+    NPC_UNFETTERED_SPIRIT = 4308,
+    NPC_SCARLET_TORTURER = 4306,
+    NPC_ANGUISHED_DEAD = 6426,
+    NPC_HAUNTING_PHANTASM = 6427,
+    NPC_FALLON_CHAMPION = 6488,
+    NPC_BLOODMAGE_THALNOS = 4543,
+    NPC_SUFFERING_VICTIM = 6547,
 };
 
 enum DataTypes
@@ -66,7 +76,7 @@ enum DataTypes
     GAMEOBJECT_PUMPKIN_SHRINE     = 10
 };
 
-float const CATHEDRAL_PULL_RANGE = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
+float constexpr CATHEDRAL_PULL_RANGE = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
 
 class instance_scarlet_monastery : public InstanceMapScript
 {
@@ -105,28 +115,33 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_SCARLET_MYRIDON:
-                case NPC_SCARLET_DEFENDER:
-                case NPC_SCARLET_CENTURION:
-                case NPC_SCARLET_SORCERER:
-                case NPC_SCARLET_WIZARD:
-                case NPC_SCARLET_ABBOT:
-                case NPC_SCARLET_MONK:
-                case NPC_SCARLET_CHAMPION:
-                case NPC_SCARLET_CHAPLAIN:
-                case NPC_FAIRBANKS:
-                    _ashbringerNpcGUID.emplace(creature->GetGUID());
-                    break;
+                //church
+                case NPC_RABBIT:
+
+                //cemetery
+                case NPC_INTERROGATOR_VISHAS:
+                case NPC_RAT:
+                case NPC_SCARLET_SENTRY:
+                case NPC_SCARLET_SCRYER:
+                case NPC_UNFETTERED_SPIRIT:
+                case NPC_SCARLET_TORTURER:
+                case NPC_ANGUISHED_DEAD:
+                case NPC_HAUNTING_PHANTASM:
+                case NPC_FALLON_CHAMPION:
+                case NPC_BLOODMAGE_THALNOS:
+                case NPC_SUFFERING_VICTIM:
+                    return;
                 case NPC_COMMANDER_MOGRAINE:
                     _mograineGUID = creature->GetGUID();
-                    _ashbringerNpcGUID.emplace(creature->GetGUID());
                     break;
                 case NPC_INQUISITOR_WHITEMANE:
-                   _whitemaneGUID = creature->GetGUID();
+                    _whitemaneGUID = creature->GetGUID();
                     break;
                 default:
                     break;
             }
+
+            _ashbringerNpcGUID.emplace(creature->GetGUID());
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -271,7 +286,63 @@ public:
     };
 };
 
+enum AshbringerSpell
+{
+    SPELL_FORGIVENESS = 28697,
+    SPELL_FORGIVENESS_IMPACTKIT = 317,
+    SPELL_TRANSFORM_GHOST = 28443,
+    SPELL_TRANSFORM_IMPACTKIT=500
+};
+
+// SPELL_FORGIVENESS               = 28697
+class spell_forgiveness_dummy_visual : public SpellScript
+{
+    PrepareSpellScript(spell_forgiveness_dummy_visual);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        target->SendPlaySpellVisual(SPELL_FORGIVENESS_IMPACTKIT);//SPELL_FORGIVENESS IMPACTKIT 317 SpellVisualEntry.ImpactKit can't be used
+
+        //Delay death to prevent the death of the creature from interrupting the animation display
+        target->m_Events.AddEventAtOffset([target]() -> void
+            {
+                target->KillSelf();
+            }, 500ms);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_forgiveness_dummy_visual::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// SPELL_TRANSFORM_GHOST           = 28443
+class spell_transform_ghost_visual: public SpellScript
+{
+    PrepareSpellScript(spell_transform_ghost_visual);
+
+    void HandleAfterHit()
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        target->SendPlaySpellVisual(SPELL_TRANSFORM_IMPACTKIT); //SPELL_TRANSFORM_GHOST IMPACTKIT 500
+    }
+
+    void Register() override
+    {
+       AfterHit += SpellHitFn(spell_transform_ghost_visual::HandleAfterHit);
+    }
+};
+
 void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
+    RegisterSpellScript(spell_forgiveness_dummy_visual);
+    RegisterSpellScript(spell_transform_ghost_visual);
 }

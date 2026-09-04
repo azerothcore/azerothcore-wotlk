@@ -1103,6 +1103,49 @@ TEST_F(CombatManagerIntegrationTest, CanBeginCombat_ValidUnits_Succeeds)
     EXPECT_TRUE(CombatManager::CanBeginCombat(_creatureA, _creatureB));
 }
 
+// Asymmetric factions: A is hostile to the target, but the target's faction still considers A
+// friendly (e.g. Dragonblight Mage Hunters vs Moonrest Highborne). The aggressor's hostility must
+// win so combat can begin.
+TEST_F(CombatManagerIntegrationTest, CanBeginCombat_AsymmetricHostileVsFriendly_Succeeds)
+{
+    auto* factionC = new FactionTemplateEntry{};
+    factionC->ID = 90003;
+    factionC->faction = 90003;
+    factionC->factionFlags = 0;
+    factionC->ourMask = 2;       // A (hostileMask=2) is hostile to this group...
+    factionC->friendlyMask = 1;  // ...but this faction considers A's group (ourMask=1) friendly
+    factionC->hostileMask = 0;
+    for (auto& e : factionC->enemyFaction) e = 0;
+    for (auto& f : factionC->friendFaction) f = 0;
+    sFactionTemplateStore.SetEntry(90003, factionC);
+
+    _creatureB->SetFaction(90003);
+    ASSERT_TRUE(_creatureA->IsHostileTo(_creatureB));
+    ASSERT_TRUE(_creatureB->IsFriendlyTo(_creatureA));
+    EXPECT_TRUE(CombatManager::CanBeginCombat(_creatureA, _creatureB));
+}
+
+// One side friendly and neither side hostile: combat must still be blocked so neutral/friendly
+// bystanders are not dragged into combat.
+TEST_F(CombatManagerIntegrationTest, CanBeginCombat_FriendlyWithoutHostility_Fails)
+{
+    auto* factionD = new FactionTemplateEntry{};
+    factionD->ID = 90004;
+    factionD->faction = 90004;
+    factionD->factionFlags = 0;
+    factionD->ourMask = 4;       // A (hostileMask=2) is NOT hostile to this group...
+    factionD->friendlyMask = 1;  // ...and this faction considers A's group friendly
+    factionD->hostileMask = 0;
+    for (auto& e : factionD->enemyFaction) e = 0;
+    for (auto& f : factionD->friendFaction) f = 0;
+    sFactionTemplateStore.SetEntry(90004, factionD);
+
+    _creatureB->SetFaction(90004);
+    ASSERT_FALSE(_creatureA->IsHostileTo(_creatureB));
+    ASSERT_FALSE(_creatureB->IsHostileTo(_creatureA));
+    EXPECT_FALSE(CombatManager::CanBeginCombat(_creatureA, _creatureB));
+}
+
 // ============================================================================
 // GAP COVERAGE: CombatManager::IsInCombatWith (ObjectGuid variant)
 // ============================================================================

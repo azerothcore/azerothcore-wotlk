@@ -28,7 +28,6 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
-#include "RaceMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
@@ -216,12 +215,18 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
             return true;
+
+        if (!player->IsAlive())
+        {
+            wintergrasp->SendAreaSpiritHealerQueryOpcode(player, creature->GetGUID());
+            player->CastSpell(player, SPELL_WAITING_FOR_RESURRECT, true);
+        }
+
+        if (creature->IsQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
 
         GraveyardVect graveyard = wintergrasp->GetGraveyardVector();
         for (uint8 i = 0; i < graveyard.size(); i++)
@@ -824,7 +829,7 @@ public:
                 checkTimer = 0;
                 if (me->GetVehicleKit())
                     for (SeatMap::iterator itr = me->GetVehicleKit()->Seats.begin(); itr != me->GetVehicleKit()->Seats.end(); ++itr)
-                        if (const VehicleSeatEntry* seatInfo = itr->second.SeatInfo)
+                        if (VehicleSeatEntry const* seatInfo = itr->second.SeatInfo)
                             if (seatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
                                 if (Unit* passenger = ObjectAccessor::GetUnit(*me, itr->second.Passenger.Guid))
                                     if (!CanControlVehicle(passenger))
@@ -860,8 +865,12 @@ public:
 
         bool IsFriendly(Unit* passenger)
         {
-            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & sRaceMgr->GetHordeRaceMask()) ||
-                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & sRaceMgr->GetAllianceRaceMask()));
+            Player* player = passenger->ToPlayer();
+            if (!player)
+                return false;
+
+            TeamId goTeam = me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] ? TEAM_HORDE : TEAM_ALLIANCE;
+            return player->GetTeamId() == goTeam;
         }
 
         Creature* IsValidVehicle(Creature* cVeh)
@@ -1158,6 +1167,10 @@ public:
     {
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
+            return false;
+
+        // Attacker-only achievement -- defenders winning fast must not qualify.
+        if (!sBattlefieldMgr->IsWintergraspAttackerVictory())
             return false;
 
         return wintergrasp->GetTimer() >= (20 * MINUTE * IN_MILLISECONDS);

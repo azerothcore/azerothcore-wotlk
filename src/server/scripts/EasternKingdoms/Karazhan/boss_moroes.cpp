@@ -117,8 +117,9 @@ struct boss_moroes : public BossAI
     {
         BossAI::Reset();
         DoCastSelf(SPELL_DUAL_WIELD, true);
-        _recentlySpoken = false;
         _vanished = false;
+        me->SetImmuneToAll(false);
+        me->SetReactState(REACT_AGGRESSIVE);
 
         InitializeGuests();
 
@@ -142,9 +143,11 @@ struct boss_moroes : public BossAI
             Talk(SAY_SPECIAL);
             DoCastSelf(SPELL_VANISH);
             me->SetImmuneToAll(true, true);
+            me->SetReactState(REACT_PASSIVE);
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
                 me->SetImmuneToAll(false);
+                me->SetReactState(REACT_AGGRESSIVE);
                 DoCastSelf(SPELL_VANISH_TELEPORT);
                 _vanished = false;
             });
@@ -166,15 +169,7 @@ struct boss_moroes : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (!_recentlySpoken && victim->IsPlayer())
-        {
-            Talk(SAY_KILL);
-            _recentlySpoken = true;
-            scheduler.Schedule(5s, [this](TaskContext)
-            {
-                _recentlySpoken = false;
-            });
-        }
+        Talk(SAY_KILL, victim);
     }
 
     void JustDied(Unit* killer) override
@@ -239,7 +234,6 @@ struct boss_moroes : public BossAI
     private:
         EventMap _events2;
         uint8 _activeGuests;
-        bool _recentlySpoken;
         bool _vanished;
 };
 
