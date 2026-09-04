@@ -235,10 +235,10 @@ struct boss_hydross_the_unstable : public BossAI
 
         scheduler.Schedule(1s, [this](TaskContext context)
         {
-            if (me->HasAura(SPELL_BLUE_BEAM) == me->HasAura(SPELL_CORRUPTION))
-            {
-                SetForm(!me->HasAura(SPELL_BLUE_BEAM), false);
-            }
+            // The cleansing field determines the phase; its beam is only a visual.
+            bool const cleansed = me->HasAura(SPELL_CLEANSING_FIELD_AURA);
+            if (cleansed == me->HasAura(SPELL_CORRUPTION))
+                SetForm(!cleansed, false);
             context.Repeat(1s);
         }).Schedule(10min, [this](TaskContext)
         {
