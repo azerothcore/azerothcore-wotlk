@@ -157,6 +157,7 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
 | instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
+| instances/zulaman | Zul'jin has Shape of the Dragonhawk (42608) after the 20% transition, with Claw Rage (43149) and Lynx Rush (43152) gone | P1 | `gap` (no Go toolchain or AzerothGhost checkout locally; needs boss-AI drive to 20% + aura query) | — |
 
 ---
 
