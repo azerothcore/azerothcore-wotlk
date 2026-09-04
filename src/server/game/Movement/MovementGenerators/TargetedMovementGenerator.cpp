@@ -196,20 +196,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || isStoppedBecauseOfCasting)
     {
+        // Every time a caster mob stops to cast a spell, the leash timer ticks down. Once the timer expires, the mob evades and walks home.
         owner->StopMoving();
         _lastTargetPosition.reset();
+
         if (cOwner)
         {
-            if (isStoppedBecauseOfCasting)
-            {
-                // Don't reset leash timer if it's a spell like Shoot with a short cast time.
-                /// @todo: Research how it should actually work.
-                Spell *spell = cOwner->GetFirstCurrentCastingSpell();
-                bool spellHasLongCast = spell && spell->GetCastTime() > 1 * SECOND * IN_MILLISECONDS;
-                if (spellHasLongCast)
-                    cOwner->UpdateLeashExtensionTime();
-            }
-            else
+            if (!isStoppedBecauseOfCasting)
                 cOwner->UpdateLeashExtensionTime();
 
             cOwner->SetCannotReachTarget();
