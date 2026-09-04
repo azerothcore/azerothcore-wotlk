@@ -205,12 +205,14 @@ public:
 enum eTimeLost
 {
     NPC_TIME_LOST_PROTO_DRAKE = 32491,
-    NPC_VYRAGOSA = 32630,
+    NPC_VYRAGOSA              = 32630,
 
-    SPELL_TIME_SHIFT = 61084,
-    SPELL_TIME_LAPSE = 51020,
-    SPELL_FROST_BREATH = 47425,
-    SPELL_FROST_CLEAVE = 51857,
+    SPELL_TIME_SHIFT          = 61084,
+    SPELL_TIME_LAPSE          = 51020,
+    SPELL_FROST_BREATH        = 47425,
+    SPELL_FROST_CLEAVE        = 51857,
+
+    ACTION_TLPD_REVEAL        = 1
 };
 
 class npc_time_lost_proto_drake : public CreatureScript
@@ -227,18 +229,33 @@ public:
             scheduler.CancelAll();
         }
 
-        void InitializeAI() override
+        void JustRespawned() override
         {
-            ScriptedAI::InitializeAI();
+            Reset();
             me->SetAnimTier(AnimTier::Fly);
             me->setActive(true);
-            me->SetVisible(false);
-            me->SetImmuneToAll(true);
+            ArmHiddenState();
+        }
 
-            me->m_Events.AddEventAtOffset([&] {
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_TLPD_REVEAL)
+            {
                 me->SetVisible(true);
                 me->SetImmuneToAll(false);
-            }, Hours(urand(6, 22)));
+                me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
+            }
+        }
+
+        void ArmHiddenState()
+        {
+            me->SetVisible(false);
+            me->SetImmuneToAll(true);
+            me->GetMotionMaster()->MoveIdle();
+
+            me->m_Events.AddEventAtOffset([&] {
+                DoAction(ACTION_TLPD_REVEAL);
+            }, Seconds(urand(0, 60 * 60 * 16)));
         }
 
         void JustEngagedWith(Unit* who) override

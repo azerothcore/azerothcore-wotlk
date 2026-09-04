@@ -150,6 +150,7 @@ enum YoggSpells
     SPELL_LUNATIC_GAZE_YS               = 64163,
     SPELL_DEAFENING_ROAR                = 64189,
     SPELL_SHADOW_BEACON                 = 64465,
+    SPELL_DEATH_ANIMATION               = 64165,
 
     // IMMORTAL GUARDIAN
     SPELL_SIMPLE_TELEPORT               = 64195,
@@ -511,6 +512,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
         me->SetDisplayId(me->GetNativeDisplayId());
         me->SetDisableGravity(true);
         me->SetFaction(FACTION_FRIENDLY);
+        me->SetFullHealth();
         me->ClearUnitState(UNIT_STATE_EVADE);
         EnableSara(false);
 
@@ -775,10 +777,10 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (me->GetHealth() <= damage)
         {
             _secondPhase = true;
-            damage = 0;
+            // leave her at 1 health through the transformation dialogue, the client treats 0 health as dead
+            damage = me->GetHealth() - 1;
 
             events.SetPhase(EVENT_PHASE_TWO);
-            me->SetHealth(me->GetMaxHealth());
             me->SetInCombatWithZone();
             me->SetFaction(FACTION_MONSTER_2);
 
@@ -993,6 +995,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 }
             case EVENT_SARA_P2_SPAWN_START_TENTACLES:
                 {
+                    me->SetFullHealth();
                     me->SetOrientation(M_PI);
                     me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
@@ -1159,6 +1162,7 @@ struct boss_yoggsaron : public ScriptedAI
         _instance = me->GetInstanceScript();
         _thirdPhase = false;
         _usedInsane = false;
+        _defeated = false;
         summons.DespawnAll();
         events.Reset();
 
@@ -1182,6 +1186,7 @@ struct boss_yoggsaron : public ScriptedAI
     SummonList summons;
     bool _thirdPhase;
     bool _usedInsane;
+    bool _defeated;
 
     void AttackStart(Unit*) override { }
 
@@ -1193,6 +1198,32 @@ struct boss_yoggsaron : public ScriptedAI
         float o = rand_norm() * M_PI * 2;
         float Zplus = (dist - 38) / 6.5f;
         me->SummonCreature(NPC_IMMORTAL_GUARDIAN, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+    }
+
+    // Never dies from damage: once pushed below 1.5% health he is defeated.
+    // The remaining sliver is not dealt, the death animation plays and the
+    // server kills him half a second later.
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (_defeated)
+        {
+            damage = 0;
+            return;
+        }
+
+        if (damage >= me->GetHealth())
+            damage = me->GetHealth() - 1;
+
+        if (me->GetHealth() - damage >= CalculatePct(me->GetMaxHealth(), 1.5f))
+            return;
+
+        _defeated = true;
+        me->InterruptNonMeleeSpells(true);
+        DoCastSelf(SPELL_DEATH_ANIMATION, true);
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            me->KillSelf();
+        }, 500ms);
     }
 
     void JustDied(Unit*  /*who*/) override
@@ -1814,6 +1845,12 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
     {
         if (!apply)
             passenger->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, passenger));
+
+        // Prevent players from escaping the tentacle's grasp.
+        constexpr uint32 SPELL_BLINK = 1953;
+        constexpr uint32 SPELL_DEMONIC_CIRCLE_TELEPORT = 48020;
+        passenger->ApplySpellImmune(0, IMMUNITY_ID, SPELL_BLINK, apply);
+        passenger->ApplySpellImmune(0, IMMUNITY_ID, SPELL_DEMONIC_CIRCLE_TELEPORT, apply);
     }
 
     void JustDied(Unit*) override
@@ -2992,12 +3029,14 @@ class spell_yogg_saron_grim_reprisal_aura : public AuraScript
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
 
         if (!damageInfo || !damageInfo->GetDamage())
-        {
             return;
-        }
+
+        Unit* attacker = damageInfo->GetAttacker();
+        if (!attacker || attacker->IsTotem())
+            return;
 
         int32 damage = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), 60);
-        GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, damageInfo->GetAttacker(), true, nullptr, aurEff);
+        GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, attacker, true, nullptr, aurEff);
     }
 
     void Register() override

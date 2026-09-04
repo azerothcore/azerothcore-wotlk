@@ -997,6 +997,19 @@ struct boss_freya_iron_root : public NullCreatureAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        ReleaseRootedPlayer();
+    }
+
+    // The root aura is infinite and self-cast by the victim, so nothing engine-side
+    // removes it; a root despawned without being killed must free its victim too
+    void OnDespawn() override
+    {
+        ReleaseRootedPlayer();
+    }
+
+private:
+    void ReleaseRootedPlayer()
+    {
         if (!me->IsSummon())
             return;
 

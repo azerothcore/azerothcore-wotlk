@@ -1895,12 +1895,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
     });
 
-    // Hurl Pyrite
-    ApplySpellFix({ 62490 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = 0;
-    });
-
     // Meeting Stone Summon
     ApplySpellFix({ 23598 }, [](SpellInfo* spellInfo)
     {
@@ -2043,6 +2037,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 63050 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
+    });
+
+    // Shadow Nova (Sara)
+    ApplySpellFix({ 65719 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Cosmic Smash (Algalon the Observer)
