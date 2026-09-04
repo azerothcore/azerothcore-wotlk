@@ -3923,6 +3923,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].BasePoints = -25;
     });
 
+    // Reconstructed Wyrm - Frost Breath
+    ApplySpellFix({ 49342 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_MOD_DECREASE_SPEED;
+        spellInfo->Effects[EFFECT_2].BasePoints = -51;
+        spellInfo->Effects[EFFECT_2].Mechanic = MECHANIC_SNARE;
+    });
+
     // Eye of Kilrogg Passive (DND)
     ApplySpellFix({ 2585 }, [](SpellInfo* spellInfo)
     {
