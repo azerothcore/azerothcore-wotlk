@@ -828,7 +828,9 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
     Cell old_cell = creature->GetCurrentCell();
     Cell new_cell(x, y);
 
-    if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
+    bool const cellChanged = old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell);
+
+    if (cellChanged)
     {
         if (old_cell.DiffGrid(new_cell))
             EnsureGridLoaded(new_cell);
@@ -841,7 +843,29 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
     creature->Relocate(x, y, z, o);
     if (creature->IsVehicle())
         creature->GetVehicleKit()->RelocatePassengers();
-    creature->UpdatePositionData();
+
+    // Terrain status (zone / area / floor / liquid) is derived lazily: the getters recompute it on
+    // demand, the same as for GameObjects. GetFullTerrainStatusForPosition() is VMAP-heavy and used to
+    // run on every spline sub-step, so a wandering creature that nothing is querying now costs no
+    // raycast. Re-derive eagerly here only when the result must be exact immediately and nothing is
+    // guaranteed to read it:
+    //  - the creature changed grid cell;
+    //  - it is in combat or evading home (a mob chasing / returning through water must have the
+    //    correct swim state at once);
+    //  - it is zone-wide visible (world boss / event NPC) - ProcessPositionDataChanged() moves it
+    //    between zone visibility maps only on a real derive, so throttling could hide it from players
+    //    after it crosses a zone border.
+    // For a plain wandering creature, Creature::Update() keeps the swim / fly / hover flags in step
+    // with the terrain it moves over.
+    if (cellChanged || creature->IsInCombat() || creature->IsInEvadeMode() || creature->IsZoneWideVisible())
+    {
+        creature->UpdatePositionData();
+    }
+    else
+    {
+        creature->SetPositionDataUpdate();
+    }
+
     creature->UpdateObjectVisibility(false);
 }
 

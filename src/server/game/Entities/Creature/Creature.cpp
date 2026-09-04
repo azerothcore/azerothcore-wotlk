@@ -57,6 +57,11 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+// How far (yards, squared) a wandering creature may travel between refreshes of its swim / fly / hover
+// movement flags. Combat / cell-change / zone-wide-visible creatures refresh immediately in
+// Map::CreatureRelocation() and never use this.
+constexpr float CREATURE_MOVEMENT_FLAGS_REFRESH_DIST_SQ = 2.0f * 2.0f;
+
 CreatureMovementData::CreatureMovementData() : Ground(CreatureGroundMovementType::Run), Flight(CreatureFlightMovementType::None),
                                                Swim(true), Rooted(false), Chase(CreatureChaseMovementType::Run),
                                                Random(CreatureRandomMovementType::Walk), InteractionPauseTimer(sWorld->getIntConfig(CONFIG_CREATURE_STOP_FOR_PLAYER)) {}
@@ -508,6 +513,7 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data)
 
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
+    m_cachedScriptIdEntry = 0;                              // force GetScriptId() to re-resolve for this (re)init
 
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
@@ -774,6 +780,17 @@ void Creature::Update(uint32 diff)
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
             if (!IsAlive())
                 break;
+
+            // Swim / fly / hover flags are only refreshed inside UpdatePositionData(), which
+            // Map::CreatureRelocation() throttles for a plain wandering creature. Drive them here: as
+            // soon as it comes to rest, or once it has moved far enough that its liquid / floor state
+            // could have changed. (Creatures in combat, changing grid cell, or zone-wide visible
+            // re-derive immediately in CreatureRelocation and never reach this.)
+            if (IsPositionDataUpdatePending() &&
+                (!isMoving() || GetExactDistSq(m_lastMovementFlagsPos) >= CREATURE_MOVEMENT_FLAGS_REFRESH_DIST_SQ))
+            {
+                UpdatePositionData(); // -> ProcessTerrainStatusUpdate() -> UpdateMovementFlags() re-baselines m_lastMovementFlagsPos
+            }
 
             GetThreatMgr().Update(diff);
 
@@ -3186,14 +3203,25 @@ std::string Creature::GetScriptName() const
 
 uint32 Creature::GetScriptId() const
 {
-    if (CreatureData const* creatureData = GetCreatureData())
-    {
-        uint32 scriptId = creatureData->ScriptId;
-        if (scriptId && GetEntry() == creatureData->id)
-            return scriptId;
-    }
+    uint32 const entry = GetEntry();
 
-    return sObjectMgr->GetCreatureTemplate(GetEntry())->ScriptID;
+    // Cache the resolved id per entry. Re-resolve whenever the entry changes - InitEntry(),
+    // UpdateEntry(), or a bare SetEntry() done by transform / entry-swap scripts.
+    if (entry && m_cachedScriptIdEntry == entry)
+        return m_cachedScriptId;
+
+    uint32 scriptId = 0;
+    if (CreatureData const* creatureData = GetCreatureData())
+        if (creatureData->ScriptId && entry == creatureData->id)
+            scriptId = creatureData->ScriptId;
+
+    if (!scriptId)
+        if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry))
+            scriptId = cInfo->ScriptID;
+
+    m_cachedScriptId = scriptId;
+    m_cachedScriptIdEntry = entry;
+    return scriptId;
 }
 
 VendorItemData const* Creature::GetVendorItems() const
@@ -3446,6 +3474,10 @@ float Creature::GetAggroRange(Unit const* target) const
 
 void Creature::UpdateMovementFlags()
 {
+    // Track where the flags were last evaluated - Creature::Update() uses this as the throttle
+    // baseline for a wandering creature (see Map::CreatureRelocation).
+    m_lastMovementFlagsPos.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
+
     // Do not update movement flags if creature is controlled by a player (charm/vehicle)
     if (m_movedByPlayer)
         return;
