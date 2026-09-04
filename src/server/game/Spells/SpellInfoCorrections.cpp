@@ -63,6 +63,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_SPELL_ATTACK;
     });
 
+    // Cleansing Field
+    ApplySpellFix({ 37934 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_25_YARDS);
+    });
+
     // Has Brewfest Mug
     ApplySpellFix({ 42533 }, [](SpellInfo* spellInfo)
     {
