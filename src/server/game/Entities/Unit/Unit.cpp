@@ -12561,6 +12561,9 @@ void Unit::RemoveFromWorld()
     if (IsInWorld())
     {
         m_duringRemoveFromWorld = true;
+        if (IsAIEnabled)
+            GetAI()->OnDespawn();
+
         if (IsVehicle())
             RemoveVehicleKit();
 
@@ -14363,14 +14366,10 @@ void Unit::SetControlled(bool apply, UnitState state, Unit* source /*= nullptr*/
                 SetStunned(false);
                 break;
             case UNIT_STATE_ROOT:
-                // Prevent creature_template_movement rooted flag from being removed on aura expiration.
+                // Prevent the DB rooted flag from being removed on aura expiration.
                 if (IsCreature())
-                {
-                    if (ToCreature()->GetCreatureTemplate()->Movement.Rooted)
-                    {
+                    if (ToCreature()->GetMovementTemplate().IsRooted())
                         return;
-                    }
-                }
 
                 if (HasRootAura() || GetVehicle())
                     return;
@@ -15831,8 +15830,11 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         KnockbackFrom(pos.GetPositionX(), pos.GetPositionY(), 10.0f, 20.0f);
     }
 
-    // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest
-    if (IsCreature() && !CanFly() && vehicleInfo && (vehicleInfo->m_ID == 113 || vehicleInfo->m_ID == 8 || vehicleInfo->m_ID == 290 || vehicleInfo->m_ID == 298))
+    // xinef: move fall for air-exit quest vehicles:
+    // Quest Drag and Drop, Air Assault, and Shoot 'em Up.
+    if (IsCreature() && !CanFly() && vehicleInfo &&
+        (vehicleInfo->m_ID == 8 || vehicleInfo->m_ID == 113 || vehicleInfo->m_ID == 228 ||
+         vehicleInfo->m_ID == 290 || vehicleInfo->m_ID == 298))
     {
         GetMotionMaster()->MoveFall();
     }
