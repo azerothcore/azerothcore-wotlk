@@ -542,9 +542,23 @@ public:
                 me->SetFaction(me->ToTempSummon()->GetSummonerUnit()->GetFaction());
         }
 
+        bool CanAIAttack(Unit const* who) const override
+        {
+            switch (who->GetEntry())
+            {
+                case NPC_INFINITE_ASSAILANT:
+                case NPC_INFINITE_CHRONO_MAGUS:
+                case NPC_INFINITE_DESTROYER:
+                case NPC_INFINITE_TIMERENDER:
+                    return !who->IsFlying();
+                default:
+                    return false;
+            }
+        }
+
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->GetVictim() && !who->IsFlying() && who->GetEntry() >= NPC_INFINITE_ASSAILANT && who->GetEntry() <= NPC_INFINITE_TIMERENDER)
+            if (!me->GetVictim() && CanAIAttack(who))
                 AttackStart(who);
         }
 
