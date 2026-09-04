@@ -68,6 +68,9 @@ void BattlegroundEY::PostUpdateImpl(uint32 diff)
                         AddPoints(TEAM_ALLIANCE, BG_EY_TickPoints[_ownedPointsCount[TEAM_ALLIANCE] - 1]);
                     if (_ownedPointsCount[TEAM_HORDE] > 0)
                         AddPoints(TEAM_HORDE, BG_EY_TickPoints[_ownedPointsCount[TEAM_HORDE] - 1]);
+                    CheckVictory();
+                    if (GetStatus() != STATUS_IN_PROGRESS)
+                        return;
                     _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, BG_EY_FPOINTS_TICK_TIME - (GameTime::GetGameTimeMS() % BG_EY_FPOINTS_TICK_TIME));
                     break;
                 case BG_EY_EVENT_FLAG_ON_GROUND:
@@ -121,8 +124,19 @@ void BattlegroundEY::AddPoints(TeamId teamId, uint32 points)
         RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
 
     UpdateWorldState(teamId == TEAM_ALLIANCE ? WORLD_STATE_BATTLEGROUND_EY_ALLIANCE_RESOURCES : WORLD_STATE_BATTLEGROUND_EY_HORDE_RESOURCES, std::min<uint32>(m_TeamScores[teamId], _configurableMaxTeamScore));
-    if (m_TeamScores[teamId] >= static_cast<int32>(_configurableMaxTeamScore))
-        EndBattleground(teamId);
+}
+
+void BattlegroundEY::CheckVictory()
+{
+    if (GetStatus() != STATUS_IN_PROGRESS)
+        return;
+
+    bool const allianceWon = GetTeamScore(TEAM_ALLIANCE) >= _configurableMaxTeamScore;
+    bool const hordeWon = GetTeamScore(TEAM_HORDE) >= _configurableMaxTeamScore;
+    if (allianceWon && hordeWon)
+        EndBattleground(TEAM_NEUTRAL);
+    else if (allianceWon || hordeWon)
+        EndBattleground(allianceWon ? TEAM_ALLIANCE : TEAM_HORDE);
 }
 
 void BattlegroundEY::UpdatePointsState()
@@ -556,6 +570,7 @@ void BattlegroundEY::EventPlayerCapturedFlag(Player* player, uint32 BgObjectType
     UpdatePlayerScore(player, SCORE_FLAG_CAPTURES, 1);
     if (_ownedPointsCount[player->GetTeamId()] > 0)
         AddPoints(player->GetTeamId(), BG_EY_FlagPoints[_ownedPointsCount[player->GetTeamId()] - 1]);
+    CheckVictory();
 }
 
 bool BattlegroundEY::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
