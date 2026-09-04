@@ -74,12 +74,36 @@ void BattlegroundIC::DoAction(uint32 action, ObjectGuid guid)
         return;
 
     MotionTransport* transport = player->GetTeamId() == TEAM_ALLIANCE ? gunshipAlliance : gunshipHorde;
-    float x = BG_IC_HangarTrigger[player->GetTeamId()].GetPositionX();
-    float y = BG_IC_HangarTrigger[player->GetTeamId()].GetPositionY();
-    float z = BG_IC_HangarTrigger[player->GetTeamId()].GetPositionZ();
-    transport->CalculatePassengerPosition(x, y, z);
+    Position const& localPosition = BG_IC_HangarTeleport[player->GetTeamId()];
+    float x, y, z, orientation;
+    localPosition.GetPosition(x, y, z, orientation);
+    transport->CalculatePassengerPosition(x, y, z, &orientation);
 
-    player->TeleportTo(GetMapId(), x, y, z, player->GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT);
+    Transport* previousTransport = player->GetTransport();
+    auto const previousTransportInfo = player->m_movementInfo.transport;
+    if (previousTransport)
+        previousTransport->RemovePassenger(player);
+
+    // The teleport packet must include the ship and local coordinates, so the client
+    // keeps moving with the ship while acknowledging the teleport.
+    player->SetTransport(transport);
+    player->m_movementInfo.transport.Reset();
+    player->m_movementInfo.transport.guid = transport->GetGUID();
+    player->m_movementInfo.transport.pos = localPosition;
+    player->m_movementInfo.transport.time = transport->GetPathProgress();
+    player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    transport->AddPassenger(player);
+
+    if (!player->TeleportTo(GetMapId(), x, y, z, orientation, TELE_TO_NOT_LEAVE_TRANSPORT))
+    {
+        transport->RemovePassenger(player);
+        player->SetTransport(previousTransport);
+        player->m_movementInfo.transport = previousTransportInfo;
+        if (previousTransport)
+            previousTransport->AddPassenger(player);
+        else
+            player->RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    }
 }
 
 void BattlegroundIC::HandlePlayerResurrect(Player* player)

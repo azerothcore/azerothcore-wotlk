@@ -400,7 +400,7 @@ class spell_ioc_gunship_portal : public SpellScript
         Player* caster = GetCaster()->ToPlayer();
         if (!caster->IsBeingTeleported())
             if (Battleground* bg = caster->GetBattleground())
-                bg->DoAction(2 /**/, caster->GetGUID());
+                bg->DoAction(ACTION_TELEPORT_PLAYER_TO_TRANSPORT, caster->GetGUID());
     }
 
     void Register() override
