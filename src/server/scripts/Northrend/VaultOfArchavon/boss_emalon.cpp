@@ -194,7 +194,13 @@ public:
                     Talk(EMOTE_BERSERK);
                     break;
                 case EVENT_SUMMON_NEXT_MINION:
-                    me->SummonCreature(NPC_TEMPEST_MINION, TempestMinions[urand(0, 3)], TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    if (Creature* minion = me->SummonCreature(NPC_TEMPEST_MINION,
+                        me->GetNearPosition(frand(5.0f, 10.0f), frand(0.0f, 2.0f * float(M_PI))),
+                        TEMPSUMMON_CORPSE_DESPAWN, 0))
+                    {
+                        DoZoneInCombat(minion);
+                        Talk(EMOTE_MINION_RESPAWN);
+                    }
                     break;
                 default:
                     break;
