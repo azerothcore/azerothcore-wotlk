@@ -108,8 +108,8 @@ public:
             InstanceScript::OnGameObjectCreate(go);
             switch (go->GetEntry())
             {
-                case 188192:
-                case 187892:
+                case GO_ICE_CHEST:
+                case GO_ICE_CHEST_2:
                     go->SetLootRecipient(instance);
                     break;
                 default:
