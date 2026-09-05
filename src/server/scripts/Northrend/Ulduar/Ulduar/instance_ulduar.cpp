@@ -797,6 +797,12 @@ public:
                     if (GetBossState(BOSS_LEVIATHAN) >= DONE)
                         gameObject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     break;
+                case GO_ULDUAR_PROTECTIVE_BUBBLE:
+                    if (GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) == MAGE_BARRIER_LOWERED
+                        || GetPersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE) != 0
+                        || IsBossDone(BOSS_LEVIATHAN))
+                        gameObject->DespawnOrUnsummon(0ms, 7_days);
+                    break;
                 case GO_KOLOGARN_BRIDGE:
                     OpenIfDone(BOSS_KOLOGARN, gameObject, GO_STATE_READY);
                     break;
