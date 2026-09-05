@@ -1253,7 +1253,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         if (!victim->IsPlayer())
         {
-            /// @fix: Hack to avoid premature leashing
+            // DoT ticks and passive damage (e.g. Thorns) do not reset leash timer
             if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
                 victim->ToCreature()->UpdateLeashExtensionTime();
 
@@ -11462,6 +11462,12 @@ void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
 {
     if (!target->IsEngaged() && !canInitialAggro)
         return;
+
+    if (Creature* cTarget = target->ToCreature())
+    {
+        if (!cTarget->GetOwnerGUID().IsPlayer())
+            cTarget->UpdateLeashExtensionTime();
+    }
 
     target->EngageWithTarget(this);
     if (Unit* targetOwner = target->GetCharmerOrOwner())
