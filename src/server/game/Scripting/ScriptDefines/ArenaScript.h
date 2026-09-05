@@ -62,8 +62,11 @@ public:
     [[nodiscard]] virtual bool CanSaveArenaStatsForMember(ArenaTeam* /*team*/, ObjectGuid /*playerGuid*/) { return true; }
 
     // Called with the fully built member right before it is added to the team and written to
-    // arena_team_member. Whatever the hook leaves on the struct, rating and counters alike, is what
-    // the team holds and what is stored. Cannot veto the join, CanAddMember does that.
+    // arena_team_member. The personal rating and the week/season counters left on the struct are
+    // what the team holds and what is stored. MatchMakerRating and MaxMMR are held in memory but
+    // not written here, only by the next ArenaTeam::SaveToDB; Guid, Name and Class are identity,
+    // and changing them desyncs the member from its row and the character cache.
+    // Cannot veto the join, CanAddMember does that.
     virtual void OnAddMember(ArenaTeam* /*team*/, ArenaTeamMember& /*member*/) { }
 };
 

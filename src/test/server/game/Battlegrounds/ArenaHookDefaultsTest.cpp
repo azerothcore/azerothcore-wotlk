@@ -99,7 +99,7 @@ TEST_F(ArenaHookDefaultsTest, OnAddMemberLeavesMemberUntouched)
 {
     ArenaTeam team;
 
-    ArenaTeamMember member;
+    ArenaTeamMember member{};
     member.PersonalRating = 1000;
     member.WeekGames      = 6;
     member.WeekWins       = 3;
