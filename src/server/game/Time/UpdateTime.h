@@ -21,6 +21,7 @@
 #include "Define.h"
 #include "Duration.h"
 #include <array>
+#include <string>
 
 constexpr auto AVG_DIFF_COUNT = 500;
 

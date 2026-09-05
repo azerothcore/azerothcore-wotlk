@@ -44,7 +44,7 @@ public:
     // Identity
     virtual bool IsPlayer() const { return _isPlayer; }
     virtual bool IsAlive() const { return _isAlive; }
-    virtual bool IsFriendlyTo(UnitStub const* unit) const { return _isFriendly; }
+    virtual bool IsFriendlyTo(UnitStub const*) const { return _isFriendly; }
 
     void SetIsPlayer(bool isPlayer) { _isPlayer = isPlayer; }
     void SetIsAlive(bool isAlive) { _isAlive = isAlive; }
