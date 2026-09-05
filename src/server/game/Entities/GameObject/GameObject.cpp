@@ -1383,10 +1383,8 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
 
     // found correct GO
     // xinef: we should use the trap (checks for despawn type)
-    if (GameObject* trapGO = GetLinkedTrap())
-    {
+    if (GameObject* trapGO = GetLinkedTrap(); trapGO && trapGO->getLootState() == GO_READY)
         trapGO->Use(target); // trapGO->CastSpell(target, trapInfo->trap.spellId);
-    }
 }
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
