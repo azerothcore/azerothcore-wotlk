@@ -3094,6 +3094,8 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
         if (pLastItem->IsBOPTradable())
             AddTradeableItem(pLastItem);
     }
+
+    sScriptMgr->OnPlayerAfterMoveItemToInventory(this, pLastItem, update);
 }
 
 void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
