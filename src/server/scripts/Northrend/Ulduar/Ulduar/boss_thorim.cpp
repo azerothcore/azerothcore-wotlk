@@ -150,6 +150,8 @@ enum ThormNPCandGOs : uint32
     NPC_ANCIENT_RUNE_GIANT                  = 32873,
     NPC_DARK_RUNE_ACOLYTE_G                 = 33110,
     NPC_IRON_HONOR_GUARD                    = 32875,
+    NPC_GOLEM_RIGHT_HAND_BUNNY              = 33140,
+    NPC_GOLEM_LEFT_HAND_BUNNY               = 33141,
 
     // TRIGGERS
     NPC_LIGHTNING_ORB                       = 33138,
@@ -563,6 +565,11 @@ struct boss_thorim : public BossAI
                 me->RemoveAllAuras();
                 events.Reset();
                 DisableThorim(true);
+
+                // Sif is zone-combatted at summon and never evades: end her combat with Thorim's so
+                // the raid drops combat at the defeat instead of at her later despawn
+                if (Creature* sif = me->FindNearestCreature(NPC_SIF, 250.0f))
+                    sif->CombatStop(true);
 
                 Talk(SAY_DEATH);
 
@@ -1360,6 +1367,17 @@ struct boss_thorim_runic_colossus : public ScriptedAI
         float _nextTriggerPos;
         ObjectGuid _triggerLeftGUID[2], _triggerRightGUID[2];
 
+        // Sweep by entry so it also catches orphans left by a previous colossus that
+        // despawned without dying (wipe path) - their combat refs keep players in combat.
+        void DespawnSmashTriggers()
+        {
+            std::list<Creature*> triggers;
+            me->GetCreatureListWithEntryInGrid(triggers, { NPC_GOLEM_RIGHT_HAND_BUNNY,
+                NPC_GOLEM_LEFT_HAND_BUNNY }, 200.0f);
+            for (Creature* trigger : triggers)
+                trigger->DespawnOrUnsummon();
+        }
+
         void Reset() override
         {
             _nextTriggerPos = 0.0f;
@@ -1367,16 +1385,18 @@ struct boss_thorim_runic_colossus : public ScriptedAI
             _checkTarget = false;
             events.Reset();
             events.ScheduleEvent(EVENT_RC_RUNIC_SMASH, 0ms);
+
+            DespawnSmashTriggers();
             Creature* c;
 
-            if ((c = me->SummonCreature(33140, 2221, -385, me->GetPositionZ())))
+            if ((c = me->SummonCreature(NPC_GOLEM_RIGHT_HAND_BUNNY, 2221, -385, me->GetPositionZ())))
                 _triggerRightGUID[0] = c->GetGUID();
-            if ((c = me->SummonCreature(33140, 2210, -385, me->GetPositionZ())))
+            if ((c = me->SummonCreature(NPC_GOLEM_RIGHT_HAND_BUNNY, 2210, -385, me->GetPositionZ())))
                 _triggerRightGUID[1] = c->GetGUID();
 
-            if ((c = me->SummonCreature(33141, 2235, -385, me->GetPositionZ())))
+            if ((c = me->SummonCreature(NPC_GOLEM_LEFT_HAND_BUNNY, 2235, -385, me->GetPositionZ())))
                 _triggerLeftGUID[0] = c->GetGUID();
-            if ((c = me->SummonCreature(33141, 2246, -385, me->GetPositionZ())))
+            if ((c = me->SummonCreature(NPC_GOLEM_LEFT_HAND_BUNNY, 2246, -385, me->GetPositionZ())))
                 _triggerLeftGUID[1] = c->GetGUID();
         }
 
@@ -1394,6 +1414,9 @@ struct boss_thorim_runic_colossus : public ScriptedAI
             // The Ancient Rune Giant stays immune to players until the colossus falls
             if (Creature* giant = me->FindNearestCreature(NPC_ANCIENT_RUNE_GIANT, 200.0f))
                 giant->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+
+            // The bunnies never evade, so anyone hit by Runic Smash would stay in combat forever
+            DespawnSmashTriggers();
         }
 
         void JustEngagedWith(Unit*) override
