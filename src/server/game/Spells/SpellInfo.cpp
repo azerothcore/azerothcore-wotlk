@@ -1317,6 +1317,13 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
     return AttributesEx2 & SPELL_ATTR2_AUTO_REPEAT;
 }
 
+bool SpellInfo::IsWandAutoAttack() const
+{
+    return EquippedItemClass == ITEM_CLASS_WEAPON &&
+        (EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND)) &&
+        IsAutoRepeatRangedSpell();
+}
+
 bool SpellInfo::HasInitialAggro() const
 {
     return !(HasAttribute(SPELL_ATTR1_NO_THREAT) || HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
