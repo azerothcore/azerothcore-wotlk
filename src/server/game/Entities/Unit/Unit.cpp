@@ -4612,6 +4612,18 @@ bool Unit::IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType aur
                 for (int32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     diff += int32((auraEffectMask & (1 << i)) >> i) - int32((existingAurEff->GetBase()->GetEffectMask() & (1 << i)) >> i);
 
+            if (!diff && spellInfo->GetFirstRankSpell()->Id != existingAurEff->GetSpellInfo()->GetFirstRankSpell()->Id)
+            {
+                int32 newDuration = spellInfo->GetMaxDuration();
+                int32 existingDuration = existingAurEff->GetBase()->GetMaxDuration();
+                if (newDuration == -1 && existingDuration != -1)
+                    diff = 1;
+                else if (newDuration != -1 && existingDuration == -1)
+                    diff = -1;
+                else
+                    diff = newDuration - existingDuration;
+            }
+
             if (diff > 0)
             {
                 Aura const* base = existingAurEff->GetBase();
