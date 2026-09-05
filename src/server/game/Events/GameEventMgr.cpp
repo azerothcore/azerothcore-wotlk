@@ -1879,16 +1879,48 @@ public:
 
     void Visit(std::unordered_map<ObjectGuid, Creature*>& creatureMap)
     {
+        // Snapshot the pointers before dispatching anything.
+        //
+        // sOnGameEvent() runs arbitrary SmartAI actions for whichever creature
+        // the callback lands on. An action such as a same-map
+        // SMART_ACTION_SUMMON_CREATURE reaches Creature::AddToWorld(), which
+        // does GetMap()->GetObjectsStore().Insert<Creature>(...) synchronously
+        // -- inserting into this very container. Inserting into an
+        // std::unordered_map may rehash it, and a rehash invalidates every
+        // iterator into it, including the one a range-based for over
+        // creatureMap would still be holding. That is undefined behaviour and
+        // the observed crash signature.
+        //
+        // Copying the raw pointers is safe against use-after-free: object
+        // destruction is deferred to Map::RemoveAllObjectsInRemoveList(),
+        // which is called from Map::DelayedUpdate(), a different phase from
+        // the World::Update() -> GameEventMgr::Update() -> RunSmartAIScripts()
+        // path this runs on. Nothing is freed mid-sweep, so the per-element
+        // guards below remain sufficient for objects that were logically
+        // removed during the sweep.
+        std::vector<Creature*> creatures;
+        creatures.reserve(creatureMap.size());
         for (auto const& p : creatureMap)
-            if (p.second->IsInWorld() && !p.second->IsDuringRemoveFromWorld() && p.second->FindMap() && p.second->IsAIEnabled && p.second->AI())
-                p.second->AI()->sOnGameEvent(_activate, _eventId);
+            creatures.push_back(p.second);
+
+        for (Creature* creature : creatures)
+            if (creature->IsInWorld() && !creature->IsDuringRemoveFromWorld() && creature->FindMap() && creature->IsAIEnabled && creature->AI())
+                creature->AI()->sOnGameEvent(_activate, _eventId);
     }
 
     void Visit(std::unordered_map<ObjectGuid, GameObject*>& gameObjectMap)
     {
+        // Same hazard and same reasoning as the creature overload above:
+        // GameObjectAI::OnGameEvent() can reach GameObject::AddToWorld(), which
+        // inserts into this container synchronously.
+        std::vector<GameObject*> gameObjects;
+        gameObjects.reserve(gameObjectMap.size());
         for (auto const& p : gameObjectMap)
-            if (p.second->IsInWorld() && p.second->FindMap() && p.second->AI())
-                p.second->AI()->OnGameEvent(_activate, _eventId);
+            gameObjects.push_back(p.second);
+
+        for (GameObject* gameObject : gameObjects)
+            if (gameObject->IsInWorld() && gameObject->FindMap() && gameObject->AI())
+                gameObject->AI()->OnGameEvent(_activate, _eventId);
     }
 
     template<class T>
