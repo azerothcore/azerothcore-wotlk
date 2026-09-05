@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObject.h"
 #include "Pet.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -1467,6 +1468,44 @@ private:
     bool _canProcT10 = false;
 };
 
+enum RitualOfRefreshment
+{
+    SPELL_MAGE_RITUAL_OF_REFRESHMENT_R1 = 43987,
+    SPELL_MAGE_RITUAL_OF_REFRESHMENT_R2 = 58659,
+    GO_MAGE_REFRESHMENT_PORTAL_R1       = 186811,
+    GO_MAGE_REFRESHMENT_PORTAL_R2       = 193062
+};
+
+// 43985, 58661 - Conjure Refreshment Table
+class spell_mage_conjure_refreshment_table : public SpellScript
+{
+public:
+    spell_mage_conjure_refreshment_table(uint32 ritualSpellId, uint32 portalEntry)
+        : _ritualSpellId(ritualSpellId), _portalEntry(portalEntry) { }
+
+    PrepareSpellScript(spell_mage_conjure_refreshment_table);
+
+    // the destination follows the mage, who may have turned or walked off while the group finished
+    // the ritual; the table has to land where the portal was left
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+        if (GameObject* portal = caster->GetGameObject(_ritualSpellId))
+            if (portal->GetEntry() == _portalEntry && portal->GetOwnerGUID() == caster->GetGUID())
+                dest.Relocate(portal->GetPosition());
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(
+            spell_mage_conjure_refreshment_table::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
+    }
+
+private:
+    uint32 _ritualSpellId;
+    uint32 _portalEntry;
+};
+
 // -31661 - Dragon's Breath
 class spell_mage_dragon_breath : public AuraScript
 {
@@ -1644,6 +1683,10 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_combustion);
     RegisterSpellScript(spell_mage_glyph_of_eternal_water);
     RegisterSpellScript(spell_mage_combustion_proc);
+    RegisterSpellScriptWithArgs(spell_mage_conjure_refreshment_table, "spell_mage_conjure_refreshment_table_r1",
+        SPELL_MAGE_RITUAL_OF_REFRESHMENT_R1, GO_MAGE_REFRESHMENT_PORTAL_R1);
+    RegisterSpellScriptWithArgs(spell_mage_conjure_refreshment_table, "spell_mage_conjure_refreshment_table_r2",
+        SPELL_MAGE_RITUAL_OF_REFRESHMENT_R2, GO_MAGE_REFRESHMENT_PORTAL_R2);
     RegisterSpellScript(spell_mage_dragon_breath);
     RegisterSpellScript(spell_mage_empowered_fire);
     RegisterSpellScript(spell_mage_gen_extra_effects);
