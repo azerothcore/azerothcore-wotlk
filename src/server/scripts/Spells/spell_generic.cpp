@@ -5385,6 +5385,42 @@ class spell_gen_sober_up : public AuraScript
     }
 };
 
+// 10255 - Stoned. Statue creatures in Uldaman and Blackrock Depths carry this dummy aura
+// until their event awakens them by removing it. Only Uldaman's statues are unattackable
+// while stoned: sniffs show the aura on the BRD golems around Golem Lord Argelmach too, but
+// classic-era videos show those as attackable (players cleared the Manufactory before the
+// pull), so outside Uldaman the aura is visual-only and any freeze mechanics belong to the
+// event scripts (the BRD vault warders are frozen via flags in instance_blackrock_depths).
+class spell_gen_stoned : public AuraScript
+{
+    PrepareAuraScript(spell_gen_stoned);
+
+    bool Load() override
+    {
+        return GetUnitOwner()->IsCreature() && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
+    }
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Creature* target = GetUnitOwner()->ToCreature();
+        target->SetReactState(REACT_PASSIVE);
+        target->SetImmuneToAll(true);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Creature* target = GetUnitOwner()->ToCreature();
+        target->SetReactState(REACT_AGGRESSIVE);
+        target->SetImmuneToAll(false);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_stoned::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_gen_stoned::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 enum StealWeapon
 {
     SPELL_STEAL_WEAPON = 36207, // in 36208 as script_effect
@@ -6365,6 +6401,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_choking_vines);
     RegisterSpellScript(spell_gen_consumption);
     RegisterSpellScript(spell_gen_sober_up);
+    RegisterSpellScript(spell_gen_stoned);
     RegisterSpellScript(spell_gen_steal_weapon);
     RegisterSpellScript(spell_gen_set_health);
     RegisterSpellScript(spell_pet_intellect_spirit_resilience_scaling);
