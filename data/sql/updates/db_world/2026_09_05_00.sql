@@ -1,3 +1,4 @@
+-- DB update 2026_09_04_02 -> 2026_09_05_00
 
 -- Newly landed invaders have no threat for the taunt aura to update. Explicitly start their attack.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (27709, 27753, 27754));
