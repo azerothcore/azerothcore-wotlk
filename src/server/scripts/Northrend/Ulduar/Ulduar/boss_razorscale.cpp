@@ -280,6 +280,8 @@ struct boss_razorscale : public BossAI
             case ACTION_GROUND_PHASE:
                 me->InterruptNonMeleeSpells(false);
                 events.SetPhase(PHASE_GROUND);
+                events.CancelEvent(EVENT_SUMMON_MINIONS);
+                events.CancelEvent(EVENT_SUMMON_MINIONS_DELAYED);
                 _harpoonHits = 0;
                 me->SetSpeedRate(MOVE_RUN, 3.0f);
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
@@ -917,10 +919,11 @@ struct npc_razorscale_spawner : public ScriptedAI
         scheduler.Schedule(1s, [this](TaskContext) { DoCastSelf(SPELL_SUMMON_MOLE_MACHINE); })
             .Schedule(6s, [this](TaskContext)
         {
-            DoCastSelf(DwarfSummonSpells[urand(0, 2)]);
-            // Vrykul: RNG-based, independent chance per spawner
-            if (roll_chance_i(30))
+            // A mole machine either spawns a Sentinel alone (25% chance) or a pack of Dark Rune Dwarves
+            if (roll_chance_i(25))
                 DoCastSelf(SPELL_TRIGGER_SUMMON_IRON_VRYKUL);
+            else
+                DoCastSelf(DwarfSummonSpells[urand(0, 2)]);
         });
     }
 
