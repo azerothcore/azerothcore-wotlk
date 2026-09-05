@@ -733,7 +733,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             continue;
 
                         if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
-                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        {
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(
+                                true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        }
 
                         continue;
                     }
@@ -745,7 +749,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             continue;
 
                         CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, 0.f);
-                        if (e.action.cast.castFlags & SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS)
+                        if (e.action.cast.castFlags & (SMARTCAST_COMBAT_MOVE | SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS))
                             CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
                         continue;
                     }
@@ -764,10 +768,24 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
-                        if (result == SPELL_FAILED_OUT_OF_RANGE)
-                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
-                        else if (result != SPELL_CAST_OK)
+                        if (result == SPELL_CAST_OK || result == SPELL_FAILED_SPELL_IN_PROGRESS)
+                        {
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(false, true);
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(
+                                true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        }
+                        else if (result == SPELL_FAILED_OUT_OF_RANGE)
+                        {
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(
+                                true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        }
+                        else if (me->IsSpellProhibited(spellInfo->GetSchoolMask()) ||
+                                 CAST_AI(SmartAI, me->AI())->IsMainSpellPrevented(spellInfo))
+                        {
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
                             CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
+                        }
                     }
 
                     if (spellCastFailed)
@@ -2811,15 +2829,26 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         SpellCastResult result = me->CastCustomSpell(spellInfo, values, target->ToUnit(), (e.action.castCustom.flags & SMARTCAST_TRIGGERED) ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
 
                         float spellMaxRange = me->GetSpellMaxRangeForTarget(target->ToUnit(), spellInfo);
-                        if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
+                        if (e.action.castCustom.flags & SMARTCAST_COMBAT_MOVE)
                         {
-                            // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
-                            if (result == SPELL_FAILED_OUT_OF_RANGE || result == SPELL_CAST_OK)
-                                // if we are just out of range, we only chase until we are back in spell range.
-                                CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
-                            else // move into melee on any other fail
-                                // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
+                            if (result == SPELL_CAST_OK || result == SPELL_FAILED_SPELL_IN_PROGRESS)
+                            {
+                                CAST_AI(SmartAI, me->AI())->SetCombatMovement(false, true);
+                                CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(
+                                    true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                            }
+                            else if (result == SPELL_FAILED_OUT_OF_RANGE)
+                            {
+                                CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
+                                CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(
+                                    true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                            }
+                            else if (me->IsSpellProhibited(spellInfo->GetSchoolMask()) ||
+                                     CAST_AI(SmartAI, me->AI())->IsMainSpellPrevented(spellInfo))
+                            {
+                                CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
                                 CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
+                            }
                         }
                     }
                 }
@@ -5096,9 +5125,12 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
     if (e.timer < diff)
     {
         // delay spell cast for another AI tick if another spell is being cast
-        if (e.GetActionType() == SMART_ACTION_CAST)
+        if (e.GetActionType() == SMART_ACTION_CAST || e.GetActionType() == SMART_ACTION_CUSTOM_CAST)
         {
-            if (!(e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS))
+            uint32 flags = (e.GetActionType() == SMART_ACTION_CAST)
+                ? e.action.cast.castFlags
+                : e.action.castCustom.flags;
+            if (!(flags & SMARTCAST_INTERRUPT_PREVIOUS))
             {
                 if (me && me->IsActionPreventedByCasting())
                 {
