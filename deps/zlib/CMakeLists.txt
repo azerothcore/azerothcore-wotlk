@@ -22,6 +22,20 @@ if(UNIX)
         "${ZLIB_LIBRARIES}"
       INTERFACE_INCLUDE_DIRECTORIES
         "${ZLIB_INCLUDE_DIRS}")
+elseif(WIN32 AND ZLIB_IMPORT)
+  # libnode.dll exports the zlib C API. Make the core's zlib target an IMPORTED
+  # shared library bound to libnode.dll so there's no duplicate symbol at link
+  # time. ZLIB_IMPORT is a thin import lib (generated from a
+  # .def of libnode.dll's zlib exports) that the linker uses instead of the
+  # bundled static zlib.
+  add_library(zlib SHARED IMPORTED GLOBAL)
+  set_target_properties(zlib
+    PROPERTIES
+      IMPORTED_IMPLIB
+        "${ZLIB_IMPORT}"
+      INTERFACE_INCLUDE_DIRECTORIES
+        "${CMAKE_CURRENT_SOURCE_DIR}")
+  set_target_properties(zlib PROPERTIES FOLDER "deps")
 else()
   # Use the bundled source on windows
   SET(zlib_STAT_SRCS
