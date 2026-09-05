@@ -264,8 +264,6 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     // For online receiver update in game mail status and data
     if (pReceiver)
     {
-        pReceiver->AddNewMailDeliverTime(deliver_time);
-
         Mail* m = new Mail;
         m->messageID = mailId;
         m->mailTemplateId = GetMailTemplateId();
@@ -303,6 +301,9 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
             // for another receiver must not attach them a second time
             m_items.clear();
         }
+
+        // Announce last: the notification may push the inbox, which has to contain this mail already
+        pReceiver->AddNewMailDeliverTime(deliver_time);
     }
     else if (!m_items.empty())
     {

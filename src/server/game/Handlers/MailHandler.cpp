@@ -681,6 +681,17 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
     if (!CanOpenMailBox(mailbox))
         return;
 
+    SendMailList();
+
+    // recalculate m_nextMailDelivereTime and unReadMails
+    _player->UpdateNextMailTimeAndUnreads();
+}
+
+// Builds and sends the inbox. Normally a reply to CMSG_GET_MAIL_LIST, but it is also pushed
+// unsolicited on delivery when Mail.PushInboxOnDelivery is on, because the client refuses to
+// re-query its inbox more than once a minute and would otherwise show a stale mailbox
+void WorldSession::SendMailList()
+{
     Player* player = _player;
 
     uint8 mailsCount = 0;
@@ -802,9 +813,6 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
     data.put<uint32>(0, realCount);     //  this will display warning about undelivered mail to player if realCount > mailsCount
     data.put<uint8>(4, mailsCount);     // set real send mails to client
     SendPacket(&data);
-
-    // recalculate m_nextMailDelivereTime and unReadMails
-    _player->UpdateNextMailTimeAndUnreads();
 }
 
 //used when player copies mail body to his inventory
