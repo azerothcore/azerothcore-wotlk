@@ -1459,6 +1459,14 @@ class spell_warl_glyph_of_life_tap : public AuraScript
         return ValidateSpellInfo({ SPELL_WARLOCK_GLYPH_OF_LIFE_TAP_TRIGGERED });
     }
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // Proc from Life Tap / Dark Pact themselves, even when mana restoration is immune.
+        // Their energize spells must not trigger the glyph a second time.
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        return spellInfo && !spellInfo->HasEffect(SPELL_EFFECT_ENERGIZE);
+    }
+
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
@@ -1468,6 +1476,7 @@ class spell_warl_glyph_of_life_tap : public AuraScript
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_warl_glyph_of_life_tap::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_warl_glyph_of_life_tap::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
