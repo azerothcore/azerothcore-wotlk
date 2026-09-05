@@ -16,6 +16,7 @@
  */
 
 #include "Unit.h"
+#include "UnitReactionUtils.h"
 #include "AbstractFollower.h"
 #include "AreaDefines.h"
 #include "ArenaSpectator.h"
@@ -7273,8 +7274,22 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
                 {
                     // CvP case - check reputation, don't allow state higher than neutral when at war
                     ReputationRank repRank = targetPlayerOwner->GetReputationMgr().GetRank(factionEntry);
-                    if (targetPlayerOwner->GetReputationMgr().IsAtWar(factionEntry))
+                    bool const isAtWar = targetPlayerOwner->GetReputationMgr().IsAtWar(factionEntry);
+                    if (isAtWar)
                         repRank = std::min(REP_NEUTRAL, repRank);
+
+                    // A player in a control seat replaces the vehicle's live faction.
+                    // Use its saved pre-charm faction only for explicitly friendly reactions,
+                    // while keeping reputation authoritative for hostile and at-war drivers.
+                    if (Acore::UnitReactionUtils::ShouldCheckOriginalVehicleFaction(isAtWar, repRank,
+                            target->IsVehicle(), target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED),
+                            target->GetCharmerGUID().IsPlayer()))
+                        if (FactionTemplateEntry const* originalTargetFactionTemplateEntry =
+                                sFactionTemplateStore.LookupEntry(target->GetOldFactionId()))
+                            if (factionTemplateEntry->IsFriendlyTo(*originalTargetFactionTemplateEntry)
+                                    || originalTargetFactionTemplateEntry->IsFriendlyTo(*factionTemplateEntry))
+                                return REP_FRIENDLY;
+
                     return repRank;
                 }
             }
