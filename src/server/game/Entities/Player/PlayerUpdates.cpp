@@ -2411,7 +2411,7 @@ void Player::ProcessSpellQueue()
 // important changes, so a crash loses at most a few seconds of them
 void Player::UpdateAdditionalSaves(uint32 p_time)
 {
-    if (!m_additionalSaveTimer || GetSession()->isLogingOut())
+    if (!m_additionalSaveTimer || GetSession()->IsLoggingOut())
         return;
 
     if (m_additionalSaveTimer > p_time)

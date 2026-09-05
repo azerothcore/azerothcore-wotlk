@@ -510,7 +510,10 @@ public:
     void SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemaining);
 
     /// Is the user engaged in a log out process?
-    bool isLogingOut() const { return _logoutTime || m_playerLogout; }
+    bool IsLoggingOut() const
+    {
+        return _logoutTime || m_playerLogout;
+    }
 
     /// Engage the logout process for the user
     void SetLogoutStartTime(time_t requestTime)
