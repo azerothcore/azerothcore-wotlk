@@ -91,7 +91,7 @@ public:
         }
 
     private:
-        uint32 _encounters[MAX_ENCOUNTERS];
+        uint32 _encounters[MAX_ENCOUNTERS]{};
     };
 };
 
