@@ -101,7 +101,7 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
 {
     Creature* cOwner = owner->ToCreature();
 
-    if (owner->IsHovering())
+    if (owner->IsHovering() || !owner->CanFly())
         owner->UpdateAllowedPositionZ(x, y, z);
 
     auto isPathUsable = [&]()
@@ -137,6 +137,20 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
         pathFailed = !i_path->CalculatePath(x, y, z, forceDest) || !isPathUsable();
         // the destination already lies on the melee ring, nothing to cut
         cutPath = false;
+
+        // If the nearest point on the melee ring is also unpathable (e.g. Brain of Yogg-Saron
+        // where the 30yd combat reach extends beyond the room's walls into geometry, but the
+        // floor directly underneath the target is walkable), fall back to pathing directly
+        // toward the target's ground position and cut the path once within combat range.
+        if (pathFailed)
+        {
+            x = GetTarget()->GetPositionX();
+            y = GetTarget()->GetPositionY();
+            z = GetTarget()->GetPositionZ();
+            owner->UpdateAllowedPositionZ(x, y, z);
+            pathFailed = !i_path->CalculatePath(x, y, z, forceDest) || !isPathUsable();
+            cutPath = true;
+        }
     }
 
     if (pathFailed)
@@ -154,7 +168,7 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
     }
 
     if (cutPath)
-        i_path->ShortenPathUntilDist(G3D::Vector3(x, y, z), maxTarget);
+        i_path->ShortenPathUntilDist(G3D::Vector3(GetTarget()->GetPositionX(), GetTarget()->GetPositionY(), GetTarget()->GetPositionZ()), maxTarget);
 
     if (cOwner)
     {
@@ -241,6 +255,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         angle = Optional<ChaseAngle>();
         mutualChase = true;
+    }
+
+    // For oversized targets (e.g. Kologarn, Brain of Yogg-Saron), chasing behind the target
+    // in melee is invalid because the rear is off-mesh or inside geometry.
+    if (angle && (!_range || _range->MaxRange <= CONTACT_DISTANCE) && target->GetCombatReach() > NOMINAL_MELEE_RANGE)
+    {
+        angle = Optional<ChaseAngle>();
     }
 
     // periodically check if we're already in the expected range...
