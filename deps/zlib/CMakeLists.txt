@@ -22,50 +22,53 @@ if(UNIX)
         "${ZLIB_LIBRARIES}"
       INTERFACE_INCLUDE_DIRECTORIES
         "${ZLIB_INCLUDE_DIRS}")
-elseif(WIN32 AND ZLIB_IMPORT)
+else()
   # some modules (including, but not necessarily always limited to, mod-nodejs)
   # have dependencies that bring their own zlib along for the ride, so they hit
   # issues at link time when building everything together statically. allow them
   # to opt-in to having us import the symbols from their import lib file.
-  add_library(zlib SHARED IMPORTED GLOBAL)
-  set_target_properties(zlib
-    PROPERTIES
-      IMPORTED_IMPLIB
-        "${ZLIB_IMPORT}"
-      INTERFACE_INCLUDE_DIRECTORIES
-        "${CMAKE_CURRENT_SOURCE_DIR}")
-  set_target_properties(zlib PROPERTIES FOLDER "deps")
-else()
-  # Use the bundled source on windows
-  SET(zlib_STAT_SRCS
-    adler32.c
-    compress.c
-    crc32.c
-    deflate.c
-    infback.c
-    inffast.c
-    inflate.c
-    inftrees.c
-    trees.c
-    uncompr.c
-    zutil.c
-  )
-
-  add_library(zlib STATIC
-    ${zlib_STAT_SRCS})
-
-  set_target_properties(zlib PROPERTIES LINKER_LANGUAGE CXX)
-
-  target_include_directories(zlib
-    PUBLIC
-      ${CMAKE_CURRENT_SOURCE_DIR})
-
-  target_link_libraries(zlib
-    PRIVATE
-      acore-dependency-interface)
-
-  set_target_properties(zlib
+  CU_GET_GLOBAL(ZLIB_IMPORT)
+  if(ZLIB_IMPORT)
+    add_library(zlib SHARED IMPORTED GLOBAL)
+    set_target_properties(zlib
       PROPERTIES
-        FOLDER
-          "deps")
+        IMPORTED_IMPLIB
+          "${ZLIB_IMPORT}"
+        INTERFACE_INCLUDE_DIRECTORIES
+          "${CMAKE_CURRENT_SOURCE_DIR}")
+    set_target_properties(zlib PROPERTIES FOLDER "deps")
+  else()
+    # Use the bundled source on windows
+    SET(zlib_STAT_SRCS
+      adler32.c
+      compress.c
+      crc32.c
+      deflate.c
+      infback.c
+      inffast.c
+      inflate.c
+      inftrees.c
+      trees.c
+      uncompr.c
+      zutil.c
+    )
+
+    add_library(zlib STATIC
+      ${zlib_STAT_SRCS})
+
+    set_target_properties(zlib PROPERTIES LINKER_LANGUAGE CXX)
+
+    target_include_directories(zlib
+      PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR})
+
+    target_link_libraries(zlib
+      PRIVATE
+        acore-dependency-interface)
+
+    set_target_properties(zlib
+        PROPERTIES
+          FOLDER
+            "deps")
+  endif()
 endif()
