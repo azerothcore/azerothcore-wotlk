@@ -49,11 +49,6 @@ enum Misc
     GUID_MURMUR_NPCS                = 1
 };
 
-enum Npc
-{
-    NPC_CABAL_SPELLBINDER           = 18639
-};
-
 struct boss_murmur : public BossAI
 {
     boss_murmur(Creature* creature) : BossAI(creature, DATA_MURMUR)
