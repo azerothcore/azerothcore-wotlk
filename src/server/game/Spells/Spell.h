@@ -580,6 +580,9 @@ public:
     void SetDelayStart(uint64 m_time) { m_delayStart = m_time; }
     uint64 GetDelayMoment() const { return m_delayMoment; }
     uint64 GetDelayTrajectory() const { return m_delayTrajectory; }
+    // SMSG_SPELL_GO reports the rune mask from before the cast, so a script taking over
+    // SPELL_EFFECT_ACTIVATE_RUNE has to record it itself
+    void SetRuneState(uint8 state) { m_runesState = state; }
 
     uint64 CalculateDelayMomentForDst() const;
     void RecalculateDelayMomentForDst();

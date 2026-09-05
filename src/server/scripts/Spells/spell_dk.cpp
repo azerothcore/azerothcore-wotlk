@@ -44,6 +44,7 @@ enum DeathKnightSpells
     SPELL_DK_BLACK_ICE_R1                       = 49140,
     SPELL_DK_BLOOD_BOIL_TRIGGERED               = 65658,
     SPELL_DK_BLOOD_GORGED_HEAL                  = 50454,
+    SPELL_DK_BLOOD_TAP_VISUAL                   = 47804,
     SPELL_DK_BLOOD_PRESENCE                     = 48266,
     SPELL_DK_CORPSE_EXPLOSION_TRIGGERED         = 43999,
     SPELL_DK_CORPSE_EXPLOSION_VISUAL            = 51270,
@@ -456,6 +457,115 @@ class spell_dk_chains_of_ice_aura : public AuraScript
     {
         OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_dk_chains_of_ice_aura::HandlePeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
+};
+
+// 45529 - Blood Tap
+class spell_dk_blood_tap_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dk_blood_tap_aura);
+
+public:
+    void SetRuneIndex(uint8 index) { _runeIndex = index; }
+
+private:
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        // The default handler walks the slots from 0, so it can convert a rune other than the
+        // one the spell just brought back. The spell script tells us which one it was.
+        PreventDefaultAction();
+
+        if (_runeIndex >= MAX_RUNES)
+            return;
+
+        Player* player = GetTarget()->ToPlayer();
+        if (!player || !player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+            return;
+
+        // Taking ownership of the slot matters even when it already shows a death rune. Reaping
+        // and friends are passive, so RestoreBaseRune turns their runes back to blood as soon as
+        // they are spent, while ours survive being spent for the full duration.
+        player->AddRuneByAuraEffect(_runeIndex, RuneType(aurEff->GetMiscValueB()), aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_dk_blood_tap_aura::HandleApply, EFFECT_1, SPELL_AURA_CONVERT_RUNE, AURA_EFFECT_HANDLE_REAL);
+    }
+
+    uint8 _runeIndex = MAX_RUNES;
+};
+
+class spell_dk_blood_tap : public SpellScript
+{
+    PrepareSpellScript(spell_dk_blood_tap);
+
+    void HandleActivateRune(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        Player* player = GetCaster()->ToPlayer();
+        if (!player || !player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+            return;
+
+        GetSpell()->SetRuneState(player->GetRunesState());
+
+        // The DBC asks for a death rune here, so matching on the rune's current type misses a
+        // spent blood rune that has not been converted yet. Go by the slot's base type instead.
+        RuneType const baseType = RuneType(GetSpellInfo()->Effects[EFFECT_0].MiscValueB);
+        int32 count = GetEffectValue();
+        if (count <= 0)
+            count = 1;
+
+        while (count > 0)
+        {
+            uint8 spent = MAX_RUNES;
+            for (uint8 i = 0; i < MAX_RUNES; ++i)
+            {
+                // A rune that is already up keeps its grace period, so leave it alone
+                if (player->GetBaseRune(i) != baseType || !player->GetRuneCooldown(i))
+                    continue;
+                if (spent == MAX_RUNES || player->GetRuneCooldown(i) < player->GetRuneCooldown(spent))
+                    spent = i;
+            }
+
+            if (spent == MAX_RUNES)
+                break;
+
+            player->SetRuneCooldown(spent, 0);
+            player->SetGracePeriod(spent, player->IsInCombat()); // xinef: reset grace period
+            _runeIndex = spent;
+            --count;
+        }
+
+        // Nothing was spent, so fall back to what the default aura handler would have done and
+        // convert a rune that is already up
+        if (_runeIndex >= MAX_RUNES)
+            for (uint8 i = 0; i < MAX_RUNES; ++i)
+                if (player->GetBaseRune(i) == baseType && !player->GetRuneCooldown(i) && player->GetCurrentRune(i) == baseType)
+                {
+                    _runeIndex = i;
+                    break;
+                }
+
+        // Carries the rune list to the client, which otherwise keeps showing the rune we just
+        // handed back as still on cooldown. The core handler cast this too
+        player->CastSpell(player, SPELL_DK_BLOOD_TAP_VISUAL, true);
+    }
+
+    void SetRuneIndex(SpellEffIndex /*effIndex*/)
+    {
+        if (Aura* aura = GetHitAura())
+            if (spell_dk_blood_tap_aura* script = aura->GetScript<spell_dk_blood_tap_aura>("spell_dk_blood_tap"))
+                script->SetRuneIndex(_runeIndex);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_dk_blood_tap::HandleActivateRune, EFFECT_0, SPELL_EFFECT_ACTIVATE_RUNE);
+        OnEffectHitTarget += SpellEffectFn(spell_dk_blood_tap::SetRuneIndex, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+    }
+
+    uint8 _runeIndex = MAX_RUNES;
 };
 
 // 50452 - Bloodworm
@@ -3024,6 +3134,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_anti_magic_zone);
     RegisterSpellScript(spell_dk_blood_boil);
     RegisterSpellScript(spell_dk_blood_gorged);
+    RegisterSpellAndAuraScriptPair(spell_dk_blood_tap, spell_dk_blood_tap_aura);
     RegisterSpellScript(spell_dk_corpse_explosion);
     RegisterSpellScript(spell_dk_death_coil);
     RegisterSpellScript(spell_dk_death_gate);
