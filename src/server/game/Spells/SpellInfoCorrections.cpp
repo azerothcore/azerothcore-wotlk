@@ -69,6 +69,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(347); // 15 min
     });
 
+    // Headless Horseman's Mount - use the flying creature model for the flying variants
+    ApplySpellFix({ 48023, 51617 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 27152;
+    });
+
     // Elixir of Minor Fortitude
     ApplySpellFix({ 2378 }, [](SpellInfo* spellInfo)
     {
