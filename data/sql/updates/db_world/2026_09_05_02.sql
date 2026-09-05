@@ -1,3 +1,4 @@
+-- DB update 2026_09_05_01 -> 2026_09_05_02
 -- Hydross' Cleansing Field Helper and both Beam Helpers to their sniffed spawn positions
 UPDATE `creature` SET `position_x` = -239.715, `position_y` = -366.44, `position_z` = -0.744514, `orientation` = 1.23918, `VerifiedBuild` = 69587 WHERE `guid` = 153019 AND `id` = 21934;
 UPDATE `creature` SET `position_x` = -215.753, `position_y` = -375.343, `position_z` = 38.403, `orientation` = 5.0091, `VerifiedBuild` = 69587 WHERE `guid` = 153020 AND `id` = 21933;
