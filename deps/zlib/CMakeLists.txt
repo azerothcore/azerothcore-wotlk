@@ -23,11 +23,10 @@ if(UNIX)
       INTERFACE_INCLUDE_DIRECTORIES
         "${ZLIB_INCLUDE_DIRS}")
 elseif(WIN32 AND ZLIB_IMPORT)
-  # libnode.dll exports the zlib C API. Make the core's zlib target an IMPORTED
-  # shared library bound to libnode.dll so there's no duplicate symbol at link
-  # time. ZLIB_IMPORT is a thin import lib (generated from a
-  # .def of libnode.dll's zlib exports) that the linker uses instead of the
-  # bundled static zlib.
+  # some modules (including, but not necessarily always limited to, mod-nodejs)
+  # have dependencies that bring their own zlib along for the ride, so they hit
+  # issues at link time when building everything together statically. allow them
+  # to opt-in to having us import the symbols from their import lib file.
   add_library(zlib SHARED IMPORTED GLOBAL)
   set_target_properties(zlib
     PROPERTIES
