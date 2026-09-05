@@ -70,7 +70,7 @@ public:
     void UpdateAttackPowerAndDamage(bool /*ranged*/) override {}
     void UpdateDamagePhysical(WeaponAttackType /*attType*/) override {}
 
-    bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster = nullptr) const override;
+    bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, WorldObject const* caster = nullptr) const override;
 
 protected:
     TotemType m_type;
