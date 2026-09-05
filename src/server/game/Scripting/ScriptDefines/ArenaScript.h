@@ -22,6 +22,8 @@
 #include "ScriptObject.h"
 #include <vector>
 
+struct ArenaTeamMember;
+
 enum ArenaHook
 {
     ARENAHOOK_CAN_ADD_MEMBER,
@@ -31,7 +33,7 @@ enum ArenaHook
     ARENAHOOK_ON_ARENA_START,
     ARENAHOOK_ON_BEFORE_TEAM_MEMBER_UPDATE,
     ARENAHOOK_CAN_SAVE_ARENA_STATS_FOR_MEMBER,
-    ARENAHOOK_ON_GET_START_PERSONAL_RATING,
+    ARENAHOOK_ON_ADD_MEMBER,
     ARENAHOOK_END
 };
 
@@ -59,9 +61,10 @@ public:
 
     [[nodiscard]] virtual bool CanSaveArenaStatsForMember(ArenaTeam* /*team*/, ObjectGuid /*playerGuid*/) { return true; }
 
-    // Called with the personal rating the core computed for a player joining the team, before it is
-    // stored on the member and written to arena_team_member.
-    virtual void OnGetStartPersonalRating(ArenaTeam* /*team*/, ObjectGuid /*playerGuid*/, uint32& /*personalRating*/) { }
+    // Called with the fully built member right before it is added to the team and written to
+    // arena_team_member. Whatever the hook leaves on the struct, rating and counters alike, is what
+    // the team holds and what is stored. Cannot veto the join, CanAddMember does that.
+    virtual void OnAddMember(ArenaTeam* /*team*/, ArenaTeamMember& /*member*/) { }
 };
 
 #endif
