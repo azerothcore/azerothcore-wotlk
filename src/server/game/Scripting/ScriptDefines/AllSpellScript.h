@@ -37,6 +37,8 @@ enum AllSpellHook
     ALLSPELLHOOK_ON_CAST_CANCEL,
     ALLSPELLHOOK_ON_CAST,
     ALLSPELLHOOK_ON_PREPARE,
+    ALLSPELLHOOK_HASTE_AFFECTS_PERIODIC_DURATION,
+    ALLSPELLHOOK_HASTE_AFFECTS_ALL_PERIODIC_TICKS,
     ALLSPELLHOOK_END
 };
 
@@ -61,6 +63,37 @@ public:
     [[nodiscard]] virtual bool CanScalingEverything(Spell* /*spell*/) { return false; }
 
     [[nodiscard]] virtual bool CanSelectSpecTalent(Spell* /*spell*/) { return true; }
+
+    /**
+     * @brief Chooses how haste scales the total duration of a periodic aura that is
+     * already haste-affected (native SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC attribute
+     * or a granted SPELL_AURA_PERIODIC_HASTE aura).
+     * @param spellInfo the aura's spell info.
+     * @param caster the aura's caster.
+     * @return true (default) to keep legacy WotLK behavior: haste scales the aura's
+     * total duration proportionally, same as the tick period. false switches to
+     * Cata-style behavior instead: duration is rounded to the nearest whole number of
+     * (already-hasted) ticks via Unit::CalcHastePeriodicTickAlignedDuration.
+     */
+    [[nodiscard]] virtual bool HasteAffectsPeriodicDuration(SpellInfo const* /*spellInfo*/, Unit* /*caster*/)
+    {
+        return true;
+    }
+
+    /**
+     * @brief Widens haste-affects-periodic handling to spells that don't carry the
+     * native SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC attribute or a granted
+     * SPELL_AURA_PERIODIC_HASTE aura.
+     * @param spellInfo the aura's spell info.
+     * @param caster the aura's caster.
+     * @return true to include this spell; default false is a no-op, only the native
+     * condition applies. When true, HasteAffectsPeriodicDuration still decides legacy
+     * vs. Cata-style math for the now-included spell.
+     */
+    [[nodiscard]] virtual bool HasteAffectsAllPeriodicTicks(SpellInfo const* /*spellInfo*/, Unit* /*caster*/)
+    {
+        return false;
+    }
 
     virtual void OnScaleAuraUnitAdd(Spell* /*spell*/, Unit* /*target*/, uint32 /*effectMask*/, bool /*checkIfValid*/, bool /*implicit*/, uint8 /*auraScaleMask*/, TargetInfo& /*targetInfo*/) { }
 

@@ -922,6 +922,16 @@ public:
     void ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply);
     void ApplyCastTimePercentMod(float val, bool apply);
 
+    /**
+     * @brief Cata-style periodic haste: rounds baseDuration to the nearest whole number
+     * of hasted ticks for spellInfo's periodic effect, instead of scaling duration
+     * proportionally with haste.
+     * @param spellInfo the aura's spell info, used to resolve its periodic tick amplitude.
+     * @param baseDuration the aura's un-hasted duration; returned unchanged if <= 0.
+     * @return baseDuration rounded to the nearest whole number of hasted ticks.
+     */
+    [[nodiscard]] int32 CalcHastePeriodicTickAlignedDuration(SpellInfo const* spellInfo, int32 baseDuration) const;
+
     void SetImmuneToAll(bool apply, bool keepCombat = false) { SetImmuneToPC(apply, keepCombat); SetImmuneToNPC(apply, keepCombat); }
     bool IsImmuneToAll() const { return IsImmuneToPC() && IsImmuneToNPC(); }
     void SetImmuneToPC(bool apply, bool keepCombat = false);

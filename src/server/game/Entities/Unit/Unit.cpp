@@ -13490,6 +13490,64 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply)
     SetFloatValue(UNIT_MOD_CAST_SPEED, amount);
 }
 
+int32 Unit::CalcHastePeriodicTickAlignedDuration(SpellInfo const* spellInfo, int32 baseDuration) const
+{
+    if (baseDuration <= 0)
+        return baseDuration;
+
+    int32 amplitude = 0;
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!spellInfo->Effects[i].IsEffect(SPELL_EFFECT_APPLY_AURA))
+            continue;
+
+        switch (spellInfo->Effects[i].ApplyAuraName)
+        {
+            // mirrors the case list in AuraEffect::CalculatePeriodic
+            case SPELL_AURA_PERIODIC_DAMAGE:
+            case SPELL_AURA_PERIODIC_HEAL:
+            case SPELL_AURA_OBS_MOD_HEALTH:
+            case SPELL_AURA_OBS_MOD_POWER:
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
+            case SPELL_AURA_PERIODIC_ENERGIZE:
+            case SPELL_AURA_PERIODIC_LEECH:
+            case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+            case SPELL_AURA_PERIODIC_MANA_LEECH:
+            case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+            case SPELL_AURA_POWER_BURN:
+            case SPELL_AURA_PERIODIC_DUMMY:
+            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+                amplitude = spellInfo->Effects[i].Amplitude;
+                break;
+            default:
+                break;
+        }
+
+        if (amplitude)
+            break;
+    }
+
+    if (amplitude <= 0)
+        amplitude = 1000; // fix broken DBC data, mirrors AuraEffect::CalculatePeriodic
+
+    if (Player* modOwner = GetSpellModOwner())
+        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_ACTIVATION_TIME, amplitude);
+
+    amplitude = int32(amplitude * GetFloatValue(UNIT_MOD_CAST_SPEED));
+    if (amplitude <= 0)
+        return baseDuration;
+
+    int32 ticks = baseDuration / amplitude;
+    int32 remainder = baseDuration % amplitude;
+    if (remainder * 2 >= amplitude)
+        ++ticks;
+    if (ticks <= 0)
+        ticks = 1;
+
+    return ticks * amplitude;
+}
+
 uint32 Unit::GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const
 {
     // Not apply this to creature casted spells with casttime == 0

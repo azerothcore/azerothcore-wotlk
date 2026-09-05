@@ -44,6 +44,18 @@ bool ScriptMgr::CanSelectSpecTalent(Spell* spell)
     CALL_ENABLED_BOOLEAN_HOOKS(AllSpellScript, ALLSPELLHOOK_CAN_SELECT_SPEC_TALENT, !script->CanSelectSpecTalent(spell));
 }
 
+bool ScriptMgr::HasteAffectsPeriodicDuration(SpellInfo const* spellInfo, Unit* caster)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(AllSpellScript, ALLSPELLHOOK_HASTE_AFFECTS_PERIODIC_DURATION,
+        !script->HasteAffectsPeriodicDuration(spellInfo, caster));
+}
+
+bool ScriptMgr::HasteAffectsAllPeriodicTicks(SpellInfo const* spellInfo, Unit* caster)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(AllSpellScript, ALLSPELLHOOK_HASTE_AFFECTS_ALL_PERIODIC_TICKS,
+        script->HasteAffectsAllPeriodicTicks(spellInfo, caster));
+}
+
 void ScriptMgr::OnScaleAuraUnitAdd(Spell* spell, Unit* target, uint32 effectMask, bool checkIfValid, bool implicit, uint8 auraScaleMask, TargetInfo& targetInfo)
 {
     CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_SCALE_AURA_UNIT_ADD, script->OnScaleAuraUnitAdd(spell, target, effectMask, checkIfValid, implicit, auraScaleMask, targetInfo));
