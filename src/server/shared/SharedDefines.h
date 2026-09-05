@@ -566,7 +566,7 @@ enum SpellAttr5 : uint32
     SPELL_ATTR5_IMPLIED_TARGETING                              = 0x00000800, // TITLE Auto-target target of target (client only)
     SPELL_ATTR5_MELEE_CHAIN_TARGETING                          = 0x00001000, // TITLE Unknown attribute 12@Attr5 DESCRIPTION Cleave related?
     SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC                   = 0x00002000, // TITLE Duration scales with Haste Rating
-    SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED                    = 0x00004000, // TITLE Charmed units cannot cast this spell
+    SPELL_ATTR5_NOT_AVAILABLE_WHILE_CHARMED                    = 0x00004000, // TITLE Charmed units cannot cast this spell
     SPELL_ATTR5_TREAT_AS_AREA_EFFECT                           = 0x00008000, // TITLE Unknown attribute 15@Attr5 DESCRIPTION Related to multi-target spells?
     SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM        = 0x00010000, // TITLE DESCRIPTION this allows spells with EquippedItemClass to affect spells from other items if the required item is equipped
     SPELL_ATTR5_ALLOW_WHILE_FLEEING                            = 0x00020000, // TITLE Usable while feared

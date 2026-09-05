@@ -85,8 +85,13 @@ void CharmInfo::InitPossessCreateSpells()
             uint32 spellId = _unit->ToCreature()->m_spells[i];
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (spellInfo)
+            {
+                if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_AVAILABLE_WHILE_CHARMED))
+                    continue;
+
                 if (spellInfo->IsPassive())
                     _unit->CastSpell(_unit, spellInfo, true);
+            }
 
             AddSpellToActionBar(spellInfo, ACT_PASSIVE, i);
         }
@@ -112,6 +117,9 @@ void CharmInfo::InitCharmCreateSpells()
             _charmspells[i].SetActionAndType(spellId, ACT_DISABLED);
             continue;
         }
+
+        if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_AVAILABLE_WHILE_CHARMED))
+            continue;
 
         if (spellInfo->IsPassive())
         {
