@@ -315,6 +315,10 @@ struct boss_alar : public BossAI
 
         switch (id)
         {
+            case EVENT_CHARGE:
+            case EVENT_CHARGE_PREPATH:
+                DoCastAOE(SPELL_FLAME_BUFFET);
+                break;
             case POINT_QUILL:
                 scheduler.CancelGroup(GROUP_FLAME_BUFFET);
                 scheduler.Schedule(1s, [this](TaskContext)
