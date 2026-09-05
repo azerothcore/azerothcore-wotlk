@@ -35,7 +35,7 @@ enum class GroupAIFlags : uint16
     GROUP_AI_FLAG_RESPAWN_ON_EVADE              = 0x008,
     GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE  = 0x010,
     GROUP_AI_FLAG_ACQUIRE_NEW_TARGET_ON_EVADE   = 0x020,
-    //GROUP_AI_FLAG_UNK5                        = 0x040,
+    GROUP_AI_FLAG_PROMOTE_PATROL_LEADER         = 0x040,
     //GROUP_AI_FLAG_UNK6                        = 0x080,
     //GROUP_AI_FLAG_UNK7                        = 0x100,
     GROUP_AI_FLAG_FOLLOW_LEADER                 = 0x200,
@@ -44,8 +44,11 @@ enum class GroupAIFlags : uint16
     GROUP_AI_FLAG_EVADE_MASK                    = GROUP_AI_FLAG_EVADE_TOGETHER | GROUP_AI_FLAG_RESPAWN_ON_EVADE,
 
     // Used to verify valid and usable flags
-    GROUP_AI_FLAG_SUPPORTED                     = GROUP_AI_FLAG_ASSIST_MASK | GROUP_AI_FLAG_EVADE_MASK | GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE |
-                                                  GROUP_AI_FLAG_FOLLOW_LEADER | GROUP_AI_FLAG_ACQUIRE_NEW_TARGET_ON_EVADE
+    GROUP_AI_FLAG_SUPPORTED                     = GROUP_AI_FLAG_ASSIST_MASK | GROUP_AI_FLAG_EVADE_MASK |
+                                                  GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE |
+                                                  GROUP_AI_FLAG_FOLLOW_LEADER |
+                                                  GROUP_AI_FLAG_ACQUIRE_NEW_TARGET_ON_EVADE |
+                                                  GROUP_AI_FLAG_PROMOTE_PATROL_LEADER
 };
 
 struct FormationInfo
@@ -93,10 +96,13 @@ public:
     typedef std::map<Creature*, FormationInfo>  CreatureGroupMemberType;
 
     //Group cannot be created empty
-    explicit CreatureGroup(uint32 id) : m_leader(nullptr), m_groupID(id), m_Formed(false) {}
+    explicit CreatureGroup(uint32 id) :
+        m_leader(nullptr), m_movementLeader(nullptr), m_groupID(id), m_patrolPathId(0), m_Formed(false),
+        m_restoreOriginalLeader(false), m_promotePatrolLeader(false) { }
     ~CreatureGroup() {}
 
     Creature* GetLeader() const { return m_leader; }
+    Creature* GetMovementLeader() const { return m_movementLeader; }
     uint32 GetId() const { return m_groupID; }
 
     bool IsEmpty() const { return m_members.empty(); }
@@ -107,6 +113,10 @@ public:
     void AddMember(Creature* member);
     void RemoveMember(Creature* member);
     void FormationReset(bool dismiss, bool initMotionMaster);
+    bool TryPromotePatrolLeader(Creature* deadLeader);
+    void MemberRespawned(Creature* member);
+    void TryRestoreOriginalLeader();
+    void InitializeMovementLeader(Creature* member);
 
     void LeaderStartedMoving();
     [[nodiscard]] bool CanLeaderStartMoving() const;
@@ -120,11 +130,19 @@ public:
     [[nodiscard]] bool IsAnyMemberAlive(bool ignoreLeader = false);
 
 private:
+    [[nodiscard]] bool IsPatrolLeaderPromotionEnabled() const;
+    [[nodiscard]] Creature* SelectNewMovementLeader(Creature const* excluded) const;
+    void PrepareFormationMovement();
+
     Creature* m_leader; //Important do not forget sometimes to work with pointers instead synonims :D:D
+    Creature* m_movementLeader;
     CreatureGroupMemberType m_members;
 
     uint32 m_groupID;
+    uint32 m_patrolPathId;
     bool m_Formed;
+    bool m_restoreOriginalLeader;
+    bool m_promotePatrolLeader;
 };
 
 #define sFormationMgr FormationMgr::instance()

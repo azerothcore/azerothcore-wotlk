@@ -24,6 +24,7 @@
 #include "QueryResult.h"
 #include "Timer.h"
 #include "WaypointMgr.h"
+#include <algorithm>
 
 FormationMgr::~FormationMgr()
 {
@@ -171,27 +172,185 @@ void CreatureGroup::AddMember(Creature* member)
 {
     LOG_DEBUG("entities.unit", "CreatureGroup::AddMember: Adding unit {}.", member->GetGUID().ToString());
 
+    auto const formationItr = sFormationMgr->CreatureGroupMap.find(member->GetSpawnId());
+    ASSERT(formationItr != sFormationMgr->CreatureGroupMap.end());
+    m_members[member] = formationItr->second;
+    member->SetFormation(this);
+
     //Check if it is a leader
     if (member->GetSpawnId() == m_groupID)
     {
         LOG_DEBUG("entities.unit", "Unit {} is formation leader. Adding group.", member->GetGUID().ToString());
+        bool const isReturningLeader = m_movementLeader != nullptr;
         m_leader = member;
-    }
+        m_promotePatrolLeader = formationItr->second.HasGroupFlag(
+            std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_PROMOTE_PATROL_LEADER));
+        m_patrolPathId = member->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE ? member->GetWaypointPath() : 0;
 
-    m_members[member] = sFormationMgr->CreatureGroupMap.find(member->GetSpawnId())->second;
-    member->SetFormation(this);
+        if (!isReturningLeader || !m_movementLeader->IsAlive() || !IsFormationInCombat())
+        {
+            m_movementLeader = member;
+            m_restoreOriginalLeader = false;
+            if (isReturningLeader)
+                PrepareFormationMovement();
+        }
+        else
+            m_restoreOriginalLeader = true;
+    }
 }
 
 void CreatureGroup::RemoveMember(Creature* member)
 {
     if (m_leader == member)
     {
-        RemoveFormationMovement();
         m_leader = nullptr;
+        if (m_movementLeader == member)
+        {
+            RemoveFormationMovement();
+            m_movementLeader = nullptr;
+            m_restoreOriginalLeader = false;
+            m_Formed = false;
+        }
+    }
+    else if (m_movementLeader == member)
+    {
+        RemoveFormationMovement();
+        m_movementLeader = nullptr;
+        m_Formed = false;
     }
 
     m_members.erase(member);
     member->SetFormation(nullptr);
+}
+
+bool CreatureGroup::IsPatrolLeaderPromotionEnabled() const
+{
+    return m_promotePatrolLeader;
+}
+
+Creature* CreatureGroup::SelectNewMovementLeader(Creature const* excluded) const
+{
+    Creature* newLeader = nullptr;
+    for (auto const& [member, formationInfo] : m_members)
+    {
+        if (!member || member == excluded || !member->IsAlive() || !member->IsInWorld())
+            continue;
+
+        if (!formationInfo.HasGroupFlag(
+                std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
+            continue;
+
+        if (member->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) || member->isPossessed() ||
+            member->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+            continue;
+
+        if (!newLeader || member->GetSpawnId() < newLeader->GetSpawnId())
+            newLeader = member;
+    }
+
+    return newLeader;
+}
+
+void CreatureGroup::PrepareFormationMovement()
+{
+    if (!m_movementLeader)
+        return;
+
+    for (auto const& [member, formationInfo] : m_members)
+    {
+        if (!member || member == m_movementLeader || !member->IsAlive())
+            continue;
+
+        if (!formationInfo.HasGroupFlag(
+                std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
+            continue;
+
+        member->GetMotionMaster()->MoveFormation(
+            m_movementLeader, formationInfo.follow_dist, formationInfo.follow_angle,
+            formationInfo.point_1, formationInfo.point_2);
+    }
+
+    m_Formed = true;
+}
+
+bool CreatureGroup::TryPromotePatrolLeader(Creature* deadLeader)
+{
+    if (!deadLeader || deadLeader != m_movementLeader || !IsPatrolLeaderPromotionEnabled())
+        return false;
+
+    uint32 const pathId = m_patrolPathId;
+    if (!pathId)
+        return false;
+
+    Creature* newLeader = SelectNewMovementLeader(deadLeader);
+    if (!newLeader)
+        return false;
+
+    auto const [lastWaypointId, currentPathId] = deadLeader->GetCurrentWaypointInfo();
+    uint32 const resumeAfterWaypointId = currentPathId == pathId ? lastWaypointId : deadLeader->GetCurrentWaypointID();
+
+    m_movementLeader = newLeader;
+    m_restoreOriginalLeader = true;
+    newLeader->UpdateWaypointID(resumeAfterWaypointId);
+    newLeader->UpdateCurrentWaypointInfo(resumeAfterWaypointId, pathId);
+    newLeader->GetMotionMaster()->MoveWaypoint(pathId, true, PathSource::WAYPOINT_MGR, resumeAfterWaypointId);
+    PrepareFormationMovement();
+
+    LOG_DEBUG("entities.unit", "Promoted {} to movement leader of formation {} after {} died.",
+        newLeader->GetGUID().ToString(), m_groupID, deadLeader->GetGUID().ToString());
+    return true;
+}
+
+void CreatureGroup::MemberRespawned(Creature* member)
+{
+    if (member != m_leader || m_movementLeader == m_leader)
+        return;
+
+    if (IsFormationInCombat())
+    {
+        m_restoreOriginalLeader = true;
+        return;
+    }
+
+    m_movementLeader = m_leader;
+    m_restoreOriginalLeader = false;
+    m_Formed = true;
+}
+
+void CreatureGroup::TryRestoreOriginalLeader()
+{
+    if (!m_restoreOriginalLeader || !m_leader || !m_leader->IsAlive() || IsFormationInCombat())
+        return;
+
+    m_movementLeader = m_leader;
+    m_restoreOriginalLeader = false;
+    m_Formed = true;
+    m_leader->Motion_Initialize();
+}
+
+void CreatureGroup::InitializeMovementLeader(Creature* member)
+{
+    if (!member || member != m_movementLeader)
+        return;
+
+    FormationReset(false, true);
+    if (member == m_leader)
+    {
+        member->GetMotionMaster()->Initialize();
+        return;
+    }
+
+    uint32 const pathId = m_patrolPathId;
+    if (!pathId)
+    {
+        FormationReset(true, false);
+        member->GetMotionMaster()->Initialize();
+        return;
+    }
+
+    auto const [lastWaypointId, currentPathId] = member->GetCurrentWaypointInfo();
+    member->GetMotionMaster()->MoveWaypoint(pathId, true, PathSource::WAYPOINT_MGR,
+        currentPathId == pathId ? lastWaypointId : member->GetCurrentWaypointID());
 }
 
 void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
@@ -323,13 +482,18 @@ void CreatureGroup::MemberEvaded(Creature* member)
 
 void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 {
-    if (m_members.size() && !(m_members.begin()->second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER))))
+    bool const hasFormationMovement = std::ranges::any_of(m_members, [](auto const& member)
+    {
+        return member.second.HasGroupFlag(
+            std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER));
+    });
+    if (!hasFormationMovement)
         return;
 
     for (auto const& itr : m_members)
     {
         Creature* member = itr.first;
-        if (member && member != m_leader && member->IsAlive())
+        if (member && member != m_movementLeader && member->IsAlive())
         {
             if (initMotionMaster)
             {
@@ -338,7 +502,8 @@ void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
                 else
                     member->GetMotionMaster()->MoveIdle();
 
-                LOG_DEBUG("entities.unit", "Set {} movement for member {}", dismiss ? "default" : "idle", member->GetGUID().ToString());
+                LOG_DEBUG("entities.unit", "Set {} movement for member {}",
+                    dismiss ? "default" : "idle", member->GetGUID().ToString());
             }
         }
     }
@@ -347,24 +512,28 @@ void CreatureGroup::FormationReset(bool dismiss, bool initMotionMaster)
 
 void CreatureGroup::LeaderStartedMoving()
 {
-    if (!m_leader)
+    if (!m_movementLeader)
         return;
 
     for (auto const& itr : m_members)
     {
         Creature* member = itr.first;
         FormationInfo const& pFormationInfo = itr.second;
-        if (member == m_leader || !member->IsAlive() || member->GetVictim() || !pFormationInfo.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
+        if (member == m_movementLeader || !member->IsAlive() || member->GetVictim() ||
+            !pFormationInfo.HasGroupFlag(
+                std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
             continue;
 
-        if (member->HasUnitState(UNIT_STATE_NOT_MOVE) || member->isPossessed() || member->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+        if (member->HasUnitState(UNIT_STATE_NOT_MOVE) || member->isPossessed() ||
+            member->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
             continue;
 
         float const followAngle = pFormationInfo.follow_angle;
         float const followDist = pFormationInfo.follow_dist;
 
         if (!member->HasUnitState(UNIT_STATE_FOLLOW_MOVE))
-            member->GetMotionMaster()->MoveFormation(m_leader, followDist, followAngle, pFormationInfo.point_1, pFormationInfo.point_2);
+            member->GetMotionMaster()->MoveFormation(
+                m_movementLeader, followDist, followAngle, pFormationInfo.point_1, pFormationInfo.point_2);
     }
 }
 
@@ -372,7 +541,7 @@ bool CreatureGroup::CanLeaderStartMoving() const
 {
     for (auto const& itr : m_members)
     {
-        if (itr.first && itr.first != m_leader && itr.first->IsAlive())
+        if (itr.first && itr.first != m_movementLeader && itr.first->IsAlive())
             if (itr.first->IsEngaged() || itr.first->IsInEvadeMode())
                 return false;
     }
@@ -385,7 +554,7 @@ void CreatureGroup::RemoveFormationMovement()
     for (auto const& itr : m_members)
     {
         Creature* member = itr.first;
-        if (!member || member == m_leader)
+        if (!member || member == m_movementLeader)
             continue;
 
         if (member->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_IDLE) == FORMATION_MOTION_TYPE)
