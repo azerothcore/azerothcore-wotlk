@@ -71,6 +71,9 @@ enum Say
     SAY_SOULS_LICH_KING_RAND_WHISPER = 5
 };
 
+// How long the Lady Deathwhisper elevator stays motionless at each end of its cycle before departing again.
+constexpr uint32 DARKWHISPER_ELEVATOR_DWELL_TIME = 7 * IN_MILLISECONDS;
+
 BossBoundaryData const boundaries =
 {
     { DATA_LORD_MARROWGAR, new CircleBoundary(Position(-428.0f,2211.0f), 95.0) },
@@ -212,7 +215,7 @@ public:
             PutricideEventProgress = 0;
             LichKingHeroicAvailable = true;
             LichKingRandomWhisperTimer = 120 * IN_MILLISECONDS;
-            DarkwhisperElevatorTimer = 3000;
+            DarkwhisperElevatorTimer = DARKWHISPER_ELEVATOR_DWELL_TIME;
 
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
@@ -1664,21 +1667,28 @@ public:
             else
                 LichKingRandomWhisperTimer -= diff;
 
-            if (DarkwhisperElevatorTimer <= diff)
-            {
-                DarkwhisperElevatorTimer = 3000;
-                if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE)
-                    if (GameObject* elevator = instance->GetGameObject(LadyDeathwisperElevatorGUID))
-                        if (StaticTransport* trans = elevator->ToStaticTransport())
+            if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE)
+                if (GameObject* elevator = instance->GetGameObject(LadyDeathwisperElevatorGUID))
+                    if (StaticTransport* trans = elevator->ToStaticTransport())
+                    {
+                        // StaticTransport::Update clamps PathProgress to exactly 0 / GetPauseTime() and then freezes
+                        // there while GOState matches, so these two comparisons detect "parked at a stop" exactly.
+                        bool const atBottom = trans->GetGoState() == GO_STATE_READY && trans->GetPathProgress() == 0;
+                        bool const atTop = trans->GetGoState() == GO_STATE_ACTIVE &&
+                            trans->GetPathProgress() == trans->GetPauseTime();
+
+                        // Count the dwell down only while parked, so it always starts on arrival instead of on the
+                        // phase of a free-running tick. Flipping GOState sends the transport towards the other end.
+                        if (!atBottom && !atTop)
+                            DarkwhisperElevatorTimer = DARKWHISPER_ELEVATOR_DWELL_TIME;
+                        else if (DarkwhisperElevatorTimer <= diff)
                         {
-                            if (trans->GetGoState() == GO_STATE_READY && trans->GetPathProgress() == 0)
-                                trans->SetGoState(GO_STATE_ACTIVE);
-                            else if (trans->GetGoState() == GO_STATE_ACTIVE && trans->GetPathProgress() == trans->GetPauseTime())
-                                trans->SetGoState(GO_STATE_READY);
+                            DarkwhisperElevatorTimer = DARKWHISPER_ELEVATOR_DWELL_TIME;
+                            trans->SetGoState(atBottom ? GO_STATE_ACTIVE : GO_STATE_READY);
                         }
-            }
-            else
-                DarkwhisperElevatorTimer -= diff;
+                        else
+                            DarkwhisperElevatorTimer -= diff;
+                    }
 
             if (Events.Empty())
                 return;
