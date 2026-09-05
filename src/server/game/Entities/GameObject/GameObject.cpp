@@ -29,6 +29,7 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "PoolMgr.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
 #include "Transport.h"
@@ -1315,6 +1316,19 @@ bool GameObject::ActivateToQuest(Player* target) const
 
     if (!GetGOInfo()->IsGameObjectForQuests())
         return false;
+
+    FactionTemplateEntry const* gameObjectFaction =
+        sFactionTemplateStore.LookupEntry(GetUInt32Value(GAMEOBJECT_FACTION));
+    FactionTemplateEntry const* playerFaction = target->GetFactionTemplateEntry();
+    if (gameObjectFaction && playerFaction)
+    {
+        bool isHostile = gameObjectFaction->IsHostileTo(*playerFaction);
+        if (ReputationRank const* forcedRank = target->GetReputationMgr().GetForcedRankIfAny(gameObjectFaction))
+            isHostile = *forcedRank <= REP_HOSTILE;
+
+        if (isHostile)
+            return false;
+    }
 
     switch (GetGoType())
     {
