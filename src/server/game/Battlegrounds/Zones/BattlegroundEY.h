@@ -323,6 +323,8 @@ struct BattlegroundEYScore final : public BattlegroundScore
 {
     friend class BattlegroundEY;
 
+    [[nodiscard]] uint32 GetFlagCaptures() const { return FlagCaptures; }
+
 protected:
     BattlegroundEYScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
 
