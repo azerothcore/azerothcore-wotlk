@@ -18,6 +18,7 @@
 #include "ServerMailMgr.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "ClassMgr.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
@@ -262,7 +263,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             }
             break;
         case ServerMailConditionType::Class:
-            if (conditionValue & ~CLASSMASK_ALL_PLAYABLE)
+            if (conditionValue & ~sClassMgr->GetPlayableClassMask())
             {
                 LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Class' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
