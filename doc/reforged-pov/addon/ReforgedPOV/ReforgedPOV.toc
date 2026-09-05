@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: Reforged POV
+## Notes: Live player and bot spectating. Requires the Reforged POV server extension and a GM account.
+## Author: Reforged
+## Version: 0.1.0
+ReforgedPOV.lua
