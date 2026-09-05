@@ -10,6 +10,7 @@ AzerothCore is a C++ MMORPG server emulator for World of Warcraft 3.3.5a (WotLK)
 - **Prefer live-stack e2e to debug/validate player-visible behaviour** when a local auth+world+MySQL stack is available (protocol, combat, quests, loot, death, multi-bot). See `e2e/README.md` and AzerothGhost `e2e/LLM_GUIDE.md`. Do not invent e2e for pure unit-sized logic — see `.agents/docs/e2e-policy.md`.
 - **Scratch e2e only under `e2e/local/`** (gitignored). Never commit throwaway debug tests. Promote keepers into `e2e/suites/` or `e2e/smoke/`.
 - Planning docs go in `.agents/plans/<task-slug>/` (gitignored), named `<task-slug>.<TYPE>.md` (`PLAN`, `REQUIREMENTS`, `ANALYSIS`, …).
+- **Credit upstream authors.** Code, a mechanism, or data mirrored from another core (TrinityCore, cMaNGOS, …) is committed with `--author` naming the original commit's author (extra sources as `Co-authored-by`), even when rewritten against AC or confirmed by own sniffs; find them in the upstream file's commit history.
 
 ## Mandatory reading per task
 

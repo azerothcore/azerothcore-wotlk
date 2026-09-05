@@ -1297,7 +1297,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea, bool force)
         return;
 
     if (sWorld->getBoolConfig(CONFIG_WEATHER))
-        GetMap()->GetOrGenerateZoneDefaultWeather(newZone);
+        if (!GetMap()->GetOrGenerateZoneDefaultWeather(newZone))
+            Weather::SendFineWeatherUpdateToPlayer(this);
 
     GetMap()->SendZoneDynamicInfo(newZone, this);
 

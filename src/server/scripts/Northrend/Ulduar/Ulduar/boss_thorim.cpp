@@ -484,6 +484,16 @@ struct boss_thorim : public BossAI
             _isHitAllowed = true;
     }
 
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+    {
+        // start pack deaths must be counted here: a member killed while Mind Controlled
+        // still has PossessedAI installed when it dies, so its own JustDied never runs
+        if (summon->EntryEquals(NPC_JORMUNGAR_BEHEMOT, NPC_CAPTURED_MERCENARY_SOLDIER_ALLY,
+            NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY,
+            NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, NPC_DARK_RUNE_ACOLYTE_I))
+            DoAction(ACTION_START_TRASH_DIED);
+    }
+
     void KilledUnit(Unit* victim) override
     {
         if (victim->IsPlayer())
@@ -1100,13 +1110,6 @@ struct boss_thorim_start_npcs : public ScriptedAI
             me->GetThreatMgr().ClearAllThreat();
             if (Unit* attacker = ObjectAccessor::GetUnit(*me, guid))
                 AttackStart(attacker);
-        }
-
-        void JustDied(Unit*) override
-        {
-            if (me->GetInstanceScript())
-                if (Creature* thorim = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
-                    thorim->AI()->DoAction(ACTION_START_TRASH_DIED);
         }
 
         void JustEngagedWith(Unit*  /*who*/) override
