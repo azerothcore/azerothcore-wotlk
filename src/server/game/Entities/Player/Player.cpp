@@ -12005,6 +12005,17 @@ void Player::ApplyEquipCooldown(Item* pItem)
     if (GetCommandStatus(CHEAT_COOLDOWN))
         return;
 
+    TimePoint const cooldownStart = std::chrono::steady_clock::now();
+    auto applyProcCooldown = [this, pItem, cooldownStart](uint32 spellId)
+    {
+        SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(spellId);
+        if (!procEntry)
+            return;
+
+        if (Aura* itemAura = GetAura(spellId, GetGUID(), pItem->GetGUID()))
+            itemAura->AddProcCooldown(cooldownStart + procEntry->Cooldown);
+    };
+
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         _Spell const& spellData = pItem->GetTemplate()->Spells[i];
@@ -12016,12 +12027,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
         // apply proc cooldown to equip auras if we have any
         if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP)
         {
-            SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(spellData.SpellId);
-            if (!procEntry)
-                continue;
-
-            if (Aura* itemAura = GetAura(spellData.SpellId, GetGUID(), pItem->GetGUID()))
-                itemAura->AddProcCooldown(std::chrono::steady_clock::now() + procEntry->Cooldown);
+            applyProcCooldown(spellData.SpellId);
             continue;
         }
 
@@ -12049,6 +12055,22 @@ void Player::ApplyEquipCooldown(Item* pItem)
         data << pItem->GetGUID();
         data << uint32(spellData.SpellId);
         SendDirectMessage(&data);
+    }
+
+    // Enchantment equip spells are not included in the item template spell list.
+    for (uint8 enchantmentSlot = 0; enchantmentSlot < MAX_ENCHANTMENT_SLOT; ++enchantmentSlot)
+    {
+        uint32 enchantmentId = pItem->GetEnchantmentId(EnchantmentSlot(enchantmentSlot));
+        if (!enchantmentId)
+            continue;
+
+        SpellItemEnchantmentEntry const* enchantment = sSpellItemEnchantmentStore.LookupEntry(enchantmentId);
+        if (!enchantment)
+            continue;
+
+        for (uint8 effect = 0; effect < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++effect)
+            if (enchantment->type[effect] == ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL && enchantment->spellid[effect])
+                applyProcCooldown(enchantment->spellid[effect]);
     }
 }
 
