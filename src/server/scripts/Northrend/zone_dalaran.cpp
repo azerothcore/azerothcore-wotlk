@@ -17,12 +17,17 @@
 
 #include "AreaDefines.h"
 #include "CreatureScript.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "TaskScheduler.h"
 #include "World.h"
+#include "WorldState.h"
+#include "WorldStateDefines.h"
 
 class npc_steam_powered_auctioneer : public CreatureScript
 {
@@ -861,6 +866,78 @@ private:
     };
 };
 
+/*########
+## Dedication of Honor - Runeweaver Square Lich King monument
+########*/
+
+// The Runeweaver Square fountain (entry 202616, a single spawn - guid 151164) gives way to the
+// "Dedication of Honor" Lich King statue once the realm has defeated the Lich King. The Icecrown
+// Citadel instance latches worldstate WORLD_STATE_CUSTOM_DALARAN_LICH_KING_DEFEATED to 1 on that
+// kill (any difficulty, any group); this AI reflects it on the fountain. Activating the button -
+// exactly what ".gobject activate" does - swaps the fountain for the statue, and the button has no
+// auto-close time, so the revealed (statue) state persists.
+class go_dalaran_lich_king_monument : public GameObjectScript
+{
+public:
+    go_dalaran_lich_king_monument() : GameObjectScript("go_dalaran_lich_king_monument") { }
+
+    struct go_dalaran_lich_king_monumentAI : public GameObjectAI
+    {
+        go_dalaran_lich_king_monumentAI(GameObject* go) : GameObjectAI(go) { }
+
+        void InitializeAI() override
+        {
+            // Realm already defeated the Lich King when the fountain spawns (server start / grid
+            // load): reveal the statue straight away.
+            if (IsMonumentEarned())
+                Reveal();
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_revealed)
+                return;
+
+            // Catch the live case: a player is in Runeweaver Square (so this grid is ticking) when
+            // the Lich King dies elsewhere on the realm. Poll the worldstate, then stop.
+            if (_checkTimer <= diff)
+            {
+                _checkTimer = 1000;
+                if (IsMonumentEarned())
+                    Reveal();
+            }
+            else
+                _checkTimer -= diff;
+        }
+
+    private:
+        static bool IsMonumentEarned()
+        {
+            return sWorldState->getWorldState(WORLD_STATE_CUSTOM_DALARAN_LICH_KING_DEFEATED) != 0;
+        }
+
+        void Reveal()
+        {
+            // Mirror ".gobject activate": no auto-close time, so the statue state is permanent.
+            if (me->GetGoState() != GO_STATE_ACTIVE)
+            {
+                me->SetLootState(GO_READY);
+                me->UseDoorOrButton(0, false, nullptr);
+            }
+
+            _revealed = true;
+        }
+
+        bool _revealed = false;
+        uint32 _checkTimer = 0;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_dalaran_lich_king_monumentAI(go);
+    }
+};
+
 void AddSC_dalaran()
 {
     // our
@@ -873,4 +950,5 @@ void AddSC_dalaran()
     RegisterCreatureAI(npc_cosmetic_toy_plane);
     new npc_mageguard_dalaran();
     RegisterCreatureAI(npc_minigob_manabonk);
+    new go_dalaran_lich_king_monument();
 }
