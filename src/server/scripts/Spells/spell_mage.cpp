@@ -1135,20 +1135,23 @@ class spell_mage_gen_extra_effects : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         Unit* caster = eventInfo.GetActor();
-        // T8 4P bonus: prevent double proc on Arcane Missiles
-        if (GetSpellInfo()->Id == SPELL_MAGE_HOT_STREAK_PROC && caster->HasAura(SPELL_MAGE_T8_4P_BONUS))
-        {
-            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-            if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
-                (spellInfo->SpellFamilyFlags[0] & 0x00000800)) // Arcane Missiles
+        if (!caster)
+            return true;
+
+        // T8 4P bonus: chance to not consume the proc
+        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MAGE_T8_4P_BONUS, EFFECT_0))
+            if (roll_chance_i(aurEff->GetAmount()))
                 return false;
-        }
+
         return true;
     }
 
     void HandleProc(ProcEventInfo& eventInfo)
     {
         Unit* caster = eventInfo.GetActor();
+        if (!caster)
+            return;
+
         // T10 2P bonus: apply pushing the limit on proc consumption
         if (caster->HasAura(SPELL_MAGE_T10_2P_BONUS))
             caster->CastSpell(caster, SPELL_MAGE_T10_2P_BONUS_EFFECT, true);

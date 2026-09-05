@@ -10218,16 +10218,6 @@ void Player::RemoveSpellMods(Spell* spell)
             // leave this here, if spell have two mods it will remove 2 charges - wrong
             spell->m_appliedMods.erase(iterMod);
 
-            // MAGE T8P4 BONUS
-            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE)
-            {
-                SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
-                // Missile Barrage, Hot Streak, Brain Freeze (trigger spell - Fireball!)
-                if (sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938)
-                    if (AuraEffect* aurEff = GetAuraEffectDummy(64869))
-                        if (roll_chance_i(aurEff->GetAmount()))
-                            continue; // don't consume charge
-            }
             if (mod->ownerAura->DropCharge(AURA_REMOVE_BY_EXPIRE))
                 itr = m_spellMods[i].begin();
         }
