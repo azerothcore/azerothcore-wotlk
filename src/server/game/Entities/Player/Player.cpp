@@ -103,6 +103,11 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+enum DruidSpells
+{
+    SPELL_DRUID_GLYPH_OF_HURRICANE  = 54831
+};
+
 enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
@@ -9989,6 +9994,13 @@ bool Player::IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod
 
     // +duration to infinite duration spells making them limited
     if (mod->op == SPELLMOD_DURATION && spellInfo->GetDuration() == -1)
+        return false;
+
+    // The glyph's flat -20 is meant for the dormant slow sitting in the channelled spell's first
+    // effect. Hurricane's triggered damage spells share its family mask and hold direct damage at
+    // that same index, so keep the mod away from them.
+    if (mod->spellId == SPELL_DRUID_GLYPH_OF_HURRICANE && mod->op == SPELLMOD_EFFECT1 &&
+        !spellInfo->Effects[EFFECT_0].IsAura())
         return false;
 
     return spellInfo->IsAffectedBySpellMod(mod);
