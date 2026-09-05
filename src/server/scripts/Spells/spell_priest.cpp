@@ -359,6 +359,22 @@ class spell_pri_hymn_of_hope : public SpellScript
     }
 };
 
+static bool IsLightwellEntry(uint32 entry)
+{
+    switch (entry)
+    {
+        case PRIEST_LIGHTWELL_NPC_1:
+        case PRIEST_LIGHTWELL_NPC_2:
+        case PRIEST_LIGHTWELL_NPC_3:
+        case PRIEST_LIGHTWELL_NPC_4:
+        case PRIEST_LIGHTWELL_NPC_5:
+        case PRIEST_LIGHTWELL_NPC_6:
+            return true;
+        default:
+            return false;
+    }
+}
+
 // 60123 - Lightwell
 class spell_pri_lightwell : public SpellScript
 {
@@ -389,7 +405,8 @@ class spell_pri_lightwell : public SpellScript
         // proc a spellcast
         if (Aura* chargesAura = caster->GetAura(SPELL_PRIEST_LIGHTWELL_CHARGES))
         {
-            caster->CastSpell(GetHitUnit(), lightwellRenew, caster->ToTempSummon()->GetSummonerGUID());
+            caster->CastSpell(GetHitUnit(), lightwellRenew, true, nullptr, nullptr,
+                caster->ToTempSummon()->GetSummonerGUID());
             if (chargesAura->ModCharges(-1))
                 caster->ToTempSummon()->UnSummon();
         }
@@ -439,16 +456,26 @@ class spell_pri_lightwell_renew : public AuraScript
 
     void HandleUpdateSpellclick(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* caster = GetCaster())
+        Player* player = GetTarget()->ToPlayer();
+        if (!player)
+            return;
+
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        // The renew is cast by the priest, so resend the well's own fields instead: the spellclick
+        // condition that hides the click while the renew is up is evaluated on them, per player.
+        for (Unit* controlled : caster->m_Controlled)
         {
-            if (Player* player = GetTarget()->ToPlayer())
-            {
-                UpdateData data;
-                WorldPacket packet;
-                caster->BuildValuesUpdateBlockForPlayer(&data, player);
-                data.BuildPacket(packet);
-                player->SendDirectMessage(&packet);
-            }
+            if (!IsLightwellEntry(controlled->GetEntry()))
+                continue;
+
+            UpdateData data;
+            WorldPacket packet;
+            controlled->BuildValuesUpdateBlockForPlayer(&data, player);
+            data.BuildPacket(packet);
+            player->SendDirectMessage(&packet);
         }
     }
 
