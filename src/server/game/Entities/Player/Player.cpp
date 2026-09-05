@@ -12173,6 +12173,11 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
             }
 
             SetSkill(skillId, rank, skillValue, maxValue);
+
+            std::vector<uint32> rankSpells = sSpellMgr->GetSkillRankSpells(skillId);
+            for (size_t i = 0; i < rankSpells.size() && i < rank; ++i)
+                learnSpell(rankSpells[i], false);
+
             break;
         }
         default:
