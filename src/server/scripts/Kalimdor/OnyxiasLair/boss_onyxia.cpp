@@ -16,10 +16,15 @@
  */
 
 #include "CreatureScript.h"
+#include "Map.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "onyxias_lair.h"
+
+#include <array>
+
+std::array<ObjectGuid::LowType, 4> constexpr OnyxianWarderSpawnIds = { 12550, 12551, 12552, 12553 };
 
 enum Spells
 {
@@ -195,6 +200,25 @@ public:
     {
         Talk(SAY_AGGRO);
         SetPhase(PHASE_GROUNDED);
+
+        for (ObjectGuid::LowType spawnId : OnyxianWarderSpawnIds)
+        {
+            bool hasAliveSpawn = false;
+            auto bounds = me->GetMap()->GetCreatureBySpawnIdStore().equal_range(spawnId);
+            for (auto itr = bounds.first; itr != bounds.second; ++itr)
+            {
+                if (!itr->second->IsAlive())
+                    itr->second->Respawn();
+                hasAliveSpawn |= itr->second->IsAlive();
+            }
+
+            // Dynamic respawns remove the dead object from the map, so force its database spawn as well.
+            if (!hasAliveSpawn)
+            {
+                me->GetMap()->RemoveCreatureRespawnTime(spawnId);
+                me->GetMap()->ProcessCreatureRespawn(spawnId);
+            }
+        }
 
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT); // just in case at reset some players already left the instance
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
