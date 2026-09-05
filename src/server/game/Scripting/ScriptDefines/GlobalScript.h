@@ -37,6 +37,7 @@ enum GlobalHook
     GLOBALHOOK_ON_INITIALIZE_LOCKED_DUNGEONS,
     GLOBALHOOK_ON_AFTER_INITIALIZE_LOCKED_DUNGEONS,
     GLOBALHOOK_ON_BEFORE_UPDATE_ARENA_POINTS,
+    GLOBALHOOK_ON_ARENA_WEEK_RESET,
     GLOBALHOOK_ON_AFTER_UPDATE_ENCOUNTER_STATE,
     GLOBALHOOK_ON_BEFORE_WORLDOBJECT_SET_PHASEMASK,
     GLOBALHOOK_ON_IS_AFFECTED_BY_SPELL_MOD_CHECK,
@@ -72,6 +73,10 @@ public:
 
     // On Before arena points distribution
     virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<ObjectGuid, uint32>& /*ap*/) { }
+
+    // Called when the weekly arena point distribution has just reset the week statistics of every
+    // arena team on the realm.
+    virtual void OnArenaWeekReset() { }
 
     // Called when a dungeon encounter is updated.
     virtual void OnAfterUpdateEncounterState(Map* /*map*/, EncounterCreditType /*type*/,  uint32 /*creditEntry*/, Unit* /*source*/, Difficulty /*difficulty_fixed*/, std::list<DungeonEncounter const*> const* /*encounters*/, uint32 /*dungeonCompleted*/, bool /*updated*/) { }
