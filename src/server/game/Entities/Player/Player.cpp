@@ -9293,6 +9293,9 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
             return;
     }
 
+    // Captured here because the reagent block below clears m_temporaryUnsummonedPetNumber
+    bool removedWhileTemporarilyUnsummoned = !pet && m_temporaryUnsummonedPetNumber;
+
     if (returnreagent && (pet || (m_temporaryUnsummonedPetNumber && (!m_session || !m_session->PlayerLogout()))) && !InBattleground())
     {
         //returning of reagents only for players, so best done here
@@ -9321,6 +9324,16 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
     if (!pet)
     {
+        // The "pet is out" block is an infinity cooldown and those are never written to the DB, so it has
+        // to become the real one once the pet is gone for good or the session ends while it is away
+        SpellInfo const* petSpellInfo = nullptr;
+        if (removedWhileTemporarilyUnsummoned)
+        {
+            petSpellInfo = sSpellMgr->GetSpellInfo(m_oldpetspell);
+            if (petSpellInfo && !petSpellInfo->IsCooldownStartedOnEvent())
+                petSpellInfo = nullptr;
+        }
+
         if (mode == PET_SAVE_NOT_IN_SLOT && m_petStable && m_petStable->CurrentPet)
         {
             // Handle removing pet while it is in "temporarily unsummoned" state, for example on mount
@@ -9332,6 +9345,18 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
             m_petStable->UnslottedPets.push_back(std::move(*m_petStable->CurrentPet));
             m_petStable->CurrentPet.reset();
+
+            if (petSpellInfo)
+            {
+                SendCooldownEvent(petSpellInfo);
+                // Nothing left to resummon, the pet is out of the slot now
+                m_temporaryUnsummonedPetNumber = 0;
+            }
+        }
+        else if (petSpellInfo && m_session && m_session->PlayerLogout())
+        {
+            // Runs before SaveToDB, so the cooldown reaches character_spell_cooldown
+            SendCooldownEvent(petSpellInfo);
         }
 
         return;
@@ -11278,11 +11303,65 @@ void Player::ModifySpellCooldown(uint32 spellId, int32 cooldown)
     SendDirectMessage(&data);
 }
 
+uint32 Player::GetSpellbookSpellForCooldown(SpellInfo const* spellInfo) const
+{
+    if (!spellInfo)
+        return 0;
+
+    // The spell itself is in the spellbook, so there is nothing to translate
+    if (HasActiveSpell(spellInfo->Id))
+        return 0;
+
+    uint32 category = spellInfo->GetCategory();
+    if (!category)
+        return 0;
+
+    SpellCategoryStore::const_iterator i_scstore = sSpellsByCategoryStore.find(category);
+    if (i_scstore == sSpellsByCategoryStore.end())
+        return 0;
+
+    for (auto i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
+    {
+        // Item categories share their ids with spell ones, they are not siblings
+        if (i_scset->first)
+            continue;
+
+        SpellInfo const* categorySpellInfo = sSpellMgr->GetSpellInfo(i_scset->second);
+        if (!categorySpellInfo || categorySpellInfo->SpellFamilyName != spellInfo->SpellFamilyName)
+            continue;
+
+        if (HasActiveSpell(i_scset->second))
+            return i_scset->second;
+    }
+
+    return 0;
+}
+
 void Player::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId /*= 0*/, Spell* spell /*= nullptr*/, bool setCooldown /*= true*/)
 {
     // start cooldowns at server side, if any
     if (setCooldown)
         AddSpellAndCategoryCooldowns(spellInfo, itemId, spell);
+
+    // The spell triggering the event may not be in the client's spellbook (the death knight ghoul is
+    // summoned by one of those), so the client also needs the event for the spell it does know
+    if (!itemId && spellInfo->IsCooldownStartedOnEvent())
+    {
+        if (uint32 spellbookSpellId = GetSpellbookSpellForCooldown(spellInfo))
+        {
+            SpellCooldowns::iterator itr = m_spellCooldowns.find(spellbookSpellId);
+            if (itr != m_spellCooldowns.end())
+            {
+                // Otherwise SendInitialSpells skips it and the cooldown is lost on relog
+                itr->second.needSendToClient = true;
+            }
+
+            WorldPacket spellbookData(SMSG_COOLDOWN_EVENT, 4 + 8);
+            spellbookData << uint32(spellbookSpellId);
+            spellbookData << GetGUID();
+            SendDirectMessage(&spellbookData);
+        }
+    }
 
     // Send activate cooldown timer (possible 0) at client side
     WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);

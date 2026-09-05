@@ -7945,7 +7945,21 @@ void Unit::SetMinion(Minion* minion, bool apply)
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(minion->GetUInt32Value(UNIT_CREATED_BY_SPELL));
             // Remove infinity cooldown
             if (spellInfo && spellInfo->IsCooldownStartedOnEvent())
-                ToPlayer()->SendCooldownEvent(spellInfo);
+            {
+                // A pet put away for a while comes back untouched, so its cooldown must not start yet: the
+                // infinity cooldown stays and Pet::LoadPetFromDB restores the client side block on resummon
+                bool temporarilyUnsummoned = false;
+                if (Pet* pet = minion->ToPet())
+                {
+                    CharmInfo* charmInfo = pet->GetCharmInfo();
+                    bool hasCooldown = spellInfo->CategoryRecoveryTime > 0 || spellInfo->RecoveryTime > 0;
+                    temporarilyUnsummoned = charmInfo && hasCooldown
+                        && ToPlayer()->GetTemporaryUnsummonedPetNumber() == charmInfo->GetPetNumber();
+                }
+
+                if (!temporarilyUnsummoned)
+                    ToPlayer()->SendCooldownEvent(spellInfo);
+            }
 
             // xinef: clear spell book
             if (m_Controlled.empty())
