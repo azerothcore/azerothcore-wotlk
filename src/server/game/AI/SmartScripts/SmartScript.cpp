@@ -3184,8 +3184,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!e.action.followGroup.followState)
             {
                 for (WorldObject* target : targets)
-                    if (IsUnit(target))
-                        target->ToCreature()->GetMotionMaster()->MoveIdle();
+                    if (IsCreature(target))
+                        target->ToCreature()->GetMotionMaster()->Clear();
 
                 break;
             }

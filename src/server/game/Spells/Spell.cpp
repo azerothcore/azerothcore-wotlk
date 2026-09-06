@@ -1363,7 +1363,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
             break;
     }
 
-    SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions, Acore::WorldObjectSpellAreaTargetSearchReason::Area);
+    SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions, Acore::WorldObjectSpellAreaTargetSearchReason::Area, targetType.GetReferenceType());
 
     CallScriptObjectAreaTargetSelectHandlers(targets, effIndex, targetType);
 
@@ -2138,12 +2138,12 @@ WorldObject* Spell::SearchNearbyTarget(float range, SpellTargetObjectTypes objec
     return target;
 }
 
-void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason)
+void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason, SpellTargetReferenceTypes referenceType)
 {
     uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList);
     if (!containerTypeMask)
         return;
-    Acore::WorldObjectSpellAreaTargetCheck check(range, position, m_caster, referer, m_spellInfo, selectionType, condList, searchReason);
+    Acore::WorldObjectSpellAreaTargetCheck check(range, position, m_caster, referer, m_spellInfo, selectionType, condList, searchReason, referenceType);
     Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(m_caster, targets, check, containerTypeMask);
     SearchTargets<Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> > (searcher, containerTypeMask, m_caster, position, range);
 }
@@ -6261,16 +6261,49 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         m_preGeneratedPath = std::make_unique<PathGenerator>(m_caster);
                         m_preGeneratedPath->SetPathLengthLimit(range);
 
+                        float destX = target->GetPositionX();
+                        float destY = target->GetPositionY();
+                        float destZ = target->GetPositionZ();
+                        bool cutPath = true;
+
+                        // Targets with an oversized combat reach can stand entirely over unwalkable space
+                        // (e.g. Kologarn) so pathing to their center fails or creates a shortcut into the void.
+                        // For these targets, path directly to the nearest point on the melee ring facing the caster.
+                        if (target->GetCombatReach() > NOMINAL_MELEE_RANGE)
+                        {
+                            target->GetNearPoint2D(m_caster, destX, destY, 0.0f, target->GetAngle(m_caster));
+                            destZ = target->GetPositionZ();
+                            m_caster->UpdateAllowedPositionZ(destX, destY, destZ);
+                            cutPath = false;
+                        }
+
                         // first try with raycast, if it fails fall back to normal path
-                        bool result = m_preGeneratedPath->CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
-                        if (m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
+                        bool result = m_preGeneratedPath->CalculatePath(destX, destY, destZ, false);
+                        bool pathFailed = !result || (m_preGeneratedPath->GetPathType() &
+                            (PATHFIND_NOPATH | PATHFIND_INCOMPLETE | PATHFIND_SHORT));
+
+                        if (pathFailed && !cutPath)
+                        {
+                            destX = target->GetPositionX();
+                            destY = target->GetPositionY();
+                            destZ = target->GetPositionZ();
+                            cutPath = true;
+
+                            result = m_preGeneratedPath->CalculatePath(destX, destY, destZ, false);
+                            pathFailed = !result || (m_preGeneratedPath->GetPathType() &
+                                (PATHFIND_NOPATH | PATHFIND_INCOMPLETE | PATHFIND_SHORT));
+                        }
+
+                        if (pathFailed)
                             return SPELL_FAILED_NOPATH;
-                        else if (!result || m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
-                            return SPELL_FAILED_NOPATH;
-                        else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if not in a straight line
+                        else if (cutPath && m_preGeneratedPath->IsInvalidDestinationZ(target))
                             return SPELL_FAILED_NOPATH;
 
-                        m_preGeneratedPath->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), objSize); // move back
+                        if (cutPath)
+                        {
+                            m_preGeneratedPath->ShortenPathUntilDist(
+                                G3D::Vector3(destX, destY, destZ), objSize);
+                        }
                     }
                     if (Player* player = m_caster->ToPlayer())
                         player->SetCanTeleport(true);
@@ -9137,8 +9170,8 @@ namespace Acore
     }
 
     WorldObjectSpellAreaTargetCheck::WorldObjectSpellAreaTargetCheck(float range, Position const* position, Unit* caster,
-            Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason)
-        : WorldObjectSpellTargetCheck(caster, referer, spellInfo, selectionType, condList), _range(range), _position(position), _searchReason(searchReason)
+            Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason, SpellTargetReferenceTypes referenceType)
+        : WorldObjectSpellTargetCheck(caster, referer, spellInfo, selectionType, condList), _range(range), _position(position), _searchReason(searchReason), _referenceType(referenceType)
     {
     }
 
@@ -9149,9 +9182,38 @@ namespace Acore
             if (!target->ToGameObject()->IsInRange3d(_position->GetPositionX(), _position->GetPositionY(), _position->GetPositionZ(), _range))
                 return false;
         }
-        else if (!target->IsWithinDist3d(_position, _range))
-            return false;
-        else if (Creature* c = target->ToCreature())
+        else
+        {
+            if (_searchReason == Acore::WorldObjectSpellAreaTargetSearchReason::Chain)
+            {
+                if (!target->IsWithinDist3d(_position, _range))
+                    return false;
+            }
+            else if (_referenceType == TARGET_REFERENCE_TYPE_SRC
+                  || _referenceType == TARGET_REFERENCE_TYPE_DEST
+                  || _referenceType == TARGET_REFERENCE_TYPE_TARGET)
+            {
+                float effectiveRange = _range;
+                // searcher also visits non-unit objects (corpses, dynobjects) when the spell can target them
+                if (Unit const* unitTarget = target->ToUnit())
+                    if (_caster->IsControlledByPlayer() && !unitTarget->IsControlledByPlayer())
+                        effectiveRange += unitTarget->GetCombatReach();
+
+                // override the range check for entry area targets
+                float dist = target->GetExactDist(_position);
+                if (_targetSelectionType == TARGET_CHECK_ENTRY)
+                    dist = target->GetExactDist2d(_position);
+                if (dist > effectiveRange)
+                    return false;
+            }
+            else
+            {
+                if (!target->IsWithinDist3d(_position, _range))
+                    return false;
+            }
+        }
+
+        if (Creature* c = target->ToCreature())
         {
             if (c->IsAvoidingAOE()) // pussywizard
                 return false;
