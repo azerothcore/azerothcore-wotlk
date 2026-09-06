@@ -272,7 +272,7 @@ def strip_sql_noise(text: str, in_block_comment: bool) -> tuple:
             in_block_comment = True
             index += 2
             continue
-        if text.startswith('--', index):
+        if text.startswith('--', index) or text[index] == '#':
             break
         if text[index] in "'\"":
             quote = text[index]
@@ -305,8 +305,9 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
     def report(text: str, line_number: int, table: str) -> bool:
         # A disjunction needs real boolean parsing to judge, so it is refused rather than guessed at
         if re.search(r"\bOR\b", text, re.IGNORECASE):
-            print(f"❌ DELETE FROM `{table}` must not use OR. Use IN, or split it into one statement "
-                  f"per spawn. {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+            print(f"❌ DELETE FROM `{table}` must not use OR. Use IN, or split it into one statement per "
+                  f"spawn. {file_path} at line {line_number}\n"
+                  f"If this error is intended, please notify a maintainer")
             return True
         missing = [column for column in ("id", "guid") if not has_column_filter(text, column)]
         if not missing:
