@@ -243,6 +243,7 @@ def open_paren_balance(text: str) -> int:
     without_strings = re.sub(r'"(?:\\.|[^"])*"', "", without_strings)
     return without_strings.count('(') - without_strings.count(')')
 
+DELETE_START = re.compile(r"\bDELETE\b", re.IGNORECASE)
 SPAWN_DELETE_START = re.compile(r"DELETE\s+FROM\s+(?:`(creature|gameobject)`|\b(creature|gameobject)\b)", re.IGNORECASE)
 # Only these bound a delete to known rows: `guid` > 0 or `id` != 5 match without limiting.
 SPAWN_FILTER_OPERATORS = r"(?:=|\bIN\b|\bBETWEEN\b)"
@@ -300,7 +301,6 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
     in_block_comment = False
     statement = ""
     statement_line = 0
-    table_name = ""
 
     def report(text: str, line_number: int, table: str) -> bool:
         # A disjunction needs real boolean parsing to judge, so it is refused rather than guessed at
@@ -317,6 +317,14 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
               f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
         return True
 
+    # Judged once the whole statement is accumulated, since DELETE, FROM and the table name can
+    # each sit on their own line
+    def report_when_spawn_delete(text: str, line_number: int) -> bool:
+        table = SPAWN_DELETE_START.search(text)
+        if not table:
+            return False
+        return report(text, line_number, table.group(1) or table.group(2))
+
     for line_number, line in enumerate(file, start = 1):
         text, in_block_comment = strip_sql_noise(line.strip(), in_block_comment)
         if not text:
@@ -328,22 +336,21 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
                 segment, terminator, rest = remainder.partition(';')
                 statement += " " + segment
             else:
-                match = SPAWN_DELETE_START.search(remainder)
+                match = DELETE_START.search(remainder)
                 if not match:
                     break
-                table_name = match.group(1) or match.group(2)
                 statement_line = line_number
                 segment, terminator, rest = remainder[match.start():].partition(';')
                 statement = segment
             if not terminator:
                 break
-            if report(statement, statement_line, table_name):
+            if report_when_spawn_delete(statement, statement_line):
                 check_failed = True
             statement = ""
             remainder = rest.strip()
 
     # An unterminated statement is reported by semicolon_check, but still judge it here
-    if statement and report(statement, statement_line, table_name):
+    if statement and report_when_spawn_delete(statement, statement_line):
         check_failed = True
 
     return check_failed
