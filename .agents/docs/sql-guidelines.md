@@ -4,7 +4,7 @@
 
 1. `cd data/sql/updates/pending_db_world/` (or `pending_db_auth` / `pending_db_characters`).
 2. `./create_sql.sh` generates an empty `rev_<timestamp>.sql` to write into.
-3. Conventions (linted): every `INSERT` preceded by a matching `DELETE` (idempotency); no double semicolons; no multiple blank lines; InnoDB engine.
+3. Conventions (linted): every `INSERT` preceded by a matching `DELETE` (idempotency); spawn `DELETE` (`creature`, `gameobject`) filters on both `id` and `guid`, never `OR`; no double semicolons; no multiple blank lines; InnoDB engine.
 
 Run the linter before claiming a change is done: `python apps/codestyle/codestyle-sql.py` (compares to origin/master).
 

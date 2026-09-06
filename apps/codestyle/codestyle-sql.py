@@ -243,14 +243,53 @@ def open_paren_balance(text: str) -> int:
     without_strings = re.sub(r'"(?:\\.|[^"])*"', "", without_strings)
     return without_strings.count('(') - without_strings.count(')')
 
-SPAWN_DELETE_START = re.compile(r"DELETE\s+FROM\s+`?(creature|gameobject)`?\s*(?:$|;|WHERE|\()", re.IGNORECASE)
-SPAWN_FILTER_OPERATORS = r"(?:=|!=|<>|<=|>=|<|>|\bIN\b|\bBETWEEN\b)"
+SPAWN_DELETE_START = re.compile(r"DELETE\s+FROM\s+(?:`(creature|gameobject)`|\b(creature|gameobject)\b)", re.IGNORECASE)
+# Only these bound a delete to known rows: `guid` > 0 or `id` != 5 match without limiting.
+SPAWN_FILTER_OPERATORS = r"(?:=|\bIN\b|\bBETWEEN\b)"
 
 # The column token has to be bounded on both sides, otherwise `guid` would satisfy the `id`
 # requirement and `id1`/`id2`/`id3` (the pre-rename creature columns) would pass as `id`.
 def has_column_filter(statement: str, column: str) -> bool:
-    pattern = rf"(?:`{column}`|(?<![\w@`]){column}(?![\w`]))\s*(?:NOT\s+)?{SPAWN_FILTER_OPERATORS}"
+    pattern = rf"(?:`{column}`|(?<![\w@`]){column}(?![\w`]))\s*{SPAWN_FILTER_OPERATORS}"
     return re.search(pattern, statement, re.IGNORECASE) is not None
+
+# Walk the line left to right dropping quoted literals and both comment styles, so a "--", a "/*"
+# or a ";" inside a string is not taken for a comment or a statement terminator. Returns the
+# sanitised text plus whether a block comment is left open for the following lines.
+def strip_sql_noise(text: str, in_block_comment: bool) -> tuple:
+    sanitized = []
+    index = 0
+    while index < len(text):
+        if in_block_comment:
+            closing = text.find('*/', index)
+            if closing == -1:
+                break
+            in_block_comment = False
+            index = closing + 2
+            sanitized.append(' ')
+            continue
+        if text.startswith('/*', index):
+            in_block_comment = True
+            index += 2
+            continue
+        if text.startswith('--', index):
+            break
+        if text[index] in "'\"":
+            quote = text[index]
+            index += 1
+            while index < len(text):
+                if text[index] == '\\':
+                    index += 2
+                    continue
+                if text[index] == quote:
+                    index += 1
+                    break
+                index += 1
+            sanitized.append("''")
+            continue
+        sanitized.append(text[index])
+        index += 1
+    return ''.join(sanitized).strip(), in_block_comment
 
 # Spawns in `creature` and `gameobject` must be deleted by both `id` and `guid`: a guid-only delete
 # wipes whatever spawn owns that guid today, an id-only one wipes every spawn of that entry in the
@@ -264,6 +303,11 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
     table_name = ""
 
     def report(text: str, line_number: int, table: str) -> bool:
+        # A disjunction needs real boolean parsing to judge, so it is refused rather than guessed at
+        if re.search(r"\bOR\b", text, re.IGNORECASE):
+            print(f"❌ DELETE FROM `{table}` must not use OR. Use IN, or split it into one statement "
+                  f"per spawn. {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+            return True
         missing = [column for column in ("id", "guid") if not has_column_filter(text, column)]
         if not missing:
             return False
@@ -273,24 +317,7 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
         return True
 
     for line_number, line in enumerate(file, start = 1):
-        text = line.strip()
-
-        # Handle block comments
-        if in_block_comment:
-            if '*/' not in text:
-                continue
-            in_block_comment = False
-            text = text.split('*/', 1)[1].strip()
-        elif '/*' in text:
-            in_block_comment = True
-            text = text.split('/*', 1)[0].strip()
-
-        # Skip single-line comments
-        if text.startswith('--'):
-            continue
-
-        # Remove inline comments after SQL (ignoring "--" inside string literals)
-        text = strip_inline_comment(text)
+        text, in_block_comment = strip_sql_noise(line.strip(), in_block_comment)
         if not text:
             continue
 
@@ -303,7 +330,7 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
                 match = SPAWN_DELETE_START.search(remainder)
                 if not match:
                     break
-                table_name = match.group(1)
+                table_name = match.group(1) or match.group(2)
                 statement_line = line_number
                 segment, terminator, rest = remainder[match.start():].partition(';')
                 statement = segment
