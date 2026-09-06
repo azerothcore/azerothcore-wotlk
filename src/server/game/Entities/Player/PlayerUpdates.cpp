@@ -61,11 +61,10 @@ void Player::Update(uint32 p_time)
     if (m_nextMailDelivereTime && m_nextMailDelivereTime <= GameTime::GetGameTime().count())
     {
         SendNewMail();
-        ++unReadMails;
 
-        // It will be recalculate at mailbox open (for unReadMails important
-        // non-0 until mailbox open, it also will be recalculated)
-        m_nextMailDelivereTime = time_t(0);
+        // Recount from the mailbox instead of clearing the timer: any mail that is still
+        // undelivered keeps its own delivery time and gets announced when it arrives
+        UpdateNextMailTimeAndUnreads();
     }
 
     // Update cinematic camera (if needed)
@@ -164,9 +163,14 @@ void Player::Update(uint32 p_time)
             // default combat reach 10
             /// @todo add weapon, skill check
 
+            // A vehicle passenger can neither turn nor move, and their stored position and
+            // orientation can be stale; never fail swing range or facing against the vehicle
+            // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
+            bool const victimIsVehicleBase = GetVehicleBase() == victim;
+
             if (isAttackReady(BASE_ATTACK))
             {
-                if (!IsWithinMeleeRange(victim))
+                if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 1) // send single time (client auto repeat)
@@ -176,7 +180,7 @@ void Player::Update(uint32 p_time)
                     }
                 }
                 // 120 degrees of radiant range, if player is not in boundary radius
-                else if (!IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 2) // send single time (client auto repeat)
@@ -206,9 +210,9 @@ void Player::Update(uint32 p_time)
 
             if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
             {
-                if (!IsWithinMeleeRange(victim))
+                if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
-                else if (!IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
@@ -759,6 +763,28 @@ inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel,
     return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ORANGE) * 10;
 }
 
+inline int32 CraftSkillGainChance(uint32 skillValue, uint32 grayLevel, uint32 yellowLevel)
+{
+    int32 orangeChance = sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ORANGE) * 10;
+    int32 grayChance = sWorld->getIntConfig(CONFIG_SKILL_CHANCE_GREY) * 10;
+
+    // Invalid or equal thresholds cannot be interpolated. Preserve the
+    // previous orange/gray boundary behavior for malformed DBC entries.
+    if (grayLevel <= yellowLevel)
+        return skillValue < grayLevel ? orangeChance : grayChance;
+
+    if (skillValue <= yellowLevel)
+        return orangeChance;
+    if (skillValue >= grayLevel)
+        return grayChance;
+
+    // Crafting skill-up chance falls linearly from orange at the yellow
+    // threshold to gray at the gray threshold. The green threshold is the
+    // midpoint of that range and therefore has a 50% chance by default.
+    return grayChance + int32(int64(grayLevel - skillValue) * (orangeChance - grayChance) /
+        (grayLevel - yellowLevel));
+}
+
 bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
                                uint32 RedLevel, uint32 Multiplicator)
 {
@@ -850,12 +876,9 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 
             return UpdateSkillPro(
                 _spell_idx->second->SkillLine,
-                SkillGainChance(SkillValue,
-                                _spell_idx->second->TrivialSkillLineRankHigh,
-                                (_spell_idx->second->TrivialSkillLineRankHigh +
-                                 _spell_idx->second->TrivialSkillLineRankLow) /
-                                    2,
-                                _spell_idx->second->TrivialSkillLineRankLow),
+                CraftSkillGainChance(SkillValue,
+                                     _spell_idx->second->TrivialSkillLineRankHigh,
+                                     _spell_idx->second->TrivialSkillLineRankLow),
                 craft_skill_gain);
         }
     }
@@ -1292,7 +1315,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea, bool force)
         return;
 
     if (sWorld->getBoolConfig(CONFIG_WEATHER))
-        GetMap()->GetOrGenerateZoneDefaultWeather(newZone);
+        if (!GetMap()->GetOrGenerateZoneDefaultWeather(newZone))
+            Weather::SendFineWeatherUpdateToPlayer(this);
 
     GetMap()->SendZoneDynamicInfo(newZone, this);
 

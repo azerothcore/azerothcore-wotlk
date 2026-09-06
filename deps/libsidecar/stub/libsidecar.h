@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/* Compile-time version macros (vendored with real headers under include/) */
+#include "tc9_version.h"
+
 /* Include all API headers */
 #include "battleground-api.h"
 #include "events-group.h"
@@ -17,6 +20,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Version APIs (implemented by stub without panic; real lib reports its build) */
+void TC9GetVersion(int* major, int* minor, int* patch);
+const char* TC9GetVersionString(void);
+int TC9CheckAbiCompatible(int required_major, int required_minor);
 
 /* Main library functions */
 void TC9InitLib(uint16_t port, uint32_t realmID, uint8_t isCrossRealm, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize);

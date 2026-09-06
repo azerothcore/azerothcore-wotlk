@@ -76,6 +76,7 @@ struct SpawnData
     uint32 ScriptId{0};
     bool dbData{true};
     uint32 spawnGroupId{0};
+    uint32 poolId{0};
 
 protected:
     SpawnData(SpawnObjectType t) : type(t) {}

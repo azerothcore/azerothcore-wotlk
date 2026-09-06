@@ -143,7 +143,11 @@ int main(int argc, char** argv)
 
     if (sRealmList->GetRealms().empty())
     {
-        LOG_ERROR("server.authserver", "No valid realms specified.");
+        LOG_ERROR("server.authserver", "No valid realms specified. Possible reasons:");
+        LOG_ERROR("server.authserver", "- the realmlist table of the auth database is empty");
+        LOG_ERROR("server.authserver", "- every realm has flag 3 (REALM_FLAG_VERSION_MISMATCH | REALM_FLAG_OFFLINE), which the realm list "
+            "query excludes. Reset it with: UPDATE realmlist SET flag = 0 WHERE id = <realm id>;");
+        LOG_ERROR("server.authserver", "- no realm address could be resolved, see the resolver errors logged above");
         return 1;
     }
 

@@ -1,0 +1,31 @@
+-- DB update 2026_08_09_01 -> 2026_08_09_02
+--
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceEntry` IN (62584, 64185, 63947);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 3, 62584, 0, 0, 31, 0, 3, 32906, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Force cast and heal only Freya'),
+(13, 3, 64185, 0, 0, 31, 0, 3, 32906, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Force cast and heal only Freya'),
+(13, 4, 62584, 0, 0, 31, 0, 3, 32916, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Snaplasher'),
+(13, 4, 62584, 0, 1, 31, 0, 3, 32918, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Detonating Lasher'),
+(13, 4, 62584, 0, 2, 31, 0, 3, 32919, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Storm Lasher'),
+(13, 4, 62584, 0, 3, 31, 0, 3, 33050, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Unstable Sun Beam'),
+(13, 4, 62584, 0, 4, 31, 0, 3, 33088, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Iron Roots'),
+(13, 4, 62584, 0, 5, 31, 0, 3, 33168, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Strengthened Iron Roots'),
+(13, 4, 62584, 0, 6, 31, 0, 3, 33170, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Sun Beam'),
+(13, 4, 62584, 0, 7, 31, 0, 3, 33202, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Ancient Water Spirit'),
+(13, 4, 62584, 0, 8, 31, 0, 3, 33203, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Ancient Conservator'),
+(13, 4, 62584, 0, 9, 31, 0, 3, 33215, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Healthy Spore'),
+(13, 4, 62584, 0, 10, 31, 0, 3, 33228, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Eonar''s Gift'),
+(13, 4, 62584, 0, 11, 31, 0, 3, 34129, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Nature Bomb'),
+(13, 4, 64185, 0, 0, 31, 0, 3, 32916, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Snaplasher'),
+(13, 4, 64185, 0, 1, 31, 0, 3, 32918, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Detonating Lasher'),
+(13, 4, 64185, 0, 2, 31, 0, 3, 32919, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Storm Lasher'),
+(13, 4, 64185, 0, 3, 31, 0, 3, 33050, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Unstable Sun Beam'),
+(13, 4, 64185, 0, 4, 31, 0, 3, 33088, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Iron Roots'),
+(13, 4, 64185, 0, 5, 31, 0, 3, 33168, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Strengthened Iron Roots'),
+(13, 4, 64185, 0, 6, 31, 0, 3, 33170, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Sun Beam'),
+(13, 4, 64185, 0, 7, 31, 0, 3, 33202, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Ancient Water Spirit'),
+(13, 4, 64185, 0, 8, 31, 0, 3, 33203, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Ancient Conservator'),
+(13, 4, 64185, 0, 9, 31, 0, 3, 33215, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Healthy Spore'),
+(13, 4, 64185, 0, 10, 31, 0, 3, 33228, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Eonar''s Gift'),
+(13, 4, 64185, 0, 11, 31, 0, 3, 34129, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift - Heal Nature Bomb'),
+(13, 1, 63947, 0, 0, 31, 0, 3, 33228, 0, 0, 0, 0, '', 'Freya - Lifebinder''s Gift Heal - Target Eonar''s Gift');

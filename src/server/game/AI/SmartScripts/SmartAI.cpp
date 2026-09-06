@@ -66,6 +66,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mFollowCreditType = 0;
     mFollowArrivedAlive = 0;
     mFollowArrivedTimer = 0;
+    _followCheckTimer = 0;
     mInvincibilityHpLevel = 0;
 
     mJustReset = false;
@@ -759,7 +760,9 @@ void SmartAI::EnterEvadeMode(EvadeReason why)
 
     if (Unit* owner = me->GetCharmerOrOwner())
     {
-        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+        if (!me->IsVehicle()) // vehicles should not follow their owner (passenger)
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+
         me->ClearUnitState(UNIT_STATE_EVADE);
     }
     else if (HasEscortState(SMART_ESCORT_ESCORTING))
@@ -1267,6 +1270,7 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
     mFollowDist = dist;
     mFollowAngle = angle;
     mFollowArrivedTimer = 1000;
+    _followCheckTimer = 0;
     mFollowCredit = credit;
     mFollowArrivedEntry = end;
     mFollowArrivedAlive = !aliveState; // negate - 0 is alive

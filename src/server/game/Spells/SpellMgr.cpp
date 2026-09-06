@@ -3278,6 +3278,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                         case 46021: // Spectral Realm (SWP)
                         case 52951: // Chapel Invisibility (DK starting zone)
                         case 43062: // Alpha Worg: Garwal's Invisibility
+                        case 45614: // Shroud of the Scourge (Blending In, Temple City of En'kilah)
                             break;
                         default:
                             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;

@@ -1778,18 +1778,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
     });
 
-    // Lava Strike damage
-    ApplySpellFix({ 57697 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Lava Strike trigger
-    ApplySpellFix({ 57578 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-    });
-
     // Gift of Twilight Shadow/Fire
     ApplySpellFix({ 57835, 58766 }, [](SpellInfo* spellInfo)
     {
@@ -1905,12 +1893,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 61028 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Hurl Pyrite
-    ApplySpellFix({ 62490 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
     // Meeting Stone Summon
@@ -2057,6 +2039,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
+    // Shadow Nova (Sara)
+    ApplySpellFix({ 65719 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
+    });
+
     // Cosmic Smash (Algalon the Observer)
     ApplySpellFix({ 62293 }, [](SpellInfo* spellInfo)
     {
@@ -2081,6 +2070,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 62168, 65250, 62169 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_ON_PLAYER; // pets phased away from their owner get despawned
     });
 
     // Ground Slam

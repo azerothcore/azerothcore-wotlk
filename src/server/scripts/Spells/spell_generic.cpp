@@ -1483,6 +1483,33 @@ class spell_gen_clear_debuffs : public SpellScript
     }
 };
 
+enum ClearDemonicCircle
+{
+    SPELL_DEMONIC_CIRCLE_SUMMON = 48018
+};
+
+// 62037 - Clear Demonic Circle
+class spell_gen_clear_demonic_circle : public SpellScript
+{
+    PrepareSpellScript(spell_gen_clear_demonic_circle);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DEMONIC_CIRCLE_SUMMON });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            target->RemoveAurasDueToSpell(SPELL_DEMONIC_CIRCLE_SUMMON);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_clear_demonic_circle::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 enum CreateLanceSpells
 {
     SPELL_CREATE_LANCE_ALLIANCE = 63914,
@@ -2528,7 +2555,8 @@ class spell_gen_allow_cast_from_item_only : public SpellScript
 
 enum VehicleScaling
 {
-    SPELL_GEAR_SCALING      = 66668
+    SPELL_GEAR_SCALING        = 66668,
+    SPELL_GEAR_SCALING_ULDUAR = 65266,
 };
 
 // 65266, 65635, 65636, 66666, 66667, 66668 - Gear Scaling
@@ -2565,26 +2593,35 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
     {
         Player* player = GetCaster()->ToPlayer();
 
+        float factor;
+        uint16 baseItemLevel;
+
         /// @todo Reserach coeffs for different vehicles
         switch (GetId())
         {
-            case SPELL_GEAR_SCALING:
-            {
-                float avgILvl = player->GetAverageItemLevel();
-                if (avgILvl < 205.0f)
-                    return;
-
-                amount = static_cast<int32>(avgILvl - 205.0f);
-                break;
-            }
-            default:
+            case SPELL_GEAR_SCALING_ULDUAR:
             {
                 float totalILvl = player->GetTotalItemLevel();
-                float result = (totalILvl - 2500.0f) / 5.0f / 100.0f;
-                amount = static_cast<int32>(std::max(0.1f, result));
-                break;
+                float scaling = (totalILvl - 2500.0f) / 5.0f / 100.0f;
+                scaling = std::max(0.1f, scaling);
+                amount = static_cast<int32>(std::round((scaling - 1.0f) * 100.0f));
+                return;
             }
+            case SPELL_GEAR_SCALING:
+                factor = 1.0f;
+                baseItemLevel = 205;
+                break;
+            default:
+                factor = 1.0f;
+                baseItemLevel = 170;
+                break;
         }
+
+        float avgILvl = player->GetAverageItemLevel();
+        if (avgILvl < baseItemLevel)
+            return;                     /// @todo Research possibility of scaling down
+
+        amount = uint16((avgILvl - baseItemLevel) * factor);
     }
 
     void Register() override
@@ -4476,7 +4513,7 @@ class spell_gen_whisper_gulch_yogg_saron_whisper : public AuraScript
     }
 };
 
-// 50630, 68576 - Eject All Passengers
+// 50630, 51254, 68576 - Eject All Passengers
 class spell_gen_eject_all_passengers : public SpellScript
 {
     PrepareSpellScript(spell_gen_eject_all_passengers);
@@ -5269,40 +5306,29 @@ class spell_gen_choking_vines : public AuraScript
     }
 };
 
- // 28865 - Consumption
+// 28865 - Consumption
+// 64208 - Consumption
 class spell_gen_consumption : public SpellScript
 {
     PrepareSpellScript(spell_gen_consumption);
 
-    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
-        Map* map = GetCaster()->GetMap();
-        if (!map)
-        {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsCreature())
             return;
-        }
-        int32 value = 0;
-        if (map->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL) // NAXX25 N
-        {
-            value = urand(4500, 4700);
-        }
-        else if (map->GetId() == 533) // NAXX10 N
-        {
-            value = urand(3000, 3200);
-        }
-        else if (map->GetId() == 532) // Karazhan
-        {
-            value = urand(1110, 1310);
-        }
-        if (value)
-        {
-            SetEffectValue(value);
-        }
+
+        int32 damage = 0;
+        if (SpellInfo const* createdBySpell = sSpellMgr->GetSpellInfo(caster->GetUInt32Value(UNIT_CREATED_BY_SPELL)))
+            damage = createdBySpell->Effects[EFFECT_1].CalcValue();
+
+        if (damage)
+            SetEffectValue(damage);
     }
 
     void Register() override
     {
-        OnEffectLaunchTarget += SpellEffectFn(spell_gen_consumption::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectLaunchTarget += SpellEffectFn(spell_gen_consumption::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -6236,6 +6262,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_burn_brutallus);
     RegisterSpellScript(spell_gen_cannibalize);
     RegisterSpellScript(spell_gen_clear_debuffs);
+    RegisterSpellScript(spell_gen_clear_demonic_circle);
     RegisterSpellScript(spell_gen_create_lance);
     RegisterSpellScript(spell_gen_netherbloom);
     RegisterSpellScript(spell_gen_nightmare_vine);
