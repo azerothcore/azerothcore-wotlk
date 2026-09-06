@@ -1064,6 +1064,26 @@ class spell_frog_kiss : public SpellScript
     }
 };
 
+class spell_q12058_the_runic_prophecies : public SpellScript
+{
+    PrepareSpellScript(spell_q12058_the_runic_prophecies);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Player* player = GetHitPlayer();
+
+        if (!player)
+            return;
+
+        player->Unit::Say(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12058_the_runic_prophecies::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_grizzly_hills()
 {
     new npc_emily();
@@ -1082,4 +1102,5 @@ void AddSC_grizzly_hills()
     RegisterSpellScript(spell_q12227_outhouse_groans);
     RegisterSpellScript(spell_q12227_camera_shake);
     RegisterSpellScript(spell_frog_kiss);
+    RegisterSpellScript(spell_q12058_the_runic_prophecies);
 }

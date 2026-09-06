@@ -38,6 +38,7 @@
 #include "Pet.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
+#include "TC9Sidecar.h"
 #include "Transport.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
@@ -80,6 +81,8 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
 
     _weatherUpdateTimer.SetInterval(1 * IN_MILLISECONDS);
     _corpseUpdateTimer.SetInterval(20 * MINUTE * IN_MILLISECONDS);
+
+    _poolData = sPoolMgr->InitPoolsForMap(this);
 }
 
 // Hook called after map is created AND after added to map list
@@ -517,6 +520,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     MoveAllDynamicObjectsInMoveList();
 
     HandleDelayedVisibility();
+
+    UpdatePlayersRedirectKickEvent(t_diff);
 
     UpdateWeather(t_diff);
     UpdateExpiredCorpses(t_diff);
@@ -1670,7 +1675,7 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
-        if (*itr != player->GetTransport())
+        if (*itr != player->GetTransport() && (!sToCloud9Sidecar->ClusterModeEnabled() || player->InSamePhase(*itr)))
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
     if (!transData.HasData())
@@ -1846,6 +1851,50 @@ uint32 Map::GetPlayersCountExceptGMs(bool aliveOnly /*= false*/) const
             if (!player->IsGameMaster() && (!aliveOnly || (player->IsAlive() && !player->HasSpiritOfRedemptionAura())))
                 ++count;
     return count;
+}
+
+void Map::StartPlayersRedirectKickTimer()
+{
+    for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+        itr->GetSource()->SendSystemMessage("Preparing to enter parallel dimension... One minute!\nAccelerate transfer: Teleport or type \"/ready\" in chat.");
+
+    _redirectKickTimer.Reset(60 * SECOND * IN_MILLISECONDS);
+    _lastAnnounceRedirectKickTimer.Reset(55 * SECOND * IN_MILLISECONDS);
+
+    _lastAnnounceRedirectKickTimer.Update(1);
+
+}
+
+void Map::StopPlayersRedirectKickTimer()
+{
+    _redirectKickTimer.Reset(0);
+    _lastAnnounceRedirectKickTimer.Reset(0);
+}
+
+void Map::UpdatePlayersRedirectKickEvent(uint32 diff)
+{
+    if (_redirectKickTimer.Passed())
+        return;
+
+    _redirectKickTimer.Update(diff);
+
+    if (_redirectKickTimer.Passed())
+    {
+        auto emptyPacket = WorldPacket();
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+            itr->GetSource()->GetSession()->HandleTC9PrepareForRedirect(emptyPacket);
+
+        return;
+    }
+
+    if (_lastAnnounceRedirectKickTimer.Passed())
+        return;
+
+    _lastAnnounceRedirectKickTimer.Update(diff);
+
+    if (_lastAnnounceRedirectKickTimer.Passed())
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+            itr->GetSource()->SendSystemMessage("Dimensional shift incoming! Prepare to transition in 5 seconds...");
 }
 
 void Map::SendToPlayers(WorldPacket const* data) const
@@ -2733,18 +2782,12 @@ void Map::ProcessRespawns()
 
 void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 {
-    // Pool members in non-instanced maps are handled entirely by PoolMgr.
-    // In instanced maps the pool system operates globally and Spawn1Object is
-    // a no-op for instanceable maps, so fall through to the normal per-instance
-    // respawn logic instead.
-    if (!Instanceable())
+    // Pool members are handled entirely by the pool system on this map's pool data
+    if (uint32 poolId = sPoolMgr->IsPartOfAPool<Creature>(spawnId))
     {
-        if (uint32 poolId = sPoolMgr->IsPartOfAPool<Creature>(spawnId))
-        {
-            sPoolMgr->UpdatePool<Creature>(poolId, spawnId);
-            RemoveCreatureRespawnTime(spawnId);
-            return;
-        }
+        sPoolMgr->UpdatePool<Creature>(GetPoolData(), poolId, spawnId);
+        RemoveCreatureRespawnTime(spawnId);
+        return;
     }
 
     CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
@@ -2819,16 +2862,12 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 
 void Map::ProcessGameObjectRespawn(ObjectGuid::LowType spawnId)
 {
-    // Same rationale as ProcessCreatureRespawn: pool management via PoolMgr is
-    // only meaningful for non-instanced maps where Spawn1Object actually spawns.
-    if (!Instanceable())
+    // Pool members are handled entirely by the pool system on this map's pool data
+    if (uint32 poolId = sPoolMgr->IsPartOfAPool<GameObject>(spawnId))
     {
-        if (uint32 poolId = sPoolMgr->IsPartOfAPool<GameObject>(spawnId))
-        {
-            sPoolMgr->UpdatePool<GameObject>(poolId, spawnId);
-            RemoveGORespawnTime(spawnId);
-            return;
-        }
+        sPoolMgr->UpdatePool<GameObject>(GetPoolData(), poolId, spawnId);
+        RemoveGORespawnTime(spawnId);
+        return;
     }
 
     GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);

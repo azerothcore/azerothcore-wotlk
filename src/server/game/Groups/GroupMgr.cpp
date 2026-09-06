@@ -53,7 +53,11 @@ void GroupMgr::InitGroupIds()
 
 void GroupMgr::RegisterGroupId(ObjectGuid::LowType groupId)
 {
-    // Allocation was done in InitGroupIds()
+    // InitGroupIds() sizes the bitmap to the local MAX(guid) at startup. In cluster mode the
+    // group service assigns ids (auto-increment), which can exceed that bound, so grow on demand.
+    if (groupId >= _groupIds.size())
+        _groupIds.resize(groupId + 1);
+
     _groupIds[groupId] = true;
 
     // Groups are pulled in ascending order from db and _nextGroupId is initialized with 1,
