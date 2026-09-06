@@ -1,0 +1,421 @@
+# Live e2e (native only): start auth + world, then go test.
+#
+#   PR / master: nopch-build (ubuntu-24.04 clang-18) compiles + dry-run,
+#       uploads binaries; this workflow is called with artifact_run_id, scope=full.
+#   Dispatch: compile via linux-build, or nopch-build -f scope=smoke|full.
+#
+# Triggers: workflow_call (from nopch-build) | workflow_dispatch
+
+name: e2e-live
+
+on:
+  workflow_call:
+    inputs:
+      scope:
+        description: 'smoke | full'
+        type: string
+        default: 'full'
+      count:
+        type: string
+        default: '1'
+      timeout:
+        type: string
+        default: ''
+      parallel:
+        type: string
+        default: '1'
+      package_parallel:
+        type: string
+        default: '1'
+      packages:
+        type: string
+        default: './...'
+      tags_filter:
+        type: string
+        default: ''
+      artifact_run_id:
+        description: 'Caller run id that uploaded ac-server-ubuntu-24.04-clang-18'
+        type: string
+        default: ''
+
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Go packages under e2e/ when scope=full'
+        required: false
+        default: './...'
+      scope:
+        description: 'smoke | full'
+        required: false
+        default: 'full'
+        type: choice
+        options: [smoke, full]
+      count:
+        required: false
+        default: '1'
+      timeout:
+        description: 'go test -timeout (smoke default 30m; full should be >=120m)'
+        required: false
+        default: ''
+      parallel:
+        description: 'go test -parallel (in-package; keep 1 for pad safety)'
+        required: false
+        default: '1'
+      package_parallel:
+        description: 'go test -p (packages; keep 1 unless each concurrent suite has a unique pad)'
+        required: false
+        default: '1'
+      tags_filter:
+        description: 'E2E_TAGS for full scope only'
+        required: false
+        default: ''
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  # Cancel superseded PR runs; do not cancel intentional dispatch full suites.
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
+permissions:
+  contents: read
+  actions: read  # download-artifact with run-id
+
+env:
+  CONTINUOUS_INTEGRATION: true
+  MYSQL_ROOT_PASSWORD: root
+
+jobs:
+  e2e:
+    name: e2e (native / ${{ inputs.scope || 'full' }})
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    # Artifact path (PR nopch): ubuntu-24.04 to match the uploaded binaries.
+    # Dispatch (no artifact): optional self-hosted via E2E_RUNS_ON.
+    runs-on: ${{ inputs.artifact_run_id != '' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
+    timeout-minutes: 480
+    steps:
+      - name: Free disk
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc "$AGENT_TOOLSDIRECTORY" || true
+          df -h
+
+      - name: Checkout AzerothCore
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: e2e/go.mod
+          cache-dependency-path: e2e/go.sum
+
+      # AzerothGhost is a public Go module (e2e/go.mod; repo azerothcore/AzerothGhost).
+      - name: Download e2e modules
+        working-directory: e2e
+        run: go mod download
+
+      # upload-artifact roots the zip at the common parent (env/dist), so the
+      # archive is bin/authserver + etc/, not env/dist/bin/authserver.
+      - name: Download nopch server binaries
+        if: ${{ inputs.artifact_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ac-server-ubuntu-24.04-clang-18
+          path: ${{ runner.temp }}/ac-server
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.artifact_run_id }}
+
+      - name: Place downloaded binaries
+        if: ${{ inputs.artifact_run_id != '' }}
+        run: |
+          set -euo pipefail
+          root="${RUNNER_TEMP}/ac-server"
+          find "$root" -type f -print | sed -n '1,50p'
+          auth=$(find "$root" -type f -name authserver | sed -n '1p')
+          [[ -n "${auth}" ]] || { echo '::error::authserver missing from artifact'; exit 1; }
+          src=$(dirname "${auth}")
+          mkdir -p env/dist/bin env/dist/etc
+          cp -a "${src}/authserver" "${src}/worldserver" env/dist/bin/
+          chmod +x env/dist/bin/authserver env/dist/bin/worldserver
+          etc=$(find "$root" -type d -name etc | head -n 1)
+          [[ -n "${etc}" ]] || { echo '::error::etc/ missing from artifact'; exit 1; }
+          cp -a "${etc}/." env/dist/etc/
+          ls -l env/dist/bin/authserver env/dist/bin/worldserver env/dist/etc
+
+      # Runtime only (no compile). install-deps starts MySQL in CI.
+      - name: Deps, empty DBs, client-data
+        if: ${{ inputs.artifact_run_id != '' }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          CONTINUOUS_INTEGRATION: true
+          DATAPATH: ${{ github.workspace }}/env/dist/data
+        run: |
+          set -euo pipefail
+          ./acore.sh install-deps
+          ./acore.sh setup-db
+          ./acore.sh client-data
+          echo "AC_DATA_DIR=${DATAPATH}" >> "$GITHUB_ENV"
+        timeout-minutes: 30
+
+      - name: Build (dispatch / no artifact)
+        if: ${{ inputs.artifact_run_id == '' }}
+        uses: ./.github/actions/linux-build
+        with:
+          CC: clang-18
+          CXX: clang++-18
+          pch: false
+
+      # linux-build only clones ac-data (DBC). Real worldserver needs maps/vmaps/mmaps.
+      - name: Client-data (dispatch / no artifact)
+        if: ${{ inputs.artifact_run_id == '' }}
+        env:
+          CONTINUOUS_INTEGRATION: true
+          DATAPATH: ${{ github.workspace }}/env/dist/data
+        run: |
+          set -euo pipefail
+          ./acore.sh client-data
+          echo "AC_DATA_DIR=${DATAPATH}" >> "$GITHUB_ENV"
+        timeout-minutes: 30
+
+      # create_mysql.sql only creates acore@localhost (unix_socket). Servers and
+      # the harness connect via TCP 127.0.0.1, which needs a separate account host.
+      # Grants are loopback-only (no root@% / acore@%) for self-hosted runner safety.
+      - name: MySQL TCP grants for acore + root password
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        run: |
+          set -euo pipefail
+          mysql_root() {
+            sudo mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" "$@"
+          }
+          # Hosted images often have empty root password. Set it once.
+          # Do not ALTER when root already uses a password (self-hosted).
+          if sudo mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" -e 'SELECT 1' &>/dev/null; then
+            :
+          elif sudo mysql -uroot -e 'SELECT 1' &>/dev/null; then
+            sudo mysql -uroot -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '${MYSQL_ROOT_PASSWORD}';"
+          else
+            echo '::error::cannot connect to MySQL as root'
+            exit 1
+          fi
+          mysql_root <<'SQL'
+          CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY 'root';
+          GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+          CREATE USER IF NOT EXISTS 'acore'@'127.0.0.1' IDENTIFIED BY 'acore';
+          GRANT ALL PRIVILEGES ON `acore_world`.* TO 'acore'@'127.0.0.1' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_characters`.* TO 'acore'@'127.0.0.1' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_auth`.* TO 'acore'@'127.0.0.1' WITH GRANT OPTION;
+          CREATE USER IF NOT EXISTS 'acore'@'localhost' IDENTIFIED BY 'acore';
+          GRANT ALL PRIVILEGES ON `acore_world`.* TO 'acore'@'localhost' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_characters`.* TO 'acore'@'localhost' WITH GRANT OPTION;
+          GRANT ALL PRIVILEGES ON `acore_auth`.* TO 'acore'@'localhost' WITH GRANT OPTION;
+          FLUSH PRIVILEGES;
+          SQL
+          mysql -h127.0.0.1 -uacore -pacore -e 'SELECT USER(), CURRENT_USER();' acore_auth
+
+      # Copy .conf from .dist only (no sed). Runtime overrides use AC_* env vars
+      # (ConfigMgr: ini key → AC_UPPER_SNAKE, e.g. Console.Enable → AC_CONSOLE_ENABLE).
+      - name: Prepare server conf + AC_*
+        run: |
+          set -euo pipefail
+          etc="$(cd env/dist/etc && pwd)"
+          for n in authserver worldserver; do
+            [[ -f "${etc}/${n}.conf" ]] || cp -v "${etc}/${n}.conf.dist" "${etc}/${n}.conf"
+          done
+          mkdir -p env/dist/bin env/dist/data
+          logs_dir="$(cd env/dist/bin && pwd)"
+          data_dir="$(cd env/dist/data && pwd)"
+          {
+            echo "AC_LOGS_DIR=${logs_dir}"
+            echo "AC_DATA_DIR=${data_dir}"
+            echo "AC_CONSOLE_ENABLE=0"
+            echo "AC_WARDEN_ENABLED=0"
+            echo "AC_BEEP_AT_START=0"
+            echo "AC_REALMS_STATE_UPDATE_DELAY=1"
+            echo "E2E_AUTH_ADDR=127.0.0.1:3724"
+            echo "E2E_AUTH_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_auth"
+            echo "E2E_CHAR_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_characters"
+            echo "E2E_WORLD_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_world"
+          } >> "$GITHUB_ENV"
+
+      - name: Start authserver + worldserver (background)
+        run: |
+          set -euo pipefail
+          cd env/dist/bin
+          etc="$(cd ../etc && pwd)"
+          [[ -f "${etc}/authserver.conf" ]] || cp -v "${etc}/authserver.conf.dist" "${etc}/authserver.conf"
+          [[ -f "${etc}/worldserver.conf" ]] || cp -v "${etc}/worldserver.conf.dist" "${etc}/worldserver.conf"
+          # AC_* from GITHUB_ENV (set in Prepare server conf). Re-export for this shell.
+          : "${AC_LOGS_DIR:=$(pwd)}"
+          export AC_LOGS_DIR
+          # linux-build sets a workspace-relative DataDir; worldserver CWD is bin/.
+          if [[ -n "${AC_DATA_DIR:-}" ]]; then
+            export AC_DATA_DIR
+          fi
+          export AC_CONSOLE_ENABLE="${AC_CONSOLE_ENABLE:-0}"
+          export AC_WARDEN_ENABLED="${AC_WARDEN_ENABLED:-0}"
+          export AC_BEEP_AT_START="${AC_BEEP_AT_START:-0}"
+          export AC_REALMS_STATE_UPDATE_DELAY="${AC_REALMS_STATE_UPDATE_DELAY:-1}"
+          echo "AC overrides: LOGS_DIR=${AC_LOGS_DIR} DATA_DIR=${AC_DATA_DIR:-} CONSOLE=${AC_CONSOLE_ENABLE} WARDEN=${AC_WARDEN_ENABLED} BEEP=${AC_BEEP_AT_START} REALMS_DELAY=${AC_REALMS_STATE_UPDATE_DELAY}"
+
+          wait_port() {
+            local port="$1" name="$2" secs="${3:-120}"
+            local i
+            for i in $(seq 1 "${secs}"); do
+              if (echo >"/dev/tcp/127.0.0.1/${port}") >/dev/null 2>&1; then
+                echo "${name} listening on ${port} at ${i}s"
+                return 0
+              fi
+              if ! kill -0 "$(cat "${RUNNER_TEMP}/${name}.pid")" 2>/dev/null; then
+                echo "::error::${name} exited early"
+                tail -n 150 "${RUNNER_TEMP}/${name}.log" 2>/dev/null || true
+                return 1
+              fi
+              if (( i % 30 == 0 )); then
+                echo "${name}: still waiting for port ${port} (${i}s)"
+              fi
+              sleep 1
+            done
+            echo "::error::${name} did not open port ${port} within ${secs}s"
+            tail -n 150 "${RUNNER_TEMP}/${name}.log" 2>/dev/null || true
+            return 1
+          }
+
+          # World first: Main.cpp binds :8085 only after SetInitialWorldSettings
+          # (first boot also applies world/chars schema — can take ~15m).
+          ./worldserver -c "${etc}/worldserver.conf" \
+            < /dev/null >"${RUNNER_TEMP}/worldserver.log" 2>&1 &
+          echo $! >"${RUNNER_TEMP}/worldserver.pid"
+          wait_port 8085 worldserver 900
+
+          ./authserver -c "${etc}/authserver.conf" \
+            < /dev/null >"${RUNNER_TEMP}/authserver.log" 2>&1 &
+          echo $! >"${RUNNER_TEMP}/authserver.pid"
+          wait_port 3724 authserver 300
+
+          # realmlist exists only after first-boot schema apply.
+          mysql -h127.0.0.1 -uacore -pacore -e \
+            "UPDATE acore_auth.realmlist
+             SET address='127.0.0.1', localAddress='127.0.0.1',
+                 localSubnetMask='255.255.255.0', flag=0, port=8085, gamebuild=12340
+             WHERE id=1;
+             SELECT id,name,address,localAddress,localSubnetMask,port,flag,gamebuild
+             FROM acore_auth.realmlist\G"
+          # >= RealmsStateUpdateDelay (1s) + margin so in-memory realm list drops OFFLINE.
+          sleep 3
+          (echo >/dev/tcp/127.0.0.1/8085) >/dev/null 2>&1 || { echo '::error::world port lost'; exit 1; }
+          (echo >/dev/tcp/127.0.0.1/3724) >/dev/null 2>&1 || { echo '::error::auth port lost'; exit 1; }
+        timeout-minutes: 40
+
+      - name: Validate E2E_*
+        run: |
+          set -euo pipefail
+          for v in E2E_AUTH_ADDR E2E_AUTH_DSN E2E_CHAR_DSN E2E_WORLD_DSN; do
+            [[ -n "${!v:-}" ]] || { echo "missing $v"; exit 1; }
+          done
+          echo "E2E_AUTH_ADDR=${E2E_AUTH_ADDR}"
+
+      - name: Run go e2e
+        working-directory: e2e
+        env:
+          # Inputs via env only — never expand untrusted workflow_dispatch into bash -c text.
+          E2E_SCOPE: ${{ inputs.scope || 'smoke' }}
+          E2E_COUNT: ${{ inputs.count || '1' }}
+          E2E_TIMEOUT_INPUT: ${{ inputs.timeout || '' }}
+          E2E_PARALLEL: ${{ inputs.parallel || '1' }}
+          E2E_P: ${{ inputs.package_parallel || '1' }}
+          E2E_PACKAGES: ${{ inputs.packages || './...' }}
+          E2E_TAGS_FILTER: ${{ inputs.tags_filter || '' }}
+        run: |
+          set -euo pipefail
+          count="${E2E_COUNT}"
+          parallel="${E2E_PARALLEL}"
+          p="${E2E_P}"
+          scope="${E2E_SCOPE}"
+          packages_raw="${E2E_PACKAGES}"
+
+          # Packages must stay under e2e/. Allow Go ./... ; reject a ../ path segment.
+          [[ "${packages_raw}" =~ ^\./[A-Za-z0-9_./\*+-]*$ ]] || { echo "bad packages"; exit 1; }
+          case "${packages_raw}" in
+            ..|../*|*/..|*/../*) echo "packages must not contain ../"; exit 1 ;;
+          esac
+          [[ "${count}" =~ ^[1-9][0-9]*$ ]] || { echo "bad count (need >=1)"; exit 1; }
+          if (( count > 5 )); then
+            echo "count capped at 5 (was ${count})"
+            count=5
+          fi
+          [[ "${parallel}" =~ ^[1-9][0-9]*$ ]] || { echo "bad parallel (need >=1)"; exit 1; }
+          [[ "${p}" =~ ^[1-9][0-9]*$ ]] || { echo "bad package_parallel (need >=1)"; exit 1; }
+          if (( parallel > 1 )); then
+            echo "::warning::parallel=${parallel} >1 shares PackagePad within a package; prefer 1"
+          fi
+          if (( p > 1 )); then
+            echo "::warning::package_parallel=${p} >1 may hash-share IsolationPads if two suites land on the same pad"
+          fi
+          if (( p > 27 )); then
+            echo "package_parallel capped at 27 (IsolationPads size)"
+            p=27
+          fi
+          if [[ -n "${E2E_TIMEOUT_INPUT}" ]]; then
+            [[ "${E2E_TIMEOUT_INPUT}" =~ ^[0-9]+([.][0-9]+)?(ns|us|µs|ms|s|m|h)$ ]] \
+              || { echo "bad timeout duration: ${E2E_TIMEOUT_INPUT}"; exit 1; }
+            timeout="${E2E_TIMEOUT_INPUT}"
+          elif [[ "${scope}" == "full" ]]; then
+            timeout="180m"
+          else
+            timeout="30m"
+          fi
+
+          run_go_test() {
+            go test -tags=e2e -count="${count}" -timeout="${timeout}" -parallel="${parallel}" -p "${p}" -v "$@"
+          }
+
+          if [[ "${scope}" == "smoke" ]]; then
+            # Smoke package + suites tagged smoke (open-issue suites must not carry smoke).
+            run_go_test ./smoke/
+            E2E_TAGS=smoke run_go_test ./suites/...
+          else
+            if [[ -n "${E2E_TAGS_FILTER}" ]]; then
+              export E2E_TAGS="${E2E_TAGS_FILTER}"
+            fi
+            # shellcheck disable=SC2086
+            run_go_test ${packages_raw}
+          fi
+
+      - name: Stop servers
+        if: always()
+        run: |
+          for n in worldserver authserver; do
+            if [[ -f "${RUNNER_TEMP}/${n}.pid" ]]; then
+              kill "$(cat "${RUNNER_TEMP}/${n}.pid")" 2>/dev/null || true
+              sleep 2
+              kill -9 "$(cat "${RUNNER_TEMP}/${n}.pid")" 2>/dev/null || true
+            fi
+            pkill -f "env/dist/bin/${n}" 2>/dev/null || true
+          done
+
+      - name: Logs on failure
+        if: failure()
+        run: |
+          ls -la env/dist/bin/*.log env/dist/logs 2>/dev/null || true
+          for f in env/dist/bin/Server.log env/dist/bin/Auth.log; do
+            echo "==== ${f} ===="
+            tail -n 150 "${f}" 2>/dev/null || true
+          done
+          for f in worldserver.log authserver.log; do
+            echo "==== ${RUNNER_TEMP}/${f} ===="
+            tail -n 80 "${RUNNER_TEMP}/${f}" 2>/dev/null || true
+          done
+
+      - name: Upload server logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-server-logs
+          path: |
+            ${{ runner.temp }}/worldserver.log
+            ${{ runner.temp }}/authserver.log
+            env/dist/bin/Server.log
+            env/dist/bin/Auth.log
+            env/dist/logs/**
+          if-no-files-found: ignore
+          retention-days: 7

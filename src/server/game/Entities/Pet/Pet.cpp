@@ -1548,6 +1548,12 @@ void Pet::_LoadSpells(PreparedQueryResult result)
 
 void Pet::_SaveSpells(CharacterDatabaseTransaction trans)
 {
+    // rewrite the whole spell book: pet numbers are recycled, so an incremental save would let a
+    // new pet inherit the rows of whichever pet held the number before it
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELLS);
+    stmt->SetData(0, m_charmInfo->GetPetNumber());
+    trans->Append(stmt);
+
     for (PetSpellMap::iterator itr = m_spells.begin(), next = m_spells.begin(); itr != m_spells.end(); itr = next)
     {
         ++next;
@@ -1556,41 +1562,18 @@ void Pet::_SaveSpells(CharacterDatabaseTransaction trans)
         if (itr->second.type == PETSPELL_FAMILY)
             continue;
 
-        CharacterDatabasePreparedStatement* stmt;
-
-        switch (itr->second.state)
+        if (itr->second.state == PETSPELL_REMOVED)
         {
-            case PETSPELL_REMOVED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
-                stmt->SetData(0, m_charmInfo->GetPetNumber());
-                stmt->SetData(1, itr->first);
-                trans->Append(stmt);
-
-                m_spells.erase(itr);
-                continue;
-            case PETSPELL_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
-                stmt->SetData(0, m_charmInfo->GetPetNumber());
-                stmt->SetData(1, itr->first);
-                trans->Append(stmt);
-
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL);
-                stmt->SetData(0, m_charmInfo->GetPetNumber());
-                stmt->SetData(1, itr->first);
-                stmt->SetData(2, itr->second.active);
-                trans->Append(stmt);
-
-                break;
-            case PETSPELL_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL);
-                stmt->SetData(0, m_charmInfo->GetPetNumber());
-                stmt->SetData(1, itr->first);
-                stmt->SetData(2, itr->second.active);
-                trans->Append(stmt);
-                break;
-            case PETSPELL_UNCHANGED:
-                continue;
+            m_spells.erase(itr);
+            continue;
         }
+
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL);
+        stmt->SetData(0, m_charmInfo->GetPetNumber());
+        stmt->SetData(1, itr->first);
+        stmt->SetData(2, itr->second.active);
+        trans->Append(stmt);
+
         itr->second.state = PETSPELL_UNCHANGED;
     }
 }

@@ -537,6 +537,25 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
                 return false;
             return IsSAIBoolValid(e, e.target.formation.excludeSelf);
         }
+        case SMART_TARGET_SHARED_OWNER_ENTITIES:
+        {
+            if (e.target.sharedOwnerEntities.type != 1 && e.target.sharedOwnerEntities.type != 2)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid shared owner entities type as target ({}, must be 1 or 2).",
+                    e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType(), e.target.sharedOwnerEntities.type);
+                return false;
+            }
+
+            if (e.target.sharedOwnerEntities.entry)
+            {
+                if (e.target.sharedOwnerEntities.type == 1 && !IsCreatureValid(e, e.target.sharedOwnerEntities.entry))
+                    return false;
+
+                if (e.target.sharedOwnerEntities.type == 2 && !IsGameObjectValid(e, e.target.sharedOwnerEntities.entry))
+                    return false;
+            }
+            break;
+        }
         case SMART_TARGET_BY_HEALTH_PCT:    //Lyeus edit
         {
             if (!IsMinMaxValid(e, e.target.byHealthPct.min, e.target.byHealthPct.max))
@@ -980,6 +999,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_SUMMONED_CREATURES: return sizeof(SmartTarget::summonedCreatures);
             case SMART_TARGET_INSTANCE_STORAGE: return sizeof(SmartTarget::instanceStorage);
             case SMART_TARGET_FORMATION: return sizeof(SmartTarget::formation);
+            case SMART_TARGET_SHARED_OWNER_ENTITIES: return sizeof(SmartTarget::sharedOwnerEntities);
             case SMART_TARGET_BY_HEALTH_PCT: return sizeof(SmartTarget::byHealthPct);   //Lyeus edit
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target {} with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",

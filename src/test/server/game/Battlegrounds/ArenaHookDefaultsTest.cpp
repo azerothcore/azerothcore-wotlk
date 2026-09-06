@@ -92,6 +92,16 @@ TEST_F(ArenaHookDefaultsTest, CanSaveArenaStatsForMemberDefaultsTrue)
     EXPECT_TRUE(sScriptMgr->CanSaveArenaStatsForMember(&team, ObjectGuid::Empty));
 }
 
+// OnGetStartPersonalRating must leave the rating untouched by default so a new
+// arena team member keeps the value ArenaTeam::AddMember computed for them.
+TEST_F(ArenaHookDefaultsTest, OnGetStartPersonalRatingKeepsCoreValue)
+{
+    ArenaTeam team;
+    uint32 personalRating = 1000;
+    sScriptMgr->OnGetStartPersonalRating(&team, ObjectGuid::Empty, personalRating);
+    EXPECT_EQ(personalRating, 1000u);
+}
+
 // OnBeforeArenaCheckWinConditions must return true by default so
 // the normal win condition check proceeds.
 TEST_F(ArenaHookDefaultsTest, OnBeforeArenaCheckWinConditionsDefaultsTrue)

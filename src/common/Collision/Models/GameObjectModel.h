@@ -42,6 +42,7 @@ public:
     virtual ~GameObjectModelOwnerBase() = default;
 
     [[nodiscard]] virtual bool IsSpawned() const = 0;
+    [[nodiscard]] virtual bool IsTransport() const { return false; }
     [[nodiscard]] virtual uint32 GetDisplayId() const = 0;
     [[nodiscard]] virtual uint32 GetPhaseMask() const = 0;
     [[nodiscard]] virtual G3D::Vector3 GetPosition() const = 0;

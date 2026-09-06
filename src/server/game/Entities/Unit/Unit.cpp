@@ -2739,7 +2739,9 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
         return;
     }
 
-    if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) && !extra && !ignoreCasting)
+    // UNIT_STATE_CASTING is checked through IsActionPreventedByCasting() so that channels
+    // flagged as "allow actions during channel" do not block the auto attack
+    if ((HasUnitState(UNIT_STATE_LOST_CONTROL) || IsActionPreventedByCasting()) && !extra && !ignoreCasting)
     {
         return;
     }
@@ -4181,8 +4183,11 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
             }
         case CURRENT_CHANNELED_SPELL:
             {
-                // channel spells always break generic non-delayed and any channeled spells
-                InterruptSpell(CURRENT_GENERIC_SPELL, false);
+                // channel spells always break generic non-delayed and any channeled spells,
+                // unless the channel itself is allowed to run alongside other actions
+                if (!pSpell->GetSpellInfo()->IsActionAllowedChannel())
+                    InterruptSpell(CURRENT_GENERIC_SPELL, false);
+
                 InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, bySelf);
 
                 // it also does break autorepeat if not Auto Shot
@@ -4190,8 +4195,7 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
                         m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
                     InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 
-                if (!pSpell->GetSpellInfo()->IsActionAllowedChannel())
-                    AddUnitState(UNIT_STATE_CASTING);
+                AddUnitState(UNIT_STATE_CASTING);
 
                 break;
             }
@@ -4365,6 +4369,26 @@ bool Unit::IsMovementPreventedByCasting() const
     }
 
     // prohibit movement for all other spell casts
+    return true;
+}
+
+bool Unit::IsActionPreventedByCasting() const
+{
+    // can always act when not casting
+    if (!HasUnitState(UNIT_STATE_CASTING))
+        return false;
+
+    // a regular cast in progress always prevents other actions, even alongside a permissive channel
+    if (Spell* spell = m_currentSpells[CURRENT_GENERIC_SPELL])
+        if (spell->getState() != SPELL_STATE_FINISHED)
+            return true;
+
+    // channeled spells during channel stage (after the initial cast timer) allow actions with a specific spell attribute
+    if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
+        if (spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsActionAllowedChannel())
+            return false;
+
+    // prohibit actions for all other spell casts
     return true;
 }
 
@@ -12537,6 +12561,9 @@ void Unit::RemoveFromWorld()
     if (IsInWorld())
     {
         m_duringRemoveFromWorld = true;
+        if (IsAIEnabled)
+            GetAI()->OnDespawn();
+
         if (IsVehicle())
             RemoveVehicleKit();
 
@@ -14339,14 +14366,10 @@ void Unit::SetControlled(bool apply, UnitState state, Unit* source /*= nullptr*/
                 SetStunned(false);
                 break;
             case UNIT_STATE_ROOT:
-                // Prevent creature_template_movement rooted flag from being removed on aura expiration.
+                // Prevent the DB rooted flag from being removed on aura expiration.
                 if (IsCreature())
-                {
-                    if (ToCreature()->GetCreatureTemplate()->Movement.Rooted)
-                    {
+                    if (ToCreature()->GetMovementTemplate().IsRooted())
                         return;
-                    }
-                }
 
                 if (HasRootAura() || GetVehicle())
                     return;
@@ -15807,8 +15830,11 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         KnockbackFrom(pos.GetPositionX(), pos.GetPositionY(), 10.0f, 20.0f);
     }
 
-    // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest
-    if (IsCreature() && !CanFly() && vehicleInfo && (vehicleInfo->m_ID == 113 || vehicleInfo->m_ID == 8 || vehicleInfo->m_ID == 290 || vehicleInfo->m_ID == 298))
+    // xinef: move fall for air-exit quest vehicles:
+    // Quest Drag and Drop, Air Assault, and Shoot 'em Up.
+    if (IsCreature() && !CanFly() && vehicleInfo &&
+        (vehicleInfo->m_ID == 8 || vehicleInfo->m_ID == 113 || vehicleInfo->m_ID == 228 ||
+         vehicleInfo->m_ID == 290 || vehicleInfo->m_ID == 298))
     {
         GetMotionMaster()->MoveFall();
     }

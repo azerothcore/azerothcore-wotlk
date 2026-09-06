@@ -164,9 +164,14 @@ void Player::Update(uint32 p_time)
             // default combat reach 10
             /// @todo add weapon, skill check
 
+            // A vehicle passenger can neither turn nor move, and their stored position and
+            // orientation can be stale; never fail swing range or facing against the vehicle
+            // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
+            bool const victimIsVehicleBase = GetVehicleBase() == victim;
+
             if (isAttackReady(BASE_ATTACK))
             {
-                if (!IsWithinMeleeRange(victim))
+                if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 1) // send single time (client auto repeat)
@@ -176,7 +181,7 @@ void Player::Update(uint32 p_time)
                     }
                 }
                 // 120 degrees of radiant range, if player is not in boundary radius
-                else if (!IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 2) // send single time (client auto repeat)
@@ -206,9 +211,9 @@ void Player::Update(uint32 p_time)
 
             if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
             {
-                if (!IsWithinMeleeRange(victim))
+                if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
-                else if (!IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
@@ -331,6 +336,8 @@ void Player::Update(uint32 p_time)
             m_nextSave -= p_time;
         }
     }
+
+    UpdateAdditionalSaves(p_time);
 
     // Handle Water/drowning
     HandleDrowning(p_time);
@@ -757,6 +764,28 @@ inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel,
     return sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ORANGE) * 10;
 }
 
+inline int32 CraftSkillGainChance(uint32 skillValue, uint32 grayLevel, uint32 yellowLevel)
+{
+    int32 orangeChance = sWorld->getIntConfig(CONFIG_SKILL_CHANCE_ORANGE) * 10;
+    int32 grayChance = sWorld->getIntConfig(CONFIG_SKILL_CHANCE_GREY) * 10;
+
+    // Invalid or equal thresholds cannot be interpolated. Preserve the
+    // previous orange/gray boundary behavior for malformed DBC entries.
+    if (grayLevel <= yellowLevel)
+        return skillValue < grayLevel ? orangeChance : grayChance;
+
+    if (skillValue <= yellowLevel)
+        return orangeChance;
+    if (skillValue >= grayLevel)
+        return grayChance;
+
+    // Crafting skill-up chance falls linearly from orange at the yellow
+    // threshold to gray at the gray threshold. The green threshold is the
+    // midpoint of that range and therefore has a 50% chance by default.
+    return grayChance + int32(int64(grayLevel - skillValue) * (orangeChance - grayChance) /
+        (grayLevel - yellowLevel));
+}
+
 bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
                                uint32 RedLevel, uint32 Multiplicator)
 {
@@ -848,12 +877,9 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 
             return UpdateSkillPro(
                 _spell_idx->second->SkillLine,
-                SkillGainChance(SkillValue,
-                                _spell_idx->second->TrivialSkillLineRankHigh,
-                                (_spell_idx->second->TrivialSkillLineRankHigh +
-                                 _spell_idx->second->TrivialSkillLineRankLow) /
-                                    2,
-                                _spell_idx->second->TrivialSkillLineRankLow),
+                CraftSkillGainChance(SkillValue,
+                                     _spell_idx->second->TrivialSkillLineRankHigh,
+                                     _spell_idx->second->TrivialSkillLineRankLow),
                 craft_skill_gain);
         }
     }
@@ -1290,7 +1316,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea, bool force)
         return;
 
     if (sWorld->getBoolConfig(CONFIG_WEATHER))
-        GetMap()->GetOrGenerateZoneDefaultWeather(newZone);
+        if (!GetMap()->GetOrGenerateZoneDefaultWeather(newZone))
+            Weather::SendFineWeatherUpdateToPlayer(this);
 
     GetMap()->SendZoneDynamicInfo(newZone, this);
 
@@ -2398,4 +2425,50 @@ void Player::ProcessSpellQueue()
         else // If the first spell can't execute, stop processing
             break;
     }
+}
+
+// save only the data flagged by AdditionalSavingAddMask shortly after
+// important changes, so a crash loses at most a few seconds of them
+void Player::UpdateAdditionalSaves(uint32 p_time)
+{
+    if (!m_additionalSaveTimer || GetSession()->isLogingOut())
+        return;
+
+    if (m_additionalSaveTimer > p_time)
+    {
+        m_additionalSaveTimer -= p_time;
+        return;
+    }
+
+    uint8 mask = m_additionalSaveMask;
+    m_additionalSaveTimer = 0;
+    m_additionalSaveMask = 0;
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    if (mask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD)
+        SaveInventoryAndGoldToDB(trans);
+
+    if (mask & ADDITIONAL_SAVING_QUEST_STATUS)
+    {
+        _SaveQuestStatus(trans);
+
+        // if nothing changed, nothing will happen
+        _SaveDailyQuestStatus(trans);
+        _SaveWeeklyQuestStatus(trans);
+        _SaveSeasonalQuestStatus(trans);
+        _SaveMonthlyQuestStatus(trans);
+    }
+
+    if (mask & ADDITIONAL_SAVING_ACHIEVEMENTS)
+    {
+        m_achievementMgr->SaveToDB(trans);
+
+        // achievements are often earned together with skill or gold changes
+        // (professions, riding, wealth), save those too to keep the DB consistent
+        _SaveSkills(trans);
+        SaveGoldToDB(trans);
+    }
+
+    CharacterDatabase.CommitTransaction(trans);
 }

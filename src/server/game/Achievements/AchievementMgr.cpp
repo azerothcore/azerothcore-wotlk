@@ -1775,7 +1775,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 {
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = sAchievementMgr->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), nullptr))
+                    if (!data || !data->Meets(GetPlayer(), unit))
                         continue;
 
                     // Check map id requirement
@@ -2332,6 +2332,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                         progress->counter = 0;
                     }
     }
+
+    _player->AdditionalSavingAddMask(ADDITIONAL_SAVING_ACHIEVEMENTS);
 
     if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && !_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_REALM_FIRST_ACHIEVEMENTS))
         sAchievementMgr->SetRealmCompleted(achievement);
