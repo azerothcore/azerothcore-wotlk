@@ -37,6 +37,7 @@ class Unit;
 class WorldObject;
 class WorldPacket;
 class WorldSession;
+class ToCloud9GroupHooks;
 
 struct MapEntry;
 
@@ -174,6 +175,7 @@ public:
 /** todo: uninvite people that not accepted invite **/
 class Group
 {
+    friend class ToCloud9GroupHooks;
 public:
     struct MemberSlot
     {
@@ -343,6 +345,9 @@ protected:
     void SubGroupCounterIncrease(uint8 subgroup);
     void SubGroupCounterDecrease(uint8 subgroup);
     void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);
+
+    void AddMemberWithGuid(ObjectGuid guid);
+    void ForcedDisband(bool hideDestroy = false);
 
     MemberSlotList      m_memberSlots;
     GroupRefMgr     m_memberMgr;

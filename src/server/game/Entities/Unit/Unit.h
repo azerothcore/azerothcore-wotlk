@@ -909,13 +909,18 @@ public:
     void StopAttackingInvalidTarget();
     Unit* SelectNearbyTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
     Unit* SelectNearbyNoTotemTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
-    void SendMeleeAttackStop(Unit* victim = nullptr);
+    void SendMeleeAttackStop(Unit const* victim = nullptr) const;
     void SendMeleeAttackStart(Unit* victim, Player* sendTo = nullptr);
 
     [[nodiscard]] uint32 GetAttackTime(WeaponAttackType att) const
     {
         float f_BaseAttackTime = GetFloatValue(static_cast<uint16>(UNIT_FIELD_BASEATTACKTIME) + att) / m_modAttackSpeedPct[att];
         return (uint32)f_BaseAttackTime;
+    }
+
+    [[nodiscard]] inline uint32 GetRageWeaponSpeedHitFactor(WeaponAttackType att) const
+    {
+        return uint32(GetAttackTime(att) / 1000.0f * (att == BASE_ATTACK ? 3.5f : 1.75f));
     }
 
     void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(static_cast<uint16>(UNIT_FIELD_BASEATTACKTIME) + att, val * m_modAttackSpeedPct[att]); }
@@ -1698,6 +1703,7 @@ public:
     void AddGameObject(GameObject* gameObj);
     void RemoveGameObject(GameObject* gameObj, bool del);
     void RemoveGameObject(uint32 spellid, bool del);
+    void RemoveGameObjectsByType(GameobjectTypes type, bool del);
     void RemoveAllGameObjects();
 
     /*********************************************************/
@@ -1720,6 +1726,7 @@ public:
     [[nodiscard]] float GetHoverHeight() const { return IsHovering() ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f; }
 
     [[nodiscard]] virtual bool IsMovementPreventedByCasting() const;
+    [[nodiscard]] bool IsActionPreventedByCasting() const;
 
     [[nodiscard]] virtual bool CanEnterWater() const = 0;
     [[nodiscard]] virtual bool CanSwim() const;
