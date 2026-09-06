@@ -33,6 +33,7 @@ func placeAtArgentTournament(t *testing.T, bots ...*e2eharness.ScenarioBot) {
 
 func ensureArmistice(t *testing.T, bot *e2eharness.ScenarioBot) {
 	t.Helper()
+	// spell_area autocast only. Do not GM-apply: that would hide an area regression.
 	deadline := time.Now().Add(8 * time.Second)
 	for time.Now().Before(deadline) {
 		if bot.HasAura(spellArmistice) {
@@ -40,10 +41,7 @@ func ensureArmistice(t *testing.T, bot *e2eharness.ScenarioBot) {
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
-	bot.ApplyAura(t, spellArmistice)
-	if !bot.HasAura(spellArmistice) {
-		e2eharness.Preconditionf(t, "Armistice %d not on player (steed vehicle condition)", spellArmistice)
-	}
+	e2eharness.Preconditionf(t, "Armistice %d missing after Argent Tournament enter (spell_area)", spellArmistice)
 }
 
 func spawnAndBoardSteed(t *testing.T, bot *e2eharness.ScenarioBot) uint64 {

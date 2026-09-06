@@ -54,7 +54,7 @@ on:
         required: false
         default: '1'
       timeout:
-        description: 'go test -timeout (smoke default 30m; full should be >=120m)'
+        description: 'go test -timeout (smoke default 30m; full default 60m; job ceiling 90m)'
         required: false
         default: ''
       parallel:
@@ -94,7 +94,7 @@ jobs:
     # Ephemeral runners only: MySQL grants persist accounts, and Stop servers
     # pkill env/dist/bin/worldserver and authserver.
     runs-on: ${{ inputs.artifact_run_id != '' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
-    # Real ceiling. go test -timeout is per package (full default 180m).
+    # Real ceiling. go test -timeout is per package (full default 60m).
     timeout-minutes: 90
     steps:
       - name: Free disk
@@ -376,7 +376,7 @@ jobs:
               || { echo "bad timeout duration: ${E2E_TIMEOUT_INPUT}"; exit 1; }
             timeout="${E2E_TIMEOUT_INPUT}"
           elif [[ "${scope}" == "full" ]]; then
-            timeout="180m"
+            timeout="60m"
           else
             timeout="30m"
           fi

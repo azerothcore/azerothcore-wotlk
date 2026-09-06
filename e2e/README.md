@@ -152,7 +152,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
-| instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | manual-only (live test dropped: dirty-instance leftover not reliably resettable) | #26363 |
+| instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
 | instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
 
 ---
@@ -338,7 +338,9 @@ A test that fails intermittently on a **correct** core is a test/harness bug unt
 
 ## Policy
 
-Do not add e2e tests unless asked. `.agents/docs/e2e-policy.md` is suite convention when changing existing tests. This README is **how to run and structure** the suite.
+Do not add e2e tests unless asked. Do not mention missing coverage unless the user asked about it.
+`.agents/docs/e2e-policy.md` is suite convention when changing existing tests. This README is
+**how to run and structure** the suite.
 
 ---
 

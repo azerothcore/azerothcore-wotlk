@@ -3,7 +3,7 @@
 **Do not add, promote, or invent live-stack e2e tests unless the user explicitly asked.**
 Do not write `e2e/local/` scratch tests to validate a fix. Existing tests that fail after a
 behaviour change may be updated. Scratch, if any, stays in `e2e/local/` (gitignored) and is
-never committed.
+never committed. Do not mention missing coverage unless the user asked about it.
 
 The rest of this file applies only when the user asked to change `e2e/`, or an existing test
 broke. **How:** AzerothGhost `LLM_GUIDE.md` / `EXAMPLES.md` (this file does not replace them).

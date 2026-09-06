@@ -108,6 +108,15 @@ func waitInvAtLeast(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, lea
 	return n
 }
 
+func waitInvEqual(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, want int, timeout time.Duration) int {
+	t.Helper()
+	n := waitInv(t, bot, entry, func(got int) bool { return got == want }, timeout)
+	if n != want {
+		e2eharness.Assertf(t, "inventory entry=%d count=%d want=%d", entry, n, want)
+	}
+	return n
+}
+
 // Spec 1 — Item + gold dual-accept.
 func TestTrade_ItemGoldDualAcceptInventories(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "trade", "multi_bot"}, Runtime: "short", Category: "social/trade"})
@@ -241,13 +250,10 @@ func TestTrade_StackableMerge(t *testing.T) {
 	a.SetTradeItem(t, 0, bag, slot)
 	e2eharness.CompleteTrade(t, a, b)
 
-	a1 := waitInv(t, a, itemLinenCloth, func(n int) bool { return n == a0-5 }, 10*time.Second)
-	b1 := waitInv(t, b, itemLinenCloth, func(n int) bool { return n == b0+5 }, 10*time.Second)
+	a1 := waitInvEqual(t, a, itemLinenCloth, a0-5, 10*time.Second)
+	b1 := waitInvEqual(t, b, itemLinenCloth, b0+5, 10*time.Second)
 	if a1+b1 != a0+b0 {
 		e2eharness.Assertf(t, "linen not conserved %d+%d → %d+%d", a0, b0, a1, b1)
-	}
-	if b1 <= b0 {
-		e2eharness.Assertf(t, "B did not gain stack %d→%d", b0, b1)
 	}
 	t.Logf("PASS stackable merge/conserve a %d→%d b %d→%d", a0, a1, b0, b1)
 }

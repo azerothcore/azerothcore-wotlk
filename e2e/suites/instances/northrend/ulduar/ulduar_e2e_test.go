@@ -112,23 +112,21 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 	// so re-acquire a living GUID before Engage/FaceUnit.
 	bot.CombatReady(t)
 
-	freyaGUID := bot.WaitUnitAny(t, 30*time.Second, npcFreya10, npcFreya25)
-	// Near-tele and a leftover evade can drop the first sighting. Re-acquire
-	// a living Freya that stays in cache before Engage/FaceUnit.
-	deadline := time.Now().Add(15 * time.Second)
+	// Evade can leave a 0 HP object in cache. Re-poll until we have a living
+	// Freya, not only when the GUID disappears.
+	var freyaGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
 	for {
-		if obj := bot.World.GetObject(freyaGUID); obj != nil {
-			if hp, maxHP := bot.UnitHP(freyaGUID); maxHP > 0 && hp > 0 {
+		freyaGUID = bot.WaitUnitAny(t, 10*time.Second, npcFreya10, npcFreya25)
+		if hp, maxHP := bot.UnitHP(freyaGUID); maxHP > 0 && hp > 0 {
+			if bot.World.GetObject(freyaGUID) != nil {
 				break
 			}
 		}
 		if !time.Now().Before(deadline) {
-			e2eharness.Preconditionf(t, "Freya 0x%X not stably in cache after GoCreatureID", freyaGUID)
+			e2eharness.Preconditionf(t, "no living Freya in cache after GoCreatureID (last=0x%X)", freyaGUID)
 		}
 		time.Sleep(50 * time.Millisecond)
-		if bot.World.GetObject(freyaGUID) == nil {
-			freyaGUID = bot.WaitUnitAny(t, 10*time.Second, npcFreya10, npcFreya25)
-		}
 	}
 	bot.Engage(t, freyaGUID, 15*time.Second)
 
