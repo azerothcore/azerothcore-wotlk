@@ -612,8 +612,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if neccessary
 
         // `stored` is the stack the character ends up holding. On a full stack merge, `it` is marked for removal
-        // (ITEM_REMOVED) and Item::SaveToDB deletes it during SaveInventoryAndGoldToDB below, so it must not be
-        // the one handed to scripts afterwards.
+        // and `SaveInventoryAndGoldToDB` below deletes it, so we pass `stored` instead of `it` to downstream hooks.
         Item* stored = player->MoveItemToInventory(dest, it, true);
 
         if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
