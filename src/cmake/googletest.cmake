@@ -24,6 +24,10 @@ macro(fetch_googletest _download_module_path _download_root)
             ${_download_root}
     )
 
+    # googletest links the static CRT by default on MSVC while the rest of the
+    # project uses /MD, which makes unit_tests fail to link.
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
     # adds the targers: gtest, gtest_main, gmock, gmock_main
     add_subdirectory(
             ${_download_root}/googletest-src
