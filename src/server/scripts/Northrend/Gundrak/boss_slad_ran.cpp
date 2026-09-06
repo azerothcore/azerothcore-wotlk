@@ -49,9 +49,7 @@ enum Misc
 
     MAX_VIPER                                   = 2,
     MAX_CONSTRICTOR                             = 3,
-    MAX_SUMMONS                                 = 5,
-
-    EVENT_KILL_TALK                             = 1
+    MAX_SUMMONS                                 = 5
 };
 
 const Position SpawnLoc[] =
@@ -137,11 +135,7 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_SLAY);
         }
 
     private:

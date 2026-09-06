@@ -143,7 +143,7 @@ static const std::vector<HolidayRule> HolidayRules = {
     { HOLIDAY_DARKMOON_FAIRE_SHATTRATH, HolidayCalculationType::DARKMOON_FAIRE, 2, 0, 0, -2 }  // Feb, May, Aug, Nov
 };
 
-const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
+std::vector<HolidayRule> const& HolidayDateCalculator::GetHolidayRules()
 {
     return HolidayRules;
 }
@@ -479,7 +479,7 @@ std::tm HolidayDateCalculator::CalculateWinterSolstice(int year)
     return result;
 }
 
-std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int year)
+std::tm HolidayDateCalculator::CalculateHolidayDate(HolidayRule const& rule, int year)
 {
     std::tm result = {};
 
@@ -572,7 +572,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
     return result;
 }
 
-uint32_t HolidayDateCalculator::PackDate(const std::tm& date)
+uint32_t HolidayDateCalculator::PackDate(std::tm const& date)
 {
     // WoW packed date format (same as ByteBuffer::AppendPackedTime):
     // bits 24-28: year offset from 2000 (5 bits = 0-31, valid years 2000-2031)
@@ -648,7 +648,7 @@ std::vector<uint32_t> HolidayDateCalculator::GetDarkmoonFaireDates(int locationO
     return dates;
 }
 
-time_t HolidayDateCalculator::FindStartTimeForStage(const uint32_t* packedDates, uint8_t numDates,
+time_t HolidayDateCalculator::FindStartTimeForStage(uint32_t const* packedDates, uint8_t numDates,
     time_t stageOffset, uint32_t stageLengthMinutes, time_t curTime)
 {
     for (uint8_t i = 0; i < numDates && packedDates[i]; ++i)
@@ -670,4 +670,29 @@ time_t HolidayDateCalculator::FindStartTimeForStage(const uint32_t* packedDates,
     }
 
     return 0;
+}
+
+time_t HolidayDateCalculator::FindLoopingStartTime(uint32_t packedAnchor, time_t stageOffset,
+    uint32_t occurenceMinutes, time_t curTime)
+{
+    if (!packedAnchor)
+        return 0;
+
+    std::tm timeInfo = {};
+    timeInfo.tm_year = static_cast<int>((packedAnchor >> 24) & 0x1F) + 100; // years since 1900 (2000-2031)
+    timeInfo.tm_mon  = static_cast<int>((packedAnchor >> 20) & 0xF);
+    timeInfo.tm_mday = static_cast<int>((packedAnchor >> 14) & 0x3F) + 1;
+    timeInfo.tm_hour = static_cast<int>((packedAnchor >> 6) & 0x1F);
+    timeInfo.tm_min  = static_cast<int>(packedAnchor & 0x3F);
+    timeInfo.tm_sec  = 0;
+    timeInfo.tm_isdst = -1;
+
+    time_t anchor = mktime(&timeInfo) + stageOffset;
+
+    // Roll forward by whole periods to the most recent occurrence, preserving phase.
+    time_t const period = static_cast<time_t>(occurenceMinutes) * 60;
+    if (period > 0 && anchor < curTime)
+        anchor += ((curTime - anchor) / period) * period;
+
+    return anchor;
 }

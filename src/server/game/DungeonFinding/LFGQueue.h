@@ -103,8 +103,8 @@ namespace lfg
         uint32 FindBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue);
         void UpdateBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue, Lfg5Guids const& key);
 
-        LfgCompatibility FindNewGroups(const ObjectGuid& newGuid);
-        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
+        LfgCompatibility FindNewGroups(ObjectGuid const& newGuid);
+        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, ObjectGuid const& newGuid, uint64& foundMask, uint32& foundCount, std::set<Lfg5Guids> const& currentCompatibles);
 
         // Queue
         uint32 m_QueueStatusTimer;                         // used to check interval of sending queue status

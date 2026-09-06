@@ -35,7 +35,7 @@ enum PetHook
 class PetScript : public ScriptObject
 {
 protected:
-    PetScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    PetScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }

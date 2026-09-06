@@ -91,7 +91,7 @@ INSTANTIATE_TEST_SUITE_P(
     AllSpellProcEntries,
     SpellProcDBCValidationParamTest,
     ::testing::ValuesIn(GetAllSpellProcTestEntries()),
-    [](const testing::TestParamInfo<SpellProcTestEntry>& info) {
+    [](testing::TestParamInfo<SpellProcTestEntry> const& info) {
         // Create unique test name from SpellId (handle negative IDs)
         int32_t id = info.param.SpellId;
         if (id < 0)

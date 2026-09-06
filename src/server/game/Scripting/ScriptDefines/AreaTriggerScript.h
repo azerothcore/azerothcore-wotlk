@@ -23,7 +23,7 @@
 class AreaTriggerScript : public ScriptObject
 {
 protected:
-    AreaTriggerScript(const char* name);
+    AreaTriggerScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }

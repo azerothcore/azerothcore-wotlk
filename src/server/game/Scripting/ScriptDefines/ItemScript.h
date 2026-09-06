@@ -23,7 +23,7 @@
 class ItemScript : public ScriptObject
 {
 protected:
-    ItemScript(const char* name);
+    ItemScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
@@ -47,7 +47,7 @@ public:
     virtual void OnGossipSelect(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
 
     // Called when a player selects an option in an item gossip window
-    virtual void OnGossipSelectCode(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
+    virtual void OnGossipSelectCode(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/) { }
 };
 
 #endif

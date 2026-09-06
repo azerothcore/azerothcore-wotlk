@@ -1,6 +1,6 @@
 file-cpp:
 - changed-files:
-    - any-glob-to-any-file: 
+    - any-glob-to-any-file:
       - 'src/**/*.cpp'
       - 'src/**/*.h'
       - 'deps/**/*.cpp'
@@ -25,7 +25,7 @@ CORE:
 
 Script:
 - changed-files:
-    - any-glob-to-any-file: 
+    - any-glob-to-any-file:
       - 'src/server/scripts/**/*.cpp'
       - 'src/server/scripts/**/*.h'
 
@@ -34,12 +34,14 @@ UnitTests:
     - any-glob-to-any-file: 'src/test/**/*'
 
 Documentation:
-- changed-files:
+- all:
+  - changed-files:
     - any-glob-to-any-file: '**/*.md'
+    - all-globs-to-all-files: '!e2e/**/*.md'
 
 Bash:
 - changed-files:
-    - any-glob-to-any-file: 
+    - any-glob-to-any-file:
       - '*.sh'
       - 'apps/**/*.sh'
       - 'conf/**/*.sh'
@@ -48,7 +50,17 @@ Bash:
 
 CMake:
 - changed-files:
-    - any-glob-to-any-file: '**/*.cmake'
+    - any-glob-to-any-file:
+      - '**/*.cmake'
+      - '**/CMakeLists.txt'
+
+Platform-Docker:
+- changed-files:
+    - any-glob-to-any-file:
+        - '**/Dockerfile*'
+        - '**/docker-compose.yml'
+        - '**/docker-compose.*.yml'
+        - '**/docker/**/*'
 
 Workflow:
 - changed-files:
@@ -57,3 +69,32 @@ Workflow:
 Batch:
 - changed-files:
     - any-glob-to-any-file: 'apps/**/*.bat'
+
+Config:
+- changed-files:
+    - any-glob-to-any-file:
+      - '**/*.json'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.conf'
+      - '**/*.cfg'
+      - '**/*.nix'
+
+Utilities:
+- changed-files:
+    - any-glob-to-any-file:
+      - '**/*.py'
+      - '**/*.php'
+      - '**/*.ts'
+
+MMAPs:
+- changed-files:
+    - any-glob-to-any-file: 'src/common/Collision/Maps/MapDefines.h'
+
+VMAPs:
+- changed-files:
+    - any-glob-to-any-file: 'src/common/Collision/VMapDefinitions.h'
+
+e2e:
+- changed-files:
+     - any-glob-to-any-file: 'e2e/**/*'

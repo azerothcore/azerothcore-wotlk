@@ -102,7 +102,7 @@ public:
     bool IsEmpty() const { return m_members.empty(); }
     bool IsFormed() const { return m_Formed; }
 
-    const CreatureGroupMemberType& GetMembers() const { return m_members; }
+    CreatureGroupMemberType const& GetMembers() const { return m_members; }
 
     void AddMember(Creature* member);
     void RemoveMember(Creature* member);

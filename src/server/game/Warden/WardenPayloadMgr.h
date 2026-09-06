@@ -50,7 +50,7 @@ public:
     * @note
     * - Payloads are truncated to 512 bytes on the client, you may have to register your payloads in chunks if they are larger than this.
     */
-    uint16 RegisterPayload(const std::string& payload);
+    uint16 RegisterPayload(std::string const& payload);
 
     /**
     * @brief Register a payload into cache with a custom id and returns the result.

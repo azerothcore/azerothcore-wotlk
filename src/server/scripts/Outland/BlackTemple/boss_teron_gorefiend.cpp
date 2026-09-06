@@ -77,7 +77,6 @@ struct boss_teron_gorefiend : public BossAI
 {
     boss_teron_gorefiend(Creature* creature) : BossAI(creature, DATA_TERON_GOREFIEND)
     {
-        _recentlySpoken = false;
         _intro = false;
     }
 
@@ -127,18 +126,9 @@ struct boss_teron_gorefiend : public BossAI
         BossAI::JustEngagedWith(who);
     }
 
-    void KilledUnit(Unit*  victim) override
+    void KilledUnit(Unit* victim) override
     {
-        if (!_recentlySpoken && victim->IsPlayer())
-        {
-            Talk(SAY_SLAY);
-            _recentlySpoken = true;
-
-            ScheduleUniqueTimedEvent(6s, [&]
-            {
-                _recentlySpoken = false;
-            }, 1);
-        }
+        Talk(SAY_SLAY, victim);
     }
 
     void SetData(uint32 type, uint32 id) override
@@ -175,7 +165,6 @@ struct boss_teron_gorefiend : public BossAI
     }
 
     private:
-        bool _recentlySpoken;
         bool _intro;
 };
 

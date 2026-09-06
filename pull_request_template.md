@@ -13,11 +13,13 @@ This PR proposes changes to:
 ### AI-assisted Pull Requests
 
 > [!IMPORTANT]
-> While the use of AI tools when preparing pull requests is not prohibited, contributors must clearly disclose when such tools have been used and specify the model involved.
-> 
-> Contributors are also expected to fully understand the changes they are submitting and must be able to explain and justify those changes when requested by maintainers.
+> Using AI tools to prepare pull requests is allowed, but it must be disclosed and it must follow our AC guidelines for AI Agentic Engineering (link below).
+>
+> You are expected to fully understand the changes you submit and to be able to explain and justify them when maintainers ask.
 
-- [ ] AI tools (e.g. ChatGPT, Claude, or similar) were used entirely or partially in preparing this pull request. Please specify which tools were used, if any.
+- [ ] AI tools (e.g. Claude, ChatGPT, or similar) were used entirely or partially to prepare this pull request. If checked, specify which tools and models below.
+   - Tools/models used:
+- [ ] I have read and understood the [AC guidelines for AI Agentic Engineering](https://www.azerothcore.org/wiki/agentic-engineering)
 
 ## Issues Addressed:
 <!-- If your fix has a relating issue, link it below -->

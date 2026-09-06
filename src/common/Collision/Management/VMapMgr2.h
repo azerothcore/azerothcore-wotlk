@@ -72,7 +72,7 @@ namespace VMAP
         {
             return getMapFileName(mapId);
         }
-        LoadResult existsMap(const char* basePath, unsigned int mapId, int x, int y) override;
+        LoadResult existsMap(char const* basePath, unsigned int mapId, int x, int y) override;
 
         typedef uint32(*GetLiquidFlagsFn)(uint32 liquidType);
         GetLiquidFlagsFn GetLiquidFlagsPtr;

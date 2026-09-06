@@ -1501,7 +1501,7 @@ void GameEventMgr::GameEventSpawn(int16 eventId)
     }
 
     for (IdList::iterator itr = _gameEventPoolIds[internal_event_id].begin(); itr != _gameEventPoolIds[internal_event_id].end(); ++itr)
-        sPoolMgr->SpawnPool(*itr);
+        sPoolMgr->SpawnEventPool(*itr);
 }
 
 void GameEventMgr::GameEventUnspawn(int16 eventId)
@@ -1576,7 +1576,7 @@ void GameEventMgr::GameEventUnspawn(int16 eventId)
 
     for (IdList::iterator itr = _gameEventPoolIds[internal_event_id].begin(); itr != _gameEventPoolIds[internal_event_id].end(); ++itr)
     {
-        sPoolMgr->DespawnPool(*itr);
+        sPoolMgr->DespawnEventPool(*itr);
     }
 }
 
@@ -1959,6 +1959,17 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
     bool singleDate = ((holiday->Date[0] >> 24) & 0x1F) == 31; // Events with fixed date within year have - 1
 
     time_t curTime = GameTime::GetGameTime().count();
+
+    if (holiday->Looping)
+    {
+        // Looping events (Battleground Call to Arms) carry a single past anchor in the DBC and
+        // recur via event.Occurence. Anchor to that DBC date so the window keeps the correct phase
+        // instead of inheriting the wrong time of day from a stale game_event.start_time.
+        if (time_t start = HolidayDateCalculator::FindLoopingStartTime(holiday->Date[0], stageOffset, event.Occurence, curTime))
+            event.Start = start;
+
+        return;
+    }
 
     if (!singleDate)
     {

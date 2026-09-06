@@ -508,6 +508,10 @@ bool WaypointMovementGenerator<Creature>::GetResetPosition(float& x, float& y, f
     if (!i_path || i_path->Nodes.empty())
         return false;
 
+    // A finished non-repeating path no longer owns the creature's reset position.
+    if (_done)
+        return false;
+
     ASSERT(i_currentNode < i_path->Nodes.size(), "WaypointMovementGenerator::GetResetPos: tried to reference a node id ({}) which is not included in path ({})", i_currentNode, i_path->Id);
     WaypointNode const& waypoint = i_path->Nodes.at(i_currentNode);
 
@@ -678,8 +682,6 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
     player->RemovePlayerFlag(PLAYER_FLAGS_TAXI_BENCHMARK);
 }
 
-#define PLAYER_FLIGHT_SPEED 32.0f
-
 void FlightPathMovementGenerator::DoReset(Player* player)
 {
     uint32 end = GetPathAtMapEnd();
@@ -707,7 +709,7 @@ void FlightPathMovementGenerator::DoReset(Player* player)
     }
     init.SetFirstPointId(GetCurrentNode());
     init.SetFly();
-    init.SetVelocity(PLAYER_FLIGHT_SPEED);
+    init.SetVelocity(sWorld->getFloatConfig(CONFIG_TAXI_FLIGHT_SPEED));
     init.Launch();
 }
 

@@ -40,7 +40,7 @@ enum XPColorChar : uint8;
 class FormulaScript : public ScriptObject
 {
 protected:
-    FormulaScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    FormulaScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called after calculating honor.

@@ -74,13 +74,13 @@ namespace Movement
         };
 
         inline uint32& raw() { return (uint32&) * this; }
-        [[nodiscard]] inline const uint32& raw() const { return (const uint32&) * this; }
+        [[nodiscard]] inline uint32 const& raw() const { return (uint32 const&) * this; }
 
         MoveSplineFlag() { raw() = 0; }
         MoveSplineFlag(uint32 f) { raw() = f; }
-        MoveSplineFlag(const MoveSplineFlag& f) { raw() = f.raw(); }
+        MoveSplineFlag(MoveSplineFlag const& f) { raw() = f.raw(); }
         MoveSplineFlag(MoveSplineFlag&&) = default;
-        MoveSplineFlag& operator=(const MoveSplineFlag&) = default;
+        MoveSplineFlag& operator=(MoveSplineFlag const&) = default;
         MoveSplineFlag& operator=(MoveSplineFlag&&) = default;
 
         // Constant interface

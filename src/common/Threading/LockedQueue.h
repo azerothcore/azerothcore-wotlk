@@ -49,7 +49,7 @@ public:
      *
      * @param item The item to be added to the queue.
      */
-    void add(const T& item)
+    void add(T const& item)
     {
         std::lock_guard<std::mutex> lock(_lock);
         _queue.push_back(std::move(item));

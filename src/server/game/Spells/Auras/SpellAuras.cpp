@@ -201,6 +201,11 @@ void AuraApplication::BuildUpdatePacket(ByteBuffer& data, bool remove) const
     uint32 flags = _flags;
     if (aura->GetMaxDuration() > 0 && !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DO_NOT_DISPLAY_DURATION))
         flags |= AFLAG_DURATION;
+
+    // paladin auras are positive for self-cast only
+    if (!IsSelfcasted() && aura->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_AURA)
+        flags &= ~AFLAG_POSITIVE;
+
     data << uint8(flags);
     data << uint8(aura->GetCasterLevel());
     // send stack amount for aura which could be stacked (never 0 - causes incorrect display) or charges

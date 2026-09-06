@@ -200,11 +200,11 @@ public:
             { "add",            npcAddCommandTable },
             { "delete",         npcDeleteCommandTable },
             { "follow",         npcFollowCommandTable },
-            { "load",           HandleNpcLoadCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "load",           HandleNpcLoadCommand,              rbac::RBAC_PERM_COMMAND_NPC_LOAD,          Console::Yes },
             { "set",            npcSetCommandTable },
-            { "showloot",       HandleNpcShowLootCommand,          rbac::RBAC_PERM_COMMAND_NPC_SHOWLOOT, Console::No },
-            { "spawngroup",     HandleNpcSpawnGroupCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "despawngroup",   HandleNpcDespawnGroupCommand,      SEC_ADMINISTRATOR, Console::No }
+            { "showloot",       HandleNpcShowLootCommand,          rbac::RBAC_PERM_COMMAND_NPC_SHOWLOOT,      Console::No },
+            { "spawngroup",     HandleNpcSpawnGroupCommand,        rbac::RBAC_PERM_COMMAND_NPC_SPAWNGROUP,    Console::No },
+            { "despawngroup",   HandleNpcDespawnGroupCommand,      rbac::RBAC_PERM_COMMAND_NPC_DESPAWNGROUP,  Console::No }
         };
         static ChatCommandTable commandTable =
         {

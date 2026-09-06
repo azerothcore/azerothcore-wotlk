@@ -110,7 +110,7 @@ namespace Acore
 namespace Acore::String
 {
     template<class Str>
-    AC_COMMON_API Str Trim(const Str& s, const std::locale& loc = std::locale());
+    AC_COMMON_API Str Trim(Str const& s, std::locale const& loc = std::locale());
 
     AC_COMMON_API std::string TrimRightInPlace(std::string& str);
 

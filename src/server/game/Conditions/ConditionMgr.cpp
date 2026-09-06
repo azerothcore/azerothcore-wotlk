@@ -217,7 +217,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
                 // Xinef: cannot be null, checked at loading
-                const Quest* quest = sObjectMgr->GetQuestTemplate(ConditionValue1);
+                Quest const* quest = sObjectMgr->GetQuestTemplate(ConditionValue1);
                 condMeets = !player->IsQuestRewarded(ConditionValue1) && player->SatisfyQuestExclusiveGroup(quest, false);
             }
         }
@@ -1083,7 +1083,7 @@ ConditionList ConditionMgr::GetConditionsForNpcVendorEvent(uint32 creatureId, ui
     return cond;
 }
 
-ConditionList ConditionMgr::GetConditionsForObjectVisibility(const WorldObject* object) const
+ConditionList ConditionMgr::GetConditionsForObjectVisibility(WorldObject const* object) const
 {
     ConditionList cond;
 
@@ -1199,7 +1199,7 @@ void ConditionMgr::LoadConditions(bool isReload)
             }
             cond->ReferenceId = uint32(std::abs(iConditionTypeOrReference));
 
-            const char* rowType = "reference template";
+            char const* rowType = "reference template";
             if (iSourceTypeOrReferenceId >= 0)
                 rowType = "reference";
             // check for useless data
@@ -2546,7 +2546,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     }
     case CONDITION_QUEST_OBJECTIVE_PROGRESS:
     {
-        const Quest* quest = sObjectMgr->GetQuestTemplate(cond->ConditionValue1);
+        Quest const* quest = sObjectMgr->GetQuestTemplate(cond->ConditionValue1);
         if (!quest)
         {
             LOG_ERROR("sql.sql", "CONDITION_QUEST_OBJECTIVE_PROGRESS points to non-existing quest ({}), skipped.", cond->ConditionValue1);

@@ -36,7 +36,7 @@ private:
 public:
     ProducerConsumerQueue() = default;
 
-    void Push(const T& value)
+    void Push(T const& value)
     {
         {
             std::lock_guard<std::mutex> lock(_queueLock);

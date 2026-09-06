@@ -23,7 +23,7 @@
 class InstanceMapScript : public ScriptObject, public MapScript<InstanceMap>
 {
 protected:
-    InstanceMapScript(const char* name, uint32 mapId);
+    InstanceMapScript(char const* name, uint32 mapId);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }

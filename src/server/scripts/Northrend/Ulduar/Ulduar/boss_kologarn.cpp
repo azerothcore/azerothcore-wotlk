@@ -146,53 +146,16 @@ struct boss_kologarn : public BossAI
                 BossAI::MoveInLineOfSight(who);
         }
 
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (!CreatureAI::_EnterEvadeMode(why))
-                return;
-            if (instance && instance->GetBossState(BOSS_KOLOGARN) != DONE)
-            {
-                instance->SetBossState(BOSS_KOLOGARN, NOT_STARTED);
-                instance->SaveToDB();
-            }
-            Reset();
-            me->setActive(false);
-        }
-
         void AttachLeftArm()
         {
-            if (Unit* arm = ObjectAccessor::GetCreature(*me, _left))
-                arm->SetHealth(arm->GetMaxHealth());
-            else if (Creature* accessory = me->SummonCreature(NPC_LEFT_ARM, *me, TEMPSUMMON_MANUAL_DESPAWN))
-            {
-                accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
-                if (!me->HandleSpellClick(accessory, 0))
-                    accessory->DespawnOrUnsummon();
-                else
-                {
-                    _left = accessory->GetGUID();
-                    accessory->SetOrientation(M_PI);
-                    accessory->CastSpell(accessory, SPELL_ARM_RESPAWN_VISUAL, true);
-                }
-            }
+            if (!ObjectAccessor::GetCreature(*me, _left))
+                vehicle->InstallAccessory(NPC_LEFT_ARM, 0, true, TEMPSUMMON_MANUAL_DESPAWN, 0);
         }
 
         void AttachRightArm()
         {
-            if (Unit* arm = ObjectAccessor::GetCreature(*me, _right))
-                arm->SetHealth(arm->GetMaxHealth());
-            else if (Creature* accessory = me->SummonCreature(NPC_RIGHT_ARM, *me, TEMPSUMMON_MANUAL_DESPAWN))
-            {
-                accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
-                if (!me->HandleSpellClick(accessory, 1))
-                    accessory->DespawnOrUnsummon();
-                else
-                {
-                    _right = accessory->GetGUID();
-                    accessory->SetOrientation(M_PI);
-                    accessory->CastSpell(accessory, SPELL_ARM_RESPAWN_VISUAL, true);
-                }
-            }
+            if (!ObjectAccessor::GetCreature(*me, _right))
+                vehicle->InstallAccessory(NPC_RIGHT_ARM, 1, true, TEMPSUMMON_MANUAL_DESPAWN, 0);
         }
 
         void Reset() override
@@ -205,16 +168,6 @@ struct boss_kologarn : public BossAI
             me->DisableRotate(true);
 
             _Reset();
-
-            if (instance)
-            {
-                // Open the door inside Kologarn chamber
-                if (GameObject* door = instance->GetGameObject(DATA_KOLOGARN_DOORS))
-                    door->SetGoState(GO_STATE_ACTIVE);
-            }
-
-            AttachLeftArm();
-            AttachRightArm();
 
             // Reset breath on pull
             breathReady = false;
@@ -257,37 +210,12 @@ struct boss_kologarn : public BossAI
                 BossAI::JustSummoned(cr);
         }
 
-        void SummonedCreatureDespawn(Creature* cr) override
-        {
-            if (instance->GetBossState(BOSS_KOLOGARN) > NOT_STARTED)
-                return;
-
-            if (cr->GetEntry() == NPC_LEFT_ARM)
-            {
-                _left.Clear();
-                AttachLeftArm();
-            }
-
-            if (cr->GetEntry() == NPC_RIGHT_ARM)
-            {
-                _right.Clear();
-                AttachRightArm();
-            }
-        }
-
         void JustDied(Unit*) override
         {
             _JustDied();
             me->StopMoving();
 
             Talk(SAY_DEATH);
-
-            if (instance)
-            {
-                // Open the door inside Kologarn chamber
-                if (GameObject* door = instance->GetGameObject(DATA_KOLOGARN_DOORS))
-                    door->SetGoState(GO_STATE_ACTIVE);
-            }
 
             if (GameObject* bridge = me->FindNearestGameObject(GO_KOLOGARN_BRIDGE, 100))
                 bridge->SetGoState(GO_STATE_READY);
@@ -318,35 +246,46 @@ struct boss_kologarn : public BossAI
 
         void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
+            if (apply)
+            {
+                if (who->GetEntry() == NPC_LEFT_ARM)
+                    _left = who->GetGUID();
+                else if (who->GetEntry() == NPC_RIGHT_ARM)
+                    _right = who->GetGUID();
+                else
+                    return;
+
+                who->SetOrientation(M_PI);
+                who->CastSpell(who, SPELL_ARM_RESPAWN_VISUAL, true);
+                return;
+            }
+
             if (!me->IsAlive() || instance->GetBossState(BOSS_KOLOGARN) != IN_PROGRESS)
                 return;
 
-            if (!apply)
+            // left arm
+            if (who->GetGUID() == _left)
             {
-                // left arm
-                if (who->GetGUID() == _left)
+                _left.Clear();
+                if (me->IsInCombat())
                 {
-                    _left.Clear();
-                    if (me->IsInCombat())
-                    {
-                        Talk(SAY_LEFT_ARM_GONE);
-                        events.ScheduleEvent(EVENT_RESTORE_ARM_LEFT, 50s);
-                    }
+                    Talk(SAY_LEFT_ARM_GONE);
+                    events.ScheduleEvent(EVENT_RESTORE_ARM_LEFT, 50s);
                 }
-                else
-                {
-                    _right.Clear();
-                    if (me->IsInCombat())
-                    {
-                        Talk(SAY_RIGHT_ARM_GONE);
-                        events.ScheduleEvent(EVENT_RESTORE_ARM_RIGHT, 50s);
-                    }
-                }
-
-                me->CastSpell(me, SPELL_ARM_DEAD, true);
-                if (!_right && !_left)
-                    events.ScheduleEvent(EVENT_STONE_SHOUT, 5s);
             }
+            else
+            {
+                _right.Clear();
+                if (me->IsInCombat())
+                {
+                    Talk(SAY_RIGHT_ARM_GONE);
+                    events.ScheduleEvent(EVENT_RESTORE_ARM_RIGHT, 50s);
+                }
+            }
+
+            me->CastSpell(me, SPELL_ARM_DEAD, true);
+            if (!_right && !_left)
+                events.ScheduleEvent(EVENT_STONE_SHOUT, 5s);
         }
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -372,15 +311,6 @@ struct boss_kologarn : public BossAI
 
             Talk(SAY_AGGRO);
             me->setActive(true);
-
-            // Close the door inside Kologarn chamber
-            if (instance)
-            {
-                if (GameObject* door = instance->GetGameObject(DATA_KOLOGARN_DOORS))
-                {
-                    door->SetGoState(GO_STATE_READY);
-                }
-            }
         }
 
         void UpdateAI(uint32 diff) override

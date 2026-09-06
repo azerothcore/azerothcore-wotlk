@@ -1,0 +1,29 @@
+name: cleanup-pr-caches
+on:
+  # pull_request_target, not pull_request: for a PR from a fork the GITHUB_TOKEN
+  # of a pull_request run is read-only, so the delete would 403. This workflow
+  # never checks out or runs PR code, so the elevated token is not exposed to it.
+  pull_request_target:
+    types:
+      - closed
+
+permissions:
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    name: delete caches of the closed PR
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    steps:
+      - name: Delete caches created by this PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          # Caches written during a PR run are scoped to the merge ref and are
+          # unreachable from any other branch, so once the PR is closed they can
+          # only occupy space. Deleting by this ref cannot touch master's caches.
+          PR_REF: refs/pull/${{ github.event.pull_request.number }}/merge
+        # --succeed-on-no-caches: without it gh exits 1 when the PR has no
+        # caches, which is the normal case for a PR that never ran CI.
+        run: gh cache delete --all --ref "$PR_REF" --succeed-on-no-caches

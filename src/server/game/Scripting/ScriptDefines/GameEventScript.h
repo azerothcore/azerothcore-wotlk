@@ -32,7 +32,7 @@ enum GameEventHook
 class GameEventScript : public ScriptObject
 {
 protected:
-    GameEventScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    GameEventScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Runs on start event

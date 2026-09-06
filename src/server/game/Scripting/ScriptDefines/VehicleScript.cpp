@@ -88,7 +88,7 @@ void ScriptMgr::OnRemovePassenger(Vehicle* veh, Unit* passenger)
     }
 }
 
-VehicleScript::VehicleScript(const char* name)
+VehicleScript::VehicleScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<VehicleScript>::AddScript(this);

@@ -273,7 +273,7 @@ void ScriptMgr::OnDestroyInstance(MapInstanced* mapInstanced, Map* map)
     CALL_ENABLED_HOOKS(AllMapScript, ALLMAPHOOK_ON_DESTROY_INSTANCE, script->OnDestroyInstance(mapInstanced, map));
 }
 
-AllMapScript::AllMapScript(const char* name, std::vector<uint16> enabledHooks) : ScriptObject(name, ALLMAPHOOK_END)
+AllMapScript::AllMapScript(char const* name, std::vector<uint16> enabledHooks) : ScriptObject(name, ALLMAPHOOK_END)
 {
     // If empty - enable all available hooks.
     if (enabledHooks.empty())

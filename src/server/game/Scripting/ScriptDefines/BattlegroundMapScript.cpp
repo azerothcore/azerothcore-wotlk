@@ -19,7 +19,7 @@
 #include "Log.h"
 #include "ScriptMgr.h"
 
-BattlegroundMapScript::BattlegroundMapScript(const char* name, uint32 mapId) :
+BattlegroundMapScript::BattlegroundMapScript(char const* name, uint32 mapId) :
     ScriptObject(name), MapScript<BattlegroundMap>(mapId)
 {
     ScriptRegistry<BattlegroundMapScript>::AddScript(this);

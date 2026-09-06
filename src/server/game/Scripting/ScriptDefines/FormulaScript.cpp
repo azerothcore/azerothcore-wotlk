@@ -67,7 +67,7 @@ void ScriptMgr::OnBeforeUpdatingPersonalRating(int32& mod, uint32 type)
     CALL_ENABLED_HOOKS(FormulaScript, FORMULAHOOK_ON_BEFORE_UPDATING_PERSONAL_RATING, script->OnBeforeUpdatingPersonalRating(mod, type));
 }
 
-FormulaScript::FormulaScript(const char* name, std::vector<uint16> enabledHooks)
+FormulaScript::FormulaScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, FORMULAHOOK_END)
 {
     // If empty - enable all available hooks.

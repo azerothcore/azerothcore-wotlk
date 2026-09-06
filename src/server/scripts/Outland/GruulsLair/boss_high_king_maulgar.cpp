@@ -69,7 +69,6 @@ struct boss_high_king_maulgar : public BossAI
     void Reset() override
     {
         _Reset();
-        _recentlySpoken = false;
         me->SetLootMode(0);
         ScheduleHealthCheckEvent(50, [&]{
             Talk(SAY_ENRAGE);
@@ -87,18 +86,9 @@ struct boss_high_king_maulgar : public BossAI
         });
     }
 
-    void KilledUnit(Unit*  /*victim*/) override
+    void KilledUnit(Unit* /*victim*/) override
     {
-        if (!_recentlySpoken)
-        {
-            Talk(SAY_SLAY);
-            _recentlySpoken = true;
-        }
-
-        scheduler.Schedule(5s, [this](TaskContext)
-        {
-            _recentlySpoken = false;
-        });
+        Talk(SAY_SLAY);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -158,8 +148,6 @@ struct boss_high_king_maulgar : public BossAI
 
         DoMeleeAttackIfReady();
     }
-private:
-    bool _recentlySpoken;
 };
 
 struct boss_olm_the_summoner : public ScriptedAI

@@ -76,8 +76,7 @@ enum Events
     EVENT_MAGUS_HEALTH2             = 5,
     EVENT_MAGUS_FAIL_ACHIEVEMENT    = 6,
     EVENT_MAGUS_MERGED              = 7,
-    EVENT_MAGUS_RELOCATE            = 8,
-    EVENT_KILL_TALK                 = 9
+    EVENT_MAGUS_RELOCATE            = 8
 };
 
 struct boss_magus_telestra : public BossAI
@@ -131,11 +130,7 @@ struct boss_magus_telestra : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-        {
-            Talk(SAY_KILL);
-            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-        }
+        Talk(SAY_KILL);
     }
 
     void JustSummoned(Creature* summon) override

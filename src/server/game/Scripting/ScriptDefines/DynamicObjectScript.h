@@ -23,7 +23,7 @@
 class DynamicObjectScript : public ScriptObject, public UpdatableScript<DynamicObject>
 {
 protected:
-    DynamicObjectScript(const char* name);
+    DynamicObjectScript(char const* name);
 };
 
 #endif

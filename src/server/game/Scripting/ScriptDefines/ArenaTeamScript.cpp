@@ -44,7 +44,7 @@ void ScriptMgr::OnSetArenaMaxPlayersPerTeam(const uint8 arenaType, uint32& maxPl
     CALL_ENABLED_HOOKS(ArenaTeamScript, ARENATEAMHOOK_ON_SET_ARENA_MAX_PLAYERS_PER_TEAM, script->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayerPerTeam));
 }
 
-ArenaTeamScript::ArenaTeamScript(const char* name, std::vector<uint16> enabledHooks)
+ArenaTeamScript::ArenaTeamScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, ARENATEAMHOOK_END)
 {
     // If empty - enable all available hooks.

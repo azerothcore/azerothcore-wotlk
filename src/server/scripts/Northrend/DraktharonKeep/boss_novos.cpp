@@ -56,8 +56,6 @@ enum Misc
     NPC_CRYSTAL_HANDLER                     = 26627,
     NPC_SUMMON_CRYSTAL_HANDLER_TARGET       = 27583,
 
-    EVENT_KILL_TALK                         = 1,
-
     ROOM_RIGHT  = 0,
     ROOM_LEFT   = 1,
     ROOM_STAIRS = 2
@@ -206,11 +204,7 @@ struct boss_novos : public BossAI
 
     void KilledUnit(Unit*  /*victim*/) override
     {
-        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-        {
-            Talk(SAY_KILL);
-            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-        }
+        Talk(SAY_KILL);
     }
 
     void JustSummoned(Creature* summon) override

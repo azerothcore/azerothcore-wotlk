@@ -35,7 +35,7 @@ bool ScriptMgr::OnBeforeIsInvokerVisible(std::string name, Acore::Impl::ChatComm
     CALL_ENABLED_BOOLEAN_HOOKS(AllCommandScript, ALLCOMMANDHOOK_ON_BEFORE_IS_INVOKER_VISIBLE, !script->OnBeforeIsInvokerVisible(name, permissions, who));
 }
 
-AllCommandScript::AllCommandScript(const char* name, std::vector<uint16> enabledHooks)
+AllCommandScript::AllCommandScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, ALLCOMMANDHOOK_END)
 {
     // If empty - enable all available hooks.

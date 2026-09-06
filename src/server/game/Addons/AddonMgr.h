@@ -60,7 +60,7 @@ namespace AddonMgr
 {
     void LoadFromDB();
     void SaveAddon(AddonInfo const& addon);
-    SavedAddon const* GetAddonInfo(const std::string& name);
+    SavedAddon const* GetAddonInfo(std::string const& name);
 
     typedef std::list<BannedAddon> BannedAddonList;
     BannedAddonList const* GetBannedAddons();

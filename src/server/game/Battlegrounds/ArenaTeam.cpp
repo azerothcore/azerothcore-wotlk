@@ -137,6 +137,8 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     else if (GetRating() >= 1000)
         personalRating = 1000;
 
+    sScriptMgr->OnGetStartPersonalRating(this, playerGuid, personalRating);
+
     // xinef: sync query
     // Try to get player's match maker rating from db and fall back to config setting if not found
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MATCH_MAKER_RATING);
@@ -778,7 +780,7 @@ int32 ArenaTeam::GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won 
     return (int32)ceil(mod);
 }
 
-void ArenaTeam::FinishGame(int32 mod, const Map* bgMap)
+void ArenaTeam::FinishGame(int32 mod, Map const* bgMap)
 {
     // Rating can only drop to 0
     if (int32(Stats.Rating) + mod < 0)
@@ -808,7 +810,7 @@ void ArenaTeam::FinishGame(int32 mod, const Map* bgMap)
     }
 }
 
-int32 ArenaTeam::WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap)
+int32 ArenaTeam::WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, Map const* bgMap)
 {
     // Called when the team has won
     // Change in Matchmaker rating
@@ -828,7 +830,7 @@ int32 ArenaTeam::WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32
     return mod;
 }
 
-int32 ArenaTeam::LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap)
+int32 ArenaTeam::LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, Map const* bgMap)
 {
     // Called when the team has lost
     // Change in Matchmaker Rating
@@ -1013,7 +1015,7 @@ bool ArenaTeam::IsFighting() const
     return false;
 }
 
-ArenaTeamMember* ArenaTeam::GetMember(const std::string& name)
+ArenaTeamMember* ArenaTeam::GetMember(std::string const& name)
 {
     return GetMember(sCharacterCache->GetCharacterGuidByName(name));
 }

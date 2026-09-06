@@ -30,7 +30,7 @@ namespace MMAP
         rcFreePolyMeshDetail(polyMeshDetail);
     }
 
-    void IntermediateValues::writeIV(const std::string& dataPath, uint32 mapID, uint32 tileX, uint32 tileY)
+    void IntermediateValues::writeIV(std::string const& dataPath, uint32 mapID, uint32 tileX, uint32 tileY)
     {
         char fileName[512];
         char tileString[25];
@@ -70,7 +70,7 @@ namespace MMAP
 #undef DEBUG_WRITE
     }
 
-    void IntermediateValues::debugWrite(FILE* file, const rcHeightfield* mesh)
+    void IntermediateValues::debugWrite(FILE* file, rcHeightfield const* mesh)
     {
         if (!file || !mesh)
             return;
@@ -108,7 +108,7 @@ namespace MMAP
             }
     }
 
-    void IntermediateValues::debugWrite(FILE* file, const rcCompactHeightfield* chf)
+    void IntermediateValues::debugWrite(FILE* file, rcCompactHeightfield const* chf)
     {
         if (!file | !chf)
             return;
@@ -147,7 +147,7 @@ namespace MMAP
             fwrite(chf->areas, sizeof(unsigned char), chf->spanCount, file);
     }
 
-    void IntermediateValues::debugWrite(FILE* file, const rcContourSet* cs)
+    void IntermediateValues::debugWrite(FILE* file, rcContourSet const* cs)
     {
         if (!file || !cs)
             return;
@@ -168,7 +168,7 @@ namespace MMAP
         }
     }
 
-    void IntermediateValues::debugWrite(FILE* file, const rcPolyMesh* mesh)
+    void IntermediateValues::debugWrite(FILE* file, rcPolyMesh const* mesh)
     {
         if (!file || !mesh)
             return;
@@ -187,7 +187,7 @@ namespace MMAP
         fwrite(mesh->regs, sizeof(unsigned short), mesh->npolys, file);
     }
 
-    void IntermediateValues::debugWrite(FILE* file, const rcPolyMeshDetail* mesh)
+    void IntermediateValues::debugWrite(FILE* file, rcPolyMeshDetail const* mesh)
     {
         if (!file || !mesh)
             return;
@@ -200,7 +200,7 @@ namespace MMAP
         fwrite(mesh->meshes, sizeof(int), mesh->nmeshes * 4, file);
     }
 
-    void IntermediateValues::generateObjFile(const std::string& dataPath, uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
+    void IntermediateValues::generateObjFile(std::string const& dataPath, uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
         std::string objFileName = Acore::StringFormat(
             "{}/meshes/map{:03}{:02}{:02}.obj",

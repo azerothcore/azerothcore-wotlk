@@ -76,7 +76,7 @@ void ScriptMgr::CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<S
     }
 }
 
-SpellScriptLoader::SpellScriptLoader(const char* name)
+SpellScriptLoader::SpellScriptLoader(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<SpellScriptLoader>::AddScript(this);

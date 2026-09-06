@@ -64,7 +64,7 @@ ARG CCACHE_LOGFILE=""
 
 RUN apt-get update                                                     \
     && apt-get install -y --no-install-recommends                         \
-        build-essential ccache libtool cmake-data make cmake clang    \
+        build-essential ccache libtool cmake-data ninja-build cmake clang    \
         git lsb-base curl unzip default-mysql-client openssl                  \
         default-libmysqlclient-dev libboost-all-dev libssl-dev libmysql++-dev \
         libreadline-dev zlib1g-dev libbz2-dev libncurses5-dev liblzma-dev  \
@@ -89,6 +89,7 @@ RUN --mount=type=cache,target=/ccache,sharing=locked \
     --mount=type=bind,target=/azerothcore/.git,source=.git \
     git config --global --add safe.directory /azerothcore \
     && cmake /azerothcore \
+       -G Ninja \
        -DCMAKE_INSTALL_PREFIX="/azerothcore/env/dist"  \
        -DAPPS_BUILD="all"                              \
        -DTOOLS_BUILD="$CTOOLS_BUILD"                   \
@@ -225,8 +226,20 @@ LABEL description="AzerothCore client-data"
 ENV DATAPATH=/azerothcore/env/dist/data
 
 RUN apt-get update && \
-    apt-get install -y curl unzip && \
+    apt-get install -y curl unzip adduser && \
     rm -rf /var/lib/apt/lists/*
+
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
+
+# To use GID/UID 1000 in ubuntu > 23.04 the existing user must be deleted
+# See https://bugs.launchpad.net/cloud-images/+bug/2005129
+RUN userdel --remove ubuntu \
+  && addgroup --gid "$GROUP_ID" "$DOCKER_USER" \
+  && adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" \
+  && passwd -d "$DOCKER_USER" \
+  && chown -R "$DOCKER_USER:$DOCKER_USER" /azerothcore
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER apps apps
 

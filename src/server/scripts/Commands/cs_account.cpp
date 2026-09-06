@@ -20,8 +20,13 @@
 #include "Base32.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "Common.h"
 #include "CryptoGenerics.h"
+#include "DBCStores.h"
+#include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "IPLocation.h"
+#include "Language.h"
 #include "Player.h"
 #include "RBAC.h"
 #include "Realm.h"
@@ -29,6 +34,9 @@
 #include "SecretMgr.h"
 #include "StringConvert.h"
 #include "TOTP.h"
+#include "Util.h"
+#include "WorldSession.h"
+#include "WorldSessionMgr.h"
 #include <unordered_map>
 
 #if AC_COMPILER == AC_COMPILER_GNU
@@ -70,12 +78,21 @@ public:
             { "country",    HandleAccountRemoveLockCountryCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_COUNTRY, Console::Yes },
         };
 
+        static ChatCommandTable accountFlagCommandTable
+        {
+            { "list",       HandleAccountFlagListCommand,    rbac::RBAC_PERM_COMMAND_ACCOUNT_FLAG_LIST,   Console::Yes },
+            { "add",        HandleAccountFlagAddCommand,     rbac::RBAC_PERM_COMMAND_ACCOUNT_FLAG_ADD,    Console::Yes },
+            { "remove",     HandleAccountFlagRemoveCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_FLAG_REMOVE, Console::Yes }
+        };
+
         static ChatCommandTable accountCommandTable =
         {
             { "2fa",        account2faCommandTable                                       },
             { "addon",      HandleAccountAddonCommand,       rbac::RBAC_PERM_COMMAND_ACCOUNT_ADDON, Console::No  },
             { "create",     HandleAccountCreateCommand,      rbac::RBAC_PERM_COMMAND_ACCOUNT_CREATE, Console::Yes },
             { "delete",     HandleAccountDeleteCommand,      rbac::RBAC_PERM_COMMAND_ACCOUNT_DELETE, Console::Yes },
+            { "flag",       accountFlagCommandTable                                      },
+            { "info",       HandleAccountInfoCommand,        rbac::RBAC_PERM_COMMAND_ACCOUNT_INFO, Console::Yes },
             { "onlinelist", HandleAccountOnlineListCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_ONLINE_LIST, Console::Yes },
             { "lock",       accountLockCommandTable                                      },
             { "set",        accountSetCommandTable                                       },
@@ -94,11 +111,9 @@ public:
 
     static bool HandleAccount2FASetupCommand(ChatHandler* handler, char const* args)
     {
+        // no error message here: the framework then prints the command help, which explains how to get the key
         if (!*args)
-        {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
             return false;
-        }
 
         auto token = Acore::StringTo<uint32>(args);
 
@@ -164,11 +179,9 @@ public:
 
     static bool HandleAccount2FARemoveCommand(ChatHandler* handler, char const* args)
     {
+        // no error message here: the framework then prints the command help, which names the token argument
         if (!*args)
-        {
-            handler->SendErrorMessage(LANG_CMD_SYNTAX);
             return false;
-        }
 
         auto token = Acore::StringTo<uint32>(args);
 
@@ -672,6 +685,181 @@ public:
         return true;
     }
 
+    // Show account-wide info, optionally for another account (by name or id)
+    static bool HandleAccountInfoCommand(ChatHandler* handler, Optional<AccountIdentifier> account)
+    {
+        uint32 accountId;
+        std::string accountName;
+
+        if (account)
+        {
+            accountId = account->GetID();
+            accountName = account->GetName();
+        }
+        else if (Player* target = handler->getSelectedPlayerOrSelf())
+        {
+            accountId = target->GetSession()->GetAccountId();
+            AccountMgr::GetName(accountId, accountName);
+        }
+        else
+        {
+            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            return false;
+        }
+
+        // The strong check rejects equal security, so inspecting your own account has to be exempted
+        if (handler->GetSession() && handler->GetSession()->GetAccountId() != accountId &&
+            handler->HasLowerSecurityAccount(nullptr, accountId, true))
+            return false;
+
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO_DETAILED);
+        stmt->SetData(0, int32(realm.Id.Realm));
+        stmt->SetData(1, accountId);
+
+        PreparedQueryResult result = LoginDatabase.Query(stmt);
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+            return false;
+        }
+
+        Field* fields              = result->Fetch();
+        accountName                = fields[0].Get<std::string>();
+        uint32 security            = fields[1].Get<uint8>();
+        std::string eMail          = fields[2].Get<std::string>();
+        std::string regMail        = fields[3].Get<std::string>();
+        std::string lastIp         = fields[4].Get<std::string>();
+        std::string lastLogin      = fields[5].Get<std::string>();
+        int64 muteTime             = fields[6].Get<uint64>();
+        std::string muteReason     = fields[7].Get<std::string>();
+        std::string muteBy         = fields[8].Get<std::string>();
+        uint32 failedLogins        = fields[9].Get<uint32>();
+        uint8 locked               = fields[10].Get<uint8>();
+        std::string OS             = fields[11].Get<std::string>();
+        uint32 expansion           = fields[12].Get<uint8>();
+        uint32 accountFlags        = fields[13].Get<uint32>();
+        std::string joinDate       = fields[14].Get<std::string>();
+        uint32 totalTime           = fields[15].Get<uint32>();
+        std::string lockCountry    = fields[16].Get<std::string>();
+
+        // Empty unless the account is online, in which case it holds the address of the live connection
+        std::string currentIp;
+        uint32 latency = 0;
+
+        if (WorldSession* targetSession = sWorldSessionMgr->FindSession(accountId))
+        {
+            latency = targetSession->GetLatency();
+            muteTime = targetSession->m_muteTime;
+            accountFlags = targetSession->GetAccountFlags();
+            currentIp = targetSession->GetRemoteAddress();
+        }
+
+        if (!handler->GetSession() || handler->GetSession()->GetSecurity() >= AccountTypes(security))
+        {
+            if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(lastIp))
+                lastIp.append(" (").append(location->CountryName).append(")");
+
+            if (!currentIp.empty())
+                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(currentIp))
+                    currentIp.append(" (").append(location->CountryName).append(")");
+        }
+        else
+        {
+            eMail     = handler->GetAcoreString(LANG_UNAUTHORIZED);
+            regMail   = handler->GetAcoreString(LANG_UNAUTHORIZED);
+            lastIp    = handler->GetAcoreString(LANG_UNAUTHORIZED);
+            lastLogin = handler->GetAcoreString(LANG_UNAUTHORIZED);
+
+            if (!currentIp.empty())
+                currentIp = handler->GetAcoreString(LANG_UNAUTHORIZED);
+        }
+
+        int64 banTime = -1;
+        std::string banReason = handler->GetAcoreString(LANG_NO_REASON);
+        std::string bannedBy = handler->GetAcoreString(LANG_UNKNOWN);
+
+        LoginDatabasePreparedStatement* banStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
+        banStmt->SetData(0, accountId);
+
+        if (PreparedQueryResult banResult = LoginDatabase.Query(banStmt))
+        {
+            Field* banFields = banResult->Fetch();
+            banTime          = int64(banFields[1].Get<uint64>() ? 0 : banFields[0].Get<uint32>());
+            bannedBy         = banFields[2].Get<std::string>();
+            banReason        = banFields[3].Get<std::string>();
+        }
+
+        handler->PSendSysMessage(LANG_PINFO_ACC_ACCOUNT, accountName, accountId, security);
+
+        if (accountFlags)
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_FLAGS_PINFO);
+            for (uint8 i = 0; i < MAX_ACCOUNT_FLAG; ++i)
+                if (accountFlags & (uint32(1) << i))
+                    handler->PSendSysMessage(LANG_SUBCMDS_LIST_ENTRY, accountFlagNames[i].full);
+        }
+
+        if (banTime >= 0)
+            handler->PSendSysMessage(LANG_ACCOUNT_INFO_BANNED, banReason,
+                banTime > 0 ? secsToTimeString(banTime - GameTime::GetGameTime().count(), true) : handler->GetAcoreString(LANG_PERMANENTLY), bannedBy);
+
+        // mutetime is only cleared once the muted player logs back in, so an expired mute can still be stored
+        if (muteTime > GameTime::GetGameTime().count())
+            handler->PSendSysMessage(LANG_PINFO_MUTED, muteReason, secsToTimeString(muteTime - GameTime::GetGameTime().count(), true), muteBy);
+
+        handler->PSendSysMessage(LANG_ACCOUNT_INFO_JOINDATE, joinDate);
+        handler->PSendSysMessage(LANG_PINFO_ACC_LASTLOGIN, lastLogin, failedLogins);
+        handler->PSendSysMessage(LANG_PINFO_ACC_OS, OS, latency);
+        handler->PSendSysMessage(LANG_PINFO_ACC_REGMAILS, regMail, eMail);
+        handler->PSendSysMessage(LANG_PINFO_ACC_IP, lastIp, locked ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO));
+
+        if (!currentIp.empty())
+            handler->PSendSysMessage(LANG_ACCOUNT_INFO_CURRENT_IP, currentIp);
+
+        // "00" is the default value meaning no country lock is set
+        if (lockCountry != "00")
+            handler->PSendSysMessage(LANG_ACCOUNT_INFO_LOCK_COUNTRY, lockCountry);
+
+        handler->PSendSysMessage(LANG_ACCOUNT_INFO_EXPANSION, expansion);
+        handler->PSendSysMessage(LANG_PINFO_CHR_PLAYEDTIME, secsToTimeString(totalTime, true));
+
+        CharacterDatabasePreparedStatement* charStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_INFO_CHARS);
+        charStmt->SetData(0, accountId);
+
+        PreparedQueryResult charResult = CharacterDatabase.Query(charStmt);
+        if (!charResult)
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_INFO_NO_CHARS);
+            return true;
+        }
+
+        handler->PSendSysMessage(LANG_ACCOUNT_INFO_CHARS, uint32(charResult->GetRowCount()));
+
+        LocaleConstant locale = handler->GetSessionDbcLocale();
+
+        do
+        {
+            Field* charFields         = charResult->Fetch();
+            ObjectGuid::LowType guid  = charFields[0].Get<uint32>();
+            std::string name          = charFields[1].Get<std::string>();
+            uint8 level               = charFields[2].Get<uint8>();
+            uint8 raceId              = charFields[3].Get<uint8>();
+            uint8 classId             = charFields[4].Get<uint8>();
+            bool online               = charFields[5].Get<bool>();
+
+            ChrRacesEntry const* race = sChrRacesStore.LookupEntry(raceId);
+            ChrClassesEntry const* cls = sChrClassesStore.LookupEntry(classId);
+
+            // Own marker rather than LANG_OFFLINE, whose leading space is missing in some locales
+            handler->PSendSysMessage(LANG_ACCOUNT_INFO_CHAR_ENTRY, handler->playerLink(name),
+                online ? "" : handler->GetAcoreString(LANG_ACCOUNT_INFO_CHAR_OFFLINE), guid, uint32(level),
+                race ? race->name[locale] : handler->GetAcoreString(LANG_UNKNOWN),
+                cls ? cls->name[locale] : handler->GetAcoreString(LANG_UNKNOWN));
+        } while (charResult->NextRow());
+
+        return true;
+    }
+
     /// Set/Unset the expansion level for an account
     static bool HandleAccountSetAddonCommand(ChatHandler* handler, char const* args)
     {
@@ -813,14 +1001,14 @@ public:
             }
         }
 
-        // Check if provided realm.Id.Realm has a negative value other than -1
+        // Check if provided gmRealmID has a negative value other than -1
         if (gmRealmID < -1)
         {
             handler->SendErrorMessage(LANG_INVALID_REALMID);
             return false;
         }
 
-        // If gmRealmID is -1, delete all values for the account id, else, insert values for the specific realm.Id.Realm
+        // If gmRealmID is -1, delete access on every realm, else on the requested one and any all-realms row
         LoginDatabasePreparedStatement* stmt;
 
         if (gmRealmID == -1)
@@ -832,7 +1020,7 @@ public:
         {
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
             stmt->SetData(0, targetAccountId);
-            stmt->SetData(1, realm.Id.Realm);
+            stmt->SetData(1, gmRealmID);
         }
 
         LoginDatabase.Execute(stmt);
@@ -909,6 +1097,111 @@ public:
                 return false;
         }
         return true;
+    }
+
+    static Optional<uint8> ParseAccountFlagBit(std::string_view input)
+    {
+        for (uint8 i = 0; i < MAX_ACCOUNT_FLAG; ++i)
+            if (StringEqualI(input, accountFlagNames[i].full) || StringEqualI(input, accountFlagNames[i].shortName))
+                return i;
+
+        return std::nullopt;
+    }
+
+    static bool HandleAccountFlagListCommand(ChatHandler* handler, Optional<AccountIdentifier> account)
+    {
+        uint32 accountId;
+        std::string accountName;
+
+        if (account)
+        {
+            accountId = account->GetID();
+            accountName = account->GetName();
+        }
+        else if (WorldSession* session = handler->GetSession())
+        {
+            accountId = session->GetAccountId();
+            AccountMgr::GetName(accountId, accountName);
+        }
+        else
+        {
+            handler->SendErrorMessage(LANG_CMD_SYNTAX);
+            return false;
+        }
+
+        if (handler->HasLowerSecurityAccount(nullptr, accountId, true))
+            return false;
+
+        uint32 flags;
+        if (WorldSession* targetSession = sWorldSessionMgr->FindSession(accountId))
+            flags = targetSession->GetAccountFlags();
+        else
+        {
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_FLAG);
+            stmt->SetData(0, accountId);
+            PreparedQueryResult result = LoginDatabase.Query(stmt);
+            if (!result)
+            {
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+                return false;
+            }
+
+            flags = (*result)[0].Get<uint32>();
+        }
+
+        if (!flags)
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_FLAG_LIST_EMPTY, accountName, accountId);
+            return true;
+        }
+
+        handler->PSendSysMessage(LANG_ACCOUNT_FLAG_LIST_HEADER, accountName, accountId);
+        for (uint8 i = 0; i < MAX_ACCOUNT_FLAG; ++i)
+            if (flags & (uint32(1) << i))
+                handler->PSendSysMessage(LANG_SUBCMDS_LIST_ENTRY, accountFlagNames[i].full);
+
+        return true;
+    }
+
+    static bool ChangeAccountFlag(ChatHandler* handler, AccountIdentifier const& account, std::string_view flagArg, bool add)
+    {
+        if (handler->HasLowerSecurityAccount(nullptr, account.GetID(), true))
+            return false;
+
+        Optional<uint8> bit = ParseAccountFlagBit(flagArg);
+        if (!bit)
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_FLAG_INVALID, flagArg);
+            return false;
+        }
+
+        // ACCOUNT_FLAG_GM is handled by GMLevel and should not be allowed to set manually
+        uint32 const flag = uint32(1) << *bit;
+        if (flag & ACCOUNT_FLAG_GM)
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_FLAG_RESERVED);
+            return false;
+        }
+
+        if (WorldSession* session = sWorldSessionMgr->FindSession(account.GetID()))
+            session->UpdateAccountFlag(flag, !add);
+        else
+            LoginDatabase.Execute("UPDATE account SET Flags = Flags {} {} WHERE id = {}",
+                add ? "|" : "& ~", flag, account.GetID());
+
+        handler->PSendSysMessage(add ? LANG_ACCOUNT_FLAG_ADDED : LANG_ACCOUNT_FLAG_REMOVED,
+            accountFlagNames[*bit].full, account.GetName(), account.GetID());
+        return true;
+    }
+
+    static bool HandleAccountFlagAddCommand(ChatHandler* handler, AccountIdentifier account, std::string_view flagArg)
+    {
+        return ChangeAccountFlag(handler, account, flagArg, true);
+    }
+
+    static bool HandleAccountFlagRemoveCommand(ChatHandler* handler, AccountIdentifier account, std::string_view flagArg)
+    {
+        return ChangeAccountFlag(handler, account, flagArg, false);
     }
 
     /// Set email for account

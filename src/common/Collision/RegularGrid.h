@@ -51,7 +51,7 @@ public:
 #define HGRID_MAP_SIZE  (533.33333f * 64.f)     // shouldn't be changed
 #define CELL_SIZE       float(HGRID_MAP_SIZE/(float)CELL_NUMBER)
 
-    typedef G3D::Table<const T*, NodeArray<Node>> MemberTable;
+    typedef G3D::Table<T const*, NodeArray<Node>> MemberTable;
 
     MemberTable memberTable;
     Node* nodes[CELL_NUMBER][CELL_NUMBER];
@@ -70,7 +70,7 @@ public:
             }
     }
 
-    void insert(const T& value)
+    void insert(T const& value)
     {
         G3D::Vector3 pos[9];
         pos[0] = value.GetBounds().corner(0);
@@ -110,7 +110,7 @@ public:
         memberTable.set(&value, na);
     }
 
-    void remove(const T& value)
+    void remove(T const& value)
     {
         NodeArray<Node>& na = memberTable[&value];
         for (uint8 i = 0; i < 9; ++i)
@@ -139,13 +139,13 @@ public:
                 }
     }
 
-    bool contains(const T& value) const { return memberTable.containsKey(&value); }
+    bool contains(T const& value) const { return memberTable.containsKey(&value); }
     int size() const { return memberTable.size(); }
 
     struct Cell
     {
         int x, y;
-        bool operator == (const Cell& c2) const { return x == c2.x && y == c2.y;}
+        bool operator == (Cell const& c2) const { return x == c2.x && y == c2.y;}
 
         static Cell ComputeCell(float fx, float fy)
         {
@@ -173,13 +173,13 @@ public:
     }
 
     template<typename RayCallback>
-    void intersectRay(const G3D::Ray& ray, RayCallback& intersectCallback, float max_dist, bool stopAtFirstHit)
+    void intersectRay(G3D::Ray const& ray, RayCallback& intersectCallback, float max_dist, bool stopAtFirstHit)
     {
         intersectRay(ray, intersectCallback, max_dist, ray.origin() + ray.direction() * max_dist, stopAtFirstHit);
     }
 
     template<typename RayCallback>
-    void intersectRay(const G3D::Ray& ray, RayCallback& intersectCallback, float& max_dist, const G3D::Vector3& end, bool stopAtFirstHit)
+    void intersectRay(G3D::Ray const& ray, RayCallback& intersectCallback, float& max_dist, G3D::Vector3 const& end, bool stopAtFirstHit)
     {
         Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
         if (!cell.isValid())
@@ -261,7 +261,7 @@ public:
     }
 
     template<typename IsectCallback>
-    void intersectPoint(const G3D::Vector3& point, IsectCallback& intersectCallback)
+    void intersectPoint(G3D::Vector3 const& point, IsectCallback& intersectCallback)
     {
         Cell cell = Cell::ComputeCell(point.x, point.y);
         if (!cell.isValid())
@@ -276,7 +276,7 @@ public:
 
     // Optimized verson of intersectRay function for rays with vertical directions
     template<typename RayCallback>
-    void intersectZAllignedRay(const G3D::Ray& ray, RayCallback& intersectCallback, float& max_dist)
+    void intersectZAllignedRay(G3D::Ray const& ray, RayCallback& intersectCallback, float& max_dist)
     {
         Cell cell = Cell::ComputeCell(ray.origin().x, ray.origin().y);
         if (!cell.isValid())

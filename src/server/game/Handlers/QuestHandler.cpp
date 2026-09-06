@@ -629,7 +629,7 @@ void WorldSession::HandleQueryQuestsCompleted(WorldPacket& /*recvData*/)
     WorldPacket data(SMSG_QUERY_QUESTS_COMPLETED_RESPONSE, 4 + 4 * rew_count);
     data << uint32(rew_count);
 
-    const RewardedQuestSet& rewQuests = _player->getRewardedQuests();
+    RewardedQuestSet const& rewQuests = _player->getRewardedQuests();
     for (RewardedQuestSet::const_iterator itr = rewQuests.begin(); itr != rewQuests.end(); ++itr)
         data << uint32(*itr);
 

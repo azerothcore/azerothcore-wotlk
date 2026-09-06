@@ -165,8 +165,8 @@ private:
     MapMgr();
     ~MapMgr();
 
-    MapMgr(const MapMgr&);
-    MapMgr& operator=(const MapMgr&);
+    MapMgr(MapMgr const&);
+    MapMgr& operator=(MapMgr const&);
 
     std::mutex Lock;
     MapMapType i_maps;

@@ -112,7 +112,7 @@ namespace lfg
         return m_OldState;
     }
 
-    const LfgLockMap& LfgPlayerData::GetLockedDungeons() const
+    LfgLockMap const& LfgPlayerData::GetLockedDungeons() const
     {
         return m_LockedDungeons;
     }

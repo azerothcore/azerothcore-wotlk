@@ -18,7 +18,7 @@
 #include "ALEScript.h"
 #include "ScriptMgr.h"
 
-ALEScript::ALEScript(const char* name) : ScriptObject(name)
+ALEScript::ALEScript(char const* name) : ScriptObject(name)
 {
     ScriptRegistry<ALEScript>::AddScript(this);
 }

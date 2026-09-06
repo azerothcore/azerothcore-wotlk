@@ -76,14 +76,14 @@ namespace MMAP
     class TerrainBuilder
     {
     public:
-        TerrainBuilder(const std::string &mapsPath, bool skipLiquid);
+        TerrainBuilder(std::string const& mapsPath, bool skipLiquid);
         ~TerrainBuilder();
 
-        TerrainBuilder(const TerrainBuilder& tb) = delete;
+        TerrainBuilder(TerrainBuilder const& tb) = delete;
 
         void loadMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData);
         bool loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData);
-        void loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, const char* offMeshFilePath);
+        void loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, std::vector<std::string> const& offMeshLines);
 
         [[nodiscard]] bool usesLiquids() const { return !m_skipLiquid; }
 

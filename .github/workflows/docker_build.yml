@@ -13,8 +13,9 @@ concurrency:
   #
   # - PRs use `refs/pull/<PR_NUMBER>/merge`, so new commits cancel older
   #   in-progress runs for the same PR.
-  # - When a PR is merged, a push to the target branch starts a new group,
-  #   canceling any still-running PR CI.
+  # - A merge does NOT cancel the PR's own runs: this group is keyed on
+  #   refs/pull/<N>/merge and the master push on refs/heads/master, so they
+  #   never share a group. See the cancel-pr-runs-on-close workflow.
   # - Branch pushes are isolated by ref.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -40,7 +41,7 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The containers created in this workflow are used by
       # acore-docker, which has a dependency on mod-ale.
@@ -49,14 +50,14 @@ jobs:
       # build them locally (such as with `docker compose build`)
       - name: Download Eluna
         if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: azerothcore/mod-ale
           path: modules/mod-ale
 
       - name: Login to Docker Hub
         if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -115,7 +116,7 @@ jobs:
 
       - name: Trigger acore-docker CI
         if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.ACORE_DOCKER_REPO_ACCESS_TOKEN }}
           repository: azerothcore/acore-docker

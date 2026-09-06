@@ -22,7 +22,7 @@
 #include "RBAC.h"
 #include "WorldSession.h"
 
-constexpr std::array<const char*, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsToString =
+constexpr std::array<char const*, MAX_ITEM_SUBCLASS_CONTAINER> bagSpecsToString =
 {
     "normal",
     "soul",

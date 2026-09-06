@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "DBCStructure.h"
 #include "Language.h"
+#include "RBAC.h"
 #include "SmartEnum.h"
 #include "SpellAuraDefines.h"
 #include "SpellInfo.h"
@@ -35,10 +36,10 @@ public:
     {
         static ChatCommandTable spellinfoCommandTable =
         {
-            { "attributes", HandleSpellInfoAttributesCommand, SEC_GAMEMASTER, Console::Yes },
-            { "effects",    HandleSpellInfoEffectsCommand,    SEC_GAMEMASTER, Console::Yes },
-            { "targets",    HandleSpellInfoTargetsCommand,    SEC_GAMEMASTER, Console::Yes },
-            { "all",        HandleSpellInfoAllCommand,        SEC_GAMEMASTER, Console::Yes }
+            { "attributes", HandleSpellInfoAttributesCommand, rbac::RBAC_PERM_COMMAND_SPELLINFO_ATTRIBUTES, Console::Yes },
+            { "effects",    HandleSpellInfoEffectsCommand,    rbac::RBAC_PERM_COMMAND_SPELLINFO_EFFECTS,    Console::Yes },
+            { "targets",    HandleSpellInfoTargetsCommand,    rbac::RBAC_PERM_COMMAND_SPELLINFO_TARGETS,    Console::Yes },
+            { "all",        HandleSpellInfoAllCommand,        rbac::RBAC_PERM_COMMAND_SPELLINFO_ALL,        Console::Yes }
         };
 
         static ChatCommandTable commandTable =

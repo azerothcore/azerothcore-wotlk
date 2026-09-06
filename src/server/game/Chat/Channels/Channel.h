@@ -119,7 +119,7 @@ class ChannelRights
 {
 public:
     ChannelRights()  = default;
-    ChannelRights(const uint32& f, const uint32& d, std::string  jm, std::string  sm, std::set<uint32>  ml) : flags(f), speakDelay(d), joinMessage(std::move(jm)), speakMessage(std::move(sm)), moderators(std::move(ml)) {}
+    ChannelRights(uint32 const& f, uint32 const& d, std::string  jm, std::string  sm, std::set<uint32>  ml) : flags(f), speakDelay(d), joinMessage(std::move(jm)), speakMessage(std::move(sm)), moderators(std::move(ml)) {}
     uint32 flags{0};
     uint32 speakDelay{0};
     std::string joinMessage;

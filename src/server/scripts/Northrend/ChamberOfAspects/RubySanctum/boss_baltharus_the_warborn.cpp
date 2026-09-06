@@ -66,7 +66,6 @@ enum Events
     EVENT_CHECK_HEALTH1         = 4,
     EVENT_CHECK_HEALTH2         = 5,
     EVENT_CHECK_HEALTH3         = 6,
-    EVENT_KILL_TALK             = 7,
     EVENT_SUMMON_CLONE          = 8,
 
     EVENT_XERESTRASZA_EVENT_0   = 1,
@@ -191,11 +190,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_KILL);
         }
 
         void JustSummoned(Creature* summon) override

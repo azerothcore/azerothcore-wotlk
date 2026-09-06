@@ -32,7 +32,7 @@ namespace std
     template <>
     struct hash<std::pair<uint32_t, uint32_t>>
     {
-        std::size_t operator()(const std::pair<uint32_t, uint32_t>& p) const noexcept
+        std::size_t operator()(std::pair<uint32_t, uint32_t> const& p) const noexcept
         {
             return std::hash<uint64_t>()((static_cast<uint64_t>(p.first) << 32) | p.second);
         }
@@ -75,6 +75,8 @@ namespace MMAP
         std::string MapsPath() const { return (_dataDir / "maps").string(); }
         std::string MMapsPath() const { return (_dataDir / "mmaps").string(); }
         std::string DataDirPath() const { return _dataDir.string(); }
+
+        std::vector<std::string> const& OffMeshConnections() const { return _offmeshConnections; }
 
     private:
         explicit Config();
@@ -153,6 +155,8 @@ namespace MMAP
         bool _debugOutput;
 
         std::filesystem::path _dataDir;
+
+        std::vector<std::string> _offmeshConnections;
     };
 }
 

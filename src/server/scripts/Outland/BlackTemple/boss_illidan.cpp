@@ -196,7 +196,7 @@ public:
 
 struct boss_illidan_stormrage : public BossAI
 {
-    boss_illidan_stormrage(Creature* creature) : BossAI(creature, DATA_ILLIDAN_STORMRAGE), _canTalk(true), _dying(false), _inCutscene(false), beamPosId(0) { }
+    boss_illidan_stormrage(Creature* creature) : BossAI(creature, DATA_ILLIDAN_STORMRAGE), _dying(false), _inCutscene(false), beamPosId(0) { }
 
     void Reset() override
     {
@@ -204,7 +204,6 @@ struct boss_illidan_stormrage : public BossAI
         me->m_Events.CancelEventGroup(GROUP_BERSERK);
         me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
         me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
-        _canTalk = true;
         _dying = false;
         _inCutscene = false;
         beamPosId = urand(0, MAX_EYE_BEAM_POS - 1);
@@ -652,15 +651,7 @@ struct boss_illidan_stormrage : public BossAI
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if (_canTalk)
-        {
-            Talk(SAY_ILLIDAN_KILL);
-            _canTalk = false;
-
-            me->m_Events.AddEventAtOffset([&] {
-                _canTalk = true;
-            }, 6s); // 3590ms
-        }
+        Talk(SAY_ILLIDAN_KILL);
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
@@ -689,7 +680,6 @@ struct boss_illidan_stormrage : public BossAI
     }
 
 private:
-    bool _canTalk;
     bool _dying;
     bool _inCutscene;
     uint8 beamPosId;

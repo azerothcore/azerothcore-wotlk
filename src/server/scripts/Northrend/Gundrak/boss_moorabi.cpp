@@ -55,7 +55,6 @@ enum Events
     EVENT_NUMBLING_SHOUT                    = 2,
     EVENT_DETERMINED_STAB                   = 3,
     EVENT_TRANSFORMATION                    = 4,
-    EVENT_KILL_TALK                         = 5,
 
     EVENT_PHANTOM                           = 10
 };
@@ -125,11 +124,7 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_SLAY);
         }
 
         void UpdateAI(uint32 diff) override

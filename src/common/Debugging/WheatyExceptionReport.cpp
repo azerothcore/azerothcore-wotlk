@@ -1589,7 +1589,7 @@ DWORD_PTR WheatyExceptionReport::DereferenceUnsafePointer(DWORD_PTR address)
 // Helper function that writes to the report file, and allows the user to use
 // printf style formating
 //============================================================================
-int __cdecl WheatyExceptionReport::Log(const TCHAR* format, ...)
+int __cdecl WheatyExceptionReport::Log(TCHAR const* format, ...)
 {
     int retValue;
     va_list argptr;
@@ -1609,7 +1609,7 @@ int __cdecl WheatyExceptionReport::Log(const TCHAR* format, ...)
     return retValue;
 }
 
-int __cdecl WheatyExceptionReport::StackLog(const TCHAR* format, va_list argptr)
+int __cdecl WheatyExceptionReport::StackLog(TCHAR const* format, va_list argptr)
 {
     int retValue;
     DWORD cbWritten;
@@ -1621,7 +1621,7 @@ int __cdecl WheatyExceptionReport::StackLog(const TCHAR* format, va_list argptr)
     return retValue;
 }
 
-int __cdecl WheatyExceptionReport::HeapLog(const TCHAR* format, va_list argptr)
+int __cdecl WheatyExceptionReport::HeapLog(TCHAR const* format, va_list argptr)
 {
     int retValue = 0;
     DWORD cbWritten;

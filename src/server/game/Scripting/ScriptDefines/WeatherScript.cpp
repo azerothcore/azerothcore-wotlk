@@ -45,7 +45,7 @@ void ScriptMgr::OnWeatherUpdate(Weather* weather, uint32 diff)
     }
 }
 
-WeatherScript::WeatherScript(const char* name)
+WeatherScript::WeatherScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<WeatherScript>::AddScript(this);

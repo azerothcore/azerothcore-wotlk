@@ -469,7 +469,7 @@ public:
         return append((uint8 const*)src, cnt);
     }
 
-    template<class T> void append(const T* src, std::size_t cnt)
+    template<class T> void append(T const* src, std::size_t cnt)
     {
         return append((uint8 const*)src, cnt * sizeof(T));
     }

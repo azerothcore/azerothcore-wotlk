@@ -84,7 +84,7 @@ void ScriptMgr::OnBeforeWorldInitialized()
     CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_BEFORE_WORLD_INITIALIZED, script->OnBeforeWorldInitialized());
 }
 
-WorldScript::WorldScript(const char* name, std::vector<uint16> enabledHooks)
+WorldScript::WorldScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, WORLDHOOK_END)
 {
     // If empty - enable all available hooks.

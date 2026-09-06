@@ -129,7 +129,7 @@ public:
             {
               me->CastSpell(me, SPELL_FREEZE_ANIM, true);
               me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-              for (const auto & i : mojoPosition)
+              for (auto const& i : mojoPosition)
                   me->SummonCreature(NPC_LIVING_MOJO, i.GetPositionX(), i.GetPositionY(), i.GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
             }
             else

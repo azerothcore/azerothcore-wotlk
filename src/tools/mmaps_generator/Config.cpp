@@ -33,12 +33,12 @@ namespace MMAP
         return {x, y};
     }
 
-    bool isCurrentDirectory(const std::string& pathStr) {
+    bool isCurrentDirectory(std::string const& pathStr) {
         try {
             const std::filesystem::path givenPath = std::filesystem::canonical(std::filesystem::absolute(pathStr));
             const std::filesystem::path currentPath = std::filesystem::canonical(std::filesystem::current_path());
             return givenPath == currentPath;
-        } catch (const std::filesystem::filesystem_error& e) {
+        } catch (std::filesystem::filesystem_error const& e) {
             std::cerr << "Filesystem error: " << e.what() << "\n";
             return false;
         }
@@ -74,8 +74,8 @@ namespace MMAP
 
     ResolvedMeshConfig Config::GetConfigForTile(uint32 mapID, uint32 tileX, uint32 tileY) const
     {
-        const MapOverride* mapOverride = nullptr;
-        const TileOverride* tileOverride = nullptr;
+        MapOverride const* mapOverride = nullptr;
+        TileOverride const* tileOverride = nullptr;
 
         // Lookup map and tile overrides
         if (auto mapIt = _maps.find(mapID); mapIt != _maps.end())
@@ -102,39 +102,39 @@ namespace MMAP
 
         // Resolve vertex settings
         int vertexPerMap = resolveInt(
-            [](const TileOverride*) { return std::optional<int>{}; },
-            [](const MapOverride* m) { return m->vertexPerMapEdge; },
+            [](TileOverride const*) { return std::optional<int>{}; },
+            [](MapOverride const* m) { return m->vertexPerMapEdge; },
             _global.vertexPerMapEdge
         );
 
         int vertexPerTile = resolveInt(
-            [](const TileOverride*) { return std::optional<int>{}; },
-            [](const MapOverride* m) { return m->vertexPerTileEdge; },
+            [](TileOverride const*) { return std::optional<int>{}; },
+            [](MapOverride const* m) { return m->vertexPerTileEdge; },
             _global.vertexPerTileEdge
         );
 
         ResolvedMeshConfig config;
         config.walkableSlopeAngle = resolveFloat(
-            [](const TileOverride* t) { return t->walkableSlopeAngle; },
-            [](const MapOverride* m) { return m->walkableSlopeAngle; },
+            [](TileOverride const* t) { return t->walkableSlopeAngle; },
+            [](MapOverride const* m) { return m->walkableSlopeAngle; },
             _global.walkableSlopeAngle
         );
 
         config.walkableRadius = resolveInt(
-            [](const TileOverride* t) { return t->walkableRadius; },
-            [](const MapOverride* m) { return m->walkableRadius; },
+            [](TileOverride const* t) { return t->walkableRadius; },
+            [](MapOverride const* m) { return m->walkableRadius; },
             _global.walkableRadius
         );
 
         config.walkableHeight = resolveInt(
-            [](const TileOverride* t) { return t->walkableHeight; },
-            [](const MapOverride* m) { return m->walkableHeight; },
+            [](TileOverride const* t) { return t->walkableHeight; },
+            [](MapOverride const* m) { return m->walkableHeight; },
             _global.walkableHeight
         );
 
         config.walkableClimb = resolveInt(
-            [](const TileOverride* t) { return t->walkableClimb; },
-            [](const MapOverride* m) { return m->walkableClimb; },
+            [](TileOverride const* t) { return t->walkableClimb; },
+            [](MapOverride const* m) { return m->walkableClimb; },
             _global.walkableClimb
         );
 
@@ -168,19 +168,19 @@ namespace MMAP
 
         fkyaml::node mmapsNode = root["mmapsConfig"];
 
-        auto tryFloat = [](const fkyaml::node& n, const char* key, float& out)
+        auto tryFloat = [](fkyaml::node const& n, char const* key, float& out)
         {
             if (n.contains(key)) out = n[key].get_value<float>();
         };
-        auto tryInt = [](const fkyaml::node& n, const char* key, int& out)
+        auto tryInt = [](fkyaml::node const& n, char const* key, int& out)
         {
             if (n.contains(key)) out = n[key].get_value<int>();
         };
-        auto tryBoolean = [](const fkyaml::node& n, const char* key, bool& out)
+        auto tryBoolean = [](fkyaml::node const& n, char const* key, bool& out)
         {
             if (n.contains(key)) out = n[key].get_value<bool>();
         };
-        auto tryString = [](const fkyaml::node& n, const char* key, std::string& out)
+        auto tryString = [](fkyaml::node const& n, char const* key, std::string& out)
         {
             if (n.contains(key)) out = n[key].get_value<std::string>();
         };
@@ -190,6 +190,15 @@ namespace MMAP
         tryBoolean(mmapsNode, "skipJunkMaps", _skipJunkMaps);
         tryBoolean(mmapsNode, "skipBattlegrounds", _skipBattlegrounds);
         tryBoolean(mmapsNode, "debugOutput", _debugOutput);
+
+        if (mmapsNode.contains("offmeshConnections") && mmapsNode["offmeshConnections"].is_sequence())
+        {
+            _offmeshConnections = mmapsNode["offmeshConnections"].get_value<std::vector<std::string>>();
+        }
+        else
+        {
+            _offmeshConnections.clear();
+        }
 
         std::string dataDirPath;
         tryString(mmapsNode, "dataDir", dataDirPath);
@@ -202,8 +211,8 @@ namespace MMAP
         tryInt(mmapsNode, "walkableHeight", _global.walkableHeight);
         tryInt(mmapsNode, "walkableClimb", _global.walkableClimb);
         tryInt(mmapsNode, "walkableRadius", _global.walkableRadius);
-        tryInt(mmapsNode, "vertexPerMapEdge", _global.vertexPerMapEdge);
-        tryInt(mmapsNode, "vertexPerTileEdge", _global.vertexPerTileEdge);
+        tryInt(mmapsNode, "verticesPerMapEdge", _global.vertexPerMapEdge);
+        tryInt(mmapsNode, "verticesPerTileEdge", _global.vertexPerTileEdge);
         tryFloat(mmapsNode, "maxSimplificationError", _global.maxSimplificationError);
 
         // Map overrides
@@ -225,8 +234,10 @@ namespace MMAP
                     override.walkableHeight = mapNode["walkableHeight"].get_value<int>();
                 if (mapNode.contains("walkableClimb"))
                     override.walkableClimb = mapNode["walkableClimb"].get_value<int>();
-                if (mapNode.contains("vertexPerMapEdge"))
-                    override.vertexPerMapEdge = mapNode["vertexPerMapEdge"].get_value<int>();
+                if (mapNode.contains("verticesPerMapEdge"))
+                    override.vertexPerMapEdge = mapNode["verticesPerMapEdge"].get_value<int>();
+                if (mapNode.contains("verticesPerTileEdge"))
+                    override.vertexPerTileEdge = mapNode["verticesPerTileEdge"].get_value<int>();
                 if (mapNode.contains("cellSizeHorizontal"))
                     override.cellSizeHorizontal = mapNode["cellSizeHorizontal"].get_value<float>();
                 if (mapNode.contains("cellSizeVertical"))
