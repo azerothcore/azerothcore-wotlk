@@ -118,7 +118,7 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 	deadline := time.Now().Add(15 * time.Second)
 	for {
 		if obj := bot.World.GetObject(freyaGUID); obj != nil {
-			if hp, max := bot.UnitHP(freyaGUID); max > 0 && hp > 0 {
+			if hp, maxHP := bot.UnitHP(freyaGUID); maxHP > 0 && hp > 0 {
 				break
 			}
 		}
