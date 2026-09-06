@@ -5392,9 +5392,23 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
     }
 
     float fx, fy, fz;
+    float fo = m_caster->GetOrientation();
 
     if (m_targets.HasDst())
+    {
         destTarget->GetPosition(fx, fy, fz);
+
+        // only destinations derived from the caster's own position carry his facing, and they are
+        // the only ones a script can have deliberately turned. Destinations taken from a target,
+        // from a nearby object or from spell_target_position carry a facing of their own that must
+        // not rotate the gameobject
+        SpellImplicitTargetInfo const& targetInfo = m_spellInfo->Effects[effIndex].TargetA;
+        if (targetInfo.GetReferenceType() == TARGET_REFERENCE_TYPE_CASTER
+            && targetInfo.GetSelectionCategory() == TARGET_SELECT_CATEGORY_DEFAULT
+            && targetInfo.GetTarget() != TARGET_DEST_DB
+            && targetInfo.GetTarget() != TARGET_DEST_HOME)
+            fo = destTarget->GetOrientation();
+    }
     //FIXME: this can be better check for most objects but still hack
     else if (m_spellInfo->Effects[effIndex].HasRadius() && m_spellInfo->Speed == 0)
     {
@@ -5423,8 +5437,9 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(name_id) ? new StaticTransport() : new GameObject();
 
-    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), m_caster->GetOrientation());
-    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), rotation, 100, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), fo);
+    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, m_caster->GetPhaseMask(),
+        fx, fy, fz, fo, rotation, 100, GO_STATE_READY))
     {
         delete pGameObj;
         return;
