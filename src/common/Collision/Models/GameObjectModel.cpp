@@ -198,7 +198,8 @@ bool GameObjectModel::intersectRay(G3D::Ray const& ray, float& MaxDist, bool Sto
 
 bool GameObjectModel::GetLocationInfo(G3D::Vector3 const& point, VMAP::LocationInfo& info, uint32 ph_mask) const
 {
-    if (!(phasemask & ph_mask) || !owner->IsSpawned() || !IsMapObject())
+    // transports provide inaccurate area info while moving (e.g. Booty Bay - Ratchet boat, see #7335)
+    if (!(phasemask & ph_mask) || !owner->IsSpawned() || !IsMapObject() || owner->IsTransport())
         return false;
 
     if (!iBound.contains(point))
@@ -216,6 +217,8 @@ bool GameObjectModel::GetLocationInfo(G3D::Vector3 const& point, VMAP::LocationI
         float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
         if (info.ground_Z < world_Z)
         {
+            info.rootId = groupInfo.rootId;
+            info.hitModel = groupInfo.hitModel;
             info.ground_Z = world_Z;
             return true;
         }

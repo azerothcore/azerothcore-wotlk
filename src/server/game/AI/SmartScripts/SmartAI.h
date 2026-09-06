@@ -265,6 +265,7 @@ private:
     uint32 mDespawnState;
     void UpdateDespawn(const uint32 diff);
     void UpdateFollow(const uint32 diff);
+    void UpdateMeleeStance();
     uint32 mEscortInvokerCheckTimer;
     bool mJustReset;
 

@@ -71,7 +71,13 @@ enum PaladinSpells
 
     SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742,
 
+    SPELL_PALADIN_DEVOTION_AURA_R1               = 465,
+    SPELL_PALADIN_RETRIBUTION_AURA_R1            = 7294,
     SPELL_PALADIN_CONCENTRACTION_AURA            = 19746,
+    SPELL_PALADIN_SHADOW_RESISTANCE_AURA_R1      = 19876,
+    SPELL_PALADIN_FROST_RESISTANCE_AURA_R1       = 19888,
+    SPELL_PALADIN_FIRE_RESISTANCE_AURA_R1        = 19891,
+    SPELL_PALADIN_CRUSADER_AURA                  = 32223,
     SPELL_PALADIN_SANCTIFIED_RETRIBUTION_R1      = 31869,
     SPELL_PALADIN_SWIFT_RETRIBUTION_R1           = 53379,
 
@@ -2133,6 +2139,70 @@ private:
     uint32 _spellId;
 };
 
+// 63510 - Improved Concentration Aura (requires Concentration Aura on the target)
+// 63514 - Improved Devotion Aura (requires Devotion Aura on the target)
+class spell_pal_improved_aura_effect : public AuraScript
+{
+    PrepareAuraScript(spell_pal_improved_aura_effect);
+
+public:
+    spell_pal_improved_aura_effect(uint32 auraSpellId) : AuraScript(), _auraSpellId(auraSpellId) { }
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _auraSpellId });
+    }
+
+    bool CheckAreaTarget(Unit* target)
+    {
+        return target->GetAuraOfRankedSpell(_auraSpellId, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_pal_improved_aura_effect::CheckAreaTarget);
+    }
+
+private:
+    uint32 _auraSpellId;
+};
+
+// 63531 - Sanctified Retribution
+// "Targets affected by any of your auras" - shared effect of Sanctified Retribution and Swift Retribution
+class spell_pal_sanctified_retribution_effect : public AuraScript
+{
+    PrepareAuraScript(spell_pal_sanctified_retribution_effect);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_PALADIN_DEVOTION_AURA_R1,
+            SPELL_PALADIN_RETRIBUTION_AURA_R1,
+            SPELL_PALADIN_CONCENTRACTION_AURA,
+            SPELL_PALADIN_SHADOW_RESISTANCE_AURA_R1,
+            SPELL_PALADIN_FROST_RESISTANCE_AURA_R1,
+            SPELL_PALADIN_FIRE_RESISTANCE_AURA_R1,
+            SPELL_PALADIN_CRUSADER_AURA
+        });
+    }
+
+    bool CheckAreaTarget(Unit* target)
+    {
+        for (uint32 auraSpellId : { SPELL_PALADIN_DEVOTION_AURA_R1, SPELL_PALADIN_RETRIBUTION_AURA_R1, SPELL_PALADIN_CONCENTRACTION_AURA,
+            SPELL_PALADIN_SHADOW_RESISTANCE_AURA_R1, SPELL_PALADIN_FROST_RESISTANCE_AURA_R1, SPELL_PALADIN_FIRE_RESISTANCE_AURA_R1, SPELL_PALADIN_CRUSADER_AURA })
+            if (target->GetAuraOfRankedSpell(auraSpellId, GetCasterGUID()))
+                return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_pal_sanctified_retribution_effect::CheckAreaTarget);
+    }
+};
+
 // 53651 - Light's Beacon - Beacon of Light
 // Each source heal has a dedicated beacon copy spell:
 //   53652 - Holy Light, 53653 - Flash of Light, 53654 - Holy Shock
@@ -2256,5 +2326,8 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_improved_devotion_aura", SPELL_PALADIN_IMPROVED_DEVOTION_AURA);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_sanctified_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_swift_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
+    RegisterSpellScriptWithArgs(spell_pal_improved_aura_effect, "spell_pal_improved_concentraction_aura_effect", SPELL_PALADIN_CONCENTRACTION_AURA);
+    RegisterSpellScriptWithArgs(spell_pal_improved_aura_effect, "spell_pal_improved_devotion_aura_effect", SPELL_PALADIN_DEVOTION_AURA_R1);
+    RegisterSpellScript(spell_pal_sanctified_retribution_effect);
     RegisterSpellScript(spell_pal_light_s_beacon);
 }

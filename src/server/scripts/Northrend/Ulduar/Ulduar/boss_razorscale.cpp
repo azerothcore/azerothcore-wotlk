@@ -159,6 +159,8 @@ enum RazorscaleMisc
 
     WORLD_STATE_RAZORSCALE_MUSIC = 4162,
 
+    DATA_PERMA_GROUND       = 4,
+
     // Harpoon fire state data
     FIRE_STATE_REPAIR       = 2,
     FIRE_STATE_MAX_PROGRESS = 25
@@ -261,6 +263,11 @@ struct boss_razorscale : public BossAI
     void ScheduleGroundEvents()
     {
         events.SetPhase(PHASE_PERMA_GROUND);
+        events.CancelEvent(EVENT_FLAME_BREATH);
+        events.CancelEvent(EVENT_WING_BUFFET);
+        events.CancelEvent(EVENT_RESUME_AIR);
+        events.CancelEvent(EVENT_FIREBOLT);
+        events.CancelEvent(EVENT_FIREBALL_AIR);
         events.ScheduleEvent(EVENT_FIREBOLT, 3s, 0, PHASE_PERMA_GROUND);
         events.ScheduleEvent(EVENT_FUSE_ARMOR, 15s, 0, PHASE_PERMA_GROUND);
         events.ScheduleEvent(EVENT_FLAME_BREATH_GROUNDED, 21s, 0, PHASE_PERMA_GROUND);
@@ -278,8 +285,12 @@ struct boss_razorscale : public BossAI
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_FLIGHT, RazorFlightPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
                 break;
             case ACTION_GROUND_PHASE:
+                if (_permaGround)
+                    break;
                 me->InterruptNonMeleeSpells(false);
                 events.SetPhase(PHASE_GROUND);
+                events.CancelEvent(EVENT_SUMMON_MINIONS);
+                events.CancelEvent(EVENT_SUMMON_MINIONS_DELAYED);
                 _harpoonHits = 0;
                 me->SetSpeedRate(MOVE_RUN, 3.0f);
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
@@ -289,6 +300,14 @@ struct boss_razorscale : public BossAI
                 me->RemoveAura(SPELL_STUN_SELF);
                 Talk(EMOTE_PERMA_GROUND);
                 DoCastSelf(SPELL_WING_BUFFET);
+                {
+                    EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
+                    summons.DoAction(ACTION_STOP_CONTROLLERS, trapperPred);
+                    EntryCheckPredicate commanderPred(NPC_EXPEDITION_COMMANDER);
+                    summons.DoAction(ACTION_START_PERMA_GROUND, commanderPred);
+                    EntryCheckPredicate engineerPred(NPC_EXPEDITION_ENGINEER);
+                    summons.DoAction(ACTION_START_PERMA_GROUND, engineerPred);
+                }
                 events.ScheduleEvent(EVENT_RESUME_CHASE, 1s);
                 ScheduleGroundEvents();
                 break;
@@ -314,9 +333,16 @@ struct boss_razorscale : public BossAI
                 break;
             case POINT_RAZORSCALE_GROUND:
                 me->SetDisableGravity(false);
-                if (!_permaGround)
+                me->SetFacingTo(RazorGroundPos.GetOrientation());
+                if (_permaGround)
                 {
-                    DoCastSelf(SPELL_STUN_SELF, true);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    DoAction(ACTION_START_PERMA_GROUND);
+                    break;
+                }
+                me->SetReactState(REACT_PASSIVE);
+                DoCastSelf(SPELL_STUN_SELF, true);
+                {
                     EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
                     summons.DoAction(ACTION_GROUND_PHASE, trapperPred);
                     EntryCheckPredicate commanderPred(NPC_EXPEDITION_COMMANDER);
@@ -343,6 +369,8 @@ struct boss_razorscale : public BossAI
     {
         if (spellInfo->Id == SPELL_HARPOON_TRIGGER)
         {
+            if (_permaGround)
+                return;
             _harpoonHits++;
             if (_harpoonHits >= RAID_MODE<uint32>(2, 4))
                 DoAction(ACTION_GROUND_PHASE);
@@ -391,7 +419,11 @@ struct boss_razorscale : public BossAI
 
     uint32 GetData(uint32 id) const override
     {
-        return (id == DATA_QUICK_SHAVE_ID && _flyCount <= 1) ? 1 : 0;
+        if (id == DATA_QUICK_SHAVE_ID)
+            return _flyCount <= 1 ? 1 : 0;
+        if (id == DATA_PERMA_GROUND)
+            return _permaGround ? 1 : 0;
+        return 0;
     }
 
     void HandleMusic(bool active)
@@ -470,10 +502,10 @@ struct boss_razorscale : public BossAI
                     SummonMinions();
                     break;
                 case EVENT_FLAME_BREATH:
+                    me->SetFacingTo(RazorLandPos.GetOrientation());
                     me->RemoveAura(SPELL_STUN_SELF);
                     Talk(EMOTE_BREATH);
-                    if (Unit* victim = me->GetVictim())
-                        DoCast(victim, SPELL_FLAME_BREATH);
+                    DoCastAOE(SPELL_FLAME_BREATH);
                     events.ScheduleEvent(EVENT_WING_BUFFET, 2s, 0, PHASE_GROUND);
                     break;
                 case EVENT_FLAME_BREATH_GROUNDED:
@@ -603,6 +635,11 @@ struct npc_expedition_commander : public ScriptedAI
                 _building = true;
                 BuildHarpoon(3);
                 _building = false;
+                break;
+            case ACTION_START_PERMA_GROUND:
+                _started = false;
+                _events.Reset();
+                DestroyHarpoons();
                 break;
             case ACTION_DESTROY_HARPOONS:
                 if (_destroyCd)
@@ -833,6 +870,13 @@ struct npc_expedition_engineer : public NullCreatureAI
             _harpoonGUID.Clear();
             me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         }
+        else if (action == ACTION_START_PERMA_GROUND)
+        {
+            _state = 0;
+            _harpoonGUID.Clear();
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+            me->GetMotionMaster()->MoveTargetedHome();
+        }
     }
 
     [[nodiscard]] bool IsEast() const
@@ -869,7 +913,7 @@ struct npc_expedition_engineer : public NullCreatureAI
             if (!_harpoonGUID)
             {
                 Creature* razorscale = _instance->GetCreature(BOSS_RAZORSCALE);
-                if (!razorscale || !razorscale->IsInCombat())
+                if (!razorscale || !razorscale->IsInCombat() || razorscale->AI()->GetData(DATA_PERMA_GROUND))
                 {
                     _state = 0;
                     me->GetMotionMaster()->MoveTargetedHome();
@@ -917,10 +961,11 @@ struct npc_razorscale_spawner : public ScriptedAI
         scheduler.Schedule(1s, [this](TaskContext) { DoCastSelf(SPELL_SUMMON_MOLE_MACHINE); })
             .Schedule(6s, [this](TaskContext)
         {
-            DoCastSelf(DwarfSummonSpells[urand(0, 2)]);
-            // Vrykul: RNG-based, independent chance per spawner
-            if (roll_chance_i(30))
+            // A mole machine either spawns a Sentinel alone (25% chance) or a pack of Dark Rune Dwarves
+            if (roll_chance_i(25))
                 DoCastSelf(SPELL_TRIGGER_SUMMON_IRON_VRYKUL);
+            else
+                DoCastSelf(DwarfSummonSpells[urand(0, 2)]);
         });
     }
 

@@ -636,7 +636,7 @@ void GameObject::Update(uint32 diff)
                                         WorldPacket data(SMSG_FISH_ESCAPED, 0);
                                         caster->ToPlayer()->SendDirectMessage(&data);
                                     }
-                                    // can be delete
+                                    // can be deleted
                                     m_lootState = GO_JUST_DEACTIVATED;
                                     return;
                                 }
@@ -668,7 +668,7 @@ void GameObject::Update(uint32 diff)
                         // respawn timer
                         uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
                         if (poolid)
-                            sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+                            sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
                         else
                             GetMap()->AddToMap(this);
                     }
@@ -983,9 +983,12 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
             }
 
             uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
-            if (poolid)
+
+            // Keep the current pooled gameobject reserved until its respawn timer expires.
+            // GameObject::Update() will update the pool when the object is ready to respawn.
+            if (poolid && !m_respawnTime)
             {
-                sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+                sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
             }
         }
     }
@@ -1009,7 +1012,7 @@ void GameObject::Delete()
 
     uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
     if (poolid)
-        sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+        sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
     else
         AddObjectToRemoveList();
 }
@@ -1805,10 +1808,8 @@ void GameObject::Use(Unit* user)
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
                             {
-                                //TODO: I do not understand this hack. Need some explanation.
-                                // prevent removing GO at spell cancel
-                                RemoveFromOwner();
-                                SetOwnerGUID(player->GetGUID());
+                                // Keep the bobber owned while loot is open, but clear the
+                                // spell id so finishing the fishing channel does not delete it.
                                 SetSpellId(0); // prevent removing unintended auras at Unit::RemoveGameObject
 
                                 // fishing pool catch
@@ -3000,6 +3001,7 @@ public:
     explicit GameObjectModelOwnerImpl(GameObject* owner) : _owner(owner) { }
 
     bool IsSpawned() const override { return _owner->isSpawned(); }
+    bool IsTransport() const override { return _owner->IsTransport(); }
     uint32 GetDisplayId() const override { return _owner->GetDisplayId(); }
     uint32 GetPhaseMask() const override { return (_owner->GetGoState() == GO_STATE_READY || _owner->IsTransport()) ? _owner->GetPhaseMask() : 0; }
     G3D::Vector3 GetPosition() const override { return G3D::Vector3(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ()); }

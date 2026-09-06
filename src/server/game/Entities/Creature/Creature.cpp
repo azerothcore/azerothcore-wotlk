@@ -1775,6 +1775,9 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
 
     SetHealth(m_deathState == DeathState::Alive ? curhealth : 0);
 
+    // SelectLevel() sized the player damage requirement against full health, before curhealth was known
+    ResetPlayerDamageReq();
+
     // checked at creature_template loading
     m_defaultMovementType = MovementGeneratorType(data->movementType);
 
@@ -2121,7 +2124,7 @@ void Creature::Respawn(bool force)
 
                 uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
                 if (poolid)
-                    sPoolMgr->UpdatePool<Creature>(poolid, m_spawnId);
+                    sPoolMgr->UpdatePool<Creature>(GetMap()->GetPoolData(), poolid, m_spawnId);
 
                 //Re-initialize reactstate that could be altered by movementgenerators
                 InitializeReactState();
@@ -2184,21 +2187,23 @@ void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnT
         m_respawnDelayMax = m_respawnDelay;
     }
 
-    if (IsAlive())
+    bool const wasAlive = IsAlive();
+
+    if (wasAlive)
         setDeathState(DeathState::JustDied, true);
 
     // Xinef: Set new respawn time, ignore corpse decay time...
-    // After setDeathState, m_respawnTime includes m_corpseDelay which we don't
-    // want for a forced respawn. Override it so RemoveCorpse's max() picks ours.
-    if (forceRespawnTimer > 0s)
+    // setDeathState(JustDied) folds m_corpseDelay into m_respawnTime, but a creature
+    // despawned while alive never leaves a corpse, so the decay must not be charged.
+    // Recompute so RemoveCorpse's max() has nothing stale to pick up.
+    if (forceRespawnTimer > 0s || wasAlive)
+        m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelay;
+
+    // Restore the persisted bounds so the next natural death re-rolls from the original range.
+    if (forceRespawnTimer > 0s && m_creatureData)
     {
-        m_respawnTime = GameTime::GetGameTime().count() + forceRespawnTimer.count();
-        // Restore the persisted bounds so the next natural death re-rolls from the original range.
-        if (m_creatureData)
-        {
-            m_respawnDelayMin = m_creatureData->SpawnTimeSecMin;
-            m_respawnDelayMax = m_creatureData->SpawnTimeSecMax;
-        }
+        m_respawnDelayMin = m_creatureData->SpawnTimeSecMin;
+        m_respawnDelayMax = m_creatureData->SpawnTimeSecMax;
     }
 
     RemoveCorpse(true);
