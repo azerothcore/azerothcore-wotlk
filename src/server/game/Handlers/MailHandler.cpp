@@ -610,7 +610,10 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
 
         uint32 count = it->GetCount();                      // save counts before store and possible merge with deleting
         it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if neccessary
-        player->MoveItemToInventory(dest, it, true);
+
+        // `stored` is the stack the character ends up holding. On a full stack merge, `it` is marked for removal
+        // and `SaveInventoryAndGoldToDB` below deletes it, so we pass `stored` instead of `it` to downstream hooks.
+        Item* stored = player->MoveItemToInventory(dest, it, true);
 
         if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
         {
@@ -623,6 +626,8 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         CharacterDatabase.CommitTransaction(trans);
 
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemLowGuid, count);
+
+        sScriptMgr->OnPlayerAfterTakeItemFromMail(player, stored, count);
     }
     else
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);
