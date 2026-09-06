@@ -205,6 +205,9 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
                     f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
                 check_failed = True
 
+    if spawn_delete_filter_check(file, file_path):
+        check_failed = True
+
     # Handle the script error and update the result output
     if check_failed:
         error_handler = True
@@ -239,6 +242,83 @@ def open_paren_balance(text: str) -> int:
     without_strings = re.sub(r"'(?:\\.|[^'])*'", "", text)
     without_strings = re.sub(r'"(?:\\.|[^"])*"', "", without_strings)
     return without_strings.count('(') - without_strings.count(')')
+
+SPAWN_DELETE_START = re.compile(r"DELETE\s+FROM\s+`?(creature|gameobject)`?\s*(?:$|;|WHERE|\()", re.IGNORECASE)
+SPAWN_FILTER_OPERATORS = r"(?:=|!=|<>|<=|>=|<|>|\bIN\b|\bBETWEEN\b)"
+
+# The column token has to be bounded on both sides, otherwise `guid` would satisfy the `id`
+# requirement and `id1`/`id2`/`id3` (the pre-rename creature columns) would pass as `id`.
+def has_column_filter(statement: str, column: str) -> bool:
+    pattern = rf"(?:`{column}`|(?<![\w@`]){column}(?![\w`]))\s*(?:NOT\s+)?{SPAWN_FILTER_OPERATORS}"
+    return re.search(pattern, statement, re.IGNORECASE) is not None
+
+# Spawns in `creature` and `gameobject` must be deleted by both `id` and `guid`: a guid-only delete
+# wipes whatever spawn owns that guid today, an id-only one wipes every spawn of that entry in the
+# world. Returns whether a violation was found; the caller owns the result state.
+def spawn_delete_filter_check(file: io, file_path: str) -> bool:
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    in_block_comment = False
+    statement = ""
+    statement_line = 0
+    table_name = ""
+
+    def report(text: str, line_number: int, table: str) -> bool:
+        missing = [column for column in ("id", "guid") if not has_column_filter(text, column)]
+        if not missing:
+            return False
+        columns = " and ".join(f"`{column}`" for column in missing)
+        print(f"❌ DELETE FROM `{table}` must filter on both `id` and `guid` (missing: {columns}). "
+              f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+        return True
+
+    for line_number, line in enumerate(file, start = 1):
+        text = line.strip()
+
+        # Handle block comments
+        if in_block_comment:
+            if '*/' not in text:
+                continue
+            in_block_comment = False
+            text = text.split('*/', 1)[1].strip()
+        elif '/*' in text:
+            in_block_comment = True
+            text = text.split('/*', 1)[0].strip()
+
+        # Skip single-line comments
+        if text.startswith('--'):
+            continue
+
+        # Remove inline comments after SQL (ignoring "--" inside string literals)
+        text = strip_inline_comment(text)
+        if not text:
+            continue
+
+        remainder = text
+        while remainder:
+            if statement:
+                segment, terminator, rest = remainder.partition(';')
+                statement += " " + segment
+            else:
+                match = SPAWN_DELETE_START.search(remainder)
+                if not match:
+                    break
+                table_name = match.group(1)
+                statement_line = line_number
+                segment, terminator, rest = remainder[match.start():].partition(';')
+                statement = segment
+            if not terminator:
+                break
+            if report(statement, statement_line, table_name):
+                check_failed = True
+            statement = ""
+            remainder = rest.strip()
+
+    # An unterminated statement is reported by semicolon_check, but still judge it here
+    if statement and report(statement, statement_line, table_name):
+        check_failed = True
+
+    return check_failed
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
