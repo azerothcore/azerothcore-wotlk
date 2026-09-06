@@ -3095,6 +3095,8 @@ Item* Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool
             AddTradeableItem(pLastItem);
     }
 
+    sScriptMgr->OnPlayerAfterMoveItemToInventory(this, pLastItem, update);
+
     return pLastItem;
 }
 

@@ -337,6 +337,11 @@ void ScriptMgr::OnPlayerAfterMoveItemFromInventory(Player* player, Item* it, uin
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_MOVE_ITEM_FROM_INVENTORY, script->OnPlayerAfterMoveItemFromInventory(player, it, bag, slot, update));
 }
 
+void ScriptMgr::OnPlayerAfterMoveItemToInventory(Player* player, Item* it, bool update)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_MOVE_ITEM_TO_INVENTORY, script->OnPlayerAfterMoveItemToInventory(player, it, update));
+}
+
 void ScriptMgr::OnPlayerEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_EQUIP, script->OnPlayerEquip(player, it, bag, slot, update));

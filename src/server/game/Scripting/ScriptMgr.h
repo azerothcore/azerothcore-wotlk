@@ -353,6 +353,7 @@ public: /* PlayerScript */
     void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
     void OnPlayerAfterSetVisibleItemSlot(Player* player, uint8 slot, Item* item);
     void OnPlayerAfterMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
+    void OnPlayerAfterMoveItemToInventory(Player* player, Item* it, bool update);
     void OnPlayerEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
     void OnPlayerUnequip(Player* player, Item* it);
     void OnPlayerJoinBG(Player* player);
