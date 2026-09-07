@@ -19,13 +19,13 @@
 #define DBUpdater_h__
 
 #include "DatabaseEnv.h"
+#include "DatabaseUpdatePool.h"
 #include "Define.h"
 #include "QueryResult.h"
 #include <filesystem>
 #include <string>
-
-template <class T>
-class DatabaseWorkerPool;
+#include <string_view>
+#include <vector>
 
 namespace boost
 {
@@ -79,23 +79,38 @@ public:
 
     static inline std::string GetConfigEntry();
     static inline std::string GetTableName();
+    static std::string GetSourceDirectory();
     static std::string GetBaseFilesDirectory();
     static bool IsEnabled(uint32 const updateMask);
     static BaseLocation GetBaseLocationType();
-    static bool Create(DatabaseWorkerPool<T>& pool);
-    static bool Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList = {});
-    static bool Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories);
-    static bool Populate(DatabaseWorkerPool<T>& pool);
+    static bool Create(DatabaseUpdatePool& pool);
+    static bool Update(DatabaseUpdatePool& pool, std::string_view modulesList = {});
+    static bool Update(DatabaseUpdatePool& pool, std::vector<std::string> const* setDirectories);
+    static bool Populate(DatabaseUpdatePool& pool);
 
     // module
     static std::string GetDBModuleName();
 
-private:
-    static QueryResult Retrieve(DatabaseWorkerPool<T>& pool, std::string const& query);
-    static void Apply(DatabaseWorkerPool<T>& pool, std::string const& query);
-    static void ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path);
-    static void ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
-                          std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path);
+};
+
+// Runtime metadata describing a module-owned database for the updater.
+struct ModuleDBUpdaterInfo
+{
+    std::string tableName;          // display name used in log output, e.g. "Playerbots"
+    std::string sourceDirectory;    // root directory holding the module's sql tree
+    std::string baseFilesDirectory; // directory containing the base *.sql files
+    std::string dbModuleName;       // update-fetcher module name, must be lowercase
+};
+
+// Non-template updater entry points for module-owned pools (see ModuleDatabasePool).
+// Mirrors the DBUpdater<T> flow: Create the schema when missing, Populate an empty
+// database from the base files, then apply pending updates through the UpdateFetcher.
+class AC_DATABASE_API ModuleDBUpdater
+{
+public:
+    static bool Create(DatabaseUpdatePool& pool);
+    static bool Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::string_view modulesList = {});
+    static bool Populate(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info);
 };
 
 #endif // DBUpdater_h__

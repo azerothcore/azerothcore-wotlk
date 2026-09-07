@@ -94,9 +94,15 @@ std::string DBUpdater<LoginDatabaseConnection>::GetTableName()
 }
 
 template<>
+std::string DBUpdater<LoginDatabaseConnection>::GetSourceDirectory()
+{
+    return BuiltInConfig::GetSourceDirectory();
+}
+
+template<>
 std::string DBUpdater<LoginDatabaseConnection>::GetBaseFilesDirectory()
 {
-    return BuiltInConfig::GetSourceDirectory() + "/data/sql/base/db_auth/";
+    return DBUpdater<LoginDatabaseConnection>::GetSourceDirectory() + "/data/sql/base/db_auth/";
 }
 
 template<>
@@ -127,9 +133,15 @@ std::string DBUpdater<WorldDatabaseConnection>::GetTableName()
 }
 
 template<>
+std::string DBUpdater<WorldDatabaseConnection>::GetSourceDirectory()
+{
+    return BuiltInConfig::GetSourceDirectory();
+}
+
+template<>
 std::string DBUpdater<WorldDatabaseConnection>::GetBaseFilesDirectory()
 {
-    return BuiltInConfig::GetSourceDirectory() + "/data/sql/base/db_world/";
+    return DBUpdater<WorldDatabaseConnection>::GetSourceDirectory() + "/data/sql/base/db_world/";
 }
 
 template<>
@@ -160,9 +172,15 @@ std::string DBUpdater<CharacterDatabaseConnection>::GetTableName()
 }
 
 template<>
+std::string DBUpdater<CharacterDatabaseConnection>::GetSourceDirectory()
+{
+    return BuiltInConfig::GetSourceDirectory();
+}
+
+template<>
 std::string DBUpdater<CharacterDatabaseConnection>::GetBaseFilesDirectory()
 {
-    return BuiltInConfig::GetSourceDirectory() + "/data/sql/base/db_characters/";
+    return DBUpdater<CharacterDatabaseConnection>::GetSourceDirectory() + "/data/sql/base/db_characters/";
 }
 
 template<>
@@ -186,8 +204,18 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
     return LOCATION_REPOSITORY;
 }
 
-template<class T>
-bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
+namespace UpdaterImpl
+{
+
+using Path = std::filesystem::path;
+
+QueryResult Retrieve(DatabaseUpdatePool& pool, std::string const& query);
+void Apply(DatabaseUpdatePool& pool, std::string const& query);
+void ApplyFile(DatabaseUpdatePool& pool, Path const& path);
+void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string const& user,
+               std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path);
+
+bool Create(DatabaseUpdatePool& pool)
 {
     LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
 
@@ -220,7 +248,7 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 
     try
     {
-        DBUpdater<T>::ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
+        ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
                                 pool.GetConnectionInfo()->port_or_socket, "", pool.GetConnectionInfo()->ssl, temp);
     }
     catch (UpdateException&)
@@ -236,15 +264,14 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
     return true;
 }
 
-template<class T>
-bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList /*= {}*/)
+bool Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::string_view modulesList)
 {
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
-    LOG_INFO("sql.updates", "Updating {} database...", DBUpdater<T>::GetTableName());
+    LOG_INFO("sql.updates", "Updating {} database...", info.tableName);
 
-    Path const sourceDirectory(BuiltInConfig::GetSourceDirectory());
+    Path const sourceDirectory(info.sourceDirectory);
 
     if (!is_directory(sourceDirectory))
     {
@@ -255,16 +282,16 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
 
     auto CheckUpdateTable = [&](std::string const& tableName)
     {
-        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '{}'", tableName));
+        auto checkTable = Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '{}'", tableName));
         if (!checkTable)
         {
             LOG_WARN("sql.updates", "> Table '{}' not exist! Try add based table", tableName);
 
-            Path const temp(GetBaseFilesDirectory() + tableName + ".sql");
+            Path const temp(info.baseFilesDirectory + tableName + ".sql");
 
             try
             {
-                DBUpdater<T>::ApplyFile(pool, temp);
+                ApplyFile(pool, temp);
             }
             catch (UpdateException&)
             {
@@ -281,9 +308,9 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
     if (!CheckUpdateTable("updates") || !CheckUpdateTable("updates_include"))
         return false;
 
-    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
-    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
-    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), modulesList);
+    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { Apply(pool, query); },
+    [&](Path const & file) { ApplyFile(pool, file); },
+    [&](std::string const & query) -> QueryResult { return Retrieve(pool, query); }, info.dbModuleName, modulesList);
 
     UpdateResult result;
     try
@@ -299,27 +326,26 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
         return false;
     }
 
-    std::string const info = Acore::StringFormat("Containing {} new and {} archived updates.", result.recent, result.archived);
+    std::string const summary = Acore::StringFormat("Containing {} new and {} archived updates.", result.recent, result.archived);
 
     if (!result.updated)
-        LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", DBUpdater<T>::GetTableName(), info);
+        LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", info.tableName, summary);
     else
-        LOG_INFO("sql.updates", ">> Applied {} {}. {}", result.updated, result.updated == 1 ? "query" : "queries", info);
+        LOG_INFO("sql.updates", ">> Applied {} {}. {}", result.updated, result.updated == 1 ? "query" : "queries", summary);
 
     LOG_INFO("sql.updates", " ");
 
     return true;
 }
 
-template<class T>
-bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories)
+bool Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::vector<std::string> const* setDirectories)
 {
     if (!DBUpdaterUtil::CheckExecutable())
     {
         return false;
     }
 
-    Path const sourceDirectory(BuiltInConfig::GetSourceDirectory());
+    Path const sourceDirectory(info.sourceDirectory);
     if (!is_directory(sourceDirectory))
     {
         return false;
@@ -327,13 +353,13 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> 
 
     auto CheckUpdateTable = [&](std::string const& tableName)
     {
-        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '{}'", tableName));
+        auto checkTable = Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '{}'", tableName));
         if (!checkTable)
         {
-            Path const temp(GetBaseFilesDirectory() + tableName + ".sql");
+            Path const temp(info.baseFilesDirectory + tableName + ".sql");
             try
             {
-                DBUpdater<T>::ApplyFile(pool, temp);
+                ApplyFile(pool, temp);
             }
             catch (UpdateException&)
             {
@@ -351,9 +377,9 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> 
         return false;
     }
 
-    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
-    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
-    [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), setDirectories);
+    UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { Apply(pool, query); },
+    [&](Path const & file) { ApplyFile(pool, file); },
+    [&](std::string const & query) -> QueryResult { return Retrieve(pool, query); }, info.dbModuleName, setDirectories);
 
     UpdateResult result;
     try
@@ -372,8 +398,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> 
     return true;
 }
 
-template<class T>
-bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
+bool Populate(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info)
 {
     {
         QueryResult const result = Retrieve(pool, "SHOW TABLES");
@@ -384,9 +409,9 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
-    LOG_INFO("sql.updates", "Database {} is empty, auto populating it...", DBUpdater<T>::GetTableName());
+    LOG_INFO("sql.updates", "Database {} is empty, auto populating it...", info.tableName);
 
-    std::string const DirPathStr = DBUpdater<T>::GetBaseFilesDirectory();
+    std::string const DirPathStr = info.baseFilesDirectory;
 
     Path const DirPath(DirPathStr);
     if (!std::filesystem::is_directory(DirPath))
@@ -445,27 +470,23 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     return true;
 }
 
-template<class T>
-QueryResult DBUpdater<T>::Retrieve(DatabaseWorkerPool<T>& pool, std::string const& query)
+QueryResult Retrieve(DatabaseUpdatePool& pool, std::string const& query)
 {
-    return pool.Query(query.c_str());
+    return pool.Query(query);
 }
 
-template<class T>
-void DBUpdater<T>::Apply(DatabaseWorkerPool<T>& pool, std::string const& query)
+void Apply(DatabaseUpdatePool& pool, std::string const& query)
 {
-    pool.DirectExecute(query.c_str());
+    pool.DirectExecute(query);
 }
 
-template<class T>
-void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path)
+void ApplyFile(DatabaseUpdatePool& pool, Path const& path)
 {
-    DBUpdater<T>::ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
+    ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
                             pool.GetConnectionInfo()->port_or_socket, pool.GetConnectionInfo()->database, pool.GetConnectionInfo()->ssl, path);
 }
 
-template<class T>
-void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
+void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string const& user,
                              std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path)
 {
     std::string configTempDir = sConfigMgr->GetOption<std::string>("TempDir", "");
@@ -552,6 +573,47 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
             throw UpdateException("update failed");
         }
     }
+}
+
+} // namespace UpdaterImpl
+
+template<class T>
+bool DBUpdater<T>::Create(DatabaseUpdatePool& pool)
+{
+    return UpdaterImpl::Create(pool);
+}
+
+template<class T>
+bool DBUpdater<T>::Update(DatabaseUpdatePool& pool, std::string_view modulesList /*= {}*/)
+{
+    return UpdaterImpl::Update(pool, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() }, modulesList);
+}
+
+template<class T>
+bool DBUpdater<T>::Update(DatabaseUpdatePool& pool, std::vector<std::string> const* setDirectories)
+{
+    return UpdaterImpl::Update(pool, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() }, setDirectories);
+}
+
+template<class T>
+bool DBUpdater<T>::Populate(DatabaseUpdatePool& pool)
+{
+    return UpdaterImpl::Populate(pool, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() });
+}
+
+bool ModuleDBUpdater::Create(DatabaseUpdatePool& pool)
+{
+    return UpdaterImpl::Create(pool);
+}
+
+bool ModuleDBUpdater::Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::string_view modulesList /*= {}*/)
+{
+    return UpdaterImpl::Update(pool, info, modulesList);
+}
+
+bool ModuleDBUpdater::Populate(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info)
+{
+    return UpdaterImpl::Populate(pool, info);
 }
 
 template class AC_DATABASE_API DBUpdater<LoginDatabaseConnection>;

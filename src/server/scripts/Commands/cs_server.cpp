@@ -27,6 +27,7 @@
 #include "MySQLThreading.h"
 #include "RBAC.h"
 #include "Realm.h"
+#include "ScriptMgr.h"
 #include "StringConvert.h"
 #include "UpdateTime.h"
 #include "VMapFactory.h"
@@ -215,6 +216,11 @@ public:
         handler->PSendSysMessage("Default DBC locale: {}.\nAll available DBC locales: {}", localeNames[defaultLocale], availableLocales);
 
         handler->PSendSysMessage("Using World DB: {}", sWorld->GetDBVersion());
+
+        std::string moduleDBRevision;
+        sScriptMgr->OnDatabaseGetDBRevision(moduleDBRevision);
+        if (!moduleDBRevision.empty())
+            handler->PSendSysMessage("Using Module DB Revision: {}", moduleDBRevision);
 
         std::string lldb = "No updates found!";
         if (QueryResult resL = LoginDatabase.Query("SELECT name FROM updates ORDER BY name DESC LIMIT 1"))
