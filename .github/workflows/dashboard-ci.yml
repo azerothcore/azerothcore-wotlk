@@ -299,14 +299,11 @@ jobs:
           mysql -h127.0.0.1 -uacore -pacore -e \
             "INSERT INTO acore_auth.realmlist
                  (name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild)
-             SELECT 'AzerothCore', '127.0.0.1', '127.0.0.1', '255.255.255.0', 8085, 0, 0, 1, 0, 0, 12340
-             WHERE NOT EXISTS (SELECT 1 FROM acore_auth.realmlist);
-             UPDATE acore_auth.realmlist
-             SET name='AzerothCore', address='127.0.0.1', localAddress='127.0.0.1',
-                 localSubnetMask='255.255.255.0', port=8085, icon=0, flag=0, timezone=1,
-                 allowedSecurityLevel=0, population=0, gamebuild=12340
-             ORDER BY id
-             LIMIT 1;"
+             VALUES ('AzerothCore', '127.0.0.1', '127.0.0.1', '255.255.255.0', 8085, 0, 0, 1, 0, 0, 12340)
+             ON DUPLICATE KEY UPDATE
+                 address=VALUES(address), localAddress=VALUES(localAddress), localSubnetMask=VALUES(localSubnetMask),
+                 port=VALUES(port), icon=VALUES(icon), flag=VALUES(flag), timezone=VALUES(timezone),
+                 allowedSecurityLevel=VALUES(allowedSecurityLevel), population=VALUES(population), gamebuild=VALUES(gamebuild);"
           ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2
           ./acore.sh sm show-config authserver
           ./acore.sh sm start authserver
