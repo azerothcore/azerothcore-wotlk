@@ -204,7 +204,14 @@ jobs:
              FLUSH PRIVILEGES;"
 
           # Clean shutdown so the InnoDB datadir is consistent before capture.
+          # docker stop exits 0 even when the grace period runs out and mysqld is
+          # SIGKILLed mid-flush, which would leave a torn datadir; check the code.
           docker stop -t 120 acdb
+          if [ "$(docker inspect -f '{{.State.ExitCode}}' acdb)" != "0" ]; then
+            echo "mysqld did not shut down cleanly; datadir may be inconsistent" >&2
+            docker logs acdb >&2
+            exit 1
+          fi
 
           # Bind-mounted files are owned by uid 999 (container mysql user); make
           # them readable as the build context for the runner user.
@@ -227,10 +234,47 @@ jobs:
             --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           )
 
+          # Build one arch, boot it and check the three databases are there.
+          # $2 = poll attempts, 2s apart: 60 gives amd64 120s, 300 gives arm64
+          # 600s (its emulated MySQL start is far slower).
+          smoke() {
+            local arch="$1" attempts="$2" tag="acore/ac-wotlk-db:test-$arch"
+
+            docker buildx build --platform "linux/$arch" --load \
+              -f apps/docker/Dockerfile.db "${LABELS[@]}" -t "$tag" db-ctx
+
+            docker run -d --name acdb-test "$tag"
+            # Pre-initialized datadir: the entrypoint skips init and starts the
+            # real server directly, so a socket ping has no temp-server race here.
+            for i in $(seq 1 "$attempts"); do
+              docker exec acdb-test mysqladmin ping -uroot -ppassword --silent && break
+              if [ "$i" -eq "$attempts" ]; then
+                echo "DB image ($arch) failed to boot" >&2; docker logs acdb-test >&2; exit 1
+              fi
+              sleep 2
+            done
+            for db in acore_auth acore_world acore_characters; do
+              docker exec acdb-test mysql -uroot -ppassword \
+                -e "USE $db; SELECT 1;" >/dev/null
+            done
+            echo "DB image ($arch) booted and all three databases are present."
+
+            docker rm -f acdb-test >/dev/null
+            docker rmi "$tag" >/dev/null
+          }
+
+          trap 'docker rm -f acdb-test >/dev/null 2>&1 || true' EXIT
+
           # Push only on master of the canonical repo (same condition as
           # RUNNING_ON_PRIMARY_BRANCH, computed here to avoid its trailing newline).
-          if [ "${{ github.repository }}" = "azerothcore/azerothcore-wotlk" ] && [ "${{ github.ref_name }}" = "master" ]; then
-            # master: multi-arch (the datadir is arch-neutral; PR validation boots both) + push.
+          if [ "${{ github.repository }}" = "azerothcore/azerothcore-wotlk" ] \
+             && [ "${{ github.ref_name }}" = "master" ]; then
+            # A multi-arch --push build cannot be --load'ed, so booting the native
+            # arch first is the only chance to catch a bad datadir before users pull
+            # it. The multi-arch pass then reuses this build's cache for amd64.
+            smoke amd64 60
+
+            # The datadir is arch-neutral; PR validation boots both arches.
             docker buildx build --platform linux/amd64,linux/arm64 \
               -f apps/docker/Dockerfile.db "${LABELS[@]}" \
               -t "acore/ac-wotlk-db:master" \
@@ -238,38 +282,10 @@ jobs:
               -t "acore/ac-wotlk-db:${{ github.sha }}" \
               --push db-ctx
           else
-            # PR validation: build and boot each published arch, one at a time so two
-            # multi-GB images never sit on the runner at once. No push (no Docker Hub
-            # login on PRs).
-            smoke() {
-              local arch="$1" attempts="$2" tag="acore/ac-wotlk-db:pr-test-$arch"
-
-              docker buildx build --platform "linux/$arch" --load \
-                -f apps/docker/Dockerfile.db "${LABELS[@]}" -t "$tag" db-ctx
-
-              docker run -d --name acdb-test "$tag"
-              # Pre-initialized datadir: the entrypoint skips init and starts the
-              # real server directly, so a socket ping has no temp-server race here.
-              for i in $(seq 1 "$attempts"); do
-                docker exec acdb-test mysqladmin ping -uroot -ppassword --silent && break
-                if [ "$i" -eq "$attempts" ]; then
-                  echo "DB image ($arch) failed to boot" >&2; docker logs acdb-test >&2; exit 1
-                fi
-                sleep 2
-              done
-              for db in acore_auth acore_world acore_characters; do
-                docker exec acdb-test mysql -uroot -ppassword \
-                  -e "USE $db; SELECT 1;" >/dev/null
-              done
-              echo "DB image ($arch) booted and all three databases are present."
-
-              docker rm -f acdb-test >/dev/null
-              docker rmi "$tag" >/dev/null
-            }
-
-            trap 'docker rm -f acdb-test >/dev/null 2>&1 || true' EXIT
-            # 2-second polls: 120s for amd64, 600s for arm64 (emulated MySQL start
-            # is far slower).
+            # PR validation only, no push: there is no Docker Hub login on PRs.
             smoke amd64 60
+            # docker rmi drops only the daemon's copy; the buildx container keeps
+            # its own layers, so without this both arches sit on the runner at once.
+            docker buildx prune -f >/dev/null
             smoke arm64 300
           fi

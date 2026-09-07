@@ -47,7 +47,7 @@ already imported** (`acore_auth`, `acore_world`, `acore_characters`, including
 Eluna/mod-ale SQL to match the published `worldserver`/`authserver` images). It
 boots instantly — there is no multi-minute import on first run. It is meant for
 quick-start, dev, ephemeral test fixtures, and demos, **not production**. The
-image is a few hundred MB.
+download is a few hundred MB; unpacked, the datadir is several GB on disk.
 
 ### Using it with docker compose
 
@@ -64,6 +64,11 @@ Leave `DOCKER_DB_IMAGE` unset and the stack behaves exactly as before, on plain
 datadir, and `ac-db-import` still runs: it applies only the deltas newer than
 the snapshot. So the image is a faster starting point, not a different
 bootstrap path.
+
+`:master` tracks master, so pair it with a checkout on master. On an older
+branch, pick the `:<version>` or `:<sha>` tag matching your checkout instead —
+`ac-db-import` only applies deltas forward, so a snapshot newer than your
+worldserver leaves you on a schema it was never built against.
 
 > ⚠️ `DOCKER_DB_ROOT_PASSWORD` has **no effect** on this image. A
 > pre-initialized datadir makes the official mysql entrypoint skip

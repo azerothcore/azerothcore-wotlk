@@ -10,5 +10,4 @@
 # fixed at build time (root/password and acore/acore).
 FROM mysql:8.4
 
-# 999 = the mysql user/group in the official image.
-COPY --chown=999:999 mysql-seed/ /var/lib/mysql/
+COPY --chown=mysql:mysql mysql-seed/ /var/lib/mysql/
