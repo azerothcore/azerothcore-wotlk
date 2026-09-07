@@ -337,6 +337,11 @@ void ScriptMgr::OnPlayerAfterMoveItemFromInventory(Player* player, Item* it, uin
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_MOVE_ITEM_FROM_INVENTORY, script->OnPlayerAfterMoveItemFromInventory(player, it, bag, slot, update));
 }
 
+void ScriptMgr::OnPlayerAfterMoveItemToInventory(Player* player, Item* it, bool update)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_MOVE_ITEM_TO_INVENTORY, script->OnPlayerAfterMoveItemToInventory(player, it, update));
+}
+
 void ScriptMgr::OnPlayerEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_EQUIP, script->OnPlayerEquip(player, it, bag, slot, update));
@@ -952,6 +957,11 @@ void ScriptMgr::OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& lev
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN, script->OnPlayerBeforeGetLevelForXPGain(player, level));
     level = std::clamp(level, uint8(1), uint8(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
+}
+
+void ScriptMgr::OnPlayerAfterTakeItemFromMail(Player* player, Item* item, uint32 count)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_TAKE_ITEM_FROM_MAIL, script->OnPlayerAfterTakeItemFromMail(player, item, count));
 }
 
 PlayerScript::PlayerScript(char const* name, std::vector<uint16> enabledHooks)

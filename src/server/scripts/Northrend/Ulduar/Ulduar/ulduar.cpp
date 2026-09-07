@@ -549,31 +549,43 @@ public:
     }
 };
 
+enum SalvagedSiegeEngineSeats
+{
+    SEAT_SIEGE_ENGINE_DRIVER            = 0,
+    SEAT_SIEGE_ENGINE_TURRET            = 7
+};
+
 struct npc_salvaged_siege_engine : public VehicleAI
 {
     npc_salvaged_siege_engine(Creature* creature) : VehicleAI(creature) { }
 
     bool BeforeSpellClick(Unit* clicker) override
     {
-        if (Vehicle* vehicle = me->GetVehicleKit())
+        Vehicle* vehicle = me->GetVehicleKit();
+        if (!vehicle)
+            return true;
+
+        // The driver seat is the only one a spell click may fill directly.
+        if (vehicle->HasEmptySeat(SEAT_SIEGE_ENGINE_DRIVER))
+            return true;
+
+        // Someone is already driving: send the clicker to the turret while it is still free.
+        if (Unit* turret = vehicle->GetPassenger(SEAT_SIEGE_ENGINE_TURRET))
         {
-            if (vehicle->IsVehicleInUse())
+            if (Vehicle* turretVehicle = turret->GetVehicleKit())
             {
-                if (Unit* turret = vehicle->GetPassenger(7))
+                if (!turretVehicle->IsVehicleInUse())
                 {
-                    if (Vehicle* turretVehicle = turret->GetVehicleKit())
-                    {
-                        if (!turretVehicle->IsVehicleInUse())
-                        {
-                            turret->HandleSpellClick(clicker);
-                            return false;
-                        }
-                    }
+                    turret->HandleSpellClick(clicker);
+                    return false;
                 }
             }
         }
 
-        return true;
+        // Driver and turret are both manned. The two remaining seats (VehicleSeat.dbc 4026 and 4027)
+        // lack VEHICLE_SEAT_FLAG_CAN_ENTER_OR_EXIT, so the client never draws the Leave Vehicle button
+        // and whoever boards one can no longer get off. They cannot be used on retail either.
+        return false;
     }
 };
 

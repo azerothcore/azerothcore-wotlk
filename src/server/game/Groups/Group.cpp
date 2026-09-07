@@ -385,19 +385,21 @@ bool Group::AddLeaderInvite(Player* player)
 
 void Group::RemoveInvite(Player* player)
 {
-    if (player)
-    {
-        if (!m_invitees.empty())
-            m_invitees.erase(player);
+    if (!player)
+        return;
+
+    m_invitees.erase(player);
+
+    // Clear pending invite from current group, Keep an invite from another group.
+    if (player->GetGroupInvite() == this)
         player->SetGroupInvite(nullptr);
-    }
 }
 
 void Group::RemoveAllInvites()
 {
-    for (InvitesList::iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
-        if (*itr)
-            (*itr)->SetGroupInvite(nullptr);
+    for (Player* invitee : m_invitees)
+        if (invitee && invitee->GetGroupInvite() == this)
+            invitee->SetGroupInvite(nullptr);
 
     m_invitees.clear();
 }

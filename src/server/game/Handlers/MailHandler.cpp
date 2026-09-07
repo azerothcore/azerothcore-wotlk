@@ -610,7 +610,10 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
 
         uint32 count = it->GetCount();                      // save counts before store and possible merge with deleting
         it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if neccessary
-        player->MoveItemToInventory(dest, it, true);
+
+        // `stored` is the stack the character ends up holding. On a full stack merge, `it` is marked for removal
+        // and `SaveInventoryAndGoldToDB` below deletes it, so we pass `stored` instead of `it` to downstream hooks.
+        Item* stored = player->MoveItemToInventory(dest, it, true);
 
         if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
         {
@@ -623,6 +626,8 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         CharacterDatabase.CommitTransaction(trans);
 
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemLowGuid, count);
+
+        sScriptMgr->OnPlayerAfterTakeItemFromMail(player, stored, count);
     }
     else
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);
@@ -708,7 +713,27 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
 
         uint8 item_count = uint8(mail->items.size());            // max count is MAX_MAIL_ITEMS (12)
 
-        std::size_t next_mail_size = 2 + 4 + 1 + (mail->messageType == MAIL_NORMAL ? 8 : 4) + 4 * 8 + (mail->subject.size() + 1) + (mail->body.size() + 1) + 1 + item_count * (1 + 4 + 4 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3 * 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1);
+        // prevent client crash
+        std::string subject = mail->subject;
+        std::string body = mail->body;
+
+        if (subject.find("| |") != std::string::npos)
+        {
+            subject = "";
+        }
+        if (body.find("| |") != std::string::npos)
+        {
+            body = "";
+        }
+
+        // Declared length of this entry. Must match the bytes written below: the uint16 size itself,
+        // uint32 id, uint8 type, the sender as a guid or an entry, six uint32 fields and one float,
+        // both null terminated strings, the uint8 item count and the items. The strings are measured
+        // after sanitisation, because the sanitised ones are what gets written
+        std::size_t const sender_size = mail->messageType == MAIL_NORMAL ? 8 : 4;
+        std::size_t const item_size = 1 + 4 + 4 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3 * 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1;
+        std::size_t next_mail_size = 2 + 4 + 1 + sender_size + 7 * 4
+            + (subject.size() + 1) + (body.size() + 1) + 1 + item_count * item_size;
 
         if (data.wpos() + next_mail_size > MAX_NETCLIENT_PACKET_SIZE)
         {
@@ -731,19 +756,6 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             case MAIL_CALENDAR:
                 data << uint32(mail->sender);            // creature/gameobject entry, auction id, calendar event id?
                 break;
-        }
-
-        // prevent client crash
-        std::string subject = mail->subject;
-        std::string body = mail->body;
-
-        if (subject.find("| |") != std::string::npos)
-        {
-            subject = "";
-        }
-        if (body.find("| |") != std::string::npos)
-        {
-            body = "";
         }
 
         data << uint32(mail->COD);                                      // COD
