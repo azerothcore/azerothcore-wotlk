@@ -385,12 +385,18 @@ bool Group::AddLeaderInvite(Player* player)
 
 void Group::RemoveInvite(Player* player)
 {
-    if (player)
-    {
-        if (!m_invitees.empty())
-            m_invitees.erase(player);
-        player->SetGroupInvite(nullptr);
-    }
+    if (!player)
+        return;
+
+    // mod_playerbots: double invite hack workaround
+    if (player->GetGroupInvite() != this)
+        return;
+
+    auto itr = m_invitees.find(player);
+    if (itr != m_invitees.end())
+        m_invitees.erase(itr);
+
+    player->SetGroupInvite(nullptr);
 }
 
 void Group::RemoveAllInvites()
