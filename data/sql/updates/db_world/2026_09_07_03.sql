@@ -1,3 +1,4 @@
+-- DB update 2026_09_07_02 -> 2026_09_07_03
 -- General Vezax - Shadow Crash (63277): only one puddle area aura may affect a target (#27226, #26927)
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 63277;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
