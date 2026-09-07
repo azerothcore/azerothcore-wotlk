@@ -102,6 +102,15 @@ public:
         _condition.notify_all();
     }
 
+    // Reopens the queue after Cancel()/Shutdown() so new consumers can be attached.
+    // Callers must make sure the previous consumers have already stopped.
+    void Reset()
+    {
+        std::lock_guard<std::mutex> lock(_queueLock);
+        _cancel = false;
+        _shutdown = false;
+    }
+
 private:
     template<typename E = T>
     typename std::enable_if<std::is_pointer<E>::value>::type DeleteQueuedObject(E& obj)
