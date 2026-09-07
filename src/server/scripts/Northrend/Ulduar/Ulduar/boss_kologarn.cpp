@@ -166,6 +166,7 @@ struct boss_kologarn : public BossAI
             me->GetMotionMaster()->MoveTargetedHome();
             me->SetDisableGravity(true);
             me->DisableRotate(true);
+            me->SetCorpseDelay(7 * DAY);
 
             _Reset();
 

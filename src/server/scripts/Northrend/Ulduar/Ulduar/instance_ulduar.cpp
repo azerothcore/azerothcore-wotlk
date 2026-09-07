@@ -664,7 +664,11 @@ public:
                     {
                         creature->SetDisableGravity(true);
                         creature->SetPosition(creature->GetHomePosition());
-                        creature->setDeathState(DeathState::JustDied);
+                        creature->setDeathState(DeathState::Corpse);
+                        creature->SetHealth(0);
+                        creature->SetCorpseDelay(7 * DAY);
+                        creature->SetCorpseRemoveTime(7 * DAY);
+                        creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         creature->StopMovingOnCurrentPos();
                     }
                     break;

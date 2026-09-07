@@ -3,6 +3,7 @@
 package ulduar_test
 
 import (
+	"math"
 	"testing"
 	"time"
 
@@ -58,6 +59,69 @@ func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 	t.Logf("PASS Kologarn charge path map=%d pos=(%.1f,%.1f,%.1f)", m, x, y, z)
 }
 */
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27556
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27557
+// Kologarn corpse persists across grid reload as a bridge at health 0.
+func TestAC_27556_KologarnCorpsePersistsAfterReload(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances", "issue"},
+		Runtime:  "med",
+		Issue:    27556,
+		Category: "instances/northrend/ulduar",
+	})
+
+	posBridge := e2eharness.Position3{X: 1782.15, Y: -24.4027, Z: 448.741, Map: e2eharness.MapUlduar}
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "UldKol",
+		Level:  80,
+	})
+
+	bot.TeleNamed(t, "Kologarn")
+	bot.Teleport(t, posBridge.X, posBridge.Y, posBridge.Z, posBridge.Map)
+	kolo := bot.WaitUnit(t, e2eharness.CreatureKologarn, 30*time.Second)
+	if kolo == 0 {
+		e2eharness.Preconditionf(t, "Kologarn not found in Ulduar")
+	}
+
+	preObj := bot.World.GetObject(kolo)
+	if preObj == nil {
+		e2eharness.Preconditionf(t, "Kologarn object not in world cache")
+	}
+	initialZ := preObj.PosZ
+
+	bot.CombatReady(t)
+	bot.DamageKill(t, []uint64{kolo}, 50_000_000, 20*time.Second)
+	hp, _ := bot.UnitHP(kolo)
+	if hp > 0 {
+		e2eharness.Assertf(t, "Kologarn still alive hp=%d after DamageKill", hp)
+	}
+
+	// Teleport outside Ulduar and back to trigger grid/cell reload.
+	bot.TeleNamed(t, "Ulduar")
+	bot.TeleNamed(t, "Kologarn")
+	bot.Teleport(t, posBridge.X, posBridge.Y, posBridge.Z, posBridge.Map)
+
+	koloReloaded := bot.WaitUnit(t, e2eharness.CreatureKologarn, 30*time.Second)
+	if koloReloaded == 0 {
+		e2eharness.Assertf(t, "Kologarn corpse not found in object cache after cell reload (issue #27556)")
+	}
+
+	hpReloaded, _ := bot.UnitHP(koloReloaded)
+	if hpReloaded != 0 {
+		e2eharness.Assertf(t, "Kologarn reloaded with hp=%d, want 0 (corpse)", hpReloaded)
+	}
+
+	postObj := bot.World.GetObject(koloReloaded)
+	if postObj == nil {
+		e2eharness.Assertf(t, "Kologarn corpse object nil in cache after reload")
+	} else if math.Abs(float64(postObj.PosZ-initialZ)) > 2.0 {
+		e2eharness.Assertf(t, "Kologarn corpse Z position shifted: before=%.2f after=%.2f", initialZ, postObj.PosZ)
+	}
+
+	bot.AssertWorldAlive(t)
+	t.Logf("PASS AC#27556 Kologarn corpse persists across grid reload at health 0 (z=%.2f)", postObj.PosZ)
+}
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27095
 // PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27113
