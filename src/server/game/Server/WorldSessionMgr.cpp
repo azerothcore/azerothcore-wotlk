@@ -21,6 +21,7 @@
 #include "GameTime.h"
 #include "Metric.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
@@ -228,6 +229,8 @@ void WorldSessionMgr::KickAll()
     // pussywizard: kick offline sessions
     for (SessionMap::const_iterator itr = _offlineSessions.begin(); itr != _offlineSessions.end(); ++itr)
         itr->second->KickPlayer("KickAll offline sessions");
+
+    sScriptMgr->OnPlayerbotLogoutBots();
 }
 
 /// Kick (and save) all players with security level less `sec`

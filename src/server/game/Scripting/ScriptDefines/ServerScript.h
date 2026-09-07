@@ -71,7 +71,10 @@ public:
      * @param packet Contains information about the WorldPacket
      * @return True if you want to continue receiving the packet, false if you want to disallow receiving the packet
      */
+    [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
     [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket const& /*packet*/) { return true; }
+
+    virtual void OnPacketReceived(WorldSession* /*session*/, WorldPacket const& /*packet*/) { }
 };
 
 #endif

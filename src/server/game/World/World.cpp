@@ -1198,6 +1198,8 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
+    sScriptMgr->OnPlayerbotUpdate(diff);
+
     {
         // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));

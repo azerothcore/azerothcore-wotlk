@@ -106,7 +106,26 @@ namespace Acore::ChatCommands
 
 */
 
-// Manages registration, loading, and execution of scripts.
+class PlayerbotScript : public ScriptObject
+{
+protected:
+
+    PlayerbotScript(char const* name);
+
+public:
+    bool IsDatabaseBound() const { return false; }
+
+    [[nodiscard]] virtual bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& /*guidsList*/) { return true; }
+    virtual void OnPlayerbotCheckKillTask(Player* /*player*/, Unit* /*victim*/) { }
+    virtual void OnPlayerbotCheckPetitionAccount(Player* /*player*/, bool& /*found*/) { }
+    [[nodiscard]] virtual bool OnPlayerbotCheckUpdatesToSend(Player* /*player*/) { return true; }
+    virtual void OnPlayerbotPacketSent(Player* /*player*/, WorldPacket const* /*packet*/) { }
+    virtual void OnPlayerbotUpdate(uint32 /*diff*/) { }
+    virtual void OnPlayerbotUpdateSessions(Player* /*player*/) { }
+    virtual void OnPlayerbotLogout(Player* /*player*/) { }
+    virtual void OnPlayerbotLogoutBots() { }
+};
+
 class ScriptMgr
 {
     friend class ScriptObject;
@@ -159,6 +178,7 @@ public: /* ServerScript */
     void OnSocketOpen(std::shared_ptr<WorldSocket> const& socket);
     void OnSocketClose(std::shared_ptr<WorldSocket> const& socket);
     bool CanPacketReceive(WorldSession* session, WorldPacket const& packet);
+    void OnPacketReceived(WorldSession* session, WorldPacket const& packet);
     bool CanPacketSend(WorldSession* session, WorldPacket const& packet);
 
 public: /* WorldScript */
@@ -299,6 +319,7 @@ public: /* PlayerScript */
     void OnPlayerReleasedGhost(Player* player);
     void OnPlayerSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerBeforeUpdate(Player* player, uint32 p_time);
+    void OnPlayerAfterUpdate(Player* player, uint32 diff);
     void OnPlayerUpdate(Player* player, uint32 p_time);
     void OnPlayerPVPKill(Player* killer, Player* killed);
     void OnPlayerPVPFlagChange(Player* player, bool state);
@@ -722,6 +743,18 @@ public: /* PetScript */
 public: /* LootScript */
 
     void OnLootMoney(Player* player, uint32 gold);
+
+public: /* PlayerbotScript */
+
+    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList);
+    void OnPlayerbotCheckKillTask(Player* player, Unit* victim);
+    void OnPlayerbotCheckPetitionAccount(Player* player, bool& found);
+    bool OnPlayerbotCheckUpdatesToSend(Player* player);
+    void OnPlayerbotPacketSent(Player* player, WorldPacket const* packet);
+    void OnPlayerbotUpdate(uint32 diff);
+    void OnPlayerbotUpdateSessions(Player* player);
+    void OnPlayerbotLogout(Player* player);
+    void OnPlayerbotLogoutBots();
 
 public: /* TicketScript */
 
