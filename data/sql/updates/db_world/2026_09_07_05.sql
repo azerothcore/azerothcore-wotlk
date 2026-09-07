@@ -1,3 +1,4 @@
+-- DB update 2026_09_07_04 -> 2026_09_07_05
 --
 SET @ID := -429;
 UPDATE `creature_template` SET `CreatureImmunitiesId` = @ID WHERE (`entry` IN (33116, 33052));
