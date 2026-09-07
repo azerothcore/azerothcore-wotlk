@@ -224,7 +224,7 @@ jobs:
       - name: Build (and push on master) pre-imported DB image
         run: |
           set -euo pipefail
-          VERSION="$(jq -r '.version' acore.json)"
+          VERSION="${{ steps.version.outputs.version }}"
 
           # The sibling images get these from metadata-action; this one builds raw.
           LABELS=(

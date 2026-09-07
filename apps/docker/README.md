@@ -59,6 +59,14 @@ $ echo 'DOCKER_DB_IMAGE=acore/ac-wotlk-db:master' >> .env
 $ docker compose up -d
 ```
 
+Docker seeds a volume from the image only when that volume is new and empty, so
+on a host that has already run the stack you get your old database back and no
+warning that the snapshot was skipped. Drop the volume first:
+
+```console
+$ docker compose down -v
+```
+
 Leave `DOCKER_DB_IMAGE` unset and the stack behaves exactly as before, on plain
 `mysql:8.4`. When it is set, a fresh named volume is seeded from the baked
 datadir, and `ac-db-import` still runs: it applies only the deltas newer than
