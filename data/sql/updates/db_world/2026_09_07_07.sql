@@ -1,3 +1,4 @@
+-- DB update 2026_09_07_06 -> 2026_09_07_07
 -- Thorim Golem Right/Left Hand Bunny: static gauntlet spawns (sniff build 68887), stop combat 10s after casting Runic Smash
 SET @CGUID := 285041;
 
