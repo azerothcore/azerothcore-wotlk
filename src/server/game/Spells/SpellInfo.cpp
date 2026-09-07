@@ -1053,6 +1053,15 @@ bool SpellInfo::IsAffectingArea() const
     return false;
 }
 
+bool SpellInfo::CanBeRedirectedBySpellMagnet() const
+{
+    // Patch 1.2 notes: Spell Reflection no longer reflects abilities.
+    return !HasAttribute(SPELL_ATTR0_IS_ABILITY)
+        && !HasAttribute(SPELL_ATTR1_NO_REDIRECTION)
+        && !HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)
+        && !IsAffectingArea();
+}
+
 // checks if spell targets are selected from area, doesn't include spell effects in check (like area wide auras for example)
 bool SpellInfo::IsTargetingArea() const
 {

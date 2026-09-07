@@ -124,6 +124,13 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_NEXT_MINION, 4s);
         }
 
+        // Called by Creature::DespawnOnEvade (CREATURE_FLAG_EXTRA_HARD_RESET) after Reset() already
+        // summoned a fresh set of minions; without this they outlive the boss and stack up per wipe.
+        void SummonedCreatureDespawnAll() override
+        {
+            summons.DespawnAll();
+        }
+
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
             // restore minions health
