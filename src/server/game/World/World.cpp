@@ -35,6 +35,7 @@
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
 #include "ChatPackets.h"
+#include "ClassMgr.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Config.h"
@@ -388,6 +389,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Player race data...");
     sRaceMgr->LoadRaces();
+
+    LOG_INFO("server.loading", "Loading Player class data...");
+    sClassMgr->LoadClasses();
 
     // Load IP Location Database
     sIPLocation->Load();

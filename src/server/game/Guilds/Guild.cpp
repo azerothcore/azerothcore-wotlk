@@ -20,6 +20,7 @@
 #include "CalendarMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
+#include "ClassMgr.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
@@ -636,7 +637,7 @@ bool Guild::Member::CheckStats() const
         return false;
     }
 
-    if (m_class < CLASS_WARRIOR || m_class >= MAX_CLASSES)
+    if (m_class < CLASS_WARRIOR || m_class >= sClassMgr->GetMaxClasses())
     {
         LOG_ERROR("guild", "Player ({}) has a broken data in field `characters`.`class`, deleting him from guild!", m_guid.ToString());
         return false;
