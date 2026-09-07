@@ -424,6 +424,12 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                     spell->prepare(&(spell->m_targets));
 
+                    // Stop the current spline before the next movement update can interrupt a stationary channel.
+                    if (Pet* controlledPet = pet->ToPet())
+                        if (spellInfo->IsChanneled() && !spellInfo->IsActionAllowedChannel()
+                            && controlledPet->IsMovementPreventedByCasting())
+                            controlledPet->StopMoving();
+
                     // spell->prepare() can delete charm info.
                     // Let's refresh the pointer.
                     charmInfo = pet->GetCharmInfo();

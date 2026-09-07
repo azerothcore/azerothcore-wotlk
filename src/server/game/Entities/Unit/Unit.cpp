@@ -1110,15 +1110,13 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             case BASE_ATTACK:
             case OFF_ATTACK:
                 {
-                    weaponSpeedHitFactor = uint32(attacker->GetAttackTime(cleanDamage->attackType) / 1000.0f * (cleanDamage->attackType == BASE_ATTACK ? 3.5f : 1.75f));
+                    weaponSpeedHitFactor = attacker->GetRageWeaponSpeedHitFactor(cleanDamage->attackType);
                     if (cleanDamage->hitOutCome == MELEE_HIT_CRIT)
                         weaponSpeedHitFactor *= 2;
 
                     attacker->RewardRage(rage_damage, weaponSpeedHitFactor, true);
                     break;
                 }
-            case RANGED_ATTACK:
-                break;
             default:
                 break;
         }
@@ -2081,7 +2079,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             case BASE_ATTACK:
             case OFF_ATTACK:
             {
-                uint32 weaponSpeedHitFactor = uint32(GetAttackTime(damageInfo->attackType) / 1000.0f * (damageInfo->attackType == BASE_ATTACK ? 3.5f : 1.75f));
+                uint32 weaponSpeedHitFactor = GetRageWeaponSpeedHitFactor(damageInfo->attackType);
                 RewardRage(damageInfo->cleanDamage, weaponSpeedHitFactor, true);
                 break;
             }
@@ -8170,8 +8168,7 @@ bool RedirectSpellEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 Unit* Unit::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
 {
-    // Patch 1.2 notes: Spell Reflection no longer reflects abilities
-    if (spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY) || spellInfo->HasAttribute(SPELL_ATTR1_NO_REDIRECTION) || spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    if (!spellInfo->CanBeRedirectedBySpellMagnet())
         return victim;
 
     Unit::AuraEffectList const& magnetAuras = victim->GetAuraEffectsByType(SPELL_AURA_SPELL_MAGNET);
@@ -12614,6 +12611,10 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
 
     if (IsInWorld()) // not in world and not being removed atm
         RemoveFromWorld();
+
+    // Abort pending events here: left to ~EventProcessor they run after m_spellMods is already
+    // destroyed, and cancelling a SpellEvent then hits freed memory in Player::RestoreSpellMods.
+    m_Events.KillAllEvents(false);
 
     ASSERT(GetGUID());
 
