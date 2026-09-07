@@ -616,7 +616,7 @@ enum RocknotEvents
     EVENT_ROCKNOT_FINAL_KEG,
     EVENT_ROCKNOT_ALE,
     EVENT_ROCKNOT_BREAK_KEG,
-    EVENT_ROCKNOT_BREAK_DOOR,
+    EVENT_ROCKNOT_BAR_REACTION,
     EVENT_ROCKNOT_RECOVER
 };
 
@@ -764,11 +764,12 @@ struct npc_rocknot : public npc_escortAI
                     me->SetEmoteState(EMOTE_STATE_WORK_SHEATHED);
                     if (GameObject* keg = GetBarObject(DATA_GO_BAR_KEG))
                         keg->SetGoState(GO_STATE_ACTIVE);
-                    _events.ScheduleEvent(EVENT_ROCKNOT_BREAK_DOOR, 7s);
-                    break;
-                case EVENT_ROCKNOT_BREAK_DOOR:
+                    // Start both animations together; the trap and Phalanx react after the cork hits.
                     if (GameObject* door = GetBarObject(DATA_GO_BAR_DOOR))
                         door->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                    _events.ScheduleEvent(EVENT_ROCKNOT_BAR_REACTION, 7s);
+                    break;
+                case EVENT_ROCKNOT_BAR_REACTION:
                     if (GameObject* trap = GetBarObject(DATA_GO_BAR_KEG_TRAP))
                         trap->Use(me);
                     me->SetEmoteState(EMOTE_STATE_STUN);
