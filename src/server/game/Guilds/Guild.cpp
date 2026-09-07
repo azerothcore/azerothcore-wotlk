@@ -1408,6 +1408,29 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_v
     }
 }
 
+void Guild::HandleSetRankInfo(uint8 rankId, uint32 rights, std::string_view name, uint32 moneyPerDay)
+{
+    if (RankInfo* rankInfo = GetRankInfo(rankId))
+    {
+        if (!name.empty())
+        {
+            rankInfo->SetName(name);
+        }
+
+        if (rights > 0)
+        {
+            rankInfo->SetRights(rights);
+        }
+
+        if (moneyPerDay > 0)
+        {
+            _SetRankBankMoneyPerDay(rankId, moneyPerDay);
+        }
+
+        _BroadcastEvent(GE_RANK_UPDATED, ObjectGuid::Empty, std::to_string(rankId), rankInfo->GetName(), std::to_string(m_ranks.size()));
+    }
+}
+
 void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
 {
     Player* player = session->GetPlayer();
@@ -2628,6 +2651,22 @@ inline bool Guild::_MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 righ
         return (_GetRankBankTabRights(member->GetRankId(), tabId) & rights) == rights;
     }
     return false;
+}
+
+// Public accessors for the playerbots module (delegate to the private helpers)
+bool Guild::HasRankRight(Player* player, uint32 right) const
+{
+    return _HasRankRight(player, right);
+}
+
+uint32 Guild::GetRankRights(uint8 rankId) const
+{
+    return _GetRankRights(rankId);
+}
+
+bool Guild::MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const
+{
+    return _MemberHasTabRights(guid, tabId, rights);
 }
 
 // Add new event log record
