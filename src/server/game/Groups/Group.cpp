@@ -388,22 +388,18 @@ void Group::RemoveInvite(Player* player)
     if (!player)
         return;
 
-    // double invite workaround
-    if (player->GetGroupInvite() != this)
-        return;
+    m_invitees.erase(player);
 
-    auto itr = m_invitees.find(player);
-    if (itr != m_invitees.end())
-        m_invitees.erase(itr);
-
-    player->SetGroupInvite(nullptr);
+    // Clear pending invite from current group, Keep an invite from another group.
+    if (player->GetGroupInvite() == this)
+        player->SetGroupInvite(nullptr);
 }
 
 void Group::RemoveAllInvites()
 {
-    for (InvitesList::iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
-        if (*itr)
-            (*itr)->SetGroupInvite(nullptr);
+    for (Player* invitee : m_invitees)
+        if (invitee && invitee->GetGroupInvite() == this)
+            invitee->SetGroupInvite(nullptr);
 
     m_invitees.clear();
 }
