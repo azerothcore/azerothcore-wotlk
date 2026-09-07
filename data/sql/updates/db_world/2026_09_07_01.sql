@@ -1,3 +1,4 @@
+-- DB update 2026_09_07_00 -> 2026_09_07_01
 --
 -- Issue #26694: pickpocket does not work on heroic difficulty entries
 -- Difficulty (heroic) creature_template entries inherit `lootid` but were left with
