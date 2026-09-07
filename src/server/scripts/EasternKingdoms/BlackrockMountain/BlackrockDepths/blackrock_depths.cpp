@@ -616,7 +616,8 @@ enum RocknotEvents
     EVENT_ROCKNOT_FINAL_KEG,
     EVENT_ROCKNOT_ALE,
     EVENT_ROCKNOT_BREAK_KEG,
-    EVENT_ROCKNOT_BREAK_DOOR
+    EVENT_ROCKNOT_BREAK_DOOR,
+    EVENT_ROCKNOT_RECOVER
 };
 
 enum RocknotPoints
@@ -635,31 +636,47 @@ struct npc_rocknot : public npc_escortAI
 
     void Reset() override
     {
-        if (HasEscortState(STATE_ESCORT_ESCORTING))
+        if (HasEscortState(STATE_ESCORT_ESCORTING) || _recovering)
             return;
 
         _events.Reset();
-        if (_aleComplete)
-        {
-            me->SetEmoteState(EMOTE_STATE_STUN);
-            return;
-        }
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetEmoteState(EMOTE_STATE_NONE);
+    }
+
+    void JustRespawned() override
+    {
+        _recovering = false;
+        npc_escortAI::JustRespawned();
+    }
+
+    void JustReachedHome() override
+    {
+        if (!_recovering)
+            return;
+
+        _recovering = false;
+        me->SetEmoteState(EMOTE_STATE_NONE);
+        me->SetFacingTo(_originalPosition.GetOrientation());
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetImmuneToNPC(_originalImmuneToNPC);
+        me->ReplaceAllNpcFlags(_originalNpcFlags);
     }
 
     void sQuestReward(Player* player, Quest const* quest, uint32 /*opt*/) override
     {
         if (!_instance || quest->GetQuestId() != QUEST_ALE)
             return;
-        if (HasEscortState(STATE_ESCORT_ESCORTING) || _aleComplete)
-            return;
-        if (_instance->GetData(TYPE_BAR) == DONE || _instance->GetData(TYPE_BAR) == SPECIAL)
+        if (HasEscortState(STATE_ESCORT_ESCORTING) || _recovering)
             return;
 
         // Both captured hand-ins have the drinking emote and acknowledgement.
         me->HandleEmoteCommand(EMOTE_ONESHOT_EAT_NO_SHEATHE);
         Talk(SAY_GOT_BEER);
+        // Further quest rewards are allowed after recovery, but cannot restart the completed event.
+        if (_aleComplete || _instance->GetData(TYPE_BAR) == DONE || _instance->GetData(TYPE_BAR) == SPECIAL)
+            return;
+
         if (_instance->GetData(TYPE_BAR) != IN_PROGRESS)
             _instance->SetData(TYPE_BAR, IN_PROGRESS);
         _instance->SetData(TYPE_BAR, SPECIAL);
@@ -668,6 +685,10 @@ struct npc_rocknot : public npc_escortAI
 
         SetDespawnAtEnd(false);
         SetDespawnAtFar(false);
+        me->GetRespawnPosition(_originalPosition.m_positionX, _originalPosition.m_positionY,
+            _originalPosition.m_positionZ, &_originalPosition.m_orientation);
+        _originalNpcFlags = me->GetNpcFlags();
+        _originalImmuneToNPC = me->IsImmuneToNPC();
         me->SetWalk(true);
         Start(false);
         // Keep the escort's NPC flags cleared so WotLK rejects further quest interactions.
@@ -753,12 +774,22 @@ struct npc_rocknot : public npc_escortAI
                     me->SetEmoteState(EMOTE_STATE_STUN);
                     me->SetHomePosition(me->GetPosition());
                     _aleComplete = true;
+                    _recovering = true;
+                    // Requested recovery delay; not a timing established by the Anniversary sniff.
+                    _events.ScheduleEvent(EVENT_ROCKNOT_RECOVER, 15s);
                     if (_instance)
                     {
                         if (Creature* phalanx = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PHALANX)))
                             phalanx->AI()->DoAction(ACTION_PHALANX_START_ACTIVATION);
                         _instance->SetData(TYPE_BAR, DONE);
                     }
+                    break;
+                case EVENT_ROCKNOT_RECOVER:
+                    RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
+                    me->SetEmoteState(EMOTE_STATE_NONE);
+                    me->SetHomePosition(_originalPosition);
+                    // Keep interactions disabled until the home movement restores his position and facing.
+                    me->GetMotionMaster()->MoveTargetedHome(true);
                     break;
             }
         }
@@ -773,6 +804,10 @@ private:
     InstanceScript* _instance;
     EventMap _events;
     bool _aleComplete;
+    bool _recovering = false;
+    Position _originalPosition;
+    NPCFlags _originalNpcFlags = UNIT_NPC_FLAG_NONE;
+    bool _originalImmuneToNPC = false;
 };
 
 void AddSC_blackrock_depths()
