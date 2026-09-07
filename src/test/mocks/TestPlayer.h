@@ -33,6 +33,9 @@ public:
     void SaveToDB(bool /*create*/, bool /*logout*/) { }
     void SaveToDB(CharacterDatabaseTransaction /*trans*/, bool /*create*/, bool /*logout*/) { }
 
+    // Bypasses the race lookup, which needs ChrRaces.dbc
+    void SetTeamIdForTest(TeamId team) { m_team = team; }
+
     void ForceInitValues(ObjectGuid::LowType guidLow = 1)
     {
         Object::_Create(guidLow, uint32(0), HighGuid::Player);
