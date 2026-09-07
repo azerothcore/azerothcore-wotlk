@@ -8090,6 +8090,11 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             }
 
             go->SetLootState(GO_ACTIVATED, this);
+
+            // Trigger chest traps once per loot generation, including when the generated loot is empty.
+            if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+                if (uint32 trapEntry = go->GetGOInfo()->chest.linkedTrapId)
+                    go->TriggeringLinkedGameObject(trapEntry, this);
         }
 
         if (go->getLootState() == GO_ACTIVATED)
