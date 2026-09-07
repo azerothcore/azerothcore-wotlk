@@ -2374,15 +2374,32 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     }
 
-    // Filter relics for headles sessions.
-    if (proto->Class == ITEM_CLASS_ARMOR)
+    if (proto->InventoryType == INVTYPE_RELIC)
     {
-        if ((proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && !IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_RELIC)) ||
-            (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && !IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_RELIC)) ||
-            (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && !IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_RELIC)) ||
-            (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_RELIC)))
+        switch (proto->SubClass)
         {
-            return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+            case ITEM_SUBCLASS_ARMOR_LIBRAM:
+                if (!IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            case ITEM_SUBCLASS_ARMOR_IDOL:
+                if (!IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            case ITEM_SUBCLASS_ARMOR_TOTEM:
+                if (!IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            case ITEM_SUBCLASS_ARMOR_MISC:
+                if (!IsClass(CLASS_WARLOCK, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            case ITEM_SUBCLASS_ARMOR_SIGIL:
+                if (!IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            default:
+                break;
         }
     }
 
