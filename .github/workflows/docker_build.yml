@@ -72,7 +72,7 @@ jobs:
           version="$(jq -r '.version' acore.json)"
           echo "version=$version" >> $GITHUB_OUTPUT
 
-      # arm64 emulation, so PR validation can boot the arm64 DB image.
+      # arm64 emulation, so the labeled-PR check can boot the arm64 DB image.
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -238,7 +238,8 @@ jobs:
           # $2 = poll attempts, 2s apart: 60 gives amd64 120s, 300 gives arm64
           # 600s (its emulated MySQL start is far slower).
           smoke() {
-            local arch="$1" attempts="$2" tag="acore/ac-wotlk-db:test-$arch"
+            local arch="$1" attempts="$2"
+            local tag="acore/ac-wotlk-db:test-$arch"
 
             docker buildx build --platform "linux/$arch" --load \
               -f apps/docker/Dockerfile.db "${LABELS[@]}" -t "$tag" db-ctx
@@ -274,7 +275,8 @@ jobs:
             # it. The multi-arch pass then reuses this build's cache for amd64.
             smoke amd64 60
 
-            # The datadir is arch-neutral; PR validation boots both arches.
+            # The datadir is arch-neutral, and only amd64 was booted above:
+            # arm64 is covered by the labeled-PR check, not by this path.
             docker buildx build --platform linux/amd64,linux/arm64 \
               -f apps/docker/Dockerfile.db "${LABELS[@]}" \
               -t "acore/ac-wotlk-db:master" \

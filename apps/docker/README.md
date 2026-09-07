@@ -66,9 +66,10 @@ the snapshot. So the image is a faster starting point, not a different
 bootstrap path.
 
 `:master` tracks master, so pair it with a checkout on master. On an older
-branch, pick the `:<version>` or `:<sha>` tag matching your checkout instead —
+branch, pin the `:<sha>` tag for a commit your checkout already has:
 `ac-db-import` only applies deltas forward, so a snapshot newer than your
-worldserver leaves you on a schema it was never built against.
+worldserver leaves you on a schema it was never built against. `:<version>`
+is no help here, it moves with master too.
 
 > ⚠️ `DOCKER_DB_ROOT_PASSWORD` has **no effect** on this image. A
 > pre-initialized datadir makes the official mysql entrypoint skip
