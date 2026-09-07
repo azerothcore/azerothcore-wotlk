@@ -388,7 +388,7 @@ void Group::RemoveInvite(Player* player)
     if (!player)
         return;
 
-    // mod_playerbots: double invite hack workaround
+    // double invite workaround
     if (player->GetGroupInvite() != this)
         return;
 
