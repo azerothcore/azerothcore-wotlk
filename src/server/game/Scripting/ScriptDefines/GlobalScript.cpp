@@ -144,6 +144,11 @@ void ScriptMgr::AfterInstanceGameObjectCreate(Map* instance, GameObject* go)
     CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_AFTER_INSTANCE_GAME_OBJECT_CREATE, script->AfterInstanceGameObjectCreate(instance, go));
 }
 
+bool ScriptMgr::CanCreateLfgProposal(lfg::Lfg5Guids const& guids)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_CAN_CREATE_LFG_PROPOSAL, !script->CanCreateLfgProposal(guids));
+}
+
 GlobalScript::GlobalScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, GLOBALHOOK_END)
 {

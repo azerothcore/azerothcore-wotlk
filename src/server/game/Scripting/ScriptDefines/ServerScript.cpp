@@ -44,15 +44,6 @@ void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> const& socket)
     CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_SOCKET_CLOSE, script->OnSocketClose(socket));
 }
 
-void ScriptMgr::OnPacketReceived(WorldSession* session, WorldPacket const& packet)
-{
-    WorldPacket copy(packet);
-    ExecuteScript<ServerScript>([&](ServerScript* script)
-    {
-        script->OnPacketReceived(session, copy);
-    });
-}
-
 bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
 {
     ASSERT(session);
@@ -69,6 +60,18 @@ bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packe
         return true;
 
     CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_RECEIVE, !script->CanPacketReceive(session, packet));
+}
+
+void ScriptMgr::OnPacketSent(WorldSession* session, WorldPacket const& packet)
+{
+    ASSERT(session);
+
+    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_PACKET_SENT, script->OnPacketSent(session, packet));
+}
+
+void ScriptMgr::OnPacketReceived(WorldSession* session, WorldPacket const& packet)
+{
+    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_PACKET_RECEIVED, script->OnPacketReceived(session, packet));
 }
 
 ServerScript::ServerScript(char const* name, std::vector<uint16> enabledHooks)

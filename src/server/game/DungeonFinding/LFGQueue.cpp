@@ -412,10 +412,8 @@ namespace lfg
         if (!sLFGMgr->AllQueued(check)) // can't create proposal
             return LFG_COMPATIBILITY_PENDING;
 
-        if (!sScriptMgr->OnPlayerbotCheckLFGQueue(proposal.queues))
-        {
+        if (!sScriptMgr->CanCreateLfgProposal(proposal.queues))
             return LFG_INCOMPATIBLES_HAS_IGNORES;
-        }
 
         // Create a new proposal
         proposal.cancelTime = GameTime::GetGameTime().count() + LFG_TIME_PROPOSAL;
