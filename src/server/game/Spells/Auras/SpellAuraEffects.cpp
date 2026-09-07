@@ -1233,6 +1233,11 @@ bool AuraEffect::CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventIn
             if (!eventInfo.GetProcSpell() || !eventInfo.GetProcSpell()->GetCastTime())
                 return false;
             break;
+        case SPELL_AURA_SPELL_MAGNET:
+            // Spell magnets do not consume charges for spells they cannot redirect.
+            if (!spellInfo || !spellInfo->CanBeRedirectedBySpellMagnet())
+                return false;
+            break;
         case SPELL_AURA_MOD_POWER_COST_SCHOOL:
         case SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT:
         {
