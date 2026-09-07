@@ -1408,27 +1408,24 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_v
     }
 }
 
-void Guild::HandleSetRankInfo(uint8 rankId, uint32 rights, std::string_view name, uint32 moneyPerDay)
+void Guild::HandleSetRankInfo(uint8 rankId, Optional<uint32> rights, Optional<std::string_view> name,
+    Optional<uint32> moneyPerDay)
 {
-    if (RankInfo* rankInfo = GetRankInfo(rankId))
-    {
-        if (!name.empty())
-        {
-            rankInfo->SetName(name);
-        }
+    RankInfo* rankInfo = GetRankInfo(rankId);
+    if (!rankInfo)
+        return;
 
-        if (rights > 0)
-        {
-            rankInfo->SetRights(rights);
-        }
+    if (name)
+        rankInfo->SetName(*name);
 
-        if (moneyPerDay > 0)
-        {
-            _SetRankBankMoneyPerDay(rankId, moneyPerDay);
-        }
+    if (rights)
+        rankInfo->SetRights(*rights);
 
-        _BroadcastEvent(GE_RANK_UPDATED, ObjectGuid::Empty, std::to_string(rankId), rankInfo->GetName(), std::to_string(m_ranks.size()));
-    }
+    if (moneyPerDay)
+        _SetRankBankMoneyPerDay(rankId, *moneyPerDay);
+
+    _BroadcastEvent(GE_RANK_UPDATED, ObjectGuid::Empty, std::to_string(rankId), rankInfo->GetName(),
+        std::to_string(m_ranks.size()));
 }
 
 void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)

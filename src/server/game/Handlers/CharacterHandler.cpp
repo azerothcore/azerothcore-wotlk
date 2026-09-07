@@ -64,14 +64,14 @@
 #include "WorldSessionMgr.h"
 
 LoginQueryHolder::LoginQueryHolder(uint32 accountId, ObjectGuid guid)
-    : m_accountId(accountId), m_guid(guid) { }
+    : _accountId(accountId), _guid(guid) { }
 
 bool LoginQueryHolder::Initialize()
 {
     SetSize(MAX_PLAYER_LOGIN_QUERY);
 
     bool res = true;
-    uint64 rawGUID = m_guid.GetRawValue();
+    uint64 rawGUID = _guid.GetRawValue();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER);
     stmt->SetData(0, rawGUID);
@@ -194,7 +194,7 @@ bool LoginQueryHolder::Initialize()
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_INSTANCELOCKTIMES);
-    stmt->SetData(0, m_accountId);
+    stmt->SetData(0, _accountId);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSE_LOCATION);
@@ -576,12 +576,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             newChar->SaveToDB(characterTransaction, true, false);
             createInfo->CharCount++;
 
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS_BY_REALM);
-            stmt->SetData(0, GetAccountId());
-            stmt->SetData(1, realm.Id.Realm);
-            trans->Append(stmt);
-
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
             stmt->SetData(0, createInfo->CharCount);
             stmt->SetData(1, GetAccountId());
             stmt->SetData(2, realm.Id.Realm);

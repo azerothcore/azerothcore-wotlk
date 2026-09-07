@@ -236,6 +236,7 @@ public:
     void   SetCleaningFlags(uint32 flags) override { _cleaningFlags = flags; }
     void   ResetEventSeasonalQuests(uint16 event_id) override;
     void   ReloadRBAC() override;
+    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) override;
 
     [[nodiscard]] std::string const& GetRealmName() const override { return _realmName; } // pussywizard
     void SetRealmName(std::string name) override { _realmName = name; } // pussywizard
@@ -258,9 +259,6 @@ protected:
     void ResetRandomBG();
     void CalendarDeleteOldEvents();
     void ResetGuildCap();
-
-    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) override;
-
 private:
     WorldConfig _worldConfig;
 
