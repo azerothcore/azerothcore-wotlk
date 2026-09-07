@@ -296,6 +296,11 @@ jobs:
 
       - name: Test authserver with startup scripts
         run: |
+          mysql -h127.0.0.1 -uacore -pacore -e \
+            "UPDATE acore_auth.realmlist
+             SET address='127.0.0.1', localAddress='127.0.0.1',
+                 localSubnetMask='255.255.255.0', flag=0, port=8085, gamebuild=12340
+             WHERE id=1;"
           ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2
           ./acore.sh sm show-config authserver
           ./acore.sh sm start authserver
