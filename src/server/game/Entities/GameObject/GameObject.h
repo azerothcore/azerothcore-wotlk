@@ -258,6 +258,7 @@ public:
     [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
     [[nodiscard]] GameObject* GetLinkedTrap();
+    void DeactivateLinkedTrapParent();
     void SetLinkedTrap(GameObject* linkedTrap)
     {
         m_linkedTrap = linkedTrap->GetGUID();
@@ -416,7 +417,6 @@ protected:
 
 private:
     bool IsLinkedTrapParentSpawned() const;
-    void DeactivateLinkedTrapParent();
     void CheckRitualList();
     void ClearRitualList();
     void RemoveFromOwner();

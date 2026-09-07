@@ -2147,6 +2147,9 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
         else if (m_spellInfo->Id == 1842 && gameObjTarget->GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP)
         {
             gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
+            if (gameObjTarget->getLootState() == GO_JUST_DEACTIVATED && goInfo->trap.type == 1)
+                gameObjTarget->DeactivateLinkedTrapParent();
+
             // Consumable traps must retain their respawn delay; a zero auto-close time would rearm them immediately.
             if (gameObjTarget->getLootState() == GO_JUST_DEACTIVATED && !gameObjTarget->GetOwner() &&
                 goInfo->trap.type != 1)
