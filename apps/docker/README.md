@@ -46,16 +46,64 @@ AC> account create admin password 3 -1
 already imported** (`acore_auth`, `acore_world`, `acore_characters`, including
 Eluna/mod-ale SQL to match the published `worldserver`/`authserver` images). It
 boots instantly — there is no multi-minute import on first run. It is meant for
-quick-start, dev, ephemeral test fixtures, and demos, **not production**.
+quick-start, dev, ephemeral test fixtures, and demos, **not production**. The
+image is a few hundred MB.
 
-The image *is* the database server; run it in place of the `mysql:8.4` +
-`ac-db-import` pair:
+### Using it with docker compose
+
+This is the primary way to use the image. Point the `ac-database` service at it
+from your `.env`:
 
 ```console
-$ docker run -d --name acdb -p 3306:3306 acore/ac-wotlk-db:master
+$ echo 'DOCKER_DB_IMAGE=acore/ac-wotlk-db:master' >> .env
+$ docker compose up -d
 ```
 
-### Credentials (baked at build time)
+Leave `DOCKER_DB_IMAGE` unset and the stack behaves exactly as before, on plain
+`mysql:8.4`. When it is set, a fresh named volume is seeded from the baked
+datadir, and `ac-db-import` still runs: it applies only the deltas newer than
+the snapshot. So the image is a faster starting point, not a different
+bootstrap path.
+
+> ⚠️ `DOCKER_DB_ROOT_PASSWORD` has **no effect** on this image. A
+> pre-initialized datadir makes the official mysql entrypoint skip
+> initialization and ignore `MYSQL_ROOT_PASSWORD`, so the healthcheck ends up
+> authenticating with your custom password against the baked one. It never
+> passes, and every service gated on `service_healthy` stalls with no clear
+> error. Use the two together only after changing the password inside the
+> running database.
+
+### Tags
+
+- `:master` — the latest master build.
+- `:<version>` — the version from `acore.json`, e.g. `17.0.0-dev`.
+- `:<full commit sha>` — pin to a specific commit, or roll back to one.
+
+`:master` and `:<version>` are overwritten on every master build, so the sha
+tag is the only immutable one.
+
+### Persistence
+
+The official mysql image declares `VOLUME /var/lib/mysql`, which seeds **fresh
+anonymous or named volumes** from the baked datadir — but **bind mounts are NOT
+seeded** (a host-dir bind mount over the datadir starts empty, giving you an
+empty DB on first run). A `DOCKER_VOL_DB` pointing at a host directory is such
+a bind mount.
+
+- For the instant experience, run with **no volume** or a **fresh named
+  volume** (e.g. `-v ac-db:/var/lib/mysql`).
+- To persist afterwards, keep using that named volume; the worldserver applies
+  update deltas over time.
+
+### Standalone use
+
+The image *is* the database server, so it can also be run on its own:
+
+```console
+$ docker run -d --name acdb -p 127.0.0.1:3306:3306 acore/ac-wotlk-db:master
+```
+
+#### Credentials (baked at build time)
 
 Because the datadir is pre-initialized, the official mysql entrypoint skips
 initialization and **ignores runtime `MYSQL_*` env vars** — credentials are
@@ -65,24 +113,5 @@ fixed in the image:
 - `acore` / `acore` (native-install parity, granted on the three `acore_*` DBs)
 
 > ⚠️ These are well-known defaults. **Change/secure them before exposing the
-> server beyond your local machine.**
-
-### Persistence
-
-The official mysql image declares `VOLUME /var/lib/mysql`, which seeds **fresh
-anonymous or named volumes** from the baked datadir — but **bind mounts are NOT
-seeded** (a host-dir bind mount over the datadir starts empty, giving you an
-empty DB on first run).
-
-- For the instant experience, run with **no volume** or a **fresh named
-  volume** (e.g. `-v ac-db:/var/lib/mysql`).
-- To persist afterwards, keep using that named volume; the worldserver applies
-  update deltas over time.
-
-### Connecting a server
-
-Point a matching-commit `worldserver`/`authserver` at it with
-`AC_UPDATES_ENABLE_DATABASES=0` (the DB is already up to date). For LAN/public
-play, update `realmlist.address` away from `127.0.0.1`.
-
-The image is a few hundred MB.
+> server beyond your local machine.** The example above binds the port to
+> `127.0.0.1` for that reason.
