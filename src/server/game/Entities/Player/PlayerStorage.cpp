@@ -2374,8 +2374,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     }
 
-    // Relics are class-locked by their subclass; the client filters these, but headless
-    // sessions (and hacked clients) reach here without that filter.
+    // Filter relics for headles sessions.
     if (proto->Class == ITEM_CLASS_ARMOR)
     {
         if ((proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && !IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_RELIC)) ||
