@@ -2086,6 +2086,7 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
                         if (gameObjTarget->GetGOInfo()->chest.consumable)
                             gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
 
+                        player->SendLootRelease(guid);
                         return;
                     }
                 }
