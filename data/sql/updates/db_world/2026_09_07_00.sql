@@ -1,3 +1,4 @@
+-- DB update 2026_09_06_04 -> 2026_09_07_00
 -- Sapphiron 25-player loot pool structure fix.
 
 UPDATE `creature_loot_template` SET `MinCount`=1, `MaxCount`=1
