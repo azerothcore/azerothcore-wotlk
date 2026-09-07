@@ -888,14 +888,18 @@ public:
      * @brief This hook is called before a player learns a spell, and can cancel the learning.
      *
      * It fires late, once its caller has committed: refusing does not undo what that caller already
-     * did. A trainer has taken the money and still reports success, and Player::LearnTalent goes on
-     * to spend the talent point and record the talent anyway -- use OnPlayerCanLearnTalent, which
-     * runs before any of that, to stop a talent.
+     * did. A trainer has taken the money and still reports success, and Player::LearnTalent spends
+     * the point and records the talent anyway -- use OnPlayerCanLearnTalent to stop a talent.
      *
-     * Two paths never reach this hook: trainer entries that wrap other spells (a paladin's Summon
-     * Warhorse hands over both the mount and Apprentice Riding) are cast rather than learned, so it
-     * sees what the wrapper hands over instead; and the initial spells of a character still being
-     * created go through addSpell directly.
+     * Only Player::learnSpell reaches it; spells written through addSpell do not. Those bypasses
+     * include character loading (_LoadSpells, and the initial class and skill-rewarded spells,
+     * which run on every login) and talent spells from _addTalentAurasAndSpells, reapplied on
+     * every dual-spec switch -- so a refusal in world is undone the next time one of them runs.
+     *
+     * What it sees can be indirect: a trainer entry that wraps other spells (a paladin's Summon
+     * Warhorse) is cast, so the hook sees the wrapped spells instead. A talent rank arrives only
+     * when it lands in the spell book, which most do not -- but a learn-spell talent still
+     * delivers its additional talent spells.
      *
      * @param player Contains information about the Player
      * @param spellId The id of the spell about to be learned
