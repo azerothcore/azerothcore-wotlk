@@ -500,9 +500,16 @@ def populated_character_seed_sql() -> str:
         "(`guid`,`account`,`name`,`race`,`class`,`gender`,`level`,`skin`,`face`,`hairStyle`,`hairColor`,"
         "`facialStyle`,`playerFlags`,`position_x`,`position_y`,`position_z`,`map`,`orientation`,`taximask`,"
         "`at_login`,`zone`,`extra_flags`,`equipmentCache`,`exploredZones`,`knownTitles`,`order`,`innTriggerId`,"
-        "`health`) "
+        # `cinematic`=1 marks the intro cinematic as already seen. Left at the 0 default the
+        # server sends SMSG_TRIGGER_CINEMATIC just before SMSG_LOGIN_VERIFY_WORLD (matching
+        # TrinityCore's `if (!getCinematic())` gate), and the real client parks in cinematic
+        # mode: it never answers with CMSG_COMPLETE_CINEMATIC or CMSG_NEXT_CINEMATIC_CAMERA,
+        # never reaches the normal in-world state, and so never sends CMSG_TIME_SYNC_RESP --
+        # while still servicing every other opcode, which makes it look like a loading hang.
+        # The cinematic path is not what this harness exercises, so skip it.
+        "`health`,`cinematic`) "
         f"VALUES ({CHARACTER_GUID},{ACCOUNT_ID},'{CHARACTER_NAME}',{CHARACTER_RACE},{CHARACTER_CLASS},0,1,0,0,0,0,0,0,"
-        f"{x},{y},{z},{CHARACTER_MAP},0,'',0,{CHARACTER_ZONE},0,'','','',{CHARACTER_LIST_POSITION},0,10000);"
+        f"{x},{y},{z},{CHARACTER_MAP},0,'',0,{CHARACTER_ZONE},0,'','','',{CHARACTER_LIST_POSITION},0,10000,1);"
     )
 
 
@@ -518,7 +525,7 @@ def verify_populated_character_seed(manifest: Manifest, generation: Generation) 
         f"AND ABS(`position_z`-({z}))<0.001 AND `map`={CHARACTER_MAP} AND `zone`={CHARACTER_ZONE} AND `orientation`=0 "
         "AND `playerFlags`=0 AND `at_login`=0 AND `extra_flags`=0 AND COALESCE(`order`,0)=7 "
         "AND `taximask`='' AND `innTriggerId`=0 AND `equipmentCache`='' AND `exploredZones`='' "
-        "AND `knownTitles`='' AND `deleteDate` IS NULL;",
+        "AND `knownTitles`='' AND `cinematic`=1 AND `deleteDate` IS NULL;",
         generation["schemas"]["characters"],
     )
     if matches != "1":
