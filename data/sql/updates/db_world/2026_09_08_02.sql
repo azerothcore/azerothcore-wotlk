@@ -1,3 +1,4 @@
+-- DB update 2026_09_08_01 -> 2026_09_08_02
 --
 -- Call to Arms banners stand on the wrong faction's side: both the Alterac Valley and
 -- Arathi Basin sets in Dalaran, and the Alterac Valley set in Shattrath, where #20539
