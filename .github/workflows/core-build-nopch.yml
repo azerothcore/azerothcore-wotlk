@@ -35,11 +35,53 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      # workflow_dispatch is a manual "run this now": always treat it as
+      # relevant rather than making a maintainer's explicit request depend on
+      # the changed-files filter.
+      relevant: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.relevant == 'true' }}
+    steps:
+      # paths-filter's token mode (no checkout, reads the changed-file list from
+      # the API) only works for pull_request: there's no such API for a push, so
+      # that case needs a real checkout to diff locally instead. workflow_dispatch
+      # has no base to diff against at all, so the filter step is skipped for it
+      # and the output above always reports relevant.
+      - uses: actions/checkout@v7
+        if: github.event_name == 'push'
+        with:
+          fetch-depth: 2
+      - uses: dorny/paths-filter@v3
+        id: filter
+        if: github.event_name != 'workflow_dispatch'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # every: a file only counts as excluded if it fails to match ALL
+          # patterns below. The default (some) treats the leading '**' alone
+          # as a match for every file, which made every PR "relevant"
+          # regardless of what actually changed.
+          predicate-quantifier: every
+          filters: |
+            relevant:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+              - '!.github/ISSUE_TEMPLATE/**'
+              - '!.github/FUNDING.yml'
+              - '!.github/labeler.yml'
+
   # Split out of the matrix so e2e can needs: this cell only (not gcc/clang-21).
   build-e2e:
     name: ubuntu-24.04-clang-18-nopch
+    needs: changes
     runs-on: ubuntu-24.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
@@ -73,7 +115,8 @@ jobs:
               CXX: clang++-21
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    needs: changes
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
@@ -84,12 +127,13 @@ jobs:
 
   e2e:
     name: e2e ${{ inputs.scope || 'full' }}
-    needs: build-e2e
+    needs: [changes, build-e2e]
     # Official PR, master push, and dispatch. Master re-runs full so flakes
     # and merge-base drift show up after squash, not only on the PR head.
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
+      && needs.changes.outputs.relevant == 'true'
       && needs.build-e2e.result == 'success'
       && (
         github.event_name == 'pull_request'
