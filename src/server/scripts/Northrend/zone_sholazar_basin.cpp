@@ -1157,8 +1157,7 @@ class spell_alystros_lapsing_dream_aura : public AuraScript
     {
         PreventDefaultAction();
 
-        // 51928 only carries area targets with an enemy check, so the generic trigger path lets the
-        // victim cast it and it finds nobody. sniffs have the debuff coming from Alystros himself
+        // default trigger makes the victim the caster, and 51928's area targets then find nobody
         if (Unit* caster = GetCaster())
             caster->AddAura(SPELL_LAPSING_DREAM_SLOW, GetTarget());
     }
