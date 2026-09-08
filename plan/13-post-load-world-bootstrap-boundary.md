@@ -9,10 +9,14 @@ trip can complete -- for reasons unrelated to the time-sync path itself. See [Pl
 which owns diagnosing and resolving that exit. This plan resumes once Plan 14 proves the client
 survives past the current post-map-insertion boundary.
 
-## Root cause of the missing `CMSG_TIME_SYNC_RESP` (2026-09-08)
+## Cinematic mode: a real confound, but NOT the cause (2026-09-08)
 
-The client was never failing on the time-sync path, and it was never stuck on a loading bar.
-It was parked in **cinematic mode**.
+**Tested and disproved as the cause.** Seeding `cinematic=1` does remove a genuine
+confound -- generation 77 sends zero `SMSG_TRIGGER_CINEMATIC` -- but the client's behaviour is
+byte-for-byte unchanged: the same 30 client packets, the same opcode set, and still zero
+`CMSG_TIME_SYNC_RESP`. Keep the fix (it removes a variable), but the stall is elsewhere.
+
+What was actually observed:
 
 Ordering the server's world-entry sends out of generation 76's `WorldServer.log` shows
 `SMSG_TRIGGER_CINEMATIC` immediately before `SMSG_LOGIN_VERIFY_WORLD`:
@@ -49,3 +53,28 @@ lead chased under that framing (opcode table values, `SMSG_COMPRESSED_UPDATE_OBJ
 `UpdateData::BuildPacket`, `OBJECT_UPDATE_TYPE`, `SMSG_LOGIN_VERIFY_WORLD` layout, the
 bit-packed movement create block) was verified correct against the pinned reference and none
 of them was the bug. The answer was in the ordered opcode log the whole time.
+
+## Generation 77 result and the correct observable
+
+Run on `27e8f3dd933f` with `cinematic=1`: state `observed`, `CMSG_TIME_SYNC_RESP` count **0**.
+Client packet set identical to generation 76.
+
+Two things worth carrying forward:
+
+- **`CMSG_LOADING_SCREEN_NOTIFY` is the log-based loading-screen observable** -- use it instead
+  of screenshots (see the `window.xwd` retraction in `client-automation.md`). The client sends
+  it when the screen is shown and again when it is dismissed, with the map id.
+- In generation 77 it appears **exactly once, and at character select** (immediately after
+  `SMSG_CHAR_ENUM`, before `CMSG_PLAYER_LOGIN`). After `CMSG_PLAYER_LOGIN` the client never
+  announces a world loading screen at all -- neither shown nor dismissed.
+
+Also ruled out this round, all verified byte-identical or equivalent against the pinned
+TrinityCore reference: opcode values for every packet actually sent during login (0 of 51 carry
+a Cata-absent value), `SMSG_COMPRESSED_UPDATE_OBJECT` (declared but never emitted; this fork has
+no compression path), `UpdateData::BuildPacket`, `OBJECT_UPDATE_TYPE`, `SMSG_LOGIN_VERIFY_WORLD`
+layout and opcode, the bit-packed movement create block, and the periodic `SendTimeSync` timer.
+All 6 `CMSG_GAMEOBJECT_QUERY` calls were answered. No `CMSG_TIME_SYNC_RESP_FAILED` is ever sent,
+so the client is not reporting a sync failure -- it simply never reaches the state that answers.
+
+The one still-unexplained client opcode is `0x1225`
+(`CMSG_GUILD_BANK_REMAINING_WITHDRAW_MONEY_QUERY`; ours is stale at `0x3FE`), sent twice.
