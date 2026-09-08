@@ -21,6 +21,10 @@ Read the matching doc(s) BEFORE starting the task:
 - Reviewing a changeset or PR → `.agents/docs/code-review.md`
 - Self-reviewing a changeset before submission → also `.agents/docs/self-review-rules.md`
 - Cataclysm conversion work for this fork → `.agents/docs/cataclysm-conversion-goal.md`
+  - Also `plan/conversion-roadmap.md` for where the conversion currently stands, and the
+    numbered `plan/NN-*.md` doc for the boundary you are working on.
+- Running the real 4.3.4 client against the server → `plan/client-automation.md` (harness
+  tools, wine/client settings, the exact invocation, and which failures are transient)
 - Touching a subsystem that has a doc in `.agents/docs/systems/` → read that doc too
 - Capturing a lesson or adding/updating agent docs → `.agents/docs/README.md`
 
