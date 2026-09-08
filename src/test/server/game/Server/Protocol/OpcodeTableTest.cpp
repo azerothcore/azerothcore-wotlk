@@ -34,10 +34,12 @@ TEST(OpcodeTableTest, KeepsDirectionsIndependent)
     EXPECT_EQ(table.GetOpcodeNameForLogging(serverOverlap), "[SMSG_GAMETIME_SET 0x0014 (20)]");
 
     ASSERT_NE(table[CMSG_GMTICKET_CREATE], nullptr);
-    EXPECT_EQ(table[CMSG_GMTICKET_CREATE], table[CMSG_ACCEPT_LEVEL_GRANT]);
+    ASSERT_NE(table[CMSG_ACCEPT_LEVEL_GRANT], nullptr);
+    EXPECT_NE(table[CMSG_GMTICKET_CREATE], table[CMSG_ACCEPT_LEVEL_GRANT]);
     EXPECT_STREQ(table[CMSG_GMTICKET_CREATE]->Name, "CMSG_GMTICKET_CREATE");
+    EXPECT_STREQ(table[CMSG_ACCEPT_LEVEL_GRANT]->Name, "CMSG_ACCEPT_LEVEL_GRANT");
 
-    EXPECT_EQ(table.GetOpcodeNameForLogging(MSG_MINIMAP_PING_SERVER), "[MSG_MINIMAP_PING 0x01D5 (469)]");
+    EXPECT_EQ(table.GetOpcodeNameForLogging(MSG_MINIMAP_PING_SERVER), "[MSG_MINIMAP_PING 0x6635 (26165)]");
 
     uint16 serverOnly = uint16(SMSG_AUTH_RESPONSE);
     EXPECT_NE(table.GetIncomingOpcode(serverOnly), nullptr);
