@@ -1,3 +1,4 @@
+-- DB update 2026_09_08_03 -> 2026_09_08_04
 -- Grunnda Wolfheart: vendor stock must not also drop as creature loot.
 DELETE FROM `creature_loot_template` WHERE `Entry` = 13218 AND `Item` IN (
     17348, 17349, 17351, 17352, 19029, 19031, 19046, 19083, 19085, 19087,
