@@ -739,6 +739,13 @@ public:
             me->SetCorpseDelay(0);
         }
 
+        enum SpikeEvents
+        {
+            EVENT_SPIKE_SPEED_2 = 1,
+            EVENT_SPIKE_SPEED_3,
+            EVENT_SPIKE_RESUME,
+        };
+
         EventMap events;
         ObjectGuid TargetGUID;
 
@@ -752,7 +759,7 @@ public:
                 me->RemoveAllAuras();
                 me->GetMotionMaster()->MoveIdle();
                 events.Reset();
-                events.RescheduleEvent(3, 4s);
+                events.RescheduleEvent(EVENT_SPIKE_RESUME, 4s);
             }
         }
 
@@ -775,6 +782,10 @@ public:
             {
                 events.Reset();
                 me->RemoveAllAuras();
+                // Start the pursuit even if everyone is currently immune, so acquisition can retry.
+                DoCastSelf(SPELL_SPIKE_SPEED1, true);
+                DoCastSelf(SPELL_SPIKE_TRAIL, true);
+                events.RescheduleEvent(EVENT_SPIKE_SPEED_2, 7s);
             }
             DoZoneInCombat();
             DoResetThreatList();
@@ -783,12 +794,6 @@ public:
                 return DefaultTargetSelector(me, 250.0f, true, true, 0)(candidate) && CanPursue(candidate);
             }))
             {
-                if (!next)
-                {
-                    me->CastSpell(me, SPELL_SPIKE_SPEED1, true);
-                    me->CastSpell(me, SPELL_SPIKE_TRAIL, true);
-                    events.RescheduleEvent(1, 7s);
-                }
                 TargetGUID = target->GetGUID();
                 me->CastSpell(target, SPELL_MARK, true);
                 Talk(EMOTE_SPIKE, target);
@@ -820,16 +825,16 @@ public:
             {
                 case 0:
                     break;
-                case 1:
+                case EVENT_SPIKE_SPEED_2:
                     me->CastSpell(me, SPELL_SPIKE_SPEED2, true);
 
-                    events.RescheduleEvent(2, 7s);
+                    events.RescheduleEvent(EVENT_SPIKE_SPEED_3, 7s);
                     break;
-                case 2:
+                case EVENT_SPIKE_SPEED_3:
                     me->CastSpell(me, SPELL_SPIKE_SPEED3, true);
 
                     break;
-                case 3:
+                case EVENT_SPIKE_RESUME:
                     Reset();
                     break;
             }

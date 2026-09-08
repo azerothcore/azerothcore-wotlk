@@ -71,14 +71,22 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 	}{
 		{"hand_of_protection", protection},
 		{"divine_shield", shield},
+		{"initially_immune", shield},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			for _, bot := range bots {
 				selectSpikeUnit(t, bot, bot.GUID)
 				bot.GM(t, ".combatstop")
 				bot.GM(t, ".unaura all")
+				bot.GM(t, ".cooldown")
 				bot.GM(t, ".modify hp 1000000")
 				bot.FlushWorld(t)
+			}
+			if tc.name == "initially_immune" {
+				for _, bot := range bots {
+					bot.CastMust(t, shield, bot.GUID, 5*time.Second)
+					bot.WaitUnitAura(t, bot.GUID, shield, 2*time.Second)
+				}
 			}
 			selectSpikeUnit(t, a, caster)
 			// Same spell as EVENT_SPELL_SUMMON_SPIKE. No "triggered" suffix:
@@ -90,6 +98,22 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 				selectSpikeUnit(t, a, spike)
 				a.GM(t, ".npc delete")
 			})
+			if tc.name == "initially_immune" {
+				a.WaitUnitAura(t, spike, speed2, 8*time.Second)
+				a.AssertHasAura(t, shield)
+				b.AssertHasAura(t, shield)
+				if a.UnitTarget(spike) != 0 || a.HasAura(mark) || b.HasAura(mark) {
+					e2eharness.ConfirmedBugf(t, 14076, "spike selected a fully immune player on initial acquisition")
+				}
+				a.CancelAura(t, shield)
+				if !waitSpikeCondition(3*time.Second, func() bool {
+					return a.HasAura(mark) && a.UnitTarget(spike) == a.GUID && a.UnitHasAura(spike, speed2)
+				}) {
+					e2eharness.ConfirmedBugf(t, 14076, "spike stalled after all players were immune on initial acquisition")
+				}
+				t.Log("PASS: initially all immune -> acquisition resumes without resetting acceleration")
+				return
+			}
 			if !waitSpikeCondition(3*time.Second, func() bool { return a.HasAura(mark) != b.HasAura(mark) }) {
 				e2eharness.Preconditionf(t, "expected exactly one marked player")
 			}

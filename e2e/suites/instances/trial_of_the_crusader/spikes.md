@@ -19,6 +19,8 @@ Oracles:
 - Divine Shield (642): release the fully immune player and mark the other player.
   If both players become fully immune, clear the target, continue accelerating,
   and reacquire the first player after they cancel their shield without resetting speed.
+- Initially immune: summon while both players have Divine Shield, then cancel one
+  shield and verify acquisition resumes at the accelerated speed.
 
 The [issue discussion](https://github.com/azerothcore/azerothcore-wotlk/issues/14076#issuecomment-1345338310)
 distinguishes Hand of Protection from Divine Shield, Ice Block and threat-dropping
@@ -36,3 +38,8 @@ Manual encounter checks still needed: Ice Block, Feign Death, Vanish, target dea
 and disconnect; Permafrost collision's four-second pause and speed restart; normal
 boss submerge/emerge cleanup. No change to Permafrost/Hand of Freedom (#16496) is
 included. PR #19684 was merged independently in August 2024.
+
+The TC9 gateway sometimes performs a second instance transfer during fixture setup
+when repeating the entire test in one process; this produces a setup failure before
+spike summoning. Reproduction succeeded in a complete single run. Stock-core CI and
+repeatability on the patched binary remain to be checked.
