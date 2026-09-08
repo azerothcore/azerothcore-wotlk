@@ -77,9 +77,37 @@ was a real observed failure.
 Each run captures `window.xwd` (a raw X window dump) plus `window.xprop` into
 `evidence/raw/`. The `.xwd` can be decoded without any external tool — parse the big-endian
 header for width/height/`bytes_per_line`/`ncolors`, skip `header_size + ncolors * 12`, then
-reorder BGRX to RGB. This is how loading-screen progress has been measured objectively
-(comparing progress-bar fill against its track) instead of relying on someone watching the
-screen.
+reorder BGRX to RGB.
+
+### `window.xwd` does NOT contain the client's rendering — do not draw conclusions from it
+
+**The pixels in `window.xwd` are not WoW's.** `xprop` correctly identifies the window (right
+PID, `WM_NAME = World of Warcraft`, right 1800x1042 geometry) and the dump has that geometry,
+but the *content* is whatever was in the screen framebuffer underneath — in practice one of
+the user's terminals. The client renders through DXVK, and a Vulkan swapchain cannot be read
+back by `XGetImage`/`xwd`; X has no backing store for it.
+
+The proof is decisive and cost nothing to obtain:
+
+```
+md5sum generation-*/evidence/raw/window.xwd | awk '{print $1}' | sort | uniq -c | sort -rn
+     28 fa666c87577c64e834f029c6135795a5
+     20 f9775d8eaa52a354363c079dace7250b
+```
+
+28 runs produced *byte-identical* dumps, and another 20 produced a different byte-identical
+dump — across generations whose outcomes ranged from auth failure to full world entry. A real
+screenshot of a live 3D client cannot repeat byte-for-byte.
+
+Consequences:
+
+- Any earlier claim that the loading bar was measured at "90%" or "99%" from this file is an
+  artifact. That framing is **not evidence-backed** and should not be used to direct
+  debugging.
+- Use the server log as the observable instead. The opcode stream tells you exactly how far
+  the client got, and it cannot be faked by a stale framebuffer.
+- If a real screenshot is ever needed, it must come from inside the client (DXVK's own
+  `DXVK_HUD`/screenshot path, or the client's `Screenshots/` folder) — not from X.
 
 ## Tools and settings a run depends on
 
