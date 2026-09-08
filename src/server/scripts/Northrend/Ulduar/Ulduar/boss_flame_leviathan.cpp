@@ -1239,7 +1239,7 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
     npc_storm_beacon_spawn(Creature* c) : NullCreatureAI(c)
     {
         _amount = 0;
-        _checkTimer = 2000;
+        _checkTimer = 0;
     }
 
     uint8 _amount;
@@ -1247,25 +1247,17 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
 
     void UpdateAI(uint32 diff) override
     {
-        _checkTimer += diff;
-        if (_checkTimer >= 4000)
+        if (_amount < 40)
         {
-            _checkTimer = 0;
-            if (_amount < 30)
+            _checkTimer += diff;
+            if (_checkTimer >= 4000)
             {
+                _checkTimer = 0;
                 if (Unit* target = me->SelectNearestTarget(80.0f))
                 {
-                    uint8 toSpawn = std::min<uint8>(2, 30 - _amount);
-                    for (uint8 i = 0; i < toSpawn; ++i)
-                    {
-                        ++_amount;
-                        if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED,
-                            me->GetPositionX() + frand(-3.0f, 3.0f),
-                            me->GetPositionY() + frand(-3.0f, 3.0f),
-                            me->GetPositionZ() + 1.0f, me->GetOrientation(),
-                            TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
-                            cr->AI()->AttackStart(target);
-                    }
+                    ++_amount;
+                    if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 4, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
+                        cr->AI()->AttackStart(target);
                 }
             }
         }
