@@ -756,12 +756,21 @@ public:
             }
         }
 
+        bool CanPursue(Unit* target) const
+        {
+            // Physical immunity (Hand of Protection) does not break pursuit, but full immunity does.
+            return target && me->IsValidAttackTarget(target) && !target->HasAuraType(SPELL_AURA_FEIGN_DEATH)
+                && !target->HasSchoolImmunityForMask(SPELL_SCHOOL_MASK_ALL, me, nullptr);
+        }
+
         void SelectNewTarget(bool next)
         {
             if (TargetGUID)
                 if (Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID))
                     target->RemoveAura(SPELL_MARK);
             TargetGUID.Clear();
+            me->AttackStop();
+            me->GetMotionMaster()->MoveIdle();
             if (!next)
             {
                 events.Reset();
@@ -769,7 +778,10 @@ public:
             }
             DoZoneInCombat();
             DoResetThreatList();
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* candidate)
+            {
+                return DefaultTargetSelector(me, 250.0f, true, true, 0)(candidate) && CanPursue(candidate);
+            }))
             {
                 if (!next)
                 {
@@ -792,14 +804,14 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (TargetGUID)
+            // Keep searching if no eligible player remains. The trail is removed during the Permafrost pause.
+            if (TargetGUID || me->HasAura(SPELL_SPIKE_TRAIL))
             {
                 Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID);
-                if (!target || !target->HasAura(SPELL_MARK) || !me->IsValidAttackTarget(target) || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE || !me->HasUnitState(UNIT_STATE_CHASE_MOVE))
-                {
+                // Reaching the marked player clears CHASE_MOVE; that is not a reason to abandon pursuit.
+                if (!CanPursue(target) || !target->HasAura(SPELL_MARK) || me->GetVictim() != target
+                    || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
                     SelectNewTarget(true);
-                    return;
-                }
             }
 
             events.Update(diff);

@@ -141,6 +141,7 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 | combat/death | die → ghost → release → reclaim | P1 | covered | — |
 | combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
+| instances/trial_of_the_crusader | spike retains protected target on arrival; full immunity releases target; reacquire without speed reset | P1 | covered (`TestAC_14076_PursuingSpikesImmunity`); [scope and validation](suites/instances/trial_of_the_crusader/spikes.md) | #14076 |
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
 | spells/aura | apply/query; CC broken by damage; mount persist | P1 | covered (`TestAC_26130_*`) | #26130 |
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
