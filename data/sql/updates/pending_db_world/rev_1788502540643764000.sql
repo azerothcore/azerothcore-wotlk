@@ -1,16 +1,16 @@
--- Deadly Gladiator is missing from all four lower PvP title achievements.
--- Add alternatives; retain the existing Season 6-8 and lower-rank criteria.
-DELETE FROM `achievement_criteria_dbc` WHERE `ID` IN (20000, 20001, 20002, 20003);
-INSERT INTO `achievement_criteria_dbc` (`ID`, `Achievement_Id`, `Type`, `Quantity`,
-    `Description_Lang_enUS`, `Flags`, `Ui_Order`) VALUES
-    (20000, 2090, 74, 1, 'Deadly Gladiator', 2, 8),
-    (20001, 2091, 74, 1, 'Deadly Gladiator', 2, 5),
-    (20002, 2092, 74, 1, 'Deadly Gladiator', 2, 6),
-    (20003, 2093, 74, 1, 'Deadly Gladiator', 2, 7);
-
-DELETE FROM `achievement_criteria_data` WHERE `criteria_id` IN (20000, 20001, 20002, 20003);
-INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
-    (20000, 23, 157, 0, ''),
-    (20001, 23, 157, 0, ''),
-    (20002, 23, 157, 0, ''),
-    (20003, 23, 157, 0, '');
+-- Match the existing PvP title criteria to their 3.3.5a client descriptions.
+-- Deadly Gladiator has title 157; Wrathful has no criterion in these achievements.
+-- Gladiator
+UPDATE `achievement_criteria_data` SET `value1` = 42 WHERE `type` = 23 AND `criteria_id` IN (7416, 9718, 9721);
+-- Duelist
+UPDATE `achievement_criteria_data` SET `value1` = 43 WHERE `type` = 23 AND `criteria_id` IN (7415, 9720);
+-- Rival
+UPDATE `achievement_criteria_data` SET `value1` = 44 WHERE `type` = 23 AND `criteria_id` IN (7418, 9719);
+-- Challenger
+UPDATE `achievement_criteria_data` SET `value1` = 45 WHERE `type` = 23 AND `criteria_id` IN (7408);
+-- Deadly Gladiator
+UPDATE `achievement_criteria_data` SET `value1` = 157 WHERE `type` = 23 AND `criteria_id` IN (10878, 10879, 10881, 13001);
+-- Furious Gladiator
+UPDATE `achievement_criteria_data` SET `value1` = 167 WHERE `type` = 23 AND `criteria_id` IN (12999, 13002, 13006);
+-- Relentless Gladiator
+UPDATE `achievement_criteria_data` SET `value1` = 169 WHERE `type` = 23 AND `criteria_id` IN (13000, 13003, 13005);
