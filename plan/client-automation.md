@@ -81,6 +81,70 @@ reorder BGRX to RGB. This is how loading-screen progress has been measured objec
 (comparing progress-bar fill against its track) instead of relying on someone watching the
 screen.
 
+## Tools and settings a run depends on
+
+Everything below is read out of `run_real_client_authentication.py`, not remembered. If a run
+fails to even start, check this list before anything else — the failures it causes look like
+unrelated client bugs.
+
+### External binaries invoked
+
+| Tool | Used for |
+| --- | --- |
+| `docker` | one MySQL container per generation (`acore-cata-plan13-<hash>-g<N>-mysql`) |
+| `mysql` | schema creation, realmlist seeding, migration application |
+| `wine` | launching the client through the GE-Proton runner |
+| `wmctrl` | window discovery (`-lpGx`) and activation (`-i -a`) |
+| `xprop` | reading `_NET_ACTIVE_WINDOW` back to verify focus |
+| `xwd` | window dump into `evidence/raw/window.xwd` |
+
+The harness itself is pure stdlib Python — no `python-xlib`, no `xdotool`. `python-xlib` is
+only needed for the ad-hoc focus probe described above, not for a run.
+
+### Wine environment
+
+```
+WINEPREFIX        = <generation>/wine-prefix   (isolated per generation, never the user's)
+WINEARCH          = win64
+WINEDLLOVERRIDES  = d3d9=n,b                   (native d3d9 -> DXVK)
+WINEDEBUG         = +seh
+DISPLAY           = :0                         (--display)
+XAUTHORITY        = /home/trolloks/.Xauthority (--xauthority)
+```
+
+Runner: `--wine-runner /home/trolloks/.var/app/com.usebottles.bottles/data/bottles/runners/ge-proton11-1/files`.
+DXVK comes from the personal bottle passed via `--personal-bottle`; the prefix is isolated but
+seeded from it, so the bottle must still exist.
+
+### Client configuration written by `prepare`
+
+`WTF/Config.wtf` is rewritten wholesale:
+
+```
+SET locale "enUS"        SET realmlist "127.0.0.1"   SET patchlist "127.0.0.1"
+SET readTOS "1"          SET readEULA "1"
+SET movie "0"            SET playIntroMovie "0"      SET accounttype "CT"
+SET gxWindow "1"         SET gxMaximize "0"
+```
+
+`gxWindow "1"` / `gxMaximize "0"` are load-bearing: a fullscreen or maximised client cannot be
+activated reliably by `wmctrl`, and `window.xwd` of a fullscreen window is useless for
+measuring the loading bar. `movie`/`playIntroMovie` are belt-and-braces alongside the
+`MovieProxy.exe` Escape loop.
+
+`Data/enUS/realmlist.wtf` is also written (`set realmlist 127.0.0.1`); the client reads
+whichever it finds first, so both are set.
+
+### Run parameters that matter
+
+`--auto-login --stability-seconds 8 --timeout 110`. `--timeout` is the whole-run budget and
+`--stability-seconds` is how long the session must stay up after world entry before the run is
+recorded as `observed`. Raising `--timeout` does not help a loading-screen hang: the client is
+already responsive and answering opcodes, it just never clears terrain.
+
+`--mode in-world-control-bootstrap` is the mode that seeds a character and drives it to world
+entry, as opposed to the auth-only modes.
+
 ## The exact harness invocation
 
 Recovering these arguments from scratch is slow and they are not stored anywhere the
