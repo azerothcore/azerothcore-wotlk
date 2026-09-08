@@ -985,9 +985,11 @@ void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
     // serverTime = clockDelta + clientTime
 
     int64 clockDelta = (int64)serverTimeAtSent + (int64)lagDelay - (int64)clientTimestamp;
+    bool firstResponse = _timeSyncClockDeltaQueue.empty();
     _timeSyncClockDeltaQueue.put(std::pair<int64, uint32>(clockDelta, roundTripDuration));
     ComputeNewClockDelta();
-    LOG_INFO("network", "Resolved client time sync response, first in-world control liveness signal");
+    if (firstResponse)
+        LOG_INFO("network", "Resolved client time sync response, first in-world control liveness signal");
 }
 
 void WorldSession::ComputeNewClockDelta()
