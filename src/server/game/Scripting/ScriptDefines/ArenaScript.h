@@ -22,6 +22,8 @@
 #include "ScriptObject.h"
 #include <vector>
 
+struct ArenaTeamMember;
+
 enum ArenaHook
 {
     ARENAHOOK_CAN_ADD_MEMBER,
@@ -31,6 +33,7 @@ enum ArenaHook
     ARENAHOOK_ON_ARENA_START,
     ARENAHOOK_ON_BEFORE_TEAM_MEMBER_UPDATE,
     ARENAHOOK_CAN_SAVE_ARENA_STATS_FOR_MEMBER,
+    ARENAHOOK_ON_ADD_MEMBER,
     ARENAHOOK_END
 };
 
@@ -57,6 +60,14 @@ public:
     [[nodiscard]] virtual bool OnBeforeArenaTeamMemberUpdate(ArenaTeam* /*team*/, Player* /*player*/, bool /*won*/, uint32 /*opponentMatchmakerRating*/, int32 /*matchmakerChange*/) { return false; }
 
     [[nodiscard]] virtual bool CanSaveArenaStatsForMember(ArenaTeam* /*team*/, ObjectGuid /*playerGuid*/) { return true; }
+
+    // Called with the fully built member right before it is added to the team and written to
+    // arena_team_member. The personal rating and the week/season counters left on the struct are
+    // what the team holds and what is stored. MatchMakerRating and MaxMMR are held in memory but
+    // not written here, only by the next ArenaTeam::SaveToDB; Guid, Name and Class are identity,
+    // and changing them desyncs the member from its row and the character cache.
+    // Cannot veto the join, CanAddMember does that.
+    virtual void OnAddMember(ArenaTeam* /*team*/, ArenaTeamMember& /*member*/) { }
 };
 
 #endif

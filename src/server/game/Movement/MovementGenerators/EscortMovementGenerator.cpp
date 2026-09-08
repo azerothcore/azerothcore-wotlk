@@ -40,6 +40,8 @@ void EscortMovementGenerator<T>::DoInitialize(T* unit)
         init.SetWalk(true);
     else if (_forcedMovement == FORCED_MOVEMENT_RUN)
         init.SetWalk(false);
+    else if (_forcedMovement == FORCED_MOVEMENT_FLY)
+        init.SetFly();
 
     init.Launch();
 
@@ -88,6 +90,8 @@ bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32  /*diff*/)
             init.SetWalk(true);
         else if (_forcedMovement == FORCED_MOVEMENT_RUN)
             init.SetWalk(false);
+        else if (_forcedMovement == FORCED_MOVEMENT_FLY)
+            init.SetFly();
 
         init.Launch();
         // Xinef: Override spline Id on recalculate launch

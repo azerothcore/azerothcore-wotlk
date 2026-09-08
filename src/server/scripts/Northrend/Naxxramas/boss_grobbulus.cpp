@@ -189,7 +189,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer())
+            if (who->IsPlayer() && me->GetInstanceScript()->GetBossState(BOSS_GROBBULUS) == IN_PROGRESS)
                 me->GetInstanceScript()->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 

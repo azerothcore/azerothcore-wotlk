@@ -287,7 +287,7 @@ struct npc_batrider : public CreatureAI
             _mode = BATRIDER_MODE_BOSS;
 
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
 
             me->SetReactState(REACT_PASSIVE);
