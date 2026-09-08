@@ -153,12 +153,22 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 | items/equip | visible-item slot after EquipEntry; additem; survives relog | P2 | covered | — |
 | protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked-harness` (extra_flags after relog) | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
+| pvp/isle_of_conquest | Initial objective/gate icons clear stale states while preserving the current match | P3 | blocked-harness: no battleground queue/entry API (`CMSG_BATTLEMASTER_JOIN`, `CMSG_BATTLEFIELD_PORT`); packet-builder unit tests in `BattlegroundICWorldStatesTest` | #24438 |
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
 | instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
 
 ---
+
+### Isle of Conquest #24438: manual validation pending
+
+On a dedicated test realm, capture objectives and destroy gates, then enter a fresh
+Isle of Conquest match without restarting the client. Before anyone captures a base,
+verify the five field objectives are neutral, each keep belongs to its starting faction,
+and all gates appear intact. Also join an ongoing match with contested/captured bases
+and destroyed gates and verify that its actual state is displayed. Repeat for both factions.
+The unit tests check the initial packet contents, not the client's rendering or queue flow.
 
 ## Parallelism and isolation
 

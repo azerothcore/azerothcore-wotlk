@@ -923,6 +923,8 @@ public:
     bool IsResourceGlutAllowed(TeamId teamId) const;
     void DoAction(uint32 action, ObjectGuid guid) override;
 private:
+    friend class BattlegroundICWorldStatesTest;
+
     uint32 closeFortressDoorsTimer;
     bool doorsClosed;
     uint32 docksTimer;
