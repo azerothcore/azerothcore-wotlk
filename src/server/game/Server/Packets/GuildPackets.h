@@ -427,7 +427,8 @@ namespace WorldPackets
         class GuildBankRemainingWithdrawMoneyQuery final : public ClientPacket
         {
         public:
-            GuildBankRemainingWithdrawMoneyQuery(WorldPacket&& packet) : ClientPacket(MSG_GUILD_BANK_MONEY_WITHDRAWN, std::move(packet)) { }
+            GuildBankRemainingWithdrawMoneyQuery(WorldPacket&& packet)
+                : ClientPacket(CMSG_GUILD_BANK_REMAINING_WITHDRAW_MONEY_QUERY, std::move(packet)) { }
 
             void Read() override { }
         };
@@ -435,11 +436,11 @@ namespace WorldPackets
         class GuildBankRemainingWithdrawMoney final : public ServerPacket
         {
         public:
-            GuildBankRemainingWithdrawMoney() : ServerPacket(MSG_GUILD_BANK_MONEY_WITHDRAWN_SERVER, 8) { }
+            GuildBankRemainingWithdrawMoney() : ServerPacket(SMSG_GUILD_BANK_MONEY_WITHDRAWN, 8) { }
 
             WorldPacket const* Write() override;
 
-            int32 RemainingWithdrawMoney = 0;
+            int64 RemainingWithdrawMoney = 0;
         };
 
         class GuildBankWithdrawMoney final : public ClientPacket

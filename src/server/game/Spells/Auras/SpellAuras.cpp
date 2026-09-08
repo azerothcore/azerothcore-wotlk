@@ -206,7 +206,7 @@ void AuraApplication::BuildUpdatePacket(ByteBuffer& data, bool remove) const
     if (!IsSelfcasted() && aura->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_AURA)
         flags &= ~AFLAG_POSITIVE;
 
-    data << uint8(flags);
+    data << uint16(flags);
     data << uint8(aura->GetCasterLevel());
     // send stack amount for aura which could be stacked (never 0 - causes incorrect display) or charges
     // stack amount has priority over charges (checked on retail with spell 50262)

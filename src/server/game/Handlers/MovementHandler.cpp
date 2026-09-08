@@ -793,8 +793,28 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 
+    // Cata bit-packs this GUID (8 presence bits in a fixed order, then the byte sequence
+    // in a different fixed order), where WotLK sent a plain 8-byte GUID. Reading it the
+    // old way yields a garbage mover GUID. Order taken from the pinned TrinityCore
+    // reference, WorldPackets::Movement::SetActiveMover::Read.
     ObjectGuid guid;
-    recvData >> guid;
+    guid[7] = recvData.ReadBit();
+    guid[2] = recvData.ReadBit();
+    guid[1] = recvData.ReadBit();
+    guid[0] = recvData.ReadBit();
+    guid[4] = recvData.ReadBit();
+    guid[5] = recvData.ReadBit();
+    guid[6] = recvData.ReadBit();
+    guid[3] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(guid[3]);
+    recvData.ReadByteSeq(guid[2]);
+    recvData.ReadByteSeq(guid[4]);
+    recvData.ReadByteSeq(guid[0]);
+    recvData.ReadByteSeq(guid[5]);
+    recvData.ReadByteSeq(guid[1]);
+    recvData.ReadByteSeq(guid[6]);
+    recvData.ReadByteSeq(guid[7]);
 
     if (GetPlayer()->IsInWorld() && _player->m_mover && _player->m_mover->IsInWorld())
     {

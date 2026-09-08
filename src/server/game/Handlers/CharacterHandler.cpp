@@ -1054,6 +1054,19 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
                 chH.PSendSysMessage("{}", newCharString);
         }
     }
+    // The client must know which map and position it is entering before it receives any
+    // object updates for that map. TrinityCore appears to send SMSG_LOGIN_VERIFY_WORLD
+    // after AddPlayerToMap, but there object updates only accumulate and are flushed at
+    // end of tick, so verify-world still reaches the wire first. AzerothCore flushes them
+    // inline during AddPlayerToMap, which inverted the order. A confirmed-working 4.3.4
+    // capture shows LOGIN_VERIFY_WORLD immediately before the first SMSG_UPDATE_OBJECT.
+    // The instance-login failure path below teleports, which sends its own verify-world
+    // for the corrected destination.
+    WorldPackets::Character::LoginVerifyWorld loginVerifyWorld;
+    loginVerifyWorld.MapID = pCurrChar->GetMapId();
+    loginVerifyWorld.Pos = pCurrChar->GetPosition();
+    SendPacket(loginVerifyWorld.Write());
+
     LOG_INFO("network", "Adding to map");
     // Xinef: moved this from below
     ObjectAccessor::AddObject(pCurrChar);
@@ -1075,14 +1088,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         // Probably a hackfix, but currently the best workaround to prevent character names showing as Unknown after teleport out from instances at login.
         pCurrChar->GetSession()->SendNameQueryOpcode(pCurrChar->GetGUID());
     }
-
-    // Pinned Cataclysm sends SMSG_LOGIN_VERIFY_WORLD only after AddPlayerToMap, using
-    // wherever the player actually ended up (original position, or the teleport-out
-    // fallback above). It does not belong in SendInitialPacketsBeforeAddToMap.
-    WorldPackets::Character::LoginVerifyWorld loginVerifyWorld;
-    loginVerifyWorld.MapID = pCurrChar->GetMapId();
-    loginVerifyWorld.Pos = pCurrChar->GetPosition();
-    SendPacket(loginVerifyWorld.Write());
 
     LOG_INFO("network", "Finished sending initial packets after going to map");
     pCurrChar->SendInitialPacketsAfterAddToMap();

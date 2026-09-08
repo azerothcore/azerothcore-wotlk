@@ -837,7 +837,7 @@ void OpcodeTable::Initialize()
     /*0x2401*/ DEFINE_HANDLER(CMSG_DB_QUERY_BULK,                                                   STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x730E*/ DEFINE_HANDLER(CMSG_SAVE_CUF_PROFILES,                                               STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x7102*/ DEFINE_HANDLER(CMSG_REQUEST_CATEGORY_COOLDOWNS,                                      STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
-    /*0x0412*/ DEFINE_HANDLER(CMSG_LFG_LOCK_INFO_REQUEST,                                           STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x0412*/ DEFINE_HANDLER(CMSG_LFG_LOCK_INFO_REQUEST,                                           STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLfgPlayerLockInfoRequestOpcode     );
     /*0x4B25*/ DEFINE_HANDLER(CMSG_PET_CANCEL_AURA,                                                  STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandlePetCancelAuraOpcode                );
     /*0x026C*/ DEFINE_HANDLER(CMSG_PLAYER_AI_CHEAT,                                                  STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x6C35*/ DEFINE_HANDLER(CMSG_CANCEL_AUTO_REPEAT_SPELL,                                         STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleCancelAutoRepeatSpellOpcode        );
@@ -1120,7 +1120,6 @@ void OpcodeTable::Initialize()
     /*0x036B*/ DEFINE_HANDLER(CMSG_LFG_SET_NEEDS,                                                    STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x04B3*/ DEFINE_HANDLER(CMSG_LFG_SET_BOOT_VOTE,                                                STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLfgSetBootVoteOpcode               );
     /*0x0F05*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LFG_BOOT_PROPOSAL_UPDATE,                           STATUS_NEVER);
-    /*0x036E*/ DEFINE_HANDLER(CMSG_LFD_PLAYER_LOCK_INFO_REQUEST,                                     STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLfgPlayerLockInfoRequestOpcode     );
     /*0x4B36*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LFG_PLAYER_INFO,                                    STATUS_NEVER);
     /*0x2482*/ DEFINE_HANDLER(CMSG_LFG_TELEPORT,                                                     STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLfgTeleportOpcode                  );
     /*0x0371*/ DEFINE_HANDLER(CMSG_LFD_PARTY_LOCK_INFO_REQUEST,                                      STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleLfgPartyLockInfoRequestOpcode      );
@@ -1278,8 +1277,10 @@ void OpcodeTable::Initialize()
     /*0x6225*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_VOICESESSION_FULL,                                  STATUS_NEVER);
     /*0x03FD*/ DEFINE_HANDLER(MSG_GUILD_PERMISSIONS,                                                 STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGuildPermissions                   );
     DEFINE_BIDIRECTIONAL_OPCODE(MSG_GUILD_PERMISSIONS, MSG_GUILD_PERMISSIONS, MSG_GUILD_PERMISSIONS_SERVER);
-    /*0x03FE*/ DEFINE_HANDLER(MSG_GUILD_BANK_MONEY_WITHDRAWN,                                        STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGuildBankMoneyWithdrawn            );
-    DEFINE_BIDIRECTIONAL_OPCODE(MSG_GUILD_BANK_MONEY_WITHDRAWN, MSG_GUILD_BANK_MONEY_WITHDRAWN, MSG_GUILD_BANK_MONEY_WITHDRAWN_SERVER);
+    DEFINE_HANDLER(CMSG_GUILD_BANK_REMAINING_WITHDRAW_MONEY_QUERY, STATUS_LOGGEDIN, PROCESS_THREADUNSAFE,
+        &WorldSession::HandleGuildBankMoneyWithdrawn);
+    DEFINE_SERVER_OPCODE_HANDLER(SMSG_GUILD_BANK_MONEY_WITHDRAWN, STATUS_NEVER);
+    DEFINE_HANDLER(CMSG_GUILD_SET_ACHIEVEMENT_TRACKING, STATUS_UNHANDLED, PROCESS_INPLACE, &WorldSession::Handle_NULL);
     /*0x03FF*/ DEFINE_HANDLER(MSG_GUILD_EVENT_LOG_QUERY,                                             STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleGuildEventLogQueryOpcode           );
     DEFINE_BIDIRECTIONAL_OPCODE(MSG_GUILD_EVENT_LOG_QUERY, MSG_GUILD_EVENT_LOG_QUERY, MSG_GUILD_EVENT_LOG_QUERY_SERVER);
     /*0x0400*/ DEFINE_HANDLER(CMSG_MAELSTROM_RENAME_GUILD,                                           STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
