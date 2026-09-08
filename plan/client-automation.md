@@ -114,6 +114,55 @@ python3 apps/cata/run_real_client_authentication.py run --manifest "$M" \
 `var/build-plan7` is the build tree the harness uses — not `var/build`, which is not
 configured, nor `var/build-mysql-isolated`, which has no CMake cache.
 
+## Retrying a failed run — do not reset and re-prepare
+
+`run` accepts a generation already in `failed`/`inconclusive` state: it clears the raw
+evidence and client `Logs`, flips the state back to `prepared`, and proceeds. So a run that
+died on a transient environmental failure is retried by re-issuing the *same* `run` command
+and nothing else.
+
+`prepare` takes several minutes even with the database cache restored. Resetting and
+re-preparing after a transient run failure throws that time away for no benefit.
+
+### `owned WoW window did not receive focus` is transient — just re-run
+
+Measured with an Xlib probe (`get_input_focus()` plus `_NET_ACTIVE_WINDOW`) sampled once a
+second across several runs: for roughly the first **two seconds** after the WoW window is
+mapped, the window manager reports `_NET_ACTIVE_WINDOW = 0x0` *and* X reports an input focus
+of `0` — no window is focused at all. Activation requests issued inside that gap are simply
+dropped, and the 5s deadline in `run_auto_login()` can expire against it. Once the gap
+closes, focus lands on the WoW window and stays there for the rest of the run:
+
+```
+58:35 NET_ACTIVE=0x0       FOCUS=int:0                          WOW=0x08600003
+58:36 NET_ACTIVE=0x8600003 FOCUS=0x8600003(World of Warcraft)   WOW=0x08600003
+```
+
+Consequences worth remembering:
+
+- This is **not** caused by the user touching the desktop, and not by the screensaver — it
+  reproduced with the machine untouched, the monitor on, and
+  `org.cinnamon.ScreenSaver.GetActive` returning `false`. Do not go hunting for a lock screen.
+- Three consecutive focus failures followed by a clean `observed` run, with no code or
+  environment change in between, is the normal shape of this. Re-run rather than diagnose.
+- Do **not** "fix" it by typing without verified focus. The verification is the safety
+  property that stops synthetic credentials from being typed into an unrelated window; the
+  correct remedy for the race is a retry, not a weaker check.
+
+## Building before a run
+
+`prepare` refuses binaries whose `--version` does not report the current HEAD, so a build is
+required first. Two things about `var/build-plan7` that will otherwise cost time:
+
+- Its CMake cache points `MYSQL_INCLUDE_DIR`/`MYSQL_LIBRARY` at `/tmp/mysql-dev`, a staging
+  tree that does not survive a reboot. Repopulate it without root via
+  `apt-get download libmysqlclient-dev libmysqlclient21` and `dpkg-deb -x` into
+  `/tmp/mysql-dev`. MariaDB's headers (`/usr/include/mariadb`) are *not* a substitute — they
+  lack `mysql_ssl_mode` and `mysql_stmt_bind_named_param`, and linking against them trips the
+  `ACE00046` client/compile version assertion at startup.
+- `mysql_com.h` includes `"mysql/udf_registration_types.h"`, so the include root needs a
+  self-referential `mysql -> .` symlink inside it.
+
 ## Reading opcodes back out of a run
 
 `GetOpcodeNameForLogging` emits a bracketed form, so grep for the bracket or you will get
