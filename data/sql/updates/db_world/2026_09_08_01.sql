@@ -1,3 +1,4 @@
+-- DB update 2026_09_08_00 -> 2026_09_08_01
 -- Ulduar: make the left riverside Forest Swarmers patrol with their Guardian Lasher.
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0
 WHERE `id` = 33431 AND `guid` BETWEEN 136611 AND 136620;
