@@ -1,3 +1,4 @@
+-- DB update 2026_09_08_07 -> 2026_09_08_08
 -- Gnomeregan: place players on the floor when entering through the main entrance.
 UPDATE `areatrigger_teleport` SET
     `target_position_x` = -329.098,
