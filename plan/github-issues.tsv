@@ -11,7 +11,7 @@ plan	issue	state	title	url
 10	20	closed	Plan 10: select the enumerated build 15595 character	https://github.com/trolloks/azerothcore-cata/issues/20
 11	25	closed	Plan 11: build 15595 initial post-load packet contract	https://github.com/trolloks/azerothcore-cata/issues/25
 12	26	closed	Plan 12: build 15595 map insertion and object bootstrap	https://github.com/trolloks/azerothcore-cata/issues/26
-13	27	open	Plan 13: build 15595 in-world control bootstrap	https://github.com/trolloks/azerothcore-cata/issues/27
+13	27	closed	Plan 13: build 15595 in-world control bootstrap	https://github.com/trolloks/azerothcore-cata/issues/27
 14	32	closed	Plan 14: build 15595 post-map-insertion client survival	https://github.com/trolloks/azerothcore-cata/issues/32
 15	33	open	Plan 15: build 15595 basic movement packet contract	https://github.com/trolloks/azerothcore-cata/issues/33
 16	34	open	Plan 16: build 15595 movement acknowledgement and speed contract	https://github.com/trolloks/azerothcore-cata/issues/34

@@ -206,7 +206,10 @@ world control. Plan 10 proved `Player::LoadFromDB` returned true as a diagnostic
 pre-map packet contract; Plan 12 proved map insertion and object bootstrap, moving `SMSG_LOGIN_VERIFY_WORLD`
 to fire after map insertion per the pinned Cataclysm reference. On 2026-09-08, the real client entered
 Northshire and completed 10 matched time-sync exchanges after correcting aura flags and two guild
-requests in a diagnostic relay. Plans 14 and 21 reached their world-entry stopping point; the source
-fixes await the next authorized build. [Evidence and limits](client-automation.md#resolved-loading-screen-hang-aura-flags-2026-09-08).
-Plan 13 remains open for its two-fresh-generation acceptance. Plans 15-16 cover movement and remain
-separate from this passive world-entry proof.
+requests in a diagnostic relay. Plans 14 and 21 reached their world-entry stopping point.
+[Earlier evidence and limits](client-automation.md#resolved-loading-screen-hang-aura-flags-2026-09-08).
+Plan 13 subsequently passed with rebuilt binaries in fresh generations 80 and 81, each with four matched
+time-sync exchanges, one first-response marker, a 30-second stable hold, and a clean owned reset.
+The comparison checks the required response and acceptance evidence while retaining variable background
+packet sequences for diagnosis. [Completion evidence](https://github.com/trolloks/azerothcore-cata/issues/27).
+Plans 15-16 cover movement and remain separate from this passive world-entry proof.

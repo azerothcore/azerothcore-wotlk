@@ -2324,7 +2324,10 @@ def comparison_projection(evidence: dict[str, object]) -> dict[str, object]:
         "pre_map_marker_count": evidence.get("pre_map_marker_count"),
         "map_insertion_packet_prefix": evidence.get("map_insertion_packet_prefix"),
         "map_insertion_marker_count": evidence.get("map_insertion_marker_count"),
-        "in_world_control_packet_prefix": evidence.get("in_world_control_packet_prefix"),
+        # Background queries and NPC updates vary before the first resolved response.
+        "in_world_control_response_observed": (
+            "C->S:CMSG_TIME_SYNC_RESP" in (evidence.get("in_world_control_packet_prefix") or [])
+        ),
         "in_world_control_marker_count": evidence.get("in_world_control_marker_count"),
         "post_marker_hold_seconds": evidence.get("post_marker_hold_seconds"),
         "post_marker_snapshots": evidence.get("post_marker_snapshots"),
@@ -2526,6 +2529,26 @@ four Completed: COP_GET_CHARACTERS result=TRUE
         "S->C:SMSG_TIME_SYNC_REQ", "C->S:CMSG_TIME_SYNC_RESP",
     ]
     assert plan_number(IN_WORLD_CONTROL_MODE) == "13"
+    accepted_control_evidence = {
+        **in_world_control_evidence, "outcome": "in_world_control_bootstrap_pass",
+        "endpoint_ownership": True, "protected_inputs_unchanged": True, "reset": "PASS",
+    }
+    control_comparison = comparison_projection(accepted_control_evidence)
+    assert control_comparison == comparison_projection({
+        **accepted_control_evidence,
+        "in_world_control_packet_prefix": [
+            "S->C:SMSG_MONSTER_MOVE", "C->S:CMSG_CREATURE_QUERY", "C->S:CMSG_TIME_SYNC_RESP",
+        ],
+    })
+    for key, value in (
+        ("in_world_control_packet_prefix", ["S->C:SMSG_TIME_SYNC_REQ"]),
+        ("in_world_control_marker_count", 0), ("in_world_control_marker_count", 2),
+        ("post_marker_hold_seconds", 0), ("post_marker_snapshots", 1),
+        ("endpoint_ownership", False), ("screen_confirmed", False),
+        ("protected_inputs_unchanged", False), ("reset", "FAIL"),
+        ("outcome", "inconclusive"), ("inputs", {}),
+    ):
+        assert control_comparison != comparison_projection({**accepted_control_evidence, key: value}), key
     assert not selection_proof_is_complete(selection_evidence["selection"], [], [])
     seed_sql = populated_character_seed_sql()
     assert "INSERT INTO `characters`" in seed_sql and "`order`,`innTriggerId`" in seed_sql
