@@ -90,6 +90,7 @@ enum PlayerHook
     PLAYERHOOK_ON_BEING_CHARMED,
     PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT,
     PLAYERHOOK_ON_AFTER_MOVE_ITEM_FROM_INVENTORY,
+    PLAYERHOOK_ON_AFTER_MOVE_ITEM_TO_INVENTORY,
     PLAYERHOOK_ON_EQUIP,
     PLAYERHOOK_ON_UNEQUIP_ITEM,
     PLAYERHOOK_ON_PLAYER_JOIN_BG,
@@ -215,6 +216,7 @@ enum PlayerHook
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN,
+    PLAYERHOOK_ON_AFTER_TAKE_ITEM_FROM_MAIL,
     PLAYERHOOK_END
 };
 
@@ -406,6 +408,9 @@ public:
 
     // After an item has been moved from inventory
     virtual void OnPlayerAfterMoveItemFromInventory(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
+
+    // After an item has been moved to inventory
+    virtual void OnPlayerAfterMoveItemToInventory(Player* /*player*/, Item* /*it*/, bool /*update*/) { }
 
     // After an item has been equipped
     virtual void OnPlayerEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
@@ -853,6 +858,17 @@ public:
      * @param level The level that should be used for XP gain calculations
      */
     virtual void OnPlayerBeforeGetLevelForXPGain(Player const* /*player*/, uint8& /*level*/) {}
+
+    /**
+     * @brief This hook is called after a player takes an item out of a mailbox.
+     *
+     * @param player Contains information about the Player
+     * @param item The stack the player ends up holding. When the mail's item merges into an
+     *             existing stack this is that destination stack, not the mail's own copy -- the
+     *             latter is marked ITEM_REMOVED and deleted while the inventory is saved.
+     * @param count Number of items taken
+     */
+    virtual void OnPlayerAfterTakeItemFromMail(Player* /*player*/, Item* /*item*/, uint32 /*count*/) {}
 };
 
 #endif
