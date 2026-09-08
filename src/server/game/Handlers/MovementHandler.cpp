@@ -377,8 +377,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* extract packet */
-    ObjectGuid guid;
-    recvData >> guid.ReadAsPacked();
+    MovementInfo movementInfo;
+    if (opcode == MSG_MOVE_HEARTBEAT)
+        ReadMovementInfo(recvData, &movementInfo);
+    else
+        recvData >> movementInfo.guid.ReadAsPacked();
+    ObjectGuid guid = movementInfo.guid;
 
     // prevent tampered movement data
     if (!guid || guid != mover->GetGUID())
@@ -394,9 +398,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
     }
 
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
+    if (opcode != MSG_MOVE_HEARTBEAT)
+        ReadMovementInfo(recvData, &movementInfo);
 
     if (!ProcessMovementInfo(movementInfo, mover, plrMover, recvData))
     {
@@ -408,9 +411,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
 
     /* process position-change */
-    WorldPacket data(opcode, recvData.size());
+    WorldPacket data(opcode == MSG_MOVE_HEARTBEAT ? uint16(SMSG_MOVE_UPDATE) : opcode, recvData.size());
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, _player);
+    if (opcode == MSG_MOVE_HEARTBEAT)
+        LOG_DEBUG("network", "Accepted Cataclysm movement heartbeat after movement validation");
 }
 
 void WorldSession::SynchronizeMovement(MovementInfo& movementInfo)

@@ -138,9 +138,10 @@ CHARACTER_SELECTION_MODE = "character-selection"
 INITIAL_POST_LOAD_PACKETS_MODE = "initial-post-load-packets"
 MAP_INSERTION_MODE = "map-insertion-object-bootstrap"
 IN_WORLD_CONTROL_MODE = "in-world-control-bootstrap"
+BASIC_MOVEMENT_MODE = "basic-movement"
 POPULATED_CHARACTER_MODES = frozenset({
     POPULATED_MODE, CHARACTER_SELECTION_MODE, INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE,
-    IN_WORLD_CONTROL_MODE,
+    IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE,
 })
 CHARACTER_MODES = frozenset({"character-screen", *POPULATED_CHARACTER_MODES})
 CHARACTER_GUID = 0x01020304
@@ -154,6 +155,8 @@ CHARACTER_ZONE = 12
 
 
 def plan_number(mode: str) -> str:
+    if mode == BASIC_MOVEMENT_MODE:
+        return "15"
     if mode == IN_WORLD_CONTROL_MODE:
         return "13"
     if mode == MAP_INSERTION_MODE:
@@ -789,7 +792,7 @@ def write_configs(manifest: Manifest, generation: Generation) -> None:
         "SOAP.Enabled": "0",
         "Cluster.Enabled": "0",
         "Appender.Server": '2,5,0,WorldServer.log,w',
-        "Logger.network": "4,Server",
+        "Logger.network": "5,Server" if generation["mode"] == BASIC_MOVEMENT_MODE else "4,Server",
         "Logger.network.opcode": "4,Server",
     }
     auth_source = (REPO_ROOT / "src/server/apps/authserver/authserver.conf.dist").read_text()
@@ -1819,11 +1822,23 @@ def in_world_control_packet_prefix(generation: Generation) -> list[str]:
     return prefix
 
 
-POST_MARKER_MODES = frozenset({INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE, IN_WORLD_CONTROL_MODE})
+MOVEMENT_HEARTBEAT_MARKER = "Accepted Cataclysm movement heartbeat after movement validation"
+
+
+def movement_heartbeat_count(generation: Generation) -> int:
+    after_map = world_log_text(generation).partition("Finished object update bootstrap after adding to map")[2]
+    after_sync = after_map.partition(IN_WORLD_CONTROL_MARKER)[2]
+    return after_sync.count(MOVEMENT_HEARTBEAT_MARKER)
+
+
+POST_MARKER_MODES = frozenset({
+    INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE, IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE,
+})
 POST_MARKER_COUNTERS = {
     INITIAL_POST_LOAD_PACKETS_MODE: initial_packets_marker_count,
     MAP_INSERTION_MODE: map_insertion_marker_count,
     IN_WORLD_CONTROL_MODE: in_world_control_marker_count,
+    BASIC_MOVEMENT_MODE: movement_heartbeat_count,
 }
 
 
@@ -1938,6 +1953,7 @@ def sanitized_evidence(
     initial_packet_prefix_value: list[str] | None = None, pre_map_marker_count: int | None = None,
     map_insertion_prefix_value: list[str] | None = None, map_insertion_marker_count_value: int | None = None,
     in_world_control_prefix_value: list[str] | None = None, in_world_control_marker_count_value: int | None = None,
+    movement_heartbeat_count_value: int | None = None,
 ) -> dict[str, object]:
     auth_index = next(
         (index for index, item in enumerate(transcript) if item["opcode"] == "SMSG_AUTH_RESPONSE"), None,
@@ -1959,7 +1975,8 @@ def sanitized_evidence(
     selection_mode = generation["mode"] == CHARACTER_SELECTION_MODE
     initial_packets_mode = generation["mode"] == INITIAL_POST_LOAD_PACKETS_MODE
     map_insertion_mode = generation["mode"] == MAP_INSERTION_MODE
-    in_world_control_mode = generation["mode"] == IN_WORLD_CONTROL_MODE
+    basic_movement_mode = generation["mode"] == BASIC_MOVEMENT_MODE
+    in_world_control_mode = generation["mode"] in {IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE}
     login_mode = selection_mode or initial_packets_mode or map_insertion_mode or in_world_control_mode
     owned_window = owned_window_evidence(generation) if character_mode else (
         Path(generation["paths"]["raw_evidence"]) / "window.xprop"
@@ -1971,7 +1988,8 @@ def sanitized_evidence(
         "build": CLIENT_BUILD,
         "mode": generation["mode"],
         "outcome": (
-            "in_world_control_bootstrap_candidate" if in_world_control_mode and "characters_completed" in milestones
+            "basic_movement_pass_candidate" if basic_movement_mode and "characters_completed" in milestones
+            else "in_world_control_bootstrap_candidate" if in_world_control_mode and "characters_completed" in milestones
             else "map_insertion_object_bootstrap_candidate" if map_insertion_mode and "characters_completed" in milestones
             else "initial_post_load_packets_candidate" if initial_packets_mode and "characters_completed" in milestones
             else "character_selection_candidate" if selection_mode and "characters_completed" in milestones
@@ -1996,6 +2014,7 @@ def sanitized_evidence(
         "map_insertion_marker_count": map_insertion_marker_count_value if map_insertion_mode else None,
         "in_world_control_packet_prefix": in_world_control_prefix_value if in_world_control_mode else None,
         "in_world_control_marker_count": in_world_control_marker_count_value if in_world_control_mode else None,
+        "movement_heartbeat_count": movement_heartbeat_count_value if basic_movement_mode else None,
         "post_marker_hold_seconds": (
             generation.get("post_marker_hold_seconds", 0) if generation["mode"] in POST_MARKER_MODES else None
         ),
@@ -2037,7 +2056,8 @@ def verify(args: argparse.Namespace) -> None:
     selection_mode = generation["mode"] == CHARACTER_SELECTION_MODE
     initial_packets_mode = generation["mode"] == INITIAL_POST_LOAD_PACKETS_MODE
     map_insertion_mode = generation["mode"] == MAP_INSERTION_MODE
-    in_world_control_mode = generation["mode"] == IN_WORLD_CONTROL_MODE
+    basic_movement_mode = generation["mode"] == BASIC_MOVEMENT_MODE
+    in_world_control_mode = generation["mode"] in {IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE}
     login_mode = selection_mode or initial_packets_mode or map_insertion_mode or in_world_control_mode
     rows = character_row_count(manifest, generation) if character_mode else None
     realm_count = realm_character_count(manifest, generation) if populated_mode else None
@@ -2073,6 +2093,7 @@ def verify(args: argparse.Namespace) -> None:
         in_world_control_marker_count_value=(
             in_world_control_marker_count(generation) if in_world_control_mode else None
         ),
+        movement_heartbeat_count_value=movement_heartbeat_count(generation) if basic_movement_mode else None,
     )
     unchanged = protected_inputs_unchanged(manifest, generation)
     generation["isolation_unchanged"] = unchanged
@@ -2125,9 +2146,12 @@ def verify(args: argparse.Namespace) -> None:
                 and evidence["post_marker_hold_seconds"] >= 5
                 and evidence["post_marker_snapshots"] == 2
             )
+        if basic_movement_mode:
+            character_ok = character_ok and evidence["movement_heartbeat_count"] > 0
         if character_ok:
             evidence["outcome"] = (
-                "in_world_control_bootstrap_pass" if in_world_control_mode
+                "basic_movement_pass" if basic_movement_mode
+                else "in_world_control_bootstrap_pass" if in_world_control_mode
                 else "map_insertion_object_bootstrap_pass" if map_insertion_mode
                 else "initial_post_load_packets_pass" if initial_packets_mode
                 else "character_selection_pass" if selection_mode
@@ -2329,6 +2353,7 @@ def comparison_projection(evidence: dict[str, object]) -> dict[str, object]:
             "C->S:CMSG_TIME_SYNC_RESP" in (evidence.get("in_world_control_packet_prefix") or [])
         ),
         "in_world_control_marker_count": evidence.get("in_world_control_marker_count"),
+        "movement_heartbeat_observed": (evidence.get("movement_heartbeat_count") or 0) > 0,
         "post_marker_hold_seconds": evidence.get("post_marker_hold_seconds"),
         "post_marker_snapshots": evidence.get("post_marker_snapshots"),
         "stability_seconds": evidence.get("stability_seconds"),
@@ -2620,6 +2645,21 @@ four Completed: COP_GET_CHARACTERS result=TRUE
         assert enumerated_characters(enum_generation) == [{
             "account_id": ACCOUNT_ID, "guid_low": CHARACTER_GUID, "list_position": CHARACTER_LIST_POSITION,
         }]
+        assert plan_number(BASIC_MOVEMENT_MODE) == "15"
+        for log, expected in (
+            (MOVEMENT_HEARTBEAT_MARKER, 0),
+            (IN_WORLD_CONTROL_MARKER + "\n" + MOVEMENT_HEARTBEAT_MARKER, 0),
+            ("Finished object update bootstrap after adding to map\n" + MOVEMENT_HEARTBEAT_MARKER +
+             "\n" + IN_WORLD_CONTROL_MARKER, 0),
+            ("Finished object update bootstrap after adding to map\n" + IN_WORLD_CONTROL_MARKER +
+             "\n" + MOVEMENT_HEARTBEAT_MARKER, 1),
+        ):
+            (raw / "WorldServer.log").write_text(log)
+            assert movement_heartbeat_count(enum_generation) == expected
+        movement_evidence = {**accepted_control_evidence, "mode": BASIC_MOVEMENT_MODE, "movement_heartbeat_count": 1}
+        projection = comparison_projection(movement_evidence)
+        assert projection == comparison_projection({**movement_evidence, "movement_heartbeat_count": 2})
+        assert projection != comparison_projection({**movement_evidence, "movement_heartbeat_count": 0})
     auth_keys = (
         "RealmServerPort", "BindIP", "LogsDir", "PidFile", "RealmsStateUpdateDelay",
         "LoginDatabaseInfo", "Updates.EnableDatabases", "Updates.AutoSetup", "StrictVersionCheck",
@@ -2653,7 +2693,7 @@ four Completed: COP_GET_CHARACTERS result=TRUE
         pass
     else:
         raise AssertionError("invalid state transition was accepted")
-    print("Plan 7-13 runner self-check passed")
+    print("Real-client runner self-check passed")
 
 
 def stability_seconds(value: str) -> int:
@@ -2686,7 +2726,7 @@ def parser() -> argparse.ArgumentParser:
     prepare_parser.add_argument(
         "--mode", choices=(
             "no-login", "authentication", "character-screen", POPULATED_MODE, CHARACTER_SELECTION_MODE,
-            INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE, IN_WORLD_CONTROL_MODE,
+            INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE, IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE,
         ), default="authentication",
     )
     prepare_parser.add_argument("--minimum-free-gib", type=int, default=25)

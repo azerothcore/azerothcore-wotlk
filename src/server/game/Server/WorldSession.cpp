@@ -36,6 +36,7 @@
 #include "MapMgr.h"
 #include "Metric.h"
 #include "MiscPackets.h"
+#include "MovementPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -1076,38 +1077,43 @@ void WorldSession::SaveTutorialsData(CharacterDatabaseTransaction trans)
 
 void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 {
-    data >> mi->flags;
-    data >> mi->flags2;
-    data >> mi->time;
-    data >> mi->pos.PositionXYZOStream();
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    if (data.GetOpcode() == MSG_MOVE_HEARTBEAT)
+        WorldPackets::Movement::ReadHeartbeat(data, *mi);
+    else
     {
-        data >> mi->transport.guid.ReadAsPacked();
+        data >> mi->flags;
+        data >> mi->flags2;
+        data >> mi->time;
+        data >> mi->pos.PositionXYZOStream();
 
-        data >> mi->transport.pos.PositionXYZOStream();
-        data >> mi->transport.time;
-        data >> mi->transport.seat;
+        if (mi->HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+        {
+            data >> mi->transport.guid.ReadAsPacked();
 
-        if (mi->HasExtraMovementFlag(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT))
-            data >> mi->transport.time2;
+            data >> mi->transport.pos.PositionXYZOStream();
+            data >> mi->transport.time;
+            data >> mi->transport.seat;
+
+            if (mi->HasExtraMovementFlag(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT))
+                data >> mi->transport.time2;
+        }
+
+        if (mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (mi->HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING)))
+            data >> mi->pitch;
+
+        data >> mi->fallTime;
+
+        if (mi->HasMovementFlag(MOVEMENTFLAG_FALLING))
+        {
+            data >> mi->jump.zspeed;
+            data >> mi->jump.sinAngle;
+            data >> mi->jump.cosAngle;
+            data >> mi->jump.xyspeed;
+        }
+
+        if (mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
+            data >> mi->splineElevation;
     }
-
-    if (mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (mi->HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING)))
-        data >> mi->pitch;
-
-    data >> mi->fallTime;
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_FALLING))
-    {
-        data >> mi->jump.zspeed;
-        data >> mi->jump.sinAngle;
-        data >> mi->jump.cosAngle;
-        data >> mi->jump.xyspeed;
-    }
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
-        data >> mi->splineElevation;
 
     //! Anti-cheat checks. Please keep them in seperate if () blocks to maintain a clear overview.
     //! Might be subject to latency, so just remove improper flags.
@@ -1190,6 +1196,12 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
 void WorldSession::WriteMovementInfo(WorldPacket* data, MovementInfo* mi)
 {
+    if (data->GetOpcode() == SMSG_MOVE_UPDATE)
+    {
+        WorldPackets::Movement::WriteMovementUpdate(*data, *mi);
+        return;
+    }
+
     *data << mi->guid.WriteAsPacked();
 
     *data << mi->flags;
