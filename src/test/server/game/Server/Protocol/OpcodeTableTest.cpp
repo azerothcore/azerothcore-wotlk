@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GuildPackets.h"
 #include "Opcodes.h"
 #include "gtest/gtest.h"
 
@@ -44,4 +45,29 @@ TEST(OpcodeTableTest, KeepsDirectionsIndependent)
 
     EXPECT_EQ(table.GetOpcodeNameForLogging(static_cast<OpcodeClient>(NUM_OPCODE_HANDLERS)),
         "[INVALID OPCODE 0xFFFF (65535)]");
+}
+
+TEST(OpcodeTableTest, AcceptsCataclysmGuildQueriesSentAfterWorldEntry)
+{
+    OpcodeTable table;
+    table.Initialize();
+
+    OpcodeHandler const* moneyQuery = table.GetIncomingOpcode(0x1225);
+    ASSERT_NE(moneyQuery, nullptr);
+    EXPECT_STREQ(moneyQuery->Name, "CMSG_GUILD_BANK_REMAINING_WITHDRAW_MONEY_QUERY");
+    EXPECT_EQ(moneyQuery->Status, STATUS_LOGGEDIN);
+    EXPECT_NE(table[static_cast<OpcodeClient>(0x1225)], nullptr);
+
+    OpcodeHandler const* tracking = table.GetIncomingOpcode(0x1027);
+    ASSERT_NE(tracking, nullptr);
+    EXPECT_STREQ(tracking->Name, "CMSG_GUILD_SET_ACHIEVEMENT_TRACKING");
+    EXPECT_EQ(tracking->Status, STATUS_UNHANDLED);
+
+    WorldPackets::Guild::GuildBankRemainingWithdrawMoney response;
+    response.RemainingWithdrawMoney = -1;
+    WorldPacket const* packet = response.Write();
+    EXPECT_EQ(packet->GetOpcode(), 0x5DB4);
+    ASSERT_EQ(packet->size(), 8u);
+    for (std::size_t index = 0; index < packet->size(); ++index)
+        EXPECT_EQ(packet->contents()[index], 0xFF);
 }

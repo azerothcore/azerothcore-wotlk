@@ -1899,7 +1899,7 @@ void Guild::SendMoneyInfo(WorldSession* session) const
     packet.RemainingWithdrawMoney = amount;
     session->SendPacket(packet.Write());
 
-    LOG_DEBUG("guild", "MSG_GUILD_BANK_MONEY_WITHDRAWN [{}] Money: {}", session->GetPlayerInfo(), amount);
+    LOG_DEBUG("guild", "SMSG_GUILD_BANK_MONEY_WITHDRAWN [{}] Money: {}", session->GetPlayerInfo(), amount);
 }
 
 void Guild::SendLoginInfo(WorldSession* session)

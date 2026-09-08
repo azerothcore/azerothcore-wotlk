@@ -204,9 +204,9 @@ enumeration, and real-client selection through the session legitimacy gate to th
 They do not prove character creation, successful player loading, initial packet correctness, map entry, or
 world control. Plan 10 proved `Player::LoadFromDB` returned true as a diagnostic; Plan 11 proved the
 pre-map packet contract; Plan 12 proved map insertion and object bootstrap, moving `SMSG_LOGIN_VERIFY_WORLD`
-to fire after map insertion per the pinned Cataclysm reference. Plan 13 (in-world control bootstrap) is
-blocked mid-flight: its own opcode/handler work is done and evidence-proven correct, but real-client runs
-surfaced that the client process reliably exits ~30s after world entry for reasons unrelated to time-sync.
-Plan 14 owns diagnosing and fixing that exit; Plan 13 resumes once Plan 14 is green. Plans 15-16 open the
-"Movement" plan family and are blocked by both, with their exact wire-format scope deliberately left to be
-derived from the pinned reference at implementation time rather than assumed now.
+to fire after map insertion per the pinned Cataclysm reference. On 2026-09-08, the real client entered
+Northshire and completed 10 matched time-sync exchanges after correcting aura flags and two guild
+requests in a diagnostic relay. Plans 14 and 21 reached their world-entry stopping point; the source
+fixes await the next authorized build. [Evidence and limits](client-automation.md#resolved-loading-screen-hang-aura-flags-2026-09-08).
+Plan 13 remains open for its two-fresh-generation acceptance. Plans 15-16 cover movement and remain
+separate from this passive world-entry proof.

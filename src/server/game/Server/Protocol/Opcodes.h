@@ -606,7 +606,8 @@ enum OpcodeClient : uint16
     CMSG_GM_CHARACTER_RESTORE                       = 0x3FA,
     CMSG_GM_CHARACTER_SAVE                          = 0x3FB,
     MSG_GUILD_PERMISSIONS                           = 0x3FD,
-    MSG_GUILD_BANK_MONEY_WITHDRAWN                  = 0x3FE,
+    CMSG_GUILD_BANK_REMAINING_WITHDRAW_MONEY_QUERY   = 0x1225,
+    CMSG_GUILD_SET_ACHIEVEMENT_TRACKING              = 0x1027,
     MSG_GUILD_EVENT_LOG_QUERY                       = 0x3FF,
     CMSG_MAELSTROM_RENAME_GUILD                     = 0x400,
     CMSG_GET_MIRRORIMAGE_DATA                       = 0x0C25,
@@ -1206,6 +1207,7 @@ enum OpcodeServer : uint16
     SMSG_VOICE_CHAT_STATUS                          = 0x0F15,
     SMSG_REPORT_PVP_AFK_RESULT                      = 0x2D06,
     SMSG_GUILD_BANK_LIST                            = 0x3E8,
+    SMSG_GUILD_BANK_MONEY_WITHDRAWN                  = 0x5DB4,
     SMSG_USERLIST_ADD                               = 0x0F37,
     SMSG_USERLIST_REMOVE                            = 0x2006,
     SMSG_USERLIST_UPDATE                            = 0x0135,
@@ -1546,8 +1548,6 @@ inline constexpr OpcodeServer MSG_GUILD_BANK_LOG_QUERY_SERVER =
     static_cast<OpcodeServer>(MSG_GUILD_BANK_LOG_QUERY);
 inline constexpr OpcodeServer MSG_GUILD_PERMISSIONS_SERVER =
     static_cast<OpcodeServer>(MSG_GUILD_PERMISSIONS);
-inline constexpr OpcodeServer MSG_GUILD_BANK_MONEY_WITHDRAWN_SERVER =
-    static_cast<OpcodeServer>(MSG_GUILD_BANK_MONEY_WITHDRAWN);
 inline constexpr OpcodeServer MSG_GUILD_EVENT_LOG_QUERY_SERVER =
     static_cast<OpcodeServer>(MSG_GUILD_EVENT_LOG_QUERY);
 inline constexpr OpcodeServer MSG_QUERY_GUILD_BANK_TEXT_SERVER =

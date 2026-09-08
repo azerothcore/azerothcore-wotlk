@@ -1,10 +1,8 @@
 # Real-client automation: how the working design works
 
 Reference for `run --auto-login` in `apps/cata/run_real_client_authentication.py`. This
-describes the design that is currently working reliably — window focus is acquired once and
-held, credentials land in the right fields, and the client is driven to world entry without
-manual intervention. Several of these choices look arbitrary but are the result of specific
-observed failures; changing them casually will reintroduce those failures.
+describes focus acquisition and input delivery for the isolated client. Successful login and
+character selection do not prove that the world loading screen has dismissed.
 
 ## Window discovery
 
@@ -17,7 +15,9 @@ tracked wine PIDs **and** whose title is exactly `World of Warcraft`. Both halve
   every poll (`add_processes(... find_wine_processes(...))`) rather than captured once. A
   window that appears late, under a PID that did not exist at launch, is still recognised.
 
-Polled every 0.5s for up to 90s, because MPQ loading on a cold prefix is slow.
+`focus_owned_window()` rediscovers the window and its live owned PIDs every 0.25s. Discovery
+and activation share a 90s budget at startup and a 30s budget before later input. A replaced
+window is rediscovered within the same attempt.
 
 ## Focus acquisition — the important part
 
@@ -29,13 +29,12 @@ manifested as the window simply vanishing mid-login, and it cost a lot of time t
 
 The working combination is:
 
-1. `wmctrl -i -a <window_id>` — an EWMH `_NET_ACTIVE_WINDOW` request that the window manager
-   handles itself, rather than a client bypassing it.
-2. Read the WM's own `_NET_ACTIVE_WINDOW` root property back via `xprop` and compare it to
-   the target window id.
-3. Retry that pair for up to 5s.
+1. Discover the current owned WoW window and read `_NET_ACTIVE_WINDOW` using `xprop`.
+2. If it is not active, request activation with `wmctrl -i -a <window_id>`.
+3. Continue polling until the same owned window stays active for at least 0.5s, or the
+   shared deadline expires. All commands use the generation's `DISPLAY` and `XAUTHORITY`.
 
-Step 2 is not optional. `wmctrl -a` is asynchronous and returns before the WM has actually
+Verification is not optional. `wmctrl -a` is asynchronous and returns before the WM has actually
 activated the window; without reading the property back, the automation races ahead and types
 into whatever currently holds focus. Verifying through the WM's own bookkeeping is what makes
 this deterministic.
@@ -47,7 +46,10 @@ clicking each field. Every click is a potential re-activation, and re-activating
 exactly the pattern that triggered the window teardown above. `client_login_points()` still
 derives field coordinates as fractions of live window geometry (0.506 across; 0.536 / 0.623 /
 0.752 down) so they survive a resized or repositioned window, but clicking is kept to the
-minimum needed.
+minimum needed. Focus and geometry are reacquired after the movie wait, immediately before
+the account-field click. The login path checks `_NET_ACTIVE_WINDOW` again before every mouse
+or keyboard input and aborts if focus is lost. Character selection uses the same focus wait;
+it no longer calls `XSetInputFocus` or relies on a one-second sleep after activation.
 
 Keys are synthesised with `XTest` (`xtest.fake_input`), with `Shift_L` held for alphabetic
 characters so the canonical uppercase synthetic credentials are entered correctly, and a 50ms
@@ -104,10 +106,14 @@ Consequences:
 - Any earlier claim that the loading bar was measured at "90%" or "99%" from this file is an
   artifact. That framing is **not evidence-backed** and should not be used to direct
   debugging.
-- Use the server log as the observable instead. The opcode stream tells you exactly how far
-  the client got, and it cannot be faked by a stale framebuffer.
-- If a real screenshot is ever needed, it must come from inside the client (DXVK's own
-  `DXVK_HUD`/screenshot path, or the client's `Screenshots/` folder) — not from X.
+- Use the server log to establish protocol progress. It does not establish what the client
+  rendered. Record direct visual confirmation separately; missing `CMSG_TIME_SYNC_RESP` alone
+  does not prove the loading screen is still visible.
+- A desktop screenshot can work even when `xwd` fails. On this desktop, `gnome-screenshot -w`
+  captured the actual client after `focus_owned_window()` verified and activated its owned
+  window. Run it with the generation's `DISPLAY` and `XAUTHORITY` immediately after that
+  check; otherwise it captures whichever application is active. Native client screenshots
+  are another option, but sending `Print` alone did not produce a file in these runs.
 
 ## Tools and settings a run depends on
 
@@ -126,8 +132,8 @@ unrelated client bugs.
 | `xprop` | reading `_NET_ACTIVE_WINDOW` back to verify focus |
 | `xwd` | window dump into `evidence/raw/window.xwd` |
 
-The harness itself is pure stdlib Python — no `python-xlib`, no `xdotool`. `python-xlib` is
-only needed for the ad-hoc focus probe described above, not for a run.
+Automatic input requires the installed `python3-xlib` package for XTest keyboard and mouse
+events. `xdotool` is not used.
 
 ### Wine environment
 
@@ -165,10 +171,11 @@ whichever it finds first, so both are set.
 
 ### Run parameters that matter
 
-`--auto-login --stability-seconds 8 --timeout 110`. `--timeout` is the whole-run budget and
-`--stability-seconds` is how long the session must stay up after world entry before the run is
-recorded as `observed`. Raising `--timeout` does not help a loading-screen hang: the client is
-already responsive and answering opcodes, it just never clears terrain.
+`--auto-login --stability-seconds 8 --timeout 110`. `--timeout` limits the observation loop
+after automatic login. In post-marker modes, `--stability-seconds` is the hold time after the
+mode's protocol marker. `observed` means the loop finished, including timeout; it does not
+prove world entry. The `finally` block closes the owned client and servers even after a
+successful run. For a longer interactive observation, increase both limits.
 
 `--mode in-world-control-bootstrap` is the mode that seeds a character and drives it to world
 entry, as opposed to the auth-only modes.
@@ -216,30 +223,127 @@ and nothing else.
 `prepare` takes several minutes even with the database cache restored. Resetting and
 re-preparing after a transient run failure throws that time away for no benefit.
 
-### `owned WoW window did not receive focus` is transient — just re-run
+### Fixed startup focus race, 2026-09-08
 
-Measured with an Xlib probe (`get_input_focus()` plus `_NET_ACTIVE_WINDOW`) sampled once a
-second across several runs: for roughly the first **two seconds** after the WoW window is
-mapped, the window manager reports `_NET_ACTIVE_WINDOW = 0x0` *and* X reports an input focus
-of `0` — no window is focused at all. Activation requests issued inside that gap are simply
-dropped, and the 5s deadline in `run_auto_login()` can expire against it. Once the gap
-closes, focus lands on the WoW window and stays there for the rest of the run:
+The old login path discovered one window and then allowed only five seconds for activation.
+Generation 78 reproduced two focus failures before a third attempt passed. A traced run with
+the fix measured a longer activation gap:
 
+| Event | Seconds after run start |
+| --- | ---: |
+| Owned WoW window first discovered | 30.623 |
+| WM still reports `_NET_ACTIVE_WINDOW = 0x0` | 36.126 |
+| WM reports the owned window active | 36.527 |
+
+That 5.904s gap exceeds the old deadline. The shared wait now covers discovery and stable
+activation, so this delay is handled inside one attempt. Login also rechecks focus after
+the movie wait; a focus check performed before that wait cannot authorize later typing.
+
+Three consecutive runs with the fix authenticated and sent `CMSG_PLAYER_LOGIN` without a
+focus failure. The third also confirmed that X input focus matched the owned window. None
+sent `CMSG_TIME_SYNC_RESP`, so this evidence proves input delivery, not completed world
+loading. These were retries of generation 78 using existing binaries, first with a 110s
+observation period and then twice with 30s. Raw focus evidence is local at
+`/tmp/cata-focus-trace.log` and is not a committed fixture.
+
+Run the deterministic regression check with:
+
+```bash
+python3 apps/cata/test_real_client_focus.py
+python3 apps/cata/run_real_client_authentication.py self-check
 ```
-58:35 NET_ACTIVE=0x0       FOCUS=int:0                          WOW=0x08600003
-58:36 NET_ACTIVE=0x8600003 FOCUS=0x8600003(World of Warcraft)   WOW=0x08600003
+
+The focus check covers an eight-second activation delay, a replaced client window, correct
+display propagation, an unrelated window remaining focused until timeout, and focus loss
+between acquisition and input. No real input is sent by that check. If a real run exhausts
+its new deadline, inspect the reported owned and active window IDs before retrying; never
+bypass ownership or focus verification.
+
+### Visually confirmed world entry with a diagnostic packet filter, 2026-09-08
+
+The user confirmed "we were in!" during generation 78's `drop-extras` relay run with
+`--auto-login --stability-seconds 8 --timeout 60`. The run ended in `observed` without a
+recorded failure, and the harness cleaned up the client and servers. A repeat with both
+limits set to 1800s confirmed world entry followed by a disconnect before the timer expired.
+The client returned to login while the server remained running. World entry is visually
+confirmed, but a stable session is not. The server log still contained no `CMSG_TIME_SYNC_RESP`.
+
+The guide was the sibling `cata-js` implementation and its successful `server.log` packet
+trace. A loopback relay filtered these server opcodes, which were absent from that reference
+startup sequence:
+
+```text
+SMSG_POWER_UPDATE                 SMSG_CRITERIA_UPDATE
+SMSG_MOVE_SET_ACTIVE_MOVER         SMSG_CONTACT_LIST
+SMSG_SET_FORCED_REACTIONS          SMSG_AURA_UPDATE_ALL
+SMSG_MOVE_UNSET_CAN_FLY            MSG_SET_DUNGEON_DIFFICULTY
+SMSG_WEATHER                      SMSG_QUESTGIVER_STATUS_MULTIPLE
 ```
 
-Consequences worth remembering:
+The relay preserved forwarded packet bodies and compression, and re-encrypted outgoing
+headers to account for dropped packets. An earlier valid passthrough run reproduced the
+failure to enter world. This filter was a diagnostic workaround. The final test below
+isolated the aura-flag width and retained every outgoing packet. Do not remove all these
+packets from the server as a permanent fix.
 
-- This is **not** caused by the user touching the desktop, and not by the screensaver — it
-  reproduced with the machine untouched, the monitor on, and
-  `org.cinnamon.ScreenSaver.GetActive` returning `false`. Do not go hunting for a lock screen.
-- Three consecutive focus failures followed by a clean `observed` run, with no code or
-  environment change in between, is the normal shape of this. Re-run rather than diagnose.
-- Do **not** "fix" it by typing without verified focus. The verification is the safety
-  property that stops synthetic credentials from being typed into an unrelated window; the
-  correct remedy for the race is a retry, not a weaker check.
+Local evidence is preserved in `/tmp/cata-success-drop-extras/`, including the user's
+observation, relay packet decisions, and server/client logs. The diagnostic relay is
+`/tmp/cata-login-proxy.py`; neither it nor those temporary artifacts are committed fixtures.
+This comparison led to the narrowed correction below. Keep raw authentication logs out of
+committed documentation.
+
+### Disconnect after world entry: missing guild opcodes, 2026-09-08
+
+The successful cata-js trace contains two startup requests missing from this fork's opcode
+table. `WorldSocket::ReadDataHandler()` returns `Error` for an unregistered opcode, and its
+caller closes the connection. The real client hit these consecutively:
+
+| Request | Build 15595 opcode | Correction |
+| --- | --- | --- |
+| Guild-bank withdrawal limit | `0x1225` | Bind the existing guild query handler to the Cata request opcode |
+| Guild achievement tracking | `0x1027` | Register as unhandled while guild achievement tracking remains unimplemented |
+
+The withdrawal-limit response also has its own Cata opcode, `0x5DB4`, and an eight-byte
+signed amount. The old bidirectional `0x03FE` definition and four-byte amount are WotLK layouts.
+These values agree with cata-js and pinned TrinityCore commit
+`c699217775d90794158422387b07a917e161b582`.
+
+A relay test routed `0x1225` to the existing handler and ignored `0x1027`, with the outgoing
+`drop-extras` filter retained. It produced a real screenshot of Cataplan in Northshire and
+11 matched time-sync exchanges without an unknown-opcode disconnect. Evidence is local at
+`/tmp/cata-success-guild-opcodes/`. Restoring all outgoing packets reproduced the loading
+screen even with both incoming corrections. The guild fixes address the disconnect; the
+outgoing aura-flag correction below completes the verified world-entry path.
+
+Two debugger samples showed the world loop and map worker waiting normally, disproving the
+earlier persistent-busy-loop hypothesis. In this environment, attaching GDB to an existing
+server failed, but launching the owned binary as GDB's child worked without rebuilding.
+
+### Resolved loading-screen hang: aura flags, 2026-09-08
+
+`AuraApplication::BuildUpdatePacket()` wrote aura flags as `uint8`, but build 15595 reads
+`uint16`. This shifted the caster level, stack count, and optional fields in every populated
+NPC aura record. The shared writer now emits `uint16`, fixing both initial aura lists and
+later aura updates. Pinned TrinityCore's `AuraDataInfo` serializer confirms the two-byte field.
+
+The final real-client test corrected that exact width and the two guild requests in the
+loopback relay. It retained every outgoing packet, including the previously filtered power,
+flight, weather, difficulty, quest-status, and aura packets. It showed Cataplan and nearby
+NPCs in Northshire, with 10 time-sync requests and 10 replies, no unknown-opcode disconnects,
+and no relay errors. Seventy aura packets passed through the corrected serializer.
+
+![Build 15595 client in Northshire after the aura and guild-opcode corrections](evidence/2026-09-08-world-entry.png)
+
+This is the stopping point for getting in-game. The C++ changes and a guild opcode/response
+regression check are committed for the next build; no rebuild or new C++ test execution was
+performed in this session. The live proof used existing binaries with the exact wire
+corrections applied by the diagnostic relay. It does not satisfy Plan 13's separate
+requirement for two fresh generations, and does not claim movement, combat, or quest support.
+Local raw evidence and the relay are preserved in `/tmp/cata-success-aura-and-guild/`.
+
+The focus regression check and runner self-check pass. SQL style checks pass. The C++ style
+check reports only three pre-existing repeated blank lines in `UpdateFields.h`, also present
+in the starting commit; the changed files introduce no reported style violations.
 
 ## Building before a run
 

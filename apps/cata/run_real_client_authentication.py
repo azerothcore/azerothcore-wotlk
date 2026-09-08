@@ -1406,6 +1406,42 @@ def owned_wow_window(output: str, owned_pids: set[int]) -> tuple[str, int, int, 
     return None
 
 
+def focus_owned_window(generation: Generation, timeout: float = 30) -> tuple[str, int, int, int, int]:
+    environment = wine_environment(generation)
+    deadline = time.monotonic() + timeout
+    focused_since: float | None = None
+    previous_window: str | None = None
+    active_id: int | None = None
+    while time.monotonic() < deadline:
+        processes = find_wine_processes(Path(generation["paths"]["wine_prefix"]))
+        add_processes(generation, processes)
+        owned_pids = {int(item["pid"]) for item in processes}
+        output = run_command(
+            ["wmctrl", "-lpGx"], check=False, env=environment,
+        ).stdout.decode(errors="replace")
+        window = owned_wow_window(output, owned_pids)
+        active = run_command(["xprop", "-root", "_NET_ACTIVE_WINDOW"], check=False, env=environment)
+        match = re.search(rb"0x[0-9a-fA-F]+", active.stdout)
+        active_id = int(match.group(), 16) if match else None
+        window_id = window[0] if window else None
+        if window and active_id == int(window_id, 16):
+            if focused_since is None or previous_window != window_id:
+                focused_since = time.monotonic()
+            elif time.monotonic() - focused_since >= 0.5:
+                return window
+        else:
+            focused_since = None
+            if window:
+                # Ask the window manager; forcing XSetInputFocus can reset the client's render window.
+                run_command(["wmctrl", "-i", "-a", window_id], check=False, env=environment)
+        previous_window = window_id
+        time.sleep(0.25)
+    raise RuntimeError(
+        f"owned WoW window did not receive stable focus within {timeout}s "
+        f"(window={previous_window}, active={active_id})"
+    )
+
+
 def automate_client_login(generation: Generation) -> None:
     try:
         from Xlib import X, XK, display
@@ -1413,47 +1449,21 @@ def automate_client_login(generation: Generation) -> None:
     except ImportError as error:
         raise RuntimeError("--auto-login requires the installed python3-xlib package") from error
 
-    deadline = time.monotonic() + 90
-    window: tuple[str, int, int, int, int] | None = None
-    while time.monotonic() < deadline:
-        add_processes(generation, find_wine_processes(Path(generation["paths"]["wine_prefix"])))
-        owned_pids = {int(item["pid"]) for item in generation["processes"] if item["kind"] == "wine"}
-        output = run_command(
-            ["wmctrl", "-lpGx"], check=False, env=wine_environment(generation),
-        ).stdout.decode(errors="replace")
-        window = owned_wow_window(output, owned_pids)
-        if window:
-            break
-        time.sleep(0.5)
-    if not window:
-        raise RuntimeError("owned WoW window did not appear within 90 seconds")
-
-    window_id, x, y, width, height = window
-    # Measured live: an explicit XSetInputFocus (bypassing the window manager's own
-    # activation protocol), especially repeated once per field click, makes the
-    # client tear down its window and never recreate it -- almost certainly DXVK
-    # treating that as an unexpected focus-loss/gain pattern and resetting the
-    # device. wmctrl's `-a` (an EWMH _NET_ACTIVE_WINDOW request the WM handles
-    # itself) plus reading the WM's own _NET_ACTIVE_WINDOW root property back is the
-    # combination proven stable across Plans 7-10: acquire focus once, verify it via
-    # the WM's own bookkeeping, then drive the rest of the login by keyboard
-    # (Tab/Return) rather than by re-clicking (and thus re-activating) each field.
-    focus_deadline = time.monotonic() + 5
-    while time.monotonic() < focus_deadline:
-        run_command(["wmctrl", "-i", "-a", window_id])
-        active = run_command(["xprop", "-root", "_NET_ACTIVE_WINDOW"], check=False)
-        active_id = re.search(rb"0x[0-9a-fA-F]+", active.stdout)
-        if active_id is not None and int(active_id.group(), 16) == int(window_id, 16):
-            break
-        time.sleep(0.25)
-    else:
-        raise RuntimeError("owned WoW window did not receive focus")
+    window_id, x, y, width, height = focus_owned_window(generation, timeout=90)
 
     connection = display.Display(str(generation["inputs"]["display"]))
     shift = connection.keysym_to_keycode(XK.string_to_keysym("Shift_L"))
     control = connection.keysym_to_keycode(XK.string_to_keysym("Control_L"))
 
+    def require_focus() -> None:
+        active = connection.screen().root.get_full_property(
+            connection.intern_atom("_NET_ACTIVE_WINDOW"), X.AnyPropertyType,
+        )
+        if active is None or not len(active.value) or int(active.value[0]) != int(window_id, 16):
+            raise RuntimeError("owned WoW window lost focus before input")
+
     def press(value: str, modifier: int | None = None) -> None:
+        require_focus()
         symbol = XK.string_to_keysym(x_keysym_name(value))
         keycode = connection.keysym_to_keycode(symbol)
         if modifier:
@@ -1464,6 +1474,7 @@ def automate_client_login(generation: Generation) -> None:
             xtest.fake_input(connection, X.KeyRelease, modifier)
 
     def click(point: tuple[int, int]) -> None:
+        require_focus()
         connection.screen().root.warp_pointer(*point)
         xtest.fake_input(connection, X.ButtonPress, 1)
         xtest.fake_input(connection, X.ButtonRelease, 1)
@@ -1485,6 +1496,7 @@ def automate_client_login(generation: Generation) -> None:
         )
         if movie_active:
             movie_seen = True
+            window_id, x, y, width, height = focus_owned_window(generation)
             press("Escape")
             connection.sync()
             time.sleep(1)
@@ -1492,6 +1504,7 @@ def automate_client_login(generation: Generation) -> None:
         if movie_seen or time.monotonic() >= no_movie_deadline:
             break
         time.sleep(1)
+    window_id, x, y, width, height = focus_owned_window(generation)
     account_point, _, _ = client_login_points(x, y, width, height)
     click(account_point)
     press("a", control)
@@ -1513,28 +1526,8 @@ def automate_character_selection(generation: Generation) -> None:
     except ImportError as error:
         raise RuntimeError("character selection requires the installed python3-xlib package") from error
 
-    deadline = time.monotonic() + 30
-    window: tuple[str, int, int, int, int] | None = None
-    while time.monotonic() < deadline:
-        add_processes(generation, find_wine_processes(Path(generation["paths"]["wine_prefix"])))
-        owned_pids = {int(item["pid"]) for item in generation["processes"] if item["kind"] == "wine"}
-        output = run_command(
-            ["wmctrl", "-lpGx"], check=False, env=wine_environment(generation),
-        ).stdout.decode(errors="replace")
-        window = owned_wow_window(output, owned_pids)
-        if window:
-            break
-        time.sleep(0.5)
-    if not window:
-        raise RuntimeError("owned WoW window did not appear for character selection")
-
-    window_id = window[0]
     connection = display.Display(str(generation["inputs"]["display"]))
-    target = connection.create_resource_object("window", int(window_id, 16))
-    run_command(["wmctrl", "-i", "-a", window_id])
-    target.set_input_focus(X.RevertToParent, X.CurrentTime)
-    connection.sync()
-    time.sleep(1)
+    focus_owned_window(generation)
     keycode = connection.keysym_to_keycode(XK.string_to_keysym("Return"))
     xtest.fake_input(connection, X.KeyPress, keycode)
     xtest.fake_input(connection, X.KeyRelease, keycode)
