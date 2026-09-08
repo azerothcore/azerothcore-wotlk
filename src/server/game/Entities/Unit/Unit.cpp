@@ -2559,10 +2559,6 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             // absorb must be smaller than the damage itself
             splitDamage = RoundToInterval(splitDamage, 0, int32(dmgInfo.GetDamage()));
 
-            // Split damage is a hostile interaction for its recipient too.
-            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
-                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
-
             dmgInfo.AbsorbDamage(splitDamage);
 
             uint32 splitted = splitDamage;
@@ -2601,6 +2597,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+
+            // Split damage is a hostile interaction for its recipient too.
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
+
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo, false);
         }
 
@@ -2631,10 +2632,6 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
 
             // absorb must be smaller than the damage itself
             splitDamage = RoundToInterval(splitDamage, uint32(0), uint32(dmgInfo.GetDamage()));
-
-            // Split damage is a hostile interaction for its recipient too.
-            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
-                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
             // Roar of Sacrifice, dont absorb it
             if (splitSpellInfo->Id != 53480)
@@ -2678,6 +2675,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+
+            // Split damage is a hostile interaction for its recipient too.
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
+
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, splitSchoolMask, splitSpellInfo, false);
         }
     }
