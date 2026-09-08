@@ -144,7 +144,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | smoke | login / pad tele / relog / world alive | P0 | covered (`TestSmoke_*`) | — |
 | combat/charm | apply/cancel aura | P1 | covered; Yogg MC logout `blocked-harness` (no charm/MC drive) | #25506 |
 | combat/death | die → ghost → release → reclaim | P1 | covered | — |
-| combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
+| combat/pets | summon / GUID / attack / dismiss | P1 | covered; two `blocked-harness` gaps below | #26661 #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
 | spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`) | #26130 #25765 |
@@ -165,6 +165,11 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
 | instances/ulduar | named tele; Freya wave interval; a Laughing Skull's Lunatic Gaze stops at the brain room's geometry instead of draining sanity through it | P2 | covered (`TestAC_27095_*`, `TestAC_27602_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 #27602 |
 | world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
+
+Combat/pets harness gaps:
+
+- #26661 follow-resume after deferred hostile pet casts: no pet spell/reaction drive.
+- #27081 dungeon Raise Dead: no ready-check/instance summon drive.
 
 ---
 
