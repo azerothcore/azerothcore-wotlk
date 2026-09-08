@@ -354,13 +354,13 @@ struct boss_mimiron : public BossAI
         else
         {
             events.ScheduleEvent(EVENT_MIMIRON_SAY_HARDMODE, 7s);
-            events.ScheduleEvent(EVENT_BERSERK, Is25ManRaid() ? 10min : 8min);
+            events.ScheduleEvent(EVENT_BERSERK, 10min);
 
             if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
                 computer->AI()->Talk(TALK_COMPUTER_INITIATED);
 
             events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, 3s);
-            _minutesTalkNum = Is25ManRaid() ? TALK_COMPUTER_TEN : TALK_COMPUTER_EIGHT;
+            _minutesTalkNum = TALK_COMPUTER_TEN;
             for (uint32 i = 0; i < uint32(TALK_COMPUTER_ZERO - _minutesTalkNum - 1); ++i)
                 events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((i + 1) * 60000));
             events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((TALK_COMPUTER_ZERO - _minutesTalkNum) * 60000));
@@ -1259,6 +1259,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
         _leftArm = false;
         me->SetRegeneratingHealth(false);
         _events.Reset();
+        scheduler.CancelAll();
     }
 
     void AttackStart(Unit* /*who*/) override {}
@@ -1370,6 +1371,8 @@ struct npc_ulduar_vx001 : public ScriptedAI
             return;
 
         _events.Update(diff);
+        // before the casting guard: the windup facing task must tick while Spinning Up channels
+        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -1438,7 +1441,18 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 if (Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET))
                     me->SetTarget(dbTarget->GetGUID());
                 FaceBarrageArc(me);
-                me->CastSpell(me, SPELL_SPINNING_UP, true);
+                // untargeted: conditions send EFFECT_0 to the DB Target (channel object, barrage
+                // chain) and EFFECT_1 to the MK II (self-cast 66490 root+pacify for the barrage)
+                me->CastSpell((Unit*)nullptr, SPELL_SPINNING_UP, true);
+                // the DB Target moves ~42 degrees during the windup; track it or the barrage opens off the telegraph
+                scheduler.Schedule(400ms, [this](TaskContext context)
+                {
+                    if (me->FindCurrentSpellBySpellId(SPELL_SPINNING_UP))
+                    {
+                        FaceBarrageArc(me);
+                        context.Repeat();
+                    }
+                });
                 if (Unit* vehicle = me->GetVehicleBase())
                 {
                     vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
