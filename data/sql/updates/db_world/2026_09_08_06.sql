@@ -1,3 +1,4 @@
+-- DB update 2026_09_08_05 -> 2026_09_08_06
 --
 -- Quest 12478 "Frostmourne Cavern": Arthas (27455) spoke his opening line before he was
 -- visible, his replies overtook their cues, he repeated his last line, and Muradin (27480)
