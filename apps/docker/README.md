@@ -61,11 +61,19 @@ $ docker compose up -d
 
 Docker seeds a volume from the image only when that volume is new and empty, so
 on a host that has already run the stack you get your old database back and no
-warning that the snapshot was skipped. Drop the volume first:
+warning that the snapshot was skipped. Back up what is there, stop the stack,
+then remove the database volume only:
 
 ```console
-$ docker compose down -v
+$ docker compose exec -T ac-database mysqldump -uroot -ppassword --all-databases > backup.sql
+$ docker compose down
+$ docker volume rm azerothcore-wotlk_ac-database
 ```
+
+The volume is named `<project>_ac-database`; the compose project name defaults
+to the checkout directory name (`azerothcore-wotlk` for a default clone), and
+`docker volume ls` shows it. `password` is the compose default; use your
+`DOCKER_DB_ROOT_PASSWORD` if you set one.
 
 Leave `DOCKER_DB_IMAGE` unset and the stack behaves exactly as before, on plain
 `mysql:8.4`. When it is set, a fresh named volume is seeded from the baked
@@ -91,10 +99,23 @@ is no help here, it moves with master too.
 
 - `:master` — the latest master build.
 - `:<version>` — the version from `acore.json`, e.g. `17.0.0-dev`.
-- `:<full commit sha>` — pin to a specific commit, or roll back to one.
+- `:<full commit sha>` — the AzerothCore commit the datadir was imported for.
 
-`:master` and `:<version>` are overwritten on every master build, so the sha
-tag is the only immutable one.
+`:master` and `:<version>` move on every master build. The sha tag is tied to a
+commit, not to a fixed set of bytes: a manual re-run of the `docker-build`
+workflow on master rebuilds it against the then-current mod-ale,
+`acore/ac-wotlk-db-import` and `mysql:8.4`, and pushes it again under the same
+tag. The exact inputs of the image you pulled are in its labels:
+
+```console
+$ docker inspect -f '{{json .Config.Labels}}' acore/ac-wotlk-db:master
+```
+
+- `org.opencontainers.image.revision` — the AzerothCore commit.
+- `org.azerothcore.mod-ale.revision` — the mod-ale commit whose SQL is included.
+- `org.azerothcore.db-import.digest` — the `acore/ac-wotlk-db-import` image that ran the import.
+- `org.opencontainers.image.base.name` and `.base.digest` — the `mysql:8.4` tag and the
+  multi-arch index digest it resolved to at build time.
 
 ### Persistence
 

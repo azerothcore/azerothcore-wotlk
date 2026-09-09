@@ -8,6 +8,7 @@
 # Because the datadir is pre-initialized, the official entrypoint skips
 # initialization and runtime MYSQL_* env vars are ignored: credentials are
 # fixed at build time (root/password and acore/acore).
-FROM mysql:8.4
+ARG MYSQL_IMAGE=mysql:8.4
+FROM ${MYSQL_IMAGE}
 
 COPY --chown=mysql:mysql mysql-seed/ /var/lib/mysql/

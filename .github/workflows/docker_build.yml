@@ -147,6 +147,7 @@ jobs:
       # gate a rebuild on. Pushed only on master of the canonical repo.
       # ----------------------------------------------------------------------
       - name: Import database and capture datadir
+        id: db_import
         run: |
           set -euo pipefail
 
@@ -159,11 +160,18 @@ jobs:
 
           docker network create acnet
 
+          # One resolution feeds the import, the smoke boots and the pushed image's
+          # FROM, so the base.digest label cannot drift from what buildx built from.
+          MYSQL_DIGEST="$(docker buildx imagetools inspect mysql:8.4 --format '{{.Manifest.Digest}}')"
+          MYSQL_REF="mysql:8.4@${MYSQL_DIGEST}"
+          echo "mysql_digest=${MYSQL_DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "Resolved mysql:8.4 to ${MYSQL_DIGEST}"
+
           mkdir -p mysql-seed
           docker run -d --name acdb --network acnet \
             -e MYSQL_ROOT_PASSWORD=password \
             -v "$PWD/mysql-seed:/var/lib/mysql" \
-            mysql:8.4 --skip-log-bin
+            "$MYSQL_REF" --skip-log-bin
 
           # The plain mysql image has no built-in healthcheck; poll explicitly.
           # Poll over TCP from another container (same as dbimport connects): the
@@ -171,7 +179,7 @@ jobs:
           # so a socket ping would falsely report "alive" before TCP 3306 is up,
           # and dbimport does not retry its initial connection.
           for i in $(seq 1 60); do
-            if docker run --rm --network acnet mysql:8.4 \
+            if docker run --rm --network acnet "$MYSQL_REF" \
                  mysqladmin ping -h acdb -uroot -ppassword --silent; then
               break
             fi
@@ -189,6 +197,9 @@ jobs:
           # current published :master, validating the pipeline mechanics (per-PR
           # SQL content is already covered by dashboard-ci's dry-run).
           docker pull "acore/ac-wotlk-db-import:master"
+          DB_IMPORT_DIGEST="$(docker image inspect -f '{{index .RepoDigests 0}}' \
+            acore/ac-wotlk-db-import:master)"
+          echo "db_import_digest=${DB_IMPORT_DIGEST}" >> "$GITHUB_OUTPUT"
           docker run --rm --network acnet \
             -e AC_LOGIN_DATABASE_INFO="acdb;3306;root;password;acore_auth" \
             -e AC_WORLD_DATABASE_INFO="acdb;3306;root;password;acore_world" \
@@ -220,11 +231,15 @@ jobs:
           # Minimal build context: only the datadir, not the ~GB repo.
           mkdir -p db-ctx
           mv mysql-seed db-ctx/
+          du -sh db-ctx/mysql-seed
 
       - name: Build (and push on master) pre-imported DB image
         run: |
           set -euo pipefail
           VERSION="${{ steps.version.outputs.version }}"
+          MYSQL_DIGEST="${{ steps.db_import.outputs.mysql_digest }}"
+          MYSQL_REF="mysql:8.4@${MYSQL_DIGEST}"
+          DB_IMPORT_DIGEST="${{ steps.db_import.outputs.db_import_digest }}"
 
           # The sibling images get these from metadata-action; this one builds raw.
           LABELS=(
@@ -232,9 +247,17 @@ jobs:
             --label "org.opencontainers.image.revision=${{ github.sha }}"
             --label "org.opencontainers.image.version=${VERSION}"
             --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            --label "org.opencontainers.image.base.name=mysql:8.4"
+            --label "org.opencontainers.image.base.digest=${MYSQL_DIGEST}"
+            --label "org.azerothcore.db-import.digest=${DB_IMPORT_DIGEST}"
           )
+          # Download Eluna runs on master only; labeled-PR builds are never pushed.
+          if [ -d modules/mod-ale ]; then
+            LABELS+=(--label "org.azerothcore.mod-ale.revision=$(git -C modules/mod-ale rev-parse HEAD)")
+          fi
 
-          # Build one arch, boot it and check the three databases are there.
+          # Build one arch, boot it, check the three databases are there and log
+          # the resulting image size and labels.
           # $2 = poll attempts, 2s apart: 60 gives amd64 120s, 300 gives arm64
           # 600s (its emulated MySQL start is far slower).
           smoke() {
@@ -242,7 +265,8 @@ jobs:
             local tag="acore/ac-wotlk-db:test-$arch"
 
             docker buildx build --platform "linux/$arch" --load \
-              -f apps/docker/Dockerfile.db "${LABELS[@]}" -t "$tag" db-ctx
+              -f apps/docker/Dockerfile.db --build-arg "MYSQL_IMAGE=${MYSQL_REF}" \
+              "${LABELS[@]}" -t "$tag" db-ctx
 
             docker run -d --name acdb-test "$tag"
             # Pre-initialized datadir: the entrypoint skips init and starts the
@@ -259,6 +283,8 @@ jobs:
                 -e "USE $db; SELECT 1;" >/dev/null
             done
             echo "DB image ($arch) booted and all three databases are present."
+            echo "DB image ($arch) size: $(docker image ls --format '{{.Size}}' "$tag")"
+            echo "DB image ($arch) labels: $(docker image inspect -f '{{json .Config.Labels}}' "$tag")"
 
             docker rm -f acdb-test >/dev/null
             docker rmi "$tag" >/dev/null
@@ -278,7 +304,8 @@ jobs:
             # The datadir is arch-neutral, and only amd64 was booted above:
             # arm64 is covered by the labeled-PR check, not by this path.
             docker buildx build --platform linux/amd64,linux/arm64 \
-              -f apps/docker/Dockerfile.db "${LABELS[@]}" \
+              -f apps/docker/Dockerfile.db --build-arg "MYSQL_IMAGE=${MYSQL_REF}" \
+              "${LABELS[@]}" \
               -t "acore/ac-wotlk-db:master" \
               -t "acore/ac-wotlk-db:${VERSION}" \
               -t "acore/ac-wotlk-db:${{ github.sha }}" \
