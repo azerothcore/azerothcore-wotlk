@@ -6,13 +6,13 @@ and run against a **live** authserver + worldserver + MySQL.
 
 Offline `go test ./...` (without `-tags=e2e`) skips these packages.
 
-Authoring rules for new tests live in the harness:
+Authoring rules for the existing suite live in the harness:
 
 | Doc | Audience |
 |-----|----------|
-| [LLM_GUIDE.md](https://github.com/azerothcore/AzerothGhost/blob/v1.0.8/e2e/LLM_GUIDE.md) | Compact MUST/NEVER + APIs (LLMs and humans) |
+| [LLM_GUIDE.md](https://github.com/azerothcore/AzerothGhost/blob/v1.0.8/e2e/LLM_GUIDE.md) | Compact MUST/NEVER + APIs |
 | [EXAMPLES.md](https://github.com/azerothcore/AzerothGhost/blob/v1.0.8/e2e/EXAMPLES.md) | Full recipes and skeletons |
-| `.agents/docs/e2e-policy.md` | When to add e2e vs unit tests (agent/review policy) |
+| `.agents/docs/e2e-policy.md` | Do not add e2e unless asked; suite conventions |
 
 ---
 
@@ -127,18 +127,15 @@ go test -tags=e2e ./suites/... -run TestPets_SummonWaitDismiss -count=1 -v -time
 
 Every live test uses `//go:build e2e` and should call `meta.Begin(t, meta.TestMeta{…})` before expensive setup.
 
-### Scratch / agent debug (`local/`)
+### Scratch (`local/`)
 
-When validating a fix on a **live** stack (player-visible combat, protocol, quests, multi-bot), prefer writing a small e2e under **`e2e/local/`** instead of ad-hoc GM spam or long manual checklists. That tree is **not committed**.
+`e2e/local/` is gitignored except `local/README.md`. Do not add tests there unless asked. If something is already there:
 
 ```bash
-# create e.g. local/repro/repro_e2e_test.go  (//go:build e2e)
 make e2e-local
 # or:
 go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 ```
-
-If the scenario should stay as a regression, **move** it into `suites/` next to related tests with proper `meta.Begin` tags — see `.agents/docs/e2e-policy.md`.
 
 ### Inventory
 
@@ -349,9 +346,11 @@ A test that fails intermittently on a **correct** core is a test/harness bug unt
 
 ---
 
-## Policy (when to add e2e)
+## Policy
 
-Use `.agents/docs/e2e-policy.md` for decision trees (e2e vs unit, mandatory triggers, MVT). This README is **how to run and structure** the suite; the harness guides are **how to author** scenarios.
+Do not add e2e tests unless asked. Do not mention missing coverage unless the user asked about it.
+`.agents/docs/e2e-policy.md` is suite convention when changing existing tests. This README is
+**how to run and structure** the suite.
 
 ---
 
@@ -367,6 +366,6 @@ Details live in the workflow files only:
 | Merge to `master` | same clang-18 nopch build, then **full** e2e again (flake + merge-base drift) |
 | Actions → **e2e-live** → Run workflow (official repo; needs workflow on default branch, or `gh workflow run … --ref e2e`) | Compiles on the runner; choose scope (smoke/full) |
 
-Day-to-day development and agent debugging should use a **local** stack + `e2e/local/` or the committed suites — not CI setup docs.
+Day-to-day development should use a **local** stack and the committed suites, not CI setup docs.
 
 Greppable failure prefixes: `precondition:`, `AC#N CONFIRMED BUG:`, `harness:`, `WARNING:`.
