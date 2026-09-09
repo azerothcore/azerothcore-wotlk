@@ -13,6 +13,11 @@ evidence, and state what the repeat will verify. Retry transient failures in the
 as described below. Earlier plans' two-generation requirements are historical, not the default for
 new work.
 
+The disposable MySQL container starts with `--skip-log-bin`: acceptance runs do not need replication
+or point-in-time recovery logs. InnoDB commit flushing remains enabled. Restore the existing SQL
+cache into a fresh owned volume and verify the fixture as usual. Measure database restore separately
+from preflight and Wine startup when investigating `prepare` performance.
+
 ## Window discovery
 
 `owned_wow_window()` scans `wmctrl -lpGx` for a window whose PID is in the generation's own

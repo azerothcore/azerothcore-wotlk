@@ -1243,6 +1243,7 @@ def prepare(args: argparse.Namespace) -> None:
             "-e", f"MYSQL_ROOT_PASSWORD={manifest['mysql_root_password']}",
             "-p", f"127.0.0.1:{generation['ports']['mysql']}:3306",
             "-v", f"{generation['docker']['volume']}:/var/lib/mysql", str(inputs["mysql_image_id"]),
+            "--skip-log-bin",  # This disposable database has no replication or point-in-time recovery.
         ])
         generation["docker"]["container_id"] = result.stdout.decode().strip()
         save_manifest(manifest_path, manifest)
