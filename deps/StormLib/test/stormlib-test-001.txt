@@ -1,0 +1,187 @@
+==== Test Suite for StormLib version 9.31 ====
+InitWorkFolder: Work directory \Multimedia\MPQs (default)
+TestLiFiSearch (FLAT-MAP:listfile-test.txt) succeeded.
+TestLiFiSearch (listfile-test.txt) succeeded.
+TestFileStream (MPQ_2013_v4_alternate-original.MPQ) succeeded.
+TestFileStream (MPQ_2013_v4_alternate-original.MPQ) succeeded.
+TestFileStream (MPQ_2013_v4_alternate-complete.MPQ) succeeded.
+TestFileStream (part-file://MPQ_2009_v2_WoW_patch.MPQ.part) succeeded.
+TestFileStream (blk4-file://streaming/model.MPQ.0) succeeded.
+TestFileStream (mpqe-file://MPQ_2011_v2_EncryptedMpq.MPQE) succeeded.
+TestFileMirror (part-file://MPQ_2009_v1_patch-created.MPQ.part) succeeded.
+TestFileMirror (part-file://MPQ_2009_v1_patch-partial.MPQ.part) succeeded.
+TestFileMirror (part-file://MPQ_2009_v1_patch-complete.MPQ.part) succeeded.
+TestFileMirror (MPQ_2013_v4_alternate-created.MPQ) succeeded.
+TestFileMirror (MPQ_2013_v4_alternate-incomplete.MPQ) succeeded.
+TestFileMirror (MPQ_2013_v4_alternate-complete.MPQ) succeeded.
+TestEmbeddedMpq (MPQ_1997_v1_Diablo1_DIABDAT.MPQ) succeeded.
+TestEmbeddedMpq (MPQ_2001_v1_War3.mpq) succeeded.
+TestReadingMpq: Warning: CRC32 error on replay.game.events
+TestReadingMpq (pocs/MPQ_2024_01_HeapOverrun.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_02_StackOverflow.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_03_TooBigAlloc.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_04_HeapOverflow.mpq) succeeded.
+TestReadingMpq: Warning: CRC32 error on replay.tracker.events
+TestReadingMpq (pocs/MPQ_2024_05_HeapOverflow.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_06_HeapOverflowReadFile.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_07_InvalidBitmapFooter.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_08_InvalidSectorSize.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_09_InvalidSectorSize.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_10_HuffDecompressError.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_10_SparseDecompressError.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2024_11_HiBlockTablePosInvalid.mpq) succeeded.
+TestReadingMpq: Error loading the file (listfile) (error code: 38)
+TestReadingMpq (pocs/MPQ_2025_01_SectorTableBeyondEOF.mpq) succeeded.
+TestReadingMpq: Warning: CRC32 error on (listfile)
+TestReadingMpq: Warning: CRC32 error on (listfile)
+TestReadingMpq (pocs/MPQ_2025_02_SectorOffsetSizeNotAligned.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2025_03_InvalidPatchInfo.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2025_04_InvalidArchiveSize64.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2025_05_AddFileError.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2025_06_BadHashTableSize.mpq) succeeded.
+TestReadingMpq (pocs/MPQ_2025_07_BadHetTableSize.mpq) succeeded.
+TestReadingMpq (MPQ_1997_v1_Diablo1_DIABDAT.MPQ) succeeded.
+TestReadingMpq (MPQ_1997_v1_patch_rt_SC1B.mpq) succeeded.
+TestReadingMpq (MPQ_1997_v1_StarDat_SC1B.mpq) succeeded.
+TestReadingMpq (MPQ_1997_v1_INSTALL_SC1B.EXE_) succeeded.
+TestReadingMpq: Warning: CRC32 error on (signature)
+TestReadingMpq: Warning: CRC32 error on (signature)
+TestReadingMpq (MPQ_2016_v1_D2XP_IX86_1xx_114a.mpq) succeeded.
+TestReadingMpq (MPQ_2018_v1_icon_error.w3m) succeeded.
+TestReadingMpq (MPQ_1997_v1_Diablo1_STANDARD.SNP) succeeded.
+TestReadingMpq (MPQ_2012_v2_EmptyMpq.MPQ) succeeded.
+TestReadingMpq (MPQ_2013_v4_EmptyMpq.MPQ) succeeded.
+TestReadingMpq (MPQ_2013_v4_patch-base-16357.MPQ) succeeded.
+TestReadingMpq (MPQ_2011_v4_InvalidHetEntryCount.MPQ) succeeded.
+TestReadingMpq (MPQ_2002_v1_BlockTableCut.MPQ) succeeded.
+TestReadingMpq (MPQ_2010_v2_HasUserData.s2ma) succeeded.
+TestReadingMpq: Warning: CRC32 error on (listfile)
+TestReadingMpq: Warning: CRC32 error on (listfile)
+TestReadingMpq: Warning: CRC32 error on File00000003.xxx
+TestReadingMpq (MPQ_2014_v1_AttributesOneEntryLess.w3x) succeeded.
+TestReadingMpq (MPQ_2010_v3_expansion-locale-frFR.MPQ) succeeded.
+TestReadingMpq (mpqe-file://MPQ_2011_v2_EncryptedMpq.MPQE) succeeded.
+TestReadingMpq (part-file://MPQ_2010_v2_HashTableCompressed.MPQ.part) succeeded.
+TestReadingMpq (blk4-file://streaming/model.MPQ.0) succeeded.
+TestReadingMpq: Warning: CRC32 error on replay.message.events
+TestReadingMpq (MPQ_2023_v2_MemoryCorruption.SC2Replay) succeeded.
+TestReadingMpq (MPQ_2023_v1_StarcraftMap.scm) succeeded.
+TestReadingMpq (MPQ_2023_v1_BroodWarMap.scx) succeeded.
+TestReadingMpq (MPQ_2023_v1_Volcanis.scm) succeeded.
+TestReadingMpq (MPQ_2023_v4_UTF8.s2ma) succeeded.
+TestReadingMpq (MPQ_2023_v1_GreenTD.w3x) succeeded.
+TestReadingMpq (MPQ_2023_v4_1F644C5A.SC2Replay) succeeded.
+TestReadingMpq (<Chinese MPQ name>) succeeded.
+TestReadingMpq (MPQ_2024_v1_BadUtf8_5.0.2.w3x) succeeded.
+TestReadingMpq (MPQ_2002_v1_ProtectedMap_InvalidUserData.w3x) succeeded.
+TestReadingMpq (MPQ_2002_v1_ProtectedMap_InvalidMpqFormat.w3x) succeeded.
+TestReadingMpq (MPQ_2002_v1_ProtectedMap_Spazzler.w3x) succeeded.
+TestReadingMpq (MPQ_2014_v1_ProtectedMap_Spazzler2.w3x) succeeded.
+TestReadingMpq (MPQ_2014_v1_ProtectedMap_Spazzler3.w3x) succeeded.
+TestReadingMpq (MPQ_2002_v1_ProtectedMap_BOBA.w3m) succeeded.
+TestReadingMpq (MPQ_2015_v1_ProtectedMap_KangTooJee.w3x) succeeded.
+TestReadingMpq (MPQ_2015_v1_ProtectedMap_Somj2hM16.w3x) succeeded.
+TestReadingMpq (MPQ_2015_v1_ProtectedMap_Spazy.w3x) succeeded.
+TestReadingMpq (MPQ_2015_v1_MessListFile.mpq) succeeded.
+TestReadingMpq (MPQ_2016_v1_ProtectedMap_TableSizeOverflow.w3x) succeeded.
+TestReadingMpq (MPQ_2016_v1_ProtectedMap_HashOffsIsZero.w3x) succeeded.
+TestReadingMpq (MPQ_2016_v1_ProtectedMap_Somj2.w3x) succeeded.
+TestReadingMpq (MPQ_2016_v1_WME4_4.w3x) succeeded.
+TestReadingMpq (MPQ_2016_v1_SP_(4)Adrenaline.w3x) succeeded.
+TestReadingMpq (MPQ_2016_v1_ProtectedMap_1.4.w3x) succeeded.
+TestReadingMpq (MPQ_2016_v1_KoreanFile.w3m) succeeded.
+TestReadingMpq (MPQ_2017_v1_Eden_RPG_S2_2.5J.w3x) succeeded.
+TestReadingMpq (MPQ_2017_v1_BigDummyFiles.w3x) succeeded.
+TestReadingMpq (MPQ_2017_v1_TildeInFileName.mpq) succeeded.
+TestReadingMpq (MPQ_2018_v1_EWIX_v8_7.w3x) succeeded.
+TestReadingMpq (MPQ_2020_v4_FakeMpqHeaders.SC2Mod) succeeded.
+TestReadingMpq (MPQ_2020_v4_NP_Protect_1.s2ma) succeeded.
+TestReadingMpq (MPQ_2020_v4_NP_Protect_2.s2ma) succeeded.
+TestReadingMpq (MPQ_2015_v1_flem1.w3x) succeeded.
+TestReadingMpq (MPQ_2002_v1_ProtectedMap_HashTable_FakeValid.w3x) succeeded.
+TestReadingMpq (MPQ_2021_v1_CantExtractCHK.scx) succeeded.
+TestReadingMpq (MPQ_2022_v1_Sniper.scx) succeeded.
+TestReadingMpq (MPQ_2022_v1_OcOc_Bound_2.scx) succeeded.
+TestReadingMpq (MPQ_2023_v1_Lusin2Rpg1.28.w3x) succeeded.
+TestReadingMpq (MPQ_2024_v1_300TK2.09p.w3x) succeeded.
+TestReadingMpq (MPQ_2025_v1_Legion_TD_11_2d-BETA_2_TeamOZE.w3x) succeeded.
+TestReadingMpq (MPQ_2026_v1_The Art of Defense v4.11 G0A.w3x) succeeded.
+TestReadingMpq (MPQ_2026_v1_BadTablesSize.scx) succeeded.
+TestReadingMpq (mix-mpq/AHF04patch.mix) succeeded.
+TestReadingMpq (mix-mpq/hs0.1.asi) succeeded.
+TestReadingMpq (mix-mpq/hs0.8.asi) succeeded.
+TestReadingMpq (mix-mpq/MoeMoeMod.asi) succeeded.
+TestReadingMpq (MPx_2013_v1_LongwuOnline.mpk) succeeded.
+TestReadingMpq (MPx_2013_v1_WarOfTheImmortals.sqp) succeeded.
+TestReadingMpq (MPx_2022_v1_Music.mpk) succeeded.
+TestReadingMpq (MPx_2022_v1_Scp.mpk) succeeded.
+TestReadingMpq (MPx_2022_v1_UI.mpk) succeeded.
+TestReadingMpq (MPQ_1998_v1_StarCraft.mpq) succeeded.
+TestReadingMpq (MPQ_2005_v1_texture.MPQ) succeeded.
+TestReadingMpq (MPQ_2012_v4_OldWorld.MPQ) succeeded.
+TestReadingMpq (MPQ_2013_v4_world.MPQ) succeeded.
+TestReadingMpq (MPQ_2013_v4_locale-enGB.MPQ) succeeded.
+TestReadingMpq (MPQ_2013_v4_Base1.SC2Data) succeeded.
+TestReadingMpq (MPQ_2013_v4_Mods#Core.SC2Mod#enGB.SC2Assets) succeeded.
+TestReadingMpq (MPQ_2013_v4_Base1.SC2Data) succeeded.
+TestReadingMpq (MPQ_2013_v4_Base3.SC2Maps) succeeded.
+TestReadingMpq (MPQ_2013_v4_Mods#Liberty.SC2Mod#enGB.SC2Data) succeeded.
+TestReadingMpq (MPQ_2014_v4_base-Win.MPQ) succeeded.
+TestReadingMpq (MPQ_2014_v4_base-Win.MPQ) succeeded.
+TestReadingMpq (MPQ_1997_v1_Diablo1_STANDARD.SNP) succeeded.
+TestReadingMpq (MPQ_1998_v1_StarDat.mpq) succeeded.
+TestReadingMpq (MPQ_1999_v1_WeakSignature.exe) succeeded.
+TestReadingMpq (MPQ_1999_v1_WeakSignature.exe) succeeded.
+TestReadingMpq (MPQ_2002_v1_StrongSignature.w3m) succeeded.
+TestReadingMpq (MPQ_2003_v1_WeakSignatureEmpty.exe) succeeded.
+TestReadingMpq: Warning: CRC32 error on (signature)
+TestReadingMpq: Warning: CRC32 error on (signature)
+TestReadingMpq (MPQ_2006_v1_WoW-1.11.2.5464-patch.exe_) succeeded.
+TestReadingMpq (MPQ_2007_v2_StrongSignature1.exe) succeeded.
+TestReadingMpq (MPQ_2007_v2_StrongSignature2.MPQ) succeeded.
+TestReadingMpq (flat-file://streaming/model.MPQ.0) succeeded.
+TestReadingMpq (MPQ_2013_vX_Battle.net.MPQ) succeeded.
+TestReadingMpq (MPQ_1997_v1_Diablo1_DIABDAT.MPQ) succeeded.
+TestReadingMpq (MPQ_1997_v1_Diablo1_DIABDAT.MPQ) succeeded.
+TestReadingMpq (MPQ_2002_v1_StrongSignature.w3m) succeeded.
+TestReadingMpq (MPQ_2013_v4_SC2_EmptyMap.SC2Map) succeeded.
+Test_ReopenMpq (MPQ_2010_v3_expansion-locale-frFR.MPQ) succeeded.
+Test_ReopenMpq (MPQ_2016_v1_00000.pak) succeeded.
+Test_ReopenMpq (MPQ_2013_v4_SC2_EmptyMap.SC2Map) succeeded.
+Test_ReopenMpq (MPQ_2013_v4_expansion1.MPQ) succeeded.
+Test_ReopenMpq (MPQ_2014_v1_out1.w3x) succeeded.
+Test_ReopenMpq (MPQ_2014_v1_out2.w3x) succeeded.
+Test_ReopenMpq (MPQ_1997_v1_Diablo1_DIABDAT.MPQ) succeeded.
+Test_ReopenMpq (MPQ_2013_v4_SC2_EmptyMap.SC2Map) succeeded.
+Test_ReopenMpq (MPQ_2002_v1_LargeMapFile.w3m) succeeded.
+Test_Signature (MPQ_1999_v1_WeakSigned1.mpq) succeeded.
+Test_Signature (MPQ_1999_v1_WeakSigned1.mpq) succeeded.
+TestModifyMpq (MPQ_2014_v4_Base.StormReplay) succeeded.
+TestModifyMpq (MPQ_2022_v1_v4.329.w3x) succeeded.
+TestModifyMpq (MPQ_2023_v1_StarcraftMap.scm) succeeded.
+TestVerifyHash succeeded.
+CreateNewMpq (StormLibTest_EmptyMpq_v2.mpq) succeeded.
+CreateNewMpq (StormLibTest_EmptyMpq_v4.mpq) succeeded.
+CreateNewMpq (StormLibTest_Český.mpq) succeeded.
+CreateNewMpq (StormLibTest_Русский.mpq) succeeded.
+CreateNewMpq (StormLibTest_ελληνικά.mpq) succeeded.
+CreateNewMpq (StormLibTest_日本語.mpq) succeeded.
+CreateNewMpq (StormLibTest_简体中文.mpq) succeeded.
+CreateNewMpq (StormLibTest_الععربية.mpq) succeeded.
+CreateNewMpq (StormLibTest_NonStdNames.mpq) succeeded.
+CreateNewMpq (StormLibTest_MpqEditorTest.mpq) succeeded.
+TestRenameFile (MPQ_2002_v1_StrongSignature.w3m) succeeded.
+TestCreateGaps (StormLibTest_GapsTest.mpq) succeeded.
+TestCreateFull (StormLibTest_FileTableFull.mpq) succeeded.
+TestCreateFull (StormLibTest_FileTableFull.mpq) succeeded.
+TestCreateFull (StormLibTest_FileTableFull.mpq) succeeded.
+TestCreateFull (StormLibTest_FileTableFull.mpq) succeeded.
+IncMaxFileCount (StormLibTest_IncMaxFileCount.mpq) succeeded.
+TestFileFlag (StormLibTest_FileFlagTest.mpq) succeeded.
+TestCompressions: Warning: CRC32 error on WaveFile_01.wav
+TestCompressions: Warning: CRC32 error on WaveFile_02.wav
+TestCompressions (StormLibTest_AddWaveMonoBadTest.mpq) succeeded.
+TestCompressions: Warning: CRC32 error on WaveFile_01.wav
+TestCompressions: Warning: CRC32 error on WaveFile_02.wav
+ListFilePos (StormLibTest_ListFilePos.mpq) succeeded.
+TestBigArchive (StormLibTest_BigArchive_v4.mpq) succeeded.

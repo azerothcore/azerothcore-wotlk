@@ -142,6 +142,12 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
         Recast
         g3dlib
         fkYAML)
+
+    if (${TOOL_PROJECT_NAME} STREQUAL "map_extractor")
+      target_link_libraries(${TOOL_PROJECT_NAME}
+        PUBLIC
+          storm)
+    endif()
   endif()
 
   unset(TOOL_PUBLIC_INCLUDES)

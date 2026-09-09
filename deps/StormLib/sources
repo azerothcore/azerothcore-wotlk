@@ -1,0 +1,14 @@
+TARGETNAME=StormLibWDK
+TARGETTYPE=LIBRARY
+USE_MSVCRT=1
+
+C_DEFINES=$(C_DEFINES) -DUNICODE -D_UNICODE -DWDK_BUILD
+
+SOURCES=sources-cpp.cpp        \
+        sources-wdk-bzip2.c    \
+        sources-wdk-ltc.c      \
+        sources-wdk-lzma.c     \
+        sources-wdk-misc.c     \
+        sources-wdk-tomcrypt.c \
+        sources-wdk-tommath.c  \
+        sources-wdk-zlib.c

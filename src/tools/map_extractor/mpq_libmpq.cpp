@@ -21,42 +21,51 @@
 
 ArchiveSet gOpenArchives;
 
-MPQArchive::MPQArchive(char const* filename)
+MPQArchive::MPQArchive(char const* filename):
+    mpq_a(nullptr)
 {
-    int result = libmpq__archive_open(&mpq_a, filename, -1);
     printf("Opening %s\n", filename);
-    if (result)
+    if (!SFileOpenArchive(filename, 0, MPQ_OPEN_READ_ONLY, &mpq_a))
     {
-        switch (result)
-        {
-            case LIBMPQ_ERROR_OPEN :
-                printf("Error opening archive '%s': Does file really exist?\n", filename);
-                break;
-            case LIBMPQ_ERROR_FORMAT :            /* bad file format */
-                printf("Error opening archive '%s': Bad file format\n", filename);
-                break;
-            case LIBMPQ_ERROR_SEEK :         /* seeking in file failed */
-                printf("Error opening archive '%s': Seeking in file failed\n", filename);
-                break;
-            case LIBMPQ_ERROR_READ :              /* Read error in archive */
-                printf("Error opening archive '%s': Read error in archive\n", filename);
-                break;
-            case LIBMPQ_ERROR_MALLOC :               /* maybe not enough memory? :) */
-                printf("Error opening archive '%s': Maybe not enough memory\n", filename);
-                break;
-            default:
-                printf("Error opening archive '%s': Unknown error\n", filename);
-                break;
-        }
+        printf("Error opening archive '%s': error %u\n", filename, SErrGetLastError());
+        mpq_a = nullptr;
         return;
     }
     gOpenArchives.push_front(this);
 }
 
+void MPQArchive::ApplyPatch(char const* filename)
+{
+    if (!mpq_a)
+        return;
+
+    printf("Applying patch %s\n", filename);
+    if (!SFileOpenPatchArchive(mpq_a, filename, "", 0))
+        printf("Error applying patch '%s': error %u\n", filename, SErrGetLastError());
+}
+
 void MPQArchive::close()
 {
-    //gOpenArchives.erase(erase(&mpq_a);
-    libmpq__archive_close(mpq_a);
+    if (mpq_a)
+        SFileCloseArchive(mpq_a);
+    mpq_a = nullptr;
+}
+
+void MPQArchive::GetFileListTo(vector<string>& filelist)
+{
+    if (!mpq_a)
+        return;
+
+    SFILE_FIND_DATA data;
+    HANDLE hFind = SFileFindFirstFile(mpq_a, "*", &data, nullptr);
+    if (!hFind)
+        return;
+
+    do
+        filelist.emplace_back(data.cFileName);
+    while (SFileFindNextFile(hFind, &data));
+
+    SFileFindClose(hFind);
 }
 
 MPQFile::MPQFile(char const* filename):
@@ -67,26 +76,27 @@ MPQFile::MPQFile(char const* filename):
 {
     for (auto & gOpenArchive : gOpenArchives)
     {
-        mpq_archive* mpq_a = gOpenArchive->mpq_a;
+        HANDLE hFile;
+        if (!SFileOpenFileEx(gOpenArchive->mpq_a, filename, SFILE_OPEN_FROM_MPQ, &hFile))
+            continue;
 
-        uint32_t filenum;
-        if (libmpq__file_number(mpq_a, filename, &filenum)) continue;
-        libmpq__off_t transferred;
-        libmpq__file_unpacked_size(mpq_a, filenum, &size);
+        DWORD fileSize = SFileGetFileSize(hFile, nullptr);
 
         // HACK: in patch.mpq some files don't want to open and give 1 for filesize
-        if (size <= 1)
+        if (fileSize == SFILE_INVALID_SIZE || fileSize <= 1)
         {
-            //            printf("warning: file %s has size %d; cannot read.\n", filename, size);
+            SFileCloseFile(hFile);
             eof = true;
             buffer = nullptr;
             return;
         }
+
+        size = fileSize;
         buffer = new char[size];
 
-        //libmpq_file_getdata
-        libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
-        /*libmpq_file_getdata(&mpq_a, hash, fileno, (unsigned char*)buffer);*/
+        DWORD transferred = 0;
+        SFileReadFile(hFile, buffer, static_cast<DWORD>(size), &transferred, nullptr);
+        SFileCloseFile(hFile);
         return;
     }
     eof = true;
@@ -98,7 +108,7 @@ std::size_t MPQFile::read(void* dest, std::size_t bytes)
     if (eof) return 0;
 
     std::size_t rpos = pointer + bytes;
-    if (rpos > std::size_t(size))
+    if (rpos > size)
     {
         bytes = size - pointer;
         eof = true;

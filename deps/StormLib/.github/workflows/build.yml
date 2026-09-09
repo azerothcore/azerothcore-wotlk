@@ -1,0 +1,193 @@
+name: CMake
+
+on: [push, pull_request]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  debian-trixie:
+    name: debian-trixie (bundled=${{ matrix.storm_use_bundled_libraries }}, shared=${{ matrix.build_shared_libs }}, unicode=${{ matrix.unicode }})
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+
+    strategy:
+      matrix:
+        storm_use_bundled_libraries: [ ON, OFF ]
+        build_shared_libs: [ ON, OFF ]
+        unicode: [ ON, OFF ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: apt-get -y update && apt-get install -y build-essential cmake
+
+      - name: Conditionally install system libraries
+        if: matrix.storm_use_bundled_libraries == 'OFF'
+        run: apt-get install -y pkg-config zlib1g-dev libbz2-dev libtommath-dev libtomcrypt-dev
+
+      - name: CMake Configuration
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSTORM_USE_BUNDLED_LIBRARIES=${{ matrix.storm_use_bundled_libraries }} \
+            -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} \
+            -DSTORM_UNICODE=${{ matrix.unicode }}
+
+      - name: Build
+        run: cmake --build build --config Release
+
+  fedora-latest:
+    name: fedora-latest (bundled=${{ matrix.storm_use_bundled_libraries }})
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+
+    strategy:
+      matrix:
+        storm_use_bundled_libraries: [ ON, OFF ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: dnf -y install cmake gcc gcc-c++
+
+      - name: Conditionally install system libraries
+        if: matrix.storm_use_bundled_libraries == 'OFF'
+        run: dnf -y install pkg-config zlib-devel bzip2-devel libtommath-devel libtomcrypt-devel
+
+      - name: Cmake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_SHARED_LIBS=ON -DSTORM_USE_BUNDLED_LIBRARIES=${{ matrix.storm_use_bundled_libraries }}
+
+      - name: Build
+        run: cmake --build build --config Release
+
+  windows-latest-x64:
+    if: true
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x64
+
+      - name: Cmake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_SHARED_LIBS=ON -DSTORM_USE_BUNDLED_LIBRARIES=ON
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Debug
+        shell: bash
+        run: ls -la build
+
+      - name: Check PE
+        shell: bash
+        working-directory: ./build/Release
+        run: |
+          file "stormlib.dll"
+          file "stormlib.dll" |grep "x86-64"
+
+  windows-latest-x86:
+    if: true
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x86
+
+      - name: Cmake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_SHARED_LIBS=ON -DSTORM_USE_BUNDLED_LIBRARIES=ON
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Debug
+        shell: bash
+        run: ls -la build
+
+      - name: Check PE
+        shell: bash
+        working-directory: ./build/Release
+        run: |
+          file "stormlib.dll"
+          file "stormlib.dll" |grep "x86-64"
+
+  conan:
+    name: conan (${{ matrix.os }}, ${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        arch: [x64, x86]
+        exclude:
+          - os: ubuntu-latest
+            arch: x86
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        if: runner.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Install Conan
+        uses: turtlebrowser/get-conan@main
+
+      - name: Init Conan
+        run: conan profile detect
+
+      - name: Install dependencies with Conan
+        shell: bash
+        env:
+          CONAN_ARCH_ARG: ${{ matrix.arch == 'x86' && '-s:h arch=x86' || '' }}
+        run: conan install . -of build -s build_type=Release -o '*:shared=False' --build=missing $CONAN_ARCH_ARG
+
+      - name: CMake Configuration
+        shell: bash
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DSTORM_USE_BUNDLED_LIBRARIES=OFF -DWITH_BUNDLED_LIBTOMCRYPT=ON -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake
+
+      - name: Build
+        shell: bash
+        run: cmake --build build --config Release
+
+  freebsd:
+    name: freebsd (shared=${{ matrix.build_shared_libs }}, bundled=${{ matrix.storm_use_bundled_libraries }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_shared_libs: [ON, OFF]
+        storm_use_bundled_libraries: [ON, OFF]
+    env:
+      BUILD_SHARED_LIBS: ${{ matrix.build_shared_libs }}
+      STORM_USE_BUNDLED_LIBRARIES: ${{ matrix.storm_use_bundled_libraries }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build in FreeBSD
+        uses: vmactions/freebsd-vm@v1
+        with:
+          envs: 'BUILD_SHARED_LIBS STORM_USE_BUNDLED_LIBRARIES'
+          usesh: true
+          prepare: |
+            pkg install -y cmake
+            if [ "$STORM_USE_BUNDLED_LIBRARIES" = "OFF" ]; then
+              pkg install -y pkgconf libtommath libtomcrypt
+            fi
+          run: |
+            cmake -B build \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS \
+              -DSTORM_USE_BUNDLED_LIBRARIES=$STORM_USE_BUNDLED_LIBRARIES
+            cmake --build build --config Release

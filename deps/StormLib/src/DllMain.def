@@ -1,0 +1,85 @@
+;
+; Export file for Windows
+; Copyright (c) 2007-2010 Ladislav Zezula
+; ladik@zezula.net
+;
+
+LIBRARY StormLib.dll
+
+EXPORTS
+
+    SFileSetLocale
+    SFileGetLocale
+
+    SFileOpenArchive
+    SFileCreateArchive
+    SFileCreateArchive2
+    SFileFlushArchive
+    SFileCloseArchive
+
+    SFileAddListFile
+    SFileAddListFileEntries
+
+    SFileSetCompactCallback
+    SFileCompactArchive
+
+    SFileGetMaxFileCount
+    SFileSetMaxFileCount
+
+    SFileGetAttributes
+    SFileSetAttributes
+    SFileUpdateFileAttributes
+
+    SFileOpenPatchArchive
+    SFileIsPatchedArchive
+
+    SFileOpenFileArchive
+    SFileOpenFileEx
+    SFileGetFileArchive
+    SFileSetFilePointer
+    SFileGetFileSize
+    SFileReadFile
+    SFileCloseFile
+
+    SFileHasFile
+    SFileGetFileName
+    SFileGetFileInfo
+
+    SFileExtractFile
+
+    SFileVerifyFile
+    SFileVerifyRawData
+    SFileVerifyArchive
+
+    SFileFindFirstFile
+    SFileFindNextFile
+    SFileFindClose
+
+    SListFileFindFirstFile
+    SListFileFindNextFile
+    SListFileFindClose
+
+    SFileEnumLocales
+
+    SFileCreateFile
+    SFileWriteFile
+    SFileFinishFile
+    SFileAddFileEx
+    SFileAddFile
+    SFileAddWave
+    SFileRemoveFile
+    SFileRenameFile
+    SFileSetFileLocale
+    SFileSetDataCompression
+    SFileSetAddFileCallback
+
+    SMemUTF8ToFileName
+    SMemFileNameToUTF8
+
+    SCompImplode
+    SCompExplode
+    SCompCompress
+    SCompDecompress
+
+    GetLastError=Kernel32.GetLastError
+    SetLastError=Kernel32.SetLastError

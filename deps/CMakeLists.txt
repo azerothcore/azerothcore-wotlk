@@ -46,6 +46,13 @@ if (BUILD_TOOLS_MAPS)
   add_subdirectory(bzip2)
   add_subdirectory(libmpq)
   add_subdirectory(fkYAML)
+
+  # StormLib is used by map_extractor instead of libmpq because it can reconstruct
+  # Cataclysm's incremental binary-diff MPQ patches; libmpq only supports WotLK-era
+  # full-file-replacement patches and silently corrupts patched DBC/DB2 tables.
+  set(STORM_SKIP_INSTALL ON CACHE BOOL "" FORCE)
+  set(STORM_USE_BUNDLED_LIBRARIES ON CACHE BOOL "" FORCE)
+  add_subdirectory(StormLib)
 endif()
 
 add_subdirectory(libsidecar)

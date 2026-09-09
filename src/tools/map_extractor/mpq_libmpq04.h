@@ -18,8 +18,8 @@
 #ifndef MPQ_H
 #define MPQ_H
 
-#include "libmpq/mpq.h"
 #include "loadlib/loadlib.h"
+#include <StormLib.h>
 #include <cstring>
 #include <deque>
 #include <iostream>
@@ -31,51 +31,27 @@ using namespace std;
 class MPQArchive
 {
 public:
-    mpq_archive_s* mpq_a;
+    HANDLE mpq_a;
 
     MPQArchive(char const* filename);
     ~MPQArchive() { close(); }
     void close();
 
-    void GetFileListTo(vector<string>& filelist)
-    {
-        uint32_t filenum;
-        if (libmpq__file_number(mpq_a, "(listfile)", &filenum)) return;
-        libmpq__off_t size, transferred;
-        libmpq__file_unpacked_size(mpq_a, filenum, &size);
+    // Attaches a Cataclysm-style incremental binary-diff patch (or a WotLK-style
+    // full-replacement patch) directly onto this archive's handle, so StormLib can
+    // reconstruct patched files instead of them being read as raw, unpatched bytes.
+    void ApplyPatch(char const* filename);
 
-        char* buffer = new char[size + 1];
-        buffer[size] = '\0';
-
-        libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
-
-        char seps[] = "\n";
-        char* token;
-
-        token = strtok( buffer, seps );
-        uint32 counter = 0;
-        while ((token != nullptr) && (counter < size))
-        {
-            //cout << token << endl;
-            token[strlen(token) - 1] = 0;
-            string s = token;
-            filelist.push_back(s);
-            counter += strlen(token) + 2;
-            token = strtok(nullptr, seps);
-        }
-
-        delete[] buffer;
-    }
+    void GetFileListTo(vector<string>& filelist);
 };
 typedef std::deque<MPQArchive*> ArchiveSet;
 
 // cppcheck-suppress ctuOneDefinitionRuleViolation
 class MPQFile
 {
-    //MPQHANDLE handle;
     bool eof;
     char* buffer;
-    libmpq__off_t pointer, size;
+    std::size_t pointer, size;
 
     // disable copying
     MPQFile(MPQFile const& /*f*/) {}
