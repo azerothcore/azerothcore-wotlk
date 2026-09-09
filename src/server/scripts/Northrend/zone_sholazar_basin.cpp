@@ -1139,35 +1139,6 @@ class spell_q12611_deathbolt : public SpellScript
     }
 };
 
-enum LapsingDream
-{
-    SPELL_LAPSING_DREAM_SLOW = 51928
-};
-
-class spell_alystros_lapsing_dream_aura : public AuraScript
-{
-    PrepareAuraScript(spell_alystros_lapsing_dream_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_LAPSING_DREAM_SLOW });
-    }
-
-    void HandlePeriodic(AuraEffect const* /*aurEff*/)
-    {
-        PreventDefaultAction();
-
-        // default trigger makes the victim the caster, and 51928's area targets then find nobody
-        if (Unit* caster = GetCaster())
-            caster->AddAura(SPELL_LAPSING_DREAM_SLOW, GetTarget());
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_alystros_lapsing_dream_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-    }
-};
-
 void AddSC_sholazar_basin()
 {
     RegisterSpellScript(spell_q12726_song_of_wind_and_water);
@@ -1186,5 +1157,4 @@ void AddSC_sholazar_basin()
 
     RegisterSpellScript(spell_q12611_deathbolt);
     RegisterSpellScript(spell_venture_pilot_summon);
-    RegisterSpellScript(spell_alystros_lapsing_dream_aura);
 }
