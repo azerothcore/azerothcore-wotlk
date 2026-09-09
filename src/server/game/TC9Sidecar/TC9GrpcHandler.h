@@ -29,12 +29,19 @@ public:
 
     // Items
     static GetPlayerItemsByGuidsResponse          GetPlayerItemsByGuids(uint64 player, uint64* items, int items_len);
+    static GetPlayerItemByPosResponse             GetPlayerItemByPos(uint64 player, uint8 bag, uint8 slot);
     static RemoveItemsWithGuidsFromPlayerResponse RemoveItemsWithGuidsFromPlayer(uint64 player, uint64* items, int itemsLen, uint64 assignToPlayer);
+    static DestroyItemsWithGuidsFromPlayerResponse DestroyItemsWithGuidsFromPlayer(uint64 player, uint64* items, int itemsLen);
     static PlayerItemErrorCode                    AddExistingItemToPlayer(AddExistingItemToPlayerRequest*);
+    static StoreNewItemResponse                   StoreNewItem(StoreNewItemRequest* request);
+    static SetItemPermanentEnchantmentResponse    SetItemPermanentEnchantment(SetItemPermanentEnchantmentRequest* request);
 
     // Money
     static GetMoneyForPlayerResponse    GetMoneyForPlayer(uint64 player);
     static ModifyMoneyForPlayerResponse ModifyMoneyForPlayer(uint64 player, int32 value);
+
+    // Guild
+    static SetPlayerGuildFieldsResponse SetPlayerGuildFields(uint64 player, uint32 guildId, uint32 rank);
 
     // Interactions
     static CanPlayerInteractWithGOAndTypeResponse   CanPlayerInteractWithGOAndType(uint64 player, uint64 go, uint8 goType);

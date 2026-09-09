@@ -52,6 +52,7 @@
 #include "GroupMgr.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "TC9Sidecar.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
@@ -4085,9 +4086,13 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
     if (deleteFinally || sCharacterCache->GetCharacterLevelByGuid(playerGuid) < charDelete_minLvl)
         charDelete_method = CHAR_DELETE_REMOVE;
 
-    if (uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(playerGuid))
-        if (Guild* guild = sGuildMgr->GetGuildById(guildId))
-            guild->DeleteMember(playerGuid, false, false, true);
+    // Cluster: gateway + guildserver already cleaned guild_member / blocked GM.
+    if (!sToCloud9Sidecar->ClusterModeEnabled())
+    {
+        if (uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(playerGuid))
+            if (Guild* guild = sGuildMgr->GetGuildById(guildId))
+                guild->DeleteMember(playerGuid, false, false, true);
+    }
 
     // remove from arena teams
     LeaveAllArenaTeams(playerGuid);
