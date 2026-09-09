@@ -348,6 +348,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
 
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
+    GetPlayer()->ResyncControlledUnitsAfterTeleport();
 
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
