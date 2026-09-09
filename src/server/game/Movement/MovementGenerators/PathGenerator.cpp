@@ -1197,6 +1197,51 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
     _pathPoints.resize(i + 1);
 }
 
+bool PathGenerator::SnapPathToGround(float stepSize, float maxDrop)
+{
+    // Only ever a straight shortcut: anything with a middle already follows real navmesh, and
+    // flattening it into a line here would throw that route away.
+    if (_pathPoints.size() != 2 || stepSize <= 0.0f)
+        return false;
+
+    G3D::Vector3 const start = _pathPoints.front();
+    G3D::Vector3 const end = _pathPoints.back();
+
+    // Rounded up, so the gap between samples never grows past stepSize and a dip between two of
+    // them can't go unnoticed.
+    uint32 const steps = std::max<uint32>(1, uint32(std::ceil((end - start).length() / stepSize)));
+    if (steps < 2)
+        return true;
+
+    Movement::PointsArray sampled;
+    sampled.reserve(steps + 1);
+    sampled.push_back(start);
+
+    // Only the middle needs pinning. Each query starts above the previous point: on a convex
+    // slope the line runs under the surface, and a query from down there leaves the point buried.
+    float previousZ = start.z;
+    for (uint32 i = 1; i < steps; ++i)
+    {
+        G3D::Vector3 point = start + (end - start) * (float(i) / float(steps));
+        float const lineZ = point.z;
+
+        point.z = std::max(point.z, previousZ) + stepSize * 2.0f;
+        _source->UpdateAllowedPositionZ(point.x, point.y, point.z);
+
+        // Nothing under us to climb - the line is crossing a gap or clearing a roof, not running
+        // up a slope. Walking it would leave the mover hanging in mid air halfway along.
+        if (point.z < lineZ - maxDrop)
+            return false;
+
+        previousZ = point.z;
+        sampled.push_back(point);
+    }
+
+    sampled.push_back(end);
+    _pathPoints.swap(sampled);
+    return true;
+}
+
 bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
 {
     return (target->GetPositionZ() - GetActualEndPosition().z) > 5.0f;

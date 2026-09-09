@@ -6295,14 +6295,44 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         }
 
                         if (pathFailed)
-                            return SPELL_FAILED_NOPATH;
-                        else if (cutPath && m_preGeneratedPath->IsInvalidDestinationZ(target))
-                            return SPELL_FAILED_NOPATH;
-
-                        if (cutPath)
                         {
+                            // NOPATH and INCOMPLETE mean there is no route at all, so those still fail here.
+                            if (!result || (m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE)))
+                                return SPELL_FAILED_NOPATH;
+
+                            // The limit is on how far you would have to WALK, so a reachable spot blows
+                            // it whenever the way round is long: the WSG graveyard bank is ~21yd straight
+                            // but ~130yd on foot. Re-check without the limit, since BuildShortcut has
+                            // already overwritten the NORMAL/INCOMPLETE result.
+                            PathGenerator reachable(m_caster);
+                            bool built = reachable.CalculatePath(destX, destY, destZ, false);
+                            if (!built || reachable.GetPathType() != PATHFIND_NORMAL)
+                                return SPELL_FAILED_NOPATH;
+
+                            // Aim from the target's own footing: backing off along our line would step
+                            // back down into the slope we just climbed.
+                            Position land = target->GetFirstCollisionPosition(objSize,
+                                target->GetRelativeAngle(m_caster));
+                            m_preGeneratedPath->CalculatePath(land.GetPositionX(), land.GetPositionY(),
+                                land.GetPositionZ(), false);
+                            if (m_preGeneratedPath->GetPath().size() < 2)
+                                return SPELL_FAILED_NOPATH;
+
+                            // Climb the slope instead of cutting through it, and bail out when there is
+                            // no slope under the line, so this cannot carry anyone onto a roof. Shortcut
+                            // only: a path that fit the limit is a real route and stays as it is.
+                            if ((m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
+                                && !m_preGeneratedPath->SnapPathToGround(SMOOTH_PATH_STEP_SIZE, SMOOTH_PATH_STEP_SIZE))
+                                return SPELL_FAILED_NOPATH;
+                        }
+                        else if (cutPath)
+                        {
+                            // Check position z, if not in a straight line
+                            if (m_preGeneratedPath->IsInvalidDestinationZ(target))
+                                return SPELL_FAILED_NOPATH;
+
                             m_preGeneratedPath->ShortenPathUntilDist(
-                                G3D::Vector3(destX, destY, destZ), objSize);
+                                G3D::Vector3(destX, destY, destZ), objSize); // move back
                         }
                     }
                     if (Player* player = m_caster->ToPlayer())
