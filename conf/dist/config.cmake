@@ -95,6 +95,7 @@ foreach(TOOL_BUILD_NAME ${TOOLS_BUILD_LIST})
 endforeach()
 
 option(BUILD_TESTING       "Build unit tests"                                            0)
+option(ENABLE_TEST_COVERAGE "Instrument unit tests for code coverage"                    0)
 option(USE_SCRIPTPCH       "Use precompiled headers when compiling scripts"              1)
 option(USE_COREPCH         "Use precompiled headers when compiling servers"              1)
 option(WITH_WARNINGS       "Show all warnings during compile"                            0)
