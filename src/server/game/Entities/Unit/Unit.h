@@ -33,6 +33,7 @@
 #include "UnitUtils.h"
 #include <boost/container/flat_map.hpp>
 #include <functional>
+#include <optional>
 #include <utility>
 
 #define WORLD_TRIGGER   12999
@@ -651,7 +652,7 @@ typedef const OpcodeServer SpeedOpcodePair[static_cast<size_t>(SpeedOpcodeIndex:
 SpeedOpcodePair SetSpeed2Opc_table[MAX_MOVE_TYPE] =
 {
     {SMSG_FORCE_WALK_SPEED_CHANGE,        SMSG_SPLINE_SET_WALK_SPEED,           MSG_MOVE_SET_WALK_SPEED_SERVER},
-    {SMSG_FORCE_RUN_SPEED_CHANGE,         SMSG_SPLINE_SET_RUN_SPEED,            MSG_MOVE_SET_RUN_SPEED_SERVER},
+    {SMSG_MOVE_SET_RUN_SPEED,             SMSG_SPLINE_SET_RUN_SPEED,            SMSG_MOVE_UPDATE_RUN_SPEED},
     {SMSG_FORCE_RUN_BACK_SPEED_CHANGE,    SMSG_SPLINE_SET_RUN_BACK_SPEED,       MSG_MOVE_SET_RUN_BACK_SPEED_SERVER},
     {SMSG_FORCE_SWIM_SPEED_CHANGE,        SMSG_SPLINE_SET_SWIM_SPEED,           MSG_MOVE_SET_SWIM_SPEED_SERVER},
     {SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,   SMSG_SPLINE_SET_SWIM_BACK_SPEED,      MSG_MOVE_SET_SWIM_BACK_SPEED_SERVER},
@@ -1757,6 +1758,13 @@ public:
     void SetSpeed(UnitMoveType mtype, float rate, bool forced = false);
     void SetSpeedRate(UnitMoveType mtype, float rate) { m_speed_rate[mtype] = rate; }
     void SendSpeedToController(UnitMoveType mtype, Player* target) const;
+
+    struct PendingRunSpeedChange
+    {
+        uint32 Counter;
+        float Speed;
+    };
+    mutable std::optional<PendingRunSpeedChange> m_pendingRunSpeedChange;
 
     void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 

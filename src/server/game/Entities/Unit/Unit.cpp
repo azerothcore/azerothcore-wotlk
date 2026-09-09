@@ -46,6 +46,7 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "MovementGenerator.h"
+#include "MovementPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
@@ -11355,16 +11356,31 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 void Unit::SendSpeedToController(UnitMoveType mtype, Player* target) const
 {
     SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
-    uint32 const counter = target->GetSession()->GetOrderCounter();
+    uint32 counter = target->GetSession()->GetOrderCounter();
+
+    if (mtype == MOVE_RUN)
+    {
+        // The map-change guard rejects the boundary counter itself, including zero at login.
+        if (counter == target->GetMapChangeOrderCounter())
+        {
+            target->GetSession()->IncrementOrderCounter();
+            counter = target->GetSession()->GetOrderCounter();
+        }
+        float const speed = GetSpeed(mtype);
+        m_pendingRunSpeedChange = PendingRunSpeedChange{ counter, speed };
+        WorldPacket data(SMSG_MOVE_SET_RUN_SPEED, 17);
+        WorldPackets::Movement::WriteRunSpeedChange(data, GetGUID(), counter, speed);
+        target->GetSession()->SendPacket(&data);
+        target->GetSession()->IncrementOrderCounter();
+        LOG_DEBUG("network", "Sent Cataclysm run-speed change: counter={}, speed={}", counter, speed);
+        return;
+    }
 
     ++target->m_forced_speed_changes[mtype];
 
     WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
     data << GetPackGUID();
     data << counter;
-    if (mtype == MOVE_RUN)
-        data << uint8(0);
-
     data << GetSpeed(mtype);
     target->GetSession()->SendPacket(&data);
     target->GetSession()->IncrementOrderCounter();

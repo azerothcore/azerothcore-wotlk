@@ -189,6 +189,13 @@ successful run. For a longer interactive observation, increase both limits.
 `--mode in-world-control-bootstrap` is the mode that seeds a character and drives it to world
 entry, as opposed to the auth-only modes.
 
+`--mode run-speed-change` also seeds a saved Sprint aura in the disposable character database.
+Its synthetic 60-second duration lets normal aura expiry restore run speed after world entry.
+Acceptance requires a sent speed change and a matching accepted acknowledgement after the first
+heartbeat, followed by a stable hold. Use `--stability-seconds 30 --timeout 180` for this mode.
+The fixture checks Sprint's effect against the current server DBC before preparation. It does
+not modify the source DBC or claim that 60 seconds is Sprint's retail duration.
+
 ## The exact harness invocation
 
 Recovering these arguments from scratch is slow and they are not stored anywhere the

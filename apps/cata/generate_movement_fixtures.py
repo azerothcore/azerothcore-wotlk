@@ -10,7 +10,7 @@ import subprocess
 PIN = "c699217775d90794158422387b07a917e161b582"
 
 
-def encode(sequence, sample):
+def encode(sequence, sample, always_timestamp=False):
     output = bytearray()
     bits = []
 
@@ -36,7 +36,7 @@ def encode(sequence, sample):
         "FallDirection": bool(sample.get("MovementFlags", 0) & 0x800),
         "Spline": False, "HeightChangeFailed": False,
     })
-    if sequence[0] == "MSEHasFallData":
+    if always_timestamp:
         conditions["Timestamp"] = True
     for element in sequence:
         name = element.removeprefix("MSE")
@@ -83,7 +83,7 @@ def encode(sequence, sample):
                 if name in {"FallHorizontalSpeed", "FallCosAngle", "FallSinAngle"} and not conditions["FallDirection"]:
                     continue
             format_code = "f"
-            if name in {"Timestamp", "FallTime", "TransportTime", "TransportTime2", "TransportVehicleId"}:
+            if name in {"Counter", "Timestamp", "FallTime", "TransportTime", "TransportTime2", "TransportVehicleId"}:
                 format_code = "I"
             elif name == "TransportSeat":
                 format_code = "b"
@@ -101,7 +101,10 @@ def main():
         "git", "-C", args.trinity_repo, "show", PIN + ":src/server/game/Movement/MovementStructures.cpp",
     ], text=True)
     sequences = {}
-    for name in ("MovementHeartBeat", "MovementUpdate"):
+    for name in (
+        "MovementHeartBeat", "MovementUpdate", "MoveSetRunSpeed", "MovementForceRunSpeedChangeAck",
+        "MovementUpdateRunSpeed",
+    ):
         body = re.search(r"\b" + name + r"\[\]\s*=\s*\{(.*?)\};", source, re.S).group(1)
         sequences[name] = re.findall(r"\bMSE\w+", body)
     samples = {
@@ -117,7 +120,10 @@ def main():
             "FallCosAngle": 0.75, "FallSinAngle": -0.5, "Pitch": -0.25, "SplineElevation": 0.25,
         },
     }
-    print(json.dumps({name: {packet: encode(sequence, sample) for packet, sequence in sequences.items()}
+    for sample in samples.values():
+        sample.update({"Counter": 0x10203040, "ExtraElement": 10.5})
+    print(json.dumps({name: {packet: encode(sequence, sample, packet in {"MovementUpdate", "MovementUpdateRunSpeed"})
+                            for packet, sequence in sequences.items()}
                       for name, sample in samples.items()}, indent=2))
 
 

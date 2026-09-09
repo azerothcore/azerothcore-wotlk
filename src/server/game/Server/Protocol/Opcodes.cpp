@@ -382,8 +382,6 @@ void OpcodeTable::Initialize()
     DEFINE_BIDIRECTIONAL_OPCODE(MSG_MOVE_STOP_SWIM, MSG_MOVE_STOP_SWIM, MSG_MOVE_STOP_SWIM_SERVER);
     /*0x0000*/ DEFINE_HANDLER(MSG_MOVE_SET_RUN_SPEED_CHEAT,                                          STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     DEFINE_BIDIRECTIONAL_OPCODE(MSG_MOVE_SET_RUN_SPEED_CHEAT, MSG_MOVE_SET_RUN_SPEED_CHEAT, MSG_MOVE_SET_RUN_SPEED_CHEAT_SERVER);
-    /*0x00CD*/ DEFINE_HANDLER(MSG_MOVE_SET_RUN_SPEED,                                                STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
-    DEFINE_BIDIRECTIONAL_OPCODE(MSG_MOVE_SET_RUN_SPEED, MSG_MOVE_SET_RUN_SPEED, MSG_MOVE_SET_RUN_SPEED_SERVER);
     /*0x0000*/ DEFINE_HANDLER(MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT,                                     STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     DEFINE_BIDIRECTIONAL_OPCODE(MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT, MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT, MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT_SERVER);
     /*0x00CF*/ DEFINE_HANDLER(MSG_MOVE_SET_RUN_BACK_SPEED,                                           STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
@@ -419,8 +417,9 @@ void OpcodeTable::Initialize()
     /*0x34B7*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_LAND_WALK,                                     STATUS_NEVER);
     /*0x00E0*/ DEFINE_HANDLER(CMSG_MOVE_CHARM_PORT_CHEAT,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x00E1*/ DEFINE_HANDLER(CMSG_MOVE_SET_RAW_POSITION,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
-    /*0x00E2*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FORCE_RUN_SPEED_CHANGE,                             STATUS_NEVER);
-    /*0x00E3*/ DEFINE_HANDLER(CMSG_FORCE_RUN_SPEED_CHANGE_ACK,                                       STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleForceSpeedChangeAck                );
+    DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_SET_RUN_SPEED,                                          STATUS_NEVER);
+    DEFINE_HANDLER(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, STATUS_LOGGEDIN, PROCESS_THREADSAFE,
+        &WorldSession::HandleForceRunSpeedChangeAck);
     /*0x00E4*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FORCE_RUN_BACK_SPEED_CHANGE,                        STATUS_NEVER);
     /*0x00E5*/ DEFINE_HANDLER(CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK,                                  STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleForceSpeedChangeAck                );
     /*0x00E6*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FORCE_SWIM_SPEED_CHANGE,                            STATUS_NEVER);
@@ -761,6 +760,7 @@ void OpcodeTable::Initialize()
     /*0x4316*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_GOSSIP_POI,                                         STATUS_NEVER);
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_SET_ACTIVE_MOVER,                                        STATUS_NEVER);
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_UPDATE,                                                  STATUS_NEVER);
+    DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_UPDATE_RUN_SPEED,                                        STATUS_NEVER);
     /*0x0D54*/ DEFINE_HANDLER(CMSG_CHAT_IGNORED,                                                     STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChatIgnoredOpcode                  );
     /*0x0228*/ DEFINE_HANDLER(CMSG_GM_SILENCE,                                                       STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x0229*/ DEFINE_HANDLER(CMSG_GM_REVEALTO,                                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );

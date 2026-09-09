@@ -27,6 +27,7 @@
 #include "Log.h"
 #include "MapMgr.h"
 #include "MathUtil.h"
+#include "MovementPackets.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -680,6 +681,45 @@ bool WorldSession::ProcessMovementInfo(MovementInfo& movementInfo, Unit* mover, 
     return true;
 }
 
+void WorldSession::HandleForceRunSpeedChangeAck(WorldPacket& recvData)
+{
+    MovementInfo movementInfo;
+    uint32 counter;
+    float speed;
+    WorldPackets::Movement::ReadRunSpeedChangeAck(recvData, movementInfo, counter, speed);
+
+    Unit* mover = _player->m_mover;
+    if (!mover || movementInfo.guid != mover->GetGUID() || movementInfo.guid != _player->GetGUID())
+        return;
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
+
+    auto const pending = mover->m_pendingRunSpeedChange;
+    if (!pending || pending->Counter != counter)
+        return;
+    if (std::fabs(pending->Speed - speed) > 0.01f)
+    {
+        LOG_ERROR("network", "Rejected Cataclysm run-speed acknowledgement: counter={}, expected={}, received={}",
+            counter, pending->Speed, speed);
+        KickPlayer("Incorrect run speed acknowledgement");
+        return;
+    }
+
+    SanitizeMovementFlags(&movementInfo);
+    if (!ProcessMovementInfo(movementInfo, mover, _player, recvData))
+        return;
+
+    // Movement hooks may have sent a newer speed change while processing this acknowledgement.
+    if (!mover->m_pendingRunSpeedChange || mover->m_pendingRunSpeedChange->Counter != counter)
+        return;
+    mover->m_pendingRunSpeedChange.reset();
+    sScriptMgr->AnticheatSetUnderACKmount(_player);
+    WorldPacket data(SMSG_MOVE_UPDATE_RUN_SPEED);
+    WorldPackets::Movement::WriteRunSpeedUpdate(data, movementInfo, pending->Speed);
+    mover->SendMessageToSet(&data, _player);
+    LOG_DEBUG("network", "Accepted Cataclysm run-speed acknowledgement: counter={}, speed={}", counter, pending->Speed);
+}
+
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 {
     uint32 opcode = recvData.GetOpcode();
@@ -725,8 +765,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
         return;
     }
 
-    // client ACK send one packet for mounted/run case and need skip all except last from its
-    // in other cases anti-cheat check can be fail in false case
+    // Other speed types still use the legacy acknowledgement path.
     UnitMoveType move_type;
     UnitMoveType force_move_type;
 
@@ -735,7 +774,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     switch (opcode)
     {
         case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;          force_move_type = MOVE_WALK;        break;
-        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;           force_move_type = MOVE_RUN;         break;
         case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_RUN_BACK;      force_move_type = MOVE_RUN_BACK;    break;
         case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;          force_move_type = MOVE_SWIM;        break;
         case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIM_BACK;     force_move_type = MOVE_SWIM_BACK;   break;
@@ -756,8 +794,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     data << newspeed;
     mover->SendMessageToSet(&data, _player);
 
-    // skip all forced speed changes except last and unexpected
-    // in run/mounted case used one ACK and it must be skipped.m_forced_speed_changes[MOVE_RUN} store both.
+    // Skip all forced speed changes except the last and unexpected acknowledgements.
     if (_player->m_forced_speed_changes[force_move_type] > 0)
     {
         --_player->m_forced_speed_changes[force_move_type];

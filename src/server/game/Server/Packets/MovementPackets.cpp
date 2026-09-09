@@ -199,6 +199,197 @@ void WorldPackets::Movement::WriteMovementUpdate(WorldPacket& packet, MovementIn
     packet.WriteByteSeq(guid[1]);
 }
 
+void WorldPackets::Movement::WriteRunSpeedChange(WorldPacket& packet, ObjectGuid const& guid, uint32 counter, float speed)
+{
+    for (uint8 index : { 6, 1, 5, 2, 7, 0, 3, 4 })
+        packet.WriteBit(guid[index]);
+    packet.FlushBits();
+    for (uint8 index : { 5, 3, 1, 4 })
+        packet.WriteByteSeq(guid[index]);
+    packet << counter << speed;
+    for (uint8 index : { 6, 0, 7, 2 })
+        packet.WriteByteSeq(guid[index]);
+}
+
+void WorldPackets::Movement::ReadRunSpeedChangeAck(
+    WorldPacket& packet, MovementInfo& info, uint32& counter, float& speed)
+{
+    info = MovementInfo();
+    packet >> counter >> info.pos.m_positionX >> speed >> info.pos.m_positionZ >> info.pos.m_positionY;
+    for (uint8 index : { 2, 4, 1, 7 })
+        info.guid[index] = packet.ReadBit();
+    bool hasOrientation = !packet.ReadBit();
+    bool hasFallData = packet.ReadBit();
+    info.guid[0] = packet.ReadBit();
+    bool hasSpline = packet.ReadBit();
+    bool hasTransport = packet.ReadBit();
+    bool hasTimestamp = !packet.ReadBit();
+    bool hasFlags2 = !packet.ReadBit();
+    info.guid[6] = packet.ReadBit();
+    packet.ReadBit();
+    bool hasSplineElevation = !packet.ReadBit();
+    bool hasPitch = !packet.ReadBit();
+    info.guid[5] = packet.ReadBit();
+    bool hasFlags = !packet.ReadBit();
+    info.guid[3] = packet.ReadBit();
+    bool hasVehicleId = false;
+    bool hasTransportTime2 = false;
+    if (hasTransport)
+    {
+        hasVehicleId = packet.ReadBit();
+        info.transport.guid[5] = packet.ReadBit();
+        hasTransportTime2 = packet.ReadBit();
+        for (uint8 index : { 3, 2, 0, 7, 6, 1, 4 })
+            info.transport.guid[index] = packet.ReadBit();
+    }
+    if (hasFlags)
+    {
+        uint32 flags = packet.ReadBits(30);
+        info.flags = (flags & 0x000001FF) | ((flags & 0x03FFFE00) << 1) | ((flags & 0x3C000000) << 2);
+    }
+    bool hasFallDirection = hasFallData && packet.ReadBit();
+    if (hasFlags2)
+    {
+        uint16 flags = packet.ReadBits(12);
+        info.flags2 = (flags & 0x03C3) | ((flags & 0x001C) << 1) | ((flags & 0x0020) >> 3) |
+            ((flags & 0xE000) >> 3) | ((flags & 0x1C00) << 3);
+    }
+    if (hasTransport)
+        info.AddMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+    if (hasSpline)
+        info.AddMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED);
+    if (hasTransportTime2)
+        info.AddExtraMovementFlag(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT);
+    for (uint8 index : { 6, 4, 1, 3, 5, 2, 7, 0 })
+        packet.ReadByteSeq(info.guid[index]);
+    if (hasTransport)
+    {
+        packet >> info.transport.pos.m_positionZ;
+        packet.ReadByteSeq(info.transport.guid[6]);
+        packet.ReadByteSeq(info.transport.guid[1]);
+        packet >> info.transport.pos.m_positionY;
+        packet.ReadByteSeq(info.transport.guid[0]);
+        packet.ReadByteSeq(info.transport.guid[5]);
+        if (hasTransportTime2)
+            packet >> info.transport.time2;
+        packet >> info.transport.pos.m_positionX >> info.transport.time;
+        packet.ReadByteSeq(info.transport.guid[7]);
+        info.transport.pos.SetOrientation(packet.read<float>());
+        packet.ReadByteSeq(info.transport.guid[3]);
+        if (hasVehicleId)
+            packet >> info.transport.vehicleId;
+        packet.ReadByteSeq(info.transport.guid[2]);
+        packet >> info.transport.seat;
+        packet.ReadByteSeq(info.transport.guid[4]);
+    }
+    if (hasFallData)
+    {
+        packet >> info.jump.zspeed;
+        if (hasFallDirection)
+            packet >> info.jump.xyspeed >> info.jump.sinAngle >> info.jump.cosAngle;
+        packet >> info.fallTime;
+    }
+    if (hasSplineElevation)
+        packet >> info.splineElevation;
+    if (hasPitch)
+        info.pitch = G3D::wrap(packet.read<float>(), float(-M_PI), float(M_PI));
+    if (hasTimestamp)
+        packet >> info.time;
+    if (hasOrientation)
+        info.pos.SetOrientation(packet.read<float>());
+    if (packet.rpos() != packet.size())
+        throw ByteBufferInvalidValueException("run-speed acknowledgement", "trailing bytes");
+}
+
+void WorldPackets::Movement::WriteRunSpeedUpdate(WorldPacket& packet, MovementInfo const& info, float speed)
+{
+    uint32 flags = MovementFlagsToClient(info.flags);
+    uint16 flags2 = ExtraMovementFlagsToClient(info.flags2) & 0x0FFF;
+    bool hasFallDirection = info.HasMovementFlag(MOVEMENTFLAG_FALLING);
+    bool hasFallData = hasFallDirection || info.fallTime != 0;
+    bool hasOrientation = !G3D::fuzzyEq(info.pos.GetOrientation(), 0.0f);
+    bool hasTransport = !info.transport.guid.IsEmpty();
+    bool hasVehicleId = hasTransport && info.transport.vehicleId != 0;
+    bool hasTransportTime2 = hasTransport && info.transport.time2 != 0;
+    bool hasPitch = info.HasMovementFlag(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING) ||
+        info.HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING);
+    bool hasSplineElevation = info.HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+    ObjectGuid const& guid = info.guid;
+    ObjectGuid const& transport = info.transport.guid;
+
+    packet << info.pos.GetPositionZ() << info.pos.GetPositionX() << info.pos.GetPositionY() << speed;
+    packet.WriteBit(guid[6]);
+    packet.WriteBit(!flags2);
+    packet.WriteBit(!hasPitch);
+    packet.WriteBit(guid[2]);
+    packet.WriteBit(guid[5]);
+    packet.WriteBit(!hasSplineElevation);
+    packet.WriteBit(info.HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED));
+    packet.WriteBit(!flags);
+    packet.WriteBit(false); // Timestamp is always present in server movement updates.
+    packet.WriteBit(guid[1]);
+    if (flags2)
+        packet.WriteBits(flags2, 12);
+    packet.WriteBit(guid[3]);
+    if (flags)
+        packet.WriteBits(flags, 30);
+    packet.WriteBit(guid[7]);
+    packet.WriteBit(guid[0]);
+    packet.WriteBit(!hasOrientation);
+    packet.WriteBit(hasTransport);
+    if (hasTransport)
+    {
+        packet.WriteBit(transport[5]);
+        packet.WriteBit(hasTransportTime2);
+        packet.WriteBit(hasVehicleId);
+        for (uint8 index : { 7, 4, 2, 3, 6, 1, 0 })
+            packet.WriteBit(transport[index]);
+    }
+    packet.WriteBit(hasFallData);
+    if (hasFallData)
+        packet.WriteBit(hasFallDirection);
+    packet.WriteBit(guid[4]);
+    packet.WriteBit(false); // Height change failed.
+    packet.FlushBits();
+    if (hasTransport)
+    {
+        packet.WriteByteSeq(transport[4]);
+        packet.WriteByteSeq(transport[5]);
+        packet << info.transport.pos.GetPositionX() << info.transport.pos.GetOrientation();
+        for (uint8 index : { 1, 0, 6 })
+            packet.WriteByteSeq(transport[index]);
+        packet << info.transport.time;
+        packet.WriteByteSeq(transport[7]);
+        packet << info.transport.seat;
+        if (hasTransportTime2)
+            packet << info.transport.time2;
+        packet << info.transport.pos.GetPositionY();
+        packet.WriteByteSeq(transport[3]);
+        packet.WriteByteSeq(transport[2]);
+        if (hasVehicleId)
+            packet << info.transport.vehicleId;
+        packet << info.transport.pos.GetPositionZ();
+    }
+    packet << info.time;
+    if (hasFallData)
+    {
+        if (hasFallDirection)
+            packet << info.jump.cosAngle << info.jump.xyspeed << info.jump.sinAngle;
+        packet << info.jump.zspeed << info.fallTime;
+    }
+    if (hasPitch)
+        packet << info.pitch;
+    packet.WriteByteSeq(guid[6]);
+    if (hasSplineElevation)
+        packet << info.splineElevation;
+    for (uint8 index : { 5, 7, 4 })
+        packet.WriteByteSeq(guid[index]);
+    if (hasOrientation)
+        packet << info.pos.GetOrientation();
+    for (uint8 index : { 0, 3, 2, 1 })
+        packet.WriteByteSeq(guid[index]);
+}
+
 WorldPacket const* WorldPackets::Movement::MoveSetActiveMover::Write()
 {
     _worldPacket.WriteBit(MoverGUID[5]);

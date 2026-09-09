@@ -436,6 +436,7 @@ public:
     void SendAddonsInfo();
 
     void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
+    void SanitizeMovementFlags(MovementInfo* mi);
     void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
     void SynchronizeMovement(MovementInfo& movementInfo);
     void HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover);
@@ -719,6 +720,7 @@ public:                                                 // opcodes handlers
 
     void HandleMoveTeleportAck(WorldPacket& recvPacket);
     void HandleForceSpeedChangeAck(WorldPacket& recvData);
+    void HandleForceRunSpeedChangeAck(WorldPacket& recvData);
 
     void HandleRepopRequestOpcode(WorldPacket& recvPacket);
     void HandleAutostoreLootItemOpcode(WorldPacket& recvPacket);

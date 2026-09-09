@@ -6,9 +6,11 @@
  */
 
 #include "MovementPackets.h"
+#include "IntegrationTestFixture.h"
 #include "Object.h"
 #include "Util.h"
 #include <gtest/gtest.h>
+#include <limits>
 #include <span>
 
 namespace
@@ -21,11 +23,11 @@ namespace
         "0000C840317151112C0000002B0000006181210000C03F000088C04D0000000000B0400000403F000000BF000080BE"
         "0000803E44332211";
 
-    WorldPacket Heartbeat(std::string const& hex)
+    WorldPacket ClientPacket(OpcodeClient opcode, std::string const& hex)
     {
         std::vector<uint8> bytes(hex.size() / 2);
         Acore::Impl::HexStrToByteArray(hex, bytes.data(), bytes.size());
-        WorldPacket packet(MSG_MOVE_HEARTBEAT, bytes.size());
+        WorldPacket packet(opcode, bytes.size());
         if (!bytes.empty())
             packet.append(bytes.data(), bytes.size());
         return packet;
@@ -41,7 +43,7 @@ namespace
 
 TEST(MovementPacketsTest, ReadsIdleHeartbeatAndWritesMovementUpdate)
 {
-    WorldPacket packet = Heartbeat(Idle);
+    WorldPacket packet = ClientPacket(MSG_MOVE_HEARTBEAT, Idle);
     MovementInfo info;
     WorldPackets::Movement::ReadHeartbeat(packet, info);
     EXPECT_EQ(info.guid, ObjectGuid(uint64(0x01020304)));
@@ -54,7 +56,7 @@ TEST(MovementPacketsTest, ReadsIdleHeartbeatAndWritesMovementUpdate)
     EXPECT_EQ(packet.rpos(), packet.size());
     EXPECT_EQ(MovementUpdate(info), "53784000000040000000803F0000404004030201030502");
 
-    packet = Heartbeat(Sparse);
+    packet = ClientPacket(MSG_MOVE_HEARTBEAT, Sparse);
     WorldPackets::Movement::ReadHeartbeat(packet, info);
     EXPECT_EQ(info.guid, ObjectGuid(uint64(0x0010000000000001)));
     EXPECT_EQ(info.time, 0u);
@@ -64,7 +66,7 @@ TEST(MovementPacketsTest, ReadsIdleHeartbeatAndWritesMovementUpdate)
 
 TEST(MovementPacketsTest, ReadsOptionalFieldsAndPreservesTheirWireLayout)
 {
-    WorldPacket packet = Heartbeat(OptionalFields);
+    WorldPacket packet = ClientPacket(MSG_MOVE_HEARTBEAT, OptionalFields);
     MovementInfo info;
     WorldPackets::Movement::ReadHeartbeat(packet, info);
     EXPECT_EQ(info.guid, ObjectGuid(uint64(0x0807060504030201)));
@@ -103,11 +105,11 @@ TEST(MovementPacketsTest, RejectsTruncatedAndTrailingHeartbeatData)
     {
         for (std::size_t length = 0; length < fixture.size(); length += 2)
         {
-            WorldPacket packet = Heartbeat(fixture.substr(0, length));
+            WorldPacket packet = ClientPacket(MSG_MOVE_HEARTBEAT, fixture.substr(0, length));
             MovementInfo info;
             EXPECT_THROW(WorldPackets::Movement::ReadHeartbeat(packet, info), ByteBufferException) << length;
         }
-        WorldPacket packet = Heartbeat(fixture + "00");
+        WorldPacket packet = ClientPacket(MSG_MOVE_HEARTBEAT, fixture + "00");
         MovementInfo info;
         EXPECT_THROW(WorldPackets::Movement::ReadHeartbeat(packet, info), ByteBufferInvalidValueException);
     }
@@ -132,4 +134,126 @@ TEST(MovementPacketsTest, TranslatesInternalFlagsAtTheWireBoundary)
     EXPECT_EQ(ExtraMovementFlagsToClient(MOVEMENTFLAG2_FULL_SPEED_PITCHING), 0x8u);
     EXPECT_EQ(ExtraMovementFlagsToClient(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING), 0x10u);
     EXPECT_EQ(ExtraMovementFlagsToClient(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT), 0x2000u);
+}
+
+TEST(MovementPacketsTest, ReadsRunSpeedAcknowledgementAndWritesBothServerPackets)
+{
+    struct Fixture
+    {
+        char const* Ack;
+        uint64 Guid;
+        char const* Request;
+        char const* Update;
+    };
+    for (Fixture const& fixture : std::initializer_list<Fixture>{
+        {
+            "403020100000803F000028410000404000000040AA26C00200030504030201",
+            0x01020304,
+            "56000240302010000028410503",
+            "000040400000803F0000004000002841756C000403020105000302"
+        },
+        {
+            "40302010000080BF0000284100004040000000400A76801100",
+            0x0010000000000001,
+            "8440302010000028411100",
+            "00004040000080BF0000004000002841E50C00000000001100"
+        },
+        {
+            "403020100000A03F0000284100007040000020C0F6917FF08002002020060403050702090000000CC121710000F04081"
+            "312B0000000000C8402A0000001100000040512C00000061FF41000088C00000B040000000BF0000403F4D0000000000"
+            "803E000080BE443322110000C03F",
+            0x0807060504030201,
+            "FF07050304403020100000284106000902",
+            "000070400000A03F000020C00000284198404210004006FFFC41310000C840000000407181212A00000011FF2B000000"
+            "0000F04051612C00000000000CC1443322110000403F0000B040000000BF000088C04D000000000080BE060000803E07"
+            "09040000C03F00050203"
+        }
+    })
+    {
+        WorldPacket packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, fixture.Ack);
+        MovementInfo info;
+        uint32 counter;
+        float speed;
+        WorldPackets::Movement::ReadRunSpeedChangeAck(packet, info, counter, speed);
+        EXPECT_EQ(counter, 0x10203040u);
+        EXPECT_FLOAT_EQ(speed, 10.5f);
+        EXPECT_EQ(info.guid, ObjectGuid(fixture.Guid));
+        EXPECT_EQ(packet.rpos(), packet.size());
+
+        WorldPacket request(SMSG_MOVE_SET_RUN_SPEED);
+        WorldPackets::Movement::WriteRunSpeedChange(request, info.guid, counter, speed);
+        EXPECT_EQ(ByteArrayToHexStr(std::span<uint8 const>(request.contents(), request.size())), fixture.Request);
+        WorldPacket update(SMSG_MOVE_UPDATE_RUN_SPEED);
+        WorldPackets::Movement::WriteRunSpeedUpdate(update, info, speed);
+        EXPECT_EQ(ByteArrayToHexStr(std::span<uint8 const>(update.contents(), update.size())), fixture.Update);
+
+        std::string hex = fixture.Ack;
+        for (std::size_t length = 0; length < hex.size(); length += 2)
+        {
+            packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, hex.substr(0, length));
+            EXPECT_THROW(WorldPackets::Movement::ReadRunSpeedChangeAck(packet, info, counter, speed),
+                ByteBufferException) << length;
+        }
+        packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, hex + "00");
+        EXPECT_THROW(WorldPackets::Movement::ReadRunSpeedChangeAck(packet, info, counter, speed),
+            ByteBufferInvalidValueException);
+        packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, hex);
+        packet.put<float>(8, std::numeric_limits<float>::quiet_NaN());
+        EXPECT_THROW(WorldPackets::Movement::ReadRunSpeedChangeAck(packet, info, counter, speed),
+            ByteBufferInvalidValueException);
+    }
+}
+
+using RunSpeedAcknowledgementTest = IntegrationTestFixture;
+
+TEST_F(RunSpeedAcknowledgementTest, TracksLatestRequestAndRejectsInvalidAcknowledgements)
+{
+    TestPlayer* player = CreateTestPlayer(0x01020304);
+    WorldSession* session = player->GetSession();
+    player->SetSpeedRate(MOVE_RUN, 1.5f);
+    player->SendSpeedToController(MOVE_RUN, player);
+    ASSERT_TRUE(player->m_pendingRunSpeedChange);
+    EXPECT_GT(player->m_pendingRunSpeedChange->Counter, player->GetMapChangeOrderCounter());
+    EXPECT_FLOAT_EQ(player->m_pendingRunSpeedChange->Speed, 10.5f);
+    uint32 firstCounter = player->m_pendingRunSpeedChange->Counter;
+    player->SendSpeedToController(MOVE_RUN, player);
+    EXPECT_GT(player->m_pendingRunSpeedChange->Counter, firstCounter);
+
+    std::string const ack =
+        "403020100000803F000028410000404000000040AA26C00200030504030201";
+    // No pending request: an unsolicited or duplicate acknowledgement cannot be accepted.
+    player->m_pendingRunSpeedChange.reset();
+    WorldPacket packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, ack);
+    session->HandleForceRunSpeedChangeAck(packet);
+    EXPECT_FALSE(player->m_pendingRunSpeedChange);
+    EXPECT_FALSE(session->IsKicked());
+
+    // An older counter must be ignored before comparing the requested speed.
+    player->m_pendingRunSpeedChange = Unit::PendingRunSpeedChange{ 0x10203041, 7.0f };
+    packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, ack);
+    session->HandleForceRunSpeedChangeAck(packet);
+    EXPECT_EQ(player->m_pendingRunSpeedChange->Counter, 0x10203041u);
+    EXPECT_FALSE(session->IsKicked());
+
+    // The map-change boundary is also stale, even if it matches the pending counter.
+    player->m_pendingRunSpeedChange = Unit::PendingRunSpeedChange{ 0, 7.0f };
+    packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, ack);
+    packet.put<uint32>(0, 0);
+    session->HandleForceRunSpeedChangeAck(packet);
+    EXPECT_TRUE(player->m_pendingRunSpeedChange);
+    EXPECT_FALSE(session->IsKicked());
+
+    player->m_pendingRunSpeedChange = Unit::PendingRunSpeedChange{ 0x10203040, 7.0f };
+    packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK,
+        "40302010000080BF0000284100004040000000400A76801100");
+    session->HandleForceRunSpeedChangeAck(packet);
+    EXPECT_TRUE(player->m_pendingRunSpeedChange);
+    EXPECT_FALSE(session->IsKicked());
+
+    // A matching counter with the wrong speed is rejected without consuming the pending request.
+    packet = ClientPacket(CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK, ack);
+    session->HandleForceRunSpeedChangeAck(packet);
+    EXPECT_TRUE(player->m_pendingRunSpeedChange);
+    EXPECT_TRUE(session->IsKicked());
+    EXPECT_FLOAT_EQ(player->GetPositionX(), 0.0f);
 }
