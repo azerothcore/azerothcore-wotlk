@@ -956,10 +956,10 @@ struct npc_freya_ward_summon : public ScriptedAI
         events.ScheduleEvent(EVENT_LASH, 2s);
     }
 
-    // Players thrown onto Leviathan's back and vehicles behind the closed arena gate are out of reach
+    // Thrown players sit on a seat NPC nested in Leviathan's vehicle; vehicles behind the closed gate are out of reach
     bool CanAIAttack(Unit const* who) const override
     {
-        if (Unit* base = who->GetVehicleBase())
+        for (Unit const* base = who->GetVehicleBase(); base; base = base->GetVehicleBase())
             if (base->GetEntry() == NPC_LEVIATHAN)
                 return false;
 
