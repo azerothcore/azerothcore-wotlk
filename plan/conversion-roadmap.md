@@ -103,8 +103,25 @@ GitHub holds each full contract; the functionality/data trackers retain the broa
 [plan-26]: https://github.com/trolloks/azerothcore-cata/issues/56
 
 Plan 22's starter-data prerequisite is [#57](https://github.com/trolloks/azerothcore-cata/issues/57),
-a native sub-issue blocking #52. Its audit found the older Human Warrior outfit and missing Cata
-action spells in the current server inputs. Coordinate data and protocol work before final acceptance.
+a native sub-issue blocking #52. Its initial acceptance matrix is Human Warrior, level 1, both genders,
+enUS, ordinary account, with custom starting spells disabled. Other profiles remain unverified.
+
+The world and hotfix dumps now match the official TDB 434.22011 release. All 170 pending world updates
+through the TC pin replayed successfully in disposable MySQL 8.4.8; all 20 hotfix update hashes already
+match the release ledger. The updated reference removes SQL starter skills and adds class/race stats.
+See the [source and replay evidence](../apps/cata/fixtures/plan22-starting-data-audit.json) and
+[update hash ledger](../apps/cata/fixtures/plan22-world-update-audit.tsv). Client extraction provenance
+and native AC loader/runtime acceptance remain open.
+
+Implementation is split into blocking children of #57:
+
+1. [#58: native spell and skill inputs](https://github.com/trolloks/azerothcore-cata/issues/58).
+2. [#59: native items and starting outfits](https://github.com/trolloks/azerothcore-cata/issues/59).
+3. [#60: starting stats and world profiles](https://github.com/trolloks/azerothcore-cata/issues/60).
+
+Start with #58. Coordinate these changes and the saved #52 protocol patch before one authorized build
+using the existing ccache/PCH tree and one client session. Reuse cached prepare inputs and binaries.
+Keep #52 and #57 open until normal creation, correct starting state, and persistence are accepted.
 
 ### Follow-on work and dependency gates
 
@@ -152,10 +169,12 @@ Use these records together; none replaces the others:
 - [Existing conversion ledger](conversion-status.tsv): packet/file/block contracts and upstream
   delta auditing. A mapped opcode is not a verified payload or a completed capability.
 
-The initial reference inventory contains 330 SQL tables and 171 named DBC/DB2 inputs from the active
-store source. It also tracks six content/artifact gates. This accounts for reference table/store
-names, not actual record parity. Maps, locales, script registrations, per-quest chains, spawns, and
-encounters need their own expanded inventories. Uninventoried work remains unassessed, never complete.
+The reference inventory contains 345 SQL table declarations and 171 named DBC/DB2 inputs, plus six
+content/artifact gates. It includes tables introduced by current migrations because the base schema
+alone missed 15 names. Historical base declarations remain tracked even when an update removes them;
+SQL replay must establish whether each table should exist. These counts cover declared names, not
+record parity. Maps, locales, script registrations, per-quest chains, spawns, and encounters need
+expanded inventories. Uninventoried work remains unassessed, never complete.
 
 ### Source and comparison contract
 

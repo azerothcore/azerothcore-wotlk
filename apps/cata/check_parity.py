@@ -45,7 +45,22 @@ def reference_inventory(tree):
             if key in inventory:
                 raise ValueError(f"Duplicate reference entry: {key}")
             inventory[key] = (kind, f"{PIN}:{path}#{name}")
+    # Base schemas lag current migrations. Track new table declarations too; retirement and
+    # final schema parity still need replay evidence, so retain the historical base entries.
+    updates = subprocess.check_output(
+        ["git", "-C", str(tree), "ls-tree", "-r", "--name-only", PIN, "--", "sql/updates"], text=True)
+    for path in updates.splitlines():
+        if not path.endswith(".sql") or path.split("/")[2] not in {"auth", "characters", "world", "hotfixes"}:
+            continue
+        source = subprocess.check_output(["git", "-C", str(tree), "show", f"{PIN}:{path}"], text=True)
+        add_sql_declarations(inventory, path, source)
     return inventory
+
+
+def add_sql_declarations(inventory, path, source):
+    database = path.split("/")[2]
+    for name in re.findall(r"^\s*CREATE TABLE(?: IF NOT EXISTS)?\s+`([^`]+)`", source, flags=re.M | re.I):
+        inventory.setdefault(f"sql:{database}.{name}", ("sql-table", f"{PIN}:{path}#{name}"))
 
 
 def read_rows(path, columns):
@@ -141,6 +156,11 @@ def self_test():
     assert rows[0]["notes"] == "Preserve my assessment"
     must_reject(lambda: reconcile(rows, {}, False))
     must_reject(lambda: reconcile(rows, {"client:Demo.dbc": ("db2", "wrong")}, False))
+    declarations = {"sql:world.existing": ("sql-table", PIN + ":base#existing")}
+    add_sql_declarations(declarations, "sql/updates/world/4.3.4/demo.sql",
+                         "CREATE TABLE `existing` (id int);\nCREATE TABLE IF NOT EXISTS `new_stats` (id int);")
+    assert declarations["sql:world.existing"][1] == PIN + ":base#existing"
+    assert declarations["sql:world.new_stats"][1] == PIN + ":sql/updates/world/4.3.4/demo.sql#new_stats"
     print("Tracker self-test PASS: invalid proof, duplicate IDs, unpinned refs, and inventory drift rejected.")
 
 
