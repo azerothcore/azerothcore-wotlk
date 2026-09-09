@@ -134,13 +134,9 @@ public:
                 instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
-        bool SelectPlayerInRoom()
+        Player* SelectPlayerInRoom() const
         {
-            if (me->IsInCombat())
-                return false;
-
-            Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for (auto const& itr : pList)
+            for (auto const& itr : me->GetMap()->GetPlayers())
             {
                 Player* player = itr.GetSource();
                 if (!player || !player->IsAlive())
@@ -149,15 +145,28 @@ public:
                 if (player->GetPositionZ() > 300.0f || me->GetExactDist(player) > 50.0f)
                     continue;
 
-                AttackStart(player);
-                return true;
+                return player;
             }
-            return false;
+            return nullptr;
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictimWithGaze() && !SelectPlayerInRoom())
+            Player* player = SelectPlayerInRoom();
+
+            if (!player)
+            {
+                // prevents an issue where Gluth remains stuck in combat with a zombie chow
+                if (me->IsEngaged())
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+
+                return;
+            }
+
+            if (!UpdateVictimWithGaze())
+                AttackStart(player);
+
+            if (!me->GetVictim())
                 return;
 
             events.Update(diff);
@@ -184,26 +193,16 @@ public:
                     events.Repeat(RAID_MODE(110s, 90s));
                     break;
                 case EVENT_SUMMON_ZOMBIE:
+                    // \1 |0 /2 pos
+                    if (Is25ManRaid())
                     {
-                        uint8 rand = urand(0, 2);
-                        for (int32 i = 0; i < RAID_MODE(1, 2); ++i)
-                        {
-                            // In 10 man raid, normal mode - should spawn only from mid gate
-                            // \1 |0 /2 pos
-                            // In 25 man raid - should spawn from all 3 gates
-                            if (me->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
-                            {
-                                me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[0]);
-                            }
-                            else
-                            {
-                                me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[urand(0, 2)]);
-                            }
-                            (rand == 2 ? rand = 0 : rand++);
-                        }
-                        events.Repeat(10s);
-                        break;
+                        me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[1]);
+                        me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[2]);
                     }
+                    else
+                        me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[0]);
+                    events.Repeat(10s);
+                    break;
                 case EVENT_CAN_EAT_ZOMBIE:
                     events.Repeat(1s);
                     if (me->GetVictim()->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinMeleeRange(me->GetVictim()))
