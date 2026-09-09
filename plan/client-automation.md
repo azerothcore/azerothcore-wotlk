@@ -4,6 +4,15 @@ Reference for `run --auto-login` in `apps/cata/run_real_client_authentication.py
 describes focus acquisition and input delivery for the isolated client. Successful login and
 character selection do not prove that the world loading screen has dismissed.
 
+## Build and run budget
+
+Default to one server build and one isolated client acceptance run per completed change. Finish
+local packet checks before launching the client, then reuse the same binaries. Do not require two
+fresh generations automatically. Repeat only when a failure or relevant change requires new
+evidence, and state what the repeat will verify. Retry transient failures in the existing generation
+as described below. Earlier plans' two-generation requirements are historical, not the default for
+new work.
+
 ## Window discovery
 
 `owned_wow_window()` scans `wmctrl -lpGx` for a window whose PID is in the generation's own
@@ -180,6 +189,13 @@ successful run. For a longer interactive observation, increase both limits.
 `--mode in-world-control-bootstrap` is the mode that seeds a character and drives it to world
 entry, as opposed to the auth-only modes.
 
+`--mode run-speed-change` also seeds a saved Sprint aura in the disposable character database.
+Its synthetic 60-second duration lets normal aura expiry restore run speed after world entry.
+Acceptance requires a sent speed change and a matching accepted acknowledgement after the first
+heartbeat, followed by a stable hold. Use `--stability-seconds 30 --timeout 180` for this mode.
+The fixture checks Sprint's effect against the current server DBC before preparation. It does
+not modify the source DBC or claim that 60 seconds is Sprint's retail duration.
+
 ## The exact harness invocation
 
 Recovering these arguments from scratch is slow and they are not stored anywhere the
@@ -190,7 +206,8 @@ future run does not have to reconstruct them:
 cd /mnt/e1384d9e-bede-40dd-8b1c-be0beb488490/Fun/azerothcore-cata
 M="/mnt/e1384d9e-bede-40dd-8b1c-be0beb488490/Fun/.plan11-runs/auth-15595/manifest.json"
 
-# The binaries must report the current HEAD, so rebuild before every prepare.
+# Build once when authorized; reuse these binaries for subsequent prepare/run operations.
+# The binaries must report the current HEAD. Rebuild if their recorded revision is stale.
 cmake --build var/build-plan7 --target revision.h worldserver authserver -j "$(nproc)"
 
 python3 apps/cata/run_real_client_authentication.py reset --manifest "$M"

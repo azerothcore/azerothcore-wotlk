@@ -21,6 +21,9 @@ namespace WorldPackets
         uint16 ExtraMovementFlagsToClient(uint16 flags);
         void ReadHeartbeat(WorldPacket& packet, MovementInfo& info);
         void WriteMovementUpdate(WorldPacket& packet, MovementInfo const& info);
+        void WriteRunSpeedChange(WorldPacket& packet, ObjectGuid const& guid, uint32 counter, float speed);
+        void ReadRunSpeedChangeAck(WorldPacket& packet, MovementInfo& info, uint32& counter, float& speed);
+        void WriteRunSpeedUpdate(WorldPacket& packet, MovementInfo const& info, float speed);
 
         class MoveSetActiveMover final : public ServerPacket
         {

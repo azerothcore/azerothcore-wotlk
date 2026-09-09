@@ -2,6 +2,11 @@
 
 Out-of-source build is required (in-source is blocked).
 
+Build only when explicitly authorized. Once authorized, build the required targets once and reuse
+those binaries for tests and client acceptance. Rebuild only when relevant inputs changed or a build
+failed; a second client run or `prepare` is not itself a reason to rebuild. Do not compile the WoW
+client; the acceptance harness uses the existing build-15595 executable.
+
 ```bash
 mkdir -p build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/azeroth-server -DCMAKE_BUILD_TYPE=RelWithDebInfo \

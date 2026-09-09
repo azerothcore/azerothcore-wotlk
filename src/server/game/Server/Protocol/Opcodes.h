@@ -163,7 +163,6 @@ enum OpcodeClient : uint16
     MSG_MOVE_START_SWIM                             = 0x3206,
     MSG_MOVE_STOP_SWIM                              = 0x3802,
     MSG_MOVE_SET_RUN_SPEED_CHEAT                    = 0x0000,
-    MSG_MOVE_SET_RUN_SPEED                          = 0x0CD,
     MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT               = 0x0000,
     MSG_MOVE_SET_RUN_BACK_SPEED                     = 0x0CF,
     MSG_MOVE_SET_WALK_SPEED_CHEAT                   = 0x0000,
@@ -181,7 +180,7 @@ enum OpcodeClient : uint16
     MSG_MOVE_WORLDPORT_ACK                          = 0x2411,
     CMSG_MOVE_CHARM_PORT_CHEAT                      = 0x0E0,
     CMSG_MOVE_SET_RAW_POSITION                      = 0x0E1,
-    CMSG_FORCE_RUN_SPEED_CHANGE_ACK                 = 0x0E3,
+    CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK            = 0x7818,
     CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK            = 0x0E5,
     CMSG_FORCE_SWIM_SPEED_CHANGE_ACK                = 0x0E7,
     CMSG_FORCE_MOVE_ROOT_ACK                        = 0x701E,
@@ -832,7 +831,7 @@ enum OpcodeServer : uint16
     SMSG_MONSTER_MOVE                               = 0x6E17,
     SMSG_MOVE_WATER_WALK                            = 0x75B1,
     SMSG_MOVE_LAND_WALK                             = 0x34B7,
-    SMSG_FORCE_RUN_SPEED_CHANGE                     = 0x0E2,
+    SMSG_MOVE_SET_RUN_SPEED                         = 0x3DB5,
     SMSG_FORCE_RUN_BACK_SPEED_CHANGE                = 0x0E4,
     SMSG_FORCE_SWIM_SPEED_CHANGE                    = 0x0E6,
     SMSG_FORCE_MOVE_ROOT                            = 0x0E8,
@@ -1000,6 +999,7 @@ enum OpcodeServer : uint16
     SMSG_GOSSIP_POI                                 = 0x4316,
     SMSG_MOVE_SET_ACTIVE_MOVER                       = 0x11B3,
     SMSG_MOVE_UPDATE                                 = 0x79A2,
+    SMSG_MOVE_UPDATE_RUN_SPEED                       = 0x14A6,
     SMSG_GM_PLAYER_INFO                             = 0x4A15,
     SMSG_LOGIN_VERIFY_WORLD                         = 0x2005,
     SMSG_LOAD_CUF_PROFILES                          = 0x50B1,
@@ -1407,8 +1407,6 @@ inline constexpr OpcodeServer MSG_MOVE_STOP_SWIM_SERVER =
     static_cast<OpcodeServer>(MSG_MOVE_STOP_SWIM);
 inline constexpr OpcodeServer MSG_MOVE_SET_RUN_SPEED_CHEAT_SERVER =
     static_cast<OpcodeServer>(MSG_MOVE_SET_RUN_SPEED_CHEAT);
-inline constexpr OpcodeServer MSG_MOVE_SET_RUN_SPEED_SERVER =
-    static_cast<OpcodeServer>(MSG_MOVE_SET_RUN_SPEED);
 inline constexpr OpcodeServer MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT_SERVER =
     static_cast<OpcodeServer>(MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT);
 inline constexpr OpcodeServer MSG_MOVE_SET_RUN_BACK_SPEED_SERVER =

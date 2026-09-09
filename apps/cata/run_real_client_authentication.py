@@ -13,6 +13,7 @@ import secrets
 import shutil
 import signal
 import socket
+import struct
 import subprocess
 import sys
 import tempfile
@@ -139,9 +140,13 @@ INITIAL_POST_LOAD_PACKETS_MODE = "initial-post-load-packets"
 MAP_INSERTION_MODE = "map-insertion-object-bootstrap"
 IN_WORLD_CONTROL_MODE = "in-world-control-bootstrap"
 BASIC_MOVEMENT_MODE = "basic-movement"
+RUN_SPEED_MODE = "run-speed-change"
+RUN_SPEED_AURA = 2983
+RUN_SPEED_AURA_AMOUNT = 50
+RUN_SPEED_AURA_DURATION_MS = 60000
 POPULATED_CHARACTER_MODES = frozenset({
     POPULATED_MODE, CHARACTER_SELECTION_MODE, INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE,
-    IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE,
+    IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE, RUN_SPEED_MODE,
 })
 CHARACTER_MODES = frozenset({"character-screen", *POPULATED_CHARACTER_MODES})
 CHARACTER_GUID = 0x01020304
@@ -155,6 +160,8 @@ CHARACTER_ZONE = 12
 
 
 def plan_number(mode: str) -> str:
+    if mode == RUN_SPEED_MODE:
+        return "16"
     if mode == BASIC_MOVEMENT_MODE:
         return "15"
     if mode == IN_WORLD_CONTROL_MODE:
@@ -488,6 +495,34 @@ def mysql(
     return run_command(command, input_bytes=payload, timeout=timeout).stdout.decode().rstrip("\n")
 
 
+def verify_run_speed_aura_source(dbc_root: Path) -> None:
+    # These are the current server's flattened Spell.dbc columns, not the client's split Cata tables.
+    data = (dbc_root / "Spell.dbc").read_bytes()
+    magic, count, fields, size, _ = struct.unpack_from("<4s4I", data)
+    if (magic, fields, size) != (b"WDBC", 234, 936):
+        raise RuntimeError("run-speed fixture requires the current 234-field server Spell.dbc")
+    for offset in range(20, 20 + count * size, size):
+        row = struct.unpack_from("<234I", data, offset)
+        if row[0] == RUN_SPEED_AURA:
+            if (row[71], row[95], row[80] + 1) != (6, 31, RUN_SPEED_AURA_AMOUNT):
+                raise RuntimeError("Sprint effect 0 no longer matches the saved run-speed aura fixture")
+            return
+    raise RuntimeError("Sprint is absent from the server Spell.dbc")
+
+
+def run_speed_aura_seed_sql() -> str:
+    # The extended saved duration lets normal aura expiry trigger the handshake after world entry.
+    return (
+        f"DELETE FROM `character_aura` WHERE `guid`={CHARACTER_GUID} AND `spell`={RUN_SPEED_AURA};"
+        "INSERT INTO `character_aura` "
+        "(`guid`,`casterGuid`,`spell`,`effectMask`,`recalculateMask`,`stackCount`,"
+        "`amount0`,`base_amount0`,`maxDuration`,`remainTime`) "
+        f"VALUES ({CHARACTER_GUID},{CHARACTER_GUID},{RUN_SPEED_AURA},1,0,1,"
+        f"{RUN_SPEED_AURA_AMOUNT},{RUN_SPEED_AURA_AMOUNT - 1},"
+        f"{RUN_SPEED_AURA_DURATION_MS},{RUN_SPEED_AURA_DURATION_MS});"
+    )
+
+
 def populated_character_seed_sql() -> str:
     x, y, z = CHARACTER_POSITION
     return (
@@ -792,7 +827,7 @@ def write_configs(manifest: Manifest, generation: Generation) -> None:
         "SOAP.Enabled": "0",
         "Cluster.Enabled": "0",
         "Appender.Server": '2,5,0,WorldServer.log,w',
-        "Logger.network": "5,Server" if generation["mode"] == BASIC_MOVEMENT_MODE else "4,Server",
+        "Logger.network": "5,Server" if generation["mode"] in {BASIC_MOVEMENT_MODE, RUN_SPEED_MODE} else "4,Server",
         "Logger.network.opcode": "4,Server",
     }
     auth_source = (REPO_ROOT / "src/server/apps/authserver/authserver.conf.dist").read_text()
@@ -1057,6 +1092,8 @@ def preflight_prepare(args: argparse.Namespace) -> dict[str, object]:
     dbc_root = args.server_dbc_root.resolve() if args.server_dbc_root else data_root / "dbc"
     if not dbc_root.is_dir() or not (data_root / "maps").is_dir():
         raise RuntimeError("data candidates must contain readable server DBC and Cataclysm maps directories")
+    if args.mode == RUN_SPEED_MODE:
+        verify_run_speed_aura_source(dbc_root)
     wine_runner = args.wine_runner.resolve()
     wine = next(
         (path for path in (wine_runner / "bin/wine64", wine_runner / "bin/wine")
@@ -1583,6 +1620,9 @@ def run_client(args: argparse.Namespace) -> None:
     require_unused(AUTH_PORT)
     require_unused(generation["ports"]["world"])
     paths = generation["paths"]
+    if generation["mode"] == RUN_SPEED_MODE:
+        # Re-seed on a transient retry too; a previous login may have consumed the saved aura.
+        mysql(manifest, generation, run_speed_aura_seed_sql(), generation["schemas"]["characters"])
     popens: dict[str, subprocess.Popen[bytes]] = {}
     outputs: list[object] = []
     try:
@@ -1831,14 +1871,34 @@ def movement_heartbeat_count(generation: Generation) -> int:
     return after_sync.count(MOVEMENT_HEARTBEAT_MARKER)
 
 
+def run_speed_acknowledgements(generation: Generation) -> list[dict[str, int | float]]:
+    after_map = world_log_text(generation).partition("Finished object update bootstrap after adding to map")[2]
+    after_sync = after_map.partition(IN_WORLD_CONTROL_MARKER)[2]
+    after_heartbeat = after_sync.partition(MOVEMENT_HEARTBEAT_MARKER)[2]
+    pending: dict[int, float] = {}
+    accepted = []
+    pattern = (
+        r"(Sent Cataclysm run-speed change|Accepted Cataclysm run-speed acknowledgement): "
+        r"counter=(\d+), speed=([-+0-9.eE]+)(?=\s|$)"
+    )
+    for kind, counter_text, speed_text in re.findall(pattern, after_heartbeat):
+        counter, speed = int(counter_text), float(speed_text)
+        if kind.startswith("Sent"):
+            pending[counter] = speed
+        elif pending.pop(counter, None) == speed == 7.0:
+            accepted.append({"counter": counter, "speed": speed})
+    return accepted
+
+
 POST_MARKER_MODES = frozenset({
-    INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE, IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE,
+    INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE, IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE, RUN_SPEED_MODE,
 })
 POST_MARKER_COUNTERS = {
     INITIAL_POST_LOAD_PACKETS_MODE: initial_packets_marker_count,
     MAP_INSERTION_MODE: map_insertion_marker_count,
     IN_WORLD_CONTROL_MODE: in_world_control_marker_count,
     BASIC_MOVEMENT_MODE: movement_heartbeat_count,
+    RUN_SPEED_MODE: lambda generation: len(run_speed_acknowledgements(generation)),
 }
 
 
@@ -1975,8 +2035,9 @@ def sanitized_evidence(
     selection_mode = generation["mode"] == CHARACTER_SELECTION_MODE
     initial_packets_mode = generation["mode"] == INITIAL_POST_LOAD_PACKETS_MODE
     map_insertion_mode = generation["mode"] == MAP_INSERTION_MODE
-    basic_movement_mode = generation["mode"] == BASIC_MOVEMENT_MODE
-    in_world_control_mode = generation["mode"] in {IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE}
+    run_speed_mode = generation["mode"] == RUN_SPEED_MODE
+    basic_movement_mode = generation["mode"] in {BASIC_MOVEMENT_MODE, RUN_SPEED_MODE}
+    in_world_control_mode = generation["mode"] in {IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE, RUN_SPEED_MODE}
     login_mode = selection_mode or initial_packets_mode or map_insertion_mode or in_world_control_mode
     owned_window = owned_window_evidence(generation) if character_mode else (
         Path(generation["paths"]["raw_evidence"]) / "window.xprop"
@@ -1988,7 +2049,8 @@ def sanitized_evidence(
         "build": CLIENT_BUILD,
         "mode": generation["mode"],
         "outcome": (
-            "basic_movement_pass_candidate" if basic_movement_mode and "characters_completed" in milestones
+            "run_speed_change_candidate" if run_speed_mode and "characters_completed" in milestones
+            else "basic_movement_pass_candidate" if basic_movement_mode and "characters_completed" in milestones
             else "in_world_control_bootstrap_candidate" if in_world_control_mode and "characters_completed" in milestones
             else "map_insertion_object_bootstrap_candidate" if map_insertion_mode and "characters_completed" in milestones
             else "initial_post_load_packets_candidate" if initial_packets_mode and "characters_completed" in milestones
@@ -2015,6 +2077,7 @@ def sanitized_evidence(
         "in_world_control_packet_prefix": in_world_control_prefix_value if in_world_control_mode else None,
         "in_world_control_marker_count": in_world_control_marker_count_value if in_world_control_mode else None,
         "movement_heartbeat_count": movement_heartbeat_count_value if basic_movement_mode else None,
+        "run_speed_acknowledgements": run_speed_acknowledgements(generation) if run_speed_mode else None,
         "post_marker_hold_seconds": (
             generation.get("post_marker_hold_seconds", 0) if generation["mode"] in POST_MARKER_MODES else None
         ),
@@ -2056,8 +2119,9 @@ def verify(args: argparse.Namespace) -> None:
     selection_mode = generation["mode"] == CHARACTER_SELECTION_MODE
     initial_packets_mode = generation["mode"] == INITIAL_POST_LOAD_PACKETS_MODE
     map_insertion_mode = generation["mode"] == MAP_INSERTION_MODE
-    basic_movement_mode = generation["mode"] == BASIC_MOVEMENT_MODE
-    in_world_control_mode = generation["mode"] in {IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE}
+    run_speed_mode = generation["mode"] == RUN_SPEED_MODE
+    basic_movement_mode = generation["mode"] in {BASIC_MOVEMENT_MODE, RUN_SPEED_MODE}
+    in_world_control_mode = generation["mode"] in {IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE, RUN_SPEED_MODE}
     login_mode = selection_mode or initial_packets_mode or map_insertion_mode or in_world_control_mode
     rows = character_row_count(manifest, generation) if character_mode else None
     realm_count = realm_character_count(manifest, generation) if populated_mode else None
@@ -2148,9 +2212,12 @@ def verify(args: argparse.Namespace) -> None:
             )
         if basic_movement_mode:
             character_ok = character_ok and evidence["movement_heartbeat_count"] > 0
+        if run_speed_mode:
+            character_ok = character_ok and bool(evidence["run_speed_acknowledgements"])
         if character_ok:
             evidence["outcome"] = (
-                "basic_movement_pass" if basic_movement_mode
+                "run_speed_change_pass" if run_speed_mode
+                else "basic_movement_pass" if basic_movement_mode
                 else "in_world_control_bootstrap_pass" if in_world_control_mode
                 else "map_insertion_object_bootstrap_pass" if map_insertion_mode
                 else "initial_post_load_packets_pass" if initial_packets_mode
@@ -2354,6 +2421,7 @@ def comparison_projection(evidence: dict[str, object]) -> dict[str, object]:
         ),
         "in_world_control_marker_count": evidence.get("in_world_control_marker_count"),
         "movement_heartbeat_observed": (evidence.get("movement_heartbeat_count") or 0) > 0,
+        "run_speed_acknowledgement_observed": bool(evidence.get("run_speed_acknowledgements")),
         "post_marker_hold_seconds": evidence.get("post_marker_hold_seconds"),
         "post_marker_snapshots": evidence.get("post_marker_snapshots"),
         "stability_seconds": evidence.get("stability_seconds"),
@@ -2660,6 +2728,34 @@ four Completed: COP_GET_CHARACTERS result=TRUE
         projection = comparison_projection(movement_evidence)
         assert projection == comparison_projection({**movement_evidence, "movement_heartbeat_count": 2})
         assert projection != comparison_projection({**movement_evidence, "movement_heartbeat_count": 0})
+        assert plan_number(RUN_SPEED_MODE) == "16"
+        prefix = ("Finished object update bootstrap after adding to map\n" + IN_WORLD_CONTROL_MARKER +
+                  "\n" + MOVEMENT_HEARTBEAT_MARKER + "\n")
+        sent = "Sent Cataclysm run-speed change: counter=7, speed=7\n"
+        accepted = "Accepted Cataclysm run-speed acknowledgement: counter=7, speed=7\n"
+        for log, expected in (
+            (prefix + accepted, []),
+            (sent + accepted, []),
+            (prefix + sent + accepted.replace("counter=7", "counter=8"), []),
+            (prefix + sent + accepted.replace("speed=7", "speed=8"), []),
+            (prefix + sent + accepted, [{"counter": 7, "speed": 7.0}]),
+            (prefix + sent + accepted + accepted, [{"counter": 7, "speed": 7.0}]),
+        ):
+            (raw / "WorldServer.log").write_text(log)
+            assert run_speed_acknowledgements(enum_generation) == expected
+        row = [0] * 234
+        row[0], row[71], row[95], row[80] = RUN_SPEED_AURA, 6, 31, RUN_SPEED_AURA_AMOUNT - 1
+        dbc_header = struct.pack("<4s4I", b"WDBC", 1, 234, 936, 1)
+        (raw / "Spell.dbc").write_bytes(dbc_header + struct.pack("<234I", *row) + b"\0")
+        verify_run_speed_aura_source(raw)
+        row[95] = 0
+        (raw / "Spell.dbc").write_bytes(dbc_header + struct.pack("<234I", *row) + b"\0")
+        try:
+            verify_run_speed_aura_source(raw)
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("non-speed aura fixture was accepted")
     auth_keys = (
         "RealmServerPort", "BindIP", "LogsDir", "PidFile", "RealmsStateUpdateDelay",
         "LoginDatabaseInfo", "Updates.EnableDatabases", "Updates.AutoSetup", "StrictVersionCheck",
@@ -2726,7 +2822,7 @@ def parser() -> argparse.ArgumentParser:
     prepare_parser.add_argument(
         "--mode", choices=(
             "no-login", "authentication", "character-screen", POPULATED_MODE, CHARACTER_SELECTION_MODE,
-            INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE, IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE,
+            INITIAL_POST_LOAD_PACKETS_MODE, MAP_INSERTION_MODE, IN_WORLD_CONTROL_MODE, BASIC_MOVEMENT_MODE, RUN_SPEED_MODE,
         ), default="authentication",
     )
     prepare_parser.add_argument("--minimum-free-gib", type=int, default=25)
