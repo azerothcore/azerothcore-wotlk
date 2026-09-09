@@ -918,6 +918,11 @@ public:
         return (uint32)f_BaseAttackTime;
     }
 
+    [[nodiscard]] inline uint32 GetRageWeaponSpeedHitFactor(WeaponAttackType att) const
+    {
+        return uint32(GetAttackTime(att) / 1000.0f * (att == BASE_ATTACK ? 3.5f : 1.75f));
+    }
+
     void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(static_cast<uint16>(UNIT_FIELD_BASEATTACKTIME) + att, val * m_modAttackSpeedPct[att]); }
     void ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply);
     void ApplyCastTimePercentMod(float val, bool apply);
@@ -1196,7 +1201,7 @@ public:
     int32 GetMechanicResistChance(SpellInfo const* spell);
     [[nodiscard]] uint32 GetResistance(SpellSchoolMask mask) const;
     [[nodiscard]] uint32 GetResistance(SpellSchools school) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school); }
-    static float GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo = nullptr);
+    static float GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo = nullptr, uint8 casterLevel = 0);
 
     void SetResistance(SpellSchools school, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school, val); }
     void UpdateResistanceBuffModsMod(SpellSchools school);
@@ -1624,7 +1629,7 @@ public:
     uint32 SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, uint32 stack = 1);
     static uint32 SpellCriticalHealingBonus(Unit const* caster, SpellInfo const* spellProto, uint32 damage, Unit const* victim);
 
-    static void CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited = false);
+    static void CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited = false, uint8 casterLevel = 0);
     static void CalcHealAbsorb(HealInfo& healInfo);
 
     // Energize spells

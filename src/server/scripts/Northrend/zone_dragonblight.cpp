@@ -712,6 +712,9 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
+        // dismounts the player once the gryphon leaves the areas whitelisted in conditions
+        VehicleAI::UpdateAI(diff);
+
         events.Update(diff);
         while (uint32 eventId = events.ExecuteEvent())
         {
@@ -2335,6 +2338,35 @@ class spell_dragonblight_devour_ghoul_periodic : public AuraScript
     }
 };
 
+enum LapsingDream
+{
+    SPELL_LAPSING_DREAM_SLOW = 51928
+};
+
+class spell_alystros_lapsing_dream_aura : public AuraScript
+{
+    PrepareAuraScript(spell_alystros_lapsing_dream_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_LAPSING_DREAM_SLOW });
+    }
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+
+        // default trigger makes the victim the caster, and 51928's area targets then find nobody
+        if (Unit* caster = GetCaster())
+            caster->AddAura(SPELL_LAPSING_DREAM_SLOW, GetTarget());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_alystros_lapsing_dream_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_dragonblight()
 {
     new npc_conversing_with_the_depths_trigger();
@@ -2365,4 +2397,5 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_dragonblight_flame_fury);
     RegisterSpellScript(spell_dragonblight_devour_ghoul);
     RegisterSpellScript(spell_dragonblight_devour_ghoul_periodic);
+    RegisterSpellScript(spell_alystros_lapsing_dream_aura);
 }

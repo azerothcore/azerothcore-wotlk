@@ -459,6 +459,7 @@ public:
     bool IsAbilityOfSkillType(uint32 skillType) const;
 
     bool IsAffectingArea() const;
+    bool CanBeRedirectedBySpellMagnet() const;
     bool IsTargetingArea() const;
     bool NeedsExplicitUnitTarget() const;
     bool NeedsToBeTriggeredByCaster(SpellInfo const* triggeringSpell, uint8 effIndex = MAX_SPELL_EFFECTS) const;
