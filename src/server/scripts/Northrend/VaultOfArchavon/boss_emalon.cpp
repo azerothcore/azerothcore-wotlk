@@ -52,6 +52,10 @@ enum Misc
     MAX_TEMPEST_MINIONS             = 4,
 };
 
+// A minion killed mid-fight is replaced next to the boss, not at one of the four start positions
+float constexpr MINION_RESPAWN_MIN_DIST = 5.0f;
+float constexpr MINION_RESPAWN_MAX_DIST = 10.0f;
+
 struct Position TempestMinions[MAX_TEMPEST_MINIONS] =
 {
     {-203.980103f, -281.287720f, 91.650223f, 1.598807f},
@@ -194,8 +198,20 @@ public:
                     Talk(EMOTE_BERSERK);
                     break;
                 case EVENT_SUMMON_NEXT_MINION:
-                    me->SummonCreature(NPC_TEMPEST_MINION, TempestMinions[urand(0, 3)], TEMPSUMMON_CORPSE_DESPAWN, 0);
+                {
+                    float const dist = frand(MINION_RESPAWN_MIN_DIST, MINION_RESPAWN_MAX_DIST);
+                    Position const pos = me->GetNearPosition(dist, frand(0.0f, static_cast<float>(2 * M_PI)));
+                    // the replacement has to join the fight on its own instead of idling until a
+                    // player walks into its aggro range
+                    if (Creature* minion = me->SummonCreature(NPC_TEMPEST_MINION, pos, TEMPSUMMON_CORPSE_DESPAWN, 0))
+                    {
+                        DoZoneInCombat(minion);
+                        if (Unit* victim = me->GetVictim())
+                            minion->AI()->AttackStart(victim);
+                    }
+                    Talk(EMOTE_MINION_RESPAWN);
                     break;
+                }
                 default:
                     break;
             }
