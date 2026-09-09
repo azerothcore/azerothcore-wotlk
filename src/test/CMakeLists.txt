@@ -57,4 +57,11 @@ add_test(
         unit
         COMMAND
         ${CMAKE_BINARY_DIR}/src/test/unit_tests
+        --gtest_filter=-WandCombatE2ETest.*
 )
+
+add_test(
+        NAME wand_combat_e2e
+        COMMAND unit_tests --gtest_filter=WandCombatE2ETest.*
+)
+set_tests_properties(wand_combat_e2e PROPERTIES LABELS "e2e;combat" TIMEOUT 300)
