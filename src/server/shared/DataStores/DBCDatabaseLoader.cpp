@@ -104,13 +104,9 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
                 case FT_STRING:
                     // not override string if new string is empty
                     if (fields[sqlColumnNumber].Get<std::string>().empty() && oldDataValue)
-                    {
                         *reinterpret_cast<char**>(&dataValue[dataOffset]) = *reinterpret_cast<char**>(&oldDataValue[dataOffset]);
-                    }
                     else
-                    {
                         *reinterpret_cast<char**>(&dataValue[dataOffset]) = CloneStringToPool(fields[sqlColumnNumber].Get<std::string>());
-                    }
                     dataOffset += sizeof(char*);
                     break;
                 case FT_SORT:
