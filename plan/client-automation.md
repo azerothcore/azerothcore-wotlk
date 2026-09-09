@@ -4,6 +4,15 @@ Reference for `run --auto-login` in `apps/cata/run_real_client_authentication.py
 describes focus acquisition and input delivery for the isolated client. Successful login and
 character selection do not prove that the world loading screen has dismissed.
 
+## Build and run budget
+
+Default to one server build and one isolated client acceptance run per completed change. Finish
+local packet checks before launching the client, then reuse the same binaries. Do not require two
+fresh generations automatically. Repeat only when a failure or relevant change requires new
+evidence, and state what the repeat will verify. Retry transient failures in the existing generation
+as described below. Earlier plans' two-generation requirements are historical, not the default for
+new work.
+
 ## Window discovery
 
 `owned_wow_window()` scans `wmctrl -lpGx` for a window whose PID is in the generation's own
@@ -190,7 +199,8 @@ future run does not have to reconstruct them:
 cd /mnt/e1384d9e-bede-40dd-8b1c-be0beb488490/Fun/azerothcore-cata
 M="/mnt/e1384d9e-bede-40dd-8b1c-be0beb488490/Fun/.plan11-runs/auth-15595/manifest.json"
 
-# The binaries must report the current HEAD, so rebuild before every prepare.
+# Build once when authorized; reuse these binaries for subsequent prepare/run operations.
+# The binaries must report the current HEAD. Rebuild if their recorded revision is stale.
 cmake --build var/build-plan7 --target revision.h worldserver authserver -j "$(nproc)"
 
 python3 apps/cata/run_real_client_authentication.py reset --manifest "$M"
