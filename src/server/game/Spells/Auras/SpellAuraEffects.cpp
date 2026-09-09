@@ -1233,6 +1233,11 @@ bool AuraEffect::CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventIn
             if (!eventInfo.GetProcSpell() || !eventInfo.GetProcSpell()->GetCastTime())
                 return false;
             break;
+        case SPELL_AURA_SPELL_MAGNET:
+            // Spell magnets do not consume charges for spells they cannot redirect.
+            if (!spellInfo || !spellInfo->CanBeRedirectedBySpellMagnet())
+                return false;
+            break;
         case SPELL_AURA_MOD_POWER_COST_SCHOOL:
         case SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT:
         {
@@ -6392,7 +6397,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     cleanDamage.mitigated_damage = std::max(0, mitigatedDamage);
 
     DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, cleanDamage.mitigated_damage);
-    Unit::CalcAbsorbResist(dmgInfo);
+    Unit::CalcAbsorbResist(dmgInfo, false, GetCasterLevel());
 
     uint32 absorb = dmgInfo.GetAbsorb();
     uint32 resist = dmgInfo.GetResist();
@@ -6485,7 +6490,7 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     cleanDamage.mitigated_damage = std::max(0, cleanDamageAmount);
 
     DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, cleanDamage.mitigated_damage);
-    Unit::CalcAbsorbResist(dmgInfo);
+    Unit::CalcAbsorbResist(dmgInfo, false, GetCasterLevel());
 
     uint32 absorb = dmgInfo.GetAbsorb();
     uint32 resist = dmgInfo.GetResist();

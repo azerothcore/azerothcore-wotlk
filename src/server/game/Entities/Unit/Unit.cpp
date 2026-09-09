@@ -2286,7 +2286,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
     return uint32(std::ceil(std::max(damage * (1.0f - tmpvalue), 0.0f)));
 }
 
-float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo /*= nullptr*/)
+float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo /*= nullptr*/, uint8 casterLevel /*= 0*/)
 {
     float victimResistance = static_cast<float>(victim->GetResistance(schoolMask));
     if (owner)
@@ -2304,11 +2304,14 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     }
 
     victimResistance = std::max(victimResistance, 0.0f);
+    uint8 effectiveCasterLevel = owner ? owner->GetLevel() : casterLevel;
 
-    if (owner && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL)))
-        victimResistance += std::max(static_cast<float>(victim->GetLevel() - owner->GetLevel()) * 5.0f, 0.0f);
+    if (effectiveCasterLevel && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL)))
+        victimResistance += std::max(static_cast<float>(victim->GetLevel() - effectiveCasterLevel) * 5.0f, 0.0f);
 
-    float level = static_cast<float>(victim->GetLevel());
+    // Per EJ research, the resistance constant is based on the caster's level. It should be equal
+    // to 400 for a level 80 caster and 506.5 for a level 83 caster (boss).
+    float level = static_cast<float>(effectiveCasterLevel ? effectiveCasterLevel : victim->GetLevel());
     float resistanceConstant = 0.0f;
 
     if (level > 60.0f)
@@ -2321,7 +2324,7 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     return std::min(victimResistance / (victimResistance + resistanceConstant), 0.75f);
 }
 
-void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
+void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel /*= 0*/)
 {
     Unit* victim = dmgInfo.GetVictim();
     Unit* attacker = dmgInfo.GetAttacker();
@@ -2337,7 +2340,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
     // Xinef: holy resistance exists for npcs
     if (!(schoolMask & SPELL_SCHOOL_MASK_NORMAL) && (!(schoolMask & SPELL_SCHOOL_MASK_HOLY) || victim->IsCreature()) && (!spellInfo || (!spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL) && !spellInfo->HasAttribute(SPELL_ATTR4_NO_CAST_LOG))))
     {
-        float averageResist = Unit::GetEffectiveResistChance(attacker, schoolMask, victim);
+        float averageResist = Unit::GetEffectiveResistChance(attacker, schoolMask, victim, nullptr, casterLevel);
 
         float discreteResistProbability[11];
         for (uint32 i = 0; i < 11; ++i)
@@ -2567,7 +2570,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             }
             else
             {
-                Unit::CalcAbsorbResist(splittedDmgInfo, true);
+                Unit::CalcAbsorbResist(splittedDmgInfo, true, casterLevel);
                 Unit::DealDamageMods(caster, splitted, &splitted_absorb);
             }
 
@@ -2640,7 +2643,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
             }
             else
             {
-                Unit::CalcAbsorbResist(splittedDmgInfo, true);
+                Unit::CalcAbsorbResist(splittedDmgInfo, true, casterLevel);
                 Unit::DealDamageMods(caster, splitted, &splitted_absorb);
             }
 
@@ -8168,8 +8171,7 @@ bool RedirectSpellEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 Unit* Unit::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
 {
-    // Patch 1.2 notes: Spell Reflection no longer reflects abilities
-    if (spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY) || spellInfo->HasAttribute(SPELL_ATTR1_NO_REDIRECTION) || spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+    if (!spellInfo->CanBeRedirectedBySpellMagnet())
         return victim;
 
     Unit::AuraEffectList const& magnetAuras = victim->GetAuraEffectsByType(SPELL_AURA_SPELL_MAGNET);
@@ -9890,8 +9892,9 @@ bool Unit::HasSchoolImmunityForMask(SpellSchoolMask schoolMask, Unit const* cast
     uint32 accumulatedMask = 0;
     for (auto const& [immunitySchoolMask, immunityAuraId] : m_spellImmune[IMMUNITY_SCHOOL])
     {
-        // Skip the spell's own immunity entry
-        if (spellInfo && immunityAuraId == spellInfo->Id)
+        // Beneficial immunities may refresh themselves. Hostile ones (Cyclone, Banish)
+        // must still report immunity when cast again while their aura is active.
+        if (spellInfo && spellInfo->IsPositive() && immunityAuraId == spellInfo->Id)
             continue;
 
         SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
@@ -12612,6 +12615,10 @@ void Unit::CleanupBeforeRemoveFromMap(bool finalCleanup)
 
     if (IsInWorld()) // not in world and not being removed atm
         RemoveFromWorld();
+
+    // Abort pending events here: left to ~EventProcessor they run after m_spellMods is already
+    // destroyed, and cancelling a SpellEvent then hits freed memory in Player::RestoreSpellMods.
+    m_Events.KillAllEvents(false);
 
     ASSERT(GetGUID());
 

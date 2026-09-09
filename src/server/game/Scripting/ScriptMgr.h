@@ -473,6 +473,10 @@ public: /* PlayerScript */
     void OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId);
     void OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& level);
     void OnPlayerAfterTakeItemFromMail(Player* player, Item* item, uint32 count);
+    bool OnPlayerCanLearnSpell(Player* player, uint32 spellId);
+    void OnPlayerBeforeReceiveSpellListFromTrainer(Player* player, Creature* trainer, WorldPackets::NPC::TrainerList& trainerList);
+    void OnPlayerGetTrainerSpellState(Player const* player, uint32 trainerId, uint32 spellId, Trainer::SpellState& state);
+    void OnPlayerAfterTrainSpell(Player* player, Creature* trainer, uint32 spellId);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
@@ -522,6 +526,7 @@ public: /* GlobalScript */
     void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     void OnGlobalMirrorImageDisplayItem(Item const* item, uint32& display);
     void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
+    void OnArenaWeekReset();
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
     void OnAfterCalculateLootGroupAmount(Player const* player, Loot& loot, uint16 lootMode, uint32& groupAmount, LootStore const& store);
     void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store);
@@ -675,7 +680,7 @@ public: /* ArenaScript */
     void OnArenaStart(Battleground* const bg);
     bool OnBeforeArenaTeamMemberUpdate(ArenaTeam* team, Player* player, bool won, uint32 opponentMatchmakerRating, int32 matchmakerChange);
     bool CanSaveArenaStatsForMember(ArenaTeam* team, ObjectGuid playerGuid);
-    void OnGetStartPersonalRating(ArenaTeam* team, ObjectGuid playerGuid, uint32& personalRating);
+    void OnAddMember(ArenaTeam* team, ArenaTeamMember& member);
 
 public: /* MiscScript */
 
