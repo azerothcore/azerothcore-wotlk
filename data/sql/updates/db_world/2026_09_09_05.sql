@@ -1,3 +1,4 @@
+-- DB update 2026_09_09_04 -> 2026_09_09_05
 --
 -- Quests 10262 and 10308 ask for Zaxxis Insignias, but the three Zaxxis mobs that drop them
 -- advertise no quest item, so the client shows no objective when you hover them. The marker
