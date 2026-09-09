@@ -1362,7 +1362,7 @@ public:
     void RemoveItem(uint8 bag, uint8 slot, bool update);
     void MoveItemFromInventory(uint8 bag, uint8 slot, bool update);
     // in trade, auction, guild bank, mail....
-    void MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB = false);
+    Item* MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB = false);
     // in trade, guild bank, mail....
     void RemoveItemDependentAurasAndCasts(Item* pItem);
     void DestroyItem(uint8 bag, uint8 slot, bool update);
