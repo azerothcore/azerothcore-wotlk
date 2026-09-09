@@ -1820,6 +1820,7 @@ public:
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
     [[nodiscard]] bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const override;
     [[nodiscard]] uint32 GetSpellCooldownDelay(uint32 spell_id) const;
+    [[nodiscard]] uint32 GetSpellbookSpellForCooldown(SpellInfo const* spellInfo) const;
     void AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
     void AddSpellCooldown(uint32 spell_id, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
     void _AddSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);

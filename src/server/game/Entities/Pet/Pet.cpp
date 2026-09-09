@@ -392,14 +392,24 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     /// @todo pets should be summoned from real cast instead of just faking it?
     if (petInfo->CreatedBySpellId && spellInfo && (spellInfo->CategoryRecoveryTime > 0 || spellInfo->RecoveryTime > 0))
     {
+        // The death knight ghoul is summoned by a spell the client never learns, its spellbook entry is another one
+        uint32 castSpellId = petInfo->CreatedBySpellId;
+        uint32 spellbookSpellId = owner->GetSpellbookSpellForCooldown(spellInfo);
+        if (spellbookSpellId)
+            castSpellId = spellbookSpellId;
+
         WorldPacket data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
         data << owner->GetPackGUID();
         data << owner->GetPackGUID();
         data << uint8(0);
-        data << uint32(petInfo->CreatedBySpellId);
+        data << uint32(castSpellId);
         data << uint32(256); // CAST_FLAG_UNKNOWN3
         data << uint32(0);
-        owner->SendMessageToSet(&data, true);
+        // The translated id is a real spell for every client, so bystanders would see a cast that never happened
+        if (spellbookSpellId)
+            owner->SendDirectMessage(&data);
+        else
+            owner->SendMessageToSet(&data, true);
     }
 
     owner->SetMinion(this, true);
