@@ -21,6 +21,14 @@ Authoring rules for new tests live in the harness:
 1. Running AzerothCore **3.3.5a** authserver + worldserver.
 2. MySQL with `acore_auth`, `acore_characters`, and `acore_world` (world DB is required for spawn cleanup and many fixtures).
 3. Go **1.26+** and network reachability to auth (default `127.0.0.1:3724`).
+4. `Warden.Enabled = 0` on the worldserver, until the harness bug below is fixed upstream.
+   Symptom: every login fails with `attempted to log in using invalid client OS ()`.
+   `WorldSocket::HandleAuthSession` reads `account.os` from the database and, when Warden is
+   active, rejects anything that is not `Win` or `OSX`. That column is written by the
+   *authserver* from the AUTH_LOGON_CHALLENGE FourCC, and AzerothGhost sends it leading-NUL
+   first (`client/auth.go`: `os := [4]byte{0, 'n', 'i', 'W'}`), so AC's `_os = os.data()`
+   builds an empty string and stores it. Docker stacks can set `AC_WARDEN_ENABLED=0` on the
+   worldserver service.
 
 Accounts are created by the harness (GM level 3, password `test`). Do not reuse real player accounts.
 
@@ -150,12 +158,15 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 | social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
 | quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
 | quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
+| quests/frostmourne | scrying-orb vision runs; Muradin leaves the cavern and despawns; quest 12478 COMPLETE | P2 | covered (`TestAC_25760_*`); dialogue order and duplicate line `blocked-harness` (no monster-say capture) | #25760 |
 | items/equip | visible-item slot after EquipEntry; additem; survives relog | P2 | covered | — |
 | protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked-harness` (extra_flags after relog) | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
+| instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
 | instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
+| world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
 
 ---
 

@@ -276,6 +276,7 @@ enum UlduarGameObjects
     GO_LEVIATHAN_DOORS                      = 194630,
     GO_LIGHTNING_WALL1                      = 194905,
     GO_LIGHTNING_WALL2                      = 194416,
+    GO_ULDUAR_PROTECTIVE_BUBBLE             = 194484,
     GO_MIMIRONS_TARGETTING_CRYSTAL          = 194705,
     GO_FREYAS_TARGETTING_CRYSTAL            = 194704,
     GO_HODIRS_TARGETTING_CRYSTAL            = 194707,
@@ -357,6 +358,8 @@ enum UlduarPersistentData
     PERSISTENT_DATA_C_OF_ULDUAR_MASK,
     PERSISTENT_DATA_MAGE_BARRIER,
     PERSISTENT_DATA_ALGALON_FIRST_PULL,
+    // Set when Brann's action list unlocks the salvaged vehicles, they stay boardable for the rest of the lockout
+    PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE,
     MAX_PERSISTENT_DATA
 };
 

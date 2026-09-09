@@ -1895,12 +1895,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
     });
 
-    // Hurl Pyrite
-    ApplySpellFix({ 62490 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = 0;
-    });
-
     // Meeting Stone Summon
     ApplySpellFix({ 23598 }, [](SpellInfo* spellInfo)
     {
@@ -1945,6 +1939,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 63278 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Effect = 0;
+    });
+
+    // Ulduar, General Vezax, Shadow Crash (area aura)
+    ApplySpellFix({ 63277 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_DO_NOT_DISPLAY_DURATION;
     });
 
     // Boom (XT-002)

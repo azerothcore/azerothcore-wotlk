@@ -2368,7 +2368,10 @@ SkillGain.Weapon    = 1
 #    SkillChance.Yellow
 #    SkillChance.Green
 #    SkillChance.Grey
-#        Description: Chance to increase skill based on recipe color.
+#        Description: Chance to increase skill based on difficulty.
+#                     Crafting recipes interpolate between the orange and grey
+#                     chances. Yellow and green chances apply to gathering and
+#                     scripted skill gains.
 #        Default:     100 - (SkillChance.Orange)
 #                     75  - (SkillChance.Yellow)
 #                     25  - (SkillChance.Green)

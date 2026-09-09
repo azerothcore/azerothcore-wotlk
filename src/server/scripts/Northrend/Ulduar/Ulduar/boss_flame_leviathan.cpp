@@ -1207,6 +1207,49 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
     }
 };
 
+enum SalvagedChopper
+{
+    SPELL_GRAB_PYRITE                   = 67372,
+    SPELL_EJECT_PASSENGER               = 67393,
+
+    // The chopper's only other seat, carrying either a player or a grabbed pyrite crate.
+    SEAT_CHOPPER_PASSENGER              = 1,
+};
+
+struct npc_salvaged_chopper : public VehicleAI
+{
+    npc_salvaged_chopper(Creature* creature) : VehicleAI(creature) { }
+
+    // While the rear seat is taken, the "Grab Pyrite" button becomes "Eject Passenger".
+    void PassengerBoarded(Unit* /*who*/, int8 seatId, bool apply) override
+    {
+        if (seatId != SEAT_CHOPPER_PASSENGER)
+            return;
+
+        if (apply)
+            SwapActionButton(SPELL_GRAB_PYRITE, SPELL_EJECT_PASSENGER);
+        else
+            SwapActionButton(SPELL_EJECT_PASSENGER, SPELL_GRAB_PYRITE);
+    }
+
+private:
+    void SwapActionButton(uint32 from, uint32 to)
+    {
+        bool swapped = false;
+        for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+            if (me->m_spells[i] == from)
+            {
+                me->m_spells[i] = to;
+                swapped = true;
+            }
+
+        // Resend the vehicle action bar, otherwise the driver keeps seeing the old button.
+        if (swapped)
+            if (Player* driver = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                driver->VehicleSpellInitialize();
+    }
+};
+
 class go_ulduar_tower : public GameObjectScript
 {
 public:
@@ -1838,6 +1881,7 @@ void AddSC_boss_flame_leviathan()
     // Helpers
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
+    RegisterUlduarCreatureAI(npc_salvaged_chopper);
 
     // GOs
     new go_ulduar_tower();
