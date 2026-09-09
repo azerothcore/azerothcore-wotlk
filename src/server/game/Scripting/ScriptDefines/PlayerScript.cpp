@@ -964,6 +964,26 @@ void ScriptMgr::OnPlayerAfterTakeItemFromMail(Player* player, Item* item, uint32
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_TAKE_ITEM_FROM_MAIL, script->OnPlayerAfterTakeItemFromMail(player, item, count));
 }
 
+bool ScriptMgr::OnPlayerCanLearnSpell(Player* player, uint32 spellId)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_LEARN_SPELL, !script->OnPlayerCanLearnSpell(player, spellId));
+}
+
+void ScriptMgr::OnPlayerBeforeReceiveSpellListFromTrainer(Player* player, Creature* trainer, WorldPackets::NPC::TrainerList& trainerList)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_RECEIVE_SPELL_LIST_FROM_TRAINER, script->OnPlayerBeforeReceiveSpellListFromTrainer(player, trainer, trainerList));
+}
+
+void ScriptMgr::OnPlayerGetTrainerSpellState(Player const* player, uint32 trainerId, uint32 spellId, Trainer::SpellState& state)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_TRAINER_SPELL_STATE, script->OnPlayerGetTrainerSpellState(player, trainerId, spellId, state));
+}
+
+void ScriptMgr::OnPlayerAfterTrainSpell(Player* player, Creature* trainer, uint32 spellId)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_TRAIN_SPELL, script->OnPlayerAfterTrainSpell(player, trainer, spellId));
+}
+
 PlayerScript::PlayerScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {
