@@ -1,0 +1,150 @@
+{
+  "class": 1,
+  "issues": [
+    52,
+    57
+  ],
+  "limits": "File comparison only; source provenance, post-release updates, item values, skills, stats, other spell dependencies, and runtime creation remain unverified.",
+  "missing_reference_action_spells": [],
+  "missing_server_action_spells": [
+    88161,
+    88163
+  ],
+  "outfits_match": false,
+  "race": 1,
+  "reference_actions": [
+    [
+      1,
+      1,
+      72,
+      88163,
+      0
+    ],
+    [
+      1,
+      1,
+      73,
+      88161,
+      0
+    ],
+    [
+      1,
+      1,
+      81,
+      59752,
+      0
+    ],
+    [
+      1,
+      1,
+      84,
+      6603,
+      0
+    ],
+    [
+      1,
+      1,
+      96,
+      6603,
+      0
+    ],
+    [
+      1,
+      1,
+      108,
+      6603,
+      0
+    ]
+  ],
+  "reference_commit": "c699217775d90794158422387b07a917e161b582",
+  "reference_outfits": [
+    {
+      "gender": 0,
+      "items": [
+        58231,
+        39,
+        40,
+        49778,
+        6948
+      ],
+      "outfit": 0
+    },
+    {
+      "gender": 1,
+      "items": [
+        58231,
+        39,
+        40,
+        49778,
+        6948
+      ],
+      "outfit": 0
+    }
+  ],
+  "reference_spawn": [
+    [
+      1,
+      1,
+      0,
+      9,
+      -8914.57,
+      -133.909,
+      80.5378,
+      5.13806
+    ]
+  ],
+  "runtime_acceptance": "not_run",
+  "server_outfits": [
+    {
+      "gender": 0,
+      "items": [
+        38,
+        39,
+        40,
+        49778,
+        6948
+      ],
+      "outfit": 0
+    },
+    {
+      "gender": 1,
+      "items": [
+        38,
+        39,
+        40,
+        49778,
+        6948
+      ],
+      "outfit": 0
+    }
+  ],
+  "source_provenance_verified": false,
+  "sources": [
+    {
+      "file": "TDB_full_world_434.22011_2022_01_09.sql",
+      "role": "world-reference",
+      "sha256": "b03e64b196be444d1f7bef05efaa2493274402630af86d116aa8ee79002cfbee"
+    },
+    {
+      "file": "CharStartOutfit.dbc",
+      "role": "cata-client-data",
+      "sha256": "2e1e594144a4604b2f146c52287a4a7d58217de7647dbede8c1ff37f987f1470"
+    },
+    {
+      "file": "Spell.dbc",
+      "role": "cata-client-data",
+      "sha256": "088a14963d3f81a10963702c760215f49ff73132bea751306c57aae0dae9f39f"
+    },
+    {
+      "file": "CharStartOutfit.dbc",
+      "role": "current-server-data",
+      "sha256": "a026407cd4fa60867ac2eda1070e89679e811774b476980902125f6d5af61540"
+    },
+    {
+      "file": "Spell.dbc",
+      "role": "current-server-data",
+      "sha256": "d5cce1a83550dcfa9eb2f0251dbb11fd24c272534b2b1a9b230924a44d817ab3"
+    }
+  ],
+  "world_update_chain_verified": false
+}

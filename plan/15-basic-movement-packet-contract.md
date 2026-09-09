@@ -2,5 +2,5 @@
 
 Canonical issue: [#33](https://github.com/trolloks/azerothcore-cata/issues/33)
 
-Status: in progress. The dependency proofs are complete. The canonical issue defines the idle
-`MSG_MOVE_HEARTBEAT` contract, its Cata packet layouts, and local checks before final client acceptance.
+Status: complete in PR #48. The canonical issue records idle `MSG_MOVE_HEARTBEAT` acceptance.
+Directional movement and jumping remain separate work; see the conversion roadmap.
