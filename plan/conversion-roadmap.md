@@ -30,27 +30,241 @@ unverified and the log must not be committed because it contains account and pac
 
 ## Current state
 
-The Plan 1 execution baseline at `6906fe6d` was zero commits behind upstream `5fa7cb00f` and eleven
-ahead. Its pre-audit delta was 24 files, 181 changed blocks, 1,434 insertions, and 317 deletions. It is
-a partial authentication and character-list experiment plus fork-specific planning context.
+Reviewed on 2026-09-09 against merged `master` at `22f8540e1`, after PR #51. Numbered
+plans 1-21 are closed; Plans 22-26 are now queued below. Completion applies to the bounded contracts
+in each issue, not to whole gameplay systems.
 
-What fits the goal:
+Proven so far:
 
-- It retains AzerothCore's database, session, security, hook, and player-loading flows.
-- The initializer, part of world authentication, character enumeration, and packed player-login GUID
-  behavior contain useful Cata work.
-- The branch stays small enough to audit against upstream.
+- Authentication, character enumeration, selection of a database-seeded character, and stable
+  Northshire world entry through the existing AzerothCore session and player-loading flows.
+- Direction-safe opcode dispatch and the shared build-15595 opcode values. Payload conversion
+  remains a separate check for each request and response.
+- Object, Unit, Player, Item, Container, GameObject, DynamicObject, and Corpse field contracts and
+  the object-create movement block.
+- Idle movement heartbeat processing and one server-initiated run-speed change with its matching
+  client acknowledgement. These do not establish keyboard movement or the other speed types.
+- Representative rendered objects in Plan 18: an equipped bag containing a sword and jerky,
+  a chest, a player corpse, and ground flames. The inventory API reported six slots, jerky x2,
+  and sword durability 13/20; the user manually confirmed the bag contents. The second fixture
+  attempt logged 97 ordinary periodic ground-spell triggers during a stable 30-second session.
+  Its generic verifier had already recorded INCONCLUSIVE without screen confirmation; the later
+  human confirmation is supplemental evidence, not a rewritten automated verdict. See #37.
 
-What does not yet fit the goal:
+Known gaps that determine the next work:
 
-- One shared opcode table cannot represent Cata's client/server numeric collisions.
-- Most opcode values, packet payloads, update fields, DBC layouts, build identity, and expansion
-  settings remain WotLK.
-- GUID and bit-buffer foundations are incomplete, auth serializers disagree, and compression owns a
-  leaking raw zlib stream.
-- Character packet serialization bypasses AzerothCore's packet layer.
-- Temporary hot-path logging, dead code, empty handlers, and commented implementations increase the
-  upstream merge cost without adding Cata behavior.
+- Every accepted world-entry fixture so far used a database-seeded character. Normal character
+  creation, deletion, and starting-state persistence have not been accepted. The creation request
+  header already matches the pinned reference, so begin with verification rather than rewriting it.
+- `Player::Create` still derives starting inventory from `CharStartOutfit` plus `playercreateinfo_item`,
+  and skills, spells, actions, and spawn data from the existing creation stores. The sword and jerky
+  in Plan 18 were synthetic fixture contents, not proof of the correct Cata starting inventory.
+- The login `PhaseShiftChange` serializer writes empty phase/map lists and the Unphased flag.
+  Server visibility still uses the existing phase-mask model. This proves only the default phase,
+  not Cata phase IDs, quest-driven visibility, terrain swaps, or phased starting zones.
+- `WorldSession::ReadMovementInfo` selects the Cata decoder only for `MSG_MOVE_HEARTBEAT`.
+  Directional movement and jump/land requests still enter the WotLK reader and broadcast path.
+- `HandleCastSpellOpcode` omits the reference request's `Misc` word. `SendSpellStart` and
+  `SendSpellGo` omit `CastFlagsEx` before the time field. Server-triggered flames do not prove
+  that pressing a spell button works.
+- Seeing bag contents does not establish moving, equipping, splitting, or using items. Several
+  basic inventory request layouts already match the reference; verify them before changing code.
+- `LootView` writes gold and an item count without the Cata currency-count byte. Single-player
+  looting and inventory delivery have not been accepted with the real client.
+- The current server still reads the flattened 234-field `Spell.dbc`, and distributed defaults
+  remain expansion 2 and level 80. Cata client-data stores, reproducible extraction, database
+  conversion, level-85 progression, and retail combat rules remain unfinished. Current fixtures
+  deliberately use verified records from the existing server data.
+- Character creation/deletion, new races, teleports, swimming/flying, transport movement, combat,
+  quests, social systems, and content remain unproven beyond the specific earlier issue contracts.
+
+The original Plan 1 baseline and audit measurements remain historical evidence in
+[#11](https://github.com/trolloks/azerothcore-cata/issues/11); they no longer describe current master.
+
+## Next five plans
+
+The five canonical issues are open in delivery order. Creating the queue does not authorize builds
+or mean every prerequisite is already satisfied. Start each implementation from merged master after
+its predecessor is complete. Split missing data or gameplay prerequisites into explicit blocking work.
+GitHub holds each full contract; the functionality/data trackers retain the broader parity scope.
+
+| Order | Proposed plan | Completion boundary |
+| --- | --- | --- |
+| [22][plan-22] | Character creation and starting state | Create through UI; verify items, spells, spawn, and saves |
+| [23][plan-23] | On-foot movement | Walk, turn, strafe, jump, land, and stop at the accepted position |
+| [24][plan-24] | Initial phasing and visibility | Enter/leave a phase and restore correct visibility on login |
+| [25][plan-25] | Basic spell casting | Cast from the action bar and handle success, failure, and cancellation |
+| [26][plan-26] | First complete quest loop | Accept, progress, turn in, and save correct rewards and phase effects |
+
+[plan-22]: https://github.com/trolloks/azerothcore-cata/issues/52
+[plan-23]: https://github.com/trolloks/azerothcore-cata/issues/53
+[plan-24]: https://github.com/trolloks/azerothcore-cata/issues/54
+[plan-25]: https://github.com/trolloks/azerothcore-cata/issues/55
+[plan-26]: https://github.com/trolloks/azerothcore-cata/issues/56
+
+Plan 22's starter-data prerequisite is [#57](https://github.com/trolloks/azerothcore-cata/issues/57),
+a native sub-issue blocking #52. Its initial acceptance matrix is Human Warrior, level 1, both genders,
+enUS, ordinary account, with custom starting spells disabled. Other profiles remain unverified.
+
+The world and hotfix dumps now match the official TDB 434.22011 release. All 170 pending world updates
+through the TC pin replayed successfully in disposable MySQL 8.4.8; all 20 hotfix update hashes already
+match the release ledger. The updated reference removes SQL starter skills and adds class/race stats.
+See the [source and replay evidence](../apps/cata/fixtures/plan22-starting-data-audit.json) and
+[update hash ledger](../apps/cata/fixtures/plan22-world-update-audit.tsv). Client extraction provenance
+and native AC loader/runtime acceptance remain open.
+
+Implementation is split into blocking children of #57:
+
+1. [#58: native spell and skill inputs](https://github.com/trolloks/azerothcore-cata/issues/58).
+2. [#59: native items and starting outfits](https://github.com/trolloks/azerothcore-cata/issues/59).
+3. [#60: starting stats and world profiles](https://github.com/trolloks/azerothcore-cata/issues/60).
+
+Start with #58. Coordinate these changes and the saved #52 protocol patch before one authorized build
+using the existing ccache/PCH tree and one client session. Reuse cached prepare inputs and binaries.
+Keep #52 and #57 open until normal creation, correct starting state, and persistence are accepted.
+
+### Follow-on work and dependency gates
+
+The next-five list does not replace the full plan-family table below. Keep these dependencies
+visible when choosing the following tranche:
+
+- Inventory movement, splitting, equipping, item use, persistence, and failure cases. Reuse the
+  field proof from Plan 18 and the shared casting work; verify existing readers before changing them.
+- Single-player loot: correct the currency-count field, open/take/release behavior, item/money
+  delivery, full bags, ownership, and duplicate-award prevention. Use a controlled loot source
+  before claiming that combat, death, and loot all work together.
+- Combat, death, resurrection, and corpse recovery; then a repeatable kill/loot/quest-reward loop.
+- Cata extraction, client-data stores, and database migrations beyond the initial character data.
+  These gate broader progression, creature/item definitions, spells, and terrain-dependent behavior.
+- Remaining race/class combinations, Goblin/Worgen support, phased starting campaigns, quest
+  conditions/rewards, terrain swaps, and later-zone content. Track each as explicit unproven scope.
+- Teleports, swimming/flying, transports, instances, and the social/economy/PvP systems in the
+  family table. None is implied complete by a successful on-foot starting-zone session.
+
+### Validation budget
+
+Run focused deterministic checks before real-client acceptance. When a build is authorized, use
+the existing ccache/PCH build tree and build the required targets once. Reuse those binaries and
+cached prepare inputs. Default to one isolated client acceptance session per plan, combining that
+plan's scenarios. A repeat needs a concrete failure or relevant change and a stated purpose;
+there is no blanket two-build or two-run requirement. Keep protected inputs immutable and use
+only the owned disposable database and cleanup procedure.
+
+A data-dependent plan must define its source/provenance, tables, output formats, out-of-repository
+artifacts, and disposable migration checks before extraction or broad imports. Pull that prerequisite
+forward when needed; do not invent retail values or add a second compatibility framework to bypass
+an unavailable store.
+
+## Functional and data parity tracking
+
+Use these records together; none replaces the others:
+
+- [Canonical plan issues](github-issues.tsv): implementation ownership, dependencies, decisions,
+  and completion evidence for each bounded issue.
+- [Functionality matrix](parity-functionality.tsv): capability scope, pinned TC reference, status,
+  issue links, acceptance predicate, evidence, and remaining gaps. The initial 80 rows are coverage
+  categories; inventory their individual handlers, variants, and scenarios before marking them done.
+- [Data inventory](parity-data.tsv): one row per SQL table and named client store referenced by the
+  pinned TC sources, plus explicit content-source, record-coverage, and map-artifact gates.
+- [Existing conversion ledger](conversion-status.tsv): packet/file/block contracts and upstream
+  delta auditing. A mapped opcode is not a verified payload or a completed capability.
+
+The reference inventory contains 345 SQL table declarations and 171 named DBC/DB2 inputs, plus six
+content/artifact gates. It includes tables introduced by current migrations because the base schema
+alone missed 15 names. Historical base declarations remain tracked even when an update removes them;
+SQL replay must establish whether each table should exist. These counts cover declared names, not
+record parity. Maps, locales, script registrations, per-quest chains, spawns, and encounters need
+expanded inventories. Uninventoried work remains unassessed, never complete.
+
+### Source and comparison contract
+
+Keep AC's ownership, security checks, hooks, and architecture. The pinned TC commit defines the
+functional/data comparison target; cata-js corroborates protocol findings. A difference in code
+structure is acceptable when behavior is equivalent and the proof is recorded. Any intended
+behavioral deviation needs a named issue, rationale, and explicit approval; it remains visible and
+must not be silently counted as parity. TC parity is not a guarantee of bug-free retail behavior.
+
+The TC code pin is not a complete content snapshot. Its world and hotfix base SQL contain schemas
+but no content rows. Before data parity can pass, pin the compatible world/hotfix release, applied
+update sequence, locale coverage, source hashes, and required build-15595 client data. Store assets,
+dumps, credentials, and raw captures outside Git. Track their sanitized manifests and reproducible
+comparison commands. A populated local database or an unchanged row count is not source verification.
+
+Every data row needs proof of:
+
+1. Source identity: build/version, release and updates, locale, hashes, and documented provenance.
+2. Schema/layout: types, signedness, widths, keys, defaults, indexes, DBC/DB2 columns, and loader joins.
+3. Values: compare required records and fields by stable domain keys, including missing/extra IDs,
+   defaults, enum/bit meanings, strings/locales, and any explicit AC-to-TC representation mapping.
+4. Relations: detect dangling IDs and invalid cross-table references, including quest chains,
+   conditions, phase membership, spawns, scripts, loot, spells/effects, outfits, and item templates.
+5. Runtime use: the actual AC loader and consumer use the converted values correctly; fresh install,
+   supported upgrade, restart, and relevant player-visible behavior agree.
+
+Runtime-owned character/account tables need schema and behavior comparisons, not copied TC player
+records. Use synthetic records to prove migration, ownership, constraints, round trips, and recovery.
+Never require rewriting AC tables to match TC naming when an explicit semantic mapping suffices.
+
+### Functionality proof and coverage
+
+Before starting an issue, expand the relevant capability into a concrete inventory: opcode/callers,
+state transitions, data dependencies, supported variants, and negative cases. For content, generate
+per-zone, per-quest/chain, per-spawn/template, and per-map/encounter entries from the pinned data and
+script registrations. Every discovered entry must be mapped, intentionally deferred, or blocked
+with a reason. Parent categories cannot be verified while required children remain unproven.
+
+For each scoped behavior, record independently derived TC expectations and prove them through the
+normal AC path. Compare meaningful results: state, packet fields, eligibility, resource/item deltas,
+visibility, and persistence. Include invalid/unauthorized requests and the failure paths that could
+lose or duplicate data. Do not weaken security, invent retail values, or force database state to
+make an acceptance scenario pass.
+
+Use codec/unit/data comparisons for deterministic coverage, an owned live stack for integration,
+and the real build-15595 client for visible behavior. Multiple-account scenarios are required where
+ownership, recipient routing, grouping, trade, or visibility is part of the contract. A single login,
+a screenshot, or one successful spell is evidence for that scenario only. An automated INCONCLUSIVE
+record stays inconclusive; later human evidence is recorded separately with its exact scope.
+
+### Status and evidence rules
+
+- `unassessed`: scope is listed but comparison and proof are missing.
+- `partial`: some bounded cases pass; list the remaining variants and dependencies.
+- `blocked`: name the unavailable source or prerequisite and the issue needed to resolve it.
+- `deferred`: deliberately unscheduled scope, still required for full conversion unless explicitly excluded.
+- `verified`: every declared case and required child/data dependency has current, reviewable proof.
+
+No empty evidence field is allowed on a verified row. Evidence records must identify the AC commit,
+TC pin, input manifests/hashes, exact command/scenario, expected/actual result, and artifact location.
+Client evidence also identifies the run, visual observation, ownership/isolation checks, and cleanup.
+When a layer is inapplicable, use a reasoned `n/a: ...` entry instead of an empty cell or a claimed pass.
+The checker enforces structure and required fields; a reviewer must assess the evidence itself.
+
+Update the relevant rows in the same PR as the implementation, linking its canonical issue. Keep
+prior failures and limitations. A later code/data change that invalidates an expectation makes the
+related row partial again until reverified. On upstream/reference updates, compare inventories,
+identify affected capability/data consumers, and rerun their checks. Do not carry green status across
+changed inputs without review.
+
+Report functional and data status separately, with blocked/unassessed counts and missing inventory
+denominators. Do not publish one completion percentage by averaging unrelated packets, tables,
+quests, and encounters. A closed plan issue is a completed slice, not a blanket subsystem verdict.
+
+### Runnable tracking check
+
+`python3 apps/cata/check_parity.py` checks columns, identities, statuses, pinned references, and
+required evidence fields. Add `--reference-tree /path/to/TrinityCore` to check that every named SQL
+base table and active-store DBC/DB2 input at the pinned commit has a data row. The command reads the
+commit, so a dirty TC checkout does not affect the comparison.
+
+Use `--add-missing-data` with the reference tree to add newly missing rows as unassessed while keeping
+existing evidence. This updates only the tracker. It does not import game data or verify parity.
+`--self-test` exercises the tracker's rejection cases. Keep the existing conversion checker for its
+separate packet and upstream-delta audit; do not replace it with this inventory check.
+
+The final release gate requires complete scope inventories, verified functionality and data rows,
+reviewed exceptions, no required blocked/deferred work, reproducible installation/upgrades, supported
+builds, representative full client journeys, and recovery/security checks. Until those conditions
+hold, describe this fork as a partial conversion, even if all currently opened issues are closed.
 
 ## Completion predicate
 
@@ -72,7 +286,8 @@ The conversion is complete only when all of these statements are true:
 ## Plan families
 
 These are areas, not promised plan numbers. Each area will split into as many small plans as needed.
-Open a numbered GitHub issue only when its predecessor is green and its inputs are known.
+Issues may be queued in advance at the user's request. Start implementation only when the
+predecessor is green and the required inputs are known.
 
 | Area | Exit condition before moving on |
 | --- | --- |
@@ -197,19 +412,19 @@ numbered Markdown files are stable-path stubs for historical ledger references.
 - [Plan 13: build 15595 in-world control bootstrap](https://github.com/trolloks/azerothcore-cata/issues/27)
 - [Plan 14: build 15595 post-map-insertion client survival](https://github.com/trolloks/azerothcore-cata/issues/32)
 - [Plan 15: build 15595 basic movement packet contract](https://github.com/trolloks/azerothcore-cata/issues/33)
-- [Plan 16: build 15595 movement acknowledgement and speed contract](https://github.com/trolloks/azerothcore-cata/issues/34)
+- [Plan 16: run-speed acknowledgement contract](https://github.com/trolloks/azerothcore-cata/issues/34)
+- [Plan 17: Object/Unit/Player update fields](https://github.com/trolloks/azerothcore-cata/issues/36)
+- [Plan 18: remaining object update fields](https://github.com/trolloks/azerothcore-cata/issues/37)
+- [Plan 19: bit-packed movement/create block](https://github.com/trolloks/azerothcore-cata/issues/40)
+- [Plan 20: opcode-table realignment](https://github.com/trolloks/azerothcore-cata/issues/41)
+- [Plan 21: login packet sequence parity](https://github.com/trolloks/azerothcore-cata/issues/43)
+- [Plan 22: character creation and starting state](https://github.com/trolloks/azerothcore-cata/issues/52)
+- [Plan 23: on-foot movement](https://github.com/trolloks/azerothcore-cata/issues/53)
+- [Plan 24: initial phasing and visibility](https://github.com/trolloks/azerothcore-cata/issues/54)
+- [Plan 25: basic spell casting](https://github.com/trolloks/azerothcore-cata/issues/55)
+- [Plan 26: first complete quest loop](https://github.com/trolloks/azerothcore-cata/issues/56)
 
-Plans 8-10 deliberately stop at three separate boundaries: typed empty enumeration, one populated
-enumeration, and real-client selection through the session legitimacy gate to the database-load callback.
-They do not prove character creation, successful player loading, initial packet correctness, map entry, or
-world control. Plan 10 proved `Player::LoadFromDB` returned true as a diagnostic; Plan 11 proved the
-pre-map packet contract; Plan 12 proved map insertion and object bootstrap, moving `SMSG_LOGIN_VERIFY_WORLD`
-to fire after map insertion per the pinned Cataclysm reference. On 2026-09-08, the real client entered
-Northshire and completed 10 matched time-sync exchanges after correcting aura flags and two guild
-requests in a diagnostic relay. Plans 14 and 21 reached their world-entry stopping point.
-[Earlier evidence and limits](client-automation.md#resolved-loading-screen-hang-aura-flags-2026-09-08).
-Plan 13 subsequently passed with rebuilt binaries in fresh generations 80 and 81, each with four matched
-time-sync exchanges, one first-response marker, a 30-second stable hold, and a clean owned reset.
-The comparison checks the required response and acceptance evidence while retaining variable background
-packet sequences for diagnosis. [Completion evidence](https://github.com/trolloks/azerothcore-cata/issues/27).
-Plans 15-16 cover movement and remain separate from this passive world-entry proof.
+Plans 8-10 established enumeration and selection admission. Plans 11-14 and 21 completed the
+bounded world-entry sequence; Plans 17-20 supplied the field, create-block, and opcode contracts.
+Plans 15-16 established idle heartbeat and run-speed acknowledgement acceptance. See each canonical
+issue for its exact proof and exclusions. The next five plans above begin where those proofs stop.

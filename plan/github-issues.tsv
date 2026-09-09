@@ -16,7 +16,12 @@ plan	issue	state	title	url
 15	33	closed	Plan 15: build 15595 basic movement packet contract	https://github.com/trolloks/azerothcore-cata/issues/33
 16	34	closed	Plan 16: build 15595 movement acknowledgement and speed contract	https://github.com/trolloks/azerothcore-cata/issues/34
 17	36	closed	Plan 17: Object/Unit/Player update-fields Cata conversion	https://github.com/trolloks/azerothcore-cata/issues/36
-18	37	open	Plan 18: Item/Container/GameObject/DynamicObject/Corpse update-fields Cata conversion	https://github.com/trolloks/azerothcore-cata/issues/37
+18	37	closed	Plan 18: Item/Container/GameObject/DynamicObject/Corpse update-fields Cata conversion	https://github.com/trolloks/azerothcore-cata/issues/37
 19	40	closed	Plan 19: bit-packed movement/create block Cata conversion	https://github.com/trolloks/azerothcore-cata/issues/40
 20	41	closed	Plan 20: full opcode-table realignment to Cata 4.3.4	https://github.com/trolloks/azerothcore-cata/issues/41
 21	43	closed	Plan 21: login packet sequence parity with cata-js	https://github.com/trolloks/azerothcore-cata/issues/43
+22	52	open	Plan 22: character creation and correct starting state	https://github.com/trolloks/azerothcore-cata/issues/52
+23	53	open	Plan 23: on-foot movement	https://github.com/trolloks/azerothcore-cata/issues/53
+24	54	open	Plan 24: initial phasing and visibility	https://github.com/trolloks/azerothcore-cata/issues/54
+25	55	open	Plan 25: basic spell casting	https://github.com/trolloks/azerothcore-cata/issues/55
+26	56	open	Plan 26: first complete quest loop	https://github.com/trolloks/azerothcore-cata/issues/56

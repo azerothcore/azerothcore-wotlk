@@ -19,5 +19,5 @@ replies. Earlier packet-order fixes remain; a single socket write is not require
 broad packet suppression is retained in the source.
 
 See [the screenshot, evidence, and verification limits](client-automation.md#resolved-loading-screen-hang-aura-flags-2026-09-08).
-The C++ changes await the next authorized build. Plan 13's two-fresh-generation acceptance,
-full opcode realignment, and gameplay validation remain separate work.
+Subsequent compiled-client acceptance closed Plans 13 and 20. Gameplay validation remains
+separate; the conversion roadmap records the current state and next proposed plans.

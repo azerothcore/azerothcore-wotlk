@@ -1,0 +1,1021 @@
+{
+  "acceptance_configuration": {
+    "collector_bonuses": false,
+    "custom_spell_rows_active": false,
+    "level": 1,
+    "locale": "enUS",
+    "reference_PlayerStart.AllSpells": 0
+  },
+  "class": 1,
+  "hotfix_updates": {
+    "import_verified": true,
+    "inventory_sha256": "8455dd4805d24e67207374ac66e2ea74ce2a42fff846d2705865d8c61210658d",
+    "matching_name_and_hash": 20,
+    "pending_updates": 0,
+    "reference_files": 20
+  },
+  "issues": [
+    52,
+    57,
+    58,
+    59,
+    60
+  ],
+  "limits": "Source-file joins and reference SQL replay only. Client extraction provenance, native AC layouts/values/relations, exact transitive grants, supported upgrade, and normal creation/save/relogin remain unverified.",
+  "missing_reference_action_spells": [],
+  "missing_server_action_spells": [
+    88161,
+    88163
+  ],
+  "outfits_match": false,
+  "race": 1,
+  "reference_actions": [
+    [
+      1,
+      1,
+      72,
+      88163,
+      0
+    ],
+    [
+      1,
+      1,
+      73,
+      88161,
+      0
+    ],
+    [
+      1,
+      1,
+      81,
+      59752,
+      0
+    ],
+    [
+      1,
+      1,
+      84,
+      6603,
+      0
+    ],
+    [
+      1,
+      1,
+      96,
+      6603,
+      0
+    ],
+    [
+      1,
+      1,
+      108,
+      6603,
+      0
+    ]
+  ],
+  "reference_base_resources": {
+    "base_hp": 20,
+    "base_mp": 0,
+    "gt_record_id": 0,
+    "limits": "Raw class/level coefficients; final player resources require passive/stat application."
+  },
+  "reference_commit": "c699217775d90794158422387b07a917e161b582",
+  "reference_database_replay": {
+    "AC_database_migration_executed": false,
+    "assertions": [
+      "170 updates completed with no SQL errors",
+      "Spawn matches dump within 0.001 for float32 storage",
+      "All six action rows match exactly",
+      "Class and race stat rows match exactly",
+      "Obsolete SQL starter-skill table is absent",
+      "No custom item rows; initial cast spell is 2457",
+      "Custom spell rows are disabled by baseline configuration"
+    ],
+    "bound_port": "127.0.0.1:32791",
+    "container_removed": true,
+    "image_id": "sha256:63e8ae20eaef51da56723dbeea68dc75e8baa50429f641ba88e8058ce81e17e2",
+    "method": "mysql CLI import, then 170 pinned SQL files in filename order; stop on first error",
+    "native_TC_updater_executed": false,
+    "run_id": "cata-starter-867f53930731",
+    "snapshot": {
+      "actions": [
+        [
+          1,
+          1,
+          72,
+          88163,
+          0
+        ],
+        [
+          1,
+          1,
+          73,
+          88161,
+          0
+        ],
+        [
+          1,
+          1,
+          81,
+          59752,
+          0
+        ],
+        [
+          1,
+          1,
+          84,
+          6603,
+          0
+        ],
+        [
+          1,
+          1,
+          96,
+          6603,
+          0
+        ],
+        [
+          1,
+          1,
+          108,
+          6603,
+          0
+        ]
+      ],
+      "cast_spells": [
+        2457
+      ],
+      "class_stats": [
+        1,
+        1,
+        23,
+        20,
+        22,
+        20,
+        20
+      ],
+      "custom_items": null,
+      "custom_spells": [
+        33388,
+        33391,
+        34090,
+        34091,
+        54197,
+        90265,
+        90267,
+        71,
+        78,
+        100,
+        355,
+        469,
+        676,
+        772,
+        845,
+        871,
+        1134,
+        1160,
+        1161,
+        1464,
+        1680,
+        1715,
+        1719,
+        2458,
+        2565,
+        3127,
+        3411,
+        5246,
+        5308,
+        6343,
+        6544,
+        6552,
+        6572,
+        6673,
+        7384,
+        7386,
+        12678,
+        18499,
+        20230,
+        20252,
+        23920,
+        34428,
+        55694,
+        57755,
+        64382,
+        86346,
+        86479,
+        86526,
+        97462
+      ],
+      "hotfix_ledger_rows": 20,
+      "hotfix_tables": 9,
+      "mysql_version": "8.4.8",
+      "obsolete_skill_tables": 0,
+      "race_stats": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "spawn": [
+        1,
+        1,
+        0,
+        9,
+        -8914.5703125,
+        -133.90899658203125,
+        80.53780364990234,
+        5.138060092926025
+      ],
+      "world_tables": 204
+    },
+    "snapshot_query": "SELECT JSON_OBJECT(\n'mysql_version',VERSION(),\n'world_tables',(SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='starter_reference'),\n'spawn',(SELECT JSON_ARRAY(race,class,map,zone,position_x,position_y,position_z,orientation) FROM playercreateinfo WHERE race=1 AND class=1),\n'actions',(SELECT JSON_ARRAYAGG(JSON_ARRAY(race,class,button,action,type)) FROM playercreateinfo_action WHERE race=1 AND class=1),\n'class_stats',(SELECT JSON_ARRAY(class,level,str,agi,sta,inte,spi) FROM player_classlevelstats WHERE class=1 AND level=1),\n'race_stats',(SELECT JSON_ARRAY(race,str,agi,sta,inte,spi) FROM player_racestats WHERE race=1),\n'obsolete_skill_tables',(SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='starter_reference' AND table_name='playercreateinfo_skills'),\n'custom_items',(SELECT JSON_ARRAYAGG(JSON_ARRAY(race,class,itemid,amount)) FROM playercreateinfo_item WHERE race IN (0,1) AND class IN (0,1)),\n'custom_spells',(SELECT JSON_ARRAYAGG(Spell) FROM playercreateinfo_spell_custom WHERE (racemask=0 OR racemask&1) AND (classmask=0 OR classmask&1)),\n'cast_spells',(SELECT JSON_ARRAYAGG(spell) FROM playercreateinfo_cast_spell WHERE (raceMask=0 OR raceMask&1) AND (classMask=0 OR classMask&1)),\n'hotfix_tables',(SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='hotfixes_reference'),\n'hotfix_ledger_rows',(SELECT COUNT(*) FROM hotfixes_reference.updates));",
+    "status": "passed",
+    "volume_removed": true
+  },
+  "reference_outfits": [
+    {
+      "gender": 0,
+      "items": [
+        58231,
+        39,
+        40,
+        49778,
+        6948
+      ],
+      "outfit": 0
+    },
+    {
+      "gender": 1,
+      "items": [
+        58231,
+        39,
+        40,
+        49778,
+        6948
+      ],
+      "outfit": 0
+    }
+  ],
+  "reference_spawn": [
+    [
+      1,
+      1,
+      0,
+      9,
+      -8914.57,
+      -133.909,
+      80.5378,
+      5.13806
+    ]
+  ],
+  "release": {
+    "asset": "TDB_full_434.22011_2022_01_09.7z",
+    "asset_bytes": 45823142,
+    "asset_sha256": "84f9605cc4b07beca2ab1543e0f405f5a90b3760b7c0fa6857fd3abbec11bbd6",
+    "hotfixes_extracted_from_download": true,
+    "repository": "The-Cataclysm-Preservation-Project/TrinityCore",
+    "tag": "TDB434.22011",
+    "url": "https://github.com/The-Cataclysm-Preservation-Project/TrinityCore/releases/tag/TDB434.22011",
+    "world_matches_download": true
+  },
+  "reproduction": {
+    "SQL_replay": [
+      "Use a new run-owned MySQL 8.4.8 container and volume with an unused localhost port.",
+      "Import the verified world dump using mysql --binary-mode=1.",
+      "From the pinned commit, apply only the 170 ledger entries marked absent_from_dump_ledger, sorted by filename. Stop on any SQL error.",
+      "Do not reapply the 93 archived hash differences under the pinned default Updates.ArchivedRedundancy=0.",
+      "Import the companion hotfix dump separately; all 20 reference hashes already match.",
+      "Run reference_database_replay.snapshot_query and compare the recorded assertions.",
+      "Remove only the recorded run-owned container and volume."
+    ],
+    "checks": [
+      "python3 apps/cata/audit_character_starting_data.py --self-test",
+      "python3 apps/cata/check_parity.py --self-test",
+      "python3 apps/cata/check_parity.py --reference-tree <PINNED_TC_CHECKOUT>"
+    ],
+    "file_audit_argv": [
+      "python3",
+      "apps/cata/audit_character_starting_data.py",
+      "--cata-dbc-root",
+      "<CATA_DBC_ROOT>",
+      "--server-dbc-root",
+      "<CURRENT_SERVER_DBC_ROOT>",
+      "--world-reference",
+      "<OFFICIAL_WORLD_DUMP>",
+      "--reference-tree",
+      "<PINNED_TC_CHECKOUT>"
+    ]
+  },
+  "runtime_acceptance": "not_run",
+  "server_outfits": [
+    {
+      "gender": 0,
+      "items": [
+        38,
+        39,
+        40,
+        49778,
+        6948
+      ],
+      "outfit": 0
+    },
+    {
+      "gender": 1,
+      "items": [
+        38,
+        39,
+        40,
+        49778,
+        6948
+      ],
+      "outfit": 0
+    }
+  ],
+  "source_provenance_limits": "World and hotfix dumps match the official release. Client DBC extraction provenance remains unverified; DB2 headers declare build 15595. No AC loader or character-creation acceptance yet.",
+  "source_provenance_verified": false,
+  "sources": [
+    {
+      "file": "TDB_full_world_434.22011_2022_01_09.sql",
+      "role": "world-reference",
+      "sha256": "b03e64b196be444d1f7bef05efaa2493274402630af86d116aa8ee79002cfbee"
+    },
+    {
+      "file": "CharStartOutfit.dbc",
+      "role": "cata-client-data",
+      "sha256": "2e1e594144a4604b2f146c52287a4a7d58217de7647dbede8c1ff37f987f1470"
+    },
+    {
+      "file": "Spell.dbc",
+      "role": "cata-client-data",
+      "sha256": "088a14963d3f81a10963702c760215f49ff73132bea751306c57aae0dae9f39f"
+    },
+    {
+      "file": "CharStartOutfit.dbc",
+      "role": "current-server-data",
+      "sha256": "a026407cd4fa60867ac2eda1070e89679e811774b476980902125f6d5af61540"
+    },
+    {
+      "file": "Spell.dbc",
+      "role": "current-server-data",
+      "sha256": "d5cce1a83550dcfa9eb2f0251dbb11fd24c272534b2b1a9b230924a44d817ab3"
+    },
+    {
+      "file": "SkillRaceClassInfo.dbc",
+      "role": "cata-client-data",
+      "sha256": "ac1a57eb05b3b207f5616537f03fa8a95fcc565d3c7df3546fa16dc1af8a820d"
+    },
+    {
+      "file": "SkillLine.dbc",
+      "role": "cata-client-data",
+      "sha256": "b988a59c292ba58f83dd6e991afe43b5f5df63882cb49395939209de4c5706a1"
+    },
+    {
+      "file": "SkillLineAbility.dbc",
+      "role": "cata-client-data",
+      "sha256": "6b71b4746e0a950ba0414f53905c308119f0485429240651733747c252fcaadf"
+    },
+    {
+      "file": "SpellLevels.dbc",
+      "role": "cata-client-data",
+      "sha256": "a3d5b9bb9818997538d182b36b88384fb9d6a0ab3603103917f5f1d016e2a788"
+    },
+    {
+      "fields": 3,
+      "file": "CharBaseInfo.dbc",
+      "record_bytes": 8,
+      "records": 91,
+      "role": "cata-client-data",
+      "sha256": "7bb4c296501835d9f5b5a55fe343a4b1b1660586a1f06d580cd9c2cb84f14317"
+    },
+    {
+      "fields": 24,
+      "file": "ChrRaces.dbc",
+      "record_bytes": 96,
+      "records": 23,
+      "role": "cata-client-data",
+      "sha256": "446548812df17185ebef419c1fda2798b5634fbe0baf560af81acf6d12138bab"
+    },
+    {
+      "fields": 14,
+      "file": "ChrClasses.dbc",
+      "record_bytes": 56,
+      "records": 10,
+      "role": "cata-client-data",
+      "sha256": "98a159142775b29acabc2b8102604add03a460beaaf1ccb18de1f56cf585e651"
+    },
+    {
+      "declared_build": 15595,
+      "fields": 8,
+      "file": "Item.db2",
+      "record_bytes": 32,
+      "records": 64775,
+      "role": "cata-client-data",
+      "sha256": "3335bad4bc3b1cc76b761acecf6fa8aad37999c319b42527806a16f4c9d4b063"
+    },
+    {
+      "declared_build": 15595,
+      "fields": 133,
+      "file": "Item-sparse.db2",
+      "record_bytes": 532,
+      "records": 54086,
+      "role": "cata-client-data",
+      "sha256": "bd21d2a012c4a983dc3179de84d63abd1cfcd1f7063d0785426d75636dd24c06"
+    },
+    {
+      "fields": 2,
+      "file": "gtOCTBaseHPByClass.dbc",
+      "record_bytes": 8,
+      "records": 1100,
+      "role": "cata-client-data",
+      "sha256": "8469d8f0c8f22e1fbd20a7c7b715e8e8cfd66c823103b971ba8455c7fd9340fd"
+    },
+    {
+      "fields": 2,
+      "file": "gtOCTBaseMPByClass.dbc",
+      "record_bytes": 8,
+      "records": 1100,
+      "role": "cata-client-data",
+      "sha256": "b7e726a91d6f6955bda408bdd83b8c2011f1ab4a7a659c63b57c70c73f03ea0a"
+    },
+    {
+      "file": "TDB_full_hotfixes_434.22011_2022_01_09.sql",
+      "role": "hotfix-reference",
+      "sha256": "35cb78c1324adcbfa9045886ac0ac4e62d8059d590eaeab4fca39e3fb1bd5105"
+    }
+  ],
+  "starting_skills": {
+    "level": 1,
+    "limits": "Direct joins only. Skill-rank thresholds, spell effects, triggered/learned spells, specialization and runtime grants still require native loader and creation verification. Skill IDs without SkillLine definitions are ignored by pinned GetSkillRangeType; they are not required grants.",
+    "missing_reference_skills": [
+      243,
+      252,
+      416,
+      418,
+      419,
+      420,
+      453,
+      515,
+      809
+    ],
+    "missing_reference_spell_levels": [],
+    "missing_reference_spells": [],
+    "missing_server_potential_grants": [
+      76268,
+      76290,
+      79738,
+      88161,
+      88163,
+      89964,
+      90647,
+      96220
+    ],
+    "potential_automatic_grants": [
+      {
+        "ability": 246,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 45,
+        "spell": 264
+      },
+      {
+        "ability": 248,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 44,
+        "spell": 196
+      },
+      {
+        "ability": 251,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 46,
+        "spell": 266
+      },
+      {
+        "ability": 252,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 43,
+        "spell": 201
+      },
+      {
+        "ability": 254,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 54,
+        "spell": 198
+      },
+      {
+        "ability": 256,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 55,
+        "spell": 202
+      },
+      {
+        "ability": 490,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 95,
+        "spell": 204
+      },
+      {
+        "ability": 590,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 98,
+        "spell": 668
+      },
+      {
+        "ability": 689,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 95,
+        "spell": 81
+      },
+      {
+        "ability": 700,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 136,
+        "spell": 227
+      },
+      {
+        "ability": 1236,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 162,
+        "spell": 203
+      },
+      {
+        "ability": 1387,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 173,
+        "spell": 1180
+      },
+      {
+        "ability": 1424,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 95,
+        "spell": 522
+      },
+      {
+        "ability": 1441,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 2382
+      },
+      {
+        "ability": 1550,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 176,
+        "spell": 2567
+      },
+      {
+        "ability": 1655,
+        "acquire_method": 1,
+        "minimum_skill_rank": 1,
+        "skill": 176,
+        "spell": 2764
+      },
+      {
+        "ability": 1869,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 3365
+      },
+      {
+        "ability": 1870,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 3050
+      },
+      {
+        "ability": 2200,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 95,
+        "spell": 107
+      },
+      {
+        "ability": 2928,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 229,
+        "spell": 200
+      },
+      {
+        "ability": 2929,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 226,
+        "spell": 5011
+      },
+      {
+        "ability": 3213,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 172,
+        "spell": 197
+      },
+      {
+        "ability": 3214,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 160,
+        "spell": 199
+      },
+      {
+        "ability": 3370,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 95,
+        "spell": 5301
+      },
+      {
+        "ability": 3869,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 6233
+      },
+      {
+        "ability": 3870,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 6246
+      },
+      {
+        "ability": 3871,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 6247
+      },
+      {
+        "ability": 3953,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 6477
+      },
+      {
+        "ability": 3954,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 6478
+      },
+      {
+        "ability": 3999,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 6603
+      },
+      {
+        "ability": 4214,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 7266
+      },
+      {
+        "ability": 4215,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 7267
+      },
+      {
+        "ability": 4266,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 7355
+      },
+      {
+        "ability": 4695,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 8386
+      },
+      {
+        "ability": 4997,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 413,
+        "spell": 8737
+      },
+      {
+        "ability": 4998,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 414,
+        "spell": 9077
+      },
+      {
+        "ability": 4999,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 415,
+        "spell": 9078
+      },
+      {
+        "ability": 5006,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 433,
+        "spell": 9116
+      },
+      {
+        "ability": 5008,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 9125
+      },
+      {
+        "ability": 6057,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 26,
+        "spell": 2457
+      },
+      {
+        "ability": 8438,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 473,
+        "spell": 15590
+      },
+      {
+        "ability": 11728,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 754,
+        "spell": 20599
+      },
+      {
+        "ability": 11730,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 754,
+        "spell": 20597
+      },
+      {
+        "ability": 11731,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 754,
+        "spell": 20598
+      },
+      {
+        "ability": 11861,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 754,
+        "spell": 20864
+      },
+      {
+        "ability": 12056,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 21651
+      },
+      {
+        "ability": 12057,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 21652
+      },
+      {
+        "ability": 12156,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 22027
+      },
+      {
+        "ability": 12323,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 22810
+      },
+      {
+        "ability": 15695,
+        "acquire_method": 1,
+        "minimum_skill_rank": 1,
+        "skill": 46,
+        "spell": 3018
+      },
+      {
+        "ability": 15696,
+        "acquire_method": 1,
+        "minimum_skill_rank": 1,
+        "skill": 45,
+        "spell": 3018
+      },
+      {
+        "ability": 15697,
+        "acquire_method": 1,
+        "minimum_skill_rank": 1,
+        "skill": 226,
+        "spell": 3018
+      },
+      {
+        "ability": 16247,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 45927
+      },
+      {
+        "ability": 20205,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 754,
+        "spell": 59752
+      },
+      {
+        "ability": 20657,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 61437
+      },
+      {
+        "ability": 20867,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 63645
+      },
+      {
+        "ability": 20868,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 63644
+      },
+      {
+        "ability": 21260,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 68398
+      },
+      {
+        "ability": 21752,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 803,
+        "spell": 76268
+      },
+      {
+        "ability": 21753,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 803,
+        "spell": 76290
+      },
+      {
+        "ability": 21965,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 754,
+        "spell": 79738
+      },
+      {
+        "ability": 22962,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 26,
+        "spell": 88161
+      },
+      {
+        "ability": 22966,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 803,
+        "spell": 88163
+      },
+      {
+        "ability": 23502,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 810,
+        "spell": 89964
+      },
+      {
+        "ability": 23589,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 810,
+        "spell": 90647
+      },
+      {
+        "ability": 23935,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 257,
+        "spell": 49410
+      },
+      {
+        "ability": 24139,
+        "acquire_method": 2,
+        "minimum_skill_rank": 1,
+        "skill": 183,
+        "spell": 96220
+      }
+    ],
+    "skills": [
+      26,
+      43,
+      44,
+      45,
+      46,
+      54,
+      55,
+      95,
+      98,
+      136,
+      160,
+      162,
+      172,
+      173,
+      176,
+      183,
+      226,
+      229,
+      243,
+      252,
+      256,
+      257,
+      413,
+      414,
+      415,
+      416,
+      418,
+      419,
+      420,
+      433,
+      453,
+      473,
+      515,
+      754,
+      777,
+      803,
+      809,
+      810
+    ]
+  },
+  "supported_acceptance_matrix": [
+    {
+      "class": 1,
+      "gender": 0,
+      "level": 1,
+      "race": 1
+    },
+    {
+      "class": 1,
+      "gender": 1,
+      "level": 1,
+      "race": 1
+    }
+  ],
+  "world_update_chain_verified": true,
+  "world_updates": {
+    "archived_hash_differences_not_reapplied": 93,
+    "archived_redundancy_checks": false,
+    "differences_file": "apps/cata/fixtures/plan22-world-update-audit.tsv",
+    "differences_file_sha256": "7917829c53dd10f8be913ef3afe23746823426c90f1fab56e0fe1424e311ecb1",
+    "dump_ledger_rows": 4790,
+    "inventory_sha256": "b51cdedbc35975755641ccc743c26900287c1406ac9608b4acc5ef27297aafdf",
+    "limits": "Successful SQL replay against the verified release in owned MySQL 8.4.8. The 93 archived hash differences were not reapplied, matching the pinned default Updates.ArchivedRedundancy=0. This is not AC migration or loader acceptance.",
+    "matching_name_and_hash": 4697,
+    "pending_updates_replayed": 170,
+    "reference_commit": "c699217775d90794158422387b07a917e161b582",
+    "reference_files": 4960,
+    "replay_verified": true,
+    "roots": [
+      "sql/old/4.3.4/world",
+      "sql/old/custom/world",
+      "sql/updates/world",
+      "sql/custom/world"
+    ]
+  }
+}
