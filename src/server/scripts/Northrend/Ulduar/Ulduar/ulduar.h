@@ -66,6 +66,7 @@ enum UlduarData
     DATA_UNBROKEN_ACHIEVEMENT               = 105,
     DATA_LEVIATHAN_DOORS                    = 106,
     DATA_LEVIATHAN_VEHICLES_USABLE          = 107,
+    DATA_MECHANOSTRIKERS_SPAWN              = 108,
 
     // Mimiron creatures
     DATA_MIMIRON_LEVIATHAN_MKII             = 301,
@@ -232,6 +233,7 @@ enum UlduarNPCs
     NPC_IRONWORK_CANNON                     = 33264,
     NPC_ULDUAR_GAUNTLET_GENERATOR           = 33571,
     NPC_DEFENDER_GENERATED                  = 33572,
+    NPC_MECHANOSTRIKER_54_A                 = 34161,
     NPC_ARCHMAGE_RHYDIAN                    = 33696,
     NPC_RUNEFORGED_SENTRY                   = 34234,
     NPC_BRANN_FORMATION_GROUNDS             = 34119,

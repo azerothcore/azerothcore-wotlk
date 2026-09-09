@@ -1140,6 +1140,100 @@ struct npc_pool_of_tar : public NullCreatureAI
     }
 };
 
+enum MechanostrikerSpells
+{
+    SPELL_LASER_BARRAGE                 = 64766,
+    SPELL_EXPLOSION                     = 62987,
+};
+
+struct npc_mechanostriker_54_a : public ScriptedAI
+{
+    npc_mechanostriker_54_a(Creature* creature) : ScriptedAI(creature)
+    {
+        _chaseDist = frand(14.0f, 18.0f);
+        _chaseAngle = frand(0.0f, 2.0f * float(M_PI));
+        _laserTimer = urand(1000, 2000);
+        _searchTimer = 0;
+    }
+
+    uint32 _laserTimer;
+    uint32 _searchTimer;
+    float _chaseDist;
+    float _chaseAngle;
+
+    void Reset() override
+    {
+        _laserTimer = urand(1000, 2000);
+        _searchTimer = 0;
+        _chaseDist = frand(14.0f, 18.0f);
+        _chaseAngle = frand(0.0f, 2.0f * float(M_PI));
+        me->SetCanFly(true);
+        me->SetDisableGravity(true);
+        me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->CastSpell(me, SPELL_EXPLOSION, true);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        Unit* target = who->GetVehicleBase() ? who->GetVehicleBase() : who;
+        me->SetCanFly(true);
+        me->SetDisableGravity(true);
+        me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+        me->AddThreat(target, 1000.0f);
+        me->GetMotionMaster()->MoveChase(target, _chaseDist, _chaseAngle);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (!who)
+            return;
+
+        Unit* target = who->GetVehicleBase() ? who->GetVehicleBase() : who;
+        if (me->Attack(target, false))
+        {
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+            me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+            me->AddThreat(target, 1000.0f);
+            me->GetMotionMaster()->MoveChase(target, _chaseDist, _chaseAngle);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            _searchTimer += diff;
+            if (_searchTimer >= 1000)
+            {
+                _searchTimer = 0;
+                if (Unit* target = me->SelectNearestTarget(200.0f))
+                {
+                    Unit* victim = target->GetVehicleBase() ? target->GetVehicleBase() : target;
+                    AttackStart(victim);
+                }
+            }
+            return;
+        }
+
+        _laserTimer += diff;
+        if (_laserTimer >= 4000)
+        {
+            _laserTimer = 0;
+            if (Unit* victim = me->GetVictim())
+            {
+                Unit* target = victim->GetVehicleBase() ? victim->GetVehicleBase() : victim;
+                if (!me->HasUnitState(UNIT_STATE_CASTING))
+                    me->CastSpell(target, SPELL_LASER_BARRAGE, false);
+            }
+        }
+    }
+};
+
 struct npc_storm_beacon_spawn : public NullCreatureAI
 {
     npc_storm_beacon_spawn(Creature* c) : NullCreatureAI(c)
@@ -1880,6 +1974,7 @@ void AddSC_boss_flame_leviathan()
 
     // Helpers
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
+    RegisterUlduarCreatureAI(npc_mechanostriker_54_a);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
     RegisterUlduarCreatureAI(npc_salvaged_chopper);
 
