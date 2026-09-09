@@ -4635,8 +4635,6 @@ Corpse* Player::CreateCorpse()
 
     corpse->SetUInt32Value(CORPSE_FIELD_DISPLAY_ID, GetNativeDisplayId());
 
-    corpse->SetUInt32Value(CORPSE_FIELD_GUILD, GetGuildId());
-
     uint32 iDisplayID;
     uint32 iIventoryType;
     uint32 _cfi;

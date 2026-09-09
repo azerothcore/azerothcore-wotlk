@@ -18,14 +18,8 @@
 #ifndef _UPDATEFIELDS_AUTO_H
 #define _UPDATEFIELDS_AUTO_H
 
-// Auto generated for version 3, 3, 5, 12340
-//
-// EObjectFields, EUnitFields, and EPlayerFields were replaced with the equivalent blocks from
-// the pinned Cata 4.3.4 build 15595 TrinityCore reference (commit c699217775d90794158422387b07a917e161b582)
-// as part of Plan 17 (github.com/trolloks/azerothcore-cata/issues/36). EItemFields, EContainerFields,
-// EGameObjectFields, EDynamicObjectFields, and ECorpseFields are still the original WotLK 3.3.5.12340
-// layout, deferred to Plan 18 (issues/37) -- they are automatically re-anchored to the new OBJECT_END
-// value but their own internal field offsets have not been converted yet.
+// Update fields for Cataclysm 4.3.4 build 15595, from TrinityCore
+// c699217775d90794158422387b07a917e161b582. See conversion issues #36 and #37.
 
 enum EObjectFields
 {
@@ -37,7 +31,6 @@ enum EObjectFields
     OBJECT_FIELD_PADDING                             = 0x0007, // Size: 1, Type: INT, Flags: NONE
     OBJECT_END                                       = 0x0008
 };
-
 
 enum EItemFields
 {
@@ -73,13 +66,18 @@ enum EItemFields
     ITEM_FIELD_ENCHANTMENT_11_3               = OBJECT_END + 0x0030, // Size: 1, Type: TWO_SHORT, Flags: PUBLIC
     ITEM_FIELD_ENCHANTMENT_12_1               = OBJECT_END + 0x0031, // Size: 2, Type: INT, Flags: PUBLIC
     ITEM_FIELD_ENCHANTMENT_12_3               = OBJECT_END + 0x0033, // Size: 1, Type: TWO_SHORT, Flags: PUBLIC
-    ITEM_FIELD_PROPERTY_SEED                  = OBJECT_END + 0x0034, // Size: 1, Type: INT, Flags: PUBLIC
-    ITEM_FIELD_RANDOM_PROPERTIES_ID           = OBJECT_END + 0x0035, // Size: 1, Type: INT, Flags: PUBLIC
-    ITEM_FIELD_DURABILITY                     = OBJECT_END + 0x0036, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
-    ITEM_FIELD_MAXDURABILITY                  = OBJECT_END + 0x0037, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
-    ITEM_FIELD_CREATE_PLAYED_TIME             = OBJECT_END + 0x0038, // Size: 1, Type: INT, Flags: PUBLIC
-    ITEM_FIELD_PAD                            = OBJECT_END + 0x0039, // Size: 1, Type: INT, Flags: NONE
-    ITEM_END                                  = OBJECT_END + 0x003A,
+    ITEM_FIELD_ENCHANTMENT_13_1               = OBJECT_END + 0x0034, // Size: 2, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_ENCHANTMENT_13_3               = OBJECT_END + 0x0036, // Size: 1, Type: TWO_SHORT, Flags: PUBLIC
+    ITEM_FIELD_ENCHANTMENT_14_1               = OBJECT_END + 0x0037, // Size: 2, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_ENCHANTMENT_14_3               = OBJECT_END + 0x0039, // Size: 1, Type: TWO_SHORT, Flags: PUBLIC
+    ITEM_FIELD_ENCHANTMENT_15_1               = OBJECT_END + 0x003A, // Size: 2, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_ENCHANTMENT_15_3               = OBJECT_END + 0x003C, // Size: 1, Type: TWO_SHORT, Flags: PUBLIC
+    ITEM_FIELD_PROPERTY_SEED                  = OBJECT_END + 0x003D, // Size: 1, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_RANDOM_PROPERTIES_ID           = OBJECT_END + 0x003E, // Size: 1, Type: INT, Flags: PUBLIC
+    ITEM_FIELD_DURABILITY                     = OBJECT_END + 0x003F, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
+    ITEM_FIELD_MAXDURABILITY                  = OBJECT_END + 0x0040, // Size: 1, Type: INT, Flags: OWNER, ITEM_OWNER
+    ITEM_FIELD_CREATE_PLAYED_TIME             = OBJECT_END + 0x0041, // Size: 1, Type: INT, Flags: PUBLIC
+    ITEM_END                                  = OBJECT_END + 0x0042,
 };
 
 enum EContainerFields
@@ -87,7 +85,7 @@ enum EContainerFields
     CONTAINER_FIELD_NUM_SLOTS                 = ITEM_END + 0x0000, // Size: 1, Type: INT, Flags: PUBLIC
     CONTAINER_ALIGN_PAD                       = ITEM_END + 0x0001, // Size: 1, Type: BYTES, Flags: NONE
     CONTAINER_FIELD_SLOT_1                    = ITEM_END + 0x0002, // Size: 72, Type: LONG, Flags: PUBLIC
-    CONTAINER_END                             = ITEM_END + 0x004A,
+    CONTAINER_END                             = ITEM_END + 0x004A
 };
 
 enum EUnitFields
@@ -183,7 +181,6 @@ enum EUnitFields
     UNIT_FIELD_PADDING                               = OBJECT_END + 0x0089, // Size: 1, Type: INT, Flags: NONE
     UNIT_END                                         = OBJECT_END + 0x008A
 };
-
 
 enum EPlayerFields
 {
@@ -520,7 +517,6 @@ enum EPlayerFields
     PLAYER_END                                       = UNIT_END + 0x04D6
 };
 
-
 enum EGameObjectFields
 {
     OBJECT_FIELD_CREATED_BY                   = OBJECT_END + 0x0000, // Size: 2, Type: LONG, Flags: PUBLIC
@@ -531,17 +527,17 @@ enum EGameObjectFields
     GAMEOBJECT_FACTION                        = OBJECT_END + 0x0009, // Size: 1, Type: INT, Flags: PUBLIC
     GAMEOBJECT_LEVEL                          = OBJECT_END + 0x000A, // Size: 1, Type: INT, Flags: PUBLIC
     GAMEOBJECT_BYTES_1                        = OBJECT_END + 0x000B, // Size: 1, Type: BYTES, Flags: PUBLIC
-    GAMEOBJECT_END                            = OBJECT_END + 0x000C,
+    GAMEOBJECT_END                            = OBJECT_END + 0x000C
 };
 
 enum EDynamicObjectFields
 {
     DYNAMICOBJECT_CASTER                      = OBJECT_END + 0x0000, // Size: 2, Type: LONG, Flags: PUBLIC
-    DYNAMICOBJECT_BYTES                       = OBJECT_END + 0x0002, // Size: 1, Type: BYTES, Flags: PUBLIC
+    DYNAMICOBJECT_BYTES                       = OBJECT_END + 0x0002, // Size: 1, Type: INT, Flags: DYNAMIC
     DYNAMICOBJECT_SPELLID                     = OBJECT_END + 0x0003, // Size: 1, Type: INT, Flags: PUBLIC
     DYNAMICOBJECT_RADIUS                      = OBJECT_END + 0x0004, // Size: 1, Type: FLOAT, Flags: PUBLIC
     DYNAMICOBJECT_CASTTIME                    = OBJECT_END + 0x0005, // Size: 1, Type: INT, Flags: PUBLIC
-    DYNAMICOBJECT_END                         = OBJECT_END + 0x0006,
+    DYNAMICOBJECT_END                         = OBJECT_END + 0x0006
 };
 
 enum ECorpseFields
@@ -552,10 +548,8 @@ enum ECorpseFields
     CORPSE_FIELD_ITEM                         = OBJECT_END + 0x0005, // Size: 19, Type: INT, Flags: PUBLIC
     CORPSE_FIELD_BYTES_1                      = OBJECT_END + 0x0018, // Size: 1, Type: BYTES, Flags: PUBLIC
     CORPSE_FIELD_BYTES_2                      = OBJECT_END + 0x0019, // Size: 1, Type: BYTES, Flags: PUBLIC
-    CORPSE_FIELD_GUILD                        = OBJECT_END + 0x001A, // Size: 1, Type: INT, Flags: PUBLIC
-    CORPSE_FIELD_FLAGS                        = OBJECT_END + 0x001B, // Size: 1, Type: INT, Flags: PUBLIC
-    CORPSE_FIELD_DYNAMIC_FLAGS                = OBJECT_END + 0x001C, // Size: 1, Type: INT, Flags: DYNAMIC
-    CORPSE_FIELD_PAD                          = OBJECT_END + 0x001D, // Size: 1, Type: INT, Flags: NONE
-    CORPSE_END                                = OBJECT_END + 0x001E,
+    CORPSE_FIELD_FLAGS                        = OBJECT_END + 0x001A, // Size: 1, Type: INT, Flags: PUBLIC
+    CORPSE_FIELD_DYNAMIC_FLAGS                = OBJECT_END + 0x001B, // Size: 1, Type: INT, Flags: DYNAMIC
+    CORPSE_END                                = OBJECT_END + 0x001C
 };
 #endif

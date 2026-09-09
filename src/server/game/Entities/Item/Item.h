@@ -173,14 +173,17 @@ enum EnchantmentSlot : uint8
     SOCK_ENCHANTMENT_SLOT_3         = 4,
     BONUS_ENCHANTMENT_SLOT          = 5,
     PRISMATIC_ENCHANTMENT_SLOT      = 6,                    // added at apply special permanent enchantment
-    MAX_INSPECTED_ENCHANTMENT_SLOT  = 7,
+    // Slot 7 is reserved by the client.
+    REFORGE_ENCHANTMENT_SLOT        = 8,
+    TRANSMOGRIFY_ENCHANTMENT_SLOT   = 9,
+    MAX_INSPECTED_ENCHANTMENT_SLOT  = 10,
 
-    PROP_ENCHANTMENT_SLOT_0         = 7,                    // used with RandomSuffix and RandomProperty
-    PROP_ENCHANTMENT_SLOT_1         = 8,                    // used with RandomSuffix and RandomProperty
-    PROP_ENCHANTMENT_SLOT_2         = 9,                    // used with RandomSuffix and RandomProperty
-    PROP_ENCHANTMENT_SLOT_3         = 10,                   // used with RandomSuffix and RandomProperty
-    PROP_ENCHANTMENT_SLOT_4         = 11,                   // used with RandomSuffix and RandomProperty
-    MAX_ENCHANTMENT_SLOT            = 12
+    PROP_ENCHANTMENT_SLOT_0         = 10,                    // used with RandomSuffix and RandomProperty
+    PROP_ENCHANTMENT_SLOT_1         = 11,                    // used with RandomSuffix and RandomProperty
+    PROP_ENCHANTMENT_SLOT_2         = 12,                    // used with RandomSuffix and RandomProperty
+    PROP_ENCHANTMENT_SLOT_3         = 13,                   // used with RandomSuffix and RandomProperty
+    PROP_ENCHANTMENT_SLOT_4         = 14,                   // used with RandomSuffix and RandomProperty
+    MAX_ENCHANTMENT_SLOT            = 15
 };
 
 #define MAX_VISIBLE_ITEM_OFFSET       2                     // 2 fields per visible item (entry+enchantment)
