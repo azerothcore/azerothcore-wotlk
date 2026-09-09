@@ -79,12 +79,20 @@ uint32 ItemUpdateFieldFlags[CONTAINER_END] =
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_12_1
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_12_1+1
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_12_3
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_13_1
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_13_1+1
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_13_3
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_14_1
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_14_1+1
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_14_3
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_15_1
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_15_1+1
+    UF_FLAG_PUBLIC,                                         // ITEM_FIELD_ENCHANTMENT_15_3
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_PROPERTY_SEED
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_RANDOM_PROPERTIES_ID
     UF_FLAG_OWNER | UF_FLAG_ITEM_OWNER,                     // ITEM_FIELD_DURABILITY
     UF_FLAG_OWNER | UF_FLAG_ITEM_OWNER,                     // ITEM_FIELD_MAXDURABILITY
     UF_FLAG_PUBLIC,                                         // ITEM_FIELD_CREATE_PLAYED_TIME
-    UF_FLAG_NONE,                                           // ITEM_FIELD_PAD
     UF_FLAG_PUBLIC,                                         // CONTAINER_FIELD_NUM_SLOTS
     UF_FLAG_NONE,                                           // CONTAINER_ALIGN_PAD
     UF_FLAG_PUBLIC,                                         // CONTAINER_FIELD_SLOT_1
@@ -1585,7 +1593,7 @@ uint32 DynamicObjectUpdateFieldFlags[DYNAMICOBJECT_END] =
     UF_FLAG_NONE,                                           // OBJECT_FIELD_PADDING
     UF_FLAG_PUBLIC,                                         // DYNAMICOBJECT_CASTER
     UF_FLAG_PUBLIC,                                         // DYNAMICOBJECT_CASTER+1
-    UF_FLAG_PUBLIC,                                         // DYNAMICOBJECT_BYTES
+    UF_FLAG_DYNAMIC,                                        // DYNAMICOBJECT_BYTES
     UF_FLAG_PUBLIC,                                         // DYNAMICOBJECT_SPELLID
     UF_FLAG_PUBLIC,                                         // DYNAMICOBJECT_RADIUS
     UF_FLAG_PUBLIC,                                         // DYNAMICOBJECT_CASTTIME
@@ -1627,8 +1635,6 @@ uint32 CorpseUpdateFieldFlags[CORPSE_END] =
     UF_FLAG_PUBLIC,                                         // CORPSE_FIELD_ITEM+18
     UF_FLAG_PUBLIC,                                         // CORPSE_FIELD_BYTES_1
     UF_FLAG_PUBLIC,                                         // CORPSE_FIELD_BYTES_2
-    UF_FLAG_PUBLIC,                                         // CORPSE_FIELD_GUILD
     UF_FLAG_PUBLIC,                                         // CORPSE_FIELD_FLAGS
     UF_FLAG_DYNAMIC,                                        // CORPSE_FIELD_DYNAMIC_FLAGS
-    UF_FLAG_NONE,                                           // CORPSE_FIELD_PAD
 };

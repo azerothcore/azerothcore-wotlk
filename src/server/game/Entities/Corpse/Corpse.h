@@ -81,6 +81,7 @@ public:
 
 private:
     CorpseType m_type;
+    uint32 _guildId = 0; // Persisted server data; not a Cataclysm update field.
     time_t m_time;
     CellCoord _cellCoord;
 };

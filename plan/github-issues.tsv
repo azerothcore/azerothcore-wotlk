@@ -9,10 +9,14 @@ plan	issue	state	title	url
 08	18	closed	Plan 8: typed empty character enumeration and stable build 15595 screen	https://github.com/trolloks/azerothcore-cata/issues/18
 09	19	closed	Plan 9: one database-backed build 15595 character	https://github.com/trolloks/azerothcore-cata/issues/19
 10	20	closed	Plan 10: select the enumerated build 15595 character	https://github.com/trolloks/azerothcore-cata/issues/20
-11	25	closed	Plan 11: build 15595 initial post-load packet contract	https://github.com/trolloks/azerothcore-cata/issues/25
+11	25	closed	Plan 11: build 15595 pre-map initial-packet contract	https://github.com/trolloks/azerothcore-cata/issues/25
 12	26	closed	Plan 12: build 15595 map insertion and object bootstrap	https://github.com/trolloks/azerothcore-cata/issues/26
 13	27	closed	Plan 13: build 15595 in-world control bootstrap	https://github.com/trolloks/azerothcore-cata/issues/27
 14	32	closed	Plan 14: build 15595 post-map-insertion client survival	https://github.com/trolloks/azerothcore-cata/issues/32
-15	33	open	Plan 15: build 15595 basic movement packet contract	https://github.com/trolloks/azerothcore-cata/issues/33
-16	34	open	Plan 16: build 15595 movement acknowledgement and speed contract	https://github.com/trolloks/azerothcore-cata/issues/34
+15	33	closed	Plan 15: build 15595 basic movement packet contract	https://github.com/trolloks/azerothcore-cata/issues/33
+16	34	closed	Plan 16: build 15595 movement acknowledgement and speed contract	https://github.com/trolloks/azerothcore-cata/issues/34
+17	36	closed	Plan 17: Object/Unit/Player update-fields Cata conversion	https://github.com/trolloks/azerothcore-cata/issues/36
+18	37	open	Plan 18: Item/Container/GameObject/DynamicObject/Corpse update-fields Cata conversion	https://github.com/trolloks/azerothcore-cata/issues/37
+19	40	closed	Plan 19: bit-packed movement/create block Cata conversion	https://github.com/trolloks/azerothcore-cata/issues/40
+20	41	closed	Plan 20: full opcode-table realignment to Cata 4.3.4	https://github.com/trolloks/azerothcore-cata/issues/41
 21	43	closed	Plan 21: login packet sequence parity with cata-js	https://github.com/trolloks/azerothcore-cata/issues/43
