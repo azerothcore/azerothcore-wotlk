@@ -2253,16 +2253,14 @@ struct WaveChance
     uint8 chance;
 };
 
-// Waves are drawn at random - the sniff shows every cauldron running every group, in no pattern.
-// The weights are the frequencies observed over its 25 wave ticks (11 / 5 / 4 / 3 / 2); a sample
-// that size cannot separate them from a flat roll, so they are an estimate rather than a fact.
+// Could use more testing to figure out exact chances.
 WaveChance const WaveChances[] =
 {
-    { GROUP_GHOUL_AND_PLAGUE, 44 },
+    { GROUP_GHOUL_AND_PLAGUE, 30 },
     { GROUP_PLAGUE_SWARM,     20 },
-    { GROUP_DRENCHED_GHOUL,   16 },
-    { GROUP_GHOUL_PAIR,       12 },
-    { GROUP_NOTHING,           8 }
+    { GROUP_DRENCHED_GHOUL,   20 },
+    { GROUP_GHOUL_PAIR,       20 },
+    { GROUP_NOTHING,          10 }
 };
 
 struct npc_plague_cauldron_target : public ScriptedAI
@@ -2278,8 +2276,7 @@ struct npc_plague_cauldron_target : public ScriptedAI
         if (!player)
             return;
 
-        // A dose landing on a cauldron that is already boiling only tops the fluid up - retail
-        // sends nothing for those beyond a fresh Fluid Timer Buff on the bunny.
+        // A dose landing while the event is up reschedules the waves and warnings
         if (Creature* bunny = me->FindNearestCreature(GetBunnyEntry(), 5.0f))
         {
             bunny->AI()->DoAction(ACTION_ADD_FLUID);
@@ -2289,14 +2286,6 @@ struct npc_plague_cauldron_target : public ScriptedAI
         DoCastSelf(SPELL_ORANGE_RADIATION, true);
         Talk(SAY_CAULDRON_BOILS, player);
 
-        // Retail hands the summon to the player: the cauldron casts a script effect at them
-        // (59877 / 61001 / 61018 Player Summon Bunny) and they cast the matching Summon PC Bunny
-        // back, which is how 59876 Kill Credit reaches them through TARGET_UNIT_MASTER. Those
-        // summon spells carry SummonProperties 61 (ally / guardian), which here would make the
-        // bunny a player-owned guardian that walks off after them, so the cauldron summons it and
-        // the bunny credits the doser directly instead. The bunny stands in the cauldron itself, a
-        // hand's width above this NPC, and despawns the moment the event resolves - the lifetime
-        // is only there so a cauldron cannot be locked out by a bunny that lost its auras.
         if (Creature* bunny = me->SummonCreature(GetBunnyEntry(), me->GetPositionX(), me->GetPositionY(),
             me->GetPositionZ() + 0.0833f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 250 * IN_MILLISECONDS))
         {
@@ -2338,9 +2327,6 @@ struct npc_plague_cauldron_bunny : public ScriptedAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
-        // The two auras are the event. Four minutes of Event Timer Buff running out is the win,
-        // the seventy seconds of Fluid Timer Buff running out first is the loss.
-        DoCastSelf(SPELL_EVENT_TIMER_BUFF, true);
         AddFluid();
     }
 
@@ -2359,11 +2345,11 @@ struct npc_plague_cauldron_bunny : public ScriptedAI
             case ACTION_EVENT_COMPLETE:
             {
                 DoCastSelf(SPELL_CAULDRON_EVENT_COMPLETE, true);
-                Talk(SAY_EVENT_COMPLETE, GetDoser());
 
-                // Retail credits the bunny's master, which is the player who summoned it; here the
-                // cauldron owns the summon, so the doser it handed over gets the credit instead.
-                if (Player* doser = GetDoser())
+                Player* doser = GetDoser();
+                Talk(SAY_EVENT_COMPLETE, doser);
+
+                if (doser)
                     doser->RewardPlayerAndGroupAtEvent(NPC_PLAGUE_CAULDRON_KC_BUNNY, me);
 
                 EndEvent();
@@ -2380,20 +2366,15 @@ struct npc_plague_cauldron_bunny : public ScriptedAI
     }
 
 private:
-    // Both endings arrive from an aura expiring, so give the bunny the same short beat retail
-    // leaves between the closing cast and the despawn rather than tearing it down mid-removal.
+
     void EndEvent()
     {
         scheduler.CancelAll();
         me->DespawnOrUnsummon(500ms);
     }
 
-    // Every dose schedules its own pair of waves and its own pair of warnings off the moment it
-    // lands, and replaces whatever the dose before it still had pending. That is the whole
-    // scheduler: the alternating 25s / 29s cadence a sniff appears to show is only these two
-    // offsets seen through a player who re-doses roughly every 54s. All twenty wave ticks in the
-    // sniff land on +5.4s..+6.2s or +30.4s..+31.3s from the dose that armed them, without
-    // exception, and the warnings on +45.8s..+47.0s and +58.0s..+58.5s.
+    // Adding a dose schedules two waves and the warnings
+    // Adding another dose during the event just re-schedules these
     void AddFluid()
     {
         DoCastSelf(SPELL_FLUID_TIMER_BUFF, true);
@@ -2418,14 +2399,14 @@ private:
     {
         uint8 const group = RollWaveGroup();
 
-        // A tick that rolls nothing is silent apart from the line - no splash, no summon.
+        // A tick that rolls nothing is silent apart from the line
         if (group == GROUP_NOTHING)
         {
             Talk(SAY_WAVE_EMPTY, GetDoser());
             return;
         }
 
-        DoCastSelf(SPELL_HUGE_GREEN_SPLASH, true);
+        DoCastSelf(SPELL_HUGE_GREEN_SPLASH);
         Talk(SAY_WAVE_EMERGES, GetDoser());
 
         std::list<TempSummon*> summons;
@@ -2467,14 +2448,10 @@ struct npc_plague_cauldron_ghoul : public ScriptedAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
-        // Ghouls surface three yards up, inside the cauldron, and hang there through the emerge
-        // animation - keep the core from settling them onto the ground in the meantime. The
-        // summoner stamps the slot on us right after this returns, so the jump looks it up when
-        // the animation is over rather than now.
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         me->SetReactState(REACT_PASSIVE);
         me->SetImmuneToAll(true);
-        DoCastSelf(SPELL_EMERGE, true);
+        DoCastSelf(SPELL_EMERGE);
 
         scheduler.Schedule(3200ms, [this](TaskContext /*context*/)
         {
@@ -2486,7 +2463,7 @@ struct npc_plague_cauldron_ghoul : public ScriptedAI
             }
 
             if (me->GetEntry() == NPC_PLAGUE_DRENCHED_GHOUL)
-                DoCastSelf(SPELL_DISEASE_CLOUD, true);
+                DoCastSelf(SPELL_DISEASE_CLOUD);
 
             me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             me->GetMotionMaster()->MoveJump(jump->landing, 25.0f,
@@ -2525,9 +2502,6 @@ struct npc_plague_cauldron_ghoul : public ScriptedAI
     }
 
 private:
-    // Ghouls wander their landing spot the way the Living Plague wander theirs and pick players up
-    // on detection range. Reaching for the nearest player instead would let one be pulled from
-    // further off than the cauldron itself can be doused from.
     void Land()
     {
         me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
