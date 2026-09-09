@@ -166,6 +166,7 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
 | instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
+| professions/trainers | every Engineering trainer group advertises the twelve TBC master-tier recipes its visitor's class can learn. Eleven are class-restricted goggles, so four classes are needed to cover them all; two characters per class cover the Horde/Alliance and Aldor/Scryer interaction splits | P2 | covered (`TestAC_27146_*`) | #27146 |
 | world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
 
 ---
