@@ -11,10 +11,17 @@
 #include "ObjectGuid.h"
 #include "Packet.h"
 
+struct MovementInfo;
+
 namespace WorldPackets
 {
     namespace Movement
     {
+        uint32 MovementFlagsToClient(uint32 flags);
+        uint16 ExtraMovementFlagsToClient(uint16 flags);
+        void ReadHeartbeat(WorldPacket& packet, MovementInfo& info);
+        void WriteMovementUpdate(WorldPacket& packet, MovementInfo const& info);
+
         class MoveSetActiveMover final : public ServerPacket
         {
         public:

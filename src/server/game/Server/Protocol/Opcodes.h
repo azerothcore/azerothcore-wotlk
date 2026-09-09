@@ -999,6 +999,7 @@ enum OpcodeServer : uint16
     SMSG_SPIRIT_HEALER_CONFIRM                      = 0x4917,
     SMSG_GOSSIP_POI                                 = 0x4316,
     SMSG_MOVE_SET_ACTIVE_MOVER                       = 0x11B3,
+    SMSG_MOVE_UPDATE                                 = 0x79A2,
     SMSG_GM_PLAYER_INFO                             = 0x4A15,
     SMSG_LOGIN_VERIFY_WORLD                         = 0x2005,
     SMSG_LOAD_CUF_PROFILES                          = 0x50B1,

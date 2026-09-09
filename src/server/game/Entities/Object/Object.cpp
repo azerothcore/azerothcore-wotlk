@@ -16,6 +16,7 @@
  */
 
 #include "Object.h"
+#include "MovementPackets.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
@@ -370,8 +371,9 @@ void Object::BuildMovementUpdate(ByteBuffer* data, CreateObjectBits flags) const
     if (flags.MovementUpdate)
     {
         self = ToUnit();
-        movementFlags = self->m_movementInfo.GetMovementFlags();
-        movementFlagsExtra = self->m_movementInfo.GetExtraMovementFlags();
+        movementFlags = WorldPackets::Movement::MovementFlagsToClient(self->m_movementInfo.GetMovementFlags());
+        movementFlagsExtra = WorldPackets::Movement::ExtraMovementFlagsToClient(
+            self->m_movementInfo.GetExtraMovementFlags()) & 0x0FFF;
 
         hasTransportTime2 = !self->m_movementInfo.transport.guid.IsEmpty() && self->m_movementInfo.transport.time2 != 0;
         hasPitch = self->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING) || self->HasExtraUnitMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING);

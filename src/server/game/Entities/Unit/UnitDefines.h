@@ -400,6 +400,7 @@ enum MovementFlags
     MOVEMENTFLAG_WATERWALKING               = 0x10000000,       // prevent unit from falling through water
     MOVEMENTFLAG_FALLING_SLOW               = 0x20000000,       // active rogue safe fall spell (passive)
     MOVEMENTFLAG_HOVER                      = 0x40000000,       // hover, cannot jump
+    MOVEMENTFLAG_DISABLE_COLLISION          = 0x80000000,
 
     /// @todo: Check if PITCH_UP and PITCH_DOWN really belong here..
     MOVEMENTFLAG_MASK_MOVING =

@@ -760,6 +760,7 @@ void OpcodeTable::Initialize()
     /*0x0223*/ DEFINE_HANDLER(CMSG_CHARACTER_POINT_CHEAT,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x4316*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_GOSSIP_POI,                                         STATUS_NEVER);
     DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_SET_ACTIVE_MOVER,                                        STATUS_NEVER);
+    DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_UPDATE,                                                  STATUS_NEVER);
     /*0x0D54*/ DEFINE_HANDLER(CMSG_CHAT_IGNORED,                                                     STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChatIgnoredOpcode                  );
     /*0x0228*/ DEFINE_HANDLER(CMSG_GM_SILENCE,                                                       STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x0229*/ DEFINE_HANDLER(CMSG_GM_REVEALTO,                                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
