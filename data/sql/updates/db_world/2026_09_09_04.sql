@@ -1,3 +1,4 @@
+-- DB update 2026_09_09_03 -> 2026_09_09_04
 -- Kirtonos green drops include all five ranges: https://github.com/azerothcore/azerothcore-wotlk/issues/8216
 DELETE FROM `reference_loot_template` WHERE `Entry` = 10506;
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
