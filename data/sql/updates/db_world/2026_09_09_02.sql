@@ -1,3 +1,4 @@
+-- DB update 2026_09_09_01 -> 2026_09_09_02
 --
 -- Wailing Caverns - Serpentbloom Snake
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 3680;
