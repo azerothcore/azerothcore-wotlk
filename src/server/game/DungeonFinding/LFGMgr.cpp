@@ -753,17 +753,17 @@ namespace lfg
             else
                 players.insert(player->GetGUID());
 
-            // Xinef: Check dungeon cooldown only for random dungeons
-            // Xinef: Moreover check this only if dungeon is not started, afterwards its obvious that players will have the cooldown
-            if (joinData.result == LFG_JOIN_OK && !isContinue && rDungeonId)
+            // Check the dungeon cooldown for every dungeon queue. Declining a proposal applies
+            // this aura regardless of whether the player selected a random or specific dungeon.
+            if (joinData.result == LFG_JOIN_OK)
             {
-                if (player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)) // xinef: added !isContinue
+                if (IsDungeonQueueBlockedByCooldown(isContinue, player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)))
                     joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
-                else if (grp)
+                else if (grp && !isContinue)
                 {
                     for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr && joinData.result == LFG_JOIN_OK; itr = itr->next())
                         if (Player* plrg = itr->GetSource())
-                            if (plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)) // xinef: added !isContinue
+                            if (IsDungeonQueueBlockedByCooldown(isContinue, plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)))
                                 joinData.result = LFG_JOIN_PARTY_RANDOM_COOLDOWN;
                 }
             }
@@ -1849,15 +1849,14 @@ namespace lfg
 
                 // Add the cooldown spell if queued for a random dungeon
                 // xinef: add aura
-                if ((randomDungeon || selectedRandomLfgDungeon(player->GetGUID())) && !player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
-                {
+                bool const selectedRandomDungeon = selectedRandomLfgDungeon(player->GetGUID());
+                if (selectedRandomDungeon)
                     randomDungeon = true;
-                    // if player is debugging, don't add dungeon cooldown
-                    if (!m_Testing)
-                    {
-                        player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
-                    }
-                }
+
+                // if player is debugging, don't add dungeon cooldown
+                if (ShouldApplyDungeonCooldown(selectedRandomDungeon, m_Testing,
+                        player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)))
+                    player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
 
                 if (player->GetMapId() == uint32(dungeon->map))
                 {
