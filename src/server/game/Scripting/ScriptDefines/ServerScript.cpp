@@ -69,11 +69,6 @@ void ScriptMgr::OnPacketSent(WorldSession* session, WorldPacket const& packet)
     CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_PACKET_SENT, script->OnPacketSent(session, packet));
 }
 
-void ScriptMgr::OnPacketReceived(WorldSession* session, WorldPacket const& packet)
-{
-    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_PACKET_RECEIVED, script->OnPacketReceived(session, packet));
-}
-
 ServerScript::ServerScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, SERVERHOOK_END)
 {

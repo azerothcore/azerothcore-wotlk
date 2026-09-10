@@ -160,7 +160,6 @@ public: /* ServerScript */
     bool CanPacketReceive(WorldSession* session, WorldPacket const& packet);
     bool CanPacketSend(WorldSession* session, WorldPacket const& packet);
     void OnPacketSent(WorldSession* session, WorldPacket const& packet);
-    void OnPacketReceived(WorldSession* session, WorldPacket const& packet);
 
 public: /* SessionScript */
     void OnSessionUpdate(WorldSession* session, uint32 diff);

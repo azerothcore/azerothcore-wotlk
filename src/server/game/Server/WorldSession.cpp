@@ -458,7 +458,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                         opHandle->Call(this, *packet);
                         LogUnprocessedTail(packet);
-                        sScriptMgr->OnPacketReceived(this, *packet);
                     }
 
                     // lag can cause STATUS_LOGGEDIN opcodes to arrive after the player started a transfer
@@ -477,7 +476,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                         opHandle->Call(this, *packet);
                         LogUnprocessedTail(packet);
-                        sScriptMgr->OnPacketReceived(this, *packet);
                     }
                     break;
                 case STATUS_TRANSFER:
@@ -488,7 +486,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                         opHandle->Call(this, *packet);
                         LogUnprocessedTail(packet);
-                        sScriptMgr->OnPacketReceived(this, *packet);
                     }
                     break;
                 case STATUS_AUTHED:
@@ -505,7 +502,6 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                     opHandle->Call(this, *packet);
                     LogUnprocessedTail(packet);
-                    sScriptMgr->OnPacketReceived(this, *packet);
                     break;
                 case STATUS_NEVER:
                     LOG_ERROR("network.opcode", "Received not allowed opcode {} from {}",
