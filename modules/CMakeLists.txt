@@ -37,7 +37,6 @@ set("AC_MODULE_LIST" "")
 set("AC_SCRIPTS_LIST" "")
 set(MOD_ALE_FOUND 0)
 set(MOD_ALE_PATH "")
-set(MOD_PLAYERBOTS_FOUND 0)
 
 foreach(include ${AC_ADD_SCRIPTS_INCLUDE})
   set("AC_SCRIPTS_INCLUDES" "#include \"${include}\"\n${AC_SCRIPTS_INCLUDES}")
@@ -80,13 +79,6 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
   # Use only static for mod-ALE
   if (SOURCE_MODULE MATCHES "mod-ale")
     ConfigureALEModule(${SOURCE_MODULE})
-  endif()
-
-  if (SOURCE_MODULE MATCHES "mod-playerbots")
-    set(MOD_PLAYERBOTS_FOUND 1)
-    target_compile_options(game-interface
-      INTERFACE
-        -DMOD_PLAYERBOTS)
   endif()
 
   # Build the Graph values
@@ -297,7 +289,6 @@ endif()
 target_link_libraries(modules
   PRIVATE
     acore-core-interface
-    mysql
   PUBLIC
     game-interface)
 
@@ -371,12 +362,6 @@ target_compile_options(modules
 target_compile_options(modules
   INTERFACE
     -DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
-
-if (MOD_PLAYERBOTS_FOUND)
-    target_compile_options(modules
-            PRIVATE
-            -DMOD_PLAYERBOTS)
-endif()
 
 if (MOD_ALE_FOUND)
   if (APPLE)

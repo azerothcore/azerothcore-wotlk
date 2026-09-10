@@ -323,7 +323,6 @@ struct LinkValidator<LinkTags::trade>
     }
 };
 
-#ifdef MOD_PLAYERBOTS
 template <>
 struct LinkValidator<LinkTags::found>
 {
@@ -334,10 +333,9 @@ struct LinkValidator<LinkTags::found>
 
     static bool IsColorValid(FoundLinkData const&, HyperlinkColor c)
     {
-        return c == CHAT_LINK_COLOR_ACHIEVEMENT; // 0xffffff00 - yellow, shared by mod-playerbots "found" links
+        return c == CHAT_LINK_COLOR_ACHIEVEMENT; // 0xffffff00 - yellow
     }
 };
-#endif
 
 template <typename TAG>
 static bool ValidateAs(HyperlinkInfo const& info)
@@ -372,9 +370,7 @@ static bool ValidateLinkInfo(HyperlinkInfo const& info)
     TryValidateAs(creature);
     TryValidateAs(creature_entry);
     TryValidateAs(enchant);
-#ifdef MOD_PLAYERBOTS
     TryValidateAs(found);
-#endif
     TryValidateAs(gameevent);
     TryValidateAs(gameobject);
     TryValidateAs(gameobject_entry);
