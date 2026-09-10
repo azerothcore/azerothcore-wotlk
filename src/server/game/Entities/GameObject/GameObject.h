@@ -258,7 +258,12 @@ public:
     [[nodiscard]] uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
     [[nodiscard]] GameObject* GetLinkedTrap();
-    void SetLinkedTrap(GameObject* linkedTrap) { m_linkedTrap = linkedTrap->GetGUID(); }
+    void DeactivateLinkedTrapParent();
+    void SetLinkedTrap(GameObject* linkedTrap)
+    {
+        m_linkedTrap = linkedTrap->GetGUID();
+        linkedTrap->m_linkedTrapParent = GetGUID();
+    }
 
     [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id) const override;
@@ -406,10 +411,12 @@ protected:
     uint32 m_lootGenerationTime;
 
     ObjectGuid m_linkedTrap;
+    ObjectGuid m_linkedTrapParent;
 
     ObjectGuid _lootStateUnitGUID;
 
 private:
+    bool IsLinkedTrapParentSpawned() const;
     void CheckRitualList();
     void ClearRitualList();
     void RemoveFromOwner();

@@ -600,6 +600,9 @@ void GameObject::Update(uint32 diff)
             }
         case GO_READY:
             {
+                if (!IsLinkedTrapParentSpawned())
+                    break;
+
                 if (m_respawnTime > 0)                          // timer on
                 {
                     time_t now = GameTime::GetGameTime().count();
@@ -786,6 +789,9 @@ void GameObject::Update(uint32 diff)
                         break;
                     case GAMEOBJECT_TYPE_TRAP:
                     {
+                        if (!IsLinkedTrapParentSpawned())
+                            break;
+
                         GameObjectTemplate const* goInfo = GetGOInfo();
                         if (goInfo->trap.type == 2)
                         {
@@ -801,7 +807,10 @@ void GameObject::Update(uint32 diff)
                             m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
                             if (goInfo->trap.type == 1)
+                            {
                                 SetLootState(GO_JUST_DEACTIVATED);
+                                DeactivateLinkedTrapParent();
+                            }
                             else if (!goInfo->trap.type)
                                 SetLootState(GO_READY);
 
@@ -1383,10 +1392,11 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
 
     // found correct GO
     // xinef: we should use the trap (checks for despawn type)
+    // Finish pending proximity activation before the caller consumes a trap-only chest.
     if (GameObject* trapGO = GetLinkedTrap())
-    {
-        trapGO->Use(target); // trapGO->CastSpell(target, trapInfo->trap.spellId);
-    }
+        if (trapGO->isSpawned() && (trapGO->getLootState() == GO_READY ||
+            (trapInfo->trap.type == 1 && trapGO->getLootState() == GO_ACTIVATED)))
+            trapGO->Use(target); // trapGO->CastSpell(target, trapInfo->trap.spellId);
 }
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
@@ -1462,6 +1472,9 @@ void GameObject::SwitchDoorOrButton(bool activate, bool alternative /* = false *
 
 void GameObject::Use(Unit* user)
 {
+    if (!IsLinkedTrapParentSpawned())
+        return;
+
     // Xinef: we cannot use go with not selectable flags
     if (HasGameObjectFlag(GO_FLAG_NOT_SELECTABLE))
         return;
@@ -1527,7 +1540,10 @@ void GameObject::Use(Unit* user)
                 m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown :  uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
                 if (goInfo->trap.type == 1)         // Deactivate after trigger
+                {
                     SetLootState(GO_JUST_DEACTIVATED);
+                    DeactivateLinkedTrapParent();
+                }
 
                 return;
             }
@@ -2761,6 +2777,26 @@ bool GameObject::IsLootAllowedFor(Player const* player) const
 GameObject* GameObject::GetLinkedTrap()
 {
     return ObjectAccessor::GetGameObject(*this, m_linkedTrap);
+}
+
+bool GameObject::IsLinkedTrapParentSpawned() const
+{
+    if (m_linkedTrapParent.IsEmpty())
+        return true;
+
+    GameObject* parent = ObjectAccessor::GetGameObject(*this, m_linkedTrapParent);
+    return parent && parent->isSpawned() && parent->getLootState() != GO_JUST_DEACTIVATED;
+}
+
+void GameObject::DeactivateLinkedTrapParent()
+{
+    if (m_linkedTrapParent.IsEmpty())
+        return;
+
+    if (GameObject* parent = ObjectAccessor::GetGameObject(*this, m_linkedTrapParent))
+        if (parent->GetGoType() == GAMEOBJECT_TYPE_CHEST && parent->GetGOInfo()->chest.consumable &&
+            !parent->GetGOInfo()->chest.lootId)
+            parent->SetLootState(GO_JUST_DEACTIVATED);
 }
 
 void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
