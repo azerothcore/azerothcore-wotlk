@@ -29,7 +29,6 @@ struct AC_DATABASE_API DatabaseUpdatePool
 {
     virtual ~DatabaseUpdatePool() = default;
 
-    virtual void Execute(std::string_view query) = 0;
     virtual void DirectExecute(std::string_view query) = 0;
     virtual QueryResult Query(std::string_view query) = 0;
     virtual MySQLConnectionInfo const* GetConnectionInfo() const = 0;

@@ -27,11 +27,6 @@ class DatabaseWorkerPoolAdapter : public DatabaseUpdatePool
 public:
     DatabaseWorkerPoolAdapter(DatabaseWorkerPool<T>& pool) : _pool(pool) {}
 
-    void Execute(std::string_view query) override
-    {
-        _pool.Execute(query);
-    }
-
     void DirectExecute(std::string_view query) override
     {
         _pool.DirectExecute(query);

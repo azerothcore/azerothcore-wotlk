@@ -56,7 +56,7 @@ public:
 
     void Close();
 
-    void Execute(std::string_view sql) override;
+    void Execute(std::string_view sql);
     void DirectExecute(std::string_view sql) override;
     QueryResult Query(std::string_view sql) override;
     MySQLConnectionInfo const* GetConnectionInfo() const override;
