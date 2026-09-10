@@ -90,7 +90,8 @@ public:
     }
 
     //! Prepared statements. The index space is defined by the module's connection
-    //! class (DoPrepareStatements); parameter counts are recorded during Open().
+    //! class (DoPrepareStatements); parameter counts are recorded by PrepareStatements(),
+    //! so building one before that call yields a zero-parameter statement.
     //! Both calls consume (delete) the statement, mirroring DatabaseWorkerPool.
     void Execute(PreparedStatementBase* stmt);
     PreparedQueryResult Query(PreparedStatementBase* stmt);

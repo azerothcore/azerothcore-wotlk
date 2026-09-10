@@ -73,8 +73,15 @@ bool ModuleDatabasePool::PrepareStatements()
 {
     for (auto const& conn : _connections)
     {
+        conn->LockIfReady();
         if (!conn->PrepareStatements())
+        {
+            conn->Unlock();
+            Close();
             return false;
+        }
+
+        conn->Unlock();
     }
 
     if (!_connections.empty())
@@ -98,6 +105,8 @@ bool ModuleDatabasePool::PrepareStatements()
 void ModuleDatabasePool::Close()
 {
     _connections.clear();
+
+    _preparedStatementSize.clear();
 }
 
 void ModuleDatabasePool::Execute(std::string_view sql)
@@ -188,6 +197,11 @@ void ModuleDatabasePool::DirectCommitTransaction(std::shared_ptr<TransactionBase
 
     MySQLConnection* conn = GetFreeConnection();
     int errorCode = conn->ExecuteTransaction(transaction);
+    if (!errorCode)
+    {
+        conn->Unlock();
+        return;
+    }
 
     //! Handle MySQL Errno 1213 without extending deadlock to the core itself
     if (errorCode == ER_LOCK_DEADLOCK)
@@ -200,6 +214,7 @@ void ModuleDatabasePool::DirectCommitTransaction(std::shared_ptr<TransactionBase
         }
     }
 
+    transaction->Cleanup();
     conn->Unlock();
 }
 
