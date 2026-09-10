@@ -2327,6 +2327,7 @@ struct npc_plague_cauldron_bunny : public ScriptedAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
+        DoCastSelf(SPELL_EVENT_TIMER_BUFF, true);
         AddFluid();
     }
 
