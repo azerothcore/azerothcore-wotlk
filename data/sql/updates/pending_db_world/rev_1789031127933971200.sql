@@ -1,4 +1,4 @@
--- Mimiron DB Target is the anchor VX-001 aims the P3Wx2 Laser Barrage at. Without the trigger flag
--- it can be dragged into combat refs it never releases, since NullCreatureAI never evades.
--- Matches Illidan DB Target (23070).
-UPDATE `creature_template` SET `flags_extra` = 128 WHERE `entry` = 33576;
+-- Mimiron DB Target anchors VX-001's P3Wx2 Laser Barrage. Without CREATURE_FLAG_EXTRA_TRIGGER and
+-- CREATURE_FLAG_EXTRA_CANNOT_ENTER_COMBAT it is dragged into combat refs nothing releases, since
+-- NullCreatureAI never evades.
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 8320 WHERE `entry` = 33576;
