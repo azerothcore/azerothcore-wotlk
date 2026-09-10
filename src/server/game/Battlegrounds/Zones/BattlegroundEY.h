@@ -354,11 +354,11 @@ struct CaptureEYPointInfo
         _playersCount[TEAM_HORDE] = 0;
     }
 
-    Player* player = nullptr;
     TeamId _ownerTeamId;
     int8 _barStatus;
     uint32 _areaTrigger;
     int8 _playersCount[PVP_TEAMS_COUNT];
+    ObjectGuid _playerGuid;
 
     bool IsUnderControl(TeamId teamId) const { return _ownerTeamId == teamId; }
     bool IsUnderControl() const { return _ownerTeamId != TEAM_NEUTRAL; }
