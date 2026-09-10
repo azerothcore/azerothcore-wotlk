@@ -205,7 +205,7 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
     return LOCATION_REPOSITORY;
 }
 
-namespace UpdaterImpl
+namespace
 {
 
 using Path = std::filesystem::path;
@@ -267,7 +267,7 @@ bool Create(DatabaseUpdatePool& pool)
     return true;
 }
 
-bool Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::string_view modulesList)
+bool UpdateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::string_view modulesList)
 {
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
@@ -580,7 +580,7 @@ void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string co
     }
 }
 
-} // namespace UpdaterImpl
+} // anonymous namespace
 
 template<class T>
 ModuleDBUpdaterInfo DBUpdater<T>::GetUpdaterInfo()
@@ -592,44 +592,44 @@ template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
     DatabaseWorkerPoolAdapter<T> adapter(pool);
-    return UpdaterImpl::Create(adapter);
+    return Create(adapter);
 }
 
 template<class T>
 bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList /*= {}*/)
 {
     DatabaseWorkerPoolAdapter<T> adapter(pool);
-    return UpdaterImpl::Update(adapter, GetUpdaterInfo(), modulesList);
+    return Update(adapter, GetUpdaterInfo(), modulesList);
 }
 
 template<class T>
 bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories)
 {
     DatabaseWorkerPoolAdapter<T> adapter(pool);
-    return UpdaterImpl::Update(adapter, GetUpdaterInfo(), setDirectories);
+    return Update(adapter, GetUpdaterInfo(), setDirectories);
 }
 
 template<class T>
 bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 {
     DatabaseWorkerPoolAdapter<T> adapter(pool);
-    return UpdaterImpl::Populate(adapter, GetUpdaterInfo());
+    return Populate(adapter, GetUpdaterInfo());
 }
 
 bool ModuleDBUpdater::Create(DatabaseUpdatePool& pool)
 {
-    return UpdaterImpl::Create(pool);
+    return Create(pool);
 }
 
 bool ModuleDBUpdater::Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info,
                              std::string_view modulesList /*= {}*/)
 {
-    return UpdaterImpl::Update(pool, info, modulesList);
+    return Update(pool, info, modulesList);
 }
 
 bool ModuleDBUpdater::Populate(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info)
 {
-    return UpdaterImpl::Populate(pool, info);
+    return Populate(pool, info);
 }
 
 template class AC_DATABASE_API DBUpdater<LoginDatabaseConnection>;
