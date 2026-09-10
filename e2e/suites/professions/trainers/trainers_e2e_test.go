@@ -28,7 +28,12 @@ import (
 //
 //   - SendSpells filters each spell through IsSpellFitByClassAndRace. Eleven of the
 //     twelve recipes are class-restricted goggles, so any single character sees only
-//     its own. Four classes together cover all twelve (see recipesByClass).
+//     its own. Four classes together cover all twelve.
+//
+//     That filter is asserted in both directions: each character must see its own
+//     recipes and must NOT see the others'. Presence alone would still pass if the
+//     class filter broke and every character saw all twelve.
+//
 //   - HandleTrainerListOpcode goes through GetNPCIfCanInteractWith, which refuses
 //     hostile NPCs. Zebig and Mack Diver are Horde-side, Lebowski Alliance-side, so
 //     the trainers are split by the faction that can reach them.
@@ -46,6 +51,10 @@ const (
 	// int32 ReqSkillLine, int32 ReqSkillRank, int32[3] ReqAbility = 38 bytes.
 	trainerListSpellSize = 38
 )
+
+// allRecipes fixes iteration order so failures are reproducible. A character's
+// expected set is its botSpec.recipes; everything else here it must not be offered.
+var allRecipes = []uint32{39973, 40274, 41311, 41312, 41314, 41315, 41316, 41317, 41318, 41319, 41320, 41321}
 
 var recipeNames = map[uint32]string{
 	39973: "Frost Grenades",
@@ -123,6 +132,30 @@ var bots = []botSpec{
 	{"TrollPriest", e2eharness.RaceTroll, e2eharness.ClassPriest,
 		[]uint32{39973, 41320, 41321},
 		[]trainerSpec{zebig, mackDiver}},
+
+	// The remaining six classes add no recipe the four above miss, so they visit only
+	// the trainer the issue names. They pin the armour-type sharing: a warrior gets the
+	// plate goggles a paladin gets, minus the paladin-only one, and so on. Death knights
+	// share that plate set — SkillLineAbility gives 40274 and 41312 ClassMask 0x23, which
+	// is warrior, paladin and death knight.
+	{"HumanWarrior", e2eharness.RaceHuman, e2eharness.ClassWarrior,
+		[]uint32{39973, 40274, 41312},
+		[]trainerSpec{mihila}},
+	{"NightElfHunter", e2eharness.RaceNightElf, e2eharness.ClassHunter,
+		[]uint32{39973, 41314},
+		[]trainerSpec{mihila}},
+	{"HumanRogue", e2eharness.RaceHuman, e2eharness.ClassRogue,
+		[]uint32{39973, 41317},
+		[]trainerSpec{mihila}},
+	{"HumanMage", e2eharness.RaceHuman, e2eharness.ClassMage,
+		[]uint32{39973, 41320},
+		[]trainerSpec{mihila}},
+	{"HumanWarlock", e2eharness.RaceHuman, e2eharness.ClassWarlock,
+		[]uint32{39973, 41320},
+		[]trainerSpec{mihila}},
+	{"HumanDeathKnight", e2eharness.RaceHuman, e2eharness.ClassDeathKnight,
+		[]uint32{39973, 40274, 41312},
+		[]trainerSpec{mihila}},
 }
 
 // decodeTrainerSpells returns the spell IDs advertised for trainerGUID, or ok=false
@@ -228,16 +261,27 @@ func TestAC_27146_EngineeringTrainersTeachMasterRecipes(t *testing.T) {
 					for _, s := range spells {
 						have[s] = true
 					}
+					want := make(map[uint32]bool, len(bs.recipes))
 					for _, id := range bs.recipes {
-						if !have[id] {
+						want[id] = true
+					}
+					for _, id := range allRecipes {
+						switch {
+						case want[id] && !have[id]:
 							e2eharness.Assertf(t, "%s (%d, TrainerId %d) does not advertise "+
 								"%s (%d) to a %s; without the trainer_spell row the recipe "+
 								"never appears in the trainer window",
 								tr.name, tr.entry, tr.trainer, recipeNames[id], id, bs.name)
+						case !want[id] && have[id]:
+							e2eharness.Assertf(t, "%s (%d, TrainerId %d) advertises %s (%d) to "+
+								"a %s, which cannot learn it; SendSpells should have dropped it "+
+								"via IsSpellFitByClassAndRace",
+								tr.name, tr.entry, tr.trainer, recipeNames[id], id, bs.name)
 						}
 					}
-					t.Logf("OK %s (TrainerId %d) advertises all %d recipes to %s (%d spells total)",
-						tr.name, tr.trainer, len(bs.recipes), bs.name, len(spells))
+					t.Logf("OK %s (TrainerId %d) offers %s exactly its %d of the %d master "+
+						"recipes (%d spells total)",
+						tr.name, tr.trainer, bs.name, len(bs.recipes), len(allRecipes), len(spells))
 				})
 			}
 		})
