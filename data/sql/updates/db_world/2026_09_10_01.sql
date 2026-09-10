@@ -1,3 +1,4 @@
+-- DB update 2026_09_10_00 -> 2026_09_10_01
 --
 DELETE FROM `reference_loot_template` WHERE `Entry`=24077 AND `Item`=1958;
 
