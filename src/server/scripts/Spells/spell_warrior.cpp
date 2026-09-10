@@ -633,7 +633,7 @@ class spell_warr_sweeping_strikes : public AuraScript
 
     bool Load() override
     {
-        _procTarget = nullptr;
+        _procTargetGUID.Clear();
         return true;
     }
 
@@ -641,9 +641,7 @@ class spell_warr_sweeping_strikes : public AuraScript
     {
         Unit* actor = eventInfo.GetActor();
         if (!actor)
-        {
             return false;
-        }
 
         if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
         {
@@ -654,40 +652,49 @@ class spell_warr_sweeping_strikes : public AuraScript
                 case SPELL_WARRIOR_WHIRLWIND_OFF:
                     return false;
                 case SPELL_WARRIOR_WHIRLWIND_MAIN:
+                {
                     if (actor->HasSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1))
-                    {
                         return false;
-                    }
+
                     break;
+                }
                 default:
                     break;
             }
         }
 
-        _procTarget = actor->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
-        return _procTarget != nullptr;
+        Unit* procTarget = actor->SelectNearbyNoTotemTarget(eventInfo.GetProcTarget());
+        if (procTarget)
+            _procTargetGUID = procTarget->GetGUID();
+
+        return procTarget != nullptr;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+
+        Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
+        if (!procTarget)
+            return;
+
         if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
         {
             SpellInfo const* spellInfo = damageInfo->GetSpellInfo();
-            if (spellInfo && spellInfo->Id == SPELL_WARRIOR_EXECUTE && !_procTarget->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
+            if (spellInfo && spellInfo->Id == SPELL_WARRIOR_EXECUTE
+                && !procTarget->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
             {
                 // If triggered by Execute (while target is not under 20% hp) deals normalized weapon damage
-                GetTarget()->CastSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2, aurEff);
+                GetTarget()->CastSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2, aurEff);
             }
             else
             {
                 if (spellInfo && spellInfo->Id == SPELL_WARRIOR_WHIRLWIND_MAIN)
-                {
                     eventInfo.GetActor()->AddSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, 0, 500);
-                }
 
-                int32 damage = damageInfo->GetUnmitigatedDamage();
-                GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, &damage, 0, 0, true, nullptr, aurEff);
+                auto damage = static_cast<int32>(damageInfo->GetUnmitigatedDamage());
+                GetTarget()->CastCustomSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1,
+                    &damage, nullptr, nullptr, true, nullptr, aurEff);
             }
         }
     }
@@ -699,7 +706,7 @@ class spell_warr_sweeping_strikes : public AuraScript
     }
 
 private:
-    Unit* _procTarget = nullptr;
+    ObjectGuid _procTargetGUID;
 };
 
 // 50720 - Vigilance
@@ -723,7 +730,7 @@ class spell_warr_vigilance : public AuraScript
 
     bool Load() override
     {
-        _procTarget = nullptr;
+        _procTargetGUID.Clear();
         return true;
     }
 
@@ -752,14 +759,22 @@ class spell_warr_vigilance : public AuraScript
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        _procTarget = GetCaster();
-        return _procTarget;
+        if (Unit* caster = GetCaster())
+        {
+            _procTargetGUID = caster->GetGUID();
+            return true;
+        }
+        return false;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(_procTarget, SPELL_WARRIOR_VIGILANCE_PROC, true, nullptr, aurEff);
+        Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
+        if (!procTarget)
+            return;
+
+        GetTarget()->CastSpell(procTarget, SPELL_WARRIOR_VIGILANCE_PROC, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -771,7 +786,7 @@ class spell_warr_vigilance : public AuraScript
     }
 
 private:
-    Unit* _procTarget;
+    ObjectGuid _procTargetGUID;
 };
 
 // 59665 - Vigilance (Redirect Threat)

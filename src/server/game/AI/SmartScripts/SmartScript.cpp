@@ -1515,12 +1515,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_MOVE_FORWARD:
         {
-            if (!me)
-                break;
-
-            float x, y, z;
-            me->GetClosePoint(x, y, z, me->GetObjectSize() / 3, (float)e.action.moveRandom.distance);
-            me->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
+            for (WorldObject* target : targets)
+            {
+                if (IsCreature(target))
+                {
+                    float x, y, z;
+                    target->ToCreature()->GetClosePoint(x, y, z, target->ToCreature()->GetObjectSize() / 3, (float)e.action.moveRandom.distance);
+                    target->ToCreature()->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
+                }
+            }
             break;
         }
         case SMART_ACTION_RISE_UP:
@@ -3184,8 +3187,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!e.action.followGroup.followState)
             {
                 for (WorldObject* target : targets)
-                    if (IsUnit(target))
-                        target->ToCreature()->GetMotionMaster()->MoveIdle();
+                    if (IsCreature(target))
+                        target->ToCreature()->GetMotionMaster()->Clear();
 
                 break;
             }
@@ -3492,7 +3495,7 @@ void SmartScript::InstallTemplate(SmartScriptHolder const& e)
                 AddEvent(SMART_EVENT_DATA_SET, 0, 0, 0, 0, 0, 0, 0, SMART_ACTION_SET_RUN, e.action.installTtemplate.param3, 0, 0, 0, 0, 0, SMART_TARGET_NONE, 0, 0, 0, 0, 0);
                 AddEvent(SMART_EVENT_DATA_SET, 0, 0, 0, 0, 0, 0, 0, SMART_ACTION_SET_EVENT_PHASE, 1, 0, 0, 0, 0, 0, SMART_TARGET_NONE, 0, 0, 0, 0, 0);
 
-                AddEvent(SMART_EVENT_UPDATE, SMART_EVENT_FLAG_NOT_REPEATABLE, 1000, 1000, 0, 0, 0, 0, SMART_ACTION_MOVE_FORWARD, e.action.installTtemplate.param4, 0, 0, 0, 0, 0, SMART_TARGET_NONE, 0, 0, 0, 0, 1);
+                AddEvent(SMART_EVENT_UPDATE, SMART_EVENT_FLAG_NOT_REPEATABLE, 1000, 1000, 0, 0, 0, 0, SMART_ACTION_MOVE_FORWARD, e.action.installTtemplate.param4, 0, 0, 0, 0, 0, SMART_TARGET_SELF, 0, 0, 0, 0, 1);
                 //phase 1: give quest credit on movepoint reached
                 AddEvent(SMART_EVENT_MOVEMENTINFORM, 0, POINT_MOTION_TYPE, SMART_RANDOM_POINT, 0, 0, 0, 0, SMART_ACTION_SET_DATA, 0, 0, 0, 0, 0, 0, SMART_TARGET_STORED, 1, 0, 0, 0, 1);
                 //phase 1: despawn after time on movepoint reached
@@ -5100,7 +5103,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         {
             if (!(e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS))
             {
-                if (me && me->HasUnitState(UNIT_STATE_CASTING))
+                if (me && me->IsActionPreventedByCasting())
                 {
                     RaisePriority(e);
                     return;
@@ -5109,7 +5112,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
         }
 
         // Delay flee for assist event if casting
-        if (e.GetActionType() == SMART_ACTION_FLEE_FOR_ASSIST && me && me->HasUnitState(UNIT_STATE_CASTING))
+        if (e.GetActionType() == SMART_ACTION_FLEE_FOR_ASSIST && me && me->IsActionPreventedByCasting())
         {
             e.timer = 1200;
             return;

@@ -1,0 +1,32 @@
+-- DB update 2026_08_15_07 -> 2026_08_15_08
+--
+DELETE FROM `creature_text` WHERE (`CreatureID` = 31135);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(31135, 0, 0, 'Valhalas is yours to win or die in, $n. But whatever you do, stay within the bounds of the arena. To flee is to lose and be dishonored.', 12, 0, 100, 0, 0, 0, 31744, 0, 'Geirrvif - Fallen Heroes - On Quest Accept'),
+(31135, 1, 0, '$n and $g his : her; comrades in arms have chosen to accept honorable combat within the sacred confines of Valhalas.', 14, 0, 100, 0, 0, 0, 31745, 0, 'Geirrvif - Fallen Heroes - Announce Challengers'),
+(31135, 2, 0, 'There can be only one outcome to such a battle: death for one side or the other. Let $n prove $g himself : herself; upon the bones of those outsiders who have fallen before!', 14, 0, 100, 0, 0, 0, 31746, 0, 'Geirrvif - Fallen Heroes - Announce Stakes'),
+(31135, 3, 0, 'The fallen heroes of Valhalas emerge from the ground to do battle once more!', 41, 0, 100, 0, 0, 14998, 31756, 0, 'Geirrvif - Fallen Heroes - Announce Opponents Arrival'),
+(31135, 4, 0, '$n has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.', 14, 0, 100, 0, 0, 14998, 31755, 0, 'Geirrvif - Fallen Heroes - Announce Victory'),
+(31135, 5, 0, 'Prepare yourself. Khit\'rix will be entering Valhalas from the southeast. Remember, do not leave the ring or you will lose the battle.', 12, 0, 100, 0, 0, 0, 31771, 0, 'Geirrvif - Khit\'rix the Dark Master - On Quest Accept'),
+(31135, 6, 0, '$n has accepted the challenge of Khit\'rix the Dark Master. May the gods show mercy upon $g him : her; for Khit\'rix surely will not.', 14, 0, 100, 0, 0, 0, 31770, 0, 'Geirrvif - Khit\'rix the Dark Master - Announce Challengers'),
+(31135, 7, 0, 'Khit\'rix the Dark Master skitters into Valhalas from the southeast!', 41, 0, 100, 0, 0, 14998, 32753, 0, 'Geirrvif - Khit\'rix the Dark Master - Announce Opponent Arrival'),
+(31135, 8, 0, 'Khit\'rix the Dark Master has been defeated by $n and $g his : her; band of companions. Let the next challenge be issued!', 14, 0, 100, 0, 0, 14998, 31820, 0, 'Geirrvif - Khit\'rix the Dark Master - Announce Victory'),
+(31135, 9, 0, 'Sigrid Iceborn has returned to the heights of Jotunheim to prove herself against $n.  When last they met, $n bested her in personal combat.  Let us see the outcome of this match.', 14, 0, 100, 0, 0, 0, 31892, 0, 'Geirrvif - The Return of Sigrid Iceborn - On Quest Accept'),
+(31135, 10, 0, 'Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!', 41, 0, 100, 0, 0, 14998, 32757, 0, 'Geirrvif - The Return of Sigrid Iceborn - Announce Opponent Arrival'),
+(31135, 11, 0, '$n has defeated Sigrid Iceborn for a second time.  Well, this time $g he : she; did it with the help of $g his : her; friends, but a win is a win!', 14, 0, 100, 0, 0, 14998, 31921, 0, 'Geirrvif - The Return of Sigrid Iceborn - Announce Victory'),
+(31135, 12, 0, 'Carnage is coming!  Remember, no matter what you do, do NOT leave the battle ring or I will disqualify you and your group.', 12, 0, 100, 0, 0, 0, 31885, 0, 'Geirrvif - Carnage! - On Quest Accept'),
+(31135, 13, 0, 'From the bowels of the Underhalls comes Carnage.  Brave and foolish $n has accepted the challenge.  $G He : She; and $g his : her; group stand ready to face the monstrosity.', 14, 0, 100, 0, 0, 0, 31930, 0, 'Geirrvif - Carnage! - Announce Challengers'),
+(31135, 14, 0, 'Lumbering in from the south, the smell of Carnage precedes him!', 41, 0, 100, 0, 0, 14998, 32758, 0, 'Geirrvif - Carnage! - Announce Opponent Arrival'),
+(31135, 15, 0, 'The horror known as Carnage is no more.  Could it be that $n is truly worthy of battle in Valhalas?  We shall see.', 14, 0, 100, 0, 0, 14998, 31931, 0, 'Geirrvif - Carnage! - Announce Victory'),
+(31135, 16, 0, 'Look to the southeast and you will see the thane upon the platform near Gjonner the Merciless when he shows himself. Let him come down.  Stay within the ring of Valhalas.', 12, 0, 100, 0, 0, 0, 31938, 0, 'Geirrvif - Thane Deathblow - On Quest Accept'),
+(31135, 17, 0, 'Thane Banahogg returns to Valhalas for the first time in ages to prove that the vrykul are the only beings worthy to fight within its sacred ring.  Will $n prove him wrong?', 14, 0, 100, 0, 0, 0, 31939, 0, 'Geirrvif - Thane Deathblow - Announce Challengers'),
+(31135, 18, 0, 'Thane Banahogg appears upon the overlook to the southeast!', 41, 0, 100, 0, 0, 14998, 32760, 0, 'Geirrvif - Thane Deathblow - Announce Opponent Arrival'),
+(31135, 19, 0, 'Thane Banahogg the Deathblow has fallen to $n and $g his : her; fighting companions.  $G He : She; has but one challenge ahead of $g him : her;.  Who will it be?', 14, 0, 100, 0, 0, 14998, 31940, 0, 'Geirrvif - Thane Deathblow - Announce Victory'),
+(31135, 20, 0, 'It\'s too late to run now.  Do not leave the ring.  Die bravely, $n!', 12, 0, 100, 0, 0, 0, 31949, 0, 'Geirrvif - Final Challenge - On Quest Accept'),
+(31135, 21, 0, 'From the depths of Icecrown Citadel, one of the Lich King\'s chosen comes to put an end to the existence of $n and $g his : her; friends.', 14, 0, 100, 0, 0, 0, 31951, 0, 'Geirrvif - Final Challenge - Announce Challengers'),
+(31135, 22, 0, 'Warriors of Jotunheim, I present to you, Blood Prince Sandoval!', 14, 0, 100, 0, 0, 0, 31955, 0, 'Geirrvif - Final Challenge - Announce Opponent'),
+(31135, 23, 0, 'Without warning, Prince Sandoval magically appears within Valhalas!', 41, 0, 100, 0, 0, 14998, 32761, 0, 'Geirrvif - Final Challenge - Announce Opponent Arrival'),
+(31135, 24, 0, 'The unthinkable has happened... $n has slain Prince Sandoval!', 14, 0, 100, 0, 0, 0, 31945, 0, 'Geirrvif - Final Challenge - Announce Victory'),
+(31135, 25, 0, 'In defeating him, $g he : she; and $g his : her; fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.', 14, 0, 100, 0, 0, 0, 31946, 0, 'Geirrvif - Final Challenge - Announce Champion 1'),
+(31135, 26, 0, 'ALL HAIL $n, CHAMPION OF VALHALAS!', 14, 0, 100, 0, 0, 14998, 31948, 0, 'Geirrvif - Final Challenge - Announce Champion 2'),
+(31135, 27, 0, 'You were not prepared!', 14, 0, 100, 0, 0, 0, 31753, 0, 'Geirrvif - Announce Challenger Defeat');

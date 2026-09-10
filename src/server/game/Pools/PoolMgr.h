@@ -22,10 +22,15 @@
 #include "Define.h"
 #include "GameObject.h"
 #include "QuestDef.h"
+#include <memory>
+#include <type_traits>
+
+class Map;
 
 struct PoolTemplateData
 {
     uint32      MaxLimit;
+    int32       MapId;
     std::string Description;
 };
 
@@ -40,29 +45,40 @@ class Pool                                                  // for Pool of Pool 
 {
 };
 
-typedef std::unordered_set<uint32> ActivePoolObjects;
-typedef std::map<uint32, uint32> ActivePoolPools;
+typedef std::unordered_set<uint32> SpawnedPoolObjects;
+typedef std::map<uint32, uint32> SpawnedPoolPools;
 
-class ActivePoolData
+class SpawnedPoolData
 {
 public:
+    // owner is nullptr only for PoolMgr's global quest pool state
+    explicit SpawnedPoolData(Map* owner) : mOwner(owner) { }
+
+    SpawnedPoolData(SpawnedPoolData const&) = delete;
+    SpawnedPoolData(SpawnedPoolData&&) = delete;
+    SpawnedPoolData& operator=(SpawnedPoolData const&) = delete;
+    SpawnedPoolData& operator=(SpawnedPoolData&&) = delete;
+
+    Map* GetMap() const { return mOwner; }
+
     template<typename T>
-    bool IsActiveObject(uint32 db_guid_or_pool_id) const;
+    bool IsSpawnedObject(uint32 db_guid_or_pool_id) const;
 
-    uint32 GetActiveObjectCount(uint32 pool_id) const;
-
-    template<typename T>
-    void ActivateObject(uint32 db_guid_or_pool_id, uint32 pool_id);
+    uint32 GetSpawnedObjects(uint32 pool_id) const;
 
     template<typename T>
-    void RemoveObject(uint32 db_guid_or_pool_id, uint32 pool_id);
+    void AddSpawn(uint32 db_guid_or_pool_id, uint32 pool_id);
 
-    ActivePoolObjects GetActiveQuests() const { return mActiveQuests; } // a copy of the set
+    template<typename T>
+    void RemoveSpawn(uint32 db_guid_or_pool_id, uint32 pool_id);
+
+    SpawnedPoolObjects GetSpawnedQuests() const { return mSpawnedQuests; } // a copy of the set
 private:
-    ActivePoolObjects mSpawnedCreatures;
-    ActivePoolObjects mSpawnedGameobjects;
-    ActivePoolObjects mActiveQuests;
-    ActivePoolPools   mSpawnedPools;
+    Map* mOwner;
+    SpawnedPoolObjects mSpawnedCreatures;
+    SpawnedPoolObjects mSpawnedGameobjects;
+    SpawnedPoolObjects mSpawnedQuests;
+    SpawnedPoolPools   mSpawnedPools;
 };
 
 template <class T>
@@ -74,14 +90,15 @@ public:
     void SetPoolId(uint32 pool_id) { poolId = pool_id; }
     ~PoolGroup() {};
     bool IsEmpty() const { return ExplicitlyChanced.empty() && EqualChanced.empty(); }
+    bool IsEmptyDeepCheck() const;
     void AddEntry(PoolObject& poolitem, uint32 maxentries);
     bool CheckPool() const;
-    void DespawnObject(ActivePoolData& spawns, ObjectGuid::LowType guid = 0);
-    void Despawn1Object(ObjectGuid::LowType guid);
-    void SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 triggerFrom);
+    void DespawnObject(SpawnedPoolData& spawns, ObjectGuid::LowType guid = 0);
+    void Despawn1Object(SpawnedPoolData& spawns, ObjectGuid::LowType guid);
+    void SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom);
 
-    void Spawn1Object(PoolObject* obj);
-    void ReSpawn1Object(PoolObject* obj);
+    void Spawn1Object(SpawnedPoolData& spawns, PoolObject* obj);
+    void ReSpawn1Object(SpawnedPoolData& spawns, PoolObject* obj);
     void RemoveOneRelation(uint32 child_pool_id);
     uint32 GetFirstEqualChancedObjectId()
     {
@@ -93,6 +110,8 @@ public:
     std::vector<PoolObject> const& GetExplicitlyChanced() const { return ExplicitlyChanced; }
     std::vector<PoolObject> const& GetEqualChanced() const { return EqualChanced; }
 private:
+    static bool IsSpawnableOnMap(uint32 db_guid_or_pool_id, Map* map);
+
     uint32 poolId;
     PoolObjectList ExplicitlyChanced;
     PoolObjectList EqualChanced;
@@ -120,16 +139,31 @@ public:
     template<typename T>
     uint32 IsPartOfAPool(uint32 db_guid_or_pool_id) const;
 
+    // Quest pool state is global: quests are realm-wide, not tied to a map.
+    // Creature/GameObject/Pool spawn state lives on the owning Map's SpawnedPoolData.
     template<typename T>
-    bool IsSpawnedObject(uint32 db_guid_or_pool_id) const { return mSpawnedData.IsActiveObject<T>(db_guid_or_pool_id); }
+    bool IsSpawnedObject(uint32 quest_id) const
+    {
+        static_assert(std::is_same_v<T, Quest>, "only quest pool state is global; query the owning Map's SpawnedPoolData instead");
+        return mQuestSpawnedData.IsSpawnedObject<Quest>(quest_id);
+    }
 
+    bool IsEmpty(uint32 pool_id) const;
     bool CheckPool(uint32 pool_id) const;
 
-    void SpawnPool(uint32 pool_id);
-    void DespawnPool(uint32 pool_id);
+    void SpawnPool(SpawnedPoolData& spawnedPoolData, uint32 pool_id);
+    void DespawnPool(SpawnedPoolData& spawnedPoolData, uint32 pool_id);
 
     template<typename T>
-    void UpdatePool(uint32 pool_id, uint32 db_guid_or_pool_id);
+    void UpdatePool(SpawnedPoolData& spawnedPoolData, uint32 pool_id, uint32 db_guid_or_pool_id);
+
+    // Game-event pools are spawned on all live maps of the pool's map id and
+    // remembered while active, so maps created mid-event (lazily created
+    // continents, new instances) spawn them on creation too.
+    void SpawnEventPool(uint32 pool_id);
+    void DespawnEventPool(uint32 pool_id);
+
+    std::unique_ptr<SpawnedPoolData> InitPoolsForMap(Map* map);
 
     void ChangeDailyQuests();
     void ChangeWeeklyQuests();
@@ -143,14 +177,14 @@ public:
     PoolGroup<Creature> const* GetPoolCreatureGroup(uint32 poolId) const;
     PoolGroup<GameObject> const* GetPoolGameObjectGroup(uint32 poolId) const;
     PoolGroup<Pool> const* GetPoolPoolGroup(uint32 poolId) const;
-    ActivePoolData const& GetSpawnedData() const { return mSpawnedData; }
+    SpawnedPoolData const& GetQuestSpawnedData() const { return mQuestSpawnedData; }
     uint32 GetCreaturePoolId(uint32 guid) const;
     uint32 GetGameObjectPoolId(uint32 guid) const;
 
     friend class PoolQuestReloadFixTest;
 private:
     template<typename T>
-    void SpawnPool(uint32 pool_id, uint32 db_guid_or_pool_id);
+    void SpawnPool(SpawnedPoolData& spawnedPoolData, uint32 pool_id, uint32 db_guid_or_pool_id);
 
     typedef std::unordered_map<uint32, PoolTemplateData>      PoolTemplateDataMap;
     typedef std::unordered_map<uint32, PoolGroup<Creature>>   PoolGroupCreatureMap;
@@ -170,11 +204,21 @@ private:
     SearchMap mPoolSearchMap;
     SearchMap mQuestSearchMap;
 
-    // dynamic data
-    ActivePoolData mSpawnedData;
+    std::unordered_map<uint32, std::vector<uint32>> mAutoSpawnPoolsPerMap;
+
+    // World thread only: mutated on game event start/stop, read on map creation
+    std::unordered_set<uint32> mActiveEventPools;
+
+    // active state of quest pools; per-map state lives on each Map's SpawnedPoolData
+    SpawnedPoolData mQuestSpawnedData;
 };
 
 #define sPoolMgr PoolMgr::instance()
+
+template<> void PoolMgr::SpawnPool<Pool>(SpawnedPoolData& spawnedPoolData, uint32 pool_id, uint32 sub_pool_id);
+template<> void PoolMgr::SpawnPool<Creature>(SpawnedPoolData& spawnedPoolData, uint32 pool_id, uint32 db_guid);
+template<> void PoolMgr::SpawnPool<GameObject>(SpawnedPoolData& spawnedPoolData, uint32 pool_id, uint32 db_guid);
+template<> void PoolMgr::SpawnPool<Quest>(SpawnedPoolData& spawnedPoolData, uint32 pool_id, uint32 quest_id);
 
 // Method that tell if the creature is part of a pool and return the pool id if yes
 template<>

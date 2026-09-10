@@ -1399,7 +1399,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
         m_spawnId = sObjectMgr->GenerateCreatureSpawnId();
 
     CreatureData& data = sObjectMgr->NewOrExistCreatureData(m_spawnId);
-
+    data.spawnId = m_spawnId;
     uint32 displayId = GetNativeDisplayId();
     uint32 npcflag = GetNpcFlags();
     uint32 unit_flags = GetUnitFlags();
@@ -2117,7 +2117,7 @@ void Creature::Respawn(bool force)
 
                 uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
                 if (poolid)
-                    sPoolMgr->UpdatePool<Creature>(poolid, m_spawnId);
+                    sPoolMgr->UpdatePool<Creature>(GetMap()->GetPoolData(), poolid, m_spawnId);
 
                 //Re-initialize reactstate that could be altered by movementgenerators
                 InitializeReactState();

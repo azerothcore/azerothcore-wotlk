@@ -1,0 +1,29 @@
+-- DB update 2026_08_08_12 -> 2026_08_08_13
+-- Yogg-Saron brain room Influence Tentacles (sniffed positions), summoned per illusion by the brain
+DELETE FROM `creature_summon_groups` WHERE `summonerId` = 33890 AND `summonerType` = 0 AND `groupId` IN (1, 2, 3);
+INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
+(33890, 0, 1, 33943, 2069.298, -43.5317, 239.8006, 0.47124, 8, 0, 'Brain of Yogg-Saron - Chamber Illusion - Influence Tentacle'),
+(33890, 0, 1, 33943, 2069.4792, -5.6997, 239.8058, 5.42797, 8, 0, 'Brain of Yogg-Saron - Chamber Illusion - Influence Tentacle'),
+(33890, 0, 1, 33943, 2113.3298, -65.7101, 239.8058, 1.78024, 8, 0, 'Brain of Yogg-Saron - Chamber Illusion - Influence Tentacle'),
+(33890, 0, 1, 33943, 2139.8298, -50.2865, 239.8058, 2.46091, 8, 0, 'Brain of Yogg-Saron - Chamber Illusion - Influence Tentacle'),
+(33890, 0, 1, 33943, 2136.6406, -1.9965, 239.8058, 3.83972, 8, 0, 'Brain of Yogg-Saron - Chamber Illusion - Influence Tentacle'),
+(33890, 0, 1, 33943, 2116.9307, 11.375, 239.8058, 4.41568, 8, 0, 'Brain of Yogg-Saron - Chamber Illusion - Influence Tentacle'),
+(33890, 0, 1, 33943, 2146.2395, -34.4045, 239.8058, 3.01942, 8, 0, 'Brain of Yogg-Saron - Chamber Illusion - Influence Tentacle'),
+(33890, 0, 1, 33943, 2146.8801, -17.0313, 239.8058, 3.35103, 8, 0, 'Brain of Yogg-Saron - Chamber Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1897.3455, -106.6076, 240.1444, 4.93928, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1902.132, -111.3594, 240.0698, 4.85202, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1905.3264, -104.7865, 240.0523, 4.76475, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1912.1285, -136.934, 240.073, 4.18879, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1917.5591, -135.7448, 240.073, 4.18879, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1919.125, -140.9566, 240.073, 3.97935, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1948.4688, -136.2951, 240.0707, 3.4383, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1952.9653, -130.5295, 240.1347, 3.80482, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 2, 33943, 1956.4445, -138.4028, 240.1078, 3.36849, 8, 0, 'Brain of Yogg-Saron - Icecrown Illusion - Influence Tentacle'),
+(33890, 0, 3, 33943, 1897.3435, 64.3142, 239.7495, 0.13963, 8, 0, 'Brain of Yogg-Saron - Stormwind Illusion - Influence Tentacle'),
+(33890, 0, 3, 33943, 1903.3931, 86.6029, 239.7495, 5.61996, 8, 0, 'Brain of Yogg-Saron - Stormwind Illusion - Influence Tentacle'),
+(33890, 0, 3, 33943, 1908.993, 44.2666, 239.7495, 0.92502, 8, 0, 'Brain of Yogg-Saron - Stormwind Illusion - Influence Tentacle'),
+(33890, 0, 3, 33943, 1923.3416, 98.0123, 239.7495, 4.83456, 8, 0, 'Brain of Yogg-Saron - Stormwind Illusion - Influence Tentacle'),
+(33890, 0, 3, 33943, 1931.1404, 38.4695, 239.7495, 1.71042, 8, 0, 'Brain of Yogg-Saron - Stormwind Illusion - Influence Tentacle'),
+(33890, 0, 3, 33943, 1945.4417, 92.1795, 239.7495, 4.04916, 8, 0, 'Brain of Yogg-Saron - Stormwind Illusion - Influence Tentacle'),
+(33890, 0, 3, 33943, 1951.0402, 49.8888, 239.7495, 2.49582, 8, 0, 'Brain of Yogg-Saron - Stormwind Illusion - Influence Tentacle'),
+(33890, 0, 3, 33943, 1956.5028, 72.1946, 239.7495, 3.28122, 8, 0, 'Brain of Yogg-Saron - Stormwind Illusion - Influence Tentacle');

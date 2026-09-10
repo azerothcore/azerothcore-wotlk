@@ -953,6 +953,21 @@ void Player::FailQuest(uint32 questId)
     }
 }
 
+void Player::FailQuestsOnDeath()
+{
+    for (auto& [id, statusData] : m_QuestStatus)
+    {
+        if (statusData.Status != QUEST_STATUS_INCOMPLETE)
+            continue;
+
+        Quest const* quest = sObjectMgr->GetQuestTemplate(id);
+        if (!quest || !quest->HasFlag(QUEST_FLAGS_STAY_ALIVE))
+            continue;
+
+        FailQuest(id);
+    }
+}
+
 void Player::AbandonQuest(uint32 questId)
 {
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
