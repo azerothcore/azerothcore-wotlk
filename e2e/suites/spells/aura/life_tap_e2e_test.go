@@ -81,21 +81,45 @@ func TestAC_27279_LifeTapGlyphUnderDespair(t *testing.T) {
 	// conceal a broken immunity. Demon Skin does not belong to the glyph mask.
 	bot.CastMust(t, demonSkin, self, 10*time.Second)
 	bot.WaitUnitAura(t, self, demonSkin, 3*time.Second)
-	bot.FlushWorld(t)
+	// AzerothGhost v1.0.8 drops short SMSG_POWER_UPDATE packets (packed player
+	// GUIDs). Wait for the object update; a chat ack does not refresh this cache.
+	powerTimeout := time.NewTimer(3 * time.Second)
+	defer powerTimeout.Stop()
+	poll := time.NewTicker(40 * time.Millisecond)
+	defer poll.Stop()
 	before, maximum := bot.PlayerPower()
-	if maximum == 0 || before >= maximum || bot.HasAura(glyphBuff) || !bot.HasAura(despair) {
+	for maximum == 0 || before >= maximum {
+		select {
+		case <-powerTimeout.C:
+			e2eharness.Preconditionf(t, "Demon Skin mana cost not observed (mana=%d/%d)", before, maximum)
+		case <-poll.C:
+		}
+		before, maximum = bot.PlayerPower()
+	}
+	if bot.HasAura(glyphBuff) || !bot.HasAura(despair) {
 		e2eharness.Preconditionf(t, "need Despair, missing mana and no old glyph buff (mana=%d/%d)", before, maximum)
 	}
 	bot.CastMust(t, lifeTap, self, 10*time.Second)
 	waitGlyph()
-	bot.FlushWorld(t)
-	after, _ := bot.PlayerPower()
-	if !bot.HasAura(despair) {
-		e2eharness.Preconditionf(t, "Aura of Despair disappeared before the assertion")
-	}
-	if after != before {
-		e2eharness.ConfirmedBugf(t, 27279, "Life Tap changed mana under Despair: %d -> %d", before, after)
+	// Check the whole update window so stale pre-cast mana cannot produce a pass.
+	// Despair prevents regeneration and no other mana-consuming spell is cast.
+	observe := time.NewTimer(3 * time.Second)
+	defer observe.Stop()
+observeMana:
+	for {
+		if !bot.HasAura(despair) {
+			e2eharness.Preconditionf(t, "Aura of Despair disappeared during the assertion")
+		}
+		after, _ := bot.PlayerPower()
+		if after != before {
+			e2eharness.ConfirmedBugf(t, 27279, "Life Tap changed mana under Despair: %d -> %d", before, after)
+		}
+		select {
+		case <-observe.C:
+			break observeMana
+		case <-poll.C:
+		}
 	}
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS glyph 63321 procs normally and under Despair; blocked mana remains %d", after)
+	t.Logf("PASS glyph 63321 procs normally and under Despair; blocked mana remains %d", before)
 }
