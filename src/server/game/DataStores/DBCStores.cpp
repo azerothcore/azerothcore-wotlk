@@ -28,8 +28,9 @@
 #include "TransportMgr.h"
 #include "World.h"
 #include <map>
+#include <utility>
 
-typedef std::map<uint16, uint32> AreaFlagByAreaID;
+typedef std::map<std::pair<uint32, uint32>, AreaTableEntry const*> AreaEntryByFlagAndMap;
 
 typedef std::tuple<int16, int8, int32> WMOAreaTableKey;
 typedef std::map<WMOAreaTableKey, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
@@ -39,7 +40,7 @@ DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
 DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 
 static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
-static AreaFlagByAreaID sAreaFlagByAreaID;
+static AreaEntryByFlagAndMap sAreaEntryByFlagAndMap;
 
 DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
 DBCStorage <AchievementCategoryEntry> sAchievementCategoryStore(AchievementCategoryfmt);
@@ -394,14 +395,9 @@ void LoadDBCStores(std::string const& dataPath)
 
 #undef LOAD_DBC
 
-    for (uint32 i = 0; i < sAreaTableStore.GetNumRows(); ++i)    // areaflag numbered from 0
-    {
-        if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(i))
-        {
-            // fill AreaId->DBC records
-            sAreaFlagByAreaID.insert(AreaFlagByAreaID::value_type(uint16(area->ID), area->exploreFlag));
-        }
-    }
+    for (AreaTableEntry const* area : sAreaTableStore)
+        if (area->exploreFlag)
+            sAreaEntryByFlagAndMap.emplace(std::make_pair(area->mapid, area->exploreFlag), area);
 
     for (CharStartOutfitEntry const* outfit : sCharStartOutfitStore)
         sCharStartOutfitMap[outfit->Race | (outfit->Class << 8) | (outfit->Gender << 16)] = outfit;
@@ -954,26 +950,24 @@ std::vector<SkillLineAbilityEntry const*> const& GetSkillLineAbilitiesBySkillLin
 
 int32 GetAreaFlagByAreaID(uint32 area_id)
 {
-    AreaFlagByAreaID::iterator i = sAreaFlagByAreaID.find(area_id);
-    if (i == sAreaFlagByAreaID.end())
-        return -1;
+    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(area_id))
+        return int32(area->exploreFlag);
 
-    return i->second;
+    return -1;
 }
 
 AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
 {
-    int32 areaflag = GetAreaFlagByAreaID(area_id);
-    if (areaflag < 0)
-        return nullptr;
-
-    return sAreaTableStore.LookupEntry(areaflag);
+    return sAreaTableStore.LookupEntry(area_id);
 }
 
 AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag, uint32 map_id)
 {
     if (area_flag)
-        return sAreaTableStore.LookupEntry(area_flag);
+    {
+        auto itr = sAreaEntryByFlagAndMap.find(std::make_pair(map_id, area_flag));
+        return itr != sAreaEntryByFlagAndMap.end() ? itr->second : nullptr;
+    }
 
     if (MapEntry const* mapEntry = sMapStore.LookupEntry(map_id))
         return GetAreaEntryByAreaID(mapEntry->linked_zone);
