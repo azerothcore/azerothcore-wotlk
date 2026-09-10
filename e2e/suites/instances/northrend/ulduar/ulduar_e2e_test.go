@@ -62,8 +62,9 @@ func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27556
 // PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27557
-// Kologarn corpse persists across grid reload as a bridge at health 0.
-func TestAC_27556_KologarnCorpsePersistsAfterReload(t *testing.T) {
+// Verifies Kologarn's corpse persists across same-instance re-entry at health 0.
+// Note: InstanceMap full unload requires Instance.UnloadDelay (30m) or server restart.
+func TestAC_27556_KologarnCorpsePersistsOnReentry(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "instances", "issue"},
 		Runtime:  "med",
@@ -97,14 +98,14 @@ func TestAC_27556_KologarnCorpsePersistsAfterReload(t *testing.T) {
 		e2eharness.Assertf(t, "Kologarn still alive hp=%d after DamageKill", hp)
 	}
 
-	// Teleport outside Ulduar and back to trigger grid/cell reload.
+	// Teleport outside Ulduar and back (same-instance re-entry).
 	bot.TeleNamed(t, "Ulduar")
 	bot.TeleNamed(t, "Kologarn")
 	bot.Teleport(t, posBridge.X, posBridge.Y, posBridge.Z, posBridge.Map)
 
 	koloReloaded := bot.WaitUnit(t, e2eharness.CreatureKologarn, 30*time.Second)
 	if koloReloaded == 0 {
-		e2eharness.Assertf(t, "Kologarn corpse not found in object cache after cell reload (issue #27556)")
+		e2eharness.Assertf(t, "Kologarn corpse not found in object cache after re-entry (issue #27556)")
 	}
 
 	hpReloaded, _ := bot.UnitHP(koloReloaded)
@@ -114,13 +115,13 @@ func TestAC_27556_KologarnCorpsePersistsAfterReload(t *testing.T) {
 
 	postObj := bot.World.GetObject(koloReloaded)
 	if postObj == nil {
-		e2eharness.Assertf(t, "Kologarn corpse object nil in cache after reload")
+		e2eharness.Assertf(t, "Kologarn corpse object nil in cache after re-entry")
 	} else if math.Abs(float64(postObj.PosZ-initialZ)) > 2.0 {
 		e2eharness.Assertf(t, "Kologarn corpse Z position shifted: before=%.2f after=%.2f", initialZ, postObj.PosZ)
 	}
 
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS AC#27556 Kologarn corpse persists across grid reload at health 0 (z=%.2f)", postObj.PosZ)
+	t.Logf("PASS AC#27556 Kologarn corpse persists across same-instance re-entry at health 0 (z=%.2f)", postObj.PosZ)
 }
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27095

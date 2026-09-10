@@ -666,6 +666,8 @@ public:
                         creature->SetPosition(creature->GetHomePosition());
                         creature->setDeathState(DeathState::Corpse);
                         creature->SetHealth(0);
+                        creature->SetStandState(UNIT_STAND_STATE_STAND);
+                        creature->ReplaceAllDynamicFlags(0);
                         creature->SetCorpseDelay(7 * DAY);
                         creature->SetCorpseRemoveTime(7 * DAY);
                         creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
