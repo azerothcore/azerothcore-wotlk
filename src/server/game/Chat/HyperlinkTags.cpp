@@ -263,7 +263,10 @@ bool Acore::Hyperlinks::LinkTags::trade::StoreTo(TradeskillLinkData& val, std::s
 #ifdef MOD_PLAYERBOTS
 bool Acore::Hyperlinks::LinkTags::found::StoreTo(FoundLinkData& val, std::string_view text)
 {
-    // format is "<rawguid>:<entry>:" - the trailing delimiter leaves the tokenizer empty after two fields
+    // format is "<rawguid>:<entry>:"
+    if (!text.ends_with(HYPERLINK_DATA_DELIMITER))
+        return false;
+
     HyperlinkDataTokenizer t(text);
     return t.TryConsumeTo(val.RawGuid) && t.TryConsumeTo(val.Entry) && t.IsEmpty();
 }
