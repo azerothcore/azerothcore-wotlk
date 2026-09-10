@@ -704,11 +704,11 @@ public: /* CommandSC */
 
 public: /* DatabaseScript */
 
-    bool OnDatabasesLoading();
+    bool OnModuleDatabasesLoading();
     void OnAfterDatabasesLoaded(uint32 updateFlags);
     void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> creatureTemplateStore);
-    void OnDatabasesKeepAlive();
-    void OnDatabasesClosing();
+    void OnModuleDatabasesKeepAlive();
+    void OnModuleDatabasesClosing();
     void OnDatabaseWarnAboutSyncQueries(bool apply);
     void OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam);
     void OnDatabaseGetDBRevision(std::string& revision);

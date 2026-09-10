@@ -19,7 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-bool ScriptMgr::OnDatabasesLoading()
+bool ScriptMgr::OnModuleDatabasesLoading()
 {
     auto ret = IsValidBoolScript<DatabaseScript>([&](DatabaseScript* script)
     {
@@ -44,7 +44,7 @@ void ScriptMgr::OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplat
     CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_AFTER_DATABASE_LOAD_CREATURETEMPLATES, script->OnAfterDatabaseLoadCreatureTemplates(creatureTemplates));
 }
 
-void ScriptMgr::OnDatabasesKeepAlive()
+void ScriptMgr::OnModuleDatabasesKeepAlive()
 {
     ExecuteScript<DatabaseScript>([&](DatabaseScript* script)
     {
@@ -52,7 +52,7 @@ void ScriptMgr::OnDatabasesKeepAlive()
     });
 }
 
-void ScriptMgr::OnDatabasesClosing()
+void ScriptMgr::OnModuleDatabasesClosing()
 {
     ExecuteScript<DatabaseScript>([&](DatabaseScript* script)
     {
