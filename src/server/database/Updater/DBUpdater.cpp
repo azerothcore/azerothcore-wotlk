@@ -20,6 +20,7 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
+#include "DatabaseWorkerPoolAdapter.h"
 #include "Log.h"
 #include "StartProcess.h"
 #include "UpdateFetcher.h"
@@ -578,27 +579,31 @@ void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string co
 } // namespace UpdaterImpl
 
 template<class T>
-bool DBUpdater<T>::Create(DatabaseUpdatePool& pool)
+bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
-    return UpdaterImpl::Create(pool);
+    DatabaseWorkerPoolAdapter<T> adapter(pool);
+    return UpdaterImpl::Create(adapter);
 }
 
 template<class T>
-bool DBUpdater<T>::Update(DatabaseUpdatePool& pool, std::string_view modulesList /*= {}*/)
+bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList /*= {}*/)
 {
-    return UpdaterImpl::Update(pool, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() }, modulesList);
+    DatabaseWorkerPoolAdapter<T> adapter(pool);
+    return UpdaterImpl::Update(adapter, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() }, modulesList);
 }
 
 template<class T>
-bool DBUpdater<T>::Update(DatabaseUpdatePool& pool, std::vector<std::string> const* setDirectories)
+bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories)
 {
-    return UpdaterImpl::Update(pool, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() }, setDirectories);
+    DatabaseWorkerPoolAdapter<T> adapter(pool);
+    return UpdaterImpl::Update(adapter, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() }, setDirectories);
 }
 
 template<class T>
-bool DBUpdater<T>::Populate(DatabaseUpdatePool& pool)
+bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 {
-    return UpdaterImpl::Populate(pool, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() });
+    DatabaseWorkerPoolAdapter<T> adapter(pool);
+    return UpdaterImpl::Populate(adapter, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() });
 }
 
 bool ModuleDBUpdater::Create(DatabaseUpdatePool& pool)

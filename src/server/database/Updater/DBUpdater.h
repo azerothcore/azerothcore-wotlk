@@ -83,10 +83,10 @@ public:
     static std::string GetBaseFilesDirectory();
     static bool IsEnabled(uint32 const updateMask);
     static BaseLocation GetBaseLocationType();
-    static bool Create(DatabaseUpdatePool& pool);
-    static bool Update(DatabaseUpdatePool& pool, std::string_view modulesList = {});
-    static bool Update(DatabaseUpdatePool& pool, std::vector<std::string> const* setDirectories);
-    static bool Populate(DatabaseUpdatePool& pool);
+    static bool Create(DatabaseWorkerPool<T>& pool);
+    static bool Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList = {});
+    static bool Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories);
+    static bool Populate(DatabaseWorkerPool<T>& pool);
 
     // module
     static std::string GetDBModuleName();

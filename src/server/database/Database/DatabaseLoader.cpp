@@ -16,7 +16,6 @@
  */
 
 #include "DatabaseLoader.h"
-#include "DatabaseWorkerPoolAdapter.h"
 #include "Config.h"
 #include "DBUpdater.h"
 #include "DatabaseEnv.h"
@@ -107,8 +106,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
             if ((error == ER_BAD_DB_ERROR) && updatesEnabledForThis && _autoSetup)
             {
                 // Try to create the database and connect again if auto setup is enabled
-                DatabaseWorkerPoolAdapter<T> adapter(pool);
-                if (DBUpdater<T>::Create(adapter) && (!pool.Open()))
+                if (DBUpdater<T>::Create(pool) && (!pool.Open()))
                 {
                     error = 0;
                 }
@@ -137,8 +135,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
     {
         _populate.push([this, name, &pool]() -> bool
         {
-            DatabaseWorkerPoolAdapter<T> adapter(pool);
-            if (!DBUpdater<T>::Populate(adapter))
+            if (!DBUpdater<T>::Populate(pool))
             {
                 LOG_ERROR(_logger, "Could not populate the {} database, see log for details.", name);
                 return false;
@@ -149,8 +146,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
         _update.push([this, name, &pool]() -> bool
         {
-            DatabaseWorkerPoolAdapter<T> adapter(pool);
-            if (!DBUpdater<T>::Update(adapter, _modulesList))
+            if (!DBUpdater<T>::Update(pool, _modulesList))
             {
                 LOG_ERROR(_logger, "Could not update the {} database, see log for details.", name);
                 return false;
