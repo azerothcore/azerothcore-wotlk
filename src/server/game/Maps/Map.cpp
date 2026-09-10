@@ -862,9 +862,7 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
         creature->UpdatePositionData();
     }
     else
-    {
         creature->SetPositionDataUpdate();
-    }
 
     creature->UpdateObjectVisibility(false);
 }
