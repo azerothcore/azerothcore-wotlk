@@ -1166,7 +1166,8 @@ void Aura::SetLoadedState(int32 maxduration, int32 duration, int32 charges, uint
             m_effects[i]->SetCanBeRecalculated(recalculateMask & (1 << i));
             m_effects[i]->CalculatePeriodic(caster, false, true);
             m_effects[i]->CalculateSpellMod();
-            m_effects[i]->RecalculateAmount(caster);
+            if (caster)
+                m_effects[i]->RecalculateAmount(caster);
         }
 }
 
