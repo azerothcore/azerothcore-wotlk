@@ -49,11 +49,6 @@ void ScriptMgr::OnDatabaseWarnAboutSyncQueries(bool apply)
     CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_DATABASE_WARN_ABOUT_SYNC_QUERIES, script->OnDatabaseWarnAboutSyncQueries(apply));
 }
 
-void ScriptMgr::OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam)
-{
-    CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_DATABASE_SELECT_INDEX_LOGOUT, script->OnDatabaseSelectIndexLogout(player, statementIndex, statementParam));
-}
-
 void ScriptMgr::OnDatabaseGetDBRevision(std::string& revision)
 {
     CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_DATABASE_GET_DB_REVISION, script->OnDatabaseGetDBRevision(revision));

@@ -29,7 +29,6 @@ enum DatabaseHook
     DATABASEHOOK_ON_MODULE_DATABASES_KEEPALIVE,
     DATABASEHOOK_ON_MODULE_DATABASES_CLOSING,
     DATABASEHOOK_ON_DATABASE_WARN_ABOUT_SYNC_QUERIES,
-    DATABASEHOOK_ON_DATABASE_SELECT_INDEX_LOGOUT,
     DATABASEHOOK_ON_DATABASE_GET_DB_REVISION,
     DATABASEHOOK_END
 };
@@ -83,15 +82,6 @@ public:
      * @param apply True when the warning is being enabled
      */
     virtual void OnDatabaseWarnAboutSyncQueries(bool /*apply*/) { }
-
-    /**
-     * @brief Called while building the statement that marks a logging-out account offline.
-     *
-     * @param player The player logging out
-     * @param statementIndex Prepared statement index to use instead of the core's
-     * @param statementParam Single uint32 parameter bound to that statement
-     */
-    virtual void OnDatabaseSelectIndexLogout(Player* /*player*/, uint32& /*statementIndex*/, uint32& /*statementParam*/) { }
 
     /**
      * @brief Called by .server info to collect the revision of a module-owned database.
