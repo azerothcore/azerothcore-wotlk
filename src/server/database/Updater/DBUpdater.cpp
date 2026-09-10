@@ -214,7 +214,8 @@ QueryResult Retrieve(DatabaseUpdatePool& pool, std::string const& query);
 void Apply(DatabaseUpdatePool& pool, std::string const& query);
 void ApplyFile(DatabaseUpdatePool& pool, Path const& path);
 void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string const& user,
-               std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path);
+               std::string const& password, std::string const& port_or_socket, std::string const& database,
+               std::string const& ssl, Path const& path);
 
 bool Create(DatabaseUpdatePool& pool)
 {
@@ -249,8 +250,9 @@ bool Create(DatabaseUpdatePool& pool)
 
     try
     {
-        ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
-                                pool.GetConnectionInfo()->port_or_socket, "", pool.GetConnectionInfo()->ssl, temp);
+        ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user,
+                  pool.GetConnectionInfo()->password, pool.GetConnectionInfo()->port_or_socket, "",
+                  pool.GetConnectionInfo()->ssl, temp);
     }
     catch (UpdateException&)
     {
@@ -483,12 +485,14 @@ void Apply(DatabaseUpdatePool& pool, std::string const& query)
 
 void ApplyFile(DatabaseUpdatePool& pool, Path const& path)
 {
-    ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
-                            pool.GetConnectionInfo()->port_or_socket, pool.GetConnectionInfo()->database, pool.GetConnectionInfo()->ssl, path);
+    ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user,
+              pool.GetConnectionInfo()->password, pool.GetConnectionInfo()->port_or_socket,
+              pool.GetConnectionInfo()->database, pool.GetConnectionInfo()->ssl, path);
 }
 
 void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string const& user,
-                             std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path)
+               std::string const& password, std::string const& port_or_socket, std::string const& database,
+               std::string const& ssl, Path const& path)
 {
     std::string configTempDir = sConfigMgr->GetOption<std::string>("TempDir", "");
 
@@ -579,6 +583,12 @@ void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string co
 } // namespace UpdaterImpl
 
 template<class T>
+ModuleDBUpdaterInfo DBUpdater<T>::GetUpdaterInfo()
+{
+    return { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() };
+}
+
+template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
     DatabaseWorkerPoolAdapter<T> adapter(pool);
@@ -589,21 +599,21 @@ template<class T>
 bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList /*= {}*/)
 {
     DatabaseWorkerPoolAdapter<T> adapter(pool);
-    return UpdaterImpl::Update(adapter, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() }, modulesList);
+    return UpdaterImpl::Update(adapter, GetUpdaterInfo(), modulesList);
 }
 
 template<class T>
 bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories)
 {
     DatabaseWorkerPoolAdapter<T> adapter(pool);
-    return UpdaterImpl::Update(adapter, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() }, setDirectories);
+    return UpdaterImpl::Update(adapter, GetUpdaterInfo(), setDirectories);
 }
 
 template<class T>
 bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 {
     DatabaseWorkerPoolAdapter<T> adapter(pool);
-    return UpdaterImpl::Populate(adapter, { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() });
+    return UpdaterImpl::Populate(adapter, GetUpdaterInfo());
 }
 
 bool ModuleDBUpdater::Create(DatabaseUpdatePool& pool)
@@ -611,7 +621,8 @@ bool ModuleDBUpdater::Create(DatabaseUpdatePool& pool)
     return UpdaterImpl::Create(pool);
 }
 
-bool ModuleDBUpdater::Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::string_view modulesList /*= {}*/)
+bool ModuleDBUpdater::Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info,
+                             std::string_view modulesList /*= {}*/)
 {
     return UpdaterImpl::Update(pool, info, modulesList);
 }
