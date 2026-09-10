@@ -33,7 +33,8 @@ enum Timers
 enum Distances
 {
     RADIUS_RING_OF_LAW      = 80,
-    DISTANCE_EMPEROR_ROOM   = 125
+    DISTANCE_EMPEROR_ROOM   = 125,
+    DISTANCE_VAULT_WARDER   = 15
 };
 
 enum PrincessQuests
@@ -317,7 +318,7 @@ struct instance_blackrock_depths : public InstanceScript
             case NPC_WARBRINGER_CONSTRUCT:
                 // only the four constructs in the Relic Coffer room belong to the vault event,
                 // the rest of the Black Vault spawns are regular trash
-                if (creature->GetDistance2d(VaultWarderCenter.GetPositionX(), VaultWarderCenter.GetPositionY()) > 15.0f)
+                if (creature->GetDistance2d(VaultWarderCenter.GetPositionX(), VaultWarderCenter.GetPositionY()) > (float)DISTANCE_VAULT_WARDER)
                     break;
                 // dead spawns with a pending respawn are loaded too: a corpse must not be frozen or
                 // counted, or the restarted event could not complete until its respawn timer expires
@@ -448,7 +449,8 @@ struct instance_blackrock_depths : public InstanceScript
             case NPC_WATCHMAN_DOOMGRIP:
                 if (GetData(TYPE_VAULT) == IN_PROGRESS)
                 {
-                    // regular Black Vault trash shares the entry but is not in the list, remove() is a no-op for it
+                    // regular Black Vault trash shares the entry but is not in the list,
+                    // remove() is a no-op for it
                     VaultWarderGUIDs.remove(unit->GetGUID());
                     if (VaultWarderGUIDs.empty())
                         SetData(TYPE_VAULT, DONE);
