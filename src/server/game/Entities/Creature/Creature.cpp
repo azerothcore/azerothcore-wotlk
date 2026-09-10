@@ -513,7 +513,7 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data)
 
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
-    m_cachedScriptIdEntry = 0;                              // force GetScriptId() to re-resolve for this (re)init
+    CachedScriptIdEntry = 0;                              // force GetScriptId() to re-resolve for this (re)init
 
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
@@ -787,7 +787,7 @@ void Creature::Update(uint32 diff)
             // could have changed. (Creatures in combat, changing grid cell, or zone-wide visible
             // re-derive immediately in CreatureRelocation and never reach this.)
             if (IsPositionDataUpdatePending() &&
-                (!isMoving() || GetExactDistSq(m_lastMovementFlagsPos) >= CREATURE_MOVEMENT_FLAGS_REFRESH_DIST_SQ))
+                (!isMoving() || GetExactDistSq(LastMovementFlagsPos) >= CREATURE_MOVEMENT_FLAGS_REFRESH_DIST_SQ))
             {
                 UpdatePositionData(); // -> ProcessTerrainStatusUpdate() -> UpdateMovementFlags() re-baselines m_lastMovementFlagsPos
             }
@@ -3207,8 +3207,8 @@ uint32 Creature::GetScriptId() const
 
     // Cache the resolved id per entry. Re-resolve whenever the entry changes - InitEntry(),
     // UpdateEntry(), or a bare SetEntry() done by transform / entry-swap scripts.
-    if (entry && m_cachedScriptIdEntry == entry)
-        return m_cachedScriptId;
+    if (entry && CachedScriptIdEntry == entry)
+        return CachedScriptId;
 
     uint32 scriptId = 0;
     if (CreatureData const* creatureData = GetCreatureData())
@@ -3219,8 +3219,8 @@ uint32 Creature::GetScriptId() const
         if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry))
             scriptId = cInfo->ScriptID;
 
-    m_cachedScriptId = scriptId;
-    m_cachedScriptIdEntry = entry;
+    CachedScriptId = scriptId;
+    CachedScriptIdEntry = entry;
     return scriptId;
 }
 
@@ -3476,7 +3476,7 @@ void Creature::UpdateMovementFlags()
 {
     // Track where the flags were last evaluated - Creature::Update() uses this as the throttle
     // baseline for a wandering creature (see Map::CreatureRelocation).
-    m_lastMovementFlagsPos.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
+    LastMovementFlagsPos.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
 
     // Do not update movement flags if creature is controlled by a player (charm/vehicle)
     if (m_movedByPlayer)
