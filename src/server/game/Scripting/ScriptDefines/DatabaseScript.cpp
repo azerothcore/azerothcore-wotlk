@@ -49,9 +49,9 @@ void ScriptMgr::OnDatabaseWarnAboutSyncQueries(bool apply)
     CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_DATABASE_WARN_ABOUT_SYNC_QUERIES, script->OnDatabaseWarnAboutSyncQueries(apply));
 }
 
-void ScriptMgr::OnDatabaseGetDBRevision(std::string& revision)
+void ScriptMgr::OnDatabaseGetDBRevision(std::map<std::string, std::string>& revisions)
 {
-    CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_DATABASE_GET_DB_REVISION, script->OnDatabaseGetDBRevision(revision));
+    CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_DATABASE_GET_DB_REVISION, script->OnDatabaseGetDBRevision(revisions));
 }
 
 DatabaseScript::DatabaseScript(char const* name, std::vector<uint16> enabledHooks)

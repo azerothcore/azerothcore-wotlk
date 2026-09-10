@@ -710,7 +710,7 @@ public: /* DatabaseScript */
     void OnModuleDatabasesKeepAlive();
     void OnModuleDatabasesClosing();
     void OnDatabaseWarnAboutSyncQueries(bool apply);
-    void OnDatabaseGetDBRevision(std::string& revision);
+    void OnDatabaseGetDBRevision(std::map<std::string, std::string>& revisions);
 
 public: /* WorldObjectScript */
 

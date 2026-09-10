@@ -19,6 +19,8 @@
 #define SCRIPT_OBJECT_DATABASE_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <map>
+#include <string>
 #include <vector>
 
 enum DatabaseHook
@@ -86,9 +88,9 @@ public:
     /**
      * @brief Called by .server info to collect the revision of a module-owned database.
      *
-     * @param revision Revision string to report
+     * @param revisions Revision string to report, keyed by module name
      */
-    virtual void OnDatabaseGetDBRevision(std::string& /*revision*/) { }
+    virtual void OnDatabaseGetDBRevision(std::map<std::string, std::string>& /*revisions*/) { }
 
 };
 
