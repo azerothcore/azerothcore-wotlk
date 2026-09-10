@@ -43,6 +43,13 @@ void ModuleDatabasePool::SetConnectionInfo(std::string_view infoString, uint8 sy
 
 uint32 ModuleDatabasePool::Open()
 {
+    if (!_synchThreads)
+    {
+        LOG_ERROR("sql.driver", "ModuleDatabasePool: database `{}` was configured with 0 synchronous connections, "
+            "at least one is required.", _connectionInfo.database);
+        return 1;
+    }
+
     for (uint8 i = 0; i < _synchThreads; ++i)
     {
         auto conn = std::unique_ptr<MySQLConnection>(CreateConnection(_connectionInfo));
