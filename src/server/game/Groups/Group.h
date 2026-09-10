@@ -312,7 +312,7 @@ public:
     void EndRoll(Loot* loot);
     void RemovePlayerFromRolls(ObjectGuid guid);
 
-    Rolls GetRolls() const { return RollId; }
+    std::vector<Roll const*> GetRolls() const { return { RollId.begin(), RollId.end() }; }
 
     // related to disenchant rolls
     void ResetMaxEnchantingLevel();
