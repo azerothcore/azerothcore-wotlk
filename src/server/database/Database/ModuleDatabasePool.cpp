@@ -24,6 +24,7 @@
 #include "Transaction.h"
 #include <limits>
 #include <mysqld_error.h>
+#include <thread>
 
 ModuleDatabasePool::ModuleDatabasePool()
     : _connectionInfo(""), _synchThreads(0)
@@ -228,6 +229,9 @@ MySQLConnection* ModuleDatabasePool::GetFreeConnection()
         //! Must be matched with connection->Unlock() or you will get deadlocks
         if (connection->LockIfReady())
             break;
+
+        if (i % num_cons == 0)
+            std::this_thread::yield();
     }
 
     return connection;
