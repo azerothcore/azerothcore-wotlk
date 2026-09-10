@@ -288,7 +288,7 @@ bool Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::stri
         {
             LOG_WARN("sql.updates", "> Table '{}' not exist! Try add based table", tableName);
 
-            Path const temp(info.baseFilesDirectory + tableName + ".sql");
+            Path const temp = Path(info.baseFilesDirectory) / (tableName + ".sql");
 
             try
             {
@@ -357,7 +357,7 @@ bool Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::vect
         auto checkTable = Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '{}'", tableName));
         if (!checkTable)
         {
-            Path const temp(info.baseFilesDirectory + tableName + ".sql");
+            Path const temp = Path(info.baseFilesDirectory) / (tableName + ".sql");
             try
             {
                 ApplyFile(pool, temp);
