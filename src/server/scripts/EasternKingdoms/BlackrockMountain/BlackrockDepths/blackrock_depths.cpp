@@ -1125,6 +1125,7 @@ struct npc_rocknot : public npc_escortAI
     {
         if (type == DATA_CAN_START_LOVE_POTION)
             return CanStartLovePotionEvent();
+
         if (type == DATA_LOVE_POTION_ACTIVE)
             return _lovePotionEvent;
 
