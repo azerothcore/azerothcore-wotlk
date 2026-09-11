@@ -312,6 +312,7 @@ public:
     void EndRoll(Loot* loot);
     void RemovePlayerFromRolls(ObjectGuid guid);
 
+    // Snapshot of the active rolls, roll is deleted after a roll finishes. Do not cache the pointers across ticks.
     std::vector<Roll const*> GetRolls() const { return { RollId.begin(), RollId.end() }; }
 
     // related to disenchant rolls
