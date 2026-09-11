@@ -254,6 +254,7 @@ struct boss_alar : public BossAI
         }, 30s);
         ScheduleTimedEvent(34s, [&]
         {
+            _noMelee = true;
             me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], FORCED_MOVEMENT_NONE, 0.f, false, true);
             scheduler.DelayAll(15s);
         }, 57s);
@@ -315,10 +316,6 @@ struct boss_alar : public BossAI
 
         switch (id)
         {
-            case EVENT_CHARGE:
-            case EVENT_CHARGE_PREPATH:
-                DoCastAOE(SPELL_FLAME_BUFFET);
-                break;
             case POINT_QUILL:
                 scheduler.CancelGroup(GROUP_FLAME_BUFFET);
                 scheduler.Schedule(1s, [this](TaskContext)
@@ -345,8 +342,18 @@ struct boss_alar : public BossAI
     {
         scheduler.Schedule(timer, GROUP_FLAME_BUFFET, [this](TaskContext context)
         {
-            if (!me->SelectNearestTarget(me->GetCombatReach()) && !me->isMoving())
-                DoCastAOE(SPELL_FLAME_BUFFET);
+            if (_platform < POINT_MIDDLE)
+            {
+                if (!me->SelectNearestTarget(me->GetCombatReach()) && !me->isMoving())
+                    DoCastAOE(SPELL_FLAME_BUFFET);
+            }
+            else if (!_noMelee && !me->HasUnitState(UNIT_STATE_CHARGING))
+            {
+                // Phase two checks the tank, not nearby DPS or the random Charge target.
+                if (Unit* victim = me->GetThreatMgr().GetCurrentVictim())
+                    if (!me->IsWithinMeleeRange(victim))
+                        DoCastAOE(SPELL_FLAME_BUFFET);
+            }
 
             context.Repeat(2s);
         });
