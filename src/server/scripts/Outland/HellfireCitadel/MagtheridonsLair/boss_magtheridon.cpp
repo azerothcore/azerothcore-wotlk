@@ -169,6 +169,7 @@ struct boss_magtheridon : public BossAI
             context.Repeat(56300ms, 64300ms);
         }).Schedule(55650ms, [this](TaskContext context)
         {
+            Talk(SAY_EMOTE_NOVA);
             DoCastSelf(SPELL_BLAST_NOVA);
             scheduler.DelayAll(10s);
             context.Repeat(54350ms, 55400ms);
