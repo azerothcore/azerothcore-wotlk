@@ -1941,6 +1941,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].Effect = 0;
     });
 
+    // Ulduar, General Vezax, Shadow Crash (area aura)
+    ApplySpellFix({ 63277 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_DO_NOT_DISPLAY_DURATION;
+    });
+
     // Boom (XT-002)
     ApplySpellFix({ 62834 }, [](SpellInfo* spellInfo)
     {
