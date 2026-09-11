@@ -1046,18 +1046,7 @@ struct npc_rocknot : public npc_escortAI
 
         _breakKegTimer = 0;
         _breakDoorTimer = 0;
-        if (!_lovePotionComplete)
-            _lovePotionEvent = false;
-
         _aleEventStarted = false;
-
-        if (_lovePotionComplete)
-        {
-            me->setActive(false);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            me->GetMotionMaster()->MoveIdle();
-        }
     }
 
     void DoAction(int32 action) override
