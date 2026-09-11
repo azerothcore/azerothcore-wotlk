@@ -797,6 +797,12 @@ public:
                     if (GetBossState(BOSS_LEVIATHAN) >= DONE)
                         gameObject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     break;
+                case GO_ULDUAR_PROTECTIVE_BUBBLE:
+                    if (GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) == MAGE_BARRIER_LOWERED
+                        || GetPersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE) != 0
+                        || IsBossDone(BOSS_LEVIATHAN))
+                        gameObject->DespawnOrUnsummon(0ms, 7_days);
+                    break;
                 case GO_KOLOGARN_BRIDGE:
                     OpenIfDone(BOSS_KOLOGARN, gameObject, GO_STATE_READY);
                     break;
@@ -872,6 +878,19 @@ public:
             }
         }
 
+        // A shattered Rare Cache stays down for the DB respawn delay (7 days), so it has to be
+        // brought back with Hodir or the next attempt can never earn it.
+        void respawnHodirHardmodeChest()
+        {
+            if (GetBossState(BOSS_HODIR) == DONE)
+                return;
+
+            _hmHodir = true;
+
+            if (GameObject* go = GetHodirChest(true))
+                go->Respawn();
+        }
+
         void setChestsLootable(uint32 boss)
         {
             if (boss)
@@ -901,6 +920,9 @@ public:
         {
             switch (type)
             {
+                case TYPE_HODIR_HM_RESET:
+                    respawnHodirHardmodeChest();
+                    break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = GetHodirChest(true))
                     {

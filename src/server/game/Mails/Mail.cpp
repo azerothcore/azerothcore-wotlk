@@ -25,6 +25,7 @@
 #include "Item.h"
 #include "Log.h"
 #include "MailMgr.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -198,6 +199,12 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     if (pReceiver)
         prepareItems(pReceiver, trans);                            // generate mail template items
 
+    // Callers that only know the receiver's guid must still reach an online receiver's in-memory
+    // mailbox, otherwise the mail is written to the database only and stays invisible (and
+    // unannounced) until that character relogs
+    if (!pReceiver)
+        pReceiver = ObjectAccessor::FindConnectedPlayer(ObjectGuid::Create<HighGuid::Player>(receiver.GetPlayerGUIDLow()));
+
     uint32 mailId = sObjectMgr->GenerateMailID();
 
     time_t deliver_time = GameTime::GetGameTime().count() + deliver_delay;
@@ -290,6 +297,11 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
             {
                 pReceiver->AddMItem(mailItemIter->second);
             }
+
+            // The receiver owns the items now, so drop them from the draft without deleting them.
+            // The offline path below does the same through deleteIncludedItems, and a draft reused
+            // for another receiver must not attach them a second time
+            m_items.clear();
         }
     }
     else if (!m_items.empty())
