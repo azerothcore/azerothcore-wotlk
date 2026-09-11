@@ -211,13 +211,6 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     if (pUser->m_mover != pUser)
         return;
 
-    // xinef: additional check, client outputs message on its own
-    if (!pUser->IsAlive())
-    {
-        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, nullptr, nullptr);
-        return;
-    }
-
     uint8 bagIndex, slot;
 
     recvPacket >> bagIndex >> slot;
@@ -228,6 +221,15 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     if (!item)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        return;
+    }
+
+    // The client locks the item when it sends CMSG_OPEN_ITEM and only unlocks it on a loot
+    // response for that item's guid, so a plain equip error would leave it grayed out until /reload.
+    if (!pUser->IsAlive())
+    {
+        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, item, nullptr);
+        pUser->SendLootRelease(item->GetGUID());
         return;
     }
 
