@@ -642,6 +642,7 @@ struct npc_expedition_commander : public ScriptedAI
             case ACTION_START_PERMA_GROUND:
                 _started = false;
                 _events.Reset();
+                StopControllers();
                 DestroyHarpoons();
                 break;
             case ACTION_DESTROY_HARPOONS:
