@@ -1045,6 +1045,7 @@ struct npc_rocknot : public npc_escortAI
         _breakDoorTimer = 0;
         if (!_lovePotionComplete)
             _lovePotionEvent = false;
+
         _aleEventStarted = false;
 
         if (_lovePotionComplete)
