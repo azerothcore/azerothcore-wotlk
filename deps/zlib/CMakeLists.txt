@@ -38,6 +38,10 @@ else()
     zutil.c
   )
 
+  # prefix the zlib symbols so external modules can bring their own (via, e.g.,
+  # a library that already has them compiled in) without interfering with ours.
+  SET(Z_PREFIX 1)
+
   add_library(zlib STATIC
     ${zlib_STAT_SRCS})
 
