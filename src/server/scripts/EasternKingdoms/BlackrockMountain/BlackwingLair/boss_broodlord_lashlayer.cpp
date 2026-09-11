@@ -170,6 +170,7 @@ struct go_suppression_device : public GameObjectAI
     {
         if (action == ACTION_DEACTIVATE)
         {
+            Deactivate();
             _events.CancelEvent(EVENT_SUPPRESSION_RESET);
         }
         else if (action == ACTION_DISARMED)
@@ -180,6 +181,16 @@ struct go_suppression_device : public GameObjectAI
             if (_instance->GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
                 _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, 30s, 120s);
         }
+    }
+
+    void OnStateChanged(uint32 state, Unit* /*unit*/) override
+    {
+        if (state != GO_JUST_DEACTIVATED)
+            return;
+
+        // Disarm Trap must disable the device without despawning it.
+        me->SetLootState(GO_READY);
+        DoAction(ACTION_DISARMED);
     }
 
     void Activate()
