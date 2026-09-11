@@ -147,7 +147,7 @@ func gmSystemMessages(t *testing.T, bot *e2eharness.ScenarioBot, cmd string) []s
 	var msgs []string
 	cancel := bot.World.AddPacketHook(func(op uint16, data []byte) {
 		// type u8, lang u32, sender u64, unk u32, target u64, len u32, text
-		if op != client.SmsgMessageChat || len(data) < 29 || data[0] != 0xFF {
+		if op != client.SmsgMessageChat || len(data) < 29 || data[0] != 0x00 { // CHAT_MSG_SYSTEM
 			return
 		}
 		n := int(binary.LittleEndian.Uint32(data[25:29]))
