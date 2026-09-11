@@ -22,7 +22,6 @@
 #include "DatabaseUpdatePool.h"
 #include "Define.h"
 #include "MySQLConnection.h"
-#include "MySQLPreparedStatement.h"
 #include "PreparedStatement.h"
 #include "StringFormat.h"
 #include <memory>
