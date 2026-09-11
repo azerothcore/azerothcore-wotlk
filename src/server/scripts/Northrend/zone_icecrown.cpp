@@ -1810,17 +1810,6 @@ public:
         void JustSummoned(Creature* summon) override
         {
             Summons.Summon(summon);
-            if (summon->GetEntry() == NPC_SCOURGE_DRUDGE || summon->GetEntry() == NPC_REANIMATED_CAPTAIN ||
-                summon->GetEntry() == NPC_HIDEOUS_PLAGUEBRINGER || summon->GetEntry() == NPC_HALOF_THE_DEATHBRINGER)
-            {
-                summon->SetHomePosition(DalforsPos[2]);
-                summon->SetReactState(REACT_PASSIVE);
-                summon->EngageWithTarget(me);
-                summon->m_Events.AddEventAtOffset([summon]()
-                {
-                    summon->SetReactState(REACT_AGGRESSIVE);
-                }, 5s);
-            }
         }
 
         void JustDied(Unit* /*killer*/) override
