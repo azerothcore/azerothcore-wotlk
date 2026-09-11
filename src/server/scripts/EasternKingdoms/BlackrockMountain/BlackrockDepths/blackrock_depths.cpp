@@ -939,6 +939,8 @@ private:
         if (!door)
             return false;
 
+        // players can open this door with the Grim Guzzler Key, so only close it again if we opened it
+        _doorOpenedByEvent = door->GetGoState() == GO_STATE_READY;
         door->SetGoState(GO_STATE_ACTIVE);
         return true;
     }
