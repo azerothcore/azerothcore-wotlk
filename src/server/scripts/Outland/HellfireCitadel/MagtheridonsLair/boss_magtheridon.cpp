@@ -72,22 +72,25 @@ enum Groups
 
 struct boss_magtheridon : public BossAI
 {
-    boss_magtheridon(Creature* creature) : BossAI(creature, DATA_MAGTHERIDON)
+    boss_magtheridon(Creature* creature) : BossAI(creature, DATA_MAGTHERIDON),
+        _castingQuake(false), _magReleased(false), _currentPhase(0)
     {    }
 
     void Reset() override
     {
-        BossAI::Reset();
+        // State first: BossAI::Reset() calls back into this AI through the instance.
         _currentPhase = 0;
         _castingQuake = false;
         _magReleased = false;
+
+        BossAI::Reset();
         _interruptScheduler.CancelAll();
         scheduler.Schedule(90s, [this](TaskContext context)
         {
-            if (!me->IsEngaged())
-            {
+            // Engaged from the Channeler pull, so key the idle taunt on the release, not on combat.
+            if (!_magReleased)
                 Talk(SAY_TAUNT);
-            }
+
             context.Repeat(90s);
         });
         DoCastSelf(SPELL_SHADOW_CAGE, true);
@@ -175,27 +178,31 @@ struct boss_magtheridon : public BossAI
         });
     }
 
-    void DoAction(int32 action) override
+    // Both release paths land here: the 2 minute timer and the last Channeler dying.
+    void ReleaseMagtheridon()
     {
-        if (action == ACTION_RELEASE_MAGTHERIDON)
-        {
-            if (_magReleased)
-                return;
+        if (_magReleased)
+            return;
 
-            Talk(SAY_EMOTE_FREE);
-            Talk(SAY_FREE);
-            scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK); //cancel regular countdown
-            _magReleased = true;
-            scheduler.Schedule(3s, [this](TaskContext)
-            {
-                ScheduleCombatEvents();
-            });
-        }
-        else if (action == ACTION_BANISH_SELF)
+        _magReleased = true;
+        Talk(SAY_EMOTE_FREE);
+        Talk(SAY_FREE);
+        scheduler.Schedule(3s, [this](TaskContext /*context*/)
         {
-            Talk(SAY_BANISH);
-            me->CastSpell(me, SPELL_SHADOW_CAGE_STUN, true);
-        }
+            ScheduleCombatEvents();
+        });
+    }
+
+    // Caged, he keeps UNIT_FLAG_IMMUNE_TO_PC, so every threat reference from the instance's
+    // SetInCombatWithZone() lands offline (ThreatReference::ShouldBeOffline) and the threat manager
+    // never engages him. Engage off the combat reference itself, so the encounter anchors to the
+    // Channeler pull and not to his release.
+    void JustEnteredCombat(Unit* who) override
+    {
+        if (IsEngaged())
+            return;
+
+        EngagementStart(who);
     }
 
     void JustEngagedWith(Unit* who) override
@@ -208,13 +215,65 @@ struct boss_magtheridon : public BossAI
             Talk(SAY_EMOTE_NEARLY);
         }).Schedule(120s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
-            Talk(SAY_EMOTE_FREE);
-            Talk(SAY_FREE);
-            _magReleased = true;
-        }).Schedule(123s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
-        {
-            ScheduleCombatEvents();
+            ReleaseMagtheridon();
         });
+    }
+
+    // Caged, he is engaged but never fights, so a wipe gets here through his own UpdateVictim() or
+    // through the instance, whichever creature updates first. BossAI's evade would trip
+    // CREATURE_FLAG_EXTRA_HARD_RESET and despawn him for 20s in front of the raid. Reset in place
+    // instead. Released, the normal boss evade applies.
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        if (_magReleased)
+        {
+            BossAI::EnterEvadeMode(why);
+            return;
+        }
+
+        // Also covers the re-entry from Reset() via instance->SetBossState(NOT_STARTED):
+        // EngagementOver() already ran.
+        if (!IsEngaged())
+            return;
+
+        me->CombatStop(true);
+        // BossAI::_Reset() bails while engaged, so end the engagement first. Reset() then drops the
+        // countdown through scheduler.CancelAll().
+        EngagementOver();
+        // He never walks home, so clear what BossAI::_JustReachedHome() would have.
+        me->setActive(false);
+        Reset();
+    }
+
+    // Read by the instance: IsImmuneToPC() lags the release by the 3s until ScheduleCombatEvents().
+    uint32 GetData(uint32 type) const override
+    {
+        return type == DATA_MAGTHERIDON_RELEASED ? uint32(_magReleased) : 0;
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+            case ACTION_RELEASE_MAGTHERIDON:
+                // Channelers died before the timer ran out. Drop the rest of it, or the 60s task
+                // still calls him nearly free after he is free.
+                scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK);
+                ReleaseMagtheridon();
+                break;
+            case ACTION_BANISH_SELF:
+                Talk(SAY_BANISH);
+                DoCastSelf(SPELL_SHADOW_CAGE_STUN, true);
+                break;
+            case ACTION_RESET_ENCOUNTER:
+                // Wipe signal from the instance. UpdateVictim() catches most wipes on its own, but
+                // not a survivor outside the room still holding him in combat. Freed, he fights on.
+                if (!_magReleased)
+                    EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            default:
+                break;
+        }
     }
 
     void UpdateAI(uint32 diff) override
