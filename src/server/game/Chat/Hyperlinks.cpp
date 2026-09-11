@@ -31,10 +31,13 @@ inline uint8 toHex(char c)
 {
     if (c >= '0' && c <= '9')
         return c - '0' + 0x10;
+
     if (c >= 'a' && c <= 'f')
         return c - 'a' + 0x1a;
+
     if (c >= 'A' && c <= 'F')
         return c - 'A' + 0x1a;
+
     return 0x00;
 }
 
