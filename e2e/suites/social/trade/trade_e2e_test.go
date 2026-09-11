@@ -9,9 +9,9 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 	"github.com/azerothcore/AzerothGhost/client"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
+	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
 
 // Cheap stackable trade bait (Linen Cloth).
@@ -104,6 +104,15 @@ func waitInvAtLeast(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, lea
 	n := waitInv(t, bot, entry, func(got int) bool { return got >= least }, timeout)
 	if n < least {
 		e2eharness.Preconditionf(t, "inventory entry=%d count=%d want>=%d", entry, n, least)
+	}
+	return n
+}
+
+func waitInvEqual(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, want int, timeout time.Duration) int {
+	t.Helper()
+	n := waitInv(t, bot, entry, func(got int) bool { return got == want }, timeout)
+	if n != want {
+		e2eharness.Assertf(t, "inventory entry=%d count=%d want=%d", entry, n, want)
 	}
 	return n
 }
@@ -233,23 +242,18 @@ func TestTrade_StackableMerge(t *testing.T) {
 	// After accept: totals conserved and B gains.
 	bag, slot := a.AddItemWait(t, itemLinenCloth, 5)
 	b.AddItemWait(t, itemLinenCloth, 3)
-	a0 := a.InventoryCount(t, itemLinenCloth)
-	b0 := b.InventoryCount(t, itemLinenCloth)
-	if a0 < 5 || b0 < 3 {
-		e2eharness.Preconditionf(t, "seed failed a=%d b=%d", a0, b0)
-	}
+	// Same oracle as the dual-accept test: client push can land before CharDB.
+	a0 := waitInvAtLeast(t, a, itemLinenCloth, 5, 10*time.Second)
+	b0 := waitInvAtLeast(t, b, itemLinenCloth, 3, 10*time.Second)
 
 	e2eharness.OpenTrade(t, a, b)
 	a.SetTradeItem(t, 0, bag, slot)
 	e2eharness.CompleteTrade(t, a, b)
 
-	a1 := a.InventoryCount(t, itemLinenCloth)
-	b1 := b.InventoryCount(t, itemLinenCloth)
+	a1 := waitInvEqual(t, a, itemLinenCloth, a0-5, 10*time.Second)
+	b1 := waitInvEqual(t, b, itemLinenCloth, b0+5, 10*time.Second)
 	if a1+b1 != a0+b0 {
 		e2eharness.Assertf(t, "linen not conserved %d+%d → %d+%d", a0, b0, a1, b1)
-	}
-	if b1 <= b0 {
-		e2eharness.Assertf(t, "B did not gain stack %d→%d", b0, b1)
 	}
 	t.Logf("PASS stackable merge/conserve a %d→%d b %d→%d", a0, a1, b0, b1)
 }

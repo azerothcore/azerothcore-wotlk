@@ -148,6 +148,7 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 		Prefix: "Freya",
 		Level:  80,
 	})
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
 
 	const (
 		npcFreya10          = uint32(32906)
@@ -173,16 +174,39 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 		return "Unknown"
 	}
 
-	bot.TeleNamed(t, "Freya")
+	// Raid interior pad (game_tele BossFreya). .go xyz is reliable; a missing
+	// custom "Freya" name hangs TeleNamed for 60s.
+	bot.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Freya pad tele map=%d", m)
+	}
 	bot.GoCreatureID(t, npcFreya10)
+	// Now drop GM. FlushWorld/.gps beside Freya can evade her out of cache,
+	// so re-acquire a living GUID before Engage/FaceUnit.
 	bot.CombatReady(t)
 
-	freyaGUID := bot.WaitUnitAny(t, 30*time.Second, npcFreya10, npcFreya25)
+	// Evade can leave a 0 HP object in cache. Re-poll until we have a living
+	// Freya, not only when the GUID disappears.
+	var freyaGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		freyaGUID = bot.WaitUnitAny(t, 10*time.Second, npcFreya10, npcFreya25)
+		if hp, maxHP := bot.UnitHP(freyaGUID); maxHP > 0 && hp > 0 {
+			if bot.World.GetObject(freyaGUID) != nil {
+				break
+			}
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Freya in cache after GoCreatureID (last=0x%X)", freyaGUID)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
 	bot.Engage(t, freyaGUID, 15*time.Second)
 
 	tr := e2eharness.NewSpawnSetTracker(allyEntries, 3*time.Second)
 	tr.KindOf = func(entry uint32) string { return label(entry) }
-	sets := tr.WaitSets(t, bot.World, 2, 4*time.Minute)
+	// Waves are ~60s apart. 90s covers two waves; 4m just delayed a miss.
+	sets := tr.WaitSets(t, bot.World, 2, 90*time.Second)
 	t.Logf("Set1=%s units=%d  Set2=%s units=%d  gap=%s",
 		sets[0].Kind, len(sets[0].Guids),
 		sets[1].Kind, len(sets[1].Guids),
@@ -191,7 +215,7 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 	// Detonating Lashers explode on death — if Set1 is Lashers, wait for Set3
 	// and kill Set2 (still: older set while a newer set is up).
 	if sets[0].Kind == "Lashers" {
-		sets = tr.WaitSets(t, bot.World, 3, 4*time.Minute)
+		sets = tr.WaitSets(t, bot.World, 3, 150*time.Second)
 	}
 
 	var older, newer e2eharness.SpawnSet
@@ -204,7 +228,6 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 		e2eharness.Preconditionf(t, "cannot find a non-Lasher older set to kill without collateral explosions")
 	}
 
-	time.Sleep(2 * time.Second)
 	tr.Poll(bot.World, time.Now())
 
 	var olderLive []uint64
@@ -249,9 +272,9 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 	for _, s := range bot.UnitsByEntry(120, allyEntries...) {
 		knownAtKill[s.GUID] = struct{}{}
 	}
-	fresh := bot.WaitNewUnits(t, knownAtKill, allyEntries, 90*time.Second)
+	fresh := bot.WaitNewUnits(t, knownAtKill, allyEntries, 75*time.Second)
 	if len(fresh) == 0 {
-		e2eharness.Preconditionf(t, "no new ally set spawned within 90s after older-set kill")
+		e2eharness.Preconditionf(t, "no new ally set spawned within 75s after older-set kill")
 	}
 	nextT := time.Now()
 	fromNewer := nextT.Sub(newer.SpawnT)
@@ -318,7 +341,7 @@ func TestUlduar_MultiBotLoginNearBossPad(t *testing.T) {
 		Level:  80,
 	})
 	for _, b := range bots {
-		b.TeleNamed(t, "Freya")
+		b.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
 	}
 	_, _, _, m0 := bots[0].Pos()
 	_, _, _, m1 := bots[1].Pos()
