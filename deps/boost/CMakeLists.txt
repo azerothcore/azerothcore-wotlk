@@ -34,7 +34,7 @@ endif()
 # Boost.System is header-only since 1.69; do not require it explicitly.
 set(BOOST_COMPONENTS filesystem program_options iostreams regex)
 
-sGetModuleSourceList(AC_MODULES_PRESENT)
+GetModuleSourceList(AC_MODULES_PRESENT)
 if(BUILD_APPLICATION_WORLDSERVER AND AC_MODULES_PRESENT)
   list(APPEND BOOST_COMPONENTS thread)
 endif()
