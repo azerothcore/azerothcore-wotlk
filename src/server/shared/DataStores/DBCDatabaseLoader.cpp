@@ -102,7 +102,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
                     dataOffset += sizeof(uint8);
                     break;
                 case FT_STRING:
-                    // not override string if new string is empty
+                    // an empty column means "not overridden", not "blank it"
                     if (fields[sqlColumnNumber].Get<std::string>().empty() && oldDataValue)
                         *reinterpret_cast<char**>(&dataValue[dataOffset]) = *reinterpret_cast<char**>(&oldDataValue[dataOffset]);
                     else
