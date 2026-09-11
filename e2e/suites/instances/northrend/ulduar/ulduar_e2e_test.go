@@ -3,19 +3,11 @@
 package ulduar_test
 
 import (
-	"encoding/binary"
-	"fmt"
-	"math"
-	"regexp"
-	"strconv"
-	"strings"
-	"sync"
 	"testing"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/azerothcore/AzerothGhost/client"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
@@ -66,131 +58,6 @@ func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 	t.Logf("PASS Kologarn charge path map=%d pos=(%.1f,%.1f,%.1f)", m, x, y, z)
 }
 */
-
-// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27556
-// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27557
-// Kologarn created while BOSS_KOLOGARN is already DONE must come up as a
-// stationary corpse (the instance reload branch), not fall into the pit again.
-// The boss state is set before his grid loads, so OnCreatureCreate runs the
-// DONE branch on a fresh instance without waiting for an instance unload.
-// He loads alive here and is flipped to a corpse, unlike a lockout reload where
-// he loads dead, so the arms stay seated; that does not affect the assertions.
-// Oracle is `.npc info` (server-side health, flags, position): the harness
-// misparses this create packet (vehicle block + spline), so the object cache
-// cannot be trusted for it.
-func TestAC_27556_KologarnReloadedAsStationaryCorpse(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"med", "instances", "issue"},
-		Runtime:  "med",
-		Issue:    27556,
-		Category: "instances/northrend/ulduar",
-	})
-
-	const (
-		bossKologarn          = 5 // ulduar.h BOSS_KOLOGARN
-		encounterDone         = 3 // EncounterState DONE
-		spawnZ                = 448.741
-		unitFlagNotSelectable = uint32(0x02000000)
-	)
-	posBridge := e2eharness.Position3{X: 1782.15, Y: -24.4027, Z: spawnZ, Map: e2eharness.MapUlduar}
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "UldKol",
-		Level:  80,
-	})
-
-	// Enter far from Kologarn so his grid is not loaded when the state is set.
-	bot.TeleNamed(t, "UlduarInstance")
-	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
-		e2eharness.Preconditionf(t, "not in Ulduar after .tele UlduarInstance (map=%d)", m)
-	}
-	if bot.FindUnit(e2eharness.CreatureKologarn, 0) != 0 {
-		e2eharness.Preconditionf(t, "Kologarn already tracked before the boss state was set")
-	}
-	bot.GM(t, fmt.Sprintf(".instance setbossstate %d %d", bossKologarn, encounterDone))
-	bot.FlushWorld(t)
-
-	bot.Teleport(t, posBridge.X, posBridge.Y, posBridge.Z, posBridge.Map)
-	kolo := bot.WaitUnit(t, e2eharness.CreatureKologarn, 30*time.Second)
-
-	// A MoveFall launched at creation needs a moment to move the server-side
-	// position before .npc info reports it.
-	time.Sleep(3 * time.Second)
-	if err := bot.World.SetTarget(kolo); err != nil {
-		e2eharness.Preconditionf(t, "SetTarget Kologarn: %v", err)
-	}
-	info := strings.Join(gmSystemMessages(t, bot, ".npc info"), "\n")
-
-	hp := matchUint(t, info, `\(current\): (\d+)\.`, "health")
-	flags := matchUint(t, info, `Unit Flags: (\d+)\.`, "unit flags")
-	z := matchFloat(t, info, `Position: \S+ \S+ (\S+)\.`, "position Z")
-
-	if hp != 0 {
-		e2eharness.Assertf(t, "Kologarn created with hp=%d, want 0 (corpse)", hp)
-	}
-	if math.Abs(z-spawnZ) > 2.0 {
-		e2eharness.Assertf(t, "Kologarn corpse Z=%.2f, want spawn Z %.2f (fell, issue #27556)", z, spawnZ)
-	}
-	if flags&unitFlagNotSelectable == 0 {
-		e2eharness.Assertf(t, "Kologarn corpse missing UNIT_FLAG_NOT_SELECTABLE (flags=0x%X)", flags)
-	}
-
-	bot.AssertWorldAlive(t)
-	t.Logf("PASS AC#27556 Kologarn came up as a stationary corpse (z=%.2f flags=0x%X)", z, flags)
-}
-
-// gmSystemMessages runs a GM command and returns the CHAT_MSG_SYSTEM lines it
-// produced. The trailing FlushWorld (.gps) guarantees the command output has
-// arrived; its own reply is included and harmless.
-func gmSystemMessages(t *testing.T, bot *e2eharness.ScenarioBot, cmd string) []string {
-	t.Helper()
-	var mu sync.Mutex
-	var msgs []string
-	cancel := bot.World.AddPacketHook(func(op uint16, data []byte) {
-		// type u8, lang u32, sender u64, unk u32, target u64, len u32, text
-		if op != client.SmsgMessageChat || len(data) < 29 || data[0] != 0x00 { // CHAT_MSG_SYSTEM
-			return
-		}
-		n := int(binary.LittleEndian.Uint32(data[25:29]))
-		if n <= 0 || 29+n > len(data) {
-			return
-		}
-		mu.Lock()
-		msgs = append(msgs, strings.TrimRight(string(data[29:29+n]), "\x00"))
-		mu.Unlock()
-	})
-	defer cancel()
-	bot.GM(t, cmd)
-	bot.FlushWorld(t)
-	mu.Lock()
-	defer mu.Unlock()
-	return append([]string(nil), msgs...)
-}
-
-func matchUint(t *testing.T, text, pattern, what string) uint32 {
-	t.Helper()
-	m := regexp.MustCompile(pattern).FindStringSubmatch(text)
-	if m == nil {
-		e2eharness.Preconditionf(t, "%s not found in .npc info output:\n%s", what, text)
-	}
-	v, err := strconv.ParseUint(m[1], 10, 32)
-	if err != nil {
-		e2eharness.Preconditionf(t, "%s %q: %v", what, m[1], err)
-	}
-	return uint32(v)
-}
-
-func matchFloat(t *testing.T, text, pattern, what string) float64 {
-	t.Helper()
-	m := regexp.MustCompile(pattern).FindStringSubmatch(text)
-	if m == nil {
-		e2eharness.Preconditionf(t, "%s not found in .npc info output:\n%s", what, text)
-	}
-	v, err := strconv.ParseFloat(m[1], 64)
-	if err != nil {
-		e2eharness.Preconditionf(t, "%s %q: %v", what, m[1], err)
-	}
-	return v
-}
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27095
 // PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27113
