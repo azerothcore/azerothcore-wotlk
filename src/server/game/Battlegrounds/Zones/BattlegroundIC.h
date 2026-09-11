@@ -923,7 +923,11 @@ public:
     bool IsResourceGlutAllowed(TeamId teamId) const;
     void DoAction(uint32 action, ObjectGuid guid) override;
 
-    [[nodiscard]] ICNodePoint const& GetICNodePoint(uint8 index) { return nodePoint[index]; }
+    [[nodiscard]] ICNodePoint const& GetICNodePoint(uint8 index) const
+    {
+        ASSERT(index < MAX_NODE_TYPES);
+        return nodePoint[index];
+    }
 
 private:
     uint32 closeFortressDoorsTimer;

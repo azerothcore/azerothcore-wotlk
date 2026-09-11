@@ -246,18 +246,6 @@ protected:
     uint32 BasesDefended = 0;
 };
 
-struct CaptureABPointInfo
-{
-    CaptureABPointInfo() : _ownerTeamId(TEAM_NEUTRAL), _iconNone(0), _iconCapture(0), _state(BG_AB_NODE_STATE_NEUTRAL), _captured(false) {}
-
-    TeamId _ownerTeamId;
-    uint32 _iconNone;
-    uint32 _iconCapture;
-    uint8  _state;
-
-    bool _captured;
-};
-
 class AC_GAME_API BattlegroundAB : public Battleground
 {
 public:
@@ -282,9 +270,6 @@ public:
     bool IsTeamScores500Disadvantage(TeamId teamId) const { return _teamScores500Disadvantage[teamId]; }
 
     TeamId GetPrematureWinner() override;
-
-    [[nodiscard]] CaptureABPointInfo const& GetCapturePointInfo(uint32 node) const { return _capturePointInfo[node]; }
-
 private:
     void PostUpdateImpl(uint32 diff) override;
 
@@ -294,7 +279,29 @@ private:
     void NodeOccupied(uint8 node);
     void NodeDeoccupied(uint8 node);
 
-    CaptureABPointInfo _capturePointInfo[BG_AB_DYNAMIC_NODES_COUNT];
+public:
+    struct CapturePointInfo
+    {
+        CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _iconNone(0), _iconCapture(0), _state(BG_AB_NODE_STATE_NEUTRAL), _captured(false)
+        {
+        }
+
+        TeamId _ownerTeamId;
+        uint32 _iconNone;
+        uint32 _iconCapture;
+        uint8 _state;
+
+        bool _captured;
+    };
+
+    [[nodiscard]] CapturePointInfo const& GetCapturePointInfo(uint32 node) const
+    {
+        ASSERT(node < BG_AB_DYNAMIC_NODES_COUNT);
+        return _capturePointInfo[node];
+    }
+
+private:
+    CapturePointInfo _capturePointInfo[BG_AB_DYNAMIC_NODES_COUNT];
     EventMap _bgEvents;
     uint32 _honorTics;
     uint32 _reputationTics;

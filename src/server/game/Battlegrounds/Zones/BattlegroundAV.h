@@ -1791,9 +1791,13 @@ public:
 
     TeamId GetPrematureWinner() override;
 
-    [[nodiscard]] BG_AV_NodeInfo const& GetAVNodeInfo(uint32 node) const { return m_Nodes[node]; }
-    [[nodiscard]] bool IsCaptainAlive(uint8 index) const { return m_CaptainAlive[index]; }
-    [[nodiscard]] TeamId GetMineOwner(uint8 index) const { return m_Mine_Owner[index]; }
+    [[nodiscard]] BG_AV_NodeInfo const& GetAVNodeInfo(uint32 node) const
+    {
+        ASSERT(node < BG_AV_NODES_MAX);
+        return m_Nodes[node];
+    }
+    [[nodiscard]] bool IsCaptainAlive(uint8 index) const { return index < PVP_TEAMS_COUNT && m_CaptainAlive[index]; }
+    [[nodiscard]] TeamId GetMineOwner(uint8 index) const { return index < PVP_TEAMS_COUNT ? m_Mine_Owner[index] : TEAM_NEUTRAL; }
 
 private:
     void PostUpdateImpl(uint32 diff) override;

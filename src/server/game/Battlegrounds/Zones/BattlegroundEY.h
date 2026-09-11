@@ -346,25 +346,6 @@ protected:
     uint32 FlagCaptures = 0;
 };
 
-struct CaptureEYPointInfo
-{
-    CaptureEYPointInfo() : _ownerTeamId(TEAM_NEUTRAL), _barStatus(BG_EY_PROGRESS_BAR_STATE_MIDDLE), _areaTrigger(0)
-    {
-        _playersCount[TEAM_ALLIANCE] = 0;
-        _playersCount[TEAM_HORDE] = 0;
-    }
-
-    TeamId _ownerTeamId;
-    int8 _barStatus;
-    uint32 _areaTrigger;
-    int8 _playersCount[PVP_TEAMS_COUNT];
-    ObjectGuid _playerGuid;
-
-    bool IsUnderControl(TeamId teamId) const { return _ownerTeamId == teamId; }
-    bool IsUnderControl() const { return _ownerTeamId != TEAM_NEUTRAL; }
-    bool IsUncontrolled() const { return _ownerTeamId == TEAM_NEUTRAL; }
-};
-
 class AC_GAME_API BattlegroundEY : public Battleground
 {
 public:
@@ -404,8 +385,6 @@ public:
     bool AllNodesConrolledByTeam(TeamId teamId) const override;
     TeamId GetPrematureWinner() override;
 
-    [[nodiscard]] CaptureEYPointInfo const& GetCapturePointInfo(uint32 node) const { return _capturePointInfo[node]; }
-
 private:
     void PostUpdateImpl(uint32 diff) override;
 
@@ -421,7 +400,34 @@ private:
     /* Scorekeeping */
     void AddPoints(TeamId teamId, uint32 points);
 
-    CaptureEYPointInfo _capturePointInfo[EY_POINTS_MAX];
+public:
+    struct CapturePointInfo
+    {
+        CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _barStatus(BG_EY_PROGRESS_BAR_STATE_MIDDLE), _areaTrigger(0)
+        {
+            _playersCount[TEAM_ALLIANCE] = 0;
+            _playersCount[TEAM_HORDE] = 0;
+        }
+
+        TeamId _ownerTeamId;
+        int8 _barStatus;
+        uint32 _areaTrigger;
+        int8 _playersCount[PVP_TEAMS_COUNT];
+        ObjectGuid _playerGuid;
+
+        bool IsUnderControl(TeamId teamId) const { return _ownerTeamId == teamId; }
+        bool IsUnderControl() const { return _ownerTeamId != TEAM_NEUTRAL; }
+        bool IsUncontrolled() const { return _ownerTeamId == TEAM_NEUTRAL; }
+    };
+
+    [[nodiscard]] CapturePointInfo const& GetCapturePointInfo(uint32 node) const
+    {
+        ASSERT(node < EY_POINTS_MAX);
+        return _capturePointInfo[node];
+    }
+
+private:
+    CapturePointInfo _capturePointInfo[EY_POINTS_MAX];
     EventMap _bgEvents;
     uint32 _honorTics;
     uint8 _ownedPointsCount[PVP_TEAMS_COUNT];
