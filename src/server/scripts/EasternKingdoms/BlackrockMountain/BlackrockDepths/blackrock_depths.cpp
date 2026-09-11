@@ -552,6 +552,7 @@ enum NagmaraPoints
 
 // Follow Nagmara's database patrol in its proven forward order. Reversing or skipping
 // between these points can make the pathfinder choose furniture geometry.
+// same points as waypoint_data path 466130, keep both in sync
 Position const NagmaraPatrolPath[] =
 {
     { 868.316f, -202.803f, -43.7035f },
