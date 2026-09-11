@@ -400,8 +400,8 @@ public:
     uint8 GetSpiritGraveyardId(uint32 areaId) const;
     uint32 GetAreaByGraveyardId(uint8 gId) const;
 
-    // Teleport ghosts waiting at a just-captured graveyard to their team's nearest controlled one.
-    void RelocateDeadPlayers(uint8 graveyardId, TeamId newOwner);
+    // Move ghosts off a graveyard their team just lost, and queue them to resurrect at the new one.
+    void RelocateDeadPlayers(uint8 graveyardId, TeamId losingTeam);
 
     uint32 GetData(uint32 data) const override;
 
@@ -1427,6 +1427,8 @@ struct WGWorkshop
 
     void GiveControlTo(TeamId team, bool init /* for first call in setup*/)
     {
+        TeamId const previousControl = teamControl;
+
         switch (team)
         {
             case TEAM_NEUTRAL:
@@ -1473,10 +1475,10 @@ struct WGWorkshop
             bf->UpdateCounterVehicle(false);
             bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
 
-            // Workshop graveyard share the workshop id; repop ghosts that lost it.
-            // Only on an actual capture, not while the workshop is merely contested (neutral).
-            if (IsCapturable() && teamControl != TEAM_NEUTRAL)
-                bf->RelocateDeadPlayers(workshopId, teamControl);
+            // Workshop graveyard share the workshop id. Ghosts of the team that just lost it can no
+            // longer see a spirit guide here, so move them to a graveyard they can still use.
+            if (IsCapturable())
+                bf->RelocateDeadPlayers(workshopId, previousControl);
         }
     }
 
