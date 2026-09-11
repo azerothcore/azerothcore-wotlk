@@ -447,6 +447,9 @@ struct boss_razorscale : public BossAI
         }
 
         summons.DespawnAll();
+        // the home flight starts before Reset() restores this, and her home position is in the air,
+        // so without the flag the destination gets clamped down to the arena floor
+        me->SetDisableGravity(true);
         _EnterEvadeMode();
         HandleMusic(false);
     }
@@ -639,6 +642,7 @@ struct npc_expedition_commander : public ScriptedAI
             case ACTION_START_PERMA_GROUND:
                 _started = false;
                 _events.Reset();
+                StopControllers();
                 DestroyHarpoons();
                 break;
             case ACTION_DESTROY_HARPOONS:
