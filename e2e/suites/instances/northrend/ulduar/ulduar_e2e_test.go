@@ -3,6 +3,7 @@
 package ulduar_test
 
 import (
+	"fmt"
 	"math"
 	"testing"
 	"time"
@@ -10,6 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
+	"github.com/azerothcore/AzerothGhost/client"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 )
 
@@ -62,9 +64,13 @@ func TestUlduar_KologarnChargeWorldAlive(t *testing.T) {
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27556
 // PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27557
-// Verifies Kologarn's corpse persists across same-instance re-entry at health 0.
-// Note: InstanceMap full unload requires Instance.UnloadDelay (30m) or server restart.
-func TestAC_27556_KologarnCorpsePersistsOnReentry(t *testing.T) {
+// Kologarn created while BOSS_KOLOGARN is already DONE must come up as a
+// stationary corpse (the instance reload branch), not fall into the pit again.
+// The boss state is set before his grid loads, so OnCreatureCreate runs the
+// DONE branch on a fresh instance without waiting for an instance unload.
+// He loads alive here and is flipped to a corpse, unlike a lockout reload where
+// he loads dead, so the arms stay seated; that does not affect the assertions.
+func TestAC_27556_KologarnReloadedAsStationaryCorpse(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "instances", "issue"},
 		Runtime:  "med",
@@ -72,56 +78,58 @@ func TestAC_27556_KologarnCorpsePersistsOnReentry(t *testing.T) {
 		Category: "instances/northrend/ulduar",
 	})
 
-	posBridge := e2eharness.Position3{X: 1782.15, Y: -24.4027, Z: 448.741, Map: e2eharness.MapUlduar}
+	const (
+		bossKologarn  = 5 // ulduar.h BOSS_KOLOGARN
+		encounterDone = 3 // EncounterState DONE
+		spawnZ        = float32(448.741)
+	)
+	posBridge := e2eharness.Position3{X: 1782.15, Y: -24.4027, Z: spawnZ, Map: e2eharness.MapUlduar}
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "UldKol",
 		Level:  80,
 	})
 
-	bot.TeleNamed(t, "Kologarn")
+	// Enter far from Kologarn so his grid is not loaded when the state is set.
+	bot.TeleNamed(t, "UlduarInstance")
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after .tele UlduarInstance (map=%d)", m)
+	}
+	if bot.FindUnit(e2eharness.CreatureKologarn, 0) != 0 {
+		e2eharness.Preconditionf(t, "Kologarn already tracked before the boss state was set")
+	}
+	bot.GM(t, fmt.Sprintf(".instance setbossstate %d %d", bossKologarn, encounterDone))
+	bot.FlushWorld(t)
+
 	bot.Teleport(t, posBridge.X, posBridge.Y, posBridge.Z, posBridge.Map)
 	kolo := bot.WaitUnit(t, e2eharness.CreatureKologarn, 30*time.Second)
-	if kolo == 0 {
-		e2eharness.Preconditionf(t, "Kologarn not found in Ulduar")
+
+	// The create may lack its position block briefly after the teleport.
+	var obj *client.WorldObject
+	for deadline := time.Now().Add(5 * time.Second); time.Now().Before(deadline); {
+		if obj = bot.World.GetObject(kolo); obj != nil && obj.HasKnownPosition() {
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
 	}
-
-	preObj := bot.World.GetObject(kolo)
-	if preObj == nil {
-		e2eharness.Preconditionf(t, "Kologarn object not in world cache")
+	if obj == nil || !obj.HasKnownPosition() {
+		e2eharness.Assertf(t, "Kologarn create without position in cache")
 	}
-	initialZ := preObj.PosZ
-
-	bot.CombatReady(t)
-	bot.DamageKill(t, []uint64{kolo}, 50_000_000, 20*time.Second)
-	hp, _ := bot.UnitHP(kolo)
-	if hp > 0 {
-		e2eharness.Assertf(t, "Kologarn still alive hp=%d after DamageKill", hp)
+	flags := obj.Value(client.UnitFieldFlags)
+	if hp := obj.Health(); hp != 0 {
+		e2eharness.Assertf(t, "Kologarn created with hp=%d, want 0 (corpse)", hp)
 	}
-
-	// Teleport outside Ulduar and back (same-instance re-entry).
-	bot.TeleNamed(t, "Ulduar")
-	bot.TeleNamed(t, "Kologarn")
-	bot.Teleport(t, posBridge.X, posBridge.Y, posBridge.Z, posBridge.Map)
-
-	koloReloaded := bot.WaitUnit(t, e2eharness.CreatureKologarn, 30*time.Second)
-	if koloReloaded == 0 {
-		e2eharness.Assertf(t, "Kologarn corpse not found in object cache after re-entry (issue #27556)")
+	if math.Abs(float64(obj.PosZ-spawnZ)) > 2.0 {
+		e2eharness.Assertf(t, "Kologarn corpse Z=%.2f, want spawn Z %.2f", obj.PosZ, spawnZ)
 	}
-
-	hpReloaded, _ := bot.UnitHP(koloReloaded)
-	if hpReloaded != 0 {
-		e2eharness.Assertf(t, "Kologarn reloaded with hp=%d, want 0 (corpse)", hpReloaded)
+	if obj.IsMoving && math.Abs(float64(obj.DestZ-spawnZ)) > 2.0 {
+		e2eharness.Assertf(t, "Kologarn corpse falling: spline dest Z=%.2f (issue #27556)", obj.DestZ)
 	}
-
-	postObj := bot.World.GetObject(koloReloaded)
-	if postObj == nil {
-		e2eharness.Assertf(t, "Kologarn corpse object nil in cache after re-entry")
-	} else if math.Abs(float64(postObj.PosZ-initialZ)) > 2.0 {
-		e2eharness.Assertf(t, "Kologarn corpse Z position shifted: before=%.2f after=%.2f", initialZ, postObj.PosZ)
+	if flags&client.UnitFlagNotSelectable == 0 {
+		e2eharness.Assertf(t, "Kologarn corpse missing UNIT_FLAG_NOT_SELECTABLE (flags=0x%X)", flags)
 	}
 
 	bot.AssertWorldAlive(t)
-	t.Logf("PASS AC#27556 Kologarn corpse persists across same-instance re-entry at health 0 (z=%.2f)", postObj.PosZ)
+	t.Logf("PASS AC#27556 Kologarn came up as a stationary corpse (z=%.2f flags=0x%X)", obj.PosZ, flags)
 }
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27095
