@@ -8,7 +8,7 @@
 services:
   ac-database:
     container_name: ac-database
-    image: mysql:8.4
+    image: ${DOCKER_DB_IMAGE:-mysql:8.4}
     networks:
       - ac-network
     ports:
