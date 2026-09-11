@@ -1,3 +1,4 @@
+-- DB update 2026_09_10_06 -> 2026_09_11_00
 --
 -- Stokin' the Furnace: move achievement_heartbreaker from criteria 10072/10073 to Heartbreaker 10220/10221
 DELETE FROM `achievement_criteria_data` WHERE `criteria_id` IN (10072, 10073, 10220, 10221) AND `type` = 11;
