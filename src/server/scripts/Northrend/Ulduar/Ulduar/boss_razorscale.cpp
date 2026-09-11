@@ -447,6 +447,9 @@ struct boss_razorscale : public BossAI
         }
 
         summons.DespawnAll();
+        // the home flight starts before Reset() restores this, and her home position is in the air,
+        // so without the flag the destination gets clamped down to the arena floor
+        me->SetDisableGravity(true);
         _EnterEvadeMode();
         HandleMusic(false);
     }
