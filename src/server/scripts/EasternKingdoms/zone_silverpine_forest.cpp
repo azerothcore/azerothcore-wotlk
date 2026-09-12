@@ -172,12 +172,12 @@ struct npc_deathstalker_fearleia : public ScriptedAI
 
     void sQuestAccept(Player* player, Quest const* quest) override
     {
-        if (quest->GetQuestId() == QUEST_PYREWOOD_AMBUSH && !_questInProgress)
-        {
-            _questInProgress = true;
-            _playerGUID = player->GetGUID();
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-        }
+        if (quest->GetQuestId() != QUEST_PYREWOOD_AMBUSH || _questInProgress)
+            return;
+
+        _questInProgress = true;
+        _playerGUID = player->GetGUID();
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
 
         Talk(NPCSAY_INIT, player);
 
@@ -253,6 +253,11 @@ struct npc_deathstalker_fearleia : public ScriptedAI
         if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
             if (player->GetQuestStatus(QUEST_PYREWOOD_AMBUSH) == QUEST_STATUS_INCOMPLETE)
                 player->FailQuest(QUEST_PYREWOOD_AMBUSH);
+
+        scheduler.CancelAll();
+        _questInProgress = false;
+        _playerGUID.Clear();
+        _summons.DespawnAll();
     }
 
     void UpdateAI(uint32 diff) override
