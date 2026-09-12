@@ -1,3 +1,4 @@
+-- DB update 2026_09_12_04 -> 2026_09_12_05
 --
 -- Most Ulduar, ToC, and ICC bosses have parry haste incorrectly enabled
 -- Set NO_PARRY_HASTEN - creature can't counter-attack at parry
