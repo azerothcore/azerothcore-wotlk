@@ -51,6 +51,8 @@ uint32 ModuleDatabasePool::Open()
         return 1;
     }
 
+    Close();
+
     for (uint8 i = 0; i < _synchThreads; ++i)
     {
         auto conn = std::unique_ptr<MySQLConnection>(CreateConnection(_connectionInfo));
