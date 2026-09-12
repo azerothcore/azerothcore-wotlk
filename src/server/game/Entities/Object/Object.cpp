@@ -3311,10 +3311,9 @@ Unit* WorldObject::GetCharmerOrOwnerUnit() const
 {
     if (Unit const* unit = ToUnit())
         return unit->GetCharmerOrOwner();
-    else if (GameObject const* go = ToGameObject())
-        return go->GetOwner();
 
-    return nullptr;
+    // GameObject, DynamicObject and Corpse all resolve their owner from the guid
+    return GetOwnerUnit();
 }
 
 Unit* WorldObject::GetCharmerOrOwnerOrSelfUnit() const
