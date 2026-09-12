@@ -1042,13 +1042,6 @@ Unit* AuraScript::GetCaster() const
     return m_aura->GetCaster();
 }
 
-GameObject* AuraScript::GetGObjCaster() const
-{
-    if (WorldObject* caster = m_aura->GetCaster())
-        return caster->ToGameObject();
-    return nullptr;
-}
-
 WorldObject* AuraScript::GetOwner() const
 {
     return m_aura->GetOwner();

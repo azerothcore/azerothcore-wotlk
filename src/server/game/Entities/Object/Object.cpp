@@ -3295,7 +3295,12 @@ SpellCastResult WorldObject::CastSpell(CastSpellTargetArg const& targets, SpellI
         return SPELL_FAILED_BAD_TARGETS;
     }
 
-    Spell* spell = new Spell(this, info, args.TriggerFlags, args.OriginalCaster);
+    // some scripts rely on the triggering aura's caster being the original caster
+    ObjectGuid originalCaster = args.OriginalCaster;
+    if (!originalCaster && args.TriggeringAura)
+        originalCaster = args.TriggeringAura->GetCasterGUID();
+
+    Spell* spell = new Spell(this, info, args.TriggerFlags, originalCaster);
     for (auto const& kv : args.SpellValueOverrides)
         spell->SetSpellValue(kv.first, kv.second);
     spell->m_CastItem = args.CastItem;
