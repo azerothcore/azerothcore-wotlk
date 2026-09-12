@@ -1,7 +1,7 @@
 --
 -- Most Ulduar, ToC, and ICC bosses have parry haste incorrectly enabled
 -- Set NO_PARRY_HASTEN - creature can't counter-attack at parry
-SET @NO_PARRY_HASTEN := 0x8;
+SET @NO_PARRY_HASTEN := 8;
 
 UPDATE `creature_template` SET `flags_extra` = (`flags_extra` | @NO_PARRY_HASTEN)  WHERE (`entry` IN (
 -- Patchwerk
