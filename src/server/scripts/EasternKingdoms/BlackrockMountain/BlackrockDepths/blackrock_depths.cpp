@@ -639,7 +639,7 @@ struct npc_rocknot : public npc_escortAI
 
     void Reset() override
     {
-        if (HasEscortState(STATE_ESCORT_ESCORTING) || _recovering)
+        if (HasEscortState(STATE_ESCORT_ESCORTING) || _aleEventActive)
             return;
 
         _events.Reset();
@@ -649,16 +649,29 @@ struct npc_rocknot : public npc_escortAI
 
     void JustRespawned() override
     {
+        bool const restartAleEvent = _aleEventActive && !_aleComplete;
+        if (_aleEventActive)
+        {
+            me->SetHomePosition(_originalPosition);
+            me->SetImmuneToNPC(_originalImmuneToNPC);
+            me->ReplaceAllNpcFlags(_originalNpcFlags);
+        }
+        _aleEventActive = false;
         _recovering = false;
         npc_escortAI::JustRespawned();
+
+        // The three ales were already handed in; restart without charging for them again.
+        if (restartAleEvent)
+            StartAleEvent();
     }
 
     void JustReachedHome() override
     {
-        if (!_recovering)
+        if (!_recovering || _events.HasTimeUntilEvent(EVENT_ROCKNOT_RECOVER))
             return;
 
         _recovering = false;
+        _aleEventActive = false;
         me->SetEmoteState(EMOTE_STATE_NONE);
         me->SetFacingTo(_originalPosition.GetOrientation());
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -671,7 +684,7 @@ struct npc_rocknot : public npc_escortAI
         if (!_instance || quest->GetQuestId() != QUEST_ALE)
             return;
 
-        if (HasEscortState(STATE_ESCORT_ESCORTING) || _recovering)
+        if (HasEscortState(STATE_ESCORT_ESCORTING) || _aleEventActive)
             return;
 
         // Both captured hand-ins have the drinking emote and acknowledgement.
@@ -688,19 +701,9 @@ struct npc_rocknot : public npc_escortAI
         if (_instance->GetData(TYPE_BAR) != SPECIAL)
             return;
 
-        SetDespawnAtEnd(false);
-        SetDespawnAtFar(false);
-        me->GetRespawnPosition(_originalPosition.m_positionX, _originalPosition.m_positionY,
-            _originalPosition.m_positionZ, &_originalPosition.m_orientation);
-        _originalNpcFlags = me->GetNpcFlags();
-        _originalImmuneToNPC = me->IsImmuneToNPC();
-        me->SetWalk(true);
-        Start(false);
+        StartAleEvent();
         // Keep the escort's NPC flags cleared so WotLK rejects further quest interactions.
         CloseGossipMenuFor(player);
-        // Anniversary 69546 sends Uninteractible when the ale route begins.
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        _events.ScheduleEvent(EVENT_ROCKNOT_MORE_ALE, 1500ms);
     }
 
     void WaypointStart(uint32 pointId) override
@@ -730,6 +733,8 @@ struct npc_rocknot : public npc_escortAI
                 _events.ScheduleEvent(EVENT_ROCKNOT_SECOND_KEG, 1500ms);
                 break;
             case POINT_ROCKNOT_FINAL_KEG:
+                // Evade must return to the keg while the final sequence is still running.
+                me->SetHomePosition(me->GetPosition());
                 SetEscortPaused(true);
                 _events.ScheduleEvent(EVENT_ROCKNOT_FINAL_KEG, 300ms);
                 _events.ScheduleEvent(EVENT_ROCKNOT_PUNCH, 1900ms);
@@ -806,6 +811,23 @@ struct npc_rocknot : public npc_escortAI
     }
 
 private:
+    void StartAleEvent()
+    {
+        _events.Reset();
+        _aleEventActive = true;
+        SetDespawnAtEnd(false);
+        SetDespawnAtFar(false);
+        me->GetRespawnPosition(_originalPosition.m_positionX, _originalPosition.m_positionY,
+            _originalPosition.m_positionZ, &_originalPosition.m_orientation);
+        _originalNpcFlags = me->GetNpcFlags();
+        _originalImmuneToNPC = me->IsImmuneToNPC();
+        me->SetWalk(true);
+        Start(false);
+        // Anniversary 69546 sends Uninteractible when the ale route begins.
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        _events.ScheduleEvent(EVENT_ROCKNOT_MORE_ALE, 1500ms);
+    }
+
     GameObject* GetBarObject(uint32 data) const
     {
         return _instance ? _instance->instance->GetGameObject(_instance->GetGuidData(data)) : nullptr;
@@ -814,6 +836,7 @@ private:
     InstanceScript* _instance;
     EventMap _events;
     bool _aleComplete;
+    bool _aleEventActive = false;
     bool _recovering = false;
     Position _originalPosition;
     NPCFlags _originalNpcFlags = UNIT_NPC_FLAG_NONE;
