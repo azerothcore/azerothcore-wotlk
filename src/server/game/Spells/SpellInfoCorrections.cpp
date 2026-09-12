@@ -2952,6 +2952,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Professor Putricide, Expunged Gas (Gas Cloud detonation)
+    ApplySpellFix({ 70701 }, [](SpellInfo* spellInfo)
+    {
+        // custom: the detonation is an unavoidable raid-wide hit, it must not be resisted away
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
     ApplySpellFix({
         71412,  // Green Ooze Summon (Professor Putricide)
         71415   // Orange Ooze Summon (Professor Putricide)
