@@ -1,3 +1,4 @@
+-- DB update 2026_09_11_01 -> 2026_09_12_00
 -- Mogg (14908): the waypoint 29 event linked to event 8, which was never defined, so
 -- SmartScript::ProcessAction logged "Event 7, Link Event 8 not found, skipped" on every pass.
 -- The link dates from the 2017 script (2017_02_03_15.sql) and has no target to point at.
