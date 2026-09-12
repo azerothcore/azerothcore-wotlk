@@ -396,9 +396,10 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 		Level:  80,
 	})
 
-	// Raid interior pad (game_tele BossFreya), same as the Freya test: .go xyz is reliable while a
-	// missing custom tele name hangs TeleNamed for 60s. Stay GM through the raid enter.
-	bot.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
+	// Land on Brightleaf's own spawn, NOT the BossFreya pad: that pad sits 12y from Freya, and
+	// aggroing her banishes every living elder, after which Brightleaf schedules no beams for the
+	// life of the instance. Stay GM through the raid enter.
+	bot.Teleport(t, 2385.09, 131.341, 440.201, e2eharness.MapUlduar)
 	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
 		e2eharness.Preconditionf(t, "not in Ulduar after Freya pad tele map=%d", m)
 	}
@@ -417,6 +418,9 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 			e2eharness.Preconditionf(t, "no living Elder Brightleaf in cache after GoCreatureID (last=0x%X)", elder)
 		}
 		time.Sleep(50 * time.Millisecond)
+	}
+	if bot.UnitHasAura(elder, spellPurpleBanish) || bot.UnitHasAura(elder, spellBrightleafEssence) {
+		e2eharness.Preconditionf(t, "Elder Brightleaf is banished into Freya's hard mode in this instance, so he schedules no sun beams")
 	}
 	bot.Engage(t, elder, 15*time.Second)
 
