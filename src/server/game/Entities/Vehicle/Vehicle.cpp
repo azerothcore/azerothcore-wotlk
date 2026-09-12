@@ -611,6 +611,7 @@ void Vehicle::TeleportVehicle(float x, float y, float z, float ang)
         {
             if (!passenger->IsInWorld())
                 continue;
+
             if (passenger->IsPlayer())
             {
                 passenger->ToPlayer()->SetMover(passenger);
