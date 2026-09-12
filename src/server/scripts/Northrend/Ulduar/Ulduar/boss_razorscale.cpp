@@ -296,10 +296,15 @@ struct boss_razorscale : public BossAI
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
                 break;
             case ACTION_START_PERMA_GROUND:
+                // Crossing 50% during the descent triggers this from DamageTaken, then again on landing
+                if (events.IsInPhase(PHASE_PERMA_GROUND))
+                    break;
                 me->SetDisableGravity(false);
                 me->RemoveAura(SPELL_STUN_SELF);
                 Talk(EMOTE_PERMA_GROUND);
-                DoCastSelf(SPELL_WING_BUFFET);
+                // A queued take-off means the harpoon phase finale already knocked the raid back
+                if (!events.HasTimeUntilEvent(EVENT_RESUME_AIR))
+                    DoCastSelf(SPELL_WING_BUFFET);
                 {
                     EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
                     summons.DoAction(ACTION_STOP_CONTROLLERS, trapperPred);
