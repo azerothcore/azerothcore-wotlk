@@ -864,6 +864,9 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             // Brittle Armor - (need add max stack of 24575 Brittle Armor)
             case 29284:
                 {
+                    if (!unitCaster)
+                        return;
+
                     // Brittle Armor
                     SpellInfo const* spell = sSpellMgr->GetSpellInfo(24575);
                     if (!spell)
@@ -876,6 +879,9 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             // Mercurial Shield - (need add max stack of 26464 Mercurial Shield)
             case 29286:
                 {
+                    if (!unitCaster)
+                        return;
+
                     // Mercurial Shield
                     SpellInfo const* spell = sSpellMgr->GetSpellInfo(26464);
                     if (!spell)
@@ -2549,7 +2555,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         // Mana Tide Totem
                         if (m_spellInfo->Id == 16190)
-                            damage = unitCaster->CountPctFromMaxHealth(10);
+                            damage = m_caster->ToUnit()->CountPctFromMaxHealth(10);
 
                         if (damage && properties->Type != SUMMON_TYPE_LIGHTWELL) // Health set in script for lightwell
                         {
