@@ -1,3 +1,4 @@
+-- DB update 2026_09_12_02 -> 2026_09_12_03
 --
 -- Ulduar trash loot: split 10-man and 25-man epic pools correctly
 

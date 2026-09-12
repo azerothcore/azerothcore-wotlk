@@ -1,3 +1,4 @@
+-- DB update 2026_09_12_03 -> 2026_09_12_04
 --
 -- Ulduar boss loot: keep 10-man and 25-man items in their own pools
 
