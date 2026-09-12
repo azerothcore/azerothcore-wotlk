@@ -711,8 +711,13 @@ public: /* CommandSC */
 
 public: /* DatabaseScript */
 
+    bool OnModuleDatabasesLoading();
     void OnAfterDatabasesLoaded(uint32 updateFlags);
     void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> creatureTemplateStore);
+    void OnModuleDatabasesKeepAlive();
+    void OnModuleDatabasesClosing();
+    void OnDatabaseWarnAboutSyncQueries(bool apply);
+    void OnDatabaseGetDBRevision(std::map<std::string, std::string>& revisions);
 
 public: /* WorldObjectScript */
 

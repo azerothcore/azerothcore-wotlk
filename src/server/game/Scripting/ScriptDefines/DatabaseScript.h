@@ -19,12 +19,19 @@
 #define SCRIPT_OBJECT_DATABASE_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <map>
+#include <string>
 #include <vector>
 
 enum DatabaseHook
 {
     DATABASEHOOK_ON_AFTER_DATABASES_LOADED,
     DATABASEHOOK_ON_AFTER_DATABASE_LOAD_CREATURETEMPLATES,
+    DATABASEHOOK_ON_MODULE_DATABASES_LOADING,
+    DATABASEHOOK_ON_MODULE_DATABASES_KEEPALIVE,
+    DATABASEHOOK_ON_MODULE_DATABASES_CLOSING,
+    DATABASEHOOK_ON_DATABASE_WARN_ABOUT_SYNC_QUERIES,
+    DATABASEHOOK_ON_DATABASE_GET_DB_REVISION,
     DATABASEHOOK_END
 };
 
@@ -51,6 +58,39 @@ public:
      * @param creatureTemplates Pointer to a modifiable vector of creature templates. Indexed by Entry ID.
      */
     virtual void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> /*creatureTemplates*/) { }
+
+    /**
+     * @brief Called once the core databases are up, so a module can open a database of its own.
+     * Runs before the rest of the world loads, unlike OnAfterDatabasesLoaded which reports the
+     * finished core load.
+     *
+     * @return false to abort startup, e.g. when the module's own database failed to open
+     */
+    [[nodiscard]] virtual bool OnModuleDatabasesLoading() { return true; }
+
+    /**
+     * @brief Called on the world's keep-alive tick, alongside the core pools being pinged.
+     */
+    virtual void OnModuleDatabasesKeepAlive() { }
+
+    /**
+     * @brief Called after the core databases are closed, so a module can close its own.
+     */
+    virtual void OnModuleDatabasesClosing() { }
+
+    /**
+     * @brief Called when the core turns its synchronous-query warning on or off.
+     *
+     * @param apply True when the warning is being enabled
+     */
+    virtual void OnDatabaseWarnAboutSyncQueries(bool /*apply*/) { }
+
+    /**
+     * @brief Called by .server info to collect the revision of a module-owned database.
+     *
+     * @param revisions Revision string to report, keyed by module name
+     */
+    virtual void OnDatabaseGetDBRevision(std::map<std::string, std::string>& /*revisions*/) { }
 
 };
 
