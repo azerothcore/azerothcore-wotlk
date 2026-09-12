@@ -236,6 +236,7 @@ public:
     void   SetCleaningFlags(uint32 flags) override { _cleaningFlags = flags; }
     void   ResetEventSeasonalQuests(uint16 event_id) override;
     void   ReloadRBAC() override;
+    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) override;
 
     [[nodiscard]] std::string const& GetRealmName() const override { return _realmName; } // pussywizard
     void SetRealmName(std::string name) override { _realmName = name; } // pussywizard
@@ -305,6 +306,7 @@ private:
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
+    AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
 
     /**
      * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.
