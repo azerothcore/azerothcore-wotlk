@@ -1,3 +1,4 @@
+-- DB update 2026_09_12_01 -> 2026_09_12_02
 --
 -- Quest 6027 'Book of the Ancients': using the Gem of the Serpent lights the Naga Beam but
 -- often summons nothing, leaving Lord Kragaru (12369) unreachable. The beam is a temporary
