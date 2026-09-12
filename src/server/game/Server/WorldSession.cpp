@@ -833,6 +833,8 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
         LOG_INFO("entities.player", "Account: {} (IP: {}) Logout Character:[{}] ({}) Level: {}",
             GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().ToString(), _player->GetLevel());
 
+        ObjectGuid const playerGuid = _player->GetGUID();
+
         //! Remove the player from the world
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map
@@ -851,8 +853,8 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
         SendPacket(WorldPackets::Character::LogoutComplete().Write());
         LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
 
-        //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
-        if (!redirecting)
+        //! Mark all characters of the account offline, unless a script running several per account handles it instead
+        if (!redirecting && !sScriptMgr->OnPlayerMarkAccountOffline(playerGuid, GetAccountId()))
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
             stmt->SetData(0, GetAccountId());
