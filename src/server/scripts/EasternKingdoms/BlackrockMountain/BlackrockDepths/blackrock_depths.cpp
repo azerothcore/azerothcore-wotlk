@@ -476,6 +476,7 @@ struct npc_phalanx : public ScriptedAI
         // must still return to the final guard position.
         if (_state != PHALANX_STATE_DORMANT)
             SetDoorHome();
+
         ScriptedAI::EnterEvadeMode(why);
     }
 
@@ -513,8 +514,10 @@ struct npc_phalanx : public ScriptedAI
             if (eventId == EVENT_PHALANX_YELL)
                 Talk(SAY_PHALANX_AGGRO);
             else if (eventId == EVENT_PHALANX_FINISH_MOVEMENT)
+            {
                 // A blocked route must not leave him permanently passive or teleport him.
                 Activate();
+            }
         }
 
         if (_state != PHALANX_STATE_ACTIVE || !UpdateVictim())
@@ -667,6 +670,7 @@ struct npc_rocknot : public npc_escortAI
     {
         if (!_instance || quest->GetQuestId() != QUEST_ALE)
             return;
+
         if (HasEscortState(STATE_ESCORT_ESCORTING) || _recovering)
             return;
 
@@ -679,6 +683,7 @@ struct npc_rocknot : public npc_escortAI
 
         if (_instance->GetData(TYPE_BAR) != IN_PROGRESS)
             _instance->SetData(TYPE_BAR, IN_PROGRESS);
+
         _instance->SetData(TYPE_BAR, SPECIAL);
         if (_instance->GetData(TYPE_BAR) != SPECIAL)
             return;
@@ -764,14 +769,17 @@ struct npc_rocknot : public npc_escortAI
                     me->SetEmoteState(EMOTE_STATE_WORK_SHEATHED);
                     if (GameObject* keg = GetBarObject(DATA_GO_BAR_KEG))
                         keg->SetGoState(GO_STATE_ACTIVE);
+
                     // Start both animations together; the trap and Phalanx react after the cork hits.
                     if (GameObject* door = GetBarObject(DATA_GO_BAR_DOOR))
                         door->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+
                     _events.ScheduleEvent(EVENT_ROCKNOT_BAR_REACTION, 7s);
                     break;
                 case EVENT_ROCKNOT_BAR_REACTION:
                     if (GameObject* trap = GetBarObject(DATA_GO_BAR_KEG_TRAP))
                         trap->Use(me);
+
                     me->SetEmoteState(EMOTE_STATE_STUN);
                     me->SetHomePosition(me->GetPosition());
                     _aleComplete = true;
@@ -782,6 +790,7 @@ struct npc_rocknot : public npc_escortAI
                     {
                         if (Creature* phalanx = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PHALANX)))
                             phalanx->AI()->DoAction(ACTION_PHALANX_START_ACTIVATION);
+
                         _instance->SetData(TYPE_BAR, DONE);
                     }
                     break;
