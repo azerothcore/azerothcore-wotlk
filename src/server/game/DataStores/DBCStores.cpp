@@ -22,14 +22,15 @@
 #include "Errors.h"
 #include "LFGMgr.h"
 #include "Log.h"
+#include "RaceMgr.h"
 #include "SharedDefines.h"
 #include "SpellMgr.h"
 #include "TransportMgr.h"
 #include "World.h"
 #include <map>
+#include <utility>
 
-typedef std::map<uint16, uint32> AreaFlagByAreaID;
-typedef std::map<uint32, uint32> AreaFlagByMapID;
+typedef std::map<std::pair<uint32, uint32>, AreaTableEntry const*> AreaEntryByFlagAndMap;
 
 typedef std::tuple<int16, int8, int32> WMOAreaTableKey;
 typedef std::map<WMOAreaTableKey, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
@@ -39,6 +40,7 @@ DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
 DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 
 static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
+static AreaEntryByFlagAndMap sAreaEntryByFlagAndMap;
 
 DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
 DBCStorage <AchievementCategoryEntry> sAchievementCategoryStore(AchievementCategoryfmt);
@@ -49,6 +51,9 @@ DBCStorage <BattlemasterListEntry> sBattlemasterListStore(BattlemasterListEntryf
 DBCStorage <BarberShopStyleEntry> sBarberShopStyleStore(BarberShopStyleEntryfmt);
 DBCStorage <CharStartOutfitEntry> sCharStartOutfitStore(CharStartOutfitEntryfmt);
 std::map<uint32, CharStartOutfitEntry const*> sCharStartOutfitMap;
+
+DBCStorage <CharSectionsEntry> sCharSectionsStore(CharSectionsEntryfmt);
+
 DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
@@ -70,6 +75,10 @@ DBCStorage <DurabilityCostsEntry> sDurabilityCostsStore(DurabilityCostsfmt);
 
 DBCStorage <EmotesEntry> sEmotesStore(EmotesEntryfmt);
 DBCStorage <EmotesTextEntry> sEmotesTextStore(EmotesTextEntryfmt);
+
+typedef std::tuple<uint32, uint32, uint32> EmotesTextSoundKey;
+static std::map<EmotesTextSoundKey, EmotesTextSoundEntry const*> sEmotesTextSoundMap;
+DBCStorage <EmotesTextSoundEntry> sEmotesTextSoundStore(EmotesTextSoundEntryfmt);
 
 typedef std::map<uint32, SimpleFactionsList> FactionTeamMap;
 static FactionTeamMap sFactionTeamMap;
@@ -280,6 +289,7 @@ void LoadDBCStores(std::string const& dataPath)
     LOAD_DBC(sBattlemasterListStore,                "BattlemasterList.dbc",                 "battlemasterlist_dbc");
     LOAD_DBC(sBarberShopStyleStore,                 "BarberShopStyle.dbc",                  "barbershopstyle_dbc");
     LOAD_DBC(sCharStartOutfitStore,                 "CharStartOutfit.dbc",                  "charstartoutfit_dbc");
+    LOAD_DBC(sCharSectionsStore,                    "CharSections.dbc",                     "charsections_dbc");
     LOAD_DBC(sCharTitlesStore,                      "CharTitles.dbc",                       "chartitles_dbc");
     LOAD_DBC(sChatChannelsStore,                    "ChatChannels.dbc",                     "chatchannels_dbc");
     LOAD_DBC(sChrClassesStore,                      "ChrClasses.dbc",                       "chrclasses_dbc");
@@ -299,6 +309,7 @@ void LoadDBCStores(std::string const& dataPath)
     LOAD_DBC(sDurabilityQualityStore,               "DurabilityQuality.dbc",                "durabilityquality_dbc");
     LOAD_DBC(sEmotesStore,                          "Emotes.dbc",                           "emotes_dbc");
     LOAD_DBC(sEmotesTextStore,                      "EmotesText.dbc",                       "emotestext_dbc");
+    LOAD_DBC(sEmotesTextSoundStore,                 "EmotesTextSound.dbc",                  "emotetextsound_dbc");
     LOAD_DBC(sFactionStore,                         "Faction.dbc",                          "faction_dbc");
     LOAD_DBC(sFactionTemplateStore,                 "FactionTemplate.dbc",                  "factiontemplate_dbc");
     LOAD_DBC(sGameObjectArtKitStore,                "GameObjectArtKit.dbc",                 "gameobjectartkit_dbc");
@@ -384,6 +395,10 @@ void LoadDBCStores(std::string const& dataPath)
 
 #undef LOAD_DBC
 
+    for (AreaTableEntry const* area : sAreaTableStore)
+        if (area->exploreFlag)
+            sAreaEntryByFlagAndMap.emplace(std::make_pair(area->mapid, area->exploreFlag), area);
+
     for (CharStartOutfitEntry const* outfit : sCharStartOutfitStore)
         sCharStartOutfitMap[outfit->Race | (outfit->Class << 8) | (outfit->Gender << 16)] = outfit;
 
@@ -407,6 +422,9 @@ void LoadDBCStores(std::string const& dataPath)
         if (info->maxZ < info->minZ)
             std::swap(*(float*)(&info->maxZ), *(float*)(&info->minZ));
     }
+
+    for (EmotesTextSoundEntry const* emoteTextSound : sEmotesTextSoundStore)
+        sEmotesTextSoundMap[EmotesTextSoundKey(emoteTextSound->EmotesTextId, emoteTextSound->RaceId, emoteTextSound->SexId)] = emoteTextSound;
 
     // fill data
     for (MapDifficultyEntry const* entry : sMapDifficultyStore)
@@ -913,6 +931,12 @@ SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, u
     return nullptr;
 }
 
+EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint32 race, uint32 gender)
+{
+    auto itr = sEmotesTextSoundMap.find(EmotesTextSoundKey(emote, race, gender));
+    return itr != sEmotesTextSoundMap.end() ? itr->second : nullptr;
+}
+
 std::vector<SkillLineAbilityEntry const*> const& GetSkillLineAbilitiesBySkillLine(uint32 skillLine)
 {
     auto it = sSkillLineAbilityIndexBySkillLine.find(skillLine);
@@ -922,4 +946,31 @@ std::vector<SkillLineAbilityEntry const*> const& GetSkillLineAbilitiesBySkillLin
         return emptyVector;
     }
     return it->second;
+}
+
+int32 GetAreaFlagByAreaID(uint32 area_id)
+{
+    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(area_id))
+        return int32(area->exploreFlag);
+
+    return -1;
+}
+
+AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
+{
+    return sAreaTableStore.LookupEntry(area_id);
+}
+
+AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag, uint32 map_id)
+{
+    if (area_flag)
+    {
+        auto itr = sAreaEntryByFlagAndMap.find(std::make_pair(map_id, area_flag));
+        return itr != sAreaEntryByFlagAndMap.end() ? itr->second : nullptr;
+    }
+
+    if (MapEntry const* mapEntry = sMapStore.LookupEntry(map_id))
+        return GetAreaEntryByAreaID(mapEntry->linked_zone);
+
+    return nullptr;
 }
