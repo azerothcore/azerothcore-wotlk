@@ -119,7 +119,7 @@ TEST(WorldObjectCastApi, CastSpellTargetArgPosition)
 
 TEST(WorldObjectCastApi, CastSpellTargetArgWorldObjectNull)
 {
-    // Null caster yields an error-state CastSpellTargetArg (Targets stays
+    // A null target yields an error-state CastSpellTargetArg (Targets stays
     // empty so WorldObject::CastSpell returns SPELL_FAILED_BAD_TARGETS).
     CastSpellTargetArg t(static_cast<WorldObject*>(nullptr));
     EXPECT_FALSE(t.Targets);

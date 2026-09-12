@@ -740,7 +740,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         // HoL, Arc Weld
                         case 59086:
                             {
-                                if (m_caster && unitCaster->IsPlayer() && unitCaster->ToPlayer()->isMoving())
+                                if (unitCaster->IsPlayer() && unitCaster->ToPlayer()->isMoving())
                                     unitCaster->CastSpell(unitCaster, 59097, true);
 
                                 return;
@@ -870,7 +870,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         return;
 
                     for (uint32 j = 0; j < spell->StackAmount; ++j)
-                        m_caster->CastSpell(unitTarget, spell->Id, true);
+                        unitCaster->CastSpell(unitTarget, spell->Id, true);
                     return;
                 }
             // Mercurial Shield - (need add max stack of 26464 Mercurial Shield)
@@ -882,7 +882,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         return;
 
                     for (uint32 j = 0; j < spell->StackAmount; ++j)
-                        m_caster->CastSpell(unitTarget, spell->Id, true);
+                        unitCaster->CastSpell(unitTarget, spell->Id, true);
                     return;
                 }
             // Cloak of Shadows
@@ -2477,11 +2477,10 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         return;
 
     Unit* unitCaster = m_originalCaster;
-    WorldObject* caster = m_originalCaster;
 
     bool personalSpawn = (properties->Flags & SUMMON_PROP_FLAG_ONLY_VISIBLE_TO_SUMMONER) != 0;
     int32 duration = m_spellInfo->GetDuration();
-    if (Player* modOwner = caster->GetSpellModOwner())
+    if (Player* modOwner = unitCaster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     TempSummon* summon = nullptr;
@@ -2550,7 +2549,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         // Mana Tide Totem
                         if (m_spellInfo->Id == 16190)
-                            damage = m_caster->ToUnit()->CountPctFromMaxHealth(10);
+                            damage = unitCaster->CountPctFromMaxHealth(10);
 
                         if (damage && properties->Type != SUMMON_TYPE_LIGHTWELL) // Health set in script for lightwell
                         {
@@ -2594,7 +2593,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         TempSummonType summonType = (duration <= 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
-                        WorldObject* summoner = caster;
+                        WorldObject* summoner = unitCaster;
                         if (Unit* unitSummoner = summoner->ToUnit())
                             if (unitSummoner->IsPet())
                                 if (Unit* owner = unitSummoner->GetOwner())
@@ -2676,7 +2675,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
     if (summon)
     {
-        summon->SetCreatorGUID(caster->GetGUID());
+        summon->SetCreatorGUID(unitCaster->GetGUID());
         ExecuteLogEffectSummonObject(effIndex, summon);
     }
 }
@@ -4151,7 +4150,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             }
                         case 61263: // for item Intravenous Healing Potion (44698)
                             {
-                                if (!m_caster || !unitTarget)
+                                if (!unitTarget)
                                     return;
 
                                 unitCaster->CastSpell(unitCaster, 61267, true);

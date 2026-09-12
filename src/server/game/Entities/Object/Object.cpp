@@ -2016,8 +2016,7 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     // It isn't possible in invisibility to detect something that can't detect the invisible object
     // (it's at least true for spell: 66)
     // It seems like that only Units are affected by this check (couldn't see arena doors with preparation invisibility)
-    // and only unit seers are subject to it - invisible trap gameobjects must still "see" their victims to cast at them
-    if (ToUnit() && obj->ToUnit())
+    if (obj->ToUnit())
     {
         // Permanently invisible creatures should be able to engage non-invisible targets.
         // ex. Skulking Witch (20882) / Greater Invisibility (16380)
@@ -3986,9 +3985,6 @@ float WorldObject::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const
 
     if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
         return spellInfo->GetMinRange();
-
-    if (!target)
-        return spellInfo->GetMinRange(true);
 
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
