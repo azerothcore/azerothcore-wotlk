@@ -2374,6 +2374,35 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     }
 
+    if (proto->InventoryType == INVTYPE_RELIC)
+    {
+        switch (proto->SubClass)
+        {
+            case ITEM_SUBCLASS_ARMOR_LIBRAM:
+                if (!IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            case ITEM_SUBCLASS_ARMOR_IDOL:
+                if (!IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            case ITEM_SUBCLASS_ARMOR_TOTEM:
+                if (!IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            case ITEM_SUBCLASS_ARMOR_MISC:
+                if (!IsClass(CLASS_WARLOCK, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            case ITEM_SUBCLASS_ARMOR_SIGIL:
+                if (!IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_RELIC))
+                    return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
+                break;
+            default:
+                break;
+        }
+    }
+
     if (proto->RequiredSkill != 0)
     {
         if (GetSkillValue(proto->RequiredSkill) == 0)
@@ -3071,7 +3100,7 @@ void Player::MoveItemFromInventory(uint8 bag, uint8 slot, bool update)
 }
 
 // Common operation need to add item from inventory without delete in trade, guild bank, mail....
-void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB)
+Item* Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB)
 {
     // update quest counters
     ItemAddedQuestCheck(pItem->GetEntry(), pItem->GetCount());
@@ -3094,6 +3123,10 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
         if (pLastItem->IsBOPTradable())
             AddTradeableItem(pLastItem);
     }
+
+    sScriptMgr->OnPlayerAfterMoveItemToInventory(this, pLastItem, update);
+
+    return pLastItem;
 }
 
 void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
@@ -6610,7 +6643,16 @@ void Player::_LoadSpells(PreparedQueryResult result)
             if (CheckSkillLearnedBySpell(spellId))
                 addSpell(spellId, specMask, true);
             else
+            {
+                // Spell was never addSpell()'d, so removeSpell is often a no-op and would
+                // leave an orphan character_spell row (MySQL 1062 on later re-learn/save).
                 removeSpell(spellId, SPEC_MASK_ALL, false);
+
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_BY_SPELL);
+                stmt->SetData(0, GetGUID().GetRawValue());
+                stmt->SetData(1, spellId);
+                CharacterDatabase.Execute(stmt);
+            }
         } while (result->NextRow());
     }
 }

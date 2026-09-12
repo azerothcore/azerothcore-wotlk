@@ -667,7 +667,7 @@ void GameObject::Update(uint32 diff)
                         // respawn timer
                         uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
                         if (poolid)
-                            sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+                            sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
                         else
                             GetMap()->AddToMap(this);
                     }
@@ -968,7 +968,7 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
             // GameObject::Update() will update the pool when the object is ready to respawn.
             if (poolid && !m_respawnTime)
             {
-                sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+                sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
             }
         }
     }
@@ -992,7 +992,7 @@ void GameObject::Delete()
 
     uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
     if (poolid)
-        sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+        sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
     else
         AddObjectToRemoveList();
 }
