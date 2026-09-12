@@ -22,3 +22,10 @@ DELETE FROM `reference_loot_template` WHERE `Entry` = 34352 AND `Item` IN (45086
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (34352, 45086, 0, 0, 0, 1, 1, 1, 1, 'Rising Sun'),
 (34352, 45110, 0, 0, 0, 1, 1, 1, 1, 'Titanguard');
+
+-- Hodir 25-man hard-mode cache: Fragment of Val'anyr, Runed Orb and recipes like the other 25-man hard-mode caches
+DELETE FROM `gameobject_loot_template` WHERE `Entry` = 26950 AND `Item` IN (1, 45038, 45087);
+INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(26950, 1, 34154, 10, 0, 1, 0, 1, 1, 'Rare Cache of Winter - (ReferenceTable)'),
+(26950, 45038, 0, 18, 0, 1, 0, 1, 1, 'Rare Cache of Winter - Fragment of Val\'anyr'),
+(26950, 45087, 0, 10, 0, 1, 0, 1, 1, 'Rare Cache of Winter - Runed Orb');
