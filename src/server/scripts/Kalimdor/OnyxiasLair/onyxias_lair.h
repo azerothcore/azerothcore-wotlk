@@ -36,6 +36,7 @@ enum eCreatures
 {
     NPC_ONYXIA                  = 10184,
     NPC_ONYXIAN_WHELP           = 11262,
+    NPC_ONYXIAN_WARDER          = 12129,
     NPC_ONYXIA_TRIGGER          = 12758,
     NPC_ONYXIAN_LAIR_GUARD      = 36561,
 };
