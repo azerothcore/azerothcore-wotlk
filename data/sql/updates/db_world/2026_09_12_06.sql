@@ -1,3 +1,4 @@
+-- DB update 2026_09_12_05 -> 2026_09_12_06
 --
 -- Unstable Sun Beam (33050) now owns its own lifetime instead of relying on Elder Brightleaf's
 -- event map, which stops running the moment he dies and left the beams up forever.
