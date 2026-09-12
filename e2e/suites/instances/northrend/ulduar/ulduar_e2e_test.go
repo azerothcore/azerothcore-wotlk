@@ -376,6 +376,9 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 		// plus slack for the kill and the object-cache round trip.
 		beamMaxLifetime = 25 * time.Second
 		beamSearchRange = float32(150)
+		// The elder's own beam sits on him, so "landed on the player" is only distinguishable
+		// from "stacked on the elder" while the bot stands clear of him by more than this.
+		beamOnPlayerRange = float32(3)
 	)
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
@@ -420,9 +423,14 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 		time.Sleep(250 * time.Millisecond)
 	}
 	bx, by, bz, _ := bot.Pos()
-	ex, ey, ez := float32(0), float32(0), float32(0)
-	if o := bot.World.GetObject(elder); o != nil {
-		ex, ey, ez = o.PosX, o.PosY, o.PosZ
+	elderObj := bot.World.GetObject(elder)
+	if elderObj == nil {
+		e2eharness.Preconditionf(t, "Elder Brightleaf 0x%X left the object cache before the wave landed", elder)
+	}
+	ex, ey, ez := elderObj.PosX, elderObj.PosY, elderObj.PosZ
+	if botToElder := e2eharness.Distance3D(bx, by, bz, ex, ey, ez); botToElder <= beamOnPlayerRange {
+		e2eharness.Preconditionf(t, "bot stands %.1fy from the elder, too close for the placement oracle to discriminate (need > %.1fy)",
+			botToElder, beamOnPlayerRange)
 	}
 	nearestToBot := float32(math.MaxFloat32)
 	for _, b := range wave {
@@ -436,7 +444,7 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 	// 62207 summons one beam at the elder and force-casts 62221 on every player in range, each
 	// summoning one at their own feet. A forced cast whose target mask takes no unit target must
 	// not inherit the original caster as its destination, or every beam stacks on the elder.
-	if nearestToBot > 3 {
+	if nearestToBot > beamOnPlayerRange {
 		e2eharness.Assertf(t, "no Unstable Sun Beam landed on the player: nearest of %d beams is %.1fy away",
 			len(wave), nearestToBot)
 	}
