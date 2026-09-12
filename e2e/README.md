@@ -163,7 +163,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
-| instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
+| instances/ulduar | named tele; Freya wave interval; a Laughing Skull's Lunatic Gaze stops at the brain room's geometry instead of draining sanity through it | P2 | covered (`TestAC_27095_*`, `TestAC_27602_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 #27602 |
 | world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
 
 ---

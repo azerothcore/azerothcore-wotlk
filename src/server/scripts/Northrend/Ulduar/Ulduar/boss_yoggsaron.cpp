@@ -2586,14 +2586,17 @@ class spell_yogg_saron_lunatic_gaze : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        std::list<WorldObject*> tmplist;
-        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-            if ((*itr)->HasInArc(M_PI, GetCaster()))
-                tmplist.push_back(*itr);
+        Unit* caster = GetCaster();
+        // 64168 inherits SPELL_ATTR2_IGNORE_LINE_OF_SIGHT from the aura triggering it, so the illusion room walls have to be checked here
+        bool ignoreLos = GetSpellInfo()->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT);
 
-        targets.clear();
-        for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-            targets.push_back(*itr);
+        targets.remove_if([caster, ignoreLos](WorldObject* target)
+        {
+            if (!target->HasInArc(M_PI, caster))
+                return true;
+
+            return !ignoreLos && !caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2);
+        });
     }
 
     void Register() override
