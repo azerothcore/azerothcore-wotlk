@@ -76,7 +76,7 @@ enum SPGameObjectIds
     GO_ICE_SPEAR                         = 188077,
     GO_ICE_STONE                         = 187882,
     GO_ICE_CHEST                         = 188192,
-    GO_ICE_CHEST_2                       = 187892,
+    GO_ICE_CHEST_2                       = 187892
 };
 
 template <class AI, class T>
