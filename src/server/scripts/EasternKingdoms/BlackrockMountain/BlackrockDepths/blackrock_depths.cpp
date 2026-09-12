@@ -406,6 +406,23 @@ enum PhalanxSpells
     SPELL_MIGHTYBLOW                    = 14099
 };
 
+enum PhalanxAction
+{
+    ACTION_BAR_DOOR_BROKEN = 0
+};
+
+enum PhalanxPoints
+{
+    POINT_BAR_DOOR = 0
+};
+
+enum PhalanxSays
+{
+    SAY_BAR_DOOR_BROKEN = 0
+};
+
+Position const PhalanxDoorPos = {868.97f, -224.979f, -43.7191, 2.1145};
+
 struct npc_phalanx : public ScriptedAI
 {
     npc_phalanx(Creature* creature) : ScriptedAI(creature) { }
@@ -447,6 +464,17 @@ struct npc_phalanx : public ScriptedAI
         else _mightyBlowTimer -= diff;
 
         DoMeleeAttackIfReady();
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_BAR_DOOR_BROKEN)
+        {
+            me->SetHomePosition(PhalanxDoorPos);
+            me->SetFaction(FACTION_MONSTER);
+            me->GetMotionMaster()->MovePoint(POINT_BAR_DOOR, PhalanxDoorPos);
+            Talk(SAY_BAR_DOOR_BROKEN);
+        }
     }
 
 private:
@@ -565,7 +593,7 @@ struct npc_rocknot : public npc_escortAI
                 //spell by trap has effect61, this indicate the bar go hostile
 
                 if (Unit* tmp = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_PHALANX)))
-                    tmp->SetFaction(FACTION_MONSTER);
+                    tmp->GetAI()->DoAction(ACTION_BAR_DOOR_BROKEN);
 
                 //for later, this event(s) has alot more to it.
                 //optionally, DONE can trigger bar to go hostile.
