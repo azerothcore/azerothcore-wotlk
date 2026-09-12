@@ -1320,8 +1320,10 @@ bool GameObject::ActivateToQuest(Player* target) const
     FactionTemplateEntry const* gameObjectFaction =
         sFactionTemplateStore.LookupEntry(GetUInt32Value(GAMEOBJECT_FACTION));
     FactionTemplateEntry const* playerFaction = target->GetFactionTemplateEntry();
-    if (gameObjectFaction && playerFaction)
+    if (gameObjectFaction && playerFaction &&
+        (gameObjectFaction->IsHostileToAlliancePlayers() || gameObjectFaction->IsHostileToHordePlayers()))
     {
+        // Faction templates 101/102 have no ourMask, so check hostility from the gameobject to the player.
         bool isHostile = gameObjectFaction->IsHostileTo(*playerFaction);
         if (ReputationRank const* forcedRank = target->GetReputationMgr().GetForcedRankIfAny(gameObjectFaction))
             isHostile = *forcedRank <= REP_HOSTILE;
