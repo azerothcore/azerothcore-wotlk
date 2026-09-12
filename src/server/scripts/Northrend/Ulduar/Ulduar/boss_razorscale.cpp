@@ -296,9 +296,6 @@ struct boss_razorscale : public BossAI
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
                 break;
             case ACTION_START_PERMA_GROUND:
-                // Crossing 50% during the descent triggers this from DamageTaken, then again on landing
-                if (events.IsInPhase(PHASE_PERMA_GROUND))
-                    break;
                 me->SetDisableGravity(false);
                 me->RemoveAura(SPELL_STUN_SELF);
                 Talk(EMOTE_PERMA_GROUND);
@@ -396,7 +393,10 @@ struct boss_razorscale : public BossAI
         {
             _permaGround = true;
             me->SetReactState(REACT_AGGRESSIVE);
-            DoAction(ACTION_START_PERMA_GROUND);
+            // Wing Buffet is a 35 yard sphere measured in 3D, so it misses the floor while she is
+            // still descending; the landing point runs the transition in that case
+            if (!me->IsFlying())
+                DoAction(ACTION_START_PERMA_GROUND);
         }
     }
 
