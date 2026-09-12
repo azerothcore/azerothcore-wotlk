@@ -156,13 +156,14 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
 | quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
 | quests/frostmourne | scrying-orb vision runs; Muradin leaves the cavern and despawns; quest 12478 COMPLETE | P2 | covered (`TestAC_25760_*`); dialogue order and duplicate line `blocked-harness` (no monster-say capture) | #25760 |
+| quests/objectives | a mob that drops a quest item advertises it, so the client shows the objective on hover (`creature_questitem` -> `SMSG_CREATURE_QUERY_RESPONSE.questItems`) | P2 | covered (`TestAC_27553_*`), decoding the response through a raw packet hook since the harness has no dispatch case for it | #27553 |
 | items/equip | visible-item slot after EquipEntry; additem; survives relog | P2 | covered | — |
 | protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked-harness` (extra_flags after relog) | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
-| instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
+| instances/ulduar | named tele; Freya wave interval; a Laughing Skull's Lunatic Gaze stops at the brain room's geometry instead of draining sanity through it | P2 | covered (`TestAC_27095_*`, `TestAC_27602_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 #27602 |
 | world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
 
 ---

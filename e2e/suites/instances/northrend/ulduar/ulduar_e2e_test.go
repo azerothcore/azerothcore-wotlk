@@ -277,3 +277,81 @@ func TestUlduar_MultiBotLoginNearBossPad(t *testing.T) {
 	}
 	t.Logf("PASS multi-bot Freya pad login n=%d map=%d", len(bots), m0)
 }
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27602
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27614
+// A Laughing Skull's Lunatic Gaze (64168) must not reach a player behind the brain
+// room's geometry. 64168 has no ignore-LoS attribute of its own; it used to inherit
+// one from the aura that triggers it (64167), so the skulls drained sanity through
+// walls. The clear-line half runs first and is the fixture check: without sanity
+// loss there, the blocked half proves nothing.
+func TestAC_27602_LaughingSkullGazeLoS(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances", "issue"},
+		Runtime:  "med",
+		Issue:    27602,
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcLaughingSkull = uint32(33990)
+		spellSanity      = uint32(63050)
+
+		// Icecrown illusion chamber floor. The pair sits 18 yd either side of the
+		// skull: due west is open, due east is behind structure (verified in-world
+		// with a LoS-respecting player cast at 12, 18 and 24 yd).
+		skullX, skullY, skullZ = float32(1930.0), float32(-120.0), float32(240.07)
+		clearX, clearY         = float32(1912.0), float32(-120.0)
+		blockedX, blockedY     = float32(1948.0), float32(-120.0)
+
+		// 64167 ticks every second for 2 sanity; 8s leaves margin for spawn settle.
+		gazeWindow = 8 * time.Second
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "YoggLo", Race: e2eharness.RaceHuman, Level: 80,
+	})
+
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
+	bot.Teleport(t, skullX, skullY, skullZ, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after brain room tele map=%d", m)
+	}
+	// The skulls are SummonCreature'd by the Brain AI, not by a spell, so a GM spawn
+	// is the fixture rather than a stand-in for a summon path. 64167 rides on
+	// creature_template_addon, so the spawn gazes on its own with no AI to drive.
+	skull := bot.Spawn(t, npcLaughingSkull, 30*time.Second)
+
+	// Drop GM so the gaze can select the bot; god mode absorbs the 1749/s it deals.
+	bot.CombatReady(t)
+	bot.CheatGod(t)
+
+	// Sanity carries AURA_INTERRUPT_FLAG_CHANGE_MAP, so apply it after the tele.
+	sanityLost := func(label string, px, py float32) int {
+		bot.Teleport(t, px, py, skullZ, e2eharness.MapUlduar)
+		bot.WaitUnitGUID(t, skull, 15*time.Second) // tele clears the object cache
+		bot.Face(t, skull)                         // 64168 only takes targets facing the caster
+		bot.ApplyAura(t, spellSanity)
+		before := bot.AuraStacks(spellSanity)
+		if before == 0 {
+			e2eharness.Preconditionf(t, "%s: Sanity 63050 did not apply", label)
+		}
+		time.Sleep(gazeWindow)
+		after := bot.AuraStacks(spellSanity)
+		bot.CancelAura(t, spellSanity)
+		t.Logf("%s pos=(%.1f,%.1f) skull=0x%X sanity %d -> %d", label, px, py, skull, before, after)
+		return before - after
+	}
+
+	clearLoss := sanityLost("CLEAR", clearX, clearY)
+	if clearLoss <= 0 {
+		e2eharness.Preconditionf(t, "fixture dead: skull 0x%X drained no sanity with a clear line", skull)
+	}
+	blockedLoss := sanityLost("BLOCKED", blockedX, blockedY)
+	if blockedLoss > 0 {
+		e2eharness.ConfirmedBugf(t, 27602,
+			"Lunatic Gaze drained %d sanity through the brain room geometry (clear line drained %d)",
+			blockedLoss, clearLoss)
+	}
+	t.Logf("PASS Lunatic Gaze LoS: clear drained %d, blocked drained %d", clearLoss, blockedLoss)
+}
