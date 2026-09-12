@@ -40,7 +40,7 @@ UPDATE `creature_template` SET `flags_extra` = (`flags_extra` | @NO_PARRY_HASTEN
 -- Leviathan Mk II
 33432,
 34106,
--- Anti-personnel Assault Cannon
+-- VX-001
 33651,
 34108,
 -- Aerial Command Unit
