@@ -247,7 +247,9 @@ public:
     Loot        loot;
 
     [[nodiscard]] Player* GetLootRecipient() const;
+    [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Group* GetLootRecipientGroup() const;
+    [[nodiscard]] ObjectGuid::LowType GetLootRecipientGroupGUID() const { return m_lootRecipientGroup; }
     void SetLootRecipient(Creature* creature);
     void SetLootRecipient(Map* map);
     bool IsLootAllowedFor(Player const* player) const;

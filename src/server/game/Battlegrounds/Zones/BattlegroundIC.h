@@ -859,6 +859,9 @@ struct BattlegroundICScore final : public BattlegroundScore
 {
     friend class BattlegroundIC;
 
+    [[nodiscard]] uint32 GetBasesAssaulted() const { return BasesAssaulted; }
+    [[nodiscard]] uint32 GetBasesDefended() const { return BasesDefended; }
+
 protected:
     BattlegroundICScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
 
