@@ -1072,6 +1072,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             SpellInfo const* spell = (*i)->GetSpellInfo();
 
             uint32 shareDamage = CalculatePct(damage, (*i)->GetAmount());
+            bool const hasSharedDamage = shareDamage != 0;
 
             uint32 shareAbsorb = 0;
             uint32 shareResist = 0;
@@ -1095,6 +1096,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             {
                 attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, shareResist, damagetype == DIRECT_DAMAGE, 0, false, true);
             }
+
+            // Shared damage is a hostile interaction for its recipient too.
+            if (hasSharedDamage && attacker && !attacker->IsFriendlyTo(shareDamageTarget))
+                attacker->AtTargetAttacked(shareDamageTarget, !spellProto || spellProto->HasInitialAggro());
 
             Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask, spellProto, false, false, damageSpell);
         }
@@ -2549,6 +2554,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
             if (!caster || (caster == victim) || !caster->IsInWorld() || !caster->IsAlive())
                 continue;
 
+            SpellInfo const* splitSpellInfo = (*itr)->GetSpellInfo();
             int32 splitDamage = (*itr)->GetAmount();
 
             // absorb must be smaller than the damage itself
@@ -2588,11 +2594,16 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
 
             if (attacker)
             {
-                attacker->SendSpellNonMeleeDamageLog(caster, (*itr)->GetSpellInfo(), splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
+                attacker->SendSpellNonMeleeDamageLog(caster, splitSpellInfo, splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
             }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*itr)->GetSpellInfo(), false);
+
+            // Split damage is a hostile interaction for its recipient too.
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
+
+            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo, false);
         }
 
         // We're going to call functions which can modify content of the list during iteration over it's elements
@@ -2665,6 +2676,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
             }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+
+            // Split damage is a hostile interaction for its recipient too.
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
+
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, splitSchoolMask, splitSpellInfo, false);
         }
     }
