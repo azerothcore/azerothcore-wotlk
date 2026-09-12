@@ -662,7 +662,7 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
 bool PetAI::StartChase(Unit* target)
 {
-    if (!_canMeleeAttack())
+    if (!target || target == me || me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) || !_canMeleeAttack())
         return false;
 
     std::optional<ChaseAngle> chaseAngle;
