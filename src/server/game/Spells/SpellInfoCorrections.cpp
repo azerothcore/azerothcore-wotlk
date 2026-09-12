@@ -1941,6 +1941,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].Effect = 0;
     });
 
+    // Ulduar, General Vezax, Shadow Crash (area aura)
+    ApplySpellFix({ 63277 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_DO_NOT_DISPLAY_DURATION;
+    });
+
     // Boom (XT-002)
     ApplySpellFix({ 62834 }, [](SpellInfo* spellInfo)
     {
@@ -2044,12 +2050,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
         spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
-    });
-
-    // Cosmic Smash (Algalon the Observer)
-    ApplySpellFix({ 62293 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
     // Cosmic Smash (Algalon the Observer)

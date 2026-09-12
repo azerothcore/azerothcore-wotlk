@@ -1043,7 +1043,11 @@ void Spell::EffectForceCast(SpellEffIndex effIndex)
     }
 
     SpellCastTargets targets;
-    targets.SetUnitTarget(m_caster);
+    // InitExplicitTargets turns a unit target the triggered spell cannot take into that spell's
+    // destination, which would anchor the forced cast to the original caster instead of to the
+    // forced one (e.g. Algalon's Cosmic Smash craters, Elder Brightleaf's Unstable Sun Beams).
+    if (spellInfo->GetExplicitTargetMask() & (TARGET_FLAG_UNIT_MASK | TARGET_FLAG_CORPSE_MASK))
+        targets.SetUnitTarget(m_caster);
 
     unitTarget->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK);
 }

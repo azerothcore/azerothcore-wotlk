@@ -1038,6 +1038,10 @@ struct npc_living_constellation : public ScriptedAI
         if (spell->Id != SPELL_CONSTELLATION_PHASE_EFFECT || !caster->IsCreature())
             return;
 
+        // prevent Living Constellations closing Black Holes while they are far up in the air during their activation
+        if (me->GetDistanceZ(caster) > 5.0f)
+            return;
+
         if (InstanceScript* instance = me->GetInstanceScript())
             instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, EVENT_ID_SUPERMASSIVE_START);
 
