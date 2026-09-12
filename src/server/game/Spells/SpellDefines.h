@@ -19,7 +19,15 @@
 #define SPELLDEFINES_H
 
 #include "Define.h"
+#include "ObjectGuid.h"
+#include <memory>
 #include <vector>
+
+class AuraEffect;
+class Item;
+class Position;
+class SpellCastTargets;
+class WorldObject;
 
 enum SpellInterruptFlags
 {
@@ -180,5 +188,64 @@ struct SpellImmune
 };
 
 typedef std::vector<SpellImmune> SpellImmuneList;
+
+// AzerothCore note: TC keeps SpellCastTargets in SpellDefines.h, so its
+// CastSpellTargetArg can hold an Optional<SpellCastTargets> by value.
+// In AC, SpellCastTargets lives in Spell.h and depends on WorldLocation,
+// so we hold it via std::unique_ptr (forward-declaration friendly) and
+// define all special members out-of-line in Spell.cpp where the type is
+// complete. A null Targets pointer signals an error/empty state, matching
+// TC's empty-optional semantics.
+//
+// AzerothCore note: AC has no AreaTrigger entity (DBC structs only). Any
+// TC backport that constructs spells via AreaTrigger::CastSpell must be
+// translated manually.
+struct AC_GAME_API CastSpellTargetArg
+{
+    CastSpellTargetArg();
+    CastSpellTargetArg(std::nullptr_t);
+    CastSpellTargetArg(WorldObject* target);
+    CastSpellTargetArg(Item* itemTarget);
+    CastSpellTargetArg(Position const& dest);
+    CastSpellTargetArg(SpellCastTargets&& targets);
+    CastSpellTargetArg(CastSpellTargetArg&&) noexcept;
+    CastSpellTargetArg& operator=(CastSpellTargetArg&&) noexcept;
+    ~CastSpellTargetArg();
+
+    std::unique_ptr<SpellCastTargets> Targets;
+};
+
+struct AC_GAME_API CastSpellExtraArgs
+{
+    CastSpellExtraArgs() = default;
+    CastSpellExtraArgs(bool triggered)
+        : TriggerFlags(triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE) {}
+    CastSpellExtraArgs(TriggerCastFlags trigger) : TriggerFlags(trigger) {}
+    CastSpellExtraArgs(Item* item)
+        : TriggerFlags(TRIGGERED_FULL_MASK), CastItem(item) {}
+    CastSpellExtraArgs(AuraEffect const* eff)
+        : TriggerFlags(TRIGGERED_FULL_MASK), TriggeringAura(eff) {}
+    CastSpellExtraArgs(ObjectGuid const& origCaster)
+        : TriggerFlags(TRIGGERED_FULL_MASK), OriginalCaster(origCaster) {}
+    CastSpellExtraArgs(AuraEffect const* eff, ObjectGuid const& origCaster)
+        : TriggerFlags(TRIGGERED_FULL_MASK), TriggeringAura(eff), OriginalCaster(origCaster) {}
+    CastSpellExtraArgs(SpellValueMod mod, int32 val)
+    {
+        SpellValueOverrides.AddSpellMod(mod, val);
+    }
+
+    CastSpellExtraArgs& SetTriggerFlags(TriggerCastFlags flag) { TriggerFlags = flag; return *this; }
+    CastSpellExtraArgs& SetCastItem(Item* item) { CastItem = item; return *this; }
+    CastSpellExtraArgs& SetTriggeringAura(AuraEffect const* eff) { TriggeringAura = eff; return *this; }
+    CastSpellExtraArgs& SetOriginalCaster(ObjectGuid const& guid) { OriginalCaster = guid; return *this; }
+    CastSpellExtraArgs& AddSpellMod(SpellValueMod mod, int32 val) { SpellValueOverrides.AddSpellMod(mod, val); return *this; }
+    CastSpellExtraArgs& AddSpellBP0(int32 val) { return AddSpellMod(SPELLVALUE_BASE_POINT0, val); }
+
+    TriggerCastFlags  TriggerFlags   = TRIGGERED_NONE;
+    Item*             CastItem       = nullptr;
+    AuraEffect const* TriggeringAura = nullptr;
+    ObjectGuid        OriginalCaster = ObjectGuid::Empty;
+    CustomSpellValues SpellValueOverrides;
+};
 
 #endif // SPELLDEFINES_H
