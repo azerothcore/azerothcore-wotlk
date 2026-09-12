@@ -147,7 +147,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
-| spells/aura | apply/query; CC broken by damage; mount persist | P1 | covered (`TestAC_26130_*`) | #26130 |
+| spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`) | #26130 #25765 |
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
 | spells/effects | Charge / grounding totem / Sweeping Strikes Execute | P1 | covered (`TestAC_26997_*`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
@@ -157,6 +157,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
 | quests/frostmourne | scrying-orb vision runs; Muradin leaves the cavern and despawns; quest 12478 COMPLETE | P2 | covered (`TestAC_25760_*`); dialogue order and duplicate line `blocked-harness` (no monster-say capture) | #25760 |
 | quests/objectives | a mob that drops a quest item advertises it, so the client shows the objective on hover (`creature_questitem` -> `SMSG_CREATURE_QUERY_RESPONSE.questItems`) | P2 | covered (`TestAC_27553_*`), decoding the response through a raw packet hook since the harness has no dispatch case for it | #27553 |
+| quests/summons | using the Serpent Statue on Ranazjar Isle summons Lord Kragaru, the only source of the Book of the Ancients (quest 6027). Beam and summon are asserted separately so a failure names which script broke, and the activation is repeated because the regression it guards was probabilistic, not absolute | P2 | covered (`TestQuest6027_*`) | — |
 | items/equip | visible-item slot after EquipEntry; additem; survives relog | P2 | covered | — |
 | protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked-harness` (extra_flags after relog) | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
