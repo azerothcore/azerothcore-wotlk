@@ -3,6 +3,8 @@
 package ulduar_test
 
 import (
+	"fmt"
+	"math"
 	"testing"
 	"time"
 
@@ -354,4 +356,132 @@ func TestAC_27602_LaughingSkullGazeLoS(t *testing.T) {
 			blockedLoss, clearLoss)
 	}
 	t.Logf("PASS Lunatic Gaze LoS: clear drained %d, blocked drained %d", clearLoss, blockedLoss)
+}
+
+// Elder Brightleaf's Unstable Sun Beams must not outlive him. The beams are spell summons that
+// nothing in the engine despawns, so while the elder's event map was the only thing removing them
+// every kill taken with a wave up left the beams on the ground permanently.
+// Issue: https://github.com/chromiecraft/chromiecraft/issues/10163
+func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances"},
+		Runtime:  "med",
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcElderBrightleaf = uint32(32915)
+		npcUnstableSunBeam = uint32(33050)
+		// Each beam despawns itself after a randomised 18-25s; the oracle allows the worst case
+		// plus slack for the kill and the object-cache round trip.
+		beamMaxLifetime = 25 * time.Second
+		beamSearchRange = float32(150)
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "Bleaf",
+		Level:  80,
+	})
+
+	// Raid interior pad (game_tele BossFreya), same as the Freya test: .go xyz is reliable while a
+	// missing custom tele name hangs TeleNamed for 60s. Stay GM through the raid enter.
+	bot.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Freya pad tele map=%d", m)
+	}
+	bot.GoCreatureID(t, npcElderBrightleaf)
+	bot.CombatReady(t)
+
+	// Evade beside the elder can leave a 0 HP object in cache; re-poll for a living one.
+	var elder uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		elder = bot.WaitUnit(t, npcElderBrightleaf, 10*time.Second)
+		if hp, maxHP := bot.UnitHP(elder); maxHP > 0 && hp > 0 && bot.World.GetObject(elder) != nil {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Elder Brightleaf in cache after GoCreatureID (last=0x%X)", elder)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	bot.Engage(t, elder, 15*time.Second)
+
+	// First wave lands ~6s after the pull, then every 22-26s.
+	var wave []sunBeamSnap
+	waveDeadline := time.Now().Add(40 * time.Second)
+	for {
+		if wave = sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange); len(wave) > 0 {
+			break
+		}
+		if !time.Now().Before(waveDeadline) {
+			e2eharness.Preconditionf(t, "no Unstable Sun Beam spawned within 40s of engaging Elder Brightleaf")
+		}
+		time.Sleep(250 * time.Millisecond)
+	}
+	bx, by, bz, _ := bot.Pos()
+	ex, ey, ez := float32(0), float32(0), float32(0)
+	if o := bot.World.GetObject(elder); o != nil {
+		ex, ey, ez = o.PosX, o.PosY, o.PosZ
+	}
+	nearestToBot := float32(math.MaxFloat32)
+	for _, b := range wave {
+		toBot := e2eharness.Distance3D(bx, by, bz, b.x, b.y, b.z)
+		if toBot < nearestToBot {
+			nearestToBot = toBot
+		}
+		t.Logf("beam 0x%X at (%.1f,%.1f,%.1f) dist bot=%.1f elder=%.1f", b.guid, b.x, b.y, b.z,
+			toBot, e2eharness.Distance3D(ex, ey, ez, b.x, b.y, b.z))
+	}
+	// 62207 summons one beam at the elder and force-casts 62221 on every player in range, each
+	// summoning one at their own feet. A forced cast whose target mask takes no unit target must
+	// not inherit the original caster as its destination, or every beam stacks on the elder.
+	if nearestToBot > 3 {
+		e2eharness.Assertf(t, "no Unstable Sun Beam landed on the player: nearest of %d beams is %.1fy away",
+			len(wave), nearestToBot)
+	}
+
+	// Kill him with the wave still up — that is the state that used to leak.
+	bot.DamageKill(t, []uint64{elder}, 10_000_000, 30*time.Second)
+	killT := time.Now()
+
+	cutoff := killT.Add(beamMaxLifetime + 15*time.Second)
+	for {
+		left := sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange)
+		if len(left) == 0 {
+			break
+		}
+		if !time.Now().Before(cutoff) {
+			e2eharness.Assertf(t, "%d Unstable Sun Beam(s) still up %s after Elder Brightleaf died: %v",
+				len(left), time.Since(killT).Round(time.Second), sunBeamGUIDs(left))
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	t.Logf("PASS %d sun beams all gone %s after Elder Brightleaf died",
+		len(wave), time.Since(killT).Round(time.Millisecond))
+}
+
+type sunBeamSnap struct {
+	guid    uint64
+	x, y, z float32
+}
+
+// sunBeamsInCache reports beams by presence, not liveness: the bug is the object still existing.
+func sunBeamsInCache(bot *e2eharness.ScenarioBot, entry uint32, maxDist float32) []sunBeamSnap {
+	var out []sunBeamSnap
+	for _, u := range bot.World.GetNearbyUnits(maxDist) {
+		if u.Entry != entry {
+			continue
+		}
+		out = append(out, sunBeamSnap{guid: u.GUID, x: u.PosX, y: u.PosY, z: u.PosZ})
+	}
+	return out
+}
+
+func sunBeamGUIDs(beams []sunBeamSnap) []string {
+	out := make([]string, len(beams))
+	for i, b := range beams {
+		out[i] = fmt.Sprintf("0x%X", b.guid)
+	}
+	return out
 }
