@@ -358,9 +358,10 @@ func TestAC_27602_LaughingSkullGazeLoS(t *testing.T) {
 	t.Logf("PASS Lunatic Gaze LoS: clear drained %d, blocked drained %d", clearLoss, blockedLoss)
 }
 
-// Elder Brightleaf's Unstable Sun Beams must not outlive him. The beams are spell summons that
-// nothing in the engine despawns, so while the elder's event map was the only thing removing them
-// every kill taken with a wave up left the beams on the ground permanently.
+// Elder Brightleaf's Unstable Sun Beams must not outlive him, and each wave must land one beam on
+// the elder plus one under each player in range. Before the fix the beams were hand-summoned with
+// no duration and the elder's event map was the only thing that removed them, so a kill taken with
+// a wave up left them standing for the life of the instance.
 // Issue: https://github.com/chromiecraft/chromiecraft/issues/10163
 func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
@@ -373,7 +374,9 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 		npcElderBrightleaf = uint32(32915)
 		npcUnstableSunBeam = uint32(33050)
 		// Each beam despawns itself after a randomised 18-25s; the oracle allows the worst case
-		// plus slack for the kill and the object-cache round trip.
+		// plus slack for the kill and the object-cache round trip. Do not widen it past 30s: that
+		// is 62221's summon duration, the engine backstop that would despawn the player's beam by
+		// itself and hide the regression this guards.
 		beamMaxLifetime = 25 * time.Second
 		beamSearchRange = float32(150)
 		// The elder's own beam sits on him, so "landed on the player" is only distinguishable
@@ -412,15 +415,25 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 
 	// First wave lands ~6s after the pull, then every 22-26s.
 	var wave []sunBeamSnap
-	waveDeadline := time.Now().Add(40 * time.Second)
+	waveDeadline := time.Now().Add(70 * time.Second)
 	for {
 		if wave = sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange); len(wave) > 0 {
 			break
 		}
 		if !time.Now().Before(waveDeadline) {
-			e2eharness.Preconditionf(t, "no Unstable Sun Beam spawned within 40s of engaging Elder Brightleaf")
+			e2eharness.Preconditionf(t, "no Unstable Sun Beam spawned within 70s of engaging Elder Brightleaf")
 		}
 		time.Sleep(250 * time.Millisecond)
+	}
+	// Let the wave stop growing before measuring, or placement gets judged on whichever of the two
+	// summons reached the cache first.
+	for settle := time.Now().Add(5 * time.Second); time.Now().Before(settle); {
+		time.Sleep(500 * time.Millisecond)
+		grown := sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange)
+		if len(grown) <= len(wave) {
+			break
+		}
+		wave = grown
 	}
 	bx, by, bz, _ := bot.Pos()
 	elderObj := bot.World.GetObject(elder)
