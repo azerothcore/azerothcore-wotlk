@@ -43,6 +43,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
+#include "Timer.h"
 #include "Transport.h"
 #include "Util.h"
 #include "Vehicle.h"
@@ -258,6 +259,9 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     return true;
 }
 
+// Only has to outlive one map update: everyone in range at the summon gets the create block on that tick.
+constexpr uint32 BIRTH_ANIM_WINDOW = 1000;
+
 Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
     m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
@@ -312,6 +316,12 @@ void Creature::AddToWorld()
         {
             GetMap()->GetCreatureBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
         }
+        else
+        {
+            // Only summons. Spawns with a spawnId also reach this on grid load, which would
+            // birth-animate them at anyone walking up to the grid.
+            m_birthAnimTime = getMSTime();
+        }
         Unit::AddToWorld();
 
         SearchFormation();
@@ -332,6 +342,11 @@ void Creature::AddToWorld()
 
         sScriptMgr->OnCreatureAddWorld(this);
     }
+}
+
+bool Creature::ShouldPlayBirthAnim() const
+{
+    return m_birthAnimTime && GetMSTimeDiffToNow(m_birthAnimTime) < BIRTH_ANIM_WINDOW;
 }
 
 void Creature::RemoveFromWorld()

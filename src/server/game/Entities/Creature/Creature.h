@@ -52,6 +52,10 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
+    // Only true right after a summon enters the world, so players walking into range later do not
+    // see the birth animation again.
+    bool ShouldPlayBirthAnim() const;
+
     float GetNativeObjectScale() const override;
     void SetObjectScale(float scale) override;
     void SetDisplayId(uint32 displayId, float displayScale = 1.f) override;
@@ -475,6 +479,7 @@ protected:
 
     /// Timers
     time_t m_corpseRemoveTime;                          // (secs) timer for death or corpse disappearance
+    uint32 m_birthAnimTime{0};                          // (ms) world-add time, 0 for non-summons
     time_t m_respawnTime;                               // (secs) time of next respawn
     time_t m_respawnedTime;                             // (secs) time when creature respawned
     uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning

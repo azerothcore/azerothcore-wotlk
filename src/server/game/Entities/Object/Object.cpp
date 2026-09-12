@@ -201,6 +201,11 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
         if (target->GetPetGUID() == GetGUID())
             updatetype = UPDATETYPE_CREATE_OBJECT2;
 
+        // UPDATETYPE_CREATE_OBJECT2 is what makes the client play a creature's birth animation
+        if (Creature const* creature = ToCreature())
+            if (creature->ShouldPlayBirthAnim())
+                updatetype = UPDATETYPE_CREATE_OBJECT2;
+
         // UPDATETYPE_CREATE_OBJECT2 for some gameobject types...
         if (isType(TYPEMASK_GAMEOBJECT))
         {
