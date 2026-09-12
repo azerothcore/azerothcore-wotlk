@@ -190,6 +190,10 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Uni
             spellInfo->Id != SPELL_STONECLAW && spellInfo->Id != SPELL_BIND_SIGHT && spellInfo->Id != SPELL_INTERVENE)
         return true;
 
+    if (spellInfo->Effects[index].Effect == SPELL_EFFECT_ATTACK_ME ||
+            spellInfo->Effects[index].ApplyAuraName == SPELL_AURA_MOD_TAUNT)
+        return true;
+
     // Cyclone shouldn't be casted on totems
     if (spellInfo->Id == SPELL_CYCLONE)
     {

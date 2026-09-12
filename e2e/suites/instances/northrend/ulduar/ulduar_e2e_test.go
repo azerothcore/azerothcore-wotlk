@@ -8,8 +8,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
+	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
 
 // OPEN(e2e): re-enable when AC#26266 is fixed — Charge near Kologarn must not drop below bridge Z.
@@ -75,6 +75,7 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 		Prefix: "Freya",
 		Level:  80,
 	})
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
 
 	const (
 		npcFreya10          = uint32(32906)
@@ -100,16 +101,39 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 		return "Unknown"
 	}
 
-	bot.TeleNamed(t, "Freya")
+	// Raid interior pad (game_tele BossFreya). .go xyz is reliable; a missing
+	// custom "Freya" name hangs TeleNamed for 60s.
+	bot.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Freya pad tele map=%d", m)
+	}
 	bot.GoCreatureID(t, npcFreya10)
+	// Now drop GM. FlushWorld/.gps beside Freya can evade her out of cache,
+	// so re-acquire a living GUID before Engage/FaceUnit.
 	bot.CombatReady(t)
 
-	freyaGUID := bot.WaitUnitAny(t, 30*time.Second, npcFreya10, npcFreya25)
+	// Evade can leave a 0 HP object in cache. Re-poll until we have a living
+	// Freya, not only when the GUID disappears.
+	var freyaGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		freyaGUID = bot.WaitUnitAny(t, 10*time.Second, npcFreya10, npcFreya25)
+		if hp, maxHP := bot.UnitHP(freyaGUID); maxHP > 0 && hp > 0 {
+			if bot.World.GetObject(freyaGUID) != nil {
+				break
+			}
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Freya in cache after GoCreatureID (last=0x%X)", freyaGUID)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
 	bot.Engage(t, freyaGUID, 15*time.Second)
 
 	tr := e2eharness.NewSpawnSetTracker(allyEntries, 3*time.Second)
 	tr.KindOf = func(entry uint32) string { return label(entry) }
-	sets := tr.WaitSets(t, bot.World, 2, 4*time.Minute)
+	// Waves are ~60s apart. 90s covers two waves; 4m just delayed a miss.
+	sets := tr.WaitSets(t, bot.World, 2, 90*time.Second)
 	t.Logf("Set1=%s units=%d  Set2=%s units=%d  gap=%s",
 		sets[0].Kind, len(sets[0].Guids),
 		sets[1].Kind, len(sets[1].Guids),
@@ -118,7 +142,7 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 	// Detonating Lashers explode on death — if Set1 is Lashers, wait for Set3
 	// and kill Set2 (still: older set while a newer set is up).
 	if sets[0].Kind == "Lashers" {
-		sets = tr.WaitSets(t, bot.World, 3, 4*time.Minute)
+		sets = tr.WaitSets(t, bot.World, 3, 150*time.Second)
 	}
 
 	var older, newer e2eharness.SpawnSet
@@ -131,7 +155,6 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 		e2eharness.Preconditionf(t, "cannot find a non-Lasher older set to kill without collateral explosions")
 	}
 
-	time.Sleep(2 * time.Second)
 	tr.Poll(bot.World, time.Now())
 
 	var olderLive []uint64
@@ -176,9 +199,9 @@ func TestAC_27095_FreyaAlliesSpawnRateReduction(t *testing.T) {
 	for _, s := range bot.UnitsByEntry(120, allyEntries...) {
 		knownAtKill[s.GUID] = struct{}{}
 	}
-	fresh := bot.WaitNewUnits(t, knownAtKill, allyEntries, 90*time.Second)
+	fresh := bot.WaitNewUnits(t, knownAtKill, allyEntries, 75*time.Second)
 	if len(fresh) == 0 {
-		e2eharness.Preconditionf(t, "no new ally set spawned within 90s after older-set kill")
+		e2eharness.Preconditionf(t, "no new ally set spawned within 75s after older-set kill")
 	}
 	nextT := time.Now()
 	fromNewer := nextT.Sub(newer.SpawnT)
@@ -245,7 +268,7 @@ func TestUlduar_MultiBotLoginNearBossPad(t *testing.T) {
 		Level:  80,
 	})
 	for _, b := range bots {
-		b.TeleNamed(t, "Freya")
+		b.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
 	}
 	_, _, _, m0 := bots[0].Pos()
 	_, _, _, m1 := bots[1].Pos()
@@ -253,4 +276,82 @@ func TestUlduar_MultiBotLoginNearBossPad(t *testing.T) {
 		e2eharness.Assertf(t, "Freya pad maps leader=%d mate=%d want %d", m0, m1, e2eharness.MapUlduar)
 	}
 	t.Logf("PASS multi-bot Freya pad login n=%d map=%d", len(bots), m0)
+}
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27602
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27614
+// A Laughing Skull's Lunatic Gaze (64168) must not reach a player behind the brain
+// room's geometry. 64168 has no ignore-LoS attribute of its own; it used to inherit
+// one from the aura that triggers it (64167), so the skulls drained sanity through
+// walls. The clear-line half runs first and is the fixture check: without sanity
+// loss there, the blocked half proves nothing.
+func TestAC_27602_LaughingSkullGazeLoS(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances", "issue"},
+		Runtime:  "med",
+		Issue:    27602,
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcLaughingSkull = uint32(33990)
+		spellSanity      = uint32(63050)
+
+		// Icecrown illusion chamber floor. The pair sits 18 yd either side of the
+		// skull: due west is open, due east is behind structure (verified in-world
+		// with a LoS-respecting player cast at 12, 18 and 24 yd).
+		skullX, skullY, skullZ = float32(1930.0), float32(-120.0), float32(240.07)
+		clearX, clearY         = float32(1912.0), float32(-120.0)
+		blockedX, blockedY     = float32(1948.0), float32(-120.0)
+
+		// 64167 ticks every second for 2 sanity; 8s leaves margin for spawn settle.
+		gazeWindow = 8 * time.Second
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "YoggLo", Race: e2eharness.RaceHuman, Level: 80,
+	})
+
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
+	bot.Teleport(t, skullX, skullY, skullZ, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after brain room tele map=%d", m)
+	}
+	// The skulls are SummonCreature'd by the Brain AI, not by a spell, so a GM spawn
+	// is the fixture rather than a stand-in for a summon path. 64167 rides on
+	// creature_template_addon, so the spawn gazes on its own with no AI to drive.
+	skull := bot.Spawn(t, npcLaughingSkull, 30*time.Second)
+
+	// Drop GM so the gaze can select the bot; god mode absorbs the 1749/s it deals.
+	bot.CombatReady(t)
+	bot.CheatGod(t)
+
+	// Sanity carries AURA_INTERRUPT_FLAG_CHANGE_MAP, so apply it after the tele.
+	sanityLost := func(label string, px, py float32) int {
+		bot.Teleport(t, px, py, skullZ, e2eharness.MapUlduar)
+		bot.WaitUnitGUID(t, skull, 15*time.Second) // tele clears the object cache
+		bot.Face(t, skull)                         // 64168 only takes targets facing the caster
+		bot.ApplyAura(t, spellSanity)
+		before := bot.AuraStacks(spellSanity)
+		if before == 0 {
+			e2eharness.Preconditionf(t, "%s: Sanity 63050 did not apply", label)
+		}
+		time.Sleep(gazeWindow)
+		after := bot.AuraStacks(spellSanity)
+		bot.CancelAura(t, spellSanity)
+		t.Logf("%s pos=(%.1f,%.1f) skull=0x%X sanity %d -> %d", label, px, py, skull, before, after)
+		return before - after
+	}
+
+	clearLoss := sanityLost("CLEAR", clearX, clearY)
+	if clearLoss <= 0 {
+		e2eharness.Preconditionf(t, "fixture dead: skull 0x%X drained no sanity with a clear line", skull)
+	}
+	blockedLoss := sanityLost("BLOCKED", blockedX, blockedY)
+	if blockedLoss > 0 {
+		e2eharness.ConfirmedBugf(t, 27602,
+			"Lunatic Gaze drained %d sanity through the brain room geometry (clear line drained %d)",
+			blockedLoss, clearLoss)
+	}
+	t.Logf("PASS Lunatic Gaze LoS: clear drained %d, blocked drained %d", clearLoss, blockedLoss)
 }

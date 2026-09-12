@@ -6,13 +6,13 @@ and run against a **live** authserver + worldserver + MySQL.
 
 Offline `go test ./...` (without `-tags=e2e`) skips these packages.
 
-Authoring rules for new tests live in the harness:
+Authoring rules for the existing suite live in the harness:
 
 | Doc | Audience |
 |-----|----------|
-| [LLM_GUIDE.md](https://github.com/azerothcore/AzerothGhost/blob/v1.0.8/e2e/LLM_GUIDE.md) | Compact MUST/NEVER + APIs (LLMs and humans) |
+| [LLM_GUIDE.md](https://github.com/azerothcore/AzerothGhost/blob/v1.0.8/e2e/LLM_GUIDE.md) | Compact MUST/NEVER + APIs |
 | [EXAMPLES.md](https://github.com/azerothcore/AzerothGhost/blob/v1.0.8/e2e/EXAMPLES.md) | Full recipes and skeletons |
-| `.agents/docs/e2e-policy.md` | When to add e2e vs unit tests (agent/review policy) |
+| `.agents/docs/e2e-policy.md` | Do not add e2e unless asked; suite conventions |
 
 ---
 
@@ -21,6 +21,14 @@ Authoring rules for new tests live in the harness:
 1. Running AzerothCore **3.3.5a** authserver + worldserver.
 2. MySQL with `acore_auth`, `acore_characters`, and `acore_world` (world DB is required for spawn cleanup and many fixtures).
 3. Go **1.26+** and network reachability to auth (default `127.0.0.1:3724`).
+4. `Warden.Enabled = 0` on the worldserver, until the harness bug below is fixed upstream.
+   Symptom: every login fails with `attempted to log in using invalid client OS ()`.
+   `WorldSocket::HandleAuthSession` reads `account.os` from the database and, when Warden is
+   active, rejects anything that is not `Win` or `OSX`. That column is written by the
+   *authserver* from the AUTH_LOGON_CHALLENGE FourCC, and AzerothGhost sends it leading-NUL
+   first (`client/auth.go`: `os := [4]byte{0, 'n', 'i', 'W'}`), so AC's `_os = os.data()`
+   builds an empty string and stores it. Docker stacks can set `AC_WARDEN_ENABLED=0` on the
+   worldserver service.
 
 Accounts are created by the harness (GM level 3, password `test`). Do not reuse real player accounts.
 
@@ -119,18 +127,15 @@ go test -tags=e2e ./suites/... -run TestPets_SummonWaitDismiss -count=1 -v -time
 
 Every live test uses `//go:build e2e` and should call `meta.Begin(t, meta.TestMeta{…})` before expensive setup.
 
-### Scratch / agent debug (`local/`)
+### Scratch (`local/`)
 
-When validating a fix on a **live** stack (player-visible combat, protocol, quests, multi-bot), prefer writing a small e2e under **`e2e/local/`** instead of ad-hoc GM spam or long manual checklists. That tree is **not committed**.
+`e2e/local/` is gitignored except `local/README.md`. Do not add tests there unless asked. If something is already there:
 
 ```bash
-# create e.g. local/repro/repro_e2e_test.go  (//go:build e2e)
 make e2e-local
 # or:
 go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 ```
-
-If the scenario should stay as a regression, **move** it into `suites/` next to related tests with proper `meta.Begin` tags — see `.agents/docs/e2e-policy.md`.
 
 ### Inventory
 
@@ -142,7 +147,7 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 | combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
-| spells/aura | apply/query; CC broken by damage; mount persist | P1 | covered (`TestAC_26130_*`) | #26130 |
+| spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`) | #26130 #25765 |
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
 | spells/effects | Charge / grounding totem / Sweeping Strikes Execute | P1 | covered (`TestAC_26997_*`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
@@ -150,13 +155,17 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 | social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
 | quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
 | quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
+| quests/frostmourne | scrying-orb vision runs; Muradin leaves the cavern and despawns; quest 12478 COMPLETE | P2 | covered (`TestAC_25760_*`); dialogue order and duplicate line `blocked-harness` (no monster-say capture) | #25760 |
+| quests/objectives | a mob that drops a quest item advertises it, so the client shows the objective on hover (`creature_questitem` -> `SMSG_CREATURE_QUERY_RESPONSE.questItems`) | P2 | covered (`TestAC_27553_*`), decoding the response through a raw packet hook since the harness has no dispatch case for it | #27553 |
+| quests/summons | using the Serpent Statue on Ranazjar Isle summons Lord Kragaru, the only source of the Book of the Ancients (quest 6027). Beam and summon are asserted separately so a failure names which script broke, and the activation is repeated because the regression it guards was probabilistic, not absolute | P2 | covered (`TestQuest6027_*`) | — |
 | items/equip | visible-item slot after EquipEntry; additem; survives relog | P2 | covered | — |
 | protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked-harness` (extra_flags after relog) | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
-| instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
+| instances/ulduar | named tele; Freya wave interval; a Laughing Skull's Lunatic Gaze stops at the brain room's geometry instead of draining sanity through it | P2 | covered (`TestAC_27095_*`, `TestAC_27602_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 #27602 |
+| world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
 
 ---
 
@@ -339,9 +348,11 @@ A test that fails intermittently on a **correct** core is a test/harness bug unt
 
 ---
 
-## Policy (when to add e2e)
+## Policy
 
-Use `.agents/docs/e2e-policy.md` for decision trees (e2e vs unit, mandatory triggers, MVT). This README is **how to run and structure** the suite; the harness guides are **how to author** scenarios.
+Do not add e2e tests unless asked. Do not mention missing coverage unless the user asked about it.
+`.agents/docs/e2e-policy.md` is suite convention when changing existing tests. This README is
+**how to run and structure** the suite.
 
 ---
 
@@ -357,6 +368,6 @@ Details live in the workflow files only:
 | Merge to `master` | same clang-18 nopch build, then **full** e2e again (flake + merge-base drift) |
 | Actions → **e2e-live** → Run workflow (official repo; needs workflow on default branch, or `gh workflow run … --ref e2e`) | Compiles on the runner; choose scope (smoke/full) |
 
-Day-to-day development and agent debugging should use a **local** stack + `e2e/local/` or the committed suites — not CI setup docs.
+Day-to-day development should use a **local** stack and the committed suites, not CI setup docs.
 
 Greppable failure prefixes: `precondition:`, `AC#N CONFIRMED BUG:`, `harness:`, `WARNING:`.

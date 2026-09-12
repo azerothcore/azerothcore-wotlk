@@ -106,9 +106,17 @@ public:
 
         void OnCreatureEvade(Creature* creature) override
         {
-            // Phase-1 wipe signal: Mag is ImmuneToPC so BossAI evade does not fire; a Channeler evade is the trigger.
-            if (creature->GetEntry() == NPC_HELLFIRE_CHANNELER && GetBossState(DATA_MAGTHERIDON) == IN_PROGRESS)
-                SetBossState(DATA_MAGTHERIDON, NOT_STARTED);
+            if (creature->GetEntry() != NPC_HELLFIRE_CHANNELER || GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
+                return;
+
+            // Only a Channeler-phase wipe resets the encounter. Past the 2 minute auto-release he is
+            // loose with Channelers still up, and a reset there would disable the Manticron Cubes and
+            // open the door mid-fight.
+            if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
+                if (magtheridon->AI()->GetData(DATA_MAGTHERIDON_RELEASED))
+                    return;
+
+            SetBossState(DATA_MAGTHERIDON, NOT_STARTED);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -191,6 +199,10 @@ public:
                         for (ObjectGuid const& guid : _burningAbyssalsSet)
                             if (Creature* abyssal = instance->GetCreature(guid))
                                 abyssal->DespawnOrUnsummon();
+
+                        // Reset a still-caged Magtheridon: he is engaged from the Channeler pull on.
+                        if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
+                            magtheridon->AI()->DoAction(ACTION_RESET_ENCOUNTER);
                     }
                 }
             }
@@ -202,7 +214,9 @@ public:
             switch (type)
             {
                 case DATA_CHANNELER_COMBAT:
-                    // Force the encounter start: Mag is ImmuneToPC so SetInCombatWithZone alone may miss JustEngagedWith.
+                    // Start the encounter on the Channeler pull. The combat references this creates
+                    // engage Magtheridon (boss_magtheridon::JustEnteredCombat), which anchors his
+                    // release countdown here and not to when players can first hit him.
                     if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
                     {
                         SetBossState(DATA_MAGTHERIDON, IN_PROGRESS);

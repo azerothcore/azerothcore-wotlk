@@ -205,6 +205,9 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
                     f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
                 check_failed = True
 
+    if spawn_delete_filter_check(file, file_path):
+        check_failed = True
+
     # Handle the script error and update the result output
     if check_failed:
         error_handler = True
@@ -239,6 +242,118 @@ def open_paren_balance(text: str) -> int:
     without_strings = re.sub(r"'(?:\\.|[^'])*'", "", text)
     without_strings = re.sub(r'"(?:\\.|[^"])*"', "", without_strings)
     return without_strings.count('(') - without_strings.count(')')
+
+DELETE_START = re.compile(r"\bDELETE\b", re.IGNORECASE)
+SPAWN_DELETE_START = re.compile(r"DELETE\s+FROM\s+(?:`(creature|gameobject)`|\b(creature|gameobject)\b)", re.IGNORECASE)
+# Only these bound a delete to known rows: `guid` > 0 or `id` != 5 match without limiting.
+SPAWN_FILTER_OPERATORS = r"(?:=|\bIN\b|\bBETWEEN\b)"
+
+# The column token has to be bounded on both sides, otherwise `guid` would satisfy the `id`
+# requirement and `id1`/`id2`/`id3` (the pre-rename creature columns) would pass as `id`.
+def has_column_filter(statement: str, column: str) -> bool:
+    pattern = rf"(?:`{column}`|(?<![\w@`]){column}(?![\w`]))\s*{SPAWN_FILTER_OPERATORS}"
+    return re.search(pattern, statement, re.IGNORECASE) is not None
+
+# Walk the line left to right dropping quoted literals and both comment styles, so a "--", a "/*"
+# or a ";" inside a string is not taken for a comment or a statement terminator. Returns the
+# sanitised text plus whether a block comment is left open for the following lines.
+def strip_sql_noise(text: str, in_block_comment: bool) -> tuple:
+    sanitized = []
+    index = 0
+    while index < len(text):
+        if in_block_comment:
+            closing = text.find('*/', index)
+            if closing == -1:
+                break
+            in_block_comment = False
+            index = closing + 2
+            sanitized.append(' ')
+            continue
+        if text.startswith('/*', index):
+            in_block_comment = True
+            index += 2
+            continue
+        if text.startswith('--', index) or text[index] == '#':
+            break
+        if text[index] in "'\"":
+            quote = text[index]
+            index += 1
+            while index < len(text):
+                if text[index] == '\\':
+                    index += 2
+                    continue
+                if text[index] == quote:
+                    index += 1
+                    break
+                index += 1
+            sanitized.append("''")
+            continue
+        sanitized.append(text[index])
+        index += 1
+    return ''.join(sanitized).strip(), in_block_comment
+
+# Spawns in `creature` and `gameobject` must be deleted by both `id` and `guid`: a guid-only delete
+# wipes whatever spawn owns that guid today, an id-only one wipes every spawn of that entry in the
+# world. Returns whether a violation was found; the caller owns the result state.
+def spawn_delete_filter_check(file: io, file_path: str) -> bool:
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    in_block_comment = False
+    statement = ""
+    statement_line = 0
+
+    def report(text: str, line_number: int, table: str) -> bool:
+        # A disjunction needs real boolean parsing to judge, so it is refused rather than guessed at
+        if re.search(r"\bOR\b", text, re.IGNORECASE):
+            print(f"❌ DELETE FROM `{table}` must not use OR. Use IN, or split it into one statement per "
+                  f"spawn. {file_path} at line {line_number}\n"
+                  f"If this error is intended, please notify a maintainer")
+            return True
+        missing = [column for column in ("id", "guid") if not has_column_filter(text, column)]
+        if not missing:
+            return False
+        columns = " and ".join(f"`{column}`" for column in missing)
+        print(f"❌ DELETE FROM `{table}` must filter on both `id` and `guid` (missing: {columns}). "
+              f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+        return True
+
+    # Judged once the whole statement is accumulated, since DELETE, FROM and the table name can
+    # each sit on their own line
+    def report_when_spawn_delete(text: str, line_number: int) -> bool:
+        table = SPAWN_DELETE_START.search(text)
+        if not table:
+            return False
+        return report(text, line_number, table.group(1) or table.group(2))
+
+    for line_number, line in enumerate(file, start = 1):
+        text, in_block_comment = strip_sql_noise(line.strip(), in_block_comment)
+        if not text:
+            continue
+
+        remainder = text
+        while remainder:
+            if statement:
+                segment, terminator, rest = remainder.partition(';')
+                statement += " " + segment
+            else:
+                match = DELETE_START.search(remainder)
+                if not match:
+                    break
+                statement_line = line_number
+                segment, terminator, rest = remainder[match.start():].partition(';')
+                statement = segment
+            if not terminator:
+                break
+            if report_when_spawn_delete(statement, statement_line):
+                check_failed = True
+            statement = ""
+            remainder = rest.strip()
+
+    # An unterminated statement is reported by semicolon_check, but still judge it here
+    if statement and report_when_spawn_delete(statement, statement_line):
+        check_failed = True
+
+    return check_failed
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results

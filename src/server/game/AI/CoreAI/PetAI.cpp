@@ -350,6 +350,12 @@ void PetAI::UpdateAI(uint32 diff)
             me->AddSpellCooldown(spell->m_spellInfo->Id, 0, 0);
 
             spell->prepare(&targets);
+
+            // Stop the current spline before the next movement update can interrupt a stationary channel.
+            if (Pet* controlledPet = me->ToPet())
+                if (spell->m_spellInfo->IsChanneled() && !spell->m_spellInfo->IsActionAllowedChannel()
+                    && controlledPet->IsMovementPreventedByCasting())
+                    controlledPet->StopMoving();
         }
 
         // deleted cached Spell objects
