@@ -373,6 +373,13 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 	const (
 		npcElderBrightleaf = uint32(32915)
 		npcUnstableSunBeam = uint32(33050)
+		// Freya's hard-mode activation banishes each living elder and takes the beams over herself,
+		// summoning 33170 instead. Brightleaf then schedules nothing, so name that state if the
+		// wave never arrives rather than reporting a bare timeout.
+		npcFreyaSunBeam        = uint32(33170)
+		spellPurpleBanish      = uint32(61014)
+		spellBrightleafEssence = uint32(62485)
+		spellDrainedOfPower    = uint32(62467)
 		// Each beam despawns itself after a randomised 18-25s; the oracle allows the worst case
 		// plus slack for the kill and the object-cache round trip. Do not widen it past 30s: that
 		// is 62221's summon duration, the engine backstop that would despawn the player's beam by
@@ -421,6 +428,14 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 			break
 		}
 		if !time.Now().Before(waveDeadline) {
+			hp, maxHP := bot.UnitHP(elder)
+			t.Logf("no wave: elder hp=%d/%d banished=%v essence=%v drained=%v 33050@500y=%d 33170@500y=%d",
+				hp, maxHP,
+				bot.UnitHasAura(elder, spellPurpleBanish),
+				bot.UnitHasAura(elder, spellBrightleafEssence),
+				bot.UnitHasAura(elder, spellDrainedOfPower),
+				len(sunBeamsInCache(bot, npcUnstableSunBeam, 500)),
+				len(sunBeamsInCache(bot, npcFreyaSunBeam, 500)))
 			e2eharness.Preconditionf(t, "no Unstable Sun Beam spawned within 70s of engaging Elder Brightleaf")
 		}
 		time.Sleep(250 * time.Millisecond)
