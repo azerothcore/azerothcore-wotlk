@@ -400,7 +400,12 @@ bool SpellScript::IsInEffectHook() const
 
 Unit* SpellScript::GetCaster()
 {
-    return m_spell->GetCaster();
+    return m_spell->GetCaster()->ToUnit();
+}
+
+GameObject* SpellScript::GetGObjCaster()
+{
+    return m_spell->GetCaster()->ToGameObject();
 }
 
 Unit* SpellScript::GetOriginalCaster()

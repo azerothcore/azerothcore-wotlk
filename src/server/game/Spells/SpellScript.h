@@ -384,6 +384,7 @@ public:
     //
     // methods useable during all spell handling phases
     Unit* GetCaster();
+    GameObject* GetGObjCaster();
     Unit* GetOriginalCaster();
     SpellInfo const* GetSpellInfo();
     SpellValue const* GetSpellValue();
