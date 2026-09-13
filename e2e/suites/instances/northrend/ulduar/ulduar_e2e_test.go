@@ -3,8 +3,10 @@
 package ulduar_test
 
 import (
+	"encoding/binary"
 	"fmt"
 	"math"
+	"sync"
 	"testing"
 	"time"
 
@@ -686,6 +688,270 @@ func TestAC_27590_PsychosisSkipsLowSanity(t *testing.T) {
 	}
 
 	t.Logf("PASS low sanity targeting: both spells landed down to %d sanity and neither reached the player at %d", lastValid, atFloor)
+}
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27455
+// An Ancient Water Spirit's Tidal Wave (62653, 25-man rank 62935) is a 2s cast that surges the
+// spirit forward and knocks everything in its path off its feet with a second spell, 62654
+// (25-man 62936). Kicking the cast used to stop the surge and nothing else: the script queued
+// that second spell on a standalone 3s EventMap timer started at cast time, so the damage and
+// knockback still went out on an empty cast bar.
+//
+// The oracle is whether the spirit casts 62654 at all, read off SMSG_SPELL_GO. That is the
+// mechanism the bug is about, and it holds regardless of who the cone ends up covering. The
+// knockback the player actually receives (SMSG_MOVE_KNOCK_BACK, which AC sends to the knocked
+// player's own session out of Unit::KnockbackFrom) is logged next to it but is not the oracle:
+// it depends on where the bot is standing when the wave goes off, and the harness never acks a
+// knockback, which makes repeat knockbacks in one session unreliable.
+//
+// An uninterrupted wave is measured too. Without it a quiet window after a Kick proves nothing:
+// it would pass just as happily against a spirit that never casts anything.
+//
+// A lone spawned spirit rather than Freya's Allies of Nature waves, because the trio is one of
+// three wave kinds picked at random roughly every 60s and a real pull spends minutes rolling
+// for the subject. The wave is scheduled from JustEngagedWith and needs nothing from Freya.
+func TestAC_27455_TidalWaveInterruptStopsKnockback(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances", "issue"},
+		Runtime:  "med",
+		Issue:    27455,
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcWaterSpirit = uint32(33202)
+		// spelldifficulty_dbc swaps the 10-man ids for the 25-man ones on a 25-man instance.
+		spellTidalWave10 = uint32(62653)
+		spellTidalWave25 = uint32(62935)
+		spellTidalDmg10  = uint32(62654)
+		spellTidalDmg25  = uint32(62936)
+		spellKick        = uint32(1766)
+
+		// game_tele BossRazorscale, not Freya's platform: the spirit only needs the Ulduar
+		// instance script (RegisterUlduarCreatureAI), and this is the emptiest ground in the
+		// raid, with nothing spawned inside 100y. Fighting it in the Conservatory pulls Freya
+		// herself, and her Allies of Nature then land Conservator's Grip (62532) on the bot,
+		// which is pacify-silence and blocks Kick outright.
+		padX, padY, padZ = float32(589.2), float32(-145.0), float32(391.5)
+
+		botHealth = 10000000
+
+		// JustEngagedWith schedules the first wave at 12s and repeats on that interval.
+		waveWindow = 40 * time.Second
+		// 2s cast, then the surge. Everything the cast does has happened inside this.
+		resolveWindow = 5 * time.Second
+		sampleEvery   = 20 * time.Millisecond
+		// Kick is a melee ability and can be dodged or parried, which leaves the cast running.
+		// Take the next wave when that happens rather than calling the run unjudgeable.
+		kickAttempts = 6
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "TidWav", Race: e2eharness.RaceHuman,
+		Class: e2eharness.ClassRogue, Level: 80, LearnAllClass: true,
+	})
+
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
+	bot.Teleport(t, padX, padY, padZ, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after pad tele map=%d", m)
+	}
+
+	spirit := bot.Spawn(t, npcWaterSpirit, 30*time.Second)
+	t.Logf("Ancient Water Spirit guid=0x%X", spirit)
+
+	// Only now drop GM: Spawn turns it on for `.npc add` and leaves it on, and the spirit picks
+	// its target through SelectTargetFromPlayerList, which skips game masters. Note the bare
+	// CombatReady helpers would also turn `.cheat god` on, leaving the bot invulnerable.
+	e2eharness.CombatReady(t, bot.World, e2eharness.CombatReadyOpts{})
+	if err := bot.World.SetTarget(bot.World.CharGUID()); err != nil {
+		e2eharness.Preconditionf(t, "select self: %v", err)
+	}
+	bot.GM(t, fmt.Sprintf(".modify hp %d", botHealth))
+	// A fresh level-80 character still carries its starting weapon skills, and an unarmed bot
+	// misses a level-81 elite with Kick most of the time.
+	bot.GM(t, ".maxskill")
+
+	bot.Engage(t, spirit, 15*time.Second)
+
+	var (
+		mu        sync.Mutex
+		castStart time.Time
+		castGo    time.Time
+		dmgGo     time.Time
+		knockAt   time.Time
+	)
+	isWave := func(id uint32) bool { return id == spellTidalWave10 || id == spellTidalWave25 }
+	isDamage := func(id uint32) bool { return id == spellTidalDmg10 || id == spellTidalDmg25 }
+	cancel := bot.World.AddPacketHook(func(opcode uint16, data []byte) {
+		switch opcode {
+		case client.SmsgSpellStart:
+			if id, ok := castSpellID(data); ok && isWave(id) {
+				mu.Lock()
+				castStart = time.Now()
+				mu.Unlock()
+			}
+		case client.SmsgSpellGo:
+			id, ok := castSpellID(data)
+			if !ok {
+				return
+			}
+			mu.Lock()
+			if isWave(id) {
+				castGo = time.Now()
+			} else if isDamage(id) {
+				dmgGo = time.Now()
+			}
+			mu.Unlock()
+		case client.SmsgMoveKnockBack:
+			mu.Lock()
+			knockAt = time.Now()
+			mu.Unlock()
+		}
+	})
+	defer cancel()
+
+	reset := func() {
+		mu.Lock()
+		castStart, castGo, dmgGo, knockAt = time.Time{}, time.Time{}, time.Time{}, time.Time{}
+		mu.Unlock()
+	}
+	snapshot := func() (start, done, dmg, knock time.Time) {
+		mu.Lock()
+		defer mu.Unlock()
+		return castStart, castGo, dmgGo, knockAt
+	}
+
+	// The creature's combat flag reaches the object cache a beat after Engage, so a spirit that
+	// evades is only called out once it has been seen fighting.
+	sawCombat := false
+	status := func() string {
+		hp, _ := bot.UnitHP(spirit)
+		self, _ := bot.UnitHP(bot.World.CharGUID())
+		return fmt.Sprintf("inCombat=%v target=0x%X spiritHP=%d botHP=%d",
+			bot.UnitInCombat(spirit), bot.UnitTarget(spirit), hp, self)
+	}
+	waitCast := func(what string) {
+		deadline := time.Now().Add(waveWindow)
+		for time.Now().Before(deadline) {
+			if start, _, _, _ := snapshot(); !start.IsZero() {
+				return
+			}
+			if bot.UnitInCombat(spirit) {
+				sawCombat = true
+			} else if sawCombat {
+				e2eharness.Preconditionf(t, "spirit left combat while waiting for the %s wave (%s)", what, status())
+			}
+			time.Sleep(sampleEvery)
+		}
+		e2eharness.Preconditionf(t, "no Tidal Wave cast within %s (%s wave, %s)", waveWindow, what, status())
+	}
+
+	// Target and facing are settled up front so the only thing between seeing a cast start and
+	// the Kick going out is one CMSG_CAST_SPELL.
+	if err := bot.World.SetTarget(spirit); err != nil {
+		e2eharness.Preconditionf(t, "select spirit: %v", err)
+	}
+	bot.Face(t, spirit)
+
+	var kickedDmg, kickedKnock, kickedStart time.Time
+	interrupted := false
+	var lastFail string
+	for attempt := 1; attempt <= kickAttempts && !interrupted; attempt++ {
+		reset()
+		waitCast("interrupted")
+		kicked := false
+		for deadline := time.Now().Add(1200 * time.Millisecond); time.Now().Before(deadline); {
+			// Re-faced every attempt: a wave that went off leaves the spirit 40y past the
+			// bot, and Kick on a target behind it is SPELL_FAILED_UNIT_NOT_INFRONT.
+			bot.Face(t, spirit)
+			res, err := bot.TryCast(t, spellKick, spirit, 500*time.Millisecond)
+			if err != nil {
+				lastFail = err.Error()
+			} else if res.Success {
+				kicked = true
+				break
+			} else {
+				lastFail = e2eharness.SpellFailReasonName(res.FailReason)
+			}
+		}
+		if !kicked {
+			t.Logf("attempt %d: Kick never went out (%s, casterFlags=0x%X, auras=%v)",
+				attempt, lastFail, casterFlags(bot), bot.World.SelfAuras())
+			continue
+		}
+		time.Sleep(resolveWindow)
+		start, done, dmg, knock := snapshot()
+		if !done.IsZero() {
+			// Kick went out but was dodged or parried; the cast ran to completion.
+			t.Logf("attempt %d: Kick did not land, wave completed %s after cast start",
+				attempt, done.Sub(start).Round(time.Millisecond))
+			continue
+		}
+		interrupted = true
+		kickedStart, kickedDmg, kickedKnock = start, dmg, knock
+	}
+	if !interrupted {
+		e2eharness.Preconditionf(t, "no Tidal Wave was interrupted in %d attempts (last Kick result: %s, %s)",
+			kickAttempts, lastFail, status())
+	}
+	t.Logf("kicked wave: damage cast=%v knockback=%v", !kickedDmg.IsZero(), !kickedKnock.IsZero())
+
+	// Control: let the next one through, so the quiet window above means something.
+	reset()
+	waitCast("uninterrupted")
+	time.Sleep(resolveWindow)
+	plainStart, plainGo, plainDmg, plainKnock := snapshot()
+	if plainGo.IsZero() {
+		e2eharness.Preconditionf(t, "Tidal Wave started but never completed without an interrupt")
+	}
+	if plainDmg.IsZero() {
+		e2eharness.Preconditionf(t,
+			"an uninterrupted Tidal Wave never cast its damage spell; the interrupt oracle would be vacuous")
+	}
+	t.Logf("uninterrupted wave: damage cast %s after cast start, knockback=%v",
+		plainDmg.Sub(plainStart).Round(time.Millisecond), !plainKnock.IsZero())
+
+	if !kickedDmg.IsZero() {
+		e2eharness.ConfirmedBugf(t, 27455,
+			"interrupted Tidal Wave still cast its damage and knockback %s after the cast started",
+			kickedDmg.Sub(kickedStart).Round(time.Millisecond))
+	}
+	t.Logf("PASS AC#27455 kicked Tidal Wave cast no damage spell within %s", resolveWindow)
+}
+
+// casterFlags reads UNIT_FIELD_FLAGS off the bot, so a refused cast names the state that
+// refused it.
+func casterFlags(bot *e2eharness.ScenarioBot) uint32 {
+	obj := bot.World.GetObject(bot.World.CharGUID())
+	if obj == nil {
+		return 0
+	}
+	return obj.Value(client.UnitFieldFlags)
+}
+
+// castSpellID pulls the spell id out of an SMSG_SPELL_START / SMSG_SPELL_GO header, which both
+// open with the cast-item and caster packed GUIDs and a cast counter ahead of it. The harness
+// parses SPELL_GO for its own waiters but exposes neither the header nor a packed-GUID reader.
+func castSpellID(data []byte) (uint32, bool) {
+	off := 0
+	for i := 0; i < 2; i++ {
+		if off >= len(data) {
+			return 0, false
+		}
+		mask := data[off]
+		off++
+		for bit := 0; bit < 8; bit++ {
+			if mask&(1<<uint(bit)) != 0 {
+				off++
+			}
+		}
+	}
+	off++ // cast count
+	if off+4 > len(data) {
+		return 0, false
+	}
+	return binary.LittleEndian.Uint32(data[off : off+4]), true
 }
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27539

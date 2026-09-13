@@ -152,7 +152,6 @@ enum FreyaEvents
     EVENT_ANCIENT_CONSERVATOR_NATURE_FURY       = 40,
     EVENT_ANCIENT_CONSERVATOR_GRIP              = 41,
     EVENT_WATER_SPIRIT_CHARGE                   = 45,
-    EVENT_WATER_SPIRIT_DAMAGE                   = 46,
     EVENT_STORM_LASHER_LIGHTNING_LASH           = 50,
     EVENT_STORM_LASHER_STORMBOLT                = 51,
     EVENT_DETONATING_LASHER_FLAME_LASH          = 55,
@@ -1226,13 +1225,8 @@ struct boss_freya_summons : public ScriptedAI
                me->CastSpell(me, SPELL_CONSERVATOR_GRIP, true);
                break;
             case EVENT_WATER_SPIRIT_CHARGE:
-                me->CastSpell(me, SPELL_TIDAL_WAVE_AURA, true);
                 me->CastSpell(me->GetVictim(), SPELL_TIDAL_WAVE, false);
                 events.Repeat(12s);
-                events.ScheduleEvent(EVENT_WATER_SPIRIT_DAMAGE, 3s);
-                break;
-            case EVENT_WATER_SPIRIT_DAMAGE:
-                me->CastSpell(me, SPELL_TIDAL_WAVE_DAMAGE, false);
                 break;
             case EVENT_STORM_LASHER_LIGHTNING_LASH:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
@@ -1386,6 +1380,30 @@ class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
     }
 };
 
+// 62653 - Tidal Wave
+class spell_freya_tidal_wave : public SpellScript
+{
+    PrepareSpellScript(spell_freya_tidal_wave);
+
+    void HandleSurge(SpellMissInfo /*missInfo*/)
+    {
+        // The wave is a delayed missile: the damage lands when the surge reaches its target,
+        // so an interrupted cast never gets here. Hooked before the hit rather than on the
+        // effect, so a target that is immune (Hand of Protection covers the wave's physical
+        // school) or simply missed does not cancel the mechanic for the whole raid.
+        Unit* caster = GetCaster();
+        caster->CastSpell(caster, SPELL_TIDAL_WAVE_AURA, true);
+        // Untriggered so the cast is announced: the damage spell has no SpellVisual, and
+        // Spell::IsNeedSendToClient would otherwise drop its SMSG_SPELL_GO.
+        caster->CastSpell(caster, SPELL_TIDAL_WAVE_DAMAGE, false);
+    }
+
+    void Register() override
+    {
+        BeforeHit += BeforeSpellHitFn(spell_freya_tidal_wave::HandleSurge);
+    }
+};
+
 // 62450 - Unstable Sun Beam
 class spell_freya_unstable_sun_beam : public SpellScript
 {
@@ -1416,6 +1434,7 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
 
     RegisterSpellScript(spell_freya_attuned_to_nature_dose_reduction);
+    RegisterSpellScript(spell_freya_tidal_wave);
     RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();
