@@ -10,6 +10,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/azerothcore/AzerothGhost/client"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
@@ -685,4 +686,251 @@ func TestAC_27590_PsychosisSkipsLowSanity(t *testing.T) {
 	}
 
 	t.Logf("PASS low sanity targeting: both spells landed down to %d sanity and neither reached the player at %d", lastValid, atFloor)
+}
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27539
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27630
+// Big Bang is an 8s cast the raid survives by hiding inside a black hole. When it ends
+// Algalon holds still for 3s before he picks the fight back up; AzerothCore resumed melee,
+// Quantum Strike and the chase on the very next AI tick instead.
+//
+// The oracle is the bots' combined health, compared against a running peak because the pool
+// regenerates while the fight runs: regeneration only raises the peak, so any decrease at all
+// is Algalon landing something. Big Bang
+// triggers 64445 on every player for exactly one second at the moment the cast lands, which
+// is the protocol-visible marker the window is measured from. Reading the total rather than
+// one bot's health keeps a tank swap mid-window from reading as a quiet boss.
+//
+// Two bots, because a solo one is not enough to hold the encounter up. Phase Punch's 5th
+// stack applies 64417, a SPELL_AURA_PHASE that moves its target out of Algalon's phase for
+// good (taking 64412 off afterwards does not remove it). With one player that leaves every
+// threat reference offline via !CanSeeOrDetect, and Algalon sits flagged in combat unable to
+// touch anyone. A second body is what a real raid's tank swap provides.
+//
+// Living Constellations are killed on sight because their Arcane Barrage is the one other
+// thing that can reach a bot inside the window. Collapsing Stars are left alone: all four
+// spawn points sit about 20y from where Algalon lands, well clear of a black hole's 6y reach.
+func TestAC_27539_AlgalonBigBangStasis(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"long", "instances", "issue", "multi_bot"},
+		Runtime:  "long",
+		Issue:    27539,
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcAlgalon             = uint32(32871)
+		npcLivingConstellation = uint32(33052)
+		// Enough to drop a constellation in one hit.
+		constellationHit = uint32(500000)
+
+		goPlanetarium10 = uint32(194628)
+		goPlanetarium25 = uint32(194752)
+		itemKey10       = uint32(45797)
+		itemKey25       = uint32(45798)
+
+		spellPhasePunch = uint32(64412)
+		// The 5th Phase Punch stack: SPELL_AURA_PHASE, misc 16, the same phase a black hole
+		// puts a player in.
+		spellPhasePunchShift = uint32(64417)
+		spellRemovePhase     = uint32(64445)
+
+		// Planetarium console, where Brann spawns and the summon roleplay starts.
+		consoleX, consoleY, consoleZ = float32(1646.2), float32(-174.7), float32(427.3)
+		// Off AlgalonLandPos, where he sets down. Standing on his exact coordinates leaves
+		// the facing check no direction and every swing returns SMSG_ATTACKSWING_BAD_FACING.
+		landX, landY, landZ = float32(1632.668), float32(-308.5), float32(417.321)
+
+		botHealth = 10000000
+
+		// Brann's walk plus Algalon's descent before EVENT_INTRO_FINISH drops SetImmuneToPC.
+		introWindow = 4 * time.Minute
+		// 90s fight timer plus the intro delay (26s on a first pull), with slack.
+		bigBangWindow = 3 * time.Minute
+
+		// Big Bang's damage and its 64445 marker come out of the same cast; give the health
+		// update from that cast time to arrive before the quiet window opens.
+		settle = 700 * time.Millisecond
+		// 3s of stasis from the cast, minus the settle already spent inside it.
+		stasisWindow = 3 * time.Second
+		// Quantum Strike repeats every 3-4.5s and melee is faster, so a boss that resumed
+		// lands something well inside this.
+		resumeWindow = 10 * time.Second
+
+		sampleEvery = 100 * time.Millisecond
+		// Throttle for the sweep that keeps the bots targetable and the field clear.
+		sweepEvery = 3 * time.Second
+	)
+
+	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
+		Prefix: "AlgBB",
+		Bots: []e2eharness.BotSpec{
+			{Role: "tank", Race: e2eharness.RaceHuman, Class: e2eharness.ClassWarrior, Level: 80, LearnAllClass: true},
+			{Role: "spare", Race: e2eharness.RaceHuman, Class: e2eharness.ClassWarrior, Level: 80, LearnAllClass: true},
+		},
+	})
+	tank := e2eharness.ByRole(t, bots, "tank")
+	spare := e2eharness.ByRole(t, bots, "spare")
+
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
+	for _, b := range bots {
+		b.Teleport(t, consoleX, consoleY, consoleZ, e2eharness.MapUlduar)
+		if _, _, _, m := b.Pos(); m != e2eharness.MapUlduar {
+			e2eharness.Preconditionf(t, "%s not in Ulduar after console pad tele map=%d", b.Name, m)
+		}
+	}
+
+	// The console is a locked goober with one key entry per raid size, and which one spawned
+	// depends on the difficulty this instance came up at. Carry both.
+	tank.AddItem(t, itemKey10, 1)
+	tank.AddItem(t, itemKey25, 1)
+
+	console := e2eharness.TryNearbyGameObjectByEntry(t, tank.World, goPlanetarium10, 15*time.Second)
+	if console == 0 {
+		console = e2eharness.TryNearbyGameObjectByEntry(t, tank.World, goPlanetarium25, 15*time.Second)
+	}
+	if console == 0 {
+		e2eharness.Preconditionf(t, "no Celestial Planetarium Access console (%d/%d) at the pad", goPlanetarium10, goPlanetarium25)
+	}
+	tank.GameObjectUse(t, console)
+
+	// Brann walks the intro from the console end of the room; wait it out on the platform
+	// Algalon lands on. Instance grids are always loaded, so the roleplay runs regardless.
+	tank.Teleport(t, landX, landY, landZ, e2eharness.MapUlduar)
+	spare.Teleport(t, landX+4, landY-2, landZ, e2eharness.MapUlduar)
+	algalon := tank.WaitUnit(t, npcAlgalon, introWindow)
+	t.Logf("Algalon summoned guid=0x%X", algalon)
+
+	// Pulling him mid-roleplay is not the same fight: JustEngagedWith calls events.Reset(),
+	// which drops the pending EVENT_INTRO_FINISH that clears SetImmuneToPC, and he then never
+	// reaches EVENT_INTRO_TIMER_DONE to turn REACT_AGGRESSIVE. Wait for the flag to clear.
+	immune := func() bool {
+		o := tank.World.GetObject(algalon)
+		return o == nil || o.Value(client.UnitFieldFlags)&client.UnitFlagImmuneToPC != 0
+	}
+	introDeadline := time.Now().Add(introWindow)
+	for immune() && time.Now().Before(introDeadline) {
+		time.Sleep(500 * time.Millisecond)
+	}
+	if immune() {
+		e2eharness.Preconditionf(t, "Algalon 0x%X still UNIT_FLAG_IMMUNE_TO_PC after %s; intro roleplay never finished", algalon, introWindow)
+	}
+	t.Logf("intro roleplay done, Algalon attackable")
+
+	// Drop GM so he fights back, then make both bots able to sit through a Big Bang. Note the
+	// bare CombatReady/CombatReadyFull helpers turn `.cheat god` on, which would leave the
+	// bots invulnerable and every quiet window vacuous: this oracle needs real damage.
+	for _, b := range bots {
+		e2eharness.CombatReady(t, b.World, e2eharness.CombatReadyOpts{})
+		if err := b.World.SetTarget(b.World.CharGUID()); err != nil {
+			e2eharness.Preconditionf(t, "%s select self: %v", b.Name, err)
+		}
+		b.GM(t, fmt.Sprintf(".modify hp %d", botHealth))
+	}
+
+	tank.Engage(t, algalon, 60*time.Second)
+	t.Logf("engaged Algalon, waiting for Big Bang")
+
+	totalHP := func() uint32 {
+		var sum uint32
+		for _, b := range bots {
+			hp, _ := b.UnitHP(b.World.CharGUID())
+			sum += hp
+		}
+		return sum
+	}
+
+	sweep := func() bool {
+		// Stripped every pass rather than on a stack threshold: a missed read is
+		// unrecoverable, because once the 5th stack lands 64417 stays on and taking 64412 off
+		// does not remove it. This is the tank swap a real raid does, and Phase Punch only
+		// comes around every 15.5s.
+		for _, b := range bots {
+			if err := b.World.SetTarget(b.World.CharGUID()); err == nil {
+				b.GM(t, fmt.Sprintf(".unaura %d", spellPhasePunch))
+				b.GM(t, fmt.Sprintf(".unaura %d", spellPhasePunchShift))
+			}
+		}
+		if guids := e2eharness.LivingByEntries(tank.World, 300, npcLivingConstellation); len(guids) > 0 {
+			tank.DamageKill(t, guids, constellationHit, 10*time.Second)
+			t.Logf("cleared %d Living Constellation(s)", len(guids))
+		}
+		bossHP, _ := tank.UnitHP(algalon)
+		t.Logf("sweep: total hp=%d boss hp=%d bossTarget=0x%X inCombat=%v",
+			totalHP(), bossHP, tank.UnitTarget(algalon), tank.UnitInCombat(algalon))
+		tank.Attack(t, algalon)
+		return tank.UnitInCombat(algalon)
+	}
+
+	startHP := totalHP()
+	var bigBangAt time.Time
+	lastSweep := time.Time{}
+	waitDeadline := time.Now().Add(bigBangWindow)
+	for time.Now().Before(waitDeadline) {
+		if tank.HasAura(spellRemovePhase) || spare.HasAura(spellRemovePhase) {
+			bigBangAt = time.Now()
+			break
+		}
+		if time.Since(lastSweep) >= sweepEvery {
+			if !sweep() {
+				e2eharness.Preconditionf(t, "Algalon left combat before Big Bang (total hp %d -> %d)", startHP, totalHP())
+			}
+			lastSweep = time.Now()
+		}
+		time.Sleep(sampleEvery)
+	}
+	if bigBangAt.IsZero() {
+		e2eharness.Preconditionf(t, "no Big Bang (%d) within %s of the pull", spellRemovePhase, bigBangWindow)
+	}
+
+	// Oracle liveness: if nothing has been hitting the bots up to here, a quiet window proves
+	// nothing at all.
+	preHP := totalHP()
+	if preHP >= startHP {
+		e2eharness.Preconditionf(t, "bots took no damage before Big Bang (total %d -> %d), the quiet window would be vacuous", startHP, preHP)
+	}
+	t.Logf("Big Bang landed, total hp %d -> %d", startHP, preHP)
+
+	// The bots regenerate while this runs, so the total is not monotonic and a plain
+	// "below the value at window start" check would let regeneration mask a hit. Compare
+	// against a running peak instead: regeneration only raises it, and any decrease at all
+	// is Algalon landing something.
+	time.Sleep(settle)
+	quietHP := totalHP()
+	peakHP := quietHP
+	for time.Since(bigBangAt) < stasisWindow {
+		hp := totalHP()
+		if hp < peakHP {
+			e2eharness.ConfirmedBugf(t, 27539,
+				"Algalon acted %s after Big Bang, inside the 3s stasis: total hp %d -> %d",
+				time.Since(bigBangAt).Round(time.Millisecond), peakHP, hp)
+		}
+		if hp > peakHP {
+			peakHP = hp
+		}
+		time.Sleep(sampleEvery)
+	}
+
+	// The window must be quiet because he is holding still, not because he evaded or the bots
+	// stopped being targets: he has to come back swinging right after it.
+	resumed := false
+	resumeDeadline := time.Now().Add(resumeWindow)
+	for time.Now().Before(resumeDeadline) {
+		hp := totalHP()
+		if hp < peakHP {
+			resumed = true
+			break
+		}
+		if hp > peakHP {
+			peakHP = hp
+		}
+		time.Sleep(sampleEvery)
+	}
+	if !resumed {
+		e2eharness.Preconditionf(t,
+			"Algalon never resumed within %s of the stasis ending (total hp still %d, in combat=%v) — the quiet window proves nothing",
+			resumeWindow, quietHP, tank.UnitInCombat(algalon))
+	}
+
+	t.Logf("PASS Big Bang stasis: no damage for %s after the cast, then Algalon resumed", stasisWindow)
 }
