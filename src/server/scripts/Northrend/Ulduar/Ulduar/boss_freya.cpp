@@ -1385,12 +1385,12 @@ class spell_freya_tidal_wave : public SpellScript
 {
     PrepareSpellScript(spell_freya_tidal_wave);
 
-    void HandleSurge(SpellMissInfo /*missInfo*/)
+    void HandleSurge(SpellEffIndex /*effIndex*/)
     {
-        // The wave is a delayed missile: the damage lands when the surge reaches its target,
-        // so an interrupted cast never gets here. Hooked before the hit rather than on the
-        // effect, so a target that is immune (Hand of Protection covers the wave's physical
-        // school) or simply missed does not cancel the mechanic for the whole raid.
+        // Fired as the charge launches, from the caster's pre-charge position and facing, so
+        // the damage cone spans the same 40 yds the spirit is about to cross: everything the
+        // wave rolls over is caught in one go. Resolving it later would leave behind whoever
+        // the spirit has already passed. An interrupted cast never launches and deals nothing.
         Unit* caster = GetCaster();
         caster->CastSpell(caster, SPELL_TIDAL_WAVE_AURA, true);
         // Untriggered so the cast is announced: the damage spell has no SpellVisual, and
@@ -1400,7 +1400,7 @@ class spell_freya_tidal_wave : public SpellScript
 
     void Register() override
     {
-        BeforeHit += BeforeSpellHitFn(spell_freya_tidal_wave::HandleSurge);
+        OnEffectLaunch += SpellEffectFn(spell_freya_tidal_wave::HandleSurge, EFFECT_1, SPELL_EFFECT_CHARGE_DEST);
     }
 };
 
