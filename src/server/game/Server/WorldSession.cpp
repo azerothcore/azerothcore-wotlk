@@ -302,6 +302,8 @@ ObjectGuid::LowType WorldSession::GetGuidLow() const
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {
+    sScriptMgr->OnPacketSent(this, *packet);
+
     if (!m_Socket)
         return;
 
@@ -588,6 +590,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     //logout procedure should happen only in World::UpdateSessions() method!!!
     if (updater.ProcessUnsafe())
     {
+        sScriptMgr->OnSessionUpdate(this, diff);
+
         if (m_Socket && m_Socket->IsOpen() && _warden)
         {
             _warden->Update(diff);

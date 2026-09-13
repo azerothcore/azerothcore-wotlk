@@ -181,6 +181,14 @@ void ScriptMgr::OnUnloadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint
     });
 }
 
+bool ScriptMgr::CanSendObjectUpdatesToPlayer(Map* map, Player* player)
+{
+    ASSERT(map);
+    ASSERT(player);
+
+    CALL_ENABLED_BOOLEAN_HOOKS(AllMapScript, ALLMAPHOOK_CAN_SEND_OBJECT_UPDATES_TO_PLAYER, !script->CanSendObjectUpdatesToPlayer(map, player));
+}
+
 void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
 {
     ASSERT(map);
