@@ -1387,14 +1387,11 @@ class spell_freya_tidal_wave : public SpellScript
 
     void HandleSurge(SpellEffIndex /*effIndex*/)
     {
-        // Fired as the charge launches, from the caster's pre-charge position and facing, so
-        // the damage cone spans the same 40 yds the spirit is about to cross: everything the
-        // wave rolls over is caught in one go. Resolving it later would leave behind whoever
-        // the spirit has already passed. An interrupted cast never launches and deals nothing.
+        // The cone is caster-referenced: taken before the charge moves the spirit, it spans
+        // the same 40 yds the surge is about to cross.
         Unit* caster = GetCaster();
         caster->CastSpell(caster, SPELL_TIDAL_WAVE_AURA, true);
-        // Untriggered so the cast is announced: the damage spell has no SpellVisual, and
-        // Spell::IsNeedSendToClient would otherwise drop its SMSG_SPELL_GO.
+        // Untriggered: no SpellVisual, so a triggered cast would lose its SMSG_SPELL_GO.
         caster->CastSpell(caster, SPELL_TIDAL_WAVE_DAMAGE, false);
     }
 
