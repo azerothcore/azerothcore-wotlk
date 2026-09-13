@@ -207,7 +207,6 @@ struct boss_flame_leviathan : public BossAI
     uint8 _overloadCircuitCount;
 
     // Custom
-    void BindPlayers();
     void RadioSay(uint8 textid);
     void ActivateTowers();
     void TurnGates(bool _start, bool _death);
@@ -278,7 +277,6 @@ struct boss_flame_leviathan : public BossAI
         ActivateTowers();
         instance->SetBossState(BOSS_LEVIATHAN, SPECIAL);
 
-        BindPlayers();
         me->SetInCombatWithZone();
 
         if (!_startTimer)
@@ -482,11 +480,6 @@ struct boss_flame_leviathan : public BossAI
     }
 };
 
-void boss_flame_leviathan::BindPlayers()
-{
-    me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
-}
-
 void boss_flame_leviathan::RadioSay(uint8 textid)
 {
     if (Creature* r = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX() - 150, me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000))
@@ -655,7 +648,6 @@ void boss_flame_leviathan::JustDied(Unit*)
     Talk(FLAME_LEVIATHAN_SAY_DEATH);
 
     TurnGates(false, true);
-    BindPlayers();
 }
 
 void boss_flame_leviathan::KilledUnit(Unit* who)

@@ -2053,12 +2053,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Cosmic Smash (Algalon the Observer)
-    ApplySpellFix({ 62293 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
-    });
-
-    // Cosmic Smash (Algalon the Observer)
     ApplySpellFix({ 62311, 64596 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
