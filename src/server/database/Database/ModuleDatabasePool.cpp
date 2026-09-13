@@ -120,6 +120,9 @@ void ModuleDatabasePool::Execute(std::string_view sql)
 
 void ModuleDatabasePool::DirectExecute(std::string_view sql)
 {
+    if (sql.empty())
+        return;
+
     if (_connections.empty())
         return;
 
