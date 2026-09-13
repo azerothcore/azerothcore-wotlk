@@ -267,7 +267,7 @@ bool CreateDatabase(DatabaseUpdatePool& pool)
     return true;
 }
 
-bool UpdateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::string_view modulesList)
+bool UpdateDatabase(DatabaseUpdatePool& pool, DBUpdaterInfo const& info, std::string_view modulesList)
 {
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
@@ -341,7 +341,7 @@ bool UpdateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, s
     return true;
 }
 
-bool UpdateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info,
+bool UpdateDatabase(DatabaseUpdatePool& pool, DBUpdaterInfo const& info,
                     std::vector<std::string> const* setDirectories)
 {
     if (!DBUpdaterUtil::CheckExecutable())
@@ -402,7 +402,7 @@ bool UpdateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info,
     return true;
 }
 
-bool PopulateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info)
+bool PopulateDatabase(DatabaseUpdatePool& pool, DBUpdaterInfo const& info)
 {
     {
         QueryResult const result = Retrieve(pool, "SHOW TABLES");
@@ -584,7 +584,7 @@ void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string co
 } // anonymous namespace
 
 template<class T>
-ModuleDBUpdaterInfo DBUpdater<T>::GetUpdaterInfo()
+DBUpdaterInfo DBUpdater<T>::GetUpdaterInfo()
 {
     return { GetTableName(), GetSourceDirectory(), GetBaseFilesDirectory(), GetDBModuleName() };
 }
@@ -622,13 +622,13 @@ bool ModuleDBUpdater::Create(DatabaseUpdatePool& pool)
     return CreateDatabase(pool);
 }
 
-bool ModuleDBUpdater::Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info,
+bool ModuleDBUpdater::Update(DatabaseUpdatePool& pool, DBUpdaterInfo const& info,
                              std::string_view modulesList /*= {}*/)
 {
     return UpdateDatabase(pool, info, modulesList);
 }
 
-bool ModuleDBUpdater::Populate(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info)
+bool ModuleDBUpdater::Populate(DatabaseUpdatePool& pool, DBUpdaterInfo const& info)
 {
     return PopulateDatabase(pool, info);
 }

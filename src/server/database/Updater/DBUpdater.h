@@ -71,11 +71,11 @@ private:
     static uint32& failed_updates();
 };
 
-// Runtime metadata describing a module-owned database for the updater.
-struct ModuleDBUpdaterInfo
+// Runtime metadata the updater needs about one database, core or module owned.
+struct DBUpdaterInfo
 {
     std::string displayName;        // name used in log output
-    std::string sourceDirectory;    // root directory holding the module's sql tree
+    std::string sourceDirectory;    // root directory holding the sql tree
     std::string baseFilesDirectory; // base *.sql files, trailing separator optional
     std::string dbModuleName;       // update-fetcher module name, must be lowercase
 };
@@ -101,7 +101,7 @@ public:
     static std::string GetDBModuleName();
 
 private:
-    static ModuleDBUpdaterInfo GetUpdaterInfo();
+    static DBUpdaterInfo GetUpdaterInfo();
 };
 
 // Non-template updater entry points for module-owned pools (see ModuleDatabasePool).
@@ -111,8 +111,8 @@ class AC_DATABASE_API ModuleDBUpdater
 {
 public:
     static bool Create(DatabaseUpdatePool& pool);
-    static bool Update(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, std::string_view modulesList = {});
-    static bool Populate(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info);
+    static bool Update(DatabaseUpdatePool& pool, DBUpdaterInfo const& info, std::string_view modulesList = {});
+    static bool Populate(DatabaseUpdatePool& pool, DBUpdaterInfo const& info);
 };
 
 #endif // DBUpdater_h__
