@@ -751,8 +751,12 @@ func TestAC_27539_AlgalonBigBangStasis(t *testing.T) {
 		// Big Bang's damage and its 64445 marker come out of the same cast; give the health
 		// update from that cast time to arrive before the quiet window opens.
 		settle = 700 * time.Millisecond
-		// 3s of stasis from the cast, minus the settle already spent inside it.
-		stasisWindow = 3 * time.Second
+		// The script holds Algalon for 3s, but the server starts counting when it applies
+		// 64445 and this window starts when the client *sees* it, so the tail of a full 3s
+		// window runs past the moment he is allowed to move again. Stop short of the boundary
+		// by enough to cover that lag plus a world tick. A boss that never held still at all
+		// lands something around 1s, far inside what is still asserted.
+		stasisWindow = 2300 * time.Millisecond
 		// Quantum Strike repeats every 3-4.5s and melee is faster, so a boss that resumed
 		// lands something well inside this.
 		resumeWindow = 10 * time.Second
