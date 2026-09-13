@@ -174,6 +174,7 @@ namespace Trainer
                     if (spellLearnSkill->maxvalue > 0 &&
                         player->GetPureMaxSkillValue(spellLearnSkill->skill) >= spellLearnSkill->maxvalue)
                         return true;
+
                     if (spellLearnSkill->step > 0 &&
                         player->GetSkillStep(spellLearnSkill->skill) >= spellLearnSkill->step)
                         return true;
