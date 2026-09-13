@@ -464,8 +464,8 @@ class spell_pri_lightwell_renew : public AuraScript
         if (!caster)
             return;
 
-        // The renew is cast by the priest, so resend the well's own fields instead: the spellclick
-        // condition that hides the click while the renew is up is evaluated on them, per player.
+        // Spellclick gets hidden per player on the well's own NPC flags, so the wells are what
+        // need resending here, not the aura's caster (the priest).
         for (Unit* controlled : caster->m_Controlled)
         {
             if (!IsLightwellEntry(controlled->GetEntry()))
