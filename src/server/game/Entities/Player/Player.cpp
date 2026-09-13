@@ -2977,6 +2977,13 @@ void Player::SendNewMail()
     WorldPacket data(SMSG_RECEIVED_MAIL, 4);
     data << (uint32) 0;
     SendDirectMessage(&data);
+
+    // The client caches its inbox and refuses to re-query it more than once a minute, so a mailbox
+    // opened inside that window still shows the old list. Pushing the inbox refreshes it in place.
+    // Only when in world: _LoadInventory mails problematic items during login, and that must not
+    // push a mail list to a client that has not finished logging in yet.
+    if (IsInWorld() && sWorld->getBoolConfig(CONFIG_MAIL_PUSH_INBOX_ON_DELIVERY))
+        GetSession()->SendMailList();
 }
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
