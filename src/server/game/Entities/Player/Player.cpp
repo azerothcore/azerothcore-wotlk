@@ -4996,7 +4996,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
     return TotalCost;
 }
 
-void Player::RepopAtGraveyard()
+void Player::RepopAtGraveyard(bool nearCorpse)
 {
     // note: this can be called also when the player is alive
     // for example from WorldSession::HandleMovementOpcodes
@@ -5021,10 +5021,20 @@ void Player::RepopAtGraveyard()
         ClosestGrave = bg->GetClosestGraveyard(this);
     else
     {
-        if (sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
-            ClosestGrave = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId())->GetClosestGraveyard(this);
+        uint32 graveyardZoneId = GetZoneId();
+
+        if (nearCorpse && HasCorpse())
+        {
+            WorldLocation const& corpseLoc = GetCorpseLocation();
+            uint32 corpseAreaId = 0;
+
+            sMapMgr->GetZoneAndAreaId(PHASEMASK_NORMAL, graveyardZoneId, corpseAreaId, corpseLoc.GetMapId(), corpseLoc.GetPositionX(), corpseLoc.GetPositionY(), corpseLoc.GetPositionZ());
+        }
+
+        if (sBattlefieldMgr->GetBattlefieldToZoneId(graveyardZoneId))
+            ClosestGrave = sBattlefieldMgr->GetBattlefieldToZoneId(graveyardZoneId)->GetClosestGraveyard(this);
         else
-            ClosestGrave = sGraveyard->GetClosestGraveyard(this, GetTeamId(), HasCorpse());
+            ClosestGrave = sGraveyard->GetClosestGraveyard(this, GetTeamId(), nearCorpse);
     }
 
     // stop countdown until repop

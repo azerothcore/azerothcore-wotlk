@@ -102,8 +102,9 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
         return GetGraveyard(graveyardOverride);
 
     WorldLocation loc = player->GetWorldLocation();
+    bool shouldUseCorpseLoc = nearCorpse && player->HasCorpse();
 
-    if (nearCorpse && player->HasCorpse())
+    if (shouldUseCorpseLoc)
         loc = player->GetCorpseLocation();
 
     uint32 mapId = loc.GetMapId();
@@ -114,7 +115,10 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
     uint32 zoneId = 0;
     uint32 areaId = 0;
 
-    sMapMgr->GetZoneAndAreaId(PHASEMASK_NORMAL, zoneId, areaId, mapId, x, y, z);
+    if (shouldUseCorpseLoc)
+        sMapMgr->GetZoneAndAreaId(PHASEMASK_NORMAL, zoneId, areaId, mapId, x, y, z);
+    else
+        player->GetZoneAndAreaId(zoneId, areaId);
 
     if (!zoneId && !areaId)
     {

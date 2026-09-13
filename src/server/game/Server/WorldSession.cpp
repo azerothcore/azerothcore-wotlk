@@ -696,7 +696,7 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
         if (_player->GetDeathTimer())
         {
             _player->GetThreatMgr().RemoveMeFromThreatLists();
-            _player->BuildPlayerRepop();
+            _player->BuildPlayerRepop(true);
             _player->RepopAtGraveyard();
         }
         else if (_player->HasSpiritOfRedemptionAura())
@@ -704,7 +704,7 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
             // this will kill character by SPELL_AURA_SPIRIT_OF_REDEMPTION
             _player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             _player->KillPlayer();
-            _player->BuildPlayerRepop();
+            _player->BuildPlayerRepop(true);
             _player->RepopAtGraveyard();
         }
         else if (_player->HasPendingBind())
