@@ -399,6 +399,7 @@ private:
 
     /* Scorekeeping */
     void AddPoints(TeamId teamId, uint32 points);
+    void CheckVictory();
 
     struct CapturePointInfo
     {
