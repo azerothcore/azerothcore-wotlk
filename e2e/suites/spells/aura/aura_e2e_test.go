@@ -245,3 +245,103 @@ func TestAura_ApplyMultipleDistinctAuras(t *testing.T) {
 	}
 	t.Logf("PASS multi-aura apply (stance present=%v)", bot.HasAura(e2eharness.SpellBattleStance))
 }
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/26386
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27464
+// Mage Tier 8 4-Piece bonus (64869): Hot Streak (48108) must have a chance not to be consumed
+// when casting Pyroblast, and must always be consumed when the bonus is absent.
+func TestAC_26386_MageT84PBonusHotStreakPreservation(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"short", "spells", "issue"},
+		Runtime:  "short",
+		Issue:    26386,
+		Category: "spells/aura",
+	})
+
+	const (
+		spellPyroblast  = uint32(11366) // Rank 1 Pyroblast
+		spellHotStreak  = uint32(48108) // Hot Streak proc buff
+		spellT84PBonus  = uint32(64869) // Item - Mage T8 4P Bonus
+		itemT8Head      = uint32(46134) // Conqueror's Kirin Tor Hood
+		itemT8Chest     = uint32(46132) // Conqueror's Kirin Tor Tunic
+		itemT8Legs      = uint32(46130) // Conqueror's Kirin Tor Leggings
+		itemT8Shoulders = uint32(46133) // Conqueror's Kirin Tor Shoulderpads
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix:        "MageT8",
+		Race:          e2eharness.RaceHuman,
+		Class:         e2eharness.ClassMage,
+		Level:         80,
+		LearnAllClass: true,
+	})
+
+	pad := e2eharness.PackagePad(t)
+	bot.TeleportPad(t, pad)
+	bot.CombatReady(t)
+	bot.CheatPower(t)
+	bot.GM(t, ".cheat cooldown on")
+	bot.FlushWorld(t)
+
+	bot.Learn(t, spellPyroblast)
+
+	dummy := bot.Spawn(t, e2eharness.CreatureHeroicTrainingDummy, 60*time.Second)
+	if err := bot.World.SetTarget(dummy); err != nil {
+		e2eharness.Preconditionf(t, "SetTarget dummy: %v", err)
+	}
+	bot.Face(t, dummy)
+
+	// Phase 1: Deterministic baseline without T8 4P bonus.
+	// Pyroblast must consume Hot Streak 100% of the time.
+	bot.ApplyAura(t, spellHotStreak)
+	if !bot.HasAura(spellHotStreak) {
+		e2eharness.Preconditionf(t, "Hot Streak %d missing after ApplyAura", spellHotStreak)
+	}
+	bot.CastMust(t, spellPyroblast, dummy, 5*time.Second)
+	if !bot.TryWaitAuraGone(t, spellHotStreak, 2*time.Second) {
+		e2eharness.Assertf(t, "Hot Streak %d was not consumed after Pyroblast without T8 4P bonus", spellHotStreak)
+	}
+	t.Logf("PASS Hot Streak consumed by Pyroblast without T8 4P bonus")
+
+	// Phase 2: Equip 4-piece T8 set and verify 20% proc preservation chance.
+	bot.EquipEntry(t, itemT8Head, 1)
+	bot.EquipEntry(t, itemT8Chest, 1)
+	bot.EquipEntry(t, itemT8Legs, 1)
+	bot.EquipEntry(t, itemT8Shoulders, 1)
+	bot.FlushWorld(t)
+
+	if !bot.HasAura(spellT84PBonus) {
+		bot.ApplyAura(t, spellT84PBonus)
+	}
+	if !bot.HasAura(spellT84PBonus) {
+		e2eharness.Preconditionf(t, "Mage T8 4P bonus aura %d missing after equipping items", spellT84PBonus)
+	}
+
+	// With 20% chance to preserve, across 50 attempts, probability of 0 preservations is (0.8)^50 ≈ 1.4e-5.
+	preserved := false
+	const maxAttempts = 50
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		if !bot.HasAura(spellHotStreak) {
+			bot.ApplyAura(t, spellHotStreak)
+		}
+		if !bot.HasAura(spellHotStreak) {
+			e2eharness.Preconditionf(t, "Hot Streak %d missing at attempt %d", spellHotStreak, attempt)
+		}
+
+		bot.CastMust(t, spellPyroblast, dummy, 5*time.Second)
+		time.Sleep(100 * time.Millisecond)
+
+		if bot.HasAura(spellHotStreak) {
+			preserved = true
+			t.Logf("PASS Hot Streak preserved by T8 4P bonus on attempt %d", attempt)
+			break
+		}
+	}
+
+	if !preserved {
+		e2eharness.Assertf(t, "Hot Streak was consumed on all %d attempts despite T8 4P bonus (P(fail) < 0.002%%)", maxAttempts)
+	}
+
+	bot.AssertWorldAlive(t)
+	t.Logf("PASS AC#26386 Mage T8 4P bonus Hot Streak preservation verified")
+}
