@@ -153,7 +153,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
 | social/loot | need/greed / master loot; below-half kill | P1 | covered (`TestAC_26862_*`); chest mid-roll `blocked-harness` (GO 194821 UseGameObject); pass-on-loot delete `blocked-harness` (item-survive after ALL_PASSED) | #26894 #26862 #22000 |
 | social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
-| quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
+| quests/lifecycle | STAY_ALIVE fail on death; status after save/relog; questgiver accept gating | P1 | covered (`TestAC_26549_*`, `TestAC_27417_*`) | #26549 #27417 |
 | quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
 | quests/frostmourne | scrying-orb vision runs; Muradin leaves the cavern and despawns; quest 12478 COMPLETE | P2 | covered (`TestAC_25760_*`); dialogue order and duplicate line `blocked-harness` (no monster-say capture) | #25760 |
 | quests/objectives | a mob that drops a quest item advertises it, so the client shows the objective on hover (`creature_questitem` -> `SMSG_CREATURE_QUERY_RESPONSE.questItems`) | P2 | covered (`TestAC_27553_*`), decoding the response through a raw packet hook since the harness has no dispatch case for it | #27553 |
