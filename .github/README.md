@@ -60,6 +60,7 @@ We also recommend you read our [Contributor Covenant Code of Conduct](https://gi
 Feel free to join our [Discord server](https://discord.gg/gkt4y2x).
 
 🤖 If you use any AI agent to work on AzerothCore, please read our [AI Agentic Engineering guidelines](https://www.azerothcore.org/wiki/agentic-engineering).
+Agent instructions for this repo live in [AGENTS.md](../AGENTS.md), with task-scoped guides in [.agents/docs/](../.agents/docs/); [.agents/README.md](../.agents/README.md) explains how to hook up your agent.
 
 Click on the "⭐ Star" button to help us gain more visibility on GitHub!
 
