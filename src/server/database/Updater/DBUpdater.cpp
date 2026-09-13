@@ -272,7 +272,7 @@ bool UpdateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, s
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
-    LOG_INFO("sql.updates", "Updating {} database...", info.tableName);
+    LOG_INFO("sql.updates", "Updating {} database...", info.displayName);
 
     Path const sourceDirectory(info.sourceDirectory);
 
@@ -332,7 +332,7 @@ bool UpdateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info, s
     std::string const summary = Acore::StringFormat("Containing {} new and {} archived updates.", result.recent, result.archived);
 
     if (!result.updated)
-        LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", info.tableName, summary);
+        LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", info.displayName, summary);
     else
         LOG_INFO("sql.updates", ">> Applied {} {}. {}", result.updated, result.updated == 1 ? "query" : "queries", summary);
 
@@ -413,7 +413,7 @@ bool PopulateDatabase(DatabaseUpdatePool& pool, ModuleDBUpdaterInfo const& info)
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
 
-    LOG_INFO("sql.updates", "Database {} is empty, auto populating it...", info.tableName);
+    LOG_INFO("sql.updates", "Database {} is empty, auto populating it...", info.displayName);
 
     std::string const DirPathStr = info.baseFilesDirectory;
 

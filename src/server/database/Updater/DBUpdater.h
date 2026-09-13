@@ -74,7 +74,7 @@ private:
 // Runtime metadata describing a module-owned database for the updater.
 struct ModuleDBUpdaterInfo
 {
-    std::string tableName;          // display name used in log output
+    std::string displayName;        // name used in log output
     std::string sourceDirectory;    // root directory holding the module's sql tree
     std::string baseFilesDirectory; // base *.sql files, trailing separator optional
     std::string dbModuleName;       // update-fetcher module name, must be lowercase
