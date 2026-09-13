@@ -1,3 +1,4 @@
+-- DB update 2026_09_12_06 -> 2026_09_13_00
 --
 -- Freya's Elders: emblem loot when killed before the encounter
 
