@@ -14503,7 +14503,13 @@ void Unit::SendMoveRoot(bool apply)
     {
         if (apply)
         {
-            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY);
+            // MOVEMENTFLAG_ROOT must not be sent alongside MOVEMENTFLAG_MASK_MOVING.
+            // The 3.3.5a client's movement step returns zero consumed time as soon
+            // as it sees ROOT, while the loop driving it only terminates once that
+            // time reaches the step target, so a moving flag alongside ROOT spins
+            // forever and freezes every client that receives this unit's movement
+            // info. The turn bits stay set, they never reach that step.
+            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_MASK_MOVING | MOVEMENTFLAG_MASK_MOVING_FLY);
             m_movementInfo.AddMovementFlag(MOVEMENTFLAG_ROOT);
             if (!client)
                 StopMoving();
