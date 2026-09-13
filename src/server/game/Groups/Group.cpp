@@ -1558,7 +1558,7 @@ void Group::EndRoll(Loot* pLoot)
 
                 vote = PASS;
                 ++roll->totalPass;
-                SendLootRoll(ObjectGuid::Empty, playerGuid, 128, ROLL_PASS, *roll);
+                SendLootRoll(roll->itemGUID, playerGuid, 128, ROLL_PASS, *roll);
             }
 
             CountTheRoll(itr);
