@@ -752,7 +752,7 @@ public:
     ALEEventProcessor* ALEEvents;
     EventProcessor m_Events;
 
-    // CastSpell's third arg can be a variety of things — see CastSpellExtraArgs' constructors.
+    // CastSpell's third arg can be a variety of things, see CastSpellExtraArgs' constructors.
     SpellCastResult CastSpell(CastSpellTargetArg const& targets, uint32 spellId,
                               CastSpellExtraArgs const& args = {});
     SpellCastResult CastSpell(CastSpellTargetArg const& targets, SpellInfo const* info,

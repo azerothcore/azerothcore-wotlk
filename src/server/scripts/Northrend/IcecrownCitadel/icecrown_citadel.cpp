@@ -3705,7 +3705,7 @@ struct npc_icc_spire_frostwyrm : public ScriptedAI
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+            me->SetAnimTier(AnimTier::Ground);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         }
     }
@@ -3737,6 +3737,7 @@ struct npc_icc_spire_frostwyrm : public ScriptedAI
         bool hordeSide = action == HORDE_AREATRIGGER || action == HORDE_AREATRIGGER + 1;
         Position landingPosition = hordeSide ? posHordeMove : posAllianceMove;
 
+        me->SetAnimTier(AnimTier::Fly);
         me->GetMotionMaster()->MovePoint(1, landingPosition);
         me->SetHomePosition(landingPosition);
 
@@ -3745,11 +3746,11 @@ struct npc_icc_spire_frostwyrm : public ScriptedAI
 
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type == EFFECT_MOTION_TYPE && id == 1)
+        if (type == POINT_MOTION_TYPE && id == 1)
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+            me->SetAnimTier(AnimTier::Ground);
             _canResetFlyingEffects = false;
         }
     }
@@ -3761,7 +3762,7 @@ struct npc_icc_spire_frostwyrm : public ScriptedAI
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+            me->SetAnimTier(AnimTier::Ground);
         }
     }
 

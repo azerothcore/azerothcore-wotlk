@@ -740,7 +740,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         // HoL, Arc Weld
                         case 59086:
                             {
-                                if (m_caster && unitCaster->IsPlayer() && unitCaster->ToPlayer()->isMoving())
+                                if (unitCaster->IsPlayer() && unitCaster->ToPlayer()->isMoving())
                                     unitCaster->CastSpell(unitCaster, 59097, true);
 
                                 return;
@@ -864,25 +864,31 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             // Brittle Armor - (need add max stack of 24575 Brittle Armor)
             case 29284:
                 {
+                    if (!unitCaster)
+                        return;
+
                     // Brittle Armor
                     SpellInfo const* spell = sSpellMgr->GetSpellInfo(24575);
                     if (!spell)
                         return;
 
                     for (uint32 j = 0; j < spell->StackAmount; ++j)
-                        m_caster->CastSpell(unitTarget, spell->Id, true);
+                        unitCaster->CastSpell(unitTarget, spell->Id, true);
                     return;
                 }
             // Mercurial Shield - (need add max stack of 26464 Mercurial Shield)
             case 29286:
                 {
+                    if (!unitCaster)
+                        return;
+
                     // Mercurial Shield
                     SpellInfo const* spell = sSpellMgr->GetSpellInfo(26464);
                     if (!spell)
                         return;
 
                     for (uint32 j = 0; j < spell->StackAmount; ++j)
-                        m_caster->CastSpell(unitTarget, spell->Id, true);
+                        unitCaster->CastSpell(unitTarget, spell->Id, true);
                     return;
                 }
             // Cloak of Shadows
@@ -1095,7 +1101,14 @@ void Spell::EffectForceCast(SpellEffIndex effIndex)
         args.AddSpellMod(SPELLVALUE_BASE_POINT2, damage);
     }
 
-    unitTarget->CastSpell(m_caster, spellInfo->Id, args);
+    SpellCastTargets targets;
+    // InitExplicitTargets turns a unit target the triggered spell cannot take into that spell's
+    // destination, which would anchor the forced cast to the original caster instead of to the
+    // forced one (e.g. Algalon's Cosmic Smash craters, Elder Brightleaf's Unstable Sun Beams).
+    if (spellInfo->GetExplicitTargetMask() & (TARGET_FLAG_UNIT_MASK | TARGET_FLAG_CORPSE_MASK))
+        targets.SetUnitTarget(m_caster->ToUnit());
+
+    unitTarget->CastSpell(std::move(targets), spellInfo, args);
 }
 
 void Spell::EffectTriggerRitualOfSummoning(SpellEffIndex effIndex)
@@ -1566,16 +1579,16 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         {
             // Amount of heal - depends from stacked Holy Energy
             int damageAmount = 0;
-            if (AuraEffect const* aurEff = caster->GetAuraEffect(45062, 0))
+            if (AuraEffect const* aurEff = unitCaster->GetAuraEffect(45062, 0))
             {
                 damageAmount += aurEff->GetAmount();
-                caster->RemoveAurasDueToSpell(45062);
+                unitCaster->RemoveAurasDueToSpell(45062);
             }
 
             addhealth += damageAmount;
         }
         // Swiftmend - consumes Regrowth or Rejuvenation
-        else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, caster))
+        else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, unitCaster))
         {
             Unit::AuraEffectList const& RejorRegr = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
             // find most short by duration
@@ -1586,7 +1599,7 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
                 if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID
                         && (*i)->GetSpellInfo()->SpellFamilyFlags[0] & 0x50)
                 {
-                    if (caster->GetGUID() == (*i)->GetCasterGUID())
+                    if (unitCaster->GetGUID() == (*i)->GetCasterGUID())
                     {
                         if (!forcedTargetAura || (*i)->GetBase()->GetDuration() < forcedTargetAura->GetBase()->GetDuration())
                             forcedTargetAura = *i;
@@ -2448,7 +2461,6 @@ void Spell::EffectProficiency(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectSummonType(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
@@ -2469,6 +2481,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
     // prefer the unit original caster, fall back to the WorldObject caster (e.g. GameObject traps)
     WorldObject* caster = m_originalCaster ? m_originalCaster : m_caster;
+    Unit* unitCaster = m_originalCaster;
 
     bool personalSpawn = (properties->Flags & SUMMON_PROP_FLAG_ONLY_VISIBLE_TO_SUMMONER) != 0;
     int32 duration = m_spellInfo->GetDuration();
@@ -4160,7 +4173,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             }
                         case 61263: // for item Intravenous Healing Potion (44698)
                             {
-                                if (!m_caster || !unitTarget)
+                                if (!unitTarget)
                                     return;
 
                                 unitCaster->CastSpell(unitCaster, 61267, true);
@@ -6267,11 +6280,11 @@ void Spell::EffectGameObjectRepair(SpellEffIndex /*effIndex*/)
     if (!gameObjTarget)
         return;
 
-    Unit* caster = m_originalCaster;
-    if (!caster)
+    Unit* unitCaster = m_caster->ToUnit();
+    if (!unitCaster)
         return;
 
-    gameObjTarget->ModifyHealth(damage, caster);
+    gameObjTarget->ModifyHealth(damage, unitCaster);
 }
 
 void Spell::EffectGameObjectSetDestructionState(SpellEffIndex effIndex)

@@ -23,7 +23,7 @@
 #include "SpellDefines.h"
 
 // Surface-level tests for the WorldObject spellcasting port API. These do
-// not exercise Spell::prepare() — that requires TestMap / TestCreature
+// not exercise Spell::prepare(), which requires TestMap / TestCreature
 // scaffolding and is covered indirectly by the existing proc/immunity
 // tests. The goal here is to lock in the new TC-style argument types so a
 // future regression to CastSpellTargetArg / CastSpellExtraArgs surfaces
@@ -72,7 +72,7 @@ TEST(WorldObjectCastApi, CastSpellExtraArgsFluentChain)
 
     EXPECT_EQ(args.TriggerFlags, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
     EXPECT_EQ(args.OriginalCaster, guid);
-    // SpellValueOverrides is private detail of CustomSpellValues — just
+    // SpellValueOverrides is private detail of CustomSpellValues, so just
     // verify two entries were appended via the public iteration interface.
     int hits = 0;
     for (auto const& kv : args.SpellValueOverrides)
@@ -119,7 +119,7 @@ TEST(WorldObjectCastApi, CastSpellTargetArgPosition)
 
 TEST(WorldObjectCastApi, CastSpellTargetArgWorldObjectNull)
 {
-    // Null caster yields an error-state CastSpellTargetArg (Targets stays
+    // A null target yields an error-state CastSpellTargetArg (Targets stays
     // empty so WorldObject::CastSpell returns SPELL_FAILED_BAD_TARGETS).
     CastSpellTargetArg t(static_cast<WorldObject*>(nullptr));
     EXPECT_FALSE(t.Targets);

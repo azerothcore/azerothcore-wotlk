@@ -3295,7 +3295,12 @@ SpellCastResult WorldObject::CastSpell(CastSpellTargetArg const& targets, SpellI
         return SPELL_FAILED_BAD_TARGETS;
     }
 
-    Spell* spell = new Spell(this, info, args.TriggerFlags, args.OriginalCaster);
+    // some scripts rely on the triggering aura's caster being the original caster
+    ObjectGuid originalCaster = args.OriginalCaster;
+    if (!originalCaster && args.TriggeringAura)
+        originalCaster = args.TriggeringAura->GetCasterGUID();
+
+    Spell* spell = new Spell(this, info, args.TriggerFlags, originalCaster);
     for (auto const& kv : args.SpellValueOverrides)
         spell->SetSpellValue(kv.first, kv.second);
     spell->m_CastItem = args.CastItem;
@@ -3311,10 +3316,9 @@ Unit* WorldObject::GetCharmerOrOwnerUnit() const
 {
     if (Unit const* unit = ToUnit())
         return unit->GetCharmerOrOwner();
-    else if (GameObject const* go = ToGameObject())
-        return go->GetOwner();
 
-    return nullptr;
+    // GameObject, DynamicObject and Corpse all resolve their owner from the guid
+    return GetOwnerUnit();
 }
 
 Unit* WorldObject::GetCharmerOrOwnerOrSelfUnit() const
@@ -4010,9 +4014,6 @@ float WorldObject::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const
 
     if (spellInfo->RangeEntry->RangeMin[1] == spellInfo->RangeEntry->RangeMin[0])
         return spellInfo->GetMinRange();
-
-    if (!target)
-        return spellInfo->GetMinRange(true);
 
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }

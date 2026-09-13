@@ -7092,7 +7092,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
 SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
 {
-    Unit* unitCaster = (m_originalCaster ? m_originalCaster : m_caster->ToUnit());
+    Unit* unitCaster = m_caster->ToUnit();
     if (!unitCaster)
         return SPELL_CAST_OK;
     // spells totally immuned to caster auras (wsg flag drop, give marks etc)
@@ -8431,7 +8431,10 @@ bool Spell::HaveTargetsForEffect(uint8 effect) const
 
 Unit* Spell::GetUnitCasterForEffectHandlers() const
 {
-    return m_originalCaster ? m_originalCaster : m_caster->ToUnit();
+    if (Unit* unitCaster = m_caster->ToUnit())
+        return unitCaster;
+
+    return m_originalCaster;
 }
 
 SpellEvent::SpellEvent(Spell* spell) : BasicEvent()
