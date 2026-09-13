@@ -99,16 +99,12 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
     uint32 graveyardOverride = 0;
     sScriptMgr->OnPlayerBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
     if (graveyardOverride)
-    {
         return GetGraveyard(graveyardOverride);
-    }
 
     WorldLocation loc = player->GetWorldLocation();
 
     if (nearCorpse && player->HasCorpse())
-    {
         loc = player->GetCorpseLocation();
-    }
 
     uint32 mapId = loc.GetMapId();
     float  x     = loc.GetPositionX();
@@ -118,15 +114,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
     uint32 zoneId = 0;
     uint32 areaId = 0;
 
-    if (nearCorpse && player->HasCorpse())
-    {
-        Map* map = sMapMgr->CreateBaseMap(mapId);
-        map->GetZoneAndAreaId(PHASEMASK_NORMAL, zoneId, areaId, x, y, z);
-    }
-    else
-    {
-        player->GetZoneAndAreaId(zoneId, areaId);
-    }
+    sMapMgr->GetZoneAndAreaId(PHASEMASK_NORMAL, zoneId, areaId, mapId, x, y, z);
 
     if (!zoneId && !areaId)
     {
@@ -150,18 +138,14 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
 
     // No graveyards linked to the area, search zone.
     if (range.first == range.second)
-    {
         range = GraveyardStore.equal_range(zoneId);
-    }
     else // Found a graveyard linked to the area, check if it's a valid one.
     {
         GraveyardData const& graveyardLink = range.first->second;
 
+        // Not a friendly or neutral graveyard, search zone.
         if (!graveyardLink.IsNeutralOrFriendlyToTeam(teamId))
-        {
-            // Not a friendly or neutral graveyard, search zone.
             range = GraveyardStore.equal_range(zoneId);
-        }
     }
 
     MapEntry const* map = sMapStore.LookupEntry(mapId);
@@ -200,9 +184,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
 
         // Skip enemy faction graveyard.
         if (!graveyardLink.IsNeutralOrFriendlyToTeam(teamId))
-        {
             continue;
-        }
 
         // Skip Archerus graveyards if the player isn't a Death Knight.
         enum DeathKnightGraveyards
@@ -212,9 +194,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
         };
 
         if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_GRAVEYARD) && (graveyardLink.safeLocId == GRAVEYARD_EBON_HOLD || graveyardLink.safeLocId == GRAVEYARD_ARCHERUS))
-        {
             continue;
-        }
 
         // find now nearest graveyard at other map
         if (mapId != entry->Map)
@@ -441,7 +421,8 @@ GraveyardStruct const* Graveyard::GetGraveyard(std::string const& name) const
     {
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (!alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
+
+        if (!alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
     }
 
