@@ -36,7 +36,9 @@ class TransactionBase;
 // compatibility without any core-side registration.
 //
 // Connections are synchronous; asynchronous execution can be added in a
-// follow-up without changing this interface.
+// follow-up without changing this interface. DoPrepareStatements must mark every
+// statement CONNECTION_SYNCH: a CONNECTION_ASYNC one is skipped on these
+// connections and asserts on first use.
 class AC_DATABASE_API ModuleDatabasePool : public DatabaseUpdatePool
 {
 public:
