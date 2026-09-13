@@ -91,7 +91,6 @@ public:
      * @param revisions Revision string to report, keyed by module name
      */
     virtual void OnDatabaseGetDBRevision(std::map<std::string, std::string>& /*revisions*/) { }
-
 };
 
 #endif
