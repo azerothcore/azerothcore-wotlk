@@ -5041,7 +5041,7 @@ void Player::RepopAtGraveyard(bool nearCorpse)
         if (sBattlefieldMgr->GetBattlefieldToZoneId(graveyardZoneId))
             ClosestGrave = sBattlefieldMgr->GetBattlefieldToZoneId(graveyardZoneId)->GetClosestGraveyard(this);
         else
-            ClosestGrave = sGraveyard->GetClosestGraveyard(this, GetTeamId(), nearCorpse);
+            ClosestGrave = sGraveyard->GetClosestGraveyard(this, GetTeamId(), nearCorpse, nearCorpse);
     }
 
     // stop countdown until repop

@@ -4389,7 +4389,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
         if (target->HasPreventResurectionAura())
             return;
 
-        // xinef: player is in corps
+        // xinef: player is in corpse
         bool createCorpse = !target->HasPlayerFlag(PLAYER_FLAGS_GHOST);
         if (createCorpse)
             target->BuildPlayerRepop();

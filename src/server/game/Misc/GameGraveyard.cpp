@@ -94,7 +94,7 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
     return GetGraveyard(teamId == TEAM_HORDE ? HORDE_GRAVEYARD : ALLIANCE_GRAVEYARD);
 }
 
-GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse)
+GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse, bool useCorpseZone)
 {
     uint32 graveyardOverride = 0;
     sScriptMgr->OnPlayerBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
@@ -102,9 +102,8 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
         return GetGraveyard(graveyardOverride);
 
     WorldLocation loc = player->GetWorldLocation();
-    bool shouldUseCorpseLoc = nearCorpse && player->HasCorpse();
 
-    if (shouldUseCorpseLoc)
+    if (nearCorpse && player->HasCorpse())
         loc = player->GetCorpseLocation();
 
     uint32 mapId = loc.GetMapId();
@@ -115,7 +114,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
     uint32 zoneId = 0;
     uint32 areaId = 0;
 
-    if (shouldUseCorpseLoc)
+    if (useCorpseZone && player->HasCorpse())
         sMapMgr->GetZoneAndAreaId(PHASEMASK_NORMAL, zoneId, areaId, mapId, x, y, z);
     else
         player->GetZoneAndAreaId(zoneId, areaId);
