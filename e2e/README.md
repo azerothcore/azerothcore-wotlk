@@ -151,7 +151,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
 | spells/effects | Charge / grounding totem / Sweeping Strikes Execute; forced cast summons at the forced caster, not at the unit that forced it | P1 | covered (`TestAC_26997_*`, `TestEffects_ForceCastDestination`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 #27621 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
-| social/loot | need/greed / master loot; below-half kill | P1 | covered (`TestAC_26862_*`); chest mid-roll `blocked-harness` (GO 194821 UseGameObject); pass-on-loot delete `blocked-harness` (item-survive after ALL_PASSED) | #26894 #26862 #22000 |
+| social/loot | need/greed / master loot; below-half kill; a roll that ends on the timer names the roll in its terminating packet, and the member who never voted gets one PASS | P1 | covered (`TestAC_26862_*`, `TestAC_27299_*`); chest mid-roll `blocked-harness` (GO 194821 UseGameObject); pass-on-loot delete `blocked-harness` (item-survive after ALL_PASSED) | #26894 #26862 #27299 #22000 |
 | social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
 | quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
 | quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
