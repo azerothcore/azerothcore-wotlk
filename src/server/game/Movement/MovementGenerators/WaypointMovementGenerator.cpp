@@ -242,7 +242,9 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature* creature, bool rel
         {
             uint32 idx = (i_currentNode + i) % i_path->Nodes.size();
             WaypointNode const& node = i_path->Nodes.at(idx);
-            init.Path().push_back(G3D::Vector3(node.X, node.Y, node.Z));
+            float newZ = node.Z;
+            creature->UpdateAllowedPositionZ(node.X, node.Y, newZ);
+            init.Path().push_back(G3D::Vector3(node.X, node.Y, newZ));
             segmentNodes++;
 
             // Stop the segment at a waypoint with a delay
@@ -260,7 +262,9 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature* creature, bool rel
             {
                 uint32 idx = (i_currentNode + i) % i_path->Nodes.size();
                 WaypointNode const& node = i_path->Nodes.at(idx);
-                init.Path().push_back(G3D::Vector3(node.X, node.Y, node.Z));
+                float newZ = node.Z;
+                creature->UpdateAllowedPositionZ(node.X, node.Y, newZ);
+                init.Path().push_back(G3D::Vector3(node.X, node.Y, newZ));
             }
         }
 

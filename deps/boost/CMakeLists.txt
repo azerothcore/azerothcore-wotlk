@@ -32,7 +32,14 @@ else()
 endif()
 
 # Boost.System is header-only since 1.69; do not require it explicitly.
-find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS filesystem program_options iostreams regex)
+set(BOOST_COMPONENTS filesystem program_options iostreams regex)
+
+GetModuleSourceList(AC_MODULES_PRESENT)
+if(BUILD_APPLICATION_WORLDSERVER AND AC_MODULES_PRESENT)
+  list(APPEND BOOST_COMPONENTS thread)
+endif()
+
+find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS ${BOOST_COMPONENTS})
 
 if(NOT Boost_FOUND)
   if(NOT DEFINED ENV{Boost_ROOT} AND NOT DEFINED Boost_DIR AND NOT DEFINED BOOST_ROOT AND NOT DEFINED BOOSTROOT)
