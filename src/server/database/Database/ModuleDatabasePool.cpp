@@ -22,6 +22,7 @@
 #include "MySQLPreparedStatement.h"
 #include "QueryResult.h"
 #include "Transaction.h"
+#include <errmsg.h>
 #include <limits>
 #include <mysqld_error.h>
 #include <thread>
@@ -48,7 +49,7 @@ uint32 ModuleDatabasePool::Open()
     {
         LOG_ERROR("sql.driver", "ModuleDatabasePool: database `{}` was configured with 0 synchronous connections, "
             "at least one is required.", _connectionInfo.database);
-        return 1;
+        return CR_UNKNOWN_ERROR;
     }
 
     Close();
