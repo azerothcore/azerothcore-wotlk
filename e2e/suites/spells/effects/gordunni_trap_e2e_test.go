@@ -25,11 +25,10 @@ const (
 
 	// Trips are spread around a ring, so every trip is >20yd from every other while none
 	// of them wanders far from the isolation pad. That separation is what keeps the radius
-	// below matching only the mound this trip produced: summoned mounds are never
-	// despawned (EffectSummonObjectWild leaves m_spawnedByDefault set, so the 120s
-	// duration expires into a permanent object) and would otherwise satisfy every later
-	// trip.
-	tripRingRadius float32 = 40
+	// below matching only the mound this trip produced: a mound lives for the summon
+	// spell's 120s duration, which outlasts the whole run, so without the spacing an
+	// earlier trip's mound would satisfy every later one.
+	tripRingRadius float32 = 70
 
 	// The mound lands at TARGET_DEST_CASTER_FRONT, ~3yd ahead of the bot -- but snapped
 	// to the ground, which is why the bot is placed on the terrain below the pad rather
@@ -40,9 +39,10 @@ const (
 	ringJitter = 150
 
 	// spell_gordunni_trap rolls chest or junk 50/50, so one trip proves nothing about
-	// the roll. Twelve leave a ~0.05% chance of missing either face on a fixed core;
-	// the loop exits as soon as both have been seen, which takes 3 trips on average.
-	maxTrips = 12
+	// the roll. Twenty leave a 2*(1/2)^20 chance, about 0.0002%, of missing either face on
+	// a fixed core; the loop exits as soon as both have been seen, which takes 3 trips on
+	// average, so the extra headroom costs nothing in the normal case.
+	maxTrips = 20
 )
 
 // The Gordunni Trap casts 19395 on the player who disturbs it, and spell_gordunni_trap
@@ -54,6 +54,7 @@ const (
 // asserted alongside it so a roll stuck on one face fails rather than passing on half
 // the behaviour.
 //
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27632
 // Upstream: https://github.com/TrinityCore/TrinityCore/commit/9d6c4e3d931875008cd9ca15754b3edb1aef2a01
 func TestEffects_GordunniTrapRollsBothMounds(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
@@ -97,6 +98,15 @@ func TestEffects_GordunniTrapRollsBothMounds(t *testing.T) {
 		bot.FlushWorld(t)
 
 		trap := bot.WaitGameObject(t, gordunniTrap, 15*time.Second)
+
+		// A mound from an earlier run can still be standing inside this trip's radius.
+		// Bank it before tripping the trap so only a fresh summon can satisfy the search.
+		for _, entry := range []uint32{gordunniMoundChest, gordunniMoundJunk} {
+			if g := bot.World.FindGameObjectByEntry(entry, moundSearchRadius); g != 0 {
+				seen[g] = true
+			}
+		}
+
 		bot.GameObjectUse(t, trap)
 
 		// A guid this run has already credited cannot stand in for a fresh summon.
@@ -114,7 +124,12 @@ func TestEffects_GordunniTrapRollsBothMounds(t *testing.T) {
 			}
 			time.Sleep(50 * time.Millisecond)
 		}
-		seen[chest], seen[junk] = true, true
+		if chest != 0 {
+			seen[chest] = true
+		}
+		if junk != 0 {
+			seen[junk] = true
+		}
 
 		switch {
 		case chest != 0:
