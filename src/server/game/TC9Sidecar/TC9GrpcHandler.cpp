@@ -18,9 +18,13 @@
 #include "TC9GrpcHandler.h"
 #include "Bag.h"
 #include "BattlegroundMgr.h"
+#include "Guild.h"
 #include "Item.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "World.h"
 
 GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 playerGuid, uint64* items, int itemsLen)
 {
@@ -86,6 +90,74 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
     resp.errorCode = PlayerItemErrorCodeNoError;
     resp.items = itemsResult;
     resp.itemsSize = itemsFound;
+    return resp;
+}
+
+GetPlayerItemByPosResponse ToCloud9GrpcHandler::GetPlayerItemByPos(uint64 playerGuid, uint8 bag, uint8 slot)
+{
+    GetPlayerItemByPosResponse resp{};
+    resp.found = false;
+
+    Player* player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
+    if (!player)
+    {
+        resp.errorCode = PlayerItemErrorCodePlayerNotFound;
+        return resp;
+    }
+
+    resp.errorCode = PlayerItemErrorCodeNoError;
+
+    Item* pItem = player->GetItemByPos(bag, slot);
+    if (!pItem)
+        return resp;
+
+    resp.found = true;
+    resp.item.guid = pItem->GetGUID().GetRawValue();
+    resp.item.entry = pItem->GetEntry();
+    resp.item.owner = playerGuid;
+    resp.item.bagSlot = pItem->GetBagSlot();
+    resp.item.slot = pItem->GetSlot();
+    // Guild bank deposit uses the same tradability rules as stock Guild::PlayerMoveItemData
+    // (mail=false). CanBeTraded(true) would incorrectly allow account-bound soulbound items.
+    resp.item.isTradable = pItem->CanBeTraded();
+    resp.item.count = pItem->GetCount();
+    resp.item.flags = pItem->GetUInt32Value(ITEM_FIELD_FLAGS);
+    resp.item.durability = pItem->GetUInt32Value(ITEM_FIELD_DURABILITY);
+    resp.item.randomPropertyID = pItem->GetItemRandomPropertyId();
+
+    // Allocated here, released with free() on the caller side.
+    char* text = (char*)malloc(sizeof(char) * (pItem->GetText().length() + 1));
+    strcpy(text, pItem->GetText().c_str());
+    resp.item.text = text;
+
+    return resp;
+}
+
+SetPlayerGuildFieldsResponse ToCloud9GrpcHandler::SetPlayerGuildFields(uint64 playerGuid, uint32 guildId, uint32 rank)
+{
+    SetPlayerGuildFieldsResponse resp{};
+    resp.errorCode = PlayerGuildErrorCodeNoError;
+    resp.applied = false;
+
+    Player* player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
+    if (!player)
+        return resp;
+
+    if (rank >= GUILD_RANKS_MAX_COUNT)
+    {
+        LOG_ERROR("entities.player", "SetPlayerGuildFields ignored for {}: guild {} rank {} (max {})",
+            player->GetGUID().ToString(), guildId, rank, uint32(GUILD_RANKS_MAX_COUNT));
+        return resp;
+    }
+
+    // The client gates the guild control UI on these public unit fields; in
+    // cluster mode the guild service owns membership, so refresh them on the
+    // live object to avoid a relog after a rank change.
+    if (player->GetGuildId() != guildId)
+        player->SetInGuild(guildId);
+    player->SetRank(static_cast<uint8>(rank));
+
+    resp.applied = true;
     return resp;
 }
 
@@ -159,6 +231,69 @@ RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuids
     resp.updatedItemsSize = itemsResultsItr;
     return resp;
 
+}
+
+DestroyItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::DestroyItemsWithGuidsFromPlayer(uint64 playerGuid, uint64* items, int itemsLen)
+{
+    Player* player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
+    if (!player)
+    {
+        DestroyItemsWithGuidsFromPlayerResponse resp;
+        resp.errorCode = PlayerItemErrorCodePlayerNotFound;
+        resp.destroyedItems = nullptr;
+        resp.destroyedItemsSize = 0;
+        return resp;
+    }
+
+    if (itemsLen <= 0)
+    {
+        DestroyItemsWithGuidsFromPlayerResponse resp;
+        resp.errorCode = PlayerItemErrorCodeNoError;
+        resp.destroyedItems = nullptr;
+        resp.destroyedItemsSize = 0;
+        return resp;
+    }
+
+    int itemsFound = 0;
+    std::unique_ptr<uint64[]> destroyed(new uint64[itemsLen]);
+    for (int i = 0; i < itemsLen; i++)
+    {
+        Item* item = player->GetItemByGuid(ObjectGuid(items[i]));
+        if (!item)
+        {
+            destroyed[i] = 0;
+            continue;
+        }
+
+        itemsFound++;
+        destroyed[i] = item->GetGUID().GetRawValue();
+        // Permanently destroy (inventory + item_instance), unlike RemoveItems which reassigns owner.
+        player->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+    }
+
+    if (itemsFound > 0)
+    {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        player->SaveInventoryAndGoldToDB(trans);
+        CharacterDatabase.CommitTransaction(trans);
+    }
+
+    uint64_t* itemsResult = itemsFound > 0
+        ? static_cast<uint64_t*>(malloc(sizeof(uint64_t) * itemsFound))
+        : nullptr;
+    int itr = 0;
+    for (int i = 0; i < itemsLen; i++)
+    {
+        if (destroyed[i] == 0)
+            continue;
+        itemsResult[itr++] = destroyed[i];
+    }
+
+    DestroyItemsWithGuidsFromPlayerResponse resp;
+    resp.errorCode = PlayerItemErrorCodeNoError;
+    resp.destroyedItems = itemsResult;
+    resp.destroyedItemsSize = itr;
+    return resp;
 }
 
 PlayerItemErrorCode ToCloud9GrpcHandler::AddExistingItemToPlayer(AddExistingItemToPlayerRequest* request)
@@ -371,4 +506,107 @@ BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerTeleportToBattlegro
         return BattlegroundJoinCheckErrorCodeResponseIsFalse;
 
     return BattlegroundJoinCheckErrorCodeOK;
+}
+
+StoreNewItemResponse ToCloud9GrpcHandler::StoreNewItem(StoreNewItemRequest* request)
+{
+    StoreNewItemResponse resp;
+    resp.errorCode = PlayerItemErrorCodePlayerNotFound;
+    resp.itemGuid = 0;
+
+    if (!request || request->itemEntry == 0)
+    {
+        resp.errorCode = PlayerItemErrorFailedToCreateItem;
+        return resp;
+    }
+
+    Player* player = ObjectAccessor::FindPlayer(ObjectGuid(request->playerGuid));
+    if (!player)
+        return resp;
+
+    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(request->itemEntry);
+    if (!proto)
+    {
+        resp.errorCode = PlayerItemErrorUnknownTemplate;
+        return resp;
+    }
+
+    uint32 count = request->count ? request->count : 1;
+    ItemPosCountVec dest;
+    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, request->itemEntry, count);
+    if (msg != EQUIP_ERR_OK)
+    {
+        resp.errorCode = PlayerItemErrorNoInventorySpace;
+        return resp;
+    }
+
+    if (player->HasUnitState(UNIT_STATE_DIED))
+        player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+
+    Item* item = player->StoreNewItem(dest, request->itemEntry, true);
+    if (!item)
+    {
+        resp.errorCode = PlayerItemErrorFailedToCreateItem;
+        return resp;
+    }
+
+    // Permanent enchantment ids are applied as-is (0 skips the slot).
+    if (request->enchantmentIDs && request->enchantmentIDsSize > 0)
+    {
+        for (int i = 0; i < request->enchantmentIDsSize; ++i)
+        {
+            if (i >= MAX_ENCHANTMENT_SLOT)
+                break;
+
+            uint32 enchId = request->enchantmentIDs[i];
+            if (!enchId)
+                continue;
+            item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + uint16(i * MAX_ENCHANTMENT_OFFSET), enchId);
+        }
+        item->SetState(ITEM_CHANGED, player);
+    }
+
+    player->SendNewItem(item, count, true, false);
+
+    // Persist inventory so a quick disconnect does not lose the item.
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    player->SaveInventoryAndGoldToDB(trans);
+    CharacterDatabase.CommitTransaction(trans);
+
+    resp.errorCode = PlayerItemErrorCodeNoError;
+    resp.itemGuid = item->GetGUID().GetRawValue();
+    return resp;
+}
+
+SetItemPermanentEnchantmentResponse ToCloud9GrpcHandler::SetItemPermanentEnchantment(SetItemPermanentEnchantmentRequest* request)
+{
+    SetItemPermanentEnchantmentResponse resp;
+    resp.errorCode = PlayerItemErrorCodePlayerNotFound;
+
+    if (!request || request->itemGuid == 0)
+    {
+        resp.errorCode = PlayerItemErrorItemNotFound;
+        return resp;
+    }
+
+    Player* player = ObjectAccessor::FindPlayer(ObjectGuid(request->playerGuid));
+    if (!player)
+        return resp;
+
+    Item* item = player->GetItemByGuid(ObjectGuid(request->itemGuid));
+    if (!item || request->slot >= MAX_ENCHANTMENT_SLOT)
+    {
+        resp.errorCode = PlayerItemErrorItemNotFound;
+        return resp;
+    }
+
+    item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + uint16(request->slot * MAX_ENCHANTMENT_OFFSET), request->enchantmentId);
+    item->SetState(ITEM_CHANGED, player);
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    player->SaveInventoryAndGoldToDB(trans);
+    CharacterDatabase.CommitTransaction(trans);
+
+    resp.errorCode = PlayerItemErrorCodeNoError;
+    return resp;
 }

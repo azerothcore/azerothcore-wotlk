@@ -68,12 +68,18 @@ class LoginQueryHolder : public CharacterDatabaseQueryHolder
 private:
     uint32 m_accountId;
     ObjectGuid m_guid;
+    // Cluster only: guild state from the gateway CMSG_PLAYER_LOGIN extension.
+    uint32 m_clusterGuildId = 0;
+    uint8 m_clusterGuildRank = 0;
 public:
     LoginQueryHolder(uint32 accountId, ObjectGuid guid)
         : m_accountId(accountId), m_guid(guid) { }
 
     ObjectGuid GetGuid() const { return m_guid; }
     uint32 GetAccountId() const { return m_accountId; }
+    void SetClusterGuild(uint32 guildId, uint8 rank) { m_clusterGuildId = guildId; m_clusterGuildRank = rank; }
+    uint32 GetClusterGuildId() const { return m_clusterGuildId; }
+    uint8 GetClusterGuildRank() const { return m_clusterGuildRank; }
     bool Initialize();
 };
 
@@ -641,12 +647,16 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     uint8 level = 0;
     std::string name;
 
-    // is guild leader
-    if (sGuildMgr->GetGuildByLeader(guid))
+    // Guild leader check: in cluster mode the gateway owns this (guildserver).
+    // sGuildMgr is not the product authority and must not block/allow deletes.
+    if (!sToCloud9Sidecar->ClusterModeEnabled())
     {
-        sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
-        SendCharDelete(CHAR_DELETE_FAILED_GUILD_LEADER);
-        return;
+        if (sGuildMgr->GetGuildByLeader(guid))
+        {
+            sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
+            SendCharDelete(CHAR_DELETE_FAILED_GUILD_LEADER);
+            return;
+        }
     }
 
     // is arena team captain
@@ -700,6 +710,20 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
     ObjectGuid playerGuid;
     recvData >> playerGuid;
+
+    // Cluster: gateway appends guildId (uint32) + rank (uint8) after the player guid
+    // so we can stamp PLAYER_GUILDID/PLAYER_GUILDRANK without GuildMgr.
+    // Stock client packets remain guid-only.
+    uint32 clusterGuildId = 0;
+    uint8 clusterGuildRank = 0;
+    bool hasClusterGuildExtras = false;
+    if (sToCloud9Sidecar->ClusterModeEnabled()
+        && recvData.rpos() + sizeof(uint32) + sizeof(uint8) <= recvData.size())
+    {
+        recvData >> clusterGuildId;
+        recvData >> clusterGuildRank;
+        hasClusterGuildExtras = true;
+    }
 
     // The ownership check is delegated to the gateway in cluster mode, but a
     // non-player GUID is invalid regardless of who authenticated the session.
@@ -788,12 +812,29 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
             p->SetSession(this);
             delete p->PlayerTalkClass;
             p->PlayerTalkClass = new PlayerMenu(p->GetSession());
+            // Cluster reconnect: re-stamp only when the gateway sent a full guild id+rank tail.
+            // A guid-only or short packet must not wipe live fields with the 0/0 defaults.
+            if (hasClusterGuildExtras)
+            {
+                if (clusterGuildRank >= GUILD_RANKS_MAX_COUNT)
+                {
+                    LOG_ERROR("network", "Cluster guild stamp for {} ignored: guild {} rank {} (max {})",
+                        p->GetGUID().ToString(), clusterGuildId, uint32(clusterGuildRank), uint32(GUILD_RANKS_MAX_COUNT));
+                }
+                else
+                {
+                    p->SetInGuild(clusterGuildId);
+                    p->SetRank(clusterGuildRank);
+                }
+            }
             HandlePlayerLoginToCharInWorld(p);
             return;
         }
     }
 
     std::shared_ptr<LoginQueryHolder> holder = std::make_shared<LoginQueryHolder>(GetAccountId(), playerGuid);
+    if (sToCloud9Sidecar->ClusterModeEnabled())
+        holder->SetClusterGuild(clusterGuildId, clusterGuildRank);
     if (!holder->Initialize())
         return;
 
@@ -879,8 +920,19 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     }
     else
     {
-        pCurrChar->SetInGuild(0);
-        pCurrChar->SetRank(0);
+        // Cluster: guild id/rank come from the gateway on CMSG_PLAYER_LOGIN (via LoginQueryHolder).
+        // Do not call SendLoginInfo — MOTD/roster/signed-on are handled by the gateway.
+        if (holder.GetClusterGuildRank() >= GUILD_RANKS_MAX_COUNT)
+        {
+            LOG_ERROR("network", "Cluster guild stamp for {} ignored: guild {} rank {} (max {})",
+                pCurrChar->GetGUID().ToString(), holder.GetClusterGuildId(), uint32(holder.GetClusterGuildRank()),
+                uint32(GUILD_RANKS_MAX_COUNT));
+        }
+        else
+        {
+            pCurrChar->SetInGuild(holder.GetClusterGuildId());
+            pCurrChar->SetRank(holder.GetClusterGuildRank());
+        }
     }
 
     data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4 + 4);

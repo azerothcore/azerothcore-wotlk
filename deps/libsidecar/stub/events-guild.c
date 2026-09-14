@@ -41,3 +41,17 @@ int CallOnGuildMemberRemovedHook(uint64_t guild_id, uint64_t player_guid) {
     guildMemberRemovedHook(guild_id, player_guid);
     return GuildHookStatusOK;
 }
+
+// GuildCreated
+static OnGuildCreatedHook guildCreatedHook;
+void SetOnGuildCreatedHook(OnGuildCreatedHook h) {
+    guildCreatedHook = h;
+}
+
+int CallOnGuildCreatedHook(uint64_t guild_id, char* guild_name, uint64_t leader_guid, uint64_t* member_guids, int member_guids_size) {
+    if (guildCreatedHook == 0) {
+        return GuildHookStatusNoHook;
+    }
+    guildCreatedHook(guild_id, guild_name, leader_guid, member_guids, member_guids_size);
+    return GuildHookStatusOK;
+}

@@ -173,11 +173,16 @@ void ToCloud9Sidecar::SetupHooks()
 void ToCloud9Sidecar::SetupGrpcHandlers()
 {
     TC9SetGetPlayerItemsByGuidsHandler(&ToCloud9GrpcHandler::GetPlayerItemsByGuids);
+    TC9SetGetPlayerItemByPosHandler(&ToCloud9GrpcHandler::GetPlayerItemByPos);
     TC9SetRemoveItemsWithGuidsFromPlayerHandler(&ToCloud9GrpcHandler::RemoveItemsWithGuidsFromPlayer);
+    TC9SetDestroyItemsWithGuidsFromPlayerHandler(&ToCloud9GrpcHandler::DestroyItemsWithGuidsFromPlayer);
     TC9SetAddExistingItemToPlayerHandler(&ToCloud9GrpcHandler::AddExistingItemToPlayer);
+    TC9SetStoreNewItemHandler(&ToCloud9GrpcHandler::StoreNewItem);
+    TC9SetSetItemPermanentEnchantmentHandler(&ToCloud9GrpcHandler::SetItemPermanentEnchantment);
 
     TC9SetGetMoneyForPlayerHandler(&ToCloud9GrpcHandler::GetMoneyForPlayer);
     TC9SetModifyMoneyForPlayerHandler(&ToCloud9GrpcHandler::ModifyMoneyForPlayer);
+    TC9SetSetPlayerGuildFieldsHandler(&ToCloud9GrpcHandler::SetPlayerGuildFields);
 
     TC9SetCanPlayerInteractWithGOAndTypeHandler(&ToCloud9GrpcHandler::CanPlayerInteractWithGOAndType);
     TC9SetCanPlayerInteractWithNPCAndFlagsHandler(&ToCloud9GrpcHandler::CanPlayerInteractWithNPCAndFlags);

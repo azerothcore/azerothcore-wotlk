@@ -9,10 +9,10 @@
 #define TC9_LIBSIDECAR_IS_STUB 1
 
 #define TC9_VERSION_MAJOR 1
-#define TC9_VERSION_MINOR 0
+#define TC9_VERSION_MINOR 1
 #define TC9_VERSION_PATCH 0
 
-#define TC9_VERSION_STRING "1.0.0"
+#define TC9_VERSION_STRING "1.1.0"
 
 /* major*10000 + minor*100 + patch */
 #define TC9_VERSION_NUMBER \
