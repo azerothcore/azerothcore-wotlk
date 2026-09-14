@@ -425,6 +425,33 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 	if bot.UnitHasAura(elder, spellPurpleBanish) || bot.UnitHasAura(elder, spellBrightleafEssence) {
 		e2eharness.Preconditionf(t, "Elder Brightleaf is banished into Freya's hard mode in this instance, so he schedules no sun beams")
 	}
+
+	// Freya's hard-mode activation full-heals every living elder and leaves it
+	// UNIT_FLAG_NOT_SELECTABLE + REACT_PASSIVE, and boss_freya_elder_brightleaf::JustEngagedWith
+	// returns on that flag without scheduling a single beam. The banish auras it applies
+	// alongside are dropped when Freya resets, but the flag is only cleared by the elder's own
+	// Reset, so an instance where anyone has pulled her stays poisoned and the aura checks above
+	// see nothing. Killing the elder and respawning him runs that Reset.
+	if elderNotSelectable(bot, elder) {
+		t.Logf("Elder Brightleaf is left over from a Freya pull in this instance (NOT_SELECTABLE); respawning him")
+		bot.DamageKill(t, []uint64{elder}, 10_000_000, 15*time.Second)
+		if err := bot.World.SetTarget(elder); err != nil {
+			e2eharness.Preconditionf(t, "select Elder Brightleaf to respawn: %v", err)
+		}
+		bot.GM(t, ".respawn")
+		respawned := time.Now().Add(30 * time.Second)
+		for {
+			elder = bot.WaitUnit(t, npcElderBrightleaf, 10*time.Second)
+			if hp, maxHP := bot.UnitHP(elder); maxHP > 0 && hp > 0 && !elderNotSelectable(bot, elder) {
+				break
+			}
+			if !time.Now().Before(respawned) {
+				e2eharness.Preconditionf(t, "Elder Brightleaf still NOT_SELECTABLE after respawn, so he schedules no sun beams")
+			}
+			time.Sleep(250 * time.Millisecond)
+		}
+	}
+
 	bot.Engage(t, elder, 15*time.Second)
 
 	// First wave lands ~6s after the pull, then every 22-26s.
@@ -436,8 +463,10 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 		}
 		if !time.Now().Before(waveDeadline) {
 			hp, maxHP := bot.UnitHP(elder)
-			t.Logf("no wave: elder hp=%d/%d banished=%v essence=%v drained=%v 33050@500y=%d 33170@500y=%d",
+			t.Logf("no wave: elder hp=%d/%d flags=0x%X inCombat=%v banished=%v essence=%v drained=%v 33050@500y=%d 33170@500y=%d",
 				hp, maxHP,
+				unitFlags(bot, elder),
+				bot.UnitInCombat(elder),
 				bot.UnitHasAura(elder, spellPurpleBanish),
 				bot.UnitHasAura(elder, spellBrightleafEssence),
 				bot.UnitHasAura(elder, spellDrainedOfPower),
@@ -510,6 +539,20 @@ type sunBeamSnap struct {
 }
 
 // sunBeamsInCache reports beams by presence, not liveness: the bug is the object still existing.
+// unitFlags reads UNIT_FIELD_FLAGS off a unit in the object cache.
+func unitFlags(bot *e2eharness.ScenarioBot, guid uint64) uint32 {
+	obj := bot.World.GetObject(guid)
+	if obj == nil {
+		return 0
+	}
+	return obj.Value(client.UnitFieldFlags)
+}
+
+// elderNotSelectable reports the flag boss_freya_elder_brightleaf::JustEngagedWith gates on.
+func elderNotSelectable(bot *e2eharness.ScenarioBot, guid uint64) bool {
+	return unitFlags(bot, guid)&client.UnitFlagNotSelectable != 0
+}
+
 func sunBeamsInCache(bot *e2eharness.ScenarioBot, entry uint32, maxDist float32) []sunBeamSnap {
 	var out []sunBeamSnap
 	for _, u := range bot.World.GetNearbyUnits(maxDist) {
