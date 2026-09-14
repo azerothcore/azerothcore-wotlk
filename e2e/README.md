@@ -149,9 +149,9 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
 | spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`) | #26130 #25765 |
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
-| spells/effects | Charge / grounding totem / Sweeping Strikes Execute | P1 | covered (`TestAC_26997_*`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 |
+| spells/effects | Charge / grounding totem / Sweeping Strikes Execute; forced cast summons at the forced caster, not at the unit that forced it | P1 | covered (`TestAC_26997_*`, `TestEffects_ForceCastDestination`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 #27621 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
-| social/loot | need/greed / master loot; below-half kill | P1 | covered (`TestAC_26862_*`); chest mid-roll `blocked-harness` (GO 194821 UseGameObject); pass-on-loot delete `blocked-harness` (item-survive after ALL_PASSED) | #26894 #26862 #22000 |
+| social/loot | need/greed / master loot; below-half kill; a roll that ends on the timer names the roll in its terminating packet, and the member who never voted gets one PASS | P1 | covered (`TestAC_26862_*`, `TestAC_27299_*`); chest mid-roll `blocked-harness` (GO 194821 UseGameObject); pass-on-loot delete `blocked-harness` (item-survive after ALL_PASSED) | #26894 #26862 #27299 #22000 |
 | social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
 | quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
 | quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
@@ -164,7 +164,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
-| instances/ulduar | named tele; Freya wave interval; a Laughing Skull's Lunatic Gaze stops at the brain room's geometry instead of draining sanity through it | P2 | covered (`TestAC_27095_*`, `TestAC_27602_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 #27602 |
+| instances/ulduar | named tele; Freya wave interval; a Laughing Skull's Lunatic Gaze stops at the brain room's geometry instead of draining sanity through it; Elder Brightleaf's Unstable Sun Beams despawn on their own timer instead of outliving him, and one lands under the player rather than all on the elder; Psychosis and Malady of the Mind stop picking a player once they are at 40 Sanity or less; Algalon holds still for 3s once his Big Bang cast lands instead of resuming melee and Quantum Strike on the next tick | P2 | covered (`TestAC_27095_*`, `TestAC_27602_*`, `TestAC_27590_*`, `TestAC_27539_*`, `TestUlduar_BrightleafSunBeams*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 #27539 #27590 #27602 |
 | world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
 
 ---

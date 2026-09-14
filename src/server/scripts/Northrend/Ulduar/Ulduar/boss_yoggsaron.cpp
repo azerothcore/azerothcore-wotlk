@@ -2873,9 +2873,27 @@ class spell_yogg_saron_sanity_reduce : public SpellScript
         }
     }
 
+    // Psychosis and Malady of the Mind skip anyone at 40 Sanity or less, so that their random
+    // targeting evens out across the raid instead of finishing off the lowest players.
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([](WorldObject* target)
+        {
+            Unit* unit = target->ToUnit();
+            if (!unit)
+                return true;
+
+            Aura* sanity = unit->GetAura(SPELL_SANITY);
+            return !sanity || sanity->GetStackAmount() <= 40;
+        });
+    }
+
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_sanity_reduce::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
+
+        if (m_scriptSpellId == SPELL_SARA_PSYCHOSIS_10 || m_scriptSpellId == SPELL_SARA_PSYCHOSIS_25 || m_scriptSpellId == SPELL_MALADY_OF_THE_MIND)
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_sanity_reduce::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
