@@ -1,6 +1,7 @@
 -- Battle for Crusaders' Pinnacle (quest 13141).
 -- The wave actionlist runs on the out-of-combat timer so a creature pulled on the way up keeps
--- fighting instead of breaking off to reach the position.
+-- fighting instead of breaking off to reach the position. Emote 449 = EMOTE_ONESHOT_EMERGE, so the
+-- wave climbs out of the ground before it charges.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30989;
 
 -- speed_run 0.45714 is not sniffed and sits below the Drudge's own speed_walk, so it trails the wave.
@@ -25,7 +26,8 @@ DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryorguid` IN (309870
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (30984, 30986, 30987, 30989);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
     -- Shared wave actionlist
-    (3098900, 9, 0, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 6419.78, 422.362, 510.995, 0, 'The Battle for Crusaders\' Pinnacle - Actionlist - Move To Position'),
+    (3098900, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 5, 449, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'The Battle for Crusaders\' Pinnacle - Actionlist - Play Emote Emerge'),
+    (3098900, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 6419.78, 422.362, 510.995, 0, 'The Battle for Crusaders\' Pinnacle - Actionlist - Move To Position'),
     -- Scourge Drudge
     (30984, 0, 0, 0, 0, 0, 100, 0, 5000, 5000, 11300, 14500, 0, 0, 11, 51917, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Drudge - In Combat - Cast \'Cleave\''),
     (30984, 0, 1, 0, 0, 0, 100, 0, 7000, 9000, 17800, 20200, 0, 0, 11, 49678, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Drudge - In Combat - Cast \'Flesh Rot\''),
