@@ -2030,7 +2030,6 @@ public:
     void SendComboPoints();
 
     void SendPlaySpellVisual(uint32 id);
-    void SendPlaySpellVisual(ObjectGuid guid, uint32 id);
     void SendPlaySpellImpact(ObjectGuid guid, uint32 id);
 
     void SendPetActionFeedback(uint8 msg) const;
