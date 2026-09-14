@@ -27,10 +27,10 @@
 
 class ChannelMgr
 {
+public:
     typedef std::unordered_map<std::wstring, Channel*> ChannelMap;
     typedef std::map<std::string, ChannelRights> ChannelRightsMap;
 
-public:
     ChannelMgr(TeamId teamId) : _teamId(teamId)
     { }
 
