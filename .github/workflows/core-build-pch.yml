@@ -26,6 +26,41 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect relevant changes
+    runs-on: ubuntu-latest
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      relevant: ${{ steps.filter.outputs.relevant }}
+    steps:
+      # paths-filter's token mode (no checkout, reads the changed-file list from
+      # the API) only works for pull_request: there's no such API for a push, so
+      # that case needs a real checkout to diff locally instead.
+      - uses: actions/checkout@v7
+        if: github.event_name == 'push'
+        with:
+          fetch-depth: 2
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # every: a file only counts as excluded if it fails to match ALL
+          # patterns below. The default (some) treats the leading '**' alone
+          # as a match for every file, which made every PR "relevant"
+          # regardless of what actually changed.
+          predicate-quantifier: every
+          filters: |
+            relevant:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+              - '!.github/ISSUE_TEMPLATE/**'
+              - '!.github/FUNDING.yml'
+              - '!.github/labeler.yml'
+
   build:
     strategy:
       fail-fast: true
@@ -41,7 +76,8 @@ jobs:
               CXX: clang++-21
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-pch
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    needs: changes
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
