@@ -35,9 +35,9 @@ enum AllBattlegroundHook
     ALLBATTLEGROUNDHOOK_ON_ADD_GROUP,
     ALLBATTLEGROUNDHOOK_CAN_FILL_PLAYERS_TO_BG,
     ALLBATTLEGROUNDHOOK_IS_CHECK_NORMAL_MATCH,
-    ALLBATTLEGROUNDHOOK_CAN_SEND_MESSAGE_BG_QUEUE,
-    ALLBATTLEGROUNDHOOK_ON_BEFORE_SEND_JOIN_MESSAGE_ARENA_QUEUE,
-    ALLBATTLEGROUNDHOOK_ON_BEFORE_SEND_EXIT_MESSAGE_ARENA_QUEUE,
+    ALLBATTLEGROUNDHOOK_ON_QUEUE_GROUP_JOINED,
+    ALLBATTLEGROUNDHOOK_ON_QUEUE_PLAYER_REMOVED,
+    ALLBATTLEGROUNDHOOK_ON_QUEUE_BRACKET_UPDATE,
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_END,
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_DESTROY,
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_CREATE,
@@ -48,6 +48,7 @@ enum AllBattlegroundHook
 };
 
 enum BattlegroundBracketId : uint8;
+enum BattlegroundQueueTypeId : uint8;
 enum BattlegroundTypeId : uint8;
 enum TeamId : uint8;
 
@@ -95,28 +96,35 @@ public:
 
     [[nodiscard]] virtual bool IsCheckNormalMatch(BattlegroundQueue* /*queue*/, Battleground* /*bgTemplate*/, BattlegroundBracketId /*bracket_id*/, uint32 /*minPlayers*/, uint32 /*maxPlayers*/) { return false; };
 
-    [[nodiscard]] virtual bool CanSendMessageBGQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
-
     /**
-     * @brief This hook runs before sending the join message during the arena queue, allowing you to run extra operations or disabling the join message
+     * @brief This hook runs right after a group has been added to a battleground or arena queue.
      *
-     * @param queue Contains information about the Arena queue
+     * @param queue Contains information about the queue the group was added to
      * @param leader Contains information about the player leader
      * @param ginfo Contains information about the group of the queue
      * @param bracketEntry Contains information about the bracket
      * @param isRated Contains information about rated arena or skirmish
-     * @return True if you want to continue sending the message, false if you want to disable the message
+     * @param isPremade True if the group joined as a premade
      */
-    [[nodiscard]] virtual bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, GroupQueueInfo* /*ginfo*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isRated*/) { return true; }
+    virtual void OnBattlegroundQueueGroupJoined(BattlegroundQueue* /*queue*/, Player* /*leader*/, GroupQueueInfo* /*ginfo*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isRated*/, bool /*isPremade*/) { }
 
     /**
-     * @brief This hook runs before sending the exit message during the arena queue, allowing you to run extra operations or disabling the exit message
+     * @brief This hook runs right after a player has been removed from a queue, once the queued player entry is gone.
      *
-     * @param queue Contains information about the Arena queue
+     * @param queue Contains information about the queue the player was removed from
      * @param ginfo Contains information about the group of the queue
-     * @return True if you want to continue sending the message, false if you want to disable the message
      */
-    [[nodiscard]] virtual bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { return true; }
+    virtual void OnBattlegroundQueuePlayerRemoved(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/) { }
+
+    /**
+     * @brief This hook runs on every queue update pass, per queue type and bracket.
+     *
+     * @param queue Contains information about the queue being updated
+     * @param diff Time since the previous pass, in milliseconds
+     * @param bgQueueTypeId Contains information about the queue type
+     * @param bracketId Contains information about the bracket
+     */
+    virtual void OnBattlegroundQueueBracketUpdate(BattlegroundQueue* /*queue*/, uint32 /*diff*/, BattlegroundQueueTypeId /*bgQueueTypeId*/, BattlegroundBracketId /*bracketId*/) { }
 
     /**
      * @brief This hook runs after end Battleground

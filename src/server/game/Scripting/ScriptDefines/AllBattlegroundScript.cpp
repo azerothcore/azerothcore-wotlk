@@ -74,19 +74,19 @@ bool ScriptMgr::IsCheckNormalMatch(BattlegroundQueue* queue, Battleground* bgTem
     CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_IS_CHECK_NORMAL_MATCH, script->IsCheckNormalMatch(queue, bgTemplate, bracket_id, minPlayers, maxPlayers));
 }
 
-bool ScriptMgr::CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+void ScriptMgr::OnBattlegroundQueueGroupJoined(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated, bool isPremade)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_CAN_SEND_MESSAGE_BG_QUEUE, !script->CanSendMessageBGQueue(queue, leader, bg, bracketEntry));
+    CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_QUEUE_GROUP_JOINED, script->OnBattlegroundQueueGroupJoined(queue, leader, ginfo, bracketEntry, isRated, isPremade));
 }
 
-bool ScriptMgr::OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated)
+void ScriptMgr::OnBattlegroundQueuePlayerRemoved(BattlegroundQueue* queue, GroupQueueInfo* ginfo)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_BEFORE_SEND_JOIN_MESSAGE_ARENA_QUEUE, !script->OnBeforeSendJoinMessageArenaQueue(queue, leader, ginfo, bracketEntry, isRated));
+    CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_QUEUE_PLAYER_REMOVED, script->OnBattlegroundQueuePlayerRemoved(queue, ginfo));
 }
 
-bool ScriptMgr::OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo)
+void ScriptMgr::OnBattlegroundQueueBracketUpdate(BattlegroundQueue* queue, uint32 diff, BattlegroundQueueTypeId bgQueueTypeId, BattlegroundBracketId bracketId)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_BEFORE_SEND_EXIT_MESSAGE_ARENA_QUEUE, !script->OnBeforeSendExitMessageArenaQueue(queue, ginfo));
+    CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_QUEUE_BRACKET_UPDATE, script->OnBattlegroundQueueBracketUpdate(queue, diff, bgQueueTypeId, bracketId));
 }
 
 void ScriptMgr::OnBattlegroundEnd(Battleground* bg, TeamId winnerTeam)
