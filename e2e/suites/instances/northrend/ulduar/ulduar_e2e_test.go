@@ -359,10 +359,27 @@ func TestAC_27602_LaughingSkullGazeLoS(t *testing.T) {
 	t.Logf("PASS Lunatic Gaze LoS: clear drained %d, blocked drained %d", clearLoss, blockedLoss)
 }
 
+const (
+	npcElderBrightleaf = uint32(32915)
+	npcUnstableSunBeam = uint32(33050)
+	// Freya's hard-mode activation banishes each living elder and takes the beams over herself,
+	// summoning 33170 instead. Brightleaf then schedules nothing, so name that state if the wave
+	// never arrives rather than reporting a bare timeout.
+	npcFreyaSunBeam        = uint32(33170)
+	spellPurpleBanish      = uint32(61014)
+	spellBrightleafEssence = uint32(62485)
+	spellDrainedOfPower    = uint32(62467)
+	beamSearchRange        = float32(150)
+)
+
+// Elder Brightleaf's own spawn. Not the BossFreya pad: that pad sits 12y from Freya, and aggroing
+// her banishes every living elder, after which he schedules no beams for the life of the instance.
+var brightleafSpawn = e2eharness.Position3{X: 2385.09, Y: 131.341, Z: 440.201, Map: e2eharness.MapUlduar}
+
 // Elder Brightleaf's Unstable Sun Beams must not outlive him, and each wave must land one beam on
-// the elder plus one under each player in range. Before the fix the beams were hand-summoned with
-// no duration and the elder's event map was the only thing that removed them, so a kill taken with
-// a wave up left them standing for the life of the instance.
+// the elder plus one under a player in range. Before the fix the beams were hand-summoned with no
+// duration and the elder's event map was the only thing that removed them, so a kill taken with a
+// wave up left them standing for the life of the instance.
 // Issue: https://github.com/chromiecraft/chromiecraft/issues/10163
 func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
@@ -372,21 +389,11 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 	})
 
 	const (
-		npcElderBrightleaf = uint32(32915)
-		npcUnstableSunBeam = uint32(33050)
-		// Freya's hard-mode activation banishes each living elder and takes the beams over herself,
-		// summoning 33170 instead. Brightleaf then schedules nothing, so name that state if the
-		// wave never arrives rather than reporting a bare timeout.
-		npcFreyaSunBeam        = uint32(33170)
-		spellPurpleBanish      = uint32(61014)
-		spellBrightleafEssence = uint32(62485)
-		spellDrainedOfPower    = uint32(62467)
 		// Each beam despawns itself after a randomised 18-25s; the oracle allows the worst case
 		// plus slack for the kill and the object-cache round trip. Do not widen it past 30s: that
 		// is 62221's summon duration, the engine backstop that would despawn the player's beam by
 		// itself and hide the regression this guards.
 		beamMaxLifetime = 25 * time.Second
-		beamSearchRange = float32(150)
 		// The elder's own beam sits on him, so "landed on the player" is only distinguishable
 		// from "stacked on the elder" while the bot stands clear of him by more than this.
 		beamOnPlayerRange = float32(3)
@@ -397,64 +404,18 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 		Level:  80,
 	})
 
-	// Land on Brightleaf's own spawn, NOT the BossFreya pad: that pad sits 12y from Freya, and
-	// aggroing her banishes every living elder, after which Brightleaf schedules no beams for the
-	// life of the instance. Stay GM through the raid enter.
-	bot.Teleport(t, 2385.09, 131.341, 440.201, e2eharness.MapUlduar)
+	// Stay GM through the raid enter.
+	bot.TeleportPad(t, brightleafSpawn)
 	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
-		e2eharness.Preconditionf(t, "not in Ulduar after Freya pad tele map=%d", m)
+		e2eharness.Preconditionf(t, "not in Ulduar after Brightleaf tele map=%d", m)
 	}
 	bot.GoCreatureID(t, npcElderBrightleaf)
 	bot.CombatReady(t)
 
-	// Evade beside the elder can leave a 0 HP object in cache; re-poll for a living one.
-	var elder uint64
-	deadline := time.Now().Add(30 * time.Second)
-	for {
-		elder = bot.WaitUnit(t, npcElderBrightleaf, 10*time.Second)
-		if hp, maxHP := bot.UnitHP(elder); maxHP > 0 && hp > 0 && bot.World.GetObject(elder) != nil {
-			break
-		}
-		if !time.Now().Before(deadline) {
-			e2eharness.Preconditionf(t, "no living Elder Brightleaf in cache after GoCreatureID (last=0x%X)", elder)
-		}
-		time.Sleep(50 * time.Millisecond)
-	}
-	if bot.UnitHasAura(elder, spellPurpleBanish) || bot.UnitHasAura(elder, spellBrightleafEssence) {
-		e2eharness.Preconditionf(t, "Elder Brightleaf is banished into Freya's hard mode in this instance, so he schedules no sun beams")
-	}
+	elder := waitLivingBrightleaf(t, bot)
 	bot.Engage(t, elder, 15*time.Second)
 
-	// First wave lands ~6s after the pull, then every 22-26s.
-	var wave []sunBeamSnap
-	waveDeadline := time.Now().Add(70 * time.Second)
-	for {
-		if wave = sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange); len(wave) > 0 {
-			break
-		}
-		if !time.Now().Before(waveDeadline) {
-			hp, maxHP := bot.UnitHP(elder)
-			t.Logf("no wave: elder hp=%d/%d banished=%v essence=%v drained=%v 33050@500y=%d 33170@500y=%d",
-				hp, maxHP,
-				bot.UnitHasAura(elder, spellPurpleBanish),
-				bot.UnitHasAura(elder, spellBrightleafEssence),
-				bot.UnitHasAura(elder, spellDrainedOfPower),
-				len(sunBeamsInCache(bot, npcUnstableSunBeam, 500)),
-				len(sunBeamsInCache(bot, npcFreyaSunBeam, 500)))
-			e2eharness.Preconditionf(t, "no Unstable Sun Beam spawned within 70s of engaging Elder Brightleaf")
-		}
-		time.Sleep(250 * time.Millisecond)
-	}
-	// Let the wave stop growing before measuring, or placement gets judged on whichever of the two
-	// summons reached the cache first.
-	for settle := time.Now().Add(5 * time.Second); time.Now().Before(settle); {
-		time.Sleep(500 * time.Millisecond)
-		grown := sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange)
-		if len(grown) <= len(wave) {
-			break
-		}
-		wave = grown
-	}
+	wave := waitBrightleafWave(t, bot, elder)
 	bx, by, bz, _ := bot.Pos()
 	elderObj := bot.World.GetObject(elder)
 	if elderObj == nil {
@@ -474,9 +435,9 @@ func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
 		t.Logf("beam 0x%X at (%.1f,%.1f,%.1f) dist bot=%.1f elder=%.1f", b.guid, b.x, b.y, b.z,
 			toBot, e2eharness.Distance3D(ex, ey, ez, b.x, b.y, b.z))
 	}
-	// 62207 summons one beam at the elder and force-casts 62221 on every player in range, each
-	// summoning one at their own feet. A forced cast whose target mask takes no unit target must
-	// not inherit the original caster as its destination, or every beam stacks on the elder.
+	// 62207 summons one beam at the elder and force-casts 62221 on the players its script picks,
+	// each summoning one at their own feet. A forced cast whose target mask takes no unit target
+	// must not inherit the original caster as its destination, or every beam stacks on the elder.
 	if nearestToBot > beamOnPlayerRange {
 		e2eharness.Assertf(t, "no Unstable Sun Beam landed on the player: nearest of %d beams is %.1fy away",
 			len(wave), nearestToBot)
@@ -525,6 +486,157 @@ func sunBeamGUIDs(beams []sunBeamSnap) []string {
 		out[i] = fmt.Sprintf("0x%X", b.guid)
 	}
 	return out
+}
+
+// waitLivingBrightleaf returns the elder from the bot's object cache once he is alive and able to
+// schedule beams. Evade beside him can leave a 0 HP object behind, so re-poll rather than trust the
+// first hit.
+func waitLivingBrightleaf(t *testing.T, bot *e2eharness.ScenarioBot) uint64 {
+	t.Helper()
+	var elder uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		elder = bot.WaitUnit(t, npcElderBrightleaf, 10*time.Second)
+		if hp, maxHP := bot.UnitHP(elder); maxHP > 0 && hp > 0 && bot.World.GetObject(elder) != nil {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Elder Brightleaf in cache after GoCreatureID (last=0x%X)", elder)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	if bot.UnitHasAura(elder, spellPurpleBanish) || bot.UnitHasAura(elder, spellBrightleafEssence) {
+		e2eharness.Preconditionf(t, "Elder Brightleaf is banished into Freya's hard mode in this instance, so he schedules no sun beams")
+	}
+	return elder
+}
+
+// waitBrightleafWave returns the first Unstable Sun Beam wave after the pull, settled so neither a
+// count nor a placement check is judged on whichever summon reached the cache first. The first wave
+// lands ~6s after the pull and the next is 22-26s behind it, which is what keeps the settle window
+// from folding two waves into one measurement.
+func waitBrightleafWave(t *testing.T, bot *e2eharness.ScenarioBot, elder uint64) []sunBeamSnap {
+	t.Helper()
+	var wave []sunBeamSnap
+	deadline := time.Now().Add(70 * time.Second)
+	for {
+		if wave = sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange); len(wave) > 0 {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			hp, maxHP := bot.UnitHP(elder)
+			t.Logf("no wave: elder hp=%d/%d banished=%v essence=%v drained=%v 33050@500y=%d 33170@500y=%d",
+				hp, maxHP,
+				bot.UnitHasAura(elder, spellPurpleBanish),
+				bot.UnitHasAura(elder, spellBrightleafEssence),
+				bot.UnitHasAura(elder, spellDrainedOfPower),
+				len(sunBeamsInCache(bot, npcUnstableSunBeam, 500)),
+				len(sunBeamsInCache(bot, npcFreyaSunBeam, 500)))
+			e2eharness.Preconditionf(t, "no Unstable Sun Beam spawned within 70s of engaging Elder Brightleaf")
+		}
+		time.Sleep(250 * time.Millisecond)
+	}
+	for settle := time.Now().Add(5 * time.Second); time.Now().Before(settle); {
+		time.Sleep(500 * time.Millisecond)
+		grown := sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange)
+		if len(grown) <= len(wave) {
+			break
+		}
+		wave = grown
+	}
+	return wave
+}
+
+// One Unstable Sun Beam wave must stay capped however many players stand under the elder. 62207
+// summons one beam at his feet and force-casts 62221 on every enemy player inside 100y, and that
+// effect carries no MaxAffectedTargets, so an uncapped core gives a 25-man raid 26 beams a cast.
+// Reported as https://github.com/chromiecraft/chromiecraft/issues/10177
+func TestUlduar_BrightleafSunBeamsCappedPerWave(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances", "multi_bot"},
+		Runtime:  "med",
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		botCount = 3
+		// A party enters Ulduar at 10-man normal, where the script picks 1 player, and effect 0
+		// adds the elder's own beam on top. Three players in range is what makes the cap
+		// measurable: uncapped this wave is botCount+1 beams, capped it is 2.
+		wantMaxBeamsPerWave = 2
+		// 62207's force-cast radius. A bot outside it is not a candidate, which would shrink the
+		// wave for the wrong reason and leave the oracle proving nothing.
+		beamCastRange = float32(100)
+	)
+
+	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
+		Prefix: "BlfCap",
+		Count:  botCount,
+		Level:  80,
+	})
+	leader, mates := bots[0], bots[1:]
+	e2eharness.FormParty(t, leader, mates...)
+
+	// Stay GM through the raid enter and the summons.
+	leader.TeleportPad(t, brightleafSpawn)
+	if _, _, _, m := leader.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "leader not in Ulduar after Brightleaf tele map=%d", m)
+	}
+	leader.GoCreatureID(t, npcElderBrightleaf)
+
+	// A plain tele would hand each mate its own instance copy. `.summon` pulls them into the
+	// leader's, which is the only way three players end up facing one elder.
+	leaderGUID := leader.World.CharGUID()
+	for _, mate := range mates {
+		before := mate.World.TeleportSeq()
+		leader.GM(t, ".summon "+mate.Name)
+		if err := mate.World.WaitForTeleportAfter(before, 15*time.Second); err != nil {
+			e2eharness.Preconditionf(t, "%s .summon into Ulduar: %v", mate.Name, err)
+		}
+		if _, _, _, m := mate.Pos(); m != e2eharness.MapUlduar {
+			e2eharness.Preconditionf(t, "%s not in Ulduar after .summon (map=%d)", mate.Name, m)
+		}
+		// Seeing the leader's own GUID is the co-location proof: creature GUIDs repeat across
+		// instance copies, player GUIDs do not.
+		colocated := time.Now().Add(15 * time.Second)
+		for mate.World.GetObject(leaderGUID) == nil {
+			if !time.Now().Before(colocated) {
+				e2eharness.Preconditionf(t, "%s never saw the leader after .summon: separate instance copies", mate.Name)
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
+
+	// GM mode keeps a player off a creature's hostile target list, so a mate left in GM would be
+	// skipped by the force-cast and the wave would look capped on an uncapped core.
+	for _, b := range bots {
+		b.CombatReady(t)
+	}
+
+	elder := waitLivingBrightleaf(t, leader)
+	elderObj := leader.World.GetObject(elder)
+	if elderObj == nil {
+		e2eharness.Preconditionf(t, "Elder Brightleaf 0x%X left the object cache before the pull", elder)
+	}
+	for _, b := range bots {
+		x, y, z, _ := b.Pos()
+		if d := e2eharness.Distance3D(x, y, z, elderObj.PosX, elderObj.PosY, elderObj.PosZ); d > beamCastRange {
+			e2eharness.Preconditionf(t, "%s stands %.1fy from the elder, outside 62207's %.0fy radius",
+				b.Name, d, beamCastRange)
+		}
+	}
+	leader.Engage(t, elder, 15*time.Second)
+
+	wave := waitBrightleafWave(t, leader, elder)
+	for _, b := range wave {
+		t.Logf("beam 0x%X at (%.1f,%.1f,%.1f) dist elder=%.1f", b.guid, b.x, b.y, b.z,
+			e2eharness.Distance3D(elderObj.PosX, elderObj.PosY, elderObj.PosZ, b.x, b.y, b.z))
+	}
+	if len(wave) > wantMaxBeamsPerWave {
+		e2eharness.Assertf(t, "one Unstable Sun Beam wave placed %d beams with %d players in range, want at most %d: %v",
+			len(wave), botCount, wantMaxBeamsPerWave, sunBeamGUIDs(wave))
+	}
+	t.Logf("PASS %d sun beam(s) in one wave with %d players in range", len(wave), botCount)
 }
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27590
