@@ -685,13 +685,13 @@ enum AcoreStrings
     LANG_PLAYER_DND_DEFAULT             = 709,
     LANG_PLAYER_AFK_DEFAULT             = 710,
 
-    // 711-714 - free
+    // 711-713 - free
 
     //                                      = 714, see LANG_PINFO_MAP_ONLINE
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
     //                                      = 716, see LANG_PINFO_MAP_OFFLINE
 
-    // 716-719 - free
+    // 717-719 - free
 
     LANG_BG_GROUP_TOO_LARGE             = 720,              // "Your group is too large for this battleground. Please regroup to join."
     LANG_ARENA_GROUP_TOO_LARGE          = 721,              // "Your group is too large for this arena. Please regroup to join."
