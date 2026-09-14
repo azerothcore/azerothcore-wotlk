@@ -146,6 +146,7 @@ extern DBCStorage <NamesReservedEntry>           sNamesReservedStore;
 extern DBCStorage <NamesProfanityEntry>          sNamesProfanityStore;
 extern DBCStorage <OverrideSpellDataEntry>       sOverrideSpellDataStore;
 extern DBCStorage <PowerDisplayEntry>            sPowerDisplayStore;
+extern DBCStorage <PvPDifficultyEntry>           sPvPDifficultyStore;
 extern DBCStorage <QuestSortEntry>               sQuestSortStore;
 extern DBCStorage <QuestXPEntry>                 sQuestXPStore;
 extern DBCStorage <QuestFactionRewEntry>         sQuestFactionRewardStore;

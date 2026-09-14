@@ -61,6 +61,8 @@ enum BattlegroundQueueGroupTypes
 
     BG_QUEUE_CFBG,
 
+    BG_QUEUE_RATED_ARENA,
+
     BG_QUEUE_MAX = 10
 };
 
@@ -104,10 +106,12 @@ public:
     This two dimensional array is used to store All queued groups
     First dimension specifies the bgTypeId
     Second dimension specifies the player's group types -
-         BG_QUEUE_PREMADE_ALLIANCE  is used for premade alliance groups and alliance rated arena teams
-         BG_QUEUE_PREMADE_HORDE     is used for premade horde groups and horde rated arena teams
+         BG_QUEUE_PREMADE_ALLIANCE  is used for premade alliance groups
+         BG_QUEUE_PREMADE_HORDE     is used for premade horde groups
          BG_QUEUE_NORMAL_ALLIANCE   is used for normal (or small) alliance groups or non-rated arena matches
          BG_QUEUE_NORMAL_HORDE      is used for normal (or small) horde groups or non-rated arena matches
+         BG_QUEUE_RATED_ARENA       is used for rated arena teams, which are not split by faction because
+                                    the side a team plays is chosen when it is invited, not when it queues
     */
     GroupsQueueType m_QueuedGroups[MAX_BATTLEGROUND_BRACKETS][BG_QUEUE_MAX];
 
@@ -133,6 +137,14 @@ public:
     [[nodiscard]] int32 GetQueueAnnouncementTimer(uint32 bracketId) const;
 
 private:
+    // Start every rated arena match the queued teams currently allow.
+    //
+    // @todo Rescans the bracket every update because the scheduler names a bracket, not a team.
+    // Once it carries the joiner this can search once for that team, though a periodic sweep is
+    // still needed for pairs whose discard timer elapses with no join to trigger a search.
+    void CreateRatedArenaMatches(BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry,
+        BattlegroundBracketId bracketId, uint8 arenaType);
+
     uint32 m_WaitTimes[PVP_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];
     uint32 m_WaitTimeLastIndex[PVP_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS];
 
