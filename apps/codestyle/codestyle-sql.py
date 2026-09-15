@@ -245,8 +245,9 @@ def open_paren_balance(text: str) -> int:
 
 SPAWN_STATEMENT_START = re.compile(r"\b(?:DELETE|UPDATE)\b", re.IGNORECASE)
 SPAWN_TABLE = r"(?:`(creature|gameobject)`|\b(creature|gameobject)\b)"
-SPAWN_DELETE_START = re.compile(rf"DELETE\s+FROM\s+{SPAWN_TABLE}", re.IGNORECASE)
-SPAWN_UPDATE_START = re.compile(rf"UPDATE\s+(?:IGNORE\s+)?{SPAWN_TABLE}", re.IGNORECASE)
+# MySQL allows modifiers between the keyword and the table, and they must not hide the table
+SPAWN_DELETE_START = re.compile(rf"DELETE\s+(?:(?:LOW_PRIORITY|QUICK|IGNORE)\s+)*FROM\s+{SPAWN_TABLE}", re.IGNORECASE)
+SPAWN_UPDATE_START = re.compile(rf"UPDATE\s+(?:(?:LOW_PRIORITY|IGNORE)\s+)*{SPAWN_TABLE}", re.IGNORECASE)
 # Only these bound a statement to known rows: `guid` > 0 or `id` != 5 match without limiting.
 SPAWN_FILTER_OPERATORS = r"(?:=|\bIN\b|\bBETWEEN\b)"
 
@@ -256,10 +257,31 @@ def has_column_filter(statement: str, column: str) -> bool:
     pattern = rf"(?:`{column}`|(?<![\w@`]){column}(?![\w`]))\s*{SPAWN_FILTER_OPERATORS}"
     return re.search(pattern, statement, re.IGNORECASE) is not None
 
+SUBQUERY_START = re.compile(r"\(\s*SELECT\b", re.IGNORECASE)
+
+# A subquery bounds its own rows, not the ones the statement touches, so its predicates must not be
+# read as filters. Parentheses that merely group a predicate are kept, those are part of the filter.
+def strip_subqueries(text: str) -> str:
+    while True:
+        match = SUBQUERY_START.search(text)
+        if not match:
+            return text
+        depth = 0
+        for index in range(match.start(), len(text)):
+            if text[index] == '(':
+                depth += 1
+            elif text[index] == ')':
+                depth -= 1
+                if depth == 0:
+                    text = text[:match.start()] + " " + text[index + 1:]
+                    break
+        else:
+            return text[:match.start()]  # unbalanced, so nothing past it can be judged
+
 # Only the WHERE clause decides which rows are hit, so the `SET id` = ... of an UPDATE must not
 # count as a filter. Returns "" when there is no WHERE at all, which then reads as unfiltered.
 def where_clause(statement: str) -> str:
-    parts = re.split(r"\bWHERE\b", statement, maxsplit = 1, flags = re.IGNORECASE)
+    parts = re.split(r"\bWHERE\b", strip_subqueries(statement), maxsplit = 1, flags = re.IGNORECASE)
     return parts[1] if len(parts) > 1 else ""
 
 # Walk the line left to right dropping quoted literals and both comment styles, so a "--", a "/*"
