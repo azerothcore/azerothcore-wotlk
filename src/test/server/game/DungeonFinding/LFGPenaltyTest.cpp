@@ -19,39 +19,72 @@
 
 TEST(LFGPenaltyTest, DungeonCooldownOnlyAppliesToRandomDungeonQueuers)
 {
-    EXPECT_TRUE(lfg::ShouldApplyDungeonCooldown(true, false, false));
-    EXPECT_FALSE(lfg::ShouldApplyDungeonCooldown(false, false, false));
-    EXPECT_FALSE(lfg::ShouldApplyDungeonCooldown(true, true, false));
-    EXPECT_FALSE(lfg::ShouldApplyDungeonCooldown(true, false, true));
+    bool constexpr randomSelection = true;
+    bool constexpr specificSelection = false;
+    bool constexpr testingEnabled = true;
+    bool constexpr testingDisabled = false;
+    bool constexpr hasCooldown = true;
+    bool constexpr noCooldown = false;
+
+    EXPECT_TRUE(lfg::ShouldApplyDungeonCooldown(randomSelection, testingDisabled, noCooldown));
+    EXPECT_FALSE(lfg::ShouldApplyDungeonCooldown(specificSelection, testingDisabled, noCooldown));
+    EXPECT_FALSE(lfg::ShouldApplyDungeonCooldown(randomSelection, testingEnabled, noCooldown));
+    EXPECT_FALSE(lfg::ShouldApplyDungeonCooldown(randomSelection, testingDisabled, hasCooldown));
 }
 
 TEST(LFGPenaltyTest, VoteKickedPlayerWithRunCooldownCanQueueSpecificDungeon)
 {
     bool constexpr hasDungeonCooldown = true;
+    bool constexpr isVoteKick = true;
+    bool constexpr dungeonFinished = false;
+    bool constexpr castDeserter = true;
+    bool constexpr hasDeclineCooldown = false;
+    uint8 constexpr remainingPlayers = 4;
+    uint32 constexpr specificQueue = 0;
 
-    EXPECT_FALSE(lfg::ShouldApplyDungeonDeserter(true, false, hasDungeonCooldown, 4, true));
-    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(false, 0, hasDungeonCooldown, false));
+    EXPECT_FALSE(lfg::ShouldApplyDungeonDeserter(
+        isVoteKick, dungeonFinished, hasDungeonCooldown, remainingPlayers, castDeserter));
+    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(specificQueue, hasDungeonCooldown, hasDeclineCooldown));
 }
 
 TEST(LFGPenaltyTest, PlayerLeavingGroupOfAtMostThreeWithRunCooldownCanQueueSpecificDungeon)
 {
     bool constexpr hasDungeonCooldown = true;
+    bool constexpr isVoteKick = false;
+    bool constexpr dungeonFinished = false;
+    bool constexpr castDeserter = true;
+    bool constexpr hasDeclineCooldown = false;
+    uint32 constexpr specificQueue = 0;
     uint8 constexpr playersRemainingFromTwoPlayerGroup = 1;
     uint8 constexpr playersRemainingFromThreePlayerGroup = 2;
 
     EXPECT_FALSE(lfg::ShouldApplyDungeonDeserter(
-        false, false, hasDungeonCooldown, playersRemainingFromTwoPlayerGroup, true));
+        isVoteKick, dungeonFinished, hasDungeonCooldown, playersRemainingFromTwoPlayerGroup, castDeserter));
     EXPECT_FALSE(lfg::ShouldApplyDungeonDeserter(
-        false, false, hasDungeonCooldown, playersRemainingFromThreePlayerGroup, true));
-    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(false, 0, hasDungeonCooldown, false));
+        isVoteKick, dungeonFinished, hasDungeonCooldown, playersRemainingFromThreePlayerGroup, castDeserter));
+    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(specificQueue, hasDungeonCooldown, hasDeclineCooldown));
 }
 
 TEST(LFGPenaltyTest, PlayerLeavingLargerGroupReceivesDeserter)
 {
-    EXPECT_TRUE(lfg::ShouldApplyDungeonDeserter(false, false, true, lfg::LFG_GROUP_KICK_VOTES_NEEDED, true));
+    bool constexpr isVoteKick = false;
+    bool constexpr dungeonFinished = false;
+    bool constexpr hasDungeonCooldown = true;
+    bool constexpr castDeserter = true;
+
+    EXPECT_TRUE(lfg::ShouldApplyDungeonDeserter(
+        isVoteKick, dungeonFinished, hasDungeonCooldown, lfg::LFG_GROUP_KICK_VOTES_NEEDED, castDeserter));
 }
 
-TEST(LFGPenaltyTest, ContinuingExistingDungeonIgnoresDungeonCooldown)
+TEST(LFGPenaltyTest, DeclineExpirySurvivesStateRestoration)
 {
-    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(true, 258, true, true));
+    lfg::LfgPlayerData data;
+    time_t constexpr now = 1000;
+    EXPECT_FALSE(data.HasDeclineCooldown(now));
+    data.SetDeclineCooldown(now + lfg::LFG_TIME_DECLINE_COOLDOWN);
+    data.SetState(lfg::LFG_STATE_PROPOSAL);
+    data.RestoreState();
+    data.SetState(lfg::LFG_STATE_NONE);
+    EXPECT_TRUE(data.HasDeclineCooldown(now + lfg::LFG_TIME_DECLINE_COOLDOWN - 1));
+    EXPECT_FALSE(data.HasDeclineCooldown(now + lfg::LFG_TIME_DECLINE_COOLDOWN));
 }

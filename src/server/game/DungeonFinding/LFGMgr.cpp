@@ -754,17 +754,17 @@ namespace lfg
                 players.insert(player->GetGUID());
 
             // Declines block all queues. The aura also comes from MakeNewGroup and only blocks random queues.
-            if (joinData.result == LFG_JOIN_OK)
+            if (joinData.result == LFG_JOIN_OK && !isContinue)
             {
                 time_t const now = GameTime::GetGameTime().count();
-                if (IsDungeonQueueBlockedByCooldown(isContinue, rDungeonId,
+                if (IsDungeonQueueBlockedByCooldown(rDungeonId,
                         player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN), PlayersStore[guid].HasDeclineCooldown(now)))
                     joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
-                else if (grp && !isContinue)
+                else if (grp)
                 {
                     for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr && joinData.result == LFG_JOIN_OK; itr = itr->next())
                         if (Player* plrg = itr->GetSource())
-                            if (IsDungeonQueueBlockedByCooldown(isContinue, rDungeonId,
+                            if (IsDungeonQueueBlockedByCooldown(rDungeonId,
                                     plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN),
                                     PlayersStore[plrg->GetGUID()].HasDeclineCooldown(now)))
                                 joinData.result = LFG_JOIN_PARTY_RANDOM_COOLDOWN;

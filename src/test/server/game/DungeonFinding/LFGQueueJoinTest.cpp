@@ -89,7 +89,8 @@ protected:
         player->SetMaxHealth(100);
         player->SetHealth(100);
         // Seed this session only, without changing the global permission store or accessing the DB.
-        auto& permissions = const_cast<rbac::RBACPermissionContainer&>(player->GetSession()->GetRBACData()->GetPermissions());
+        auto& permissions = const_cast<rbac::RBACPermissionContainer&>(
+            player->GetSession()->GetRBACData()->GetPermissions());
         permissions.insert(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER);
         _players.push_back(player);
         return player;
