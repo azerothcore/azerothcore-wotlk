@@ -300,12 +300,9 @@ def strip_sql_noise(text: str, in_block_comment: bool) -> tuple:
         index += 1
     return ''.join(sanitized).strip(), in_block_comment
 
-# Spawns in `creature` and `gameobject` must be deleted by both `id` and `guid`: a guid-only delete
-# wipes whatever spawn owns that guid today, an id-only one wipes every spawn of that entry in the
-# world. An UPDATE that names a `guid` needs the `id` beside it for the same reason, on a database
-# whose spawns have drifted the guid alone lands on somebody else's creature. Updating every spawn
-# of an entry by `id` alone stays allowed, that is a normal bulk edit.
-# Returns whether a violation was found; the caller owns the result state.
+# Spawns in `creature` and `gameobject` must be matched by both `id` and `guid`: a guid-only
+# statement hits whatever spawn owns that guid today, an id-only one hits every spawn of that entry
+# in the world. Returns whether a violation was found; the caller owns the result state.
 def spawn_filter_check(file: io, file_path: str) -> bool:
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
@@ -313,18 +310,12 @@ def spawn_filter_check(file: io, file_path: str) -> bool:
     statement = ""
     statement_line = 0
 
-    # A disjunction needs real boolean parsing to judge, so it is refused rather than guessed at
-    def report_or(clause: str, line_number: int, statement_name: str) -> bool:
-        if not re.search(r"\bOR\b", clause, re.IGNORECASE):
-            return False
-        print(f"❌ {statement_name} must not use OR. Use IN, or split it into one statement per "
-              f"spawn. {file_path} at line {line_number}\n"
-              f"If this error is intended, please notify a maintainer")
-        return True
-
-    def report_delete(clause: str, line_number: int, table: str) -> bool:
-        statement_name = f"DELETE FROM `{table}`"
-        if report_or(clause, line_number, statement_name):
+    def report(clause: str, line_number: int, statement_name: str) -> bool:
+        # A disjunction needs real boolean parsing to judge, so it is refused rather than guessed at
+        if re.search(r"\bOR\b", clause, re.IGNORECASE):
+            print(f"❌ {statement_name} must not use OR. Use IN, or split it into one statement per "
+                  f"spawn. {file_path} at line {line_number}\n"
+                  f"If this error is intended, please notify a maintainer")
             return True
         missing = [column for column in ("id", "guid") if not has_column_filter(clause, column)]
         if not missing:
@@ -334,25 +325,14 @@ def spawn_filter_check(file: io, file_path: str) -> bool:
               f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
         return True
 
-    def report_update(clause: str, line_number: int, table: str) -> bool:
-        if not has_column_filter(clause, "guid"):
-            return False
-        statement_name = f"UPDATE `{table}`"
-        if report_or(clause, line_number, statement_name):
-            return True
-        if has_column_filter(clause, "id"):
-            return False
-        print(f"❌ {statement_name} filtered on `guid` must also filter on `id`. "
-              f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
-        return True
-
     # Judged once the whole statement is accumulated, since DELETE, FROM and the table name can
     # each sit on their own line
     def report_when_spawn_statement(text: str, line_number: int) -> bool:
-        for pattern, report in ((SPAWN_DELETE_START, report_delete), (SPAWN_UPDATE_START, report_update)):
+        for pattern, keyword in ((SPAWN_DELETE_START, "DELETE FROM"), (SPAWN_UPDATE_START, "UPDATE")):
             table = pattern.search(text)
             if table:
-                return report(where_clause(text), line_number, table.group(1) or table.group(2))
+                statement_name = f"{keyword} `{table.group(1) or table.group(2)}`"
+                return report(where_clause(text), line_number, statement_name)
         return False
 
     for line_number, line in enumerate(file, start = 1):

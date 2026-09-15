@@ -102,7 +102,7 @@ reviews:
       instructions: |
         AzerothCore SQL update conventions (enforced by apps/codestyle/codestyle-sql.py):
         - Every INSERT must be preceded by a matching DELETE for idempotency, and that DELETE must include a WHERE clause scoped precisely to the intended rows. A predicate that is too broad will remove unrelated data, so confirm it matches exactly what the INSERT will re-add.
-        - Spawn tables (creature, gameobject): a DELETE must filter on both id and guid, and an UPDATE that filters on guid must filter on id as well. Filters use =, IN or BETWEEN, never OR. Updating every spawn of an entry by id alone is fine.
+        - Spawn tables (creature, gameobject): DELETE and UPDATE must filter on both id and guid, with =, IN or BETWEEN (a mix is fine), never OR.
         - 4-space indent (no tabs), trailing newline, no double semicolons, no multiple blank lines.
         - Tables must use the InnoDB engine.
     - path: "data/sql/base/**"
