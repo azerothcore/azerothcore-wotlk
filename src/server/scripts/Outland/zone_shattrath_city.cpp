@@ -158,7 +158,7 @@ public:
                 Start(false, player->GetGUID());
 
                 // SummonGuardian installs follow movement after IsSummonedBy returns, so remove it on the next update.
-                _scheduler.Schedule(1ms, [this](TaskContext /*task*/)
+                scheduler.Schedule(1ms, [this](TaskContext /*task*/)
                 {
                     if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == FOLLOW_MOTION_TYPE)
                     {
@@ -172,17 +172,14 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            _scheduler.Update(diff);
+            scheduler.Update(diff);
             npc_escortAI::UpdateAI(diff);
         }
 
         void Reset() override
         {
-            _scheduler.CancelAll();
+            scheduler.CancelAll();
         }
-
-    private:
-        TaskScheduler _scheduler;
     };
 };
 
