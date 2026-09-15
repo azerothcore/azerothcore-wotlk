@@ -439,6 +439,8 @@ namespace lfg
 
     class LFGMgr
     {
+        friend class LFGQueueJoinTest;
+
     private:
         LFGMgr();
         ~LFGMgr();
