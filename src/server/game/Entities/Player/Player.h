@@ -2072,7 +2072,7 @@ public:
     uint32 GetResurrectionSpellId();
     void ResurrectPlayer(float restore_percent, bool applySickness = false);
     void BuildPlayerRepop();
-    void RepopAtGraveyard();
+    void RepopAtGraveyard(bool nearCorpse = false);
 
     void SendDurabilityLoss();
     void DurabilityLossAll(double percent, bool inventory);

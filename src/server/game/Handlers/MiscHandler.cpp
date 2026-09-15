@@ -83,7 +83,7 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
     //this is spirit release confirm?
     GetPlayer()->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
     GetPlayer()->BuildPlayerRepop();
-    GetPlayer()->RepopAtGraveyard();
+    GetPlayer()->RepopAtGraveyard(true);
 }
 
 void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
