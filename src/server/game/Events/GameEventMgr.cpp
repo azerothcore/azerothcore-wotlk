@@ -386,6 +386,12 @@ void GameEventMgr::LoadEvents()
             }
             else
             {
+                if (pGameEvent.HolidayStage > MAX_HOLIDAY_DURATIONS)
+                {
+                    LOG_ERROR("sql.sql", "`game_event` game event id ({}) has out of range holidayStage {}.", eventId, pGameEvent.HolidayStage);
+                    pGameEvent.HolidayStage = 0;
+                }
+
                 uint8& mainStage = _holidayMainStages[pGameEvent.HolidayId];
                 if (pGameEvent.HolidayStage > mainStage)
                     mainStage = pGameEvent.HolidayStage;
