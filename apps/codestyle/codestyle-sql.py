@@ -25,7 +25,7 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "SQL codestyle check": "Passed",
-    "INSERT & DELETE safety usage check": "Passed",
+    "INSERT, UPDATE & DELETE safety usage check": "Passed",
     "Missing semicolon check": "Passed",
     "Backtick check": "Passed",
     "Directory check": "Passed",
@@ -205,13 +205,13 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
                     f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
                 check_failed = True
 
-    if spawn_delete_filter_check(file, file_path):
+    if spawn_filter_check(file, file_path):
         check_failed = True
 
     # Handle the script error and update the result output
     if check_failed:
         error_handler = True
-        results["INSERT & DELETE safety usage check"] = "Failed"
+        results["INSERT, UPDATE & DELETE safety usage check"] = "Failed"
 
 # Strip a trailing "-- ..." line comment while ignoring any "--" that appears
 # inside a single- or double-quoted string literal (e.g. descriptions).
@@ -243,9 +243,11 @@ def open_paren_balance(text: str) -> int:
     without_strings = re.sub(r'"(?:\\.|[^"])*"', "", without_strings)
     return without_strings.count('(') - without_strings.count(')')
 
-DELETE_START = re.compile(r"\bDELETE\b", re.IGNORECASE)
-SPAWN_DELETE_START = re.compile(r"DELETE\s+FROM\s+(?:`(creature|gameobject)`|\b(creature|gameobject)\b)", re.IGNORECASE)
-# Only these bound a delete to known rows: `guid` > 0 or `id` != 5 match without limiting.
+SPAWN_STATEMENT_START = re.compile(r"\b(?:DELETE|UPDATE)\b", re.IGNORECASE)
+SPAWN_TABLE = r"(?:`(creature|gameobject)`|\b(creature|gameobject)\b)"
+SPAWN_DELETE_START = re.compile(rf"DELETE\s+FROM\s+{SPAWN_TABLE}", re.IGNORECASE)
+SPAWN_UPDATE_START = re.compile(rf"UPDATE\s+(?:IGNORE\s+)?{SPAWN_TABLE}", re.IGNORECASE)
+# Only these bound a statement to known rows: `guid` > 0 or `id` != 5 match without limiting.
 SPAWN_FILTER_OPERATORS = r"(?:=|\bIN\b|\bBETWEEN\b)"
 
 # The column token has to be bounded on both sides, otherwise `guid` would satisfy the `id`
@@ -253,6 +255,12 @@ SPAWN_FILTER_OPERATORS = r"(?:=|\bIN\b|\bBETWEEN\b)"
 def has_column_filter(statement: str, column: str) -> bool:
     pattern = rf"(?:`{column}`|(?<![\w@`]){column}(?![\w`]))\s*{SPAWN_FILTER_OPERATORS}"
     return re.search(pattern, statement, re.IGNORECASE) is not None
+
+# Only the WHERE clause decides which rows are hit, so the `SET id` = ... of an UPDATE must not
+# count as a filter. Returns "" when there is no WHERE at all, which then reads as unfiltered.
+def where_clause(statement: str) -> str:
+    parts = re.split(r"\bWHERE\b", statement, maxsplit = 1, flags = re.IGNORECASE)
+    return parts[1] if len(parts) > 1 else ""
 
 # Walk the line left to right dropping quoted literals and both comment styles, so a "--", a "/*"
 # or a ";" inside a string is not taken for a comment or a statement terminator. Returns the
@@ -294,36 +302,58 @@ def strip_sql_noise(text: str, in_block_comment: bool) -> tuple:
 
 # Spawns in `creature` and `gameobject` must be deleted by both `id` and `guid`: a guid-only delete
 # wipes whatever spawn owns that guid today, an id-only one wipes every spawn of that entry in the
-# world. Returns whether a violation was found; the caller owns the result state.
-def spawn_delete_filter_check(file: io, file_path: str) -> bool:
+# world. An UPDATE that names a `guid` needs the `id` beside it for the same reason, on a database
+# whose spawns have drifted the guid alone lands on somebody else's creature. Updating every spawn
+# of an entry by `id` alone stays allowed, that is a normal bulk edit.
+# Returns whether a violation was found; the caller owns the result state.
+def spawn_filter_check(file: io, file_path: str) -> bool:
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
     in_block_comment = False
     statement = ""
     statement_line = 0
 
-    def report(text: str, line_number: int, table: str) -> bool:
-        # A disjunction needs real boolean parsing to judge, so it is refused rather than guessed at
-        if re.search(r"\bOR\b", text, re.IGNORECASE):
-            print(f"❌ DELETE FROM `{table}` must not use OR. Use IN, or split it into one statement per "
-                  f"spawn. {file_path} at line {line_number}\n"
-                  f"If this error is intended, please notify a maintainer")
+    # A disjunction needs real boolean parsing to judge, so it is refused rather than guessed at
+    def report_or(clause: str, line_number: int, statement_name: str) -> bool:
+        if not re.search(r"\bOR\b", clause, re.IGNORECASE):
+            return False
+        print(f"❌ {statement_name} must not use OR. Use IN, or split it into one statement per "
+              f"spawn. {file_path} at line {line_number}\n"
+              f"If this error is intended, please notify a maintainer")
+        return True
+
+    def report_delete(clause: str, line_number: int, table: str) -> bool:
+        statement_name = f"DELETE FROM `{table}`"
+        if report_or(clause, line_number, statement_name):
             return True
-        missing = [column for column in ("id", "guid") if not has_column_filter(text, column)]
+        missing = [column for column in ("id", "guid") if not has_column_filter(clause, column)]
         if not missing:
             return False
         columns = " and ".join(f"`{column}`" for column in missing)
-        print(f"❌ DELETE FROM `{table}` must filter on both `id` and `guid` (missing: {columns}). "
+        print(f"❌ {statement_name} must filter on both `id` and `guid` (missing: {columns}). "
+              f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+        return True
+
+    def report_update(clause: str, line_number: int, table: str) -> bool:
+        if not has_column_filter(clause, "guid"):
+            return False
+        statement_name = f"UPDATE `{table}`"
+        if report_or(clause, line_number, statement_name):
+            return True
+        if has_column_filter(clause, "id"):
+            return False
+        print(f"❌ {statement_name} filtered on `guid` must also filter on `id`. "
               f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
         return True
 
     # Judged once the whole statement is accumulated, since DELETE, FROM and the table name can
     # each sit on their own line
-    def report_when_spawn_delete(text: str, line_number: int) -> bool:
-        table = SPAWN_DELETE_START.search(text)
-        if not table:
-            return False
-        return report(text, line_number, table.group(1) or table.group(2))
+    def report_when_spawn_statement(text: str, line_number: int) -> bool:
+        for pattern, report in ((SPAWN_DELETE_START, report_delete), (SPAWN_UPDATE_START, report_update)):
+            table = pattern.search(text)
+            if table:
+                return report(where_clause(text), line_number, table.group(1) or table.group(2))
+        return False
 
     for line_number, line in enumerate(file, start = 1):
         text, in_block_comment = strip_sql_noise(line.strip(), in_block_comment)
@@ -336,7 +366,7 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
                 segment, terminator, rest = remainder.partition(';')
                 statement += " " + segment
             else:
-                match = DELETE_START.search(remainder)
+                match = SPAWN_STATEMENT_START.search(remainder)
                 if not match:
                     break
                 statement_line = line_number
@@ -344,13 +374,13 @@ def spawn_delete_filter_check(file: io, file_path: str) -> bool:
                 statement = segment
             if not terminator:
                 break
-            if report_when_spawn_delete(statement, statement_line):
+            if report_when_spawn_statement(statement, statement_line):
                 check_failed = True
             statement = ""
             remainder = rest.strip()
 
     # An unterminated statement is reported by semicolon_check, but still judge it here
-    if statement and report_when_spawn_delete(statement, statement_line):
+    if statement and report_when_spawn_statement(statement, statement_line):
         check_failed = True
 
     return check_failed
