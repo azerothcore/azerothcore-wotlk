@@ -3325,7 +3325,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spellInfo
 
     // Check damage class instead of attack type to correctly handle judgements
     // - they are meele, but can't be dodged/parried/deflected because of ranged dmg class
-    if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
+    if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED || spellInfo->IsWandAutoAttack())
         attType = RANGED_ATTACK;
 
     int32 attackerWeaponSkill;
@@ -12292,9 +12292,7 @@ void createProcFlags(SpellInfo const* spellInfo, WeaponAttackType attackType, bo
                 }
                 break;
             default:
-                if (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON &&
-                        spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND)
-                        && spellInfo->HasAttribute(SPELL_ATTR2_AUTO_REPEAT)) // Wands auto attack
+                if (spellInfo->IsWandAutoAttack())
                 {
                     procAttacker = PROC_FLAG_DONE_RANGED_AUTO_ATTACK;
                     procVictim   = PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK;
