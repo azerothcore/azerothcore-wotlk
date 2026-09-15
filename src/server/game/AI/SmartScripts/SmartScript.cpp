@@ -3197,8 +3197,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (!left->IsCreature())
                     return false;
+
                 if (!right->IsCreature())
                     return true;
+
                 return left->ToCreature()->GetSpawnId() < right->ToCreature()->GetSpawnId();
             });
 
