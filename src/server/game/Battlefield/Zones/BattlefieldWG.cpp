@@ -581,8 +581,12 @@ uint32 BattlefieldWG::GetAreaByGraveyardId(uint8 gId) const
     return 0;
 }
 
-void BattlefieldWG::RelocateDeadPlayers(uint8 graveyardId, TeamId newOwner)
+void BattlefieldWG::RelocateDeadPlayers(uint8 graveyardId, TeamId losingTeam)
 {
+    // Nobody could use the graveyard before the change, so nobody is left waiting on it.
+    if (losingTeam == TEAM_NEUTRAL)
+        return;
+
     BfGraveyard const* graveyard = GetGraveyardById(graveyardId);
     if (!graveyard)
         return;
@@ -591,19 +595,30 @@ void BattlefieldWG::RelocateDeadPlayers(uint8 graveyardId, TeamId newOwner)
     if (!capturedLoc)
         return;
 
-    ForEachPlayerInZone([this, capturedLoc, newOwner](Player* player)
+    ForEachPlayerInZone([this, capturedLoc, losingTeam](Player* player)
     {
-        // Only players of the losing team waiting to resurrect; they would otherwise be
-        // revived in place on the now-inaccessible captured platform.
-        if (player->GetTeamId() == newOwner || !player->HasAura(SPELL_WAITING_FOR_RESURRECT))
+        // Only the team that just lost it. The other team could never have released here, since
+        // RepopAtGraveyard picks a graveyard their own team holds, so they are passers-by.
+        if (player->GetTeamId() != losingTeam)
             return;
 
-        // Restrict to ghosts actually waiting at the captured graveyard, not elsewhere in the zone.
+        // Ghosts only. Skips the living, and corpses that RepopAtGraveyard will send to a
+        // graveyard their team holds once they release.
+        if (!player->HasPlayerFlag(PLAYER_FLAGS_GHOST))
+            return;
+
+        // Only ghosts waiting at this graveyard, not elsewhere in the zone.
         if (player->GetDistance2d(capturedLoc->x, capturedLoc->y) > 50.0f)
             return;
 
-        if (GraveyardStruct const* safeLoc = GetClosestGraveyard(player))
-            player->TeleportTo(safeLoc->Map, safeLoc->x, safeLoc->y, safeLoc->z, player->GetOrientation());
+        GraveyardStruct const* safeLoc = GetClosestGraveyard(player);
+        if (!safeLoc)
+            return;
+
+        player->TeleportTo(safeLoc->Map, safeLoc->x, safeLoc->y, safeLoc->z, player->GetOrientation());
+
+        // The spirit guides here are phased out for them now, so they can't queue themselves.
+        AddPlayerToResurrectQueue(ObjectGuid::Empty, player->GetGUID());
     });
 }
 
