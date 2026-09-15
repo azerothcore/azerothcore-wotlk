@@ -1125,8 +1125,10 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 	}
 	t.Logf("PASS Writhing Lasher 0x%X still up %s after summon (hp=%d/%d)", lasher, outliveWindow, hp, maxHP)
 
-	// A MANUAL_DESPAWN summon has nothing of its own to remove it, and the ward kept summoning for
-	// the whole window, so clear every add it produced rather than just the one that was timed.
+	// A MANUAL_DESPAWN summon has nothing of its own to remove it, and deleting the ward does not
+	// take its adds with it, so they have to be killed here. The ward dies first: while it lives it
+	// summons another pair every 29s, and a sweep taken before that would race the next cycle.
+	bot.DamageKill(t, []uint64{ward}, 10_000_000, 30*time.Second)
 	var adds []uint64
 	for _, add := range bot.UnitsByEntry(addSearchRange, npcWrithingLasher, npcWardOfLife) {
 		adds = append(adds, add.GUID)
