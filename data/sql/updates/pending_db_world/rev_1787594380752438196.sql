@@ -1,8 +1,8 @@
 --
 -- BRD Bael'Gar corridor patrols from 2.5.6.69110 sniff
-UPDATE `creature` SET `MovementType` = 2, `ScriptName` = '' WHERE `guid` = 47786;
-UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 45852;
-UPDATE `creature` SET `id` = 8893, `curhealth` = 6645, `curmana` = 0 WHERE `guid` = 45855;
+UPDATE `creature` SET `MovementType` = 2, `ScriptName` = '' WHERE `guid` = 47786 AND `id` = 8895;
+UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 45852 AND `id` = 8895;
+UPDATE `creature` SET `id` = 8893, `curhealth` = 6645, `curmana` = 0 WHERE `guid` = 45855 AND `id` = 8894;
 
 DELETE FROM `creature_addon` WHERE `guid` IN (45852, 47786);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -36,7 +36,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- These two static packs are duplicate snapshots of the long patrol in the retail sniff.
 DELETE FROM `creature_addon` WHERE `guid` IN (45875, 45876, 45877, 45878, 45879, 47799, 47800, 47801, 47802, 47803);
-DELETE FROM `creature` WHERE `guid` IN (45875, 45876, 45877, 45878, 45879, 47799, 47800, 47801, 47802, 47803);
+DELETE FROM `creature` WHERE `id` = 8895 AND `guid` IN (45875, 47799);
+DELETE FROM `creature` WHERE `id` = 8893 AND `guid` IN (45876, 45878, 47800, 47802);
+DELETE FROM `creature` WHERE `id` = 8894 AND `guid` IN (45877, 47801);
+DELETE FROM `creature` WHERE `id` = 8892 AND `guid` IN (45879, 47803);
 
 DELETE FROM `waypoint_data` WHERE `id` IN (4585200, 4778600);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `velocity`, `delay`, `smoothTransition`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
@@ -115,16 +118,16 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (4778600, 64, 668.65607, 138.10217, -73.31458, NULL, 0, 0, 0, 0, 0, 100, 0);
 
 -- BRD Detention Block patrols from 2.5.6.69110 sniff
-UPDATE `creature` SET `position_x` = 505.312, `position_y` = -124.581, `position_z` = -62.091, `orientation` = 3.3517, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 47825;
-UPDATE `creature` SET `position_x` = 376.711, `position_y` = -129.450, `position_z` = -64.949, `orientation` = 0.2675, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 91099;
-UPDATE `creature` SET `position_x` = 424.321, `position_y` = -79.389, `position_z` = -64.193, `orientation` = 2.8469, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 91084;
-UPDATE `creature` SET `position_x` = 524.359, `position_y` = -73.163, `position_z` = -62.163, `orientation` = 5.3016, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 47832;
-UPDATE `creature` SET `position_x` = 502.454, `position_y` = -73.061, `position_z` = -63.079, `orientation` = 1.3006, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 45917;
-UPDATE `creature` SET `position_x` = 485.841, `position_y` = -104.503, `position_z` = -62.635, `orientation` = 3.8515, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 45924;
-UPDATE `creature` SET `position_x` = 417.235, `position_y` = -117.363, `position_z` = -65.930, `orientation` = 1.3111, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 91032;
-UPDATE `creature` SET `position_x` = 422.511, `position_y` = -79.066, `position_z` = -63.935, `orientation` = 2.8346, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 90688;
-UPDATE `creature` SET `position_x` = 410.003, `position_y` = -183.575, `position_z` = -63.584, `orientation` = 3.8935, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 90855;
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (45915, 45916, 45925, 45926, 47826, 47827, 47830, 47831, 90686, 90687, 90856, 90857, 91033, 91034, 91085, 91086, 91100, 91101);
+UPDATE `creature` SET `position_x` = 505.312, `position_y` = -124.581, `position_z` = -62.091, `orientation` = 3.3517, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 47825 AND `id` = 8890;
+UPDATE `creature` SET `position_x` = 376.711, `position_y` = -129.450, `position_z` = -64.949, `orientation` = 0.2675, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 91099 AND `id` = 8890;
+UPDATE `creature` SET `position_x` = 424.321, `position_y` = -79.389, `position_z` = -64.193, `orientation` = 2.8469, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 91084 AND `id` = 8890;
+UPDATE `creature` SET `position_x` = 524.359, `position_y` = -73.163, `position_z` = -62.163, `orientation` = 5.3016, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 47832 AND `id` = 8921;
+UPDATE `creature` SET `position_x` = 502.454, `position_y` = -73.061, `position_z` = -63.079, `orientation` = 1.3006, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 45917 AND `id` = 8921;
+UPDATE `creature` SET `position_x` = 485.841, `position_y` = -104.503, `position_z` = -62.635, `orientation` = 3.8515, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 45924 AND `id` = 8921;
+UPDATE `creature` SET `position_x` = 417.235, `position_y` = -117.363, `position_z` = -65.930, `orientation` = 1.3111, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 91032 AND `id` = 8921;
+UPDATE `creature` SET `position_x` = 422.511, `position_y` = -79.066, `position_z` = -63.935, `orientation` = 2.8346, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 90688 AND `id` = 8921;
+UPDATE `creature` SET `position_x` = 410.003, `position_y` = -183.575, `position_z` = -63.584, `orientation` = 3.8935, `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 90855 AND `id` = 8921;
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (45915, 45916, 45925, 45926, 47826, 47827, 47830, 47831, 90686, 90687, 90856, 90857, 91033, 91034, 91085, 91086, 91100, 91101) AND `id` = 8921;
 
 DELETE FROM `creature_addon` WHERE `guid` IN (45917, 45924, 47825, 47832, 90688, 90855, 91032, 91084, 91099, 91100, 91101);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
