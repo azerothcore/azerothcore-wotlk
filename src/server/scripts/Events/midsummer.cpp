@@ -406,9 +406,16 @@ class spell_fire_festival_fortitude : public SpellScript
     {
         targets.clear();
 
-        GetCaster()->GetMap()->DoForAllPlayers([&](Player* p)
+        // cast by the Fire Festival Fury Trap gameobject
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
+        if (!caster)
+            return;
+
+        caster->GetMap()->DoForAllPlayers([&](Player* p)
             {
-                if (p->GetZoneId() == GetCaster()->GetZoneId())
+                if (p->GetZoneId() == caster->GetZoneId())
                     targets.push_back(p);
             });
     }
