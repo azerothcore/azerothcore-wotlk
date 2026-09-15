@@ -23,13 +23,8 @@
 #include "EventProcessor.h"
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
-#include <array>
 
 constexpr auto COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME = 10;
-
-// Immediate-mode announcer debounce (ms): fires on the next periodic pass, by
-// which point a same-tick queue burst has collapsed into one aggregated line.
-constexpr int32 BG_QUEUE_ANNOUNCER_IMMEDIATE_DEBOUNCE = 1;
 
 struct GroupQueueInfo                                       // stores information about the group in queue (also used when joined as solo!)
 {
@@ -71,7 +66,6 @@ public:
     ~BattlegroundQueue();
 
     void BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating);
-    void BattlegroundQueueAnnouncerUpdate(uint32 diff, BattlegroundQueueTypeId bgQueueTypeId, BattlegroundBracketId bracket_id);
     void UpdateEvents(uint32 diff);
 
     void FillPlayersToBG(Battleground* bg, BattlegroundBracketId bracket_id);
@@ -88,9 +82,6 @@ public:
     void InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, TeamId teamId);
     [[nodiscard]] uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
     [[nodiscard]] bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
-    void SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
-    void SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
-    void SendExitMessageArenaQueue(GroupQueueInfo* ginfo);
 
     void AddEvent(BasicEvent* Event, uint64 e_time);
 
@@ -129,18 +120,12 @@ public:
     //one selection pool for horde, other one for alliance
     SelectionPool m_SelectionPools[PVP_TEAMS_COUNT];
 
-    void SetQueueAnnouncementTimer(uint32 bracketId, int32 timer, bool isCrossFactionBG = true);
-    [[nodiscard]] int32 GetQueueAnnouncementTimer(uint32 bracketId) const;
-
 private:
     uint32 m_WaitTimes[PVP_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];
     uint32 m_WaitTimeLastIndex[PVP_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS];
 
     // Event handler
     EventProcessor m_events;
-
-    std::array<int32, MAX_BATTLEGROUND_BRACKETS> _queueAnnouncementTimer;
-    bool _queueAnnouncementCrossfactioned;
 };
 
 /*

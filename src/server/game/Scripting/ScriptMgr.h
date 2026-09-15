@@ -600,6 +600,7 @@ public: /* BattlefieldScript */
     void OnBattlefieldBeforeInvitePlayerToWar(Battlefield* bf, Player* player);
     void OnBattlefieldWarEnd(Battlefield* bf, bool endByTimer);
     void OnBattlefieldPlayerKill(Battlefield* bf, Player* killer, Player* victim);
+    void OnBattlefieldWarStart(Battlefield* bf);
 
 public: /* BGScript */
     void OnBattlegroundStart(Battleground* bg);
@@ -614,9 +615,9 @@ public: /* BGScript */
         uint8 arenaType, bool isRated, bool isPremade, uint32 arenaRating, uint32 matchmakerRating, uint32 arenaTeamId, uint32 opponentsArenaTeamId);
     bool CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, BattlegroundBracketId bracket_id);
     bool IsCheckNormalMatch(BattlegroundQueue* queue, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
-    bool CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
-    bool OnBeforeSendJoinMessageArenaQueue(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
-    bool OnBeforeSendExitMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
+    void OnBattlegroundQueueGroupJoined(BattlegroundQueue* queue, Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated, bool isPremade);
+    void OnBattlegroundQueuePlayerRemoved(BattlegroundQueue* queue, GroupQueueInfo* ginfo);
+    void OnBattlegroundQueueBracketUpdate(BattlegroundQueue* queue, uint32 diff, BattlegroundQueueTypeId bgQueueTypeId, BattlegroundBracketId bracketId);
     void OnBattlegroundEnd(Battleground* bg, TeamId winnerTeamId);
     void OnBattlegroundDestroy(Battleground* bg);
     void OnBattlegroundCreate(Battleground* bg);
