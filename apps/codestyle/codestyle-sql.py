@@ -257,7 +257,8 @@ def has_column_filter(statement: str, column: str) -> bool:
     pattern = rf"(?:`{column}`|(?<![\w@`]){column}(?![\w`]))\s*{SPAWN_FILTER_OPERATORS}"
     return re.search(pattern, statement, re.IGNORECASE) is not None
 
-SUBQUERY_START = re.compile(r"\(\s*SELECT\b", re.IGNORECASE)
+SPAWN_TABLE_MENTION = re.compile(SPAWN_TABLE, re.IGNORECASE)
+SUBQUERY_START = re.compile(r"\(\s*(?:SELECT|WITH)\b", re.IGNORECASE)
 
 # A subquery bounds its own rows, not the ones the statement touches, so its predicates must not be
 # read as filters. Parentheses that merely group a predicate are kept, those are part of the filter.
@@ -281,7 +282,8 @@ def strip_subqueries(text: str) -> str:
 # Only the WHERE clause decides which rows are hit, so the `SET id` = ... of an UPDATE must not
 # count as a filter. Returns "" when there is no WHERE at all, which then reads as unfiltered.
 def where_clause(statement: str) -> str:
-    parts = re.split(r"\bWHERE\b", strip_subqueries(statement), maxsplit = 1, flags = re.IGNORECASE)
+    # A backticked `where` column would otherwise split the statement mid-SET
+    parts = re.split(r"(?<!`)\bWHERE\b(?!`)", strip_subqueries(statement), maxsplit = 1, flags = re.IGNORECASE)
     return parts[1] if len(parts) > 1 else ""
 
 # Walk the line left to right dropping quoted literals and both comment styles, so a "--", a "/*"
@@ -347,6 +349,18 @@ def spawn_filter_check(file: io, file_path: str) -> bool:
               f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
         return True
 
+    # Reached when a statement names a spawn table somewhere other than as its plain target: a join,
+    # a comma-separated target list, a schema qualifier. Which rows it touches cannot be judged
+    # without resolving aliases, and none of it is AC update style, so the form itself is refused.
+    def report_indirect_target(text: str, line_number: int) -> bool:
+        table = SPAWN_TABLE_MENTION.search(strip_subqueries(text))
+        if not table:
+            return False
+        print(f"❌ A statement touching `{table.group(1) or table.group(2)}` must name it as its only target. "
+              f"Joins, comma-separated targets and schema qualifiers are not supported. "
+              f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+        return True
+
     # Judged once the whole statement is accumulated, since DELETE, FROM and the table name can
     # each sit on their own line
     def report_when_spawn_statement(text: str, line_number: int) -> bool:
@@ -355,7 +369,7 @@ def spawn_filter_check(file: io, file_path: str) -> bool:
             if table:
                 statement_name = f"{keyword} `{table.group(1) or table.group(2)}`"
                 return report(where_clause(text), line_number, statement_name)
-        return False
+        return report_indirect_target(text, line_number)
 
     for line_number, line in enumerate(file, start = 1):
         text, in_block_comment = strip_sql_noise(line.strip(), in_block_comment)
