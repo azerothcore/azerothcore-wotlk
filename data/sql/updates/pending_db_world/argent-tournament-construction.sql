@@ -70,10 +70,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- This is the case in 3.4.1, but may not be the case in later versions, could not verify at this time
 -- UPDATE `gameobject_template` SET `Data1` = 26890 WHERE `entry` = 194463;
+-- DELETE FROM `gameobject_loot_template` WHERE `Entry` = 26890;
+-- INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+-- (26890, 45278, 0, 100, 1, 1, 0, 1, 1, 'Small Stone Block - Small Stone Block');
 
-DELETE FROM `gameobject_loot_template` WHERE `Entry` = 26890;
-INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(26890, 45278, 0, 100, 1, 1, 0, 1, 1, 'Small Stone Block - Small Stone Block');
 DELETE FROM `gameobject_questitem` WHERE `GameObjectEntry` = 194463;
 INSERT INTO `gameobject_questitem` (`GameObjectEntry`, `Idx`, `ItemId`, `VerifiedBuild`) VALUES
 (194463, 0, 45278, 0);
