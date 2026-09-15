@@ -227,6 +227,8 @@ struct boss_zuljin : public BossAI
         // Phase 5: Dragonhawk Form.
         ScheduleHealthCheckEvent({ 20 }, [&] {
             me->m_Events.CancelEventGroup(GROUP_LYNX);
+            me->RemoveAurasDueToSpell(SPELL_CLAW_RAGE_AURA);
+            me->RemoveAurasDueToSpell(SPELL_LYNX_RUSH_HASTE);
             EnterPhase(PHASE_DRAGONHAWK);
 
             ScheduleTimedEvent(12s, 26s, [&] {
