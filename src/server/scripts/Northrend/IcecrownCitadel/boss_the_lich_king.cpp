@@ -354,9 +354,14 @@ enum MiscData
 #define DATA_PLAGUE_STACK 70337
 #define DATA_VILE 45814622
 
+bool IsValidPlatformPosition(Position const& pos)
+{
+    return pos.GetExactDist2dSq(&CenterPosition) < 90.0f * 90.0f && pos.GetPositionZ() > 840.0f && pos.GetPositionZ() < 875.0f;
+}
+
 bool IsValidPlatformTarget(Unit const* target)
 {
-    return target->GetExactDist2dSq(&CenterPosition) < 90.0f * 90.0f && target->GetPositionZ() > 840.0f && target->GetPositionZ() < 875.0f;
+    return IsValidPlatformPosition(*target);
 }
 
 void SendPacketToPlayers(WorldPacket const* data, Unit* source)
@@ -2201,6 +2206,26 @@ class spell_the_lich_king_raging_spirit : public SpellScript
     }
 };
 
+class spell_the_lich_king_summon_raging_spirit : public SpellScript
+{
+    PrepareSpellScript(spell_the_lich_king_summon_raging_spirit);
+
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || IsValidPlatformPosition(dest._position))
+            return;
+
+        // no floor under the destination drops the summon to the terrain, ~990 yd below the platform
+        dest.Relocate(caster->GetPosition());
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_the_lich_king_summon_raging_spirit::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
+    }
+};
+
 class npc_raging_spirit : public CreatureScript
 {
 public:
@@ -3562,6 +3587,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_ice_burst_target_search);
     new npc_icc_ice_sphere();
     RegisterSpellScript(spell_the_lich_king_raging_spirit);
+    RegisterSpellScript(spell_the_lich_king_summon_raging_spirit);
     new npc_raging_spirit();
     RegisterSpellScript(spell_the_lich_king_defile);
     RegisterSpellScript(spell_the_lich_king_soul_reaper_aura);
