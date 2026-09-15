@@ -1124,6 +1124,15 @@ void ArenaTeam::SetEmblem(uint32 backgroundColor, uint8 emblemStyle, uint32 embl
     EmblemColor = emblemColor;
     BorderStyle = borderStyle;
     BorderColor = borderColor;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_EMBLEM);
+    stmt->SetData(0, BackgroundColor);
+    stmt->SetData(1, EmblemStyle);
+    stmt->SetData(2, EmblemColor);
+    stmt->SetData(3, BorderStyle);
+    stmt->SetData(4, BorderColor);
+    stmt->SetData(5, GetId());
+    CharacterDatabase.Execute(stmt);
 }
 
 void ArenaTeam::SetRatingForAll(uint32 rating)
