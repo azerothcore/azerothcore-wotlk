@@ -238,7 +238,7 @@ enum GuildMemberFlags
 class EmblemInfo
 {
 public:
-    EmblemInfo(uint32 style = 0, uint32 color = 0, uint32 borderStyle = 0, uint32 borderColor = 0,
+    explicit EmblemInfo(uint32 style = 0, uint32 color = 0, uint32 borderStyle = 0, uint32 borderColor = 0,
         uint32 backgroundColor = 0) :
         m_style(style), m_color(color), m_borderStyle(borderStyle), m_borderColor(borderColor),
         m_backgroundColor(backgroundColor) { }
@@ -784,7 +784,6 @@ public:
     [[nodiscard]] bool ModifyBankMoney(CharacterDatabaseTransaction trans, uint64 const& amount, bool add) { return _ModifyBankMoney(trans, amount, add); }
     [[nodiscard]] uint32 GetMemberSize() const { return m_members.size(); }
 
-    // Public accessors for the playerbots module (delegate to the private helpers)
     bool HasRankRight(Player* player, uint32 right) const;
     uint32 GetRankRights(uint8 rankId) const;
     bool MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const;

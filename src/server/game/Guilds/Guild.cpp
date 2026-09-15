@@ -1415,6 +1415,9 @@ void Guild::HandleSetRankInfo(uint8 rankId, Optional<uint32> rights, Optional<st
     if (!rankInfo)
         return;
 
+    if (!name && !rights && !moneyPerDay)
+        return;
+
     if (name)
         rankInfo->SetName(*name);
 
@@ -2650,7 +2653,6 @@ inline bool Guild::_MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 righ
     return false;
 }
 
-// Public accessors for the playerbots module (delegate to the private helpers)
 bool Guild::HasRankRight(Player* player, uint32 right) const
 {
     return _HasRankRight(player, right);
