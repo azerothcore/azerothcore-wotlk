@@ -24,6 +24,12 @@ Every change gets the full review; go deeper the farther it can reach:
 - SQL: beyond the usual review, watch for the classic side effect — a DELETE/UPDATE whose
   WHERE clause catches rows it shouldn't.
 
+## Upstream attribution
+
+Any changed code, mechanism, or data mirrored from another core must carry that upstream commit's
+author via `--author` (extras as `Co-authored-by`) with the template's cherry-pick box checked; a
+missing credit is a finding.
+
 ## In-game testing
 
 PRs are expected to be tested in-game, which the reviewer cannot do. Never guess what the

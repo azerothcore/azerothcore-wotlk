@@ -1,0 +1,11 @@
+go 1.26.0
+
+use .
+
+// Point at a local AzerothGhost checkout that contains e2e/e2eharness
+// (https://github.com/azerothcore/AzerothGhost). Copy to go.work (gitignored)
+// and adjust the path.
+//
+//	cp go.work.example go.work
+//
+replace github.com/azerothcore/AzerothGhost => /path/to/AzerothGhost
