@@ -328,6 +328,7 @@ void GameEventMgr::LoadEvents()
 {
     LOG_INFO("server.loading", "Loading Game Events...");
     uint32 oldMSTime = getMSTime();
+    _holidayMainStages.clear();
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENTS);
     PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -382,6 +383,12 @@ void GameEventMgr::LoadEvents()
             {
                 LOG_ERROR("sql.sql", "`game_event` game event id ({}) have not existed holiday id {}.", eventId, pGameEvent.HolidayId);
                 pGameEvent.HolidayId = HOLIDAY_NONE;
+            }
+            else
+            {
+                uint8& mainStage = _holidayMainStages[pGameEvent.HolidayId];
+                if (pGameEvent.HolidayStage > mainStage)
+                    mainStage = pGameEvent.HolidayStage;
             }
 
             SetHolidayEventTime(pGameEvent);
@@ -2029,6 +2036,12 @@ uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
     return 0;
 }
 
+uint8 GameEventMgr::GetHolidayMainStage(uint32 holidayId) const
+{
+    auto itr = _holidayMainStages.find(holidayId);
+    return itr != _holidayMainStages.end() ? itr->second : 0;
+}
+
 bool IsHolidayActive(HolidayIds id)
 {
     if (id == HOLIDAY_NONE)
@@ -2037,9 +2050,16 @@ bool IsHolidayActive(HolidayIds id)
     GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
     GameEventMgr::ActiveEvents const& ae = sGameEventMgr->GetActiveEventList();
 
-    for (GameEventMgr::ActiveEvents::const_iterator itr = ae.begin(); itr != ae.end(); ++itr)
-        if (events[*itr].HolidayId == id)
+    // Brewfest and the Darkmoon Faire have a building stage running days ahead of the event itself,
+    // only their last stage means the holiday is on
+    uint8 mainStage = sGameEventMgr->GetHolidayMainStage(id);
+
+    for (uint16 eventId : ae)
+    {
+        GameEventData const& event = events[eventId];
+        if (event.HolidayId == id && event.HolidayStage == mainStage)
             return true;
+    }
 
     return false;
 }
