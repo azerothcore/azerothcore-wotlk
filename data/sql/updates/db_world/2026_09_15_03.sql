@@ -1,3 +1,4 @@
+-- DB update 2026_09_15_02 -> 2026_09_15_03
 -- Aggro talk actions targeted the action invoker without useTalkTarget, so a
 -- creature attacker (guardian, totem, NPC) became the talker. Talk from self.
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 2564 AND `source_type` = 0;
