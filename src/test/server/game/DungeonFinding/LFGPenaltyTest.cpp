@@ -25,15 +25,15 @@ TEST(LFGPenaltyTest, DungeonCooldownOnlyAppliesToRandomDungeonQueuers)
     EXPECT_FALSE(lfg::ShouldApplyDungeonCooldown(true, false, true));
 }
 
-TEST(LFGPenaltyTest, VoteKickedPlayerWithCooldownCannotQueueSpecificDungeon)
+TEST(LFGPenaltyTest, VoteKickedPlayerWithRunCooldownCanQueueSpecificDungeon)
 {
     bool constexpr hasDungeonCooldown = true;
 
     EXPECT_FALSE(lfg::ShouldApplyDungeonDeserter(true, false, hasDungeonCooldown, 4, true));
-    EXPECT_TRUE(lfg::IsDungeonQueueBlockedByCooldown(false, hasDungeonCooldown));
+    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(false, 0, hasDungeonCooldown, false));
 }
 
-TEST(LFGPenaltyTest, PlayerLeavingGroupOfAtMostThreeWithCooldownCannotQueueSpecificDungeon)
+TEST(LFGPenaltyTest, PlayerLeavingGroupOfAtMostThreeWithRunCooldownCanQueueSpecificDungeon)
 {
     bool constexpr hasDungeonCooldown = true;
     uint8 constexpr playersRemainingFromTwoPlayerGroup = 1;
@@ -43,7 +43,7 @@ TEST(LFGPenaltyTest, PlayerLeavingGroupOfAtMostThreeWithCooldownCannotQueueSpeci
         false, false, hasDungeonCooldown, playersRemainingFromTwoPlayerGroup, true));
     EXPECT_FALSE(lfg::ShouldApplyDungeonDeserter(
         false, false, hasDungeonCooldown, playersRemainingFromThreePlayerGroup, true));
-    EXPECT_TRUE(lfg::IsDungeonQueueBlockedByCooldown(false, hasDungeonCooldown));
+    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(false, 0, hasDungeonCooldown, false));
 }
 
 TEST(LFGPenaltyTest, PlayerLeavingLargerGroupReceivesDeserter)
@@ -53,5 +53,5 @@ TEST(LFGPenaltyTest, PlayerLeavingLargerGroupReceivesDeserter)
 
 TEST(LFGPenaltyTest, ContinuingExistingDungeonIgnoresDungeonCooldown)
 {
-    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(true, true));
+    EXPECT_FALSE(lfg::IsDungeonQueueBlockedByCooldown(true, 258, true, true));
 }

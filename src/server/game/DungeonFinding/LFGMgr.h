@@ -49,6 +49,7 @@ namespace lfg
         LFG_TIME_ROLECHECK                           = 45 * IN_MILLISECONDS,
         LFG_TIME_BOOT                                = 120,
         LFG_TIME_PROPOSAL                            = 40,
+        LFG_TIME_DECLINE_COOLDOWN                    = 150,
         LFG_QUEUEUPDATE_INTERVAL                     = 8 * IN_MILLISECONDS,
         LFG_SPELL_DUNGEON_COOLDOWN                   = 71328,
         LFG_SPELL_DUNGEON_DESERTER                   = 71041,
@@ -62,9 +63,10 @@ namespace lfg
         return selectedRandomDungeon && !testing && !hasDungeonCooldown;
     }
 
-    [[nodiscard]] constexpr bool IsDungeonQueueBlockedByCooldown(bool isContinue, bool hasDungeonCooldown)
+    [[nodiscard]] constexpr bool IsDungeonQueueBlockedByCooldown(bool isContinue, uint32 randomDungeonId,
+        bool hasDungeonCooldown, bool hasDeclineCooldown)
     {
-        return !isContinue && hasDungeonCooldown;
+        return !isContinue && (hasDeclineCooldown || (randomDungeonId && hasDungeonCooldown));
     }
 
     [[nodiscard]] constexpr bool ShouldApplyDungeonDeserter(bool isVoteKick, bool dungeonFinished,

@@ -753,17 +753,20 @@ namespace lfg
             else
                 players.insert(player->GetGUID());
 
-            // Check the dungeon cooldown for every dungeon queue. Declining a proposal applies
-            // this aura regardless of whether the player selected a random or specific dungeon.
+            // Declines block all queues. The aura also comes from MakeNewGroup and only blocks random queues.
             if (joinData.result == LFG_JOIN_OK)
             {
-                if (IsDungeonQueueBlockedByCooldown(isContinue, player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)))
+                time_t const now = GameTime::GetGameTime().count();
+                if (IsDungeonQueueBlockedByCooldown(isContinue, rDungeonId,
+                        player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN), PlayersStore[guid].HasDeclineCooldown(now)))
                     joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
                 else if (grp && !isContinue)
                 {
                     for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr && joinData.result == LFG_JOIN_OK; itr = itr->next())
                         if (Player* plrg = itr->GetSource())
-                            if (IsDungeonQueueBlockedByCooldown(isContinue, plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)))
+                            if (IsDungeonQueueBlockedByCooldown(isContinue, rDungeonId,
+                                    plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN),
+                                    PlayersStore[plrg->GetGUID()].HasDeclineCooldown(now)))
                                 joinData.result = LFG_JOIN_PARTY_RANDOM_COOLDOWN;
                 }
             }
@@ -2030,12 +2033,22 @@ namespace lfg
                 if (it->second.accept == LFG_ANSWER_PENDING)
                     it->second.accept = LFG_ANSWER_DENY;
 
-        // pussywizard: add cooldown for not accepting (after 40 secs) or declining
+        // Penalize declines and timeouts, including players who disconnected during the proposal.
         for (LfgProposalPlayerContainer::iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
             if (it->second.accept == LFG_ANSWER_DENY)
+            {
+                PlayersStore[it->first].SetDeclineCooldown(GameTime::GetGameTime().count() + LFG_TIME_DECLINE_COOLDOWN);
                 if (Player* plr = ObjectAccessor::FindPlayer(it->first))
+                {
+                    // Do not shorten an existing random-run cooldown.
+                    if (Aura* aura = plr->GetAura(LFG_SPELL_DUNGEON_COOLDOWN))
+                        if (aura->GetDuration() >= LFG_TIME_DECLINE_COOLDOWN * IN_MILLISECONDS)
+                            continue;
+
                     if (Aura* aura = plr->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, plr))
-                        aura->SetDuration(150 * IN_MILLISECONDS);
+                        aura->SetDuration(LFG_TIME_DECLINE_COOLDOWN * IN_MILLISECONDS);
+                }
+            }
 
         // Mark players/groups to be removed
         LfgGuidSet toRemove;
