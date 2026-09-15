@@ -313,7 +313,7 @@ public:
             mapId =   fields[6].Get<uint16>();
             phase =   fields[7].Get<uint32>();
             poolId =  sPoolMgr->IsPartOfAPool<GameObject>(guidLow);
-            if (!poolId || sPoolMgr->IsSpawnedObject<GameObject>(guidLow))
+            if (!poolId || handler->GetSession()->GetPlayer()->GetMap()->GetPoolData().IsSpawnedObject<GameObject>(guidLow))
                 found = true;
         } while (result->NextRow() && !found);
 

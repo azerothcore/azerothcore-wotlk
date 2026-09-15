@@ -148,6 +148,45 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
 
     set_target_properties(${APP_PROJECT_NAME} PROPERTIES LINK_FLAGS "${${APP_PROJECT_NAME}_LINK_FLAGS}")
 
+    # Real libsidecar runtime location (not via imported-target INTERFACE -rpath:
+    # game, scripts, and worldserver all link libsidecar and would get duplicates).
+    #
+    # UNIX/macOS — rpath search order:
+    #   BUILD:  deps/libsidecar → next to binary → ../lib
+    #   INSTALL: target inherits CMAKE_INSTALL_RPATH (${prefix}/lib) first, then
+    #            APPEND next to binary and ../lib (no source-tree path)
+    #
+    # Windows — no rpath; loader only searches the exe directory (then PATH).
+    #   BUILD:  POST_BUILD copy DLL next to worldserver
+    #   INSTALL: install(FILES) places DLL next to worldserver (see deps/libsidecar)
+    if (USE_REAL_LIBSIDECAR)
+      if (WIN32 AND LIBSIDECAR_SHARED_FILE)
+        add_custom_command(TARGET ${APP_PROJECT_NAME} POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${LIBSIDECAR_SHARED_FILE}"
+            "$<TARGET_FILE_DIR:${APP_PROJECT_NAME}>"
+          COMMENT "Copy libsidecar.dll next to worldserver (Windows build tree)")
+      elseif (LIBSIDECAR_RUNTIME_DIR)
+        if (APPLE)
+          set_property(TARGET ${APP_PROJECT_NAME} APPEND PROPERTY BUILD_RPATH
+            "${LIBSIDECAR_RUNTIME_DIR}"
+            "@loader_path"
+            "@loader_path/../lib")
+          set_property(TARGET ${APP_PROJECT_NAME} APPEND PROPERTY INSTALL_RPATH
+            "@loader_path"
+            "@loader_path/../lib")
+        elseif (UNIX)
+          set_property(TARGET ${APP_PROJECT_NAME} APPEND PROPERTY BUILD_RPATH
+            "${LIBSIDECAR_RUNTIME_DIR}"
+            "$ORIGIN"
+            "$ORIGIN/../lib")
+          set_property(TARGET ${APP_PROJECT_NAME} APPEND PROPERTY INSTALL_RPATH
+            "$ORIGIN"
+            "$ORIGIN/../lib")
+        endif()
+      endif()
+    endif()
+
     # Add all dynamic projects as dependency to the worldserver
     if (WORLDSERVER_DYNAMIC_SCRIPT_MODULES_DEPENDENCIES)
       add_dependencies(${APP_PROJECT_NAME} ${WORLDSERVER_DYNAMIC_SCRIPT_MODULES_DEPENDENCIES})

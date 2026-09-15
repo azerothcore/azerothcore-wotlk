@@ -306,6 +306,60 @@ class spell_the_cleansing_on_death_cast_on_master : public SpellScript
     }
 };
 
+// Quest 11296: Rivenwood Captives
+enum RivenwoodCaptives
+{
+    SPELL_CAPTIVES_ON_QUEST     = 43287,
+    SPELL_CAPTIVES_NOT_ON_QUEST = 43288,
+
+    SPELL_SUMMON_FREED_SCOUT    = 43289,
+
+    SPELL_SUMMON_HOSTILE_START  = 43275,
+    SPELL_SUMMON_HOSTILE_END    = 43285,
+
+    NPC_FREED_SCOUT             = 24211
+};
+
+class spell_q11296_rivenwood_captives : public SpellScript
+{
+    PrepareSpellScript(spell_q11296_rivenwood_captives);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        std::vector<uint32> spellIds = { SPELL_SUMMON_FREED_SCOUT };
+
+        for (uint32 spellId = SPELL_SUMMON_HOSTILE_START; spellId <= SPELL_SUMMON_HOSTILE_END; ++spellId)
+            spellIds.push_back(spellId);
+
+        return ValidateSpellInfo(spellIds);
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        uint32 spellId = urand(SPELL_SUMMON_HOSTILE_START, SPELL_SUMMON_HOSTILE_END);
+
+        if (GetSpellInfo()->Id == SPELL_CAPTIVES_ON_QUEST && roll_chance_i(50))
+        {
+            spellId = SPELL_SUMMON_FREED_SCOUT;
+
+            if (Creature* web = caster->ToCreature())
+                if (Player* player = web->GetLootRecipient())
+                    player->RewardPlayerAndGroupAtEvent(NPC_FREED_SCOUT, player);
+        }
+
+        caster->CastSpell(caster, spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_q11296_rivenwood_captives::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 /*######
 ## Quest 11529: Sorlof's Booty
 ######*/
@@ -573,6 +627,7 @@ void AddSC_howling_fjord()
     RegisterSpellScript(spell_the_cleansing_cleansing_soul);
     RegisterSpellScript(spell_the_cleansing_mirror_image_script_effect);
     RegisterSpellScript(spell_the_cleansing_on_death_cast_on_master);
+    RegisterSpellScript(spell_q11296_rivenwood_captives);
     RegisterSpellScript(spell_sorlofs_booty_cannon_primer);
     RegisterSpellScript(spell_sorlofs_booty_big_gun_assault);
     RegisterSpellScript(spell_sorlofs_booty_boulder_assault);

@@ -509,12 +509,27 @@ void MotionTransport::LoadStaticPassengers()
             // Creatures on transport
             guidEnd = cellItr->second.creatures.end();
             for (CellGuidSet::const_iterator guidItr = cellItr->second.creatures.begin(); guidItr != guidEnd; ++guidItr)
-                CreateNPCPassenger(*guidItr, sObjectMgr->GetCreatureData(*guidItr));
+            {
+                CreatureData const* data = sObjectMgr->GetCreatureData(*guidItr);
+
+                // Pooled spawns are in the grid data but managed by the pool system, never as static passengers
+                if (data && data->poolId)
+                    continue;
+
+                CreateNPCPassenger(*guidItr, data);
+            }
 
             // GameObjects on transport
             guidEnd = cellItr->second.gameobjects.end();
             for (CellGuidSet::const_iterator guidItr = cellItr->second.gameobjects.begin(); guidItr != guidEnd; ++guidItr)
-                CreateGOPassenger(*guidItr, sObjectMgr->GetGameObjectData(*guidItr));
+            {
+                GameObjectData const* data = sObjectMgr->GetGameObjectData(*guidItr);
+
+                if (data && data->poolId)
+                    continue;
+
+                CreateGOPassenger(*guidItr, data);
+            }
         }
     }
 }

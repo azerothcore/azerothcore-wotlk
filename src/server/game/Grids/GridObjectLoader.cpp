@@ -23,6 +23,7 @@
 #include "GameObject.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
+#include "PoolMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
 
@@ -43,6 +44,10 @@ void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
         // Skip spawns whose spawn group is not active on this map
         CreatureData const* cData = sObjectMgr->GetCreatureData(guid);
         if (cData && !map->IsSpawnGroupActive(cData->spawnGroupId))
+            continue;
+
+        // Skip pool members this map's pool state has not rolled as spawned
+        if (cData && cData->poolId && !map->GetPoolData().IsSpawnedObject<Creature>(guid))
             continue;
 
         Creature* obj = new Creature();
@@ -78,6 +83,10 @@ void GridObjectLoader::LoadGameObjects(CellGuidSet const& guid_set, Map* map)
 
         // Skip spawns whose spawn group is not active on this map
         if (data && !map->IsSpawnGroupActive(data->spawnGroupId))
+            continue;
+
+        // Skip pool members this map's pool state has not rolled as spawned
+        if (data && data->poolId && !map->GetPoolData().IsSpawnedObject<GameObject>(guid))
             continue;
 
         if (data && sObjectMgr->IsGameObjectStaticTransport(data->id))

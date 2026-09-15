@@ -96,6 +96,39 @@ enum valhalas
     NPC_CARNAGE                                 = 31271,
     NPC_THANE                                   = 31277,
     NPC_PRINCE                                  = 14688, // no mistake
+
+    SAY_FALLEN_HEROES_ACCEPT                    = 0,
+    SAY_FALLEN_HEROES_CHALLENGERS               = 1,
+    SAY_FALLEN_HEROES_STAKES                    = 2,
+    EMOTE_FALLEN_HEROES_ARRIVE                  = 3,
+    SAY_FALLEN_HEROES_VICTORY                   = 4,
+
+    SAY_DARK_MASTER_ACCEPT                      = 5,
+    SAY_DARK_MASTER_CHALLENGERS                 = 6,
+    EMOTE_DARK_MASTER_ARRIVE                    = 7,
+    SAY_DARK_MASTER_VICTORY                     = 8,
+
+    SAY_SIGRID_ACCEPT                           = 9,
+    EMOTE_SIGRID_ARRIVE                         = 10,
+    SAY_SIGRID_VICTORY                          = 11,
+
+    SAY_CARNAGE_ACCEPT                          = 12,
+    SAY_CARNAGE_CHALLENGERS                     = 13,
+    EMOTE_CARNAGE_ARRIVE                        = 14,
+    SAY_CARNAGE_VICTORY                         = 15,
+
+    SAY_THANE_ACCEPT                            = 16,
+    SAY_THANE_CHALLENGERS                       = 17,
+    EMOTE_THANE_ARRIVE                          = 18,
+    SAY_THANE_VICTORY                           = 19,
+
+    SAY_FINAL_ACCEPT                            = 20,
+    SAY_FINAL_CHALLENGERS                       = 21,
+    SAY_FINAL_OPPONENT                          = 22,
+    EMOTE_FINAL_ARRIVE                          = 23,
+    SAY_FINAL_VICTORY                           = 24,
+    SAY_FINAL_CHAMPION_1                        = 25,
+    SAY_FINAL_CHAMPION_2                        = 26,
 };
 
 class npc_battle_at_valhalas : public CreatureScript
@@ -194,31 +227,32 @@ public:
             {
                 case EVENT_VALHALAS_FIRST:
                     {
+                        Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
                         switch (currentQuest)
                         {
                             case QUEST_BFV_FALLEN_HEROES:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
-                                me->Yell("$N and comrades in arms have chosen to accept honorable combat within the sacred confines of Valhalas.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                Talk(SAY_FALLEN_HEROES_CHALLENGERS, player);
                                 break;
                             case QUEST_BFV_DARK_MASTER:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
-                                me->Yell("$N has accepted the challenge of Khit'rix the Dark Master. May the gods show mercy upon him for Khit'rix surely will not.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                Talk(SAY_DARK_MASTER_CHALLENGERS, player);
                                 break;
                             case QUEST_BFV_SIGRID:
                                 PrepareSummons();
-                                me->TextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", nullptr, true);
+                                Talk(EMOTE_SIGRID_ARRIVE);
                                 break;
                             case QUEST_BFV_CARNAGE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
-                                me->Yell("From the bowels of the Underhalls comes Carnage. Brave and foolish $N has accepted the challenge. $N and his group stand ready to face the monstrosity.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                Talk(SAY_CARNAGE_CHALLENGERS, player);
                                 break;
                             case QUEST_BFV_THANE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
-                                me->Yell("Thane Banahogg returns to Valhalas for the first time in ages to prove that the vrykul are the only beings worthy to fight within its sacred ring. Will $N prove him wrong?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                Talk(SAY_THANE_CHALLENGERS, player);
                                 break;
                             case QUEST_BFV_FINAL:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8s);
-                                me->Yell("From the depths of Icecrown Citadel, one of the Lich King's chosen comes to put an end to the existence of $N and his friends.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                Talk(SAY_FINAL_CHALLENGERS, player);
                                 break;
                         }
 
@@ -231,21 +265,21 @@ public:
                         switch (currentQuest)
                         {
                             case QUEST_BFV_FALLEN_HEROES:
-                                me->Yell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                me->TextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", nullptr, true);
+                                Talk(SAY_FALLEN_HEROES_STAKES, ObjectAccessor::GetPlayer(*me, playerGUID));
+                                Talk(EMOTE_FALLEN_HEROES_ARRIVE);
                                 break;
                             case QUEST_BFV_DARK_MASTER:
-                                me->TextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", nullptr, true);
+                                Talk(EMOTE_DARK_MASTER_ARRIVE);
                                 break;
                             case QUEST_BFV_CARNAGE:
-                                me->TextEmote("Lumbering in from the south, the smell of Carnage precedes him!", nullptr, true);
+                                Talk(EMOTE_CARNAGE_ARRIVE);
                                 break;
                             case QUEST_BFV_THANE:
-                                me->TextEmote("Thane Banahogg appears upon the overlook to the southeast!", nullptr, true);
+                                Talk(EMOTE_THANE_ARRIVE);
                                 break;
                             case QUEST_BFV_FINAL:
-                                me->Yell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL);
-                                me->TextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", nullptr, true);
+                                Talk(SAY_FINAL_OPPONENT);
+                                Talk(EMOTE_FINAL_ARRIVE);
                                 break;
                         }
 
@@ -255,14 +289,14 @@ public:
                 case EVENT_VALHALAS_THIRD:
                     {
                         if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                            me->Yell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, player);
+                            Talk(SAY_FINAL_CHAMPION_1, player);
                         events.ScheduleEvent(EVENT_VALHALAS_THIRD_2, 7s);
                         break;
                     }
                 case EVENT_VALHALAS_THIRD_2:
                     {
                         if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                            me->Yell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, player);
+                            Talk(SAY_FINAL_CHAMPION_2, player);
                         EndBattle();
                         break;
                     }
@@ -287,22 +321,22 @@ public:
                             switch (currentQuest)
                             {
                                 case QUEST_BFV_FALLEN_HEROES:
-                                    me->Yell("$N has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.", LANG_UNIVERSAL, player);
+                                    Talk(SAY_FALLEN_HEROES_VICTORY, player);
                                     break;
                                 case QUEST_BFV_DARK_MASTER:
-                                    me->Yell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, player);
+                                    Talk(SAY_DARK_MASTER_VICTORY, player);
                                     break;
                                 case QUEST_BFV_SIGRID:
-                                    me->Yell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, player);
+                                    Talk(SAY_SIGRID_VICTORY, player);
                                     break;
                                 case QUEST_BFV_CARNAGE:
-                                    me->Yell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, player);
+                                    Talk(SAY_CARNAGE_VICTORY, player);
                                     break;
                                 case QUEST_BFV_THANE:
-                                    me->Yell("Thane Banahogg the Deathblow has fallen to $N and his fighting companions. He has but one challenge ahead of him. Who will it be?", LANG_UNIVERSAL, player);
+                                    Talk(SAY_THANE_VICTORY, player);
                                     break;
                                 case QUEST_BFV_FINAL:
-                                    me->Yell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, player);
+                                    Talk(SAY_FINAL_VICTORY, player);
                                     break;
                             }
 
@@ -331,22 +365,22 @@ public:
         switch (quest->GetQuestId())
         {
             case QUEST_BFV_FALLEN_HEROES:
-                creature->Say("Valhalas is yours to win or die in, $N. But whatever you do, stay within the bounds of the arena. To flee is to lose and be dishonored.", LANG_UNIVERSAL, player);
+                creature->AI()->Talk(SAY_FALLEN_HEROES_ACCEPT, player);
                 break;
             case QUEST_BFV_DARK_MASTER:
-                creature->Say("Prepare yourself. Khit'rix will be entering Valhalas from the southeast. Remember, do not leave the ring or you will lose the battle.", LANG_UNIVERSAL, player);
+                creature->AI()->Talk(SAY_DARK_MASTER_ACCEPT, player);
                 break;
             case QUEST_BFV_SIGRID:
-                creature->Yell("Sigrid Iceborn has returned to the heights of Jotunheim to prove herself against $N. When last they met, $N bester her in personal combat. Let us see the outcome of this match.", LANG_UNIVERSAL, player);
+                creature->AI()->Talk(SAY_SIGRID_ACCEPT, player);
                 break;
             case QUEST_BFV_CARNAGE:
-                creature->Say("Carnage is coming! Remember, no matter what you do, do NOT leave the battle ring or I will disqualify you and your group.", LANG_UNIVERSAL);
+                creature->AI()->Talk(SAY_CARNAGE_ACCEPT);
                 break;
             case QUEST_BFV_THANE:
-                creature->Say("Look to the southeast and you will see the thane upon the platform near Gjonner the Merciless when he shows himself. Let him come down. Stay within the ring of Valhalas.", LANG_UNIVERSAL);
+                creature->AI()->Talk(SAY_THANE_ACCEPT);
                 break;
             case QUEST_BFV_FINAL:
-                creature->Say("It's too late to run now. Do not leave the ring. Die bravely, $N!", LANG_UNIVERSAL);
+                creature->AI()->Talk(SAY_FINAL_ACCEPT, player);
                 break;
         }
 

@@ -36,7 +36,10 @@ enum FreyaSpells
     // FREYA
     SPELL_TOUCH_OF_EONAR                        = 62528,
     SPELL_ATTUNED_TO_NATURE                     = 62519,
-    SPELL_SUMMON_LIFEBINDER                     = 62870,
+    SPELL_ATTUNED_TO_NATURE_2_DOSE              = 62524,
+    SPELL_ATTUNED_TO_NATURE_10_DOSE             = 62525,
+    SPELL_ATTUNED_TO_NATURE_25_DOSE             = 62521,
+    SPELL_LIFEBINDER_TRIGGER_MISSILE            = 62572, // summons Eonar's Gift at the missile impact point
     SPELL_SUMMON_WAVE_1                         = 62685, // Summon Ancient Conservator
     SPELL_SUMMON_WAVE_3                         = 62686, // Summon Trio (Water Spirit, Storm Lasher, Snaplasher)
     SPELL_SUMMON_WAVE_10                        = 62687, // Summon Detonating Lashers
@@ -61,16 +64,21 @@ enum FreyaSpells
 
     // ELDERS
     SPELL_DRAINED_OF_POWER                      = 62467,
-    SPELL_STONEBARK_ESSENCE                     = 62483,
-    SPELL_IRONBRANCH_ESSENCE                    = 62484,
-    SPELL_BRIGHTLEAF_ESSENCE                    = 62485,
+    SPELL_STONEBARK_ESSENCE_CHANNEL             = 62483,
+    SPELL_IRONBRANCH_ESSENCE_CHANNEL            = 62484,
+    SPELL_BRIGHTLEAF_ESSENCE_CHANNEL            = 62485,
+    SPELL_STONEBARK_ESSENCE                     = 62386,
+    SPELL_FULL_HEAL                             = 43978,
+    SPELL_GREEN_BANISH_STATE_LARGE              = 62720, // Stonebark
+    SPELL_WHITE_BANISH_STATE_LARGE              = 62718, // Ironbranch
+    SPELL_PURPLE_BANISH_STATE                   = 61014, // Brightleaf
 
     // BRIGHTLEAF
     SPELL_BRIGHTLEAF_FLUX                       = 62239,
     SPELL_SOLAR_FLARE                           = 62240,
-    SPELL_UNSTABLE_SUN_BEAM_AURA                = 62211,
-    SPELL_PHOTOSYNTHESIS                        = 62209,
-    SPELL_UNSTABLE_SUN_DAMAGE                   = 62217,
+    // summons one beam at the caster and force-casts 62221 on the players picked by
+    // spell_freya_brightleaf_unstable_sun_beam, each summoning another beam at their own feet
+    SPELL_UNSTABLE_SUN_BEAM_SUMMON              = 62207,
 
     // IRONBRANCH
     SPELL_IMPALE                                = 62310,
@@ -123,7 +131,7 @@ enum FreyaEvents
     EVENT_FREYA_GROUND_TREMOR                   = 6,
     EVENT_FREYA_IRON_ROOT                       = 7,
     EVENT_FREYA_UNSTABLE_SUN_BEAM               = 8,
-    EVENT_FREYA_RESPAWN_TRIO                    = 9,
+    EVENT_FREYA_TRIO_WAVE_END                   = 9,
 
     // STONEBARK
     EVENT_STONEBARK_FISTS_OF_STONE              = 10,
@@ -134,7 +142,6 @@ enum FreyaEvents
     EVENT_BRIGHTLEAF_FLUX                       = 20,
     EVENT_BRIGHTLEAF_SOLAR_FLARE                = 21,
     EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM          = 22,
-    EVENT_BRIGHTLEAF_DESPAWN_SUN_BEAM           = 23,
 
     // IRONBRANCH
     EVENT_IRONBRANCH_IMPALE                     = 30,
@@ -171,6 +178,10 @@ enum Texts
     EMOTE_ALLIES_OF_NATURE                       = 9,
     EMOTE_GROUND_TREMOR                          = 10,
     EMOTE_IRON_ROOTS                             = 11,
+
+    // Snaplasher / Storm Lasher / Ancient Water Spirit
+    EMOTE_TRIO_WITHERS                           = 0,
+    EMOTE_TRIO_REGENERATES                       = 1,
 };
 
 enum FreyaNPCs
@@ -179,7 +190,6 @@ enum FreyaNPCs
     NPC_CHANNEL_STALKER_FREYA                   = 33575,
     NPC_IRON_ROOT_TRIGGER                       = 33088,
     NPC_FREYA_UNSTABLE_SUN_BEAM                 = 33170,
-    NPC_UNSTABLE_SUN_BRIGHTLEAF                 = 33050, // 10 SECS?
 
     // FIRST WAVE
     NPC_STORM_LASHER                            = 32919,
@@ -199,14 +209,21 @@ enum Misc
     ACTION_REMOVE_10_STACK                      = 10,
     ACTION_REMOVE_25_STACK                      = 25,
     ACTION_REMOVE_2_STACK                       = 2,
-    ACTION_RESPAWN_TRIO                         = 1,
+    ACTION_TRIO_MEMBER_DOWN                     = 1,
+    ACTION_ATTUNED_TO_NATURE_REMOVED            = 3,
+    ACTION_TRIO_MEMBER_DOWN_CURRENT             = 5,
+    ACTION_TRIO_MEMBER_REVIVED_CURRENT          = 6,
     ACTION_LUMBERJACKED                         = -1,
+    ACTION_ADD_DIED                             = -2,
+    ACTION_TRIO_MEMBER_REVIVED                  = -3,
 
     EVENT_PHASE_ADDS                            = 1,
     EVENT_PHASE_FINAL                           = 2,
 
     DATA_GET_ELDER_COUNT                        = 1,
     DATA_BACK_TO_NATURE                         = 2,
+    DATA_TRIO_DOWN                              = 3,
+    DATA_CURRENT_SET_ID                         = 7,
 
     CRITERIA_LUMBERJACKED                       = 21686,
 
@@ -230,19 +247,23 @@ struct boss_freya : public BossAI
             instance->SetBossState(BOSS_FREYA, DONE);
     }
 
-    uint8 _trioKilled;
+    uint8 _trioDown;
     uint8 _spawnedAmount;
     uint8 _setPermutation;
     uint8 _lumberjacked;
-    bool _respawningTrio;
     bool _backToNature;
     uint8 _deforestation;
+    uint8 _aliveAddsCount;
+    uint8 _currentSetId;
+    uint8 _currentTrioDown;
+    uint8 _trioWaveEndSetId;
 
     ObjectGuid _elderGUID[3];
 
     void Reset() override
     {
         _Reset();
+        me->SetCombatMovement(true);
 
         for (uint8 i = 0; i < 3; ++i)
         {
@@ -257,11 +278,14 @@ struct boss_freya : public BossAI
 
         _lumberjacked = 0;
         _spawnedAmount = 0;
-        _trioKilled = 0;
-        _setPermutation = urand(0, 5);
-        _respawningTrio = false;
+        _trioDown = 0;
+        _setPermutation = 0;
         _backToNature = true;
         _deforestation = 0;
+        _aliveAddsCount = 0;
+        _currentSetId = 0;
+        _currentTrioDown = 0;
+        _trioWaveEndSetId = 0;
     }
 
     void KilledUnit(Unit* victim) override
@@ -339,7 +363,12 @@ struct boss_freya : public BossAI
 
     void SpawnWave()
     {
+        ++_currentSetId;
+        _currentTrioDown = 0;
         Talk(EMOTE_ALLIES_OF_NATURE);
+
+        if (_spawnedAmount % 3 == 0)
+            _setPermutation = urand(0, 5);
 
         static constexpr uint8 permTable[6][3] = {
             {GROUP_TRIO, GROUP_CONSERVATOR, GROUP_LASHERS},
@@ -355,21 +384,34 @@ struct boss_freya : public BossAI
             case GROUP_TRIO:
                 Talk(SAY_SUMMON_TRIO);
                 DoCast(SPELL_SUMMON_WAVE_3);
+                _aliveAddsCount = 0;
+                _trioDown = 0;
                 break;
             case GROUP_CONSERVATOR:
                 Talk(SAY_SUMMON_CONSERVATOR);
                 DoCast(SPELL_SUMMON_WAVE_1);
+                _aliveAddsCount = 1;
                 break;
             case GROUP_LASHERS:
                 Talk(SAY_SUMMON_LASHERS);
                 for (uint8 i = 0; i < 10; ++i)
                     DoCast(SPELL_SUMMON_WAVE_10);
+
+                _aliveAddsCount = 10;
                 break;
         }
     }
 
     void DoAction(int32 param) override
     {
+        if (param == ACTION_ADD_DIED)
+        {
+            if (--_aliveAddsCount == 0)
+                events.RescheduleEvent(EVENT_FREYA_ADDS_SPAM, 5s, 0, EVENT_PHASE_ADDS);
+
+            return;
+        }
+
         if (param == ACTION_LUMBERJACKED)
         {
             ++_lumberjacked;
@@ -380,15 +422,38 @@ struct boss_freya : public BossAI
             return;
         }
 
-        if (param == ACTION_RESPAWN_TRIO)
+        if (param == ACTION_TRIO_MEMBER_DOWN)
         {
-            if (!_respawningTrio)
-            {
-                _respawningTrio = true;
-                events.ScheduleEvent(EVENT_FREYA_RESPAWN_TRIO, 10s);
-            }
+            // A full wipe must reset Deforestation even if the set is stale;
+            // only the wave acceleration is gated to the current set below.
+            if (++_trioDown >= 3)
+                events.RescheduleEvent(EVENT_FREYA_TRIO_WAVE_END, 11s);
+            return;
+        }
 
-            ++_trioKilled;
+        if (param == ACTION_TRIO_MEMBER_DOWN_CURRENT)
+        {
+            if (++_currentTrioDown >= 3)
+                _trioWaveEndSetId = _currentSetId;
+            return;
+        }
+
+        if (param == ACTION_TRIO_MEMBER_REVIVED)
+        {
+            --_trioDown;
+            return;
+        }
+
+        if (param == ACTION_TRIO_MEMBER_REVIVED_CURRENT)
+        {
+            --_currentTrioDown;
+            return;
+        }
+
+        if (param == ACTION_ATTUNED_TO_NATURE_REMOVED)
+        {
+            events.ScheduleEvent(EVENT_FREYA_NATURE_BOMB, 5s);
+            events.SetPhase(EVENT_PHASE_FINAL);
             return;
         }
 
@@ -401,22 +466,10 @@ struct boss_freya : public BossAI
             // do not return
         }
 
-        if (Aura* aur = me->GetAura(SPELL_ATTUNED_TO_NATURE))
-        {
-            // Back to Nature achievement
-            if (aur->GetStackAmount() - param < 25)
-                _backToNature = false;
-
-            if (aur->GetStackAmount() > param)
-                aur->SetStackAmount(aur->GetStackAmount() - param);
-            else // Aura out of stack
-            {
-                events.ScheduleEvent(EVENT_FREYA_NATURE_BOMB, 5s);
-                events.SetPhase(EVENT_PHASE_FINAL);
-                aur->Remove();
-                return;
-            }
-        }
+        // Back to Nature achievement - the dose reduction spell has already updated the aura
+        Aura* aur = me->GetAura(SPELL_ATTUNED_TO_NATURE);
+        if (!aur || aur->GetStackAmount() < 25)
+            _backToNature = false;
     }
 
     uint32 GetData(uint32 param) const override
@@ -432,6 +485,12 @@ struct boss_freya : public BossAI
         }
         if (param == DATA_BACK_TO_NATURE)
             return _backToNature;
+
+        if (param == DATA_TRIO_DOWN)
+            return _trioDown;
+
+        if (param == DATA_CURRENT_SET_ID)
+            return _currentSetId;
 
         return 0;
     }
@@ -459,10 +518,6 @@ struct boss_freya : public BossAI
         Creature* elder = instance->GetCreature(DATA_ELDER_STONEBARK);
         if (elder && elder->IsAlive())
         {
-            elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
-            elder->CastSpell(elder, SPELL_STONEBARK_ESSENCE, true);
-            elder->SetInCombatWithZone();
-
             events.ScheduleEvent(EVENT_FREYA_GROUND_TREMOR, 35s);
             _elderGUID[0] = elder->GetGUID();
         }
@@ -470,10 +525,6 @@ struct boss_freya : public BossAI
         elder = instance->GetCreature(DATA_ELDER_IRONBRANCH);
         if (elder && elder->IsAlive())
         {
-            elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
-            elder->CastSpell(elder, SPELL_IRONBRANCH_ESSENCE, true);
-            elder->SetInCombatWithZone();
-
             events.ScheduleEvent(EVENT_FREYA_IRON_ROOT, 20s);
             _elderGUID[1] = elder->GetGUID();
         }
@@ -481,10 +532,6 @@ struct boss_freya : public BossAI
         elder = instance->GetCreature(DATA_ELDER_BRIGHTLEAF);
         if (elder && elder->IsAlive())
         {
-            elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
-            elder->CastSpell(elder, SPELL_BRIGHTLEAF_ESSENCE, true);
-            elder->SetInCombatWithZone();
-
             events.ScheduleEvent(EVENT_FREYA_UNSTABLE_SUN_BEAM, 1min);
             _elderGUID[2] = elder->GetGUID();
         }
@@ -492,6 +539,52 @@ struct boss_freya : public BossAI
         if (_elderGUID[0] || _elderGUID[1] || _elderGUID[2])
         {
             Talk(SAY_AGGRO_WITH_ELDER);
+
+            static constexpr uint32 essenceChannel[3] = { SPELL_STONEBARK_ESSENCE_CHANNEL,
+                SPELL_IRONBRANCH_ESSENCE_CHANNEL, SPELL_BRIGHTLEAF_ESSENCE_CHANNEL };
+            static constexpr uint32 banishState[3] = { SPELL_GREEN_BANISH_STATE_LARGE,
+                SPELL_WHITE_BANISH_STATE_LARGE, SPELL_PURPLE_BANISH_STATE };
+
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                elder = ObjectAccessor::GetCreature(*me, _elderGUID[i]);
+                if (!elder)
+                    continue;
+
+                elder->CastSpell(elder, SPELL_FULL_HEAL, true);
+                elder->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                elder->SetReactState(REACT_PASSIVE);
+                elder->SetInCombatWithZone();
+                elder->CastSpell(me, essenceChannel[i], false);
+                if (essenceChannel[i] == SPELL_STONEBARK_ESSENCE_CHANNEL)
+                    elder->CastSpell(me, SPELL_STONEBARK_ESSENCE, true);
+                elder->CastSpell(elder, banishState[i], true);
+            }
+
+            // Freya stands still while the Elders channel their essences into her.
+            // The motion stop is deferred a tick because the engaging AttackStart
+            // issues its MoveChase after JustEngagedWith returns.
+            me->SetCombatMovement(false);
+            scheduler.Schedule(1ms, [this](TaskContext /*context*/)
+            {
+                // MoveIdle replaces the default waypoint generator (path 1365540),
+                // otherwise her conservatory patrol resumes once the chase is cleared
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                me->StopMoving();
+                if (Unit* victim = me->GetVictim())
+                    me->SetFacingToObject(victim);
+            });
+
+            scheduler.Schedule(5s, [this](TaskContext /*context*/)
+            {
+                me->SetCombatMovement(true);
+                me->ResumeChasingVictim();
+
+                for (ObjectGuid const& elderGuid : _elderGUID)
+                    if (Creature* drained = ObjectAccessor::GetCreature(*me, elderGuid))
+                        drained->CastSpell(drained, SPELL_DRAINED_OF_POWER, false);
+            });
         }
         else
         {
@@ -531,37 +624,24 @@ struct boss_freya : public BossAI
                 events.Repeat(1min);
                 break;
             case EVENT_FREYA_LIFEBINDER:
-                {
-                    Talk(EMOTE_LIFEBINDERS_GIFT);
-                    events.Repeat(45s);
-                    float x, y, z;
-                    for (uint8 i = 0; i < 10; ++i)
-                    {
-                        x = me->GetPositionX() + urand(7, 25);
-                        y = me->GetPositionY() + urand(7, 25);
-                        z = me->GetMapHeight(x, y, me->GetPositionZ());
-                        if (me->IsWithinLOS(x, y, z))
-                        {
-                            me->CastSpell(x, y, z, SPELL_SUMMON_LIFEBINDER, true);
-                            return;
-                        }
-                    }
-
-                    me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_SUMMON_LIFEBINDER, true);
-                    break;
-                }
+                Talk(EMOTE_LIFEBINDERS_GIFT);
+                DoCastSelf(SPELL_LIFEBINDER_TRIGGER_MISSILE);
+                events.Repeat(45s);
+                break;
             case EVENT_FREYA_SUNBEAM:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random))
                     me->CastSpell(target, SPELL_SUNBEAM, false);
                 events.Repeat(15s, 20s);
                 break;
-            case EVENT_FREYA_RESPAWN_TRIO:
+            case EVENT_FREYA_TRIO_WAVE_END:
+                // _trioDown stays set so a member resolving on this same tick
+                // still sees the trio as wiped and does not come back
                 _deforestation = 0;
-                _respawningTrio = false;
-                if (_trioKilled < 3)
-                    summons.DoAction(ACTION_RESPAWN_TRIO);
-
-                _trioKilled = 0;
+                // The 1-min fallback may have moved the set on during the 11s revive
+                // window; only the current set's trio wipe may accelerate the next wave
+                if (_trioWaveEndSetId != _currentSetId)
+                    break;
+                events.RescheduleEvent(EVENT_FREYA_ADDS_SPAM, 5s, 0, EVENT_PHASE_ADDS);
                 break;
             case EVENT_FREYA_NATURE_BOMB:
                 {
@@ -647,6 +727,8 @@ struct boss_freya_elder_stonebark : public ScriptedAI
     {
         events.Reset();
         _chargesCount = 0;
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
@@ -671,12 +753,15 @@ struct boss_freya_elder_stonebark : public ScriptedAI
 
     void JustEngagedWith(Unit*) override
     {
+        // Pulled into combat silently by Freya's hard mode activation
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            return;
+
         events.ScheduleEvent(EVENT_STONEBARK_FISTS_OF_STONE, 40s);
         events.ScheduleEvent(EVENT_STONEBARK_GROUND_TREMOR, 5s);
         events.ScheduleEvent(EVENT_STONEBARK_PETRIFIED_BARK, 20s);
 
-        if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
-            Talk(SAY_ELDER_AGGRO);
+        Talk(SAY_ELDER_AGGRO);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
@@ -721,17 +806,17 @@ struct boss_freya_elder_stonebark : public ScriptedAI
 
 struct boss_freya_elder_brightleaf : public ScriptedAI
 {
-    boss_freya_elder_brightleaf(Creature* pCreature) : ScriptedAI(pCreature), summons(pCreature)
+    boss_freya_elder_brightleaf(Creature* pCreature) : ScriptedAI(pCreature)
     {
     }
 
     EventMap events;
-    SummonList summons;
 
     void Reset() override
     {
         events.Reset();
-        summons.DespawnAll();
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
@@ -756,12 +841,15 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
 
     void JustEngagedWith(Unit*) override
     {
+        // Pulled into combat silently by Freya's hard mode activation
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            return;
+
         events.ScheduleEvent(EVENT_BRIGHTLEAF_FLUX, 10s);
         events.ScheduleEvent(EVENT_BRIGHTLEAF_SOLAR_FLARE, 5s);
-        events.ScheduleEvent(EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM, 8s);
+        events.ScheduleEvent(EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM, 6s);
 
-        if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
-            Talk(SAY_ELDER_AGGRO);
+        Talk(SAY_ELDER_AGGRO);
     }
 
     void UpdateAI(uint32 diff) override
@@ -789,31 +877,8 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
                 events.Repeat(15s);
                 break;
             case EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM:
-                events.ScheduleEvent(EVENT_BRIGHTLEAF_DESPAWN_SUN_BEAM, 15s);
-                if (Creature* beam = me->SummonCreature(NPC_UNSTABLE_SUN_BRIGHTLEAF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
-                {
-                    beam->CastSpell(beam, SPELL_UNSTABLE_SUN_BEAM_AURA, true);
-                    beam->CastSpell(beam, SPELL_PHOTOSYNTHESIS, true);
-                    summons.Summon(beam);
-                }
-                if (Creature* beam = me->SummonCreature(NPC_UNSTABLE_SUN_BRIGHTLEAF, me->GetPositionX() + 8, me->GetPositionY() + 8, me->GetPositionZ()))
-                {
-                    beam->CastSpell(beam, SPELL_UNSTABLE_SUN_BEAM_AURA, true);
-                    beam->CastSpell(beam, SPELL_PHOTOSYNTHESIS, true);
-                    summons.Summon(beam);
-                }
-                events.Repeat(20s);
-                break;
-            case EVENT_BRIGHTLEAF_DESPAWN_SUN_BEAM:
-                for (SummonList::iterator i = summons.begin(); i != summons.end();)
-                {
-                    Creature* summon = ObjectAccessor::GetCreature(*me, *i);
-                    ++i;
-                    if (summon)
-                        summon->CastSpell(summon, SPELL_UNSTABLE_SUN_DAMAGE, false);
-                }
-
-                summons.DespawnAll();
+                DoCastAOE(SPELL_UNSTABLE_SUN_BEAM_SUMMON, true);
+                events.Repeat(22s, 26s);
                 break;
         }
 
@@ -832,6 +897,8 @@ struct boss_freya_elder_ironbranch : public ScriptedAI
     void Reset() override
     {
         events.Reset();
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetReactState(REACT_AGGRESSIVE);
     }
 
     void KilledUnit(Unit*) override
@@ -856,12 +923,15 @@ struct boss_freya_elder_ironbranch : public ScriptedAI
 
     void JustEngagedWith(Unit*) override
     {
+        // Pulled into combat silently by Freya's hard mode activation
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            return;
+
         events.ScheduleEvent(EVENT_IRONBRANCH_IMPALE, 10s);
         events.ScheduleEvent(EVENT_IRONBRANCH_IRON_ROOT, 15s);
         events.ScheduleEvent(EVENT_IRONBRANCH_THORN_SWARM, 3s);
 
-        if (!me->HasAura(SPELL_DRAINED_OF_POWER)) // Prevents speech if combat is initiated by hardmode activation
-            Talk(SAY_ELDER_AGGRO);
+        Talk(SAY_ELDER_AGGRO);
     }
 
     void UpdateAI(uint32 diff) override
@@ -900,6 +970,19 @@ struct boss_freya_iron_root : public NullCreatureAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        ReleaseRootedPlayer();
+    }
+
+    // The root aura is infinite and self-cast by the victim, so nothing engine-side
+    // removes it; a root despawned without being killed must free its victim too
+    void OnDespawn() override
+    {
+        ReleaseRootedPlayer();
+    }
+
+private:
+    void ReleaseRootedPlayer()
+    {
         if (!me->IsSummon())
             return;
 
@@ -919,27 +1002,28 @@ struct boss_freya_lifebinder : public NullCreatureAI
     {
     }
 
-    uint32 _healTimer;
-
     void Reset() override
     {
-        me->CastSpell(me, SPELL_LIFEBINDER_VISUAL, true);
-        me->CastSpell(me, SPELL_LIFEBINDER_PHERONOMES, true);
-        me->CastSpell(me, SPELL_AUTO_GROW, true);
-        _healTimer = 0;
+        me->CastSpell(me, SPELL_LIFEBINDER_VISUAL, false);
+        me->CastSpell(me, SPELL_AUTO_GROW, false);
+        me->CastSpell(me, SPELL_LIFEBINDER_PHERONOMES, false);
+
+        _scheduler.CancelAll();
+        _scheduler.Schedule(12s, [this](TaskContext /*context*/)
+        {
+            me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
+            me->CastSpell(me, SPELL_LIFEBINDER_HEAL, false);
+            me->DespawnOrUnsummon(2500ms);
+        });
     }
 
     void UpdateAI(uint32 diff) override
     {
-        _healTimer += diff;
-        if (_healTimer >= 12000)
-        {
-            me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
-            me->CastSpell(me, SPELL_LIFEBINDER_HEAL, true);
-            me->DespawnOrUnsummon(2s);
-            _healTimer = 0;
-        }
+        _scheduler.Update(diff);
     }
+
+private:
+    TaskScheduler _scheduler;
 };
 
 struct boss_freya_healthy_spore : public NullCreatureAI
@@ -976,16 +1060,25 @@ struct boss_freya_summons : public ScriptedAI
     {
         _isTrio = me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT || me->GetEntry() == NPC_STORM_LASHER || me->GetEntry() == NPC_SNAPLASHER;
         _hasDied = false;
+        _setId = 0;
     }
 
     EventMap events;
-    uint8 _stackCount;
     bool _hasDied;
     bool _isTrio;
+    uint8 _setId;
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (Creature* freya = summoner->ToCreature())
+        {
+            if (freya->GetEntry() == NPC_FREYA)
+                _setId = freya->AI()->GetData(DATA_CURRENT_SET_ID);
+        }
+    }
 
     void Reset() override
     {
-        _stackCount = 0;
         events.Reset();
 
         // Detonating Lashers spawn submerged in the ground and stay passive for a
@@ -1020,27 +1113,77 @@ struct boss_freya_summons : public ScriptedAI
         {
             if (Creature* freya = instance->GetCreature(BOSS_FREYA))
             {
+                bool const isCurrentSet = _setId == freya->AI()->GetData(DATA_CURRENT_SET_ID);
+
                 if (!_hasDied)
-                    freya->AI()->DoAction(_stackCount);
+                {
+                    uint32 doseSpell = 0;
+                    int32 stackAction = 0;
+                    switch (me->GetEntry())
+                    {
+                        case NPC_ANCIENT_CONSERVATOR:
+                            doseSpell = SPELL_ATTUNED_TO_NATURE_25_DOSE;
+                            stackAction = ACTION_REMOVE_25_STACK;
+                            break;
+                        case NPC_ANCIENT_WATER_SPIRIT:
+                        case NPC_STORM_LASHER:
+                        case NPC_SNAPLASHER:
+                            doseSpell = SPELL_ATTUNED_TO_NATURE_10_DOSE;
+                            stackAction = ACTION_REMOVE_10_STACK;
+                            break;
+                        case NPC_DETONATING_LASHER:
+                            doseSpell = SPELL_ATTUNED_TO_NATURE_2_DOSE;
+                            stackAction = ACTION_REMOVE_2_STACK;
+                            break;
+                    }
+
+                    me->CastSpell(freya, doseSpell, true);
+                    freya->AI()->DoAction(stackAction);
+                }
 
                 if (_isTrio)
                 {
-                    freya->AI()->DoAction(ACTION_RESPAWN_TRIO);
+                    freya->AI()->DoAction(ACTION_TRIO_MEMBER_DOWN);
+                    if (isCurrentSet)
+                        freya->AI()->DoAction(ACTION_TRIO_MEMBER_DOWN_CURRENT);
                     _hasDied = true;
+                    Talk(EMOTE_TRIO_WITHERS);
+
+                    // The corpse keeps ticking its events, so each member counts
+                    // down its own revive window instead of sharing one with Freya
+                    me->m_Events.AddEventAtOffset([this]()
+                    {
+                        ReviveWithAllies();
+                    }, 11s);
                 }
+                else if (isCurrentSet)
+                    freya->AI()->DoAction(ACTION_ADD_DIED);
             }
         }
         if (me->GetEntry() == NPC_DETONATING_LASHER)
             me->CastSpell(me, SPELL_DETONATE, true);
     }
 
-    void DoAction(int32 param) override
+    void ReviveWithAllies()
     {
-        if (_isTrio && param == ACTION_RESPAWN_TRIO)
-        {
-            me->setDeathState(DeathState::JustRespawned);
-            Reset();
-        }
+        InstanceScript* instance = me->GetInstanceScript();
+        if (!instance)
+            return;
+
+        Creature* freya = instance->GetCreature(BOSS_FREYA);
+        if (!freya)
+            return;
+
+        // A member only comes back while at least one of its allies is still up
+        if (freya->AI()->GetData(DATA_TRIO_DOWN) >= 3)
+            return;
+
+        Talk(EMOTE_TRIO_REGENERATES);
+        me->setDeathState(DeathState::JustRespawned);
+        Reset();
+        freya->AI()->DoAction(ACTION_TRIO_MEMBER_REVIVED);
+        if (_setId == freya->AI()->GetData(DATA_CURRENT_SET_ID))
+            freya->AI()->DoAction(ACTION_TRIO_MEMBER_REVIVED_CURRENT);
     }
 
     void JustEngagedWith(Unit*) override
@@ -1050,29 +1193,18 @@ struct boss_freya_summons : public ScriptedAI
             me->CastSpell(me, SPELL_HEALTHY_SPORE_SUMMON, true);
             events.ScheduleEvent(EVENT_ANCIENT_CONSERVATOR_GRIP, 6s);
             events.ScheduleEvent(EVENT_ANCIENT_CONSERVATOR_NATURE_FURY, 14s);
-            _stackCount = ACTION_REMOVE_25_STACK;
         }
         else if (me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT)
-        {
             events.ScheduleEvent(EVENT_WATER_SPIRIT_CHARGE, 12s);
-            _stackCount = ACTION_REMOVE_10_STACK;
-        }
         else if (me->GetEntry() == NPC_STORM_LASHER)
         {
             events.ScheduleEvent(EVENT_STORM_LASHER_LIGHTNING_LASH, 10s);
             events.ScheduleEvent(EVENT_STORM_LASHER_STORMBOLT, 6s);
-            _stackCount = ACTION_REMOVE_10_STACK;
         }
         else if (me->GetEntry() == NPC_DETONATING_LASHER)
-        {
             events.ScheduleEvent(EVENT_DETONATING_LASHER_FLAME_LASH, 10s);
-            _stackCount = ACTION_REMOVE_2_STACK;
-        }
         else if (me->GetEntry() == NPC_SNAPLASHER)
-        {
             me->CastSpell(me, SPELL_HARDENED_BARK, true);
-            _stackCount = ACTION_REMOVE_10_STACK;
-        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -1117,7 +1249,14 @@ struct boss_freya_summons : public ScriptedAI
                 if (Unit* target = SelectTargetFromPlayerList(80))
                     AttackStart(target);
                 else
+                {
+                    // Despawning still counts the add as cleared so the set's wave can accelerate
+                    if (InstanceScript* instance = me->GetInstanceScript())
+                        if (Creature* freya = instance->GetCreature(BOSS_FREYA))
+                            if (_setId == freya->AI()->GetData(DATA_CURRENT_SET_ID))
+                                freya->AI()->DoAction(ACTION_ADD_DIED);
                     me->DespawnOrUnsummon(1ms);
+                }
                 events.Repeat(10s);
                 break;
         }
@@ -1198,6 +1337,71 @@ private:
     uint32 const _elderCount;
 };
 
+// 62521 - Attuned to Nature 25 Dose Reduction
+// 62524 - Attuned to Nature 2 Dose Reduction
+// 62525 - Attuned to Nature 10 Dose Reduction
+class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
+{
+    PrepareSpellScript(spell_freya_attuned_to_nature_dose_reduction);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        // The aura to reduce (Attuned to Nature) is stored in the effect value
+        uint32 auraId = GetEffectValue();
+        Aura* aura = target->GetAura(auraId);
+        if (!aura)
+            return;
+
+        int32 doses = 0;
+        switch (GetSpellInfo()->Id)
+        {
+            case SPELL_ATTUNED_TO_NATURE_2_DOSE:
+                doses = 2;
+                break;
+            case SPELL_ATTUNED_TO_NATURE_10_DOSE:
+                doses = 10;
+                break;
+            case SPELL_ATTUNED_TO_NATURE_25_DOSE:
+                doses = 25;
+                break;
+        }
+
+        aura->ModStackAmount(-doses);
+
+        if (!target->HasAura(auraId))
+        {
+            Creature* freya = target->ToCreature();
+            if (freya && freya->IsAIEnabled)
+                freya->AI()->DoAction(ACTION_ATTUNED_TO_NATURE_REMOVED);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_freya_attuned_to_nature_dose_reduction::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 62207 - Unstable Sun Beam
+class spell_freya_brightleaf_unstable_sun_beam : public SpellScript
+{
+    PrepareSpellScript(spell_freya_brightleaf_unstable_sun_beam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_freya_brightleaf_unstable_sun_beam::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 // 62450 - Unstable Sun Beam
 class spell_freya_unstable_sun_beam : public SpellScript
 {
@@ -1227,6 +1431,8 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_summons);
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
 
+    RegisterSpellScript(spell_freya_attuned_to_nature_dose_reduction);
+    RegisterSpellScript(spell_freya_brightleaf_unstable_sun_beam);
     RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();

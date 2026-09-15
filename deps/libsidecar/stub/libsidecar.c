@@ -7,6 +7,32 @@ void panicWithTC9Unavailable(const char* message) {
     exit(EXIT_FAILURE);
 }
 
+// Version APIs work without a real libsidecar so callers can always query
+// the header version this tree was built against.
+void TC9GetVersion(int* major, int* minor, int* patch)
+{
+    if (major)
+        *major = TC9_VERSION_MAJOR;
+    if (minor)
+        *minor = TC9_VERSION_MINOR;
+    if (patch)
+        *patch = TC9_VERSION_PATCH;
+}
+
+const char* TC9GetVersionString(void)
+{
+    return TC9_VERSION_STRING;
+}
+
+int TC9CheckAbiCompatible(int required_major, int required_minor)
+{
+    if (TC9_VERSION_MAJOR != required_major)
+        return 1;
+    if (TC9_VERSION_MINOR < required_minor)
+        return 2;
+    return 0;
+}
+
 // TC9SetBattlegroundStartHandler sets handler for starting battleground.
 //
 extern void TC9SetBattlegroundStartHandler(BattlegroundStartHandler h) { panicWithTC9Unavailable("TC9SetBattlegroundStartHandler"); }
