@@ -383,19 +383,18 @@ void GameEventMgr::LoadEvents()
             {
                 LOG_ERROR("sql.sql", "`game_event` game event id ({}) have not existed holiday id {}.", eventId, pGameEvent.HolidayId);
                 pGameEvent.HolidayId = HOLIDAY_NONE;
+                continue;
             }
-            else
-            {
-                if (pGameEvent.HolidayStage > MAX_HOLIDAY_DURATIONS)
-                {
-                    LOG_ERROR("sql.sql", "`game_event` game event id ({}) has out of range holidayStage {}.", eventId, pGameEvent.HolidayStage);
-                    pGameEvent.HolidayStage = 0;
-                }
 
-                uint8& mainStage = _holidayMainStages[pGameEvent.HolidayId];
-                if (pGameEvent.HolidayStage > mainStage)
-                    mainStage = pGameEvent.HolidayStage;
+            if (pGameEvent.HolidayStage > MAX_HOLIDAY_DURATIONS)
+            {
+                LOG_ERROR("sql.sql", "`game_event` game event id ({}) has out of range holidayStage {}.", eventId, pGameEvent.HolidayStage);
+                pGameEvent.HolidayStage = 0;
             }
+
+            uint8& mainStage = _holidayMainStages[pGameEvent.HolidayId];
+            if (pGameEvent.HolidayStage > mainStage)
+                mainStage = pGameEvent.HolidayStage;
 
             SetHolidayEventTime(pGameEvent);
         }
