@@ -363,8 +363,9 @@ class CharacterCreateInfo
     friend class Player;
 
 public:
-    CharacterCreateInfo(std::string name = "", uint8 race = 0, uint8 playerClass = 0, uint8 gender = 0, uint8 skin = 0,
-        uint8 face = 0, uint8 hairStyle = 0, uint8 hairColor = 0, uint8 facialHair = 0)
+    explicit CharacterCreateInfo(std::string name = "", uint8 race = 0, uint8 playerClass = 0,
+        uint8 gender = GENDER_NONE, uint8 skin = 0, uint8 face = 0, uint8 hairStyle = 0, uint8 hairColor = 0,
+        uint8 facialHair = 0)
         : Name(std::move(name)), Race(race), Class(playerClass), Gender(gender), Skin(skin), Face(face),
         HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair) { }
 
@@ -430,7 +431,7 @@ class WorldSession
 public:
     WorldSession(uint32 id, std::string&& name, uint32 accountFlags, std::shared_ptr<WorldSocket> sock,
         AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter,
-        bool skipQueue, uint32 TotalTime, bool isBot = false);
+        bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
     uint32 GetAccountFlags() const { return _accountFlags; }
@@ -1226,9 +1227,9 @@ public:                                                 // opcodes handlers
 
     void SetPacketLogging(bool state);
 
-    LockedQueue<WorldPacket*>& GetPacketQueue();
+    std::unique_ptr<WorldPacket> NextQueuedPacket();
 
-    [[nodiscard]] bool IsBot() const { return _isBot; }
+    [[nodiscard]] bool IsHeadless() const { return _headless; }
 
 private:
     void ProcessQueryCallbacks();
@@ -1346,7 +1347,7 @@ private:
 
     uint32 _orderCounter;
 
-    bool _isBot;
+    bool const _headless;
 
     WorldSession(WorldSession const& right) = delete;
     WorldSession& operator=(WorldSession const& right) = delete;
