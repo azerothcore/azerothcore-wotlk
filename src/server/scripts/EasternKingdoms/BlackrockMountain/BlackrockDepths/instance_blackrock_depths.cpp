@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "SmartAI.h"
 #include "blackrock_depths.h"
 
 constexpr auto MAX_ENCOUNTER = 6;
@@ -33,7 +35,22 @@ enum Timers
 enum Distances
 {
     RADIUS_RING_OF_LAW      = 80,
-    DISTANCE_EMPEROR_ROOM   = 125
+    DISTANCE_EMPEROR_ROOM   = 125,
+    DISTANCE_DARK_IRON_ALE  = 20
+};
+
+enum DarkIronAle
+{
+    GO_DARK_IRON_ALE_MUG       = 165578,
+    NPC_GRIM_PATRON            = 9545,
+    NPC_GUZZLING_PATRON        = 9547,
+    NPC_HAMMERED_PATRON        = 9554,
+    DATA_DARK_IRON_ALE         = 1,
+    DATA_DARK_IRON_ALE_DRINK   = 4,
+    DATA_DARK_IRON_ALE_HOME    = 100,
+    DATA_DARK_IRON_ALE_REFORM  = 101,
+    DATA_DARK_IRON_ALE_DISBAND = 102,
+    DATA_DARK_IRON_ALE_EMOTE   = 103
 };
 
 enum PrincessQuests
@@ -311,6 +328,34 @@ struct instance_blackrock_depths : public InstanceScript
     {
         switch (go->GetEntry())
         {
+            case GO_DARK_IRON_ALE_MUG:
+            {
+                std::list<Creature*> patrons;
+                go->GetCreatureListWithEntryInGrid(patrons,
+                    { NPC_GRIM_PATRON, NPC_GUZZLING_PATRON, NPC_HAMMERED_PATRON }, DISTANCE_DARK_IRON_ALE);
+
+                Creature* closestPatron = nullptr;
+                SmartAI* closestPatronAI = nullptr;
+                float closestDistance = DISTANCE_DARK_IRON_ALE;
+                for (Creature* patron : patrons)
+                {
+                    SmartAI* patronAI = CAST_AI(SmartAI, patron->AI());
+                    float const distance = go->GetDistance(patron);
+                    if (!patronAI || !patron->IsAlive() || patron->IsInCombat() || patronAI->GetData(DATA_DARK_IRON_ALE) == DATA_DARK_IRON_ALE_DRINK || distance >= closestDistance)
+                        continue;
+
+                    closestPatron = patron;
+                    closestPatronAI = patronAI;
+                    closestDistance = distance;
+                }
+
+                if (closestPatronAI)
+                {
+                    closestPatron->SetEmoteState(EMOTE_STATE_NONE);
+                    closestPatronAI->SetData(DATA_DARK_IRON_ALE, DATA_DARK_IRON_ALE_DRINK, go);
+                }
+                break;
+            }
             case GO_ARENA1:
                 GoArena1GUID = go->GetGUID();
                 break;
@@ -630,6 +675,49 @@ struct instance_blackrock_depths : public InstanceScript
                 return arenaBossToSpawn;
         }
         return 0;
+    }
+
+    void SetGuidData(uint32 data, ObjectGuid guid) override
+    {
+        if (data != DATA_DARK_IRON_ALE_HOME && data != DATA_DARK_IRON_ALE_REFORM &&
+            data != DATA_DARK_IRON_ALE_DISBAND && data != DATA_DARK_IRON_ALE_EMOTE)
+            return;
+
+        if (Creature* patron = instance->GetCreature(guid))
+        {
+            if (data == DATA_DARK_IRON_ALE_EMOTE)
+            {
+                if (CreatureAddon const* addon = patron->GetCreatureAddon())
+                    patron->SetEmoteState(static_cast<Emote>(addon->emote));
+
+                return;
+            }
+
+            if (data == DATA_DARK_IRON_ALE_DISBAND)
+            {
+                if (CreatureGroup* formation = patron->GetFormation())
+                    sFormationMgr->RemoveCreatureFromGroup(formation, patron);
+
+                return;
+            }
+
+            if (data == DATA_DARK_IRON_ALE_REFORM)
+            {
+                if (!patron->GetFormation())
+                    patron->SearchFormation();
+
+                return;
+            }
+
+            if (patron->IsAlive() && !patron->IsInCombat())
+            {
+                if (!patron->GetFormation())
+                    patron->SearchFormation();
+
+                patron->RestoreFaction();
+                patron->GetMotionMaster()->MoveTargetedHome(true);
+            }
+        }
     }
 
     ObjectGuid GetGuidData(uint32 data) const override
