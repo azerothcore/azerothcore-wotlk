@@ -22,6 +22,7 @@
 #include "Player.h"
 #include "WorldStateDefines.h"
 #include <atomic>
+#include <mutex>
 
 enum WorldStateCondition
 {
@@ -310,6 +311,11 @@ class WorldState
     private:
         typedef std::map<uint32, uint64> WorldStatesMap;
         WorldStatesMap _worldstates;
+        // Guards every _worldstates access. Map threads read and write world states concurrently
+        // (an instance script latching a value while another map's script or a condition reads it),
+        // and std::map gives no thread safety: an insert rebalances the tree under a concurrent
+        // find(). Kept separate from _mutex below so it never interacts with that lock's call graph.
+        mutable std::mutex _worldstatesMutex;
         void SendWorldstateUpdate(std::mutex& mutex, GuidVector const& guids, uint32 value, uint32 worldStateId);
         void StopSunsReachPhase(bool forward);
         void StartSunsReachPhase(bool initial = false);
