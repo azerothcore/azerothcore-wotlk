@@ -354,3 +354,11 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- Keep sniff-derived patrol nodes in one continuous spline to avoid visible stops between samples.
 UPDATE `waypoint_data` SET `smoothTransition` = 1 WHERE `id` IN (4591700, 4592400, 4782500, 4783200, 9068800, 9085500, 9103200, 9108400, 9109900);
+
+UPDATE `creature` SET `VerifiedBuild` = 69110 WHERE `id` = 8895 AND `guid` IN (45852, 47786);
+UPDATE `creature` SET `VerifiedBuild` = 69110 WHERE `id` = 8893 AND `guid` IN (45853, 45854, 45855, 47787, 47788);
+UPDATE `creature` SET `VerifiedBuild` = 69110 WHERE `id` = 8894 AND `guid` IN (45856, 47789, 47790);
+UPDATE `creature` SET `VerifiedBuild` = 69110 WHERE `id` = 8890 AND `guid` IN (47825, 91084, 91099);
+UPDATE `creature` SET `VerifiedBuild` = 69110 WHERE `id` = 8921
+AND `guid` IN (45915, 45916, 45917, 45924, 45925, 45926, 47826, 47827, 47830, 47831, 47832, 90686,
+              90687, 90688, 90855, 90856, 90857, 91032, 91033, 91034, 91085, 91086, 91100, 91101);
