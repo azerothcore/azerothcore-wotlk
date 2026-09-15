@@ -415,7 +415,10 @@ void LoadDBCStores(std::string const& dataPath)
     }
 
     for (EmotesTextSoundEntry const* emoteTextSound : sEmotesTextSoundStore)
-        sEmotesTextSoundMap[EmotesTextSoundKey(emoteTextSound->EmotesTextId, emoteTextSound->RaceId, emoteTextSound->SexId)] = emoteTextSound;
+    {
+        EmotesTextSoundKey key(emoteTextSound->EmotesTextId, emoteTextSound->RaceId, emoteTextSound->SexId);
+        sEmotesTextSoundMap[key] = emoteTextSound;
+    }
 
     // fill data
     for (MapDifficultyEntry const* entry : sMapDifficultyStore)
