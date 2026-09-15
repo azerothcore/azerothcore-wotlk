@@ -166,7 +166,7 @@ protected:
         info->EquippedItemSubClassMask = 1 << subclass;
         info->Attributes = SPELL_ATTR0_USES_RANGED_SLOT | SPELL_ATTR0_IS_ABILITY;
         info->AttributesCu = SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_DIRECT_DAMAGE;
-        info->AttributesEx2 = repeat ? SPELL_ATTR2_AUTO_REPEAT : 0;
+        info->AttributesEx2 = repeat ? uint32(SPELL_ATTR2_AUTO_REPEAT) : 0u;
         info->AttributesEx3 = SPELL_ATTR3_NORMAL_RANGED_ATTACK;
         info->Effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
         info->ExplicitTargetMask = TARGET_FLAG_UNIT;

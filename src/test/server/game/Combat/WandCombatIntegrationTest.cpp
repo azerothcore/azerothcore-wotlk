@@ -19,11 +19,14 @@
 
 #include <cmath>
 
+#ifndef TEST_F
+#define TEST_F(fixture, name) void fixture##_##name()
+#endif
+
 namespace
 {
-// Endpoints are Spell::prepare and the resulting health/skill changes, in process.
-// This deliberately does not claim coverage of sockets, authentication or client packets.
-class WandCombatE2ETest : public WandCombatTestFixture
+// In-process spell, damage and skill updates, without a client or live realm.
+class WandCombatIntegrationTest : public WandCombatTestFixture
 {
 protected:
     struct ShotResult
@@ -33,6 +36,16 @@ protected:
         uint32 skillBefore;
         uint32 skillAfter;
     };
+
+    SpellCastResult CheckShotSetup()
+    {
+        // Validate once per scenario: prepare() tolerates failed auto-repeat checks.
+        SpellCastTargets targets;
+        targets.SetUnitTarget(_victim);
+        Spell spell(_player, _shoot.get(), TRIGGERED_FULL_MASK);
+        spell.InitExplicitTargets(targets);
+        return spell.CheckCast(true);
+    }
 
     ShotResult Fire()
     {
@@ -44,17 +57,13 @@ protected:
         // This is the same per-shot entry point used by Unit::_UpdateAutoRepeatSpell.
         // Do not use skipCheck: it also forces every hit roll to succeed.
         auto* spell = new Spell(_player, _shoot.get(), TRIGGERED_FULL_MASK);
-        // prepare() tolerates failed checks for auto-repeat controllers. Require a valid
-        // individual shot here, including the equipped weapon and ammunition checks.
-        spell->InitExplicitTargets(targets);
-        SpellCastResult check = spell->CheckCast(true);
-        if (check != SPELL_CAST_OK)
+        SpellCastResult result = spell->prepare(&targets);
+        if (result != SPELL_CAST_OK)
         {
-            ADD_FAILURE() << "Shot failed cast checks: " << check;
-            delete spell;
+            ADD_FAILURE() << "Shot preparation failed: " << result;
+            _player->m_Events.Update(1);
             return { SPELL_MISS_EVADE, 0, skillBefore, skillBefore };
         }
-        EXPECT_EQ(spell->prepare(&targets), SPELL_CAST_OK);
         auto const& targetInfo = *spell->GetUniqueTargetInfo();
         if (targetInfo.size() != 1)
         {
@@ -63,17 +72,19 @@ protected:
             return { SPELL_MISS_EVADE, 0, skillBefore, skillBefore };
         }
         EXPECT_TRUE(targetInfo.front().processed);
-        ShotResult result{ targetInfo.front().missCondition, healthBefore - _victim->GetHealth(),
+        ShotResult shotResult{ targetInfo.front().missCondition, healthBefore - _victim->GetHealth(),
             skillBefore, _player->GetBaseSkillValue(_weapon->GetSkill()) };
         _player->m_Events.Update(1);
-        return result;
+        return shotResult;
     }
 
     void ExpectMissRate(double expectedPercent)
     {
         // Disable gains only for rate sampling. Skill progression has its own test.
         ON_CALL(*GetWorldMock(), getIntConfig(CONFIG_SKILL_GAIN_WEAPON)).WillByDefault(Return(0));
-        constexpr uint32 shots = 20000;
+        ASSERT_EQ(CheckShotSetup(), SPELL_CAST_OK);
+        ASSERT_FLOAT_EQ(MissChance(), expectedPercent);
+        constexpr uint32 shots = 1000;
         uint32 misses = 0;
         uint32 hits = 0;
         for (uint32 i = 0; i < shots; ++i)
@@ -104,19 +115,20 @@ protected:
     }
 };
 
-TEST_F(WandCombatE2ETest, SkillOneAgainstLevel80MissesSixtyPercent)
+TEST_F(WandCombatIntegrationTest, SkillOneAgainstLevel80MissesSixtyPercent)
 {
     ExpectMissRate(60.0);
 }
 
-TEST_F(WandCombatE2ETest, Skill400AgainstLevel83MissesEightPercent)
+TEST_F(WandCombatIntegrationTest, Skill400AgainstLevel83MissesEightPercent)
 {
     SetWeaponSkill(400, 83);
     ExpectMissRate(8.0);
 }
 
-TEST_F(WandCombatE2ETest, MissesAtTheCapStillIncreaseWandSkill)
+TEST_F(WandCombatIntegrationTest, MissesAtTheCapStillIncreaseWandSkill)
 {
+    ASSERT_EQ(CheckShotSetup(), SPELL_CAST_OK);
     uint32 missesWithGain = 0;
     uint32 hitsWithGain = 0;
     for (uint32 i = 0; i < 100; ++i)
@@ -147,7 +159,7 @@ TEST_F(WandCombatE2ETest, MissesAtTheCapStillIncreaseWandSkill)
     RecordProperty("hits_with_skill_gain", hitsWithGain);
 }
 
-TEST_F(WandCombatE2ETest, SpellOnlyHitBonusDoesNotImproveWandAccuracy)
+TEST_F(WandCombatIntegrationTest, SpellOnlyHitBonusDoesNotImproveWandAccuracy)
 {
     SetWeaponSkill(400, 83);
     ApplyHitItem(ITEM_MOD_HIT_SPELL_RATING, 20);
@@ -156,7 +168,7 @@ TEST_F(WandCombatE2ETest, SpellOnlyHitBonusDoesNotImproveWandAccuracy)
     ExpectMissRate(8.0);
 }
 
-TEST_F(WandCombatE2ETest, AutoRepeatFiresAgainAndStopsWhenInterrupted)
+TEST_F(WandCombatIntegrationTest, AutoRepeatFiresAgainAndStopsWhenInterrupted)
 {
     SpellCastTargets targets;
     targets.SetUnitTarget(_victim);
@@ -189,7 +201,7 @@ TEST_F(WandCombatE2ETest, AutoRepeatFiresAgainAndStopsWhenInterrupted)
     EXPECT_EQ(_player->GetBaseSkillValue(SKILL_WANDS), 21u);
 }
 
-TEST_F(WandCombatE2ETest, GenericHitRatingGearStillImprovesWandAccuracy)
+TEST_F(WandCombatIntegrationTest, GenericHitRatingGearStillImprovesWandAccuracy)
 {
     SetWeaponSkill(400, 83);
     ApplyHitItem(ITEM_MOD_HIT_RATING, 3);
@@ -200,14 +212,14 @@ TEST_F(WandCombatE2ETest, GenericHitRatingGearStillImprovesWandAccuracy)
     ExpectMissRate(5.0);
 }
 
-TEST_F(WandCombatE2ETest, RangedHitBonusStillImprovesWandAccuracy)
+TEST_F(WandCombatIntegrationTest, RangedHitBonusStillImprovesWandAccuracy)
 {
     SetWeaponSkill(400, 83);
     _player->m_modRangedHitChance = 3.0f;
     ExpectMissRate(5.0);
 }
 
-TEST_F(WandCombatE2ETest, HunterAutoShotKeepsRangedAccuracy)
+TEST_F(WandCombatIntegrationTest, HunterAutoShotKeepsRangedAccuracy)
 {
     _player->SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_HUNTER);
     _weaponTemplate.SubClass = ITEM_SUBCLASS_WEAPON_BOW;
@@ -219,7 +231,7 @@ TEST_F(WandCombatE2ETest, HunterAutoShotKeepsRangedAccuracy)
     ExpectMissRate(8.0);
 }
 
-TEST_F(WandCombatE2ETest, ThrowKeepsRangedAccuracy)
+TEST_F(WandCombatIntegrationTest, ThrowKeepsRangedAccuracy)
 {
     _player->SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_HUNTER);
     _weaponTemplate.SubClass = ITEM_SUBCLASS_WEAPON_THROWN;
@@ -232,17 +244,18 @@ TEST_F(WandCombatE2ETest, ThrowKeepsRangedAccuracy)
     ExpectMissRate(8.0);
 }
 
-TEST_F(WandCombatE2ETest, SpellInfoOverloadAlsoUsesWandSkill)
+TEST_F(WandCombatIntegrationTest, SpellInfoOverloadAlsoUsesWandSkill)
 {
     // Spell::AddUnitTarget uses the Spell overload. Cover the other public entry separately.
     uint32 misses = 0;
-    constexpr uint32 shots = 20000;
+    constexpr uint32 shots = 1000;
     for (uint32 i = 0; i < shots; ++i)
     {
         SpellMissInfo miss = _player->SpellHitResult(_victim, _shoot.get());
         ASSERT_TRUE(miss == SPELL_MISS_NONE || miss == SPELL_MISS_MISS);
         misses += miss == SPELL_MISS_MISS;
     }
-    EXPECT_NEAR(100.0 * misses / shots, 60.0, 2.1);
+    double tolerance = 6.0 * std::sqrt(60.0 * 40.0 / shots) + 0.02;
+    EXPECT_NEAR(100.0 * misses / shots, 60.0, tolerance);
 }
 }

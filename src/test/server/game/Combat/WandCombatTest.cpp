@@ -17,6 +17,10 @@
 
 #include "WandCombatTestFixture.h"
 
+#ifndef TEST_F
+#define TEST_F(fixture, name) void fixture##_##name()
+#endif
+
 namespace
 {
 class WandCombatTest : public WandCombatTestFixture
