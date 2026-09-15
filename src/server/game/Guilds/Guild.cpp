@@ -1330,13 +1330,18 @@ void Guild::HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo)
     {
         player->ModifyMoney(-int32(EMBLEM_PRICE));
 
-        m_emblemInfo = emblemInfo;
-        m_emblemInfo.SaveToDB(m_id);
+        HandleSetEmblem(emblemInfo);
 
         SendSaveEmblemResult(session, ERR_GUILDEMBLEM_SUCCESS); // "Guild Emblem saved."
 
         HandleQuery(session);
     }
+}
+
+void Guild::HandleSetEmblem(EmblemInfo const& emblemInfo)
+{
+    m_emblemInfo = emblemInfo;
+    m_emblemInfo.SaveToDB(m_id);
 }
 
 void Guild::HandleSetLeader(WorldSession* session, std::string_view name)
