@@ -22,7 +22,6 @@
 #include "Common.h"
 #include "DataMap.h"
 #include "EventProcessor.h"
-#include "G3D/Quat.h"
 #include "G3D/Vector3.h"
 #include "GridDefines.h"
 #include "GridReference.h"
@@ -721,10 +720,6 @@ public:
     };
     [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
     [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
-
-    // rotation lying flush on the terrain at this object's position:
-    // yaw from the orientation, pitch/roll from the sampled ground normal
-    [[nodiscard]] G3D::Quat GetTerrainAlignedRotation() const;
 
     [[nodiscard]] float GetFloorZ() const;
     [[nodiscard]] float GetMinHeightInWater() const;

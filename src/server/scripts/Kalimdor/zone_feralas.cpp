@@ -15,53 +15,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Group.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "Unit.h"
 
-enum GordunniTrapObjects
+enum GordunniTrapSpells
 {
-    GO_GORDUNNI_DIRT_MOUND_CHEST  = 144064,
-    GO_GORDUNNI_DIRT_MOUND_JUNK   = 177681,
-    GO_GORDUNNI_COBALT_VISUAL     = 177683
+    SPELL_GORDUNNI_DIRT_MOUND_CHEST = 11756,
+    SPELL_GORDUNNI_DIRT_MOUND_JUNK  = 19394
 };
 
-enum GordunniTrapMisc
-{
-    MOUND_DESPAWN_TIME = 120 // seconds, matches the summon spell duration (11756/19394)
-};
-
-// 19395 - Gordunni Trap, cast by the trap GameObject on the player who disturbs it
+// 19395 - Gordunni Trap
 class spell_gordunni_trap : public SpellScript
 {
     PrepareSpellScript(spell_gordunni_trap);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_GORDUNNI_DIRT_MOUND_CHEST, SPELL_GORDUNNI_DIRT_MOUND_JUNK });
+    }
+
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Unit* target = GetHitUnit();
-        if (!target)
-            return;
-
-        // spawn the dug up mound at the trap itself, lying flush on the terrain
-        WorldObject* anchor = GetGObjCaster();
-        if (!anchor)
-            anchor = target;
-
-        G3D::Quat rot = anchor->GetTerrainAlignedRotation();
-
-        bool chest = urand(0, 1) != 0;
-        // detach the summons from the player so they outlive logout/death and expire on their own timer
-        if (GameObject* mound = target->SummonGameObject(chest ? GO_GORDUNNI_DIRT_MOUND_CHEST : GO_GORDUNNI_DIRT_MOUND_JUNK,
-            anchor->GetPositionX(), anchor->GetPositionY(), anchor->GetPositionZ(), anchor->GetOrientation(),
-            rot.x, rot.y, rot.z, rot.w, MOUND_DESPAWN_TIME))
-            target->RemoveGameObject(mound, false);
-        if (chest)
-            if (GameObject* visual = target->SummonGameObject(GO_GORDUNNI_COBALT_VISUAL,
-                anchor->GetPositionX(), anchor->GetPositionY(), anchor->GetPositionZ(), anchor->GetOrientation(),
-                rot.x, rot.y, rot.z, rot.w, MOUND_DESPAWN_TIME))
-                target->RemoveGameObject(visual, false);
+        target->CastSpell(target, urand(0, 1) ? SPELL_GORDUNNI_DIRT_MOUND_CHEST : SPELL_GORDUNNI_DIRT_MOUND_JUNK);
     }
 
     void Register() override

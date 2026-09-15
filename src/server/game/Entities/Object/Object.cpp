@@ -3869,34 +3869,6 @@ void WorldObject::SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spel
     SendMessageToSet(&data, true);
 }
 
-G3D::Quat WorldObject::GetTerrainAlignedRotation() const
-{
-    G3D::Quat yaw = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), GetOrientation());
-
-    constexpr float sampleDist = 1.0f;
-    float x = GetPositionX();
-    float y = GetPositionY();
-    float z = GetPositionZ() + 2.0f;
-
-    Map* map = GetMap();
-    float hXp = map->GetHeight(GetPhaseMask(), x + sampleDist, y, z);
-    float hXn = map->GetHeight(GetPhaseMask(), x - sampleDist, y, z);
-    float hYp = map->GetHeight(GetPhaseMask(), x, y + sampleDist, z);
-    float hYn = map->GetHeight(GetPhaseMask(), x, y - sampleDist, z);
-    if (hXp <= INVALID_HEIGHT || hXn <= INVALID_HEIGHT || hYp <= INVALID_HEIGHT || hYn <= INVALID_HEIGHT)
-        return yaw;
-
-    G3D::Vector3 normal = G3D::Vector3(-(hXp - hXn) / (2.0f * sampleDist), -(hYp - hYn) / (2.0f * sampleDist), 1.0f).unit();
-
-    G3D::Vector3 tiltAxis = G3D::Vector3::unitZ().cross(normal);
-    float tiltAxisLength = tiltAxis.magnitude();
-    if (tiltAxisLength < 0.001f) // flat ground
-        return yaw;
-
-    G3D::Quat tilt = G3D::Quat::fromAxisAngleRotation(tiltAxis / tiltAxisLength, std::acos(std::clamp(normal.z, -1.0f, 1.0f)));
-    return tilt * yaw;
-}
-
 FactionTemplateEntry const* WorldObject::GetFactionTemplateEntry() const
 {
     uint32 factionId = GetFaction();

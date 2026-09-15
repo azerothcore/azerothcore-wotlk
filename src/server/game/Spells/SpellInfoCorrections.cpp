@@ -4876,6 +4876,15 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SpellPriority = 100;
     });
 
+    // Item - Mage T8 4P Bonus
+    ApplySpellFix({ 64869 }, [](SpellInfo* spellInfo)
+    {
+        // DBC amount is 10, but the chance to not consume Missile Barrage,
+        // Hot Streak or Brain Freeze is 20% according to the available sources
+        spellInfo->Effects[EFFECT_0].BasePoints = 20;
+        spellInfo->Effects[EFFECT_0].DieSides = 0;
+    });
+
     // Auto Shot
     ApplySpellFix({ 75 }, [](SpellInfo* spellInfo)
     {
