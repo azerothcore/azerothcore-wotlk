@@ -22,15 +22,11 @@
 #include "Errors.h"
 #include "LFGMgr.h"
 #include "Log.h"
-#include "RaceMgr.h"
 #include "SharedDefines.h"
 #include "SpellMgr.h"
 #include "TransportMgr.h"
 #include "World.h"
 #include <map>
-#include <utility>
-
-typedef std::map<std::pair<uint32, uint32>, AreaTableEntry const*> AreaEntryByFlagAndMap;
 
 typedef std::tuple<int16, int8, int32> WMOAreaTableKey;
 typedef std::map<WMOAreaTableKey, WMOAreaTableEntry const*> WMOAreaInfoByTripple;
@@ -40,7 +36,6 @@ DBCStorage <AreaGroupEntry> sAreaGroupStore(AreaGroupEntryfmt);
 DBCStorage <AreaPOIEntry> sAreaPOIStore(AreaPOIEntryfmt);
 
 static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
-static AreaEntryByFlagAndMap sAreaEntryByFlagAndMap;
 
 DBCStorage <AchievementEntry> sAchievementStore(Achievementfmt);
 DBCStorage <AchievementCategoryEntry> sAchievementCategoryStore(AchievementCategoryfmt);
@@ -309,7 +304,7 @@ void LoadDBCStores(std::string const& dataPath)
     LOAD_DBC(sDurabilityQualityStore,               "DurabilityQuality.dbc",                "durabilityquality_dbc");
     LOAD_DBC(sEmotesStore,                          "Emotes.dbc",                           "emotes_dbc");
     LOAD_DBC(sEmotesTextStore,                      "EmotesText.dbc",                       "emotestext_dbc");
-    LOAD_DBC(sEmotesTextSoundStore,                 "EmotesTextSound.dbc",                  "emotetextsound_dbc");
+    LOAD_DBC(sEmotesTextSoundStore,                 "EmotesTextSound.dbc",                  "emotestextsound_dbc");
     LOAD_DBC(sFactionStore,                         "Faction.dbc",                          "faction_dbc");
     LOAD_DBC(sFactionTemplateStore,                 "FactionTemplate.dbc",                  "factiontemplate_dbc");
     LOAD_DBC(sGameObjectArtKitStore,                "GameObjectArtKit.dbc",                 "gameobjectartkit_dbc");
@@ -394,10 +389,6 @@ void LoadDBCStores(std::string const& dataPath)
     LOAD_DBC(sWorldMapOverlayStore,                 "WorldMapOverlay.dbc",                  "worldmapoverlay_dbc");
 
 #undef LOAD_DBC
-
-    for (AreaTableEntry const* area : sAreaTableStore)
-        if (area->exploreFlag)
-            sAreaEntryByFlagAndMap.emplace(std::make_pair(area->mapid, area->exploreFlag), area);
 
     for (CharStartOutfitEntry const* outfit : sCharStartOutfitStore)
         sCharStartOutfitMap[outfit->Race | (outfit->Class << 8) | (outfit->Gender << 16)] = outfit;
@@ -948,29 +939,7 @@ std::vector<SkillLineAbilityEntry const*> const& GetSkillLineAbilitiesBySkillLin
     return it->second;
 }
 
-int32 GetAreaFlagByAreaID(uint32 area_id)
-{
-    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(area_id))
-        return int32(area->exploreFlag);
-
-    return -1;
-}
-
 AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
 {
     return sAreaTableStore.LookupEntry(area_id);
-}
-
-AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag, uint32 map_id)
-{
-    if (area_flag)
-    {
-        auto itr = sAreaEntryByFlagAndMap.find(std::make_pair(map_id, area_flag));
-        return itr != sAreaEntryByFlagAndMap.end() ? itr->second : nullptr;
-    }
-
-    if (MapEntry const* mapEntry = sMapStore.LookupEntry(map_id))
-        return GetAreaEntryByAreaID(mapEntry->linked_zone);
-
-    return nullptr;
 }
