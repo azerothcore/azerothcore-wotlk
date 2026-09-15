@@ -245,9 +245,16 @@ def open_paren_balance(text: str) -> int:
 
 SPAWN_STATEMENT_START = re.compile(r"\b(?:DELETE|UPDATE)\b", re.IGNORECASE)
 SPAWN_TABLE = r"(?:`(creature|gameobject)`|\b(creature|gameobject)\b)"
-# MySQL allows modifiers between the keyword and the table, and they must not hide the table
-SPAWN_DELETE_START = re.compile(rf"DELETE\s+(?:(?:LOW_PRIORITY|QUICK|IGNORE)\s+)*FROM\s+{SPAWN_TABLE}", re.IGNORECASE)
-SPAWN_UPDATE_START = re.compile(rf"UPDATE\s+(?:(?:LOW_PRIORITY|IGNORE)\s+)*{SPAWN_TABLE}", re.IGNORECASE)
+# The target list, captured whole rather than matched table-first, so a spawn table named second
+# in a join or a comma list is seen too. Anchored and requiring FROM/SET, which keeps the
+# `ON DELETE CASCADE` and `ON UPDATE CURRENT_TIMESTAMP` of a DDL statement out.
+SPAWN_DELETE_TARGETS = re.compile(
+    r"^\s*DELETE\s+(?:(?:LOW_PRIORITY|QUICK|IGNORE)\s+)*(.*?)\bFROM\s+(.*?)(?:\bWHERE\b|$)",
+    re.IGNORECASE | re.DOTALL)
+SPAWN_UPDATE_TARGETS = re.compile(
+    r"^\s*UPDATE\s+(?:(?:LOW_PRIORITY|IGNORE)\s+)*(.*?)\bSET\b", re.IGNORECASE | re.DOTALL)
+# One table, optionally aliased. Anything else is a join, a comma list or a schema qualifier.
+PLAIN_SPAWN_TARGET = re.compile(rf"^\s*{SPAWN_TABLE}(?:\s+(?:AS\s+)?`?\w+`?)?\s*$", re.IGNORECASE)
 # Only these bound a statement to known rows: `guid` > 0 or `id` != 5 match without limiting.
 SPAWN_FILTER_OPERATORS = r"(?:=|\bIN\b|\bBETWEEN\b)"
 
@@ -277,7 +284,7 @@ def strip_subqueries(text: str) -> str:
                     text = text[:match.start()] + " " + text[index + 1:]
                     break
         else:
-            return text[:match.start()]  # unbalanced, so nothing past it can be judged
+            return text  # unbalanced, so leave it whole rather than judge half a statement
 
 # Only the WHERE clause decides which rows are hit, so the `SET id` = ... of an UPDATE must not
 # count as a filter. Returns "" when there is no WHERE at all, which then reads as unfiltered.
@@ -349,27 +356,33 @@ def spawn_filter_check(file: io, file_path: str) -> bool:
               f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
         return True
 
-    # Reached when a statement names a spawn table somewhere other than as its plain target: a join,
-    # a comma-separated target list, a schema qualifier. Which rows it touches cannot be judged
-    # without resolving aliases, and none of it is AC update style, so the form itself is refused.
-    def report_indirect_target(text: str, line_number: int) -> bool:
-        table = SPAWN_TABLE_MENTION.search(strip_subqueries(text))
-        if not table:
-            return False
-        print(f"❌ A statement touching `{table.group(1) or table.group(2)}` must name it as its only target. "
-              f"Joins, comma-separated targets and schema qualifiers are not supported. "
+    # Which rows a join or a comma list touches cannot be judged without resolving aliases, and a
+    # schema qualifier is wrong anyway since the database name is configurable, so the form is
+    # refused rather than guessed at.
+    def report_indirect_target(targets: str, line_number: int, table: str) -> bool:
+        print(f"❌ A statement touching `{table}` must name it as its only target. Joins, "
+              f"comma-separated targets and schema qualifiers are not supported. "
               f"{file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
         return True
 
     # Judged once the whole statement is accumulated, since DELETE, FROM and the table name can
     # each sit on their own line
     def report_when_spawn_statement(text: str, line_number: int) -> bool:
-        for pattern, keyword in ((SPAWN_DELETE_START, "DELETE FROM"), (SPAWN_UPDATE_START, "UPDATE")):
-            table = pattern.search(text)
-            if table:
-                statement_name = f"{keyword} `{table.group(1) or table.group(2)}`"
-                return report(where_clause(text), line_number, statement_name)
-        return report_indirect_target(text, line_number)
+        statement = strip_subqueries(text)
+        for pattern, keyword in ((SPAWN_DELETE_TARGETS, "DELETE FROM"), (SPAWN_UPDATE_TARGETS, "UPDATE")):
+            match = pattern.match(statement)
+            if not match:
+                continue
+            # A multi-table DELETE names its targets before FROM, so both halves have to be plain
+            targets = " ".join(group for group in match.groups() if group).strip()
+            table = SPAWN_TABLE_MENTION.search(targets)
+            if not table:
+                return False
+            name = table.group(1) or table.group(2)
+            if not PLAIN_SPAWN_TARGET.match(targets):
+                return report_indirect_target(targets, line_number, name)
+            return report(where_clause(statement), line_number, f"{keyword} `{name}`")
+        return False
 
     for line_number, line in enumerate(file, start = 1):
         text, in_block_comment = strip_sql_noise(line.strip(), in_block_comment)
