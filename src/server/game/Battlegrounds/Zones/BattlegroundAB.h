@@ -217,6 +217,9 @@ struct BattlegroundABScore final : public BattlegroundScore
 {
     friend class BattlegroundAB;
 
+    [[nodiscard]] uint32 GetBasesAssaulted() const { return BasesAssaulted; }
+    [[nodiscard]] uint32 GetBasesDefended() const { return BasesDefended; }
+
 protected:
 
     explicit BattlegroundABScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
