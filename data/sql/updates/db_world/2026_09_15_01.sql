@@ -1,3 +1,4 @@
+-- DB update 2026_09_15_00 -> 2026_09_15_01
 -- Battle for Crusaders' Pinnacle (quest 13141).
 -- The wave actionlist runs on the out-of-combat timer so a creature pulled on the way up keeps
 -- fighting instead of breaking off to reach the position. Emote 449 = EMOTE_ONESHOT_EMERGE, so the

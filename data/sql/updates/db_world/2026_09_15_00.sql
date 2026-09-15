@@ -1,3 +1,4 @@
+-- DB update 2026_09_14_00 -> 2026_09_15_00
 -- Argent Tournament construction daily "Jack Me Some Lumber" (13627).
 -- Chop Tree (62990) resolves TARGET_UNIT_NEARBY_ENTRY through a condition that did not exist,
 -- so the axe never found an oak. The rest is in the spell data: Lumberjackin' (62855) makes
