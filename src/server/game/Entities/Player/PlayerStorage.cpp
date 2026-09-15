@@ -6187,6 +6187,8 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
             }
             else if (proto->HolidayId)
             {
+                // matches on holiday id alone, unlike IsHolidayActive(): a stage aware check here
+                // would delete holiday items on login while a building stage runs
                 remove = true;
                 GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
                 GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr->GetActiveEventList();
