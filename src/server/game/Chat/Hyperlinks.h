@@ -87,6 +87,13 @@ namespace Acore::Hyperlinks
         std::string KnownRecipes;
     };
 
+    // "found" link: |cffffff00|Hfound:<rawguid>:<entry>:|h[name]|h|r - a world object, shift-clicked back as a command
+    struct FoundLinkData
+    {
+        uint64 RawGuid;
+        uint32 Entry;
+    };
+
     namespace LinkTags
     {
 
@@ -168,6 +175,13 @@ namespace Acore::Hyperlinks
             using value_type = SpellInfo const*;
             static constexpr std::string_view tag() { return "enchant"; }
             static bool StoreTo(SpellInfo const*& val, std::string_view data);
+        };
+
+        struct AC_GAME_API found
+        {
+            using value_type = FoundLinkData const&;
+            static constexpr std::string_view tag() { return "found"; }
+            static bool StoreTo(FoundLinkData& val, std::string_view data);
         };
 
         struct AC_GAME_API glyph

@@ -76,9 +76,9 @@ enum FreyaSpells
     // BRIGHTLEAF
     SPELL_BRIGHTLEAF_FLUX                       = 62239,
     SPELL_SOLAR_FLARE                           = 62240,
-    SPELL_UNSTABLE_SUN_BEAM_AURA                = 62211,
-    SPELL_PHOTOSYNTHESIS                        = 62209,
-    SPELL_UNSTABLE_SUN_DAMAGE                   = 62217,
+    // summons one beam at the caster and force-casts 62221 on the players picked by
+    // spell_freya_brightleaf_unstable_sun_beam, each summoning another beam at their own feet
+    SPELL_UNSTABLE_SUN_BEAM_SUMMON              = 62207,
 
     // IRONBRANCH
     SPELL_IMPALE                                = 62310,
@@ -142,7 +142,6 @@ enum FreyaEvents
     EVENT_BRIGHTLEAF_FLUX                       = 20,
     EVENT_BRIGHTLEAF_SOLAR_FLARE                = 21,
     EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM          = 22,
-    EVENT_BRIGHTLEAF_DESPAWN_SUN_BEAM           = 23,
 
     // IRONBRANCH
     EVENT_IRONBRANCH_IMPALE                     = 30,
@@ -191,7 +190,6 @@ enum FreyaNPCs
     NPC_CHANNEL_STALKER_FREYA                   = 33575,
     NPC_IRON_ROOT_TRIGGER                       = 33088,
     NPC_FREYA_UNSTABLE_SUN_BEAM                 = 33170,
-    NPC_UNSTABLE_SUN_BRIGHTLEAF                 = 33050, // 10 SECS?
 
     // FIRST WAVE
     NPC_STORM_LASHER                            = 32919,
@@ -281,7 +279,7 @@ struct boss_freya : public BossAI
         _lumberjacked = 0;
         _spawnedAmount = 0;
         _trioDown = 0;
-        _setPermutation = urand(0, 5);
+        _setPermutation = 0;
         _backToNature = true;
         _deforestation = 0;
         _aliveAddsCount = 0;
@@ -368,6 +366,9 @@ struct boss_freya : public BossAI
         ++_currentSetId;
         _currentTrioDown = 0;
         Talk(EMOTE_ALLIES_OF_NATURE);
+
+        if (_spawnedAmount % 3 == 0)
+            _setPermutation = urand(0, 5);
 
         static constexpr uint8 permTable[6][3] = {
             {GROUP_TRIO, GROUP_CONSERVATOR, GROUP_LASHERS},
@@ -805,17 +806,15 @@ struct boss_freya_elder_stonebark : public ScriptedAI
 
 struct boss_freya_elder_brightleaf : public ScriptedAI
 {
-    boss_freya_elder_brightleaf(Creature* pCreature) : ScriptedAI(pCreature), summons(pCreature)
+    boss_freya_elder_brightleaf(Creature* pCreature) : ScriptedAI(pCreature)
     {
     }
 
     EventMap events;
-    SummonList summons;
 
     void Reset() override
     {
         events.Reset();
-        summons.DespawnAll();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetReactState(REACT_AGGRESSIVE);
     }
@@ -848,7 +847,7 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
 
         events.ScheduleEvent(EVENT_BRIGHTLEAF_FLUX, 10s);
         events.ScheduleEvent(EVENT_BRIGHTLEAF_SOLAR_FLARE, 5s);
-        events.ScheduleEvent(EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM, 8s);
+        events.ScheduleEvent(EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM, 6s);
 
         Talk(SAY_ELDER_AGGRO);
     }
@@ -878,31 +877,8 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
                 events.Repeat(15s);
                 break;
             case EVENT_BRIGHTLEAF_UNSTABLE_SUN_BEAM:
-                events.ScheduleEvent(EVENT_BRIGHTLEAF_DESPAWN_SUN_BEAM, 15s);
-                if (Creature* beam = me->SummonCreature(NPC_UNSTABLE_SUN_BRIGHTLEAF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
-                {
-                    beam->CastSpell(beam, SPELL_UNSTABLE_SUN_BEAM_AURA, true);
-                    beam->CastSpell(beam, SPELL_PHOTOSYNTHESIS, true);
-                    summons.Summon(beam);
-                }
-                if (Creature* beam = me->SummonCreature(NPC_UNSTABLE_SUN_BRIGHTLEAF, me->GetPositionX() + 8, me->GetPositionY() + 8, me->GetPositionZ()))
-                {
-                    beam->CastSpell(beam, SPELL_UNSTABLE_SUN_BEAM_AURA, true);
-                    beam->CastSpell(beam, SPELL_PHOTOSYNTHESIS, true);
-                    summons.Summon(beam);
-                }
-                events.Repeat(20s);
-                break;
-            case EVENT_BRIGHTLEAF_DESPAWN_SUN_BEAM:
-                for (SummonList::iterator i = summons.begin(); i != summons.end();)
-                {
-                    Creature* summon = ObjectAccessor::GetCreature(*me, *i);
-                    ++i;
-                    if (summon)
-                        summon->CastSpell(summon, SPELL_UNSTABLE_SUN_DAMAGE, false);
-                }
-
-                summons.DespawnAll();
+                DoCastAOE(SPELL_UNSTABLE_SUN_BEAM_SUMMON, true);
+                events.Repeat(22s, 26s);
                 break;
         }
 
@@ -993,6 +969,19 @@ struct boss_freya_iron_root : public NullCreatureAI
     boss_freya_iron_root(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
     void JustDied(Unit* /*killer*/) override
+    {
+        ReleaseRootedPlayer();
+    }
+
+    // The root aura is infinite and self-cast by the victim, so nothing engine-side
+    // removes it; a root despawned without being killed must free its victim too
+    void OnDespawn() override
+    {
+        ReleaseRootedPlayer();
+    }
+
+private:
+    void ReleaseRootedPlayer()
     {
         if (!me->IsSummon())
             return;
@@ -1397,6 +1386,22 @@ class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
     }
 };
 
+// 62207 - Unstable Sun Beam
+class spell_freya_brightleaf_unstable_sun_beam : public SpellScript
+{
+    PrepareSpellScript(spell_freya_brightleaf_unstable_sun_beam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_freya_brightleaf_unstable_sun_beam::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 // 62450 - Unstable Sun Beam
 class spell_freya_unstable_sun_beam : public SpellScript
 {
@@ -1427,6 +1432,7 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
 
     RegisterSpellScript(spell_freya_attuned_to_nature_dose_reduction);
+    RegisterSpellScript(spell_freya_brightleaf_unstable_sun_beam);
     RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();

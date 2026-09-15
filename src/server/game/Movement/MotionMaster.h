@@ -86,6 +86,7 @@ enum ForcedMovement
     FORCED_MOVEMENT_NONE    = 0,
     FORCED_MOVEMENT_WALK    = 1,
     FORCED_MOVEMENT_RUN     = 2,
+    FORCED_MOVEMENT_FLY     = 3,
 
     FORCED_MOVEMENT_MAX
 };

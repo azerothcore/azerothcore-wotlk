@@ -6,6 +6,11 @@ Add here rules about reviewing AzerothCore PRs before they are submitted. Generi
 to the review process itself belong to the skill, not here. The [code-review.md](code-review.md)
 rules apply on top.
 
+## Pinned review
+
+The report is pasted into the PR, so the review must be pinned to a commit: uncommitted changes
+(except local-only tweaks) block the run, and fixes from a round are committed before the next one.
+
 ## Regression risk
 
 Automated test coverage is near zero, so this review is the main safety net against regressions.
@@ -18,6 +23,12 @@ Every change gets the full review; go deeper the farther it can reach:
   is usually the one boss, spell, or module touched.
 - SQL: beyond the usual review, watch for the classic side effect — a DELETE/UPDATE whose
   WHERE clause catches rows it shouldn't.
+
+## Upstream attribution
+
+Any changed code, mechanism, or data mirrored from another core must carry that upstream commit's
+author via `--author` (extras as `Co-authored-by`) with the template's cherry-pick box checked; a
+missing credit is a finding.
 
 ## In-game testing
 
