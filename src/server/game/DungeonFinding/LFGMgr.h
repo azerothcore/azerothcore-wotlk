@@ -49,6 +49,7 @@ namespace lfg
         LFG_TIME_ROLECHECK                           = 45 * IN_MILLISECONDS,
         LFG_TIME_BOOT                                = 120,
         LFG_TIME_PROPOSAL                            = 40,
+        LFG_TIME_DECLINE_COOLDOWN                    = 150,
         LFG_QUEUEUPDATE_INTERVAL                     = 8 * IN_MILLISECONDS,
         LFG_SPELL_DUNGEON_COOLDOWN                   = 71328,
         LFG_SPELL_DUNGEON_DESERTER                   = 71041,
@@ -151,6 +152,25 @@ namespace lfg
         LFG_DUNGEON_COREN_DIREBREW      = 287,
         LFG_DUNGEON_CROWN_CHEMICAL_CO   = 288
     };
+
+    [[nodiscard]] constexpr bool ShouldApplyDungeonCooldown(bool selectedRandomDungeon, bool testing,
+        bool hasDungeonCooldown)
+    {
+        return selectedRandomDungeon && !testing && !hasDungeonCooldown;
+    }
+
+    [[nodiscard]] constexpr bool IsDungeonQueueBlockedByCooldown(uint32 randomDungeonId,
+        bool hasDungeonCooldown, bool hasDeclineCooldown)
+    {
+        return hasDeclineCooldown || (randomDungeonId && hasDungeonCooldown);
+    }
+
+    [[nodiscard]] constexpr bool ShouldApplyDungeonDeserter(bool isVoteKick, bool dungeonFinished,
+        bool hasDungeonCooldown, uint8 remainingPlayers, bool castDeserter)
+    {
+        return !isVoteKick && !dungeonFinished && hasDungeonCooldown &&
+            remainingPlayers >= LFG_GROUP_KICK_VOTES_NEEDED && castDeserter;
+    }
 
     struct RBEntryInfo
     {
@@ -419,6 +439,8 @@ namespace lfg
 
     class LFGMgr
     {
+        friend class LFGQueueJoinTest;
+
     private:
         LFGMgr();
         ~LFGMgr();

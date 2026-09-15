@@ -753,17 +753,20 @@ namespace lfg
             else
                 players.insert(player->GetGUID());
 
-            // Xinef: Check dungeon cooldown only for random dungeons
-            // Xinef: Moreover check this only if dungeon is not started, afterwards its obvious that players will have the cooldown
-            if (joinData.result == LFG_JOIN_OK && !isContinue && rDungeonId)
+            // Declines block all queues. The aura also comes from MakeNewGroup and only blocks random queues.
+            if (joinData.result == LFG_JOIN_OK && !isContinue)
             {
-                if (player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)) // xinef: added !isContinue
+                time_t const now = GameTime::GetGameTime().count();
+                if (IsDungeonQueueBlockedByCooldown(rDungeonId,
+                        player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN), PlayersStore[guid].HasDeclineCooldown(now)))
                     joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
                 else if (grp)
                 {
                     for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr && joinData.result == LFG_JOIN_OK; itr = itr->next())
                         if (Player* plrg = itr->GetSource())
-                            if (plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)) // xinef: added !isContinue
+                            if (IsDungeonQueueBlockedByCooldown(rDungeonId,
+                                    plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN),
+                                    PlayersStore[plrg->GetGUID()].HasDeclineCooldown(now)))
                                 joinData.result = LFG_JOIN_PARTY_RANDOM_COOLDOWN;
                 }
             }
@@ -1849,15 +1852,14 @@ namespace lfg
 
                 // Add the cooldown spell if queued for a random dungeon
                 // xinef: add aura
-                if ((randomDungeon || selectedRandomLfgDungeon(player->GetGUID())) && !player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
-                {
+                bool const selectedRandomDungeon = selectedRandomLfgDungeon(player->GetGUID());
+                if (selectedRandomDungeon)
                     randomDungeon = true;
-                    // if player is debugging, don't add dungeon cooldown
-                    if (!m_Testing)
-                    {
-                        player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
-                    }
-                }
+
+                // if player is debugging, don't add dungeon cooldown
+                if (ShouldApplyDungeonCooldown(selectedRandomDungeon, m_Testing,
+                        player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)))
+                    player->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, player);
 
                 if (player->GetMapId() == uint32(dungeon->map))
                 {
@@ -2031,12 +2033,22 @@ namespace lfg
                 if (it->second.accept == LFG_ANSWER_PENDING)
                     it->second.accept = LFG_ANSWER_DENY;
 
-        // pussywizard: add cooldown for not accepting (after 40 secs) or declining
+        // Penalize declines and timeouts, including players who disconnected during the proposal.
         for (LfgProposalPlayerContainer::iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
             if (it->second.accept == LFG_ANSWER_DENY)
+            {
+                PlayersStore[it->first].SetDeclineCooldown(GameTime::GetGameTime().count() + LFG_TIME_DECLINE_COOLDOWN);
                 if (Player* plr = ObjectAccessor::FindPlayer(it->first))
+                {
+                    // Do not shorten an existing random-run cooldown.
+                    if (Aura* aura = plr->GetAura(LFG_SPELL_DUNGEON_COOLDOWN))
+                        if (aura->GetDuration() >= LFG_TIME_DECLINE_COOLDOWN * IN_MILLISECONDS)
+                            continue;
+
                     if (Aura* aura = plr->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, plr))
-                        aura->SetDuration(150 * IN_MILLISECONDS);
+                        aura->SetDuration(LFG_TIME_DECLINE_COOLDOWN * IN_MILLISECONDS);
+                }
+            }
 
         // Mark players/groups to be removed
         LfgGuidSet toRemove;
