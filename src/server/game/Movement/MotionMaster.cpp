@@ -617,10 +617,11 @@ void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed
     MoveTakeoff(id, pos, speed, skipAnimation);
 }
 
-void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ)
+void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ,
+    bool allowClientControlled /*= false*/)
 {
     //this function may make players fall below map
-    if (_owner->IsPlayer() && _owner->IsClientControlled())
+    if (!allowClientControlled && _owner->IsPlayer() && _owner->IsClientControlled())
         return;
 
     if (speedXY <= 0.1f)
@@ -953,27 +954,6 @@ void MotionMaster::MoveRotate(uint32 time, RotateDirection direction)
         return;
 
     Mutate(new RotateMovementGenerator(time, direction), MOTION_SLOT_ACTIVE);
-}
-
-void MotionMaster::MoveKnockbackFromForPlayer(float srcX, float srcY, float speedXY, float speedZ)
-{
-    if (speedXY <= 0.1f)
-        return;
-
-    Position dest = _owner->GetPosition();
-    float const moveTimeHalf = speedZ / Movement::gravity;
-    float const dist = 2 * moveTimeHalf * speedXY;
-    float const maxHeight = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
-
-    // Use a mmap raycast to get a valid destination.
-    _owner->MovePositionToFirstCollision(dest, dist, _owner->GetRelativeAngle(srcX, srcY) + float(M_PI));
-
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
-    init.SetParabolic(maxHeight, 0);
-    init.SetOrientationFixed(true);
-    init.SetVelocity(speedXY);
-    Mutate(new EffectMovementGenerator(init, 0), MOTION_SLOT_CONTROLLED);
 }
 
 // Same as MovePoint, but the unit keeps facing away from the destination (walks backwards)
