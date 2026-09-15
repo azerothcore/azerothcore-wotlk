@@ -1068,6 +1068,9 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 		npcFreyaWardReticle = uint32(33366)
 		npcFreyaWard        = uint32(33367)
 		npcWrithingLasher   = uint32(33387)
+		npcWardOfLife       = uint32(34275)
+
+		addSearchRange = float32(100)
 
 		// npc_freya_ward resets its cast timer to 25s and casts at 29s, so the first lasher lands
 		// ~4s after the ward spawns. One extra 29s cycle covers a ward that missed that window.
@@ -1094,10 +1097,9 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 	reticle := bot.Spawn(t, npcFreyaWardReticle, 30*time.Second)
 	ward := bot.Spawn(t, npcFreyaWard, 30*time.Second)
 
-	// Drop GM so the lasher's DoZoneInCombat can pick the bot up the way it picks up a raid;
-	// god mode is what keeps the bot standing there for the whole window.
+	// Drops GM so the lasher's DoZoneInCombat can pick the bot up the way it picks up a raid, and
+	// turns on god mode, which is what keeps the bot standing there for the whole window.
 	bot.CombatReady(t)
-	bot.CheatGod(t)
 
 	lasher := bot.WaitUnit(t, npcWrithingLasher, firstLasherWindow)
 	if lasher == 0 {
@@ -1123,7 +1125,12 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 	}
 	t.Logf("PASS Writhing Lasher 0x%X still up %s after summon (hp=%d/%d)", lasher, outliveWindow, hp, maxHP)
 
-	// A MANUAL_DESPAWN summon has nothing of its own to remove it, so do not leave it in the raid.
-	bot.DamageKill(t, []uint64{lasher}, 10_000_000, 30*time.Second)
+	// A MANUAL_DESPAWN summon has nothing of its own to remove it, and the ward kept summoning for
+	// the whole window, so clear every add it produced rather than just the one that was timed.
+	var adds []uint64
+	for _, add := range bot.UnitsByEntry(addSearchRange, npcWrithingLasher, npcWardOfLife) {
+		adds = append(adds, add.GUID)
+	}
+	bot.DamageKill(t, adds, 10_000_000, 30*time.Second)
 	bot.AssertWorldAlive(t)
 }
