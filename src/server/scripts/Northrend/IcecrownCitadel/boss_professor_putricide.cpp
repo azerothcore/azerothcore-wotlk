@@ -1068,10 +1068,12 @@ class spell_putricide_gaseous_bloat_aura : public AuraScript
 
     void HandleProc(ProcEventInfo& eventInfo)
     {
-        // the raid eats what the target had left: the periodic amount is already perStack * remaining
-        // stacks and carries the difficulty scaling, so no hardcoded per-difficulty values are needed
+        // the raid eats the whole remaining DoT, not just one tick: the periodic amount is already
+        // perStack * remaining stacks and carries the difficulty scaling, so the sum of what is left
+        // is amount * (stacks + 1) / 2. Both reads have to happen before the bloat is removed.
         AuraEffect const* bloat = GetEffect(EFFECT_0);
-        int32 const damage = bloat ? bloat->GetAmount() : 0;
+        uint8 const stacks = GetStackAmount();
+        int32 const damage = bloat ? bloat->GetAmount() * (stacks + 1) / 2 : 0;
 
         // the bloat is consumed by the detonation, just like the Volatile Ooze's adhesive
         GetTarget()->RemoveAurasDueToSpell(GetId(), GetCasterGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
