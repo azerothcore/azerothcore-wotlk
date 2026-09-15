@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "Duration.h"
 #include "ObjectGuid.h"
+#include "QueryHolder.h"
 #include "SharedDefines.h"
 #include "WorldConfig.h"
 #include <unordered_map>
@@ -110,6 +111,7 @@ public:
     virtual void   ResetEventSeasonalQuests(uint16 event_id) = 0;
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
+    virtual SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) = 0;
     virtual void ReloadRBAC() = 0;
 };
 

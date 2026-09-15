@@ -1115,3 +1115,30 @@ std::unordered_map<uint8, uint8> ArenaTeam::ArenaReqPlayersForType =
     { ARENA_TYPE_3v3, 6},
     { ARENA_TYPE_5v5, 10}
 };
+
+void ArenaTeam::SetEmblem(uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle,
+    uint32 borderColor)
+{
+    BackgroundColor = backgroundColor;
+    EmblemStyle = emblemStyle;
+    EmblemColor = emblemColor;
+    BorderStyle = borderStyle;
+    BorderColor = borderColor;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_EMBLEM);
+    stmt->SetData(0, BackgroundColor);
+    stmt->SetData(1, EmblemStyle);
+    stmt->SetData(2, EmblemColor);
+    stmt->SetData(3, BorderStyle);
+    stmt->SetData(4, BorderColor);
+    stmt->SetData(5, GetId());
+    CharacterDatabase.Execute(stmt);
+}
+
+void ArenaTeam::SetRatingForAll(uint32 rating)
+{
+    Stats.Rating = rating;
+
+    for (ArenaTeamMember& member : Members)
+        member.PersonalRating = rating;
+}
