@@ -171,6 +171,11 @@ enum EncounterPhases
     PHASE_MASK_NO_CAST_CHECK = 1 << (PHASE_ROLE_PLAY - 1),
 };
 
+enum EventGroups
+{
+    GROUP_COMBAT             = 1,
+};
+
 enum Texts
 {
     SAY_BRANN_ALGALON_INTRO_1       = 0,
@@ -395,6 +400,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         events.Reset();
         summons.DespawnAll();
         me->SetReactState(REACT_PASSIVE);
+        me->SetCombatMovement(true);
         me->SetImmuneToPC(false);
         me->SetSheath(SHEATH_STATE_UNARMED);
         me->SetFaction(190);
@@ -477,6 +483,7 @@ struct boss_algalon_the_observer : public ScriptedAI
             case ACTION_ASCEND:
                 summons.DespawnAll();
                 events.SetPhase(PHASE_BIG_BANG);
+                events.CancelEvent(EVENT_RESUME_UPDATING);
                 events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 1500ms);
                 break;
             case ACTION_FEEDS_ON_TEARS_FAILED:
@@ -522,10 +529,10 @@ struct boss_algalon_the_observer : public ScriptedAI
             introDelay = 8500ms;
 
         events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
-        events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
-        events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
+        events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay, GROUP_COMBAT);
+        events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay, GROUP_COMBAT);
         events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
-        events.ScheduleEvent(EVENT_COSMIC_SMASH, 26s + introDelay);
+        events.ScheduleEvent(EVENT_COSMIC_SMASH, 26s + introDelay, GROUP_COMBAT);
         events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 60s + introDelay);
         events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
         events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
@@ -745,13 +752,29 @@ struct boss_algalon_the_observer : public ScriptedAI
                     summons.DoAction(ACTION_BIG_BANG, pred);
 
                     me->CastSpell((Unit*)nullptr, SPELL_BIG_BANG, false);
+
+                    // 8s cast, then Algalon holds still for 3s before resuming
+                    events.SetPhase(PHASE_BIG_BANG);
+                    events.ScheduleEvent(EVENT_RESUME_UPDATING, 11s);
+                    events.DelayEventsToMax(11s, GROUP_COMBAT);
                     events.Repeat(90s + 500ms);
+
+                    me->SetCombatMovement(false);
+                    me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->MoveIdle();
                     break;
                 }
+            case EVENT_RESUME_UPDATING:
+                events.SetPhase(PHASE_NORMAL);
+                me->SetCombatMovement(true);
+                me->ResumeChasingVictim();
+                break;
             case EVENT_ASCEND_TO_THE_HEAVENS:
                 Talk(SAY_ALGALON_ASCEND);
                 me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
                 events.ScheduleEvent(EVENT_EVADE, 2500ms);
+                events.CancelEvent(EVENT_RESUME_UPDATING);
+                me->SetCombatMovement(true);
                 break;
             case EVENT_EVADE:
                 events.Reset();
@@ -849,7 +872,8 @@ struct boss_algalon_the_observer : public ScriptedAI
                 break;
         }
 
-        DoMeleeAttackIfReady();
+        if (!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE))
+            DoMeleeAttackIfReady();
     }
 };
 
