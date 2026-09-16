@@ -8,13 +8,15 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/azerothcore/AzerothGhost/client"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
 
 const (
-	dalaranMap   uint32 = 571
-	settleWindow        = 9 * time.Second
+	dalaranMap     uint32 = 571
+	spellSummonImp        = 688
+	settleWindow          = 9 * time.Second
 )
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/4467
@@ -111,4 +113,91 @@ func TestAC_4467_DalaranGuardsOnlyEjectFromRestrictedAreas(t *testing.T) {
 
 	t.Run("Horde", func(t *testing.T) { run(t, e2eharness.RaceOrc, horde) })
 	t.Run("Alliance", func(t *testing.T) { run(t, e2eharness.RaceHuman, alliance) })
+	t.Run("PetInsideOwnerOutside", petInsideOwnerOutside)
+}
+
+// The guard classifies and casts on who, not on who's owner, so a controlled unit
+// inside a quarter is ejected on its own footing even while its owner stands on
+// public ground. Every other case here is a lone player, where the two positions
+// are identical - this is the only one that would catch a regression reading the
+// owner instead.
+func petInsideOwnerOutside(t *testing.T) {
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix:        "TresP",
+		Race:          e2eharness.RaceOrc,
+		Class:         e2eharness.ClassWarlock,
+		Level:         80,
+		LearnAllClass: true,
+	})
+
+	bot.Learn(t, spellSummonImp)
+	_ = bot.CastOrGM(t, spellSummonImp, 0, 20*time.Second)
+	pet := bot.WaitPlayerPet(t, 25*time.Second)
+
+	petPos := func() (float32, float32, float32, bool) {
+		for _, u := range bot.World.GetNearbyUnits(200) {
+			if u.GUID == pet {
+				return u.PosX, u.PosY, u.PosZ, true
+			}
+		}
+		return 0, 0, 0, false
+	}
+
+	// Park owner and pet inside the Enclave under GM - the guard reads
+	// IsGameMaster() from the owner, so nothing fires while positioning.
+	e2eharness.MustGM(t, bot.World, ".gm on")
+	e2eharness.TeleportGo(t, bot.World, 5740.3, 739.6, 641.9, dalaranMap)
+	time.Sleep(3 * time.Second)
+	stay := client.MakePetActionButton(client.PetCommandStay, client.PetActCommand)
+	if err := bot.World.PetAction(pet, stay, 0); err != nil {
+		e2eharness.HarnessFailf(t, "pet stay: %v", err)
+	}
+	time.Sleep(2 * time.Second)
+
+	// Owner out to the public mailbox; the pet stays behind inside the quarter.
+	e2eharness.TeleportGo(t, bot.World, 5740.3, 680.9, 644.7, dalaranMap)
+	time.Sleep(3 * time.Second)
+	px, py, pz, ok := petPos()
+	if !ok {
+		e2eharness.HarnessFailf(t, "pet is no longer tracked; it followed or despawned, so this case proves nothing")
+	}
+	if e2eharness.Distance3D(px, py, pz, 5740.3, 739.6, 641.9) > 10 {
+		e2eharness.HarnessFailf(t, "pet did not hold position inside the quarter (%.1f, %.1f, %.1f)", px, py, pz)
+	}
+
+	e2eharness.MustGM(t, bot.World, ".gm off")
+	bot.FlushWorld(t)
+
+	// A stationary unit is never re-evaluated - MoveInLineOfSight fires on
+	// relocation - so command Follow to make it move while still inside.
+	follow := client.MakePetActionButton(client.PetCommandFollow, client.PetActCommand)
+	if err := bot.World.PetAction(pet, follow, 0); err != nil {
+		e2eharness.HarnessFailf(t, "pet follow: %v", err)
+	}
+
+	ejected := false
+	deadline := time.Now().Add(settleWindow)
+	for time.Now().Before(deadline) {
+		x, y, z, still := petPos()
+		if !still {
+			break
+		}
+		// Ejection lands on the trespasser destination, ~19y from the owner, so it
+		// is distinguishable from the pet simply walking back.
+		if e2eharness.Distance3D(x, y, z, 5758.79, 678.36, 642.73) < 5 {
+			ejected = true
+			break
+		}
+		time.Sleep(250 * time.Millisecond)
+	}
+
+	ox, oy, oz, _ := bot.Pos()
+	if e2eharness.Distance3D(ox, oy, oz, 5740.3, 680.9, 644.7) > 10 {
+		e2eharness.Assertf(t, "the owner was teleported off public ground at the mailbox; only the pet was trespassing")
+	}
+	if !ejected {
+		e2eharness.Assertf(t, "a pet left inside the Silver Enclave was not ejected while its owner stood on public ground; "+
+			"the guard is reading the owner's position instead of the trespasser's")
+	}
+	t.Logf("PASS PetInsideOwnerOutside      pet ejected, owner untouched on public ground")
 }
