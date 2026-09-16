@@ -1,3 +1,4 @@
+-- DB update 2026_09_16_02 -> 2026_09_16_03
 --
 UPDATE `quest_template_addon` SET `ExclusiveGroup` = 0 WHERE `ID` IN (6541, 6542);
 
