@@ -26,7 +26,29 @@ class PlayerCharmAIIntegrationTest : public IntegrationTestFixture
 protected:
     void PreparePlayer(TestPlayer* player, uint32 faction)
     {
+        static constexpr uint32 TestDisplayId = 90003;
+        static constexpr uint32 TestModelId = 90003;
+        static bool modelInitialized = false;
+        if (!modelInitialized)
+        {
+            auto* displayInfo = new CreatureDisplayInfoEntry{};
+            displayInfo->Displayid = TestDisplayId;
+            displayInfo->ModelId = TestModelId;
+            displayInfo->scale = 1.0f;
+            sCreatureDisplayInfoStore.SetEntry(TestDisplayId, displayInfo);
+
+            auto* modelData = new CreatureModelDataEntry{};
+            modelData->Id = TestModelId;
+            modelData->Scale = 1.0f;
+            modelData->CollisionWidth = 1.0f;
+            modelData->CollisionHeight = 2.0f;
+            sCreatureModelDataStore.SetEntry(TestModelId, modelData);
+            modelInitialized = true;
+        }
+
         player->SetFaction(faction);
+        player->SetNativeDisplayId(TestDisplayId);
+        player->SetDisplayId(TestDisplayId);
         player->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         player->SetMaxHealth(1000);
         player->SetHealth(1000);
