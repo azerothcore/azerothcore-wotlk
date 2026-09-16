@@ -3871,8 +3871,17 @@ void Spell::cancel(bool bySelf)
     }
 
     if (m_spellInfo->IsChanneled()) // if not channeled then the object for the current cast wasn't summoned yet
+    {
         if (unitCaster)
-            unitCaster->RemoveGameObject(m_spellInfo->Id, true);
+        {
+            if (GameObject* gameObject = unitCaster->GetGameObject(m_spellInfo->Id))
+            {
+                unitCaster->RemoveGameObject(gameObject, true);
+                if (gameObject->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL && unitCaster->IsPlayer())
+                    unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            }
+        }
+    }
 
     //set state back so finish will be processed
     m_spellState = oldState;

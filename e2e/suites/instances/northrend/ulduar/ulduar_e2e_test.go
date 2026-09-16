@@ -1361,3 +1361,89 @@ func TestAC_27539_AlgalonBigBangStasis(t *testing.T) {
 
 	t.Logf("PASS Big Bang stasis: no damage for %s after the cast, then Algalon resumed", stasisWindow)
 }
+
+// Freya's Ward summons its adds with 62947, whose own summon duration is 10s, and
+// npc_freya_ward_summon raises them to TEMPSUMMON_MANUAL_DESPAWN so they stay until the encounter
+// clears them. Spell::EffectSummonType re-applies that duration once the summon call returns, which
+// is after IsSummonedBy has run, so an override applied from inside that hook is discarded and the
+// lashers vanish 10s in while the raid is still fighting them.
+// The IsSummonedBy override arrived with https://github.com/azerothcore/azerothcore-wotlk/pull/27567
+func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances"},
+		Runtime:  "med",
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcFreyaWardReticle = uint32(33366)
+		npcFreyaWard        = uint32(33367)
+		npcWrithingLasher   = uint32(33387)
+		npcWardOfLife       = uint32(34275)
+
+		addSearchRange = float32(100)
+
+		// npc_freya_ward resets its cast timer to 25s and casts at 29s, so the first lasher lands
+		// ~4s after the ward spawns. One extra 29s cycle covers a ward that missed that window.
+		firstLasherWindow = 40 * time.Second
+
+		// 62947 carries SpellDuration 1 (10s). A lasher still in the cache this long after it
+		// appeared is not running on the spell's own timer. Do not shorten it below 10s: that is
+		// the despawn this guards, and a shorter window would pass on an unfixed core.
+		outliveWindow = 25 * time.Second
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "FWard", Race: e2eharness.RaceHuman, Level: 80,
+	})
+
+	// Stay GM through the raid enter, and use the brain room floor: it is empty, so nothing else
+	// pulls the bot while the lasher is being timed.
+	bot.Teleport(t, 1930.0, -120.0, 240.07, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after brain room tele map=%d", m)
+	}
+
+	// The ward only casts while a reticle is within 60y of it, so the reticle goes down first.
+	reticle := bot.Spawn(t, npcFreyaWardReticle, 30*time.Second)
+	ward := bot.Spawn(t, npcFreyaWard, 30*time.Second)
+
+	// Drops GM so the lasher's DoZoneInCombat can pick the bot up the way it picks up a raid, and
+	// turns on god mode, which is what keeps the bot standing there for the whole window.
+	bot.CombatReady(t)
+
+	lasher := bot.WaitUnit(t, npcWrithingLasher, firstLasherWindow)
+	if lasher == 0 {
+		e2eharness.Preconditionf(t, "Freya's Ward 0x%X never summoned a Writhing Lasher next to reticle 0x%X", ward, reticle)
+	}
+	appeared := time.Now()
+	t.Logf("Writhing Lasher 0x%X summoned by ward 0x%X", lasher, ward)
+
+	// Pin the GUID: the ward keeps summoning every 29s, so "some lasher is in the cache" would
+	// still be true on an unfixed core and would hide the despawn.
+	deadline := appeared.Add(outliveWindow)
+	for time.Now().Before(deadline) {
+		if bot.World.GetObject(lasher) == nil {
+			e2eharness.Assertf(t, "Writhing Lasher 0x%X left the world %s after it was summoned — IsSummonedBy set TEMPSUMMON_MANUAL_DESPAWN but 62947's own 10s duration was restored over it",
+				lasher, time.Since(appeared).Round(time.Millisecond))
+		}
+		time.Sleep(250 * time.Millisecond)
+	}
+
+	hp, maxHP := bot.UnitHP(lasher)
+	if hp == 0 {
+		e2eharness.Preconditionf(t, "Writhing Lasher 0x%X is a corpse (%d/%d) — something killed it, so its lifetime proves nothing", lasher, hp, maxHP)
+	}
+	t.Logf("PASS Writhing Lasher 0x%X still up %s after summon (hp=%d/%d)", lasher, outliveWindow, hp, maxHP)
+
+	// A MANUAL_DESPAWN summon has nothing of its own to remove it, and deleting the ward does not
+	// take its adds with it, so they have to be killed here. The ward dies first: while it lives it
+	// summons another pair every 29s, and a sweep taken before that would race the next cycle.
+	bot.DamageKill(t, []uint64{ward}, 10_000_000, 30*time.Second)
+	var adds []uint64
+	for _, add := range bot.UnitsByEntry(addSearchRange, npcWrithingLasher, npcWardOfLife) {
+		adds = append(adds, add.GUID)
+	}
+	bot.DamageKill(t, adds, 10_000_000, 30*time.Second)
+	bot.AssertWorldAlive(t)
+}
