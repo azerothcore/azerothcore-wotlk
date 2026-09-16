@@ -1,5 +1,5 @@
 -- Deathbringer Saurfang outro: the camp props only spawned on 10N/25N.
-UPDATE `gameobject` SET `spawnMask` = 15 WHERE `guid` IN (12363, 55882, 81649);
+UPDATE `gameobject` SET `spawnMask` = 15 WHERE `id` IN (1685, 191345, 187852) AND `guid` IN (12363, 55882, 81649);
 
 -- Grip of Agony hangs Muradin/High Overlord and their guards in the air, and the script owns the
 -- disable-gravity flag for that. Without 512 (CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE) the core
