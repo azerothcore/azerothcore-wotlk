@@ -26,7 +26,6 @@ class PlayerCharmAIIntegrationTest : public IntegrationTestFixture
 protected:
     void PreparePlayer(TestPlayer* player, uint32 faction)
     {
-        player->SetPhase(1);
         player->SetFaction(faction);
         player->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         player->SetMaxHealth(1000);
