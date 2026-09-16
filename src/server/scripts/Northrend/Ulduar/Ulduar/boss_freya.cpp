@@ -76,8 +76,8 @@ enum FreyaSpells
     // BRIGHTLEAF
     SPELL_BRIGHTLEAF_FLUX                       = 62239,
     SPELL_SOLAR_FLARE                           = 62240,
-    // summons one beam at the caster and force-casts 62221 on every player in range,
-    // each summoning another beam at their own feet
+    // summons one beam at the caster and force-casts 62221 on the players picked by
+    // spell_freya_brightleaf_unstable_sun_beam, each summoning another beam at their own feet
     SPELL_UNSTABLE_SUN_BEAM_SUMMON              = 62207,
 
     // IRONBRANCH
@@ -1386,6 +1386,22 @@ class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
     }
 };
 
+// 62207 - Unstable Sun Beam
+class spell_freya_brightleaf_unstable_sun_beam : public SpellScript
+{
+    PrepareSpellScript(spell_freya_brightleaf_unstable_sun_beam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_freya_brightleaf_unstable_sun_beam::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 // 62450 - Unstable Sun Beam
 class spell_freya_unstable_sun_beam : public SpellScript
 {
@@ -1416,6 +1432,7 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
 
     RegisterSpellScript(spell_freya_attuned_to_nature_dose_reduction);
+    RegisterSpellScript(spell_freya_brightleaf_unstable_sun_beam);
     RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();
