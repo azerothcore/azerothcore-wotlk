@@ -231,6 +231,8 @@ Position const SaurfangCampGeneralGoodsPosA = { -530.60070f, 2227.6736f, 539.277
 // Where the zeppelin comes to rest; it is frozen on arrival.
 Position const SaurfangOutroZeppelinPos     = { -527.66110f, 2254.6910f, 538.53300f, 0.6848107f };
 float const SaurfangOutroZeppelinDockRange  = 12.0f;
+// Saurfang's spot on deck while it flies in, relative to the transport.
+Position const SaurfangZeppelinPassengerOffset = { -1.122207f, -2.488975f, -17.782246f, 1.553343f };
 
 // Travel time of a mover at its run speed to a point, plus a margin for the spline to settle.
 static Milliseconds RunTimeTo(Unit const* who, Position const& to)
@@ -1387,6 +1389,13 @@ public:
                         RestoreSaurfangEventNpc(guard);
         }
 
+        void DespawnSaurfangZeppelinPassenger()
+        {
+            if (Creature* passenger = instance->GetCreature(SaurfangZeppelinPassengerGUID))
+                passenger->DespawnOrUnsummon();
+            SaurfangZeppelinPassengerGUID.Clear();
+        }
+
         // staged runs the on-screen build: teleporters and workers first, the tents once the workers
         // have hammered a while, then the vendors walking in. Unstaged drops the finished camp at
         // once, for an instance already DONE. The Horde crew is quicker off the mark than the Alliance one.
@@ -1560,18 +1569,34 @@ public:
                 case DATA_SAURFANG_OUTRO_ZEPPELIN:
                     if (data == IN_PROGRESS)
                     {
-                        if (!SaurfangZeppelinGUID)
+                        if (SaurfangZeppelinGUID)
+                            break;
+
+                        _saurfangZeppelinDocked = false;
+                        _saurfangZeppelinLeaving = false;
+                        MotionTransport* zeppelin = sTransportMgr->CreateTransport(GO_SAURFANG_OUTRO_ZEPPELIN, 0, instance);
+                        if (!zeppelin)
+                            break;
+
+                        SaurfangZeppelinGUID = zeppelin->GetGUID();
+                        zeppelin->setActive(true);
+                        Events.ScheduleEvent(EVENT_SAURFANG_ZEPPELIN_DOCK, 1s);
+
+                        // Saurfang rides in on deck; the one stepping off at the edge replaces him.
+                        float x, y, z, o;
+                        SaurfangZeppelinPassengerOffset.GetPosition(x, y, z, o);
+                        zeppelin->CalculatePassengerPosition(x, y, z, &o);
+                        if (Creature* passenger = instance->SummonCreature(NPC_SE_HIGH_OVERLORD_SAURFANG, Position(x, y, z, o)))
                         {
-                            _saurfangZeppelinDocked = false;
-                            _saurfangZeppelinLeaving = false;
-                            if (MotionTransport* zeppelin = sTransportMgr->CreateTransport(GO_SAURFANG_OUTRO_ZEPPELIN, 0, instance))
-                            {
-                                SaurfangZeppelinGUID = zeppelin->GetGUID();
-                                zeppelin->setActive(true);
-                                Events.ScheduleEvent(EVENT_SAURFANG_ZEPPELIN_DOCK, 1s);
-                            }
+                            zeppelin->AddPassenger(passenger, true);
+                            passenger->SetReactState(REACT_PASSIVE);
+                            passenger->SetSheath(SHEATH_STATE_MELEE);
+                            passenger->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                            SaurfangZeppelinPassengerGUID = passenger->GetGUID();
                         }
                     }
+                    else if (data == SPECIAL)
+                        DespawnSaurfangZeppelinPassenger();
                     // Asked for twice (departure, then cleanup); without the guard the second call
                     // would restart the removal timer.
                     else if (SaurfangZeppelinGUID && !_saurfangZeppelinLeaving)
@@ -1584,8 +1609,9 @@ public:
                                 zeppelin->EnableMovement(true);
 
                         // Releasing _pendingStop does not launch it: it leaves when the stop frame
-                        // DepartureTime comes round, ~24s. Removal is well past that.
-                        Events.ScheduleEvent(EVENT_SAURFANG_ZEPPELIN_REMOVE, 60s);
+                        // DepartureTime comes round, ~24s, and takes about 50s more to fly back to
+                        // its berth above the rise. Removal is once it is back there.
+                        Events.ScheduleEvent(EVENT_SAURFANG_ZEPPELIN_REMOVE, 80s);
                     }
                     break;
                 case DATA_BUFF_AVAILABLE:
@@ -2164,6 +2190,7 @@ public:
                         SummonSaurfangCampVendor(false, true);
                         break;
                     case EVENT_SAURFANG_ZEPPELIN_REMOVE:
+                        DespawnSaurfangZeppelinPassenger();
                         if (GameObject* go = instance->GetGameObject(SaurfangZeppelinGUID))
                         {
                             // A MO_TRANSPORT is not despawned like an ordinary gameobject.
@@ -2368,6 +2395,7 @@ public:
         std::array<ObjectGuid, 2> SaurfangCampTeleporterGUIDs;
         std::array<ObjectGuid, 2> SaurfangCampWorkerGUIDs;
         ObjectGuid SaurfangZeppelinGUID;
+        ObjectGuid SaurfangZeppelinPassengerGUID;
         bool _saurfangCampSpawned;
         bool _saurfangOutroRunning;
         bool _saurfangZeppelinDocked;

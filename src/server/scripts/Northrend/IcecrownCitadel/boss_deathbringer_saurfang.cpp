@@ -199,8 +199,10 @@ enum EventTypes
     EVENT_OUTRO_A_MURADIN_ACK   = 71,
     EVENT_OUTRO_A_DISMISS       = 72,
 
+    EVENT_OUTRO_A_ZEPPELIN      = 73,
+
     // Guards
-    EVENT_OUTRO_GUARD_VANISH    = 73,
+    EVENT_OUTRO_GUARD_VANISH    = 74,
 };
 
 enum Phases
@@ -1001,6 +1003,7 @@ public:
                     _events.ScheduleEvent(EVENT_OUTRO_DESCEND, 6s + 100ms);
                     _events.ScheduleEvent(EVENT_OUTRO_MOURN, 9s + 300ms);
                     _events.ScheduleEvent(EVENT_OUTRO_KNEEL, 9s + 700ms);
+                    _events.ScheduleEvent(EVENT_OUTRO_A_ZEPPELIN, 7s + 300ms);
                     _events.ScheduleEvent(EVENT_OUTRO_GUARDS_KNEEL, 13s + 300ms);
                     _events.ScheduleEvent(EVENT_OUTRO_WALK, 15s + 300ms);
                     _events.ScheduleEvent(EVENT_OUTRO_A_DISTANCE, 27s + 500ms);
@@ -1160,10 +1163,13 @@ public:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(POINT_A_MURADIN_STEP, allianceMuradinStepPos);
                     break;
+                case EVENT_OUTRO_A_ZEPPELIN:
+                    // Launched well before Muradin spots it, so it is in the distance by then.
+                    _instance->SetData(DATA_SAURFANG_OUTRO_ZEPPELIN, IN_PROGRESS);
+                    break;
                 case EVENT_OUTRO_A_DISTANCE:
                     Talk(SAY_OUTRO_ALLIANCE_3);
                     me->SetFacingTo(allianceMuradinStepPos.GetOrientation());
-                    _instance->SetData(DATA_SAURFANG_OUTRO_ZEPPELIN, IN_PROGRESS);
                     break;
                 case EVENT_OUTRO_A_TAKE_POST:
                     me->SetWalk(false);
@@ -1205,6 +1211,8 @@ public:
                         saurfang->SetWalk(true);
                         saurfang->GetMotionMaster()->MovePoint(POINT_A_SAURFANG_MEET, allianceSaurfangMeetPos);
                     }
+                    // The one riding the zeppelin has stepped off.
+                    _instance->SetData(DATA_SAURFANG_OUTRO_ZEPPELIN, SPECIAL);
                     _events.ScheduleEvent(EVENT_OUTRO_A_MURADIN_HALT, 6s + 400ms);
                     break;
                 case EVENT_OUTRO_A_MURADIN_HALT:
