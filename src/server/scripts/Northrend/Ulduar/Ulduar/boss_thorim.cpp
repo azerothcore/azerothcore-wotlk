@@ -53,10 +53,10 @@ enum ThorimSpells
     SPELL_TOUCH_OF_DOMINION                 = 62507,
     SPELL_SIF_TRANSFORM                     = 64778,
     SPELL_SIF_CHANNEL_HOLOGRAM              = 64324,
-    SPELL_FROSTBOLT                         = 62601,
-    SPELL_FROSTBOLT_VALLEY                  = 62604,
+    SPELL_FROSTBOLT                         = 62583,
+    SPELL_FROSTBOLT_VALLEY                  = 62580,
     SPELL_BLIZZARD                          = 62577,
-    SPELL_FROST_NOVA                        = 62605,
+    SPELL_FROST_NOVA                        = 62597,
 
     // DARK RUNE ACOLYTE
     SPELL_GREATER_HEAL                      = 62334,

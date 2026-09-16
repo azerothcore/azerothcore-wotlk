@@ -51,6 +51,7 @@ enum UlduarData
     TYPE_WATCHERS                           = 14,
     TYPE_HODIR_HM_FAIL                      = 15,
     TYPE_WINTER_CACHE                       = 16,
+    TYPE_HODIR_HM_RESET                     = 17,
 
     // Assembly of Iron
     DATA_STEELBREAKER                       = 20,
@@ -276,6 +277,7 @@ enum UlduarGameObjects
     GO_LEVIATHAN_DOORS                      = 194630,
     GO_LIGHTNING_WALL1                      = 194905,
     GO_LIGHTNING_WALL2                      = 194416,
+    GO_ULDUAR_PROTECTIVE_BUBBLE             = 194484,
     GO_MIMIRONS_TARGETTING_CRYSTAL          = 194705,
     GO_FREYAS_TARGETTING_CRYSTAL            = 194704,
     GO_HODIRS_TARGETTING_CRYSTAL            = 194707,

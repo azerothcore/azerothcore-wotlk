@@ -7,8 +7,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
+	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
 
 // SESS-01: position readable after login (seed of inventory/pos load).
