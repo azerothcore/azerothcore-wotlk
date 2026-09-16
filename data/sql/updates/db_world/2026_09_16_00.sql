@@ -1,3 +1,4 @@
+-- DB update 2026_09_15_03 -> 2026_09_16_00
 -- Deathbringer Saurfang outro: the camp props only spawned on 10N/25N.
 UPDATE `gameobject` SET `spawnMask` = 15 WHERE `id` IN (1685, 191345, 187852) AND `guid` IN (12363, 55882, 81649);
 
