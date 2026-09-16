@@ -664,7 +664,13 @@ public:
                     {
                         creature->SetDisableGravity(true);
                         creature->SetPosition(creature->GetHomePosition());
-                        creature->setDeathState(DeathState::JustDied);
+                        creature->setDeathState(DeathState::Corpse);
+                        creature->SetHealth(0);
+                        creature->SetStandState(UNIT_STAND_STATE_STAND);
+                        creature->ReplaceAllDynamicFlags(0);
+                        creature->SetCorpseDelay(7 * DAY);
+                        creature->SetCorpseRemoveTime(7 * DAY);
+                        creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         creature->StopMovingOnCurrentPos();
                     }
                     break;
@@ -878,6 +884,19 @@ public:
             }
         }
 
+        // A shattered Rare Cache stays down for the DB respawn delay (7 days), so it has to be
+        // brought back with Hodir or the next attempt can never earn it.
+        void respawnHodirHardmodeChest()
+        {
+            if (GetBossState(BOSS_HODIR) == DONE)
+                return;
+
+            _hmHodir = true;
+
+            if (GameObject* go = GetHodirChest(true))
+                go->Respawn();
+        }
+
         void setChestsLootable(uint32 boss)
         {
             if (boss)
@@ -907,6 +926,9 @@ public:
         {
             switch (type)
             {
+                case TYPE_HODIR_HM_RESET:
+                    respawnHodirHardmodeChest();
+                    break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = GetHodirChest(true))
                     {

@@ -51,6 +51,7 @@ enum UlduarData
     TYPE_WATCHERS                           = 14,
     TYPE_HODIR_HM_FAIL                      = 15,
     TYPE_WINTER_CACHE                       = 16,
+    TYPE_HODIR_HM_RESET                     = 17,
 
     // Assembly of Iron
     DATA_STEELBREAKER                       = 20,
