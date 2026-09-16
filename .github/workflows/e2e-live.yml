@@ -54,7 +54,7 @@ on:
         required: false
         default: '1'
       timeout:
-        description: 'go test -timeout (smoke default 30m; full should be >=120m)'
+        description: 'go test -timeout (smoke default 30m; full default 60m; job ceiling 90m)'
         required: false
         default: ''
       parallel:
@@ -86,11 +86,16 @@ env:
 jobs:
   e2e:
     name: e2e (native / ${{ inputs.scope || 'full' }})
+    # github.repository is the base repo on pull_request, so fork PRs still run here.
+    # This only skips the job inside a fork's own CI.
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     # Artifact path (PR nopch): ubuntu-24.04 to match the uploaded binaries.
     # Dispatch (no artifact): optional self-hosted via E2E_RUNS_ON.
+    # Ephemeral runners only: MySQL grants persist accounts, and Stop servers
+    # pkill env/dist/bin/worldserver and authserver.
     runs-on: ${{ inputs.artifact_run_id != '' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
-    timeout-minutes: 480
+    # Real ceiling. go test -timeout is per package (full default 60m).
+    timeout-minutes: 90
     steps:
       - name: Free disk
         run: |
@@ -107,6 +112,17 @@ jobs:
         with:
           go-version-file: e2e/go.mod
           cache-dependency-path: e2e/go.sum
+
+      - name: Check gofmt
+        working-directory: e2e
+        run: |
+          set -euo pipefail
+          dirty="$(gofmt -l .)"
+          if [[ -n "${dirty}" ]]; then
+            echo "::error::gofmt needed"
+            printf '%s\n' "${dirty}"
+            exit 1
+          fi
 
       # AzerothGhost is a public Go module (e2e/go.mod; repo azerothcore/AzerothGhost).
       - name: Download e2e modules
@@ -360,7 +376,7 @@ jobs:
               || { echo "bad timeout duration: ${E2E_TIMEOUT_INPUT}"; exit 1; }
             timeout="${E2E_TIMEOUT_INPUT}"
           elif [[ "${scope}" == "full" ]]; then
-            timeout="180m"
+            timeout="60m"
           else
             timeout="30m"
           fi
