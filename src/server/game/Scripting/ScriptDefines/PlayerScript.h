@@ -27,6 +27,16 @@
 #include "AchievementMgr.h"
 #include "KillRewarder.h"
 
+namespace Trainer
+{
+    enum class SpellState : uint8;
+}
+
+namespace WorldPackets::NPC
+{
+    class TrainerList;
+}
+
 enum PlayerHook
 {
     PLAYERHOOK_ON_PLAYER_JUST_DIED,
@@ -217,6 +227,10 @@ enum PlayerHook
     PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN,
     PLAYERHOOK_ON_AFTER_TAKE_ITEM_FROM_MAIL,
+    PLAYERHOOK_CAN_LEARN_SPELL,
+    PLAYERHOOK_ON_BEFORE_RECEIVE_SPELL_LIST_FROM_TRAINER,
+    PLAYERHOOK_ON_GET_TRAINER_SPELL_STATE,
+    PLAYERHOOK_ON_AFTER_TRAIN_SPELL,
     PLAYERHOOK_END
 };
 
@@ -869,6 +883,69 @@ public:
      * @param count Number of items taken
      */
     virtual void OnPlayerAfterTakeItemFromMail(Player* /*player*/, Item* /*item*/, uint32 /*count*/) {}
+
+    /**
+     * @brief This hook is called before a player learns a spell, and can cancel the learning.
+     *
+     * It fires late, once its caller has committed: refusing does not undo what that caller already
+     * did. A trainer has taken the money and still reports success, and Player::LearnTalent spends
+     * the point and records the talent anyway -- use OnPlayerCanLearnTalent to stop a talent.
+     *
+     * Only Player::learnSpell reaches it; spells written through addSpell do not. Those bypasses
+     * include character loading (_LoadSpells, and the initial class and skill-rewarded spells,
+     * which run on every login) and talent spells from _addTalentAurasAndSpells, reapplied on
+     * every dual-spec switch -- so a refusal in world is undone the next time one of them runs.
+     *
+     * What it sees can be indirect: a trainer entry that wraps other spells (a paladin's Summon
+     * Warhorse) is cast, so the hook sees the wrapped spells instead. A talent rank arrives only
+     * when it lands in the spell book, which most do not -- but a learn-spell talent still
+     * delivers its additional talent spells.
+     *
+     * @param player Contains information about the Player
+     * @param spellId The id of the spell about to be learned
+     *
+     * @return true if the player is allowed to learn the spell
+     */
+    [[nodiscard]] virtual bool OnPlayerCanLearnSpell(Player* /*player*/, uint32 /*spellId*/) { return true; }
+
+    /**
+     * @brief This hook is called before a trainer's spell list is sent to a player, and can edit
+     *        the spells the trainer window will display.
+     *
+     * It only changes what is displayed. Whether the trainer teaches a spell is decided by its
+     * state, so one dropped here can still be bought by a client that asks for it directly --
+     * refuse it in OnPlayerGetTrainerSpellState as well to make it stick.
+     *
+     * @param player Contains information about the Player
+     * @param trainer Contains information about the trainer
+     * @param trainerList The list of spells the trainer is about to display to the player
+     */
+    virtual void OnPlayerBeforeReceiveSpellListFromTrainer(Player* /*player*/, Creature* /*trainer*/, WorldPackets::NPC::TrainerList& /*trainerList*/) {}
+
+    /**
+     * @brief This hook is called when a trainer resolves the state of one of its spells for a
+     *        player, and can override it. The state drives both how the spell is displayed and
+     *        whether the trainer will teach it, so an override here keeps the two in step.
+     *
+     * @param player Contains information about the Player
+     * @param trainerId The id of the trainer holding the spell
+     * @param spellId The id of the trainer spell whose state is being resolved
+     * @param state The state the trainer worked out, to be read and overwritten
+     */
+    virtual void OnPlayerGetTrainerSpellState(Player const* /*player*/, uint32 /*trainerId*/, uint32 /*spellId*/, Trainer::SpellState& /*state*/) {}
+
+    /**
+     * @brief This hook is called after a trainer purchase went through, once the money has been
+     *        taken and success reported to the client.
+     *
+     * That does not guarantee the player ended up with the spell: a refused OnPlayerCanLearnSpell,
+     * or a spell already active, leaves the trainer's side done and nothing learned.
+     *
+     * @param player Contains information about the Player
+     * @param trainer Contains information about the trainer
+     * @param spellId The id of the trainer spell that was bought
+     */
+    virtual void OnPlayerAfterTrainSpell(Player* /*player*/, Creature* /*trainer*/, uint32 /*spellId*/) {}
 };
 
 #endif
