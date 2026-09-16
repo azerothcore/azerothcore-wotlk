@@ -155,6 +155,7 @@ SetPlayerGuildFieldsResponse ToCloud9GrpcHandler::SetPlayerGuildFields(uint64 pl
     // live object to avoid a relog after a rank change.
     if (player->GetGuildId() != guildId)
         player->SetInGuild(guildId);
+
     player->SetRank(static_cast<uint8>(rank));
 
     resp.applied = true;
