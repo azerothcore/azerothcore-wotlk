@@ -172,5 +172,6 @@ private:
     {
         ABORT();
     }
+    void CastPendingSpell();
 };
 #endif
