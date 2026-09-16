@@ -586,6 +586,7 @@ struct instance_blackrock_depths : public InstanceScript
 
                     // awaken the Warbringer Constructs guarding the vault
                     for (ObjectGuid const& warderGUID : VaultWarderGUIDs)
+                    {
                         if (Creature* warder = instance->GetCreature(warderGUID))
                         {
                             warder->RemoveAurasDueToSpell(SPELL_STONED);
@@ -593,6 +594,7 @@ struct instance_blackrock_depths : public InstanceScript
                             warder->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             warder->SetReactState(REACT_AGGRESSIVE);
                         }
+                    }
 
                     // spawns at the room entrance, not amidst the constructs (position from cmangos)
                     Position pos = {821.905f, -338.382f, -50.134f, 3.78736f};
