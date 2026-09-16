@@ -1,3 +1,4 @@
+-- DB update 2026_09_16_01 -> 2026_09_16_02
 -- Watchman Doomgrip: the vault event completion (Secret Door + Secret Safe) is handled by the
 -- instance script when all four vault warders and Doomgrip are dead, so drop the old on-death
 -- shortcut that opened both on his death alone. The on-aggro unfreeze of nearby Warbringer

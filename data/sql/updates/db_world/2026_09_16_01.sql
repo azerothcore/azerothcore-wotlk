@@ -1,3 +1,4 @@
+-- DB update 2026_09_16_00 -> 2026_09_16_01
 --
 -- The four Warbringer Constructs in the Black Vault's Relic Coffer room must not
 -- re-apply Stoned (10255) from creature_addon on every evade (CreatureAI::_EnterEvadeMode
