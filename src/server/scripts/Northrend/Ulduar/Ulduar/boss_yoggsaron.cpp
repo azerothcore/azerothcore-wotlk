@@ -2586,14 +2586,17 @@ class spell_yogg_saron_lunatic_gaze : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        std::list<WorldObject*> tmplist;
-        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-            if ((*itr)->HasInArc(M_PI, GetCaster()))
-                tmplist.push_back(*itr);
+        Unit* caster = GetCaster();
+        // 64168 inherits SPELL_ATTR2_IGNORE_LINE_OF_SIGHT from the aura triggering it, so the illusion room walls have to be checked here
+        bool ignoreLos = GetSpellInfo()->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT);
 
-        targets.clear();
-        for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-            targets.push_back(*itr);
+        targets.remove_if([caster, ignoreLos](WorldObject* target)
+        {
+            if (!target->HasInArc(M_PI, caster))
+                return true;
+
+            return !ignoreLos && !caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2);
+        });
     }
 
     void Register() override
@@ -2870,9 +2873,27 @@ class spell_yogg_saron_sanity_reduce : public SpellScript
         }
     }
 
+    // Psychosis and Malady of the Mind skip anyone at 40 Sanity or less, so that their random
+    // targeting evens out across the raid instead of finishing off the lowest players.
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([](WorldObject* target)
+        {
+            Unit* unit = target->ToUnit();
+            if (!unit)
+                return true;
+
+            Aura* sanity = unit->GetAura(SPELL_SANITY);
+            return !sanity || sanity->GetStackAmount() <= 40;
+        });
+    }
+
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_sanity_reduce::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
+
+        if (m_scriptSpellId == SPELL_SARA_PSYCHOSIS_10 || m_scriptSpellId == SPELL_SARA_PSYCHOSIS_25 || m_scriptSpellId == SPELL_MALADY_OF_THE_MIND)
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_sanity_reduce::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
