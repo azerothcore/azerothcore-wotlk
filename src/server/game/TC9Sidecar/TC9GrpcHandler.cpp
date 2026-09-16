@@ -287,6 +287,7 @@ DestroyItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::DestroyItemsWithGui
     {
         if (destroyed[i] == 0)
             continue;
+
         itemsResult[itr++] = destroyed[i];
     }
 
@@ -562,6 +563,7 @@ StoreNewItemResponse ToCloud9GrpcHandler::StoreNewItem(StoreNewItemRequest* requ
             uint32 enchId = request->enchantmentIDs[i];
             if (!enchId)
                 continue;
+
             item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + uint16(i * MAX_ENCHANTMENT_OFFSET), enchId);
         }
         item->SetState(ITEM_CHANGED, player);
