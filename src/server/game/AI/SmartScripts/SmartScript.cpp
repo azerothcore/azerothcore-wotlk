@@ -5350,9 +5350,6 @@ void SmartScript::GetScript()
 
         FillScript(e, me, nullptr);
 
-        // The entry script is only added on top when the guid script replaced it. A spawn with no
-        // guid rows already fell back to the entry script above, so filling it again here would
-        // give the creature two copies of every event, each on its own timer.
         if (!usingEntryScript)
         {
             if (CreatureTemplate const* cInfo = me->GetCreatureTemplate())
