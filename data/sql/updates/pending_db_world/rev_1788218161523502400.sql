@@ -162,3 +162,5 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 (32445,3,0,'Neutralizing agent failing!$bAdd fluid soon!',41,0,100,0,0,0,32484,0,'Summoned Plague Cauldron Bunny 02'),
 (32445,4,0,'Neutralizing agent failing!$bAdd fluid NOW!!',41,0,100,0,0,0,32486,0,'Summoned Plague Cauldron Bunny 02'),
 (32445,5,0,'Neutralizing agent FAILED!',41,0,100,0,0,0,32487,0,'Summoned Plague Cauldron Bunny 02');
+
+DELETE FROM `creature_text_locale` WHERE `CreatureID`=31773 AND `Locale`='zhCN';
