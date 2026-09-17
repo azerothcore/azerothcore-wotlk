@@ -317,9 +317,11 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 
             // re-enqueue BG if free slots reopened due to invite expiration
             if (bg->HasFreeSlots())
-            {
                 bg->AddToBGFreeSlotQueue();
 
+            // schedule even for an ending BG, its invite may have been holding the bracket (mod-cfbg#182)
+            if (bg->isBattleground() || bg->HasFreeSlots())
+            {
                 BattlegroundQueueTypeId queueTypeId =
                     BattlegroundMgr::BGQueueTypeId(bg->GetBgTypeID(), bg->GetArenaType());
 
@@ -863,6 +865,17 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
     m_SelectionPools[TEAM_ALLIANCE].Init();
     m_SelectionPools[TEAM_HORDE].Init();
 
+    // no new instance while invites are pending, waiters backfill the reopened slots instead (mod-cfbg#182)
+    if (bg_template->isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_WAIT_FOR_PENDING_INVITES))
+    {
+        if (uint32 pendingInvites = GetPendingInvitesCount(bracket_id))
+        {
+            LOG_DEBUG("bg.battleground", "BattlegroundQueue: holding new instance for bgtype {} bracket {}, {} invites "
+                "pending", bgTypeId, bracket_id, pendingInvites);
+            return;
+        }
+    }
+
     // check if can start new premade battleground
     if (bg_template->isBattleground() && bgTypeId != BATTLEGROUND_RB && CheckPremadeMatch(bracket_id, MinPlayersPerTeam, MaxPlayersPerTeam))
     {
@@ -1103,6 +1116,27 @@ uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bra
             playersCount += static_cast<uint32>(itr->Players.size());
 
     return playersCount;
+}
+
+uint32 BattlegroundQueue::GetPendingInvitesCount(BattlegroundBracketId bracket_id) const
+{
+    uint32 pendingInvites = 0;
+
+    for (uint8 i = 0; i < BG_QUEUE_MAX; ++i)
+    {
+        for (GroupQueueInfo const* ginfo : m_QueuedGroups[bracket_id][i])
+        {
+            if (!ginfo->IsInvitedToBGInstanceGUID)
+                continue;
+
+            // members who accepted are already erased from Players
+            Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo->IsInvitedToBGInstanceGUID, ginfo->BgTypeId);
+            if (bg && bg->GetStatus() < STATUS_WAIT_LEAVE)
+                pendingInvites += static_cast<uint32>(ginfo->Players.size());
+        }
+    }
+
+    return pendingInvites;
 }
 
 bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
@@ -1450,8 +1484,8 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
             player->RemoveBattlegroundQueueId(m_BgQueueTypeId);
             bgQueue.RemovePlayer(m_PlayerGuid, true);
 
-            //update queues if battleground isn't ended
-            if (bg && bg->isBattleground() && bg->GetStatus() != STATUS_WAIT_LEAVE)
+            // even if the BG ended, its invite may have been holding the bracket (mod-cfbg#182)
+            if (bg && bg->isBattleground())
                 sBattlegroundMgr->ScheduleQueueUpdate(0, 0, m_BgQueueTypeId, m_BgTypeId, bg->GetBracketId());
 
             WorldPacket data;

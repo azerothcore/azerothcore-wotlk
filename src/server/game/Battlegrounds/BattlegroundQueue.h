@@ -88,6 +88,7 @@ public:
     void InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, TeamId teamId);
     [[nodiscard]] uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
     [[nodiscard]] bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
+    [[nodiscard]] uint32 GetPendingInvitesCount(BattlegroundBracketId bracket_id) const;
     void SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
     void SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo* ginfo, PvPDifficultyEntry const* bracketEntry, bool isRated);
     void SendExitMessageArenaQueue(GroupQueueInfo* ginfo);
