@@ -170,7 +170,6 @@ struct go_suppression_device : public GameObjectAI
     {
         if (action == ACTION_DEACTIVATE)
         {
-            Deactivate();
             _events.CancelEvent(EVENT_SUPPRESSION_RESET);
         }
         else if (action == ACTION_DISARMED)
