@@ -693,6 +693,46 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
 }
 
 /**
+ * @brief Makes the unit travel a closed, cyclic path around (x, y, z).
+ */
+void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool clockwise, uint8 stepCount)
+{
+    float step = 2 * float(M_PI) / stepCount * (clockwise ? -1.0f : 1.0f);
+    Position const pos = { x, y, z, 0.0f };
+    float angle = pos.GetAngle(_owner->GetPositionX(), _owner->GetPositionY());
+
+    Movement::MoveSplineInit init(_owner);
+
+    for (uint8 i = 0; i < stepCount; angle += step, ++i)
+    {
+        G3D::Vector3 point;
+        point.x = x + radius * cosf(angle);
+        point.y = y + radius * sinf(angle);
+
+        if (_owner->IsFlying())
+            point.z = z;
+        else
+            point.z = _owner->GetMap()->GetHeight(_owner->GetPhaseMask(), point.x, point.y, z);
+
+        init.Path().push_back(point);
+    }
+
+    if (_owner->IsFlying())
+    {
+        init.SetFly();
+        init.SetCyclic();
+        init.SetAnimation(AnimTier::Fly);
+    }
+    else
+    {
+        init.SetWalk(true);
+        init.SetCyclic();
+    }
+
+    init.Launch();
+}
+
+/**
  * @brief The unit will fall. Used when in the air. Doesn't work with UNIT_FLAG_DISABLE_MOVE
  */
 void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
