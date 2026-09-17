@@ -694,9 +694,20 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
 
 /**
  * @brief Makes the unit travel a closed, cyclic path around (x, y, z).
+ *
+ * @param stepCount Number of points the path is built from, must be at least 1: a zero count
+ *                  divides by zero and yields an empty path, which Launch() refuses, leaving the
+ *                  unit idle with neither spline nor movement generator.
  */
 void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool clockwise, uint8 stepCount)
 {
+    if (!stepCount)
+    {
+        LOG_ERROR("movement.motionmaster", "MotionMaster::MoveCirclePath: stepCount 0 for unit ({}), no path launched",
+            _owner->GetGUID().ToString());
+        return;
+    }
+
     float step = 2 * float(M_PI) / stepCount * (clockwise ? -1.0f : 1.0f);
     Position const pos = { x, y, z, 0.0f };
     float angle = pos.GetAngle(_owner->GetPositionX(), _owner->GetPositionY());
@@ -726,6 +737,7 @@ void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool 
     else
     {
         init.SetWalk(true);
+        init.SetSmooth();
         init.SetCyclic();
     }
 
