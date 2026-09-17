@@ -1380,7 +1380,7 @@ class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
     }
 };
 
-// 62653 - Tidal Wave
+// 62653, 62935 - Tidal Wave
 class spell_freya_tidal_wave : public SpellScript
 {
     PrepareSpellScript(spell_freya_tidal_wave);

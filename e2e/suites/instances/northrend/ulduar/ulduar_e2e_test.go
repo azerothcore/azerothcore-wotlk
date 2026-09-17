@@ -470,7 +470,6 @@ type sunBeamSnap struct {
 	x, y, z float32
 }
 
-// sunBeamsInCache reports beams by presence, not liveness: the bug is the object still existing.
 // unitFlags reads UNIT_FIELD_FLAGS off a unit in the object cache.
 func unitFlags(bot *e2eharness.ScenarioBot, guid uint64) uint32 {
 	obj := bot.World.GetObject(guid)
@@ -485,6 +484,7 @@ func elderNotSelectable(bot *e2eharness.ScenarioBot, guid uint64) bool {
 	return unitFlags(bot, guid)&client.UnitFlagNotSelectable != 0
 }
 
+// sunBeamsInCache reports beams by presence, not liveness: the bug is the object still existing.
 func sunBeamsInCache(bot *e2eharness.ScenarioBot, entry uint32, maxDist float32) []sunBeamSnap {
 	var out []sunBeamSnap
 	for _, u := range bot.World.GetNearbyUnits(maxDist) {
