@@ -26,7 +26,7 @@
 
 /**
  * Tests BattlegroundQueue::GetPendingInvitesCount: only unanswered invites
- * to live (not ending, not deleted) instances of the queried bracket count.
+ * to instances of the queried bracket that have not started yet count.
  */
 class PendingInvitesCountTest : public ::testing::Test
 {
@@ -49,7 +49,8 @@ protected:
     }
 
     // ~Battleground deregisters the instance
-    static void RegisterInstance(Battleground& bg, uint32 instanceId, BattlegroundTypeId typeId, BattlegroundStatus status)
+    static void RegisterInstance(Battleground& bg, uint32 instanceId, BattlegroundTypeId typeId,
+        BattlegroundStatus status)
     {
         bg.SetBgTypeID(typeId);
         bg.SetInstanceID(instanceId);
@@ -107,7 +108,7 @@ TEST_F(PendingInvitesCountTest, InvitesToLiveInstanceCountRemainingMembers)
     EXPECT_EQ(queue.GetPendingInvitesCount(BattlegroundBracketId(0)), 3u);
 }
 
-TEST_F(PendingInvitesCountTest, InvitesToInProgressInstanceCount)
+TEST_F(PendingInvitesCountTest, InvitesToInProgressInstanceDoNotCount)
 {
     Battleground bg;
     RegisterInstance(bg, 900002, BATTLEGROUND_WS, STATUS_IN_PROGRESS);
@@ -115,7 +116,7 @@ TEST_F(PendingInvitesCountTest, InvitesToInProgressInstanceCount)
     BattlegroundQueue queue;
     AddQueuedGroup(queue, BattlegroundBracketId(0), BG_QUEUE_CFBG, 900002, BATTLEGROUND_WS, 1);
 
-    EXPECT_EQ(queue.GetPendingInvitesCount(BattlegroundBracketId(0)), 1u);
+    EXPECT_EQ(queue.GetPendingInvitesCount(BattlegroundBracketId(0)), 0u);
 }
 
 TEST_F(PendingInvitesCountTest, InvitesToEndingInstanceDoNotCount)
