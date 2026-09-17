@@ -22,7 +22,6 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
@@ -1035,13 +1034,12 @@ struct boss_yoggsaron_sara : public ScriptedAI
     }
 };
 
-struct boss_yoggsaron_cloud : public npc_escortAI
+struct boss_yoggsaron_cloud : public PassiveAI
 {
-    boss_yoggsaron_cloud(Creature* creature) : npc_escortAI(creature)
+    boss_yoggsaron_cloud(Creature* creature) : PassiveAI(creature)
     {
-        InitWaypoint();
         Reset();
-        Start(false, ObjectGuid::Empty, nullptr, false, true);
+        MoveCircle();
     }
 
     uint32 _checkTimer;
@@ -1056,11 +1054,6 @@ struct boss_yoggsaron_cloud : public npc_escortAI
             if (Creature* sara = me->GetInstanceScript()->GetCreature(DATA_SARA))
                 sara->AI()->JustSummoned(cr);
     }
-
-    void MoveInLineOfSight(Unit*  /*who*/) override {}
-    void AttackStart(Unit*  /*who*/) override {}
-    using CreatureAI::WaypointReached;
-    void WaypointReached(uint32  /*point*/) override {}
 
     void Reset() override
     {
@@ -1082,28 +1075,14 @@ struct boss_yoggsaron_cloud : public npc_escortAI
         }
     }
 
-    void InitWaypoint()
+    void MoveCircle()
     {
-        float dist = Middle.GetExactDist(me);
-        if (me->GetPositionX() > Middle.GetPositionX())
-        {
-            for (uint8 i = 0; i <= dist; ++i)
-            {
-                float angle = M_PI * 2 / dist * i;
-                AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0);
-            }
-        }
-        else
-        {
-            for (uint8 i = 0; i <= dist; ++i)
-            {
-                float angle = M_PI * 2 - (M_PI * 2 / dist * i);
-                AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0);
-            }
-        }
+        bool clockwise = me->GetPositionX() < Middle.GetPositionX();
+        me->GetMotionMaster()->MoveCirclePath(Middle.GetPositionX(), Middle.GetPositionY(), me->GetPositionZ() + 5.0f,
+            Middle.GetExactDist(me), clockwise, 16);
     }
 
-    void UpdateEscortAI(uint32 diff) override
+    void UpdateAI(uint32 diff) override
     {
         _checkTimer += diff;
         if (_checkTimer >= 500 && !_isSummoning)
