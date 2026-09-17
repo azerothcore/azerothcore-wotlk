@@ -1078,7 +1078,7 @@ struct boss_yoggsaron_cloud : public PassiveAI
     void MoveCircle()
     {
         bool clockwise = me->GetPositionX() < Middle.GetPositionX();
-        me->GetMotionMaster()->MoveCirclePath(Middle.GetPositionX(), Middle.GetPositionY(), me->GetPositionZ() + 5.0f,
+        me->GetMotionMaster()->MoveCirclePath(Middle.GetPositionX(), Middle.GetPositionY(), me->GetPositionZ(),
             Middle.GetExactDist(me), clockwise, 16);
     }
 

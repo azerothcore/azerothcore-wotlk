@@ -699,17 +699,18 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
  * the argument or follows the terrain, and which speed is used; forcedMovement overrides the
  * walk/run choice, and FORCED_MOVEMENT_FLY flies a unit that is not fly-flagged.
  *
- * @param stepCount Number of points the path is built from, must be at least 1: a zero count
- *                  divides by zero and yields an empty path, which Launch() refuses, leaving the
- *                  unit idle with neither spline nor movement generator.
+ * @param stepCount Number of points the path is built from, must be at least 2: a lower count
+ *                  yields an empty or single-point path, which Launch() refuses, leaving the unit
+ *                  idle with neither spline nor movement generator.
  * @param speed     Fixed velocity; 0.0f keeps the speed the movement flags select.
  */
-void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool clockwise, uint8 stepCount, ForcedMovement forcedMovement, float speed)
+void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool clockwise, uint8 stepCount,
+    ForcedMovement forcedMovement, float speed)
 {
-    if (!stepCount)
+    if (stepCount < 2)
     {
-        LOG_ERROR("movement.motionmaster", "MotionMaster::MoveCirclePath: stepCount 0 for unit ({}), no path launched",
-            _owner->GetGUID().ToString());
+        LOG_ERROR("movement.motionmaster", "MotionMaster::MoveCirclePath: stepCount {} for unit ({}), no path launched",
+            stepCount, _owner->GetGUID().ToString());
         return;
     }
 
@@ -732,7 +733,17 @@ void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool 
         if (flying)
             point.z = z;
         else
+        {
             point.z = _owner->GetMap()->GetHeight(_owner->GetPhaseMask(), point.x, point.y, z);
+
+            if (point.z <= INVALID_HEIGHT)
+            {
+                LOG_ERROR("movement.motionmaster",
+                    "MotionMaster::MoveCirclePath: no ground below ({}, {}) for unit ({}), no path launched",
+                    point.x, point.y, _owner->GetGUID().ToString());
+                return;
+            }
+        }
 
         init.Path().push_back(point);
     }

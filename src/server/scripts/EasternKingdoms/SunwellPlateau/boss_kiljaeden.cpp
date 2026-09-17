@@ -457,7 +457,8 @@ struct boss_kiljaeden : public BossAI
                     float x = me->GetPositionX() + 18.0f * cos((i * 2.0f - 1.0f) * M_PI / 3.0f);
                     float y = me->GetPositionY() + 18.0f * std::sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
                     if (Creature* orb = me->SummonCreature(NPC_SHIELD_ORB, x, y, 40.0f, 0, TEMPSUMMON_CORPSE_DESPAWN))
-                        orb->GetMotionMaster()->MoveCirclePath(me->GetPositionX(), me->GetPositionY(), 40.0f, 18.0f, false, 20, FORCED_MOVEMENT_FLY);
+                        orb->GetMotionMaster()->MoveCirclePath(me->GetPositionX(), me->GetPositionY(), 40.0f, 18.0f,
+                            false, 20, FORCED_MOVEMENT_FLY);
                 }
             }, 40s);
         }

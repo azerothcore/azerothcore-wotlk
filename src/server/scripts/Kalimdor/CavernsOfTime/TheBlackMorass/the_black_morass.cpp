@@ -109,7 +109,8 @@ struct npc_medivh_bm : public ScriptedAI
         else if (summon->GetEntry() == NPC_DP_EMITTER_STALKER)
         {
             summon->CastSpell(summon, SPELL_BLACK_CRYSTAL, true);
-            summon->GetMotionMaster()->MoveCirclePath(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 8.0f, false, 10, FORCED_MOVEMENT_RUN);
+            summon->GetMotionMaster()->MoveCirclePath(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 8.0f,
+                false, 10, FORCED_MOVEMENT_RUN);
         }
     }
 
