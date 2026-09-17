@@ -10,8 +10,11 @@
 --
 DELETE FROM `creature` WHERE `guid`=16 AND `id`=32442;
 UPDATE `creature` SET `position_x`=6776.59814453125, `position_y`=1628.5748291015625, `position_z`=390.922119140625, `orientation`=4.729842185974121, `VerifiedBuild`=69299, `CreateObject`=1 WHERE `id`=31773 AND `guid`=1977255;
-UPDATE `creature` SET `id`=32442, `position_x`=6777.50927734375, `position_y`=1539.3518066406250, `position_z`=390.87347412109375, `orientation`=1.623156189918518, `VerifiedBuild`=69299, `CreateObject`=1 WHERE `guid`=1977256;
-UPDATE `creature` SET `id`=32427, `position_x`=6752.57568359375, `position_y`=1583.6961669921875, `position_z`=392.109619140625, `orientation`=4.276056766510010, `VerifiedBuild`=69299, `CreateObject`=1 WHERE `guid`=1977257;
+UPDATE `creature` SET `id`=32442, `position_x`=6777.50927734375, `position_y`=1539.3518066406250, `position_z`=390.87347412109375, `orientation`=1.623156189918518, `VerifiedBuild`=69299, `CreateObject`=1 WHERE `id`=31773 AND `guid`=1977256;
+UPDATE `creature` SET `id`=32427, `position_x`=6752.57568359375, `position_y`=1583.6961669921875, `position_z`=392.109619140625, `orientation`=4.276056766510010, `VerifiedBuild`=69299, `CreateObject`=1 WHERE `id`=31773 AND `guid`=1977257;
+
+-- sniffed replace instead of bitwise ops
+UPDATE `creature_template` SET `unit_flags` = 33554688 WHERE `entry` IN (31773, 32442, 32427);
 
 --
 -- Pustulant Spinal Fluid only ever found entry 31773, so the two cauldrons that now carry their
