@@ -2083,6 +2083,9 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (GetSpellInfo()->SpellFamilyName != SPELLFAMILY_ROGUE)
             target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, ObjectGuid::Empty, GetBase());
 
+        if (target->IsClass(CLASS_DRUID, CLASS_CONTEXT_ABILITY))
+            target->RemoveAurasByShapeShift();
+
         // stop handling the effect if it was removed by linked event
         if (aurApp->GetRemoveMode())
             return;
