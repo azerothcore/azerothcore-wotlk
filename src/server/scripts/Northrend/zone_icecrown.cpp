@@ -2448,6 +2448,11 @@ struct npc_plague_cauldron_ghoul : public ScriptedAI
         });
     }
 
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
     void SetData(uint32 id, uint32 value) override
     {
         if (id == DATA_GHOUL_JUMP)
