@@ -5339,18 +5339,29 @@ void SmartScript::GetScript()
     SmartAIEventList e;
     if (me)
     {
+        bool usingEntryScript = false;
+
         e = sSmartScriptMgr->GetScript(-((int32)me->GetSpawnId()), mScriptType);
         if (e.empty())
+        {
             e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
+            usingEntryScript = true;
+        }
 
         FillScript(e, me, nullptr);
 
-        if (CreatureTemplate const* cInfo = me->GetCreatureTemplate())
+        // The entry script is only added on top when the guid script replaced it. A spawn with no
+        // guid rows already fell back to the entry script above, so filling it again here would
+        // give the creature two copies of every event, each on its own timer.
+        if (!usingEntryScript)
         {
-            if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI))
+            if (CreatureTemplate const* cInfo = me->GetCreatureTemplate())
             {
-                e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
-                FillScript(e, me, nullptr);
+                if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI))
+                {
+                    e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
+                    FillScript(e, me, nullptr);
+                }
             }
         }
     }
