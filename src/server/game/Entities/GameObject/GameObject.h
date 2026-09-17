@@ -171,7 +171,8 @@ public:
         m_spawnedByDefault = false;                     // all object with owner is despawned after delay
         SetGuidValue(OBJECT_FIELD_CREATED_BY, owner);
     }
-    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const override { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
+    [[nodiscard]] uint32 GetFaction() const override { return GetUInt32Value(GAMEOBJECT_FACTION); }
     [[nodiscard]] Unit* GetOwner() const;
 
     void SetSpellId(uint32 id)
