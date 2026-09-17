@@ -346,6 +346,11 @@ public:
 
     [[nodiscard]] SpellInfo const* GetSpellForLock(Player const* player) const;
 
+    // Returns the LockType of the gathering profession that opens this object - LOCKTYPE_MINING
+    // for an ore vein, LOCKTYPE_HERBALISM for a herb, LOCKTYPE_FISHING for a pool - or 0 when no
+    // gathering profession does.
+    [[nodiscard]] uint32 GetGatheringLockType() const;
+
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
     [[nodiscard]] bool ValidateGameobjectType() const;
