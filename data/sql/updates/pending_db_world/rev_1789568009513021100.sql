@@ -1,2 +1,2 @@
--- Dark Iron Tunneler: creep flag hides the health bar
-UPDATE `creature_addon` SET `bytes1` = 1048576 WHERE `guid` IN (9628, 9675, 9711);
+-- Dark Iron Tunneler: sniff leftovers (creep flag, Defensive Stance) hid the health bars
+DELETE FROM `creature_addon` WHERE `guid` IN (9628, 9675, 9711);
