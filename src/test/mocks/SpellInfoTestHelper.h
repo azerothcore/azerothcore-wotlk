@@ -99,12 +99,28 @@ public:
         return *this;
     }
 
+    TestSpellEntryHelper& WithAttributesEx(uint32 attr)
+    {
+        _entry.AttributesEx = attr;
+        return *this;
+    }
+
     TestSpellEntryHelper& WithEffect(uint8 effIndex, uint32 effect, uint32 auraType = 0)
     {
         if (effIndex < MAX_SPELL_EFFECTS)
         {
             _entry.Effect[effIndex] = effect;
             _entry.EffectApplyAuraName[effIndex] = auraType;
+        }
+        return *this;
+    }
+
+    TestSpellEntryHelper& WithEffectImplicitTargets(uint8 effIndex, uint32 targetA, uint32 targetB = 0)
+    {
+        if (effIndex < MAX_SPELL_EFFECTS)
+        {
+            _entry.EffectImplicitTargetA[effIndex] = targetA;
+            _entry.EffectImplicitTargetB[effIndex] = targetB;
         }
         return *this;
     }
@@ -219,9 +235,21 @@ public:
         return *this;
     }
 
+    SpellInfoBuilder& WithAttributesEx(uint32 attr)
+    {
+        _entryHelper.WithAttributesEx(attr);
+        return *this;
+    }
+
     SpellInfoBuilder& WithEffect(uint8 effIndex, uint32 effect, uint32 auraType = 0)
     {
         _entryHelper.WithEffect(effIndex, effect, auraType);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithEffectImplicitTargets(uint8 effIndex, uint32 targetA, uint32 targetB = 0)
+    {
+        _entryHelper.WithEffectImplicitTargets(effIndex, targetA, targetB);
         return *this;
     }
 

@@ -61,11 +61,10 @@ void Player::Update(uint32 p_time)
     if (m_nextMailDelivereTime && m_nextMailDelivereTime <= GameTime::GetGameTime().count())
     {
         SendNewMail();
-        ++unReadMails;
 
-        // It will be recalculate at mailbox open (for unReadMails important
-        // non-0 until mailbox open, it also will be recalculated)
-        m_nextMailDelivereTime = time_t(0);
+        // Recount from the mailbox instead of clearing the timer: any mail that is still
+        // undelivered keeps its own delivery time and gets announced when it arrives
+        UpdateNextMailTimeAndUnreads();
     }
 
     // Update cinematic camera (if needed)
@@ -2432,7 +2431,7 @@ void Player::ProcessSpellQueue()
 // important changes, so a crash loses at most a few seconds of them
 void Player::UpdateAdditionalSaves(uint32 p_time)
 {
-    if (!m_additionalSaveTimer || GetSession()->isLogingOut())
+    if (!m_additionalSaveTimer || GetSession()->IsLoggingOut())
         return;
 
     if (m_additionalSaveTimer > p_time)
