@@ -69,7 +69,8 @@
 
 enum DeathKnightSpells
 {
-    SPELL_DK_EMPOWER_RUNE_WEAPON    = 47568
+    SPELL_DK_EMPOWER_RUNE_WEAPON    = 47568,
+    SPELL_DK_BLOOD_TAP_VISUAL       = 47804
 };
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
@@ -5843,7 +5844,7 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
 
     // is needed to push through to the client that the rune is active
     //player->ResyncRunes(MAX_RUNES);
-    m_caster->CastSpell(m_caster, 47804, true);
+    m_caster->CastSpell(m_caster, SPELL_DK_BLOOD_TAP_VISUAL, true);
 }
 
 void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)

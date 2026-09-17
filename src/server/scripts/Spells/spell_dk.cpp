@@ -470,12 +470,15 @@ public:
 private:
     void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
+        // An aura restored on login never ran the spell script, so the slot is unknown. Leave
+        // the default handler in charge there: effect 1 matches on RUNE_BLOOD, and a slot we
+        // would have skipped is either on cooldown or already a death rune.
+        if (_runeIndex >= MAX_RUNES)
+            return;
+
         // The default handler walks the slots from 0, so it can convert a rune other than the
         // one the spell just brought back. The spell script tells us which one it was.
         PreventDefaultAction();
-
-        if (_runeIndex >= MAX_RUNES)
-            return;
 
         Player* player = GetTarget()->ToPlayer();
         if (!player || !player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
