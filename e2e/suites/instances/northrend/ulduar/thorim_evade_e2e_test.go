@@ -106,10 +106,10 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 
 	driver.Teleport(t, balconyX, balconyY, balconyZ, e2eharness.MapUlduar)
 	bait.Teleport(t, arenaX, arenaY, arenaZ, e2eharness.MapUlduar)
+	// Co-location is already proven (the bait saw the driver's own GUID); the bait never needs
+	// Thorim in its cache, since the packet hook matches him by GUID from raw packets. Creature
+	// GUIDs are shared across one instance, so the driver's Thorim GUID is the bait's too.
 	thorim := driver.WaitUnit(t, npcThorim, 15*time.Second)
-	if g := bait.WaitUnit(t, npcThorim, 15*time.Second); g != thorim {
-		e2eharness.Preconditionf(t, "bots see different Thorim guids 0x%X vs 0x%X", thorim, g)
-	}
 	driver.CombatReady(t)
 
 	// The bait must stay killable by Thorim's melee, so it is left out of god mode (CombatReady
@@ -125,15 +125,24 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 	// The bait keeps its (small) full health; Thorim's melee kills it in a swing or two, and every
 	// swing reflects Retribution Aura back at him.
 
-	// Which packet carried the killing damage tells whether it was his melee (shield pass) or a
-	// spell such as Unbalancing Strike (no shield pass, no repro).
+	// Only Thorim's own hits on the bait matter: his melee (SMSG_ATTACKERSTATEUPDATE, attacker then
+	// target) runs the death-persistent shield pass that reproduces the bug, a spell
+	// (SMSG_SPELLNONMELEEDAMAGELOG, target then caster) does not. Both opcodes are broadcast for
+	// nearby combat too, so filter by GUID or the driver's own hits would misclassify the death.
+	baitGUID := bait.World.CharGUID()
 	var lastMelee, lastSpell atomic.Int64
-	cancelHook := bait.World.AddPacketHook(func(opcode uint16, _ []byte) {
+	cancelHook := bait.World.AddPacketHook(func(opcode uint16, data []byte) {
 		switch opcode {
 		case client.SmsgAttackerStateUpdate:
-			lastMelee.Store(time.Now().UnixNano())
+			attacker, off := readPackedGUID(data, 4) // after uint32 HitInfo
+			if target, _ := readPackedGUID(data, off); attacker == thorim && target == baitGUID {
+				lastMelee.Store(time.Now().UnixNano())
+			}
 		case opSpellNonMeleeDamageLog:
-			lastSpell.Store(time.Now().UnixNano())
+			target, off := readPackedGUID(data, 0)
+			if caster, _ := readPackedGUID(data, off); caster == thorim && target == baitGUID {
+				lastSpell.Store(time.Now().UnixNano())
+			}
 		}
 	})
 	defer cancelHook()
@@ -170,12 +179,11 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 	}
 	t.Logf("bait died to melee at %s", diedAt.Format(time.StampMilli))
 
-	// A chest here is the defeat block running on the despawning Thorim.
-	if g := e2eharness.TryNearbyGameObjectByEntry(t, driver.World, goCacheOfStorms10, chestWindow); g != 0 {
+	// A chest here is the defeat block running on the despawning Thorim. This drive never summons
+	// Sif, so Thorim lacks the Touch of Dominion trigger (62565) and the ring phase flags hard mode;
+	// the defeat block would then spawn the hard-mode Cache (194313), so accept either entry.
+	if g := anyCacheOfStorms(t, driver.World, goCacheOfStorms10, goCacheOfStorms10Hard, chestWindow); g != 0 {
 		e2eharness.Assertf(t, "Cache of Storms 0x%X spawned from Thorim's evade despawn", g)
-	}
-	if g := e2eharness.TryNearbyGameObjectByEntry(t, driver.World, goCacheOfStorms10Hard, time.Second); g != 0 {
-		e2eharness.Assertf(t, "hard mode Cache of Storms 0x%X spawned from Thorim's evade despawn", g)
 	}
 
 	// The hard reset brings back a fresh, hostile Thorim on the balcony. On the buggy core the same
@@ -190,7 +198,7 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 	// and unattackable. This proves the guard did not break the normal defeat.
 	t.Run("LethalHitStillYields", func(t *testing.T) {
 		driver.Damage(t, respawned, lethalHit)
-		chest := e2eharness.TryNearbyGameObjectByEntry(t, driver.World, goCacheOfStorms10, 10*time.Second)
+		chest := anyCacheOfStorms(t, driver.World, goCacheOfStorms10, goCacheOfStorms10Hard, 10*time.Second)
 		if chest == 0 {
 			e2eharness.Assertf(t, "no Cache of Storms after a lethal hit on Thorim")
 		}
@@ -231,4 +239,43 @@ func waitHostileThorim(t *testing.T, b *e2eharness.ScenarioBot, entry, nonAttack
 	}
 	e2eharness.Assertf(t, "no hostile Thorim within %s of the evade", timeout)
 	return 0
+}
+
+// anyCacheOfStorms returns the guid of the first Cache of Storms of either entry found in range,
+// or 0 if none appears within timeout.
+func anyCacheOfStorms(t *testing.T, w *client.WorldClient, normal, hard uint32, timeout time.Duration) uint64 {
+	t.Helper()
+	deadline := time.Now().Add(timeout)
+	for {
+		for _, entry := range []uint32{normal, hard} {
+			if g := w.FindGameObjectByEntry(entry, 60); g != 0 {
+				return g
+			}
+		}
+		if !time.Now().Before(deadline) {
+			return 0
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
+// readPackedGUID reads a WoW packed GUID starting at off and returns the guid and the next offset.
+// The first byte is a bitmask; each set bit i contributes byte i of the guid, low bit first.
+func readPackedGUID(b []byte, off int) (uint64, int) {
+	if off >= len(b) {
+		return 0, off
+	}
+	mask := b[off]
+	off++
+	var guid uint64
+	for i := 0; i < 8; i++ {
+		if mask&(1<<uint(i)) != 0 {
+			if off >= len(b) {
+				break
+			}
+			guid |= uint64(b[off]) << (8 * uint(i))
+			off++
+		}
+	}
+	return guid, off
 }
