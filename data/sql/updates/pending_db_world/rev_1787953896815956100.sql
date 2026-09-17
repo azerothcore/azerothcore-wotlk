@@ -63,10 +63,10 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 UPDATE `creature` SET `position_x`=3846.620117, `position_y`=661.976013, `position_z`=60.248100, `orientation`=1.799750, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=50664, `CreateObject`=1 WHERE `guid`=112243 AND `id`=27564;
 UPDATE `creature` SET `position_x`=3852.050049, `position_y`=665.716980, `position_z`=59.091599, `orientation`=2.647580, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=112244 AND `id`=27564;
 
--- Remove the opening Shoot, which the ranged rows below already cover
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 27564) AND (`source_type` = 0) AND (`id` IN (2));
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 27749) AND (`source_type` = 0) AND (`id` IN (2));
-
+-- The conscripts keep only their two combat rows, with Shoot's action_param2 cleared: flag 64 is
+-- SMARTCAST_COMBAT_MOVE, which pinned a conscript in place as soon as a Shoot landed, so the
+-- line never closed on the wave it was firing at.
+--
 -- Summon Frigid Ghoul Attacker (49329) is a volley the captain fires for his whole squad at
 -- once, not a timer each conscript keeps for itself: all 94 volleys in the sniff have every one
 -- of their casts on a single timestamp - span 0.000s, 37 of them with 8 casters and 9 with all 9
@@ -74,7 +74,12 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 27749) AND (`source_type` = 0
 -- instead, so the per-conscript row only gets in the way. The script keeps the out of combat
 -- gate this row carried: the ghouls a volley drops join the fight the line is already in, so
 -- summoning through combat only feeds the wave the line is trying to clear.
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` IN (27564, 27749)) AND (`id` = 15);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` IN (27564, 27749));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(27564, 0, 0, 0, 9, 0, 100, 0, 0, 0, 2300, 3900, 5, 30, 11, 15620, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Alliance Conscript - Within 5-30 Range - Cast \'Shoot\''),
+(27564, 0, 1, 0, 9, 0, 100, 0, 7000, 9000, 7000, 9000, 0, 5, 11, 29426, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Alliance Conscript - Within 0-5 Range - Cast \'Heroic Strike\''),
+(27749, 0, 0, 0, 9, 0, 100, 0, 0, 0, 2300, 3900, 5, 30, 11, 15620, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Conscript - Within 5-30 Range - Cast \'Shoot\''),
+(27749, 0, 1, 0, 9, 0, 100, 0, 7000, 9000, 7000, 9000, 0, 5, 11, 29426, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Conscript - Within 0-5 Range - Cast \'Heroic Strike\'');
 
 -- Remove Old Alliance Spawns
 DELETE FROM `creature` WHERE `id` IN (27686, 27564, 27567, 27531, 27687, 27530, 27542) AND `guid` IN (110039,108330,99408,99407,99409,99410,99406,99420,112225,112247,112227,112221,112210,112226,112228,112523,112218,108613,99411,99412,99421,99427,99422,99423,99426,99607);
@@ -313,8 +318,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 -- The single exception is Soldier 8's first node (see its entry). Final facing is the same
 -- 1.099557399749755859 as Path 2, for all 9.
 --
--- User Note: I'm keeping this because it's easier, sue me.
--- Actually we could make another parameter for waypoint start to start at a different point.
+-- The nodes are duplicated here rather than shared with Path 2, since waypoint_data has no way
+-- to start a path at a node other than its first.
 -- ==========================================================================================
 
 -- Captain Iskandar (27567)
@@ -906,9 +911,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (105167, 105024, 0),
 (105167, 105012, 0),
 (105167, 105167, 0);
-
--- Remove flag 64 from Shoot
-UPDATE `smart_scripts` SET `action_param2` = 0 WHERE `entryorguid` IN (27564, 27749) AND `source_type` = 0 AND `action_type` = 11 AND `action_param1` = 15620;
 
 -- Also remove old stuff
 UPDATE `creature_template` SET `RegenHealth` = 0, `ScriptName` = '' WHERE (`entry` IN (27686, 27687, 27531, 27685));
