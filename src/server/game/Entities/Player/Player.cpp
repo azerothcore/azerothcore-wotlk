@@ -11302,6 +11302,8 @@ void Player::ModifySpellCooldown(uint32 spellId, int32 cooldown)
     SendDirectMessage(&data);
 }
 
+// Finding the spellbook entry through the shared cooldown category mirrors TrinityCore
+// ecbbcc8972 (Shauren), which closed TrinityCore/TrinityCore#15862.
 uint32 Player::GetSpellbookSpellForCooldown(SpellInfo const* spellInfo) const
 {
     if (!spellInfo)
