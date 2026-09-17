@@ -34,6 +34,11 @@ private:
 public:
     static ToCloud9Sidecar* instance();
 
+    /// When Cluster.Enabled, validate libsidecar (real library required; ABI match).
+    /// Call after config and logging are ready, before DB/network startup.
+    /// @return false if worldserver should exit with code 1.
+    bool CheckLibsidecarAbi();
+
     void Init(uint16 port, int realmId);
     void Deinit();
 

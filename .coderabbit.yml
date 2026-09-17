@@ -3,6 +3,9 @@
 # reviewer enforces project conventions on every PR.
 language: en-US
 
+tone_instructions: |
+  Be terse: at most three sentences per finding.
+
 reviews:
   profile: chill
   request_changes_workflow: false
@@ -99,6 +102,7 @@ reviews:
       instructions: |
         AzerothCore SQL update conventions (enforced by apps/codestyle/codestyle-sql.py):
         - Every INSERT must be preceded by a matching DELETE for idempotency, and that DELETE must include a WHERE clause scoped precisely to the intended rows. A predicate that is too broad will remove unrelated data, so confirm it matches exactly what the INSERT will re-add.
+        - Spawn tables (creature, gameobject): DELETE and UPDATE must target the table alone (no join, comma list or schema qualifier) and filter on both id and guid, with =, IN or BETWEEN (a mix is fine), never OR.
         - 4-space indent (no tabs), trailing newline, no double semicolons, no multiple blank lines.
         - Tables must use the InnoDB engine.
     - path: "data/sql/base/**"
@@ -110,6 +114,12 @@ reviews:
         This SQL directory is immutable. Changes here should not happen in a normal PR —
         flag any modification. New SQL belongs in data/sql/updates/pending_db_*/.
 
+  tools:
+    # Prose linting on markdown produces capitalisation nits reported as review
+    # findings, each wrapped in a suggestion block and a raw linter dump.
+    languagetool:
+      enabled: false
+
 knowledge_base:
   code_guidelines:
     enabled: true
@@ -117,6 +127,7 @@ knowledge_base:
     # full guideline doc is always pulled into review context.
     filePatterns:
       - "AGENTS.md"
+      - ".agents/docs/code-review.md"
 
 chat:
   auto_reply: true
