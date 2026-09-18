@@ -17,6 +17,7 @@
 
 #include "Player.h"
 #include "WorldConfig.h"
+#include <cmath>
 
 void WorldConfig::BuildConfigCache()
 {
@@ -51,21 +52,29 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_DROP_MONEY, "Rate.Drop.Money", 1.0f);
 
     SetConfigValue<float>(RATE_MINING_DROP_AMOUNT, "Rate.Mining.DropAmount", 1.0f,
-        ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+        ConfigValueCache::Reloadable::Yes,
+        [](float const& value) { return std::isfinite(value) && value > 0.0f; }, "a finite value > 0");
     SetConfigValue<float>(RATE_HERBALISM_DROP_AMOUNT, "Rate.Herbalism.DropAmount", 1.0f,
-        ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+        ConfigValueCache::Reloadable::Yes,
+        [](float const& value) { return std::isfinite(value) && value > 0.0f; }, "a finite value > 0");
     SetConfigValue<float>(RATE_SKINNING_DROP_AMOUNT, "Rate.Skinning.DropAmount", 1.0f,
-        ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+        ConfigValueCache::Reloadable::Yes,
+        [](float const& value) { return std::isfinite(value) && value > 0.0f; }, "a finite value > 0");
     SetConfigValue<float>(RATE_FISHING_DROP_AMOUNT, "Rate.Fishing.DropAmount", 1.0f,
-        ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+        ConfigValueCache::Reloadable::Yes,
+        [](float const& value) { return std::isfinite(value) && value > 0.0f; }, "a finite value > 0");
     SetConfigValue<float>(RATE_MILLING_DROP_AMOUNT, "Rate.Milling.DropAmount", 1.0f,
-        ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+        ConfigValueCache::Reloadable::Yes,
+        [](float const& value) { return std::isfinite(value) && value > 0.0f; }, "a finite value > 0");
     SetConfigValue<float>(RATE_PROSPECTING_DROP_AMOUNT, "Rate.Prospecting.DropAmount", 1.0f,
-        ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+        ConfigValueCache::Reloadable::Yes,
+        [](float const& value) { return std::isfinite(value) && value > 0.0f; }, "a finite value > 0");
     SetConfigValue<float>(RATE_DISENCHANTING_DROP_AMOUNT, "Rate.Disenchanting.DropAmount", 1.0f,
-        ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+        ConfigValueCache::Reloadable::Yes,
+        [](float const& value) { return std::isfinite(value) && value > 0.0f; }, "a finite value > 0");
     SetConfigValue<float>(RATE_PICKPOCKETING_DROP_AMOUNT, "Rate.Pickpocketing.DropAmount", 1.0f,
-        ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+        ConfigValueCache::Reloadable::Yes,
+        [](float const& value) { return std::isfinite(value) && value > 0.0f; }, "a finite value > 0");
 
     SetConfigValue<float>(RATE_REWARD_QUEST_MONEY, "Rate.RewardQuestMoney", 1.0f);
     SetConfigValue<float>(RATE_REWARD_BONUS_MONEY, "Rate.RewardBonusMoney", 1.0f);

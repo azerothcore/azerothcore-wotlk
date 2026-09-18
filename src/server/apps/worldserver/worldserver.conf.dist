@@ -2902,7 +2902,7 @@ Rate.Drop.Item.GroupAmount = 1
 #                     passed its drop roll. A loot window holds at most 18 stacks, so very
 #                     large values are capped by that limit.
 #        Default:     1 - (Disabled, blizzlike amounts)
-#        Range:       > 0
+#        Range:       a finite value > 0
 
 Rate.Mining.DropAmount        = 1
 Rate.Herbalism.DropAmount     = 1
