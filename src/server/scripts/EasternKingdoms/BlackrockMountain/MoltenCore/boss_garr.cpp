@@ -64,9 +64,9 @@ struct boss_garr : public BossAI
         massEruptionTimer = 600000;
     }
 
-    void JustEngagedWith(Unit* /*attacker*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         DoCastSelf(SPELL_SEPARATION_ANXIETY, true);
         events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15s);
         events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10s);

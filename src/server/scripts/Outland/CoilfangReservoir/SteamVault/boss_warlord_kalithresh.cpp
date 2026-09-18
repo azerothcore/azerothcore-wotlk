@@ -71,10 +71,10 @@ struct boss_warlord_kalithresh : public BossAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         scheduler.Schedule(20s, 36s, [this](TaskContext context)
         {

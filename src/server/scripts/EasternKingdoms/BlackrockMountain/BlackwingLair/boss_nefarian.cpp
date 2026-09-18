@@ -355,7 +355,7 @@ struct boss_victor_nefarius : public BossAI
 
     void BeginEvent()
     {
-        _JustEngagedWith();
+        _JustEngagedWith(nullptr);
 
         Talk(SAY_GAMESBEGIN_2);
 

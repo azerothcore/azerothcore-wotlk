@@ -63,9 +63,9 @@ struct boss_shirrak_the_dead_watcher : public BossAI
         me->SetControlled(false, UNIT_STATE_ROOT);
     }
 
-    void JustEngagedWith(Unit*) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         scheduler.Schedule(1ms, [this] (TaskContext context)
         {
             Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();

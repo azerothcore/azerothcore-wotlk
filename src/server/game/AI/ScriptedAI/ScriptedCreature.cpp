@@ -674,7 +674,7 @@ void BossAI::_JustDied()
     }
 }
 
-void BossAI::_JustEngagedWith()
+void BossAI::_JustEngagedWith(Unit* who)
 {
     me->SetCombatPulseDelay(5);
     me->setActive(true);
@@ -690,7 +690,7 @@ void BossAI::_JustEngagedWith()
     if (instance)
     {
         // bosses do not respawn, check only on enter combat
-        if (!instance->CheckRequiredBosses(_bossId))
+        if (!instance->CheckRequiredBosses(_bossId, who ? who->ToPlayer() : nullptr))
         {
             EnterEvadeMode();
             return;
