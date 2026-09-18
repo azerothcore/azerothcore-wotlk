@@ -73,7 +73,6 @@
 #include "Player.h"
 #include "PlayerDump.h"
 #include "PoolMgr.h"
-#include "QueryHolder.h"
 #include "RaceMgr.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
@@ -1902,12 +1901,6 @@ void World::UpdateAreaDependentAuras()
 void World::ProcessQueryCallbacks()
 {
     _queryProcessor.ProcessReadyCallbacks();
-    _queryHolderProcessor.ProcessReadyCallbacks();
-}
-
-SQLQueryHolderCallback& World::AddQueryHolderCallback(SQLQueryHolderCallback&& callback)
-{
-    return _queryHolderProcessor.AddCallback(std::move(callback));
 }
 
 bool World::IsPvPRealm() const
