@@ -1,3 +1,4 @@
+-- DB update 2026_09_17_01 -> 2026_09_18_00
 --
 -- Ancient Water Spirit: Tidal Wave damage and knockback now follow the cast, not a timer
 
