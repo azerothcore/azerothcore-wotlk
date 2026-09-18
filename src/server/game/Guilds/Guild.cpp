@@ -1413,7 +1413,7 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_v
     }
 }
 
-void Guild::HandleSetRankInfo(uint8 rankId, Optional<uint32> rights, Optional<std::string_view> name,
+void Guild::HandleSetRankInfo(uint8 rankId, Optional<std::string_view> name, Optional<uint32> rights,
     Optional<uint32> moneyPerDay)
 {
     RankInfo* rankInfo = GetRankInfo(rankId);
