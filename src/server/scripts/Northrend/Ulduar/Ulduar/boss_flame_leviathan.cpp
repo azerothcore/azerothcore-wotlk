@@ -939,7 +939,14 @@ struct npc_freya_ward_summon : public ScriptedAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
-        me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+        // Deferred a tick on purpose: Spell::EffectSummonType re-applies the summon spell's own
+        // duration (10s for the lashers, 3s for the wards) once the summon call returns, which
+        // would overwrite anything this hook sets.
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+        }, 1ms);
+
         DoZoneInCombat();
     }
 
