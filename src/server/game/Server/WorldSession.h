@@ -1221,6 +1221,7 @@ public:                                                 // opcodes handlers
     QueryCallbackProcessor& GetQueryProcessor() { return _queryProcessor; }
     TransactionCallback& AddTransactionCallback(TransactionCallback&& callback);
     SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback);
+    void ProcessQueryCallbacks();
 
     void InitializeSession();
     void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
@@ -1232,8 +1233,6 @@ public:                                                 // opcodes handlers
     [[nodiscard]] bool IsHeadless() const { return _headless; }
 
 private:
-    void ProcessQueryCallbacks();
-
     QueryCallbackProcessor _queryProcessor;
     AsyncCallbackProcessor<TransactionCallback> _transactionCallbacks;
     AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
