@@ -1144,4 +1144,6 @@ void ArenaTeam::SetRatingForAll(uint32 rating)
 
     for (ArenaTeamMember& member : Members)
         member.PersonalRating = rating;
+
+    SaveToDB(true);
 }
