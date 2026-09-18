@@ -2099,7 +2099,6 @@ struct boss_yoggsaron_lich_king : public NullCreatureAI
             return;
 
         creature->AI()->Talk(text);
-            return;
     }
 
     void UpdateAI(uint32 diff) override
@@ -2175,7 +2174,6 @@ struct boss_yoggsaron_llane : public NullCreatureAI
             return;
 
         creature->AI()->Talk(text);
-            return;
     }
 
     void UpdateAI(uint32 diff) override
