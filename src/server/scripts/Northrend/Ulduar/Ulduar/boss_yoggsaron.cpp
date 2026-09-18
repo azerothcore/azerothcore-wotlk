@@ -1998,7 +1998,7 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
     }
 
     static constexpr Milliseconds SPAWN_VISUAL_DELAY = 100ms;
-    static constexpr Milliseconds SPAWN_STASIS_TIME = 800ms; // Sniffed
+    static constexpr Milliseconds SPAWN_STASIS_TIME = 4s; // 3.4 sniffs show 800ms, 3.1 footage show 4s
     static constexpr Milliseconds DRAIN_LIFE_HEALTH_CHECK = 2s;
     static constexpr Milliseconds DRAIN_LIFE_INTERVAL = 9500ms;
 
@@ -2015,7 +2015,31 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
         events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_RELEASE, SPAWN_STASIS_TIME);
         events.ScheduleEvent(EVENT_GUARDIAN_DRAIN_LIFE, DRAIN_LIFE_HEALTH_CHECK);
         me->SetControlled(true, UNIT_STATE_ROOT);
+        _spawnStasis = true;
+    }
+
+    void EngageFromStasis()
+    {
+        if (!_spawnStasis)
+            return;
+
+        _spawnStasis = false;
+        events.CancelEvent(EVENT_GUARDIAN_SPAWN_RELEASE);
+        me->SetControlled(false, UNIT_STATE_ROOT);
         me->SetInCombatWithZone();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        EngageFromStasis();
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (_spawnStasis)
+            return;
+
+        CreatureAI::MoveInLineOfSight(who);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -2032,9 +2056,6 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
-            return;
-
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -2051,14 +2072,14 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
                     DoCastSelf(SPELL_SIMPLE_TELEPORT, false);
                     break;
                 case EVENT_GUARDIAN_SPAWN_RELEASE:
-                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    EngageFromStasis();
                     break;
                 case EVENT_GUARDIAN_DRAIN_LIFE:
                 {
                     Unit* target = me->HealthBelowPct(85) ? SelectTargetFromPlayerList(40.0f) : nullptr;
                     if (target)
                     {
-                        me->CastSpell(target, SPELL_DRAIN_LIFE, false);
+                        DoCast(target, SPELL_DRAIN_LIFE, false);
                         events.Repeat(DRAIN_LIFE_INTERVAL);
                     }
                     else
@@ -2071,8 +2092,15 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
             }
         }
 
-        DoMeleeAttackIfReady();
+        if (!UpdateVictim())
+            return;
+
+        if (!_spawnStasis)
+            DoMeleeAttackIfReady();
     }
+
+private:
+    bool _spawnStasis{};
 };
 
 struct boss_yoggsaron_lich_king : public NullCreatureAI
