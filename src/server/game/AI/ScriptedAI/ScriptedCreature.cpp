@@ -680,7 +680,7 @@ void BossAI::_JustEngagedWith(Unit* who)
     me->setActive(true);
     DoZoneInCombat();
     ScheduleTasks();
-    if (callForHelpRange)
+    if (callForHelpRange > 0.0f)
     {
         ScheduleTimedEvent(0ms, [&]
         {
