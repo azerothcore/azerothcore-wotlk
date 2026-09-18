@@ -28,11 +28,10 @@
 
 enum ScriptTexts
 {
-    // Deathbringer Saurfang
+    // Deathbringer Saurfang. Group 3 is a narration row that is never spoken.
     SAY_INTRO_ALLIANCE_2            = 0,
     SAY_INTRO_ALLIANCE_3            = 1,
     SAY_INTRO_ALLIANCE_6            = 2,
-    SAY_INTRO_ALLIANCE_7            = 3,
     SAY_INTRO_HORDE_2               = 4,
     SAY_INTRO_HORDE_4               = 5,
     SAY_INTRO_HORDE_9               = 6,
@@ -203,6 +202,12 @@ enum EventTypes
 
     // Guards
     EVENT_OUTRO_GUARD_VANISH    = 74,
+
+    // One-shot emotes between the Horde intro lines
+    EVENT_INTRO_HORDE_10        = 75,
+    EVENT_INTRO_HORDE_TALK      = 76,
+    EVENT_INTRO_HORDE_NO        = 77,
+    EVENT_INTRO_HORDE_QUESTION  = 78,
 };
 
 enum Phases
@@ -660,7 +665,7 @@ public:
                         Talk(SAY_INTRO_HORDE_1);
                         _events.SetPhase(PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5s, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 18s + 500ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 21s + 400ms, 0, PHASE_INTRO_H);
                         _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
 
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
@@ -731,13 +736,14 @@ public:
                     case POINT_FIRST_STEP:
                         me->SetWalk(false);
                         Talk(SAY_INTRO_HORDE_3);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_4, 10s, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_5, 22s, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_6, 36s, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_7, 53s, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_8, 57s + 800ms, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_HORDE_9, 59s, 0, PHASE_INTRO_H);
-                        _events.ScheduleEvent(EVENT_INTRO_FINISH,  68s, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_4, 8s + 500ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_5, 18s + 600ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_6, 35s + 400ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_7, 52s + 400ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_8, 56s, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_9, 57s + 200ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_HORDE_10, 59s + 800ms, 0, PHASE_INTRO_H);
+                        _events.ScheduleEvent(EVENT_INTRO_FINISH,  66s + 200ms, 0, PHASE_INTRO_H);
                         break;
                     case POINT_CORPSE:
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
@@ -789,12 +795,17 @@ public:
                 case EVENT_INTRO_HORDE_4:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                         deathbringer->AI()->Talk(SAY_INTRO_HORDE_4);
+                    _events.ScheduleEvent(EVENT_INTRO_HORDE_QUESTION, 3s + 800ms, 0, PHASE_INTRO_H);
                     break;
                 case EVENT_INTRO_HORDE_5:
                     Talk(SAY_INTRO_HORDE_5);
+                    _events.ScheduleEvent(EVENT_INTRO_HORDE_TALK, 3s, 0, PHASE_INTRO_H);
+                    _events.ScheduleEvent(EVENT_INTRO_HORDE_TALK, 6s + 700ms, 0, PHASE_INTRO_H);
                     break;
                 case EVENT_INTRO_HORDE_6:
                     Talk(SAY_INTRO_HORDE_6);
+                    _events.ScheduleEvent(EVENT_INTRO_HORDE_TALK, 3s + 400ms, 0, PHASE_INTRO_H);
+                    _events.ScheduleEvent(EVENT_INTRO_HORDE_NO, 7s + 100ms, 0, PHASE_INTRO_H);
                     break;
                 case EVENT_INTRO_HORDE_7:
                     Talk(SAY_INTRO_HORDE_7);
@@ -808,10 +819,21 @@ public:
                     break;
                 case EVENT_INTRO_HORDE_9:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
-                    {
                         deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
+                    break;
+                case EVENT_INTRO_HORDE_10:
+                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
                         deathbringer->AI()->Talk(SAY_INTRO_HORDE_9);
-                    }
+                    break;
+                case EVENT_INTRO_HORDE_TALK:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    break;
+                case EVENT_INTRO_HORDE_NO:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_NO);
+                    break;
+                case EVENT_INTRO_HORDE_QUESTION:
+                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                        deathbringer->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                     break;
                 case EVENT_INTRO_FINISH:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
@@ -981,9 +1003,9 @@ public:
                         Talk(SAY_INTRO_ALLIANCE_1);
                         _outroZeppelinWait = 0;
                         _events.SetPhase(PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500ms, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 20s, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 29s + 500ms, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 1s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 18s + 400ms, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 24s + 500ms, 0, PHASE_INTRO_A);
                         _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
 
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
@@ -1060,10 +1082,10 @@ public:
                     case POINT_FIRST_STEP:
                         me->SetWalk(false);
                         Talk(SAY_INTRO_ALLIANCE_4);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_5, 5s, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_6, 7s, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_7, 9s, 0, PHASE_INTRO_A);
-                        _events.ScheduleEvent(EVENT_INTRO_FINISH, 14s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_5, 6s, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_6, 8s + 600ms, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_7, 11s + 300ms, 0, PHASE_INTRO_A);
+                        _events.ScheduleEvent(EVENT_INTRO_FINISH, 15s + 600ms, 0, PHASE_INTRO_A);
                         break;
                     case POINT_A_MURADIN_STEP:
                         Talk(SAY_OUTRO_ALLIANCE_2);
@@ -1118,10 +1140,7 @@ public:
                     break;
                 case EVENT_INTRO_ALLIANCE_6:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
-                    {
-                        deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_7);
                         deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
-                    }
                     break;
                 case EVENT_INTRO_ALLIANCE_7:
                     if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))

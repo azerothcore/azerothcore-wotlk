@@ -1,4 +1,9 @@
--- Deathbringer Saurfang outro: the emotes played with each line, and the Orcish line spoken in Orcish.
+-- Deathbringer Saurfang intro and outro: the emotes played with each line, and the Orcish line spoken in Orcish.
+UPDATE `creature_text` SET `Emote` = 22 WHERE `CreatureID` = 37200 AND `GroupID` = 0;
+UPDATE `creature_text` SET `Emote` = 6 WHERE `CreatureID` = 37200 AND `GroupID` = 1;
+UPDATE `creature_text` SET `Emote` = 15 WHERE `CreatureID` = 37200 AND `GroupID` = 2;
+UPDATE `creature_text` SET `Emote` = 397 WHERE `CreatureID` = 37813 AND `GroupID` = 0;
+UPDATE `creature_text` SET `Emote` = 153 WHERE `CreatureID` = 37813 AND `GroupID` = 2;
 UPDATE `creature_text` SET `Emote` = 274 WHERE `CreatureID` = 37200 AND `GroupID` = 4;
 UPDATE `creature_text` SET `Emote` = 25 WHERE `CreatureID` = 37200 AND `GroupID` = 5;
 UPDATE `creature_text` SET `Emote` = 5 WHERE `CreatureID` = 37200 AND `GroupID` = 7;
