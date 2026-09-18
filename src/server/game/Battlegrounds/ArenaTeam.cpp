@@ -1125,6 +1125,9 @@ void ArenaTeam::SetEmblem(uint32 backgroundColor, uint8 emblemStyle, uint32 embl
     BorderStyle = borderStyle;
     BorderColor = borderColor;
 
+    if (!sScriptMgr->CanSaveToDB(this))
+        return;
+
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_EMBLEM);
     stmt->SetData(0, BackgroundColor);
     stmt->SetData(1, EmblemStyle);
