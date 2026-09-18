@@ -1697,7 +1697,7 @@ class spell_blood_council_summon_shadow_resonance : public SpellScript
                     summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) &&
                     destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                 {
-                    float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
+                    float destZ = summoner->GetMapHeight(destX, destY, summoner->GetPositionZ());
                     if (std::fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
                     {
                         dest._position.Relocate(destX, destY, destZ);
