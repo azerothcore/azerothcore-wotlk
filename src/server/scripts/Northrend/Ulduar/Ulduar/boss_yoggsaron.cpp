@@ -190,6 +190,10 @@ enum YoggEvents
 
     EVENT_SARA_WIPE_OPEN_DOOR           = 40,
     EVENT_SARA_WIPE_RESPAWN             = 41,
+
+    EVENT_GUARDIAN_SPAWN_VISUAL         = 45,
+    EVENT_GUARDIAN_SPAWN_RELEASE        = 46,
+    EVENT_GUARDIAN_DRAIN_LIFE           = 47,
 };
 
 enum NPCsGOs
@@ -1988,17 +1992,15 @@ static void ApplyEmpoweredStacks(Unit* target)
 
 struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 {
-    boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
+    explicit boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
     {
         Reset();
     }
 
-    uint32 _visualTimer;        // ms since spawn while the guardian is held in stasis; 0 = over
-    bool _spawnVisualPlayed;
-    uint32 _spellTimer;
-
-    static constexpr uint32 SPAWN_VISUAL_DELAY = 100;
-    static constexpr uint32 SPAWN_STASIS_TIME = 800; // Sniffed
+    static constexpr Milliseconds SPAWN_VISUAL_DELAY = 100ms;
+    static constexpr Milliseconds SPAWN_STASIS_TIME = 800ms; // Sniffed
+    static constexpr Milliseconds DRAIN_LIFE_HEALTH_CHECK = 2s;
+    static constexpr Milliseconds DRAIN_LIFE_INTERVAL = 9500ms;
 
     void Reset() override
     {
@@ -2008,9 +2010,10 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 
         ApplyEmpoweredStacks(me);
 
-        _spellTimer = 0;
-        _visualTimer = 1;
-        _spawnVisualPlayed = false;
+        events.Reset();
+        events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_VISUAL, SPAWN_VISUAL_DELAY);
+        events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_RELEASE, SPAWN_STASIS_TIME);
+        events.ScheduleEvent(EVENT_GUARDIAN_DRAIN_LIFE, DRAIN_LIFE_HEALTH_CHECK);
         me->SetControlled(true, UNIT_STATE_ROOT);
         me->SetInCombatWithZone();
     }
@@ -2032,39 +2035,40 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
         if (!UpdateVictim())
             return;
 
-        if (_visualTimer)
-        {
-            _visualTimer += diff;
-
-            if (!_spawnVisualPlayed && _visualTimer >= SPAWN_VISUAL_DELAY)
-            {
-                DoCastSelf(SPELL_SIMPLE_TELEPORT, false);
-                _spawnVisualPlayed = true;
-            }
-
-            if (_visualTimer >= SPAWN_STASIS_TIME)
-            {
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                _visualTimer = 0;
-            }
-        }
+        events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        _spellTimer += diff;
-        if (_spellTimer >= 9500)
         {
-            if (me->HealthBelowPct(85))
+            events.DelayEvents(Milliseconds(diff));
+            return;
+        }
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
             {
-                if (Unit* target = SelectTargetFromPlayerList(40.0f))
+                case EVENT_GUARDIAN_SPAWN_VISUAL:
+                    DoCastSelf(SPELL_SIMPLE_TELEPORT, false);
+                    break;
+                case EVENT_GUARDIAN_SPAWN_RELEASE:
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    break;
+                case EVENT_GUARDIAN_DRAIN_LIFE:
                 {
-                    me->CastSpell(target, SPELL_DRAIN_LIFE, false);
-                    _spellTimer = 0;
+                    Unit* target = me->HealthBelowPct(85) ? SelectTargetFromPlayerList(40.0f) : nullptr;
+                    if (target)
+                    {
+                        me->CastSpell(target, SPELL_DRAIN_LIFE, false);
+                        events.Repeat(DRAIN_LIFE_INTERVAL);
+                    }
+                    else
+                        events.Repeat(DRAIN_LIFE_HEALTH_CHECK);
+
+                    break;
                 }
+                default:
+                    break;
             }
-            else
-                _spellTimer = 7500;
         }
 
         DoMeleeAttackIfReady();
