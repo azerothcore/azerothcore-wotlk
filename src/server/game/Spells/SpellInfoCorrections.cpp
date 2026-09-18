@@ -2053,12 +2053,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Cosmic Smash (Algalon the Observer)
-    ApplySpellFix({ 62293 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
-    });
-
-    // Cosmic Smash (Algalon the Observer)
     ApplySpellFix({ 62311, 64596 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
@@ -4880,6 +4874,15 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->ProcCharges = 1;
         spellInfo->SpellPriority = 100;
+    });
+
+    // Item - Mage T8 4P Bonus
+    ApplySpellFix({ 64869 }, [](SpellInfo* spellInfo)
+    {
+        // DBC amount is 10, but the chance to not consume Missile Barrage,
+        // Hot Streak or Brain Freeze is 20% according to the available sources
+        spellInfo->Effects[EFFECT_0].BasePoints = 20;
+        spellInfo->Effects[EFFECT_0].DieSides = 0;
     });
 
     // Auto Shot
