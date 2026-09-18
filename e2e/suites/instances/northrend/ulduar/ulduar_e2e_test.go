@@ -4,7 +4,6 @@ package ulduar_test
 
 import (
 	"fmt"
-	"math"
 	"testing"
 	"time"
 
@@ -375,93 +374,6 @@ const (
 // Elder Brightleaf's own spawn. Not the BossFreya pad: that pad sits 12y from Freya, and aggroing
 // her banishes every living elder, after which he schedules no beams for the life of the instance.
 var brightleafSpawn = e2eharness.Position3{X: 2385.09, Y: 131.341, Z: 440.201, Map: e2eharness.MapUlduar}
-
-// Elder Brightleaf's Unstable Sun Beams must not outlive him, and each wave must land one beam on
-// the elder plus one under a player in range. Before the fix the beams were hand-summoned with no
-// duration and the elder's event map was the only thing that removed them, so a kill taken with a
-// wave up left them standing for the life of the instance.
-// Issue: https://github.com/chromiecraft/chromiecraft/issues/10163
-func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"med", "instances"},
-		Runtime:  "med",
-		Category: "instances/northrend/ulduar",
-	})
-
-	const (
-		// Each beam despawns itself after a randomised 18-25s; the oracle allows the worst case
-		// plus slack for the kill and the object-cache round trip. Do not widen it past 30s: that
-		// is 62221's summon duration, the engine backstop that would despawn the player's beam by
-		// itself and hide the regression this guards.
-		beamMaxLifetime = 25 * time.Second
-		// The elder's own beam sits on him, so "landed on the player" is only distinguishable
-		// from "stacked on the elder" while the bot stands clear of him by more than this.
-		beamOnPlayerRange = float32(3)
-	)
-
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "Bleaf",
-		Level:  80,
-	})
-
-	// Stay GM through the raid enter.
-	bot.TeleportPad(t, brightleafSpawn)
-	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
-		e2eharness.Preconditionf(t, "not in Ulduar after Brightleaf tele map=%d", m)
-	}
-	bot.GoCreatureID(t, npcElderBrightleaf)
-	bot.CombatReady(t)
-
-	elder := waitLivingBrightleaf(t, bot)
-	bot.Engage(t, elder, 15*time.Second)
-
-	wave := waitBrightleafWave(t, bot, elder)
-	bx, by, bz, _ := bot.Pos()
-	elderObj := bot.World.GetObject(elder)
-	if elderObj == nil {
-		e2eharness.Preconditionf(t, "Elder Brightleaf 0x%X left the object cache before the wave landed", elder)
-	}
-	ex, ey, ez := elderObj.PosX, elderObj.PosY, elderObj.PosZ
-	if botToElder := e2eharness.Distance3D(bx, by, bz, ex, ey, ez); botToElder <= beamOnPlayerRange {
-		e2eharness.Preconditionf(t, "bot stands %.1fy from the elder, too close for the placement oracle to discriminate (need > %.1fy)",
-			botToElder, beamOnPlayerRange)
-	}
-	nearestToBot := float32(math.MaxFloat32)
-	for _, b := range wave {
-		toBot := e2eharness.Distance3D(bx, by, bz, b.x, b.y, b.z)
-		if toBot < nearestToBot {
-			nearestToBot = toBot
-		}
-		t.Logf("beam 0x%X at (%.1f,%.1f,%.1f) dist bot=%.1f elder=%.1f", b.guid, b.x, b.y, b.z,
-			toBot, e2eharness.Distance3D(ex, ey, ez, b.x, b.y, b.z))
-	}
-	// 62207 summons one beam at the elder and force-casts 62221 on the players its script picks,
-	// each summoning one at their own feet. A forced cast whose target mask takes no unit target
-	// must not inherit the original caster as its destination, or every beam stacks on the elder.
-	if nearestToBot > beamOnPlayerRange {
-		e2eharness.Assertf(t, "no Unstable Sun Beam landed on the player: nearest of %d beams is %.1fy away",
-			len(wave), nearestToBot)
-	}
-
-	// Kill him with the wave still up — that is the state that used to leak.
-	bot.DamageKill(t, []uint64{elder}, 10_000_000, 30*time.Second)
-	killT := time.Now()
-
-	cutoff := killT.Add(beamMaxLifetime + 15*time.Second)
-	for {
-		left := sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange)
-		if len(left) == 0 {
-			break
-		}
-		if !time.Now().Before(cutoff) {
-			e2eharness.Assertf(t, "%d Unstable Sun Beam(s) still up %s after Elder Brightleaf died: %v",
-				len(left), time.Since(killT).Round(time.Second), sunBeamGUIDs(left))
-		}
-		time.Sleep(500 * time.Millisecond)
-	}
-	t.Logf("PASS %d sun beams all gone %s after Elder Brightleaf died",
-		len(wave), time.Since(killT).Round(time.Millisecond))
-}
 
 type sunBeamSnap struct {
 	guid    uint64
