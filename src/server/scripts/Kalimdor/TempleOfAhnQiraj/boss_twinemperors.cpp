@@ -231,12 +231,6 @@ struct boss_twinemperorsAI : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
-        if (!instance->CheckRequiredBosses(DATA_TWIN_EMPERORS, who->ToPlayer()))
-        {
-            EnterEvadeMode(EVADE_REASON_OTHER);
-            return;
-        }
-
         BossAI::JustEngagedWith(who);
 
         if (!_introDone)
