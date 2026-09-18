@@ -734,7 +734,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                         if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                         {
-                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, false);
                             CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(
                                 true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         }
@@ -776,14 +776,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         }
                         else if (result == SPELL_FAILED_OUT_OF_RANGE)
                         {
-                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, false);
                             CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(
                                 true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         }
-                        else if (me->IsSpellProhibited(spellInfo->GetSchoolMask()) ||
-                                 CAST_AI(SmartAI, me->AI())->IsMainSpellPrevented(spellInfo))
+                        else if (result != SPELL_FAILED_NOT_READY)
                         {
-                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, false);
                             CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
                         }
                     }
@@ -2839,14 +2838,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             }
                             else if (result == SPELL_FAILED_OUT_OF_RANGE)
                             {
-                                CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
+                                CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, false);
                                 CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(
                                     true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                             }
-                            else if (me->IsSpellProhibited(spellInfo->GetSchoolMask()) ||
-                                     CAST_AI(SmartAI, me->AI())->IsMainSpellPrevented(spellInfo))
+                            else if (result != SPELL_FAILED_NOT_READY)
                             {
-                                CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
+                                CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, false);
                                 CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
                             }
                         }

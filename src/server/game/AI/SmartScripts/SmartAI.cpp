@@ -1038,21 +1038,28 @@ void SmartAI::InitializeAI()
 {
     GetScript()->OnInitialize(me);
 
-    for (SmartScriptHolder const& event : GetScript()->GetEvents())
+    auto getSpellAndFlags = [](SmartScriptHolder const& event, uint32& spellId, uint32& flags) -> bool
     {
-        uint32 spellId = 0;
-        uint32 flags = 0;
         if (event.GetActionType() == SMART_ACTION_CAST)
         {
             spellId = event.action.cast.spell;
             flags = event.action.cast.castFlags;
+            return true;
         }
         else if (event.GetActionType() == SMART_ACTION_CUSTOM_CAST)
         {
             spellId = event.action.castCustom.spell;
             flags = event.action.castCustom.flags;
+            return true;
         }
-        else
+        return false;
+    };
+
+    for (SmartScriptHolder const& event : GetScript()->GetEvents())
+    {
+        uint32 spellId = 0;
+        uint32 flags = 0;
+        if (!getSpellAndFlags(event, spellId, flags))
             continue;
 
         if (!(flags & SMARTCAST_MAIN_SPELL))
@@ -1078,17 +1085,7 @@ void SmartAI::InitializeAI()
         {
             uint32 spellId = 0;
             uint32 flags = 0;
-            if (event.GetActionType() == SMART_ACTION_CAST)
-            {
-                spellId = event.action.cast.spell;
-                flags = event.action.cast.castFlags;
-            }
-            else if (event.GetActionType() == SMART_ACTION_CUSTOM_CAST)
-            {
-                spellId = event.action.castCustom.spell;
-                flags = event.action.castCustom.flags;
-            }
-            else
+            if (!getSpellAndFlags(event, spellId, flags))
                 continue;
 
             if (!(flags & SMARTCAST_COMBAT_MOVE))
@@ -1241,10 +1238,7 @@ void SmartAI::SetCombatMovement(bool on, bool stopOrStartMovement)
         if (!me->IsCrowdControlled())
         {
             if (on)
-            {
-                if (!me->IsMovementPreventedByCasting())
-                    me->GetMotionMaster()->MoveChase(me->GetVictim(), _currentRangeMode ? _attackDistance : 0.0f);
-            }
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), _currentRangeMode ? _attackDistance : 0.0f);
             else if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
                 me->StopMoving();
         }
@@ -1416,8 +1410,20 @@ bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
     if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
         return true;
 
-    if (spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) > (int32)me->GetPower(POWER_MANA))
-        return true;
+    int32 powerCost = spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask());
+    if (spellInfo->PowerType == POWER_HEALTH)
+    {
+        if ((int32)me->GetHealth() <= powerCost)
+            return true;
+    }
+    else
+    {
+        Powers power = (spellInfo->PowerType >= 0 && spellInfo->PowerType < MAX_POWERS)
+            ? Powers(spellInfo->PowerType)
+            : me->getPowerType();
+        if ((int32)me->GetPower(power) < powerCost)
+            return true;
+    }
 
     return false;
 }
@@ -1430,12 +1436,14 @@ void SmartAI::OnSpellFailed(SpellInfo const* spell)
     if (me->IsMovementPreventedByCasting())
         return;
 
-    SetCombatMovement(true, true);
-
-    uint32 spellIdToCheck = _mainSpellId ? _mainSpellId : spell->Id;
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellIdToCheck);
-    if (spellInfo && _currentRangeMode && IsMainSpellPrevented(spellInfo))
-        SetCurrentRangeMode(false, 0.f);
+    if (_mainSpellId == spell->Id)
+    {
+        if (_currentRangeMode && IsMainSpellPrevented(spell))
+        {
+            SetCombatMovement(true, false);
+            SetCurrentRangeMode(false, 0.f);
+        }
+    }
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
