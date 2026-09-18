@@ -1970,6 +1970,22 @@ struct boss_yoggsaron_influence_tentacle : public NullCreatureAI
     }
 };
 
+static void ApplyEmpoweredStacks(Unit* target)
+{
+    uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
+
+    if (!stack)
+    {
+        target->RemoveAura(SPELL_EMPOWERED);
+        target->CastSpell(target, SPELL_WEAKENED, true);
+    }
+    else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
+    {
+        aur->SetStackAmount(stack);
+        target->RemoveAurasDueToSpell(SPELL_WEAKENED);
+    }
+}
+
 struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 {
     boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
@@ -1977,18 +1993,24 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
         Reset();
     }
 
-    uint32 _visualTimer;
+    uint32 _visualTimer;        // ms since spawn while the guardian is held in stasis; 0 = over
+    bool _spawnVisualPlayed;
     uint32 _spellTimer;
+
+    static constexpr uint32 SPAWN_VISUAL_DELAY = 100;
+    static constexpr uint32 SPAWN_STASIS_TIME = 800; // Sniffed
 
     void Reset() override
     {
-        me->CastSpell(me, SPELL_RECENTLY_SPAWNED, true);
-        //me->CastSpell(me, SPELL_EMPOWERED_PASSIVE, true);
+        DoCastSelf(SPELL_RECENTLY_SPAWNED, true);
         if (Aura* aur = me->AddAura(SPELL_EMPOWERED_PASSIVE, me))
             aur->SetStackAmount(9);
 
+        ApplyEmpoweredStacks(me);
+
         _spellTimer = 0;
         _visualTimer = 1;
+        _spawnVisualPlayed = false;
         me->SetControlled(true, UNIT_STATE_ROOT);
         me->SetInCombatWithZone();
     }
@@ -2013,12 +2035,14 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
         if (_visualTimer)
         {
             _visualTimer += diff;
-            if (_visualTimer >= 100 && _visualTimer < 10000)
+
+            if (!_spawnVisualPlayed && _visualTimer >= SPAWN_VISUAL_DELAY)
             {
-                me->CastSpell(me, SPELL_SIMPLE_TELEPORT, false);
-                _visualTimer = 10000;
+                DoCastSelf(SPELL_SIMPLE_TELEPORT, false);
+                _spawnVisualPlayed = true;
             }
-            else if (_visualTimer >= 11000)
+
+            if (_visualTimer >= SPAWN_STASIS_TIME)
             {
                 me->SetControlled(false, UNIT_STATE_ROOT);
                 _visualTimer = 0;
@@ -2651,19 +2675,7 @@ class spell_yogg_saron_empowered_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        Unit* target = GetUnitOwner();
-        uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
-
-        if (!stack)
-        {
-            target->RemoveAura(SPELL_EMPOWERED);
-            target->CastSpell(target, SPELL_WEAKENED, true);
-        }
-        else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
-        {
-            aur->SetStackAmount(stack);
-            target->RemoveAurasDueToSpell(SPELL_WEAKENED);
-        }
+        ApplyEmpoweredStacks(GetUnitOwner());
     }
 
     void Register() override
