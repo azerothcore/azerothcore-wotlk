@@ -413,7 +413,7 @@ namespace lfg
             return LFG_COMPATIBILITY_PENDING;
 
         if (!sScriptMgr->CanCreateLfgProposal(proposal.queues))
-            return LFG_INCOMPATIBLES_HAS_IGNORES;
+            return LFG_INCOMPATIBLES_REJECTED_BY_SCRIPT;
 
         // Create a new proposal
         proposal.cancelTime = GameTime::GetGameTime().count() + LFG_TIME_PROPOSAL;
