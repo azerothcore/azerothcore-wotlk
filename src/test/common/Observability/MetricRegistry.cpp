@@ -76,10 +76,15 @@ TEST(MetricRegistryTest, SameNameAndLabelsCoalescesIntoSingleSeries)
     MetricRegistry registry;
     auto loc = std::source_location::current();
 
-    registry.RegisterCounter("ac_world_packets_total", "Total world packets",
+    auto& c1 = registry.RegisterCounter("ac_world_packets_total", "Total world packets",
         { { "opcode", "CMSG_PING" } }, loc);
-    registry.RegisterCounter("ac_world_packets_total", "Total world packets",
+    auto& c2 = registry.RegisterCounter("ac_world_packets_total", "Total world packets",
         { { "opcode", "CMSG_PING" } }, loc);
+
+    // Detail::CounterSeries is opaque to the test, so we cannot update the values directly.
+    // However, verifying they are the exact same object guarantees they share the same value
+    // and neither is a silently returned IgnoredCounter.
+    EXPECT_EQ(&c1, &c2);
 
     RecordingVisitor visitor;
     registry.VisitMetrics(visitor);
