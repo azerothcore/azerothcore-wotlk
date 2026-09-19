@@ -69,6 +69,7 @@ enum SpellData
     SPELL_RAPID_BURST_DAMAGE_1                      = 63387,
     SPELL_RAPID_BURST_DAMAGE_2                      = 64019,
     SPELL_SUMMON_BURST_TARGET                       = 64840,
+    NPC_BURST_TARGET                                = 34211,
 
     SPELL_SPINNING_UP                               = 63414,
 
@@ -1399,11 +1400,15 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 }
                 break;
             case EVENT_SPELL_RAPID_BURST:
+                // The damage ticks are cones off VX-001's facing, so the channel is aimed at a Burst Target
+                // parked where the player stood: the volleys hold one line instead of following the player
                 if (Player* p = SelectTargetFromPlayerList(80.0f))
-                {
-                    me->CastSpell(p, SPELL_RAPID_BURST, true);
-                    me->SetFacingToObject(p);
-                }
+                    if (Creature* burstTarget = me->SummonCreature(NPC_BURST_TARGET, p->GetPosition(),
+                        TEMPSUMMON_TIMED_DESPAWN, 4 * IN_MILLISECONDS))
+                    {
+                        me->SetFacingToObject(burstTarget);
+                        DoCast(burstTarget, SPELL_RAPID_BURST, true);
+                    }
                 _events.Repeat(3200ms);
                 break;
             case EVENT_HAND_PULSE:
