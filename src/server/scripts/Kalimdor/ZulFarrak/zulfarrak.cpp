@@ -116,6 +116,9 @@ public:
                 return;
             }
 
+            //restore gossip removed while walking to the stairs (go_troll_cage)
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+
             if (instance->GetData(DATA_PYRAMID) == PYRAMID_WAVE_3)
             {
                 if (Creature* shadowpriest = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SHADOWPRIEST_SEZZZIZ)))
@@ -317,15 +320,16 @@ public:
 
             instance->SetData(DATA_PYRAMID, PYRAMID_CAGES_OPEN);
 
-            //setting gossip option as soon as the cages open
+            //gossip while walking would pause the point movement and stall the event
+            //(restored in Bly's and Weegli's MovementInform on arrival)
             if (Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
             {
-                bly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                bly->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
 
             if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
             {
-                weegli->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                weegli->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
 
             //set bly & co to aggressive & start moving to top of stairs
@@ -585,9 +589,9 @@ enum ShadowPriestSezzizEnum
 std::array<std::vector<std::pair<uint32, Position>>, 4> shadowpriestSezzizAdds =
 { {
     { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f, 8.87f } } },
-    { { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.088f, 8.87f } } },
-    { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } } },
-    { { NPC_SANDFURY_ZEALOT, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } } }
+    { { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.088f, 8.87f } } },
+    { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 894.0f, 1198.0f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } } },
+    { { NPC_SANDFURY_ZEALOT, { 895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } } }
 } };
 
 class npc_shadowpriest_sezziz : public CreatureScript
