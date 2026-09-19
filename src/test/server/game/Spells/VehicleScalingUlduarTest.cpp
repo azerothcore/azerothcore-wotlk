@@ -20,19 +20,7 @@
  * @brief Tests for Ulduar vehicle gear scaling formula
  *
  * Formula (from spell_gen_vehicle_scaling_aura in spell_generic.cpp):
- *
- *   result = (totalAdjustedILvl - 2500) / 500
- *   amount = int32(max(0.1f, result))
- *
- * Where:
- *   totalAdjustedILvl = sum of GetItemLevelIncludingQuality across 15 equipped slots
- *                       (excludes offhand, ranged, shirt, tabard)
- *   GetItemLevelIncludingQuality bakes in quality penalty: -26 for uncommon/below,
- *   -13 for rare; heirloom items use pLevel * 2.33f instead of base ItemLevel.
- *   floor: 0.1 when totalAdjustedILvl < 2500
- *
- * Source data: Google Sheets "Ulduar Vehicle Scaling"
- * Vehicle: Salvaged Demolisher (entry 33109)
+ * Vehicles: Salvaged Demolisher (33109), Salvaged Siege Engine, Salvaged Chopper
  */
 
 #include "gtest/gtest.h"
@@ -44,9 +32,6 @@
 namespace
 {
     /// Mirrors the Ulduar vehicle scaling formula from spell_gen_vehicle_scaling_aura::CalculateAmount.
-    /// totalAdjustedILvl is the sum of GetItemLevelIncludingQuality across equipped slots
-    /// (quality penalty is already baked into each item's value).
-    /// Computes the raw float result before int32 truncation.
     float CalcUlduarVehicleScale(float totalAdjustedILvl)
     {
         float const baseILvl = 2500.0f;
@@ -54,146 +39,148 @@ namespace
         return std::max(0.1f, result);
     }
 
-    /// Mirrors the final int32 amount stored on the aura effect.
+    /// Mirrors the final int32 amount stored on the aura effect (a percent).
     int32_t CalcUlduarVehicleScaleAmount(float totalAdjustedILvl)
     {
-        return static_cast<int32_t>(CalcUlduarVehicleScale(totalAdjustedILvl));
+        float scaling = CalcUlduarVehicleScale(totalAdjustedILvl);
+        return static_cast<int32_t>(std::round((scaling - 1.0f) * 100.0f));
+    }
+
+    /// Resulting vehicle stat after the aura: base * (1 + amount / 100).
+    float CalcScaledVehicleValue(float baseValue, float totalAdjustedILvl)
+    {
+        return baseValue * (1.0f + CalcUlduarVehicleScaleAmount(totalAdjustedILvl) / 100.0f);
     }
 }
-
-// =============================================================================
-// Formula structure: result = (totalAdjustedILvl - 2500) / 500
-// =============================================================================
 
 class UlduarVehicleScaleTest : public ::testing::Test {};
 
 TEST_F(UlduarVehicleScaleTest, BaselineNoGear)
 {
     // totalILvl = 2500 (e.g. 15 items at avg 166.67)
-    // Formula gives 0. Floor at 0.1 -> 0.1, int32 truncates to 0
+    // Raw scaling 0, floored to 0.1 -> -90% (10% of base)
     float result = CalcUlduarVehicleScale(2500.0f);
     EXPECT_FLOAT_EQ(result, 0.1f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2500.0f), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2500.0f), -90);
 }
 
 TEST_F(UlduarVehicleScaleTest, MinimumScalingThreshold)
 {
-    // totalILvl = 2550 -> (2550-2500)/500 = 0.1
-    // At this threshold, floor matches formula
+    // totalILvl = 2550 -> (2550-2500)/500 = 0.1, exactly at the floor
+    // -90% = 10% of base (CSV Demolisher HP 63000)
     float result = CalcUlduarVehicleScale(2550.0f);
     EXPECT_FLOAT_EQ(result, 0.1f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2550.0f), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2550.0f), -90);
 }
 
 TEST_F(UlduarVehicleScaleTest, NaxxramasEntryGear)
 {
     // totalILvl = 2805 (avg 187 * 15 items, typical Naxx entry)
-    // (2805 - 2500) / 500 = 0.61
+    // (2805 - 2500) / 500 = 0.61 -> -39%
     float result = CalcUlduarVehicleScale(2805.0f);
     EXPECT_FLOAT_EQ(result, 0.61f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2805.0f), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2805.0f), -39);
 }
 
 TEST_F(UlduarVehicleScaleTest, NaxxramasBiSGear)
 {
     // totalILvl = 3000 (avg 200 * 15 items, Naxx BiS / Ulduar entry)
-    // (3000 - 2500) / 500 = 1.0
+    // (3000 - 2500) / 500 = 1.0 -> 0% (baseline, no change)
     float result = CalcUlduarVehicleScale(3000.0f);
     EXPECT_FLOAT_EQ(result, 1.0f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3000.0f), 1);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3000.0f), 0);
 }
 
 TEST_F(UlduarVehicleScaleTest, Ulduar10Gear)
 {
     // totalILvl = 3195 (avg 213 * 15 items, Ulduar 10)
-    // (3195 - 2500) / 500 = 1.39
+    // (3195 - 2500) / 500 = 1.39 -> +39%
     float result = CalcUlduarVehicleScale(3195.0f);
     EXPECT_FLOAT_EQ(result, 1.39f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3195.0f), 1);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3195.0f), 39);
 }
 
 TEST_F(UlduarVehicleScaleTest, Ulduar25Gear)
 {
     // totalILvl = 3390 (avg 226 * 15 items, Ulduar 25)
-    // (3390 - 2500) / 500 = 1.78
+    // (3390 - 2500) / 500 = 1.78 -> +78%
     float result = CalcUlduarVehicleScale(3390.0f);
     EXPECT_FLOAT_EQ(result, 1.78f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3390.0f), 1);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3390.0f), 78);
 }
 
 TEST_F(UlduarVehicleScaleTest, UlduarBiSGear)
 {
     // totalILvl = 3780 (avg 252 * 15 items, Ulduar BiS)
-    // (3780 - 2500) / 500 = 2.56
+    // (3780 - 2500) / 500 = 2.56 -> +156%
     float result = CalcUlduarVehicleScale(3780.0f);
     EXPECT_FLOAT_EQ(result, 2.56f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3780.0f), 2);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3780.0f), 156);
 }
 
 TEST_F(UlduarVehicleScaleTest, ToCBiSGear)
 {
     // totalILvl = 3884 (avg 258.9 * 15 items, ToGC BiS)
-    // (3884 - 2500) / 500 = 2.768
+    // (3884 - 2500) / 500 = 2.768 -> round(176.8) = +177%
     float result = CalcUlduarVehicleScale(3884.0f);
     EXPECT_FLOAT_EQ(result, 2.768f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3884.0f), 2);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3884.0f), 177);
 }
 
 TEST_F(UlduarVehicleScaleTest, ICCBiSGear)
 {
     // totalILvl = 4162 (avg 277.5 * 15 items, ICC BiS)
-    // (4162 - 2500) / 500 = 3.324
+    // (4162 - 2500) / 500 = 3.324 -> +232%
     float result = CalcUlduarVehicleScale(4162.0f);
     EXPECT_FLOAT_EQ(result, 3.324f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(4162.0f), 3);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(4162.0f), 232);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(630000.0f, 4162.0f), 2091600.0f);
 }
 
 TEST_F(UlduarVehicleScaleTest, RSBiSGear)
 {
     // totalILvl = 4204 (avg 280.3 * 15 items, RS BiS)
-    // (4204 - 2500) / 500 = 3.408
+    // (4204 - 2500) / 500 = 3.408 -> round(240.8) = +241%
     float result = CalcUlduarVehicleScale(4204.0f);
     EXPECT_FLOAT_EQ(result, 3.408f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(4204.0f), 3);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(4204.0f), 241);
 }
-
-// =============================================================================
-// Quality penalty tests
-// =============================================================================
 
 TEST_F(UlduarVehicleScaleTest, AllEpicNoPenalty)
 {
     // 15 epic items at avg 200: totalAdjustedILvl = 15 * 200 = 3000
-    // (3000 - 2500) / 500 = 1.0
+    // (3000 - 2500) / 500 = 1.0 -> 0% baseline
     float result = CalcUlduarVehicleScale(3000.0f);
     EXPECT_FLOAT_EQ(result, 1.0f);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3000.0f), 0);
 }
 
 TEST_F(UlduarVehicleScaleTest, OneRareItemPenalty)
 {
     // 14 epic (200) + 1 rare (200 - 13 = 187): totalAdjustedILvl = 14*200 + 187 = 2987
-    // (2987 - 2500) / 500 = 487/500 = 0.974
+    // (2987 - 2500) / 500 = 487/500 = 0.974 -> round(-2.6) = -3%
     float result = CalcUlduarVehicleScale(2987.0f);
     EXPECT_FLOAT_EQ(result, 0.974f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2987.0f), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2987.0f), -3);
 }
 
 TEST_F(UlduarVehicleScaleTest, OneUncommonItemPenalty)
 {
     // 14 epic (200) + 1 uncommon (200 - 26 = 174): totalAdjustedILvl = 14*200 + 174 = 2974
-    // (2974 - 2500) / 500 = 474/500 = 0.948
+    // (2974 - 2500) / 500 = 474/500 = 0.948 -> round(-5.2) = -5%
     float result = CalcUlduarVehicleScale(2974.0f);
     EXPECT_FLOAT_EQ(result, 0.948f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2974.0f), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2974.0f), -5);
 }
 
 TEST_F(UlduarVehicleScaleTest, MixedQualityPenalty)
 {
     // 10 epic (200) + 3 rare (187) + 2 uncommon (174):
     // totalAdjustedILvl = 10*200 + 3*187 + 2*174 = 2000 + 561 + 348 = 2909
-    // (2909 - 2500) / 500 = 409/500 = 0.818
+    // (2909 - 2500) / 500 = 409/500 = 0.818 -> round(-18.2) = -18%
     float result = CalcUlduarVehicleScale(2909.0f);
     EXPECT_FLOAT_EQ(result, 0.818f);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2909.0f), -18);
 }
 
 // =============================================================================
@@ -202,24 +189,49 @@ TEST_F(UlduarVehicleScaleTest, MixedQualityPenalty)
 
 TEST_F(UlduarVehicleScaleTest, FloorAtLowItemLevel)
 {
-    // totalILvl < 2500 → result would be negative, floor to 0.1
+    // totalILvl < 2500 → result would be negative, floor to 0.1 -> -90%
     float result = CalcUlduarVehicleScale(2400.0f);
     EXPECT_FLOAT_EQ(result, 0.1f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2400.0f), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2400.0f), -90);
 }
 
 TEST_F(UlduarVehicleScaleTest, FloorWithQualityPenalty)
 {
     // totalAdjustedILvl = 2400 (e.g. sum of quality-adjusted iLvl below 2500)
-    // (2400 - 2500) / 500 = -0.2 → floor to 0.1
+    // (2400 - 2500) / 500 = -0.2 → floor to 0.1 -> -90%
     float result = CalcUlduarVehicleScale(2400.0f);
     EXPECT_FLOAT_EQ(result, 0.1f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2400.0f), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2400.0f), -90);
 }
 
-// =============================================================================
-// Monotonicity: scaling must never decrease as totalILvl increases
-// =============================================================================
+TEST_F(UlduarVehicleScaleTest, DemolisherHealthMatchesCsv)
+{
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(630000.0f, 2550.0f), 63000.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(630000.0f, 3000.0f), 630000.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(630000.0f, 3195.0f), 875700.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(630000.0f, 3390.0f), 1121400.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(630000.0f, 3780.0f), 1612800.0f);
+}
+
+TEST_F(UlduarVehicleScaleTest, DemolisherDoTMatchesCsv)
+{
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(120000.0f, 3195.0f), 166800.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(120000.0f, 3390.0f), 213600.0f);
+}
+
+TEST_F(UlduarVehicleScaleTest, SiegeHealthMatchesCsv)
+{
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(1134000.0f, 2550.0f), 113400.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(1134000.0f, 3195.0f), 1576260.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(1134000.0f, 3390.0f), 2018520.0f);
+}
+
+TEST_F(UlduarVehicleScaleTest, ChopperHealthMatchesCsv)
+{
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(504000.0f, 2550.0f), 50400.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(504000.0f, 3195.0f), 700560.0f);
+    EXPECT_FLOAT_EQ(CalcScaledVehicleValue(504000.0f, 3390.0f), 897120.0f);
+}
 
 TEST_F(UlduarVehicleScaleTest, MonotonicWithSameQuality)
 {
