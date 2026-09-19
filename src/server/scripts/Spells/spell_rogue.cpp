@@ -54,7 +54,9 @@ enum RogueSpells
     SPELL_ROGUE_OVERKILL_TRIGGERED              = 58427,
     SPELL_ROGUE_HONOR_AMONG_THIEVES_PROC        = 52916,
     SPELL_ROGUE_HONOR_AMONG_THIEVES_TRIGGERED   = 51699,
-    SPELL_ROGUE_COLD_BLOOD                      = 14177
+    SPELL_ROGUE_COLD_BLOOD                      = 14177,
+    SPELL_ROGUE_REMORSELESS_ATTACKS_R1          = 14143,
+    SPELL_ROGUE_REMORSELESS_ATTACKS_R2          = 14149
 };
 
 enum RogueSpellIcons
@@ -1110,7 +1112,10 @@ class spell_rog_cold_blood : public AuraScript
     bool _usedByMutilate = false;
 
 public:
-    bool WasUsedByMutilate() const { return _usedByMutilate; }
+    bool WasUsedByMutilate() const
+    {
+        return _usedByMutilate;
+    }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
@@ -1135,6 +1140,42 @@ public:
     }
 };
 
+// 14143, 14149 - Remorseless Attacks
+class spell_rog_remorseless_attacks : public AuraScript
+{
+    PrepareAuraScript(spell_rog_remorseless_attacks);
+
+    bool _usedByMutilate = false;
+
+public:
+    bool WasUsedByMutilate() const
+    {
+        return _usedByMutilate;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return true;
+
+        // Block Mutilate MH (0x2) and OH (0x4) from consuming the charge immediately
+        if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE
+            && (spellInfo->SpellFamilyFlags[1] & 0x6))
+        {
+            _usedByMutilate = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_rog_remorseless_attacks::CheckProc);
+    }
+};
+
 // 1329 - Mutilate (parent spell, all ranks)
 class spell_rog_mutilate : public SpellScript
 {
@@ -1146,16 +1187,25 @@ class spell_rog_mutilate : public SpellScript
         if (!caster)
             return;
 
-        Aura* cb = caster->GetAura(SPELL_ROGUE_COLD_BLOOD);
-        if (!cb)
-            return;
+        if (Aura* cb = caster->GetAura(SPELL_ROGUE_COLD_BLOOD))
+        {
+            auto* script = dynamic_cast<spell_rog_cold_blood*>(
+                cb->GetScriptByName("spell_rog_cold_blood"));
+            if (script && script->WasUsedByMutilate())
+                cb->Remove();
+        }
 
-        auto* script = dynamic_cast<spell_rog_cold_blood*>(
-            cb->GetScriptByName("spell_rog_cold_blood"));
-        if (!script || !script->WasUsedByMutilate())
-            return;
+        Aura* remorseless = caster->GetAura(SPELL_ROGUE_REMORSELESS_ATTACKS_R1);
+        if (!remorseless)
+            remorseless = caster->GetAura(SPELL_ROGUE_REMORSELESS_ATTACKS_R2);
 
-        cb->Remove();
+        if (remorseless)
+        {
+            auto* script = dynamic_cast<spell_rog_remorseless_attacks*>(
+                remorseless->GetScriptByName("spell_rog_remorseless_attacks"));
+            if (script && script->WasUsedByMutilate())
+                remorseless->Remove();
+        }
     }
 
     void Register() override
@@ -1197,4 +1247,5 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_focused_attacks);
     RegisterSpellScript(spell_rog_mutilate);
     RegisterSpellScript(spell_rog_cold_blood);
+    RegisterSpellScript(spell_rog_remorseless_attacks);
 }
