@@ -8292,7 +8292,8 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             else if (loot_type == LOOT_SKINNING)
             {
                 loot->clear();
-                loot->FillLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, this, true);
+                loot->FillLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, this, true,
+                    false, LOOT_MODE_DEFAULT, creature);
                 permission = OWNER_PERMISSION;
 
                 //Inform instance if creature is skinned.
@@ -13796,10 +13797,11 @@ bool Player::IsBaseRuneSlotsOnCooldown(RuneType runeType) const
     return true;
 }
 
-void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast)
+void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast,
+    WorldObject* lootSource)
 {
     Loot loot;
-    loot.FillLoot (loot_id, store, this, true);
+    loot.FillLoot (loot_id, store, this, true, false, LOOT_MODE_DEFAULT, lootSource);
 
     uint32 max_slot = loot.GetMaxSlotInLootFor(this);
     for (uint32 i = 0; i < max_slot; ++i)
