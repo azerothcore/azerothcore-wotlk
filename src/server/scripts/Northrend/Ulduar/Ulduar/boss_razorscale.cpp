@@ -336,8 +336,9 @@ struct boss_razorscale : public BossAI
             case POINT_RAZORSCALE_GROUND:
                 me->SetDisableGravity(false);
                 me->SetFacingTo(RazorGroundPos.GetOrientation());
-                if (_permaGround)
+                if (_permaGround || me->HealthBelowPct(50))
                 {
+                    _permaGround = true;
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoAction(ACTION_START_PERMA_GROUND);
                     break;
