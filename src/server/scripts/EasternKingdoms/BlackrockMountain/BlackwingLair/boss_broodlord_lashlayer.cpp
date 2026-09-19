@@ -182,6 +182,16 @@ struct go_suppression_device : public GameObjectAI
         }
     }
 
+    void OnStateChanged(uint32 state, Unit* /*unit*/) override
+    {
+        if (state != GO_JUST_DEACTIVATED)
+            return;
+
+        // Disarm Trap must disable the device without despawning it.
+        me->SetLootState(GO_READY);
+        DoAction(ACTION_DISARMED);
+    }
+
     void Activate()
     {
         if (_active)
