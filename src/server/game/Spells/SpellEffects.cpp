@@ -2187,7 +2187,18 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
             case GAMEOBJECT_TYPE_CHEST:
                 // triggering linked GO
                 if (uint32 trapEntry = gameObjTarget->GetGOInfo()->chest.linkedTrapId)
+                {
                     gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
+
+                    if (!gameObjTarget->GetGOInfo()->chest.lootId)
+                    {
+                        if (gameObjTarget->GetGOInfo()->chest.consumable)
+                            gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
+
+                        player->SendLootRelease(guid);
+                        return;
+                    }
+                }
 
             // Don't return, let loots been taken
             default:
@@ -2249,7 +2260,12 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
         else if (m_spellInfo->Id == 1842 && gameObjTarget->GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP)
         {
             gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
-            if (gameObjTarget->getLootState() == GO_JUST_DEACTIVATED && !gameObjTarget->GetOwner()) // pussywizard
+            if (gameObjTarget->getLootState() == GO_JUST_DEACTIVATED && goInfo->trap.type == 1)
+                gameObjTarget->DeactivateLinkedTrapParent();
+
+            // Consumable traps must retain their respawn delay; a zero auto-close time would rearm them immediately.
+            if (gameObjTarget->getLootState() == GO_JUST_DEACTIVATED && !gameObjTarget->GetOwner() &&
+                goInfo->trap.type != 1)
             {
                 gameObjTarget->SetRespawnTime(gameObjTarget->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS/*xinef*/);
             }

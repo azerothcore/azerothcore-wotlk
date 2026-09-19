@@ -15,6 +15,10 @@ import (
 const (
 	npcTimmyTheCruel   = uint32(10808)
 	npcCrimsonInitiate = uint32(10420)
+	goSupplyCrate1     = uint32(176304)
+	goSupplyCrate2     = uint32(176307)
+	goSupplyCrate3     = uint32(176308)
+	goSupplyCrate4     = uint32(176309)
 
 	stratholmeMap        = uint32(329)
 	triggerRadius        = float32(55)
@@ -22,6 +26,29 @@ const (
 )
 
 var timmyActivationEntries = []uint32{10418, 10419, 10420, 10424}
+
+var stratholmeSupplyCrates = []uint32{goSupplyCrate1, goSupplyCrate2, goSupplyCrate3, goSupplyCrate4}
+
+func waitGameObjectGone(t *testing.T, bot *e2eharness.ScenarioBot, guid uint64, timeout time.Duration) {
+	t.Helper()
+
+	ticker := time.NewTicker(20 * time.Millisecond)
+	defer ticker.Stop()
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+
+	for {
+		if bot.World.GetObject(guid) == nil {
+			return
+		}
+
+		select {
+		case <-ticker.C:
+		case <-timer.C:
+			e2eharness.ConfirmedBugf(t, 12285, "Supply Crate 0x%X remained spawned after its proximity trap fired", guid)
+		}
+	}
+}
 
 func waitForTimmyActivationSet(t *testing.T, bot *e2eharness.ScenarioBot, timeout time.Duration) []uint64 {
 	t.Helper()
@@ -168,4 +195,45 @@ func TestAC_26363_TimmyEmergesAfterSquareCleared(t *testing.T) {
 	timmy := waitForTimmy(t, bot, 15*time.Second)
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS AC#26363 Timmy emerged as 0x%X only after all 15 relevant Scarlets died", timmy)
+}
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/12285
+// A Supply Crate and its linked, consumable trap form one world interaction:
+// walking into the trap radius must consume the parent crate as well as the trap.
+func TestAC_12285_SupplyCrateProximityConsumesParent(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances", "gameobject", "issue", "serial"},
+		Runtime:  "med",
+		Issue:    12285,
+		Category: "instances/classic/stratholme",
+	})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "SCProx",
+		Level:  80,
+	})
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
+
+	for _, entry := range stratholmeSupplyCrates {
+		if spawnID := bot.SpawnGameObject(t, entry); spawnID == 0 {
+			e2eharness.Preconditionf(t, "failed to create cleanup-backed Supply Crate entry=%d", entry)
+		}
+		crateGUID := bot.WaitGameObject(t, entry, 10*time.Second)
+		var count func() int32
+		cancel := func() {}
+		if entry == goSupplyCrate4 {
+			count, cancel = armSpellGoCounter(bot, spellPlagueMist)
+		}
+
+		// SpawnGameObject leaves GM mode enabled, so the environmental trap cannot
+		// select the player until CombatReady turns GM mode off.
+		bot.CombatReady(t)
+		waitGameObjectGone(t, bot, crateGUID, 10*time.Second)
+		if count != nil {
+			assertSpellGoCount(t, count, spellPlagueMist, 1)
+		}
+		cancel()
+		bot.AssertWorldAlive(t)
+		t.Logf("PASS AC#12285 proximity trap consumed Supply Crate entry=%d guid=0x%X", entry, crateGUID)
+	}
 }
