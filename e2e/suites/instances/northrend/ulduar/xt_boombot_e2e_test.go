@@ -5,6 +5,7 @@ package ulduar_test
 import (
 	"encoding/binary"
 	"fmt"
+	"math"
 	"sync"
 	"testing"
 	"time"
@@ -150,20 +151,70 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 				return
 			}
 
-			if !t.Run("overkill_outside_boom_radius", func(t *testing.T) {
-				guid := spawn(t, true)
-				bot.Teleport(t, 794.243, -10.9022, 409.804, e2eharness.MapUlduar)
-				if !xtPoll(5*time.Second, func() bool { return bot.World.GetObject(guid) != nil }) {
-					e2eharness.Preconditionf(t, "Boombot not visible after moving outside its radius")
+			if !t.Run("range", func(t *testing.T) {
+				// Boom (62834), radius 13 = 10 yards. Its destination-area entry selector
+				// checks center-to-center 2D distance, not the size-adjusted .distance value.
+				// https://www.wowhead.com/wotlk/spell=62834/boom
+				// Keep both actors on the same floor and avoid the exact floating-point edge.
+				for _, tc := range []struct {
+					distance float32
+					wantHit  bool
+				}{
+					{5, true},
+					{9.5, true},
+					{10.5, false},
+					{15, false},
+					{25, false},
+				} {
+					if !t.Run(fmt.Sprintf("%.1f_yards", tc.distance), func(t *testing.T) {
+						guid := spawn(t, true)
+						add := bot.World.GetObject(guid)
+						if add == nil {
+							e2eharness.Preconditionf(t, "Boombot disappeared before range setup")
+						}
+						// The root can stop the gathered add just short of the player. Anchor
+						// to its observed position, not the fixture's nominal teleport point.
+						bot.Teleport(t, add.PosX-tc.distance, add.PosY, add.PosZ, e2eharness.MapUlduar)
+						var measured float32
+						positioned := func() bool {
+							add := bot.World.GetObject(guid)
+							if add == nil || add.Health() == 0 || !bot.UnitHasAura(guid, xtRoot) {
+								return false
+							}
+							x, y, z, mapID := bot.Pos()
+							measured = e2eharness.Distance3D(x, y, 0, add.PosX, add.PosY, 0)
+							return mapID == e2eharness.MapUlduar &&
+								math.Abs(float64(z-add.PosZ)) <= 0.1 &&
+								math.Abs(float64(measured-tc.distance)) <= 0.1
+						}
+						// Teleport clears the cache; wait for the same rooted GUID and its pose.
+						if !xtPoll(5*time.Second, positioned) {
+							e2eharness.Preconditionf(t, "range setup: want %.1f yards, observed %.3f", tc.distance, measured)
+						}
+						prepare(t)
+						if !positioned() {
+							e2eharness.Preconditionf(t, "actors moved before range detonation: %.3f yards", measured)
+						}
+						t.Logf("Boombot %x: measured %.3f yards, expect hit=%t", guid, measured, tc.wantHit)
+						hp, _ := bot.UnitHP(guid)
+						bot.Damage(t, guid, hp*2) // retain the overkill regression case
+						xtRequireDeath(t, bot, record, guid, 5*time.Second)
+						if tc.wantHit {
+							xtRequirePlayerDamage(t, bot, record, guid)
+						} else {
+							// Require a real explosion above before accepting the absence of damage.
+							xtObserve(t, 2*time.Second, func() {
+								if _, hit := record.hit(guid, bot.World.CharGUID()); hit {
+									e2eharness.ConfirmedBugf(t, 27699, "Boom hit outside 10 yards at %.3f yards", measured)
+								}
+							})
+						}
+						t.Logf("PASS Boom range: %.3f yards, hit=%t", measured, tc.wantHit)
+						bot.Teleport(t, 819.243, -10.9022, 409.804, e2eharness.MapUlduar)
+					}) {
+						return
+					}
 				}
-				prepare(t)
-				hp, _ := bot.UnitHP(guid)
-				bot.Damage(t, guid, hp*2)
-				xtRequireDeath(t, bot, record, guid, 5*time.Second)
-				if _, hit := record.hit(guid, bot.World.CharGUID()); hit {
-					e2eharness.ConfirmedBugf(t, 27699, "Boom hit a player 25 yards away")
-				}
-				bot.Teleport(t, 819.243, -10.9022, 409.804, e2eharness.MapUlduar)
 			}) {
 				return
 			}
