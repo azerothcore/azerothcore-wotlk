@@ -119,7 +119,17 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 	bait.GM(t, ".cheat god off")
 	bait.FlushWorld(t)
 	bait.CastMust(t, spellRetributionAura, bait.World.CharGUID(), 10*time.Second)
-	if !bait.HasAura(spellRetributionAura) {
+	// SMSG_SPELL_GO arrives before the aura update, so a snapshot read here races the apply.
+	auraOn := false
+	auraDeadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(auraDeadline) {
+		if bait.HasAura(spellRetributionAura) {
+			auraOn = true
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
+	if !auraOn {
 		e2eharness.Preconditionf(t, "bait has no Retribution Aura after the cast")
 	}
 	// The bait keeps its (small) full health; Thorim's melee kills it in a swing or two, and every
