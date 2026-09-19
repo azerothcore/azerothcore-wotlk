@@ -23,7 +23,7 @@
 #include "Common.h"
 #include "ObjectGuid.h"
 
-#define MAX_MAP_ID 800 // Probably too much, but let's lean towards caution.
+#define TC9_MAX_MAP_ID 800 // Probably too much, but let's lean towards caution.
 
 class ToCloud9Sidecar
 {
@@ -73,7 +73,7 @@ private:
     bool _clusterModeEnabled;
     bool _isCrossrealm;
 
-    bool _assignedMapsByID[MAX_MAP_ID];
+    bool _assignedMapsByID[TC9_MAX_MAP_ID];
 
     AsyncCallbackProcessor<AsyncTask<bool>> _asyncTasksProcessor;
 };

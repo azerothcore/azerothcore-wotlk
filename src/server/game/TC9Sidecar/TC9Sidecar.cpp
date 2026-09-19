@@ -123,16 +123,16 @@ void ToCloud9Sidecar::Init(uint16 port, int realmId)
         std::string availableMaps = sConfigMgr->GetOption<std::string>("Cluster.AvailableMaps", AVAILABLE_MAPS_ALL_MAPS);
         TC9InitLib(port, realmId, _isCrossrealm, availableMaps.data(), &assignedMaps, &assignedMapsSize);
 
-        for (int i = 0; i < MAX_MAP_ID; i++)
+        for (int i = 0; i < TC9_MAX_MAP_ID; i++)
             _assignedMapsByID[i] = false;
 
         for (int i = 0; i < assignedMapsSize; i++)
         {
             uint32 mapId = assignedMaps[i];
-            if (mapId >= MAX_MAP_ID)
+            if (mapId >= TC9_MAX_MAP_ID)
             {
                 LOG_ERROR("server", "ToCloud9Sidecar::Init: map id {} out of range [0, {}), ignored",
-                    mapId, MAX_MAP_ID);
+                    mapId, TC9_MAX_MAP_ID);
                 continue;
             }
             _assignedMapsByID[mapId] = true;
@@ -207,7 +207,7 @@ void ToCloud9Sidecar::ProcessAsyncTasks()
 
 bool ToCloud9Sidecar::IsMapAssigned(uint32 mapId)
 {
-    if (mapId >= MAX_MAP_ID)
+    if (mapId >= TC9_MAX_MAP_ID)
         return false;
 
     return _assignedMapsByID[mapId];
@@ -265,10 +265,10 @@ void ToCloud9Sidecar::OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uin
     for (int i = 0; i < addedMapsSize; i++)
     {
         uint32 mapId = addedMaps[i];
-        if (mapId >= MAX_MAP_ID)
+        if (mapId >= TC9_MAX_MAP_ID)
         {
             LOG_ERROR("server", "ToCloud9Sidecar::OnMapsReassigned: added map id {} out of range [0, {}), ignored",
-                mapId, MAX_MAP_ID);
+                mapId, TC9_MAX_MAP_ID);
             continue;
         }
 
@@ -282,10 +282,10 @@ void ToCloud9Sidecar::OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uin
     for (int i = 0; i < removedMapsSize; i++)
     {
         uint32 mapId = removedMaps[i];
-        if (mapId >= MAX_MAP_ID)
+        if (mapId >= TC9_MAX_MAP_ID)
         {
             LOG_ERROR("server", "ToCloud9Sidecar::OnMapsReassigned: removed map id {} out of range [0, {}), ignored",
-                mapId, MAX_MAP_ID);
+                mapId, TC9_MAX_MAP_ID);
             continue;
         }
 
