@@ -25,6 +25,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "WaypointMgr.h"
 
 enum IronhandData
 {
@@ -399,190 +400,447 @@ struct npc_grimstone : public npc_escortAI
 };
 
 // npc_phalanx
+// Cala's CMaNGOS Grim Guzzler rework established the corner/door staging:
+// https://github.com/cmangos/mangos-wotlk/commit/563770518af7
+// The route and spell IDs below are checked against Anniversary build 69546.
 enum PhalanxSpells
 {
-    SPELL_THUNDERCLAP                   = 8732,
-    SPELL_FIREBALLVOLLEY                = 22425,
-    SPELL_MIGHTYBLOW                    = 14099
+    SPELL_THUNDERCLAP = 15588,
+    SPELL_FIREBALLVOLLEY = 15285,
+    SPELL_MIGHTYBLOW = 14099
+};
+
+enum PhalanxTexts
+{
+    SAY_PHALANX_AGGRO = 0
+};
+
+enum PhalanxActions
+{
+    ACTION_PHALANX_START_ACTIVATION = 1
+};
+
+enum PhalanxEvents
+{
+    EVENT_PHALANX_YELL = 1,
+    EVENT_PHALANX_FINISH_MOVEMENT,
+    EVENT_PHALANX_THUNDERCLAP,
+    EVENT_PHALANX_MIGHTY_BLOW,
+    EVENT_PHALANX_FIREBALL_VOLLEY
+};
+
+enum PhalanxStates
+{
+    PHALANX_STATE_DORMANT,
+    PHALANX_STATE_MOVING_TO_DOOR,
+    PHALANX_STATE_ACTIVE
+};
+
+enum PhalanxData
+{
+    PATH_PHALANX_DOOR = 95020,
+    FACTION_PHALANX_HOSTILE = 54
 };
 
 struct npc_phalanx : public ScriptedAI
 {
-    npc_phalanx(Creature* creature) : ScriptedAI(creature) { }
+    npc_phalanx(Creature* creature) : ScriptedAI(creature),
+        _instance(creature->GetInstanceScript()), _state(PHALANX_STATE_DORMANT), _volleyStarted(false) { }
 
     void Reset() override
     {
-        _thunderClapTimer = 12000;
-        _fireballVolleyTimer = 0;
-        _mightyBlowTimer = 15000;
+        _combatEvents.Reset();
+        _stagingEvents.Reset();
+        _volleyStarted = false;
+
+        bool const restoring = _state == PHALANX_STATE_DORMANT && _instance &&
+            _instance->GetData(DATA_PHALANX_ACTIVATED) == DONE;
+        if (_state != PHALANX_STATE_DORMANT || restoring)
+        {
+            Activate();
+            // An evade already has a home movement. A newly loaded creature needs one,
+            // but must not replay the announcement or become friendly again.
+            if (restoring)
+                me->GetMotionMaster()->MoveTargetedHome();
+        }
+        else
+        {
+            me->RestoreFaction();
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+    }
+
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        // Waypoint movement updates home at each node. Evading during the run
+        // must still return to the final guard position.
+        if (_state != PHALANX_STATE_DORMANT)
+            SetDoorHome();
+
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _combatEvents.ScheduleEvent(EVENT_PHALANX_THUNDERCLAP, 12s);
+        _combatEvents.ScheduleEvent(EVENT_PHALANX_MIGHTY_BLOW, 15s);
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        if (pathId == PATH_PHALANX_DOOR && _state == PHALANX_STATE_MOVING_TO_DOOR)
+        {
+            Activate();
+            // Zero-delay waypoints do not apply their facing; the sniff turns him after arrival.
+            me->SetFacingTo(me->GetHomePosition().GetOrientation());
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_PHALANX_START_ACTIVATION && _state == PHALANX_STATE_DORMANT)
+            StartActivation();
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
+        // Preserve the existing Plugger activation hook.
+        if (_state == PHALANX_STATE_DORMANT && me->GetFaction() == FACTION_MONSTER)
+            StartActivation();
+
+        _stagingEvents.Update(diff);
+        while (uint32 eventId = _stagingEvents.ExecuteEvent())
+        {
+            if (eventId == EVENT_PHALANX_YELL)
+                Talk(SAY_PHALANX_AGGRO);
+            else if (eventId == EVENT_PHALANX_FINISH_MOVEMENT)
+            {
+                // A blocked route must not leave him permanently passive or teleport him.
+                Activate();
+            }
+        }
+
+        if (_state != PHALANX_STATE_ACTIVE || !UpdateVictim())
             return;
 
-        if (_thunderClapTimer <= diff)
-        {
-            DoCastVictim(SPELL_THUNDERCLAP);
-            _thunderClapTimer = 10000;
-        }
-        else _thunderClapTimer -= diff;
+        _combatEvents.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
 
-        if (HealthBelowPct(51))
+        if (!_volleyStarted && HealthBelowPct(51))
         {
-            if (_fireballVolleyTimer <= diff)
+            _volleyStarted = true;
+            _combatEvents.ScheduleEvent(EVENT_PHALANX_FIREBALL_VOLLEY, 1ms);
+        }
+
+        while (uint32 eventId = _combatEvents.ExecuteEvent())
+        {
+            switch (eventId)
             {
-                DoCastVictim(SPELL_FIREBALLVOLLEY);
-                _fireballVolleyTimer = 15000;
+                case EVENT_PHALANX_THUNDERCLAP:
+                    _combatEvents.ScheduleEvent(eventId,
+                        DoCastSelf(SPELL_THUNDERCLAP) == SPELL_CAST_OK ? 10s : 500ms);
+                    break;
+                case EVENT_PHALANX_MIGHTY_BLOW:
+                    _combatEvents.ScheduleEvent(eventId,
+                        DoCastVictim(SPELL_MIGHTYBLOW) == SPELL_CAST_OK ? 10s : 500ms);
+                    break;
+                case EVENT_PHALANX_FIREBALL_VOLLEY:
+                    _combatEvents.ScheduleEvent(eventId,
+                        HealthBelowPct(51) && DoCastSelf(SPELL_FIREBALLVOLLEY) == SPELL_CAST_OK ? 10s : 500ms);
+                    break;
             }
-            else _fireballVolleyTimer -= diff;
         }
-
-        if (_mightyBlowTimer <= diff)
-        {
-            DoCastVictim(SPELL_MIGHTYBLOW);
-            _mightyBlowTimer = 10000;
-        }
-        else _mightyBlowTimer -= diff;
-
         DoMeleeAttackIfReady();
     }
 
 private:
-    uint32 _thunderClapTimer;
-    uint32 _fireballVolleyTimer;
-    uint32 _mightyBlowTimer;
+    void SetDoorHome()
+    {
+        if (WaypointPath const* path = sWaypointMgr->GetPath(PATH_PHALANX_DOOR); path && !path->Nodes.empty())
+        {
+            WaypointNode const& node = path->Nodes.back();
+            me->SetHomePosition(node.X, node.Y, node.Z, node.Orientation.value_or(me->GetOrientation()));
+        }
+    }
+
+    void StartActivation()
+    {
+        _state = PHALANX_STATE_MOVING_TO_DOOR;
+        SetDoorHome();
+        if (_instance)
+            _instance->SetData(DATA_PHALANX_ACTIVATED, DONE);
+
+        // The sniff retains interaction during staging, changes faction on arrival,
+        // and announces the event shortly after starting the run.
+        me->SetReactState(REACT_PASSIVE);
+        me->SetWalk(false);
+        me->GetMotionMaster()->MoveWaypoint(PATH_PHALANX_DOOR, false);
+        _stagingEvents.ScheduleEvent(EVENT_PHALANX_YELL, 200ms);
+        _stagingEvents.ScheduleEvent(EVENT_PHALANX_FINISH_MOVEMENT, 15s);
+    }
+
+    void Activate()
+    {
+        _state = PHALANX_STATE_ACTIVE;
+        _stagingEvents.CancelEvent(EVENT_PHALANX_FINISH_MOVEMENT);
+        SetDoorHome();
+        me->SetFaction(FACTION_PHALANX_HOSTILE);
+        me->SetReactState(REACT_AGGRESSIVE);
+    }
+
+    InstanceScript* _instance;
+    PhalanxStates _state;
+    EventMap _stagingEvents;
+    EventMap _combatEvents;
+    bool _volleyStarted;
 };
 
 // npc_rocknot
 enum RocknotSays
 {
-    SAY_GOT_BEER                       = 0
-};
-
-enum RocknotSpells
-{
-    SPELL_DRUNKEN_RAGE                 = 14872
+    SAY_GOT_BEER = 0,
+    SAY_MORE_ALE = 1,
+    SAY_FIRST_EMPTY = 2,
+    SAY_SECOND_EMPTY = 3,
+    SAY_ALE = 4
 };
 
 enum RocknotQuests
 {
-    QUEST_ALE                          = 4295
+    QUEST_ALE = 4295
+};
+
+enum RocknotEvents
+{
+    EVENT_ROCKNOT_MORE_ALE = 1,
+    EVENT_ROCKNOT_PUNCH,
+    EVENT_ROCKNOT_SECOND_KEG,
+    EVENT_ROCKNOT_FINAL_KEG,
+    EVENT_ROCKNOT_ALE,
+    EVENT_ROCKNOT_BREAK_KEG,
+    EVENT_ROCKNOT_BAR_REACTION,
+    EVENT_ROCKNOT_RECOVER
+};
+
+enum RocknotPoints
+{
+    POINT_ROCKNOT_FIRST_KEG = 2,
+    POINT_ROCKNOT_LEAVE_FIRST_KEG = 3,
+    POINT_ROCKNOT_SECOND_KEG = 4,
+    POINT_ROCKNOT_LEAVE_SECOND_KEG = 5,
+    POINT_ROCKNOT_FINAL_KEG = 7
 };
 
 struct npc_rocknot : public npc_escortAI
 {
-    npc_rocknot(Creature* creature) : npc_escortAI(creature)
-    {
-        instance = creature->GetInstanceScript();
-    }
+    npc_rocknot(Creature* creature) : npc_escortAI(creature),
+        _instance(creature->GetInstanceScript()), _aleComplete(false) { }
 
     void Reset() override
     {
-        if (HasEscortState(STATE_ESCORT_ESCORTING))
+        if (HasEscortState(STATE_ESCORT_ESCORTING) || _aleEventActive)
             return;
 
-        _breakKegTimer = 0;
-        _breakDoorTimer = 0;
+        _events.Reset();
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetEmoteState(EMOTE_STATE_NONE);
     }
 
-    void sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/) override
+    void JustRespawned() override
     {
-        if (!instance)
-            return;
-
-        if (instance->GetData(TYPE_BAR) == DONE || instance->GetData(TYPE_BAR) == SPECIAL)
-            return;
-
-        if (quest->GetQuestId() == QUEST_ALE)
+        bool const restartAleEvent = _aleEventActive && !_aleComplete;
+        if (_aleEventActive)
         {
-            if (instance->GetData(TYPE_BAR) != IN_PROGRESS)
-                instance->SetData(TYPE_BAR, IN_PROGRESS);
-
-            instance->SetData(TYPE_BAR, SPECIAL);
-
-            //keep track of amount in instance script, returns SPECIAL if amount ok and event in progress
-            if (instance->GetData(TYPE_BAR) == SPECIAL)
-            {
-                Talk(SAY_GOT_BEER);
-                me->CastSpell(me, SPELL_DRUNKEN_RAGE, false);
-                me->SetWalk(true);
-                Start(false);
-            }
+            me->SetHomePosition(_originalPosition);
+            me->SetImmuneToNPC(_originalImmuneToNPC);
+            me->ReplaceAllNpcFlags(_originalNpcFlags);
         }
+        _aleEventActive = false;
+        _recovering = false;
+        npc_escortAI::JustRespawned();
+
+        // The three ales were already handed in; restart without charging for them again.
+        if (restartAleEvent)
+            StartAleEvent();
     }
 
-    void DoGo(uint32 id, uint32 state)
+    void JustReachedHome() override
     {
-        if (GameObject* go = instance->instance->GetGameObject(instance->GetGuidData(id)))
-            go->SetGoState((GOState)state);
+        if (!_recovering || _events.HasTimeUntilEvent(EVENT_ROCKNOT_RECOVER))
+            return;
+
+        _recovering = false;
+        _aleEventActive = false;
+        me->SetEmoteState(EMOTE_STATE_NONE);
+        me->SetFacingTo(_originalPosition.GetOrientation());
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetImmuneToNPC(_originalImmuneToNPC);
+        me->ReplaceAllNpcFlags(_originalNpcFlags);
+    }
+
+    void sQuestReward(Player* player, Quest const* quest, uint32 /*opt*/) override
+    {
+        if (!_instance || quest->GetQuestId() != QUEST_ALE)
+            return;
+
+        if (HasEscortState(STATE_ESCORT_ESCORTING) || _aleEventActive)
+            return;
+
+        // Both captured hand-ins have the drinking emote and acknowledgement.
+        me->HandleEmoteCommand(EMOTE_ONESHOT_EAT_NO_SHEATHE);
+        Talk(SAY_GOT_BEER);
+        // Further quest rewards are allowed after recovery, but cannot restart the completed event.
+        if (_aleComplete || _instance->GetData(TYPE_BAR) == DONE || _instance->GetData(TYPE_BAR) == SPECIAL)
+            return;
+
+        if (_instance->GetData(TYPE_BAR) != IN_PROGRESS)
+            _instance->SetData(TYPE_BAR, IN_PROGRESS);
+
+        _instance->SetData(TYPE_BAR, SPECIAL);
+        if (_instance->GetData(TYPE_BAR) != SPECIAL)
+            return;
+
+        StartAleEvent();
+        // Keep the escort's NPC flags cleared so WotLK rejects further quest interactions.
+        CloseGossipMenuFor(player);
+    }
+
+    void WaypointStart(uint32 pointId) override
+    {
+        if (pointId == POINT_ROCKNOT_LEAVE_FIRST_KEG)
+        {
+            me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+            Talk(SAY_FIRST_EMPTY);
+        }
+        else if (pointId == POINT_ROCKNOT_LEAVE_SECOND_KEG)
+        {
+            me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+            Talk(SAY_SECOND_EMPTY);
+        }
     }
 
     using CreatureAI::WaypointReached;
-    void WaypointReached(uint32 waypointId) override
+    void WaypointReached(uint32 pointId) override
     {
-        switch (waypointId)
+        switch (pointId)
         {
-            case 1:
-                me->HandleEmoteCommand(EMOTE_ONESHOT_KICK);
+            case POINT_ROCKNOT_FIRST_KEG:
+                _events.ScheduleEvent(EVENT_ROCKNOT_PUNCH, 1500ms);
+                _events.ScheduleEvent(EVENT_ROCKNOT_PUNCH, 3100ms);
                 break;
-            case 2:
-                me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
+            case POINT_ROCKNOT_SECOND_KEG:
+                _events.ScheduleEvent(EVENT_ROCKNOT_SECOND_KEG, 1500ms);
                 break;
-            case 3:
-                me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
-                break;
-            case 4:
-                me->HandleEmoteCommand(EMOTE_ONESHOT_KICK);
-                break;
-            case 5:
-                me->HandleEmoteCommand(EMOTE_ONESHOT_KICK);
-                _breakKegTimer = 2000;
+            case POINT_ROCKNOT_FINAL_KEG:
+                // Evade must return to the keg while the final sequence is still running.
+                me->SetHomePosition(me->GetPosition());
+                SetEscortPaused(true);
+                _events.ScheduleEvent(EVENT_ROCKNOT_FINAL_KEG, 300ms);
+                _events.ScheduleEvent(EVENT_ROCKNOT_PUNCH, 1900ms);
+                _events.ScheduleEvent(EVENT_ROCKNOT_PUNCH, 3500ms);
+                _events.ScheduleEvent(EVENT_ROCKNOT_ALE, 3700ms);
+                _events.ScheduleEvent(EVENT_ROCKNOT_BREAK_KEG, 5100ms);
                 break;
         }
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateEscortAI(uint32 diff) override
     {
-        if (_breakKegTimer)
+        _events.Update(diff);
+        while (uint32 eventId = _events.ExecuteEvent())
         {
-            if (_breakKegTimer <= diff)
+            switch (eventId)
             {
-                DoGo(DATA_GO_BAR_KEG, 0);
-                _breakKegTimer = 0;
-                _breakDoorTimer = 1000;
+                case EVENT_ROCKNOT_MORE_ALE:
+                    Talk(SAY_MORE_ALE);
+                    break;
+                case EVENT_ROCKNOT_PUNCH:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
+                    break;
+                case EVENT_ROCKNOT_SECOND_KEG:
+                    me->SetFacingTo(2.0769417f);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
+                    break;
+                case EVENT_ROCKNOT_FINAL_KEG:
+                    me->SetFacingTo(2.443461f);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
+                    break;
+                case EVENT_ROCKNOT_ALE:
+                    Talk(SAY_ALE);
+                    break;
+                case EVENT_ROCKNOT_BREAK_KEG:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
+                    me->SetEmoteState(EMOTE_STATE_WORK_SHEATHED);
+                    if (GameObject* keg = GetBarObject(DATA_GO_BAR_KEG))
+                        keg->SetGoState(GO_STATE_ACTIVE);
+
+                    // Start both animations together; the trap and Phalanx react after the cork hits.
+                    if (GameObject* door = GetBarObject(DATA_GO_BAR_DOOR))
+                        door->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+
+                    _events.ScheduleEvent(EVENT_ROCKNOT_BAR_REACTION, 7s);
+                    break;
+                case EVENT_ROCKNOT_BAR_REACTION:
+                    if (GameObject* trap = GetBarObject(DATA_GO_BAR_KEG_TRAP))
+                        trap->Use(me);
+
+                    me->SetEmoteState(EMOTE_STATE_STUN);
+                    me->SetHomePosition(me->GetPosition());
+                    _aleComplete = true;
+                    _recovering = true;
+                    // Requested recovery delay; not a timing established by the Anniversary sniff.
+                    _events.ScheduleEvent(EVENT_ROCKNOT_RECOVER, 15s);
+                    if (_instance)
+                    {
+                        if (Creature* phalanx = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PHALANX)))
+                            phalanx->AI()->DoAction(ACTION_PHALANX_START_ACTIVATION);
+
+                        _instance->SetData(TYPE_BAR, DONE);
+                    }
+                    break;
+                case EVENT_ROCKNOT_RECOVER:
+                    RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
+                    me->SetEmoteState(EMOTE_STATE_NONE);
+                    me->SetHomePosition(_originalPosition);
+                    // Keep interactions disabled until the home movement restores his position and facing.
+                    me->GetMotionMaster()->MoveTargetedHome(true);
+                    break;
             }
-            else _breakKegTimer -= diff;
         }
-
-        if (_breakDoorTimer)
-        {
-            if (_breakDoorTimer <= diff)
-            {
-                DoGo(DATA_GO_BAR_DOOR, 2);
-                DoGo(DATA_GO_BAR_KEG_TRAP, 0);               //doesn't work very well, leaving code here for future
-                //spell by trap has effect61, this indicate the bar go hostile
-
-                if (Unit* tmp = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_PHALANX)))
-                    tmp->SetFaction(FACTION_MONSTER);
-
-                //for later, this event(s) has alot more to it.
-                //optionally, DONE can trigger bar to go hostile.
-                instance->SetData(TYPE_BAR, DONE);
-
-                _breakDoorTimer = 0;
-            }
-            else _breakDoorTimer -= diff;
-        }
-
-        npc_escortAI::UpdateAI(diff);
     }
 
 private:
-    InstanceScript* instance;
-    uint32 _breakKegTimer;
-    uint32 _breakDoorTimer;
+    void StartAleEvent()
+    {
+        _events.Reset();
+        _aleEventActive = true;
+        SetDespawnAtEnd(false);
+        SetDespawnAtFar(false);
+        me->GetRespawnPosition(_originalPosition.m_positionX, _originalPosition.m_positionY,
+            _originalPosition.m_positionZ, &_originalPosition.m_orientation);
+        _originalNpcFlags = me->GetNpcFlags();
+        _originalImmuneToNPC = me->IsImmuneToNPC();
+        me->SetWalk(true);
+        Start(false);
+        // Anniversary 69546 sends Uninteractible when the ale route begins.
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        _events.ScheduleEvent(EVENT_ROCKNOT_MORE_ALE, 1500ms);
+    }
+
+    GameObject* GetBarObject(uint32 data) const
+    {
+        return _instance ? _instance->instance->GetGameObject(_instance->GetGuidData(data)) : nullptr;
+    }
+
+    InstanceScript* _instance;
+    EventMap _events;
+    bool _aleComplete;
+    bool _aleEventActive = false;
+    bool _recovering = false;
+    Position _originalPosition;
+    NPCFlags _originalNpcFlags = UNIT_NPC_FLAG_NONE;
+    bool _originalImmuneToNPC = false;
 };
 
 void AddSC_blackrock_depths()
