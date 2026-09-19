@@ -258,7 +258,7 @@ Do not include `map_instanceid` in v1.
 
 The gauges aggregate all currently live `Map` objects by map ID. This keeps the Prometheus label bounded to `map_id` and deliberately avoids `map_instanceid`. Multiple instances of the same map ID are summed into one exported series.
 
-Indexed gauge slots are bounded by `MAP_ID_METRIC_COUNT`, derived from `MAX_MAP_ID + 1`, and map IDs are asserted before indexing. A map ID creates a series only after it has been observed. If a previously observed map later has no live maps, the collector exports one zero value and then stops actively refreshing that map ID until it appears again.
+Indexed gauge slots are bounded by `MAP_ID_METRIC_COUNT`, derived from `MAP_THE_RUBY_SANCTUM + 1`, and map IDs are asserted before indexing. A map ID creates a series only after it has been observed. If a previously observed map later has no live maps, the collector exports one zero value and then stops actively refreshing that map ID until it appears again.
 
 ### Session Update Duration
 
