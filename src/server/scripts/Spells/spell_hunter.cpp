@@ -74,6 +74,7 @@ enum HunterSpells
     SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA            = 34720,
     SPELL_HUNTER_REPLENISHMENT                      = 57669,
     SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS        = 57894,
+    SPELL_HUNTER_KILL_COMMAND                       = 34026,
     SPELL_HUNTER_KILL_COMMAND_HUNTER                = 34027,
     SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1         = 56654,
     SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2         = 58882,
@@ -899,9 +900,27 @@ class spell_hun_misdirection : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // Do not trigger from Mend Pet
-        if ((eventInfo.GetProcSpell() && (eventInfo.GetProcSpell()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)) || (eventInfo.GetHealInfo() && (eventInfo.GetHealInfo()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)))
-            return false;
+        // Do not trigger from Mend Pet or Kill Command
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER)
+            {
+                // Mend Pet
+                if (spellInfo->SpellFamilyFlags[0] & 0x800000)
+                    return false;
+
+                // Kill Command
+                if (spellInfo->Id == SPELL_HUNTER_KILL_COMMAND || spellInfo->Id == SPELL_HUNTER_KILL_COMMAND_HUNTER)
+                    return false;
+            }
+        }
+
+        if (eventInfo.GetHealInfo())
+        {
+            if (SpellInfo const* healSpellInfo = eventInfo.GetHealInfo()->GetSpellInfo())
+                if (healSpellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && (healSpellInfo->SpellFamilyFlags[0] & 0x800000))
+                    return false;
+        }
 
         return GetTarget()->GetThreatMgr().HasRedirects();
     }
