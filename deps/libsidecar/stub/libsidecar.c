@@ -79,6 +79,9 @@ void TC9SetOnGuildMemberRemovedHook(OnGuildMemberRemovedHook h) { panicWithTC9Un
 // TC9SetOnGuildMemberLeftHook sets hook for guild member left event.
 void TC9SetOnGuildMemberLeftHook(OnGuildMemberLeftHook h) { panicWithTC9Unavailable("TC9SetOnGuildMemberLeftHook"); }
 
+// TC9SetOnGuildCreatedHook sets hook for guild created event.
+void TC9SetOnGuildCreatedHook(OnGuildCreatedHook h) { panicWithTC9Unavailable("TC9SetOnGuildCreatedHook"); }
+
 // TC9ProcessEventsHooks calls all events hooks.
 void TC9ProcessEventsHooks() { panicWithTC9Unavailable("TC9ProcessEventsHooks"); }
 
@@ -120,11 +123,22 @@ void TC9SetCanPlayerInteractWithGOAndTypeHandler(CanPlayerInteractWithGOAndTypeH
 // TC9SetGetPlayerItemsByGuidsHandler sets handler for getting players item by guids request.
 void TC9SetGetPlayerItemsByGuidsHandler(GetPlayerItemsByGuidsHandler h) { panicWithTC9Unavailable("TC9SetGetPlayerItemsByGuidsHandler"); }
 
+// TC9SetGetPlayerItemByPosHandler sets handler for getting a player item by its inventory position request.
+void TC9SetGetPlayerItemByPosHandler(GetPlayerItemByPosHandler h) { panicWithTC9Unavailable("TC9SetGetPlayerItemByPosHandler"); }
+
 // TC9SetRemoveItemsWithGuidsFromPlayerHandler sets handler for removing items by guids from player request.
 void TC9SetRemoveItemsWithGuidsFromPlayerHandler(RemoveItemsWithGuidsFromPlayerHandler h) { panicWithTC9Unavailable("TC9SetRemoveItemsWithGuidsFromPlayerHandler"); }
 
+// TC9SetDestroyItemsWithGuidsFromPlayerHandler sets handler for permanently destroying player items.
+void TC9SetDestroyItemsWithGuidsFromPlayerHandler(DestroyItemsWithGuidsFromPlayerHandler h) { panicWithTC9Unavailable("TC9SetDestroyItemsWithGuidsFromPlayerHandler"); }
+
 // TC9SetAddExistingItemToPlayerHandler sets handler for adding item to player request.
 void TC9SetAddExistingItemToPlayerHandler(AddExistingItemToPlayerHandler h) { panicWithTC9Unavailable("TC9SetAddExistingItemToPlayerHandler"); }
+
+// TC9SetStoreNewItemHandler sets handler for creating a template item on a player.
+void TC9SetStoreNewItemHandler(StoreNewItemHandler h) { panicWithTC9Unavailable("TC9SetStoreNewItemHandler"); }
+
+void TC9SetSetItemPermanentEnchantmentHandler(SetItemPermanentEnchantmentHandler h) { panicWithTC9Unavailable("TC9SetSetItemPermanentEnchantmentHandler"); }
 
 // TC9SetGetMoneyForPlayerHandler sets handler for getting money for player request.
 //
@@ -133,6 +147,9 @@ void TC9SetGetMoneyForPlayerHandler(GetMoneyForPlayerHandler h) { panicWithTC9Un
 // TC9SetModifyMoneyForPlayerHandler sets handler for modify money for given player request.
 //
 void TC9SetModifyMoneyForPlayerHandler(ModifyMoneyForPlayerHandler h) { panicWithTC9Unavailable("TC9SetModifyMoneyForPlayerHandler"); }
+
+// TC9SetSetPlayerGuildFieldsHandler sets handler for refreshing guild id/rank on a live player request.
+void TC9SetSetPlayerGuildFieldsHandler(SetPlayerGuildFieldsHandler h) { panicWithTC9Unavailable("TC9SetSetPlayerGuildFieldsHandler"); }
 
 
 // TC9SetOnMapsReassignedHook sets hook for maps reassigning by servers registry event.
