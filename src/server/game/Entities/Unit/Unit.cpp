@@ -10276,6 +10276,31 @@ void Unit::Dismount()
 
     if (Player* player = ToPlayer())
     {
+        // Dismounting mid flight leaves the client in the movement state the mount was carrying,
+        // so it keeps playing the swim animation while it falls. Give it a velocity it has to
+        // react to.
+        if (IsFlying())
+        {
+            // Flying forward when we let go of the mount, so carry some momentum into the fall
+            // instead of dropping straight down. The knockback pushes away from the point we pass
+            // it, so aim from behind us. MOVE_RUN is still the mounted rate here because
+            // UpdateSpeed(MOVE_RUN, true) only runs at the end of this function, and that is the
+            // speed we want: the mount's ground pace, well short of the flight speed that would
+            // fling the player.
+            if (m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD))
+            {
+                KnockbackFrom(GetPositionX() - std::cos(GetOrientation()), GetPositionY() - std::sin(GetOrientation()),
+                    GetSpeed(MOVE_RUN), 0.5f);
+            }
+            else
+            {
+                // Nothing to carry, so the direction does not matter. Small enough not to be felt
+                float x, y;
+                GetPosition(x, y);
+                KnockbackFrom(x, y, 0.5f, 0.5f);
+            }
+        }
+
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data << GetPackGUID();
         data << player->GetSession()->GetOrderCounter(); // movement counter
