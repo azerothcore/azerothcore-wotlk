@@ -76,8 +76,8 @@ enum FreyaSpells
     // BRIGHTLEAF
     SPELL_BRIGHTLEAF_FLUX                       = 62239,
     SPELL_SOLAR_FLARE                           = 62240,
-    // summons one beam at the caster and force-casts 62221 on every player in range,
-    // each summoning another beam at their own feet
+    // summons one beam at the caster and force-casts 62221 on the players picked by
+    // spell_freya_brightleaf_unstable_sun_beam, each summoning another beam at their own feet
     SPELL_UNSTABLE_SUN_BEAM_SUMMON              = 62207,
 
     // IRONBRANCH
@@ -152,7 +152,6 @@ enum FreyaEvents
     EVENT_ANCIENT_CONSERVATOR_NATURE_FURY       = 40,
     EVENT_ANCIENT_CONSERVATOR_GRIP              = 41,
     EVENT_WATER_SPIRIT_CHARGE                   = 45,
-    EVENT_WATER_SPIRIT_DAMAGE                   = 46,
     EVENT_STORM_LASHER_LIGHTNING_LASH           = 50,
     EVENT_STORM_LASHER_STORMBOLT                = 51,
     EVENT_DETONATING_LASHER_FLAME_LASH          = 55,
@@ -1226,13 +1225,8 @@ struct boss_freya_summons : public ScriptedAI
                me->CastSpell(me, SPELL_CONSERVATOR_GRIP, true);
                break;
             case EVENT_WATER_SPIRIT_CHARGE:
-                me->CastSpell(me, SPELL_TIDAL_WAVE_AURA, true);
                 me->CastSpell(me->GetVictim(), SPELL_TIDAL_WAVE, false);
                 events.Repeat(12s);
-                events.ScheduleEvent(EVENT_WATER_SPIRIT_DAMAGE, 3s);
-                break;
-            case EVENT_WATER_SPIRIT_DAMAGE:
-                me->CastSpell(me, SPELL_TIDAL_WAVE_DAMAGE, false);
                 break;
             case EVENT_STORM_LASHER_LIGHTNING_LASH:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
@@ -1386,6 +1380,43 @@ class spell_freya_attuned_to_nature_dose_reduction : public SpellScript
     }
 };
 
+// 62653, 62935 - Tidal Wave
+class spell_freya_tidal_wave : public SpellScript
+{
+    PrepareSpellScript(spell_freya_tidal_wave);
+
+    void HandleSurge(SpellEffIndex /*effIndex*/)
+    {
+        // The cone is caster-referenced: taken before the charge moves the spirit, it spans
+        // the same 40 yds the surge is about to cross.
+        Unit* caster = GetCaster();
+        caster->CastSpell(caster, SPELL_TIDAL_WAVE_AURA, true);
+        // Untriggered: no SpellVisual, so a triggered cast would lose its SMSG_SPELL_GO.
+        caster->CastSpell(caster, SPELL_TIDAL_WAVE_DAMAGE, false);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_freya_tidal_wave::HandleSurge, EFFECT_1, SPELL_EFFECT_CHARGE_DEST);
+    }
+};
+
+// 62207 - Unstable Sun Beam
+class spell_freya_brightleaf_unstable_sun_beam : public SpellScript
+{
+    PrepareSpellScript(spell_freya_brightleaf_unstable_sun_beam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_freya_brightleaf_unstable_sun_beam::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 // 62450 - Unstable Sun Beam
 class spell_freya_unstable_sun_beam : public SpellScript
 {
@@ -1416,6 +1447,8 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
 
     RegisterSpellScript(spell_freya_attuned_to_nature_dose_reduction);
+    RegisterSpellScript(spell_freya_tidal_wave);
+    RegisterSpellScript(spell_freya_brightleaf_unstable_sun_beam);
     RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();
