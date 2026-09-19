@@ -6457,28 +6457,20 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         float destZ = target->GetPositionZ();
                         bool cutPath = true;
 
-                        // Targets with an oversized combat reach can stand entirely over unwalkable space
-                        // (e.g. Kologarn) so pathing to their center fails or creates a shortcut into the void.
-                        // For these targets, path directly to the nearest point on the melee ring facing the caster.
-                        if (target->GetCombatReach() > NOMINAL_MELEE_RANGE)
-                        {
-                            target->GetNearPoint2D(m_caster, destX, destY, 0.0f, target->GetAngle(m_caster));
-                            destZ = target->GetPositionZ();
-                            m_caster->UpdateAllowedPositionZ(destX, destY, destZ);
-                            cutPath = false;
-                        }
-
                         // first try with raycast, if it fails fall back to normal path
                         bool result = m_preGeneratedPath->CalculatePath(destX, destY, destZ, false);
                         bool pathFailed = !result || (m_preGeneratedPath->GetPathType() &
                             (PATHFIND_NOPATH | PATHFIND_INCOMPLETE | PATHFIND_SHORT));
 
-                        if (pathFailed && !cutPath)
+                        // Targets with an oversized combat reach can stand entirely over unwalkable space
+                        // (e.g. Kologarn) so pathing to their center fails.
+                        // For these targets, fall back to pathing to the nearest point on the melee ring facing the caster.
+                        if (pathFailed && target->GetCombatReach() > NOMINAL_MELEE_RANGE)
                         {
-                            destX = target->GetPositionX();
-                            destY = target->GetPositionY();
-                            destZ = target->GetPositionZ();
-                            cutPath = true;
+                            target->GetNearPoint2D(m_caster, destX, destY, 0.0f, target->GetAngle(m_caster));
+                            destZ = m_caster->GetPositionZ();
+                            m_caster->UpdateAllowedPositionZ(destX, destY, destZ);
+                            cutPath = false;
 
                             result = m_preGeneratedPath->CalculatePath(destX, destY, destZ, false);
                             pathFailed = !result || (m_preGeneratedPath->GetPathType() &
@@ -6488,6 +6480,8 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         if (pathFailed)
                             return SPELL_FAILED_NOPATH;
                         else if (cutPath && m_preGeneratedPath->IsInvalidDestinationZ(target))
+                            return SPELL_FAILED_NOPATH;
+                        else if (!cutPath && std::abs(m_preGeneratedPath->GetActualEndPosition().z - destZ) > 5.0f)
                             return SPELL_FAILED_NOPATH;
 
                         if (cutPath)
