@@ -354,13 +354,13 @@ struct boss_mimiron : public BossAI
         else
         {
             events.ScheduleEvent(EVENT_MIMIRON_SAY_HARDMODE, 7s);
-            events.ScheduleEvent(EVENT_BERSERK, Is25ManRaid() ? 10min : 8min);
+            events.ScheduleEvent(EVENT_BERSERK, 10min);
 
             if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
                 computer->AI()->Talk(TALK_COMPUTER_INITIATED);
 
             events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, 3s);
-            _minutesTalkNum = Is25ManRaid() ? TALK_COMPUTER_TEN : TALK_COMPUTER_EIGHT;
+            _minutesTalkNum = TALK_COMPUTER_TEN;
             for (uint32 i = 0; i < uint32(TALK_COMPUTER_ZERO - _minutesTalkNum - 1); ++i)
                 events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((i + 1) * 60000));
             events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((TALK_COMPUTER_ZERO - _minutesTalkNum) * 60000));
@@ -446,8 +446,6 @@ struct boss_mimiron : public BossAI
             case EVENT_BERSERK:
                 _berserk = true;
                 Talk(SAY_BERSERK);
-                if (_hardmode)
-                    me->SummonCreature(33576, 2744.78f, 2569.47f, 364.32f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 120000);
                 events.ScheduleEvent(EVENT_BERSERK_2, 0ms);
                 break;
             case EVENT_BERSERK_2:
@@ -737,7 +735,6 @@ struct boss_mimiron : public BossAI
                     me->GetMotionMaster()->Clear();
                     summons.DoAction(DO_DESPAWN_SUMMONS);
                     summons.DespawnEntry(NPC_FLAMES_INITIAL);
-                    summons.DespawnEntry(33576);
 
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 

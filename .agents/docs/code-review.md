@@ -14,7 +14,9 @@ line, not as background reading.
 - Review codestyle on every changed line, even when style is not the change's subject. Run both
   linters and report violations as findings: `python apps/codestyle/codestyle-cpp.py` and
   `python apps/codestyle/codestyle-sql.py`.
-- Title and description follow the [commit message guidelines](https://www.azerothcore.org/wiki/commit-message-guidelines).
+- Title and description follow the [commit message guidelines](https://www.azerothcore.org/wiki/commit-message-guidelines):
+  the title says what the change does, in the imperative (`Correct X loot`); the symptom belongs in
+  the description, not the title.
 - Prefer data over code: when a C++ or script change is also achievable through world DB data
   (SmartAI, conditions, templates), flag the DB-only alternative (see `cpp-scripts.md`).
 - Never take a claim as fact, neither the PR description's nor a comment's. Verify game-data

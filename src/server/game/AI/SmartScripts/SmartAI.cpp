@@ -66,6 +66,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mFollowCreditType = 0;
     mFollowArrivedAlive = 0;
     mFollowArrivedTimer = 0;
+    _followCheckTimer = 0;
     mInvincibilityHpLevel = 0;
 
     mJustReset = false;
@@ -1269,6 +1270,7 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
     mFollowDist = dist;
     mFollowAngle = angle;
     mFollowArrivedTimer = 1000;
+    _followCheckTimer = 0;
     mFollowCredit = credit;
     mFollowArrivedEntry = end;
     mFollowArrivedAlive = !aliveState; // negate - 0 is alive
