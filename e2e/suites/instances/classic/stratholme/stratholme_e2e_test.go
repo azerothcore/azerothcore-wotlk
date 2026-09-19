@@ -209,7 +209,7 @@ func TestAC_12285_SupplyCrateProximityConsumesParent(t *testing.T) {
 	})
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "StratCrate",
+		Prefix: "SCProx",
 		Level:  80,
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
@@ -219,11 +219,20 @@ func TestAC_12285_SupplyCrateProximityConsumesParent(t *testing.T) {
 			e2eharness.Preconditionf(t, "failed to create cleanup-backed Supply Crate entry=%d", entry)
 		}
 		crateGUID := bot.WaitGameObject(t, entry, 10*time.Second)
+		var count func() int32
+		cancel := func() {}
+		if entry == goSupplyCrate4 {
+			count, cancel = armSpellGoCounter(bot, spellPlagueMist)
+		}
 
 		// SpawnGameObject leaves GM mode enabled, so the environmental trap cannot
 		// select the player until CombatReady turns GM mode off.
 		bot.CombatReady(t)
 		waitGameObjectGone(t, bot, crateGUID, 10*time.Second)
+		if count != nil {
+			assertSpellGoCount(t, count, spellPlagueMist, 1)
+		}
+		cancel()
 		bot.AssertWorldAlive(t)
 		t.Logf("PASS AC#12285 proximity trap consumed Supply Crate entry=%d guid=0x%X", entry, crateGUID)
 	}
