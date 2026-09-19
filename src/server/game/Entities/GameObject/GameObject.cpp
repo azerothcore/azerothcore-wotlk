@@ -2781,19 +2781,19 @@ GameObject* GameObject::GetLinkedTrap()
 
 bool GameObject::IsLinkedTrapParentSpawned() const
 {
-    if (m_linkedTrapParent.IsEmpty())
+    if (LinkedTrapParent.IsEmpty())
         return true;
 
-    GameObject* parent = ObjectAccessor::GetGameObject(*this, m_linkedTrapParent);
+    GameObject* parent = ObjectAccessor::GetGameObject(*this, LinkedTrapParent);
     return parent && parent->isSpawned() && parent->getLootState() != GO_JUST_DEACTIVATED;
 }
 
 void GameObject::DeactivateLinkedTrapParent()
 {
-    if (m_linkedTrapParent.IsEmpty())
+    if (LinkedTrapParent.IsEmpty())
         return;
 
-    if (GameObject* parent = ObjectAccessor::GetGameObject(*this, m_linkedTrapParent))
+    if (GameObject* parent = ObjectAccessor::GetGameObject(*this, LinkedTrapParent))
         if (parent->GetGoType() == GAMEOBJECT_TYPE_CHEST && parent->GetGOInfo()->chest.consumable &&
             !parent->GetGOInfo()->chest.lootId)
             parent->SetLootState(GO_JUST_DEACTIVATED);

@@ -6573,8 +6573,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                     uint32 lockId = 0;
                     if (GameObject* go = m_targets.GetGOTarget())
                     {
-                        GameObjectTemplate const* goInfo = go->GetGOInfo();
-                        lockId = goInfo->GetLockId();
+                        lockId = go->GetGOInfo()->GetLockId();
                         if (!lockId)
                             return SPELL_FAILED_BAD_TARGETS;
                     }
