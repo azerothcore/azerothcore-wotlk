@@ -4483,8 +4483,8 @@ void Spell::SendSpellCooldown()
     {
         if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD))
         {
-            // xinef: this should be added here
-            //unitCaster->AddSpellCooldown(m_spellInfo->Id, 0, 0);
+            if (unitCaster->GetCharmInfo() && !m_spellInfo->IsCooldownStartedOnEvent())
+                unitCaster->AddSpellCooldown(m_spellInfo->Id, 0, 0);
 
             // xinef: this adds cooldowns to vehicle spells which misses them client-side (when we overwrote dbc info in eg.)
             if (m_spellInfo->RequireCooldownInfo())
