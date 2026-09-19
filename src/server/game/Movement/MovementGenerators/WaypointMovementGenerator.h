@@ -50,11 +50,14 @@ template<class T>
 class WaypointMovementGenerator;
 
 template<>
-class WaypointMovementGenerator<Creature> : public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature> >,
+class WaypointMovementGenerator<Creature> :
+    public MovementGeneratorMedium<Creature, WaypointMovementGenerator<Creature>>,
     public PathMovementBase<Creature, WaypointPath const*>
 {
 public:
-    explicit WaypointMovementGenerator(uint32 pathId = 0, bool repeating = true, PathSource pathSource = PathSource::WAYPOINT_MGR);
+    explicit WaypointMovementGenerator(
+        uint32 pathId = 0, bool repeating = true, PathSource pathSource = PathSource::WAYPOINT_MGR,
+        uint32 resumeAfterWaypointId = 0);
     explicit WaypointMovementGenerator(WaypointPath& path, bool repeating = true);
     ~WaypointMovementGenerator() { i_path = nullptr; }
 
@@ -78,6 +81,7 @@ private:
 
     uint32 _lastSplineId;
     uint32 _pathId;
+    uint32 _resumeAfterWaypointId;
     int32 _waypointDelay;
     std::optional<int32> _pauseTime;
     bool _waypointReached;
