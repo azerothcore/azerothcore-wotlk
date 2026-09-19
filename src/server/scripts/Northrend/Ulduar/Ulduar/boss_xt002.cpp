@@ -290,7 +290,7 @@ struct boss_xt002 : public BossAI
             _healthRecovered = true;
         }
         else if (seatId == HEART_VEHICLE_SEAT_EXPOSED)
-            who->CastSpell(who, SPELL_EXPOSED_HEART);   // Channeled
+            who->CastSpell(who, SPELL_EXPOSED_HEART, true);   // Channeled
     }
 
     void MovementInform(uint32 type, uint32 point) override
