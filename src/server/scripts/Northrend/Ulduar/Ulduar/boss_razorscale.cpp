@@ -336,6 +336,13 @@ struct boss_razorscale : public BossAI
             case POINT_RAZORSCALE_GROUND:
                 me->SetDisableGravity(false);
                 me->SetFacingTo(RazorGroundPos.GetOrientation());
+
+                // The boss correctly receives the stun aura upon landing.
+                me->SetReactState(REACT_PASSIVE);
+                DoCastSelf(SPELL_STUN_SELF, true);
+
+                // If she is already transitioning to Phase 3, break out immediately
+                // This prevents the commander from yelling "Move quickly!" during the transition
                 if (_permaGround || me->HealthBelowPct(50))
                 {
                     _permaGround = true;
@@ -343,8 +350,7 @@ struct boss_razorscale : public BossAI
                     DoAction(ACTION_START_PERMA_GROUND);
                     break;
                 }
-                me->SetReactState(REACT_PASSIVE);
-                DoCastSelf(SPELL_STUN_SELF, true);
+
                 {
                     EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
                     summons.DoAction(ACTION_GROUND_PHASE, trapperPred);
