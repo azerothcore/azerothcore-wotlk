@@ -190,6 +190,10 @@ enum YoggEvents
 
     EVENT_SARA_WIPE_OPEN_DOOR           = 40,
     EVENT_SARA_WIPE_RESPAWN             = 41,
+
+    EVENT_GUARDIAN_SPAWN_VISUAL         = 45,
+    EVENT_GUARDIAN_SPAWN_RELEASE        = 46,
+    EVENT_GUARDIAN_DRAIN_LIFE           = 47,
 };
 
 enum NPCsGOs
@@ -1970,27 +1974,72 @@ struct boss_yoggsaron_influence_tentacle : public NullCreatureAI
     }
 };
 
+static void ApplyEmpoweredStacks(Unit* target)
+{
+    uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
+
+    if (!stack)
+    {
+        target->RemoveAura(SPELL_EMPOWERED);
+        target->CastSpell(target, SPELL_WEAKENED, true);
+    }
+    else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
+    {
+        aur->SetStackAmount(stack);
+        target->RemoveAurasDueToSpell(SPELL_WEAKENED);
+    }
+}
+
 struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 {
-    boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
+    explicit boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
     {
         Reset();
     }
 
-    uint32 _visualTimer;
-    uint32 _spellTimer;
+    static constexpr Milliseconds SPAWN_VISUAL_DELAY = 100ms;
+    static constexpr Milliseconds SPAWN_STASIS_TIME = 4s; // 3.4 sniffs show 800ms, 3.1 footage show 4s
+    static constexpr Milliseconds DRAIN_LIFE_HEALTH_CHECK = 2s;
+    static constexpr Milliseconds DRAIN_LIFE_INTERVAL = 9500ms;
 
     void Reset() override
     {
-        me->CastSpell(me, SPELL_RECENTLY_SPAWNED, true);
-        //me->CastSpell(me, SPELL_EMPOWERED_PASSIVE, true);
+        DoCastSelf(SPELL_RECENTLY_SPAWNED, true);
         if (Aura* aur = me->AddAura(SPELL_EMPOWERED_PASSIVE, me))
             aur->SetStackAmount(9);
 
-        _spellTimer = 0;
-        _visualTimer = 1;
+        ApplyEmpoweredStacks(me);
+
+        events.Reset();
+        events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_VISUAL, SPAWN_VISUAL_DELAY);
+        events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_RELEASE, SPAWN_STASIS_TIME);
+        events.ScheduleEvent(EVENT_GUARDIAN_DRAIN_LIFE, DRAIN_LIFE_HEALTH_CHECK);
         me->SetControlled(true, UNIT_STATE_ROOT);
+        _spawnStasis = true;
+    }
+
+    void EngageFromStasis()
+    {
+        if (!_spawnStasis)
+            return;
+
+        _spawnStasis = false;
+        events.CancelEvent(EVENT_GUARDIAN_SPAWN_RELEASE);
+        me->SetControlled(false, UNIT_STATE_ROOT);
         me->SetInCombatWithZone();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        EngageFromStasis();
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (_spawnStasis)
+            return;
+
+        CreatureAI::MoveInLineOfSight(who);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -2007,44 +2056,51 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            events.DelayEvents(Milliseconds(diff));
+            return;
+        }
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_GUARDIAN_SPAWN_VISUAL:
+                    DoCastSelf(SPELL_SIMPLE_TELEPORT, false);
+                    break;
+                case EVENT_GUARDIAN_SPAWN_RELEASE:
+                    EngageFromStasis();
+                    break;
+                case EVENT_GUARDIAN_DRAIN_LIFE:
+                {
+                    Unit* target = me->HealthBelowPct(85) ? SelectTargetFromPlayerList(40.0f) : nullptr;
+                    if (target)
+                    {
+                        DoCast(target, SPELL_DRAIN_LIFE, false);
+                        events.Repeat(DRAIN_LIFE_INTERVAL);
+                    }
+                    else
+                        events.Repeat(DRAIN_LIFE_HEALTH_CHECK);
+
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
         if (!UpdateVictim())
             return;
 
-        if (_visualTimer)
-        {
-            _visualTimer += diff;
-            if (_visualTimer >= 100 && _visualTimer < 10000)
-            {
-                me->CastSpell(me, SPELL_SIMPLE_TELEPORT, false);
-                _visualTimer = 10000;
-            }
-            else if (_visualTimer >= 11000)
-            {
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                _visualTimer = 0;
-            }
-        }
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        _spellTimer += diff;
-        if (_spellTimer >= 9500)
-        {
-            if (me->HealthBelowPct(85))
-            {
-                if (Unit* target = SelectTargetFromPlayerList(40.0f))
-                {
-                    me->CastSpell(target, SPELL_DRAIN_LIFE, false);
-                    _spellTimer = 0;
-                }
-            }
-            else
-                _spellTimer = 7500;
-        }
-
-        DoMeleeAttackIfReady();
+        if (!_spawnStasis)
+            DoMeleeAttackIfReady();
     }
+
+private:
+    bool _spawnStasis{};
 };
 
 struct boss_yoggsaron_lich_king : public NullCreatureAI
@@ -2075,7 +2131,6 @@ struct boss_yoggsaron_lich_king : public NullCreatureAI
             return;
 
         creature->AI()->Talk(text);
-            return;
     }
 
     void UpdateAI(uint32 diff) override
@@ -2151,7 +2206,6 @@ struct boss_yoggsaron_llane : public NullCreatureAI
             return;
 
         creature->AI()->Talk(text);
-            return;
     }
 
     void UpdateAI(uint32 diff) override
@@ -2651,19 +2705,7 @@ class spell_yogg_saron_empowered_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        Unit* target = GetUnitOwner();
-        uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
-
-        if (!stack)
-        {
-            target->RemoveAura(SPELL_EMPOWERED);
-            target->CastSpell(target, SPELL_WEAKENED, true);
-        }
-        else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
-        {
-            aur->SetStackAmount(stack);
-            target->RemoveAurasDueToSpell(SPELL_WEAKENED);
-        }
+        ApplyEmpoweredStacks(GetUnitOwner());
     }
 
     void Register() override
