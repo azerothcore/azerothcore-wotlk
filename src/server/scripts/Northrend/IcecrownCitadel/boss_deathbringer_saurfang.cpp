@@ -1347,6 +1347,8 @@ public:
                         saurfang->GetMotionMaster()->MovePoint(POINT_A_VARIAN, allianceVarianMeetPos);
                         _events.ScheduleEvent(EVENT_OUTRO_A_SAURFANG_AT_VARIAN, WalkTimeTo(saurfang, allianceVarianMeetPos));
                     }
+                    else
+                        _events.ScheduleEvent(EVENT_OUTRO_A_DISMISS, 1s);
                     break;
                 case EVENT_OUTRO_A_SAURFANG_AT_VARIAN:
                 {

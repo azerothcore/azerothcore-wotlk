@@ -1589,6 +1589,9 @@ public:
                         if (Creature* passenger = instance->SummonCreature(NPC_SE_HIGH_OVERLORD_SAURFANG, Position(x, y, z, o)))
                         {
                             zeppelin->AddPassenger(passenger, true);
+                            // Clients already got his create packet without the transport; the stop
+                            // spline carries the transport guid and puts him on deck for them.
+                            passenger->StopMovingOnCurrentPos();
                             passenger->SetReactState(REACT_PASSIVE);
                             passenger->SetSheath(SHEATH_STATE_MELEE);
                             passenger->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
