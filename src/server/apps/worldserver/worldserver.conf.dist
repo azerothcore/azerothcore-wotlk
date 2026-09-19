@@ -857,9 +857,8 @@ Log.Async.Enable = 0
 
 ###################################################################################################
 # METRIC
-# Deprecated: Kept for backward compatibility only.
-# This option has been superseded by the Observability configuration and will be removed in a
-# future release. Consider using Observability instead.
+# Note: Metric.* settings control the statistics sent to the InfluxDB metric database.
+# This is independent of the Prometheus exporter, which is controlled by Observability.Prometheus.Enable.
 #
 # These settings control the statistics sent to the metric database (currently InfluxDB)
 #

@@ -131,10 +131,14 @@ namespace Acore::Observability
         MetricRegistry();
         ~MetricRegistry();
 
-        Detail::CounterSeries& RegisterCounter(StaticStringLiteral name, StaticStringLiteral help, std::vector<Label> labels, std::source_location owner);
-        Detail::GaugeSeries& RegisterGauge(StaticStringLiteral name, StaticStringLiteral help, std::vector<Label> labels, std::source_location owner);
-        Detail::GaugeSeries& RegisterInfo(StaticStringLiteral name, StaticStringLiteral help, std::vector<Label> labels, std::source_location owner);
-        Detail::HistogramSeries& RegisterHistogram(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets, std::vector<Label> labels, std::source_location owner);
+        Detail::CounterSeries& RegisterCounter(StaticStringLiteral name, StaticStringLiteral help,
+            std::vector<Label> labels, std::source_location owner);
+        Detail::GaugeSeries& RegisterGauge(StaticStringLiteral name, StaticStringLiteral help,
+            std::vector<Label> labels, std::source_location owner);
+        Detail::GaugeSeries& RegisterInfo(StaticStringLiteral name, StaticStringLiteral help,
+            std::vector<Label> labels, std::source_location owner);
+        Detail::HistogramSeries& RegisterHistogram(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets,
+            std::vector<Label> labels, std::source_location owner);
 
         void SetConstantLabel(StaticStringLiteral name, std::string_view value);
         void VisitMetrics(MetricVisitor& visitor) const;
@@ -143,18 +147,25 @@ namespace Acore::Observability
         friend class HistogramFamily;
         friend class GaugeFamily;
 
-        Entry& CreateEntry(StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner, std::size_t indexedSeriesCount = 0);
-        Entry& CreateHistogramEntry(StaticStringLiteral name, StaticStringLiteral help, std::vector<BucketBoundary> buckets, std::source_location owner, std::size_t indexedSeriesCount = 0);
+        Entry& CreateEntry(StaticStringLiteral name, StaticStringLiteral help, MetricKind kind,
+            std::source_location owner, std::size_t indexedSeriesCount = 0);
+        Entry& CreateHistogramEntry(StaticStringLiteral name, StaticStringLiteral help,
+            std::vector<BucketBoundary> buckets, std::source_location owner, std::size_t indexedSeriesCount = 0);
         Entry* FindExisting(StaticStringLiteral name);
-        bool IsCompatibleEntry(Entry const& entry, StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner) const;
-        Entry* RegisterHistogramFamily(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets, std::source_location owner, std::size_t indexedSeriesCount);
+        bool IsCompatibleEntry(Entry const& entry, StaticStringLiteral name, StaticStringLiteral help, MetricKind kind,
+            std::source_location owner) const;
+        Entry* RegisterHistogramFamily(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets,
+            std::source_location owner, std::size_t indexedSeriesCount);
         Detail::HistogramSeries* FindIndexedHistogramSeries(Entry const& entry, std::size_t index) const;
-        Detail::HistogramSeries& RegisterIndexedHistogramSeries(Entry& entry, std::size_t index, std::vector<Label> labels);
+        Detail::HistogramSeries& RegisterIndexedHistogramSeries(Entry& entry, std::size_t index,
+            std::vector<Label> labels);
         Detail::HistogramSeries& EmplaceHistogramSeries(Entry& entry, std::vector<Label> labels);
-        Entry* RegisterGaugeFamily(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, std::size_t indexedSeriesCount);
+        Entry* RegisterGaugeFamily(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner,
+            std::size_t indexedSeriesCount);
         Detail::GaugeSeries* FindIndexedGaugeSeries(Entry const& entry, std::size_t index) const;
         Detail::GaugeSeries& RegisterIndexedGaugeSeries(Entry& entry, std::size_t index, std::vector<Label> labels);
-        void LogIncompatibleRegistration(StaticStringLiteral name, std::source_location existingOwner, std::source_location duplicateOwner, std::string_view reason) const;
+        void LogIncompatibleRegistration(StaticStringLiteral name, std::source_location existingOwner,
+            std::source_location duplicateOwner, std::string_view reason) const;
         static Detail::CounterSeries& IgnoredCounter();
         static Detail::GaugeSeries& IgnoredGauge();
         static Detail::HistogramSeries& IgnoredHistogram();
@@ -182,8 +193,10 @@ namespace Acore::Observability
          * constructed with.
          */
         ///@{
-        [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t index, StaticStringLiteral labelName, uint32 labelValue) const;
-        [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t index, StaticStringLiteral labelName, StaticStringLiteral labelValue) const;
+        [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t index, StaticStringLiteral labelName,
+            uint32 labelValue) const;
+        [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t index, StaticStringLiteral labelName,
+            StaticStringLiteral labelValue) const;
         ///@}
 
     private:

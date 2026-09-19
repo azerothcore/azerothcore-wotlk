@@ -62,7 +62,8 @@ public:
     {
         METRIC_TIMER("map_update_time_diff", METRIC_TAG("map_id", std::to_string(m_map.GetId())));
         {
-            Acore::Observability::ScopedHistogramTimer observabilityTimer = Metrics.UpdateDuration.MeasureIndexed(m_map.GetId(), "map_id", m_map.GetId());
+            Acore::Observability::ScopedHistogramTimer observabilityTimer =
+                Metrics.UpdateDuration.MeasureIndexed(m_map.GetId(), "map_id", m_map.GetId());
             m_map.Update(m_diff, s_diff);
         }
         m_updater.update_finished();

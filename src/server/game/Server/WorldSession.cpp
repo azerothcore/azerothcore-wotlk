@@ -460,7 +460,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         {
             auto callOpcodeHandler = [&]
             {
-                Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
+                Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer =
+                    Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
                 opHandle->Call(this, *packet);
             };
 
