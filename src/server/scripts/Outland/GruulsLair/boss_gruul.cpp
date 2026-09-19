@@ -70,9 +70,9 @@ struct boss_gruul : public BossAI
         _caveInTimer = 29s;
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(30300ms, [this](TaskContext context)

@@ -54,9 +54,9 @@ struct boss_mennu_the_betrayer : public BossAI
         summon->GetMotionMaster()->Clear();
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(5s, 8s, [this](TaskContext context)

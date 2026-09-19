@@ -184,10 +184,10 @@ struct boss_malchezaar : public BossAI
         return nullptr;
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         me->GetCreaturesWithEntryInRange(relays, 250.0f, NPC_INFERNAL_RELAY);
         me->GetCreaturesWithEntryInRange(infernalTargets, 100.0f, NPC_INFERNAL_TARGET);

@@ -256,9 +256,9 @@ struct boss_archimonde : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         me->InterruptNonMeleeSpells(false);
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(25s, 35s, [&]

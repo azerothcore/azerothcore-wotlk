@@ -56,9 +56,9 @@ struct boss_baron_geddon : public BossAI
         armageddonCasted = false;
     }
 
-    void JustEngagedWith(Unit* /*attacker*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_INFERNO, 13s, 15s);
         events.ScheduleEvent(EVENT_IGNITE_MANA, 7s, 19s);
         events.ScheduleEvent(EVENT_LIVING_BOMB, 11s, 16s);

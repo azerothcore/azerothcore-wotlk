@@ -181,9 +181,9 @@ struct boss_mor_grayhoof : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         _scheduler.Schedule(5s, 10s, PHASE_HUMAN, [this](TaskContext context)
             {

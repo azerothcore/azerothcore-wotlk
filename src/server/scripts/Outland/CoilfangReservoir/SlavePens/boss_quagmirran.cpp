@@ -32,9 +32,9 @@ struct boss_quagmirran : public BossAI
     boss_quagmirran(Creature* creature) : BossAI(creature, DATA_QUAGMIRRAN)
     {    }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         scheduler.Schedule(9100ms, [this](TaskContext context)
         {

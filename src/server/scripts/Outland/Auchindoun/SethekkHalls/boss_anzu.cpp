@@ -101,9 +101,9 @@ struct boss_anzu : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         SummonSpirits();
         scheduler.Schedule(14s, [this](TaskContext context)
         {
