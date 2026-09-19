@@ -487,12 +487,22 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 
 //-----------------------------------------------//
 
-static float GetTargetSpeedInMotion(Unit* target)
+// Uncapped, the catch-up boost below runs into the spline speed limit in MoveSplineInit::Launch.
+constexpr float FOLLOW_CATCHUP_MAX_MULTIPLIER = 2.f;
+
+// A jump or a fall is not a pace to match; only actual running counts.
+constexpr uint32 FOLLOW_TARGET_MOVING_FLAGS =
+    MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT;
+
+static Optional<float> GetTargetSpeedInMotion(Unit* target)
 {
     if (!target->movespline->Finalized())
         return target->movespline->Velocity();
 
-    return target->GetSpeed(target->m_movementInfo.GetSpeedType());
+    if (target->m_movementInfo.HasMovementFlag(FOLLOW_TARGET_MOVING_FLAGS))
+        return target->GetSpeed(target->m_movementInfo.GetSpeedType());
+
+    return {};
 }
 
 static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const& dest, bool playerPet)
@@ -501,19 +511,26 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
     if (owner->IsInCombat() || owner->IsVehicle() || owner->HasUnitFlag(UNIT_FLAG_POSSESSED))
         return speed;
 
+    // Guardians without a pet bar (Mirror Image, Shaman Elementals, ...) keep their own run speed.
+    if (owner->IsGuardian() && !owner->IsControllableGuardian())
+        return speed;
+
     bool isPetLike = owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID();
 
     // For pets/guardians/critters or creature-to-creature follow: sync with target's speed
     if (isPetLike || (owner->IsCreature() && target->IsCreature()))
     {
+        // A standing target sets no pace to match: the follower keeps its own run speed.
         speed = GetTargetSpeedInMotion(target);
+        if (!speed)
+            return speed;
 
         if (playerPet)
         {
             float distance = owner->GetDistance2d(dest.x, dest.y) - target->GetObjectSize() - (*speed / 2.f);
             if (distance > 0.f)
             {
-                float multiplier = 1.f + (distance / 10.f);
+                float const multiplier = std::min(1.f + (distance / 10.f), FOLLOW_CATCHUP_MAX_MULTIPLIER);
                 *speed *= multiplier;
             }
         }
@@ -584,7 +601,7 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
 
     if (isPlayerPet)
     {
-        targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+        targetIsMoving = target->m_movementInfo.HasMovementFlag(FOLLOW_TARGET_MOVING_FLAGS);
     }
 
     if (exactDistSq > distanceTolerance)
