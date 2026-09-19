@@ -144,7 +144,8 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
     _pendingTimeSyncRequests(),
-    _orderCounter(0)
+    _orderCounter(0),
+    _headless(!sock)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -160,12 +161,15 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
         ResetTimeOutTime(false);
         LoginDatabase.Execute("UPDATE account SET online = 1 WHERE id = {};", GetAccountId()); // One-time query
     }
+    else
+        m_Address = "headless";
 }
 
 /// WorldSession destructor
 WorldSession::~WorldSession()
 {
-    LoginDatabase.Execute("UPDATE account SET totaltime = {} WHERE id = {}", GetTotalTime(), GetAccountId());
+    if (!_headless)
+        LoginDatabase.Execute("UPDATE account SET totaltime = {} WHERE id = {}", GetTotalTime(), GetAccountId());
 
     ///- unload player if not unloaded
     if (_player)
@@ -185,7 +189,8 @@ WorldSession::~WorldSession()
     while (_recvQueue.next(packet))
         delete packet;
 
-    LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
+    if (!_headless)
+        LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
 }
 
 void WorldSession::UpdateAccountFlag(uint32 flag, bool remove /*= flase*/)
@@ -1642,6 +1647,15 @@ void WorldSession::SetPacketLogging(bool state)
 {
     if (m_Socket)
         m_Socket->SetPacketLogging(state);
+}
+
+std::unique_ptr<WorldPacket> WorldSession::NextQueuedPacket()
+{
+    WorldPacket* packet = nullptr;
+    if (!_recvQueue.next(packet))
+        return nullptr;
+
+    return std::unique_ptr<WorldPacket>(packet);
 }
 
 void WorldSession::LoadPermissions()
