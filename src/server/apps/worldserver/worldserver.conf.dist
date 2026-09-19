@@ -4088,7 +4088,8 @@ Arena.MaxRatingDifference = 150
 #
 #    Arena.RatingDiscardTimer
 #        Description: Time (in milliseconds) after which rating differences are ignored when
-#                     setting up matches.
+#                     setting up matches. When disabled the rating difference is always
+#                     enforced. To ignore ratings entirely, disable Arena.MaxRatingDifference.
 #        Default:     600000 - (Enabled, 10 minutes)
 #                     0      - (Disabled)
 
@@ -4097,6 +4098,7 @@ Arena.RatingDiscardTimer = 600000
 #
 #    Arena.PreviousOpponentsDiscardTimer
 #        Description: Time (in milliseconds) after which the previous opponents will be ignored.
+#                     When disabled an immediate rematch is allowed.
 #        Default:     120000 - (Enabled, 2 minutes - Blizzlike)
 #                     0      - (Disabled)
 
