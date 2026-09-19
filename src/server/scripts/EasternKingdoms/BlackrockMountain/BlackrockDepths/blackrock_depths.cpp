@@ -978,6 +978,7 @@ private:
         _doorOpenedByEvent = false;
         me->setActive(false);
         me->GetMotionMaster()->Clear();
+        me->GetMotionMaster()->InitDefault();
         me->GetMotionMaster()->MoveTargetedHome();
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
