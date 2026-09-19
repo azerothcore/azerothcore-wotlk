@@ -61,9 +61,8 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 				t.Helper()
 				xtSelect(t, bot, bot.World.CharGUID())
 				bot.GM(t, ".modify hp 100000")
-				bot.GM(t, ".gm off")
 				bot.GM(t, ".cheat god off")
-				bot.FlushWorld(t)
+				e2eharness.CombatReady(t, bot.World, e2eharness.CombatReadyOpts{})
 				if !xtPoll(5*time.Second, func() bool {
 					hp, maxHP := bot.UnitHP(bot.World.CharGUID())
 					return hp == 100000 && maxHP == 100000
@@ -134,8 +133,8 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 				}
 				hp, _ = bot.UnitHP(first)
 				bot.Damage(t, first, hp)
-				xtRequireDeath(t, bot, record, first, 5*time.Second)
-				xtRequireDeath(t, bot, record, second, 5*time.Second)
+				xtRequireChainDeath(t, bot, record, first, second)
+				xtRequireChainDeath(t, bot, record, second, first)
 				if !xtPoll(5*time.Second, func() bool {
 					damage, hit := record.hit(first, second)
 					scrapHP, _ := bot.UnitHP(scrap)
@@ -458,6 +457,34 @@ func xtRequireDeath(t *testing.T, bot *e2eharness.ScenarioBot, record *xtBoomRec
 			e2eharness.ConfirmedBugf(t, 27699, "Boombot %x exploded more or less than once", guid)
 		}
 	})
+}
+
+func xtRequireChainDeath(t *testing.T, bot *e2eharness.ScenarioBot, record *xtBoomRecord, guid, other uint64) {
+	t.Helper()
+	// The other explosion can kill this bot before its own self-instakill is processed.
+	// Without an instakill packet, require a populated dead unit and the other bot's hit.
+	// A missing cache entry alone is not death evidence.
+	if !xtPoll(5*time.Second, func() bool {
+		if record.casts(guid, xtBoom) != 1 {
+			return false
+		}
+		if record.instakills(guid) == 1 {
+			hp, _ := bot.UnitHP(guid)
+			return hp == 0
+		}
+		unit := bot.World.GetObject(guid)
+		hit, ok := record.hit(other, guid)
+		return unit != nil && unit.MaxHealth() > 0 && unit.Health() == 0 &&
+			ok && hit.damage > 0 && hit.school == 4
+	}) {
+		e2eharness.ConfirmedBugf(t, 27699, "chain Boombot %x did not explode once and die", guid)
+	}
+	xtObserve(t, 2*time.Second, func() {
+		if record.casts(guid, xtBoom) != 1 || record.instakills(guid) > 1 {
+			e2eharness.ConfirmedBugf(t, 27699, "chain Boombot %x exploded or self-killed more than once", guid)
+		}
+	})
+	t.Logf("PASS chain Boombot %x: one explosion and confirmed death, self-instakills=%d", guid, record.instakills(guid))
 }
 
 func xtRequirePlayerDamage(t *testing.T, bot *e2eharness.ScenarioBot, record *xtBoomRecord, guid uint64) {
