@@ -17,10 +17,11 @@ import (
 )
 
 const (
-	xtBoom          = uint32(62834)
-	xtRechargeBoom  = uint32(62835)
-	xtRechargeScrap = uint32(62828)
-	xtRoot          = uint32(42716) // Self Root Forever (No Visual), fixture positioning only
+	xtBoom              = uint32(62834)
+	xtRechargeBoom      = uint32(62835)
+	xtRechargeScrap     = uint32(62828)
+	xtRechargePummeller = uint32(62831)
+	xtRoot              = uint32(42716) // Self Root Forever (No Visual), fixture positioning only
 )
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27699
@@ -147,6 +148,119 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 				}
 				xtRequirePlayerDamage(t, bot, record, first)
 				xtRequirePlayerDamage(t, bot, record, second)
+			}) {
+				return
+			}
+
+			if !t.Run("robot_damage", func(t *testing.T) {
+				// Wowhead recommends killing Boombots to damage the surrounding robots.
+				// https://www.wowhead.com/wotlk/guide/raids/ulduar/xt-002-deconstructor-strategy
+				// Isolate each recipient type so a second Boom cannot mask a missing hit.
+				for _, tc := range []struct {
+					name         string
+					spell, entry uint32
+					count        int
+					wantDead     bool
+				}{
+					{"scrapbot_wave", xtRechargeScrap, 33343, 3, true},
+					{"pummeller", xtRechargePummeller, 33344, 1, false},
+				} {
+					if !t.Run(tc.name, func(t *testing.T) {
+						prepare(t)
+						// Only the player gets god mode, to survive Pummeller attacks during
+						// setup. Leave the NPC recipients' health, faction and defenses unchanged.
+						bot.CheatGod(t)
+						bot.FlushWorld(t)
+						t.Cleanup(func() {
+							bot.CleanupOwnedSummons(t)
+							xtSelect(t, bot, bot.World.CharGUID())
+							bot.CombatStop(t)
+							bot.GM(t, ".cheat god off")
+							bot.FlushWorld(t)
+						})
+						bomb := spawn(t, true)
+						var nearby []uint64
+						for i := 0; i < tc.count; i++ {
+							nearby = append(nearby, xtSpawn(t, bot, tc.spell, tc.entry, true))
+						}
+						bot.Teleport(t, 794.243, -10.9022, 409.804, e2eharness.MapUlduar)
+						outside := xtSpawn(t, bot, tc.spell, tc.entry, true)
+						bot.Teleport(t, 819.243, -10.9022, 409.804, e2eharness.MapUlduar)
+						if !tc.wantDead {
+							// Tank the Pummeller with a nondamaging Warrior Taunt. Otherwise its
+							// only opponent could be the dying Boombot, allowing an immediate evade/heal.
+							for _, guid := range nearby {
+								xtSelect(t, bot, guid)
+								bot.GM(t, ".cast 355 triggered")
+								if !xtPoll(5*time.Second, func() bool { return e2eharness.UnitInCombat(bot.World, guid) }) {
+									e2eharness.Preconditionf(t, "Pummeller did not enter combat after Taunt")
+								}
+							}
+						}
+						targets := append(append([]uint64{}, nearby...), outside)
+						before := make(map[uint64]uint32)
+						// Reacquire every GUID after teleport, including the untouched control.
+						if !xtPoll(5*time.Second, func() bool {
+							source := bot.World.GetObject(bomb)
+							if source == nil || source.Health() == 0 || !bot.UnitHasAura(bomb, xtRoot) {
+								return false
+							}
+							for _, guid := range targets {
+								target := bot.World.GetObject(guid)
+								if target == nil || target.Health() == 0 || !bot.UnitHasAura(guid, xtRoot) {
+									return false
+								}
+								distance := e2eharness.Distance3D(source.PosX, source.PosY, 0, target.PosX, target.PosY, 0)
+								if math.Abs(float64(source.PosZ-target.PosZ)) > 0.5 ||
+									(guid == outside && (distance < 20 || distance > 30)) ||
+									(guid != outside && distance > 5) || target.Health() != target.MaxHealth() {
+									return false
+								}
+								before[guid] = target.Health()
+							}
+							return true
+						}) {
+							e2eharness.Preconditionf(t, "robot recipients not full-health and rooted inside/outside Boom range")
+						}
+						creditBefore := record.casts(bot.World.CharGUID(), 65037)
+						hp, _ := bot.UnitHP(bomb)
+						bot.Damage(t, bomb, hp) // do not damage any recipient directly
+						for _, guid := range nearby {
+							var hit xtBoomHit
+							var remaining uint32
+							if !xtPoll(5*time.Second, func() bool {
+								var ok bool
+								if hit, ok = record.hit(bomb, guid); !ok || hit.damage == 0 || hit.school != 4 {
+									return false
+								}
+								remaining, _ = bot.UnitHP(guid)
+								if tc.wantDead {
+									return remaining == 0 && hit.damage >= before[guid]
+								}
+								return remaining > 0 && remaining < before[guid] &&
+									before[guid]-remaining == hit.damage
+							}) {
+								e2eharness.ConfirmedBugf(t, 27699,
+									"Boom from %x did not correctly damage %s %x: HP %d -> %d, damage=%d school=%d",
+									bomb, tc.name, guid, before[guid], remaining, hit.damage, hit.school)
+							}
+							t.Logf("PASS Boom %x -> %s %x: Fire damage=%d, HP %d -> %d",
+								bomb, tc.name, guid, hit.damage, before[guid], remaining)
+						}
+						xtRequireDeath(t, bot, record, bomb, 5*time.Second)
+						xtObserve(t, 2*time.Second, func() {
+							controlHP, _ := bot.UnitHP(outside)
+							if _, hit := record.hit(bomb, outside); hit || controlHP != before[outside] {
+								e2eharness.ConfirmedBugf(t, 27699, "outside %s %x was hit or lost health", tc.name, outside)
+							}
+							if tc.wantDead && record.casts(bot.World.CharGUID(), 65037)-creditBefore != tc.count {
+								e2eharness.ConfirmedBugf(t, 27699, "Scrapbot wave did not grant exactly %d kill-credit casts", tc.count)
+							}
+						})
+					}) {
+						return
+					}
+				}
 			}) {
 				return
 			}
