@@ -16,10 +16,17 @@
  */
 
 #include "CreatureScript.h"
+#include "GameTime.h"
+#include "Map.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "onyxias_lair.h"
+
+#include <array>
+
+std::array<ObjectGuid::LowType, 4> constexpr OnyxianWarderSpawnIds = { 12550, 12551, 12552, 12553 };
 
 enum Spells
 {
@@ -195,6 +202,31 @@ public:
     {
         Talk(SAY_AGGRO);
         SetPhase(PHASE_GROUNDED);
+
+        Map* map = me->GetMap();
+        for (ObjectGuid::LowType spawnId : OnyxianWarderSpawnIds)
+        {
+            CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
+            if (!data || data->id != NPC_ONYXIAN_WARDER || data->mapid != map->GetId())
+                continue;
+
+            auto bounds = map->GetCreatureBySpawnIdStore().equal_range(spawnId);
+            if (bounds.first != bounds.second)
+            {
+                for (auto itr = bounds.first; itr != bounds.second; ++itr)
+                {
+                    // Preserve fresh corpses for looting and skinning.
+                    if (itr->second->getDeathState() == DeathState::Dead)
+                        itr->second->Respawn();
+                }
+            }
+            else
+            {
+                // Despawned dynamic spawns must return through the normal respawn queue.
+                time_t respawnTime = GameTime::GetGameTime().count();
+                map->SaveCreatureRespawnTime(spawnId, respawnTime);
+            }
+        }
 
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT); // just in case at reset some players already left the instance
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
