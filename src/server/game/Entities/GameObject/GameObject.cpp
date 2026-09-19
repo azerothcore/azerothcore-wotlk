@@ -2160,22 +2160,16 @@ bool GameObject::IsInRange2d(float x, float y, float radius) const
         return IsWithinDist2d(x, y, radius);
 
     float sinA = std::sin(GetOrientation());
-    float cosA = cos(GetOrientation());
+    float cosA = std::cos(GetOrientation());
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
-    float dist = std::sqrt(dx * dx + dy * dy);
-    //! Check if the distance between the 2 objects is 0, can happen if both objects are on the same position.
-    //! The code below this check wont crash if dist is 0 because 0/0 in float operations is valid, and returns infinite
-    if (G3D::fuzzyEq(dist, 0.0f))
-        return true;
+
+    float localX = dx * cosA + dy * sinA;
+    float localY = dy * cosA - dx * sinA;
 
     float scale = GetObjectScale();
-    float sinB = dx / dist;
-    float cosB = dy / dist;
-    dx = dist * (cosA * cosB + sinA * sinB);
-    dy = dist * (cosA * sinB - sinA * cosB);
-    return dx < (info->maxX * scale) + radius && dx >(info->minX * scale) - radius
-        && dy < (info->maxY * scale) + radius && dy >(info->minY * scale) - radius;
+    return localX < (info->maxX * scale) + radius && localX > (info->minX * scale) - radius
+        && localY < (info->maxY * scale) + radius && localY > (info->minY * scale) - radius;
 }
 
 bool GameObject::IsInRange3d(float x, float y, float z, float radius) const
@@ -2185,24 +2179,19 @@ bool GameObject::IsInRange3d(float x, float y, float z, float radius) const
         return IsWithinDist3d(x, y, z, radius);
 
     float sinA = std::sin(GetOrientation());
-    float cosA = cos(GetOrientation());
+    float cosA = std::cos(GetOrientation());
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
     float dz = z - GetPositionZ();
-    float dist = std::sqrt(dx * dx + dy * dy);
-    //! Check if the distance between the 2 objects is 0, can happen if both objects are on the same position.
-    //! The code below this check wont crash if dist is 0 because 0/0 in float operations is valid, and returns infinite
-    if (G3D::fuzzyEq(dist, 0.0f))
-        return true;
+
+    float localX = dx * cosA + dy * sinA;
+    float localY = dy * cosA - dx * sinA;
 
     float scale = GetObjectScale();
-    float sinB = dx / dist;
-    float cosB = dy / dist;
-    dx = dist * (cosA * cosB + sinA * sinB);
-    dy = dist * (cosA * sinB - sinA * cosB);
-    return dx < (info->maxX * scale) + radius && dx > (info->minX * scale) - radius
-           && dy < (info->maxY * scale) + radius && dy > (info->minY * scale) - radius
-           && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
+    float minZ = std::min(0.0f, info->minZ);
+    return localX < (info->maxX * scale) + radius && localX > (info->minX * scale) - radius
+           && localY < (info->maxY * scale) + radius && localY > (info->minY * scale) - radius
+           && dz < (info->maxZ * scale) + radius && dz > (minZ * scale) - radius;
 }
 
 void GameObject::EventInform(uint32 eventId)
