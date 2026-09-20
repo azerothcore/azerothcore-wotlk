@@ -16,14 +16,21 @@
 -- `creature_template_addon`.`auras` (64793 in 10 man, 64941 in 25 man).
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 34203;
 
+-- `creature_template_movement` only decides how the server moves the dome; the animation the
+-- client plays comes from the anim tier in `creature_template_addon`.`bytes1`. Both entries
+-- carried 50331648 (0x03000000 = UNIT_BYTE1_FLAG_FLY), which plays the flying animation and makes
+-- the dome bob up and down while it travels. Sniffs have the tier at 2 (0x02000000 =
+-- UNIT_BYTE1_FLAG_HOVER), which holds it steady.
+UPDATE `creature_template_addon` SET `bytes1` = 33554432 WHERE (`entry` IN (34203, 34227));
+
 DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (34203, 34227);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
-(34203,2,0,0,0,0,0,NULL),
-(34227,2,0,0,0,0,0,NULL);
+(34203, 2, 0, 0, 0, 0, 0, NULL),
+(34227, 2, 0, 0, 0, 0, 0, NULL);
 
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 34203 AND `source_type` = 0;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 34203);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(34203,0,0,1,54,0,100,0,0,0,0,0,0,0,11,64785,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Displacement Device - On Just Summoned - Cast Random Lightning Visual'),
-(34203,0,1,2,61,0,100,0,0,0,0,0,0,0,8,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Displacement Device - On Just Summoned - Set React State Passive'),
-(34203,0,2,0,61,0,100,0,0,0,0,0,0,0,59,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Displacement Device - On Just Summoned - Set Walk'),
-(34203,0,3,0,60,0,100,0,500,500,1000,1000,0,0,69,0,0,0,0,0,1,21,50,0,0,0,0,0,0,0,'Displacement Device - Every 1s - Move To Closest Player');
+(34203, 0, 0, 1, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 64785, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Displacement Device - On Just Summoned - Cast \'Random Lightning Visual\''),
+(34203, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Displacement Device - On Just Summoned - Set Reactstate Passive'),
+(34203, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Displacement Device - On Just Summoned - Set Run Off'),
+(34203, 0, 3, 0, 60, 0, 100, 0, 500, 500, 1000, 1000, 0, 0, 69, 0, 0, 0, 0, 0, 1, 21, 50, 0, 0, 0, 0, 0, 0, 0, 'Displacement Device - Every 1s - Move To Closest Player');
