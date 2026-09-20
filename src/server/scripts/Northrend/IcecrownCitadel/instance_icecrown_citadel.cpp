@@ -1322,8 +1322,8 @@ public:
                             instance->SummonCreature(NPC_UTHER_THE_LIGHTBRINGER_QUEST, UtherSpawnPos);
                             instance->SummonCreature(NPC_LADY_SYLVANAS_WINDRUNNER_QUEST, SylvanasSpawnPos);
 
-                            // Realm-wide Dalaran monument: latch the Lich King's defeat (any difficulty) so
-                            // Runeweaver Square's fountain gives way to the Dedication of Honor statue.
+                            // Realm-wide Dalaran monument: latch the Lich King's defeat (any difficulty) so the
+                            // Dedication of Honor plaque appears and the Runeweaver Square fountain becomes the statue.
                             if (!sWorldState->getWorldState(WORLD_STATE_CUSTOM_DALARAN_LICH_KING_DEFEATED))
                                 sWorldState->setWorldState(WORLD_STATE_CUSTOM_DALARAN_LICH_KING_DEFEATED, 1);
                         }
