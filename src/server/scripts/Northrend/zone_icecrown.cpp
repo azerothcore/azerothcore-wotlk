@@ -2747,8 +2747,9 @@ public:
                         _events.Repeat(30s);
                         break;
                     case EVENT_FROSTBOLT:
-                        if (Unit* victim = me->GetVictim())
-                            me->CastSpell(victim, SPELL_FROSTBOLT, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+                        // Left to cost mana on purpose: the doubled ManaModifier on 31016 is what
+                        // video evidence shows, so the pool has to actually be spent.
+                        DoCastVictim(SPELL_FROSTBOLT);
                         _events.Repeat(8s);
                         break;
                     case EVENT_BLIZZARD:
@@ -2881,7 +2882,7 @@ public:
                     if (Player* player = me->SelectNearestPlayer(EncounterRadius))
                     {
                         me->SetFacingToObject(player);
-                        me->CastSpell(player, SPELL_SAFIRDRANGS_CHILL, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+                        DoCast(player, SPELL_SAFIRDRANGS_CHILL);
                     }
                     break;
                 case ACTION_SAFIRDRANG_DEPART:

@@ -5,10 +5,12 @@
 -- `unit_flags` below are taken from the sniff data Dr-J posted on TrinityCore/TrinityCore#4841,
 -- as are the spawn positions, waypoints and `creature_text` rows further down; they are not
 -- invented here. 31016 reuses the curated shared CC-immunity set -354 (identical mechanics mask).
+-- `ManaModifier` 2 on the two casters is from video evidence: both sustain a spell on a timer for
+-- the whole fight, which the base pool does not cover.
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_overthane',
-    `unit_flags`= 33088, `CreatureImmunitiesId`= -354 WHERE `entry`= 31016;
+    `unit_flags`= 33088, `CreatureImmunitiesId`= -354, `ManaModifier`= 2 WHERE `entry`= 31016;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_safirdrang',
-    `unit_flags`= 256 WHERE `entry`= 31050;
+    `unit_flags`= 256, `ManaModifier`= 2 WHERE `entry`= 31050;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_elite',
     `unit_flags`= 256 WHERE `entry`= 31030;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_vardmadra',
