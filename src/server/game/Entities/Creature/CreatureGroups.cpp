@@ -299,9 +299,14 @@ void CreatureGroup::MemberEvaded(Creature* member)
         if (pMember == member || pMember->IsInEvadeMode() || !itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_MASK)))
             continue;
 
-        if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+        // EVADE_TOGETHER and RESPAWN_ON_EVADE are independent: living members evade, dead members respawn.
+        if (pMember->IsAlive())
         {
-            if (!pMember->IsAlive() || !pMember->IsInCombat())
+            if (!itr.second.HasGroupFlag(
+                    std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_EVADE_TOGETHER)))
+                continue;
+
+            if (!pMember->IsInCombat())
                 continue;
 
             if (pMember->IsAIEnabled)
@@ -310,7 +315,8 @@ void CreatureGroup::MemberEvaded(Creature* member)
         }
         else
         {
-            if (pMember->IsAlive())
+            if (!itr.second.HasGroupFlag(
+                    std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_RESPAWN_ON_EVADE)))
                 continue;
 
             if (itr.second.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE)) && pMember == m_leader)
