@@ -10022,8 +10022,11 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
 
         // skip if already instant or cost is free
         if (mod->op == SPELLMOD_CASTING_TIME || mod->op == SPELLMOD_COST)
-            if (((float)basevalue + (float)basevalue * (totalmul - 1.0f) + (float)totalflat) <= 0)
+        {
+            float currentVal = ((float)basevalue + (float)totalflat) * totalmul;
+            if (currentVal <= 0.0f)
                 return;
+        }
 
         if (mod->type == SPELLMOD_FLAT)
         {
@@ -10077,7 +10080,7 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
         calculateSpellMod(mod);
     }
 
-    if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
+    if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION || op == SPELLMOD_COST)
         basevalue = (basevalue + totalflat) > 0 ? (basevalue + totalflat) * totalmul : 0;
     else
         basevalue = (basevalue * totalmul) + totalflat;
@@ -10199,8 +10202,6 @@ void Player::RemoveSpellMods(Spell* spell)
     if (spell->m_appliedMods.empty())
         return;
 
-    SpellInfo const* const spellInfo = spell->m_spellInfo;
-
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
     {
         for (SpellModContainer::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end();)
@@ -10228,16 +10229,6 @@ void Player::RemoveSpellMods(Spell* spell)
             // leave this here, if spell have two mods it will remove 2 charges - wrong
             spell->m_appliedMods.erase(iterMod);
 
-            // MAGE T8P4 BONUS
-            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE)
-            {
-                SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
-                // Missile Barrage, Hot Streak, Brain Freeze (trigger spell - Fireball!)
-                if (sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938)
-                    if (AuraEffect* aurEff = GetAuraEffectDummy(64869))
-                        if (roll_chance_i(aurEff->GetAmount()))
-                            continue; // don't consume charge
-            }
             if (mod->ownerAura->DropCharge(AURA_REMOVE_BY_EXPIRE))
                 itr = m_spellMods[i].begin();
         }
