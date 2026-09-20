@@ -1,3 +1,4 @@
+-- DB update 2026_09_18_00 -> 2026_09_20_00
 -- Freya's Gift pays one emblem plus one per Elder left alive to empower her, so the encounter
 -- pays four either way once the Elders killed early are counted. On top of that the chests kept
 -- a second, pre-3.3 emblem reference, which paid up to four more: with one Elder alive the
