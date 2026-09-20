@@ -103,6 +103,20 @@ public:
             InstanceScript::OnCreatureCreate(creature);
         }
 
+        void OnGameObjectCreate(GameObject* go) override
+        {
+            InstanceScript::OnGameObjectCreate(go);
+            switch (go->GetEntry())
+            {
+                case GO_ICE_CHEST:
+                case GO_ICE_CHEST_2:
+                    go->SetLootRecipient(instance);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         void SetGuidData(uint32 data, ObjectGuid guid) override
         {
             switch (data)
