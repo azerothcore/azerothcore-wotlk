@@ -198,6 +198,8 @@ namespace Trainer
         if (hasSpellOrHigherRank(trainerSpell->SpellId) || isSkillRankKnown(trainerSpell->SpellId))
             return SpellState::Known;
 
+        SpellInfo const* trainerSpellInfo = sSpellMgr->AssertSpellInfo(trainerSpell->SpellId);
+
         // check race/class requirement
         if (!player->IsSpellFitByClassAndRace(trainerSpell->SpellId))
             return SpellState::Unavailable;
