@@ -4,7 +4,7 @@ services:
     image: ${AC_GRAFANA_IMAGE:-grafana/grafana:11.2.0}
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
     networks:
       - ac-network
