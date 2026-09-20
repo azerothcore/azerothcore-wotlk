@@ -379,17 +379,25 @@ void GameEventMgr::LoadEvents()
 
         if (pGameEvent.HolidayId != HOLIDAY_NONE)
         {
-            if (!sHolidaysStore.LookupEntry(pGameEvent.HolidayId))
+            HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(pGameEvent.HolidayId);
+            if (!holiday)
             {
                 LOG_ERROR("sql.sql", "`game_event` game event id ({}) have not existed holiday id {}.", eventId, pGameEvent.HolidayId);
                 pGameEvent.HolidayId = HOLIDAY_NONE;
+                continue;
             }
-            else
+
+            // a stage the holiday does not define leaves the event with length 0, which keeps it from ever starting
+            if (pGameEvent.HolidayStage > MAX_HOLIDAY_DURATIONS
+                || (pGameEvent.HolidayStage && !holiday->Duration[pGameEvent.HolidayStage - 1]))
             {
-                uint8& mainStage = _holidayMainStages[pGameEvent.HolidayId];
-                if (pGameEvent.HolidayStage > mainStage)
-                    mainStage = pGameEvent.HolidayStage;
+                LOG_ERROR("sql.sql", "`game_event` game event id ({}) has out of range holidayStage {}.", eventId, pGameEvent.HolidayStage);
+                pGameEvent.HolidayStage = 0;
             }
+
+            uint8& mainStage = _holidayMainStages[pGameEvent.HolidayId];
+            if (pGameEvent.HolidayStage > mainStage)
+                mainStage = pGameEvent.HolidayStage;
 
             SetHolidayEventTime(pGameEvent);
         }
@@ -2024,10 +2032,11 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
 uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
 {
     auto const& events = GetEventMap();
+    uint8 mainStage = GetHolidayMainStage(holidayId);
 
     for (auto const& eventEntry : events)
     {
-        if (eventEntry.HolidayId == holidayId)
+        if (eventEntry.HolidayId == holidayId && eventEntry.HolidayStage == mainStage)
         {
             return eventEntry.EventId;
         }
