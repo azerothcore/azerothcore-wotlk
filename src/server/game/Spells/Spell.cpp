@@ -7311,49 +7311,52 @@ bool Spell::CanAutoCast(Unit* target)
     }
 
     // Special autocast conditions for pet abilities
-    if (m_caster->IsPet() || m_caster->HasUnitTypeMask(UNIT_MASK_MINION))
+    if (Unit* unitCaster = m_caster->ToUnit())
     {
-        uint32 const firstRankSpellId = m_spellInfo->GetFirstRankSpell()->Id;
-        switch (firstRankSpellId)
+        if (unitCaster->IsPet() || unitCaster->HasUnitTypeMask(UNIT_MASK_MINION))
         {
-            case 26064: // Shell Shield (Turtle) - only at or below 50% health
-            case 53426: // Lick Your Wounds (Crocolisk) - only at or below 50% health
-                if (m_caster->GetHealthPct() > 50.0f)
-                    return false;
-                break;
-            case 50318: // Serenity Dust (Moth) - only at or below 75% health
-                if (m_caster->GetHealthPct() > 75.0f)
-                    return false;
-                break;
-            case 53480: // Roar of Sacrifice - target must be in combat and at or below 30% health
-                if (!target->IsInCombat() || target->GetHealthPct() > 30.0f)
-                    return false;
-                break;
-            case 53517: // Roar of Recovery - target must have mana and be at or below 20% mana
-                if (target->getPowerType() != POWER_MANA || target->GetPowerPct(POWER_MANA) > 20.0f)
-                    return false;
-                break;
-            case 1742:
-                // Cower - redesigned in 3.3.0+ to a defensive CD with 50% speed penalty; does not autocast
-                return false;
-            case 23145: // Dive
-            case 23146: // Dive (Rank 1 alternative)
-            case 61684: // Dash
+            uint32 const firstRankSpellId = m_spellInfo->GetFirstRankSpell()->Id;
+            switch (firstRankSpellId)
             {
-                // Only autocast to chase target if outside melee range
-                Unit const* chaseTarget = m_caster->GetVictim();
-                if (!chaseTarget)
-                    chaseTarget = m_caster->getAttackerForHelper();
-                if (!chaseTarget)
-                    if (Unit const* owner = m_caster->GetCharmerOrOwner())
-                        chaseTarget = owner->getAttackerForHelper();
-
-                if (!chaseTarget || m_caster->IsWithinMeleeRange(chaseTarget))
+                case 26064: // Shell Shield (Turtle) - only at or below 50% health
+                case 53426: // Lick Your Wounds (Crocolisk) - only at or below 50% health
+                    if (unitCaster->GetHealthPct() > 50.0f)
+                        return false;
+                    break;
+                case 50318: // Serenity Dust (Moth) - only at or below 75% health
+                    if (unitCaster->GetHealthPct() > 75.0f)
+                        return false;
+                    break;
+                case 53480: // Roar of Sacrifice - target must be in combat and at or below 30% health
+                    if (!target->IsInCombat() || target->GetHealthPct() > 30.0f)
+                        return false;
+                    break;
+                case 53517: // Roar of Recovery - target must have mana and be at or below 20% mana
+                    if (target->getPowerType() != POWER_MANA || target->GetPowerPct(POWER_MANA) > 20.0f)
+                        return false;
+                    break;
+                case 1742:
+                    // Cower - redesigned in 3.3.0+ to a defensive CD with 50% speed penalty; does not autocast
                     return false;
-                break;
+                case 23145: // Dive
+                case 23146: // Dive (Rank 1 alternative)
+                case 61684: // Dash
+                {
+                    // Only autocast to chase target if outside melee range
+                    Unit const* chaseTarget = unitCaster->GetVictim();
+                    if (!chaseTarget)
+                        chaseTarget = unitCaster->getAttackerForHelper();
+                    if (!chaseTarget)
+                        if (Unit const* owner = unitCaster->GetCharmerOrOwner())
+                            chaseTarget = owner->getAttackerForHelper();
+
+                    if (!chaseTarget || unitCaster->IsWithinMeleeRange(chaseTarget))
+                        return false;
+                    break;
+                }
+                default:
+                    break;
             }
-            default:
-                break;
         }
     }
 
