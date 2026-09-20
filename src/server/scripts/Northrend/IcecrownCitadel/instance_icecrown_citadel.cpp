@@ -1324,8 +1324,8 @@ public:
 
                             // Realm-wide Dalaran monument: latch the Lich King's defeat (any difficulty) so the
                             // Dedication of Honor plaque appears and the Runeweaver Square fountain becomes the statue.
-                            if (!sWorldState->getWorldState(WORLD_STATE_CUSTOM_DALARAN_LICH_KING_DEFEATED))
-                                sWorldState->setWorldState(WORLD_STATE_CUSTOM_DALARAN_LICH_KING_DEFEATED, 1);
+                            if (!sWorldState->getWorldState(WORLD_STATE_CUSTOM_LICH_KING_DEFEATED))
+                                sWorldState->setWorldState(WORLD_STATE_CUSTOM_LICH_KING_DEFEATED, 1);
                         }
                         break;
                     }
