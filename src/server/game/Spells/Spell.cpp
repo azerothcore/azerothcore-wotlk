@@ -6464,13 +6464,38 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
                         // Targets with an oversized combat reach can stand entirely over unwalkable space
                         // (e.g. Kologarn) so pathing to their center fails or creates a falling shortcut into the void.
-                        // For these targets, fall back to pathing to the nearest point on the melee ring facing the caster.
+                        // For these targets, fall back to pathing to the nearest walkable point on the melee ring facing the caster.
                         if (target->GetCombatReach() > NOMINAL_MELEE_RANGE &&
-                            (pathFailed || (m_preGeneratedPath->GetPathType() & (PATHFIND_FARFROMPOLY_END | PATHFIND_NOT_USING_PATH))))
+                            (pathFailed ||
+                             m_preGeneratedPath->IsInvalidDestinationZ(target) ||
+                             (m_preGeneratedPath->GetPathType() & (PATHFIND_FARFROMPOLY_END | PATHFIND_NOT_USING_PATH))))
                         {
-                            target->GetNearPoint2D(m_caster, destX, destY, 0.0f, target->GetAngle(m_caster));
-                            destZ = m_caster->GetPositionZ();
-                            m_caster->UpdateAllowedPositionZ(destX, destY, destZ);
+                            float const targetZ = target->GetPositionZ();
+                            float const angle = target->GetAngle(m_caster);
+                            bool foundWalkable = false;
+
+                            // Find the nearest point along the melee ring facing the caster that has walkable ground.
+                            // For targets standing over a void (e.g. Kologarn), the immediate contact ring (offset 0)
+                            // hangs over the chasm, while solid bridge ground begins slightly further out.
+                            for (float distOffset = 0.0f; distOffset <= NOMINAL_MELEE_RANGE; distOffset += 0.5f)
+                            {
+                                float testX, testY;
+                                target->GetNearPoint2D(m_caster, testX, testY, distOffset, angle);
+                                float groundZ = m_caster->GetMapHeight(testX, testY, targetZ);
+                                if (groundZ > INVALID_HEIGHT && std::abs(groundZ - targetZ) <= 5.0f)
+                                {
+                                    destX = testX;
+                                    destY = testY;
+                                    destZ = groundZ;
+                                    m_caster->UpdateAllowedPositionZ(destX, destY, destZ);
+                                    foundWalkable = true;
+                                    break;
+                                }
+                            }
+
+                            if (!foundWalkable)
+                                return SPELL_FAILED_NOPATH;
+
                             cutPath = false;
 
                             result = m_preGeneratedPath->CalculatePath(destX, destY, destZ, false);
@@ -6482,8 +6507,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                             return SPELL_FAILED_NOPATH;
                         else if (cutPath && m_preGeneratedPath->IsInvalidDestinationZ(target))
                             return SPELL_FAILED_NOPATH;
-                        else if (!cutPath && (std::abs(m_preGeneratedPath->GetActualEndPosition().z - destZ) > 5.0f ||
-                                 (m_preGeneratedPath->GetPathType() & (PATHFIND_FARFROMPOLY_END | PATHFIND_NOT_USING_PATH))))
+                        else if (!cutPath && std::abs(m_preGeneratedPath->GetActualEndPosition().z - destZ) > 5.0f)
                             return SPELL_FAILED_NOPATH;
 
                         if (cutPath)
