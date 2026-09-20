@@ -1461,6 +1461,43 @@ class spell_razorscale_firebolt : public SpellScript
     }
 };
 
+// 45026 - Heroic Strike (Dark Rune Sentinel)
+class spell_razorscale_dark_rune_sentinel_heroic_strike : public SpellScript
+{
+    PrepareSpellScript(spell_razorscale_dark_rune_sentinel_heroic_strike);
+
+    void HandleDamage(SpellEffIndex effIndex)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || caster->GetEntry() != NPC_DARK_RUNE_SENTINEL)
+            return;
+
+        PreventHitDefaultEffect(effIndex);
+
+        Unit* target = GetHitUnit();
+        if (!target || !target->IsAlive())
+            return;
+
+        // The DBC bonus is scaled ~1248x with creature level when a caster is passed to CalcValue,
+        // so the Sentinel uses the unscaled bonus; other casters keep the default handler.
+        int32 bonus = GetSpellInfo()->Effects[effIndex].CalcValue();
+        bonus = int32(bonus * caster->GetPctModifierValue(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT));
+
+        int32 damage = std::max<int32>(int32(caster->CalculateDamage(BASE_ATTACK, false, true)) + bonus, 0);
+
+        SpellSchoolMask schoolMask = GetSpellInfo()->GetSchoolMask();
+        uint32 finalDamage = caster->MeleeDamageBonusDone(target, damage, BASE_ATTACK, GetSpellInfo(), schoolMask);
+        finalDamage = target->MeleeDamageBonusTaken(caster, finalDamage, BASE_ATTACK, GetSpellInfo(), schoolMask);
+
+        SetHitDamage(GetHitDamage() + int32(finalDamage));
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_razorscale_dark_rune_sentinel_heroic_strike::HandleDamage, EFFECT_0, SPELL_EFFECT_WEAPON_DAMAGE);
+    }
+};
+
 class achievement_quick_shave : public AchievementCriteriaScript
 {
 public:
@@ -1504,6 +1541,7 @@ void AddSC_boss_razorscale()
     RegisterSpellScript(spell_razorscale_summon_iron_dwarves);
     RegisterSpellAndAuraScriptPair(spell_razorscale_fuse_armor, spell_razorscale_fuse_armor);
     RegisterSpellScript(spell_razorscale_firebolt);
+    RegisterSpellScript(spell_razorscale_dark_rune_sentinel_heroic_strike);
     new achievement_quick_shave();
     new achievement_iron_dwarf_medium_rare();
 }
