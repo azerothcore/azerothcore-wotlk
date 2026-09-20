@@ -12,11 +12,11 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (30, 1, 202443, 0, 0, 11, 0, 20009, 1, 0, 0, 0, 0, '', 'Dedication of Honor - plaque visible once the realm has defeated the Lich King');
 
 -- Using the plaque opens gossip menu 11431 ("See the fall of the Lich King.") instead of turning
--- to its text page 3605 - an undocumented 3.3.3 change. The two ids come from a Runeweaver Square
--- sniff, build 67823, so only the menu option row that sniff actually sourced is restamped;
--- `gameobject_template`.`VerifiedBuild` keeps its 3.3.5a value, since the rest of that row is
--- 3.3.5a data a modern client cannot have produced.
-UPDATE `gameobject_template` SET `Data7` = 0, `Data19` = 11431 WHERE `entry` = 202443;
+-- to its text page 3605 - an undocumented 3.3.3 change. Both ids come from a Runeweaver Square
+-- sniff, build 67823, so per sql-guidelines.md both rows the sniff validated carry that build:
+-- `gameobject_template` 202443 (was 11159, a pre-3.3.3 stamp that no longer describes `Data19`)
+-- and the menu option row the gossip event fires on.
+UPDATE `gameobject_template` SET `Data7` = 0, `Data19` = 11431, `VerifiedBuild` = 67823 WHERE `entry` = 202443;
 UPDATE `gossip_menu_option` SET `VerifiedBuild` = 67823 WHERE `MenuID` = 11431 AND `OptionID` = 0;
 
 -- Plaque SAI, full block:
