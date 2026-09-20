@@ -583,9 +583,7 @@ public:
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
-            {
                 return;
-            }
 
             if (id == POINT_WEEGLI_DOOR && doorStage == WeegliDoorStage::Moving)
             {

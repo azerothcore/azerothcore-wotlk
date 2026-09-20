@@ -188,9 +188,7 @@ public:
                 case GO_END_DOOR:
                     EndDoorGUID = gameobject->GetGUID();
                     if (EndDoorState == DONE)
-                    {
                         gameobject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                    }
                     break;
                 default:
                     break;
