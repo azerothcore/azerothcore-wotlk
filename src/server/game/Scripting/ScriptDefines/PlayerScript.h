@@ -891,18 +891,21 @@ public:
      * did. A trainer has taken the money and still reports success, and Player::LearnTalent spends
      * the point and records the talent anyway -- use OnPlayerCanLearnTalent to stop a talent.
      *
-     * Only Player::learnSpell reaches it; spells written through addSpell do not. Those bypasses
-     * include character loading (_LoadSpells, and the initial class and skill-rewarded spells,
-     * which run on every login) and talent spells from _addTalentAurasAndSpells, reapplied on
-     * every dual-spec switch -- so a refusal in world is undone the next time one of them runs.
+     * Player::learnSpell reaches it, and so does a trainer about to cast a wrapper entry (below);
+     * spells written through addSpell do not. Those bypasses include character loading
+     * (_LoadSpells, and the initial class and skill-rewarded spells, which run on every login) and
+     * talent spells from _addTalentAurasAndSpells, reapplied on every dual-spec switch -- so a
+     * refusal in world is undone the next time one of them runs.
      *
      * What it sees can be indirect: a trainer entry that wraps other spells (a paladin's Summon
-     * Warhorse) is cast, so the hook sees the wrapped spells instead. A talent rank arrives only
-     * when it lands in the spell book, which most do not -- but a learn-spell talent still
-     * delivers its additional talent spells.
+     * Warhorse) is cast, so the hook sees the entry first and then each wrapped spell as the cast
+     * teaches it. Refusing the entry skips the cast as a whole, and with it whatever else the entry
+     * does: a class mount also steps the Riding skill, which refusing the wrapped spells alone does
+     * not stop. A talent rank arrives only when it lands in the spell book, which most do not -- but
+     * a learn-spell talent still delivers its additional talent spells.
      *
      * @param player Contains information about the Player
-     * @param spellId The id of the spell about to be learned
+     * @param spellId The id of the spell about to be learned, or of the trainer entry about to be cast
      *
      * @return true if the player is allowed to learn the spell
      */
