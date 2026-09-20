@@ -12185,8 +12185,19 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
             SetSkill(skillId, rank, skillValue, maxValue);
 
             std::vector<uint32> rankSpells = sSpellMgr->GetSkillRankSpells(skillId);
-            for (size_t i = 0; i < rankSpells.size() && i < rank; ++i)
-                learnSpell(rankSpells[i], false);
+            for (uint32 rankSpellId : rankSpells)
+            {
+                if (SpellLearnSkillNode const* spellLearnSkill = sSpellMgr->GetSpellLearnSkill(rankSpellId))
+                {
+                    if (spellLearnSkill->step <= rank)
+                    {
+                        if (IsInWorld())
+                            learnSpell(rankSpellId, false);
+                        else
+                            addSpell(rankSpellId, SPEC_MASK_ALL, false, false, false);
+                    }
+                }
+            }
 
             break;
         }

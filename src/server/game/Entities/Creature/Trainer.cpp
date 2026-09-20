@@ -200,15 +200,6 @@ namespace Trainer
 
         SpellInfo const* trainerSpellInfo = sSpellMgr->AssertSpellInfo(trainerSpell->SpellId);
 
-        for (SpellEffectInfo const& eff : trainerSpellInfo->GetEffects())
-        {
-            if (eff.IsEffect(SPELL_EFFECT_SKILL_STEP))
-            {
-                uint32 skillId = eff.MiscValue;
-                if (player->HasSkill(skillId) && player->GetSkillStep(skillId) > uint32(eff.CalcValue()))
-                    return SpellState::Known;
-            }
-        }
 
         // check race/class requirement
         if (!player->IsSpellFitByClassAndRace(trainerSpell->SpellId))
