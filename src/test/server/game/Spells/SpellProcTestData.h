@@ -101,7 +101,7 @@ struct SpellProcTestEntry
 
 /**
  * @brief All spell_proc entries from the database
- * Total: 869 entries
+ * Total: 868 entries
  */
 inline std::vector<SpellProcTestEntry> GetAllSpellProcTestEntries()
 {

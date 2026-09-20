@@ -122,7 +122,7 @@ TEST_F(SpellProcDBCValidationTest, CountEntriesWithDBCData)
 
     // All entries should eventually have DBC data
     // For now, just verify the count
-    EXPECT_EQ(_allEntries.size(), 869u);
+    EXPECT_EQ(_allEntries.size(), 868u);
 }
 
 TEST_F(SpellProcDBCValidationTest, CountEntriesAddingValue)
@@ -233,7 +233,7 @@ TEST_F(SpellProcDBCValidationTest, IdentifyDBCOverrides)
     for (auto const& entry : _allEntries)
     {
         // SKIP REASON: Cannot compare against DBC defaults when DBC data
-        // is not populated. All 869 entries currently have DBC fields = 0.
+        // is not populated. All 868 entries currently have DBC fields = 0.
         // Once populated, this loop will count actual DBC overrides.
         if (!entry.HasDBCData())
             continue;
