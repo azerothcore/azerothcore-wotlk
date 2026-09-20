@@ -1418,7 +1418,7 @@ bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
     }
     else
     {
-        Powers power = (spellInfo->PowerType >= 0 && spellInfo->PowerType < MAX_POWERS)
+        Powers power = (spellInfo->PowerType < MAX_POWERS)
             ? Powers(spellInfo->PowerType)
             : me->getPowerType();
         if ((int32)me->GetPower(power) < powerCost)
