@@ -2,10 +2,13 @@
 -- The Lich King (31083), Possessed Vardmadra (NPC 31029), Lady Nightswood (NPC 31087),
 -- Safirdrang (NPC 31050) and hidden Chill target stalkers (NPC 31077)
 
+-- `unit_flags` below are taken from the sniff data Dr-J posted on TrinityCore/TrinityCore#4841,
+-- as are the spawn positions, waypoints and `creature_text` rows further down; they are not
+-- invented here. 31016 reuses the curated shared CC-immunity set -354 (identical mechanics mask).
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_overthane',
-    `unit_flags`= 33088, `CreatureImmunitiesId`= 31016, `ManaModifier`= 2 WHERE `entry`= 31016;
+    `unit_flags`= 33088, `CreatureImmunitiesId`= -354 WHERE `entry`= 31016;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_safirdrang',
-    `unit_flags`= 256, `ManaModifier`= 2 WHERE `entry`= 31050;
+    `unit_flags`= 256 WHERE `entry`= 31050;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_elite',
     `unit_flags`= 256 WHERE `entry`= 31030;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_vardmadra',
@@ -13,26 +16,25 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_va
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_nightswood' WHERE `entry`= 31087;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_lich_king',
     `unit_flags`= 768 WHERE `entry`= 31083;
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_chill_target',
+-- The chill stalker only relays one spell on hit, which SmartAI covers - no C++ needed.
+UPDATE `creature_template` SET `AIName`='SmartAI', `ScriptName`='',
     `unit_flags`= 33555200 WHERE `entry`= 31077;
 
--- Overthane Balargarde (NPC 31016) CC immunity
-DELETE FROM `creature_immunities` WHERE `ID`= 31016;
-INSERT INTO `creature_immunities` (`ID`, `SchoolMask`, `DispelTypeMask`, `MechanicsMask`, `Effects`, `Auras`, `ImmuneAoE`, `ImmuneChain`, `Comment`) VALUES
-(31016, 0, 0, 1301708534, '', '', 0, 0, 'Overthane Balargarde - Banshees Revenge boss crowd-control immunity');
-
--- Remove legacy SAI
+-- Remove legacy SAI, then give 31077 its relay script
 DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (31016, 31029, 31030, 31050, 31077, 31083, 31087);
 DELETE FROM `smart_scripts` WHERE `source_type`=9 AND `entryorguid`=31016;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(31077, 0, 0, 0, 8, 0, 100, 0, 4020, 0, 0, 0, 0, 0, 11, 4307, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Safirdrang`s Chill Target - On Spellhit Safirdrang`s Chill - Cast Safirdrang`s Chill Relay');
 
--- Spawn auras and hover states
+-- Spawn auras and hover states. `visibilityDistanceType` 3 (Large, 200 yd) is kept from the base
+-- rows: the drake, the boss and the Lich King all move well past the 100 yd normal range.
 DELETE FROM `creature_template_addon` WHERE `entry` IN (31016, 31029, 31030, 31050, 31083);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(31016, 0, 0, 0, 1, 0, 0, '61081'),
-(31029, 0, 0, 50331648, 1, 0, 0, '58102'),
+(31016, 0, 0, 0, 1, 0, 3, '61081'),
+(31029, 0, 0, 50331648, 1, 0, 3, '58102'),
 (31030, 0, 26882, 0, 1, 0, 3, ''),
-(31050, 0, 0, 50331648, 1, 0, 0, ''),
-(31083, 0, 0, 0, 1, 0, 0, '34427');
+(31050, 0, 0, 50331648, 1, 0, 3, ''),
+(31083, 0, 0, 0, 1, 0, 3, '34427');
 
 -- War Horn of Jotunheim (GO 193028) summons Possessed Vardmadra (NPC 31029)
 DELETE FROM `event_scripts` WHERE `id` = 20108;
@@ -45,6 +47,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 1, 4020, 0, 0, 31, 0, 3, 31077, 0, 0, 0, 0, '', 'Safirdrang`s Chill targets Safirdrang`s Chill Target');
 
 -- Encounter dialogue
+-- Rows below are the sniffed text; the one deviation is 31029 group 2, whose sniffed Emote 457
+-- (EMOTE_ONESHOT_FLYTALK) is dropped: unlike groups 0 and 1 that line is spoken kneeling on the
+-- ground, and a flying talk animation there breaks the kneel.
 DELETE FROM `creature_text` WHERE `CreatureID` IN (31016, 31029, 31083, 31087);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextID`, `TextRange`, `comment`) VALUES
 (31016, 1, 0, 'You dare to challenge me? You haven''t earned the right!', 14, 0, 100, 25, 0, 15633, 31597, 0, 'Banshee''s Revenge - Overthane Balargarde to Safirdrang'),
@@ -65,10 +70,10 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (31083, 4, 0, 'But nothing! Finish them! DO NOT FAIL ME, BALARGARDE!', 14, 0, 100, 5, 0, 15604, 31636, 0, 'Banshee''s Revenge - The Lich King to Overthane Balargarde'),
 (31083, 5, 0, 'You have bested one of my finest, but your efforts are for naught.', 14, 0, 100, 1, 0, 15605, 31693, 0, 'Banshee''s Revenge - The Lich King'),
 (31083, 6, 0, 'The frozen heart of Icecrown awaits....', 14, 0, 100, 1, 0, 15606, 31695, 0, 'Banshee''s Revenge - The Lich King'),
-(31087, 0, 0, '%s smiles and flies off to return to possessing The Bone Witch.', 16, 0, 100, 0, 0, 0, 0, 1, 'Banshee''s Revenge - Lady Nightswood emote');
+(31087, 0, 0, '%s smiles and flies off to return to possessing The Bone Witch.', 16, 0, 100, 0, 0, 0, 31697, 1, 'Banshee''s Revenge - Lady Nightswood emote');
 
 -- Flight paths
-DELETE FROM `waypoint_data` WHERE `id` IN (31029, 31050, 3105000, 31087, 31083, 3103001, 3103002, 3103003, 3103004, 3103005, 3103006);
+DELETE FROM `waypoint_data` WHERE `id` IN (31029, 31050, 3105000, 31087, 3103001, 3103002, 3103003, 3103004, 3103005, 3103006);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`) VALUES
 -- Possessed Vardmadra (NPC 31029)
 (31029, 1, 7119.714, 4305.82, 883.7371),
@@ -91,11 +96,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (31087, 1, 7079.599, 4301.017, 874.3533),
 (31087, 2, 7082.374, 4283.685, 878.2528),
 (31087, 3, 7093.269, 4251.247, 855.1418),
--- The Lich King (31083)
-(31083, 1, 7092.936, 4343.906, 871.9753),
-(31083, 2, 7094.104, 4331.222, 871.5023),
-(31083, 3, 7092.936, 4343.906, 871.9331),
-(31083, 4, 7088.768, 4385.59, 872.3639),
 -- Balargarde Elite (NPC 31030)
 (3103001, 1, 7108.212, 4429.457, 837.8948),
 (3103001, 2, 7108.282, 4428.459, 837.8948),
