@@ -111,11 +111,13 @@ namespace Trainer
         npc->SendPlaySpellVisual(179); // 53 SpellCastDirected
         npc->SendPlaySpellImpact(player->GetGUID(), 362); // 113 EmoteSalute
 
-        // learn explicitly or cast explicitly
-        if (trainerSpell->IsCastable())
-            player->CastSpell(player, trainerSpell->SpellId, true);
-        else
+        // learn explicitly or cast explicitly. A cast puts each wrapped spell through learnSpell and
+        // its hook, but also runs whatever else the entry does (a class mount steps the Riding skill),
+        // so the entry itself is put to the hook first and a refusal skips the cast as a whole
+        if (!trainerSpell->IsCastable())
             player->learnSpell(trainerSpell->SpellId, false);
+        else if (sScriptMgr->OnPlayerCanLearnSpell(player, trainerSpell->SpellId))
+            player->CastSpell(player, trainerSpell->SpellId, true);
 
         SendTeachSucceeded(npc, player, spellId);
 
