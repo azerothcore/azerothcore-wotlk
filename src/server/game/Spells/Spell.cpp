@@ -6463,9 +6463,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                             (PATHFIND_NOPATH | PATHFIND_INCOMPLETE | PATHFIND_SHORT));
 
                         // Targets with an oversized combat reach can stand entirely over unwalkable space
-                        // (e.g. Kologarn) so pathing to their center fails.
+                        // (e.g. Kologarn) so pathing to their center fails or creates a falling shortcut into the void.
                         // For these targets, fall back to pathing to the nearest point on the melee ring facing the caster.
-                        if (pathFailed && target->GetCombatReach() > NOMINAL_MELEE_RANGE)
+                        if (target->GetCombatReach() > NOMINAL_MELEE_RANGE &&
+                            (pathFailed || (m_preGeneratedPath->GetPathType() & (PATHFIND_FARFROMPOLY_END | PATHFIND_NOT_USING_PATH))))
                         {
                             target->GetNearPoint2D(m_caster, destX, destY, 0.0f, target->GetAngle(m_caster));
                             destZ = m_caster->GetPositionZ();
@@ -6481,7 +6482,8 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                             return SPELL_FAILED_NOPATH;
                         else if (cutPath && m_preGeneratedPath->IsInvalidDestinationZ(target))
                             return SPELL_FAILED_NOPATH;
-                        else if (!cutPath && std::abs(m_preGeneratedPath->GetActualEndPosition().z - destZ) > 5.0f)
+                        else if (!cutPath && (std::abs(m_preGeneratedPath->GetActualEndPosition().z - destZ) > 5.0f ||
+                                 (m_preGeneratedPath->GetPathType() & (PATHFIND_FARFROMPOLY_END | PATHFIND_NOT_USING_PATH))))
                             return SPELL_FAILED_NOPATH;
 
                         if (cutPath)
