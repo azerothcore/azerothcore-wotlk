@@ -49,7 +49,23 @@ enum ZulFarrakGameobjects
 enum ZulFarrakData
 {
     DATA_PYRAMID                = 0,
-    DATA_GAHZRILLA              = 1
+    DATA_GAHZRILLA              = 1,
+    DATA_END_DOOR               = 2
+};
+
+enum ZulFarrakActions
+{
+    ACTION_BLY_BETRAYAL = 1,
+    ACTION_DESTROY_GATES
+};
+
+enum ZulFarrakPoints
+{
+    POINT_CREW_STAIRS = 1,
+    POINT_CREW_DESCENT,
+    POINT_CREW_GATHER,
+    POINT_WEEGLI_DOOR,
+    POINT_WEEGLI_ESCAPE
 };
 
 enum ZFPyramidPhases
