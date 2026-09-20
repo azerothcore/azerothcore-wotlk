@@ -256,6 +256,13 @@ struct boss_hodir : public BossAI
             SpawnHelpers();
     }
 
+    // CREATURE_FLAG_EXTRA_HARD_RESET despawns Hodir on evade, so a wiped attempt ends with him
+    // respawning: the point at which a Rare Cache shattered on that attempt comes back too.
+    void JustRespawned() override
+    {
+        instance->SetData(TYPE_HODIR_HM_RESET, 0);
+    }
+
     void JustEngagedWith(Unit*  /*who*/) override
     {
         me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);
