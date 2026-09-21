@@ -941,8 +941,3 @@ std::vector<SkillLineAbilityEntry const*> const& GetSkillLineAbilitiesBySkillLin
     }
     return it->second;
 }
-
-AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
-{
-    return sAreaTableStore.LookupEntry(area_id);
-}
