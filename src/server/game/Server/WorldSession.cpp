@@ -854,7 +854,7 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
         LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
 
         //! Mark all characters of the account offline, unless a script running several per account handles it instead
-        if (!redirecting && !sScriptMgr->OnPlayerMarkAccountOffline(playerGuid, GetAccountId()))
+        if (!redirecting && sScriptMgr->OnPlayerCanMarkAccountOffline(playerGuid, GetAccountId()))
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
             stmt->SetData(0, GetAccountId());
