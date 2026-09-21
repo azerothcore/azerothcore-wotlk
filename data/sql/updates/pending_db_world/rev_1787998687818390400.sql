@@ -13,7 +13,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 SET @POOL := 9687;
 SET @OGUID := 43103;
 
-DELETE FROM `gameobject` WHERE `guid` IN (@OGUID + 0, @OGUID + 1, @OGUID + 2, 43117, 43118);
+DELETE FROM `gameobject` WHERE `id` IN (173232, 173234) AND `guid` IN (@OGUID + 0, @OGUID + 1, @OGUID + 2, 43117, 43118);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (@OGUID + 0, 173232, 230, 0, 0, 1, 1, 709.659, 57.0049, -44.1391, 2.74016, 0, 0, 0.979924, 0.19937, 43200, 100, 1, '', 0, NULL),
 (@OGUID + 1, 173232, 230, 0, 0, 1, 1, 860.409, 36.9705, -53.6437, 2.33874, 0, 0, 0.920505, 0.390732, 43200, 100, 1, '', 0, NULL),
