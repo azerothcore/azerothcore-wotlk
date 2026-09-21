@@ -18,12 +18,15 @@
 #include "CreatureGroups.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "GameTime.h"
 #include "Log.h"
+#include "Map.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "QueryResult.h"
 #include "Timer.h"
 #include "WaypointMgr.h"
+#include <algorithm>
 
 FormationMgr::~FormationMgr()
 {
@@ -84,6 +87,7 @@ void FormationMgr::LoadCreatureFormations()
 {
     uint32 const oldMSTime = getMSTime();
     CreatureGroupMap.clear();
+    CreatureGroupMembers.clear();
 
     //Get group data
     QueryResult result = WorldDatabase.Query("SELECT leaderGUID, memberGUID, dist, angle, groupAI, point_1, point_2 FROM creature_formations ORDER BY leaderGUID");
@@ -160,6 +164,7 @@ void FormationMgr::LoadCreatureFormations()
         }
 
         CreatureGroupMap[memberGUID] = group_member;
+        CreatureGroupMembers[group_member.leaderGUID].push_back(memberGUID);
         ++count;
     } while (result->NextRow());
 
@@ -324,6 +329,48 @@ void CreatureGroup::MemberEvaded(Creature* member)
 
             pMember->Respawn();
         }
+    }
+
+    RespawnRemovedMembers(member->GetMap());
+}
+
+// In dynamic respawn mode a creature is removed from the world once its corpse decays, and RemoveFromWorld drops it
+// from this group, so members waiting in the map's respawn store are no longer in m_members. Move their stored
+// respawn time to now: ProcessRespawns() recreates them on its next check and they rejoin the group when loaded.
+void CreatureGroup::RespawnRemovedMembers(Map* map)
+{
+    auto const membersItr = sFormationMgr->CreatureGroupMembers.find(m_groupID);
+    if (membersItr == sFormationMgr->CreatureGroupMembers.end())
+        return;
+
+    time_t now = GameTime::GetGameTime().count();
+    for (ObjectGuid::LowType spawnId : membersItr->second)
+    {
+        bool const inWorld = std::any_of(m_members.begin(), m_members.end(), [spawnId](auto const& itr)
+        {
+            return itr.first->GetSpawnId() == spawnId;
+        });
+        if (inWorld)
+            continue;
+
+        auto const infoItr = sFormationMgr->CreatureGroupMap.find(spawnId);
+        if (infoItr == sFormationMgr->CreatureGroupMap.end())
+            continue;
+
+        FormationInfo const& info = infoItr->second;
+        if (!info.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_RESPAWN_ON_EVADE)))
+            continue;
+
+        if (spawnId == m_groupID && info.HasGroupFlag(
+                std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_DONT_RESPAWN_LEADER_ON_EVADE)))
+            continue;
+
+        // Only creatures with a respawn still pending on this map: one without a stored time (alive, never loaded)
+        // is left alone, one already due (evade cascade of the same tick) is left to ProcessRespawns().
+        if (map->GetCreatureRespawnTime(spawnId) <= now)
+            continue;
+
+        map->SaveCreatureRespawnTime(spawnId, now);
     }
 }
 
