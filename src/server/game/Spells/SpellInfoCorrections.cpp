@@ -5226,6 +5226,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // 31930 Judgements of the Wise
     ApplySpellFix({ 31930 }, [](SpellInfo* spellInfo)
     {
+        spellInfo->SpellFamilyName = SPELLFAMILY_PALADIN;
         spellInfo->SpellFamilyFlags = flag96(0x200, 0, 0);
     });
 
