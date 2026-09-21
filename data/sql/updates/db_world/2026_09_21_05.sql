@@ -1,3 +1,4 @@
+-- DB update 2026_09_21_04 -> 2026_09_21_05
 --
 -- World DB override tables for CharSections.dbc and EmotesTextSound.dbc.
 CREATE TABLE IF NOT EXISTS `charsections_dbc` (
