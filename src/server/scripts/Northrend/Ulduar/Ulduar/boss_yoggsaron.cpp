@@ -150,6 +150,7 @@ enum YoggSpells
     SPELL_LUNATIC_GAZE_YS               = 64163,
     SPELL_DEAFENING_ROAR                = 64189,
     SPELL_SHADOW_BEACON                 = 64465,
+    SPELL_DEATH_ANIMATION               = 64165,
 
     // IMMORTAL GUARDIAN
     SPELL_SIMPLE_TELEPORT               = 64195,
@@ -189,6 +190,10 @@ enum YoggEvents
 
     EVENT_SARA_WIPE_OPEN_DOOR           = 40,
     EVENT_SARA_WIPE_RESPAWN             = 41,
+
+    EVENT_GUARDIAN_SPAWN_VISUAL         = 45,
+    EVENT_GUARDIAN_SPAWN_RELEASE        = 46,
+    EVENT_GUARDIAN_DRAIN_LIFE           = 47,
 };
 
 enum NPCsGOs
@@ -1161,6 +1166,7 @@ struct boss_yoggsaron : public ScriptedAI
         _instance = me->GetInstanceScript();
         _thirdPhase = false;
         _usedInsane = false;
+        _defeated = false;
         summons.DespawnAll();
         events.Reset();
 
@@ -1184,6 +1190,7 @@ struct boss_yoggsaron : public ScriptedAI
     SummonList summons;
     bool _thirdPhase;
     bool _usedInsane;
+    bool _defeated;
 
     void AttackStart(Unit*) override { }
 
@@ -1195,6 +1202,32 @@ struct boss_yoggsaron : public ScriptedAI
         float o = rand_norm() * M_PI * 2;
         float Zplus = (dist - 38) / 6.5f;
         me->SummonCreature(NPC_IMMORTAL_GUARDIAN, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+    }
+
+    // Never dies from damage: once pushed below 1.5% health he is defeated.
+    // The remaining sliver is not dealt, the death animation plays and the
+    // server kills him half a second later.
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (_defeated)
+        {
+            damage = 0;
+            return;
+        }
+
+        if (damage >= me->GetHealth())
+            damage = me->GetHealth() - 1;
+
+        if (me->GetHealth() - damage >= CalculatePct(me->GetMaxHealth(), 1.5f))
+            return;
+
+        _defeated = true;
+        me->InterruptNonMeleeSpells(true);
+        DoCastSelf(SPELL_DEATH_ANIMATION, true);
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            me->KillSelf();
+        }, 500ms);
     }
 
     void JustDied(Unit*  /*who*/) override
@@ -1941,27 +1974,72 @@ struct boss_yoggsaron_influence_tentacle : public NullCreatureAI
     }
 };
 
+static void ApplyEmpoweredStacks(Unit* target)
+{
+    uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
+
+    if (!stack)
+    {
+        target->RemoveAura(SPELL_EMPOWERED);
+        target->CastSpell(target, SPELL_WEAKENED, true);
+    }
+    else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
+    {
+        aur->SetStackAmount(stack);
+        target->RemoveAurasDueToSpell(SPELL_WEAKENED);
+    }
+}
+
 struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 {
-    boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
+    explicit boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
     {
         Reset();
     }
 
-    uint32 _visualTimer;
-    uint32 _spellTimer;
+    static constexpr Milliseconds SPAWN_VISUAL_DELAY = 100ms;
+    static constexpr Milliseconds SPAWN_STASIS_TIME = 4s; // 3.4 sniffs show 800ms, 3.1 footage show 4s
+    static constexpr Milliseconds DRAIN_LIFE_HEALTH_CHECK = 2s;
+    static constexpr Milliseconds DRAIN_LIFE_INTERVAL = 9500ms;
 
     void Reset() override
     {
-        me->CastSpell(me, SPELL_RECENTLY_SPAWNED, true);
-        //me->CastSpell(me, SPELL_EMPOWERED_PASSIVE, true);
+        DoCastSelf(SPELL_RECENTLY_SPAWNED, true);
         if (Aura* aur = me->AddAura(SPELL_EMPOWERED_PASSIVE, me))
             aur->SetStackAmount(9);
 
-        _spellTimer = 0;
-        _visualTimer = 1;
+        ApplyEmpoweredStacks(me);
+
+        events.Reset();
+        events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_VISUAL, SPAWN_VISUAL_DELAY);
+        events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_RELEASE, SPAWN_STASIS_TIME);
+        events.ScheduleEvent(EVENT_GUARDIAN_DRAIN_LIFE, DRAIN_LIFE_HEALTH_CHECK);
         me->SetControlled(true, UNIT_STATE_ROOT);
+        _spawnStasis = true;
+    }
+
+    void EngageFromStasis()
+    {
+        if (!_spawnStasis)
+            return;
+
+        _spawnStasis = false;
+        events.CancelEvent(EVENT_GUARDIAN_SPAWN_RELEASE);
+        me->SetControlled(false, UNIT_STATE_ROOT);
         me->SetInCombatWithZone();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        EngageFromStasis();
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (_spawnStasis)
+            return;
+
+        CreatureAI::MoveInLineOfSight(who);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -1978,44 +2056,51 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            events.DelayEvents(Milliseconds(diff));
+            return;
+        }
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_GUARDIAN_SPAWN_VISUAL:
+                    DoCastSelf(SPELL_SIMPLE_TELEPORT, false);
+                    break;
+                case EVENT_GUARDIAN_SPAWN_RELEASE:
+                    EngageFromStasis();
+                    break;
+                case EVENT_GUARDIAN_DRAIN_LIFE:
+                {
+                    Unit* target = me->HealthBelowPct(85) ? SelectTargetFromPlayerList(40.0f) : nullptr;
+                    if (target)
+                    {
+                        DoCast(target, SPELL_DRAIN_LIFE, false);
+                        events.Repeat(DRAIN_LIFE_INTERVAL);
+                    }
+                    else
+                        events.Repeat(DRAIN_LIFE_HEALTH_CHECK);
+
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
         if (!UpdateVictim())
             return;
 
-        if (_visualTimer)
-        {
-            _visualTimer += diff;
-            if (_visualTimer >= 100 && _visualTimer < 10000)
-            {
-                me->CastSpell(me, SPELL_SIMPLE_TELEPORT, false);
-                _visualTimer = 10000;
-            }
-            else if (_visualTimer >= 11000)
-            {
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                _visualTimer = 0;
-            }
-        }
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        _spellTimer += diff;
-        if (_spellTimer >= 9500)
-        {
-            if (me->HealthBelowPct(85))
-            {
-                if (Unit* target = SelectTargetFromPlayerList(40.0f))
-                {
-                    me->CastSpell(target, SPELL_DRAIN_LIFE, false);
-                    _spellTimer = 0;
-                }
-            }
-            else
-                _spellTimer = 7500;
-        }
-
-        DoMeleeAttackIfReady();
+        if (!_spawnStasis)
+            DoMeleeAttackIfReady();
     }
+
+private:
+    bool _spawnStasis{};
 };
 
 struct boss_yoggsaron_lich_king : public NullCreatureAI
@@ -2046,7 +2131,6 @@ struct boss_yoggsaron_lich_king : public NullCreatureAI
             return;
 
         creature->AI()->Talk(text);
-            return;
     }
 
     void UpdateAI(uint32 diff) override
@@ -2122,7 +2206,6 @@ struct boss_yoggsaron_llane : public NullCreatureAI
             return;
 
         creature->AI()->Talk(text);
-            return;
     }
 
     void UpdateAI(uint32 diff) override
@@ -2557,14 +2640,17 @@ class spell_yogg_saron_lunatic_gaze : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        std::list<WorldObject*> tmplist;
-        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-            if ((*itr)->HasInArc(M_PI, GetCaster()))
-                tmplist.push_back(*itr);
+        Unit* caster = GetCaster();
+        // 64168 inherits SPELL_ATTR2_IGNORE_LINE_OF_SIGHT from the aura triggering it, so the illusion room walls have to be checked here
+        bool ignoreLos = GetSpellInfo()->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT);
 
-        targets.clear();
-        for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-            targets.push_back(*itr);
+        targets.remove_if([caster, ignoreLos](WorldObject* target)
+        {
+            if (!target->HasInArc(M_PI, caster))
+                return true;
+
+            return !ignoreLos && !caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2);
+        });
     }
 
     void Register() override
@@ -2619,19 +2705,7 @@ class spell_yogg_saron_empowered_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        Unit* target = GetUnitOwner();
-        uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
-
-        if (!stack)
-        {
-            target->RemoveAura(SPELL_EMPOWERED);
-            target->CastSpell(target, SPELL_WEAKENED, true);
-        }
-        else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
-        {
-            aur->SetStackAmount(stack);
-            target->RemoveAurasDueToSpell(SPELL_WEAKENED);
-        }
+        ApplyEmpoweredStacks(GetUnitOwner());
     }
 
     void Register() override
@@ -2841,9 +2915,27 @@ class spell_yogg_saron_sanity_reduce : public SpellScript
         }
     }
 
+    // Psychosis and Malady of the Mind skip anyone at 40 Sanity or less, so that their random
+    // targeting evens out across the raid instead of finishing off the lowest players.
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([](WorldObject* target)
+        {
+            Unit* unit = target->ToUnit();
+            if (!unit)
+                return true;
+
+            Aura* sanity = unit->GetAura(SPELL_SANITY);
+            return !sanity || sanity->GetStackAmount() <= 40;
+        });
+    }
+
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_sanity_reduce::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
+
+        if (m_scriptSpellId == SPELL_SARA_PSYCHOSIS_10 || m_scriptSpellId == SPELL_SARA_PSYCHOSIS_25 || m_scriptSpellId == SPELL_MALADY_OF_THE_MIND)
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_sanity_reduce::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -3000,12 +3092,14 @@ class spell_yogg_saron_grim_reprisal_aura : public AuraScript
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
 
         if (!damageInfo || !damageInfo->GetDamage())
-        {
             return;
-        }
+
+        Unit* attacker = damageInfo->GetAttacker();
+        if (!attacker || attacker->IsTotem())
+            return;
 
         int32 damage = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), 60);
-        GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, damageInfo->GetAttacker(), true, nullptr, aurEff);
+        GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, attacker, true, nullptr, aurEff);
     }
 
     void Register() override
