@@ -877,12 +877,19 @@ UPDATE `creature_addon` SET `auras` = NULL WHERE `guid` IN (44162, 44164, 44165,
 -- Keep entry combat scripts alongside the spawn-specific ritual (DONT_OVERRIDE_ENTRY_SAI).
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 134217728 WHERE `entry` IN (5648, 5650);
 
+-- Keep Demon Skin on the shared entry, including rebuffing in combat after the ritual is interrupted.
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 5648 AND `source_type` = 0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(5648, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 18396, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Shadowcaster - On Aggro - Cast Dismounting Blast'),
+(5648, 0, 1, 0, 60, 0, 100, 0, 1000, 1000, 1000, 1000, 0, 0, 11, 20798, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Shadowcaster - On Update - Cast Demon Skin If Missing'),
+(5648, 0, 2, 0, 0, 0, 100, 0, 0, 1000, 3000, 4000, 0, 0, 11, 12471, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Shadowcaster - In Combat - Cast Shadow Bolt'),
+(5648, 0, 3, 0, 0, 0, 100, 0, 4000, 10000, 13000, 24000, 0, 0, 11, 14032, 0, 0, 0, 0, 0, 5, 30, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Shadowcaster - In Combat - Cast Shadow Word: Pain'),
+(5648, 0, 4, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Shadowcaster - Between 0-15% Health - Flee For Assist');
+
 -- Reset fires on spawn and after returning home. Aggro interrupts the normal channel cast.
--- Apply Demon Skin first without a cast time or GCD, so the channel cannot block the buff.
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-44162, -44164, -44165, -44169) AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-44162, 0, 5, 6, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 20798, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Shadowcaster - On Reset - Cast Demon Skin'),
-(-44162, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 8734, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Shadowcaster - On Link - Cast Blackfathom Channeling'),
+(-44162, 0, 5, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 8734, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Shadowcaster - On Reset - Cast Blackfathom Channeling'),
 (-44164, 0, 4, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 8734, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Witch Doctor - On Reset - Cast Blackfathom Channeling'),
 (-44165, 0, 4, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 8734, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Witch Doctor - On Reset - Cast Blackfathom Channeling'),
 (-44169, 0, 4, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 8734, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sandfury Witch Doctor - On Reset - Cast Blackfathom Channeling');
