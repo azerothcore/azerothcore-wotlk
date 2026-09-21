@@ -1,3 +1,4 @@
+-- DB update 2026_09_21_06 -> 2026_09_21_07
 -- Zul'Farrak: missing patrols and coordinated Shadowhunter/Sandcrawler groups (#11775).
 -- Positions and routes: private TBC Classic Anniversary capture, build 69795.
 -- Keep existing troll entries: the same occupied slots have different entries between captures.
