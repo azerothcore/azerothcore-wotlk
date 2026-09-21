@@ -829,16 +829,6 @@ struct npc_pet_darting_hatchling : public NullCreatureAI
     }
 };
 
-struct npc_pet_proto_drake_whelp : public NullCreatureAI
-{
-    npc_pet_proto_drake_whelp(Creature* c) : NullCreatureAI(c) { }
-
-    void Reset() override
-    {
-        me->SetAnimTier(AnimTier::Fly);
-    }
-};
-
 void AddSC_generic_pet_scripts()
 {
     RegisterCreatureAI(npc_pet_gen_soul_trader_beacon);
@@ -854,5 +844,4 @@ void AddSC_generic_pet_scripts()
     RegisterCreatureAI(npc_pet_gen_fetch_ball);
     RegisterCreatureAI(npc_pet_gen_moth);
     RegisterCreatureAI(npc_pet_darting_hatchling);
-    RegisterCreatureAI(npc_pet_proto_drake_whelp);
 }
