@@ -1,3 +1,4 @@
+-- DB update 2026_09_21_03 -> 2026_09_21_04
 -- Displacement Device (Ulduar): the dome the Chamber Overseer drops rendered half sunk into the
 -- floor and never moved, because entry 34203 runs NullCreatureAI and has no movement template.
 --
