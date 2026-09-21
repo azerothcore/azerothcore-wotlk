@@ -53,6 +53,7 @@ ARG CSCRIPTS_DEFAULT_LINKAGE="static"
 ARG CWITH_WARNINGS="ON"
 ARG CMAKE_EXTRA_OPTIONS=""
 ARG GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+ARG BUILD_JOBS=""
 
 ARG CCACHE_DIR="/ccache"
 ARG CCACHE_MAXSIZE="1000MB"
@@ -64,7 +65,7 @@ ARG CCACHE_LOGFILE=""
 
 RUN apt-get update                                                     \
     && apt-get install -y --no-install-recommends                         \
-        build-essential ccache libtool cmake-data ninja-build cmake clang    \
+        build-essential ccache libtool cmake-data ninja-build cmake clang python3 rsync \
         git lsb-base curl unzip default-mysql-client openssl                  \
         default-libmysqlclient-dev libboost-all-dev libssl-dev libmysql++-dev \
         libreadline-dev zlib1g-dev libbz2-dev libncurses5-dev liblzma-dev  \
@@ -75,22 +76,24 @@ COPY conf /azerothcore/conf
 COPY deps /azerothcore/deps
 COPY src /azerothcore/src
 COPY modules /azerothcore/modules
+COPY apps/docker/build-cache.py /usr/local/bin/ac-build-cache.py
 
 ARG CACHEBUST=1
 
 WORKDIR /azerothcore/build
 
 RUN --mount=type=cache,target=/ccache,sharing=locked \
+    --mount=type=cache,id=azerothcore-build,target=/azerothcore/build,sharing=locked \
     # This may seem silly (and it is), but AzerothCore wants the git repo at
     # build time. The git repo is _huge_ and it's not something that really
     # makes sense to mount into the container, but this way we can let the build
     # have the information it needs without including the hundreds of megabytes
     # of git repo into the container.
-    --mount=type=bind,target=/azerothcore/.git,source=.git \
-    git config --global --add safe.directory /azerothcore \
-    && cmake /azerothcore \
+    --mount=type=bind,target=/azerothcore/build/source/.git,source=.git \
+    git config --global --add safe.directory /azerothcore/build/source \
+    && python3 /usr/local/bin/ac-build-cache.py \
+       /azerothcore /azerothcore/build /azerothcore/env/dist "$BUILD_JOBS" \
        -G Ninja \
-       -DCMAKE_INSTALL_PREFIX="/azerothcore/env/dist"  \
        -DAPPS_BUILD="all"                              \
        -DTOOLS_BUILD="$CTOOLS_BUILD"                   \
        -DSCRIPTS="$CSCRIPTS"                           \
@@ -101,9 +104,7 @@ RUN --mount=type=cache,target=/ccache,sharing=locked \
        -DCMAKE_C_COMPILER="clang"                      \
        -DCMAKE_CXX_COMPILER_LAUNCHER="ccache"          \
        -DCMAKE_C_COMPILER_LAUNCHER="ccache"            \
-       -DBoost_USE_STATIC_LIBS="ON"                    \
-    && cmake --build . --config "$CTYPE" -j $(($(nproc) + 1)) \
-    && cmake --install . --config "$CTYPE"
+       -DBoost_USE_STATIC_LIBS="ON"
 
 #############################
 # Base runtime for services #
