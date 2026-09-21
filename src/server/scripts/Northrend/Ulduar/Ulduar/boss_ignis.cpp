@@ -115,7 +115,7 @@ struct npc_ulduar_iron_construct : public ScriptedAI
         {
             InstanceScript* instance = me->GetInstanceScript();
             Creature* ignis = instance ? instance->GetCreature(BOSS_IGNIS) : nullptr;
-            // the spell is a slow missile, so it can land after Ignis died or evaded
+            // the spell is a slow missile, so it can still land after Ignis evaded
             if (!ignis || !ignis->IsEngaged())
                 return;
 
