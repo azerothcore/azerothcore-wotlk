@@ -37,6 +37,7 @@ enum IgnisSpellData
     SPELL_GRAB                     = 62707,
     SPELL_GRAB_TRIGGERED           = 62708,
     SPELL_GRAB_CONTROL_2           = 62711,
+    SPELL_KILL_ALL_CONSTRUCTS      = 65109,
 
     SPELL_SCORCHED_GROUND          = 62548,
     SPELL_HEAT_AREA                = 62343,
@@ -112,16 +113,18 @@ struct npc_ulduar_iron_construct : public ScriptedAI
     {
         if (spell->Id == SPELL_ACTIVATE_CONSTRUCT)
         {
+            InstanceScript* instance = me->GetInstanceScript();
+            Creature* ignis = instance ? instance->GetCreature(BOSS_IGNIS) : nullptr;
+            // the spell is a slow missile, so it can land after Ignis died or evaded
+            if (!ignis || !ignis->IsEngaged())
+                return;
+
             me->RemoveAura(38757);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_AGGRESSIVE);
-            if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
-                {
-                    ignis->CastSpell(ignis, SPELL_STRENGTH_OF_THE_CREATOR, true);
-                    AttackStart(ignis->GetVictim());
-                    DoZoneInCombat();
-                }
+            ignis->CastSpell(ignis, SPELL_STRENGTH_OF_THE_CREATOR, true);
+            AttackStart(ignis->GetVictim());
+            DoZoneInCombat();
         }
         else if (spell->Id == SPELL_HEAT_BUFF)
         {
@@ -266,11 +269,7 @@ struct boss_ignis : public BossAI
         Talk(SAY_DEATH);
         _JustDied();
 
-        std::list<Creature*> icl;
-        me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
-        for (std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr)
-            if ((*itr)->IsAlive() && (*itr)->IsInCombat())
-                Unit::Kill(*itr, *itr);
+        DoCastAOE(SPELL_KILL_ALL_CONSTRUCTS, true);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
