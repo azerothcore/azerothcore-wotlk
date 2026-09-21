@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SessionScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
-#include "SessionScript.h"
 
 void ScriptMgr::OnSessionUpdate(WorldSession* session, uint32 diff)
 {
