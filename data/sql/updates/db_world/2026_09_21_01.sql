@@ -1,3 +1,4 @@
+-- DB update 2026_09_21_00 -> 2026_09_21_01
 -- Deathbringer Saurfang intro and outro: the emotes played with each line, and the Orcish line spoken in Orcish.
 UPDATE `creature_text` SET `Emote` = 22 WHERE `CreatureID` = 37200 AND `GroupID` = 0;
 UPDATE `creature_text` SET `Emote` = 6 WHERE `CreatureID` = 37200 AND `GroupID` = 1;
