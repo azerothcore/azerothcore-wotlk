@@ -871,6 +871,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 -- An addon aura alone does not start a channel. Keep their addon posture, but let SmartAI cast the spell.
 UPDATE `creature` SET `VerifiedBuild` = 69795 WHERE `id` = 5648 AND `guid` = 44162;
 UPDATE `creature` SET `VerifiedBuild` = 69795 WHERE `id` = 5650 AND `guid` IN (44164, 44165, 44169);
+UPDATE `creature` SET `position_x` = 1672.046, `position_y` = 905.6652, `position_z` = 9.18286, `orientation` = 3.5830138 WHERE `id` = 5650 AND `guid` = 44169;
 UPDATE `creature_addon` SET `auras` = NULL WHERE `guid` IN (44162, 44164, 44165, 44169) AND `auras` = '8734';
 
 -- Preserve the complete entry scripts; only the new, GUID-conditioned OOC events start the ritual.
