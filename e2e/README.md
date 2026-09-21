@@ -161,15 +161,6 @@ If the scenario should stay as a regression, **move** it into `suites/` next to 
 
 ---
 
-### Isle of Conquest #24438: manual validation pending
-
-On a dedicated test realm, capture objectives and destroy gates, then enter a fresh
-Isle of Conquest match without restarting the client. Before anyone captures a base,
-verify the five field objectives are neutral, each keep belongs to its starting faction,
-and all gates appear intact. Also join an ongoing match with contested/captured bases
-and destroyed gates and verify that its actual state is displayed. Repeat for both factions.
-The unit tests check the initial packet contents, not the client's rendering or queue flow.
-
 ## Parallelism and isolation
 
 ### Model
