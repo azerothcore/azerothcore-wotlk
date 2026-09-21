@@ -793,10 +793,7 @@ struct npc_mistress_nagmara : public CreatureAI
                     break;
                 case EVENT_OPEN_BAR_DOOR:
                     if (OpenBarDoor())
-                    {
-                        _doorOpenedByEvent = true;
                         _events.ScheduleEvent(EVENT_CONTINUE_AFTER_DOOR, 3s);
-                    }
                     else if (++_doorOpenAttempts < 30)
                         _events.ScheduleEvent(EVENT_OPEN_BAR_DOOR, 1s);
                     else
