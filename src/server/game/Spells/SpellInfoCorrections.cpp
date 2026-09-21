@@ -5253,11 +5253,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
-    // Heroic Strike (Dark Rune Sentinel, Kalecgos, Injured Warsong Warrior)
-    // spell level 1, so creature level scaling turns the 58-74 bonus into ~25k-92k
-    ApplySpellFix({ 45026 }, [](SpellInfo* spellInfo)
+    // spell level 1 makes creature level scaling multiply the flat bonus by ~1000x, scale from level 10 instead
+    ApplySpellFix({
+        45026, // Heroic Strike
+        29426  // Heroic Strike
+        }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Attributes &= ~SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL;
+        spellInfo->SpellLevel = 10;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
