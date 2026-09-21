@@ -39,11 +39,17 @@ namespace
     {
         std::vector<std::pair<uint8, uint8>> out;
         ForEachRaceClass(raceMask, classMask, maxRaces, allowAll,
-            [&out](uint8 raceId, uint8 classId) { out.emplace_back(raceId, classId); });
+            [&out](uint8 raceId, uint8 classId)
+        {
+            out.emplace_back(raceId, classId);
+        });
         return out;
     }
 
-    constexpr uint32 MaskOf(uint8 id) { return 1u << (id - 1); }
+    constexpr uint32 MaskOf(uint8 id)
+    {
+        return 1u << (id - 1);
+    }
 }
 
 TEST(PlayerCreateInfoMaskTest, SingleBitPairSelectsOneCombination)

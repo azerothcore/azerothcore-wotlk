@@ -4338,7 +4338,21 @@ void ObjectMgr::PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint3
         return;
 
     if (count > 0)
+    {
+        // Two rows whose masks both cover this pair would each grant the item. Masks make that
+        // reachable where one row per pair could not.
+        for (PlayerCreateInfoItem const& existing : _playerInfo[race_][class_]->item)
+        {
+            if (existing.item_id == itemId)
+            {
+                LOG_ERROR("sql.sql", "Item {} is granted to race {} class {} by more than one row in "
+                    "`playercreateinfo_item`; it will be given more than once.", itemId, race_, class_);
+                break;
+            }
+        }
+
         _playerInfo[race_][class_]->item.push_back(PlayerCreateInfoItem(itemId, count));
+    }
     else
     {
         if (count < -1)
@@ -4774,11 +4788,26 @@ void ObjectMgr::LoadPlayerInfo()
                 ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(), true,
                     [&](uint8 raceId, uint8 classId)
                 {
-                    if (PlayerInfo* info = _playerInfo[raceId][classId])
+                    PlayerInfo* info = _playerInfo[raceId][classId];
+                    if (!info)
+                        return;
+
+                    // Player::addActionButton is keyed by button, so a second row covering the same
+                    // pair would replace the first without a word. Masks make that reachable.
+                    for (PlayerCreateInfoAction const& existing : info->action)
                     {
-                        info->action.push_back(action);
-                        ++count;
+                        if (existing.button == action.button)
+                        {
+                            LOG_ERROR("sql.sql", "Button {} for race {} class {} is set by more than "
+                                "one row in `playercreateinfo_action`; raceMask {} classMask {} "
+                                "replaces action {}.", action.button, raceId, classId, raceMask,
+                                classMask, existing.action);
+                            break;
+                        }
                     }
+
+                    info->action.push_back(action);
+                    ++count;
                 });
             } while (result->NextRow());
 
