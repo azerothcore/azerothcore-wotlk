@@ -1359,3 +1359,92 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 	bot.DamageKill(t, adds, 10_000_000, 30*time.Second)
 	bot.AssertWorldAlive(t)
 }
+
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27718
+// Each Elder count has its own Freya's Gift, and the emblems the fix corrects are per chest, so
+// the chest that spawns has to be the one for the Elders actually left alive. The emblems inside
+// are out of reach here: a chest opens only through SPELL_EFFECT_OPEN_LOCK (Spell::SendLoot),
+// CMSG_LOOT drops any guid that is not a creature, and the harness cannot cast at a gameobject
+// target. Inventoried as blocked-harness in e2e/README.md.
+func TestUlduar_FreyaGiftMatchesElderCount(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"short", "instances"},
+		Runtime:  "short",
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcFreya           = uint32(32906)
+		npcElderIronbranch = uint32(32913)
+		npcElderStonebark  = uint32(32914)
+
+		// 10-man spawns 194330 for no Elder alive, 194328 for one, 194326 for two, 194324 for all
+		// three.
+		goGiftNoElder     = uint32(194330)
+		goGiftOneElder    = uint32(194328)
+		goGiftTwoElders   = uint32(194326)
+		goGiftThreeElders = uint32(194324)
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "FreyaGf",
+		Level:  80,
+	})
+
+	// Raid interior pad (game_tele BossFreya); stay GM through the raid enter.
+	bot.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Freya pad tele map=%d", m)
+	}
+	bot.GoCreatureID(t, npcFreya)
+
+	// Ironbranch and Stonebark stand 136y and 144y from Freya, inside visibility. Brightleaf at
+	// 190y is out of the object cache and never touched, so he is the one left to empower her.
+	var toKill []uint64
+	for _, entry := range []uint32{npcElderIronbranch, npcElderStonebark} {
+		elder := bot.WaitUnit(t, entry, 30*time.Second)
+		if hp, _ := bot.UnitHP(elder); hp == 0 {
+			e2eharness.Preconditionf(t, "Elder %d is already a corpse: this instance copy is not fresh", entry)
+		}
+		toKill = append(toKill, elder)
+	}
+	bot.DamageKill(t, toKill, 10_000_000, 20*time.Second)
+
+	bot.CombatReady(t)
+
+	// Evade can leave a 0 HP object in cache, so wait for a living Freya rather than any GUID.
+	var freyaGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		freyaGUID = bot.WaitUnit(t, npcFreya, 10*time.Second)
+		if hp, maxHP := bot.UnitHP(freyaGUID); maxHP > 0 && hp > 0 && bot.World.GetObject(freyaGUID) != nil {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Freya in cache after GoCreatureID (last=0x%X)", freyaGUID)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	// The Elders are read on engage, and only the living ones count.
+	bot.Engage(t, freyaGUID, 15*time.Second)
+
+	// Freya's DamageTaken runs the whole defeat: it zeroes the killing blow, summons the chest and
+	// teleports her out. She never reaches 0 HP, so DamageKill would spin until it timed out.
+	bot.Damage(t, freyaGUID, 100_000_000)
+
+	chest := e2eharness.TryNearbyGameObjectByEntry(t, bot.World, goGiftOneElder, 30*time.Second)
+	if chest == 0 {
+		for _, other := range []struct {
+			entry  uint32
+			elders int
+		}{{goGiftNoElder, 0}, {goGiftTwoElders, 2}, {goGiftThreeElders, 3}} {
+			if e2eharness.TryNearbyGameObjectByEntry(t, bot.World, other.entry, time.Second) != 0 {
+				e2eharness.Assertf(t, "Freya's Gift %d spawned: the script counted %d Elders alive, want 1",
+					other.entry, other.elders)
+			}
+		}
+		e2eharness.Preconditionf(t, "no Freya's Gift within 30s of Freya's defeat")
+	}
+	t.Logf("PASS Freya's Gift %d spawned with one Elder alive (guid=0x%X)", goGiftOneElder, chest)
+	bot.AssertWorldAlive(t)
+}
