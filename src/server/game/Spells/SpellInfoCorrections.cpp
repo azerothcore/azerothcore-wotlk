@@ -5260,6 +5260,15 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Heroic Strike
+    ApplySpellFix({
+        45026,
+        29426
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellLevel = 10;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
