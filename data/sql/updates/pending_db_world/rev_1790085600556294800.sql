@@ -341,43 +341,44 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Combat Spells
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18948 AND `id` IN (3, 4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18948, 0, 3, 0, 0, 0, 100, 0, 3000, 9000, 8000, 13000, 0, 0, 11, 33626, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Soldier - In Combat - Cast Strike'),
-(18948, 0, 4, 0, 0, 0, 40, 0, 3000, 29000, 28000, 53000, 0, 0, 11, 23511, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Soldier - In Combat - Cast Demoralizing Shout');
+(18948, 0, 3, 0, 0, 0, 100, 0, 2000, 6500, 1700, 8100, 0, 0, 11, 33626, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Soldier - In Combat - Cast Strike'),
+(18948, 0, 4, 0, 0, 0, 100, 0, 1200, 11300, 15000, 27600, 0, 0, 11, 23511, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Soldier - In Combat - Cast Demoralizing Shout');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18965 AND `id` IN (3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18965, 0, 3, 0, 0, 0, 100, 0, 0, 2000, 2000, 3000, 0, 0, 11, 15620, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Archer - In Combat - Cast Shoot');
+(18965, 0, 3, 0, 0, 0, 100, 0, 0, 1700, 2900, 3300, 0, 0, 11, 15620, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Archer - In Combat - Cast Shoot');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18986 AND `id` IN (3, 4));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18986 AND `id` IN (3, 4, 5));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18986, 0, 3, 0, 0, 0, 100, 0, 3000, 9000, 8000, 13000, 0, 0, 11, 20696, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Paladin - In Combat - Cast Holy Smite'),
-(18986, 0, 4, 0, 0, 0, 40, 0, 3000, 12000, 15000, 28000, 0, 0, 11, 33632, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Paladin - In Combat - Cast Exorcism');
+(18986, 0, 3, 0, 0, 0, 100, 0, 0, 1700, 16200, 18600, 0, 0, 11, 33632, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Paladin - In Combat - Cast Exorcism'),
+(18986, 0, 4, 0, 0, 0, 100, 0, 9600, 13300, 30800, 32400, 0, 0, 11, 13903, 32, 0, 0, 0, 0, 26, 30, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Paladin - In Combat - Cast Seal of Sacrifice'),
+(18986, 0, 5, 0, 0, 0, 100, 0, 12900, 25700, 11300, 12900, 0, 0, 11, 13005, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Paladin - In Combat - Cast Hammer of Justice');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18949 AND `id` IN (3, 4, 5));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18949, 0, 3, 0, 0, 0, 100, 0, 1000, 2000, 3000, 5000, 0, 0, 11, 33417, 192, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Mage - In Combat - Cast Fireball'),
-(18949, 0, 4, 0, 0, 0, 100, 0, 3000, 17000, 20000, 40000, 0, 0, 11, 33419, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Mage - In Combat - Cast Arcane Missiles'),
-(18949, 0, 5, 0, 0, 0, 100, 0, 3000, 27000, 30000, 50000, 0, 0, 11, 33624, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Mage - In Combat - Cast Blizzard');
+(18949, 0, 3, 0, 0, 0, 100, 0, 0, 1600, 3200, 3300, 0, 0, 11, 33417, 192, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Mage - In Combat - Cast Fireball'),
+(18949, 0, 4, 0, 0, 0, 100, 0, 0, 4800, 5300, 11300, 0, 0, 11, 33419, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Mage - In Combat - Cast Arcane Missiles'),
+(18949, 0, 5, 0, 0, 0, 100, 0, 12000, 21000, 24300, 30800, 0, 0, 11, 33624, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Mage - In Combat - Cast Blizzard');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18950 AND `id` IN (3, 4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18950, 0, 3, 0, 0, 0, 100, 0, 3000, 9000, 8000, 13000, 0, 0, 11, 33626, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Grunt - In Combat - Cast Strike'),
-(18950, 0, 4, 0, 0, 0, 40, 0, 3000, 29000, 28000, 53000, 0, 0, 11, 23511, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Grunt - In Combat - Cast Demoralizing Shout');
+(18950, 0, 3, 0, 0, 0, 100, 0, 2000, 6500, 1700, 6600, 0, 0, 11, 33626, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Grunt - In Combat - Cast Strike'),
+(18950, 0, 4, 0, 0, 0, 100, 0, 1600, 11800, 16300, 21800, 0, 0, 11, 23511, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Grunt - In Combat - Cast Demoralizing Shout');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18970 AND `id` IN (3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18970, 0, 3, 0, 0, 0, 100, 0, 0, 2000, 2300, 3900, 0, 0, 11, 10277, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkspear Axe Thrower - In Combat - Cast Throw');
+(18970, 0, 3, 0, 0, 0, 100, 0, 0, 1600, 3100, 3200, 0, 0, 11, 10277, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkspear Axe Thrower - In Combat - Cast Throw');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18972 AND `id` IN (3, 4));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18972 AND `id` IN (3, 4, 5));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18972, 0, 3, 0, 0, 0, 100, 0, 3000, 12000, 12000, 18000, 0, 0, 11, 15616, 0, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Shaman - In Combat - Cast Flame Shock'),
-(18972, 0, 4, 0, 0, 0, 100, 0, 0, 5000, 60000, 60000, 0, 0, 11, 20545, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Shaman - In Combat - Cast Lightning Shield');
+(18972, 0, 3, 0, 0, 0, 100, 0, 0, 3600, 8100, 9800, 0, 0, 11, 15616, 0, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Shaman - In Combat - Cast Flame Shock'),
+(18972, 0, 4, 0, 0, 0, 100, 0, 0, 5000, 5000, 5000, 0, 0, 11, 20545, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Shaman - In Combat - Cast Lightning Shield'),
+(18972, 0, 5, 0, 0, 0, 100, 0, 8000, 11300, 30700, 32800, 0, 0, 11, 16170, 32, 0, 0, 0, 0, 26, 30, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Shaman - In Combat - Cast Bloodlust');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18971 AND `id` IN (3, 4, 5));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(18971, 0, 3, 0, 0, 0, 100, 0, 1000, 2000, 3000, 5000, 0, 0, 11, 33417, 192, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Mage - In Combat - Cast Fireball'),
-(18971, 0, 4, 0, 0, 0, 100, 0, 3000, 17000, 20000, 40000, 0, 0, 11, 33419, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Mage - In Combat - Cast Arcane Missiles'),
-(18971, 0, 5, 0, 0, 0, 100, 0, 3000, 27000, 30000, 50000, 0, 0, 11, 33624, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Mage - In Combat - Cast Blizzard');
+(18971, 0, 3, 0, 0, 0, 100, 0, 0, 1600, 1600, 1600, 0, 0, 11, 33463, 192, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Mage - In Combat - Cast Icebolt'),
+(18971, 0, 4, 0, 0, 0, 100, 0, 10900, 14200, 22700, 25200, 0, 0, 11, 33624, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Mage - In Combat - Cast Blizzard');
 
 -- Start Movement SAI
 DELETE FROM `smart_scripts` WHERE (`entryorguid` BETWEEN -(@CGUID+35) AND -(@CGUID+0)) AND (`source_type` = 0) AND (`id` IN (1000));
@@ -418,3 +419,43 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+33), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@CGUID+33)*10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stair of Destiny Soldier - On Respawn - Start Path'),
 (-(@CGUID+34), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@CGUID+34)*10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stair of Destiny Soldier - On Respawn - Start Path'),
 (-(@CGUID+35), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@CGUID+35)*10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stair of Destiny Soldier - On Respawn - Start Path');
+
+-- Totem Passives
+DELETE FROM `creature_template_spell` WHERE (`CreatureID` IN (19222, 19225) AND `Index` = 0);
+INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
+(19222, 0, 33561, 50664),
+(19225, 0, 33571, 50664);
+
+-- Captains - Combat SAI
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (18966, 18969));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+-- Alliance - 18966 Justinius the Harbinger
+(18966, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - On Aggro - Say Line 0'),
+(18966, 0, 1, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 9705, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - On Aggro - Play Distance Sound'),
+(18966, 0, 2, 0, 0, 0, 100, 0, 5300, 9400, 11300, 14200, 0, 0, 11, 33554, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - In Combat - Cast Judgement of Command'),
+(18966, 0, 3, 0, 74, 0, 100, 0, 400, 4800, 12900, 19300, 70, 40, 11, 33641, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - On Friendly Between 0-70% Health - Cast Flash of Light'),
+(18966, 0, 4, 0, 0, 0, 100, 0, 13800, 17800, 30800, 40500, 0, 0, 11, 33564, 32, 0, 0, 0, 0, 26, 30, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - In Combat - Cast Greater Blessing of Might'),
+(18966, 0, 5, 0, 2, 0, 100, 0, 0, 80, 45000, 60000, 0, 0, 11, 33559, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - Between 0-80% Health - Cast Consecration'),
+(18966, 0, 6, 0, 2, 0, 100, 0, 0, 50, 30800, 30800, 0, 0, 11, 33581, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - Between 0-50% Health - Cast Divine Shield'),
+(18966, 0, 42, 0, 11, 0, 100, 512, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - On Respawn - Set Active On'),
+(18966, 0, 43, 0, 36, 0, 100, 512, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - On Corpse Removed - Set Active On'),
+-- Horde - 18969 Melgromm Highmountain
+(18969, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 5884, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - On Aggro - Play Distance Sound'),
+(18969, 0, 1, 0, 0, 0, 100, 0, 3100, 6400, 9600, 16200, 0, 0, 11, 33643, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - In Combat - Cast Chain Lightning'),
+(18969, 0, 2, 0, 0, 0, 100, 0, 4400, 8900, 8100, 16200, 0, 0, 11, 22885, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - In Combat - Cast Earth Shock'),
+(18969, 0, 3, 0, 74, 0, 100, 0, 4100, 8400, 12900, 20600, 70, 40, 11, 33642, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - On Friendly Between 0-70% Health - Cast Chain Heal'),
+(18969, 0, 4, 0, 0, 0, 100, 0, 1200, 9700, 32300, 43700, 0, 0, 11, 33570, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - In Combat - Cast Strength of the Storm Totem'),
+(18969, 0, 5, 0, 0, 0, 25, 0, 23500, 23500, 17800, 40000, 0, 0, 11, 33560, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - In Combat - Cast Magma Flow Totem'),
+(18969, 0, 6, 0, 2, 0, 100, 1, 0, 2, 0, 0, 0, 0, 80, 1896900, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - Between 0-2% Health - Run Script (No Repeat)'),
+(18969, 0, 42, 0, 11, 0, 100, 512, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - On Respawn - Set Active On'),
+(18969, 0, 43, 0, 36, 0, 100, 512, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - On Corpse Removed - Set Active On');
+
+-- Melgromm Highmountain - Play Dead Actionlist
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1896900);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1896900, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - Actionlist - Set Invincibility Hp 1'),
+(1896900, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 31261, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - Actionlist - Cast Permanent Feign Death (Root)'),
+(1896900, 9, 2, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 11, 32343, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - Actionlist - Cast Revive Self'),
+(1896900, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 31261, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - Actionlist - Remove Aura Permanent Feign Death (Root)'),
+(1896900, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 142, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - Actionlist - Set Health Pct 100'),
+(1896900, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - Actionlist - Reset Invincibility Hp');
