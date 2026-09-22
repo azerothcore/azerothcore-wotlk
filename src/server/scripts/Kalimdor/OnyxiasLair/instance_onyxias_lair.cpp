@@ -25,31 +25,36 @@ ObjectData const creatureData[] =
     { 0,          0           }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_ONYXIA, new CircleBoundary(Position(-10.6155f, -219.357f), 95.0) }
+};
+
 class instance_onyxias_lair : public InstanceMapScript
 {
 public:
     instance_onyxias_lair() : InstanceMapScript("instance_onyxias_lair", MAP_ONYXIAS_LAIR) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
-        return new instance_onyxias_lair_InstanceMapScript(pMap);
+        return new instance_onyxias_lair_InstanceMapScript(map);
     }
 
     struct instance_onyxias_lair_InstanceMapScript : public InstanceScript
     {
-        instance_onyxias_lair_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
-
-        std::string str_data;
-        uint16 ManyWhelpsCounter;
-        bool bDeepBreath;
+        instance_onyxias_lair_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            Initialize();
+        }
 
         void Initialize() override
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
-            ManyWhelpsCounter = 0;
-            bDeepBreath = true;
             LoadObjectData(creatureData, nullptr);
+            LoadBossBoundaries(boundaries);
+            _manyWhelpsCounter = 0;
+            _deepBreath = true;
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -57,11 +62,13 @@ public:
             switch (go->GetEntry())
             {
                 case GO_WHELP_SPAWNER:
-                    go->CastSpell((Unit*)nullptr, 17646);
+                    go->CastSpell(nullptr, SPELL_SUMMON_WHELP);
                     if (Creature* onyxia = GetCreature(DATA_ONYXIA))
                     {
                         onyxia->AI()->DoAction(ACTION_WHELP_SUMMONED);
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -75,39 +82,46 @@ public:
 
             if (type == DATA_ONYXIA && state == NOT_STARTED)
             {
-                ManyWhelpsCounter = 0;
-                bDeepBreath = true;
+                _manyWhelpsCounter = 0;
+                _deepBreath = true;
             }
 
             return true;
         }
 
-        void SetData(uint32 uiType, uint32 /*uiData*/) override
+        void SetData(uint32 type, uint32 /*data*/) override
         {
-            switch (uiType)
+            switch (type)
             {
                 case DATA_WHELP_SUMMONED:
-                    ++ManyWhelpsCounter;
+                    ++_manyWhelpsCounter;
                     break;
                 case DATA_DEEP_BREATH_FAILED:
-                    bDeepBreath = false;
+                    _deepBreath = false;
+                    break;
+                default:
                     break;
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
+        bool CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
         {
-            switch (criteria_id)
+            switch (criteriaId)
             {
                 case ACHIEV_CRITERIA_MANY_WHELPS_10_PLAYER:
                 case ACHIEV_CRITERIA_MANY_WHELPS_25_PLAYER:
-                    return ManyWhelpsCounter >= 50;
+                    return _manyWhelpsCounter >= 50;
                 case ACHIEV_CRITERIA_DEEP_BREATH_10_PLAYER:
                 case ACHIEV_CRITERIA_DEEP_BREATH_25_PLAYER:
-                    return bDeepBreath;
+                    return _deepBreath;
+                default:
+                    return false;
             }
-            return false;
         }
+
+    private:
+        uint16 _manyWhelpsCounter;
+        bool _deepBreath;
     };
 };
 
