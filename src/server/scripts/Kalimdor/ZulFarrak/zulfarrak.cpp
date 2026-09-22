@@ -419,25 +419,10 @@ enum class WeegliDoorStage
 // TBC Classic Anniversary 2.5.6.69795: barrel placement at the end door.
 Position const WeegliDoorPosition = { 1857.1129f, 1145.692f, 15.184351f, 3.85f };
 
-// Escape route from the same capture, ending at the last recorded destination.
-std::array<Position, 15> const WeegliEscapePath =
-{{
-    { 1885.4933f, 1118.2045f, 9.171623f },
-    { 1866.796f, 1083.2489f, 8.890825f },
-    { 1852.6313f, 1057.8712f, 8.876791f },
-    { 1859.7643f, 1031.1738f, 8.876792f },
-    { 1875.8618f, 1016.4999f, 8.876792f },
-    { 1878.0048f, 996.3937f, 8.877529f },
-    { 1864.4512f, 975.57117f, 9.248044f },
-    { 1850.092f, 954.7588f, 8.881894f },
-    { 1831.214f, 924.3683f, 8.881894f },
-    { 1821.0056f, 908.9256f, 8.889058f },
-    { 1789.5393f, 878.99457f, 8.877297f },
-    { 1769.9774f, 857.2041f, 8.877438f },
-    { 1748.5785f, 834.42944f, 8.876786f },
-    { 1718.3058f, 817.5149f, 8.876786f },
-    { 1696.7391f, 805.065f, 8.955191f }
-}};
+enum WeegliPaths
+{
+    PATH_WEEGLI_ESCAPE = 815530
+};
 
 #define GOSSIP_WEEGLI               "Will you blow up that door now?"
 
@@ -455,7 +440,6 @@ public:
 
         uint32 Bomb_Timer;
         uint32 LandMine_Timer;
-        uint32 escapeWaypoint = 0;
         WeegliDoorStage doorStage = WeegliDoorStage::Idle;
         InstanceScript* instance;
 
@@ -463,7 +447,6 @@ public:
         {
             events.Reset();
             doorStage = WeegliDoorStage::Idle;
-            escapeWaypoint = 0;
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             Reset();
         }
@@ -525,8 +508,8 @@ public:
                         }
 
                         doorStage = WeegliDoorStage::Escaping;
-                        escapeWaypoint = 0;
-                        me->GetMotionMaster()->MovePoint(POINT_WEEGLI_ESCAPE, WeegliEscapePath[escapeWaypoint]);
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveWaypoint(PATH_WEEGLI_ESCAPE, false);
                         break;
                 }
             }
@@ -592,15 +575,6 @@ public:
                 return;
             }
 
-            if (id == POINT_WEEGLI_ESCAPE && doorStage == WeegliDoorStage::Escaping)
-            {
-                if (++escapeWaypoint < WeegliEscapePath.size())
-                    me->GetMotionMaster()->MovePoint(POINT_WEEGLI_ESCAPE, WeegliEscapePath[escapeWaypoint]);
-                else
-                    me->DespawnOrUnsummon();
-                return;
-            }
-
             if (doorStage != WeegliDoorStage::Idle)
                 return;
 
@@ -614,6 +588,12 @@ public:
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
             }
+        }
+
+        void PathEndReached(uint32 pathId) override
+        {
+            if (pathId == PATH_WEEGLI_ESCAPE && doorStage == WeegliDoorStage::Escaping)
+                me->DespawnOrUnsummon();
         }
 
         void DoAction(int32 action) override

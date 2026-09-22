@@ -64,8 +64,7 @@ enum ZulFarrakPoints
     POINT_CREW_STAIRS = 1,
     POINT_CREW_DESCENT,
     POINT_CREW_GATHER,
-    POINT_WEEGLI_DOOR,
-    POINT_WEEGLI_ESCAPE
+    POINT_WEEGLI_DOOR
 };
 
 enum ZFPyramidPhases
