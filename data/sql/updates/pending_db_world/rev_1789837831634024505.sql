@@ -1,2 +1,4 @@
--- XE-321 Boombot: keep the walking bomb model in both raid difficulties.
-DELETE FROM `creature_template_model` WHERE `CreatureID` IN (33346, 33886) AND `CreatureDisplayID` IN (28575, 26442);
+-- XE-321 Boombot: retain the model list while only selecting the walking bomb model in both raid difficulties.
+UPDATE `creature_template_model` SET `Probability` = 0, `VerifiedBuild` = 51831 WHERE `CreatureID` = 33346 AND `Idx` IN (1, 2);
+UPDATE `creature_template_model` SET `VerifiedBuild` = 51831 WHERE `CreatureID` = 33346 AND `Idx` = 0;
+UPDATE `creature_template_model` SET `Probability` = 0 WHERE `CreatureID` = 33886 AND `Idx` IN (1, 2);
