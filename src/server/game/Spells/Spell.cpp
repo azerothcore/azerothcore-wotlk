@@ -6491,29 +6491,46 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                             if (!result || (m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE)))
                                 return SPELL_FAILED_NOPATH;
 
-                            // The limit is on how far you would have to WALK, so a reachable spot blows
-                            // it whenever the way round is long: the WSG graveyard bank is ~21yd straight
-                            // but ~130yd on foot. Re-check without the limit, since BuildShortcut has
-                            // already overwritten the NORMAL/INCOMPLETE result.
-                            PathGenerator reachable(m_caster);
-                            bool built = reachable.CalculatePath(destX, destY, destZ, false);
-                            if (!built || reachable.GetPathType() != PATHFIND_NORMAL)
-                                return SPELL_FAILED_NOPATH;
-
                             // Aim from the target's own footing: backing off along our line would step
                             // back down into the slope we just climbed.
                             Position land = target->GetFirstCollisionPosition(objSize,
                                 target->GetRelativeAngle(m_caster));
-                            m_preGeneratedPath->CalculatePath(land.GetPositionX(), land.GetPositionY(),
-                                land.GetPositionZ(), false);
-                            if (m_preGeneratedPath->GetPath().size() < 2)
+                            if (!m_preGeneratedPath->CalculatePath(land.GetPositionX(),
+                                land.GetPositionY(), land.GetPositionZ(), false))
                                 return SPELL_FAILED_NOPATH;
 
-                            // Climb the slope instead of cutting through it, and bail out when there is
-                            // no slope under the line, so this cannot carry anyone onto a roof. Shortcut
-                            // only: a path that fit the limit is a real route and stays as it is.
-                            if ((m_preGeneratedPath->GetPathType() & PATHFIND_SHORT)
-                                && !m_preGeneratedPath->SnapPathToGround(SMOOTH_PATH_STEP_SIZE, SMOOTH_PATH_STEP_SIZE))
+                            // Two results are safe to carry on with: the same over-long shortcut,
+                            // resampled onto the ground below, or a real navmesh route that fit the
+                            // limit after all, which already ends where we want. Everything else -
+                            // NOPATH, a partial path ending somewhere else, a raw line on a map with
+                            // no mmaps - is a route nothing has validated, and all of it refused the
+                            // cast before this branch existed.
+                            PathType const landType = m_preGeneratedPath->GetPathType();
+                            if (landType != PATHFIND_NORMAL
+                                && landType != PathType(PATHFIND_SHORTCUT | PATHFIND_SHORT))
+                                return SPELL_FAILED_NOPATH;
+
+                            // Same drop check an ordinary charge does. With the target on the lip of
+                            // a bank the back-off steps off the edge and resolves to the ground under
+                            // it, and the charge would spend itself dropping us to the foot of it.
+                            if (m_preGeneratedPath->IsInvalidDestinationZ(target))
+                                return SPELL_FAILED_NOPATH;
+
+                            // The limit is on how far you would have to WALK, so a reachable spot blows
+                            // it whenever the way round is long: the WSG graveyard bank is ~21yd straight
+                            // but ~130yd on foot. Re-check without the limit, since BuildShortcut has
+                            // already overwritten the NORMAL/INCOMPLETE result. Strictly NORMAL, which
+                            // also confirms both ends stand on real navmesh.
+                            PathGenerator reachable(unitCaster);
+                            if (!reachable.CalculatePath(destX, destY, destZ, false)
+                                || reachable.GetPathType() != PATHFIND_NORMAL)
+                                return SPELL_FAILED_NOPATH;
+
+                            // Climb the slope instead of cutting through it: a bare two-point line
+                            // runs yards inside the hill on anything convex, and the client drops you
+                            // out of the world when the spline ends in there.
+                            if (landType != PATHFIND_NORMAL
+                                && !m_preGeneratedPath->SnapPathToGround(SMOOTH_PATH_STEP_SIZE))
                                 return SPELL_FAILED_NOPATH;
                         }
                         else if (cutPath)

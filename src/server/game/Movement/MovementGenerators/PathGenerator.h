@@ -41,6 +41,12 @@ class WorldObject;
 #define VERTEX_SIZE       3
 #define INVALID_POLYREF   0
 
+// SnapPathToGround tolerances, in yards. A sample may sit this far below the straight line before
+// the line counts as clearing a gap rather than climbing a slope, and the surface may rise this
+// far between two samples before it counts as a ledge rather than a climb.
+constexpr float SNAP_PATH_MAX_DROP  = 4.0f;
+constexpr float SNAP_PATH_MAX_CLIMB = 8.0f;
+
 enum PathType
 {
     PATHFIND_BLANK             = 0x00,   // path not built yet
@@ -95,9 +101,12 @@ class PathGenerator
         void ShortenPathUntilDist(G3D::Vector3 const& point, float dist);
 
         // re-samples a straight two-point path onto the ground so a shortcut climbs a slope
-        // instead of cutting through it. Returns false when the ground falls maxDrop below the
-        // line, i.e. there is nothing to climb.
-        [[nodiscard]] bool SnapPathToGround(float stepSize, float maxDrop);
+        // instead of cutting through it. Returns false and leaves the path alone unless every
+        // sample lands on real ground within SNAP_PATH_MAX_CLIMB of the one before it and no more
+        // than SNAP_PATH_MAX_DROP below the line - i.e. a slope, not a gap, a ledge or a roof.
+        // The path stays PATHFIND_SHORTCUT afterwards: the points follow the surface, but they
+        // come from height queries rather than from the navmesh.
+        [[nodiscard]] bool SnapPathToGround(float stepSize);
 
         [[nodiscard]] float getPathLength() const
         {

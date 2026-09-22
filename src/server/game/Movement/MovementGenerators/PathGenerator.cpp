@@ -1197,45 +1197,65 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
     _pathPoints.resize(i + 1);
 }
 
-bool PathGenerator::SnapPathToGround(float stepSize, float maxDrop)
+bool PathGenerator::SnapPathToGround(float stepSize)
 {
     // Only ever a straight shortcut: anything with a middle already follows real navmesh, and
     // flattening it into a line here would throw that route away.
     if (_pathPoints.size() != 2 || stepSize <= 0.0f)
         return false;
 
+    // On a transport UpdateAllowedPositionZ does nothing, so every sample would keep the height
+    // it was probed from and the path would arc through the air.
+    if (_source->GetTransport())
+        return false;
+
     G3D::Vector3 const start = _pathPoints.front();
     G3D::Vector3 const end = _pathPoints.back();
 
-    // Rounded up, so the gap between samples never grows past stepSize and a dip between two of
-    // them can't go unnoticed.
+    // Rounded up, so the spacing never grows past stepSize. It still cannot see a hole narrower
+    // than that, with a sample landing either side of it.
     uint32 const steps = std::max<uint32>(1, uint32(std::ceil((end - start).length() / stepSize)));
-    if (steps < 2)
-        return true;
 
     Movement::PointsArray sampled;
     sampled.reserve(steps + 1);
     sampled.push_back(start);
 
-    // Only the middle needs pinning. Each query starts above the previous point: on a convex
-    // slope the line runs under the surface, and a query from down there leaves the point buried.
     float previousZ = start.z;
     for (uint32 i = 1; i < steps; ++i)
     {
         G3D::Vector3 point = start + (end - start) * (float(i) / float(steps));
         float const lineZ = point.z;
 
-        point.z = std::max(point.z, previousZ) + stepSize * 2.0f;
-        _source->UpdateAllowedPositionZ(point.x, point.y, point.z);
+        // Probe from one climb above whichever sits higher, the line or the point before this
+        // one. Starting above the line is what gets a convex slope right: there the line runs
+        // inside the hill and a query from down there comes back buried. Stopping a climb above
+        // it is what keeps a sample off a roof or a walkway overhead, since the query only ever
+        // reports a surface at or below where it starts and finds the real ground instead.
+        point.z = std::max(lineZ, previousZ) + SNAP_PATH_MAX_CLIMB;
 
-        // Nothing under us to climb - the line is crossing a gap or clearing a roof, not running
-        // up a slope. Walking it would leave the mover hanging in mid air halfway along.
-        if (point.z < lineZ - maxDrop)
+        float groundZ = INVALID_HEIGHT;
+        _source->UpdateAllowedPositionZ(point.x, point.y, point.z, &groundZ);
+
+        // No floor under the sample at all - a hole in the terrain, or open space on a WMO-only
+        // map. UpdateAllowedPositionZ leaves the height alone in that case, which would strand
+        // the point in mid air at the height we probed from.
+        if (groundZ <= INVALID_HEIGHT)
+            return false;
+
+        // The surface falls away below the line instead of rising to meet it: the line is
+        // clearing a gap, not climbing a slope.
+        if (point.z < lineZ - SNAP_PATH_MAX_DROP)
             return false;
 
         previousZ = point.z;
         sampled.push_back(point);
     }
+
+    // The far end is the landing spot itself and is already on the ground, but nothing has
+    // checked it joins the last sample - without this a target on a ledge is reached by a jump
+    // at the very end of the path.
+    if (end.z > previousZ + SNAP_PATH_MAX_CLIMB)
+        return false;
 
     sampled.push_back(end);
     _pathPoints.swap(sampled);
