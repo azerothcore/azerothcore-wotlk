@@ -1061,10 +1061,53 @@ void GameEventMgr::LoadEventPoolData()
     }
 }
 
+void GameEventMgr::LoadEventLocales()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _gameEventLocales.clear(); // needed for reload case
+
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_LOCALES);
+    PreparedQueryResult result = WorldDatabase.Query(stmt);
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].Get<uint8>();
+
+        LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
+        if (locale == LOCALE_enUS)
+            continue;
+
+        GameEventLocale& data = _gameEventLocales[id];
+        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), locale, data.Description);
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Game Event Locale Strings in {} ms",
+        (uint32)_gameEventLocales.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+std::string GameEventMgr::GetLocalizedDescription(uint16 eventId, LocaleConstant locale) const
+{
+    std::string desc = (eventId < _gameEvent.size()) ? _gameEvent[eventId].Description : "";
+    if (locale == LOCALE_enUS)
+        return desc;
+
+    auto const itr = _gameEventLocales.find(eventId);
+    if (itr != _gameEventLocales.end())
+        ObjectMgr::GetLocaleString(itr->second.Description, locale, desc);
+
+    return desc;
+}
+
 void GameEventMgr::LoadFromDB()
 {
     // The order of these functions matter. Do not change
     LoadEvents();
+    LoadEventLocales();
     LoadEventSaveData();
     LoadEventPrerequisiteData();
     LoadEventCreatureData();
@@ -1360,7 +1403,22 @@ void GameEventMgr::ApplyNewEvent(uint16 eventId)
 {
     uint8 announce = _gameEvent[eventId].Announce;
     if (announce == 1 || (announce == 2 && sWorld->getIntConfig(CONFIG_EVENT_ANNOUNCE)))
-        ChatHandler(nullptr).SendWorldText(LANG_EVENTMESSAGE, _gameEvent[eventId].Description);
+    {
+        // Announce to every online player in their own client locale (falls back to enUS).
+        for (auto const& itr : sWorldSessionMgr->GetAllSessions())
+        {
+            WorldSession* session = itr.second;
+            if (!session)
+                continue;
+
+            Player* player = session->GetPlayer();
+            if (!player || !player->IsInWorld())
+                continue;
+
+            LocaleConstant locale = session->GetSessionDbLocaleIndex();
+            ChatHandler(session).PSendSysMessage(LANG_EVENTMESSAGE, GetLocalizedDescription(eventId, locale).c_str());
+        }
+    }
 
     LOG_DEBUG("gameevent", "GameEvent {} \"{}\" started.", eventId, _gameEvent[eventId].Description);
 

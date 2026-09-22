@@ -73,6 +73,11 @@ struct GameEventData
     [[nodiscard]] bool isValid() const { return Length > 0 || State > GAMEEVENT_NORMAL; }
 };
 
+struct GameEventLocale
+{
+    std::vector<std::string> Description;
+};
+
 struct ModelEquip
 {
     uint32 ModelId;
@@ -107,6 +112,8 @@ public:
     typedef std::vector<GameEventData> GameEventDataMap;
     [[nodiscard]] ActiveEvents const& GetActiveEventList() const { return _activeEvents; }
     [[nodiscard]] GameEventDataMap const& GetEventMap() const { return _gameEvent; }
+    // Event description in the given client locale (falls back to the base enUS description).
+    [[nodiscard]] std::string GetLocalizedDescription(uint16 eventId, LocaleConstant locale) const;
     [[nodiscard]] bool CheckOneGameEvent(uint16 entry) const;
     [[nodiscard]] uint32 NextCheck(uint16 entry) const;
     void LoadFromDB();
@@ -126,6 +133,7 @@ public:
     [[nodiscard]] uint8 GetHolidayMainStage(uint32 holidayId) const;
 private:
     void LoadEvents();
+    void LoadEventLocales();
     void LoadEventSaveData();
     void LoadEventPrerequisiteData();
     void LoadEventCreatureData();
@@ -188,6 +196,7 @@ private:
     GameEventModelEquipMap _gameEventModelEquip;
     GameEventIdMap    _gameEventPoolIds;
     GameEventDataMap  _gameEvent;
+    std::unordered_map<uint32 /*eventId*/, GameEventLocale> _gameEventLocales;
     GameEventBitmask  _gameEventBattlegroundHolidays;
     QuestIdToEventConditionMap _questToEventConditions;
     GameEventNPCFlagMap _gameEventNPCFlags;

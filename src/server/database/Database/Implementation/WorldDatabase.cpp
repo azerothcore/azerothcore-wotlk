@@ -87,6 +87,7 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_CREATURE_NEAREST, "SELECT guid, id, position_x, position_y, position_z, map, (POW(position_x - ?, 2) + POW(position_y - ?, 2) + POW(position_z - ?, 2)) AS order_ FROM creature WHERE map = ? AND (POW(position_x - ?, 2) + POW(position_y - ?, 2) + POW(position_z - ?, 2)) <= ? AND (phaseMask & ?) <> 0 ORDER BY order_", CONNECTION_SYNCH);
     PrepareStatement(WORLD_INS_CREATURE, "INSERT INTO creature (guid, id, map, spawnMask, phaseMask, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, currentwaypoint, curhealth, curmana, MovementType, npcflag, unit_flags, dynamicflags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_GAME_EVENTS, "SELECT eventEntry, UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(end_time), occurence, length, holiday, holidayStage, description, world_event, announce FROM game_event", CONNECTION_SYNCH);
+    PrepareStatement(WORLD_SEL_GAME_EVENT_LOCALES, "SELECT eventEntry, locale, description FROM game_event_locale", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_GAME_EVENT_PREREQUISITE_DATA, "SELECT eventEntry, prerequisite_event FROM game_event_prerequisite", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_GAME_EVENT_CREATURE_DATA, "SELECT guid, eventEntry FROM game_event_creature", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_GAME_EVENT_GAMEOBJECT_DATA, "SELECT guid, eventEntry FROM game_event_gameobject", CONNECTION_SYNCH);
