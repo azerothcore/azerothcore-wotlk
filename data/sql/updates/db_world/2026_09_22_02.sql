@@ -1,3 +1,4 @@
+-- DB update 2026_09_22_01 -> 2026_09_22_02
 -- Ignis casts Kill All Constructs on death. Its implicit target is entry-based, which without a
 -- condition matches every unit in range, players included.
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 65109) AND (`SourceId` = 0);
