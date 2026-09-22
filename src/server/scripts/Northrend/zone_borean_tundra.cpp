@@ -1415,6 +1415,80 @@ private:
     bool _ejected;
 };
 
+enum NakedCaravanGuard
+{
+    // Models the Dead Caravan Guards / Workers spawn with
+    MODEL_GUARD_ORC_MALE             = 23246,
+    MODEL_GUARD_FORSAKEN_MALE        = 23247,
+    MODEL_GUARD_ORC_FEMALE           = 23248,
+    MODEL_GUARD_TAUREN_MALE          = 23249,
+    MODEL_WORKER_ORC_MALE            = 23124,
+    MODEL_WORKER_FORSAKEN_MALE       = 23125,
+    MODEL_WORKER_ORC_FEMALE          = 23126,
+    MODEL_WORKER_TROLL_MALE          = 23127,
+
+    // Their counterparts once the outfit has been looted
+    MODEL_NAKED_GUARD_ORC_MALE       = 23245,
+    MODEL_NAKED_GUARD_FORSAKEN_MALE  = 23250,
+    MODEL_NAKED_GUARD_ORC_FEMALE     = 23251,
+    MODEL_NAKED_GUARD_TAUREN_MALE    = 23252,
+    MODEL_NAKED_WORKER_ORC_MALE      = 23253,
+    MODEL_NAKED_WORKER_FORSAKEN_MALE = 23254,
+    MODEL_NAKED_WORKER_ORC_FEMALE    = 23255,
+    MODEL_NAKED_WORKER_TROLL_MALE    = 23256
+};
+
+// 45713 - Naked Caravan Guard - Master Transform
+class spell_naked_caravan_guard_transform : public SpellScript
+{
+    PrepareSpellScript(spell_naked_caravan_guard_transform);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
+
+        uint32 nakedModelId = 0;
+        switch (target->GetDisplayId())
+        {
+            case MODEL_GUARD_ORC_MALE:
+                nakedModelId = MODEL_NAKED_GUARD_ORC_MALE;
+                break;
+            case MODEL_GUARD_FORSAKEN_MALE:
+                nakedModelId = MODEL_NAKED_GUARD_FORSAKEN_MALE;
+                break;
+            case MODEL_GUARD_ORC_FEMALE:
+                nakedModelId = MODEL_NAKED_GUARD_ORC_FEMALE;
+                break;
+            case MODEL_GUARD_TAUREN_MALE:
+                nakedModelId = MODEL_NAKED_GUARD_TAUREN_MALE;
+                break;
+            case MODEL_WORKER_ORC_MALE:
+                nakedModelId = MODEL_NAKED_WORKER_ORC_MALE;
+                break;
+            case MODEL_WORKER_FORSAKEN_MALE:
+                nakedModelId = MODEL_NAKED_WORKER_FORSAKEN_MALE;
+                break;
+            case MODEL_WORKER_ORC_FEMALE:
+                nakedModelId = MODEL_NAKED_WORKER_ORC_FEMALE;
+                break;
+            case MODEL_WORKER_TROLL_MALE:
+                nakedModelId = MODEL_NAKED_WORKER_TROLL_MALE;
+                break;
+            default:
+                return;
+        }
+
+        target->SetDisplayId(nakedModelId);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_naked_caravan_guard_transform::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -1438,4 +1512,5 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_bloodspore_haze);
     RegisterSpellScript(spell_q11652_rescue_injured_soldier);
     RegisterSpellScript(spell_q11652_soldier_rescued);
+    RegisterSpellScript(spell_naked_caravan_guard_transform);
 }
