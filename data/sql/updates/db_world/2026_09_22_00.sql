@@ -1,3 +1,4 @@
+-- DB update 2026_09_21_08 -> 2026_09_22_00
 --
 -- Twelve TBC master-tier Engineering recipes are missing from some trainers, leaving e.g.
 -- Technician Mihila unable to teach Frost Grenades (39973). Wowhead lists all eight
