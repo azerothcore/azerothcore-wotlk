@@ -13799,6 +13799,9 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             }
         }
 
+        if (player)
+            sScriptMgr->OnPlayerCreatureKillCredit(player, creature);
+
         // Dungeon specific stuff, only applies to players killing creatures
         if (creature->GetInstanceId())
         {
