@@ -507,6 +507,7 @@ UPDATE `creature` SET `Comment` = 'SAI Target' WHERE (`id` = 19215) AND (`guid` 
 -- Infernal Target (Hyjal) - Keep the two launch points airborne
 -- Both spawns sit at z 79.5 / 91.9 over a floor near 41.7. `creature_template_movement` allows ground movement only,
 -- so Creature::UpdateMovementFlags clears gravity-disable and drops them onto the stairs.
+-- Maintainer note: These are hacks, but we'd otherwise need cpp for a miniscule thing. So whatever.
 DELETE FROM `creature_movement_override` WHERE (`SpawnId` IN (74081, 74082));
 INSERT INTO `creature_movement_override` (`SpawnId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (74081, NULL, NULL, 1, NULL, NULL, NULL, NULL),
