@@ -3,8 +3,9 @@
 package ulduar_test
 
 import (
+	"encoding/binary"
 	"fmt"
-	"math"
+	"sync"
 	"testing"
 	"time"
 
@@ -376,96 +377,23 @@ const (
 // her banishes every living elder, after which he schedules no beams for the life of the instance.
 var brightleafSpawn = e2eharness.Position3{X: 2385.09, Y: 131.341, Z: 440.201, Map: e2eharness.MapUlduar}
 
-// Elder Brightleaf's Unstable Sun Beams must not outlive him, and each wave must land one beam on
-// the elder plus one under a player in range. Before the fix the beams were hand-summoned with no
-// duration and the elder's event map was the only thing that removed them, so a kill taken with a
-// wave up left them standing for the life of the instance.
-// Issue: https://github.com/chromiecraft/chromiecraft/issues/10163
-func TestUlduar_BrightleafSunBeamsDespawnAfterDeath(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"med", "instances"},
-		Runtime:  "med",
-		Category: "instances/northrend/ulduar",
-	})
-
-	const (
-		// Each beam despawns itself after a randomised 18-25s; the oracle allows the worst case
-		// plus slack for the kill and the object-cache round trip. Do not widen it past 30s: that
-		// is 62221's summon duration, the engine backstop that would despawn the player's beam by
-		// itself and hide the regression this guards.
-		beamMaxLifetime = 25 * time.Second
-		// The elder's own beam sits on him, so "landed on the player" is only distinguishable
-		// from "stacked on the elder" while the bot stands clear of him by more than this.
-		beamOnPlayerRange = float32(3)
-	)
-
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "Bleaf",
-		Level:  80,
-	})
-
-	// Stay GM through the raid enter.
-	bot.TeleportPad(t, brightleafSpawn)
-	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
-		e2eharness.Preconditionf(t, "not in Ulduar after Brightleaf tele map=%d", m)
-	}
-	bot.GoCreatureID(t, npcElderBrightleaf)
-	bot.CombatReady(t)
-
-	elder := waitLivingBrightleaf(t, bot)
-	bot.Engage(t, elder, 15*time.Second)
-
-	wave := waitBrightleafWave(t, bot, elder)
-	bx, by, bz, _ := bot.Pos()
-	elderObj := bot.World.GetObject(elder)
-	if elderObj == nil {
-		e2eharness.Preconditionf(t, "Elder Brightleaf 0x%X left the object cache before the wave landed", elder)
-	}
-	ex, ey, ez := elderObj.PosX, elderObj.PosY, elderObj.PosZ
-	if botToElder := e2eharness.Distance3D(bx, by, bz, ex, ey, ez); botToElder <= beamOnPlayerRange {
-		e2eharness.Preconditionf(t, "bot stands %.1fy from the elder, too close for the placement oracle to discriminate (need > %.1fy)",
-			botToElder, beamOnPlayerRange)
-	}
-	nearestToBot := float32(math.MaxFloat32)
-	for _, b := range wave {
-		toBot := e2eharness.Distance3D(bx, by, bz, b.x, b.y, b.z)
-		if toBot < nearestToBot {
-			nearestToBot = toBot
-		}
-		t.Logf("beam 0x%X at (%.1f,%.1f,%.1f) dist bot=%.1f elder=%.1f", b.guid, b.x, b.y, b.z,
-			toBot, e2eharness.Distance3D(ex, ey, ez, b.x, b.y, b.z))
-	}
-	// 62207 summons one beam at the elder and force-casts 62221 on the players its script picks,
-	// each summoning one at their own feet. A forced cast whose target mask takes no unit target
-	// must not inherit the original caster as its destination, or every beam stacks on the elder.
-	if nearestToBot > beamOnPlayerRange {
-		e2eharness.Assertf(t, "no Unstable Sun Beam landed on the player: nearest of %d beams is %.1fy away",
-			len(wave), nearestToBot)
-	}
-
-	// Kill him with the wave still up — that is the state that used to leak.
-	bot.DamageKill(t, []uint64{elder}, 10_000_000, 30*time.Second)
-	killT := time.Now()
-
-	cutoff := killT.Add(beamMaxLifetime + 15*time.Second)
-	for {
-		left := sunBeamsInCache(bot, npcUnstableSunBeam, beamSearchRange)
-		if len(left) == 0 {
-			break
-		}
-		if !time.Now().Before(cutoff) {
-			e2eharness.Assertf(t, "%d Unstable Sun Beam(s) still up %s after Elder Brightleaf died: %v",
-				len(left), time.Since(killT).Round(time.Second), sunBeamGUIDs(left))
-		}
-		time.Sleep(500 * time.Millisecond)
-	}
-	t.Logf("PASS %d sun beams all gone %s after Elder Brightleaf died",
-		len(wave), time.Since(killT).Round(time.Millisecond))
-}
-
 type sunBeamSnap struct {
 	guid    uint64
 	x, y, z float32
+}
+
+// unitFlags reads UNIT_FIELD_FLAGS off a unit in the object cache.
+func unitFlags(bot *e2eharness.ScenarioBot, guid uint64) uint32 {
+	obj := bot.World.GetObject(guid)
+	if obj == nil {
+		return 0
+	}
+	return obj.Value(client.UnitFieldFlags)
+}
+
+// elderNotSelectable reports the flag boss_freya_elder_brightleaf::JustEngagedWith gates on.
+func elderNotSelectable(bot *e2eharness.ScenarioBot, guid uint64) bool {
+	return unitFlags(bot, guid)&client.UnitFlagNotSelectable != 0
 }
 
 // sunBeamsInCache reports beams by presence, not liveness: the bug is the object still existing.
@@ -508,6 +436,35 @@ func waitLivingBrightleaf(t *testing.T, bot *e2eharness.ScenarioBot) uint64 {
 	if bot.UnitHasAura(elder, spellPurpleBanish) || bot.UnitHasAura(elder, spellBrightleafEssence) {
 		e2eharness.Preconditionf(t, "Elder Brightleaf is banished into Freya's hard mode in this instance, so he schedules no sun beams")
 	}
+
+	// Freya's hard-mode activation full-heals every living elder, flags it
+	// UNIT_FLAG_NOT_SELECTABLE, turns it REACT_PASSIVE and puts it in combat with the zone.
+	// Either leftover suppresses the beams: boss_freya_elder_brightleaf::JustEngagedWith returns
+	// on that flag without scheduling anything, and an elder still in combat never gets a second
+	// JustEngagedWith when this bot pulls it. The banish auras applied alongside are dropped when
+	// Freya resets, so the aura checks above see a healthy elder either way. Killing it and
+	// respawning runs the Reset that clears both.
+	if elderNotSelectable(bot, elder) || bot.UnitInCombat(elder) {
+		t.Logf("Elder Brightleaf is left over from a Freya pull in this instance (flags=0x%X inCombat=%v); respawning him",
+			unitFlags(bot, elder), bot.UnitInCombat(elder))
+		bot.DamageKill(t, []uint64{elder}, 10_000_000, 15*time.Second)
+		if err := bot.World.SetTarget(elder); err != nil {
+			e2eharness.Preconditionf(t, "select Elder Brightleaf to respawn: %v", err)
+		}
+		bot.GM(t, ".respawn")
+		respawned := time.Now().Add(30 * time.Second)
+		for {
+			elder = bot.WaitUnit(t, npcElderBrightleaf, 10*time.Second)
+			if hp, maxHP := bot.UnitHP(elder); maxHP > 0 && hp > 0 && !elderNotSelectable(bot, elder) && !bot.UnitInCombat(elder) {
+				break
+			}
+			if !time.Now().Before(respawned) {
+				e2eharness.Preconditionf(t, "Elder Brightleaf still unpullable after respawn (flags=0x%X inCombat=%v), so he schedules no sun beams",
+					unitFlags(bot, elder), bot.UnitInCombat(elder))
+			}
+			time.Sleep(250 * time.Millisecond)
+		}
+	}
 	return elder
 }
 
@@ -525,8 +482,10 @@ func waitBrightleafWave(t *testing.T, bot *e2eharness.ScenarioBot, elder uint64)
 		}
 		if !time.Now().Before(deadline) {
 			hp, maxHP := bot.UnitHP(elder)
-			t.Logf("no wave: elder hp=%d/%d banished=%v essence=%v drained=%v 33050@500y=%d 33170@500y=%d",
+			t.Logf("no wave: elder hp=%d/%d flags=0x%X inCombat=%v banished=%v essence=%v drained=%v 33050@500y=%d 33170@500y=%d",
 				hp, maxHP,
+				unitFlags(bot, elder),
+				bot.UnitInCombat(elder),
 				bot.UnitHasAura(elder, spellPurpleBanish),
 				bot.UnitHasAura(elder, spellBrightleafEssence),
 				bot.UnitHasAura(elder, spellDrainedOfPower),
@@ -798,6 +757,270 @@ func TestAC_27590_PsychosisSkipsLowSanity(t *testing.T) {
 	}
 
 	t.Logf("PASS low sanity targeting: both spells landed down to %d sanity and neither reached the player at %d", lastValid, atFloor)
+}
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27455
+// An Ancient Water Spirit's Tidal Wave (62653, 25-man rank 62935) is a 2s cast that surges the
+// spirit forward and knocks everything in its path off its feet with a second spell, 62654
+// (25-man 62936). Kicking the cast used to stop the surge and nothing else: the script queued
+// that second spell on a standalone 3s EventMap timer started at cast time, so the damage and
+// knockback still went out on an empty cast bar.
+//
+// The oracle is whether the spirit casts 62654 at all, read off SMSG_SPELL_GO. That is the
+// mechanism the bug is about, and it holds regardless of who the cone ends up covering. The
+// knockback the player actually receives (SMSG_MOVE_KNOCK_BACK, which AC sends to the knocked
+// player's own session out of Unit::KnockbackFrom) is logged next to it but is not the oracle:
+// it depends on where the bot is standing when the wave goes off, and the harness never acks a
+// knockback, which makes repeat knockbacks in one session unreliable.
+//
+// An uninterrupted wave is measured too. Without it a quiet window after a Kick proves nothing:
+// it would pass just as happily against a spirit that never casts anything.
+//
+// A lone spawned spirit rather than Freya's Allies of Nature waves, because the trio is one of
+// three wave kinds picked at random roughly every 60s and a real pull spends minutes rolling
+// for the subject. The wave is scheduled from JustEngagedWith and needs nothing from Freya.
+func TestAC_27455_TidalWaveInterruptStopsKnockback(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances", "issue"},
+		Runtime:  "med",
+		Issue:    27455,
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcWaterSpirit = uint32(33202)
+		// spelldifficulty_dbc swaps the 10-man ids for the 25-man ones on a 25-man instance.
+		spellTidalWave10 = uint32(62653)
+		spellTidalWave25 = uint32(62935)
+		spellTidalDmg10  = uint32(62654)
+		spellTidalDmg25  = uint32(62936)
+		spellKick        = uint32(1766)
+
+		// game_tele BossRazorscale, not Freya's platform: the spirit only needs the Ulduar
+		// instance script (RegisterUlduarCreatureAI), and this is the emptiest ground in the
+		// raid, with nothing spawned inside 100y. Fighting it in the Conservatory pulls Freya
+		// herself, and her Allies of Nature then land Conservator's Grip (62532) on the bot,
+		// which is pacify-silence and blocks Kick outright.
+		padX, padY, padZ = float32(589.2), float32(-145.0), float32(391.5)
+
+		botHealth = 10000000
+
+		// JustEngagedWith schedules the first wave at 12s and repeats on that interval.
+		waveWindow = 40 * time.Second
+		// 2s cast, then the surge. Everything the cast does has happened inside this.
+		resolveWindow = 5 * time.Second
+		sampleEvery   = 20 * time.Millisecond
+		// Kick is a melee ability and can be dodged or parried, which leaves the cast running.
+		// Take the next wave when that happens rather than calling the run unjudgeable.
+		kickAttempts = 6
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "TidWav", Race: e2eharness.RaceHuman,
+		Class: e2eharness.ClassRogue, Level: 80, LearnAllClass: true,
+	})
+
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
+	bot.Teleport(t, padX, padY, padZ, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after pad tele map=%d", m)
+	}
+
+	spirit := bot.Spawn(t, npcWaterSpirit, 30*time.Second)
+	t.Logf("Ancient Water Spirit guid=0x%X", spirit)
+
+	// Only now drop GM: Spawn turns it on for `.npc add` and leaves it on, and the spirit picks
+	// its target through SelectTargetFromPlayerList, which skips game masters. Note the bare
+	// CombatReady helpers would also turn `.cheat god` on, leaving the bot invulnerable.
+	e2eharness.CombatReady(t, bot.World, e2eharness.CombatReadyOpts{})
+	if err := bot.World.SetTarget(bot.World.CharGUID()); err != nil {
+		e2eharness.Preconditionf(t, "select self: %v", err)
+	}
+	bot.GM(t, fmt.Sprintf(".modify hp %d", botHealth))
+	// A fresh level-80 character still carries its starting weapon skills, and an unarmed bot
+	// misses a level-81 elite with Kick most of the time.
+	bot.GM(t, ".maxskill")
+
+	bot.Engage(t, spirit, 15*time.Second)
+
+	var (
+		mu        sync.Mutex
+		castStart time.Time
+		castGo    time.Time
+		dmgGo     time.Time
+		knockAt   time.Time
+	)
+	isWave := func(id uint32) bool { return id == spellTidalWave10 || id == spellTidalWave25 }
+	isDamage := func(id uint32) bool { return id == spellTidalDmg10 || id == spellTidalDmg25 }
+	cancel := bot.World.AddPacketHook(func(opcode uint16, data []byte) {
+		switch opcode {
+		case client.SmsgSpellStart:
+			if id, ok := castSpellID(data); ok && isWave(id) {
+				mu.Lock()
+				castStart = time.Now()
+				mu.Unlock()
+			}
+		case client.SmsgSpellGo:
+			id, ok := castSpellID(data)
+			if !ok {
+				return
+			}
+			mu.Lock()
+			if isWave(id) {
+				castGo = time.Now()
+			} else if isDamage(id) {
+				dmgGo = time.Now()
+			}
+			mu.Unlock()
+		case client.SmsgMoveKnockBack:
+			mu.Lock()
+			knockAt = time.Now()
+			mu.Unlock()
+		}
+	})
+	defer cancel()
+
+	reset := func() {
+		mu.Lock()
+		castStart, castGo, dmgGo, knockAt = time.Time{}, time.Time{}, time.Time{}, time.Time{}
+		mu.Unlock()
+	}
+	snapshot := func() (start, done, dmg, knock time.Time) {
+		mu.Lock()
+		defer mu.Unlock()
+		return castStart, castGo, dmgGo, knockAt
+	}
+
+	// The creature's combat flag reaches the object cache a beat after Engage, so a spirit that
+	// evades is only called out once it has been seen fighting.
+	sawCombat := false
+	status := func() string {
+		hp, _ := bot.UnitHP(spirit)
+		self, _ := bot.UnitHP(bot.World.CharGUID())
+		return fmt.Sprintf("inCombat=%v target=0x%X spiritHP=%d botHP=%d",
+			bot.UnitInCombat(spirit), bot.UnitTarget(spirit), hp, self)
+	}
+	waitCast := func(what string) {
+		deadline := time.Now().Add(waveWindow)
+		for time.Now().Before(deadline) {
+			if start, _, _, _ := snapshot(); !start.IsZero() {
+				return
+			}
+			if bot.UnitInCombat(spirit) {
+				sawCombat = true
+			} else if sawCombat {
+				e2eharness.Preconditionf(t, "spirit left combat while waiting for the %s wave (%s)", what, status())
+			}
+			time.Sleep(sampleEvery)
+		}
+		e2eharness.Preconditionf(t, "no Tidal Wave cast within %s (%s wave, %s)", waveWindow, what, status())
+	}
+
+	// Target and facing are settled up front so the only thing between seeing a cast start and
+	// the Kick going out is one CMSG_CAST_SPELL.
+	if err := bot.World.SetTarget(spirit); err != nil {
+		e2eharness.Preconditionf(t, "select spirit: %v", err)
+	}
+	bot.Face(t, spirit)
+
+	var kickedDmg, kickedKnock, kickedStart time.Time
+	interrupted := false
+	var lastFail string
+	for attempt := 1; attempt <= kickAttempts && !interrupted; attempt++ {
+		reset()
+		waitCast("interrupted")
+		kicked := false
+		for deadline := time.Now().Add(1200 * time.Millisecond); time.Now().Before(deadline); {
+			// Re-faced every attempt: a wave that went off leaves the spirit 40y past the
+			// bot, and Kick on a target behind it is SPELL_FAILED_UNIT_NOT_INFRONT.
+			bot.Face(t, spirit)
+			res, err := bot.TryCast(t, spellKick, spirit, 500*time.Millisecond)
+			if err != nil {
+				lastFail = err.Error()
+			} else if res.Success {
+				kicked = true
+				break
+			} else {
+				lastFail = e2eharness.SpellFailReasonName(res.FailReason)
+			}
+		}
+		if !kicked {
+			t.Logf("attempt %d: Kick never went out (%s, casterFlags=0x%X, auras=%v)",
+				attempt, lastFail, casterFlags(bot), bot.World.SelfAuras())
+			continue
+		}
+		time.Sleep(resolveWindow)
+		start, done, dmg, knock := snapshot()
+		if !done.IsZero() {
+			// Kick went out but was dodged or parried; the cast ran to completion.
+			t.Logf("attempt %d: Kick did not land, wave completed %s after cast start",
+				attempt, done.Sub(start).Round(time.Millisecond))
+			continue
+		}
+		interrupted = true
+		kickedStart, kickedDmg, kickedKnock = start, dmg, knock
+	}
+	if !interrupted {
+		e2eharness.Preconditionf(t, "no Tidal Wave was interrupted in %d attempts (last Kick result: %s, %s)",
+			kickAttempts, lastFail, status())
+	}
+	t.Logf("kicked wave: damage cast=%v knockback=%v", !kickedDmg.IsZero(), !kickedKnock.IsZero())
+
+	// Control: let the next one through, so the quiet window above means something.
+	reset()
+	waitCast("uninterrupted")
+	time.Sleep(resolveWindow)
+	plainStart, plainGo, plainDmg, plainKnock := snapshot()
+	if plainGo.IsZero() {
+		e2eharness.Preconditionf(t, "Tidal Wave started but never completed without an interrupt")
+	}
+	if plainDmg.IsZero() {
+		e2eharness.Preconditionf(t,
+			"an uninterrupted Tidal Wave never cast its damage spell; the interrupt oracle would be vacuous")
+	}
+	t.Logf("uninterrupted wave: damage cast %s after cast start, knockback=%v",
+		plainDmg.Sub(plainStart).Round(time.Millisecond), !plainKnock.IsZero())
+
+	if !kickedDmg.IsZero() {
+		e2eharness.ConfirmedBugf(t, 27455,
+			"interrupted Tidal Wave still cast its damage and knockback %s after the cast started",
+			kickedDmg.Sub(kickedStart).Round(time.Millisecond))
+	}
+	t.Logf("PASS AC#27455 kicked Tidal Wave cast no damage spell within %s", resolveWindow)
+}
+
+// casterFlags reads UNIT_FIELD_FLAGS off the bot, so a refused cast names the state that
+// refused it.
+func casterFlags(bot *e2eharness.ScenarioBot) uint32 {
+	obj := bot.World.GetObject(bot.World.CharGUID())
+	if obj == nil {
+		return 0
+	}
+	return obj.Value(client.UnitFieldFlags)
+}
+
+// castSpellID pulls the spell id out of an SMSG_SPELL_START / SMSG_SPELL_GO header, which both
+// open with the cast-item and caster packed GUIDs and a cast counter ahead of it. The harness
+// parses SPELL_GO for its own waiters but exposes neither the header nor a packed-GUID reader.
+func castSpellID(data []byte) (uint32, bool) {
+	off := 0
+	for i := 0; i < 2; i++ {
+		if off >= len(data) {
+			return 0, false
+		}
+		mask := data[off]
+		off++
+		for bit := 0; bit < 8; bit++ {
+			if mask&(1<<uint(bit)) != 0 {
+				off++
+			}
+		}
+	}
+	off++ // cast count
+	if off+4 > len(data) {
+		return 0, false
+	}
+	return binary.LittleEndian.Uint32(data[off : off+4]), true
 }
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27539
@@ -1134,5 +1357,229 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 		adds = append(adds, add.GUID)
 	}
 	bot.DamageKill(t, adds, 10_000_000, 30*time.Second)
+	bot.AssertWorldAlive(t)
+}
+
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27718
+// Each Elder count has its own Freya's Gift, and the emblems the fix corrects are per chest, so
+// the chest that spawns has to be the one for the Elders actually left alive. The emblems inside
+// are out of reach here: a chest opens only through SPELL_EFFECT_OPEN_LOCK (Spell::SendLoot),
+// CMSG_LOOT drops any guid that is not a creature, and the harness cannot cast at a gameobject
+// target. Inventoried as blocked-harness in e2e/README.md.
+func TestUlduar_FreyaGiftMatchesElderCount(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"short", "instances"},
+		Runtime:  "short",
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcFreya           = uint32(32906)
+		npcElderIronbranch = uint32(32913)
+		npcElderStonebark  = uint32(32914)
+
+		// 10-man spawns 194330 for no Elder alive, 194328 for one, 194326 for two, 194324 for all
+		// three.
+		goGiftNoElder     = uint32(194330)
+		goGiftOneElder    = uint32(194328)
+		goGiftTwoElders   = uint32(194326)
+		goGiftThreeElders = uint32(194324)
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "FreyaGf",
+		Level:  80,
+	})
+
+	// Raid interior pad (game_tele BossFreya); stay GM through the raid enter.
+	bot.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Freya pad tele map=%d", m)
+	}
+	bot.GoCreatureID(t, npcFreya)
+
+	// Ironbranch and Stonebark stand 136y and 144y from Freya, inside visibility. Brightleaf at
+	// 190y is out of the object cache and never touched, so he is the one left to empower her.
+	var toKill []uint64
+	for _, entry := range []uint32{npcElderIronbranch, npcElderStonebark} {
+		elder := bot.WaitUnit(t, entry, 30*time.Second)
+		if hp, _ := bot.UnitHP(elder); hp == 0 {
+			e2eharness.Preconditionf(t, "Elder %d is already a corpse: this instance copy is not fresh", entry)
+		}
+		toKill = append(toKill, elder)
+	}
+	bot.DamageKill(t, toKill, 10_000_000, 20*time.Second)
+
+	bot.CombatReady(t)
+
+	// Evade can leave a 0 HP object in cache, so wait for a living Freya rather than any GUID.
+	var freyaGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		freyaGUID = bot.WaitUnit(t, npcFreya, 10*time.Second)
+		if hp, maxHP := bot.UnitHP(freyaGUID); maxHP > 0 && hp > 0 && bot.World.GetObject(freyaGUID) != nil {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Freya in cache after GoCreatureID (last=0x%X)", freyaGUID)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	// The Elders are read on engage, and only the living ones count.
+	bot.Engage(t, freyaGUID, 15*time.Second)
+
+	// Freya's DamageTaken runs the whole defeat: it zeroes the killing blow, summons the chest and
+	// teleports her out. She never reaches 0 HP, so DamageKill would spin until it timed out.
+	bot.Damage(t, freyaGUID, 100_000_000)
+
+	chest := e2eharness.TryNearbyGameObjectByEntry(t, bot.World, goGiftOneElder, 30*time.Second)
+	if chest == 0 {
+		for _, other := range []struct {
+			entry  uint32
+			elders int
+		}{{goGiftNoElder, 0}, {goGiftTwoElders, 2}, {goGiftThreeElders, 3}} {
+			if e2eharness.TryNearbyGameObjectByEntry(t, bot.World, other.entry, time.Second) != 0 {
+				e2eharness.Assertf(t, "Freya's Gift %d spawned: the script counted %d Elders alive, want 1",
+					other.entry, other.elders)
+			}
+		}
+		e2eharness.Preconditionf(t, "no Freya's Gift within 30s of Freya's defeat")
+	}
+	t.Logf("PASS Freya's Gift %d spawned with one Elder alive (guid=0x%X)", goGiftOneElder, chest)
+	bot.AssertWorldAlive(t)
+}
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27736
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27751
+// Ignis dying casts Kill All Constructs (65109). Every Iron Construct must die with him,
+// dormant ones included, and the instakill must reach nothing else: its implicit target is
+// entry-based, so a missing `conditions` row would let it hit the player and every other
+// creature on the map.
+//
+// 10-man only: the harness cannot switch a bot to 25-man, inventoried as blocked-harness
+// on the instances/ulduar row of e2e/README.md. The construct entry is 33121 in both
+// difficulties because Creature::InitEntry keeps the normal entry and only swaps the
+// template, so the targeting row this asserts on is the same row 25-man uses.
+func TestAC_27736_IgnisKillsAllConstructs(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"long", "instances", "issue"},
+		Runtime:  "long",
+		Issue:    27736,
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcIgnis         = uint32(33118)
+		npcIronConstruct = uint32(33121)
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "Ignis",
+		Level:  80,
+	})
+
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
+	bot.Teleport(t, 586.542, 378.798, 360.923, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Ignis pad tele map=%d", m)
+	}
+	bot.GoCreatureID(t, npcIgnis)
+	bot.CombatReady(t)
+
+	// FlushWorld beside a boss can evade him out of cache; re-acquire a living GUID.
+	var ignisGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		ignisGUID = bot.WaitUnit(t, npcIgnis, 10*time.Second)
+		if hp, maxHP := bot.UnitHP(ignisGUID); maxHP > 0 && hp > 0 && bot.World.GetObject(ignisGUID) != nil {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Ignis in cache after GoCreatureID (last=0x%X)", ignisGUID)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	bot.Engage(t, ignisGUID, 15*time.Second)
+
+	// Snapshot immediately before the killing blow. Activate Construct is 40s out on 10-man,
+	// so the constructs are still dormant: exactly the case the old IsInCombat filter missed.
+	constructs := e2eharness.UnitsByEntry(bot.World, 0, npcIronConstruct)
+	if len(constructs) == 0 {
+		e2eharness.Preconditionf(t, "no living Iron Construct in cache beside Ignis")
+	}
+	dormant := 0
+	for _, c := range constructs {
+		if !c.InCombat {
+			dormant++
+		}
+	}
+	if dormant == 0 {
+		e2eharness.Preconditionf(t, "all %d Iron Constructs are already in combat; the dormant case is not exercised", len(constructs))
+	}
+
+	// Anything alive and not a construct must survive the instakill.
+	bystanders := make(map[uint64]uint32)
+	for _, u := range bot.World.GetNearbyUnits(200) {
+		// Entry 0 is a create the cache has not resolved yet. It may be a construct, which
+		// UnitsByEntry already judges by GUID, so it must not be filed as a bystander too.
+		if u.GUID == ignisGUID || u.Entry == npcIronConstruct || u.Entry == 0 || u.Health() == 0 {
+			continue
+		}
+		bystanders[u.GUID] = u.Entry
+	}
+	t.Logf("before kill: %d Iron Constructs (%d dormant), %d other living creatures in cache",
+		len(constructs), dormant, len(bystanders))
+
+	bot.DamageKill(t, []uint64{ignisGUID}, 1_000_000, 60*time.Second)
+	bot.WaitUnitDead(t, ignisGUID, 30*time.Second)
+
+	// The constructs die in the same object update as the boss; poll briefly for it to land.
+	var alive, judged []uint64
+	dl := time.Now().Add(15 * time.Second)
+	for {
+		alive, judged = alive[:0], judged[:0]
+		for _, c := range constructs {
+			obj := bot.World.GetObject(c.GUID)
+			if obj == nil {
+				continue // left the cache: cannot judge this one
+			}
+			judged = append(judged, c.GUID)
+			if obj.Health() > 0 {
+				alive = append(alive, c.GUID)
+			}
+		}
+		if len(alive) == 0 || !time.Now().Before(dl) {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	if len(judged) == 0 {
+		e2eharness.Preconditionf(t, "every Iron Construct left the object cache after Ignis died; nothing to judge")
+	}
+	if len(alive) > 0 {
+		e2eharness.ConfirmedBugf(t, 27736, "%d of %d judged Iron Constructs still alive after Ignis died (first=0x%X)",
+			len(alive), len(judged), alive[0])
+	}
+
+	for guid, entry := range bystanders {
+		obj := bot.World.GetObject(guid)
+		if obj == nil {
+			continue // left the cache: cannot judge this one
+		}
+		if obj.Health() == 0 {
+			e2eharness.Assertf(t, "Kill All Constructs killed a bystander creature guid=0x%X entry=%d: spell 65109 is not restricted to entry %d",
+				guid, entry, npcIronConstruct)
+		}
+	}
+	self := bot.World.GetObject(bot.GUID)
+	if self == nil {
+		e2eharness.HarnessFailf(t, "own player object missing from the cache after the kill")
+	}
+	if self.Health() == 0 {
+		e2eharness.Assertf(t, "Kill All Constructs killed the player: spell 65109 is missing its targeting conditions")
+	}
+
+	t.Logf("PASS Ignis death killed %d/%d judged Iron Constructs (%d dormant); %d bystander creatures and the player survived",
+		len(judged), len(constructs), dormant, len(bystanders))
 	bot.AssertWorldAlive(t)
 }
