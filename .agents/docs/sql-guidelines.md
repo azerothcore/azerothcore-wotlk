@@ -4,7 +4,7 @@
 
 1. `cd data/sql/updates/pending_db_world/` (or `pending_db_auth` / `pending_db_characters`).
 2. `./create_sql.sh` generates an empty `rev_<timestamp>.sql` to write into.
-3. Conventions (linted): every `INSERT` preceded by a matching `DELETE` (idempotency); spawn `DELETE` (`creature`, `gameobject`) filters on both `id` and `guid` with `=`/`IN`/`BETWEEN`, never `OR`; no double semicolons; no multiple blank lines; InnoDB engine.
+3. Conventions (linted): every `INSERT` preceded by a matching `DELETE` (idempotency); spawn `DELETE` and `UPDATE` (`creature`, `gameobject`) target that table alone (no join, comma list or schema qualifier) and filter on both `id` and `guid` with `=`/`IN`/`BETWEEN`, never `OR`; no double semicolons; no multiple blank lines; InnoDB engine.
 
 Run the linter before claiming a change is done: `python apps/codestyle/codestyle-sql.py` (compares to origin/master).
 
@@ -13,6 +13,7 @@ Run the linter before claiming a change is done: `python apps/codestyle/codestyl
 - Set `flags_extra` on every `difficulty_entry_*` template, not just the base entry: which of the two the engine reads varies by call site.
 - `smart_scripts` edits always rewrite the full block — `DELETE` + `INSERT` of every row for the `(entryorguid, source_type)` pair, with the `DELETE` matching both columns — never a partial `UPDATE`, not even for a comment-only fix.
 - Sniff-backed changes stamp `VerifiedBuild` (the sniff's client build) on every row the sniff validated, including rows the fix doesn't otherwise touch.
+- `creature_template_model`: rows were generated from the old `modelid1`-`modelid4` columns, and that migration copied `creature_template.VerifiedBuild` onto every `Idx`, so equal probabilities are that import's default rather than a randomization claim. Judge a stamp by its build, not its `Idx`: a legacy build on the extra rows is migration noise, while later sniff passes stamp `Idx` >= 1 legitimately. Authority is the creature query response's per-index `Probability`, which Classic and retail sniffs carry and 3.3.5 clients omit. Suppress a model by setting its `Probability` to 0 and keeping the row, never by deleting it; keep a creature's only row at 1, since the loader reads a zero total as equal chance and resets every row to 1.0.
 - `creature_immunities`: negative ids are curated shared sets — reference them via `creature_template.CreatureImmunitiesId`, never edit them or allocate new ones. Positive ids are single-creature sets — reuse an existing set only on an exact match; to extend a creature's immunities, insert a superset under a new id and point the creature's `CreatureImmunitiesId` at it.
 
 ## The three databases

@@ -2032,10 +2032,11 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
 uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
 {
     auto const& events = GetEventMap();
+    uint8 mainStage = GetHolidayMainStage(holidayId);
 
     for (auto const& eventEntry : events)
     {
-        if (eventEntry.HolidayId == holidayId)
+        if (eventEntry.HolidayId == holidayId && eventEntry.HolidayStage == mainStage)
         {
             return eventEntry.EventId;
         }
