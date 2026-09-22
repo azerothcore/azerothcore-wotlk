@@ -24,30 +24,42 @@
 #include "MySQLConnection.h"
 #include "PreparedStatement.h"
 #include "StringFormat.h"
+#include <array>
 #include <memory>
 #include <string_view>
 #include <vector>
 
+template <typename T>
+class ProducerConsumerQueue;
+
+class SQLOperation;
 class TransactionBase;
 
-// Base class for module-owned database pools. A module derives from this,
-// implements CreateConnection with its own MySQLConnection subclass (carrying
-// the module's prepared statements), and gets open/execute/query plus DBUpdater
-// compatibility without any core-side registration.
-//
-// Connections are synchronous; asynchronous execution can be added in a
-// follow-up without changing this interface. DoPrepareStatements must mark every
-// statement CONNECTION_SYNCH: a CONNECTION_ASYNC one is skipped on these
-// connections and asserts on first use.
+// Base class for module-owned database pools: a module implements CreateConnection
+// with its own MySQLConnection subclass and gets the DatabaseWorkerPool API plus
+// DBUpdater compatibility. Statement flags route like the core pools (async entry
+// points need CONNECTION_ASYNC, direct ones CONNECTION_SYNCH). With no asynchronous
+// connections every async entry point runs synchronously.
 class AC_DATABASE_API ModuleDatabasePool : public DatabaseUpdatePool
 {
+private:
+    enum InternalIndex
+    {
+        IDX_ASYNC,
+        IDX_SYNCH,
+        IDX_SIZE
+    };
+
 public:
     ModuleDatabasePool();
     virtual ~ModuleDatabasePool();
 
+    //! Synchronous-only configuration.
     void SetConnectionInfo(std::string_view infoString, uint8 synchThreads);
 
-    //! Opens the configured number of synchronous connections.
+    //! Same argument order as DatabaseWorkerPool; async threads need the queue-taking CreateConnection.
+    void SetConnectionInfo(std::string_view infoString, uint8 asyncThreads, uint8 synchThreads);
+
     //! Returns 0 on success, or the MySQL error code of the first failed connection.
     uint32 Open();
 
@@ -90,32 +102,55 @@ public:
         return Query(std::string_view(Acore::StringFormat(sql, std::forward<Args>(args)...)));
     }
 
-    //! Prepared statements. The index space is defined by the module's connection
-    //! class (DoPrepareStatements); parameter counts are recorded by PrepareStatements(),
-    //! so building one before that call yields a zero-parameter statement.
-    //! Both calls consume (delete) the statement, mirroring DatabaseWorkerPool.
+    //! All of these consume (delete) the statement, mirroring DatabaseWorkerPool.
     void Execute(PreparedStatementBase* stmt);
+    void DirectExecute(PreparedStatementBase* stmt);
     PreparedQueryResult Query(PreparedStatementBase* stmt);
 
-    //! Parameter count for a prepared statement index, for constructing typed
-    //! PreparedStatement<T> objects module-side.
+    QueryCallback AsyncQuery(std::string_view sql);
+    QueryCallback AsyncQuery(PreparedStatementBase* stmt);
+
+    template<typename... Args>
+    QueryCallback AsyncQuery(std::string_view sql, Args&&... args)
+    {
+        return AsyncQuery(std::string_view(Acore::StringFormat(sql, std::forward<Args>(args)...)));
+    }
+
+    SQLQueryHolderCallback DelayQueryHolder(std::shared_ptr<SQLQueryHolderBase> holder);
+
+    //! Parameter count of a prepared statement, recorded by PrepareStatements().
     [[nodiscard]] uint8 GetPreparedStatementParamCount(uint32 index) const;
 
-    //! Synchronously commits the transaction on a free connection.
+    void CommitTransaction(std::shared_ptr<TransactionBase> transaction);
+    TransactionCallback AsyncCommitTransaction(std::shared_ptr<TransactionBase> transaction);
     void DirectCommitTransaction(std::shared_ptr<TransactionBase> transaction);
 
-    //! Pings every idle connection to keep them alive.
     void KeepAlive();
+    [[nodiscard]] std::size_t QueueSize() const;
+
+    //! Debug builds only: logs a stack trace for every synchronous query of the calling thread.
+    void WarnAboutSyncQueries(bool warn);
 
 protected:
     virtual MySQLConnection* CreateConnection(MySQLConnectionInfo& connInfo) = 0;
 
+    //! Asynchronous connection factory; the default returns nullptr and Open() fails.
+    virtual MySQLConnection* CreateConnection(ProducerConsumerQueue<SQLOperation*>* queue,
+        MySQLConnectionInfo& connInfo);
+
 private:
+    uint32 OpenConnections(InternalIndex type, uint8 numConnections);
+
+    void Enqueue(SQLOperation* op);
+
+    //! Caller must Unlock() the returned synchronous connection.
     MySQLConnection* GetFreeConnection();
 
     MySQLConnectionInfo _connectionInfo;
-    std::vector<std::unique_ptr<MySQLConnection>> _connections;
+    std::unique_ptr<ProducerConsumerQueue<SQLOperation*>> _queue;
+    std::array<std::vector<std::unique_ptr<MySQLConnection>>, IDX_SIZE> _connections;
     std::vector<uint8> _preparedStatementSize;
+    uint8 _asyncThreads;
     uint8 _synchThreads;
 };
 
