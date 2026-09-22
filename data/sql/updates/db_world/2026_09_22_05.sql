@@ -1,3 +1,4 @@
+-- DB update 2026_09_22_04 -> 2026_09_22_05
 --
 -- Blacksmithing Plans require the skill needed to learn their contained recipe.
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 4 AND (`SourceGroup`, `SourceEntry`) IN ((11524, 11614), (11525, 11615), (13721, 12827), (13722, 12830));
