@@ -456,22 +456,12 @@ struct boss_onyxia : public BossAI
             }
             case EVENT_PHASE_2_STEP_CW:
             {
-                uint8 newWP = _currentWP + 1;
-                if (newWP > WP_SOUTH_EAST)
-                {
-                    newWP = WP_SOUTH;
-                }
-                MoveToWaypoint(newWP);
+                MoveToWaypoint(_currentWP == WP_SOUTH_EAST ? WP_SOUTH : _currentWP + 1);
                 break;
             }
             case EVENT_PHASE_2_STEP_ACW:
             {
-                uint8 newWP = _currentWP - 1;
-                if (newWP < WP_SOUTH)
-                {
-                    newWP = WP_SOUTH_EAST;
-                }
-                MoveToWaypoint(newWP);
+                MoveToWaypoint(_currentWP == WP_SOUTH ? WP_SOUTH_EAST : _currentWP - 1);
                 break;
             }
             case EVENT_PHASE_2_STEP_ACROSS:

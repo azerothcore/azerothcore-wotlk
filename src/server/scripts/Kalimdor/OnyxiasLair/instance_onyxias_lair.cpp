@@ -25,9 +25,10 @@ ObjectData const creatureData[] =
     { 0,          0           }
 };
 
+// 95 yards from the spawn plus Onyxia's 18 yard combat reach, which the old GetDistance2d check subtracted
 BossBoundaryData const boundaries =
 {
-    { DATA_ONYXIA, new CircleBoundary(Position(-10.6155f, -219.357f), 95.0) }
+    { DATA_ONYXIA, new CircleBoundary(Position(-10.6155f, -219.357f), 113.0) }
 };
 
 class instance_onyxias_lair : public InstanceMapScript
@@ -42,10 +43,7 @@ public:
 
     struct instance_onyxias_lair_InstanceMapScript : public InstanceScript
     {
-        instance_onyxias_lair_InstanceMapScript(Map* map) : InstanceScript(map)
-        {
-            Initialize();
-        }
+        instance_onyxias_lair_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
         void Initialize() override
         {
