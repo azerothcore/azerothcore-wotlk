@@ -1422,7 +1422,7 @@ struct SmartAction
 
         struct
         {
-            SAIBool state;
+            uint32 state;
             uint32 spawnTimerMin;
             uint32 spawnTimerMax;
             uint32 respawnDelay;
@@ -1590,8 +1590,9 @@ enum SMARTAI_TARGETS
     SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry
     SMART_TARGET_INSTANCE_STORAGE               = 205,  // Instance data index, Type (creature (1), gameobject (2))
     SMART_TARGET_FORMATION                      = 206,  // Type (0: members only, 1: leader only, 2: all), CreatureEntry (0: any), ExcludeSelf (0/1)
+    SMART_TARGET_SHARED_OWNER_ENTITIES          = 207,  // Type (creature (1), gameobject (2)), Entry (0: any), MaxDist (0: visibility range)
 
-    SMART_TARGET_AC_END                         = 207   // placeholder
+    SMART_TARGET_AC_END                         = 208   // placeholder
 };
 
 struct SmartTarget
@@ -1779,6 +1780,14 @@ struct SmartTarget
         {
             SAIBool includePets;
         } invokerParty;
+
+        // entities sharing our owner, charmer or summoner, whether they were summoned by it or not
+        struct
+        {
+            uint32 type;        // creature (1), gameobject (2)
+            uint32 entry;       // entry filter, 0 = any
+            uint32 maxDist;     // 0 = visibility range
+        } sharedOwnerEntities;
     };
 };
 

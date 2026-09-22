@@ -535,7 +535,7 @@ void SpellMgr::SetSpellDifficultyId(uint32 spellId, uint32 id)
     mSpellDifficultySearcherMap[spellId] = id;
 }
 
-uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) const
+uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, WorldObject const* caster) const
 {
     if (!GetSpellInfo(spellId))
         return spellId;
@@ -577,7 +577,7 @@ uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) con
     return uint32(difficultyEntry->SpellID[mode]);
 }
 
-SpellInfo const* SpellMgr::GetSpellForDifficultyFromSpell(SpellInfo const* spell, Unit const* caster) const
+SpellInfo const* SpellMgr::GetSpellForDifficultyFromSpell(SpellInfo const* spell, WorldObject const* caster) const
 {
     uint32 newSpellId = GetSpellIdForDifficulty(spell->Id, caster);
     SpellInfo const* newSpell = GetSpellInfo(newSpellId);
@@ -3177,8 +3177,12 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
     }
     else
     {
-        for (count = 0; result->NextRow(); ++count)
+        count = 0;
+
+        do
         {
+            ++count;
+
             Field const* fields = result->Fetch();
 
             uint32 const spellId = fields[0].Get<uint32>();
@@ -3237,7 +3241,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             }
 
             spellInfo->AttributesCu |= attributes;
-        }
+        } while (result->NextRow());
+
         LOG_INFO("server.loading", ">> Loaded {} spell custom attributes from DB in {} ms", count, GetMSTimeDiffToNow(customAttrTime));
     }
 
@@ -3278,6 +3283,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                         case 46021: // Spectral Realm (SWP)
                         case 52951: // Chapel Invisibility (DK starting zone)
                         case 43062: // Alpha Worg: Garwal's Invisibility
+                        case 45614: // Shroud of the Scourge (Blending In, Temple City of En'kilah)
                             break;
                         default:
                             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;

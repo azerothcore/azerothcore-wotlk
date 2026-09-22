@@ -510,7 +510,7 @@ public:
     void SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemaining);
 
     /// Is the user engaged in a log out process?
-    bool isLogingOut() const { return _logoutTime || m_playerLogout; }
+    bool IsLoggingOut() const { return _logoutTime || m_playerLogout; }
 
     /// Engage the logout process for the user
     void SetLogoutStartTime(time_t requestTime)
@@ -524,7 +524,7 @@ public:
         return (_logoutTime > 0 && currTime >= _logoutTime + 20);
     }
 
-    void LogoutPlayer(bool save);
+    void LogoutPlayer(bool save, bool redirecting = false);
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
 
@@ -549,6 +549,7 @@ public:
     void SendShowBank(ObjectGuid guid);
     bool CanOpenMailBox(ObjectGuid guid);
     void SendShowMailBox(ObjectGuid guid);
+    void SendMailList();
     void SendTabardVendorActivate(ObjectGuid guid);
     void SendSpiritResurrect();
     void SendBindPoint(Creature* npc);
@@ -686,6 +687,8 @@ public:                                                 // opcodes handlers
     void SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo);
     void SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo);
     void SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid);
+
+    void HandleTC9PrepareForRedirect(WorldPacket& recvData);
 
     // played time
     void HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet);

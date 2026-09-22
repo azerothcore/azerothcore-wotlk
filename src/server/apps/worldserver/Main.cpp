@@ -49,10 +49,12 @@
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
 #include "Systemd.h"
+#include "TC9Sidecar.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
+#include "libsidecar.h"
 #include <boost/asio/signal_set.hpp>
 #include <boost/program_options.hpp>
 #include <csignal>
@@ -202,6 +204,11 @@ int main(int argc, char** argv)
             LOG_INFO("server.worldserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             LOG_INFO("server.worldserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
+
+    // Cluster.Enabled is known from config here. Fail before DB/network if the
+    // loaded libsidecar is the stub or does not match the headers we built with.
+    if (!sToCloud9Sidecar->CheckLibsidecarAbi())
+        return 1;
 
     OpenSSLCrypto::threadsSetup();
 
@@ -365,7 +372,8 @@ int main(int argc, char** argv)
         sWorldSocketMgr.StopNetwork();
 
         ///- Clean database before leaving
-        ClearOnlineAccounts();
+        if (!sToCloud9Sidecar->ClusterModeEnabled())
+            ClearOnlineAccounts();
     });
 
     // Set server online (allow connecting now)
@@ -397,10 +405,14 @@ int main(int argc, char** argv)
         cliThread.reset(new std::thread(CliThread), &ShutdownCLIThread);
     }
 
+    sToCloud9Sidecar->Init(worldPort, realm.Id.Realm);
+
     WorldUpdateLoop();
 
     // Shutdown starts here
     threadPool.reset();
+
+    sToCloud9Sidecar->Deinit();
 
     sLog->SetSynchronous();
 
@@ -434,6 +446,9 @@ bool StartDB()
     if (!loader.Load())
         return false;
 
+    if (!sScriptMgr->OnModuleDatabasesLoading())
+        return false;
+
     ///- Get the realm Id from the configuration file
     realm.Id.Realm = sConfigMgr->GetOption<uint32>("RealmID", 1);
     if (!realm.Id.Realm)
@@ -455,8 +470,11 @@ bool StartDB()
     LOG_INFO("server.loading", "Loading World Information...");
     LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
 
-    ///- Clean the database before starting
-    ClearOnlineAccounts();
+    ///- Clean the database before starting.
+    /// Cluster.Enabled is read from config here because sToCloud9Sidecar->Init()
+    /// has not run yet; ClusterModeEnabled() would still be the default false.
+    if (!sConfigMgr->GetOption<bool>("Cluster.Enabled", false))
+        ClearOnlineAccounts();
 
     ///- Insert version info into DB
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_VERSION);
@@ -478,6 +496,8 @@ void StopDB()
     CharacterDatabase.Close();
     WorldDatabase.Close();
     LoginDatabase.Close();
+
+    sScriptMgr->OnModuleDatabasesClosing();
 
     MySQL::Library_End();
 }
@@ -569,6 +589,8 @@ void WorldUpdateLoop()
     CharacterDatabase.WarnAboutSyncQueries(true);
     WorldDatabase.WarnAboutSyncQueries(true);
 
+    sScriptMgr->OnDatabaseWarnAboutSyncQueries(true);
+
     ///- While we have not World::m_stopEvent, update the world
     while (!World::IsStopped())
     {
@@ -597,6 +619,8 @@ void WorldUpdateLoop()
             Sleep(1000);
 #endif
     }
+
+    sScriptMgr->OnDatabaseWarnAboutSyncQueries(false);
 
     LoginDatabase.WarnAboutSyncQueries(false);
     CharacterDatabase.WarnAboutSyncQueries(false);

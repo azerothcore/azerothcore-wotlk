@@ -36,6 +36,7 @@ enum ZeppelinEvent
     EVENT_UC_TO_OG_DEPARTURE      = 15321,
     EVENT_UC_TO_GROMGOL_DEPARTURE = 15313,
     EVENT_GROMGOL_TO_UC_DEPARTURE = 15315,
+    EVENT_WK_DEPARTURE            = 15430,
 };
 
 enum ZeppelinMaster
@@ -53,6 +54,11 @@ enum ZeppelinMaster
     NPC_DRENK_SPANNERSPARK = 26540,
     NPC_ZELLI_HOTNOZZLE    = 34765,
     NPC_KRENDLE_BIGPOCKETS = 34766,
+};
+
+enum ZeppelinTransport
+{
+    GO_WESTGUARD_ZEPPELIN = 186371,
 };
 
 const float SEARCH_RANGE_ZEPPELIN_MASTER = 32.0f;

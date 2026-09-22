@@ -8,6 +8,7 @@ on:
       - opened
       - reopened
       - synchronize
+      - ready_for_review
 
 concurrency:
   # One concurrency group per workflow + ref.
@@ -37,8 +38,8 @@ jobs:
               CXX: clang++-18
           - os: ubuntu-26.04
             compiler:
-              CC: clang-20
-              CXX: clang++-20
+              CC: clang-21
+              CXX: clang++-21
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-pch
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft

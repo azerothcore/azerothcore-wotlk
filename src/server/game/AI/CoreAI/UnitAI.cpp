@@ -40,7 +40,7 @@ void UnitAI::AttackStartCaster(Unit* victim, float dist)
 
 void UnitAI::DoMeleeAttackIfReady()
 {
-    if (me->HasUnitState(UNIT_STATE_CASTING))
+    if (me->IsActionPreventedByCasting())
         return;
 
     Unit* victim = me->GetVictim();
@@ -75,7 +75,7 @@ void UnitAI::DoMeleeAttackIfReady()
 
 bool UnitAI::DoSpellAttackIfReady(uint32 spell)
 {
-    if (me->HasUnitState(UNIT_STATE_CASTING) || !me->isAttackReady())
+    if (me->IsActionPreventedByCasting() || !me->isAttackReady())
         return true;
 
     if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
@@ -93,7 +93,7 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
 
 void UnitAI::DoSpellAttackToRandomTargetIfReady(uint32 spell, uint32 threatTablePosition /*= 0*/, float dist /*= 0.f*/, bool playerOnly /*= true*/)
 {
-    if (me->HasUnitState(UNIT_STATE_CASTING) || !me->isAttackReady())
+    if (me->IsActionPreventedByCasting() || !me->isAttackReady())
         return;
 
     if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
@@ -269,7 +269,7 @@ SpellCastResult UnitAI::DoCast(Unit* victim, uint32 spellId, bool triggered)
     if (!victim)
         return SPELL_FAILED_BAD_TARGETS;
 
-    if (me->HasUnitState(UNIT_STATE_CASTING) && !triggered)
+    if (me->IsActionPreventedByCasting() && !triggered)
         return SPELL_FAILED_SPELL_IN_PROGRESS;
 
     return me->CastSpell(victim, spellId, triggered);
@@ -285,7 +285,7 @@ SpellCastResult UnitAI::DoCastVictim(uint32 spellId, bool triggered)
 
 SpellCastResult UnitAI::DoCastAOE(uint32 spellId, bool triggered)
 {
-    if (!triggered && me->HasUnitState(UNIT_STATE_CASTING))
+    if (!triggered && me->IsActionPreventedByCasting())
         return SPELL_FAILED_SPELL_IN_PROGRESS;
 
     return me->CastSpell((Unit*)nullptr, spellId, triggered);

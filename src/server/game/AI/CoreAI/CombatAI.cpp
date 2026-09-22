@@ -91,7 +91,7 @@ void CombatAI::UpdateAI(uint32 diff)
 
     events.Update(diff);
 
-    if (me->HasUnitState(UNIT_STATE_CASTING))
+    if (me->IsActionPreventedByCasting())
         return;
 
     if (uint32 spellId = events.ExecuteEvent())
@@ -161,7 +161,7 @@ void CasterAI::UpdateAI(uint32 diff)
         return;
     }
 
-    if (me->HasUnitState(UNIT_STATE_CASTING))
+    if (me->IsActionPreventedByCasting())
         return;
 
     if (uint32 spellId = events.ExecuteEvent())

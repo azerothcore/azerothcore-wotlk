@@ -27,6 +27,7 @@
 #include "AuthSocketMgr.h"
 #include "Banner.h"
 #include "Config.h"
+#include "DBUpdater.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "GitRevision.h"
@@ -142,13 +143,23 @@ int main(int argc, char** argv)
 
     if (sRealmList->GetRealms().empty())
     {
-        LOG_ERROR("server.authserver", "No valid realms specified.");
+        LOG_ERROR("server.authserver", "No valid realms specified. Possible reasons:");
+        LOG_ERROR("server.authserver", "- the realmlist table of the auth database is empty");
+        LOG_ERROR("server.authserver", "- every realm has flag 3 (REALM_FLAG_VERSION_MISMATCH | REALM_FLAG_OFFLINE), which the realm list "
+            "query excludes. Reset it with: UPDATE realmlist SET flag = 0 WHERE id = <realm id>;");
+        LOG_ERROR("server.authserver", "- no realm address could be resolved, see the resolver errors logged above");
         return 1;
     }
 
     // Stop auth server if dry run
     if (sConfigMgr->isDryRun())
     {
+        if (uint32 failed = DBUpdaterUtil::GetFailedUpdateCount())
+        {
+            LOG_FATAL("server.authserver", "Dry run completed with {} failed database update(s), terminating.", failed);
+            return 1;
+        }
+
         LOG_INFO("server.authserver", "Dry run completed, terminating.");
         return 0;
     }

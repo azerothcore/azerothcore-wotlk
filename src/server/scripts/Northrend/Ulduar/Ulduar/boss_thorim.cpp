@@ -18,6 +18,7 @@
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
+#include "ObjectAccessor.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -52,15 +53,19 @@ enum ThorimSpells
     SPELL_TOUCH_OF_DOMINION                 = 62507,
     SPELL_SIF_TRANSFORM                     = 64778,
     SPELL_SIF_CHANNEL_HOLOGRAM              = 64324,
-    SPELL_FROSTBOLT                         = 62601,
-    SPELL_FROSTBOLT_VALLEY                  = 62604,
+    SPELL_FROSTBOLT                         = 62583,
+    SPELL_FROSTBOLT_VALLEY                  = 62580,
     SPELL_BLIZZARD                          = 62577,
-    SPELL_FROST_NOVA                        = 62605,
+    SPELL_FROST_NOVA                        = 62597,
 
     // DARK RUNE ACOLYTE
     SPELL_GREATER_HEAL                      = 62334,
     SPELL_HOLY_SMITE                        = 62335,
     SPELL_RENEW                             = 62333,
+    // NPC variants used while healing the arena mock fight
+    SPELL_GREATER_HEAL_RP                   = 61965,
+    SPELL_RENEW_RP                          = 61967,
+    SPELL_CIRCLE_OF_HEALING_RP              = 61964,
 
     // CAPTURED MERCENARY SOLDIER
     SPELL_BARBED_SHOT                       = 62318,
@@ -70,6 +75,8 @@ enum ThorimSpells
     // CAPTURED MERCENARY CAPTAIN
     SPELL_DEVASTATE                         = 62317,
     SPELL_HEROIC_STRIKE                     = 62444,
+    SPELL_SUNDER_ARMOR                      = 57807,
+    SPELL_THREAT                            = 34915, // serverside, keeps the behemoth glued to the captain
 
     // JORMUNGAR BEHEMOTH
     SPELL_ACID_BREATH                       = 62315,
@@ -143,6 +150,8 @@ enum ThormNPCandGOs : uint32
     NPC_ANCIENT_RUNE_GIANT                  = 32873,
     NPC_DARK_RUNE_ACOLYTE_G                 = 33110,
     NPC_IRON_HONOR_GUARD                    = 32875,
+    NPC_GOLEM_RIGHT_HAND_BUNNY              = 33140,
+    NPC_GOLEM_LEFT_HAND_BUNNY               = 33141,
 
     // TRIGGERS
     NPC_LIGHTNING_ORB                       = 33138,
@@ -178,6 +187,9 @@ enum ThorimEvents
     EVENT_DR_ACOLYTE_GH                     = 20,
     EVENT_DR_ACOLYTE_HS                     = 21,
     EVENT_DR_ACOLYTE_R                      = 22,
+    EVENT_DR_ACOLYTE_RP_GH                  = 23,
+    EVENT_DR_ACOLYTE_RP_RENEW               = 24,
+    EVENT_DR_ACOLYTE_RP_COH                 = 25,
 
     EVENT_CM_SOLDIER_BS                     = 30,
     EVENT_CM_SOLDIER_S                      = 31,
@@ -185,6 +197,8 @@ enum ThorimEvents
 
     EVENT_CM_CAPTAIN_D                      = 40,
     EVENT_CM_CAPTAIN_HC                     = 41,
+    EVENT_CM_CAPTAIN_SA                     = 42,
+    EVENT_CM_CAPTAIN_THREAT                 = 43,
 
     EVENT_JB_ACID_BREATH                    = 50,
     EVENT_JB_SWEEP                          = 51,
@@ -195,7 +209,6 @@ enum ThorimEvents
     EVENT_RC_RUNIC_BARRIER                  = 70,
     EVENT_RC_SMASH                          = 71,
     EVENT_RC_RUNIC_SMASH                    = 72,
-    EVENT_RC_RUNIC_SMASH_TRIGGER            = 73,
     EVENT_RC_CHARGE                         = 74,
 
     EVENT_ARG_RD                            = 80,
@@ -207,7 +220,7 @@ enum ThorimEvents
     EVENT_IH_GUARD_HAMSTRING                = 91,
     EVENT_IH_GUARD_SHIELD_SMASH             = 92,
 
-    EVENT_SIF_START_TALK                    = 100,
+    EVENT_THORIM_SUMMON_SIF                 = 100,
     EVENT_SIF_JOIN_TALK                     = 101,
     EVENT_SIF_FINISH_DOMINION               = 102,
     EVENT_SIF_FROSTBOLT_VALLEY              = 103,
@@ -284,10 +297,11 @@ enum Misc
     ACTION_START_TRASH_DIED     = 1,
     ACTION_ALLOW_HIT            = 2,
     ACTION_SIF_JOIN_FIGHT       = 3,
-    ACTION_SIF_START_TALK       = 4,
     ACTION_SIF_START_DOMINION   = 5,
     ACTION_SIF_TRANSFORM        = 6,
     ACTION_IRON_HONOR_DIED      = 7,
+    ACTION_ENGAGE_PLAYERS       = 8,
+    ACTION_RUNIC_SMASH_CAST     = 9,
 
     EVENT_PHASE_START           = 1,
     EVENT_PHASE_RING            = 2,
@@ -301,15 +315,9 @@ const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI * 1.5f};
 
 struct boss_thorim : public BossAI
 {
-    boss_thorim(Creature* creature) : BossAI(creature, BOSS_THORIM)
-    {
-        _encounterFinished = !me->IsAlive();
-        if (_encounterFinished)
-            instance->SetBossState(BOSS_THORIM, DONE);
-    }
+    boss_thorim(Creature* creature) : BossAI(creature, BOSS_THORIM) { }
 
     bool _isArenaEmpty;
-    bool _encounterFinished;
     bool _spawnCommoners;
     bool _hardMode;
     bool _isHitAllowed;
@@ -343,7 +351,7 @@ struct boss_thorim : public BossAI
     void SpawnAllNPCs()
     {
         // Jormungar Behemoth 32882
-        me->SummonCreature(NPC_JORMUNGAR_BEHEMOT, 2149.68f, -263.477f, 419.679f, 3.12102f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+        me->SummonCreature(NPC_JORMUNGAR_BEHEMOT, 2146.611f, -266.653f, 419.8175f, 2.70526f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
         // Captured Mercenary Soldier 32885
         me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2127.24f, -251.309f, 419.793f, 5.89921f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
@@ -376,9 +384,6 @@ struct boss_thorim : public BossAI
 
         // Ancient Rune Giant 32873
         me->SummonCreature(NPC_ANCIENT_RUNE_GIANT, 2134.57f, -440.318f, 438.331f, 0.226893f);
-
-        // Sif 33196
-        me->SummonCreature(NPC_SIF, 2147.86f, -301.2f, 438.246f, 2.488f);
     }
 
     void CloseDoors()
@@ -402,7 +407,7 @@ struct boss_thorim : public BossAI
     void JustExitedCombat() override
     {
         EngagementOver();
-        if (_encounterFinished)
+        if (instance->GetBossState(BOSS_THORIM) == DONE)
             return;
         EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
     }
@@ -415,7 +420,7 @@ struct boss_thorim : public BossAI
 
     void Reset() override
     {
-        if (!_encounterFinished)
+        if (instance->GetBossState(BOSS_THORIM) != DONE)
             _Reset();
 
         _trashCounter = 0;
@@ -457,6 +462,14 @@ struct boss_thorim : public BossAI
                 if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
                     go->RemoveGameObjectFlag((GameObjectFlags)48);
 
+                // Iron Ring Guards and the Runic Colossus spawn with UNIT_FLAG_IMMUNE_TO_PC until the arena event starts
+                summons.DoForAllSummons([](WorldObject* obj)
+                {
+                    if (Creature* c = obj->ToCreature())
+                        if (c->EntryEquals(NPC_IRON_RING_GUARD, NPC_RUNIC_COLOSSUS))
+                            c->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                });
+
                 events.ScheduleEvent(EVENT_THORIM_AGGRO, 0ms);
                 events.SetPhase(EVENT_PHASE_START);
                 events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20s);
@@ -465,6 +478,16 @@ struct boss_thorim : public BossAI
         }
         else if (param == ACTION_ALLOW_HIT)
             _isHitAllowed = true;
+    }
+
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+    {
+        // start pack deaths must be counted here: a member killed while Mind Controlled
+        // still has PossessedAI installed when it dies, so its own JustDied never runs
+        if (summon->EntryEquals(NPC_JORMUNGAR_BEHEMOT, NPC_CAPTURED_MERCENARY_SOLDIER_ALLY,
+            NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY,
+            NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, NPC_DARK_RUNE_ACOLYTE_I))
+            DoAction(ACTION_START_TRASH_DIED);
     }
 
     void KilledUnit(Unit* victim) override
@@ -481,7 +504,7 @@ struct boss_thorim : public BossAI
 
     void JustEngagedWith(Unit*) override
     {
-        if (!_encounterFinished)
+        if (instance->GetBossState(BOSS_THORIM) != DONE)
             instance->SetBossState(BOSS_THORIM, IN_PROGRESS);
         me->setActive(true);
         DisableThorim(true);
@@ -523,12 +546,15 @@ struct boss_thorim : public BossAI
                 me->AddThreat(player, 1000.0f);
         }
 
-        if (damage >= me->GetHealth()|| me->GetHealth()<2)
+        // The hook also fires with zero damage on an already despawned Thorim (damage shields after
+        // his own lethal melee during the HARD_RESET evade), where 0 >= 0 would count as a defeat
+        if (me->IsAlive() && damage >= me->GetHealth())
         {
             damage = 0;
-            if (!_encounterFinished)
+            if (instance->GetBossState(BOSS_THORIM) != DONE)
             {
-                _encounterFinished = true;
+                // Must precede CombatStop: it runs JustExitedCombat, whose DONE check keeps the outro from evading
+                instance->SetBossState(BOSS_THORIM, DONE);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetHealth(me->GetMaxHealth());
@@ -560,7 +586,6 @@ struct boss_thorim : public BossAI
 
                 // Defeat credit
                 me->CastSpell(me, 64985, true); // credit
-                instance->SetBossState(BOSS_THORIM, DONE);
             }
         }
     }
@@ -617,7 +642,7 @@ struct boss_thorim : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!_encounterFinished && !UpdateVictim())
+        if (instance->GetBossState(BOSS_THORIM) != DONE && !UpdateVictim())
             return;
 
         events.Update(diff);
@@ -635,13 +660,12 @@ struct boss_thorim : public BossAI
 
                 break;
             case EVENT_THORIM_AGGRO2:
-                {
-                    Talk(SAY_AGGRO_2);
-
-                    EntryCheckPredicate pred(NPC_SIF);
-                    summons.DoAction(ACTION_SIF_START_TALK, pred);
-                    break;
-                }
+                Talk(SAY_AGGRO_2);
+                events.ScheduleEvent(EVENT_THORIM_SUMMON_SIF, 6500ms);
+                break;
+            case EVENT_THORIM_SUMMON_SIF:
+                me->SummonCreature(NPC_SIF, 2148.3f, -297.845f, 438.331f, 2.688f);
+                break;
             case EVENT_THORIM_START_PHASE1:
                 {
                     events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8s, 0, EVENT_PHASE_START);
@@ -754,8 +778,6 @@ struct boss_thorim : public BossAI
                 {
                     Talk(SAY_END_NORMAL_3);
                 }
-                // Defeat credit
-                instance->SetBossState(BOSS_THORIM, DONE);
                 events.ScheduleEvent(EVENT_THORIM_OUTRO4, 14s, 0, 3);
                 break;
             case EVENT_THORIM_OUTRO4:
@@ -763,7 +785,7 @@ struct boss_thorim : public BossAI
                 break;
         }
 
-        if (!_encounterFinished)
+        if (instance->GetBossState(BOSS_THORIM) != DONE)
             DoMeleeAttackIfReady();
     }
 };
@@ -785,11 +807,14 @@ struct boss_thorim_sif : public ScriptedAI
             _allowCast = false;
         }
 
+        void IsSummonedBy(WorldObject* /*summoner*/) override
+        {
+            Talk(SAY_SIF_AGGRO);
+        }
+
         void DoAction(int32 param) override
         {
-            if (param == ACTION_SIF_START_TALK)
-                events.ScheduleEvent(EVENT_SIF_START_TALK, 9s);
-            else if (param == ACTION_SIF_START_DOMINION)
+            if (param == ACTION_SIF_START_DOMINION)
             {
                 if (me->GetInstanceScript())
                     if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
@@ -801,7 +826,6 @@ struct boss_thorim_sif : public ScriptedAI
             {
                 me->InterruptNonMeleeSpells(false);
                 events.ScheduleEvent(EVENT_SIF_JOIN_TALK, 9s);
-                events.CancelEvent(EVENT_SIF_START_TALK);
                 events.CancelEvent(EVENT_SIF_FINISH_DOMINION);
             }
             else if (param == ACTION_SIF_TRANSFORM)
@@ -824,9 +848,6 @@ struct boss_thorim_sif : public ScriptedAI
                 case EVENT_SIF_FINISH_DOMINION:
                     Talk(SAY_SIF_HM_MISSED);
                     me->DespawnOrUnsummon(5s);
-                    break;
-                case EVENT_SIF_START_TALK:
-                    Talk(SAY_SIF_AGGRO);
                     break;
                 case EVENT_SIF_JOIN_TALK:
                     Talk(SAY_SIF_HM_REACHED);
@@ -1014,9 +1035,39 @@ struct boss_thorim_start_npcs : public ScriptedAI
             events.Reset();
             _isCaster = (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I);
             _playerAttack = false;
-            if (me->GetEntry() != NPC_JORMUNGAR_BEHEMOT)
-                if (Creature* cr = me->FindNearestCreature(NPC_JORMUNGAR_BEHEMOT, 30.0f))
-                    AttackStart(cr);
+            StartMockBattle();
+        }
+
+        void JustReachedHome() override
+        {
+            // Reset() runs at evade start, when UNIT_STATE_EVADE still blocks Unit::Attack
+            StartMockBattle();
+        }
+
+        void StartMockBattle()
+        {
+            events.Reset();
+
+            // The acolyte is friendly to both sides and heals the fight from its spawn point
+            if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I)
+            {
+                me->SetReactState(REACT_PASSIVE);
+                events.ScheduleEvent(EVENT_DR_ACOLYTE_RP_GH, 5s);
+                events.ScheduleEvent(EVENT_DR_ACOLYTE_RP_RENEW, 8s);
+                events.ScheduleEvent(EVENT_DR_ACOLYTE_RP_COH, 20s);
+                return;
+            }
+
+            if (me->GetEntry() == NPC_JORMUNGAR_BEHEMOT)
+                return;
+
+            if (Creature* behemoth = me->FindNearestCreature(NPC_JORMUNGAR_BEHEMOT, 60.0f))
+            {
+                if (me->GetEntry() == NPC_CAPTURED_MERCENARY_SOLDIER_ALLY || me->GetEntry() == NPC_CAPTURED_MERCENARY_SOLDIER_HORDE)
+                    AttackStartNoMove(behemoth); // soldiers shoot from their spawn point
+                else
+                    AttackStart(behemoth);
+            }
         }
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
@@ -1032,27 +1083,37 @@ struct boss_thorim_start_npcs : public ScriptedAI
                             thorim->AI()->AttackStart(who);
                         }
                     }
-                _playerAttack = true;
-                me->GetThreatMgr().ResetAllThreat();
-                me->CallForHelp(40.0f);
-                AttackStart(who);
+
+                // The whole pack turns on the raid at once; CallForHelp cannot cross the mock fight's faction split
+                std::list<Creature*> pack;
+                me->GetCreatureListWithEntryInGrid(pack, { NPC_JORMUNGAR_BEHEMOT, NPC_CAPTURED_MERCENARY_SOLDIER_ALLY, NPC_CAPTURED_MERCENARY_SOLDIER_HORDE,
+                    NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY, NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, NPC_DARK_RUNE_ACOLYTE_I }, 100.0f);
+                for (Creature* member : pack)
+                    member->AI()->SetGUID(who->GetGUID(), ACTION_ENGAGE_PLAYERS);
             }
 
             if (!_playerAttack && me->HealthBelowPct(60))
                 me->SetHealth(me->GetMaxHealth());
         }
 
-        void JustDied(Unit*) override
+        void SetGUID(ObjectGuid const& guid, int32 id) override
         {
-            if (me->GetInstanceScript())
-                if (Creature* thorim = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
-                    thorim->AI()->DoAction(ACTION_START_TRASH_DIED);
+            if (id != ACTION_ENGAGE_PLAYERS || _playerAttack)
+                return;
+
+            _playerAttack = true;
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->GetThreatMgr().ClearAllThreat();
+            if (Unit* attacker = ObjectAccessor::GetUnit(*me, guid))
+                AttackStart(attacker);
         }
 
         void JustEngagedWith(Unit*  /*who*/) override
         {
             if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I)
             {
+                // Entering real combat ends the mock fight heal rotation
+                events.Reset();
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_GH, 10s);
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_HS, 5s);
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_R, 7s);
@@ -1067,6 +1128,8 @@ struct boss_thorim_start_npcs : public ScriptedAI
             {
                 events.ScheduleEvent(EVENT_CM_CAPTAIN_D, 9s);
                 events.ScheduleEvent(EVENT_CM_CAPTAIN_HC, 5s);
+                events.ScheduleEvent(EVENT_CM_CAPTAIN_SA, 8s);
+                events.ScheduleEvent(EVENT_CM_CAPTAIN_THREAT, 1200ms);
             }
             else if (me->GetEntry() == NPC_JORMUNGAR_BEHEMOT)
             {
@@ -1080,7 +1143,39 @@ struct boss_thorim_start_npcs : public ScriptedAI
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
+                // The acolyte tends both sides of the mock fight from outside of combat
+                if (_isCaster && !_playerAttack)
+                {
+                    events.Update(diff);
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
+
+                    switch (events.ExecuteEvent())
+                    {
+                        case EVENT_DR_ACOLYTE_RP_GH:
+                            if (Creature* behemoth = me->FindNearestCreature(NPC_JORMUNGAR_BEHEMOT, 60.0f))
+                                me->CastSpell(behemoth, SPELL_GREATER_HEAL_RP, false);
+                            events.Repeat(23s);
+                            break;
+                        case EVENT_DR_ACOLYTE_RP_RENEW:
+                        {
+                            Creature* captain = me->FindNearestCreature(NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY, 60.0f);
+                            if (!captain)
+                                captain = me->FindNearestCreature(NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, 60.0f);
+                            if (captain)
+                                me->CastSpell(captain, SPELL_RENEW_RP, false);
+                            events.Repeat(23s);
+                            break;
+                        }
+                        case EVENT_DR_ACOLYTE_RP_COH:
+                            me->CastSpell(me, SPELL_CIRCLE_OF_HEALING_RP, false);
+                            events.Repeat(23s);
+                            break;
+                    }
+                }
                 return;
+            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -1109,7 +1204,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
                     break;
                 case EVENT_CM_SOLDIER_BS:
                     me->CastSpell(me->GetVictim(), SPELL_BARBED_SHOT, false);
-                    events.Repeat(9s);
+                    events.Repeat(12s);
                     break;
                 case EVENT_CM_SOLDIER_WC:
                     me->CastSpell(me->GetVictim(), SPELL_WING_CLIP, false);
@@ -1119,7 +1214,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
                     if (me->GetDistance(me->GetVictim()) > 8)
                         me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
 
-                    events.Repeat(1500ms);
+                    events.Repeat(3700ms);
                     break;
                 case EVENT_CM_CAPTAIN_D:
                     me->CastSpell(me->GetVictim(), SPELL_DEVASTATE, false);
@@ -1127,7 +1222,18 @@ struct boss_thorim_start_npcs : public ScriptedAI
                     break;
                 case EVENT_CM_CAPTAIN_HC:
                     me->CastSpell(me->GetVictim(), SPELL_HEROIC_STRIKE, false);
-                    events.Repeat(5s);
+                    events.Repeat(12s);
+                    break;
+                case EVENT_CM_CAPTAIN_SA:
+                    me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
+                    events.Repeat(12s);
+                    break;
+                case EVENT_CM_CAPTAIN_THREAT:
+                    if (!_playerAttack)
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_THREAT, true);
+                        events.Repeat(1200ms);
+                    }
                     break;
                 case EVENT_JB_ACID_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_ACID_BREATH, false);
@@ -1135,7 +1241,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
                     break;
                 case EVENT_JB_SWEEP:
                     me->CastSpell(me->GetVictim(), SPELL_SWEEP, false);
-                    events.Repeat(5s);
+                    events.Repeat(15s);
                     break;
             }
 
@@ -1164,7 +1270,7 @@ struct boss_thorim_gauntlet_npcs : public ScriptedAI
                 events.ScheduleEvent(EVENT_IR_GUARD_IMPALE, 12s);
                 events.ScheduleEvent(EVENT_IR_GUARD_WHIRL, 5s);
             }
-            else if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I)
+            else if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_G)
             {
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_GH, 10s);
                 events.ScheduleEvent(EVENT_DR_ACOLYTE_HS, 5s);
@@ -1245,29 +1351,13 @@ struct boss_thorim_runic_colossus : public ScriptedAI
     boss_thorim_runic_colossus(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         EventMap events;
-        bool _leftHand;
         bool _checkTarget;
-        float _nextTriggerPos;
-        ObjectGuid _triggerLeftGUID[2], _triggerRightGUID[2];
 
         void Reset() override
         {
-            _nextTriggerPos = 0.0f;
-            _leftHand = false;
             _checkTarget = false;
             events.Reset();
             events.ScheduleEvent(EVENT_RC_RUNIC_SMASH, 0ms);
-            Creature* c;
-
-            if ((c = me->SummonCreature(33140, 2221, -385, me->GetPositionZ())))
-                _triggerRightGUID[0] = c->GetGUID();
-            if ((c = me->SummonCreature(33140, 2210, -385, me->GetPositionZ())))
-                _triggerRightGUID[1] = c->GetGUID();
-
-            if ((c = me->SummonCreature(33141, 2235, -385, me->GetPositionZ())))
-                _triggerLeftGUID[0] = c->GetGUID();
-            if ((c = me->SummonCreature(33141, 2246, -385, me->GetPositionZ())))
-                _triggerLeftGUID[1] = c->GetGUID();
         }
 
         void JustDied(Unit*) override
@@ -1280,6 +1370,10 @@ struct boss_thorim_runic_colossus : public ScriptedAI
                 if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                     cr->AI()->Talk(SAY_SPECIAL_2);
             }
+
+            // The Ancient Rune Giant stays immune to players until the colossus falls
+            if (Creature* giant = me->FindNearestCreature(NPC_ANCIENT_RUNE_GIANT, 200.0f))
+                giant->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void JustEngagedWith(Unit*) override
@@ -1293,30 +1387,22 @@ struct boss_thorim_runic_colossus : public ScriptedAI
             _checkTarget = true;
         }
 
+        // Runic Smash lands on the colossus itself; the static hand bunny row it belongs to then
+        // casts the damage at once. Sniffed mapping: 62057 drives the Right Hand row, 62058 the Left
         void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == SPELL_RUNIC_SMASH_LEFT || spellInfo->Id == SPELL_RUNIC_SMASH_RIGHT)
-            {
-                _leftHand = spellInfo->Id == SPELL_RUNIC_SMASH_LEFT;
-                events.RescheduleEvent(EVENT_RC_RUNIC_SMASH_TRIGGER, 1s);
-            }
-        }
+            if (spellInfo->Id != SPELL_RUNIC_SMASH_LEFT && spellInfo->Id != SPELL_RUNIC_SMASH_RIGHT)
+                return;
 
-        void RunRunicSmash(bool cast)
-        {
-            if (Creature* cr = ObjectAccessor::GetCreature(*me, _leftHand ? _triggerLeftGUID[0] : _triggerRightGUID[0]))
+            uint32 entry = spellInfo->Id == SPELL_RUNIC_SMASH_LEFT ? NPC_GOLEM_RIGHT_HAND_BUNNY : NPC_GOLEM_LEFT_HAND_BUNNY;
+            std::list<Creature*> triggers;
+            me->GetCreatureListWithEntryInGrid(triggers, entry, 150.0f);
+            for (Creature* trigger : triggers)
             {
-                if (cast)
-                    cr->CastSpell(cr, SPELL_RUNIC_SMASH_DAMAGE, true);
-                cr->SetPosition(_leftHand ? 2235.0f : 2221.0f, _nextTriggerPos, cr->GetPositionZ(), 0.0f);
-                cr->StopMovingOnCurrentPos();
-            }
-            if (Creature* cr = ObjectAccessor::GetCreature(*me, _leftHand ? _triggerLeftGUID[1] : _triggerRightGUID[1]))
-            {
-                if (cast)
-                    cr->CastSpell(cr, SPELL_RUNIC_SMASH_DAMAGE, true);
-                cr->SetPosition(_leftHand ? 2246.0f : 2210.0f, _nextTriggerPos, cr->GetPositionZ(), 0.0f);
-                cr->StopMovingOnCurrentPos();
+                trigger->CastSpell(trigger, SPELL_RUNIC_SMASH_DAMAGE, true);
+                // Starts the bunny's combat-stop timer off the cast rather than the hit: an immune
+                // or missed player still ends up in combat with it but never triggers a hit event
+                trigger->AI()->DoAction(ACTION_RUNIC_SMASH_CAST);
             }
         }
 
@@ -1331,23 +1417,11 @@ struct boss_thorim_runic_colossus : public ScriptedAI
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_RC_RUNIC_SMASH_TRIGGER:
-                    _nextTriggerPos += 16.0f;
-                    if (_nextTriggerPos <= -260.0f)
-                    {
-                        events.RescheduleEvent(EVENT_RC_RUNIC_SMASH_TRIGGER, 500ms);
-                    }
-
-                    RunRunicSmash(true);
-                    break;
                 case EVENT_RC_RUNIC_SMASH:
                     if (urand(0, 1))
                         me->CastSpell(me, SPELL_RUNIC_SMASH_LEFT, false);
                     else
                         me->CastSpell(me, SPELL_RUNIC_SMASH_RIGHT, false);
-
-                    _nextTriggerPos = -385.0f;
-                    RunRunicSmash(false);
                     events.Repeat(11s);
                     break;
                 case EVENT_RC_RUNIC_BARRIER:

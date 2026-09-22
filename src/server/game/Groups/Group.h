@@ -37,6 +37,7 @@ class Unit;
 class WorldObject;
 class WorldPacket;
 class WorldSession;
+class ToCloud9GroupHooks;
 
 struct MapEntry;
 
@@ -174,6 +175,7 @@ public:
 /** todo: uninvite people that not accepted invite **/
 class Group
 {
+    friend class ToCloud9GroupHooks;
 public:
     struct MemberSlot
     {
@@ -268,6 +270,7 @@ public:
     void SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid);
     void SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag);
     void RemoveUniqueGroupMemberFlag(GroupMemberFlags flag);
+    [[nodiscard]] ObjectGuid GetTargetIcon(uint8 id) const { return id < TARGETICONCOUNT ? m_targetIcons[id] : ObjectGuid::Empty; }
 
     Difficulty GetDifficulty(bool isRaid) const;
     Difficulty GetDungeonDifficulty() const;
@@ -309,6 +312,9 @@ public:
     void EndRoll(Loot* loot);
     void RemovePlayerFromRolls(ObjectGuid guid);
 
+    // Snapshot of the active rolls, roll is deleted after a roll finishes. Do not cache the pointers across ticks.
+    [[nodiscard]] std::vector<Roll const*> GetRolls() const { return { RollId.begin(), RollId.end() }; }
+
     // related to disenchant rolls
     void ResetMaxEnchantingLevel();
 
@@ -343,6 +349,9 @@ protected:
     void SubGroupCounterIncrease(uint8 subgroup);
     void SubGroupCounterDecrease(uint8 subgroup);
     void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);
+
+    void AddMemberWithGuid(ObjectGuid guid);
+    void ForcedDisband(bool hideDestroy = false);
 
     MemberSlotList      m_memberSlots;
     GroupRefMgr     m_memberMgr;

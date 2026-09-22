@@ -2333,6 +2333,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     }
     }
 
+    _player->AdditionalSavingAddMask(ADDITIONAL_SAVING_ACHIEVEMENTS);
+
     if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && !_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_REALM_FIRST_ACHIEVEMENTS))
         sAchievementMgr->SetRealmCompleted(achievement);
 

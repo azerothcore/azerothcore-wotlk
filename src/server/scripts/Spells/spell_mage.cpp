@@ -589,20 +589,29 @@ class spell_mage_focus_magic : public AuraScript
 
     bool Load() override
     {
-        _procTarget = nullptr;
+        _procTargetGUID.Clear();
         return true;
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        _procTarget = GetCaster();
-        return _procTarget && _procTarget->IsAlive();
+        Unit* caster = GetCaster();
+        if (caster && caster->IsAlive())
+        {
+            _procTargetGUID = caster->GetGUID();
+            return true;
+        }
+        return false;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(_procTarget, SPELL_MAGE_FOCUS_MAGIC_PROC, true, nullptr, aurEff);
+        Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
+        if (!procTarget)
+            return;
+
+        GetTarget()->CastSpell(procTarget, SPELL_MAGE_FOCUS_MAGIC_PROC, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -612,7 +621,7 @@ class spell_mage_focus_magic : public AuraScript
     }
 
 private:
-    Unit* _procTarget;
+    ObjectGuid _procTargetGUID;
 };
 
 // -11426 - Ice Barrier
@@ -1126,7 +1135,7 @@ class spell_mage_gen_extra_effects : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         Unit* caster = eventInfo.GetActor();
-        // T8 4P bonus: prevent double proc on Arcane Missiles
+        // prevent double proc on Arcane Missiles
         if (GetSpellInfo()->Id == SPELL_MAGE_HOT_STREAK_PROC && caster->HasAura(SPELL_MAGE_T8_4P_BONUS))
         {
             SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
@@ -1134,6 +1143,12 @@ class spell_mage_gen_extra_effects : public AuraScript
                 (spellInfo->SpellFamilyFlags[0] & 0x00000800)) // Arcane Missiles
                 return false;
         }
+
+        // T8 4P bonus: chance to not consume the proc
+        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MAGE_T8_4P_BONUS, EFFECT_0))
+            if (roll_chance_i(aurEff->GetAmount()))
+                return false;
+
         return true;
     }
 
