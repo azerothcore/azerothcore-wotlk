@@ -5253,10 +5253,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
-    // spell level 1 makes creature level scaling multiply the flat bonus by ~1000x, scale from level 10 instead
+    // Heroic Strike
     ApplySpellFix({
-        45026, // Heroic Strike
-        29426  // Heroic Strike
+        45026,
+        29426
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->SpellLevel = 10;
