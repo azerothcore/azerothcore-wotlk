@@ -27,7 +27,7 @@ const (
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27699
 // Use Recharge's real summons and their AI, not a GM cast of Boom. The encounter state is
 // fixture setup: this does not test the heart phase or its add-spawn cadence.
-// Boom must survive its own instakill long enough to damage nearby players and chain to adds.
+// Boom must damage nearby players and adds after death without stealing the killing blow.
 func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags: []string{"long", "instances", "issue"}, Runtime: "long",
@@ -106,7 +106,7 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 				})
 				left, _ := bot.UnitHP(guid)
 				bot.Damage(t, guid, left) // one hit, never retry a failed detonation
-				xtRequireDeath(t, bot, record, guid, 5*time.Second)
+				xtRequireDeath(t, bot, record, guid, bot.World.CharGUID(), 5*time.Second)
 				xtRequirePlayerDamage(t, bot, record, guid)
 			}) {
 				return
@@ -133,7 +133,7 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 				}
 				hp, _ = bot.UnitHP(first)
 				bot.Damage(t, first, hp)
-				xtRequireChainDeath(t, bot, record, first, second)
+				xtRequireDeath(t, bot, record, first, bot.World.CharGUID(), 5*time.Second)
 				xtRequireChainDeath(t, bot, record, second, first)
 				if !xtPoll(5*time.Second, func() bool {
 					damage, hit := record.hit(first, second)
@@ -246,7 +246,7 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 							t.Logf("PASS Boom %x -> %s %x: Fire damage=%d, HP %d -> %d",
 								bomb, tc.name, guid, hit.damage, before[guid], remaining)
 						}
-						xtRequireDeath(t, bot, record, bomb, 5*time.Second)
+						xtRequireDeath(t, bot, record, bomb, bot.World.CharGUID(), 5*time.Second)
 						xtObserve(t, 2*time.Second, func() {
 							controlHP, _ := bot.UnitHP(outside)
 							if _, hit := record.hit(bomb, outside); hit || controlHP != before[outside] {
@@ -311,7 +311,7 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 						t.Logf("Boombot %x: measured %.3f yards, expect hit=%t", guid, measured, tc.wantHit)
 						hp, _ := bot.UnitHP(guid)
 						bot.Damage(t, guid, hp*2) // retain the overkill regression case
-						xtRequireDeath(t, bot, record, guid, 5*time.Second)
+						xtRequireDeath(t, bot, record, guid, bot.World.CharGUID(), 5*time.Second)
 						if tc.wantHit {
 							xtRequirePlayerDamage(t, bot, record, guid)
 						} else {
@@ -353,7 +353,7 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 				}) || !atXT {
 					e2eharness.ConfirmedBugf(t, 27699, "undamaged Boombot did not reach XT and self-destruct")
 				}
-				xtRequireDeath(t, bot, record, guid, 5*time.Second)
+				xtRequireDeath(t, bot, record, guid, guid, 5*time.Second)
 			})
 		})
 	}
@@ -442,35 +442,38 @@ func xtObserve(t *testing.T, duration time.Duration, check func()) {
 	}
 }
 
-func xtRequireDeath(t *testing.T, bot *e2eharness.ScenarioBot, record *xtBoomRecord, guid uint64, timeout time.Duration) {
+func xtRequireDeath(t *testing.T, bot *e2eharness.ScenarioBot, record *xtBoomRecord, guid, killer uint64, timeout time.Duration) {
 	t.Helper()
+	wantInstakills := 0
+	if killer == guid {
+		wantInstakills = 1
+	}
+	credited := func() bool {
+		if killer == guid {
+			return record.instakills(guid) == 1
+		}
+		return record.killCredits(killer, guid) == 1
+	}
 	if !xtPoll(timeout, func() bool {
 		hp, _ := bot.UnitHP(guid)
-		return record.instakills(guid) == 1 && hp == 0
+		return credited() && record.casts(guid, xtBoom) == 1 && hp == 0
 	}) {
-		e2eharness.ConfirmedBugf(t, 27699, "Boombot %x did not die through Boom's self-instakill", guid)
+		e2eharness.ConfirmedBugf(t, 27699, "Boombot %x did not explode once and die with killer %x", guid, killer)
 	}
-	// Removal alone isn't death evidence. Require its self-instakill packet and exactly
-	// one cast, including after another proximity tick could have run.
+	// Require a kill-credit or self-instakill packet, not just removal from the cache.
 	xtObserve(t, 2*time.Second, func() {
-		if record.casts(guid, xtBoom) != 1 || record.instakills(guid) != 1 {
-			e2eharness.ConfirmedBugf(t, 27699, "Boombot %x exploded more or less than once", guid)
+		if !credited() || record.casts(guid, xtBoom) != 1 || record.instakills(guid) != wantInstakills {
+			e2eharness.ConfirmedBugf(t, 27699, "Boombot %x changed killing-blow attribution or exploded more than once", guid)
 		}
 	})
 }
 
 func xtRequireChainDeath(t *testing.T, bot *e2eharness.ScenarioBot, record *xtBoomRecord, guid, other uint64) {
 	t.Helper()
-	// The other explosion can kill this bot before its own self-instakill is processed.
-	// Without an instakill packet, require a populated dead unit and the other bot's hit.
-	// A missing cache entry alone is not death evidence.
+	// The other explosion must kill this bot. A missing cache entry alone isn't death evidence.
 	if !xtPoll(5*time.Second, func() bool {
 		if record.casts(guid, xtBoom) != 1 {
 			return false
-		}
-		if record.instakills(guid) == 1 {
-			hp, _ := bot.UnitHP(guid)
-			return hp == 0
 		}
 		unit := bot.World.GetObject(guid)
 		hit, ok := record.hit(other, guid)
@@ -480,7 +483,7 @@ func xtRequireChainDeath(t *testing.T, bot *e2eharness.ScenarioBot, record *xtBo
 		e2eharness.ConfirmedBugf(t, 27699, "chain Boombot %x did not explode once and die", guid)
 	}
 	xtObserve(t, 2*time.Second, func() {
-		if record.casts(guid, xtBoom) != 1 || record.instakills(guid) > 1 {
+		if record.casts(guid, xtBoom) != 1 || record.instakills(guid) != 0 {
 			e2eharness.ConfirmedBugf(t, 27699, "chain Boombot %x exploded or self-killed more than once", guid)
 		}
 	})
@@ -520,17 +523,28 @@ type xtBoomCast struct {
 	spell  uint32
 }
 
+type xtKillCredit struct {
+	killer, victim uint64
+}
+
 type xtBoomRecord struct {
-	mu    sync.Mutex
-	goes  []xtBoomCast
-	kills []uint64
-	hits  []xtBoomHit
+	mu      sync.Mutex
+	goes    []xtBoomCast
+	kills   []uint64
+	hits    []xtBoomHit
+	credits []xtKillCredit
 }
 
 func (r *xtBoomRecord) packet(opcode uint16, data []byte) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	switch opcode {
+	case 0x01F5: // SMSG_PARTYKILLLOG: unpacked credited player and victim
+		if len(data) >= 16 {
+			r.credits = append(r.credits, xtKillCredit{
+				killer: binary.LittleEndian.Uint64(data), victim: binary.LittleEndian.Uint64(data[8:]),
+			})
+		}
 	case client.SmsgSpellGo:
 		spell, ok := castSpellID(data)
 		if !ok || (spell != xtBoom && spell != 65037) {
@@ -579,6 +593,18 @@ func (r *xtBoomRecord) instakills(guid uint64) int {
 	n := 0
 	for _, killed := range r.kills {
 		if killed == guid {
+			n++
+		}
+	}
+	return n
+}
+
+func (r *xtBoomRecord) killCredits(killer, victim uint64) int {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	n := 0
+	for _, credit := range r.credits {
+		if credit.killer == killer && credit.victim == victim {
 			n++
 		}
 	}

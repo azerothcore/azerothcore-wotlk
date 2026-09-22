@@ -625,11 +625,11 @@ struct npc_boombot : public ScriptedAI
             });
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
+    void JustDied(Unit* /*killer*/) override
     {
-        // Boom's own instakill re-enters this callback; do not intercept it or explode twice.
-        if (!_boomed && damage >= me->GetHealth() && Detonate())
-            damage = 0;
+        // Let the killing hit keep its attacker and credit before triggering the explosion.
+        // Arrival at XT sets _boomed before the self-instakill reaches this callback.
+        Detonate();
     }
 
     void UpdateAI(uint32 diff) override
@@ -659,7 +659,7 @@ private:
 
     bool Detonate()
     {
-        if (_boomed || !me->IsAlive())
+        if (_boomed)
             return false;
 
         _boomed = true;
