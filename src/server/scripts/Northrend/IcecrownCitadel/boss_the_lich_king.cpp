@@ -2206,26 +2206,6 @@ class spell_the_lich_king_raging_spirit : public SpellScript
     }
 };
 
-class spell_the_lich_king_summon_raging_spirit : public SpellScript
-{
-    PrepareSpellScript(spell_the_lich_king_summon_raging_spirit);
-
-    void SetDest(SpellDestination& dest)
-    {
-        Unit* caster = GetCaster();
-        if (!caster || IsValidPlatformPosition(dest._position))
-            return;
-
-        // no floor under the destination drops the summon to the terrain, ~990 yd below the platform
-        dest.Relocate(caster->GetPosition());
-    }
-
-    void Register() override
-    {
-        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_the_lich_king_summon_raging_spirit::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
-    }
-};
-
 class npc_raging_spirit : public CreatureScript
 {
 public:
@@ -2262,8 +2242,12 @@ public:
             }
         }
 
-        void IsSummonedBy(WorldObject* /*summoner*/) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
+            // no floor under the summon destination drops the spirit to the terrain, ~990 yd below the platform
+            if (summoner && !IsValidPlatformPosition(*me) && IsValidPlatformPosition(*summoner))
+                me->NearTeleportTo(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), me->GetOrientation());
+
             // player is the spellcaster so register summon manually
             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 lichKing->AI()->JustSummoned(me);
@@ -3587,7 +3571,6 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_ice_burst_target_search);
     new npc_icc_ice_sphere();
     RegisterSpellScript(spell_the_lich_king_raging_spirit);
-    RegisterSpellScript(spell_the_lich_king_summon_raging_spirit);
     new npc_raging_spirit();
     RegisterSpellScript(spell_the_lich_king_defile);
     RegisterSpellScript(spell_the_lich_king_soul_reaper_aura);
