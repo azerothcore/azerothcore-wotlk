@@ -335,6 +335,7 @@ public: /* PlayerScript */
     void OnPlayerLoadFromDB(Player* player);
     void OnPlayerBeforeLogout(Player* player);
     void OnPlayerLogout(Player* player);
+    bool OnPlayerCanMarkAccountOffline(ObjectGuid guid, uint32 accountId);
     void OnPlayerCreate(Player* player);
     void OnPlayerSave(Player* player);
     void OnPlayerDelete(ObjectGuid guid, uint32 accountId);
