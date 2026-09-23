@@ -121,3 +121,5 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (14, 5853, 7021, 0, 0, 7, 0, 185, 1, 0, 1, 0, 0, '', 'Cooking trainer - show gossip text 7021 if player does not have Cooking'),
 (14, 5854, 7017, 0, 0, 7, 0, 185, 225, 0, 0, 0, 0, '', 'Cooking trainer - show gossip text 7017 if player has Cooking 225 or higher'),
 (14, 5854, 7021, 0, 0, 7, 0, 185, 1, 0, 1, 0, 0, '', 'Cooking trainer - show gossip text 7021 if player does not have Cooking');
+UPDATE `npc_text` SET `VerifiedBuild` = 46779 WHERE `ID` = 7017;
+UPDATE `npc_text` SET `VerifiedBuild` = 45435 WHERE `ID` = 7021;
