@@ -96,5 +96,5 @@ UPDATE `npc_vendor` SET `VerifiedBuild` = 53788 WHERE `entry` = 33630 AND `item`
 -- Enchantress Andiala
 DELETE FROM `npc_vendor` WHERE `entry` = 33633 AND `item` IN (10940);
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
-(33633, 0, 10940, 3, 7200, 0, 53788); -- Strange Dust
+(33633, 0, 10940, 4, 7200, 0, 53788); -- Strange Dust
 UPDATE `npc_vendor` SET `VerifiedBuild` = 53788 WHERE `entry` = 33633 AND `item` IN (4470, 5565, 6217, 10938, 11291, 16583, 17020, 17021, 17026, 17028, 17029, 17030, 17031, 17032, 17033, 17034, 17035, 17036, 17037, 17038, 20752, 20753, 20758, 21177, 22147, 22148, 22307, 37201);
