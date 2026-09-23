@@ -131,7 +131,6 @@ uint32 ModuleDatabasePool::OpenConnections(InternalIndex type, uint8 numConnecti
                     "for database `{}`.", _connectionInfo.database);
             }
 
-            //! A failed connection's destructor joins its worker, so cancel first.
             _queue->Cancel();
             _connections[type].clear();
             return CR_UNKNOWN_ERROR;
@@ -193,33 +192,28 @@ bool ModuleDatabasePool::PrepareStatements()
         }
     }
 
-    //! Without async connections every statement runs on a synchronous one, so CONNECTION_* flag only shows up as an assert on first use; list the gaps once.
-    auto listMissing = [](MySQLConnection const* conn)
+    //! Without async connections every statement runs on a synchronous one, so CONNECTION_ASYNC-only ones fail.
+    if (_connections[IDX_ASYNC].empty())
     {
-        std::string indices;
+        MySQLConnection const* conn = _connections[IDX_SYNCH].front().get();
+        std::string missing;
 
         for (std::size_t i = 0; i < conn->m_stmts.size(); ++i)
         {
             if (conn->m_stmts[i])
                 continue;
 
-            if (!indices.empty())
-                indices += ", ";
+            if (!missing.empty())
+                missing += ", ";
 
-            indices += std::to_string(i);
+            missing += std::to_string(i);
         }
 
-        return indices;
-    };
-
-    for (uint8 type = 0; type < IDX_SIZE; ++type)
-    {
-        if (_connections[type].empty())
-            continue;
-
-        LOG_DEBUG("sql.driver", "DatabasePool '{}': statements not prepared on the {} connections: [{}]",
-            _connectionInfo.database, type == IDX_ASYNC ? "asynchronous" : "synchronous",
-            listMissing(_connections[type].front().get()));
+        if (!missing.empty())
+        {
+            LOG_ERROR("sql.driver", "DatabasePool '{}' has no asynchronous connections, statements [{}] are not "
+                "prepared on the synchronous ones. Flag them CONNECTION_BOTH.", _connectionInfo.database, missing);
+        }
     }
 
     return true;
@@ -367,7 +361,6 @@ SQLQueryHolderCallback ModuleDatabasePool::DelayQueryHolder(std::shared_ptr<SQLQ
     if (!_connections[IDX_ASYNC].empty())
     {
         SQLQueryHolderTask* task = new SQLQueryHolderTask(holder);
-        // Take the future before Enqueue: the task may already be gone afterwards.
         QueryResultHolderFuture result = task->GetFuture();
         Enqueue(task);
         return { std::move(holder), std::move(result) };
@@ -405,7 +398,8 @@ void ModuleDatabasePool::CommitTransaction(std::shared_ptr<TransactionBase> tran
         LOG_DEBUG("sql.driver", "Transaction contains 0 queries. Not executing.");
         return;
     case 1:
-        LOG_DEBUG("sql.driver", "Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
+        LOG_DEBUG("sql.driver",
+            "Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
         break;
     default:
         break;
@@ -423,14 +417,14 @@ void ModuleDatabasePool::CommitTransaction(std::shared_ptr<TransactionBase> tran
 TransactionCallback ModuleDatabasePool::AsyncCommitTransaction(std::shared_ptr<TransactionBase> transaction)
 {
 #ifdef ACORE_DEBUG
-    //! Only analyze transaction weaknesses in Debug mode.
     switch (transaction->GetSize())
     {
     case 0:
         LOG_DEBUG("sql.driver", "Transaction contains 0 queries. Not executing.");
         break;
     case 1:
-        LOG_DEBUG("sql.driver", "Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
+        LOG_DEBUG("sql.driver",
+            "Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
         break;
     default:
         break;
@@ -439,10 +433,8 @@ TransactionCallback ModuleDatabasePool::AsyncCommitTransaction(std::shared_ptr<T
 
     if (_connections[IDX_ASYNC].empty())
     {
-        DirectCommitTransaction(transaction);
-
         TransactionPromise result;
-        result.set_value(true);
+        result.set_value(TryDirectCommitTransaction(transaction));
         return TransactionCallback(result.get_future());
     }
 
@@ -454,16 +446,23 @@ TransactionCallback ModuleDatabasePool::AsyncCommitTransaction(std::shared_ptr<T
 
 void ModuleDatabasePool::DirectCommitTransaction(std::shared_ptr<TransactionBase> transaction)
 {
+    TryDirectCommitTransaction(transaction);
+}
+
+bool ModuleDatabasePool::TryDirectCommitTransaction(std::shared_ptr<TransactionBase> transaction)
+{
     if (_connections[IDX_SYNCH].empty())
-        return;
+        return false;
 
     MySQLConnection* conn = GetFreeConnection();
     int errorCode = conn->ExecuteTransaction(transaction);
     if (!errorCode)
     {
         conn->Unlock();
-        return;
+        return true;
     }
+
+    bool committed = false;
 
     //! Handle MySQL Errno 1213 without extending deadlock to the core itself
     if (errorCode == ER_LOCK_DEADLOCK)
@@ -472,17 +471,20 @@ void ModuleDatabasePool::DirectCommitTransaction(std::shared_ptr<TransactionBase
         for (uint8 i = 0; i < loopBreaker; ++i)
         {
             if (!conn->ExecuteTransaction(transaction))
+            {
+                committed = true;
                 break;
+            }
         }
     }
 
     transaction->Cleanup();
     conn->Unlock();
+    return committed;
 }
 
 void ModuleDatabasePool::KeepAlive()
 {
-    //! Ping connections that are not busy; a locked connection is in use and alive.
     for (auto const& conn : _connections[IDX_SYNCH])
     {
         if (conn->LockIfReady())

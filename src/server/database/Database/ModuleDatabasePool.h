@@ -130,6 +130,7 @@ private:
     uint32 OpenConnections(InternalIndex type, uint8 numConnections);
 
     void Enqueue(SQLOperation* op);
+    bool TryDirectCommitTransaction(std::shared_ptr<TransactionBase> transaction);
 
     MySQLConnection* GetFreeConnection();
 
