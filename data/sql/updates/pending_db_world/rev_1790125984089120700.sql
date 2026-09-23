@@ -112,3 +112,12 @@ UPDATE `npc_text` SET `Probability0` = 1, `VerifiedBuild` = 53788 WHERE `ID` = 1
 UPDATE `npc_text` SET `Probability0` = 1, `VerifiedBuild` = 53788 WHERE `ID` = 11077;
 UPDATE `npc_text` SET `Probability0` = 1, `VerifiedBuild` = 53788 WHERE `ID` = 11233;
 UPDATE `npc_text` SET `Probability0` = 1, `VerifiedBuild` = 53788 WHERE `ID` = 14230;
+
+-- Cooking trainers: greeting by Cooking skill, as sniffed at 0, 39-108, 225 and 450 (7016's Expert Cookbook is obsolete)
+DELETE FROM `gossip_menu` WHERE `MenuID` = 5853 AND `TextID` = 7016;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 14 AND `SourceGroup` IN (5853, 5854) AND `SourceEntry` IN (7015, 7016, 7017, 7021);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(14, 5853, 7017, 0, 0, 7, 0, 185, 225, 0, 0, 0, 0, '', 'Cooking trainer - show gossip text 7017 if player has Cooking 225 or higher'),
+(14, 5853, 7021, 0, 0, 7, 0, 185, 1, 0, 1, 0, 0, '', 'Cooking trainer - show gossip text 7021 if player does not have Cooking'),
+(14, 5854, 7017, 0, 0, 7, 0, 185, 225, 0, 0, 0, 0, '', 'Cooking trainer - show gossip text 7017 if player has Cooking 225 or higher'),
+(14, 5854, 7021, 0, 0, 7, 0, 185, 1, 0, 1, 0, 0, '', 'Cooking trainer - show gossip text 7021 if player does not have Cooking');
