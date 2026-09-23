@@ -16,6 +16,7 @@
 #include "player-interactions-api.h"
 #include "player-items-api.h"
 #include "player-money-api.h"
+#include "player-guild-api.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,6 +65,7 @@ void TC9SetOnGroupConvertedToRaidHook(OnGroupConvertedToRaidHook h);
 void TC9SetOnGuildMemberAddedHook(OnGuildMemberAddedHook h);
 void TC9SetOnGuildMemberRemovedHook(OnGuildMemberRemovedHook h);
 void TC9SetOnGuildMemberLeftHook(OnGuildMemberLeftHook h);
+void TC9SetOnGuildCreatedHook(OnGuildCreatedHook h);
 
 void TC9SetOnMapsReassignedHook(OnMapsReassignedHook h);
 
@@ -79,11 +81,17 @@ void TC9SetCanPlayerInteractWithNPCAndFlagsHandler(CanPlayerInteractWithNPCAndFl
 void TC9SetCanPlayerInteractWithGOAndTypeHandler(CanPlayerInteractWithGOAndTypeHandler h);
 
 void TC9SetGetPlayerItemsByGuidsHandler(GetPlayerItemsByGuidsHandler h);
+void TC9SetGetPlayerItemByPosHandler(GetPlayerItemByPosHandler h);
 void TC9SetRemoveItemsWithGuidsFromPlayerHandler(RemoveItemsWithGuidsFromPlayerHandler h);
+void TC9SetDestroyItemsWithGuidsFromPlayerHandler(DestroyItemsWithGuidsFromPlayerHandler h);
 void TC9SetAddExistingItemToPlayerHandler(AddExistingItemToPlayerHandler h);
+void TC9SetStoreNewItemHandler(StoreNewItemHandler h);
+void TC9SetSetItemPermanentEnchantmentHandler(SetItemPermanentEnchantmentHandler h);
 
 void TC9SetGetMoneyForPlayerHandler(GetMoneyForPlayerHandler h);
 void TC9SetModifyMoneyForPlayerHandler(ModifyMoneyForPlayerHandler h);
+
+void TC9SetSetPlayerGuildFieldsHandler(SetPlayerGuildFieldsHandler h);
 
 #ifdef __cplusplus
 }
