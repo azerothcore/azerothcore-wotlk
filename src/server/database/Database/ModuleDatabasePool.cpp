@@ -177,7 +177,6 @@ bool ModuleDatabasePool::PrepareStatements()
 
             for (std::size_t i = 0; i < preparedSize; ++i)
             {
-                //! Each connection only prepares the statements carrying its own flag.
                 if (_preparedStatementSize[i] > 0)
                     continue;
 
@@ -194,7 +193,7 @@ bool ModuleDatabasePool::PrepareStatements()
         }
     }
 
-    //! A wrong CONNECTION_* flag only shows up as an assert on first use; list the gaps once.
+    //! Without async connections every statement runs on a synchronous one, so CONNECTION_* flag only shows up as an assert on first use; list the gaps once.
     auto listMissing = [](MySQLConnection const* conn)
     {
         std::string indices;
@@ -228,7 +227,6 @@ bool ModuleDatabasePool::PrepareStatements()
 
 void ModuleDatabasePool::Close()
 {
-    //! Workers drain the queue and exit; the connection destructors join them.
     _queue->Shutdown();
 
     _connections[IDX_ASYNC].clear();
@@ -344,7 +342,6 @@ QueryCallback ModuleDatabasePool::AsyncQuery(std::string_view sql)
     }
 
     BasicStatementTask* task = new BasicStatementTask(sql, true);
-    // Take the future before Enqueue: the task may already be gone afterwards.
     QueryResultFuture result = task->GetFuture();
     Enqueue(task);
     return QueryCallback(std::move(result));
@@ -360,7 +357,6 @@ QueryCallback ModuleDatabasePool::AsyncQuery(PreparedStatementBase* stmt)
     }
 
     PreparedStatementTask* task = new PreparedStatementTask(stmt, true);
-    // Take the future before Enqueue: the task may already be gone afterwards.
     PreparedQueryResultFuture result = task->GetFuture();
     Enqueue(task);
     return QueryCallback(std::move(result));
@@ -403,7 +399,6 @@ uint8 ModuleDatabasePool::GetPreparedStatementParamCount(uint32 index) const
 void ModuleDatabasePool::CommitTransaction(std::shared_ptr<TransactionBase> transaction)
 {
 #ifdef ACORE_DEBUG
-    //! Only analyze transaction weaknesses in Debug mode.
     switch (transaction->GetSize())
     {
     case 0:
@@ -415,8 +410,7 @@ void ModuleDatabasePool::CommitTransaction(std::shared_ptr<TransactionBase> tran
     default:
         break;
     }
-#endif // ACORE_DEBUG
-
+#endif
     if (_connections[IDX_ASYNC].empty())
     {
         DirectCommitTransaction(transaction);
@@ -441,7 +435,7 @@ TransactionCallback ModuleDatabasePool::AsyncCommitTransaction(std::shared_ptr<T
     default:
         break;
     }
-#endif // ACORE_DEBUG
+#endif
 
     if (_connections[IDX_ASYNC].empty())
     {
@@ -498,7 +492,6 @@ void ModuleDatabasePool::KeepAlive()
         }
     }
 
-    //! One ping per worker; an uneven split when some are busy does not matter.
     auto const count = _connections[IDX_ASYNC].size();
 
     for (std::size_t i = 0; i < count; ++i)
