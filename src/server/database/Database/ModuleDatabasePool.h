@@ -101,12 +101,6 @@ public:
     QueryCallback AsyncQuery(std::string_view sql);
     QueryCallback AsyncQuery(PreparedStatementBase* stmt);
 
-    template<typename... Args>
-    QueryCallback AsyncQuery(std::string_view sql, Args&&... args)
-    {
-        return AsyncQuery(std::string_view(Acore::StringFormat(sql, std::forward<Args>(args)...)));
-    }
-
     SQLQueryHolderCallback DelayQueryHolder(std::shared_ptr<SQLQueryHolderBase> holder);
 
     [[nodiscard]] uint8 GetPreparedStatementParamCount(uint32 index) const;
