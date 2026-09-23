@@ -2799,12 +2799,19 @@ void Player::SendInitialSpells()
     std::size_t countPos = data.wpos();
     data << uint16(spellCount);                             // spell count placeholder
 
+    // Form spells are shown by the client from its own SpellShapeshiftForm.dbc and never sent as learned
+    SpellShapeshiftFormEntry const* shapeInfo = sSpellShapeshiftFormStore.LookupEntry(GetShapeshiftForm());
+
     for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
         if (itr->second->State == PLAYERSPELL_REMOVED)
             continue;
 
         if (!itr->second->Active || !itr->second->IsInSpec(GetActiveSpec()))
+            continue;
+
+        if (shapeInfo && itr->second->State == PLAYERSPELL_TEMPORARY &&
+            std::ranges::find(shapeInfo->stanceSpell, itr->first) != std::ranges::end(shapeInfo->stanceSpell))
             continue;
 
         data << uint32(itr->first);
