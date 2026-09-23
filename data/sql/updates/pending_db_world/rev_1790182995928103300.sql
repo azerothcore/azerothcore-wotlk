@@ -9,294 +9,488 @@ UPDATE `creature_template` SET `mingold` = 1, `maxgold` = 8 WHERE `entry` IN (10
 UPDATE `creature_template` SET `mingold` = 1, `maxgold` = 9 WHERE `entry` IN (15949, 17102);
 UPDATE `creature_template` SET `mingold` = 2, `maxgold` = 12 WHERE `entry` IN (40, 285, 735, 1135, 1520, 1526, 1531,
 1535, 1674, 1897, 1934, 1941, 2004, 2008, 2152, 2950, 2976, 3104, 3111, 3119, 3129, 7235, 11328);
-UPDATE `creature_template` SET `mingold` = 2, `maxgold` = 13 WHERE `entry` IN (60, 327, 476, 880, 1120, 1522, 1527,
-1536, 1543, 1675, 1936, 1975, 2009, 2010, 2025, 2038, 2045, 2162, 2951, 2962, 2977, 2989, 3105, 3112, 3115, 3116, 3120,
-3192, 7234, 14431, 15420, 15635, 15655, 15670, 15950, 16162, 17278, 17279, 17591);
-UPDATE `creature_template` SET `mingold` = 2, `maxgold` = 14 WHERE `entry` IN (97, 583, 881, 1121, 1123, 1137, 1397,
-1523, 1528, 1533, 1537, 1544, 1657, 1662, 1949, 2011, 2015, 2017, 2018, 2027, 2166, 2963, 2967, 2990, 3113, 3141, 3195,
-3206, 3207, 5808, 5809, 5826, 6927, 15656, 15668, 15669, 15958, 16294, 17183, 17193, 17194, 17195);
+UPDATE `creature_template` SET `mingold` = 2, `maxgold` = 13 WHERE `entry` IN (60, 327, 476, 1120, 1522, 1527, 1536,
+1543, 1675, 1975, 2009, 2010, 2025, 2038, 2045, 2951, 2962, 2977, 2989, 3105, 3112, 3115, 3116, 3120, 3192, 14431,
+15420, 15635, 15655, 15670, 15950, 16162, 17278, 17279, 17591);
+UPDATE `creature_template` SET `mingold` = 2, `maxgold` = 14 WHERE `entry` IN (97, 583, 880, 881, 1121, 1123, 1137,
+1397, 1523, 1528, 1533, 1537, 1544, 1657, 1936, 1949, 2011, 2015, 2017, 2027, 2162, 2166, 2963, 2967, 2990, 3113, 3141,
+3195, 3206, 3207, 5808, 5809, 5826, 6927, 7234, 15656, 15668, 15669, 15958, 16294, 17183, 17193, 17194, 17195);
 UPDATE `creature_template` SET `mingold` = 2, `maxgold` = 15 WHERE `entry` IN (79, 473, 474, 480, 649, 1116, 1122, 1124,
-1211, 1380, 1529, 1534, 1538, 1545, 1654, 1655, 1656, 1753, 1910, 1981, 1993, 2012, 2013, 2019, 2020, 2029, 2968, 2979,
-3114, 3117, 3196, 3205, 3232, 6123, 6128, 6846, 6866, 6911, 7318, 15636, 15641, 15658, 15937, 17184, 17185, 17186);
+1211, 1380, 1529, 1534, 1538, 1545, 1654, 1656, 1662, 1753, 1981, 1993, 2012, 2013, 2018, 2019, 2020, 2029, 2968, 2979,
+3114, 3117, 3196, 3205, 3232, 6123, 6846, 6911, 15636, 15641, 15658, 15937, 17184, 17185, 17186);
+UPDATE `creature_template` SET `mingold` = 2, `maxgold` = 16 WHERE `entry` IN (1655, 6128);
 UPDATE `creature_template` SET `mingold` = 2, `maxgold` = 17 WHERE `entry` IN (481, 1172, 1173, 1530, 1532, 1539, 1540,
-1664, 2014, 2030, 2176, 2189, 2965, 3118, 3199, 3267, 3379, 5787, 6113, 6124, 6133, 8503, 15637, 15642, 15643, 15657,
-15965, 16300, 16313, 16855, 17187, 17188, 17189, 17190, 17191, 17192, 17298);
-UPDATE `creature_template` SET `mingold` = 4, `maxgold` = 25 WHERE `entry` IN (36, 95, 100, 117, 472, 515, 1118, 1119,
-1161, 1162, 1176, 1202, 1665, 1770, 1772, 1866, 1911, 2039, 2060, 2177, 2190, 2201, 3051, 3203, 3265, 3380, 6466, 6909,
-10159, 10358, 12138, 13156, 13157, 15407, 16303, 16307, 16322, 16325, 16330, 16340, 16854, 17210, 17320, 17321, 17448,
-17475);
-UPDATE `creature_template` SET `mingold` = 4, `maxgold` = 26 WHERE `entry` IN (16327, 16328, 17325, 17447, 20424);
-UPDATE `creature_template` SET `mingold` = 4, `maxgold` = 27 WHERE `entry` IN (126, 500, 504, 1174, 1236, 1658, 1767,
-1773, 1865, 1971, 2061, 2062, 2063, 2064, 2065, 2066, 2067, 2167, 2178, 2202, 2212, 3272, 3381, 3535, 6494, 6497, 10158,
-12320);
-UPDATE `creature_template` SET `mingold` = 4, `maxgold` = 29 WHERE `entry` IN (123, 456, 1163, 1177, 1782, 1867, 1868,
-1891, 1892, 1983, 2149, 2191, 2203, 3271, 3273, 10157, 10160, 12319, 16309, 16335, 16402, 16403, 17326, 17327, 17331,
-17333, 17337, 17524, 17701, 17702);
-UPDATE `creature_template` SET `mingold` = 5, `maxgold` = 34 WHERE `entry` IN (114, 501, 502, 513, 519, 589, 712, 846,
-1424, 1425, 1426, 1869, 1893, 1894, 1895, 1896, 1972, 2204, 2361, 2362, 3274, 3276, 3284, 3383, 3384, 3397, 3438, 3470,
-3528, 3529, 3530, 3531, 3532, 3533, 3617, 5837, 11910, 11911, 12321, 16301, 16311, 16323, 16324, 16331, 16334, 16337,
-17334, 17336, 17338, 17339, 17528);
+1664, 1910, 2014, 2030, 2176, 2189, 2965, 3118, 3199, 3267, 3379, 5787, 6113, 6124, 6133, 6866, 7318, 15637, 15642,
+15643, 15657, 15965, 16300, 16313, 16855, 17187, 17188, 17189, 17190, 17191, 17192, 17298);
+UPDATE `creature_template` SET `mingold` = 3, `maxgold` = 18 WHERE `entry` IN (8503);
+UPDATE `creature_template` SET `mingold` = 4, `maxgold` = 25 WHERE `entry` IN (36, 95, 100, 117, 515, 1118, 1119, 1161,
+1162, 1176, 1202, 1770, 1772, 1866, 2060, 2177, 2190, 2201, 3265, 3380, 6466, 6909, 10159, 10358, 12138, 13156, 13157,
+15407, 16303, 16307, 16322, 16325, 16330, 16340, 16854, 17210, 17320, 17321, 17448, 17475);
+UPDATE `creature_template` SET `mingold` = 4, `maxgold` = 26 WHERE `entry` IN (2039, 3051, 16327, 16328, 17447, 20424);
+UPDATE `creature_template` SET `mingold` = 4, `maxgold` = 27 WHERE `entry` IN (126, 472, 500, 504, 1174, 1236, 1665,
+1767, 1773, 1865, 1911, 1971, 2061, 2062, 2063, 2064, 2065, 2066, 2067, 2167, 2178, 2202, 2212, 3203, 3272, 3381, 3535,
+6494, 6497, 10158, 12320, 17325);
+UPDATE `creature_template` SET `mingold` = 4, `maxgold` = 29 WHERE `entry` IN (123, 456, 1163, 1177, 1658, 1782, 1867,
+1868, 1891, 1892, 1983, 2149, 2191, 2203, 3271, 3273, 10157, 10160, 12319, 16309, 16335, 16402, 16403, 17326, 17327,
+17331, 17333, 17337, 17524, 17701, 17702);
+UPDATE `creature_template` SET `mingold` = 5, `maxgold` = 34 WHERE `entry` IN (114, 501, 502, 513, 589, 712, 846, 1425,
+1426, 1869, 1893, 1894, 1895, 1896, 2204, 2361, 2362, 3274, 3276, 3284, 3383, 3384, 3397, 3470, 3528, 3529, 3530, 3531,
+3532, 3533, 3617, 11910, 11911, 12321, 16301, 16311, 16323, 16324, 16331, 16334, 16337, 17334, 17336, 17338, 17339);
+UPDATE `creature_template` SET `mingold` = 5, `maxgold` = 36 WHERE `entry` IN (5837);
+UPDATE `creature_template` SET `mingold` = 5, `maxgold` = 37 WHERE `entry` IN (519, 1424, 1972);
 UPDATE `creature_template` SET `mingold` = 5, `maxgold` = 38 WHERE `entry` IN (124, 171, 423, 594, 824, 1197, 1206,
-1207, 1870, 1914, 1924, 1953, 2106, 2179, 2186, 2205, 3275, 3282, 3467, 3577, 3578, 3667, 7017, 9523, 11714, 11912,
-11913);
+1207, 1870, 1914, 1924, 1953, 2106, 2179, 2186, 2205, 3275, 3282, 3438, 3577, 3578, 7017, 9523, 11714, 11912, 11913,
+17528);
+UPDATE `creature_template` SET `mingold` = 6, `maxgold` = 39 WHERE `entry` IN (3667);
+UPDATE `creature_template` SET `mingold` = 6, `maxgold` = 41 WHERE `entry` IN (3467);
 UPDATE `creature_template` SET `mingold` = 6, `maxgold` = 42 WHERE `entry` IN (16332, 17322);
 UPDATE `creature_template` SET `mingold` = 7, `maxgold` = 50 WHERE `entry` IN (424, 449, 452, 458, 1083, 1205, 1222,
-1725, 1726, 1727, 1913, 1939, 1954, 1957, 2168, 2180, 2184, 2206, 2336, 2338, 3260, 3278, 3283, 3386, 3655, 3662, 3672,
-3990, 5838, 9524, 11914, 11915, 11917, 14271, 16339, 16343, 17323, 17324, 17328, 17340, 17341, 17550, 17713);
-UPDATE `creature_template` SET `mingold` = 7, `maxgold` = 51 WHERE `entry` IN (448, 1271, 5785, 5824);
-UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 54 WHERE `entry` IN (98, 115, 426, 441, 506, 517, 548, 596,
-598, 599, 623, 624, 625, 626, 1165, 1915, 1940, 1955, 1958, 2169, 2339, 3258, 3279, 3280, 3286, 3395, 3445, 4071, 5835,
-6180, 11918, 14272, 16302, 16316, 16342, 17329, 17330, 17342, 17588, 17606, 17607, 17714);
-UPDATE `creature_template` SET `mingold` = 9, `maxgold` = 60 WHERE `entry` IN (127, 422, 430, 450, 453, 520, 572, 1167,
-1169, 1178, 1179, 1181, 1888, 1909, 1942, 1943, 1956, 2053, 2112, 2156, 2158, 2170, 2181, 2192, 2207, 3261, 3396, 3454,
-3455, 3713, 3717, 3725, 3728, 3732, 3733, 3989, 4416, 5836, 5863, 6020, 9336, 10323, 10373, 14270, 17715);
-UPDATE `creature_template` SET `mingold` = 9, `maxgold` = 61 WHERE `entry` IN (16305, 16308, 16318, 16344, 16469, 17494,
+1725, 1726, 1727, 1913, 1939, 1954, 1957, 2168, 2180, 2184, 2206, 2336, 2338, 3260, 3278, 3283, 3386, 3655, 3672, 3990,
+5838, 9524, 11914, 11915, 11917, 14271, 16339, 16343, 17323, 17324, 17328, 17340, 17550, 17713);
+UPDATE `creature_template` SET `mingold` = 7, `maxgold` = 51 WHERE `entry` IN (448, 1271, 5785);
+UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 53 WHERE `entry` IN (17341);
+UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 54 WHERE `entry` IN (98, 115, 426, 441, 517, 548, 598, 623,
+624, 625, 1165, 1915, 1940, 1955, 1958, 2169, 2339, 3258, 3279, 3280, 3286, 3395, 3445, 3662, 4071, 5835, 6180, 11918,
+16302, 16316, 16342, 17329, 17330, 17342, 17588, 17606, 17607, 17714);
+UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 55 WHERE `entry` IN (596);
+UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 56 WHERE `entry` IN (14272);
+UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 57 WHERE `entry` IN (626, 5824);
+UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 58 WHERE `entry` IN (506);
+UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 59 WHERE `entry` IN (599);
+UPDATE `creature_template` SET `mingold` = 9, `maxgold` = 60 WHERE `entry` IN (127, 422, 430, 450, 453, 520, 1167, 1169,
+1178, 1179, 1181, 1888, 1909, 1942, 1943, 1956, 2053, 2112, 2156, 2158, 2170, 2181, 2207, 3261, 3396, 3454, 3455, 3713,
+3717, 3725, 3728, 3732, 3733, 3989, 4416, 5836, 5863, 6020, 9336, 10323, 10373, 14270, 17715);
+UPDATE `creature_template` SET `mingold` = 9, `maxgold` = 61 WHERE `entry` IN (572, 16305, 16308, 16318, 16344, 16469,
 17589, 17608, 22060, 22062);
+UPDATE `creature_template` SET `mingold` = 9, `maxgold` = 63 WHERE `entry` IN (17494);
+UPDATE `creature_template` SET `mingold` = 9, `maxgold` = 64 WHERE `entry` IN (2192);
 UPDATE `creature_template` SET `mingold` = 9, `maxgold` = 66 WHERE `entry` IN (125, 440, 545, 573, 578, 1180, 1183,
-1393, 1481, 1483, 1889, 1908, 1947, 1974, 2054, 2099, 2103, 2157, 2159, 2171, 2182, 2208, 3263, 3393, 3452, 3712, 3715,
-3730, 3734, 3737, 3739, 3988, 3991, 4001, 5671, 5682, 5745, 6047, 12657, 12658, 16317, 16319, 16321, 16345, 16346);
-UPDATE `creature_template` SET `mingold` = 10, `maxgold` = 72 WHERE `entry` IN (485, 580, 1007, 1024, 1039, 1399, 1920,
-1973, 2102, 2160, 2183, 2261, 3456, 3711, 3727, 3740, 3742, 3879, 3944, 3992, 3998, 4003, 4064, 4070, 4788, 4802, 16247,
-16248, 16249, 16250, 16320, 25866);
+1393, 1481, 1483, 1889, 1908, 1947, 1974, 2054, 2099, 2103, 2157, 2159, 2171, 2182, 2208, 3263, 3452, 3712, 3715, 3730,
+3737, 3739, 3988, 3991, 4001, 5671, 5682, 5745, 6047, 12657, 12658, 16317, 16319, 16321, 16345, 16346);
+UPDATE `creature_template` SET `mingold` = 10, `maxgold` = 69 WHERE `entry` IN (3393);
+UPDATE `creature_template` SET `mingold` = 10, `maxgold` = 70 WHERE `entry` IN (3734);
+UPDATE `creature_template` SET `mingold` = 10, `maxgold` = 72 WHERE `entry` IN (485, 580, 1007, 1024, 1039, 1973, 2102,
+2160, 2183, 2261, 3456, 3711, 3727, 3740, 3742, 3944, 3992, 3998, 4003, 4064, 4070, 4788, 4802, 16247, 16248, 16249,
+16250, 16320, 25866);
 UPDATE `creature_template` SET `mingold` = 11, `maxgold` = 75 WHERE `entry` IN (16357);
+UPDATE `creature_template` SET `mingold` = 11, `maxgold` = 76 WHERE `entry` IN (3879);
+UPDATE `creature_template` SET `mingold` = 11, `maxgold` = 79 WHERE `entry` IN (1920);
+UPDATE `creature_template` SET `mingold` = 11, `maxgold` = 80 WHERE `entry` IN (1399);
 UPDATE `creature_template` SET `mingold` = 13, `maxgold` = 88 WHERE `entry` IN (48, 434, 437, 544, 1008, 1025, 1259,
-1398, 1944, 2120, 2244, 2260, 2283, 3374, 3735, 3943, 3993, 3999, 4004, 4065, 5683, 7016, 7050, 7067, 10559, 12897);
-UPDATE `creature_template` SET `mingold` = 14, `maxgold` = 96 WHERE `entry` IN (203, 232, 433, 436, 1009, 1010, 1026,
-1948, 2090, 2360, 3375, 3434, 3457, 3736, 3780, 3783, 3893, 4002, 4033, 4074, 6668, 7052, 7053, 10643, 12896, 14281,
-17359);
-UPDATE `creature_template` SET `mingold` = 15, `maxgold` = 102 WHERE `entry` IN (3270, 11318, 11319, 11322, 11323,
+1944, 2120, 2244, 2260, 2283, 3374, 3735, 3993, 3999, 4004, 4065, 5683, 7016, 7050, 7067, 10559, 12897);
+UPDATE `creature_template` SET `mingold` = 13, `maxgold` = 89 WHERE `entry` IN (1398);
+UPDATE `creature_template` SET `mingold` = 13, `maxgold` = 92 WHERE `entry` IN (3943);
+UPDATE `creature_template` SET `mingold` = 14, `maxgold` = 96 WHERE `entry` IN (203, 433, 436, 1009, 1010, 1026, 1948,
+2090, 2360, 3375, 3457, 3736, 3780, 3783, 4002, 4033, 4074, 6668, 7052, 7053, 10643, 12896, 14281, 17359);
+UPDATE `creature_template` SET `mingold` = 14, `maxgold` = 98 WHERE `entry` IN (232);
+UPDATE `creature_template` SET `mingold` = 15, `maxgold` = 102 WHERE `entry` IN (3270, 3434, 11318, 11319, 11322, 11323,
 11324);
+UPDATE `creature_template` SET `mingold` = 15, `maxgold` = 104 WHERE `entry` IN (3893);
 UPDATE `creature_template` SET `mingold` = 15, `maxgold` = 106 WHERE `entry` IN (202, 432, 579, 711, 1011, 1028, 1038,
 1042, 2266, 2403, 2427, 2428, 3376, 3458, 3664, 3743, 3745, 3750, 3772, 3781, 3898, 3899, 3900, 3921, 3922, 3923, 3924,
 3925, 3926, 4022, 4025, 4051, 4462, 5847, 5849, 6132, 12856, 12860, 14425);
 UPDATE `creature_template` SET `mingold` = 16, `maxgold` = 114 WHERE `entry` IN (3, 215, 218, 435, 531, 568, 1037, 1043,
 2153, 2264, 2265, 2267, 2449, 2451, 3377, 3435, 3459, 3746, 3748, 3749, 3986, 3987, 4016, 4026, 4053, 4054, 4057, 4094,
 4096, 4409, 4464, 5848, 6210, 6221, 6547, 7843, 10639, 10641, 11979, 11994, 14273, 14424);
-UPDATE `creature_template` SET `mingold` = 18, `maxgold` = 124 WHERE `entry` IN (397, 429, 431, 511, 703, 889, 909, 947,
-948, 1013, 1029, 1041, 1069, 2044, 2091, 2268, 2387, 2404, 2448, 3758, 3762, 3773, 3782, 3797, 3815, 4023, 4024, 4028,
-4050, 4061, 4093, 4098, 4112, 4969, 6207, 6208, 6213, 10617, 10758, 12579, 12918);
+UPDATE `creature_template` SET `mingold` = 18, `maxgold` = 124 WHERE `entry` IN (429, 431, 889, 909, 947, 948, 1013,
+1029, 1041, 1069, 2044, 2268, 2387, 2404, 2448, 3758, 3762, 3773, 3782, 3797, 4023, 4024, 4028, 4050, 4061, 4093, 4098,
+4112, 4969, 6207, 6208, 6213, 10617, 10758, 12918);
+UPDATE `creature_template` SET `mingold` = 18, `maxgold` = 125 WHERE `entry` IN (12579);
+UPDATE `creature_template` SET `mingold` = 18, `maxgold` = 126 WHERE `entry` IN (3815);
+UPDATE `creature_template` SET `mingold` = 18, `maxgold` = 128 WHERE `entry` IN (511);
+UPDATE `creature_template` SET `mingold` = 19, `maxgold` = 130 WHERE `entry` IN (2091);
+UPDATE `creature_template` SET `mingold` = 19, `maxgold` = 134 WHERE `entry` IN (703);
+UPDATE `creature_template` SET `mingold` = 19, `maxgold` = 135 WHERE `entry` IN (397);
 UPDATE `creature_template` SET `mingold` = 19, `maxgold` = 136 WHERE `entry` IN (210, 584, 787, 891, 898, 910, 1014,
 1044, 1157, 2269, 2372, 3759, 3763, 3765, 3771, 3784, 3833, 3919, 4017, 4027, 4052, 4056, 4097, 4099, 4111, 4202, 10640,
 10759, 10760, 11656, 14426);
 UPDATE `creature_template` SET `mingold` = 21, `maxgold` = 146 WHERE `entry` IN (533, 604, 892, 1051, 1110, 1158, 2270,
-2373, 2503, 3767, 3770, 3834, 3932, 4029, 4095, 4114, 6523, 10761, 11680, 11681, 14278, 14427, 17108);
+2373, 2503, 3767, 3770, 3834, 3932, 4029, 4095, 4114, 6523, 11680, 11681, 14278, 14427, 17108);
 UPDATE `creature_template` SET `mingold` = 21, `maxgold` = 150 WHERE `entry` IN (5841);
 UPDATE `creature_template` SET `mingold` = 22, `maxgold` = 156 WHERE `entry` IN (205, 570, 785, 1052, 1159, 1251, 1418,
-2108, 2337, 2344, 2363, 2368, 2374, 2450, 3754, 3755, 3789, 3799, 3801, 3804, 3808, 4100, 4113, 4273, 10896, 11683);
+2337, 2344, 2363, 2368, 2374, 2450, 3754, 3755, 3789, 3799, 3801, 3804, 3808, 4100, 4113, 4273, 10761, 10896, 11683);
 UPDATE `creature_template` SET `mingold` = 23, `maxgold` = 162 WHERE `entry` IN (634, 1729, 3849, 3850);
-UPDATE `creature_template` SET `mingold` = 25, `maxgold` = 173 WHERE `entry` IN (206, 212, 314, 1053, 1160, 1270, 1755,
-2305, 2335, 2345, 2346, 2370, 2375, 3414, 3696, 3752, 3757, 3791, 3802, 3803, 3806, 3807, 3931, 4030, 4066, 4101, 4104,
-4116, 4280, 4281, 4282, 4490, 6115, 7404, 11682, 11697, 14276);
-UPDATE `creature_template` SET `mingold` = 26, `maxgold` = 180 WHERE `entry` IN (622, 636, 641, 1731, 3586, 3851, 3853,
-4417, 4418, 5761, 5830, 5912, 14267);
-UPDATE `creature_template` SET `mingold` = 26, `maxgold` = 183 WHERE `entry` IN (503, 920, 1054, 1364, 1421, 1487, 1754,
-2248, 2369, 2376, 2552, 2582, 2586, 3660, 4062, 4283, 4284, 4285, 4308, 4632, 4633, 4663, 4664, 5933, 17609, 17664);
+UPDATE `creature_template` SET `mingold` = 24, `maxgold` = 165 WHERE `entry` IN (2108);
+UPDATE `creature_template` SET `mingold` = 25, `maxgold` = 173 WHERE `entry` IN (206, 212, 1053, 1160, 1270, 1755, 2305,
+2335, 2345, 2346, 2370, 2375, 3414, 3696, 3752, 3757, 3791, 3802, 3803, 3806, 3807, 3931, 4030, 4066, 4101, 4116, 4280,
+4281, 4282, 6115, 11682, 11697, 14276);
+UPDATE `creature_template` SET `mingold` = 25, `maxgold` = 176 WHERE `entry` IN (4104);
+UPDATE `creature_template` SET `mingold` = 25, `maxgold` = 177 WHERE `entry` IN (7404);
+UPDATE `creature_template` SET `mingold` = 26, `maxgold` = 180 WHERE `entry` IN (622, 1731, 3586, 3851, 4417, 4418,
+5830, 5912, 14267);
+UPDATE `creature_template` SET `mingold` = 26, `maxgold` = 181 WHERE `entry` IN (641);
+UPDATE `creature_template` SET `mingold` = 26, `maxgold` = 183 WHERE `entry` IN (503, 920, 1054, 1421, 1487, 1754, 2248,
+2369, 2376, 2552, 2582, 2586, 3660, 4062, 4283, 4284, 4285, 4632, 4633, 4663, 4664, 5933, 17609, 17664);
+UPDATE `creature_template` SET `mingold` = 27, `maxgold` = 190 WHERE `entry` IN (314, 1364);
+UPDATE `creature_template` SET `mingold` = 27, `maxgold` = 191 WHERE `entry` IN (636, 5761);
+UPDATE `creature_template` SET `mingold` = 27, `maxgold` = 192 WHERE `entry` IN (3853);
+UPDATE `creature_template` SET `mingold` = 28, `maxgold` = 195 WHERE `entry` IN (4490);
+UPDATE `creature_template` SET `mingold` = 28, `maxgold` = 197 WHERE `entry` IN (4308);
 UPDATE `creature_template` SET `mingold` = 28, `maxgold` = 198 WHERE `entry` IN (657, 2529, 3854, 3947, 9456, 17610);
 UPDATE `creature_template` SET `mingold` = 28, `maxgold` = 199 WHERE `entry` IN (507, 754, 771, 2249, 2271, 2304, 2371,
-2377, 2392, 2395, 2396, 2398, 2400, 2402, 2553, 2575, 2577, 2581, 2589, 3792, 3940, 3941, 3942, 4619, 4634, 4635, 4665,
-4666, 4670, 4671, 4672, 6072, 6170, 10647, 17300);
+2377, 2392, 2395, 2396, 2398, 2400, 2402, 2553, 2575, 2577, 2581, 2589, 3792, 3940, 3942, 4619, 4634, 4635, 4665, 4666,
+4670, 4671, 4672, 6072, 6170, 10647);
+UPDATE `creature_template` SET `mingold` = 30, `maxgold` = 208 WHERE `entry` IN (3941);
 UPDATE `creature_template` SET `mingold` = 31, `maxgold` = 214 WHERE `entry` IN (775, 937, 940, 2240, 2250, 2272, 2411,
-2412, 2440, 2554, 2562, 2587, 4479, 4636, 4637, 4638, 4639, 4646, 4647, 4667, 4673, 4674, 4675, 4711, 4712, 5085, 6238,
-13019, 14225, 14277);
+2412, 2440, 2554, 2562, 2587, 4636, 4637, 4638, 4639, 4646, 4647, 4667, 4673, 4674, 4675, 4711, 4712, 5085, 6238, 14225,
+14277);
+UPDATE `creature_template` SET `mingold` = 31, `maxgold` = 215 WHERE `entry` IN (17300);
 UPDATE `creature_template` SET `mingold` = 31, `maxgold` = 216 WHERE `entry` IN (2477, 2478, 3872, 7170, 14682, 16245,
 16246, 16329, 16358, 17678);
+UPDATE `creature_template` SET `mingold` = 31, `maxgold` = 220 WHERE `entry` IN (13019);
+UPDATE `creature_template` SET `mingold` = 32, `maxgold` = 225 WHERE `entry` IN (4479);
 UPDATE `creature_template` SET `mingold` = 33, `maxgold` = 232 WHERE `entry` IN (534, 587, 694, 697, 702, 943, 2241,
-2251, 2378, 2413, 2555, 2564, 2600, 2618, 2628, 4481, 4640, 4641, 4648, 4649, 4713, 4718, 7074, 7872, 7873, 7874, 11562,
+2251, 2378, 2413, 2555, 2564, 2600, 2618, 2628, 4481, 4640, 4641, 4648, 4649, 4713, 7074, 7872, 7873, 7874, 11562,
 12976);
+UPDATE `creature_template` SET `mingold` = 35, `maxgold` = 245 WHERE `entry` IN (4718);
 UPDATE `creature_template` SET `mingold` = 35, `maxgold` = 247 WHERE `entry` IN (588, 595, 699, 701, 740, 755, 815, 921,
-938, 941, 1094, 1097, 2252, 2319, 2358, 2379, 2414, 2556, 2619, 2714, 2721, 4445, 4449, 4480, 4642, 4643, 4651, 4714,
-5086, 5150, 5600, 7073, 7175, 7895, 11563, 12865, 12977, 14229);
-UPDATE `creature_template` SET `mingold` = 38, `maxgold` = 264 WHERE `entry` IN (1210, 4807, 4815, 4818, 5797, 5800,
-5864, 5932);
+938, 941, 1094, 1097, 2252, 2319, 2358, 2379, 2556, 2619, 2721, 4445, 4449, 4480, 4642, 4643, 4651, 4714, 5086, 5150,
+5600, 7073, 7175, 7895, 11563, 12865, 12977, 14229);
+UPDATE `creature_template` SET `mingold` = 37, `maxgold` = 261 WHERE `entry` IN (2414);
+UPDATE `creature_template` SET `mingold` = 38, `maxgold` = 263 WHERE `entry` IN (2714);
+UPDATE `creature_template` SET `mingold` = 38, `maxgold` = 264 WHERE `entry` IN (1210, 4815, 5797, 5800, 5864, 5932);
 UPDATE `creature_template` SET `mingold` = 38, `maxgold` = 267 WHERE `entry` IN (741, 757, 871, 873, 877, 879, 1095,
-1096, 2242, 2253, 2318, 2415, 2452, 2557, 2566, 2572, 2590, 2603, 2733, 2739, 2751, 4358, 4457, 4458, 4461, 4644, 4645,
-4652, 4653, 4715, 4719, 4834, 4844, 4845, 4846, 5044, 5045, 5184, 5643, 6068, 7344, 14221, 23555, 23620, 23841);
+1096, 2242, 2253, 2318, 2415, 2452, 2557, 2566, 2572, 2590, 2603, 2733, 2739, 4358, 4457, 4458, 4461, 4644, 4645, 4652,
+4653, 4715, 4719, 4834, 4844, 4846, 5044, 5184, 5643, 6068, 14221, 23620, 23841);
+UPDATE `creature_template` SET `mingold` = 39, `maxgold` = 271 WHERE `entry` IN (5045, 7344);
+UPDATE `creature_template` SET `mingold` = 39, `maxgold` = 275 WHERE `entry` IN (4818);
+UPDATE `creature_template` SET `mingold` = 39, `maxgold` = 276 WHERE `entry` IN (23555);
+UPDATE `creature_template` SET `mingold` = 40, `maxgold` = 279 WHERE `entry` IN (4807);
+UPDATE `creature_template` SET `mingold` = 40, `maxgold` = 281 WHERE `entry` IN (4845);
 UPDATE `creature_template` SET `mingold` = 41, `maxgold` = 286 WHERE `entry` IN (597, 671, 759, 760, 861, 875, 939, 942,
 1106, 1142, 1144, 2243, 2254, 2416, 2431, 2558, 2567, 2574, 2588, 2606, 2738, 2740, 2906, 2907, 2932, 4359, 4361, 4362,
-4363, 4382, 4385, 4386, 4459, 4460, 4504, 4716, 4851, 4856, 5046, 5057, 5601, 5602, 5622, 14230, 14231, 14236, 14487,
-23589, 23590, 23592, 23593, 23637, 23701, 23714, 24477);
-UPDATE `creature_template` SET `mingold` = 41, `maxgold` = 288 WHERE `entry` IN (4798, 4799, 4809, 4811, 4819, 4820);
-UPDATE `creature_template` SET `mingold` = 44, `maxgold` = 305 WHERE `entry` IN (761, 762, 814, 862, 978, 979, 2245,
-2255, 2434, 2569, 2573, 2583, 2584, 2591, 2599, 2612, 2892, 4360, 4387, 4654, 4655, 4677, 4679, 4723, 6733, 7076, 7077,
-7309, 11561, 14488, 17115, 23591);
-UPDATE `creature_template` SET `mingold` = 45, `maxgold` = 318 WHERE `entry` IN (335, 486, 5799, 5931);
+4382, 4385, 4386, 4459, 4460, 4504, 4716, 4851, 4856, 5046, 5602, 14230, 14231, 14236, 14487, 23589, 23590, 23592,
+23637, 23701, 24477);
+UPDATE `creature_template` SET `mingold` = 41, `maxgold` = 287 WHERE `entry` IN (5622, 23593);
+UPDATE `creature_template` SET `mingold` = 41, `maxgold` = 288 WHERE `entry` IN (4809);
+UPDATE `creature_template` SET `mingold` = 42, `maxgold` = 292 WHERE `entry` IN (2751);
+UPDATE `creature_template` SET `mingold` = 42, `maxgold` = 294 WHERE `entry` IN (5601, 23714);
+UPDATE `creature_template` SET `mingold` = 43, `maxgold` = 302 WHERE `entry` IN (4363);
+UPDATE `creature_template` SET `mingold` = 44, `maxgold` = 305 WHERE `entry` IN (761, 762, 814, 862, 2245, 2255, 2434,
+2569, 2573, 2583, 2584, 2591, 2599, 2612, 2892, 4360, 4387, 4654, 4655, 4677, 4679, 4723, 6733, 7076, 7077, 7309, 11561,
+14488, 17115);
+UPDATE `creature_template` SET `mingold` = 44, `maxgold` = 306 WHERE `entry` IN (23591);
+UPDATE `creature_template` SET `mingold` = 44, `maxgold` = 307 WHERE `entry` IN (4799, 4819);
+UPDATE `creature_template` SET `mingold` = 44, `maxgold` = 310 WHERE `entry` IN (4798);
+UPDATE `creature_template` SET `mingold` = 45, `maxgold` = 313 WHERE `entry` IN (5057);
+UPDATE `creature_template` SET `mingold` = 45, `maxgold` = 318 WHERE `entry` IN (335, 5799, 5931);
+UPDATE `creature_template` SET `mingold` = 46, `maxgold` = 319 WHERE `entry` IN (978);
+UPDATE `creature_template` SET `mingold` = 46, `maxgold` = 320 WHERE `entry` IN (979, 4820);
+UPDATE `creature_template` SET `mingold` = 46, `maxgold` = 321 WHERE `entry` IN (4811);
 UPDATE `creature_template` SET `mingold` = 47, `maxgold` = 328 WHERE `entry` IN (763, 764, 2246, 2256, 2422, 2453, 2545,
-2570, 2585, 2595, 2604, 2636, 2701, 2723, 2742, 2743, 2765, 2793, 4063, 4656, 4657, 4668, 4680, 4682, 5477, 6070, 7011,
-7012, 7091, 7396, 7397, 23594, 23595);
-UPDATE `creature_template` SET `mingold` = 49, `maxgold` = 340 WHERE `entry` IN (667, 696, 765, 780, 813, 1062, 2247,
-2287, 2306, 2320, 2421, 2571, 2596, 2597, 2605, 2609, 2715, 2744, 2764, 2773, 2783, 2893, 3896, 4207, 4497, 4658, 4659,
-4684, 4705, 5771, 6069, 11559, 14226);
-UPDATE `creature_template` SET `mingold` = 49, `maxgold` = 342 WHERE `entry` IN (1720, 4435, 4436, 4437, 4517, 4520,
-4530, 5798);
-UPDATE `creature_template` SET `mingold` = 52, `maxgold` = 362 WHERE `entry` IN (674, 677, 742, 766, 1061, 1561, 1562,
-1563, 1564, 2420, 2423, 2530, 2649, 2716, 2779, 2780, 2781, 2782, 2894, 4402, 4506, 5229, 5249, 5616, 11686, 14224);
-UPDATE `creature_template` SET `mingold` = 53, `maxgold` = 372 WHERE `entry` IN (334, 1792, 4427, 4438, 4442, 4515,
-4516, 4518, 4519, 4522, 4523, 4525, 4531, 5859, 6035, 6206, 6209, 6211, 6329);
-UPDATE `creature_template` SET `mingold` = 55, `maxgold` = 382 WHERE `entry` IN (669, 670, 675, 676, 709, 744, 747, 782,
-784, 1081, 1565, 1653, 2546, 2548, 2549, 2550, 2611, 2650, 2662, 2717, 2763, 2944, 2945, 4334, 4505, 5237, 5251, 5253,
-5332, 5335, 5402, 5618, 7726, 11685, 11687, 12216, 12217, 14448, 14492);
-UPDATE `creature_template` SET `mingold` = 58, `maxgold` = 403 WHERE `entry` IN (743, 750, 2257, 2547, 2551, 2651, 2652,
-2718, 2725, 2927, 5232, 5254, 5255, 5331, 5337, 5617, 5645, 7725, 7997, 8219, 11688, 14446, 14447);
-UPDATE `creature_template` SET `mingold` = 58, `maxgold` = 408 WHERE `entry` IN (4842, 5851, 5916, 6407);
-UPDATE `creature_template` SET `mingold` = 62, `maxgold` = 431 WHERE `entry` IN (672, 678, 679, 710, 723, 745, 751, 781,
-783, 1488, 1489, 1490, 1491, 1907, 2535, 2536, 2537, 2607, 2691, 2720, 4405, 5234, 5240, 5258, 5292, 5295, 5328, 5334,
-5336, 5354, 5615, 5646, 5647, 5839, 5860, 7727, 8210);
+2570, 2585, 2595, 2604, 2636, 2701, 2723, 2742, 2743, 2765, 4063, 4656, 4657, 4668, 4680, 4682, 5477, 6070, 7011, 7012,
+7091, 7396, 7397);
+UPDATE `creature_template` SET `mingold` = 47, `maxgold` = 332 WHERE `entry` IN (2793);
+UPDATE `creature_template` SET `mingold` = 48, `maxgold` = 333 WHERE `entry` IN (486);
+UPDATE `creature_template` SET `mingold` = 48, `maxgold` = 336 WHERE `entry` IN (23594);
+UPDATE `creature_template` SET `mingold` = 48, `maxgold` = 337 WHERE `entry` IN (23595);
+UPDATE `creature_template` SET `mingold` = 49, `maxgold` = 340 WHERE `entry` IN (667, 696, 765, 780, 813, 2247, 2287,
+2320, 2421, 2571, 2596, 2597, 2605, 2715, 2764, 2773, 2783, 2893, 3896, 4207, 4497, 4658, 4659, 4684, 4705, 5771, 6069,
+11559, 14226);
+UPDATE `creature_template` SET `mingold` = 49, `maxgold` = 341 WHERE `entry` IN (2609);
+UPDATE `creature_template` SET `mingold` = 49, `maxgold` = 342 WHERE `entry` IN (1720, 4435, 4436, 4437, 4520, 4530,
+5798);
+UPDATE `creature_template` SET `mingold` = 50, `maxgold` = 349 WHERE `entry` IN (2306);
+UPDATE `creature_template` SET `mingold` = 50, `maxgold` = 350 WHERE `entry` IN (2744);
+UPDATE `creature_template` SET `mingold` = 51, `maxgold` = 354 WHERE `entry` IN (1062);
+UPDATE `creature_template` SET `mingold` = 52, `maxgold` = 362 WHERE `entry` IN (674, 677, 766, 1061, 1561, 1562, 1563,
+1564, 2420, 2423, 2649, 2716, 2779, 2780, 2781, 2782, 2894, 4402, 4506, 5229, 5249, 5616, 11686, 14224);
+UPDATE `creature_template` SET `mingold` = 53, `maxgold` = 368 WHERE `entry` IN (2530);
+UPDATE `creature_template` SET `mingold` = 53, `maxgold` = 372 WHERE `entry` IN (1792, 4427, 4438, 4515, 4516, 4522,
+4523, 4525, 4531, 5859, 6206, 6209, 6329);
+UPDATE `creature_template` SET `mingold` = 54, `maxgold` = 380 WHERE `entry` IN (742);
+UPDATE `creature_template` SET `mingold` = 55, `maxgold` = 382 WHERE `entry` IN (669, 670, 675, 676, 709, 747, 782, 784,
+1565, 1653, 2546, 2549, 2550, 2611, 2650, 2662, 2717, 2763, 2944, 2945, 4505, 5237, 5251, 5253, 5332, 5335, 5402, 5618,
+7726, 11685, 11687, 14448, 14492);
+UPDATE `creature_template` SET `mingold` = 55, `maxgold` = 384 WHERE `entry` IN (4442);
+UPDATE `creature_template` SET `mingold` = 55, `maxgold` = 387 WHERE `entry` IN (2548);
+UPDATE `creature_template` SET `mingold` = 56, `maxgold` = 389 WHERE `entry` IN (6035);
+UPDATE `creature_template` SET `mingold` = 56, `maxgold` = 391 WHERE `entry` IN (4517);
+UPDATE `creature_template` SET `mingold` = 56, `maxgold` = 393 WHERE `entry` IN (744);
+UPDATE `creature_template` SET `mingold` = 57, `maxgold` = 396 WHERE `entry` IN (334, 1081);
+UPDATE `creature_template` SET `mingold` = 57, `maxgold` = 398 WHERE `entry` IN (12216, 12217);
+UPDATE `creature_template` SET `mingold` = 57, `maxgold` = 399 WHERE `entry` IN (4334);
+UPDATE `creature_template` SET `mingold` = 57, `maxgold` = 402 WHERE `entry` IN (4518);
+UPDATE `creature_template` SET `mingold` = 58, `maxgold` = 403 WHERE `entry` IN (743, 2547, 2551, 2651, 2652, 2718,
+2725, 2927, 5232, 5254, 5255, 5331, 5337, 5645, 7725, 7997, 8219, 11688, 14446, 14447);
+UPDATE `creature_template` SET `mingold` = 58, `maxgold` = 404 WHERE `entry` IN (750, 2257, 5617);
+UPDATE `creature_template` SET `mingold` = 58, `maxgold` = 408 WHERE `entry` IN (4842, 5851, 5916);
+UPDATE `creature_template` SET `mingold` = 59, `maxgold` = 412 WHERE `entry` IN (4519);
+UPDATE `creature_template` SET `mingold` = 61, `maxgold` = 426 WHERE `entry` IN (6211);
+UPDATE `creature_template` SET `mingold` = 62, `maxgold` = 431 WHERE `entry` IN (678, 679, 710, 723, 745, 751, 781, 783,
+1488, 1489, 1907, 2535, 2536, 2537, 2607, 2691, 2720, 4405, 5234, 5240, 5258, 5292, 5328, 5334, 5336, 5354, 5615, 5646,
+5647, 5839, 5860, 7727, 8210);
+UPDATE `creature_template` SET `mingold` = 62, `maxgold` = 434 WHERE `entry` IN (1490);
 UPDATE `creature_template` SET `mingold` = 63, `maxgold` = 438 WHERE `entry` IN (5930, 6228, 14275);
+UPDATE `creature_template` SET `mingold` = 64, `maxgold` = 445 WHERE `entry` IN (5295);
+UPDATE `creature_template` SET `mingold` = 64, `maxgold` = 448 WHERE `entry` IN (1491);
+UPDATE `creature_template` SET `mingold` = 65, `maxgold` = 452 WHERE `entry` IN (672);
 UPDATE `creature_template` SET `mingold` = 66, `maxgold` = 459 WHERE `entry` IN (746, 752, 1059, 2541, 2653, 2692, 2719,
-2928, 5236, 5261, 5278, 5327, 5333, 5345, 5623, 5862, 5881, 7805, 7855, 7856, 7857, 7858, 7883, 7899, 7901, 7902, 8218,
-8337, 8637, 15685, 15692, 28577, 28941);
-UPDATE `creature_template` SET `mingold` = 67, `maxgold` = 468 WHERE `entry` IN (5915);
+2928, 5236, 5278, 5327, 5333, 5345, 5623, 5862, 5881, 7805, 7855, 7856, 7857, 7858, 7883, 7899, 7901, 7902, 8218, 8337,
+8637, 15685, 15692, 28577, 28941);
+UPDATE `creature_template` SET `mingold` = 67, `maxgold` = 468 WHERE `entry` IN (5915, 6407);
+UPDATE `creature_template` SET `mingold` = 68, `maxgold` = 477 WHERE `entry` IN (5261);
 UPDATE `creature_template` SET `mingold` = 70, `maxgold` = 489 WHERE `entry` IN (2534, 2639, 2654, 2693, 4465, 5238,
 5239, 5243, 5293, 5343, 5471, 5844, 5861, 5974, 6116, 6125, 7584, 7808, 7847, 7848, 8279, 8391, 8400, 8419, 9916, 17235,
 28557);
-UPDATE `creature_template` SET `mingold` = 73, `maxgold` = 509 WHERE `entry` IN (1063, 2640, 2641, 2694, 2929, 4466,
-4467, 5241, 5263, 5269, 5296, 5472, 5473, 5840, 5843, 5853, 5975, 5976, 5979, 6117, 6126, 6127, 6184, 6190, 7809, 8136,
-8203, 8318);
+UPDATE `creature_template` SET `mingold` = 73, `maxgold` = 509 WHERE `entry` IN (1063, 2640, 2641, 2694, 4466, 4467,
+5241, 5269, 5296, 5472, 5473, 5840, 5843, 5853, 5975, 5976, 5979, 6117, 6126, 6127, 6184, 6190, 7809, 8136, 8203, 8318);
+UPDATE `creature_template` SET `mingold` = 73, `maxgold` = 511 WHERE `entry` IN (2929, 5263);
 UPDATE `creature_template` SET `mingold` = 74, `maxgold` = 519 WHERE `entry` IN (522);
 UPDATE `creature_template` SET `mingold` = 77, `maxgold` = 542 WHERE `entry` IN (2642, 2643, 5299, 5346, 5399, 5400,
-5401, 5474, 5475, 5481, 5846, 5996, 5997, 5998, 6118, 6185, 6193, 8202, 8216, 8296, 8319, 8566, 8917, 12939, 14638);
+5401, 5474, 5475, 5481, 5846, 5996, 5997, 5998, 6118, 6185, 6193, 8202, 8216, 8296, 8566, 8917, 12939, 14638);
 UPDATE `creature_template` SET `mingold` = 78, `maxgold` = 549 WHERE `entry` IN (4293, 4306, 6426, 6427);
 UPDATE `creature_template` SET `mingold` = 82, `maxgold` = 571 WHERE `entry` IN (2644, 5297, 5363, 5490, 5854, 6186,
-6194, 7105, 7153, 7154, 8214, 8324, 12046, 14603, 14604, 14639, 24818);
-UPDATE `creature_template` SET `mingold` = 85, `maxgold` = 597 WHERE `entry` IN (1200, 6488, 6489, 6490);
+6194, 7153, 7154, 8214, 8324, 12046, 14603, 14604);
+UPDATE `creature_template` SET `mingold` = 83, `maxgold` = 581 WHERE `entry` IN (7105);
+UPDATE `creature_template` SET `mingold` = 85, `maxgold` = 597 WHERE `entry` IN (1200, 6488, 6489);
+UPDATE `creature_template` SET `mingold` = 86, `maxgold` = 601 WHERE `entry` IN (14639);
+UPDATE `creature_template` SET `mingold` = 86, `maxgold` = 602 WHERE `entry` IN (24818);
+UPDATE `creature_template` SET `mingold` = 87, `maxgold` = 608 WHERE `entry` IN (8319);
 UPDATE `creature_template` SET `mingold` = 88, `maxgold` = 613 WHERE `entry` IN (864, 2646, 2647, 5276, 5364, 5366,
-5485, 5999, 6187, 6651, 7155, 7864, 7996, 8075, 8201, 8278, 8283, 8442, 8636, 8924, 14640, 24819, 28846, 28942);
+5485, 5999, 6187, 6651, 7155, 7864, 7996, 8075, 8201, 8278, 8283, 8442, 8636, 8924, 14640, 24819, 28942);
+UPDATE `creature_template` SET `mingold` = 90, `maxgold` = 628 WHERE `entry` IN (28846);
 UPDATE `creature_template` SET `mingold` = 92, `maxgold` = 642 WHERE `entry` IN (3984);
 UPDATE `creature_template` SET `mingold` = 92, `maxgold` = 645 WHERE `entry` IN (863, 865, 1783, 2648, 6000, 6001, 6002,
-6003, 6188, 6196, 6372, 6517, 6649, 6650, 7033, 7106, 7109, 7113, 7995, 9464, 10802, 14342);
+6003, 6188, 6196, 6372, 6517, 6649, 6650, 7033, 7106, 7109, 7113, 7995, 10802, 14342);
+UPDATE `creature_template` SET `mingold` = 94, `maxgold` = 660 WHERE `entry` IN (6490);
+UPDATE `creature_template` SET `mingold` = 95, `maxgold` = 662 WHERE `entry` IN (9464);
 UPDATE `creature_template` SET `mingold` = 98, `maxgold` = 683 WHERE `entry` IN (867, 1784, 1791, 1847, 6004, 6189,
-6195, 6198, 6200, 6371, 6527, 6647, 6652, 7034, 7044, 7047, 7110, 7112, 7115, 8902, 9545, 9547, 9861);
-UPDATE `creature_template` SET `mingold` = 99, `maxgold` = 696 WHERE `entry` IN (3985, 4287, 4288, 4291, 4296, 4299,
-14693);
+6195, 6198, 6200, 6371, 6527, 6647, 6652, 7034, 7044, 7047, 7110, 7112, 7115, 9545, 9547);
+UPDATE `creature_template` SET `mingold` = 98, `maxgold` = 689 WHERE `entry` IN (8902);
+UPDATE `creature_template` SET `mingold` = 99, `maxgold` = 696 WHERE `entry` IN (3985, 4287, 4288, 4296, 14693);
+UPDATE `creature_template` SET `mingold` = 100, `maxgold` = 698 WHERE `entry` IN (4299);
+UPDATE `creature_template` SET `mingold` = 102, `maxgold` = 711 WHERE `entry` IN (9861);
 UPDATE `creature_template` SET `mingold` = 103, `maxgold` = 724 WHERE `entry` IN (868, 1831, 4475, 5981, 6005, 6006,
 6199, 6201, 6202, 6370, 7035, 7040, 7100, 7107, 7108, 7114, 7138, 7139, 8409, 9601, 9776, 9777, 10986, 10991, 11443,
 11553, 11678);
-UPDATE `creature_template` SET `mingold` = 106, `maxgold` = 741 WHERE `entry` IN (412, 4297, 7327, 7332, 7337);
+UPDATE `creature_template` SET `mingold` = 104, `maxgold` = 731 WHERE `entry` IN (4291);
+UPDATE `creature_template` SET `mingold` = 106, `maxgold` = 741 WHERE `entry` IN (412, 4297, 7327, 7332);
 UPDATE `creature_template` SET `mingold` = 109, `maxgold` = 762 WHERE `entry` IN (1785, 1835, 4474, 5977, 6007, 6008,
-6135, 6136, 6518, 6519, 7036, 7041, 7048, 7101, 7111, 7118, 7120, 7156, 7158, 7442, 7669, 7885, 8298, 8523, 8547, 8900,
-8977, 9043, 9044, 9176, 9454, 9461, 9602, 9604, 9860, 10605, 10801, 11290, 11440, 11442, 11516, 11552, 11675, 11837,
-14340, 14522, 28608, 28609, 28939);
+6135, 6136, 6518, 6519, 7036, 7041, 7048, 7101, 7111, 7118, 7120, 7156, 7158, 7442, 7669, 7885, 8298, 8523, 8547, 8977,
+9043, 9044, 9176, 9454, 9461, 9602, 9604, 9860, 10605, 11290, 11440, 11442, 11516, 11552, 11675, 11837, 14340, 14522,
+28608, 28939);
+UPDATE `creature_template` SET `mingold` = 110, `maxgold` = 770 WHERE `entry` IN (28609);
+UPDATE `creature_template` SET `mingold` = 113, `maxgold` = 790 WHERE `entry` IN (7337, 8900, 10801);
 UPDATE `creature_template` SET `mingold` = 114, `maxgold` = 797 WHERE `entry` IN (353, 1787, 1793, 1794, 1833, 4257,
 4476, 5978, 6009, 6011, 6137, 6138, 6350, 6351, 7037, 7038, 7039, 7045, 7157, 7441, 7450, 7457, 7523, 7670, 7728, 7886,
-8408, 8524, 8530, 8540, 8553, 8904, 8915, 9046, 9862, 9877, 9956, 10078, 10197, 10648, 10659, 10816, 10817, 11291,
-12250, 28610, 28611, 28768, 28940);
-UPDATE `creature_template` SET `mingold` = 114, `maxgold` = 801 WHERE `entry` IN (4289, 4290, 4292, 7328, 7329, 7341,
-7342, 7345, 7347, 7348, 7352, 7353);
+8408, 8524, 8530, 8540, 8553, 8904, 8915, 9046, 9877, 9956, 10078, 10197, 10648, 10659, 10816, 10817, 11291, 12250,
+28610, 28611, 28768);
+UPDATE `creature_template` SET `mingold` = 114, `maxgold` = 801 WHERE `entry` IN (4290, 7328, 7329, 7342, 7345);
+UPDATE `creature_template` SET `mingold` = 115, `maxgold` = 803 WHERE `entry` IN (4289);
+UPDATE `creature_template` SET `mingold` = 115, `maxgold` = 806 WHERE `entry` IN (7353);
+UPDATE `creature_template` SET `mingold` = 118, `maxgold` = 826 WHERE `entry` IN (9862);
 UPDATE `creature_template` SET `mingold` = 118, `maxgold` = 829 WHERE `entry` IN (1789, 1795, 1796, 1812, 1826, 1827,
 1834, 1848, 1884, 7025, 7026, 7049, 7369, 7440, 7451, 7458, 7524, 7671, 8297, 8525, 8538, 8551, 8981, 9462, 9518, 9778,
-9779, 10383, 10390, 10580, 10660, 10661, 10827, 11613, 12178, 13276, 28936, 28945, 28946, 29000, 29001, 29076);
-UPDATE `creature_template` SET `mingold` = 123, `maxgold` = 858 WHERE `entry` IN (4852, 7354, 7356, 14686, 24830);
+9779, 10383, 10390, 10580, 10660, 10661, 11613, 12178, 13276, 28936, 28945, 28946, 29000);
+UPDATE `creature_template` SET `mingold` = 119, `maxgold` = 835 WHERE `entry` IN (4292, 29001);
+UPDATE `creature_template` SET `mingold` = 120, `maxgold` = 837 WHERE `entry` IN (29076);
+UPDATE `creature_template` SET `mingold` = 121, `maxgold` = 848 WHERE `entry` IN (28940);
+UPDATE `creature_template` SET `mingold` = 123, `maxgold` = 858 WHERE `entry` IN (7354, 7356, 14686, 24830);
+UPDATE `creature_template` SET `mingold` = 123, `maxgold` = 861 WHERE `entry` IN (7347);
+UPDATE `creature_template` SET `mingold` = 124, `maxgold` = 865 WHERE `entry` IN (4852);
+UPDATE `creature_template` SET `mingold` = 124, `maxgold` = 868 WHERE `entry` IN (10827);
 UPDATE `creature_template` SET `mingold` = 124, `maxgold` = 871 WHERE `entry` IN (1788, 1804, 1813, 1832, 1883, 4493,
 7027, 7028, 7042, 7371, 7379, 7439, 7452, 7459, 7668, 8304, 8526, 8531, 8541, 8548, 8978, 9517, 10391, 10411, 10608,
 10821, 10826, 10916, 11611, 11838, 11839, 12051, 12127, 12179, 12481, 13448, 13546, 14523, 16937, 16938, 19477);
+UPDATE `creature_template` SET `mingold` = 127, `maxgold` = 890 WHERE `entry` IN (7352);
+UPDATE `creature_template` SET `mingold` = 127, `maxgold` = 892 WHERE `entry` IN (7348);
+UPDATE `creature_template` SET `mingold` = 128, `maxgold` = 893 WHERE `entry` IN (7341);
 UPDATE `creature_template` SET `mingold` = 131, `maxgold` = 915 WHERE `entry` IN (4294, 4850, 7057);
 UPDATE `creature_template` SET `mingold` = 132, `maxgold` = 927 WHERE `entry` IN (1802, 1844, 4472, 4494, 7029, 7043,
 7046, 7372, 7438, 7453, 7460, 8527, 8539, 8543, 8560, 8565, 10442, 10485, 10822, 11196, 11476, 11657, 12053, 12199,
-12261, 12262, 12263, 12480, 13078, 13324, 13329, 13428, 22673);
+12261, 12263, 12480, 13078, 13324, 13329, 13428, 22673);
 UPDATE `creature_template` SET `mingold` = 137, `maxgold` = 959 WHERE `entry` IN (1845, 1885, 7454, 8528, 8532, 8542,
-8544, 8546, 8561, 8562, 8563, 8979, 9605, 10199, 10480, 10481, 10678, 10738, 10823, 11477, 11840, 11880, 13326, 13328,
-13333, 13334, 14185, 14188, 15542);
-UPDATE `creature_template` SET `mingold` = 141, `maxgold` = 984 WHERE `entry` IN (2417, 2598, 2602, 4300, 4301, 4302,
-4303, 4686, 4847, 4848, 4849, 4853, 4855, 4860, 6907, 6908, 7030, 7290, 7320, 7321, 10120);
-UPDATE `creature_template` SET `mingold` = 146, `maxgold` = 1020 WHERE `entry` IN (2749, 3976, 4687, 4857, 5760);
+8544, 8546, 8561, 8562, 8563, 8979, 9605, 10199, 10480, 10481, 10678, 10738, 10823, 11840, 11880, 13326, 13328, 13333,
+13334, 14185, 14188, 15542);
+UPDATE `creature_template` SET `mingold` = 137, `maxgold` = 962 WHERE `entry` IN (11477);
+UPDATE `creature_template` SET `mingold` = 141, `maxgold` = 984 WHERE `entry` IN (2417, 2598, 2602, 4300, 4301, 4303,
+4686, 4847, 4848, 4849, 4853, 4855, 4860, 6907, 6908, 7030, 7290, 7320, 7321, 10120);
+UPDATE `creature_template` SET `mingold` = 141, `maxgold` = 990 WHERE `entry` IN (4302);
+UPDATE `creature_template` SET `mingold` = 146, `maxgold` = 1020 WHERE `entry` IN (2749, 4687, 4857, 5760);
 UPDATE `creature_template` SET `mingold` = 148, `maxgold` = 1039 WHERE `entry` IN (603, 1837, 3895, 7734, 7735, 8529,
-8545, 8550, 8564, 10316, 10824, 11699, 11803, 11804, 11873, 11881, 11882, 11883, 12248, 12322, 12904, 13331, 13332,
-13358, 13359, 13424, 13425, 14186, 14187, 14479, 14564, 15201, 17878);
+8545, 8550, 8564, 10316, 10824, 11699, 11803, 11804, 11873, 11881, 11882, 11883, 12248, 12262, 12322, 12904, 13331,
+13332, 13358, 13359, 13424, 13425, 14186, 14187, 14479, 14564, 15201);
+UPDATE `creature_template` SET `mingold` = 150, `maxgold` = 1048 WHERE `entry` IN (17878);
 UPDATE `creature_template` SET `mingold` = 155, `maxgold` = 1086 WHERE `entry` IN (4339, 13718);
+UPDATE `creature_template` SET `mingold` = 155, `maxgold` = 1087 WHERE `entry` IN (3976);
 UPDATE `creature_template` SET `mingold` = 164, `maxgold` = 1146 WHERE `entry` IN (1492, 1494, 2601, 13741);
-UPDATE `creature_template` SET `mingold` = 172, `maxgold` = 1201 WHERE `entry` IN (16876, 16907, 16925, 18975, 18981,
-19190, 19261, 19434, 19701);
-UPDATE `creature_template` SET `mingold` = 173, `maxgold` = 1209 WHERE `entry` IN (2937, 11790, 11792, 13141, 13142,
-13740, 13742);
-UPDATE `creature_template` SET `mingold` = 178, `maxgold` = 1244 WHERE `entry` IN (16904, 16905, 16906, 19442, 20496);
+UPDATE `creature_template` SET `mingold` = 172, `maxgold` = 1201 WHERE `entry` IN (16876, 18975, 18981, 19190, 19434,
+19701);
+UPDATE `creature_template` SET `mingold` = 173, `maxgold` = 1209 WHERE `entry` IN (2937, 11792, 13142, 13740, 13742);
+UPDATE `creature_template` SET `mingold` = 174, `maxgold` = 1220 WHERE `entry` IN (16925);
+UPDATE `creature_template` SET `mingold` = 175, `maxgold` = 1223 WHERE `entry` IN (19261);
+UPDATE `creature_template` SET `mingold` = 175, `maxgold` = 1227 WHERE `entry` IN (11790);
+UPDATE `creature_template` SET `mingold` = 176, `maxgold` = 1233 WHERE `entry` IN (16907);
+UPDATE `creature_template` SET `mingold` = 178, `maxgold` = 1244 WHERE `entry` IN (16904, 16905, 16906);
+UPDATE `creature_template` SET `mingold` = 182, `maxgold` = 1276 WHERE `entry` IN (13141);
 UPDATE `creature_template` SET `mingold` = 185, `maxgold` = 1293 WHERE `entry` IN (1060, 2433, 2447, 5648, 7286, 7605,
-7606, 7608);
+7608);
+UPDATE `creature_template` SET `mingold` = 185, `maxgold` = 1297 WHERE `entry` IN (20496);
+UPDATE `creature_template` SET `mingold` = 187, `maxgold` = 1308 WHERE `entry` IN (19442);
+UPDATE `creature_template` SET `mingold` = 188, `maxgold` = 1315 WHERE `entry` IN (7606);
 UPDATE `creature_template` SET `mingold` = 188, `maxgold` = 1317 WHERE `entry` IN (11598, 13421, 13422, 16846, 16871,
-16873, 16927, 16928, 16947, 16954, 16960, 16964, 16974, 16975, 16977, 16978, 18077, 18079, 18677, 19263, 19295, 19408,
-19422, 19424, 19457, 20115);
+16873, 16928, 16954, 16960, 16964, 16974, 16975, 16977, 16978, 18079, 18677, 19263, 19295, 19408, 19457);
+UPDATE `creature_template` SET `mingold` = 189, `maxgold` = 1321 WHERE `entry` IN (19424);
+UPDATE `creature_template` SET `mingold` = 189, `maxgold` = 1323 WHERE `entry` IN (16947);
+UPDATE `creature_template` SET `mingold` = 189, `maxgold` = 1324 WHERE `entry` IN (19422);
+UPDATE `creature_template` SET `mingold` = 189, `maxgold` = 1326 WHERE `entry` IN (16927);
+UPDATE `creature_template` SET `mingold` = 190, `maxgold` = 1327 WHERE `entry` IN (18077, 20115);
 UPDATE `creature_template` SET `mingold` = 197, `maxgold` = 1377 WHERE `entry` IN (2726, 2754, 5649, 5650, 7247, 7604,
-7797, 8199, 10080, 10082, 11793, 11794, 12223, 12224, 14445);
+7797, 8199, 10080, 10082, 14445);
+UPDATE `creature_template` SET `mingold` = 197, `maxgold` = 1382 WHERE `entry` IN (12223);
+UPDATE `creature_template` SET `mingold` = 201, `maxgold` = 1404 WHERE `entry` IN (12224);
 UPDATE `creature_template` SET `mingold` = 203, `maxgold` = 1423 WHERE `entry` IN (16929, 16946, 16951, 17014, 18080,
-18113, 18114, 18136, 18137, 18282, 18679, 18974, 18976, 19282, 19298, 19335, 19413, 19414, 19415, 19527, 19946, 19947,
-20089, 20270, 20798);
+18113, 18136, 18137, 18282, 18679, 18974, 18976, 19282, 19298, 19335, 19413, 19414, 19415, 19527, 19946, 19947, 20270,
+20798);
+UPDATE `creature_template` SET `mingold` = 203, `maxgold` = 1424 WHERE `entry` IN (18114);
+UPDATE `creature_template` SET `mingold` = 206, `maxgold` = 1442 WHERE `entry` IN (11793);
 UPDATE `creature_template` SET `mingold` = 210, `maxgold` = 1467 WHERE `entry` IN (1493, 7274, 8200, 10081, 12237,
 13739);
+UPDATE `creature_template` SET `mingold` = 214, `maxgold` = 1501 WHERE `entry` IN (11794);
 UPDATE `creature_template` SET `mingold` = 218, `maxgold` = 1526 WHERE `entry` IN (16867, 16870, 16911, 16912, 16966,
 16967, 17084, 17143, 18086, 18087, 18115, 18116, 18117, 18118, 18119, 18159, 18340, 18449, 18450, 18451, 18456, 18457,
 18539, 18540, 18595, 18681, 19192, 19410, 19411, 19732, 20443, 21661, 21902, 21907, 22750, 22761, 22762, 22778, 22782,
 22785);
-UPDATE `creature_template` SET `mingold` = 218, `maxgold` = 1527 WHERE `entry` IN (12206, 13738);
-UPDATE `creature_template` SET `mingold` = 232, `maxgold` = 1626 WHERE `entry` IN (5256, 5267, 5270, 5361, 8384, 8504);
+UPDATE `creature_template` SET `mingold` = 218, `maxgold` = 1527 WHERE `entry` IN (13738);
+UPDATE `creature_template` SET `mingold` = 231, `maxgold` = 1618 WHERE `entry` IN (20089);
+UPDATE `creature_template` SET `mingold` = 232, `maxgold` = 1626 WHERE `entry` IN (5267, 5361, 8384, 8504);
 UPDATE `creature_template` SET `mingold` = 233, `maxgold` = 1631 WHERE `entry` IN (1410, 5355, 16519, 16769, 16772,
 16810, 17088, 18088, 18089, 18120, 18121, 18160, 18452, 18453, 18454, 18541, 18548, 18583, 18685, 18686, 18992, 19174,
 20442, 20444, 21198, 21200, 21242, 21660, 21662, 21963, 22388, 22763, 22787);
-UPDATE `creature_template` SET `mingold` = 245, `maxgold` = 1713 WHERE `entry` IN (5271, 5273, 5277, 5280, 5283, 5357,
-5359, 5360, 5466, 5469, 5712, 5713, 5714, 5715, 5716, 5717, 8497, 8889);
+UPDATE `creature_template` SET `mingold` = 243, `maxgold` = 1700 WHERE `entry` IN (12206);
+UPDATE `creature_template` SET `mingold` = 245, `maxgold` = 1713 WHERE `entry` IN (5256, 5271, 5273, 5283, 5357, 5359,
+5360, 5466, 5469, 5712, 5713, 5714, 5715, 5716, 5717, 8497, 8889);
 UPDATE `creature_template` SET `mingold` = 248, `maxgold` = 1739 WHERE `entry` IN (16805, 17134, 17135, 17139, 17141,
 17142, 18192, 18256, 18260, 18351, 18352, 18455, 18460, 18498, 18499, 18500, 18501, 18554, 18718, 18720, 19992, 21285,
 21368, 21370, 21405, 21636, 22378, 22381, 22387, 22653, 22748);
+UPDATE `creature_template` SET `mingold` = 253, `maxgold` = 1769 WHERE `entry` IN (5270);
+UPDATE `creature_template` SET `mingold` = 253, `maxgold` = 1772 WHERE `entry` IN (5277);
 UPDATE `creature_template` SET `mingold` = 263, `maxgold` = 1839 WHERE `entry` IN (5358, 5467, 5470, 8196, 8215, 8890);
 UPDATE `creature_template` SET `mingold` = 264, `maxgold` = 1848 WHERE `entry` IN (17136, 17137, 17138, 17147, 17148,
 17149, 17981, 18064, 18202, 18413, 18556, 18557, 18558, 18559, 18684, 19943, 19944, 19945, 19948, 19952, 19957, 19982,
 19983, 19984, 19991, 19995, 19998, 20113, 20161, 20334, 20726, 20730, 20731, 21238, 21284, 21296, 21640, 22045);
-UPDATE `creature_template` SET `mingold` = 276, `maxgold` = 1935 WHERE `entry` IN (193, 8282, 8891, 8912);
-UPDATE `creature_template` SET `mingold` = 278, `maxgold` = 1947 WHERE `entry` IN (17146, 17150, 18037, 18043, 18065,
-18203, 18204, 18211, 18238, 18298, 18391, 19755, 19801, 19825, 19830, 19985, 19986, 19987, 19993, 19994, 20095, 20116,
-20211, 20732, 20753, 20765, 20766, 20768, 20918, 21189, 21300, 21302, 21386, 21809, 21810, 22160, 22217, 22305, 22308,
-22384, 22665, 22666, 22751, 22760, 22784, 22786);
+UPDATE `creature_template` SET `mingold` = 275, `maxgold` = 1927 WHERE `entry` IN (5280);
+UPDATE `creature_template` SET `mingold` = 276, `maxgold` = 1935 WHERE `entry` IN (193, 8891, 8912);
+UPDATE `creature_template` SET `mingold` = 278, `maxgold` = 1947 WHERE `entry` IN (17146, 17150, 18037, 18043, 18203,
+18204, 18211, 18238, 18298, 18391, 19755, 19801, 19825, 19830, 19985, 19986, 19987, 19993, 19994, 20095, 20116, 20211,
+20732, 20753, 20765, 20768, 20918, 21300, 21302, 21386, 21809, 21810, 22160, 22217, 22305, 22308, 22384, 22665, 22666,
+22751, 22760, 22784, 22786);
+UPDATE `creature_template` SET `mingold` = 279, `maxgold` = 1951 WHERE `entry` IN (20766);
+UPDATE `creature_template` SET `mingold` = 279, `maxgold` = 1952 WHERE `entry` IN (21189);
+UPDATE `creature_template` SET `mingold` = 279, `maxgold` = 1955 WHERE `entry` IN (18065);
+UPDATE `creature_template` SET `mingold` = 286, `maxgold` = 2002 WHERE `entry` IN (8282);
 UPDATE `creature_template` SET `mingold` = 292, `maxgold` = 2044 WHERE `entry` IN (16952, 17151, 18658, 18660, 18661,
-18690, 18693, 18850, 18852, 18853, 18855, 18857, 18872, 18873, 18875, 19453, 19543, 19544, 19545, 19546, 19593, 19635,
-19642, 19643, 19707, 19740, 19762, 19779, 19826, 19827, 19831, 19853, 19881, 19926, 19960, 19961, 19978, 19979, 19980,
-19988, 19989, 19990, 20134, 20135, 20136, 20210, 20221, 20284, 20329, 20397, 20416, 20435, 20480, 20512, 20601, 20609,
-20614, 20934, 21021, 21032, 21046, 21047, 21048, 21057, 21058, 21065, 21314, 21382, 21383, 21384, 21385, 21387, 21389,
-21492, 21519, 21637, 21742, 21743, 21767, 22099, 22674, 22685, 22687, 22688, 22696, 23053, 23982, 24474);
+18690, 18693, 18852, 18855, 18857, 18872, 19453, 19543, 19544, 19545, 19593, 19635, 19643, 19707, 19740, 19762, 19779,
+19826, 19827, 19831, 19853, 19926, 19960, 19961, 19979, 19980, 19988, 19989, 20135, 20136, 20221, 20284, 20329, 20397,
+20416, 20435, 20480, 20512, 20601, 20609, 20614, 21021, 21032, 21046, 21047, 21048, 21057, 21058, 21065, 21314, 21382,
+21383, 21384, 21385, 21387, 21389, 21492, 21742, 21743, 21767, 22099, 22674, 22685, 22687, 22688, 22696, 23053, 23982,
+24474);
 UPDATE `creature_template` SET `mingold` = 293, `maxgold` = 2049 WHERE `entry` IN (6131, 8198, 8217, 8964, 9398, 9445,
-9554, 9680, 9681, 10043);
+9554, 9680, 9681, 10043, 18850, 18853);
+UPDATE `creature_template` SET `mingold` = 293, `maxgold` = 2050 WHERE `entry` IN (19546);
+UPDATE `creature_template` SET `mingold` = 293, `maxgold` = 2051 WHERE `entry` IN (20934);
+UPDATE `creature_template` SET `mingold` = 293, `maxgold` = 2054 WHERE `entry` IN (21637);
+UPDATE `creature_template` SET `mingold` = 294, `maxgold` = 2056 WHERE `entry` IN (21519);
+UPDATE `creature_template` SET `mingold` = 294, `maxgold` = 2059 WHERE `entry` IN (18875);
+UPDATE `creature_template` SET `mingold` = 294, `maxgold` = 2060 WHERE `entry` IN (18873);
+UPDATE `creature_template` SET `mingold` = 295, `maxgold` = 2062 WHERE `entry` IN (19978);
+UPDATE `creature_template` SET `mingold` = 295, `maxgold` = 2064 WHERE `entry` IN (20134);
+UPDATE `creature_template` SET `mingold` = 295, `maxgold` = 2065 WHERE `entry` IN (20210);
+UPDATE `creature_template` SET `mingold` = 296, `maxgold` = 2069 WHERE `entry` IN (19881);
+UPDATE `creature_template` SET `mingold` = 296, `maxgold` = 2070 WHERE `entry` IN (19990);
+UPDATE `creature_template` SET `mingold` = 296, `maxgold` = 2075 WHERE `entry` IN (19642);
 UPDATE `creature_template` SET `mingold` = 310, `maxgold` = 2172 WHERE `entry` IN (6130, 6148, 9437, 9438, 9439, 9441,
-9442, 9443, 9541, 9677, 9678, 13149, 22769);
+9442, 9443, 9677, 9678, 13149, 22769);
+UPDATE `creature_template` SET `mingold` = 315, `maxgold` = 2202 WHERE `entry` IN (9541);
 UPDATE `creature_template` SET `mingold` = 320, `maxgold` = 2242 WHERE `entry` IN (16943, 16944, 16948, 16949, 17462,
 18641, 18695, 18697, 18858, 18859, 19641, 19657, 19705, 19716, 19738, 19754, 19756, 19759, 19789, 19792, 19795, 19796,
 19799, 19800, 19802, 19965, 19966, 19971, 20139, 20140, 20207, 20215, 20285, 20404, 20409, 20410, 20452, 20453, 20606,
 20683, 20684, 20795, 20872, 20878, 20927, 20928, 21044, 21287, 21337, 21455, 21477, 21478, 21499, 21656, 21717, 21788,
 21795, 21803, 21808, 21923, 22016, 22017, 22018, 22082, 22252, 22699, 22712, 22714, 22715, 22719, 22720, 22783, 23311,
-23651, 23652, 23653, 23654, 23655, 23656, 23657, 23658, 23660, 23672, 23711, 23793, 23794, 23866, 23883, 23934, 23946,
-23962, 23963, 23964, 23983, 23998, 24016, 24116, 24161, 24162, 24169, 24213, 24216, 24249, 24250, 24562, 24567, 24635,
-24846, 24960, 24966, 25227, 25294, 25468, 25470, 25496, 25520, 25523, 25605, 25609, 25611, 25613, 25650, 25651, 25788,
-25981, 26252, 26658, 26825, 26827);
-UPDATE `creature_template` SET `mingold` = 327, `maxgold` = 2286 WHERE `entry` IN (6129, 6143, 6147, 6646, 8898, 8899,
-8906, 8907, 9447, 9476);
+23651, 23652, 23654, 23656, 23658, 23660, 23672, 23711, 23793, 23794, 23866, 23883, 23934, 23946, 23962, 23963, 23964,
+23983, 23998, 24116, 24161, 24162, 24169, 24213, 24216, 24249, 24635, 24846, 24960, 24966, 25227, 25520, 25605, 25650,
+25651, 25981, 26252, 26658, 26825);
+UPDATE `creature_template` SET `mingold` = 321, `maxgold` = 2245 WHERE `entry` IN (24016);
+UPDATE `creature_template` SET `mingold` = 324, `maxgold` = 2268 WHERE `entry` IN (24562);
+UPDATE `creature_template` SET `mingold` = 326, `maxgold` = 2279 WHERE `entry` IN (25613);
+UPDATE `creature_template` SET `mingold` = 326, `maxgold` = 2283 WHERE `entry` IN (24567);
+UPDATE `creature_template` SET `mingold` = 327, `maxgold` = 2286 WHERE `entry` IN (6129, 6143, 6147, 6646, 8906, 9447,
+9476);
+UPDATE `creature_template` SET `mingold` = 327, `maxgold` = 2291 WHERE `entry` IN (23653);
+UPDATE `creature_template` SET `mingold` = 328, `maxgold` = 2293 WHERE `entry` IN (25611);
+UPDATE `creature_template` SET `mingold` = 328, `maxgold` = 2294 WHERE `entry` IN (23655);
+UPDATE `creature_template` SET `mingold` = 328, `maxgold` = 2298 WHERE `entry` IN (25609);
+UPDATE `creature_template` SET `mingold` = 330, `maxgold` = 2308 WHERE `entry` IN (25468, 25496);
+UPDATE `creature_template` SET `mingold` = 330, `maxgold` = 2311 WHERE `entry` IN (23657);
+UPDATE `creature_template` SET `mingold` = 331, `maxgold` = 2319 WHERE `entry` IN (25470);
+UPDATE `creature_template` SET `mingold` = 333, `maxgold` = 2330 WHERE `entry` IN (24250);
 UPDATE `creature_template` SET `mingold` = 334, `maxgold` = 2336 WHERE `entry` IN (18663, 18860, 19744, 19765, 19767,
 19788, 19806, 20248, 20326, 20427, 20456, 20458, 20459, 20474, 20685, 20727, 20770, 20803, 20854, 20929, 20930, 21089,
-21179, 21180, 21196, 21409, 21416, 21453, 21454, 21503, 21505, 21520, 21650, 21663, 21709, 21710, 21711, 21718, 21719,
-21720, 21784, 21815, 21827, 22081, 22084, 22202, 22528, 22533, 22538, 22555, 22569, 22588, 22589, 22739, 22766, 22822,
-22924, 22981, 23188, 23287, 23324, 23386, 23643, 23661, 23662, 23673, 23674, 23675, 23676, 23677, 23678, 23760, 23796,
-23940, 24030, 24084, 24212, 24286, 24334, 24542, 24543, 24628, 24642, 24644, 24676, 24713, 24714, 24788, 24872, 24919,
-24955, 24976, 24978, 24979, 24999, 25087, 25215, 25216, 25316, 25350, 25351, 25393, 25432, 25433, 25434, 25501, 25548,
-25839, 25843, 25844, 26266, 26449, 26451, 26663, 26823, 26826, 27926, 27927, 28419);
+21179, 21180, 21196, 21416, 21453, 21454, 21503, 21505, 21520, 21650, 21663, 21709, 21710, 21711, 21718, 21719, 21720,
+21784, 21815, 21827, 22081, 22084, 22202, 22528, 22533, 22538, 22555, 22569, 22588, 22589, 22739, 22766, 22822, 22924,
+22981, 23188, 23287, 23324, 23386, 23661, 23662, 23673, 23674, 23675, 23676, 23677, 23760, 23796, 24084, 24212, 24286,
+24334, 24542, 24543, 24628, 24642, 24644, 24676, 24713, 24714, 24788, 24919, 24955, 24976, 24978, 24979, 24999, 25087,
+25351, 25393, 25432, 25433, 25501, 25548, 25839, 25843, 25844, 26266, 26449, 26451, 26663, 26823, 26826, 27926, 27927,
+28419);
+UPDATE `creature_template` SET `mingold` = 335, `maxgold` = 2344 WHERE `entry` IN (25350);
+UPDATE `creature_template` SET `mingold` = 337, `maxgold` = 2361 WHERE `entry` IN (8898);
 UPDATE `creature_template` SET `mingold` = 342, `maxgold` = 2391 WHERE `entry` IN (6144, 6146, 7229, 7851, 8903, 8908,
 9045, 9097, 9098, 9199, 9201, 9257, 9449, 9452, 9522, 11355, 11462);
+UPDATE `creature_template` SET `mingold` = 342, `maxgold` = 2393 WHERE `entry` IN (8907);
+UPDATE `creature_template` SET `mingold` = 343, `maxgold` = 2398 WHERE `entry` IN (23643);
+UPDATE `creature_template` SET `mingold` = 343, `maxgold` = 2404 WHERE `entry` IN (25216);
+UPDATE `creature_template` SET `mingold` = 344, `maxgold` = 2406 WHERE `entry` IN (24030);
+UPDATE `creature_template` SET `mingold` = 344, `maxgold` = 2410 WHERE `entry` IN (23678);
+UPDATE `creature_template` SET `mingold` = 345, `maxgold` = 2413 WHERE `entry` IN (25788);
+UPDATE `creature_template` SET `mingold` = 345, `maxgold` = 2414 WHERE `entry` IN (25294);
+UPDATE `creature_template` SET `mingold` = 345, `maxgold` = 2417 WHERE `entry` IN (24872);
+UPDATE `creature_template` SET `mingold` = 347, `maxgold` = 2428 WHERE `entry` IN (25434);
+UPDATE `creature_template` SET `mingold` = 347, `maxgold` = 2432 WHERE `entry` IN (23940);
+UPDATE `creature_template` SET `mingold` = 348, `maxgold` = 2434 WHERE `entry` IN (25215);
 UPDATE `creature_template` SET `mingold` = 352, `maxgold` = 2464 WHERE `entry` IN (19973, 20784, 20786, 20789, 20790,
 21644, 21649, 21651, 21763, 21787, 21911, 22144, 22195, 22201, 22204, 22221, 22241, 22242, 22289, 22341, 22342, 22343,
-22363, 22608, 22609, 23008, 23066, 23067, 23068, 23305, 23644, 23645, 23663, 23664, 23665, 23666, 23667, 23668, 23669,
-23670, 23875, 23932, 23967, 23992, 24013, 24262, 24291, 24398, 24400, 24459, 24460, 24461, 24546, 24638, 24789, 24957,
-25001, 25002, 25060, 25073, 25224, 25383, 25386, 25427, 25429, 25615, 25619, 25660, 25684, 25685, 25686, 25687, 25699,
-25700, 25701, 25725, 25726, 25790, 25880, 25979, 26126, 26202, 27226, 27272, 27699, 27701, 27800, 32576);
+22363, 22608, 22609, 23008, 23066, 23067, 23068, 23305, 23663, 23664, 23665, 23666, 23667, 23668, 23669, 23670, 23875,
+23932, 23967, 24013, 24291, 24398, 24400, 24459, 24460, 24461, 24546, 24638, 24957, 25001, 25002, 25060, 25073, 25224,
+25383, 25386, 25427, 25429, 25615, 25619, 25660, 25684, 25685, 25686, 25687, 25699, 25700, 25701, 25725, 25726, 25790,
+25880, 25979, 26126, 26202, 27226, 27272, 27699, 27701, 27800, 32576);
+UPDATE `creature_template` SET `mingold` = 352, `maxgold` = 2465 WHERE `entry` IN (21409);
 UPDATE `creature_template` SET `mingold` = 355, `maxgold` = 2487 WHERE `entry` IN (7104, 7435, 8923, 9198, 9200, 9239,
-9240, 9258, 9267, 9450, 9520, 10382, 10384, 10662, 11346, 11451, 11454, 11455, 11456, 11464, 13021, 13524, 14349,
-22689);
+9240, 9258, 9267, 9450, 9520, 10382, 10384, 10662, 11346, 11451, 11454, 11455, 11464, 13021, 13524, 14349, 22689);
+UPDATE `creature_template` SET `mingold` = 357, `maxgold` = 2502 WHERE `entry` IN (24262);
+UPDATE `creature_template` SET `mingold` = 358, `maxgold` = 2509 WHERE `entry` IN (23644);
+UPDATE `creature_template` SET `mingold` = 359, `maxgold` = 2512 WHERE `entry` IN (25316);
+UPDATE `creature_template` SET `mingold` = 362, `maxgold` = 2534 WHERE `entry` IN (25523);
+UPDATE `creature_template` SET `mingold` = 362, `maxgold` = 2535 WHERE `entry` IN (26827);
+UPDATE `creature_template` SET `mingold` = 363, `maxgold` = 2539 WHERE `entry` IN (23645);
+UPDATE `creature_template` SET `mingold` = 366, `maxgold` = 2560 WHERE `entry` IN (24789);
+UPDATE `creature_template` SET `mingold` = 367, `maxgold` = 2567 WHERE `entry` IN (23992);
+UPDATE `creature_template` SET `mingold` = 368, `maxgold` = 2579 WHERE `entry` IN (11456);
 UPDATE `creature_template` SET `mingold` = 370, `maxgold` = 2590 WHERE `entry` IN (21652, 21912, 21985, 22143, 22148,
 22175, 22243, 22254, 22291, 22327, 22392, 24920, 25209, 25378, 25392, 25396, 25430, 25448, 25713, 25717, 25719, 25722,
-25728, 25800, 25803, 26073, 26076, 26103, 26115, 26197, 26198, 26199, 26201, 26257, 26280, 26295, 26319, 26336, 26343,
-26344, 26411, 26413, 26455, 26456, 26480, 26496, 26605, 26606, 26655, 26762, 26769, 26770, 26771, 26815, 26816, 27202,
-27206, 27207, 27209, 27211, 27224, 27225, 27229, 27232, 27233, 27236, 27238, 27246, 27283, 27284, 27286, 27287, 27289,
-27332, 27340, 27342, 27343, 27370, 27401, 27405, 27406, 27410, 27416, 27508, 27551, 27552, 32572);
+25728, 25800, 25803, 26073, 26076, 26103, 26115, 26197, 26198, 26199, 26201, 26257, 26280, 26295, 26319, 26343, 26344,
+26411, 26413, 26455, 26456, 26480, 26496, 26605, 26606, 26655, 26762, 26769, 26770, 26771, 26815, 26816, 27202, 27209,
+27211, 27224, 27225, 27229, 27232, 27236, 27238, 27246, 27283, 27284, 27286, 27287, 27289, 27340, 27342, 27343, 27370,
+27401, 27405, 27410, 27416, 27508, 27551, 27552, 32572);
+UPDATE `creature_template` SET `mingold` = 370, `maxgold` = 2591 WHERE `entry` IN (26336);
 UPDATE `creature_template` SET `mingold` = 373, `maxgold` = 2613 WHERE `entry` IN (1805, 7436, 9219, 9241, 9259, 9261,
 9262, 9264, 9265, 9266, 9269, 9448, 9451, 10196, 10263, 10381, 10385, 11082, 11383, 11452, 11453, 11457, 13150, 14354,
 22768);
+UPDATE `creature_template` SET `mingold` = 375, `maxgold` = 2622 WHERE `entry` IN (27406);
+UPDATE `creature_template` SET `mingold` = 379, `maxgold` = 2652 WHERE `entry` IN (27233);
+UPDATE `creature_template` SET `mingold` = 381, `maxgold` = 2668 WHERE `entry` IN (27206);
 UPDATE `creature_template` SET `mingold` = 382, `maxgold` = 2674 WHERE `entry` IN (22261, 22262, 22263, 23809, 26196,
-26349, 26425, 26447, 26457, 26461, 26481, 26492, 26493, 26544, 26705, 26795, 26797, 26919, 27004, 27005, 27220, 27234,
-27235, 27237, 27278, 27279, 27330, 27333, 27533, 27555, 27570, 27613, 27615, 27797, 27799, 27805, 27823, 27824, 27826,
-27830, 27835, 27836, 27941, 30759, 30760, 30761);
+26349, 26425, 26457, 26461, 26481, 26493, 26544, 26705, 26795, 26797, 26919, 27004, 27005, 27220, 27234, 27235, 27237,
+27278, 27279, 27330, 27333, 27533, 27555, 27570, 27613, 27615, 27797, 27823, 27826, 27835, 27836, 27941, 30759, 30760,
+30761);
+UPDATE `creature_template` SET `mingold` = 382, `maxgold` = 2675 WHERE `entry` IN (27805);
+UPDATE `creature_template` SET `mingold` = 384, `maxgold` = 2691 WHERE `entry` IN (27799);
+UPDATE `creature_template` SET `mingold` = 385, `maxgold` = 2695 WHERE `entry` IN (26447);
+UPDATE `creature_template` SET `mingold` = 385, `maxgold` = 2696 WHERE `entry` IN (26492);
+UPDATE `creature_template` SET `mingold` = 385, `maxgold` = 2697 WHERE `entry` IN (27207);
+UPDATE `creature_template` SET `mingold` = 386, `maxgold` = 2701 WHERE `entry` IN (27332);
+UPDATE `creature_template` SET `mingold` = 389, `maxgold` = 2726 WHERE `entry` IN (27830);
+UPDATE `creature_template` SET `mingold` = 390, `maxgold` = 2732 WHERE `entry` IN (27824);
 UPDATE `creature_template` SET `mingold` = 397, `maxgold` = 2781 WHERE `entry` IN (1045, 1836, 7068, 7071, 7437, 7665,
 7666, 9197, 9216, 9217, 9218, 9260, 9263, 9268, 9692, 9716, 9717, 10393, 10405, 10414, 10418, 10419, 10420, 10463,
 10470, 10471, 10476, 10663, 10983, 11142, 11441, 11444, 11461, 11465, 11471, 11472, 11498, 13180, 13216, 13218, 13284,
@@ -307,11 +501,13 @@ UPDATE `creature_template` SET `mingold` = 411, `maxgold` = 2877 WHERE `entry` I
 13137, 13138, 13143, 13144, 13145, 13146, 13147, 13179, 13296, 13297, 13298, 13299, 13300, 13439, 13447, 13529, 13777,
 13958, 14303, 14351, 14398, 22718, 22759, 22789, 22791);
 UPDATE `creature_template` SET `mingold` = 412, `maxgold` = 2885 WHERE `entry` IN (26270, 26334, 26348, 26389, 26416,
-26575, 26577, 26679, 26704, 26708, 26942, 26946, 26948, 26965, 27020, 27024, 27117, 27118, 27259, 27260, 27356, 27357,
-27358, 27360, 27362, 27363, 27367, 27424, 27470, 27493, 27539, 27545, 27546, 27547, 27554, 27627, 27676, 27807);
-UPDATE `creature_template` SET `mingold` = 431, `maxgold` = 3020 WHERE `entry` IN (26268, 26356, 26357, 26408, 26409,
-26410, 26414, 26428, 26436, 26681, 26786, 26820, 26891, 26920, 26921, 26922, 26923, 27177, 27355, 27680, 28519, 28564,
-28603, 29654, 29656, 29697, 29699, 38032);
+26575, 26577, 26679, 26704, 26708, 26942, 26946, 26948, 27020, 27024, 27117, 27118, 27259, 27260, 27356, 27357, 27358,
+27360, 27362, 27363, 27367, 27424, 27470, 27493, 27539, 27545, 27546, 27547, 27554, 27627, 27676, 27807);
+UPDATE `creature_template` SET `mingold` = 419, `maxgold` = 2930 WHERE `entry` IN (26965);
+UPDATE `creature_template` SET `mingold` = 431, `maxgold` = 3020 WHERE `entry` IN (26268, 26356, 26357, 26409, 26410,
+26414, 26428, 26436, 26681, 26786, 26820, 26891, 26920, 26921, 26922, 26923, 27177, 27355, 27680, 28519, 28564, 28603,
+29654, 29656, 29697, 29699, 38032);
+UPDATE `creature_template` SET `mingold` = 433, `maxgold` = 3029 WHERE `entry` IN (26408);
 UPDATE `creature_template` SET `mingold` = 445, `maxgold` = 3117 WHERE `entry` IN (1047, 1284, 1841, 4364, 4371, 5319,
 7070, 7072, 7428, 7429, 7461, 7463, 7664, 7846, 8976, 9817, 9818, 9819, 10198, 10407, 10416, 10424, 10425, 10426, 10447,
 10478, 10487, 10498, 10499, 10664, 10680, 10681, 10742, 10762, 10814, 10946, 10996, 11043, 11120, 11143, 11257, 11284,
@@ -321,12 +517,22 @@ UPDATE `creature_template` SET `mingold` = 445, `maxgold` = 3117 WHERE `entry` I
 UPDATE `creature_template` SET `mingold` = 460, `maxgold` = 3220 WHERE `entry` IN (28022, 28023, 28026, 28034, 28035,
 28036, 28108, 28123, 28124, 28151, 28158, 28186, 28188, 28257, 28268, 28303, 28412, 28414, 28565, 28802, 28843, 29129,
 29133, 29211, 29449, 29450, 29451, 29646, 30739, 30740);
-UPDATE `creature_template` SET `mingold` = 465, `maxgold` = 3258 WHERE `entry` IN (29404, 29409, 29622, 29623, 29626,
-30003, 30202, 30204, 30205, 30333, 30430, 30541, 30543, 31037, 31039, 31043);
-UPDATE `creature_template` SET `mingold` = 483, `maxgold` = 3379 WHERE `entry` IN (28080, 28081, 28101, 28105, 28109,
-28110, 28373, 28388, 28402, 28403, 28417, 28418, 28442, 28465, 28494, 28495, 28496, 28504, 28538, 28575, 28600, 28641,
-28747, 28748, 28861, 28916, 28917, 28918, 28988, 29235, 29236, 29237, 29332, 29407, 29413, 29554, 29874, 30206);
-UPDATE `creature_template` SET `mingold` = 515, `maxgold` = 3603 WHERE `entry` IN (17309);
+UPDATE `creature_template` SET `mingold` = 465, `maxgold` = 3258 WHERE `entry` IN (29409, 29622, 29626, 30003, 30430,
+30543, 31037, 31039, 31043);
+UPDATE `creature_template` SET `mingold` = 466, `maxgold` = 3265 WHERE `entry` IN (29623);
+UPDATE `creature_template` SET `mingold` = 467, `maxgold` = 3271 WHERE `entry` IN (30202);
+UPDATE `creature_template` SET `mingold` = 483, `maxgold` = 3379 WHERE `entry` IN (28080, 28081, 28101, 28373, 28388,
+28402, 28403, 28417, 28418, 28442, 28465, 28494, 28495, 28496, 28504, 28538, 28575, 28600, 28641, 28747, 28748, 28861,
+28916, 28917, 28918, 28988, 29235, 29236, 29237, 29332, 29407, 29413, 29554, 29874, 30206);
+UPDATE `creature_template` SET `mingold` = 483, `maxgold` = 3382 WHERE `entry` IN (30541);
+UPDATE `creature_template` SET `mingold` = 485, `maxgold` = 3393 WHERE `entry` IN (28105);
+UPDATE `creature_template` SET `mingold` = 489, `maxgold` = 3425 WHERE `entry` IN (30204);
+UPDATE `creature_template` SET `mingold` = 490, `maxgold` = 3428 WHERE `entry` IN (30333);
+UPDATE `creature_template` SET `mingold` = 492, `maxgold` = 3447 WHERE `entry` IN (28109);
+UPDATE `creature_template` SET `mingold` = 494, `maxgold` = 3455 WHERE `entry` IN (28110);
+UPDATE `creature_template` SET `mingold` = 500, `maxgold` = 3502 WHERE `entry` IN (30205);
+UPDATE `creature_template` SET `mingold` = 501, `maxgold` = 3507 WHERE `entry` IN (29404);
+UPDATE `creature_template` SET `mingold` = 515, `maxgold` = 3608 WHERE `entry` IN (17309);
 UPDATE `creature_template` SET `mingold` = 533, `maxgold` = 3732 WHERE `entry` IN (17455, 18977);
 UPDATE `creature_template` SET `mingold` = 541, `maxgold` = 3787 WHERE `entry` IN (26667, 29323, 29369, 29370, 29374,
 29376, 29377, 29518, 29586, 29652, 29695, 29792, 29793, 29843, 29862, 30135, 30144, 30208, 30222, 30701, 30856, 30860,
@@ -339,10 +545,21 @@ UPDATE `creature_template` SET `mingold` = 558, `maxgold` = 3904 WHERE `entry` I
 32236, 32238, 32250, 32255, 32257, 32259, 32262, 32263, 32268, 32276, 32279, 32284, 32285, 32289, 32290, 32291, 32297,
 32349, 32502, 32505, 32507, 33537, 34728, 34734, 34838, 34839, 35074, 39019);
 UPDATE `creature_template` SET `mingold` = 564, `maxgold` = 3951 WHERE `entry` IN (13139, 13140, 13152, 13153, 13154,
-13155, 13318, 13319, 13320, 13356, 13357, 13798, 13959, 16449, 17259, 17264, 17269, 17270, 17271, 17281, 17370, 17371,
-17395, 17397, 17478, 17491, 17626, 18894, 19443, 20002, 22539, 22624);
+13155, 13318, 13319, 13320, 13356, 13357, 13798, 13959, 16449, 17259, 17264, 17269, 17270, 17271, 17281, 17478, 18894,
+19443, 20002, 22539, 22624);
+UPDATE `creature_template` SET `mingold` = 568, `maxgold` = 3979 WHERE `entry` IN (17395);
+UPDATE `creature_template` SET `mingold` = 596, `maxgold` = 4174 WHERE `entry` IN (17626);
+UPDATE `creature_template` SET `mingold` = 598, `maxgold` = 4188 WHERE `entry` IN (17371);
+UPDATE `creature_template` SET `mingold` = 602, `maxgold` = 4213 WHERE `entry` IN (17370);
+UPDATE `creature_template` SET `mingold` = 605, `maxgold` = 4236 WHERE `entry` IN (17491);
+UPDATE `creature_template` SET `mingold` = 608, `maxgold` = 4256 WHERE `entry` IN (17397);
 UPDATE `creature_template` SET `mingold` = 610, `maxgold` = 4269 WHERE `entry` IN (8680, 10984, 11121, 14516, 16451,
-16452, 17398, 17400, 17414, 17429, 17624, 17816, 17817, 17938, 17960, 17961, 17962, 19312, 21126);
+16452, 17398, 17400, 17414, 17429, 17624, 17961, 19312, 21126);
+UPDATE `creature_template` SET `mingold` = 631, `maxgold` = 4417 WHERE `entry` IN (17938);
+UPDATE `creature_template` SET `mingold` = 635, `maxgold` = 4448 WHERE `entry` IN (17960);
+UPDATE `creature_template` SET `mingold` = 638, `maxgold` = 4467 WHERE `entry` IN (17817);
+UPDATE `creature_template` SET `mingold` = 645, `maxgold` = 4518 WHERE `entry` IN (17962);
+UPDATE `creature_template` SET `mingold` = 650, `maxgold` = 4549 WHERE `entry` IN (17816);
 UPDATE `creature_template` SET `mingold` = 654, `maxgold` = 4578 WHERE `entry` IN (1840, 16383, 17057, 17940, 17957,
 17958, 17959, 18044, 18046, 19191, 19264, 19354, 21127, 22374);
 UPDATE `creature_template` SET `mingold` = 699, `maxgold` = 4893 WHERE `entry` IN (17726, 17727, 17728, 17729, 17730,
@@ -354,33 +571,38 @@ UPDATE `creature_template` SET `mingold` = 792, `maxgold` = 5544 WHERE `entry` I
 UPDATE `creature_template` SET `mingold` = 834, `maxgold` = 5841 WHERE `entry` IN (17820, 17833, 17860, 18182, 18318,
 18319, 18323, 18327, 18328, 18411, 18521, 18934, 19996, 19997, 20756, 20757);
 UPDATE `creature_template` SET `mingold` = 876, `maxgold` = 6132 WHERE `entry` IN (16845, 16945, 18092, 18093, 18094,
-18170, 18171, 18172, 18322, 18325, 18535, 18585, 18586, 18588, 18885, 19747, 19940, 19963, 20772, 22678, 22679, 22680,
-22681, 22691, 22697, 22698, 22794, 24458, 28132);
+18170, 18171, 18172, 18322, 18325, 18535, 18585, 18586, 18588, 18885, 19940, 19963, 20772, 22678, 22679, 22680, 22681,
+22691, 22697, 22698, 22794, 24458, 28132);
+UPDATE `creature_template` SET `mingold` = 883, `maxgold` = 6182 WHERE `entry` IN (19747);
 UPDATE `creature_template` SET `mingold` = 961, `maxgold` = 6726 WHERE `entry` IN (16507, 16523, 17420, 17427, 18320,
-18321, 18326, 18633, 18640, 18794, 19168, 19208, 19209, 19633, 19824, 20202, 20483, 20800, 20801, 20857, 20859, 20988,
-20990, 21500, 21501, 22700, 22701, 22702, 22703, 22704, 22705, 22706, 22707, 22708, 22709, 22710, 22711, 22721, 22722,
-22735, 24469);
+18321, 18326, 18633, 19168, 19208, 19209, 19633, 19824, 20202, 20483, 20800, 20801, 20857, 20859, 20988, 20990, 21500,
+21501, 22700, 22701, 22702, 22703, 22704, 22705, 22706, 22707, 22708, 22709, 22710, 22711, 22721, 22722, 22735, 24469);
+UPDATE `creature_template` SET `mingold` = 972, `maxgold` = 6803 WHERE `entry` IN (18640);
+UPDATE `creature_template` SET `mingold` = 987, `maxgold` = 6907 WHERE `entry` IN (18794);
 UPDATE `creature_template` SET `mingold` = 1001, `maxgold` = 7008 WHERE `entry` IN (16593, 16594, 16699, 16700, 16704,
-16959, 17301, 17435, 17464, 17670, 17694, 17695, 17721, 17722, 17800, 17801, 17802, 17803, 17805, 17839, 17993, 17994,
-18404, 18405, 18419, 18421, 18422, 18635, 18636, 18637, 18638, 18796, 18830, 18886, 19167, 19231, 19299, 19486, 19505,
-19507, 19508, 19509, 19510, 19511, 19512, 19712, 19713, 19823, 19843, 20059, 20138, 20216, 20555, 20600, 20661, 20873,
-20875, 20879, 20880, 20881, 20882, 20883, 20896, 20897, 20901, 20902, 20905, 21140, 21148, 21164, 21168, 21171, 21178,
-21205, 21506, 21589, 21702, 21801, 21979, 22011, 22012, 22072, 22093, 22199, 22527, 22541, 22548, 22552, 22562, 22567,
-22568, 22571, 22573, 22575, 22577, 22592, 22597, 22598, 23176, 23956, 23960, 23961, 24069, 24071, 24078, 24079, 24080,
-24082, 24085, 24238, 24762, 24849, 24918);
+16959, 17301, 17435, 17464, 17670, 17694, 17695, 17721, 17722, 17801, 17803, 17805, 17839, 17993, 17994, 18404, 18405,
+18419, 18421, 18422, 18635, 18636, 18637, 18638, 18796, 18830, 18886, 19167, 19231, 19299, 19486, 19505, 19507, 19508,
+19509, 19510, 19511, 19512, 19712, 19713, 19823, 19843, 20059, 20138, 20216, 20555, 20600, 20661, 20873, 20875, 20879,
+20880, 20881, 20882, 20883, 20896, 20897, 20901, 20902, 20905, 21140, 21148, 21164, 21168, 21171, 21178, 21205, 21506,
+21589, 21702, 21801, 21979, 22011, 22012, 22072, 22093, 22199, 22527, 22541, 22548, 22552, 22562, 22567, 22568, 22571,
+22573, 22575, 22577, 22592, 22597, 22598, 23176, 23956, 23960, 23961, 24069, 24071, 24078, 24079, 24080, 24082, 24085,
+24238, 24762, 24849, 24918);
 UPDATE `creature_template` SET `mingold` = 1056, `maxgold` = 7392 WHERE `entry` IN (17461, 17465, 17671, 18420, 18632,
 18634, 18639, 18848, 20900, 21315, 22128, 22283, 22325, 22393, 22604, 22613, 22614, 22615, 22616, 22617, 22618, 22619,
-22620, 22635, 22723, 22724, 23022, 25789, 26727, 26728, 26729, 26734, 26735, 26782, 26792, 26800, 26802, 26805, 28231,
-28410);
+22620, 22635, 22723, 22724, 23022, 25789, 26728, 26729, 26734, 26782, 26792, 26800, 26802, 26805, 28231, 28410);
+UPDATE `creature_template` SET `mingold` = 1096, `maxgold` = 7669 WHERE `entry` IN (17802);
+UPDATE `creature_template` SET `mingold` = 1099, `maxgold` = 7691 WHERE `entry` IN (26727);
+UPDATE `creature_template` SET `mingold` = 1099, `maxgold` = 7693 WHERE `entry` IN (26735);
 UPDATE `creature_template` SET `mingold` = 1110, `maxgold` = 7770 WHERE `entry` IN (11980, 20132, 20454, 20909, 20910,
 20911, 20992, 21181, 21618, 21838, 21844, 22076, 22129, 22275, 22281, 22297, 22301, 22302, 22725, 23061, 23161, 23261,
 23281, 23282, 25301, 25801, 25804, 25808, 25819, 26186, 26621, 27210, 27247, 27859, 28732);
+UPDATE `creature_template` SET `mingold` = 1134, `maxgold` = 7938 WHERE `entry` IN (17800);
 UPDATE `creature_template` SET `mingold` = 1146, `maxgold` = 8022 WHERE `entry` IN (22357, 23776, 26862, 26863, 27006,
 27007, 27008, 27009);
 UPDATE `creature_template` SET `mingold` = 1236, `maxgold` = 8655 WHERE `entry` IN (26578, 26626, 26635, 26828, 26836,
 27122, 27334, 30111, 30319);
 UPDATE `creature_template` SET `mingold` = 1294, `maxgold` = 9060 WHERE `entry` IN (24104, 27431, 27579, 27580, 30179,
-30666, 30667, 30668);
+30666, 30668);
 UPDATE `creature_template` SET `mingold` = 1380, `maxgold` = 9660 WHERE `entry` IN (26620, 26639, 28068, 28255, 30660,
 30695);
 UPDATE `creature_template` SET `mingold` = 1396, `maxgold` = 9774 WHERE `entry` IN (27963, 27966, 28024, 28025, 28076,
@@ -398,20 +620,32 @@ UPDATE `creature_template` SET `mingold` = 1432, `maxgold` = 10021 WHERE `entry`
 21621, 21645, 21842, 21843, 22170, 22171, 22172, 22346, 25547, 25551, 25563, 25565, 25567, 25568, 25569, 25570, 25572,
 25575, 25576, 25577, 28171);
 UPDATE `creature_template` SET `mingold` = 1448, `maxgold` = 10137 WHERE `entry` IN (26550, 27960, 27961, 27962, 27964,
-27965, 28443, 29819, 29820, 29822, 29826, 29829, 29836);
-UPDATE `creature_template` SET `mingold` = 1623, `maxgold` = 11361 WHERE `entry` IN (26669, 26670, 26694, 27633, 27635,
-27639, 27640, 27641, 28368, 28578, 28961, 28965, 29885, 30829, 30830, 30831, 31104);
+27965, 28443, 29820, 29826, 29829, 29836);
+UPDATE `creature_template` SET `mingold` = 1461, `maxgold` = 10224 WHERE `entry` IN (30667);
+UPDATE `creature_template` SET `mingold` = 1470, `maxgold` = 10292 WHERE `entry` IN (29819);
+UPDATE `creature_template` SET `mingold` = 1587, `maxgold` = 11109 WHERE `entry` IN (29822);
+UPDATE `creature_template` SET `mingold` = 1623, `maxgold` = 11361 WHERE `entry` IN (26669, 26670, 26694, 27635, 27639,
+27640, 27641, 28578, 28961, 28965, 29885, 30829, 30830, 30831, 31104);
+UPDATE `creature_template` SET `mingold` = 1624, `maxgold` = 11366 WHERE `entry` IN (27633);
+UPDATE `creature_template` SET `mingold` = 1645, `maxgold` = 11514 WHERE `entry` IN (28368);
 UPDATE `creature_template` SET `mingold` = 1673, `maxgold` = 11712 WHERE `entry` IN (26553, 26554, 26555, 26696, 27729,
-27732, 27734, 27742, 27743, 27744, 28199, 28200, 28249, 28579, 28580, 28581, 28582, 28837, 28838, 28920, 29375, 29503,
-29614, 29794, 29809, 29920, 30457, 30460, 30478, 30485, 30495, 30496, 30498, 30509, 30516, 30517, 30524, 30525, 30526,
-30698, 30747, 30764, 30765, 30766, 30817, 30818, 30820, 30821, 30901, 30904, 30905, 30911, 30915, 30916, 30925, 30926,
-30927, 30929, 30930, 30932, 30933, 30935, 30939, 30966, 30967, 30968, 30971, 30974, 30975, 30976, 30977, 30980, 30981,
-30982, 31159, 31161, 31338, 31339, 31340, 31342, 31345, 31346, 31347, 31351, 31352, 31354, 31355, 31357, 31359, 31363,
-31371, 31372, 31373, 31374, 31375, 31376, 31377, 31378, 31383, 31385, 31387, 31399, 31442, 31443, 31449, 31450, 31457,
-31460, 31470, 31471, 31472, 31475, 31486, 31490, 31493, 31501, 31502, 31503, 31504, 31604, 31606, 31608, 31658, 31659,
-31660, 31661, 31662, 31663, 31665, 31666, 31667, 31675, 31676, 32192, 32278, 35305, 35307, 35309, 36478, 36499, 36516,
-36522, 36564, 36620, 36666, 36788, 36830, 36840, 36842, 36879, 36886, 36892, 36893, 37563, 37565, 37566, 37567, 37568,
-37569, 38172, 38173, 38175, 38176, 38177, 38193, 40446);
+27732, 27734, 27742, 27743, 27744, 28199, 28200, 28249, 28579, 28580, 28582, 28837, 28920, 29614, 29794, 29809, 29920,
+30457, 30460, 30478, 30485, 30495, 30496, 30498, 30509, 30516, 30517, 30524, 30525, 30526, 30698, 30747, 30764, 30765,
+30766, 30817, 30818, 30820, 30821, 30901, 30904, 30905, 30911, 30915, 30916, 30925, 30926, 30927, 30929, 30930, 30932,
+30933, 30935, 30939, 30966, 30967, 30968, 30971, 30974, 30975, 30976, 30977, 30980, 30981, 30982, 31159, 31161, 31338,
+31339, 31340, 31342, 31345, 31346, 31347, 31351, 31352, 31354, 31355, 31357, 31359, 31363, 31371, 31372, 31373, 31374,
+31375, 31376, 31377, 31378, 31383, 31385, 31387, 31399, 31442, 31443, 31449, 31450, 31457, 31460, 31470, 31471, 31472,
+31475, 31486, 31490, 31493, 31501, 31502, 31503, 31504, 31604, 31606, 31608, 31658, 31659, 31660, 31661, 31662, 31663,
+31665, 31666, 31667, 31675, 31676, 32192, 32278, 36478, 36499, 36516, 36522, 36564, 36620, 36666, 36788, 36830, 36840,
+36842, 36879, 36886, 36892, 36893, 37563, 37565, 37566, 37567, 37568, 37569, 38172, 38173, 38175, 38176, 38177, 38193,
+40446);
+UPDATE `creature_template` SET `mingold` = 1674, `maxgold` = 11719 WHERE `entry` IN (28581);
+UPDATE `creature_template` SET `mingold` = 1688, `maxgold` = 11819 WHERE `entry` IN (28838);
+UPDATE `creature_template` SET `mingold` = 1792, `maxgold` = 12547 WHERE `entry` IN (29503);
+UPDATE `creature_template` SET `mingold` = 1838, `maxgold` = 12866 WHERE `entry` IN (35307);
+UPDATE `creature_template` SET `mingold` = 1844, `maxgold` = 12906 WHERE `entry` IN (35305);
+UPDATE `creature_template` SET `mingold` = 1853, `maxgold` = 12972 WHERE `entry` IN (35309);
+UPDATE `creature_template` SET `mingold` = 1854, `maxgold` = 12975 WHERE `entry` IN (29375);
 
 -- Observed in sniffs, disagreeing with the level model
 UPDATE `creature_template` SET `mingold` = 1, `maxgold` = 2 WHERE `entry` IN (25084, 25085);
