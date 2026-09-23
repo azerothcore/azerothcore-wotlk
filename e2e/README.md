@@ -171,6 +171,24 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 
 ---
 
+### Chest regression checks (PR #27381)
+
+`world/chests` covers Cat Figurine reopening, Ice Chest party rolls and reward attribution,
+and both Shallow Grave variants: inert graves summon nothing; trapped graves do not summon
+again on reopening. Grave checks include full bags, another looter, consuming all loot,
+and replaying an opening request after despawn. Live execution is still pending.
+
+```bash
+go test -tags=e2e ./suites/world/chests -count=2 -v -p 1 -parallel 1 -timeout 20m
+```
+
+Use a disposable realm with the pending migrations applied. Tests create temporary fixtures
+through cleanup-enabled spawn helpers, not the dungeon's real graves. They sample up to
+48 fresh graves for item loot and a positive summon from the trapped variant; inability to
+obtain that fixture fails as a precondition. Initial empty-loot coverage is not claimed:
+the grave money range is now nonzero. Exact summon/drop probabilities and the dungeon's
+pool selection are not asserted by these lifecycle tests.
+
 ## Parallelism and isolation
 
 ### Model
