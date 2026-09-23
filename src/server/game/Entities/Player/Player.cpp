@@ -13235,6 +13235,20 @@ void Player::SetMover(Unit* target)
         m_mover->GetMotionMaster()->Initialize();
 }
 
+void Player::ResyncCanFlyToClient()
+{
+    if (!_pendingCanFlyResync || GetClientControlling() != this)
+        return;
+
+    // a queued fear/confuse keeps the client out of control even without its unit flag
+    if (HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED))
+        return;
+
+    bool const enable = *_pendingCanFlyResync;
+    _pendingCanFlyResync.reset();
+    SetCanFly(enable);
+}
+
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const
 {
     if (pvp)
