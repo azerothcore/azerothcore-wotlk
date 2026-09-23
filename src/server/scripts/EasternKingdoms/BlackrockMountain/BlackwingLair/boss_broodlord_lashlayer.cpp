@@ -175,6 +175,22 @@ struct go_suppression_device : public GameObjectAI
         }
     }
 
+    void OnStateChanged(uint32 state, Unit* /*unit*/) override
+    {
+        switch (state)
+        {
+            case GO_JUST_DEACTIVATED:
+                // Disarm Trap must retract the device, not send it through generic despawning.
+                me->SetLootState(GO_READY);
+                [[fallthrough]];
+            case GO_ACTIVATED:
+                DoAction(ACTION_DISARMED);
+                break;
+            default:
+                break;
+        }
+    }
+
     void DoAction(int32 action) override
     {
         if (action == ACTION_DEACTIVATE)
@@ -183,6 +199,9 @@ struct go_suppression_device : public GameObjectAI
         }
         else if (action == ACTION_DISARMED)
         {
+            if (!_active)
+                return;
+
             Deactivate();
             _events.CancelEvent(EVENT_SUPPRESSION_CAST);
 
