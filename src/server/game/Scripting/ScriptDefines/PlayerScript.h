@@ -50,6 +50,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CREATURE_KILL,
     PLAYERHOOK_ON_CREATURE_KILLED_BY_PET,
     PLAYERHOOK_ON_PLAYER_KILLED_BY_CREATURE,
+    PLAYERHOOK_ON_CREATURE_KILL_CREDIT,
     PLAYERHOOK_ON_LEVEL_CHANGED,
     PLAYERHOOK_ON_FREE_TALENT_POINTS_CHANGED,
     PLAYERHOOK_ON_TALENTS_RESET,
@@ -57,6 +58,7 @@ enum PlayerHook
     PLAYERHOOK_ON_AFTER_SPEC_SLOT_CHANGED,
     PLAYERHOOK_ON_BEFORE_UPDATE,
     PLAYERHOOK_ON_UPDATE,
+    PLAYERHOOK_ON_AFTER_UPDATE,
     PLAYERHOOK_ON_MONEY_CHANGED,
     PLAYERHOOK_ON_BEFORE_LOOT_MONEY,
     PLAYERHOOK_ON_BEFORE_SEND_LOOT,
@@ -143,6 +145,7 @@ enum PlayerHook
     PLAYERHOOK_CAN_SEND_MAIL,
     PLAYERHOOK_PETITION_BUY,
     PLAYERHOOK_PETITION_SHOW_LIST,
+    PLAYERHOOK_ON_BEFORE_PETITION_SIGN,
     PLAYERHOOK_ON_REWARD_KILL_REWARDER,
     PLAYERHOOK_CAN_GIVE_MAIL_REWARD_AT_GIVE_LEVEL,
     PLAYERHOOK_ON_DELETE_FROM_DB,
@@ -273,6 +276,10 @@ public:
     // Called when a player is killed by a creature
     virtual void OnPlayerKilledByCreature(Creature* /*killer*/, Player* /*killed*/) { }
 
+    // Called when a creature dies and a player gets the kill credit (the killer's owner or the loot recipient).
+    // Unlike OnPlayerCreatureKill this also fires for kills by pets, totems and for tapped creatures.
+    virtual void OnPlayerCreatureKillCredit(Player* /*player*/, Creature* /*killed*/) { }
+
     // Called when a player's level changes (right after the level is applied)
     virtual void OnPlayerLevelChanged(Player* /*player*/, uint8 /*oldlevel*/) { }
 
@@ -290,6 +297,7 @@ public:
 
     // Called for player::update
     virtual void OnPlayerBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
+    virtual void OnPlayerAfterUpdate(Player* /*player*/, uint32 /*p_time*/) { }
     virtual void OnPlayerUpdate(Player* /*player*/, uint32 /*p_time*/) { }
 
     // Called when a player's money is modified (before the modification is done)
@@ -526,6 +534,10 @@ public:
     virtual void OnPlayerPetitionBuy(Player* /*player*/, Creature* /*creature*/, uint32& /*charterid*/, uint32& /*cost*/, uint32& /*type*/) { }
 
     virtual void OnPlayerPetitionShowList(Player* /*player*/, Creature* /*creature*/, uint32& /*CharterEntry*/, uint32& /*CharterDispayID*/, uint32& /*CharterCost*/) { }
+
+    // Called before a petition signature is accepted. alreadySignedByAccount is true when another character
+    // of the same account already signed it, which rejects the signature; scripts may override it.
+    virtual void OnPlayerBeforePetitionSign(Player* /*player*/, ObjectGuid /*petitionGuid*/, bool& /*alreadySignedByAccount*/) { }
 
     virtual void OnPlayerRewardKillRewarder(Player* /*player*/, KillRewarder* /*rewarder*/, bool /*isDungeon*/, float& /*rate*/) { }
 
@@ -891,18 +903,21 @@ public:
      * did. A trainer has taken the money and still reports success, and Player::LearnTalent spends
      * the point and records the talent anyway -- use OnPlayerCanLearnTalent to stop a talent.
      *
-     * Only Player::learnSpell reaches it; spells written through addSpell do not. Those bypasses
-     * include character loading (_LoadSpells, and the initial class and skill-rewarded spells,
-     * which run on every login) and talent spells from _addTalentAurasAndSpells, reapplied on
-     * every dual-spec switch -- so a refusal in world is undone the next time one of them runs.
+     * Player::learnSpell reaches it, and so does a trainer about to cast a wrapper entry (below);
+     * spells written through addSpell do not. Those bypasses include character loading
+     * (_LoadSpells, and the initial class and skill-rewarded spells, which run on every login) and
+     * talent spells from _addTalentAurasAndSpells, reapplied on every dual-spec switch -- so a
+     * refusal in world is undone the next time one of them runs.
      *
      * What it sees can be indirect: a trainer entry that wraps other spells (a paladin's Summon
-     * Warhorse) is cast, so the hook sees the wrapped spells instead. A talent rank arrives only
-     * when it lands in the spell book, which most do not -- but a learn-spell talent still
-     * delivers its additional talent spells.
+     * Warhorse) is cast, so the hook sees the entry first and then each wrapped spell as the cast
+     * teaches it. Refusing the entry skips the cast as a whole, and with it whatever else the entry
+     * does: a class mount also steps the Riding skill, which refusing the wrapped spells alone does
+     * not stop. A talent rank arrives only when it lands in the spell book, which most do not -- but
+     * a learn-spell talent still delivers its additional talent spells.
      *
      * @param player Contains information about the Player
-     * @param spellId The id of the spell about to be learned
+     * @param spellId The id of the spell about to be learned, or of the trainer entry about to be cast
      *
      * @return true if the player is allowed to learn the spell
      */

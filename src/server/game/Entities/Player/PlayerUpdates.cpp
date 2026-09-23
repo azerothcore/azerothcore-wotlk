@@ -428,6 +428,7 @@ void Player::Update(uint32 p_time)
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
+    sScriptMgr->OnPlayerAfterUpdate(this, p_time);
 }
 
 void Player::UpdateMirrorTimers()
@@ -2430,7 +2431,7 @@ void Player::ProcessSpellQueue()
 // important changes, so a crash loses at most a few seconds of them
 void Player::UpdateAdditionalSaves(uint32 p_time)
 {
-    if (!m_additionalSaveTimer || GetSession()->isLogingOut())
+    if (!m_additionalSaveTimer || GetSession()->IsLoggingOut())
         return;
 
     if (m_additionalSaveTimer > p_time)
