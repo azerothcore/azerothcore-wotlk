@@ -134,10 +134,19 @@ struct go_suppression_device : public GameObjectAI
 
     void InitializeAI() override
     {
-        if (_instance->GetBossState(DATA_BROODLORD_LASHLAYER) == DONE)
+        me->AllowSaveToDB(true);
+
+        // Disarmed devices use GO_STATE_ACTIVE. Preserve that state after Broodlord dies;
+        // before then, a reload resets the transient disarm because its reset timer is not persisted.
+        if (me->GetGoState() == GO_STATE_ACTIVE)
         {
-            Deactivate();
-            return;
+            if (_instance->GetBossState(DATA_BROODLORD_LASHLAYER) == DONE)
+            {
+                Deactivate();
+                return;
+            }
+
+            me->SetGoState(GO_STATE_READY);
         }
 
         _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5s);
