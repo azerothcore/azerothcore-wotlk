@@ -97,6 +97,11 @@ void ScriptMgr::OnPlayerKilledByCreature(Creature* killer, Player* killed)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_KILLED_BY_CREATURE, script->OnPlayerKilledByCreature(killer, killed));
 }
 
+void ScriptMgr::OnPlayerCreatureKillCredit(Player* player, Creature* killed)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CREATURE_KILL_CREDIT, script->OnPlayerCreatureKillCredit(player, killed));
+}
+
 void ScriptMgr::OnPlayerLevelChanged(Player* player, uint8 oldLevel)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEVEL_CHANGED, script->OnPlayerLevelChanged(player, oldLevel));
@@ -207,6 +212,11 @@ void ScriptMgr::OnPlayerBeforeUpdate(Player* player, uint32 p_time)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_UPDATE, script->OnPlayerBeforeUpdate(player, p_time));
 }
 
+void ScriptMgr::OnPlayerAfterUpdate(Player* player, uint32 p_time)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_UPDATE, script->OnPlayerAfterUpdate(player, p_time));
+}
+
 void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE, script->OnPlayerUpdate(player, p_time));
@@ -225,6 +235,11 @@ void ScriptMgr::OnPlayerLoadFromDB(Player* player)
 void ScriptMgr::OnPlayerBeforeLogout(Player* player)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_LOGOUT, script->OnPlayerBeforeLogout(player));
+}
+
+bool ScriptMgr::OnPlayerCanMarkAccountOffline(ObjectGuid guid, uint32 accountId)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_MARK_ACCOUNT_OFFLINE, !script->OnPlayerCanMarkAccountOffline(guid, accountId));
 }
 
 void ScriptMgr::OnPlayerLogout(Player* player)
@@ -550,6 +565,11 @@ void ScriptMgr::OnPlayerPetitionBuy(Player* player, Creature* creature, uint32& 
 void ScriptMgr::OnPlayerPetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_PETITION_SHOW_LIST, script->OnPlayerPetitionShowList(player, creature, CharterEntry, CharterDispayID, CharterCost));
+}
+
+void ScriptMgr::OnPlayerBeforePetitionSign(Player* player, ObjectGuid petitionGuid, bool& alreadySignedByAccount)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_PETITION_SIGN, script->OnPlayerBeforePetitionSign(player, petitionGuid, alreadySignedByAccount));
 }
 
 void ScriptMgr::OnPlayerRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate)

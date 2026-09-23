@@ -1010,7 +1010,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
                     SpawnTentacle(NPC_CRUSHER_TENTACLE);
                     me->CastCustomSpell(SPELL_CONSTRICTOR_TENTACLE, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
-                    SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
 
                     // Sniffed: Psychosis opens with the tentacle wave, Malady follows at 12s, Death Ray at 20s.
                     // Brain Link at 18s comes from OG/Classic references (needs two players, absent from solo sniffs)
