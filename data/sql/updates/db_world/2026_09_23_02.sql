@@ -1,3 +1,4 @@
+-- DB update 2026_09_23_01 -> 2026_09_23_02
 
 -- Scourge Gryphons
 UPDATE `creature` SET `phaseMask` = `phaseMask` |128 WHERE (`id` = 29501) AND (`guid` IN (128509,128510));
