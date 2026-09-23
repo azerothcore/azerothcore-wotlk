@@ -4390,9 +4390,10 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
             return;
 
         // xinef: player is in corpse
-        if (!target->HasPlayerFlag(PLAYER_FLAGS_GHOST))
+        bool createCorpse = !target->HasPlayerFlag(PLAYER_FLAGS_GHOST);
+        if (createCorpse)
             target->BuildPlayerRepop();
-        target->RepopAtGraveyard();
+        target->RepopAtGraveyard(createCorpse);
         return;
     }
 

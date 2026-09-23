@@ -369,7 +369,7 @@ void Player::Update(uint32 p_time)
         {
             m_deathTimer = 0;
             BuildPlayerRepop();
-            RepopAtGraveyard();
+            RepopAtGraveyard(true);
         }
         else
             m_deathTimer -= p_time;

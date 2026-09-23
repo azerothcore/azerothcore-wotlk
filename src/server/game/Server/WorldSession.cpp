@@ -701,7 +701,7 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
         {
             _player->GetThreatMgr().RemoveMeFromThreatLists();
             _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard();
+            _player->RepopAtGraveyard(true);
         }
         else if (_player->HasSpiritOfRedemptionAura())
         {
@@ -709,7 +709,7 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
             _player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             _player->KillPlayer();
             _player->BuildPlayerRepop();
-            _player->RepopAtGraveyard();
+            _player->RepopAtGraveyard(true);
         }
         else if (_player->HasPendingBind())
         {
