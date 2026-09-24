@@ -425,8 +425,11 @@ class spell_dk_chains_of_ice : public SpellScript
         {
             std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
             for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-                if (ihit->missCondition == SPELL_MISS_NONE && ihit->targetGUID == target->GetGUID())
-                    GetCaster()->CastSpell(target, 55095 /*SPELL_FROST_FEVER*/, true);
+                if (ihit->targetGUID == target->GetGUID() &&
+                    (ihit->missCondition == SPELL_MISS_NONE ||
+                     ihit->missCondition == SPELL_MISS_IMMUNE ||
+                     ihit->missCondition == SPELL_MISS_IMMUNE2))
+                    GetCaster()->CastSpell(target, SPELL_DK_FROST_FEVER, true);
         }
     }
 

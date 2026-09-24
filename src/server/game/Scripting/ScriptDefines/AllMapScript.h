@@ -30,6 +30,7 @@ enum AllMapHook
     ALLMAPHOOK_ON_CREATE_MAP,
     ALLMAPHOOK_ON_DESTROY_MAP,
     ALLMAPHOOK_ON_MAP_UPDATE,
+    ALLMAPHOOK_CAN_SEND_OBJECT_UPDATES_TO_PLAYER,
     ALLMAPHOOK_END
 };
 
@@ -95,6 +96,15 @@ public:
      * @param diff Contains information about the diff time
      */
     virtual void OnMapUpdate(Map* /*map*/, uint32 /*diff*/) { }
+
+    /**
+     * @brief This hook is called before the map sends its pending object update packets to a player
+     *
+     * @param map Contains information about the Map
+     * @param player Contains information about the Player
+     * @return True to send the updates, false to discard them for this player
+     */
+    [[nodiscard]] virtual bool CanSendObjectUpdatesToPlayer(Map* /*map*/, Player* /*player*/) { return true; }
 };
 
 #endif
