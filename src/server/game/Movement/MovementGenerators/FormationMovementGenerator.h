@@ -42,6 +42,7 @@ private:
     void LaunchMovement(Creature* owner, Unit* target);
 
     static constexpr uint32 FORMATION_MOVEMENT_INTERVAL = 1200;
+    static constexpr uint8 MAX_PATH_RETRIES_WITHOUT_PROGRESS = 3;
 
     float const _range;
     float _angle;
@@ -50,8 +51,11 @@ private:
     uint32 _lastLeaderSplineID;
     bool _hasPredictedDestination;
     bool _isMoving;
+    bool _hasIncompletePath;
+    uint8 _pathRetryCount;
 
     Position _lastLeaderPosition;
+    Position _lastPathStartPosition;
     TimeTracker _nextMoveTimer;
 };
 
