@@ -75,6 +75,28 @@ TEST_F(PlayerCharmAIIntegrationTest, CreatureControlledPlayerSelectsHostileGroup
 }
 
 // cppcheck-suppress syntaxError
+TEST_F(PlayerCharmAIIntegrationTest, CreatureControlledPlayerSelectsClosestHostileGroupMember)
+{
+    Group group;
+    TestPlayer* charmedPlayer = CreateTestPlayer(1, "CharmedPlayer");
+    TestPlayer* nearbyMember = CreateTestPlayer(2, "NearbyMember");
+    TestPlayer* distantMember = CreateTestPlayer(3, "DistantMember");
+
+    PreparePlayer(charmedPlayer, TEST_FACTION_HOSTILE_TO_ALL);
+    PreparePlayer(nearbyMember, TEST_FACTION_HOSTILE_TO_MONSTERS);
+    PreparePlayer(distantMember, TEST_FACTION_HOSTILE_TO_MONSTERS);
+    charmedPlayer->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+    nearbyMember->Relocate(5.0f, 0.0f, 0.0f, 0.0f);
+    distantMember->Relocate(20.0f, 0.0f, 0.0f, 0.0f);
+    charmedPlayer->SetGroup(&group, 0);
+    nearbyMember->SetGroup(&group, 0);
+    distantMember->SetGroup(&group, 0);
+
+    ASSERT_EQ(group.GetFirstMember()->GetSource(), distantMember);
+    EXPECT_EQ(charmedPlayer->TestSelectCharmedAIGroupTarget(100.0f), nearbyMember);
+}
+
+// cppcheck-suppress syntaxError
 TEST_F(PlayerCharmAIIntegrationTest, CreatureControlledPlayerRejectsInvalidGroupMembers)
 {
     Group group;

@@ -20,7 +20,6 @@
 #include "CellImpl.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
-#include "Containers.h"
 #include "Formulas.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -2204,7 +2203,7 @@ Unit* Player::SelectCharmedAIGroupTarget(float distance) const
     if (!group)
         return nullptr;
 
-    std::vector<Unit*> targets;
+    Player* target = nullptr;
     for (GroupReference const* itr = group->GetFirstMember(); itr; itr = itr->next())
     {
         Player* member = itr->GetSource();
@@ -2217,13 +2216,11 @@ Unit* Player::SelectCharmedAIGroupTarget(float distance) const
         if ((!IsHostileTo(member) && !member->IsHostileTo(this)) || !IsValidAttackTarget(member))
             continue;
 
-        targets.push_back(member);
+        if (!target || GetDistanceOrder(member, target))
+            target = member;
     }
 
-    if (targets.empty())
-        return nullptr;
-
-    return Acore::Containers::SelectRandomContainerElement(targets);
+    return target;
 }
 
 void Player::UpdateLootAchievements(LootItem* item, Loot* loot)
