@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_08 -> 2026_09_24_09
 --
 -- BRD Bael'Gar corridor patrols from 2.5.6.69110 sniff
 UPDATE `creature` SET `MovementType` = 2, `ScriptName` = '' WHERE `guid` = 47786 AND `id` = 8895;
