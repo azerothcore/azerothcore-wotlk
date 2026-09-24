@@ -141,7 +141,8 @@ public:
             summons2.DespawnAll();
             BoatNum = 0;
 
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            me->SetReactState(REACT_AGGRESSIVE);
 
             if (pInstance)
             {
@@ -213,9 +214,10 @@ public:
                         if (me->GetHealth() < std::max(0.0f, float(me->GetMaxHealth() * (1.0f - (IsHeroic() ? 0.2f : 0.334f)*float(BoatNum + 1)))))
                         {
                             events.DelayEvents(12s);
-                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->InterruptNonMeleeSpells(true);
                             me->CastSpell(me, SPELL_SCREAMS_OF_THE_DEAD, true);
+                            me->AttackStop();
+                            me->SetReactState(REACT_PASSIVE);
                             me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MovePoint(0, BoatStructure[BoatOrder[BoatNum]].MoveX, BoatStructure[BoatOrder[BoatNum]].MoveY, BoatStructure[BoatOrder[BoatNum]].MoveZ);
                             me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
@@ -259,7 +261,7 @@ public:
                         // Spawn it!
                         if (Creature* king = me->SummonCreature(BoatStructure[BoatOrder[BoatNum - 1]].npc, BoatStructure[BoatOrder[BoatNum - 1]].SpawnX, BoatStructure[BoatOrder[BoatNum - 1]].SpawnY, BoatStructure[BoatOrder[BoatNum - 1]].SpawnZ, BoatStructure[BoatOrder[BoatNum - 1]].SpawnO, TEMPSUMMON_CORPSE_DESPAWN, 0))
                         {
-                            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                            me->SetReactState(REACT_AGGRESSIVE);
                             king->CastSpell(me, SPELL_CHANNEL_SPIRIT_TO_YMIRON, true);
                             summons.Summon(king);
                             king->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
