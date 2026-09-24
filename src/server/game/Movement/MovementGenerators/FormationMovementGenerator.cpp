@@ -131,6 +131,11 @@ void FormationMovementGenerator::LaunchMovement(Creature* owner, Unit* target)
         G3D::Vector3 const leaderDestination = target->movespline->CurrentDestination();
         relativeAngle = target->GetRelativeAngle(leaderDestination.x, leaderDestination.y);
         leaderTravelDistance = target->GetExactDist2d(leaderDestination.x, leaderDestination.y);
+
+        // Refresh at the next corner without waiting a full interval on short segments.
+        int32 const segmentTime = target->movespline->_Spline().length(target->movespline->_currentSplineIdx() + 1) -
+            target->movespline->timePassed();
+        _nextMoveTimer.Reset(std::clamp<int32>(segmentTime, 100, FORMATION_MOVEMENT_INTERVAL));
     }
 
     Position dest = target->GetPosition();
