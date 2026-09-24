@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_04 -> 2026_09_24_05
 -- Shallow Grave alternatives from Gultask's Classic sniff research:
 -- https://github.com/azerothcore/azerothcore-wotlk/pull/27381#issuecomment-5803161498
 -- Each location has an inert (128308) or trapped (128403) grave, never both.

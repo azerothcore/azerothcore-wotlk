@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_02 -> 2026_09_24_03
 --
 -- Shallow Grave
 -- Entry 128403 summons through its WDB-linked trap; entry 128308 is the inert alternative.

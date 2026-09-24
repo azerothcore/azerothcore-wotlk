@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_03 -> 2026_09_24_04
 -- Zul'Farrak grave summons: use the Loot Normalization (#24398) world loot pools.
 -- Gultask's WotLK Classic research (builds 49822, 52237 and 54261):
 -- https://github.com/azerothcore/azerothcore-wotlk/pull/27381#issuecomment-5798468763
