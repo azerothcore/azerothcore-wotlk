@@ -606,14 +606,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
     });
 
-    // Glyph of Holy Light, Damage Class should be magic
+    // Glyph of Holy Light
     ApplySpellFix({ 54968 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     });
 
-    // Beacon of Light heals use the caster's transferred amount and the beacon target's modifiers
+    // Beacon of Light
     ApplySpellFix({ 53652, 53653, 53654 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
