@@ -147,7 +147,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
-| spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`) | #26130 #25765 |
+| spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery; Beacon applies its target's Improved Devotion Aura healing bonus exactly once for Holy Light, Flash of Light, Holy Shock and Lay on Hands | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`, `TestAC_27756_*`) | #26130 #25765 #27756 |
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
 | spells/effects | Charge / grounding totem / Sweeping Strikes Execute; forced cast summons at the forced caster, not at the unit that forced it; a tripped Gordunni Trap rolls out both dirt mounds | P1 | covered (`TestAC_26997_*`, `TestEffects_ForceCastDestination`, `TestEffects_GordunniTrapRollsBothMounds`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 #27621 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
