@@ -80,7 +80,8 @@ struct npc_ouro_spawner : public ScriptedAI
             if (InstanceScript* instance = me->GetInstanceScript())
             {
                 Creature* ouro = instance->GetCreature(DATA_OURO);
-                if (instance->GetBossState(DATA_OURO) != IN_PROGRESS && !ouro)
+                EncounterState state = instance->GetBossState(DATA_OURO);
+                if ((state == NOT_STARTED || state == FAIL) && !ouro)
                 {
                     DoCastSelf(SPELL_SUMMON_OURO);
                     hasSummoned = true;
@@ -268,7 +269,9 @@ struct boss_ouro : public BossAI
 
     void Reset() override
     {
-        instance->SetBossState(DATA_OURO, NOT_STARTED);
+        // A new Ouro summoned by a moving mound continues the same encounter.
+        if (instance->GetBossState(DATA_OURO) != IN_PROGRESS)
+            instance->SetBossState(DATA_OURO, NOT_STARTED);
         scheduler.CancelAll();
         _submergeMelee = 0;
         _submerged = false;
@@ -277,6 +280,10 @@ struct boss_ouro : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
+        // The moving mounds own the encounter while this Ouro is despawning.
+        if (_submerged)
+            return;
+
         if (me->GetThreatMgr().IsThreatListEmpty(true))
         {
             scheduler.CancelAll();
@@ -299,6 +306,9 @@ struct boss_ouro : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        if (_submerged)
+            return;
+
         UpdateVictim();
 
         if (!IsEngaged())
@@ -384,8 +394,22 @@ struct npc_dirt_mound : ScriptedAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
+        // An unavailable target is not a wipe, nor is one mound losing combat.
+        if (!me->GetThreatMgr().IsThreatListEmpty(true))
+            return;
+
+        std::list<Creature*> ouroMounds;
+        me->GetCreatureListWithEntryInGrid(ouroMounds, NPC_DIRT_MOUND, 200.0f);
+        for (Creature* mound : ouroMounds)
+            if (!mound->GetThreatMgr().IsThreatListEmpty(true))
+                return;
+
         if (_instance)
         {
+            if (Creature* ouro = _instance->GetCreature(DATA_OURO))
+                if (!ouro->GetThreatMgr().IsThreatListEmpty(true))
+                    return;
+
             _instance->SetBossState(DATA_OURO, FAIL);
         }
 
