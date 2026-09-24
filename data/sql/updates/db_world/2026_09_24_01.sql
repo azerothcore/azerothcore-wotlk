@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_00 -> 2026_09_24_01
 -- Jekyll Flandring
 DELETE FROM `npc_vendor` WHERE `entry` = 13219 AND `item` IN (19483);
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES

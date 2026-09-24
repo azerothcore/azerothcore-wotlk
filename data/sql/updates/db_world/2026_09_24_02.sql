@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_01 -> 2026_09_24_02
 -- #20700 creature money: per-level amounts measured from sniffs
 -- Level model: non-elite x1, elite x3, checked against the sniff corpus
 UPDATE `creature_template` SET `mingold` = 1, `maxgold` = 4 WHERE `entry` IN (6, 707, 1501, 1502, 5917, 27124);

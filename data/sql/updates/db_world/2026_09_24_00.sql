@@ -1,3 +1,4 @@
+-- DB update 2026_09_23_02 -> 2026_09_24_00
 -- npc_text: re-point BroadcastTextID to the IDs sniffed in WotLK Classic, where the text players see is unchanged or fixed
 UPDATE `npc_text` SET `BroadcastTextID0` = 2528, `VerifiedBuild` = 45942 WHERE `ID` = 563;
 UPDATE `npc_text` SET `BroadcastTextID0` = 2821, `VerifiedBuild` = 46902 WHERE `ID` = 820;
