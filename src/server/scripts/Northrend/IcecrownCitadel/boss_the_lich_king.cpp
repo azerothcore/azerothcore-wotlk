@@ -354,9 +354,14 @@ enum MiscData
 #define DATA_PLAGUE_STACK 70337
 #define DATA_VILE 45814622
 
+bool IsValidPlatformPosition(Position const& pos)
+{
+    return pos.GetExactDist2dSq(&CenterPosition) < 90.0f * 90.0f && pos.GetPositionZ() > 840.0f && pos.GetPositionZ() < 875.0f;
+}
+
 bool IsValidPlatformTarget(Unit const* target)
 {
-    return target->GetExactDist2dSq(&CenterPosition) < 90.0f * 90.0f && target->GetPositionZ() > 840.0f && target->GetPositionZ() < 875.0f;
+    return IsValidPlatformPosition(*target);
 }
 
 void SendPacketToPlayers(WorldPacket const* data, Unit* source)
@@ -2237,8 +2242,12 @@ public:
             }
         }
 
-        void IsSummonedBy(WorldObject* /*summoner*/) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
+            // no floor under the summon destination drops the spirit to the terrain, ~990 yd below the platform
+            if (summoner && !IsValidPlatformPosition(*me) && IsValidPlatformPosition(*summoner))
+                me->NearTeleportTo(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), me->GetOrientation());
+
             // player is the spellcaster so register summon manually
             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 lichKing->AI()->JustSummoned(me);

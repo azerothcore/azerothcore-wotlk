@@ -25,7 +25,7 @@
 
 class AuraEffect;
 class Item;
-class Position;
+struct Position;
 class SpellCastTargets;
 class WorldObject;
 

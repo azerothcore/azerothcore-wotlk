@@ -3,6 +3,7 @@
 package ulduar_test
 
 import (
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -26,6 +27,12 @@ import (
 // unlocks the ring phase and pulls Thorim down onto the bait, whose death is the wipe.
 // Oracle: no Cache of Storms after the evade, Thorim respawns hostile, and a real lethal hit on the
 // respawned Thorim still yields (chest spawns, he turns friendly and unattackable).
+//
+// The defeat block writes DONE before its CombatStop; that call ends Thorim's combat inside the
+// same damage call, and JustExitedCombat evades unless the boss state already reads DONE. An
+// evade there would reset him mid-outro: hostile again, home on the balcony, NOT_STARTED. So the
+// yield subtest also follows the outro: Thorim stays friendly until his teleport removes him, no
+// hostile Thorim comes back, and the instance save keeps his encounter DONE.
 func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instances", "multi_bot"},
@@ -61,6 +68,13 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 		// DespawnOnEvade's default respawn delay is 20s.
 		respawnWindow = 45 * time.Second
 		lethalHit     = uint32(50_000_000)
+		// The defeat outro is four timed lines (about 35s) and ends with Thorim teleporting out.
+		outroWindow = 90 * time.Second
+
+		// instance.data is the DataHeader chars, then one EncounterState per boss, space separated.
+		saveHeaderFields = 2  // "UU"
+		bossThorim       = 10 // BOSS_THORIM in ulduar.h
+		encounterDone    = "3"
 	)
 
 	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
@@ -216,9 +230,77 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 			e2eharness.Assertf(t, "Thorim not friendly and unattackable after his defeat")
 		}
 		t.Logf("PASS lethal hit yields: chest=0x%X", chest)
+
+		// The outro must run to the teleport without an evade: Thorim never turns hostile again while
+		// he is still there, and his removal from the cache is the teleport, not a hard reset.
+		outroDeadline := time.Now().Add(outroWindow)
+		gone := false
+		for time.Now().Before(outroDeadline) {
+			obj := driver.World.GetObject(respawned)
+			if obj == nil {
+				gone = true
+				break
+			}
+			if obj.Value(client.UnitFieldFlags)&unitFlagNonAttackable == 0 || obj.Value(client.UnitFieldFaction) != factionFriendly {
+				e2eharness.Assertf(t, "Thorim evaded through his outro: flags=0x%X faction=%d",
+					obj.Value(client.UnitFieldFlags), obj.Value(client.UnitFieldFaction))
+			}
+			time.Sleep(200 * time.Millisecond)
+		}
+		if !gone {
+			e2eharness.Assertf(t, "Thorim still in the arena %s after his defeat: outro never reached the teleport", outroWindow)
+		}
+		t.Logf("outro done: Thorim 0x%X left through the teleport", respawned)
+
+		// DONE blocks the respawn (BossAI::CanRespawn); a hostile Thorim here is a reset encounter.
+		noRespawnDeadline := time.Now().Add(respawnWindow)
+		for time.Now().Before(noRespawnDeadline) {
+			for _, g := range e2eharness.LivingByEntries(driver.World, 120, npcThorim) {
+				obj := driver.World.GetObject(g)
+				if obj != nil && obj.Value(client.UnitFieldFlags)&unitFlagNonAttackable == 0 && obj.Value(client.UnitFieldFaction) != factionFriendly {
+					e2eharness.Assertf(t, "hostile Thorim 0x%X respawned after the defeat outro", g)
+				}
+			}
+			time.Sleep(500 * time.Millisecond)
+		}
+
+		// The instance save is what a later reload reads; the defeat must leave BOSS_THORIM at DONE.
+		state := thorimSavedState(t, driver, saveHeaderFields, bossThorim, 10*time.Second)
+		if state != encounterDone {
+			e2eharness.Assertf(t, "instance save has Thorim at state %s after the outro, want DONE (%s)", state, encounterDone)
+		}
+		t.Logf("PASS outro survives defeat: no respawn, saved state=%s", state)
 	})
 
 	t.Logf("PASS Thorim evade despawn does not yield: old=0x%X respawned=0x%X", thorim, respawned)
+}
+
+// thorimSavedState reads the bot's bound Ulduar save and returns the Thorim boss-state field.
+func thorimSavedState(t *testing.T, b *e2eharness.ScenarioBot, headerFields, bossIndex int, timeout time.Duration) string {
+	t.Helper()
+	var data string
+	var lastErr error
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		lastErr = b.CharDB.QueryRow(`
+			SELECT i.data FROM instance i
+			JOIN character_instance ci ON ci.instance = i.id
+			WHERE ci.guid = ? AND i.map = ?
+			ORDER BY i.id DESC LIMIT 1`, b.GUID, e2eharness.MapUlduar).Scan(&data)
+		if lastErr == nil && len(strings.Fields(data)) > headerFields+bossIndex {
+			break
+		}
+		time.Sleep(250 * time.Millisecond)
+	}
+	if lastErr != nil {
+		e2eharness.HarnessFailf(t, "instance save query: %v", lastErr)
+	}
+	fields := strings.Fields(data)
+	if len(fields) <= headerFields+bossIndex {
+		e2eharness.Preconditionf(t, "instance save data too short for Ulduar: %q", data)
+	}
+	t.Logf("instance save: %q", data)
+	return fields[headerFields+bossIndex]
 }
 
 // waitHostileThorim waits for a living Thorim that is attackable and not friendly.
