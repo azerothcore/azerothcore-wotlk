@@ -520,10 +520,11 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
     // For pets/guardians/critters or creature-to-creature follow: sync with target's speed
     if (isPetLike || (owner->IsCreature() && target->IsCreature()))
     {
-        // A standing target sets no pace to match: the follower keeps its own run speed.
+        // A standing target has no pace to match. Returning no velocity makes the spline
+        // fall back to the follower's own run speed, with no catch-up boost.
         speed = GetTargetSpeedInMotion(target);
         if (!speed)
-            return speed;
+            return {};
 
         if (playerPet)
         {
