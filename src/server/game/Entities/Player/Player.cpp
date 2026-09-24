@@ -7456,6 +7456,13 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
     if (!sScriptMgr->OnPlayerCanCastItemCombatSpell(this, target, attType, procVictim, procEx, item, proto))
         return;
 
+    // Both proc loops below hand `item` to CastSpell as the cast item, and a proc
+    // can destroy the very item it fired from. The raw pointer must therefore not
+    // be trusted after a cast: remember the identity now, while the item is known
+    // to be alive, so each cast can be followed by a liveness re-check.
+    ObjectGuid const itemGuid = item->GetGUID();
+    uint32 const itemEntry = item->GetEntry();
+
     // Can do effect if any damage done to target
     if (procVictim & PROC_FLAG_TAKEN_DAMAGE)
         //if (damageInfo->procVictim & PROC_FLAG_TAKEN_ANY_DAMAGE)
@@ -7492,7 +7499,18 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             }
 
             if (roll_chance_f(chance) && sScriptMgr->OnCastItemCombatSpell(this, target, spellInfo, item))
+            {
                 CastSpell(target, spellInfo->Id, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
+
+                // If the proc destroyed its own item, `item` is dangling and the
+                // enchantment loop below would read freed memory.
+                if (!GetItemByGuid(itemGuid))
+                {
+                    LOG_ERROR("entities.player", "Player::CastItemCombatSpell: item {} (entry {}) was destroyed by its own on-hit proc spell {}; "
+                        "aborting remaining procs for player {}", itemGuid.ToString(), itemEntry, spellInfo->Id, GetGUID().ToString());
+                    return;
+                }
+            }
         }
     }
 
@@ -7578,6 +7596,15 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
                 Unit* unitTarget = spellInfo->IsPositive() ? this : target;
                 CastSpell(unitTarget, spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
+
+                // Same hazard. Without this the next e_slot iteration dereferences a
+                // freed Item in GetEnchantmentId() -> Object::GetUInt32Value().
+                if (!GetItemByGuid(itemGuid))
+                {
+                    LOG_ERROR("entities.player", "Player::CastItemCombatSpell: item {} (entry {}) was destroyed by enchantment {} proc spell {} in enchantment slot {}; "
+                        "aborting remaining procs for player {}", itemGuid.ToString(), itemEntry, pEnchant->ID, spellInfo->Id, uint32(e_slot), GetGUID().ToString());
+                    return;
+                }
             }
         }
     }
