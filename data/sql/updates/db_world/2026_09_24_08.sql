@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_07 -> 2026_09_24_08
 -- Weegli Blastfuse (GUID 81553): escape after the end door explodes.
 -- TBC Classic Anniversary build 69795; ends at the last recorded destination.
 DELETE FROM `waypoint_data` WHERE `id` = 815530;

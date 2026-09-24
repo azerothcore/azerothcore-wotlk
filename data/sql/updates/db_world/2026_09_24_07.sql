@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_06 -> 2026_09_24_07
 -- Zul'Farrak: TBC Classic Anniversary capture, build 69795.
 -- Observed gossip pauses vary from 2.4 to 4.1 seconds; 3 seconds approximates them without disabling gossip.
 DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (7604, 7607);
