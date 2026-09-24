@@ -3716,6 +3716,9 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, SpellInfo const* spell, 
         }
     }
 
+    if (spell->IsWandAutoAttack())
+        return MeleeSpellHitResult(victim, spell);
+
     switch (spell->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_RANGED:
@@ -3794,6 +3797,9 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* victim, Spell const* spell, bool
             return SPELL_MISS_REFLECT;
         }
     }
+
+    if (spellInfo->IsWandAutoAttack())
+        return MeleeSpellHitResult(victim, spellInfo);
 
     switch (spellInfo->DmgClass)
     {
