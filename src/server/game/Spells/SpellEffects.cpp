@@ -2184,11 +2184,6 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
                     gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
                 return;
 
-            case GAMEOBJECT_TYPE_CHEST:
-                // triggering linked GO
-                if (uint32 trapEntry = gameObjTarget->GetGOInfo()->chest.linkedTrapId)
-                    gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
-
             // Don't return, let loots been taken
             default:
                 break;
