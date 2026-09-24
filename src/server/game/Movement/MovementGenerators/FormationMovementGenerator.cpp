@@ -21,6 +21,7 @@
 #include "CreatureGroups.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "PathGenerator.h"
 
 FormationMovementGenerator::FormationMovementGenerator(Unit* leader, float range, float angle, uint32 point1, uint32 point2)
     : AbstractFollower(leader), _range(range), _angle(angle), _point1(point1), _point2(point2), _lastLeaderSplineID(0),
@@ -120,12 +121,16 @@ bool FormationMovementGenerator::DoUpdate(Creature* owner, uint32 diff)
 
 void FormationMovementGenerator::LaunchMovement(Creature* owner, Unit* target)
 {
+    _nextMoveTimer.Reset(FORMATION_MOVEMENT_INTERVAL);
+
     float relativeAngle = 0.0f;
+    float leaderTravelDistance = 0.0f;
 
     if (!target->movespline->Finalized())
     {
         G3D::Vector3 const leaderDestination = target->movespline->CurrentDestination();
         relativeAngle = target->GetRelativeAngle(leaderDestination.x, leaderDestination.y);
+        leaderTravelDistance = target->GetExactDist2d(leaderDestination.x, leaderDestination.y);
     }
 
     Position dest = target->GetPosition();
@@ -136,13 +141,13 @@ void FormationMovementGenerator::LaunchMovement(Creature* owner, Unit* target)
         // Pick up leader's spline velocity
         velocity = target->movespline->Velocity();
 
-        // Calculate travel distance to get a 1650ms result
-        float travelDist = velocity * 1.65f;
+        // Don't predict past the leader's next spline point at a turn.
+        float travelDist = std::min(velocity * 1.65f, leaderTravelDistance);
         target->MovePositionToFirstCollision(dest, travelDist, relativeAngle);
         target->MovePositionToFirstCollision(dest, _range, _angle + relativeAngle);
 
         float distance = owner->GetExactDist(dest);
-        float velocityMod = std::min<float>(distance / travelDist, 1.5f);
+        float velocityMod = travelDist > 0.0f ? std::min<float>(distance / travelDist, 1.5f) : 1.0f;
 
         velocity *= velocityMod;
         _hasPredictedDestination = true;
@@ -156,8 +161,20 @@ void FormationMovementGenerator::LaunchMovement(Creature* owner, Unit* target)
     if (velocity == 0.0f)
         velocity = target->GetSpeed(MOVE_WALK);
 
+    PathGenerator path(owner);
+    if (!path.CalculatePath(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ()) ||
+        !(path.GetPathType() & (PATHFIND_NORMAL | PATHFIND_INCOMPLETE)) ||
+        (path.GetPathType() & (PATHFIND_NOPATH | PATHFIND_SHORTCUT | PATHFIND_SHORT)) || path.GetPath().size() < 2)
+    {
+        // Retry later instead of cutting through terrain when navigation fails.
+        owner->StopMoving();
+        owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
+        _isMoving = false;
+        return;
+    }
+
     Movement::MoveSplineInit init(owner);
-    init.MoveTo(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
+    init.MovebyPath(path.GetPath());
     init.SetVelocity(velocity);
     init.Launch();
 
