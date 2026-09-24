@@ -130,6 +130,7 @@ public:
 
         uint32 GahzrillaSummoned;
         uint32 PyramidPhase;
+        uint32 EndDoorState;
         uint32 major_wave_Timer;
         uint32 minor_wave_Timer;
         uint32 addGroupSize;
@@ -141,6 +142,7 @@ public:
             GahzrillaSummoned = NOT_STARTED;
 
             PyramidPhase = 0;
+            EndDoorState = NOT_STARTED;
             major_wave_Timer = 0;
             minor_wave_Timer = 0;
             addGroupSize = 0;
@@ -185,10 +187,8 @@ public:
             {
                 case GO_END_DOOR:
                     EndDoorGUID = gameobject->GetGUID();
-                    if (PyramidPhase == PYRAMID_DONE)
-                    {
-                        HandleGameObject(gameobject->GetGUID(), true, gameobject);
-                    }
+                    if (EndDoorState == DONE)
+                        gameobject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     break;
                 default:
                     break;
@@ -214,6 +214,9 @@ public:
                 case DATA_GAHZRILLA:
                     GahzrillaSummoned = data;
                     break;
+                case DATA_END_DOOR:
+                    EndDoorState = data;
+                    break;
                 default:
                     break;
             }
@@ -229,6 +232,8 @@ public:
                     return PyramidPhase;
                 case DATA_GAHZRILLA:
                     return GahzrillaSummoned;
+                case DATA_END_DOOR:
+                    return EndDoorState;
             }
 
             return 0;
@@ -332,11 +337,11 @@ public:
                     if (major_wave_Timer <= diff)
                     {
                         // move NPCs to bottom of stair
-                        MoveNPCIfAlive(NPC_BLY, 1887.92f, 1228.179f, 9.98f, 4.78f);
-                        MoveNPCIfAlive(NPC_MURTA, 1891.57f, 1228.68f, 9.69f, 4.78f);
-                        MoveNPCIfAlive(NPC_ORO, 1897.23f, 1228.34f, 9.43f, 4.78f);
-                        MoveNPCIfAlive(NPC_RAVEN, 1883.68f, 1227.95f, 9.543f, 4.78f);
-                        MoveNPCIfAlive(NPC_WEEGLI, 1878.02f, 1227.65f, 9.485f, 4.78f);
+                        MoveNPCIfAlive(NPC_BLY, POINT_CREW_DESCENT, 1887.92f, 1228.179f, 9.98f, 4.78f);
+                        MoveNPCIfAlive(NPC_MURTA, POINT_CREW_DESCENT, 1891.57f, 1228.68f, 9.69f, 4.78f);
+                        MoveNPCIfAlive(NPC_ORO, POINT_CREW_DESCENT, 1897.23f, 1228.34f, 9.43f, 4.78f);
+                        MoveNPCIfAlive(NPC_RAVEN, POINT_CREW_DESCENT, 1883.68f, 1227.95f, 9.543f, 4.78f);
+                        MoveNPCIfAlive(NPC_WEEGLI, POINT_CREW_DESCENT, 1878.02f, 1227.65f, 9.485f, 4.78f);
                         SetData(DATA_PYRAMID, PYRAMID_WAVE_3);
                         if (Creature* sergeantBlye = instance->GetCreature(BlyGUID))
                         {
@@ -352,11 +357,11 @@ public:
                     if (IsWaveAllDead()) // move NPCS to their final positions
                     {
                         SetData(DATA_PYRAMID, PYRAMID_KILLED_ALL_TROLLS);
-                        MoveNPCIfAlive(NPC_BLY, 1883.82f, 1200.83f, 8.87f, 1.32f);
-                        MoveNPCIfAlive(NPC_MURTA, 1891.83f, 1201.45f, 8.87f, 1.32f);
-                        MoveNPCIfAlive(NPC_ORO, 1894.50f, 1204.40f, 8.87f, 1.32f);
-                        MoveNPCIfAlive(NPC_RAVEN, 1874.11f, 1206.17f, 8.87f, 1.32f);
-                        MoveNPCIfAlive(NPC_WEEGLI, 1877.52f, 1199.63f, 8.87f, 1.32f);
+                        MoveNPCIfAlive(NPC_BLY, POINT_CREW_GATHER, 1883.82f, 1200.83f, 8.87f, 1.32f);
+                        MoveNPCIfAlive(NPC_MURTA, POINT_CREW_GATHER, 1891.83f, 1201.45f, 8.87f, 1.32f);
+                        MoveNPCIfAlive(NPC_ORO, POINT_CREW_GATHER, 1894.50f, 1204.40f, 8.87f, 1.32f);
+                        MoveNPCIfAlive(NPC_RAVEN, POINT_CREW_GATHER, 1874.11f, 1206.17f, 8.87f, 1.32f);
+                        MoveNPCIfAlive(NPC_WEEGLI, POINT_CREW_GATHER, 1877.52f, 1199.63f, 8.87f, 1.32f);
                     }
                     break;
                 default:
@@ -364,14 +369,14 @@ public:
             };
         }
 
-        void MoveNPCIfAlive(uint32 entry, float x, float y, float z, float o)
+        void MoveNPCIfAlive(uint32 entry, uint32 point, float x, float y, float z, float o)
         {
            if (Creature* npc = instance->GetCreature(GetGuidData(entry)))
            {
                if (npc->IsAlive())
                {
                     npc->SetWalk(true);
-                    npc->GetMotionMaster()->MovePoint(1, { x, y, z, o } );
+                    npc->GetMotionMaster()->MovePoint(point, { x, y, z, o });
                     npc->SetHomePosition(x, y, z, o);
                }
             }
@@ -449,11 +454,16 @@ public:
         {
             data >> PyramidPhase;
             data >> GahzrillaSummoned;
+            // Older saves only stored the pyramid and Gahz'rilla states.
+            if (!(data >> EndDoorState))
+                EndDoorState = PyramidPhase >= PYRAMID_GATES_DESTROYED ? DONE : NOT_STARTED;
+            else if (EndDoorState != DONE)
+                EndDoorState = NOT_STARTED;
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
         {
-            data << PyramidPhase << ' ' << GahzrillaSummoned;
+            data << PyramidPhase << ' ' << GahzrillaSummoned << ' ' << EndDoorState;
         }
     };
 };
