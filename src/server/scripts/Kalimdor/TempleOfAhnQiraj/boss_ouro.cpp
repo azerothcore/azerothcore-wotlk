@@ -115,6 +115,13 @@ struct boss_ouro : public BossAI
         return me->IsWithinMeleeRange(victim);
     }
 
+    void JustEnteredCombat(Unit* who) override
+    {
+        // Ranged targets are offline on the threat list, but must still start the encounter.
+        if (!IsEngaged())
+            EngagementStart(who);
+    }
+
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (me->HealthBelowPctDamaged(20, damage) && !_enraged)
@@ -272,6 +279,10 @@ struct boss_ouro : public BossAI
     {
         if (me->GetThreatMgr().IsThreatListEmpty(true))
         {
+            scheduler.CancelAll();
+            if (IsEngaged())
+                EngagementOver();
+
             DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
             me->DespawnOrUnsummon(1s);
             instance->SetBossState(DATA_OURO, FAIL);
@@ -289,6 +300,9 @@ struct boss_ouro : public BossAI
     void UpdateAI(uint32 diff) override
     {
         UpdateVictim();
+
+        if (!IsEngaged())
+            return;
 
         scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
