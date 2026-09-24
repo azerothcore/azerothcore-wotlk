@@ -20,10 +20,26 @@
 #include "RBAC.h"
 #include "GameTime.h"
 #include "Metric.h"
+#include "Observability.h"
 #include "Player.h"
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
+
+namespace
+{
+    struct WorldSessionMgrMetrics
+    {
+        Acore::Observability::Histogram SessionUpdateDuration
+        {
+            "ac_world_session_update_duration_seconds",
+            "Duration of world session manager updates.",
+            Acore::Observability::DefaultDurationBuckets()
+        };
+    };
+
+    WorldSessionMgrMetrics Metrics;
+}
 
 WorldSessionMgr* WorldSessionMgr::Instance()
 {
@@ -92,6 +108,8 @@ WorldSession* WorldSessionMgr::FindOfflineSessionForCharacterGUID(ObjectGuid::Lo
 
 void WorldSessionMgr::UpdateSessions(uint32 const diff)
 {
+    Acore::Observability::ScopedHistogramTimer observabilityTimer = Metrics.SessionUpdateDuration.Measure();
+
     // Drop play-history entries past the reset window so the map stays bounded even for
     // accounts that disconnect and never reconnect (login only erases their own entry).
     _accountsPlayHistoryPruneTimer += diff;

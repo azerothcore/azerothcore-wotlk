@@ -13,6 +13,7 @@ source "$AC_PATH_APPS/bash_shared/menu_system.sh"
 menu_items=(
     "bash|b|Run Bash tests"
     "core|c|Run AzerothCore tests"
+    "observability|p|Run Observability e2e smoke tests"
     "quit|q|Exit from this menu"
 )
 
@@ -29,6 +30,9 @@ function handle_menu_command() {
         "core")
             # shellcheck source=./run-core-tests.sh
             bash "$CURRENT_PATH/run-core-tests.sh" "$@"
+            ;;
+        "observability")
+            bash "$AC_PATH_APPS/prometheus-test/run.sh" "$@"
             ;;
         "quit")
             echo "Goodbye!"

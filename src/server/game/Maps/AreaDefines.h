@@ -19,6 +19,7 @@
 #define ACORE_AREA_DEFINES_H
 
 #include "Define.h"
+#include <cstddef>
 
 enum AreaTableIDs : uint32
 {
@@ -274,5 +275,7 @@ enum MapIDs : uint32
     MAP_HALLS_OF_REFLECTION                  = 668,
     MAP_THE_RUBY_SANCTUM                     = 724
 };
+
+constexpr std::size_t MAP_ID_METRIC_COUNT = static_cast<std::size_t>(MAP_THE_RUBY_SANCTUM) + 1;
 
 #endif
