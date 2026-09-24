@@ -2184,11 +2184,6 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
                     gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
                 return;
 
-            case GAMEOBJECT_TYPE_CHEST:
-                // triggering linked GO
-                if (uint32 trapEntry = gameObjTarget->GetGOInfo()->chest.linkedTrapId)
-                    gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
-
             // Don't return, let loots been taken
             default:
                 break;
@@ -6311,6 +6306,13 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
             switch (m_spellInfo->Id)
             {
+                // Target dummies use RequiredSkillRank/5, not player's current skill
+                case 4071:  // Target Dummy
+                case 4072:  // Advanced Target Dummy
+                case 19805: // Masterwork Target Dummy
+                    summonLevel = proto->RequiredSkillRank / 5;
+                    break;
+
                 // Dragon's Call
                 case 13049:
                     summonLevel = 55;

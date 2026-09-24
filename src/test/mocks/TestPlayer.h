@@ -34,6 +34,11 @@ public:
     void SaveToDB(bool /*create*/, bool /*logout*/) { }
     void SaveToDB(CharacterDatabaseTransaction /*trans*/, bool /*create*/, bool /*logout*/) { }
 
+    Unit* TestSelectCharmedAIGroupTarget(float distance) const
+    {
+        return SelectCharmedAIGroupTarget(distance);
+    }
+
     void ForceInitValues(ObjectGuid::LowType guidLow = 1)
     {
         Object::_Create(guidLow, uint32(0), HighGuid::Player);
