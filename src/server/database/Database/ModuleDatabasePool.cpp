@@ -136,6 +136,17 @@ uint32 ModuleDatabasePool::OpenConnections(InternalIndex type, uint8 numConnecti
             return CR_UNKNOWN_ERROR;
         }
 
+        if (type == IDX_ASYNC && conn->m_queue != _queue.get())
+        {
+            LOG_ERROR("sql.driver", "ModuleDatabasePool: async queries for database `{}` cannot run. No queue was "
+                "set on the asynchronous connection: pass `queue` to the connection's constructor in the module's "
+                "CreateConnection(queue, connInfo) override.", _connectionInfo.database);
+
+            _queue->Cancel();
+            _connections[type].clear();
+            return CR_UNKNOWN_ERROR;
+        }
+
         uint32 result = conn->Open();
         if (result != 0)
         {
@@ -193,7 +204,7 @@ bool ModuleDatabasePool::PrepareStatements()
     }
 
     //! Without async connections every statement runs on a synchronous one, so CONNECTION_ASYNC-only ones fail.
-    if (_connections[IDX_ASYNC].empty())
+    if (_connections[IDX_ASYNC].empty() && !_connections[IDX_SYNCH].empty())
     {
         MySQLConnection const* conn = _connections[IDX_SYNCH].front().get();
         std::string missing;

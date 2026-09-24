@@ -20,7 +20,6 @@
 
 #include "DatabaseEnvFwd.h"
 #include "Define.h"
-#include "MySQLConnection.h"
 #include <variant>
 
 //- Type specifier of our element data
@@ -36,6 +35,8 @@ struct SQLElementData
     std::variant<PreparedStatementBase*, std::string> element;
     SQLElementDataType type;
 };
+
+class MySQLConnection;
 
 class AC_DATABASE_API SQLOperation
 {
@@ -62,11 +63,7 @@ private:
 //- Keeps an idle asynchronous connection alive
 class PingOperation : public SQLOperation
 {
-    bool Execute() override
-    {
-        m_conn->Ping();
-        return true;
-    }
+    bool Execute() override;
 };
 
 #endif
