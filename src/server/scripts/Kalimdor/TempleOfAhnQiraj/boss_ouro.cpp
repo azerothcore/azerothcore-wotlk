@@ -72,6 +72,8 @@ struct npc_ouro_spawner : public ScriptedAI
         DoCastSelf(SPELL_DIRTMOUND_PASSIVE);
     }
 
+    void AttackStart(Unit* /*who*/) override { }
+
     void MoveInLineOfSight(Unit* who) override
     {
         // Spawn Ouro on LoS check
@@ -81,15 +83,13 @@ struct npc_ouro_spawner : public ScriptedAI
             {
                 Creature* ouro = instance->GetCreature(DATA_OURO);
                 EncounterState state = instance->GetBossState(DATA_OURO);
-                if ((state == NOT_STARTED || state == FAIL) && !ouro)
+                if (state != IN_PROGRESS && state != DONE && !ouro)
                 {
                     DoCastSelf(SPELL_SUMMON_OURO);
                     hasSummoned = true;
                 }
             }
         }
-
-        ScriptedAI::MoveInLineOfSight(who);
     }
 
     void JustSummoned(Creature* creature) override
