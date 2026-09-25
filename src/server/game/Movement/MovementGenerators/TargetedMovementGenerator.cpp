@@ -477,19 +477,12 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 // Sniffed: a pet catching up to its owner tops out at 2.6x the owner's current run speed.
 constexpr float FOLLOW_CATCHUP_MAX_MULTIPLIER = 2.6f;
 
-// A jump or a fall is not a pace to match; only actual running counts.
-constexpr uint32 FOLLOW_TARGET_MOVING_FLAGS =
-    MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT;
-
-static Optional<float> GetTargetSpeedInMotion(Unit* target)
+static float GetTargetSpeedInMotion(Unit* target)
 {
     if (!target->movespline->Finalized())
         return target->movespline->Velocity();
 
-    if (target->m_movementInfo.HasMovementFlag(FOLLOW_TARGET_MOVING_FLAGS))
-        return target->GetSpeed(target->m_movementInfo.GetSpeedType());
-
-    return {};
+    return target->GetSpeed(target->m_movementInfo.GetSpeedType());
 }
 
 static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const& dest, bool playerPet)
@@ -507,11 +500,7 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
     // For pets/guardians/critters or creature-to-creature follow: sync with target's speed
     if (isPetLike || (owner->IsCreature() && target->IsCreature()))
     {
-        // A standing target has no pace to match. Returning no velocity makes the spline
-        // fall back to the follower's own run speed, with no catch-up boost.
         speed = GetTargetSpeedInMotion(target);
-        if (!speed)
-            return {};
 
         if (playerPet)
         {
@@ -589,7 +578,7 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
 
     if (isPlayerPet)
     {
-        targetIsMoving = target->m_movementInfo.HasMovementFlag(FOLLOW_TARGET_MOVING_FLAGS);
+        targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
     }
 
     if (exactDistSq > distanceTolerance)
