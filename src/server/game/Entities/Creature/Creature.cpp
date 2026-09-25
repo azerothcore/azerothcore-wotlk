@@ -2156,6 +2156,8 @@ void Creature::Respawn(bool force)
                 // Set respawn time to now so ProcessRespawns() picks it up
                 time_t now = GameTime::GetGameTime().count();
                 GetMap()->SaveCreatureRespawnTime(m_spawnId, now);
+                if (force)
+                    GetMap()->MarkForcedCreatureRespawn(m_spawnId);
             }
             AddObjectToRemoveList();
         }

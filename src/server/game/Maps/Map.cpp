@@ -2860,6 +2860,17 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
         }
     }
 
+    // A spawn whose BossAI bound it to a DONE encounter stays down, as BossAI::CanRespawn keeps
+    // compat-mode spawns down. The expired row is kept so a reload still loads the boss dead, and
+    // the check repeats like an inactive group's. A forced Respawn() passes, as force does in compat mode.
+    if (InstanceMap* instanceMap = ToInstanceMap())
+        if (InstanceScript* script = instanceMap->GetInstanceScript())
+            if (!_forcedCreatureRespawns.erase(spawnId) && script->IsBossSpawnDone(spawnId))
+            {
+                _respawnQueue.insert({GameTime::GetGameTime().count() + 5, SPAWN_TYPE_CREATURE, spawnId});
+                return;
+            }
+
     // Check linked_respawn: don't spawn if the master creature is still dead.
     // This mirrors the check in Creature::Respawn() for compat-mode creatures:
     // hard-reset creatures bypass it (they despawn on evade and must always
