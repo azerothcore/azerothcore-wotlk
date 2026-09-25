@@ -133,6 +133,14 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 	bait.GM(t, ".cheat god off")
 	bait.FlushWorld(t)
 	bait.CastMust(t, spellRetributionAura, bait.World.CharGUID(), 10*time.Second)
+	// CastMust returns on SPELL_GO; the aura update that follows it can land a moment later.
+	auraDeadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(auraDeadline) {
+		if bait.HasAura(spellRetributionAura) {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
 	if !bait.HasAura(spellRetributionAura) {
 		e2eharness.Preconditionf(t, "bait has no Retribution Aura after the cast")
 	}
