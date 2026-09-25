@@ -69,6 +69,8 @@ enum SpellData
     SPELL_RAPID_BURST_DAMAGE_1                      = 63387,
     SPELL_RAPID_BURST_DAMAGE_2                      = 64019,
     SPELL_SUMMON_BURST_TARGET                       = 64840,
+    SPELL_RAPID_BURST_TARGET_ME                     = 64841,
+    NPC_BURST_TARGET                                = 34211,
 
     SPELL_SPINNING_UP                               = 63414,
 
@@ -1399,12 +1401,11 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 }
                 break;
             case EVENT_SPELL_RAPID_BURST:
+                // 64840 parks a Burst Target where the player stands; the channel is aimed at it from SpellHit
+                // so the damage cones hold one line instead of following the player around
                 if (Player* p = SelectTargetFromPlayerList(80.0f))
-                {
-                    me->CastSpell(p, SPELL_RAPID_BURST, true);
-                    me->SetFacingToObject(p);
-                }
-                _events.Repeat(3200ms);
+                    DoCast(p, SPELL_SUMMON_BURST_TARGET);
+                _events.Repeat(3600ms);
                 break;
             case EVENT_HAND_PULSE:
                 if (Player* p = SelectTargetFromPlayerList(80.0f))
@@ -1508,12 +1509,28 @@ struct npc_ulduar_vx001 : public ScriptedAI
             p->ToCreature()->DespawnOrUnsummon(8s);
     }
 
-    void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_BURST_TARGET)
+        {
+            // 64840 has no usable duration, so the aim point is despawned by hand: sniffs put its
+            // lifetime near 11s, which keeps three of them alive across a chain of volleys
+            summon->DespawnOrUnsummon(11s);
+            summon->CastSpell(me, SPELL_RAPID_BURST_TARGET_ME);
+        }
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_SELF_REPAIR)
         {
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_AGGRESSIVE);
+        }
+        else if (caster && spell->Id == SPELL_RAPID_BURST_TARGET_ME && !me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            me->SetFacingToObject(caster);
+            DoCast(caster, SPELL_RAPID_BURST, true);
         }
     }
 
@@ -1609,7 +1626,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
                 me->GetMotionMaster()->MoveFall();
                 me->SetHover(false);
-                _events.DelayEvents(25s);
+                _events.DelayEvents(23s);
                 break;
             case DO_ENABLE_AERIAL:
                 if (_isDefeated)
@@ -1681,7 +1698,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || me->HasAura(SPELL_MAGNETIC_CORE))
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             return;
 
         if (!UpdateVictim())
@@ -1724,7 +1741,8 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 break;
         }
 
-        DoSpellAttackIfReady(_phase == 3 ? SPELL_PLASMA_BALL_P1 : SPELL_PLASMA_BALL_P2);
+        if (!me->HasAura(SPELL_MAGNETIC_CORE))
+            DoSpellAttackIfReady(_phase == 3 ? SPELL_PLASMA_BALL_P1 : SPELL_PLASMA_BALL_P2);
     }
 
     void MoveInLineOfSight(Unit* /*mover*/) override {}
@@ -2148,7 +2166,8 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            uint32 id = (aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_2 : SPELL_RAPID_BURST_DAMAGE_1;
+            // The first tick of every volley fires 63387; the two barrels alternate from there
+            uint32 id = (aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_1 : SPELL_RAPID_BURST_DAMAGE_2;
             caster->CastSpell((Unit*)nullptr, id, true);
         }
     }

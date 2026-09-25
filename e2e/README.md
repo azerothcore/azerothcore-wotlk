@@ -147,26 +147,47 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
-| spells/aura | apply/query; CC broken by damage; mount persist | P1 | covered (`TestAC_26130_*`) | #26130 |
+| spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery; Beacon applies its target's Improved Devotion Aura healing bonus exactly once for Holy Light, Flash of Light, Holy Shock and Lay on Hands | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`, `TestAC_27756_*`) | #26130 #25765 #27756 |
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
-| spells/effects | Charge / grounding totem / Sweeping Strikes Execute | P1 | covered (`TestAC_26997_*`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 |
+| spells/effects | Charge / grounding totem / Sweeping Strikes Execute; forced cast summons at the forced caster, not at the unit that forced it; a tripped Gordunni Trap rolls out both dirt mounds | P1 | covered (`TestAC_26997_*`, `TestEffects_ForceCastDestination`, `TestEffects_GordunniTrapRollsBothMounds`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 #27621 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
-| social/loot | need/greed / master loot; below-half kill | P1 | covered (`TestAC_26862_*`); chest mid-roll `blocked-harness` (GO 194821 UseGameObject); pass-on-loot delete `blocked-harness` (item-survive after ALL_PASSED) | #26894 #26862 #22000 |
+| social/loot | need/greed / master loot; below-half kill; a roll that ends on the timer names the roll in its terminating packet, and the member who never voted gets one PASS | P1 | covered (`TestAC_26862_*`, `TestAC_27299_*`); chest mid-roll `blocked-harness` (GO 194821 UseGameObject); pass-on-loot delete `blocked-harness` (item-survive after ALL_PASSED) | #26894 #26862 #27299 #22000 |
 | social/trade | item+gold accept; cancel; walk-OOR TARGET_TO_FAR | P1 | covered | #25723 |
-| quests/lifecycle | STAY_ALIVE fail on death; status after save/relog | P1 | covered (`TestAC_26549_*`) | #26549 |
+| quests/lifecycle | STAY_ALIVE fail on death; status after save/relog; questgiver accept gating | P1 | covered (`TestAC_26549_*`, `TestAC_27417_*`) | #26549 #27417 |
 | quests/escort | find spawned unit; follow-NPC despawns on logout | P2 | covered (`TestAC_24450_*`) | #24450 |
 | quests/frostmourne | scrying-orb vision runs; Muradin leaves the cavern and despawns; quest 12478 COMPLETE | P2 | covered (`TestAC_25760_*`); dialogue order and duplicate line `blocked-harness` (no monster-say capture) | #25760 |
 | quests/objectives | a mob that drops a quest item advertises it, so the client shows the objective on hover (`creature_questitem` -> `SMSG_CREATURE_QUERY_RESPONSE.questItems`) | P2 | covered (`TestAC_27553_*`), decoding the response through a raw packet hook since the harness has no dispatch case for it | #27553 |
+| quests/summons | using the Serpent Statue on Ranazjar Isle summons Lord Kragaru, the only source of the Book of the Ancients (quest 6027). Beam and summon are asserted separately so a failure names which script broke, and the activation is repeated because the regression it guards was probabilistic, not absolute | P2 | covered (`TestQuest6027_*`) | — |
 | items/equip | visible-item slot after EquipEntry; additem; survives relog | P2 | covered | — |
 | protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked-harness` (extra_flags after relog) | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
-| instances/ulduar | named tele; Freya wave interval | P2 | covered (`TestAC_27095_*`); Kologarn Charge `blocked-harness` (bridge Z after Charge) | #26266 #27095 |
+| instances/ulduar | named tele; Freya wave interval; a Laughing Skull's Lunatic Gaze stops at the brain room's geometry instead of draining sanity through it; a wave of Elder Brightleaf's Unstable Sun Beams stays capped however many players stand in range; Psychosis and Malady of the Mind stop picking a player once they are at 40 Sanity or less; Algalon holds still for 3s once his Big Bang cast lands instead of resuming melee and Quantum Strike on the next tick; a Writhing Lasher stays up past 62947's own 10s summon duration, because the despawn type its AI sets in `IsSummonedBy` is no longer overwritten on the way out of the summon call; a wipe to Thorim's melee with a death-persistent damage shield on the last victim spawns no Cache of Storms while his hard-reset despawn runs, and a lethal hit on the respawned Thorim still yields, runs the outro to his teleport-out without an evade and leaves the saved encounter DONE; an Ancient Water Spirit whose Tidal Wave is kicked casts no damage-and-knockback follow-up; one Elder left alive spawns the one-Elder Freya's Gift, which is the chest whose emblem count the fix corrects; Ignis dying kills every Iron Construct including the dormant ones, and his Kill All Constructs instakill spares the player and every other creature in range | P2 | covered (`TestAC_27095_*`, `TestAC_27602_*`, `TestAC_27590_*`, `TestAC_27539_*`, `TestAC_27455_*`, `TestUlduar_BrightleafSunBeamsCappedPerWave`, `TestUlduar_FreyaWardLasherOutlivesSummonDuration`, `TestUlduar_ThorimEvadeDespawnDoesNotYield`, `TestUlduar_FreyaGiftMatchesElderCount`, `TestAC_27736_IgnisKillsAllConstructs`); Kologarn Charge `blocked-harness` (bridge Z after Charge); Freya's Gift emblem counts `blocked-harness` (a chest's loot opens only through SPELL_EFFECT_OPEN_LOCK, and CMSG_CAST_SPELL carries no TARGET_FLAG_GAMEOBJECT); Ignis constructs on 25-man `blocked-harness` (no way to set a bot's raid difficulty: CMSG_SET_RAID_DIFFICULTY is unexported and a `characters`.`instance_mode_mask` write is overwritten by the save on Relog's logout) | #26266 #27095 #27455 #27539 #27590 #27602 #27736 |
+| professions/trainers | every Engineering trainer group offers a visitor exactly the twelve TBC master-tier recipes its class can learn — and none of the others, so a broken class filter fails too. Eleven are class-restricted goggles: four classes cover all twelve across the eight groups, two characters per class cover the Horde/Alliance and Aldor/Scryer interaction splits, and the remaining five classes pin the armour-type sharing at Technician Mihila. Why a hidden recipe is hidden is pinned too: either the class cannot wear the goggle at all — the refusal read from SMSG_INVENTORY_CHANGE_FAILURE, which must be EQUIP_ERR_NO_REQUIRED_PROFICIENCY — or the goggle is another class's within the same armour type, which is why armour proficiency would be the wrong filter to gate on | P2 | covered (`TestAC_27146_*`) | #27146 |
+| world/dalaran | Dalaran's faction guards eject a hostile player from the Silver Enclave and Sunreaver's Sanctuary, and from nowhere else — public mailboxes, the street, the sewers and the neutral inn are left alone. Both directions are asserted: only checking public ground would pass a build where the guards never fire. One case parks a pet inside a quarter with its owner outside, since every other case is a lone player and would not notice the guard reading the owner's position instead of the trespasser's | P2 | covered (`TestAC_4467_*`) | #4467 |
 | world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
 
 ---
+
+### Chest regression checks (PR #27381)
+
+`world/chests` covers Cat Figurine reopening, Ice Chest party rolls and reward attribution,
+and both Shallow Grave variants: inert graves summon nothing; trapped graves do not summon
+again on reopening. Grave checks include full bags, another looter, consuming all loot,
+and replaying an opening request after despawn. Live execution is still pending.
+
+```bash
+go test -tags=e2e ./suites/world/chests -count=2 -v -p 1 -parallel 1 -timeout 20m
+```
+
+Use a disposable realm with the pending migrations applied. Tests create temporary fixtures
+through cleanup-enabled spawn helpers, not the dungeon's real graves. They sample up to
+48 fresh graves for item loot and a positive summon from the trapped variant; inability to
+obtain that fixture fails as a precondition. Initial empty-loot coverage is not claimed:
+the grave money range is now nonzero. Exact summon/drop probabilities and the dungeon's
+pool selection are not asserted by these lifecycle tests.
 
 ## Parallelism and isolation
 
