@@ -1011,7 +1011,8 @@ void MotionMaster::Mutate(MovementGenerator* m, MovementSlot slot)
 /**
  * @brief Move the unit following a specific path. Doesn't work with UNIT_FLAG_DISABLE_MOVE
  */
-void MotionMaster::MoveWaypoint(uint32 path_id, bool repeatable, PathSource pathSource)
+void MotionMaster::MoveWaypoint(
+    uint32 path_id, bool repeatable, PathSource pathSource, uint32 resumeAfterWaypointId)
 {
     if (!path_id)
         return;
@@ -1019,7 +1020,8 @@ void MotionMaster::MoveWaypoint(uint32 path_id, bool repeatable, PathSource path
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    Mutate(new WaypointMovementGenerator<Creature>(path_id, repeatable, pathSource), MOTION_SLOT_IDLE);
+    Mutate(new WaypointMovementGenerator<Creature>(
+        path_id, repeatable, pathSource, resumeAfterWaypointId), MOTION_SLOT_IDLE);
 
     LOG_DEBUG("movement.motionmaster", "{} ({}) start moving over path(Id:{}, repeatable: {})",
         _owner->IsPlayer() ? "Player" : "Creature", _owner->GetGUID().ToString(), path_id, repeatable ? "YES" : "NO");
