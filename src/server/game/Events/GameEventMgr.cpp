@@ -1065,12 +1065,16 @@ void GameEventMgr::LoadEventLocales()
 {
     uint32 oldMSTime = getMSTime();
 
-    _gameEventLocales.clear(); // needed for reload case
+    _gameEventLocales.clear();
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_LOCALES);
     PreparedQueryResult result = WorldDatabase.Query(stmt);
     if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 Game Event Locale Strings. DB table `game_event_locale` is empty.");
+        LOG_INFO("server.loading", " ");
         return;
+    }
 
     do
     {
@@ -1088,6 +1092,7 @@ void GameEventMgr::LoadEventLocales()
 
     LOG_INFO("server.loading", ">> Loaded {} Game Event Locale Strings in {} ms",
         (uint32)_gameEventLocales.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 std::string GameEventMgr::GetLocalizedDescription(uint16 eventId, LocaleConstant locale) const
@@ -1405,19 +1410,11 @@ void GameEventMgr::ApplyNewEvent(uint16 eventId)
     if (announce == 1 || (announce == 2 && sWorld->getIntConfig(CONFIG_EVENT_ANNOUNCE)))
     {
         // Announce to every online player in their own client locale (falls back to enUS).
-        for (auto const& itr : sWorldSessionMgr->GetAllSessions())
+        ChatHandler(nullptr).DoForAllValidSessions([&](Player* player)
         {
-            WorldSession* session = itr.second;
-            if (!session)
-                continue;
-
-            Player* player = session->GetPlayer();
-            if (!player || !player->IsInWorld())
-                continue;
-
-            LocaleConstant locale = session->GetSessionDbLocaleIndex();
-            ChatHandler(session).PSendSysMessage(LANG_EVENTMESSAGE, GetLocalizedDescription(eventId, locale).c_str());
-        }
+            LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_EVENTMESSAGE, GetLocalizedDescription(eventId, locale).c_str());
+        });
     }
 
     LOG_DEBUG("gameevent", "GameEvent {} \"{}\" started.", eventId, _gameEvent[eventId].Description);
