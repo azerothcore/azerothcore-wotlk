@@ -1,3 +1,4 @@
+-- DB update 2026_09_24_11 -> 2026_09_25_00
 -- --------------------------------------------------------------------------------------------
 -- Acherus: The Ebon Hold (Eastern Plaguelands, map 609)
 -- Olrun the Battlecaller (Entry 29047, GUID 128739)
