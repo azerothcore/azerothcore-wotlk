@@ -623,19 +623,29 @@ enum RocknotEvents
     EVENT_ROCKNOT_RECOVER
 };
 
+enum RocknotPaths
+{
+    PATH_ROCKNOT_ALE = 95030
+};
+
 enum RocknotPoints
 {
-    POINT_ROCKNOT_FIRST_KEG = 2,
-    POINT_ROCKNOT_LEAVE_FIRST_KEG = 3,
-    POINT_ROCKNOT_SECOND_KEG = 4,
-    POINT_ROCKNOT_LEAVE_SECOND_KEG = 5,
-    POINT_ROCKNOT_FINAL_KEG = 7
+    POINT_ROCKNOT_FIRST_KEG = 3,
+    POINT_ROCKNOT_LEAVE_FIRST_KEG = 4,
+    POINT_ROCKNOT_SECOND_KEG = 5,
+    POINT_ROCKNOT_LEAVE_SECOND_KEG = 6,
+    POINT_ROCKNOT_FINAL_KEG = 8
 };
 
 struct npc_rocknot : public npc_escortAI
 {
     npc_rocknot(Creature* creature) : npc_escortAI(creature),
-        _instance(creature->GetInstanceScript()), _aleComplete(false) { }
+        _instance(creature->GetInstanceScript()), _aleComplete(false)
+    {
+        if (WaypointPath const* path = sWaypointMgr->GetPath(PATH_ROCKNOT_ALE))
+            for (WaypointNode const& node : path->Nodes)
+                AddWaypoint(node.Id, node.X, node.Y, node.Z, node.Delay);
+    }
 
     void Reset() override
     {

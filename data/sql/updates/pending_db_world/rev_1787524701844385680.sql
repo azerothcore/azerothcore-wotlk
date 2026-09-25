@@ -11,18 +11,20 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (95020, 1, 865.3834, -219.31128, -43.7037, NULL, 8, 0, 0, 1, 0, 100, 0),
 (95020, 2, 867.29456, -222.6452, -43.72592, 2.0071287, 8, 0, 0, 1, 0, 100, 0);
 
+DELETE FROM `script_waypoint` WHERE `entry` = 9503;
+
 -- Positions on the captured route, with waits at the three actual keg stops.
 -- Redirected spline endpoints that Rocknot never reaches are not additional stops.
-DELETE FROM `script_waypoint` WHERE `entry` = 9503;
-INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) VALUES
-(9503, 0, 884.94965, -193.1537, -43.7037, 0, 'Rocknot - Approach kegs'),
-(9503, 1, 879.8619, -189.96124, -43.703705, 0, 'Rocknot - Approach first keg'),
-(9503, 2, 871.6734, -185.76802, -43.70371, 4700, 'Rocknot - First keg'),
-(9503, 3, 867.2741, -190.41896, -43.70371, 0, 'Rocknot - Turn toward second keg'),
-(9503, 4, 860.8991, -191.71492, -43.703705, 3100, 'Rocknot - Second keg'),
-(9503, 5, 858.04724, -193.25536, -43.703705, 0, 'Rocknot - Approach final keg'),
-(9503, 6, 855.1874, -194.80013, -43.703705, 0, 'Rocknot - Approach final keg'),
-(9503, 7, 851.37866, -196.69437, -43.703705, 0, 'Rocknot - Break keg and remain stunned');
+DELETE FROM `waypoint_data` WHERE `id` = 95030;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `velocity`, `delay`, `smoothTransition`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(95030, 1, 884.94965, -193.1537, -43.7037, NULL, 0, 0, 0, 0, 0, 100, 0),
+(95030, 2, 879.8619, -189.96124, -43.703705, NULL, 0, 0, 0, 0, 0, 100, 0),
+(95030, 3, 871.6734, -185.76802, -43.70371, NULL, 0, 4700, 0, 0, 0, 100, 0),
+(95030, 4, 867.2741, -190.41896, -43.70371, NULL, 0, 0, 0, 0, 0, 100, 0),
+(95030, 5, 860.8991, -191.71492, -43.703705, NULL, 0, 3100, 0, 0, 0, 100, 0),
+(95030, 6, 858.04724, -193.25536, -43.703705, NULL, 0, 0, 0, 0, 0, 100, 0),
+(95030, 7, 855.1874, -194.80013, -43.703705, NULL, 0, 0, 0, 0, 0, 100, 0),
+(95030, 8, 851.37866, -196.69437, -43.703705, NULL, 0, 0, 0, 0, 0, 100, 0);
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 9502 AND `GroupID` = 0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
