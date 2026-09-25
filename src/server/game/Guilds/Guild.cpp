@@ -1286,9 +1286,7 @@ void Guild::HandleSetMOTD(WorldSession* session, std::string_view motd)
     if (!_HasRankRight(session->GetPlayer(), GR_RIGHT_SETMOTD))
         SendCommandResult(session, GUILD_COMMAND_EDIT_MOTD, ERR_GUILD_PERMISSIONS);
     else
-    {
         SetMOTD(motd);
-    }
 }
 
 void Guild::SetMOTD(std::string_view motd)
