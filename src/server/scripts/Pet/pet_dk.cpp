@@ -421,7 +421,8 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
         // No locals: they would be unused when PERFORMANCE_PROFILING compiles the log out
         LOG_DEBUG("spells.scripts", "spell_pet_dk_gargoyle_strike: {} cast time {} ms, cast speed {}, spell power {}, "
             "owner attack power {}, owner melee attack speed pct {}",
-            GetCaster()->GetGUID().ToString(), GetSpell()->GetCastTime(), GetCaster()->GetFloatValue(UNIT_MOD_CAST_SPEED),
+            GetCaster()->GetGUID().ToString(), GetSpell()->GetCastTime(),
+            GetCaster()->GetFloatValue(UNIT_MOD_CAST_SPEED),
             GetCaster()->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask()),
             GetCaster()->GetOwner() ? GetCaster()->GetOwner()->GetTotalAttackPowerValue(BASE_ATTACK) : 0.0f,
             GetCaster()->GetOwner() ? GetCaster()->GetOwner()->m_modAttackSpeedPct[BASE_ATTACK] : 0.0f);
