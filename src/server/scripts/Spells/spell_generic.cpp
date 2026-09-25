@@ -23,15 +23,18 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "Creature.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
+#include "ObjectAccessor.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "ThreatManager.h"
 #include "Unit.h"
 #include "Vehicle.h"
 #include <array>
@@ -65,6 +68,85 @@ class spell_gen_5000_gold : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_gen_5000_gold::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 38153 - Acid Spray (Quagmirran)
+// 38971 - Acid Geyser (Underbog Colossus)
+class spell_gen_acid_geyser : public AuraScript
+{
+    PrepareAuraScript(spell_gen_acid_geyser);
+
+    enum Ids
+    {
+        SPELL_ACID_SPRAY       = 38153,
+        SPELL_ACID_GEYSER      = 38971,
+        NPC_QUAGMIRRAN         = 17942,
+        NPC_QUAGMIRRAN_HEROIC  = 19894,
+        NPC_UNDERBOG_COLOSSUS  = 21251
+    };
+
+    ObjectGuid _channelTarget;
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return spellInfo->IsChanneled()
+            && spellInfo->Effects[EFFECT_1].ApplyAuraName == SPELL_AURA_PERIODIC_TRIGGER_SPELL
+            && spellInfo->Effects[EFFECT_1].TargetA.GetTarget() == TARGET_UNIT_CASTER
+            && ValidateSpellInfo({ spellInfo->Effects[EFFECT_1].TriggerSpell });
+    }
+
+    bool Load() override
+    {
+        Creature* caster = GetCaster() ? GetCaster()->ToCreature() : nullptr;
+        if (!caster || GetUnitOwner() != caster)
+            return false;
+
+        _channelTarget = caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT);
+
+        // Acid Geyser is also used by other creatures, whose behaviour is unchanged.
+        return (GetId() == SPELL_ACID_SPRAY &&
+            (caster->GetEntry() == NPC_QUAGMIRRAN || caster->GetEntry() == NPC_QUAGMIRRAN_HEROIC)) ||
+            (GetId() == SPELL_ACID_GEYSER && caster->GetEntry() == NPC_UNDERBOG_COLOSSUS);
+    }
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsAlive())
+        {
+            PreventDefaultAction();
+            return;
+        }
+
+        // The channel fields can already be cleared when the aura delivers its final tick.
+        Unit* target = ObjectAccessor::GetUnit(*caster, _channelTarget);
+        if (!target || !target->IsAlive() || !caster->IsValidAttackTarget(target))
+        {
+            PreventDefaultAction();
+            return;
+        }
+
+        // Quagmirran follows a taunter only while the taunt is active, then returns to the channel target.
+        if (GetId() == SPELL_ACID_SPRAY)
+            if (Unit* victim = caster->GetThreatMgr().GetCurrentVictim())
+                if (caster->HasAuraTypeWithCaster(SPELL_AURA_MOD_TAUNT, victim->GetGUID()) &&
+                    victim->IsAlive() && caster->IsValidAttackTarget(victim))
+                    target = victim;
+
+        // The triggered spell is a caster-relative cone. Aim immediately before its target selection,
+        // since normal victim updates can turn the caster back toward the tank between channel ticks.
+        caster->SetInFront(target);
+
+        // Update the displayed focus, not Creature::SetTarget's saved post-cast target.
+        // Keep the channel object unchanged so taunt expiry can recover the original target.
+        if (caster->GetUInt32Value(UNIT_CHANNEL_SPELL) == GetId())
+            caster->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_acid_geyser::HandlePeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -6209,6 +6291,7 @@ void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
     RegisterSpellScript(spell_gen_5000_gold);
+    RegisterSpellScript(spell_gen_acid_geyser);
     RegisterSpellScript(spell_gen_arena_drink);
     RegisterSpellScript(spell_gen_model_visible);
     RegisterSpellScript(spell_the_flag_of_ownership);
