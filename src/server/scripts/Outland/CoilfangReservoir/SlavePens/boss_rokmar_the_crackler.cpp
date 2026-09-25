@@ -41,9 +41,9 @@ struct boss_rokmar_the_crackler : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         scheduler.Schedule(8s, [this] (TaskContext context)
         {

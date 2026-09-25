@@ -522,14 +522,14 @@ public:
     virtual void ScheduleTasks() { }
 
     void Reset() override { _Reset(); }
-    void JustEngagedWith(Unit* /*who*/) override { _JustEngagedWith(); }
+    void JustEngagedWith(Unit* who) override { _JustEngagedWith(who); }
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { _EnterEvadeMode(why); }
     void JustDied(Unit* /*killer*/) override { _JustDied(); }
     void JustReachedHome() override { _JustReachedHome(); }
 
 protected:
     void _Reset();
-    void _JustEngagedWith();
+    void _JustEngagedWith(Unit* who);
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
     void _EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
