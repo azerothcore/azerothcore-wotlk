@@ -7506,8 +7506,10 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 // enchantment loop below would read freed memory.
                 if (!GetItemByGuid(itemGuid))
                 {
-                    LOG_ERROR("entities.player", "Player::CastItemCombatSpell: item {} (entry {}) was destroyed by its own on-hit proc spell {}; "
-                        "aborting remaining procs for player {}", itemGuid.ToString(), itemEntry, spellInfo->Id, GetGUID().ToString());
+                    LOG_ERROR("entities.player",
+                        "Player::CastItemCombatSpell: item {} (entry {}) was destroyed by its own on-hit proc "
+                        "spell {}; aborting remaining procs for player {}",
+                        itemGuid.ToString(), itemEntry, spellInfo->Id, GetGUID().ToString());
                     return;
                 }
             }
@@ -7601,8 +7603,11 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 // freed Item in GetEnchantmentId() -> Object::GetUInt32Value().
                 if (!GetItemByGuid(itemGuid))
                 {
-                    LOG_ERROR("entities.player", "Player::CastItemCombatSpell: item {} (entry {}) was destroyed by enchantment {} proc spell {} in enchantment slot {}; "
-                        "aborting remaining procs for player {}", itemGuid.ToString(), itemEntry, pEnchant->ID, spellInfo->Id, uint32(e_slot), GetGUID().ToString());
+                    LOG_ERROR("entities.player",
+                        "Player::CastItemCombatSpell: item {} (entry {}) was destroyed by enchantment {} proc spell {} "
+                        "in enchantment slot {}; aborting remaining procs for player {}",
+                        itemGuid.ToString(), itemEntry, pEnchant->ID, spellInfo->Id, uint32(e_slot),
+                        GetGUID().ToString());
                     return;
                 }
             }
