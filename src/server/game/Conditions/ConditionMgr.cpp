@@ -17,6 +17,7 @@
 
 #include "ConditionMgr.h"
 #include "AchievementMgr.h"
+#include "ClassMgr.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
@@ -2192,9 +2193,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     }
     case CONDITION_CLASS:
     {
-        if (!(cond->ConditionValue1 & CLASSMASK_ALL_PLAYABLE))
+        if (!(cond->ConditionValue1 & sClassMgr->GetPlayableClassMask()))
         {
-            LOG_ERROR("sql.sql", "Class condition has non existing classmask ({}), skipped", cond->ConditionValue1 & ~CLASSMASK_ALL_PLAYABLE);
+            LOG_ERROR("sql.sql", "Class condition has non existing classmask ({}), skipped", cond->ConditionValue1 & ~sClassMgr->GetPlayableClassMask());
             return false;
         }
 
