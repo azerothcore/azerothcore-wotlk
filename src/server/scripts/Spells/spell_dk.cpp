@@ -2436,7 +2436,8 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
         {
             amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), 6.5f);
 
-            LOG_DEBUG("spells.scripts", "spell_dk_army_of_the_dead_passive: {} attack power {} (owner {} AP {})",
+            LOG_DEBUG("spells.scripts", "spell_dk_army_of_the_dead_passive: {} attack power {} "
+                "(owner {} attack power {})",
                 GetUnitOwner()->GetGUID().ToString(), amount, owner->GetGUID().ToString(),
                 owner->GetTotalAttackPowerValue(BASE_ATTACK));
         }
@@ -2461,7 +2462,8 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
         {
             amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), 6.5f);
 
-            LOG_DEBUG("spells.scripts", "spell_dk_army_of_the_dead_passive: {} spell power {} (owner {} AP {})",
+            LOG_DEBUG("spells.scripts", "spell_dk_army_of_the_dead_passive: {} spell power {} "
+                "(owner {} attack power {})",
                 GetUnitOwner()->GetGUID().ToString(), amount, owner->GetGUID().ToString(),
                 owner->GetTotalAttackPowerValue(BASE_ATTACK));
         }
