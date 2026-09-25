@@ -1632,6 +1632,54 @@ void ObjectMgr::LoadCreatureMovementOverrides()
     LOG_INFO("server.loading", " ");
 }
 
+void ObjectMgr::LoadCreatureHostileOverrides()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureHostileOverrides.clear();
+
+    //                                                   0              1
+    QueryResult result = WorldDatabase.Query("SELECT `AttackerEntry`, `TargetEntry` FROM `creature_hostile_override`");
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 creature hostile overrides. DB table `creature_hostile_override` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields        = result->Fetch();
+        uint32 attackerEntry = fields[0].Get<uint32>();
+        uint32 targetEntry   = fields[1].Get<uint32>();
+
+        if (!GetCreatureTemplate(attackerEntry))
+        {
+            LOG_ERROR("sql.sql", "Table `creature_hostile_override` has AttackerEntry {} which does not exist in `creature_template`, skipped.", attackerEntry);
+            continue;
+        }
+
+        if (!GetCreatureTemplate(targetEntry))
+        {
+            LOG_ERROR("sql.sql", "Table `creature_hostile_override` has TargetEntry {} which does not exist in `creature_template`, skipped.", targetEntry);
+            continue;
+        }
+
+        _creatureHostileOverrides[attackerEntry].insert(targetEntry);
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Creature Hostile Overrides in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+bool ObjectMgr::IsHostileOverride(uint32 attackerEntry, uint32 targetEntry) const
+{
+    auto const& itr = _creatureHostileOverrides.find(attackerEntry);
+    return itr != _creatureHostileOverrides.end() && itr->second.find(targetEntry) != itr->second.end();
+}
+
 CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelId) const
 {
     CreatureModelContainer::const_iterator itr = _creatureModelStore.find(modelId);
