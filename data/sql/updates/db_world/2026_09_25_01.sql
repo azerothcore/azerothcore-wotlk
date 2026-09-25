@@ -1,3 +1,4 @@
+-- DB update 2026_09_25_00 -> 2026_09_25_01
 --
 -- Captured Rageclaw: drop Immune To NPC on release so it fights Drakuru trolls, despawn once out of combat
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 29686);
