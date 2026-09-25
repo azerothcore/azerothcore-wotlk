@@ -19,22 +19,22 @@ class MMapTargetData
 {
 public:
     MMapTargetData() = default;
-    MMapTargetData(uint32 endTime, const Position* o, const Position* t)
+    MMapTargetData(uint32 endTime, Position const* o, Position const* t)
     {
         _endTime = endTime;
         _posOwner.Relocate(o);
         _posTarget.Relocate(t);
     }
-    MMapTargetData(const MMapTargetData& c)
+    MMapTargetData(MMapTargetData const& c)
     {
         _endTime = c._endTime;
         _posOwner.Relocate(c._posOwner);
         _posTarget.Relocate(c._posTarget);
     }
     MMapTargetData(MMapTargetData&&) = default;
-    MMapTargetData& operator=(const MMapTargetData&) = default;
+    MMapTargetData& operator=(MMapTargetData const&) = default;
     MMapTargetData& operator=(MMapTargetData&&) = default;
-    [[nodiscard]] bool PosChanged(const Position& o, const Position& t) const
+    [[nodiscard]] bool PosChanged(Position const& o, Position const& t) const
     {
         return _posOwner.GetExactDistSq(&o) > 0.5f * 0.5f || _posTarget.GetExactDistSq(&t) > 0.5f * 0.5f;
     }
@@ -47,7 +47,7 @@ class SafeUnitPointer
 {
 public:
     explicit SafeUnitPointer(Unit* defVal) : ptr(defVal), defaultValue(defVal) {}
-    SafeUnitPointer(const SafeUnitPointer& /*p*/) { ABORT(); }
+    SafeUnitPointer(SafeUnitPointer const& /*p*/) { ABORT(); }
     void Initialize(Unit* defVal) { defaultValue = defVal; ptr = defVal; }
     ~SafeUnitPointer();
     void SetPointedTo(Unit* u);

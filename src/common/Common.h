@@ -66,7 +66,7 @@ enum AccountFlag
 {
     ACCOUNT_FLAG_GM                   = 0x1,        // Account is GM
     ACCOUNT_FLAG_NOKICK               = 0x2,        // Will not be logged out while AFK
-    ACCOUNT_FLAG_COLLECTOR            = 0x4,        // NYI Collector's Edition
+    ACCOUNT_FLAG_COLLECTOR            = 0x4,        // Collector's Edition
     ACCOUNT_FLAG_TRIAL                = 0x8,        // Trial account
     ACCOUNT_FLAG_CANCELLED            = 0x10,       // NYI UNK
     ACCOUNT_FLAG_IGR                  = 0x20,       // NYI Internet Game Room (Internet cafe?)
@@ -144,7 +144,7 @@ enum LocaleConstant
 AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
 AC_COMMON_API bool IsLocaleValid(std::string const& locale);
-AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
+AC_COMMON_API LocaleConstant GetLocaleByName(std::string const& name);
 AC_COMMON_API const std::string GetNameByLocaleConstant(LocaleConstant localeConstant);
 AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 

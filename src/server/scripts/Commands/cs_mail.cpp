@@ -23,6 +23,7 @@
 #include "GameTime.h"
 #include "Language.h"
 #include "Mail.h"
+#include "MailMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -391,7 +392,7 @@ public:
 
         CharacterDatabase.CommitTransaction(trans);
 
-        sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, receiver));
+        sMailMgr->OnMailDeleted(receiver);
 
         handler->PSendSysMessage(LANG_MAIL_RETURN_SUCCESS, mailId, handler->playerLink(target.GetName()));
         return true;

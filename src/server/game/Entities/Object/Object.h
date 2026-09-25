@@ -31,6 +31,7 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Position.h"
+#include "SpellDefines.h"
 #include "UnitDefines.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
@@ -94,6 +95,11 @@ class Unit;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+struct FactionTemplateEntry;
+class Spell;
+class SpellInfo;
+struct CastSpellTargetArg;
+enum SpellCastResult : uint8;
 
 struct PositionFullTerrainStatus;
 
@@ -241,6 +247,7 @@ protected:
 
     void _InitValues();
     void _Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh);
+    void _Create(ObjectGuid guid);
     [[nodiscard]] std::string _ConcatFields(uint16 startIndex, uint16 size) const;
     bool _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
@@ -280,7 +287,7 @@ private:
 
     // for output helpfull error messages from asserts
     [[nodiscard]] bool PrintIndexError(uint32 index, bool set) const;
-    Object(const Object&);                              // prevent generation copy constructor
+    Object(Object const&);                              // prevent generation copy constructor
     Object& operator=(Object const&);                   // prevent generation assigment operator
 };
 
@@ -507,8 +514,8 @@ public:
     void UpdateGroundPositionZ(float x, float y, float& z) const;
     void UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ = nullptr) const;
 
-    void GetRandomPoint(const Position& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
-    [[nodiscard]] Position GetRandomPoint(const Position& srcPos, float distance) const;
+    void GetRandomPoint(Position const& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
+    [[nodiscard]] Position GetRandomPoint(Position const& srcPos, float distance) const;
 
     [[nodiscard]] uint32 GetInstanceId() const { return m_InstanceId; }
 
@@ -531,7 +538,7 @@ public:
     [[nodiscard]] virtual std::string const& GetNameForLocaleIdx(LocaleConstant /*locale_idx*/) const { return m_name; }
 
     float GetDistance(WorldObject const* obj) const;
-    [[nodiscard]] float GetDistance(const Position& pos) const;
+    [[nodiscard]] float GetDistance(Position const& pos) const;
     [[nodiscard]] float GetDistance(float x, float y, float z) const;
     float GetDistance2d(WorldObject const* obj) const;
     [[nodiscard]] float GetDistance2d(float x, float y) const;
@@ -540,9 +547,9 @@ public:
     bool IsSelfOrInSameMap(WorldObject const* obj) const;
     bool IsInMap(WorldObject const* obj) const;
     [[nodiscard]] bool IsWithinDist3d(float x, float y, float z, float dist) const;
-    bool IsWithinDist3d(const Position* pos, float dist) const;
+    bool IsWithinDist3d(Position const* pos, float dist) const;
     [[nodiscard]] bool IsWithinDist2d(float x, float y, float dist) const;
-    bool IsWithinDist2d(const Position* pos, float dist) const;
+    bool IsWithinDist2d(Position const* pos, float dist) const;
     virtual bool IsWithinSightRange(Position const& pos, float dist) const;
     // use only if you will sure about placing both object at same map
     bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
@@ -635,7 +642,7 @@ public:
     void ClearZoneScript();
     [[nodiscard]] ZoneScript* GetZoneScript() const { return m_zoneScript; }
 
-    TempSummon* SummonCreature(uint32 id, const Position& pos, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, uint32 vehId = 0, SummonPropertiesEntry const* properties = nullptr, bool visibleBySummonerOnly = false) const;
+    TempSummon* SummonCreature(uint32 id, Position const& pos, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, uint32 vehId = 0, SummonPropertiesEntry const* properties = nullptr, bool visibleBySummonerOnly = false) const;
     TempSummon* SummonCreature(uint32 id, float x, float y, float z, float ang = 0, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, SummonPropertiesEntry const* properties = nullptr, bool visibleBySummonerOnly = false);
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true, GOSummonType summonType = GO_SUMMON_TIMED_OR_CORPSE_DESPAWN);
     Creature*   SummonTrigger(float x, float y, float z, float ang, uint32 dur, bool setLevel = false, CreatureAI * (*GetAI)(Creature*) = nullptr);
@@ -660,6 +667,7 @@ public:
 
     void SetPositionDataUpdate();
     void UpdatePositionData();
+    [[nodiscard]] bool IsPositionDataUpdatePending() const { return _updatePositionData; }
 
     void AddToObjectUpdate() override;
     void RemoveFromObjectUpdate() override;
@@ -739,6 +747,53 @@ public:
     // Event handler
     ALEEventProcessor* ALEEvents;
     EventProcessor m_Events;
+
+    // CastSpell's third arg can be a variety of things, see CastSpellExtraArgs' constructors.
+    SpellCastResult CastSpell(CastSpellTargetArg const& targets, uint32 spellId,
+                              CastSpellExtraArgs const& args = {});
+    SpellCastResult CastSpell(CastSpellTargetArg const& targets, SpellInfo const* info,
+                              CastSpellExtraArgs const& args = {});
+
+    // Ownership, faction and target validation at the WorldObject level so
+    // non-Unit casters (GameObjects, DynamicObjects, Corpses) can resolve them.
+    // Unit and GameObject override the virtuals with their field-based versions.
+    [[nodiscard]] virtual ObjectGuid GetOwnerGUID() const { return ObjectGuid::Empty; }
+    [[nodiscard]] virtual ObjectGuid GetCharmerOrOwnerGUID() const { return GetOwnerGUID(); }
+    [[nodiscard]] Unit* GetOwnerUnit() const;
+    [[nodiscard]] Unit* GetCharmerOrOwnerUnit() const;
+    [[nodiscard]] Unit* GetCharmerOrOwnerOrSelfUnit() const;
+    [[nodiscard]] Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
+    [[nodiscard]] Player* GetAffectingPlayer() const;
+    [[nodiscard]] virtual Player* GetSpellModOwner() const;
+
+    [[nodiscard]] virtual uint32 GetFaction() const { return 0; }
+    [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
+    [[nodiscard]] ReputationRank GetReactionTo(WorldObject const* target) const;
+    static ReputationRank GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
+    [[nodiscard]] bool IsHostileTo(WorldObject const* target) const;
+    [[nodiscard]] bool IsFriendlyTo(WorldObject const* target) const;
+
+    [[nodiscard]] float GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
+    [[nodiscard]] float GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
+
+    [[nodiscard]] bool IsValidAttackTarget(WorldObject const* target, SpellInfo const* bySpell = nullptr) const;
+    [[nodiscard]] bool IsValidAssistTarget(WorldObject const* target, SpellInfo const* bySpell = nullptr) const;
+    Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
+    Unit* GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
+
+    // Spell calculations usable by any WorldObject caster. Unit-specific
+    // bonuses apply when the caster is (or is owned by) a Unit.
+    int32 CalculateSpellDamage(Unit const* target, SpellInfo const* spellProto, uint8 effect_index, int32 const* basePoints = nullptr) const;
+    int32 CalcSpellDuration(SpellInfo const* spellProto) const;
+    int32 ModSpellDuration(SpellInfo const* spellProto, Unit const* target, int32 duration, bool positive, uint32 effectMask) const;
+    void ModSpellCastTime(SpellInfo const* spellProto, int32& castTime, Spell* spell = nullptr) const;
+
+    [[nodiscard]] virtual SpellMissInfo MeleeSpellHitResult(Unit* /*victim*/, SpellInfo const* /*spellInfo*/) { return SPELL_MISS_NONE; }
+    SpellMissInfo MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo);
+    SpellMissInfo SpellHitResult(Unit* victim, SpellInfo const* spellInfo, bool canReflect = false);
+    SpellMissInfo SpellHitResult(Unit* victim, Spell const* spell, bool canReflect = false);
+    void SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo missInfo);
+    void SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, uint32 damage, SpellSchoolMask schoolMask, uint32 absorb, uint32 resist);
 
 protected:
     std::string m_name;

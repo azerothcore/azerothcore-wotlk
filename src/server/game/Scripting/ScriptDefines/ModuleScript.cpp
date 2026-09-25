@@ -18,7 +18,7 @@
 #include "ModuleScript.h"
 #include "ScriptMgr.h"
 
-ModuleScript::ModuleScript(const char* name)
+ModuleScript::ModuleScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<ModuleScript>::AddScript(this);

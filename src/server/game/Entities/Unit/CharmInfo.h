@@ -144,7 +144,7 @@ public:
     //return true if successful
     bool AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates newstate = ACT_DECIDE, uint32 index = MAX_UNIT_ACTION_BAR_INDEX + 1);
     bool RemoveSpellFromActionBar(uint32 spell_id);
-    void LoadPetActionBar(const std::string& data);
+    void LoadPetActionBar(std::string const& data);
     void BuildActionBar(WorldPacket* data);
     void SetSpellAutocast(SpellInfo const* spellInfo, bool state);
     void SetActionBar(uint8 index, uint32 spellOrAction, ActiveStates type)

@@ -35,6 +35,7 @@ class AuraScript;
 
 class AuraApplication
 {
+    friend class Aura; // Aura::UpdateTargetMap manages paladin aura effect suppression
     friend void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask);
     friend void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMode);
     friend void Unit::_ApplyAuraEffect(Aura* aura, uint8 effIndex);
@@ -181,7 +182,7 @@ public:
     // Helpers for targets
     ApplicationMap const& GetApplicationMap() {return m_applications;}
     void GetApplicationList(std::list<AuraApplication*>& applicationList) const;
-    const AuraApplication* GetApplicationOfTarget (ObjectGuid guid) const { ApplicationMap::const_iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
+    AuraApplication const* GetApplicationOfTarget (ObjectGuid guid) const { ApplicationMap::const_iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
     AuraApplication* GetApplicationOfTarget (ObjectGuid guid) { ApplicationMap::iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
     bool IsAppliedOnTarget(ObjectGuid guid) const { return m_applications.find(guid) != m_applications.end(); }
 

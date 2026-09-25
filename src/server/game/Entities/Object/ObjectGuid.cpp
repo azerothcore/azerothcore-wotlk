@@ -17,6 +17,7 @@
 
 #include "ObjectGuid.h"
 #include "Log.h"
+#include "TC9Sidecar.h"
 #include "World.h"
 #include <iomanip>
 #include <sstream>
@@ -94,6 +95,21 @@ void ObjectGuidGeneratorBase::HandleCounterOverflow(HighGuid high)
 {
     LOG_ERROR("entities.object", "{} guid overflow!! Can't continue, shutting down server. ", ObjectGuid::GetTypeName(high));
     World::StopNow(ERROR_EXIT_CODE);
+}
+
+bool ObjectGuidGeneratorBase::GetClusterGuid(HighGuid high, uint16 realmId, ObjectGuid::LowType& clusterGuid)
+{
+    if (!sToCloud9Sidecar->ClusterModeEnabled())
+        return false;
+
+    if (high == HighGuid::Player)
+        clusterGuid = ObjectGuid::LowType(sToCloud9Sidecar->GenerateCharacterGuid(realmId));
+    else if (high == HighGuid::Item)
+        clusterGuid = ObjectGuid::LowType(sToCloud9Sidecar->GenerateItemGuid(realmId));
+    else
+        return false;
+
+    return true;
 }
 
 #define GUID_TRAIT_INSTANTIATE_GUID( HIGH_GUID ) \

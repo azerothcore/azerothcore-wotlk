@@ -26,7 +26,7 @@ bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sour
     return tempScript ? tempScript->OnConditionCheck(condition, sourceInfo) : true;
 }
 
-ConditionScript::ConditionScript(const char* name)
+ConditionScript::ConditionScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<ConditionScript>::AddScript(this);

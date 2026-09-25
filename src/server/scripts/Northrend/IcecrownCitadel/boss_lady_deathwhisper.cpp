@@ -607,7 +607,7 @@ public:
         }
 
         // helper for summoning wave mobs
-        void Summon(uint32 entry, const Position& pos)
+        void Summon(uint32 entry, Position const& pos)
         {
             if (me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                 if (TempSummon* trigger = me->SummonCreature(WORLD_TRIGGER, pos, TEMPSUMMON_TIMED_DESPAWN, 2000))

@@ -94,7 +94,7 @@ void ScriptMgr::OnAfterLootTemplateProcess(Loot* loot, LootTemplate const* tab, 
     CALL_ENABLED_HOOKS(MiscScript, MISCHOOK_ON_AFTER_LOOT_TEMPLATE_PROCESS, script->OnAfterLootTemplateProcess(loot, tab, store, lootOwner, personal, noEmptyError, lootMode));
 }
 
-void ScriptMgr::OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase)
+void ScriptMgr::OnPlayerSetPhase(AuraEffect const* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase)
 {
     CALL_ENABLED_HOOKS(MiscScript, MISCHOOK_ON_PLAYER_SET_PHASE, script->OnPlayerSetPhase(auraEff, aurApp, mode, apply, newPhase));
 }
@@ -109,7 +109,7 @@ void ScriptMgr::GetDialogStatus(Player* player, Object* questgiver)
     CALL_ENABLED_HOOKS(MiscScript, MISCHOOK_GET_DIALOG_STATUS, script->GetDialogStatus(player, questgiver));
 }
 
-MiscScript::MiscScript(const char* name, std::vector<uint16> enabledHooks)
+MiscScript::MiscScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, MISCHOOK_END)
 {
     // If empty - enable all available hooks.

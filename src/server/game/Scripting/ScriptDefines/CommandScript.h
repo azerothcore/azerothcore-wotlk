@@ -24,7 +24,7 @@
 class CommandScript : public ScriptObject
 {
 protected:
-    CommandScript(const char* name);
+    CommandScript(char const* name);
 
 public:
     // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.

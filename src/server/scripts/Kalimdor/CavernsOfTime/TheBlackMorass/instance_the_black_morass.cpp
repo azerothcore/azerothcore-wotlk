@@ -32,6 +32,7 @@ const Position PortalLocation[4] =
 ObjectData const creatureData[] =
 {
     { NPC_MEDIVH, DATA_MEDIVH },
+    { NPC_AEONUS, DATA_AEONUS },
     { 0,          0           }
 };
 

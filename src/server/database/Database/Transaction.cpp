@@ -66,7 +66,7 @@ void TransactionBase::Cleanup()
 
                     delete stmt;
                 }
-                catch (const std::bad_variant_access& ex)
+                catch (std::bad_variant_access const& ex)
                 {
                     LOG_FATAL("sql.sql", "> PreparedStatementBase not found in SQLElementData. {}", ex.what());
                     ABORT();
@@ -79,7 +79,7 @@ void TransactionBase::Cleanup()
                 {
                     std::get<std::string>(data.element).clear();
                 }
-                catch (const std::bad_variant_access& ex)
+                catch (std::bad_variant_access const& ex)
                 {
                     LOG_FATAL("sql.sql", "> std::string not found in SQLElementData. {}", ex.what());
                     ABORT();

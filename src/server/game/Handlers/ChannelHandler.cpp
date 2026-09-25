@@ -18,6 +18,8 @@
 #include "ChannelMgr.h"
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
+#include "Language.h"
+#include "TC9Sidecar.h"
 #include <cctype>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
@@ -38,6 +40,23 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
         if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
             return;
+
+        // Cluster mode rebuilds the localized channel name so nodes agree on it;
+        // stock servers keep the client-supplied name.
+        if (sToCloud9Sidecar->ClusterModeEnabled())
+        {
+            auto const locale = GetSessionDbcLocale();
+            std::string const& zoneName = zone->area_name[locale];
+            std::string const cityName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_CHANNEL_CITY);
+            char const* nameExt = (channel->flags & CHANNEL_DBC_FLAG_CITY_ONLY) ? cityName.c_str() : zoneName.c_str();
+
+            std::array<char, 128> buffer{};
+            if (char const* pattern = channel->pattern[locale])
+            {
+                std::snprintf(buffer.data(), buffer.size(), pattern, nameExt);
+                channelName = buffer.data();
+            }
+        }
     }
 
     if (channelName.empty())

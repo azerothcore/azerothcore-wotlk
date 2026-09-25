@@ -1083,7 +1083,7 @@ void Channel::MakePlayerUnbanned(WorldPacket* data, ObjectGuid bad, ObjectGuid g
     *data << good;
 }
 
-void Channel::MakePlayerNotBanned(WorldPacket* data, const std::string& name)
+void Channel::MakePlayerNotBanned(WorldPacket* data, std::string const& name)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_NOT_BANNED_NOTICE);
     *data << name;
@@ -1121,13 +1121,13 @@ void Channel::MakeNotModerated(WorldPacket* data)
     MakeNotifyPacket(data, CHAT_NOT_MODERATED_NOTICE);
 }
 
-void Channel::MakePlayerInvited(WorldPacket* data, const std::string& name)
+void Channel::MakePlayerInvited(WorldPacket* data, std::string const& name)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_INVITED_NOTICE);
     *data << name;
 }
 
-void Channel::MakePlayerInviteBanned(WorldPacket* data, const std::string& name)
+void Channel::MakePlayerInviteBanned(WorldPacket* data, std::string const& name)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_INVITE_BANNED_NOTICE);
     *data << name;

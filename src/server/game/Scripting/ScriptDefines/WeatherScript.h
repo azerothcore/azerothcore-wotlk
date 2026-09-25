@@ -23,7 +23,7 @@
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
 {
 protected:
-    WeatherScript(const char* name);
+    WeatherScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }

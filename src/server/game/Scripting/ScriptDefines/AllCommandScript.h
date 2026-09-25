@@ -33,7 +33,7 @@ enum AllCommandHook
 class AllCommandScript : public ScriptObject
 {
 protected:
-    AllCommandScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    AllCommandScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }

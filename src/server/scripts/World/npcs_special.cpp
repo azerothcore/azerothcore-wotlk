@@ -21,6 +21,7 @@
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
+#include "DBCStores.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -118,12 +119,6 @@ public:
                         {
                             sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
                             finishWarning = true;
-                            // no one won - despawn
-                            if (!finished)
-                            {
-                                me->DespawnOrUnsummon();
-                                break;
-                            }
                         }
 
                         events.Repeat(1s);
@@ -361,42 +356,33 @@ private:
     std::unordered_map<ObjectGuid, Milliseconds> _combatTimer;
 };
 
-struct npc_target_dummy : NullCreatureAI
+struct npc_target_dummy : ScriptedAI
 {
-    npc_target_dummy(Creature* creature) : NullCreatureAI(creature)
-    {
-        _deathTimer = 15s;
-    }
+    explicit npc_target_dummy(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
+        scheduler.CancelAll();
+        ClearUniqueTimedEventsDone();
+
         me->SetControlled(true, UNIT_STATE_STUNNED);
         me->SetLootRecipient(me->GetOwner());
-        me->SelectLevel();
-    }
 
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        damage = 0;
+        ScheduleUniqueTimedEvent(15s, [this]
+        {
+            me->SetLootRecipient(me->GetOwner()); // the dummy is lootable by the player who summoned it
+            me->LowerPlayerDamageReq(me->GetMaxHealth());
+            me->KillSelf();
+        }, 1);
     }
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!me->HasUnitState(UNIT_STATE_STUNNED))
             me->SetControlled(true, UNIT_STATE_STUNNED);
-
-        _deathTimer -= Milliseconds(diff);
-        if (_deathTimer <= 0s)
-        {
-            me->SetLootRecipient(me->GetOwner());
-            me->LowerPlayerDamageReq(me->GetMaxHealth());
-            me->KillSelf();
-            _deathTimer = 600s;
-        }
     }
-
-private:
-    Milliseconds _deathTimer;
 };
 
 /*########
@@ -467,6 +453,7 @@ public:
         {
             SpawnAssoc = nullptr;
             SpawnedGUID.Clear();
+            SpawnedFactionTemplate = nullptr;
 
             // find the correct spawnhandling
             static uint32 entryCount = sizeof(spawnAssociations) / sizeof(SpawnAssociation);
@@ -492,11 +479,16 @@ public:
                     SpawnAssoc = nullptr;
                     return;
                 }
+
+                // guard posts and trip wires are of the neutral Ambient faction, so the reaction
+                // towards players is judged by the faction of the guard they summon
+                SpawnedFactionTemplate = sFactionTemplateStore.LookupEntry(spawnedTemplate->faction);
             }
         }
 
         SpawnAssociation* SpawnAssoc;
         ObjectGuid SpawnedGUID;
+        FactionTemplateEntry const* SpawnedFactionTemplate;
 
         void Reset() override {}
 
@@ -537,6 +529,12 @@ public:
 
                 // airforce guards only spawn for players
                 if (!playerTarget)
+                    return;
+
+                // only mark and attack players the summoned guard is hostile to, e.g. players
+                // merely Unfriendly with Sporeggar are attackable but must not be aggroed
+                if (SpawnedFactionTemplate && !playerTarget->IsHostileTo(me)
+                        && me->GetFactionReactionTo(SpawnedFactionTemplate, playerTarget) > REP_HOSTILE)
                     return;
 
                 Creature* lastSpawnedGuard = !SpawnedGUID ? nullptr : GetSummonedGuard();

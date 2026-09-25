@@ -25,7 +25,7 @@
 #include <string>
 
 #if WIN32
-    void inline setenv(const char* name, const char* value, int overwrite)
+    void inline setenv(char const* name, char const* value, int overwrite)
     {
     _putenv_s(name, value);
     }

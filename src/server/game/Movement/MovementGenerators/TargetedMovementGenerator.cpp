@@ -67,6 +67,7 @@ void ChaseMovementGenerator<T>::SetOffsetAndAngle(std::optional<ChaseRange> dist
 {
     _range = dist;
     _angle = angle;
+    _fallbackPositioning = false;
     _lastTargetPosition.reset();
 }
 
@@ -74,6 +75,7 @@ template<class T>
 void ChaseMovementGenerator<T>::SetNewTarget(Unit* target)
 {
     SetTarget(target);
+    _fallbackPositioning = false;
     _lastTargetPosition.reset();
 }
 
@@ -100,22 +102,76 @@ template<class T>
 bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, float y, float z, bool walk, bool cutPath, float maxTarget, bool forceDest, bool target)
 {
     Creature* cOwner = owner->ToCreature();
+    G3D::Vector3 const targetPos = GetTarget()->GetPosition();
 
     if (owner->IsHovering())
         owner->UpdateAllowedPositionZ(x, y, z);
 
-    bool success = i_path->CalculatePath(x, y, z, forceDest);
-    uint32 pathType = i_path->GetPathType();
-    bool pathFailed = !success || (pathType & PATHFIND_NOPATH);
+    auto isPathUsable = [&]()
+    {
+        uint32 pathType = i_path->GetPathType();
+        if (pathType & PATHFIND_NOPATH)
+            return false;
 
-    // For pets, treat incomplete paths as failures to avoid clipping through geometry
-    // Players and Player-controlled units have more erratic movement, skip failure
-    if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer()) && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer())
-        if (pathType & PATHFIND_INCOMPLETE)
-            pathFailed = true;
+        // For pets, treat incomplete paths as failures to avoid clipping through geometry
+        // Players and Player-controlled units have more erratic movement, skip failure
+        if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer())
+            && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer())
+            if (pathType & PATHFIND_INCOMPLETE)
+                return false;
+
+        return true;
+    };
+
+    bool pathFailed = !i_path->CalculatePath(x, y, z, forceDest) || !isPathUsable();
+    bool usedFallback = false;
+
+    // Targets with an oversized combat reach can stand entirely over unwalkable space
+    // (e.g. Kologarn) so pathing to their center or to an angled near point (pets chase
+    // to behind the target, which may hang over the void) fails even though the melee
+    // ring covers the navmesh. Retry against the nearest point on the ring, ignoring the
+    // chase angle, via GetNearPoint2D: GetNearPoint's LoS repositioning must be avoided
+    // here, it can rotate the point to the far side of the target.
+    if (pathFailed && (!_range || _range->MaxRange <= CONTACT_DISTANCE)
+        && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer() && GetTarget()->GetCombatReach() > NOMINAL_MELEE_RANGE)
+    {
+        GetTarget()->GetNearPoint2D(owner, x, y, 0.0f, GetTarget()->GetAngle(owner));
+        z = targetPos.z;
+        owner->UpdateAllowedPositionZ(x, y, z);
+        if (std::abs(z - targetPos.z) < maxTarget)
+        {
+            pathFailed = !i_path->CalculatePath(x, y, z, forceDest) || !isPathUsable();
+            // the destination already lies on the melee ring, nothing to cut
+            cutPath = false;
+
+            if (!pathFailed)
+                usedFallback = true;
+        }
+
+        if (pathFailed)
+        {
+            // If the nearest point on the melee ring is also unpathable (e.g. Brain of Yogg-Saron
+            // where the 30yd combat reach extends beyond the room's walls into geometry, but the
+            // floor directly underneath the target is walkable), fall back to pathing directly
+            // toward the target's ground position and cut the path once within combat range.
+            float groundZ = targetPos.z;
+            owner->UpdateAllowedPositionZ(targetPos.x, targetPos.y, groundZ);
+            if (std::abs(groundZ - targetPos.z) < maxTarget)
+            {
+                x = targetPos.x;
+                y = targetPos.y;
+                z = groundZ;
+                pathFailed = !i_path->CalculatePath(x, y, z, forceDest) || !isPathUsable();
+                cutPath = true;
+                if (!pathFailed)
+                    usedFallback = true;
+            }
+        }
+    }
 
     if (pathFailed)
     {
+        _fallbackPositioning = false;
         if (cOwner)
         {
             cOwner->SetCannotReachTarget(GetTarget()->GetGUID());
@@ -128,8 +184,10 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
         return false;
     }
 
+    _fallbackPositioning = usedFallback;
+
     if (cutPath)
-        i_path->ShortenPathUntilDist(G3D::Vector3(x, y, z), maxTarget);
+        i_path->ShortenPathUntilDist(targetPos, maxTarget);
 
     if (cOwner)
     {
@@ -171,24 +229,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || isStoppedBecauseOfCasting)
     {
+        // Every time a caster mob stops to cast a spell, the leash timer ticks down. Once the timer expires, the mob evades and walks home.
         owner->StopMoving();
         _lastTargetPosition.reset();
-        if (cOwner)
-        {
-            if (isStoppedBecauseOfCasting)
-            {
-                // Don't reset leash timer if it's a spell like Shoot with a short cast time.
-                /// @todo: Research how it should actually work.
-                Spell *spell = cOwner->GetFirstCurrentCastingSpell();
-                bool spellHasLongCast = spell && spell->GetCastTime() > 1 * SECOND * IN_MILLISECONDS;
-                if (spellHasLongCast)
-                    cOwner->UpdateLeashExtensionTime();
-            }
-            else
-                cOwner->UpdateLeashExtensionTime();
 
+        if (cOwner)
             cOwner->SetCannotReachTarget();
-        }
+
         return true;
     }
 
@@ -208,7 +255,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     float const maxRange = _range ? _range->MaxRange + chaseRange : meleeRange; // melee range already includes hitboxes
     float const maxTarget = _range ? _range->MaxTolerance + chaseRange : CONTACT_DISTANCE + chaseRange;
 
-    Optional<ChaseAngle> angle = mutualChase ? Optional<ChaseAngle>() : _angle;
+    Optional<ChaseAngle> angle = (mutualChase || _fallbackPositioning) ? Optional<ChaseAngle>() : _angle;
 
     // Prevent almost infinite spinning of mutual targets.
     if (angle && !mutualChase && _mutualChase && mutualTarget && chaseRange < meleeRange)
@@ -266,16 +313,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     if (cOwner)
     {
-        if (owner->movespline->Finalized() && cOwner->IsWithinMeleeRange(target))
-        { // Mobs should chase you infinitely if you stop and wait every few seconds.
-            i_leashExtensionTimer.Update(time_diff);
-            if (i_leashExtensionTimer.Passed())
-            {
-                i_leashExtensionTimer.Reset(cOwner->GetAttackTime(BASE_ATTACK));
-                cOwner->UpdateLeashExtensionTime();
-            }
-        }
-        else if (i_recalculateTravel)
+        if (i_recalculateTravel)
             i_leashExtensionTimer.Reset(cOwner->GetAttackTime(BASE_ATTACK));
     }
 
@@ -287,6 +325,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         _lastTargetPosition = target->GetPosition();
         _mutualChase = mutualChase;
+        _fallbackPositioning = false;
+        angle = mutualChase ? Optional<ChaseAngle>() : _angle;
         if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) || !PositionOkay(owner, target, maxTarget, angle))
         {
             // can we get to the target?
@@ -374,6 +414,7 @@ void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 {
     i_path = nullptr;
     _lastTargetPosition.reset();
+    _fallbackPositioning = false;
     owner->StopMoving();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
@@ -383,6 +424,7 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
     i_path = nullptr;
     _lastTargetPosition.reset();
+    _fallbackPositioning = false;
     i_recheckDistance.Reset(0);
     i_leashExtensionTimer.Reset(owner->GetAttackTime(BASE_ATTACK));
     owner->AddUnitState(UNIT_STATE_CHASE);

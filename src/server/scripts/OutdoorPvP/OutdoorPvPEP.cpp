@@ -155,7 +155,7 @@ void OPvPCapturePointEP_EWT::SummonSupportUnitAtNorthpassTower(TeamId teamId)
     if (m_UnitsSummonedSideId != teamId)
     {
         m_UnitsSummonedSideId = teamId;
-        const creature_type* ct = teamId == TEAM_ALLIANCE ? EP_EWT_Summons_A : EP_EWT_Summons_H;
+        creature_type const* ct = teamId == TEAM_ALLIANCE ? EP_EWT_Summons_A : EP_EWT_Summons_H;
 
         for (uint8 i = 0; i < EP_EWT_NUM_CREATURES; ++i)
         {

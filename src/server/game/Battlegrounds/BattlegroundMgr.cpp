@@ -343,7 +343,7 @@ std::vector<Battleground const*> BattlegroundMgr::GetActiveBattlegrounds()
     for (auto const& [bgType, bgData] : bgDataStore)
         for (auto const& [id, bg] : bgData._Battlegrounds)
             if (bg->GetStatus() == STATUS_WAIT_JOIN || bg->GetStatus() == STATUS_IN_PROGRESS)
-                result.push_back(static_cast<const Battleground*>(bg));
+                result.push_back(static_cast<Battleground const*>(bg));
 
     return result;
 }
@@ -718,7 +718,7 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
 
 uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
-    uint8 arenaType = 0;
+    uint8 arenaType = ARENA_TYPE_NONE;
 
     if (BattlegroundMgr::QueueToArenaType.find(bgQueueTypeId) != BattlegroundMgr::QueueToArenaType.end())
     {

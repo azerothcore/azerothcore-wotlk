@@ -40,7 +40,7 @@ enum AuctionHouseHook
 class AuctionHouseScript : public ScriptObject
 {
 protected:
-    AuctionHouseScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    AuctionHouseScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when an auction is added to an auction house.

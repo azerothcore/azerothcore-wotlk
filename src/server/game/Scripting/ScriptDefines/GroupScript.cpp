@@ -33,7 +33,7 @@ void ScriptMgr::OnGroupInviteMember(Group* group, ObjectGuid guid)
     CALL_ENABLED_HOOKS(GroupScript, GROUPHOOK_ON_INVITE_MEMBER, script->OnInviteMember(group, guid));
 }
 
-void ScriptMgr::OnGroupRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, const char* reason)
+void ScriptMgr::OnGroupRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, char const* reason)
 {
     ASSERT(group);
 
@@ -64,7 +64,7 @@ void ScriptMgr::OnCreate(Group* group, Player* leader)
     CALL_ENABLED_HOOKS(GroupScript, GROUPHOOK_ON_CREATE, script->OnCreate(group, leader));
 }
 
-GroupScript::GroupScript(const char* name, std::vector<uint16> enabledHooks)
+GroupScript::GroupScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, GROUPHOOK_END)
 {
     // If empty - enable all available hooks.

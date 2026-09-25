@@ -211,13 +211,6 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     if (pUser->m_mover != pUser)
         return;
 
-    // xinef: additional check, client outputs message on its own
-    if (!pUser->IsAlive())
-    {
-        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, nullptr, nullptr);
-        return;
-    }
-
     uint8 bagIndex, slot;
 
     recvPacket >> bagIndex >> slot;
@@ -228,6 +221,15 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     if (!item)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
+        return;
+    }
+
+    // The client locks the item when it sends CMSG_OPEN_ITEM and only unlocks it on a loot
+    // response for that item's guid, so a plain equip error would leave it grayed out until /reload.
+    if (!pUser->IsAlive())
+    {
+        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, item, nullptr);
+        pUser->SendLootRelease(item->GetGUID());
         return;
     }
 
@@ -477,7 +479,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         // pussywizard: casting player's spells from vehicle when seat allows it
         // if ANYTHING CHANGES in this function, INFORM ME BEFORE applying!!!
         if (Vehicle* veh = mover->GetVehicleKit())
-            if (const VehicleSeatEntry* seat = veh->GetSeatForPassenger(_player))
+            if (VehicleSeatEntry const* seat = veh->GetSeatForPassenger(_player))
                 if (seat->m_flags & VEHICLE_SEAT_FLAG_CAN_ATTACK || spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_OPEN_LOCK /*allow looting from vehicle, but only if player has required spell (all necessary opening spells are in playercreateinfo_spell)*/)
                     if ((mover->IsCreature() && !mover->ToCreature()->HasSpell(spellId)) || spellInfo->IsPassive()) // the creature can't cast that spell, check player instead
                     {

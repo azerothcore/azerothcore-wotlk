@@ -68,7 +68,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     LOG_INFO("server.loading", " ");
 }
 
-void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table, bool (*check)(uint32))
+void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table, bool (*check)(uint32))
 {
     QueryResult result = CharacterDatabase.Query("SELECT DISTINCT {} FROM {}", column, table);
     if (!result)

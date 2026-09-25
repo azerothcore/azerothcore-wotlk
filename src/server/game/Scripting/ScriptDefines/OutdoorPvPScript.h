@@ -23,7 +23,7 @@
 class OutdoorPvPScript : public ScriptObject
 {
 protected:
-    OutdoorPvPScript(const char* name);
+    OutdoorPvPScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }

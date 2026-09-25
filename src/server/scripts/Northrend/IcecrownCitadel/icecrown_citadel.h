@@ -62,6 +62,9 @@ enum SharedSpells
     SPELL_UNSATED_CRAVING               = 71168,
     SPELL_SHADOWS_FATE                  = 71169,
 
+    // Empowering Blood Orb
+    SPELL_EMPOWERED_BLOOD               = 70227,
+
     // Misc
     SPELL_WEB_BEAM                      = 69887,
     SPELL_WEB_BEAM2                     = 69986,
@@ -131,6 +134,8 @@ enum DataTypes
     DATA_ENEMY_GUNSHIP              = 40,
     DATA_THE_SKYBREAKER             = 41,
     DATA_ORGRIMS_HAMMER             = 42,
+    DATA_SAURFANG_CAMP              = 43,
+    DATA_SAURFANG_OUTRO_ZEPPELIN    = 44,
 
     // pussywizard:
     DATA_BUFF_AVAILABLE             = 251,
@@ -247,6 +252,14 @@ enum CreaturesIds
     NPC_SE_HIGH_OVERLORD_SAURFANG               = 37187,
     NPC_SE_KOR_KRON_REAVER                      = 37920,
     NPC_SE_SKYBREAKER_MARINE                    = 37830,
+    NPC_SE_STORMWIND_PORTAL                     = 37880,
+    // Victory camp raised on Deathbringer's Rise once Saurfang is defeated
+    NPC_CAMP_ALLIANCE_MASON                     = 37902,
+    NPC_CAMP_SHELY_STEELBOWELS                  = 37903,    // Alliance blacksmith
+    NPC_CAMP_BRAZIE_GETZ                        = 37904,    // Alliance general goods
+    NPC_CAMP_WARSONG_PEON                       = 37930,
+    NPC_CAMP_APOTHECARY_CANDITH_TOMAS           = 37935,    // Horde general goods
+    NPC_CAMP_MORGAN_DAYBLAZE                    = 37936,    // Horde blacksmith
     NPC_FROST_FREEZE_TRAP                       = 37744,
 
     // Festergut
@@ -282,6 +295,13 @@ enum CreaturesIds
     NPC_KINETIC_BOMB_TARGET                     = 38458,
     NPC_KINETIC_BOMB                            = 38454,
     NPC_SHOCK_VORTEX                            = 38422,
+    NPC_DARKFALLEN_BLOOD_KNIGHT                 = 37595,
+    NPC_DARKFALLEN_NOBLE                        = 37663,
+    NPC_DARKFALLEN_ARCHMAGE                     = 37664,
+    NPC_DARKFALLEN_ADVISOR                      = 37571,
+    NPC_DARKFALLEN_TACTICIAN                    = 37666,
+    NPC_VAMPIRIC_FIEND                          = 37901,
+    NPC_ORB_VISUAL_STALKER                      = 38463,
 
     // Blood-Queen Lana'thel
     NPC_BLOOD_QUEEN_LANA_THEL                   = 37955,
@@ -415,6 +435,20 @@ enum GameObjectsIds
     GO_DEATHBRINGER_S_CACHE_10H             = 202238,
     GO_DEATHBRINGER_S_CACHE_25H             = 202241,
     GO_SCOURGE_TRANSPORTER_SAURFANG         = 202244,
+    // Victory camp. Forge, bonfire and anvil are the Horde camp's and have spawn rows - the script
+    // only raises them; everything else, the Alliance camp included, it summons.
+    GO_SAURFANG_CAMP_FORGE                  = 1685,
+    GO_SAURFANG_CAMP_BONFIRE                = 187852,
+    GO_SAURFANG_CAMP_ANVIL                  = 191345,
+    GO_SAURFANG_CAMP_TENT_A                 = 201868,
+    GO_SAURFANG_CAMP_TENT_H1                = 201886,
+    GO_SAURFANG_CAMP_TENT_H2                = 201887,
+    GO_SAURFANG_CAMP_TELEPORTER_A           = 201858,
+    GO_SAURFANG_CAMP_TELEPORTER_H           = 201880,
+    GO_SAURFANG_CAMP_BANNER_A               = 201869,
+    GO_SAURFANG_CAMP_ANVIL_A                = 1684,     // the Alliance camp uses its own anvil
+    // Zeppelin is a MO_TRANSPORT (taxi path 1834) created through TransportMgr, like the gunships.
+    GO_SAURFANG_OUTRO_ZEPPELIN              = 201834,
 
     // Professor Putricide
     GO_ORANGE_PLAGUE_MONSTER_ENTRANCE       = 201371,
@@ -434,6 +468,7 @@ enum GameObjectsIds
     GO_CRIMSON_HALL_DOOR                    = 201376,
     GO_BLOOD_ELF_COUNCIL_DOOR               = 201378,
     GO_BLOOD_ELF_COUNCIL_DOOR_RIGHT         = 201377,
+    GO_EMPOWERING_BLOOD_ORB                 = 201741,
 
     // Blood-Queen Lana'thel
     GO_DOODAD_ICECROWN_BLOODPRINCE_DOOR_01  = 201746,

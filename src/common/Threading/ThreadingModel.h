@@ -41,8 +41,8 @@ namespace Acore
         }
 
     private:
-        GeneralLock(const GeneralLock&);
-        GeneralLock& operator=(const GeneralLock&);
+        GeneralLock(GeneralLock const&);
+        GeneralLock& operator=(GeneralLock const&);
         MUTEX& i_mutex;
     };
 
@@ -55,11 +55,11 @@ namespace Acore
             Lock()
             {
             }
-            Lock(const T&)
+            Lock(T const&)
             {
             }
 
-            Lock(const SingleThreaded<T>&)              // for single threaded we ignore this
+            Lock(SingleThreaded<T> const&)              // for single threaded we ignore this
             {
             }
         };
@@ -90,8 +90,8 @@ namespace Acore
 
     private:
         // prevent the compiler creating a copy construct
-        ObjectLevelLockable(const ObjectLevelLockable<T, MUTEX>&);
-        ObjectLevelLockable<T, MUTEX>& operator=(const ObjectLevelLockable<T, MUTEX>&);
+        ObjectLevelLockable(ObjectLevelLockable<T, MUTEX> const&);
+        ObjectLevelLockable<T, MUTEX>& operator=(ObjectLevelLockable<T, MUTEX> const&);
 
         MUTEX i_mtx;
     };
@@ -109,12 +109,12 @@ namespace Acore
         class Lock
         {
         public:
-            Lock(const T& /*host*/)
+            Lock(T const& /*host*/)
             {
                 ClassLevelLockable<T, MUTEX>::si_mtx.lock();
             }
 
-            Lock(const ClassLevelLockable<T, MUTEX>&)
+            Lock(ClassLevelLockable<T, MUTEX> const&)
             {
                 ClassLevelLockable<T, MUTEX>::si_mtx.lock();
             }

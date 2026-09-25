@@ -47,3 +47,5 @@ if (BUILD_TOOLS_MAPS)
   add_subdirectory(libmpq)
   add_subdirectory(fkYAML)
 endif()
+
+add_subdirectory(libsidecar)

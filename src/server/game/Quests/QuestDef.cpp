@@ -199,7 +199,7 @@ void Quest::LoadQuestTemplateAddon(Field* fields)
 uint32 Quest::XPValue(uint8 playerLevel) const
 {
     int32 quest_level = (Level == -1 ? playerLevel : Level);
-    const QuestXPEntry* xpentry = sQuestXPStore.LookupEntry(quest_level);
+    QuestXPEntry const* xpentry = sQuestXPStore.LookupEntry(quest_level);
     if (!xpentry)
     {
         return 0;

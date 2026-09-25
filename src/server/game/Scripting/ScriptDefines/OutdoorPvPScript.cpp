@@ -27,7 +27,7 @@ OutdoorPvP* ScriptMgr::CreateOutdoorPvP(OutdoorPvPData const* data)
     return tempScript ? tempScript->GetOutdoorPvP() : nullptr;
 }
 
-OutdoorPvPScript::OutdoorPvPScript(const char* name)
+OutdoorPvPScript::OutdoorPvPScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<OutdoorPvPScript>::AddScript(this);

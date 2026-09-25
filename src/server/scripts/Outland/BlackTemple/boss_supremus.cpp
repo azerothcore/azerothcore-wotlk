@@ -186,27 +186,24 @@ struct npc_supremus_punch_invisible_stalker : public ScriptedAI
 {
     npc_supremus_punch_invisible_stalker(Creature* creature) : ScriptedAI(creature) { }
 
-    void IsSummonedBy(WorldObject* /*summoner*/) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
-        me->SetInCombatWithZone();
-        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-            me->AddThreat(target, 10000.f);
-
         DoCastSelf(SPELL_MOLTEN_FLAME, true);
+
+        // Trigger creatures cannot have their own threat list, pick the chase target from the summoner's
+        if (Creature* supremus = summoner->ToCreature())
+            if (Unit* target = supremus->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                me->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
 
         scheduler.Schedule(6s, 10s, [this](TaskContext /*context*/)
         {
-            me->CombatStop();
-            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->MoveIdle();
         });
     }
 
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-
-        if (!UpdateVictim())
-            return;
     }
 };
 

@@ -66,6 +66,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mFollowCreditType = 0;
     mFollowArrivedAlive = 0;
     mFollowArrivedTimer = 0;
+    _followCheckTimer = 0;
     mInvincibilityHpLevel = 0;
 
     mJustReset = false;
@@ -338,6 +339,8 @@ void SmartAI::StopPath(uint32 DespawnTime, uint32 quest, bool fail)
     if (quest)
         mEscortQuestID = quest;
 
+    mCanRepeatPath = false;
+
     SetDespawnTime(DespawnTime);
 
     if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == ESCORT_MOTION_TYPE)
@@ -594,7 +597,25 @@ void SmartAI::UpdateAI(uint32 diff)
         return;
 
     if (mCanAutoAttack)
+    {
+        UpdateMeleeStance();
         DoMeleeAttackIfReady();
+    }
+}
+
+void SmartAI::UpdateMeleeStance()
+{
+    // Ranged creatures should not switch to melee stance at distance
+    if (!_currentRangeMode || me->IsCrowdControlled())
+        return;
+
+    Unit* victim = me->GetVictim();
+    if (!victim)
+        return;
+
+    bool const canMelee = me->IsWithinMeleeRange(victim);
+    if (canMelee != me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+        me->Attack(victim, canMelee);
 }
 
 bool SmartAI::IsEscortInvokerInRange()
@@ -739,7 +760,9 @@ void SmartAI::EnterEvadeMode(EvadeReason why)
 
     if (Unit* owner = me->GetCharmerOrOwner())
     {
-        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+        if (!me->IsVehicle()) // vehicles should not follow their owner (passenger)
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+
         me->ClearUnitState(UNIT_STATE_EVADE);
     }
     else if (HasEscortState(SMART_ESCORT_ESCORTING))
@@ -869,6 +892,12 @@ void SmartAI::JustReachedHome()
             me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
     }
 
+    if (_mainSpellId)
+    {
+        SetMainSpell(_mainSpellId);
+        SetCombatMovement(true, false);
+    }
+
     mJustReset = false;
 }
 
@@ -876,7 +905,14 @@ void SmartAI::JustEngagedWith(Unit* enemy)
 {
     // Xinef: Interrupt channeled spells
     if (IsAIControlled())
-        me->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+    {
+        if (Spell* spell = me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+        {
+            if (!spell->GetSpellInfo()->IsActionAllowedChannel())
+                me->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+        }
+    }
+
     GetScript()->ProcessEventsFor(SMART_EVENT_AGGRO, enemy);
 }
 
@@ -918,7 +954,7 @@ void SmartAI::AttackStart(Unit* who)
         return;
     }
 
-    if (who && me->Attack(who, mCanAutoAttack))
+    if (who && me->Attack(who, mCanAutoAttack && !_currentRangeMode))
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
@@ -1002,23 +1038,43 @@ void SmartAI::InitializeAI()
 {
     GetScript()->OnInitialize(me);
 
+    auto getSpellAndFlags = [](SmartScriptHolder const& event, uint32& spellId, uint32& flags) -> bool
+    {
+        if (event.GetActionType() == SMART_ACTION_CAST)
+        {
+            spellId = event.action.cast.spell;
+            flags = event.action.cast.castFlags;
+            return true;
+        }
+        else if (event.GetActionType() == SMART_ACTION_CUSTOM_CAST)
+        {
+            spellId = event.action.castCustom.spell;
+            flags = event.action.castCustom.flags;
+            return true;
+        }
+        return false;
+    };
+
     for (SmartScriptHolder const& event : GetScript()->GetEvents())
     {
-        if (event.GetActionType() != SMART_ACTION_CAST)
+        uint32 spellId = 0;
+        uint32 flags = 0;
+        if (!getSpellAndFlags(event, spellId, flags))
             continue;
 
-        if (!(event.action.cast.castFlags & SMARTCAST_MAIN_SPELL))
+        if (!(flags & SMARTCAST_MAIN_SPELL))
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(event.action.cast.spell);
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (spellInfo && spellInfo->IsPositive())
         {
-            LOG_WARN("scripts.ai", "SmartAI: Creature {} has SMARTCAST_MAIN_SPELL on positive spell {} - positive spells should not be used as main spell",
-                me->GetEntry(), event.action.cast.spell);
+            LOG_WARN("scripts.ai",
+                "SmartAI: Creature {} has SMARTCAST_MAIN_SPELL on positive spell {} - "
+                "positive spells should not be used as main spell", me->GetEntry(), spellId);
             continue;
         }
 
-        SetMainSpell(event.action.cast.spell);
+        SetMainSpell(spellId);
         break;
     }
 
@@ -1027,18 +1083,20 @@ void SmartAI::InitializeAI()
     {
         for (SmartScriptHolder const& event : GetScript()->GetEvents())
         {
-            if (event.GetActionType() != SMART_ACTION_CAST)
+            uint32 spellId = 0;
+            uint32 flags = 0;
+            if (!getSpellAndFlags(event, spellId, flags))
                 continue;
 
-            if (!(event.action.cast.castFlags & SMARTCAST_COMBAT_MOVE))
+            if (!(flags & SMARTCAST_COMBAT_MOVE))
                 continue;
 
             // Don't use positive (healing/buff) spells to determine attack distance
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(event.action.cast.spell);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (spellInfo && spellInfo->IsPositive())
                 continue;
 
-            SetMainSpell(event.action.cast.spell);
+            SetMainSpell(spellId);
             break;
         }
     }
@@ -1151,7 +1209,7 @@ void SmartAI::sGossipSelect(Player* player, uint32 sender, uint32 action)
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_SELECT, player, sender, action);
 }
 
-void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/)
+void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/)
 {
 }
 
@@ -1180,7 +1238,7 @@ void SmartAI::SetCombatMovement(bool on, bool stopOrStartMovement)
         if (!me->IsCrowdControlled())
         {
             if (on)
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                me->GetMotionMaster()->MoveChase(me->GetVictim(), _currentRangeMode ? _attackDistance : 0.0f);
             else if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
                 me->StopMoving();
         }
@@ -1193,7 +1251,14 @@ void SmartAI::SetCurrentRangeMode(bool on, float range)
     _attackDistance = range;
 
     if (Unit* victim = me->GetVictim())
-        me->GetMotionMaster()->MoveChase(victim, _attackDistance);
+    {
+        if (me->IsCombatMovementAllowed() && !me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT)
+            && !me->IsMovementPreventedByCasting())
+            me->GetMotionMaster()->MoveChase(victim, _attackDistance);
+
+        if (!on && mCanAutoAttack && !me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+            me->Attack(victim, true);
+    }
 }
 
 void SmartAI::SetMainSpell(uint32 spellId)
@@ -1235,6 +1300,7 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
     mFollowDist = dist;
     mFollowAngle = angle;
     mFollowArrivedTimer = 1000;
+    _followCheckTimer = 0;
     mFollowCredit = credit;
     mFollowArrivedEntry = end;
     mFollowArrivedAlive = !aliveState; // negate - 0 is alive
@@ -1335,13 +1401,29 @@ void SmartAI::DistancingEnded()
 
 bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
 {
-    if (me->HasSpellCooldown(spellInfo->Id))
+    if (me->IsSpellProhibited(spellInfo->GetSchoolMask()))
         return true;
 
     if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
         return true;
+
     if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
         return true;
+
+    int32 powerCost = spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask());
+    if (spellInfo->PowerType == POWER_HEALTH)
+    {
+        if ((int32)me->GetHealth() <= powerCost)
+            return true;
+    }
+    else
+    {
+        Powers power = (spellInfo->PowerType < MAX_POWERS)
+            ? Powers(spellInfo->PowerType)
+            : me->getPowerType();
+        if ((int32)me->GetPower(power) < powerCost)
+            return true;
+    }
 
     return false;
 }
@@ -1349,9 +1431,19 @@ bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
 void SmartAI::OnSpellFailed(SpellInfo const* spell)
 {
     CreatureAI::OnSpellFailed(spell);
+
+    // If another cast or channel is still active, do not resume combat movement
+    if (me->IsMovementPreventedByCasting())
+        return;
+
     if (_mainSpellId == spell->Id)
+    {
         if (_currentRangeMode && IsMainSpellPrevented(spell))
-            SetCurrentRangeMode(false);
+        {
+            SetCombatMovement(true, false);
+            SetCurrentRangeMode(false, 0.f);
+        }
+    }
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
@@ -1404,7 +1496,7 @@ bool SmartGameObjectAI::GossipSelect(Player* player, uint32 sender, uint32 actio
 }
 
 // Called when a player selects a gossip with a code in the gameobject's gossip menu.
-bool SmartGameObjectAI::GossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/)
+bool SmartGameObjectAI::GossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/)
 {
     return false;
 }

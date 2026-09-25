@@ -63,9 +63,10 @@ struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
 
     Player* GetOwner() const { return ObjectAccessor::GetPlayer(*me, ownerGUID); }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id == SPELL_STEAL_ESSENCE_VISUAL && target == me)
+        // Handle the kill notification from the owner's kill aura (spell 50051)
+        if (spellInfo->Id == SPELL_OWNER_KILLED_INFORM)
         {
             Talk(1);
             events.ScheduleEvent(EVENT_ADD_TOKEN, 3s);
@@ -83,7 +84,10 @@ struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
                 break;
             case EVENT_ADD_TOKEN:
                 me->RemoveAurasDueToSpell(SPELL_EMOTE_STATE_SWIM_RUN);
-                me->CastSpell(me, SPELL_CREATE_TOKEN, true);
+                // Cast the token creation spell on the player owner, not on the pet
+                if (Player* owner = GetOwner())
+                    me->CastSpell(owner, SPELL_CREATE_TOKEN, true);
+
                 Talk(2);
                 break;
         }
@@ -128,7 +132,7 @@ struct argentPonyBanner
 {
     uint32 achievement;
     uint32 spell;
-    const char* text;
+    char const* text;
 };
 
 static std::unordered_map<uint8, argentPonyBanner> argentBanners = {
@@ -825,16 +829,6 @@ struct npc_pet_darting_hatchling : public NullCreatureAI
     }
 };
 
-struct npc_pet_proto_drake_whelp : public NullCreatureAI
-{
-    npc_pet_proto_drake_whelp(Creature* c) : NullCreatureAI(c) { }
-
-    void Reset() override
-    {
-        me->SetAnimTier(AnimTier::Fly);
-    }
-};
-
 void AddSC_generic_pet_scripts()
 {
     RegisterCreatureAI(npc_pet_gen_soul_trader_beacon);
@@ -850,5 +844,4 @@ void AddSC_generic_pet_scripts()
     RegisterCreatureAI(npc_pet_gen_fetch_ball);
     RegisterCreatureAI(npc_pet_gen_moth);
     RegisterCreatureAI(npc_pet_darting_hatchling);
-    RegisterCreatureAI(npc_pet_proto_drake_whelp);
 }

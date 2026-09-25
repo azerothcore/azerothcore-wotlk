@@ -42,7 +42,7 @@ enum GuildHook
 class GuildScript : public ScriptObject
 {
 protected:
-    GuildScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    GuildScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
@@ -54,13 +54,13 @@ public:
     virtual void OnRemoveMember(Guild* /*guild*/, Player* /*player*/, bool /*isDisbanding*/, bool /*isKicked*/) { }
 
     // Called when the guild MOTD (message of the day) changes.
-    virtual void OnMOTDChanged(Guild* /*guild*/, const std::string& /*newMotd*/) { }
+    virtual void OnMOTDChanged(Guild* /*guild*/, std::string const& /*newMotd*/) { }
 
     // Called when the guild info is altered.
-    virtual void OnInfoChanged(Guild* /*guild*/, const std::string& /*newInfo*/) { }
+    virtual void OnInfoChanged(Guild* /*guild*/, std::string const& /*newInfo*/) { }
 
     // Called when a guild is created.
-    virtual void OnCreate(Guild* /*guild*/, Player* /*leader*/, const std::string& /*name*/) { }
+    virtual void OnCreate(Guild* /*guild*/, Player* /*leader*/, std::string const& /*name*/) { }
 
     // Called when a guild is disbanded.
     virtual void OnDisband(Guild* /*guild*/) { }

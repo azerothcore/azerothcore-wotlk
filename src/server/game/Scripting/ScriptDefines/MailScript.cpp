@@ -24,7 +24,7 @@ void ScriptMgr::OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver c
     CALL_ENABLED_HOOKS(MailScript, MAILHOOK_ON_BEFORE_MAIL_DRAFT_SEND_MAIL_TO, script->OnBeforeMailDraftSendMailTo(mailDraft, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail));
 }
 
-MailScript::MailScript(const char* name, std::vector<uint16> enabledHooks)
+MailScript::MailScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, MAILHOOK_END)
 {
     // If empty - enable all available hooks.

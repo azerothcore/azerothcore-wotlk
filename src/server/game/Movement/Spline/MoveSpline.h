@@ -27,8 +27,8 @@ namespace Movement
     {
         Location()  = default;
         Location(float x, float y, float z, float o) : Vector3(x, y, z), orientation(o) {}
-        Location(const Vector3& v) : Vector3(v) {}
-        Location(const Vector3& v, float o) : Vector3(v), orientation(o) {}
+        Location(Vector3 const& v) : Vector3(v) {}
+        Location(Vector3 const& v, float o) : Vector3(v), orientation(o) {}
 
         float orientation{0};
     };
@@ -69,10 +69,10 @@ namespace Movement
         int32           point_Idx;
         int32           point_Idx_offset;
 
-        void init_spline(const MoveSplineInitArgs& args);
+        void init_spline(MoveSplineInitArgs const& args);
 
     protected:
-        [[nodiscard]] const MySpline::ControlArray& getPath() const { return spline.getPoints(); }
+        [[nodiscard]] MySpline::ControlArray const& getPath() const { return spline.getPoints(); }
         void computeParabolicElevation(float& el) const;
         void computeFallElevation(float& el) const;
 
@@ -91,7 +91,7 @@ namespace Movement
         void _Interrupt() { splineflags.done = true; }
 
     public:
-        void Initialize(const MoveSplineInitArgs&);
+        void Initialize(MoveSplineInitArgs const&);
         [[nodiscard]] bool Initialized() const { return !spline.empty(); }
 
         MoveSpline();

@@ -150,7 +150,7 @@ void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
     for (int i = 0; i < NA_HALAA_CREATURE_TEAM_SPAWN; i++)
     {
         ObjectGuid::LowType spawnId = teamNPC[i];
-        const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
+        CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
         if (data)
         {
             UpdateCreatureHalaa(spawnId, _pvp->GetMap(), data->posX, data->posY);
@@ -162,7 +162,7 @@ void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
 
 void OPvPCapturePointNA::SpawnGOsForTeam(TeamId teamId)
 {
-    const go_type* gos = nullptr;
+    go_type const* gos = nullptr;
     if (teamId == TEAM_ALLIANCE)
         gos = AllianceControlGOs;
     else if (teamId == TEAM_HORDE)
@@ -470,7 +470,7 @@ int32 OPvPCapturePointNA::HandleOpenGo(Player* player, GameObject* go)
     int32 retval = OPvPCapturePoint::HandleOpenGo(player, go);
     if (retval >= 0)
     {
-        const go_type* gos = nullptr;
+        go_type const* gos = nullptr;
         if (m_ControllingFaction == TEAM_ALLIANCE)
             gos = AllianceControlGOs;
         else if (m_ControllingFaction == TEAM_HORDE)

@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 
 namespace lfg
@@ -194,7 +195,7 @@ namespace lfg
         return newGroupsProcessed;
     }
 
-    LfgCompatibility LFGQueue::FindNewGroups(const ObjectGuid& newGuid)
+    LfgCompatibility LFGQueue::FindNewGroups(ObjectGuid const& newGuid)
     {
         // each combination of dps+heal+tank (tank*8 + heal+4 + dps) has a value assigned 0..15
         // first 16 bits of the mask are for marking if such combination was found once, second 16 bits for marking second occurence of that combination, etc
@@ -243,7 +244,7 @@ namespace lfg
         return selfCompatibility;
     }
 
-    LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles)
+    LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, ObjectGuid const& newGuid, uint64& foundMask, uint32& foundCount, std::set<Lfg5Guids> const& currentCompatibles)
     {
         LOG_DEBUG("lfg", "CHECK CheckCompatibility: {}, new guid: {}", checkWith.toString(), newGuid.ToString());
         Lfg5Guids check(checkWith, false); // here newGuid is at front
@@ -315,7 +316,7 @@ namespace lfg
         {
             for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
             {
-                const LfgRolesMap& roles = QueueDataStore[check.guids[i]].roles;
+                LfgRolesMap const& roles = QueueDataStore[check.guids[i]].roles;
                 for (LfgRolesMap::const_iterator itRoles = roles.begin(); itRoles != roles.end(); ++itRoles)
                 {
                     LfgRolesMap::const_iterator itPlayer;
@@ -383,7 +384,7 @@ namespace lfg
         else
         {
             ObjectGuid gguid = check.front();
-            const LfgQueueData& queue = QueueDataStore[gguid];
+            LfgQueueData const& queue = QueueDataStore[gguid];
             proposalDungeons = queue.dungeons;
             proposalRoles = queue.roles;
             LFGMgr::CheckGroupRoles(proposalRoles);          // assing new roles
@@ -410,6 +411,9 @@ namespace lfg
 
         if (!sLFGMgr->AllQueued(check)) // can't create proposal
             return LFG_COMPATIBILITY_PENDING;
+
+        if (!sScriptMgr->CanCreateLfgProposal(proposal.queues))
+            return LFG_INCOMPATIBLES_REJECTED_BY_SCRIPT;
 
         // Create a new proposal
         proposal.cancelTime = GameTime::GetGameTime().count() + LFG_TIME_PROPOSAL;

@@ -54,7 +54,7 @@ void ScriptMgr::OnWorldObjectUpdate(WorldObject* object, uint32 diff)
     CALL_ENABLED_HOOKS(WorldObjectScript, WORLDOBJECTHOOK_ON_WORLD_OBJECT_UPDATE, script->OnWorldObjectUpdate(object, diff));
 }
 
-WorldObjectScript::WorldObjectScript(const char* name, std::vector<uint16> enabledHooks)
+WorldObjectScript::WorldObjectScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, WORLDOBJECTHOOK_END)
 {
     // If empty - enable all available hooks.

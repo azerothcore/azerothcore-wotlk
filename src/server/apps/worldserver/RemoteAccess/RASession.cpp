@@ -120,7 +120,7 @@ std::string RASession::ReadString()
     return line;
 }
 
-bool RASession::CheckAccessLevel(const std::string& user)
+bool RASession::CheckAccessLevel(std::string const& user)
 {
     std::string safeUser = user;
 
@@ -152,7 +152,7 @@ bool RASession::CheckAccessLevel(const std::string& user)
     return true;
 }
 
-bool RASession::CheckPassword(const std::string& user, const std::string& pass)
+bool RASession::CheckPassword(std::string const& user, std::string const& pass)
 {
     std::string safe_user = user;
     std::transform(safe_user.begin(), safe_user.end(), safe_user.begin(), ::toupper);

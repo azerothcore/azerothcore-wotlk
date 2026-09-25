@@ -537,6 +537,25 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
                 return false;
             return IsSAIBoolValid(e, e.target.formation.excludeSelf);
         }
+        case SMART_TARGET_SHARED_OWNER_ENTITIES:
+        {
+            if (e.target.sharedOwnerEntities.type != 1 && e.target.sharedOwnerEntities.type != 2)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid shared owner entities type as target ({}, must be 1 or 2).",
+                    e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType(), e.target.sharedOwnerEntities.type);
+                return false;
+            }
+
+            if (e.target.sharedOwnerEntities.entry)
+            {
+                if (e.target.sharedOwnerEntities.type == 1 && !IsCreatureValid(e, e.target.sharedOwnerEntities.entry))
+                    return false;
+
+                if (e.target.sharedOwnerEntities.type == 2 && !IsGameObjectValid(e, e.target.sharedOwnerEntities.entry))
+                    return false;
+            }
+            break;
+        }
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
@@ -963,6 +982,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_SUMMONED_CREATURES: return sizeof(SmartTarget::summonedCreatures);
             case SMART_TARGET_INSTANCE_STORAGE: return sizeof(SmartTarget::instanceStorage);
             case SMART_TARGET_FORMATION: return sizeof(SmartTarget::formation);
+            case SMART_TARGET_SHARED_OWNER_ENTITIES: return sizeof(SmartTarget::sharedOwnerEntities);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target {} with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
@@ -2070,7 +2090,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_SCALE:
         case SMART_ACTION_SUMMON_RADIAL:
         case SMART_ACTION_PLAY_SPELL_VISUAL:
-        case SMART_ACTION_FOLLOW_GROUP:
         case SMART_ACTION_SET_ORIENTATION_TARGET:
         case SMART_ACTION_WAYPOINT_START:
         case SMART_ACTION_WAYPOINT_DATA_RANDOM:
@@ -2082,6 +2101,15 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP:
         case SMART_ACTION_SPAWN_SPAWNGROUP:
         case SMART_ACTION_DESPAWN_SPAWNGROUP:
+            break;
+        case SMART_ACTION_FOLLOW_GROUP:
+            if (e.action.followGroup.followState &&
+                (e.action.followGroup.followType < FOLLOW_TYPE_CIRCLE || e.action.followGroup.followType >= FOLLOW_TYPE_MAX))
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid follow type {}, skipped.",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.followGroup.followType);
+                return false;
+            }
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

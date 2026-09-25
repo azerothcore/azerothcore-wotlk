@@ -90,12 +90,28 @@ public:
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
-                if (Encounter[i] == IN_PROGRESS && i != BRANN_BRONZEBEARD)
+                // The escort is not an encounter, it must not keep the instance locked
+                if (i == BRANN_BRONZEBEARD)
+                {
+                    continue;
+                }
+
+                // Krystallus and the Maiden of Grief are tracked through SetData, the rest through boss states
+                if (Encounter[i] == IN_PROGRESS || GetBossState(i) == IN_PROGRESS)
                 {
                     return true;
                 }
             }
             return false;
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            if (unit->IsPlayer() && GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
+            {
+                if (Creature* brann = instance->GetCreature(GetGuidData(NPC_BRANN)))
+                    brann->AI()->DoAction(ACTION_PLAYER_DEATH_IN_TRIBUNAL);
+            }
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -107,7 +123,8 @@ public:
                     break;
                 case GO_ABEDNEUM:
                     goAbedneumGUID = go->GetGUID();
-                    if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
+                    // Encounter[] is toggled back and forth by the post event lore, the boss state is the reliable one
+                    if (GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_MARNAK:
@@ -118,7 +135,7 @@ public:
                     break;
                 case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
-                    if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
+                    if (GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_SJONNIR_CONSOLE:
@@ -126,7 +143,7 @@ public:
                     break;
                 case GO_SJONNIR_DOOR:
                     goSjonnirDoorGUID = go->GetGUID();
-                    if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
+                    if (GetBossState(BRANN_DOOR) == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_LEFT_PIPE:
@@ -146,7 +163,6 @@ public:
                     BrannGUID = creature->GetGUID();
                     break;
             }
-
             InstanceScript::OnCreatureCreate(creature);
         }
 
@@ -191,6 +207,7 @@ public:
                 case BOSS_TRIBUNAL_OF_AGES:
                 case BOSS_SJONNIR:
                 case BRANN_BRONZEBEARD:
+                case BRANN_DOOR:
                     return Encounter[id];
             }
 
@@ -308,6 +325,12 @@ public:
                     pSkyRoomFloor->SetGoState(GO_STATE_READY);
             }
 
+            if (type == BRANN_DOOR && data == DONE)
+            {
+                if (GameObject* pSjonnirDoor = instance->GetGameObject(goSjonnirDoorGUID))
+                    pSjonnirDoor->SetGoState(GO_STATE_ACTIVE);
+            }
+
             if (type == DATA_BRANN_ACHIEVEMENT)
             {
                 brannAchievement = (bool)data;
@@ -330,6 +353,7 @@ public:
             data >> Encounter[2];
             data >> Encounter[3];
             data >> Encounter[4];
+            data >> Encounter[5];
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
@@ -338,7 +362,8 @@ public:
                 << Encounter[1] << ' '
                 << Encounter[2] << ' '
                 << Encounter[3] << ' '
-                << Encounter[4] << ' ';
+                << Encounter[4] << ' '
+                << Encounter[5] << ' ';
         }
     };
 };

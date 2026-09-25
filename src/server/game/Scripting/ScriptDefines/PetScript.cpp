@@ -51,7 +51,7 @@ void ScriptMgr::OnPetAddToWorld(Pet* pet)
     CALL_ENABLED_HOOKS(PetScript, PETHOOK_ON_PET_ADD_TO_WORLD, script->OnPetAddToWorld(pet));
 }
 
-PetScript::PetScript(const char* name, std::vector<uint16> enabledHooks)
+PetScript::PetScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PETHOOK_END)
 {
     // If empty - enable all available hooks.

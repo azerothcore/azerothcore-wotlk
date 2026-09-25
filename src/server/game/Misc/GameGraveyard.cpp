@@ -119,6 +119,13 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
     uint32 areaId = 0;
     player->GetZoneAndAreaId(zoneId, areaId);
 
+    return GetClosestGraveyard(mapId, x, y, z, teamId, areaId, zoneId,
+        player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_GRAVEYARD));
+}
+
+GraveyardStruct const* Graveyard::GetClosestGraveyard(uint32 mapId, float x, float y, float z, TeamId teamId,
+    uint32 areaId, uint32 zoneId, bool isDeathKnight)
+{
     if (!zoneId && !areaId)
     {
         if (z > -500)
@@ -202,7 +209,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
             GRAVEYARD_ARCHERUS  = 1405
         };
 
-        if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_GRAVEYARD) && (graveyardLink.safeLocId == GRAVEYARD_EBON_HOLD || graveyardLink.safeLocId == GRAVEYARD_ARCHERUS))
+        if (!isDeathKnight && (graveyardLink.safeLocId == GRAVEYARD_EBON_HOLD || graveyardLink.safeLocId == GRAVEYARD_ARCHERUS))
         {
             continue;
         }
@@ -416,7 +423,7 @@ void Graveyard::LoadGraveyardZones()
     LOG_INFO("server.loading", " ");
 }
 
-GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
+GraveyardStruct const* Graveyard::GetGraveyard(std::string const& name) const
 {
     // explicit name case
     std::wstring wname;
@@ -427,7 +434,7 @@ GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
     wstrToLower(wname);
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
-    const GraveyardStruct* alt = nullptr;
+    GraveyardStruct const* alt = nullptr;
     for (GraveyardContainer::const_iterator itr = _graveyardStore.begin(); itr != _graveyardStore.end(); ++itr)
     {
         if (itr->second.wnameLow == wname)

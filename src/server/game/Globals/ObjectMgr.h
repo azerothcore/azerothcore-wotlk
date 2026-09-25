@@ -877,6 +877,7 @@ public:
         return nullptr;
     }
 
+    [[nodiscard]] AreaTriggerTeleportContainer const& GetAllAreaTriggerTeleports() const { return _areaTriggerTeleportStore; }
     [[nodiscard]] AreaTriggerTeleport const* GetAreaTriggerTeleport(uint32 trigger) const
     {
         AreaTriggerTeleportContainer::const_iterator itr = _areaTriggerTeleportStore.find(trigger);
@@ -1134,8 +1135,6 @@ public:
         return itr != _fishingBaseForAreaStore.end() ? itr->second : 0;
     }
 
-    void ReturnOrDeleteOldMails(bool serverUp);
-
     CreatureBaseStats const* GetCreatureBaseStats(uint8 level, uint8 unitClass);
 
     void SetHighestGuids();
@@ -1177,7 +1176,7 @@ public:
         if (map_itr == _mailLevelRewardStore.end())
             return nullptr;
 
-        for (const auto & set_itr : map_itr->second)
+        for (auto const& set_itr : map_itr->second)
             if (set_itr.raceMask & raceMask)
                 return &set_itr;
 
@@ -1501,7 +1500,7 @@ public:
         else
             return {};
     }
-    static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
+    static inline void GetLocaleString(std::vector<std::string> const& data, int loc_idx, std::string& value)
     {
         if (data.size() > std::size_t(loc_idx) && !data[loc_idx].empty())
             value = data[loc_idx];

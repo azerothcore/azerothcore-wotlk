@@ -136,7 +136,7 @@ public:
     //}
 
     ContainerMapList<OBJECT_TYPES>& GetElements() { return i_elements; }
-    [[nodiscard]] const ContainerMapList<OBJECT_TYPES>& GetElements() const { return i_elements;}
+    [[nodiscard]] ContainerMapList<OBJECT_TYPES> const& GetElements() const { return i_elements;}
 
 private:
     ContainerMapList<OBJECT_TYPES> i_elements;
@@ -163,7 +163,7 @@ public:
     }
 
     ContainerVector<OBJECT_TYPES>& GetElements() { return i_elements; }
-    [[nodiscard]] const ContainerVector<OBJECT_TYPES>& GetElements() const { return i_elements; }
+    [[nodiscard]] ContainerVector<OBJECT_TYPES> const& GetElements() const { return i_elements; }
 
 private:
     ContainerVector<OBJECT_TYPES> i_elements;

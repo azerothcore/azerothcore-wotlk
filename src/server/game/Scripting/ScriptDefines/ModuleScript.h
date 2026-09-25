@@ -25,7 +25,7 @@
 class ModuleScript : public ScriptObject
 {
 protected:
-    ModuleScript(const char* name);
+    ModuleScript(char const* name);
 };
 
 #endif

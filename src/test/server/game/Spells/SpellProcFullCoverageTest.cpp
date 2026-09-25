@@ -353,7 +353,7 @@ INSTANTIATE_TEST_SUITE_P(
     AllSpellProcEntries,
     SpellProcFullCoverageTest,
     ::testing::ValuesIn(GetAllSpellProcTestEntries()),
-    [](const ::testing::TestParamInfo<SpellProcTestEntry>& info) {
+    [](::testing::TestParamInfo<SpellProcTestEntry> const& info) {
         // Generate unique test name from spell ID
         int32_t id = info.param.SpellId;
         if (id < 0)

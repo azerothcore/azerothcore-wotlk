@@ -44,7 +44,7 @@ bool ScriptMgr::CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry c
     CALL_ENABLED_BOOLEAN_HOOKS(AchievementScript, ACHIEVEMENTHOOK_CAN_CHECK_CRITERIA, !script->CanCheckCriteria(mgr, achievementCriteria));
 }
 
-AchievementScript::AchievementScript(const char* name, std::vector<uint16> enabledHooks)
+AchievementScript::AchievementScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, ACHIEVEMENTHOOK_END)
 {
     // If empty - enable all available hooks.

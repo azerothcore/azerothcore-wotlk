@@ -446,7 +446,7 @@ namespace lfg
 
         // World.cpp
         /// Finish the dungeon for the given group. All check are performed using internal lfg data
-        void FinishDungeon(ObjectGuid gguid, uint32 dungeonId, const Map* currMap);
+        void FinishDungeon(ObjectGuid gguid, uint32 dungeonId, Map const* currMap);
         /// Loads rewards for random dungeons
         void LoadRewards();
         /// Loads dungeons from dbc and adds teleport coords
@@ -561,8 +561,8 @@ namespace lfg
         void UpdateRaidBrowser(uint32 diff);
         void LfrSetComment(Player* p, std::string comment);
         void SendRaidBrowserJoinedPacket(Player* p, LfgDungeonSet& dungeons, std::string comment);
-        void RBPacketAppendGroup(const RBInternalInfo& info, ByteBuffer& buffer);
-        void RBPacketAppendPlayer(const RBInternalInfo& info, ByteBuffer& buffer);
+        void RBPacketAppendGroup(RBInternalInfo const& info, ByteBuffer& buffer);
+        void RBPacketAppendPlayer(RBInternalInfo const& info, ByteBuffer& buffer);
         void RBPacketBuildDifference(WorldPacket& differencePacket, uint32 dungeonId, uint32 deletedCounter, ByteBuffer const& bufferDeleted, uint32 groupCounter, ByteBuffer const& bufferGroups, uint32 playerCounter, ByteBuffer const& bufferPlayers);
         void RBPacketBuildFull(WorldPacket& fullPacket, uint32 dungeonId, RBInternalInfoMap const& infoMap);
 
@@ -589,6 +589,7 @@ namespace lfg
         [[nodiscard]] bool IsTesting() const { return m_Testing; }
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
+        LFGDungeonData const* GetLFGDungeon(uint32 id);
 
     private:
         TeamId GetTeam(ObjectGuid guid);
@@ -601,7 +602,6 @@ namespace lfg
         void SetCanOverrideRBState(ObjectGuid guid, bool val);
         void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId = 0);
         void _SaveToDB(ObjectGuid guid);
-        LFGDungeonData const* GetLFGDungeon(uint32 id);
 
         // Proposals
         void RemoveProposal(LfgProposalContainer::iterator itProposal, LfgUpdateType type);
