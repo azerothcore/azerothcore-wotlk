@@ -160,7 +160,7 @@ public:
     uint32 itemid;
     int32  itemRandomPropId;
     uint32 itemRandomSuffix;
-    uint8 itemCount;
+    uint32 itemCount;
     typedef std::map<ObjectGuid, RollVote> PlayerVote;
     PlayerVote playerVote;                              //vote position correspond with player position (in group)
     uint8 totalPlayersRolling;
