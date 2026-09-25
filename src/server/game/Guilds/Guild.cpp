@@ -1286,18 +1286,21 @@ void Guild::HandleSetMOTD(WorldSession* session, std::string_view motd)
     if (!_HasRankRight(session->GetPlayer(), GR_RIGHT_SETMOTD))
         SendCommandResult(session, GUILD_COMMAND_EDIT_MOTD, ERR_GUILD_PERMISSIONS);
     else
-    {
-        m_motd = motd;
+        SetMOTD(motd);
+}
 
-        sScriptMgr->OnGuildMOTDChanged(this, m_motd);
+void Guild::SetMOTD(std::string_view motd)
+{
+    m_motd = motd;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MOTD);
-        stmt->SetData(0, m_motd);
-        stmt->SetData(1, m_id);
-        CharacterDatabase.Execute(stmt);
+    sScriptMgr->OnGuildMOTDChanged(this, m_motd);
 
-        _BroadcastEvent(GE_MOTD, ObjectGuid::Empty, m_motd);
-    }
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MOTD);
+    stmt->SetData(0, m_motd);
+    stmt->SetData(1, m_id);
+    CharacterDatabase.Execute(stmt);
+
+    _BroadcastEvent(GE_MOTD, ObjectGuid::Empty, m_motd);
 }
 
 void Guild::HandleSetInfo(WorldSession* session, std::string_view info)
@@ -1307,16 +1310,19 @@ void Guild::HandleSetInfo(WorldSession* session, std::string_view info)
 
     // Player must have rights to set guild's info
     if (_HasRankRight(session->GetPlayer(), GR_RIGHT_MODIFY_GUILD_INFO))
-    {
-        m_info = info;
+        SetInfo(info);
+}
 
-        sScriptMgr->OnGuildInfoChanged(this, m_info);
+void Guild::SetInfo(std::string_view info)
+{
+    m_info = info;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_INFO);
-        stmt->SetData(0, m_info);
-        stmt->SetData(1, m_id);
-        CharacterDatabase.Execute(stmt);
-    }
+    sScriptMgr->OnGuildInfoChanged(this, m_info);
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_INFO);
+    stmt->SetData(0, m_info);
+    stmt->SetData(1, m_id);
+    CharacterDatabase.Execute(stmt);
 }
 
 void Guild::HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo)
@@ -1330,13 +1336,18 @@ void Guild::HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo)
     {
         player->ModifyMoney(-int32(EMBLEM_PRICE));
 
-        m_emblemInfo = emblemInfo;
-        m_emblemInfo.SaveToDB(m_id);
+        HandleSetEmblem(emblemInfo);
 
         SendSaveEmblemResult(session, ERR_GUILDEMBLEM_SUCCESS); // "Guild Emblem saved."
 
         HandleQuery(session);
     }
+}
+
+void Guild::HandleSetEmblem(EmblemInfo const& emblemInfo)
+{
+    m_emblemInfo = emblemInfo;
+    m_emblemInfo.SaveToDB(m_id);
 }
 
 void Guild::HandleSetLeader(WorldSession* session, std::string_view name)
@@ -1406,6 +1417,29 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_v
 
         LOG_DEBUG("guild", "Changed RankName to '{}', rights to 0x{:08X}", rankInfo->GetName(), rights);
     }
+}
+
+void Guild::HandleSetRankInfo(uint8 rankId, Optional<std::string_view> name, Optional<uint32> rights,
+    Optional<uint32> moneyPerDay)
+{
+    RankInfo* rankInfo = GetRankInfo(rankId);
+    if (!rankInfo)
+        return;
+
+    if (!name && !rights && !moneyPerDay)
+        return;
+
+    if (name)
+        rankInfo->SetName(*name);
+
+    if (rights)
+        rankInfo->SetRights(*rights);
+
+    if (moneyPerDay)
+        _SetRankBankMoneyPerDay(rankId, *moneyPerDay);
+
+    _BroadcastEvent(GE_RANK_UPDATED, ObjectGuid::Empty, std::to_string(rankId), rankInfo->GetName(),
+        std::to_string(m_ranks.size()));
 }
 
 void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
@@ -2628,6 +2662,21 @@ inline bool Guild::_MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 righ
         return (_GetRankBankTabRights(member->GetRankId(), tabId) & rights) == rights;
     }
     return false;
+}
+
+bool Guild::HasRankRight(Player* player, uint32 right) const
+{
+    return _HasRankRight(player, right);
+}
+
+uint32 Guild::GetRankRights(uint8 rankId) const
+{
+    return _GetRankRights(rankId);
+}
+
+bool Guild::MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const
+{
+    return _MemberHasTabRights(guid, tabId, rights);
 }
 
 // Add new event log record
