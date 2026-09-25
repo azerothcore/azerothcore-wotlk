@@ -2810,6 +2810,9 @@ void Map::ProcessRespawns()
 
 void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 {
+    // Consumed by every attempt, or a mark set on a continent would never go away
+    bool const forced = _forcedCreatureRespawns.erase(spawnId) != 0;
+
     // Pool members are handled entirely by the pool system on this map's pool data
     if (uint32 poolId = sPoolMgr->IsPartOfAPool<Creature>(spawnId))
     {
@@ -2865,7 +2868,7 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
     // the check repeats like an inactive group's. A forced Respawn() passes, as force does in compat mode.
     if (InstanceMap* instanceMap = ToInstanceMap())
         if (InstanceScript* script = instanceMap->GetInstanceScript())
-            if (!_forcedCreatureRespawns.erase(spawnId) && script->IsBossSpawnDone(spawnId))
+            if (!forced && script->IsBossSpawnDone(spawnId))
             {
                 _respawnQueue.insert({GameTime::GetGameTime().count() + 5, SPAWN_TYPE_CREATURE, spawnId});
                 return;
