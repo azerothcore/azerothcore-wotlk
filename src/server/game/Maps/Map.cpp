@@ -2519,6 +2519,13 @@ void Map::RemoveCreatureRespawnTime(ObjectGuid::LowType spawnId)
     CharacterDatabase.Execute(stmt);
 }
 
+void Map::ForceCreatureRespawn(ObjectGuid::LowType spawnId)
+{
+    time_t now = GameTime::GetGameTime().count();
+    SaveCreatureRespawnTime(spawnId, now);
+    _forcedCreatureRespawns.insert(spawnId);
+}
+
 void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
 {
     if (!respawnTime)

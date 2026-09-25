@@ -433,8 +433,8 @@ public:
 
     void SaveCreatureRespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
     void RemoveCreatureRespawnTime(ObjectGuid::LowType dbGuid);
-    // A forced Respawn() must bypass the DONE-boss hold in ProcessCreatureRespawn, like force does in compat mode
-    void MarkForcedCreatureRespawn(ObjectGuid::LowType dbGuid) { _forcedCreatureRespawns.insert(dbGuid); }
+    // Queues the spawn for the next respawn pass and lets it through the DONE-boss hold, as force bypasses CanRespawn in compat mode
+    void ForceCreatureRespawn(ObjectGuid::LowType dbGuid);
     void SaveGORespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
     void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
     [[nodiscard]] std::unordered_map<ObjectGuid::LowType, time_t> const& GetCreatureRespawnTimes() const { return _creatureRespawnTimes; }
