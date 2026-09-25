@@ -115,7 +115,7 @@ public:
 
     int32 GetOldAmount() const { return m_oldAmount; }
     void SetOldAmount(int32 amount) { m_oldAmount = amount; }
-    [[nodiscard]] bool GetEnabled() const { return m_isAuraEnabled; }
+    [[nodiscard]] bool IsEnabled() const { return m_isAuraEnabled; }
     void SetEnabled(bool enabled) { m_isAuraEnabled = enabled; }
 
 private:
