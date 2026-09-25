@@ -1637,7 +1637,7 @@ public:
     void EnergizeBySpell(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
 
     // Spells immunities
-    void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType blockType = SPELL_BLOCK_TYPE_ALL);
+    void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply);
     virtual bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr);
     bool IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster);
     bool IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster, SpellSchoolMask spellSchoolMask);
