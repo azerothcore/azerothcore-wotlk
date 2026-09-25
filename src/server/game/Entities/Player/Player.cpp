@@ -12894,6 +12894,28 @@ bool Player::CanNoReagentCast(SpellInfo const* spellInfo) const
 
 void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
 {
+    // Disarm keeps the weapon equipped, keep active auras (e.g. Deterrence)
+    auto hasDisarmedFitWeapon = [this](SpellInfo const* spellInfo)
+    {
+        if (spellInfo->EquippedItemClass != ITEM_CLASS_WEAPON || spellInfo->IsPassive())
+            return false;
+
+        static constexpr std::pair<uint8, AuraType> disarmSlots[] =
+        {
+            { EQUIPMENT_SLOT_MAINHAND, SPELL_AURA_MOD_DISARM },
+            { EQUIPMENT_SLOT_OFFHAND,  SPELL_AURA_MOD_DISARM_OFFHAND },
+            { EQUIPMENT_SLOT_RANGED,   SPELL_AURA_MOD_DISARM_RANGED }
+        };
+
+        for (auto const& [slot, disarmAura] : disarmSlots)
+            if (HasAuraType(disarmAura))
+                if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                    if (item->IsFitToSpellRequirements(spellInfo))
+                        return true;
+
+        return false;
+    };
+
     for (AuraMap::iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end();)
     {
         Aura* aura = itr->second;
@@ -12907,7 +12929,7 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
         }
 
         // skip if not item dependent or have alternative item
-        if (HasItemFitToSpellRequirements(spellInfo, pItem))
+        if (HasItemFitToSpellRequirements(spellInfo, pItem) || hasDisarmedFitWeapon(spellInfo))
         {
             ++itr;
             continue;
