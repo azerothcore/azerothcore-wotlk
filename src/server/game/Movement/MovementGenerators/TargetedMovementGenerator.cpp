@@ -474,8 +474,8 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 
 //-----------------------------------------------//
 
-// Uncapped, the catch-up boost below runs into the spline speed limit in MoveSplineInit::Launch.
-constexpr float FOLLOW_CATCHUP_MAX_MULTIPLIER = 2.f;
+// Sniffed: a pet catching up to its owner tops out at 2.6x the owner's current run speed.
+constexpr float FOLLOW_CATCHUP_MAX_MULTIPLIER = 2.6f;
 
 // A jump or a fall is not a pace to match; only actual running counts.
 constexpr uint32 FOLLOW_TARGET_MOVING_FLAGS =
