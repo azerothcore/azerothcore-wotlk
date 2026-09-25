@@ -6997,7 +6997,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo)
         data << uint32(0);
 
     //! Probably used for debugging purposes, as it is not known to appear on retail servers
-    if (damageInfo->HitInfo & HITINFO_UNK1)
+    if (damageInfo->HitInfo & HITINFO_DEBUG)
     {
         data << uint32(0);
         data << float(0);
