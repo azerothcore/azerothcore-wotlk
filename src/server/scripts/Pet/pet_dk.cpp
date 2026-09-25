@@ -418,22 +418,20 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
 
     void HandleCast()
     {
-        Unit* caster = GetCaster();
-        Unit* owner = caster->GetOwner();
-        float ownerAttackPower = owner ? owner->GetTotalAttackPowerValue(BASE_ATTACK) : 0.0f;
-        float ownerAttackSpeedPct = owner ? owner->m_modAttackSpeedPct[BASE_ATTACK] : 0.0f;
-
+        // No locals: they would be unused when PERFORMANCE_PROFILING compiles the log out
         LOG_DEBUG("spells.scripts", "spell_pet_dk_gargoyle_strike: {} cast time {} ms, cast speed {}, spell power {}, "
             "owner attack power {}, owner melee attack speed pct {}",
-            caster->GetGUID().ToString(), GetSpell()->GetCastTime(), caster->GetFloatValue(UNIT_MOD_CAST_SPEED),
-            caster->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask()), ownerAttackPower, ownerAttackSpeedPct);
+            GetCaster()->GetGUID().ToString(), GetSpell()->GetCastTime(), GetCaster()->GetFloatValue(UNIT_MOD_CAST_SPEED),
+            GetCaster()->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask()),
+            GetCaster()->GetOwner() ? GetCaster()->GetOwner()->GetTotalAttackPowerValue(BASE_ATTACK) : 0.0f,
+            GetCaster()->GetOwner() ? GetCaster()->GetOwner()->m_modAttackSpeedPct[BASE_ATTACK] : 0.0f);
     }
 
     void HandleAfterHit()
     {
-        Unit* target = GetHitUnit();
         LOG_DEBUG("spells.scripts", "spell_pet_dk_gargoyle_strike: {} hit {} for {}",
-            GetCaster()->GetGUID().ToString(), target ? target->GetGUID().ToString() : "nothing", GetHitDamage());
+            GetCaster()->GetGUID().ToString(), GetHitUnit() ? GetHitUnit()->GetGUID().ToString() : "nothing",
+            GetHitDamage());
     }
 
     void Register() override
