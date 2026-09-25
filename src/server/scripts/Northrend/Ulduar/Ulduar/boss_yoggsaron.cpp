@@ -1082,7 +1082,7 @@ struct boss_yoggsaron_cloud : public PassiveAI
     {
         bool clockwise = me->GetPositionX() < Middle.GetPositionX();
         me->GetMotionMaster()->MoveCirclePath(Middle.GetPositionX(), Middle.GetPositionY(), me->GetPositionZ(),
-            Middle.GetExactDist(me), clockwise, 16);
+            Middle.GetExactDist2d(me), clockwise, 16);
     }
 
     void UpdateAI(uint32 diff) override
