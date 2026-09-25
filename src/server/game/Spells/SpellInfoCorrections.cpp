@@ -606,13 +606,18 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
     });
 
-    ApplySpellFix({
-        54968,  // Glyph of Holy Light, Damage Class should be magic
-        53652,  // Beacon of Light heal, Damage Class should be magic
-        53654
-        }, [](SpellInfo* spellInfo)
+    // Glyph of Holy Light
+    ApplySpellFix({ 54968 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+    });
+
+    // Beacon of Light
+    ApplySpellFix({ 53652, 53653, 53654 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
+        spellInfo->AttributesEx6 &= ~SPELL_ATTR6_IGNORE_HEALTH_MODIFIERS;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     });
 

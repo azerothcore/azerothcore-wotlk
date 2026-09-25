@@ -1639,6 +1639,10 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
             addhealth += tickheal * tickcount;
 
+            // Swiftmend spell mods (e.g. Druid T8 Restoration 2P Bonus)
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DAMAGE, addhealth);
+
             // Glyph of Swiftmend
             if (!caster->HasAura(54824))
                 unitTarget->RemoveAura(targetAura->GetId(), targetAura->GetCasterGUID());
@@ -2183,11 +2187,6 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
                 if (uint32 trapEntry = gameObjTarget->GetGOInfo()->spellFocus.linkedTrapId)
                     gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
                 return;
-
-            case GAMEOBJECT_TYPE_CHEST:
-                // triggering linked GO
-                if (uint32 trapEntry = gameObjTarget->GetGOInfo()->chest.linkedTrapId)
-                    gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
 
             // Don't return, let loots been taken
             default:

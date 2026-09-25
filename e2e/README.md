@@ -147,7 +147,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
 | combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
-| spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`) | #26130 #25765 |
+| spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery; Beacon applies its target's Improved Devotion Aura healing bonus exactly once for Holy Light, Flash of Light, Holy Shock and Lay on Hands | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`, `TestAC_27756_*`) | #26130 #25765 #27756 |
 | spells/cast | Charge on dummy; fail path; stance; Raise Dead + ghoul | P1 | covered (`TestAC_27061_*`) | #27061 |
 | spells/effects | Charge / grounding totem / Sweeping Strikes Execute; forced cast summons at the forced caster, not at the unit that forced it; a tripped Gordunni Trap rolls out both dirt mounds | P1 | covered (`TestAC_26997_*`, `TestEffects_ForceCastDestination`, `TestEffects_GordunniTrapRollsBothMounds`); dummy-summon `blocked-harness` (engineering dummy lifetime) | #26774 #26997 #27621 |
 | social/group | form / leave / leader / loot method / disband | P2 | covered | — |
@@ -170,6 +170,24 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | world/gameevents | Call to Arms banners at the Dalaran portals belong to the side they stand on, and the already-correct Warsong set is unchanged. **Wants an exclusive realm**: starting a holiday re-anchors its schedule in the running worldserver until restart; holidays already running are left alone | P2 | covered (`TestAC_24380_*`); Shattrath's 23 positions `gap` | #24380 |
 
 ---
+
+### Chest regression checks (PR #27381)
+
+`world/chests` covers Cat Figurine reopening, Ice Chest party rolls and reward attribution,
+and both Shallow Grave variants: inert graves summon nothing; trapped graves do not summon
+again on reopening. Grave checks include full bags, another looter, consuming all loot,
+and replaying an opening request after despawn. Live execution is still pending.
+
+```bash
+go test -tags=e2e ./suites/world/chests -count=2 -v -p 1 -parallel 1 -timeout 20m
+```
+
+Use a disposable realm with the pending migrations applied. Tests create temporary fixtures
+through cleanup-enabled spawn helpers, not the dungeon's real graves. They sample up to
+48 fresh graves for item loot and a positive summon from the trapped variant; inability to
+obtain that fixture fails as a precondition. Initial empty-loot coverage is not claimed:
+the grave money range is now nonzero. Exact summon/drop probabilities and the dungeon's
+pool selection are not asserted by these lifecycle tests.
 
 ## Parallelism and isolation
 
