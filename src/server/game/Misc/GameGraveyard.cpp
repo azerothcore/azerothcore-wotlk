@@ -117,7 +117,10 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
 
     uint32 zoneId = 0;
     uint32 areaId = 0;
-    player->GetZoneAndAreaId(zoneId, areaId);
+    if (nearCorpse)
+        sMapMgr->GetZoneAndAreaId(player->GetPhaseMask(), zoneId, areaId, mapId, x, y, z);
+    else
+        player->GetZoneAndAreaId(zoneId, areaId);
 
     return GetClosestGraveyard(mapId, x, y, z, teamId, areaId, zoneId,
         player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_GRAVEYARD));
