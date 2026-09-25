@@ -133,16 +133,32 @@ struct boss_ouro : public BossAI
             scheduler.Schedule(1s, [this](TaskContext context)
                 {
                     if (!IsPlayerWithinMeleeRange())
-                        DoSpellAttackToRandomTargetIfReady(SPELL_BOULDER);
+                        CastBoulderIfReady();
 
                     context.Repeat();
-                })
-                .Schedule(20s, [this](TaskContext context)
-                    {
-                        DoCastSelf(SPELL_SUMMON_OURO_MOUNDS, true);
-                        context.Repeat();
-                    });
+                });
         }
+    }
+
+    void CastBoulderIfReady()
+    {
+        if (me->IsActionPreventedByCasting() || !me->isAttackReady())
+            return;
+
+        std::vector<Unit*> targets;
+        SpellTargetSelector spellTarget(me, SPELL_BOULDER);
+        // CanAIAttack marks ranged participants offline; validate them for the spell instead.
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
+        {
+            Unit* target = ref->GetVictim();
+            if (target->IsPlayer() && me->IsValidAttackTarget(target) && me->CanSeeOrDetect(target)
+                && spellTarget(target) && me->IsWithinLOSInMap(target))
+                targets.push_back(target);
+        }
+
+        if (!targets.empty())
+            if (DoCast(Acore::Containers::SelectRandomContainerElement(targets), SPELL_BOULDER) == SPELL_CAST_OK)
+                me->resetAttackTimer();
     }
 
     void Submerge()
