@@ -416,9 +416,31 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
         SetEffectValue(damage);
     }
 
+    void HandleCast()
+    {
+        Unit* caster = GetCaster();
+        Unit* owner = caster->GetOwner();
+        float ownerAttackPower = owner ? owner->GetTotalAttackPowerValue(BASE_ATTACK) : 0.0f;
+        float ownerAttackSpeedPct = owner ? owner->m_modAttackSpeedPct[BASE_ATTACK] : 0.0f;
+
+        LOG_DEBUG("spells.scripts", "spell_pet_dk_gargoyle_strike: {} cast time {} ms, cast speed {}, spell power {}, "
+            "owner attack power {}, owner melee attack speed pct {}",
+            caster->GetGUID().ToString(), GetSpell()->GetCastTime(), caster->GetFloatValue(UNIT_MOD_CAST_SPEED),
+            caster->SpellBaseDamageBonusDone(GetSpellInfo()->GetSchoolMask()), ownerAttackPower, ownerAttackSpeedPct);
+    }
+
+    void HandleAfterHit()
+    {
+        Unit* target = GetHitUnit();
+        LOG_DEBUG("spells.scripts", "spell_pet_dk_gargoyle_strike: {} hit {} for {}",
+            GetCaster()->GetGUID().ToString(), target ? target->GetGUID().ToString() : "nothing", GetHitDamage());
+    }
+
     void Register() override
     {
         OnEffectLaunchTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnCast += SpellCastFn(spell_pet_dk_gargoyle_strike::HandleCast);
+        AfterHit += SpellHitFn(spell_pet_dk_gargoyle_strike::HandleAfterHit);
     }
 };
 

@@ -837,6 +837,10 @@ class spell_dk_pet_scaling : public AuraScript
 
             amount = CalculatePct(std::max<int32>(0, static_cast<int32>(owner->GetTotalAttackPowerValue(BASE_ATTACK))), modifier);
 
+            LOG_DEBUG("spells.scripts", "spell_dk_pet_scaling: {} spell power {} ({}% of owner {} attack power {})",
+                GetUnitOwner()->GetGUID().ToString(), amount, modifier, owner->GetGUID().ToString(),
+                owner->GetTotalAttackPowerValue(BASE_ATTACK));
+
             // xinef: Update appropriate player field
             if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
@@ -851,6 +855,10 @@ class spell_dk_pet_scaling : public AuraScript
             float modSpeed = owner->m_modAttackSpeedPct[BASE_ATTACK];
             modSpeed = std::ranges::clamp(modSpeed, 1e-6f, 1.0f);
             amount = static_cast<int32>(((1.0f / modSpeed) - 1.0f) * 100.0f);
+
+            LOG_DEBUG("spells.scripts", "spell_dk_pet_scaling: {} haste {}% (owner {} melee attack speed pct {})",
+                GetUnitOwner()->GetGUID().ToString(), amount, owner->GetGUID().ToString(),
+                owner->m_modAttackSpeedPct[BASE_ATTACK]);
         }
     }
 
@@ -884,6 +892,9 @@ class spell_dk_pet_scaling : public AuraScript
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
+        LOG_DEBUG("spells.scripts", "spell_dk_pet_scaling: {} recalculating spell {} effect {}",
+            GetUnitOwner()->GetGUID().ToString(), GetId(), aurEff->GetEffIndex());
+
         if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
         {
             int32 currentAmount = aurEff->GetAmount();
@@ -2422,21 +2433,38 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
     {
         // army ghoul inherits 6.5% of AP
         if (Unit* owner = GetUnitOwner()->GetOwner())
+        {
             amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), 6.5f);
+
+            LOG_DEBUG("spells.scripts", "spell_dk_army_of_the_dead_passive: {} attack power {} (owner {} AP {})",
+                GetUnitOwner()->GetGUID().ToString(), amount, owner->GetGUID().ToString(),
+                owner->GetTotalAttackPowerValue(BASE_ATTACK));
+        }
     }
 
     void CalculateHealthAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // army ghoul inherits 20% of health
         if (Unit* owner = GetUnitOwner()->GetOwner())
+        {
             amount = owner->CountPctFromMaxHealth(20);
+
+            LOG_DEBUG("spells.scripts", "spell_dk_army_of_the_dead_passive: {} health {} (owner {} max health {})",
+                GetUnitOwner()->GetGUID().ToString(), amount, owner->GetGUID().ToString(), owner->GetMaxHealth());
+        }
     }
 
     void CalculateSPAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // army ghoul inherits 6.5% of AP
         if (Unit* owner = GetUnitOwner()->GetOwner())
+        {
             amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), 6.5f);
+
+            LOG_DEBUG("spells.scripts", "spell_dk_army_of_the_dead_passive: {} spell power {} (owner {} AP {})",
+                GetUnitOwner()->GetGUID().ToString(), amount, owner->GetGUID().ToString(),
+                owner->GetTotalAttackPowerValue(BASE_ATTACK));
+        }
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -2465,6 +2493,8 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
+        LOG_DEBUG("spells.scripts", "spell_dk_army_of_the_dead_passive: {} recalculating effect {}",
+            GetUnitOwner()->GetGUID().ToString(), aurEff->GetEffIndex());
         GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
     }
 
