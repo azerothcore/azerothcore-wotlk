@@ -7,6 +7,7 @@ on:
     types:
       - labeled
       - synchronize
+  workflow_dispatch:
 
 concurrency:
   # One concurrency group per workflow + ref.
@@ -19,6 +20,9 @@ concurrency:
   # - Branch pushes are isolated by ref.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   COMPOSE_DOCKER_CLI_BUILD: 1
@@ -67,6 +71,10 @@ jobs:
         run: |
           version="$(jq -r '.version' acore.json)"
           echo "version=$version" >> $GITHUB_OUTPUT
+
+      # arm64 emulation, so the labeled-PR check can boot the arm64 DB image.
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -126,3 +134,187 @@ jobs:
               "ref": "${{ github.ref_name }}",
               "sha": "${{ github.sha }}"
             }
+
+      # ----------------------------------------------------------------------
+      # Pre-imported DB image (acore/ac-wotlk-db)
+      #
+      # Kept LAST so a failure here cannot block the six images already pushed
+      # above (build and push are fused per step). It only marks the run failed.
+      #
+      # Rebuilt on every run of this job: nothing in this repository signals that
+      # azerothcore/mod-ale moved (Download Eluna checks it out without a ref, so
+      # it picks up that repo's HEAD at run time), leaving nothing reliable to
+      # gate a rebuild on. Pushed only on master of the canonical repo.
+      # ----------------------------------------------------------------------
+      - name: Import database and capture datadir
+        id: db_import
+        run: |
+          set -euo pipefail
+
+          # Tear down the helper container/network on success or failure.
+          cleanup() {
+            docker rm -f acdb >/dev/null 2>&1 || true
+            docker network rm acnet >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          docker network create acnet
+
+          # One resolution feeds the import, the smoke boots and the pushed image's
+          # FROM, so the base.digest label cannot drift from what buildx built from.
+          MYSQL_DIGEST="$(docker buildx imagetools inspect mysql:8.4 --format '{{.Manifest.Digest}}')"
+          MYSQL_REF="mysql:8.4@${MYSQL_DIGEST}"
+          echo "mysql_digest=${MYSQL_DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "Resolved mysql:8.4 to ${MYSQL_DIGEST}"
+
+          mkdir -p mysql-seed
+          docker run -d --name acdb --network acnet \
+            -e MYSQL_ROOT_PASSWORD=password \
+            -v "$PWD/mysql-seed:/var/lib/mysql" \
+            "$MYSQL_REF" --skip-log-bin
+
+          # The plain mysql image has no built-in healthcheck; poll explicitly.
+          # Poll over TCP from another container (same as dbimport connects): the
+          # image's first-boot temporary init server runs with --skip-networking,
+          # so a socket ping would falsely report "alive" before TCP 3306 is up,
+          # and dbimport does not retry its initial connection.
+          for i in $(seq 1 60); do
+            if docker run --rm --network acnet "$MYSQL_REF" \
+                 mysqladmin ping -h acdb -uroot -ppassword --silent; then
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "MySQL did not become ready in time" >&2
+              docker logs acdb >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          # Import with the published db-import image (includes Eluna, no test
+          # modules). AutoSetup creates the acore_* databases. On master this is
+          # the image pushed earlier in this same job; on a labeled PR it is the
+          # current published :master, validating the pipeline mechanics (per-PR
+          # SQL content is already covered by dashboard-ci's dry-run).
+          docker pull "acore/ac-wotlk-db-import:master"
+          DB_IMPORT_DIGEST="$(docker image inspect -f '{{index .RepoDigests 0}}' \
+            acore/ac-wotlk-db-import:master)"
+          echo "db_import_digest=${DB_IMPORT_DIGEST}" >> "$GITHUB_OUTPUT"
+          docker run --rm --network acnet \
+            -e AC_LOGIN_DATABASE_INFO="acdb;3306;root;password;acore_auth" \
+            -e AC_WORLD_DATABASE_INFO="acdb;3306;root;password;acore_world" \
+            -e AC_CHARACTER_DATABASE_INFO="acdb;3306;root;password;acore_characters" \
+            "acore/ac-wotlk-db-import:master"
+
+          # Native-install parity account for standalone/non-root clients.
+          docker exec acdb mysql -uroot -ppassword -e \
+            "CREATE USER 'acore'@'%' IDENTIFIED BY 'acore';
+             GRANT ALL PRIVILEGES ON acore_world.*      TO 'acore'@'%';
+             GRANT ALL PRIVILEGES ON acore_characters.* TO 'acore'@'%';
+             GRANT ALL PRIVILEGES ON acore_auth.*       TO 'acore'@'%';
+             FLUSH PRIVILEGES;"
+
+          # Clean shutdown so the InnoDB datadir is consistent before capture.
+          # docker stop exits 0 even when the grace period runs out and mysqld is
+          # SIGKILLed mid-flush, which would leave a torn datadir; check the code.
+          docker stop -t 120 acdb
+          if [ "$(docker inspect -f '{{.State.ExitCode}}' acdb)" != "0" ]; then
+            echo "mysqld did not shut down cleanly; datadir may be inconsistent" >&2
+            docker logs acdb >&2
+            exit 1
+          fi
+
+          # Bind-mounted files are owned by uid 999 (container mysql user); make
+          # them readable as the build context for the runner user.
+          sudo chown -R "$(id -u):$(id -g)" mysql-seed
+
+          # Minimal build context: only the datadir, not the ~GB repo.
+          mkdir -p db-ctx
+          mv mysql-seed db-ctx/
+          du -sh db-ctx/mysql-seed
+
+      - name: Build (and push on master) pre-imported DB image
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          MYSQL_DIGEST="${{ steps.db_import.outputs.mysql_digest }}"
+          MYSQL_REF="mysql:8.4@${MYSQL_DIGEST}"
+          DB_IMPORT_DIGEST="${{ steps.db_import.outputs.db_import_digest }}"
+
+          # The sibling images get these from metadata-action; this one builds raw.
+          LABELS=(
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}"
+            --label "org.opencontainers.image.revision=${{ github.sha }}"
+            --label "org.opencontainers.image.version=${VERSION}"
+            --label "org.opencontainers.image.created=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            --label "org.opencontainers.image.base.name=mysql:8.4"
+            --label "org.opencontainers.image.base.digest=${MYSQL_DIGEST}"
+            --label "org.azerothcore.db-import.digest=${DB_IMPORT_DIGEST}"
+          )
+          # Download Eluna runs on master only; labeled-PR builds are never pushed.
+          if [ -d modules/mod-ale ]; then
+            LABELS+=(--label "org.azerothcore.mod-ale.revision=$(git -C modules/mod-ale rev-parse HEAD)")
+          fi
+
+          # Build one arch, boot it, check the three databases are there and log
+          # the resulting image size and labels.
+          # $2 = poll attempts, 2s apart: 60 gives amd64 120s, 300 gives arm64
+          # 600s (its emulated MySQL start is far slower).
+          smoke() {
+            local arch="$1" attempts="$2"
+            local tag="acore/ac-wotlk-db:test-$arch"
+
+            docker buildx build --platform "linux/$arch" --load \
+              -f apps/docker/Dockerfile.db --build-arg "MYSQL_IMAGE=${MYSQL_REF}" \
+              "${LABELS[@]}" -t "$tag" db-ctx
+
+            docker run -d --name acdb-test "$tag"
+            # Pre-initialized datadir: the entrypoint skips init and starts the
+            # real server directly, so a socket ping has no temp-server race here.
+            for i in $(seq 1 "$attempts"); do
+              docker exec acdb-test mysqladmin ping -uroot -ppassword --silent && break
+              if [ "$i" -eq "$attempts" ]; then
+                echo "DB image ($arch) failed to boot" >&2; docker logs acdb-test >&2; exit 1
+              fi
+              sleep 2
+            done
+            for db in acore_auth acore_world acore_characters; do
+              docker exec acdb-test mysql -uroot -ppassword \
+                -e "USE $db; SELECT 1;" >/dev/null
+            done
+            echo "DB image ($arch) booted and all three databases are present."
+            echo "DB image ($arch) size: $(docker image ls --format '{{.Size}}' "$tag")"
+            echo "DB image ($arch) labels: $(docker image inspect -f '{{json .Config.Labels}}' "$tag")"
+
+            docker rm -f acdb-test >/dev/null
+            docker rmi "$tag" >/dev/null
+          }
+
+          trap 'docker rm -f acdb-test >/dev/null 2>&1 || true' EXIT
+
+          # Push only on master of the canonical repo (same condition as
+          # RUNNING_ON_PRIMARY_BRANCH, computed here to avoid its trailing newline).
+          if [ "${{ github.repository }}" = "azerothcore/azerothcore-wotlk" ] \
+             && [ "${{ github.ref_name }}" = "master" ]; then
+            # A multi-arch --push build cannot be --load'ed, so booting the native
+            # arch first is the only chance to catch a bad datadir before users pull
+            # it. The multi-arch pass then reuses this build's cache for amd64.
+            smoke amd64 60
+
+            # The datadir is arch-neutral, and only amd64 was booted above:
+            # arm64 is covered by the labeled-PR check, not by this path.
+            docker buildx build --platform linux/amd64,linux/arm64 \
+              -f apps/docker/Dockerfile.db --build-arg "MYSQL_IMAGE=${MYSQL_REF}" \
+              "${LABELS[@]}" \
+              -t "acore/ac-wotlk-db:master" \
+              -t "acore/ac-wotlk-db:${VERSION}" \
+              -t "acore/ac-wotlk-db:${{ github.sha }}" \
+              --push db-ctx
+          else
+            # PR validation only, no push: there is no Docker Hub login on PRs.
+            smoke amd64 60
+            # docker rmi drops only the daemon's copy; the buildx container keeps
+            # its own layers, so without this both arches sit on the runner at once.
+            docker buildx prune -f >/dev/null
+            smoke arm64 300
+          fi
