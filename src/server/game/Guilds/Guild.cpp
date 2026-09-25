@@ -1312,9 +1312,7 @@ void Guild::HandleSetInfo(WorldSession* session, std::string_view info)
 
     // Player must have rights to set guild's info
     if (_HasRankRight(session->GetPlayer(), GR_RIGHT_MODIFY_GUILD_INFO))
-    {
         SetInfo(info);
-    }
 }
 
 void Guild::SetInfo(std::string_view info)
