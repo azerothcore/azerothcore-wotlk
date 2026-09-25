@@ -1,5 +1,5 @@
 -- creature_template modifiers measured from the sniff corpus (scripts/creature-modifiers.py)
--- 1191 entries
+-- 1203 entries
 
 -- Forest Spider: DamageModifier 1 -> 0.9 (melee, TBC, 113 swings, k 0.914-0.899)
 UPDATE `creature_template` SET `DamageModifier` = 0.9 WHERE `entry` = 30;
@@ -799,10 +799,16 @@ UPDATE `creature_template` SET `DamageModifier` = 0.4 WHERE `entry` = 11288;
 UPDATE `creature_template` SET `ArmorModifier` = 1 WHERE `entry` = 11339;
 -- Hakkari Blood Priest: ArmorModifier 1.15 -> 1 (armor, TBC, 4 sheets, 0.82 of basearmor)
 UPDATE `creature_template` SET `ArmorModifier` = 1 WHERE `entry` = 11340;
+-- Gurubashi Axe Thrower: DamageModifier 4.05 -> 5 (melee, TBC, 56 swings, k 4.975-4.999)
+UPDATE `creature_template` SET `DamageModifier` = 5 WHERE `entry` = 11350;
 -- Gurubashi Blood Drinker: ArmorModifier 1.1 -> 1 (armor, TBC, 2 sheets, 1.011 of basearmor)
 UPDATE `creature_template` SET `ArmorModifier` = 1 WHERE `entry` = 11353;
--- Bloodseeker Bat: DamageModifier 1.25 -> 2.5 (melee, WotLK, 82 swings, k 2.492-2.488)
+-- Bloodseeker Bat: DamageModifier 1.25 -> 2.5 (melee, TBC, 136 swings, k 2.496-2.485)
 UPDATE `creature_template` SET `DamageModifier` = 2.5 WHERE `entry` = 11368;
+-- Razzashi Adder: DamageModifier 4.2 -> 6 (melee, TBC, 49 swings, k 5.995-6.008)
+UPDATE `creature_template` SET `DamageModifier` = 6 WHERE `entry` = 11372;
+-- Hooktooth Frenzy: DamageModifier 2.4 -> 4 (melee, TBC, 77 swings, k 3.976-4.002)
+UPDATE `creature_template` SET `DamageModifier` = 4 WHERE `entry` = 11374;
 -- Jergosh the Invoker: DamageModifier 2.4 -> 1.95 (melee, TBC, 58 swings, k 1.971-1.945)
 UPDATE `creature_template` SET `DamageModifier` = 1.95 WHERE `entry` = 11518;
 -- Undead Ravager: DamageModifier 1 -> 1.25 (melee, WotLK, 80 swings, k 1.236-1.237)
@@ -895,16 +901,18 @@ UPDATE `creature_template` SET `DamageModifier` = 5 WHERE `entry` = 14527;
 UPDATE `creature_template` SET `DamageModifier` = 1 WHERE `entry` = 14528;
 -- Franklin the Friendly: DamageModifier 4.6 -> 5 (sheet, TBC, 2 sheets, exp 0 (AC 0))
 UPDATE `creature_template` SET `DamageModifier` = 5 WHERE `entry` = 14529;
+-- Razzashi Venombrood: DamageModifier 10 -> 5 (melee, TBC, 188 swings, k 5.005-5.003)
+UPDATE `creature_template` SET `DamageModifier` = 5 WHERE `entry` = 14532;
 -- Field Marshal Afrasiabi: DamageModifier 4.6 -> 12 (sheet, TBC, 1528 sheets, exp 0 (AC 0))
 UPDATE `creature_template` SET `DamageModifier` = 12 WHERE `entry` = 14721;
 -- Silas Darkmoon: DamageModifier 4.6 -> 1 (sheet, TBC, 2 sheets, exp 0 (AC 0))
 UPDATE `creature_template` SET `DamageModifier` = 1 WHERE `entry` = 14823;
 -- Flik: DamageModifier 1 -> 0.98 (sheet, TBC, 4 sheets, exp 0 (AC 0)); ArmorModifier 1 -> 1.05 (armor, TBC, 4 sheets, 1.118 of basearmor)
 UPDATE `creature_template` SET `ArmorModifier` = 1.05, `DamageModifier` = 0.98 WHERE `entry` = 14860;
--- Atal'ai Mistress: ArmorModifier 1.1 -> 1.3 (armor, TBC, 1 sheets, 1.332 of basearmor)
-UPDATE `creature_template` SET `ArmorModifier` = 1.3 WHERE `entry` = 14882;
--- Voodoo Slave: ArmorModifier 1.1 -> 1.4 (armor, TBC, 2 sheets, 1.142 of basearmor)
-UPDATE `creature_template` SET `ArmorModifier` = 1.4 WHERE `entry` = 14883;
+-- Atal'ai Mistress: DamageModifier 9.6 -> 7 (sheet, TBC, 1 sheets, exp 0 (AC 0)); ArmorModifier 1.1 -> 1.3 (armor, TBC, 1 sheets, 1.332 of basearmor)
+UPDATE `creature_template` SET `ArmorModifier` = 1.3, `DamageModifier` = 7 WHERE `entry` = 14882;
+-- Voodoo Slave: DamageModifier 10.3 -> 5 (sheet, TBC, 2 sheets, exp 0 (AC 0)); ArmorModifier 1.1 -> 1.4 (armor, TBC, 2 sheets, 1.142 of basearmor)
+UPDATE `creature_template` SET `ArmorModifier` = 1.4, `DamageModifier` = 5 WHERE `entry` = 14883;
 -- Kartra Bloodsnarl: DamageModifier 4.6 -> 12 (sheet, TBC, 17 sheets, exp 0 (AC 0))
 UPDATE `creature_template` SET `DamageModifier` = 12 WHERE `entry` = 14942;
 -- Elfarran: DamageModifier 4.6 -> 12 (sheet, TBC, 6 sheets, exp 0 (AC 0))
@@ -931,6 +939,8 @@ UPDATE `creature_template` SET `DamageModifier` = 2.5 WHERE `entry` = 15422;
 UPDATE `creature_template` SET `DamageModifier` = 7 WHERE `entry` = 15424;
 -- Ironforge Brigade Footman: DamageModifier 4.6 -> 3 (melee, WotLK, 67 swings, k 2.998-2.984)
 UPDATE `creature_template` SET `DamageModifier` = 3 WHERE `entry` = 15442;
+-- Spectral Stallion: DamageModifier 5 -> 15.5 (melee, TBC, 58 swings, k 15.220-15.294)
+UPDATE `creature_template` SET `DamageModifier` = 15.5 WHERE `entry` = 15548;
 -- Wretched Thug: DamageModifier 1 -> 0.95 (melee, WotLK, 115 swings, k 0.931-0.943)
 UPDATE `creature_template` SET `DamageModifier` = 0.95 WHERE `entry` = 15645;
 -- Manawraith: DamageModifier 1 -> 0.95 (melee, WotLK, 37 swings, k 0.918-0.940)
@@ -1003,8 +1013,14 @@ UPDATE `creature_template` SET `DamageModifier` = 1.25 WHERE `entry` = 16295;
 UPDATE `creature_template` SET `DamageModifier` = 0.95 WHERE `entry` = 16304;
 -- Flameshocker: DamageModifier 7.5 -> 1 (melee, WotLK, 716 swings, k 1.001-0.996)
 UPDATE `creature_template` SET `DamageModifier` = 1 WHERE `entry` = 16383;
+-- Phantom Attendant: DamageModifier 10 -> 8 (melee, TBC, 96 swings, k 7.996-8.009)
+UPDATE `creature_template` SET `DamageModifier` = 8 WHERE `entry` = 16406;
+-- Phantom Guardsman: DamageModifier 9 -> 12 (melee, TBC, 35 swings, k 11.939-12.017)
+UPDATE `creature_template` SET `DamageModifier` = 12 WHERE `entry` = 16425;
 -- Skeletal Trooper: DamageModifier 1 -> 0.9 (melee, WotLK, 59 swings, k 0.913-0.935)
 UPDATE `creature_template` SET `DamageModifier` = 0.9 WHERE `entry` = 16438;
+-- Ghostly Philanthropist: DamageModifier 10 -> 16 (melee, TBC, 47 swings, k 16.403-16.017)
+UPDATE `creature_template` SET `DamageModifier` = 16 WHERE `entry` = 16470;
 -- Proenitus: DamageModifier 1 -> 0.95 (sheet, TBC, 119 sheets, exp 0 (AC 0))
 UPDATE `creature_template` SET `DamageModifier` = 0.95 WHERE `entry` = 16477;
 -- Keilnei: ArmorModifier 1 -> 0.95 (armor, TBC, 90 sheets, 0.92 of basearmor)
@@ -1101,6 +1117,8 @@ UPDATE `creature_template` SET `ExperienceModifier` = 0.4 WHERE `entry` = 16950;
 UPDATE `creature_template` SET `DamageModifier` = 1 WHERE `entry` = 16977;
 -- Illidari Taskmaster: ExperienceModifier 1 -> 0.75 (xp, WotLK, 67 kills in 7 sniffs, 0.88 at median)
 UPDATE `creature_template` SET `ExperienceModifier` = 0.75 WHERE `entry` = 17058;
+-- Phantom Hound: DamageModifier 1 -> 6 (melee, TBC, 41 swings, k 6.002-5.975)
+UPDATE `creature_template` SET `DamageModifier` = 6 WHERE `entry` = 17067;
 -- Spirit of the Vale: DamageModifier 1.2 -> 3.33 (sheet, TBC, 10 sheets, exp 1 (AC 1))
 UPDATE `creature_template` SET `DamageModifier` = 3.33 WHERE `entry` = 17087;
 -- Shadowy Summoner: ArmorModifier 1.14 -> 1 (armor, TBC, 15 sheets, 0.818 of basearmor)
@@ -1123,6 +1141,10 @@ UPDATE `creature_template` SET `ArmorModifier` = 0.95 WHERE `entry` = 17214;
 UPDATE `creature_template` SET `DamageModifier` = 1.2 WHERE `entry` = 17238;
 -- Admiral Odesyus: DamageModifier 2.6 -> 1 (sheet, TBC, 82 sheets, exp 1 (AC 1))
 UPDATE `creature_template` SET `DamageModifier` = 1 WHERE `entry` = 17240;
+-- Hellfire Channeler: DamageModifier 20 -> 17 (melee, TBC, 72 swings, k 17.094-16.763)
+UPDATE `creature_template` SET `DamageModifier` = 17 WHERE `entry` = 17256;
+-- Fiendish Imp: DamageModifier 1.1 -> 1 (melee, TBC, 40 swings, k 0.997-1.003)
+UPDATE `creature_template` SET `DamageModifier` = 1 WHERE `entry` = 17267;
 -- Venture Co. Gemologist: DamageModifier 1 -> 0.95 (melee, TBC, 39 swings, k 0.919-0.940)
 UPDATE `creature_template` SET `DamageModifier` = 0.95 WHERE `entry` = 17279;
 -- Sentinel Luciel Starwhisper: DamageModifier 2.4 -> 2 (sheet, TBC, 43 sheets, exp 0 (AC 0))
@@ -1147,6 +1169,8 @@ UPDATE `creature_template` SET `DamageModifier` = 2 WHERE `entry` = 17554;
 UPDATE `creature_template` SET `DamageModifier` = 2 WHERE `entry` = 17555;
 -- Sunhawk Saboteur: DamageModifier 1.7 -> 1.95 (melee, WotLK, 123 swings, k 1.966-1.980)
 UPDATE `creature_template` SET `DamageModifier` = 1.95 WHERE `entry` = 17609;
+-- Prince Malchezaar's Axes: DamageModifier 1 -> 2.75 (melee, TBC, 51 swings, k 2.866-2.793)
+UPDATE `creature_template` SET `DamageModifier` = 2.75 WHERE `entry` = 17650;
 -- Logistics Officer Ulrike: DamageModifier 1 -> 1.7 (sheet, TBC, 23 sheets, exp 0 (AC 0))
 UPDATE `creature_template` SET `DamageModifier` = 1.7 WHERE `entry` = 17657;
 -- Knight-Lord Bloodvalor: DamageModifier 0.5 -> 1 (sheet, TBC, 95 sheets, exp 1 (AC 1))
