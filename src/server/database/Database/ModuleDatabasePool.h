@@ -36,7 +36,12 @@ class SQLOperation;
 class TransactionBase;
 
 // Base class for module-owned database pools, with the DatabaseWorkerPool API.
-// With 0 async connections, async calls run synchronously: flag their statements CONNECTION_BOTH.
+// Flag each prepared statement by the calls that use it:
+//   CONNECTION_ASYNC  - Execute, CommitTransaction, AsyncQuery, AsyncCommitTransaction, DelayQueryHolder
+//   CONNECTION_SYNCH  - Query and the Direct* calls
+//   CONNECTION_BOTH   - both groups
+// If the pool may run with 0 async connections, every call runs synchronously: use CONNECTION_BOTH, never
+// CONNECTION_ASYNC. A statement missing from the connection it runs on asserts on first use.
 class AC_DATABASE_API ModuleDatabasePool : public DatabaseUpdatePool
 {
 private:
@@ -94,6 +99,7 @@ public:
         return Query(std::string_view(Acore::StringFormat(sql, std::forward<Args>(args)...)));
     }
 
+    //! These take ownership of the statement and delete it.
     void Execute(PreparedStatementBase* stmt);
     void DirectExecute(PreparedStatementBase* stmt);
     PreparedQueryResult Query(PreparedStatementBase* stmt);
@@ -103,6 +109,7 @@ public:
 
     SQLQueryHolderCallback DelayQueryHolder(std::shared_ptr<SQLQueryHolderBase> holder);
 
+    //! Returns 0 until PrepareStatements() has run.
     [[nodiscard]] uint8 GetPreparedStatementParamCount(uint32 index) const;
 
     void CommitTransaction(std::shared_ptr<TransactionBase> transaction);
