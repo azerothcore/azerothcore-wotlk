@@ -2051,7 +2051,16 @@ void Player::UpdateCharmedAI()
 
     if (!target || !IsValidAttackTarget(target))
     {
-        target = SelectNearbyTarget(nullptr, GetMap()->IsDungeon() ? 100.f : 30.f);
+        float const targetSearchDistance = GetMap()->IsDungeon() ? 100.f : 30.f;
+
+        // NPC mind controls should turn a player against their group before
+        // considering unrelated nearby units.
+        if (charmer->IsCreature())
+            target = SelectCharmedAIGroupTarget(targetSearchDistance);
+
+        if (!target)
+            target = SelectNearbyTarget(nullptr, targetSearchDistance);
+
         if (!target)
         {
             if (!HasUnitState(UNIT_STATE_FOLLOW))
@@ -2186,6 +2195,32 @@ void Player::UpdateCharmedAI()
             }
         }
     }
+}
+
+Unit* Player::SelectCharmedAIGroupTarget(float distance) const
+{
+    Group const* group = GetGroup();
+    if (!group)
+        return nullptr;
+
+    Player* target = nullptr;
+    for (GroupReference const* itr = group->GetFirstMember(); itr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        if (!member || member == this || !member->IsInWorld())
+            continue;
+
+        if (!IsWithinDistInMap(member, distance) || !IsWithinLOSInMap(member))
+            continue;
+
+        if ((!IsHostileTo(member) && !member->IsHostileTo(this)) || !IsValidAttackTarget(member))
+            continue;
+
+        if (!target || GetDistanceOrder(member, target))
+            target = member;
+    }
+
+    return target;
 }
 
 void Player::UpdateLootAchievements(LootItem* item, Loot* loot)
