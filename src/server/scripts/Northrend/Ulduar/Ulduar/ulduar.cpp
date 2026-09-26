@@ -549,6 +549,22 @@ public:
     }
 };
 
+class AreaTrigger_at_ulduar_mechanostriker_spawn : public AreaTriggerScript
+{
+public:
+    AreaTrigger_at_ulduar_mechanostriker_spawn()
+        : AreaTriggerScript("at_ulduar_mechanostriker_spawn")
+    {
+    }
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+            instance->SetData(DATA_MECHANOSTRIKERS_SPAWN, 1);
+        return true;
+    }
+};
+
 enum SalvagedSiegeEngineSeats
 {
     SEAT_SIEGE_ENGINE_DRIVER            = 0,
@@ -634,5 +650,6 @@ void AddSC_ulduar()
     RegisterUlduarCreatureAI(npc_ulduar_arachnopod_destroyer);
     RegisterSpellScript(spell_ulduar_arachnopod_damaged_aura);
     new AreaTrigger_at_celestial_planetarium_enterance();
+    new AreaTrigger_at_ulduar_mechanostriker_spawn();
     RegisterCreatureAI(npc_salvaged_siege_engine);
 }
