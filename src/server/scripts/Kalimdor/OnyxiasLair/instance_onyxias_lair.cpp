@@ -25,7 +25,7 @@ ObjectData const creatureData[] =
     { 0,          0           }
 };
 
-// 95 yards from the spawn plus Onyxia's 18 yard combat reach, which the old GetDistance2d check subtracted
+// Leash radius: 95 yards plus Onyxia's 18 yard combat reach
 BossBoundaryData const boundaries =
 {
     { DATA_ONYXIA, new CircleBoundary(Position(-10.6155f, -219.357f), 113.0) }
