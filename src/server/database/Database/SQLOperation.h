@@ -60,4 +60,10 @@ private:
     SQLOperation& operator=(SQLOperation const& right) = delete;
 };
 
+//- Keeps an idle asynchronous connection alive
+class PingOperation : public SQLOperation
+{
+    bool Execute() override;
+};
+
 #endif
