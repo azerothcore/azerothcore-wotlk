@@ -288,8 +288,7 @@ public:
         if (sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_IRON_MAN))
             player->SetFreeTalentPoints(0);
 
-        if (sChallengeModes->ShouldShowFirstLoginPicker(player))
-            sChallengeModes->OpenFirstLoginPicker(player);
+        sChallengeModes->ScheduleOpenFirstLoginPicker(player);
     }
 
     void OnPlayerFirstLogin(Player* player) override
@@ -298,8 +297,7 @@ public:
             return;
 
         sChallengeModes->LoadPlayer(player);
-        if (sChallengeModes->ShouldShowFirstLoginPicker(player))
-            sChallengeModes->OpenFirstLoginPicker(player);
+        sChallengeModes->ScheduleOpenFirstLoginPicker(player);
     }
 
     void OnPlayerGossipSelect(Player* player, uint32 menuId, uint32 /*sender*/, uint32 action) override

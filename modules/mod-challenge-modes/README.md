@@ -66,11 +66,12 @@ The shrine gameobject is still registered (`gobject_challenge_modes`) so an exis
 
 ## First-login picker
 
-On the first login of a **level 1** character (or **55** Death Knight), the module opens a mode picker:
+On **every login** of a **level 1** character (or **55** Death Knight) that has not locked a challenge, the module opens a mode picker:
 
 - If the **ChallengeModes** addon is installed (`addon/ChallengeModes/` → `Interface/AddOns/ChallengeModes`), a window lists every mode with icon, title and a short teaser. Selecting a card opens a **detail page** with the full rules, the honorific, and Accept. **Back** returns to the list.
 - Without the addon, the same choice appears as a gossip menu (icons + short text). **Info** prints the long description in chat.
-- One choice only, including **Normal**. Closing the window without picking opens it again on the next login.
+- The window is sent again after the client finishes entering the world, so it is not missed on login.
+- One challenge only. Closing the window without picking a challenge opens it again on the next level-1 login.
 - `.challenge pick` reopens it while the character can still choose.
 
 Copy the folder `modules/mod-challenge-modes/addon/ChallengeModes` into the client `Interface/AddOns/` directory. `AddonChannel.Enabled` must stay on (default).

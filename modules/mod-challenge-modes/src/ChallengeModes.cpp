@@ -12,9 +12,11 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "Duration.h"
 #include "GossipDef.h"
 #include "ItemTemplate.h"
 #include "Log.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
@@ -514,10 +516,8 @@ bool ChallengeModes::ShouldShowFirstLoginPicker(Player const* player) const
     if (!CanActivate(player))
         return false;
 
-    if (IsPickerDone(player->GetGUID()) || HasActiveChallenge(player->GetGUID()))
-        return false;
-
-    return true;
+    // Level 1 (or DK 55) always sees the picker until a challenge is locked in.
+    return !HasActiveChallenge(player->GetGUID());
 }
 
 void ChallengeModes::MarkPickerDone(Player* player)
@@ -862,6 +862,19 @@ void ChallengeModes::SendPickerAddon(Player* player) const
     SendPickerRewards(player);
 }
 
+void ChallengeModes::ScheduleOpenFirstLoginPicker(Player* player)
+{
+    if (!player || !ShouldShowFirstLoginPicker(player))
+        return;
+
+    ObjectGuid const guid = player->GetGUID();
+    player->m_Events.AddEventAtOffset([guid]()
+    {
+        if (Player* target = ObjectAccessor::FindPlayer(guid))
+            sChallengeModes->OpenFirstLoginPicker(target);
+    }, 2s);
+}
+
 void ChallengeModes::OpenFirstLoginPicker(Player* player)
 {
     if (!player || !ShouldShowFirstLoginPicker(player))
@@ -930,7 +943,10 @@ bool ChallengeModes::HandlePickerAddon(Player* player, std::string const& msg)
 
     if (body == "HELLO" || body == "SYNC")
     {
-        SendPickerRewards(player);
+        if (ShouldShowFirstLoginPicker(player))
+            SendPickerAddon(player);
+        else
+            SendPickerRewards(player);
         return true;
     }
 

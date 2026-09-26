@@ -16,8 +16,9 @@
 #        Default:     1
 #
 #    ChallengeModes.FirstLoginUI
-#        Description: On first login at level 1 (or 55 DK), open the mode picker (addon + gossip).
-#                     Offers every enabled challenge plus Normal mode. 0 = do not auto-open.
+#        Description: On every login at level 1 (or 55 DK), open the mode picker (addon + gossip)
+#                     until the character has locked in a challenge. Offers every enabled
+#                     challenge plus Normal mode. 0 = do not auto-open.
 #        Default:     1
 #
 #    ChallengeModes.NPCEntry

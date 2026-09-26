@@ -35,7 +35,7 @@ local L = {
 if GetLocale() == "esES" or GetLocale() == "esMX" then
     L.title = "Elige tu camino"
     L.subtitle = "Un solo modo por personaje. No se puede cambiar despues."
-    L.hint = "Selecciona un modo para leer las reglas completas."
+    L.hint = "Selecciona un modo para leer las reglas. Baja con la rueda para ver todo."
     L.accept = "Aceptar este modo"
     L.back = "< Atras"
     L.selected = "Seleccionado"
@@ -832,7 +832,10 @@ listener:SetScript("OnEvent", function(_, event, prefix, message)
             StoreExtra(message)
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
-        Send("HELLO")
+        if not listener.greeted then
+            listener.greeted = true
+            Send("HELLO")
+        end
     end
 end)
 

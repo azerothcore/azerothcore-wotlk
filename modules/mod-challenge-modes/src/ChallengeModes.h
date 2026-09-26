@@ -105,6 +105,7 @@ public:
     void HandlePlayerDeath(Player* player, char const* killer = nullptr);
     void GrantModeTitle(Player* player, uint8 mode, bool makeCurrent) const;
     void OpenFirstLoginPicker(Player* player);
+    void ScheduleOpenFirstLoginPicker(Player* player);
     bool ChooseNormal(Player* player, std::string& error);
     void MarkPickerDone(Player* player);
     bool HandlePickerAddon(Player* player, std::string const& msg);
