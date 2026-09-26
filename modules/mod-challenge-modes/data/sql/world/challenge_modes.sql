@@ -8,9 +8,9 @@ DELETE FROM `creature_template_locale` WHERE `entry` = 190012;
 DELETE FROM `creature_template_model` WHERE `CreatureID` = 190012;
 DELETE FROM `creature_template` WHERE `entry` = 190012;
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 190012;
-DELETE FROM `gossip_menu` WHERE `MenuID` = 190012;
-DELETE FROM `npc_text_locale` WHERE `ID` = 190012;
-DELETE FROM `npc_text` WHERE `ID` = 190012;
+DELETE FROM `gossip_menu` WHERE `MenuID` IN (190012, 190013);
+DELETE FROM `npc_text_locale` WHERE `ID` IN (190012, 190013);
+DELETE FROM `npc_text` WHERE `ID` IN (190012, 190013);
 DELETE FROM `gameobject_template` WHERE `entry` = 254605;
 
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`, `lang0`, `Probability0`,
@@ -27,8 +27,23 @@ INSERT INTO `npc_text_locale` (`ID`, `Locale`, `Text0_0`, `Text0_1`) VALUES
     'El Guardian de los Desafios sopesa tu determinacion.$B$BSolo puedes aceptar un desafio en nivel 1 (o 55 si eres Caballero de la Muerte). Una vez aceptado, no se puede desactivar.$B$BElige con cuidado.',
     '');
 
+INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`, `lang0`, `Probability0`,
+    `em0_0`, `em0_1`, `em0_2`, `em0_3`, `em0_4`, `em0_5`, `VerifiedBuild`) VALUES
+(190013,
+    'Welcome, adventurer.$B$BThis is your first step. Choose how this character will play: a challenge, or the classic path.$B$BYou may pick only one, and you cannot change it later.',
+    '', 0, 0, 1, 0, 0, 0, 0, 0, 0, 12340);
+
+INSERT INTO `npc_text_locale` (`ID`, `Locale`, `Text0_0`, `Text0_1`) VALUES
+(190013, 'esES',
+    'Bienvenido, aventurero.$B$BEste es tu primer paso. Elige como jugara este personaje: un desafio, o el camino clasico.$B$BSolo puedes escoger uno, y no se puede cambiar despues.',
+    ''),
+(190013, 'esMX',
+    'Bienvenido, aventurero.$B$BEste es tu primer paso. Elige como jugara este personaje: un desafio, o el camino clasico.$B$BSolo puedes escoger uno, y no se puede cambiar despues.',
+    '');
+
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
-(190012, 190012);
+(190012, 190012),
+(190013, 190013);
 
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`,
     `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`,

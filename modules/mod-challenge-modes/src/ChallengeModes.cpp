@@ -12,9 +12,12 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "GossipDef.h"
 #include "Log.h"
 #include "Player.h"
+#include "ScriptedGossip.h"
 #include "StringFormat.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
 #include <sstream>
 
@@ -86,6 +89,33 @@ char const* ChallengeModes::GetModeDescription(uint8 mode, bool spanish)
     }
 }
 
+uint8 ChallengeModes::GetModeGossipIcon(uint8 mode)
+{
+    switch (mode)
+    {
+        case CHALLENGE_HARDCORE:
+            return GOSSIP_ICON_BATTLE;
+        case CHALLENGE_SEMI_HARDCORE:
+            return GOSSIP_ICON_MONEY_BAG;
+        case CHALLENGE_SELF_CRAFTED:
+            return GOSSIP_ICON_TRAINER;
+        case CHALLENGE_ITEM_QUALITY:
+            return GOSSIP_ICON_TABARD;
+        case CHALLENGE_SLOW_XP:
+            return GOSSIP_ICON_TAXI;
+        case CHALLENGE_VERY_SLOW_XP:
+            return GOSSIP_ICON_INTERACT_1;
+        case CHALLENGE_QUEST_XP_ONLY:
+            return GOSSIP_ICON_TALK;
+        case CHALLENGE_IRON_MAN:
+            return GOSSIP_ICON_BATTLE;
+        case CHALLENGE_NORMAL_MODE:
+            return GOSSIP_ICON_CHAT;
+        default:
+            return GOSSIP_ICON_DOT;
+    }
+}
+
 bool ChallengeModes::IsSpanish(Player const* player)
 {
     if (!player || !player->GetSession())
@@ -115,6 +145,7 @@ void ChallengeModes::LoadRewardMap(std::unordered_map<uint8, uint32>& map, std::
 void ChallengeModes::LoadConfig(bool /*reload*/)
 {
     _enabled = sConfigMgr->GetOption<bool>("ChallengeModes.Enable", true);
+    _firstLoginUi = sConfigMgr->GetOption<bool>("ChallengeModes.FirstLoginUI", true);
     _npcEntry = sConfigMgr->GetOption<uint32>("ChallengeModes.NPCEntry", NPC_CHALLENGE_KEEPER);
 
     auto loadMode = [this](uint8 mode, char const* prefix, float defaultXp)
@@ -161,8 +192,13 @@ void ChallengeModes::EnsureDatabase()
         " `quest_xp` TINYINT UNSIGNED NOT NULL DEFAULT 0,"
         " `iron_man` TINYINT UNSIGNED NOT NULL DEFAULT 0,"
         " `hardcore_dead` TINYINT UNSIGNED NOT NULL DEFAULT 0,"
+        " `picker_done` TINYINT UNSIGNED NOT NULL DEFAULT 0,"
         " PRIMARY KEY (`guid`)"
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    if (!CharacterDatabase.Query("SHOW COLUMNS FROM character_challenge_modes LIKE 'picker_done'"))
+        CharacterDatabase.DirectExecute(
+            "ALTER TABLE character_challenge_modes ADD COLUMN `picker_done` TINYINT UNSIGNED NOT NULL DEFAULT 0");
 }
 
 void ChallengeModes::LoadPlayer(Player* player)
@@ -174,11 +210,12 @@ void ChallengeModes::LoadPlayer(Player* player)
     ChallengeModeState state;
     if (QueryResult result = CharacterDatabase.Query(
             "SELECT hardcore, semi_hardcore, self_crafted, item_quality, slow_xp, very_slow_xp, "
-            "quest_xp, iron_man, hardcore_dead FROM character_challenge_modes WHERE guid = {}", guid))
+            "quest_xp, iron_man, hardcore_dead, picker_done FROM character_challenge_modes WHERE guid = {}", guid))
     {
         Field* fields = result->Fetch();
         for (uint8 i = 0; i < CHALLENGE_MODE_MAX; ++i)
             state.Flag[i] = fields[i].Get<uint8>();
+        state.PickerDone = fields[CHALLENGE_MODE_MAX].Get<uint8>();
     }
 
     _players[guid] = state;
@@ -198,7 +235,7 @@ void ChallengeModes::SavePlayer(ObjectGuid guid)
     CharacterDatabase.Execute(
         "REPLACE INTO character_challenge_modes "
         "(guid, hardcore, semi_hardcore, self_crafted, item_quality, slow_xp, very_slow_xp, "
-        "quest_xp, iron_man, hardcore_dead) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {})",
+        "quest_xp, iron_man, hardcore_dead, picker_done) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})",
         guid.GetCounter(),
         uint32(state->Flag[CHALLENGE_HARDCORE]),
         uint32(state->Flag[CHALLENGE_SEMI_HARDCORE]),
@@ -208,7 +245,8 @@ void ChallengeModes::SavePlayer(ObjectGuid guid)
         uint32(state->Flag[CHALLENGE_VERY_SLOW_XP]),
         uint32(state->Flag[CHALLENGE_QUEST_XP_ONLY]),
         uint32(state->Flag[CHALLENGE_IRON_MAN]),
-        uint32(state->Flag[CHALLENGE_HARDCORE_DEAD]));
+        uint32(state->Flag[CHALLENGE_HARDCORE_DEAD]),
+        uint32(state->PickerDone));
 }
 
 ChallengeModeState* ChallengeModes::GetState(ObjectGuid guid)
@@ -331,6 +369,190 @@ bool ChallengeModes::EnableChallenge(Player* player, uint8 mode, std::string& er
     }
 
     SetEnabled(player, mode, true);
+    MarkPickerDone(player);
+    return true;
+}
+
+bool ChallengeModes::HasActiveChallenge(ObjectGuid guid) const
+{
+    for (uint8 mode = 0; mode <= CHALLENGE_IRON_MAN; ++mode)
+        if (IsEnabled(guid, mode))
+            return true;
+
+    return false;
+}
+
+bool ChallengeModes::IsPickerDone(ObjectGuid guid) const
+{
+    ChallengeModeState const* state = GetState(guid);
+    return state && state->PickerDone != 0;
+}
+
+bool ChallengeModes::ShouldShowFirstLoginPicker(Player const* player) const
+{
+    if (!_enabled || !_firstLoginUi || !player)
+        return false;
+
+    if (!CanActivate(player))
+        return false;
+
+    if (IsPickerDone(player->GetGUID()) || HasActiveChallenge(player->GetGUID()))
+        return false;
+
+    return true;
+}
+
+void ChallengeModes::MarkPickerDone(Player* player)
+{
+    if (!player)
+        return;
+
+    ChallengeModeState* state = GetState(player->GetGUID());
+    if (!state)
+    {
+        LoadPlayer(player);
+        state = GetState(player->GetGUID());
+        if (!state)
+            return;
+    }
+
+    state->PickerDone = 1;
+    SavePlayer(player->GetGUID());
+}
+
+bool ChallengeModes::ChooseNormal(Player* player, std::string& error)
+{
+    bool const spanish = IsSpanish(player);
+
+    if (!_enabled)
+    {
+        error = spanish ? "Los desafios estan desactivados." : "Challenge modes are disabled.";
+        return false;
+    }
+
+    if (!CanActivate(player))
+    {
+        error = spanish
+            ? "Solo puedes elegir modo en nivel 1 (o 55 si eres Caballero de la Muerte)."
+            : "You can only choose a mode at level 1 (or 55 for Death Knights).";
+        return false;
+    }
+
+    if (HasActiveChallenge(player->GetGUID()))
+    {
+        error = spanish ? "Este personaje ya tiene un modo de juego." : "This character already has a challenge mode.";
+        return false;
+    }
+
+    MarkPickerDone(player);
+    return true;
+}
+
+void ChallengeModes::SendPickerAddon(Player* player) const
+{
+    if (!player)
+        return;
+
+    std::string flags;
+    for (uint8 mode = 0; mode <= CHALLENGE_IRON_MAN; ++mode)
+    {
+        if (!flags.empty())
+            flags += ',';
+        flags += IsModeEnabled(mode) ? '1' : '0';
+    }
+
+    std::string const msg = Acore::StringFormat("CMUI\tOPEN\t{}\t{}",
+        IsSpanish(player) ? "es" : "en", flags);
+
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, player, player, msg);
+    player->SendDirectMessage(&data);
+}
+
+void ChallengeModes::OpenFirstLoginPicker(Player* player)
+{
+    if (!player || !ShouldShowFirstLoginPicker(player))
+        return;
+
+    SendPickerAddon(player);
+
+    ClearGossipMenuFor(player);
+    bool const spanish = IsSpanish(player);
+
+    AddGossipItemFor(player, GOSSIP_ICON_TALK,
+        spanish ? "Elige un camino. Solo uno, y no se puede cambiar."
+                : "Choose a path. Only one, and it cannot be changed.",
+        GOSSIP_SENDER_MAIN, 0);
+
+    for (uint8 mode = 0; mode <= CHALLENGE_IRON_MAN; ++mode)
+    {
+        if (!IsModeEnabled(mode))
+            continue;
+
+        std::string const label = Acore::StringFormat("|cffffd100{}|r - {}",
+            GetModeName(mode, spanish), GetModeDescription(mode, spanish));
+        uint32 const action = GOSSIP_CHALLENGE_ENABLE_BASE + mode;
+
+        if (mode == CHALLENGE_HARDCORE || mode == CHALLENGE_IRON_MAN)
+            AddGossipItemFor(player, GetModeGossipIcon(mode), label, GOSSIP_SENDER_MAIN, action,
+                spanish ? "Este modo no se puede desactivar. ¿Aceptar?"
+                        : "This mode cannot be turned off. Accept?",
+                0, false);
+        else
+            AddGossipItemFor(player, GetModeGossipIcon(mode), label, GOSSIP_SENDER_MAIN, action);
+    }
+
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT,
+        spanish ? "|cff00ff00Modo normal|r - Juego clasico, sin restricciones."
+                : "|cff00ff00Normal mode|r - Classic play, no restrictions.",
+        GOSSIP_SENDER_MAIN, GOSSIP_CHALLENGE_NORMAL);
+
+    player->PlayerTalkClass->GetGossipMenu().SetMenuId(GOSSIP_MENU_CHALLENGE);
+    SendGossipMenuFor(player, NPC_TEXT_CHALLENGE_PICKER, player->GetGUID());
+}
+
+bool ChallengeModes::HandlePickerAddon(Player* player, std::string const& msg)
+{
+    if (!player || msg.rfind("CMUI\t", 0) != 0)
+        return false;
+
+    std::string const body = msg.substr(5);
+    bool const spanish = IsSpanish(player);
+    std::string error;
+
+    if (body == "NORMAL")
+    {
+        if (!ChooseNormal(player, error))
+        {
+            ChatHandler(player->GetSession()).SendSysMessage(error);
+            return true;
+        }
+
+        ChatHandler(player->GetSession()).SendSysMessage(spanish
+            ? "Has elegido el modo normal. Juega sin restricciones."
+            : "You chose Normal mode. Play without restrictions.");
+        CloseGossipMenuFor(player);
+        return true;
+    }
+
+    if (body.rfind("SELECT\t", 0) != 0)
+        return body == "HELLO";
+
+    uint32 mode = 0;
+    std::stringstream selectStream(body.substr(7));
+    if (!(selectStream >> mode) || mode > CHALLENGE_IRON_MAN)
+        return true;
+
+    if (!EnableChallenge(player, uint8(mode), error))
+    {
+        ChatHandler(player->GetSession()).SendSysMessage(error);
+        return true;
+    }
+
+    ChatHandler(player->GetSession()).PSendSysMessage(
+        spanish ? "Desafio activado: {}." : "Challenge enabled: {}.",
+        GetModeName(uint8(mode), spanish));
+    CloseGossipMenuFor(player);
     return true;
 }
 

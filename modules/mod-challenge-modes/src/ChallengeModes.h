@@ -37,7 +37,16 @@ enum ChallengeNpcConst : uint32
     NPC_CHALLENGE_KEEPER         = 190012,
     GO_SHRINE_OF_CHALLENGE       = 254605,
     NPC_TEXT_CHALLENGE_GREETING  = 190012,
+    NPC_TEXT_CHALLENGE_PICKER    = 190013,
     GOSSIP_MENU_CHALLENGE        = 190012
+};
+
+enum ChallengePickerConst : uint32
+{
+    CHALLENGE_NORMAL_MODE            = 255,
+    GOSSIP_CHALLENGE_ENABLE_BASE     = 10,
+    GOSSIP_CHALLENGE_INFO_BASE       = 30,
+    GOSSIP_CHALLENGE_NORMAL          = 50
 };
 
 struct ChallengeModeConfig
@@ -55,6 +64,7 @@ struct ChallengeModeConfig
 struct ChallengeModeState
 {
     std::array<uint8, CHALLENGE_MODE_MAX> Flag{};
+    uint8 PickerDone = 0;
 };
 
 class ChallengeModes
@@ -77,11 +87,19 @@ public:
     [[nodiscard]] uint32 GetNpcEntry() const { return _npcEntry; }
     [[nodiscard]] bool CanActivate(Player const* player) const;
     [[nodiscard]] bool Conflicts(uint8 mode, ObjectGuid guid) const;
+    [[nodiscard]] bool HasActiveChallenge(ObjectGuid guid) const;
+    [[nodiscard]] bool IsPickerDone(ObjectGuid guid) const;
+    [[nodiscard]] bool ShouldShowFirstLoginPicker(Player const* player) const;
 
     void GiveLevelRewards(Player* player, uint8 oldLevel);
+    void OpenFirstLoginPicker(Player* player);
+    bool ChooseNormal(Player* player, std::string& error);
+    void MarkPickerDone(Player* player);
+    bool HandlePickerAddon(Player* player, std::string const& msg);
 
     static char const* GetModeName(uint8 mode, bool spanish);
     static char const* GetModeDescription(uint8 mode, bool spanish);
+    static uint8 GetModeGossipIcon(uint8 mode);
     static bool IsSpanish(Player const* player);
 
 private:
@@ -91,8 +109,10 @@ private:
     ChallengeModeState* GetState(ObjectGuid guid);
     ChallengeModeState const* GetState(ObjectGuid guid) const;
     static void LoadRewardMap(std::unordered_map<uint8, uint32>& map, std::string const& config);
+    void SendPickerAddon(Player* player) const;
 
     bool _enabled = true;
+    bool _firstLoginUi = true;
     uint32 _npcEntry = NPC_CHALLENGE_KEEPER;
     std::array<ChallengeModeConfig, CHALLENGE_IRON_MAN + 1> _modes;
     std::unordered_map<uint32, ChallengeModeState> _players;

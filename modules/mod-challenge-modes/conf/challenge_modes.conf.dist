@@ -10,6 +10,11 @@
 #        Description: Master switch. If 0, the keeper gossip still opens but cannot start a challenge.
 #        Default:     1
 #
+#    ChallengeModes.FirstLoginUI
+#        Description: On first login at level 1 (or 55 DK), open the mode picker (addon + gossip).
+#                     Offers every enabled challenge plus Normal mode. 0 = do not auto-open.
+#        Default:     1
+#
 #    ChallengeModes.NPCEntry
 #        Description: creature_template.entry of the Keeper of Challenges (must match SQL).
 #        Default:     190012
@@ -37,6 +42,7 @@
 #
 
 ChallengeModes.Enable = 1
+ChallengeModes.FirstLoginUI = 1
 ChallengeModes.NPCEntry = 190012
 
 Hardcore.Enable = 1

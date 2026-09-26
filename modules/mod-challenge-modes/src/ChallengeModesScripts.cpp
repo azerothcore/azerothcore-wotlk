@@ -10,6 +10,7 @@
 #include "ChallengeModes.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "SharedDefines.h"
 #include "Creature.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
@@ -28,9 +29,7 @@ using namespace Acore::ChatCommands;
 
 enum ChallengeGossipAction
 {
-    GOSSIP_CHALLENGE_HELLO       = 0,
-    GOSSIP_CHALLENGE_ENABLE_BASE = 10,
-    GOSSIP_CHALLENGE_INFO_BASE   = 30
+    GOSSIP_CHALLENGE_HELLO = 0
 };
 
 enum AllowedChallengeProfessions
@@ -105,6 +104,12 @@ void BuildChallengeGossip(Player* player)
         else
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, label, GOSSIP_SENDER_MAIN, action);
     }
+
+    if (canActivate && !sChallengeModes->HasActiveChallenge(guid) && !sChallengeModes->IsPickerDone(guid))
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT,
+            spanish ? "|cff00ff00Modo normal|r - Juego clasico, sin restricciones."
+                    : "|cff00ff00Normal mode|r - Classic play, no restrictions.",
+            GOSSIP_SENDER_MAIN, GOSSIP_CHALLENGE_NORMAL);
 }
 
 bool HandleChallengeGossipSelect(Player* player, uint32 action)
@@ -133,6 +138,21 @@ bool HandleChallengeGossipSelect(Player* player, uint32 action)
         ChatHandler(player->GetSession()).PSendSysMessage(
             spanish ? "Desafio activado: {}." : "Challenge enabled: {}.",
             ChallengeModes::GetModeName(mode, spanish));
+        return true;
+    }
+
+    if (action == GOSSIP_CHALLENGE_NORMAL)
+    {
+        std::string error;
+        if (!sChallengeModes->ChooseNormal(player, error))
+        {
+            ChatHandler(player->GetSession()).SendSysMessage(error);
+            return false;
+        }
+
+        ChatHandler(player->GetSession()).SendSysMessage(spanish
+            ? "Has elegido el modo normal. Juega sin restricciones."
+            : "You chose Normal mode. Play without restrictions.");
         return true;
     }
 
@@ -206,7 +226,10 @@ class ChallengeModesPlayerScript : public PlayerScript
 {
 public:
     ChallengeModesPlayerScript() : PlayerScript("ChallengeModesPlayerScript", {
+        PLAYERHOOK_ON_FIRST_LOGIN,
         PLAYERHOOK_ON_LOGIN,
+        PLAYERHOOK_ON_GOSSIP_SELECT,
+        PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE,
         PLAYERHOOK_ON_LOGOUT,
         PLAYERHOOK_ON_PLAYER_RELEASED_GHOST,
         PLAYERHOOK_ON_PVP_KILL,
@@ -243,6 +266,47 @@ public:
 
         if (sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_IRON_MAN))
             player->SetFreeTalentPoints(0);
+
+        if (sChallengeModes->ShouldShowFirstLoginPicker(player))
+            sChallengeModes->OpenFirstLoginPicker(player);
+    }
+
+    void OnPlayerFirstLogin(Player* player) override
+    {
+        if (!player || !sChallengeModes->IsModuleEnabled())
+            return;
+
+        sChallengeModes->LoadPlayer(player);
+        if (sChallengeModes->ShouldShowFirstLoginPicker(player))
+            sChallengeModes->OpenFirstLoginPicker(player);
+    }
+
+    void OnPlayerGossipSelect(Player* player, uint32 menuId, uint32 /*sender*/, uint32 action) override
+    {
+        if (!player || menuId != GOSSIP_MENU_CHALLENGE)
+            return;
+
+        HandleChallengeGossipSelect(player, action);
+
+        if (!sChallengeModes->ShouldShowFirstLoginPicker(player))
+        {
+            CloseGossipMenuFor(player);
+            return;
+        }
+
+        sChallengeModes->OpenFirstLoginPicker(player);
+    }
+
+    void OnPlayerBeforeSendChatMessage(Player* player, uint32& type, uint32& lang, std::string& msg) override
+    {
+        if (!player || lang != LANG_ADDON)
+            return;
+
+        if (type != CHAT_MSG_WHISPER && type != CHAT_MSG_GUILD)
+            return;
+
+        if (msg.rfind("CMUI\t", 0) == 0)
+            sChallengeModes->HandlePickerAddon(player, msg);
     }
 
     void OnPlayerLogout(Player* player) override
@@ -534,6 +598,7 @@ public:
         static ChatCommandTable challengeTable =
         {
             { "status", HandleStatus, SEC_PLAYER, Console::No },
+            { "pick",   HandlePick,   SEC_PLAYER, Console::No },
             { "",       HandleStatus, SEC_PLAYER, Console::No }
         };
 
@@ -571,10 +636,35 @@ public:
                 : "- Hardcore: this character is permanently dead.");
 
         if (!any)
-            handler->SendSysMessage(spanish
-                ? "Ninguno. Habla con el Guardian de los Desafios (.npc add 190012)."
-                : "None. Speak with the Keeper of Challenges (.npc add 190012).");
+        {
+            if (sChallengeModes->IsPickerDone(player->GetGUID()))
+                handler->SendSysMessage(spanish
+                    ? "Modo normal. Sin restricciones de desafio."
+                    : "Normal mode. No challenge restrictions.");
+            else
+                handler->SendSysMessage(spanish
+                    ? "Ninguno. Usa .challenge pick o habla con el Guardian (.npc add 190012)."
+                    : "None. Use .challenge pick or speak with the Keeper (.npc add 190012).");
+        }
 
+        return true;
+    }
+
+    static bool HandlePick(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+            return false;
+
+        if (!sChallengeModes->ShouldShowFirstLoginPicker(player))
+        {
+            handler->SendSysMessage(ChallengeModes::IsSpanish(player)
+                ? "Ya elegiste un modo para este personaje."
+                : "You already chose a mode for this character.");
+            return true;
+        }
+
+        sChallengeModes->OpenFirstLoginPicker(player);
         return true;
     }
 };

@@ -33,9 +33,20 @@ Progress is stored in `character_challenge_modes` (created on boot). `EnablePlay
 
 The shrine gameobject is still registered (`gobject_challenge_modes`) so an existing `254605` shrine keeps working. `.gobject add 254605` if you want the idol as well.
 
+## First-login picker
+
+On the first login of a **level 1** character (or **55** Death Knight), the module opens a mode picker:
+
+- If the **ChallengeModes** addon is installed (`addon/ChallengeModes/` → `Interface/AddOns/ChallengeModes`), a Blizzard-style window shows an icon and a short explanation for each mode, plus **Normal**.
+- Without the addon, the same choice appears as a gossip menu (icons + short text).
+- One choice only. Closing the window without picking opens it again on the next login.
+- `.challenge pick` reopens it while the character can still choose.
+
+Copy the folder `modules/mod-challenge-modes/addon/ChallengeModes` into the client `Interface/AddOns/` directory. `AddonChannel.Enabled` must stay on (default).
+
 ## Play
 
-Talk to the keeper. The greeting and every option are real strings (no `???`). Hardcore and Iron Man ask for confirmation.
+Talk to the keeper. The greeting and every option are real strings (no `???`). Hardcore and Iron Man ask for confirmation. The keeper also offers **Normal mode** if you have not chosen yet.
 
 `.challenge` / `.challenge status` lists the modes on your character.
 
