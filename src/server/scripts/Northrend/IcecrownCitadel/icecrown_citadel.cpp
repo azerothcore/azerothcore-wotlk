@@ -406,7 +406,11 @@ public:
 
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
-        creature->DespawnOrUnsummon();
+        // Force the respawn timer: creatures already dead (captains speared by Svalna) keep the
+        // m_respawnTime their long corpse delay set, which ForcedDespawn recomputes only when forced.
+        // Under the default dynamic respawn mode RemoveCorpse keeps that stale time (it only ever
+        // pushes it further out), so without the timer they would not come back for a full day.
+        creature->DespawnOrUnsummon(0ms, 2s);
 
         creature->SetCorpseDelay(corpseDelay);
         creature->SetRespawnDelay(respawnDelay);
@@ -1340,7 +1344,11 @@ public:
 
         me->GetMotionMaster()->Clear(false);
         if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+        {
+            // MoveFollow never clears the evade state _EnterEvadeMode sets, unlike MoveTargetedHome
+            me->ClearUnitState(UNIT_STATE_EVADE);
             me->GetMotionMaster()->MoveFollow(crok, FollowDist, FollowAngle, MOTION_SLOT_IDLE);
+        }
         else
             me->GetMotionMaster()->MoveTargetedHome();
 

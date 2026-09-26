@@ -2563,10 +2563,7 @@ public:
         }
         // Also trigger via respawn time queue for fully-removed spawns
         if (map->GetCreatureRespawnTime(spawnId) > 0)
-        {
-            time_t now = GameTime::GetGameTime().count();
-            map->SaveCreatureRespawnTime(spawnId, now);
-        }
+            map->ForceCreatureRespawn(spawnId);
         handler->PSendSysMessage(LANG_RESPAWN_GUID_CREATURE_QUEUED, spawnId, creData->id);
         return true;
     }
@@ -2658,7 +2655,6 @@ public:
             return false;
         }
 
-        time_t now = GameTime::GetGameTime().count();
         uint32 count = 0;
 
         // Phase 1: respawn dead corpses that are still tracked in the spawn-id store.
@@ -2691,7 +2687,7 @@ public:
         }
         for (ObjectGuid::LowType spawnId : toRespawn)
         {
-            map->SaveCreatureRespawnTime(spawnId, now);
+            map->ForceCreatureRespawn(spawnId);
             ++count;
         }
 

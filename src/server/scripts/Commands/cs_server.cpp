@@ -27,6 +27,7 @@
 #include "MySQLThreading.h"
 #include "RBAC.h"
 #include "Realm.h"
+#include "ScriptMgr.h"
 #include "StringConvert.h"
 #include "UpdateTime.h"
 #include "VMapFactory.h"
@@ -34,6 +35,7 @@
 #include "WorldSessionMgr.h"
 #include <boost/version.hpp>
 #include <filesystem>
+#include <map>
 #include <numeric>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
@@ -215,6 +217,11 @@ public:
         handler->PSendSysMessage("Default DBC locale: {}.\nAll available DBC locales: {}", localeNames[defaultLocale], availableLocales);
 
         handler->PSendSysMessage("Using World DB: {}", sWorld->GetDBVersion());
+
+        std::map<std::string, std::string> moduleDBRevisions;
+        sScriptMgr->OnDatabaseGetDBRevision(moduleDBRevisions);
+        for (auto const& [moduleName, revision] : moduleDBRevisions)
+            handler->PSendSysMessage("Using {} DB Revision: {}", moduleName, revision);
 
         std::string lldb = "No updates found!";
         if (QueryResult resL = LoginDatabase.Query("SELECT name FROM updates ORDER BY name DESC LIMIT 1"))
