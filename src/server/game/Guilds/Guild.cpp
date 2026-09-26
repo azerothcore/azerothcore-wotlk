@@ -1286,18 +1286,21 @@ void Guild::HandleSetMOTD(WorldSession* session, std::string_view motd)
     if (!_HasRankRight(session->GetPlayer(), GR_RIGHT_SETMOTD))
         SendCommandResult(session, GUILD_COMMAND_EDIT_MOTD, ERR_GUILD_PERMISSIONS);
     else
-    {
-        m_motd = motd;
+        SetMOTD(motd);
+}
 
-        sScriptMgr->OnGuildMOTDChanged(this, m_motd);
+void Guild::SetMOTD(std::string_view motd)
+{
+    m_motd = motd;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MOTD);
-        stmt->SetData(0, m_motd);
-        stmt->SetData(1, m_id);
-        CharacterDatabase.Execute(stmt);
+    sScriptMgr->OnGuildMOTDChanged(this, m_motd);
 
-        _BroadcastEvent(GE_MOTD, ObjectGuid::Empty, m_motd);
-    }
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MOTD);
+    stmt->SetData(0, m_motd);
+    stmt->SetData(1, m_id);
+    CharacterDatabase.Execute(stmt);
+
+    _BroadcastEvent(GE_MOTD, ObjectGuid::Empty, m_motd);
 }
 
 void Guild::HandleSetInfo(WorldSession* session, std::string_view info)
@@ -1307,16 +1310,19 @@ void Guild::HandleSetInfo(WorldSession* session, std::string_view info)
 
     // Player must have rights to set guild's info
     if (_HasRankRight(session->GetPlayer(), GR_RIGHT_MODIFY_GUILD_INFO))
-    {
-        m_info = info;
+        SetInfo(info);
+}
 
-        sScriptMgr->OnGuildInfoChanged(this, m_info);
+void Guild::SetInfo(std::string_view info)
+{
+    m_info = info;
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_INFO);
-        stmt->SetData(0, m_info);
-        stmt->SetData(1, m_id);
-        CharacterDatabase.Execute(stmt);
-    }
+    sScriptMgr->OnGuildInfoChanged(this, m_info);
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_INFO);
+    stmt->SetData(0, m_info);
+    stmt->SetData(1, m_id);
+    CharacterDatabase.Execute(stmt);
 }
 
 void Guild::HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo)

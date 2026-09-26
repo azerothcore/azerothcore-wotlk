@@ -360,10 +360,12 @@ void InstanceSaveMgr::LoadResetTimes()
             // calculate the next reset time
             t = (t / DAY) * DAY;
             t += ((today - t) / period + 1) * period + diff;
+            SetResetTimeFor(mapid, difficulty, t);
             CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
         }
 
-        SetExtendedResetTimeFor(mapid, difficulty, t);
+        // An extended lock runs one period past the reset, as _ResetOrWarnAll sets it after a runtime reset
+        SetExtendedResetTimeFor(mapid, difficulty, t + period);
 
         // schedule the global reset/warning
         uint8 type;

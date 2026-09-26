@@ -87,6 +87,12 @@ void InstanceScript::OnCreatureRemove(Creature* creature)
     RemoveMinion(creature);
 }
 
+bool InstanceScript::IsBossSpawnDone(ObjectGuid::LowType spawnId) const
+{
+    auto itr = _bossSpawns.find(spawnId);
+    return itr != _bossSpawns.end() && GetBossState(itr->second) == DONE;
+}
+
 void InstanceScript::OnGameObjectCreate(GameObject* go)
 {
     AddObject(go);

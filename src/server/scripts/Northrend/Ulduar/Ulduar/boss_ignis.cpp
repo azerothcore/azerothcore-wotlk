@@ -507,7 +507,7 @@ class spell_ignis_brittle_aura : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        return damageInfo && damageInfo->GetDamage() >= (GetId() == SPELL_BRITTLE ? 5000u : 3000u);
+        return damageInfo && damageInfo->GetDamage() >= 5000u;
     }
 
     void HandleProc(ProcEventInfo& eventInfo)

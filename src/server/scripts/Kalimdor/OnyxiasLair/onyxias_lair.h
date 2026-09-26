@@ -24,7 +24,7 @@
 
 #define OnyxiasLairScriptName "instance_onyxias_lair"
 
-enum eInstanceData
+enum DataTypes
 {
     DATA_ONYXIA                 = 0,
     MAX_ENCOUNTER               = 1,
@@ -32,7 +32,7 @@ enum eInstanceData
     DATA_DEEP_BREATH_FAILED,
 };
 
-enum eCreatures
+enum CreatureIds
 {
     NPC_ONYXIA                  = 10184,
     NPC_ONYXIAN_WHELP           = 11262,
@@ -40,18 +40,22 @@ enum eCreatures
     NPC_ONYXIAN_LAIR_GUARD      = 36561,
 };
 
-enum eActions
+enum Actions
 {
-    ACTION_WHELP_SUMMONED       = -1
+    ACTION_WHELP_SUMMONED       = 1
 };
 
-enum eGameObjects
+enum GameObjectIds
 {
-    GO_WHELP_SPAWNER            = 176510,
-    GO_WHELP_EGG                = 176511
+    GO_WHELP_SPAWNER            = 176510
 };
 
-enum eAchievementData
+enum SharedSpells
+{
+    SPELL_SUMMON_WHELP          = 17646
+};
+
+enum AchievementData
 {
     ACHIEV_CRITERIA_MANY_WHELPS_10_PLAYER                   = 12565, // Criteria for achievement 4403: Many Whelps! Handle It! (10 player) Hatch 50 eggs in 10s
     ACHIEV_CRITERIA_MANY_WHELPS_25_PLAYER                   = 12568, // Criteria for achievement 4406: Many Whelps! Handle It! (25 player) Hatch 50 eggs in 10s

@@ -363,7 +363,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode(EvadeReason why) override
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
         if (_fightWon)
             return;
@@ -373,23 +373,23 @@ struct boss_algalon_the_observer : public ScriptedAI
             me->SetInCombatWithZone();
             return;
         }
-        else if (events.GetPhaseMask() & PHASE_NORMAL)
+
+        // A wipe ends with Ascend to the Heavens; EVENT_EVADE then fails the encounter
+        DoAction(ACTION_ASCEND);
+    }
+
+    // Algalon has CREATURE_FLAG_EXTRA_HARD_RESET: the base evade despawns him and the map re-summons him
+    // 20s later at his home position, so point that at the sky for the arrival the instance script replays.
+    void FailEncounter(EvadeReason why)
+    {
+        if (_instance)
         {
-            DoAction(ACTION_ASCEND);
-            return;
+            _instance->SetBossState(BOSS_ALGALON, FAIL);
+            _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
         }
 
-        if (_instance)
-            _instance->SetBossState(BOSS_ALGALON, FAIL);
-
-        if (!_EnterEvadeMode(why))
-            return;
-
-        me->GetMotionMaster()->MoveTargetedHome();
-
-        Reset();
-
-        sScriptMgr->OnUnitEnterEvadeMode(me, why);
+        me->SetHomePosition(AlgalonSummonPos);
+        ScriptedAI::EnterEvadeMode(why);
     }
 
     void Reset() override
@@ -408,16 +408,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         _phaseTwo = false;
         _heraldOfTheTitans = true;
         if (_instance)
-        {
-            if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
-            {
-                _firstPull = false;
-                _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
-                _instance->SetData(DATA_RESUMMON_ALGALON, 0);
-                me->DespawnOrUnsummon(1ms);
-            }
             _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
-        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -443,13 +434,25 @@ struct boss_algalon_the_observer : public ScriptedAI
                     me->SetHomePosition(AlgalonLandPos);
                     events.Reset();
                     events.SetPhase(PHASE_ROLE_PLAY);
-                    events.ScheduleEvent(EVENT_INTRO_1, 5s, 0, PHASE_ROLE_PLAY);
-                    events.ScheduleEvent(EVENT_INTRO_CHANNEL, 6s, 0, PHASE_ROLE_PLAY);
-                    events.ScheduleEvent(EVENT_INTRO_SUMMON, 7s, 0, PHASE_ROLE_PLAY);
-                    events.ScheduleEvent(EVENT_INTRO_DESCEND, 10s, 0, PHASE_ROLE_PLAY);
-                    events.ScheduleEvent(EVENT_INTRO_2, 15s, 0, PHASE_ROLE_PLAY);
-                    events.ScheduleEvent(EVENT_INTRO_3, 23s, 0, PHASE_ROLE_PLAY);
-                    events.ScheduleEvent(EVENT_INTRO_FINISH, 36s, 0, PHASE_ROLE_PLAY);
+                    if (_firstPull)
+                    {
+                        events.ScheduleEvent(EVENT_INTRO_1, 5s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_CHANNEL, 6s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_SUMMON, 7s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_DESCEND, 10s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_2, 15s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_3, 23s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_FINISH, 36s, 0, PHASE_ROLE_PLAY);
+                    }
+                    else
+                    {
+                        // The re-arrival after a wipe has no dialogue, so the visuals run back to back
+                        events.ScheduleEvent(EVENT_INTRO_1, 1s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_CHANNEL, 1500ms, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_SUMMON, 2s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_DESCEND, 3s, 0, PHASE_ROLE_PLAY);
+                        events.ScheduleEvent(EVENT_INTRO_FINISH, 5s, 0, PHASE_ROLE_PLAY);
+                    }
                     break;
                 }
             case ACTION_DESPAWN_ALGALON:
@@ -778,7 +781,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 break;
             case EVENT_EVADE:
                 events.Reset();
-                ScriptedAI::EnterEvadeMode();
+                FailEncounter(EVADE_REASON_OTHER);
                 return;
             case EVENT_OUTRO_START:
                 if (_instance)
@@ -814,7 +817,8 @@ struct boss_algalon_the_observer : public ScriptedAI
             case EVENT_OUTRO_3:
                 me->CastSpell((Unit*)nullptr, SPELL_KILL_CREDIT);
                 // Summon Chest
-                if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO), 1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 0))
+                if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO),
+                    1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 7 * DAY, true, GO_SUMMON_TIMED_DESPAWN))
                 {
                     go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                     go->SetLootRecipient(me);
