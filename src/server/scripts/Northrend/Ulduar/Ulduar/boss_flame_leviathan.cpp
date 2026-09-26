@@ -625,8 +625,6 @@ void boss_flame_leviathan::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInf
 
         Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
     }
-    else if (spellInfo->Id == 62522 /*SPELL_ELECTROSHOCK*/)
-        me->InterruptNonMeleeSpells(false);
 }
 
 void boss_flame_leviathan::JustDied(Unit*)
