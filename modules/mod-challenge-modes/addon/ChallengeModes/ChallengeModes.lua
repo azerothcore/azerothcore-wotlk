@@ -3,7 +3,7 @@ local PREFIX = "CMUI"
 local L = {
     title = "Choose your path",
     subtitle = "One mode per character. It cannot be changed later.",
-    hint = "Select a mode to read the full rules.",
+    hint = "Select a mode to read the full rules. Scroll to see every line.",
     accept = "Accept this mode",
     back = "< Back",
     selected = "Selected",
@@ -287,8 +287,8 @@ local function SetReadableFont(fs, size)
 end
 
 local frame = CreateFrame("Frame", "ChallengeModePickerFrame", UIParent)
-frame:SetWidth(640)
-frame:SetHeight(600)
+frame:SetWidth(680)
+frame:SetHeight(640)
 frame:SetPoint("CENTER")
 frame:SetFrameStrata("DIALOG")
 frame:SetToplevel(true)
@@ -396,27 +396,42 @@ detailRulesHeader:SetText(L.rules)
 SetReadableFont(detailRulesHeader, 17)
 detailRulesHeader:SetTextColor(1, 0.82, 0)
 
-local ruleLines = {}
-for i = 1, 7 do
-    local fs = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    if i == 1 then
-        fs:SetPoint("TOPLEFT", detailRulesHeader, "BOTTOMLEFT", 0, -10)
-    else
-        fs:SetPoint("TOPLEFT", ruleLines[i - 1], "BOTTOMLEFT", 0, -7)
-    end
-    fs:SetPoint("RIGHT", detailPanel, "RIGHT", -24, 0)
-    fs:SetJustifyH("LEFT")
-    fs:SetJustifyV("TOP")
-    SetReadableFont(fs, 15)
-    fs:SetTextColor(1, 0.96, 0.88)
-    table.insert(ruleLines, fs)
-end
-
 local detailRewardHeader = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 detailRewardHeader:SetPoint("BOTTOMLEFT", 24, 186)
 detailRewardHeader:SetText(L.reward)
 SetReadableFont(detailRewardHeader, 17)
 detailRewardHeader:SetTextColor(1, 0.82, 0)
+
+local RULE_WIDTH = 560
+local rulesScroll = CreateFrame("ScrollFrame", "ChallengeModeRulesScroll", detailPanel, "UIPanelScrollFrameTemplate")
+rulesScroll:SetPoint("TOPLEFT", detailRulesHeader, "BOTTOMLEFT", 0, -8)
+rulesScroll:SetPoint("BOTTOMLEFT", detailRewardHeader, "TOPLEFT", 0, 12)
+rulesScroll:SetPoint("RIGHT", detailPanel, "RIGHT", -36, 0)
+rulesScroll:EnableMouse(true)
+rulesScroll:EnableMouseWheel(true)
+rulesScroll:SetScript("OnMouseWheel", function(self, delta)
+    local step = 32
+    local current = self:GetVerticalScroll()
+    local maxScroll = self:GetVerticalScrollRange()
+    if delta > 0 then
+        self:SetVerticalScroll(math.max(0, current - step))
+    else
+        self:SetVerticalScroll(math.min(maxScroll, current + step))
+    end
+end)
+
+local rulesChild = CreateFrame("Frame", nil, rulesScroll)
+rulesChild:SetWidth(RULE_WIDTH)
+rulesScroll:SetScrollChild(rulesChild)
+
+local rulesBody = rulesChild:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+rulesBody:SetPoint("TOPLEFT", 0, 0)
+rulesBody:SetWidth(RULE_WIDTH)
+rulesBody:SetJustifyH("LEFT")
+rulesBody:SetJustifyV("TOP")
+rulesBody:SetNonSpaceWrap(true)
+SetReadableFont(rulesBody, 15)
+rulesBody:SetTextColor(1, 0.96, 0.88)
 
 local rewardLines = {}
 for i = 1, 8 do
@@ -426,8 +441,10 @@ for i = 1, 8 do
     else
         fs:SetPoint("TOPLEFT", rewardLines[i - 1], "BOTTOMLEFT", 0, -5)
     end
-    fs:SetPoint("RIGHT", detailPanel, "RIGHT", -24, 0)
+    fs:SetWidth(560)
     fs:SetJustifyH("LEFT")
+    fs:SetJustifyV("TOP")
+    fs:SetNonSpaceWrap(true)
     SetReadableFont(fs, 14)
     fs:SetTextColor(0.95, 0.9, 0.72)
     table.insert(rewardLines, fs)
@@ -550,6 +567,25 @@ local function ShowList()
     title:SetText(L.title)
 end
 
+local function LayoutRules(mode)
+    local parts = {}
+    for _, rule in ipairs(mode.rules or {}) do
+        table.insert(parts, "|cffffd100•|r  " .. Loc(rule))
+    end
+    rulesBody:SetWidth(RULE_WIDTH)
+    rulesBody:SetText(table.concat(parts, "\n\n"))
+    local height = rulesBody:GetStringHeight() or 40
+    if height < 40 then
+        height = 40
+    end
+    rulesBody:SetHeight(height + 8)
+    rulesChild:SetHeight(height + 16)
+    rulesScroll:SetVerticalScroll(0)
+    if ChallengeModeRulesScrollScrollBar then
+        ChallengeModeRulesScrollScrollBar:SetValue(0)
+    end
+end
+
 local function FillDetail(mode)
     selectedMode = mode
     detailIcon:SetTexture(mode.icon)
@@ -557,19 +593,10 @@ local function FillDetail(mode)
     local r = serverRewards[mode.id]
     local honorific = (r and r.title and r.title ~= "") and r.title or Loc(mode.title)
     detailTitle:SetText("|cffffd100" .. L.titleLabel .. ":|r " .. honorific)
-    for i, fs in ipairs(ruleLines) do
-        local rule = mode.rules and mode.rules[i]
-        if rule then
-            fs:SetText("|cffffd100•|r  " .. Loc(rule))
-            fs:Show()
-        else
-            fs:SetText("")
-            fs:Hide()
-        end
-    end
     local rewards = BuildRewardLines(mode)
     for i, fs in ipairs(rewardLines) do
         if rewards[i] then
+            fs:SetWidth(560)
             fs:SetText(rewards[i])
             fs:Show()
         else
@@ -580,6 +607,7 @@ local function FillDetail(mode)
     title:SetText(Loc(mode.name))
     listPanel:Hide()
     detailPanel:Show()
+    LayoutRules(mode)
 end
 
 local function CreateCard(parent, mode, index)
