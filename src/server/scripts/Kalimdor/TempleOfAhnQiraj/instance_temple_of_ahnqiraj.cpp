@@ -71,6 +71,7 @@ public:
         void Initialize() override
         {
             BugTrioDeathCount = 0;
+            OuroSpawnerSpawnId = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -78,6 +79,7 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_OURO_SPAWNER:
+                    OuroSpawnerSpawnId = creature->GetSpawnId();
                     if (GetBossState(DATA_OURO) != DONE)
                         creature->Respawn();
                     break;
@@ -224,6 +226,9 @@ public:
                     {
                         if (Creature* ouroSpawner = GetCreature(DATA_OURO_SPAWNER))
                             ouroSpawner->Respawn();
+                        // Dynamic respawns remove the creature object when the spawner despawns.
+                        else if (OuroSpawnerSpawnId)
+                            instance->ProcessCreatureRespawn(OuroSpawnerSpawnId);
                     }
                     break;
                 default:
@@ -236,6 +241,7 @@ public:
     private:
         GuidVector CThunGraspGUIDs;
         uint32 BugTrioDeathCount;
+        ObjectGuid::LowType OuroSpawnerSpawnId;
     };
 };
 
