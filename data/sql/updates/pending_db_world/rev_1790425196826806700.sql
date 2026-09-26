@@ -1,4 +1,5 @@
 --
+--
 DELETE FROM `quest_poi` WHERE (`QuestID`, `id`) IN ((3802,0), (3802,1), (4123,1), (4136,1), (4201,2), (4201,3));
 DELETE FROM `quest_poi` WHERE (`QuestID`, `id`) IN ((4286,1), (4294,2), (4294,4), (4294,5), (9015,1), (25199,2));
 DELETE FROM `quest_poi` WHERE (`QuestID`, `id`) IN ((25199,3), (25212,0), (25212,1), (25229,1), (25229,2), (25229,3));
