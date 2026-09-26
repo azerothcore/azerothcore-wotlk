@@ -3646,7 +3646,38 @@ bool Creature::HasSpellFocus(Spell const* focusSpell) const
         return false;
     }
 
-    return focusSpell ? (focusSpell == _spellFocusInfo.Spell) : (_spellFocusInfo.Spell || _spellFocusInfo.Delay);
+    return focusSpell ? (focusSpell == _focusSpell) : _focusSpell != nullptr;
+}
+
+bool Creature::UpdateChannelTargetFacing(SpellInfo const* spellInfo, ObjectGuid const& channelTarget)
+{
+    if (!IsAlive())
+        return false;
+
+    WorldObject* target = ObjectAccessor::GetWorldObject(*this, channelTarget);
+    if (!target || spellInfo->CheckTarget(this, target, false) != SPELL_CAST_OK)
+        return false;
+
+    if (spellInfo->ChannelTracksTaunt)
+        if (Unit* victim = GetThreatMgr().GetCurrentVictim())
+            if (HasAuraTypeWithCaster(SPELL_AURA_MOD_TAUNT, victim->GetGUID()) &&
+                victim->IsAlive() && IsValidAttackTarget(victim))
+                target = victim;
+
+    // Tracking may turn a rooted caster, as channel validation already did, but must not take over
+    // scripted rotations or casts that explicitly lock facing. This never changes the caster's position.
+    if (!HasUnitState(UNIT_STATE_LOST_CONTROL | UNIT_STATE_ROTATING) &&
+        !spellInfo->HasAttribute(SPELL_ATTR5_AI_DOESNT_FACE_TARGET))
+    {
+        UpdateOrientation(GetAngle(target));
+
+        // Keep the original channel target and saved post-cast target intact. ReleaseFocus owns restoration.
+        if (_focusSpell && _focusSpell == GetCurrentSpell(CURRENT_CHANNELED_SPELL) &&
+            _focusSpell->GetSpellInfo() == spellInfo)
+            SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
+    }
+
+    return true;
 }
 
 void Creature::ReleaseFocus(Spell const* focusSpell)
