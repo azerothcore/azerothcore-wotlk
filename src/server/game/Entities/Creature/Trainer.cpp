@@ -19,6 +19,7 @@
 #include "Creature.h"
 #include "NPCPackets.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -74,6 +75,8 @@ namespace Trainer
             std::copy(trainerSpell.ReqAbility.begin(), trainerSpell.ReqAbility.end(), trainerListSpell.ReqAbility.begin());
         }
 
+        sScriptMgr->OnPlayerBeforeReceiveSpellListFromTrainer(player, npc, trainerList);
+
         player->SendDirectMessage(trainerList.Write());
     }
 
@@ -108,13 +111,17 @@ namespace Trainer
         npc->SendPlaySpellVisual(179); // 53 SpellCastDirected
         npc->SendPlaySpellImpact(player->GetGUID(), 362); // 113 EmoteSalute
 
-        // learn explicitly or cast explicitly
-        if (trainerSpell->IsCastable())
-            player->CastSpell(player, trainerSpell->SpellId, true);
-        else
+        // learn explicitly or cast explicitly. A cast puts each wrapped spell through learnSpell and
+        // its hook, but also runs whatever else the entry does (a class mount steps the Riding skill),
+        // so the entry itself is put to the hook first and a refusal skips the cast as a whole
+        if (!trainerSpell->IsCastable())
             player->learnSpell(trainerSpell->SpellId, false);
+        else if (sScriptMgr->OnPlayerCanLearnSpell(player, trainerSpell->SpellId))
+            player->CastSpell(player, trainerSpell->SpellId, true);
 
         SendTeachSucceeded(npc, player, spellId);
+
+        sScriptMgr->OnPlayerAfterTrainSpell(player, npc, spellId);
     }
 
     Spell const* Trainer::GetSpell(uint32 spellId) const
@@ -152,6 +159,13 @@ namespace Trainer
     }
 
     SpellState Trainer::GetSpellState(Player const* player, Spell const* trainerSpell) const
+    {
+        SpellState state = GetDefaultSpellState(player, trainerSpell);
+        sScriptMgr->OnPlayerGetTrainerSpellState(player, _trainerId, trainerSpell->SpellId, state);
+        return state;
+    }
+
+    SpellState Trainer::GetDefaultSpellState(Player const* player, Spell const* trainerSpell) const
     {
         if (player->HasSpell(trainerSpell->SpellId))
             return SpellState::Known;

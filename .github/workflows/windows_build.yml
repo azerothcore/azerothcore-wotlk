@@ -60,14 +60,49 @@ jobs:
           # (VS detection failures and slproweb removing old OpenSSL installers).
 
           # --- Boost 1.87.0 (msvc-14.3, 64-bit) prebuilt binaries -> C:\local\boost_1_87_0 (BOOST_ROOT) ---
-          # Use the direct-download host; the plain /download URL serves an HTML interstitial.
+          # Go through downloads.sourceforge.net, which hands out an https mirror. The
+          # master.dl host redirects to a plain-http URL that PowerShell 7.4+ refuses to
+          # follow, and an installer we then execute shouldn't travel in the clear anyway.
+          # SourceForge sniffs the user agent: anything starting with Mozilla gets the HTML
+          # download page instead of the file, so send a non-browser one. Note this is the
+          # opposite of what the MySQL archives CDN below wants.
           if (-not (Test-Path 'C:\local\boost_1_87_0\boost'))
           {
               $boostExe = Join-Path $env:RUNNER_TEMP 'boost.exe'
-              Invoke-WebRequest -Uri 'https://master.dl.sourceforge.net/project/boost/boost-binaries/1.87.0/boost_1_87_0-msvc-14.3-64.exe?viasf=1' -OutFile $boostExe
-              $boostMB = (Get-Item $boostExe).Length / 1MB
+              $boostUrl = 'https://downloads.sourceforge.net/project/boost/boost-binaries/' +
+                  '1.87.0/boost_1_87_0-msvc-14.3-64.exe'
+              # Mirrors drop connections often enough on a 200 MB file to be worth retrying.
+              # OperationTimeoutSeconds is the one that catches a mirror going quiet mid-transfer,
+              # which would otherwise hang the job until the 6h runner limit. Don't collapse the
+              # two into a whole-transfer budget, slow mirrors can need 15+ minutes.
+              $boostRequest = @{
+                  Uri                      = $boostUrl
+                  OutFile                  = $boostExe
+                  UserAgent                = 'azerothcore-ci'
+                  ConnectionTimeoutSeconds = 60
+                  OperationTimeoutSeconds  = 60
+              }
+              $boostAttempts = 3
+              for ($attempt = 1; $attempt -le $boostAttempts; $attempt++)
+              {
+                  try
+                  {
+                      Invoke-WebRequest @boostRequest
+                      # A mirror can answer 200 with an error page, which doesn't throw. Size-check
+                      # inside the loop so a bad payload retries onto a different mirror instead of
+                      # failing the job outright. Each attempt re-rolls the mirror.
+                      $boostMB = (Get-Item $boostExe).Length / 1MB
+                      if ($boostMB -lt 50) { throw "got $([int]$boostMB) MB, likely an HTML page." }
+                      break
+                  }
+                  catch
+                  {
+                      Write-Host "Boost download attempt $attempt failed: $($_.Exception.Message)"
+                      if ($attempt -eq $boostAttempts) { throw }
+                      Start-Sleep -Seconds 15
+                  }
+              }
               Write-Host ("Downloaded Boost installer: {0:N1} MB" -f $boostMB)
-              if ($boostMB -lt 50) { throw "Boost installer download looks wrong ($([int]$boostMB) MB) - likely an HTML page." }
               $boostProc = Start-Process -FilePath $boostExe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/DIR=C:\local\boost_1_87_0' -Wait -PassThru
               if ($boostProc.ExitCode -ne 0) { throw "Boost installer failed with exit code $($boostProc.ExitCode)." }
               # Fail fast if the installer "succeeded" but didn't lay down the expected tree,

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CombatAI.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -880,6 +881,41 @@ public:
     }
 };
 
+// Right-clicking a target while driving sends the pet attack command, which sets the victim through
+// AttackStart. VehicleAI has no melee, so deliver the swings here.
+struct npc_putricide_mutated_abomination : public VehicleAI
+{
+    explicit npc_putricide_mutated_abomination(Creature* creature) : VehicleAI(creature) { }
+
+    void AttackStart(Unit* victim) override
+    {
+        // no MoveChase, movement stays with the driver
+        if (victim)
+            me->Attack(victim, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        VehicleAI::UpdateAI(diff);
+
+        Unit* victim = me->GetVictim();
+        if (!victim)
+            return;
+
+        if (!me->GetCharmer() || !me->IsValidAttackTarget(victim))
+        {
+            me->AttackStop();
+            return;
+        }
+
+        // driven vehicles don't auto-face, so gate swings like player melee does
+        if (!me->IsWithinBoundaryRadius(victim) && !me->HasInArc(2 * float(M_PI) / 3, victim))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 class spell_putricide_slime_puddle : public SpellScript
 {
     PrepareSpellScript(spell_putricide_slime_puddle);
@@ -1559,6 +1595,7 @@ void AddSC_boss_professor_putricide()
     new boss_professor_putricide();
     new npc_volatile_ooze();
     new npc_gas_cloud();
+    RegisterIcecrownCitadelCreatureAI(npc_putricide_mutated_abomination);
     RegisterSpellScript(spell_putricide_ooze_tank_protection);
     RegisterSpellScript(spell_putricide_slime_puddle);
     RegisterSpellScript(spell_putricide_slime_puddle_spawn);

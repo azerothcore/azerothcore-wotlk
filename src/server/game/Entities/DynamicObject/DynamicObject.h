@@ -52,10 +52,12 @@ public:
     void RemoveAura();
     void SetCasterViewpoint(bool updateViewerVisibility);
     void RemoveCasterViewpoint();
+    [[nodiscard]] uint32 GetFaction() const override;
     [[nodiscard]] Unit* GetCaster() const { return _caster; }
     void BindToCaster();
     void UnbindFromCaster();
     [[nodiscard]] uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const override { return GetCasterGUID(); }
     [[nodiscard]] ObjectGuid GetCasterGUID() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
     [[nodiscard]] float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
     [[nodiscard]] bool IsViewpoint() const { return _isViewpoint; }
