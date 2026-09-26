@@ -116,6 +116,7 @@ public:
     static uint8 GetModeGossipIcon(uint8 mode);
     static bool IsSpanish(Player const* player);
     [[nodiscard]] std::string GetFormattedTitle(Player const* player, uint8 mode) const;
+    void PrintModeRewards(Player* player, uint8 mode) const;
     void Broadcast(std::string const& message) const;
     void BroadcastLocalized(std::string const& spanish, std::string const& english) const;
 
@@ -126,7 +127,13 @@ private:
     ChallengeModeState* GetState(ObjectGuid guid);
     ChallengeModeState const* GetState(ObjectGuid guid) const;
     static void LoadRewardMap(std::unordered_map<uint8, uint32>& map, std::string const& config);
+    void SendAddonWhisper(Player* player, std::string const& payload) const;
     void SendPickerAddon(Player* player) const;
+    void SendPickerRewards(Player* player) const;
+    [[nodiscard]] std::string GetTitleHonorific(Player const* player, uint32 titleId) const;
+    [[nodiscard]] std::string GetLocalizedItemName(Player const* player, uint32 itemId) const;
+    [[nodiscard]] std::string GetLocalizedAchievementName(Player const* player, uint32 achievementId) const;
+    static std::string SanitizeAddonField(std::string text, size_t maxLen);
     void GiveConfiguredReward(Player* player, uint8 mode, uint8 level);
     void BroadcastStart(Player* player, uint8 mode) const;
     void BroadcastDeath(Player* player, uint8 mode, char const* killer) const;

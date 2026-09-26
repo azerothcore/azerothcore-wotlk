@@ -13,7 +13,9 @@
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "GossipDef.h"
+#include "ItemTemplate.h"
 #include "Log.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "StringFormat.h"
@@ -614,6 +616,234 @@ bool ChallengeModes::ChooseNormal(Player* player, std::string& error)
     return true;
 }
 
+std::string ChallengeModes::SanitizeAddonField(std::string text, size_t maxLen)
+{
+    for (char& c : text)
+        if (c == '\t' || c == '\n' || c == '\r')
+            c = ' ';
+
+    while (!text.empty() && text.front() == ' ')
+        text.erase(text.begin());
+    while (!text.empty() && text.back() == ' ')
+        text.pop_back();
+
+    if (text.size() > maxLen)
+        text.resize(maxLen);
+
+    return text;
+}
+
+std::string ChallengeModes::GetTitleHonorific(Player const* player, uint32 titleId) const
+{
+    CharTitlesEntry const* title = titleId ? sCharTitlesStore.LookupEntry(titleId) : nullptr;
+    if (!title)
+        return {};
+
+    LocaleConstant const loc = player && player->GetSession()
+        ? player->GetSession()->GetSessionDbcLocale()
+        : LOCALE_enUS;
+    bool const female = player && player->getGender() == GENDER_FEMALE;
+    char const* pattern = female ? title->nameFemale[loc] : title->nameMale[loc];
+    if (!pattern || !pattern[0])
+        pattern = title->nameMale[LOCALE_enUS];
+    if (!pattern || !pattern[0])
+        return {};
+
+    std::string formatted(pattern);
+    if (size_t const pos = formatted.find("%s"); pos != std::string::npos)
+        formatted.erase(pos, 2);
+
+    return SanitizeAddonField(std::move(formatted), 48);
+}
+
+std::string ChallengeModes::GetLocalizedItemName(Player const* player, uint32 itemId) const
+{
+    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+    if (!proto)
+        return {};
+
+    std::string name = proto->Name1;
+    LocaleConstant const loc = player && player->GetSession()
+        ? player->GetSession()->GetSessionDbLocaleIndex()
+        : LOCALE_enUS;
+    if (ItemLocale const* itemLocale = sObjectMgr->GetItemLocale(itemId))
+        ObjectMgr::GetLocaleString(itemLocale->Name, loc, name);
+
+    return SanitizeAddonField(std::move(name), 48);
+}
+
+std::string ChallengeModes::GetLocalizedAchievementName(Player const* player, uint32 achievementId) const
+{
+    AchievementEntry const* achievement = sAchievementStore.LookupEntry(achievementId);
+    if (!achievement)
+        return {};
+
+    LocaleConstant loc = player && player->GetSession()
+        ? player->GetSession()->GetSessionDbcLocale()
+        : LOCALE_enUS;
+    char const* name = achievement->name[loc];
+    if (!name || !name[0])
+        name = achievement->name[LOCALE_enUS];
+    if (!name || !name[0])
+        return {};
+
+    return SanitizeAddonField(name, 40);
+}
+
+void ChallengeModes::SendAddonWhisper(Player* player, std::string const& payload) const
+{
+    if (!player || payload.empty())
+        return;
+
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, player, player, payload);
+    player->SendDirectMessage(&data);
+}
+
+void ChallengeModes::SendPickerRewards(Player* player) const
+{
+    if (!player)
+        return;
+
+    for (uint8 mode = 0; mode <= CHALLENGE_IRON_MAN; ++mode)
+    {
+        if (!IsModeEnabled(mode))
+            continue;
+
+        ChallengeModeConfig const& config = _modes[mode];
+        std::string titleName = GetTitleHonorific(player, config.RewardTitle);
+        if (titleName.empty())
+            titleName = GetModeTitle(mode, IsSpanish(player));
+
+        std::string itemName;
+        if (config.RewardItem)
+        {
+            itemName = GetLocalizedItemName(player, config.RewardItem);
+            if (itemName.empty())
+                itemName = Acore::StringFormat("#{}", config.RewardItem);
+        }
+
+        std::string achName;
+        if (config.RewardAchievement)
+        {
+            achName = GetLocalizedAchievementName(player, config.RewardAchievement);
+            if (achName.empty())
+                achName = Acore::StringFormat("#{}", config.RewardAchievement);
+        }
+
+        SendAddonWhisper(player, Acore::StringFormat(
+            "CMUI\tREWARD\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
+            uint32(mode),
+            config.RewardLevel,
+            titleName,
+            config.RewardItem,
+            config.RewardItemCount ? config.RewardItemCount : 1,
+            itemName,
+            config.RewardGold,
+            config.RewardHonor,
+            config.RewardAchievement,
+            achName,
+            config.RewardTalents));
+
+        auto sendExtra = [this, player, mode](char const* kind, uint8 level, uint32 id, std::string const& name,
+            uint32 count)
+        {
+            SendAddonWhisper(player, Acore::StringFormat("CMUI\tEXTRA\t{}\t{}\t{}\t{}\t{}\t{}",
+                uint32(mode), kind, uint32(level), id, SanitizeAddonField(name, 40), count));
+        };
+
+        for (auto const& [level, titleId] : config.TitleRewards)
+        {
+            if (titleId == config.RewardTitle && level == config.RewardLevel)
+                continue;
+            sendExtra("title", level, titleId, GetTitleHonorific(player, titleId), 1);
+        }
+
+        for (auto const& [level, itemId] : config.ItemRewards)
+        {
+            if (itemId == config.RewardItem && level == config.RewardLevel)
+                continue;
+            std::string name = GetLocalizedItemName(player, itemId);
+            if (name.empty())
+                name = Acore::StringFormat("#{}", itemId);
+            sendExtra("item", level, itemId, name, config.ItemRewardAmount ? config.ItemRewardAmount : 1);
+        }
+
+        for (auto const& [level, achId] : config.AchievementRewards)
+        {
+            if (achId == config.RewardAchievement && level == config.RewardLevel)
+                continue;
+            std::string name = GetLocalizedAchievementName(player, achId);
+            if (name.empty())
+                name = Acore::StringFormat("#{}", achId);
+            sendExtra("ach", level, achId, name, 1);
+        }
+
+        for (auto const& [level, talents] : config.TalentRewards)
+        {
+            if (talents == config.RewardTalents && level == config.RewardLevel)
+                continue;
+            sendExtra("talent", level, talents, "", talents);
+        }
+    }
+}
+
+void ChallengeModes::PrintModeRewards(Player* player, uint8 mode) const
+{
+    if (!player || mode > CHALLENGE_IRON_MAN)
+        return;
+
+    ChatHandler handler(player->GetSession());
+    bool const spanish = IsSpanish(player);
+    ChallengeModeConfig const& config = _modes[mode];
+
+    handler.PSendSysMessage(spanish ? "Completas el reto al nivel {}." : "Completes at level {}.",
+        config.RewardLevel);
+
+    std::string titleName = GetTitleHonorific(player, config.RewardTitle);
+    if (titleName.empty())
+        titleName = GetModeTitle(mode, spanish);
+    if (!titleName.empty())
+        handler.PSendSysMessage(spanish ? "Titulo: |cffffd100{}|r" : "Title: |cffffd100{}|r", titleName);
+
+    if (config.RewardItem)
+    {
+        std::string itemName = GetLocalizedItemName(player, config.RewardItem);
+        if (itemName.empty())
+            itemName = Acore::StringFormat("#{}", config.RewardItem);
+        handler.PSendSysMessage(spanish ? "Objeto: |cff00ff00{}|r x{}" : "Item: |cff00ff00{}|r x{}",
+            itemName, config.RewardItemCount ? config.RewardItemCount : 1);
+    }
+
+    if (config.RewardGold)
+    {
+        uint32 const gold = config.RewardGold / 10000;
+        uint32 const silver = (config.RewardGold % 10000) / 100;
+        uint32 const copper = config.RewardGold % 100;
+        handler.PSendSysMessage(spanish ? "Oro: {}g {}s {}c" : "Gold: {}g {}s {}c", gold, silver, copper);
+    }
+
+    if (config.RewardHonor)
+        handler.PSendSysMessage(spanish ? "Honor: {}" : "Honor: {}", config.RewardHonor);
+
+    if (config.RewardAchievement)
+    {
+        std::string achName = GetLocalizedAchievementName(player, config.RewardAchievement);
+        if (achName.empty())
+            achName = Acore::StringFormat("#{}", config.RewardAchievement);
+        handler.PSendSysMessage(spanish ? "Logro: |cff00ccff{}|r" : "Achievement: |cff00ccff{}|r", achName);
+    }
+
+    if (config.RewardTalents && mode != CHALLENGE_IRON_MAN)
+        handler.PSendSysMessage(spanish ? "Talentos extra: {}" : "Extra talent points: {}", config.RewardTalents);
+
+    if (!config.RewardItem && !config.RewardGold && !config.RewardHonor &&
+        !config.RewardAchievement && !config.RewardTalents)
+        handler.SendSysMessage(spanish
+            ? "Sin objeto, oro, honor, logro ni talentos extra en el conf."
+            : "No extra item, gold, honor, achievement or talents in the conf.");
+}
+
 void ChallengeModes::SendPickerAddon(Player* player) const
 {
     if (!player)
@@ -627,12 +857,9 @@ void ChallengeModes::SendPickerAddon(Player* player) const
         flags += IsModeEnabled(mode) ? '1' : '0';
     }
 
-    std::string const msg = Acore::StringFormat("CMUI\tOPEN\t{}\t{}",
-        IsSpanish(player) ? "es" : "en", flags);
-
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, player, player, msg);
-    player->SendDirectMessage(&data);
+    SendAddonWhisper(player, Acore::StringFormat("CMUI\tOPEN\t{}\t{}",
+        IsSpanish(player) ? "es" : "en", flags));
+    SendPickerRewards(player);
 }
 
 void ChallengeModes::OpenFirstLoginPicker(Player* player)
@@ -701,8 +928,14 @@ bool ChallengeModes::HandlePickerAddon(Player* player, std::string const& msg)
         return true;
     }
 
+    if (body == "HELLO" || body == "SYNC")
+    {
+        SendPickerRewards(player);
+        return true;
+    }
+
     if (body.rfind("SELECT\t", 0) != 0)
-        return body == "HELLO";
+        return false;
 
     uint32 mode = 0;
     std::stringstream selectStream(body.substr(7));

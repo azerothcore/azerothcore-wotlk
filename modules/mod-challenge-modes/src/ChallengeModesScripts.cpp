@@ -129,10 +129,10 @@ bool HandleChallengeGossipSelect(Player* player, uint32 action)
             ChallengeModes::GetModeName(mode, spanish),
             ChallengeModes::GetModeTitle(mode, spanish));
         handler.SendSysMessage(ChallengeModes::GetModeDescription(mode, spanish));
-        handler.PSendSysMessage(spanish
-            ? "Titulo al aceptarlo: |cffffd100{}|r. Solo un modo por personaje. Completas el reto al nivel 80."
-            : "Title when accepted: |cffffd100{}|r. One mode per character. The run completes at level 80.",
-            ChallengeModes::GetModeTitle(mode, spanish));
+        sChallengeModes->PrintModeRewards(player, mode);
+        handler.SendSysMessage(spanish
+            ? "Solo un modo por personaje."
+            : "One mode per character.");
         return true;
     }
 

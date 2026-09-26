@@ -6,7 +6,7 @@
 ## Notes-esES: Elige un modo de juego al crear el personaje
 ## Notes-esMX: Elige un modo de juego al crear el personaje
 ## Author: AzerothCore
-## Version: 1.1
+## Version: 1.2
 ## DefaultState: enabled
 
 ChallengeModes.lua
