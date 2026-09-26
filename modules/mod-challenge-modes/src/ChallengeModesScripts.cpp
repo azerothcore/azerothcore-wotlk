@@ -10,6 +10,7 @@
 #include "ChallengeModes.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "DBCStructure.h"
 #include "SharedDefines.h"
 #include "Creature.h"
 #include "GameObject.h"
@@ -47,21 +48,22 @@ void BuildChallengeGossip(Player* player)
     bool const spanish = ChallengeModes::IsSpanish(player);
     ObjectGuid const guid = player->GetGUID();
 
-    std::string active;
-    for (uint8 mode = 0; mode <= CHALLENGE_IRON_MAN; ++mode)
+    Optional<uint8> activeMode = sChallengeModes->GetActiveChallenge(guid);
+    if (activeMode)
     {
-        if (!sChallengeModes->IsEnabled(guid, mode))
-            continue;
-
-        if (!active.empty())
-            active += ", ";
-        active += ChallengeModes::GetModeName(mode, spanish);
-    }
-
-    if (!active.empty())
         AddGossipItemFor(player, GOSSIP_ICON_CHAT,
-            Acore::StringFormat(spanish ? "Activos: {}" : "Active: {}", active),
+            Acore::StringFormat(spanish ? "Modo activo: {}" : "Active mode: {}",
+                ChallengeModes::GetModeName(*activeMode, spanish)),
             GOSSIP_SENDER_MAIN, GOSSIP_CHALLENGE_HELLO);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT,
+            Acore::StringFormat(spanish ? "Titulo: {}" : "Title: {}",
+                ChallengeModes::GetModeTitle(*activeMode, spanish)),
+            GOSSIP_SENDER_MAIN, GOSSIP_CHALLENGE_HELLO);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT,
+            spanish ? "Solo se permite un modo por personaje."
+                    : "Only one challenge mode is allowed per character.",
+            GOSSIP_SENDER_MAIN, GOSSIP_CHALLENGE_HELLO);
+    }
 
     if (sChallengeModes->IsEnabled(guid, CHALLENGE_HARDCORE_DEAD))
     {
@@ -73,7 +75,7 @@ void BuildChallengeGossip(Player* player)
     }
 
     bool const canActivate = sChallengeModes->CanActivate(player);
-    if (!canActivate && active.empty())
+    if (!canActivate && !activeMode)
         AddGossipItemFor(player, GOSSIP_ICON_CHAT,
             spanish ? "Los desafios solo se activan en nivel 1 (o 55 DK)."
                     : "Challenges can only be enabled at level 1 (or 55 DK).",
@@ -85,21 +87,24 @@ void BuildChallengeGossip(Player* player)
             continue;
 
         AddGossipItemFor(player, GOSSIP_ICON_CHAT,
-            Acore::StringFormat(spanish ? "Info: {}" : "Info: {}",
-                ChallengeModes::GetModeName(mode, spanish)),
+            Acore::StringFormat(spanish ? "Info: {} — {}" : "Info: {} — {}",
+                ChallengeModes::GetModeName(mode, spanish),
+                ChallengeModes::GetModeTitle(mode, spanish)),
             GOSSIP_SENDER_MAIN, uint32(GOSSIP_CHALLENGE_INFO_BASE) + mode);
 
-        if (!canActivate || sChallengeModes->Conflicts(mode, guid))
+        if (!canActivate || sChallengeModes->HasActiveChallenge(guid))
             continue;
 
         std::string const label = Acore::StringFormat(
-            spanish ? "Activar {}" : "Enable {}", ChallengeModes::GetModeName(mode, spanish));
+            spanish ? "Activar {} ({})" : "Enable {} ({})",
+            ChallengeModes::GetModeName(mode, spanish),
+            ChallengeModes::GetModeTitle(mode, spanish));
         uint32 const action = uint32(GOSSIP_CHALLENGE_ENABLE_BASE) + mode;
 
         if (mode == CHALLENGE_HARDCORE || mode == CHALLENGE_IRON_MAN)
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, label, GOSSIP_SENDER_MAIN, action,
-                spanish ? "No se puede desactivar. ¿Continuar?"
-                        : "This cannot be turned off. Continue?",
+                spanish ? "Solo un modo por personaje y no se puede desactivar. ¿Continuar?"
+                        : "One mode per character and it cannot be turned off. Continue?",
                 0, false);
         else
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, label, GOSSIP_SENDER_MAIN, action);
@@ -119,9 +124,15 @@ bool HandleChallengeGossipSelect(Player* player, uint32 action)
     if (action >= GOSSIP_CHALLENGE_INFO_BASE && action < GOSSIP_CHALLENGE_INFO_BASE + CHALLENGE_MODE_MAX)
     {
         uint8 mode = static_cast<uint8>(action - GOSSIP_CHALLENGE_INFO_BASE);
-        ChatHandler(player->GetSession()).PSendSysMessage("{}: {}",
+        ChatHandler handler(player->GetSession());
+        handler.PSendSysMessage("|cff00ccff===== {} — {} =====|r",
             ChallengeModes::GetModeName(mode, spanish),
-            ChallengeModes::GetModeDescription(mode, spanish));
+            ChallengeModes::GetModeTitle(mode, spanish));
+        handler.SendSysMessage(ChallengeModes::GetModeDescription(mode, spanish));
+        handler.PSendSysMessage(spanish
+            ? "Titulo al aceptarlo: |cffffd100{}|r. Solo un modo por personaje. Completas el reto al nivel 80."
+            : "Title when accepted: |cffffd100{}|r. One mode per character. The run completes at level 80.",
+            ChallengeModes::GetModeTitle(mode, spanish));
         return true;
     }
 
@@ -135,9 +146,6 @@ bool HandleChallengeGossipSelect(Player* player, uint32 action)
             return false;
         }
 
-        ChatHandler(player->GetSession()).PSendSysMessage(
-            spanish ? "Desafio activado: {}." : "Challenge enabled: {}.",
-            ChallengeModes::GetModeName(mode, spanish));
         return true;
     }
 
@@ -193,7 +201,8 @@ void StripEquippedGearAndGold(Player* player)
         if (!item || !item->GetTemplate())
             continue;
 
-        ChatHandler(player->GetSession()).PSendSysMessage("|cffff2020{}|r |cffffffff|Hitem:{}:0:0:0:0:0:0:0:0|h[{}]|h|r",
+        ChatHandler(player->GetSession()).PSendSysMessage(
+            "|cffff2020{}|r |cffffffff|Hitem:{}:0:0:0:0:0:0:0:0|h[{}]|h|r",
             ChallengeModes::IsSpanish(player) ? "Has perdido" : "You lost",
             item->GetEntry(), item->GetTemplate()->Name1);
         player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
@@ -226,6 +235,7 @@ class ChallengeModesPlayerScript : public PlayerScript
 {
 public:
     ChallengeModesPlayerScript() : PlayerScript("ChallengeModesPlayerScript", {
+        PLAYERHOOK_ON_LOAD_FROM_DB,
         PLAYERHOOK_ON_FIRST_LOGIN,
         PLAYERHOOK_ON_LOGIN,
         PLAYERHOOK_ON_GOSSIP_SELECT,
@@ -238,6 +248,8 @@ public:
         PLAYERHOOK_CAN_RESURRECT,
         PLAYERHOOK_ON_GIVE_EXP,
         PLAYERHOOK_ON_LEVEL_CHANGED,
+        PLAYERHOOK_ON_CALCULATE_TALENTS_POINTS,
+        PLAYERHOOK_CAN_LEARN_TALENT,
         PLAYERHOOK_CAN_EQUIP_ITEM,
         PLAYERHOOK_CAN_USE_ITEM,
         PLAYERHOOK_CAN_APPLY_ENCHANTMENT,
@@ -247,12 +259,21 @@ public:
         PLAYERHOOK_CAN_GROUP_ACCEPT
     }) { }
 
+    void OnPlayerLoadFromDB(Player* player) override
+    {
+        if (player)
+            sChallengeModes->LoadPlayer(player);
+    }
+
     void OnPlayerLogin(Player* player) override
     {
         if (!player || !sChallengeModes->IsModuleEnabled())
             return;
 
         sChallengeModes->LoadPlayer(player);
+
+        if (Optional<uint8> mode = sChallengeModes->GetActiveChallenge(player->GetGUID()))
+            sChallengeModes->GrantModeTitle(player, *mode, false);
 
         if (sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_HARDCORE_DEAD))
         {
@@ -317,31 +338,27 @@ public:
 
     void OnPlayerReleasedGhost(Player* player) override
     {
-        if (!player || !sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_HARDCORE))
-            return;
-
-        sChallengeModes->SetEnabled(player, CHALLENGE_HARDCORE_DEAD, true);
+        if (player)
+            sChallengeModes->HandlePlayerDeath(player, nullptr);
     }
 
-    void OnPlayerPVPKill(Player* /*killer*/, Player* killed) override
+    void OnPlayerPVPKill(Player* killer, Player* killed) override
     {
         if (!killed)
             return;
 
-        if (sChallengeModes->IsEnabled(killed->GetGUID(), CHALLENGE_HARDCORE))
-            sChallengeModes->SetEnabled(killed, CHALLENGE_HARDCORE_DEAD, true);
+        sChallengeModes->HandlePlayerDeath(killed, killer ? killer->GetName().c_str() : nullptr);
 
         if (sChallengeModes->IsEnabled(killed->GetGUID(), CHALLENGE_SEMI_HARDCORE))
             StripEquippedGearAndGold(killed);
     }
 
-    void OnPlayerKilledByCreature(Creature* /*killer*/, Player* killed) override
+    void OnPlayerKilledByCreature(Creature* killer, Player* killed) override
     {
         if (!killed)
             return;
 
-        if (sChallengeModes->IsEnabled(killed->GetGUID(), CHALLENGE_HARDCORE))
-            sChallengeModes->SetEnabled(killed, CHALLENGE_HARDCORE_DEAD, true);
+        sChallengeModes->HandlePlayerDeath(killed, killer ? killer->GetName().c_str() : nullptr);
 
         if (sChallengeModes->IsEnabled(killed->GetGUID(), CHALLENGE_SEMI_HARDCORE))
             StripEquippedGearAndGold(killed);
@@ -369,7 +386,7 @@ public:
             sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_HARDCORE_DEAD) ||
             sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_IRON_MAN))
         {
-            sChallengeModes->SetEnabled(player, CHALLENGE_HARDCORE_DEAD, true);
+            sChallengeModes->HandlePlayerDeath(player, nullptr);
             player->KillPlayer();
         }
     }
@@ -389,6 +406,24 @@ public:
 
         if (sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_IRON_MAN))
             player->SetFreeTalentPoints(0);
+    }
+
+    void OnPlayerCalculateTalentsPoints(Player const* player, uint32& talentPointsForLevel) override
+    {
+        if (player && sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_IRON_MAN))
+            talentPointsForLevel = 0;
+    }
+
+    bool OnPlayerCanLearnTalent(Player* player, TalentEntry const* /*talent*/, uint32 /*rank*/) override
+    {
+        if (!player || !sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_IRON_MAN))
+            return true;
+
+        ChatHandler(player->GetSession()).SendSysMessage(
+            ChallengeModes::IsSpanish(player)
+                ? "Hombre de Hierro: no puedes aprender puntos de talento."
+                : "Iron Man: you cannot learn talent points.");
+        return false;
     }
 
     bool OnPlayerCanEquipItem(Player* player, uint8 /*slot*/, uint16& /*dest*/, Item* item, bool /*swap*/,
@@ -550,14 +585,7 @@ public:
         {
             return sChallengeModes->IsModuleEnabled() && player &&
                 (sChallengeModes->CanActivate(player) ||
-                    sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_HARDCORE) ||
-                    sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_SEMI_HARDCORE) ||
-                    sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_SELF_CRAFTED) ||
-                    sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_ITEM_QUALITY) ||
-                    sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_SLOW_XP) ||
-                    sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_VERY_SLOW_XP) ||
-                    sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_QUEST_XP_ONLY) ||
-                    sChallengeModes->IsEnabled(player->GetGUID(), CHALLENGE_IRON_MAN));
+                    sChallengeModes->HasActiveChallenge(player->GetGUID()));
         }
     };
 
@@ -625,8 +653,9 @@ public:
             if (!sChallengeModes->IsEnabled(player->GetGUID(), mode))
                 continue;
 
-            handler->PSendSysMessage("- {} — {}", ChallengeModes::GetModeName(mode, spanish),
-                ChallengeModes::GetModeDescription(mode, spanish));
+            handler->PSendSysMessage("- {} [{}]", ChallengeModes::GetModeName(mode, spanish),
+                ChallengeModes::GetModeTitle(mode, spanish));
+            handler->SendSysMessage(ChallengeModes::GetModeDescription(mode, spanish));
             any = true;
         }
 

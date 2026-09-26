@@ -3,68 +3,220 @@ local PREFIX = "CMUI"
 local L = {
     title = "Choose your path",
     subtitle = "One mode per character. It cannot be changed later.",
-    accept = "Accept",
+    hint = "Select a mode to read the full rules.",
+    accept = "Accept this mode",
+    back = "< Back",
     selected = "Selected",
     confirm = "This mode cannot be turned off. Continue?",
     needSelect = "Select a mode first.",
+    rules = "Rules",
+    reward = "Reward",
+    titleLabel = "Title",
+    complete = "Completes at level 80.",
+    oneMode = "Only one mode per character.",
+    announced = "The realm announces when you accept, fall or finish.",
     normalName = "Normal",
+    normalTitle = "Adventurer",
     normalDesc = "Classic play with no extra rules.",
 }
 
 if GetLocale() == "esES" or GetLocale() == "esMX" then
     L.title = "Elige tu camino"
     L.subtitle = "Un solo modo por personaje. No se puede cambiar despues."
-    L.accept = "Aceptar"
+    L.hint = "Selecciona un modo para leer las reglas completas."
+    L.accept = "Aceptar este modo"
+    L.back = "< Atras"
     L.selected = "Seleccionado"
     L.confirm = "Este modo no se puede desactivar. ¿Continuar?"
     L.needSelect = "Primero elige un modo."
+    L.rules = "Reglas"
+    L.reward = "Recompensa"
+    L.titleLabel = "Titulo"
+    L.complete = "Se completa al nivel 80."
+    L.oneMode = "Solo un modo por personaje."
+    L.announced = "El reino anuncia cuando aceptas, caes o terminas."
     L.normalName = "Modo normal"
+    L.normalTitle = "Aventurero"
     L.normalDesc = "Juego clasico, sin reglas extra."
 end
 
+local function T(en, es)
+    return { en = en, es = es }
+end
+
 local MODES = {
-    { id = 0, icon = "Interface\\Icons\\Spell_Shadow_DeathPact",
-        name = { en = "Hardcore", es = "Hardcore" },
-        desc = { en = "One life. Death leaves you a ghost forever.",
-                 es = "Una sola vida. Si mueres, quedas fantasma para siempre." },
-        warn = true },
+    { id = 0, icon = "Interface\\Icons\\Spell_Shadow_DeathPact", warn = true,
+        name = T("Hardcore", "Hardcore"),
+        title = T("the Undying", "el Imperecedero"),
+        short = T("One life. Death leaves you a ghost forever.",
+            "Una sola vida. Si mueres, quedas fantasma para siempre."),
+        rules = {
+            T("One life only. Death to a mob, a player or spirit release is permanent.",
+                "Una sola vida. Morir por un monstruo, un jugador o al liberar el espiritu es permanente."),
+            T("You stay a ghost forever: no graveyard, no resurrection spells.",
+                "Quedas como fantasma para siempre: ni cementerio ni hechizos de resurreccion."),
+            T("The realm announces your fall to everyone online.",
+                "El reino anuncia tu caida a todos los conectados."),
+            T("Finish by reaching level 80 without dying.",
+                "Completas el reto al llegar a nivel 80 sin morir."),
+            T("Cannot be turned off. This is the only mode this character can have.",
+                "No se puede desactivar. Es el unico modo que puede tener este personaje."),
+        },
+        reward = T("Grants and equips the title the Undying.",
+            "Otorga y equipa el titulo el Imperecedero.") },
     { id = 1, icon = "Interface\\Icons\\INV_Misc_Coin_02",
-        name = { en = "Semi-Hardcore", es = "Semi-Hardcore" },
-        desc = { en = "Death destroys worn gear and all carried gold.",
-                 es = "Si mueres pierdes el equipo puesto y todo el oro." } },
+        name = T("Semi-Hardcore", "Semi-Hardcore"),
+        title = T("of the Nightfall", "de la Caida Nocturna"),
+        short = T("Death destroys worn gear and all carried gold.",
+            "Si mueres pierdes el equipo puesto y todo el oro."),
+        rules = {
+            T("You may die and resurrect as usual.",
+                "Puedes morir y resucitar con normalidad."),
+            T("Each death strips ALL worn equipment.",
+                "Cada muerte te despoja de TODO el equipo puesto."),
+            T("Each death also takes ALL gold you are carrying. Bags and bank stay.",
+                "Cada muerte tambien te quita TODO el oro que lleves. Bolsas y banco se quedan."),
+            T("High risk without deleting the character.",
+                "Alto riesgo sin perder el personaje."),
+            T("Complete the run by reaching level 80.",
+                "Completas el reto al llegar a nivel 80."),
+        },
+        reward = T("Grants and equips the title of the Nightfall.",
+            "Otorga y equipa el titulo de la Caida Nocturna.") },
     { id = 2, icon = "Interface\\Icons\\INV_Hammer_20",
-        name = { en = "Self-Crafted", es = "Solo fabricado" },
-        desc = { en = "Equip only items you crafted yourself.",
-                 es = "Solo puedes equipar lo que fabricaste tu." } },
+        name = T("Self-Crafted", "Solo fabricado"),
+        title = T("the Supreme", "el Supremo"),
+        short = T("Equip only items you crafted yourself.",
+            "Solo puedes equipar lo que fabricaste tu."),
+        rules = {
+            T("You may only equip items YOU crafted. The item creator must be this character.",
+                "Solo puedes equipar objetos que TU hayas fabricado. El creador debe ser este personaje."),
+            T("No loot, auction house, gifts or boss drops as equipment.",
+                "No vale loot, casa de subastas, regalos ni drops de jefes como equipo."),
+            T("Armor and weapons must come from your professions.",
+                "Armaduras y armas tienen que salir de tus profesiones."),
+            T("Complete the run at level 80.",
+                "Completas el reto al nivel 80."),
+        },
+        reward = T("Grants and equips the title the Supreme.",
+            "Otorga y equipa el titulo el Supremo.") },
     { id = 3, icon = "Interface\\Icons\\INV_Shirt_Grey_01",
-        name = { en = "Item Quality", es = "Calidad baja" },
-        desc = { en = "Poor or Common gear only.",
-                 es = "Solo equipo pobre o comun." } },
+        name = T("Item Quality", "Calidad baja"),
+        title = T("Jenkins", "Jenkins"),
+        short = T("Poor or Common gear only.",
+            "Solo equipo pobre o comun."),
+        rules = {
+            T("You may only equip Poor (grey) or Common (white) items.",
+                "Solo puedes equipar objetos pobres (gris) o comunes (blanco)."),
+            T("No green, blue, epic or legendary gear from quests, dungeons or the auction house.",
+                "Nada de verdes, azules, epicos ni legendarios: ni misiones, ni mazmorras, ni AH."),
+            T("Bags and items you cannot equip are allowed.",
+                "Las bolsas y objetos no equipables estan permitidos."),
+            T("Complete the run at level 80.",
+                "Completas el reto al nivel 80."),
+        },
+        reward = T("Grants and equips the title Jenkins.",
+            "Otorga y equipa el titulo Jenkins.") },
     { id = 4, icon = "Interface\\Icons\\Spell_Nature_Sleep",
-        name = { en = "Slow XP", es = "XP lenta" },
-        desc = { en = "You receive half experience.",
-                 es = "Recibes la mitad de experiencia." } },
+        name = T("Slow XP", "XP lenta"),
+        title = T("the Patient", "el Paciente"),
+        short = T("You receive half experience.",
+            "Recibes la mitad de experiencia."),
+        rules = {
+            T("You receive half experience from kills, quests and exploration.",
+                "Recibes la mitad de experiencia de muertes, misiones y exploracion."),
+            T("Leveling takes twice as long.",
+                "Subir de nivel tarda el doble."),
+            T("Normal gear is allowed.",
+                "Puedes usar equipo normal."),
+            T("Cannot be combined with Very Slow XP. Complete at level 80.",
+                "No se combina con XP muy lenta. Completas el reto al nivel 80."),
+        },
+        reward = T("Grants and equips the title the Patient.",
+            "Otorga y equipa el titulo el Paciente.") },
     { id = 5, icon = "Interface\\Icons\\Spell_Frost_Stun",
-        name = { en = "Very Slow XP", es = "XP muy lenta" },
-        desc = { en = "You receive a quarter of experience.",
-                 es = "Recibes un cuarto de experiencia." } },
+        name = T("Very Slow XP", "XP muy lenta"),
+        title = T("the Explorer", "el Explorador"),
+        short = T("You receive a quarter of experience.",
+            "Recibes un cuarto de experiencia."),
+        rules = {
+            T("You receive 25% of normal experience. Each level costs four times as much.",
+                "Recibes un 25% de la experiencia normal. Cada nivel cuesta cuatro veces mas."),
+            T("The harshest leveling pace.",
+                "El ritmo de subida mas exigente."),
+            T("Gear is unrestricted.",
+                "El equipo es libre."),
+            T("Cannot be combined with Slow XP. Complete at level 80.",
+                "No se combina con XP lenta. Completas el reto al nivel 80."),
+        },
+        reward = T("Grants and equips the title the Explorer.",
+            "Otorga y equipa el titulo el Explorador.") },
     { id = 6, icon = "Interface\\Icons\\INV_Misc_Book_11",
-        name = { en = "Quest XP Only", es = "Solo XP de misiones" },
-        desc = { en = "Only quests grant experience.",
-                 es = "Solo las misiones dan experiencia." } },
-    { id = 7, icon = "Interface\\Icons\\INV_Helmet_25",
-        name = { en = "Iron Man", es = "Hombre de Hierro" },
-        desc = { en = "No res, talents, rare gear, pots, enchants or groups.",
-                 es = "Sin resucitar, talentos, raros, pociones, encantos ni grupos." },
-        warn = true },
+        name = T("Quest XP Only", "Solo XP de misiones"),
+        title = T("Loremaster", "Maestro Cultural"),
+        short = T("Only quests grant experience.",
+            "Solo las misiones dan experiencia."),
+        rules = {
+            T("Kills, exploration and battlegrounds grant no experience.",
+                "Las muertes, la exploracion y los campos de batalla no dan experiencia."),
+            T("Only quests level you. Your pet can still gain kill XP.",
+                "Solo las misiones te suben de nivel. Tu mascota si puede ganar XP de asesinatos."),
+            T("Gear is unrestricted.",
+                "El equipo es libre."),
+            T("Complete the run at level 80.",
+                "Completas el reto al nivel 80."),
+        },
+        reward = T("Grants and equips the title Loremaster.",
+            "Otorga y equipa el titulo Maestro Cultural.") },
+    { id = 7, icon = "Interface\\Icons\\INV_Helmet_25", warn = true,
+        name = T("Iron Man", "Hombre de Hierro"),
+        title = T("the Insane", "el Demente"),
+        short = T("No res, talents, rare gear, pots, enchants or groups.",
+            "Sin resucitar, talentos, raros, pociones, encantos ni grupos."),
+        rules = {
+            T("You cannot resurrect. Death ends the spirit of the run.",
+                "No puedes resucitar. Una muerte termina el espiritu de la run."),
+            T("You gain no talent points. The server zeroes them and blocks learning.",
+                "No ganas puntos de talento. El servidor los anula y bloquea aprenderlos."),
+            T("Poor or Common gear only. No enchants.",
+                "Solo equipo pobre o comun. Sin encantamientos."),
+            T("No potions, elixirs, flasks or food buffs.",
+                "Sin pociones, elixires, frascos ni comida con buff."),
+            T("No extra professions and no groups.",
+                "Sin profesiones extra y sin grupos."),
+            T("The realm announces your death. Complete at level 80.",
+                "El reino anuncia tu muerte. Completas el reto al nivel 80."),
+        },
+        reward = T("Grants and equips the title the Insane.",
+            "Otorga y equipa el titulo el Demente.") },
     { id = "normal", icon = "Interface\\Icons\\Achievement_General",
-        name = { en = L.normalName, es = L.normalName },
-        desc = { en = L.normalDesc, es = L.normalDesc } },
+        name = T(L.normalName, L.normalName),
+        title = T(L.normalTitle, L.normalTitle),
+        short = T(L.normalDesc, L.normalDesc),
+        rules = {
+            T("Classic World of Warcraft. No extra restrictions.",
+                "World of Warcraft clasico. Sin restricciones extra."),
+            T("Talents, groups, gear and resurrection work as usual.",
+                "Talentos, grupos, equipo y resurreccion funcionan con normalidad."),
+            T("No challenge title and no realm announce.",
+                "Sin titulo de desafio y sin anuncio al reino."),
+            T("You can still talk to the Keeper later if you have not chosen yet. After this, the choice is locked.",
+                "Puedes hablar con el Guardian mas tarde si aun no has elegido. Despues de esto, la eleccion queda fija."),
+        },
+        reward = T("No extra rewards. Play the game as designed.",
+            "Sin recompensas extra. Juega el juego tal como es.") },
 }
 
 local locale = (GetLocale() == "esES" or GetLocale() == "esMX") and "es" or "en"
-local selectedId
+local selectedMode
 local cards = {}
+
+local function Loc(entry)
+    if type(entry) == "table" then
+        return entry[locale] or entry.en or ""
+    end
+    return entry or ""
+end
 
 local function Send(payload)
     local name = UnitName("player")
@@ -73,13 +225,38 @@ local function Send(payload)
     end
 end
 
-local function Text(mode)
-    return mode.name[locale], mode.desc[locale]
+local function FindMode(id)
+    for _, mode in ipairs(MODES) do
+        if mode.id == id then
+            return mode
+        end
+    end
 end
 
+local BACKDROP_FRAME = {
+    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+    tile = true, tileSize = 32, edgeSize = 32,
+    insets = { left = 11, right = 12, top = 12, bottom = 11 }
+}
+
+local BACKDROP_CARD = {
+    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+    tile = true, tileSize = 16, edgeSize = 16,
+    insets = { left = 4, right = 4, top = 4, bottom = 4 }
+}
+
+local BACKDROP_PANEL = {
+    bgFile = "Interface\\AchievementFrame\\UI-Achievement-Parchment-Horizontal",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+    tile = false, tileSize = 16, edgeSize = 16,
+    insets = { left = 5, right = 5, top = 5, bottom = 5 }
+}
+
 local frame = CreateFrame("Frame", "ChallengeModePickerFrame", UIParent)
-frame:SetWidth(560)
-frame:SetHeight(520)
+frame:SetWidth(620)
+frame:SetHeight(560)
 frame:SetPoint("CENTER")
 frame:SetFrameStrata("DIALOG")
 frame:SetToplevel(true)
@@ -88,64 +265,185 @@ frame:SetMovable(true)
 frame:RegisterForDrag("LeftButton")
 frame:SetScript("OnDragStart", frame.StartMoving)
 frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
-frame:SetBackdrop({
-    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-    tile = true, tileSize = 32, edgeSize = 32,
-    insets = { left = 11, right = 12, top = 12, bottom = 11 }
-})
-frame:SetBackdropColor(0, 0, 0, 0.92)
+frame:SetBackdrop(BACKDROP_FRAME)
+frame:SetBackdropColor(0.05, 0.04, 0.03, 0.96)
 frame:Hide()
 
 local header = frame:CreateTexture(nil, "ARTWORK")
 header:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
-header:SetWidth(400)
+header:SetWidth(420)
 header:SetHeight(64)
-header:SetPoint("TOP", 0, 12)
+header:SetPoint("TOP", 0, 14)
 
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 title:SetPoint("TOP", header, "TOP", 0, -13)
 title:SetText(L.title)
 
-local subtitle = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-subtitle:SetPoint("TOP", frame, "TOP", 0, -38)
-subtitle:SetWidth(500)
+local close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
+close:SetPoint("TOPRIGHT", -4, -4)
+close:SetScript("OnClick", function()
+    frame:Hide()
+    PlaySound("igMainMenuClose")
+end)
+
+local listPanel = CreateFrame("Frame", nil, frame)
+listPanel:SetPoint("TOPLEFT", 16, -42)
+listPanel:SetPoint("BOTTOMRIGHT", -16, 16)
+
+local subtitle = listPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+subtitle:SetPoint("TOP", listPanel, "TOP", 0, -2)
+subtitle:SetWidth(560)
 subtitle:SetJustifyH("CENTER")
 subtitle:SetText(L.subtitle)
 
-local function SetCardSelected(card, on)
-    if on then
+local hint = listPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+hint:SetPoint("TOP", subtitle, "BOTTOM", 0, -6)
+hint:SetWidth(560)
+hint:SetJustifyH("CENTER")
+hint:SetTextColor(1, 0.82, 0.2)
+hint:SetText(L.hint)
+
+local function SetCardLook(card, state)
+    if state == "selected" then
         card:SetBackdropBorderColor(1, 0.82, 0, 1)
-        card:SetBackdropColor(0.22, 0.18, 0.05, 0.95)
+        card:SetBackdropColor(0.28, 0.2, 0.04, 0.95)
+    elseif state == "hover" then
+        card:SetBackdropBorderColor(0.95, 0.78, 0.28, 1)
+        card:SetBackdropColor(0.16, 0.13, 0.05, 0.92)
+    elseif state == "danger" then
+        card:SetBackdropBorderColor(0.75, 0.22, 0.18, 0.95)
+        card:SetBackdropColor(0.12, 0.05, 0.04, 0.9)
     else
-        card:SetBackdropBorderColor(0.4, 0.35, 0.25, 0.9)
-        card:SetBackdropColor(0.08, 0.08, 0.08, 0.85)
+        card:SetBackdropBorderColor(0.45, 0.38, 0.22, 0.9)
+        card:SetBackdropColor(0.07, 0.06, 0.04, 0.88)
     end
 end
 
-local function SelectCard(id)
-    selectedId = id
-    for _, card in ipairs(cards) do
-        SetCardSelected(card, card.modeId == id)
+local detailPanel = CreateFrame("Frame", nil, frame)
+detailPanel:SetPoint("TOPLEFT", 22, -48)
+detailPanel:SetPoint("BOTTOMRIGHT", -22, 18)
+detailPanel:SetBackdrop(BACKDROP_PANEL)
+detailPanel:SetBackdropColor(1, 1, 1, 0.92)
+detailPanel:SetBackdropBorderColor(0.85, 0.7, 0.25, 1)
+detailPanel:Hide()
+
+local detailIconBorder = detailPanel:CreateTexture(nil, "ARTWORK")
+detailIconBorder:SetTexture("Interface\\Buttons\\UI-Quickslot2")
+detailIconBorder:SetWidth(84)
+detailIconBorder:SetHeight(84)
+detailIconBorder:SetPoint("TOPLEFT", 18, -22)
+
+local detailIcon = detailPanel:CreateTexture(nil, "OVERLAY")
+detailIcon:SetWidth(52)
+detailIcon:SetHeight(52)
+detailIcon:SetPoint("CENTER", detailIconBorder, "CENTER", 0, 0)
+
+local detailName = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+detailName:SetPoint("TOPLEFT", detailIconBorder, "TOPRIGHT", 8, -10)
+detailName:SetPoint("RIGHT", detailPanel, "RIGHT", -20, 0)
+detailName:SetJustifyH("LEFT")
+
+local detailTitle = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+detailTitle:SetPoint("TOPLEFT", detailName, "BOTTOMLEFT", 0, -6)
+detailTitle:SetPoint("RIGHT", detailPanel, "RIGHT", -20, 0)
+detailTitle:SetJustifyH("LEFT")
+detailTitle:SetTextColor(1, 0.82, 0)
+
+local detailDivider = detailPanel:CreateTexture(nil, "ARTWORK")
+detailDivider:SetTexture("Interface\\FriendsFrame\\UI-FriendsFrame-OnlineDivider")
+detailDivider:SetHeight(8)
+detailDivider:SetPoint("TOPLEFT", 22, -108)
+detailDivider:SetPoint("RIGHT", detailPanel, "RIGHT", -22, 0)
+
+local detailRulesHeader = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+detailRulesHeader:SetPoint("TOPLEFT", 24, -122)
+detailRulesHeader:SetText(L.rules)
+
+local ruleLines = {}
+for i = 1, 7 do
+    local fs = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    if i == 1 then
+        fs:SetPoint("TOPLEFT", detailRulesHeader, "BOTTOMLEFT", 0, -8)
+    else
+        fs:SetPoint("TOPLEFT", ruleLines[i - 1], "BOTTOMLEFT", 0, -6)
     end
+    fs:SetPoint("RIGHT", detailPanel, "RIGHT", -24, 0)
+    fs:SetJustifyH("LEFT")
+    fs:SetJustifyV("TOP")
+    fs:SetTextColor(0.15, 0.1, 0.05)
+    table.insert(ruleLines, fs)
+end
+
+local detailRewardHeader = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+detailRewardHeader:SetPoint("BOTTOMLEFT", 24, 86)
+detailRewardHeader:SetText(L.reward)
+
+local detailReward = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+detailReward:SetPoint("TOPLEFT", detailRewardHeader, "BOTTOMLEFT", 0, -6)
+detailReward:SetPoint("RIGHT", detailPanel, "RIGHT", -24, 0)
+detailReward:SetJustifyH("LEFT")
+detailReward:SetTextColor(0.2, 0.12, 0.04)
+
+local detailMeta = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+detailMeta:SetPoint("TOPLEFT", detailReward, "BOTTOMLEFT", 0, -6)
+detailMeta:SetPoint("RIGHT", detailPanel, "RIGHT", -24, 0)
+detailMeta:SetJustifyH("LEFT")
+
+local backBtn = CreateFrame("Button", nil, detailPanel, "UIPanelButtonTemplate")
+backBtn:SetWidth(110)
+backBtn:SetHeight(24)
+backBtn:SetPoint("BOTTOMLEFT", 18, 16)
+backBtn:SetText(L.back)
+
+local acceptBtn = CreateFrame("Button", nil, detailPanel, "UIPanelButtonTemplate")
+acceptBtn:SetWidth(180)
+acceptBtn:SetHeight(24)
+acceptBtn:SetPoint("BOTTOMRIGHT", -18, 16)
+acceptBtn:SetText(L.accept)
+
+local function ShowList()
+    selectedMode = nil
+    detailPanel:Hide()
+    listPanel:Show()
+    title:SetText(L.title)
+end
+
+local function FillDetail(mode)
+    selectedMode = mode
+    detailIcon:SetTexture(mode.icon)
+    detailName:SetText(Loc(mode.name))
+    detailTitle:SetText("|cffffd100" .. L.titleLabel .. ":|r " .. Loc(mode.title))
+    for i, fs in ipairs(ruleLines) do
+        local rule = mode.rules and mode.rules[i]
+        if rule then
+            fs:SetText("|cff6b4a16•|r  " .. Loc(rule))
+            fs:Show()
+        else
+            fs:SetText("")
+            fs:Hide()
+        end
+    end
+    detailReward:SetText(Loc(mode.reward))
+    if mode.id == "normal" then
+        detailMeta:SetText(L.oneMode)
+    else
+        detailMeta:SetText(L.complete .. "  " .. L.oneMode .. "  " .. L.announced)
+    end
+    title:SetText(Loc(mode.name))
+    listPanel:Hide()
+    detailPanel:Show()
 end
 
 local function CreateCard(parent, mode, index)
     local col = (index - 1) % 3
     local row = math.floor((index - 1) / 3)
     local card = CreateFrame("Button", nil, parent)
-    card:SetWidth(168)
+    card:SetWidth(186)
     card:SetHeight(118)
-    card:SetPoint("TOPLEFT", 22 + col * 176, -62 - row * 126)
-    card:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 4, right = 4, top = 4, bottom = 4 }
-    })
-    SetCardSelected(card, false)
-    card.modeId = mode.id
-    card.warn = mode.warn
+    card:SetPoint("TOPLEFT", 8 + col * 194, -48 - row * 128)
+    card:SetBackdrop(BACKDROP_CARD)
+    SetCardLook(card, mode.warn and "danger" or "idle")
+    card.mode = mode
 
     local icon = card:CreateTexture(nil, "ARTWORK")
     icon:SetWidth(36)
@@ -153,31 +451,45 @@ local function CreateCard(parent, mode, index)
     icon:SetPoint("TOPLEFT", 10, -10)
     icon:SetTexture(mode.icon)
 
-    local name, desc = Text(mode)
     local nameFS = card:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    nameFS:SetPoint("TOPLEFT", icon, "TOPRIGHT", 8, -2)
+    nameFS:SetPoint("TOPLEFT", icon, "TOPRIGHT", 8, -1)
     nameFS:SetPoint("RIGHT", card, "RIGHT", -8, 0)
     nameFS:SetJustifyH("LEFT")
-    nameFS:SetText(name)
+    nameFS:SetText(Loc(mode.name))
+    card.nameFS = nameFS
+
+    local titleFS = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    titleFS:SetPoint("TOPLEFT", nameFS, "BOTTOMLEFT", 0, -2)
+    titleFS:SetPoint("RIGHT", card, "RIGHT", -8, 0)
+    titleFS:SetJustifyH("LEFT")
+    titleFS:SetTextColor(1, 0.82, 0)
+    titleFS:SetText(Loc(mode.title))
+    card.titleFS = titleFS
 
     local descFS = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     descFS:SetPoint("TOPLEFT", icon, "BOTTOMLEFT", 0, -8)
     descFS:SetPoint("RIGHT", card, "RIGHT", -8, 0)
     descFS:SetJustifyH("LEFT")
     descFS:SetJustifyV("TOP")
-    descFS:SetText(desc)
+    descFS:SetText(Loc(mode.short))
+    card.descFS = descFS
 
     card:SetScript("OnClick", function()
-        SelectCard(mode.id)
         PlaySound("igMainMenuOptionCheckBoxOn")
+        FillDetail(mode)
     end)
     card:SetScript("OnEnter", function(self)
-        if selectedId ~= mode.id then
-            self:SetBackdropBorderColor(0.8, 0.7, 0.3, 1)
-        end
+        SetCardLook(self, "hover")
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(Loc(mode.name), 1, 0.82, 0)
+        GameTooltip:AddLine(Loc(mode.title), 0.9, 0.8, 0.4, true)
+        GameTooltip:AddLine(Loc(mode.short), 1, 1, 1, true)
+        GameTooltip:AddLine(L.hint, 0.6, 0.8, 1, true)
+        GameTooltip:Show()
     end)
     card:SetScript("OnLeave", function(self)
-        SetCardSelected(self, selectedId == mode.id)
+        SetCardLook(self, mode.warn and "danger" or "idle")
+        GameTooltip:Hide()
     end)
 
     table.insert(cards, card)
@@ -185,42 +497,50 @@ local function CreateCard(parent, mode, index)
 end
 
 for i, mode in ipairs(MODES) do
-    CreateCard(frame, mode, i)
+    CreateCard(listPanel, mode, i)
 end
 
-local accept = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-accept:SetWidth(140)
-accept:SetHeight(24)
-accept:SetPoint("BOTTOM", 0, 18)
-accept:SetText(L.accept)
+local function RefreshCardTexts()
+    for _, card in ipairs(cards) do
+        local mode = card.mode
+        card.nameFS:SetText(Loc(mode.name))
+        card.titleFS:SetText(Loc(mode.title))
+        card.descFS:SetText(Loc(mode.short))
+    end
+    subtitle:SetText(L.subtitle)
+    hint:SetText(L.hint)
+    title:SetText(L.title)
+    detailRulesHeader:SetText(L.rules)
+    detailRewardHeader:SetText(L.reward)
+    backBtn:SetText(L.back)
+    acceptBtn:SetText(L.accept)
+end
 
 local function DoAccept()
-    if selectedId == nil then
+    if not selectedMode then
         UIErrorsFrame:AddMessage(L.needSelect, 1, 0.2, 0.2, 1)
         return
     end
-    if selectedId == "normal" then
+    if selectedMode.id == "normal" then
         Send("NORMAL")
     else
-        Send("SELECT\t" .. tostring(selectedId))
+        Send("SELECT\t" .. tostring(selectedMode.id))
     end
     frame:Hide()
     PlaySound("igMainMenuOption")
 end
 
-accept:SetScript("OnClick", function()
-    if selectedId == nil then
+backBtn:SetScript("OnClick", function()
+    PlaySound("igMainMenuOptionCheckBoxOff")
+    ShowList()
+end)
+
+acceptBtn:SetScript("OnClick", function()
+    if not selectedMode then
         UIErrorsFrame:AddMessage(L.needSelect, 1, 0.2, 0.2, 1)
         return
     end
-    local warn = false
-    for _, card in ipairs(cards) do
-        if card.modeId == selectedId and card.warn then
-            warn = true
-            break
-        end
-    end
-    if warn then
+    if selectedMode.warn then
         StaticPopup_Show("CHALLENGE_MODE_CONFIRM")
     else
         DoAccept()
@@ -239,7 +559,7 @@ StaticPopupDialogs["CHALLENGE_MODE_CONFIRM"] = {
 }
 
 frame:SetScript("OnShow", function()
-    SelectCard(nil)
+    ShowList()
     PlaySound("igCharacterInfoOpen")
 end)
 
@@ -247,8 +567,9 @@ local function ShowPicker(enabledFlags)
     if CloseGossip then
         CloseGossip()
     end
-    for i, card in ipairs(cards) do
-        local mode = MODES[i]
+    RefreshCardTexts()
+    for _, card in ipairs(cards) do
+        local mode = card.mode
         if mode.id == "normal" then
             card:Show()
         else
@@ -260,6 +581,7 @@ local function ShowPicker(enabledFlags)
             end
         end
     end
+    ShowList()
     frame:Show()
 end
 

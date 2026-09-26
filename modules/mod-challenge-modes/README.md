@@ -8,20 +8,51 @@ Este módulo usa el **mismo NPC y el mismo gossip**, con textos reales en `npc_t
 
 Challenge modes for AzerothCore 3.3.5a. Activate per-character at the **Keeper of Challenges** (entry `190012`) in each starting area, or at the optional Shrine of Challenge gameobject (`254605`).
 
-| Mode | Rule |
+## Rules
+
+- **One mode per character.** After a challenge is accepted, Enable options disappear and a second mode is rejected.
+- Challenges can only be enabled at **level 1** (or **55** for Death Knights). They cannot be turned off, except by a configured `DisableLevel`.
+- The realm **announces** when a player accepts a mode, when a Hardcore / Iron Man character dies, and when someone completes a run at `RewardLevel` (default 80). Toggle with `ChallengeModes.Announce`.
+- Progress is stored in `character_challenge_modes` (created on boot). `EnablePlayerSettings` is **not** required.
+
+| Mode | Title (id) | Rule |
+| --- | --- | --- |
+| Hardcore | the Undying (142) | One life. Death (mob, player or spirit release) leaves you a ghost forever. The realm announces your fall. |
+| Semi-Hardcore | of the Nightfall (140) | You may die, but each death destroys worn equipment and all carried gold. |
+| Self-Crafted | the Supreme (85) | Only items you crafted yourself (item creator must be this character). |
+| Item Quality | Jenkins (143) | Poor / Common gear only. |
+| Slow XP | the Patient (172) | 0.5× experience from kills, quests and exploration. |
+| Very Slow XP | the Explorer (78) | 0.25× experience. |
+| Quest XP Only | Loremaster (125) | Experience from quests only. |
+| Iron Man / Hombre de Hierro | the Insane (145) | No resurrect, **no talent points** (blocked at calculation and learn), rare gear, potions/flasks, enchants or groups. Death is announced. |
+
+Accepting a mode **grants and equips** that title (stock 3.3.5 `CharTitles.dbc` ids, so the nameplate shows it without a client patch). Change or disable with `<Mode>.RewardTitle` (`0` = no title). Gossip **Info** prints the title plus a longer bilingual explanation.
+
+## Level 80 rewards
+
+Configure completion rewards per mode in `challenge_modes.conf`. When the character reaches `RewardLevel` (default **80**) they receive any of:
+
+| Key | What it grants |
 | --- | --- |
-| Hardcore | Death is permanent. You stay a ghost and cannot resurrect. |
-| Semi-Hardcore | Death destroys worn equipment and all carried gold. |
-| Self-Crafted | Only items you crafted yourself. |
-| Item Quality | Poor / Common gear only. |
-| Slow XP | 0.5× experience. |
-| Very Slow XP | 0.25× experience. |
-| Quest XP Only | Experience from quests only. |
-| Iron Man | No resurrect, talent points, rare gear, potions/flasks, enchants or groups. |
+| `RewardItem` / `RewardItemCount` | Item mailed to the player |
+| `RewardTitle` | `CharTitles.dbc` id (also granted and worn when the mode is accepted) |
+| `RewardGold` | Copper (10000 = 1 gold) |
+| `RewardHonor` | Honor points |
+| `RewardAchievement` | Achievement id |
+| `RewardTalents` | Extra talent points |
 
-Challenges can only be enabled at **level 1** (or **55** for Death Knights). They cannot be turned off, except by a configured `DisableLevel`. Conflicting pairs: Hardcore / Semi-Hardcore, Slow XP / Very Slow XP, Self-Crafted / Iron Man.
+Set an id/amount to `0` to skip that reward. The old `TitleRewards` / `ItemRewards` / `TalentRewards` / `AchievementReward` maps (`"60 143, 80 145"`) still work for extra levels.
 
-Progress is stored in `character_challenge_modes` (created on boot). `EnablePlayerSettings` is **not** required.
+Example:
+
+```ini
+Hardcore.RewardLevel = 80
+Hardcore.RewardTitle = 42
+Hardcore.RewardItem = 49426
+Hardcore.RewardItemCount = 5
+Hardcore.RewardGold = 1000000
+Hardcore.RewardHonor = 2000
+```
 
 ## Install
 
@@ -37,17 +68,15 @@ The shrine gameobject is still registered (`gobject_challenge_modes`) so an exis
 
 On the first login of a **level 1** character (or **55** Death Knight), the module opens a mode picker:
 
-- If the **ChallengeModes** addon is installed (`addon/ChallengeModes/` → `Interface/AddOns/ChallengeModes`), a Blizzard-style window shows an icon and a short explanation for each mode, plus **Normal**.
-- Without the addon, the same choice appears as a gossip menu (icons + short text).
-- One choice only. Closing the window without picking opens it again on the next login.
+- If the **ChallengeModes** addon is installed (`addon/ChallengeModes/` → `Interface/AddOns/ChallengeModes`), a window lists every mode with icon, title and a short teaser. Selecting a card opens a **detail page** with the full rules, the honorific, and Accept. **Back** returns to the list.
+- Without the addon, the same choice appears as a gossip menu (icons + short text). **Info** prints the long description in chat.
+- One choice only, including **Normal**. Closing the window without picking opens it again on the next login.
 - `.challenge pick` reopens it while the character can still choose.
 
 Copy the folder `modules/mod-challenge-modes/addon/ChallengeModes` into the client `Interface/AddOns/` directory. `AddonChannel.Enabled` must stay on (default).
 
 ## Play
 
-Talk to the keeper. The greeting and every option are real strings (no `???`). Hardcore and Iron Man ask for confirmation. The keeper also offers **Normal mode** if you have not chosen yet.
+Talk to the keeper. The greeting and every option are real strings (no `???`). Hardcore and Iron Man ask for confirmation. Accepting a mode broadcasts to the realm. The keeper also offers **Normal mode** if you have not chosen yet.
 
-`.challenge` / `.challenge status` lists the modes on your character.
-
-Rewards (titles, extra talent points, items by mail, achievements) are optional and configured per mode as `level id` pairs, for example `Hardcore.TitleRewards = "60 143, 80 145"`.
+`.challenge` / `.challenge status` lists the mode on your character and the full description.

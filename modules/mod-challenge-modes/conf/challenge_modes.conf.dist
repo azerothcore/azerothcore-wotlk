@@ -10,6 +10,11 @@
 #        Description: Master switch. If 0, the keeper gossip still opens but cannot start a challenge.
 #        Default:     1
 #
+#    ChallengeModes.Announce
+#        Description: World-announce when a player accepts a mode, dies in Hardcore / Iron Man,
+#                     or completes a challenge at RewardLevel (default 80). 0 = silent.
+#        Default:     1
+#
 #    ChallengeModes.FirstLoginUI
 #        Description: On first login at level 1 (or 55 DK), open the mode picker (addon + gossip).
 #                     Offers every enabled challenge plus Normal mode. 0 = do not auto-open.
@@ -19,8 +24,12 @@
 #        Description: creature_template.entry of the Keeper of Challenges (must match SQL).
 #        Default:     190012
 #
+#    One mode per character
+#        A character may enable only ONE challenge. After that, Enable options are hidden
+#        and further attempts are rejected. Challenges cannot be turned off (except DisableLevel).
+#
 #    Modes:
-#        Hardcore        - death is permanent (ghost, cannot resurrect)
+#        Hardcore        - death is permanent (ghost, cannot resurrect); realm announces the fall
 #        SemiHardcore    - death destroys worn gear and carried gold
 #        SelfCrafted     - only self-crafted equipment
 #        ItemQualityLevel- Poor / Common gear only
@@ -31,88 +40,185 @@
 #
 #    Per-mode options, with <M> being Hardcore, SemiHardcore, SelfCrafted,
 #    ItemQualityLevel, SlowXpGain, VerySlowXpGain, QuestXpOnly or IronMan:
+#
 #        <M>.Enable              (default 1)
 #        <M>.XPMultiplier        (default 1, or 0.50 / 0.25 for slow XP)
 #        <M>.DisableLevel        (default 0 = never auto-disable)
-#        <M>.TitleRewards        ("60 143, 80 145" = level then CharTitles.dbc id)
+#
+#        Completion rewards at a single target level (default 80). Set the id/amount to 0
+#        to skip that reward. Gold is in copper (10000 = 1 gold).
+#        <M>.RewardLevel         (default 80)
+#        <M>.RewardItem          item entry mailed on completion (0 = none)
+#        <M>.RewardItemCount     stack size of RewardItem (default 1)
+#        <M>.RewardTitle         CharTitles.dbc id granted when the mode is accepted
+#                               and worn as the current title. 0 = no title.
+#                               Defaults (stock 3.3.5 titles, visible without a client patch):
+#                                 Hardcore         142  the Undying
+#                                 SemiHardcore     140  of the Nightfall
+#                                 SelfCrafted       85  the Supreme
+#                                 ItemQualityLevel 143  Jenkins
+#                                 SlowXpGain       172  the Patient
+#                                 VerySlowXpGain    78  the Explorer
+#                                 QuestXpOnly      125  Loremaster
+#                                 IronMan          145  the Insane
+#        <M>.RewardGold          copper granted instantly (0 = none)
+#        <M>.RewardHonor         honor points (0 = none)
+#        <M>.RewardAchievement   achievement id (0 = none)
+#        <M>.RewardTalents       extra talent points (0 = none)
+#
+#        Optional extra rewards at other levels, as "level id, level id":
+#        <M>.TitleRewards        ("60 143, 80 145")
 #        <M>.TalentRewards       ("60 2, 80 5")
 #        <M>.ItemRewards         ("80 54811")
-#        <M>.ItemRewardAmount    (default 1)
+#        <M>.ItemRewardAmount    (default 1) — stack size for ItemRewards
 #        <M>.AchievementReward   ("80 1234")
+#
+#    Examples (commented):
+#        Hardcore.RewardLevel = 80
+#        Hardcore.RewardTitle = 42
+#        Hardcore.RewardItem = 49426
+#        Hardcore.RewardItemCount = 5
+#        Hardcore.RewardGold = 1000000
+#        Hardcore.RewardHonor = 2000
 #
 
 ChallengeModes.Enable = 1
+ChallengeModes.Announce = 1
 ChallengeModes.FirstLoginUI = 1
 ChallengeModes.NPCEntry = 190012
 
 Hardcore.Enable = 1
-Hardcore.TitleRewards = ""
 Hardcore.XPMultiplier = 1
+Hardcore.DisableLevel = 0
+Hardcore.RewardLevel = 80
+Hardcore.RewardItem = 0
+Hardcore.RewardItemCount = 1
+Hardcore.RewardTitle = 142
+Hardcore.RewardGold = 0
+Hardcore.RewardHonor = 0
+Hardcore.RewardAchievement = 0
+Hardcore.RewardTalents = 0
+Hardcore.TitleRewards = ""
 Hardcore.TalentRewards = ""
 Hardcore.ItemRewards = ""
 Hardcore.ItemRewardAmount = 1
-Hardcore.DisableLevel = 0
 Hardcore.AchievementReward = ""
 
 SemiHardcore.Enable = 1
-SemiHardcore.TitleRewards = ""
 SemiHardcore.XPMultiplier = 1
+SemiHardcore.DisableLevel = 0
+SemiHardcore.RewardLevel = 80
+SemiHardcore.RewardItem = 0
+SemiHardcore.RewardItemCount = 1
+SemiHardcore.RewardTitle = 140
+SemiHardcore.RewardGold = 0
+SemiHardcore.RewardHonor = 0
+SemiHardcore.RewardAchievement = 0
+SemiHardcore.RewardTalents = 0
+SemiHardcore.TitleRewards = ""
 SemiHardcore.TalentRewards = ""
 SemiHardcore.ItemRewards = ""
 SemiHardcore.ItemRewardAmount = 1
-SemiHardcore.DisableLevel = 0
 SemiHardcore.AchievementReward = ""
 
 SelfCrafted.Enable = 1
-SelfCrafted.TitleRewards = ""
 SelfCrafted.XPMultiplier = 1
+SelfCrafted.DisableLevel = 0
+SelfCrafted.RewardLevel = 80
+SelfCrafted.RewardItem = 0
+SelfCrafted.RewardItemCount = 1
+SelfCrafted.RewardTitle = 85
+SelfCrafted.RewardGold = 0
+SelfCrafted.RewardHonor = 0
+SelfCrafted.RewardAchievement = 0
+SelfCrafted.RewardTalents = 0
+SelfCrafted.TitleRewards = ""
 SelfCrafted.TalentRewards = ""
 SelfCrafted.ItemRewards = ""
 SelfCrafted.ItemRewardAmount = 1
-SelfCrafted.DisableLevel = 0
 SelfCrafted.AchievementReward = ""
 
 ItemQualityLevel.Enable = 1
-ItemQualityLevel.TitleRewards = ""
 ItemQualityLevel.XPMultiplier = 1
+ItemQualityLevel.DisableLevel = 0
+ItemQualityLevel.RewardLevel = 80
+ItemQualityLevel.RewardItem = 0
+ItemQualityLevel.RewardItemCount = 1
+ItemQualityLevel.RewardTitle = 143
+ItemQualityLevel.RewardGold = 0
+ItemQualityLevel.RewardHonor = 0
+ItemQualityLevel.RewardAchievement = 0
+ItemQualityLevel.RewardTalents = 0
+ItemQualityLevel.TitleRewards = ""
 ItemQualityLevel.TalentRewards = ""
 ItemQualityLevel.ItemRewards = ""
 ItemQualityLevel.ItemRewardAmount = 1
-ItemQualityLevel.DisableLevel = 0
 ItemQualityLevel.AchievementReward = ""
 
 SlowXpGain.Enable = 1
+SlowXpGain.XPMultiplier = 0.50
+SlowXpGain.DisableLevel = 0
+SlowXpGain.RewardLevel = 80
+SlowXpGain.RewardItem = 0
+SlowXpGain.RewardItemCount = 1
+SlowXpGain.RewardTitle = 172
+SlowXpGain.RewardGold = 0
+SlowXpGain.RewardHonor = 0
+SlowXpGain.RewardAchievement = 0
+SlowXpGain.RewardTalents = 0
 SlowXpGain.TitleRewards = ""
 SlowXpGain.TalentRewards = ""
 SlowXpGain.ItemRewards = ""
 SlowXpGain.ItemRewardAmount = 1
-SlowXpGain.DisableLevel = 0
-SlowXpGain.XPMultiplier = 0.50
 SlowXpGain.AchievementReward = ""
 
 VerySlowXpGain.Enable = 1
+VerySlowXpGain.XPMultiplier = 0.25
+VerySlowXpGain.DisableLevel = 0
+VerySlowXpGain.RewardLevel = 80
+VerySlowXpGain.RewardItem = 0
+VerySlowXpGain.RewardItemCount = 1
+VerySlowXpGain.RewardTitle = 78
+VerySlowXpGain.RewardGold = 0
+VerySlowXpGain.RewardHonor = 0
+VerySlowXpGain.RewardAchievement = 0
+VerySlowXpGain.RewardTalents = 0
 VerySlowXpGain.TitleRewards = ""
 VerySlowXpGain.TalentRewards = ""
 VerySlowXpGain.ItemRewards = ""
 VerySlowXpGain.ItemRewardAmount = 1
-VerySlowXpGain.DisableLevel = 0
-VerySlowXpGain.XPMultiplier = 0.25
 VerySlowXpGain.AchievementReward = ""
 
 QuestXpOnly.Enable = 1
-QuestXpOnly.TitleRewards = ""
 QuestXpOnly.XPMultiplier = 1
+QuestXpOnly.DisableLevel = 0
+QuestXpOnly.RewardLevel = 80
+QuestXpOnly.RewardItem = 0
+QuestXpOnly.RewardItemCount = 1
+QuestXpOnly.RewardTitle = 125
+QuestXpOnly.RewardGold = 0
+QuestXpOnly.RewardHonor = 0
+QuestXpOnly.RewardAchievement = 0
+QuestXpOnly.RewardTalents = 0
+QuestXpOnly.TitleRewards = ""
 QuestXpOnly.TalentRewards = ""
 QuestXpOnly.ItemRewards = ""
 QuestXpOnly.ItemRewardAmount = 1
-QuestXpOnly.DisableLevel = 0
 QuestXpOnly.AchievementReward = ""
 
 IronMan.Enable = 1
+IronMan.XPMultiplier = 1
+IronMan.DisableLevel = 0
+IronMan.RewardLevel = 80
+IronMan.RewardItem = 0
+IronMan.RewardItemCount = 1
+IronMan.RewardTitle = 145
+IronMan.RewardGold = 0
+IronMan.RewardHonor = 0
+IronMan.RewardAchievement = 0
+IronMan.RewardTalents = 0
 IronMan.TitleRewards = ""
 IronMan.TalentRewards = ""
 IronMan.ItemRewards = ""
 IronMan.ItemRewardAmount = 1
-IronMan.DisableLevel = 0
-IronMan.XPMultiplier = 1
 IronMan.AchievementReward = ""

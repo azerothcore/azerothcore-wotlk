@@ -2,11 +2,11 @@
 ## Title: Challenge Modes
 ## Title-esES: Modos desafio
 ## Title-esMX: Modos desafio
-## Notes: First-login challenge picker
+## Notes: First-login challenge picker with per-mode detail
 ## Notes-esES: Elige un modo de juego al crear el personaje
 ## Notes-esMX: Elige un modo de juego al crear el personaje
 ## Author: AzerothCore
-## Version: 1.0
+## Version: 1.1
 ## DefaultState: enabled
 
 ChallengeModes.lua

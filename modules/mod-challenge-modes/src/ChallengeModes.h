@@ -11,10 +11,12 @@
 #define MODULE_CHALLENGE_MODES_H
 
 #include "ObjectGuid.h"
+#include "Optional.h"
 #include "SharedDefines.h"
 #include <array>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 class Player;
 
@@ -55,6 +57,14 @@ struct ChallengeModeConfig
     uint32 DisableLevel = 0;
     float XpMultiplier = 1.f;
     uint32 ItemRewardAmount = 1;
+    uint32 RewardLevel = 80;
+    uint32 RewardItem = 0;
+    uint32 RewardItemCount = 1;
+    uint32 RewardTitle = 0;
+    uint32 RewardGold = 0;
+    uint32 RewardHonor = 0;
+    uint32 RewardAchievement = 0;
+    uint32 RewardTalents = 0;
     std::unordered_map<uint8, uint32> TitleRewards;
     std::unordered_map<uint8, uint32> TalentRewards;
     std::unordered_map<uint8, uint32> ItemRewards;
@@ -86,21 +96,28 @@ public:
     [[nodiscard]] ChallengeModeConfig const& GetModeConfig(uint8 mode) const;
     [[nodiscard]] uint32 GetNpcEntry() const { return _npcEntry; }
     [[nodiscard]] bool CanActivate(Player const* player) const;
-    [[nodiscard]] bool Conflicts(uint8 mode, ObjectGuid guid) const;
     [[nodiscard]] bool HasActiveChallenge(ObjectGuid guid) const;
+    [[nodiscard]] Optional<uint8> GetActiveChallenge(ObjectGuid guid) const;
     [[nodiscard]] bool IsPickerDone(ObjectGuid guid) const;
     [[nodiscard]] bool ShouldShowFirstLoginPicker(Player const* player) const;
 
     void GiveLevelRewards(Player* player, uint8 oldLevel);
+    void HandlePlayerDeath(Player* player, char const* killer = nullptr);
+    void GrantModeTitle(Player* player, uint8 mode, bool makeCurrent) const;
     void OpenFirstLoginPicker(Player* player);
     bool ChooseNormal(Player* player, std::string& error);
     void MarkPickerDone(Player* player);
     bool HandlePickerAddon(Player* player, std::string const& msg);
 
     static char const* GetModeName(uint8 mode, bool spanish);
+    static char const* GetModeTitle(uint8 mode, bool spanish);
     static char const* GetModeDescription(uint8 mode, bool spanish);
+    static char const* GetModeShortDescription(uint8 mode, bool spanish);
     static uint8 GetModeGossipIcon(uint8 mode);
     static bool IsSpanish(Player const* player);
+    [[nodiscard]] std::string GetFormattedTitle(Player const* player, uint8 mode) const;
+    void Broadcast(std::string const& message) const;
+    void BroadcastLocalized(std::string const& spanish, std::string const& english) const;
 
 private:
     ChallengeModes() = default;
@@ -110,12 +127,18 @@ private:
     ChallengeModeState const* GetState(ObjectGuid guid) const;
     static void LoadRewardMap(std::unordered_map<uint8, uint32>& map, std::string const& config);
     void SendPickerAddon(Player* player) const;
+    void GiveConfiguredReward(Player* player, uint8 mode, uint8 level);
+    void BroadcastStart(Player* player, uint8 mode) const;
+    void BroadcastDeath(Player* player, uint8 mode, char const* killer) const;
+    void BroadcastComplete(Player* player, uint8 mode) const;
 
     bool _enabled = true;
+    bool _announce = true;
     bool _firstLoginUi = true;
     uint32 _npcEntry = NPC_CHALLENGE_KEEPER;
     std::array<ChallengeModeConfig, CHALLENGE_IRON_MAN + 1> _modes;
     std::unordered_map<uint32, ChallengeModeState> _players;
+    std::unordered_set<uint32> _ironManDeathAnnounced;
 };
 
 #define sChallengeModes ChallengeModes::instance()
