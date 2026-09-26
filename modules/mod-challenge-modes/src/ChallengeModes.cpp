@@ -27,6 +27,11 @@
 #include <limits>
 #include <sstream>
 
+namespace
+{
+thread_local bool _skipGainRates = false;
+}
+
 ChallengeModes* ChallengeModes::instance()
 {
     static ChallengeModes instance;
@@ -327,6 +332,9 @@ void ChallengeModes::LoadConfig(bool /*reload*/)
         config.Enabled = sConfigMgr->GetOption<bool>(option("Enable"), true);
         config.DisableLevel = sConfigMgr->GetOption<uint32>(option("DisableLevel"), 0);
         config.XpMultiplier = sConfigMgr->GetOption<float>(option("XPMultiplier"), defaultXp);
+        config.GoldRate = sConfigMgr->GetOption<float>(option("GoldRate"), 1.f);
+        config.HonorRate = sConfigMgr->GetOption<float>(option("HonorRate"), 1.f);
+        config.ReputationRate = sConfigMgr->GetOption<float>(option("ReputationRate"), 1.f);
         config.ItemRewardAmount = sConfigMgr->GetOption<uint32>(option("ItemRewardAmount"), 1);
         config.RewardLevel = sConfigMgr->GetOption<uint32>(option("RewardLevel"), 80);
         config.RewardItem = sConfigMgr->GetOption<uint32>(option("RewardItem"), 0);
@@ -448,6 +456,47 @@ bool ChallengeModes::IsModeEnabled(uint8 mode) const
 ChallengeModeConfig const& ChallengeModes::GetModeConfig(uint8 mode) const
 {
     return _modes[mode <= CHALLENGE_IRON_MAN ? mode : uint8(CHALLENGE_HARDCORE)];
+}
+
+float ChallengeModes::GetActiveGainRate(ObjectGuid guid, ChallengeGainRate rate) const
+{
+    float value = 1.f;
+    for (uint8 mode = 0; mode <= CHALLENGE_IRON_MAN; ++mode)
+    {
+        if (!IsModeEnabled(mode) || !IsEnabled(guid, mode))
+            continue;
+
+        ChallengeModeConfig const& config = _modes[mode];
+        switch (rate)
+        {
+            case CHALLENGE_RATE_XP:
+                value *= config.XpMultiplier;
+                break;
+            case CHALLENGE_RATE_GOLD:
+                value *= config.GoldRate;
+                break;
+            case CHALLENGE_RATE_HONOR:
+                value *= config.HonorRate;
+                break;
+            case CHALLENGE_RATE_REPUTATION:
+                value *= config.ReputationRate;
+                break;
+            default:
+                break;
+        }
+    }
+
+    return value;
+}
+
+bool ChallengeModes::ShouldSkipGainRates() const
+{
+    return _skipGainRates;
+}
+
+void ChallengeModes::SetSkipGainRates(bool skip)
+{
+    _skipGainRates = skip;
 }
 
 bool ChallengeModes::IsEnabled(ObjectGuid guid, uint8 mode) const
@@ -745,6 +794,9 @@ void ChallengeModes::SendPickerRewards(Player* player) const
             achName,
             config.RewardTalents));
 
+        SendAddonWhisper(player, Acore::StringFormat("CMUI\tRATES\t{}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}",
+            uint32(mode), config.XpMultiplier, config.GoldRate, config.HonorRate, config.ReputationRate));
+
         auto sendExtra = [this, player, mode](char const* kind, uint8 level, uint32 id, std::string const& name,
             uint32 count)
         {
@@ -799,6 +851,10 @@ void ChallengeModes::PrintModeRewards(Player* player, uint8 mode) const
 
     handler.PSendSysMessage(spanish ? "Completas el reto al nivel {}." : "Completes at level {}.",
         config.RewardLevel);
+    handler.PSendSysMessage(spanish
+        ? "Rates: XP x{:.2f} / Oro x{:.2f} / Honor x{:.2f} / Reputacion x{:.2f}"
+        : "Rates: XP x{:.2f} / Gold x{:.2f} / Honor x{:.2f} / Reputation x{:.2f}",
+        config.XpMultiplier, config.GoldRate, config.HonorRate, config.ReputationRate);
 
     std::string titleName = GetTitleHonorific(player, config.RewardTitle);
     if (titleName.empty())
@@ -1063,7 +1119,9 @@ void ChallengeModes::GiveConfiguredReward(Player* player, uint8 mode, uint8 /*le
         int32 copper = config.RewardGold > uint32(std::numeric_limits<int32>::max())
             ? std::numeric_limits<int32>::max()
             : int32(config.RewardGold);
+        SetSkipGainRates(true);
         player->ModifyMoney(copper, false);
+        SetSkipGainRates(false);
     }
 
     if (config.RewardHonor)

@@ -215,6 +215,7 @@ enum PlayerHook
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN,
+    PLAYERHOOK_ON_REWARD_HONOR,
     PLAYERHOOK_END
 };
 
@@ -296,6 +297,9 @@ public:
 
     // Called when a player gains Reputation (before anything is given)
     virtual void OnPlayerGiveReputation(Player* /*player*/, int32 /*factionID*/, float& /*amount*/, ReputationSource /*repSource*/) { }
+
+    // Called after world honor rate is applied, before honor is granted
+    virtual void OnPlayerRewardHonor(Player* /*player*/, float& /*honor*/) { }
 
     // Called when a player learned new spell
     virtual void OnPlayerLearnSpell(Player* /*player*/, uint32 /*spellID*/) {}

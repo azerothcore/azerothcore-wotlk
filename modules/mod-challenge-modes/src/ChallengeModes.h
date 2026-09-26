@@ -51,11 +51,22 @@ enum ChallengePickerConst : uint32
     GOSSIP_CHALLENGE_NORMAL          = 50
 };
 
+enum ChallengeGainRate : uint8
+{
+    CHALLENGE_RATE_XP           = 0,
+    CHALLENGE_RATE_GOLD         = 1,
+    CHALLENGE_RATE_HONOR        = 2,
+    CHALLENGE_RATE_REPUTATION   = 3
+};
+
 struct ChallengeModeConfig
 {
     bool Enabled = true;
     uint32 DisableLevel = 0;
     float XpMultiplier = 1.f;
+    float GoldRate = 1.f;
+    float HonorRate = 1.f;
+    float ReputationRate = 1.f;
     uint32 ItemRewardAmount = 1;
     uint32 RewardLevel = 80;
     uint32 RewardItem = 0;
@@ -118,6 +129,9 @@ public:
     static bool IsSpanish(Player const* player);
     [[nodiscard]] std::string GetFormattedTitle(Player const* player, uint8 mode) const;
     void PrintModeRewards(Player* player, uint8 mode) const;
+    [[nodiscard]] float GetActiveGainRate(ObjectGuid guid, ChallengeGainRate rate) const;
+    [[nodiscard]] bool ShouldSkipGainRates() const;
+    void SetSkipGainRates(bool skip);
     void Broadcast(std::string const& message) const;
     void BroadcastLocalized(std::string const& spanish, std::string const& english) const;
 

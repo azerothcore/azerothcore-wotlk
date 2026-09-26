@@ -28,6 +28,19 @@ Challenge modes for AzerothCore 3.3.5a. Activate per-character at the **Keeper o
 
 Accepting a mode **grants and equips** that title (stock 3.3.5 `CharTitles.dbc` ids, so the nameplate shows it without a client patch). Change or disable with `<Mode>.RewardTitle` (`0` = no title). Gossip **Info** prints the title plus a longer bilingual explanation.
 
+## Per-mode rates
+
+Each mode can scale gains in `challenge_modes.conf` (`1` = normal, `0` = none, `2` = double):
+
+| Key | What it scales |
+| --- | --- |
+| `XPMultiplier` | Experience (kills, quests, exploration, battlegrounds) |
+| `GoldRate` | Gold gained (loot, quests, vendor sales). Spending and trades stay 1:1. |
+| `HonorRate` | Honor from PvP, quests and battlegrounds |
+| `ReputationRate` | Reputation from kills and quests |
+
+Example: `Hardcore.GoldRate = 0.5` and `Hardcore.XPMultiplier = 1.25`.
+
 ## Level 80 rewards
 
 Configure completion rewards per mode in `challenge_modes.conf`. When the character reaches `RewardLevel` (default **80**) they receive any of:

@@ -6356,6 +6356,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
     }
 
     honor_f *= sWorld->getRate(RATE_HONOR);
+    sScriptMgr->OnPlayerRewardHonor(this, honor_f);
     // Back to int now
     honor = int32(honor_f);
     // honor - for show honor points in log

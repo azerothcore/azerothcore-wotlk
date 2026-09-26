@@ -27,6 +27,7 @@ local L = {
     goldLabel = "%s gold",
     silverLabel = "%s silver",
     copperLabel = "%s copper",
+    rates = "Rates: XP x%s / Gold x%s / Honor x%s / Rep x%s",
     normalName = "Normal",
     normalTitle = "Adventurer",
     normalDesc = "Classic play with no extra rules.",
@@ -59,6 +60,7 @@ if GetLocale() == "esES" or GetLocale() == "esMX" then
     L.goldLabel = "%s oro"
     L.silverLabel = "%s plata"
     L.copperLabel = "%s cobre"
+    L.rates = "Rates: XP x%s / Oro x%s / Honor x%s / Reputacion x%s"
     L.normalName = "Modo normal"
     L.normalTitle = "Aventurero"
     L.normalDesc = "Juego clasico, sin reglas extra."
@@ -434,7 +436,7 @@ SetReadableFont(rulesBody, 15)
 rulesBody:SetTextColor(1, 0.96, 0.88)
 
 local rewardLines = {}
-for i = 1, 8 do
+for i = 1, 10 do
     local fs = detailPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     if i == 1 then
         fs:SetPoint("TOPLEFT", detailRewardHeader, "BOTTOMLEFT", 0, -8)
@@ -504,6 +506,11 @@ local function BuildRewardLines(mode)
         table.insert(lines, "|cffffd100" .. L.rewardTitle .. ":|r " .. r.title)
     else
         table.insert(lines, "|cffffd100" .. L.rewardTitle .. ":|r " .. Loc(mode.title))
+    end
+    if r.xp or r.goldRate or r.honorRate or r.repRate then
+        table.insert(lines, string.format(L.rates,
+            tostring(r.xp or "1"), tostring(r.goldRate or "1"),
+            tostring(r.honorRate or "1"), tostring(r.repRate or "1")))
     end
 
     local hasExtra = false
@@ -803,6 +810,22 @@ local function StoreReward(message)
     end
 end
 
+local function StoreRates(message)
+    local _, mode, xp, gold, honor, rep = strsplit("\t", message or "")
+    mode = tonumber(mode)
+    if not mode then
+        return
+    end
+    serverRewards[mode] = serverRewards[mode] or { extras = {} }
+    serverRewards[mode].xp = xp or "1"
+    serverRewards[mode].goldRate = gold or "1"
+    serverRewards[mode].honorRate = honor or "1"
+    serverRewards[mode].repRate = rep or "1"
+    if selectedMode and selectedMode.id == mode then
+        FillDetail(selectedMode)
+    end
+end
+
 local function StoreExtra(message)
     local _, mode, kind, level, id, name, count = strsplit("\t", message or "")
     mode = tonumber(mode)
@@ -842,6 +865,8 @@ listener:SetScript("OnEvent", function(_, event, prefix, message)
             ShowPicker(enabled)
         elseif cmd == "REWARD" then
             StoreReward(message)
+        elseif cmd == "RATES" then
+            StoreRates(message)
         elseif cmd == "EXTRA" then
             StoreExtra(message)
         end

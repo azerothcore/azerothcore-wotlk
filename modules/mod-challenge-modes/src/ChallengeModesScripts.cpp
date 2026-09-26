@@ -193,6 +193,46 @@ void ApplyXpForPlayer(Player* player, uint32& amount, Unit* victim, uint8 xpSour
     }
 }
 
+void ApplyGoldRate(Player* player, int32& amount)
+{
+    if (!player || amount <= 0 || sChallengeModes->ShouldSkipGainRates())
+        return;
+
+    // Trades must stay 1:1 or a GoldRate above 1 can be used to duplicate gold.
+    if (player->GetTrader())
+        return;
+
+    float const rate = sChallengeModes->GetActiveGainRate(player->GetGUID(), CHALLENGE_RATE_GOLD);
+    if (rate == 1.f)
+        return;
+
+    amount = int32(float(amount) * rate);
+}
+
+void ApplyHonorRate(Player* player, float& honor)
+{
+    if (!player || honor <= 0.f)
+        return;
+
+    float const rate = sChallengeModes->GetActiveGainRate(player->GetGUID(), CHALLENGE_RATE_HONOR);
+    if (rate == 1.f)
+        return;
+
+    honor *= rate;
+}
+
+void ApplyReputationRate(Player* player, float& amount)
+{
+    if (!player || amount == 0.f)
+        return;
+
+    float const rate = sChallengeModes->GetActiveGainRate(player->GetGUID(), CHALLENGE_RATE_REPUTATION);
+    if (rate == 1.f)
+        return;
+
+    amount *= rate;
+}
+
 void StripEquippedGearAndGold(Player* player)
 {
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -247,6 +287,9 @@ public:
         PLAYERHOOK_ON_PLAYER_RESURRECT,
         PLAYERHOOK_CAN_RESURRECT,
         PLAYERHOOK_ON_GIVE_EXP,
+        PLAYERHOOK_ON_MONEY_CHANGED,
+        PLAYERHOOK_ON_REWARD_HONOR,
+        PLAYERHOOK_ON_GIVE_REPUTATION,
         PLAYERHOOK_ON_LEVEL_CHANGED,
         PLAYERHOOK_ON_CALCULATE_TALENTS_POINTS,
         PLAYERHOOK_CAN_LEARN_TALENT,
@@ -393,6 +436,22 @@ public:
     {
         if (player)
             ApplyXpForPlayer(player, amount, victim, xpSource);
+    }
+
+    void OnPlayerMoneyChanged(Player* player, int32& amount) override
+    {
+        ApplyGoldRate(player, amount);
+    }
+
+    void OnPlayerRewardHonor(Player* player, float& honor) override
+    {
+        ApplyHonorRate(player, honor);
+    }
+
+    void OnPlayerGiveReputation(Player* player, int32 /*factionID*/, float& amount,
+        ReputationSource /*repSource*/) override
+    {
+        ApplyReputationRate(player, amount);
     }
 
     void OnPlayerLevelChanged(Player* player, uint8 oldlevel) override

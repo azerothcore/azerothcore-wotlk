@@ -43,7 +43,10 @@
 #    ItemQualityLevel, SlowXpGain, VerySlowXpGain, QuestXpOnly or IronMan:
 #
 #        <M>.Enable              (default 1)
-#        <M>.XPMultiplier        (default 1, or 0.50 / 0.25 for slow XP)
+#        <M>.XPMultiplier        XP rate (default 1, or 0.50 / 0.25 for slow XP)
+#        <M>.GoldRate            gold gained (loot, quests, vendors). Trades stay 1:1.
+#        <M>.HonorRate           honor gained (PvP, quests, battlegrounds)
+#        <M>.ReputationRate      reputation gained from kills and quests
 #        <M>.DisableLevel        (default 0 = never auto-disable)
 #
 #        Completion rewards at a single target level (default 80). Set the id/amount to 0
@@ -81,6 +84,10 @@
 #        Hardcore.RewardItemCount = 5
 #        Hardcore.RewardGold = 1000000
 #        Hardcore.RewardHonor = 2000
+#        Hardcore.GoldRate = 0.5
+#        Hardcore.HonorRate = 1.5
+#        Hardcore.ReputationRate = 1.25
+#        Hardcore.XPMultiplier = 1.25
 #
 
 ChallengeModes.Enable = 1
@@ -90,6 +97,9 @@ ChallengeModes.NPCEntry = 190012
 
 Hardcore.Enable = 1
 Hardcore.XPMultiplier = 1
+Hardcore.GoldRate = 1
+Hardcore.HonorRate = 1
+Hardcore.ReputationRate = 1
 Hardcore.DisableLevel = 0
 Hardcore.RewardLevel = 80
 Hardcore.RewardItem = 0
@@ -107,6 +117,9 @@ Hardcore.AchievementReward = ""
 
 SemiHardcore.Enable = 1
 SemiHardcore.XPMultiplier = 1
+SemiHardcore.GoldRate = 1
+SemiHardcore.HonorRate = 1
+SemiHardcore.ReputationRate = 1
 SemiHardcore.DisableLevel = 0
 SemiHardcore.RewardLevel = 80
 SemiHardcore.RewardItem = 0
@@ -124,6 +137,9 @@ SemiHardcore.AchievementReward = ""
 
 SelfCrafted.Enable = 1
 SelfCrafted.XPMultiplier = 1
+SelfCrafted.GoldRate = 1
+SelfCrafted.HonorRate = 1
+SelfCrafted.ReputationRate = 1
 SelfCrafted.DisableLevel = 0
 SelfCrafted.RewardLevel = 80
 SelfCrafted.RewardItem = 0
@@ -141,6 +157,9 @@ SelfCrafted.AchievementReward = ""
 
 ItemQualityLevel.Enable = 1
 ItemQualityLevel.XPMultiplier = 1
+ItemQualityLevel.GoldRate = 1
+ItemQualityLevel.HonorRate = 1
+ItemQualityLevel.ReputationRate = 1
 ItemQualityLevel.DisableLevel = 0
 ItemQualityLevel.RewardLevel = 80
 ItemQualityLevel.RewardItem = 0
@@ -158,6 +177,9 @@ ItemQualityLevel.AchievementReward = ""
 
 SlowXpGain.Enable = 1
 SlowXpGain.XPMultiplier = 0.50
+SlowXpGain.GoldRate = 1
+SlowXpGain.HonorRate = 1
+SlowXpGain.ReputationRate = 1
 SlowXpGain.DisableLevel = 0
 SlowXpGain.RewardLevel = 80
 SlowXpGain.RewardItem = 0
@@ -175,6 +197,9 @@ SlowXpGain.AchievementReward = ""
 
 VerySlowXpGain.Enable = 1
 VerySlowXpGain.XPMultiplier = 0.25
+VerySlowXpGain.GoldRate = 1
+VerySlowXpGain.HonorRate = 1
+VerySlowXpGain.ReputationRate = 1
 VerySlowXpGain.DisableLevel = 0
 VerySlowXpGain.RewardLevel = 80
 VerySlowXpGain.RewardItem = 0
@@ -192,6 +217,9 @@ VerySlowXpGain.AchievementReward = ""
 
 QuestXpOnly.Enable = 1
 QuestXpOnly.XPMultiplier = 1
+QuestXpOnly.GoldRate = 1
+QuestXpOnly.HonorRate = 1
+QuestXpOnly.ReputationRate = 1
 QuestXpOnly.DisableLevel = 0
 QuestXpOnly.RewardLevel = 80
 QuestXpOnly.RewardItem = 0
@@ -209,6 +237,9 @@ QuestXpOnly.AchievementReward = ""
 
 IronMan.Enable = 1
 IronMan.XPMultiplier = 1
+IronMan.GoldRate = 1
+IronMan.HonorRate = 1
+IronMan.ReputationRate = 1
 IronMan.DisableLevel = 0
 IronMan.RewardLevel = 80
 IronMan.RewardItem = 0
