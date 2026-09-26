@@ -618,7 +618,11 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
 {
     callForHelpRange = 0.0f;
     if (instance)
+    {
         SetBoundary(instance->GetBossBoundary(bossId));
+        if (creature->GetSpawnId())
+            instance->RegisterBossSpawn(creature->GetSpawnId(), bossId);
+    }
 
     // Prevents updating the scheduler's timer while the creature is casting.
     // Clear it in the script if you need it to update while the creature is casting.
