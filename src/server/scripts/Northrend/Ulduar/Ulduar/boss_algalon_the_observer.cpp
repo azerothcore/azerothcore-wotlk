@@ -814,7 +814,8 @@ struct boss_algalon_the_observer : public ScriptedAI
             case EVENT_OUTRO_3:
                 me->CastSpell((Unit*)nullptr, SPELL_KILL_CREDIT);
                 // Summon Chest
-                if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO), 1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 0))
+                if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO),
+                    1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 7 * DAY, true, GO_SUMMON_TIMED_DESPAWN))
                 {
                     go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                     go->SetLootRecipient(me);
