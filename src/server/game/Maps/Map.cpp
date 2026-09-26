@@ -2883,12 +2883,12 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 
     // Check linked_respawn: don't spawn if the master creature is still dead.
     // This mirrors the check in Creature::Respawn() for compat-mode creatures:
-    // hard-reset creatures bypass it (they despawn on evade and must always
-    // come back), and a creature linked to itself never auto-respawns.
+    // hard-reset creatures and forced respawns bypass it (the former despawn on
+    // evade and must always come back), and a creature linked to itself never auto-respawns.
     ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(data->id, spawnId);
     time_t linkedRespawntime = GetLinkedRespawnTime(dbtableHighGuid);
     CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(data->id);
-    if (linkedRespawntime && !(cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))
+    if (linkedRespawntime && !forced && !(cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))
     {
         time_t now = GameTime::GetGameTime().count();
         time_t newRespawnTime;
