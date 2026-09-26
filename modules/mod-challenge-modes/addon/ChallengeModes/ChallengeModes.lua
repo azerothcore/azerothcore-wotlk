@@ -324,13 +324,13 @@ listPanel:SetPoint("BOTTOMRIGHT", -16, 16)
 
 local subtitle = listPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 subtitle:SetPoint("TOP", listPanel, "TOP", 0, -2)
-subtitle:SetWidth(560)
+subtitle:SetWidth(620)
 subtitle:SetJustifyH("CENTER")
 subtitle:SetText(L.subtitle)
 
 local hint = listPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 hint:SetPoint("TOP", subtitle, "BOTTOM", 0, -6)
-hint:SetWidth(560)
+hint:SetWidth(620)
 hint:SetJustifyH("CENTER")
 hint:SetTextColor(1, 0.82, 0.2)
 hint:SetText(L.hint)
@@ -610,43 +610,57 @@ local function FillDetail(mode)
     LayoutRules(mode)
 end
 
+local CARD_COLS = 3
+local CARD_ROWS = 3
+local CARD_PAD = 8
+local CARD_GAP = 8
+local CARD_TOP = 50
+local CARD_WIDTH = 208
+local CARD_HEIGHT = 172
+
 local function CreateCard(parent, mode, index)
-    local col = (index - 1) % 3
-    local row = math.floor((index - 1) / 3)
+    local col = (index - 1) % CARD_COLS
+    local row = math.floor((index - 1) / CARD_COLS)
     local card = CreateFrame("Button", nil, parent)
-    card:SetWidth(186)
-    card:SetHeight(118)
-    card:SetPoint("TOPLEFT", 8 + col * 194, -48 - row * 128)
+    card:SetWidth(CARD_WIDTH)
+    card:SetHeight(CARD_HEIGHT)
+    card:SetPoint("TOPLEFT", CARD_PAD + col * (CARD_WIDTH + CARD_GAP),
+        -CARD_TOP - row * (CARD_HEIGHT + CARD_GAP))
     card:SetBackdrop(BACKDROP_CARD)
     SetCardLook(card, mode.warn and "danger" or "idle")
     card.mode = mode
 
     local icon = card:CreateTexture(nil, "ARTWORK")
-    icon:SetWidth(36)
-    icon:SetHeight(36)
-    icon:SetPoint("TOPLEFT", 10, -10)
+    icon:SetWidth(48)
+    icon:SetHeight(48)
+    icon:SetPoint("TOPLEFT", 12, -12)
     icon:SetTexture(mode.icon)
 
     local nameFS = card:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    nameFS:SetPoint("TOPLEFT", icon, "TOPRIGHT", 8, -1)
-    nameFS:SetPoint("RIGHT", card, "RIGHT", -8, 0)
+    nameFS:SetPoint("TOPLEFT", icon, "TOPRIGHT", 10, -2)
+    nameFS:SetPoint("RIGHT", card, "RIGHT", -10, 0)
     nameFS:SetJustifyH("LEFT")
+    SetReadableFont(nameFS, 16)
     nameFS:SetText(Loc(mode.name))
     card.nameFS = nameFS
 
-    local titleFS = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    titleFS:SetPoint("TOPLEFT", nameFS, "BOTTOMLEFT", 0, -2)
-    titleFS:SetPoint("RIGHT", card, "RIGHT", -8, 0)
+    local titleFS = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    titleFS:SetPoint("TOPLEFT", nameFS, "BOTTOMLEFT", 0, -4)
+    titleFS:SetPoint("RIGHT", card, "RIGHT", -10, 0)
     titleFS:SetJustifyH("LEFT")
+    SetReadableFont(titleFS, 14)
     titleFS:SetTextColor(1, 0.82, 0)
     titleFS:SetText(Loc(mode.title))
     card.titleFS = titleFS
 
-    local descFS = card:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    descFS:SetPoint("TOPLEFT", icon, "BOTTOMLEFT", 0, -8)
-    descFS:SetPoint("RIGHT", card, "RIGHT", -8, 0)
+    local descFS = card:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    descFS:SetPoint("TOPLEFT", icon, "BOTTOMLEFT", 0, -10)
+    descFS:SetPoint("RIGHT", card, "RIGHT", -12, 0)
+    descFS:SetPoint("BOTTOM", card, "BOTTOM", 0, 12)
     descFS:SetJustifyH("LEFT")
     descFS:SetJustifyV("TOP")
+    descFS:SetNonSpaceWrap(true)
+    SetReadableFont(descFS, 13)
     descFS:SetText(Loc(mode.short))
     card.descFS = descFS
 
