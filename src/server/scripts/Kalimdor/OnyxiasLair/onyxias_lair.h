@@ -47,7 +47,8 @@ enum Actions
 
 enum GameObjectIds
 {
-    GO_WHELP_SPAWNER            = 176510
+    GO_WHELP_SPAWNER            = 176510,
+    GO_ONYXIA_EGG               = 176511
 };
 
 enum SharedSpells
