@@ -134,6 +134,7 @@ struct OutdoorPvPData;
 
 namespace lfg
 {
+    class Lfg5Guids;
     struct LFGDungeonData;
 }
 
