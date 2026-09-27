@@ -701,12 +701,14 @@ struct npc_onyxian_whelp : public ScriptedAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
+        // The template's UNIT_FLAG_NON_ATTACKABLE only stops others attacking the whelp; passive keeps it from aggroing too
+        me->SetReactState(REACT_PASSIVE);
         DoCastSelf(SPELL_ROOKERY_WHELP_SPAWN_IN);
 
         scheduler.Schedule(500ms, [this](TaskContext context)
         {
-            // Set in creature_template, so whelps are unattackable from their create packet until here
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetReactState(REACT_AGGRESSIVE);
 
             if (Unit* target = me->SelectNearestTarget(300.0f))
             {
@@ -721,15 +723,6 @@ struct npc_onyxian_whelp : public ScriptedAI
                 check.Repeat();
             });
         });
-    }
-
-    // The flag only stops others from attacking; without this a hatching whelp would still aggro nearby players
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-            return;
-
-        ScriptedAI::MoveInLineOfSight(who);
     }
 
     void JustDied(Unit* /*killer*/) override
