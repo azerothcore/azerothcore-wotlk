@@ -287,6 +287,9 @@ int main(int argc, char** argv)
 
     std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
 
+    // Declared right after dbHandle so it runs after every other shutdown step; a crash before this leaves EndTime NULL
+    std::shared_ptr<void> sessionEndHandle(nullptr, [](void*) { sWorld->SaveSessionEnd(true); });
+
     // set server offline (not connectable)
     LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
 
@@ -408,6 +411,9 @@ int main(int argc, char** argv)
     sToCloud9Sidecar->Init(worldPort, realm.Id.Realm);
 
     WorldUpdateLoop();
+
+    // Record the shutdown details now so a crash while saving players still reports them
+    sWorld->SaveSessionEnd(false);
 
     // Shutdown starts here
     threadPool.reset();

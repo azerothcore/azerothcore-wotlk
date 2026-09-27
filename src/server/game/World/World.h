@@ -31,6 +31,7 @@
 #include <atomic>
 #include <list>
 #include <map>
+#include <mutex>
 #include <unordered_map>
 
 class Object;
@@ -185,8 +186,13 @@ public:
     void ShutdownCancel() override;
     void ShutdownMsg(bool show = false, Player* player = nullptr, std::string const& reason = std::string()) override;
     static uint8 GetExitCode() { return _exitCode; }
-    static void StopNow(uint8 exitcode) { _stopEvent = true; _exitCode = exitcode; }
+    static void StopNow(uint8 exitcode);
     static bool IsStopped() { return _stopEvent; }
+
+    /// Records how this session ended in `uptime`; `finished` marks the shutdown as complete (not a crash)
+    void SaveSessionEnd(bool finished) override;
+    [[nodiscard]] Optional<PreviousSessionInfo> const& GetPreviousSessionInfo() const override { return _previousSession; }
+    [[nodiscard]] uint32 GetLifetimeMaxPlayerCount() const override;
 
     void Update(uint32 diff) override;
 
@@ -243,6 +249,7 @@ public:
 protected:
     void _UpdateGameTime();
     bool RescheduleShutdownForWintergrasp();
+    void LoadPreviousSessionInfo();
     // callback for UpdateRealmCharacters
     void _UpdateRealmCharCount(PreparedQueryResult resultCharCount,uint32 accountId);
 
@@ -263,9 +270,15 @@ private:
 
     static std::atomic_long _stopEvent;
     static uint8 _exitCode;
+    static std::mutex _stopNowLock;
+    // True when StopNow stopped the world before a scheduled shutdown did; the scheduled details then don't apply
+    static bool _stoppedByStopNow;
     uint32 _shutdownTimer;
     uint32 _shutdownMask;
     std::string _shutdownReason;
+
+    Optional<PreviousSessionInfo> _previousSession;
+    uint32 _lifetimeMaxPlayerCount;
 
     uint32 _cleaningFlags;
 

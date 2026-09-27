@@ -103,9 +103,12 @@
 #include "WorldStateDefines.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
+#include <ctime>
 
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
+std::mutex World::_stopNowLock;
+bool World::_stoppedByStopNow = false;
 uint32 World::m_worldLoopCounter = 0;
 
 float World::_maxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
@@ -121,6 +124,7 @@ World::World()
     _allowMovement = true;
     _shutdownMask = 0;
     _shutdownTimer = 0;
+    _lifetimeMaxPlayerCount = 0;
     _nextDailyQuestReset = 0s;
     _nextWeeklyQuestReset = 0s;
     _nextMonthlyQuestReset = 0s;
@@ -900,11 +904,20 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initialize Game Time and Timers");
     LOG_INFO("server.loading", " ");
 
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_UPTIME);
-    stmt->SetData(0, realm.Id.Realm);
-    stmt->SetData(1, uint32(GameTime::GetStartTime().count()));
-    stmt->SetData(2, GitRevision::GetFullVersion());
-    LoginDatabase.Execute(stmt);
+    // A dry run exits below without unwinding main(), so its row would never be marked as cleanly ended
+    if (!sConfigMgr->isDryRun())
+    {
+        // Must run before this session's row is inserted. Cluster nodes share the realm id, so the newest
+        // row may be another node's live session. The sidecar isn't initialized yet, so read the config.
+        if (!sConfigMgr->GetOption<bool>("Cluster.Enabled", false))
+            LoadPreviousSessionInfo();
+
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_UPTIME);
+        stmt->SetData(0, realm.Id.Realm);
+        stmt->SetData(1, uint32(GameTime::GetStartTime().count()));
+        stmt->SetData(2, GitRevision::GetFullVersion());
+        LoginDatabase.Execute(stmt);
+    }
 
     _timers[WUPDATE_UPTIME].SetInterval(getIntConfig(CONFIG_UPTIME_UPDATE)*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
@@ -1625,11 +1638,93 @@ void World::ShutdownCancel()
     _shutdownMask = 0;
     _shutdownTimer = 0;
     _exitCode = SHUTDOWN_EXIT_CODE;                       // to default value
+    _shutdownReason.clear();
     sWorldSessionMgr->SendServerMessage(msgid);
 
     LOG_DEBUG("server.worldserver", "Server {} cancelled.", (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"));
 
     sScriptMgr->OnShutdownCancel();
+}
+
+void World::StopNow(uint8 exitcode)
+{
+    std::lock_guard<std::mutex> guard(_stopNowLock);
+
+    if (!_stopEvent)
+        _stoppedByStopNow = true;
+
+    _stopEvent = true;
+    _exitCode = exitcode;
+}
+
+void World::SaveSessionEnd(bool finished)
+{
+    bool restartScheduled = false;
+    std::string reason;
+
+    {
+        std::lock_guard<std::mutex> guard(_stopNowLock);
+
+        if (!_stoppedByStopNow)
+        {
+            restartScheduled = (_shutdownMask & SHUTDOWN_MASK_RESTART) != 0;
+            reason = _shutdownReason;
+        }
+    }
+
+    ShutdownType type = SHUTDOWN_TYPE_SHUTDOWN;
+    if (_exitCode == ERROR_EXIT_CODE)
+        type = SHUTDOWN_TYPE_ERROR;
+    else if (_exitCode == RESTART_EXIT_CODE || restartScheduled)
+        type = SHUTDOWN_TYPE_RESTART;
+
+    // Column limit; strict SQL mode rejects the whole UPDATE on overflow
+    utf8truncate(reason, 255);
+
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_SHUTDOWN);
+    stmt->SetData(0, uint32(GameTime::GetUptime().count()));
+    stmt->SetData(1, uint16(sWorldSessionMgr->GetMaxPlayerCount()));
+    if (finished)
+        stmt->SetData(2, uint32(std::time(nullptr)));
+    else
+        stmt->SetData(2);
+    stmt->SetData(3, uint8(type));
+    stmt->SetData(4, _exitCode);
+    stmt->SetData(5, reason);
+    stmt->SetData(6, realm.Id.Realm);
+    stmt->SetData(7, uint32(GameTime::GetStartTime().count()));
+    LoginDatabase.DirectExecute(stmt);
+}
+
+void World::LoadPreviousSessionInfo()
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_UPTIME_PREVIOUS);
+    stmt->SetData(0, realm.Id.Realm);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+    if (!result)
+        return;
+
+    Field* fields = result->Fetch();
+    PreviousSessionInfo& previous = _previousSession.emplace();
+    previous.StartTime = Seconds(fields[0].Get<uint32>());
+    previous.Uptime = Seconds(fields[1].Get<uint32>());
+    previous.Crashed = fields[2].IsNull();
+    previous.Type = ShutdownType(fields[3].Get<uint8>());
+    previous.Reason = fields[4].Get<std::string>();
+
+    if (previous.Crashed)
+        LOG_WARN("server.loading", "Previous session did not shut down cleanly. Last seen alive {}.",
+            Acore::Time::TimeToTimestampStr(previous.StartTime + previous.Uptime));
+
+    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_UPTIME_MAXPLAYERS);
+    stmt->SetData(0, realm.Id.Realm);
+    if (PreparedQueryResult maxResult = LoginDatabase.Query(stmt))
+        _lifetimeMaxPlayerCount = (*maxResult)[0].Get<uint16>();
+}
+
+uint32 World::GetLifetimeMaxPlayerCount() const
+{
+    return std::max(_lifetimeMaxPlayerCount, sWorldSessionMgr->GetMaxPlayerCount());
 }
 
 // This handles the issued and queued CLI commands
