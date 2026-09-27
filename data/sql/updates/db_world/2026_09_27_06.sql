@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_05 -> 2026_09_27_06
 -- creature_template modifiers measured from the sniff corpus (scripts/creature-modifiers.py)
 -- 1203 entries
 
