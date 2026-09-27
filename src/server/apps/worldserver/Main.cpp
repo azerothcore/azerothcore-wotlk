@@ -412,11 +412,12 @@ int main(int argc, char** argv)
 
     WorldUpdateLoop();
 
-    // Record the shutdown details now so a crash while saving players still reports them
-    sWorld->SaveSessionEnd(false);
-
     // Shutdown starts here
     threadPool.reset();
+
+    // Record the shutdown details now so a crash while saving players still reports them.
+    // After threadPool.reset() no signal handler can run StopNow and change the exit code.
+    sWorld->SaveSessionEnd(false);
 
     sToCloud9Sidecar->Deinit();
 

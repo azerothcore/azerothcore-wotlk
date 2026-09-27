@@ -1638,7 +1638,6 @@ void World::ShutdownCancel()
     _shutdownMask = 0;
     _shutdownTimer = 0;
     _exitCode = SHUTDOWN_EXIT_CODE;                       // to default value
-    _shutdownReason.clear();
     sWorldSessionMgr->SendServerMessage(msgid);
 
     LOG_DEBUG("server.worldserver", "Server {} cancelled.", (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"));
