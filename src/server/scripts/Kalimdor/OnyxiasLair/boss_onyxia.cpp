@@ -226,6 +226,7 @@ struct boss_onyxia : public BossAI
             Talk(SAY_EVADE);
         }
 
+        me->DespawnOnEvade(1min);
         BossAI::EnterEvadeMode(why);
     }
 
