@@ -37,6 +37,7 @@ enum CreatureIds
     NPC_ONYXIA                  = 10184,
     NPC_ONYXIAN_WHELP           = 11262,
     NPC_ONYXIA_TRIGGER          = 12758,
+    NPC_WORLD_TRIGGER           = 22515,
     NPC_ONYXIAN_LAIR_GUARD      = 36561,
 };
 
