@@ -1,3 +1,4 @@
+-- DB update 2026_08_16_00 -> 2026_09_27_00
 --
 -- EndTime stays NULL while a session runs and is only written after a clean shutdown,
 -- so a NULL on an older row means that session crashed.
