@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_09 -> 2026_09_27_10
 --
 DELETE FROM `spell_target_position` WHERE `ID` BETWEEN 22191 AND 22202;
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
