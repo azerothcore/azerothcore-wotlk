@@ -355,7 +355,7 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 		}
 		if time.Now().After(deadline) {
 			_, gos, _, _ := obs.snapshot()
-			e2eharness.Preconditionf(t, "%d Bellowing Roars landed within %s of Onyxia dropping below 40%%, want %d", len(gos), roarsBy, wantRoars)
+			e2eharness.Assertf(t, "%d Bellowing Roars landed within %s of Onyxia dropping below 40%%, want %d", len(gos), roarsBy, wantRoars)
 		}
 		time.Sleep(sampleEvery)
 	}
