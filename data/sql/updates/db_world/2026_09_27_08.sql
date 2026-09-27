@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_07 -> 2026_09_27_08
 -- --------------------------------------------------------------------------------------------
 -- Durotar (Kalimdor, map 1) and Azuremyst Isle (Outland, map 530)
 -- Magga (Entry 11943, GUID 3416) and Jaeleil (Entry 16476, GUID 57174)
