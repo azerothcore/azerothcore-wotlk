@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_01 -> 2026_09_27_02
 --
 UPDATE `acore_string` SET
 `content_default` = 'Removed itemID = {}, amount = {} from {} (GUID: {}, {}). Remaining: {}',
