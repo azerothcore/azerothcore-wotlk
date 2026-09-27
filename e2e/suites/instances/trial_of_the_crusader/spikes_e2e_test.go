@@ -28,12 +28,7 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 		shield     = uint32(642)
 		speed2     = uint32(65922)
 	)
-	bots := e2eharness.NewScenario(t, e2eharness.ScenarioOpts{
-		Prefix: "Spike", Bots: []e2eharness.BotSpec{
-			{Role: "one", Race: e2eharness.RaceHuman, Class: e2eharness.ClassPaladin, Level: 80},
-			{Role: "two", Race: e2eharness.RaceHuman, Class: e2eharness.ClassPaladin, Level: 80},
-		},
-	})
+	bots := newSpikeBots(t)
 	a, b := bots[0], bots[1]
 	e2eharness.FormPartyAtPad(t, e2eharness.PackagePad(t), a, b)
 	// CMSG_GROUP_RAID_CONVERT has no payload (GroupHandler.cpp).

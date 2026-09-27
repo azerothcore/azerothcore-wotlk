@@ -10,7 +10,14 @@ Two level-80 paladins form a fresh raid and enter the empty ToC arena. A neutral
 World Trigger fixture casts the encounter's real summon spell (66169), creating
 Pursuing Spikes (34660) with the ToC instance AI. Characters receive extra health,
 but no god mode or damage immunity. The immunity spells are cast by the clients.
-The summon and persistent fixture are removed during cleanup.
+The summon and persistent fixture are removed during cleanup. Each run owns two
+new accounts: cleanup is registered before login, closes the bot sessions, deletes
+their characters through the server, then deletes the accounts and GM permissions.
+This also runs after assertion/setup failures. Cleanup errors fail the test and
+trigger an attempt to ban remaining accounts; ban failures are reported too.
+Existing accounts from earlier runs are untouched.
+Character retention follows the server's configured deletion policy. A killed
+test process cannot run Go cleanup callbacks and still requires manual cleanup.
 
 Oracles:
 
