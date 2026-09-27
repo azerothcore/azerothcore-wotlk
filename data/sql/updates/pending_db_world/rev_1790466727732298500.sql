@@ -1,12 +1,12 @@
 --
 DELETE FROM `acore_string` WHERE `entry` BETWEEN 11023 AND 11031;
-INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
-(11023, 'Character peak: {} (lifetime: {}).'),
-(11024, 'Previous session ended with {} after {}.'),
-(11025, 'Previous session ran {}.'),
-(11026, 'Previous session ended unexpectedly after {}. Last seen alive {}.'),
-(11027, 'Previous session ended unexpectedly during {} after {}. Last seen alive {}.'),
-(11028, '|- Reason: {}'),
-(11029, 'a shutdown'),
-(11030, 'a restart'),
-(11031, 'an error shutdown');
+INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
+(11023, 'Character peak: {} (lifetime: {}).', '캐릭터 최고 동시 접속: {} (전체 기간: {}).', 'Pic de personnages : {} (record : {}).', 'Charakter-Höchststand: {} (insgesamt: {}).', '角色峰值：{}（历史最高：{}）。', '角色峰值：{}（歷史最高：{}）。', 'Pico de personajes: {} (histórico: {}).', 'Pico de personajes: {} (histórico: {}).', 'Пик персонажей: {} (за всё время: {}).'),
+(11024, 'Previous session ended with {} after {}.', '이전 세션이 다음 사유로 종료되었습니다: {}. 가동 시간: {}.', 'La session précédente s''est terminée par {} après {}.', 'Vorherige Sitzung endete mit {} nach {}.', '上一次会话以{}结束，运行时长 {}。', '上一次工作階段以{}結束，運行時長 {}。', 'La sesión anterior terminó con {} tras {}.', 'La sesión anterior terminó con {} tras {}.', 'Предыдущая сессия завершена (тип: {}) спустя {}.'),
+(11025, 'Previous session ran {}.', '이전 세션 가동 시간: {}.', 'La session précédente a duré {}.', 'Vorherige Sitzung lief {}.', '上一次会话运行了 {}。', '上一次工作階段運行了 {}。', 'La sesión anterior duró {}.', 'La sesión anterior duró {}.', 'Предыдущая сессия длилась {}.'),
+(11026, 'Previous session ended unexpectedly after {}. Last online {}.', '이전 세션이 {} 후 예기치 않게 종료되었습니다. 마지막 온라인: {}.', 'La session précédente s''est terminée de façon inattendue après {}. Dernière fois en ligne : {}.', 'Vorherige Sitzung endete unerwartet nach {}. Zuletzt online {}.', '上一次会话在运行 {} 后意外结束。最后在线时间：{}。', '上一次工作階段在運行 {} 後意外結束。最後上線時間：{}。', 'La sesión anterior terminó de forma inesperada tras {}. Última vez en línea: {}.', 'La sesión anterior terminó de forma inesperada tras {}. Última vez en línea: {}.', 'Предыдущая сессия неожиданно прервалась спустя {}. Последний раз в сети: {}.'),
+(11027, 'Previous session ended unexpectedly during {} after {}. Last online {}.', '이전 세션이 예기치 않게 종료되었습니다 (진행 중: {}). 가동 시간: {}. 마지막 온라인: {}.', 'La session précédente s''est terminée de façon inattendue pendant {} après {}. Dernière fois en ligne : {}.', 'Vorherige Sitzung endete unerwartet bei {} nach {}. Zuletzt online {}.', '上一次会话在{}过程中意外结束，运行时长 {}。最后在线时间：{}。', '上一次工作階段在{}過程中意外結束，運行時長 {}。最後上線時間：{}。', 'La sesión anterior terminó de forma inesperada durante {} tras {}. Última vez en línea: {}.', 'La sesión anterior terminó de forma inesperada durante {} tras {}. Última vez en línea: {}.', 'Предыдущая сессия неожиданно прервалась во время остановки (тип: {}) спустя {}. Последний раз в сети: {}.'),
+(11028, '|- Reason: {}', '|- 사유: {}', '|- Raison : {}', '|- Grund: {}', '|- 原因：{}', '|- 原因：{}', '|- Motivo: {}', '|- Motivo: {}', '|- Причина: {}'),
+(11029, 'a shutdown', '종료', 'un arrêt', 'einem Herunterfahren', '关闭', '關閉', 'un apagado', 'un apagado', 'выключение'),
+(11030, 'a restart', '재시작', 'un redémarrage', 'einem Neustart', '重启', '重新啟動', 'un reinicio', 'un reinicio', 'перезапуск'),
+(11031, 'an error shutdown', '오류로 인한 종료', 'un arrêt dû à une erreur', 'einem fehlerbedingten Herunterfahren', '错误关闭', '錯誤關閉', 'un apagado por error', 'un apagado por error', 'выключение из-за ошибки');
