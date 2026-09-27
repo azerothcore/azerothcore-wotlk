@@ -61,7 +61,7 @@ enum ServerMessageType
 };
 
 // Stored in `uptime`.`ShutdownType`
-enum ShutdownType : uint8
+enum SessionShutdownType : uint8
 {
     SHUTDOWN_TYPE_UNKNOWN  = 0,
     SHUTDOWN_TYPE_SHUTDOWN = 1,
@@ -74,7 +74,7 @@ struct PreviousSessionInfo
     Seconds StartTime = 0s;
     Seconds Uptime = 0s;
     bool Crashed = false;
-    ShutdownType Type = SHUTDOWN_TYPE_UNKNOWN;
+    SessionShutdownType Type = SHUTDOWN_TYPE_UNKNOWN;
     std::string Reason;
 };
 

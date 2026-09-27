@@ -274,18 +274,17 @@ public:
 
         handler->PSendSysMessage("{}", GitRevision::GetFullVersion());
         if (!queuedSessionCount)
-            handler->PSendSysMessage("Connected players: {}. Characters in world: {}.", activeSessionCount, playerCount);
+            handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_CONNECTED, activeSessionCount, connPeak);
         else
-            handler->PSendSysMessage("Connected players: {}. Characters in world: {}. Queue: {}.", activeSessionCount, playerCount, queuedSessionCount);
+            handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_CONNECTED_QUEUE, activeSessionCount, connPeak, queuedSessionCount);
 
-        handler->PSendSysMessage("Connection peak: {}.", connPeak);
-        handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_CHARACTER_PEAK, sWorldSessionMgr->GetMaxPlayerCount(), sWorld->GetLifetimeMaxPlayerCount());
+        handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_CHARACTERS_IN_WORLD, playerCount, sWorldSessionMgr->GetMaxPlayerCount(), sWorld->GetLifetimeMaxPlayerCount());
         handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_SECURITY, uint32(sWorld->GetPlayerSecurityLimit()));
         handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()));
-        handler->PSendSysMessage("Update time diff: {}ms. Last {} diffs summary:", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetDatasetSize());
-        handler->PSendSysMessage("|- Mean: {}ms", sWorldUpdateTime.GetAverageUpdateTime());
-        handler->PSendSysMessage("|- Median: {}ms", sWorldUpdateTime.GetPercentile(50));
-        handler->PSendSysMessage("|- Percentiles (95, 99, max): {}ms, {}ms, {}ms",
+        handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_UPDATE_DIFF, sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetDatasetSize());
+        handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_UPDATE_MEAN, sWorldUpdateTime.GetAverageUpdateTime());
+        handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_UPDATE_MEDIAN, sWorldUpdateTime.GetPercentile(50));
+        handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_UPDATE_PERCENTILES,
                                  sWorldUpdateTime.GetPercentile(95),
                                  sWorldUpdateTime.GetPercentile(99),
                                  sWorldUpdateTime.GetPercentile(100));
@@ -326,7 +325,7 @@ public:
             handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_SHUTDOWN_REASON, previous->Reason);
     }
 
-    static AcoreStrings GetShutdownTypeString(ShutdownType type)
+    static AcoreStrings GetShutdownTypeString(SessionShutdownType type)
     {
         switch (type)
         {

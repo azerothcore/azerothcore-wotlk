@@ -1699,7 +1699,7 @@ void World::LoadPreviousSessionInfo()
     previous.StartTime = Seconds(fields[0].Get<uint32>());
     previous.Uptime = Seconds(fields[1].Get<uint32>());
     previous.Crashed = fields[2].IsNull();
-    previous.Type = ShutdownType(fields[3].Get<uint8>());
+    previous.Type = SessionShutdownType(fields[3].Get<uint8>());
     previous.Reason = fields[4].Get<std::string>();
 
     if (previous.Crashed)
