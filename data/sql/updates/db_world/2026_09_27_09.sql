@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_08 -> 2026_09_27_09
 -- #27662 Valiant Of (city) quests are mutually exclusive while one is in the quest log
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 19 AND `SourceGroup` = 0 AND `ConditionTypeOrReference` = 47 AND `SourceEntry` IN (13593, 13703, 13704, 13705, 13706, 13707, 13708, 13709, 13710, 13711);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
