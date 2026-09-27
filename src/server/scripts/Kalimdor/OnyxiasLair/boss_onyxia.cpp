@@ -697,12 +697,7 @@ struct npc_onyxian_lair_guard : public ScriptedAI
 
 struct npc_onyxian_whelp : public ScriptedAI
 {
-    npc_onyxian_whelp(Creature* creature) : ScriptedAI(creature)
-    {
-        // The create packet goes out before IsSummonedBy, which schedules the clear, so only summons may get the flag here
-        if (me->IsSummon())
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-    }
+    npc_onyxian_whelp(Creature* creature) : ScriptedAI(creature) { }
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
@@ -710,6 +705,7 @@ struct npc_onyxian_whelp : public ScriptedAI
 
         scheduler.Schedule(500ms, [this](TaskContext context)
         {
+            // Set in creature_template, so whelps are unattackable from their create packet until here
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 
             if (Unit* target = me->SelectNearestTarget(300.0f))
