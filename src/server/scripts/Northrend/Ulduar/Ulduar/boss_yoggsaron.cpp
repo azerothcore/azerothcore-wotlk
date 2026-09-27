@@ -22,7 +22,6 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
@@ -190,6 +189,10 @@ enum YoggEvents
 
     EVENT_SARA_WIPE_OPEN_DOOR           = 40,
     EVENT_SARA_WIPE_RESPAWN             = 41,
+
+    EVENT_GUARDIAN_SPAWN_VISUAL         = 45,
+    EVENT_GUARDIAN_SPAWN_RELEASE        = 46,
+    EVENT_GUARDIAN_DRAIN_LIFE           = 47,
 };
 
 enum NPCsGOs
@@ -298,14 +301,6 @@ struct LocationsXY
     float x, y, z;
 };
 
-Position const GossipKeepersPos[4] =
-{
-    {1945.6823f, 33.342014f, 411.44083f, 5.270895f}, // Freya
-    {1945.7609f, -81.52171f,  411.4407f, 1.029744f}, // Hodir
-    {2028.7656f,  17.42014f, 411.44458f, 3.857178f}, // Mimiron
-    {2028.8219f, -65.73573f, 411.44257f, 2.460914f}  // Thorim
-};
-
 const Position KeepersPos[4] =
 {
     {1939.32f,   42.165f, 338.415f, 5.17955f}, // Freya
@@ -315,7 +310,6 @@ const Position KeepersPos[4] =
 };
 
 const uint32 TABLE_KEEPER_ENTRY[4] = {NPC_FREYA_KEEPER, NPC_HODIR_KEEPER, NPC_MIMIRON_KEEPER, NPC_THORIM_KEEPER};
-const uint32 TABLE_GOSSIP_ENTRY[4] = {NPC_FREYA_GOSSIP, NPC_HODIR_GOSSIP, NPC_MIMIRON_GOSSIP, NPC_THORIM_GOSSIP};
 
 static LocationsXY yoggPortalLoc[] =
 {
@@ -576,11 +570,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
             DATA_MIMIRON_GOSSIP, DATA_THORIM_GOSSIP
         };
         for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; i++)
-        {
-            summons.DespawnEntry(TABLE_GOSSIP_ENTRY[i]);
             if (Creature* keeper = _instance->GetCreature(gossipData[i]))
                 keeper->DespawnOrUnsummon();
-        }
     }
 
     void UpdateKeeperSpawns()
@@ -731,10 +722,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
             summons.DespawnEntry(NPC_CONSTRICTOR_TENTACLE);
             summons.DespawnEntry(NPC_CORRUPTOR_TENTACLE);
             summons.DespawnEntry(NPC_BRAIN_OF_YOGG_SARON);
-            summons.DespawnEntry(NPC_MIMIRON_GOSSIP);
-            summons.DespawnEntry(NPC_HODIR_GOSSIP);
-            summons.DespawnEntry(NPC_FREYA_GOSSIP);
-            summons.DespawnEntry(NPC_THORIM_GOSSIP);
             summons.DespawnEntry(NPC_MIMIRON_KEEPER);
             summons.DespawnEntry(NPC_HODIR_KEEPER);
             summons.DespawnEntry(NPC_FREYA_KEEPER);
@@ -1006,7 +993,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
                     SpawnTentacle(NPC_CRUSHER_TENTACLE);
                     me->CastCustomSpell(SPELL_CONSTRICTOR_TENTACLE, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
-                    SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
 
                     // Sniffed: Psychosis opens with the tentacle wave, Malady follows at 12s, Death Ray at 20s.
                     // Brain Link at 18s comes from OG/Classic references (needs two players, absent from solo sniffs)
@@ -1035,13 +1021,12 @@ struct boss_yoggsaron_sara : public ScriptedAI
     }
 };
 
-struct boss_yoggsaron_cloud : public npc_escortAI
+struct boss_yoggsaron_cloud : public PassiveAI
 {
-    boss_yoggsaron_cloud(Creature* creature) : npc_escortAI(creature)
+    boss_yoggsaron_cloud(Creature* creature) : PassiveAI(creature)
     {
-        InitWaypoint();
         Reset();
-        Start(false, ObjectGuid::Empty, nullptr, false, true);
+        MoveCircle();
     }
 
     uint32 _checkTimer;
@@ -1056,11 +1041,6 @@ struct boss_yoggsaron_cloud : public npc_escortAI
             if (Creature* sara = me->GetInstanceScript()->GetCreature(DATA_SARA))
                 sara->AI()->JustSummoned(cr);
     }
-
-    void MoveInLineOfSight(Unit*  /*who*/) override {}
-    void AttackStart(Unit*  /*who*/) override {}
-    using CreatureAI::WaypointReached;
-    void WaypointReached(uint32  /*point*/) override {}
 
     void Reset() override
     {
@@ -1082,28 +1062,14 @@ struct boss_yoggsaron_cloud : public npc_escortAI
         }
     }
 
-    void InitWaypoint()
+    void MoveCircle()
     {
-        float dist = Middle.GetExactDist(me);
-        if (me->GetPositionX() > Middle.GetPositionX())
-        {
-            for (uint8 i = 0; i <= dist; ++i)
-            {
-                float angle = M_PI * 2 / dist * i;
-                AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0);
-            }
-        }
-        else
-        {
-            for (uint8 i = 0; i <= dist; ++i)
-            {
-                float angle = M_PI * 2 - (M_PI * 2 / dist * i);
-                AddWaypoint(i, Middle.GetPositionX() + dist * cos(angle), Middle.GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0);
-            }
-        }
+        bool clockwise = me->GetPositionX() < Middle.GetPositionX();
+        me->GetMotionMaster()->MoveCirclePath(Middle.GetPositionX(), Middle.GetPositionY(), me->GetPositionZ(),
+            Middle.GetExactDist2d(me), clockwise, 16);
     }
 
-    void UpdateEscortAI(uint32 diff) override
+    void UpdateAI(uint32 diff) override
     {
         _checkTimer += diff;
         if (_checkTimer >= 500 && !_isSummoning)
@@ -1970,27 +1936,72 @@ struct boss_yoggsaron_influence_tentacle : public NullCreatureAI
     }
 };
 
+static void ApplyEmpoweredStacks(Unit* target)
+{
+    uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
+
+    if (!stack)
+    {
+        target->RemoveAura(SPELL_EMPOWERED);
+        target->CastSpell(target, SPELL_WEAKENED, true);
+    }
+    else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
+    {
+        aur->SetStackAmount(stack);
+        target->RemoveAurasDueToSpell(SPELL_WEAKENED);
+    }
+}
+
 struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 {
-    boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
+    explicit boss_yoggsaron_immortal_guardian(Creature* creature) : ScriptedAI(creature)
     {
         Reset();
     }
 
-    uint32 _visualTimer;
-    uint32 _spellTimer;
+    static constexpr Milliseconds SPAWN_VISUAL_DELAY = 100ms;
+    static constexpr Milliseconds SPAWN_STASIS_TIME = 4s; // 3.4 sniffs show 800ms, 3.1 footage show 4s
+    static constexpr Milliseconds DRAIN_LIFE_HEALTH_CHECK = 2s;
+    static constexpr Milliseconds DRAIN_LIFE_INTERVAL = 9500ms;
 
     void Reset() override
     {
-        me->CastSpell(me, SPELL_RECENTLY_SPAWNED, true);
-        //me->CastSpell(me, SPELL_EMPOWERED_PASSIVE, true);
+        DoCastSelf(SPELL_RECENTLY_SPAWNED, true);
         if (Aura* aur = me->AddAura(SPELL_EMPOWERED_PASSIVE, me))
             aur->SetStackAmount(9);
 
-        _spellTimer = 0;
-        _visualTimer = 1;
+        ApplyEmpoweredStacks(me);
+
+        events.Reset();
+        events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_VISUAL, SPAWN_VISUAL_DELAY);
+        events.ScheduleEvent(EVENT_GUARDIAN_SPAWN_RELEASE, SPAWN_STASIS_TIME);
+        events.ScheduleEvent(EVENT_GUARDIAN_DRAIN_LIFE, DRAIN_LIFE_HEALTH_CHECK);
         me->SetControlled(true, UNIT_STATE_ROOT);
+        _spawnStasis = true;
+    }
+
+    void EngageFromStasis()
+    {
+        if (!_spawnStasis)
+            return;
+
+        _spawnStasis = false;
+        events.CancelEvent(EVENT_GUARDIAN_SPAWN_RELEASE);
+        me->SetControlled(false, UNIT_STATE_ROOT);
         me->SetInCombatWithZone();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        EngageFromStasis();
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (_spawnStasis)
+            return;
+
+        CreatureAI::MoveInLineOfSight(who);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -2007,44 +2018,51 @@ struct boss_yoggsaron_immortal_guardian : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            events.DelayEvents(Milliseconds(diff));
+            return;
+        }
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_GUARDIAN_SPAWN_VISUAL:
+                    DoCastSelf(SPELL_SIMPLE_TELEPORT, false);
+                    break;
+                case EVENT_GUARDIAN_SPAWN_RELEASE:
+                    EngageFromStasis();
+                    break;
+                case EVENT_GUARDIAN_DRAIN_LIFE:
+                {
+                    Unit* target = me->HealthBelowPct(85) ? SelectTargetFromPlayerList(40.0f) : nullptr;
+                    if (target)
+                    {
+                        DoCast(target, SPELL_DRAIN_LIFE, false);
+                        events.Repeat(DRAIN_LIFE_INTERVAL);
+                    }
+                    else
+                        events.Repeat(DRAIN_LIFE_HEALTH_CHECK);
+
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
         if (!UpdateVictim())
             return;
 
-        if (_visualTimer)
-        {
-            _visualTimer += diff;
-            if (_visualTimer >= 100 && _visualTimer < 10000)
-            {
-                me->CastSpell(me, SPELL_SIMPLE_TELEPORT, false);
-                _visualTimer = 10000;
-            }
-            else if (_visualTimer >= 11000)
-            {
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                _visualTimer = 0;
-            }
-        }
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        _spellTimer += diff;
-        if (_spellTimer >= 9500)
-        {
-            if (me->HealthBelowPct(85))
-            {
-                if (Unit* target = SelectTargetFromPlayerList(40.0f))
-                {
-                    me->CastSpell(target, SPELL_DRAIN_LIFE, false);
-                    _spellTimer = 0;
-                }
-            }
-            else
-                _spellTimer = 7500;
-        }
-
-        DoMeleeAttackIfReady();
+        if (!_spawnStasis)
+            DoMeleeAttackIfReady();
     }
+
+private:
+    bool _spawnStasis{};
 };
 
 struct boss_yoggsaron_lich_king : public NullCreatureAI
@@ -2075,7 +2093,6 @@ struct boss_yoggsaron_lich_king : public NullCreatureAI
             return;
 
         creature->AI()->Talk(text);
-            return;
     }
 
     void UpdateAI(uint32 diff) override
@@ -2151,7 +2168,6 @@ struct boss_yoggsaron_llane : public NullCreatureAI
             return;
 
         creature->AI()->Talk(text);
-            return;
     }
 
     void UpdateAI(uint32 diff) override
@@ -2586,14 +2602,17 @@ class spell_yogg_saron_lunatic_gaze : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        std::list<WorldObject*> tmplist;
-        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-            if ((*itr)->HasInArc(M_PI, GetCaster()))
-                tmplist.push_back(*itr);
+        Unit* caster = GetCaster();
+        // 64168 inherits SPELL_ATTR2_IGNORE_LINE_OF_SIGHT from the aura triggering it, so the illusion room walls have to be checked here
+        bool ignoreLos = GetSpellInfo()->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT);
 
-        targets.clear();
-        for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-            targets.push_back(*itr);
+        targets.remove_if([caster, ignoreLos](WorldObject* target)
+        {
+            if (!target->HasInArc(M_PI, caster))
+                return true;
+
+            return !ignoreLos && !caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2);
+        });
     }
 
     void Register() override
@@ -2648,19 +2667,7 @@ class spell_yogg_saron_empowered_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        Unit* target = GetUnitOwner();
-        uint8 stack = std::min(uint8(target->GetHealthPct() / 10), (uint8)9);
-
-        if (!stack)
-        {
-            target->RemoveAura(SPELL_EMPOWERED);
-            target->CastSpell(target, SPELL_WEAKENED, true);
-        }
-        else if (Aura* aur = target->AddAura(SPELL_EMPOWERED, target))
-        {
-            aur->SetStackAmount(stack);
-            target->RemoveAurasDueToSpell(SPELL_WEAKENED);
-        }
+        ApplyEmpoweredStacks(GetUnitOwner());
     }
 
     void Register() override
@@ -2870,9 +2877,27 @@ class spell_yogg_saron_sanity_reduce : public SpellScript
         }
     }
 
+    // Psychosis and Malady of the Mind skip anyone at 40 Sanity or less, so that their random
+    // targeting evens out across the raid instead of finishing off the lowest players.
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([](WorldObject* target)
+        {
+            Unit* unit = target->ToUnit();
+            if (!unit)
+                return true;
+
+            Aura* sanity = unit->GetAura(SPELL_SANITY);
+            return !sanity || sanity->GetStackAmount() <= 40;
+        });
+    }
+
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_yogg_saron_sanity_reduce::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
+
+        if (m_scriptSpellId == SPELL_SARA_PSYCHOSIS_10 || m_scriptSpellId == SPELL_SARA_PSYCHOSIS_25 || m_scriptSpellId == SPELL_MALADY_OF_THE_MIND)
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_yogg_saron_sanity_reduce::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 

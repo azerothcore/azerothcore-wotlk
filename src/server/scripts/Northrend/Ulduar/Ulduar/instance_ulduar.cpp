@@ -256,7 +256,7 @@ public:
         // Shared
         EventMap _events;
         bool _mimironTramUsed;
-        bool _algalonResummonPending;
+        bool _algalonArrivalPending;
 
         void Initialize() override
         {
@@ -281,7 +281,7 @@ public:
             // Shared
             _events.Reset();
             _mimironTramUsed       = false;
-            _algalonResummonPending = false;
+            _algalonArrivalPending = false;
         }
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
@@ -320,6 +320,20 @@ public:
             for (LeviathanVehicle const& summoned : _leviathanVehicles)
                 if (Creature* vehicle = instance->GetCreature(summoned.guid))
                     vehicle->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+        }
+
+        // Keepers of defeated bosses not yet chosen to assist against Yogg-Saron
+        void SpawnObservationRingKeepers()
+        {
+            uint32 watchersMask =
+                GetPersistentData(PERSISTENT_DATA_WATCHERS_MASK);
+            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; ++i)
+                if (IsBossDone(ObservationRingKeeperBoss[i])
+                    && !(watchersMask & (1 << i))
+                    && !GetObjectGuid(ObservationRingKeeperData[i]))
+                    instance->SummonCreature(
+                        ObservationRingKeeperEntry[i],
+                        ObservationRingKeepersPos[i]);
         }
 
         void SpawnLeviathanOutro(bool justKilled)
@@ -504,40 +518,15 @@ public:
                 }
             }
 
-            // Spawn Observation Ring keepers for defeated bosses
-            uint32 watchersMask =
-                GetPersistentData(PERSISTENT_DATA_WATCHERS_MASK);
-            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; ++i)
-                if (IsBossDone(ObservationRingKeeperBoss[i])
-                    && !(watchersMask & (1 << i))
-                    && !GetObjectGuid(ObservationRingKeeperData[i]))
-                    instance->SummonCreature(
-                        ObservationRingKeeperEntry[i],
-                        ObservationRingKeepersPos[i]);
+            SpawnObservationRingKeepers();
 
-            uint32 algalonTimer =
-                GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
-            if (!GetObjectGuid(BOSS_ALGALON) && !_algalonResummonPending && algalonTimer
-                && (algalonTimer <= 60
-                    || algalonTimer == TIMER_ALGALON_TO_SUMMON))
-            {
-                TempSummon* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonLandPos);
-                if (!algalon)
-                    return;
-
-                if (algalonTimer <= 60)
-                {
-                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
-                    algalon->AI()->DoAction(ACTION_INIT_ALGALON);
-                }
-                else // if (algalonTimer == TIMER_ALGALON_TO_SUMMON)
-                {
-                    StorePersistentData(
-                        PERSISTENT_DATA_ALGALON_TIMER,
-                        TIMER_ALGALON_SUMMONED);
-                    algalon->SetImmuneToPC(false);
-                }
-            }
+            // Only covers an instance reload: after a wipe the map re-summons Algalon itself 20s after
+            // the evade, so wait long enough for that respawn to land first.
+            uint32 algalonTimer = GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
+            if (!GetCreature(BOSS_ALGALON) && algalonTimer
+                && (algalonTimer <= 60 || algalonTimer == TIMER_ALGALON_TO_SUMMON)
+                && !_events.HasTimeUntilEvent(EVENT_RESUMMON_ALGALON))
+                _events.ScheduleEvent(EVENT_RESUMMON_ALGALON, 30s);
         }
 
         bool IsEncounterInProgress() const override
@@ -624,6 +613,11 @@ public:
                             ObservationRingKeepersPos[keeperIdx]);
                     }
                     break;
+                case BOSS_YOGGSARON:
+                    // Sara despawns the unchosen keepers on pull, bring them back after a wipe
+                    if (state == NOT_STARTED)
+                        SpawnObservationRingKeepers();
+                    break;
                 default:
                     break;
             }
@@ -664,13 +658,24 @@ public:
                     {
                         creature->SetDisableGravity(true);
                         creature->SetPosition(creature->GetHomePosition());
-                        creature->setDeathState(DeathState::JustDied);
+                        creature->setDeathState(DeathState::Corpse);
+                        creature->SetHealth(0);
+                        creature->SetStandState(UNIT_STAND_STATE_STAND);
+                        creature->ReplaceAllDynamicFlags(0);
+                        creature->SetCorpseDelay(7 * DAY);
+                        creature->SetCorpseRemoveTime(7 * DAY);
+                        creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         creature->StopMovingOnCurrentPos();
                     }
                     break;
                 case NPC_ALGALON:
                     if (!GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER))
                         creature->DespawnOrUnsummon();
+                    else if (_algalonArrivalPending)
+                    {
+                        _algalonArrivalPending = false;
+                        creature->AI()->DoAction(ACTION_START_INTRO);
+                    }
                     break;
                 // Gone for good once Flame Leviathan is defeated
                 case NPC_STEELFORGED_DEFENDER:
@@ -706,6 +711,13 @@ public:
                         algalon->AI()->JustSummoned(creature);
                     break;
             }
+        }
+
+        void OnCreatureEvade(Creature* creature) override
+        {
+            // The map re-summons Algalon 20s after his hard-reset evade; the new one replays the arrival
+            if (creature->GetEntry() == NPC_ALGALON && GetBossState(BOSS_ALGALON) != DONE)
+                _algalonArrivalPending = true;
         }
 
         void OpenIfDone(uint32 encounter, GameObject* go, GOState state)
@@ -797,6 +809,12 @@ public:
                     if (GetBossState(BOSS_LEVIATHAN) >= DONE)
                         gameObject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     break;
+                case GO_ULDUAR_PROTECTIVE_BUBBLE:
+                    if (GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) == MAGE_BARRIER_LOWERED
+                        || GetPersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE) != 0
+                        || IsBossDone(BOSS_LEVIATHAN))
+                        gameObject->DespawnOrUnsummon(0ms, 7_days);
+                    break;
                 case GO_KOLOGARN_BRIDGE:
                     OpenIfDone(BOSS_KOLOGARN, gameObject, GO_STATE_READY);
                     break;
@@ -872,6 +890,19 @@ public:
             }
         }
 
+        // A shattered Rare Cache stays down for the DB respawn delay (7 days), so it has to be
+        // brought back with Hodir or the next attempt can never earn it.
+        void respawnHodirHardmodeChest()
+        {
+            if (GetBossState(BOSS_HODIR) == DONE)
+                return;
+
+            _hmHodir = true;
+
+            if (GameObject* go = GetHodirChest(true))
+                go->Respawn();
+        }
+
         void setChestsLootable(uint32 boss)
         {
             if (boss)
@@ -901,6 +932,9 @@ public:
         {
             switch (type)
             {
+                case TYPE_HODIR_HM_RESET:
+                    respawnHodirHardmodeChest();
+                    break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = GetHodirChest(true))
                     {
@@ -947,10 +981,6 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 60);
                     StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, 60);
                     _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
-                    return;
-                case DATA_RESUMMON_ALGALON:
-                    _algalonResummonPending = true;
-                    _events.RescheduleEvent(EVENT_RESUMMON_ALGALON, 2s);
                     return;
                 case DATA_ALGALON_SUMMON_STATE:
                 case DATA_ALGALON_DEFEATED:
@@ -1181,11 +1211,28 @@ public:
                     break;
                 }
                 case EVENT_RESUMMON_ALGALON:
-                    _algalonResummonPending = false;
-                    if (!GetCreature(BOSS_ALGALON))
-                        if (Creature* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
-                            algalon->AI()->DoAction(ACTION_START_INTRO);
+                {
+                    uint32 algalonTimer = GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
+                    if (GetCreature(BOSS_ALGALON) || !algalonTimer
+                        || (algalonTimer > 60 && algalonTimer != TIMER_ALGALON_TO_SUMMON))
+                        break;
+
+                    TempSummon* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonLandPos);
+                    if (!algalon)
+                        break;
+
+                    if (algalonTimer <= 60)
+                    {
+                        _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
+                        algalon->AI()->DoAction(ACTION_INIT_ALGALON);
+                    }
+                    else // TIMER_ALGALON_TO_SUMMON
+                    {
+                        StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, TIMER_ALGALON_SUMMONED);
+                        algalon->SetImmuneToPC(false);
+                    }
                     break;
+                }
             }
         }
 
