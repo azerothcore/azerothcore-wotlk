@@ -49,6 +49,9 @@ enum Spells
     SPELL_BREATH_NW_TO_SE           = 18584,
     SPELL_BREATH_SW_TO_NE           = 18596,
     SPELL_BREATH_NE_TO_SW           = 18617,
+
+    // Each patch triggers the next one, up to 22202
+    SPELL_HEATED_GROUND             = 22191,
 };
 
 enum Events
@@ -606,6 +609,12 @@ struct boss_onyxia : public BossAI
         }
 
         DoMeleeAttackIfReady();
+    }
+
+    void OnSpellCast(SpellInfo const* spell) override
+    {
+        if (spell->Id == OnyxiaMoveData[_currentWP].SpellId)
+            DoCastSelf(SPELL_HEATED_GROUND, true);
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
