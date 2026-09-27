@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_06 -> 2026_09_27_07
 -- Onyxian Whelp
 UPDATE `creature_template` SET `ScriptName` = 'npc_onyxian_whelp' WHERE `entry` = 11262;
 
