@@ -2120,14 +2120,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(5);
     });
 
-    // Onyxia's Lair, Onyxia, Eruption
-    ApplySpellFix({ 17731, 69294 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_DUMMY;
-        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(3);
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_18_YARDS); // 18yd instead of 13yd to make sure all cracks erupt
-    });
-
     // Onyxia's Lair, Onyxia, Breath
     ApplySpellFix({
         18576, 18578, 18579, 18580, 18581, 18582, 18583, 18609, 18611, 18612, 18613, 18614, 18615, 18616, 18584,
