@@ -29,6 +29,13 @@ const (
 	smsgGameObjectCustomAnim = uint16(0x0B3)
 )
 
+// The Lava Fissures that sit above the lair floor. Retail sniffs show only these passing an
+// Eruption on; a fissure sunk below the floor erupts when hit but its own Eruption hits nothing.
+var lavaFissuresAboveFloor = map[uint32]bool{
+	176811: true, 176814: true, 176821: true, 176824: true, 176827: true, 176829: true,
+	176830: true, 176839: true, 176841: true, 176908: true, 176921: true,
+}
+
 // The 52 Lava Fissure templates; each has exactly one spawn on map 249.
 func isLavaFissure(entry uint32) bool {
 	return (entry >= 176513 && entry <= 176515) || (entry >= 176809 && entry <= 176842) ||
@@ -274,11 +281,18 @@ func dist3(ax, ay, az, bx, by, bz float32) float32 {
 	return float32(math.Sqrt(float64((ax-bx)*(ax-bx) + (ay-by)*(ay-by) + (az-bz)*(az-bz))))
 }
 
-// Phase 3 Eruption, measured against a retail sniff of a full kill: Bellowing Roar's own
-// activate-object effect sets off every Lava Fissure within 13y of Onyxia when the cast lands,
-// each fissure casts Eruption itself, and that Eruption sets off its neighbours within 13y in the
-// same tick. Every hit plays the fissure's crack animation. A fissure's 10s trap cooldown keeps it
-// from erupting twice in a row, and nothing erupts before a Roar lands.
+// Onyxia's cached Z is the start of her last spline, which after the landing is still her flight
+// height, so distances from her are measured flat.
+func dist2(ax, ay, bx, by float32) float32 {
+	return float32(math.Hypot(float64(ax-bx), float64(ay-by)))
+}
+
+// Phase 3 Eruption, measured against retail sniffs: Bellowing Roar's own activate-object effect
+// sets off every Lava Fissure within 13y of Onyxia when the cast lands, and each fissure casts
+// Eruption itself. Only a fissure above the lair floor passes it on, to every fissure within 13y
+// in the same tick, so a Roar erupts a cluster around her and never the whole floor. Every hit
+// plays the fissure's crack animation. A fissure's 10s trap cooldown keeps it from erupting twice
+// in a row, and nothing erupts before a Roar lands.
 // PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27843
 func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
@@ -429,8 +443,8 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 		}
 	}
 
-	// Per Roar: the fissures near Onyxia erupt, the rest are chained from a neighbour, and every
-	// erupting fissure plays its crack animation.
+	// Per Roar: the fissures near Onyxia erupt, the rest are chained from an erupting fissure above
+	// the floor, nothing else erupts, and every erupting fissure plays its crack animation.
 	judged := 0
 	var summary []string
 	for r, g := range gos {
@@ -442,8 +456,28 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 			}
 		}
 
+		var names []string
+		for entry := range erupted {
+			names = append(names, fmt.Sprint(entry))
+		}
+		sort.Strings(names)
+		t.Logf("roar %d: Onyxia at (%.1f, %.1f), erupted %s", r+1, g.x, g.y, strings.Join(names, " "))
+
+		// Whether p lies within radius of Onyxia or of an erupting fissure that passes Eruption on.
+		reachedBy := func(entry uint32, p fissurePos, radius float32) bool {
+			if dist2(g.x, g.y, p.x, p.y) <= radius {
+				return true
+			}
+			for other := range erupted {
+				if o := fissures[other]; other != entry && lavaFissuresAboveFloor[other] && dist3(o.x, o.y, o.z, p.x, p.y, p.z) <= radius {
+					return true
+				}
+			}
+			return false
+		}
+
 		for entry, p := range fissures {
-			if dist3(g.x, g.y, g.z, p.x, p.y, p.z) > mustEruptWithin {
+			if !reachedBy(entry, p, mustEruptWithin) {
 				continue
 			}
 			if _, ok := erupted[entry]; ok {
@@ -457,27 +491,20 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 				}
 			}
 			if !onCooldown {
-				e2eharness.Assertf(t, "Roar %d landed with Onyxia at (%.1f, %.1f, %.1f), %.1fy from fissure %d, which did not erupt",
-					r+1, g.x, g.y, g.z, dist3(g.x, g.y, g.z, p.x, p.y, p.z), entry)
+				e2eharness.Assertf(t, "Roar %d landed with Onyxia at (%.1f, %.1f): fissure %d, %.1fy from her, is in reach of her or an erupting fissure above the floor but did not erupt",
+					r+1, g.x, g.y, entry, dist2(g.x, g.y, p.x, p.y))
 			}
 		}
 
 		direct, chained := 0, 0
 		for entry, e := range erupted {
 			p := fissures[entry]
-			if dist3(g.x, g.y, g.z, p.x, p.y, p.z) <= roarRadius+rangeSlack {
+			if dist2(g.x, g.y, p.x, p.y) <= roarRadius+rangeSlack {
 				direct++
 			} else {
-				linked := false
-				for other := range erupted {
-					if o := fissures[other]; other != entry && dist3(o.x, o.y, o.z, p.x, p.y, p.z) <= fissureRadius+rangeSlack {
-						linked = true
-						break
-					}
-				}
-				if !linked {
-					e2eharness.Assertf(t, "Roar %d: fissure %d erupted %.1fy from Onyxia with no erupting fissure within %.0fy",
-						r+1, entry, dist3(g.x, g.y, g.z, p.x, p.y, p.z), fissureRadius)
+				if !reachedBy(entry, p, fissureRadius+rangeSlack) {
+					e2eharness.Assertf(t, "Roar %d: fissure %d erupted %.1fy from Onyxia with no erupting fissure above the floor within %.0fy; only those pass an Eruption on",
+						r+1, entry, dist2(g.x, g.y, p.x, p.y), fissureRadius)
 				}
 				chained++
 			}
@@ -503,7 +530,7 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 	}
 
 	t.Logf("%s", strings.Join(summary, "; "))
-	t.Logf("PASS eruptions: %d Roars, %d Eruptions, %d crack animations, all set off by a landing Roar, none inside a fissure's cooldown",
+	t.Logf("PASS eruptions: %d Roars, %d Eruptions, %d crack animations, all set off by a landing Roar and chained only through fissures above the floor, none inside a fissure's cooldown",
 		len(gos), len(eruptions), len(anims))
 }
 

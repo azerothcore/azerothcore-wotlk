@@ -23,6 +23,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "onyxias_lair.h"
+#include <algorithm>
 #include <array>
 
 enum Spells
@@ -743,11 +744,42 @@ private:
     }
 };
 
+// The Lava Fissures whose position sits above the lair floor. In retail sniffs only these pass an Eruption on: a
+// fissure sunk below the floor erupts when hit, but its own Eruption hits no neighbour
+static constexpr std::array<uint32, 11> LavaFissuresAboveFloor =
+{
+    176811, 176814, 176821, 176824, 176827, 176829, 176830, 176839, 176841, 176908, 176921
+};
+
 // 18431 - Bellowing Roar
 // 17731, 69294 - Eruption
 class spell_onyxia_disturb_lava_fissure : public SpellScript
 {
     PrepareSpellScript(spell_onyxia_disturb_lava_fissure);
+
+    void FilterFissures(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        // The area search measures a gameobject by its display bounds, which stretch a fissure's reach to about 18.75y;
+        // retail sniffs only ever hit fissures within the effect radius of the centre
+        float const radius = GetSpellInfo()->Effects[EFFECT_1].CalcRadius(caster);
+        targets.remove_if([caster, radius](WorldObject* target) { return caster->GetExactDist(target) > radius; });
+
+        if (GetSpellInfo()->Id == SPELL_BELLOWINGROAR)
+            return;
+
+        // A fissure's Eruption is cast by a trigger the fissure summons
+        TempSummon* trigger = caster->ToTempSummon();
+        GameObject* fissure = trigger ? trigger->GetSummonerGameObject() : nullptr;
+        if (!fissure)
+            return;
+
+        if (std::find(LavaFissuresAboveFloor.begin(), LavaFissuresAboveFloor.end(), fissure->GetEntry()) == LavaFissuresAboveFloor.end())
+            targets.clear();
+    }
 
     // The default effect sets the fissure off; every hit also plays its crack animation, even while the fissure's
     // trap cooldown keeps it from erupting again
@@ -759,6 +791,7 @@ class spell_onyxia_disturb_lava_fissure : public SpellScript
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_onyxia_disturb_lava_fissure::FilterFissures, EFFECT_1, TARGET_GAMEOBJECT_DEST_AREA);
         OnEffectHitTarget += SpellEffectFn(spell_onyxia_disturb_lava_fissure::HandleActivateObject, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
     }
 };
