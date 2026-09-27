@@ -263,12 +263,11 @@ struct boss_onyxia : public BossAI
 
         if (summon->GetEntry() == NPC_ONYXIAN_WHELP)
         {
-            // A whelp hatches the eggs next to it once its spawn-in cast is done
-            ObjectGuid const whelpGUID = summon->GetGUID();
-            scheduler.Schedule(500ms, [this, whelpGUID](TaskContext)
+            // Candidates are taken where the whelp appears: by the time its spawn-in ends it may already have moved or teleported
+            GuidVector const eggGUIDs = GetEggsNearestFirst(summon);
+            scheduler.Schedule(500ms, [this, eggGUIDs](TaskContext)
             {
-                if (Creature* whelp = ObjectAccessor::GetCreature(*me, whelpGUID))
-                    HatchEggsNear(whelp);
+                HatchNearestEgg(eggGUIDs);
             });
             return;
         }
@@ -360,16 +359,28 @@ struct boss_onyxia : public BossAI
             _pointWhelpGUIDs[point] = whelp->GetGUID();
     }
 
-    // Each egg within 5 yards despawns and releases a whelp 2s later, the cast time of Summon Onyxia Whelp
-    void HatchEggsNear(Creature* whelp)
+    GuidVector GetEggsNearestFirst(Creature* whelp) const
     {
         std::list<GameObject*> eggs;
-        whelp->GetGameObjectListWithEntryInGrid(eggs, GO_ONYXIA_EGG, 5.0f);
+        whelp->GetGameObjectListWithEntryInGrid(eggs, GO_ONYXIA_EGG, 4.0f);
+        // The grid search pads the range with both object sizes
+        eggs.remove_if([whelp](GameObject* egg) { return whelp->GetExactDist(egg) > 4.0f; });
+        eggs.sort(Acore::ObjectDistanceOrderPred(whelp));
 
+        GuidVector eggGUIDs;
         for (GameObject* egg : eggs)
+            eggGUIDs.push_back(egg->GetGUID());
+
+        return eggGUIDs;
+    }
+
+    // Only the nearest egg still standing hatches; its whelp appears 2s later, the cast time of Summon Onyxia Whelp
+    void HatchNearestEgg(GuidVector const& eggGUIDs)
+    {
+        for (ObjectGuid const& eggGUID : eggGUIDs)
         {
-            // The grid search pads the range with both object sizes
-            if (!egg->isSpawned() || whelp->GetExactDist(egg) > 5.0f)
+            GameObject* egg = ObjectAccessor::GetGameObject(*me, eggGUID);
+            if (!egg || !egg->isSpawned())
                 continue;
 
             Position const eggPos = egg->GetPosition();
@@ -378,6 +389,7 @@ struct boss_onyxia : public BossAI
             {
                 me->SummonCreature(NPC_ONYXIAN_WHELP, eggPos);
             });
+            return;
         }
     }
 
