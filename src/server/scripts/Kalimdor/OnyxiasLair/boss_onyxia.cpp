@@ -77,8 +77,7 @@ enum Events
     EVENT_OLG_SPELL_IGNITEWEAPON    = 19,
 
     EVENT_LIFTOFF                   = 31,
-    EVENT_FLY_S_TO_N                = 32,
-    EVENT_END_MANY_WHELPS_TIME
+    EVENT_FLY_S_TO_N                = 32
 };
 
 enum Phases
@@ -468,8 +467,11 @@ struct boss_onyxia : public BossAI
                 me->SendMovementFlagUpdate();
                 me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, OnyxiaMoveData[WP_SOUTH].X + 1.0f, OnyxiaMoveData[WP_SOUTH].Y, OnyxiaMoveData[WP_SOUTH].Z, 12.0f);
                 _manyWhelpsAvailable = true;
-
-                events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10s);
+                // On the scheduler: reaching 40% during takeoff resets the event map before the window would close
+                scheduler.Schedule(10s, [this](TaskContext)
+                {
+                    _manyWhelpsAvailable = false;
+                });
 
                 _whelpsRespawn = true;
                 for (uint8 point = 0; point < std::size(WhelpSpawnPoints); ++point)
@@ -477,9 +479,6 @@ struct boss_onyxia : public BossAI
                 me->SummonCreature(NPC_ONYXIAN_WHELP, WhelpLiftoffOnlyPoint);
                 break;
             }
-            case EVENT_END_MANY_WHELPS_TIME:
-                _manyWhelpsAvailable = false;
-                break;
             case EVENT_FLY_S_TO_N:
             {
                 me->SetSpeed(MOVE_RUN, 2.95f, false);
