@@ -106,9 +106,8 @@
 #include <ctime>
 
 std::atomic_long World::_stopEvent = false;
-uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
-std::mutex World::_stopNowLock;
-bool World::_stoppedByStopNow = false;
+std::atomic<uint8> World::_exitCode = SHUTDOWN_EXIT_CODE;
+std::atomic<bool> World::_stoppedByStopNow = false;
 uint32 World::m_worldLoopCounter = 0;
 
 float World::_maxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
@@ -916,7 +915,8 @@ void World::SetInitialWorldSettings()
         stmt->SetData(0, realm.Id.Realm);
         stmt->SetData(1, uint32(GameTime::GetStartTime().count()));
         stmt->SetData(2, GitRevision::GetFullVersion());
-        LoginDatabase.Execute(stmt);
+        // Synchronous so it can't land after the shutdown UPDATEs, which run on the synchronous connection
+        LoginDatabase.DirectExecute(stmt);
     }
 
     _timers[WUPDATE_UPTIME].SetInterval(getIntConfig(CONFIG_UPTIME_UPDATE)*MINUTE * IN_MILLISECONDS);
@@ -1646,36 +1646,22 @@ void World::ShutdownCancel()
     sScriptMgr->OnShutdownCancel();
 }
 
-void World::StopNow(uint8 exitcode)
-{
-    std::lock_guard<std::mutex> guard(_stopNowLock);
-
-    if (!_stopEvent)
-        _stoppedByStopNow = true;
-
-    _stopEvent = true;
-    _exitCode = exitcode;
-}
-
 void World::SaveSessionEnd(bool finished)
 {
+    uint8 const exitCode = _exitCode;
     bool restartScheduled = false;
     std::string reason;
 
+    if (!_stoppedByStopNow)
     {
-        std::lock_guard<std::mutex> guard(_stopNowLock);
-
-        if (!_stoppedByStopNow)
-        {
-            restartScheduled = (_shutdownMask & SHUTDOWN_MASK_RESTART) != 0;
-            reason = _shutdownReason;
-        }
+        restartScheduled = (_shutdownMask & SHUTDOWN_MASK_RESTART) != 0;
+        reason = _shutdownReason;
     }
 
     ShutdownType type = SHUTDOWN_TYPE_SHUTDOWN;
-    if (_exitCode == ERROR_EXIT_CODE)
+    if (exitCode == ERROR_EXIT_CODE)
         type = SHUTDOWN_TYPE_ERROR;
-    else if (_exitCode == RESTART_EXIT_CODE || restartScheduled)
+    else if (exitCode == RESTART_EXIT_CODE || restartScheduled)
         type = SHUTDOWN_TYPE_RESTART;
 
     // Column limit; strict SQL mode rejects the whole UPDATE on overflow
@@ -1689,7 +1675,7 @@ void World::SaveSessionEnd(bool finished)
     else
         stmt->SetData(2);
     stmt->SetData(3, uint8(type));
-    stmt->SetData(4, _exitCode);
+    stmt->SetData(4, exitCode);
     stmt->SetData(5, reason);
     stmt->SetData(6, realm.Id.Realm);
     stmt->SetData(7, uint32(GameTime::GetStartTime().count()));
