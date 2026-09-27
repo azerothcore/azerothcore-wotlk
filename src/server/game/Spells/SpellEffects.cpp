@@ -724,19 +724,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                                     unitCaster->CastSpell(unitTarget, 66904, true);
                                 return;
                             }
-                        case 17731:
-                        case 69294:
-                            {
-                                if (!gameObjTarget || gameObjTarget->GetRespawnTime() > GameTime::GetGameTime().count())
-                                    return;
-
-                                gameObjTarget->SetRespawnTime(10);
-                                gameObjTarget->SendCustomAnim(gameObjTarget->GetGoAnimProgress());
-                                if (Creature* trigger = gameObjTarget->SummonCreature(12758, *gameObjTarget, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                                    trigger->CastSpell(trigger, 17731, false);
-
-                                return;
-                            }
                         // HoL, Arc Weld
                         case 59086:
                             {
