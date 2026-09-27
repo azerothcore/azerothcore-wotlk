@@ -582,7 +582,6 @@ struct boss_onyxia : public BossAI
                 DoCastAOE(SPELL_BELLOWINGROAR);
 
                 events.ScheduleEvent(EVENT_ERUPTION, 0ms);
-                events.ScheduleEvent(EVENT_SPELL_WINGBUFFET, 10s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_FLAMEBREATH, 10s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_TAILSWEEP, 15s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_CLEAVE, 2s, 5s);
