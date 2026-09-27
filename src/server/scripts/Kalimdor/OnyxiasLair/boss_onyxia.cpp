@@ -763,8 +763,8 @@ class spell_onyxia_disturb_lava_fissure : public SpellScript
         if (!caster)
             return;
 
-        // The area search measures a gameobject by its display bounds, which stretch a fissure's reach to about 18.75y;
-        // retail sniffs only ever hit fissures within the effect radius of the centre
+        // The area search measures a gameobject by its display bounds, which stretch a fissure's reach well past the
+        // effect radius; retail sniffs only ever hit fissures within that radius of the centre
         float const radius = GetSpellInfo()->Effects[EFFECT_1].CalcRadius(caster);
         targets.remove_if([caster, radius](WorldObject* target) { return caster->GetExactDist(target) > radius; });
 
