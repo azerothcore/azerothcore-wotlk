@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_04 -> 2026_09_27_05
 -- Update creature 'Vanilla Collector's Edition Quest Enders' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id` IN (27928, 11944, 11945, 11943, 11941, 11942, 15493, 16476, 11940)) AND (`guid` IN (125762, 128460, 26568, 31923, 3416, 348, 46827, 55415, 57174, 79949));
