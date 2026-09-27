@@ -1912,6 +1912,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
+    // Ulduar, Flame Leviathan, Flame Vents
+    // The channel carries no interrupt flags, so Electroshock and player interrupts could never stop it
+    ApplySpellFix({ 62396 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags |= CHANNEL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     // Ulduar, Mimiron, bomb bot explosion
     ApplySpellFix({ 63801 }, [](SpellInfo* spellInfo)
     {
