@@ -613,6 +613,8 @@ struct boss_onyxia : public BossAI
 
     void OnSpellCast(SpellInfo const* spell) override
     {
+        BossAI::OnSpellCast(spell);
+
         if (spell->Id == OnyxiaMoveData[_currentWP].SpellId)
             DoCastSelf(SPELL_HEATED_GROUND, true);
     }
