@@ -705,7 +705,14 @@ struct npc_onyxian_whelp : public ScriptedAI
 
         scheduler.Schedule(500ms, [this](TaskContext context)
         {
-            if (Unit* target = me->SelectNearestTarget(300.0f))
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+
+            // A whelp that aggroed during its spawn-in goes for the victim it picked then
+            Unit* target = me->IsEngaged() ? me->GetThreatMgr().GetCurrentVictim() : nullptr;
+            if (!target)
+                target = me->SelectNearestTarget(300.0f);
+
+            if (target)
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -718,6 +725,18 @@ struct npc_onyxian_whelp : public ScriptedAI
                 check.Repeat();
             });
         });
+    }
+
+    // While UNIT_FLAG_NON_ATTACKABLE (from the template) is set, whelps may aggro but only take a target and attack once it clears
+    void AttackStart(Unit* who) override
+    {
+        if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        {
+            me->EngageWithTarget(who);
+            return;
+        }
+
+        ScriptedAI::AttackStart(who);
     }
 
     void JustDied(Unit* /*killer*/) override
