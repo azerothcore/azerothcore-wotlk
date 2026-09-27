@@ -122,6 +122,8 @@ static OnyxiaMove const OnyxiaMoveData[] =
 
 static_assert(std::size(OnyxiaMoveData) == WP_SOUTH_EAST + 1);
 
+Position const LairGuardTriggerPos = { -134.40698f, -213.74207f, -70.19801f, 0.01745329f };
+
 enum Yells
 {
     SAY_AGGRO                   = 0,
@@ -146,6 +148,7 @@ struct boss_onyxia : public BossAI
         _phase = PHASE_NONE;
         _currentWP = WP_GROUND_SOUTH;
         _manyWhelpsAvailable = false;
+        _lairGuardTriggerGUID.Clear();
     }
 
     void SetPhase(Phases phase)
@@ -213,6 +216,7 @@ struct boss_onyxia : public BossAI
         ScheduleHealthCheckEvent(40, [&]
         {
             me->InterruptNonMeleeSpells(false);
+            summons.DespawnEntry(NPC_WORLD_TRIGGER);
             SetPhase(PHASE_LANDED);
         });
 
@@ -370,6 +374,11 @@ struct boss_onyxia : public BossAI
                 me->StopMoving();
                 DoResetThreatList();
                 me->GetMotionMaster()->MovePoint(POINT_GROUND_SOUTH, OnyxiaMoveData[WP_GROUND_SOUTH].X, OnyxiaMoveData[WP_GROUND_SOUTH].Y, OnyxiaMoveData[WP_GROUND_SOUTH].Z);
+
+                if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER, LairGuardTriggerPos, TEMPSUMMON_MANUAL_DESPAWN))
+                    _lairGuardTriggerGUID = trigger->GetGUID();
+
+                events.ScheduleEvent(EVENT_SUMMON_LAIR_GUARD, 46s);
                 break;
             }
             case EVENT_LIFTOFF:
@@ -398,13 +407,15 @@ struct boss_onyxia : public BossAI
 
                 StartWhelpSpam();
                 events.ScheduleEvent(EVENT_WHELP_SPAM, 90s);
-                events.ScheduleEvent(EVENT_SUMMON_LAIR_GUARD, 30s);
                 break;
             }
             case EVENT_SUMMON_LAIR_GUARD:
             {
-                me->CastSpell(-101.654f, -214.491f, -80.70f, SPELL_SUMMON_LAIR_GUARD, true);
-                events.Repeat(30s);
+                // Onyxia as original caster makes her the summoner, so the guard joins her summons and engages in JustSummoned
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _lairGuardTriggerGUID))
+                    trigger->CastSpell(trigger, SPELL_SUMMON_LAIR_GUARD, CastSpellExtraArgs(true).SetOriginalCaster(me->GetGUID()));
+
+                events.Repeat(46s);
                 break;
             }
             case EVENT_WHELP_SPAM:
@@ -548,6 +559,7 @@ private:
     Phases _phase;
     uint8 _currentWP;
     bool _manyWhelpsAvailable;
+    ObjectGuid _lairGuardTriggerGUID;
 };
 
 struct npc_onyxian_lair_guard : public ScriptedAI
