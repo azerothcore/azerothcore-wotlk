@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_03 -> 2026_09_27_04
 -- --------------------------------------------------------------------------------------------
 -- Capital Cities (Eastern Kingdoms, map 0 / Kalimdor, map 1)
 -- Named guard elite patrols
