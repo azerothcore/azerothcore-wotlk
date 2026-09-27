@@ -12868,7 +12868,7 @@ bool Player::CanNoReagentCast(SpellInfo const* spellInfo) const
 void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
 {
     // Disarm keeps the weapon equipped, keep active auras (e.g. Deterrence)
-    auto hasDisarmedFitWeapon = [this](SpellInfo const* spellInfo)
+    auto hasDisarmedFitWeapon = [this, pItem](SpellInfo const* spellInfo)
     {
         if (spellInfo->EquippedItemClass != ITEM_CLASS_WEAPON || spellInfo->IsPassive())
             return false;
@@ -12883,7 +12883,7 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
         for (auto const& [slot, disarmAura] : disarmSlots)
             if (HasAuraType(disarmAura))
                 if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-                    if (item->IsFitToSpellRequirements(spellInfo))
+                    if (item != pItem && item->IsFitToSpellRequirements(spellInfo))
                         return true;
 
         return false;
