@@ -25,6 +25,7 @@
 
 #include <array>
 #include <list>
+#include <unordered_set>
 
 const Position BlackGuardPos[10] =
 {
@@ -101,6 +102,7 @@ public:
             _zigguratState3 = 0;
             _slaughterProgress = SLAUGHTER_ABOMINATIONS;
             _slaughterNPCs = 0;
+            _abominationSpawnIds.clear();
             _postboxesOpened = 0;
 
             _scarletThreadUsedLocations = 0;
@@ -139,10 +141,8 @@ public:
                     break;
                 case NPC_VENOM_BELCHER:
                 case NPC_BILE_SPEWER:
-                    // Dead spawns are still created while waiting for their respawn timer.
-                    // Do not count them again when rebuilding the event after a restart.
-                    if (_slaughterProgress == SLAUGHTER_ABOMINATIONS && creature->IsAlive())
-                        ++_slaughterNPCs;
+                    if (_slaughterProgress == SLAUGHTER_ABOMINATIONS && creature->GetSpawnId())
+                        _abominationSpawnIds.insert(creature->GetSpawnId());
                     break;
                 case NPC_RAMSTEIN_THE_GORGER:
                     if (_slaughterProgress == SLAUGHTER_RAMSTEIN)
@@ -200,15 +200,22 @@ public:
             {
                 case NPC_VENOM_BELCHER:
                 case NPC_BILE_SPEWER:
+                {
+                    Creature* creature = unit->ToCreature();
+                    if (_slaughterProgress != SLAUGHTER_ABOMINATIONS || !creature ||
+                        !_abominationSpawnIds.count(creature->GetSpawnId()) ||
+                        HasLivingAbominations(creature->GetSpawnId()))
+                        break;
+
+                    _abominationSpawnIds.clear();
+                    AdvanceSlaughterEvent();
+                    break;
+                }
                 case NPC_RAMSTEIN_THE_GORGER:
                 case NPC_MINDLESS_UNDEAD:
                 case NPC_BLACK_GUARD:
                     if (IsCurrentSlaughterTarget(unit->GetEntry()) && _slaughterNPCs && --_slaughterNPCs == 0)
-                    {
-                        ++_slaughterProgress;
-                        SaveToDB();
-                        ProcessSlaughterEvent();
-                    }
+                        AdvanceSlaughterEvent();
                     break;
                 case NPC_BARON_RIVENDARE:
                     events.CancelEvent(EVENT_BARON_TIME);
@@ -646,6 +653,7 @@ public:
         uint32 _zigguratState3;
         uint32 _slaughterProgress;
         uint32 _slaughterNPCs;
+        std::unordered_set<ObjectGuid::LowType> _abominationSpawnIds;
         uint32 _barthilasrunProgress{};
         uint32 _postboxesOpened;
         EventMap events;
@@ -666,12 +674,41 @@ public:
         ObjectGuid _trappedPlayerGUIDs[MAX_GATE_TRAPS];
         ObjectGuid _trapGatesGUIDs[MAX_GATE_TRAP_GATES];
 
+        bool HasLivingAbominations(ObjectGuid::LowType dyingSpawnId) const
+        {
+            auto const& creatures = instance->GetCreatureBySpawnIdStore();
+            for (ObjectGuid::LowType spawnId : _abominationSpawnIds)
+            {
+                if (spawnId == dyingSpawnId)
+                    continue;
+
+                auto const range = creatures.equal_range(spawnId);
+                if (range.first == range.second)
+                {
+                    // An unloaded spawn still blocks the event unless it is waiting to respawn.
+                    if (instance->GetCreatureRespawnTime(spawnId) <= GameTime::GetGameTime().count())
+                        return true;
+                }
+                else
+                    for (auto itr = range.first; itr != range.second; ++itr)
+                        if (itr->second->IsAlive())
+                            return true;
+            }
+
+            return false;
+        }
+
+        void AdvanceSlaughterEvent()
+        {
+            ++_slaughterProgress;
+            SaveToDB();
+            ProcessSlaughterEvent();
+        }
+
         bool IsCurrentSlaughterTarget(uint32 entry) const
         {
             switch (_slaughterProgress)
             {
-                case SLAUGHTER_ABOMINATIONS:
-                    return entry == NPC_VENOM_BELCHER || entry == NPC_BILE_SPEWER;
                 case SLAUGHTER_RAMSTEIN:
                     return entry == NPC_RAMSTEIN_THE_GORGER;
                 case SLAUGHTER_MINDLESS_UNDEAD:
