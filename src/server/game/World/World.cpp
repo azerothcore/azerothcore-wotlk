@@ -1713,7 +1713,7 @@ void World::LoadPreviousSessionInfo()
     previous.Reason = fields[4].Get<std::string>();
 
     if (previous.Crashed)
-        LOG_WARN("server.loading", "Previous session did not shut down cleanly. Last seen alive {}.",
+        LOG_WARN("server.loading", "Previous session did not shut down cleanly. Last online {}.",
             Acore::Time::TimeToTimestampStr(previous.StartTime + previous.Uptime));
 
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_UPTIME_MAXPLAYERS);
