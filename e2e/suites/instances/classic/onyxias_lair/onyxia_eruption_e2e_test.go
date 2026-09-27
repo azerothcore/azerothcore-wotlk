@@ -279,6 +279,7 @@ func dist3(ax, ay, az, bx, by, bz float32) float32 {
 // each fissure casts Eruption itself, and that Eruption sets off its neighbours within 13y in the
 // same tick. Every hit plays the fissure's crack animation. A fissure's 10s trap cooldown keeps it
 // from erupting twice in a row, and nothing erupts before a Roar lands.
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27843
 func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instances"},

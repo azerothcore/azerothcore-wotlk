@@ -330,11 +330,16 @@ struct boss_onyxia : public BossAI
 
         switch (id)
         {
+            // The landing replaces an unfinished walk or takeoff, and the replaced movement still reports its point
             case POINT_GROUND_SOUTH:
+                if (_phase != PHASE_AIRPHASE)
+                    break;
                 me->SetFacingTo(OnyxiaMoveData[WP_GROUND_SOUTH].O);
                 events.ScheduleEvent(EVENT_LIFTOFF, 0ms);
                 break;
             case POINT_TAKEOFF:
+                if (_phase != PHASE_AIRPHASE)
+                    break;
                 me->SetFacingTo(OnyxiaMoveData[WP_SOUTH].O);
                 events.ScheduleEvent(EVENT_FLY_S_TO_N, 0ms);
                 break;
