@@ -231,6 +231,7 @@ struct boss_onyxia : public BossAI
         }
 
         BossAI::EnterEvadeMode(why);
+        me->DespawnOnEvade(1min);
     }
 
     void JustSummoned(Creature* summon) override
