@@ -36,3 +36,14 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 DELETE FROM `creature_loot_template` WHERE `Entry` = 10504 AND `Item` IN (16722, 35031, 35095) AND `GroupId` = 1;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (10504, 35095, 35095, 100, 0, 1, 1, 1, 1, 'Lord Alexei Barov - Primary rare');
+
+-- Replace individual incidental drops with the level-60 elite world-loot pool.
+DELETE FROM `creature_loot_template` WHERE `Entry` = 10504 AND `Item` IN (1, 4500, 5759, 7909, 7910, 8766, 8932, 10307, 10308, 10309, 10310, 12683, 12684, 12713, 13492, 14484, 14491, 14494, 14498, 16245, 17414, 17683, 18335, 18600, 19262, 19281);
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(10504, 1, 1000360, 0, 0, 1, 5, 1, 1, 'Lord Alexei Barov - World Loot Level 60'),
+(10504, 8766, 0, 0.863275, 0, 1, 0, 1, 1, 'Lord Alexei Barov - Morning Glory Dew'),
+(10504, 8932, 0, 1.528816, 0, 1, 0, 1, 1, 'Lord Alexei Barov - Alterac Swiss');
+
+-- Food/drink: 179/317 observations out of 20,735; Runecloth: 2,440, stacks of 2-4.
+UPDATE `creature_loot_template` SET `Chance` = 11.767543, `MinCount` = 2, `MaxCount` = 4
+WHERE `Entry` = 10504 AND `Item` = 14047 AND `Reference` = 0;
