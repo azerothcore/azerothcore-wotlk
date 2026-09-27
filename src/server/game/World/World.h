@@ -278,6 +278,15 @@ private:
     Optional<PreviousSessionInfo> _previousSession;
     uint32 _lifetimeMaxPlayerCount;
 
+    struct SessionOutcome
+    {
+        ShutdownType Type = SHUTDOWN_TYPE_UNKNOWN;
+        uint8 ExitCode = SHUTDOWN_EXIT_CODE;
+        std::string Reason;
+    };
+
+    Optional<SessionOutcome> _sessionOutcome;
+
     uint32 _cleaningFlags;
 
     bool _isClosed;

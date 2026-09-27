@@ -1648,24 +1648,29 @@ void World::ShutdownCancel()
 
 void World::SaveSessionEnd(bool finished)
 {
-    uint8 const exitCode = _exitCode;
-    bool restartScheduled = false;
-    std::string reason;
-
-    if (!_stoppedByStopNow)
+    // Fixed by the first call: main() has picked its exit code by the final call, and a later StopNow
+    // (e.g. the CLI thread failing its read during teardown) no longer reflects how the session ended
+    if (!_sessionOutcome)
     {
-        restartScheduled = (_shutdownMask & SHUTDOWN_MASK_RESTART) != 0;
-        reason = _shutdownReason;
+        SessionOutcome& outcome = _sessionOutcome.emplace();
+        outcome.ExitCode = _exitCode;
+
+        bool restartScheduled = false;
+        if (!_stoppedByStopNow)
+        {
+            restartScheduled = (_shutdownMask & SHUTDOWN_MASK_RESTART) != 0;
+            outcome.Reason = _shutdownReason;
+        }
+
+        outcome.Type = SHUTDOWN_TYPE_SHUTDOWN;
+        if (outcome.ExitCode == ERROR_EXIT_CODE)
+            outcome.Type = SHUTDOWN_TYPE_ERROR;
+        else if (outcome.ExitCode == RESTART_EXIT_CODE || restartScheduled)
+            outcome.Type = SHUTDOWN_TYPE_RESTART;
+
+        // Column limit; strict SQL mode rejects the whole UPDATE on overflow
+        utf8truncate(outcome.Reason, 255);
     }
-
-    ShutdownType type = SHUTDOWN_TYPE_SHUTDOWN;
-    if (exitCode == ERROR_EXIT_CODE)
-        type = SHUTDOWN_TYPE_ERROR;
-    else if (exitCode == RESTART_EXIT_CODE || restartScheduled)
-        type = SHUTDOWN_TYPE_RESTART;
-
-    // Column limit; strict SQL mode rejects the whole UPDATE on overflow
-    utf8truncate(reason, 255);
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_SHUTDOWN);
     stmt->SetData(0, uint32(GameTime::GetUptime().count()));
@@ -1674,9 +1679,9 @@ void World::SaveSessionEnd(bool finished)
         stmt->SetData(2, uint32(std::time(nullptr)));
     else
         stmt->SetData(2);
-    stmt->SetData(3, uint8(type));
-    stmt->SetData(4, exitCode);
-    stmt->SetData(5, reason);
+    stmt->SetData(3, uint8(_sessionOutcome->Type));
+    stmt->SetData(4, _sessionOutcome->ExitCode);
+    stmt->SetData(5, _sessionOutcome->Reason);
     stmt->SetData(6, realm.Id.Realm);
     stmt->SetData(7, uint32(GameTime::GetStartTime().count()));
     LoginDatabase.DirectExecute(stmt);
