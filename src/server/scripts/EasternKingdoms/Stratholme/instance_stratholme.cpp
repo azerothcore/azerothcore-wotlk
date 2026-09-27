@@ -58,6 +58,15 @@ Position const MindlessUndeadPos = { 3941.75f, -3393.06f, 119.70f, 0.0f };
 Position const BarthilasPos = { 4068.74f, -3535.97f, 122.825f, 2.478367567062377929f };
 Position const SlaughterPos = { 4032.20f, -3378.06f, 119.75f, 4.67f };
 
+enum SlaughterPhases
+{
+    SLAUGHTER_ABOMINATIONS,
+    SLAUGHTER_RAMSTEIN,
+    SLAUGHTER_MINDLESS_UNDEAD,
+    SLAUGHTER_BLACK_GUARD,
+    SLAUGHTER_COMPLETE
+};
+
 enum GateTrapIndexes
 {
     GATE_TRAP_SCARLET,
@@ -90,7 +99,7 @@ public:
             _zigguratState1 = 0;
             _zigguratState2 = 0;
             _zigguratState3 = 0;
-            _slaughterProgress = 0;
+            _slaughterProgress = SLAUGHTER_ABOMINATIONS;
             _slaughterNPCs = 0;
             _postboxesOpened = 0;
 
@@ -132,19 +141,19 @@ public:
                 case NPC_BILE_SPEWER:
                     // Dead spawns are still created while waiting for their respawn timer.
                     // Do not count them again when rebuilding the event after a restart.
-                    if (_slaughterProgress == 0 && creature->IsAlive())
+                    if (_slaughterProgress == SLAUGHTER_ABOMINATIONS && creature->IsAlive())
                         ++_slaughterNPCs;
                     break;
                 case NPC_RAMSTEIN_THE_GORGER:
-                    if (_slaughterProgress == 1)
+                    if (_slaughterProgress == SLAUGHTER_RAMSTEIN)
                         ++_slaughterNPCs;
                     break;
                 case NPC_MINDLESS_UNDEAD:
-                    if (_slaughterProgress == 2)
+                    if (_slaughterProgress == SLAUGHTER_MINDLESS_UNDEAD)
                         ++_slaughterNPCs;
                     break;
                 case NPC_BLACK_GUARD:
-                    if (_slaughterProgress == 3)
+                    if (_slaughterProgress == SLAUGHTER_BLACK_GUARD)
                         ++_slaughterNPCs;
                     break;
                 case NPC_BARTHILAS:
@@ -157,14 +166,14 @@ public:
 
         void ProcessSlaughterEvent()
         {
-            if (_slaughterProgress == 1)
+            if (_slaughterProgress == SLAUGHTER_RAMSTEIN)
             {
                 if (Creature* baron = instance->GetCreature(_baronRivendareGUID))
                     baron->AI()->Talk(SAY_BRAON_SUMMON_RAMSTEIN);
 
                 instance->SummonCreature(NPC_RAMSTEIN_THE_GORGER, SlaughterPos);
             }
-            if (_slaughterProgress == 2)
+            if (_slaughterProgress == SLAUGHTER_MINDLESS_UNDEAD)
             {
                 for (uint32 i = 0; i < 33; ++i)
                     events.ScheduleEvent(EVENT_SPAWN_MINDLESS, Milliseconds(5000 + i * 210));
@@ -172,11 +181,11 @@ public:
                     if (GameObject* gate = baron->FindNearestGameObject(GO_SLAUGHTER_GATE_SIDE, 200.0f))
                         gate->SetGoState(GO_STATE_ACTIVE);
             }
-            if (_slaughterProgress == 3)
+            if (_slaughterProgress == SLAUGHTER_BLACK_GUARD)
             {
                 events.ScheduleEvent(EVENT_SPAWN_BLACK_GUARD, 20s);
             }
-            if (_slaughterProgress == 4)
+            if (_slaughterProgress == SLAUGHTER_COMPLETE)
             {
                 if (Creature* baron = instance->GetCreature(_baronRivendareGUID))
                     baron->AI()->Talk(SAY_BARON_GUARD_DEAD);
@@ -252,18 +261,18 @@ public:
                 case GO_ZIGGURAT_DOORS4:
                     go->AllowSaveToDB(true);
                     _zigguratDoorsGUID4 = go->GetGUID();
-                    if (_slaughterProgress == 4)
+                    if (_slaughterProgress == SLAUGHTER_COMPLETE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ZIGGURAT_DOORS5:
                     go->AllowSaveToDB(true);
                     _zigguratDoorsGUID5 = go->GetGUID();
-                    if (_slaughterProgress == 4)
+                    if (_slaughterProgress == SLAUGHTER_COMPLETE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_SLAUGHTER_GATE_SIDE:
                     go->AllowSaveToDB(true);
-                    if (_slaughterProgress >= 2)
+                    if (_slaughterProgress >= SLAUGHTER_MINDLESS_UNDEAD)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_PORT_TRAP_GATE_1:
@@ -417,22 +426,38 @@ public:
             data >> _postboxesOpened;
             data >> _barthilasrunProgress;
 
-            uint32 scarletThreadUsedLocations;
-            if (data >> scarletThreadUsedLocations && scarletThreadUsedLocations <= AllScarletThreadLocations)
-                _scarletThreadUsedLocations = scarletThreadUsedLocations;
+            // Older saves contain either the thread mask or the two trap cooldowns.
+            std::array<time_t, MAX_GATE_TRAPS + 1> savedFields{};
+            std::size_t savedFieldCount = 0;
+            while (savedFieldCount < savedFields.size() && data >> savedFields[savedFieldCount])
+                ++savedFieldCount;
+
+            if (savedFieldCount == MAX_GATE_TRAPS)
+            {
+                _gateTrapCooldownEnd[GATE_TRAP_SCARLET] = savedFields[0];
+                _gateTrapCooldownEnd[GATE_TRAP_UNDEAD] = savedFields[1];
+            }
+            else
+            {
+                if (savedFieldCount && savedFields[0] >= 0 && savedFields[0] <= AllScarletThreadLocations)
+                    _scarletThreadUsedLocations = uint8(savedFields[0]);
+
+                if (savedFieldCount == savedFields.size())
+                {
+                    _gateTrapCooldownEnd[GATE_TRAP_SCARLET] = savedFields[1];
+                    _gateTrapCooldownEnd[GATE_TRAP_UNDEAD] = savedFields[2];
+                }
+            }
 
             if (_baronRunTime)
             {
                 events.ScheduleEvent(EVENT_BARON_TIME, 60s);
             }
 
-            if (_slaughterProgress > 0 && _slaughterProgress < 4)
+            if (_slaughterProgress > SLAUGHTER_ABOMINATIONS && _slaughterProgress < SLAUGHTER_COMPLETE)
             {
                 events.ScheduleEvent(EVENT_FORCE_SLAUGHTER_EVENT, 5s);
             }
-
-            data >> _gateTrapCooldownEnd[GATE_TRAP_SCARLET];
-            data >> _gateTrapCooldownEnd[GATE_TRAP_UNDEAD];
 
             RestoreGateTrapCooldown(GATE_TRAP_SCARLET);
             RestoreGateTrapCooldown(GATE_TRAP_UNDEAD);
@@ -645,13 +670,13 @@ public:
         {
             switch (_slaughterProgress)
             {
-                case 0:
+                case SLAUGHTER_ABOMINATIONS:
                     return entry == NPC_VENOM_BELCHER || entry == NPC_BILE_SPEWER;
-                case 1:
+                case SLAUGHTER_RAMSTEIN:
                     return entry == NPC_RAMSTEIN_THE_GORGER;
-                case 2:
+                case SLAUGHTER_MINDLESS_UNDEAD:
                     return entry == NPC_MINDLESS_UNDEAD;
-                case 3:
+                case SLAUGHTER_BLACK_GUARD:
                     return entry == NPC_BLACK_GUARD;
                 default:
                     return false;
