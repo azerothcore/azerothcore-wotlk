@@ -325,7 +325,7 @@ func TestOnyxia_WhelpCadence(t *testing.T) {
 		padX, padY, padZ = float32(-40.0), float32(-215.0), float32(-84.0)
 
 		sampleEvery = 25 * time.Millisecond
-		// Onyxia walks to her takeoff spot after dropping below 65% and yells as she lifts off.
+		// Onyxia yells on dropping below 65%, then walks to her takeoff spot; the whelps come at liftoff.
 		liftoffWindow = 60 * time.Second
 		// All eleven points are summoned in one tick.
 		burstSpread = 1500 * time.Millisecond

@@ -20,7 +20,10 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "onyxias_lair.h"
+#include <algorithm>
 #include <array>
 
 enum Spells
@@ -33,7 +36,6 @@ enum Spells
     SPELL_BELLOWINGROAR             = 18431,
 
     SPELL_SUMMON_LAIR_GUARD         = 68968,
-    SPELL_ERUPTION                  = 17731,
 
     SPELL_OLG_BLASTNOVA             = 68958,
     SPELL_OLG_IGNITEWEAPON          = 68959,
@@ -49,6 +51,9 @@ enum Spells
     SPELL_BREATH_NW_TO_SE           = 18584,
     SPELL_BREATH_SW_TO_NE           = 18596,
     SPELL_BREATH_NE_TO_SW           = 18617,
+
+    // Each patch triggers the next one, up to 22202
+    SPELL_HEATED_GROUND             = 22191,
 };
 
 enum Events
@@ -70,12 +75,9 @@ enum Events
     EVENT_SUMMON_LAIR_GUARD         = 16,
     EVENT_OLG_SPELL_BLASTNOVA       = 18,
     EVENT_OLG_SPELL_IGNITEWEAPON    = 19,
-    EVENT_ERUPTION                  = 20,
 
     EVENT_LIFTOFF                   = 31,
-    EVENT_FLY_S_TO_N                = 32,
-    EVENT_LAND                      = 33,
-    EVENT_END_MANY_WHELPS_TIME
+    EVENT_FLY_S_TO_N                = 32
 };
 
 enum Phases
@@ -99,7 +101,6 @@ enum Points
 {
     POINT_GROUND_SOUTH  = 10,
     POINT_TAKEOFF       = 11,
-    POINT_PRE_LAND      = 12,
     POINT_LAND          = 13
 };
 
@@ -195,7 +196,8 @@ struct boss_onyxia : public BossAI
                 events.ScheduleEvent(EVENT_START_PHASE_2, 0ms);
                 break;
             case PHASE_LANDED:
-                events.ScheduleEvent(EVENT_START_PHASE_3, 5s);
+                // Runs once the current cast ends: the landing never cuts a Fireball short
+                events.ScheduleEvent(EVENT_START_PHASE_3, 0ms);
                 break;
             default:
                 break;
@@ -243,7 +245,6 @@ struct boss_onyxia : public BossAI
         });
         ScheduleHealthCheckEvent(40, [&]
         {
-            me->InterruptNonMeleeSpells(false);
             summons.DespawnEntry(NPC_WORLD_TRIGGER);
             SetPhase(PHASE_LANDED);
         });
@@ -329,23 +330,24 @@ struct boss_onyxia : public BossAI
 
         switch (id)
         {
+            // The landing replaces an unfinished walk or takeoff, and the replaced movement still reports its point
             case POINT_GROUND_SOUTH:
+                if (_phase != PHASE_AIRPHASE)
+                    break;
                 me->SetFacingTo(OnyxiaMoveData[WP_GROUND_SOUTH].O);
                 events.ScheduleEvent(EVENT_LIFTOFF, 0ms);
                 break;
             case POINT_TAKEOFF:
+                if (_phase != PHASE_AIRPHASE)
+                    break;
                 me->SetFacingTo(OnyxiaMoveData[WP_SOUTH].O);
                 events.ScheduleEvent(EVENT_FLY_S_TO_N, 0ms);
-                break;
-            case POINT_PRE_LAND:
-                me->SetFacingTo(OnyxiaMoveData[WP_SOUTH].O);
-                events.ScheduleEvent(EVENT_LAND, 0ms);
                 break;
             case POINT_LAND:
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
-                events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0ms);
+                events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 2s);
                 break;
             default:
                 break;
@@ -441,6 +443,7 @@ struct boss_onyxia : public BossAI
             }
             case EVENT_START_PHASE_2:
             {
+                Talk(SAY_PHASE_2_TRANS);
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
                 me->StopMoving();
@@ -455,7 +458,6 @@ struct boss_onyxia : public BossAI
             }
             case EVENT_LIFTOFF:
             {
-                Talk(SAY_PHASE_2_TRANS);
                 me->SendMeleeAttackStop(me->GetVictim());
                 me->GetMotionMaster()->MoveIdle();
                 me->DisableSpline();
@@ -465,8 +467,11 @@ struct boss_onyxia : public BossAI
                 me->SendMovementFlagUpdate();
                 me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, OnyxiaMoveData[WP_SOUTH].X + 1.0f, OnyxiaMoveData[WP_SOUTH].Y, OnyxiaMoveData[WP_SOUTH].Z, 12.0f);
                 _manyWhelpsAvailable = true;
-
-                events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10s);
+                // On the scheduler: reaching 40% during takeoff resets the event map before the window would close
+                scheduler.Schedule(10s, [this](TaskContext)
+                {
+                    _manyWhelpsAvailable = false;
+                });
 
                 _whelpsRespawn = true;
                 for (uint8 point = 0; point < std::size(WhelpSpawnPoints); ++point)
@@ -474,9 +479,6 @@ struct boss_onyxia : public BossAI
                 me->SummonCreature(NPC_ONYXIAN_WHELP, WhelpLiftoffOnlyPoint);
                 break;
             }
-            case EVENT_END_MANY_WHELPS_TIME:
-                _manyWhelpsAvailable = false;
-                break;
             case EVENT_FLY_S_TO_N:
             {
                 me->SetSpeed(MOVE_RUN, 2.95f, false);
@@ -490,14 +492,6 @@ struct boss_onyxia : public BossAI
                     trigger->CastSpell(trigger, SPELL_SUMMON_LAIR_GUARD, CastSpellExtraArgs(true).SetOriginalCaster(me->GetGUID()));
 
                 events.Repeat(46s);
-                break;
-            }
-            case EVENT_LAND:
-            {
-                Talk(SAY_PHASE_3_TRANS);
-                me->SendMeleeAttackStop(me->GetVictim());
-                me->GetMotionMaster()->MoveLand(POINT_LAND, OnyxiaMoveData[WP_GROUND_SOUTH].X + 1.0f, OnyxiaMoveData[WP_GROUND_SOUTH].Y, OnyxiaMoveData[WP_GROUND_SOUTH].Z, 12.0f);
-                DoResetThreatList();
                 break;
             }
             case EVENT_SPELL_FIREBALL_FIRST:
@@ -559,8 +553,20 @@ struct boss_onyxia : public BossAI
             }
             case EVENT_START_PHASE_3:
             {
-                me->SetSpeed(MOVE_RUN, 2.95f, false);
-                me->GetMotionMaster()->MovePoint(POINT_PRE_LAND, OnyxiaMoveData[WP_SOUTH].X, OnyxiaMoveData[WP_SOUTH].Y, OnyxiaMoveData[WP_SOUTH].Z);
+                Talk(SAY_PHASE_3_TRANS);
+                me->SendMeleeAttackStop(me->GetVictim());
+                DoResetThreatList();
+                me->StopMoving();
+
+                // Straight down from wherever the flight is; the whole descent takes about 10s
+                Position landPos = me->GetPosition();
+                float const groundZ = me->GetMapHeight(landPos.GetPositionX(), landPos.GetPositionY(), landPos.GetPositionZ());
+                if (groundZ > INVALID_HEIGHT)
+                    landPos.m_positionZ = groundZ;
+                else
+                    landPos.Relocate(OnyxiaMoveData[WP_GROUND_SOUTH].X, OnyxiaMoveData[WP_GROUND_SOUTH].Y, OnyxiaMoveData[WP_GROUND_SOUTH].Z);
+
+                me->GetMotionMaster()->MoveLand(POINT_LAND, landPos, 2.5f);
                 break;
             }
             case EVENT_PHASE_3_ATTACK:
@@ -578,27 +584,16 @@ struct boss_onyxia : public BossAI
 
                 DoCastAOE(SPELL_BELLOWINGROAR);
 
-                events.ScheduleEvent(EVENT_ERUPTION, 0ms);
-                events.ScheduleEvent(EVENT_SPELL_WINGBUFFET, 10s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_FLAMEBREATH, 10s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_TAILSWEEP, 15s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_CLEAVE, 2s, 5s);
-                events.ScheduleEvent(EVENT_SPELL_BELLOWINGROAR, 15s);
+                events.ScheduleEvent(EVENT_SPELL_BELLOWINGROAR, 22s, 26s);
                 break;
             }
             case EVENT_SPELL_BELLOWINGROAR:
             {
                 DoCastAOE(SPELL_BELLOWINGROAR);
-                events.Repeat(22s);
-                events.ScheduleEvent(EVENT_ERUPTION, 0ms);
-                break;
-            }
-            case EVENT_ERUPTION:
-            {
-                if (Creature* trigger = me->SummonCreature(NPC_ONYXIA_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                {
-                    trigger->CastSpell(trigger, SPELL_ERUPTION, false);
-                }
+                events.Repeat(22s, 26s);
                 break;
             }
             default:
@@ -606,6 +601,14 @@ struct boss_onyxia : public BossAI
         }
 
         DoMeleeAttackIfReady();
+    }
+
+    void OnSpellCast(SpellInfo const* spell) override
+    {
+        BossAI::OnSpellCast(spell);
+
+        if (spell->Id == OnyxiaMoveData[_currentWP].SpellId)
+            DoCastSelf(SPELL_HEATED_GROUND, true);
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -694,7 +697,14 @@ struct npc_onyxian_whelp : public ScriptedAI
 
         scheduler.Schedule(500ms, [this](TaskContext context)
         {
-            if (Unit* target = me->SelectNearestTarget(300.0f))
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+
+            // A whelp that aggroed during its spawn-in goes for the victim it picked then
+            Unit* target = me->IsEngaged() ? me->GetThreatMgr().GetCurrentVictim() : nullptr;
+            if (!target)
+                target = me->SelectNearestTarget(300.0f);
+
+            if (target)
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -707,6 +717,18 @@ struct npc_onyxian_whelp : public ScriptedAI
                 check.Repeat();
             });
         });
+    }
+
+    // While UNIT_FLAG_NON_ATTACKABLE (from the template) is set, whelps may aggro but only take a target and attack once it clears
+    void AttackStart(Unit* who) override
+    {
+        if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        {
+            me->EngageWithTarget(who);
+            return;
+        }
+
+        ScriptedAI::AttackStart(who);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -739,9 +761,62 @@ private:
     }
 };
 
+// The Lava Fissures whose position sits above the lair floor. In retail sniffs only these pass an Eruption on: a
+// fissure sunk below the floor erupts when hit, but its own Eruption hits no neighbour
+static constexpr std::array<uint32, 11> LavaFissuresAboveFloor =
+{
+    176811, 176814, 176821, 176824, 176827, 176829, 176830, 176839, 176841, 176908, 176921
+};
+
+// 18431 - Bellowing Roar
+// 17731, 69294 - Eruption
+class spell_onyxia_disturb_lava_fissure : public SpellScript
+{
+    PrepareSpellScript(spell_onyxia_disturb_lava_fissure);
+
+    void FilterFissures(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        // The area search measures a gameobject by its display bounds, which stretch a fissure's reach well past the
+        // effect radius; retail sniffs only ever hit fissures within that radius of the centre
+        float const radius = GetSpellInfo()->Effects[EFFECT_1].CalcRadius(caster);
+        targets.remove_if([caster, radius](WorldObject* target) { return caster->GetExactDist(target) > radius; });
+
+        if (GetSpellInfo()->Id == SPELL_BELLOWINGROAR)
+            return;
+
+        // A fissure's Eruption is cast by a trigger the fissure summons
+        TempSummon* trigger = caster->ToTempSummon();
+        GameObject* fissure = trigger ? trigger->GetSummonerGameObject() : nullptr;
+        if (!fissure)
+            return;
+
+        if (std::find(LavaFissuresAboveFloor.begin(), LavaFissuresAboveFloor.end(), fissure->GetEntry()) == LavaFissuresAboveFloor.end())
+            targets.clear();
+    }
+
+    // The default effect sets the fissure off; every hit also plays its crack animation, even while the fissure's
+    // trap cooldown keeps it from erupting again
+    void HandleActivateObject(SpellEffIndex /*effIndex*/)
+    {
+        if (GameObject* fissure = GetHitGObj())
+            fissure->SendCustomAnim(0);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_onyxia_disturb_lava_fissure::FilterFissures, EFFECT_1, TARGET_GAMEOBJECT_DEST_AREA);
+        OnEffectHitTarget += SpellEffectFn(spell_onyxia_disturb_lava_fissure::HandleActivateObject, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
+    }
+};
+
 void AddSC_boss_onyxia()
 {
     RegisterOnyxiasLairCreatureAI(boss_onyxia);
     RegisterOnyxiasLairCreatureAI(npc_onyxian_lair_guard);
     RegisterOnyxiasLairCreatureAI(npc_onyxian_whelp);
+    RegisterSpellScript(spell_onyxia_disturb_lava_fissure);
 }
