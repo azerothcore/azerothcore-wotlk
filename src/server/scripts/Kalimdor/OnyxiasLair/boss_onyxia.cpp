@@ -16,10 +16,15 @@
  */
 
 #include "CreatureScript.h"
+#include "PathGenerator.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "onyxias_lair.h"
+#include <algorithm>
+#include <array>
 
 enum Spells
 {
@@ -30,12 +35,13 @@ enum Spells
     SPELL_FIREBALL                  = 18392,
     SPELL_BELLOWINGROAR             = 18431,
 
-    SPELL_SUMMON_WHELP              = 17646,
     SPELL_SUMMON_LAIR_GUARD         = 68968,
-    SPELL_ERUPTION                  = 17731,
 
     SPELL_OLG_BLASTNOVA             = 68958,
     SPELL_OLG_IGNITEWEAPON          = 68959,
+
+    SPELL_ROOKERY_WHELP_SPAWN_IN    = 15750,
+    SPELL_TELEPORT_SELF             = 42527,
 
     SPELL_BREATH_N_TO_S             = 17086,
     SPELL_BREATH_S_TO_N             = 18351,
@@ -45,6 +51,9 @@ enum Spells
     SPELL_BREATH_NW_TO_SE           = 18584,
     SPELL_BREATH_SW_TO_NE           = 18596,
     SPELL_BREATH_NE_TO_SW           = 18617,
+
+    // Each patch triggers the next one, up to 22202
+    SPELL_HEATED_GROUND             = 22191,
 };
 
 enum Events
@@ -63,17 +72,12 @@ enum Events
     EVENT_START_PHASE_3             = 12,
     EVENT_PHASE_3_ATTACK            = 13,
     EVENT_SPELL_BELLOWINGROAR       = 14,
-    EVENT_WHELP_SPAM                = 15,
     EVENT_SUMMON_LAIR_GUARD         = 16,
-    EVENT_SUMMON_WHELP              = 17,
     EVENT_OLG_SPELL_BLASTNOVA       = 18,
     EVENT_OLG_SPELL_IGNITEWEAPON    = 19,
-    EVENT_ERUPTION                  = 20,
 
     EVENT_LIFTOFF                   = 31,
-    EVENT_FLY_S_TO_N                = 32,
-    EVENT_LAND                      = 33,
-    EVENT_END_MANY_WHELPS_TIME
+    EVENT_FLY_S_TO_N                = 32
 };
 
 enum Phases
@@ -84,12 +88,19 @@ enum Phases
     PHASE_LANDED    // Phase 3 - Landed after Airphase - 40% health
 };
 
-// Ids 0-8 are reserved for the OnyxiaMoveData waypoints
+// Indices into OnyxiaMoveData, also used as point ids; the flight loop runs over WP_SOUTH..WP_SOUTH_EAST
+enum Waypoints : uint8
+{
+    WP_GROUND_SOUTH     = 0,
+    WP_SOUTH            = 1,
+    WP_NORTH            = 5,
+    WP_SOUTH_EAST       = 8
+};
+
 enum Points
 {
     POINT_GROUND_SOUTH  = 10,
     POINT_TAKEOFF       = 11,
-    POINT_PRE_LAND      = 12,
     POINT_LAND          = 13
 };
 
@@ -113,6 +124,33 @@ static OnyxiaMove const OnyxiaMoveData[] =
     {8, 4, SPELL_BREATH_SE_TO_NW, -63.5156f, -240.096f, -60.0f, M_PI / 4}, // south-east
 };
 
+static_assert(std::size(OnyxiaMoveData) == WP_SOUTH_EAST + 1);
+
+Position const LairGuardTriggerPos = { -134.40698f, -213.74207f, -70.19801f, 0.01745329f };
+
+enum TaskGroups
+{
+    GROUP_WHELP_RESPAWN = 1
+};
+
+// Each point respawns its whelp 30-60s after the previous one died, until Onyxia lands
+static Position const WhelpSpawnPoints[] =
+{
+    { -102.75786f, -198.85912f, -93.76155f,  5.131268f },
+    { -107.54872f, -198.04468f, -93.883644f, 4.433136f },
+    { -112.76325f, -196.49747f, -92.722244f, 0.261799f },
+    { -117.191f,   -196.107f,   -92.73233f,  0.034907f },
+    { -99.41064f,  -198.543f,   -93.59504f,  5.864306f },
+    { -104.5892f,  -233.16988f, -94.13f,     6.248279f },
+    { -107.39845f, -230.61523f, -93.882454f, 1.448623f },
+    { -110.02973f, -233.42484f, -93.29275f,  4.694936f },
+    { -113.6534f,  -231.24023f, -92.559586f, 2.565634f },
+    { -115.66789f, -234.56912f, -92.65229f,  0.663225f }
+};
+
+// Only spawns with the liftoff burst, never respawns
+static Position const WhelpLiftoffOnlyPoint = { -107.17814f, -232.05528f, -93.999115f, 6.248279f };
+
 enum Yells
 {
     SAY_AGGRO                   = 0,
@@ -125,27 +163,28 @@ enum Yells
 
 struct boss_onyxia : public BossAI
 {
-public:
     boss_onyxia(Creature* creature) : BossAI(creature, DATA_ONYXIA)
     {
+        // Whelp respawns and egg hatches must keep ticking through Deep Breath, so the scheduler may not pause while casting
+        scheduler.ClearValidator();
         Initialize();
     }
 
     void Initialize()
     {
         _phase = PHASE_NONE;
-        _currentWP = 0;
-        _whelpSpam = false;
-        _whelpCount = 0;
-        _whelpSpamTimer = 0;
+        _currentWP = WP_GROUND_SOUTH;
         _manyWhelpsAvailable = false;
+        _whelpsRespawn = false;
+        _pointWhelpGUIDs.fill(ObjectGuid::Empty);
+        _lairGuardTriggerGUID.Clear();
     }
 
-    void SetPhase(uint8 ph)
+    void SetPhase(Phases phase)
     {
         events.Reset();
-        _phase = ph;
-        switch (ph)
+        _phase = phase;
+        switch (phase)
         {
             case PHASE_GROUNDED:
                 events.ScheduleEvent(EVENT_SPELL_WINGBUFFET, 10s, 20s);
@@ -157,7 +196,8 @@ public:
                 events.ScheduleEvent(EVENT_START_PHASE_2, 0ms);
                 break;
             case PHASE_LANDED:
-                events.ScheduleEvent(EVENT_START_PHASE_3, 5s);
+                // Runs once the current cast ends: the landing never cuts a Fireball short
+                events.ScheduleEvent(EVENT_START_PHASE_3, 0ms);
                 break;
             default:
                 break;
@@ -167,7 +207,6 @@ public:
     void Reset() override
     {
         Initialize();
-        SetPhase(PHASE_NONE);
         me->SetReactState(REACT_AGGRESSIVE);
         me->SetCanFly(false);
         me->SetDisableGravity(false);
@@ -200,32 +239,46 @@ public:
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         BossAI::JustEngagedWith(who);
 
+        ScheduleHealthCheckEvent(65, [&]
+        {
+            SetPhase(PHASE_AIRPHASE);
+        });
+        ScheduleHealthCheckEvent(40, [&]
+        {
+            summons.DespawnEntry(NPC_WORLD_TRIGGER);
+            SetPhase(PHASE_LANDED);
+        });
+
         me->SummonCreature(NPC_ONYXIAN_LAIR_GUARD, -167.837936f, -200.549332f, -66.343231f, 5.598287f, TEMPSUMMON_MANUAL_DESPAWN);
     }
 
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void EnterEvadeMode(EvadeReason why) override
     {
-        if (me->HealthBelowPctDamaged(65, damage) && _phase == PHASE_GROUNDED)
+        if (why == EVADE_REASON_BOUNDARY)
         {
-            SetPhase(PHASE_AIRPHASE);
+            Talk(SAY_EVADE);
         }
-        else if (me->HealthBelowPctDamaged(40, damage) && _phase == PHASE_AIRPHASE)
-        {
-            me->InterruptNonMeleeSpells(false);
-            SetPhase(PHASE_LANDED);
-        }
+
+        BossAI::EnterEvadeMode(why);
+        me->DespawnOnEvade(1min);
     }
 
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
 
-        if (summon->GetEntry() != NPC_ONYXIAN_WHELP && summon->GetEntry() != NPC_ONYXIAN_LAIR_GUARD)
+        if (summon->GetEntry() == NPC_ONYXIAN_WHELP)
         {
+            // Candidates are taken where the whelp appears: by the time its spawn-in ends it may already have moved or teleported
+            GuidVector const eggGUIDs = GetEggsNearestFirst(summon);
+            scheduler.Schedule(500ms, [this, eggGUIDs](TaskContext)
+            {
+                HatchNearestEgg(eggGUIDs);
+            });
             return;
         }
 
-        if (summon->GetEntry() == NPC_ONYXIAN_LAIR_GUARD && _phase < PHASE_AIRPHASE)
+        if (summon->GetEntry() != NPC_ONYXIAN_LAIR_GUARD || _phase < PHASE_AIRPHASE)
         {
             return;
         }
@@ -237,6 +290,25 @@ public:
         }
     }
 
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+    {
+        if (!_whelpsRespawn)
+            return;
+
+        for (uint8 point = 0; point < _pointWhelpGUIDs.size(); ++point)
+        {
+            if (_pointWhelpGUIDs[point] != summon->GetGUID())
+                continue;
+
+            _pointWhelpGUIDs[point].Clear();
+            scheduler.Schedule(30s, 60s, GROUP_WHELP_RESPAWN, [this, point](TaskContext)
+            {
+                SummonPointWhelp(point);
+            });
+            break;
+        }
+    }
+
     void MovementInform(uint32 type, uint32 id) override
     {
         if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
@@ -244,86 +316,88 @@ public:
             return;
         }
 
-        if (id < 9)
+        if (id <= WP_SOUTH_EAST)
         {
-            if (id > 0 && _phase == PHASE_AIRPHASE)
+            if (id >= WP_SOUTH && _phase == PHASE_AIRPHASE)
             {
                 me->SetFacingTo(OnyxiaMoveData[id].O);
                 me->SetSpeed(MOVE_RUN, 1.6f, false);
                 _currentWP = id;
                 events.ScheduleEvent(EVENT_SPELL_FIREBALL_FIRST, 1s);
             }
+            return;
         }
-        else
+
+        switch (id)
         {
-            switch (id)
-            {
-                case POINT_GROUND_SOUTH:
-                    me->SetFacingTo(OnyxiaMoveData[0].O);
-                    events.ScheduleEvent(EVENT_LIFTOFF, 0ms);
+            // The landing replaces an unfinished walk or takeoff, and the replaced movement still reports its point
+            case POINT_GROUND_SOUTH:
+                if (_phase != PHASE_AIRPHASE)
                     break;
-                case POINT_TAKEOFF:
-                    me->SetFacingTo(OnyxiaMoveData[1].O);
-                    events.ScheduleEvent(EVENT_FLY_S_TO_N, 0ms);
+                me->SetFacingTo(OnyxiaMoveData[WP_GROUND_SOUTH].O);
+                events.ScheduleEvent(EVENT_LIFTOFF, 0ms);
+                break;
+            case POINT_TAKEOFF:
+                if (_phase != PHASE_AIRPHASE)
                     break;
-                case POINT_PRE_LAND:
-                    me->SetFacingTo(OnyxiaMoveData[1].O);
-                    events.ScheduleEvent(EVENT_LAND, 0ms);
-                    break;
-                case POINT_LAND:
-                    me->SetCanFly(false);
-                    me->SetDisableGravity(false);
-                    me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
-                    events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0ms);
-                    break;
-                default:
-                    break;
-            }
+                me->SetFacingTo(OnyxiaMoveData[WP_SOUTH].O);
+                events.ScheduleEvent(EVENT_FLY_S_TO_N, 0ms);
+                break;
+            case POINT_LAND:
+                me->SetCanFly(false);
+                me->SetDisableGravity(false);
+                me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
+                events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 2s);
+                break;
+            default:
+                break;
         }
     }
 
-    // Summons one whelp at each of the two side caves
-    void SummonWhelps()
+    void MoveToWaypoint(uint8 wp)
     {
-        float angle = rand_norm() * 2 * M_PI;
-        float dist  = rand_norm() * 4.0f;
-        me->CastSpell(-33.18f + std::cos(angle) * dist, -258.80f + std::sin(angle) * dist, -89.0f, SPELL_SUMMON_WHELP, true);
-        me->CastSpell(-32.535f + std::cos(angle) * dist, -170.190f + std::sin(angle) * dist, -89.0f, SPELL_SUMMON_WHELP, true);
+        OnyxiaMove const& point = OnyxiaMoveData[wp];
+        me->GetMotionMaster()->MovePoint(wp, point.X, point.Y, point.Z);
     }
 
-    void HandleWhelpSpam(uint32 diff)
+    void SummonPointWhelp(uint8 point)
     {
-        if (_whelpSpam)
-        {
-            if (_whelpCount < 40)
-            {
-                _whelpSpamTimer -= diff;
-                if (_whelpSpamTimer <= 0)
-                {
-                    SummonWhelps();
-                    _whelpCount += 2;
-                    _whelpSpamTimer += 600;
-                }
-            }
-            else
-            {
-                _whelpSpam      = false;
-                _whelpCount     = 0;
-                _whelpSpamTimer = 0;
-            }
-        }
+        if (Creature* whelp = me->SummonCreature(NPC_ONYXIAN_WHELP, WhelpSpawnPoints[point]))
+            _pointWhelpGUIDs[point] = whelp->GetGUID();
     }
 
-    bool CheckInRoom() override
+    GuidVector GetEggsNearestFirst(Creature* whelp) const
     {
-        if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 95.0f)
-        {
-            Talk(SAY_EVADE);
-            EnterEvadeMode();
-            return false;
-        }
+        std::list<GameObject*> eggs;
+        whelp->GetGameObjectListWithEntryInGrid(eggs, GO_ONYXIA_EGG, 4.0f);
+        // The grid search pads the range with both object sizes
+        eggs.remove_if([whelp](GameObject* egg) { return whelp->GetExactDist(egg) > 4.0f; });
+        eggs.sort(Acore::ObjectDistanceOrderPred(whelp));
 
-        return true;
+        GuidVector eggGUIDs;
+        for (GameObject* egg : eggs)
+            eggGUIDs.push_back(egg->GetGUID());
+
+        return eggGUIDs;
+    }
+
+    // Only the nearest egg still standing hatches; its whelp appears 2s later, the cast time of Summon Onyxia Whelp
+    void HatchNearestEgg(GuidVector const& eggGUIDs)
+    {
+        for (ObjectGuid const& eggGUID : eggGUIDs)
+        {
+            GameObject* egg = ObjectAccessor::GetGameObject(*me, eggGUID);
+            if (!egg || !egg->isSpawned())
+                continue;
+
+            Position const eggPos = egg->GetPosition();
+            egg->DespawnOrUnsummon();
+            scheduler.Schedule(2s, [this, eggPos](TaskContext)
+            {
+                me->SummonCreature(NPC_ONYXIAN_WHELP, eggPos);
+            });
+            return;
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -334,7 +408,7 @@ public:
         }
 
         events.Update(diff);
-        HandleWhelpSpam(diff);
+        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
         {
@@ -369,60 +443,55 @@ public:
             }
             case EVENT_START_PHASE_2:
             {
+                Talk(SAY_PHASE_2_TRANS);
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
                 me->StopMoving();
                 DoResetThreatList();
-                me->GetMotionMaster()->MovePoint(POINT_GROUND_SOUTH, OnyxiaMoveData[0].X, OnyxiaMoveData[0].Y, OnyxiaMoveData[0].Z);
+                me->GetMotionMaster()->MovePoint(POINT_GROUND_SOUTH, OnyxiaMoveData[WP_GROUND_SOUTH].X, OnyxiaMoveData[WP_GROUND_SOUTH].Y, OnyxiaMoveData[WP_GROUND_SOUTH].Z);
+
+                if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER, LairGuardTriggerPos, TEMPSUMMON_MANUAL_DESPAWN))
+                    _lairGuardTriggerGUID = trigger->GetGUID();
+
+                events.ScheduleEvent(EVENT_SUMMON_LAIR_GUARD, 46s);
                 break;
             }
             case EVENT_LIFTOFF:
             {
-                Talk(SAY_PHASE_2_TRANS);
                 me->SendMeleeAttackStop(me->GetVictim());
                 me->GetMotionMaster()->MoveIdle();
                 me->DisableSpline();
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetOrientation(OnyxiaMoveData[0].O);
+                me->SetOrientation(OnyxiaMoveData[WP_GROUND_SOUTH].O);
                 me->SendMovementFlagUpdate();
-                me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, OnyxiaMoveData[1].X + 1.0f, OnyxiaMoveData[1].Y, OnyxiaMoveData[1].Z, 12.0f);
+                me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, OnyxiaMoveData[WP_SOUTH].X + 1.0f, OnyxiaMoveData[WP_SOUTH].Y, OnyxiaMoveData[WP_SOUTH].Z, 12.0f);
                 _manyWhelpsAvailable = true;
+                // On the scheduler: reaching 40% during takeoff resets the event map before the window would close
+                scheduler.Schedule(10s, [this](TaskContext)
+                {
+                    _manyWhelpsAvailable = false;
+                });
 
-                events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10s);
+                _whelpsRespawn = true;
+                for (uint8 point = 0; point < std::size(WhelpSpawnPoints); ++point)
+                    SummonPointWhelp(point);
+                me->SummonCreature(NPC_ONYXIAN_WHELP, WhelpLiftoffOnlyPoint);
                 break;
             }
-            case EVENT_END_MANY_WHELPS_TIME:
-                _manyWhelpsAvailable = false;
-                break;
             case EVENT_FLY_S_TO_N:
             {
                 me->SetSpeed(MOVE_RUN, 2.95f, false);
-                me->GetMotionMaster()->MovePoint(5, OnyxiaMoveData[5].X, OnyxiaMoveData[5].Y, OnyxiaMoveData[5].Z);
-
-                _whelpSpam = true;
-                events.ScheduleEvent(EVENT_WHELP_SPAM, 90s);
-                events.ScheduleEvent(EVENT_SUMMON_LAIR_GUARD, 30s);
+                MoveToWaypoint(WP_NORTH);
                 break;
             }
             case EVENT_SUMMON_LAIR_GUARD:
             {
-                me->CastSpell(-101.654f, -214.491f, -80.70f, SPELL_SUMMON_LAIR_GUARD, true);
-                events.Repeat(30s);
-                break;
-            }
-            case EVENT_WHELP_SPAM:
-            {
-                _whelpSpam = true;
-                events.Repeat(90s);
-                break;
-            }
-            case EVENT_LAND:
-            {
-                Talk(SAY_PHASE_3_TRANS);
-                me->SendMeleeAttackStop(me->GetVictim());
-                me->GetMotionMaster()->MoveLand(POINT_LAND, OnyxiaMoveData[0].X + 1.0f, OnyxiaMoveData[0].Y, OnyxiaMoveData[0].Z, 12.0f);
-                DoResetThreatList();
+                // Onyxia as original caster makes her the summoner, so the guard joins her summons and engages in JustSummoned
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _lairGuardTriggerGUID))
+                    trigger->CastSpell(trigger, SPELL_SUMMON_LAIR_GUARD, CastSpellExtraArgs(true).SetOriginalCaster(me->GetGUID()));
+
+                events.Repeat(46s);
                 break;
             }
             case EVENT_SPELL_FIREBALL_FIRST:
@@ -460,22 +529,12 @@ public:
             }
             case EVENT_PHASE_2_STEP_CW:
             {
-                uint8 newWP = _currentWP + 1;
-                if (newWP > 8)
-                {
-                    newWP = 1;
-                }
-                me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].X, OnyxiaMoveData[newWP].Y, OnyxiaMoveData[newWP].Z);
+                MoveToWaypoint(_currentWP == WP_SOUTH_EAST ? WP_SOUTH : _currentWP + 1);
                 break;
             }
             case EVENT_PHASE_2_STEP_ACW:
             {
-                uint8 newWP = _currentWP - 1;
-                if (newWP < 1)
-                {
-                    newWP = 8;
-                }
-                me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].X, OnyxiaMoveData[newWP].Y, OnyxiaMoveData[newWP].Z);
+                MoveToWaypoint(_currentWP == WP_SOUTH ? WP_SOUTH_EAST : _currentWP - 1);
                 break;
             }
             case EVENT_PHASE_2_STEP_ACROSS:
@@ -488,19 +547,34 @@ public:
             }
             case EVENT_SPELL_BREATH:
             {
-                uint8 newWP = OnyxiaMoveData[_currentWP].DestId;
                 me->SetSpeed(MOVE_RUN, 2.95f, false);
-                me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].X, OnyxiaMoveData[newWP].Y, OnyxiaMoveData[newWP].Z);
+                MoveToWaypoint(OnyxiaMoveData[_currentWP].DestId);
                 break;
             }
             case EVENT_START_PHASE_3:
             {
-                me->SetSpeed(MOVE_RUN, 2.95f, false);
-                me->GetMotionMaster()->MovePoint(POINT_PRE_LAND, OnyxiaMoveData[1].X, OnyxiaMoveData[1].Y, OnyxiaMoveData[1].Z);
+                Talk(SAY_PHASE_3_TRANS);
+                me->SendMeleeAttackStop(me->GetVictim());
+                DoResetThreatList();
+                me->StopMoving();
+
+                // Straight down from wherever the flight is; the whole descent takes about 10s
+                Position landPos = me->GetPosition();
+                float const groundZ = me->GetMapHeight(landPos.GetPositionX(), landPos.GetPositionY(), landPos.GetPositionZ());
+                if (groundZ > INVALID_HEIGHT)
+                    landPos.m_positionZ = groundZ;
+                else
+                    landPos.Relocate(OnyxiaMoveData[WP_GROUND_SOUTH].X, OnyxiaMoveData[WP_GROUND_SOUTH].Y, OnyxiaMoveData[WP_GROUND_SOUTH].Z);
+
+                me->GetMotionMaster()->MoveLand(POINT_LAND, landPos, 2.5f);
                 break;
             }
             case EVENT_PHASE_3_ATTACK:
             {
+                // Hatches already under way still finish
+                _whelpsRespawn = false;
+                scheduler.CancelGroup(GROUP_WHELP_RESPAWN);
+
                 me->SetReactState(REACT_AGGRESSIVE);
 
                 if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0, false))
@@ -510,34 +584,16 @@ public:
 
                 DoCastAOE(SPELL_BELLOWINGROAR);
 
-                events.ScheduleEvent(EVENT_ERUPTION, 0ms);
-                events.ScheduleEvent(EVENT_SPELL_WINGBUFFET, 10s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_FLAMEBREATH, 10s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_TAILSWEEP, 15s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_CLEAVE, 2s, 5s);
-                events.ScheduleEvent(EVENT_SPELL_BELLOWINGROAR, 15s);
-                events.ScheduleEvent(EVENT_SUMMON_WHELP, 10s);
+                events.ScheduleEvent(EVENT_SPELL_BELLOWINGROAR, 22s, 26s);
                 break;
             }
             case EVENT_SPELL_BELLOWINGROAR:
             {
                 DoCastAOE(SPELL_BELLOWINGROAR);
-                events.Repeat(22s);
-                events.ScheduleEvent(EVENT_ERUPTION, 0ms);
-                break;
-            }
-            case EVENT_ERUPTION:
-            {
-                if (Creature* trigger = me->SummonCreature(NPC_ONYXIA_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                {
-                    trigger->CastSpell(trigger, SPELL_ERUPTION, false);
-                }
-                break;
-            }
-            case EVENT_SUMMON_WHELP:
-            {
-                SummonWhelps();
-                events.Repeat(30s);
+                events.Repeat(22s, 26s);
                 break;
             }
             default:
@@ -545,6 +601,14 @@ public:
         }
 
         DoMeleeAttackIfReady();
+    }
+
+    void OnSpellCast(SpellInfo const* spell) override
+    {
+        BossAI::OnSpellCast(spell);
+
+        if (spell->Id == OnyxiaMoveData[_currentWP].SpellId)
+            DoCastSelf(SPELL_HEATED_GROUND, true);
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -560,21 +624,17 @@ public:
     }
 
 private:
-    uint8 _phase;
-    int8  _currentWP;
-
-    bool  _whelpSpam;
-    uint8 _whelpCount;
-    int32 _whelpSpamTimer;
-    bool  _manyWhelpsAvailable;
+    Phases _phase;
+    uint8 _currentWP;
+    bool _manyWhelpsAvailable;
+    bool _whelpsRespawn;
+    std::array<ObjectGuid, std::size(WhelpSpawnPoints)> _pointWhelpGUIDs;
+    ObjectGuid _lairGuardTriggerGUID;
 };
 
 struct npc_onyxian_lair_guard : public ScriptedAI
 {
-public:
-    npc_onyxian_lair_guard(Creature* creature) : ScriptedAI(creature) {}
-
-    EventMap events;
+    npc_onyxian_lair_guard(Creature* creature) : ScriptedAI(creature) { }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -618,18 +678,138 @@ public:
                 break;
         }
 
-        if (!me->HasUnitState(UNIT_STATE_CASTING) && me->isAttackReady())
+        if (me->HasUnitFlag(UNIT_FLAG_DISARMED))
         {
-            if (me->HasUnitFlag(UNIT_FLAG_DISARMED))
-            {
-                if (me->HasAura(SPELL_OLG_IGNITEWEAPON))
-                {
-                    me->RemoveAura(SPELL_OLG_IGNITEWEAPON);
-                }
-            }
+            me->RemoveAura(SPELL_OLG_IGNITEWEAPON);
         }
 
         DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_onyxian_whelp : public ScriptedAI
+{
+    npc_onyxian_whelp(Creature* creature) : ScriptedAI(creature) { }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        DoCastSelf(SPELL_ROOKERY_WHELP_SPAWN_IN);
+
+        scheduler.Schedule(500ms, [this](TaskContext context)
+        {
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+
+            // A whelp that aggroed during its spawn-in goes for the victim it picked then
+            Unit* target = me->IsEngaged() ? me->GetThreatMgr().GetCurrentVictim() : nullptr;
+            if (!target)
+                target = me->SelectNearestTarget(300.0f);
+
+            if (target)
+            {
+                AttackStart(target);
+                DoZoneInCombat();
+            }
+
+            TeleportIfVictimUnreachable();
+            context.Schedule(1s, [this](TaskContext check)
+            {
+                TeleportIfVictimUnreachable();
+                check.Repeat();
+            });
+        });
+    }
+
+    // While UNIT_FLAG_NON_ATTACKABLE (from the template) is set, whelps may aggro but only take a target and attack once it clears
+    void AttackStart(Unit* who) override
+    {
+        if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        {
+            me->EngageWithTarget(who);
+            return;
+        }
+
+        ScriptedAI::AttackStart(who);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->DespawnOrUnsummon(4s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    // The chase movement walks partial paths, so a victim on an unreachable ledge would never be flagged by the core
+    void TeleportIfVictimUnreachable()
+    {
+        Unit* victim = me->GetVictim();
+        if (!victim || victim->IsFalling() || me->IsWithinMeleeRange(victim))
+            return;
+
+        PathGenerator path(me);
+        path.CalculatePath(victim->GetPositionX(), victim->GetPositionY(), victim->GetPositionZ());
+        if (path.GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE))
+            DoCastVictim(SPELL_TELEPORT_SELF);
+    }
+};
+
+// The Lava Fissures whose position sits above the lair floor. In retail sniffs only these pass an Eruption on: a
+// fissure sunk below the floor erupts when hit, but its own Eruption hits no neighbour
+static constexpr std::array<uint32, 11> LavaFissuresAboveFloor =
+{
+    176811, 176814, 176821, 176824, 176827, 176829, 176830, 176839, 176841, 176908, 176921
+};
+
+// 18431 - Bellowing Roar
+// 17731, 69294 - Eruption
+class spell_onyxia_disturb_lava_fissure : public SpellScript
+{
+    PrepareSpellScript(spell_onyxia_disturb_lava_fissure);
+
+    void FilterFissures(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        // The area search measures a gameobject by its display bounds, which stretch a fissure's reach well past the
+        // effect radius; retail sniffs only ever hit fissures within that radius of the centre
+        float const radius = GetSpellInfo()->Effects[EFFECT_1].CalcRadius(caster);
+        targets.remove_if([caster, radius](WorldObject* target) { return caster->GetExactDist(target) > radius; });
+
+        if (GetSpellInfo()->Id == SPELL_BELLOWINGROAR)
+            return;
+
+        // A fissure's Eruption is cast by a trigger the fissure summons
+        TempSummon* trigger = caster->ToTempSummon();
+        GameObject* fissure = trigger ? trigger->GetSummonerGameObject() : nullptr;
+        if (!fissure)
+            return;
+
+        if (std::find(LavaFissuresAboveFloor.begin(), LavaFissuresAboveFloor.end(), fissure->GetEntry()) == LavaFissuresAboveFloor.end())
+            targets.clear();
+    }
+
+    // The default effect sets the fissure off; every hit also plays its crack animation, even while the fissure's
+    // trap cooldown keeps it from erupting again
+    void HandleActivateObject(SpellEffIndex /*effIndex*/)
+    {
+        if (GameObject* fissure = GetHitGObj())
+            fissure->SendCustomAnim(0);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_onyxia_disturb_lava_fissure::FilterFissures, EFFECT_1, TARGET_GAMEOBJECT_DEST_AREA);
+        OnEffectHitTarget += SpellEffectFn(spell_onyxia_disturb_lava_fissure::HandleActivateObject, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
     }
 };
 
@@ -637,4 +817,6 @@ void AddSC_boss_onyxia()
 {
     RegisterOnyxiasLairCreatureAI(boss_onyxia);
     RegisterOnyxiasLairCreatureAI(npc_onyxian_lair_guard);
+    RegisterOnyxiasLairCreatureAI(npc_onyxian_whelp);
+    RegisterSpellScript(spell_onyxia_disturb_lava_fissure);
 }
