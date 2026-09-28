@@ -303,7 +303,8 @@ public:
 
         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
-        creature->GetInstanceScript()->SetData(DATA_CHEST_LOOTED, 0);
+        if (InstanceScript* instance = creature->GetInstanceScript())
+            instance->SetData(DATA_CHEST_LOOTED, 0);
 
         float x, y, z;
         creature->GetPosition(x, y, z);
