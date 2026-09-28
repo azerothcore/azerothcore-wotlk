@@ -3815,17 +3815,16 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             break;
         case OFF_ATTACK:
             unitMod = UNIT_MOD_DAMAGE_OFFHAND;
+            // Base damage is already halved in DBC for Threat of Thassarian off-hand spells
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+                fixed_bonus *= 2;
             break;
         case RANGED_ATTACK:
             unitMod = UNIT_MOD_DAMAGE_RANGED;
             break;
         }
         float weapon_total_pct = unitCaster->GetPctModifierValue(unitMod, TOTAL_PCT);
-        // Base damage is already halved in DBC for Threat of Thassarian off-hand spells
-        if (m_attackType == OFF_ATTACK && m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
-            fixed_bonus = int32(fixed_bonus * weapon_total_pct * 2.0f);
-        else
-            fixed_bonus = int32(fixed_bonus * weapon_total_pct);
+        fixed_bonus = int32(fixed_bonus * weapon_total_pct);
         spell_bonus = int32(spell_bonus * weapon_total_pct);
     }
 
