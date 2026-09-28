@@ -1,3 +1,4 @@
+-- DB update 2026_09_28_01 -> 2026_09_28_02
 -- Zul'Aman hostages: move the hardcoded gossip option to the DB (credit: TrinityCore)
 DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (8799, 8874, 8881, 8927) AND `OptionID` = 0;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES

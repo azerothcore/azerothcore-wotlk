@@ -1,3 +1,4 @@
+-- DB update 2026_09_28_00 -> 2026_09_28_01
 -- Rounded Alexei-only weights based on observed drop frequencies.
 -- https://www.wowhead.com/wotlk/npc=10504/lord-alexei-barov#drops
 -- Zero-chance entries share the remaining 11.5% equally.
