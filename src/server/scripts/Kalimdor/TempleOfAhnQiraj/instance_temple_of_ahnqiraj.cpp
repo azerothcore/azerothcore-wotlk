@@ -42,7 +42,8 @@ ObjectData const creatureData[] =
 DoorData const doorData[] =
 {
     { AQ40_DOOR_SKERAM,      DATA_SKERAM,        DOOR_TYPE_PASSAGE },
-    { AQ40_DOOR_TE_ENTRANCE, DATA_TWIN_EMPERORS, DOOR_TYPE_ROOM },
+    { AQ40_DOOR_TE_ENTRANCE, DATA_HUHURAN,       DOOR_TYPE_PASSAGE },
+    { AQ40_DOOR_TE_ENTRANCE, DATA_TWIN_EMPERORS, DOOR_TYPE_ROOM    },
     { AQ40_DOOR_TE_EXIT,     DATA_TWIN_EMPERORS, DOOR_TYPE_PASSAGE },
     { 0,                     0,                  DOOR_TYPE_ROOM}
 };
@@ -187,6 +188,28 @@ public:
                 default:
                     break;
             }
+        }
+
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
+        {
+            if (_SkipCheckRequiredBosses(player))
+                return true;
+
+            switch (bossId)
+            {
+                case DATA_TWIN_EMPERORS:
+                    if (GetBossState(DATA_HUHURAN) != DONE)
+                        return false;
+                    break;
+                case DATA_CTHUN:
+                    if (GetBossState(DATA_TWIN_EMPERORS) != DONE)
+                        return false;
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override

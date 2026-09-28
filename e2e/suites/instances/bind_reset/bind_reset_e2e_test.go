@@ -8,8 +8,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
+	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
 
 // BIND-* : instance party baselines + ritual summon (3 roles) + #10708.
@@ -248,5 +248,3 @@ func TestBind_CharacterInstanceAfterEnter(t *testing.T) {
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS character_instance rows=%d map=%d", n, m)
 }
-
-
