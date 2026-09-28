@@ -423,9 +423,7 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (!GetTarget()->HasAura(SPELL_MAGE_COMBUSTION))
-            {
                 GetAura()->Remove();
-            }
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1081,18 +1079,10 @@ class spell_mage_combustion : public AuraScript
             actor->m_Events.AddEventAtOffset([actorGuid, token]()
             {
                 if (auto locked = token.lock())
-                {
                     if (*locked)
-                    {
                         if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
-                        {
                             if (actor->HasAura(SPELL_MAGE_COMBUSTION))
-                            {
                                 actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
-                            }
-                        }
-                    }
-                }
             }, 1ms);
             return false;
         }
