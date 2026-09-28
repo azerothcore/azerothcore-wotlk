@@ -18,6 +18,7 @@
 #include "AreaDefines.h"
 #include "CellImpl.h"
 #include "CreatureScript.h"
+#include "DBCStores.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
@@ -1898,6 +1899,45 @@ public:
     }
 };
 
+class go_personal_mole_machine : public GameObjectScript
+{
+public:
+    go_personal_mole_machine() : GameObjectScript("go_personal_mole_machine") { }
+
+    struct go_personal_mole_machineAI : public GameObjectAI
+    {
+        go_personal_mole_machineAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (_initialized)
+                return;
+
+            _initialized = true;
+            me->SetGoState(GO_STATE_READY);
+
+            uint32 zoneId = 0;
+            uint32 areaId = 0;
+            me->GetZoneAndAreaId(zoneId, areaId);
+
+            AreaTableEntry const* zone = sAreaTableStore.LookupEntry(zoneId);
+            AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
+
+            if ((area && (area->flags & (AREA_FLAG_SANCTUARY | AREA_FLAG_CAPITAL))) ||
+                (zone && (zone->flags & (AREA_FLAG_SANCTUARY | AREA_FLAG_CAPITAL))))
+                me->EnableCollision(false);
+        }
+
+    private:
+        bool _initialized = false;
+    };
+
+    GameObjectAI* GetAI(GameObject* gameObject) const override
+    {
+        return new go_personal_mole_machineAI(gameObject);
+    }
+};
+
 // 47691 - Summon Mole Machine Target Picker
 class spell_direbrew_summon_mole_machine_target_picker : public SpellScript
 {
@@ -2092,6 +2132,7 @@ void AddSC_event_brewfest_scripts()
     RegisterCreatureAI(npc_direbrew_minion);
     RegisterCreatureAI(npc_direbrew_antagonist);
     new go_direbrew_mole_machine();
+    new go_personal_mole_machine();
     RegisterSpellScript(spell_direbrew_summon_mole_machine_target_picker);
     RegisterSpellScript(spell_send_mug_target_picker);
     RegisterSpellScript(spell_request_second_mug);
