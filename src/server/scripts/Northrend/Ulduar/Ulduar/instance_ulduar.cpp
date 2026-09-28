@@ -246,6 +246,8 @@ public:
         bool _leviathanSequenceStarted;
         ObjectGuid _formationRhydianGUID;
         ObjectGuid _leviathanMachineGUID;
+        GuidUnorderedSet _westMechanostrikerGUIDs;
+        GuidUnorderedSet _eastMechanostrikerGUIDs;
 
         // Hodir
         bool _hmHodir;
@@ -274,6 +276,8 @@ public:
             _leviathanSequenceStarted = false;
             _formationRhydianGUID.Clear();
             _leviathanMachineGUID.Clear();
+            _westMechanostrikerGUIDs.clear();
+            _eastMechanostrikerGUIDs.clear();
 
             // Hodir
             _hmHodir = true; // If players fail the Hardmode then becomes false
@@ -303,6 +307,8 @@ public:
                 if (Creature* creature = instance->GetCreature(guid))
                     creature->DespawnOrUnsummon(0ms, 7_days);
             _leviathanGauntletGUIDs.clear();
+            _westMechanostrikerGUIDs.clear();
+            _eastMechanostrikerGUIDs.clear();
 
             for (ObjectGuid const& guid : _leviathanBeaconGUIDs)
                 if (GameObject* beacon = instance->GetGameObject(guid))
@@ -334,6 +340,67 @@ public:
                     instance->SummonCreature(
                         ObservationRingKeeperEntry[i],
                         ObservationRingKeepersPos[i]);
+        }
+
+        bool IsMechanostrikerSideActive(GuidUnorderedSet& guids)
+        {
+            for (auto itr = guids.begin(); itr != guids.end();)
+            {
+                if (Creature* mechanostriker = instance->GetCreature(*itr); mechanostriker && mechanostriker->IsAlive())
+                    return true;
+
+                itr = guids.erase(itr);
+            }
+
+            return false;
+        }
+
+        void SpawnMechanostrikerPack(uint8 groupId, uint32 pathId, GuidUnorderedSet& sideGUIDs)
+        {
+            std::list<TempSummon*> summons;
+            instance->SummonCreatureGroup(groupId, &summons);
+
+            Creature* leader = nullptr;
+            for (TempSummon* summon : summons)
+            {
+                // Map summon groups currently apply summonTime but not summonType; retain the sniffed 3-second wreck.
+                summon->SetTempSummonType(TEMPSUMMON_CORPSE_TIMED_DESPAWN);
+                sideGUIDs.insert(summon->GetGUID());
+
+                if (!leader)
+                {
+                    leader = summon;
+                    leader->GetMotionMaster()->MoveWaypoint(pathId, false);
+                    continue;
+                }
+
+                summon->GetMotionMaster()->MoveFollow(
+                    leader, leader->GetExactDist2d(summon), leader->GetRelativeAngle(summon));
+            }
+        }
+
+        void SpawnMechanostrikers(uint32 triggerId)
+        {
+            if (triggerId == AREATRIGGER_MECHANOSTRIKER_WEST)
+            {
+                if (IsMechanostrikerSideActive(_westMechanostrikerGUIDs))
+                    return;
+
+                SpawnMechanostrikerPack(SUMMON_GROUP_MECHANOSTRIKER_NW, PATH_MECHANOSTRIKER_NW,
+                    _westMechanostrikerGUIDs);
+                SpawnMechanostrikerPack(SUMMON_GROUP_MECHANOSTRIKER_SW, PATH_MECHANOSTRIKER_SW,
+                    _westMechanostrikerGUIDs);
+            }
+            else if (triggerId == AREATRIGGER_MECHANOSTRIKER_EAST)
+            {
+                if (IsMechanostrikerSideActive(_eastMechanostrikerGUIDs))
+                    return;
+
+                SpawnMechanostrikerPack(SUMMON_GROUP_MECHANOSTRIKER_NE, PATH_MECHANOSTRIKER_NE,
+                    _eastMechanostrikerGUIDs);
+                SpawnMechanostrikerPack(SUMMON_GROUP_MECHANOSTRIKER_SE, PATH_MECHANOSTRIKER_SE,
+                    _eastMechanostrikerGUIDs);
+            }
         }
 
         void SpawnLeviathanOutro(bool justKilled)
@@ -680,6 +747,7 @@ public:
                 // Gone for good once Flame Leviathan is defeated
                 case NPC_STEELFORGED_DEFENDER:
                 case NPC_DEFENDER_GENERATED:
+                case NPC_MECHANOSTRIKER_54_A:
                 case NPC_ULDUAR_GAUNTLET_GENERATOR:
                 case NPC_IRONWORK_CANNON:
                     if (IsBossDone(BOSS_LEVIATHAN))
@@ -976,6 +1044,10 @@ public:
                         UnlockLeviathanVehicles();
                     });
                     return;
+                case DATA_MECHANOSTRIKERS_SPAWN:
+                    if (!IsBossDone(BOSS_LEVIATHAN))
+                        SpawnMechanostrikers(data);
+                    return;
                 case DATA_DESPAWN_ALGALON:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 60);
@@ -1101,7 +1173,11 @@ public:
         void OnUnitDeath(Unit* unit) override
         {
             if (Creature* creature = unit->ToCreature())
+            {
                 ScheduleLeviathanVehicleRespawn(creature);
+                _westMechanostrikerGUIDs.erase(creature->GetGUID());
+                _eastMechanostrikerGUIDs.erase(creature->GetGUID());
+            }
 
             // Feeds on Tears achievement
             if (unit->IsPlayer())
