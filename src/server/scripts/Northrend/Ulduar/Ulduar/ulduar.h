@@ -51,6 +51,7 @@ enum UlduarData
     TYPE_WATCHERS                           = 14,
     TYPE_HODIR_HM_FAIL                      = 15,
     TYPE_WINTER_CACHE                       = 16,
+    TYPE_HODIR_HM_RESET                     = 17,
 
     // Assembly of Iron
     DATA_STEELBREAKER                       = 20,
@@ -110,7 +111,6 @@ enum UlduarData
     DATA_UNIVERSE_GLOBE                     = 608,
     DATA_ALGALON_TRAPDOOR                   = 609,
     DATA_BRANN_BRONZEBEARD_ALG              = 610,
-    DATA_RESUMMON_ALGALON                   = 611,
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
@@ -276,6 +276,7 @@ enum UlduarGameObjects
     GO_LEVIATHAN_DOORS                      = 194630,
     GO_LIGHTNING_WALL1                      = 194905,
     GO_LIGHTNING_WALL2                      = 194416,
+    GO_ULDUAR_PROTECTIVE_BUBBLE             = 194484,
     GO_MIMIRONS_TARGETTING_CRYSTAL          = 194705,
     GO_FREYAS_TARGETTING_CRYSTAL            = 194704,
     GO_HODIRS_TARGETTING_CRYSTAL            = 194707,
@@ -357,6 +358,8 @@ enum UlduarPersistentData
     PERSISTENT_DATA_C_OF_ULDUAR_MASK,
     PERSISTENT_DATA_MAGE_BARRIER,
     PERSISTENT_DATA_ALGALON_FIRST_PULL,
+    // Set when Brann's action list unlocks the salvaged vehicles, they stay boardable for the rest of the lockout
+    PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE,
     MAX_PERSISTENT_DATA
 };
 

@@ -65,9 +65,11 @@ enum LeviathanSpells
     SPELL_TOWER_OF_LIFE                 = 64482,
 
     SPELL_HODIRS_FURY                   = 62533,
+    SPELL_HODIRS_FURY_STUN              = 62297,
     SPELL_FREYA_WARD                    = 62906, // removed spawn effect
     SPELL_MIMIRONS_INFERNO              = 62909,
     SPELL_THORIMS_HAMMER                = 62911,
+    SPELL_LASH                          = 65062,
 
     SPELL_FREYA_DUMMY_BLUE              = 63294,
     SPELL_FREYA_DUMMY_GREEN             = 63295,
@@ -125,6 +127,7 @@ enum Events
     EVENT_SOUND_BEGINNING               = 10,
     EVENT_EJECT_PLAYERS                 = 11,
     EVENT_CHECK_PLAYERS                 = 12,
+    EVENT_LASH                          = 13,
 };
 
 enum Texts
@@ -204,7 +207,6 @@ struct boss_flame_leviathan : public BossAI
     uint8 _overloadCircuitCount;
 
     // Custom
-    void BindPlayers();
     void RadioSay(uint8 textid);
     void ActivateTowers();
     void TurnGates(bool _start, bool _death);
@@ -275,7 +277,6 @@ struct boss_flame_leviathan : public BossAI
         ActivateTowers();
         instance->SetBossState(BOSS_LEVIATHAN, SPECIAL);
 
-        BindPlayers();
         me->SetInCombatWithZone();
 
         if (!_startTimer)
@@ -305,6 +306,9 @@ struct boss_flame_leviathan : public BossAI
         summons.DoAction(ACTION_DESPAWN_ADDS);
         summons.DespawnAll();
         events.Reset();
+
+        // The stun lasts 60s and is applied to dead players too, nothing else clears it once the fight ends
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_HODIRS_FURY_STUN);
 
         _shutdown = false;
         _startTimer = 1;
@@ -476,11 +480,6 @@ struct boss_flame_leviathan : public BossAI
     }
 };
 
-void boss_flame_leviathan::BindPlayers()
-{
-    me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
-}
-
 void boss_flame_leviathan::RadioSay(uint8 textid)
 {
     if (Creature* r = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX() - 150, me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000))
@@ -626,8 +625,6 @@ void boss_flame_leviathan::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInf
 
         Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
     }
-    else if (spellInfo->Id == 62522 /*SPELL_ELECTROSHOCK*/)
-        me->InterruptNonMeleeSpells(false);
 }
 
 void boss_flame_leviathan::JustDied(Unit*)
@@ -641,13 +638,14 @@ void boss_flame_leviathan::JustDied(Unit*)
     for (Creature* creature : tarPools)
         creature->DespawnOrUnsummon();
 
+    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_HODIRS_FURY_STUN);
+
     instance->SetBossState(BOSS_LEVIATHAN, DONE);
     instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);
 
     Talk(FLAME_LEVIATHAN_SAY_DEATH);
 
     TurnGates(false, true);
-    BindPlayers();
 }
 
 void boss_flame_leviathan::KilledUnit(Unit* who)
@@ -751,12 +749,17 @@ struct boss_flame_leviathan_seat : public VehicleAI
 
     void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
     {
-        if (!who->IsPlayer() || !me->GetVehicle())
+        if (!who->IsPlayer())
             return;
 
         who->ApplySpellImmune(63847, IMMUNITY_ID, 63847, apply); // SPELL_FLAME_VENTS_TRIGGER
         who->ApplySpellImmune(SPELL_MISSILE_BARRAGE, IMMUNITY_ID, SPELL_MISSILE_BARRAGE, apply);
         who->ApplySpellImmune(SPELL_BATTERING_RAM, IMMUNITY_ID, SPELL_BATTERING_RAM, apply);
+        // 10yd ground-level AoE that cannot reach the seats ~15yd up on the boss' back
+        who->ApplySpellImmune(SPELL_HODIRS_FURY_STUN, IMMUNITY_ID, SPELL_HODIRS_FURY_STUN, apply);
+
+        if (!me->GetVehicleKit())
+            return;
 
         if (seatId == SEAT_PLAYER)
         {
@@ -887,11 +890,9 @@ struct npc_freya_ward : public NullCreatureAI
 
     SummonList summons;
     uint32 _castTimer;
-    bool _summoned;
 
     void Reset() override
     {
-        _summoned = false;
         _castTimer = 25000;
         summons.DespawnAll();
         if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
@@ -902,32 +903,12 @@ struct npc_freya_ward : public NullCreatureAI
             }
     }
 
-    void JustSummoned(Creature* cr) override
-    {
-        _summoned = true;
-        summons.Summon(cr);
-    }
+    void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
     void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
     void UpdateAI(uint32 diff) override
     {
-        if (_summoned)
-        {
-            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end();)
-            {
-                Creature* summon = ObjectAccessor::GetCreature(*me, *itr);
-                ++itr;
-                if (summon)
-                {
-                    summon->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
-                    if (Unit* target = summon->SelectNearestTarget(200.0f))
-                        summon->AI()->AttackStart(target);
-                }
-            }
-            _summoned = false;
-        }
-
         _castTimer += diff;
         if (_castTimer >= 29 * IN_MILLISECONDS)
         {
@@ -945,6 +926,59 @@ struct npc_freya_ward : public NullCreatureAI
     {
         if (param == ACTION_DESPAWN_ADDS)
             summons.DespawnAll();
+    }
+};
+
+struct npc_freya_ward_summon : public ScriptedAI
+{
+    npc_freya_ward_summon(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        events.Reset();
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        // Deferred a tick on purpose: Spell::EffectSummonType re-applies the summon spell's own
+        // duration (10s for the lashers, 3s for the wards) once the summon call returns, which
+        // would overwrite anything this hook sets.
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+        }, 1ms);
+
+        DoZoneInCombat();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_LASH, 2s);
+    }
+
+    // Thrown players sit on a seat NPC nested in Leviathan's vehicle; vehicles behind the closed gate are out of reach
+    bool CanAIAttack(Unit const* who) const override
+    {
+        for (Unit const* base = who->GetVehicleBase(); base; base = base->GetVehicleBase())
+            if (base->GetEntry() == NPC_LEVIATHAN)
+                return false;
+
+        return me->IsWithinLOSInMap(who);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (events.ExecuteEvent() == EVENT_LASH)
+        {
+            DoCastVictim(SPELL_LASH);
+            events.Repeat(2s);
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -1196,6 +1230,49 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
             me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
             me->SetPosition(x, y, z, 0);
         }
+    }
+};
+
+enum SalvagedChopper
+{
+    SPELL_GRAB_PYRITE                   = 67372,
+    SPELL_EJECT_PASSENGER               = 67393,
+
+    // The chopper's only other seat, carrying either a player or a grabbed pyrite crate.
+    SEAT_CHOPPER_PASSENGER              = 1,
+};
+
+struct npc_salvaged_chopper : public VehicleAI
+{
+    npc_salvaged_chopper(Creature* creature) : VehicleAI(creature) { }
+
+    // While the rear seat is taken, the "Grab Pyrite" button becomes "Eject Passenger".
+    void PassengerBoarded(Unit* /*who*/, int8 seatId, bool apply) override
+    {
+        if (seatId != SEAT_CHOPPER_PASSENGER)
+            return;
+
+        if (apply)
+            SwapActionButton(SPELL_GRAB_PYRITE, SPELL_EJECT_PASSENGER);
+        else
+            SwapActionButton(SPELL_EJECT_PASSENGER, SPELL_GRAB_PYRITE);
+    }
+
+private:
+    void SwapActionButton(uint32 from, uint32 to)
+    {
+        bool swapped = false;
+        for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+            if (me->m_spells[i] == from)
+            {
+                me->m_spells[i] = to;
+                swapped = true;
+            }
+
+        // Resend the vehicle action bar, otherwise the driver keeps seeing the old button.
+        if (swapped)
+            if (Player* driver = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                driver->VehicleSpellInitialize();
     }
 };
 
@@ -1823,6 +1900,7 @@ void AddSC_boss_flame_leviathan()
 
     // Hard Mode
     RegisterUlduarCreatureAI(npc_freya_ward);
+    RegisterUlduarCreatureAI(npc_freya_ward_summon);
     RegisterUlduarCreatureAI(npc_thorims_hammer);
     RegisterUlduarCreatureAI(npc_mimirons_inferno);
     RegisterUlduarCreatureAI(npc_hodirs_fury);
@@ -1830,6 +1908,7 @@ void AddSC_boss_flame_leviathan()
     // Helpers
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
+    RegisterUlduarCreatureAI(npc_salvaged_chopper);
 
     // GOs
     new go_ulduar_tower();

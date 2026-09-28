@@ -197,6 +197,17 @@ BossBoundaryData const boundaries =
     { BOSS_LEVIATHAN, new RectangleBoundary(130.0f, 450.0f, -170.0f, 110.0f) },
 };
 
+// Delay between a salvaged vehicle's wreck decaying and its replacement rolling out of the Expedition Base Camp
+constexpr Seconds LEVIATHAN_VEHICLE_RESPAWN_DELAY = 40s;
+
+// A salvaged vehicle summoned for the Flame Leviathan encounter, kept together with the slot it was summoned into
+struct LeviathanVehicle
+{
+    ObjectGuid guid;
+    uint32 entry;
+    uint32 index;
+};
+
 class instance_ulduar : public InstanceMapScript
 {
 public:
@@ -225,7 +236,9 @@ public:
         ObjectGuid _leviathanVisualTowers[4][2];
         ObjectGuid _repairSGUID[2];
         bool _leviathanTowers[4];
-        GuidList _leviathanVehicles;
+        std::vector<LeviathanVehicle> _leviathanVehicles;
+        uint8 _leviathanVehicleMode;
+        bool _leviathanVehiclesUsable;
         GuidUnorderedSet _leviathanGauntletGUIDs;
         GuidUnorderedSet _leviathanBeaconGUIDs;
         GuidList _leviathanCrewGUIDs;
@@ -243,7 +256,7 @@ public:
         // Shared
         EventMap _events;
         bool _mimironTramUsed;
-        bool _algalonResummonPending;
+        bool _algalonArrivalPending;
 
         void Initialize() override
         {
@@ -252,6 +265,8 @@ public:
                 _leviathanTowers[i] = true;
 
             _leviathanVehicles.clear();
+            _leviathanVehicleMode = VEHICLE_POS_NONE;
+            _leviathanVehiclesUsable = false;
             _leviathanGauntletGUIDs.clear();
             _leviathanBeaconGUIDs.clear();
             _leviathanCrewGUIDs.clear();
@@ -266,7 +281,7 @@ public:
             // Shared
             _events.Reset();
             _mimironTramUsed       = false;
-            _algalonResummonPending = false;
+            _algalonArrivalPending = false;
         }
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
@@ -295,16 +310,30 @@ public:
             _leviathanBeaconGUIDs.clear();
         }
 
-        void SetLeviathanVehiclesUsable(bool usable)
+        // Brann only ever unlocks the vehicles, and they must stay unlocked across wipes, respawns and instance
+        // reloads. Locking one back is the job of SummonLeviathanVehicle, which withholds the flag on spawn.
+        void UnlockLeviathanVehicles()
         {
-            for (ObjectGuid const& guid : _leviathanVehicles)
-                if (Creature* vehicle = instance->GetCreature(guid))
-                {
-                    if (usable)
-                        vehicle->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-                    else
-                        vehicle->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-                }
+            _leviathanVehiclesUsable = true;
+            StorePersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE, 1);
+
+            for (LeviathanVehicle const& summoned : _leviathanVehicles)
+                if (Creature* vehicle = instance->GetCreature(summoned.guid))
+                    vehicle->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+        }
+
+        // Keepers of defeated bosses not yet chosen to assist against Yogg-Saron
+        void SpawnObservationRingKeepers()
+        {
+            uint32 watchersMask =
+                GetPersistentData(PERSISTENT_DATA_WATCHERS_MASK);
+            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; ++i)
+                if (IsBossDone(ObservationRingKeeperBoss[i])
+                    && !(watchersMask & (1 << i))
+                    && !GetObjectGuid(ObservationRingKeeperData[i]))
+                    instance->SummonCreature(
+                        ObservationRingKeeperEntry[i],
+                        ObservationRingKeepersPos[i]);
         }
 
         void SpawnLeviathanOutro(bool justKilled)
@@ -468,8 +497,10 @@ public:
         {
             if (IsBossDone(BOSS_LEVIATHAN))
                 SpawnLeviathanOutro(false);
-            // The salvaged vehicles wait for the raid at the Expedition Base Camp, they are not tied to Brann's intro
-            else if (GetBossState(BOSS_LEVIATHAN) != SPECIAL && _leviathanVehicles.empty())
+            // The salvaged vehicles wait for the raid at the Expedition Base Camp, they are not tied to Brann's intro.
+            // Keyed on the mode rather than on the pool being empty: a pool whose wrecks are all pending replacement
+            // is empty too, and respawning over it would leave the camp with a double set once the timers fire.
+            else if (GetBossState(BOSS_LEVIATHAN) != SPECIAL && _leviathanVehicleMode == VEHICLE_POS_NONE)
                 SpawnLeviathanEncounterVehicles(VEHICLE_POS_START);
 
             // mimiron tram:
@@ -487,40 +518,15 @@ public:
                 }
             }
 
-            // Spawn Observation Ring keepers for defeated bosses
-            uint32 watchersMask =
-                GetPersistentData(PERSISTENT_DATA_WATCHERS_MASK);
-            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; ++i)
-                if (IsBossDone(ObservationRingKeeperBoss[i])
-                    && !(watchersMask & (1 << i))
-                    && !GetObjectGuid(ObservationRingKeeperData[i]))
-                    instance->SummonCreature(
-                        ObservationRingKeeperEntry[i],
-                        ObservationRingKeepersPos[i]);
+            SpawnObservationRingKeepers();
 
-            uint32 algalonTimer =
-                GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
-            if (!GetObjectGuid(BOSS_ALGALON) && !_algalonResummonPending && algalonTimer
-                && (algalonTimer <= 60
-                    || algalonTimer == TIMER_ALGALON_TO_SUMMON))
-            {
-                TempSummon* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonLandPos);
-                if (!algalon)
-                    return;
-
-                if (algalonTimer <= 60)
-                {
-                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
-                    algalon->AI()->DoAction(ACTION_INIT_ALGALON);
-                }
-                else // if (algalonTimer == TIMER_ALGALON_TO_SUMMON)
-                {
-                    StorePersistentData(
-                        PERSISTENT_DATA_ALGALON_TIMER,
-                        TIMER_ALGALON_SUMMONED);
-                    algalon->SetImmuneToPC(false);
-                }
-            }
+            // Only covers an instance reload: after a wipe the map re-summons Algalon itself 20s after
+            // the evade, so wait long enough for that respawn to land first.
+            uint32 algalonTimer = GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
+            if (!GetCreature(BOSS_ALGALON) && algalonTimer
+                && (algalonTimer <= 60 || algalonTimer == TIMER_ALGALON_TO_SUMMON)
+                && !_events.HasTimeUntilEvent(EVENT_RESUMMON_ALGALON))
+                _events.ScheduleEvent(EVENT_RESUMMON_ALGALON, 30s);
         }
 
         bool IsEncounterInProgress() const override
@@ -607,6 +613,11 @@ public:
                             ObservationRingKeepersPos[keeperIdx]);
                     }
                     break;
+                case BOSS_YOGGSARON:
+                    // Sara despawns the unchosen keepers on pull, bring them back after a wipe
+                    if (state == NOT_STARTED)
+                        SpawnObservationRingKeepers();
+                    break;
                 default:
                     break;
             }
@@ -647,13 +658,24 @@ public:
                     {
                         creature->SetDisableGravity(true);
                         creature->SetPosition(creature->GetHomePosition());
-                        creature->setDeathState(DeathState::JustDied);
+                        creature->setDeathState(DeathState::Corpse);
+                        creature->SetHealth(0);
+                        creature->SetStandState(UNIT_STAND_STATE_STAND);
+                        creature->ReplaceAllDynamicFlags(0);
+                        creature->SetCorpseDelay(7 * DAY);
+                        creature->SetCorpseRemoveTime(7 * DAY);
+                        creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         creature->StopMovingOnCurrentPos();
                     }
                     break;
                 case NPC_ALGALON:
                     if (!GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER))
                         creature->DespawnOrUnsummon();
+                    else if (_algalonArrivalPending)
+                    {
+                        _algalonArrivalPending = false;
+                        creature->AI()->DoAction(ACTION_START_INTRO);
+                    }
                     break;
                 // Gone for good once Flame Leviathan is defeated
                 case NPC_STEELFORGED_DEFENDER:
@@ -689,6 +711,13 @@ public:
                         algalon->AI()->JustSummoned(creature);
                     break;
             }
+        }
+
+        void OnCreatureEvade(Creature* creature) override
+        {
+            // The map re-summons Algalon 20s after his hard-reset evade; the new one replays the arrival
+            if (creature->GetEntry() == NPC_ALGALON && GetBossState(BOSS_ALGALON) != DONE)
+                _algalonArrivalPending = true;
         }
 
         void OpenIfDone(uint32 encounter, GameObject* go, GOState state)
@@ -780,6 +809,12 @@ public:
                     if (GetBossState(BOSS_LEVIATHAN) >= DONE)
                         gameObject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     break;
+                case GO_ULDUAR_PROTECTIVE_BUBBLE:
+                    if (GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) == MAGE_BARRIER_LOWERED
+                        || GetPersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE) != 0
+                        || IsBossDone(BOSS_LEVIATHAN))
+                        gameObject->DespawnOrUnsummon(0ms, 7_days);
+                    break;
                 case GO_KOLOGARN_BRIDGE:
                     OpenIfDone(BOSS_KOLOGARN, gameObject, GO_STATE_READY);
                     break;
@@ -855,6 +890,19 @@ public:
             }
         }
 
+        // A shattered Rare Cache stays down for the DB respawn delay (7 days), so it has to be
+        // brought back with Hodir or the next attempt can never earn it.
+        void respawnHodirHardmodeChest()
+        {
+            if (GetBossState(BOSS_HODIR) == DONE)
+                return;
+
+            _hmHodir = true;
+
+            if (GameObject* go = GetHodirChest(true))
+                go->Respawn();
+        }
+
         void setChestsLootable(uint32 boss)
         {
             if (boss)
@@ -884,6 +932,9 @@ public:
         {
             switch (type)
             {
+                case TYPE_HODIR_HM_RESET:
+                    respawnHodirHardmodeChest();
+                    break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = GetHodirChest(true))
                     {
@@ -922,7 +973,7 @@ public:
                     // Archmage Pentarus has just answered Brann, the crews get a moment to reach the vehicles
                     scheduler.Schedule(3s, [this](TaskContext /*context*/)
                     {
-                        SetLeviathanVehiclesUsable(true);
+                        UnlockLeviathanVehicles();
                     });
                     return;
                 case DATA_DESPAWN_ALGALON:
@@ -930,10 +981,6 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 60);
                     StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, 60);
                     _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
-                    return;
-                case DATA_RESUMMON_ALGALON:
-                    _algalonResummonPending = true;
-                    _events.RescheduleEvent(EVENT_RESUMMON_ALGALON, 2s);
                     return;
                 case DATA_ALGALON_SUMMON_STATE:
                 case DATA_ALGALON_DEFEATED:
@@ -1053,6 +1100,9 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
+            if (Creature* creature = unit->ToCreature())
+                ScheduleLeviathanVehicleRespawn(creature);
+
             // Feeds on Tears achievement
             if (unit->IsPlayer())
             {
@@ -1161,15 +1211,34 @@ public:
                     break;
                 }
                 case EVENT_RESUMMON_ALGALON:
-                    _algalonResummonPending = false;
-                    if (!GetCreature(BOSS_ALGALON))
-                        if (Creature* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
-                            algalon->AI()->DoAction(ACTION_START_INTRO);
+                {
+                    uint32 algalonTimer = GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
+                    if (GetCreature(BOSS_ALGALON) || !algalonTimer
+                        || (algalonTimer > 60 && algalonTimer != TIMER_ALGALON_TO_SUMMON))
+                        break;
+
+                    TempSummon* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonLandPos);
+                    if (!algalon)
+                        break;
+
+                    if (algalonTimer <= 60)
+                    {
+                        _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
+                        algalon->AI()->DoAction(ACTION_INIT_ALGALON);
+                    }
+                    else // TIMER_ALGALON_TO_SUMMON
+                    {
+                        StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, TIMER_ALGALON_SUMMONED);
+                        algalon->SetImmuneToPC(false);
+                    }
                     break;
+                }
             }
         }
 
         void SpawnLeviathanEncounterVehicles(uint8 mode);
+        void SummonLeviathanVehicle(uint32 entry, uint32 index);
+        void ScheduleLeviathanVehicleRespawn(Creature* vehicle);
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
@@ -1283,40 +1352,75 @@ const Position vehiclePositions[30] =
 
 void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounterVehicles(uint8 mode)
 {
-    if (!_leviathanVehicles.empty())
-    {
-        for (ObjectGuid const& guid : _leviathanVehicles)
-        {
-            if (Creature* cr = instance->GetCreature(guid))
-            {
-                cr->DespawnOrUnsummon();
-            }
-        }
+    // Retire the old set first: despawning it must not queue replacements for a set that is going away
+    std::vector<LeviathanVehicle> retired;
+    retired.swap(_leviathanVehicles);
+    _leviathanVehicleMode = mode;
 
-        _leviathanVehicles.clear();
+    for (LeviathanVehicle const& summoned : retired)
+    {
+        if (Creature* cr = instance->GetCreature(summoned.guid))
+        {
+            cr->DespawnOrUnsummon();
+        }
     }
 
-    if (mode < VEHICLE_POS_NONE)
-    {
-        for (uint8 i = 0; i < (instance->Is25ManRaid() ? 5 : 2); ++i)
-        {
-            if (TempSummon* veh = instance->SummonCreature(NPC_SALVAGED_SIEGE_ENGINE, vehiclePositions[15 * mode + i]))
-            {
-                _leviathanVehicles.push_back(veh->GetGUID());
-            }
-            if (TempSummon* veh = instance->SummonCreature(NPC_VEHICLE_CHOPPER, vehiclePositions[15 * mode + i + 5]))
-            {
-                _leviathanVehicles.push_back(veh->GetGUID());
-            }
-            if (TempSummon* veh = instance->SummonCreature(NPC_SALVAGED_DEMOLISHER, vehiclePositions[15 * mode + i + 10]))
-            {
-                _leviathanVehicles.push_back(veh->GetGUID());
-            }
-        }
+    if (mode >= VEHICLE_POS_NONE)
+        return;
 
-        // The raid may look the vehicles over on arrival, but cannot board them until the Kirin Tor say so
-        if (mode == VEHICLE_POS_START && GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) != MAGE_BARRIER_LOWERED)
-            SetLeviathanVehiclesUsable(false);
+    // The raid may look the vehicles over on arrival, but cannot board them until the Kirin Tor say so.
+    // MAGE_BARRIER_LOWERED covers lockouts saved before the unlock got its own flag.
+    _leviathanVehiclesUsable = mode != VEHICLE_POS_START
+        || GetPersistentData(PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE) != 0
+        || GetPersistentData(PERSISTENT_DATA_MAGE_BARRIER) == MAGE_BARRIER_LOWERED;
+
+    for (uint32 i = 0; i < (instance->Is25ManRaid() ? 5u : 2u); ++i)
+    {
+        SummonLeviathanVehicle(NPC_SALVAGED_SIEGE_ENGINE, 15 * mode + i);
+        SummonLeviathanVehicle(NPC_VEHICLE_CHOPPER, 15 * mode + i + 5);
+        SummonLeviathanVehicle(NPC_SALVAGED_DEMOLISHER, 15 * mode + i + 10);
+    }
+}
+
+void instance_ulduar::instance_ulduar_InstanceMapScript::SummonLeviathanVehicle(uint32 entry, uint32 index)
+{
+    if (TempSummon* veh = instance->SummonCreature(entry, vehiclePositions[index]))
+    {
+        // The vehicle kit hands out the spell click on install, take it back while the barrier is still up
+        if (!_leviathanVehiclesUsable)
+            veh->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+
+        _leviathanVehicles.push_back({ veh->GetGUID(), entry, index });
+    }
+}
+
+void instance_ulduar::instance_ulduar_InstanceMapScript::ScheduleLeviathanVehicleRespawn(Creature* vehicle)
+{
+    // The Expedition Base Camp keeps its motor pool stocked. The trigger that ends it is the pool itself being
+    // relocated to the Formation Grounds on the first Reset() after the boss has been engaged, not the raid
+    // driving up there: for the whole first attempt wrecks are still replaced back at the camp. From the
+    // relocation on, a wreck stays where it fell and only the next reset lays out a fresh set
+    if (_leviathanVehicleMode != VEHICLE_POS_START)
+        return;
+
+    for (auto itr = _leviathanVehicles.begin(); itr != _leviathanVehicles.end(); ++itr)
+    {
+        if (itr->guid != vehicle->GetGUID())
+            continue;
+
+        uint32 entry = itr->entry;
+        uint32 index = itr->index;
+        _leviathanVehicles.erase(itr);
+
+        // A replacement rolls out of the camp 40 seconds after the wreck has decayed
+        Seconds respawnDelay = Seconds(vehicle->GetCorpseDelay()) + LEVIATHAN_VEHICLE_RESPAWN_DELAY;
+        scheduler.Schedule(respawnDelay, [this, entry, index](TaskContext /*context*/)
+        {
+            if (_leviathanVehicleMode == VEHICLE_POS_START)
+                SummonLeviathanVehicle(entry, index);
+        });
+
+        return;
     }
 }
 
