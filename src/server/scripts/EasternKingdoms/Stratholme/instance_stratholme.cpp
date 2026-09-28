@@ -434,7 +434,7 @@ public:
             data >> _barthilasrunProgress;
 
             // Older saves contain either the thread mask or the two trap cooldowns.
-            std::array<time_t, MAX_GATE_TRAPS + 1> savedFields{};
+            std::array<time_t, 3> savedFields{};
             std::size_t savedFieldCount = 0;
             while (savedFieldCount < savedFields.size() && data >> savedFields[savedFieldCount])
                 ++savedFieldCount;
