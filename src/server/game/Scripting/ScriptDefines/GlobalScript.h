@@ -48,6 +48,7 @@ enum GlobalHook
     GLOBALHOOK_ON_INSTANCEID_REMOVED,
     GLOBALHOOK_ON_BEFORE_SET_BOSS_STATE,
     GLOBALHOOK_AFTER_INSTANCE_GAME_OBJECT_CREATE,
+    GLOBALHOOK_CAN_CREATE_LFG_PROPOSAL,
     GLOBALHOOK_END
 };
 
@@ -107,6 +108,10 @@ public:
 
     // Called when a gameobject is created by an instance
     virtual void AfterInstanceGameObjectCreate(Map* /*instance*/, GameObject* /*go*/) { }
+
+    // Called before the LFG queue turns a compatible set of queued players and groups into a proposal.
+    // Return false to reject the combination.
+    [[nodiscard]] virtual bool CanCreateLfgProposal(lfg::Lfg5Guids const& /*guids*/) { return true; }
 };
 
 #endif

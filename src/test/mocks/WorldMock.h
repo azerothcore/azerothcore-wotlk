@@ -52,6 +52,9 @@ public:
     MOCK_METHOD(void, ShutdownServ, (uint32 time, uint32 options, uint8 exitcode, std::string const& reason), ());
     MOCK_METHOD(void, ShutdownCancel, ());
     MOCK_METHOD(void, ShutdownMsg, (bool show, Player* player, std::string const& reason), ());
+    MOCK_METHOD(void, SaveSessionEnd, (bool finished), ());
+    MOCK_METHOD(Optional<PreviousSessionInfo> const&, GetPreviousSessionInfo, (), (const));
+    MOCK_METHOD(uint32, GetLifetimeMaxPlayerCount, (), (const));
     MOCK_METHOD(void, Update, (uint32 diff), ());
     MOCK_METHOD(void, setRate, (ServerConfigs index, float value), ());
     MOCK_METHOD(float, getRate, (ServerConfigs index), (const));

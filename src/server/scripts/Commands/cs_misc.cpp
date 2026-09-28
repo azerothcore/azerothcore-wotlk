@@ -1721,6 +1721,16 @@ public:
         return true;
     }
 
+    static void SendRemoveItemResult(ChatHandler* handler, uint32 itemId, uint32 removed, std::string const& nameLink, ObjectGuid::LowType guidLow, bool online, uint32 countLeft)
+    {
+        std::string status = handler->GetAcoreString(online ? LANG_CHARACTER_ONLINE : LANG_CHARACTER_OFFLINE);
+
+        if (countLeft)
+            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, removed, nameLink, guidLow, status, countLeft);
+        else
+            handler->PSendSysMessage(LANG_REMOVEITEM_NONE_LEFT, itemId, removed, nameLink, guidLow, status);
+    }
+
     static bool HandleAddItemCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, ItemTemplate const* itemTemplate, Optional<int32> _count)
     {
         if (!sObjectMgr->GetItemTemplate(itemTemplate->ItemId))
@@ -1771,9 +1781,12 @@ public:
                     }
                 }
 
-                // output successful amount of destroyed items
+                uint32 countBefore = playerTarget->GetItemCount(itemId, true);
                 playerTarget->DestroyItemCount(itemId, removeCount, true, false);
-                handler->PSendSysMessage(LANG_REMOVEITEM, itemId, removeCount, handler->GetNameLink(playerTarget));
+                uint32 countAfter = playerTarget->GetItemCount(itemId, true);
+
+                SendRemoveItemResult(handler, itemId, countBefore - countAfter, handler->GetNameLink(playerTarget),
+                    playerTarget->GetGUID().GetCounter(), true, countAfter);
                 return true;
             }
 
@@ -1789,18 +1802,26 @@ public:
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
             std::vector<std::pair<ObjectGuid::LowType, uint32>> stacks;
-            uint32 totalCount = 0;
+            uint32 removableCount = 0;
+            uint32 ownedCount = 0;
             if (result)
             {
                 do
                 {
                     Field* fields = result->Fetch();
-                    stacks.emplace_back(fields[0].Get<uint32>(), fields[1].Get<uint32>());
-                    totalCount += fields[1].Get<uint32>();
+                    uint32 stackCount = fields[1].Get<uint32>();
+                    ownedCount += stackCount;
+
+                    // Bags that still hold items are never removed
+                    if (fields[2].Get<uint64>())
+                        continue;
+
+                    stacks.emplace_back(fields[0].Get<uint32>(), stackCount);
+                    removableCount += stackCount;
                 } while (result->NextRow());
             }
 
-            if (!totalCount)
+            if (!removableCount)
             {
                 handler->SendErrorMessage(LANG_REMOVEITEM_FAILURE, nameLink, itemId);
                 return false;
@@ -1808,7 +1829,7 @@ public:
 
             // Only have scam check on player accounts
             uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
-            if (AccountMgr::GetSecurity(accountId, realm.Id.Realm) == SEC_PLAYER && totalCount < removeCount)
+            if (AccountMgr::GetSecurity(accountId, realm.Id.Realm) == SEC_PLAYER && removableCount < removeCount)
             {
                 handler->SendErrorMessage(LANG_REMOVEITEM_ERROR, nameLink, itemId);
                 return false;
@@ -1854,7 +1875,8 @@ public:
             }
             CharacterDatabase.CommitTransaction(trans);
 
-            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, removeCount - remaining, nameLink);
+            uint32 removed = removeCount - remaining;
+            SendRemoveItemResult(handler, itemId, removed, nameLink, player->GetGUID().GetCounter(), false, ownedCount - removed);
             return true;
         }
 
@@ -2563,10 +2585,7 @@ public:
         }
         // Also trigger via respawn time queue for fully-removed spawns
         if (map->GetCreatureRespawnTime(spawnId) > 0)
-        {
-            time_t now = GameTime::GetGameTime().count();
-            map->SaveCreatureRespawnTime(spawnId, now);
-        }
+            map->ForceCreatureRespawn(spawnId);
         handler->PSendSysMessage(LANG_RESPAWN_GUID_CREATURE_QUEUED, spawnId, creData->id);
         return true;
     }
@@ -2658,7 +2677,6 @@ public:
             return false;
         }
 
-        time_t now = GameTime::GetGameTime().count();
         uint32 count = 0;
 
         // Phase 1: respawn dead corpses that are still tracked in the spawn-id store.
@@ -2691,7 +2709,7 @@ public:
         }
         for (ObjectGuid::LowType spawnId : toRespawn)
         {
-            map->SaveCreatureRespawnTime(spawnId, now);
+            map->ForceCreatureRespawn(spawnId);
             ++count;
         }
 
