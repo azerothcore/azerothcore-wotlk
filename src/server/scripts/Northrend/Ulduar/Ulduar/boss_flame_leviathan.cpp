@@ -747,6 +747,35 @@ struct boss_flame_leviathan_seat : public VehicleAI
 
     void AttackStart(Unit*) override { }
 
+    static bool ActivateTurret(Unit* seat, Unit* rider)
+    {
+        Vehicle* seatVehicle = seat->GetVehicleKit();
+        Unit* turretSeatUnit = seatVehicle ? seatVehicle->GetPassenger(SEAT_TURRET) : nullptr;
+        Creature* turret = turretSeatUnit ? turretSeatUnit->ToCreature() : nullptr;
+        if (!turret)
+            return false;
+
+        turret->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        turret->AI()->AttackStart(rider);
+        return true;
+    }
+
+    // In 25m, the rider activates a pair of seats out of the four. In 10m, the rider activates both seats out of the two.
+    bool ActivateTurrets(Unit* rider)
+    {
+        bool activated = ActivateTurret(me, rider);
+
+        if (Vehicle* leviathanVehicle = me->GetVehicle())
+        {
+            int8 const partnerSeatId = static_cast<int8>(me->GetTransSeat() ^ (me->GetMap()->Is25ManRaid() ? 2 : 1));
+            if (Unit* partnerSeat = leviathanVehicle->GetPassenger(partnerSeatId))
+                if (partnerSeat->GetEntry() == NPC_SEAT && ActivateTurret(partnerSeat, rider))
+                    activated = true;
+        }
+
+        return activated;
+    }
+
     void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
     {
         if (!who->IsPlayer())
@@ -763,26 +792,14 @@ struct boss_flame_leviathan_seat : public VehicleAI
 
         if (seatId == SEAT_PLAYER)
         {
-            Unit* turretSeatUnit = me->GetVehicleKit()->GetPassenger(SEAT_TURRET);
-            if (Creature* turret = turretSeatUnit ? turretSeatUnit->ToCreature() : nullptr)
+            if (!apply)
+                who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
+            else if (ActivateTurrets(who))
             {
-                if (apply)
+                if (Creature* leviathan = me->GetVehicleCreatureBase())
                 {
-                    turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                    turret->AI()->AttackStart(who);
-                    if (Creature* leviathan = me->GetVehicleCreatureBase())
-                    {
-                        leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
-                        leviathan->SetInCombatWithZone();
-                    }
-                }
-                else
-                {
-                    turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
-                    turret->SetImmuneToAll(true);
-                    turret->AI()->EnterEvadeMode();
-
-                    who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
+                    leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
+                    leviathan->SetInCombatWithZone();
                 }
             }
             if (Unit* device = me->GetVehicleKit()->GetPassenger(SEAT_DEVICE))
@@ -822,6 +839,14 @@ struct boss_flame_leviathan_defense_turret : public TurretAI
         if (Unit* seat = me->GetVehicleBase())
             if (Creature* leviathan = seat->GetVehicleCreatureBase())
                 leviathan->SetInCombatWithZone();
+    }
+
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        TurretAI::EnterEvadeMode(why);
+        // Seated turrets never move home, which is the only thing that clears the evade state.
+        // Because of this, we need to manually clear it ourselves.
+        me->ClearUnitState(UNIT_STATE_EVADE);
     }
 
     void JustDied(Unit* killer) override
