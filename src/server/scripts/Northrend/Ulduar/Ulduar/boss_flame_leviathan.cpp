@@ -763,12 +763,13 @@ struct boss_flame_leviathan_seat : public VehicleAI
 
         if (seatId == SEAT_PLAYER)
         {
-            if (Unit* turret = me->GetVehicleKit()->GetPassenger(SEAT_TURRET))
+            Unit* turretSeatUnit = me->GetVehicleKit()->GetPassenger(SEAT_TURRET);
+            if (Creature* turret = turretSeatUnit ? turretSeatUnit->ToCreature() : nullptr)
             {
                 if (apply)
                 {
                     turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                    turret->GetAI()->AttackStart(who);
+                    turret->AI()->AttackStart(who);
                     if (Creature* leviathan = me->GetVehicleCreatureBase())
                     {
                         leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
@@ -779,8 +780,7 @@ struct boss_flame_leviathan_seat : public VehicleAI
                 {
                     turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
                     turret->SetImmuneToAll(true);
-                    if (turret->IsCreature())
-                        turret->ToCreature()->AI()->EnterEvadeMode();
+                    turret->AI()->EnterEvadeMode();
 
                     who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
                 }
@@ -1492,6 +1492,16 @@ class spell_pursue : public SpellScript
     }
 };
 
+static bool IsLeviathanSeatAvailable(Unit const* seat)
+{
+    Vehicle* seatVehicle = seat->GetEntry() == NPC_SEAT ? seat->GetVehicleKit() : nullptr;
+    if (!seatVehicle || seatVehicle->GetPassenger(SEAT_PLAYER))
+        return false;
+
+    Unit* device = seatVehicle->GetPassenger(SEAT_DEVICE);
+    return device && !device->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+}
+
 class spell_vehicle_throw_passenger : public SpellScript
 {
     PrepareSpellScript(spell_vehicle_throw_passenger);
@@ -1526,11 +1536,8 @@ class spell_vehicle_throw_passenger : public SpellScript
         for (WorldObject* obj : targetList)
         {
             Unit* unit = obj->ToUnit();
-            if (!unit || unit->GetEntry() != NPC_SEAT) continue;
-
-            Vehicle* seat = unit->GetVehicleKit();
-            Unit* device = seat ? seat->GetPassenger(SEAT_DEVICE) : nullptr;
-            if (!seat || seat->GetPassenger(0) || !device || device->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) continue;
+            if (!unit || !IsLeviathanSeatAvailable(unit))
+                continue;
 
             float dist = unit->GetExactDistSq(dst);
             if (dist < minDist)
@@ -1553,6 +1560,52 @@ class spell_vehicle_throw_passenger : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_vehicle_throw_passenger::HandleScript);
+    }
+};
+
+class spell_hookshot : public SpellScript
+{
+    PrepareSpellScript(spell_hookshot);
+
+    // Restrict target selection to the nearest seat whose player seat is free.
+    Creature* SelectAvailableSeat()
+    {
+        Unit* caster = GetCaster();
+        std::list<Creature*> seats;
+        caster->GetCreatureListWithEntryInGrid(seats, NPC_SEAT, GetSpellInfo()->GetMaxRange());
+
+        Creature* nearestSeat = nullptr;
+        float nearestDist = 0.0f;
+        for (Creature* seat : seats)
+        {
+            if (!IsLeviathanSeatAvailable(seat))
+                continue;
+
+            float dist = caster->GetExactDistSq(seat);
+            if (!nearestSeat || dist < nearestDist)
+            {
+                nearestSeat = seat;
+                nearestDist = dist;
+            }
+        }
+
+        return nearestSeat;
+    }
+
+    SpellCastResult CheckCast()
+    {
+        return SelectAvailableSeat() ? SPELL_CAST_OK : SPELL_FAILED_DONT_REPORT;
+    }
+
+    void SelectSeat(WorldObject*& target)
+    {
+        target = SelectAvailableSeat();
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_hookshot::CheckCast);
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_hookshot::SelectSeat, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
     }
 };
 
@@ -1919,6 +1972,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_systems_shutdown_aura);
     RegisterSpellScript(spell_pursue);
     RegisterSpellScript(spell_vehicle_throw_passenger);
+    RegisterSpellScript(spell_hookshot);
     RegisterSpellScript(spell_hookshot_aura);
     RegisterSpellScript(spell_tar_blaze_aura);
     RegisterSpellScript(spell_vehicle_grab_pyrite);
