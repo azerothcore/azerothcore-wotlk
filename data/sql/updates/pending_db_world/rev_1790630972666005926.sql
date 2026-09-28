@@ -23,9 +23,11 @@ INSERT INTO `smart_scripts`
 (24484, 0, 8, 11, 100, 0, 0, 0, 0, 0, 2, 1935, 0, 0, 1,
  'Brewfest Reveler - On Respawn With Horde Disguise - Restore Horde Faction'),
 (24484, 0, 9, 11, 100, 0, 0, 0, 0, 0, 2, 35, 0, 0, 1,
- 'Brewfest Reveler - On Respawn With Goblin Disguise - Restore Friendly Faction');
+ 'Brewfest Reveler - On Respawn With Goblin Disguise - Restore Friendly Faction'),
+(24484, 0, 10, 11, 100, 0, 0, 0, 0, 0, 2, 35, 0, 0, 1,
+ 'Brewfest Reveler - On Respawn In Shattrath - Remain Friendly To Both Factions');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 24484 AND `SourceId` = 0 AND `SourceGroup` IN (8, 9, 10);
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 24484 AND `SourceId` = 0 AND `SourceGroup` IN (8, 9, 10, 11);
 INSERT INTO `conditions`
 (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`,
  `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `Comment`) VALUES
@@ -45,4 +47,5 @@ INSERT INTO `conditions`
 (22, 9, 24484, 0, 5, 1, 1, 43917, 0, 'Horde Brewfest disguise'),
 (22, 10, 24484, 0, 1, 1, 1, 44003, 0, 'Goblin Brewfest disguise'),
 (22, 10, 24484, 0, 2, 1, 1, 44004, 0, 'Goblin Brewfest disguise'),
-(22, 10, 24484, 0, 3, 1, 1, 44096, 0, 'Goblin Brewfest disguise');
+(22, 10, 24484, 0, 3, 1, 1, 44096, 0, 'Goblin Brewfest disguise'),
+(22, 11, 24484, 0, 0, 23, 1, 3703, 0, 'Brewfest Reveler in Shattrath City');
