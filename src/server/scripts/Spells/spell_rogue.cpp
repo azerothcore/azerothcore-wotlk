@@ -55,8 +55,7 @@ enum RogueSpells
     SPELL_ROGUE_HONOR_AMONG_THIEVES_PROC        = 52916,
     SPELL_ROGUE_HONOR_AMONG_THIEVES_TRIGGERED   = 51699,
     SPELL_ROGUE_COLD_BLOOD                      = 14177,
-    SPELL_ROGUE_REMORSELESS_ATTACKS_R1          = 14143,
-    SPELL_ROGUE_REMORSELESS_ATTACKS_R2          = 14149
+    SPELL_ROGUE_REMORSELESS_ATTACKS_R1          = 14143
 };
 
 enum RogueSpellIcons
@@ -1195,11 +1194,7 @@ class spell_rog_mutilate : public SpellScript
                 cb->Remove();
         }
 
-        Aura* remorseless = caster->GetAura(SPELL_ROGUE_REMORSELESS_ATTACKS_R1);
-        if (!remorseless)
-            remorseless = caster->GetAura(SPELL_ROGUE_REMORSELESS_ATTACKS_R2);
-
-        if (remorseless)
+        if (Aura* remorseless = caster->GetAuraOfRankedSpell(SPELL_ROGUE_REMORSELESS_ATTACKS_R1))
         {
             auto* script = dynamic_cast<spell_rog_remorseless_attacks*>(
                 remorseless->GetScriptByName("spell_rog_remorseless_attacks"));
