@@ -1,3 +1,4 @@
+-- DB update 2026_09_28_02 -> 2026_09_28_03
 -- Onyxia's Lair, World Triggers over Onyxia's air-phase points and the room centre
 SET @CGUID := 13396;
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+8 AND `id` = 22515;
