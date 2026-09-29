@@ -112,14 +112,14 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
             // xinef: allow to dissmis dead pets
             if ((*itr)->GetEntry() == pet->GetEntry() && ((*itr)->IsAlive() || (flag == ACT_COMMAND && spellId == COMMAND_ABANDON)))
                 controlled.push_back(*itr);
-            else if (flag == ACT_COMMAND && spellId <= COMMAND_ATTACK && (*itr)->IsCreature() &&
-                (*itr)->ToCreature()->IsGuardian() && !(*itr)->GetCharmInfo() && (*itr)->IsAlive())
-                guardians.push_back((*itr)->ToCreature());
             // xinef: mirror image blizzard
             else if ((*itr)->GetEntry() == NPC_MIRROR_IMAGE && flag == ACT_COMMAND && spellId == COMMAND_FOLLOW)
             {
                 (*itr)->InterruptNonMeleeSpells(false);
             }
+            else if (flag == ACT_COMMAND && spellId <= COMMAND_ATTACK && (*itr)->IsCreature() &&
+                (*itr)->ToCreature()->IsGuardian() && !(*itr)->GetCharmInfo() && (*itr)->IsAlive())
+                guardians.push_back((*itr)->ToCreature());
         }
 
         for (Unit* pet : controlled)
