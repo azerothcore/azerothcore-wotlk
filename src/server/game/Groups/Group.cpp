@@ -932,7 +932,7 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, Roll const& r)
     data << uint32(r.itemSlot);                             // itemslot
     data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
     data << uint32(r.itemRandomSuffix);                     // randomSuffix
-    data << uint32(r.itemRandomPropId);                     // item random property ID
+    data << uint32(r.itemRandomPropId);                      // item random property ID
     data << uint32(r.itemCount);                            // items in stack
     data << uint32(CountDown);                              // the countdown time to choose "need" or "greed"
     data << uint8(r.rollVoteMask);                          // roll type mask
@@ -1001,9 +1001,17 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p,
     data << r.itemGUID;                                     // guid of rolled item
     data << uint32(mapId);                                  // 3.3.3 mapid
     data << uint32(r.itemSlot);                             // itemslot
-    data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
-    data << uint32(r.itemRandomSuffix);                     // randomSuffix
-    data << uint32(r.itemRandomPropId);                     // item random property ID
+    Loot* loot = const_cast<Roll&>(r).getLoot();
+    LootItem* lootItem = loot ? loot->LootItemInSlot(r.itemSlot, p) : nullptr;
+    uint32 itemId = r.itemid;
+    uint32 randomSuffix = r.itemRandomSuffix;
+    int32 randomProperty = r.itemRandomPropId;
+    if (lootItem)
+        lootItem->GetScaledValuesForPlayer(p->getAreaZoneLevel(), p, itemId, randomSuffix, randomProperty);
+
+    data << itemId;                   // the itemEntryId for the item that shall be rolled for
+    data << randomSuffix;              // randomSuffix
+    data << randomProperty;            // item random property ID
     data << uint32(r.itemCount);                            // items in stack
     data << uint32(countDown);                              // the countdown time to choose "need" or "greed"
     uint8 voteMask = r.rollVoteMask;
@@ -1651,14 +1659,18 @@ void Group::CountTheRoll(Rolls::iterator rollI)
 
                     ItemPosCountVec dest;
                     LootItem* item = &(roll->itemSlot >= roll->getLoot()->items.size() ? roll->getLoot()->quest_items[roll->itemSlot - roll->getLoot()->items.size()] : roll->getLoot()->items[roll->itemSlot]);
-                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
+                    uint32 itemId = roll->itemid;
+                    uint32 randomSuffix = item->randomSuffix;
+                    int32 randomProperty = item->randomPropertyId;
+                    item->GetScaledValuesForPlayer(player->getAreaZoneLevel(), player, itemId, randomSuffix, randomProperty);
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, item->count);
                     if (msg == EQUIP_ERR_OK)
                     {
                         item->is_looted = true;
                         roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                         roll->getLoot()->unlootedCount--;
                         AllowedLooterSet looters = item->GetAllowedLooters();
-                        Item* _item = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+                        Item* _item = player->StoreNewItem(dest, itemId, true, randomProperty, looters);
                         if (_item)
                             sScriptMgr->OnPlayerGroupRollRewardItem(player, _item, item->count, NEED, roll);
                         player->UpdateLootAchievements(item, roll->getLoot());
@@ -1731,18 +1743,22 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                     player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, roll->itemid, maxresul);
 
                     LootItem* item = &(roll->itemSlot >= roll->getLoot()->items.size() ? roll->getLoot()->quest_items[roll->itemSlot - roll->getLoot()->items.size()] : roll->getLoot()->items[roll->itemSlot]);
+                    uint32 itemId = roll->itemid;
+                    uint32 randomSuffix = item->randomSuffix;
+                    int32 randomProperty = item->randomPropertyId;
+                    item->GetScaledValuesForPlayer(player->getAreaZoneLevel(), player, itemId, randomSuffix, randomProperty);
 
                     if (rollvote == GREED)
                     {
                         ItemPosCountVec dest;
-                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
+                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, item->count);
                         if (msg == EQUIP_ERR_OK)
                         {
                             item->is_looted = true;
                             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                             roll->getLoot()->unlootedCount--;
                             AllowedLooterSet looters = item->GetAllowedLooters();
-                            Item* _item = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+                            Item* _item = player->StoreNewItem(dest, itemId, true, randomProperty, looters);
                             if (_item)
                                 sScriptMgr->OnPlayerGroupRollRewardItem(player, _item, item->count, GREED, roll);
                             player->UpdateLootAchievements(item, roll->getLoot());

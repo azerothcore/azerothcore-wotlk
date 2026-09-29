@@ -105,11 +105,9 @@ float playerBaseMoveSpeed[MAX_MOVE_TYPE] =
 
 DamageInfo::DamageInfo(Unit* _attacker, Unit* _victim, uint32 _damage, SpellInfo const* _spellInfo, SpellSchoolMask _schoolMask, DamageEffectType _damageType, uint32 cleanDamage)
     : m_attacker(_attacker), m_victim(_victim), m_damage(_damage), m_spellInfo(_spellInfo), m_schoolMask(_schoolMask),
-      m_damageType(_damageType), m_attackType(BASE_ATTACK), m_cleanDamage(cleanDamage), m_hitMask(0)
+      m_damageType(_damageType), m_attackType(BASE_ATTACK), m_absorb(0), m_altHeal(0), m_altAbsorb(0), m_ratio(1.0f),
+      m_hasBeenScaled(false), m_isValuesForTarget(true), m_resist(0), m_block(0), m_cleanDamage(cleanDamage), m_hitMask(0)
 {
-    m_absorb = 0;
-    m_resist = 0;
-    m_block = 0;
 }
 
 // Clamp the unit's effective level to the configured range for its area or zone.
@@ -1710,6 +1708,8 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss,
         return;
     }
 
+    SetSpellNonMeleeDamageForTarget(damageInfo);
+
     // Call default DealDamage
     CleanDamage cleanDamage(damageInfo->cleanDamage, damageInfo->absorb, BASE_ATTACK, MELEE_HIT_NORMAL);
     Unit::DealDamage(this, victim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, SpellSchoolMask(damageInfo->schoolMask), spellProto, durabilityLoss, false, spell);
@@ -1720,6 +1720,9 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
 {
     damageInfo->attacker         = this;
     damageInfo->target           = victim;
+    damageInfo->ratio            = 1.0f;
+    damageInfo->scaled           = false;
+    damageInfo->isValuesForTarget = false;
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
     {
@@ -1727,6 +1730,7 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
         damageInfo->damages[i].damage = 0;
         damageInfo->damages[i].absorb = 0;
         damageInfo->damages[i].resist = 0;
+        damageInfo->alt_damages[i] = { 0, 0, 0 };
     }
 
     damageInfo->attackType       = attackType;
@@ -2058,9 +2062,54 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
 
 }
 
+void Unit::SetRatioInCalcDamageInfoForTarget(CalcDamageInfo* damageInfo)
+{
+    if (!damageInfo || !sObjectMgr->IsScalable(damageInfo->attacker, damageInfo->target))
+        return;
+
+    sObjectMgr->ScaleDamage(damageInfo->attacker, damageInfo->target, 1.0f, damageInfo->ratio);
+    damageInfo->scaled = damageInfo->ratio != 1.0f;
+}
+
+void Unit::ComputeScaledDamageInfo(CalcDamageInfo* damageInfo)
+{
+    if (!damageInfo || !damageInfo->scaled || damageInfo->isValuesForTarget)
+        return;
+
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+        damageInfo->alt_damages[i].damage = uint32(std::lround(sObjectMgr->ScaleDamage(damageInfo->attacker, damageInfo->target, float(damageInfo->damages[i].damage), damageInfo->ratio)));
+}
+
+void Unit::SetDamageInfoForTarget(CalcDamageInfo* damageInfo)
+{
+    if (!damageInfo)
+        return;
+
+    SetRatioInCalcDamageInfoForTarget(damageInfo);
+    ComputeScaledDamageInfo(damageInfo);
+    if (damageInfo->scaled && !damageInfo->isValuesForTarget)
+    {
+        for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+            std::swap(damageInfo->damages[i].damage, damageInfo->alt_damages[i].damage);
+        damageInfo->isValuesForTarget = true;
+    }
+}
+
+void Unit::FormatDamageInfoForPacketSender(CalcDamageInfo* damageInfo)
+{
+    if (!damageInfo || !damageInfo->scaled)
+        return;
+
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+        std::swap(damageInfo->damages[i].damage, damageInfo->alt_damages[i].damage);
+    damageInfo->isValuesForTarget = !damageInfo->isValuesForTarget;
+}
+
 void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
 {
     Unit* victim = damageInfo->target;
+
+    SetDamageInfoForTarget(damageInfo);
 
     auto canTakeMeleeDamage = [&]()
     {
@@ -2180,6 +2229,52 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     // Do effect if any damage done to target
     if (damageInfo->damages[0].damage + damageInfo->damages[1].damage)
         DealDamageShieldDamage(victim);
+}
+
+void Unit::SetRatioInSpellNonMeleeDamageForTarget(SpellNonMeleeDamage* damageInfo)
+{
+    if (!damageInfo || !sObjectMgr->IsScalable(damageInfo->attacker, damageInfo->target))
+        return;
+
+    sObjectMgr->ScaleDamage(damageInfo->attacker, damageInfo->target, 1.0f, damageInfo->ratio);
+    damageInfo->scaled = damageInfo->ratio != 1.0f;
+}
+
+void Unit::ComputeScaledSpellNonMeleeDamage(SpellNonMeleeDamage* damageInfo)
+{
+    if (!damageInfo || !damageInfo->scaled || damageInfo->isValuesForTarget)
+        return;
+
+    damageInfo->alt_damage = uint32(std::lround(sObjectMgr->ScaleDamage(damageInfo->attacker, damageInfo->target, float(damageInfo->damage), damageInfo->ratio)));
+    damageInfo->alt_absorb = uint32(std::lround(float(damageInfo->absorb) * damageInfo->ratio));
+    damageInfo->alt_resist = uint32(std::lround(float(damageInfo->resist) * damageInfo->ratio));
+    damageInfo->alt_blocked = uint32(std::lround(float(damageInfo->blocked) * damageInfo->ratio));
+}
+
+void Unit::SetSpellNonMeleeDamageForTarget(SpellNonMeleeDamage* damageInfo)
+{
+    if (!damageInfo)
+        return;
+
+    SetRatioInSpellNonMeleeDamageForTarget(damageInfo);
+    ComputeScaledSpellNonMeleeDamage(damageInfo);
+    if (damageInfo->scaled && !damageInfo->isValuesForTarget)
+        SwitchDataForSpellNonMeleeDamage(damageInfo);
+}
+
+void Unit::SwitchDataForSpellNonMeleeDamage(SpellNonMeleeDamage* damageInfo)
+{
+    std::swap(damageInfo->damage, damageInfo->alt_damage);
+    std::swap(damageInfo->absorb, damageInfo->alt_absorb);
+    std::swap(damageInfo->resist, damageInfo->alt_resist);
+    std::swap(damageInfo->blocked, damageInfo->alt_blocked);
+    damageInfo->isValuesForTarget = !damageInfo->isValuesForTarget;
+}
+
+void Unit::FormatSpellNonMeleeDamageForPacketSender(SpellNonMeleeDamage* damageInfo, bool /*forAttacker*/)
+{
+    if (damageInfo && damageInfo->scaled)
+        SwitchDataForSpellNonMeleeDamage(damageInfo);
 }
 
 void Unit::DealDamageShieldDamage(Unit* victim)
@@ -7930,6 +8025,17 @@ int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
     return gain;
 }
 
+void HealInfo::ScaleValuesForTarget()
+{
+    if (m_hasBeenScaled || !m_healer || !m_target)
+        return;
+
+    m_altHeal = uint32(std::lround(sObjectMgr->ScaleDamage(m_healer, m_target, float(m_heal), m_ratio, SPELLTYPE_HEAL)));
+    m_altAbsorb = uint32(std::lround(float(m_absorb) * m_ratio));
+    m_hasBeenScaled = m_ratio != 1.0f;
+    m_isValuesForTarget = true;
+}
+
 bool RedirectSpellEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     if (Unit* auraOwner = ObjectAccessor::GetUnit(_self, _auraOwnerGUID))
@@ -8183,6 +8289,7 @@ int32 Unit::HealBySpell(HealInfo& healInfo, bool critical)
     uint32 heal = healInfo.GetHeal();
     sScriptMgr->ModifyHealReceived(this, healInfo.GetTarget(), heal, healInfo.GetSpellInfo());
     healInfo.SetHeal(heal);
+    healInfo.ScaleValuesForTarget();
 
     // calculate heal absorb and reduce healing
     CalcHealAbsorb(healInfo);
@@ -11240,7 +11347,7 @@ bool Unit::CanHaveThreatList(bool skipAliveCheck) const
 
 //======================================================================
 
-void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask /*schoolMask*/, SpellInfo const* threatSpell)
+void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask /*schoolMask*/, SpellInfo const* threatSpell, bool /*isScaled*/)
 {
     // Only mobs can manage threat lists
     if (CanHaveThreatList() && !HasUnitState(UNIT_STATE_EVADE))

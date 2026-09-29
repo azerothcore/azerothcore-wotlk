@@ -25,24 +25,29 @@
 #include "Util.h"
 #include <cmath>
 #include <functional>
+#include <unordered_map>
 #include <vector>
 
 struct EnchStoreItem
 {
     uint32  ench;
     float   chance;
+    uint32  propertyFamily;
+    uint32  suffixFamily;
 
     EnchStoreItem()
-        : ench(0), chance(0) {}
+        : ench(0), chance(0), propertyFamily(0), suffixFamily(0) {}
 
-    EnchStoreItem(uint32 _ench, float _chance)
-        : ench(_ench), chance(_chance) {}
+    EnchStoreItem(uint32 _ench, float _chance, uint32 _propertyFamily = 0, uint32 _suffixFamily = 0)
+        : ench(_ench), chance(_chance), propertyFamily(_propertyFamily), suffixFamily(_suffixFamily) {}
 };
 
 typedef std::vector<EnchStoreItem> EnchStoreList;
 typedef std::unordered_map<uint32, EnchStoreList> EnchantmentStore;
 
 static EnchantmentStore RandomItemEnch;
+static std::unordered_map<uint32, uint32> RandomEnchPropertyValues;
+static std::unordered_map<uint32, uint32> RandomEnchSuffixValues;
 
 void LoadRandomEnchantmentsTable()
 {
@@ -64,9 +69,11 @@ void LoadRandomEnchantmentsTable()
             uint32 entry = fields[0].Get<uint32>();
             uint32 ench = fields[1].Get<uint32>();
             float chance = fields[2].Get<float>();
+            uint32 propertyFamily = RandomEnchPropertyValues[ench];
+            uint32 suffixFamily = RandomEnchSuffixValues[ench];
 
             if (chance > 0.000001f && chance <= 100.0f)
-                RandomItemEnch[entry].push_back(EnchStoreItem(ench, chance));
+                RandomItemEnch[entry].push_back(EnchStoreItem(ench, chance, propertyFamily, suffixFamily));
 
             ++count;
         } while (result->NextRow());
@@ -83,6 +90,17 @@ void LoadRandomEnchantmentsTable()
 
 uint32 GetItemEnchantMod(int32 entry)
 {
+    uint32 propertyFamily = 0;
+    uint32 suffixFamily = 0;
+
+    return GetItemEnchantMod(entry, propertyFamily, suffixFamily);
+}
+
+uint32 GetItemEnchantMod(int32 entry, uint32& propertyFamily, uint32& suffixFamily)
+{
+    propertyFamily = 0;
+    suffixFamily = 0;
+
     if (!entry)
         return 0;
 
@@ -104,7 +122,11 @@ uint32 GetItemEnchantMod(int32 entry)
         fCount += ench_iter->chance;
 
         if (fCount > dRoll)
+        {
+            propertyFamily = ench_iter->propertyFamily;
+            suffixFamily = ench_iter->suffixFamily;
             return ench_iter->ench;
+        }
     }
 
     //we could get here only if sum of all enchantment chances is lower than 100%
@@ -116,10 +138,46 @@ uint32 GetItemEnchantMod(int32 entry)
         fCount += ench_iter->chance;
 
         if (fCount > dRoll)
+        {
+            propertyFamily = ench_iter->propertyFamily;
+            suffixFamily = ench_iter->suffixFamily;
             return ench_iter->ench;
+        }
     }
 
     return 0;
+}
+
+void LoadRochenoireRandomEnchantmentsTable()
+{
+    uint32 oldMSTime = getMSTime();
+
+    RandomEnchPropertyValues.clear();
+    RandomEnchSuffixValues.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT ench, propertyFamily, suffixFamily FROM rochenoire_enchantment_family");
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 Enchantment suffix values. DB table `rochenoire_enchantment_family` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 ench = fields[0].Get<uint32>();
+        uint32 propertyFamily = fields[1].Get<uint32>();
+        uint32 suffixFamily = fields[2].Get<uint32>();
+
+        if (propertyFamily > 0)
+            RandomEnchPropertyValues[ench] = propertyFamily;
+        if (suffixFamily > 0)
+            RandomEnchSuffixValues[ench] = suffixFamily;
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Enchantment suffix values in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 uint32 GenerateEnchSuffixFactor(uint32 item_id)

@@ -82,7 +82,7 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
 
         uint8 playerLevel = player->GetLevel();
         sScriptMgr->OnPlayerBeforeGetLevelForXPGain(player, playerLevel);
-        gain = BaseGain(playerLevel, unit->GetLevel(), GetContentLevelsForMapAndZone(unit->GetMapId(), unit->GetZoneId()));
+        gain = BaseGain(playerLevel, unit->getLevelForTarget(player), GetContentLevelsForMapAndZone(unit->GetMapId(), unit->GetZoneId()));
 
         if (gain && creature)
         {

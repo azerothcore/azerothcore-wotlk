@@ -1133,6 +1133,9 @@ void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
         return;
 
     Unit* target = aurApp->GetTarget();
+    int32 amount = GetAmount();
+    if (!(aurApp->IsPositive() || aurApp->IsSelfcasted()))
+        amount = int32(sObjectMgr->ScaleDamage(GetCaster(), target, float(amount), SPELLTYPE_AMORMAGICPEN));
 
     // Update serverside orientation of tracking channeled auras on periodic update ticks
     // exclude players because can turn during channeling and shouldn't desync orientation client/server
@@ -4186,15 +4189,19 @@ void AuraEffect::HandleModTargetResistance(AuraApplication const* aurApp, uint8 
 
     Unit* target = aurApp->GetTarget();
 
+    int32 amount = GetAmount();
+    if (!(aurApp->IsPositive() || aurApp->IsSelfcasted()))
+        amount = int32(sObjectMgr->ScaleDamage(GetCaster(), target, float(amount), SPELLTYPE_AMORMAGICPEN));
+
     // applied to damage as HandleNoImmediateEffect in Unit::CalcAbsorbResist and Unit::CalcArmorReducedDamage
 
     // show armor penetration
     if (target->IsPlayer() && (GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
-        target->ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_PHYSICAL_RESISTANCE, GetAmount(), apply);
+        target->ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_PHYSICAL_RESISTANCE, amount, apply);
 
     // show as spell penetration only full spell penetration bonuses (all resistances except armor and holy
     if (target->IsPlayer() && (GetMiscValue() & SPELL_SCHOOL_MASK_SPELL) == SPELL_SCHOOL_MASK_SPELL)
-        target->ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, GetAmount(), apply);
+        target->ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, amount, apply);
 }
 
 /********************************/
@@ -4213,6 +4220,9 @@ void AuraEffect::HandleAuraModStat(AuraApplication const* aurApp, uint8 mode, bo
     }
 
     Unit* target = aurApp->GetTarget();
+    float amount = float(GetAmount());
+    if (!(aurApp->IsPositive() || aurApp->IsSelfcasted()))
+        amount = sObjectMgr->ScaleDamage(GetCaster(), target, amount, SPELLTYPE_CHARSTAT);
     int32 spellGroupVal = target->GetHighestExclusiveSameEffectSpellGroupValue(this, SPELL_AURA_MOD_STAT, true, GetMiscValue());
     if (std::abs(spellGroupVal) >= std::abs(GetAmount()))
         return;
@@ -4223,9 +4233,9 @@ void AuraEffect::HandleAuraModStat(AuraApplication const* aurApp, uint8 mode, bo
         if (GetMiscValue() < 0 || GetMiscValue() == i)
         {
             if (spellGroupVal)
-                target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(GetAmount()), !apply);
+                target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, amount, !apply);
 
-            target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(GetAmount()), apply);
+            target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, amount, apply);
             if (target->IsPlayer() || target->IsPet())
                 target->UpdateStatBuffMod(Stats(i));
         }
@@ -6340,6 +6350,13 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
     sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage, GetSpellInfo());
 
+    if (caster)
+    {
+        bool isScaled = false;
+        float ratio = 1.0f;
+        damage = uint32(std::lround(sObjectMgr->ScaleDamage(caster, target, float(damage), isScaled, ratio, GetSpellInfo(), SpellEffIndex(GetEffIndex()))));
+    }
+
     if (target->GetAI())
     {
         target->GetAI()->OnCalculatePeriodicTickReceived(damage, caster);
@@ -6553,6 +6570,9 @@ void AuraEffect::HandlePeriodicHealthFunnelAuraTick(Unit* target, Unit* caster) 
     }
 
     uint32 damage = std::max(GetAmount(), 0);
+    if (caster)
+        damage = uint32(std::lround(sObjectMgr->ScaleDamage(caster, target, float(damage))));
+
     // do not kill health donator
     if (caster->GetHealth() < damage)
         damage = caster->GetHealth() - 1;
@@ -6665,6 +6685,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     }
 
     HealInfo healInfo(caster, target, heal, GetSpellInfo(), GetSpellInfo()->GetSchoolMask());
+    healInfo.ScaleValuesForTarget();
     Unit::CalcHealAbsorb(healInfo);
     int32 gain = Unit::DealHeal(caster, target, healInfo.GetHeal());
     healInfo.SetEffectiveHeal(gain);
@@ -6748,7 +6769,10 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
     if (PowerType == POWER_MANA)
         drainAmount -= target->GetSpellCritDamageReduction(drainAmount);
 
-    int32 drainedAmount = -target->ModifyPower(PowerType, -drainAmount);
+    float ratio = 1.0f;
+    int32 scaledDrainAmount = int32(std::lround(sObjectMgr->ScaleDamage(caster, target, float(drainAmount), ratio, SPELLTYPE_POWER)));
+
+    int32 drainedAmount = -target->ModifyPower(PowerType, -scaledDrainAmount);
 
     float gainMultiplier = GetSpellInfo()->Effects[GetEffIndex()].CalcValueMultiplier(caster);
 
@@ -6756,6 +6780,8 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
     target->SendPeriodicAuraLog(&pInfo);
 
     int32 gainAmount = int32(drainedAmount * gainMultiplier);
+    if (scaledDrainAmount)
+        gainAmount = int32(std::lround(float(gainAmount) / scaledDrainAmount * drainAmount));
     int32 gainedAmount = 0;
     if (gainAmount)
     {
@@ -6870,7 +6896,10 @@ void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) con
     if (PowerType == POWER_MANA)
         damage -= target->GetSpellCritDamageReduction(damage);
 
-    uint32 gain = uint32(-target->ModifyPower(PowerType, -damage));
+    float ratio = 1.0f;
+    int32 scaledDamage = int32(std::lround(sObjectMgr->ScaleDamage(caster, target, float(damage), ratio, SPELLTYPE_POWER)));
+
+    uint32 gain = uint32(-target->ModifyPower(PowerType, -scaledDamage));
 
     float dmgMultiplier = GetSpellInfo()->Effects[GetEffIndex()].CalcValueMultiplier(caster);
 

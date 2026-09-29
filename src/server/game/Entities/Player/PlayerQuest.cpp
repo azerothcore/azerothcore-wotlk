@@ -489,10 +489,11 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
     {
         if (quest->RewardChoiceItemId[reward])
         {
-            InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardChoiceItemId[reward], quest->RewardChoiceItemCount[reward]);
+            uint32 itemId = LootStore::LoadScaledLoot(quest->RewardChoiceItemId[reward], this);
+            InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardChoiceItemCount[reward]);
             if (res != EQUIP_ERR_OK)
             {
-                SendEquipError(res, nullptr, nullptr, quest->RewardChoiceItemId[reward]);
+                SendEquipError(res, nullptr, nullptr, itemId);
                 return false;
             }
         }
@@ -504,10 +505,11 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
         {
             if (quest->RewardItemId[i])
             {
-                InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardItemId[i], quest->RewardItemIdCount[i]);
+                uint32 itemId = LootStore::LoadScaledLoot(quest->RewardItemId[i], this);
+                InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardItemIdCount[i]);
                 if (res != EQUIP_ERR_OK)
                 {
-                    SendEquipError(res, nullptr, nullptr, quest->RewardItemId[i]);
+                    SendEquipError(res, nullptr, nullptr, itemId);
                     return false;
                 }
             }
@@ -709,6 +711,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     {
         if (uint32 itemId = quest->RewardChoiceItemId[reward])
         {
+            itemId = LootStore::LoadScaledLoot(itemId, this);
             ItemPosCountVec dest;
             if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardChoiceItemCount[reward]) == EQUIP_ERR_OK)
             {
@@ -730,6 +733,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         {
             if (uint32 itemId = quest->RewardItemId[i])
             {
+                itemId = LootStore::LoadScaledLoot(itemId, this);
                 ItemPosCountVec dest;
                 if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardItemIdCount[i]) == EQUIP_ERR_OK)
                 {

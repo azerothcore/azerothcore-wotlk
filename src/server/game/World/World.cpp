@@ -521,6 +521,7 @@ void World::SetInitialWorldSettings()
     sSpellMgr->LoadSpellEnchantProcData();
 
     LOG_INFO("server.loading", "Loading Item Random Enchantments Table...");
+    LoadRochenoireRandomEnchantmentsTable();
     LoadRandomEnchantmentsTable();
 
     LOG_INFO("server.loading", "Loading Disables");
@@ -528,6 +529,11 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Items...");                         // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr->LoadItemTemplates();
+    sObjectMgr->LoadZoneScale();
+    sObjectMgr->LoadLevelScaleCreature();
+    sObjectMgr->LoadLevelScaleCreatureTemplate();
+    sObjectMgr->LoadLootConsumableScale();
+    sObjectMgr->LoadItemsNotScaledFromVendors();
 
     LOG_INFO("server.loading", "Loading Item Set Names...");                // must be after LoadItemPrototypes
     sObjectMgr->LoadItemSetNames();
@@ -721,6 +727,7 @@ void World::SetInitialWorldSettings()
     sServerMailMgr->LoadMailServerTemplates();
 
     // Loot tables
+    LoadRochenoireSmartLootTable("creature_loot_template");
     LoadLootTables();
 
     LOG_INFO("server.loading", "Loading Skill Discovery Table...");

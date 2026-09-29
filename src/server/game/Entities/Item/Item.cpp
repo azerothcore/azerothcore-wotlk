@@ -622,6 +622,15 @@ uint32 Item::GetSpell()
 
 int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
 {
+    uint32 propertyFamily = 0;
+    uint32 suffixFamily = 0;
+    return GenerateItemRandomPropertyId(item_id, propertyFamily, suffixFamily);
+}
+
+int32 Item::GenerateItemRandomPropertyId(uint32 item_id, uint32& propertyFamily, uint32& suffixFamily)
+{
+    propertyFamily = 0;
+    suffixFamily = 0;
     ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item_id);
 
     if (!itemProto)
@@ -641,7 +650,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     // RandomProperty case
     if (itemProto->RandomProperty)
     {
-        uint32 randomPropId = GetItemEnchantMod(itemProto->RandomProperty);
+        uint32 randomPropId = GetItemEnchantMod(itemProto->RandomProperty, propertyFamily, suffixFamily);
         ItemRandomPropertiesEntry const* random_id = sItemRandomPropertiesStore.LookupEntry(randomPropId);
         if (!random_id)
         {
@@ -654,7 +663,7 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     // RandomSuffix case
     else
     {
-        uint32 randomPropId = GetItemEnchantMod(itemProto->RandomSuffix);
+        uint32 randomPropId = GetItemEnchantMod(itemProto->RandomSuffix, propertyFamily, suffixFamily);
         ItemRandomSuffixEntry const* random_id = sItemRandomSuffixStore.LookupEntry(randomPropId);
         if (!random_id)
         {

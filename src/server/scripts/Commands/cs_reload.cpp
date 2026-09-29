@@ -111,8 +111,14 @@ public:
             { "gossip_menu",                   HandleReloadGossipMenuCommand,                 rbac::RBAC_PERM_COMMAND_RELOAD_GOSSIP_MENU, Console::Yes },
             { "gossip_menu_option",            HandleReloadGossipMenuOptionCommand,           rbac::RBAC_PERM_COMMAND_RELOAD_GOSSIP_MENU_OPTION, Console::Yes },
             { "item_enchantment_template",     HandleReloadItemEnchantementsCommand,          rbac::RBAC_PERM_COMMAND_RELOAD_ITEM_ENCHANTMENT_TEMPLATE, Console::Yes },
+            { "rochenoire_enchantment_family", HandleReloadRochenoireEnchantmentsCommand,     rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
+            { "rochenoire_smart_loot",         HandleReloadRochenoireSmartLootCommand,         rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "item_loot_template",            HandleReloadLootTemplatesItemCommand,          rbac::RBAC_PERM_COMMAND_RELOAD_ITEM_LOOT_TEMPLATE, Console::Yes },
             { "item_set_names",                HandleReloadItemSetNamesCommand,               rbac::RBAC_PERM_COMMAND_RELOAD_ITEM_SET_NAMES, Console::Yes },
+            { "rochenoire_scale_zone",         HandleReloadRochenoireScaleZoneCommand,        rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
+            { "rochenoire_scale_creature",     HandleReloadRochenoireScaleCreatureCommand,    rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
+            { "rochenoire_scale_consumable_loot", HandleReloadRochenoireScaleLootCommand,     rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
+            { "rochenoire_items_not_scaled_from_vendors", HandleReloadRochenoireVendorItemsCommand, rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "lfg_dungeon_rewards",           HandleReloadLfgRewardsCommand,                 rbac::RBAC_PERM_COMMAND_RELOAD_LFG_DUNGEON_REWARDS, Console::Yes },
             { "achievement_reward_locale",     HandleReloadLocalesAchievementRewardCommand,   rbac::RBAC_PERM_COMMAND_RELOAD_ACHIEVEMENT_REWARD_LOCALE, Console::Yes },
             { "creature_template_locale",      HandleReloadLocalesCreatureCommand,            rbac::RBAC_PERM_COMMAND_RELOAD_CREATURE_TEMPLATE_LOCALE, Console::Yes },
@@ -1297,6 +1303,51 @@ public:
         sObjectMgr->LoadSpawnGroupTemplates();
         sObjectMgr->LoadSpawnGroups();
         handler->SendGlobalGMSysMessage("DB tables `spawn_group_template` and `spawn_group` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadRochenoireEnchantmentsCommand(ChatHandler* handler)
+    {
+        LoadRochenoireRandomEnchantmentsTable();
+        LoadRandomEnchantmentsTable();
+        handler->SendGlobalGMSysMessage("Rochenoire enchantment families reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadRochenoireSmartLootCommand(ChatHandler* handler)
+    {
+        LoadRochenoireSmartLootTable("creature_loot_template");
+        LoadLootTemplates_Creature();
+        handler->SendGlobalGMSysMessage("Rochenoire smart loot reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadRochenoireScaleZoneCommand(ChatHandler* handler)
+    {
+        sObjectMgr->LoadZoneScale();
+        handler->SendGlobalGMSysMessage("Rochenoire zone scaling reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadRochenoireScaleCreatureCommand(ChatHandler* handler)
+    {
+        sObjectMgr->LoadLevelScaleCreature();
+        sObjectMgr->LoadLevelScaleCreatureTemplate();
+        handler->SendGlobalGMSysMessage("Rochenoire creature level scaling reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadRochenoireScaleLootCommand(ChatHandler* handler)
+    {
+        sObjectMgr->LoadLootConsumableScale();
+        handler->SendGlobalGMSysMessage("Rochenoire consumable loot scaling reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadRochenoireVendorItemsCommand(ChatHandler* handler)
+    {
+        sObjectMgr->LoadItemsNotScaledFromVendors();
+        handler->SendGlobalGMSysMessage("Rochenoire vendor item exclusions reloaded.");
         return true;
     }
 };

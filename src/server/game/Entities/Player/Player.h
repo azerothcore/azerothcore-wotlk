@@ -2287,6 +2287,7 @@ public:
     std::vector<ItemSetEffect*> ItemSetEff;
 
     void SendLoot(ObjectGuid guid, LootType loot_type);
+    void GetScaledLootForPlayer(Loot* loot);
     void SendLootError(ObjectGuid guid, LootError error);
     void SendLootRelease(ObjectGuid guid);
     void SendNotifyLootItemRemoved(uint8 lootSlot);

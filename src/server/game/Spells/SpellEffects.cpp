@@ -1518,7 +1518,8 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
     if (unitCaster && m_spellInfo->Id == 8129)
     {
-        int32 maxDamage = int32(CalculatePct(unitCaster->GetMaxPower(PowerType), damage * 2));
+        float ratio = 1.0f;
+        int32 maxDamage = int32(CalculatePct(sObjectMgr->ScaleDamage(unitCaster, unitTarget, unitCaster->GetMaxPower(PowerType), ratio, SPELLTYPE_POWER), damage * 2));
         damage = int32(CalculatePct(unitTarget->GetMaxPower(PowerType), damage));
         damage = std::min(damage, maxDamage);
 
@@ -1531,7 +1532,10 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     if (PowerType == POWER_MANA)
         power -= unitTarget->GetSpellCritDamageReduction(power);
 
-    int32 newDamage = -(unitTarget->ModifyPower(PowerType, -power));
+    float ratio = 1.0f;
+    int32 newDamage = -(unitTarget->ModifyPower(PowerType, -int32(std::lround(sObjectMgr->ScaleDamage(unitCaster, unitTarget, float(power), ratio, SPELLTYPE_POWER)))));
+    if (ratio != 0.0f)
+        newDamage = int32(std::lround(float(newDamage) / ratio));
 
     // NO - Not a typo - EffectPowerBurn uses effect value multiplier - not effect damage multiplier
     float dmgMultiplier = m_spellInfo->Effects[effIndex].CalcValueMultiplier(m_originalCaster, this);

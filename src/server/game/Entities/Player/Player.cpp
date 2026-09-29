@@ -8362,6 +8362,8 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     // need know merged fishing/corpse loot type for achievements
     loot->loot_type = loot_type;
 
+    GetScaledLootForPlayer(loot);
+
     if (!sScriptMgr->OnAllowedToLootContainerCheck(this, guid))
     {
         SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
@@ -8389,6 +8391,21 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     }
     else
         SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
+}
+
+void Player::GetScaledLootForPlayer(Loot* loot)
+{
+    if (!loot)
+        return;
+
+    uint32 playerLevel = getAreaZoneLevel();
+    uint32 maxSlot = loot->GetMaxSlotInLootFor(this);
+    for (uint32 slot = 0; slot < maxSlot; ++slot)
+    {
+        LootItem* lootItem = loot->LootItemInSlot(slot, this);
+        if (lootItem)
+            lootItem->ScaleForPlayer(playerLevel, this);
+    }
 }
 
 void Player::SendLootError(ObjectGuid guid, LootError error)

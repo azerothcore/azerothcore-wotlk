@@ -135,12 +135,13 @@ struct LootStoreItem
     uint8   mincount;                           // mincount for drop items
     uint8   maxcount;                           // max drop count for the item mincount or Ref multiplicator
     ConditionList conditions;                   // additional loot condition
+    int8    lootInfo;
 
     // Constructor
     // displayid is filled in IsValid() which must be called after
-    LootStoreItem(uint32 _itemid, int32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
+    LootStoreItem(uint32 _itemid, int32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount, int8 _lootInfo = -1)
         : itemid(_itemid), reference(_reference), chance(_chance), needs_quest(_needs_quest),
-          lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
+          lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount), lootInfo(_lootInfo)
     {}
 
     bool Roll(bool rate, Player const* player, Loot& loot, LootStore const& store) const;   // Checks if the entry takes it's chance (at loot generation)
@@ -153,6 +154,9 @@ typedef GuidSet AllowedLooterSet;
 struct LootItem
 {
     uint32  itemid;
+    uint32  loot_level = 0;
+    bool    has_random_property = false;
+    bool    has_random_suffix = false;
     uint32  itemIndex;
     uint32  randomSuffix;
     int32   randomPropertyId;
@@ -168,10 +172,15 @@ struct LootItem
     bool    needs_quest       : 1;                          // quest drop
     bool    follow_loot_rules : 1;
     uint8   groupid           : 7;
+    uint32  randomPropertyFamily = 0;
+    uint32  randomSuffixFamily = 0;
 
     // Constructor, copies most fields from LootStoreItem, generates random count and random suffixes/properties
     // Should be called for non-reference LootStoreItem entries only (reference = 0)
     explicit LootItem(LootStoreItem const& li);
+
+    void ScaleForPlayer(uint32 playerLevel, Player* player);
+    void GetScaledValuesForPlayer(uint32 playerLevel, Player* player, uint32& scaledItemId, uint32& scaledRandomSuffix, int32& scaledRandomProperty) const;
 
     LootItem() = default;
 
@@ -231,6 +240,10 @@ public:
     [[nodiscard]] char const* GetName() const { return m_name; }
     [[nodiscard]] char const* GetEntryName() const { return m_entryName; }
     [[nodiscard]] bool IsRatesAllowed() const { return m_ratesAllowed; }
+
+    static uint32 LoadScaledLoot(uint32 itemId, Player* player, uint32 forcedLevel = 0);
+    static uint32 LoadScaledLoot(uint32 itemId, uint32 playerLevel, Player* player = nullptr);
+    static uint32 LoadScaledParent(uint32 itemId);
 protected:
     uint32 LoadLootTable();
     void Clear();
@@ -437,6 +450,7 @@ void LoadLootTemplates_Prospecting();
 
 void LoadLootTemplates_Spell();
 void LoadLootTemplates_Reference();
+void LoadRochenoireSmartLootTable(char const* tableName);
 
 void LoadLootTemplates_Player();
 

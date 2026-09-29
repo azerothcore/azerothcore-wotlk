@@ -346,6 +346,11 @@ private:
     DamageEffectType const m_damageType;
     WeaponAttackType m_attackType;
     uint32 m_absorb;
+    uint32 m_altHeal;
+    uint32 m_altAbsorb;
+    float m_ratio;
+    bool m_hasBeenScaled;
+    bool m_isValuesForTarget;
     uint32 m_resist;
     uint32 m_block;
     uint32 m_cleanDamage;
@@ -391,6 +396,11 @@ private:
     uint32 m_healBeforeTakenMods;
     uint32 m_effectiveHeal;
     uint32 m_absorb;
+    uint32 m_altHeal;
+    uint32 m_altAbsorb;
+    float m_ratio;
+    bool m_hasBeenScaled;
+    bool m_isValuesForTarget;
     SpellInfo const* const m_spellInfo;
     SpellSchoolMask const m_schoolMask;
     uint32 m_hitMask;
@@ -399,8 +409,15 @@ public:
         : m_healer(_healer), m_target(_target), m_heal(_heal), m_healBeforeTakenMods(0), m_spellInfo(_spellInfo), m_schoolMask(_schoolMask), m_hitMask(0)
     {
         m_absorb = 0;
+        m_altHeal = 0;
+        m_altAbsorb = 0;
+        m_ratio = 1.0f;
+        m_hasBeenScaled = false;
+        m_isValuesForTarget = true;
         m_effectiveHeal = 0;
     }
+
+    void ScaleValuesForTarget();
 
     void AbsorbHeal(uint32 amount)
     {
@@ -429,10 +446,10 @@ public:
 
     [[nodiscard]] Unit* GetHealer() const { return m_healer; }
     [[nodiscard]] Unit* GetTarget() const { return m_target; }
-    [[nodiscard]] uint32 GetHeal() const { return m_heal; }
+    [[nodiscard]] uint32 GetHeal() const { return m_hasBeenScaled ? (m_isValuesForTarget ? m_altHeal : m_heal) : m_heal; }
     [[nodiscard]] uint32 GetHealBeforeTakenMods() const { return m_healBeforeTakenMods; }
     [[nodiscard]] uint32 GetEffectiveHeal() const { return m_effectiveHeal; }
-    [[nodiscard]] uint32 GetAbsorb() const { return m_absorb; }
+    [[nodiscard]] uint32 GetAbsorb() const { return m_hasBeenScaled ? (m_isValuesForTarget ? m_altAbsorb : m_absorb) : m_absorb; }
     [[nodiscard]] SpellInfo const* GetSpellInfo() const { return m_spellInfo; };
     [[nodiscard]] SpellSchoolMask GetSchoolMask() const { return m_schoolMask; };
     [[nodiscard]] uint32 GetHitMask() const { return m_hitMask; }
@@ -504,6 +521,21 @@ struct CalcDamageInfo
     uint32 procVictim;
     uint32 cleanDamage;          // Used only for rage calculation
     MeleeHitOutcome hitOutCome;  /// @todo: remove this field (need use TargetState)
+
+    struct
+    {
+        uint32 damage;
+        uint32 absorb;
+        uint32 resist;
+    } alt_damages[MAX_ITEM_PROTO_DAMAGES];
+    float ratio;
+    bool scaled;
+    bool isValuesForTarget;
+
+    uint32 GetTargetDamage(uint8 index) const { return scaled ? (isValuesForTarget ? damages[index].damage : alt_damages[index].damage) : damages[index].damage; }
+    uint32 GetAttackerDamage(uint8 index) const { return scaled ? (!isValuesForTarget ? damages[index].damage : alt_damages[index].damage) : damages[index].damage; }
+    void SetTargetDamage(uint32 value, uint8 index) { isValuesForTarget ? damages[index].damage = value : alt_damages[index].damage = value; }
+    void SetAttackerDamage(uint32 value, uint8 index) { !isValuesForTarget ? damages[index].damage = value : alt_damages[index].damage = value; }
 };
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
@@ -511,7 +543,8 @@ struct SpellNonMeleeDamage
 {
     SpellNonMeleeDamage(Unit* _attacker, Unit* _target, SpellInfo const* _spellInfo, uint32 _schoolMask)
         : target(_target), attacker(_attacker), spellInfo(_spellInfo), damage(0), overkill(0), schoolMask(_schoolMask),
-          absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0)
+          absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0),
+           alt_damage(0), alt_absorb(0), alt_resist(0), alt_blocked(0), ratio(1.0f), scaled(false), isValuesForTarget(false)
     {}
 
     Unit* target;
@@ -528,6 +561,13 @@ struct SpellNonMeleeDamage
     uint32 HitInfo;
     // Used for help
     uint32 cleanDamage;
+    uint32 alt_damage;
+    uint32 alt_absorb;
+    uint32 alt_resist;
+    uint32 alt_blocked;
+    float ratio;
+    bool scaled;
+    bool isValuesForTarget;
 };
 
 struct SpellPeriodicAuraLogInfo
@@ -952,7 +992,7 @@ public:
 
     // Threat related methods
     [[nodiscard]] bool CanHaveThreatList(bool skipAliveCheck = false) const;
-    void AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
+    void AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr, bool isScaled = true);
     void AtTargetAttacked(Unit* target, bool canInitialAggro);
 
     // ThreatManager/CombatManager accessors
@@ -1254,6 +1294,15 @@ public:
     virtual void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex = 0) = 0;
     void CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, WeaponAttackType attackType = BASE_ATTACK, const bool sittingVictim = false);
     void CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType = BASE_ATTACK, bool crit = false);
+    void SetRatioInCalcDamageInfoForTarget(CalcDamageInfo* damageInfo);
+    void SetDamageInfoForTarget(CalcDamageInfo* damageInfo);
+    void ComputeScaledDamageInfo(CalcDamageInfo* damageInfo);
+    void FormatDamageInfoForPacketSender(CalcDamageInfo* damageInfo);
+    void SetRatioInSpellNonMeleeDamageForTarget(SpellNonMeleeDamage* damageInfo);
+    void SetSpellNonMeleeDamageForTarget(SpellNonMeleeDamage* damageInfo);
+    void ComputeScaledSpellNonMeleeDamage(SpellNonMeleeDamage* damageInfo);
+    void FormatSpellNonMeleeDamageForPacketSender(SpellNonMeleeDamage* damageInfo, bool forAttacker = true);
+    void SwitchDataForSpellNonMeleeDamage(SpellNonMeleeDamage* damageInfo);
     float CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffectType damagetype) const;
 
     // Melee damage bonus
