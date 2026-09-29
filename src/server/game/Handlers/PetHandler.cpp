@@ -106,11 +106,15 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     {
         //If a pet is dismissed, m_Controlled will change
         std::vector<Unit*> controlled;
+        std::vector<Creature*> guardians;
         for (Unit::ControlSet::iterator itr = GetPlayer()->m_Controlled.begin(); itr != GetPlayer()->m_Controlled.end(); ++itr)
         {
             // xinef: allow to dissmis dead pets
             if ((*itr)->GetEntry() == pet->GetEntry() && ((*itr)->IsAlive() || (flag == ACT_COMMAND && spellId == COMMAND_ABANDON)))
                 controlled.push_back(*itr);
+            else if (flag == ACT_COMMAND && spellId <= COMMAND_ATTACK && (*itr)->IsCreature() &&
+                (*itr)->ToCreature()->IsGuardian() && !(*itr)->GetCharmInfo() && (*itr)->IsAlive())
+                guardians.push_back((*itr)->ToCreature());
             // xinef: mirror image blizzard
             else if ((*itr)->GetEntry() == NPC_MIRROR_IMAGE && flag == ACT_COMMAND && spellId == COMMAND_FOLLOW)
             {
@@ -121,6 +125,17 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
         for (Unit* pet : controlled)
             if (pet && pet->IsInWorld() && pet->GetMap() == _player->GetMap())
                 HandlePetActionHelper(pet, guid1, spellId, flag, guid2);
+
+        if (!guardians.empty())
+        {
+            Unit* target = spellId == COMMAND_ATTACK ? ObjectAccessor::GetUnit(*_player, guid2) : nullptr;
+            if (spellId == COMMAND_ATTACK && (_player->HasPacifyAura() || !target || !_player->IsValidAttackTarget(target)))
+                return;
+
+            for (Creature* guardian : guardians)
+                if (guardian->IsInWorld() && guardian->GetMap() == _player->GetMap() && guardian->IsAIEnabled)
+                    guardian->AI()->OwnerPetCommand(CommandStates(spellId), target);
+        }
     }
 }
 

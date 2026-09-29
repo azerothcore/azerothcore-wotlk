@@ -212,6 +212,9 @@ public:
     // Called when owner attacks something
     virtual void OwnerAttacked(Unit* target) { OnOwnerCombatInteraction(target); }
 
+    // Called when the owner commands a different pet and this guardian is also controlled by them
+    virtual void OwnerPetCommand(CommandStates /*command*/, Unit* /*target*/) {}
+
     // Default handler for owner combat interactions — makes controlled creatures auto-engage
     void OnOwnerCombatInteraction(Unit* target);
 

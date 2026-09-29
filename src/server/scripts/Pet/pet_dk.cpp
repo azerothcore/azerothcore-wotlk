@@ -51,6 +51,12 @@ enum DeathKnightSpells
     SPELL_GARGOYLE_STRIKE           = 51963,
 };
 
+enum GargoylePoints
+{
+    POINT_GARGOYLE_ARRIVAL = 1,
+    POINT_GARGOYLE_DEPARTURE
+};
+
 struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 {
     npc_pet_dk_ebon_gargoyle(Creature* creature) : ScriptedAI(creature)
@@ -58,16 +64,22 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
         _despawning = false;
         _initialSelection = true;
+        _commandState = COMMAND_ATTACK;
         _targetGUID.Clear();
     }
 
     void MovementInform(uint32 type, uint32 point) override
     {
-        if (type == POINT_MOTION_TYPE && point == 1)
+        if (type != POINT_MOTION_TYPE)
+            return;
+
+        if (point == POINT_GARGOYLE_ARRIVAL)
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);
         }
+        else if (point == POINT_GARGOYLE_DEPARTURE)
+            me->DespawnOrUnsummon();
     }
 
     void JustExitedCombat() override
@@ -81,12 +93,12 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
             return;
 
         me->ClearUnitState(UNIT_STATE_EVADE);
+        me->GetMotionMaster()->Clear(false);
 
-        if (Unit* owner = me->GetOwner())
-        {
-            me->GetMotionMaster()->Clear(false);
+        if (_commandState == COMMAND_STAY)
+            me->GetMotionMaster()->MoveIdle();
+        else if (Unit* owner = me->GetOwner())
             me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
-        }
     }
 
     void InitializeAI() override
@@ -106,7 +118,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         me->SetDisableGravity(true);
 
         float tz = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
-        me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
+        me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, POINT_GARGOYLE_ARRIVAL);
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         _selectionTimer = 2000;
         _initialCastTimer = 0;
@@ -115,6 +127,9 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 
     void MySelectNextTarget()
     {
+        if (_commandState != COMMAND_ATTACK)
+            return;
+
         Unit* owner = me->GetOwner();
         if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_GARGOYLE_STRIKE)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
         {
@@ -156,6 +171,42 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         MySelectNextTarget();
     }
 
+    void OwnerPetCommand(CommandStates command, Unit* target) override
+    {
+        if (_despawning || !me->IsAlive())
+            return;
+
+        if (command == COMMAND_ATTACK)
+        {
+            if (!target || !me->IsValidAttackTarget(target) || !me->CanCreatureAttack(target))
+                return;
+
+            _commandState = command;
+            _initialSelection = false;
+            SetGazeOn(target);
+        }
+        else if (command == COMMAND_FOLLOW || command == COMMAND_STAY)
+        {
+            Unit* owner = me->GetOwner();
+            if (!owner)
+                return;
+
+            _commandState = command;
+            _initialSelection = false;
+            RemoveTargetAura();
+            _targetGUID.Clear();
+            me->AttackStop();
+            me->CombatStop(true);
+            me->InterruptNonMeleeSpells(false);
+            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->Clear(false);
+            if (command == COMMAND_FOLLOW)
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+            else
+                me->GetMotionMaster()->MoveIdle();
+        }
+    }
+
     // Fly away when dismissed
     void FlyAway()
     {
@@ -163,23 +214,21 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 
         // Stop Fighting
         me->CombatStop(true);
+        me->InterruptNonMeleeSpells(false);
         me->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, true);
 
         // Sanctuary
         me->CastSpell(me, SPELL_DK_SANCTUARY, true);
         me->SetReactState(REACT_PASSIVE);
 
-        me->SetSpeed(MOVE_FLIGHT, 1.0f, true);
-        me->SetSpeed(MOVE_RUN, 1.0f, true);
-        float x = me->GetPositionX() + 20 * cos(me->GetOrientation());
-        float y = me->GetPositionY() + 20 * std::sin(me->GetOrientation());
-        float z = me->GetPositionZ() + 40;
-        me->DisableSpline();
+        float x = me->GetPositionX() + 12.0f * std::cos(me->GetOrientation());
+        float y = me->GetPositionY() + 12.0f * std::sin(me->GetOrientation());
+        float z = me->GetPositionZ() + 18.0f;
         me->GetMotionMaster()->Clear(false);
-
-        me->GetMotionMaster()->MoveCharge(x, y, z, 7.0f, 1);
         me->SetCanFly(true);
         me->SetDisableGravity(true);
+        me->GetMotionMaster()->MovePoint(POINT_GARGOYLE_DEPARTURE, x, y, z,
+            FORCED_MOVEMENT_NONE, 7.0f, 0.0f, false);
 
         _despawning = true;
     }
@@ -203,6 +252,14 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
                     break;
                 }
         }
+
+        if (_despawnTimer > 4000 && diff >= _despawnTimer - 4000)
+        {
+            _despawnTimer = 4000;
+            FlyAway();
+            return;
+        }
+
         if (_despawnTimer > 4000)
         {
             _despawnTimer -= diff;
@@ -247,6 +304,13 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
                     }
                 }
             }
+
+            if (Unit* victim = me->GetVictim())
+                if (me->IsWithinMeleeRange(victim))
+                {
+                    me->Attack(victim, true);
+                    DoMeleeAttackIfReady();
+                }
         }
         else
         {
@@ -268,6 +332,7 @@ private:
     int32 _decisionTimer;
     bool _despawning;
     bool _initialSelection;
+    CommandStates _commandState;
 };
 
 struct npc_pet_dk_ghoul : public CombatAI
