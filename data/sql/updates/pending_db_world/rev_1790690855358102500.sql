@@ -2,7 +2,8 @@
 -- A request that is not answered within 10 s fails and resets Shandy, so the next run starts clean.
 -- Shandy respawns 1 s after she leaves, so the next player does not wait the full 5 min spawn timer.
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 36856;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `unit_class` = 2, `unit_flags` = `unit_flags` | 33554432 WHERE `entry` IN (36944, 36945, 36946, 36947);
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `unit_class` = 2, `unit_flags` = `unit_flags` | 33554432
+WHERE `entry` IN (36944, 36945, 36946, 36947);
 
 -- Shandy Glossgleam
 SET @ENTRY := 36856;
