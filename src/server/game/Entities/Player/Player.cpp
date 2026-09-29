@@ -20,9 +20,9 @@
 #include "AchievementMgr.h"
 #include "AreaDefines.h"
 #include "ArenaSpectator.h"
+#include "Battlegrounds/ArenaSeason/ArenaSeasonMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
-#include "ArenaSeasonMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
@@ -16746,6 +16746,103 @@ std::string Player::GetDebugInfo() const
     std::stringstream sstr;
     sstr << Unit::GetDebugInfo();
     return sstr.str();
+}
+
+namespace
+{
+std::array<ServerConfigs, MAX_ITEM_QUALITY> const qualityToCoeff =
+{
+    RATE_WEIGHT_ITEM_POOR, RATE_WEIGHT_ITEM_NORMAL, RATE_WEIGHT_ITEM_UNCOMMON,
+    RATE_WEIGHT_ITEM_RARE, RATE_WEIGHT_ITEM_EPIC, RATE_WEIGHT_ITEM_LEGENDARY,
+    RATE_WEIGHT_ITEM_ARTIFACT, RATE_WEIGHT_ITEM_HEIRLOOM
+};
+}
+
+// Calculate effective item level from usable weapons and armor in equipment/inventory.
+uint32 Player::GetItemLevel() const
+{
+    float totalItemLevel = 0.0f;
+    uint8 itemCount = 0;
+    auto addItem = [&](Item const* item)
+    {
+        ItemTemplate const* proto = item ? item->GetTemplate() : nullptr;
+        if (proto && (proto->Class == ITEM_CLASS_WEAPON || proto->Class == ITEM_CLASS_ARMOR) && CanUseItem(proto) <= EQUIP_ERR_CANT_EQUIP_SKILL)
+        {
+            ++itemCount;
+            totalItemLevel += std::max(static_cast<float>(proto->ItemLevel) * sWorld->getRate(qualityToCoeff[proto->Quality]), 1.0f);
+        }
+    };
+
+    for (int slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+        addItem(GetItemByPos(INVENTORY_SLOT_BAG_0, slot));
+    for (int slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+        addItem(GetItemByPos(INVENTORY_SLOT_BAG_0, slot));
+    for (int bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+        if (Item* bagItem = GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
+            if (Bag* container = bagItem->ToBag())
+            for (uint32 slot = 0; slot < container->GetBagSize(); ++slot)
+                addItem(GetItemByPos(bag, slot));
+
+    totalItemLevel /= std::max(static_cast<float>(itemCount), static_cast<float>(sObjectMgr->GetPlayerExpectedItemCount(GetLevel())));
+    return static_cast<uint32>(std::max(totalItemLevel, 5.0f));
+}
+
+// An item is relevant to smart loot when it is level-appropriate and usable.
+bool Player::IsRelevant(Item const* item) const
+{
+    return item && item->GetTemplate() &&
+        static_cast<float>(item->GetTemplate()->RequiredLevel) / static_cast<float>(GetLevel()) >= 0.75f &&
+        CanUseItem(item->GetTemplate()) == EQUIP_ERR_OK;
+}
+
+// Count relevant items of a quality, optionally including the inventory and bags.
+float Player::countRelevant(uint32 quality, bool inventory) const
+{
+    float count = 0.0f;
+    auto countItem = [&](Item* item)
+    {
+        ItemTemplate const* proto = item ? item->GetTemplate() : nullptr;
+        if (proto && (proto->Class == ITEM_CLASS_WEAPON || proto->Class == ITEM_CLASS_ARMOR) && IsRelevant(item) && proto->Quality == quality)
+            count += 1.0f;
+    };
+
+    for (int slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+        countItem(GetItemByPos(INVENTORY_SLOT_BAG_0, slot));
+    if (inventory)
+    {
+        for (int slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+            countItem(GetItemByPos(INVENTORY_SLOT_BAG_0, slot));
+        for (int bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+            if (Item* bagItem = GetItemByPos(INVENTORY_SLOT_BAG_0, bag))
+                if (Bag* container = bagItem->ToBag())
+                    for (uint32 slot = 0; slot < container->GetBagSize(); ++slot)
+                        countItem(GetItemByPos(bag, slot));
+    }
+    return count;
+}
+
+// Combine item-level and quality-quantity signals into the smart-loot coefficient.
+float Player::GetItemLevelCoeff(uint32 quality) const
+{
+    if (!sWorld->getBoolConfig(CONFIG_BOOL_SMART_LOOT) || GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+        return 1.0f;
+
+    float itemLevelModifier = std::max(static_cast<float>(sObjectMgr->GetPlayerExpectedItemLevel(GetLevel())) / static_cast<float>(GetItemLevel()), 1.0f);
+    float quantityModifier = 1.0f;
+    uint32 level = std::min(static_cast<uint8>(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)), GetLevel());
+    switch (quality)
+    {
+        case ITEM_QUALITY_UNCOMMON:
+        case ITEM_QUALITY_RARE:
+        case ITEM_QUALITY_EPIC:
+            quantityModifier = 1.0f - countRelevant(quality, true);
+            break;
+        default:
+            break;
+    }
+    (void)level;
+    float maxAmount = static_cast<float>(sWorld->getIntConfig(CONFIG_INT32_SMART_LOOT_AMOUNT));
+    return std::min(std::max(itemLevelModifier, quantityModifier), maxAmount);
 }
 
 void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)

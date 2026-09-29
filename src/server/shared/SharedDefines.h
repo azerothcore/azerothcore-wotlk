@@ -26,6 +26,11 @@
 float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
 constexpr float Z_OFFSET_FIND_HEIGHT = 2.0f;
 
+// Rochenoire item-scaling entry range. Items below MIN_ENTRY_SCALE are
+// regular database items; generated scaling items use this reserved range.
+constexpr uint32 MIN_ENTRY_SCALE = 70000;
+constexpr uint32 MAX_REQUIREDLEVEL = 120;
+
 enum SpellEffIndex : uint8
 {
     EFFECT_0 = 0,

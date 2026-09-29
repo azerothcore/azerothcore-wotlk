@@ -1111,6 +1111,14 @@ public:
     [[nodiscard]] uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
     uint8 getLevelForTarget(WorldObject const* /*target*/) const override { return GetLevel(); }
     void SetLevel(uint8 lvl, bool showLevelChange = true);
+    // Rochenoire level offset applied to creature scaling calculations.
+    [[nodiscard]] int8 GetLevelVar() const { return level_var; }
+    void SetLevelVar(int8 var) { level_var = var; }
+    void ModifyLevelVar(int8 var) { level_var += var; }
+    // Returns the configured level range for the unit's current or supplied area/zone.
+    [[nodiscard]] uint8 getAreaZoneLevel(uint32 AreaID = 0, uint32 ZoneID = 0) const;
+    // Indicates whether a configured scaling range applies to the unit's area/zone.
+    [[nodiscard]] bool hasAreaZoneLevel(uint32 AreaID = 0, uint32 ZoneID = 0) const;
 
     // Health methods
     [[nodiscard]] uint32 GetHealth()    const { return GetUInt32Value(UNIT_FIELD_HEALTH); }
@@ -2215,6 +2223,7 @@ protected:
     // xinef: apply resilience
     bool m_applyResilience;
     bool _instantCast;
+    int8 level_var = 0;
 
 private:
     // Legacy proc handlers removed - all procs now use AuraScripts and spell_proc table

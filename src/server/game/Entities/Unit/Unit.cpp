@@ -112,6 +112,47 @@ DamageInfo::DamageInfo(Unit* _attacker, Unit* _victim, uint32 _damage, SpellInfo
     m_block = 0;
 }
 
+// Clamp the unit's effective level to the configured range for its area or zone.
+uint8 Unit::getAreaZoneLevel(uint32 AreaID, uint32 ZoneID) const
+{
+    uint32 area = AreaID != 0 ? AreaID : GetMap() ? GetAreaId() : 0;
+    uint32 zone = ZoneID != 0 ? ZoneID : GetMap() ? GetZoneId() : 0;
+    uint8 level = GetLevel();
+
+    if (ZoneFlex const* zoneFlex = sObjectMgr->GetAreaZoneFlex(area, zone))
+    {
+        if (zoneFlex->IsLowLevel())
+            return level;
+
+        if (level < zoneFlex->LevelRangeMin)
+            return zoneFlex->LevelRangeMin;
+
+        if (level > zoneFlex->LevelRangeMax)
+            return zoneFlex->LevelRangeMax;
+    }
+
+    return level;
+}
+
+// Check whether the unit is inside a configured area/zone scaling range.
+bool Unit::hasAreaZoneLevel(uint32 AreaID, uint32 ZoneID) const
+{
+    uint32 area = AreaID != 0 ? AreaID : GetMap() ? GetAreaId() : 0;
+    uint32 zone = ZoneID != 0 ? ZoneID : GetMap() ? GetZoneId() : 0;
+    uint32 level = GetLevel();
+
+    if (ZoneFlex const* zoneFlex = sObjectMgr->GetAreaZoneFlex(area, zone))
+    {
+        if (zoneFlex->IsLowLevel())
+            return false;
+
+        if (level < zoneFlex->LevelRangeMin || level > zoneFlex->LevelRangeMax)
+            return false;
+    }
+
+    return true;
+}
+
 DamageInfo::DamageInfo(CalcDamageInfo const& dmgInfo) : DamageInfo(DamageInfo(dmgInfo, 0), DamageInfo(dmgInfo, 1))
 {
 }

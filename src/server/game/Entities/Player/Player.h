@@ -2608,6 +2608,14 @@ public:
     float GetAverageItemLevel();
     [[nodiscard]] float GetTotalItemLevel() const;
     float GetAverageItemLevelForDF();
+    // Calculates the player's effective item level for Rochenoire scaling and smart loot.
+    [[nodiscard]] uint32 GetItemLevel() const;
+    // Determines whether an item contributes to the effective item-level calculation.
+    [[nodiscard]] bool IsRelevant(Item const* item) const;
+    // Returns the weighted quantity of relevant items of the requested quality.
+    [[nodiscard]] float countRelevant(uint32 quality, bool inventory) const;
+    // Returns the quality-aware coefficient used by the smart-loot calculation.
+    [[nodiscard]] float GetItemLevelCoeff(uint32 quality) const;
     bool isDebugAreaTriggers;
 
     void ClearWhisperWhiteList() { WhisperList.clear(); }

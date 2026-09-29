@@ -77,13 +77,13 @@ struct MmapTileHeader
 
 // All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
 static_assert(sizeof(MmapTileHeader) == 56, "MmapTileHeader size is not correct, adjust the padding field size");
-static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
+static_assert(sizeof(MmapTileHeader) == sizeof(MmapTileHeader::mmapMagic) +
               sizeof(MmapTileHeader::dtVersion) +
               sizeof(MmapTileHeader::mmapVersion) +
               sizeof(MmapTileHeader::size) +
               sizeof(MmapTileHeader::usesLiquids) +
               sizeof(MmapTileHeader::padding)+
-              sizeof(MmapTileRecastConfig)), "MmapTileHeader has uninitialized padding fields");
+              sizeof(MmapTileRecastConfig), "MmapTileHeader has uninitialized padding fields");
 
 enum NavTerrain
 {
