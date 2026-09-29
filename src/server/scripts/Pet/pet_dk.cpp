@@ -25,6 +25,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "pet_dk.h"
 /*
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "npc_pet_dk_".
@@ -44,12 +45,17 @@ enum DeathKnightSpells
     SPELL_DK_SANCTUARY              = 54661,
     SPELL_DK_NIGHT_OF_THE_DEAD      = 62137,
     SPELL_DK_PET_SCALING            = 61017,
+    SPELL_DK_GHOUL_BIRTH            = 7398,
     // Risen Ally
     SPELL_DK_RAISE_ALLY             = 46619,
     SPELL_GHOUL_FRENZY              = 62218,
     // Gargoyle
     SPELL_GARGOYLE_STRIKE           = 51963,
 };
+
+// Birth has a two-second cast before the client plays its spawn animation.
+static constexpr auto GhoulEmergeTime = 5500ms;
+static constexpr auto RisenGhoulEmergeTime = 5s;
 
 struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 {
@@ -279,15 +285,50 @@ struct npc_pet_dk_ghoul : public CombatAI
         if (!summoner || !summoner->IsPlayer())
             return;
 
-        // Remember the owner's target so we can attack it after the rising stun expires.
-        if (Unit* victim = summoner->ToPlayer()->GetVictim())
+        BeginEmergence(summoner->ToPlayer());
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action != ACTION_DK_GHOUL_EMERGE)
+            return;
+
+        if (Unit* owner = me->GetOwner())
+            if (Player* player = owner->ToPlayer())
+                BeginEmergence(player);
+    }
+
+    void BeginEmergence(Player* owner)
+    {
+        if (_emerging)
+            return;
+
+        _emerging = true;
+        bool guardian = !me->IsPet();
+        if (guardian)
+            me->SetReactState(REACT_PASSIVE);
+        me->SetControlled(true, UNIT_STATE_ROOT);
+        // Risen Ghouls use the Northrend model's emerge animation.
+        me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+
+        scheduler.Schedule(RisenGhoulEmergeTime, [this, guardian](TaskContext /*context*/)
+        {
+            me->SetControlled(false, UNIT_STATE_ROOT);
+            if (guardian)
+                me->SetReactState(REACT_AGGRESSIVE);
+            _emerging = false;
+        });
+
+        // Remember the owner's target so we can attack it after emerging.
+        if (Unit* victim = owner->GetVictim())
             _summonTargetGUID = victim->GetGUID();
     }
 
     void UpdateAI(uint32 diff) override
     {
-        // While stunned (rising animation), don't run CombatAI - just wait.
-        if (me->HasUnitState(UNIT_STATE_STUNNED))
+        scheduler.Update(diff);
+
+        if (_emerging || me->HasUnitState(UNIT_STATE_STUNNED))
             return;
 
         // Once the stun expires, attack the saved target from summon time.
@@ -312,6 +353,7 @@ struct npc_pet_dk_ghoul : public CombatAI
 
 private:
     ObjectGuid _summonTargetGUID;
+    bool _emerging = false;
 };
 
 struct npc_pet_dk_risen_ally : public PossessedAI
@@ -335,11 +377,31 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
 {
     npc_pet_dk_army_of_the_dead(Creature* creature) : AggressorAI(creature) { }
 
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        _emerging = true;
+        me->SetReactState(REACT_PASSIVE);
+        me->SetControlled(true, UNIT_STATE_ROOT);
+        DoCastSelf(SPELL_DK_GHOUL_BIRTH);
+
+        scheduler.Schedule(GhoulEmergeTime, [this](TaskContext /*context*/)
+        {
+            me->SetControlled(false, UNIT_STATE_ROOT);
+            _emerging = false;
+            me->SetReactState(REACT_AGGRESSIVE);
+
+            if (Unit* owner = me->GetOwner())
+                if (Unit* target = owner->GetVictim())
+                    if (me->IsValidAttackTarget(target))
+                        AttackStart(target);
+        });
+    }
+
     // Restrict MoveInLineOfSight aggro to targets already fighting our owner,
     // so ghouls don't pull extra packs on their own.
     bool CanAIAttack(Unit const* target) const override
     {
-        if (!target)
+        if (_emerging || !target)
             return false;
         Unit* owner = me->GetOwner();
         if (owner && !target->IsInCombatWith(owner))
@@ -352,7 +414,7 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
     // may reject the target before combat refs are established.
     void OwnerAttacked(Unit* target) override
     {
-        if (!target || !me->IsAlive() || me->HasReactState(REACT_PASSIVE))
+        if (_emerging || !target || !me->IsAlive() || me->HasReactState(REACT_PASSIVE))
             return;
         if (me->IsValidAttackTarget(target))
             AttackStart(target);
@@ -361,14 +423,19 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
     // Owner was attacked — help defend.
     void OwnerAttackedBy(Unit* attacker) override
     {
-        if (!attacker || !me->IsAlive() || me->HasReactState(REACT_PASSIVE))
+        if (_emerging || !attacker || !me->IsAlive() || me->HasReactState(REACT_PASSIVE))
             return;
         if (me->IsValidAttackTarget(attacker))
             AttackStart(attacker);
     }
 
-    void UpdateAI(uint32 /*diff*/) override
+    void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
+        if (_emerging)
+            return;
+
         if (!UpdateVictim())
         {
             // Re-engage if we still have a valid victim but lost engagement
@@ -386,6 +453,9 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    bool _emerging = false;
 };
 
 struct npc_pet_dk_dancing_rune_weapon : public NullCreatureAI
