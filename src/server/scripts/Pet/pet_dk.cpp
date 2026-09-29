@@ -63,20 +63,28 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
     {
         _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
         _despawning = false;
+        _arrivalPending = true;
+        _arriving = true;
         _initialSelection = true;
+        _pendingCommand = false;
         _commandState = COMMAND_ATTACK;
+        _landingZ = creature->GetPositionZ();
+        _selectionTimer = 0;
+        _initialCastTimer = 0;
+        _decisionTimer = 0;
         _targetGUID.Clear();
     }
 
     void MovementInform(uint32 type, uint32 point) override
     {
-        if (type != POINT_MOTION_TYPE)
+        if (type != EFFECT_MOTION_TYPE)
             return;
 
         if (point == POINT_GARGOYLE_ARRIVAL)
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);
+            _arriving = false;
         }
         else if (point == POINT_GARGOYLE_DEPARTURE)
             me->DespawnOrUnsummon();
@@ -89,6 +97,9 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
+        if (_despawning)
+            return;
+
         if (!_EnterEvadeMode())
             return;
 
@@ -117,8 +128,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         me->SetCanFly(true);
         me->SetDisableGravity(true);
 
-        float tz = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
-        me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, POINT_GARGOYLE_ARRIVAL);
+        _landingZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         _selectionTimer = 2000;
         _initialCastTimer = 0;
@@ -127,7 +137,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 
     void MySelectNextTarget()
     {
-        if (_commandState != COMMAND_ATTACK)
+        if (_arriving || _commandState != COMMAND_ATTACK)
             return;
 
         Unit* owner = me->GetOwner();
@@ -176,6 +186,24 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         if (_despawning || !me->IsAlive())
             return;
 
+        if (_arriving)
+        {
+            if (command == COMMAND_ATTACK)
+            {
+                if (!target || !me->IsValidAttackTarget(target) || !me->CanCreatureAttack(target))
+                    return;
+
+                _commandTargetGUID = target->GetGUID();
+            }
+            else if (command != COMMAND_FOLLOW && command != COMMAND_STAY)
+                return;
+
+            _commandState = command;
+            _pendingCommand = true;
+            _initialSelection = false;
+            return;
+        }
+
         if (command == COMMAND_ATTACK)
         {
             if (!target || !me->IsValidAttackTarget(target) || !me->CanCreatureAttack(target))
@@ -210,6 +238,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
     // Fly away when dismissed
     void FlyAway()
     {
+        _despawning = true;
         RemoveTargetAura();
 
         // Stop Fighting
@@ -221,20 +250,64 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         me->CastSpell(me, SPELL_DK_SANCTUARY, true);
         me->SetReactState(REACT_PASSIVE);
 
-        float x = me->GetPositionX() + 12.0f * std::cos(me->GetOrientation());
-        float y = me->GetPositionY() + 12.0f * std::sin(me->GetOrientation());
+        float angle = me->GetOrientation();
+        if (Unit* owner = me->GetOwner())
+            angle = owner->GetAngle(me);
+
+        float x = me->GetPositionX() + 12.0f * std::cos(angle);
+        float y = me->GetPositionY() + 12.0f * std::sin(angle);
         float z = me->GetPositionZ() + 18.0f;
         me->GetMotionMaster()->Clear(false);
         me->SetCanFly(true);
         me->SetDisableGravity(true);
-        me->GetMotionMaster()->MovePoint(POINT_GARGOYLE_DEPARTURE, x, y, z,
-            FORCED_MOVEMENT_NONE, 7.0f, 0.0f, false);
-
-        _despawning = true;
+        me->GetMotionMaster()->MoveTakeoff(POINT_GARGOYLE_DEPARTURE, x, y, z, 7.0f);
     }
 
     void UpdateAI(uint32 diff) override
     {
+        if (_despawning)
+        {
+            if (_despawnTimer > diff)
+                _despawnTimer -= diff;
+            else
+                me->DespawnOrUnsummon();
+            return;
+        }
+
+        if (_despawnTimer <= 4000 || diff >= _despawnTimer - 4000)
+        {
+            _despawnTimer = 4000;
+            FlyAway();
+            return;
+        }
+
+        _despawnTimer -= diff;
+        _initialCastTimer += diff;
+
+        if (_arrivalPending)
+        {
+            _arrivalPending = false;
+            me->GetMotionMaster()->Clear(false);
+            float x = me->GetPositionX() + 0.2f * std::cos(me->GetOrientation());
+            float y = me->GetPositionY() + 0.2f * std::sin(me->GetOrientation());
+            me->GetMotionMaster()->MoveLand(POINT_GARGOYLE_ARRIVAL, x, y, _landingZ, 7.0f);
+            return;
+        }
+
+        if (_arriving)
+            return;
+
+        if (_pendingCommand)
+        {
+            _pendingCommand = false;
+            Unit* target = ObjectAccessor::GetUnit(*me, _commandTargetGUID);
+            if (_commandState == COMMAND_ATTACK && !target)
+                _initialSelection = true;
+            else
+                OwnerPetCommand(_commandState, target);
+            _commandTargetGUID.Clear();
+        }
+
         if (_initialSelection)
         {
             _initialSelection = false;
@@ -253,75 +326,53 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
                 }
         }
 
-        if (_despawnTimer > 4000 && diff >= _despawnTimer - 4000)
+        _decisionTimer -= diff;
+        if (!UpdateVictimWithGaze())
         {
-            _despawnTimer = 4000;
-            FlyAway();
+            // Re-engage if we still have a valid victim but lost engagement
+            // (e.g., PvP combat reference expired during CC like Cyclone)
+            if (Unit* victim = me->GetVictim())
+            {
+                if (me->IsValidAttackTarget(victim))
+                {
+                    me->EngageWithTarget(victim);
+                    return;
+                }
+            }
+            MySelectNextTarget();
             return;
         }
 
-        if (_despawnTimer > 4000)
+        _selectionTimer += diff;
+        if (_selectionTimer >= 1000)
         {
-            _despawnTimer -= diff;
-            _decisionTimer -= diff;
-            if (!UpdateVictimWithGaze())
-            {
-                // Re-engage if we still have a valid victim but lost engagement
-                // (e.g., PvP combat reference expired during CC like Cyclone)
-                if (Unit* victim = me->GetVictim())
-                {
-                    if (me->IsValidAttackTarget(victim))
-                    {
-                        me->EngageWithTarget(victim);
-                        return;
-                    }
-                }
-                MySelectNextTarget();
-                return;
-            }
-
-            _initialCastTimer += diff;
-            _selectionTimer += diff;
-            if (_selectionTimer >= 1000)
-            {
-                MySelectNextTarget();
-                _selectionTimer = 0;
-            }
-
-            if (_decisionTimer <= 0)
-            {
-                _decisionTimer += 400;
-                if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE && rand_chance() > 20.0f)
-                {
-                    if (me->HasSilenceAura() || me->IsSpellProhibited(SPELL_SCHOOL_MASK_NATURE))
-                    {
-                        me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    }
-                    else
-                    {
-                        me->GetMotionMaster()->MoveChase(me->GetVictim(), 40);
-                        DoCastVictim(SPELL_GARGOYLE_STRIKE);
-                    }
-                }
-            }
-
-            if (Unit* victim = me->GetVictim())
-                if (me->IsWithinMeleeRange(victim))
-                {
-                    me->Attack(victim, true);
-                    DoMeleeAttackIfReady();
-                }
+            MySelectNextTarget();
+            _selectionTimer = 0;
         }
-        else
+
+        if (_decisionTimer <= 0)
         {
-            if (!_despawning)
-                FlyAway();
-
-            if (_despawnTimer > diff)
-                _despawnTimer -= diff;
-            else
-                me->DespawnOrUnsummon();
+            _decisionTimer += 400;
+            if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE && rand_chance() > 20.0f)
+            {
+                if (me->HasSilenceAura() || me->IsSpellProhibited(SPELL_SCHOOL_MASK_NATURE))
+                {
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                }
+                else
+                {
+                    me->GetMotionMaster()->MoveChase(me->GetVictim(), 40);
+                    DoCastVictim(SPELL_GARGOYLE_STRIKE);
+                }
+            }
         }
+
+        if (Unit* victim = me->GetVictim())
+            if (me->IsWithinMeleeRange(victim))
+            {
+                me->Attack(victim, true);
+                DoMeleeAttackIfReady();
+            }
     }
 
 private:
@@ -330,9 +381,14 @@ private:
     uint32 _selectionTimer;
     uint32 _initialCastTimer;
     int32 _decisionTimer;
+    float _landingZ;
     bool _despawning;
+    bool _arrivalPending;
+    bool _arriving;
     bool _initialSelection;
+    bool _pendingCommand;
     CommandStates _commandState;
+    ObjectGuid _commandTargetGUID;
 };
 
 struct npc_pet_dk_ghoul : public CombatAI
