@@ -90,7 +90,22 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 36851 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (36851, 0, 0, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 0, 11, 69659, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aquanos - On Data Set 2 2 - Cast \'Evocation, Visual Only\''),
-(36851, 0, 1, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 0, 50, 201384, 360, 0, 0, 0, 0, 8, 0, 0, 0, 0, 5797.147461, 696.602417, 657.949463, 6.090852, 'Aquanos - On Data Set 3 3 - Summon Gameobject \'Clean Laundry\'');
+(36851, 0, 1, 0, 38, 0, 100, 0, 3, 3, 0, 0, 0, 0, 50, 201384, 60, 0, 0, 0, 0, 8, 0, 0, 0, 0, 5797.147461, 696.602417, 657.949463, 6.090852, 'Aquanos - On Data Set 3 3 - Summon Gameobject \'Clean Laundry\'');
+
+-- Clean Laundry: the template chest is not consumable, so remove it once it is fully looted.
+-- Anyone can open it and an empty loot also counts as looted, so only arm the removal once
+-- a player on the quest has opened it.
+UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 201384;
+
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 201384 AND `source_type` = 1;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(201384, 1, 0, 0, 70, 0, 100, 0, 2, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Clean Laundry - On Loot State Activated - Set Event Phase 1'),
+(201384, 1, 1, 0, 70, 1, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Clean Laundry - On Loot State Just Deactivated - Remove From World (Phase 1)');
+
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` = 1 AND `SourceEntry` = 201384 AND `SourceId` = 1;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 201384, 1, 0, 9, 0, 20438, 0, 0, 0, 0, 0, '', 'Clean Laundry - Opener has A Suitable Disguise (A) incomplete'),
+(22, 1, 201384, 1, 1, 9, 0, 24556, 0, 0, 0, 0, 0, '', 'Clean Laundry - Opener has A Suitable Disguise (H) incomplete');
 
 -- Show each faction's gossip option only while its quest is in progress
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 10854 AND `SourceEntry` IN (0, 1);
