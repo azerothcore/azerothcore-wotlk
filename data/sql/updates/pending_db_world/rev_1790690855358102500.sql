@@ -1,5 +1,6 @@
 -- A Suitable Disguise (20438 / 24556): port Shandy Glossgleam's laundry event to SmartAI (TrinityCore 36414de688).
 -- A request that is not answered within 10 s fails and resets Shandy, so the next run starts clean.
+-- Shandy respawns 1 s after she leaves, so the next player does not wait the full 5 min spawn timer.
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 36856;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `unit_class` = 2, `unit_flags` = `unit_flags` | 33554432 WHERE `entry` IN (36944, 36945, 36946, 36947);
 
@@ -12,7 +13,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 2, 0, 1, 1, 100, 0, 8000, 8000, 12000, 12000, 0, 0, 88, @ENTRY*100+1, @ENTRY*100+4, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shandy Glossgleam - Out of Combat - Run Random Script (Phase 1)'),
 (@ENTRY, 0, 3, 0, 38, 1, 100, 0, 1, 1, 0, 0, 0, 0, 80, @ENTRY*100+5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shandy Glossgleam - On Data Set 1 1 - Run Script (Phase 1)'),
 (@ENTRY, 0, 4, 0, 1, 1, 100, 0, 120000, 120000, 120000, 120000, 0, 0, 80, @ENTRY*100+6, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shandy Glossgleam - Out of Combat - Run Script (Phase 1)'),
-(@ENTRY, 0, 5, 0, 40, 0, 100, 0, 16, @ENTRY, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shandy Glossgleam - On Waypoint 16 Reached - Despawn Instant');
+(@ENTRY, 0, 5, 0, 40, 0, 100, 0, 16, @ENTRY, 0, 0, 0, 0, 41, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shandy Glossgleam - On Waypoint 16 Reached - Despawn Instant (Respawn 1s)');
 
 -- Shandy Glossgleam - start
 DELETE FROM `smart_scripts` WHERE `entryorguid` = @ENTRY*100+0 AND `source_type` = 9;
