@@ -1016,7 +1016,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
     }
 };
 
-
 struct boss_yoggsaron_cloud : public PassiveAI
 {
     static bool clockwise;
