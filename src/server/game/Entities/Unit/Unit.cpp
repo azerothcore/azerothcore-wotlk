@@ -6729,7 +6729,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo)
         data << uint32(0);
 
     //! Probably used for debugging purposes, as it is not known to appear on retail servers
-    if (damageInfo->HitInfo & HITINFO_UNK1)
+    if (damageInfo->HitInfo & HITINFO_DEBUG)
     {
         data << uint32(0);
         data << float(0);
@@ -10204,29 +10204,33 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     return uint32(std::max(tmpDamage, 0.0f));
 }
 
-class spellIdImmunityPredicate
-{
-public:
-    spellIdImmunityPredicate(uint32 type) : _type(type) {}
-    bool operator()(SpellImmune const& spellImmune) { return spellImmune.spellId == 0 && spellImmune.type == _type; }
-
-private:
-    uint32 _type;
-};
-
 void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType /*blockType*/)
 {
     if (apply)
+    {
+        // Immunities with spellId 0 are applied by scripts and are meant to exist only once per type.
+        if (!spellId)
+        {
+            auto bounds = m_spellImmune[op].equal_range(type);
+            for (auto itr = bounds.first; itr != bounds.second; ++itr)
+                if (!itr->second)
+                    return;
+        }
+
         m_spellImmune[op].emplace(type, spellId);
+    }
     else
     {
+        // Remove a single entry: the same spell can be applied by several casters at once (e.g. the four
+        // Magic Barrier channels on Lady Vashj), and each removal must drop only the application it belongs to.
         auto bounds = m_spellImmune[op].equal_range(type);
-        for (auto itr = bounds.first; itr != bounds.second;)
+        for (auto itr = bounds.first; itr != bounds.second; ++itr)
         {
             if (itr->second == spellId)
-                itr = m_spellImmune[op].erase(itr);
-            else
-                ++itr;
+            {
+                m_spellImmune[op].erase(itr);
+                break;
+            }
         }
     }
 }
