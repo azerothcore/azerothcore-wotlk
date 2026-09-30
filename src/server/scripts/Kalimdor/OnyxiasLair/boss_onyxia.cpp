@@ -20,7 +20,10 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "onyxias_lair.h"
+#include <algorithm>
 #include <array>
 
 enum Spells
@@ -31,9 +34,9 @@ enum Spells
     SPELL_TAILSWEEP                 = 68867,
     SPELL_FIREBALL                  = 18392,
     SPELL_BELLOWINGROAR             = 18431,
+    SPELL_DEEP_BREATH_TIMER         = 68800,
 
     SPELL_SUMMON_LAIR_GUARD         = 68968,
-    SPELL_ERUPTION                  = 17731,
 
     SPELL_OLG_BLASTNOVA             = 68958,
     SPELL_OLG_IGNITEWEAPON          = 68959,
@@ -45,10 +48,13 @@ enum Spells
     SPELL_BREATH_S_TO_N             = 18351,
     SPELL_BREATH_E_TO_W             = 18576,
     SPELL_BREATH_W_TO_E             = 18609,
-    SPELL_BREATH_SE_TO_NW           = 18564,
-    SPELL_BREATH_NW_TO_SE           = 18584,
+    SPELL_BREATH_NE_TO_SW           = 18564,
+    SPELL_BREATH_SE_TO_NW           = 18584,
     SPELL_BREATH_SW_TO_NE           = 18596,
-    SPELL_BREATH_NE_TO_SW           = 18617,
+    SPELL_BREATH_NW_TO_SE           = 18617,
+
+    // Each patch triggers the next one, up to 22202
+    SPELL_HEATED_GROUND             = 22191,
 };
 
 enum Events
@@ -58,11 +64,8 @@ enum Events
     EVENT_SPELL_TAILSWEEP           = 3,
     EVENT_SPELL_CLEAVE              = 4,
     EVENT_START_PHASE_2             = 5,
-    EVENT_SPELL_FIREBALL_FIRST      = 6,
-    EVENT_SPELL_FIREBALL_SECOND     = 7,
-    EVENT_PHASE_2_STEP_CW           = 8,
-    EVENT_PHASE_2_STEP_ACW          = 9,
-    EVENT_PHASE_2_STEP_ACROSS       = 10,
+    EVENT_AIR_PHASE_ACTION          = 6,
+    EVENT_DEEP_BREATH_TIMER         = 7,
     EVENT_SPELL_BREATH              = 11,
     EVENT_START_PHASE_3             = 12,
     EVENT_PHASE_3_ATTACK            = 13,
@@ -70,12 +73,9 @@ enum Events
     EVENT_SUMMON_LAIR_GUARD         = 16,
     EVENT_OLG_SPELL_BLASTNOVA       = 18,
     EVENT_OLG_SPELL_IGNITEWEAPON    = 19,
-    EVENT_ERUPTION                  = 20,
 
     EVENT_LIFTOFF                   = 31,
-    EVENT_FLY_S_TO_N                = 32,
-    EVENT_LAND                      = 33,
-    EVENT_END_MANY_WHELPS_TIME
+    EVENT_FLY_S_TO_N                = 32
 };
 
 enum Phases
@@ -99,7 +99,6 @@ enum Points
 {
     POINT_GROUND_SOUTH  = 10,
     POINT_TAKEOFF       = 11,
-    POINT_PRE_LAND      = 12,
     POINT_LAND          = 13
 };
 
@@ -110,17 +109,18 @@ struct OnyxiaMove
     float X, Y, Z, O;
 };
 
+// O is her facing on arrival and for Deep Breath
 static OnyxiaMove const OnyxiaMoveData[] =
 {
-    {0, 0, 0, -64.496f, -214.906f, -84.4f, 0.0f}, // south ground
-    {1, 5, SPELL_BREATH_S_TO_N, -64.496f, -214.906f, -60.0f, 0.0f}, // south
-    {2, 6, SPELL_BREATH_SW_TO_NE, -59.809f, -190.758f, -60.0f, 7 * M_PI / 4}, // south-west
-    {3, 7, SPELL_BREATH_W_TO_E, -29.450f, -180.600f, -60.0f, M_PI + M_PI / 2}, // west
-    {4, 8, SPELL_BREATH_NW_TO_SE, 6.895f, -180.246f, -60.0f, M_PI + M_PI / 4}, // north-west
-    {5, 1, SPELL_BREATH_N_TO_S,  22.876f, -217.152f, -60.0f, M_PI}, // north
-    {6, 2, SPELL_BREATH_NE_TO_SW, 10.2191f, -247.912f, -60.0f, 3 * M_PI / 4}, // north-east
-    {7, 3, SPELL_BREATH_E_TO_W, -31.496f, -250.123f, -60.0f, M_PI / 2}, // east
-    {8, 4, SPELL_BREATH_SE_TO_NW, -63.5156f, -240.096f, -60.0f, M_PI / 4}, // south-east
+    {0, 0, 0, -66.3589f, -215.928f, -84.23904f, 0.0f}, // south ground
+    {1, 5, SPELL_BREATH_S_TO_N, -75.387505f, -215.21892f, -58.02298f, 0.0075448f}, // south
+    {2, 6, SPELL_BREATH_SW_TO_NE, -64.04101f, -188.51236f, -59.439896f, 5.549744f}, // south-west
+    {3, 7, SPELL_BREATH_W_TO_E, -15.713689f, -181.3027f, -62.038284f, 4.2037554f}, // west
+    {4, 8, SPELL_BREATH_NW_TO_SE, 11.944992f, -180.16212f, -60.27321f, 3.9242017f}, // north-west
+    {5, 1, SPELL_BREATH_N_TO_S, 25.16067f, -216.08244f, -58.92215f, 3.2004213f}, // north
+    {6, 2, SPELL_BREATH_NE_TO_SW, 12.422047f, -242.43831f, -60.561646f, 2.6292219f}, // north-east
+    {7, 3, SPELL_BREATH_E_TO_W, -14.978153f, -245.48346f, -60.375755f, 2.0324559f}, // east
+    {8, 4, SPELL_BREATH_SE_TO_NW, -63.786427f, -235.2712f, -60.19681f, 0.5779157f}, // south-east
 };
 
 static_assert(std::size(OnyxiaMoveData) == WP_SOUTH_EAST + 1);
@@ -173,6 +173,9 @@ struct boss_onyxia : public BossAI
     {
         _phase = PHASE_NONE;
         _currentWP = WP_GROUND_SOUTH;
+        _fireballsCast = 0;
+        _fireballsBeforeMoving = 0;
+        _landingPending = false;
         _manyWhelpsAvailable = false;
         _whelpsRespawn = false;
         _pointWhelpGUIDs.fill(ObjectGuid::Empty);
@@ -195,7 +198,8 @@ struct boss_onyxia : public BossAI
                 events.ScheduleEvent(EVENT_START_PHASE_2, 0ms);
                 break;
             case PHASE_LANDED:
-                events.ScheduleEvent(EVENT_START_PHASE_3, 5s);
+                // Runs once the current cast ends: the landing never cuts a Fireball short
+                events.ScheduleEvent(EVENT_START_PHASE_3, 0ms);
                 break;
             default:
                 break;
@@ -208,7 +212,6 @@ struct boss_onyxia : public BossAI
         me->SetReactState(REACT_AGGRESSIVE);
         me->SetCanFly(false);
         me->SetDisableGravity(false);
-        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
         BossAI::Reset();
     }
@@ -241,11 +244,10 @@ struct boss_onyxia : public BossAI
         {
             SetPhase(PHASE_AIRPHASE);
         });
+        // She keeps flying her route and lands at the next waypoint where she has cast a Fireball
         ScheduleHealthCheckEvent(40, [&]
         {
-            me->InterruptNonMeleeSpells(false);
-            summons.DespawnEntry(NPC_WORLD_TRIGGER);
-            SetPhase(PHASE_LANDED);
+            _landingPending = true;
         });
 
         me->SummonCreature(NPC_ONYXIAN_LAIR_GUARD, -167.837936f, -200.549332f, -66.343231f, 5.598287f, TEMPSUMMON_MANUAL_DESPAWN);
@@ -320,9 +322,11 @@ struct boss_onyxia : public BossAI
             if (id >= WP_SOUTH && _phase == PHASE_AIRPHASE)
             {
                 me->SetFacingTo(OnyxiaMoveData[id].O);
-                me->SetSpeed(MOVE_RUN, 1.6f, false);
+                // The first stop, after the long flight north, waits longer before its first Fireball
+                events.ScheduleEvent(EVENT_AIR_PHASE_ACTION, _currentWP == WP_GROUND_SOUTH ? 3250ms : 1400ms);
                 _currentWP = id;
-                events.ScheduleEvent(EVENT_SPELL_FIREBALL_FIRST, 1s);
+                _fireballsCast = 0;
+                _fireballsBeforeMoving = urand(3, 5);
             }
             return;
         }
@@ -330,32 +334,31 @@ struct boss_onyxia : public BossAI
         switch (id)
         {
             case POINT_GROUND_SOUTH:
+                if (_phase != PHASE_AIRPHASE)
+                    break;
                 me->SetFacingTo(OnyxiaMoveData[WP_GROUND_SOUTH].O);
                 events.ScheduleEvent(EVENT_LIFTOFF, 0ms);
                 break;
             case POINT_TAKEOFF:
+                if (_phase != PHASE_AIRPHASE)
+                    break;
                 me->SetFacingTo(OnyxiaMoveData[WP_SOUTH].O);
                 events.ScheduleEvent(EVENT_FLY_S_TO_N, 0ms);
-                break;
-            case POINT_PRE_LAND:
-                me->SetFacingTo(OnyxiaMoveData[WP_SOUTH].O);
-                events.ScheduleEvent(EVENT_LAND, 0ms);
                 break;
             case POINT_LAND:
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
-                events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0ms);
+                events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 2s);
                 break;
             default:
                 break;
         }
     }
 
-    void MoveToWaypoint(uint8 wp)
+    void MoveToWaypoint(uint8 wp, float speed)
     {
         OnyxiaMove const& point = OnyxiaMoveData[wp];
-        me->GetMotionMaster()->MovePoint(wp, point.X, point.Y, point.Z);
+        me->GetMotionMaster()->MovePoint(wp, point.X, point.Y, point.Z, FORCED_MOVEMENT_NONE, speed);
     }
 
     void SummonPointWhelp(uint8 point)
@@ -441,6 +444,7 @@ struct boss_onyxia : public BossAI
             }
             case EVENT_START_PHASE_2:
             {
+                Talk(SAY_PHASE_2_TRANS);
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
                 me->StopMoving();
@@ -451,11 +455,11 @@ struct boss_onyxia : public BossAI
                     _lairGuardTriggerGUID = trigger->GetGUID();
 
                 events.ScheduleEvent(EVENT_SUMMON_LAIR_GUARD, 46s);
+                events.ScheduleEvent(EVENT_DEEP_BREATH_TIMER, 25s, 35s);
                 break;
             }
             case EVENT_LIFTOFF:
             {
-                Talk(SAY_PHASE_2_TRANS);
                 me->SendMeleeAttackStop(me->GetVictim());
                 me->GetMotionMaster()->MoveIdle();
                 me->DisableSpline();
@@ -463,10 +467,14 @@ struct boss_onyxia : public BossAI
                 me->SetDisableGravity(true);
                 me->SetOrientation(OnyxiaMoveData[WP_GROUND_SOUTH].O);
                 me->SendMovementFlagUpdate();
-                me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, OnyxiaMoveData[WP_SOUTH].X + 1.0f, OnyxiaMoveData[WP_SOUTH].Y, OnyxiaMoveData[WP_SOUTH].Z, 12.0f);
+                // Straight up, 20y in 2s
+                me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, OnyxiaMoveData[WP_GROUND_SOUTH].X, OnyxiaMoveData[WP_GROUND_SOUTH].Y, OnyxiaMoveData[WP_GROUND_SOUTH].Z + 20.0f, 10.0f);
                 _manyWhelpsAvailable = true;
-
-                events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10s);
+                // On the scheduler: reaching 40% during takeoff resets the event map before the window would close
+                scheduler.Schedule(10s, [this](TaskContext)
+                {
+                    _manyWhelpsAvailable = false;
+                });
 
                 _whelpsRespawn = true;
                 for (uint8 point = 0; point < std::size(WhelpSpawnPoints); ++point)
@@ -474,13 +482,9 @@ struct boss_onyxia : public BossAI
                 me->SummonCreature(NPC_ONYXIAN_WHELP, WhelpLiftoffOnlyPoint);
                 break;
             }
-            case EVENT_END_MANY_WHELPS_TIME:
-                _manyWhelpsAvailable = false;
-                break;
             case EVENT_FLY_S_TO_N:
             {
-                me->SetSpeed(MOVE_RUN, 2.95f, false);
-                MoveToWaypoint(WP_NORTH);
+                MoveToWaypoint(WP_NORTH, 8.0f);
                 break;
             }
             case EVENT_SUMMON_LAIR_GUARD:
@@ -492,75 +496,73 @@ struct boss_onyxia : public BossAI
                 events.Repeat(46s);
                 break;
             }
-            case EVENT_LAND:
+            case EVENT_DEEP_BREATH_TIMER:
             {
-                Talk(SAY_PHASE_3_TRANS);
-                me->SendMeleeAttackStop(me->GetVictim());
-                me->GetMotionMaster()->MoveLand(POINT_LAND, OnyxiaMoveData[WP_GROUND_SOUTH].X + 1.0f, OnyxiaMoveData[WP_GROUND_SOUTH].Y, OnyxiaMoveData[WP_GROUND_SOUTH].Z, 12.0f);
-                DoResetThreatList();
+                DoCastSelf(SPELL_DEEP_BREATH_TIMER, true);
+                events.Repeat(37s, 62s);
                 break;
             }
-            case EVENT_SPELL_FIREBALL_FIRST:
+            // At a waypoint: Fireballs back to back, a pending Deep Breath once two are out, then on to a neighbour
+            case EVENT_AIR_PHASE_ACTION:
             {
+                if (_landingPending && _fireballsCast > 0)
+                {
+                    summons.DespawnEntry(NPC_WORLD_TRIGGER);
+                    SetPhase(PHASE_LANDED);
+                    break;
+                }
+
+                if (_fireballsCast >= _fireballsBeforeMoving)
+                {
+                    if (urand(0, 1))
+                        MoveToWaypoint(_currentWP == WP_SOUTH_EAST ? WP_SOUTH : _currentWP + 1, 8.0f);
+                    else
+                        MoveToWaypoint(_currentWP == WP_SOUTH ? WP_SOUTH_EAST : _currentWP - 1, 8.0f);
+                    break;
+                }
+
+                if (_fireballsCast >= 2 && me->HasAura(SPELL_DEEP_BREATH_TIMER))
+                {
+                    me->RemoveAurasDueToSpell(SPELL_DEEP_BREATH_TIMER);
+                    Talk(EMOTE_BREATH);
+                    me->SetFacingTo(OnyxiaMoveData[_currentWP].O);
+                    DoCastAOE(OnyxiaMoveData[_currentWP].SpellId);
+                    events.ScheduleEvent(EVENT_SPELL_BREATH, 8250ms);
+                    break;
+                }
+
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
                 {
                     me->SetFacingToObject(target);
                     DoCast(target, SPELL_FIREBALL);
                 }
 
-                events.ScheduleEvent(EVENT_SPELL_FIREBALL_SECOND, 4s);
-                break;
-            }
-            case EVENT_SPELL_FIREBALL_SECOND:
-            {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
-                {
-                    me->SetFacingToObject(target);
-                    DoCast(target, SPELL_FIREBALL);
-                }
-
-                switch (urand(0, 2))
-                {
-                    case 0:
-                        events.ScheduleEvent(EVENT_PHASE_2_STEP_CW, 4s);
-                        break;
-                    case 1:
-                        events.ScheduleEvent(EVENT_PHASE_2_STEP_ACW, 4s);
-                        break;
-                    default:
-                        events.ScheduleEvent(EVENT_PHASE_2_STEP_ACROSS, 4s);
-                        break;
-                }
-                break;
-            }
-            case EVENT_PHASE_2_STEP_CW:
-            {
-                MoveToWaypoint(_currentWP == WP_SOUTH_EAST ? WP_SOUTH : _currentWP + 1);
-                break;
-            }
-            case EVENT_PHASE_2_STEP_ACW:
-            {
-                MoveToWaypoint(_currentWP == WP_SOUTH ? WP_SOUTH_EAST : _currentWP - 1);
-                break;
-            }
-            case EVENT_PHASE_2_STEP_ACROSS:
-            {
-                Talk(EMOTE_BREATH);
-                me->SetFacingTo(OnyxiaMoveData[_currentWP].O);
-                DoCastAOE(OnyxiaMoveData[_currentWP].SpellId);
-                events.ScheduleEvent(EVENT_SPELL_BREATH, 8250ms);
+                ++_fireballsCast;
+                // The 3s cast plus a 0.6s pause
+                events.Repeat(3600ms);
                 break;
             }
             case EVENT_SPELL_BREATH:
             {
-                me->SetSpeed(MOVE_RUN, 2.95f, false);
-                MoveToWaypoint(OnyxiaMoveData[_currentWP].DestId);
+                MoveToWaypoint(OnyxiaMoveData[_currentWP].DestId, 24.0f);
                 break;
             }
             case EVENT_START_PHASE_3:
             {
-                me->SetSpeed(MOVE_RUN, 2.95f, false);
-                me->GetMotionMaster()->MovePoint(POINT_PRE_LAND, OnyxiaMoveData[WP_SOUTH].X, OnyxiaMoveData[WP_SOUTH].Y, OnyxiaMoveData[WP_SOUTH].Z);
+                Talk(SAY_PHASE_3_TRANS);
+                me->SendMeleeAttackStop(me->GetVictim());
+                DoResetThreatList();
+                me->StopMoving();
+
+                // Straight down from wherever the flight is; the whole descent takes about 10s
+                Position landPos = me->GetPosition();
+                float const groundZ = me->GetMapHeight(landPos.GetPositionX(), landPos.GetPositionY(), landPos.GetPositionZ());
+                if (groundZ > INVALID_HEIGHT)
+                    landPos.m_positionZ = groundZ;
+                else
+                    landPos.Relocate(OnyxiaMoveData[WP_GROUND_SOUTH].X, OnyxiaMoveData[WP_GROUND_SOUTH].Y, OnyxiaMoveData[WP_GROUND_SOUTH].Z);
+
+                me->GetMotionMaster()->MoveLand(POINT_LAND, landPos, 2.5f);
                 break;
             }
             case EVENT_PHASE_3_ATTACK:
@@ -578,27 +580,16 @@ struct boss_onyxia : public BossAI
 
                 DoCastAOE(SPELL_BELLOWINGROAR);
 
-                events.ScheduleEvent(EVENT_ERUPTION, 0ms);
-                events.ScheduleEvent(EVENT_SPELL_WINGBUFFET, 10s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_FLAMEBREATH, 10s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_TAILSWEEP, 15s, 20s);
                 events.ScheduleEvent(EVENT_SPELL_CLEAVE, 2s, 5s);
-                events.ScheduleEvent(EVENT_SPELL_BELLOWINGROAR, 15s);
+                events.ScheduleEvent(EVENT_SPELL_BELLOWINGROAR, 22s, 26s);
                 break;
             }
             case EVENT_SPELL_BELLOWINGROAR:
             {
                 DoCastAOE(SPELL_BELLOWINGROAR);
-                events.Repeat(22s);
-                events.ScheduleEvent(EVENT_ERUPTION, 0ms);
-                break;
-            }
-            case EVENT_ERUPTION:
-            {
-                if (Creature* trigger = me->SummonCreature(NPC_ONYXIA_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                {
-                    trigger->CastSpell(trigger, SPELL_ERUPTION, false);
-                }
+                events.Repeat(22s, 26s);
                 break;
             }
             default:
@@ -606,6 +597,14 @@ struct boss_onyxia : public BossAI
         }
 
         DoMeleeAttackIfReady();
+    }
+
+    void OnSpellCast(SpellInfo const* spell) override
+    {
+        BossAI::OnSpellCast(spell);
+
+        if (spell->Id == OnyxiaMoveData[_currentWP].SpellId)
+            DoCastSelf(SPELL_HEATED_GROUND, true);
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -623,6 +622,9 @@ struct boss_onyxia : public BossAI
 private:
     Phases _phase;
     uint8 _currentWP;
+    uint8 _fireballsCast;
+    uint8 _fireballsBeforeMoving;
+    bool _landingPending;
     bool _manyWhelpsAvailable;
     bool _whelpsRespawn;
     std::array<ObjectGuid, std::size(WhelpSpawnPoints)> _pointWhelpGUIDs;
@@ -694,7 +696,14 @@ struct npc_onyxian_whelp : public ScriptedAI
 
         scheduler.Schedule(500ms, [this](TaskContext context)
         {
-            if (Unit* target = me->SelectNearestTarget(300.0f))
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+
+            // A whelp that aggroed during its spawn-in goes for the victim it picked then
+            Unit* target = me->IsEngaged() ? me->GetThreatMgr().GetCurrentVictim() : nullptr;
+            if (!target)
+                target = me->SelectNearestTarget(300.0f);
+
+            if (target)
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -707,6 +716,18 @@ struct npc_onyxian_whelp : public ScriptedAI
                 check.Repeat();
             });
         });
+    }
+
+    // While UNIT_FLAG_NON_ATTACKABLE (from the template) is set, whelps may aggro but only take a target and attack once it clears
+    void AttackStart(Unit* who) override
+    {
+        if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        {
+            me->EngageWithTarget(who);
+            return;
+        }
+
+        ScriptedAI::AttackStart(who);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -739,9 +760,62 @@ private:
     }
 };
 
+// The Lava Fissures whose position sits above the lair floor. In retail sniffs only these pass an Eruption on: a
+// fissure sunk below the floor erupts when hit, but its own Eruption hits no neighbour
+static constexpr std::array<uint32, 11> LavaFissuresAboveFloor =
+{
+    176811, 176814, 176821, 176824, 176827, 176829, 176830, 176839, 176841, 176908, 176921
+};
+
+// 18431 - Bellowing Roar
+// 17731, 69294 - Eruption
+class spell_onyxia_disturb_lava_fissure : public SpellScript
+{
+    PrepareSpellScript(spell_onyxia_disturb_lava_fissure);
+
+    void FilterFissures(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        // The area search measures a gameobject by its display bounds, which stretch a fissure's reach well past the
+        // effect radius; retail sniffs only ever hit fissures within that radius of the centre
+        float const radius = GetSpellInfo()->Effects[EFFECT_1].CalcRadius(caster);
+        targets.remove_if([caster, radius](WorldObject* target) { return caster->GetExactDist(target) > radius; });
+
+        if (GetSpellInfo()->Id == SPELL_BELLOWINGROAR)
+            return;
+
+        // A fissure's Eruption is cast by a trigger the fissure summons
+        TempSummon* trigger = caster->ToTempSummon();
+        GameObject* fissure = trigger ? trigger->GetSummonerGameObject() : nullptr;
+        if (!fissure)
+            return;
+
+        if (std::find(LavaFissuresAboveFloor.begin(), LavaFissuresAboveFloor.end(), fissure->GetEntry()) == LavaFissuresAboveFloor.end())
+            targets.clear();
+    }
+
+    // The default effect sets the fissure off; every hit also plays its crack animation, even while the fissure's
+    // trap cooldown keeps it from erupting again
+    void HandleActivateObject(SpellEffIndex /*effIndex*/)
+    {
+        if (GameObject* fissure = GetHitGObj())
+            fissure->SendCustomAnim(0);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_onyxia_disturb_lava_fissure::FilterFissures, EFFECT_1, TARGET_GAMEOBJECT_DEST_AREA);
+        OnEffectHitTarget += SpellEffectFn(spell_onyxia_disturb_lava_fissure::HandleActivateObject, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
+    }
+};
+
 void AddSC_boss_onyxia()
 {
     RegisterOnyxiasLairCreatureAI(boss_onyxia);
     RegisterOnyxiasLairCreatureAI(npc_onyxian_lair_guard);
     RegisterOnyxiasLairCreatureAI(npc_onyxian_whelp);
+    RegisterSpellScript(spell_onyxia_disturb_lava_fissure);
 }
