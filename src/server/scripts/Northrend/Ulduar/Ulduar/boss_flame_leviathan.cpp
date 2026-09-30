@@ -68,6 +68,7 @@ enum LeviathanSpells
     SPELL_HODIRS_FURY_STUN              = 62297,
     SPELL_FREYA_WARD                    = 62906, // removed spawn effect
     SPELL_MIMIRONS_INFERNO              = 62909,
+    SPELL_MIMIRONS_INFERNO_DAMAGE       = 62910,
     SPELL_THORIMS_HAMMER                = 62911,
     SPELL_LASH                          = 65062,
 
@@ -786,6 +787,7 @@ struct boss_flame_leviathan_seat : public VehicleAI
         who->ApplySpellImmune(SPELL_BATTERING_RAM, IMMUNITY_ID, SPELL_BATTERING_RAM, apply);
         // 10yd ground-level AoE that cannot reach the seats ~15yd up on the boss' back
         who->ApplySpellImmune(SPELL_HODIRS_FURY_STUN, IMMUNITY_ID, SPELL_HODIRS_FURY_STUN, apply);
+        who->ApplySpellImmune(SPELL_MIMIRONS_INFERNO_DAMAGE, IMMUNITY_ID, SPELL_MIMIRONS_INFERNO_DAMAGE, apply);
 
         if (!me->GetVehicleKit())
             return;
