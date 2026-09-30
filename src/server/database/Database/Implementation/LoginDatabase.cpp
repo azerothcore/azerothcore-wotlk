@@ -155,7 +155,10 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_SEL_ACCOUNT_TOTP_SECRET, "SELECT totp_secret FROM account WHERE id = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_UPD_ACCOUNT_TOTP_SECRET, "UPDATE account SET totp_secret = ? WHERE id = ?", CONNECTION_ASYNC);
 
-    PrepareStatement(LOGIN_INS_UPTIME, "INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES (?, ?, 0, ?)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_INS_UPTIME, "INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES (?, ?, 0, ?)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_UPD_UPTIME_SHUTDOWN, "UPDATE uptime SET uptime = ?, maxplayers = ?, EndTime = ?, ShutdownType = ?, ExitCode = ?, ShutdownReason = ? WHERE realmid = ? AND starttime = ?", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_UPTIME_PREVIOUS, "SELECT starttime, uptime, EndTime, ShutdownType, ShutdownReason FROM uptime WHERE realmid = ? ORDER BY starttime DESC LIMIT 1", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_UPTIME_MAXPLAYERS, "SELECT MAX(maxplayers) FROM uptime WHERE realmid = ?", CONNECTION_SYNCH);
 
     PrepareStatement(LOGIN_GET_EMAIL_BY_ID, "SELECT email FROM account WHERE id = ?", CONNECTION_SYNCH);
 

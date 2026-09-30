@@ -625,8 +625,6 @@ void boss_flame_leviathan::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInf
 
         Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
     }
-    else if (spellInfo->Id == 62522 /*SPELL_ELECTROSHOCK*/)
-        me->InterruptNonMeleeSpells(false);
 }
 
 void boss_flame_leviathan::JustDied(Unit*)
@@ -749,9 +747,38 @@ struct boss_flame_leviathan_seat : public VehicleAI
 
     void AttackStart(Unit*) override { }
 
+    static bool ActivateTurret(Unit* seat, Unit* rider)
+    {
+        Vehicle* seatVehicle = seat->GetVehicleKit();
+        Unit* turretSeatUnit = seatVehicle ? seatVehicle->GetPassenger(SEAT_TURRET) : nullptr;
+        Creature* turret = turretSeatUnit ? turretSeatUnit->ToCreature() : nullptr;
+        if (!turret)
+            return false;
+
+        turret->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        turret->AI()->AttackStart(rider);
+        return true;
+    }
+
+    // In 25m, the rider activates a pair of seats out of the four. In 10m, the rider activates both seats out of the two.
+    bool ActivateTurrets(Unit* rider)
+    {
+        bool activated = ActivateTurret(me, rider);
+
+        if (Vehicle* leviathanVehicle = me->GetVehicle())
+        {
+            int8 const partnerSeatId = static_cast<int8>(me->GetTransSeat() ^ (me->GetMap()->Is25ManRaid() ? 2 : 1));
+            if (Unit* partnerSeat = leviathanVehicle->GetPassenger(partnerSeatId))
+                if (partnerSeat->GetEntry() == NPC_SEAT && ActivateTurret(partnerSeat, rider))
+                    activated = true;
+        }
+
+        return activated;
+    }
+
     void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
     {
-        if (!who->IsPlayer() || !me->GetVehicle())
+        if (!who->IsPlayer())
             return;
 
         who->ApplySpellImmune(63847, IMMUNITY_ID, 63847, apply); // SPELL_FLAME_VENTS_TRIGGER
@@ -760,28 +787,19 @@ struct boss_flame_leviathan_seat : public VehicleAI
         // 10yd ground-level AoE that cannot reach the seats ~15yd up on the boss' back
         who->ApplySpellImmune(SPELL_HODIRS_FURY_STUN, IMMUNITY_ID, SPELL_HODIRS_FURY_STUN, apply);
 
+        if (!me->GetVehicleKit())
+            return;
+
         if (seatId == SEAT_PLAYER)
         {
-            if (Unit* turret = me->GetVehicleKit()->GetPassenger(SEAT_TURRET))
+            if (!apply)
+                who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
+            else if (ActivateTurrets(who))
             {
-                if (apply)
+                if (Creature* leviathan = me->GetVehicleCreatureBase())
                 {
-                    turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                    turret->GetAI()->AttackStart(who);
-                    if (Creature* leviathan = me->GetVehicleCreatureBase())
-                    {
-                        leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
-                        leviathan->SetInCombatWithZone();
-                    }
-                }
-                else
-                {
-                    turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
-                    turret->SetImmuneToAll(true);
-                    if (turret->IsCreature())
-                        turret->ToCreature()->AI()->EnterEvadeMode();
-
-                    who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
+                    leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
+                    leviathan->SetInCombatWithZone();
                 }
             }
             if (Unit* device = me->GetVehicleKit()->GetPassenger(SEAT_DEVICE))
@@ -821,6 +839,14 @@ struct boss_flame_leviathan_defense_turret : public TurretAI
         if (Unit* seat = me->GetVehicleBase())
             if (Creature* leviathan = seat->GetVehicleCreatureBase())
                 leviathan->SetInCombatWithZone();
+    }
+
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        TurretAI::EnterEvadeMode(why);
+        // Seated turrets never move home, which is the only thing that clears the evade state.
+        // Because of this, we need to manually clear it ourselves.
+        me->ClearUnitState(UNIT_STATE_EVADE);
     }
 
     void JustDied(Unit* killer) override
@@ -1491,6 +1517,16 @@ class spell_pursue : public SpellScript
     }
 };
 
+static bool IsLeviathanSeatAvailable(Unit const* seat)
+{
+    Vehicle* seatVehicle = seat->GetEntry() == NPC_SEAT ? seat->GetVehicleKit() : nullptr;
+    if (!seatVehicle || seatVehicle->GetPassenger(SEAT_PLAYER))
+        return false;
+
+    Unit* device = seatVehicle->GetPassenger(SEAT_DEVICE);
+    return device && !device->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+}
+
 class spell_vehicle_throw_passenger : public SpellScript
 {
     PrepareSpellScript(spell_vehicle_throw_passenger);
@@ -1525,11 +1561,8 @@ class spell_vehicle_throw_passenger : public SpellScript
         for (WorldObject* obj : targetList)
         {
             Unit* unit = obj->ToUnit();
-            if (!unit || unit->GetEntry() != NPC_SEAT) continue;
-
-            Vehicle* seat = unit->GetVehicleKit();
-            Unit* device = seat ? seat->GetPassenger(SEAT_DEVICE) : nullptr;
-            if (!seat || seat->GetPassenger(0) || !device || device->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) continue;
+            if (!unit || !IsLeviathanSeatAvailable(unit))
+                continue;
 
             float dist = unit->GetExactDistSq(dst);
             if (dist < minDist)
@@ -1552,6 +1585,52 @@ class spell_vehicle_throw_passenger : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_vehicle_throw_passenger::HandleScript);
+    }
+};
+
+class spell_hookshot : public SpellScript
+{
+    PrepareSpellScript(spell_hookshot);
+
+    // Restrict target selection to the nearest seat whose player seat is free.
+    Creature* SelectAvailableSeat()
+    {
+        Unit* caster = GetCaster();
+        std::list<Creature*> seats;
+        caster->GetCreatureListWithEntryInGrid(seats, NPC_SEAT, GetSpellInfo()->GetMaxRange());
+
+        Creature* nearestSeat = nullptr;
+        float nearestDist = 0.0f;
+        for (Creature* seat : seats)
+        {
+            if (!IsLeviathanSeatAvailable(seat))
+                continue;
+
+            float dist = caster->GetExactDistSq(seat);
+            if (!nearestSeat || dist < nearestDist)
+            {
+                nearestSeat = seat;
+                nearestDist = dist;
+            }
+        }
+
+        return nearestSeat;
+    }
+
+    SpellCastResult CheckCast()
+    {
+        return SelectAvailableSeat() ? SPELL_CAST_OK : SPELL_FAILED_DONT_REPORT;
+    }
+
+    void SelectSeat(WorldObject*& target)
+    {
+        target = SelectAvailableSeat();
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_hookshot::CheckCast);
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_hookshot::SelectSeat, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
     }
 };
 
@@ -1918,6 +1997,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_systems_shutdown_aura);
     RegisterSpellScript(spell_pursue);
     RegisterSpellScript(spell_vehicle_throw_passenger);
+    RegisterSpellScript(spell_hookshot);
     RegisterSpellScript(spell_hookshot_aura);
     RegisterSpellScript(spell_tar_blaze_aura);
     RegisterSpellScript(spell_vehicle_grab_pyrite);
