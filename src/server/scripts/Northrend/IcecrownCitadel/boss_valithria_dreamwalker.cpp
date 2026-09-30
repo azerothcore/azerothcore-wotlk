@@ -1191,17 +1191,25 @@ class spell_dreamwalker_decay_periodic_timer_aura : public AuraScript
 
     bool Load() override
     {
-        _decayRate = GetId() != SPELL_TIMER_BLAZING_SKELETON ? 1000 : 5000;
+        switch (GetId())
+        {
+            case SPELL_TIMER_SUPPRESSER:
+            case SPELL_TIMER_BLAZING_SKELETON:
+                _decayRate = 5000;
+                break;
+            default:
+                _decayRate = 1000;
+                break;
+        }
         return true;
     }
 
+    // engine adds the fixed amplitude back every tick, so work out each interval from the tick number
     void DecayPeriodicTimer(AuraEffect* aurEff)
     {
-        int32 timer = aurEff->GetPeriodicTimer();
-        if (timer <= 5000)
-            return;
-
-        aurEff->SetPeriodicTimer(timer - _decayRate);
+        int32 amplitude = aurEff->GetAmplitude();
+        int32 interval = std::max<int32>(5000, amplitude - int32(aurEff->GetTickNumber()) * _decayRate);
+        aurEff->SetPeriodicTimer(aurEff->GetPeriodicTimer() - (amplitude - interval));
     }
 
     void Register() override
