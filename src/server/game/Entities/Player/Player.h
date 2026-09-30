@@ -2102,8 +2102,9 @@ public:
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
-    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* item = nullptr);
-    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item = nullptr);
+    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, ObjectGuid itemGuid = ObjectGuid::Empty);
+    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence,
+        ObjectGuid itemGuid = ObjectGuid::Empty);
 
     void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);
     [[nodiscard]] uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus

@@ -1007,7 +1007,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* item /*= nullptr*/)
+void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, ObjectGuid itemGuid /*= ObjectGuid::Empty*/)
 {
     if (IsInFeralForm())
         return; // always maximized SKILL_FERAL_COMBAT in fact
@@ -1021,9 +1021,22 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
 
     Item* tmpitem = GetWeaponForAttack(attType, true);
-    if (item && item != tmpitem && !item->IsBroken())
+
+    // The weapon used for the cast was recorded by GUID in Spell::CheckItems(), before the spell's damage,
+    // kill processing and script hooks ran. Any of those may have destroyed the item since, so it must be
+    // looked up again here rather than trusted through a pointer taken at cast time.
+    if (itemGuid && (!tmpitem || tmpitem->GetGUID() != itemGuid))
     {
-        tmpitem = item;
+        if (Item* item = GetItemByGuid(itemGuid))
+        {
+            if (!item->IsBroken())
+                tmpitem = item;
+        }
+        else
+            LOG_ERROR("entities.player",
+                "Player::UpdateWeaponSkill: weapon {} used for the cast is no longer in the inventory of player {} "
+                "(attack type {}); updating the skill of the currently equipped weapon instead",
+                itemGuid.ToString(), GetGUID().ToString(), uint32(attType));
     }
 
     if (!tmpitem && attType == BASE_ATTACK)
@@ -1051,7 +1064,8 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
     UpdateAllCritPercentages();
 }
 
-void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item /*= nullptr*/)
+void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence,
+    ObjectGuid itemGuid /*= ObjectGuid::Empty*/)
 {
     uint8  playerLevel = GetLevel();
     uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
@@ -1100,7 +1114,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         }
         else
         {
-            UpdateWeaponSkill(victim, attType, item);
+            UpdateWeaponSkill(victim, attType, itemGuid);
         }
     }
 }
