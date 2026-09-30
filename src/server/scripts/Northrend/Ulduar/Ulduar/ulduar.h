@@ -111,7 +111,6 @@ enum UlduarData
     DATA_UNIVERSE_GLOBE                     = 608,
     DATA_ALGALON_TRAPDOOR                   = 609,
     DATA_BRANN_BRONZEBEARD_ALG              = 610,
-    DATA_RESUMMON_ALGALON                   = 611,
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
