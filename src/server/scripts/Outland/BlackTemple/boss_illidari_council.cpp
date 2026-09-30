@@ -143,6 +143,12 @@ struct boss_illidari_council : public BossAI
     {
         if (param == ACTION_START_ENCOUNTER)
         {
+            if (instance->GetBossState(DATA_ILLIDARI_COUNCIL) != NOT_STARTED)
+                return;
+
+            // Set before pulling the members in, their aggro calls back into here
+            instance->SetBossState(DATA_ILLIDARI_COUNCIL, IN_PROGRESS);
+
             if (!me->isActiveObject())
                 me->setActive(true);
 
@@ -159,7 +165,7 @@ struct boss_illidari_council : public BossAI
             {
                 if (Creature* member = instance->GetCreature(i))
                 {
-                    if (!spoken && (roll_chance_i(33) || i == 3))
+                    if (!spoken && (roll_chance_i(33) || i == DATA_VERAS_DARKSHADOW))
                     {
                         spoken = true;
                         member->AI()->Talk(SAY_COUNCIL_AGGRO);
