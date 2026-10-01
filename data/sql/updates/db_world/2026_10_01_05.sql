@@ -1,3 +1,4 @@
+-- DB update 2026_10_01_04 -> 2026_10_01_05
 -- Captive Child (22314) - Missing Friends (10852): freed children thank the player and run off on a fixed path per spawn
 -- Sniffed: 3.4.2.50664, 3.4.0.45942 and 3.4.0.46368; every path checked against 211 runs in 34 TBC/WotLK/Cata Classic sniffs
 
