@@ -639,6 +639,9 @@ class spell_dru_lifebloom : public AuraScript
 {
     PrepareAuraScript(spell_dru_lifebloom);
 
+    static constexpr auto SPELL_DRUID_AURA_OF_DESPAIR_1 = 62692;
+    static constexpr auto SPELL_DRUID_AURA_OF_DESPAIR_2 = 64848;
+
     bool Validate(SpellInfo const* /*spell*/) override
     {
         return ValidateSpellInfo({ SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, SPELL_DRUID_LIFEBLOOM_ENERGIZE });
@@ -662,11 +665,7 @@ class spell_dru_lifebloom : public AuraScript
 
             // restore mana
             int32 returnmana = GetSpellInfo()->ManaCostPercentage * caster->GetCreateMana() * stack / 100 / 2;
-
-            // Special-case handling for Vezax's Aura of Despair.
-            constexpr uint32 SPELL_AURA_OF_DESPAIR_1 = 62692;
-            constexpr uint32 SPELL_AURA_OF_DESPAIR_2 = 64848;
-            if (caster->HasAnyAuras(SPELL_AURA_OF_DESPAIR_1, SPELL_AURA_OF_DESPAIR_2))
+            if (caster->HasAnyAuras(SPELL_DRUID_AURA_OF_DESPAIR_1, SPELL_DRUID_AURA_OF_DESPAIR_2))
                 returnmana /= 2;
 
             caster->CastCustomSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, &returnmana, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
@@ -691,6 +690,9 @@ class spell_dru_lifebloom : public AuraScript
 
                     // mana amount
                     int32 mana = CalculatePct(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * dispelInfo->GetRemovedCharges() / 2;
+                    if (caster->HasAnyAuras(SPELL_DRUID_AURA_OF_DESPAIR_1, SPELL_DRUID_AURA_OF_DESPAIR_2))
+                        mana /= 2;
+
                     caster->CastCustomSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, &mana, nullptr, nullptr, true, nullptr, nullptr, GetCasterGUID());
                 }
                 target->CastCustomSpell(target, SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, nullptr, nullptr, true, nullptr, nullptr, GetCasterGUID());
