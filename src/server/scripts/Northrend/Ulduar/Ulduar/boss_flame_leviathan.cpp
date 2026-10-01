@@ -1236,7 +1236,7 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
     {
         if (id == me->GetEntry())
         {
-            if (Creature* liquid = me->SummonCreature(NPC_LIQUID, *me))
+            if (Creature* liquid = me->SummonCreature(NPC_LIQUID, *me, TEMPSUMMON_TIMED_DESPAWN, 180 * IN_MILLISECONDS))
             {
                 liquid->CastSpell(liquid, SPELL_LIQUID_PYRITE, true);
                 liquid->CastSpell(liquid, SPELL_DUST_CLOUD_IMPACT, true);
