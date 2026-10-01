@@ -30,9 +30,7 @@ enum Spells
     SPELL_SUMMON_ANUBAR_CHAMPION            = 53064,
     SPELL_SUMMON_ANUBAR_CRYPT_FIEND         = 53065,
     SPELL_SUMMON_ANUBAR_NECROMANCER         = 53066,
-    SPELL_SUMMON_ANUBAR_CHAMPION_PERIODIC   = 53035,
-    SPELL_SUMMON_ANUBAR_NECROMANCER_PERIODIC = 53036,
-    SPELL_SUMMON_ANUBAR_CRYPT_FIEND_PERIODIC = 53037,
+    SPELL_SUMMON_ANUBAR_PERIODIC            = 53037,
 
     // Hadronox
     SPELL_WEB_FRONT_DOORS                   = 53177,
@@ -195,9 +193,7 @@ struct boss_hadronox : public BossAI
         switch (summon->GetEntry())
         {
             case NPC_WORLD_TRIGGER_LAOI:
-                summon->AddAura(SPELL_SUMMON_ANUBAR_CHAMPION_PERIODIC, summon);
-                summon->AddAura(SPELL_SUMMON_ANUBAR_NECROMANCER_PERIODIC, summon);
-                summon->AddAura(SPELL_SUMMON_ANUBAR_CRYPT_FIEND_PERIODIC, summon);
+                summon->AddAura(SPELL_SUMMON_ANUBAR_PERIODIC, summon);
                 break;
             case NPC_ANUB_AR_CHAMPION:
             case NPC_ANUB_AR_NECROMANCER:
@@ -609,12 +605,34 @@ class spell_hadronox_summon_periodic_aura : public AuraScript
 {
     PrepareAuraScript(spell_hadronox_summon_periodic_aura);
 
-public:
-    spell_hadronox_summon_periodic_aura(int32 delay, uint32 spellEntry) : _delay(delay), _spellEntry(spellEntry) { }
+    // One summon per door every 5s; fiends are the most common, then necromancers, then champions
+    static constexpr uint32 SUMMON_INTERVAL = 5'000;
+    static constexpr std::array<std::pair<uint32, uint32>, 3> SUMMON_WEIGHTS =
+    {{
+        { SPELL_SUMMON_ANUBAR_CRYPT_FIEND,  6 },
+        { SPELL_SUMMON_ANUBAR_NECROMANCER,  3 },
+        { SPELL_SUMMON_ANUBAR_CHAMPION,     2 },
+    }};
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_WEB_FRONT_DOORS });
+        return ValidateSpellInfo({ SPELL_WEB_FRONT_DOORS, SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_NECROMANCER });
+    }
+
+    static uint32 SelectSummonSpell()
+    {
+        uint32 totalWeight = 0;
+        for (auto const& [spellId, weight] : SUMMON_WEIGHTS)
+            totalWeight += weight;
+
+        uint32 roll = urand(1, totalWeight);
+        for (auto const& [spellId, weight] : SUMMON_WEIGHTS)
+        {
+            if (roll <= weight)
+                return spellId;
+            roll -= weight;
+        }
+        return SUMMON_WEIGHTS.front().first;
     }
 
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
@@ -625,7 +643,7 @@ public:
             if (!instance->IsBossDone(DATA_HADRONOX) != NOT_STARTED)
             {
                 if (!owner->HasAura(SPELL_WEB_FRONT_DOORS))
-                    owner->CastSpell(owner, _spellEntry, true);
+                    owner->CastSpell(owner, SelectSummonSpell(), true);
                 else if (!instance->IsEncounterInProgress())
                     owner->RemoveAurasDueToSpell(SPELL_WEB_FRONT_DOORS);
             }
@@ -633,7 +651,7 @@ public:
 
     void OnApply(AuraEffect const* auraEffect, AuraEffectHandleModes)
     {
-        GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(_delay);
+        GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(SUMMON_INTERVAL);
     }
 
     void Register() override
@@ -641,10 +659,6 @@ public:
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_hadronox_summon_periodic_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         OnEffectApply += AuraEffectApplyFn(spell_hadronox_summon_periodic_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
-
-private:
-    int32 _delay;
-    uint32 _spellEntry;
 };
 
 class spell_hadronox_leech_poison_aura : public AuraScript
@@ -709,9 +723,7 @@ void AddSC_boss_hadronox()
     RegisterAzjolNerubCreatureAI(npc_anub_ar_crusher_champion);
     RegisterAzjolNerubCreatureAI(npc_anub_ar_crusher_crypt_fiend);
     RegisterAzjolNerubCreatureAI(npc_anub_ar_crusher_necromancer);
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion_aura", 15'000, SPELL_SUMMON_ANUBAR_CHAMPION);
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer_aura", 10'000, SPELL_SUMMON_ANUBAR_NECROMANCER);
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend_aura", 5'000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
+    RegisterSpellScript(spell_hadronox_summon_periodic_aura);
     RegisterSpellScript(spell_hadronox_leech_poison_aura);
     RegisterSpellScript(spell_hadronox_web_grab);
     new achievement_hadronox_denied();
