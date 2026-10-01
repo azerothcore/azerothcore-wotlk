@@ -639,8 +639,11 @@ class spell_dru_lifebloom : public AuraScript
 {
     PrepareAuraScript(spell_dru_lifebloom);
 
-    static constexpr auto SPELL_DRUID_AURA_OF_DESPAIR_1 = 62692;
-    static constexpr auto SPELL_DRUID_AURA_OF_DESPAIR_2 = 64848;
+    enum Spells
+    {
+        SPELL_DRUID_AURA_OF_DESPAIR_1 = 62692,
+        SPELL_DRUID_AURA_OF_DESPAIR_2 = 64848
+    };
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
