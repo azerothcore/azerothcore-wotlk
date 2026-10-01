@@ -1,3 +1,4 @@
+-- DB update 2026_10_01_05 -> 2026_10_01_06
 --
 -- Prevent cone cast of Scorch targeting players in Ignis' Slag Pot
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` IN (62549, 62553, 63475)) AND (`SourceId` = 0) AND (`ElseGroup` = 0);
