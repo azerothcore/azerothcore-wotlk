@@ -155,6 +155,8 @@ enum HardMode
     SPELL_ENTER_VEHICLE_4                           = 63316,
 };
 
+constexpr uint32 MIMIRON_MAX_ACTIVE_FLAMES = 50;
+
 enum EVENTS
 {
     // Mimiron:
@@ -299,6 +301,7 @@ struct boss_mimiron : public BossAI
         _achievBombBot = false;
         _achievRocketStrike = false;
         _allowedFlameSpreadTime = 0;
+        _activeFlames.clear();
         _outOfCombatTimer = 0;
         _changeAllowedFlameSpreadTime = false;
         ResetGameObjects();
@@ -306,6 +309,21 @@ struct boss_mimiron : public BossAI
 
         if (!instance->IsBossDone(BOSS_MIMIRON))
             _Reset();
+    }
+
+    void RegisterFlame(ObjectGuid guid)
+    {
+        _activeFlames.push_back(guid);
+    }
+
+    void UnregisterFlame(ObjectGuid guid)
+    {
+        _activeFlames.remove(guid);
+    }
+
+    uint32 GetActiveFlameCount() const
+    {
+        return static_cast<uint32>(_activeFlames.size());
     }
 
     void AttackStart(Unit* who) override
@@ -939,6 +957,7 @@ private:
     bool _changeAllowedFlameSpreadTime;
     uint8 _minutesTalkNum;
     uint32 _outOfCombatTimer;
+    GuidList _activeFlames;
 };
 
 struct npc_ulduar_leviathan_mkii : public ScriptedAI
@@ -2243,11 +2262,14 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
         _createTime = GameTime::GetGameTime().count();
         _events.Reset();
         _events.ScheduleEvent(EVENT_FLAMES_SPREAD, 5750ms);
-        if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f))
-        {
-            _flameList.push_back(flame->GetGUID());
-            flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
-        }
+        if (boss_mimiron* mimironAI = GetMimironAI())
+            if (mimironAI->GetActiveFlameCount() < MIMIRON_MAX_ACTIVE_FLAMES)
+                if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f))
+                {
+                    _flameList.push_back(flame->GetGUID());
+                    mimironAI->RegisterFlame(flame->GetGUID());
+                    flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
+                }
     }
 
     void DoAction(int32 action) override
@@ -2258,23 +2280,36 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
 
     void SpreadFlame(float x, float y)
     {
-        if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, x, y, 364.32f, 0.0f))
-        {
-            _flameList.push_back(flame->GetGUID());
-            if (Creature* c = me->FindNearestCreature(NPC_FLAMES_SPREAD, 10.0f))
-                if (c->GetExactDist2d(flame->GetPositionX(), flame->GetPositionY()) <= 4.0f)
-                    return;
-            flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
-        }
+        if (boss_mimiron* mimironAI = GetMimironAI())
+            if (mimironAI->GetActiveFlameCount() < MIMIRON_MAX_ACTIVE_FLAMES)
+                if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, x, y, 364.32f, 0.0f))
+                {
+                    if (Creature* c = me->FindNearestCreature(NPC_FLAMES_SPREAD, 10.0f))
+                        if (c->GetExactDist2d(flame->GetPositionX(), flame->GetPositionY()) <= 4.0f)
+                        {
+                            flame->DespawnOrUnsummon();
+                            return;
+                        }
+
+                    _flameList.push_back(flame->GetGUID());
+                    mimironAI->RegisterFlame(flame->GetGUID());
+                    flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
+                }
     }
 
     void RemoveFlame(ObjectGuid guid)
     {
         _flameList.remove(guid);
+        if (boss_mimiron* mimironAI = GetMimironAI())
+            mimironAI->UnregisterFlame(guid);
     }
 
     void RemoveAll()
     {
+        if (boss_mimiron* mimironAI = GetMimironAI())
+            for (ObjectGuid const& guid : _flameList)
+                mimironAI->UnregisterFlame(guid);
+
         for (ObjectGuid const& guid : _flameList)
             if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                 c->DespawnOrUnsummon();
@@ -2339,6 +2374,14 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
     }
 
 private:
+    boss_mimiron* GetMimironAI() const
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* mimiron = instance->GetCreature(BOSS_MIMIRON))
+                return CAST_AI(boss_mimiron, mimiron->AI());
+        return nullptr;
+    }
+
     GuidList _flameList;
     EventMap _events;
     uint32 _createTime;
