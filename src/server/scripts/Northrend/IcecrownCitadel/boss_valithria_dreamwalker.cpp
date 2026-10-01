@@ -1193,9 +1193,14 @@ class spell_dreamwalker_decay_periodic_timer_aura : public AuraScript
     {
         switch (GetId())
         {
-            case SPELL_TIMER_SUPPRESSER:
             case SPELL_TIMER_BLAZING_SKELETON:
                 _decayRate = 5000;
+                break;
+            case SPELL_TIMER_GLUTTONOUS_ABOMINATION:
+                _decayRate = 3000;
+                break;
+            case SPELL_TIMER_SUPPRESSER:
+                _decayRate = 2000;
                 break;
             default:
                 _decayRate = 1000;
@@ -1205,10 +1210,11 @@ class spell_dreamwalker_decay_periodic_timer_aura : public AuraScript
     }
 
     // engine adds the fixed amplitude back every tick, so work out each interval from the tick number
+    // first two intervals are full length, decay starts from the third
     void DecayPeriodicTimer(AuraEffect* aurEff)
     {
         int32 amplitude = aurEff->GetAmplitude();
-        int32 interval = std::max<int32>(5000, amplitude - int32(aurEff->GetTickNumber()) * _decayRate);
+        int32 interval = std::max<int32>(5000, amplitude - int32(aurEff->GetTickNumber() - 1) * _decayRate);
         aurEff->SetPeriodicTimer(aurEff->GetPeriodicTimer() - (amplitude - interval));
     }
 
