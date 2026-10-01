@@ -107,7 +107,9 @@ enum Misc
 
     ACTION_START_POST_EVENT         = 1,
     ACTION_NO_KILL_TALK             = 2,
-    ACTION_START_AERIAL_SUPPORT     = 3
+    ACTION_START_AERIAL_SUPPORT     = 3,
+
+    DATA_HAND_ENGAGED               = 1
 };
 
 class CastArmageddon : public BasicEvent
@@ -197,26 +199,50 @@ struct npc_kiljaeden_controller : public NullCreatureAI
         }
     }
 
+    void StartEncounter()
+    {
+        if (instance->GetBossState(DATA_KILJAEDEN) != NOT_STARTED)
+            return;
+
+        // Set before pulling the Hands in, their aggro calls back into here
+        instance->SetBossState(DATA_KILJAEDEN, IN_PROGRESS);
+        summons.DoZoneInCombat(NPC_HAND_OF_THE_DECEIVER);
+
+        scheduler.Schedule(1s, [this](TaskContext context) {
+            auto const& playerList = me->GetMap()->GetPlayers();
+            for (auto const& playerRef : playerList)
+                if (Player* player = playerRef.GetSource())
+                    if (!player->IsGameMaster() && me->GetDistance2d(player) < 60.0f && player->IsAlive())
+                    {
+                        context.Repeat();
+                        return;
+                    }
+
+            CreatureAI::EnterEvadeMode();
+        });
+    }
+
+    void SetData(uint32 type, uint32 /*data*/) override
+    {
+        if (type == DATA_HAND_ENGAGED)
+            StartEncounter();
+    }
+
+    void SummonedCreatureEvade(Creature* summon) override
+    {
+        if (summon->GetEntry() != NPC_HAND_OF_THE_DECEIVER || instance->GetBossState(DATA_KILJAEDEN) != IN_PROGRESS)
+            return;
+
+        CreatureAI::EnterEvadeMode();
+    }
+
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
         summons.Despawn(summon);
 
         if (summon->GetEntry() == NPC_HAND_OF_THE_DECEIVER)
         {
-            instance->SetBossState(DATA_KILJAEDEN, IN_PROGRESS);
-
-            scheduler.Schedule(1s, [this](TaskContext context) {
-                auto const& playerList = me->GetMap()->GetPlayers();
-                for (auto const& playerRef : playerList)
-                    if (Player* player = playerRef.GetSource())
-                        if (!player->IsGameMaster() && me->GetDistance2d(player) < 60.0f && player->IsAlive())
-                        {
-                            context.Repeat();
-                            return;
-                        }
-
-                CreatureAI::EnterEvadeMode();
-            });
+            StartEncounter();
 
             if (!summons.HasEntry(NPC_HAND_OF_THE_DECEIVER))
             {
