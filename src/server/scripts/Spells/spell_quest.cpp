@@ -2535,6 +2535,40 @@ class spell_q13413_wyrmrest_skytalon_ride_periodic : public AuraScript
     }
 };
 
+// 48268 - Container of Rats
+enum LetThemNotRise
+{
+    SPELL_SKELETAL_TRANSFORM    = 48255,
+    SPELL_SUMMON_RAT            = 48272,
+
+    RAT_COUNT                   = 6
+};
+
+class spell_container_of_rats : public SpellScript
+{
+    PrepareSpellScript(spell_container_of_rats);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SKELETAL_TRANSFORM, SPELL_SUMMON_RAT });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* corpse = GetHitUnit();
+        for (uint8 i = 0; i < RAT_COUNT; ++i)
+            corpse->CastSpell(corpse, SPELL_SUMMON_RAT, true);
+
+        // Applied right away so the corpse cannot be used twice
+        corpse->CastSpell(corpse, SPELL_SKELETAL_TRANSFORM, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_container_of_rats::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_quest_spell_scripts()
 {
     RegisterSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator);
@@ -2609,4 +2643,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
     RegisterSpellScript(spell_q13413_wyrmrest_skytalon_ride_periodic);
+    RegisterSpellScript(spell_container_of_rats);
 }
