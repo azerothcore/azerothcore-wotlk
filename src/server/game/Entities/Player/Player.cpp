@@ -2075,23 +2075,20 @@ void Player::RegenerateHealth()
 
 void Player::ResetAllPowers()
 {
-    SetHealth(GetMaxHealth());
+    if (IsAlive())
+        SetHealth(GetMaxHealth());
+
     if (HasActivePowerType(POWER_MANA))
-    {
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-    }
+
     if (HasActivePowerType(POWER_RAGE))
-    {
         SetPower(POWER_RAGE, 0);
-    }
+
     if (HasActivePowerType(POWER_ENERGY))
-    {
         SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-    }
+
     if (HasActivePowerType(POWER_RUNIC_POWER))
-    {
         SetPower(POWER_RUNIC_POWER, 0);
-    }
 }
 
 bool Player::CanInteractWithQuestGiver(Object* questGiver)
