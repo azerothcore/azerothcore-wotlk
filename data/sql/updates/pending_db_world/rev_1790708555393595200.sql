@@ -69,11 +69,6 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (2243202, 1, -710.5018, 2750.7266, 103.75797, NULL, 0, 'Colonel Jules'),
 (2243202, 2, -710.211, 2754.36, 102.467, 1.46213, 0, 'Colonel Jules');
 
--- Anchorite Barada: spirit spawn-out at 9 health
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 22431 AND `SourceId` = 0;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 5, 22431, 0, 0, 37, 1, 9, 4, 0, 0, 0, 0, '', 'Anchorite Barada - Health is 9 or lower');
-
 -- Anchorite Barada
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 22431);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -81,7 +76,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (22431, 0, 1, 0, 62, 1, 100, 0, 8539, 0, 0, 0, 0, 0, 80, 2243100, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Gossip Option 0 Selected - Run Script \'Exorcism\' (Phase 1)'),
 (22431, 0, 2, 0, 62, 14, 100, 0, 8539, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Gossip Option 0 Selected - Close Gossip (Phases 2-4)'),
 (22431, 0, 3, 0, 8, 4, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Spellhit - Set Flag Standstate Kneel (Phase 3)'),
-(22431, 0, 4, 0, 60, 6, 100, 0, 1000, 1000, 1000, 1000, 0, 0, 80, 2243101, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Update - Run Script \'Exorcism Failed\' (Phases 2-3)'),
+(22431, 0, 4, 0, 2, 6, 100, 0, 0, 1, 1000, 1000, 0, 0, 80, 2243101, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Between 0-1% Health - Run Script \'Exorcism Failed\' (Phases 2-3)'),
 (22431, 0, 5, 0, 6, 14, 100, 0, 0, 0, 0, 0, 0, 0, 223, 3, 0, 0, 0, 0, 0, 19, 22432, 50, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Just Died - Do Action \'Exorcism Failed\' (Phases 2-4)');
 
 -- Anchorite Barada actionlists: exorcism (drives both sides' lines), exorcism failed, reset
@@ -92,7 +87,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2243100, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Actionlist - Close Gossip'),
 (2243100, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 117, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Actionlist - Disable Evade'),
 (2243100, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Actionlist - Set Active On'),
-(2243100, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 42, 9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Actionlist - Set Invincibility Hp 9'),
+(2243100, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Actionlist - Set Invincibility Hp 1'),
 (2243100, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 102, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Actionlist - Disable Health Regeneration'),
 (2243100, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Actionlist - Remove Flag Standstate Kneel'),
 (2243100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - Actionlist - Set Run Off'),
