@@ -659,8 +659,16 @@ class spell_dru_lifebloom : public AuraScript
         {
             healAmount = caster->SpellHealingBonusDone(GetTarget(), finalHeal, healAmount, HEAL, aurEff->GetEffIndex(), 0.0f, stack);
             healAmount = GetTarget()->SpellHealingBonusTaken(caster, finalHeal, healAmount, HEAL, stack);
+
             // restore mana
-            int32 returnmana = (GetSpellInfo()->ManaCostPercentage * caster->GetCreateMana() / 100) * stack / 2;
+            int32 returnmana = GetSpellInfo()->ManaCostPercentage * caster->GetCreateMana() * stack / 100 / 2;
+
+            // Special-case handling for Vezax's Aura of Despair.
+            constexpr uint32 SPELL_AURA_OF_DESPAIR_1 = 62692;
+            constexpr uint32 SPELL_AURA_OF_DESPAIR_2 = 64848;
+            if (caster->HasAnyAuras(SPELL_AURA_OF_DESPAIR_1, SPELL_AURA_OF_DESPAIR_2))
+                returnmana /= 2;
+
             caster->CastCustomSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, &returnmana, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
         }
         GetTarget()->CastCustomSpell(GetTarget(), SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
