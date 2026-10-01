@@ -11809,8 +11809,6 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_UPDATE_WORLD_STATE
     // SMSG_POWER_UPDATE
 
-    ResyncRunes();
-
     SetMover(this);
 
     sScriptMgr->OnPlayerSendInitialPacketsBeforeAddToMap(this, data);
