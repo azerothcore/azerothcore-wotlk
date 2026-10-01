@@ -9,13 +9,13 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 -- Let Them Not Rise!: Skeletal Transform, transform into Skeleton (6412)
 UPDATE `spell_dbc` SET `Effect_1` = 6, `ImplicitTargetA_1` = 1, `EffectAura_1` = 56, `EffectMiscValue_1` = 6412 WHERE `ID` = 48255;
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 17 AND `SourceEntry` = 48268 AND `ConditionTypeOrReference` = 1 AND `ConditionValue1` = 48255;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 17 AND `SourceEntry` = 48268 AND `ConditionTypeOrReference` IN (1, 104);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(17, 0, 48268, 0, 0, 1, 1, 48255, 0, 0, 1, 0, 0, '', 'Target must not have aura Let Them Not Rise!: Skeletal Transform'),
-(17, 0, 48268, 0, 1, 1, 1, 48255, 0, 0, 1, 0, 0, '', 'Target must not have aura Let Them Not Rise!: Skeletal Transform'),
-(17, 0, 48268, 0, 2, 1, 1, 48255, 0, 0, 1, 0, 0, '', 'Target must not have aura Let Them Not Rise!: Skeletal Transform'),
-(17, 0, 48268, 0, 3, 1, 1, 48255, 0, 0, 1, 0, 0, '', 'Target must not have aura Let Them Not Rise!: Skeletal Transform'),
-(17, 0, 48268, 0, 4, 1, 1, 48255, 0, 0, 1, 0, 0, '', 'Target must not have aura Let Them Not Rise!: Skeletal Transform');
+(17, 0, 48268, 0, 0, 104, 1, 1, 1, 0, 1, 0, 0, '', 'Target must not have been eaten by rats yet (AI data 1 = 1)'),
+(17, 0, 48268, 0, 1, 104, 1, 1, 1, 0, 1, 0, 0, '', 'Target must not have been eaten by rats yet (AI data 1 = 1)'),
+(17, 0, 48268, 0, 2, 104, 1, 1, 1, 0, 1, 0, 0, '', 'Target must not have been eaten by rats yet (AI data 1 = 1)'),
+(17, 0, 48268, 0, 3, 104, 1, 1, 1, 0, 1, 0, 0, '', 'Target must not have been eaten by rats yet (AI data 1 = 1)'),
+(17, 0, 48268, 0, 4, 104, 1, 1, 1, 0, 1, 0, 0, '', 'Target must not have been eaten by rats yet (AI data 1 = 1)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `unit_flags` = 33554688, `VerifiedBuild` = 52237 WHERE `entry` = 27276;
 

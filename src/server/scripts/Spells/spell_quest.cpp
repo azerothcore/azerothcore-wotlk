@@ -2541,6 +2541,8 @@ enum LetThemNotRise
     SPELL_SKELETAL_TRANSFORM    = 48255,
     SPELL_SUMMON_RAT            = 48272,
 
+    DATA_EATEN_BY_RATS          = 1,
+
     RAT_COUNT                   = 6
 };
 
@@ -2555,12 +2557,23 @@ class spell_q12211_container_of_rats : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        Unit* corpse = GetHitUnit();
+        Creature* corpse = GetHitCreature();
+        if (!corpse)
+            return;
+
+        // blocks a second use, cleared on respawn
+        if (CreatureAI* ai = corpse->AI())
+            ai->SetData(DATA_EATEN_BY_RATS, 1);
+
         for (uint8 i = 0; i < RAT_COUNT; ++i)
             corpse->CastSpell(corpse, SPELL_SUMMON_RAT, true);
 
-        // Applied right away so the corpse cannot be used twice
-        corpse->CastSpell(corpse, SPELL_SKELETAL_TRANSFORM, true);
+        // not cancelled if the corpse is removed, don't morph it after respawn
+        corpse->m_Events.AddEventAtOffset([corpse]()
+        {
+            if (!corpse->IsAlive())
+                corpse->CastSpell(corpse, SPELL_SKELETAL_TRANSFORM, true);
+        }, randtime(6900ms, 8600ms));
     }
 
     void Register() override
