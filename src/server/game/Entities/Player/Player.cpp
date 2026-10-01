@@ -11809,6 +11809,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_UPDATE_WORLD_STATE
     // SMSG_POWER_UPDATE
 
+    ResyncRunes();
+
     SetMover(this);
 
     sScriptMgr->OnPlayerSendInitialPacketsBeforeAddToMap(this, data);
@@ -13724,31 +13726,48 @@ void Player::RemoveRunesByAuraEffect(AuraEffect const* aura)
 {
     for (uint8 i = 0; i < MAX_RUNES; ++i)
     {
-        if (m_runes->runes[i].ConvertAura == aura)
-        {
+        // The rune keeps its converted type while another aura still converts it
+        if (m_runes->runes[i].ConvertAuras.erase(aura) && m_runes->runes[i].ConvertAuras.empty())
             ConvertRune(i, GetBaseRune(i));
-            SetRuneConvertAura(i, nullptr);
-        }
     }
 }
 
 void Player::RestoreBaseRune(uint8 index)
 {
-    AuraEffect const* aura = m_runes->runes[index].ConvertAura;
-    // If rune was converted by a non-pasive aura that still active we should keep it converted
-    if (aura && !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_PASSIVE))
-        return;
-    ConvertRune(index, GetBaseRune(index));
-    SetRuneConvertAura(index, nullptr);
-    // Don't drop passive talents providing rune convertion
-    if (!aura || aura->GetAuraType() != SPELL_AURA_CONVERT_RUNE)
-        return;
-    for (uint8 i = 0; i < MAX_RUNES; ++i)
+    std::unordered_set<AuraEffect const*>& auras = m_runes->runes[index].ConvertAuras;
+    std::vector<AuraEffect const*> passiveConvertAuras;
+
+    // Using the rune ends the conversions of passive auras, a non-passive aura that is still active keeps it converted
+    for (auto itr = auras.begin(); itr != auras.end();)
     {
-        if (aura == m_runes->runes[i].ConvertAura)
-            return;
+        AuraEffect const* aura = *itr;
+        if (aura && !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_PASSIVE))
+        {
+            ++itr;
+            continue;
+        }
+
+        if (aura && aura->GetAuraType() == SPELL_AURA_CONVERT_RUNE)
+            passiveConvertAuras.push_back(aura);
+
+        itr = auras.erase(itr);
     }
-    aura->GetBase()->Remove();
+
+    if (!auras.empty())
+        return;
+
+    ConvertRune(index, GetBaseRune(index));
+
+    // Drop passive SPELL_AURA_CONVERT_RUNE auras that no longer convert any rune
+    for (AuraEffect const* aura : passiveConvertAuras)
+    {
+        bool stillConverting = false;
+        for (uint8 i = 0; i < MAX_RUNES && !stillConverting; ++i)
+            stillConverting = m_runes->runes[i].ConvertAuras.count(aura) > 0;
+
+        if (!stillConverting)
+            aura->GetBase()->Remove();
+    }
 }
 
 void Player::ConvertRune(uint8 index, RuneType newType)
@@ -13761,14 +13780,22 @@ void Player::ConvertRune(uint8 index, RuneType newType)
     SendDirectMessage(&data);
 }
 
-void Player::ResyncRunes(uint8 count)
+void Player::ResyncRunes()
 {
-    WorldPacket data(SMSG_RESYNC_RUNES, 4 + count * 2);
-    data << uint32(count);
-    for (uint32 i = 0; i < count; ++i)
+    if (!IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+        return;
+
+    WorldPacket data(SMSG_RESYNC_RUNES, 4 + MAX_RUNES * 2);
+    data << uint32(MAX_RUNES);
+    for (uint8 i = 0; i < MAX_RUNES; ++i)
     {
-        data << uint8(GetCurrentRune(i));                   // rune type
-        data << uint8(255 - (GetRuneCooldown(i) * 51));     // passed cooldown time (0-255)
+        // Passed cooldown time (0-255)
+        uint32 baseCooldown = GetRuneBaseCooldown(i, true);
+        uint32 cooldown = std::min(GetRuneCooldown(i), baseCooldown);
+        uint8 passed = baseCooldown ? uint8(255 - cooldown * 255 / baseCooldown) : 255;
+
+        data << uint8(GetCurrentRune(i));
+        data << uint8(passed);
     }
     SendDirectMessage(&data);
 }
@@ -13806,7 +13833,7 @@ void Player::InitRunes()
         SetCurrentRune(i, runeSlotTypes[i]);                           // init current types
         SetRuneCooldown(i, 0);                                         // reset cooldowns
         SetGracePeriod(i, 0);                                          // xinef: reset grace period
-        SetRuneConvertAura(i, nullptr);
+        m_runes->runes[i].ConvertAuras.clear();
         m_runes->SetRuneState(i);
     }
 

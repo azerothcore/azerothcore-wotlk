@@ -43,6 +43,7 @@
 #include "WorldSession.h"
 #include <set>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 struct CreatureTemplate;
@@ -406,7 +407,7 @@ struct RuneInfo
     uint8 CurrentRune;
     uint32 Cooldown;
     uint32 GracePeriod;
-    AuraEffect const* ConvertAura;
+    std::unordered_set<AuraEffect const*> ConvertAuras;
 };
 
 struct Runes
@@ -2564,12 +2565,12 @@ public:
     void SetCurrentRune(uint8 index, RuneType currentRune) { m_runes->runes[index].CurrentRune = currentRune; }
     void SetRuneCooldown(uint8 index, uint32 cooldown) { m_runes->runes[index].Cooldown = cooldown; m_runes->SetRuneState(index, (cooldown == 0)); }
     void SetGracePeriod(uint8 index, uint32 period) { m_runes->runes[index].GracePeriod = period; }
-    void SetRuneConvertAura(uint8 index, AuraEffect const* aura) { m_runes->runes[index].ConvertAura = aura; }
+    void SetRuneConvertAura(uint8 index, AuraEffect const* aura) { m_runes->runes[index].ConvertAuras.insert(aura); }
     void AddRuneByAuraEffect(uint8 index, RuneType newType, AuraEffect const* aura) { SetRuneConvertAura(index, aura); ConvertRune(index, newType); }
     void RemoveRunesByAuraEffect(AuraEffect const* aura);
     void RestoreBaseRune(uint8 index);
     void ConvertRune(uint8 index, RuneType newType);
-    void ResyncRunes(uint8 count);
+    void ResyncRunes();
     void AddRunePower(uint8 index);
     void InitRunes();
 
