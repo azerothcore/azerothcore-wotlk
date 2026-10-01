@@ -1646,42 +1646,6 @@ public:
     }
 };
 
-/*########
-#### go_veil_skith_cage
-#####*/
-
-enum MissingFriends
-{
-    QUEST_MISSING_FRIENDS    = 10852,
-    NPC_CAPTIVE_CHILD        = 22314,
-    SAY_FREE_0               = 0,
-};
-
-class go_veil_skith_cage : public GameObjectScript
-{
-public:
-    go_veil_skith_cage() : GameObjectScript("go_veil_skith_cage") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        go->UseDoorOrButton();
-        if (player->GetQuestStatus(QUEST_MISSING_FRIENDS) == QUEST_STATUS_INCOMPLETE)
-        {
-            std::list<Creature*> childrenList;
-            GetCreatureListWithEntryInGrid(childrenList, go, NPC_CAPTIVE_CHILD, INTERACTION_DISTANCE);
-            for (std::list<Creature*>::const_iterator itr = childrenList.begin(); itr != childrenList.end(); ++itr)
-            {
-                player->KilledMonsterCredit(NPC_CAPTIVE_CHILD, (*itr)->GetGUID());
-                (*itr)->DespawnOrUnsummon(5s);
-                (*itr)->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
-                (*itr)->AI()->Talk(SAY_FREE_0);
-                (*itr)->GetMotionMaster()->Clear();
-            }
-        }
-        return false;
-    }
-};
-
 /*####
 ## go_bells
 ####*/
@@ -1907,6 +1871,5 @@ void AddSC_go_scripts()
     new go_amberpine_outhouse();
     new go_hive_pod();
     new go_massive_seaforium_charge();
-    new go_veil_skith_cage();
     new go_bells();
 }
