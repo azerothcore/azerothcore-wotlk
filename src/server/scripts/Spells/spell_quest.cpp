@@ -2544,9 +2544,9 @@ enum LetThemNotRise
     RAT_COUNT                   = 6
 };
 
-class spell_container_of_rats : public SpellScript
+class spell_q12211_container_of_rats : public SpellScript
 {
-    PrepareSpellScript(spell_container_of_rats);
+    PrepareSpellScript(spell_q12211_container_of_rats);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
@@ -2565,7 +2565,7 @@ class spell_container_of_rats : public SpellScript
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_container_of_rats::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectHitTarget += SpellEffectFn(spell_q12211_container_of_rats::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2643,5 +2643,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
     RegisterSpellScript(spell_q13413_wyrmrest_skytalon_ride_periodic);
-    RegisterSpellScript(spell_container_of_rats);
+    RegisterSpellScript(spell_q12211_container_of_rats);
 }

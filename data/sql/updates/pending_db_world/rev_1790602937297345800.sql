@@ -4,7 +4,7 @@ DELETE FROM `spell_linked_spell` WHERE `spell_trigger` = 48268 AND `spell_effect
 
 DELETE FROM `spell_script_names` WHERE `spell_id` = 48268;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(48268, 'spell_container_of_rats');
+(48268, 'spell_q12211_container_of_rats');
 
 -- Let Them Not Rise!: Skeletal Transform, transform into Skeleton (6412)
 UPDATE `spell_dbc` SET `Effect_1` = 6, `ImplicitTargetA_1` = 1, `EffectAura_1` = 56, `EffectMiscValue_1` = 6412 WHERE `ID` = 48255;
