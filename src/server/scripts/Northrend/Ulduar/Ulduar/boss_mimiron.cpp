@@ -155,7 +155,7 @@ enum HardMode
     SPELL_ENTER_VEHICLE_4                           = 63316,
 };
 
-constexpr uint32 MIMIRON_MAX_ACTIVE_FLAMES = 50;
+constexpr uint32 MIMIRON_MAX_ACTIVE_FLAMES = 75;
 
 enum EVENTS
 {
