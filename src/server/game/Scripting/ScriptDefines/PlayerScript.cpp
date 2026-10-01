@@ -237,6 +237,11 @@ void ScriptMgr::OnPlayerBeforeLogout(Player* player)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_LOGOUT, script->OnPlayerBeforeLogout(player));
 }
 
+bool ScriptMgr::OnPlayerCanMarkAccountOffline(ObjectGuid guid, uint32 accountId)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_MARK_ACCOUNT_OFFLINE, !script->OnPlayerCanMarkAccountOffline(guid, accountId));
+}
+
 void ScriptMgr::OnPlayerLogout(Player* player)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LOGOUT, script->OnPlayerLogout(player));
