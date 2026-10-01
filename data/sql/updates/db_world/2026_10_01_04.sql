@@ -1,3 +1,4 @@
+-- DB update 2026_10_01_03 -> 2026_10_01_04
 -- Korean community-reviewed locale data, filtered against upstream world DB.
 -- Only rows with an existing upstream parent entry and Hangul translation are included.
 -- New locale rows use batched DELETE and INSERT; existing rows update Korean fields only.
