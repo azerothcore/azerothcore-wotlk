@@ -635,9 +635,12 @@ class spell_hadronox_summon_periodic_aura : public AuraScript
         return SUMMON_WEIGHTS.front().first;
     }
 
-    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
+        // the core re-arms the timer with the DBC amplitude before each tick, override it
+        GetAura()->GetEffect(aurEff->GetEffIndex())->SetPeriodicTimer(SUMMON_INTERVAL);
+
         Unit* owner = GetUnitOwner();
         if (InstanceScript* instance = owner->GetInstanceScript())
             if (!instance->IsBossDone(DATA_HADRONOX) != NOT_STARTED)
