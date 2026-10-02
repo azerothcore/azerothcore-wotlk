@@ -17,8 +17,8 @@
 
 #include "GameTime.h"
 #include "Group.h"
-#include "IntegrationTestFixture.h"
 #include "LFGMgr.h"
+#include "IntegrationTestFixture.h"
 #include "RBAC.h"
 #include "SpellAuras.h"
 #include "SpellInfoTestHelper.h"
@@ -109,6 +109,11 @@ protected:
     void SetDeclineExpiry(Player* player, time_t expiresAt)
     {
         _manager->PlayersStore[player->GetGUID()].SetDeclineCooldown(expiresAt);
+    }
+
+    void SetQueueState(Player* player, LfgState state)
+    {
+        _manager->SetState(player->GetGUID(), state);
     }
 
     bool HasDeclineCooldown(Player* player, time_t now)
@@ -240,7 +245,7 @@ TEST_F(LFGQueueJoinTest, QueueStateResetDoesNotClearDeclinePenalty)
 {
     Player* player = NewPlayer();
     SetDeclineExpiry(player, GameTime::GetGameTime().count() + LFG_TIME_DECLINE_COOLDOWN);
-    _manager->SetState(player->GetGUID(), LFG_STATE_NONE);
+    SetQueueState(player, LFG_STATE_NONE);
     _manager->LeaveLfg(player->GetGUID());
     EXPECT_EQ(Join(player, SPECIFIC_DUNGEON), LFG_STATE_NONE);
     EXPECT_TRUE(HasDeclineCooldown(player, GameTime::GetGameTime().count()));
