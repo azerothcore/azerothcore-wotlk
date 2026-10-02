@@ -6283,6 +6283,8 @@ void Spell::EffectGameObjectSetDestructionState(SpellEffIndex effIndex)
 
 void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* properties, uint32 numGuardians, bool personalSpawn)
 {
+    constexpr uint32 NPC_EBON_GARGOYLE = 27829;
+
     Unit* unitCaster = GetUnitCasterForEffectHandlers();
     Unit* caster = m_originalCaster;
     if (!caster)
@@ -6383,7 +6385,8 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         // xinef: do not use precalculated position for effect summon pet in this function
         // it means it was cast by NPC and should have its position overridden unless the
         // target position is specified in the DB AND the effect has no or zero radius
-        if ((totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET) ||
+        bool useSummonDestination = totalNumGuardians == 1 || (numGuardians == 1 && entry == NPC_EBON_GARGOYLE);
+        if ((useSummonDestination && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET) ||
             (GetSpellInfo()->Effects[i].TargetA.GetTarget() == TARGET_DEST_DB &&
             (!GetSpellInfo()->Effects[i].HasRadius() || GetSpellInfo()->Effects[i].RadiusEntry->RadiusMax == 0)))
         {

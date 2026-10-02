@@ -80,7 +80,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         if (type != EFFECT_MOTION_TYPE)
             return;
 
-        if (point == POINT_GARGOYLE_ARRIVAL)
+        if (point == POINT_GARGOYLE_ARRIVAL && !_despawning)
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);
