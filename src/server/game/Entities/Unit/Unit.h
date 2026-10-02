@@ -31,6 +31,7 @@
 #include "ThreatManager.h"
 #include "UnitDefines.h"
 #include "UnitUtils.h"
+#include <array>
 #include <boost/container/flat_map.hpp>
 #include <functional>
 #include <utility>
@@ -210,8 +211,12 @@ enum class DeathState : uint8
     JustRespawned = 4,
 };
 
-extern float baseMoveSpeed[MAX_MOVE_TYPE];
-extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
+extern std::array<float, MAX_MOVE_TYPE> baseMoveSpeed;
+extern std::array<float, MAX_MOVE_TYPE> playerBaseMoveSpeed;
+
+// Sets baseMoveSpeed (NPCs) and playerBaseMoveSpeed to the default speeds times
+// the given rates. Recomputed from the defaults, so a config reload doesn't compound.
+void ApplyMoveSpeedRates(float npcRate, float playerRate);
 
 enum WeaponAttackType : uint8
 {
