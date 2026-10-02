@@ -63,7 +63,8 @@ public:
     bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
     bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
     static std::pair<PetStable::PetInfo const*, PetSaveMode> GetLoadPetInfo(PetStable const& stable, uint32 petEntry, uint32 petnumber, bool current);
-    bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct = 0, bool fullMana = false);
+    bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct = 0,
+        bool fullMana = false, Position const* summonPosition = nullptr);
     bool isBeingLoaded() const override { return m_loading; }
     void SavePetToDB(PetSaveMode mode);
     void FillPetInfo(PetStable::PetInfo* petInfo) const;
@@ -167,6 +168,7 @@ protected:
 
 private:
     bool _newRisenGhoulVisible = false;
+    bool _summonedRisenGhoul = false;
     void SaveToDB(uint32, uint8, uint32) override                // override of Creature::SaveToDB     - must not be called
     {
         ABORT();

@@ -9175,7 +9175,9 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     Pet* pet = new Pet(this, petType);
 
-    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false, healthPct))
+    Position summonPosition(x, y, z, ang);
+    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, false, healthPct, false,
+        entry == NPC_RISEN_GHOUL ? &summonPosition : nullptr))
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
