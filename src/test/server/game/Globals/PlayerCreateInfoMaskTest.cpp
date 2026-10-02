@@ -63,8 +63,8 @@ TEST(PlayerCreateInfoMaskTest, SingleBitPairSelectsOneCombination)
 
 TEST(PlayerCreateInfoMaskTest, MultipleBitsSelectTheFullRectangle)
 {
-    // Two races by three classes is six pairs. This is the property that makes condensing safe:
-    // a row stands for the complete cross product of its two masks, never a ragged subset.
+    // Two races by three classes is six pairs. A row stands for the complete cross product of its
+    // two masks and never a ragged subset, so anyone writing a multi-bit row has to mean all of it.
     uint32 const races = MaskOf(RACE_ORC) | MaskOf(RACE_TROLL);
     uint32 const classes = MaskOf(CLASS_WARRIOR) | MaskOf(CLASS_HUNTER) | MaskOf(CLASS_ROGUE);
 

@@ -4476,6 +4476,7 @@ void ObjectMgr::LoadPlayerInfo()
                     // levelInfo is freed the same way ~ObjectMgr does; it is still null this early,
                     // but the two disposal sites should not disagree.
                     PlayerInfo*& slot = _playerInfo[raceId][classId];
+                    bool const replaced = slot != nullptr;
                     if (slot)
                     {
                         LOG_ERROR("sql.sql", "Race {} class {} is covered by more than one row in "
@@ -4496,7 +4497,10 @@ void ObjectMgr::LoadPlayerInfo()
                     info->displayId_f = rEntry->model_f;
                     slot = info;
 
-                    ++count;
+                    // A replaced slot is not a new definition, so the reported count stays equal to
+                    // the number of race/class pairs that actually have a start position.
+                    if (!replaced)
+                        ++count;
                 });
             } while (result->NextRow());
 
