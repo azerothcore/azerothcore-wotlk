@@ -17,6 +17,7 @@
 
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
+#include "PathGenerator.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
@@ -127,6 +128,20 @@ enum Misc
 };
 
 static Position const LowerDoorPosition = { 581.0f, 608.5f, 739.0f };
+static Position const RampUpperLanding = { 571.498718f, 576.978333f, 727.582947f };
+static Position const RampBottom = { 532.775f, 535.233f, 681.056f };
+
+// Stops of the add path from each door. The first one is right outside the door's web wall and is reached in a
+// straight line because the navmesh does not pass through the webbing; the others are reached down the ramp by
+// pathfinding.
+static std::array<std::vector<Position>, 3> const doorPaths =
+{{
+    { { 485.314606f, 611.418640f, 771.428406f }, { 513.574341f, 587.022156f, 736.229065f }, RampUpperLanding,
+        RampBottom },
+    { { 575.760437f, 611.516418f, 771.427368f }, { 537.920410f, 580.436157f, 732.796692f }, RampUpperLanding,
+        RampBottom },
+    { { 588.930725f, 598.233276f, 739.142151f }, { 601.289246f, 583.259644f, 725.443054f }, RampBottom },
+}};
 
 static const std::array<Position, 3> hadronoxSteps =
 {{
@@ -210,17 +225,40 @@ struct boss_hadronox : public BossAI
             case NPC_ANUB_AR_CHAMPION_LOWER:
             case NPC_ANUB_AR_CRYPT_FIEND_LOWER:
             case NPC_ANUB_AR_NECROMANCER_LOWER:
-                // Xinef: cannot use pathfinding...
-                if (summon->GetDistance(477.0f, 618.0f, 771.0f) < 5.0f)
-                    summon->GetMotionMaster()->MoveWaypoint(3000012, false);
-                else if (summon->GetDistance(583.0f, 617.0f, 771.0f) < 5.0f)
-                    summon->GetMotionMaster()->MoveWaypoint(3000013, false);
-                else if (summon->GetDistance(LowerDoorPosition) < 5.0f)
-                    summon->GetMotionMaster()->MoveWaypoint(3000014, false);
+                MoveDownRamp(summon);
                 break;
             default:
                 break;
         }
+    }
+
+    void MoveDownRamp(Creature* summon)
+    {
+        auto const& doorPath = *std::min_element(doorPaths.begin(), doorPaths.end(),
+            [summon](std::vector<Position> const& a, std::vector<Position> const& b)
+            {
+                return summon->GetExactDistSq(a.front()) < summon->GetExactDistSq(b.front());
+            });
+
+        Movement::PointsArray path;
+        path.emplace_back(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ());
+        path.emplace_back(doorPath.front().GetPositionX(), doorPath.front().GetPositionY(),
+            doorPath.front().GetPositionZ());
+
+        PathGenerator pathGenerator(summon);
+        for (std::size_t i = 1; i < doorPath.size(); ++i)
+        {
+            Position const& from = doorPath[i - 1];
+            Position const& to = doorPath[i];
+            bool const found = pathGenerator.CalculatePath(from.GetPositionX(), from.GetPositionY(),
+                from.GetPositionZ(), to.GetPositionX(), to.GetPositionY(), to.GetPositionZ(), false);
+            if (found && (pathGenerator.GetPathType() & PATHFIND_NORMAL))
+                path.insert(path.end(), std::next(pathGenerator.GetPath().begin()), pathGenerator.GetPath().end());
+            else
+                path.emplace_back(to.GetPositionX(), to.GetPositionY(), to.GetPositionZ());
+        }
+
+        summon->GetMotionMaster()->MoveSplinePath(&path, FORCED_MOVEMENT_RUN);
     }
 
     void KilledUnit(Unit* victim) override
