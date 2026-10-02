@@ -17,7 +17,6 @@
 
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
-#include "GameTime.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
@@ -100,11 +99,6 @@ enum NPCs
     NPC_ANUB_AR_CHAMPION_PACK     = 29117,
     NPC_ANUB_AR_CRYPT_FIEND_PACK  = 29118,
     NPC_ANUB_AR_NECROMANCER_PACK  = 29119,
-
-    // Summoned by the lower door (53090-53092)
-    NPC_ANUB_AR_CHAMPION_LOWER    = 29096,
-    NPC_ANUB_AR_CRYPT_FIEND_LOWER = 29097,
-    NPC_ANUB_AR_NECROMANCER_LOWER = 29098,
 };
 
 enum SummonGroups : uint32
@@ -625,7 +619,6 @@ class spell_hadronox_summon_periodic_aura : public AuraScript
 
 public:
     static constexpr int32 SUMMON_PERIOD = 15'000;
-    static constexpr int32 STAGGER_TOLERANCE = 500;
 
     spell_hadronox_summon_periodic_aura(int32 delay, uint32 spellEntry, uint32 lowerDoorSpellEntry) : _delay(delay), _spellEntry(spellEntry), _lowerDoorSpellEntry(lowerDoorSpellEntry) { }
 
@@ -637,21 +630,9 @@ public:
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-
-        // The core re-arms the timer with the DBC amplitude before each tick, so the stagger and the 15s period are
-        // enforced here: the three auras start 5s apart and each repeats every 15s, a door spawns one add per 5s.
-        AuraEffect* effect = GetAura()->GetEffect(aurEff->GetEffIndex());
-        if (!_staggered)
-        {
-            _staggered = true;
-            int32 elapsed = int32(GameTime::GetGameTimeMS().count() - _appliedAt);
-            if (elapsed + STAGGER_TOLERANCE < _delay)
-            {
-                effect->SetPeriodicTimer(_delay - elapsed);
-                return;
-            }
-        }
-        effect->SetPeriodicTimer(SUMMON_PERIOD);
+        // The three auras start 5s apart (see OnApply) and each repeats every 15s, so a door spawns one add per 5s.
+        // The core re-arms the timer with the DBC amplitude before each tick, so pin the period here.
+        GetAura()->GetEffect(aurEff->GetEffIndex())->SetPeriodicTimer(SUMMON_PERIOD);
 
         Unit* owner = GetUnitOwner();
         if (InstanceScript* instance = owner->GetInstanceScript())
@@ -666,7 +647,6 @@ public:
 
     void OnApply(AuraEffect const* auraEffect, AuraEffectHandleModes)
     {
-        _appliedAt = uint32(GameTime::GetGameTimeMS().count());
         GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(_delay);
     }
 
@@ -680,8 +660,6 @@ private:
     int32 _delay;
     uint32 _spellEntry;
     uint32 _lowerDoorSpellEntry;
-    uint32 _appliedAt = 0;
-    bool _staggered = false;
 };
 
 class spell_hadronox_leech_poison_aura : public AuraScript
