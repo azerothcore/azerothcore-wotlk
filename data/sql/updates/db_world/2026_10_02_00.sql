@@ -1,3 +1,4 @@
+-- DB update 2026_10_01_06 -> 2026_10_02_00
 UPDATE `creature_template_locale` SET `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `entry` IN (1156, 1293, 10540, 11583, 12807, 23863, 31025);
 DELETE FROM `creature_text_locale` WHERE `Locale` = 'koKR' AND (`CreatureID`, `GroupID`, `ID`) IN ((1328, 1, 1), (3626, 1, 1), (3976, 3, 0), (6244, 4, 0), (10262, 0, 5), (14721, 0, 0), (14721, 1, 0), (28576, 1, 0), (28577, 1, 0), (32906, 11, 0));
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
