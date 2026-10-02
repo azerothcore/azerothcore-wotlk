@@ -2188,10 +2188,9 @@ bool GameObject::IsInRange3d(float x, float y, float z, float radius) const
     float localY = dy * cosA - dx * sinA;
 
     float scale = GetObjectScale();
-    float minZ = std::min(0.0f, info->minZ);
     return localX < (info->maxX * scale) + radius && localX > (info->minX * scale) - radius
            && localY < (info->maxY * scale) + radius && localY > (info->minY * scale) - radius
-           && dz < (info->maxZ * scale) + radius && dz > (minZ * scale) - radius;
+           && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
 }
 
 void GameObject::EventInform(uint32 eventId)
