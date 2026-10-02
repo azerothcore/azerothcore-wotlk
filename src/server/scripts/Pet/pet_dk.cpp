@@ -21,6 +21,7 @@
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "PassiveAI.h"
+#include "PetDefines.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"

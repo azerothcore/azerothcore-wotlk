@@ -2176,7 +2176,14 @@ class spell_dk_raise_dead : public SpellScript
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(GetGhoulSpellId());
         SpellCastTargets targets;
-        targets.SetDst(*GetHitUnit());
+        if (spellInfo->Id == SPELL_DK_RAISE_DEAD_PET)
+        {
+            float x, y, z;
+            GetCaster()->GetClosePoint(x, y, z, GetCaster()->GetObjectSize());
+            targets.SetDst(x, y, z, GetCaster()->GetOrientation(), GetCaster()->GetMapId());
+        }
+        else
+            targets.SetDst(*GetHitUnit());
 
         GetCaster()->CastSpell(targets, spellInfo, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCaster()->GetGUID());
 
@@ -2212,7 +2219,16 @@ class spell_dk_raise_dead_summon : public SpellScript
     void SetSpawnDestination(SpellDestination& dest)
     {
         WorldLocation const* originalDest = GetExplTargetDest();
-        if (!originalDest || !GetCaster()->IsWithinDist2d(originalDest, 0.1f))
+        if (!originalDest)
+            return;
+
+        if (GetSpellInfo()->Id == SPELL_DK_RAISE_DEAD_PET)
+        {
+            dest.Relocate(*originalDest);
+            return;
+        }
+
+        if (!GetCaster()->IsWithinDist2d(originalDest, 0.1f))
             return;
 
         float x, y, z;

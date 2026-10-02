@@ -44,6 +44,8 @@ public:
     ~Pet() override = default;
 
     void AddToWorld() override;
+    void UpdateObjectVisibilityOnCreate() override;
+    bool IsNewRisenGhoulVisible() const { return _newRisenGhoulVisible; }
     void RemoveFromWorld() override;
 
     float GetNativeObjectScale() const override;
@@ -164,6 +166,7 @@ protected:
     uint32     m_tempspell;
 
 private:
+    bool _newRisenGhoulVisible = false;
     void SaveToDB(uint32, uint8, uint32) override                // override of Creature::SaveToDB     - must not be called
     {
         ABORT();

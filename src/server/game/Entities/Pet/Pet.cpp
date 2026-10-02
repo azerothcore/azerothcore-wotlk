@@ -119,6 +119,13 @@ void Pet::AddToWorld()
     }
 }
 
+void Pet::UpdateObjectVisibilityOnCreate()
+{
+    _newRisenGhoulVisible = GetEntry() == NPC_RISEN_GHOUL && !isBeingLoaded();
+    TempSummon::UpdateObjectVisibilityOnCreate();
+    _newRisenGhoulVisible = false;
+}
+
 void Pet::RemoveFromWorld()
 {
     ///- Remove the pet from the accessor

@@ -10,11 +10,6 @@
 #ifndef AZEROTHCORE_PET_DK_H
 #define AZEROTHCORE_PET_DK_H
 
-enum DeathKnightPetActions
-{
-    ACTION_DK_GHOUL_EMERGE = 1,
-};
-
 enum DeathKnightPetCreatures
 {
     NPC_DK_RISEN_GHOUL = 26125,
