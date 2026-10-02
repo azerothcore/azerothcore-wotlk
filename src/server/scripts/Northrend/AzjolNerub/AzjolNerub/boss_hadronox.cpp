@@ -17,6 +17,7 @@
 
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
@@ -30,7 +31,12 @@ enum Spells
     SPELL_SUMMON_ANUBAR_CHAMPION            = 53064,
     SPELL_SUMMON_ANUBAR_CRYPT_FIEND         = 53065,
     SPELL_SUMMON_ANUBAR_NECROMANCER         = 53066,
-    SPELL_SUMMON_ANUBAR_PERIODIC            = 53037,
+    SPELL_SUMMON_ANUBAR_CHAMPION_LOWER      = 53090,
+    SPELL_SUMMON_ANUBAR_CRYPT_FIEND_LOWER   = 53091,
+    SPELL_SUMMON_ANUBAR_NECROMANCER_LOWER   = 53092,
+    SPELL_SUMMON_ANUBAR_CHAMPION_PERIODIC   = 53035,
+    SPELL_SUMMON_ANUBAR_NECROMANCER_PERIODIC = 53036,
+    SPELL_SUMMON_ANUBAR_CRYPT_FIEND_PERIODIC = 53037,
 
     // Hadronox
     SPELL_WEB_FRONT_DOORS                   = 53177,
@@ -94,6 +100,11 @@ enum NPCs
     NPC_ANUB_AR_CHAMPION_PACK     = 29117,
     NPC_ANUB_AR_CRYPT_FIEND_PACK  = 29118,
     NPC_ANUB_AR_NECROMANCER_PACK  = 29119,
+
+    // Summoned by the lower door (53090-53092)
+    NPC_ANUB_AR_CHAMPION_LOWER    = 29096,
+    NPC_ANUB_AR_CRYPT_FIEND_LOWER = 29097,
+    NPC_ANUB_AR_NECROMANCER_LOWER = 29098,
 };
 
 enum SummonGroups : uint32
@@ -120,6 +131,8 @@ enum Misc
     ACTION_CRUSHER_DIED         = 2,
     ACTION_PACK_WALK            = 3,
 };
+
+static Position const LowerDoorPosition = { 581.0f, 608.5f, 739.0f };
 
 static const std::array<Position, 3> hadronoxSteps =
 {{
@@ -193,17 +206,22 @@ struct boss_hadronox : public BossAI
         switch (summon->GetEntry())
         {
             case NPC_WORLD_TRIGGER_LAOI:
-                summon->AddAura(SPELL_SUMMON_ANUBAR_PERIODIC, summon);
+                summon->AddAura(SPELL_SUMMON_ANUBAR_CHAMPION_PERIODIC, summon);
+                summon->AddAura(SPELL_SUMMON_ANUBAR_NECROMANCER_PERIODIC, summon);
+                summon->AddAura(SPELL_SUMMON_ANUBAR_CRYPT_FIEND_PERIODIC, summon);
                 break;
             case NPC_ANUB_AR_CHAMPION:
             case NPC_ANUB_AR_NECROMANCER:
             case NPC_ANUB_AR_CRYPTFIEND:
+            case NPC_ANUB_AR_CHAMPION_LOWER:
+            case NPC_ANUB_AR_CRYPT_FIEND_LOWER:
+            case NPC_ANUB_AR_NECROMANCER_LOWER:
                 // Xinef: cannot use pathfinding...
                 if (summon->GetDistance(477.0f, 618.0f, 771.0f) < 5.0f)
                     summon->GetMotionMaster()->MoveWaypoint(3000012, false);
                 else if (summon->GetDistance(583.0f, 617.0f, 771.0f) < 5.0f)
                     summon->GetMotionMaster()->MoveWaypoint(3000013, false);
-                else if (summon->GetDistance(581.0f, 608.5f, 739.0f) < 5.0f)
+                else if (summon->GetDistance(LowerDoorPosition) < 5.0f)
                     summon->GetMotionMaster()->MoveWaypoint(3000014, false);
                 break;
             default:
@@ -605,48 +623,42 @@ class spell_hadronox_summon_periodic_aura : public AuraScript
 {
     PrepareAuraScript(spell_hadronox_summon_periodic_aura);
 
-    // One summon per door every 5s; fiends are the most common, then necromancers, then champions
-    static constexpr uint32 SUMMON_INTERVAL = 5'000;
-    static constexpr std::array<std::pair<uint32, uint32>, 3> SUMMON_WEIGHTS =
-    {{
-        { SPELL_SUMMON_ANUBAR_CRYPT_FIEND,  6 },
-        { SPELL_SUMMON_ANUBAR_NECROMANCER,  3 },
-        { SPELL_SUMMON_ANUBAR_CHAMPION,     2 },
-    }};
+public:
+    static constexpr int32 SUMMON_PERIOD = 15'000;
+    static constexpr int32 STAGGER_TOLERANCE = 500;
+
+    spell_hadronox_summon_periodic_aura(int32 delay, uint32 spellEntry, uint32 lowerDoorSpellEntry) : _delay(delay), _spellEntry(spellEntry), _lowerDoorSpellEntry(lowerDoorSpellEntry) { }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_WEB_FRONT_DOORS, SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_NECROMANCER });
-    }
-
-    static uint32 SelectSummonSpell()
-    {
-        uint32 totalWeight = 0;
-        for (auto const& [spellId, weight] : SUMMON_WEIGHTS)
-            totalWeight += weight;
-
-        uint32 roll = urand(1, totalWeight);
-        for (auto const& [spellId, weight] : SUMMON_WEIGHTS)
-        {
-            if (roll <= weight)
-                return spellId;
-            roll -= weight;
-        }
-        return SUMMON_WEIGHTS.front().first;
+        return ValidateSpellInfo({ SPELL_WEB_FRONT_DOORS, _spellEntry, _lowerDoorSpellEntry });
     }
 
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        // the core re-arms the timer with the DBC amplitude before each tick, override it
-        GetAura()->GetEffect(aurEff->GetEffIndex())->SetPeriodicTimer(SUMMON_INTERVAL);
+
+        // The core re-arms the timer with the DBC amplitude before each tick, so the stagger and the 15s period are
+        // enforced here: the three auras start 5s apart and each repeats every 15s, a door spawns one add per 5s.
+        AuraEffect* effect = GetAura()->GetEffect(aurEff->GetEffIndex());
+        if (!_staggered)
+        {
+            _staggered = true;
+            int32 elapsed = int32(GameTime::GetGameTimeMS().count() - _appliedAt);
+            if (elapsed + STAGGER_TOLERANCE < _delay)
+            {
+                effect->SetPeriodicTimer(_delay - elapsed);
+                return;
+            }
+        }
+        effect->SetPeriodicTimer(SUMMON_PERIOD);
 
         Unit* owner = GetUnitOwner();
         if (InstanceScript* instance = owner->GetInstanceScript())
             if (!instance->IsBossDone(DATA_HADRONOX) != NOT_STARTED)
             {
                 if (!owner->HasAura(SPELL_WEB_FRONT_DOORS))
-                    owner->CastSpell(owner, SelectSummonSpell(), true);
+                    owner->CastSpell(owner, owner->GetDistance(LowerDoorPosition) < 5.0f ? _lowerDoorSpellEntry : _spellEntry, true);
                 else if (!instance->IsEncounterInProgress())
                     owner->RemoveAurasDueToSpell(SPELL_WEB_FRONT_DOORS);
             }
@@ -654,7 +666,8 @@ class spell_hadronox_summon_periodic_aura : public AuraScript
 
     void OnApply(AuraEffect const* auraEffect, AuraEffectHandleModes)
     {
-        GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(SUMMON_INTERVAL);
+        _appliedAt = uint32(GameTime::GetGameTimeMS().count());
+        GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(_delay);
     }
 
     void Register() override
@@ -662,6 +675,13 @@ class spell_hadronox_summon_periodic_aura : public AuraScript
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_hadronox_summon_periodic_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         OnEffectApply += AuraEffectApplyFn(spell_hadronox_summon_periodic_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
+
+private:
+    int32 _delay;
+    uint32 _spellEntry;
+    uint32 _lowerDoorSpellEntry;
+    uint32 _appliedAt = 0;
+    bool _staggered = false;
 };
 
 class spell_hadronox_leech_poison_aura : public AuraScript
@@ -726,7 +746,9 @@ void AddSC_boss_hadronox()
     RegisterAzjolNerubCreatureAI(npc_anub_ar_crusher_champion);
     RegisterAzjolNerubCreatureAI(npc_anub_ar_crusher_crypt_fiend);
     RegisterAzjolNerubCreatureAI(npc_anub_ar_crusher_necromancer);
-    RegisterSpellScript(spell_hadronox_summon_periodic_aura);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion_aura", 5'000, SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CHAMPION_LOWER);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer_aura", 10'000, SPELL_SUMMON_ANUBAR_NECROMANCER, SPELL_SUMMON_ANUBAR_NECROMANCER_LOWER);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend_aura", 15'000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_CRYPT_FIEND_LOWER);
     RegisterSpellScript(spell_hadronox_leech_poison_aura);
     RegisterSpellScript(spell_hadronox_web_grab);
     new achievement_hadronox_denied();
