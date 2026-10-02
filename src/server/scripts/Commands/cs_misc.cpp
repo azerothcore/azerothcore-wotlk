@@ -39,6 +39,7 @@
 #include "MiscPackets.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
+#include "PacketLog.h"
 #include "Pet.h"
 #include "Player.h"
 #include "PoolMgr.h"
@@ -3529,6 +3530,14 @@ public:
 
     static bool HandlePacketLog(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<bool> enableArg)
     {
+        if (enableArg && *enableArg && !sPacketLog->CanLogPacket())
+        {
+            handler->SendErrorMessage(
+                "Packet logging is unavailable: PacketLogFile is empty or cannot be opened. "
+                "Check worldserver.conf and restart the worldserver.");
+            return false;
+        }
+
         if (!target)
             target = PlayerIdentifier::FromTargetOrSelf(handler);
 
