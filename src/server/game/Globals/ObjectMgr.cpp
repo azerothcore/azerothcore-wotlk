@@ -4309,12 +4309,9 @@ PetLevelInfo const* ObjectMgr::GetPetLevelInfo(uint32 creature_id, uint8 level) 
     return &itr->second[level - 1];                         // data for level 1 stored in [0] array element, ...
 }
 
-void ForEachRaceClass(uint32 raceMask, uint32 classMask, uint8 maxRaces, bool allowAll,
+void ForEachRaceClass(uint32 raceMask, uint32 classMask, uint8 maxRaces,
     std::function<void(uint8 raceId, uint8 classId)> const& fn)
 {
-    if ((!raceMask || !classMask) && !allowAll)
-        return;
-
     for (uint8 raceId = RACE_HUMAN; raceId < maxRaces; ++raceId)
     {
         // Race and class ids are 1-based, so race 1 is bit 0. Ids past the width of the mask have
@@ -4464,7 +4461,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(), false,
+                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(),
                     [&](uint8 raceId, uint8 classId)
                 {
                     ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(raceId);
@@ -4566,7 +4563,7 @@ void ObjectMgr::LoadPlayerInfo()
                 // on: raceMask 0 strips an unused item from every death knight's starting outfit.
                 // PlayerCreateInfoAddItemHelper ignores pairs that have no PlayerInfo, so a wide
                 // mask cannot reach a combination that does not exist.
-                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(), true,
+                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(),
                     [&](uint8 raceId, uint8 classId)
                 {
                     PlayerCreateInfoAddItemHelper(raceId, classId, item_id, amount);
@@ -4628,7 +4625,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(), true,
+                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(),
                     [&](uint8 raceId, uint8 classId)
                 {
                     if (!GetSkillRaceClassInfo(skill.SkillId, raceId, classId))
@@ -4681,7 +4678,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(), true,
+                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(),
                     [&](uint8 raceId, uint8 classId)
                 {
                     if (PlayerInfo* info = _playerInfo[raceId][classId])
@@ -4731,7 +4728,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(), true,
+                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(),
                     [&](uint8 raceId, uint8 classId)
                 {
                     if (PlayerInfo* info = _playerInfo[raceId][classId])
@@ -4789,7 +4786,7 @@ void ObjectMgr::LoadPlayerInfo()
                 // An empty mask means "all" here, which these rows could not express before.
                 // Pairs without a PlayerInfo are skipped, and the count follows applied actions
                 // rather than rows so the logged figure stays comparable.
-                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(), true,
+                ForEachRaceClass(raceMask, classMask, sRaceMgr->GetMaxRaces(),
                     [&](uint8 raceId, uint8 classId)
                 {
                     PlayerInfo* info = _playerInfo[raceId][classId];

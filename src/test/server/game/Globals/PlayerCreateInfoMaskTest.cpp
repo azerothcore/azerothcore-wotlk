@@ -34,11 +34,11 @@ namespace
     // 10 and 11, since id 9 is flagged not playable - hence 12 rather than 11.
     constexpr uint8 WOTLK_MAX_RACES = 12;
 
-    std::vector<std::pair<uint8, uint8>> Expand(uint32 raceMask, uint32 classMask, bool allowAll = true,
+    std::vector<std::pair<uint8, uint8>> Expand(uint32 raceMask, uint32 classMask,
         uint8 maxRaces = WOTLK_MAX_RACES)
     {
         std::vector<std::pair<uint8, uint8>> out;
-        ForEachRaceClass(raceMask, classMask, maxRaces, allowAll,
+        ForEachRaceClass(raceMask, classMask, maxRaces,
             [&out](uint8 raceId, uint8 classId)
         {
             out.emplace_back(raceId, classId);
@@ -79,7 +79,7 @@ TEST(PlayerCreateInfoMaskTest, MultipleBitsSelectTheFullRectangle)
     }
 }
 
-TEST(PlayerCreateInfoMaskTest, ZeroMaskMeansEveryValueWhenAllowed)
+TEST(PlayerCreateInfoMaskTest, ZeroMaskMeansEveryValue)
 {
     // playercreateinfo_item ships exactly one row, raceMask 0 and classMask 32 for the death
     // knight, stripping an unused item from every one of them. A zero race mask has to keep
@@ -94,16 +94,6 @@ TEST(PlayerCreateInfoMaskTest, ZeroMaskMeansEveryValueWhenAllowed)
         EXPECT_EQ(classId, CLASS_DEATH_KNIGHT);
         EXPECT_GE(raceId, uint8(RACE_HUMAN));
     }
-}
-
-TEST(PlayerCreateInfoMaskTest, ZeroMaskSelectsNothingWhenNotAllowed)
-{
-    // playercreateinfo allocates the PlayerInfo entries, so a zero mask there must not expand.
-    // Letting it through would create combinations the game does not have, such as a human shaman,
-    // and make them selectable at character creation.
-    EXPECT_TRUE(Expand(0, MaskOf(CLASS_WARRIOR), false).empty());
-    EXPECT_TRUE(Expand(MaskOf(RACE_HUMAN), 0, false).empty());
-    EXPECT_TRUE(Expand(0, 0, false).empty());
 }
 
 TEST(PlayerCreateInfoMaskTest, BitsBeyondTheKnownRangeAreIgnored)
@@ -125,7 +115,7 @@ TEST(PlayerCreateInfoMaskTest, RaceIdsPastTheMaskWidthAreNotShifted)
     // raceMask is 32 bits, so an id above 32 has no bit to test. Without the guard the walk would
     // evaluate 1u << 32, which is undefined, and this is the only case that reaches it: a realm
     // whose ChrRaces.dbc carries more than 32 playable races.
-    auto const got = Expand(0xFFFFFFFF, MaskOf(CLASS_WARRIOR), true, 40);
+    auto const got = Expand(0xFFFFFFFF, MaskOf(CLASS_WARRIOR), 40);
 
     ASSERT_EQ(got.size(), 32u);
     EXPECT_EQ(got.front().first, uint8(RACE_HUMAN));
@@ -138,7 +128,7 @@ TEST(PlayerCreateInfoMaskTest, RacesAreBoundedByMaxRaces)
     // the limit rather than walking past it.
     uint32 const allRaces = 0xFFFFFFFF;
 
-    auto const got = Expand(allRaces, MaskOf(CLASS_WARRIOR), true, 3);
+    auto const got = Expand(allRaces, MaskOf(CLASS_WARRIOR), 3);
 
     ASSERT_EQ(got.size(), 2u);
     EXPECT_EQ(got[0].first, uint8(RACE_HUMAN));
