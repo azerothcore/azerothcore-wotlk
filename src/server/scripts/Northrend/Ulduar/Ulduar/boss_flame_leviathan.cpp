@@ -963,6 +963,7 @@ struct npc_freya_ward_summon : public ScriptedAI
     void Reset() override
     {
         events.Reset();
+        me->SetCorpseDelay(5);
     }
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
