@@ -895,6 +895,20 @@ public:
         }
     }
 
+    // Deletes every script. Hooks still fire after this (the static destructors of
+    // GroupMgr and AuctionHouseMgr run after ScriptMgr::Unload()), so each hook list
+    // is emptied but kept: CALL_ENABLED_HOOKS indexes EnabledHooks by hook type.
+    static void Unload()
+    {
+        for (auto const& [scriptID, script] : ScriptPointerList)
+            delete script;
+
+        ScriptPointerList.clear();
+
+        for (auto& hookScripts : EnabledHooks)
+            hookScripts.clear();
+    }
+
     // Gets a script by its ID (assigned by ObjectMgr).
     static TScript* GetScriptById(uint32 id)
     {
