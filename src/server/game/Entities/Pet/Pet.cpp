@@ -1430,7 +1430,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
         AddAura(SPELL_ORC_RACIAL_COMMAND_DK, this);
 
-        AddAura(SPELL_RISEN_GHOUL_SELF_STUN, this);
+        if (!isBeingLoaded())
+            AddAura(SPELL_RISEN_GHOUL_SELF_STUN, this);
 
         // Avoidance, Night of the Dead
         if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))
