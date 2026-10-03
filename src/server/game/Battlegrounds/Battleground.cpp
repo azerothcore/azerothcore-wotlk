@@ -658,10 +658,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                 itr->second->ResetAllPowers();
             }
 
-            // Announce BG starting
-            if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
-                ChatHandler(nullptr).SendWorldTextOptional(LANG_BG_STARTED_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_PVP_START, GetName(), std::min(GetMinLevel(), (uint32)80), std::min(GetMaxLevel(), (uint32)80));
-
             sScriptMgr->OnBattlegroundStart(this);
         }
     }
