@@ -1,3 +1,4 @@
+-- DB update 2026_10_03_06 -> 2026_10_03_07
 --
 -- Let Them Not Rise! (12211): Container of Rats (48268) corpse sequence
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger` = 48268 AND `spell_effect` = 48272;

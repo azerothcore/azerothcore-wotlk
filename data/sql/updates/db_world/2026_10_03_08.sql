@@ -1,3 +1,4 @@
+-- DB update 2026_10_03_07 -> 2026_10_03_08
 -- A Suitable Disguise (20438 / 24556): port Shandy Glossgleam's laundry event to SmartAI (TrinityCore 36414de688).
 -- Timings, positions and the run length follow WotLK Classic sniffs: a run is 7 requests, each request fails
 -- about 12 s after it is asked, and either way Shandy walks off and respawns about 16 s later.

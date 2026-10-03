@@ -1,3 +1,4 @@
+-- DB update 2026_10_03_08 -> 2026_10_03_09
 --
 -- The Exorcism of Colonel Jules (quest 10935): sniffed timings, path, lines and npcflags; retail-like skull rate, ending and failure
 -- Summon Flying Skull: aura 39284 still ticks 39280 every 2 s, but only the SmartAI of Colonel Jules spawns Darkness Released (20% of the ticks)
