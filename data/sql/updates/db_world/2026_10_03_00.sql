@@ -1,3 +1,4 @@
+-- DB update 2026_10_02_00 -> 2026_10_03_00
 --
 -- Sif's Blizzard, Frostbolt, Frostbolt Volley and Frost Nova
 -- 10m      25m
