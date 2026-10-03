@@ -178,17 +178,6 @@ public:
     }
 };
 
-struct SpellImmune
-{
-    SpellImmune() : spellId(0), type(IMMUNITY_EFFECT), blockType(SPELL_BLOCK_TYPE_ALL) { }
-
-    uint32 spellId;
-    uint32 type;
-    uint32 blockType;
-};
-
-typedef std::vector<SpellImmune> SpellImmuneList;
-
 // AzerothCore note: TC keeps SpellCastTargets in SpellDefines.h, so its
 // CastSpellTargetArg can hold an Optional<SpellCastTargets> by value.
 // In AC, SpellCastTargets lives in Spell.h and depends on WorldLocation,

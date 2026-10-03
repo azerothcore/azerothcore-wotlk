@@ -1626,7 +1626,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
                 me->GetMotionMaster()->MoveFall();
                 me->SetHover(false);
-                _events.DelayEvents(25s);
+                _events.DelayEvents(23s);
                 break;
             case DO_ENABLE_AERIAL:
                 if (_isDefeated)
@@ -1698,7 +1698,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || me->HasAura(SPELL_MAGNETIC_CORE))
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             return;
 
         if (!UpdateVictim())
@@ -1741,7 +1741,8 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 break;
         }
 
-        DoSpellAttackIfReady(_phase == 3 ? SPELL_PLASMA_BALL_P1 : SPELL_PLASMA_BALL_P2);
+        if (!me->HasAura(SPELL_MAGNETIC_CORE))
+            DoSpellAttackIfReady(_phase == 3 ? SPELL_PLASMA_BALL_P1 : SPELL_PLASMA_BALL_P2);
     }
 
     void MoveInLineOfSight(Unit* /*mover*/) override {}
