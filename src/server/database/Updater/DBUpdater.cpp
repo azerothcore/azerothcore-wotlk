@@ -515,11 +515,12 @@ void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string co
     args.emplace_back("--defaults-extra-file="+tempDir + confFileName+"");
 
     // CLI Client connection info
-    args.emplace_back("-h" + host);
     args.emplace_back("-u" + user);
 
     // Check if we want to connect through ip or socket (Unix only)
 #ifdef _WIN32
+
+    args.emplace_back("-h" + host);
 
     if (host == ".")
         args.emplace_back("--protocol=PIPE");
@@ -528,16 +529,19 @@ void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string co
 
 #else
 
-    if (!std::isdigit(port_or_socket[0]))
+    if (host == ".")
     {
-        // We can't check if host == "." here, because it is named localhost if socket option is enabled
+        // The client only uses the socket for host localhost, see MySQLConnection::Open()
+        args.emplace_back("-hlocalhost");
         args.emplace_back("-P0");
         args.emplace_back("--protocol=SOCKET");
         args.emplace_back("-S" + port_or_socket);
     }
     else
-        // generic case
+    {
+        args.emplace_back("-h" + host);
         args.emplace_back("-P" + port_or_socket);
+    }
 
 #endif
 
