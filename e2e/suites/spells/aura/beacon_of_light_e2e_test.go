@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"testing"
 	"time"
 
@@ -33,6 +34,10 @@ const (
 	smsgSpellHealLog = uint16(0x0150)
 	healingBonusPct  = uint32(6)
 	testMaxHealth    = uint32(200_000)
+
+	// Distances from the Beacon target, who casts Devotion Aura and owns Light's Beacon.
+	healerDistance    = float32(25)
+	recipientDistance = float32(51)
 )
 
 type spellHealLog struct {
@@ -52,11 +57,13 @@ type beaconHealCase struct {
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27756
 //
-// Improved Devotion Aura gives grouped targets 6% more healing received. The
-// ungrouped recipient supplies the target-without-bonus case without depending
-// on range or terrain. Healing the grouped paladin supplies the both-targets-
-// have-the-bonus case. Beacon must use its target's bonus exactly once for all
-// four source heals.
+// Improved Devotion Aura gives grouped targets 6% more healing received. Beacon
+// only copies heals on members of its target's party or raid (Light's Beacon is
+// an area raid aura, 60 yd), so every bot is grouped. The recipient stands 51 yd
+// from the Beacon target: past Improved Devotion's 40 yd party aura (43 with both
+// combat reaches) but inside Light's Beacon, which supplies the target-without-
+// bonus case. Healing the paladin supplies the both-targets-have-the-bonus case.
+// Beacon must use its target's bonus exactly once for all four source heals.
 func TestAC_27756_BeaconUsesTargetHealingBonusOnce(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells", "issue", "multi_bot"},
@@ -78,12 +85,15 @@ func TestAC_27756_BeaconUsesTargetHealingBonusOnce(t *testing.T) {
 	recipient := e2eharness.ByRole(t, bots, "recipient")
 
 	pad := e2eharness.PackagePad(t)
-	recipient.TeleportPad(t, pad)
-	e2eharness.FormPartyAtPad(t, pad, healer, beacon)
-	defer e2eharness.DisbandParty(t, healer, beacon)
-	if recipient.InGroup() {
-		e2eharness.Preconditionf(t, "recipient unexpectedly joined the healer and Beacon target's party")
-	}
+	e2eharness.FormPartyAtPad(t, pad, healer, beacon, recipient)
+	defer e2eharness.DisbandParty(t, healer, beacon, recipient)
+
+	// The Beacon target stays on the pad. The healer stands halfway to the recipient, in
+	// range of both for every heal. The pad's floor is level for 70 yd along this line.
+	diagonal := float32(math.Sqrt2 / 2)
+	dirX, dirY := -diagonal, diagonal
+	healer.Teleport(t, pad.X+dirX*healerDistance, pad.Y+dirY*healerDistance, pad.Z, pad.Map)
+	recipient.Teleport(t, pad.X+dirX*recipientDistance, pad.Y+dirY*recipientDistance, pad.Z, pad.Map)
 
 	for _, spellID := range []uint32{spellBeaconOfLight, spellHolyLight, spellFlashOfLight, spellHolyShock, spellLayOnHands} {
 		healer.Learn(t, spellID)
@@ -101,7 +111,8 @@ func TestAC_27756_BeaconUsesTargetHealingBonusOnce(t *testing.T) {
 	healer.WaitUnitAura(t, beacon.GUID, spellImprovedDevotionEffect, 10*time.Second)
 	healer.WaitUnitAura(t, healer.GUID, spellImprovedDevotionEffect, 10*time.Second)
 	if recipient.HasAura(spellImprovedDevotionEffect) {
-		e2eharness.Preconditionf(t, "ungrouped recipient unexpectedly has Improved Devotion Aura effect %d", spellImprovedDevotionEffect)
+		e2eharness.Preconditionf(t, "recipient %.0f yd away unexpectedly has Improved Devotion Aura effect %d",
+			recipientDistance, spellImprovedDevotionEffect)
 	}
 
 	healLogs := make(chan spellHealLog, 64)
@@ -161,7 +172,7 @@ func TestAC_27756_BeaconUsesTargetHealingBonusOnce(t *testing.T) {
 
 					healer.CastMust(t, spellBeaconOfLight, beacon.GUID, 10*time.Second)
 					healer.WaitUnitAura(t, beacon.GUID, spellBeaconOfLight, 10*time.Second)
-					healer.WaitUnitAura(t, healer.GUID, spellLightsBeacon, 10*time.Second)
+					healer.WaitUnitAura(t, matrix.source.GUID, spellLightsBeacon, 10*time.Second)
 					drainHealLogs(healLogs)
 
 					healer.CastMust(t, testCase.castSpell, matrix.source.GUID, 10*time.Second)

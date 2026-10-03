@@ -1912,6 +1912,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
+    // Ulduar, Flame Leviathan, Flame Vents
+    // The channel carries no interrupt flags, so Electroshock and player interrupts could never stop it
+    ApplySpellFix({ 62396 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags |= CHANNEL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     // Ulduar, Mimiron, bomb bot explosion
     ApplySpellFix({ 63801 }, [](SpellInfo* spellInfo)
     {
@@ -2111,14 +2118,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(5);
-    });
-
-    // Onyxia's Lair, Onyxia, Eruption
-    ApplySpellFix({ 17731, 69294 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_DUMMY;
-        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(3);
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_18_YARDS); // 18yd instead of 13yd to make sure all cracks erupt
     });
 
     // Onyxia's Lair, Onyxia, Breath
@@ -2960,6 +2959,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // copied attributes from Green Ooze Channel
         spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Professor Putricide, Expunged Gas (Gas Cloud detonation)
+    ApplySpellFix({ 70701 }, [](SpellInfo* spellInfo)
+    {
+        // custom: the detonation is an unavoidable raid-wide hit, it must not be resisted away
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
