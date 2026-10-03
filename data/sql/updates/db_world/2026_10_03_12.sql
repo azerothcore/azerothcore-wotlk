@@ -1,3 +1,4 @@
+-- DB update 2026_10_03_11 -> 2026_10_03_12
 --
 -- 26319 Anub'ar Cultist
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 26319);
