@@ -50,6 +50,12 @@ enum GormokEvents
     EVENT_SPELL_BATTER,
     EVENT_SPELL_FIRE_BOMB,
     EVENT_SPELL_HEAD_CRACK,
+    EVENT_DISMOUNTED_ATTACK,
+};
+
+enum GormokActions
+{
+    ACTION_GORMOK_DIED = 1,
 };
 
 enum GormokNPCs
@@ -96,6 +102,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         ObjectGuid TargetGUID;
+        bool Dismounted = false;
 
         void Reset() override
         {
@@ -105,6 +112,9 @@ public:
 
         void JustEngagedWith(Unit*  /*who*/) override
         {
+            if (Dismounted)
+                return;
+
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SNOBOLLED, 1500ms);
             events.ScheduleEvent(EVENT_SPELL_BATTER, 5s);
@@ -113,23 +123,46 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if (who->GetGUID() != TargetGUID )
+            if (!Dismounted && who->GetGUID() != TargetGUID)
                 return;
             ScriptedAI::AttackStart(who);
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            // Nothing cleans up a dismounted snobold once Gormok's corpse is gone
+            if (Dismounted)
+            {
+                me->DespawnOrUnsummon();
+                return;
+            }
+
+            ScriptedAI::EnterEvadeMode(why);
+        }
+
         void UpdateAI(uint32 diff) override
         {
-            if (!TargetGUID && !me->GetVehicle())
-                return;
+            Unit* t = nullptr;
+            if (Dismounted)
+            {
+                if (me->GetReactState() != REACT_PASSIVE && !UpdateVictim())
+                    return;
 
-            Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID);
-            if (!t && !(t = me->GetVehicleBase()))
-                return;
+                t = me->GetVictim();
+            }
+            else
+            {
+                if (!TargetGUID && !me->GetVehicle())
+                    return;
 
-            if (t->isDead())
+                t = ObjectAccessor::GetUnit(*me, TargetGUID);
+                if (!t && !(t = me->GetVehicleBase()))
+                    return;
+            }
+
+            if (!Dismounted && t->isDead())
             {
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
                 me->RemoveAllAuras();
@@ -160,6 +193,11 @@ public:
             {
                 case 0:
                     break;
+                case EVENT_DISMOUNTED_ATTACK:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    DoZoneInCombat();
+                    events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 1s, 5s);
+                    break;
                 case EVENT_SPELL_SNOBOLLED:
                     if (t->IsPlayer())
                         me->CastSpell((Unit*)nullptr, SPELL_SNOBOLLED, true);
@@ -172,7 +210,7 @@ public:
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
                     {
-                        if (!t->IsPlayer() && pInstance )
+                        if ((Dismounted || !t->IsPlayer()) && pInstance)
                         {
                             GuidVector validPlayers;
                             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
@@ -181,7 +219,7 @@ public:
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             {
                                 if (Player* p = itr->GetSource())
-                                    if (p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !p->IsWithinMeleeRange(gormok)))
+                                    if (p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !gormok->IsAlive() || !p->IsWithinMeleeRange(gormok)))
                                         validPlayers.push_back(p->GetGUID());
                             }
 
@@ -219,8 +257,14 @@ public:
 
         void DoAction(int32 param) override
         {
-            if (param == 1 && !TargetGUID)
-                me->DespawnOrUnsummon();
+            // Gormok's death ejects his passengers; they keep bombing and join the fight shortly after landing
+            if (param != ACTION_GORMOK_DIED || TargetGUID)
+                return;
+
+            Dismounted = true;
+            events.Reset();
+            events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, 1s, 12s);
+            events.ScheduleEvent(EVENT_DISMOUNTED_ATTACK, 5s);
         }
     };
 };
@@ -381,7 +425,7 @@ public:
 
         void JustDied(Unit* /*pKiller*/) override
         {
-            summons.DoAction(1);
+            summons.DoAction(ACTION_GORMOK_DIED);
 
             if (pInstance)
                 pInstance->SetData(TYPE_GORMOK, DONE);
