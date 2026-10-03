@@ -1,16 +1,15 @@
 -- SPELL_ATTR0_CU_IGNORE_BINARY (512) for spells that must not be auto-classified as binary.
 -- Replaces the hardcoded id list in SpellMgr::LoadSpellInfoCustomAttributes.
-DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (55095, 62457, 62469, 62577, 62580, 62583, 62597, 62601, 62603, 62604, 62605, 65370, 69425, 69649, 70827, 71056, 71057, 71058, 73061, 73062, 73063, 73064);
+DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (62457, 62469, 62576, 62580, 62583, 62597, 62601, 62602, 62604, 62605, 65370, 69425, 69649, 70827, 71056, 71057, 71058, 73061, 73062, 73063, 73064);
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
-(55095, 512), -- Frost Fever (Death Knight)
 (62457, 512), -- Ice Shards (Hodir, small)
 (62469, 512), -- Freeze (Hodir)
-(62577, 512), -- Blizzard (Thorim 10m)
+(62576, 512), -- Blizzard (Thorim 10m)
 (62580, 512), -- Frostbolt Volley (Thorim 10m)
 (62583, 512), -- Frostbolt (Thorim 10m)
 (62597, 512), -- Frost Nova (Thorim 10m)
 (62601, 512), -- Frostbolt (Thorim 25m)
-(62603, 512), -- Blizzard (Thorim 25m)
+(62602, 512), -- Blizzard (Thorim 25m)
 (62604, 512), -- Frostbolt Volley (Thorim 25m)
 (62605, 512), -- Frost Nova (Thorim 25m)
 (65370, 512), -- Ice Shards (Hodir, big)
