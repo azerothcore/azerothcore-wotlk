@@ -147,14 +147,6 @@ public:
     bool SetSwim(bool enable) override;
     bool HasSpellFocus(Spell const* focusSpell = nullptr) const;
 
-    struct
-    {
-        ::Spell const* Spell = nullptr;
-        uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
-        ObjectGuid Target;        // the creature's "real" target while casting
-        float Orientation = 0.0f; // the creature's "real" orientation while casting
-    } _spellFocusInfo;
-
     [[nodiscard]] uint32 GetShieldBlockValue() const override
     {
         return (GetLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
@@ -396,6 +388,7 @@ public:
     void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
     void ClearTarget() { SetTarget(); };
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
+    bool UpdateChannelTargetFacing(SpellInfo const* spellInfo, ObjectGuid const& channelTarget);
     void ReleaseFocus(Spell const* focusSpell);
     [[nodiscard]] bool IsMovementPreventedByCasting() const override;
 

@@ -399,7 +399,8 @@ AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* cast
     // Xinef: channel data structure
     if (caster)
         if (Spell* spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            m_channelData = new ChannelTargetData(caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT), spell->m_targets.HasDst() ? spell->m_targets.GetDst() : nullptr);
+            m_channelData = new ChannelTargetData(caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT),
+                spell->m_targets.HasDst() ? spell->m_targets.GetDst() : nullptr, spell->GetSpellInfo()->Id);
 }
 
 AuraEffect::~AuraEffect()
@@ -1138,13 +1139,16 @@ void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
     // exclude players because can turn during channeling and shouldn't desync orientation client/server
     if (caster && !caster->IsPlayer() && m_spellInfo->IsChanneled() && m_spellInfo->HasAttribute(SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL))
     {
-        ObjectGuid const channelGuid = caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT);
+        // Channel fields may already be cleared before the aura delivers its final tick.
+        // Do not reuse target data captured from a different channel running during aura creation.
+        ObjectGuid const channelGuid = m_channelData && m_channelData->spellId == GetId()
+            ? m_channelData->channelGUID : caster->GetUInt32Value(UNIT_CHANNEL_SPELL) == GetId()
+                ? caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT) : ObjectGuid::Empty;
         if (!channelGuid.IsEmpty() && channelGuid != caster->GetGUID())
         {
-            if (WorldObject const* objectTarget = ObjectAccessor::GetWorldObject(*caster, channelGuid))
-            {
-                caster->SetInFront(objectTarget);
-            }
+            if (Creature* creature = caster->ToCreature())
+                if (!creature->UpdateChannelTargetFacing(m_spellInfo, channelGuid))
+                    return;
         }
     }
 

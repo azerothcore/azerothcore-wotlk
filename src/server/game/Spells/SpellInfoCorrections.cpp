@@ -40,6 +40,18 @@ void SpellMgr::LoadSpellInfoCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
+    // Acid Spray (Quagmirran) and Acid Geyser (Underbog Colossus, Coprous the Defiled)
+    ApplySpellFix({ 38153, 38971 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx |= SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL;
+    });
+
+    // Acid Spray follows a taunter temporarily, then resumes tracking its original target.
+    ApplySpellFix({ 38153 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelTracksTaunt = true;
+    });
+
     ApplySpellFix({
         467,    // Thorns (Rank 1)
         782,    // Thorns (Rank 2)
