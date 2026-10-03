@@ -18,6 +18,8 @@
 #include "LootMgr.h"
 #include "Containers.h"
 #include "DisableMgr.h"
+#include "Creature.h"
+#include "GameObject.h"
 #include "Group.h"
 #include "ItemEnchantmentMgr.h"
 #include "Log.h"
@@ -29,6 +31,9 @@
 #include "SpellMgr.h"
 #include "Util.h"
 #include "World.h"
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 ServerConfigs const qualityToRate[] =
 {
@@ -473,6 +478,88 @@ void LootItem::AddAllowedLooter(Player const* player)
     allowedGUIDs.insert(player->GetGUID());
 }
 
+uint32 CalculateDropAmount(uint32 rolled, float rate)
+{
+    if (rate == 1.0f || !rolled)
+        return rolled;
+
+    // Round rather than truncate, so a rate of 1.5 on a 3 ore vein yields 5 and not 4, and clamp to
+    // 1: the item already passed its drop roll, so a rate below 1 must thin the stack, not drop the
+    // item out of the loot entirely.
+    double const scaled = std::round(double(rolled) * double(rate));
+
+    return uint32(std::clamp(scaled, 1.0, double(std::numeric_limits<uint32>::max())));
+}
+
+float ScalableDropRate(bool needsQuest, int32 itemMaxCount, float rate)
+{
+    // ItemTemplate::MaxCount documents <= 0 as "no limit", so only a positive value is a cap.
+    if (needsQuest || itemMaxCount > 0)
+        return 1.0f;
+
+    return rate;
+}
+
+ServerConfigs RateForLootSource(LootStore const& store, uint32 lockSkillType, uint32 corpseLootSkill)
+{
+    // A skinnable corpse is not always skinned. CreatureTemplate::GetRequiredLootSkill picks the
+    // profession that opens it from the creature's type flags, and all of them read
+    // skinning_loot_template, so the store alone would put ore and herbs under the skinning rate.
+    if (&store == &LootTemplates_Skinning)
+    {
+        switch (corpseLootSkill)
+        {
+            case SKILL_HERBALISM:
+                return RATE_HERBALISM_DROP_AMOUNT;
+            case SKILL_MINING:
+                return RATE_MINING_DROP_AMOUNT;
+            case SKILL_ENGINEERING:
+                // Engineering-lootable mechanicals, and gas clouds emptied with the Zapthrottle
+                // Mote Extractor. Engineering is not a gathering profession with a rate of its own,
+                // so these stay blizzlike rather than borrowing an unrelated one.
+                return MAX_NUM_SERVER_CONFIGS;
+            default:
+                return RATE_SKINNING_DROP_AMOUNT;
+        }
+    }
+
+    if (&store == &LootTemplates_Fishing)
+        return RATE_FISHING_DROP_AMOUNT;
+
+    if (&store == &LootTemplates_Milling)
+        return RATE_MILLING_DROP_AMOUNT;
+
+    if (&store == &LootTemplates_Prospecting)
+        return RATE_PROSPECTING_DROP_AMOUNT;
+
+    if (&store == &LootTemplates_Disenchant)
+        return RATE_DISENCHANTING_DROP_AMOUNT;
+
+    if (&store == &LootTemplates_Pickpocketing)
+        return RATE_PICKPOCKETING_DROP_AMOUNT;
+
+    // Ore veins, herbs and fishing pools are all gameobjects reading gameobject_loot_template, so
+    // only the lock tells them apart. Every other gameobject - chests, quest objects, world
+    // containers - shares that store and must stay unscaled.
+    //
+    // Fishing reaches this store because a pool is looted as the fishing hole itself
+    // (GAMEOBJECT_TYPE_FISHINGHOLE -> LOOT_FISHINGHOLE), not through Loot::GetFishLoot, which only
+    // serves open-water casts and junk. Both halves of fishing must scale by the same rate.
+    if (&store == &LootTemplates_Gameobject)
+    {
+        if (lockSkillType == LOCKTYPE_MINING)
+            return RATE_MINING_DROP_AMOUNT;
+
+        if (lockSkillType == LOCKTYPE_HERBALISM)
+            return RATE_HERBALISM_DROP_AMOUNT;
+
+        if (lockSkillType == LOCKTYPE_FISHING)
+            return RATE_FISHING_DROP_AMOUNT;
+    }
+
+    return MAX_NUM_SERVER_CONFIGS;
+}
+
 //
 // --------- Loot ---------
 //
@@ -484,7 +571,8 @@ void Loot::AddItem(LootStoreItem const& item)
     if (!proto)
         return;
 
-    uint32 count = urand(item.mincount, item.maxcount);
+    uint32 count = CalculateDropAmount(urand(item.mincount, item.maxcount),
+        ScalableDropRate(item.needs_quest, proto->MaxCount, professionDropRate));
     uint32 stacks = count / proto->GetMaxStackSize() + (count % proto->GetMaxStackSize() ? 1 : 0);
 
     std::vector<LootItem>& lootItems = item.needs_quest ? quest_items : items;
@@ -556,6 +644,33 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
+
+    professionDropRate = 1.0f;
+    uint32 lockSkillType = 0;
+    uint32 corpseLootSkill = 0;
+    if (lootSource)
+    {
+        if (GameObject const* lootObject = lootSource->ToGameObject())
+        {
+            lockSkillType = lootObject->GetGatheringLockType();
+        }
+        else if (Creature const* lootCreature = lootSource->ToCreature())
+        {
+            CreatureTemplate const* lootTemplate = lootCreature->GetCreatureTemplate();
+
+            // A gas cloud is emptied with the Zapthrottle Mote Extractor, so it is engineering
+            // loot, but it carries no CREATURE_TYPE_FLAG_SKIN_WITH_ENGINEERING and would otherwise
+            // fall through to skinning. The core identifies one by creature type everywhere else
+            // (see the Extract Gas handler in SpellAuraEffects), so do the same here.
+            corpseLootSkill = lootTemplate->type == CREATURE_TYPE_GAS_CLOUD
+                ? uint32(SKILL_ENGINEERING)
+                : uint32(lootTemplate->GetRequiredLootSkill());
+        }
+    }
+
+    ServerConfigs const rate = RateForLootSource(store, lockSkillType, corpseLootSkill);
+    if (rate != MAX_NUM_SERVER_CONFIGS)
+        professionDropRate = sWorld->getRate(rate);
 
     // Initial group is 0, top level set to True
     tab->Process(*this, store, lootMode, lootOwner, 0, true);          // Processing is done there, callback via Loot::AddItem()

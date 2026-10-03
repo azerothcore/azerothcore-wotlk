@@ -23,6 +23,7 @@
 #include "ObjectGuid.h"
 #include "RefMgr.h"
 #include "SharedDefines.h"
+#include "WorldConfig.h"
 #include <list>
 #include <map>
 #include <unordered_map>
@@ -309,6 +310,30 @@ struct LootView;
 ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li);
 ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
 
+// Scales a rolled stack count by a profession drop-amount rate.
+// Rounds rather than truncates, and never returns 0 for an item that already passed its drop roll:
+// a rate below 1 thins stacks, it does not delete drops.
+uint32 CalculateDropAmount(uint32 rolled, float rate);
+
+// Returns the rate a single loot row may be scaled by. Rows flagged as quest drops keep their
+// fixed count - note this is the row's quest flag, not the item's Quest class - and an
+// item limited by ItemTemplate::MaxCount is never duplicated: the copies past the limit can never
+// be taken, so unlootedCount never reaches 0, Loot::isLooted() stays false and the corpse or node
+// that owns the loot never clears.
+float ScalableDropRate(bool needsQuest, int32 itemMaxCount, float rate);
+
+// Maps a loot source to the Rate.<Profession>.DropAmount config it is scaled by, or
+// MAX_NUM_SERVER_CONFIGS when the source is not a profession one and must not be scaled.
+//
+// Two discriminators, because two stores each serve more than one profession:
+//  - lockSkillType is the gathering LockType of a gameobject (GameObject::GetGatheringLockType),
+//    telling ore veins, herbs and fishing pools apart within gameobject_loot_template;
+//  - corpseLootSkill is the SkillType that opens a creature corpse
+//    (CreatureTemplate::GetRequiredLootSkill), telling skinning from the corpses that are mined or
+//    herbed instead, since all of them read skinning_loot_template.
+// Either is 0 when the loot has no source of that kind.
+ServerConfigs RateForLootSource(LootStore const& store, uint32 lockSkillType, uint32 corpseLootSkill);
+
 struct Loot
 {
     friend ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
@@ -329,6 +354,10 @@ struct Loot
     ObjectGuid containerGUID;
     ObjectGuid sourceWorldObjectGUID;
     GameObject* sourceGameObject{nullptr};
+
+    // Rate.<Profession>.DropAmount resolved once per FillLoot, applied to every stack count in
+    // AddItem. 1.0f for loot that is not profession loot.
+    float professionDropRate{1.0f};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }
@@ -362,6 +391,7 @@ struct Loot
         roundRobinPlayer.Clear();
         i_LootValidatorRefMgr.clearReferences();
         loot_type = LOOT_NONE;
+        professionDropRate = 1.0f;
     }
 
     [[nodiscard]] bool empty() const { return items.empty() && gold == 0; }
