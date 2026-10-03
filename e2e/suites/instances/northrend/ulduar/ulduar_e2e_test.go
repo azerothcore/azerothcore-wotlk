@@ -1448,3 +1448,138 @@ func TestUlduar_FreyaGiftMatchesElderCount(t *testing.T) {
 	t.Logf("PASS Freya's Gift %d spawned with one Elder alive (guid=0x%X)", goGiftOneElder, chest)
 	bot.AssertWorldAlive(t)
 }
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27736
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27751
+// Ignis dying casts Kill All Constructs (65109). Every Iron Construct must die with him,
+// dormant ones included, and the instakill must reach nothing else: its implicit target is
+// entry-based, so a missing `conditions` row would let it hit the player and every other
+// creature on the map.
+//
+// 10-man only: the harness cannot switch a bot to 25-man, inventoried as blocked-harness
+// on the instances/ulduar row of e2e/README.md. The construct entry is 33121 in both
+// difficulties because Creature::InitEntry keeps the normal entry and only swaps the
+// template, so the targeting row this asserts on is the same row 25-man uses.
+func TestAC_27736_IgnisKillsAllConstructs(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"long", "instances", "issue"},
+		Runtime:  "long",
+		Issue:    27736,
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcIgnis         = uint32(33118)
+		npcIronConstruct = uint32(33121)
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "Ignis",
+		Level:  80,
+	})
+
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
+	bot.Teleport(t, 586.542, 378.798, 360.923, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Ignis pad tele map=%d", m)
+	}
+	bot.GoCreatureID(t, npcIgnis)
+	bot.CombatReady(t)
+
+	// FlushWorld beside a boss can evade him out of cache; re-acquire a living GUID.
+	var ignisGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		ignisGUID = bot.WaitUnit(t, npcIgnis, 10*time.Second)
+		if hp, maxHP := bot.UnitHP(ignisGUID); maxHP > 0 && hp > 0 && bot.World.GetObject(ignisGUID) != nil {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Ignis in cache after GoCreatureID (last=0x%X)", ignisGUID)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	bot.Engage(t, ignisGUID, 15*time.Second)
+
+	// Snapshot immediately before the killing blow. Activate Construct is 40s out on 10-man,
+	// so the constructs are still dormant: exactly the case the old IsInCombat filter missed.
+	constructs := e2eharness.UnitsByEntry(bot.World, 0, npcIronConstruct)
+	if len(constructs) == 0 {
+		e2eharness.Preconditionf(t, "no living Iron Construct in cache beside Ignis")
+	}
+	dormant := 0
+	for _, c := range constructs {
+		if !c.InCombat {
+			dormant++
+		}
+	}
+	if dormant == 0 {
+		e2eharness.Preconditionf(t, "all %d Iron Constructs are already in combat; the dormant case is not exercised", len(constructs))
+	}
+
+	// Anything alive and not a construct must survive the instakill.
+	bystanders := make(map[uint64]uint32)
+	for _, u := range bot.World.GetNearbyUnits(200) {
+		// Entry 0 is a create the cache has not resolved yet. It may be a construct, which
+		// UnitsByEntry already judges by GUID, so it must not be filed as a bystander too.
+		if u.GUID == ignisGUID || u.Entry == npcIronConstruct || u.Entry == 0 || u.Health() == 0 {
+			continue
+		}
+		bystanders[u.GUID] = u.Entry
+	}
+	t.Logf("before kill: %d Iron Constructs (%d dormant), %d other living creatures in cache",
+		len(constructs), dormant, len(bystanders))
+
+	bot.DamageKill(t, []uint64{ignisGUID}, 1_000_000, 60*time.Second)
+	bot.WaitUnitDead(t, ignisGUID, 30*time.Second)
+
+	// The constructs die in the same object update as the boss; poll briefly for it to land.
+	var alive, judged []uint64
+	dl := time.Now().Add(15 * time.Second)
+	for {
+		alive, judged = alive[:0], judged[:0]
+		for _, c := range constructs {
+			obj := bot.World.GetObject(c.GUID)
+			if obj == nil {
+				continue // left the cache: cannot judge this one
+			}
+			judged = append(judged, c.GUID)
+			if obj.Health() > 0 {
+				alive = append(alive, c.GUID)
+			}
+		}
+		if len(alive) == 0 || !time.Now().Before(dl) {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	if len(judged) == 0 {
+		e2eharness.Preconditionf(t, "every Iron Construct left the object cache after Ignis died; nothing to judge")
+	}
+	if len(alive) > 0 {
+		e2eharness.ConfirmedBugf(t, 27736, "%d of %d judged Iron Constructs still alive after Ignis died (first=0x%X)",
+			len(alive), len(judged), alive[0])
+	}
+
+	for guid, entry := range bystanders {
+		obj := bot.World.GetObject(guid)
+		if obj == nil {
+			continue // left the cache: cannot judge this one
+		}
+		if obj.Health() == 0 {
+			e2eharness.Assertf(t, "Kill All Constructs killed a bystander creature guid=0x%X entry=%d: spell 65109 is not restricted to entry %d",
+				guid, entry, npcIronConstruct)
+		}
+	}
+	self := bot.World.GetObject(bot.GUID)
+	if self == nil {
+		e2eharness.HarnessFailf(t, "own player object missing from the cache after the kill")
+	}
+	if self.Health() == 0 {
+		e2eharness.Assertf(t, "Kill All Constructs killed the player: spell 65109 is missing its targeting conditions")
+	}
+
+	t.Logf("PASS Ignis death killed %d/%d judged Iron Constructs (%d dormant); %d bystander creatures and the player survived",
+		len(judged), len(constructs), dormant, len(bystanders))
+	bot.AssertWorldAlive(t)
+}

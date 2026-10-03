@@ -29,6 +29,7 @@
 #include "ScriptSystem.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ThreatManager.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -53,6 +54,19 @@ enum blySpells
     SPELL_REVENGE              = 12170
 };
 
+enum BlyEvents
+{
+    EVENT_BLY_FIRST_REPLY = 1,
+    EVENT_BLY_SECOND_REPLY,
+    EVENT_BLY_HOSTILE
+};
+
+enum CrewFactions
+{
+    FACTION_BLY_HOSTILE = 41,
+    FACTION_WEEGLI_ESCAPE = 188
+};
+
 #define GOSSIP_BLY                  "That's it!  I'm tired of helping you out.  It's time we settled things on the battlefield!"
 
 class npc_sergeant_bly : public CreatureScript
@@ -72,17 +86,15 @@ public:
             ableToPortHome = false;
             startedFight = false;
             me->SetFaction(FACTION_FRIENDLY);
-            postGossipStep = 0;
-            Text_Timer = 0;
+            events.Reset();
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            Reset();
         }
 
         InstanceScript* instance;
 
         bool startedFight;
         bool ableToPortHome;
-        uint32 postGossipStep;
-        uint32 Text_Timer;
         uint32 ShieldBash_Timer;
         uint32 Revenge_Timer; //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
         uint32 Porthome_Timer;
@@ -94,11 +106,21 @@ public:
             Revenge_Timer = 8000;
             Porthome_Timer = 156000;
             ableToPortHome = false;
-            startedFight = false;
         }
 
-        void EnterEvadeMode(EvadeReason /*reason*/) override
+        void JustRespawned() override
         {
+            InitializeAI();
+        }
+
+        void EnterEvadeMode(EvadeReason reason) override
+        {
+            if (startedFight || instance->GetData(DATA_PYRAMID) <= PYRAMID_WAVE_3)
+            {
+                ScriptedAI::EnterEvadeMode(reason);
+                return;
+            }
+
             if (ableToPortHome)
                 return;
 
@@ -109,18 +131,22 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 /*id*/) override
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
-            {
                 return;
-            }
 
-            if (instance->GetData(DATA_PYRAMID) == PYRAMID_WAVE_3)
+            // Weegli may already have left after a player selected his door option during the gathering walk.
+            if (id == POINT_CREW_GATHER && instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+                instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
+
+            if (id == POINT_CREW_DESCENT && instance->GetData(DATA_PYRAMID) == PYRAMID_WAVE_3)
             {
                 if (Creature* shadowpriest = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SHADOWPRIEST_SEZZZIZ)))
                 {
                     AttackStart(shadowpriest);
+                    // Reach the crew beyond normal aggro range; passive Weegli cannot answer this call.
+                    me->CallForHelp(100.0f, shadowpriest);
                     shadowpriest->CallAssistance();
                 }
             }
@@ -128,52 +154,41 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (postGossipStep > 0 && postGossipStep < 4)
+            events.Update(diff);
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                if (Text_Timer <= diff)
+                switch (eventId)
                 {
-                    switch (postGossipStep)
+                    case EVENT_BLY_FIRST_REPLY:
+                        Talk(SAY_1);
+                        events.ScheduleEvent(EVENT_BLY_SECOND_REPLY, 3s);
+                        break;
+                    case EVENT_BLY_SECOND_REPLY:
+                        Talk(SAY_2);
+                        events.ScheduleEvent(EVENT_BLY_HOSTILE, 3s);
+                        break;
+                    case EVENT_BLY_HOSTILE:
                     {
-                        case 1:
-                            startedFight = true;
-                            //weegli doesn't fight - he goes & blows up the door
-                            if (Creature* pWeegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
-                            {
-                                pWeegli->AI()->DoAction(0);
-                            }
-                            Talk(SAY_1);
-                            Text_Timer = 5000;
-                            break;
-                        case 2:
-                            Talk(SAY_2);
-                            Text_Timer = 5000;
-                            break;
-                        case 3:
-                            me->SetFaction(FACTION_MONSTER);
-                            Player* target = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+                        // Weegli leaves when Bly turns hostile; he never joins the fight.
+                        if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+                            weegli->AI()->DoAction(ACTION_BLY_BETRAYAL);
 
-                            switchFactionIfAlive(NPC_WEEGLI, target);
-                            switchFactionIfAlive(NPC_RAVEN, target);
-                            switchFactionIfAlive(NPC_ORO, target);
-                            switchFactionIfAlive(NPC_MURTA, target);
-
-                            if (target)
-                            {
-                                AttackStart(target);
-                            }
+                        me->SetFaction(FACTION_BLY_HOSTILE);
+                        Player* target = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+                        switchFactionIfAlive(NPC_RAVEN, target);
+                        switchFactionIfAlive(NPC_ORO, target);
+                        switchFactionIfAlive(NPC_MURTA, target);
+                        if (target)
+                            AttackStart(target);
+                        break;
                     }
-
-                    postGossipStep++;
-                }
-                else
-                {
-                    Text_Timer -= diff;
                 }
             }
 
             if (Porthome_Timer <= diff && ableToPortHome == true)
             {
-                if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+                if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI));
+                    weegli && instance->GetData(DATA_END_DOOR) == NOT_STARTED)
                 {
                     weegli->CastSpell(weegli, SPELL_BLYS_BAND_ESCAPE);
                     weegli->DespawnOrUnsummon(10s);
@@ -197,7 +212,7 @@ public:
                 me->DespawnOrUnsummon(10s);
                 Porthome_Timer = 156000; //set timer back so that the event doesn't keep triggering
             }
-            else
+            else if (ableToPortHome)
             {
                 Porthome_Timer -= diff;
             }
@@ -230,11 +245,16 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void DoAction(int32 /*param*/) override
+        void DoAction(int32 action) override
         {
+            if (action != ACTION_BLY_BETRAYAL || startedFight || !me->IsAlive() ||
+                instance->GetData(DATA_PYRAMID) < PYRAMID_MOVED_DOWNSTAIRS ||
+                instance->GetData(DATA_PYRAMID) == PYRAMID_DONE)
+                return;
+
+            startedFight = true;
             ableToPortHome = false;
-            postGossipStep = 1;
-            Text_Timer = 0;
+            events.ScheduleEvent(EVENT_BLY_FIRST_REPLY, 1500ms);
         }
 
         void switchFactionIfAlive(uint32 entry, Player* target)
@@ -243,7 +263,7 @@ public:
             {
                 if (crew->IsAlive())
                 {
-                    crew->SetFaction(FACTION_MONSTER);
+                    crew->SetFaction(FACTION_BLY_HOSTILE);
 
                     if (target)
                     {
@@ -258,17 +278,18 @@ public:
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             ClearGossipMenuFor(player);
 
-            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            if (action == GOSSIP_ACTION_INFO_DEF + 1 && !startedFight)
             {
                 CloseGossipMenuFor(player);
                 PlayerGUID = player->GetGUID();
-                DoAction(0);
+                DoAction(ACTION_BLY_BETRAYAL);
             }
         }
 
         void sGossipHello(Player* player) override
         {
-            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_MOVED_DOWNSTAIRS && !startedFight)
+            if (instance->GetData(DATA_PYRAMID) >= PYRAMID_MOVED_DOWNSTAIRS &&
+                instance->GetData(DATA_PYRAMID) != PYRAMID_DONE && !startedFight)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 SendGossipMenuFor(player, 1517, me->GetGUID());
@@ -315,6 +336,9 @@ public:
                 return true;
             }
 
+            if (instance->GetData(DATA_PYRAMID) != PYRAMID_NOT_STARTED)
+                return false;
+
             instance->SetData(DATA_PYRAMID, PYRAMID_CAGES_OPEN);
 
             //setting gossip option as soon as the cages open
@@ -329,7 +353,7 @@ public:
             }
 
             //set bly & co to aggressive & start moving to top of stairs
-            initBlyCrewMember(NPC_BLY, 1884.99f, 1263, 41.52f);
+            initBlyCrewMember(NPC_BLY, 1886.9601f, 1263.4943f, 41.544308f);
             initBlyCrewMember(NPC_RAVEN, 1882.5f, 1263, 41.52f);
             initBlyCrewMember(NPC_ORO, 1886.47f, 1270.68f, 41.68f);
             initBlyCrewMember(NPC_WEEGLI, 1890, 1263, 41.52f);
@@ -345,8 +369,8 @@ public:
                 crew->SetReactState(REACT_AGGRESSIVE);
                 crew->SetWalk(true);
                 crew->SetHomePosition(x, y, z, 4.78f);
-                crew->GetMotionMaster()->MovePoint(1, { x, y, z, 4.78f });
-                crew->SetFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+                crew->GetMotionMaster()->MovePoint(POINT_CREW_STAIRS, { x, y, z, 4.78f });
+                crew->SetFaction(FACTION_ESCORTEE_N_FRIEND_ACTIVE);
 
             }
         }
@@ -377,6 +401,29 @@ enum weegliSays
     SAY_WEEGLI_OUT_OF_HERE      = 2
 };
 
+enum WeegliEvents
+{
+    EVENT_WEEGLI_PLANT_BARREL = 1,
+    EVENT_WEEGLI_ESCAPE
+};
+
+enum class WeegliDoorStage
+{
+    Idle,
+    Moving,
+    Planting,
+    WaitingForExplosion,
+    Escaping
+};
+
+// TBC Classic Anniversary 2.5.6.69795: barrel placement at the end door.
+Position const WeegliDoorPosition = { 1857.1129f, 1145.692f, 15.184351f, 3.85f };
+
+enum WeegliPaths
+{
+    PATH_WEEGLI_ESCAPE = 815530
+};
+
 #define GOSSIP_WEEGLI               "Will you blow up that door now?"
 
 class npc_weegli_blastfuse : public CreatureScript
@@ -389,22 +436,33 @@ public:
         npc_weegli_blastfuseAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            destroyingDoor = false;
-            outroTimer = 2000;
-            outroStage = 0;
         }
 
         uint32 Bomb_Timer;
         uint32 LandMine_Timer;
-        uint32 outroTimer;
-        uint8 outroStage;
-        bool destroyingDoor;
+        WeegliDoorStage doorStage = WeegliDoorStage::Idle;
         InstanceScript* instance;
 
         void InitializeAI() override
         {
+            events.Reset();
+            doorStage = WeegliDoorStage::Idle;
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             Reset();
+        }
+
+        void JustRespawned() override
+        {
+            InitializeAI();
+            if (instance->GetData(DATA_END_DOOR) == IN_PROGRESS)
+                instance->SetData(DATA_END_DOOR, NOT_STARTED);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            events.Reset();
+            if (instance->GetData(DATA_END_DOOR) == IN_PROGRESS)
+                instance->SetData(DATA_END_DOOR, NOT_STARTED);
         }
 
         void Reset() override
@@ -415,41 +473,49 @@ public:
 
         void AttackStart(Unit* victim) override
         {
+            if (doorStage != WeegliDoorStage::Idle)
+                return;
+
             AttackStartCaster(victim, 10);//keep back & toss bombs/shoot
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+            events.Update(diff);
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                if (destroyingDoor)
+                switch (eventId)
                 {
-                    if (outroTimer <= diff)
-                    {
-                        switch (outroStage)
-                        {
-                            case 0:
-                                DoCastSelf(SPELL_WEEGLIS_BARREL);
-                                outroTimer = 2000;
-                                ++outroStage;
-                                break;
-                            case 1:
-                                me->GetMotionMaster()->MovePoint(2, 1871.18f, 1100.f, 8.88f);
-                                Talk(SAY_WEEGLI_OUT_OF_HERE);
-                                me->DespawnOrUnsummon(8s);
-                                instance->SetData(DATA_PYRAMID, PYRAMID_GATES_DESTROYED);
-                                destroyingDoor = false;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        outroTimer -= diff;
-                    }
-                }
+                    case EVENT_WEEGLI_PLANT_BARREL:
+                        if (doorStage != WeegliDoorStage::Planting)
+                            break;
 
-                return;
+                        if (DoCastSelf(SPELL_WEEGLIS_BARREL, true) != SPELL_CAST_OK)
+                        {
+                            events.ScheduleEvent(EVENT_WEEGLI_PLANT_BARREL, 1s);
+                            break;
+                        }
+
+                        doorStage = WeegliDoorStage::WaitingForExplosion;
+                        events.ScheduleEvent(EVENT_WEEGLI_ESCAPE, 3s);
+                        break;
+                    case EVENT_WEEGLI_ESCAPE:
+                        // The barrel's SmartAI records completion, not a movement callback or Bly's death.
+                        if (instance->GetData(DATA_END_DOOR) != DONE)
+                        {
+                            events.ScheduleEvent(EVENT_WEEGLI_ESCAPE, 500ms);
+                            break;
+                        }
+
+                        doorStage = WeegliDoorStage::Escaping;
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveWaypoint(PATH_WEEGLI_ESCAPE, false);
+                        break;
+                }
             }
+
+            if (doorStage != WeegliDoorStage::Idle || !UpdateVictim())
+                return;
 
             if (Bomb_Timer <= diff)
             {
@@ -485,56 +551,73 @@ public:
 
         void JustReachedHome() override
         {
-            if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
+            if (doorStage == WeegliDoorStage::Moving)
             {
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
-                Talk(SAY_WEEGLI_OHNO);
-            }
-            else if (instance->GetData(DATA_PYRAMID) >= PYRAMID_KILLED_ALL_TROLLS && instance->GetData(DATA_PYRAMID) < PYRAMID_DESTROY_GATES)
-            {
-                instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
-            }
-            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
-            {
-                destroyingDoor = true;
-            }
-        }
-
-        void MovementInform(uint32 type, uint32 /*id*/) override
-        {
-            if (type != POINT_MOTION_TYPE)
-            {
+                MovementInform(POINT_MOTION_TYPE, POINT_WEEGLI_DOOR);
                 return;
             }
 
             if (instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
+                MovementInform(POINT_MOTION_TYPE, POINT_CREW_STAIRS);
+            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+                MovementInform(POINT_MOTION_TYPE, POINT_CREW_GATHER);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != POINT_MOTION_TYPE)
+                return;
+
+            if (id == POINT_WEEGLI_DOOR && doorStage == WeegliDoorStage::Moving)
+            {
+                doorStage = WeegliDoorStage::Planting;
+                events.ScheduleEvent(EVENT_WEEGLI_PLANT_BARREL, 2s);
+                return;
+            }
+
+            if (doorStage != WeegliDoorStage::Idle)
+                return;
+
+            if (id == POINT_CREW_STAIRS && instance->GetData(DATA_PYRAMID) == PYRAMID_CAGES_OPEN)
             {
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 instance->SetData(DATA_PYRAMID, PYRAMID_ARRIVED_AT_STAIR);
                 Talk(SAY_WEEGLI_OHNO);
             }
-            else if (instance->GetData(DATA_PYRAMID) >= PYRAMID_KILLED_ALL_TROLLS && instance->GetData(DATA_PYRAMID) < PYRAMID_DESTROY_GATES)
+            else if (id == POINT_CREW_GATHER && instance->GetData(DATA_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
             {
                 instance->SetData(DATA_PYRAMID, PYRAMID_MOVED_DOWNSTAIRS);
             }
-            else if (instance->GetData(DATA_PYRAMID) == PYRAMID_DESTROY_GATES)
-            {
-                destroyingDoor = true;
-            }
         }
 
-        void DestroyDoor()
+        void PathEndReached(uint32 pathId) override
         {
-            if (me->IsAlive())
-            {
-                me->SetFaction(FACTION_FRIENDLY);
-                me->SetWalk(false);
-                me->GetMotionMaster()->MovePoint(0, { 1858.57f, 1146.35f, 14.745f, 3.85f });
-                me->SetHomePosition(1858.57f, 1146.35f, 14.745f, 3.85f);
-                Talk(SAY_WEEGLI_OK_I_GO);
-                instance->SetData(DATA_PYRAMID, PYRAMID_DESTROY_GATES);
-            }
+            if (pathId == PATH_WEEGLI_ESCAPE && doorStage == WeegliDoorStage::Escaping)
+                me->DespawnOrUnsummon();
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action != ACTION_BLY_BETRAYAL && action != ACTION_DESTROY_GATES)
+                return;
+
+            // The menu can remain open on multiple clients, including while he is already escaping.
+            if (!me->IsAlive() || doorStage != WeegliDoorStage::Idle ||
+                instance->GetData(DATA_PYRAMID) < PYRAMID_KILLED_ALL_TROLLS ||
+                instance->GetData(DATA_END_DOOR) != NOT_STARTED)
+                return;
+
+            doorStage = WeegliDoorStage::Moving;
+            instance->SetData(DATA_END_DOOR, IN_PROGRESS);
+            me->SetReactState(REACT_PASSIVE);
+            me->CombatStop(true);
+            me->GetThreatMgr().ClearAllThreat();
+            me->SetFaction(FACTION_WEEGLI_ESCAPE);
+            me->SetWalk(false);
+            me->GetMotionMaster()->Clear();
+            me->SetHomePosition(WeegliDoorPosition);
+            me->GetMotionMaster()->MovePoint(POINT_WEEGLI_DOOR, WeegliDoorPosition);
+            Talk(action == ACTION_BLY_BETRAYAL ? SAY_WEEGLI_OUT_OF_HERE : SAY_WEEGLI_OK_I_GO);
         }
 
         void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
@@ -545,8 +628,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 1)
             {
                 CloseGossipMenuFor(player);
-                //here we make him run to door, set the charge and run away off to nowhere
-                DestroyDoor();
+                DoAction(ACTION_DESTROY_GATES);
             }
         }
 
@@ -556,6 +638,9 @@ public:
             {
                 case PYRAMID_MOVED_DOWNSTAIRS:
                 case PYRAMID_KILLED_ALL_TROLLS:
+                case PYRAMID_DESTROY_GATES:
+                case PYRAMID_GATES_DESTROYED:
+                case PYRAMID_DONE:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WEEGLI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                     SendGossipMenuFor(player, 1514, me->GetGUID());  //if event can proceed to end
                     break;
@@ -584,10 +669,25 @@ enum ShadowPriestSezzizEnum
 
 std::array<std::vector<std::pair<uint32, Position>>, 4> shadowpriestSezzizAdds =
 { {
-    { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f, 8.87f } } },
-    { { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.088f, 8.87f } } },
-    { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } } },
-    { { NPC_SANDFURY_ZEALOT, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } } }
+    {
+        { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } },
+        { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f, 8.87f } }
+    },
+    {
+        { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } },
+        { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.088f, 8.87f } }
+    },
+    {
+        { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } },
+        { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } },
+        { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } }
+    },
+    {
+        { NPC_SANDFURY_ZEALOT, { 1895.26f, 1199.09f, 8.87f } },
+        { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } },
+        { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f, 8.87f } },
+        { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } }
+    }
 } };
 
 class npc_shadowpriest_sezziz : public CreatureScript

@@ -217,6 +217,9 @@ struct BattlegroundABScore final : public BattlegroundScore
 {
     friend class BattlegroundAB;
 
+    [[nodiscard]] uint32 GetBasesAssaulted() const { return BasesAssaulted; }
+    [[nodiscard]] uint32 GetBasesDefended() const { return BasesDefended; }
+
 protected:
 
     explicit BattlegroundABScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
@@ -279,6 +282,7 @@ private:
     void NodeOccupied(uint8 node);
     void NodeDeoccupied(uint8 node);
 
+public:
     struct CapturePointInfo
     {
         CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _iconNone(0), _iconCapture(0), _state(BG_AB_NODE_STATE_NEUTRAL), _captured(false)
@@ -293,6 +297,13 @@ private:
         bool _captured;
     };
 
+    [[nodiscard]] CapturePointInfo const& GetCapturePointInfo(uint32 node) const
+    {
+        ASSERT(node < BG_AB_DYNAMIC_NODES_COUNT);
+        return _capturePointInfo[node];
+    }
+
+private:
     CapturePointInfo _capturePointInfo[BG_AB_DYNAMIC_NODES_COUNT];
     EventMap _bgEvents;
     uint32 _honorTics;
