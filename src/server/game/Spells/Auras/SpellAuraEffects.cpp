@@ -4917,7 +4917,8 @@ void AuraEffect::HandleAuraModRangedAttackPower(AuraApplication const* aurApp, u
 
     Unit* target = aurApp->GetTarget();
 
-    if ((target->getClassMask() & CLASSMASK_WAND_USERS) != 0)
+    if (target->IsClass(CLASS_MAGE, CLASS_CONTEXT_STATS) || target->IsClass(CLASS_PRIEST, CLASS_CONTEXT_STATS)
+        || target->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_STATS))
         return;
 
     target->HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(GetAmount()), apply);
@@ -4947,7 +4948,8 @@ void AuraEffect::HandleAuraModRangedAttackPowerPercent(AuraApplication const* au
 
     Unit* target = aurApp->GetTarget();
 
-    if ((target->getClassMask() & CLASSMASK_WAND_USERS) != 0)
+    if (target->IsClass(CLASS_MAGE, CLASS_CONTEXT_STATS) || target->IsClass(CLASS_PRIEST, CLASS_CONTEXT_STATS)
+        || target->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_STATS))
         return;
 
     //UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
@@ -4968,7 +4970,8 @@ void AuraEffect::HandleAuraModRangedAttackPowerOfStatPercent(AuraApplication con
     Unit* target = aurApp->GetTarget();
 
     // Recalculate bonus
-    if (target->IsPlayer() && !(target->getClassMask() & CLASSMASK_WAND_USERS))
+    if (target->IsPlayer() && !target->IsClass(CLASS_MAGE, CLASS_CONTEXT_STATS)
+        && !target->IsClass(CLASS_PRIEST, CLASS_CONTEXT_STATS) && !target->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_STATS))
         target->ToPlayer()->UpdateAttackPowerAndDamage(true);
 }
 
