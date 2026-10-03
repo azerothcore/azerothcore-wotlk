@@ -1208,6 +1208,98 @@ class spell_dk_blood_boil : public SpellScript
     bool _executed;
 };
 
+// 45529 - Blood Tap
+class spell_dk_blood_tap_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dk_blood_tap_aura);
+
+public:
+    void SetRuneIndex(uint8 index) { _runeIndex = index; }
+
+private:
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (_runeIndex >= MAX_RUNES)
+            return;
+
+        Player* player = GetTarget()->ToPlayer();
+        if (!player || !player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+            return;
+
+        // Convert the rune the spell just activated, not the first ready Blood Rune
+        PreventDefaultAction();
+        player->AddRuneByAuraEffect(_runeIndex, RuneType(aurEff->GetMiscValueB()), aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_dk_blood_tap_aura::HandleApply, EFFECT_1, SPELL_AURA_CONVERT_RUNE, AURA_EFFECT_HANDLE_REAL);
+    }
+
+    uint8 _runeIndex = MAX_RUNES;
+};
+
+class spell_dk_blood_tap : public SpellScript
+{
+    PrepareSpellScript(spell_dk_blood_tap);
+
+    void HandleActivateRune(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        Player* player = GetCaster()->ToPlayer();
+        if (!player || !player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+            return;
+
+        GetSpell()->SetRuneState(player->GetRunesState());
+
+        // Blood Tap activates one Blood Rune slot and converts that same rune into a Death Rune.
+        // A depleted rune is picked first (the one closest to coming back if both are depleted),
+        // otherwise a ready rune that is still a Blood Rune so the conversion is not wasted.
+        auto isBetterPick = [player](uint8 candidate, uint8 current) -> bool
+        {
+            uint32 candidateCooldown = player->GetRuneCooldown(candidate);
+            uint32 currentCooldown = player->GetRuneCooldown(current);
+            if (candidateCooldown && currentCooldown)
+                return candidateCooldown < currentCooldown;
+
+            if (candidateCooldown || currentCooldown)
+                return candidateCooldown != 0;
+
+            return player->GetCurrentRune(candidate) == RUNE_BLOOD && player->GetCurrentRune(current) != RUNE_BLOOD;
+        };
+
+        for (uint8 i = 0; i < MAX_RUNES; ++i)
+            if (player->GetBaseRune(i) == RUNE_BLOOD && (_runeIndex == MAX_RUNES || isBetterPick(i, _runeIndex)))
+                _runeIndex = i;
+
+        if (_runeIndex == MAX_RUNES)
+            return;
+
+        if (player->GetRuneCooldown(_runeIndex))
+        {
+            player->SetRuneCooldown(_runeIndex, 0);
+            player->SetGracePeriod(_runeIndex, player->IsInCombat()); // same grace reset as Spell::EffectActivateRune
+            player->ResyncRunes();
+        }
+    }
+
+    void HandleConvertRune(SpellEffIndex /*effIndex*/)
+    {
+        if (Aura* aura = GetHitAura())
+            if (auto* script = aura->GetScript<spell_dk_blood_tap_aura>("spell_dk_blood_tap"))
+                script->SetRuneIndex(_runeIndex);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_dk_blood_tap::HandleActivateRune, EFFECT_0, SPELL_EFFECT_ACTIVATE_RUNE);
+        OnEffectHitTarget += SpellEffectFn(spell_dk_blood_tap::HandleConvertRune, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+    }
+
+    uint8 _runeIndex = MAX_RUNES;
+};
+
 // 50453 - Bloodworms Health Leech
 class spell_dk_blood_gorged : public AuraScript
 {
@@ -3026,6 +3118,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_anti_magic_shell_self);
     RegisterSpellScript(spell_dk_anti_magic_zone);
     RegisterSpellScript(spell_dk_blood_boil);
+    RegisterSpellAndAuraScriptPair(spell_dk_blood_tap, spell_dk_blood_tap_aura);
     RegisterSpellScript(spell_dk_blood_gorged);
     RegisterSpellScript(spell_dk_corpse_explosion);
     RegisterSpellScript(spell_dk_death_coil);
