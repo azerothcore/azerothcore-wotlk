@@ -439,8 +439,6 @@ class spell_ignis_grab_initial : public SpellScript
 enum SlagPot
 {
     SPELL_SLAG_POT_DAMAGE   = 65722,
-    SPELL_SCORCH_DAMAGE_1   = 62549,
-    SPELL_SCORCH_DAMAGE_2   = 63475,
     SPELL_SLAG_IMBUED       = 62836,
 };
 
@@ -453,8 +451,6 @@ class spell_ignis_slag_pot_aura : public AuraScript
         return ValidateSpellInfo(
             {
                 SPELL_SLAG_POT_DAMAGE,
-                SPELL_SCORCH_DAMAGE_1,
-                SPELL_SCORCH_DAMAGE_2,
                 SPELL_SLAG_IMBUED
             });
     }
@@ -466,21 +462,10 @@ class spell_ignis_slag_pot_aura : public AuraScript
                 caster->CastSpell(target, SPELL_SLAG_POT_DAMAGE, true);
     }
 
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* target = GetTarget())
-        {
-            target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_1, true);
-            target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_2, true);
-        }
-    }
-
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
         {
-            target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_1, false);
-            target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_2, false);
             if (target->IsAlive())
                 target->CastSpell(target, SPELL_SLAG_IMBUED, true);
         }
@@ -489,7 +474,6 @@ class spell_ignis_slag_pot_aura : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_ignis_slag_pot_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        OnEffectApply += AuraEffectApplyFn(spell_ignis_slag_pot_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_ignis_slag_pot_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };

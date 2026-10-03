@@ -23,12 +23,13 @@ namespace GameTime
     using namespace std::chrono;
 
     Seconds const StartTime = GetEpochTime();
+    TimePoint const StartSteadyPoint = steady_clock::now();
 
     Seconds GameTime = GetEpochTime();
     Milliseconds GameMSTime = 0ms;
 
     SystemTimePoint GameTimeSystemPoint = SystemTimePoint::min();
-    TimePoint GameTimeSteadyPoint = TimePoint::min();
+    TimePoint GameTimeSteadyPoint = StartSteadyPoint;
 
     Seconds GetStartTime()
     {
@@ -57,7 +58,7 @@ namespace GameTime
 
     Seconds GetUptime()
     {
-        return GameTime - StartTime;
+        return duration_cast<Seconds>(GameTimeSteadyPoint - StartSteadyPoint);
     }
 
     void UpdateGameTimers()
