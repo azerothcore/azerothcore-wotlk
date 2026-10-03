@@ -1,3 +1,4 @@
+-- DB update 2026_10_03_12 -> 2026_10_03_13
 -- Remove erroneous Relentless Strikes spell_proc override that was incorrectly assigned to Remorseless Attacks
 DELETE FROM `spell_proc` WHERE `SpellId` = -14143;
 
