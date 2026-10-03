@@ -1,3 +1,4 @@
+-- DB update 2026_10_03_10 -> 2026_10_03_11
 --
 -- Normalize the world-drop loot of 57 open-world vanilla rare elites (issue #27900) onto the
 -- "Loot Normalization" World Loot (GroupId 5) and Vanilla Greens (GroupId 6) references (#24398).
