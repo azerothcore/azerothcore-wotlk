@@ -12140,7 +12140,13 @@ void Player::LearnDefaultSkills()
     {
         uint32 skillId = itr->SkillId;
         if (HasSkill(skillId))
+        {
+            if (SkillRaceClassInfoEntry const* rcInfo = GetSkillRaceClassInfo(skillId, getRace(), getClass()))
+                if (GetSkillRangeType(rcInfo) == SKILL_RANGE_RANK)
+                    LearnSkillRankSpells(skillId, GetSkillStep(skillId));
+
             continue;
+        }
 
         LearnDefaultSkill(skillId, itr->Rank);
     }
@@ -12209,10 +12215,28 @@ void Player::LearnDefaultSkill(uint32 skillId, uint16 rank)
             }
 
             SetSkill(skillId, rank, skillValue, maxValue);
+            LearnSkillRankSpells(skillId, rank);
             break;
         }
         default:
             break;
+    }
+}
+
+void Player::LearnSkillRankSpells(uint32 skillId, uint16 rank)
+{
+    for (uint32 rankSpellId : sSpellMgr->GetSkillRankSpells(skillId))
+    {
+        if (SpellLearnSkillNode const* spellLearnSkill = sSpellMgr->GetSpellLearnSkill(rankSpellId))
+        {
+            if (spellLearnSkill->step <= rank)
+            {
+                if (IsInWorld())
+                    learnSpell(rankSpellId, false);
+                else
+                    addSpell(rankSpellId, SPEC_MASK_ALL, true, false, false);
+            }
+        }
     }
 }
 
