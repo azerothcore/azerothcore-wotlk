@@ -265,7 +265,8 @@ public:
     void MoveSeekAssistanceDistract(uint32 timer);
     void MoveTaxiFlight(uint32 path, uint32 pathnode);
     void MoveDistract(uint32 time);
-    void MoveWaypoint(uint32 path_id, bool repeatable, PathSource pathSource = PathSource::WAYPOINT_MGR);
+    void MoveWaypoint(uint32 path_id, bool repeatable, PathSource pathSource = PathSource::WAYPOINT_MGR,
+        uint32 resumeAfterWaypointId = 0);
     void MoveRotate(uint32 time, RotateDirection direction);
     void MovePointBackwards(uint32 id, float x, float y, float z, bool generatePath = true,
         bool forceDestination = true, MovementSlot slot = MOTION_SLOT_ACTIVE, float orientation = 0.0f);
