@@ -85,9 +85,9 @@ public:
         me->SetReactState(REACT_PASSIVE);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         me->SetReactState(REACT_AGGRESSIVE);
 
         // Both phases

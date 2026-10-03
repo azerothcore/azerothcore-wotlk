@@ -102,9 +102,9 @@ struct boss_the_beast : public BossAI
             me->GetMotionMaster()->MoveWaypoint(BEAST_MOVEMENT_ID, true);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_FLAME_BREAK, 12s);
         events.ScheduleEvent(EVENT_IMMOLATE, 3s);
         events.ScheduleEvent(EVENT_TERRIFYING_ROAR, 23s);

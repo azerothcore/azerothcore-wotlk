@@ -129,10 +129,10 @@ struct boss_vezax : public BossAI
         me->setActive(false);
     }
 
-    void JustEngagedWith(Unit*  /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         me->setActive(true);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         events.RescheduleEvent(EVENT_SPELL_VEZAX_SHADOW_CRASH, 13s);
         events.RescheduleEvent(EVENT_SPELL_SEARING_FLAMES, 10s, 1);

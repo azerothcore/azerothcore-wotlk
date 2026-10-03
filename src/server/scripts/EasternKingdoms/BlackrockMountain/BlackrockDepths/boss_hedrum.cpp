@@ -34,9 +34,9 @@ struct boss_hedrum : public BossAI
 {
     boss_hedrum(Creature* creature) : BossAI(creature, DATA_HEDRUM) {}
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_PARALYZING, TIMER_PARALYZING / 5);
         events.ScheduleEvent(SPELL_BANEFUL, TIMER_BANEFUL / 5);
         events.ScheduleEvent(SPELL_WEB_EXPLOSION, TIMER_WEB_EXPLOSION / 5);

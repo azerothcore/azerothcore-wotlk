@@ -38,9 +38,9 @@ struct boss_anubshiah : public BossAI
 {
     boss_anubshiah(Creature* creature) :  BossAI(creature, DATA_ANUBSHIAH) { }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_SHADOWBOLT, TIMER_SHADOWBOLT / 5);
         events.ScheduleEvent(SPELL_CURSE_TONGUES, TIMER_CURSE_TONGUES / 5);
         events.ScheduleEvent(SPELL_CURSE_WEAKNESS, TIMER_CURSE_WEAKNESS / 5);

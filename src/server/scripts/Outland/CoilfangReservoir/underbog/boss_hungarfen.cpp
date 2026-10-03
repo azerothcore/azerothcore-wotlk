@@ -65,9 +65,9 @@ struct boss_hungarfen : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         _scheduler.Schedule(IsHeroic() ? randtime(2400ms, 3600ms) : 10s, [this](TaskContext context)
             {

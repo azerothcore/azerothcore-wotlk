@@ -36,9 +36,9 @@ struct boss_gorosh_the_dervish : public BossAI
 
     Milliseconds nextWhirlwindTime;
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_WHIRLWIND, TIMER_WHIRLWIND / 5);
         events.ScheduleEvent(SPELL_MORTALSTRIKE, TIMER_MORTAL / 5);
         events.ScheduleEvent(SPELL_BLOODLUST, TIMER_BLOODLUST / 5);

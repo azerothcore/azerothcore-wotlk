@@ -44,9 +44,9 @@ struct boss_gatewatcher_gyrokill : public BossAI
         Talk(SAY_DEATH);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         scheduler.Schedule(10s, [this](TaskContext context)
         {

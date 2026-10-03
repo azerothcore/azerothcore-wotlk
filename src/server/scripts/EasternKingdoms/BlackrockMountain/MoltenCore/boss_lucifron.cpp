@@ -37,9 +37,9 @@ struct boss_lucifron : public BossAI
 {
     boss_lucifron(Creature* creature) : BossAI(creature, DATA_LUCIFRON) {}
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_IMPENDING_DOOM, 6s, 11s);
         events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 11s, 14s);
         events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5s);

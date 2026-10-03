@@ -73,10 +73,10 @@ struct boss_watchkeeper_gargolmar : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         scheduler.Schedule(5s, [this] (TaskContext context)
         {
             DoCastVictim(SPELL_MORTAL_WOUND);

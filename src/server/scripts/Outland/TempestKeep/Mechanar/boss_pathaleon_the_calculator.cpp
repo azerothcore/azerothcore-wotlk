@@ -77,9 +77,9 @@ struct boss_pathaleon_the_calculator : public BossAI
         return instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) >= 4;
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         ScheduleHealthCheckEvent(20, [&]()
         {
