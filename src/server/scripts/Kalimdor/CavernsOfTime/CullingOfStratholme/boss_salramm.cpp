@@ -62,25 +62,16 @@ public:
         return GetCullingOfStratholmeAI<boss_salrammAI>(creature);
     }
 
-    struct boss_salrammAI : public ScriptedAI
+    struct boss_salrammAI : public BossAI
     {
-        boss_salrammAI(Creature* c) : ScriptedAI(c), summons(me)
+        boss_salrammAI(Creature* creature) : BossAI(creature, BOSS_SALRAMM)
         {
             Talk(SAY_SPAWN);
         }
 
-        EventMap events;
-        SummonList summons;
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-        }
-
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
-
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _JustEngagedWith();
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 7s);
             events.ScheduleEvent(EVENT_SPELL_STEAL_FLESH, 11s);
@@ -92,7 +83,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            summons.DespawnAll();
+            _JustDied();
             Talk(SAY_DEATH);
         }
 

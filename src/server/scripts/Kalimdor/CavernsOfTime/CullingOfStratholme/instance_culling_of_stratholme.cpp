@@ -42,11 +42,12 @@ public:
         {
             // Instance
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTERS);
+            SetPersistentDataCount(PERSISTENT_DATA_COUNT);
             _crateCount = 0;
             _showCrateTimer = 0;
             _guardianTimer = 0;
             _respawnAndReposition = false;
-            _encounterState = COS_PROGRESS_NOT_STARTED;
             _loadTimer = 0;
         }
 
@@ -80,7 +81,7 @@ public:
             {
                 case NPC_ARTHAS:
                     _arthasGUID = creature->GetGUID();
-                    if (_encounterState == COS_PROGRESS_FINISHED)
+                    if (GetPersistentData(PERSISTENT_DATA_ARTHAS_EVENT) == COS_PROGRESS_FINISHED)
                         creature->SetVisible(false);
                     else
                         Reposition(creature);
@@ -97,12 +98,12 @@ public:
             {
                 case GO_SHKAF_GATE:
                     _shkafGateGUID = go->GetGUID();
-                    if (_encounterState >= COS_PROGRESS_KILLED_EPOCH)
+                    if (GetPersistentData(PERSISTENT_DATA_ARTHAS_EVENT) >= COS_PROGRESS_KILLED_EPOCH)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_EXIT_GATE:
                     _exitGateGUID = go->GetGUID();
-                    if (_encounterState == COS_PROGRESS_FINISHED)
+                    if (GetPersistentData(PERSISTENT_DATA_ARTHAS_EVENT) == COS_PROGRESS_FINISHED)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
             }
@@ -123,7 +124,7 @@ public:
                     if (data == 0)
                     {
                         _guardianTimer = 0;
-                        SaveToDB();
+                        StorePersistentData(PERSISTENT_DATA_GUARDIAN_TIMER, _guardianTimer);
                     }
                     else if (!_infiniteGUID)
                         instance->SummonCreature(NPC_INFINITE, EventPos[EVENT_SRC_CORRUPTOR]);
@@ -155,8 +156,7 @@ public:
                     DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_CRATES_REVEALED, _crateCount);
                     return;
                 case DATA_ARTHAS_EVENT:
-                    // Start Event
-                    _encounterState = data;
+                    StorePersistentData(PERSISTENT_DATA_ARTHAS_EVENT, data);
                     if (data == COS_PROGRESS_START_INTRO)
                     {
                         if (Creature* arthas = instance->GetCreature(_arthasGUID))
@@ -175,9 +175,6 @@ public:
                         Reposition(arthas);
                     return;
             }
-
-            if (type == DATA_ARTHAS_EVENT)
-                SaveToDB();
         }
 
         uint32 GetData(uint32 type) const override
@@ -185,11 +182,11 @@ public:
             switch (type)
             {
                 case DATA_ARTHAS_EVENT:
-                    return _encounterState;
+                    return GetPersistentData(PERSISTENT_DATA_ARTHAS_EVENT);
                 case DATA_GUARDIANTIME_EVENT:
                     return _guardianTimer;
                 case DATA_INTRO_EVENT_FINISHED:
-                    return _encounterState >= COS_PROGRESS_FINISHED_INTRO ? 1 : 0;
+                    return GetPersistentData(PERSISTENT_DATA_ARTHAS_EVENT) >= COS_PROGRESS_FINISHED_INTRO ? 1 : 0;
             }
             return 0;
         }
@@ -259,6 +256,7 @@ public:
                 if (divAfter == 0)
                 {
                     _guardianTimer = 0;
+                    StorePersistentData(PERSISTENT_DATA_GUARDIAN_TIMER, _guardianTimer);
                     DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, 0);
 
                     // Inform infinite we run out of time
@@ -274,28 +272,29 @@ public:
                         ChromieWhisper(2);
 
                     DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, divAfter);
-                    SaveToDB();
+                    StorePersistentData(PERSISTENT_DATA_GUARDIAN_TIMER, _guardianTimer);
                 }
             }
         }
 
         void UpdateEventState()
         {
-            if (_encounterState > COS_PROGRESS_NOT_STARTED)
+            uint32 progress = GetPersistentData(PERSISTENT_DATA_ARTHAS_EVENT);
+            if (progress > COS_PROGRESS_NOT_STARTED)
             {
                 // Summon Chromie and global whisper
                 instance->SummonCreature(NPC_CHROMIE_MIDDLE, EventPos[EVENT_POS_CHROMIE]);
                 instance->SummonCreature(NPC_HOURGLASS, EventPos[EVENT_POS_HOURGLASS]);
 
-                if (_encounterState == COS_PROGRESS_CRATES_FOUND ||
-                        _encounterState == COS_PROGRESS_START_INTRO)
+                if (progress == COS_PROGRESS_CRATES_FOUND ||
+                        progress == COS_PROGRESS_START_INTRO)
                 {
                     ChromieWhisper(0);
 
                     // hide crates count
                     DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, 0);
                     _showCrateTimer = 0;
-                    _encounterState = COS_PROGRESS_CRATES_FOUND;
+                    StorePersistentData(PERSISTENT_DATA_ARTHAS_EVENT, COS_PROGRESS_CRATES_FOUND);
                 }
             }
         }
@@ -354,45 +353,12 @@ public:
             }
         }
 
-        std::string GetSaveData() override
+        void Load(char const* data) override
         {
-            OUT_SAVE_INST_DATA;
+            InstanceScript::Load(data);
 
-            std::ostringstream saveStream;
-            saveStream << "C S " << _encounterState << ' ' << _guardianTimer;
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(char const* in) override
-        {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            uint32 data0, data1;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1;
-
-            if (dataHead1 == 'C' && dataHead2 == 'S')
-            {
-                _encounterState = data0;
-                _guardianTimer = data1;
-
-                //UpdateEventState();
-                _loadTimer++;
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            _guardianTimer = GetPersistentData(PERSISTENT_DATA_GUARDIAN_TIMER);
+            _loadTimer++;
         }
 
     private:
@@ -403,7 +369,6 @@ public:
         // GOs
         ObjectGuid _shkafGateGUID;
         ObjectGuid _exitGateGUID;
-        uint32 _encounterState;
         uint32 _crateCount;
         uint32 _showCrateTimer;
         uint32 _guardianTimer;
