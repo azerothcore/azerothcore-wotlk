@@ -161,6 +161,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | items/equip | visible-item slot after EquipEntry; additem; survives relog | P2 | covered | — |
 | protocol/session | pos; item/quest load; money save/relog | P1 | covered; GM vis persist `blocked-harness` (extra_flags after relog) | #25793 |
 | protocol/teleport | cross-map; named; GoCreatureID | P1 | covered | — |
+| pvp/isle_of_conquest | Initial objective/gate icons clear stale states while preserving the current match | P3 | blocked-harness: no battleground queue/entry API (`CMSG_BATTLEMASTER_JOIN`, `CMSG_BATTLEFIELD_PORT`); packet-builder unit tests in `BattlegroundICWorldStatesTest` | #24438 |
 | guild/charter_bank | charter buy+turn-in | P2 | covered | — |
 | instances/bind_reset | party tele; ritual summon | P2 | covered; post-reset summon `blocked-harness` (AcceptSummon after reset) | #10708 |
 | instances/classic/stratholme | Timmy remains hidden while a relevant Square Scarlet lives, then emerges after the area is clear | P2 | covered (`TestAC_26363_TimmyEmergesAfterSquareCleared`) | #26363 |
