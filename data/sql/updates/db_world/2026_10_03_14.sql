@@ -1,3 +1,4 @@
+-- DB update 2026_10_03_13 -> 2026_10_03_14
 -- SPELL_ATTR0_CU_IGNORE_BINARY (512) for spells that must not be auto-classified as binary.
 -- Replaces the hardcoded id list in SpellMgr::LoadSpellInfoCustomAttributes.
 DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (62457, 62469, 62576, 62580, 62583, 62597, 62601, 62602, 62604, 62605, 65370, 69425, 69649, 70827, 71056, 71057, 71058, 73061, 73062, 73063, 73064);
