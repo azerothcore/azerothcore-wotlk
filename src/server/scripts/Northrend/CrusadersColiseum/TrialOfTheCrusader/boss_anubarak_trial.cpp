@@ -739,6 +739,13 @@ public:
             me->SetCorpseDelay(0);
         }
 
+        enum SpikeEvents
+        {
+            EVENT_SPIKE_SPEED_2 = 1,
+            EVENT_SPIKE_SPEED_3,
+            EVENT_SPIKE_RESUME,
+        };
+
         EventMap events;
         ObjectGuid TargetGUID;
 
@@ -752,8 +759,15 @@ public:
                 me->RemoveAllAuras();
                 me->GetMotionMaster()->MoveIdle();
                 events.Reset();
-                events.RescheduleEvent(3, 4s);
+                events.RescheduleEvent(EVENT_SPIKE_RESUME, 4s);
             }
+        }
+
+        bool CanPursue(Unit* target) const
+        {
+            // Physical immunity (Hand of Protection) does not break pursuit, but full immunity does.
+            return target && me->IsValidAttackTarget(target) && !target->HasAuraType(SPELL_AURA_FEIGN_DEATH)
+                && !target->HasSchoolImmunityForMask(SPELL_SCHOOL_MASK_ALL, me, nullptr);
         }
 
         void SelectNewTarget(bool next)
@@ -762,21 +776,24 @@ public:
                 if (Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID))
                     target->RemoveAura(SPELL_MARK);
             TargetGUID.Clear();
+            me->AttackStop();
+            me->GetMotionMaster()->MoveIdle();
             if (!next)
             {
                 events.Reset();
                 me->RemoveAllAuras();
+                // Start the pursuit even if everyone is currently immune, so acquisition can retry.
+                DoCastSelf(SPELL_SPIKE_SPEED1, true);
+                DoCastSelf(SPELL_SPIKE_TRAIL, true);
+                events.RescheduleEvent(EVENT_SPIKE_SPEED_2, 7s);
             }
             DoZoneInCombat();
             DoResetThreatList();
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* candidate)
             {
-                if (!next)
-                {
-                    me->CastSpell(me, SPELL_SPIKE_SPEED1, true);
-                    me->CastSpell(me, SPELL_SPIKE_TRAIL, true);
-                    events.RescheduleEvent(1, 7s);
-                }
+                return DefaultTargetSelector(me, 250.0f, true, true, 0)(candidate) && CanPursue(candidate);
+            }))
+            {
                 TargetGUID = target->GetGUID();
                 me->CastSpell(target, SPELL_MARK, true);
                 Talk(EMOTE_SPIKE, target);
@@ -792,14 +809,14 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (TargetGUID)
+            // Keep searching if no eligible player remains. The trail is removed during the Permafrost pause.
+            if (TargetGUID || me->HasAura(SPELL_SPIKE_TRAIL))
             {
                 Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID);
-                if (!target || !target->HasAura(SPELL_MARK) || !me->IsValidAttackTarget(target) || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE || !me->HasUnitState(UNIT_STATE_CHASE_MOVE))
-                {
+                // Reaching the marked player clears CHASE_MOVE; that is not a reason to abandon pursuit.
+                if (!CanPursue(target) || !target->HasAura(SPELL_MARK) || me->GetVictim() != target
+                    || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
                     SelectNewTarget(true);
-                    return;
-                }
             }
 
             events.Update(diff);
@@ -808,16 +825,16 @@ public:
             {
                 case 0:
                     break;
-                case 1:
+                case EVENT_SPIKE_SPEED_2:
                     me->CastSpell(me, SPELL_SPIKE_SPEED2, true);
 
-                    events.RescheduleEvent(2, 7s);
+                    events.RescheduleEvent(EVENT_SPIKE_SPEED_3, 7s);
                     break;
-                case 2:
+                case EVENT_SPIKE_SPEED_3:
                     me->CastSpell(me, SPELL_SPIKE_SPEED3, true);
 
                     break;
-                case 3:
+                case EVENT_SPIKE_RESUME:
                     Reset();
                     break;
             }
