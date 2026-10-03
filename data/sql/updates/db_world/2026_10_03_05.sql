@@ -1,3 +1,4 @@
+-- DB update 2026_10_03_04 -> 2026_10_03_05
 --
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2681100 AND 2681112;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `velocity`, `delay`, `smoothTransition`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
