@@ -43,6 +43,12 @@ jobs:
 
       - uses: actions/checkout@v7
 
+      - name: Test incremental build cache
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build ccache rsync
+          python3 apps/docker/tests/test_build_cache.py
+
       # The containers created in this workflow are used by
       # acore-docker, which has a dependency on mod-ale.
       #
