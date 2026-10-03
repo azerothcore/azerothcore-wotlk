@@ -2075,23 +2075,20 @@ void Player::RegenerateHealth()
 
 void Player::ResetAllPowers()
 {
-    SetHealth(GetMaxHealth());
+    if (IsAlive())
+        SetHealth(GetMaxHealth());
+
     if (HasActivePowerType(POWER_MANA))
-    {
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-    }
+
     if (HasActivePowerType(POWER_RAGE))
-    {
         SetPower(POWER_RAGE, 0);
-    }
+
     if (HasActivePowerType(POWER_ENERGY))
-    {
         SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-    }
+
     if (HasActivePowerType(POWER_RUNIC_POWER))
-    {
         SetPower(POWER_RUNIC_POWER, 0);
-    }
 }
 
 bool Player::CanInteractWithQuestGiver(Object* questGiver)
@@ -8100,6 +8097,11 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             }
 
             go->SetLootState(GO_ACTIVATED, this);
+
+            // Trigger chest traps once per loot generation, including when the generated loot is empty.
+            if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+                if (uint32 trapEntry = go->GetGOInfo()->chest.linkedTrapId)
+                    go->TriggeringLinkedGameObject(trapEntry, this);
         }
 
         if (go->getLootState() == GO_ACTIVATED)
