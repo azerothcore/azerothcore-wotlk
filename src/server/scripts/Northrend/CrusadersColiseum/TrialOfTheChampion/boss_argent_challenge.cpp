@@ -92,7 +92,7 @@ public:
             events.Reset();
             me->SetReactState(REACT_PASSIVE);
             if (pInstance)
-                pInstance->SetData(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
+                pInstance->SetBossState(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -117,7 +117,7 @@ public:
             Talk(SAY_EADRIC_AGGRO);
             me->CastSpell(me, SPELL_VENGEANCE, false);
             if (pInstance)
-                pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
+                pInstance->SetBossState(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
         void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
@@ -144,7 +144,7 @@ public:
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToAll(true);
                     if (pInstance)
-                        pInstance->SetData(BOSS_ARGENT_CHALLENGE, DONE);
+                        pInstance->SetBossState(BOSS_ARGENT_CHALLENGE, DONE);
                 }
             }
         }
@@ -219,7 +219,7 @@ public:
             }
             me->SetReactState(REACT_PASSIVE);
             if (pInstance)
-                pInstance->SetData(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
+                pInstance->SetBossState(BOSS_ARGENT_CHALLENGE, NOT_STARTED);
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -244,7 +244,7 @@ public:
             me->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
             Talk(SAY_PALETRESS_AGGRO);
             if (pInstance)
-                pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
+                pInstance->SetBossState(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
         void DoAction(int32 param) override
@@ -288,7 +288,7 @@ public:
                     me->SetImmuneToAll(true);
                     if (pInstance)
                     {
-                        pInstance->SetData(BOSS_ARGENT_CHALLENGE, DONE);
+                        pInstance->SetBossState(BOSS_ARGENT_CHALLENGE, DONE);
                         pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 68206);
                     }
                 }
