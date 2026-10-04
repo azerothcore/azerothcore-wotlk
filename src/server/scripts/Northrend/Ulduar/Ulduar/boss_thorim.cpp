@@ -315,15 +315,9 @@ const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI * 1.5f};
 
 struct boss_thorim : public BossAI
 {
-    boss_thorim(Creature* creature) : BossAI(creature, BOSS_THORIM)
-    {
-        _encounterFinished = !me->IsAlive();
-        if (_encounterFinished)
-            instance->SetBossState(BOSS_THORIM, DONE);
-    }
+    boss_thorim(Creature* creature) : BossAI(creature, BOSS_THORIM) { }
 
     bool _isArenaEmpty;
-    bool _encounterFinished;
     bool _spawnCommoners;
     bool _hardMode;
     bool _isHitAllowed;
@@ -413,7 +407,7 @@ struct boss_thorim : public BossAI
     void JustExitedCombat() override
     {
         EngagementOver();
-        if (_encounterFinished)
+        if (instance->GetBossState(BOSS_THORIM) == DONE)
             return;
         EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
     }
@@ -426,7 +420,7 @@ struct boss_thorim : public BossAI
 
     void Reset() override
     {
-        if (!_encounterFinished)
+        if (instance->GetBossState(BOSS_THORIM) != DONE)
             _Reset();
 
         _trashCounter = 0;
@@ -510,7 +504,7 @@ struct boss_thorim : public BossAI
 
     void JustEngagedWith(Unit*) override
     {
-        if (!_encounterFinished)
+        if (instance->GetBossState(BOSS_THORIM) != DONE)
             instance->SetBossState(BOSS_THORIM, IN_PROGRESS);
         me->setActive(true);
         DisableThorim(true);
@@ -557,9 +551,10 @@ struct boss_thorim : public BossAI
         if (me->IsAlive() && damage >= me->GetHealth())
         {
             damage = 0;
-            if (!_encounterFinished)
+            if (instance->GetBossState(BOSS_THORIM) != DONE)
             {
-                _encounterFinished = true;
+                // Must precede CombatStop: it runs JustExitedCombat, whose DONE check keeps the outro from evading
+                instance->SetBossState(BOSS_THORIM, DONE);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetHealth(me->GetMaxHealth());
@@ -591,7 +586,6 @@ struct boss_thorim : public BossAI
 
                 // Defeat credit
                 me->CastSpell(me, 64985, true); // credit
-                instance->SetBossState(BOSS_THORIM, DONE);
             }
         }
     }
@@ -648,7 +642,7 @@ struct boss_thorim : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!_encounterFinished && !UpdateVictim())
+        if (instance->GetBossState(BOSS_THORIM) != DONE && !UpdateVictim())
             return;
 
         events.Update(diff);
@@ -784,8 +778,6 @@ struct boss_thorim : public BossAI
                 {
                     Talk(SAY_END_NORMAL_3);
                 }
-                // Defeat credit
-                instance->SetBossState(BOSS_THORIM, DONE);
                 events.ScheduleEvent(EVENT_THORIM_OUTRO4, 14s, 0, 3);
                 break;
             case EVENT_THORIM_OUTRO4:
@@ -793,7 +785,7 @@ struct boss_thorim : public BossAI
                 break;
         }
 
-        if (!_encounterFinished)
+        if (instance->GetBossState(BOSS_THORIM) != DONE)
             DoMeleeAttackIfReady();
     }
 };
