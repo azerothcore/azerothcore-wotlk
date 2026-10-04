@@ -17,11 +17,20 @@ import (
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
 
+// Keep travel and movement short enough to observe Taunt expiry within the
+// native eight-second channels. Stationary positions are outside melee range.
+const (
+	acidTargetDistance = 6
+	acidProbeDistance  = 8
+	acidTimingMargin   = 250 * time.Millisecond
+)
+
 type acidSpell struct {
-	parent, damage uint32
-	issue          int
-	period         time.Duration
-	tauntRedirect  bool
+	parent, damage  uint32
+	issue           int
+	period          time.Duration
+	projectileSpeed float64
+	tauntRedirect   bool
 }
 
 // These are deterministic spell regressions, not tests of boss timers or random
@@ -30,14 +39,14 @@ type acidSpell struct {
 // all run normally. No creature templates or spell data are changed by the tests.
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/19917
 func TestAC_19917_AcidSprayChannel(t *testing.T) {
-	runAcidChannel(t, acidSpell{38153, 38163, 19917, 800 * time.Millisecond, true})
+	runAcidChannel(t, acidSpell{38153, 38163, 19917, 800 * time.Millisecond, 10, true})
 }
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/19921
 // 38971 is shared by Underbog Colossus and Coprous. Their different AI target
 // selectors are outside this fixture; neither should inherit 38153's taunt opt-in.
 func TestAC_19921_AcidGeyserChannel(t *testing.T) {
-	runAcidChannel(t, acidSpell{38971, 38973, 19921, time.Second, false})
+	runAcidChannel(t, acidSpell{38971, 38973, 19921, time.Second, 14, false})
 }
 
 func runAcidChannel(t *testing.T, spell acidSpell) {
@@ -48,15 +57,15 @@ func runAcidChannel(t *testing.T, spell acidSpell) {
 	t.Run("MovingTargetAndNextChannel", func(t *testing.T) {
 		f := newAcidFixture(t, spell, false)
 		f.start(t, f.aim)
-		f.expectDamage(t, f.mark, spell.period+200*time.Millisecond, f.aim.GUID, f.probe.GUID)
+		f.expectDamage(t, f.mark, spell.period+spell.flightWindow(), f.aim.GUID, f.probe.GUID)
 
 		// Walk the chord from east to north at normal run speed. The probe stays
 		// east, so a cone frozen in its initial direction cannot pass this test.
 		f.moveAimNorth(t)
-		mark := f.logs.mark()
-		f.expectDamage(t, mark, spell.period+200*time.Millisecond, f.aim.GUID)
+		mark := f.drainProjectiles(t)
+		f.expectDamage(t, mark, spell.period+acidTimingMargin, f.aim.GUID)
 		f.waitChannelEnd(t)
-		f.expectDamage(t, f.logs.mark(), 2*spell.period)
+		f.expectDamage(t, f.drainProjectiles(t), 2*spell.period)
 		f.wait(t, 3*time.Second, "normal threat target restored", func() bool {
 			return f.probe.UnitTarget(f.caster) == f.tank.GUID
 		})
@@ -64,25 +73,28 @@ func runAcidChannel(t *testing.T, spell acidSpell) {
 		// A later channel must capture its own target rather than reuse the old
 		// aura's cached GUID. The tank is on the opposite side of the caster.
 		f.start(t, f.tank)
-		f.expectDamage(t, f.mark, spell.period+200*time.Millisecond, f.tank.GUID)
+		f.expectDamage(t, f.mark, spell.period+spell.flightWindow(), f.tank.GUID)
 	})
 	t.Run("TauntAndNaturalExpiry", func(t *testing.T) {
 		// The east-side probe pulls here. The west-side warrior is not the
 		// current threat victim, so its Taunt is not the no-effect case.
 		f := newAcidFixture(t, spell, true)
 		f.start(t, f.aim)
-		f.expectDamage(t, f.mark, spell.period+200*time.Millisecond, f.aim.GUID, f.probe.GUID)
+		f.expectDamage(t, f.mark, spell.period+spell.flightWindow(), f.aim.GUID, f.probe.GUID)
 		f.tank.CastMust(t, e2eharness.SpellTaunt, f.caster, 3*time.Second)
 		f.tank.WaitUnitAura(t, f.caster, e2eharness.SpellTaunt, time.Second)
 		f.prepare(t, time.Second, "observer sees the applied Taunt", func() bool {
 			return f.probe.UnitHasAura(f.caster, e2eharness.SpellTaunt)
 		})
 		f.probe.FlushWorld(t)
-		mark := f.logs.mark()
+		mark := f.drainProjectiles(t)
 		if spell.tauntRedirect {
-			f.expectDamage(t, mark, spell.period+200*time.Millisecond, f.tank.GUID)
+			f.expectDamage(t, mark, spell.period+acidTimingMargin, f.tank.GUID)
 		} else {
-			f.expectDamage(t, mark, spell.period+200*time.Millisecond, f.aim.GUID, f.probe.GUID)
+			f.expectDamage(t, mark, spell.period+acidTimingMargin, f.aim.GUID, f.probe.GUID)
+		}
+		if !f.probe.UnitHasAura(f.caster, e2eharness.SpellTaunt) {
+			e2eharness.Preconditionf(t, "Taunt expired before its damage observation completed")
 		}
 		if obj := f.probe.World.GetObject(f.caster); obj == nil ||
 			obj.GUIDField(client.UnitFieldChannelObject) != f.aim.GUID {
@@ -93,7 +105,7 @@ func runAcidChannel(t *testing.T, spell acidSpell) {
 		})
 		// Threat now belongs to the taunter, but the still-running channel must
 		// aim at its original target again (or keep it for Acid Geyser).
-		f.expectDamage(t, f.logs.mark(), spell.period+200*time.Millisecond, f.aim.GUID, f.probe.GUID)
+		f.expectDamage(t, f.drainProjectiles(t), spell.period+acidTimingMargin, f.aim.GUID, f.probe.GUID)
 		f.waitChannelEnd(t)
 		f.wait(t, 3*time.Second, "post-channel victim is the taunter", func() bool {
 			return f.probe.UnitTarget(f.caster) == f.tank.GUID
@@ -102,7 +114,7 @@ func runAcidChannel(t *testing.T, spell acidSpell) {
 	t.Run("DeadTargetStopsDamage", func(t *testing.T) {
 		f := newAcidFixture(t, spell, false)
 		f.start(t, f.aim)
-		f.expectDamage(t, f.mark, spell.period+200*time.Millisecond, f.aim.GUID, f.probe.GUID)
+		f.expectDamage(t, f.mark, spell.period+spell.flightWindow(), f.aim.GUID, f.probe.GUID)
 		// No CombatStop/GM toggle: death itself must invalidate the target.
 		selectAcidTarget(t, f.aim, f.aim.GUID)
 		f.aim.GM(t, ".die")
@@ -114,7 +126,7 @@ func runAcidChannel(t *testing.T, spell acidSpell) {
 		f.probe.FlushWorld(t)
 		// The probe is still in the last cone, and the tank remains alive on
 		// threat. Neither continued stale ticks nor fallback-to-tank ticks pass.
-		f.expectDamage(t, f.logs.mark(), 3*spell.period)
+		f.expectDamage(t, f.drainProjectiles(t), 3*spell.period)
 	})
 }
 
@@ -147,9 +159,9 @@ func newAcidFixture(t *testing.T, spell acidSpell, probePulls bool) *acidFixture
 	// changing the cone geometry and covers rotation while rooted as well.
 	f.tank.GM(t, ".aura 42716")
 	f.tank.WaitUnitAura(t, f.caster, 42716, 5*time.Second)
-	f.tank.Teleport(t, pad.X-18, pad.Y, pad.Z, pad.Map)
-	f.aim.Teleport(t, pad.X+18, pad.Y, pad.Z, pad.Map)
-	f.probe.Teleport(t, pad.X+24, pad.Y, pad.Z, pad.Map)
+	f.tank.Teleport(t, pad.X-acidTargetDistance, pad.Y, pad.Z, pad.Map)
+	f.aim.Teleport(t, pad.X+acidTargetDistance, pad.Y, pad.Z, pad.Map)
+	f.probe.Teleport(t, pad.X+acidProbeDistance, pad.Y, pad.Z, pad.Map)
 	for _, bot := range bots {
 		selectAcidTarget(t, bot, bot.GUID)
 		bot.GM(t, ".modify hp 500000")
@@ -219,6 +231,27 @@ func (f *acidFixture) start(t *testing.T, target *e2eharness.ScenarioBot) {
 	})
 }
 
+// Spell::AddUnitTarget clamps travel distance to at least five yards. The
+// farthest fixture recipient is eight yards away; using center distance gives
+// a conservative bound even when the core subtracts the caster's size.
+func (s acidSpell) flightWindow() time.Duration {
+	return time.Duration(math.Ceil(math.Max(5, acidProbeDistance)/s.projectileSpeed*float64(time.Second))) + acidTimingMargin
+}
+
+// A hit logged after a transition may have been launched before it. Drain for
+// one maximum flight window before marking the strict recipient/no-damage check.
+// This is a bounded projectile transit interval, not a retry on failed assertions.
+func (f *acidFixture) drainProjectiles(t *testing.T) int {
+	t.Helper()
+	window := f.spell.flightWindow()
+	t.Logf("draining pre-transition projectiles for %s", window)
+	timer := time.NewTimer(window)
+	defer timer.Stop()
+	<-timer.C
+	f.probe.FlushWorld(t)
+	return f.logs.mark()
+}
+
 func (f *acidFixture) waitChannelEnd(t *testing.T) {
 	t.Helper()
 	f.wait(t, 10*time.Second, "channel and its periodic aura finish", func() bool {
@@ -231,17 +264,17 @@ func (f *acidFixture) waitChannelEnd(t *testing.T) {
 
 func (f *acidFixture) moveAimNorth(t *testing.T) {
 	t.Helper()
-	const duration = 4 * time.Second // 25.46 yd at < 7 yd/s
+	const duration = 1500 * time.Millisecond // 8.49 yd at < 7 yd/s
 	start := time.Now()
 	orientation := float32(3 * math.Pi / 4)
-	if err := f.aim.World.MoveForwardAt(f.x+18, f.y, f.z, orientation); err != nil {
+	if err := f.aim.World.MoveForwardAt(f.x+acidTargetDistance, f.y, f.z, orientation); err != nil {
 		e2eharness.HarnessFailf(t, "start target movement: %v", err)
 	}
 	ticker := time.NewTicker(50 * time.Millisecond)
 	defer ticker.Stop()
 	for now := range ticker.C {
 		fraction := math.Min(1, float64(now.Sub(start))/float64(duration))
-		x, y := f.x+18*(1-float32(fraction)), f.y+18*float32(fraction)
+		x, y := f.x+acidTargetDistance*(1-float32(fraction)), f.y+acidTargetDistance*float32(fraction)
 		if err := f.aim.World.SendMovementHeartbeatAt(x, y, f.z, orientation); err != nil {
 			e2eharness.HarnessFailf(t, "move channel target: %v", err)
 		}
@@ -249,13 +282,13 @@ func (f *acidFixture) moveAimNorth(t *testing.T) {
 			break
 		}
 	}
-	if err := f.aim.World.MoveStopAt(f.x, f.y+18, f.z, orientation); err != nil {
+	if err := f.aim.World.MoveStopAt(f.x, f.y+acidTargetDistance, f.z, orientation); err != nil {
 		e2eharness.HarnessFailf(t, "stop channel target: %v", err)
 	}
 	f.aim.FlushWorld(t)
 	f.prepare(t, time.Second, "observer sees the target north of the caster", func() bool {
 		obj := f.probe.World.GetObject(f.aim.GUID)
-		return obj != nil && e2eharness.Distance3D(obj.PosX, obj.PosY, obj.PosZ, f.x, f.y+18, f.z) < 1
+		return obj != nil && e2eharness.Distance3D(obj.PosX, obj.PosY, obj.PosZ, f.x, f.y+acidTargetDistance, f.z) < 1
 	})
 	f.probe.FlushWorld(t)
 }
@@ -291,7 +324,8 @@ func waitAcidCondition(timeout time.Duration, ready func() bool) bool {
 
 // Check the whole bounded window, including forbidden recipients. A positive
 // check requires real damage, not merely a visual target or an absorbed hit.
-// Windows exceed one native periodic interval; both cone spells ALWAYS_HIT.
+// Start windows include flight time; transition windows begin after draining
+// old projectiles. Both cone spells ALWAYS_HIT.
 func (f *acidFixture) expectDamage(t *testing.T, mark int, window time.Duration, want ...uint64) {
 	t.Helper()
 	allowed := make(map[uint64]bool, len(want))
@@ -308,6 +342,9 @@ func (f *acidFixture) expectDamage(t *testing.T, mark int, window time.Duration,
 			!f.probe.UnitInCombat(f.caster) || !f.probe.UnitHasAura(f.caster, 42716) ||
 			e2eharness.Distance3D(obj.PosX, obj.PosY, obj.PosZ, f.x, f.y, f.z) > 1 {
 			e2eharness.Preconditionf(t, "acid fixture died, evaded, lost its root or moved during observation")
+		}
+		if len(want) != 0 && obj.Value(client.UnitChannelSpell) != f.spell.parent {
+			e2eharness.Preconditionf(t, "channel ended before the damage observation completed")
 		}
 		for _, hit := range f.logs.since(mark) {
 			if _, ok := allowed[hit.target]; !ok {
