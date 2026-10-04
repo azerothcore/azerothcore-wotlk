@@ -92,6 +92,13 @@ enum LivingRootOfTheWildheart
     SPELL_LIVING_ROOT_NONE                  = 37344
 };
 
+enum MeteoriteCrystal
+{
+    SPELL_BEACON_OF_LIGHT_HL                = 53652,
+    SPELL_BEACON_OF_LIGHT_FOL               = 53653,
+    SPELL_BEACON_OF_LIGHT_HS                = 53654
+};
+
 enum CharmWitchDoctor
 {
     SPELL_CHARM_WITCH_DOCTOR_PROC           = 43821
@@ -6071,6 +6078,35 @@ class spell_item_living_root_of_the_wildheart : public AuraScript
     }
 };
 
+// 64999 - Meteoric Inspiration
+class spell_item_meteoric_inspiration : public AuraScript
+{
+    PrepareAuraScript(spell_item_meteoric_inspiration);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Beacon of Light heal copies cost no mana but still grant a stack
+        switch (spellInfo->Id)
+        {
+            case SPELL_BEACON_OF_LIGHT_HL:
+            case SPELL_BEACON_OF_LIGHT_FOL:
+            case SPELL_BEACON_OF_LIGHT_HS:
+                return true;
+            default:
+                return spellInfo->ManaCost || spellInfo->ManaCostPercentage;
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_item_meteoric_inspiration::CheckProc);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -6251,4 +6287,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_purified_shard_of_the_scale);
     RegisterSpellScript(spell_item_shiny_shard_of_the_scale);
     RegisterSpellScript(spell_item_living_root_of_the_wildheart);
+    RegisterSpellScript(spell_item_meteoric_inspiration);
 }
