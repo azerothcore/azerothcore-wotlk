@@ -4,6 +4,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -38,6 +39,22 @@ def source_topology(source):
     return sorted(entries)
 
 
+def include_topology(source, topology):
+    # Include directives can name extensionless files or even another .cpp/.cc file.
+    # Keep their names as well as conventional headers, so a new shadow include
+    # invalidates direct-mode manifests without discarding all hits for a new TU.
+    header_suffixes = {'.h', '.hh', '.hpp', '.hxx', '.inc', '.inl', '.ipp', '.tpp', '.def'}
+    includes = set()
+    for name, _ in topology:
+        path = source / name
+        if path.suffix in header_suffixes | {'.c', '.cc', '.cpp', '.cxx'} and path.is_file():
+            for target in re.findall(rb'^\s*#\s*include\s*[<"]([^>"\r\n]+)', path.read_bytes(), re.MULTILINE):
+                includes.add(Path(os.fsdecode(target)).name)
+    return [(name, target) for name, target in topology
+            if Path(name).suffix in header_suffixes or Path(name).name in includes
+            or (source / name).is_symlink()]
+
+
 def build(incoming, cache, install, jobs, options):
     cache.mkdir(parents=True, exist_ok=True)
     with (cache / 'lock').open('w') as lock:
@@ -49,6 +66,13 @@ def build(incoming, cache, install, jobs, options):
         subprocess.run(['rsync', '-rlpc', '--delete', '--exclude=.git',
                         *(str(incoming / name) for name in ('CMakeLists.txt', 'conf', 'deps', 'src', 'modules')),
                         str(source) + '/'], check=True)
+        # Older helpers left the clone/worktree Git bind mountpoint in this cache.
+        # Git metadata now lives at /azerothcore/.git, outside the persistent mount.
+        metadata = source / '.git'
+        if metadata.is_dir() and not metadata.is_symlink():
+            shutil.rmtree(metadata)
+        elif metadata.exists() or metadata.is_symlink():
+            metadata.unlink()
         topology = source_topology(source)
         # CMake caches option defaults: reconfiguring alone does not pick up changed defaults.
         configuration = {name: digest((source / name).read_bytes()) for name, _ in topology
@@ -62,8 +86,12 @@ def build(incoming, cache, install, jobs, options):
             # In particular, adding a shadow header can invalidate Ninja's existing dependency graph.
             if binary.exists():
                 shutil.rmtree(binary)
+            # Failed/cancelled runs must not leave a stamp describing the old CMake cache.
+            stamp.write_text(signature)
         # ccache direct-mode manifests also cannot detect a newly appearing shadow header.
-        env = dict(os.environ, CCACHE_NAMESPACE=signature)
+        namespace_identity = {'toolchain': identity['toolchain'], 'options': options,
+                              'includes': include_topology(source, topology)}
+        env = dict(os.environ)
         timings = {}
         try:
             for phase, command in (
@@ -72,6 +100,10 @@ def build(incoming, cache, install, jobs, options):
                 ('build', ['cmake', '--build', str(binary), '--parallel', str(jobs)]),
                 ('install', ['cmake', '--install', str(binary)]),
             ):
+                if phase == 'build':
+                    # Configuration may create a new shadow header in the binary tree too.
+                    namespace_identity['generated_includes'] = include_topology(binary, source_topology(binary))
+                    env['CCACHE_NAMESPACE'] = digest(json.dumps(namespace_identity, sort_keys=True).encode())
                 if phase == 'install' and install.exists():
                     # Never ship an obsolete binary/library left by a removed target or module.
                     shutil.rmtree(install)
@@ -80,7 +112,6 @@ def build(incoming, cache, install, jobs, options):
                     subprocess.run(command, cwd=source, env=env, check=True)
                 finally:
                     timings[phase + '_seconds'] = time.monotonic() - start
-            stamp.write_text(signature)
         finally:
             print('BUILD_CACHE_TIMINGS ' + json.dumps(timings), flush=True)
 

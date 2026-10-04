@@ -89,8 +89,8 @@ RUN --mount=type=cache,target=/ccache,sharing=locked \
     # makes sense to mount into the container, but this way we can let the build
     # have the information it needs without including the hundreds of megabytes
     # of git repo into the container.
-    --mount=type=bind,target=/azerothcore/build/source/.git,source=.git \
-    git config --global --add safe.directory /azerothcore/build/source \
+    --mount=type=bind,target=/azerothcore/.git,source=.git \
+    git config --global --add safe.directory /azerothcore \
     && python3 /usr/local/bin/ac-build-cache.py \
        /azerothcore /azerothcore/build /azerothcore/env/dist "$BUILD_JOBS" \
        -G Ninja \
@@ -203,6 +203,7 @@ LABEL description="AzerothCore Database Import tool"
 USER $DOCKER_USER
 
 ENV ACORE_COMPONENT=dbimport
+ENV AC_SOURCE_DIRECTORY=/azerothcore
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER \
     data data

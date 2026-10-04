@@ -134,6 +134,18 @@ install(TARGETS probe RUNTIME DESTINATION bin)
         source.write_text(valid.replace('+ 0', '+ 9'))
         self.assertEqual(self.build(), '10')
 
+    def test_failed_option_change_then_return_to_default(self):
+        self.assertEqual(self.build(), '1')
+        main = self.source / 'src/main.cpp'
+        valid = main.read_text()
+        self.options.append('-DEXTRA=ON')
+        main.write_text('not valid C++\n')
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.build()
+        self.options.pop()
+        main.write_text(valid)
+        self.assertEqual(self.build(), '1')
+
     def test_symlink_target_change(self):
         (self.source / 'src/value1.h').write_text('#define ANSWER 11\n')
         (self.source / 'src/value2.h').write_text('#define ANSWER 22\n')
@@ -145,6 +157,114 @@ install(TARGETS probe RUNTIME DESTINATION bin)
         link.symlink_to('../value2.h')
         self.assertEqual(self.build(), '22')
         self.assertFalse(marker.exists())
+
+
+class BuildCacheStateTests(unittest.TestCase):
+    """Exercise cache recovery without invoking a compiler or building binaries."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix='ac-build-cache-state-')
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.source, self.cache, self.install = (self.root / name for name in ('input', 'cache', 'install'))
+        for name in ('conf', 'deps', 'modules', 'src'):
+            (self.source / name).mkdir(parents=True)
+        (self.source / 'CMakeLists.txt').write_text('project(Fixture)\n')
+        (self.source / 'src/main.cpp').write_text('#include "value.h"\n')
+        (self.source / 'src/value.h').write_text('#define VALUE 1\n')
+        self.options = []
+        self.fail_build = False
+        self.generated_header = False
+        self.namespaces = []
+        for mock in (patch.object(helper, 'toolchain_identity', return_value={'compiler': 'fixture'}),
+                     patch.object(helper.subprocess, 'run', side_effect=self.command)):
+            mock.start()
+            self.addCleanup(mock.stop)
+
+    def command(self, command, **kwargs):
+        if command[0] == 'rsync':
+            for name in ('CMakeLists.txt', 'conf', 'deps', 'src', 'modules'):
+                source, destination = self.source / name, self.cache / 'source' / name
+                if source.is_dir():
+                    if destination.exists():
+                        shutil.rmtree(destination)
+                    shutil.copytree(source, destination, symlinks=True)
+                else:
+                    shutil.copy2(source, destination)
+            return
+        if 'CCACHE_NAMESPACE' in kwargs['env']:
+            self.namespaces.append(kwargs['env']['CCACHE_NAMESPACE'])
+        binary = self.cache / 'binary'
+        if '-S' in command:
+            binary.mkdir(exist_ok=True)
+            config = binary / 'CMakeCache.txt'
+            # Explicit options override the cache; omitted options retain cached defaults.
+            extra = next((value for value in command if value.startswith('-DEXTRA=')), None)
+            if extra is not None or not config.exists():
+                config.write_text(extra or '-DEXTRA=OFF')
+            if self.generated_header:
+                (binary / 'value.h').write_text('#define VALUE 3\n')
+        elif '--build' in command and self.fail_build:
+            raise subprocess.CalledProcessError(1, command)
+        elif '--install' in command:
+            self.install.mkdir(exist_ok=True)
+
+    def build(self):
+        helper.build(self.source, self.cache, self.install, 1, self.options)
+        return self.namespaces[-1]
+
+    def test_failed_configuration_change_then_return_to_previous_options(self):
+        self.build()
+        self.options = ['-DEXTRA=ON']
+        self.fail_build = True
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.build()
+        self.options = []
+        self.fail_build = False
+        self.build()
+        self.assertEqual((self.cache / 'binary/CMakeCache.txt').read_text(), '-DEXTRA=OFF')
+
+    def test_cmake_and_translation_unit_changes_reuse_ccache(self):
+        namespace = self.build()
+        marker = self.cache / 'binary/marker'
+        marker.touch()
+        (self.source / 'src/unused_test.cpp').write_text('int unused = 0;\n')
+        self.assertEqual(self.build(), namespace)
+        self.assertFalse(marker.exists())
+        marker.touch()
+        (self.source / 'CMakeLists.txt').write_text('project(Fixture)\n# changed default\n')
+        self.assertEqual(self.build(), namespace)
+        self.assertFalse(marker.exists())
+
+    def test_shadow_header_and_options_change_namespace(self):
+        namespace = self.build()
+        (self.source / 'src/override').mkdir()
+        (self.source / 'src/override/value.h').write_text('#define VALUE 2\n')
+        shadow_namespace = self.build()
+        self.assertNotEqual(shadow_namespace, namespace)
+        self.options = ['-DEXTRA=ON']
+        self.assertNotEqual(self.build(), shadow_namespace)
+
+    def test_included_translation_unit_changes_namespace(self):
+        (self.source / 'src/main.cpp').write_text('#include "inline.cpp"\n')
+        namespace = self.build()
+        (self.source / 'src/inline.cpp').write_text('int included = 0;\n')
+        self.assertNotEqual(self.build(), namespace)
+
+    def test_new_generated_header_changes_namespace(self):
+        namespace = self.build()
+        self.generated_header = True
+        self.assertNotEqual(self.build(), namespace)
+
+    def test_legacy_git_mountpoints_are_removed(self):
+        self.build()
+        metadata = self.cache / 'source/.git'
+        metadata.mkdir()
+        self.build()
+        self.assertFalse(metadata.exists())
+        metadata.write_text('')
+        self.build()
+        self.assertFalse(metadata.exists())
 
 
 if __name__ == '__main__':
