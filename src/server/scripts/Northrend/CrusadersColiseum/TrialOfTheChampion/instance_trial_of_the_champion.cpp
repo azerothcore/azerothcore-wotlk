@@ -1081,10 +1081,10 @@ public:
                     break;
                 case EVENT_SUMMON_BLACK_KNIGHT:
                     {
-                        HandleGameObject(GO_EnterGateGUID, false);
                         if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                             if (Creature* bk_vehicle = announcer->SummonCreature(VEHICLE_BLACK_KNIGHT, 769.834f, 651.915f, 447.035f, 0.0f))
                             {
+                                HandleGameObject(GO_EnterGateGUID, false);
                                 NPC_BlackKnightVehicleGUID = bk_vehicle->GetGUID();
                                 bk_vehicle->SetReactState(REACT_PASSIVE);
                                 bk_vehicle->SetFacingTo(M_PI);
