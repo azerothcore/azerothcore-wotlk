@@ -31,6 +31,7 @@ namespace lfg
         LFG_INCOMPATIBLES_HAS_IGNORES,
         LFG_INCOMPATIBLES_NO_ROLES,
         LFG_INCOMPATIBLES_NO_DUNGEONS,
+        LFG_INCOMPATIBLES_REJECTED_BY_SCRIPT,
         LFG_COMPATIBLES_WITH_LESS_PLAYERS,                     // Values under this = not compatible (do not modify order)
         LFG_COMPATIBLES_MATCH                                  // Must be the last one
     };

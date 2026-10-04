@@ -17,6 +17,7 @@
 
 #include "Corpse.h"
 #include "CharacterCache.h"
+#include "DBCStores.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
@@ -56,6 +57,15 @@ void Corpse::RemoveFromWorld()
         GetMap()->GetObjectsStore().Remove<Corpse>(GetGUID());
 
     WorldObject::RemoveFromWorld();
+}
+
+uint32 Corpse::GetFaction() const
+{
+    // inherit faction from player race
+    uint32 const race = GetByteValue(CORPSE_FIELD_BYTES_1, 1);
+
+    ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
+    return rEntry ? rEntry->FactionID : 0;
 }
 
 bool Corpse::Create(ObjectGuid::LowType guidlow)

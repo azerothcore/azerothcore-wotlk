@@ -110,7 +110,7 @@ public:
 
     [[nodiscard]] bool HasMechanicTemplateImmunity(uint64 mask) const;
     // redefine Unit::IsImmunedToSpell
-    bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster = nullptr) const override;
+    bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, WorldObject const* caster = nullptr) const override;
     // redefine Unit::IsImmunedToSpellEffect
     [[nodiscard]] bool isElite() const
     {
@@ -511,12 +511,15 @@ protected:
 
     Position m_homePosition;
     Position m_transportHomePosition;
+    Position LastMovementFlagsPos; // where UpdateMovementFlags() last ran while wandering (swim/fly flag refresh cadence)
 
     bool DisableReputationReward;
     bool DisableLootReward;
 
     CreatureTemplate const* m_creatureInfo;   // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
+    mutable uint32 CachedScriptId = 0;      // GetScriptId() cache
+    mutable uint32 CachedScriptIdEntry = 0; // GetEntry() the cache was resolved for (0 = unresolved)
 
     float m_detectionDistance;
     uint16 m_LootMode;  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
