@@ -724,19 +724,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                                     unitCaster->CastSpell(unitTarget, 66904, true);
                                 return;
                             }
-                        case 17731:
-                        case 69294:
-                            {
-                                if (!gameObjTarget || gameObjTarget->GetRespawnTime() > GameTime::GetGameTime().count())
-                                    return;
-
-                                gameObjTarget->SetRespawnTime(10);
-                                gameObjTarget->SendCustomAnim(gameObjTarget->GetGoAnimProgress());
-                                if (Creature* trigger = gameObjTarget->SummonCreature(12758, *gameObjTarget, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                                    trigger->CastSpell(trigger, 17731, false);
-
-                                return;
-                            }
                         // HoL, Arc Weld
                         case 59086:
                             {
@@ -1639,6 +1626,10 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
             addhealth += tickheal * tickcount;
 
+            // Swiftmend spell mods (e.g. Druid T8 Restoration 2P Bonus)
+            if (Player* modOwner = caster->GetSpellModOwner())
+                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DAMAGE, addhealth);
+
             // Glyph of Swiftmend
             if (!caster->HasAura(54824))
                 unitTarget->RemoveAura(targetAura->GetId(), targetAura->GetCasterGUID());
@@ -2183,22 +2174,6 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype)
                 if (uint32 trapEntry = gameObjTarget->GetGOInfo()->spellFocus.linkedTrapId)
                     gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
                 return;
-
-            case GAMEOBJECT_TYPE_CHEST:
-                // triggering linked GO
-                if (uint32 trapEntry = gameObjTarget->GetGOInfo()->chest.linkedTrapId)
-                {
-                    gameObjTarget->TriggeringLinkedGameObject(trapEntry, unitCaster);
-
-                    if (!gameObjTarget->GetGOInfo()->chest.lootId)
-                    {
-                        if (gameObjTarget->GetGOInfo()->chest.consumable)
-                            gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
-
-                        player->SendLootRelease(guid);
-                        return;
-                    }
-                }
 
             // Don't return, let loots been taken
             default:
@@ -3831,6 +3806,9 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             break;
         case OFF_ATTACK:
             unitMod = UNIT_MOD_DAMAGE_OFFHAND;
+            // Base damage is already halved in DBC for Threat of Thassarian off-hand spells
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+                fixed_bonus *= 2;
             break;
         case RANGED_ATTACK:
             unitMod = UNIT_MOD_DAMAGE_RANGED;
@@ -6327,6 +6305,13 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
             switch (m_spellInfo->Id)
             {
+                // Target dummies use RequiredSkillRank/5, not player's current skill
+                case 4071:  // Target Dummy
+                case 4072:  // Advanced Target Dummy
+                case 19805: // Masterwork Target Dummy
+                    summonLevel = proto->RequiredSkillRank / 5;
+                    break;
+
                 // Dragon's Call
                 case 13049:
                     summonLevel = 55;

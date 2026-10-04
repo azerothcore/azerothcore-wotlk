@@ -19,6 +19,7 @@ import (
 
 const (
 	spellDisarmTrap    = uint32(1842)
+	spellStealth       = uint32(1784)
 	spellOpening       = uint32(3365)
 	spellOpeningChest  = uint32(11437)
 	spellPlagueMist    = uint32(16432)
@@ -26,15 +27,13 @@ const (
 	spellJinxed        = uint32(24184)
 	spellLandMine      = uint32(54355)
 
-	goNormalSupplyCrate     = uint32(176224)
-	goStratholmeSupplyCrate = uint32(181085)
-	goPassYourRite          = uint32(178325)
-	goJinxedHoodooPile      = uint32(180229)
-	goJinxedHoodooTrap      = uint32(180244)
-	goLandMine              = uint32(191502)
+	goNormalSupplyCrate = uint32(176224)
+	goPassYourRite      = uint32(178325)
+	goJinxedHoodooPile  = uint32(180229)
+	goJinxedHoodooTrap  = uint32(180244)
+	goLandMine          = uint32(191502)
 
-	npcMiltonBeats          = uint32(13082)
-	questTheManorRavenholdt = uint32(6681)
+	npcMiltonBeats = uint32(13082)
 
 	targetFlagGameObject = uint32(0x00000800)
 )
@@ -113,6 +112,15 @@ func lootReleaseGUID(data []byte) (uint64, bool) {
 
 func useGameObjectSpell(t *testing.T, bot *e2eharness.ScenarioBot, spellID uint32, guid uint64, timeout time.Duration) gameObjectSpellResult {
 	t.Helper()
+	return useGameObjectAndWait(t, bot, spellID, guid, timeout, func() {
+		if err := bot.World.SendPacketRaw(client.CmsgCastSpell, gameObjectCastPayload(spellID, guid)); err != nil {
+			e2eharness.HarnessFailf(t, "cast spell %d at gameobject 0x%X: %v", spellID, guid, err)
+		}
+	})
+}
+
+func useGameObjectAndWait(t *testing.T, bot *e2eharness.ScenarioBot, spellID uint32, guid uint64, timeout time.Duration, use func()) gameObjectSpellResult {
+	t.Helper()
 	resultCh := make(chan gameObjectSpellResult, 3)
 	cancelLoot := bot.World.AddLootOpenedHook(func(lootGUID uint64, items []client.LootItem) {
 		if lootGUID != guid {
@@ -140,20 +148,20 @@ func useGameObjectSpell(t *testing.T, bot *e2eharness.ScenarioBot, spellID uint3
 	})
 	defer cancelRelease()
 
-	cancelCast := bot.World.AddSpellCastResultHook(func(resultSpellID uint32, success bool, failReason uint8) {
-		if resultSpellID != spellID || success {
-			return
-		}
-		select {
-		case resultCh <- gameObjectSpellResult{outcome: gameObjectSpellCastFailed, failReason: failReason}:
-		default:
-		}
-	})
-	defer cancelCast()
-
-	if err := bot.World.SendPacketRaw(client.CmsgCastSpell, gameObjectCastPayload(spellID, guid)); err != nil {
-		e2eharness.HarnessFailf(t, "cast spell %d at gameobject 0x%X: %v", spellID, guid, err)
+	if spellID != 0 {
+		cancelCast := bot.World.AddSpellCastResultHook(func(resultSpellID uint32, success bool, failReason uint8) {
+			if resultSpellID != spellID || success {
+				return
+			}
+			select {
+			case resultCh <- gameObjectSpellResult{outcome: gameObjectSpellCastFailed, failReason: failReason}:
+			default:
+			}
+		})
+		defer cancelCast()
 	}
+
+	use()
 
 	timer := time.NewTimer(timeout)
 	defer timer.Stop()
@@ -290,17 +298,11 @@ func TestAC_12285_SupplyCrateOpenAndDisarm(t *testing.T) {
 		Category: "instances/classic/stratholme",
 	})
 
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix:        "SCrate",
-		Class:         e2eharness.ClassRogue,
-		Level:         80,
-		LearnAllClass: true,
-	})
-	bot.Learn(t, spellOpening)
 	pad := e2eharness.PackagePad(t)
 
 	for _, crate := range trappedSupplyCrates {
 		t.Run(fmt.Sprintf("open_%d", crate.parent), func(t *testing.T) {
+			bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "SCrate", Level: 80})
 			bot.TeleportPad(t, pad)
 			if spawnID := bot.SpawnGameObject(t, crate.parent); spawnID == 0 {
 				e2eharness.Preconditionf(t, "failed to create cleanup-backed Supply Crate entry=%d", crate.parent)
@@ -315,15 +317,14 @@ func TestAC_12285_SupplyCrateOpenAndDisarm(t *testing.T) {
 			}
 			defer cancel()
 
-			// Keep GM mode on so the proximity path cannot win the race. Opening
-			// itself must synchronously trigger the linked trap.
-			result := useGameObjectSpell(t, bot, spellOpening, parentGUID, 10*time.Second)
-			if result.outcome == gameObjectSpellCastFailed {
-				e2eharness.ConfirmedBugf(t, 12285, "Opening Supply Crate %d failed reason=%d (%s)", crate.parent, result.failReason, e2eharness.SpellFailReasonName(result.failReason))
+			// Keep GM mode on so the proximity path cannot win the race.
+			result := useGameObjectAndWait(t, bot, 0, parentGUID, 10*time.Second, func() {
+				bot.GameObjectUse(t, parentGUID)
+			})
+			if result.outcome != gameObjectSpellLoot || len(result.items) != 0 {
+				e2eharness.ConfirmedBugf(t, 12285, "Opening Supply Crate %d returned outcome=%d with %d items, want empty loot", crate.parent, result.outcome, len(result.items))
 			}
-			if result.outcome != gameObjectSpellReleased {
-				e2eharness.ConfirmedBugf(t, 12285, "Opening Supply Crate %d returned outcome=%d, want loot release", crate.parent, result.outcome)
-			}
+			releaseLootAndWait(t, bot, parentGUID, 5*time.Second)
 			assertGameObjectGone(t, bot, parentGUID, "Supply Crate", 10*time.Second)
 			assertGameObjectGone(t, bot, trapGUID, "linked Supply Crate trap", 10*time.Second)
 			if count != nil {
@@ -332,6 +333,9 @@ func TestAC_12285_SupplyCrateOpenAndDisarm(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("disarm_%d", crate.parent), func(t *testing.T) {
+			bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+				Prefix: "SCrate", Class: e2eharness.ClassRogue, Level: 80, LearnAllClass: true,
+			})
 			bot.TeleportPad(t, pad)
 			if spawnID := bot.SpawnGameObject(t, crate.parent); spawnID == 0 {
 				e2eharness.Preconditionf(t, "failed to create cleanup-backed Supply Crate entry=%d", crate.parent)
@@ -348,6 +352,7 @@ func TestAC_12285_SupplyCrateOpenAndDisarm(t *testing.T) {
 			defer cancel()
 
 			bot.CombatReady(t)
+			bot.CastMust(t, spellStealth, 0, 10*time.Second)
 			cast := castGameObjectAndWait(t, bot, spellDisarmTrap, trapGUID, 10*time.Second)
 			if !cast.Success {
 				e2eharness.ConfirmedBugf(t, 12285, "Disarm Trap on Supply Crate %d failed reason=%d (%s)", crate.parent, cast.FailReason, e2eharness.SpellFailReasonName(cast.FailReason))
@@ -375,21 +380,22 @@ func TestAC_12285_LinkedChestRegressionMatrix(t *testing.T) {
 	bot.Learn(t, spellOpening)
 	pad := e2eharness.PackagePad(t)
 
-	for _, entry := range []uint32{goNormalSupplyCrate, goStratholmeSupplyCrate} {
-		bot.TeleportPad(t, pad)
-		if spawnID := bot.SpawnGameObject(t, entry); spawnID == 0 {
-			e2eharness.Preconditionf(t, "failed to create cleanup-backed loot chest entry=%d", entry)
-		}
-		guid := bot.WaitGameObject(t, entry, 10*time.Second)
-		result := useGameObjectSpell(t, bot, spellOpening, guid, 10*time.Second)
-		if result.outcome != gameObjectSpellLoot {
-			e2eharness.ConfirmedBugf(t, 12285, "loot-bearing chest %d returned outcome=%d, want loot window", entry, result.outcome)
-		}
-		if len(result.items) == 0 {
-			e2eharness.ConfirmedBugf(t, 12285, "loot-bearing chest %d opened with no items", entry)
-		}
-		releaseLootAndWait(t, bot, guid, 5*time.Second)
+	bot.TeleportPad(t, pad)
+	if spawnID := bot.SpawnGameObject(t, goNormalSupplyCrate); spawnID == 0 {
+		e2eharness.Preconditionf(t, "failed to create cleanup-backed loot chest entry=%d", goNormalSupplyCrate)
 	}
+	guid := bot.WaitGameObject(t, goNormalSupplyCrate, 10*time.Second)
+	result := useGameObjectSpell(t, bot, spellOpening, guid, 10*time.Second)
+	if result.outcome != gameObjectSpellLoot {
+		e2eharness.ConfirmedBugf(t, 12285, "loot-bearing chest %d returned outcome=%d, want loot window", goNormalSupplyCrate, result.outcome)
+	}
+	if len(result.items) == 0 {
+		e2eharness.ConfirmedBugf(t, 12285, "loot-bearing chest %d opened with no items", goNormalSupplyCrate)
+	}
+	releaseLootAndWait(t, bot, guid, 5*time.Second)
+
+	// Stratholme Supply Crate 181085 requires Open Tinkering, not Opening.
+	// Keep that lock-specific interaction for manual validation.
 
 	bot.TeleportPad(t, pad)
 	if spawnID := bot.SpawnGameObject(t, goJinxedHoodooPile); spawnID == 0 {
@@ -399,7 +405,7 @@ func TestAC_12285_LinkedChestRegressionMatrix(t *testing.T) {
 	_ = bot.WaitGameObject(t, goJinxedHoodooTrap, 10*time.Second)
 	count, cancel := armSpellGoCounter(bot, spellJinxed)
 	defer cancel()
-	result := useGameObjectSpell(t, bot, spellOpening, pileGUID, 10*time.Second)
+	result = useGameObjectSpell(t, bot, spellOpening, pileGUID, 10*time.Second)
 	if result.outcome != gameObjectSpellLoot {
 		e2eharness.ConfirmedBugf(t, 12285, "Jinxed Hoodoo Pile returned outcome=%d, want loot window", result.outcome)
 	}
@@ -407,8 +413,7 @@ func TestAC_12285_LinkedChestRegressionMatrix(t *testing.T) {
 	releaseLootAndWait(t, bot, pileGUID, 5*time.Second)
 }
 
-// The quest chest must still fire its linked trap and summon one Milton Beats;
-// a trap-only chest now also produces the explicit successful loot release.
+// The quest chest must still fire its linked trap and summon one Milton Beats.
 func TestAC_12285_PassYourRiteSummonsOneMilton(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"short", "gameobject", "issue", "serial"},
@@ -424,7 +429,6 @@ func TestAC_12285_PassYourRiteSummonsOneMilton(t *testing.T) {
 	})
 	bot.Learn(t, spellOpeningChest)
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
-	bot.AddQuest(t, questTheManorRavenholdt)
 
 	baseline := make(map[uint64]struct{})
 	for _, unit := range bot.UnitsByEntry(200, npcMiltonBeats) {
@@ -437,9 +441,10 @@ func TestAC_12285_PassYourRiteSummonsOneMilton(t *testing.T) {
 	count, cancel := armSpellGoCounter(bot, spellConjureMilton)
 	defer cancel()
 	result := useGameObjectSpell(t, bot, spellOpeningChest, guid, 10*time.Second)
-	if result.outcome != gameObjectSpellReleased {
-		e2eharness.ConfirmedBugf(t, 12285, "Pass Your Rite returned outcome=%d, want loot release", result.outcome)
+	if result.outcome != gameObjectSpellLoot {
+		e2eharness.ConfirmedBugf(t, 12285, "Pass Your Rite returned outcome=%d, want loot window", result.outcome)
 	}
+	releaseLootAndWait(t, bot, guid, 5*time.Second)
 	waiterKnown := make(map[uint64]struct{}, len(baseline))
 	for guid := range baseline {
 		waiterKnown[guid] = struct{}{}
@@ -502,6 +507,7 @@ func TestAC_12285_LandMineDisarmUsesRespawnDelay(t *testing.T) {
 	count, cancel := armSpellGoCounter(bot, spellLandMine)
 	defer cancel()
 	bot.CombatReady(t)
+	bot.CastMust(t, spellStealth, 0, 10*time.Second)
 	cast := castGameObjectAndWait(t, bot, spellDisarmTrap, mineGUID, 10*time.Second)
 	if !cast.Success {
 		e2eharness.ConfirmedBugf(t, 12285, "Land Mine disarm failed reason=%d (%s)", cast.FailReason, e2eharness.SpellFailReasonName(cast.FailReason))

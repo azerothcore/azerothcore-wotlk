@@ -29,6 +29,7 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "PoolMgr.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
 #include "Transport.h"
@@ -807,10 +808,7 @@ void GameObject::Update(uint32 diff)
                             m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
                             if (goInfo->trap.type == 1)
-                            {
                                 SetLootState(GO_JUST_DEACTIVATED);
-                                DeactivateLinkedTrapParent();
-                            }
                             else if (!goInfo->trap.type)
                                 SetLootState(GO_READY);
 
@@ -1325,6 +1323,21 @@ bool GameObject::ActivateToQuest(Player* target) const
     if (!GetGOInfo()->IsGameObjectForQuests())
         return false;
 
+    FactionTemplateEntry const* gameObjectFaction =
+        sFactionTemplateStore.LookupEntry(GetUInt32Value(GAMEOBJECT_FACTION));
+    FactionTemplateEntry const* playerFaction = target->GetFactionTemplateEntry();
+    if (gameObjectFaction && playerFaction &&
+        (gameObjectFaction->IsHostileToAlliancePlayers() || gameObjectFaction->IsHostileToHordePlayers()))
+    {
+        // Faction templates 101/102 have no ourMask, so check hostility from the gameobject to the player.
+        bool isHostile = gameObjectFaction->IsHostileTo(*playerFaction);
+        if (ReputationRank const* forcedRank = target->GetReputationMgr().GetForcedRankIfAny(gameObjectFaction))
+            isHostile = *forcedRank <= REP_HOSTILE;
+
+        if (isHostile)
+            return false;
+    }
+
     switch (GetGoType())
     {
         case GAMEOBJECT_TYPE_QUESTGIVER:
@@ -1392,7 +1405,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
 
     // found correct GO
     // xinef: we should use the trap (checks for despawn type)
-    // Finish pending proximity activation before the caller consumes a trap-only chest.
+    // Finish pending proximity activation before opening the chest.
     if (GameObject* trapGO = GetLinkedTrap())
         if (trapGO->isSpawned() && (trapGO->getLootState() == GO_READY ||
             (trapInfo->trap.type == 1 && trapGO->getLootState() == GO_ACTIVATED)))
@@ -1531,6 +1544,11 @@ void GameObject::Use(Unit* user)
                 player->SendPreparedGossip(this);
                 return;
             }
+        case GAMEOBJECT_TYPE_CHEST:                         //3
+            if (Player* player = user->ToPlayer())
+                if (isSpawned() && !GetGOInfo()->GetLockId())
+                    player->SendLoot(GetGUID(), LOOT_CORPSE);
+            return;
         case GAMEOBJECT_TYPE_TRAP:                          //6
             {
                 GameObjectTemplate const* goInfo = GetGOInfo();
@@ -1540,10 +1558,7 @@ void GameObject::Use(Unit* user)
                 m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown :  uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
                 if (goInfo->trap.type == 1)         // Deactivate after trigger
-                {
                     SetLootState(GO_JUST_DEACTIVATED);
-                    DeactivateLinkedTrapParent();
-                }
 
                 return;
             }

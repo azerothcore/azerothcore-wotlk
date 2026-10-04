@@ -27,29 +27,6 @@ const (
 
 var timmyActivationEntries = []uint32{10418, 10419, 10420, 10424}
 
-var stratholmeSupplyCrates = []uint32{goSupplyCrate1, goSupplyCrate2, goSupplyCrate3, goSupplyCrate4}
-
-func waitGameObjectGone(t *testing.T, bot *e2eharness.ScenarioBot, guid uint64, timeout time.Duration) {
-	t.Helper()
-
-	ticker := time.NewTicker(20 * time.Millisecond)
-	defer ticker.Stop()
-	timer := time.NewTimer(timeout)
-	defer timer.Stop()
-
-	for {
-		if bot.World.GetObject(guid) == nil {
-			return
-		}
-
-		select {
-		case <-ticker.C:
-		case <-timer.C:
-			e2eharness.ConfirmedBugf(t, 12285, "Supply Crate 0x%X remained spawned after its proximity trap fired", guid)
-		}
-	}
-}
-
 func waitForTimmyActivationSet(t *testing.T, bot *e2eharness.ScenarioBot, timeout time.Duration) []uint64 {
 	t.Helper()
 
@@ -198,9 +175,8 @@ func TestAC_26363_TimmyEmergesAfterSquareCleared(t *testing.T) {
 }
 
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/12285
-// A Supply Crate and its linked, consumable trap form one world interaction:
-// walking into the trap radius must consume the parent crate as well as the trap.
-func TestAC_12285_SupplyCrateProximityConsumesParent(t *testing.T) {
+// Proximity activation consumes the linked trap but leaves its parent crate.
+func TestAC_12285_SupplyCrateProximityLeavesParent(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "instances", "gameobject", "issue", "serial"},
 		Runtime:  "med",
@@ -214,26 +190,30 @@ func TestAC_12285_SupplyCrateProximityConsumesParent(t *testing.T) {
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
 
-	for _, entry := range stratholmeSupplyCrates {
-		if spawnID := bot.SpawnGameObject(t, entry); spawnID == 0 {
-			e2eharness.Preconditionf(t, "failed to create cleanup-backed Supply Crate entry=%d", entry)
+	for _, crate := range trappedSupplyCrates {
+		if spawnID := bot.SpawnGameObject(t, crate.parent); spawnID == 0 {
+			e2eharness.Preconditionf(t, "failed to create cleanup-backed Supply Crate entry=%d", crate.parent)
 		}
-		crateGUID := bot.WaitGameObject(t, entry, 10*time.Second)
+		crateGUID := bot.WaitGameObject(t, crate.parent, 10*time.Second)
+		trapGUID := bot.WaitGameObject(t, crate.trap, 10*time.Second)
 		var count func() int32
 		cancel := func() {}
-		if entry == goSupplyCrate4 {
+		if crate.parent == goSupplyCrate4 {
 			count, cancel = armSpellGoCounter(bot, spellPlagueMist)
 		}
 
 		// SpawnGameObject leaves GM mode enabled, so the environmental trap cannot
 		// select the player until CombatReady turns GM mode off.
 		bot.CombatReady(t)
-		waitGameObjectGone(t, bot, crateGUID, 10*time.Second)
+		assertGameObjectGone(t, bot, trapGUID, "proximity trap", 10*time.Second)
+		if bot.World.GetObject(crateGUID) == nil {
+			e2eharness.ConfirmedBugf(t, 12285, "Supply Crate %d disappeared with its proximity trap", crate.parent)
+		}
 		if count != nil {
 			assertSpellGoCount(t, count, spellPlagueMist, 1)
 		}
 		cancel()
 		bot.AssertWorldAlive(t)
-		t.Logf("PASS AC#12285 proximity trap consumed Supply Crate entry=%d guid=0x%X", entry, crateGUID)
+		t.Logf("PASS AC#12285 proximity trap left Supply Crate entry=%d guid=0x%X", crate.parent, crateGUID)
 	}
 }
