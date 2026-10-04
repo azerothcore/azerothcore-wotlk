@@ -1487,10 +1487,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     // Druid T8 Restoration 4P Bonus
                     if (caster->GetAuraEffectDummy(64760))
                     {
-                        uint32 damage = GetEffect(0)->GetAmount();
-                        damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT);
-
-                        int32 basepoints0 = damage;
+                        // 50% of an unmodified tick: 64801's own heal adds spell power (0.188),
+                        // Empowered Rejuvenation and healing done/taken mods once
+                        int32 basepoints0 = CalculatePct(GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster), 50);
                         caster->CastCustomSpell(target, 64801, &basepoints0, nullptr, nullptr, true, nullptr, GetEffect(0));
                     }
                 }
