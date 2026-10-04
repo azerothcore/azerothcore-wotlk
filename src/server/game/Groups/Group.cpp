@@ -462,9 +462,10 @@ bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
 
     SubGroupCounterIncrease(subGroup);
 
-    // Drop a pending invite. Another group would otherwise keep the player in its invitees after logout,
-    // since logout only cleans up the invite the player still points to.
-    if (Group* invite = player->GetGroupInvite())
+    // Joining a normal group ends a pending invite; remove it on the group's side too, as logout only cleans
+    // up the invite the player still points to. A battleground or battlefield raid keeps it to accept there.
+    Group* invite = player->GetGroupInvite();
+    if (invite && !isBGGroup() && !isBFGroup())
     {
         if (invite == this)
             RemoveInvite(player);
