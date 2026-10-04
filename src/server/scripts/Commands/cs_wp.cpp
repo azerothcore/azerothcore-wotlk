@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "RBAC.h"
 #include "WaypointMgr.h"
+#include <vector>
 
 #if AC_COMPILER == AC_COMPILER_GNU
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -56,7 +57,8 @@ public:
         return commandTable;
     }
 
-    static bool AddWaypointsByPreparedStatement(ChatHandler* handler, WorldDatabaseConnection::Statements index, uint32 pathid, Creature* target = nullptr)
+    static bool AddWaypointsByPreparedStatement(ChatHandler* handler, WorldDatabaseConnection::Statements index,
+        uint32 pathid, Creature* target = nullptr)
     {
         ASSERT(handler);
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(index);
@@ -84,7 +86,8 @@ public:
 
             // Try to create new creature
             Creature* wpCreature = new Creature;
-            if (!wpCreature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), wpEntry, 0, x, y, z, o))
+            if (!wpCreature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(),
+                wpEntry, 0, x, y, z, o))
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, wpEntry);
                 delete wpCreature;
@@ -136,11 +139,19 @@ public:
     * @return true - command did succeed, false - something went wrong
     *
     */
-    static bool RemoveWaypointById(ChatHandler* handler, ObjectGuid::LowType const guid, bool deleteFromWaypointData = false)
+    static bool RemoveWaypointById(ChatHandler* handler, ObjectGuid::LowType const guid,
+        bool deleteFromWaypointData = false)
     {
         ASSERT(handler);
-        auto const creatureRange = handler->GetSession()->GetPlayer()->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
-        if (creatureRange.first == creatureRange.second)
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
+
+        // Copied out first: removing a creature from the world erases it from this store
+        std::vector<Creature*> creatures;
+        auto const creatureRange = map->GetCreatureBySpawnIdStore().equal_range(guid);
+        for (auto itr = creatureRange.first; itr != creatureRange.second; ++itr)
+            creatures.push_back(itr->second);
+
+        if (creatures.empty())
         {
             handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
             return false;
@@ -149,14 +160,14 @@ public:
         if (deleteFromWaypointData)
         {
             // Set "wpguid" column to "empty"
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_BY_WPGUID);
+            WorldDatabasePreparedStatement* stmt =
+                WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_BY_WPGUID);
             stmt->SetData(0, guid);
             WorldDatabase.Execute(stmt);
         }
 
-        for (auto itr = creatureRange.first; itr != creatureRange.second; ++itr)
+        for (Creature* creature : creatures)
         {
-            Creature* creature = itr->second;
             creature->CombatStop();
             creature->DeleteFromDB();
             creature->AddObjectToRemoveList();
@@ -546,8 +557,8 @@ public:
             std::string arg_string = arg_2;
 
             if ((arg_string != "setid") && (arg_string != "delay") && (arg_string != "command")
-                && (arg_string != "datalong") && (arg_string != "datalong2") && (arg_string != "dataint") && (arg_string != "posx")
-                && (arg_string != "posy") && (arg_string != "posz") && (arg_string != "orientation"))
+                    && (arg_string != "datalong") && (arg_string != "datalong2") && (arg_string != "dataint") && (arg_string != "posx")
+                    && (arg_string != "posy") && (arg_string != "posz") && (arg_string != "orientation"))
             {
                 handler->SendSysMessage("|cffff33ffERROR: No valid argument present.|r");
                 return true;
@@ -854,6 +865,9 @@ public:
 
     static bool HandleWpShowCommand(ChatHandler* handler, std::string show, Optional<uint32> pathId)
     {
+        if (show != "on" && show != "off" && show != "first" && show != "last" && show != "info")
+            return false;
+
         uint32 pathid = 0;
         Creature* target = handler->getSelectedCreature();
 
