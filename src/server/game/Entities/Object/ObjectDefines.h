@@ -25,7 +25,8 @@
 #define ATTACK_DISTANCE              5.0f
 #define VISIBILITY_COMPENSATION      15.0f                  // increase searchers
 #define INSPECT_DISTANCE             28.0f
-#define SPELL_SEARCHER_COMPENSATION  40.0f                  // increase searchers size in case we have large npc near cell border
+// Include large targets whose origins lie across a cell border.
+#define SPELL_SEARCHER_COMPENSATION  40.0f
 #define TRADE_DISTANCE               11.11f
 #define MAX_VISIBILITY_DISTANCE      250.0f                 // max distance for visible objects, experimental
 #define SIGHT_RANGE_UNIT             50.0f
