@@ -769,6 +769,9 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
     // If group size before player removal <= 2 then disband it
     else
     {
+        // As in the branch above: a player who leaves or is kicked can't win a roll the disband settles
+        RemovePlayerFromRolls(guid);
+
         sScriptMgr->OnGroupRemoveMember(this, guid, method, kicker, reason);
         Disband();
         return false;
