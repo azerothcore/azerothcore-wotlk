@@ -7261,6 +7261,11 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
 bool Spell::CanAutoCast(Unit* target)
 {
     ObjectGuid targetguid = target->GetGUID();
+    bool const dealsDirectDamage = m_spellInfo->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE) ||
+        m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_DAMAGE) ||
+        m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL) ||
+        m_spellInfo->HasEffect(SPELL_EFFECT_NORMALIZED_WEAPON_DMG) ||
+        m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
 
     for (SpellEffectInfo const& spellEffectInfo : m_spellInfo->GetEffects())
     {
@@ -7275,11 +7280,7 @@ bool Spell::CanAutoCast(Unit* target)
             {
                 // Direct-damage attacks (e.g. Acid Spit, Sting, Monstrous Bite) deal primary damage
                 // on each hit and should not be prevented from autocasting by their own debuff.
-                if (m_spellInfo->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE) ||
-                    m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_DAMAGE) ||
-                    m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL) ||
-                    m_spellInfo->HasEffect(SPELL_EFFECT_NORMALIZED_WEAPON_DMG) ||
-                    m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_PERCENT_DAMAGE))
+                if (dealsDirectDamage)
                     continue;
 
                 // Stacking auras should continue to be cast until maximum stacks are reached
@@ -7300,7 +7301,8 @@ bool Spell::CanAutoCast(Unit* target)
                     break;
                 case SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT:
                 case SPELL_GROUP_STACK_RULE_EXCLUSIVE_HIGHEST:
-                    if (abs(spellEffectInfo.BasePoints) <= abs((*auraIt)->GetAmount()))
+                    // A stronger aura must not prevent the spell's direct damage.
+                    if (!dealsDirectDamage && abs(spellEffectInfo.BasePoints) <= abs((*auraIt)->GetAmount()))
                         return false;
                     break;
                 case SPELL_GROUP_STACK_RULE_DEFAULT:
@@ -7319,7 +7321,7 @@ bool Spell::CanAutoCast(Unit* target)
             switch (firstRankSpellId)
             {
                 case 26064: // Shell Shield (Turtle) - only at or below 50% health
-                case 53426: // Lick Your Wounds (Crocolisk) - only at or below 50% health
+                case 53426: // Lick Your Wounds - only at or below 50% health
                     if (unitCaster->GetHealthPct() > 50.0f)
                         return false;
                     break;
