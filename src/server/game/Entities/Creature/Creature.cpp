@@ -3192,7 +3192,7 @@ void Creature::AllLootRemovedFromCorpse()
     // the corpse keeps decayRate of the time it had left
     float decayRate = sWorld->getRate(RATE_CORPSE_DECAY_LOOTED);
     time_t timeLeft = m_corpseRemoveTime - now;
-    time_t diff = timeLeft - time_t(timeLeft * decayRate);
+    time_t diff = time_t(timeLeft * (1.0f - decayRate));
 
     m_respawnTime -= diff;
 
