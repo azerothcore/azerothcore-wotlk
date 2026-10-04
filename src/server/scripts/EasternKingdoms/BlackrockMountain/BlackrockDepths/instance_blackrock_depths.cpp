@@ -792,8 +792,6 @@ struct instance_blackrock_depths : public InstanceScript
         std::istringstream loadStream(in);
         loadStream >> encounter[0] >> encounter[1] >> encounter[2] >> encounter[3]
                    >> encounter[4] >> encounter[5] >> GhostKillCount;
-        // Optional fields are named: Nagmara's independent event must not be
-        // interpreted as Phalanx activation when loading another branch's save.
         PhalanxActivationState = NOT_STARTED;
         std::string field;
         uint32 value;
