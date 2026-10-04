@@ -3062,8 +3062,9 @@ Corpse.Decay.WORLDBOSS = 3600
 
 #
 #    Rate.Corpse.Decay.Looted
-#        Description: Multiplier for Corpse.Decay.* to configure how long creature corpses stay
-#                     after they have been looted.
+#        Description: Multiplier for the time a creature corpse has left (see Corpse.Decay.*) once
+#                     it has been looted, or when it dies with nothing to loot.
+#                     1 keeps the full time, 0 removes the corpse at once.
 #         Default:    0.5
 
 Rate.Corpse.Decay.Looted = 0.5
