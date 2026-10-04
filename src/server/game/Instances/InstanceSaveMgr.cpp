@@ -745,11 +745,13 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
         ScheduleReset(time_t(next_reset - 3600), InstResetEvent(1, mapid, difficulty));
 
-        // update it in the DB
+        // update it in the DB; only forward, as an overdue reset at startup can queue two updates for the row
+        // and async workers may commit them out of order
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
         stmt->SetData(0, next_reset);
         stmt->SetData(1, uint16(mapid));
         stmt->SetData(2, uint8(difficulty));
+        stmt->SetData(3, next_reset);
         CharacterDatabase.Execute(stmt);
 
         // remove all binds to instances of the given map and delete from db (delete per instance id, no mass deletion!)
