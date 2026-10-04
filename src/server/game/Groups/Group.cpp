@@ -820,6 +820,11 @@ void Group::ForcedDisband(bool hideDestroy /* = false */)
 {
     sScriptMgr->OnGroupDisband(this);
 
+    // Settle open rolls: only CountTheRoll unblocks a rolled item, and the looted object's roll timer
+    // can't once the group is gone, so the item would stay locked
+    while (!RollId.empty())
+        CountTheRoll(RollId.begin());
+
     Player* player;
     uint32 instanceId = 0;
 
