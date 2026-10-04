@@ -420,12 +420,6 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
             return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION });
         }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (!GetTarget()->HasAura(SPELL_MAGE_COMBUSTION))
-                GetAura()->Remove();
-        }
-
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_COMBUSTION);
@@ -433,8 +427,6 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
 
         void Register() override
         {
-            AfterEffectApply += AuraEffectApplyFn(spell_mage_combustion_proc::OnApply, EFFECT_0,
-                SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc::OnRemove, EFFECT_0,
                 SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
         }
@@ -1058,8 +1050,6 @@ class spell_mage_combustion : public AuraScript
 {
     PrepareAuraScript(spell_mage_combustion);
 
-    std::shared_ptr<bool> _aliveToken = std::make_shared<bool>(true);
-
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION_PROC });
@@ -1075,14 +1065,11 @@ class spell_mage_combustion : public AuraScript
             // invalidate the live iterator (aura containers are flat_multimaps).
             Unit* actor = eventInfo.GetActor();
             ObjectGuid actorGuid = actor->GetGUID();
-            std::weak_ptr<bool> token = _aliveToken;
-            actor->m_Events.AddEventAtOffset([actorGuid, token]()
+            actor->m_Events.AddEventAtOffset([actorGuid]()
             {
-                if (auto locked = token.lock())
-                    if (*locked)
-                        if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
-                            if (actor->HasAura(SPELL_MAGE_COMBUSTION))
-                                actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+                if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
+                    if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                        actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
             }, 1ms);
             return false;
         }
@@ -1090,17 +1077,9 @@ class spell_mage_combustion : public AuraScript
         return true;
     }
 
-    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        *_aliveToken = false;
-        GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_COMBUSTION_PROC);
-    }
-
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_mage_combustion::CheckProc);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion::OnRemove, EFFECT_0,
-            SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
