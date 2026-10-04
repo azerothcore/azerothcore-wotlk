@@ -24,7 +24,7 @@ func newSpikeBots(t *testing.T) []*e2eharness.ScenarioBot {
 	idents := e2eharness.MakeBotIdentsRaceClass("Spike", 2, e2eharness.RaceHuman, e2eharness.ClassPaladin)
 	for _, ident := range idents {
 		username := strings.ToUpper(ident.Account)
-		salt, verifier := e2eharness.ComputeSRP6(username, e2eharness.DefaultPassword)
+		salt, verifier := e2eharness.ComputeSRP6(username, strings.ToUpper(e2eharness.DefaultPassword))
 		result, err := authDB.Exec(`INSERT INTO account (username, salt, verifier, expansion) VALUES (?, ?, ?, 2)`, username, salt, verifier)
 		if err != nil {
 			e2eharness.HarnessFailf(t, "create owned account %s: %v", username, err)

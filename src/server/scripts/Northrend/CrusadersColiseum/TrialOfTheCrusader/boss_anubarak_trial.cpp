@@ -744,6 +744,7 @@ public:
             EVENT_SPIKE_SPEED_2 = 1,
             EVENT_SPIKE_SPEED_3,
             EVENT_SPIKE_RESUME,
+            EVENT_SPIKE_REACQUIRE,
         };
 
         EventMap events;
@@ -767,11 +768,13 @@ public:
         {
             // Physical immunity (Hand of Protection) does not break pursuit, but full immunity does.
             return target && me->IsValidAttackTarget(target) && !target->HasAuraType(SPELL_AURA_FEIGN_DEATH)
+                && !target->HasStealthAura()
                 && !target->HasSchoolImmunityForMask(SPELL_SCHOOL_MASK_ALL, me, nullptr);
         }
 
         void SelectNewTarget(bool next)
         {
+            events.CancelEvent(EVENT_SPIKE_REACQUIRE);
             if (TargetGUID)
                 if (Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID))
                     target->RemoveAura(SPELL_MARK);
@@ -800,6 +803,8 @@ public:
                 AttackStart(target);
                 me->GetMotionMaster()->MoveChase(target);
             }
+            else
+                events.RescheduleEvent(EVENT_SPIKE_REACQUIRE, 300ms);
         }
 
         void Reset() override
@@ -809,8 +814,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            // Keep searching if no eligible player remains. The trail is removed during the Permafrost pause.
-            if (TargetGUID || me->HasAura(SPELL_SPIKE_TRAIL))
+            if (TargetGUID)
             {
                 Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID);
                 // Reaching the marked player clears CHASE_MOVE; that is not a reason to abandon pursuit.
@@ -836,6 +840,9 @@ public:
                     break;
                 case EVENT_SPIKE_RESUME:
                     Reset();
+                    break;
+                case EVENT_SPIKE_REACQUIRE:
+                    SelectNewTarget(true);
                     break;
             }
         }
