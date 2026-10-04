@@ -956,6 +956,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
+            summon->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = summon->SelectNearestTarget(200.0f))
                 summon->AI()->AttackStart(target);
             DoZoneInCombat(summon);
@@ -1272,6 +1273,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
+            summon->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = summon->SelectNearestTarget(200.0f))
                 summon->AI()->AttackStart(target);
             DoZoneInCombat(summon);
