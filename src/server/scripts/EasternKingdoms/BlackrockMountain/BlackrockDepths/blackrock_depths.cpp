@@ -535,8 +535,13 @@ enum NagmaraPoints
 {
     POINT_APPROACH   = 100,
     POINT_APPROACH_GREETING = 108,
-    POINT_LOVERS_ROUTE      = 200,
     POINT_ROCKNOT_FINAL     = 300
+};
+
+enum NagmaraWaypoints
+{
+    PATH_NAGMARA_LOVERS = 95001,
+    POINT_NAGMARA_DOOR_WAIT = 4
 };
 
 // WotLK Classic 3.4.1.49345 sniff, identical waypoints in two runs:
@@ -544,25 +549,13 @@ enum NagmaraPoints
 Position const NagmaraApproachPosition = { 874.3762f, -187.63274f, -43.70371f };
 Position const NagmaraGreetingPosition = { 889.49426f, -196.88141f, -43.713f };
 
-Position const NagmaraLoversPath[] =
-{
-    { 869.12384f, -202.85149f, -43.708836f },
-    { 863.9559f, -210.76521f, -43.707447f },
-    { 866.69403f, -221.29358f, -43.709167f },
-    { 868.26624f, -224.17285f, -43.728756f },
-    { 882.0711f, -226.17651f, -46.92732f },
-    { 888.93f, -221.56207f, -49.944458f },
-    { 886.03735f, -218.21387f, -49.942142f },
-    { 878.1779f, -222.06618f, -49.967144f, 0.25003412f }
-};
-
-constexpr uint8 NAGMARA_DOOR_WAIT_POINT = 3;
+Position const NagmaraFinalPosition = { 878.1779f, -222.06618f, -49.967144f, 0.25003412f };
 Position const RocknotFinalPosition = { 880.1218f, -221.5959f, -49.95902f, 3.3916268f };
 
 struct npc_mistress_nagmara : public CreatureAI
 {
     npc_mistress_nagmara(Creature* creature) : CreatureAI(creature), _instance(creature->GetInstanceScript()),
-        _routePoint(0), _doorOpenAttempts(0), _lovePotionEvent(false),
+        _doorOpenAttempts(0), _lovePotionEvent(false),
         _lovePotionComplete(false), _doorOpenedByEvent(false) { }
 
     void Reset() override
@@ -581,13 +574,12 @@ struct npc_mistress_nagmara : public CreatureAI
             scheduler.CancelAll();
             _ambientScheduler.CancelAll();
             _rocknotGuid.Clear();
-            _routePoint = 0;
             _doorOpenAttempts = 0;
             _lovePotionEvent = false;
             _lovePotionComplete = true;
             _doorOpenedByEvent = false;
             me->GetMotionMaster()->Clear();
-            Position const& finalPosition = NagmaraLoversPath[std::size(NagmaraLoversPath) - 1];
+            Position const& finalPosition = NagmaraFinalPosition;
             me->NearTeleportTo(finalPosition.GetPositionX(), finalPosition.GetPositionY(),
                 finalPosition.GetPositionZ(), finalPosition.GetOrientation());
             me->SetHomePosition(finalPosition);
@@ -607,7 +599,6 @@ struct npc_mistress_nagmara : public CreatureAI
 
         CancelLovePotionTasks();
         _rocknotGuid.Clear();
-        _routePoint = 0;
         _doorOpenAttempts = 0;
         _doorOpenedByEvent = false;
     }
@@ -712,36 +703,36 @@ struct npc_mistress_nagmara : public CreatureAI
                 MoveToGreetingPosition();
             });
         }
-        else if (pointId >= POINT_LOVERS_ROUTE && pointId < POINT_LOVERS_ROUTE + std::size(NagmaraLoversPath))
-        {
-            _routePoint = pointId - POINT_LOVERS_ROUTE;
-            if (_routePoint == NAGMARA_DOOR_WAIT_POINT)
-            {
-                _doorOpenAttempts = 0;
-                if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
-                    if (rocknot->AI())
-                        rocknot->AI()->DoAction(ACTION_PAUSE_AT_BAR_DOOR);
+    }
 
-                scheduler.Schedule(500ms, GROUP_NAGMARA_LOVE_SEQUENCE, [this](TaskContext context)
-                {
-                    TryOpenBarDoor(context);
-                });
-            }
-            else if (++_routePoint < std::size(NagmaraLoversPath))
+    void WaypointReached(uint32 pointId, uint32 pathId) override
+    {
+        if (!_lovePotionEvent || pathId != PATH_NAGMARA_LOVERS)
+            return;
+
+        scheduler.RescheduleGroup(GROUP_NAGMARA_MOVEMENT_TIMEOUT, 45s);
+        if (pointId != POINT_NAGMARA_DOOR_WAIT)
+            return;
+
+        me->PauseMovement();
+        _doorOpenAttempts = 0;
+        if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
+            if (rocknot->AI())
+                rocknot->AI()->DoAction(ACTION_PAUSE_AT_BAR_DOOR);
+
+        scheduler.Schedule(500ms, GROUP_NAGMARA_LOVE_SEQUENCE, [this](TaskContext context)
+        {
+            TryOpenBarDoor(context);
+        });
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        if (_lovePotionEvent && pathId == PATH_NAGMARA_LOVERS)
+            scheduler.Schedule(1ms, GROUP_NAGMARA_LOVE_SEQUENCE, [this](TaskContext context)
             {
-                scheduler.Schedule(1ms, GROUP_NAGMARA_LOVE_SEQUENCE, [this](TaskContext /*context*/)
-                {
-                    MoveToRoutePoint();
-                });
-            }
-            else
-            {
-                scheduler.Schedule(1ms, GROUP_NAGMARA_LOVE_SEQUENCE, [this](TaskContext context)
-                {
-                    ReachLoversStop(context);
-                });
-            }
-        }
+                ReachLoversStop(context);
+            });
     }
 
     void UpdateAI(uint32 diff) override
@@ -824,14 +815,7 @@ private:
             return;
         }
 
-        _routePoint = 0;
-        MoveToRoutePoint();
-    }
-
-    void MoveToRoutePoint()
-    {
-        me->GetMotionMaster()->MovePoint(POINT_LOVERS_ROUTE + _routePoint, NagmaraLoversPath[_routePoint],
-            FORCED_MOVEMENT_NONE, 0.0f, false);
+        me->GetMotionMaster()->MoveWaypoint(PATH_NAGMARA_LOVERS, false);
     }
 
     bool OpenBarDoor()
@@ -853,9 +837,9 @@ private:
     {
         if (OpenBarDoor())
         {
-            context.Schedule(3200ms, GROUP_NAGMARA_LOVE_SEQUENCE, [this](TaskContext context)
+            context.Schedule(3200ms, GROUP_NAGMARA_LOVE_SEQUENCE, [this](TaskContext /*context*/)
             {
-                ContinueAfterDoor(context);
+                ContinueAfterDoor();
             });
         }
         else if (++_doorOpenAttempts < 30)
@@ -864,16 +848,13 @@ private:
             AbortLovePotionEvent(true, context);
     }
 
-    void ContinueAfterDoor(TaskContext& context)
+    void ContinueAfterDoor()
     {
         if (Creature* rocknot = ObjectAccessor::GetCreature(*me, _rocknotGuid))
             if (rocknot->AI())
                 rocknot->AI()->DoAction(ACTION_RESUME_AFTER_BAR_DOOR);
 
-        if (++_routePoint < std::size(NagmaraLoversPath))
-            MoveToRoutePoint();
-        else
-            ReachLoversStop(context);
+        me->ResumeMovement();
     }
 
     void ReachLoversStop(TaskContext& context)
@@ -944,7 +925,6 @@ private:
 
         _rocknotGuid.Clear();
         _lovePotionEvent = false;
-        _routePoint = 0;
         _doorOpenAttempts = 0;
         _doorOpenedByEvent = false;
         me->setActive(false);
@@ -962,7 +942,6 @@ private:
     InstanceScript* _instance;
     TaskScheduler _ambientScheduler;
     ObjectGuid _rocknotGuid;
-    uint8 _routePoint;
     uint8 _doorOpenAttempts;
     bool _lovePotionEvent;
     bool _lovePotionComplete;
