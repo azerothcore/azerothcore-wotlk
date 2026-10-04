@@ -354,14 +354,14 @@ void InstanceSaveMgr::LoadResetTimes()
             CharacterDatabase.DirectExecute("INSERT INTO instance_reset VALUES ('{}', '{}', '{}')", mapid, difficulty, (uint32)t);
         }
 
-        if (t < now)
+        // A reset missed while the server was down is scheduled below as overdue, and the first Update()
+        // runs it like a live one, chaining one per missed period. Two resets clear every lock (the first
+        // ends extensions), so skip all but the last two. The startup cleanup in LoadInstances() misses
+        // these: raid and heroic instances are saved with resettime 0.
+        if (now - t >= time_t(2) * period)
         {
-            // assume that expired instances have already been cleaned
-            // calculate the next reset time
-            t = (t / DAY) * DAY;
-            t += ((today - t) / period + 1) * period + diff;
+            t += ((now - t) / period - 1) * period;
             SetResetTimeFor(mapid, difficulty, t);
-            CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
         }
 
         // An extended lock runs one period past the reset, as _ResetOrWarnAll sets it after a runtime reset
