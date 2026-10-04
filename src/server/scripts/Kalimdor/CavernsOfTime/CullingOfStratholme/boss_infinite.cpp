@@ -114,6 +114,7 @@ public:
             if (param == ACTION_RUN_OUT_OF_TIME)
             {
                 Talk(SAY_FAIL);
+                instance->SetBossState(BOSS_INFINITE_CORRUPTOR, FAIL);
                 summons.DespawnAll();
                 me->DespawnOrUnsummon(500ms);
             }

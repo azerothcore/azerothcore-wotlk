@@ -25,6 +25,7 @@
 #include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include "culling_of_stratholme.h"
+#include <iterator>
 
 class instance_culling_of_stratholme : public InstanceMapScript
 {
@@ -49,11 +50,6 @@ public:
             _guardianTimer = 0;
             _respawnAndReposition = false;
             _loadTimer = 0;
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            return false;
         }
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
@@ -355,6 +351,14 @@ public:
 
         void Load(char const* data) override
         {
+            // Older saves hold only "C S <progress> <timer>", which the base parser would read as boss states
+            if (data)
+            {
+                std::istringstream stream(data);
+                if (std::distance(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>()) == 4)
+                    return;
+            }
+
             InstanceScript::Load(data);
 
             _guardianTimer = GetPersistentData(PERSISTENT_DATA_GUARDIAN_TIMER);
