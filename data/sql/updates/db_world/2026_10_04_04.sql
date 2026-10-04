@@ -1,3 +1,4 @@
+-- DB update 2026_10_04_03 -> 2026_10_04_04
 -- Acidmaw and Dreadscale have no submerge or emerge emotes
 DELETE FROM `creature_text_locale` WHERE `CreatureID` = 34799 AND `GroupID` IN (1, 2);
 DELETE FROM `creature_text_locale` WHERE `CreatureID` = 35144 AND `GroupID` = 2;
