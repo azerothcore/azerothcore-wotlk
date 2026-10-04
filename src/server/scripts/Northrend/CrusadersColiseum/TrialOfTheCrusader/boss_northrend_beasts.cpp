@@ -74,8 +74,7 @@ enum Yells
 
     // Acidmaw & Dreadscale
     EMOTE_ENRAGE            = 0,
-    EMOTE_SUBMERGE          = 1,
-    EMOTE_EMERGE            = 2,
+    WHISPER_PARALYTIC_TOXIN = 1, // Acidmaw only
 
     // Icehowl
     EMOTE_TRAMPLE_STARE     = 0,
@@ -630,7 +629,6 @@ struct boss_jormungarAI : public ScriptedAI
                     bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, false);
-                    Talk(EMOTE_SUBMERGE);
 
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if (pInstance)
@@ -677,7 +675,6 @@ struct boss_jormungarAI : public ScriptedAI
                     }
                     me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
-                    Talk(EMOTE_EMERGE);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     ScheduleEvents();
                 }
@@ -784,6 +781,25 @@ public:
     CreatureAI* GetAI(Creature* pCreature) const override
     {
         return GetTrialOfTheCrusaderAI<boss_dreadscaleAI>(pCreature);
+    }
+};
+
+// 66823, 67618, 67619, 67620 - Paralytic Toxin
+class spell_jormungars_paralytic_toxin_aura : public AuraScript
+{
+    PrepareAuraScript(spell_jormungars_paralytic_toxin_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (caster && caster->GetEntry() == NPC_ACIDMAW)
+            if (Creature* acidmaw = caster->ToCreature())
+                acidmaw->AI()->Talk(WHISPER_PARALYTIC_TOXIN, GetTarget());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_jormungars_paralytic_toxin_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1135,6 +1151,7 @@ void AddSC_boss_northrend_beasts()
 
     new boss_acidmaw();
     new boss_dreadscale();
+    RegisterSpellScript(spell_jormungars_paralytic_toxin_aura);
 
     new boss_icehowl();
     RegisterSpellScript(spell_icehowl_jump_back);
