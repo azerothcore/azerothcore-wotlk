@@ -3750,11 +3750,8 @@ bool Creature::IsMovementPreventedByCasting() const
         return false;
     }
 
-    if (HasSpellFocus())
-    {
-        return true;
-    }
-
+    // Focus controls facing, not movement. Scripts may clear UNIT_STATE_CASTING
+    // to allow chase or follow movement while a focused channel remains active.
     if (HasUnitState(UNIT_STATE_CASTING))
     {
         return true;
