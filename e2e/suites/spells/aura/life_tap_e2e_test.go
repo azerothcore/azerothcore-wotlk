@@ -64,16 +64,24 @@ func TestAC_27279_LifeTapGlyphUnderDespair(t *testing.T) {
 	bot.CancelAura(t, glyphBuff)
 	bot.WaitAuraGone(t, glyphBuff, 3*time.Second)
 
-	// 62692 is an enemy area aura: applying it to the player does not apply its
-	// effects to that same player. Enter the raid while still GM, then engage
-	// Vezax so his normal AI applies the aura to us as an enemy.
+	// 62692 is an enemy area aura: self-applying it does not affect the player.
+	// Use Vezax's normal AI on a temporary summon in his room. The database spawn
+	// need not be alive/visible in the test instance; .go creature id only
+	// locates its saved position, and does not guarantee a live creature there.
 	bot.GM(t, ".gm on")
 	bot.FlushWorld(t)
 	bot.GoCreatureID(t, vezaxEntry)
-	vezax := bot.WaitUnit(t, vezaxEntry, 30*time.Second)
-	if vezax == 0 {
-		e2eharness.Preconditionf(t, "General Vezax not found after teleport")
+	known := map[uint64]struct{}{}
+	for _, unit := range bot.UnitsByEntry(0, vezaxEntry) {
+		known[unit.GUID] = struct{}{}
 	}
+	e2eharness.SpawnNPC(t, bot.World, vezaxEntry)
+	fresh := bot.WaitNewUnits(t, known, []uint32{vezaxEntry}, 30*time.Second)
+	if len(fresh) != 1 {
+		e2eharness.Preconditionf(t, "expected one temporary Vezax, got %d", len(fresh))
+	}
+	vezax := fresh[0].GUID
+	t.Cleanup(func() { bot.DespawnNPC(t, vezax) })
 	bot.CombatReady(t) // god on, GM off; power cheat remains off
 	bot.Engage(t, vezax, 20*time.Second)
 	bot.WaitUnitAura(t, self, despair, 5*time.Second)
