@@ -147,6 +147,7 @@ enum NPCs
     NPC_ACIDMAW                                     = 35144,
     NPC_ICEHOWL                                     = 34797,
     NPC_JARAXXUS                                    = 34780,
+    NPC_MISTRESS_OF_PAIN                            = 34826,
 
     NPC_PURPLE_GROUND                               = 35651,
     NPC_WORLD_TRIGGER                               = 18721,
@@ -353,6 +354,7 @@ enum EventSpells
     SPELL_RESILIENCE_WILL_FIX_IT_CREDIT             = 68620,
     SPELL_TRAITOR_KING                              = 68186,
     SPELL_PORTAL_TO_DALARAN                         = 53142,
+    SPELL_JARAXXUS_CHAINS                           = 67924,
 };
 
 enum eAchievementCriteria
@@ -402,5 +404,7 @@ inline AI* GetTrialOfTheCrusaderAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TrialOfTheCrusaderScriptName);
 }
+
+#define RegisterTrialOfTheCrusaderCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTrialOfTheCrusaderAI)
 
 #endif
