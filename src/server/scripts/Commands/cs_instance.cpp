@@ -82,8 +82,9 @@ public:
         return true;
     }
 
-    // The player comes last: as the first argument, a numeric character guid would be read before the map id
-    static bool HandleInstanceUnbindCommand(ChatHandler* handler, Variant<uint16, EXACT_SEQUENCE("all")> mapArg, Optional<uint8> difficultyArg, Optional<PlayerIdentifier> target)
+    // Player last, difficulty uint32: a number meant as map or difficulty is never read as a character guid
+    static bool HandleInstanceUnbindCommand(ChatHandler* handler, Variant<uint16, EXACT_SEQUENCE("all")> mapArg,
+        Optional<uint32> difficultyArg, Optional<PlayerIdentifier> target)
     {
         if (!target)
             target = PlayerIdentifier::FromTargetOrSelf(handler);
@@ -103,7 +104,8 @@ public:
             currentMapId = player->GetMapId();
         else
         {
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION_XYZ);
+            CharacterDatabasePreparedStatement* stmt =
+                CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION_XYZ);
             stmt->SetData(0, guid.GetCounter());
             if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
                 currentMapId = (*result)[0].Get<uint16>();
@@ -125,7 +127,7 @@ public:
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
             {
                 InstanceSave const* save = itr->second.save;
-                if (itr->first != currentMapId && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty()))
+                if (itr->first != currentMapId && (!mapId || mapId == itr->first) && (!difficultyArg || *difficultyArg == uint32(save->GetDifficulty())))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
                     uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
