@@ -57,6 +57,25 @@ enum Misc
     DATA_OURO_HEALTH            = 0
 };
 
+namespace
+{
+    bool IsTargetableAtRange(Creature const* creature, Unit const* target)
+    {
+        return creature->IsValidAttackTarget(target) && creature->CanSeeOrDetect(target)
+            && creature->_IsTargetAcceptable(target);
+    }
+
+    bool HasTargetableThreat(Creature const* creature)
+    {
+        // Ranged players are offline for Ouro's melee AI, but still count unless they cannot be targeted.
+        for (ThreatReference const* ref : creature->GetThreatMgr().GetUnsortedThreatList())
+            if (IsTargetableAtRange(creature, ref->GetVictim()))
+                return true;
+
+        return false;
+    }
+}
+
 struct npc_ouro_spawner : public ScriptedAI
 {
     npc_ouro_spawner(Creature* creature) : ScriptedAI(creature)
@@ -77,7 +96,7 @@ struct npc_ouro_spawner : public ScriptedAI
     void MoveInLineOfSight(Unit* who) override
     {
         // Spawn Ouro on LoS check
-        if (!hasSummoned && who->IsPlayer() && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
+        if (!hasSummoned && who->IsPlayer() && me->IsWithinDistInMap(who, 40.0f) && IsTargetableAtRange(me, who))
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {
@@ -151,7 +170,7 @@ struct boss_ouro : public BossAI
         for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
             Unit* target = ref->GetVictim();
-            if (target->IsPlayer() && me->IsValidAttackTarget(target) && me->CanSeeOrDetect(target)
+            if (target->IsPlayer() && IsTargetableAtRange(me, target)
                 && spellTarget(target) && me->IsWithinLOSInMap(target))
                 targets.push_back(target);
         }
@@ -300,18 +319,18 @@ struct boss_ouro : public BossAI
         if (_submerged)
             return;
 
-        if (me->GetThreatMgr().IsThreatListEmpty(true))
-        {
-            scheduler.CancelAll();
-            if (IsEngaged())
-                EngagementOver();
+        if (HasTargetableThreat(me))
+            return;
 
-            DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
-            me->DespawnOrUnsummon(1s);
-            instance->SetBossState(DATA_OURO, FAIL);
-            if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
-                base->DespawnOrUnsummon();
-        }
+        scheduler.CancelAll();
+        if (IsEngaged())
+            EngagementOver();
+
+        DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
+        me->DespawnOrUnsummon(1s);
+        instance->SetBossState(DATA_OURO, FAIL);
+        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
+            base->DespawnOrUnsummon();
     }
 
     void JustEngagedWith(Unit* who) override
@@ -410,20 +429,20 @@ struct npc_dirt_mound : ScriptedAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        // An unavailable target is not a wipe, nor is one mound losing combat.
-        if (!me->GetThreatMgr().IsThreatListEmpty(true))
+        // Keep the encounter running while any mound or Ouro still has a targetable opponent.
+        if (HasTargetableThreat(me))
             return;
 
         std::list<Creature*> ouroMounds;
         me->GetCreatureListWithEntryInGrid(ouroMounds, NPC_DIRT_MOUND, 200.0f);
         for (Creature* mound : ouroMounds)
-            if (!mound->GetThreatMgr().IsThreatListEmpty(true))
+            if (HasTargetableThreat(mound))
                 return;
 
         if (_instance)
         {
             if (Creature* ouro = _instance->GetCreature(DATA_OURO))
-                if (!ouro->GetThreatMgr().IsThreatListEmpty(true))
+                if (HasTargetableThreat(ouro))
                     return;
 
             _instance->SetBossState(DATA_OURO, FAIL);
