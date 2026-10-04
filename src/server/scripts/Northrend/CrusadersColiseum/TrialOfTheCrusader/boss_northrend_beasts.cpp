@@ -18,6 +18,9 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "trial_of_the_crusader.h"
 
@@ -795,6 +798,7 @@ enum IcehowlSpells
     SPELL_ARCTIC_BREATH                 = 66689,
 
     SPELL_MASSIVE_CRASH                 = 66683,
+    SPELL_ROAR                          = 66736,
     SPELL_JUMP_BACK                     = 66733,
     SPELL_TRAMPLE                       = 66734,
     SPELL_FROTHING_RAGE                 = 66759,
@@ -803,10 +807,21 @@ enum IcehowlSpells
     SPELL_SURGE_OF_ADRENALINE           = 68667,
 };
 
+enum IcehowlNPCs
+{
+    NPC_FURIOUS_CHARGE_STALKER          = 35062,
+};
+
+enum IcehowlPoints
+{
+    POINT_ICEHOWL_MIDDLE                = 1,
+};
+
 enum IcehowlEvents
 {
     EVENT_JUMP_MIDDLE = 1,
     EVENT_GAZE,
+    EVENT_ROAR,
     EVENT_JUMP_BACK,
     EVENT_TRAMPLE,
     EVENT_CHECK_TRAMPLE_PLAYERS,
@@ -846,7 +861,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        ObjectGuid TargetGUID;
+        ObjectGuid StalkerGUID;
         float destX, destY, destZ;
 
         void AttackStart(Unit* who) override
@@ -862,7 +877,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, 15s, 30s);
             events.RescheduleEvent(EVENT_SPELL_WHIRL, 10s, 12s);
             events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, 14s);
-            events.RescheduleEvent(EVENT_JUMP_MIDDLE, 30s);
+            events.RescheduleEvent(EVENT_JUMP_MIDDLE, 35s);
         }
 
         void JustReachedHome() override
@@ -884,9 +899,11 @@ public:
             return false;
         }
 
-        void MovementInform(uint32  /*type*/, uint32 id) override
+        void MovementInform(uint32 type, uint32 id) override
         {
-            if (id == EVENT_CHARGE)
+            if (type == EFFECT_MOTION_TYPE && id == POINT_ICEHOWL_MIDDLE)
+                events.RescheduleEvent(EVENT_SPELL_MASSIVE_CRASH, 900ms);
+            else if (id == EVENT_CHARGE)
             {
                 events.Reset();
                 events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, 5s, 15s);
@@ -951,26 +968,38 @@ public:
                     me->GetMotionMaster()->MoveIdle();
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), 40.0f, 12.0f);
-                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                     events.Reset();
-                    events.RescheduleEvent(EVENT_SPELL_MASSIVE_CRASH, 2s);
+                    me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), 40.0f, 12.0f, POINT_ICEHOWL_MIDDLE);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                     break;
                 case EVENT_SPELL_MASSIVE_CRASH:
                     me->GetMotionMaster()->Clear();
                     me->CastSpell((Unit*)nullptr, SPELL_MASSIVE_CRASH, false);
 
-                    events.RescheduleEvent(EVENT_GAZE, 2s);
+                    events.RescheduleEvent(EVENT_GAZE, 3900ms);
                     break;
                 case EVENT_GAZE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 500.0f, true))
                     {
-                        TargetGUID = target->GetGUID();
-                        me->SetGuidValue(UNIT_FIELD_TARGET, TargetGUID);
-                        me->SetFacingToObject(target);
+                        me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
                         Talk(EMOTE_TRAMPLE_STARE, target);
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                        events.RescheduleEvent(EVENT_JUMP_BACK, 2s);
+
+                        // The charge runs through the glared position and on into the arena wall
+                        float angle = Locs[LOC_CENTER].GetAngle(target);
+                        float dist = 50.0f;
+                        if (angle > 1.0f && angle < 2.0f) // near main gate
+                            dist = 46.0f;
+                        destX = Locs[LOC_CENTER].GetPositionX() + cos(angle) * dist;
+                        destY = Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * dist;
+                        destZ = Locs[LOC_CENTER].GetPositionZ() + 1.0f;
+
+                        if (Creature* stalker = me->SummonCreature(NPC_FURIOUS_CHARGE_STALKER, *target, TEMPSUMMON_TIMED_DESPAWN, 20000))
+                        {
+                            StalkerGUID = stalker->GetGUID();
+                            me->SetFacingToObject(stalker);
+                        }
+
+                        events.RescheduleEvent(EVENT_ROAR, 1800ms);
                     }
                     else // in case something went wrong
                     {
@@ -983,45 +1012,18 @@ public:
                     }
 
                     break;
+                case EVENT_ROAR:
+                    if (Creature* stalker = ObjectAccessor::GetCreature(*me, StalkerGUID))
+                        DoCast(stalker, SPELL_ROAR);
+                    events.RescheduleEvent(EVENT_JUMP_BACK, 2800ms);
+                    break;
                 case EVENT_JUMP_BACK:
+                    if (Creature* stalker = ObjectAccessor::GetCreature(*me, StalkerGUID))
                     {
-                        float angle;
-                        if (Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID))
-                            angle = me->GetAngle(target);
-                        else // in case something went wrong
-                            angle = rand_norm() * 2 * M_PI;
-
-                        float jumpangle = angle >= M_PI ? angle - M_PI : angle + M_PI;
-                        float dist = 50.0f;
-                        if (angle > 1.0f && angle < 2.0f) // near main gate
-                            dist = 46.0f;
-                        destX = Locs[LOC_CENTER].GetPositionX() + cos(angle) * dist;
-                        destY = Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * dist;
-                        destZ = Locs[LOC_CENTER].GetPositionZ() + 1.0f;
-                        me->StopMoving();
-                        me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX() + cos(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(jumpangle) * 35.0f, Locs[LOC_CENTER].GetPositionZ() + 1.0f, 40.0f, 12.0f);
-
-                        events.RescheduleEvent(EVENT_TRAMPLE, 1500ms);
-
-                        if (pInstance)
-                            switch (GetDifficulty())
-                            {
-                                case RAID_DIFFICULTY_10MAN_NORMAL:
-                                    pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MASSIVE_CRASH);
-                                    pInstance->DoCastSpellOnPlayers(SPELL_SURGE_OF_ADRENALINE);
-                                    break;
-                                case RAID_DIFFICULTY_25MAN_NORMAL:
-                                    pInstance->DoRemoveAurasDueToSpellOnPlayers(67660);
-                                    pInstance->DoCastSpellOnPlayers(SPELL_SURGE_OF_ADRENALINE);
-                                    break;
-                                case RAID_DIFFICULTY_10MAN_HEROIC:
-                                    pInstance->DoRemoveAurasDueToSpellOnPlayers(67661);
-                                    break;
-                                case RAID_DIFFICULTY_25MAN_HEROIC:
-                                    pInstance->DoRemoveAurasDueToSpellOnPlayers(67662);
-                                    break;
-                            }
+                        me->SetFacingToObject(stalker);
+                        DoCast(stalker, SPELL_JUMP_BACK);
                     }
+                    events.RescheduleEvent(EVENT_TRAMPLE, 2s);
                     break;
                 case EVENT_TRAMPLE:
                     //Talk(EMOTE_TRAMPLE_START);
@@ -1045,7 +1047,8 @@ public:
                         me->GetMotionMaster()->MovementExpired();
                         me->SetReactState(REACT_AGGRESSIVE);
                     }
-                    // no PopEvent() intended!
+                    else
+                        events.Repeat(100ms);
                     break;
                 case EVENT_REFRESH_POSITION:
                     //me->SetFacingTo(me->GetOrientation());
@@ -1075,6 +1078,56 @@ public:
     };
 };
 
+// 66733 - Jump Back
+class spell_icehowl_jump_back : public SpellScript
+{
+    PrepareSpellScript(spell_icehowl_jump_back);
+
+    // The default handler leaps non-hunter spells forward and pads the distance with the caster's combat reach
+    void HandleLeapBack(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        float speedXY = GetSpellInfo()->Effects[effIndex].MiscValue / 10.0f;
+        float speedZ = GetEffectValue() / 10.0f;
+        float dist = 2.0f * speedZ / Movement::gravity * speedXY;
+        Position dest = target->GetFirstCollisionPosition(dist, M_PI);
+        target->GetMotionMaster()->MoveJump(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), speedXY, speedZ, 0, GetExplTargetUnit());
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_icehowl_jump_back::HandleLeapBack, EFFECT_1, SPELL_EFFECT_LEAP_BACK);
+    }
+};
+
+// 66683, 67660, 67661, 67662 - Massive Crash
+class spell_icehowl_massive_crash : public AuraScript
+{
+    PrepareAuraScript(spell_icehowl_massive_crash);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SURGE_OF_ADRENALINE });
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (target->IsPlayer() && !target->GetMap()->IsHeroic())
+            target->CastSpell(target, SPELL_SURGE_OF_ADRENALINE, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_icehowl_massive_crash::HandleRemove, EFFECT_2, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_northrend_beasts()
 {
     new boss_gormok();
@@ -1084,4 +1137,6 @@ void AddSC_boss_northrend_beasts()
     new boss_dreadscale();
 
     new boss_icehowl();
+    RegisterSpellScript(spell_icehowl_jump_back);
+    RegisterSpellScript(spell_icehowl_massive_crash);
 }
