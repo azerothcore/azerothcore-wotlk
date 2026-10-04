@@ -1690,6 +1690,16 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
     // creature/player specific target checks
     if (unitTarget)
     {
+        // can't assist player which is dueling someone, also for spells with generic unit targets (e.g. Devour Magic)
+        // boarding a dueling player's passenger mount is not an assist
+        if (unitCaster && unitCaster != unitTarget && !HasAura(SPELL_AURA_CONTROL_VEHICLE))
+            if (Player const* targetPlayerOwner = unitTarget->GetAffectingPlayer())
+                if (targetPlayerOwner->duel)
+                    if (Player const* casterPlayerOwner = unitCaster->GetAffectingPlayer())
+                        if (casterPlayerOwner != targetPlayerOwner
+                                && !unitCaster->IsValidAttackTarget(unitTarget, this))
+                            return SPELL_FAILED_TARGET_DUELING;
+
         // xinef: spells cannot be cast if player is in fake combat also
         if (AttributesEx & SPELL_ATTR1_ONLY_PEACEFUL_TARGETS && (unitTarget->IsInCombat() || unitTarget->IsPetInCombat()))
             return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
