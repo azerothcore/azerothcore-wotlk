@@ -23,6 +23,7 @@
 #include "GameObjectScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
