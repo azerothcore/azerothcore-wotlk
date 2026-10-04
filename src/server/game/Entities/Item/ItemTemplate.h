@@ -723,6 +723,7 @@ struct ItemTemplate
     }
 
     [[nodiscard]] bool IsCurrencyToken() const { return BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS; }
+    [[nodiscard]] bool IsTemporary() const { return Duration > 0; }
 
     [[nodiscard]] uint32 GetMaxStackSize() const
     {
