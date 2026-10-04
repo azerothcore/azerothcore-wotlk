@@ -127,7 +127,8 @@ public:
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
             {
                 InstanceSave const* save = itr->second.save;
-                if (itr->first != currentMapId && (!mapId || mapId == itr->first) && (!difficultyArg || *difficultyArg == uint32(save->GetDifficulty())))
+                if (itr->first != currentMapId && (!mapId || mapId == itr->first)
+                    && (!difficultyArg || *difficultyArg == uint32(save->GetDifficulty())))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
                     uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
