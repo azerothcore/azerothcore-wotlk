@@ -40,7 +40,7 @@ func TestToC_GormokSnoboldsFightAfterDeath(t *testing.T) {
 		centerX, centerY, centerZ = float32(563.67), float32(139.57), float32(393.84)
 
 		seatWindow = 15 * time.Second
-		// The old script despawned them inside Gormok's JustDied; this is far past that.
+		// Snobolds must outlive Gormok's death handling, which runs in the same tick.
 		surviveWindow = 3 * time.Second
 		// Dismounted Snobolds engage 5s after Gormok dies.
 		engageWindow  = 12 * time.Second

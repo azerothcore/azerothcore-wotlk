@@ -142,6 +142,31 @@ public:
             ScriptedAI::EnterEvadeMode(why);
         }
 
+        void LoseCarrier(Unit* carrier)
+        {
+            if (carrier)
+                carrier->RemoveAura(SPELL_CHANGE_VEHICLE);
+            me->RemoveAllAuras();
+            me->GetThreatMgr().ClearAllThreat();
+            me->CombatStop(true);
+            me->SetHealth(me->GetMaxHealth());
+            TargetGUID.Clear();
+            Creature* gormok = pInstance ? ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) : nullptr;
+            if (gormok && gormok->IsAlive())
+            {
+                if (Vehicle* vk = gormok->GetVehicleKit())
+                    for (uint8 i = 0; i < 4; ++i)
+                        if (!vk->GetPassenger(i))
+                        {
+                            me->EnterVehicleUnattackable(gormok, i);
+                            Reset();
+                            break;
+                        }
+            }
+            else // Gormok is dead or gone, so fight on like the Snobolds ejected from him
+                DoAction(ACTION_GORMOK_DIED);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             Unit* t = nullptr;
@@ -159,28 +184,16 @@ public:
 
                 t = ObjectAccessor::GetUnit(*me, TargetGUID);
                 if (!t && !(t = me->GetVehicleBase()))
+                {
+                    // The carrier left the map, which ejects its passengers
+                    LoseCarrier(nullptr);
                     return;
+                }
             }
 
             if (!Dismounted && t->isDead())
             {
-                t->RemoveAura(SPELL_CHANGE_VEHICLE);
-                me->RemoveAllAuras();
-                me->GetThreatMgr().ClearAllThreat();
-                me->CombatStop(true);
-                me->SetHealth(me->GetMaxHealth());
-                if (pInstance)
-                    if (Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)))
-                        if (gormok->IsAlive())
-                            if (Vehicle* vk = gormok->GetVehicleKit())
-                                for( uint8 i = 0; i < 4; ++i )
-                                    if (!vk->GetPassenger(i))
-                                    {
-                                        me->EnterVehicleUnattackable(gormok, i);
-                                        Reset();
-                                        break;
-                                    }
-                TargetGUID.Clear();
+                LoseCarrier(t);
                 return;
             }
 
