@@ -1,4 +1,6 @@
 -- Acidmaw and Dreadscale have no submerge or emerge emotes
+DELETE FROM `creature_text_locale` WHERE `CreatureID` = 34799 AND `GroupID` IN (1, 2);
+DELETE FROM `creature_text_locale` WHERE `CreatureID` = 35144 AND `GroupID` = 2;
 DELETE FROM `creature_text` WHERE `CreatureID` = 34799 AND `GroupID` IN (1, 2);
 DELETE FROM `creature_text` WHERE `CreatureID` = 35144 AND `GroupID` = 2;
 
