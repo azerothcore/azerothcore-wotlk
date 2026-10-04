@@ -370,6 +370,7 @@ public:
                 if (!leader)
                 {
                     leader = summon;
+                    leader->LoadPath(pathId);
                     leader->GetMotionMaster()->MoveWaypoint(pathId, false);
                     continue;
                 }

@@ -1,6 +1,6 @@
 -- Ulduar: Mechanostriker 54-A templates, movement, pilot, and SmartAI
-UPDATE `creature_template` SET `unit_flags` = 0, `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 34161;
-UPDATE `creature_template` SET `unit_flags` = 0, `ScriptName` = '' WHERE `entry` = 34162;
+UPDATE `creature_template` SET `unit_flags` = 0, `AIName` = 'SmartAI', `ScriptName` = '', `VerifiedBuild` = 49822 WHERE `entry` = 34161;
+UPDATE `creature_template` SET `unit_flags` = 0, `ScriptName` = '', `VerifiedBuild` = 48120 WHERE `entry` = 34162;
 
 DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (34161, 34162);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
@@ -9,8 +9,8 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 
 DELETE FROM `creature_template_addon` WHERE `entry` IN (34161, 34162);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(34161, 0, 0, 50331648, 1, 0, 0, NULL),
-(34162, 0, 0, 50331648, 1, 0, 0, NULL);
+(34161, 0, 0, 50331648, 1, 0, 4, NULL),
+(34162, 0, 0, 50331648, 1, 0, 4, NULL);
 
 DELETE FROM `vehicle_template_accessory` WHERE `entry` IN (34161, 34162);
 INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`) VALUES
