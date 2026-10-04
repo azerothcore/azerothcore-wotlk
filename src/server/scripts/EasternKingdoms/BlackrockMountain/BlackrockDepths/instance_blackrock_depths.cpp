@@ -607,7 +607,7 @@ struct instance_blackrock_depths : public InstanceScript
             std::ostringstream saveStream;
             saveStream << encounter[0] << ' ' << encounter[1] << ' ' << encounter[2] << ' '
                        << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount << ' '
-                       << LovePotionEventState;
+                       << "NAGMARA " << LovePotionEventState;
 
             str_data = saveStream.str();
 
@@ -712,8 +712,12 @@ struct instance_blackrock_depths : public InstanceScript
         std::istringstream loadStream(in);
         loadStream >> encounter[0] >> encounter[1] >> encounter[2] >> encounter[3]
                    >> encounter[4] >> encounter[5] >> GhostKillCount;
-        if (!(loadStream >> LovePotionEventState) || LovePotionEventState != DONE)
-            LovePotionEventState = NOT_STARTED;
+        LovePotionEventState = NOT_STARTED;
+        std::string field;
+        uint32 value;
+        while (loadStream >> field >> value)
+            if (field == "NAGMARA" && value == DONE)
+                LovePotionEventState = DONE;
 
         for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             if (encounter[i] == IN_PROGRESS)
