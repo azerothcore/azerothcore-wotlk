@@ -1,3 +1,4 @@
+-- DB update 2026_10_04_01 -> 2026_10_04_02
 --
 -- Isle of Conquest: Horde Siege Engine turrets in the level 80 bracket (the vehicle kit uses the difficulty entry)
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = 35433;
