@@ -228,6 +228,10 @@ jobs:
           # them readable as the build context for the runner user.
           sudo chown -R "$(id -u):$(id -g)" mysql-seed
 
+          # mysqld creates its TLS/RSA keys and server_uuid per container when missing,
+          # so don't bake ours in. All *.pem: one leftover cert stops it making new ones.
+          rm -f mysql-seed/*.pem mysql-seed/auto.cnf
+
           # Minimal build context: only the datadir, not the ~GB repo.
           mkdir -p db-ctx
           mv mysql-seed db-ctx/
