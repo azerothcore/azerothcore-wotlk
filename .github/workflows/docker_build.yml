@@ -74,6 +74,7 @@ jobs:
 
       # arm64 emulation, so the labeled-PR check can boot the arm64 DB image.
       - name: Set up QEMU
+        if: github.event_name == 'pull_request'
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
@@ -141,10 +142,9 @@ jobs:
       # Kept LAST so a failure here cannot block the six images already pushed
       # above (build and push are fused per step). It only marks the run failed.
       #
-      # Rebuilt on every run of this job: nothing in this repository signals that
-      # azerothcore/mod-ale moved (Download Eluna checks it out without a ref, so
-      # it picks up that repo's HEAD at run time), leaving nothing reliable to
-      # gate a rebuild on. Pushed only on master of the canonical repo.
+      # Rebuilt on every run, like db-import: a data/sql/** gate would skip an SQL
+      # change whenever a newer push cancels the run before this step. Pushed only
+      # on master of the canonical repo.
       # ----------------------------------------------------------------------
       - name: Import database and capture datadir
         id: db_import
@@ -290,11 +290,11 @@ jobs:
             echo "DB image ($arch) size: $(docker image ls --format '{{.Size}}' "$tag")"
             echo "DB image ($arch) labels: $(docker image inspect -f '{{json .Config.Labels}}' "$tag")"
 
-            docker rm -f acdb-test >/dev/null
+            docker rm -f -v acdb-test >/dev/null
             docker rmi "$tag" >/dev/null
           }
 
-          trap 'docker rm -f acdb-test >/dev/null 2>&1 || true' EXIT
+          trap 'docker rm -f -v acdb-test >/dev/null 2>&1 || true' EXIT
 
           # Push only on master of the canonical repo (same condition as
           # RUNNING_ON_PRIMARY_BRANCH, computed here to avoid its trailing newline).

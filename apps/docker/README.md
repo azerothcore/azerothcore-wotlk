@@ -43,11 +43,12 @@ AC> account create admin password 3 -1
 ## Pre-imported database image (`acore/ac-wotlk-db`)
 
 `acore/ac-wotlk-db` is a MySQL 8.4 server **with the AzerothCore database
-already imported** (`acore_auth`, `acore_world`, `acore_characters`, including
-Eluna/mod-ale SQL to match the published `worldserver`/`authserver` images). It
-boots instantly — there is no multi-minute import on first run. It is meant for
-quick-start, dev, ephemeral test fixtures, and demos, **not production**. The
-download is a few hundred MB; unpacked, the datadir is several GB on disk.
+already imported** (`acore_auth`, `acore_world`, `acore_characters`, by the
+`acore/ac-wotlk-db-import` build published alongside the
+`worldserver`/`authserver` images). It boots instantly — there is no
+multi-minute import on first run. It is meant for quick-start, dev, ephemeral
+test fixtures, and demos, **not production**. The download is a few hundred MB;
+unpacked, the datadir is several GB on disk.
 
 ### Using it with docker compose
 
@@ -103,7 +104,7 @@ is no help here, it moves with master too.
 
 `:master` and `:<version>` move on every master build. The sha tag is tied to a
 commit, not to a fixed set of bytes: a manual re-run of the `docker-build`
-workflow on master rebuilds it against the then-current mod-ale,
+workflow on master rebuilds it against the then-current
 `acore/ac-wotlk-db-import` and `mysql:8.4`, and pushes it again under the same
 tag. The exact inputs of the image you pulled are in its labels:
 
@@ -112,7 +113,7 @@ $ docker inspect -f '{{json .Config.Labels}}' acore/ac-wotlk-db:master
 ```
 
 - `org.opencontainers.image.revision` — the AzerothCore commit.
-- `org.azerothcore.mod-ale.revision` — the mod-ale commit whose SQL is included.
+- `org.azerothcore.mod-ale.revision` — the mod-ale commit the run built its images with.
 - `org.azerothcore.db-import.digest` — the `acore/ac-wotlk-db-import` image that ran the import.
 - `org.opencontainers.image.base.name` and `.base.digest` — the `mysql:8.4` tag and the
   multi-arch index digest it resolved to at build time.
@@ -121,14 +122,17 @@ $ docker inspect -f '{{json .Config.Labels}}' acore/ac-wotlk-db:master
 
 The official mysql image declares `VOLUME /var/lib/mysql`, which seeds **fresh
 anonymous or named volumes** from the baked datadir — but **bind mounts are NOT
-seeded** (a host-dir bind mount over the datadir starts empty, giving you an
-empty DB on first run). A `DOCKER_VOL_DB` pointing at a host directory is such
-a bind mount.
+seeded**. A host directory mounted over the datadir (e.g. a `DOCKER_VOL_DB`
+pointing at one) hides the snapshot: under docker compose, MySQL initializes an
+empty server and `ac-db-import` falls back to the full multi-minute import;
+standalone, the entrypoint refuses to initialize it without a
+`MYSQL_ROOT_PASSWORD`, and the container exits.
 
 - For the instant experience, run with **no volume** or a **fresh named
   volume** (e.g. `-v ac-db:/var/lib/mysql`).
-- To persist afterwards, keep using that named volume; the worldserver applies
-  update deltas over time.
+- To persist afterwards, keep using that named volume. Under docker compose,
+  `ac-db-import` applies newer update deltas on each start; the published
+  `worldserver` image has database updates turned off.
 
 ### Standalone use
 
