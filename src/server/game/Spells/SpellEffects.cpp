@@ -5245,7 +5245,14 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
 
     // Instantly interrupt non melee spells being casted
     if (unitTarget->IsNonMeleeSpellCast(true))
-        unitTarget->InterruptNonMeleeSpells(true);
+    {
+        // Preserve spells awaiting their batch without changing other spell interruptions.
+        Spell const* pendingSpell = unitTarget->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        bool const pendingBatch = pendingSpell && pendingSpell->getState() == SPELL_STATE_DELAYED &&
+            pendingSpell->GetSpellInfo()->Speed == 0.0f;
+
+        unitTarget->InterruptNonMeleeSpells(!pendingBatch);
+    }
 
     float ratio = 0.1f;
     float speedxy = float(m_spellInfo->Effects[effIndex].MiscValue) * ratio;
