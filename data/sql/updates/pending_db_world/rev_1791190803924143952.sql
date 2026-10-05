@@ -1,0 +1,2 @@
+--
+DELETE FROM `creature` WHERE `id` = 21796 AND `guid` BETWEEN 86672 AND 86694;
