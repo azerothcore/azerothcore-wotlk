@@ -231,6 +231,8 @@ public:
     [[nodiscard]] char const* GetName() const { return m_name; }
     [[nodiscard]] char const* GetEntryName() const { return m_entryName; }
     [[nodiscard]] bool IsRatesAllowed() const { return m_ratesAllowed; }
+
+    friend class LootTemplateCollectItemIdsTest;
 protected:
     uint32 LoadLootTable();
     void Clear();
