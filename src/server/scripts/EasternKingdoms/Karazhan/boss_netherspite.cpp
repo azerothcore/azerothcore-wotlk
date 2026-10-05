@@ -331,8 +331,33 @@ class spell_nether_portal_perseverence : public AuraScript
     }
 };
 
+// 38523 - Netherbreath
+class spell_netherspite_netherbreath : public SpellScript
+{
+    PrepareSpellScript(spell_netherspite_netherbreath);
+
+    // Rooted units can't turn (UNIT_STATE_CANNOT_TURN), so the banish root keeps Netherspite facing his
+    // pre-banish victim. Turn him to the chosen target by hand, since the breath cone fires wherever he faces.
+    void HandleBeforeCast()
+    {
+        Unit* caster = GetCaster();
+        if (Unit* target = GetExplTargetUnit())
+        {
+            float angle = caster->GetAngle(target);
+            caster->SetOrientation(angle);
+            caster->SetFacingTo(angle);
+        }
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_netherspite_netherbreath::HandleBeforeCast);
+    }
+};
+
 void AddSC_boss_netherspite()
 {
     RegisterKarazhanCreatureAI(boss_netherspite);
     RegisterSpellScript(spell_nether_portal_perseverence);
+    RegisterSpellScript(spell_netherspite_netherbreath);
 }
