@@ -1,3 +1,4 @@
+-- DB update 2026_10_05_02 -> 2026_10_05_03
 -- Rocknot's Ale and Phalanx: TBC Anniversary 2.5.6 build 69546, 2026-09-06.
 -- Corner/door staging originally implemented by Cala in CMaNGOS (563770518af7).
 -- The fallback corner facing is from ratkosrb's vMaNGOS spawn update (55ba8c15866c).
