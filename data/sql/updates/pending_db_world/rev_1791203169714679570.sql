@@ -1,0 +1,2 @@
+--
+DELETE FROM `creature` WHERE (`id` = 22451) AND (`guid` BETWEEN 78797 AND 78809);
