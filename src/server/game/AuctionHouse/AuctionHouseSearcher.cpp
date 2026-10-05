@@ -326,7 +326,8 @@ void AuctionHouseWorkerThread::BuildListAuctionItems(AuctionSearchListRequest co
         // No need to do any of this if no search term was entered
         if (!searchRequest.searchInfo.wsearchedname.empty())
         {
-            if (Aitem.itemName[searchRequest.playerInfo.loc_idx].find(searchRequest.searchInfo.wsearchedname) == std::wstring::npos)
+            std::wstring const& itemName = Aitem.GetItemName(searchRequest.playerInfo.loc_idx);
+            if (itemName.find(searchRequest.searchInfo.wsearchedname) == std::wstring::npos)
                 continue;
         }
 
@@ -463,7 +464,9 @@ void SearchableAuctionEntry::SetItemNames()
     ItemTemplate const* proto = item.itemTemplate;
     ItemLocale const* il = sObjectMgr->GetItemLocale(proto->ItemId);
 
-    for (uint32 locale = 0; locale < TOTAL_LOCALES; ++locale)
+    item.itemName.assign(GetTotalLocales(), std::wstring());
+
+    for (uint32 locale = 0; locale < GetTotalLocales(); ++locale)
     {
         if (proto->Name1.empty())
             continue;
@@ -573,7 +576,7 @@ int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, SearchableAuction
         break;
     case AUCTION_SORT_ITEM:                                             // name = 5
     {
-        int comparison = item.itemName[loc_idx].compare(auc.item.itemName[loc_idx]);
+        int comparison = item.GetItemName(loc_idx).compare(auc.item.GetItemName(loc_idx));
         if (comparison > 0)
             return -1;
         else if (comparison < 0)

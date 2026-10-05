@@ -19,6 +19,7 @@
 #define AZEROTHCORE_COMMON_H
 
 #include "Define.h"
+#include "Optional.h"
 #include <string>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
@@ -141,8 +142,19 @@ enum LocaleConstant
 #define MAX_LOCALES 8
 #define MAX_ACCOUNT_TUTORIAL_VALUES 8
 
+// Client locales and locales registered by modules together. Localized DBC strings have 16 slots and code
+// indexes them with the database locale of a session, so no locale index may reach past them.
+#define MAX_TOTAL_LOCALES 16
+
 AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
+// Registers a database locale that the client does not have (e.g. a language provided by a module) and
+// returns its index, which follows the client locales. The name is the one used in the `locale` column of
+// the *_locale tables (up to 4 characters). Registering a known name returns its index again.
+// Not thread-safe: call it while scripts are loaded, before the world loads its data.
+AC_COMMON_API Optional<LocaleConstant> RegisterCustomLocale(std::string const& name);
+// Number of client locales plus registered ones: every valid database locale index is below it.
+AC_COMMON_API uint8 GetTotalLocales();
 AC_COMMON_API bool IsLocaleValid(std::string const& locale);
 AC_COMMON_API LocaleConstant GetLocaleByName(std::string const& name);
 AC_COMMON_API const std::string GetNameByLocaleConstant(LocaleConstant localeConstant);

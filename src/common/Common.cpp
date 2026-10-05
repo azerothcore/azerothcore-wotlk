@@ -16,6 +16,7 @@
  */
 
 #include "Common.h"
+#include <vector>
 
 char const* localeNames[TOTAL_LOCALES] =
 {
@@ -66,22 +67,51 @@ AccountFlagName const accountFlagNames[MAX_ACCOUNT_FLAG] =
     { "ACCOUNT_FLAG_S2_TRIAL",             "S2_TRIAL"             }
 };
 
+namespace
+{
+    // names of the locales registered at runtime, their index is TOTAL_LOCALES + position
+    std::vector<std::string> customLocaleNames;
+
+    Optional<LocaleConstant> FindLocaleByName(std::string const& name)
+    {
+        for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
+            if (name == localeNames[i])
+                return LocaleConstant(i);
+
+        for (std::size_t i = 0; i < customLocaleNames.size(); ++i)
+            if (name == customLocaleNames[i])
+                return LocaleConstant(TOTAL_LOCALES + i);
+
+        return {};
+    }
+}
+
+Optional<LocaleConstant> RegisterCustomLocale(std::string const& name)
+{
+    if (Optional<LocaleConstant> locale = FindLocaleByName(name))
+        return locale;
+
+    // `locale` is varchar(4) in the *_locale tables
+    if (name.empty() || name.size() > 4 || GetTotalLocales() >= MAX_TOTAL_LOCALES)
+        return {};
+
+    customLocaleNames.push_back(name);
+    return LocaleConstant(GetTotalLocales() - 1);
+}
+
+uint8 GetTotalLocales()
+{
+    return uint8(TOTAL_LOCALES + customLocaleNames.size());
+}
+
 bool IsLocaleValid(std::string const& locale)
 {
-    for (int i = 0; i < TOTAL_LOCALES; ++i)
-        if (locale == localeNames[i])
-            return true;
-
-    return false;
+    return FindLocaleByName(locale).has_value();
 }
 
 LocaleConstant GetLocaleByName(std::string const& name)
 {
-    for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-        if (name == localeNames[i])
-            return LocaleConstant(i);
-
-    return LOCALE_enUS;                                     // including enGB case
+    return FindLocaleByName(name).value_or(LOCALE_enUS);    // including enGB case
 }
 
 const std::string GetNameByLocaleConstant(LocaleConstant localeConstant)
@@ -90,6 +120,9 @@ const std::string GetNameByLocaleConstant(LocaleConstant localeConstant)
     {
         return localeNames[localeConstant];
     }
+
+    if (localeConstant < GetTotalLocales())
+        return customLocaleNames[localeConstant - TOTAL_LOCALES];
 
     return "enUS"; // Default value for unsupported or invalid LocaleConstant
 }

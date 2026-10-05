@@ -158,7 +158,7 @@ struct LinkValidator<LinkTags::item>
         if (data.IsBuggedInspectLink) /* DBC lookup will have failed on the client, so the link should've arrived without suffix */
             randomSuffixes = nullptr;
 
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+        for (uint8 i = 0; i < GetTotalLocales(); ++i)
         {
             if (!locale && i != DEFAULT_LOCALE)
                 continue;
@@ -169,13 +169,19 @@ struct LinkValidator<LinkTags::item>
 
             if (randomSuffixes)
             {
-                std::string_view randomSuffix((*randomSuffixes)[i]);
-                if ((!randomSuffix.empty()) &&
-                  (text.length() == (name.length() + 1 + randomSuffix.length())) &&
-                  (text.substr(0, name.length()) == name) &&
-                  (text[name.length()] == ' ') &&
-                  (text.substr(name.length() + 1) == randomSuffix))
-                    return true;
+                // A registered locale has no DBC strings, clients append the suffix of their DBC locale
+                uint8 first = (i < TOTAL_LOCALES) ? i : 0;
+                uint8 last = (i < TOTAL_LOCALES) ? i : TOTAL_LOCALES - 1;
+                for (uint8 dbcLocale = first; dbcLocale <= last; ++dbcLocale)
+                {
+                    std::string_view randomSuffix((*randomSuffixes)[dbcLocale]);
+                    if ((!randomSuffix.empty()) &&
+                      (text.length() == (name.length() + 1 + randomSuffix.length())) &&
+                      (text.substr(0, name.length()) == name) &&
+                      (text[name.length()] == ' ') &&
+                      (text.substr(name.length() + 1) == randomSuffix))
+                        return true;
+                }
             }
             else if (text == name)
                 return true;
@@ -204,7 +210,7 @@ struct LinkValidator<LinkTags::quest>
         if (!locale)
             return false;
 
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+        for (uint8 i = 0; i < GetTotalLocales(); ++i)
         {
             if (i == DEFAULT_LOCALE)
                 continue;

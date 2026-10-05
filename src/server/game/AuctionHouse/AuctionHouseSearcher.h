@@ -28,6 +28,7 @@
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 struct ItemTemplate;
 
@@ -65,7 +66,7 @@ struct AuctionEntryItemEnchants
 
 struct SearchableAuctionEntryItem
 {
-    std::wstring itemName[TOTAL_LOCALES];
+    std::vector<std::wstring> itemName; // one per locale, see SearchableAuctionEntry::SetItemNames
     uint32 entry;
     AuctionEntryItemEnchants enchants[MAX_INSPECTED_ENCHANTMENT_SLOT];
     int32 randomPropertyId;
@@ -73,6 +74,12 @@ struct SearchableAuctionEntryItem
     uint32 count;
     int32 spellCharges;
     ItemTemplate const* itemTemplate;
+
+    // A locale registered after the names were built has no entry of its own
+    std::wstring const& GetItemName(int loc_idx) const
+    {
+        return itemName[std::size_t(loc_idx) < itemName.size() ? loc_idx : DEFAULT_LOCALE];
+    }
 };
 
 struct SearchableAuctionEntry

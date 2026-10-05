@@ -342,7 +342,7 @@ public:
     static bool HandleServerMotdCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage(LANG_MOTD_CURRENT);
-        for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
+        for (uint32 i = 0; i < GetTotalLocales(); ++i)
             handler->PSendSysMessage(LANG_GENERIC_TWO_CURLIES_WITH_COLON, GetNameByLocaleConstant(LocaleConstant(i)), sMotdMgr->GetMotd(LocaleConstant(i)));
         return true;
     }

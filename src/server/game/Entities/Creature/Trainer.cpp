@@ -32,6 +32,7 @@ namespace Trainer
 
     Trainer::Trainer(uint32 trainerId, Type type, uint32 requirement, std::string greeting, std::vector<Spell> spells) : _trainerId(trainerId), _type(type), _requirement(requirement), _spells(std::move(spells))
     {
+        _greeting.resize(GetTotalLocales());
         _greeting[DEFAULT_LOCALE] = std::move(greeting);
     }
 
@@ -263,7 +264,7 @@ namespace Trainer
 
     std::string const& Trainer::GetGreeting(LocaleConstant locale) const
     {
-        if (_greeting[locale].empty())
+        if (std::size_t(locale) >= _greeting.size() || _greeting[locale].empty())
             return _greeting[DEFAULT_LOCALE];
 
         return _greeting[locale];
@@ -271,6 +272,9 @@ namespace Trainer
 
     void Trainer::AddGreetingLocale(LocaleConstant locale, std::string greeting)
     {
+        if (std::size_t(locale) >= _greeting.size())
+            return;
+
         _greeting[locale] = std::move(greeting);
     }
 }
