@@ -28,6 +28,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
+#include "GossipDef.h"
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -918,6 +919,15 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
         KickPlayer("WorldSession::DisallowHyperlinksAndMaybeKick Illegal chat link");
 
     return false;
+}
+
+void WorldSession::SetSessionDbLocaleIndex(LocaleConstant locale)
+{
+    m_sessionDbLocaleIndex = locale < GetTotalLocales() ? locale : DEFAULT_LOCALE;
+
+    // the gossip menu of the player keeps its own copy of the locale
+    if (_player && _player->PlayerTalkClass)
+        _player->PlayerTalkClass->GetGossipMenu().SetLocale(m_sessionDbLocaleIndex);
 }
 
 std::string WorldSession::GetAcoreString(uint32 entry) const
