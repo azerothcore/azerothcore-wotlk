@@ -1,8 +1,9 @@
 --
 SET @TASKMASTER := 17058;
 SET @BRUTE := 16938;
+SET @GEOMANCER := 16937;
 
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (@TASKMASTER, @BRUTE) AND `source_type` = 0;
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN (@TASKMASTER, @BRUTE, @GEOMANCER) AND `source_type` = 0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (1693800, 1693801) AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (@TASKMASTER, 0, 0, 0, 2, 0, 100, 1, 0, 20, 0, 0, 0, 0, 11, 34186, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidari Taskmaster - Between 0-20% Health - Cast ''Haste Other'' (No Repeat)'),
@@ -10,7 +11,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@TASKMASTER, 0, 2, 4, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidari Taskmaster - On Aggro - Say Line 1'),
 (@TASKMASTER, 0, 3, 0, 1, 0, 100, 0, 15000, 60000, 45000, 90000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Illidari Taskmaster - Out of Combat - Say Line 0'),
 (@TASKMASTER, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 16938, 20, 0, 0, 0, 0, 0, 0, 'Illidari Taskmaster - On Aggro - Set Data 1 1 (Dreghood Brute)'),
-(@TASKMASTER, 0, 5, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 19, 16938, 20, 0, 0, 0, 0, 0, 0, 'Illidari Taskmaster - On Death - Set Data 2 2 (Dreghood Brute)'),
+(@TASKMASTER, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 19, 16938, 20, 0, 0, 0, 0, 0, 0, 'Illidari Taskmaster - On Death - Set Data 2 2 (Dreghood Brute)'),
+(@TASKMASTER, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 3, 3, 0, 0, 0, 0, 9, 16937, 0, 20, 1, 0, 0, 0, 0, 'Illidari Taskmaster - On Death - Set Data 3 3 (Dreghood Geomancers)'),
 (@BRUTE, 0, 0, 0, 0, 0, 75, 0, 8000, 8000, 10000, 10000, 0, 0, 11, 31553, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - In Combat - Cast ''Hamstring'''),
 (@BRUTE, 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Data 1 1 Set - Say Line 0'),
 (@BRUTE, 0, 2, 3, 38, 0, 100, 0, 2, 2, 0, 0, 0, 0, 117, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Data 2 2 Set - Disable Evade'),
@@ -26,15 +28,23 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@BRUTE, 0, 12, 13, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Data 3 3 Set - Stop Combat'),
 (@BRUTE, 0, 13, 14, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 94, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Data 3 3 Set - Set Faction 94'),
 (@BRUTE, 0, 14, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 1693801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Data 3 3 Set - Run Script'),
+(@GEOMANCER, 0, 0, 0, 23, 0, 100, 0, 32734, 0, 5000, 10000, 0, 0, 11, 32734, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Geomancer - On Aura ''Earth Shield'' Missing - Cast ''Earth Shield'''),
+(@GEOMANCER, 0, 1, 0, 0, 0, 75, 0, 500, 500, 5000, 5000, 0, 0, 11, 34083, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Geomancer - In Combat - Cast ''Fireball'''),
+(@GEOMANCER, 0, 2, 3, 38, 0, 100, 0, 3, 3, 0, 0, 0, 0, 117, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Geomancer - On Data 3 3 Set - Disable Evade'),
+(@GEOMANCER, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 36, 20157, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Geomancer - On Data 3 3 Set - Update Template To ''Fleeing Dreghood Geomancer'''),
+(@GEOMANCER, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Geomancer - On Data 3 3 Set - Set ReactState Defensive'),
+(@GEOMANCER, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Geomancer - On Data 3 3 Set - Stop Combat'),
+(@GEOMANCER, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 94, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Geomancer - On Data 3 3 Set - Set Faction 94'),
+(@GEOMANCER, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 1693801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Geomancer - On Data 3 3 Set - Run Script'),
 (1693800, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Script - Say Line 0'),
 (1693800, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Script - Start Random Movement'),
 (1693800, 9, 2, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -613.5, 4800.21, 38.24, 0, 'Dreghood Brute - On Script - Move To Position'),
 (1693800, 9, 3, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Script - Despawn'),
-(1693801, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 89, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Script - Start Random Movement'),
-(1693801, 9, 1, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -613.5, 4800.21, 38.24, 0, 'Dreghood Brute - On Script - Move To Position'),
-(1693801, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood Brute - On Script - Despawn');
+(1693801, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 89, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood - On Script - Start Random Movement'),
+(1693801, 9, 1, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -613.5, 4800.21, 38.24, 0, 'Dreghood - On Script - Move To Position'),
+(1693801, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dreghood - On Script - Despawn');
 
-DELETE FROM `creature_formations` WHERE `leaderGUID` IN (59451, 59452, 59453, 59454, 59455, 59456, 59457, 59458, 59459, 59460, 59462, 59463, 59464);
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (59461, 59451, 59452, 59453, 59454, 59455, 59456, 59457, 59458, 59459, 59460, 59462, 59463, 59464);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (59451, 59451, 0, 0, 3, 0, 0),
 (59451, 58906, 0, 0, 3, 0, 0),
@@ -75,4 +85,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (59460, 58925, 0, 0, 3, 0, 0),
 (59457, 59457, 0, 0, 3, 0, 0),
 (59457, 58924, 0, 0, 3, 0, 0),
-(59457, 58923, 0, 0, 3, 0, 0);
+(59457, 58923, 0, 0, 3, 0, 0),
+(59461, 59461, 0, 0, 3, 0, 0),
+(59461, 58902, 3, 60, 515, 0, 0),
+(59461, 58903, 3, 300, 515, 0, 0);
