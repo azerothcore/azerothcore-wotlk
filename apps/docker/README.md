@@ -48,7 +48,7 @@ already imported** (`acore_auth`, `acore_world`, `acore_characters`, by the
 `worldserver`/`authserver` images). It boots instantly — there is no
 multi-minute import on first run. It is meant for quick-start, dev, ephemeral
 test fixtures, and demos, **not production**. The download is a few hundred MB;
-unpacked, the datadir is several GB on disk.
+unpacked, the datadir is about 1.2 GB on disk.
 
 ### Using it with docker compose
 
