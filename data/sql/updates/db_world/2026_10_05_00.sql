@@ -1,3 +1,4 @@
+-- DB update 2026_10_04_05 -> 2026_10_05_00
 -- The revelers default to neutral/friendly for Shattrath and the sniffed exceptions.
 UPDATE `creature_template` SET `faction` = 35 WHERE `entry` = 24484;
 
