@@ -5132,6 +5132,25 @@ void ObjectMgr::LoadQuests()
         Field* fields = result->Fetch();
 
         Quest* newQuest = new Quest(fields);
+
+        // a choice reward with zero quantity would be shown to the player but never given
+        bool hasZeroCountChoice = false;
+        for (uint8 j = 0; j < QUEST_REWARD_CHOICES_COUNT; ++j)
+        {
+            if (newQuest->RewardChoiceItemId[j] && !newQuest->RewardChoiceItemCount[j])
+            {
+                LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but `RewardChoiceItemCount{}` = 0, quest skipped.",
+                                 newQuest->GetQuestId(), j + 1, newQuest->RewardChoiceItemId[j], j + 1);
+                hasZeroCountChoice = true;
+            }
+        }
+
+        if (hasZeroCountChoice)
+        {
+            delete newQuest;
+            continue;
+        }
+
         _questTemplates[newQuest->GetQuestId()] = newQuest;
     } while (result->NextRow());
 
@@ -5605,13 +5624,6 @@ void ObjectMgr::LoadQuests()
                     LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but item with entry {} does not exist, quest will not reward this item.",
                                      qinfo->GetQuestId(), j + 1, id, id);
                     qinfo->RewardChoiceItemId[j] = 0;          // no changes, quest will not reward this
-                }
-
-                if (!qinfo->RewardChoiceItemCount[j])
-                {
-                    LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but `RewardChoiceItemCount{}` = 0, quest can't be done.",
-                                     qinfo->GetQuestId(), j + 1, id, j + 1);
-                    // no changes, quest can't be done
                 }
             }
             else if (qinfo->RewardChoiceItemCount[j] > 0)
