@@ -12,3 +12,26 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (@NATASHA, 0, 2, 'Antelarion, is it safe to play in the forest yet?', 12, 0, 100, 6, 0, 0, 20357, 0, 'Natasha'),
 (@NATASHA, 0, 3, 'I think I came from Eng-land, do you know where that is?', 12, 0, 100, 5, 0, 0, 20358, 0, 'Natasha'),
 (@NATASHA, 0, 4, 'Antelarion says I fell off a big bird, as I fell he caught me... He is so pretty!', 12, 0, 100, 0, 0, 0, 20360, 0, 'Natasha');
+
+SET @ANTELARION := 77716;
+SET @PATH := @ANTELARION * 10;
+UPDATE `creature` SET `wander_distance` = 0, `currentwaypoint` = 0, `MovementType` = 2 WHERE `guid` = @ANTELARION AND `id` = 22127;
+DELETE FROM `creature_addon` WHERE `guid` = @ANTELARION;
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(@ANTELARION, @PATH, 0, 0, 1, 0, 0, NULL);
+DELETE FROM `waypoint_data` WHERE `id` = @PATH;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
+(@PATH, 1, 2965.87, 5451.4, 144.6, NULL, 0),
+(@PATH, 2, 2989.8, 5444.5, 144.755, NULL, 0),
+(@PATH, 3, 3012.29, 5452.81, 145.825, NULL, 0),
+(@PATH, 4, 3024.48, 5468.78, 146.622, NULL, 0),
+(@PATH, 5, 3025.23, 5486.21, 146.245, NULL, 0),
+(@PATH, 6, 3015.91, 5508.87, 145.675, NULL, 0),
+(@PATH, 7, 2993.65, 5520.81, 147.527, NULL, 0),
+(@PATH, 8, 2964.14, 5506.05, 143.722, NULL, 0),
+(@PATH, 9, 2954.42, 5477.45, 143.748, NULL, 0);
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` = @ANTELARION;
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
+(@ANTELARION, @ANTELARION, 0, 0, 512, 0, 0),
+(@ANTELARION, 78841, 3, 194, 512, 0, 0);
