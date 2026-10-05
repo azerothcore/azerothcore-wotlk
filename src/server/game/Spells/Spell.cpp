@@ -2405,7 +2405,8 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     if (checkIfValid)
     {
-        SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit, m_originalCaster);
+        SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit,
+            m_triggeredByAuraSpell ? m_originalCaster : nullptr);
         if (res != SPELL_CAST_OK)
             return;
     }
@@ -6084,7 +6085,8 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
     if (Unit* target = m_targets.GetUnitTarget())
     {
-        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false, m_originalCaster);
+        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false,
+            m_triggeredByAuraSpell ? m_originalCaster : nullptr);
         if (castResult != SPELL_CAST_OK)
             return castResult;
 

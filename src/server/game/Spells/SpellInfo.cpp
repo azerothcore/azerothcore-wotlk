@@ -1693,7 +1693,8 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
     {
         // can't assist player which is dueling someone, also for spells with generic unit targets (e.g. Devour Magic)
         // boarding a dueling player's passenger mount is not an assist
-        // owner is taken from the original caster, so a duelist's Prayer of Mending can still jump back to them
+        // owner is taken from the original caster of aura-triggered casts, so a duelist's Prayer of Mending can still
+        // jump back to them (spellclicks set the clicker as original caster, so they keep using the caster)
         Unit const* assistingUnit = originalCaster ? originalCaster : unitCaster;
         if (unitCaster && unitCaster != unitTarget && !HasAura(SPELL_AURA_CONTROL_VEHICLE))
             if (Player const* targetPlayerOwner = unitTarget->GetAffectingPlayer())
