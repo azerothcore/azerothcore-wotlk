@@ -1674,7 +1674,8 @@ bool SpellInfo::ValidateAttribute6SpellDamageMods(Unit const* caster, AuraEffect
     return !isDot && auraEffect && (auraEffect->GetAmount() < 0 || (auraEffect->GetCasterGUID() == caster->GetGUID() && auraEffect->GetSpellInfo()->SpellFamilyName == SpellFamilyName)) && !auraEffect->GetBase()->GetCastItemGUID();
 }
 
-SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject const* target, bool implicit) const
+SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject const* target, bool implicit,
+    Unit const* originalCaster) const
 {
     if (AttributesEx & SPELL_ATTR1_EXCLUDE_CASTER && caster == target)
         return SPELL_FAILED_BAD_TARGETS;
@@ -1692,10 +1693,12 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
     {
         // can't assist player which is dueling someone, also for spells with generic unit targets (e.g. Devour Magic)
         // boarding a dueling player's passenger mount is not an assist
+        // owner is taken from the original caster, so a duelist's Prayer of Mending can still jump back to them
+        Unit const* assistingUnit = originalCaster ? originalCaster : unitCaster;
         if (unitCaster && unitCaster != unitTarget && !HasAura(SPELL_AURA_CONTROL_VEHICLE))
             if (Player const* targetPlayerOwner = unitTarget->GetAffectingPlayer())
                 if (targetPlayerOwner->duel)
-                    if (Player const* casterPlayerOwner = unitCaster->GetAffectingPlayer())
+                    if (Player const* casterPlayerOwner = assistingUnit->GetAffectingPlayer())
                         if (casterPlayerOwner != targetPlayerOwner
                                 && !unitCaster->IsValidAttackTarget(unitTarget, this))
                             return SPELL_FAILED_TARGET_DUELING;
