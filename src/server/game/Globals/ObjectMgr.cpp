@@ -5139,8 +5139,9 @@ void ObjectMgr::LoadQuests()
         {
             if (newQuest->RewardChoiceItemId[j] && !newQuest->RewardChoiceItemCount[j])
             {
-                LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but `RewardChoiceItemCount{}` = 0, quest skipped.",
-                                 newQuest->GetQuestId(), j + 1, newQuest->RewardChoiceItemId[j], j + 1);
+                LOG_ERROR("sql.sql",
+                    "Quest {} has `RewardChoiceItemId{}` = {} but `RewardChoiceItemCount{}` = 0, quest skipped.",
+                    newQuest->GetQuestId(), j + 1, newQuest->RewardChoiceItemId[j], j + 1);
                 hasZeroCountChoice = true;
             }
         }
