@@ -271,7 +271,6 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr),
     m_detectionDistance(20.0f), _sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr),
     m_leash(nullptr), _leashRefreshSeen(0), _leashTicks(0), _leashSkipTick(false), _leashBroken(false),
-    _rangedAttackDistance(0.0f),
     _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _highestPlayerAttackerLevel(0), _isCombatMovementAllowed(true)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
@@ -3788,26 +3787,21 @@ void Creature::ClearLeash()
     _leashBroken = false;
 }
 
-// Moves the leash point to the attacker and restarts the count
-void Creature::RefreshLeash(WorldObject const* attacker)
+// Moves the leash point to where the creature stands and restarts the count
+void Creature::RefreshLeash()
 {
     CreatureLeash& leash = *GetLeashPtr();
-    if (attacker)
-        leash.Point.Relocate(attacker);
+    leash.Point.Relocate(this);
     ++leash.Refreshes;
 }
 
-// Fitted to TBC Classic sniffs: 6 up to level 32, one more every ~3.6 levels, 13 from level 57
-uint8 Creature::GetLeashTicks() const
+// Fitted to TBC Classic sniffs: level - 26 yards, at least 5, capped by the config (30 by default)
+float Creature::GetLeashRadius() const
 {
-    uint8 const level = GetLevel();
-    if (level <= 32)
-        return 6;
-
-    return std::min<uint8>(13, 6 + uint8((level - 32) * 0.28f + 0.5f));
+    return std::min(sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS), std::max(5.0f, GetLevel() - 26.0f));
 }
 
-// Every 1.6 s: counts ticks the victim spends outside the leash, skipping ticks under lost control
+// Every 1.6 s: counts ticks the creature spends outside the leash, skipping ticks under lost control
 void Creature::UpdateLeash(Unit const* victim)
 {
     if (!sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS) || IsInEvadeMode() || GetCharmerOrOwnerGUID().IsPlayer())
@@ -3838,25 +3832,20 @@ void Creature::UpdateLeash(Unit const* victim)
 
     if (IsWithinLeash(victim))
         _leashTicks = 0;
-    else if (_leashTicks < GetLeashTicks())
+    else if (_leashTicks < LEASH_TICKS)
         ++_leashTicks;
 
-    _leashBroken = _leashTicks >= GetLeashTicks();
+    _leashBroken = _leashTicks >= LEASH_TICKS;
 }
 
-// Victim stands still in reach, or is within the leash distance of the leash point
+// Victim stands still in melee reach, or the creature is within the leash radius of the leash point
 bool Creature::IsWithinLeash(Unit const* victim) const
 {
     bool const victimMoving = victim->isMoving() || !victim->movespline->Finalized();
-    // Ranged creatures reach from their chase distance
-    float const rangedReach = std::max(m_CombatDistance, _rangedAttackDistance);
-    bool const victimReached = IsWithinMeleeRange(victim)
-        || (rangedReach > 0.0f && IsWithinCombatRange(victim, rangedReach + CONTACT_DISTANCE));
-
-    if (!victimMoving && victimReached)
+    if (!victimMoving && IsWithinMeleeRange(victim))
         return true;
 
-    return victim->GetExactDist2d(&GetLeashPtr()->Point) <= sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
+    return GetExactDist2d(&GetLeashPtr()->Point) <= GetLeashRadius();
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const

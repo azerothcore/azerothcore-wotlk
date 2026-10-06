@@ -1269,10 +1269,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
             }
 
-            // Not DoT ticks or Thorns. After the threat, so a damage pull starts the leash at the attacker.
+            // Not DoT ticks or Thorns. After the threat, so a damage pull refreshes the leash it creates.
             if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer()
                 && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
-                victim->ToCreature()->RefreshLeash(attacker);
+                victim->ToCreature()->RefreshLeash();
         }
         else                                                // victim is a player
         {
@@ -11221,7 +11221,7 @@ void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
     // Swings and hostile spells (debuffs too) move the leash point; after engaging, like damage
     if (Creature* cTarget = target->ToCreature())
         if (cTarget->IsEngaged() && !cTarget->GetOwnerGUID().IsPlayer())
-            cTarget->RefreshLeash(this);
+            cTarget->RefreshLeash();
 
     // Patch 3.0.8: All player spells which cause a creature to become aggressive
     // to you will now also immediately cause the creature to be tapped.

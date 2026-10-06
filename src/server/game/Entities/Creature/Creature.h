@@ -43,7 +43,7 @@ class CreatureGroup;
 typedef std::vector<uint8> CreatureTextRepeatIds;
 typedef std::unordered_map<uint8, CreatureTextRepeatIds> CreatureTextRepeatGroup;
 
-// Position at aggro, moved to the last attacker
+// Creature's position at aggro, moved to where it was last attacked
 struct CreatureLeash
 {
     Position Point;
@@ -411,10 +411,8 @@ public:
     void SetLeashPtr(std::shared_ptr<CreatureLeash> const& leash);
     void ShareLeashWith(Creature* other);
     void ClearLeash();
-    void RefreshLeash(WorldObject const* attacker);
-    [[nodiscard]] uint8 GetLeashTicks() const;
-    // Distance the AI fights from at range; counts as reach for the leash
-    void SetRangedAttackDistance(float distance) { _rangedAttackDistance = distance; }
+    void RefreshLeash();
+    [[nodiscard]] float GetLeashRadius() const;
 
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
     void SetTextRepeatId(uint8 textGroup, uint8 id);
@@ -427,6 +425,7 @@ public:
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
     static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
     static constexpr uint32 LEASH_TICK_INTERVAL = 1600;
+    static constexpr uint8 LEASH_TICKS = 8;
     uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
     uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
     uint32 m_leashTickTime = LEASH_TICK_INTERVAL;
@@ -562,7 +561,6 @@ private:
     uint8 _leashTicks;
     bool _leashSkipTick;
     bool _leashBroken;
-    float _rangedAttackDistance;
 
     ObjectGuid m_cannotReachTarget;
 
