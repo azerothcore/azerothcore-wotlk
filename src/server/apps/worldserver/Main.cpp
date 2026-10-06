@@ -250,10 +250,7 @@ int main(int argc, char** argv)
         delete del;
     });
 
-    if (numThreads < 1)
-    {
-        numThreads = 1;
-    }
+    ASSERT(numThreads > 0);
 
     for (int i = 0; i < numThreads; ++i)
     {
