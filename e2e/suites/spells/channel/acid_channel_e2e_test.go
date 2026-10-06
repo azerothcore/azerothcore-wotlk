@@ -145,6 +145,20 @@ func newAcidFixture(t *testing.T, spell acidSpell, probePulls bool) *acidFixture
 		Prefix: "AcidCh", Count: 3, Race: e2eharness.RaceHuman,
 		Class: e2eharness.ClassWarrior, Level: 80,
 	})
+	// AC can keep disconnected players in the world for up to a minute. Move
+	// living bots out of the shared pad before NewScenario closes their sockets,
+	// or the next subtest's cone can hit a character from this subtest.
+	t.Cleanup(func() {
+		for _, bot := range bots {
+			if !bot.Alive() {
+				continue
+			}
+			if hp, _ := bot.UnitHP(bot.GUID); hp > 0 {
+				bot.Teleport(t, -8885.47, 575.48, 92.84, 0) // Stormwind entrance
+				bot.WaitNear(t, -8885.47, 575.48, 92.84, 2, 5*time.Second)
+			}
+		}
+	})
 	f := &acidFixture{spell: spell, tank: bots[0], aim: bots[1], probe: bots[2], logs: &acidDamageLog{}}
 	pad := e2eharness.PackagePad(t)
 	e2eharness.TeleportAllPad(t, bots, pad)
