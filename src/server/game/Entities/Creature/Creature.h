@@ -412,6 +412,7 @@ public:
     void ShareLeashWith(Creature* other);
     void ClearLeash();
     void RefreshLeash();
+    [[nodiscard]] uint8 GetLeashTicks() const;
     [[nodiscard]] float GetLeashRadius() const;
 
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
@@ -425,7 +426,6 @@ public:
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
     static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
     static constexpr uint32 LEASH_TICK_INTERVAL = 1600;
-    static constexpr uint8 LEASH_TICKS = 8;
     uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
     uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
     uint32 m_leashTickTime = LEASH_TICK_INTERVAL;

@@ -3795,10 +3795,18 @@ void Creature::RefreshLeash()
     ++leash.Refreshes;
 }
 
-// Fitted to TBC Classic sniffs: level - 26 yards, at least 5, capped by the config (30 by default)
+// Leash ticks and radius fitted to TBC Classic sniffs
+uint8 Creature::GetLeashTicks() const
+{
+    uint8 const level = GetLevel();
+    return level < 35 ? 6 : level < 50 ? 8 : 9;
+}
+
+// 3/4 yard per level from level 27 (5 yd), capped by the config (25 yd from level 54 by default)
 float Creature::GetLeashRadius() const
 {
-    return std::min(sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS), std::max(5.0f, GetLevel() - 26.0f));
+    float const radius = std::max(5.0f, (GetLevel() - 20) * 0.75f);
+    return std::min(sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS), radius);
 }
 
 // Every 1.6 s: counts ticks the creature spends outside the leash, skipping ticks under lost control
@@ -3832,10 +3840,10 @@ void Creature::UpdateLeash(Unit const* victim)
 
     if (IsWithinLeash(victim))
         _leashTicks = 0;
-    else if (_leashTicks < LEASH_TICKS)
+    else if (_leashTicks < GetLeashTicks())
         ++_leashTicks;
 
-    _leashBroken = _leashTicks >= LEASH_TICKS;
+    _leashBroken = _leashTicks >= GetLeashTicks();
 }
 
 // Victim stands still in melee reach, or the creature is within the leash radius of the leash point
