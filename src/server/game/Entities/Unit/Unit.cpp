@@ -11219,6 +11219,12 @@ void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
     if (Unit* myOwner = GetCharmerOrOwner())
         target->EngageWithTarget(myOwner);
 
+    // Hostile spells, debuffs like Curse of Weakness included, and melee swings move the leash point
+    // like damage does. After engaging, so that a pull starts the leash at the attacker.
+    if (Creature* cTarget = target->ToCreature())
+        if (cTarget->IsEngaged() && !cTarget->GetOwnerGUID().IsPlayer())
+            cTarget->RefreshLeash(this);
+
     // Patch 3.0.8: All player spells which cause a creature to become aggressive
     // to you will now also immediately cause the creature to be tapped.
     if (Creature* creature = target->ToCreature())

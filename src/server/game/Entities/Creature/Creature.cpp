@@ -2740,7 +2740,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
             return true;
 
         // An engaged creature leashes by ticks (UpdateLeash), not by distance from home.
-        // One whose leash broke without evading takes its victims back after any direct damage,
+        // One whose leash broke without evading takes its victims back once it is attacked again,
         // or once a victim is within its leash again.
         if (IsEngaged())
             return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen || IsWithinLeash(victim);
@@ -3791,8 +3791,8 @@ void Creature::ClearLeash()
     _leashBroken = false;
 }
 
-// Damage moves the leash point to where the attacker stands and restarts the count, which is
-// what lets a hunter kite a creature anywhere.
+// Damage, hostile spells and melee swings move the leash point to where the attacker stands and
+// restart the count, which is what lets a hunter kite a creature anywhere.
 void Creature::RefreshLeash(WorldObject const* attacker)
 {
     CreatureLeash& leash = *GetLeashPtr();

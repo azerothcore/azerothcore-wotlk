@@ -43,7 +43,7 @@ class CreatureGroup;
 typedef std::vector<uint8> CreatureTextRepeatIds;
 typedef std::unordered_map<uint8, CreatureTextRepeatIds> CreatureTextRepeatGroup;
 
-// Where a creature's leash is measured from: its position at aggro, then wherever it last took damage from.
+// Where a creature's leash is measured from: its position at aggro, then wherever it was last attacked from.
 struct CreatureLeash
 {
     Position Point;
