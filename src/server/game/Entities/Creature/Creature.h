@@ -412,6 +412,8 @@ public:
     void ClearLeash();
     void RefreshLeash(WorldObject const* attacker);
     [[nodiscard]] uint8 GetLeashTicks() const;
+    // Distance the AI keeps from its victim while fighting at range (0 in melee); counts as reach for the leash
+    void SetRangedAttackDistance(float distance) { _rangedAttackDistance = distance; }
 
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
     void SetTextRepeatId(uint8 textGroup, uint8 id);
@@ -558,6 +560,7 @@ private:
     uint8 _leashTicks;
     bool _leashSkipTick;
     bool _leashBroken;
+    float _rangedAttackDistance;
 
     ObjectGuid m_cannotReachTarget;
 

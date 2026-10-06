@@ -1271,7 +1271,8 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
             // DoT ticks and passive damage (e.g. Thorns) do not refresh the leash.
             // After the threat, so that a damage pull engages first and the leash starts at the attacker.
-            if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
+            if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer()
+                && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
                 victim->ToCreature()->RefreshLeash(attacker);
         }
         else                                                // victim is a player
@@ -7181,13 +7182,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
     }
 
-    // Share leash with controlled unit
-    if (controlledCreatureWithSameVictim)
-        creature->SetLeashPtr(controlledCreatureWithSameVictim->GetLeashPtr());
-    // Share leash with owner
-    else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
-        creature->SetLeashPtr(ownerCreature->GetLeashPtr());
-
     // Player-controlled creatures (pets, charms) enter combat on contact instead
     // (melee swing execution or spell launch/hit, see Unit::AtTargetAttacked).
     // Non-controllable guardians (e.g. Shaman Elementals, Infernal) have no attack
@@ -7210,6 +7204,13 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
             SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         }
     }
+
+    // Share leash with controlled unit. After engaging, which gives the creature a leash of its own.
+    if (controlledCreatureWithSameVictim)
+        creature->SetLeashPtr(controlledCreatureWithSameVictim->GetLeashPtr());
+    // Share leash with owner
+    else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
+        creature->SetLeashPtr(ownerCreature->GetLeashPtr());
 
     // delay offhand weapon attack by 50% of the base attack time
     if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))

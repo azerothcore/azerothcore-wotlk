@@ -268,8 +268,10 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_alreadyCallForHelp(false), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _gossipMenuId(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
-    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f),_sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), m_leash(nullptr),
-    _leashRefreshSeen(0), _leashTicks(0), _leashSkipTick(false), _leashBroken(false),
+    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr),
+    m_detectionDistance(20.0f), _sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr),
+    m_leash(nullptr), _leashRefreshSeen(0), _leashTicks(0), _leashSkipTick(false), _leashBroken(false),
+    _rangedAttackDistance(0.0f),
     _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _highestPlayerAttackerLevel(0), _isCombatMovementAllowed(true)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
@@ -2739,9 +2741,14 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
             if (HasTauntAura())
                 return true;
 
-            // An engaged creature leashes on its AI tick (UpdateLeash), not by distance from home
+            // An engaged creature leashes by ticks (UpdateLeash), not by distance from home.
+            // Damage since the leash broke gives it a new leash point (see UpdateLeash).
             if (IsEngaged())
-                return !_leashBroken;
+                return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen;
+
+            // A creature that was attacked fights back, wherever its home is
+            if (IsInCombatWith(victim))
+                return true;
         }
     }
 
@@ -3812,10 +3819,10 @@ uint8 Creature::GetLeashTicks() const
     return 6 + uint8((level - 32) * 0.28f + 0.5f);
 }
 
-// Runs on the creature's AI tick, every 1.62 s. Each tick its victim spends beyond the leash
-// distance from the leash point counts, whether walking away or standing where the creature
-// has not reached it yet; standing still within the creature's reach resets the count. Ticks
-// spent stunned, and the one after, are skipped.
+// Runs every 1.62 s while the creature has a victim. Each tick its victim spends beyond the
+// leash distance from the leash point counts, whether walking away or standing where the
+// creature has not reached it yet; standing still within the creature's reach resets the count.
+// Ticks spent stunned, and the one after, are skipped.
 void Creature::UpdateLeash(Unit const* victim)
 {
     float const leashDistance = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_DISTANCE);
@@ -3830,6 +3837,7 @@ void Creature::UpdateLeash(Unit const* victim)
     {
         _leashRefreshSeen = leash.Refreshes;
         _leashTicks = 0;
+        _leashBroken = false;
     }
 
     if (HasUnitState(UNIT_STATE_LOST_CONTROL))
@@ -3845,8 +3853,10 @@ void Creature::UpdateLeash(Unit const* victim)
     }
 
     bool const victimMoving = victim->isMoving() || !victim->movespline->Finalized();
+    // A ranged creature reaches its victim from the distance it chases at
+    float const rangedReach = std::max(m_CombatDistance, _rangedAttackDistance);
     bool const victimReached = IsWithinMeleeRange(victim)
-        || (m_CombatDistance > 0.0f && IsWithinCombatRange(victim, m_CombatDistance));
+        || (rangedReach > 0.0f && IsWithinCombatRange(victim, rangedReach + CONTACT_DISTANCE));
 
     if (!victimMoving && victimReached)
         _leashTicks = 0;

@@ -84,6 +84,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     _currentRangeMode = false;
     _attackDistance = 0.f;
+    me->SetRangedAttackDistance(0.0f);
     _mainSpellId = 0;
 }
 
@@ -1249,6 +1250,7 @@ void SmartAI::SetCurrentRangeMode(bool on, float range)
 {
     _currentRangeMode = on;
     _attackDistance = range;
+    me->SetRangedAttackDistance(on ? range : 0.0f);
 
     if (Unit* victim = me->GetVictim())
     {
@@ -1274,6 +1276,7 @@ void SmartAI::SetMainSpell(uint32 spellId)
     _mainSpellId = spellId;
     _attackDistance = std::max(maxRange - NOMINAL_MELEE_RANGE, 0.0f);
     _currentRangeMode = true;
+    me->SetRangedAttackDistance(_attackDistance);
 }
 
 void SmartAI::DistanceYourself(float range)
