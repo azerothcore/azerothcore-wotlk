@@ -153,7 +153,7 @@ void BattlegroundMgr::Update(uint32 diff)
     {
         m_NextPeriodicQueueUpdateTime = 5 * IN_MILLISECONDS;
 
-        LOG_TRACE("bg.arena", "BattlegroundMgr: UPDATING ARENA QUEUES");
+        LOG_TRACE("bg.arena", "BattlegroundMgr: UPDATING ARENA AND BATTLEGROUND QUEUES");
 
         // for rated arenas
         for (uint32 qtype = BATTLEGROUND_QUEUE_2v2; qtype < MAX_BATTLEGROUND_QUEUE_TYPES; ++qtype)
@@ -161,6 +161,19 @@ void BattlegroundMgr::Update(uint32 diff)
             for (uint32 bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
             {
                 m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(m_NextPeriodicQueueUpdateTime, BATTLEGROUND_AA, BattlegroundBracketId(bracket), BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId(qtype)), true, 0);
+            }
+        }
+
+        // for battlegrounds: a premade group whose PremadeGroupWaitForMatch has expired only moves to the normal queue
+        // when its queue is updated, so without this pass it waits for the next join, leave or battleground end
+        for (uint32 qtype = BATTLEGROUND_QUEUE_AV; qtype <= BATTLEGROUND_QUEUE_RB; ++qtype)
+        {
+            BattlegroundTypeId const bgTypeId = BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId(qtype));
+
+            for (uint32 bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
+            {
+                m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(m_NextPeriodicQueueUpdateTime, bgTypeId,
+                    BattlegroundBracketId(bracket), ARENA_TYPE_NONE, false, 0);
             }
         }
 
