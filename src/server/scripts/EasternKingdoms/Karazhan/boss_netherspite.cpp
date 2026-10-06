@@ -255,7 +255,28 @@ struct boss_netherspite : public BossAI
             return;
         }).Schedule(10s, BANISH_PHASE, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_NETHERBREATH, 0, 40.0f, true);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
+            {
+                // no facing on cast start, he keeps facing his victim until spell_netherspite_netherbreath turns him
+                me->CastSpell(target, SPELL_NETHERBREATH, TRIGGERED_IGNORE_SET_FACING);
+                // client faces the target field over SetFacingTo, so clear it for the cast
+                me->SetTarget();
+                // without a target the client falls back to its last facing update, stale on the phase's first breath
+                if (Unit* victim = me->GetVictim())
+                    me->SetFacingTo(me->GetAngle(victim));
+                // not in BANISH_PHASE, must still run if the phase ends first
+                scheduler.Schedule(3500ms, [this](TaskContext)
+                {
+                    if (Unit* victim = me->GetVictim())
+                    {
+                        // root blocks the core from turning him back, and the client keeps the breath's facing
+                        float angle = me->GetAngle(victim);
+                        me->SetOrientation(angle);
+                        me->SetFacingTo(angle);
+                        me->SetTarget(victim->GetGUID());
+                    }
+                });
+            }
             context.Repeat(5s, 7s);
         });
 
