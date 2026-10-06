@@ -51,33 +51,29 @@ public:
         return GetCullingOfStratholmeAI<boss_infinite_corruptorAI>(creature);
     }
 
-    struct boss_infinite_corruptorAI : public ScriptedAI
+    struct boss_infinite_corruptorAI : public BossAI
     {
-        boss_infinite_corruptorAI(Creature* c) : ScriptedAI(c), summons(me)
+        boss_infinite_corruptorAI(Creature* creature) : BossAI(creature, BOSS_INFINITE_CORRUPTOR)
         {
         }
 
-        EventMap events;
-        SummonList summons;
         uint32 beamTimer;
 
         void Reset() override
         {
-            events.Reset();
-            summons.DespawnAll();
-            if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (pInstance->GetData(DATA_GUARDIANTIME_EVENT) == 0)
-                    me->DespawnOrUnsummon(500ms);
+            _Reset();
+            if (instance->GetData(DATA_GUARDIANTIME_EVENT) == 0)
+                me->DespawnOrUnsummon(500ms);
 
             me->SummonCreature(NPC_TIME_RIFT, 2337.6f, 1270.0f, 132.95f, 2.79f);
             me->SummonCreature(NPC_GUARDIAN_OF_TIME, 2319.3f, 1267.7f, 132.8f, 1.0f);
             beamTimer = 1;
         }
 
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
-
         void JustEngagedWith(Unit* /*who*/) override
         {
+            // Optional boss off the escort route: skip _JustEngagedWith so its zone combat pulse doesn't pull players still on the event
+            instance->SetBossState(BOSS_INFINITE_CORRUPTOR, IN_PROGRESS);
             me->InterruptNonMeleeSpells(false);
             events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8s);
             events.ScheduleEvent(EVENT_SPELL_CORRUPTING_BLIGHT, 12s);
@@ -104,11 +100,10 @@ public:
                 }
             }
 
-            if (InstanceScript* pInstance = me->GetInstanceScript())
-            {
-                pInstance->SetData(DATA_SHOW_INFINITE_TIMER, 0);
-                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CORRUPTING_BLIGHT);
-            }
+            // Not _JustDied: it despawns the summons right away, cutting the Guardian's thanks and the delayed despawns above
+            instance->SetBossState(BOSS_INFINITE_CORRUPTOR, DONE);
+            instance->SetData(DATA_SHOW_INFINITE_TIMER, 0);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CORRUPTING_BLIGHT);
         }
 
         void DoAction(int32 param) override
@@ -119,6 +114,7 @@ public:
             if (param == ACTION_RUN_OUT_OF_TIME)
             {
                 Talk(SAY_FAIL);
+                instance->SetBossState(BOSS_INFINITE_CORRUPTOR, FAIL);
                 summons.DespawnAll();
                 me->DespawnOrUnsummon(500ms);
             }

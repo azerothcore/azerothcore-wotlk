@@ -58,22 +58,22 @@ public:
         return GetCullingOfStratholmeAI<boss_epochAI>(creature);
     }
 
-    struct boss_epochAI : public ScriptedAI
+    struct boss_epochAI : public BossAI
     {
-        boss_epochAI(Creature* c) : ScriptedAI(c)
+        boss_epochAI(Creature* creature) : BossAI(creature, BOSS_EPOCH)
         {
         }
 
-        EventMap events;
         uint8 warps;
         void Reset() override
         {
-            events.Reset();
+            _Reset();
             warps = 0;
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _JustEngagedWith();
             Talk(SAY_AGGRO);
 
             events.ScheduleEvent(EVENT_SPELL_CURSE_OF_EXERTION, 9s);
@@ -140,6 +140,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
+            _JustDied();
             Talk(SAY_DEATH);
         }
 
