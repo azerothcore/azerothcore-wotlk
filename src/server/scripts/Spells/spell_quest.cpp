@@ -2535,6 +2535,53 @@ class spell_q13413_wyrmrest_skytalon_ride_periodic : public AuraScript
     }
 };
 
+// 48268 - Container of Rats
+enum LetThemNotRise
+{
+    SPELL_SKELETAL_TRANSFORM    = 48255,
+    SPELL_SUMMON_RAT            = 48272,
+
+    DATA_EATEN_BY_RATS          = 1,
+
+    RAT_COUNT                   = 6
+};
+
+class spell_q12211_container_of_rats : public SpellScript
+{
+    PrepareSpellScript(spell_q12211_container_of_rats);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SKELETAL_TRANSFORM, SPELL_SUMMON_RAT });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Creature* corpse = GetHitCreature();
+        if (!corpse)
+            return;
+
+        // blocks a second use, cleared on respawn
+        if (CreatureAI* ai = corpse->AI())
+            ai->SetData(DATA_EATEN_BY_RATS, 1);
+
+        for (uint8 i = 0; i < RAT_COUNT; ++i)
+            corpse->CastSpell(corpse, SPELL_SUMMON_RAT, true);
+
+        // not cancelled if the corpse is removed, don't morph it after respawn
+        corpse->m_Events.AddEventAtOffset([corpse]()
+        {
+            if (!corpse->IsAlive())
+                corpse->CastSpell(corpse, SPELL_SKELETAL_TRANSFORM, true);
+        }, randtime(6900ms, 8600ms));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12211_container_of_rats::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_quest_spell_scripts()
 {
     RegisterSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator);
@@ -2609,4 +2656,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
     RegisterSpellScript(spell_q13413_wyrmrest_skytalon_ride_periodic);
+    RegisterSpellScript(spell_q12211_container_of_rats);
 }
