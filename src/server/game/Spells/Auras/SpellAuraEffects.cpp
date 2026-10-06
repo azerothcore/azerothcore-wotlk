@@ -4226,7 +4226,8 @@ void AuraEffect::HandleAuraModStat(AuraApplication const* aurApp, uint8 mode, bo
         if (GetMiscValue() < 0 || GetMiscValue() == i)
         {
             if (spellGroupVal)
-                target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(GetAmount()), !apply);
+                target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE,
+                    float(spellGroupVal), !apply);
 
             target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(GetAmount()), apply);
             if (target->IsPlayer() || target->IsPet())
