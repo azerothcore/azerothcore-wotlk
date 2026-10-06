@@ -2742,9 +2742,9 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
                 return true;
 
             // An engaged creature leashes by ticks (UpdateLeash), not by distance from home.
-            // Damage since the leash broke gives it a new leash point (see UpdateLeash).
+            // One whose leash broke without evading takes back a victim that damages it or returns.
             if (IsEngaged())
-                return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen;
+                return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen || IsWithinLeash(victim);
 
             // A creature that was attacked fights back, wherever its home is
             if (IsInCombatWith(victim))
@@ -3852,6 +3852,18 @@ void Creature::UpdateLeash(Unit const* victim)
         return;
     }
 
+    if (IsWithinLeash(victim))
+        _leashTicks = 0;
+    else if (_leashTicks < GetLeashTicks())
+        ++_leashTicks;
+
+    _leashBroken = _leashTicks >= GetLeashTicks();
+}
+
+// Whether a leash tick resets: the victim stands still within the creature's reach, or is within
+// the leash distance of the leash point.
+bool Creature::IsWithinLeash(Unit const* victim) const
+{
     bool const victimMoving = victim->isMoving() || !victim->movespline->Finalized();
     // A ranged creature reaches its victim from the distance it chases at
     float const rangedReach = std::max(m_CombatDistance, _rangedAttackDistance);
@@ -3859,14 +3871,9 @@ void Creature::UpdateLeash(Unit const* victim)
         || (rangedReach > 0.0f && IsWithinCombatRange(victim, rangedReach + CONTACT_DISTANCE));
 
     if (!victimMoving && victimReached)
-        _leashTicks = 0;
-    else if (victim->GetExactDist2d(&leash.Point) > leashDistance)
-        ++_leashTicks;
-    else
-        _leashTicks = 0;
+        return true;
 
-    if (_leashTicks >= GetLeashTicks())
-        _leashBroken = true;
+    return victim->GetExactDist2d(&GetLeashPtr()->Point) <= sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_DISTANCE);
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const

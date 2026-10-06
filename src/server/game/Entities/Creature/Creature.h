@@ -553,6 +553,7 @@ private:
     bool TriggerJustRespawned;
 
     void UpdateLeash(Unit const* victim);
+    [[nodiscard]] bool IsWithinLeash(Unit const* victim) const;
 
     // Shared between mobs who assist another: damaging one moves the leash point of all of them.
     mutable std::shared_ptr<CreatureLeash> m_leash;
