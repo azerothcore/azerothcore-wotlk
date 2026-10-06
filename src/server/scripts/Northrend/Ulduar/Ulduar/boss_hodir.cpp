@@ -392,12 +392,7 @@ struct boss_hodir : public BossAI
         if (!UpdateVictim())
         {
             if (me->IsInCombat())
-            {
-                Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                    itr->GetSource()->CastSpell(itr->GetSource(), SPELL_FLASH_FREEZE_INSTAKILL, true);
                 EnterEvadeMode();
-            }
             return;
         }
 

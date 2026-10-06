@@ -1365,56 +1365,6 @@ struct npc_brew_bubble : public NullCreatureAI
     }
 };
 
-enum BrewfestRevelerEnum
-{
-    FACTION_ALLIANCE    = 1934,
-    FACTION_HORDE       = 1935,
-
-    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE          = 44003,
-    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE        = 44004,
-    SPELL_BREWFEST_REVELER_TRANSFORM_BE                   = 43907,
-    SPELL_BREWFEST_REVELER_TRANSFORM_ORC                  = 43914,
-    SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN               = 43915,
-    SPELL_BREWFEST_REVELER_TRANSFORM_TROLL                = 43916,
-    SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD               = 43917,
-
-    SPELL_DRUNKEN_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE  = 44096
-};
-
-class spell_brewfest_reveler_transform : public AuraScript
-{
-    PrepareAuraScript(spell_brewfest_reveler_transform);
-
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        uint32 factionId = FACTION_ALLIANCE;
-        switch (m_scriptSpellId)
-        {
-            case SPELL_BREWFEST_REVELER_TRANSFORM_BE:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_ORC:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_TROLL:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD:
-                factionId = FACTION_HORDE;
-                break;
-            case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE:
-            case SPELL_DRUNKEN_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
-                factionId = FACTION_FRIENDLY;
-                break;
-            default:
-                break;
-        }
-
-        GetTarget()->SetFaction(factionId);
-    }
-
-    void Register() override
-    {
-        AfterEffectApply += AuraEffectApplyFn(spell_brewfest_reveler_transform::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class spell_brewfest_relay_race_force_cast : public SpellScript
 {
     PrepareSpellScript(spell_brewfest_relay_race_force_cast);
@@ -2080,7 +2030,6 @@ void AddSC_event_brewfest_scripts()
     RegisterSpellScript(spell_brewfest_unfill_keg);
     RegisterSpellScript(spell_brewfest_toss_mug);
     RegisterSpellScript(spell_brewfest_add_mug);
-    RegisterSpellScript(spell_brewfest_reveler_transform);
     RegisterSpellScript(spell_brewfest_relay_race_force_cast);
 
     // beer effect
