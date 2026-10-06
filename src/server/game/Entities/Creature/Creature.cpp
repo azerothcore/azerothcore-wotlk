@@ -2742,7 +2742,8 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
                 return true;
 
             // An engaged creature leashes by ticks (UpdateLeash), not by distance from home.
-            // One whose leash broke without evading takes back a victim that damages it or returns.
+            // One whose leash broke without evading takes its victims back after any direct damage,
+            // or once a victim is within its leash again.
             if (IsEngaged())
                 return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen || IsWithinLeash(victim);
 
@@ -3789,6 +3790,15 @@ void Creature::SetLeashPtr(std::shared_ptr<CreatureLeash> const& leash)
     m_leash = leash;
 }
 
+// Puts two creatures fighting together on one leash: the other's, unless damage has moved ours more often.
+void Creature::ShareLeashWith(Creature* other)
+{
+    if (other->GetLeashPtr()->Refreshes >= GetLeashPtr()->Refreshes)
+        SetLeashPtr(other->GetLeashPtr());
+    else
+        other->SetLeashPtr(GetLeashPtr());
+}
+
 void Creature::ClearLeash()
 {
     m_leash.reset();
@@ -3822,7 +3832,8 @@ uint8 Creature::GetLeashTicks() const
 // Runs every 1.62 s while the creature has a victim. Each tick its victim spends beyond the
 // leash distance from the leash point counts, whether walking away or standing where the
 // creature has not reached it yet; standing still within the creature's reach resets the count.
-// Ticks spent stunned, and the one after, are skipped.
+// Ticks spent stunned or otherwise out of control (fleeing, confused, ...), and the one after,
+// are skipped.
 void Creature::UpdateLeash(Unit const* victim)
 {
     float const leashDistance = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_DISTANCE);

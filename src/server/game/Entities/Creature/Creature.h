@@ -409,6 +409,7 @@ public:
     // Part of Evade mechanics
     std::shared_ptr<CreatureLeash> const& GetLeashPtr() const;
     void SetLeashPtr(std::shared_ptr<CreatureLeash> const& leash);
+    void ShareLeashWith(Creature* other);
     void ClearLeash();
     void RefreshLeash(WorldObject const* attacker);
     [[nodiscard]] uint8 GetLeashTicks() const;

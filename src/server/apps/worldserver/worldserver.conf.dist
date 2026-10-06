@@ -3009,7 +3009,8 @@ CreatureLeashRadius = 30
 #        Description: Distance (in yards) of an engaged creature's victim from the leash point (where
 #                     the fight started, or where its last direct damage came from) beyond which the
 #                     creature counts towards evading. It evades after a level-based number of 1.6 s
-#                     ticks spent beyond it. Standing still in the creature's reach restarts the count.
+#                     ticks spent beyond it. Coming back within it, or standing still in the creature's
+#                     reach, restarts the count.
 #                     Does not apply in dungeons or raids.
 #        Default:     18.5 - (Enabled)
 #                     0    - (Disabled, engaged creatures never leash)

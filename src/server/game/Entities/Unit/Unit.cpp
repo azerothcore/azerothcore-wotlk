@@ -7205,12 +7205,11 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
     }
 
-    // Share leash with controlled unit. After engaging, which gives the creature a leash of its own.
+    // Share leash with controlled unit or owner. After engaging, which gives the creature a leash of its own.
     if (controlledCreatureWithSameVictim)
-        creature->SetLeashPtr(controlledCreatureWithSameVictim->GetLeashPtr());
-    // Share leash with owner
+        creature->ShareLeashWith(controlledCreatureWithSameVictim);
     else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
-        creature->SetLeashPtr(ownerCreature->GetLeashPtr());
+        creature->ShareLeashWith(ownerCreature);
 
     // delay offhand weapon attack by 50% of the base attack time
     if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
