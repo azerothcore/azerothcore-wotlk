@@ -2996,16 +2996,6 @@ CreatureFamilyFleeAssistanceRadius = 30
 
 #
 #    CreatureLeashRadius
-#        Description: Distance (in yards) a creature can be from its home position and still start a
-#                     fight on its own. A world boss stops attacking once it is farther from home than
-#                     this. Other engaged creatures leash by CreatureLeashDistance instead.
-#        Default:     30 - (Enabled)
-#                     0  - (Disabled)
-
-CreatureLeashRadius = 30
-
-#
-#    CreatureLeashDistance
 #        Description: Distance (in yards) of an engaged creature's victim from the leash point (where
 #                     the fight started, or where its last direct damage came from) beyond which the
 #                     creature counts towards evading. It evades after a level-based number of 1.6 s
@@ -3013,9 +3003,9 @@ CreatureLeashRadius = 30
 #                     reach, restarts the count.
 #                     Does not apply in dungeons or raids.
 #        Default:     18.5 - (Enabled)
-#                     0    - (Disabled, engaged creatures never leash)
+#                     0    - (Disabled)
 
-CreatureLeashDistance = 18.5
+CreatureLeashRadius = 18.5
 
 #
 #    CreatureFamilyAssistanceRadius

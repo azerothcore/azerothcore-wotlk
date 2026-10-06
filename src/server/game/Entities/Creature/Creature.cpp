@@ -2735,22 +2735,15 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         if (!IsWithinDist(victim, visibility))
             return false;
 
-        if (!isWorldBoss())
-        {
-            // xinef: this should include taunt auras
-            if (HasTauntAura())
-                return true;
+        // xinef: this should include taunt auras
+        if (HasTauntAura())
+            return true;
 
-            // An engaged creature leashes by ticks (UpdateLeash), not by distance from home.
-            // One whose leash broke without evading takes its victims back after any direct damage,
-            // or once a victim is within its leash again.
-            if (IsEngaged())
-                return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen || IsWithinLeash(victim);
-
-            // A creature that was attacked fights back, wherever its home is
-            if (IsInCombatWith(victim))
-                return true;
-        }
+        // An engaged creature leashes by ticks (UpdateLeash), not by distance from home.
+        // One whose leash broke without evading takes its victims back after any direct damage,
+        // or once a victim is within its leash again.
+        if (IsEngaged())
+            return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen || IsWithinLeash(victim);
     }
 
     if (skipDistCheck)
@@ -2762,17 +2755,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         return victim->IsWithinDist(unit, visibilityDist);
     }
 
-    float dist = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
-    if (!dist)
-        return true;
-
-    float x, y, z;
-    x = y = z = 0.0f;
-    MovementGenerator* idleSlot = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE);
-    if (idleSlot && idleSlot->GetResetPosition(x, y, z))
-        return IsInDist2d(x, y, dist);
-    else
-        return IsInDist2d(&m_homePosition, dist);
+    return true;
 }
 
 CreatureAddon const* Creature::GetCreatureAddon() const
@@ -3829,15 +3812,14 @@ uint8 Creature::GetLeashTicks() const
     return 6 + uint8((level - 32) * 0.28f + 0.5f);
 }
 
-// Runs every 1.62 s while the creature has a victim. Each tick its victim spends beyond the
+// Runs every 1.6 s while the creature has a victim. Each tick its victim spends beyond the
 // leash distance from the leash point counts, whether walking away or standing where the
 // creature has not reached it yet; standing still within the creature's reach resets the count.
 // Ticks spent stunned or otherwise out of control (fleeing, confused, ...), and the one after,
 // are skipped.
 void Creature::UpdateLeash(Unit const* victim)
 {
-    float const leashDistance = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_DISTANCE);
-    if (!leashDistance || IsInEvadeMode() || isWorldBoss() || GetCharmerOrOwnerGUID().IsPlayer())
+    if (!sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS) || IsInEvadeMode() || GetCharmerOrOwnerGUID().IsPlayer())
         return;
 
     if (GetMap()->IsDungeon())
@@ -3884,7 +3866,7 @@ bool Creature::IsWithinLeash(Unit const* victim) const
     if (!victimMoving && victimReached)
         return true;
 
-    return victim->GetExactDist2d(&GetLeashPtr()->Point) <= sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_DISTANCE);
+    return victim->GetExactDist2d(&GetLeashPtr()->Point) <= sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const
