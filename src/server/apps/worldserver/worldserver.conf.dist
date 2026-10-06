@@ -2996,12 +2996,12 @@ CreatureFamilyFleeAssistanceRadius = 30
 
 #
 #    CreatureLeashRadius
-#        Description: Maximum distance (in yards) a creature can be from where the fight started, or
-#                     from where it was last attacked. The radius shrinks by 3/4 yd per level the
-#                     creature is below its victim, down to 5 yd, and is capped by this value. The
-#                     creature evades after 6, 8 or 9 ticks of 1.6 s beyond it (creature levels 1-34,
-#                     35-49, 50+); a tick with its victim standing still in melee range resets the
-#                     count. Not used in dungeons or raids.
+#        Description: Maximum distance (in yards) a creature can chase a moving victim from where the
+#                     fight started, or from where it was last attacked. The radius is 24 yd at the
+#                     victim's level, 3/4 yd less per level the creature is below it (at least 5 yd),
+#                     capped by this value. The creature evades after 10-16 s (by the same level
+#                     difference) beyond it, or unable to attack its victim. A victim standing still
+#                     where the creature attacks it resets the time. Not used in dungeons or raids.
 #        Default:     25 - (Enabled)
 #                     0  - (Disabled)
 

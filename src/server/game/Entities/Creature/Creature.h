@@ -412,7 +412,7 @@ public:
     void ShareLeashWith(Creature* other);
     void ClearLeash();
     void RefreshLeash();
-    [[nodiscard]] uint8 GetLeashTicks() const;
+    [[nodiscard]] uint32 GetLeashTime(Unit const* victim) const;
     [[nodiscard]] float GetLeashRadius(Unit const* victim) const;
 
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
@@ -425,10 +425,8 @@ public:
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
     static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
-    static constexpr uint32 LEASH_TICK_INTERVAL = 1600;
     uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
     uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
-    uint32 m_leashTickTime = LEASH_TICK_INTERVAL;
 
     [[nodiscard]] bool HasSwimmingFlagOutOfCombat() const
     {
@@ -552,14 +550,13 @@ private:
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
 
-    void UpdateLeash(Unit const* victim);
+    void UpdateLeash(Unit const* victim, uint32 diff);
     [[nodiscard]] bool IsWithinLeash(Unit const* victim) const;
 
     // Shared with assistants, pets and owner
     mutable std::shared_ptr<CreatureLeash> m_leash;
     uint32 _leashRefreshSeen;
-    uint8 _leashTicks;
-    bool _leashSkipTick;
+    uint32 _leashTimer;
     bool _leashBroken;
 
     ObjectGuid m_cannotReachTarget;
