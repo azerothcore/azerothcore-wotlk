@@ -867,8 +867,6 @@ void Creature::Update(uint32 diff)
                 }
                 else
                     m_moveCircleMovementTime -= diff;
-
-                UpdateLeash(victim, diff);
             }
 
             // Call for assistance if not disabled
@@ -901,6 +899,10 @@ void Creature::Update(uint32 diff)
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
             if (!IsAlive())
                 break;
+
+            // After the AI, so a spell it cast this update counts as attacking
+            if (Unit* victim = GetVictim())
+                UpdateLeash(victim, diff);
 
             m_regenTimer -= diff;
             if (m_regenTimer <= 0)
