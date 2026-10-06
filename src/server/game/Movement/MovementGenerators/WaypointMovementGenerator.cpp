@@ -242,7 +242,9 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature* creature, bool rel
         {
             uint32 idx = (i_currentNode + i) % i_path->Nodes.size();
             WaypointNode const& node = i_path->Nodes.at(idx);
-            init.Path().push_back(G3D::Vector3(node.X, node.Y, node.Z));
+            float newZ = node.Z;
+            creature->UpdateAllowedPositionZ(node.X, node.Y, newZ);
+            init.Path().push_back(G3D::Vector3(node.X, node.Y, newZ));
             segmentNodes++;
 
             // Stop the segment at a waypoint with a delay
@@ -260,7 +262,9 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature* creature, bool rel
             {
                 uint32 idx = (i_currentNode + i) % i_path->Nodes.size();
                 WaypointNode const& node = i_path->Nodes.at(idx);
-                init.Path().push_back(G3D::Vector3(node.X, node.Y, node.Z));
+                float newZ = node.Z;
+                creature->UpdateAllowedPositionZ(node.X, node.Y, newZ);
+                init.Path().push_back(G3D::Vector3(node.X, node.Y, newZ));
             }
         }
 
@@ -682,8 +686,6 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
     player->RemovePlayerFlag(PLAYER_FLAGS_TAXI_BENCHMARK);
 }
 
-#define PLAYER_FLIGHT_SPEED 32.0f
-
 void FlightPathMovementGenerator::DoReset(Player* player)
 {
     uint32 end = GetPathAtMapEnd();
@@ -711,7 +713,7 @@ void FlightPathMovementGenerator::DoReset(Player* player)
     }
     init.SetFirstPointId(GetCurrentNode());
     init.SetFly();
-    init.SetVelocity(PLAYER_FLIGHT_SPEED);
+    init.SetVelocity(sWorld->getFloatConfig(CONFIG_TAXI_FLIGHT_SPEED));
     init.Launch();
 }
 

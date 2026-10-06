@@ -279,7 +279,6 @@ jobs:
           fi
         continue-on-error: false
 
-
       - name: Test worldserver with startup scripts
         run: |
           ./acore.sh sm create world worldserver --bin-path ./env/dist/bin --provider pm2

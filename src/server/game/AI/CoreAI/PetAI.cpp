@@ -174,10 +174,19 @@ void PetAI::UpdateAI(uint32 diff)
             return;
         }
 
-        // Check before attacking to prevent pets from leaving stay position
-        if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
+        CharmInfo* charmInfo = me->GetCharmInfo();
+        // Deferred hostile casts pause their chase at cast range. Resume once movement cannot interrupt the cast.
+        if (!me->HasReactState(REACT_PASSIVE) && charmInfo->HasCommandState(COMMAND_FOLLOW) &&
+            charmInfo->IsCommandAttack() && charmInfo->IsAtStay() && !me->IsMovementPreventedByCasting())
         {
-            if (me->GetCharmInfo()->IsCommandAttack() || (me->GetCharmInfo()->IsAtStay() && me->IsWithinMeleeRange(me->GetVictim())))
+            if (StartChase(me->GetVictim()))
+                charmInfo->SetIsAtStay(false);
+        }
+
+        // Check before attacking to prevent pets from leaving stay position
+        if (charmInfo->HasCommandState(COMMAND_STAY))
+        {
+            if (charmInfo->IsCommandAttack() || (charmInfo->IsAtStay() && me->IsWithinMeleeRange(me->GetVictim())))
                 _doMeleeAttack();
         }
         else
@@ -350,6 +359,12 @@ void PetAI::UpdateAI(uint32 diff)
             me->AddSpellCooldown(spell->m_spellInfo->Id, 0, 0);
 
             spell->prepare(&targets);
+
+            // Stop the current spline before the next movement update can interrupt a stationary channel.
+            if (Pet* controlledPet = me->ToPet())
+                if (spell->m_spellInfo->IsChanneled() && !spell->m_spellInfo->IsActionAllowedChannel()
+                    && controlledPet->IsMovementPreventedByCasting())
+                    controlledPet->StopMoving();
         }
 
         // deleted cached Spell objects
@@ -632,14 +647,7 @@ void PetAI::DoAttack(Unit* target, bool chase)
             ClearCharmInfoFlags();
             me->GetCharmInfo()->SetIsCommandAttack(oldCmdAttack); // For passive pets commanded to attack so they will use spells
 
-            if (_canMeleeAttack())
-            {
-                std::optional<ChaseAngle> chaseAngle;
-                if (combatRange == 0.f && !target->IsPlayer() && !target->IsPet())
-                    chaseAngle.emplace(float(M_PI), float(M_PI_4));
-
-                me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, combatRange), chaseAngle);
-            }
+            StartChase(target);
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
@@ -650,6 +658,19 @@ void PetAI::DoAttack(Unit* target, bool chase)
             me->GetMotionMaster()->MoveIdle();
         }
     }
+}
+
+bool PetAI::StartChase(Unit* target)
+{
+    if (!target || target == me || me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) || !_canMeleeAttack())
+        return false;
+
+    std::optional<ChaseAngle> chaseAngle;
+    if (combatRange == 0.f && !target->IsPlayer() && !target->IsPet())
+        chaseAngle.emplace(float(M_PI), float(M_PI_4));
+
+    me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, combatRange), chaseAngle);
+    return true;
 }
 
 void PetAI::MovementInform(uint32 moveType, uint32 data)

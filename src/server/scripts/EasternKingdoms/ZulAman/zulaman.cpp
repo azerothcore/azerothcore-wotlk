@@ -240,7 +240,10 @@ struct npc_forest_frog : public ScriptedAI
 ## npc_zulaman_hostage
 ######*/
 
-#define GOSSIP_HOSTAGE1        "I am glad to help you."
+enum ZulAmanHostage
+{
+    GOSSIP_OPTION_HOSTAGE_FREE = 0
+};
 
 static uint32 HostageEntry[] = {23999, 23790, 24024, 24001};
 static uint32 ChestEntry[] = {187021, 186648, 186667, 186672};
@@ -282,7 +285,8 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HOSTAGE1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        uint32 const menuId = creature->GetCreatureTemplate()->GossipMenuId;
+        AddGossipItemFor(player, menuId, GOSSIP_OPTION_HOSTAGE_FREE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
@@ -299,7 +303,8 @@ public:
 
         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
-        creature->GetInstanceScript()->SetData(DATA_CHEST_LOOTED, 0);
+        if (InstanceScript* instance = creature->GetInstanceScript())
+            instance->SetData(DATA_CHEST_LOOTED, 0);
 
         float x, y, z;
         creature->GetPosition(x, y, z);

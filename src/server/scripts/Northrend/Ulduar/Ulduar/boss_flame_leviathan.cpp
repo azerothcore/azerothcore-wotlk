@@ -65,9 +65,12 @@ enum LeviathanSpells
     SPELL_TOWER_OF_LIFE                 = 64482,
 
     SPELL_HODIRS_FURY                   = 62533,
+    SPELL_HODIRS_FURY_STUN              = 62297,
     SPELL_FREYA_WARD                    = 62906, // removed spawn effect
     SPELL_MIMIRONS_INFERNO              = 62909,
+    SPELL_MIMIRONS_INFERNO_DAMAGE       = 62910,
     SPELL_THORIMS_HAMMER                = 62911,
+    SPELL_LASH                          = 65062,
 
     SPELL_FREYA_DUMMY_BLUE              = 63294,
     SPELL_FREYA_DUMMY_GREEN             = 63295,
@@ -96,12 +99,10 @@ enum GosNpcs
     NPC_FLAME_LEVIATHAN_TURRET          = 33139,
     NPC_SEAT                            = 33114,
     NPC_LIQUID                          = 33189,
+    NPC_POOL_OF_TAR                     = 33090,
 
     // Starting event
-    NPC_ULDUAR_COLOSSUS                 = 33237,
     NPC_BRANN_RADIO                     = 34054,
-    NPC_ULDUAR_GAUNTLET_GENERATOR       = 33571,
-    NPC_DEFENDER_GENERATED              = 33572,
 
     // Hard Mode
     NPC_THORIM_HAMMER_TARGET            = 33364,
@@ -126,6 +127,8 @@ enum Events
     EVENT_THORIMS_HAMMER                = 9,
     EVENT_SOUND_BEGINNING               = 10,
     EVENT_EJECT_PLAYERS                 = 11,
+    EVENT_CHECK_PLAYERS                 = 12,
+    EVENT_LASH                          = 13,
 };
 
 enum Texts
@@ -205,13 +208,23 @@ struct boss_flame_leviathan : public BossAI
     uint8 _overloadCircuitCount;
 
     // Custom
-    void BindPlayers();
     void RadioSay(uint8 textid);
     void ActivateTowers();
     void TurnGates(bool _start, bool _death);
     void TurnHealStations(bool _apply);
     void ScheduleEvents();
     void SummonTowerHelpers(uint8 towerId);
+
+    bool IsInCombatWithPlayer() const
+    {
+        return std::ranges::any_of(me->GetCombatManager().GetPvECombatRefs(),
+            [this](CombatReference* ref)
+            {
+                Player* player = ref->GetOther(me)->GetCharmerOrOwnerPlayerOrPlayerItself();
+                return player && player->IsAlive();
+            },
+            [](auto const& entry) { return entry.second; });
+    }
 
     void JustReachedHome() override
     {
@@ -222,7 +235,18 @@ struct boss_flame_leviathan : public BossAI
         me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
     }
 
-    void MoveInLineOfSight(Unit*) override {}
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        CreatureAI::EnterEvadeMode(why);
+    }
+
+    void MoveInLineOfSight(Unit* unit) override {
+        if (_startTimer || _speakTimer)
+            return;
+
+        BossAI::MoveInLineOfSight(unit);
+    }
+
     void JustSummoned(Creature* cr)  override
     {
         if (cr->GetEntry() != NPC_FLAME_LEVIATHAN_TURRET && cr->GetEntry() != NPC_SEAT)
@@ -254,7 +278,6 @@ struct boss_flame_leviathan : public BossAI
         ActivateTowers();
         instance->SetBossState(BOSS_LEVIATHAN, SPECIAL);
 
-        BindPlayers();
         me->SetInCombatWithZone();
 
         if (!_startTimer)
@@ -284,6 +307,9 @@ struct boss_flame_leviathan : public BossAI
         summons.DoAction(ACTION_DESPAWN_ADDS);
         summons.DespawnAll();
         events.Reset();
+
+        // The stun lasts 60s and is applied to dead players too, nothing else clears it once the fight ends
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_HODIRS_FURY_STUN);
 
         _shutdown = false;
         _startTimer = 1;
@@ -435,6 +461,13 @@ struct boss_flame_leviathan : public BossAI
                             if (Unit* player = seatVehicle->GetPassenger(SEAT_PLAYER))
                                 player->ExitVehicle();
                 return;
+            case EVENT_CHECK_PLAYERS:
+                // Empty vehicles keep the boss in combat
+                if (me->IsInCombat() && !IsInCombatWithPlayer())
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+                else
+                    events.Repeat(5s);
+                return;
         }
 
         if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
@@ -447,11 +480,6 @@ struct boss_flame_leviathan : public BossAI
         }
     }
 };
-
-void boss_flame_leviathan::BindPlayers()
-{
-    me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
-}
 
 void boss_flame_leviathan::RadioSay(uint8 textid)
 {
@@ -555,6 +583,7 @@ void boss_flame_leviathan::TurnHealStations(bool _apply)
 
 void boss_flame_leviathan::ScheduleEvents()
 {
+    events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
     events.RescheduleEvent(EVENT_MISSILE, 5s);
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);
@@ -597,8 +626,6 @@ void boss_flame_leviathan::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInf
 
         Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
     }
-    else if (spellInfo->Id == 62522 /*SPELL_ELECTROSHOCK*/)
-        me->InterruptNonMeleeSpells(false);
 }
 
 void boss_flame_leviathan::JustDied(Unit*)
@@ -607,13 +634,19 @@ void boss_flame_leviathan::JustDied(Unit*)
     summons.DoAction(ACTION_DESPAWN_ADDS);
     summons.DespawnAll();
 
+    std::list<Creature*> tarPools;
+    me->GetCreatureListWithEntryInGrid(tarPools, NPC_POOL_OF_TAR, 500.0f);
+    for (Creature* creature : tarPools)
+        creature->DespawnOrUnsummon();
+
+    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_HODIRS_FURY_STUN);
+
     instance->SetBossState(BOSS_LEVIATHAN, DONE);
     instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);
 
     Talk(FLAME_LEVIATHAN_SAY_DEATH);
 
     TurnGates(false, true);
-    BindPlayers();
 }
 
 void boss_flame_leviathan::KilledUnit(Unit* who)
@@ -715,37 +748,60 @@ struct boss_flame_leviathan_seat : public VehicleAI
 
     void AttackStart(Unit*) override { }
 
+    static bool ActivateTurret(Unit* seat, Unit* rider)
+    {
+        Vehicle* seatVehicle = seat->GetVehicleKit();
+        Unit* turretSeatUnit = seatVehicle ? seatVehicle->GetPassenger(SEAT_TURRET) : nullptr;
+        Creature* turret = turretSeatUnit ? turretSeatUnit->ToCreature() : nullptr;
+        if (!turret)
+            return false;
+
+        turret->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        turret->AI()->AttackStart(rider);
+        return true;
+    }
+
+    // In 25m, the rider activates a pair of seats out of the four. In 10m, the rider activates both seats out of the two.
+    bool ActivateTurrets(Unit* rider)
+    {
+        bool activated = ActivateTurret(me, rider);
+
+        if (Vehicle* leviathanVehicle = me->GetVehicle())
+        {
+            int8 const partnerSeatId = static_cast<int8>(me->GetTransSeat() ^ (me->GetMap()->Is25ManRaid() ? 2 : 1));
+            if (Unit* partnerSeat = leviathanVehicle->GetPassenger(partnerSeatId))
+                if (partnerSeat->GetEntry() == NPC_SEAT && ActivateTurret(partnerSeat, rider))
+                    activated = true;
+        }
+
+        return activated;
+    }
+
     void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
     {
-        if (!who->IsPlayer() || !me->GetVehicle())
+        if (!who->IsPlayer())
             return;
 
         who->ApplySpellImmune(63847, IMMUNITY_ID, 63847, apply); // SPELL_FLAME_VENTS_TRIGGER
         who->ApplySpellImmune(SPELL_MISSILE_BARRAGE, IMMUNITY_ID, SPELL_MISSILE_BARRAGE, apply);
         who->ApplySpellImmune(SPELL_BATTERING_RAM, IMMUNITY_ID, SPELL_BATTERING_RAM, apply);
+        // 10yd ground-level AoE that cannot reach the seats ~15yd up on the boss' back
+        who->ApplySpellImmune(SPELL_HODIRS_FURY_STUN, IMMUNITY_ID, SPELL_HODIRS_FURY_STUN, apply);
+        who->ApplySpellImmune(SPELL_MIMIRONS_INFERNO_DAMAGE, IMMUNITY_ID, SPELL_MIMIRONS_INFERNO_DAMAGE, apply);
+
+        if (!me->GetVehicleKit())
+            return;
 
         if (seatId == SEAT_PLAYER)
         {
-            if (Unit* turret = me->GetVehicleKit()->GetPassenger(SEAT_TURRET))
+            if (!apply)
+                who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
+            else if (ActivateTurrets(who))
             {
-                if (apply)
+                if (Creature* leviathan = me->GetVehicleCreatureBase())
                 {
-                    turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                    turret->GetAI()->AttackStart(who);
-                    if (Creature* leviathan = me->GetVehicleCreatureBase())
-                    {
-                        leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
-                        leviathan->SetInCombatWithZone();
-                    }
-                }
-                else
-                {
-                    turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
-                    turret->SetImmuneToAll(true);
-                    if (turret->IsCreature())
-                        turret->ToCreature()->AI()->EnterEvadeMode();
-
-                    who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
+                    leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
+                    leviathan->SetInCombatWithZone();
                 }
             }
             if (Unit* device = me->GetVehicleKit()->GetPassenger(SEAT_DEVICE))
@@ -785,6 +841,14 @@ struct boss_flame_leviathan_defense_turret : public TurretAI
         if (Unit* seat = me->GetVehicleBase())
             if (Creature* leviathan = seat->GetVehicleCreatureBase())
                 leviathan->SetInCombatWithZone();
+    }
+
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+    {
+        TurretAI::EnterEvadeMode(why);
+        // Seated turrets never move home, which is the only thing that clears the evade state.
+        // Because of this, we need to manually clear it ourselves.
+        me->ClearUnitState(UNIT_STATE_EVADE);
     }
 
     void JustDied(Unit* killer) override
@@ -853,11 +917,9 @@ struct npc_freya_ward : public NullCreatureAI
 
     SummonList summons;
     uint32 _castTimer;
-    bool _summoned;
 
     void Reset() override
     {
-        _summoned = false;
         _castTimer = 25000;
         summons.DespawnAll();
         if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
@@ -868,32 +930,12 @@ struct npc_freya_ward : public NullCreatureAI
             }
     }
 
-    void JustSummoned(Creature* cr) override
-    {
-        _summoned = true;
-        summons.Summon(cr);
-    }
+    void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
     void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
     void UpdateAI(uint32 diff) override
     {
-        if (_summoned)
-        {
-            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end();)
-            {
-                Creature* summon = ObjectAccessor::GetCreature(*me, *itr);
-                ++itr;
-                if (summon)
-                {
-                    summon->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
-                    if (Unit* target = summon->SelectNearestTarget(200.0f))
-                        summon->AI()->AttackStart(target);
-                }
-            }
-            _summoned = false;
-        }
-
         _castTimer += diff;
         if (_castTimer >= 29 * IN_MILLISECONDS)
         {
@@ -911,6 +953,60 @@ struct npc_freya_ward : public NullCreatureAI
     {
         if (param == ACTION_DESPAWN_ADDS)
             summons.DespawnAll();
+    }
+};
+
+struct npc_freya_ward_summon : public ScriptedAI
+{
+    npc_freya_ward_summon(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        events.Reset();
+        me->SetCorpseDelay(5);
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        // Deferred a tick on purpose: Spell::EffectSummonType re-applies the summon spell's own
+        // duration (10s for the lashers, 3s for the wards) once the summon call returns, which
+        // would overwrite anything this hook sets.
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+        }, 1ms);
+
+        DoZoneInCombat();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_LASH, 2s);
+    }
+
+    // Thrown players sit on a seat NPC nested in Leviathan's vehicle; vehicles behind the closed gate are out of reach
+    bool CanAIAttack(Unit const* who) const override
+    {
+        for (Unit const* base = who->GetVehicleBase(); base; base = base->GetVehicleBase())
+            if (base->GetEntry() == NPC_LEVIATHAN)
+                return false;
+
+        return me->IsWithinLOSInMap(who);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (events.ExecuteEvent() == EVENT_LASH)
+        {
+            DoCastVictim(SPELL_LASH);
+            events.Repeat(2s);
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -1141,7 +1237,7 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
     {
         if (id == me->GetEntry())
         {
-            if (Creature* liquid = me->SummonCreature(NPC_LIQUID, *me))
+            if (Creature* liquid = me->SummonCreature(NPC_LIQUID, *me, TEMPSUMMON_TIMED_DESPAWN, 180 * IN_MILLISECONDS))
             {
                 liquid->CastSpell(liquid, SPELL_LIQUID_PYRITE, true);
                 liquid->CastSpell(liquid, SPELL_DUST_CLOUD_IMPACT, true);
@@ -1162,6 +1258,49 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
             me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
             me->SetPosition(x, y, z, 0);
         }
+    }
+};
+
+enum SalvagedChopper
+{
+    SPELL_GRAB_PYRITE                   = 67372,
+    SPELL_EJECT_PASSENGER               = 67393,
+
+    // The chopper's only other seat, carrying either a player or a grabbed pyrite crate.
+    SEAT_CHOPPER_PASSENGER              = 1,
+};
+
+struct npc_salvaged_chopper : public VehicleAI
+{
+    npc_salvaged_chopper(Creature* creature) : VehicleAI(creature) { }
+
+    // While the rear seat is taken, the "Grab Pyrite" button becomes "Eject Passenger".
+    void PassengerBoarded(Unit* /*who*/, int8 seatId, bool apply) override
+    {
+        if (seatId != SEAT_CHOPPER_PASSENGER)
+            return;
+
+        if (apply)
+            SwapActionButton(SPELL_GRAB_PYRITE, SPELL_EJECT_PASSENGER);
+        else
+            SwapActionButton(SPELL_EJECT_PASSENGER, SPELL_GRAB_PYRITE);
+    }
+
+private:
+    void SwapActionButton(uint32 from, uint32 to)
+    {
+        bool swapped = false;
+        for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+            if (me->m_spells[i] == from)
+            {
+                me->m_spells[i] = to;
+                swapped = true;
+            }
+
+        // Resend the vehicle action bar, otherwise the driver keeps seeing the old button.
+        if (swapped)
+            if (Player* driver = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                driver->VehicleSpellInitialize();
     }
 };
 
@@ -1381,6 +1520,16 @@ class spell_pursue : public SpellScript
     }
 };
 
+static bool IsLeviathanSeatAvailable(Unit const* seat)
+{
+    Vehicle* seatVehicle = seat->GetEntry() == NPC_SEAT ? seat->GetVehicleKit() : nullptr;
+    if (!seatVehicle || seatVehicle->GetPassenger(SEAT_PLAYER))
+        return false;
+
+    Unit* device = seatVehicle->GetPassenger(SEAT_DEVICE);
+    return device && !device->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+}
+
 class spell_vehicle_throw_passenger : public SpellScript
 {
     PrepareSpellScript(spell_vehicle_throw_passenger);
@@ -1415,11 +1564,8 @@ class spell_vehicle_throw_passenger : public SpellScript
         for (WorldObject* obj : targetList)
         {
             Unit* unit = obj->ToUnit();
-            if (!unit || unit->GetEntry() != NPC_SEAT) continue;
-
-            Vehicle* seat = unit->GetVehicleKit();
-            Unit* device = seat ? seat->GetPassenger(SEAT_DEVICE) : nullptr;
-            if (!seat || seat->GetPassenger(0) || !device || device->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) continue;
+            if (!unit || !IsLeviathanSeatAvailable(unit))
+                continue;
 
             float dist = unit->GetExactDistSq(dst);
             if (dist < minDist)
@@ -1442,6 +1588,52 @@ class spell_vehicle_throw_passenger : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_vehicle_throw_passenger::HandleScript);
+    }
+};
+
+class spell_hookshot : public SpellScript
+{
+    PrepareSpellScript(spell_hookshot);
+
+    // Restrict target selection to the nearest seat whose player seat is free.
+    Creature* SelectAvailableSeat()
+    {
+        Unit* caster = GetCaster();
+        std::list<Creature*> seats;
+        caster->GetCreatureListWithEntryInGrid(seats, NPC_SEAT, GetSpellInfo()->GetMaxRange());
+
+        Creature* nearestSeat = nullptr;
+        float nearestDist = 0.0f;
+        for (Creature* seat : seats)
+        {
+            if (!IsLeviathanSeatAvailable(seat))
+                continue;
+
+            float dist = caster->GetExactDistSq(seat);
+            if (!nearestSeat || dist < nearestDist)
+            {
+                nearestSeat = seat;
+                nearestDist = dist;
+            }
+        }
+
+        return nearestSeat;
+    }
+
+    SpellCastResult CheckCast()
+    {
+        return SelectAvailableSeat() ? SPELL_CAST_OK : SPELL_FAILED_DONT_REPORT;
+    }
+
+    void SelectSeat(WorldObject*& target)
+    {
+        target = SelectAvailableSeat();
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_hookshot::CheckCast);
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_hookshot::SelectSeat, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
     }
 };
 
@@ -1789,6 +1981,7 @@ void AddSC_boss_flame_leviathan()
 
     // Hard Mode
     RegisterUlduarCreatureAI(npc_freya_ward);
+    RegisterUlduarCreatureAI(npc_freya_ward_summon);
     RegisterUlduarCreatureAI(npc_thorims_hammer);
     RegisterUlduarCreatureAI(npc_mimirons_inferno);
     RegisterUlduarCreatureAI(npc_hodirs_fury);
@@ -1796,6 +1989,7 @@ void AddSC_boss_flame_leviathan()
     // Helpers
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
+    RegisterUlduarCreatureAI(npc_salvaged_chopper);
 
     // GOs
     new go_ulduar_tower();
@@ -1806,6 +2000,7 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_systems_shutdown_aura);
     RegisterSpellScript(spell_pursue);
     RegisterSpellScript(spell_vehicle_throw_passenger);
+    RegisterSpellScript(spell_hookshot);
     RegisterSpellScript(spell_hookshot_aura);
     RegisterSpellScript(spell_tar_blaze_aura);
     RegisterSpellScript(spell_vehicle_grab_pyrite);

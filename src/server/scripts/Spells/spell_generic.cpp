@@ -2555,7 +2555,8 @@ class spell_gen_allow_cast_from_item_only : public SpellScript
 
 enum VehicleScaling
 {
-    SPELL_GEAR_SCALING      = 66668
+    SPELL_GEAR_SCALING        = 66668,
+    SPELL_GEAR_SCALING_ULDUAR = 65266,
 };
 
 // 65266, 65635, 65636, 66666, 66667, 66668 - Gear Scaling
@@ -2592,26 +2593,35 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
     {
         Player* player = GetCaster()->ToPlayer();
 
+        float factor;
+        uint16 baseItemLevel;
+
         /// @todo Reserach coeffs for different vehicles
         switch (GetId())
         {
-            case SPELL_GEAR_SCALING:
-            {
-                float avgILvl = player->GetAverageItemLevel();
-                if (avgILvl < 205.0f)
-                    return;
-
-                amount = static_cast<int32>(avgILvl - 205.0f);
-                break;
-            }
-            default:
+            case SPELL_GEAR_SCALING_ULDUAR:
             {
                 float totalILvl = player->GetTotalItemLevel();
-                float result = (totalILvl - 2500.0f) / 5.0f / 100.0f;
-                amount = static_cast<int32>(std::max(0.1f, result));
-                break;
+                float scaling = (totalILvl - 2500.0f) / 5.0f / 100.0f;
+                scaling = std::max(0.1f, scaling);
+                amount = static_cast<int32>(std::round((scaling - 1.0f) * 100.0f));
+                return;
             }
+            case SPELL_GEAR_SCALING:
+                factor = 1.0f;
+                baseItemLevel = 205;
+                break;
+            default:
+                factor = 1.0f;
+                baseItemLevel = 170;
+                break;
         }
+
+        float avgILvl = player->GetAverageItemLevel();
+        if (avgILvl < baseItemLevel)
+            return;                     /// @todo Research possibility of scaling down
+
+        amount = uint16((avgILvl - baseItemLevel) * factor);
     }
 
     void Register() override

@@ -69,6 +69,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(347); // 15 min
     });
 
+    // Headless Horseman's Mount - use the flying creature model for the flying variants
+    ApplySpellFix({ 48023, 51617 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 27152;
+    });
+
     // Elixir of Minor Fortitude
     ApplySpellFix({ 2378 }, [](SpellInfo* spellInfo)
     {
@@ -600,13 +606,18 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
     });
 
-    ApplySpellFix({
-        54968,  // Glyph of Holy Light, Damage Class should be magic
-        53652,  // Beacon of Light heal, Damage Class should be magic
-        53654
-        }, [](SpellInfo* spellInfo)
+    // Glyph of Holy Light
+    ApplySpellFix({ 54968 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+    });
+
+    // Beacon of Light
+    ApplySpellFix({ 53652, 53653, 53654 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
+        spellInfo->AttributesEx6 &= ~SPELL_ATTR6_IGNORE_HEALTH_MODIFIERS;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     });
 
@@ -1895,16 +1906,17 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
     });
 
-    // Hurl Pyrite
-    ApplySpellFix({ 62490 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = 0;
-    });
-
     // Meeting Stone Summon
     ApplySpellFix({ 23598 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
+    });
+
+    // Ulduar, Flame Leviathan, Flame Vents
+    // The channel carries no interrupt flags, so Electroshock and player interrupts could never stop it
+    ApplySpellFix({ 62396 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags |= CHANNEL_INTERRUPT_FLAG_INTERRUPT;
     });
 
     // Ulduar, Mimiron, bomb bot explosion
@@ -1945,6 +1957,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 63278 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Effect = 0;
+    });
+
+    // Ulduar, General Vezax, Shadow Crash (area aura)
+    ApplySpellFix({ 63277 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_DO_NOT_DISPLAY_DURATION;
     });
 
     // Boom (XT-002)
@@ -2045,10 +2063,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
-    // Cosmic Smash (Algalon the Observer)
-    ApplySpellFix({ 62293 }, [](SpellInfo* spellInfo)
+    // Shadow Nova (Sara)
+    ApplySpellFix({ 65719 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Cosmic Smash (Algalon the Observer)
@@ -2099,14 +2118,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(5);
-    });
-
-    // Onyxia's Lair, Onyxia, Eruption
-    ApplySpellFix({ 17731, 69294 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_DUMMY;
-        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(3);
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_18_YARDS); // 18yd instead of 13yd to make sure all cracks erupt
     });
 
     // Onyxia's Lair, Onyxia, Breath
@@ -2948,6 +2959,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // copied attributes from Green Ooze Channel
         spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Professor Putricide, Expunged Gas (Gas Cloud detonation)
+    ApplySpellFix({ 70701 }, [](SpellInfo* spellInfo)
+    {
+        // custom: the detonation is an unavoidable raid-wide hit, it must not be resisted away
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
@@ -4875,6 +4893,15 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SpellPriority = 100;
     });
 
+    // Item - Mage T8 4P Bonus
+    ApplySpellFix({ 64869 }, [](SpellInfo* spellInfo)
+    {
+        // DBC amount is 10, but the chance to not consume Missile Barrage,
+        // Hot Streak or Brain Freeze is 20% according to the available sources
+        spellInfo->Effects[EFFECT_0].BasePoints = 20;
+        spellInfo->Effects[EFFECT_0].DieSides = 0;
+    });
+
     // Auto Shot
     ApplySpellFix({ 75 }, [](SpellInfo* spellInfo)
     {
@@ -5210,6 +5237,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // 31930 Judgements of the Wise
     ApplySpellFix({ 31930 }, [](SpellInfo* spellInfo)
     {
+        spellInfo->SpellFamilyName = SPELLFAMILY_PALADIN;
         spellInfo->SpellFamilyFlags = flag96(0x200, 0, 0);
     });
 
@@ -5241,6 +5269,15 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 45008 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Heroic Strike
+    ApplySpellFix({
+        45026,
+        29426
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellLevel = 10;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

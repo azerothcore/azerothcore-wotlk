@@ -2075,23 +2075,20 @@ void Player::RegenerateHealth()
 
 void Player::ResetAllPowers()
 {
-    SetHealth(GetMaxHealth());
+    if (IsAlive())
+        SetHealth(GetMaxHealth());
+
     if (HasActivePowerType(POWER_MANA))
-    {
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-    }
+
     if (HasActivePowerType(POWER_RAGE))
-    {
         SetPower(POWER_RAGE, 0);
-    }
+
     if (HasActivePowerType(POWER_ENERGY))
-    {
         SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-    }
+
     if (HasActivePowerType(POWER_RUNIC_POWER))
-    {
         SetPower(POWER_RUNIC_POWER, 0);
-    }
 }
 
 bool Player::CanInteractWithQuestGiver(Object* questGiver)
@@ -2799,12 +2796,19 @@ void Player::SendInitialSpells()
     std::size_t countPos = data.wpos();
     data << uint16(spellCount);                             // spell count placeholder
 
+    // Form spells are shown by the client from its own SpellShapeshiftForm.dbc and never sent as learned
+    SpellShapeshiftFormEntry const* shapeInfo = sSpellShapeshiftFormStore.LookupEntry(GetShapeshiftForm());
+
     for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
         if (itr->second->State == PLAYERSPELL_REMOVED)
             continue;
 
         if (!itr->second->Active || !itr->second->IsInSpec(GetActiveSpec()))
+            continue;
+
+        if (shapeInfo && itr->second->State == PLAYERSPELL_TEMPORARY &&
+            std::ranges::find(shapeInfo->stanceSpell, itr->first) != std::ranges::end(shapeInfo->stanceSpell))
             continue;
 
         data << uint32(itr->first);
@@ -2977,6 +2981,13 @@ void Player::SendNewMail()
     WorldPacket data(SMSG_RECEIVED_MAIL, 4);
     data << (uint32) 0;
     SendDirectMessage(&data);
+
+    // The client caches its inbox and refuses to re-query it more than once a minute, so a mailbox
+    // opened inside that window still shows the old list. Pushing the inbox refreshes it in place.
+    // Only when in world: _LoadInventory mails problematic items during login, and that must not
+    // push a mail list to a client that has not finished logging in yet.
+    if (IsInWorld() && sWorld->getBoolConfig(CONFIG_MAIL_PUSH_INBOX_ON_DELIVERY))
+        GetSession()->SendMailList();
 }
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
@@ -3231,7 +3242,8 @@ bool Player::CheckSkillLearnedBySpell(uint32 spellId)
     return true;
 }
 
-bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill /*= false*/)
+bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill /*= false*/,
+    bool sendPacket /*= true*/)
 {
     // pussywizard: this can be called to OVERWRITE currently existing spell params! usually to set active = false for lower ranks of a spell
 
@@ -3247,7 +3259,9 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
     // xinef: send packet so client can properly recognize this new spell
     // xinef: ignore passive spells and spells with learn effect
     // xinef: send spells with no aura effects (ie dual wield)
-    if (IsInWorld() && !isBeingLoaded() && temporary && !learnFromSkill && (!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+    if (IsInWorld() && !isBeingLoaded() && temporary && sendPacket && !learnFromSkill &&
+        (!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) ||
+        !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
         SendLearnPacket(spellInfo->Id, true);
 
     // xinef: DO NOT allow to learn spell with effect learn spell!
@@ -3264,7 +3278,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
                     //ABORT();
                 }
                 else if (SpellInfo const* learnSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
-                    _addSpell(learnSpell->Id, SPEC_MASK_ALL, true);
+                    _addSpell(learnSpell->Id, SPEC_MASK_ALL, true, false, sendPacket);
             }
 
         return false;
@@ -3411,6 +3425,9 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const
 
 void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFromSkill /*= false*/)
 {
+    if (!sScriptMgr->OnPlayerCanLearnSpell(this, spellId))
+        return;
+
     // Xinef: don't allow to learn active spell once more
     if (HasActiveSpell(spellId))
     {
@@ -3491,7 +3508,7 @@ uint8 Player::GetLearnSpellSpecMask(uint32 spellId) const
     return specMask;
 }
 
-void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTemporary)
+void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTemporary, bool sendPacket /*= true*/)
 {
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr == m_spells.end())
@@ -3509,7 +3526,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     // pussywizard: do this at the beginning, not in the middle of removing!
     if (uint32 nextSpell = sSpellMgr->GetNextSpellInChain(spell_id))
         if (!GetTalentSpellPos(nextSpell))
-            removeSpell(nextSpell, removeSpecMask, onlyTemporary);
+            removeSpell(nextSpell, removeSpecMask, onlyTemporary, sendPacket);
 
     // xinef: if current spell has talentcost, remove spells requiring this spell
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spell_id);
@@ -3518,7 +3535,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
         SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr->GetSpellsRequiringSpellBounds(firstRankSpellId);
         for (auto spellsItr = spellsRequiringSpell.first; spellsItr != spellsRequiringSpell.second; ++spellsItr)
         {
-            removeSpell(spellsItr->second, removeSpecMask, onlyTemporary);
+            removeSpell(spellsItr->second, removeSpecMask, onlyTemporary, sendPacket);
         }
     }
 
@@ -3640,7 +3657,8 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     if (!onlyTemporary || ((!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL)))
     {
         sScriptMgr->OnPlayerForgotSpell(this, spell_id);
-        SendLearnPacket(spell_id, false);
+        if (sendPacket)
+            SendLearnPacket(spell_id, false);
     }
 }
 
@@ -8090,6 +8108,11 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
             }
 
             go->SetLootState(GO_ACTIVATED, this);
+
+            // Trigger chest traps once per loot generation, including when the generated loot is empty.
+            if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
+                if (uint32 trapEntry = go->GetGOInfo()->chest.linkedTrapId)
+                    go->TriggeringLinkedGameObject(trapEntry, this);
         }
 
         if (go->getLootState() == GO_ACTIVATED)
@@ -10012,8 +10035,11 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
 
         // skip if already instant or cost is free
         if (mod->op == SPELLMOD_CASTING_TIME || mod->op == SPELLMOD_COST)
-            if (((float)basevalue + (float)basevalue * (totalmul - 1.0f) + (float)totalflat) <= 0)
+        {
+            float currentVal = ((float)basevalue + (float)totalflat) * totalmul;
+            if (currentVal <= 0.0f)
                 return;
+        }
 
         if (mod->type == SPELLMOD_FLAT)
         {
@@ -10067,7 +10093,7 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
         calculateSpellMod(mod);
     }
 
-    if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
+    if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION || op == SPELLMOD_COST)
         basevalue = (basevalue + totalflat) > 0 ? (basevalue + totalflat) * totalmul : 0;
     else
         basevalue = (basevalue * totalmul) + totalflat;
@@ -10189,8 +10215,6 @@ void Player::RemoveSpellMods(Spell* spell)
     if (spell->m_appliedMods.empty())
         return;
 
-    SpellInfo const* const spellInfo = spell->m_spellInfo;
-
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
     {
         for (SpellModContainer::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end();)
@@ -10218,16 +10242,6 @@ void Player::RemoveSpellMods(Spell* spell)
             // leave this here, if spell have two mods it will remove 2 charges - wrong
             spell->m_appliedMods.erase(iterMod);
 
-            // MAGE T8P4 BONUS
-            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE)
-            {
-                SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
-                // Missile Barrage, Hot Streak, Brain Freeze (trigger spell - Fireball!)
-                if (sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938)
-                    if (AuraEffect* aurEff = GetAuraEffectDummy(64869))
-                        if (roll_chance_i(aurEff->GetAmount()))
-                            continue; // don't consume charge
-            }
             if (mod->ownerAura->DropCharge(AURA_REMOVE_BY_EXPIRE))
                 itr = m_spellMods[i].begin();
         }
@@ -10405,7 +10419,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
 
     // not let cheating with start flight in time of logout process || while in combat || has type state: stunned || has type state: root
-    if (GetSession()->isLogingOut() || IsInCombat() || HasUnitState(UNIT_STATE_STUNNED) || HasUnitState(UNIT_STATE_ROOT))
+    if (GetSession()->IsLoggingOut() || IsInCombat() || HasUnitState(UNIT_STATE_STUNNED) || HasUnitState(UNIT_STATE_ROOT))
     {
         GetSession()->SendActivateTaxiReply(ERR_TAXIPLAYERBUSY);
         return false;
@@ -12005,6 +12019,17 @@ void Player::ApplyEquipCooldown(Item* pItem)
     if (GetCommandStatus(CHEAT_COOLDOWN))
         return;
 
+    TimePoint const cooldownStart = std::chrono::steady_clock::now();
+    auto applyProcCooldown = [this, pItem, cooldownStart](uint32 spellId)
+    {
+        SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(spellId);
+        if (!procEntry)
+            return;
+
+        if (Aura* itemAura = GetAura(spellId, GetGUID(), pItem->GetGUID()))
+            itemAura->AddProcCooldown(cooldownStart + procEntry->Cooldown);
+    };
+
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         _Spell const& spellData = pItem->GetTemplate()->Spells[i];
@@ -12016,12 +12041,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
         // apply proc cooldown to equip auras if we have any
         if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP)
         {
-            SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(spellData.SpellId);
-            if (!procEntry)
-                continue;
-
-            if (Aura* itemAura = GetAura(spellData.SpellId, GetGUID(), pItem->GetGUID()))
-                itemAura->AddProcCooldown(std::chrono::steady_clock::now() + procEntry->Cooldown);
+            applyProcCooldown(spellData.SpellId);
             continue;
         }
 
@@ -12049,6 +12069,22 @@ void Player::ApplyEquipCooldown(Item* pItem)
         data << pItem->GetGUID();
         data << uint32(spellData.SpellId);
         SendDirectMessage(&data);
+    }
+
+    // Enchantment equip spells are not included in the item template spell list.
+    for (uint8 enchantmentSlot = 0; enchantmentSlot < MAX_ENCHANTMENT_SLOT; ++enchantmentSlot)
+    {
+        uint32 enchantmentId = pItem->GetEnchantmentId(EnchantmentSlot(enchantmentSlot));
+        if (!enchantmentId)
+            continue;
+
+        SpellItemEnchantmentEntry const* enchantment = sSpellItemEnchantmentStore.LookupEntry(enchantmentId);
+        if (!enchantment)
+            continue;
+
+        for (uint8 effect = 0; effect < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++effect)
+            if (enchantment->type[effect] == ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL && enchantment->spellid[effect])
+                applyProcCooldown(enchantment->spellid[effect]);
     }
 }
 
@@ -13148,13 +13184,11 @@ void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= 
         return;
     }
 
-    // still affected by some aura that shouldn't allow control, only allow on last such aura to be removed
-    if (target->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED))
-        allowMove = false;
-
+    // A fleeing/confused target can't be controlled by the client yet, but the mover
+    // must still switch so control is restored once the crowd control ends.
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
-    data << uint8(allowMove ? 1 : 0);
+    data << uint8((allowMove && !target->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED)) ? 1 : 0);
     SendDirectMessage(&data);
 
     // We want to set the packet only
