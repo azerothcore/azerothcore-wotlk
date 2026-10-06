@@ -36,11 +36,7 @@ enum MTData
 
     // Persistent data
     DATA_KAEL_INTRO             = 0,
-    DATA_DELRISSA_HELPER_1      = 1, // DATA_DELRISSA_HELPER_1 + i: entry summoned at helper position i
-    DATA_DELRISSA_HELPER_2      = 2,
-    DATA_DELRISSA_HELPER_3      = 3,
-    DATA_DELRISSA_HELPER_4      = 4,
-    MAX_PERSISTENT_DATA         = 5
+    MAX_PERSISTENT_DATA         = 1
 };
 
 enum MTCreatures

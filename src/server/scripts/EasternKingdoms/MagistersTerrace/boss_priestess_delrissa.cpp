@@ -18,7 +18,6 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "magisters_terrace.h"
-#include <array>
 
 enum Yells
 {
@@ -42,14 +41,6 @@ enum Misc
 {
     MAX_ACTIVE_HELPERS             = 4,
     MAX_HELPERS_COUNT              = 8
-};
-
-static_assert(MAX_PERSISTENT_DATA - DATA_DELRISSA_HELPER_1 >= MAX_ACTIVE_HELPERS,
-    "Not enough persistent data slots for Delrissa's helpers");
-
-enum Creatures
-{
-    NPC_SLIVER                     = 24552
 };
 
 const Position helpersLocations[MAX_ACTIVE_HELPERS] =
@@ -99,49 +90,15 @@ struct boss_priestess_delrissa : public BossAI
     {
         ScriptedAI::InitializeAI();
 
-        if (instance->GetBossState(DATA_DELRISSA) == DONE)
-            return;
-
-        // A respawn in dynamic mode creates a new Delrissa object: remove the helpers left by the old one
-        std::vector<uint32> leftoverEntries(std::begin(helpersEntries), std::end(helpersEntries));
-        leftoverEntries.push_back(NPC_SLIVER);
-
-        std::list<Creature*> leftovers;
-        me->GetCreatureListWithEntryInGrid(leftovers, leftoverEntries, SIZE_OF_GRIDS);
-        for (Creature* leftover : leftovers)
-            if (leftover->IsSummon())
-                leftover->DespawnOrUnsummon();
-
-        std::array<uint32, MAX_ACTIVE_HELPERS> const entries = GetHelpersEntries();
-        for (uint8 i = 0; i < MAX_ACTIVE_HELPERS; ++i)
-            me->SummonCreature(entries[i], helpersLocations[i], TEMPSUMMON_MANUAL_DESPAWN, 0);
-    }
-
-    // The helper set is rolled once per instance and kept in the instance save
-    std::array<uint32, MAX_ACTIVE_HELPERS> GetHelpersEntries()
-    {
-        std::array<uint32, MAX_ACTIVE_HELPERS> entries;
-        bool stored = true;
-        for (uint8 i = 0; i < MAX_ACTIVE_HELPERS; ++i)
+        if (instance->GetBossState(DATA_DELRISSA) != DONE)
         {
-            entries[i] = instance->GetPersistentData(DATA_DELRISSA_HELPER_1 + i);
-            if (std::find(std::begin(helpersEntries), std::end(helpersEntries), entries[i]) == std::end(helpersEntries))
-                stored = false;
+            std::vector<uint32> helpersList(std::begin(helpersEntries), std::end(helpersEntries));
+            Acore::Containers::RandomResize(helpersList, MAX_ACTIVE_HELPERS);
+
+            uint8 j = 0;
+            for (uint32 entry : helpersList)
+                me->SummonCreature(entry, helpersLocations[j++], TEMPSUMMON_MANUAL_DESPAWN, 0);
         }
-
-        if (stored)
-            return entries;
-
-        std::vector<uint32> helpersList(std::begin(helpersEntries), std::end(helpersEntries));
-        Acore::Containers::RandomResize(helpersList, MAX_ACTIVE_HELPERS);
-
-        for (uint8 i = 0; i < MAX_ACTIVE_HELPERS; ++i)
-        {
-            entries[i] = helpersList[i];
-            instance->StorePersistentData(DATA_DELRISSA_HELPER_1 + i, entries[i]);
-        }
-
-        return entries;
     }
 
     void JustSummoned(Creature* summon) override
@@ -622,7 +579,9 @@ enum HunterEnum
     SPELL_CONCUSSIVE_SHOT       = 27634,
     SPELL_MULTI_SHOT            = 31942,
     SPELL_WING_CLIP             = 44286,
-    SPELL_FREEZING_TRAP         = 44136
+    SPELL_FREEZING_TRAP         = 44136,
+
+    NPC_SLIVER                  = 24552
 };
 
 struct boss_garaxxas : public boss_priestess_lackey_commonAI
