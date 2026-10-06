@@ -2909,8 +2909,14 @@ Rate.Drop.Item.GroupAmount = 1
 #                     has no effect on loot that only ever drops one. How much that matters
 #                     varies by profession: fishing is almost entirely single-catch, while
 #                     milling and prospecting roll several pigments or gems and thin as you
-#                     would expect. A loot window holds at most 18 stacks, so very large values
-#                     are capped by that limit.
+#                     would expect.
+#                     A loot window holds at most 18 stacks, so very large values are capped by
+#                     that limit - and a node whose scaled rows fill all 18 stops granting quest
+#                     loot from the same node, since a quest row is never scaled and so has no
+#                     slot left to occupy. Where that starts depends on how many rows the node
+#                     drops and how large they stack, so it is worth checking any quest gathering
+#                     objective at the rate you intend to run. It is usually in the tens, but on
+#                     a pickpocket target whose items do not stack it can be single digits.
 #        Default:     1 - (Disabled, blizzlike amounts)
 #        Range:       a finite value > 0
 

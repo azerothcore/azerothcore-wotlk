@@ -581,7 +581,13 @@ void Loot::AddItem(LootStoreItem const& item)
     uint32 count = CalculateDropAmount(urand(item.mincount, item.maxcount),
         ScalableDropRate(item.needs_quest, proto->MaxCount, professionDropRate),
         professionDropRate != 1.0f ? rand_norm() : 0.0);
-    uint32 stacks = count / proto->GetMaxStackSize() + (count % proto->GetMaxStackSize() ? 1 : 0);
+    // LootItem::count is 8 bits. A rolled count could never exceed that before, since
+    // LootStoreItem::maxcount is a uint8, but a rate can scale past it on an item that stacks
+    // higher than 255 - GetMaxStackSize also reports 0x7FFFFFFE for a Stackable of 0 or less. Split
+    // on the capped size so the rows and the remainder agree; for every shipped item, which stacks
+    // to at most 20, this is the stack size itself.
+    uint32 const stackSize = std::min<uint32>(proto->GetMaxStackSize(), 255u);
+    uint32 stacks = count / stackSize + (count % stackSize ? 1 : 0);
 
     std::vector<LootItem>& lootItems = item.needs_quest ? quest_items : items;
     uint32 limit = item.needs_quest ? MAX_NR_QUEST_ITEMS : MAX_NR_LOOT_ITEMS;
@@ -589,10 +595,10 @@ void Loot::AddItem(LootStoreItem const& item)
     for (uint32 i = 0; i < stacks && lootItems.size() < limit; ++i)
     {
         LootItem generatedLoot(item);
-        generatedLoot.count = std::min(count, proto->GetMaxStackSize());
+        generatedLoot.count = std::min(count, stackSize);
         generatedLoot.itemIndex = lootItems.size();
         lootItems.push_back(generatedLoot);
-        count -= proto->GetMaxStackSize();
+        count -= stackSize;
 
         // In some cases, a dropped item should be visible/lootable only for some players in group
         bool canSeeItemInLootWindow = false;
