@@ -2886,21 +2886,31 @@ Rate.Drop.Item.GroupAmount = 1
 #                     Example: Rate.Fishing.DropAmount = 3 catches three fish per cast.
 #                     Each rate follows the skill the loot actually requires, not the table it
 #                     comes from. Mining and Herbalism apply only to nodes and corpses requiring
-#                     that skill, so ordinary chests and quest objects are unaffected, and a
-#                     corpse that is mined or herbed rather than skinned follows its own rate
-#                     instead of Skinning's. Corpses looted with engineering - mechanicals, and
-#                     gas clouds emptied with a mote extractor - are left blizzlike, since
-#                     engineering has no rate here.
-#                     Loot rows flagged as quest drops - the ones that only appear for a player
-#                     on the quest - are never scaled, since an objective's count is fixed. Items
-#                     that are merely of the Quest class on ordinary rows do scale, so a high
-#                     Fishing rate also multiplies Speckled Tastyfish and shortens the Stranglethorn
-#                     Fishing Extravaganza.
+#                     that skill, so an ordinary chest is unaffected even though it shares the
+#                     same loot table, and a corpse that is mined or herbed rather than skinned
+#                     follows its own rate instead of Skinning's. Corpses looted with engineering
+#                     - mechanicals, and gas clouds emptied with a mote extractor - are left
+#                     blizzlike, since engineering has no rate here.
+#                     What decides whether a row scales is the row's own quest flag, not what the
+#                     object is for. Rows flagged as quest drops - the ones that only appear for a
+#                     player on the quest - are never scaled, since an objective's count is fixed.
+#                     An unflagged row scales even when it holds a Quest-class item and even on an
+#                     object that exists only for a quest, so a high Fishing rate multiplies
+#                     Speckled Tastyfish and shortens the Stranglethorn Fishing Extravaganza, and a
+#                     high Herbalism rate makes a Sanguine Hibiscus pick yield several at once.
 #                     Fishing covers open-water casts, fishing pools, and the junk caught when a
 #                     cast outside a pool fails.
+#                     Fractional values work by chance, since an item count is a whole number:
+#                     1.25 gives the extra item one time in four, so the average over many
+#                     gathers is 1.25 times blizzlike. Whole values are exact, so 2 is always
+#                     precisely double.
 #                     Values below 1 thin stacks but never remove an item that already
-#                     passed its drop roll. A loot window holds at most 18 stacks, so very
-#                     large values are capped by that limit.
+#                     passed its drop roll, so a stack of one stays at one and a value below 1
+#                     has no effect on loot that only ever drops one. How much that matters
+#                     varies by profession: fishing is almost entirely single-catch, while
+#                     milling and prospecting roll several pigments or gems and thin as you
+#                     would expect. A loot window holds at most 18 stacks, so very large values
+#                     are capped by that limit.
 #        Default:     1 - (Disabled, blizzlike amounts)
 #        Range:       a finite value > 0
 

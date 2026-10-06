@@ -478,17 +478,22 @@ void LootItem::AddAllowedLooter(Player const* player)
     allowedGUIDs.insert(player->GetGUID());
 }
 
-uint32 CalculateDropAmount(uint32 rolled, float rate)
+uint32 CalculateDropAmount(uint32 rolled, float rate, double draw)
 {
     if (rate == 1.0f || !rolled)
         return rolled;
 
-    // Round rather than truncate, so a rate of 1.5 on a 3 ore vein yields 5 and not 4, and clamp to
-    // 1: the item already passed its drop roll, so a rate below 1 must thin the stack, not drop the
-    // item out of the loot entirely.
-    double const scaled = std::round(double(rolled) * double(rate));
+    double const scaled = double(rolled) * double(rate);
+    double const whole = std::floor(scaled);
 
-    return uint32(std::clamp(scaled, 1.0, double(std::numeric_limits<uint32>::max())));
+    // Carry the fraction as a chance rather than rounding it away. Most profession rows roll a
+    // single item, so rounding to nearest would make every rate under 1.5 a no-op; spending the
+    // fraction on a draw instead leaves the long-run average at rolled * rate.
+    double amount = whole + (draw < scaled - whole ? 1.0 : 0.0);
+
+    // Clamp to 1: the item already passed its drop roll, so a rate below 1 thins the stack rather
+    // than removing the item from the loot. A stack of one therefore cannot be thinned any further.
+    return uint32(std::clamp(amount, 1.0, double(std::numeric_limits<uint32>::max())));
 }
 
 float ScalableDropRate(bool needsQuest, int32 itemMaxCount, float rate)
@@ -571,8 +576,11 @@ void Loot::AddItem(LootStoreItem const& item)
     if (!proto)
         return;
 
+    // Only spend a draw when one can change the outcome. Every rate defaults to 1, so on a stock
+    // server this skips an RNG call for every item of every loot in the game.
     uint32 count = CalculateDropAmount(urand(item.mincount, item.maxcount),
-        ScalableDropRate(item.needs_quest, proto->MaxCount, professionDropRate));
+        ScalableDropRate(item.needs_quest, proto->MaxCount, professionDropRate),
+        professionDropRate != 1.0f ? rand_norm() : 0.0);
     uint32 stacks = count / proto->GetMaxStackSize() + (count % proto->GetMaxStackSize() ? 1 : 0);
 
     std::vector<LootItem>& lootItems = item.needs_quest ? quest_items : items;

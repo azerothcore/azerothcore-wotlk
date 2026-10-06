@@ -311,9 +311,11 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li);
 ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
 
 // Scales a rolled stack count by a profession drop-amount rate.
-// Rounds rather than truncates, and never returns 0 for an item that already passed its drop roll:
-// a rate below 1 thins stacks, it does not delete drops.
-uint32 CalculateDropAmount(uint32 rolled, float rate);
+// A fractional result is resolved by draw, a value in [0, 1): the fraction is the chance of rounding
+// up, so the long-run average is rolled * rate rather than whatever rounding to nearest would give.
+// Never returns 0 for an item that already passed its drop roll: a rate below 1 thins stacks, it
+// does not delete drops, so a stack of one stays at one.
+uint32 CalculateDropAmount(uint32 rolled, float rate, double draw);
 
 // Returns the rate a single loot row may be scaled by. Rows flagged as quest drops keep their
 // fixed count - note this is the row's quest flag, not the item's Quest class - and an

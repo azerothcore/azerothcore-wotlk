@@ -29,56 +29,102 @@
 
 #include <limits>
 
+namespace
+{
+    // The draw only decides a fraction, so these two name the extremes of its range.
+    constexpr double ALWAYS_ROUNDS_DOWN = 0.999999;
+    constexpr double ALWAYS_ROUNDS_UP = 0.0;
+}
+
 TEST(LootDropAmountTest, RateOfOneIsIdentity)
 {
-    // The default rate must not perturb blizzlike amounts at all.
+    // The default rate must not perturb blizzlike amounts at all, whatever the draw.
     for (uint32 rolled = 0; rolled <= 20; ++rolled)
-        EXPECT_EQ(CalculateDropAmount(rolled, 1.0f), rolled) << "rolled " << rolled;
+    {
+        EXPECT_EQ(CalculateDropAmount(rolled, 1.0f, ALWAYS_ROUNDS_DOWN), rolled) << "rolled " << rolled;
+        EXPECT_EQ(CalculateDropAmount(rolled, 1.0f, ALWAYS_ROUNDS_UP), rolled) << "rolled " << rolled;
+    }
 }
 
-TEST(LootDropAmountTest, ScalesWholeMultiples)
+TEST(LootDropAmountTest, WholeMultiplesDoNotDependOnTheDraw)
 {
-    EXPECT_EQ(CalculateDropAmount(1, 3.0f), 3u);
-    EXPECT_EQ(CalculateDropAmount(2, 3.0f), 6u);
-    EXPECT_EQ(CalculateDropAmount(4, 2.0f), 8u);
+    // A whole rate leaves no fraction to spend, so the result must be exact either way. This is what
+    // keeps Rate.X.DropAmount = 2 meaning precisely double rather than approximately double.
+    for (double draw : { ALWAYS_ROUNDS_DOWN, ALWAYS_ROUNDS_UP, 0.5 })
+    {
+        EXPECT_EQ(CalculateDropAmount(1, 3.0f, draw), 3u);
+        EXPECT_EQ(CalculateDropAmount(2, 3.0f, draw), 6u);
+        EXPECT_EQ(CalculateDropAmount(4, 2.0f, draw), 8u);
+    }
 }
 
-TEST(LootDropAmountTest, FractionalRatesRoundRatherThanTruncate)
+TEST(LootDropAmountTest, TheFractionIsSpentOnTheDrawRatherThanRoundedAway)
 {
-    // 3 * 1.5 is 4.5. Truncating would quietly bias every fractional rate downwards.
-    EXPECT_EQ(CalculateDropAmount(3, 1.5f), 5u);
-    EXPECT_EQ(CalculateDropAmount(2, 1.5f), 3u);
-    EXPECT_EQ(CalculateDropAmount(10, 1.25f), 13u);  // 12.5 rounds up
-    EXPECT_EQ(CalculateDropAmount(10, 1.24f), 12u);  // 12.4 rounds down
+    // Rounding to nearest would make every rate under 1.5 a no-op on a single-item roll, which is
+    // what most profession rows are. The fraction becomes the chance of the extra item instead.
+    EXPECT_EQ(CalculateDropAmount(1, 1.25f, ALWAYS_ROUNDS_DOWN), 1u);
+    EXPECT_EQ(CalculateDropAmount(1, 1.25f, ALWAYS_ROUNDS_UP), 2u);
+
+    // 3 * 1.5 is 4.5, so the draw decides between 4 and 5.
+    EXPECT_EQ(CalculateDropAmount(3, 1.5f, ALWAYS_ROUNDS_DOWN), 4u);
+    EXPECT_EQ(CalculateDropAmount(3, 1.5f, ALWAYS_ROUNDS_UP), 5u);
+}
+
+TEST(LootDropAmountTest, TheDrawIsComparedAgainstTheFractionItself)
+{
+    // 5 * 1.25 is 6.25, so only a draw below 0.25 may add the seventh item. Getting this boundary
+    // wrong would bias every fractional rate one way or the other.
+    EXPECT_EQ(CalculateDropAmount(5, 1.25f, 0.24), 7u);
+    EXPECT_EQ(CalculateDropAmount(5, 1.25f, 0.25), 6u);
+    EXPECT_EQ(CalculateDropAmount(5, 1.25f, 0.26), 6u);
+
+    // A product that lands on a whole number has no fraction to spend, so no draw can move it.
+    EXPECT_EQ(CalculateDropAmount(4, 1.25f, 0.0), 5u);
+    EXPECT_EQ(CalculateDropAmount(4, 1.25f, 0.999999), 5u);
 }
 
 TEST(LootDropAmountTest, RatesBelowOneThinStacksButNeverDeleteTheDrop)
 {
-    EXPECT_EQ(CalculateDropAmount(10, 0.5f), 5u);
-    EXPECT_EQ(CalculateDropAmount(3, 0.5f), 2u);     // 1.5 rounds up
+    EXPECT_EQ(CalculateDropAmount(10, 0.5f, ALWAYS_ROUNDS_DOWN), 5u);
+    EXPECT_EQ(CalculateDropAmount(3, 0.5f, ALWAYS_ROUNDS_DOWN), 1u);
+    EXPECT_EQ(CalculateDropAmount(3, 0.5f, ALWAYS_ROUNDS_UP), 2u);
 
     // The item already passed its drop roll, so it must still be in the loot. Returning 0 here
-    // would put a zero-count item in the loot window instead of dropping less of it.
-    EXPECT_EQ(CalculateDropAmount(1, 0.5f), 1u);
-    EXPECT_EQ(CalculateDropAmount(1, 0.1f), 1u);
-    EXPECT_EQ(CalculateDropAmount(4, 0.01f), 1u);
+    // would put a zero-count item in the loot window instead of dropping less of it. A stack of one
+    // therefore cannot be thinned, whatever the rate or the draw.
+    EXPECT_EQ(CalculateDropAmount(1, 0.5f, ALWAYS_ROUNDS_DOWN), 1u);
+    EXPECT_EQ(CalculateDropAmount(1, 0.1f, ALWAYS_ROUNDS_DOWN), 1u);
+    EXPECT_EQ(CalculateDropAmount(4, 0.01f, ALWAYS_ROUNDS_DOWN), 1u);
 }
 
 TEST(LootDropAmountTest, NothingRolledStaysNothing)
 {
     // A rate must not conjure an item out of a zero roll.
-    EXPECT_EQ(CalculateDropAmount(0, 1.0f), 0u);
-    EXPECT_EQ(CalculateDropAmount(0, 100.0f), 0u);
+    EXPECT_EQ(CalculateDropAmount(0, 1.0f, ALWAYS_ROUNDS_UP), 0u);
+    EXPECT_EQ(CalculateDropAmount(0, 100.0f, ALWAYS_ROUNDS_UP), 0u);
 }
 
 TEST(LootDropAmountTest, ExtremeRatesSaturateInsteadOfWrapping)
 {
     // Config accepts any rate above 0, so the arithmetic must survive an absurd one rather than
     // wrapping around into a small count.
-    uint32 const huge = CalculateDropAmount(std::numeric_limits<uint32>::max(), 1000.0f);
+    uint32 const huge = CalculateDropAmount(std::numeric_limits<uint32>::max(), 1000.0f, ALWAYS_ROUNDS_UP);
     EXPECT_EQ(huge, std::numeric_limits<uint32>::max());
 
-    EXPECT_GT(CalculateDropAmount(200, 1.0e9f), 1u);
+    EXPECT_GT(CalculateDropAmount(200, 1.0e9f, ALWAYS_ROUNDS_DOWN), 1u);
+}
+
+TEST(LootDropAmountTest, TheAverageMatchesTheRateOverManyDraws)
+{
+    // The point of spending the fraction on a draw: a rate of 1.25 on a single-item roll has to
+    // average 1.25, which rounding to nearest could never do. Sweeping the draw range stands in for
+    // the uniform rand_norm the caller passes.
+    constexpr uint32 SAMPLES = 10000;
+    uint64 total = 0;
+    for (uint32 i = 0; i < SAMPLES; ++i)
+        total += CalculateDropAmount(1, 1.25f, double(i) / SAMPLES);
+
+    EXPECT_NEAR(double(total) / SAMPLES, 1.25, 0.001);
 }
 
 TEST(LootDropAmountTest, LimitedAndQuestItemsAreNeverScaled)
