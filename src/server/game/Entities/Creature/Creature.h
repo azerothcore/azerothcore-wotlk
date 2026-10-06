@@ -413,7 +413,7 @@ public:
     void ClearLeash();
     void RefreshLeash();
     [[nodiscard]] uint8 GetLeashTicks() const;
-    [[nodiscard]] float GetLeashRadius() const;
+    [[nodiscard]] float GetLeashRadius(Unit const* victim) const;
 
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
     void SetTextRepeatId(uint8 textGroup, uint8 id);

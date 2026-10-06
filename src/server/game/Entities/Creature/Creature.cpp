@@ -3802,10 +3802,11 @@ uint8 Creature::GetLeashTicks() const
     return level < 35 ? 6 : level < 50 ? 8 : 9;
 }
 
-// 3/4 yard per level from level 27 (5 yd), capped by the config (25 yd from level 54 by default)
-float Creature::GetLeashRadius() const
+// 28 yd at the victim's level, 3/4 yd less per level below it: 5 yd at 31 levels below, capped by the config (25 yd)
+float Creature::GetLeashRadius(Unit const* victim) const
 {
-    float const radius = std::max(5.0f, (GetLevel() - 20) * 0.75f);
+    int32 const levelDiff = int32(GetLevel()) - int32(victim->GetLevel());
+    float const radius = std::max(5.0f, 28.0f + levelDiff * 0.75f);
     return std::min(sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS), radius);
 }
 
@@ -3853,7 +3854,7 @@ bool Creature::IsWithinLeash(Unit const* victim) const
     if (!victimMoving && IsWithinMeleeRange(victim))
         return true;
 
-    return GetExactDist2d(&GetLeashPtr()->Point) <= GetLeashRadius();
+    return GetExactDist2d(&GetLeashPtr()->Point) <= GetLeashRadius(victim);
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const
