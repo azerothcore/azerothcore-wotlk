@@ -367,6 +367,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_EVENT_ANNOUNCE, "Event.Announce", 0);
 
     SetConfigValue<float>(CONFIG_CREATURE_LEASH_RADIUS, "CreatureLeashRadius", 30.0f);
+    SetConfigValue<float>(CONFIG_CREATURE_LEASH_DISTANCE, "CreatureLeashDistance", 18.5f);
     SetConfigValue<float>(CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS, "CreatureFamilyFleeAssistanceRadius", 30.0f);
     SetConfigValue<float>(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS, "CreatureFamilyAssistanceRadius", 10.0f);
     SetConfigValue<uint32>(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY, "CreatureFamilyAssistanceDelay", 2000);

@@ -1264,14 +1264,15 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         if (!victim->IsPlayer())
         {
-            // DoT ticks and passive damage (e.g. Thorns) do not reset leash timer
-            if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
-                victim->ToCreature()->UpdateLeashExtensionTime();
-
             if (attacker && attacker != victim)
             {
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
             }
+
+            // DoT ticks and passive damage (e.g. Thorns) do not refresh the leash.
+            // After the threat, so that a damage pull engages first and the leash starts at the attacker.
+            if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
+                victim->ToCreature()->RefreshLeash(attacker);
         }
         else                                                // victim is a player
         {
@@ -7180,15 +7181,12 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
     }
 
-    // Share leash timer with controlled unit
+    // Share leash with controlled unit
     if (controlledCreatureWithSameVictim)
-        creature->SetLastLeashExtensionTimePtr(controlledCreatureWithSameVictim->GetLastLeashExtensionTimePtr());
-    // Share leash timer with owner
+        creature->SetLeashPtr(controlledCreatureWithSameVictim->GetLeashPtr());
+    // Share leash with owner
     else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
-        creature->SetLastLeashExtensionTimePtr(ownerCreature->GetLastLeashExtensionTimePtr());
-    // Update leash timer when attacking creatures
-    else if (victim->IsCreature())
-        victim->ToCreature()->UpdateLeashExtensionTime();
+        creature->SetLeashPtr(ownerCreature->GetLeashPtr());
 
     // Player-controlled creatures (pets, charms) enter combat on contact instead
     // (melee swing execution or spell launch/hit, see Unit::AtTargetAttacked).
@@ -7280,7 +7278,7 @@ void Unit::CombatStop(bool includingCast, bool mutualPvP)
     if (IsPlayer())
         ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
     if (Creature* pCreature = ToCreature())
-        pCreature->ClearLastLeashExtensionTimePtr();
+        pCreature->ClearLeash();
 
     if (mutualPvP)
         ClearInCombat();
@@ -11214,12 +11212,6 @@ void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
 {
     if (!target->IsEngaged() && !canInitialAggro)
         return;
-
-    if (Creature* cTarget = target->ToCreature())
-    {
-        if (!cTarget->GetOwnerGUID().IsPlayer())
-            cTarget->UpdateLeashExtensionTime();
-    }
 
     target->EngageWithTarget(this);
     if (Unit* targetOwner = target->GetCharmerOrOwner())
