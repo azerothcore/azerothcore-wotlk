@@ -488,7 +488,10 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
         }
         else
         {
-            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, 0);
+            Creature* creatureCaster = caster->ToCreature();
+            // Drop the infinite cooldown set on apply, a longer running cooldown would otherwise be kept
+            creatureCaster->RemoveSpellCooldown(m_spellInfo->Id, false);
+            creatureCaster->AddSpellCooldown(m_spellInfo->Id, 0, 0);
 
             if (Unit* owner = caster->GetCharmerOrOwner())
             {
