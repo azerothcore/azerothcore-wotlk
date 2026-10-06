@@ -1,3 +1,4 @@
+-- DB update 2026_10_06_04 -> 2026_10_06_05
 --
 SET @BRONWYN := 21197;
 SET @BORGRIM := 21151;
