@@ -1269,8 +1269,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
             }
 
-            // DoT ticks and passive damage (e.g. Thorns) do not refresh the leash.
-            // After the threat, so that a damage pull engages first and the leash starts at the attacker.
+            // Not DoT ticks or Thorns. After the threat, so a damage pull starts the leash at the attacker.
             if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer()
                 && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
                 victim->ToCreature()->RefreshLeash(attacker);
@@ -7205,7 +7204,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
     }
 
-    // Share leash with controlled unit or owner. After engaging, which gives the creature a leash of its own.
+    // Share leash with controlled unit or owner, after engaging creates one
     if (controlledCreatureWithSameVictim)
         creature->ShareLeashWith(controlledCreatureWithSameVictim);
     else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
@@ -11219,8 +11218,7 @@ void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
     if (Unit* myOwner = GetCharmerOrOwner())
         target->EngageWithTarget(myOwner);
 
-    // Hostile spells, debuffs like Curse of Weakness included, and melee swings move the leash point
-    // like damage does. After engaging, so that a pull starts the leash at the attacker.
+    // Swings and hostile spells (debuffs too) move the leash point; after engaging, like damage
     if (Creature* cTarget = target->ToCreature())
         if (cTarget->IsEngaged() && !cTarget->GetOwnerGUID().IsPlayer())
             cTarget->RefreshLeash(this);

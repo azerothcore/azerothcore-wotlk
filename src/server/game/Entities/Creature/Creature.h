@@ -43,7 +43,7 @@ class CreatureGroup;
 typedef std::vector<uint8> CreatureTextRepeatIds;
 typedef std::unordered_map<uint8, CreatureTextRepeatIds> CreatureTextRepeatGroup;
 
-// Where a creature's leash is measured from: its position at aggro, then wherever it was last attacked from.
+// Position at aggro, moved to the last attacker
 struct CreatureLeash
 {
     Position Point;
@@ -413,7 +413,7 @@ public:
     void ClearLeash();
     void RefreshLeash(WorldObject const* attacker);
     [[nodiscard]] uint8 GetLeashTicks() const;
-    // Distance the AI keeps from its victim while fighting at range (0 in melee); counts as reach for the leash
+    // Distance the AI fights from at range; counts as reach for the leash
     void SetRangedAttackDistance(float distance) { _rangedAttackDistance = distance; }
 
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
@@ -556,7 +556,7 @@ private:
     void UpdateLeash(Unit const* victim);
     [[nodiscard]] bool IsWithinLeash(Unit const* victim) const;
 
-    // Shared between mobs who assist another: damaging one moves the leash point of all of them.
+    // Shared with assistants, pets and owner
     mutable std::shared_ptr<CreatureLeash> m_leash;
     uint32 _leashRefreshSeen;
     uint8 _leashTicks;

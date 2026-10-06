@@ -2996,12 +2996,9 @@ CreatureFamilyFleeAssistanceRadius = 30
 
 #
 #    CreatureLeashRadius
-#        Description: Distance (in yards) of an engaged creature's victim from the leash point (where
-#                     the fight started, or where it was last attacked from) beyond which the
-#                     creature counts towards evading. It evades after a level-based number of 1.6 s
-#                     ticks spent beyond it. Coming back within it, or standing still in the creature's
-#                     reach, restarts the count.
-#                     Does not apply in dungeons or raids.
+#        Description: Distance (in yards) of a creature's victim from where the fight started, or
+#                     where it was last attacked from. The creature evades after 6-13 ticks of 1.6 s
+#                     (by level) with its victim beyond it. Not used in dungeons or raids.
 #        Default:     18.5 - (Enabled)
 #                     0    - (Disabled)
 

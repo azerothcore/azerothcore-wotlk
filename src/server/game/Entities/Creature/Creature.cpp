@@ -2739,9 +2739,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         if (HasTauntAura())
             return true;
 
-        // An engaged creature leashes by ticks (UpdateLeash), not by distance from home.
-        // One whose leash broke without evading takes its victims back once it is attacked again,
-        // or once a victim is within its leash again.
+        // Leashes by ticks (UpdateLeash); a broken leash recovers when attacked or when the victim returns
         if (IsEngaged())
             return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen || IsWithinLeash(victim);
     }
@@ -2890,8 +2888,7 @@ void Creature::AtEngage(Unit* target)
 {
     Unit::AtEngage(target);
 
-    // A fresh leash from where the fight starts. Done before the AI engages, which can share
-    // it with the creature's pets and assistants.
+    // Before the AI engages, so pets and assistants can share it
     ClearLeash();
     m_leash = std::make_shared<CreatureLeash>(CreatureLeash{ GetPosition() });
 
@@ -3773,7 +3770,7 @@ void Creature::SetLeashPtr(std::shared_ptr<CreatureLeash> const& leash)
     m_leash = leash;
 }
 
-// Puts two creatures fighting together on one leash: the other's, unless damage has moved ours more often.
+// Keeps whichever leash attacks have moved more
 void Creature::ShareLeashWith(Creature* other)
 {
     if (other->GetLeashPtr()->Refreshes >= GetLeashPtr()->Refreshes)
@@ -3791,8 +3788,7 @@ void Creature::ClearLeash()
     _leashBroken = false;
 }
 
-// Damage, hostile spells and melee swings move the leash point to where the attacker stands and
-// restart the count, which is what lets a hunter kite a creature anywhere.
+// Moves the leash point to the attacker and restarts the count
 void Creature::RefreshLeash(WorldObject const* attacker)
 {
     CreatureLeash& leash = *GetLeashPtr();
@@ -3801,22 +3797,17 @@ void Creature::RefreshLeash(WorldObject const* attacker)
     ++leash.Refreshes;
 }
 
-// Fitted to TBC Classic sniffs: 6 ticks up to level 32, then about one more every 3.6 levels
-// (8 at 40, 11 at 50, 13 at 57). Higher levels are extrapolated.
+// Fitted to TBC Classic sniffs: 6 up to level 32, one more every ~3.6 levels, 13 from level 57
 uint8 Creature::GetLeashTicks() const
 {
     uint8 const level = GetLevel();
     if (level <= 32)
         return 6;
 
-    return 6 + uint8((level - 32) * 0.28f + 0.5f);
+    return std::min<uint8>(13, 6 + uint8((level - 32) * 0.28f + 0.5f));
 }
 
-// Runs every 1.6 s while the creature has a victim. Each tick its victim spends beyond the
-// leash distance from the leash point counts, whether walking away or standing where the
-// creature has not reached it yet; standing still within the creature's reach resets the count.
-// Ticks spent stunned or otherwise out of control (fleeing, confused, ...), and the one after,
-// are skipped.
+// Every 1.6 s: counts ticks the victim spends outside the leash, skipping ticks under lost control
 void Creature::UpdateLeash(Unit const* victim)
 {
     if (!sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS) || IsInEvadeMode() || GetCharmerOrOwnerGUID().IsPlayer())
@@ -3853,12 +3844,11 @@ void Creature::UpdateLeash(Unit const* victim)
     _leashBroken = _leashTicks >= GetLeashTicks();
 }
 
-// Whether a leash tick resets: the victim stands still within the creature's reach, or is within
-// the leash distance of the leash point.
+// Victim stands still in reach, or is within the leash distance of the leash point
 bool Creature::IsWithinLeash(Unit const* victim) const
 {
     bool const victimMoving = victim->isMoving() || !victim->movespline->Finalized();
-    // A ranged creature reaches its victim from the distance it chases at
+    // Ranged creatures reach from their chase distance
     float const rangedReach = std::max(m_CombatDistance, _rangedAttackDistance);
     bool const victimReached = IsWithinMeleeRange(victim)
         || (rangedReach > 0.0f && IsWithinCombatRange(victim, rangedReach + CONTACT_DISTANCE));
