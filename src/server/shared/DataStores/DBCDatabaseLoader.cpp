@@ -62,7 +62,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
         return nullptr;
     }
 
-    // Skip leading rows with an out of range index, the first valid one holds the highest index
+    // Negative IDs sort last, so this only skips rows when every ID is invalid
     // database query *MUST* contain ORDER BY `index_field` DESC clause
     while ((*result)[_sqlIndexPos].Get<uint32>() > MAX_DBC_INDEX)
     {
