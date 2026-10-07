@@ -35,7 +35,8 @@ public:
         if (!session)
             return;
 
-        uint32 playerGUID = player->GetGUID().GetCounter();
+        ObjectGuid playerGuid = player->GetGUID();
+        uint32 playerGUID = playerGuid.GetCounter();
         bool isAlliance = player->GetTeamId() == TEAM_ALLIANCE;
 
         for (auto const& [mailId, servMail] : serverMailStore)
@@ -45,9 +46,13 @@ public:
             stmt->SetData(1, mailId);
 
             // Capture servMail by value
-            auto callback = [session, servMailWrapper = std::reference_wrapper<ServerMail const>(servMail), isAlliance](PreparedQueryResult result)
+            auto callback = [session, playerGuid, servMailWrapper = std::reference_wrapper<ServerMail const>(servMail), isAlliance](PreparedQueryResult result)
                 {
                     ServerMail const& servMail = servMailWrapper.get();  // Dereference the wrapper to get the original object
+
+                    Player* sessionPlayer = session->GetPlayer();
+                    if (!sessionPlayer || sessionPlayer->GetGUID() != playerGuid)
+                        return;
 
                     if (!result)
                     {
@@ -56,7 +61,7 @@ public:
                         std::vector<ServerMailCondition> const& conditions = servMail.conditions;
 
                         sServerMailMgr->SendServerMail(
-                            session->GetPlayer(),
+                            sessionPlayer,
                             servMail.id,
                             servMail.senderEntry,
                             money,

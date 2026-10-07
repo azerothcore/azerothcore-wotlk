@@ -259,3 +259,13 @@ bool Acore::Hyperlinks::LinkTags::trade::StoreTo(TradeskillLinkData& val, std::s
     return (val.Spell && val.Spell->Effects[0].Effect == SPELL_EFFECT_TRADE_SKILL && t.TryConsumeTo(val.CurValue) &&
         t.TryConsumeTo(val.MaxValue) && t.TryConsumeTo(val.Owner) && t.TryConsumeTo(val.KnownRecipes) && t.IsEmpty());
 }
+
+bool Acore::Hyperlinks::LinkTags::found::StoreTo(FoundLinkData& val, std::string_view text)
+{
+    // format is "<rawguid>:<entry>:"
+    if (!text.ends_with(HYPERLINK_DATA_DELIMITER))
+        return false;
+
+    HyperlinkDataTokenizer t(text);
+    return t.TryConsumeTo(val.RawGuid) && t.TryConsumeTo(val.Entry) && t.IsEmpty();
+}

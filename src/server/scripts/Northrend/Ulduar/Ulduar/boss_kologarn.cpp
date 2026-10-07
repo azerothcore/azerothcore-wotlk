@@ -166,6 +166,7 @@ struct boss_kologarn : public BossAI
             me->GetMotionMaster()->MoveTargetedHome();
             me->SetDisableGravity(true);
             me->DisableRotate(true);
+            me->SetCorpseDelay(7 * DAY);
 
             _Reset();
 
@@ -234,6 +235,8 @@ struct boss_kologarn : public BossAI
                 arm->DespawnOrUnsummon(3s); // visual
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisableGravity(true);
+            me->SetCorpseDelay(7 * DAY);
+            me->SetCorpseRemoveTime(7 * DAY);
         }
 
         void KilledUnit(Unit*) override

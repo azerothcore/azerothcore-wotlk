@@ -250,6 +250,9 @@ public:
 
     virtual bool SetBossState(uint32 id, EncounterState state);
     EncounterState GetBossState(uint32 id) const { return id < bosses.size() ? bosses[id].state : TO_BE_DECIDED; }
+    // Spawns a BossAI bound to an encounter; the respawn system keeps them down while it is DONE
+    void RegisterBossSpawn(ObjectGuid::LowType spawnId, uint32 bossId) { _bossSpawns[spawnId] = bossId; }
+    bool IsBossSpawnDone(ObjectGuid::LowType spawnId) const;
     static std::string GetBossStateName(uint8 state);
     CreatureBoundary const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
     BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; }
@@ -351,6 +354,7 @@ private:
     DoorInfoMap doors;
     MinionInfoMap minions;
     ObjectInfoMap _creatureInfo;
+    std::unordered_map<ObjectGuid::LowType, uint32 /*bossId*/> _bossSpawns;
     ObjectInfoMap _gameObjectInfo;
     ObjectInfoMap _summonInfo;
     ObjectGuidMap _objectGuids;

@@ -1476,7 +1476,7 @@ public:
                         c->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         if (Creature* jaraxxus = c->SummonCreature(NPC_JARAXXUS, Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), Locs[LOC_CENTER].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000))
                         {
-                            jaraxxus->CastSpell(jaraxxus, 67924, true);
+                            jaraxxus->CastSpell(jaraxxus, SPELL_JARAXXUS_CHAINS, true);
                             jaraxxus->SetReactState(REACT_AGGRESSIVE);
                             jaraxxus->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             jaraxxus->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
@@ -1638,7 +1638,7 @@ public:
                     {
                         std::list<Creature*> L;
                         uint8 count = 0;
-                        c->GetCreaturesWithEntryInRange(L, 200.0f, 34826); // find all mistress of pain
+                        c->GetCreaturesWithEntryInRange(L, 200.0f, NPC_MISTRESS_OF_PAIN);
                         for( std::list<Creature*>::const_iterator itr = L.begin(); itr != L.end(); ++itr )
                             if ((*itr)->IsAlive())
                                 ++count;

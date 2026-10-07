@@ -17,12 +17,14 @@
 
 #include "AreaDefines.h"
 #include "CreatureScript.h"
+#include "Map.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "TaskScheduler.h"
 #include "World.h"
+#include <algorithm>
+#include <array>
 
 class npc_steam_powered_auctioneer : public CreatureScript
 {
@@ -72,49 +74,6 @@ public:
     }
 };
 
-/******************************************
-***** Shady Gnome - A Suitable Disguise **
-****************************************/
-
-enum DisguiseEvent
-{
-    ACTION_SHANDY_INTRO         = 0,
-    ACTION_WATER                = 1,
-    ACTION_SHIRTS               = 2,
-    ACTION_PANTS                = 3,
-    ACTION_UNMENTIONABLES       = 4,
-
-    EVENT_INTRO_DH1             = 1,
-    EVENT_INTRO_DH2             = 2,
-    EVENT_INTRO_DH3             = 3,
-    EVENT_INTRO_DH4             = 4,
-    EVENT_INTRO_DH5             = 5,
-    EVENT_INTRO_DH6             = 6,
-    EVENT_OUTRO_DH              = 7,
-
-    SAY_SHANDY1                 = 0,
-    SAY_SHANDY2                 = 1,
-    SAY_SHANDY3                 = 2,
-    SAY_SHANDY_WATER            = 3, // shirts = 4, pants = 5, unmentionables = 6
-    SAY_SHANDY4                 = 7,
-    SAY_SHANDY5                 = 8,
-    SAY_SHANDY6                 = 9,
-};
-
-enum DisguiseMisc
-{
-    QUEST_SUITABLE_DISGUISE_A       = 20438,
-    QUEST_SUITABLE_DISGUISE_H       = 24556,
-
-    SPELL_EVOCATION_VISUAL          = 69659,
-
-    NPC_AQUANOS_ENTRY               = 36851,
-
-    GOSSIP_MENU_AQUANOS             = 10854,
-    GOSSIP_AQUANOS_ALLIANCE         = 0,
-    GOSSIP_AQUANOS_HORDE            = 1,
-};
-
 enum spells
 {
     // Sewers Warrior Spells
@@ -131,146 +90,6 @@ enum spells
     SPELL_FROSTFIRE                 = 44614
 };
 
-class npc_shandy_dalaran : public CreatureScript
-{
-public:
-    npc_shandy_dalaran() : CreatureScript("npc_shandy_dalaran") { }
-
-    struct npc_shandy_dalaranAI : public ScriptedAI
-    {
-        npc_shandy_dalaranAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            _events.Reset();
-            _aquanosGUID.Clear();
-        }
-
-        void SetData(uint32 type, uint32 /*data*/) override
-        {
-            switch (type)
-            {
-                case ACTION_SHANDY_INTRO:
-                    if (Creature* aquanos = me->FindNearestCreature(NPC_AQUANOS_ENTRY, 30, true))
-                        _aquanosGUID = aquanos->GetGUID();
-
-                    _events.Reset();
-                    _lCount = 0;
-                    _lSource = 0;
-                    _canWash = false;
-                    Talk(SAY_SHANDY1);
-                    _events.ScheduleEvent(EVENT_INTRO_DH1, 5s);
-                    _events.ScheduleEvent(EVENT_OUTRO_DH, 10min);
-                    break;
-                default:
-                    if (_lSource == type && _canWash)
-                    {
-                        _canWash = false;
-                        _events.ScheduleEvent(EVENT_INTRO_DH2, type == ACTION_UNMENTIONABLES ? 4s : 10s);
-                        Talk(SAY_SHANDY2);
-                        if (Creature* aquanos = ObjectAccessor::GetCreature(*me, _aquanosGUID))
-                            aquanos->CastSpell(aquanos, SPELL_EVOCATION_VISUAL, false);
-                    }
-                    break;
-            }
-        }
-
-        void RollTask()
-        {
-            _lSource = urand(ACTION_SHIRTS, ACTION_UNMENTIONABLES);
-            if (_lCount == 1 || _lCount == 4)
-                _lSource = ACTION_WATER;
-
-            Talk(SAY_SHANDY_WATER + _lSource - 1);
-            _canWash = true;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-            switch (_events.ExecuteEvent())
-            {
-                case EVENT_INTRO_DH1:
-                    Talk(SAY_SHANDY3);
-                    _events.ScheduleEvent(EVENT_INTRO_DH2, 15s);
-                    break;
-                case EVENT_INTRO_DH2:
-                    if (_lCount++ > 6)
-                        _events.ScheduleEvent(EVENT_INTRO_DH3, 6s);
-                    else
-                        RollTask();
-
-                    break;
-                case EVENT_INTRO_DH3:
-                    Talk(SAY_SHANDY4);
-                    _events.ScheduleEvent(EVENT_INTRO_DH4, 20s);
-                    break;
-                case EVENT_INTRO_DH4:
-                    Talk(SAY_SHANDY5);
-                    _events.ScheduleEvent(EVENT_INTRO_DH5, 3s);
-                    break;
-                case EVENT_INTRO_DH5:
-                    me->SummonGameObject(201384, 5798.74f, 693.19f, 657.94f, 0.91f, 0, 0, 0, 0, 90000000);
-                    _events.ScheduleEvent(EVENT_INTRO_DH6, 1s);
-                    break;
-                case EVENT_INTRO_DH6:
-                    me->SetWalk(true);
-                    me->GetMotionMaster()->MovePoint(0, 5797.55f, 691.97f, 657.94f);
-                    _events.RescheduleEvent(EVENT_OUTRO_DH, 30s);
-                    break;
-                case EVENT_OUTRO_DH:
-                    me->GetMotionMaster()->MoveTargetedHome();
-                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                    _events.Reset();
-                    break;
-            }
-        }
-
-    private:
-        EventMap _events;
-        ObjectGuid _aquanosGUID;
-        uint8 _lCount;
-        uint32 _lSource;
-
-        bool _canWash;
-    };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_A) == QUEST_STATUS_INCOMPLETE ||
-                player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_H) == QUEST_STATUS_INCOMPLETE)
-        {
-            if (player->GetTeamId() == TEAM_ALLIANCE)
-                AddGossipItemFor(player, GOSSIP_MENU_AQUANOS, GOSSIP_AQUANOS_ALLIANCE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            else
-                AddGossipItemFor(player, GOSSIP_MENU_AQUANOS, GOSSIP_AQUANOS_HORDE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        }
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-                CloseGossipMenuFor(player);
-                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-                creature->AI()->SetData(ACTION_SHANDY_INTRO, 0);
-                break;
-        }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_shandy_dalaranAI(creature);
-    }
-};
 enum ArchmageLandalockQuests
 {
     QUEST_SARTHARION_MUST_DIE               = 24579,
@@ -413,13 +232,51 @@ enum Spells
     SPELL_SILVER_COVENANT_DISGUISE_MALE    = 70972,
 };
 
-enum NPCs // All outdoor guards are within 35.0f of these NPCs
+enum NPCs
 {
-    NPC_APPLEBOUGH_A                       = 29547,
-    NPC_SWEETBERRY_H                       = 29715,
     NPC_SILVER_COVENANT_GUARDIAN_MAGE      = 29254,
     NPC_SUNREAVER_GUARDIAN_MAGE            = 29255,
 };
+
+// The guards must notice a trespasser anywhere inside the quarter they watch, not
+// just beside themselves: no guard stands within interaction range of most of the
+// floor area of either sanctum.
+constexpr float GUARD_WATCH_RANGE = 40.0f;
+
+// The area id only covers part of each sanctum. Most of the restricted ground -
+// the buildings, the inns, much of the interior - resolves to 4395 (Dalaran), the
+// same value the neutral Legerdemain Lounge reports, so an area check alone leaves
+// holes. WMOAreaTable.dbc does tell them apart, and it is what labels the building
+// on screen as you walk in, so match the WMO group as well.
+//
+// From WMOAreaTable.dbc for the Dalaran model (WMOID 5164): every group named
+// "The Silver Enclave" / "A Hero's Welcome", and "Sunreaver's Sanctuary" / "The
+// Filthy Animal". The neutral buildings - the Legerdemain Lounge, Sisters
+// Sorcerous, The Wonderworks, the Visitor Center - are in neither list, which is
+// what keeps a hostile visitor welcome in them. 25768 is The Beer Garden, a named
+// venue inside the Silver Enclave rather than a group named for the quarter, found
+// by sweeping the quarter and reading back the groups the server actually resolves.
+constexpr std::array<int32, 11> WMO_GROUPS_SILVER_ENCLAVE =
+{
+    24537, 24704, 24713, 25067, 25177, 25367, 25368, 25369, 25370, 25371, 25768
+};
+constexpr std::array<int32, 7> WMO_GROUPS_SUNREAVERS_SANCTUARY =
+{
+    24725, 25066, 25145, 25381, 25383, 25384, 25406
+};
+
+template <std::size_t N>
+bool IsInsideWMOGroups(WorldObject const* who, std::array<int32, N> const& groups)
+{
+    uint32 mogpFlags;
+    int32 adtId, rootId, groupId;
+    if (!who->GetMap()->GetAreaInfo(who->GetPhaseMask(),
+        who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(),
+        mogpFlags, adtId, rootId, groupId))
+        return false;
+
+    return std::find(groups.begin(), groups.end(), groupId) != groups.end();
+}
 
 class npc_mageguard_dalaran : public CreatureScript
 {
@@ -443,10 +300,10 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || !who->IsInWorld()|| who->GetZoneId() != AREA_DALARAN || who->GetAreaId() == AREA_SEWER_EXIT_PIPE)
+            if (!who || !who->IsInWorld() || who->GetZoneId() != AREA_DALARAN)
                 return;
 
-            if (!me->IsWithinDist(who, 5.0f, false))
+            if (!me->IsWithinDist(who, GUARD_WATCH_RANGE, false))
                 return;
 
             if (who->IsCreature() && who->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
@@ -459,31 +316,28 @@ public:
                     player->HasAnyAuras(SPELL_SUNREAVER_DISGUISE_FEMALE, SPELL_SUNREAVER_DISGUISE_MALE, SPELL_SILVER_COVENANT_DISGUISE_FEMALE, SPELL_SILVER_COVENANT_DISGUISE_MALE))
                 return;
 
+            // Eject on where the trespasser actually is, not on how it is standing
+            // relative to the guard. Both halves are needed: the area ids cover each
+            // sanctum's open courtyard, the WMO groups cover its buildings, which
+            // report the plain zone id instead. Neutral streets, mailboxes, the sewer
+            // pipe and the neutral inns are in neither.
+            //
+            // Position comes from who rather than its owner, so that a pet sent into
+            // a quarter is ejected on its own footing - it is who that gets teleported.
+            uint32 const areaId = who->GetAreaId();
+
             switch (me->GetEntry())
             {
                 case NPC_SILVER_COVENANT_GUARDIAN_MAGE:
-                    if (player->GetTeamId() == TEAM_HORDE)              // Horde unit found in Alliance area
-                    {
-                        if (GetClosestCreatureWithEntry(me, NPC_APPLEBOUGH_A, 32.0f))
-                        {
-                            if (me->isInBackInMap(who, 12.0f))   // In my line of sight, "outdoors", and behind me
-                                DoCast(who, SPELL_TRESPASSER_A); // Teleport the Horde unit out
-                        }
-                        else                                      // In my line of sight, and "indoors"
-                            DoCast(who, SPELL_TRESPASSER_A);     // Teleport the Horde unit out
-                    }
+                    if (player->GetTeamId() == TEAM_HORDE
+                        && (areaId == AREA_THE_SILVER_ENCLAVE || IsInsideWMOGroups(who, WMO_GROUPS_SILVER_ENCLAVE)))
+                        DoCast(who, SPELL_TRESPASSER_A);
                     break;
                 case NPC_SUNREAVER_GUARDIAN_MAGE:
-                    if (player->GetTeamId() == TEAM_ALLIANCE)           // Alliance unit found in Horde area
-                    {
-                        if (GetClosestCreatureWithEntry(me, NPC_SWEETBERRY_H, 32.0f))
-                        {
-                            if (me->isInBackInMap(who, 12.0f))   // In my line of sight, "outdoors", and behind me
-                                DoCast(who, SPELL_TRESPASSER_H); // Teleport the Alliance unit out
-                        }
-                        else                                      // In my line of sight, and "indoors"
-                            DoCast(who, SPELL_TRESPASSER_H);     // Teleport the Alliance unit out
-                    }
+                    if (player->GetTeamId() == TEAM_ALLIANCE
+                        && (areaId == AREA_SUNREAVERS_SANCTUARY
+                            || IsInsideWMOGroups(who, WMO_GROUPS_SUNREAVERS_SANCTUARY)))
+                        DoCast(who, SPELL_TRESPASSER_H);
                     break;
             }
             me->SetOrientation(me->GetHomePosition().GetOrientation());
@@ -866,7 +720,6 @@ void AddSC_dalaran()
     // our
     new npc_steam_powered_auctioneer();
     new npc_mei_francis_mount();
-    new npc_shandy_dalaran();
     new npc_archmage_landalock();
     new npc_dalaran_mage();
     new npc_dalaran_warrior();
