@@ -262,9 +262,7 @@ struct boss_netherspite : public BossAI
                 me->SetOrientation(angle);
                 me->SetFacingTo(angle);
                 DoCast(target, SPELL_NETHERBREATH);
-                // turn back to the victim about a second after the breath, not in BANISH_PHASE so it still
-                // runs if the phase ends first
-                scheduler.Schedule(3500ms, [this](TaskContext)
+                scheduler.Schedule(3500ms, BANISH_PHASE, [this](TaskContext)
                 {
                     if (Unit* victim = me->GetVictim())
                     {
