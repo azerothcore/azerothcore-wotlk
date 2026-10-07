@@ -57,23 +57,20 @@ enum Misc
     DATA_OURO_HEALTH            = 0
 };
 
-namespace
+static bool IsTargetableAtRange(Creature const* creature, Unit const* target)
 {
-    bool IsTargetableAtRange(Creature const* creature, Unit const* target)
-    {
-        return creature->IsValidAttackTarget(target) && creature->CanSeeOrDetect(target)
-            && creature->_IsTargetAcceptable(target);
-    }
+    return creature->IsValidAttackTarget(target) && creature->CanSeeOrDetect(target)
+        && creature->_IsTargetAcceptable(target);
+}
 
-    bool HasTargetableThreat(Creature const* creature)
-    {
-        // Ranged players are offline for Ouro's melee AI, but still count unless they cannot be targeted.
-        for (ThreatReference const* ref : creature->GetThreatMgr().GetUnsortedThreatList())
-            if (IsTargetableAtRange(creature, ref->GetVictim()))
-                return true;
+static bool HasTargetableThreat(Creature const* creature)
+{
+    // Ranged players are offline for Ouro's melee AI, but still count unless they cannot be targeted.
+    for (ThreatReference const* ref : creature->GetThreatMgr().GetUnsortedThreatList())
+        if (IsTargetableAtRange(creature, ref->GetVictim()))
+            return true;
 
-        return false;
-    }
+    return false;
 }
 
 struct npc_ouro_spawner : public ScriptedAI
