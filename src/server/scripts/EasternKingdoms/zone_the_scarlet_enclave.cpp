@@ -26,6 +26,7 @@
 #include "ObjectMgr.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -1377,6 +1378,7 @@ enum LightOfDawnEncounter
     EVENT_SPELL_DEATH_EMBRACE,
     EVENT_SPELL_UNHOLY_BLIGHT,
     EVENT_SPELL_DARION_MOD_DAMAGE,
+    EVENT_ENGAGE_IDLE_COMBATANTS,
     // Positioning
     EVENT_FINISH_FIGHT_1,
     EVENT_FINISH_FIGHT_2,
@@ -1450,13 +1452,25 @@ enum LightOfDawnEncounter
     ACTION_PLAY_EMOTE                   = 1,
     ACTION_POSITION_NPCS                = 2,
 
+    POINT_ARMY_CHARGE                   = 1,
+
     ENCOUNTER_START_TIME                = 5,
     ENCOUNTER_TOTAL_DEFENDERS           = 300,
     ENCOUNTER_TOTAL_SCOURGE             = 10000,
+    ENCOUNTER_BATTLE_RADIUS             = 80,
+    ENCOUNTER_PLAYER_REACH              = 50,
 
     ENCOUNTER_STATE_NONE                = 0,
     ENCOUNTER_STATE_FIGHT               = 1,
     ENCOUNTER_STATE_OUTRO               = 2,
+};
+
+enum LightOfDawnSummonGroups
+{
+    SUMMON_GROUP_SCOURGE_WAVE_1         = 0,
+    SUMMON_GROUP_SCOURGE_WAVE_5         = 4,
+    SUMMON_GROUP_DEFENDERS              = 5,
+    SUMMON_GROUP_SCOURGE_LEADERS        = 30
 };
 
 enum LightOfDawnNPCs
@@ -1561,6 +1575,8 @@ const Position LightOfDawnFightPos[] =
     {2258.42f, -5307.72f, 81.98f, 0.1f}
 };
 
+const Position LightOfDawnBattleCenter = {2275.0f, -5283.0f, 82.0f, 0.0f};
+
 class DelayedSummonEvent : public BasicEvent
 {
 public:
@@ -1586,6 +1602,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         me->SetCorpseDelay(3 * 60);
         me->SetRespawnTime(3 * 60);
         resetExecuted = false;
+        armyReleased = false;
     }
 
     EventMap events;
@@ -1595,6 +1612,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
     uint32 scourgeRemaining;
     uint8 battleStarted;
     bool resetExecuted;
+    bool armyReleased;
 
     void sGossipHello(Player* player) override
     {
@@ -1693,7 +1711,20 @@ struct npc_highlord_darion_mograine : public ScriptedAI
     {
         summons.Summon(cr);
 
-        if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING && battleStarted == ENCOUNTER_STATE_FIGHT)
+        if (battleStarted == ENCOUNTER_STATE_FIGHT && armyReleased && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING)
+        {
+            PrepareCombatant(cr);
+
+            // Scourge replacements spawn in the staging area and charge into the battle
+            if (cr->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
+            {
+                SendIntoBattle(cr, LightOfDawnFightPos[urand(0, 9)]);
+                return;
+            }
+        }
+
+        if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING &&
+            cr->GetEntry() < NPC_RAMPAGING_ABOMINATION && battleStarted == ENCOUNTER_STATE_FIGHT)
         {
             Position pos = LightOfDawnFightPos[urand(0, 9)];
             if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
@@ -1717,7 +1748,9 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         if (battleStarted != ENCOUNTER_STATE_FIGHT)
             return;
 
-        me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), *creature), 3s);
+        Position pos = creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION ?
+            GetScourgeReinforcementPosition(creature) : creature->GetPosition();
+        me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), pos), 3s);
         if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
         {
             --scourgeRemaining;
@@ -1742,6 +1775,8 @@ struct npc_highlord_darion_mograine : public ScriptedAI
 
     void FinishFight()
     {
+        armyReleased = false;
+
         if (Creature* tirion = me->SummonCreature(NPC_HIGHLORD_TIRION_FORDRING, LightOfDawnPos[6], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600000))
         {
             tirion->LoadEquipment(0, true);
@@ -1777,6 +1812,15 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 500ms);
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        // Evading walks Darion back home and leaves him idle in the middle of the battle
+        if (battleStarted == ENCOUNTER_STATE_FIGHT && armyReleased)
+            return;
+
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
     void Reset() override
     {
         if (resetExecuted)
@@ -1800,12 +1844,13 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         me->SetWalk(false);
 
         battleStarted = ENCOUNTER_STATE_NONE;
+        armyReleased = false;
         startTimeRemaining = 0;
         defendersRemaining = 0;
         scourgeRemaining = 0;
 
         SendInitialWorldStates();
-        me->SummonCreatureGroup(30);
+        me->SummonCreatureGroup(SUMMON_GROUP_SCOURGE_LEADERS);
     }
 
     Creature* GetEntryFromSummons(uint32 entry)
@@ -1815,6 +1860,117 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 if (summon->GetEntry() == entry)
                     return summon;
         return nullptr;
+    }
+
+    void PrepareCombatant(Creature* combatant)
+    {
+        // An evading creature refuses to attack and walks back home, which leaves it idle
+        if (SmartAI* ai = CAST_AI(SmartAI, combatant->AI()))
+            ai->SetEvadeDisabled(true);
+    }
+
+    void SendIntoBattle(Creature* combatant, Position const& dest)
+    {
+        combatant->SetHomePosition(dest);
+        combatant->GetMotionMaster()->MovePoint(POINT_ARMY_CHARGE, dest.GetPositionX(), dest.GetPositionY(),
+            dest.GetPositionZ(), FORCED_MOVEMENT_RUN, 0.f, 0.f, true, false);
+    }
+
+    Creature* SelectNearestEnemy(Unit* fighter, std::vector<Creature*> const& candidates)
+    {
+        Creature* nearest = nullptr;
+        float nearestDistSq = std::numeric_limits<float>::max();
+        for (Creature* candidate : candidates)
+        {
+            if (candidate == fighter || !candidate->IsAlive() || !fighter->IsValidAttackTarget(candidate))
+                continue;
+
+            float distSq = fighter->GetExactDistSq(candidate);
+            if (distSq < nearestDistSq)
+            {
+                nearest = candidate;
+                nearestDistSq = distSq;
+            }
+        }
+        return nearest;
+    }
+
+    void LeaveFarPlayerFight(Creature* combatant)
+    {
+        // With evade disabled nothing ends the combat of a player who left the battle, nor leashes a chasing combatant
+        // A player still in reach of a combatant inside the battle keeps fighting it, so it cannot be hit for free
+        bool combatantInBattle = combatant->IsWithinDist2d(&LightOfDawnBattleCenter, ENCOUNTER_BATTLE_RADIUS);
+        Unit* victim = combatant->GetVictim();
+        bool victimLeft = false;
+        std::vector<ObjectGuid> farPlayerSide;
+        for (auto const& [guid, ref] : combatant->GetCombatManager().GetPvECombatRefs())
+        {
+            Unit* other = ref->GetOther(combatant);
+            if (other->GetCharmerOrOwnerPlayerOrPlayerItself() &&
+                !other->IsWithinDist2d(&LightOfDawnBattleCenter, ENCOUNTER_BATTLE_RADIUS) &&
+                (!combatantInBattle || !other->IsWithinDist(combatant, ENCOUNTER_PLAYER_REACH)))
+            {
+                farPlayerSide.push_back(guid);
+                if (other == victim)
+                    victimLeft = true;
+            }
+        }
+
+        for (ObjectGuid const& guid : farPlayerSide)
+        {
+            auto const& refs = combatant->GetCombatManager().GetPvECombatRefs();
+            auto itr = refs.find(guid);
+            if (itr != refs.end())
+                itr->second->EndCombat();
+        }
+
+        if (victimLeft)
+            combatant->AttackStop();
+    }
+
+    void CollectCombatants(std::vector<Creature*>& out)
+    {
+        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                if (summon->IsAlive() && summon->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING)
+                    out.push_back(summon);
+
+        if (me->IsAlive())
+            out.push_back(me);
+    }
+
+    Position GetScourgeReinforcementPosition(Creature const* dead)
+    {
+        // Scourge staging area: the spawn positions of the dead creature's entry, else any wave position
+        std::vector<Position> positions;
+        std::vector<Position> wavePositions;
+        auto addGroup = [&](uint8 group)
+        {
+            std::vector<TempSummonData> const* data =
+                sObjectMgr->GetSummonGroup(me->GetEntry(), SUMMONER_TYPE_CREATURE, group);
+            if (!data)
+                return;
+
+            for (TempSummonData const& slot : *data)
+            {
+                if (slot.entry == dead->GetEntry())
+                    positions.push_back(slot.pos);
+                if (group != SUMMON_GROUP_SCOURGE_LEADERS)
+                    wavePositions.push_back(slot.pos);
+            }
+        };
+
+        for (uint8 group = SUMMON_GROUP_SCOURGE_WAVE_1; group <= SUMMON_GROUP_SCOURGE_WAVE_5; ++group)
+            addGroup(group);
+        addGroup(SUMMON_GROUP_SCOURGE_LEADERS);
+
+        if (positions.empty())
+            positions = wavePositions;
+
+        if (positions.empty())
+            return dead->GetPosition();
+
+        return Acore::Containers::SelectRandomContainerElement(positions);
     }
 
     void MovementInform(uint32 type, uint32 point) override
@@ -1887,7 +2043,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 }
                 else
                     me->CastSpell(me, SPELL_CAMERA_SHAKE, true);
-                me->SummonCreatureGroup(eventId - EVENT_START_COUNTDOWN_6);
+                me->SummonCreatureGroup(SUMMON_GROUP_SCOURGE_WAVE_1 + (eventId - EVENT_START_COUNTDOWN_6));
                 break;
             case EVENT_START_COUNTDOWN_11:
                 Talk(SAY_LIGHT_OF_DAWN06);
@@ -1901,24 +2057,53 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                        {
-                            Position pos = LightOfDawnPos[first];
-                            summon->SetHomePosition(pos);
-                            summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, true, false);
-                        }
+                            if (summon->IsAlive())
+                            {
+                                PrepareCombatant(summon);
+                                SendIntoBattle(summon, LightOfDawnPos[first]);
+                            }
                         first = first == 0 ? 1 : 0;
                     }
                     Position pos = LightOfDawnPos[first];
                     me->SetHomePosition(pos);
                     me->SetWalk(false);
-                    me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, true, true);
+                    me->GetMotionMaster()->MovePoint(POINT_ARMY_CHARGE, pos.GetPositionX(), pos.GetPositionY(),
+                        pos.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, true, true);
                     DoCastSelf(SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                    armyReleased = true;
                     break;
                 }
             case EVENT_START_COUNTDOWN_14:
                 me->SetImmuneToAll(false);
-                me->SummonCreatureGroup(5);
+                me->SummonCreatureGroup(SUMMON_GROUP_DEFENDERS);
+                events.ScheduleEvent(EVENT_ENGAGE_IDLE_COMBATANTS, 1s);
                 return;
+            case EVENT_ENGAGE_IDLE_COMBATANTS:
+                {
+                    if (battleStarted != ENCOUNTER_STATE_FIGHT || !armyReleased)
+                        break;
+
+                    std::vector<Creature*> combatants;
+                    CollectCombatants(combatants);
+                    for (Creature* combatant : combatants)
+                    {
+                        // Keep the leash from dropping targets that are far from home
+                        combatant->UpdateLeashExtensionTime();
+                        LeaveFarPlayerFight(combatant);
+
+                        // Darion re-targets in UpdateAI; unconscious defenders stay down;
+                        // charging units finish their charge
+                        if (combatant == me || combatant->GetVictim() || combatant->IsImmuneToNPC() ||
+                            combatant->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
+                            continue;
+
+                        if (Creature* enemy = SelectNearestEnemy(combatant, combatants))
+                            combatant->AI()->AttackStart(enemy);
+                    }
+
+                    events.ScheduleEvent(EVENT_ENGAGE_IDLE_COMBATANTS, 1s);
+                    break;
+                }
             case EVENT_FINISH_FIGHT_1:
                 summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
                 battleStarted = ENCOUNTER_STATE_OUTRO;
@@ -2396,6 +2581,15 @@ struct npc_highlord_darion_mograine : public ScriptedAI
 
         if (battleStarted != ENCOUNTER_STATE_FIGHT)
             return;
+
+        // Re-target in the same tick, so a fight event is not dropped for lack of a victim
+        if (armyReleased && !me->GetVictim())
+        {
+            std::vector<Creature*> combatants;
+            CollectCombatants(combatants);
+            if (Creature* enemy = SelectNearestEnemy(me, combatants))
+                AttackStart(enemy);
+        }
 
         if (!UpdateVictim())
             return;
