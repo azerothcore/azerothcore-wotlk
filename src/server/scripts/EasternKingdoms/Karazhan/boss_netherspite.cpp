@@ -257,27 +257,24 @@ struct boss_netherspite : public BossAI
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
             {
-                // no facing on cast start, he keeps facing his victim until spell_netherspite_netherbreath turns him
-                me->CastSpell(target, SPELL_NETHERBREATH, TRIGGERED_IGNORE_SET_FACING);
-                // client faces the target field over SetFacingTo, so clear it for the cast
-                me->SetTarget();
-                // without a target the client falls back to its last facing update, stale on the phase's first breath
-                if (Unit* victim = me->GetVictim())
-                    me->SetFacingTo(me->GetAngle(victim));
-                // not in BANISH_PHASE, must still run if the phase ends first
+                // root blocks SetInFront, so turn him by hand, the breath cone fires along his facing
+                float angle = me->GetAngle(target);
+                me->SetOrientation(angle);
+                me->SetFacingTo(angle);
+                DoCast(target, SPELL_NETHERBREATH);
+                // turn back to the victim about a second after the breath, not in BANISH_PHASE so it still
+                // runs if the phase ends first
                 scheduler.Schedule(3500ms, [this](TaskContext)
                 {
                     if (Unit* victim = me->GetVictim())
                     {
-                        // root blocks the core from turning him back, and the client keeps the breath's facing
-                        float angle = me->GetAngle(victim);
-                        me->SetOrientation(angle);
-                        me->SetFacingTo(angle);
-                        me->SetTarget(victim->GetGUID());
+                        float victimAngle = me->GetAngle(victim);
+                        me->SetOrientation(victimAngle);
+                        me->SetFacingTo(victimAngle);
                     }
                 });
             }
-            context.Repeat(5s, 7s);
+            context.Repeat(5s);
         });
 
         for (uint8 i = 0; i < 3; ++i)
@@ -352,33 +349,8 @@ class spell_nether_portal_perseverence : public AuraScript
     }
 };
 
-// 38523 - Netherbreath
-class spell_netherspite_netherbreath : public SpellScript
-{
-    PrepareSpellScript(spell_netherspite_netherbreath);
-
-    // Rooted units can't turn (UNIT_STATE_CANNOT_TURN), so the banish root keeps Netherspite facing his
-    // pre-banish victim. Turn him to the chosen target by hand, since the breath cone fires wherever he faces.
-    void HandleBeforeCast()
-    {
-        Unit* caster = GetCaster();
-        if (Unit* target = GetExplTargetUnit())
-        {
-            float angle = caster->GetAngle(target);
-            caster->SetOrientation(angle);
-            caster->SetFacingTo(angle);
-        }
-    }
-
-    void Register() override
-    {
-        BeforeCast += SpellCastFn(spell_netherspite_netherbreath::HandleBeforeCast);
-    }
-};
-
 void AddSC_boss_netherspite()
 {
     RegisterKarazhanCreatureAI(boss_netherspite);
     RegisterSpellScript(spell_nether_portal_perseverence);
-    RegisterSpellScript(spell_netherspite_netherbreath);
 }
