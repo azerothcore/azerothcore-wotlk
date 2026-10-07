@@ -1,9 +1,13 @@
 -- Test content: two copies of the same teleport portal, to compare the old full-row `spell_dbc` format
--- with the new partial (NULL) format. Both teleport to (-1288, 1231, 110) on Kalimdor.
+-- with the new partial (NULL) format. Both teleport to (-14295.623, 532.61017, 9) on Eastern Kingdoms.
+-- Safe spot for both factions, Booty Bay as the testing ground
+-- .go xyz -14295.623 532.61017 9 0 5.9089246
 SET @GO_NULL      := 935000;
 SET @GO_FILLED    := @GO_NULL + 1;
 SET @SPELL_NULL   := 250150;
 SET @SPELL_FILLED := @SPELL_NULL + 1;
+SET @GUID_NULL    := 5759525;
+SET @GUID_FILLED  := @GUID_NULL + 1;
 
 DELETE FROM `gameobject_template` WHERE `entry` IN (@GO_NULL, @GO_FILLED);
 INSERT INTO `gameobject_template` (
@@ -16,6 +20,16 @@ INSERT INTO `gameobject_template` (
     0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340),
 (@GO_FILLED, 22, 6956, 'Portal filled DBC', '', '', '', 1, @SPELL_FILLED,
     0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 12340);
+
+-- Spawns next to the Booty Bay safe spot
+DELETE FROM `gameobject` WHERE `id` IN (@GO_NULL, @GO_FILLED) AND `guid` IN (@GUID_NULL, @GUID_FILLED);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`,
+    `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`,
+    `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
+(@GUID_NULL, @GO_NULL, 0, 0, 0, 1, 1, -14291.9, 529.887, 8.93718, 2.76341, 0, 0, 0.982175, 0.187969, 300, 0, 1, '',
+    NULL, 'Custom Pull Request Test'),
+(@GUID_FILLED, @GO_FILLED, 0, 0, 0, 1, 1, -14290.2, 533.953, 8.93221, 2.74377, 0, 0, 0.980282, 0.197602, 300, 0, 1, '',
+    NULL, 'Custom Pull Request Test');
 
 -- New format: only the columns that are not 0 / empty, every other column is left NULL
 DELETE FROM `spell_dbc` WHERE `ID` = @SPELL_NULL;
@@ -94,5 +108,5 @@ INSERT INTO `spell_dbc` (
 DELETE FROM `spell_target_position` WHERE `ID` IN (@SPELL_NULL, @SPELL_FILLED);
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`,
     `VerifiedBuild`) VALUES
-(@SPELL_NULL, 0, 1, -1288, 1231, 110, 3.12, 0),
-(@SPELL_FILLED, 0, 1, -1288, 1231, 110, 3.12, 0);
+(@SPELL_NULL, 0, 0, -14295.623, 532.61017, 9, 5.9089246, 0),
+(@SPELL_FILLED, 0, 0, -14295.623, 532.61017, 9, 5.9089246, 0);
