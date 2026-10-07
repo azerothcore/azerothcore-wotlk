@@ -122,6 +122,8 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
                 case FT_FLOAT:
                     if (keepDbcValue)
                         memcpy(&dataValue[dataOffset], &oldDataValue[dataOffset], sizeof(float));
+                    else if (fields[sqlColumnNumber].IsNull()) // Field::Get<float>() returns 1.0f on NULL
+                        *reinterpret_cast<float*>(&dataValue[dataOffset]) = 0.0f;
                     else
                         *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<float>();
 
