@@ -231,7 +231,7 @@ struct boss_illidan_stormrage : public BossAI
         ScheduleHealthCheckEvent(30, [&] {
             // Maiev Spawn Scene
             scheduler.CancelAll();
-            if (me->HasAura(SPELL_DEMON_FORM))
+            if (IsInDemonFormOrTransforming())
                 DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
             me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
             DoAction(ACTION_SHADOW_PRISON);
@@ -378,7 +378,7 @@ struct boss_illidan_stormrage : public BossAI
                 me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
                 scheduler.CancelAll();
 
-                if (me->HasAura(SPELL_DEMON_FORM))
+                if (IsInDemonFormOrTransforming())
                     DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
 
                 _dying = true;
@@ -683,6 +683,13 @@ private:
     bool _dying;
     bool _inCutscene;
     uint8 beamPosId;
+
+    // Demon Form is only applied partway through the transform, so check the transform auras too
+    bool IsInDemonFormOrTransforming() const
+    {
+        return me->HasAnyAuras(SPELL_DEMON_TRANSFORM_1, SPELL_DEMON_TRANSFORM_2, SPELL_DEMON_TRANSFORM_3,
+            SPELL_DEMON_FORM);
+    }
 
     void CycleBeamPos(uint8 &beamPosId)
     {
