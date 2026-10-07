@@ -1433,9 +1433,19 @@ class spell_illidan_parasitic_shadowfiend_aura : public AuraScript
             GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
     }
 
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        // The DoT ignores immunities, but Shadow Prison should still stop its damage
+        if (GetTarget()->HasAura(SPELL_SHADOW_PRISON))
+            PreventDefaultAction();
+    }
+
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_aura::HandleEffectRemove,
+            EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_parasitic_shadowfiend_aura::HandlePeriodic,
+            EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1471,9 +1481,19 @@ class spell_illidan_parasitic_shadowfiend_trigger_aura : public AuraScript
             GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
     }
 
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        // The DoT ignores immunities, but Shadow Prison should still stop its damage
+        if (GetTarget()->HasAura(SPELL_SHADOW_PRISON))
+            PreventDefaultAction();
+    }
+
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_trigger_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_trigger_aura::HandleEffectRemove,
+            EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_parasitic_shadowfiend_trigger_aura::HandlePeriodic,
+            EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
