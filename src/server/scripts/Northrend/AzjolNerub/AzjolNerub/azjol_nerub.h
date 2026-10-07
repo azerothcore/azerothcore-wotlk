@@ -54,6 +54,10 @@ enum ANIds
     NPC_ANUB_AR_CHAMPION                = 29062,
     NPC_ANUB_AR_NECROMANCER             = 29063,
     NPC_ANUB_AR_CRYPTFIEND              = 29064,
+    // Summoned by the lower Hadronox door (53090-53092)
+    NPC_ANUB_AR_CHAMPION_LOWER          = 29096,
+    NPC_ANUB_AR_CRYPT_FIEND_LOWER       = 29097,
+    NPC_ANUB_AR_NECROMANCER_LOWER       = 29098,
 
     GO_KRIKTHIR_DOORS                   = 192395,
     GO_ANUBARAK_DOORS1                  = 192396,

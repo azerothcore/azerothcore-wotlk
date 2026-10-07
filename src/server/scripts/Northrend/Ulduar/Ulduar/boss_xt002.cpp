@@ -290,7 +290,7 @@ struct boss_xt002 : public BossAI
             _healthRecovered = true;
         }
         else if (seatId == HEART_VEHICLE_SEAT_EXPOSED)
-            who->CastSpell(who, SPELL_EXPOSED_HEART);   // Channeled
+            who->CastSpell(who, SPELL_EXPOSED_HEART, true);   // Channeled
     }
 
     void MovementInform(uint32 type, uint32 point) override
@@ -335,8 +335,13 @@ struct boss_xt002 : public BossAI
                 if (!_hardMode)
                 {
                     uint32 transferHealth = data;
-                    if (transferHealth >= me->GetHealth())
-                        transferHealth = me->GetHealth() - 1;
+                    uint32 currentHealth = me->GetHealth();
+                    if (transferHealth >= currentHealth)
+                    {
+                        me->LowerPlayerDamageReq(currentHealth);
+                        Unit::Kill(nullptr, me);
+                        break;
+                    }
 
                     me->ModifyHealth(-static_cast<int32>(transferHealth));
                     me->LowerPlayerDamageReq(transferHealth);
@@ -744,7 +749,8 @@ class spell_xt002_searing_light_spawn_life_spark : public AuraScript
     {
         if (Player* player = GetOwner()->ToPlayer())
             if (Unit* xt002 = GetCaster())
-                if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
+                // Heartbreak (hard mode) is death-persistent, so without this a corpse still summons
+                if (xt002->IsAlive() && xt002->HasAura(aurEff->GetAmount()))
                     xt002->CastSpell(player, SPELL_SUMMON_LIFE_SPARK, true);
     }
 
@@ -768,7 +774,8 @@ class spell_xt002_gravity_bomb_aura : public AuraScript
     {
         if (Player* player = GetOwner()->ToPlayer())
             if (Unit* xt002 = GetCaster())
-                if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
+                // Heartbreak (hard mode) is death-persistent, so without this a corpse still summons
+                if (xt002->IsAlive() && xt002->HasAura(aurEff->GetAmount()))
                     xt002->CastSpell(player, SPELL_SUMMON_VOID_ZONE, true);
     }
 

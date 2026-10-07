@@ -79,6 +79,7 @@ namespace Trainer
 
             private:
             SpellState GetSpellState(Player const* player, Spell const* trainerSpell) const;
+            SpellState GetDefaultSpellState(Player const* player, Spell const* trainerSpell) const;
             void SendTeachFailure(Creature const* npc, Player const* player, uint32 spellId, FailReason reason) const;
             void SendTeachSucceeded(Creature const* npc, Player const* player, uint32 spellId) const;
             [[nodiscard]] std::string const& GetGreeting(LocaleConstant locale) const;
