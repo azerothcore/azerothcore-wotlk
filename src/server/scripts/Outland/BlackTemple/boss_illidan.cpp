@@ -588,7 +588,7 @@ struct boss_illidan_stormrage : public BossAI
                     else
                         ScheduleAbilities(PHASE_LANDING);
                     DoResetThreatList();
-                }, 60s);
+                }, 60s, GROUP_DEMON_FORM);
             }
             break;
             case PHASE_MAIEV:
