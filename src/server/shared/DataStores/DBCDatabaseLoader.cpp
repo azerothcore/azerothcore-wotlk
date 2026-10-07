@@ -180,10 +180,9 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
         ASSERT(sqlColumnNumber == result->GetFieldCount(), "SQL format string does not match database for table: '{}'", _sqlTableName);
         ASSERT(dataOffset == _recordSize);
 
-        // most likely a partial override with a wrong ID
+        // valid for a new record, but also how a partial override with a wrong ID shows up
         if (nullWithoutDbcValue)
-            LOG_ERROR("server.loading",
-                "Table `{}` ID {} has {} NULL column(s) but no DBC record to take the values from, loaded as 0.",
+            LOG_DEBUG("server.loading", "Table `{}` ID {} has no DBC record, {} NULL column(s) loaded as 0.",
                 _sqlTableName, indexValue, nullWithoutDbcValue);
     } while (result->NextRow());
 
