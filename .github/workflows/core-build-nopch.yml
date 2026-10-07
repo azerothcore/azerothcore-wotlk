@@ -3,12 +3,25 @@ on:
   push:
     branches:
       - 'master'
+    # Skip when every changed file is docs or non-build GitHub config. A
+    # filtered-out workflow never starts, so it can't cancel an in-progress
+    # run for the same ref either.
+    paths-ignore:
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/FUNDING.yml'
+      - '.github/labeler.yml'
   pull_request:
     types:
       - opened
       - reopened
       - synchronize
       - ready_for_review
+    paths-ignore:
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/FUNDING.yml'
+      - '.github/labeler.yml'
   workflow_dispatch:
     inputs:
       scope:
@@ -35,23 +48,11 @@ permissions:
   contents: read
 
 jobs:
-  changes:
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    uses: ./.github/workflows/detect-relevant-changes.yml
-    # The workflow-level `permissions` above doesn't include pull-requests, and
-    # a reusable-workflow call is capped by the caller's grant regardless of
-    # what the called workflow's own `permissions:` asks for - so it has to be
-    # re-granted here for paths-filter's PR-files API read to work.
-    permissions:
-      contents: read
-      pull-requests: read
-
   # Split out of the matrix so e2e can needs: this cell only (not gcc/clang-21).
   build-e2e:
     name: ubuntu-24.04-clang-18-nopch
-    needs: changes
     runs-on: ubuntu-24.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
@@ -85,8 +86,7 @@ jobs:
               CXX: clang++-21
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
-    needs: changes
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
@@ -97,11 +97,9 @@ jobs:
 
   e2e:
     name: e2e ${{ inputs.scope || 'full' }}
-    needs: [changes, build-e2e]
+    needs: build-e2e
     # Official PR, master push, and dispatch. Master re-runs full so flakes
     # and merge-base drift show up after squash, not only on the PR head.
-    # No separate needs.changes.outputs.relevant check: build-e2e can only
-    # reach result == 'success' if its own `if` already required that.
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft

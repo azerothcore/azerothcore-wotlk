@@ -8,11 +8,24 @@ on:
   push:
     branches:
       - 'master'
+    # Skip when every changed file is docs or non-build GitHub config. A
+    # filtered-out workflow never starts, so it can't cancel an in-progress
+    # run for the same ref either.
+    paths-ignore:
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/FUNDING.yml'
+      - '.github/labeler.yml'
   pull_request:
     types:
       - opened
       - reopened
       - synchronize
+    paths-ignore:
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/FUNDING.yml'
+      - '.github/labeler.yml'
   workflow_dispatch:
 
 concurrency:
@@ -36,20 +49,8 @@ env:
   MYSQL_ROOT_PASSWORD: root
 
 jobs:
-  changes:
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    uses: ./.github/workflows/detect-relevant-changes.yml
-    # The workflow-level `permissions` above doesn't include pull-requests, and
-    # a reusable-workflow call is capped by the caller's grant regardless of
-    # what the called workflow's own `permissions:` asks for - so it has to be
-    # re-granted here for paths-filter's PR-files API read to work.
-    permissions:
-      contents: read
-      pull-requests: read
-
   test-bash-scripts:
     name: Test Bash Scripts
-    needs: changes
     strategy:
       fail-fast: true
       matrix:
@@ -57,7 +58,7 @@ jobs:
           - os: ubuntu-24.04
           - os: ubuntu-26.04
     runs-on: ${{ matrix.os }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -82,7 +83,6 @@ jobs:
 
   build-and-test:
     name: Build and Integration Test
-    needs: changes
     strategy:
       fail-fast: true
       matrix:
@@ -90,7 +90,7 @@ jobs:
           - os: ubuntu-24.04
           - os: ubuntu-26.04
     runs-on: ${{ matrix.os }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft && needs.changes.outputs.relevant == 'true'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
