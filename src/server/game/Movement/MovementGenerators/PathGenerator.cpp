@@ -442,7 +442,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             // we can hit offmesh connection as last poly - closestPointOnPoly() don't like that
             // try to recover by using prev polyref
             --prefixPolyLength;
-            suffixStartPoly = _pathPolyRefs[prefixPolyLength - 1];
+            suffixStartPoly = prefixPolyLength ? _pathPolyRefs[prefixPolyLength - 1] : INVALID_POLYREF;
             if (dtStatusFailed(_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint, nullptr)))
             {
                 // suffixStartPoly is still invalid, error state
