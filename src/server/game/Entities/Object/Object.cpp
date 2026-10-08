@@ -2955,14 +2955,14 @@ Position WorldObject::GetFirstCollisionPosition(float startX, float startY, floa
 
     auto distance = pos.GetExactDist2d(destX,destY);
 
-    MovePositionToFirstCollision(pos, distance, ang);
+    MovePositionToFirstCollision(pos, distance, ang - GetOrientation());
     return pos;
 }
 
-Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float destZ)
+Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float /*destZ*/)
 {
     Position pos = GetPosition();
-    auto distance = GetExactDistSq(destX,destY,destZ);
+    auto distance = GetExactDist2d(destX, destY);
 
     auto dx = destX - pos.GetPositionX();
     auto dy = destY - pos.GetPositionY();
@@ -2970,7 +2970,7 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
     auto ang = std::atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * M_PI + ang;
 
-    MovePositionToFirstCollision(pos, distance, ang);
+    MovePositionToFirstCollision(pos, distance, ang - GetOrientation());
     return pos;
 }
 
