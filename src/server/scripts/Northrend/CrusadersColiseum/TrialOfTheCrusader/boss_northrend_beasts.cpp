@@ -482,6 +482,7 @@ enum JormungarSpells
     SPELL_ACID_SPEW                     = 66818,
     SPELL_PARALYTIC_SPRAY               = 66901,
     SPELL_PARALYTIC_BITE                = 66824,
+    SPELL_PARALYSIS                     = 66830,
 
     SPELL_FIRE_SPIT                     = 66796,
     SPELL_MOLTEN_SPEW                   = 66821,
@@ -680,7 +681,7 @@ struct boss_jormungarAI : public ScriptedAI
                 }
                 break;
             case EVENT_SPELL_SPRAY:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
                     me->CastSpell(target, _SPELL_SPRAY, false);
                 events.Repeat(20s);
                 break;
@@ -789,6 +790,11 @@ class spell_jormungars_paralytic_toxin_aura : public AuraScript
 {
     PrepareAuraScript(spell_jormungars_paralytic_toxin_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PARALYSIS });
+    }
+
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* caster = GetCaster();
@@ -797,9 +803,39 @@ class spell_jormungars_paralytic_toxin_aura : public AuraScript
                 acidmaw->AI()->Talk(WHISPER_PARALYTIC_TOXIN, GetTarget());
     }
 
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_PARALYSIS);
+    }
+
+    // Keeps the accumulated slow across amount recalculations
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+    {
+        if (!canBeRecalculated)
+            amount = aurEff->GetAmount();
+
+        canBeRecalculated = false;
+    }
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        AuraEffect* slow = GetEffect(EFFECT_0);
+        if (!slow)
+            return;
+
+        int32 newAmount = std::max(slow->GetAmount() - 10, -100);
+        slow->ChangeAmount(newAmount);
+
+        if (newAmount == -100 && !GetTarget()->HasAura(SPELL_PARALYSIS))
+            GetTarget()->CastSpell(GetTarget(), SPELL_PARALYSIS, true, nullptr, slow, GetCasterGUID());
+    }
+
     void Register() override
     {
         AfterEffectApply += AuraEffectApplyFn(spell_jormungars_paralytic_toxin_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_jormungars_paralytic_toxin_aura::OnRemove, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_jormungars_paralytic_toxin_aura::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_jormungars_paralytic_toxin_aura::HandlePeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
