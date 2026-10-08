@@ -229,6 +229,13 @@ class spell_q12014_steady_as_a_rock : public SpellScript
     }
 };
 
+enum BanishTheDemons
+{
+    SPELL_BANISHMENT                = 40825,
+    SPELL_BANISH_KILL_CREDIT        = 40828,
+    NPC_BANISHING_CRYSTAL_BUNNY_02  = 23327
+};
+
 class spell_q11026_a11051_banish_the_demons_aura : public AuraScript
 {
     PrepareAuraScript(spell_q11026_a11051_banish_the_demons_aura)
@@ -237,13 +244,13 @@ class spell_q11026_a11051_banish_the_demons_aura : public AuraScript
     {
         Unit* ar = GetTarget();
         if (ar && !ar->IsAlive())
-            ar->CastSpell(ar, 40828, true); // Banish kill credit
+            ar->CastSpell(ar, SPELL_BANISH_KILL_CREDIT, true);
     }
 
     void Register() override
     {
         // aura spell only
-        if (m_scriptSpellId == 40825)
+        if (m_scriptSpellId == SPELL_BANISHMENT)
             OnEffectRemove += AuraEffectRemoveFn(spell_q11026_a11051_banish_the_demons_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -254,16 +261,19 @@ class spell_q11026_a11051_banish_the_demons : public SpellScript
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        if (Unit* target = GetHitUnit())
-            if (Unit* owner = target->ToTempSummon()->GetSummonerUnit())
-                if (owner->IsPlayer())
-                    owner->ToPlayer()->KilledMonsterCredit(23327); // Some trigger, just count
+        Unit* target = GetHitUnit();
+        if (!target || !target->IsSummon())
+            return;
+
+        if (Unit* summoner = target->ToTempSummon()->GetSummonerUnit())
+            if (Player* owner = summoner->ToPlayer())
+                owner->RewardPlayerAndGroupAtEvent(NPC_BANISHING_CRYSTAL_BUNNY_02, target);
     }
 
     void Register() override
     {
         // script effect only
-        if (m_scriptSpellId == 40828)
+        if (m_scriptSpellId == SPELL_BANISH_KILL_CREDIT)
             OnEffectHitTarget += SpellEffectFn(spell_q11026_a11051_banish_the_demons::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
