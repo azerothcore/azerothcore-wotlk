@@ -4,7 +4,7 @@
 
 -- Entries without any translation datas, on any version
 -- AC datas : OLD Title : "", Title AC enUS : "" OLD Description : "", Description AC enUS : "" ; Reason : Locale datas strictly equals to AC enUS, no more data available from WoWHead
-DELETE FROM `quest_template_locale` WHERE `locale` = 'zhTW' AND `ID` = 12923;
+UPDATE `quest_template_locale` SET `Title` = NULL, `Details` = NULL WHERE `locale` = 'zhTW' AND `ID` = 12923;
 
 -- Update existing entries, from WOTLK
 -- AC datas : OLD Title : "坎瑞薩德的任務", Title AC enUS : "Kanrethad's Quest" ; Wowhead enUS : "Kanrethad's Quest",  OLD Description : "歡迎你從死亡的世界歸來。$B$B在過去的時代你驕傲地挺立，是你族人之中的英雄。而現在你既墮落又破碎 - 不過是個過去的遺物。站到我面前吧，我將喚醒你過去的榮光。$B$B  我會回復你失去的力量，讓你再次完整歸一。", Description AC enUS : "Welcome back from the world of death. $B$BIn an age long past you stood proud, a hero among your brethren. Now you stand fallen and broken - a relic of the past. Stand before me, as I awaken the legend that you once were. $B$B I shall restore the weapons and powers you have lost, making you whole once again. " ; Wowhead enUS : "Speak to Kanrethad to restore your talents, weapon and mount."
@@ -1633,10 +1633,6 @@ UPDATE `quest_template_locale` SET `Details` = '將一捆毛皮帶給血蹄村�
 UPDATE `quest_template_locale` SET `Title` = '薰死南海鎮', `Details` = '在希爾斯布萊德的南海鎮中心投擲三顆被遺忘者臭彈，然後回去找在提里斯法林地的稻草人節的黑暗召喚者雅恩卡。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 1657;
 -- AC datas : OLD Title : "稻草人的節日", Title AC enUS : "Crashing the Wickerman Festival" ; Wowhead enUS : "Crashing the Wickerman Festival",  OLD Description : "我需要勇敢的人去提瑞斯法林地然後找到亡靈的稻草人節日舉辦地點。我不想撒謊——去那裡會有危險。那裡的守衛非常兇悍。但是，我們需要知道今年這個展會的規模有多大，另外就是被遺忘者打算在萬聖節給我們造成多大的麻煩。$B$B如果你願意接受這個任務的話，去提瑞斯法林地進行偵查吧。當你得到有價值的情報之後就回到我這裡來，我會給予你優厚的補償。", Description AC enUS : "I need brave individuals to head up to Tirisfal Glades and check out the Wickerman Festival.  I'm not going to lie - heading up there will be dangerous.  The guards at the festival will be exceptionally vicious.  Still, we need to know how big the festival is this year, and how much trouble the Forsaken are going to cause us during Hallow's End.$B$BIf you're up for it, head to Tirisfal and scout out the festival.  Return to me with the information, and I'll make sure you're well compensated." ; Wowhead enUS : "Locate the Forsaken's Wickerman Festival in Tirisfal Glades.  Return to Sergeant Hartman in Southshore once you've done so."
 UPDATE `quest_template_locale` SET `Title` = '破壞稻草人節', `Details` = '找出提里斯法林地的被遺忘者的稻草人節所在地。完成後回去向南海鎮的哈特曼中士覆命。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 1658;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1659))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1659))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 1659;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1660))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1660))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 1660;
 -- AC datas : OLD Description : "我今天就把這些拿給孩子們。你要多加小心，好心的$n。城裡已經很難看到像你這樣樂於助人的$G紳士:女士;了，不過你已經證明了聖騎士決不會拒絕幫助那些陷入困境的人。$B$B請多保重。", Description AC enUS : "I'll take these to the children this very day. Please be safe, good $c. It is not often $G men:women; of your character show their faces in the city, but you've proven that the paladins here in Stormwind shall never turn their backs on those in need.$B$BFarewell." ; Wowhead enUS : "Speak to Duthorian Rall in Stormwind."
 UPDATE `quest_template_locale` SET `Details` = '與暴風城的達索瑞恩·拉爾談話。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 1780;
 -- AC datas : OLD Description : "拿著這個，$N。這是生命符記。$B$B你已經證明了自己的仁慈和耐心，現在讓我們看看你是否有能力掌握光明之道的一項最偉大的能力。$B$B我的朋友傑生最近剛從艾爾文森林的英烈碑回來，他在那裡遭遇了迪菲亞盜賊，差點就沒命了。現在他正在聖壇邊上接受牧師的治療。$B$B把這個符記帶給他，和他談談。如果你幫得了他，我們很快就能再見面了。願你永享聖光的榮耀。", Description AC enUS : "Take this, $N. It is called the Symbol of Life.$B$BYou've proven charitable and patient, and now the time has come to see if you're powerful enough to focus one of the Light's greatest gifts.$B$BMy friend Gazin returned recently from an encounter with some Defias in Elwynn near Heroes' Vigil--he barely escaped with his life. He's near the altar having his wounds healed by our priests.$B$BTake the Symbol and speak to him. If you can help him, then we will speak again soon. May you bask in the Light's glory." ; Wowhead enUS : "Take the Symbol of Life to Gazin Tenorm in Stormwind.$b$bProvided item: $b"
@@ -2139,8 +2135,6 @@ UPDATE `quest_template_locale` SET `Details` = '到東瘟疫之地的北方邊�
 UPDATE `quest_template_locale` SET `Details` = '與淒涼之地的安東修士談話。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 6141;
 -- AC datas : OLD Description : "準備開張！你想要點什麼？$B$B啊，等等……沒有收據冊，我就不能開張。沒有收據冊的話，我怎麼能搞清楚帳目呢？$B$B我一定是把它丟在鎮子裡了。我在旅店裡住過，一定是在那裡。$B$B把我的收據冊拿回來吧。請把它交給我！我要儘快開張營業，而你會看到我的價格完全出乎你的意料！", Description AC enUS : "I'm ready for business!  What you do want?$B$BOh wait... I can't open up shop without my receipt book.  How am I to keep track of things without my receipt book?$B$BI must have left it in town somewhere.  I had a room in the inn... the book must be there.$B$BBring me my book.  Please, bring it to me!  Bring me my book and you'll see!  I'll set up shop and you'll see that my prices are INSANE!" ; Wowhead enUS : "Get Augustus' Receipt Book from the inn in Terrordale."
 UPDATE `quest_template_locale` SET `Details` = '把奧古斯圖斯的收據冊交給恐懼谷中精神失常的奧古斯圖斯。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 6164;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(6165))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(6165))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 6165;
 -- AC datas : OLD Description : "納薩諾斯·瑪瑞斯是歷史上第一個也是最後一個人類遊俠領主，他是希瓦娜斯·風行者的學生。$B$B我們一直以為納薩諾斯在五年前的羅德隆保衛戰中犧牲了。儘管他的屍體從未被發現，但人們都認為他不大可能從東瘟疫之地逃出來。$B$B馬迪亞斯·肖爾一直在調查這起失蹤案，而且可能有了一些新的消息。立即去向他彙報。馬迪亞斯就住在舊城區的兵營裡。", Description AC enUS : "Nathanos Marris was the first and last of the human ranger lords. A disciple of Sylvanas Windrunner, now the Banshee Queen of the Forsaken.$B$BWe had thought that Nathanos had been killed in action in the defense of Lordaeron five years ago. Although his corpse was never recovered, it was assumed that he did not make it out of the Eastern Plaguelands.$B$BMathias Shaw has been investigating the disappearance and may have some new information. Report to him at once. He resides in Old Town, at the Barracks." ; Wowhead enUS : "Speak with Mathias Shaw in Old Town Stormwind. He resides in the Barracks."
 UPDATE `quest_template_locale` SET `Details` = '與暴風城的馬迪亞斯·肖爾談一談，他住在舊城區的兵營裡。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 6182;
 -- AC datas : OLD Title : "布瑞爾的補給", Title AC enUS : "Supplying the Sepulcher" ; Wowhead enUS : "Supplying the Sepulcher",  OLD Description : "執行官塞加德要我清查我們在布瑞爾這裡的裝備。由於潛伏在森林中的天譴軍團和其他更糟糕的威脅，他不希望我們在裝備方面有所短缺。$B$B我發現，基本上，我們的武器裝備庫存豐富，但我們仍然需要更多的武器來替換那些在戰場上損失的武器。$B$B這裡是一份武器需求訂單，把它交給幽暗城裡的武器供應商高頓·溫德哈姆。帶著訂單去找我們的蝙蝠管理員安妮特，跟她談談前往幽暗城的事情。", Description AC enUS : "Executor Hadrec asked me to take stock of our equipment at the Sepulcher.  With the Scourge, and worse, lurking in the woods, he doesn't want the Deathguards to lack gear they might need.$B$BI found that we are, in general, well stocked, but we do need more weapons to replace those lost in the field.$B$BHere is a requisition order of what is needed, for the weapon dealer Gordon Wendham in the Undercity.  Take the order to our bat master, Karos Razok, and speak with him about transport to the Undercity." ; Wowhead enUS : "Bring Podrig's Order to Karos Razok."
@@ -3573,8 +3567,6 @@ UPDATE `quest_template_locale` SET `Title` = '抓住野生鹿角兔!', `Details`
 UPDATE `quest_template_locale` SET `Details` = '和啤酒節管理人交談。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 11441;
 -- AC datas : OLD Description : "前往在奧格瑪外的啤酒節營地，找啤酒節管理人談談並取得一杯免費啤酒。", Description AC enUS : "Speak to the Brewfest Organizer at the Brewfest Grounds outside of Orgrimmar and receive a free beer." ; Wowhead enUS : "Speak to the Brewfest Organizer."
 UPDATE `quest_template_locale` SET `Details` = '和啤酒節管理人交談。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 11446;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(11461))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(11461))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 11461;
 -- AC datas : OLD Description : "這種像傳染病的愛有些不對勁。這情形很噁心，而且當它降低了我們的警戒心，對所有人來說都是個威脅。$b$b我們有這麼多人民都已經陷入如此荒繆的行為已經夠糟了。但我想這甚至還散播到我們的守衛那裡了，他們是應該對這種事免疫的人。$b$b找一名我們的守衛，看看他們是否已經得到了這愚蠢的病。", Description AC enUS : "There's something unnatural about this epidemic of love. It's disgusting, and as it lowers our defenses, it could be a threat to the all of us.$b$bIt's bad enough that so many of our people are caught up in this ridiculous behavior. But I think that it has spread even to our guardians, who should be immune to such things.$b$bFind one of our guardians and see if they've been caught up in this foolishness." ; Wowhead enUS : "Get a Guardian's Moldy Card and bring it to Fenstad Argyle in the Undercity."
 UPDATE `quest_template_locale` SET `Details` = '取得一張守衛發霉的卡片並帶給幽暗城的芬斯塔德·阿吉歐。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 11558;
 -- AC datas : OLD Title : "褻瀆這些火焰！", Title AC enUS : "Desecrate this Fire!" ; Wowhead enUS : "Desecrate this Fire!"
@@ -3797,10 +3789,6 @@ UPDATE `quest_template_locale` SET `Details` = '獵殺在龍眠神殿東方的�
 UPDATE `quest_template_locale` SET `Details` = '找出德瑞格瑪·符標;在通往能俯瞰黎明之鏡懸崖的途中，有個道路旁邊的洞穴，他就在裡面。向他挑戰，使用一切手段問出猛瑪象人領袖的名字。獲得情報後向龍眠神殿的歐拉史卓莎回報。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12150;
 -- AC datas : OLD Description : "我們沒有理由懷疑德瑞格瑪說的不是真話。不論是葛羅姆薩爾擊敗了你，或是你擊敗了牠，都與他無關。$b$b照著他的指引...帶著你先前交給我的號角，到蒼藍龍殿南方的火炬圈去，然後吹響號角公開宣佈你的挑戰。$B$B當『雷霆使者』葛羅姆薩爾現身的時候，殺了他，然後帶他的頭來見我。", Description AC enUS : "There's no reason to suspect Dregmar's words are anything but true. Whether Grom'thar defeats you or is defeated by you, he can wash his hands of this.$b$bFollow his instructions... take the horn that you brought me earlier, travel to the ring of torches south of the Azure Dragonshrine, and blow it to announce your challenge.$B$BWhen Grom'thar the Thunderbringer arrives, kill him and bring me his head." ; Wowhead enUS : "Travel to the ring of torches south of the Azure Dragonshrine and blow the Emblazoned Battle Horn. Defeat Grom'thar the Thunderbringer and bring his head back to Aurastrasza at Wyrmrest."
 UPDATE `quest_template_locale` SET `Details` = '前往蒼藍龍殿南方的火炬圈，然後吹響紋飾戰鬥號角。擊敗『雷霆使者』葛羅姆薩爾，然後把他的頭帶回去給龍眠神殿的歐拉史卓莎。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12151;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12162))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12162))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12162;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12163))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12163))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12163;
 -- AC datas : OLD Description : "為了探查神器和當地歷史的資訊，瑞加爾派了一隊的勘察員進丹亞戈。瑞加爾的小隊卻從未料想到丹亞戈是如此的人口眾多。$B$B當鐵矮人備戰的同時，他們被俘，但是我們不夠人手救出他們，而瑞加爾又忙著幻想著如何打敗鐵矮人而分身乏術。$B$B任務落在你肩上了，$n，任何鐵矮人和他們僕役的身上，都有可能帶著關有勘查員牢房的鑰匙。", Description AC enUS : "Raegar sent a team of prospectors into Dun Argol to search for artifacts and information about the history of the settlement. Raegar's team never expected Dun Argol to be this heavily populated.$B$BThey're being held captive while the iron dwarves prepare for war. We haven't the men to charge in after them, and Raegar's too busy fantasizing about defeating the irons to be of much help.$B$BIt falls to you, $N. Any of the irons or their servants could be carrying the keys to the cages holding our men." ; Wowhead enUS : "Free Prospector Gann, Prospector Torgan, and Prospector Varana, then return to Mountaineer Kilian at Prospector's Point."
 UPDATE `quest_template_locale` SET `Details` = '救出勘察員加恩、勘察員拓剛和勘察員韋拉那，再向勘察員崗哨的巡山人基立安回報。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12180;
 -- AC datas : OLD Title : "乾了再砸！", Title AC enUS : "Chug and Chuck!" ; Wowhead enUS : "Chug and Chuck!",  OLD Description : "嘿，看來你的手臂挺有力的！ ⏎  ⏎ 我就開門見山地說了。有時候麥芽酒會在營地附近大鬧。我們花了大把的錢才把那些商人和他們的酒給請到這裡來！一丁點酒都不能浪費掉，更別說是讓它們活過來了！ ⏎  ⏎ 讓麥芽酒回到原始型態最好的方法就是朝它丟酒杯。把樣品酒喝光，然後朝這邊的S.T.O.U.T.丟酒杯。證明你有能力保護我們的財產！", Description AC enUS : "Those pesky Dark Irons are back!  We need to make sure that you can defend yourself if needed.  More importantly, we need to know that you can defend our property!$b$bS.T.O.U.T. here is ready for action, are you?  Drink from the Complimentary Brewfest Samplers then throw the mug at S.T.O.U.T.!  Hit the target 5 times then talk to me." ; Wowhead enUS : "Use the Complimentary Brewfest Sampler to hit S.T.O.U.T. 5 times, then talk to Bizzle Quicklift."
@@ -3847,8 +3835,6 @@ UPDATE `quest_template_locale` SET `Details` = '殺死『無心者』阿楚依�
 UPDATE `quest_template_locale` SET `Details` = '德拉克索璀的專家榫輪要你去收集瘟疫噴灑器零件。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12583;
 -- AC datas : OLD Description : "你覺得你會射擊?$B$B好吧，咱們來試試看。來，我們先從好脾氣的目標開始。別擔心，這完全沒有後座力。記得不要把槍指向你沒有要射擊的目標。$B$B現在，你準備好了就瞄準老維爾海姆頭上的蘋果，然後開火吧!", Description AC enUS : "So you think you can shoot?$B$BWell, let's give it a try. Here, we'll start you out with something nice and gentle. Don't worry, it's got no kick to it at all. Remember, don't point that gun at anything you don't intend to fire at.$B$BNow, when you're ready, just take aim at that apple on top o' old Lucky Wilhelm's head and let 'er fly!" ; Wowhead enUS : "Using the RJR Rifle, shoot the apple on top of Lucky Wilhelm's head, then speak with Drostan."
 UPDATE `quest_template_locale` SET `Details` = '使用RJR步槍，射擊幸運的維爾海姆頭上的蘋果，然後和德羅斯坦交談。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12589;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12590))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12590))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12590;
 -- AC datas : OLD Description : "在我們出發之前得先解決一個小問題。懂嗎，我好像找不到飛行器的鑰匙。$B$B我幾乎把每個地方都找遍了...也許你可以幫我一把。我還沒找過的地方就只剩下湖裡而已了。$B$B我甚至可以把我自己的氣瓶給你。雖然氣瓶裡面的空氣不多了，但是還能讓你呼吸個幾口。", Description AC enUS : "There's one little problem we have to solve before we head out.  You see, I can't seem to find the keys to my flying machine.$B$BI've looked pretty much everywhere for them... maybe you can give me a hand.  Only place I haven't looked yet is inside the lake.$B$BI'll even give you my very own air tank.  It's almost empty, but it's got a couple of hits left." ; Wowhead enUS : "Look for Vic's Keys inside the lake at River's Heart."
 UPDATE `quest_template_locale` SET `Details` = '在大河之心的湖水中尋找維克的鑰匙串。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12699;
 -- AC datas : OLD Description : "諸神已然開口，而我們必須回應祂們的睿智。到北邊的辛茹克去殺死那裡的守護者，直到得到一顆無瑕疵的心臟。到東南邊的奎茲倫祭壇去瓦解祭壇守望者，直到取得他們的陣風精華。$B$B把兩者都送去給哈寇亞，她將會把它們結合成一樣物品，能夠強迫死去阿卡利的預言者現身。", Description AC enUS : "The gods have spoken and we must heed their wisdom.$B$BGather friends to your side, $N. Take them north to Zim'Rhuk to destroy guardians there until they yield the unblemished heart. Take them east to the Altar of Quetz'lun and disrupt the altar wardens until you recover their gusty essence.$B$BDeliver both to Har'koa and she will combine them into that which will compel late Akali's prophet to appear." ; Wowhead enUS : "Deliver the Unblemished Heart of the Guardian and the Gusty Essence of the Warden to Har'koa at Zim'Torga."
@@ -3879,14 +3865,10 @@ UPDATE `quest_template_locale` SET `Details` = '把10個奧杜亞聖物帶去給
 UPDATE `quest_template_locale` SET `Details` = '帶著諾甘農之殼去霜堡找拉格努斯。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12871;
 -- AC datas : OLD Description : "我很樂意提供我的居所與家園給需要幫助的旅行者，但是我不願強迫我的人民加入你們的行動。$B$B這樣吧...我的子民都是貨真價實的戰士。在霜誕矮人成年的時候，他必須在戰鬥中證明自己的本事。他必須向我們證明他不會被體型的差距給打敗。$B$B向我證明你跟我的子民一樣強悍勇猛，我就會讓他們聽你說話或是為你作戰。跟南邊懸崖的弗尤林談談，他會讓你進行測驗。", Description AC enUS : "I be more than willing ta lend my shelter and home ta travelers in need, but I'm nae too keen ta force my people inte yer affairs.$B$BI'll tell ye what... my people are warriors, straight and true. On the day a frostborn becomes a man, he has ta prove himself in battle. He has ta show us that he'll not let size hold'm back.$B$BShow me yer as strong and fierce as one of my men, and I'll have them lend ye an ear or a blade. Speak ta Fjorlin over by the cliff to the south there and he'll put ye ta the test." ; Wowhead enUS : "Yorg Stormheart at Frosthold has requested that you speak to Fjorlin Frostbrow to secure a ride and face your challenge."
 UPDATE `quest_template_locale` SET `Details` = '霜堡的約格·風暴之心要求你與弗尤林·霜眉交談，取得坐騎，並進行你的挑戰。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12874;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12881))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12881))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12881;
 -- AC datas : OLD Description : "風暴群山是個複雜的地方，可只是泰坦遺跡而已。住在那裡的人面對的是洛肯跟他的爪牙們。$B$B他將他最喜愛的僕人們，鐵矮人，放在那裡對抗所有岩石生物。他將土靈逐出奧杜亞，強迫他們遷居石崖避難所，就在發明者圖書館的西邊山面上。石崖跟他的兄弟被鐵矮人圍困在那裡。找到他們，幫助他們，$n。", Description AC enUS : "The Storm Peaks are an intriguing place, but there's far more here than titan ruins. The peoples who live here face a dire threat in Loken and his minions.$B$BHe sent his favorite servants, the iron dwarves, on a brutal campaign against all the creatures of stone. He expelled the earthen from Ulduar, forcing them to take shelter at Bouldercrag's Refuge, on the face of a mountain west of the Inventor's Library. Bouldercrag and his brethren are beset by the iron dwarves there. Find and help them, $N." ; Wowhead enUS : "Speak with Bouldercrag the Rockshaper at Bouldercrag's Refuge."
 UPDATE `quest_template_locale` SET `Details` = '跟石崖避難所的『塑岩者』石崖談話。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12885;
 -- AC datas : OLD Description : "黯刃騎士團要拿下西北邊的暗影穹殿。我在他們的隊伍中有一個線民，他需要幫忙。$B$B首先第一步就是遮斷巫妖王的視覺。他用一個名叫窺探之眼的裝置監視整個區域，那眼睛就飄浮在穹殿的頂端。$B$B我們的矮人準備了一些對付他的東西。破壞「眼睛」了以後，去找穹殿中的史力弗男爵。他偽裝成仍受巫妖王的控制的樣子。", Description AC enUS : "The Knights of the Ebon Blade want to take the Scourge base known as The Shadow Vault to the northwest. I have a contact in their group who has asked for help.$B$BThe first step is to blind the Lich King. He's using a device known as The Ocular to watch the area, which floats above the vault's spires.$B$BOur dwarves have created something for you to use against it. After the 'eye' has been destroyed, find Baron Sliver on the vault grounds. He's pretending to still be under the Lich King's will." ; Wowhead enUS : "Destroy The Ocular and then report to Baron Sliver at The Shadow Vault."
 UPDATE `quest_template_locale` SET `Details` = '破壞窺探之眼，然後向暗影穹殿的史力弗男爵回報。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12887;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12890))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12890))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12890;
 -- AC datas : OLD Description : "我的子民被巫妖王大舉屠殺。天譴軍團現在用風暴巨人的屍體製造毫無心智的血肉巨人，或者縫補出像瑟瑞姆這種更糟的畸形怪物。$B$B沒有任何東西可以阻止我把他們逐出這個世界。我們會攜手毀滅威脅祖爾德拉克的天譴軍。$B$B我們將會把他們全部殺死:納法勒斯王子、奧嘉爾以及瑟瑞姆!$B$B當你準備好了，就告訴我，讓我們開始我們的毀滅之旅。", Description AC enUS : "My people have been decimated by the Lich King. The Scourge now use the corpses of storm giants to create mindless flesh giants, or worse, stitched together aberrations like Thrym.$B$BI will stop at nothing to see them all driven from this world. We will work together to destroy the Scourge that threaten Zul'Drak.$B$BWe will kill them all: Navarius, Algar and Thrym!$B$BWhen you are ready, let me know and we will begin our destructive journey." ; Wowhead enUS : "Speak with Gymer to begin.$b$bWhile riding Gymer, destroy 100 Scourge and kill Algar the Chosen, Thrym and Prince Navarius. Report to Crusader MacKellar at Crusader Forward Camp should you succeed."
 UPDATE `quest_template_locale` SET `Details` = '與基默交談出發。$b$b騎著基默摧毀100個天譴軍，並殺死『天選』奧嘉爾、瑟瑞姆以及納法勒斯王子。一旦你成功了，就向十字軍前進營地的十字軍麥克凱拉報告。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12919;
 -- AC datas : OLD Title : "精煉之火", Title AC enUS : "The Refiner's Fire" ; Wowhead enUS : "The Refiner's Fire",  OLD Description : "在它滲著水氣的外層之下，這塊金屬閃動著奇異的光芒。$b$b不過首先，你認為先把上頭的熔渣在斐雍的鐵砧燒掉才是謹慎的作法。$b$b正當你思索著在這冰凍的荒原裡要上哪找火源的時候，一個火焰亡魄走過了你面前...", Description AC enUS : "Beneath its porous exterior, this hunk of metal gleams with a mysterious quality.$b$bYou feel it would only be prudent to burn off the slag at Fjorn's Anvil.$b$bAs you ponder where in this frozen waste you might find something hot enough for the job, a fire revenant crosses your path...$B" ; Wowhead enUS : "You must collect 10 Furious Sparks from the Seething Revenants at Frostfield Lake and then use the anvil at Fjorn's Anvil."
@@ -3949,14 +3931,8 @@ UPDATE `quest_template_locale` SET `Details` = '苦難高崗上奸詐的維瑞�
 UPDATE `quest_template_locale` SET `Details` = '苦難高崗上奸詐的維瑞希派遣你去殺死歐貝茲·血禍。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 13164;
 -- AC datas : OLD Description : "逆王阿努巴拉克，以阿茲歐-奈幽，這個一度光榮輝煌的地底王國作為根據地。$b$b自他叛變以來，他已使我們的家鄉墮落成卑鄙污穢之地。他統率著一支不死奈幽蟲族的軍隊，如同其領導者，也都出賣了靈魂來服侍巫妖王。$b$b為逆王的統治畫下一個句點吧，$c。這對我們雙方的子民都好。$b$b若你能夠達成過往眾人所辦不到的事，就將阿努巴拉克的軀殼帶來見我。", Description AC enUS : "Anub'arak, the traitor king, makes his home in the once proud underland of Azjol-Nerub.$b$bSince his betrayal, he has twisted and perverted our homeland into the wretched squalor it is today. He rules over an army of undead nerubians who, like their leader, have pledged themselves to serving the Lich King.$b$bBring an end to the traitor king's reign, $c. You will be doing a great service to both of our peoples.$b$bIf you manage to succeed where all others have failed, bring me the husk of Anub'arak." ; Wowhead enUS : "Kilix the Unraveler in the Pit of Narjun has tasked you with defeating Anub'arak in Azjol-Nerub. You are to return to Kilix with Anub'arak's Broken Husk."
 UPDATE `quest_template_locale` SET `Details` = '那金之淵裡的『排除者』齊力克斯交付給你一個任務，要你擊敗阿茲歐-奈幽的阿努巴拉克。然後將阿努巴拉克的裂殼帶回給齊力克斯。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 13167;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(13175))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(13175))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 13175;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(13176))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(13176))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 13176;
 -- AC datas : OLD Description : "遍佈於阿茲歐-奈幽，天譴奈幽蟲族總是小心翼翼地孵育將孵化的蛋，這是牠們數量迅速滋長的原因。$b$b若能清除掉不死生物玷污過，用以鳩佔鵲巢的敗壞蟲蛋，對牠們的洞穴而言是件好事。$b$b當你探索那一度是阿茲歐-奈幽的廣袤地帶，一定要清理我們古老家園中，任何你看到的天譴蛋。", Description AC enUS : "Throughout Azjol-Nerub, the scourged nerubians carefully nurture eggs that will soon hatch, providing them even greater numbers.$b$bIt would do little good for the caverns to be cleansed of the undead that stain them if these fouled eggs were left to hatch and take their place.$b$bAs you  explore the expanse that was once Azjol-Nerub, be sure to clear our ancient home of any scourge eggs you find." ; Wowhead enUS : "Kilix the Unraveler in the Pit of Narjun wants you to enter Azjol-Nerub and destroy 6 Nerubian Scourge Eggs."
 UPDATE `quest_template_locale` SET `Details` = '那金之淵裡的『排除者』齊力克斯，要你進入阿茲歐-奈幽並摧毀6個奈幽天譴蛋。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 13182;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "$b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(13184))"
-UPDATE `quest_template_locale` SET `Details` = '$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(13184))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 13184;
 -- AC datas : OLD Description : "一朵畸形的磨菇-似乎是剛從蠻穴野獸惡臭又滿布分泌物的屍塊上掉下來的磨菇。檢視它時，你被中人欲嘔的惡臭薰得差點昏過去。$b$b你想知道，是否這是奈幽蟲族的盤中美味。將這黏涕涕的噁心玩意放進你的背包，你決定要找出真相...", Description AC enUS : "A misshapen piece of mushroom-like fungus falls from a particularly smelly, ooze-covered patch of the cave beast's flesh. Examining it, you are violently repulsed by its overwhelming stench.$b$bYou wonder to yourself if this is the kind of thing that the nerubians might find appetizing. Placing the sticky organism in your pack, you determine to find out..." ; Wowhead enUS : "You are to collect 6 Grotesque Fungus from Savage Cave Beasts in Ahn'kahet and deliver them to Kilix the Unraveler in The Pit of Narjun."
 UPDATE `quest_template_locale` SET `Details` = '你必須在安卡罕特的蠻穴野獸身上，採集6朵怪誕菌菇，並送去給那金之淵裡的『排除者』齊力克斯。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 13204;
 -- AC datas : OLD Description : "我們無法獨力擊敗巫妖王。分裂的我們唯有敗亡一途!$B$B我懇求你回應我們的呼喚，$g兄弟:姐妹;。銀白十字軍接受所有願意為戰爭奉獻心力的志士。大領主提里奧‧弗丁在銀白先鋒駐地親自等著你!坐上你的坐騎，飛往寒冰皇冠的東南邊境。你可以在那裡找到大領主弗丁以及銀白十字軍的士兵。$B$B去吧，$c，為了審判日將臨!", Description AC enUS : "We cannot defeat the Lich King on our own. Divided we shall all fall!$B$BI implore you to answer the call, $g brother:sister;. The Argent Crusade accepts all who would volunteer to aid in the war effort. Highlord Tirion Fordring himself awaits you at the Argent Vanguard! Get upon your mount and fly to the southeastern reaches of Icecrown. It is there that you will find Lord Fordring and the soldiers of the Argent Crusade.$B$BGo now, $c, for judgment day comes!" ; Wowhead enUS : "Report to Highlord Tirion Fordring at the Argent Vanguard in Icecrown."
@@ -4105,8 +4081,14 @@ UPDATE `quest_template_locale` SET `Details` = '將暴風城之焰交給(名稱)
 -- Update existing entries, from RETAIL
 -- AC datas : OLD Description : "$n!你也差不多該出現了。戰鬥也許已經結束了，但我們還得準備下一場戰鬥。前往冬握湖東南的火焰熔爐，然後取回幾個永恆餘燼。$B$B我們把這些餘燼和煤炭混合，用來驅動石毀車和攻城機具。$B$B喔，如果你碰巧在那裡碰上了部落的傢伙，不要猶豫，殺了他們並奪取他們的餘燼。我們可不能讓他們在下一場戰鬥佔上優勢。", Description AC enUS : "$n! About time you showed up. While the battle may be over, we still need to prepare for the next battle. Travel to the Cauldron of Flames in south eastern Wintergrasp and retrieve several eternal embers.$B$BThe embers are mixed in with coal to fuel the Demolisher and Siege Engines. $B$BOh, and if you happen to see some of the Horde in the Cauldron, don't hesitate to slay them and take their embers. We can't let them have the advantage in the next battle." ; Wowhead enUS : "This quest is no longer available within the game.Siege Master Stouthandle at Wintergrasp Fortress wants you to retrieve 10 Eternal Embers from Horde players at the Cauldron of Flames."
 UPDATE `quest_template_locale` SET `Details` = '此任務已經絕版。冬握堡壘的攻城大師斯托哈德要你前往火焰熔爐，從部落玩家身上取回10個永恆餘燼。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 236;
+-- AC datas : OLD Title : "暫無內容", Title AC enUS : "<UNUSED>" ; Wowhead enUS : "<UNUSED>"
+UPDATE `quest_template_locale` SET `Title` = '暂无内容', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 1659;
+-- AC datas : OLD Title : "暫無內容", Title AC enUS : "<UNUSED>" ; Wowhead enUS : "<UNUSED>"
+UPDATE `quest_template_locale` SET `Title` = '暂无内容', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 1660;
 -- AC datas : OLD Description : "這兒可不是你呆的地方，$N。你該儘快轉至幽暗城的軍事區。艾薩萊斯特已經開始召集所有牧師去向她報告，讓他們充分瞭解並利用自己的力量。$B$B她絕不容忍怠慢和推託，因此你最好現在就出發。", Description AC enUS : "This isn't the place for you, $N. You should head to the War Quarter in Undercity as soon as possible. Aelthalyste has called all her priests and priestesses there as soon as they are ready. It's time they learn more about their power and how to harness it.$B$BShe will not tolerate tardiness or excuses, so you'd best be on your way." ; Wowhead enUS : "This quest is no longer available within the game.Speak to Aelthalyste in the Undercity."
 UPDATE `quest_template_locale` SET `Details` = '此任務已經絕版。[Speak to Aelthalyste in the Undercity.]', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 5659;
+-- AC datas : OLD Title : "大法師提莫萊恩的遺骸", Title AC enUS : "<NYI> <TXT> Archmage Timolain's Remains" ; Wowhead enUS : "<NYI> <TXT> Archmage Timolain's Remains"
+UPDATE `quest_template_locale` SET `Title` = '暂无内容', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 6165;
 -- AC datas : OLD Title : "暫無內容", Title AC enUS : "<UNUSED>" ; Wowhead enUS : "<UNUSED>",  OLD Description : "x", Description AC enUS : "x" ; Wowhead enUS : "This quest was marked obsolete by Blizzard and cannot be obtained or completed.x"
 UPDATE `quest_template_locale` SET `Title` = '暂无内容', `Details` = '此任務被暴雪標記為過期，無法獲得或完成。x', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 6841;
 -- AC datas : OLD Description : "我們燻木牧場的人感謝你幫我們找回了丟失的禮物，$n。為此，我們將會給你一件特殊的禮物...將由冬天爺爺特別送出!$B$B請你，和冬天爺爺談談，他會親自從我們燻木牧場這裡的貨物中選一樣送給你做為冬幕節的禮物。各種貨物一應俱全─這是燻木牧場精心為您準備的貨物...當然我們還要感謝你!", Description AC enUS : "We at Smokywood Pastures appreciate the recovery of the stolen treats, $N.  For that, we'd like to offer you a special gift... presented by none other than Great-father Winter himself!$B$BPlease, speak with Great-father Winter, and he will give you your Feast of Winter Veil gift from us here at Smokywood Pastures.  From our farm to your plate, it's always Smokywood Pastures wholesome goodness... thanks to you, of course!" ; Wowhead enUS : "Speak with Great-father Winter in Orgrimmar."
@@ -5893,8 +5875,6 @@ UPDATE `quest_template_locale` SET `Details` = '從南方的通道進入晶紅�
 UPDATE `quest_template_locale` SET `Details` = '從南方的通道進入晶紅龍殿，並殺死6名嚴寒死靈法師，同時消滅神殿下方腐化的源頭。任務完成以後，向凡加斯塔茲回報。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12450;
 -- AC datas : OLD Description : "當我們建築征服堡的時候，我派了斥候沃塔克和我們東方的坦卡雷盟友接觸。他們駐紮在前往歐尼克瓦營地，就在灰白之丘的最東邊，越過灰喉鎮的地方。$B$B前去該地，聽取沃塔克的報告，提供他，以及當地酋長你的援助。你對征服堡的貢獻是所有人的模範，同時，我知道沃塔克會感謝你的幫助的。", Description AC enUS : "While we build Conquest Hold, I sent Scout Vor'takh to make contact with our taunka allies in the east. They're based in Camp Oneqwah, which is in the easternmost part of Grizzly Hills, beyond Grizzlemaw.$B$BMake the journey there, hear Vor'takh's report and offer your assistance with anything he and the local chieftain may need. Your contributions to Conquest Hold have been exemplary and I know Vor'takh will be grateful for the assistance." ; Wowhead enUS : "Speak with Scout Vor'takh at Camp Oneqwah."
 UPDATE `quest_template_locale` SET `Details` = '和歐尼克瓦營地的斥候沃塔克交談。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12451;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "This quest is no longer available within the game.Bring Dahlia's Ruby Broach to Ceristrasz and inform him of her fate.    $b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12452))"
-UPDATE `quest_template_locale` SET `Details` = '此任務已經絕版。[Bring Dahlia''s Ruby Broach to Ceristrasz and inform him of her fate.]    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12452))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12452;
 -- AC datas : OLD Description : "他們要我提供協助對抗聯盟大軍。目前的情況，我軍與對方勢均力敵，而我們極力找尋優勢。$B$B在這附近翱翔於山巔林間的帝王雄鷹將會是我們極佳的斥候選擇。帶著這根銀色的羽毛，將我的目光與牠們連結在一起。$B$B只要能看到敵人的一舉一動，便能獲得我們所需的戰略優勢。你將會發現大量的雄鷹出沒在東方的山地中。", Description AC enUS : "I've been asked to lend my support to our efforts against the Alliance.  At the moment our military forces are about evenly matched and we're looking for ways to find an edge.$B$BThe imperial eagles that fly over the mountains and trees in this area would make excellent scouts for us.  Take this silver feather and use it to bind my sight to that of them.$B$BBeing able to see our enemy's movements will grant us the strategic advantage we need.  You'll find abundant eagles in the mountains to the east." ; Wowhead enUS : "Windseer Grayhorn wants you to use the Silver Feather on 6 Imperial Eagles in Grizzly Hills."
 UPDATE `quest_template_locale` SET `Details` = '風先知灰角要你在6隻灰白之丘的帝王雄鷹身上使用銀羽。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12453;
 -- AC datas : OLD Description : "伊瑟拉在翡翠夢境中沉睡著，同時監視著夢境與艾澤拉斯。然而，一場駭人的夢魘佔據了夢境，我擔心伊瑟拉現今已被這場夢魘所影響。$B$B近來，我請求她援助對抗天譴軍團的戰爭;天譴軍正在其他的龍殿中喚醒冰霜巨龍。但是她曲解了我的意思。$B$B取而代之的是，她告訴龍殿中的防衛者，將所有不是綠龍軍團的成員視為敵人。$B$B我需要你殺掉一些天爪，龍殿必須回歸它的平衡。", Description AC enUS : "Ysera sleeps in the Emerald Dream, watching over both the Dream and Azeroth. But a horrible nightmare has taken hold in the Dream, and now I fear that Ysera is being affected by it.$B$BRecently, I asked her to aid in the fight against the Scourge that are raising frostwyrms at the other dragonshrines. She misunderstood.$B$BInstead, she told our dragonshrine's defenders to treat those not of the green dragonflight as enemies.$B$BI need you to slay some of the skytalons. The shrine must regain its balance." ; Wowhead enUS : "Nishera the Garden Keeper at the Emerald Dragonshrine has asked you to slay 5 Emerald Skytalons."
@@ -6557,8 +6537,6 @@ UPDATE `quest_template_locale` SET `Details` = 'K3的瑞基特要你殺死6個�
 UPDATE `quest_template_locale` SET `Details` = '迦姆高崗的基諾，要你把硬盒裝爆裂物裝置在霜膽的祭壇附近，然後殺死托爾瑪‧霜膽，在洞穴坍塌壓垮你之前逃出去。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12823;
 -- AC datas : OLD Description : "你有雙飛毛腿啊孩子!謝謝你幫忙處理那些炸彈...我想測試那項發明好久了!$B$B去告訴瑞基特我們現在在猛瑪象人前有掩護了...我的工兵會把剩下來的壞蛋都清光。$B$B謝啦!", Description AC enUS : "You've got some swift feet on you sonny! Thanks for lending a hand with those explosives... I've been waiting to give that invention a good test run for a while!$B$BGo ahead and tell Ricket we should be covered on the magnataur front now... my sappers will clean up any of the remaining baddies.$B$BThanks again!" ; Wowhead enUS : "Return to Ricket at K3."
 UPDATE `quest_template_locale` SET `Details` = '回去K3找瑞基特。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12824;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "This quest is no longer available within the game.[PLACEHOLDER] Use mini-plane to kamakazi on the gnoll leader.    $b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12825))"
-UPDATE `quest_template_locale` SET `Details` = '此任務已經絕版。[PLACEHOLDER] Use mini-plane to kamakazi on the gnoll leader.    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12825))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12825;
 -- AC datas : OLD Description : "看起來不錯!$B$B不，不是說你 - 是說我的新地雷。你有點太自滿了，不是嗎?另一方面，我，絕對是才華洋溢的!我的智力可沒有人能比得上。$B$B我們在談什麼?哦對，我的新地雷!全新，而且更加進化...不管瑞基特想用來做什麼用途都可以。$B$B做個好$G孩子:女孩;，把它交給瑞基特，好嗎?她就在那兒...這應該是段史詩般的旅程，我很確定。不過小心點，她有些瘋瘋癲顛的。", Description AC enUS : "Looking good!$B$BNo, not you - my new mines. You're just a little full of yourself, aren't you? I, on the other hand, am absolutely brilliant! My intellect cannot be matched.$B$BWhat were we talking about? Oh yes, my new mines! New and improved... ready for whatever devious use Ricket has concocted.$B$BBe a $G good lad:doll; and go hand them off to Ricket, will you? She's right over there... it should be quite the epic journey, I'm sure. Be careful though, she's a little loopy." ; Wowhead enUS : "Deliver Jeer's Improved Land Mines to Ricket in K3."
 UPDATE `quest_template_locale` SET `Details` = '把吉爾的強化地雷送去給K3的瑞基特。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12826;
 -- AC datas : OLD Description : "哇!那東西可真是噁心。不是要替豺狼人的品味說話，只是不管他們吃的是什麼，至少是...可以吃的東西吧?$B$B讓我們更進一步地活用創意...$B$B托爾在城鎮北邊有個炸藥配給器...就在那個大洞穴的入口處附近，你不會看漏的。我相信她應該是要用那些炸藥來採礦什麼的，但我有個更好的點子。$B$B去拿一個炸藥來，然後扔向附近的長毛象...牠們大多分佈在西邊。收集那些肉，然後把肉帶回來。", Description AC enUS : "Wow! That stuff is nasty. Not to account for gnoll taste or anything, but I figured whatever they had would at least be... edible?$B$BLet's get more creative.$B$BTore's got an explosive dispenser north of town... not far from the big cavern entrance, can't miss it. I'm sure she intends them for mining purposes of some sort, but I've got a better idea.$B$BGrab one of those things and rush it to one of the nearby mammoths... most of them are to the west. Collect the meat, bring it back." ; Wowhead enUS : "Ricket at K3 wants you to retrieve a U.D.E.D, use it to blow up a mammoth, and retrieve 8 Hearty Mammoth Meat."
@@ -6571,12 +6549,8 @@ UPDATE `quest_template_locale` SET `Details` = '晶網洞窟外面的托爾‧�
 UPDATE `quest_template_locale` SET `Details` = '護送受傷的哥布林礦工離開晶網洞窟，然後與K3的瑞基特交談。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12832;
 -- AC datas : OLD Description : "又見面啦!你沒有像其他的冒險者一樣落跑啊?好吧，你真是個惹人愛的傢伙，不是嗎?我才正懷疑是不是我聞起來怪怪的還是怎樣?$B$B我們需要一點幫助，你的經驗正好可以派上用場。記得那些猛瑪象人嗎?顯然那個洞窟沒有完全倒塌...還有一小撮苟活著。基諾還說什麼有他就搞定了。$B$B幸虧，吉爾做的地雷數量遠超過所需。這個給你!", Description AC enUS : "Hey there again! You didn't run off like all the other adventurers did? Well, you're just a peach, aren't ya? I was beginning to think I smelled funny or something!$B$BWe could still use a bit of a hand around here, and you have just the right experience.  Remember those magnataur? Well apparently the cave didn't completely collapse... there are still quite a few left. So much for Gino taking care of them, eh?$B$BFortunately, Jeer made way more than enough mines. You've got this!" ; Wowhead enUS : "Ricket at K3 wants you to use Improved Land Mines at Garm's Bane to fend off the attackers from Garm. Both Garm Invaders and Snowblind Followers will count towards this goal."
 UPDATE `quest_template_locale` SET `Details` = 'K3的瑞基特要求你，在迦姆之禍用強化地雷抵擋來自迦姆的攻擊者。迦姆入侵者與雪盲跟隨者，都算在任務目標的攻擊者內。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12833;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "This quest is no longer available within the game.[PLACEHOLDER] Test cold-weather bomber on giant.    $b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12834))"
-UPDATE `quest_template_locale` SET `Details` = '此任務已經絕版。[PLACEHOLDER] Test cold-weather bomber on giant.    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12834))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12834;
 -- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "This quest is no longer available within the game.[PLACEHOLDER] Test Grown Up Jormungar on Giant"
 UPDATE `quest_template_locale` SET `Details` = '此任務已經絕版。[PLACEHOLDER] Test Grown Up Jormungar on Giant', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12835;
--- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : "This quest is no longer available within the game.[PLACEHOLDER] Report to Tore    $b        See if you've already completed this by typing:$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12837))"
-UPDATE `quest_template_locale` SET `Details` = '此任務已經絕版。[PLACEHOLDER] Report to Tore    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(12837))', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12837;
 -- AC datas : OLD Description : "我得要知道血色突襲軍今天在策劃些什麼。你要替我執行這項任務。$B$B飛往突襲軍港口，然後從他們的軍備箱裡面偷出文件來。箱子一定有上鎖，所以你得要用你想的到的辦法從血色突襲軍成員身上把鑰匙弄來。", Description AC enUS : "I need to know what the Scarlet Onslaught is planning today. You will be my instrument in this task.$B$BFly to Onslaught Harbor and rifle through their baggage trunks for documents. The trunks will be locked, so you'll have to take the keys from the Scarlet Onslaught members by whatever means." ; Wowhead enUS : "Aurochs Grimbane at Death's Rise wants you to collect 5 Onslaught Intel Documents."
 UPDATE `quest_template_locale` SET `Details` = '死亡高崗的野牛‧厲禍要你收集5份突襲軍情報文件。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 12838;
 -- AC datas : OLD Description : "起初這些筆記看起來就像是你在找的其他資料一樣。但，迅速讀過內容之後你發現不是這麼回事。$B$B這封信上寫著韋斯溫上將就在島上的某處，但他目前仍然隱藏著自己的行蹤。他談到一個就快降臨的光榮之日，到時候血色突襲軍將會先解決巫妖王，然後再洗淨整個世界，為艾澤拉斯帶來秩序。$B$B統領指揮會想看看這封信的!", Description AC enUS : "At first this note looks like any of the other intel that you've been looking for. However, a quick perusal of its contents disabuses you of this notion.$B$BThe letter conveys that Grand Admiral Westwind is present somewhere on the island, but that he is keeping himself secluded for now. He speaks of a glorious day that is coming soon in which the Scarlet Onslaught will wash over first the Lich King and then the rest of world to finally bring order to Azeroth.$B$BThe lord-commander will want to see this!" ; Wowhead enUS : "Deliver the Note from the Grand Admiral to Lord-Commander Arete at Death's Rise."
@@ -8233,13 +8207,13 @@ UPDATE `quest_template_locale` SET `Details` = '調查龍眠神殿下的晶紅�
 UPDATE `quest_template_locale` SET `Details` = '擊敗海萊恩並擊退對晶紅聖所的入侵。', `VerifiedBuild` = 0 WHERE `locale` = 'zhTW' AND `ID` = 26034;
 
 -- Insert new entries, from WOTLK
-DELETE FROM `quest_template_locale` WHERE `ID` IN(50,51,53,63,73,77,81,82,96,100,110,113,162,172,200,215,216,220,235,242) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(50,51,53,63,73,77,81,82,96,100,110,113,162,172,200,215,216,220,235,243) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (50,'zhTW','琥珀酒','葛林布茲·雷酒需要一些真銀。',0),
 (51,'zhTW','琥珀酒','帶給葛林布茲·雷酒一枝楓樹枝。',0),
 (53,'zhTW','琥珀酒','帶一捆燒焦的橡木給葛林布茲·雷酒。',0),
 (63,'zhTW','水之召喚','擊敗墮落的水之靈體，把墮落水之靈體的護腕和剩餘的最純淨的水放在銀松森林的聖泉火盆上。',0),
-(73,'zhTW','暫無內容','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(73))',0),
+(73,'zhTW','暫無內容',NULL,0),
 (77,'zhTW','黏著的情況','從隱匿石一帶部落的廢棄基地中，從箱子裡找到10瓶辛特蘭蜜酒。',0),
 (81,'zhTW','送回蜜酒','把木桶交給奧格瑪的德蘭·杜佛斯。',0),
 (82,'zhTW','腐化之巢','從腐化之巢找5個森提帕蟲的肢體，把它們交給加基森的鍊金師匹斯特蘇格。',0),
@@ -8254,18 +8228,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (216,'zhTW','薊皮熊怪的麻煩','殺死8個薊皮復仇者和8個薊皮薩滿。他們大部分都位於佐拉姆海岸東部的薊皮村裡。任務完成後回到梣谷佐拉姆加前哨站的卡拉恩·阿瑪卡那裡覆命。',0),
 (220,'zhTW','水之召喚','把最純淨的水交給貧瘠之地的伊斯倫。',0),
 (235,'zhTW','梣谷狩獵','與梣谷碎木崗哨的塞娜尼·雷心談話。',0),
-(242,'zhTW',NULL,'殺掉8個龍喉襲擊者、3個龍喉白骨守衛和1個龍喉軍官。',0);
+(243,'zhTW','進入沙漠','和加基森的首席工程師比格維茲談一談，請他為實驗工具包提供能量源。$b$b已提供物品：$b',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(243,247,254,264,272,308,314,316,328,329,330,331,349,351,379,390,397,403,406,410) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(247,254,264,272,308,314,328,329,330,331,349,351,379,397,403,410,415,428,431,452) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(243,'zhTW','進入沙漠','和加基森的首席工程師比格維茲談一談，請他為實驗工具包提供能量源。$b$b已提供物品：$b',0),
 (247,'zhTW','完成狩獵',NULL,0),
 (254,'zhTW','掘墓',NULL,0),
 (264,'zhTW','直到死亡把我們分離','把克拉莉斯的墜飾放在銀松森林尤瑞夫的墳墓上。',0),
 (272,'zhTW','海獅試煉','尋找水獸耐力墜飾和水獸敏捷墜飾。與月光林地的居民談話，找出這些東西可能被放在哪裡。$b$b在雷姆洛斯神殿附近將海獅墜飾的兩部分合而為一。$b$b將合併好的墜飾交給月光林地永夜港中的德迪利特·星焰。',0),
 (308,'zhTW','加文的愛好',NULL,0),
 (314,'zhTW','保護牲畜','山羊農場的魯德拉·凍石要你殺了瓦加什，並且把它的牙齒給她帶回去。',0),
-(316,'zhTW','<UNUSED>',NULL,0),
 (328,'zhTW','隱藏的鑰匙','使用黃銅鑰匙打開書呆子赫羅德的保險箱。',0),
 (329,'zhTW','找出內鬼!','將沾泥的便箋交給反抗軍營地裡的多倫中尉。',0),
 (330,'zhTW','巡邏時間表','與塞斯曼下士談話。',0),
@@ -8273,21 +8245,18 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (349,'zhTW','荊棘谷熱疫',NULL,0),
 (351,'zhTW','尋找OOX-17/TN!','把定位器帶到奧格索普的母體機器人那裡。',0),
 (379,'zhTW','口渴的比格維茲','給加基森的首席工程師沙克斯·比格維茲帶去五隻廢土水袋。',0),
-(390,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(390))',0),
 (397,'zhTW','幹得好','去找黑爪加爾德斯的僕人茲吉談一談，並向他索要你的酬勞。',0),
 (403,'zhTW','戒備森嚴',NULL,0),
-(406,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(406))',0),
-(410,'zhTW','潛伏的陰影',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(415,428,431,452,467,485,490,498,503,506,507,508,509,513,515,517,518,519,520,521) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(410,'zhTW','潛伏的陰影',NULL,0),
 (415,'zhTW','雷傑德的新酒','和雷傑德·麥酒談話。',0),
 (428,'zhTW','失蹤的亡靈哨兵','找到亡靈哨兵蘭妮·尤瑞克和奎恩·尤瑞克。',0),
 (431,'zhTW','誘靈蠟燭',NULL,0),
-(452,'zhTW','焚木村中的伏擊','幫助亡靈哨兵費雷亞消滅焚木村議會。',0),
+(452,'zhTW','焚木村中的伏擊','幫助亡靈哨兵費雷亞消滅焚木村議會。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(467,485,498,503,506,507,508,509,513,515,517,518,519,520,521,524,526,527,528,529) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (467,'zhTW','迪恩·石輪的追尋','和駕駛員迪恩·石輪談話。',0),
 (485,'zhTW','找到OOX-09/HL!','把定位器帶到奧格索普的母體機器人那裡去。$b$b奧格索普的母體機器人位於辛特蘭的河水源頭，就在隱匿石的附近。',0),
-(490,'zhTW',NULL,'達納蘇斯外的莎依拉·夜風想要你帶給她20個瘤背熊怪的牙齒。',0),
 (498,'zhTW','拯救行動','塔倫米爾的克魯斯克要你把德盧爾和托格薩從敦霍爾德城堡救出來。',0),
 (503,'zhTW','高迪爾','救出高迪爾，然後回到塔倫米爾去見克魯斯克。',0),
 (506,'zhTW','布拉克摩爾的餘孽','把高迪爾收集的消息帶給塔倫米爾的克魯斯克。',0),
@@ -8300,15 +8269,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (518,'zhTW','意志之冠','塔倫米爾的梅里薩拉要你去殺掉10個破碎嶺虐待者。',0),
 (519,'zhTW','意志之冠','幹掉塔爾格、瑪克拉克和戈洛姆斯，把他們的頭帶給塔倫米爾的梅裡薩拉。',0),
 (520,'zhTW','意志之冠','殺了瑪格索爾，帶著他的腦袋和意志之冠去塔倫米爾見梅里薩拉。',0),
-(521,'zhTW','意志之冠','把意志之冠交給幽暗城的沙琳德拉。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(524,526,527,528,529,532,533,535,539,541,544,545,546,547,549,550,551,552,553,554) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(521,'zhTW','意志之冠','把意志之冠交給幽暗城的沙琳德拉。',0),
 (524,'zhTW','苦楚藥劑','把被污染的酒桶放在被俘農夫房間的地毯上。',0),
 (526,'zhTW','光鑄鐵錠','收集5塊光鑄鐵錠，把它們交給濕地的戈羅林·鋼眉。',0),
 (527,'zhTW','希爾斯布萊德之戰','殺掉6個希爾斯布萊德雇農和6個希爾斯布萊德農夫，還有農夫雷恩和農夫蓋茲，然後返回塔倫米爾向達薩利亞報告。',0),
 (528,'zhTW','希爾斯布萊德之戰','殺死15個希爾斯布萊德農民，然後回到塔倫米爾向達薩利亞彙報。',0),
-(529,'zhTW','希爾斯布萊德之戰','殺掉鐵匠維林坦和4個希爾斯布萊德見習鐵匠，並從那裡搶回一箱鐵材，然後向塔倫米爾的達薩利亞彙報。',0),
+(529,'zhTW','希爾斯布萊德之戰','殺掉鐵匠維林坦和4個希爾斯布萊德見習鐵匠，並從那裡搶回一箱鐵材，然後向塔倫米爾的達薩利亞彙報。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(532,533,535,539,541,544,545,546,547,549,550,551,552,553,554,556,557,566,567,568) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (532,'zhTW','希爾斯布萊德之戰','殺掉波恩塞德鎮長和5個希爾斯布萊德議員，摧毀《希爾斯布萊德宣言》，偷取希爾斯布萊德城鎮文檔，然後回到塔倫米爾向達薩利亞彙報。',0),
 (533,'zhTW','秘密潛入','把關於高迪爾下落的消息帶回來給塔倫米爾的克魯斯克。',0),
 (535,'zhTW','僕從瓦里克','給辛迪加營地裡的瓦里克帶去一杯南海鎮烈酒。',0),
@@ -8323,15 +8292,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (551,'zhTW','附有魔法的羊皮紙','將這張附有魔法的羊皮紙帶給南海鎮的博學者迪布斯。',0),
 (552,'zhTW','赫爾庫拉的復仇','從雪怪手上拿回赫爾庫拉的魔棒，把它交給塔倫米爾的學徒塞萬德。',0),
 (553,'zhTW','赫爾庫拉的復仇','將埃希爾之焰、沃拉茲之焰和尤基爾之焰的力量注入赫爾庫拉的魔棒。$b$b把經過儀式洗禮之後的魔棒帶到南海鎮的赫爾庫拉墓地。',0),
-(554,'zhTW','解碼高手','把附有魔法的羊皮紙帶給鐵爐堡的勘察員塔伯斯·雷矛。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(556,557,566,567,568,569,570,571,572,573,581,582,584,585,586,588,589,590,591,592) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(554,'zhTW','解碼高手','把附有魔法的羊皮紙帶給鐵爐堡的勘察員塔伯斯·雷矛。',0),
 (556,'zhTW','石雕','收集10個用舊的石雕，把它們帶給塔倫米爾的看守者貝爾杜加。',0),
 (557,'zhTW','地縛護腕','為塔倫米爾的看守者貝瓦里爾收集4個地縛護腕。',0),
 (566,'zhTW','懸賞:瓦杜斯男爵','殺了瓦杜斯男爵，把他的頭帶給塔倫米爾的高級執行官達薩利亞。',0),
 (567,'zhTW','危險!','塔倫米爾的高級執行官達薩利亞懸賞通緝書記員赫拉斯·懷特斯蒂德、居民維爾克斯、礦工哈克特和農夫卡拉巴。',0),
-(568,'zhTW','格羅姆高保衛戰','格羅姆高營地的指揮官阿格羅戈西要求你殺死15隻鞭尾迅猛龍。',0),
+(568,'zhTW','格羅姆高保衛戰','格羅姆高營地的指揮官阿格羅戈西要求你殺死15隻鞭尾迅猛龍。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(569,570,571,572,573,581,582,584,585,586,588,589,590,591,592,593,594,596,598,615) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (569,'zhTW','格羅姆高保衛戰','格羅姆高營地的指揮官阿格羅戈西要求你殺死10個巨魔蠻兵和5個巨魔巫醫。',0),
 (570,'zhTW','摩克薩爾丁的魔法','格羅姆高營地的先知摩克薩爾丁要求你給他帶回8隻深喉獵豹的爪子和一顆雌虎的牙齒。',0),
 (571,'zhTW','摩克薩爾丁的魔法','給格羅姆高營地的先知摩克薩爾丁帶回1根成年大猩猩的肌腱。',0),
@@ -8346,15 +8315,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (589,'zhTW','歌唱水晶','給格羅姆高營地的肯維雷帶回3塊藍色波光碎片。',0),
 (590,'zhTW','盜賊的交易','打敗喪鐘鎮的卡爾文·蒙泰古。',0),
 (591,'zhTW','心靈之眼','將心靈之眼交給格羅姆高營地裡的肯維雷。',0),
-(592,'zhTW','拯救耶尼庫','將裝滿的靈魂寶石交給尼姆布亞。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(593,594,596,598,615,618,619,620,622,625,626,629,630,638,639,640,641,643,644,645) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(592,'zhTW','拯救耶尼庫','將裝滿的靈魂寶石交給尼姆布亞。',0),
 (593,'zhTW','靈魂寶石',NULL,0),
 (594,'zhTW','瓶中信','找到瓶中信的作者。',0),
 (596,'zhTW','染血的白骨項鍊','給格羅姆高營地的肯維雷帶回25串染血的白骨項鍊。',0),
 (598,'zhTW','裂骨項鏈','給格羅姆高營地的肯維雷帶回25串裂骨項鏈。',0),
-(615,'zhTW','船長的彎刀','與斯普羅格談話。',0),
+(615,'zhTW','船長的彎刀','與斯普羅格談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(618,619,620,622,625,626,629,630,638,639,640,641,643,644,645,646,648,649,650,654) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (618,'zhTW','挑戰奈古拉什','將10塊燒烤禿鷲翅膀和5瓶密林葡萄酒帶到斯莫特船長的救生艇上去。$b$b然後殺死奈古拉什，將斯莫特的彎刀交給荊棘谷的斯莫特船長。',0),
 (619,'zhTW','引誘奈古拉什',NULL,0),
 (620,'zhTW','刺著字母的束帶','將刺著字母的束帶還給他的主人。',0),
@@ -8369,15 +8338,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (641,'zhTW','索拉丁符印','把修復的索拉丁符印交給落錘村的森古。',0),
 (643,'zhTW','阿拉索符印','取回阿拉索符印，把它交給落錘村的森古。',0),
 (644,'zhTW','托爾貝恩符印','殺掉加林·托爾貝恩王子，把托爾貝恩符印帶給落錘村的森古。',0),
-(645,'zhTW','托卡拉爾','從激流堡的托爾貝恩墓室中取回托卡拉爾劍。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(646,648,649,650,654,655,656,662,663,664,665,666,667,668,669,670,671,672,673,674) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(645,'zhTW','托卡拉爾','從激流堡的托爾貝恩墓室中取回托卡拉爾劍。',0),
 (646,'zhTW','托卡拉爾','把托卡拉爾劍交給落錘村的森古。',0),
 (648,'zhTW','拯救OOX-17/TN!','將OOX-17/TN護送到熱砂港，然後向藏寶海灣的奧格索普·奧布諾提斯報告。',0),
 (649,'zhTW','尋找蜜酒','和奧格瑪的瑪爾頓·杜佛斯談話。',0),
 (650,'zhTW','尋找蜜酒','和基沃拉丁·逐日者談一談，他的營地就在辛特蘭區域。',0),
-(654,'zhTW','塔納利斯的樣本','收集8份蜥蜴樣本、8份土狼樣本和8份蠍子樣本，然後在能量源耗盡之前把野外實驗工具包還給加基森的安全主管吉羅姆·比格維茲。',0),
+(654,'zhTW','塔納利斯的樣本','收集8份蜥蜴樣本、8份土狼樣本和8份蠍子樣本，然後在能量源耗盡之前把野外實驗工具包還給加基森的安全主管吉羅姆·比格維茲。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(655,656,662,663,664,665,666,667,668,669,670,671,672,673,674,675,676,677,678,679) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (655,'zhTW','落錘鎮','和落錘村的托爾甘交談。',0),
 (656,'zhTW','召喚大地公主','到密斯賴爾水晶裂片去召喚她，然後打敗她。$b$b搜出她身上的怪異鐐銬，將其和密斯賴爾水晶裂片縛在一起。',0),
 (662,'zhTW','深海打撈','大副尼茲利克斯讓你從處女號和銀松之魂號中取回航海圖和航海日誌。',0),
@@ -8392,15 +8361,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (671,'zhTW','邪惡的魔法','幫落錘村的托爾甘找10枚血石護符。',0),
 (672,'zhTW','振奮精神','從高地闊步龍和高地長尾龍身上取得1０個高地迅猛龍的眼睛，把它們交給落錘村的托爾甘。',0),
 (673,'zhTW','邪惡的魔法','取回瑪雷茲·考爾的血石寶珠，把它交給落錘村的托爾甘。',0),
-(674,'zhTW','振奮精神','把迅猛龍利爪護符交給戈莫爾。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(675,676,677,678,679,680,683,686,688,689,692,698,699,700,701,702,703,704,705,706) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(674,'zhTW','振奮精神','把迅猛龍利爪護符交給戈莫爾。',0),
 (675,'zhTW','振奮精神','和托爾甘談話。',0),
 (676,'zhTW','落錘之戰','殺掉8個石拳巨魔和10個石拳執行者，然後去阿拉希高地的落錘村哨所找杜拉姆法爾。',0),
 (677,'zhTW','短兵相接','殺死10名枯木擲斧者、10名枯木獵頭者和8個枯木巫醫，然後回到落錘村哨所的杜拉姆法爾那裡。',0),
 (678,'zhTW','短兵相接','殺死10個石拳蠻兵和4個石拳法師，然後向落錘村哨所的杜拉姆法爾覆命。',0),
-(679,'zhTW','短兵相接','殺死15個石拳薩滿和10個石拳領主，然後向落錘村哨所的杜拉姆法爾覆命。',0),
+(679,'zhTW','短兵相接','殺死15個石拳薩滿和10個石拳領主，然後向落錘村哨所的杜拉姆法爾覆命。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(680,683,686,688,689,692,698,699,700,701,702,703,704,705,706,708,709,710,711,712) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (680,'zhTW','真正的威脅','殺死奧卡拉爾，將他的頭顱帶給落錘村哨所的科林法爾。',0),
 (683,'zhTW','薩拉·巴魯的請求','把薩拉·巴魯的字條交給鐵爐堡的國王麥格尼·銅鬚。',0),
 (686,'zhTW','國王的禮物','國王麥格尼·銅鬚讓你去和大石匠瑪布勒斯坦談話。',0),
@@ -8415,15 +8384,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (703,'zhTW','燒烤禿鷲翅膀','給里格弗茲帶去4只禿鷲的翅膀。',0),
 (704,'zhTW','埃格蒙德的命運','收集4個雕紋石罐，把它們交給洛克莫丹的勘察員基恩薩·鐵環。',0),
 (705,'zhTW','潛水采珍珠','收集9枚藍珍珠，把它們交給荒蕪之地的里格弗茲。',0),
-(706,'zhTW','黑龍之火','為西格魯·鐵斧拿到一顆黑龍之心。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(708,709,710,711,712,713,714,715,716,717,718,719,720,721,722,723,724,725,726,727) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(706,'zhTW','黑龍之火','為西格魯·鐵斧拿到一顆黑龍之心。',0),
 (708,'zhTW','黑盒子','把這個黑盒子帶到鐵爐堡的軍事大廳去。',0),
 (709,'zhTW','化解災難','把雷烏納石板帶給『迷失者』塞爾杜林。',0),
 (710,'zhTW','研究石元素','收集10塊小石頭裂片，把它們交給荒蕪之地的魯特維爾·沃拉圖斯。',0),
 (711,'zhTW','研究石元素','收集3塊大石片，把它們交給荒蕪之地的魯特維爾·沃拉圖斯。',0),
-(712,'zhTW','研究石元素','收集5個石縛護腕，把它們交給荒蕪之地的魯特維爾·沃拉圖斯。',0),
+(712,'zhTW','研究石元素','收集5個石縛護腕，把它們交給荒蕪之地的魯特維爾·沃拉圖斯。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(713,714,715,716,717,718,719,720,721,722,723,724,725,726,727,728,732,733,734,735) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (713,'zhTW','至關重要的冷卻劑','找到冰霜之油，把它交給荒蕪之地的魯特維爾·沃拉圖斯。',0),
 (714,'zhTW','發條式什麼什麼儀','給荒蕪之地的魯特維爾·沃拉圖斯帶去一個發條式同步協調陀螺儀。',0),
 (715,'zhTW','盧希恩的藥水','為荒蕪之地的盧希恩·槍穗找到一瓶隱形藥水和一瓶治療藥水。',0),
@@ -8438,21 +8407,20 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (724,'zhTW','鐵趾的遺願','把鐵趾的護符交給鐵爐堡的史學家卡尼克。',0),
 (725,'zhTW','亡者的警告','找到顧問貝爾格拉姆，把便箋交給他。',0),
 (726,'zhTW','亡者的警告','和史學家卡尼克談話。',0),
-(727,'zhTW','遠赴鐵爐堡','把戰錘印章交給鐵爐堡的葛利·硬骨。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(728,732,733,734,735,737,739,742,762,770,774,777,778,779,781,782,785,793,795,796) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(727,'zhTW','遠赴鐵爐堡','把戰錘印章交給鐵爐堡的葛利·硬骨。',0),
 (728,'zhTW','遠赴幽暗城','把戰錘印章交給幽暗城的看守者貝爾杜加。',0),
 (732,'zhTW','大地的震顫','幫加瑞克取回大地印章。',0),
 (733,'zhTW','搜集行動','幫西格魯收集7塊金屬碎塊。',0),
 (734,'zhTW','不祥的感覺','和荒蕪之地的盧希恩·槍穗談話。',0),
-(735,'zhTW','星，手，心','找齊葛利·硬骨的便箋上列出的東西，然後把它們交給鐵爐堡的葛利·硬骨。',0),
+(735,'zhTW','星，手，心','找齊葛利·硬骨的便箋上列出的東西，然後把它們交給鐵爐堡的葛利·硬骨。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(737,739,742,762,770,777,778,779,781,782,785,793,795,809,812,813,822,824,825,827) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (737,'zhTW','禁斷的知識','把雅格因的筆記交給塞爾杜林。',0),
 (739,'zhTW','莫達洛克','幹掉殺害埃格蒙德的兇手:莫達洛克。$b$b順便殺掉12個石窟斷骨者。$b$b然後向洛克莫丹的勘察員基恩薩·鐵環報告。',0),
 (742,'zhTW','梣谷狩獵','與梣谷碎木崗哨的塞娜尼·雷心談話。',0),
 (762,'zhTW','邪惡的使者','殺死苦痛堡壘中的因弗努斯大使，把證明他已死亡的信物交給鐵爐堡的顧問貝爾格拉姆。',0),
 (770,'zhTW','惡魔之傷','去打聽打聽誰聽說過鬼嚎。$b$b已提供物品：$b',0),
-(774,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(774))',0),
 (777,'zhTW','不祥的感覺','把5號齒輪交給魯特維爾·沃拉圖斯。',0),
 (778,'zhTW','不祥的感覺','擊敗法姆雷托守護者，並將魯特維爾的元素禁錮鐐銬交還給魯特維爾。',0),
 (779,'zhTW','大地封印',NULL,0),
@@ -8461,33 +8429,22 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (785,'zhTW','協助盟友','在森金村的西側找到拉爾·獵齒。',0),
 (793,'zhTW','破碎的聯盟','用大地徽印啟動鑽石柱、蛋白石柱和紫水晶石柱並拿到三顆符石。$b$b把符石放在大地封印上，釋放黑龍布萊克拉席和赫瑪圖斯。$b$b殺了這兩條黑龍，把黑龍布萊克拉席的鎖鍊、赫瑪圖斯的鎖鍊和大地徽印交給高恩。',0),
 (795,'zhTW','大地封印',NULL,0),
-(796,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(796))',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(797,798,799,800,801,802,803,809,812,813,822,824,825,827,828,829,830,831,832,836) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(797,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(797))',0),
-(798,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(798))',0),
-(799,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(799))',0),
-(800,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(800))',0),
-(801,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(801))',0),
-(802,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(802))',0),
-(803,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(803))',0),
 (809,'zhTW','雅克塞羅斯','到貧瘠之地去和雅克塞羅斯談話。',0),
 (812,'zhTW','救命如救火','找到毒尾蠍的解毒劑，把它交給杜洛塔西北邊境的林納格。',0),
 (813,'zhTW','尋找解毒劑','收集4個毒尾蠍的毒囊，把它們交給奧格瑪的考格漢。',0),
 (822,'zhTW','老陳的空酒桶','收集5個閃電腺、1個雷鷹的唾液腺和1個科多獸的肝臟，把它們交給棘齒城裡的釀酒師德羅恩。',0),
 (824,'zhTW','陶土議會的耶努薩克雷','將被污染的水球交給梣谷佐拉姆加前哨站的耶努薩克雷。',0),
 (825,'zhTW','海底沉船','剃刀嶺的加索克要你從海岸邊的艦隊殘骸中打撈出3件地精的工具。',0),
-(827,'zhTW','骷髏石','在骷髏石中的火刃祭司身上收集灼熱項圈，$b$b然後交給瑪高茲。',0),
+(827,'zhTW','骷髏石','在骷髏石中的火刃祭司身上收集灼熱項圈，$b$b然後交給瑪高茲。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(828,829,830,831,832,836,838,840,841,842,843,846,847,849,850,851,852,854,855,857) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (828,'zhTW','瑪高茲','和瑪高茲談話。',0),
 (829,'zhTW','尼爾魯·火刃','給奧格瑪的尼爾魯·火刃帶去一個項圈樣本。',0),
 (830,'zhTW','將軍的命令','把普勞德摩爾上將的命令帶給剃刀嶺的加索克。',0),
 (831,'zhTW','將軍的命令','把普勞德摩爾上將的命令交給奧格瑪城中的沃金，他就在索爾的大廳裡。',0),
 (832,'zhTW','燃影之眼','把這顆燃影之眼帶給尼爾魯·火刃。',0),
-(836,'zhTW','拯救OOX-09/HL!','將OOX-09/HL護送到望海崖，然後向藏寶海灣的奧格索普·奧布諾提斯報告。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(838,840,841,842,843,846,847,849,850,851,852,854,855,857,859,862,866,868,872,873) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(836,'zhTW','拯救OOX-09/HL!','將OOX-09/HL護送到望海崖，然後向藏寶海灣的奧格索普·奧布諾提斯報告。',0),
 (838,'zhTW','通靈學院','和西瘟疫之地亡靈壁壘的藥劑師迪瑟斯談話。',0),
 (840,'zhTW','部落的新兵','沿著剃刀嶺西部的小路一直前進，過橋之後就可以進入貧瘠之地。$b$b在橋對面的獸人前哨找到卡加爾·戰痕，將你的募兵信交給他。',0),
 (841,'zhTW','另一個能量源?','用10個廢土水袋來和加基森的首席工程師比格維茲換取另外一個能量源。',0),
@@ -8501,16 +8458,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (852,'zhTW','赫茲盧爾·血印','把赫茲盧爾的頭顱交給十字路口的雷戈薩·死門。',0),
 (854,'zhTW','十字路口之旅','去十字路口和索克談話。',0),
 (855,'zhTW','半人馬護腕','收集15個半人馬護腕，把他們交給十字路口的雷戈薩·死門。',0),
-(857,'zhTW','眾月之淚','被流放的費格雷要你取回他的眾月之淚。',0),
-(859,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(859))',0),
+(857,'zhTW','眾月之淚','被流放的費格雷要你取回他的眾月之淚。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(862,866,868,872,873,874,875,876,877,878,879,880,881,882,883,884,885,886,889,893) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (862,'zhTW','掘地鼠燉肉','給十字路口的格拉布弄到8隻掘地鼠。',0),
 (866,'zhTW','根鬚樣本','將8個根鬚樣本交給棘齒城的麥伯克·米希瑞克斯。',0),
 (868,'zhTW','獵蛋任務','把12枚異種蟲蛋和掘地爪交給十字路口的科蘭。',0),
 (872,'zhTW','野豬人的頭目','殺掉8個鋼鬃地卜師、8個鋼鬃防禦者和他們的頭目克里尼格·糟鼻。$b$b把克里尼格·糟鼻的獠牙交給十字路口的索克。',0),
-(873,'zhTW','依沙瓦克','把依沙瓦克的心臟交給瑪倫·星眼。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(874,875,876,877,878,879,880,881,882,883,884,885,886,889,893,897,905,906,907,908) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(873,'zhTW','依沙瓦克','把依沙瓦克的心臟交給瑪倫·星眼。',0),
 (874,'zhTW','瑪倫·星眼','和瑪倫·星眼談話。',0),
 (875,'zhTW','鷹身人副官','從巫翼殺戮者那裡收集6枚鷹身人副官之戒，把它們交給十字路口的達索克·快刀。',0),
 (876,'zhTW','塞瑞娜·血羽','殺掉塞瑞娜·血羽，把她的頭顱交給十字路口的達索克·快刀。',0),
@@ -8525,15 +8481,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (885,'zhTW','瓦希塔帕恩','把瓦希塔帕恩的羽毛交給陶拉祖營地的喬恩·星眼。',0),
 (886,'zhTW','貧瘠之地的綠洲','和十字路口的圖加·符文圖騰談話。',0),
 (889,'zhTW','風之靈',NULL,0),
-(893,'zhTW','選擇武器','給陶拉祖營地的塔特納克·鋼爐帶去一把鋼鬃背刺匕首、一根燒焦的鋼鬃魔杖和一面鋼鬃大盾。',0),
+(893,'zhTW','選擇武器','給陶拉祖營地的塔特納克·鋼爐帶去一把鋼鬃背刺匕首、一根燒焦的鋼鬃魔杖和一面鋼鬃大盾。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(897,905,906,907,908,910,911,913,914,924,926,927,931,934,936,938,939,941,960,961) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (897,'zhTW','收割者','把收割者的頭顱交給喬恩·星眼。',0),
 (905,'zhTW','狂暴的鐮爪龍','殺死赤鱗迅猛龍並收集它們的羽毛，把這些羽毛放在3個赤鱗鐮爪龍的巢穴裡，然後返回十字路口的瑟格拉·黑棘那裡。',0),
 (906,'zhTW','內奸','把洛克·奧克班恩的顱骨交給十字路口的索克。',0),
 (907,'zhTW','被激怒的雷霆蜥蜴','收集3瓶雷霆蜥蜴的血液，把它們交給陶拉祖營地的喬恩·星眼。',0),
-(908,'zhTW','廢墟之間','把深淵之核交給梣谷左拉姆加前哨站裡的耶努薩克雷。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(910,911,913,914,924,926,927,931,934,936,938,939,941,946,960,961,968,969,972,974) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(908,'zhTW','廢墟之間','把深淵之核交給梣谷左拉姆加前哨站裡的耶努薩克雷。',0),
 (910,'zhTW','降帆靠港','帶著你看護的孤兒去貧瘠之地的棘齒城碼頭。',0),
 (911,'zhTW','前線之門','帶著你看護的孤兒去貧瘠之地北部的摩爾沙農場，它就在靠近梣谷入口的地方。',0),
 (913,'zhTW','雷鷹的嘶鳴','找到一隻雷鷹，殺掉它，然後把它的翅膀交給陶拉祖營地的喬恩·星眼。',0),
@@ -8547,39 +8503,37 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (938,'zhTW','密斯特','護送密斯特去神諭之樹附近的月井旁找哨兵阿瑞尼亞·碎雲。',0),
 (939,'zhTW','薩瓦里克長笛','將薩瓦里克長笛和5個碧火魔符交給費伍德森林南部的艾瑞丹·藍風。',0),
 (941,'zhTW','培養心臟','把受污染的心臟放到德納蘭的培養槽裡。',0),
-(946,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(946))',0),
 (960,'zhTW','正在冥想的安努',NULL,0),
-(961,'zhTW','正在冥想的安努',NULL,0),
+(961,'zhTW','正在冥想的安努',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(968,969,972,974,975,977,978,979,980,992,995,996,998,999,1000,1005,1006,1018,1036,1047) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (968,'zhTW','深淵之神','把《深淵之神》交給鐵爐堡荒棄的洞穴中的葛利·硬骨。',0),
 (969,'zhTW','祝你好運','收集4塊霜槌裂片，把它們交給永望鎮的巫醫瑪艾里。',0),
 (972,'zhTW','水之靈契',NULL,0),
-(974,'zhTW','究根問底','安戈洛環形山的克拉蘭克要你去找到火羽山中溫度最高的地方。$b$b當你找到一個看起來很熱的地方時，就右鍵點擊溫度計來測量當地的溫度。不斷嘗試，直到你找到溫度最高的地方。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(975,977,978,979,980,987,992,995,996,998,999,1000,1005,1006,1018,1036,1047,1048,1049,1051) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(974,'zhTW','究根問底','安戈洛環形山的克拉蘭克要你去找到火羽山中溫度最高的地方。$b$b當你找到一個看起來很熱的地方時，就右鍵點擊溫度計來測量當地的溫度。不斷嘗試，直到你找到溫度最高的地方。',0),
 (975,'zhTW','瑪艾里的容器','與巫醫瑪艾里再次談話，然後拿到幸運符。',0),
 (977,'zhTW','雪怪計畫!','為永望鎮的烏米收集2支完美的雪人角。',0),
 (978,'zhTW','月光羽毛','從冬泉谷收集10片月光羽毛，然後將它們帶給魯瑟蘭村的艾瑞拉斯·琥珀。',0),
 (979,'zhTW','蘭莎爾拉','在冬泉谷找到蘭莎爾拉。',0),
 (980,'zhTW','新的泉水','到冬泉谷去和多諾瓦·雪山談話。',0),
-(987,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(987))',0),
 (992,'zhTW','加基森水業公司的調查報告','用未使用的尋水器在流沙崗哨旁邊的池中採集水樣。一旦你收集到水樣，就儘快將其交給加基森的高級勘探員菲茲杜瑟。',0),
 (995,'zhTW','偷偷溜走','離開熊怪洞穴，然後去見奧伯丁的特倫希斯。',0),
 (996,'zhTW','被腐化的迎風花',NULL,0),
 (998,'zhTW','被腐化的迎風花',NULL,0),
-(999,'zhTW','噩夢成真','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(999))',0),
+(999,'zhTW','噩夢成真',NULL,0),
 (1000,'zhTW','新的邊疆','與雷霆崖長者高地的大德魯伊哈繆爾·符文圖騰談一談關於議會號召部落成員探索卡林多大陸的事情。',0),
-(1005,'zhTW','逃出影牙城堡','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1005))',0),
-(1006,'zhTW','逃出影牙城堡','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1006))',0),
+(1005,'zhTW','逃出影牙城堡',NULL,0),
+(1006,'zhTW','逃出影牙城堡',NULL,0),
 (1018,'zhTW','新的邊疆','與雷霆崖長者高地的大德魯伊哈繆爾·符文圖騰談一談關於議會號召部落成員探索卡林多大陸的事情。',0),
 (1036,'zhTW','嘿，水手!','登上停泊在荊棘谷海岸邊的紅霧號，與船裡的艦隊指揮官菲爾拉倫談話。',0),
-(1047,'zhTW','新的邊疆','與達納蘇斯塞納里奧區的大德魯范達爾·鹿盔談一談關於議會號召聯盟成員探索卡林多大陸的事情。',0),
+(1047,'zhTW','新的邊疆','與達納蘇斯塞納里奧區的大德魯范達爾·鹿盔談一談關於議會號召聯盟成員探索卡林多大陸的事情。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1048,1049,1051,1052,1053,1058,1060,1063,1064,1065,1066,1067,1068,1086,1087,1088,1089,1099,1100,1101) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1048,'zhTW','深入血色修道院','此任務已經絕版。殺掉高等審判官懷特邁恩、血色十字軍指揮官莫格萊尼、血色十字軍勇士赫洛德和馴犬者洛克希，然後向幽暗城的瓦里瑪薩斯回報。',0),
 (1049,'zhTW','墮落者綱要','從血色修道院裡找到《墮落者綱要》，把它交給雷霆崖的賢者圖希克。',0),
-(1051,'zhTW','沃瑞爾的復仇','把沃瑞爾·森古斯的結婚戒指還給塔倫米爾的莫尼卡·森古斯。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1052,1053,1058,1060,1063,1064,1065,1066,1067,1068,1086,1087,1088,1089,1099,1100,1101,1102,1103,1104) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1051,'zhTW','沃瑞爾的復仇','把沃瑞爾·森古斯的結婚戒指還給塔倫米爾的莫尼卡·森古斯。',0),
 (1052,'zhTW','血色之路','將安東修士的表彰信帶給南海鎮的虔誠的萊雷恩。',0),
 (1053,'zhTW','以聖光之名','殺死高階審判官懷特邁恩，血色十字軍指揮官莫格萊尼，十字軍的勇士赫洛德和馴犬者洛克希並向南海鎮的萊雷恩覆命。',0),
 (1058,'zhTW','金吉爾的森林魔法','瑪拉卡金的巫醫金吉爾需要5瓶石爪苔液、5根夜行虎鬚、30顆巨角鹿的眼球和1塊靈龍的鱗片。',0),
@@ -8596,13 +8550,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1089,'zhTW','大獸穴','到石爪峰上的洞穴中去，使用守門人的鑰匙，取得德魯伊藏匿的物品。用這些物品打開石爪峰洞穴儲藏室。',0),
 (1099,'zhTW','哥布林獲勝！',NULL,0),
 (1100,'zhTW','亨里格的日記','閱讀亨里格·獨眉的日記。',0),
-(1101,'zhTW','剃刀沼澤的乾癟老太婆','把卡爾加·刺肋的大勳章帶給薩蘭納爾的法芬德爾。',0),
+(1101,'zhTW','剃刀沼澤的乾癟老太婆','把卡爾加·刺肋的大勳章帶給薩蘭納爾的法芬德爾。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1102,1103,1104,1106,1107,1108,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1102,'zhTW','奧爾德的報復','把卡爾加·刺肋的心臟交給雷霆崖的奧爾德·石塔。',0),
 (1103,'zhTW','水之召喚','如果你沒能與水之靈體交談，就給銀松森林的提夫·摩杜恩再拿去一瓶水之靈契。',0),
-(1104,'zhTW','含鹽的蠍毒','為閃光平原的菲茲爾·銅栓帶去6份含鹽的蠍毒。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1106,1107,1108,1110,1111,1112,1113,1114,1115,1116,1117,1118,1119,1120,1121,1122,1123,1124,1125,1126) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1104,'zhTW','含鹽的蠍毒','為閃光平原的菲茲爾·銅栓帶去6份含鹽的蠍毒。',0),
 (1106,'zhTW','『流放者』馬特克','把菲茲爾·銅栓的信帶給荒蕪之地的『流放者』馬特克。',0),
 (1107,'zhTW','堅硬的尾鰭','給閃光平原上的瑞茲爾·銅栓帶去10片堅硬的尾鰭。',0),
 (1108,'zhTW','精鐵碎片','收集10塊精鐵碎片，把它們交給荒蕪之地的『流放者』馬特克。',0),
@@ -8619,13 +8573,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1120,'zhTW','灌醉地精','把蠢人酒帶給地精車隊老闆。',0),
 (1121,'zhTW','灌醉哥布林','把蠢人酒交給哥布林車隊老闆。',0),
 (1122,'zhTW','向菲茲巴布報告','把蠢人酒的試驗報告交給藏寶海灣的克蘭克·菲茲巴布。',0),
-(1123,'zhTW','拉比恩·薩圖納','與月光林地永夜港的拉比恩·薩圖納談一談。月光林地在費伍德森林和冬泉谷之間，可以從木喉要塞中的一條通道抵達那裡。',0),
+(1123,'zhTW','拉比恩·薩圖納','與月光林地永夜港的拉比恩·薩圖納談一談。月光林地在費伍德森林和冬泉谷之間，可以從木喉要塞中的一條通道抵達那裡。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1124,1125,1126,1127,1130,1131,1132,1133,1135,1136,1137,1139,1142,1144,1145,1146,1147,1148,1149,1150) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1124,'zhTW','荒地','在希利蘇斯的勇士之墓附近找萊耶·星擊談談，把拉比恩的信交給他。',0),
 (1125,'zhTW','南風村的靈魂','在南風村釋放8個被折磨的德魯伊和8個被折磨的哨兵的靈魂，然後向希利蘇斯勇士之墓的萊耶·星擊覆命。',0),
-(1126,'zhTW','塔中之巢','爬上南風村的塔，找尋啟動異種蠍群的方法。把任何你認為不尋常的東西交給希利蘇斯勇士之墓的萊耶·星擊。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1127,1130,1131,1132,1133,1135,1136,1137,1139,1142,1144,1145,1146,1147,1148,1149,1150,1151,1152,1153) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1126,'zhTW','塔中之巢','爬上南風村的塔，找尋啟動異種蠍群的方法。把任何你認為不尋常的東西交給希利蘇斯勇士之墓的萊耶·星擊。',0),
 (1127,'zhTW','蠢人酒','收集12份贊吉爾的藥劑，把它們交給藏寶海灣的克蘭克·菲茲巴布。',0),
 (1130,'zhTW','梅洛的關注','和雷霆崖的梅洛·石蹄交談。',0),
 (1131,'zhTW','鋼齒土狼','把鋼齒土狼的肋骨交給雷霆崖的梅洛·石蹄。',0),
@@ -8642,16 +8596,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1147,'zhTW','瘋狂的蟲群','殺掉5隻異種搜尋者、5隻異種築巢蠍和5隻異種侵略者，然後向千針石林的摩克塔·克林覆命。',0),
 (1148,'zhTW','蟲群的樣本','收集1顆異種蠍的心臟、5隻異種蠍的爪子和3個完整的異種蠍殼，把它們和你手中的這個破碎的異種蠍殼一起交給十字路口的科蘭。',0),
 (1149,'zhTW','信仰的試煉','如果你有堅定的信仰，就從那個可以俯瞰千針石林的木板跳下去。',0),
-(1150,'zhTW','耐力的試煉','把格林卡的爪子交給千針石林的多恩·平原行者。',0),
+(1150,'zhTW','耐力的試煉','把格林卡的爪子交給千針石林的多恩·平原行者。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1151,1152,1153,1154,1156,1159,1160,1166,1168,1169,1170,1171,1172,1173,1174,1175,1176,1177,1178,1179) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1151,'zhTW','力量的試煉','把羅卡里姆的碎片交給千針石林的多恩·平原行者。',0),
 (1152,'zhTW','知識試煉','找到連接石爪山和梣谷的深爪小徑裡的布勞格·幽魂。',0),
-(1153,'zhTW','新的礦石樣本','從砂齒掘地工或砂齒勘探員那裡找一塊未精煉的礦石樣本，把它交給陶拉祖營地的塔特納克·鋼爐。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1154,1156,1157,1159,1160,1166,1168,1169,1170,1171,1172,1173,1174,1175,1176,1177,1178,1179,1180,1181) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1153,'zhTW','新的礦石樣本','從砂齒掘地工或砂齒勘探員那裡找一塊未精煉的礦石樣本，把它交給陶拉祖營地的塔特納克·鋼爐。',0),
 (1154,'zhTW','知識試煉','找到《守護巨龍的遺產》，把它還給位於梣谷和石爪山之間的深爪小徑裡的布勞格·幽魂。',0),
 (1156,'zhTW',NULL,'此任務已經絕版。x',0),
-(1157,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1157))',0),
 (1159,'zhTW','知識試煉','找到幽暗城的帕科瓦·芬塔拉斯。',0),
 (1160,'zhTW','知識試煉','找到《不死生物的起源》，把它交給幽暗城的帕科瓦·芬塔拉斯。',0),
 (1166,'zhTW','莫格穆洛克主宰的任務','蕨牆村的莫格穆洛克主宰要你從石槌廢墟拿回他的烈酒、鼻煙和保險箱。',0),
@@ -8666,12 +8619,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1176,'zhTW','減輕負重','給閃光平原的普茲克找10根空心禿鷹骨。',0),
 (1177,'zhTW','餓!','塵泥沼澤北部的碎泥·杜特非要你去抓8條沼鰭小魚。',0),
 (1178,'zhTW','哥布林贊助商','和棘齒城的加茲魯維談話。',0),
-(1179,'zhTW','銅栓兄弟','將防撞盔帽木箱帶給閃光平原上的維茲爾·銅栓。',0),
-(1180,'zhTW','哥布林贊助商','和藏寶海灣的碼頭管理員羅茲基爾談話。',0),
-(1181,'zhTW','哥布林贊助商','與藏寶海灣的大財主里維加茲談話。',0);
+(1179,'zhTW','銅栓兄弟','將防撞盔帽木箱帶給閃光平原上的維茲爾·銅栓。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1182,1183,1184,1185,1186,1187,1188,1189,1190,1191,1192,1193,1194,1195,1196,1197,1201,1202,1203,1204) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1180,1181,1182,1183,1184,1185,1186,1187,1188,1189,1190,1191,1192,1193,1194,1195,1196,1197,1201,1202) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1180,'zhTW','哥布林贊助商','和藏寶海灣的碼頭管理員羅茲基爾談話。',0),
+(1181,'zhTW','哥布林贊助商','與藏寶海灣的大財主里維加茲談話。',0),
 (1182,'zhTW','哥布林贊助商','將燃料調節器的藍圖交給藏寶海灣的大財主里維加茲。',0),
 (1183,'zhTW','哥布林贊助商','把燃料調節器的藍圖帶給閃光平原的普茲克。',0),
 (1184,'zhTW','蟲群的樣本','回到奧格瑪的貝爾戈洛姆·石槌那兒。',0),
@@ -8689,12 +8642,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1196,'zhTW','神聖之火','把裝滿的蝕刻之瓶交給亂風崗的勞恩·峭壁行者。',0),
 (1197,'zhTW','神聖之火','拿到裂開的蹄子，把它交給亂風崗的勞恩·峭壁行者。',0),
 (1201,'zhTW','塞拉摩間諜','殺掉9個塞拉摩間諜，然後回到蕨牆村去見納澤爾·血矛。',0),
-(1202,'zhTW','塞拉摩碼頭','把指揮官的文件交給蕨牆村的納澤爾·血矛。',0),
-(1203,'zhTW','加爾需要一把劍','將尖背之劍交給水光莊園的『沼澤之眼』加爾。',0),
-(1204,'zhTW','泥石龜蟹湯','給塞拉摩的摩根·斯特恩收集8個分叉的泥石龜舌。',0);
+(1202,'zhTW','塞拉摩碼頭','把指揮官的文件交給蕨牆村的納澤爾·血矛。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1205,1206,1218,1219,1220,1222,1238,1239,1240,1251,1252,1253,1258,1259,1261,1262,1263,1268,1269,1270) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1203,1204,1205,1206,1218,1219,1220,1222,1238,1239,1240,1251,1252,1253,1258,1259,1261,1262,1263,1268) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1203,'zhTW','加爾需要一把劍','將尖背之劍交給水光莊園的『沼澤之眼』加爾。',0),
+(1204,'zhTW','泥石龜蟹湯','給塞拉摩的摩根·斯特恩收集8個分叉的泥石龜舌。',0),
 (1205,'zhTW','死沼巨鱷','把死沼巨鱷的牙齒交給雷霆崖的梅洛。',0),
 (1206,'zhTW','加爾需要蜘蛛眼','將20顆完好的暗霧蜘蛛眼球交給水光莊園的『沼澤之眼』加爾。',0),
 (1218,'zhTW','沼澤青蛙腿','帶10條沼澤青蛙腿給塵泥沼澤的『沼澤之眼』加爾。',0),
@@ -8711,36 +8664,23 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1259,'zhTW','帕瓦爾·雷瑟上尉','從塞拉摩的泰索蘭副官那兒找出更多關於雷瑟的消息。',0),
 (1261,'zhTW','瑪格的囑託','把寶石墜子交給蕨牆村的納澤爾·血矛。',0),
 (1262,'zhTW','向佐爾報告','把鑲寶石的墜子帶給奧格瑪的佐爾·孤樹。',0),
-(1263,'zhTW','燃燒的旅店','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1263))',0),
-(1268,'zhTW','可疑的蹄印','把樹蔭旅店的可疑蹄印報告給蕨牆村的克羅格。',0),
-(1269,'zhTW','帕瓦爾·雷瑟上尉','把雷瑟的徽章帶給蕨牆村的克羅格。',0),
-(1270,'zhTW','伊格納茲的逃亡','護送伊格納茲，然後和棘齒城的麥伯克·米希瑞克斯談話。',0);
+(1263,'zhTW','燃燒的旅店',NULL,0),
+(1268,'zhTW','可疑的蹄印','把樹蔭旅店的可疑蹄印報告給蕨牆村的克羅格。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1271,1272,1273,1276,1278,1280,1281,1282,1283,1284,1285,1286,1287,1293,1294,1295,1296,1297,1299,1300) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1269,1270,1271,1273,1276,1281,1282,1283,1284,1285,1286,1287,1318,1319,1320,1321,1322,1323,1339,1361) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1269,'zhTW','帕瓦爾·雷瑟上尉','把雷瑟的徽章帶給蕨牆村的克羅格。',0),
+(1270,'zhTW','伊格納茲的逃亡','護送伊格納茲，然後和棘齒城的麥伯克·米希瑞克斯談話。',0),
 (1271,'zhTW','盛筵',NULL,0),
-(1272,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1272))',0),
 (1273,'zhTW','盤問雷瑟','和奧格隆一起去和雷瑟談話，然後回到蕨牆村找克羅格。',0),
 (1276,'zhTW','黑色盾牌','把燻黑的鐵盾牌拿給雷霆崖的莫薩恩看看。',0),
-(1278,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1278))',0),
-(1280,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1280))',0),
-(1281,'zhTW','吉姆的歌謠','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1281))',0),
+(1281,'zhTW','吉姆的歌謠',NULL,0),
 (1282,'zhTW','他們叫他微笑的吉姆','與塞拉摩堡壘的蓋蘭·維米斯上尉談話。',0),
-(1283,'zhTW','樹蔭旅店的大火','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1283))',0),
+(1283,'zhTW','樹蔭旅店的大火',NULL,0),
 (1284,'zhTW','可疑的蹄印','把樹蔭旅店的可疑蹄印報告給塞拉摩的蓋蘭·維米斯上尉。',0),
 (1285,'zhTW','戴林的下屬','把雷瑟的資料報告給塞拉摩的蓋蘭·維米斯上尉。',0),
 (1286,'zhTW','叛逃者','從巴魯斯·加科因及塵泥沼澤的背叛者那裡打探消息。',0),
 (1287,'zhTW','叛逃者','和塞拉摩的蓋蘭·維米斯上尉談談關於雷瑟的事。',0),
-(1293,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1293))',0),
-(1294,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1294))',0),
-(1295,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1295))',0),
-(1296,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1296))',0),
-(1297,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1297))',0),
-(1299,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1299))',0),
-(1300,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1300))',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1318,1319,1320,1321,1322,1323,1339,1361,1362,1365,1366,1367,1368,1369,1370,1371,1373,1374,1375,1380) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1318,'zhTW','戈多克巨魔的事務','找到戈多克力量護手，並將它交給厄運之槌的克羅卡斯。$b$b根據克羅卡斯所說的，「傳說」自稱是王子的精靈托塞德林從一名戈多克巨魔手中偷走了那件神器。',0),
 (1319,'zhTW','黑色盾牌','把被燻黑的鐵盾牌拿給塞拉摩的卡茲·雙鏈看一看。',0),
 (1320,'zhTW','黑色盾牌','與塞拉摩的蓋蘭·維米斯隊長談話。',0),
@@ -8748,7 +8688,10 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1322,'zhTW','黑色盾牌','為蕨牆村的杜高爾收集6個酸性毒囊。',0),
 (1323,'zhTW','黑色盾牌','和蕨牆村的克羅格談話。',0),
 (1339,'zhTW','巡山人雷矛的任務','和巡山人雷矛談話。',0),
-(1361,'zhTW','雷戈薩·死門','和雷戈薩·死門談話。',0),
+(1361,'zhTW','雷戈薩·死門','和雷戈薩·死門談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1362,1365,1366,1367,1368,1369,1370,1371,1373,1374,1375,1380,1381,1382,1384,1385,1386,1387,1388,1389) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1362,'zhTW','淒涼之地的科卡爾部族','和淒涼之地鬼旅崗哨的費古爾·雙刃談話。',0),
 (1365,'zhTW','戴茲帕可汗','把戴茲帕可汗的頭顱交給淒涼之地的費古爾·雙刃。',0),
 (1366,'zhTW','懸賞半人馬','收集15個半人馬的耳朵，把它們交給淒涼之地的費古爾·雙刃。',0),
@@ -8760,10 +8703,7 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1373,'zhTW','盎格庫','維持你在吉爾吉斯族中的名聲，並把德萊尼水晶裂片交給淒涼之地吉爾吉斯村的『智者』烏泰克。',0),
 (1374,'zhTW','傑恩可汗','把傑恩可汗的頭顱交給淒涼之地吉爾吉斯村的『智者』烏泰克。',0),
 (1375,'zhTW','沙卡可汗','繼續和瑪格拉姆部族保持良好的關係，把沙卡可汗的頭顱交給淒涼之地瑪格拉姆村的瓦魯格。',0),
-(1380,'zhTW','赫蘭薩可汗','繼續和吉爾吉斯部族保持良好的關係，把瑪洛迪鑰匙碎片交給吉爾吉斯村的『智者』烏泰克。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1381,1382,1384,1385,1386,1387,1388,1389,1391,1392,1393,1394,1396,1398,1418,1419,1420,1421,1422,1423) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1380,'zhTW','赫蘭薩可汗','繼續和吉爾吉斯部族保持良好的關係，把瑪洛迪鑰匙碎片交給吉爾吉斯村的『智者』烏泰克。',0),
 (1381,'zhTW','赫蘭薩可汗','維持你在瑪格拉姆族的名聲，並把瑪洛迪鑰匙碎片交給淒涼之地瑪格拉姆村的瓦魯格。',0),
 (1382,'zhTW','奇怪的聯盟','和吉爾吉斯部族建立良好的關係，然後和『智者』烏泰克談話。',0),
 (1384,'zhTW','突襲科卡爾','和吉爾吉斯部族保持良好的關係，把10個粗製符咒交給淒涼之地吉爾吉斯村的『智者』烏泰克。',0),
@@ -8771,7 +8711,10 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1386,'zhTW','突襲科卡爾部族','繼續保持和瑪格拉姆部族的良好關係，殺掉12個科卡爾半人馬，12個科卡爾斥候和6個科卡爾虐待者，然後回到淒涼之地向瑪格拉姆部族的瓦魯格報告。',0),
 (1387,'zhTW','懸賞半人馬','收集15個半人馬耳朵給尼耶爾前哨站的麥爾金斯下士。',0),
 (1388,'zhTW','真言藥水','把法奧斯丁的真言藥水交給乞丐鬼屋的亡靈哨兵萊度斯。',0),
-(1389,'zhTW','德萊尼水晶','給悲傷沼澤避難營地裡的瑪格圖爾帶去6塊德萊尼水晶。',0),
+(1389,'zhTW','德萊尼水晶','給悲傷沼澤避難營地裡的瑪格圖爾帶去6塊德萊尼水晶。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1391,1392,1393,1394,1396,1398,1418,1419,1420,1421,1422,1423,1424,1425,1426,1427,1428,1429,1430,1431) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1391,'zhTW','真言藥水','把萊度斯的酒交給斯通納德的間諜馬克森。',0),
 (1392,'zhTW','『鬥棍』諾博魯','把諾博魯的鬥棍交給悲傷沼澤中的避難營領導人。',0),
 (1393,'zhTW','加林的逃亡','護送加林逃出困境，然後去開啟他放在傷心沼澤營地裡的保險箱。',0),
@@ -8783,10 +8726,7 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1420,'zhTW','向赫格拉姆報到','把尼卡的報告帶去給斯通納德的迅捷的赫格拉姆。',0),
 (1421,'zhTW','走失的商隊','找到商隊被劫去巨魔村落的箱子，把原料帶回來給衛兵比格斯。',0),
 (1422,'zhTW','海中的威脅','與悲傷沼澤的卡塔爾談話。',0),
-(1423,'zhTW','遺失的補給物資','把遺失的補給物資交給軍需官朗格茲。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1424,1425,1426,1427,1428,1429,1430,1431,1432,1433,1434,1435,1436,1437,1438,1439,1440,1444,1445,1450) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1423,'zhTW','遺失的補給物資','把遺失的補給物資交給軍需官朗格茲。',0),
 (1424,'zhTW','淚水之池','斯通納德的費澤盧爾要求你收集10件阿塔萊神器。',0),
 (1425,'zhTW','運送貨物','把貨物帶給守望堡的軍需官朗格爾斯。',0),
 (1426,'zhTW','海中的威脅','殺掉10個沼澤魚人、10個沼澤噴墨魚人和10個沼澤食腐魚人，然後向悲傷沼澤的卡塔爾回報。',0),
@@ -8794,7 +8734,10 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1428,'zhTW','海中的威脅','殺掉10名沼澤噴墨魚人、10名沼澤食腐魚人和10名沼澤魚人智者，然後向悲傷沼澤的卡塔爾回報。',0),
 (1429,'zhTW','阿塔萊流放者','將一包阿塔萊神器交給辛特蘭的阿塔萊流放者。',0),
 (1430,'zhTW','新鮮的螃蟹腿','給悲傷沼澤的達爾帶去10條巨大的螃蟹腿。',0),
-(1431,'zhTW','聯盟關係','與奧格瑪的科爾丹談話。',0),
+(1431,'zhTW','聯盟關係','與奧格瑪的科爾丹談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1432,1433,1434,1435,1436,1437,1438,1439,1440,1444,1445,1450,1451,1452,1454,1455,1456,1457,1458,1459) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1432,'zhTW','聯盟關係','與淒涼之地的塔卡塔·鋼刃談話。',0),
 (1433,'zhTW','聯盟關係','去找淒涼之地的莫林·碎骨者談話。',0),
 (1434,'zhTW','薩特的威脅','殺死7隻怨怒盜賊、7隻怨怒魔僕、7隻怨怒背叛者和7隻怨怒喚魔者，然後向淒涼之地的塔卡塔·鋼刃覆命。',0),
@@ -8806,10 +8749,7 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1440,'zhTW','回覆瓦拉里爾','護送黛琳達·瑪雷姆離開雷斧堡壘，然後回到淒涼之地的瓦拉里爾·屠魔者那裡。',0),
 (1444,'zhTW','向費澤盧爾覆命','向斯通納德的費澤盧爾回報。',0),
 (1445,'zhTW','阿塔哈卡神廟','收集20個哈卡神像，並把它們交給斯通納德的費澤盧爾。',0),
-(1450,'zhTW','獅鷲獸管理員沙拉克·鷹斧','與辛特蘭的鷹巢山獅鷲獸飼養場裡的獅鷲獸管理員沙拉克·鷹斧談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1451,1452,1454,1455,1456,1457,1458,1459,1460,1461,1462,1463,1464,1465,1466,1467,1468,1469,1470,1471) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1450,'zhTW','獅鷲獸管理員沙拉克·鷹斧','與辛特蘭的鷹巢山獅鷲獸飼養場裡的獅鷲獸管理員沙拉克·鷹斧談話。',0),
 (1451,'zhTW','拉普索迪·鐵鏟','去辛特蘭找到拉普索迪·鐵鏟。',0),
 (1452,'zhTW','拉普索迪的卡林多雞尾酒','辛特蘭的拉普索迪·鐵鏟要求你帶給他3塊大鵬的砂囊、3塊格羅多克猩猩的肝臟和3塊鐵鬃熊的肝臟。',0),
 (1454,'zhTW','卡尼托的海難','在淒涼之地找到卡尼托的箱子。',0),
@@ -8817,9 +8757,10 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1456,'zhTW','卡尼托的海難','找到卡尼托的背包，把它交給淒涼之地的克雷迪格·安戈爾。',0),
 (1457,'zhTW','卡尼托的海難','把卡尼托的背包交給鐵爐堡的羅頓·石錘。',0),
 (1458,'zhTW','尋物公司的委託','收集10隻怨怒薩特的爪子和10根怨怒薩特的角，把它們交給淒涼之地的克雷迪格·安戈爾。',0),
-(1459,'zhTW','尋物公司的委託','收集7瓶鞭尾蠍的毒液和3塊老邁科多獸的毛皮，把它們交給淒涼之地的克雷迪格·安戈爾。',0),
-(1460,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1460))',0),
-(1461,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1461))',0),
+(1459,'zhTW','尋物公司的委託','收集7瓶鞭尾蠍的毒液和3塊老邁科多獸的毛皮，把它們交給淒涼之地的克雷迪格·安戈爾。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1462,1463,1464,1465,1466,1467,1468,1469,1470,1471,1472,1473,1474,1475,1476,1478,1479,1480,1481,1482) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1462,'zhTW','大地靈契','向鴉羽先知要另一瓶大地靈契。',0),
 (1463,'zhTW','大地靈契','向坎納甘·地鳴要另一個大地靈契。',0),
 (1464,'zhTW','火焰靈契','向泰爾夫·祖拉姆再要一個 火焰靈契。',0),
@@ -8829,10 +8770,7 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1468,'zhTW','兒童週','使用人類孤兒哨來和你在兒童週期間要照顧的孩子進行對話。$b$b已提供物品：$b',0),
 (1469,'zhTW','拉普索迪的故事','將阿塔萊石板碎片交給暴風城的布羅哈恩·鐵桶。',0),
 (1470,'zhTW','控制小鬼','此任務已經絕版。收集3個斷骨骷髏的顱骨，把它們交給溫雅·瑪山德。',0),
-(1471,'zhTW','誓縛','召喚並征服一隻虛無行者，然後將召喚符文還給詛咒神廟中的凱倫丁·哈加爾。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1472,1473,1474,1475,1476,1478,1479,1480,1481,1482,1484,1485,1486,1487,1488,1489,1490,1499,1500,1501) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1471,'zhTW','誓縛','召喚並征服一隻虛無行者，然後將召喚符文還給詛咒神廟中的凱倫丁·哈加爾。',0),
 (1472,'zhTW','噬魂者','與詛咒神殿中的高德瑞克·法杉談話。',0),
 (1473,'zhTW','虛無中的生物','奪回埃加林的魔典，把它交給詛咒神廟中的凱倫丁·哈加爾。',0),
 (1474,'zhTW','誓縛','召喚並征服一隻魅魔，然後將純潔的心還給詛咒神廟裡的凱倫丁·哈加爾。',0),
@@ -8842,7 +8780,10 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1479,'zhTW','永恆之樹','帶著你看護的孤兒去達納蘇斯的銀行。銀行就坐落在一棵中空的樹裡，它被稱為永恆之樹。',0),
 (1480,'zhTW','墮落者','把這塊惡魔之皮拿給淒涼之地的莫林·碎骨看看。',0),
 (1481,'zhTW','墮落者','帶一張巡影者的頭皮回來給淒涼之地的莫林·碎骨者。',0),
-(1482,'zhTW','墮落者','帶一塊神諭水晶回來給淒涼之地的莫林·碎骨者。',0),
+(1482,'zhTW','墮落者','帶一塊神諭水晶回來給淒涼之地的莫林·碎骨者。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1484,1485,1486,1487,1488,1489,1490,1499,1500,1501,1504,1506,1507,1508,1509,1510,1511,1512,1513,1514) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1484,'zhTW','墮落者','與淒涼之地的塔卡塔·鋼刃談話。',0),
 (1485,'zhTW','邪靈劣魔','此任務已經絕版。帶6顆邪靈劣魔的頭顱回來給魯贊。',0),
 (1486,'zhTW','變異皮革','哀嚎洞穴的納爾派克想要20張變異皮革。',0),
@@ -8851,11 +8792,8 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1489,'zhTW','哈繆爾·符文圖騰','和哈繆爾·符文圖騰談話。',0),
 (1490,'zhTW','納拉·蠻鬃','和納拉·蠻鬃談話。',0),
 (1499,'zhTW','邪靈劣魔','與祖雷薩談話。',0),
-(1500,'zhTW','喚醒納拉雷克斯','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1500))',0),
-(1501,'zhTW','虛無中的生物','為奧格瑪的甘盧爾·血眼找回維爾加石板。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1504,1506,1507,1508,1509,1510,1511,1512,1513,1514,1515,1516,1517,1518,1519,1520,1521,1522,1523,1524) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1500,'zhTW','喚醒納拉雷克斯',NULL,0),
+(1501,'zhTW','虛無中的生物','為奧格瑪的甘盧爾·血眼找回維爾加石板。',0),
 (1504,'zhTW','誓縛','召喚並征服一隻虛無行者，然後帶著召喚雕紋向奧格瑪的甘盧爾·血眼回報。',0),
 (1506,'zhTW','甘盧爾的召喚','去奧格瑪和甘盧爾·血眼談話。',0),
 (1507,'zhTW','噬魂者','和暗影裂口的卡祖爾談話。',0),
@@ -8865,7 +8803,10 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1511,'zhTW','肯茲格拉的傷藥','將肯茲格拉的傷藥交給陶拉祖營地的步兵勞格瑪。',0),
 (1512,'zhTW','愛的禮物','把沾滿泥土的墜飾帶給奧格瑪的甘盧爾·血眼。',0),
 (1513,'zhTW','誓縛','召喚並征服一隻魅魔，然後將多格蘭的墜飾還給奧格瑪的甘盧爾·血眼。',0),
-(1514,'zhTW','被腐化的迎風花',NULL,0),
+(1514,'zhTW','被腐化的迎風花',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1515,1516,1517,1518,1519,1520,1521,1522,1523,1524,1525,1526,1527,1528,1529,1530,1531,1532,1534,1535) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1515,'zhTW','多格蘭之囚','把肯茲格拉的傷藥帶給貧瘠之地的多格蘭。',0),
 (1516,'zhTW','召喚大地','帶2隻惡魔捕獵者的蹄子給試煉谷的坎納甘·地鳴。',0),
 (1517,'zhTW','召喚大地','找到靈魂石地，在那裡喝下大地靈契。$b$b已提供物品：$b',0),
@@ -8875,10 +8816,7 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1521,'zhTW','召喚大地','將劣質石英帶給納拉其營地的鴉羽先知。',0),
 (1522,'zhTW','火焰的召喚','去貧瘠之地找到卡納爾·菲斯。',0),
 (1523,'zhTW','火焰的召喚','去貧瘠之地找到卡納爾·菲斯。',0),
-(1524,'zhTW','火焰的召喚','把眠炎火炬帶給杜洛塔的泰爾夫·祖拉姆。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1525,1526,1527,1528,1529,1530,1531,1532,1534,1535,1536,1537,1558,1559,1560,1578,1579,1580,1581,1598) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1524,'zhTW','火焰的召喚','把眠炎火炬帶給杜洛塔的泰爾夫·祖拉姆。',0),
 (1525,'zhTW','火焰的召喚','找到1個火焰焦油和1個試劑袋，把它們交給杜洛塔的泰爾夫·祖拉姆。',0),
 (1526,'zhTW','火焰的召喚','擊敗火焰之靈體，將餘燼放在恒焰聖殿屋頂的火盆裡。',0),
 (1527,'zhTW','火焰的召喚','將恆焰火炬交給貧瘠之地的卡納爾·菲斯。',0),
@@ -8888,9 +8826,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1531,'zhTW','風的召喚','到千針石林去找普拉特·雲眼。',0),
 (1532,'zhTW','風的召喚','到千針石林去找普拉特·雲眼。',0),
 (1534,'zhTW','水之召喚','到梣谷的星辰廢墟去，將空的藍色水囊盛滿泉水，然後把它交給貧瘠之地的布瑞恩。',0),
-(1535,'zhTW','水之召喚','到野豬人的水池去，用井中的水裝滿空的棕色水囊，然後把水囊交給貧瘠之地的布瑞恩。',0),
+(1535,'zhTW','水之召喚','到野豬人的水池去，用井中的水裝滿空的棕色水囊，然後把水囊交給貧瘠之地的布瑞恩。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1536,1558,1559,1560,1578,1579,1580,1581,1598,1599,1618,1638,1639,1640,1641,1645,1646,1647,1648,1661) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1536,'zhTW','水之召喚','用塔倫米爾的井水裝滿空的紅色水囊，然後把它交給貧瘠之地的布瑞恩。',0),
-(1537,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1537))',0),
 (1558,'zhTW','巨石水壩','帶著你看護的孤兒去洛克莫丹的巨石水壩。你應該帶他去水壩的中間，然後讓他俯瞰巨大的瀑布。',0),
 (1559,'zhTW','閃光彈的製法',NULL,0),
 (1560,'zhTW','圖加的任務','把圖加帶回到他的妻子托爾塔身邊。',0),
@@ -8898,10 +8838,7 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1579,'zhTW','小齒輪','收集8個小齒輪，把它們交給奧伯丁的維茲班恩·曲針。',0),
 (1580,'zhTW','導電器','收集12個導電器，把它們交給奧伯丁的維茲班恩·曲針。',0),
 (1581,'zhTW','刃葉的藥劑','給在多蘭納爾的塞拉爾·刃葉帶去6瓶獅王之力藥劑和2瓶初級防禦藥劑。',0),
-(1598,'zhTW','失竊的典籍','此任務已經絕版。為杜希拉·拉薩雷找回《虛無靈能》。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1599,1618,1638,1639,1640,1641,1645,1646,1647,1648,1661,1662,1663,1664,1665,1666,1667,1678,1679,1680) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1598,'zhTW','失竊的典籍','此任務已經絕版。為杜希拉·拉薩雷找回《虛無靈能》。',0),
 (1599,'zhTW','開端','此任務已經絕版。帶3個羽毛符咒給安威瑪的阿拉瑪爾·格里姆。',0),
 (1618,'zhTW','支援赤脊山','托姆斯·深爐要你帶4條銅質符文腰帶和4把重銅大槌給赤脊山的弗納·奧斯古。',0),
 (1638,'zhTW','戰士的訓練','到暴風城找哈里·伯加德談話。',0),
@@ -8912,19 +8849,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1646,'zhTW','聖潔之書','與鐵爐堡的蒂薩·熱爐談話。',0),
 (1647,'zhTW','聖潔之書','在鐵爐堡的外環區域找到約翰·特納。',0),
 (1648,'zhTW','聖潔之書','收集10塊亞麻布，把它們交給鐵爐堡的約翰·特納。',0),
-(1661,'zhTW','高貴之書','與暴風城的達索瑞恩·拉爾談話。',0),
-(1662,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1662))',0),
-(1663,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1663))',0),
-(1664,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(1664))',0),
+(1661,'zhTW','高貴之書','與暴風城的達索瑞恩·拉爾談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1665,1666,1667,1678,1679,1680,1681,1682,1683,1684,1685,1686,1687,1688,1689,1690,1691,1692,1693,1698) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1665,'zhTW','巴托比的酒杯','把巴托比的酒杯交給伯加德。',0),
 (1666,'zhTW','治安官哈迦德','和治安官哈迦德談話。',0),
 (1667,'zhTW','蛀牙傑克','從蛀牙傑克的營地裡取回治安官哈迦德的徽章，把它交給治安官哈迦德。',0),
 (1678,'zhTW','維吉雷克','將維吉雷克的頭顱交給鐵爐堡的穆倫·雷矛。',0),
 (1679,'zhTW','穆倫·雷矛','和穆倫·雷矛談話。',0),
-(1680,'zhTW','托姆斯·深爐','和托姆斯·深爐談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1681,1682,1683,1684,1685,1686,1687,1688,1689,1690,1691,1692,1693,1698,1699,1700,1701,1702,1703,1704) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1680,'zhTW','托姆斯·深爐','和托姆斯·深爐談話。',0),
 (1681,'zhTW','鐵環營地','把陰影礦石交給鐵爐堡的托姆斯·深爐。',0),
 (1682,'zhTW','灰鐵武器',NULL,0),
 (1683,'zhTW','沃魯斯·邪蹄','將沃魯斯的角交給達納蘇斯的艾蘭娜瑞。',0),
@@ -8938,16 +8872,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1691,'zhTW','制裁更多廢土遊民','殺死10個廢土暗法師、8個廢土遊蕩者和6個廢土刺客，然後向加基森的首席工程師比格維茲報告。',0),
 (1692,'zhTW','鐵匠瑪希爾','把這箱月神礦石交給鐵匠瑪希爾。',0),
 (1693,'zhTW','月神武器',NULL,0),
-(1698,'zhTW','猶魯斯·麥酒','與猶魯斯·麥酒談話。',0),
+(1698,'zhTW','猶魯斯·麥酒','與猶魯斯·麥酒談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1699,1700,1701,1702,1703,1704,1705,1706,1707,1708,1709,1710,1711,1712,1713,1714,1715,1716,1717,1718) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1699,'zhTW','往返瑞斯班洞穴','進入瑞斯班洞穴，然後在規定的時間內回到猶魯斯·麥酒那裡。$b$b在整個過程中你都不能死掉或者釋放靈魂，否則任務就宣告失敗。',0),
 (1700,'zhTW','格瑞曼德·艾爾默','把弗倫的筆記交給格瑞曼德·艾爾默。',0),
 (1701,'zhTW','淬火鎖甲','收集必需的材料，將它們交給暴風城的弗倫·長鬚。',0),
 (1702,'zhTW','鑄盾師','將這桶熱酒交給弗倫·長鬚。',0),
 (1703,'zhTW','瑪希爾','把弗倫的筆記交給瑪希爾。',0),
-(1704,'zhTW','科羅莫特·鋼尺','把弗倫的筆記交給科羅莫特·鋼尺。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1705,1706,1707,1708,1709,1710,1711,1712,1713,1714,1715,1716,1717,1718,1719,1738,1739,1740,1758,1778) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1704,'zhTW','科羅莫特·鋼尺','把弗倫的筆記交給科羅莫特·鋼尺。',0),
 (1705,'zhTW','燃燒之血','把20瓶燃燒之血和1塊燃燒之石交給暴風城的格瑞曼德·艾爾默。',0),
 (1706,'zhTW','格瑞曼德的鎧甲',NULL,0),
 (1707,'zhTW','收集水袋','收集5個廢土水袋，把它們交給加基森的魯葛蘭克。',0),
@@ -8961,16 +8895,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1715,'zhTW','已宰的羔羊','去暴風城的法師區向『黑暗縛靈師』加金報到。',0),
 (1716,'zhTW','噬魂者','與貧瘠之地的『先知』塔卡爾交談。',0),
 (1717,'zhTW','加科因的召喚','去暴風城的法師區向『黑暗縛靈師』加金報到。',0),
-(1718,'zhTW','島民','和克蘭諾克·馬克雷德談話。',0),
+(1718,'zhTW','島民','和克蘭諾克·馬克雷德談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1719,1738,1739,1740,1758,1778,1779,1782,1783,1784,1785,1789,1790,1791,1792,1793,1795,1796,1798,1799) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1719,'zhTW','格鬥考驗','殺掉比格維爾，然後向勇士島的克蘭諾克·馬克雷德回覆。',0),
 (1738,'zhTW','同心樹','從梣谷取回同心樹，把它交給暴風城法師區裡的『黑暗縛靈師』加金。',0),
 (1739,'zhTW','誓縛','召喚並制服一個魅魔，然後將同心樹之核還給已宰的羔羊旅店的『黑暗縛靈師』加金。',0),
 (1740,'zhTW','索蘭魯克寶珠','找到3塊索蘭魯克寶珠的碎片和1塊索蘭魯克寶珠的大碎片，把它們交給貧瘠之地的杜安·卡漢。',0),
 (1758,'zhTW','陰謀之書','與鐵爐堡的克羅姆·粗臂談話。',0),
-(1778,'zhTW','聖潔之書','與鐵爐堡的蒂薩·熱爐談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1779,1782,1783,1784,1785,1789,1790,1791,1792,1793,1795,1796,1798,1799,1800,1801,1802,1803,1804,1805) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1778,'zhTW','聖潔之書','與鐵爐堡的蒂薩·熱爐談話。',0),
 (1779,'zhTW','聖潔之書','帶上生命符記，和鐵爐堡的穆里頓·熱爐談話。$b$b已提供物品：$b',0),
 (1782,'zhTW','弗倫的護甲',NULL,0),
 (1783,'zhTW','聖潔之書','使用生命符記復活丹莫洛的納姆·法奧克。',0),
@@ -8984,16 +8918,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1795,'zhTW','誓縛','召喚地獄獵犬並打敗它，然後把陰謀之書交給棘齒城的斯坦哈德·法爾杉。',0),
 (1796,'zhTW','附魔金線血袍','將秘法之袍交給貧瘠之地的梅納拉·虛無撕裂者。',0),
 (1798,'zhTW','尋找斯坦哈德','與貧瘠之地的斯坦哈德·法爾杉談話。',0),
-(1799,'zhTW','寶珠碎片','在棘齒城外的塔里與梅納拉的侍僧們談話，選擇自己修行的方式。$b$b然後給塵泥沼澤的塔貝薩帶去一顆地獄火珠。',0),
+(1799,'zhTW','寶珠碎片','在棘齒城外的塔里與梅納拉的侍僧們談話，選擇自己修行的方式。$b$b然後給塵泥沼澤的塔貝薩帶去一顆地獄火珠。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1800,1801,1802,1803,1804,1805,1806,1818,1819,1820,1821,1822,1823,1824,1825,1838,1839,1840,1841,1842) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1800,'zhTW','羅德隆的王座','帶著你看護的孤兒去幽暗城電梯外的王座大廳。',0),
 (1801,'zhTW','陰謀之書','和幽暗城的約拉·安尼森談話。',0),
 (1802,'zhTW','陰謀之書','為鐵爐堡的克羅姆·粗臂找回發黴的書籍和破損的手稿。',0),
 (1803,'zhTW','陰謀之書','給幽暗城的約拉·安尼森帶回發黴的書籍和破損的手稿。',0),
 (1804,'zhTW','陰謀之書','將翻修過的書籍和3根導能魔棒交給棘齒城的斯坦哈德·法爾杉。',0),
-(1805,'zhTW','陰謀之書','將翻修過的書籍和3根導能魔棒交給棘齒城的斯坦哈德·法爾杉。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1806,1818,1819,1820,1821,1822,1823,1824,1825,1838,1839,1840,1841,1842,1843,1844,1845,1846,1847,1848) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1805,'zhTW','陰謀之書','將翻修過的書籍和3根導能魔棒交給棘齒城的斯坦哈德·法爾杉。',0),
 (1806,'zhTW','正義試煉','等待喬丹·斯迪威爾為你鑄造武器。',0),
 (1818,'zhTW','迪林格爾','和布瑞爾的亡靈衛兵迪林格爾談話。',0),
 (1819,'zhTW','『斬擊者』奧拉格','殺死『斬擊者』奧拉格，然後和亡靈衛兵迪林格爾談話。',0),
@@ -9007,16 +8941,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1839,'zhTW','尤拉萊克和野蠻護手','與杜洛塔的尤拉萊克談話。',0),
 (1840,'zhTW','歐姆·石蹄和野蠻頭盔','和雷霆崖的歐姆·石蹄談話。',0),
 (1841,'zhTW','維羅拉·奈特雷和野蠻腿甲','與幽暗城的維羅拉·奈特雷談話。',0),
-(1842,'zhTW','薩特之蹄','收集7隻完整的薩特之蹄，把它們交給杜洛塔森金村的尤拉萊克。',0),
+(1842,'zhTW','薩特之蹄','收集7隻完整的薩特之蹄，把它們交給杜洛塔森金村的尤拉萊克。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1843,1844,1845,1846,1847,1848,1859,1860,1861,1878,1879,1880,1881,1882,1883,1884,1886,1898,1899,1918) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1843,'zhTW','野蠻護手',NULL,0),
 (1844,'zhTW','奇美拉之角','把光滑的奇美拉角交給雷霆崖的歐姆·石蹄。',0),
 (1845,'zhTW','野蠻頭盔',NULL,0),
 (1846,'zhTW','龍喉脛骨','給幽暗城的維羅拉·奈特雷帶去8根結實的龍喉脛骨。',0),
 (1847,'zhTW','野蠻腿甲',NULL,0),
-(1848,'zhTW','野蠻鍊衫',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1859,1860,1861,1878,1879,1880,1881,1882,1883,1884,1886,1898,1899,1918,1919,1920,1921,1938,1939,1940) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1848,'zhTW','野蠻鍊衫',NULL,0),
 (1859,'zhTW','瑟祖克','到奧格瑪的暗影裂口和瑟祖克談談。',0),
 (1860,'zhTW','和詹妮亞交談','和暴風城的詹妮亞·坎農談話。',0),
 (1861,'zhTW','明鏡湖','把一份明鏡湖水的樣本交給暴風城的詹妮亞·坎農。',0),
@@ -9030,16 +8964,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1886,'zhTW','亡靈哨兵','得到阿斯托的介紹信，並將其交給盜賊區的米奈特·卡加德。',0),
 (1898,'zhTW','亡靈哨兵','與幽暗城的安德隆·甘特交談。',0),
 (1899,'zhTW','亡靈哨兵','將安德隆的帳本交給幽暗城盜賊區的米奈特·卡加德。',0),
-(1918,'zhTW','被污染的水元素','將被污染的水球交給梣谷碎木崗哨的馬斯托克·維爾西斯。',0),
+(1918,'zhTW','被污染的水元素','將被污染的水球交給梣谷碎木崗哨的馬斯托克·維爾西斯。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1919,1920,1921,1938,1939,1940,1941,1942,1943,1944,1945,1946,1947,1948,1949,1950,1951,1952,1953,1954) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1919,'zhTW','向詹妮亞報告','和暴風城的詹妮亞·坎農談談。',0),
 (1920,'zhTW','調查藍色隱士','從詹妮亞·坎農身後拿取一根顯形卷軸以及一盒封靈箱。將3個裝滿的封靈箱交給巫師聖所裡的詹妮亞·坎農。',0),
 (1921,'zhTW','收集原料','把10匹亞麻布和6顆充能裂隙寶石交給暴風城的威恩·拉爾森。',0),
 (1938,'zhTW','烏爾的暗影魔法研究論文','將《烏爾的暗影魔法研究論文》交給暴風城的高階巫士安多瑪斯。',0),
 (1939,'zhTW','高階巫士安多瑪斯','和高階巫士安多瑪斯談話。',0),
-(1940,'zhTW','新鮮的蜘蛛絲','找到8束新鮮的蜘蛛絲，把它們交給暴風城的威恩·拉爾森。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1941,1942,1943,1944,1945,1946,1947,1948,1949,1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1940,'zhTW','新鮮的蜘蛛絲','找到8束新鮮的蜘蛛絲，把它們交給暴風城的威恩·拉爾森。',0),
 (1941,'zhTW','法力之紋長袍',NULL,0),
 (1942,'zhTW','星界之衣',NULL,0),
 (1943,'zhTW','食人妖法師迪諾','和迪諾談話。',0),
@@ -9053,16 +8987,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (1951,'zhTW','能量儀式','將《能量儀式》交給塵泥沼澤的塔貝薩。',0),
 (1952,'zhTW','法師的魔杖','等塔貝薩的儀式完成後，和她談話。',0),
 (1953,'zhTW','回到沼澤','和塔貝薩談話。',0),
-(1954,'zhTW','地獄火寶珠','將一顆地獄火寶珠交給塵泥沼澤的塔貝薩。',0),
+(1954,'zhTW','地獄火寶珠','將一顆地獄火寶珠交給塵泥沼澤的塔貝薩。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1955,1956,1957,1958,1959,1960,1961,1962,1978,2000,2198,2199,2200,2201,2202,2203,2204,2205,2206,2218) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (1955,'zhTW','驅除魔鬼','殺死寶珠之魔，然後與塔貝薩談話。',0),
 (1956,'zhTW','奧達曼的能量源','找到一個黑曜石能量源，將其交給塵泥沼澤的塔貝薩。',0),
 (1957,'zhTW','法力怒靈','在限定時間內殺死12隻法力怒靈。',0),
 (1958,'zhTW','天國之力',NULL,0),
 (1959,'zhTW','向安娜斯塔西婭報告','和安娜斯塔西婭·哈特威爾談話。',0),
-(1960,'zhTW','調查鍊金店','從安娜斯塔西婭·哈特威爾身後拿取一根顯形卷軸以及一盒封靈箱。將3個裝滿的封靈箱交給幽暗城的安娜斯塔西婭·哈特威爾。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1961,1962,1978,2000,2198,2199,2200,2201,2202,2203,2204,2205,2206,2218,2238,2239,2240,2258,2278,2279) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1960,'zhTW','調查鍊金店','從安娜斯塔西婭·哈特威爾身後拿取一根顯形卷軸以及一盒封靈箱。將3個裝滿的封靈箱交給幽暗城的安娜斯塔西婭·哈特威爾。',0),
 (1961,'zhTW','收集原料','把10塊亞麻布和6塊達拉然法力寶石帶給喬瑟夫·格里高利。',0),
 (1962,'zhTW','魔焰長袍',NULL,0),
 (1978,'zhTW','亡靈哨兵','此任務已經絕版。將安德隆的帳本交給幽暗城黑暗女王大廳裡的瓦里瑪薩斯。',0),
@@ -9076,16 +9010,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2204,'zhTW','修復項鍊','從奧達曼最強大的石人身上獲得能量源，然後將其交給鐵爐堡的塔瓦斯德。',0),
 (2205,'zhTW','尋找軍情七處','把科瑞恩·塞爾留斯的包裹帶給暴風城兵營的馬迪亞斯·肖爾。',0),
 (2206,'zhTW','連偷帶搶','找到迪菲亞碼頭主管，從他那裡為馬迪亞斯·肖爾拿到迪菲亞船運時間表。',0),
-(2218,'zhTW','救贖之路','和鐵爐堡的霍夫丹·黑鬚談話。',0),
+(2218,'zhTW','救贖之路','和鐵爐堡的霍夫丹·黑鬚談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2238,2239,2240,2258,2278,2279,2280,2283,2284,2298,2299,2300,2318,2338,2339,2340,2341,2342,2361,2380) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2238,'zhTW','國王的財寶','在諾姆瑞根附近找到奧寧·雨錘。',0),
 (2239,'zhTW','奧寧的報告','把奧寧的報告交給鐵爐堡的霍夫丹。',0),
 (2240,'zhTW','密室','閱讀巴爾洛戈的日記，探索密室，然後向鐵爐堡的勘察員塔伯斯·雷矛彙報。',0),
 (2258,'zhTW','荒蕪之地的試劑','將5個禿鷲的胃囊，10顆峭壁山狗的牙齒，還有5個石元素的裂片交給荒蕪之地，卡加斯的加卡爾。',0),
 (2278,'zhTW','白金圓盤','和石頭守護者交談，從他那裡瞭解更多古代的知識。一旦你瞭解到了所有的內容之後就啟動諾甘農圓盤。',0),
-(2279,'zhTW','白金圓盤','把迷你版的諾甘農圓盤帶到鐵爐堡的探險者協會去。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2280,2283,2284,2298,2299,2300,2318,2338,2339,2340,2341,2342,2361,2380,2383,2399,2418,2439,2440,2458) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2279,'zhTW','白金圓盤','把迷你版的諾甘農圓盤帶到鐵爐堡的探險者協會去。',0),
 (2280,'zhTW','白金圓盤','把迷你版的諾甘農圓盤帶到雷霆崖的賢者那裡。',0),
 (2283,'zhTW','搜尋項鍊','在奧達曼挖掘場中尋找一條珍貴的項鍊，然後將其交給奧格瑪的德蘭·杜佛斯。項鍊有可能已經損壞。',0),
 (2284,'zhTW','搜尋項鍊，再來一次','在奧達曼裡找尋寶石的線索。',0),
@@ -9099,16 +9033,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2341,'zhTW','項鍊任務的終結','去卡加斯看看加卡爾是否成功了。',0),
 (2342,'zhTW','尋回寶物','從奧達曼南部大廳的箱子中找到加勒特的家族寶藏，然後把它交給幽暗城的派翠克·加瑞特。',0),
 (2361,'zhTW','修復項鍊',NULL,0),
-(2380,'zhTW','向奧格瑪進發!','在奧格瑪城中的暗影裂口和申蘇爾談談。',0),
+(2380,'zhTW','向奧格瑪進發!','在奧格瑪城中的暗影裂口和申蘇爾談談。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2383,2399,2418,2439,2440,2458,2460,2478,2479,2480,2501,2521,2522,2523,2581,2582,2583,2584,2585,2586) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2383,'zhTW','簡易羊皮紙','閱讀簡易羊皮紙，然後和試煉谷的弗郎恩談話。',0),
 (2399,'zhTW','發芽的樹葉',NULL,0),
 (2418,'zhTW','能量石','給荒蕪之地的里格弗茲帶去8塊德提亞姆能量石和8塊安納洛姆能量石。',0),
 (2439,'zhTW','白金圓盤','把你的報酬憑證交給鐵爐堡銀行的丁尼塔·石衣。',0),
 (2440,'zhTW','白金圓盤','把報酬憑證交給雷霆崖的貝娜·冰蹄。',0),
-(2458,'zhTW','臥底密探','到淤泥沼澤北邊的風險投資公司塔樓去，聯繫破碎之手氏族的臥底監工費蘇勒。$b$b看到塔樓之後，用信號槍發射信號，向監工費蘇勒示意你已經到達。發出兩個閃光信號，然後使用破碎之手軍禮和監工費蘇勒接頭。$b$b注意，這些步驟必須依次進行，因為費蘇勒會攻擊並幹掉任何他無法識別的人。$b$b已提供物品：$b',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2460,2478,2479,2480,2501,2521,2522,2523,2581,2582,2583,2584,2585,2586,2601,2602,2603,2604,2605,2606) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2458,'zhTW','臥底密探','到淤泥沼澤北邊的風險投資公司塔樓去，聯繫破碎之手氏族的臥底監工費蘇勒。$b$b看到塔樓之後，用信號槍發射信號，向監工費蘇勒示意你已經到達。發出兩個閃光信號，然後使用破碎之手軍禮和監工費蘇勒接頭。$b$b注意，這些步驟必須依次進行，因為費蘇勒會攻擊並幹掉任何他無法識別的人。$b$b已提供物品：$b',0),
 (2460,'zhTW','碎手軍禮','對著申蘇爾練習碎手軍禮。',0),
 (2478,'zhTW','基本不可能的任務','從工頭希里克斯那裡偷出希里克斯的塔樓鑰匙，進入塔樓，然後殺掉兩個變異風險投資公司工人、兩個風險投資公司巡邏員、兩個風險投資公司看守。$b$b殺掉大工頭普茲克·加里維克斯，取了他的首級，然後打開加里維克斯的帶鎖箱，拿走贊吉爾的改良藥劑。將藥劑和加里維克斯的頭顱交給奧格瑪的申蘇爾，等候進一步的指示。',0),
 (2479,'zhTW','希諾特的幫助','到希爾斯布萊德丘陵的塔倫米爾去，把贊吉爾的藥劑樣品交給瑟爾格·希諾特。$b$b要去塔倫米爾，可以搭乘飛艇到幽暗城，然後沿著大路向南穿過銀松森林，直到希爾斯布萊德丘陵。跟著路標走!',0),
@@ -9122,16 +9056,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2583,'zhTW','野豬的活力','收集3片詛咒之地的野豬肺、2個厚甲蠍螯和1顆石化蜥蜴的大腦，把它們交給血法師德拉吉亞。',0),
 (2584,'zhTW','野豬之靈','收集3片詛咒之地的野豬肺、2個厚甲蠍螯和1顆石化蜥蜴的大腦，把它們交給血法師德拉吉亞。',0),
 (2585,'zhTW','決定性的打擊','收集3個厚甲蠍螯、2個禿鷹的砂囊和1片詛咒之地的野豬肺，把它們血法師德拉吉亞。',0),
-(2586,'zhTW','厚甲蠍鹽','收集3個厚甲蠍螯、2個禿鷹的砂囊和1片詛咒之地的野豬肺，把它們血法師德拉吉亞。',0),
+(2586,'zhTW','厚甲蠍鹽','收集3個厚甲蠍螯、2個禿鷹的砂囊和1片詛咒之地的野豬肺，把它們血法師德拉吉亞。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2601,2602,2603,2604,2605,2606,2621,2622,2623,2641,2661,2662,2681,2701,2702,2721,2741,2742,2743,2744) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2601,'zhTW','石化蜥蜴的大腦','收集10顆石化蜥蜴的大腦和2個禿鷹的砂囊，把它們交給血法師萊諾雷。',0),
 (2602,'zhTW','清晰的思想','收集10顆石化蜥蜴的大腦和2個禿鷹的砂囊，把它們交給血法師萊諾雷。',0),
 (2603,'zhTW','禿鷹的活力','收集10個禿鷹的砂囊和2塊彎牙土狼的顎骨，把它們交給血法師萊諾雷。',0),
 (2604,'zhTW','精神矍鑠','收集10個禿鷹的砂囊和2塊彎牙土狼的顎骨，把它們交給血法師萊諾雷。',0),
 (2605,'zhTW','口渴的哥布林','找到1個飽滿的露水腺，把它交給加基森的馬林·諾格弗格。',0),
-(2606,'zhTW','好味道','馬林·諾格弗格讓你與加基森的斯普琳科談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2621,2622,2623,2641,2661,2662,2681,2701,2702,2721,2741,2742,2743,2744,2747,2748,2749,2750,2751,2752) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2606,'zhTW','好味道','馬林·諾格弗格讓你與加基森的斯普琳科談話。',0),
 (2621,'zhTW','悔恨的戰士','與斯通納德的分隊指揮官盧爾格談話。',0),
 (2622,'zhTW','遺失的命令','與本戈爾談話。',0),
 (2623,'zhTW','沼澤空談者','取回酋長的命令，把它們還給部落英雄的靈魂。',0),
@@ -9145,16 +9079,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2741,'zhTW','超級測蛋器',NULL,0),
 (2742,'zhTW','林吉被困住了!','護送林吉逃出奎爾丹尼小屋，然後在望海崖找到他藏起來的東西。',0),
 (2743,'zhTW','黑暗籠罩','回去見部落英雄的靈魂，將你的發現告訴他。',0),
-(2744,'zhTW','惡魔獵人','與艾薩拉的洛拉姆斯·薩里比迪斯談話。',0),
+(2744,'zhTW','惡魔獵人','與艾薩拉的洛拉姆斯·薩里比迪斯談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2747,2748,2749,2750,2751,2752,2753,2754,2755,2756,2757,2758,2759,2760,2761,2762,2763,2764,2765,2766) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2747,'zhTW','特別的蛋',NULL,0),
 (2748,'zhTW','優良的蛋',NULL,0),
 (2749,'zhTW','普通的蛋',NULL,0),
 (2750,'zhTW','壞掉的蛋',NULL,0),
 (2751,'zhTW','野人裝甲','將2副青銅花紋護腕、2把青銅巨劍和2隻鋒利的爪子交給奧格瑪的奧羅克·沃姆什。',0),
-(2752,'zhTW','鐵肩鎧','將4把青銅戰斧和4把青銅戰錘交給奧格瑪的奧羅克·沃姆什。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2753,2754,2755,2756,2757,2758,2759,2760,2761,2762,2763,2764,2765,2766,2767,2768,2771,2772,2773,2781) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2752,'zhTW','鐵肩鎧','將4把青銅戰斧和4把青銅戰錘交給奧格瑪的奧羅克·沃姆什。',0),
 (2753,'zhTW','踩在腳底下','將4頂綠鐵頭盔、4副綠鐵護腕和4副綠鐵護腿交給奧格瑪的奧羅克·沃姆什。',0),
 (2754,'zhTW','瘋狂之角','將2隻堅固的鐵槌、2雙鍍銀青銅戰靴和2副鍍銀青銅護手交給奧格瑪的奧羅克·沃姆什。',0),
 (2755,'zhTW','沃姆什的喜悅','觀察並學習沃姆什的喜悅之舞。',0),
@@ -9168,16 +9102,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2763,'zhTW','灌魔工藝','將40塊秘銀錠和4塊黃水晶交給荊棘谷的『長者』加爾文。',0),
 (2764,'zhTW','加爾文的得意門生','和加基森的特倫頓·輕錘談話。',0),
 (2765,'zhTW','鍛造專家!','到『長者』加爾文那裡拿取報酬!',0),
-(2766,'zhTW','尋找OOX-22/FE!','把定位器帶到深痕谷附近山洞中的奧格索普的導航機器人旁邊。',0),
+(2766,'zhTW','尋找OOX-22/FE!','把定位器帶到深痕谷附近山洞中的奧格索普的導航機器人旁邊。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2767,2768,2771,2772,2773,2781,2782,2783,2784,2801,2821,2822,2841,2842,2843,2844,2845,2846,2847,2848) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2767,'zhTW','拯救OOX-22/FE!','將OOX-22/FE護送到被遺忘的海岸上的碼頭，然後向藏寶海灣的奧格索普·奧布諾提斯報告。',0),
 (2768,'zhTW','探水棒','把探水棒交給加基森的首席工程師比格維茲。',0),
 (2771,'zhTW','罩帽和護肩','將2頂秘銀頭巾和1副華麗秘銀護肩帶秘銀護肩交給特倫頓·輕錘。',0),
 (2772,'zhTW','世界在你腳下','將2雙秘銀重靴和1條華麗秘銀便褲交給特倫頓·輕錘。',0),
 (2773,'zhTW','秘銀小子','將2件重型秘銀胸甲和2副華麗秘銀手套交給特倫頓·輕錘。',0),
-(2781,'zhTW','懸賞:卡利夫·斯科比斯汀','將卡利夫·斯科比斯汀的頭顱交給加基森的首席工程師比格維茲。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2782,2783,2784,2801,2821,2822,2841,2842,2843,2844,2845,2846,2847,2848,2849,2850,2851,2852,2853,2854) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2781,'zhTW','懸賞:卡利夫·斯科比斯汀','將卡利夫·斯科比斯汀的頭顱交給加基森的首席工程師比格維茲。',0),
 (2782,'zhTW','林吉的秘密','找到對這塊石板有更多瞭解的人。',0),
 (2783,'zhTW','爭論','與詛咒之地和悲傷沼澤交界處的部落英雄的靈魂談話。',0),
 (2784,'zhTW','失去的榮耀','聆聽部落英雄的靈魂講述他的故事。',0),
@@ -9191,16 +9125,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2845,'zhTW','迷路的沙恩','從箱子裡拿取沙恩的鈴鐺，然後護送沙恩·飄葉回到羅克比特的營地。',0),
 (2846,'zhTW','深淵冠冕','將深淵冠冕交給塵泥沼澤的塔貝薩。',0),
 (2847,'zhTW','蠻皮護甲','給羽月要塞的普拉特·馬克格魯比帶去10塊厚皮。',0),
-(2848,'zhTW','蠻皮護肩','給羽月要塞的普拉特·馬克格魯帶去6片厚重護甲片和1株野葡萄。',0),
+(2848,'zhTW','蠻皮護肩','給羽月要塞的普拉特·馬克格魯帶去6片厚重護甲片和1株野葡萄。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2849,2850,2851,2852,2853,2854,2855,2856,2857,2858,2859,2860,2862,2863,2865,2866,2867,2869,2870,2871) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2849,'zhTW','蠻皮外衣','給羽月要塞的普拉特·馬克格魯帶去2件龜鱗胸甲、2副龜鱗手套和1株野葡萄。',0),
 (2850,'zhTW','蠻皮盔帽','給羽月要塞的普拉特·馬克格魯比帶去2件夜景外套、2條夜景頭巾和一株野葡萄。',0),
 (2851,'zhTW','蠻皮戰靴','給羽月要塞的普拉特·馬克格魯帶去2條夜景褲、2雙夜景靴和2株野葡萄。',0),
 (2852,'zhTW','蠻皮護腿','給羽月要塞的普拉特·馬克格魯比帶去2頂龜鱗頭盔、2副龜鱗護腕和2株野葡萄。',0),
 (2853,'zhTW','蠻皮護甲大師','將普拉特的信交給達納蘇斯的製皮大師泰龍尼斯。',0),
-(2854,'zhTW','蠻皮護甲','給莫沙徹營地的杉多爾·迅蹄帶去10塊厚皮。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2855,2856,2857,2858,2859,2860,2862,2863,2865,2866,2867,2869,2870,2871,2873,2874,2875,2876,2877,2878) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2854,'zhTW','蠻皮護甲','給莫沙徹營地的杉多爾·迅蹄帶去10塊厚皮。',0),
 (2855,'zhTW','蠻皮護肩','給莫沙徹營地的杉多爾·迅蹄帶去6塊厚重護甲片和1株野葡萄。',0),
 (2856,'zhTW','蠻皮外衣','給莫沙徹營地的杉多爾·迅蹄帶去2件龜鱗胸甲、2副龜鱗手套和1株野葡萄。',0),
 (2857,'zhTW','蠻皮盔帽','給莫沙徹營地的杉多爾·迅蹄帶去2件夜景外套、2條夜景頭巾和1株野葡萄。',0),
@@ -9214,16 +9148,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2867,'zhTW','返回羽月要塞','向羽月要塞的珊蒂斯·羽月彙報你的發現。',0),
 (2869,'zhTW','憎世納迦之戰','收集10塊憎世納迦的鱗片，把它們交給羽月要塞的拉托尼庫斯·月矛。',0),
 (2870,'zhTW','擊敗沙爾札魯領主','消滅沙爾札魯領主，然後把神秘聖物交給羽月要塞的拉托尼庫斯·月矛。',0),
-(2871,'zhTW','遞送聖物','將神秘聖物交給羽月要塞的維斯提亞·月矛。',0),
+(2871,'zhTW','遞送聖物','將神秘聖物交給羽月要塞的維斯提亞·月矛。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2873,2874,2875,2876,2877,2878,2879,2880,2881,2882,2902,2903,2932,2933,2934,2935,2936,2937,2938,2939) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2873,'zhTW','斯杜雷的貨物','將斯杜雷的貨物交給熱砂港的斯杜雷。',0),
 (2874,'zhTW','給馬克基雷的貨物','將斯杜雷的瓶子交給藏寶海灣的『海狼』馬克基雷。',0),
 (2875,'zhTW','懸賞:安德雷·火鬍','將安德雷的頭顱交給熱砂港的安全主管比格維茲。',0),
 (2876,'zhTW','船運時刻表','把船運時刻表交給熱砂港的某個官員。',0),
 (2877,'zhTW','清理隱匿石','殺掉10個綠色淤泥怪和10個玉石軟泥怪，然後回到鷹巢山向弗拉加爾報告。',0),
-(2878,'zhTW','被腐化的輕歌花',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2879,2880,2881,2882,2902,2903,2932,2933,2934,2935,2936,2937,2938,2939,2940,2941,2942,2943,2944,2945) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2878,'zhTW','被腐化的輕歌花',NULL,0),
 (2879,'zhTW','艾奎尼克斯法杖','給特洛亞斯的法杖注入能量，並找到艾奎尼克斯石碑。',0),
 (2880,'zhTW','食人妖部族項鍊','給鷹巢山的弗拉加爾帶去5條食人妖部族項鍊。',0),
 (2881,'zhTW','食人妖部族項鍊',NULL,0),
@@ -9237,16 +9171,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2936,'zhTW','蜘蛛之神','閱讀塞卡石板，瞭解枯木食人妖的蜘蛛之神的名字，然後回到加德林大師那裡。',0),
 (2937,'zhTW','召喚沙德拉','在沙德拉洛祭壇上擊敗沙德拉，把它的毒液交給塔倫米爾的藥劑師林度恩。',0),
 (2938,'zhTW','送往幽暗城的毒藥','將法拉尼爾的包裹交給幽暗城的大藥劑師法拉尼爾。',0),
-(2939,'zhTW','尋找知識','與魯瑟蘭村的達蕾恩·輕風談話。',0),
+(2939,'zhTW','尋找知識','與魯瑟蘭村的達蕾恩·輕風談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2940,2941,2942,2943,2944,2945,2947,2949,2950,2953,2954,2964,2965,2966,2967,2968,2969,2970,2972,2973) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2940,'zhTW','菲拉斯的歷史','如果你想借達蕾恩·輕風的書，要先得到她的允許。',0),
 (2941,'zhTW','海龜照片','把信交給塔納利斯的克格爾·曲藤。',0),
 (2942,'zhTW','晨光石','將閃亮的石頭和艾奎尼克斯法杖交給羽月要塞的特洛亞斯·月風。',0),
 (2943,'zhTW','向特洛亞斯回覆','把書交給羽月要塞的特洛亞斯·月風。',0),
 (2944,'zhTW','超級攝影器FX','用超級攝影器FX給加莫里塔拍張照片，然後把它交給魯瑟蘭村的達蕾恩·輕風。',0),
-(2945,'zhTW','髒兮兮的戒指','想方法把髒兮兮的戒指弄乾淨。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2947,2949,2950,2953,2954,2964,2965,2966,2967,2968,2969,2970,2972,2973,2974,2975,2976,2978,2979,2980) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2945,'zhTW','髒兮兮的戒指','想方法把髒兮兮的戒指弄乾淨。',0),
 (2947,'zhTW','歸還戒指','你可以自己留著這枚戒指，或者按照戒指內側刻著的名字找到它的主人。',0),
 (2949,'zhTW','歸還戒指','你要麼自己留著這枚戒指，要麼就按照戒指內側刻著的名字找到它的主人。',0),
 (2950,'zhTW','諾格的手藝','將閃亮的金戒指、1塊銀錠、1塊綠瑪瑙和30個銀幣交給奧格瑪的諾格。',0),
@@ -9260,16 +9194,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2969,'zhTW','所有生物的自由','從恐怖圖騰營地的圍欄裡釋放被俘獲的小精龍。至少6個小精龍和辛達爾·月紋必須活著。$b$b如果6分鐘之內你還沒能達成這個目標，辛達爾就會決定撤退，任務也會隨即失敗。',0),
 (2970,'zhTW','菲拉斯的正義','殺掉12個恐怖圖騰自然學家、10個恐怖圖騰劫掠者和6個恐怖圖騰薩滿，然後向菲拉斯的耶爾卡·月紋彙報。',0),
 (2972,'zhTW','菲拉斯的正義','將耶爾卡的璽戒交給達納蘇斯的高階女祭司泰蘭妲·語風。',0),
-(2973,'zhTW','新斗篷的光輝','給千針石林的克魯伊格·劈顱帶去10個閃光的小精靈翅膀。',0),
+(2973,'zhTW','新斗篷的光輝','給千針石林的克魯伊格·劈顱帶去10個閃光的小精靈翅膀。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2974,2975,2976,2978,2979,2980,2981,2982,2983,2984,2985,2986,2987,2988,2989,2990,2991,2992,2993,2994) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2974,'zhTW','可怕的發現','收集20支恐怖圖騰之角，把它們交給千針石林的克魯伊格·劈顱。',0),
 (2975,'zhTW','菲拉斯的巨魔','莫沙徹營地的洛卡·奧赫要你殺掉10個戈杜尼巨魔、10個戈杜尼巨魔法師和5個戈杜尼蠻卒。',0),
 (2976,'zhTW','可怕的發現','將一箱恐怖圖騰之角交給奧格瑪的貝爾戈洛姆·石槌。',0),
 (2978,'zhTW','戈杜尼卷軸','將戈杜尼卷軸交給莫沙徹營地的洛克·奧漢。',0),
 (2979,'zhTW','黑暗儀式','莫沙徹營地的洛卡·奧赫希望你找到一顆戈杜尼之寶珠。',0),
-(2980,'zhTW','菲拉斯的巨魔','莫沙徹營地的洛卡·奧赫要你去殺掉十個戈杜尼薩滿、10個戈杜尼術士和5個戈杜尼虐待者。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(2981,2982,2983,2984,2985,2986,2987,2988,2989,2990,2991,2992,2993,2994,2995,2996,2997,2999,3000,3001) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(2980,'zhTW','菲拉斯的巨魔','莫沙徹營地的洛卡·奧赫要你去殺掉十個戈杜尼薩滿、10個戈杜尼術士和5個戈杜尼虐待者。',0),
 (2981,'zhTW','菲拉斯的危機','貝爾戈洛姆·石槌想讓你去和莫沙徹營地的洛卡·奧赫談話。',0),
 (2982,'zhTW','高原荒野','安吉拉斯·月風要求你殺死8個戈杜尼術士、8個戈杜尼薩滿和8個戈杜尼蠻卒。',0),
 (2983,'zhTW','火焰的召喚','去貧瘠之地找到卡納爾·菲斯。',0),
@@ -9283,19 +9217,18 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (2991,'zhTW','耐克魯姆的勳章','將耐克魯姆的勳章交給詛咒之地的薩迪斯·格希德。',0),
 (2992,'zhTW','占卜','等待薩迪斯完成占卜儀式。',0),
 (2993,'zhTW','返回辛特蘭','與辛特蘭的獅鷲獸管理員沙拉克·鷹斧談話。',0),
-(2994,'zhTW','拯救沙普比克','到辛薩羅山頂去，殺掉邪惡祭司海克斯，找到沙普比克籠子的鑰匙，然後救出沙普比克。',0),
+(2994,'zhTW','拯救沙普比克','到辛薩羅山頂去，殺掉邪惡祭司海克斯，找到沙普比克籠子的鑰匙，然後救出沙普比克。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(2995,2996,2997,2999,3000,3001,3002,3022,3042,3062,3063,3065,3082,3083,3084,3085,3086,3088,3089,3090) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (2995,'zhTW','溝通管道','幽暗城的奧蘭·蛇繞讓你到辛特蘭去燒毀高原精靈記錄、高原精靈報告和高原精靈信件。',0),
 (2996,'zhTW','尋找斯坦哈德','與棘齒城的斯坦哈德·法爾杉談話。',0),
 (2997,'zhTW','聖潔之書','與鐵爐堡的蒂薩·熱爐談話。',0),
 (2999,'zhTW','聖潔之書','和鐵爐堡的蒂薩·熱爐談話。',0),
 (3000,'zhTW','聖潔之書','與鐵爐堡的蒂薩·熱爐談話。',0),
-(3001,'zhTW','尋找斯坦哈德','在棘齒城找到斯坦哈德·法爾杉。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3002,3022,3023,3042,3062,3063,3065,3082,3083,3084,3085,3086,3088,3089,3090,3092,3093,3094,3095,3098) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3001,'zhTW','尋找斯坦哈德','在棘齒城找到斯坦哈德·法爾杉。',0),
 (3002,'zhTW','戈杜尼寶珠','將戈杜尼寶珠交給奧格瑪暗木小屋裡的尤塞爾奈。',0),
 (3022,'zhTW','小心運送','把仔細包裝過的木箱交給魯瑟蘭村的艾瑞拉斯·琥珀。',0),
-(3023,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3023))',0),
 (3042,'zhTW','食人妖調和劑','收集20瓶食人妖調和劑，把它們交給加基森的特倫頓·輕錘。',0),
 (3062,'zhTW','黑心','莫沙徹營地的塔羅·刺蹄要你給他拿去艾丹娜·邪爪的黑心。',0),
 (3063,'zhTW','對鷹身人的復仇','塔羅·刺蹄讓你殺掉4個北泉鷹身人、4個北泉遊蕩者、4個北泉喚風者和4個北泉殺戮者。',0),
@@ -9307,15 +9240,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3086,'zhTW','雕紋石板','閱讀雕紋石板，然後和試煉谷裡大獸穴入口附近的邁安談話。',0),
 (3088,'zhTW','密文羊皮紙','閱讀密文羊皮紙，然後和試煉谷的魯瓦格談話。',0),
 (3089,'zhTW','符文羊皮紙','閱讀符文羊皮紙，然後和試煉谷的史克里克談話。',0),
-(3090,'zhTW','受污染的羊皮紙','閱讀受污染的羊皮紙，然後到試煉谷的大獸穴裡去和納托克談話。',0),
+(3090,'zhTW','受污染的羊皮紙','閱讀受污染的羊皮紙，然後到試煉谷的大獸穴裡去和納托克談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3092,3093,3094,3095,3098,3099,3100,3102,3104,3105,3106,3109,3112,3113,3114,3115,3116,3117,3120,3121) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3092,'zhTW','風化便箋','閱讀風化便箋，然後與紅雲台地的蘭卡·遠箭談話。',0),
 (3093,'zhTW','符文便箋','閱讀符文便箋，然後與納拉其營地的米拉·晨行者談話。',0),
 (3094,'zhTW','綠色便箋','閱讀綠色便箋，然後與納拉其營地的加爾特·迷霧行者談話。',0),
 (3095,'zhTW','簡易卷軸','閱讀簡易卷軸，然後和喪鐘鎮的丹納爾·斯特恩談話。',0),
-(3098,'zhTW','雕紋卷軸','閱讀雕紋卷軸，然後和喪鐘鎮教堂的伊莎貝拉談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3099,3100,3102,3104,3105,3106,3109,3112,3113,3114,3115,3116,3117,3120,3121,3122,3123,3124,3125,3126) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3098,'zhTW','雕紋卷軸','閱讀雕紋卷軸，然後和喪鐘鎮教堂的伊莎貝拉談話。',0),
 (3099,'zhTW','受污染的卷軸','閱讀受污染的卷軸，然後和喪鐘鎮的馬克希米林談話。',0),
 (3100,'zhTW','簡要的信件','閱讀簡要的信件，然後與北郡修道院的萊尼·拜舍爾談話。',0),
 (3102,'zhTW','密文信件','閱讀密文信件，然後與北郡修道院的喬里克·克里丹談話。',0),
@@ -9330,15 +9263,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3116,'zhTW','簡易符記','閱讀簡易符記，然後與幽影谷的奧莉希亞談話。',0),
 (3117,'zhTW','風化符記','閱讀風化符記，然後與幽影谷內奧達希爾頂端的阿亞娜·遠途談話。',0),
 (3120,'zhTW','綠色符記','閱讀綠色符記，然後與幽影谷中的奧達希爾頂端的瑪丹特·硬木談話。',0),
-(3121,'zhTW','奇怪的要求','將皺縮頭顱交給奧格瑪的尼爾魯·火刃。',0),
+(3121,'zhTW','奇怪的要求','將皺縮頭顱交給奧格瑪的尼爾魯·火刃。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3122,3123,3124,3125,3126,3127,3128,3129,3130,3141,3161,3181,3182,3201,3261,3281,3301,3321,3341,3362) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3122,'zhTW','向巫醫尤克里回覆','將尼爾魯的草藥包送給菲拉斯的巫醫尤克里。',0),
 (3123,'zhTW','測試容器','到辛特蘭去殺掉10頭梟獸，然後使用靈魂精華容器捕獲它們的靈魂。',0),
 (3124,'zhTW','角鷹獸靈魂精華','殺掉任何種類的10隻亂羽角鷹獸，然後用靈魂精華容器縮小並捕獲它們。',0),
 (3125,'zhTW','精靈龍靈魂精華','殺掉8隻精龍或小精龍，然後用靈魂精華容器捕獲它們的靈魂。',0),
-(3126,'zhTW','樹人靈魂精華','殺掉3個森林漫遊者，然後用靈魂精華容器捕獲它們的靈魂。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3127,3128,3129,3130,3141,3161,3181,3182,3201,3261,3281,3301,3321,3341,3362,3363,3366,3367,3368,3369) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3126,'zhTW','樹人靈魂精華','殺掉3個森林漫遊者，然後用靈魂精華容器捕獲它們的靈魂。',0),
 (3127,'zhTW','山嶺巨人靈魂精華','殺掉7個大地行者或者峭壁巨人，然後用靈魂精華容器捕獲它們的靈魂。',0),
 (3128,'zhTW','天然材料','為莫沙徹營地的巫醫尤克里收集2根斷裂的原木、6顆包殼礦石、20片有彈性的肌腱和40塊金屬碎片。',0),
 (3129,'zhTW','靈魂武器','巫醫尤克里希望你在他準備武器的時候稍等一會兒。',0),
@@ -9353,15 +9286,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3301,'zhTW','茉拉·符文圖騰','和瑟伯切爾的茉拉·符文圖騰談話。',0),
 (3321,'zhTW','秘銀會的認可','等待特倫頓完成他的工作。',0),
 (3341,'zhTW','寒冰之王','安德魯·布隆奈爾要你殺了『寒冰使者』亞門納爾並將其頭骨帶回來。',0),
-(3362,'zhTW','灌木谷','加基森的特蘭雷克要你殺掉8隻長瘤的灌木獸和8隻灌木塑根者。',0),
+(3362,'zhTW','灌木谷','加基森的特蘭雷克要你殺掉8隻長瘤的灌木獸和8隻灌木塑根者。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3363,3366,3367,3368,3369,3370,3372,3373,3374,3375,3377,3378,3379,3380,3381,3382,3385,3402,3421,3441) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3363,'zhTW','被腐化的輕歌花',NULL,0),
 (3366,'zhTW','發光的碎片','到棘齒城去尋找更多有關這塊噩夢碎片的資訊。',0),
 (3367,'zhTW','桑塔拉之石','幫助杜里奧斯回到鐵爐堡。',0),
 (3368,'zhTW','桑塔拉之石','把燒焦的信件交給鐵爐堡的索里奧斯，他在探險者大廳裡。',0),
-(3369,'zhTW','在夢魘中','把夢魘裂片交給長者高地的哈繆爾·符文圖騰。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3370,3372,3373,3374,3375,3377,3378,3379,3380,3381,3382,3385,3401,3402,3403,3404,3405,3421,3422,3423) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3369,'zhTW','在夢魘中','把夢魘裂片交給長者高地的哈繆爾·符文圖騰。',0),
 (3370,'zhTW','在夢魘中','把夢魘裂片交給達納蘇斯的瑪斯雷·馭熊者。',0),
 (3372,'zhTW','釋放他們','找到被暮光之錘信徒守衛著的神秘古器，就在灼熱峽谷的西北邊緣。然後把東西帶到熔渣之池的蘇塔拉祭壇。',0),
 (3373,'zhTW','伊蘭尼庫斯精華','把伊蘭尼庫斯精華放在精華之泉裡，精華之泉就在沉沒的神廟中，伊蘭尼庫斯的巢穴裡。',0),
@@ -9374,20 +9307,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3381,'zhTW','會見主人','如果你想要見到薩納斯的主人，就把2根完好無損的角鷹獸羽毛交給他。',0),
 (3382,'zhTW','危難中的船長','幫助瓦妮莎·貝蒂斯船長、她的船員和地平線輕帆號上的乘客抵禦納迦的攻擊。瓦妮莎·貝蒂斯船長必須存活。',0),
 (3385,'zhTW','黑市交易','殺了貿易首領考維克和他的同夥科朗克。從他的屍體上拿回商人的背包，把它交給尼莉絲。',0),
-(3401,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3401))',0),
 (3402,'zhTW','黑市交易','和加基森的維茲格里克談話。',0),
-(3403,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3403))',0),
-(3404,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3404))',0),
-(3405,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3405))',0),
 (3421,'zhTW','回程',NULL,0),
-(3422,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3422))',0),
-(3423,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3423))',0);
+(3441,'zhTW','神聖的懲戒','聽卡拉然·溫布雷講述他的故事。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3424,3425,3441,3442,3443,3444,3445,3446,3447,3452,3453,3454,3461,3462,3463,3481,3482,3501,3502,3503) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3442,3443,3444,3445,3446,3447,3452,3453,3454,3461,3462,3463,3481,3482,3501,3502,3503,3504,3505,3506) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(3424,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3424))',0),
-(3425,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3425))',0),
-(3441,'zhTW','神聖的懲戒','聽卡拉然·溫布雷講述他的故事。',0),
 (3442,'zhTW','無瑕之焰','收集4份烈焰之心和4份魔像之油，然後把這些東西交給卡拉然·溫布雷。',0),
 (3443,'zhTW','鑄造火炬桿','帶8把瑟銀匕首給卡拉然·風刃。',0),
 (3444,'zhTW','石環','到棘齒城去，從瑪爾馮·瑞文斯克的車間裡取回石環。',0),
@@ -9404,13 +9329,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3482,'zhTW',NULL,'把這個箱子交給克拉維爾。',0),
 (3501,'zhTW','多多益善','將有瑕疵的德萊尼水晶碎片交給庫米沙，你就可以得到相應的回報。',0),
 (3502,'zhTW','德萊尼的垃圾…','將有瑕疵的德萊尼水晶碎片交給庫米沙。詛咒之地的任何怪物都有可能攜帶著這樣的碎片。',0),
-(3503,'zhTW','見到主人',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3504,3505,3506,3507,3508,3509,3510,3511,3512,3513,3514,3517,3518,3520,3523,3525,3527,3528,3529,3541) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3503,'zhTW','見到主人',NULL,0),
 (3504,'zhTW','叛徒','把這封給阿格圖的密信交給艾薩拉的阿格圖·血拳。',0),
 (3505,'zhTW','叛徒','殺死10個血精靈搜尋者和10個血精靈探測員，然後尋找大法師雷姆托里的營地。一旦你發現了營地，找出某個對她極為重要的東西，以用於激怒她，讓她與你戰鬥。',0),
-(3506,'zhTW','叛徒','摧毀大法師雷姆托里身上的秘法專注水晶並殺死她。然後把她的腦袋交給艾薩拉的阿格圖·血拳。',0),
+(3506,'zhTW','叛徒','摧毀大法師雷姆托里身上的秘法專注水晶並殺死她。然後把她的腦袋交給艾薩拉的阿格圖·血拳。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3507,3508,3509,3510,3511,3512,3513,3514,3517,3518,3520,3523,3525,3527,3528,3541,3542,3561,3562,3563) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3507,'zhTW','叛徒','與奧格瑪的貝爾戈洛姆·石槌談話。',0),
 (3508,'zhTW','破壞結界','等待洛拉姆斯完成啟迪法術。',0),
 (3509,'zhTW','惡魔之名','與艾薩拉的亞考羅克領主談一談。你應該在海邊搜索亞考蘭神殿。',0),
@@ -9426,15 +9351,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3525,'zhTW','封印塑像','護送貝尼斯特拉茲來到剃刀高地的野豬人塑像處。$b$b當他在執行儀式封印塑像時保護他。',0),
 (3527,'zhTW','摩沙魯的預言','將第一塊和第二塊摩沙魯石板交給塔納利斯的葉基亞。',0),
 (3528,'zhTW','神靈哈卡','將裝滿的哈卡之卵交給塔納利斯的葉基亞。',0),
-(3529,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3529))',0),
-(3541,'zhTW','送貨給傑斯雷蒙','將辛耶爾石板交給奧格瑪的傑斯雷蒙。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3542,3561,3562,3563,3564,3565,3566,3567,3569,3570,3601,3602,3621,3622,3625,3626,3627,3628,3629,3630) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3541,'zhTW','送貨給傑斯雷蒙','將辛耶爾石板交給奧格瑪的傑斯雷蒙。',0),
 (3542,'zhTW','送貨給安德隆·甘特','將瑪寇里石板交給幽暗城的安德隆·甘特。',0),
 (3561,'zhTW','送貨給大法師克希雷姆','將塞爾哈石板交給艾薩拉的大法師克希雷姆。',0),
 (3562,'zhTW','瑪加薩的報酬','將瑪加薩的便箋交給艾薩拉的傑迪加。',0),
-(3563,'zhTW','傑斯雷蒙的報酬','將傑斯雷蒙的便箋交給艾薩拉的傑迪加。',0),
+(3563,'zhTW','傑斯雷蒙的報酬','將傑斯雷蒙的便箋交給艾薩拉的傑迪加。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3564,3565,3566,3567,3569,3570,3601,3602,3621,3625,3626,3627,3628,3629,3630,3631,3632,3633,3634,3637) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3564,'zhTW','安德隆的報酬','將安德隆的字條交給艾薩拉的傑迪加。',0),
 (3565,'zhTW','克希雷姆的報酬','將克希雷姆的便箋交給艾薩拉的傑迪加。',0),
 (3566,'zhTW','奧比斯頓','殺死黑衣拉索里克和奧比斯頓，帶著黑衣拉索里克的頭顱和奧比斯頓的心臟回到鐵爐堡的索里奧斯那裡。',0),
@@ -9444,21 +9368,20 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3601,'zhTW','我就是基姆加爾!','搜索薩拉斯營地，尋找基姆加爾的指南針，望遠鏡，燒雞和花生，然後將它們交還給艾薩拉的基姆加爾。',0),
 (3602,'zhTW','艾薩拉水晶','在艾薩拉南部收集20塊艾薩拉晶體。你可以使用惡魔犬協助尋找一些隱藏的礦脈。$b$b任務完成之後就回到洛拉姆斯那裡去。',0),
 (3621,'zhTW','武器的鑄造','把貨物交給荊棘谷的『長者』加爾文。',0),
-(3622,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(3622))',0),
 (3625,'zhTW','附魔艾薩拉魔化武器','等待加爾文為你鍛造武器。',0),
 (3626,'zhTW','返回詛咒之地','回到部落英雄的靈魂那裡。',0),
 (3627,'zhTW','收集破碎的護符','殺掉『毀滅者』戈洛爾、瑟溫妮女士，以及大法師奧利斯塔。從他們到屍體上拿到戈洛爾的護符、瑟溫妮的護符和奧利斯塔的護符。$b$b記住使用你的附魔艾薩拉魔化武器來削弱他們，否則他們是無法被殺死的─你必須小心謹慎地使用你的武器……',0),
 (3628,'zhTW','惡魔拉瑟萊克','消滅『污染者』拉瑟萊克，將污染者之角交給部落英雄的靈魂。另外你還要把污染者防護結界交給他，這樣部落英雄的靈魂就可以消滅它，以避免它落入邪惡勢力之手。',0),
 (3629,'zhTW','哥布林工程學','如果你想要對哥布林工程學有更多瞭解，就把工程學教材交給加基森的尼克斯·斯普克斯賓。',0),
-(3630,'zhTW','地精工程學','如果你想要對地精工程學有更多瞭解，就把工程學教材交給鐵爐堡的技工大師歐沃斯巴克。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3631,3632,3633,3634,3637,3638,3639,3640,3641,3642,3643,3644,3645,3646,3647,3681,3721,3761,3762,3763) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3630,'zhTW','地精工程學','如果你想要對地精工程學有更多瞭解，就把工程學教材交給鐵爐堡的技工大師歐沃斯巴克。',0),
 (3631,'zhTW','召喚地獄戰馬','與貧瘠之地棘齒城的斯坦哈德·法爾杉談話。',0),
 (3632,'zhTW','地精工程學','如果你想要對地精工程學有更多瞭解，就把工程學教材交給鐵爐堡的技工大師歐沃斯巴克。',0),
 (3633,'zhTW','哥布林工程學','如果你想要對哥布林工程學有更多瞭解，就把工程學教材交給加基森的尼克斯·斯普克斯賓。',0),
 (3634,'zhTW','地精工程學','如果你想要對地精工程學有更多瞭解，就把工程學教材交給鐵爐堡的技工大師歐沃斯巴克。',0),
-(3637,'zhTW','地精工程學','如果你想要對地精工程學有更多瞭解，就把工程學教材交給藏寶海灣的奧格索普·奧布諾提斯。',0),
+(3637,'zhTW','地精工程學','如果你想要對地精工程學有更多瞭解，就把工程學教材交給藏寶海灣的奧格索普·奧布諾提斯。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3638,3639,3640,3641,3642,3643,3644,3645,3646,3647,3681,3721,3761,3762,3763,3764,3781,3782,3783,3785) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3638,'zhTW','保密協議','此任務已經絕版。如果你同意成為一名哥布林工程師，就右鍵點擊保密協議，然後再次和加基森的尼克斯·斯普克斯賓談話。',0),
 (3639,'zhTW','工作成果','將20顆重磅鐵製爆裂物、20顆實心火藥和5隻自爆綿羊交給加基森的尼克斯·斯普克斯賓。',0),
 (3640,'zhTW','保密協議','此任務已經絕版。如果你同意成為一名地精工程師，就右鍵點擊保密協議，然後再次和鐵爐堡的技工大師歐沃斯巴克談話。',0),
@@ -9473,15 +9396,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3721,'zhTW','你自己的OOX',NULL,0),
 (3761,'zhTW','安戈洛的泥土','收集20份安戈洛的泥土，把它們交給雷霆崖長者高地的格德。',0),
 (3762,'zhTW','協助大德魯伊符文圖騰','與雷霆崖的大德魯伊哈繆爾·符文圖騰談話。',0),
-(3763,'zhTW','協助大德魯伊鹿盔','與達納蘇斯的大德魯伊范達爾·鹿盔談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3764,3781,3782,3783,3785,3786,3788,3791,3792,3801,3802,3803,3804,3821,3822,3823,3824,3825,3841,3842) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3763,'zhTW','協助大德魯伊鹿盔','與達納蘇斯的大德魯伊范達爾·鹿盔談話。',0),
 (3764,'zhTW','安戈洛的泥土','收集20份安戈洛的泥土，把它們交給達納蘇斯的耶納爾。',0),
 (3781,'zhTW','晨光麥研究','將大德魯伊的草種購買券交給達納蘇斯城塞納里奧區的瑪斯雷·馭熊者。',0),
 (3782,'zhTW','晨光麥研究','將草種購買券交給雷霆崖的巴珊娜·符文圖騰。',0),
 (3783,'zhTW','雪怪計畫!','為永望鎮的烏米收集10張厚雪人毛皮。',0),
-(3785,'zhTW','晨光麥研究','用一個常青袋、一包薩倫迪斯種子以及兩份安戈洛的泥土來嘗試種植晨光麥。$b$b將10株晨光麥交給達納蘇斯的瑪斯雷·馭熊者。',0),
+(3785,'zhTW','晨光麥研究','用一個常青袋、一包薩倫迪斯種子以及兩份安戈洛的泥土來嘗試種植晨光麥。$b$b將10株晨光麥交給達納蘇斯的瑪斯雷·馭熊者。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3786,3788,3791,3792,3801,3802,3803,3804,3821,3822,3823,3824,3825,3841,3842,3843,3844,3845,3861,3881) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3786,'zhTW','晨光麥研究','用一個常青袋、一包薩倫迪斯種子以及兩份安戈洛的泥土來嘗試種植晨光麥。$b$b將10株晨光麥交給雷霆崖的巴珊娜·符文圖騰。',0),
 (3788,'zhTW','奎恩提斯的請求','與羽月要塞的奎恩提斯談話。',0),
 (3791,'zhTW','晨光麥的秘密','將10株晨光麥交給羽月要塞的奎恩提斯。',0),
@@ -9496,15 +9419,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3824,'zhTW','蠻王戈泰什','找到戈泰什，他應該在巨槌石西面的某處。殺掉戈泰什並把他的頭顱交給燃燒平原的奧拉留斯。',0),
 (3825,'zhTW','梟首示眾','把戈泰什的頭顱放在巨槌石的山頂上。找一塊軟土堆把串著頭顱的長矛插上去就可以了。',0),
 (3841,'zhTW','領養孤兒','與千針石林的奎恩丁談話。',0),
-(3842,'zhTW','即將孵化','將2份堅韌藥劑交給千針石林的奎恩丁。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3843,3844,3845,3861,3881,3882,3883,3884,3906,3907,3908,3909,3911,3912,3913,3914,3921,3922,3923,3924) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3842,'zhTW','即將孵化','將2份堅韌藥劑交給千針石林的奎恩丁。',0),
 (3843,'zhTW','新生之雛','帶著這枚脆弱的小精龍卵去辛特蘭，與阿格納談一談，但是你一定要在它還有生命力的時候趕到，在蛋裡的小生命夭折之前，你只有1小時的時間。',0),
 (3844,'zhTW','無人知曉的秘密','在池塘附近查找與擱淺的小艇有關的線索。',0),
 (3845,'zhTW','無人知曉的秘密','查看袋子裡的東西，然後將它們交給物主。',0),
 (3861,'zhTW','咕咕嘎!','找一些特殊的雞飼料，把它交給友好的小雞。當你找到小雞的時候，在餵食它特殊的雞飼料之前對它做出拍動翅膀的表情。(使用/cheer 命令)',0),
-(3881,'zhTW','搶救物資','將食物木箱和研究設備交給安戈洛環形山的威利德·馬紹爾。',0),
+(3881,'zhTW','搶救物資','將食物木箱和研究設備交給安戈洛環形山的威利德·馬紹爾。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3882,3883,3884,3906,3907,3908,3909,3911,3912,3913,3914,3921,3922,3923,3924,3941,3942,3961,3962,3981) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3882,'zhTW','挖骨頭','將8根恐龍骨頭交給安戈洛環形山的斯巴克·尼米爾。',0),
 (3883,'zhTW','異型的生態','使用採集瓶從安戈洛環形山的某個格里什蟲巢的孵化室中收集一份巢穴側壁的樣本，在有懸掛著的蟲卵的房間裡收集樣本。$b$b將蟲穴內壁樣本交給安戈洛環形山的霍萊伊·馬紹爾。',0),
 (3884,'zhTW','威利德的日記','將日記還給安戈洛環形山中的威利德·馬紹爾。',0),
@@ -9519,15 +9442,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (3921,'zhTW','維妮·布特巴克','將損壞的主動式負載平衡器交給維妮·布特巴克。',0),
 (3922,'zhTW','高強度齒輪','把15個高強度齒輪交給貧瘠之地的維妮·布特巴克。',0),
 (3923,'zhTW','雷里·格里斯高布','把破碎的主動式負載平衡器交給奧格瑪的雷里·格里斯高布。',0),
-(3924,'zhTW','主動式負載平衡器說明書','把主動式負載平衡器說明書交給奧格瑪的雷里·格里斯高布。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(3941,3942,3961,3962,3981,3982,4001,4002,4003,4004,4005,4021,4022,4023,4024,4041,4061,4062,4063,4081) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3924,'zhTW','主動式負載平衡器說明書','把主動式負載平衡器說明書交給奧格瑪的雷里·格里斯高布。',0),
 (3941,'zhTW','地精的援助','到馬紹爾營地那裡的山洞中去找科琳。',0),
 (3942,'zhTW','林克的記憶','到費伍德森林去找艾瑞丹·藍風。',0),
 (3961,'zhTW','林克的冒險','把亞奎門塔斯的銀圖騰交給馬紹爾營地裡的林克。',0),
 (3962,'zhTW','結伴而行','到馬紹爾營地南邊的火羽山去。$b$b找到火焰使者，並使用圖騰除掉它的防護光環。在擊敗它之後從洞中取得金色火焰。',0),
-(3981,'zhTW','指揮官哥沙克','在黑石深淵裡找到指揮官哥沙克。$b$b在那幅草圖上畫著的是一個鐵欄後面的獸人，也許你應該到某個類似監獄的地方去找找看。',0),
+(3981,'zhTW','指揮官哥沙克','在黑石深淵裡找到指揮官哥沙克。$b$b在那幅草圖上畫著的是一個鐵欄後面的獸人，也許你應該到某個類似監獄的地方去找找看。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3982,4001,4002,4003,4004,4005,4021,4022,4023,4024,4041,4061,4062,4063,4081,4082,4083,4084,4101,4102) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (3982,'zhTW','出了什麼事?','保護哥沙克。',0),
 (4001,'zhTW','出了什麼事?','與卡蘭·巨錘談一談，收集關於綁架公主鐵爐堡公主茉艾拉·銅鬚這一事件的情報。將情報回饋給奧格瑪城裡的索爾。$b$b哥沙克提到過卡蘭被關在附近的某個牢房中。',0),
 (4002,'zhTW','東部王國','如果你準備好要接受索爾所安排的任務，就去找他談話。',0),
@@ -9542,15 +9465,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4061,'zhTW','機器的崛起','到燃燒平原去為塞朵拉·穆瓦丹尼收集10塊斷裂的元素裂片。$b$b塞朵拉曾經說過，那裡的機械魔像和元素生物是這種裂片的主要來源。',0),
 (4062,'zhTW','機器的崛起','將元素裂片樣本交給魯特維爾·沃拉圖斯。$b$b塞朵拉說魯特維爾就在東邊的一處營地裡。',0),
 (4063,'zhTW','機器的崛起','找到並殺掉魔像領主阿格曼奇，將他的頭交給魯特維爾。你還需要從守衛著阿格曼奇的狂怒魔像和戰鬥魔像身上收集10塊完整的元素核心。',0),
-(4081,'zhTW','格殺勿論:黑鐵矮人','到黑石深淵去消滅那些邪惡的侵略者!$b$b督軍高圖斯要你去殺死15個鐵怒衛士、10個鐵怒獄卒和5個鐵怒步兵。完成任務之後回去找他。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4082,4083,4084,4101,4102,4103,4104,4105,4106,4107,4108,4109,4110,4111,4112,4113,4114,4115,4116,4117) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4081,'zhTW','格殺勿論:黑鐵矮人','到黑石深淵去消滅那些邪惡的侵略者!$b$b督軍高圖斯要你去殺死15個鐵怒衛士、10個鐵怒獄卒和5個鐵怒步兵。完成任務之後回去找他。',0),
 (4082,'zhTW','格殺勿論:高階黑鐵軍官','到黑石深淵去消滅那些邪惡的侵略者!$b$b督軍高圖斯要你殺死10個鐵怒醫師,、10個鐵怒士兵和10個鐵怒軍官。完成任務之後回去向他覆命。',0),
 (4083,'zhTW','鬼靈之杯',NULL,0),
 (4084,'zhTW','銀爪鐵心','為費伍德森林的艾瑞丹·藍風收集11隻銀爪和1顆鐵樹之心。',0),
 (4101,'zhTW','淨化費伍德','收集15顆血琥珀，把它們交給費伍德森林的阿拉珊蒂絲·銀空。',0),
-(4102,'zhTW','淨化費伍德','收集15顆血琥珀，把它們交給費伍德森林的梅貝絲·河風。',0),
+(4102,'zhTW','淨化費伍德','收集15顆血琥珀，把它們交給費伍德森林的梅貝絲·河風。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4103,4104,4105,4106,4107,4108,4109,4110,4111,4112,4113,4114,4115,4116,4117,4118,4119,4120,4121,4122) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4103,'zhTW','狩獵換藥膏',NULL,0),
 (4104,'zhTW','採礦換藥膏',NULL,0),
 (4105,'zhTW','採集換藥膏',NULL,0),
@@ -9565,15 +9488,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4114,'zhTW','被腐化的輕歌花',NULL,0),
 (4115,'zhTW','被腐化的迎風花',NULL,0),
 (4116,'zhTW','被腐化的輕歌花',NULL,0),
-(4117,'zhTW','被腐化的鞭根草',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4118,4119,4120,4121,4122,4123,4124,4125,4126,4127,4128,4129,4130,4131,4132,4133,4134,4135,4136,4141) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4117,'zhTW','被腐化的鞭根草',NULL,0),
 (4118,'zhTW','被腐化的輕歌花',NULL,0),
 (4119,'zhTW','被腐化的夜龍草',NULL,0),
 (4120,'zhTW','腐化的力量','菲拉斯莫沙徹營地的塔羅·刺蹄要你去費伍德森林殺掉12頭怒爪灰熊和12頭魔爪劫毀者。',0),
 (4121,'zhTW','押送囚徒','押送你的囚犯格拉克·洛克魯布。穿過燃燒平原和黑石山脈，一直走到灼熱峽谷。$b$b雷克斯洛特曾經告訴過你，他會讓他的人等在黑石山脈的另外一邊準備接收格拉克。$b$b另外，你還要把瑟銀鐐銬一併還給雷克斯洛特。',0),
-(4122,'zhTW','格拉克·洛克魯布','到燃燒平原去找到格拉克·洛克魯布。你回憶起雷克斯洛特曾經提起過，格拉克應該是在一座大型的黑石要塞中。$b$b當你找到格拉克·洛克魯布之後，用瑟銀鐐銬把他銬起來，然後將其帶回灼熱峽谷。雷克斯洛特會讓他的部下等在那裡接應你。$b$b已提供物品：$b',0),
+(4122,'zhTW','格拉克·洛克魯布','到燃燒平原去找到格拉克·洛克魯布。你回憶起雷克斯洛特曾經提起過，格拉克應該是在一座大型的黑石要塞中。$b$b當你找到格拉克·洛克魯布之後，用瑟銀鐐銬把他銬起來，然後將其帶回灼熱峽谷。雷克斯洛特會讓他的部下等在那裡接應你。$b$b已提供物品：$b',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4123,4124,4125,4126,4127,4128,4129,4130,4131,4132,4133,4134,4135,4136,4141,4142,4143,4144,4145,4146) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4123,'zhTW','山脈之心','把山脈之心交給燃燒平原的麥克斯沃特·尤柏格林。',0),
 (4124,'zhTW','失蹤的信差','和羽月要塞的基恩諾·燃爐談話。',0),
 (4125,'zhTW','失蹤的信差','找到信差的小船，你應該在菲拉斯的南部海岸線上展開搜索。',0),
@@ -9588,15 +9511,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4134,'zhTW','遺失的雷酒秘方','把遺失的雷酒秘方交給卡加斯的薇薇安·拉格雷。',0),
 (4135,'zhTW','痛苦深淵','現在你已經知道了拉斯卡爾的去向，那麼你最好到痛苦深淵去尋找他，或者至少是他的屍體。根據便箋上的資訊，那個地方應該在木爪豺狼人營地的南邊。$b$b已提供物品：$b',0),
 (4136,'zhTW','雷布里·斯庫比格特','把雷布里的頭顱交給燃燒平原的尤卡·斯庫比格特。',0),
-(4141,'zhTW','莫爾金和拉里安','收集15朵血瓣花，然後回覆給莫爾金。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4142,4143,4144,4145,4146,4147,4148,4181,4182,4183,4184,4185,4186,4201,4221,4222,4223,4224,4241,4242) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4141,'zhTW','莫爾金和拉里安','收集15朵血瓣花，然後回覆給莫爾金。',0),
 (4142,'zhTW','造訪格雷甘','把血瓣花交給菲拉斯的格雷甘·山酒。',0),
 (4143,'zhTW','邪惡之霧','收集5份阿塔萊之霧的樣本，然後向安戈洛環形山的莫爾金覆命。',0),
 (4144,'zhTW','血瓣花苗',NULL,0),
 (4145,'zhTW','拉里安和莫爾金','為馬紹爾營地裡的拉里安殺掉10個血瓣花鞭笞者和10個血瓣花捕獸者。',0),
-(4146,'zhTW','除草器的燃料','收集5份阿塔萊之霧的樣本，然後將它們送到馬紹爾營地的拉里安那裡。',0),
+(4146,'zhTW','除草器的燃料','收集5份阿塔萊之霧的樣本，然後將它們送到馬紹爾營地的拉里安那裡。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4147,4148,4181,4182,4183,4184,4185,4186,4201,4221,4222,4223,4224,4241,4242,4243,4244,4245,4261,4262) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4147,'zhTW','瑪爾馮的車間','到棘齒城去，在瑪爾馮·瑞文斯克的車間裡找到他。',0),
 (4148,'zhTW','血瓣花除草器',NULL,0),
 (4181,'zhTW','哥布林工程學','如果你想要對哥布林工程學有更多瞭解，就把工程學教材交給加基森的尼克斯·斯普克斯賓。',0),
@@ -9611,15 +9534,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4223,'zhTW','真正的主人','和燃燒平原的麥克斯韋爾元帥談話。',0),
 (4224,'zhTW','真正的主人','和狼狽不堪的約翰談談來瞭解溫德索爾元帥的命運，然後回到麥克斯韋爾元帥那裡。$b$b你想起麥克斯韋爾元帥說過他在一個北面的洞穴那裡。',0),
 (4241,'zhTW','溫德索爾元帥','到西北部的黑石山脈去，在黑石深淵中找到溫德索爾元帥的下落。$b$b狼狽不堪的約翰曾告訴你說溫德索爾被關進了一個監獄。',0),
-(4242,'zhTW','被遺棄的希望','把這個壞消息傳達給麥克斯韋爾元帥。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4243,4244,4245,4261,4262,4263,4264,4265,4266,4267,4281,4282,4283,4284,4285,4286,4287,4288,4289,4290) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4242,'zhTW','被遺棄的希望','把這個壞消息傳達給麥克斯韋爾元帥。',0),
 (4243,'zhTW','找回艾米 01','在安戈洛環形山找到艾米 01。',0),
 (4244,'zhTW','找回艾米 01','找到一個秘銀外殼，然後回到安戈洛環形山的艾米 01身邊。',0),
 (4245,'zhTW','找回艾米 01','將艾米 01交給安戈洛環形山的卡爾納·雷塔維。',0),
 (4261,'zhTW','遠古之靈','護送艾雷到安全處，然後和梣谷東部林歌神殿的凱尼斯·靜風談話。',0),
-(4262,'zhTW','征服者派隆','殺掉征服者派隆，然後向加琳達覆命。$b$b加琳達告訴過你，派隆守在採礦場中，也許你應該去那裡找找。',0),
+(4262,'zhTW','征服者派隆','殺掉征服者派隆，然後向加琳達覆命。$b$b加琳達告訴過你，派隆守在採礦場中，也許你應該去那裡找找。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4263,4264,4265,4266,4267,4281,4282,4283,4284,4285,4286,4287,4288,4289,4290,4291,4292,4295,4296,4297) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4263,'zhTW','伊森迪奧斯!','在黑石深淵裡找到伊森迪奧斯領主，然後把他幹掉!',0),
 (4264,'zhTW','弄皺的便箋','溫德索爾元帥也許會對你手中的東西感興趣。畢竟，希望還沒有被完全扼殺。',0),
 (4265,'zhTW','逃離蟲巢','到祖卡什蟲巢拯救拉斯卡爾。$b$b回到羽月要塞的基恩諾·燃爐那兒，告訴他拉斯卡爾還活著，且狀況良好。',0),
@@ -9634,15 +9557,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4287,'zhTW','東部水晶塔','在安戈洛環形山找到東部水晶塔。',0),
 (4288,'zhTW','西部水晶塔','在安戈洛環形山找到西部水晶塔。',0),
 (4289,'zhTW','安戈洛的猩猩','將2塊安戈洛猩猩的皮、2塊安戈洛大猩猩的皮和2塊安戈洛巨猩猩的皮交給安戈洛環形山入口處的托爾瓦·尋路者。',0),
-(4290,'zhTW','拉克維的食物','找到拉克維剛剛獵殺的動物的屍體，從屍體上偷取一塊蛇頸龍肉塊，然後回到安戈洛環形山的托爾瓦·尋路者那裡。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4291,4292,4295,4296,4297,4298,4300,4301,4321,4322,4324,4341,4342,4343,4361,4362,4363,4381,4382,4383) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4290,'zhTW','拉克維的食物','找到拉克維剛剛獵殺的動物的屍體，從屍體上偷取一塊蛇頸龍肉塊，然後回到安戈洛環形山的托爾瓦·尋路者那裡。',0),
 (4291,'zhTW','拉克維的氣味','將2份暴掠龍資訊素交給安戈洛環形山入口附近的托爾瓦·尋路者。',0),
 (4292,'zhTW','拉克維的誘餌','使用托爾瓦的麻袋中的東西召喚拉克維並打敗它。將拉克維的頭顱交給安戈洛環形山入口處的托爾瓦·尋路者。',0),
 (4295,'zhTW','羅克諾特的麥酒',NULL,0),
 (4296,'zhTW','七賢石板','把石板拓文交給燃燒平原的麥克斯沃特·尤柏格林。',0),
-(4297,'zhTW','小精龍的食物','將5塊銀鬃捕獵者的肉交給辛特蘭的阿格納。',0),
+(4297,'zhTW','小精龍的食物','將5塊銀鬃捕獵者的肉交給辛特蘭的阿格納。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4298,4300,4301,4321,4322,4324,4341,4342,4343,4361,4362,4363,4381,4382,4383,4384,4385,4386,4401,4403) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4298,'zhTW','為人父母','與辛特蘭的阿格納談話。',0),
 (4300,'zhTW','骨刃武器','將8隻白色暴掠龍爪交給奧格瑪的傑斯雷蒙。',0),
 (4301,'zhTW','強大的尤爾查','把尤爾查的毛皮交給安戈洛環形山入口處的托爾瓦·尋路者。',0),
@@ -9657,15 +9580,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4363,'zhTW','語出驚人的公主','回到鐵爐堡去，與國王麥格尼·銅鬚談話。',0),
 (4381,'zhTW','恢復水晶',NULL,0),
 (4382,'zhTW','精神水晶',NULL,0),
-(4383,'zhTW','防禦水晶',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4384,4385,4386,4401,4403,4421,4441,4442,4443,4444,4445,4446,4447,4448,4449,4450,4451,4461,4462,4463) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4383,'zhTW','防禦水晶',NULL,0),
 (4384,'zhTW','破甲水晶',NULL,0),
 (4385,'zhTW','爆炸水晶',NULL,0),
 (4386,'zhTW','尖刺水晶',NULL,0),
 (4401,'zhTW','被腐化的輕歌花',NULL,0),
-(4403,'zhTW','被腐化的迎風花',NULL,0),
+(4403,'zhTW','被腐化的迎風花',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4421,4441,4442,4443,4444,4445,4446,4447,4448,4449,4450,4451,4461,4462,4463,4464,4465,4466,4467,4481) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4421,'zhTW','碧火薩特','殺掉11個碧火魔僕、9個碧火巡影者、9個碧火盜賊和薩瓦瑟拉斯。任務完成之後回到費伍德森林的艾瑞丹·藍風處覆命。',0),
 (4441,'zhTW','被禁錮的古樹','到達納蘇斯去，用艾瑞丹的瓶子收集月神殿中的祝福之水，然後回到艾瑞丹那兒。',0),
 (4442,'zhTW','淨化!','過一會兒再與艾瑞丹對話。',0),
@@ -9680,15 +9603,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4451,'zhTW','自由的鑰匙','搜尋灼熱峽谷並找到一個可以使用這把格里塞特庫房鑰匙的地方。',0),
 (4461,'zhTW','被腐化的鞭根草',NULL,0),
 (4462,'zhTW','被腐化的夜龍草',NULL,0),
-(4463,'zhTW','沉思聖契',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4464,4465,4466,4467,4481,4482,4483,4484,4485,4486,4487,4488,4489,4490,4491,4492,4493,4494,4496,4501) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4463,'zhTW','沉思聖契',NULL,0),
 (4464,'zhTW','被腐化的輕歌花',NULL,0),
 (4465,'zhTW','被腐化的輕歌花',NULL,0),
 (4466,'zhTW','被腐化的迎風花',NULL,0),
 (4467,'zhTW','被腐化的迎風花',NULL,0),
-(4481,'zhTW','體質聖契',NULL,0),
+(4481,'zhTW','體質聖契',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4482,4483,4484,4485,4486,4487,4488,4489,4490,4491,4492,4493,4494,4496,4501,4502,4503,4504,4505,4506) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4482,'zhTW','堅毅聖契',NULL,0),
 (4483,'zhTW','韌性聖契',NULL,0),
 (4484,'zhTW','貪婪聖契',NULL,0),
@@ -9703,15 +9626,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4493,'zhTW','異種蠍的遠征','與加基森的鍊金師匹斯特蘇格談話。',0),
 (4494,'zhTW','異種蠍的遠征','與加基森的煉金術士匹斯特蘇格談話。',0),
 (4496,'zhTW','擒蟲先擒王','帶一個格里什香味腺體和5個安戈洛的泥土樣本給加基森的鍊金師匹斯特蘇格。',0),
-(4501,'zhTW','當心翼手龍','殺掉10隻翼手龍和15隻狂怒的翼手龍，然後向馬紹爾營地的斯普拉格·弗勞克報告。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4502,4503,4504,4505,4506,4507,4508,4509,4510,4511,4521,4542,4561,4603,4604,4621,4642,4661,4701,4721) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4501,'zhTW','當心翼手龍','殺掉10隻翼手龍和15隻狂怒的翼手龍，然後向馬紹爾營地的斯普拉格·弗勞克報告。',0),
 (4502,'zhTW','火山的活動','到安戈洛環形山的火山中去，從那裡的元素身上收集9份安戈洛灰燼，把它們交給棘齒城的莉芙·雷茲菲克斯。',0),
 (4503,'zhTW','希茲爾的飛行器','替馬紹爾營地的希茲爾收集8片精細的雙帆龍鱗片和8片精細的翼手龍鱗片。',0),
 (4504,'zhTW','極度粘稠的瀝青','幫加基森的特蘭雷克收集12塊極度粘稠的瀝青。',0),
 (4505,'zhTW','腐化之井','從碧火薩特的月井中收集一份被腐化的水的樣本，把它交給血毒哨所的溫娜·哈薩德。',0),
-(4506,'zhTW','被腐蝕的貓','把溫娜的小貓帶到墮落的月井旁邊，把貓放出來，然後把它還給溫娜。$b$b當你回到溫娜那裡之後，點擊貓就可以將它還給溫娜。',0),
+(4506,'zhTW','被腐蝕的貓','把溫娜的小貓帶到墮落的月井旁邊，把貓放出來，然後把它還給溫娜。$b$b當你回到溫娜那裡之後，點擊貓就可以將它還給溫娜。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4507,4508,4509,4510,4511,4521,4542,4561,4603,4604,4621,4642,4661,4701,4721,4724,4726,4729,4734,4735) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4507,'zhTW','小兵捉蠍后','當格里什蜂后被召喚之後擊敗她。$b$b帶格里什皇后的腦袋給加基森的鍊金師匹斯特蘇格。',0),
 (4508,'zhTW','暴風雨前的寧靜','把匹斯特蘇格的安戈洛報告交給達納蘇斯的格拉希娜·靈風。',0),
 (4509,'zhTW','暴風雨前的寧靜','把匹斯特蘇格的安戈洛報告交給奧格瑪的基爾茲賓·鼓眼。',0),
@@ -9726,15 +9649,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4642,'zhTW','融合軟泥怪','把一塊融合的軟泥怪樣本交給幽暗城的化學家弗雷。',0),
 (4661,'zhTW','墮落檢測 - 費伍德森林',NULL,0),
 (4701,'zhTW','座狼之源','到黑石塔去摧毀那裡的座狼源頭。當你離開的時候，赫林迪斯喊出了一個名字:哈雷肯。這個詞就是獸人語中「座狼」的意思。',0),
-(4721,'zhTW','冬泉谷的梟獸','費伍德森林的特盧爾·法貝恩要你去冬泉谷獵殺10頭狂暴梟獸。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4724,4726,4729,4734,4735,4736,4737,4738,4739,4741,4742,4743,4764,4765,4766,4767,4768,4769,4770,4771) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4721,'zhTW','冬泉谷的梟獸','費伍德森林的特盧爾·法貝恩要你去冬泉谷獵殺10頭狂暴梟獸。',0),
 (4724,'zhTW','座狼的首領','殺死血斧座狼的領袖，哈雷肯。',0),
 (4726,'zhTW','小龍精華','將龍靈採集器900型和8份小龍精華交給燃燒平原烈焰峰的丁奇·斯迪波爾。',0),
 (4729,'zhTW','基布雷爾的特殊寵物','到黑石塔去找到小血斧座狼。使用籠子來捕捉這些兇猛的小野獸，然後把籠中的小血斧座狼交給基布雷爾。',0),
 (4734,'zhTW','冷凍龍蛋','在孵化間對著某顆龍蛋使用龍蛋冷凍器初號機。',0),
-(4735,'zhTW','收集龍蛋','將電動採集模組和8顆收集到的龍蛋交給燃燒平原烈焰峰的丁奇·斯迪波爾。',0),
+(4735,'zhTW','收集龍蛋','將電動採集模組和8顆收集到的龍蛋交給燃燒平原烈焰峰的丁奇·斯迪波爾。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4736,4737,4738,4739,4741,4742,4743,4764,4765,4766,4767,4768,4769,4770,4771,4781,4782,4783,4784,4785) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4736,'zhTW','尋找梅納拉·沃倫德','與貧瘠之地的梅納拉·沃倫德談話。',0),
 (4737,'zhTW','尋找梅納拉·沃倫德','與貧瘠之地的梅納拉·沃倫德談話。',0),
 (4738,'zhTW','尋找梅納拉·沃倫德','與貧瘠之地的梅納拉·沃倫德談話。',0),
@@ -9749,15 +9672,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4768,'zhTW','黑暗石板','將黑暗石板交給卡加斯的暗影法師薇薇安·拉格雷。',0),
 (4769,'zhTW','薇薇安·拉格雷和黑暗石板','與卡加斯的暗影法師薇薇安·拉格雷談話。',0),
 (4770,'zhTW','返家','護送波卡·捷山走出風巢，然後和白沙崗哨的莫特加·火鬃談話。',0),
-(4771,'zhTW','黎明先鋒','將黎明先鋒放在通靈學院的觀察室裡。打敗維克圖斯,然後回到貝蒂娜·比格辛克那裡去。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4781,4782,4783,4784,4785,4786,4787,4788,4801,4802,4803,4804,4805,4806,4807,4808,4809,4810,4821,4841) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4771,'zhTW','黎明先鋒','將黎明先鋒放在通靈學院的觀察室裡。打敗維克圖斯,然後回到貝蒂娜·比格辛克那裡去。',0),
 (4781,'zhTW','附魔金線血袍','將一塊金錠交給荊棘谷的希茲克·古斯提。',0),
 (4782,'zhTW','附魔金線血袍','回到貧瘠之地的梅納拉·虛無撕裂者那裡。',0),
 (4783,'zhTW','附魔金線血袍','將10瓶怨怒薩特之血和1塊次級地獄火石交給貧瘠之地的梅納拉·虛無撕裂者。',0),
 (4784,'zhTW','附魔金線血袍','將一些優質金線、2塊悶燒煤和一塊靈魂裂片交給貧瘠之地的梅納拉·虛無撕裂者。',0),
-(4785,'zhTW','優質金線',NULL,0),
+(4785,'zhTW','優質金線',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4786,4787,4788,4801,4802,4803,4804,4805,4806,4807,4808,4809,4810,4821,4841,4842,4861,4862,4863,4864) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4786,'zhTW','完成金線血袍','等待梅納拉·虛無撕裂者織好披風，然後跟她談話。',0),
 (4787,'zhTW','遠古之卵','將遠古之卵交給塔納利斯的葉基亞。',0),
 (4788,'zhTW','最後的石板','將第五塊和第六塊摩沙魯石板交給塔納利斯的勘察員鐵靴。',0),
@@ -9772,15 +9695,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4809,'zhTW','冰風奇美拉角','將8支完整的冰風奇美拉角交給菲諾克。',0),
 (4810,'zhTW','返回丁奇身邊','把菲諾克的包裹交給燃燒平原的丁奇·斯迪波爾。',0),
 (4821,'zhTW','異型卵','把異型卵交給亂風崗的哈加爾·雷蹄。',0),
-(4841,'zhTW','清除半人馬','殺掉12個加拉克斥候、10個加拉克爭吵者和6個加拉克逐風者，然後向亂風崗的峭壁衛兵圖林·長角覆命。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4842,4861,4862,4863,4864,4865,4866,4867,4881,4882,4883,4901,4902,4903,4904,4906,4907,4941,4961,4962) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4841,'zhTW','清除半人馬','殺掉12個加拉克斥候、10個加拉克爭吵者和6個加拉克逐風者，然後向亂風崗的峭壁衛兵圖林·長角覆命。',0),
 (4842,'zhTW','奇怪的源頭','根據多諾瓦·雪山的指示行動，然後回到她那裡報告。',0),
 (4861,'zhTW','被激怒的梟獸','在冬泉谷的南部尋找加隆·石矛的被破壞的營帳，以及他的補給物資。',0),
 (4862,'zhTW','蜘蛛卵','到黑石塔去為基布雷爾收集15枚尖塔蜘蛛卵。$b$b聽說那些蜘蛛周圍有許多這樣的卵。',0),
 (4863,'zhTW','被激怒的梟獸','找到加隆·石矛的馬車。',0),
-(4864,'zhTW','被激怒的梟獸','從雪地中拾起加隆的補給物資，然後尋找加隆所說偷走護符的梟獸。$b$b將加隆的補給物資和藍色羽毛護符交給冬泉谷小屋的加隆·石矛。',0),
+(4864,'zhTW','被激怒的梟獸','從雪地中拾起加隆的補給物資，然後尋找加隆所說偷走護符的梟獸。$b$b將加隆的補給物資和藍色羽毛護符交給冬泉谷小屋的加隆·石矛。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4865,4866,4867,4881,4882,4883,4901,4902,4903,4904,4906,4907,4941,4961,4962,4963,4964,4965,4966,4967) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4865,'zhTW','狂熱之蛇','向莫特加·火鬃彙報你的發現。',0),
 (4866,'zhTW','蛛后的乳汁','你可以在黑石塔的中心地帶找到煙網蛛后。與她戰鬥，讓她在你體內注入毒汁。如果你有能力的話，就殺死她吧。當你中毒之後，回到狼狽不堪的約翰那兒，他會從你的身體裡抽取這些「蛛后的乳汁」。',0),
 (4867,'zhTW','烏洛克','閱讀瓦羅什的卷軸。將瓦羅什的魔精交給他。',0),
@@ -9795,15 +9718,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4907,'zhTW','丁奇·斯迪波爾','與丁奇·斯迪波爾談話。',0),
 (4941,'zhTW','伊崔格的智慧','和奧格瑪的伊崔格談話。討論完畢後，諮詢索爾的意見。$b$b你回憶起曾在索爾的大廳中見過伊崔格。',0),
 (4961,'zhTW','奧拉赫寶珠的淨化','殺死寶珠之魔，然後與塔貝薩談話。',0),
-(4962,'zhTW','惡魔犬的靈魂','帶上惡魔犬紅寶石到淒涼之地去，用它捕獲一隻惡魔犬的靈魂。成功之後，將惡魔犬紅寶石和被禁錮的惡魔犬靈魂交給貧瘠之地的梅納拉·虛無撕裂者。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(4963,4964,4965,4966,4967,4968,4969,4970,4973,4974,4975,4976,4981,4982,4983,4985,4986,5001,5002,5023) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(4962,'zhTW','惡魔犬的靈魂','帶上惡魔犬紅寶石到淒涼之地去，用它捕獲一隻惡魔犬的靈魂。成功之後，將惡魔犬紅寶石和被禁錮的惡魔犬靈魂交給貧瘠之地的梅納拉·虛無撕裂者。',0),
 (4963,'zhTW','地獄火的靈魂','帶上地獄火綠寶石到淒涼之地去，用它捕獲一個地獄火的靈魂。成功之後，將地獄火綠寶石和被禁錮的地獄火靈魂交給貧瘠之地的梅納拉·沃倫德。',0),
 (4964,'zhTW','達奧拉赫寶珠','等待梅納拉·虛無撕裂者完成達奧拉赫寶珠，然後再與她談一談。',0),
 (4965,'zhTW','奧拉赫寶珠的知識','與貧瘠之地的梅納拉·沃倫德談話。',0),
 (4966,'zhTW','保護卡納提·灰雲','保護卡納提·灰雲免受半人馬的襲擊。',0),
-(4967,'zhTW','奧拉赫寶珠','與貧瘠之地的梅納拉·沃倫德談話。',0),
+(4967,'zhTW','奧拉赫寶珠','與貧瘠之地的梅納拉·沃倫德談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(4968,4969,4970,4973,4974,4975,4976,4981,4982,4983,4985,4986,5001,5002,5023,5041,5042,5043,5044,5045) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (4968,'zhTW','奧拉赫寶珠','與貧瘠之地的梅納拉·沃倫德談話。',0),
 (4969,'zhTW','奧拉赫寶珠','與貧瘠之地的梅納拉·沃倫德談話。',0),
 (4970,'zhTW','霜刃豹的糧食','收集5塊裂齒熊肉和5塊冰風奇美拉肉交給冬泉谷的雷沃·霜風。',0),
@@ -9818,15 +9741,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (4986,'zhTW','雕紋橡木樹枝','根據這枝雕紋橡木樹枝所附加的魔法，這個牛頭人德魯伊本來準備把它交給達納蘇斯的塞納里奧議會。到那裡去尋求某個德魯伊的幫助吧。',0),
 (5001,'zhTW','比修的裝置','找到比修的裝置並且交還給她。祝你好運!',0),
 (5002,'zhTW','給麥斯威爾的訊息','把比修的消息帶去給在燃燒平原的麥斯威爾元帥。',0),
-(5023,'zhTW','遲到總比不到好','與幽暗城的皇家監督者打聽傑雷米亞·費爾斯通的下落。通常在公會註冊處附近會有一個人口普查官。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5041,5042,5043,5044,5045,5046,5047,5048,5049,5052,5054,5055,5056,5057,5061,5062,5063,5064,5067,5068) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5023,'zhTW','遲到總比不到好','與幽暗城的皇家監督者打聽傑雷米亞·費爾斯通的下落。通常在公會註冊處附近會有一個人口普查官。',0),
 (5041,'zhTW','十字路口的補給物資','找到並把十字路口的補給木箱還給貧脊之地的索克。',0),
 (5042,'zhTW','阿迦瑪甘的力量',NULL,0),
 (5043,'zhTW','阿迦瑪甘的敏捷',NULL,0),
 (5044,'zhTW','阿迦瑪甘的智慧',NULL,0),
-(5045,'zhTW','高漲的士氣',NULL,0),
+(5045,'zhTW','高漲的士氣',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5046,5047,5048,5049,5052,5054,5055,5056,5057,5061,5062,5063,5064,5067,5068,5081,5082,5083,5084,5085) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5046,'zhTW','野豬之皮',NULL,0),
 (5047,'zhTW','芬克·恩霍爾，為您效勞!','與永望鎮的瑪雷弗斯·暗錘談話。',0),
 (5048,'zhTW','善良的艾瑪','找到暴風城的老艾瑪並弄清楚她是否就是艾瑪·菲爾斯通。如果她是,那麼她可能會想要珍妮絲·菲爾斯通為她製作的包裹.',0),
@@ -9841,15 +9764,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5063,'zhTW','血色學者之帽','為了製造血色學者之帽，你必須將下列物品交給瑪雷弗斯·暗錘:1塊比斯巨獸的皮，5根磨損的憎惡縫合線，8塊秘法水晶，5根附魔血色絲線。$b$b另外你還必須支付50金幣的製作費用。',0),
 (5064,'zhTW','偵察恐怖圖騰族','在黑雲頂找出並拿回三封秘密訊息。',0),
 (5067,'zhTW','阿卡納護腿','為了製造阿卡納護腿，你必須將下列物品交給瑪雷弗斯·暗錘:1塊比斯巨獸的皮，5根磨損的憎惡縫合線，5塊奧金錠，5份萊斯·霜語的防腐液。$b$b另外你還必須支付50金幣的製作費用。',0),
-(5068,'zhTW','血嗜胸甲','為了製造血嗜胸甲，你必須將下列物品交給瑪雷弗斯·暗錘:1塊比斯巨獸的皮，10根磨損的憎惡縫合線，5塊奧金錠，5塊暗影之皮。$b$b另外你還必須支付50金幣的製作費用。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5081,5082,5083,5084,5085,5086,5087,5088,5089,5091,5101,5102,5103,5121,5122,5123,5124,5125,5126,5127) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5068,'zhTW','血嗜胸甲','為了製造血嗜胸甲，你必須將下列物品交給瑪雷弗斯·暗錘:1塊比斯巨獸的皮，10根磨損的憎惡縫合線，5塊奧金錠，5塊暗影之皮。$b$b另外你還必須支付50金幣的製作費用。',0),
 (5081,'zhTW','麥克斯韋爾的任務','到黑石塔去消滅指揮官沃恩、歐莫克大王和維姆薩拉克主宰。完成任務之後回到麥克斯韋爾元帥處覆命。',0),
 (5082,'zhTW','冬泉熊怪的威脅','冬泉谷的多諾瓦·雪山要你去殺死8個冬泉探路者、8個冬泉巢穴守衛和8個冬泉圖騰師。',0),
 (5083,'zhTW','冬泉火水','將空的火水瓶交給冬泉谷的多諾瓦·雪山。',0),
 (5084,'zhTW','墮落熊怪','搜尋費伍德森林北部的死木熊怪的營帳，繼續尋找線索。',0),
-(5085,'zhTW','神秘的粘液','帶著你的發現回去找多諾瓦·雪山。',0),
+(5085,'zhTW','神秘的粘液','帶著你的發現回去找多諾瓦·雪山。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5086,5087,5088,5089,5091,5101,5102,5103,5121,5122,5123,5124,5125,5126,5127,5128,5141,5143,5144,5145) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5086,'zhTW','劇毒之水','為冬泉谷的多諾瓦·雪山收集3份劇毒水滴。',0),
 (5087,'zhTW','冬泉信差','找到冬泉信差，阻止他們向冬泉村運送物品。',0),
 (5088,'zhTW','阿利卡拉','殺死阿利卡拉。把她的遺體和火岩粉交給白沙崗哨的莫特加·火鬃作為證明。',0),
@@ -9864,15 +9787,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5124,'zhTW','熾熱鎧甲護手','將6塊附魔瑟銀錠、2份火焰精華和4顆紅寶石交給瑪雷弗斯·暗錘。另外你還得把未淬火的鎧甲護手也交給他。',0),
 (5125,'zhTW','奧里爾斯的清算',NULL,0),
 (5126,'zhTW','羅拉克斯的故事','與羅拉克斯談話，聽聽他說了什麼。',0),
-(5127,'zhTW','惡魔熔爐','到黑石塔去找到古拉魯克。殺死他，然後用血污長矛刺入他的屍體。當他的靈魂被吸幹後，這支矛就會成為穿魂長矛。$b$b你還必須找到未鑄造的符文覆飾胸甲。$b$b將穿魂長矛和未鑄造的符文覆飾胸甲都交給冬泉谷的羅拉克斯。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5128,5141,5143,5144,5145,5146,5147,5148,5150,5151,5153,5155,5156,5157,5158,5159,5160,5161,5162,5163) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5127,'zhTW','惡魔熔爐','到黑石塔去找到古拉魯克。殺死他，然後用血污長矛刺入他的屍體。當他的靈魂被吸幹後，這支矛就會成為穿魂長矛。$b$b你還必須找到未鑄造的符文覆飾胸甲。$b$b將穿魂長矛和未鑄造的符文覆飾胸甲都交給冬泉谷的羅拉克斯。',0),
 (5128,'zhTW','熊怪酋長的話','將潦草的日誌交給費伍德森林南部的科雷克·望天。',0),
 (5141,'zhTW','龍鱗製皮','將2套硬化蠍殼胸甲、2套硬化蠍殼手套和10片龍鱗交給艾薩拉的彼得·加林。$b$b完成這項任務之後，你就可以學到龍鱗製皮技術了。$b$b同時，你也將永遠無法學習元素製皮技術和部族製皮技術:在決定之前先考慮清楚。',0),
 (5143,'zhTW','部族製皮','將1件蠻皮外衣和1件蠻皮盔帽交給菲拉斯的凱雷希亞·獵月。$b$b完成這項任務之後，你就可以學到部族製皮技術了。$b$b同時，你也將永遠無法學習元素製皮技術和龍鱗製皮技術，在決定之前先考慮清楚。',0),
 (5144,'zhTW','元素製皮','將2個火焰之心、2個純水之球、2個大地之核和2個風之氣息交給灼熱峽谷的薩拉·坦尼。$b$b一旦你完成這項任務，就可以開始學習元素製皮技藝了。$b$b同時，你也就無法再學習龍鱗製皮和部落製皮了，在你決定之前要考慮清楚。',0),
-(5145,'zhTW','龍鱗製皮','將2套硬化蠍殼胸甲、2套硬化蠍殼手套和10片龍鱗交給荒蕪之地的索卡夫·龍眼。$b$b完成這項任務之後，你就可以學到龍鱗製皮技術了。$b$b同時，你也將永遠無法學習元素製皮技術和部族製皮技術;在決定之前先考慮清楚。',0),
+(5145,'zhTW','龍鱗製皮','將2套硬化蠍殼胸甲、2套硬化蠍殼手套和10片龍鱗交給荒蕪之地的索卡夫·龍眼。$b$b完成這項任務之後，你就可以學到龍鱗製皮技術了。$b$b同時，你也將永遠無法學習元素製皮技術和部族製皮技術;在決定之前先考慮清楚。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5146,5147,5148,5150,5151,5153,5155,5156,5157,5158,5159,5160,5161,5162,5163,5164,5165,5166,5167,5201) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5146,'zhTW','元素製皮','將2個火焰之心、2個純水之球、2個大地之核和2個風之氣息交給阿拉希山脈的布魯姆·白蹄。$b$b一旦你完成這項任務，就可以開始學習元素製皮技藝了。$b$b同時，你也就無法再學習龍鱗製皮和部落製皮了，在你決定之前要考慮清楚。',0),
 (5147,'zhTW','通緝:阿納克·恐怖圖騰','殺死阿納克·恐怖圖騰，並向亂風崗的峭壁衛兵圖林·長角出示證據。',0),
 (5148,'zhTW','部族製皮','將1件蠻皮外衣和1件蠻皮盔帽交給荊棘谷的瑟伊布。$b$b完成這項任務之後，你就可以學到部族製皮技術了。$b$b同時，你也將永遠無法學習元素製皮技術和龍鱗製皮技術，在決定之前先考慮清楚。',0),
@@ -9887,22 +9810,18 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5160,'zhTW','監護者','到冬泉谷去找到哈爾琳，把奧比的鱗片交給她。',0),
 (5161,'zhTW','藍龍軍團之怒','要是你想繼續的話，就與哈爾琳談話。',0),
 (5162,'zhTW','藍龍軍團之怒','與瘟疫之地的耶茲巴交談。他居住在安多哈爾。',0),
-(5163,'zhTW','雪怪計畫!','帶著烏米的機械雪人去嚇唬她的朋友:$b$b永望鎮的萊加奇(冬泉谷)、加基森的斯普琳科(塔納利斯)，還有馬紹爾營地的奎克希爾(安戈洛環形山)。$b$b當你完成任務之後，把機械雪人還給烏米。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5164,5165,5166,5167,5201,5202,5203,5204,5205,5207,5208,5209,5212,5213,5214,5218,5221,5224,5227,5228) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5163,'zhTW','雪怪計畫!','帶著烏米的機械雪人去嚇唬她的朋友:$b$b永望鎮的萊加奇(冬泉谷)、加基森的斯普琳科(塔納利斯)，還有馬紹爾營地的奎克希爾(安戈洛環形山)。$b$b當你完成任務之後，把機械雪人還給烏米。',0),
 (5164,'zhTW','遊蕩者目錄','閱讀遊蕩者目錄。',0),
 (5165,'zhTW','熄滅火焰','使用淨化過的月井水熄滅暗影堡內部的四座火盆的火焰，從而破除其保護效果，然後向翡翠聖地的格雷塔·苔蹄覆命。',0),
 (5166,'zhTW','炫彩巨龍胸甲','為了鑄造炫彩巨龍胸甲，你必須把以下材料交給雕刻者耶茲巴:$b$b1塊炫彩龍鱗。$b$b10塊閃亮的炫彩龍鱗。$b$b10份英雄之血。$b$b10條磨損的憎惡縫合線。',0),
 (5167,'zhTW','炫彩挑戰者腿鎧','為了鑄造炫彩挑戰者腿鎧，你必須把以下材料交給雕刻者耶茲巴:$b$b1塊炫彩龍鱗。$b$b10塊閃亮的炫彩龍鱗。$b$b10份英雄之血。$b$b5塊暗影之皮。',0),
-(5201,'zhTW','冬泉熊怪的侵擾','雷沃·霜風要你去殺死5個冬泉薩滿和5個冬泉巨熊怪。',0),
+(5201,'zhTW','冬泉熊怪的侵擾','雷沃·霜風要你去殺死5個冬泉薩滿和5個冬泉巨熊怪。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5202,5203,5204,5212,5213,5214,5218,5221,5224,5227,5228,5229,5230,5231,5232,5236,5238,5241,5242,5243) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5202,'zhTW','奇怪的紅鑰匙','搜尋加德納爾，找出血紅鑰匙的用途。',0),
 (5203,'zhTW','逃出加德納爾','護送亞科納琳到萊弗治和她的裝備所在的地方，然後保護她逃離暗影堡。之後，在費伍德森林找傑希爾·月弓，並告訴她剛才發生的事情。',0),
 (5204,'zhTW','光明的懲戒','回到加德納爾殺了魅魔拉凱雅，然後找到特雷·萊弗治的殘骸。',0),
-(5205,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5205))',0),
-(5207,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5207))',0),
-(5208,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5208))',0),
-(5209,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5209))',0),
 (5212,'zhTW','血肉不會撒謊','從斯坦索姆找回10個瘟疫肉塊，並把它們交給貝蒂娜·比格辛克。你覺得斯坦索姆中的生物都不大可能長著肉。',0),
 (5213,'zhTW','活躍的探子','到斯坦索姆去探索那裡的通靈塔。找到新的天譴軍團檔案，把它交給貝蒂娜·比格辛克。',0),
 (5214,'zhTW','弗拉斯·希亞比','找到弗拉斯·希亞比在斯坦索姆的煙草店，並從中找回一盒希亞比的煙草，把它交給煙鬼拉魯恩。',0),
@@ -9910,10 +9829,7 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5221,'zhTW','達爾松之淚的瘟疫之鍋',NULL,0),
 (5224,'zhTW','嚎哭鬼屋的瘟疫之鍋',NULL,0),
 (5227,'zhTW','蓋羅恩農場的瘟疫之鍋',NULL,0),
-(5228,'zhTW','瘟疫之鍋','與西瘟疫之地亡靈壁壘的暗影牧師范蒂絲談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5229,5230,5231,5232,5236,5238,5241,5242,5243,5244,5245,5249,5250,5251,5252,5253,5262,5263,5264,5265) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5228,'zhTW','瘟疫之鍋','與西瘟疫之地亡靈壁壘的暗影牧師范蒂絲談話。',0),
 (5229,'zhTW','目標:費爾斯通農場','到西瘟疫之地的費爾斯通農場去，找到並擊敗那裡的護鍋領主，用它的鑰匙打開瘟疫之鍋。你必須隨身攜帶費爾斯通農場的空瓶來採集瘟疫之鍋中的毒藥樣本。',0),
 (5230,'zhTW','返回亡靈壁壘','把費爾斯通農場的樣本瓶交給西瘟疫之地亡靈壁壘的暗影牧師范蒂絲。',0),
 (5231,'zhTW','目標:達爾松之淚','到西瘟疫之地的達爾松之淚去，找到並擊敗那裡的護鍋領主，用它的鑰匙打開瘟疫之鍋。你必須隨身攜帶達爾松之淚的空瓶來採集瘟疫之鍋中的毒藥樣本。',0),
@@ -9922,7 +9838,10 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5238,'zhTW','任務完成!',NULL,0),
 (5241,'zhTW','卡林叔叔','找到卡林·雷德帕斯。',0),
 (5242,'zhTW','最終一擊','殺掉米萊恩和薩莉亞，並把暗影領主費爾丹的頭顱交給費伍德森林的格雷塔·苔蹄。',0),
-(5243,'zhTW','神聖之屋','到北方的斯坦索姆去，尋找散落在城市中的補給木箱，並收集5瓶斯坦索姆聖水。當你找到足夠的聖水之後就回去向可敬的萊尼德·巴薩羅梅覆命。',0),
+(5243,'zhTW','神聖之屋','到北方的斯坦索姆去，尋找散落在城市中的補給木箱，並收集5瓶斯坦索姆聖水。當你找到足夠的聖水之後就回去向可敬的萊尼德·巴薩羅梅覆命。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5244,5245,5249,5250,5251,5252,5253,5262,5263,5264,5265,5282,5283,5284,5301,5302,5305,5306,5307,5341) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5244,'zhTW','凱斯利爾廢墟','與墜星村的加隆·石矛談話。',0),
 (5245,'zhTW','凱斯利爾的怨靈','使用加隆的鎬來尋找四塊精靈貴族聖物的碎片，把它們交給東瘟疫之地的奧蘿拉。',0),
 (5249,'zhTW','前往冬泉谷!','找到冬泉谷的墜星村，在那裡與威恩德·夜風談話。',0),
@@ -9933,20 +9852,19 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5262,'zhTW','可怕的真相','將巴納札爾的頭顱交給東瘟疫之地的尼古拉斯·瑟倫霍夫公爵。',0),
 (5263,'zhTW','超越','到斯坦索姆去殺掉瑞文戴爾男爵，把他的頭顱交給尼古拉斯·瑟倫霍夫公爵。',0),
 (5264,'zhTW','麥克斯韋爾·泰羅索斯領主','和麥克斯韋爾·泰羅索斯領主談一談。他就在教堂裡面。',0),
-(5265,'zhTW','銀色黎明寶箱','打開銀色黎明寶箱，拿取你應得的獎勵。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5282,5283,5284,5301,5302,5304,5305,5306,5307,5341,5343,5361,5381,5382,5384,5385,5386,5402,5403,5404) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5265,'zhTW','銀色黎明寶箱','打開銀色黎明寶箱，拿取你應得的獎勵。',0),
 (5282,'zhTW','永不安息的靈魂','對斯坦索姆的鬼魅居民和鬼靈居民使用伊根的衝擊器。當那些永不安息的靈魂掙脫他們的幽靈軀體時，再次使用伊根的衝擊器─他們就可以獲得自由了!$b$b解放15個永不安息的靈魂，然後回到伊根那裡去。',0),
 (5283,'zhTW','護甲鍛造師的藝術','要想成為一名護甲鑄造師的話，你必須將下列物品交給格魯努斯:4頂華麗秘銀頭盔、2雙華麗秘銀戰靴和1副華麗秘銀胸甲。',0),
 (5284,'zhTW','武器鑄造師之道','要想成為一名武器鑄造師的話，你必須將下列物品交給埃隆努斯·冷鋼:4把月鋼寬劍、4把巨型鐵斧、2把秘銀重斧和2把巨型黑錘。',0),
 (5301,'zhTW','護甲鍛造師的藝術','要想成為一名護甲鍛造師的話，你必須將下列物品交給奧克索斯:4頂華麗秘銀頭盔、2雙華麗秘銀戰靴和1副華麗秘銀胸甲。',0),
 (5302,'zhTW','武器鑄造師之道','要想成為一名武器鑄造師的話，你必須將下列物品交給伯古什:4把月鋼寬劍、4把巨型鐵斧、2把秘銀重斧和2把巨型黑錘。',0),
-(5304,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5304))',0),
 (5305,'zhTW','甜美的平靜','到斯坦索姆去殺死紅衣鑄錘師。將紅衣鑄錘師的圍裙交給莉莉絲。',0),
 (5306,'zhTW','沃許加斯的菊石','到黑石塔去殺死暗影獵手沃許加斯，將沃許加斯的菊石交給基爾拉姆。',0),
 (5307,'zhTW','腐蝕','在斯坦索姆找到黑衣守衛鑄劍師，然後殺死他。將黑色衛士徽記交給亡靈殺手瑟里爾。',0),
-(5341,'zhTW','巴羅夫家族的寶藏','到通靈學院中去取得巴羅夫家族的寶藏。這份寶藏包括四份地契:凱爾達隆地契、布瑞爾地契、塔倫米爾地契，還有南海鎮地契。完成任務之後就回到阿萊克斯·巴羅夫那兒去。',0),
+(5341,'zhTW','巴羅夫家族的寶藏','到通靈學院中去取得巴羅夫家族的寶藏。這份寶藏包括四份地契:凱爾達隆地契、布瑞爾地契、塔倫米爾地契，還有南海鎮地契。完成任務之後就回到阿萊克斯·巴羅夫那兒去。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5343,5361,5381,5382,5384,5385,5386,5402,5403,5404,5406,5407,5408,5421,5461,5462,5463,5464,5465,5466) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5343,'zhTW','巴羅夫家族的寶藏','到通靈學院中去取得巴羅夫家族的寶藏。這份寶藏包括四份地契:凱爾達隆地契、布瑞爾地契、塔倫米爾地契，還有南海鎮地契。完成任務之後就回到維爾頓·巴羅夫那兒去。',0),
 (5361,'zhTW','族譜','將峭壁衛兵圖林·長角的報告交給淒涼之地鬼旅崗哨的納塔卡·長角。',0),
 (5381,'zhTW','埃盧梭斯之手','在雷斧堡壘中找到惡魔之盒，把它和惡魔之鋤一起交給葬影村的泰迦·慧鬃。',0),
@@ -9956,10 +9874,7 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5386,'zhTW','食魚度日','與葬影村的吉納澤林談話，然後將2條血肚魚交給納塔卡·長角。',0),
 (5402,'zhTW','爪牙的天譴石',NULL,0),
 (5403,'zhTW','侵略者的天譴石',NULL,0),
-(5404,'zhTW','墮落者的天譴石',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5406,5407,5408,5421,5461,5462,5463,5464,5465,5466,5501,5506,5508,5509,5510,5511,5512,5515,5516,5518) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5404,'zhTW','墮落者的天譴石',NULL,0),
 (5406,'zhTW','墮落者的天譴石',NULL,0),
 (5407,'zhTW','侵略者的天譴石',NULL,0),
 (5408,'zhTW','爪牙的天譴石',NULL,0),
@@ -9969,24 +9884,19 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5463,'zhTW','米奈希爾的禮物','到斯坦索姆城裡去找到米奈希爾的禮物，把巫妖生前的遺物放在那塊邪惡的土地上。',0),
 (5464,'zhTW','米奈希爾的禮物','把禁錮靈魂的遺物交給東瘟疫之地的萊尼德·巴薩羅梅。',0),
 (5465,'zhTW','禁錮靈魂的遺物','回到凱爾達隆的馬杜克鎮長那裡，把禁錮靈魂的遺物交給他。',0),
-(5466,'zhTW','巫妖萊斯·霜語','在通靈學院裡找到萊斯·霜語。當你找到他之後，使用禁錮靈魂的遺物破除其不死生物的外殼。如果你成功地破除了他的不死之身，就殺掉他並拿到萊斯·霜語的頭顱。把那個頭顱交給馬杜克鎮長。',0),
+(5466,'zhTW','巫妖萊斯·霜語','在通靈學院裡找到萊斯·霜語。當你找到他之後，使用禁錮靈魂的遺物破除其不死生物的外殼。如果你成功地破除了他的不死之身，就殺掉他並拿到萊斯·霜語的頭顱。把那個頭顱交給馬杜克鎮長。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5501,5508,5509,5510,5511,5515,5518,5519,5522,5525,5526,5527,5528,5529,5531,5534,5535,5536,5561,5581) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5501,'zhTW','集骨者','從科多墓地收集10根科多獸骨，把它們交給獸人小屋的比布里·弗斯巴克。',0),
-(5506,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5506))',0),
 (5508,'zhTW','墮落者的天譴石',NULL,0),
 (5509,'zhTW','侵略者的天譴石',NULL,0),
 (5510,'zhTW','爪牙的天譴石',NULL,0),
 (5511,'zhTW','通靈學院的鑰匙',NULL,0),
-(5512,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5512))',0),
 (5515,'zhTW','卡斯迪諾夫的恐懼之袋','在通靈學院找到詹迪斯·巴羅夫並打敗她。從她的屍體上找到卡斯迪諾夫的恐懼之袋，然後將其交給艾瓦·薩克霍夫。',0),
-(5516,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5516))',0),
-(5518,'zhTW','戈多克巨魔裝','把4份符文布卷、8塊硬甲皮、2卷符文線和一份巨魔鞣酸交給諾特·希姆加克。他現在被拴在厄運之槌的戈多克巨魔那邊。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5519,5520,5522,5523,5525,5526,5527,5528,5529,5531,5534,5535,5536,5561,5581,5582,5621,5622,5623,5625) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5518,'zhTW','戈多克巨魔裝','把4份符文布卷、8塊硬甲皮、2卷符文線和一份巨魔鞣酸交給諾特·希姆加克。他現在被拴在厄運之槌的戈多克巨魔那邊。',0),
 (5519,'zhTW','戈多克巨魔裝',NULL,0),
-(5520,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5520))',0),
 (5522,'zhTW','萊尼德·巴薩羅梅','把冰凍的龍蛋交給東瘟疫之地的萊尼德·巴薩羅梅。',0),
-(5523,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(5523))',0),
 (5525,'zhTW','逃出生天!',NULL,0),
 (5526,'zhTW','魔藤裂片','在厄運之槌中找到魔藤，然後從它上面採集一塊裂片。只有幹掉了奧茲恩之後，你才能進行採集工作。使用淨化之匣安全地封印裂片，然後將其交給月光林地永夜港的拉比恩·薩圖納。',0),
 (5527,'zhTW','淨化之匣','到希利蘇斯的南風村去尋找淨化之匣。然後將其交給月光林地永夜港的拉比恩·薩圖納。',0),
@@ -9997,15 +9907,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5535,'zhTW','無法安息的靈魂','殺掉6個精靈貴族的亡魂和6個精靈貴族鬼巫，然後向艾薩拉的羅哈圖覆命。',0),
 (5536,'zhTW','充滿仇恨的土地','殺掉6個哈達爾薩特、2個哈達爾欺詐者和2個哈達爾魔僕，然後向梣谷與艾薩拉交界處的羅哈圖覆命。',0),
 (5561,'zhTW','誘捕科多獸','將科多獸誘引器和5頭被馴服的科多獸交給瑟卡布斯庫的營地中的斯米德·瑟卡布斯庫。',0),
-(5581,'zhTW','燃燒軍團的傳送門','放逐6個瑪諾洛克集會所的傳送門，然後回到葬影村的泰迦·慧鬃那裡。',0),
+(5581,'zhTW','燃燒軍團的傳送門','放逐6個瑪諾洛克集會所的傳送門，然後回到葬影村的泰迦·慧鬃那裡。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5582,5621,5622,5623,5625,5626,5627,5628,5630,5631,5632,5634,5635,5636,5637,5638,5639,5640,5641,5642) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5582,'zhTW','健康的龍鱗','把健康的龍鱗交給東瘟疫之地聖光之願禮拜堂中的貝蒂娜·比格辛克。',0),
 (5621,'zhTW','月光之衣','找到哨兵莎恩雅並使用次級治療術(等級 2)來治療她。然後對她施放真言術:韌，最後向多蘭納爾的勞爾娜·晨光覆命。',0),
 (5622,'zhTW','月神的恩賜','與泰達希爾的勞爾娜·晨光談話。',0),
 (5623,'zhTW','聖光的恩賜','與艾爾文森林的女牧師潔塞塔談話。',0),
-(5625,'zhTW','聖光之衣','找到巡山人多爾夫並使用次級治療術(等級 2)治療他。然後對他施放真言術:韌，之後回去找卡拉諾斯的馬克薩恩·安沃爾。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5626,5627,5628,5630,5631,5632,5634,5635,5636,5637,5638,5639,5640,5641,5642,5643,5645,5647,5648,5652) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5625,'zhTW','聖光之衣','找到巡山人多爾夫並使用次級治療術(等級 2)治療他。然後對他施放真言術:韌，之後回去找卡拉諾斯的馬克薩恩·安沃爾。',0),
 (5626,'zhTW','聖光的恩賜','與丹莫洛的馬克薩恩·安沃爾談話。',0),
 (5627,'zhTW','伊露恩之星',NULL,0),
 (5628,'zhTW','回家','與達納蘇斯的女祭司阿蘭希雅談話。',0),
@@ -10020,15 +9930,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5639,'zhTW','絕望禱言','與暴風城的高階牧師勞瑞娜談話。',0),
 (5640,'zhTW','絕望禱言','與暴風城的高階牧師勞瑞娜談話。',0),
 (5641,'zhTW','毫無畏懼',NULL,0),
-(5642,'zhTW','暗影守衛','與奧格瑪的烏爾庫談話。',0),
+(5642,'zhTW','暗影守衛','與奧格瑪的烏爾庫談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5643,5645,5647,5648,5652,5654,5655,5656,5657,5672,5673,5674,5675,5676,5677,5678,5680,5713,5722,5723) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5643,'zhTW','暗影守衛','與奧格瑪的烏爾庫談話。',0),
 (5645,'zhTW','毫無畏懼','與鐵爐堡的高階牧師洛漢談話。',0),
 (5647,'zhTW','毫無畏懼','與鐵爐堡的高階牧師洛漢談話。',0),
 (5648,'zhTW','靈魂之衣','找到蠻兵科雅，用次級治療術(等級 2)治療她，然後為她加上真言術:韌，最後向剃刀嶺的泰金覆命。',0),
-(5652,'zhTW','虛弱妖術',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5654,5655,5656,5657,5672,5673,5674,5675,5676,5677,5678,5680,5713,5722,5723,5724,5725,5729,5730,5741) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5652,'zhTW','虛弱妖術',NULL,0),
 (5654,'zhTW','虛弱妖術','與奧格瑪的烏爾庫談話。',0),
 (5655,'zhTW','虛弱妖術','與奧格瑪的烏爾庫談話。',0),
 (5656,'zhTW','虛弱妖術','與奧格瑪的烏爾庫談話。',0),
@@ -10043,15 +9953,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5680,'zhTW','暗影守衛',NULL,0),
 (5713,'zhTW','一擊必殺','保護哨兵阿娜莎，然後向梣谷邁斯特拉崗哨的奧奈雅報告。',0),
 (5722,'zhTW','尋找背包','在怒焰裂谷搜尋瑪爾·恐怖圖騰的屍體以及他留下的東西。',0),
-(5723,'zhTW','試探敵人','在奧格瑪找到怒焰裂谷，殺掉8個怒焰穴居人和8個怒焰薩滿，然後向雷霆崖的拉哈羅覆命。',0),
+(5723,'zhTW','試探敵人','在奧格瑪找到怒焰裂谷，殺掉8個怒焰穴居人和8個怒焰薩滿，然後向雷霆崖的拉哈羅覆命。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5724,5725,5729,5730,5741,5742,5762,5763,5801,5802,5805,5821,5841,5842,5843,5844,5847,5848,5863,5881) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5724,'zhTW','歸還背包','將恐怖圖騰背包交給雷霆崖的拉哈羅。',0),
 (5725,'zhTW','毀滅之力','此任務已經絕版。將《暗影法術研究》和《扭曲虛空的魔法》這兩本書交給幽暗城的瓦里瑪薩斯。',0),
 (5729,'zhTW','隱藏的敵人','與奧格瑪的尼爾魯·火刃談話。',0),
 (5730,'zhTW','隱藏的敵人','與奧格瑪的索爾談話，告訴他你瞭解到的東西。',0),
-(5741,'zhTW','聖光權杖','拿到聖光權杖，並將它交給艾瑟雷索高塔的阿佐爾·奧達蒙特。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5742,5762,5763,5801,5802,5805,5821,5841,5842,5843,5844,5847,5848,5863,5881,5882,5883,5884,5885,5886) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5741,'zhTW','聖光權杖','拿到聖光權杖，並將它交給艾瑟雷索高塔的阿佐爾·奧達蒙特。',0),
 (5742,'zhTW','救贖','聽聽提里恩·弗丁要說什麼。',0),
 (5762,'zhTW','小赫米特·奈辛瓦里','將克拉維爾的木箱送到荊棘谷給小赫米特·奈辛瓦里。',0),
 (5763,'zhTW','荊棘谷狩獵','將魯恩的科多獸角送到荊棘谷的小赫米特·奈辛瓦里那裡。',0),
@@ -10066,15 +9976,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5847,'zhTW','歡迎！','將喪鐘鎮禮品券交給克雷爾·韋洛。',0),
 (5848,'zhTW','愛與家庭','到瘟疫之地北部的斯坦索姆去。你可以在血色十字軍堡壘中找到「愛與家庭」這幅畫，它被隱藏在另一幅描繪兩個月亮的畫之後。$b$b把這幅畫還給提里恩·弗丁。',0),
 (5863,'zhTW','砂槌巨魔','加基森的安迪·利恩想要你攻入砂槌營地，殺死10個砂槌蠻卒、10個砂槌執行者，以及『劫毀者』格瑪洛克。',0),
-(5881,'zhTW','召回衛兵','馬格蘭希望你將信送到貧瘠之地升降梯的瑞什·長跑者手中。',0),
+(5881,'zhTW','召回衛兵','馬格蘭希望你將信送到貧瘠之地升降梯的瑞什·長跑者手中。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5882,5883,5884,5885,5886,5887,5888,5889,5890,5891,5892,5893,5902,5921,5922,5923,5924,5925,5926,5927) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5882,'zhTW','狩獵換藥膏',NULL,0),
 (5883,'zhTW','採礦換藥膏',NULL,0),
 (5884,'zhTW','採集換藥膏',NULL,0),
 (5885,'zhTW','剝皮換藥膏',NULL,0),
-(5886,'zhTW','分解換藥膏',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5887,5888,5889,5890,5891,5892,5893,5902,5921,5922,5923,5924,5925,5926,5927,5928,5929,5930,5931,5932) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5886,'zhTW','分解換藥膏',NULL,0),
 (5887,'zhTW','狩獵換藥膏',NULL,0),
 (5888,'zhTW','採礦換藥膏',NULL,0),
 (5889,'zhTW','採集換藥膏',NULL,0),
@@ -10089,15 +9999,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (5924,'zhTW','回應召喚','與達納蘇斯塞納里奧區的瑪斯雷·馭熊者談話。',0),
 (5925,'zhTW','回應召喚','與達納蘇斯塞納里奧區的瑪斯雷·馭熊者談話。',0),
 (5926,'zhTW','回應召喚','與雷霆崖長者高地上的圖拉克·符文圖騰談話。',0),
-(5927,'zhTW','回應召喚','與雷霆崖長者高地上的圖拉克·符文圖騰談話。',0),
+(5927,'zhTW','回應召喚','與雷霆崖長者高地上的圖拉克·符文圖騰談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5928,5929,5930,5931,5932,5941,5942,5943,5944,5981,6001,6002,6023,6025,6027,6028,6029,6030,6031,6032) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (5928,'zhTW','回應召喚','與雷霆崖長者高地上的圖拉克·符文圖騰談話。',0),
 (5929,'zhTW','巨熊之靈','到月光林地的西北部去尋找巨熊之靈，向它學習關於熊的知識，然後回到月光林地的永夜港去找德迪利特·星焰。',0),
 (5930,'zhTW','巨熊之靈','到月光林地的西北部去尋找巨熊之靈，向它學習關於熊的知識，然後回到月光林地的永夜港去找德迪利特·星焰。',0),
 (5931,'zhTW','返回達納蘇斯','回到達納蘇斯，與塞納里奧區的瑪斯雷·馭熊者談話。',0),
-(5932,'zhTW','回到雷霆崖','回到雷霆崖，與長者高地的圖拉克·符文圖騰談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(5941,5942,5943,5944,5981,6001,6002,6023,6025,6027,6028,6029,6030,6031,6032,6041,6061,6062,6063,6064) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5932,'zhTW','回到雷霆崖','回到雷霆崖，與長者高地的圖拉克·符文圖騰談話。',0),
 (5941,'zhTW','返回克羅米身邊','將一包聖物交給安多哈爾的克羅米。',0),
 (5942,'zhTW','隱藏的寶藏','用約瑟夫的鑰匙打開約瑟夫的箱子。',0),
 (5943,'zhTW','基澤爾頓車隊','護送基澤爾頓車隊通過瑪諾洛克集會所，然後與瑟卡布斯庫的營地的斯米德談一談，領取你的獎勵。',0),
@@ -10112,15 +10022,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6029,'zhTW','永望鎮報告','把永望鎮報告送給西瘟疫地亡靈壁壘的銀色黎明軍官加魯什。',0),
 (6030,'zhTW','尼古拉斯·瑟倫霍夫公爵','將《靈語研究》這本書交給東瘟疫之地聖光之願禮拜堂的尼古拉斯·瑟倫霍夫公爵。',0),
 (6031,'zhTW','符文布','把30塊符文布交給木喉要塞的梅羅西。',0),
-(6032,'zhTW','神聖的月布','把2塊月布交給木喉要塞的梅羅西。',0),
+(6032,'zhTW','神聖的月布','把2塊月布交給木喉要塞的梅羅西。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6041,6061,6062,6063,6064,6065,6066,6067,6068,6069,6070,6071,6072,6073,6074,6075,6076,6081,6082,6083) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6041,'zhTW','煙鬼的炸藥','到聖光之願禮拜堂西北方的病木林去。在那些有爆炸標記的建築物中對爆炸標記使用煙鬼的特殊混合物，以此來摧毀8座天譴軍團建築。煙鬼已經給通靈塔和屠宰房做上了標記。$b$b一旦你放置好炸彈，就離那些建築物遠一些，然後盡情欣賞你的傑作吧。$b$b順便說一句，煙鬼的特殊混合物相當……不穩定。',0),
 (6061,'zhTW','馴服野獸','使用馴獸棒馴服成年平原陸行鳥。練習你的技能，然後將馴獸棒還給血蹄村的雅文·刺鬃。',0),
 (6062,'zhTW','馴服野獸','使用馴獸棒馴服可怕的雜斑野豬。練習你的技能，然後將馴獸棒還給剃刀嶺的索塔爾。',0),
 (6063,'zhTW','馴服野獸','使用馴獸棒馴服樹林潛伏者。練習你的技能，然後將馴獸棒還給多蘭納爾的達札拉。',0),
-(6064,'zhTW','馴服野獸','使用馴獸棒馴服大峭壁野豬。練習你的技能，然後將馴獸棒還給卡拉諾斯的格瑞夫。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6065,6066,6067,6068,6069,6070,6071,6072,6073,6074,6075,6076,6081,6082,6083,6084,6085,6086,6087,6088) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6064,'zhTW','馴服野獸','使用馴獸棒馴服大峭壁野豬。練習你的技能，然後將馴獸棒還給卡拉諾斯的格瑞夫。',0),
 (6065,'zhTW','獵人之道','與血蹄村的雅文·刺鬃談話。',0),
 (6066,'zhTW','獵人之道','與血蹄村的雅文·刺鬃談話。',0),
 (6067,'zhTW','獵人之道','與血蹄村的雅文·刺鬃談話。',0),
@@ -10135,15 +10045,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6076,'zhTW','獵人之道','與卡拉諾斯的格瑞夫談話。',0),
 (6081,'zhTW','訓練野獸','與奧格瑪的奧瑪克談話。',0),
 (6082,'zhTW','馴服野獸','使用馴獸棒馴服硬甲蠍。練習你的技能，然後將馴獸棒還給剃刀嶺的索塔爾。',0),
-(6083,'zhTW','馴服野獸','使用馴獸棒馴服海浪蟹。練習你的技能，然後將馴獸棒還給剃刀嶺的索塔爾。',0),
+(6083,'zhTW','馴服野獸','使用馴獸棒馴服海浪蟹。練習你的技能，然後將馴獸棒還給剃刀嶺的索塔爾。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6084,6085,6086,6087,6088,6089,6101,6102,6103,6121,6122,6123,6124,6125,6126,6127,6128,6129,6130,6131) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6084,'zhTW','馴服野獸','使用馴獸棒馴服雪豹。練習你的技能，然後將馴獸棒還給卡拉諾斯的格瑞夫。',0),
 (6085,'zhTW','馴服野獸','使用馴服獸棒馴服一頭冰爪熊。練習你的技能，然後將馴獸棒還給卡拉諾斯的格瑞夫。',0),
 (6086,'zhTW','訓練野獸','與鐵爐堡的貝莉亞·雷岩談話。',0),
 (6087,'zhTW','馴服野獸','使用馴獸棒馴服一隻草原捕食者。練習你的技能，然後將馴獸棒還給血蹄村的雅文·刺鬃。',0),
-(6088,'zhTW','馴服野獸','使用馴獸棒馴服一隻猛鷲。練習你的技能，然後將馴服法杖交還給血蹄村的雅文·刺鬃。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6089,6101,6102,6103,6121,6122,6123,6124,6125,6126,6127,6128,6129,6130,6131,6132,6134,6135,6136,6142) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6088,'zhTW','馴服野獸','使用馴獸棒馴服一隻猛鷲。練習你的技能，然後將馴服法杖交還給血蹄村的雅文·刺鬃。',0),
 (6089,'zhTW','訓練野獸','與雷霆崖獵人高地的浩特·雷角談話。',0),
 (6101,'zhTW','馴服野獸','使用馴獸棒馴服一隻夜刃捕食者。練習你的技能，然後將馴獸棒還給多蘭納爾的達札拉。',0),
 (6102,'zhTW','馴服野獸','使用馴獸棒馴服一隻巨翼惡梟。練習你的技能，然後將馴獸棒還給多蘭納爾的達札拉。',0),
@@ -10158,15 +10068,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6128,'zhTW','收集解藥','收集5個地根草和5個科多獸角，把它們交給十字路口的圖加·符文圖騰，這樣他就可以製作解藥了。',0),
 (6129,'zhTW','消除疾病','對貧瘠之地北部的10隻生病的瞪羚使用動物醫療藥膏，以此來治療它們。在穿過十字路口的那條東西走向的大路北面到處都是生病的蹬羚。',0),
 (6130,'zhTW','解毒之術','回到雷霆崖長者高地的圖拉克·符文圖騰那裡。',0),
-(6131,'zhTW','木喉熊怪的盟友','格拉茲要你去殺死5個死木戰士、5個死木探路者以及5個死木園丁。',0),
+(6131,'zhTW','木喉熊怪的盟友','格拉茲要你去殺死5個死木戰士、5個死木探路者以及5個死木園丁。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6132,6134,6135,6136,6142,6143,6144,6145,6146,6147,6148,6161,6162,6163,6181,6183,6184,6185,6186,6187) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6132,'zhTW','救我出去！','護送梅麗薩，再到淒涼之地和科多獸墳場的霍恩尼茲談談。',0),
 (6134,'zhTW','幽靈電漿','把8個幽靈電漿和幽靈磁鐵箱帶給淒涼之地的霍恩尼茲。',0),
 (6135,'zhTW','暗翼蝠','找到暗翼蝠並殺掉它。從屍體上取下一塊暗翼蝠的皮，並把它交給納薩諾斯·凋零者。$b$b據說暗翼蝠遊蕩在瑪瑞斯農場北面的荒原上。',0),
 (6136,'zhTW','肥仔','找到東部瘟疫之地的北方荒原中的淤血蟲並消滅它。任務完成後回去找納薩諾斯·凋零者。',0),
-(6142,'zhTW','蚌肉魚餌','找到10塊軟殼蚌肉，把它們交給葬影村的麥拉斯。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6143,6144,6145,6146,6147,6148,6161,6162,6163,6181,6183,6184,6185,6186,6187,6241,6261,6281,6282,6283) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6142,'zhTW','蚌肉魚餌','找到10塊軟殼蚌肉，把它們交給葬影村的麥拉斯。',0),
 (6143,'zhTW','另一種魚','殺死7個滑刃侍從、7個滑刃納迦，以及5個滑刃巫女，然後與葬影村的杜澤加爾談談。',0),
 (6144,'zhTW','上級的命令','到幽暗城去與瓦里瑪薩斯談話。',0),
 (6145,'zhTW','紅衣信差','返回東瘟疫之地，找到並殺死紅衣信差，拿到大十字軍的命令。$b$b把命令交給納薩諾斯·凋零者，並等待進一步的指示。',0),
@@ -10181,15 +10091,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6184,'zhTW','弗林特·沙多摩爾','到西瘟疫之地的冰風營地去跟弗林特·沙多摩爾會面。',0),
 (6185,'zhTW','東部的瘟疫','搜尋東瘟疫之地，尋找「凋零者」的線索以及失蹤的軍情七處密探。如果你找到任何軍情七處徽記，就把它們交給冰風營地的弗林特·沙多摩爾。',0),
 (6186,'zhTW','凋零者','回到暴風城，將納薩諾斯·瑪瑞斯的下落報告給大領主伯瓦爾·弗塔根。',0),
-(6187,'zhTW','重鑄秩序','組織一支部隊，然後到東瘟疫之地去。向納薩諾斯·凋零者和任何敢於保護他的部落成員發起攻擊。$b$b你要傾盡全力，$n。部落會不惜一切代價保護他們的遊俠領主。',0),
+(6187,'zhTW','重鑄秩序','組織一支部隊，然後到東瘟疫之地去。向納薩諾斯·凋零者和任何敢於保護他的部落成員發起攻擊。$b$b你要傾盡全力，$n。部落會不惜一切代價保護他們的遊俠領主。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6241,6261,6281,6282,6283,6284,6285,6301,6365,6381,6382,6383,6384,6385,6386,6387,6388,6389,6390,6391) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6241,'zhTW','冬泉熊怪的活動','薩爾法要你去殺死6個冬泉圖騰師、6個冬泉巢穴守衛和6個冬泉探路者。',0),
 (6261,'zhTW','杜加爾·朗德瑞克','將奧斯瑞克的木箱交給獅鷲獸管理員杜加爾·朗德瑞克。',0),
 (6281,'zhTW','趕赴暴風城','從獅鷲獸管理員托爾那裡租用一頭獅鷲獸，然後把路易斯的便箋交給暴風城有限防護的奧斯瑞克·斯圖恩。',0),
 (6282,'zhTW','鷹身人的威脅','烈日石居的馬格蘭要你去殺掉7個血怒鷹身人、7個血怒伏擊者、7個血怒殺戮者和7個血怒遊蕩者。',0),
-(6283,'zhTW','血怒一族','烈日石居的馬格蘭要你去殺掉血怒撕裂者，然後把她的遺體帶回來作為證據。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6284,6285,6301,6365,6381,6382,6383,6384,6385,6386,6387,6388,6389,6390,6391,6392,6393,6401,6402,6403) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6283,'zhTW','血怒一族','烈日石居的馬格蘭要你去殺掉血怒撕裂者，然後把她的遺體帶回來作為證據。',0),
 (6284,'zhTW','貝瑟萊斯','殺掉貝瑟萊斯，然後把貝瑟萊斯的牙齒交給烈日石居的馬格蘭。',0),
 (6285,'zhTW','返回西部荒野','從獅鷲獸管理員杜加爾·朗德瑞克那裡租用一頭獅鷲獸飛到哨兵嶺，然後將奧斯瑞克的木箱交給哨兵嶺的路易斯。',0),
 (6301,'zhTW','生生不息','烈日石居的塔姆拉·荒原要你去收集10枚蓋亞之種。',0),
@@ -10204,15 +10114,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6388,'zhTW','格萊斯·瑟登','將榮譽鋤交給鐵爐堡的格萊斯·瑟登。',0),
 (6389,'zhTW','瘟疫與你','使用北山伐木場裡的鐵棍放出那裡的瘟疫白蟻，然後向西瘟疫之地冰風營地的納薩尼爾·杜馬報告。',0),
 (6390,'zhTW','瘟疫與你','使用北山伐木場裡的鐵棍放出那裡的瘟疫白蟻，然後向提里斯法林地亡靈壁壘的米克·萊文報告。',0),
-(6391,'zhTW','飛往鐵爐堡','從獅鷲獸管理員索格拉姆·伯雷森那裡租一隻獅鷲獸飛往鐵爐堡，然後將布洛克的名單交給鐵爐堡的高尼爾·石趾。',0),
+(6391,'zhTW','飛往鐵爐堡','從獅鷲獸管理員索格拉姆·伯雷森那裡租一隻獅鷲獸飛往鐵爐堡，然後將布洛克的名單交給鐵爐堡的高尼爾·石趾。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6392,6393,6401,6402,6403,6421,6441,6442,6461,6462,6481,6482,6501,6502,6503,6504,6521,6522,6523,6541) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6392,'zhTW','向布洛克回覆','從獅鷲獸管理員格萊斯·瑟登那裡租用一頭飛往塞爾薩瑪的獅鷲獸，然後將榮譽鋤交給塞爾薩瑪的布洛克·尋石者。',0),
 (6393,'zhTW','元素戰爭','將10塊焚火餘燼交給烈日石居的蘇納曼。',0),
 (6401,'zhTW','卡雅還活著','告訴烈日石居的塔姆拉·荒原這個好消息。',0),
 (6402,'zhTW','暴風城在集合','前往暴風城的城門。和侍衛洛義談談，這樣他就會讓溫德索爾元帥知道你已抵達了。',0),
-(6403,'zhTW','潛藏者','跟隨雷吉納德·溫德索爾元帥在暴風城中前進。保護他，別讓他受到傷害!',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6421,6441,6442,6461,6462,6481,6482,6501,6502,6503,6504,6521,6522,6523,6541,6542,6543,6544,6545,6546) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6403,'zhTW','潛藏者','跟隨雷吉納德·溫德索爾元帥在暴風城中前進。保護他，別讓他受到傷害!',0),
 (6421,'zhTW','滾岩峽谷','深入滾岩峽谷的洞穴中，為烈日石居的摩羅加爾取回10塊共鳴水晶以供研究。',0),
 (6441,'zhTW','薩特之角','為碎木崗哨的皮克希爾收集16隻薩特的角。',0),
 (6442,'zhTW','佐拉姆海岸的納迦','將20顆怒尾納迦的頭顱交給佐拉姆海岸的瑪魯凱。',0),
@@ -10227,15 +10137,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6521,'zhTW','邪惡的盟友','把瑪克林大使的頭顱交給幽暗城的貝拉戈·血拳。',0),
 (6522,'zhTW','邪惡的盟友','把小卷軸交給幽暗城皇家區的貝拉戈·血拳。',0),
 (6523,'zhTW','保護卡雅','護送卡雅·扁蹄回到阿帕拉耶營地，然後到石爪山東南邊界附近的瑪卡巴·扁蹄那裡去覆命。',0),
-(6541,'zhTW','向卡德拉克報到','到貧瘠之地北部的卡德拉克那裡報到。',0),
+(6541,'zhTW','向卡德拉克報到','到貧瘠之地北部的卡德拉克那裡報到。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6542,6543,6544,6545,6546,6547,6561,6562,6563,6564,6565,6566,6567,6568,6569,6570,6571,6581,6582,6583) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6542,'zhTW','向卡德拉克報到','到貧瘠之地北部的卡德拉克那裡報到。',0),
 (6543,'zhTW','戰歌報告','打開報告集，把戰歌報告交給戰歌斥候、戰歌信差和戰歌偵察騎兵。把他們的最新報告交給貧瘠之地北部哨塔上的卡德拉克。',0),
 (6544,'zhTW','托雷克的突襲','保護在銀翼哨站與杜瑞爾·月火作戰的托雷克，然後向慰籍之林的埃爾托格·怒齒彙報勝利的消息。',0),
 (6545,'zhTW','戰歌信差的報告',NULL,0),
-(6546,'zhTW','戰歌偵察騎兵的報告',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6547,6561,6562,6563,6564,6565,6566,6567,6568,6569,6570,6571,6581,6582,6583,6584,6585,6601,6602,6603) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6546,'zhTW','戰歌偵察騎兵的報告',NULL,0),
 (6547,'zhTW','戰歌斥候報告',NULL,0),
 (6561,'zhTW','黑暗深淵中的惡魔','把暮光領主克爾里斯的頭顱交給雷霆崖的巴珊娜·符文圖騰。',0),
 (6562,'zhTW','幫助耶努薩克雷','與梣谷的耶努薩克雷談話。',0),
@@ -10250,15 +10160,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6571,'zhTW','戰歌氏族的補給品','收集戰歌族的補給品:戰歌鋸刃、伐木繩、戰歌之油，還有一箱戰歌之斧。',0),
 (6581,'zhTW','戰歌鋸刃',NULL,0),
 (6582,'zhTW','龍骨試煉，斯克利爾','找到藍龍軍團的斯克利爾並殺掉他。從他的身上取下他的顱骨，然後將其交給艾博斯塔夫。$b$b你可以在冬泉谷找到斯克利爾。',0),
-(6583,'zhTW','龍骨試煉，索姆努斯','殺掉綠龍索姆努斯，把他的顱骨交給艾博斯塔夫。',0),
+(6583,'zhTW','龍骨試煉，索姆努斯','殺掉綠龍索姆努斯，把他的顱骨交給艾博斯塔夫。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6584,6585,6601,6602,6603,6604,6605,6606,6607,6608,6609,6610,6611,6612,6621,6622,6623,6625,6626,6627) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6584,'zhTW','龍骨試煉，克魯納里斯','諾茲多姆的子嗣克魯納里斯在塔納利斯沙漠守衛著時光之穴。殺了牠，把牠的顱骨交給艾博斯塔夫。',0),
 (6585,'zhTW','龍骨試煉，埃克托茲','到格瑞姆巴托去殺掉紅龍埃克托茲，把他的顱骨交給艾博斯塔夫。',0),
 (6601,'zhTW','晉升……','看來這場猜謎遊戲就要結束了。你知道米蘭達為你製作的龍形護符在黑石塔裡面無法發揮作用，也許你應該去找羅卡洛，將你的困境告訴他。把黯淡的龍火護符給他看看，也許他知道下一步該怎麼做。',0),
 (6602,'zhTW','黑龍勇士之血','到黑石塔去殺掉達基薩斯將軍，把它的血交給羅卡洛。',0),
-(6603,'zhTW','冬泉谷的麻煩!','到冬泉谷的溫泉附近尋找多諾瓦·雪山。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6604,6605,6606,6607,6608,6609,6610,6611,6612,6621,6622,6623,6625,6626,6627,6628,6641,6642,6643,6644) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6603,'zhTW','冬泉谷的麻煩!','到冬泉谷的溫泉附近尋找多諾瓦·雪山。',0),
 (6604,'zhTW','被激怒的梟獸','與墜星村的加隆·石矛談話。',0),
 (6605,'zhTW','奇怪的傢伙','與費伍德森林的溫娜·哈薩德談話。',0),
 (6606,'zhTW','一點運氣','與奧格瑪的巫醫瑪艾里談話。',0),
@@ -10273,15 +10183,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6623,'zhTW','部落醫療隊','到阿拉希高地的落錘鎮去，與格里高利·維克托醫生談一談關於加入部落外科醫療隊的事宜。',0),
 (6625,'zhTW','聯盟醫療隊','到塵泥沼澤的塞拉摩去，與古斯塔夫·范沃森醫生談一談關於加入聯盟外科醫療隊的事宜。',0),
 (6626,'zhTW','邪惡之地','殺掉8個剃刀沼澤護衛者、8個剃刀沼澤織棘者和8個亡首教徒，然後向剃刀高地入口處的麥雷姆·月歌覆命。',0),
-(6627,'zhTW','知識試煉','成功回答布勞格·幽魂的問題，然後和他再次對話。他會一直在石爪山等你回答問題。',0),
+(6627,'zhTW','知識試煉','成功回答布勞格·幽魂的問題，然後和他再次對話。他會一直在石爪山等你回答問題。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6628,6641,6642,6643,6644,6645,6646,6701,6722,6741,6761,6762,6781,6801,6804,6805,6821,6822,6823,6824) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6628,'zhTW','知識試煉','成功回答帕科瓦·芬塔拉斯的問題，然後再次和他對話。他會一直在幽暗城等你回答問題。',0),
 (6641,'zhTW','『鞭笞者』沃爾沙','在穆格拉什尋找火盆的過程中保障他的安全，幫助他熄滅火盆，然後在與納迦作戰時保護他。$b$b如果你成功了，就回到佐拉姆加前哨站去，把『鞭笞者』沃爾沙的死訊通知給戰歌傳信者。',0),
 (6642,'zhTW','兄弟會的好感 - 黑鐵礦石',NULL,0),
 (6643,'zhTW','兄弟會的好感 - 熾熱之核',NULL,0),
-(6644,'zhTW','兄弟會的好感 - 熔岩之核',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6645,6646,6701,6722,6741,6761,6762,6781,6801,6804,6805,6821,6822,6823,6824,6825,6826,6827,6844,6845) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6644,'zhTW','兄弟會的好感 - 熔岩之核',NULL,0),
 (6645,'zhTW','兄弟會的好感 - 熔核犬皮',NULL,0),
 (6646,'zhTW','兄弟會的好感 - 山脈之血',NULL,0),
 (6701,'zhTW','辛迪加徽章',NULL,0),
@@ -10296,15 +10206,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6821,'zhTW','艾博希爾之眼','將艾博希爾之眼交給艾薩拉的海達克西斯公爵。',0),
 (6822,'zhTW','熔火之心','殺死一個火焰之王、一個熔岩巨人、一個上古熔核犬和一個熔岩奔騰者，然後回到艾薩拉的海達克西斯公爵那裡。',0),
 (6823,'zhTW','海達克西斯的使者','在海達希亞水元素中達到被尊敬的聲望，然後與艾薩拉的海達克西斯公爵談話。',0),
-(6824,'zhTW','敵人之手','將魯西弗隆之手、薩弗隆之手、基赫納斯之手和沙斯拉爾之手交給艾薩拉的海達克西斯公爵。',0),
+(6824,'zhTW','敵人之手','將魯西弗隆之手、薩弗隆之手、基赫納斯之手和沙斯拉爾之手交給艾薩拉的海達克西斯公爵。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(6825,6826,6827,6844,6845,6846,6847,6848,6861,6862,6881,6901,6921,6922,6941,6942,6943,6981,6982,6985) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (6825,'zhTW','天空的召喚 - 古斯的部隊',NULL,0),
 (6826,'zhTW','天空的召喚 - 傑斯托的部隊',NULL,0),
 (6827,'zhTW','天空的召喚 - 穆維里克的部隊',NULL,0),
 (6844,'zhTW','檔案管理員阿姆伯爾','將異種蠍粘液包裹的物體交給月光林地永夜港的阿姆伯爾，他是塞納里奧議會的檔案管理員。',0),
-(6845,'zhTW','發現過去的秘密','與月光林地永夜港的拉比恩·薩圖納談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6846,6847,6848,6861,6862,6881,6901,6921,6922,6941,6942,6943,6981,6982,6985,7001,7002,7003,7026,7027) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(6845,'zhTW','發現過去的秘密','與月光林地永夜港的拉比恩·薩圖納談話。',0),
 (6846,'zhTW','展開攻擊!',NULL,0),
 (6847,'zhTW','雷爾松的全視之眼','從冰斧食人妖洞穴中找到雷爾松的全視之眼，然後回到指揮官雷爾松那裡。$b$b要當心，據說雷爾松的全視之眼帶有可怕的詛咒！',0),
 (6848,'zhTW','雷爾松的全視之眼','從冰斧食人妖洞穴中找到雷爾松的全視之眼，然後回到指揮官雷爾松那裡。$b$b要當心，據說雷爾松的全視之眼帶有可怕的詛咒！',0),
@@ -10319,15 +10229,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (6943,'zhTW','天空的召喚 - 艾克曼的空軍',NULL,0),
 (6981,'zhTW','發光的裂片','前往棘齒城尋找一個人，他能告訴你更多關於發光裂片的事。$b$b然後，將裂片送往被指示的地方。',0),
 (6982,'zhTW','冷齒礦坑補給品','把10份冷齒礦坑補給品交給丹巴達爾的聯盟軍需官。',0),
-(6985,'zhTW','深鐵礦坑補給品','把10份深鐵礦坑補給品交給霜狼要塞的部落軍需官。',0),
+(6985,'zhTW','深鐵礦坑補給品','把10份深鐵礦坑補給品交給霜狼要塞的部落軍需官。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7001,7002,7003,7026,7027,7028,7029,7041,7042,7044,7046,7064,7065,7066,7067,7068,7070,7081,7082,7101) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7001,'zhTW','補充坐騎','找到奧特蘭克山谷中的霜狼。使用霜狼口套來馴服它們。被馴服的霜狼會跟隨你回到獸欄管理員那裡，然後與獸欄管理員談話以獲得你的獎勵。',0),
 (7002,'zhTW','羊皮座具',NULL,0),
 (7003,'zhTW','被縮小的巨人','使用索爾賓的超級壓縮器來縮小菲拉斯的任意種類的巨人，將他們縮小到更容易控制的體積。從縮小過的巨人身上收集15份微縮殘渣，把它們交給菲拉斯被遺忘的海岸碼頭的索爾賓·范達瑟。',0),
 (7026,'zhTW','山羊座具',NULL,0),
-(7027,'zhTW','補充坐騎','找到奧特蘭克山谷中的山羊。使用雷矛訓練項圈來馴服它們。被馴服的山羊會跟隨你回到獸欄管理員那裡，然後與獸欄管理員談話以獲得你的獎勵。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7028,7029,7041,7042,7044,7046,7064,7065,7066,7067,7068,7070,7081,7082,7101,7102,7121,7122,7123,7124) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7027,'zhTW','補充坐騎','找到奧特蘭克山谷中的山羊。使用雷矛訓練項圈來馴服它們。被馴服的山羊會跟隨你回到獸欄管理員那裡，然後與獸欄管理員談話以獲得你的獎勵。',0),
 (7028,'zhTW','扭曲的邪惡','為淒涼之地的維洛收集15個瑟萊德絲水晶刻像。',0),
 (7029,'zhTW','維利塔恩的污染','在瑪拉頓裡用天藍水瓶在橘色水晶池中裝滿水。$b$b在維利斯塔姆藤蔓上使用裝滿水的天藍水瓶，使墮落的諾克賽恩幼體出現。$b$b治療8株植物並殺死那些諾克賽恩幼體，然後向葬影村的瓦克·戰痕覆命。',0),
 (7041,'zhTW','維利塔恩的污染','在瑪拉頓裡用天藍水瓶在橘色水晶池中裝滿水。$b$b在維利斯塔姆藤蔓上使用裝滿水的天藍水瓶，使墮落的諾克賽恩幼體出現。$b$b治療8株植物並殺死那些諾克賽恩幼體，然後向尼耶爾前哨站的塔琳德莉亞覆命。',0),
@@ -10342,15 +10252,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7070,'zhTW','裂影碎片','從瑪拉頓收集10塊裂影碎片，然後把它們交給塵泥沼澤塞拉摩島上的大法師特沃許。',0),
 (7081,'zhTW','奧特蘭克山谷的墓地','佔領一座墓地，然後向奧特蘭克山脈的諾雷格·雷矛中尉覆命。',0),
 (7082,'zhTW','奧特蘭克的墓地','佔領一座墓地，然後向奧特蘭克山脈的提卡·血牙下士覆命。',0),
-(7101,'zhTW','哨塔和碉堡','佔領敵方的某座哨塔，然後向奧特蘭克山脈的提卡·血牙下士覆命。',0),
+(7101,'zhTW','哨塔和碉堡','佔領敵方的某座哨塔，然後向奧特蘭克山脈的提卡·血牙下士覆命。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7102,7121,7122,7123,7124,7141,7142,7161,7162,7163,7164,7165,7166,7167,7168,7169,7170,7171,7172,7181) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7102,'zhTW','哨塔和碉堡','摧毀敵方的某座哨塔或者碉堡中的旗幟，然後向奧特蘭克山脈的杜爾根·雷矛覆命。',0),
 (7121,'zhTW','軍需官','與雷矛軍需官談話。',0),
 (7122,'zhTW','佔領礦坑','佔領一座還沒有被雷矛部族控制的礦坑，然後向丹巴達爾的雷矛軍需官覆命。',0),
 (7123,'zhTW','霜狼軍需官','與霜狼軍需官談話。',0),
-(7124,'zhTW','佔領礦坑','佔領一座礦坑，然後回去找奧特蘭克山脈的提卡·血牙下士。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7141,7142,7161,7162,7163,7164,7165,7166,7167,7168,7169,7170,7171,7172,7181,7201,7202,7221,7222,7223) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7124,'zhTW','佔領礦坑','佔領一座礦坑，然後回去找奧特蘭克山脈的提卡·血牙下士。',0),
 (7141,'zhTW','霜狼地圖','進入奧特蘭克山谷並擊敗部落將軍德雷克塔爾。然後，再回去找奧特蘭克山脈的勘察員塔雷·石鎬。',0),
 (7142,'zhTW','雷矛戰鬥計畫','進入奧特蘭克山谷並擊敗矮人將軍范達爾·雷矛。然後，再回去找奧特蘭克山脈的沃加·死爪。',0),
 (7161,'zhTW','試煉場','到主基地東南邊的蠻爪洞穴中去找到霜狼軍旗，然後把它交給拉格隆德。',0),
@@ -10365,15 +10275,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7170,'zhTW','贏得尊敬',NULL,0),
 (7171,'zhTW','傳說的英雄',NULL,0),
 (7172,'zhTW','命令之眼',NULL,0),
-(7181,'zhTW','科爾拉克的傳說','據說強大的冰斧食人妖領袖會隨心所欲地出現，對奧特蘭克山谷的居民造成傷害。$b$b殺掉科爾拉克，然後向拉格隆德覆命。',0),
+(7181,'zhTW','科爾拉克的傳說','據說強大的冰斧食人妖領袖會隨心所欲地出現，對奧特蘭克山谷的居民造成傷害。$b$b殺掉科爾拉克，然後向拉格隆德覆命。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7201,7202,7221,7222,7223,7224,7241,7261,7281,7282,7301,7302,7321,7341,7367,7368,7385,7386,7429,7441) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7201,'zhTW','最後的元素','到黑石深淵去取得10份元素精華。你應該在那些作戰魔像和魔像製造者身上找找，另外，薇薇安·拉格雷也提到了一些有關元素生物的話題。',0),
 (7202,'zhTW','『血怒者』科爾拉克','血怒者科爾拉克躲在冰斧洞穴的深處。據說只有在第1001個冰斧食人妖被幹掉的時候，這個強大的冰斧食人妖領袖才會出現。$b$b到冰斧洞穴中去，殺掉所有擋在你面前的食人妖，直到科爾拉克出現為止。殺掉科爾拉克，然後向哈格丁中尉覆命。',0),
 (7221,'zhTW','勘查員塔雷·石鎬','與丹巴達爾兵營的勘查員塔雷·石鎬談話。',0),
 (7222,'zhTW','沃加·死爪','與霜狼要塞裡的沃加談話。',0),
-(7223,'zhTW','護甲碎塊','給丹巴達爾的莫高特·深爐帶去20塊護甲碎塊。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7224,7241,7261,7281,7282,7301,7302,7321,7341,7367,7368,7385,7386,7429,7441,7461,7462,7463,7481,7482) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7223,'zhTW','護甲碎塊','給丹巴達爾的莫高特·深爐帶去20塊護甲碎塊。',0),
 (7224,'zhTW','敵人的物資','給霜狼村的鐵匠雷格薩帶去20塊護甲碎塊。',0),
 (7241,'zhTW','保衛霜狼氏族','到希爾斯布萊德丘陵地區的奧特蘭克山谷去。找到拉格隆德並和他談談，然後成為霜狼氏族的士兵。',0),
 (7261,'zhTW','國王的命令','到希爾斯布萊德丘陵地區的奧特蘭克山谷去。到那裡之後，和哈格丁中尉談談。$b$b為了銅鬚的榮耀!',0),
@@ -10388,15 +10298,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7385,'zhTW','聯盟之血',NULL,0),
 (7386,'zhTW','水晶簇',NULL,0),
 (7429,'zhTW','逃出生天!',NULL,0),
-(7441,'zhTW','普希林和埃斯托爾迪','到厄運之槌找小鬼普希林。你可以使用任何手段從小鬼那裡得到埃斯托爾迪的咒術之書。$b$b找到咒術之書後，回到拉瑞斯小亭的埃斯托爾迪那裡。',0),
+(7441,'zhTW','普希林和埃斯托爾迪','到厄運之槌找小鬼普希林。你可以使用任何手段從小鬼那裡得到埃斯托爾迪的咒術之書。$b$b找到咒術之書後，回到拉瑞斯小亭的埃斯托爾迪那裡。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7461,7462,7463,7481,7482,7483,7484,7485,7486,7487,7488,7489,7490,7491,7492,7493,7494,7497,7498,7499) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7461,'zhTW','伊莫塔爾的瘋狂','你必須幹掉5座水晶塔周圍的守衛，那5座水晶塔維持著關押伊莫塔爾的監獄。一旦水晶塔的能量被削弱，伊莫塔爾周圍的能量力場就會消散。$b$b進入伊莫塔爾的監獄，幹掉站在中間的那個惡魔。最後，在圖書館挑戰托塞德林王子。$b$b當任務完成之後，到庭院中去找辛德拉古靈。',0),
 (7462,'zhTW','辛德拉的寶藏','返回圖書館去找到辛德拉的寶藏。拿取你的獎勵吧！',0),
 (7463,'zhTW','久違的法師','到厄運之槌的扭木廣場去殺掉水元素海多斯博恩。把海多斯博恩精華交給圖書館的博學者萊德羅斯。',0),
 (7481,'zhTW','精靈的傳說','到厄運之槌去尋找卡里爾·溫薩魯斯。向莫沙徹營地的先知科魯拉克報告你所找到的資訊。',0),
-(7482,'zhTW','精靈的傳說','到厄運之槌去尋找卡里爾·溫薩魯斯。向羽月要塞的學者盧索恩·紋角報告你所找到的資訊。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7483,7484,7485,7486,7487,7488,7489,7490,7491,7492,7493,7494,7497,7498,7499,7500,7501,7502,7503,7504) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7482,'zhTW','精靈的傳說','到厄運之槌去尋找卡里爾·溫薩魯斯。向羽月要塞的學者盧索恩·紋角報告你所找到的資訊。',0),
 (7483,'zhTW','疾速聖典','將疾速聖典、一顆原始黑鑽石、二個大型魔光裂片和二個英雄之血交給厄運之槌中的守護者，以獲取疾速術的奧妙。',0),
 (7484,'zhTW','專注聖典','將專注聖典、一顆原始黑鑽石、四份大塊魔光裂片和二張暗影之皮交給厄運之槌的博學者萊德羅斯，以換取一份專注秘藥。',0),
 (7485,'zhTW','防護聖典','將防護聖典、一顆原始黑鑽石、二份大塊魔光裂片和一份磨損的憎惡縫合線交給厄運之槌的博學者萊德羅斯，以換取一份防護秘藥。',0),
@@ -10411,15 +10321,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7494,'zhTW','羽月要塞','和菲拉斯羽月要塞的拉托尼庫斯·月矛談話。',0),
 (7497,'zhTW','一切才剛剛開始',NULL,0),
 (7498,'zhTW','迦羅娜:潛行與詭計研究','將這本典籍交給它的主人。',0),
-(7499,'zhTW','防禦寶典','將這本典籍交給它的主人。',0),
+(7499,'zhTW','防禦寶典','將這本典籍交給它的主人。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7500,7501,7502,7503,7504,7505,7506,7507,7508,7509,7541,7562,7563,7564,7581,7582,7583,7601,7602,7603) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7500,'zhTW','秘法師的食譜','將這本典籍交給它的主人。',0),
 (7501,'zhTW','聖光之力','將這本典籍交給它的主人。',0),
 (7502,'zhTW','束縛之影','將這本典籍交給它的主人。',0),
 (7503,'zhTW','最偉大的獵手','將這本典籍交給它的主人。',0),
-(7504,'zhTW','光明不會告訴你的事情','將這本典籍交給它的主人。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7505,7506,7507,7508,7509,7541,7562,7563,7564,7581,7582,7583,7601,7602,7603,7604,7621,7622,7623,7624) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7504,'zhTW','光明不會告訴你的事情','將這本典籍交給它的主人。',0),
 (7505,'zhTW','你與冰霜震擊','將這本典籍交給它的主人。',0),
 (7506,'zhTW','翡翠夢境……','將這本典籍交給它的主人。',0),
 (7507,'zhTW','弗洛爾的屠龍技術綱要','此任務已經絕版。將《弗洛爾的屠龍技術綱要》還回圖書館。',0),
@@ -10434,15 +10344,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7583,'zhTW','壓制','在腐化之痕中找到一個末日守衛指揮官。$b$b對其使用光芒水晶監牢。你要做好承受瘋狂攻擊的準備，那個惡魔會拼命掙扎試圖逃脫。$b$b如果你成功了，就把被囚禁的末日守衛交給腐化之痕的戴奧。',0),
 (7601,'zhTW','尼比的助手','與費伍德森林的伊普斯談話。',0),
 (7602,'zhTW','無暇的惡魔精華','費伍德的伊普斯要求你從三個不同的地區收集三塊無暇的惡魔精華，然後把它們交給他。$b$b艾薩拉的雷加斯薩特、費伍德森林的加德納爾軍團士兵和詛咒之地的地獄衛士斥候分別擁有一種無暇的惡魔精華。',0),
-(7603,'zhTW','克羅蘇斯的惡魔之核','在費伍德森林的碎痕谷中搜尋克羅蘇斯的屍體。當你找到屍體後，在他身上使用魔火，並等待克羅蘇斯複生。當這個地獄火被喚醒之後，幹掉他，從他的身上拿取克羅蘇斯的惡魔之核。$b$b把克羅蘇斯的惡魔之核交給費伍德森林的尼比。',0),
+(7603,'zhTW','克羅蘇斯的惡魔之核','在費伍德森林的碎痕谷中搜尋克羅蘇斯的屍體。當你找到屍體後，在他身上使用魔火，並等待克羅蘇斯複生。當這個地獄火被喚醒之後，幹掉他，從他的身上拿取克羅蘇斯的惡魔之核。$b$b把克羅蘇斯的惡魔之核交給費伍德森林的尼比。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7604,7621,7622,7623,7624,7625,7626,7627,7628,7629,7630,7631,7632,7633,7634,7635,7636,7637,7638,7639) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7604,'zhTW','一份必須遵守的契約','如果你願意接受薩弗隆的設計圖，請將瑟銀兄弟會契約交給羅克圖斯·暗契。',0),
 (7621,'zhTW','警示',NULL,0),
 (7622,'zhTW','光與影的平衡','在總計有15個農夫被殺死之前拯救50個農夫。完成任務之後與艾瑞斯·哈文法談談。$b$b你可以通過瀏覽死亡佈告來瞭解自己拯救了多少農夫。',0),
 (7623,'zhTW','貝恩霍勒領主','從燃燒平原的戈瑟奇那裡購買暗影藥水。$b$b使用這種藥劑進入加德納爾，然後與貝恩霍勒領主談話。',0),
-(7624,'zhTW','背叛者烏拉泰克','找到並殺死烏拉泰克，然後把叛徒之心交給加德納爾的貝恩霍勒領主。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7625,7626,7627,7628,7629,7630,7631,7632,7633,7634,7635,7636,7637,7638,7639,7640,7641,7642,7643,7644) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7624,'zhTW','背叛者烏拉泰克','找到並殺死烏拉泰克，然後把叛徒之心交給加德納爾的貝恩霍勒領主。',0),
 (7625,'zhTW','克索諾斯星塵','從烏爾丹那裡購買克索諾斯星塵，把它交給燃燒平原的戈瑟奇·邪眼。',0),
 (7626,'zhTW','達斯莫拉之鈴','把2瓶暗影之力藥劑交給燃燒平原的戈瑟奇·邪眼。',0),
 (7627,'zhTW','黑暗戰車之輪','把6份大塊魔光裂片和25塊黑鐵礦石交給燃燒平原的戈瑟奇·邪眼。',0),
@@ -10457,15 +10367,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7636,'zhTW','上古守護者的手杖','你必須找到並幹掉下列4個惡魔:$b$b迷人的西蒙妮。$b$b瘋狂的克林弗蘭。$b$b『殺戮者』索倫諾爾。$b$b『毀滅使者』阿托留斯。$b$b殺掉這些惡魔，然後回到費伍德森林的古樹瓦特魯斯那裡去。$b$b根據你背包中的石化樹皮來找到它們所在位置的線索。$b$b你必須獨自完成這個任務。',0),
 (7637,'zhTW','犧牲精神','到鐵爐堡去找高階牧師洛漢，從他那裡拿到驅魔香爐。你需要捐贈150金幣來獲得它。',0),
 (7638,'zhTW','格雷森·破影者領主','與暴風城教堂區的格雷森·破影者領主談話。',0),
-(7639,'zhTW','聖騎士的審判','把驅魔香爐交給暴風城教堂區的格雷森·破影者領主。',0),
+(7639,'zhTW','聖騎士的審判','把驅魔香爐交給暴風城教堂區的格雷森·破影者領主。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7640,7641,7642,7643,7644,7645,7646,7647,7648,7649,7650,7651,7652,7653,7654,7655,7656,7657,7658,7659) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7640,'zhTW','恐懼谷的靈魂','使用驅魔香爐召喚恐懼谷中的靈魂。當你殺掉25個恐懼谷的靈魂之後，回到暴風城教堂區的格雷森·破影者領主那裡覆命。',0),
 (7641,'zhTW','格瑞曼德·艾爾默的工作','與暴風城矮人區的格瑞曼德·艾爾默談話。',0),
 (7642,'zhTW','收集材料','把40塊符文布、6塊奧金錠、10份阿薩斯之淚、5瓶斯坦索姆聖水和150枚金幣交給暴風城矮人區的格瑞曼德·艾爾默。',0),
 (7643,'zhTW','上古聖馬之魂','你需要特殊的飼料來餵養靈魂馬。南海鎮的梅麗德絲·卡爾森可以為你提供這樣的糧草。$b$b到菲拉斯的厄運之槌去，殺掉特迪斯·扭木，釋放上古聖馬之魂。用特殊的糧草餵養它，這樣可以安撫它的靈魂。最後，把奧金馬鎧交給它就可以完成祝福。',0),
-(7644,'zhTW','受祝福的奧金馬鎧','將受祝福的奧金馬鎧交給暴風城教堂區的格雷森·破影者領主。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7645,7646,7647,7648,7649,7650,7651,7652,7653,7654,7655,7656,7657,7658,7659,7660,7661,7662,7663,7664) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7644,'zhTW','受祝福的奧金馬鎧','將受祝福的奧金馬鎧交給暴風城教堂區的格雷森·破影者領主。',0),
 (7645,'zhTW','魔法糧草','把製作魔法糧草所需要的重要材料:20塊可口的魔法點心帶給希爾斯布萊德丘陵的梅麗德絲·卡爾森。據說銀色黎明會出售這種餅乾。$b$b你還需要給她50金幣來對她進行安撫。',0),
 (7646,'zhTW','預言水晶球','把一塊艾澤拉斯鑽石和一塊原始黑鑽石交給暴風城教堂區的格雷森·破影者領主。',0),
 (7647,'zhTW','審判和救贖','在通靈學院屍骨儲藏所地下室的中心使用預言水晶球。將你要審判的靈魂引領出來。將這些靈魂擊敗然後死亡騎士達克雷爾就將被召喚出來。將其擊敗然後獲得墮落戰馬的靈魂。$b$b把戰馬的救贖之魂和受祝福的奧金馬鎧一起附在達克雷爾的墮落戰馬身上。',0),
@@ -10480,15 +10390,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7656,'zhTW','君王鎧甲護胸',NULL,0),
 (7657,'zhTW','君王鎧甲頭盔',NULL,0),
 (7658,'zhTW','君王鎧甲護腿',NULL,0),
-(7659,'zhTW','君王鎧甲護肩',NULL,0),
+(7659,'zhTW','君王鎧甲護肩',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7660,7661,7662,7663,7664,7665,7666,7667,7668,7669,7670,7671,7672,7673,7674,7675,7676,7677,7678,7681) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7660,'zhTW','更換冰狼',NULL,0),
 (7661,'zhTW','更換赤狼',NULL,0),
 (7662,'zhTW','藍色科多獸',NULL,0),
 (7663,'zhTW','綠色科多獸',NULL,0),
-(7664,'zhTW','白色迅猛龍',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7665,7666,7667,7668,7669,7670,7671,7672,7673,7674,7675,7676,7677,7678,7681,7682,7701,7703,7704,7721) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7664,'zhTW','白色迅猛龍',NULL,0),
 (7665,'zhTW','紅色迅猛龍',NULL,0),
 (7666,'zhTW','重回屍骨儲藏所',NULL,0),
 (7667,'zhTW','蒐集材料','如果你願意幫助奧格瑪智慧谷的薩格尼，就將一顆艾澤拉斯鑽石和一顆原始黑鑽石交給他。',0),
@@ -10503,15 +10413,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7676,'zhTW','更換白色機械陸行鳥',NULL,0),
 (7677,'zhTW','更換白馬',NULL,0),
 (7678,'zhTW','更換褐色馬',NULL,0),
-(7681,'zhTW',NULL,'餵你的寵物，然後和你的任務給予者對話。',0),
+(7681,'zhTW',NULL,'餵你的寵物，然後和你的任務給予者對話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7682,7701,7703,7704,7721,7722,7723,7724,7725,7726,7727,7728,7729,7730,7731,7732,7733,7734,7735,7736) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7682,'zhTW',NULL,'餵你的寵物，然後和你的任務給予者對話。',0),
 (7701,'zhTW','懸賞:監督者瑪托留斯','那個叫做監督者瑪托留斯的黑鐵矮人叛徒就藏在大熔爐的熔渣之池深處。$b$b殺死監督者瑪托留斯，將他的頭顱交給灼熱峽谷的偵察隊長洛洛爾以換取你的獎勵。',0),
 (7703,'zhTW','戈多克巨魔的事務','找到戈多克力量護手，並將它交給厄運之槌的克羅卡斯。$b$b根據克羅卡斯所說的，「傳說」自稱是王子的精靈托塞德林從一名戈多克巨魔手中偷走了那件神器。',0),
 (7704,'zhTW','看看它的個頭！','將比拉凱琳的枕頭交給灼熱峽谷的艾沃奈斯。',0),
-(7721,'zhTW','壓縮器的動力','從菲拉斯被遺忘的海岸那裡的海元素和巨型海元素身上獲取10塊水元素核心，把它們交給碼頭附近的索爾賓·范達瑟。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7722,7723,7724,7725,7726,7727,7728,7729,7730,7731,7732,7733,7734,7735,7736,7737,7738,7761,7783,7784) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7721,'zhTW','壓縮器的動力','從菲拉斯被遺忘的海岸那裡的海元素和巨型海元素身上獲取10塊水元素核心，把它們交給碼頭附近的索爾賓·范達瑟。',0),
 (7722,'zhTW','絕密配方!','在大熔爐的熔渣之池中的某個地方，你可以找到監督者瑪托留斯偷走的秘密設計圖:熾熱助熔劑。找到這些設計圖，把它們還給灼熱峽谷的大鐵匠博恩奈特。',0),
 (7723,'zhTW','該死的胖手指!','漢瑟爾·重拳讓你殺掉20個重型作戰魔像。$b$b重型作戰魔像就在灼熱峽谷的大熔爐附近。當你殺死足夠多的魔像後，就回去找漢瑟爾·重拳。',0),
 (7724,'zhTW','熔岩蜘蛛的威脅!','漢瑟爾·重拳要你殺死灼熱峽谷中的20隻巨型熔岩蜘蛛。你可以在灼熱峽谷的高地和熔岩池裡找到巨型熔岩蜘蛛。$b$b當你殺死足夠的巨型熔岩蜘蛛之後，回到漢瑟爾·重拳那裡覆命。',0),
@@ -10526,15 +10436,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7733,'zhTW','更高的品質','把10塊怒痕雪人的毛皮交給菲拉斯羽月要塞的普拉特·馬克格魯比。',0),
 (7734,'zhTW','更高的品質','把10塊怒痕雪人的毛皮交給菲拉斯莫沙徹營地的杉多爾·迅蹄。',0),
 (7735,'zhTW','原始雪人毛皮','把原始雪人毛皮交給菲拉斯羽月要塞的普拉特·馬克格魯比。',0),
-(7736,'zhTW','熾熱助熔劑的補給:皇血草',NULL,0),
+(7736,'zhTW','熾熱助熔劑的補給:皇血草',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7737,7738,7761,7783,7784,7785,7786,7787,7788,7789,7795,7796,7797,7799,7800,7801,7805,7806,7810,7811) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7737,'zhTW','獲得信任',NULL,0),
 (7738,'zhTW','完美的雪人毛皮','把完美的雪人毛皮交給菲拉斯莫沙徹營地的杉多爾·迅蹄。',0),
 (7761,'zhTW','黑手的命令','真是個愚蠢的獸人。看來你需要找到那枚烙印並獲得達基薩斯徽記才可以使用命令寶珠。$b$b你從信中獲知，達基薩斯將軍守衛著烙印。也許你應該就此進行更深入的調查。',0),
 (7783,'zhTW','黑石之王','將奈法利安的頭顱交給奧格瑪的索爾。',0),
-(7784,'zhTW','黑石之王','和奧格瑪的薩魯法爾霸王談談。他在力量谷等你。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7785,7786,7787,7788,7789,7795,7796,7797,7799,7800,7801,7805,7806,7810,7811,7812,7815,7816,7818,7819) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7784,'zhTW','黑石之王','和奧格瑪的薩魯法爾霸王談談。他在力量谷等你。',0),
 (7785,'zhTW','複生之瓶','查看重生之瓶，然後回到大領主德米提恩那裡去。',0),
 (7786,'zhTW','逐風者桑德蘭','如果你想要把逐風者桑德蘭從監牢裡釋放出來，你就必須找到左右2塊逐風者禁錮之顱，10塊源質錠，以及炎魔的精華，把它們交給大領主德米提恩。',0),
 (7787,'zhTW','覺醒吧，雷霆之怒!','把風吻之刃交給大領主德米提恩。',0),
@@ -10542,22 +10452,22 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7789,'zhTW','鎮壓銀翼部隊','進入戰歌峽谷擊敗聯盟小隊，獲得一枚戰歌榮譽獎章，然後向莫爾杉營地的沙塔爾·碎顱覆命。',0),
 (7795,'zhTW','捐獻符文布',NULL,0),
 (7796,'zhTW','更多的符文布',NULL,0),
-(7797,'zhTW','空間撕裂器 - 永望鎮','$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(7797))',0),
+(7797,'zhTW','空間撕裂器 - 永望鎮',NULL,0),
 (7799,'zhTW','捐獻魔紋布',NULL,0),
 (7800,'zhTW','捐獻符文布',NULL,0),
 (7801,'zhTW','更多的符文布',NULL,0),
 (7805,'zhTW','捐獻符文布',NULL,0),
 (7806,'zhTW','更多的符文布',NULL,0),
 (7810,'zhTW','競技場大師','與荊棘競技場的小個子約翰·米斯瑞爾談話。$b$b已提供物品：$b',0),
-(7811,'zhTW','捐獻符文布',NULL,0),
+(7811,'zhTW','捐獻符文布',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7812,7815,7816,7818,7819,7820,7821,7822,7823,7824,7825,7826,7827,7828,7829,7830,7831,7832,7833,7834) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7812,'zhTW','更多的符文布',NULL,0),
 (7815,'zhTW','鉗嘴龜!','辛特蘭惡齒村的『垂釣者』卡圖姆要你去殺掉15隻海水鉗嘴龜。完成任務之後回到他那裡去覆命。',0),
 (7816,'zhTW','加莫里塔！','辛特蘭惡齒村的釣魚者卡圖姆要你去殺掉加莫里塔，並從它的屍體上找到卡圖姆的超級魚餌。$b$b卡圖姆說加莫里塔和其他海龜都在海岸附近活動。',0),
 (7818,'zhTW','捐獻符文布',NULL,0),
-(7819,'zhTW','更多的符文布',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7820,7821,7822,7823,7824,7825,7826,7827,7828,7829,7830,7831,7832,7833,7834,7835,7836,7837,7838,7839) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7819,'zhTW','更多的符文布',NULL,0),
 (7820,'zhTW','捐獻毛料',NULL,0),
 (7821,'zhTW','捐獻絲綢',NULL,0),
 (7822,'zhTW','捐獻魔紋布',NULL,0),
@@ -10572,15 +10482,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7831,'zhTW','捐獻魔紋布',NULL,0),
 (7832,'zhTW','更多的符文布',NULL,0),
 (7833,'zhTW','捐獻毛料',NULL,0),
-(7834,'zhTW','捐獻絲綢',NULL,0),
+(7834,'zhTW','捐獻絲綢',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7835,7836,7837,7838,7839,7840,7841,7842,7843,7844,7845,7846,7847,7848,7849,7850,7861,7862,7865,7868) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7835,'zhTW','捐獻魔紋布',NULL,0),
 (7836,'zhTW','捐獻符文布',NULL,0),
 (7837,'zhTW','更多的符文布',NULL,0),
 (7838,'zhTW','競技場宗師',NULL,0),
-(7839,'zhTW','邪枝竊賊','辛特蘭惡齒村的鐵匠斯拉提要你去找到斯拉提的工具。完成任務之後就回到他那裡去。$b$b你記得鐵匠斯拉提說過，你可以在辛特蘭東北部的某個邪枝食人妖神廟中找到它，要不然就是在隱匿石那邊。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7840,7841,7842,7843,7844,7845,7846,7847,7848,7849,7850,7861,7862,7865,7868,7871,7872,7873,7874,7875) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7839,'zhTW','邪枝竊賊','辛特蘭惡齒村的鐵匠斯拉提要你去找到斯拉提的工具。完成任務之後就回到他那裡去。$b$b你記得鐵匠斯拉提說過，你可以在辛特蘭東北部的某個邪枝食人妖神廟中找到它，要不然就是在隱匿石那邊。',0),
 (7840,'zhTW','拉爾德的午餐','辛特蘭惡齒村的拉爾德要求你去找到拉爾德的午餐。完成任務之後就回到他那裡去。$b$b拉爾德說他把午餐留在了北面的島上。當心邪枝食人妖。',0),
 (7841,'zhTW','給蠻錘部族的警告','辛特蘭惡齒村的奧索·莫吉克要你去殺掉15個高原前鋒、15個高原斥候、15個高原神射手和15個高原遊俠。任務完成之後回到他那裡去覆命。$b$b你可以在辛特蘭西北部的奎爾丹尼小屋找到那些高原精靈。',0),
 (7842,'zhTW','又一個給蠻錘部族的警告','辛特蘭惡齒村的奧索·莫吉克要你從辛特蘭的獅鷲獸身上收集10根細長的獅鷲獸羽毛。任務完成之後回到他那裡去覆命。$b$b在辛特蘭各處都有獅鷲獸出沒。',0),
@@ -10595,15 +10505,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7861,'zhTW','通緝：邪惡祭司海克斯和她的爪牙','你必須殺掉邪惡祭司海克斯和20名邪枝精英守衛。任務完成之後回到辛特蘭的惡齒村，向斷齒族長報告。$b$b你可以在辛特蘭的邪枝食人妖城市辛薩羅的頂部找到他們。',0),
 (7862,'zhTW','職位空缺:惡齒村衛兵隊長','你必須消滅10個邪枝狂戰士、5個邪枝暗影獵手、5個邪枝飲血者和5個邪枝噬魂者。$b$b完成任務之後向辛特蘭惡齒村的斷齒族長覆命。',0),
 (7865,'zhTW','哨兵高級護理包',NULL,0),
-(7868,'zhTW','斥候高級護理包',NULL,0),
+(7868,'zhTW','斥候高級護理包',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7871,7872,7873,7874,7875,7876,7877,7881,7882,7883,7884,7885,7889,7890,7891,7892,7893,7894,7895,7896) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7871,'zhTW','擊敗入侵者！','進入戰歌峽谷並擊敗部落小隊，取得戰歌峽谷榮譽獎章後向銀翼樹林哨兵艾蒂亞·輕歌回覆。',0),
 (7872,'zhTW','擊敗入侵者！','進入戰歌峽谷並擊敗部落小隊，取得戰歌峽谷榮譽獎章後向銀翼樹林哨兵艾蒂亞·輕歌回覆。',0),
 (7873,'zhTW','擊敗入侵者！','進入戰歌峽谷並擊敗部落小隊，取得戰歌峽谷榮譽獎章後向銀翼樹林哨兵艾蒂亞·輕歌回覆。',0),
 (7874,'zhTW','鎮壓銀翼部隊','進入戰歌峽谷擊敗聯盟小隊，獲得一枚戰歌榮譽獎章，然後向莫爾杉營地的沙塔爾·碎顱覆命。',0),
-(7875,'zhTW','鎮壓銀翼部隊','進入戰歌峽谷擊敗聯盟小隊，獲得一枚戰歌榮譽獎章，然後向莫爾杉營地的沙塔爾·碎顱覆命。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7876,7877,7881,7882,7883,7884,7885,7889,7890,7891,7892,7893,7894,7895,7896,7897,7898,7899,7900,7901) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7875,'zhTW','鎮壓銀翼部隊','進入戰歌峽谷擊敗聯盟小隊，獲得一枚戰歌榮譽獎章，然後向莫爾杉營地的沙塔爾·碎顱覆命。',0),
 (7876,'zhTW','鎮壓銀翼部隊','進入戰歌峽谷擊敗聯盟小隊，獲得一枚戰歌榮譽獎章，然後向莫爾杉營地的沙塔爾·碎顱覆命。',0),
 (7877,'zhTW','辛德拉的寶藏','返回圖書館去找到辛德拉的寶藏。拿取你的獎勵吧!',0),
 (7881,'zhTW','狂歡節長靴',NULL,0),
@@ -10618,15 +10528,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7893,'zhTW','力量儀式',NULL,0),
 (7894,'zhTW','銅質調節器',NULL,0),
 (7895,'zhTW','高速青銅齒輪',NULL,0),
-(7896,'zhTW','綠色煙火',NULL,0),
+(7896,'zhTW','綠色煙火',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7897,7898,7899,7900,7901,7902,7903,7907,7908,7926,7927,7928,7929,7930,7931,7932,7933,7934,7935,7936) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7897,'zhTW','機械修理包',NULL,0),
 (7898,'zhTW','瑟銀零件',NULL,0),
 (7899,'zhTW','毛茸茸的小爪子',NULL,0),
 (7900,'zhTW','破損的熊皮',NULL,0),
-(7901,'zhTW','柔軟的狼尾',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7902,7903,7907,7908,7926,7927,7928,7929,7930,7931,7932,7933,7934,7935,7936,7937,7938,7939,7940,7941) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7901,'zhTW','柔軟的狼尾',NULL,0),
 (7902,'zhTW','鮮豔的羽毛',NULL,0),
 (7903,'zhTW','邪惡的蝙蝠眼',NULL,0),
 (7907,'zhTW','暗月野獸套卡','當暗月馬戲團來到鎮上的時候，把野獸套卡交給他們。',0),
@@ -10641,15 +10551,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7933,'zhTW','40張獎券 - 一等暗月獎',NULL,0),
 (7934,'zhTW','50張獎券 - 暗月收藏箱',NULL,0),
 (7935,'zhTW','10張獎券 - 上個月的羊肉',NULL,0),
-(7936,'zhTW','50張獎券 - 去年的羊肉',NULL,0),
+(7936,'zhTW','50張獎券 - 去年的羊肉',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(7937,7938,7939,7940,7941,7942,7943,7944,7945,7946,7961,7962,7981,8021,8023,8026,8041,8042,8043,8044) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (7937,'zhTW','財富等著你……','到艾爾文森林的東谷伐木場去尋找你的財寶吧。',0),
 (7938,'zhTW','財富等著你……','到西部荒野的死亡礦坑中去尋找你的財寶吧。',0),
 (7939,'zhTW','更多的緻密砂輪',NULL,0),
 (7940,'zhTW','1200張獎券 - 暗月寶珠',NULL,0),
-(7941,'zhTW','更多的護甲片',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(7942,7943,7944,7945,7946,7961,7962,7981,8021,8023,8026,8041,8042,8043,8044,8045,8046,8047,8048,8049) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(7941,'zhTW','更多的護甲片',NULL,0),
 (7942,'zhTW','更多的瑟銀零件',NULL,0),
 (7943,'zhTW','更多蝙蝠眼',NULL,0),
 (7944,'zhTW','財富等著你……','到貧瘠之地的哀嚎洞穴中去尋找你的財寶吧。',0),
@@ -10664,15 +10574,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8041,'zhTW','穆賈巴之力',NULL,0),
 (8042,'zhTW','穆賈巴之力',NULL,0),
 (8043,'zhTW','穆賈巴之力',NULL,0),
-(8044,'zhTW','穆賈巴的怒火',NULL,0),
+(8044,'zhTW','穆賈巴的怒火',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8045,8046,8047,8048,8049,8050,8051,8052,8053,8054,8055,8056,8057,8058,8059,8060,8061,8062,8063,8064) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8045,'zhTW','異教徒的烙印',NULL,0),
 (8046,'zhTW','異教徒的烙印',NULL,0),
 (8047,'zhTW','異教徒的烙印',NULL,0),
 (8048,'zhTW','英雄的烙印',NULL,0),
-(8049,'zhTW','祖達薩之眼',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8050,8051,8052,8053,8054,8055,8056,8057,8058,8059,8060,8061,8062,8063,8064,8065,8066,8067,8068,8069) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8049,'zhTW','祖達薩之眼',NULL,0),
 (8050,'zhTW','祖達薩之眼',NULL,0),
 (8051,'zhTW','祖達薩之眼',NULL,0),
 (8052,'zhTW','祖達薩的全視之眼',NULL,0),
@@ -10687,15 +10597,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8061,'zhTW','權力珍寶:懺悔者裹布','把原始哈卡萊直柱交給『全知者』阿塔比姆。你還必須在贊達拉部族中達到友好或更高的聲望。$b$b『全知者』阿塔比姆在荊棘谷的尤亞姆巴島上。',0),
 (8062,'zhTW','權力珍寶:捕獵者護腕','從祖爾格拉布把以下權力珍寶帶給盲眼法希爾克:1條原始哈卡萊束腕。你還必須在贊達拉部族中達到友好或更高的聲望。$b$b盲眼法希爾克在荊棘谷的尤亞姆巴島上。',0),
 (8063,'zhTW','權力珍寶:狂妄者護腕','把原始哈卡萊護腕帶給盲眼法希爾。你還必須在贊達拉部族中達到友好或更高的聲望。$b$b盲眼法希爾在荊棘谷的尤亞姆巴島上。',0),
-(8064,'zhTW','權力珍寶:占卜師腰帶','把原始哈卡萊束帶交給祖達薩的梅維克。祖達薩的梅維克在荊棘谷的尤亞姆巴島上。你還必須在贊達拉部族中達到尊敬聲望。',0),
+(8064,'zhTW','權力珍寶:占卜師腰帶','把原始哈卡萊束帶交給祖達薩的梅維克。祖達薩的梅維克在荊棘谷的尤亞姆巴島上。你還必須在贊達拉部族中達到尊敬聲望。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8065,8066,8067,8068,8069,8070,8071,8072,8073,8074,8075,8076,8077,8078,8079,8080,8101,8102,8103,8104) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8065,'zhTW','權力珍寶:占卜師外套','把原始哈卡萊徽章帶給祖達薩的梅維克。祖達薩的梅維克在荊棘谷的尤亞姆巴島上。你還必須在贊達拉部族中達到崇敬聲望。',0),
 (8066,'zhTW','權力珍寶:捕獵者腰帶','從祖爾格拉布把以下權力珍寶帶給盲眼法希爾:1條原始哈卡萊披巾。你還必須在贊達拉部族中達到尊敬或更高的聲望。$b$b盲眼法希爾在荊棘谷的尤亞姆巴島上。',0),
 (8067,'zhTW','權力珍寶:捕獵者披肩','從祖爾格拉布把以下權力珍寶帶給盲眼法希爾:1塊原始哈卡萊聖禦盾。你還必須在贊達拉部族中達到崇敬或更高的聲望。$b$b盲眼法希爾在荊棘谷的尤亞姆巴島上。',0),
 (8068,'zhTW','權力珍寶:幻術師披肩','把原始哈卡萊披巾交給『全知者』阿塔比姆。你還必須在贊達拉部族中達到尊敬或更高的聲望。$b$b『全知者』阿塔比姆克在荊棘谷的尤亞姆巴島上。',0),
-(8069,'zhTW','權力珍寶:幻術師長袍','把原始哈卡萊套索帶給『全知者』阿塔比姆。你還必須在贊達拉部族中達到崇敬或更高的聲望。$b$b『全知者』阿塔比姆克在荊棘谷的尤亞姆巴島上。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8070,8071,8072,8073,8074,8075,8076,8077,8078,8079,8080,8101,8102,8103,8104,8105,8106,8107,8108,8109) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8069,'zhTW','權力珍寶:幻術師長袍','把原始哈卡萊套索帶給『全知者』阿塔比姆。你還必須在贊達拉部族中達到崇敬或更高的聲望。$b$b『全知者』阿塔比姆克在荊棘谷的尤亞姆巴島上。',0),
 (8070,'zhTW','權力珍寶:懺悔者束腕','把原始哈卡萊束帶交給『全知者』阿塔比姆。你還必須在贊達拉部族中達到尊敬或更高的聲望。$b$b『全知者』阿塔比姆在荊棘谷的尤亞姆巴島上。',0),
 (8071,'zhTW','權力珍寶:懺悔者披肩','把原始哈卡萊聖禦盾交給『全知者』阿塔比姆。你還必須在贊達拉部族中達到崇敬或更高的聲望。$b$b『全知者』阿塔比姆在荊棘谷的尤亞姆巴島上。',0),
 (8072,'zhTW','權力珍寶:狂妄者披肩','把原始哈卡萊束腰交給盲眼法希爾。你還必須在贊達拉部族中達到尊敬或更高的聲望。$b$b盲眼法希爾在荊棘谷的尤亞姆巴島上。',0),
@@ -10710,15 +10620,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8101,'zhTW','卡亞羅之石',NULL,0),
 (8102,'zhTW','卡亞羅之石',NULL,0),
 (8103,'zhTW','卡亞羅之石',NULL,0),
-(8104,'zhTW','卡亞羅的珠寶',NULL,0),
+(8104,'zhTW','卡亞羅的珠寶',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8105,8106,8107,8108,8109,8110,8111,8112,8113,8114,8115,8116,8117,8118,8119,8120,8121,8122,8123,8141) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8105,'zhTW','阿拉希盆地之戰!','進攻礦坑、伐木場、鐵匠鋪和農場，然後向避難谷地的奧斯萊特元帥覆命。',0),
 (8106,'zhTW','科贊的玷污',NULL,0),
 (8107,'zhTW','科贊的玷污',NULL,0),
 (8108,'zhTW','科贊的玷污',NULL,0),
-(8109,'zhTW','科贊的強力玷污',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8110,8111,8112,8113,8114,8115,8116,8117,8118,8119,8120,8121,8122,8123,8141,8142,8143,8144,8145,8146) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8109,'zhTW','科贊的強力玷污',NULL,0),
 (8110,'zhTW','附魔南海海藻',NULL,0),
 (8111,'zhTW','附魔南海海藻',NULL,0),
 (8112,'zhTW','附魔南海海藻',NULL,0),
@@ -10733,15 +10643,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8121,'zhTW','奪取四座基地','同時佔據阿拉希盆地中的4座基地，然後向落錘鎮的屠殺者杜維爾覆命。',0),
 (8122,'zhTW','奪取五座基地','同時佔據阿拉希盆地中的5座基地，然後向落錘鎮的屠殺者杜維爾覆命。',0),
 (8123,'zhTW','切斷阿拉索補給線','進入阿拉希盆地，獲得一箱阿拉希資源箱，然後將它交給落錘鎮的亡靈哨兵莫提斯。',0),
-(8141,'zhTW','贊達拉暗影墜飾',NULL,0),
+(8141,'zhTW','贊達拉暗影墜飾',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8142,8143,8144,8145,8146,8147,8148,8151,8153,8160,8161,8162,8169,8170,8171,8181,8182,8183,8184,8185) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8142,'zhTW','贊達拉暗影墜飾',NULL,0),
 (8143,'zhTW','贊達拉暗影墜飾',NULL,0),
 (8144,'zhTW','贊達拉暗影大師墜飾',NULL,0),
 (8145,'zhTW','漩渦之藤',NULL,0),
-(8146,'zhTW','漩渦之藤',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8147,8148,8151,8153,8160,8161,8162,8169,8170,8171,8181,8182,8183,8184,8185,8186,8187,8188,8189,8190) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8146,'zhTW','漩渦之藤',NULL,0),
 (8147,'zhTW','漩渦之藤',NULL,0),
 (8148,'zhTW','漩渦之怒',NULL,0),
 (8151,'zhTW','獵人符咒','跟艾薩拉的奧汀克談話。',0),
@@ -10756,15 +10666,15 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8182,'zhTW','拉斯塔哈之手','跟荊棘谷的莫托爾談話。',0),
 (8183,'zhTW','哈卡之心','把哈卡之心交給尤亞姆巴島上的莫托爾。',0),
 (8184,'zhTW','力量的證明',NULL,0),
-(8185,'zhTW','調和的徽記',NULL,0),
+(8185,'zhTW','調和的徽記',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8186,8187,8188,8189,8190,8191,8192,8193,8194,8195,8196,8201,8221,8222,8223,8224,8225,8226,8227,8228) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8186,'zhTW','死亡的擁抱',NULL,0),
 (8187,'zhTW','獵鷹的召喚',NULL,0),
 (8188,'zhTW','巫毒的警覺',NULL,0),
 (8189,'zhTW','魔法的視域',NULL,0),
-(8190,'zhTW','不祥的妖術',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8191,8192,8193,8194,8195,8196,8201,8221,8222,8223,8224,8225,8226,8227,8228,8229,8231,8232,8233,8234) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8190,'zhTW','不祥的妖術',NULL,0),
 (8191,'zhTW','預言的光環',NULL,0),
 (8192,'zhTW','靈魂的安撫',NULL,0),
 (8193,'zhTW','釣魚大師',NULL,0),
@@ -10779,18 +10689,17 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8225,'zhTW','稀有魚類 - 布隆奈爾藍斑魚',NULL,0),
 (8226,'zhTW','稀有魚類 - 灰白食屍魚',NULL,0),
 (8227,'zhTW','納特的捲尺','將納特的捲尺交給塵泥沼澤的納特·帕格。',0),
-(8228,'zhTW','能給我一張宣傳單嗎？',NULL,0),
+(8228,'zhTW','能給我一張宣傳單嗎？',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8229,8231,8232,8233,8234,8235,8236,8238,8239,8240,8241,8242,8243,8246,8481,8484,8485,8492,8493,8494) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8229,'zhTW','能給我一張宣傳單嗎？',NULL,0),
 (8231,'zhTW','獵殺碎浪多頭蛇','帶回6個碎浪多頭蛇的鱗片給艾薩拉的奧汀克。奧汀克居住在埃達拉斯廢墟東北部的懸崖頂部。',0),
 (8232,'zhTW','神廟中的綠龍','將摩弗拉斯的牙齒交給艾薩拉的奧汀克。他住在埃達拉斯廢墟東北部懸崖的頂端。',0),
 (8233,'zhTW','簡單的要求','前往拉文霍德莊園，和喬拉齊·拉文霍德領主談一談。',0),
-(8234,'zhTW','密封的藍袋子','從艾薩拉的木喉薩滿那兒取回密封的藍袋子，將它交給艾薩拉的大法師克希雷姆。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8235,8236,8237,8238,8239,8240,8241,8242,8243,8246,8481,8484,8485,8492,8493,8494,8495,8496,8497,8498) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8234,'zhTW','密封的藍袋子','從艾薩拉的木喉薩滿那兒取回密封的藍袋子，將它交給艾薩拉的大法師克希雷姆。',0),
 (8235,'zhTW','密碼碎片','將10片密碼碎片交給艾薩拉的大法師克希雷姆。',0),
 (8236,'zhTW','碧藍鑰匙','將碧藍鑰匙交給喬拉齊·拉文霍德領主。',0),
-(8237,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(8237))',0),
 (8238,'zhTW','古拉巴什、邪枝和枯木硬幣',NULL,0),
 (8239,'zhTW','沙怒、劈顱和血頂硬幣',NULL,0),
 (8240,'zhTW','贊札的寶石','將你在祖爾格拉布找到的哈卡萊寶石帶往尤亞姆巴島的贊札祭壇進行銷毀。一旦成功，跟附近的溫卡薩談談。',0),
@@ -10803,14 +10712,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8485,'zhTW','重鑄和平','帶回木喉和平契約給奧格瑪的索爾。',0),
 (8492,'zhTW','聯盟需要銅錠!','帶20個銅錠給鐵爐堡軍事區的石眉中尉。',0),
 (8493,'zhTW','聯盟需要更多銅錠!','帶20個銅錠給丹莫洛飛機場的石眉中尉。',0),
-(8494,'zhTW','聯盟需要鐵錠!','帶20個鐵錠給鐵爐堡軍事區的卡恩斯下士。',0),
+(8494,'zhTW','聯盟需要鐵錠!','帶20個鐵錠給鐵爐堡軍事區的卡恩斯下士。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8495,8496,8497,8498,8499,8500,8501,8502,8503,8504,8505,8506,8507,8508,8509,8510,8511,8512,8513,8514) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8495,'zhTW','聯盟需要更多鐵錠!','帶20個鐵錠給丹莫洛飛機場的卡恩斯下士。',0),
 (8496,'zhTW','戰場上的繃帶','將30個厚符文布繃帶，30個厚絲質繃帶和30個厚魔紋繃帶到希利蘇斯給塞納里奧城堡的喚風者傲角。你還必須將後勤任務簡報 X帶去才能完成這個任務。',0),
 (8497,'zhTW','沙漠生存包','帶4個純水之球，4個特強抗毒藥劑和4個沙漠肉丸子帶到希利蘇斯給塞納里奧城堡旅店的卡蘭德拉斯。你還必須將後勤任務簡報 I帶去才能完成這個任務。',0),
-(8498,'zhTW','暮光作戰命令','取得暮光作戰命令並將它們帶到希利蘇斯給塞納里奧城堡的指揮官瑪爾利斯。你還必須將戰術任務簡報 X帶去才能完成這個任務。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8499,8500,8501,8502,8503,8504,8505,8506,8507,8508,8509,8510,8511,8512,8513,8514,8515,8516,8517,8518) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8498,'zhTW','暮光作戰命令','取得暮光作戰命令並將它們帶到希利蘇斯給塞納里奧城堡的指揮官瑪爾利斯。你還必須將戰術任務簡報 X帶去才能完成這個任務。',0),
 (8499,'zhTW','聯盟需要瑟銀錠!','帶20個瑟銀錠給鐵爐堡軍事區的妲姆·雙辮。',0),
 (8500,'zhTW','聯盟需要更多瑟銀錠!','將20個瑟銀錠帶給丹莫洛飛機場的妲姆·雙辮。',0),
 (8501,'zhTW','目標:亞什毒蠍','殺死30隻亞什毒蠍並回到希利蘇斯向塞納里奧城堡的指揮官瑪爾利斯報告。你還必須將作戰任務簡報 XII帶去才能完成這個任務。',0),
@@ -10826,14 +10735,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8511,'zhTW','聯盟需要輕皮!','帶10張輕皮給鐵爐堡軍事區的波尼·碎石。',0),
 (8512,'zhTW','聯盟需要更多輕皮!','帶10張輕皮給丹莫洛飛機場的波尼·碎石。',0),
 (8513,'zhTW','聯盟需要中皮!','帶10張中皮給鐵爐堡軍事區的士兵波特。',0),
-(8514,'zhTW','聯盟需要更多中皮!','帶10張中皮給丹莫洛飛機場的士兵波特。',0),
+(8514,'zhTW','聯盟需要更多中皮!','帶10張中皮給丹莫洛飛機場的士兵波特。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8515,8516,8517,8518,8519,8520,8521,8522,8523,8524,8525,8526,8527,8528,8529,8530,8532,8533,8534,8535) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8515,'zhTW','聯盟需要厚皮!','帶10張厚皮給鐵爐堡軍事區的瑪塔·鋼軸。',0),
 (8516,'zhTW','聯盟需要更多厚皮!','帶10張厚皮給丹莫洛飛機場的瑪塔·鋼軸。',0),
 (8517,'zhTW','聯盟需要亞麻繃帶!','帶20個亞麻布繃帶給鐵爐堡軍事區的哨兵塞爾瓦·銀空。',0),
-(8518,'zhTW','聯盟需要更多亞麻繃帶!','帶20個亞麻布繃帶給丹莫洛飛機場的哨兵塞爾瓦·銀空。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8519,8520,8521,8522,8523,8524,8525,8526,8527,8528,8529,8530,8532,8533,8534,8535,8536,8537,8538,8539) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8518,'zhTW','聯盟需要更多亞麻繃帶!','帶20個亞麻布繃帶給丹莫洛飛機場的哨兵塞爾瓦·銀空。',0),
 (8519,'zhTW','往日的回憶','了解一切你能知道的過去，再到塔納利斯和時光之穴與安納克羅斯交談。',0),
 (8520,'zhTW','聯盟需要絲質繃帶!','帶20個絲質繃帶給鐵爐堡軍事區的護士斯通菲爾德。',0),
 (8521,'zhTW','聯盟需要更多絲質繃帶!','帶20個絲質繃帶給丹莫洛飛機場的護士斯通菲爾德。',0),
@@ -10849,14 +10758,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8532,'zhTW','部落需要銅錠!','帶20個銅錠給奧格瑪精神谷的礦工克羅威爾。',0),
 (8533,'zhTW','部落需要更多銅錠!','帶20個銅錠給杜洛塔的礦工克羅威爾。',0),
 (8534,'zhTW','佐拉蟲巢偵察報告','聯絡佐拉蟲巢的塞納里奧斥候艾澤奈爾並將佐拉蟲巢偵察報告交給塞納里奧城堡的喚風者傲角。你還必須將戰術任務簡報VI帶去才能完成這個任務。',0),
-(8535,'zhTW','蒼白聖殿騎士','想辦法召喚並殺死蒼白聖殿騎士，再向塞納里奧城堡的鮑爾·蠻鬃回報。你還必須將戰術任務簡報 IV帶去才能完成這個任務。',0),
+(8535,'zhTW','蒼白聖殿騎士','想辦法召喚並殺死蒼白聖殿騎士，再向塞納里奧城堡的鮑爾·蠻鬃回報。你還必須將戰術任務簡報 IV帶去才能完成這個任務。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8536,8537,8538,8539,8540,8541,8542,8543,8544,8545,8546,8547,8548,8549,8550,8551,8552,8553,8554,8555) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8536,'zhTW','土色聖殿騎士','想辦法召喚並殺死土色聖殿騎士，再向塞納里奧城堡的鮑爾·蠻鬃回報。你還必須將戰術任務簡報 III帶去才能完成這個任務。',0),
 (8537,'zhTW','赤紅聖殿騎士','想辦法召喚並殺死赤紅聖殿騎士，再向塞納里奧城堡的鮑爾·蠻鬃回報。你還必須將戰術任務簡報 II帶去才能完成這個任務。',0),
 (8538,'zhTW','四個公爵','設法召喚並擊殺辛德爾公爵、深淵公爵、微風公爵和裂石公爵，然後向塞納里奧城堡的指揮官瑪爾利斯覆命。你還必須隨身帶著戰術任務簡報 V才能完成這個任務。',0),
-(8539,'zhTW','目標:佐拉雌蠍','殺死30隻佐拉雌蠍並回希利蘇斯向塞納里奧城堡的指揮官瑪爾利斯回報。你還必須將作戰任務簡報 V帶去才能完成這個任務。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8540,8541,8542,8543,8544,8545,8546,8547,8548,8549,8550,8551,8552,8553,8554,8555,8556,8557,8558,8559) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8539,'zhTW','目標:佐拉雌蠍','殺死30隻佐拉雌蠍並回希利蘇斯向塞納里奧城堡的指揮官瑪爾利斯回報。你還必須將作戰任務簡報 V帶去才能完成這個任務。',0),
 (8540,'zhTW','衛兵的靴子','將3雙華麗秘銀戰靴帶到希利蘇斯給塞納里奧城堡的守衛隊長維斯·庫魯茲。你還必須將後勤任務簡報 II帶去才能完成這個任務。',0),
 (8541,'zhTW','衛兵的砂輪','將10個緻密砂輪，10個堅固的砂輪和10個重砂輪帶到希利蘇斯給塞納里奧城堡的守衛隊長維斯·庫魯茲。你還必須將後勤任務簡報 III帶去才能完成這個任務。',0),
 (8542,'zhTW','部落需要錫錠!','帶20個錫錠給奧格瑪精神谷的蠻兵瑪烏格。',0),
@@ -10872,14 +10781,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8552,'zhTW','刺著字母的束帶','將刺著字母的束帶還給他的主人。',0),
 (8553,'zhTW','船長的彎刀','與斯普羅格談話。',0),
 (8554,'zhTW','挑戰奈古拉什','將10塊燒烤禿鷲翅膀和5瓶密林葡萄酒帶到斯莫特船長的救生艇上去。$b$b然後殺死奈古拉什，將斯莫特的彎刀交給荊棘谷的斯莫特船長。',0),
-(8555,'zhTW','守護之龍',NULL,0),
+(8555,'zhTW','守護之龍',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8556,8557,8558,8559,8560,8561,8562,8563,8565,8566,8567,8568,8569,8570,8572,8573,8574,8575,8576,8577) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8556,'zhTW','不屈力量之戒','帶1枚其拉將領戒指、2個柔光塑像、5隻青銅甲蟲和5隻象牙甲蟲給希利蘇斯的喚風者耶薩德拉。你還需要在塞納里奧議會達到尊敬聲望才能完成這個任務。',0),
 (8557,'zhTW','不屈力量披氅','帶1件其拉軍用披氅、2個瑪瑙塑像、5隻銀色甲蟲和5隻白骨甲蟲給希利蘇斯的凱伊·迅爪。你還需要在塞納里奧議會達到崇敬聲望才能完成這個任務。',0),
 (8558,'zhTW','不屈力量之鐮','帶1把其拉尖刺刀柄、2個雪白塑像、5隻水晶甲蟲和5隻石甲蟲給希利蘇斯的守望者哈爾洛。你還必須在塞納里奧議會達到崇拜聲望值才能完成這個任務。',0),
-(8559,'zhTW','征服者的護脛','將其拉命令束腕、2個戰爭塑像、5隻象牙甲蟲和5隻金色甲蟲帶給安其拉的坎多斯特拉茲。此任務還需要在諾茲多姆的子嗣達到中立的聲望。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8560,8561,8562,8563,8565,8566,8567,8568,8569,8570,8572,8573,8574,8575,8576,8577,8578,8579,8580,8581) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8559,'zhTW','征服者的護脛','將其拉命令束腕、2個戰爭塑像、5隻象牙甲蟲和5隻金色甲蟲帶給安其拉的坎多斯特拉茲。此任務還需要在諾茲多姆的子嗣達到中立的聲望。',0),
 (8560,'zhTW','征服者的腿甲','將奧羅的外皮、2個死亡塑像、5隻青銅甲蟲和5隻象牙甲蟲帶給安其拉裡面的坎多斯特拉茲。你還必須在諾茲多姆的子嗣達到友好聲望值才能完成這個任務。',0),
 (8561,'zhTW','征服者之冠','將維克尼拉斯的頭環、2個太陽塑像、5隻石甲蟲和5隻水晶甲蟲帶給安其拉的安多葛斯。你還必須在諾茲多姆的子嗣達到友好聲望值才能完成此任務。',0),
 (8562,'zhTW','征服者的胸甲','將上古之神的甲殼、2個戰爭塑像、5隻銀色甲蟲和5隻白骨甲蟲帶給安其拉的溫瑟拉。你還必須在諾茲多姆的子嗣達到尊敬聲望值才能完成這個任務。',0),
@@ -10895,14 +10804,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8574,'zhTW','忠誠者的裝備','將15個塞納里奧作戰徽章，20個塞納里奧後勤徽章，17個塞納里奧戰術徽章和1枚雷姆洛斯印記帶到希利蘇斯給塞納里奧城堡的瓦古斯。你還必須在塞納里奧議會達到崇敬聲望值才能完成這個任務。',0),
 (8575,'zhTW','艾索雷葛斯的魔法賬本','將艾索雷葛斯的魔法石板帶給塔納利斯的納里安·柔想。',0),
 (8576,'zhTW','翻譯龍語',NULL,0),
-(8577,'zhTW','斯圖沃爾，曾經最好的朋友','納里安·柔想要你去找到他曾經最好的朋友，斯圖沃爾，並拿回他被偷走的水晶球護目鏡。',0),
+(8577,'zhTW','斯圖沃爾，曾經最好的朋友','納里安·柔想要你去找到他曾經最好的朋友，斯圖沃爾，並拿回他被偷走的水晶球護目鏡。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8578,8579,8580,8581,8582,8583,8584,8585,8586,8587,8588,8589,8590,8591,8592,8593,8594,8595,8596,8597) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8578,'zhTW','水晶球護目鏡?沒問題!','去熔火之心探險並找回那些護目鏡!當你取回護目鏡後再回到塔納利斯的納里安·柔想那裡。',0),
 (8579,'zhTW','人類勝利者',NULL,0),
 (8580,'zhTW','部落需要火焰花!','帶20朵火焰花給奧格瑪精神谷的蝙蝠騎士比雷凱基。',0),
-(8581,'zhTW','部落需要更多火焰花!',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8582,8583,8584,8585,8586,8587,8588,8589,8590,8591,8592,8593,8594,8595,8596,8597,8598,8599,8600,8601) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8581,'zhTW','部落需要更多火焰花!',NULL,0),
 (8582,'zhTW','部落需要紫蓮花!','帶20朵紫蓮花給奧格瑪精神谷的藥劑師耶澤爾。',0),
 (8583,'zhTW','部落需要更多紫蓮花!',NULL,0),
 (8584,'zhTW','不要過問我的工作','塔納利斯的納里安·柔想要你去和加基森的戴格·奎克里弗談談。',0),
@@ -10918,14 +10827,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8594,'zhTW','神諭者的披肩','帶回其拉命令束腕、2座重生塑像、5隻銀色甲蟲和5隻象牙甲蟲給在安其拉的安多葛斯。同時你必須在諾茲多姆的子嗣達到中立的聲望值才能完成此項任務。',0),
 (8595,'zhTW','人類勝利者',NULL,0),
 (8596,'zhTW','神諭者的裹足','將其拉命令束腕、2個死亡塑像、5個青銅甲蟲和5個金色甲蟲帶給安其拉的坎多斯特拉茲。此任務還需要在諾茲多姆的子嗣為中立的陣營。',0),
-(8597,'zhTW','龍語傻瓜教程','找到埋在南海中一個島上的納里安·柔想的書。',0),
+(8597,'zhTW','龍語傻瓜教程','找到埋在南海中一個島上的納里安·柔想的書。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8598,8599,8600,8601,8602,8603,8604,8605,8606,8607,8608,8609,8610,8611,8612,8613,8614,8615,8616,8617) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8598,'zhTW','贖金','將勒贖信件帶給塔納利斯的納里安·柔想。',0),
 (8599,'zhTW','給納里安的情歌','把米莉蒂絲的情書帶給塔納利斯的納里安·柔想。',0),
 (8600,'zhTW','部落需要硬甲皮!','帶10張硬甲皮給奧格瑪精神谷的塞拉圖斯。',0),
-(8601,'zhTW','部落需要更多硬甲皮!',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8602,8603,8604,8605,8606,8607,8608,8609,8610,8611,8612,8613,8614,8615,8616,8617,8620,8621,8622,8623) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8601,'zhTW','部落需要更多硬甲皮!',NULL,0),
 (8602,'zhTW','風暴召喚者的肩鎧','將其拉統御束腕、2個生命塑像、5隻金色甲蟲和5隻水晶甲蟲帶給安其拉的安多葛斯。你還必須在諾茲多姆的子嗣達到中立的聲望值才能完成這個任務。',0),
 (8603,'zhTW','神諭者的法衣','將上古之神的外殼、2個死亡塑像、5隻石甲蟲和5隻水晶甲蟲帶給安其拉的溫瑟拉。你還必須在諾茲多姆的子嗣達到尊敬聲望值才能完成這個任務。',0),
 (8604,'zhTW','部落需要絨線繃帶!','帶20個絨線繃帶給奧格瑪精神谷的醫者朗蘭納。',0),
@@ -10941,14 +10850,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8614,'zhTW','部落需要更多斑點黃尾魚!',NULL,0),
 (8615,'zhTW','部落需要烤鮭魚!','帶20條烤鮭魚給奧格瑪精神谷的圖拉·利爪。',0),
 (8616,'zhTW','部落需要更多烤鮭魚！',NULL,0),
-(8617,'zhTW','部落需要燒焦的核心石！','帶50個燒焦的核心石給杜洛塔的佐格將軍。',0),
+(8617,'zhTW','部落需要燒焦的核心石！','帶50個燒焦的核心石給杜洛塔的佐格將軍。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8620,8621,8622,8623,8624,8625,8626,8627,8628,8629,8630,8631,8632,8633,8634,8637,8638,8639,8640,8641) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8620,'zhTW','獨一無二的秘笈','接著復原龍語傻瓜教程書中遺漏的八章，並將它們與魔法書裝訂在一起以完成龍語傻瓜教程:第二卷，將它交給塔納利斯的納里安·柔想即可。',0),
 (8621,'zhTW','風暴召喚者的護足','將其拉統御束腕、2個先知塑像、5隻青銅甲蟲和5隻泥土甲蟲帶給安其拉的坎多斯特拉茲。你一定要在諾茲多姆的子嗣達到中立的聲望值才能完成這個任務。',0),
 (8622,'zhTW','風暴召喚者鍊衫','帶回上古之神的甲殼、2個先知塑像、5隻銀色甲蟲和5隻白骨甲蟲給安其拉的溫瑟拉。你還必須在諾茲多姆的子嗣達到尊敬聲望值才能完成這個任務。',0),
-(8623,'zhTW','風暴召喚者的王冠','將維克洛爾的王冠、2個重生塑像、5隻石甲蟲和5隻水晶甲蟲帶給安其拉的安多葛斯。你還必須在諾茲多姆的子嗣達到友好的聲望值才能完成此項任務。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8624,8625,8626,8627,8628,8629,8630,8631,8632,8633,8634,8637,8638,8639,8640,8641,8655,8656,8657,8658) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8623,'zhTW','風暴召喚者的王冠','將維克洛爾的王冠、2個重生塑像、5隻石甲蟲和5隻水晶甲蟲帶給安其拉的安多葛斯。你還必須在諾茲多姆的子嗣達到友好的聲望值才能完成此項任務。',0),
 (8624,'zhTW','風暴召喚者的護腿','將巨型沙蟲的皮、2個征戰塑像、5隻青銅甲蟲和5隻象牙甲蟲給安其拉的坎多斯特拉茲。你還必須在諾茲多姆的子嗣達到友好的聲望值才能完成此任務。',0),
 (8625,'zhTW','神秘肩墊','帶回其拉統御束腕、2個死亡塑像、5隻石甲蟲和5隻青銅甲蟲給安其拉的安多葛斯。同時你必須在諾茲多姆的子嗣達到中立的聲望值才能完成此項任務。',0),
 (8626,'zhTW','打擊者的護足','帶其拉命令束腕、2個生命塑像、5隻石甲蟲和5隻白骨甲蟲給安其拉的坎多斯特拉茲。同時你必須在諾茲多姆的子嗣達到中立的聲望值才能完成此任務。',0),
@@ -10964,14 +10873,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8638,'zhTW','死亡執行者的外衣','帶回上古之神的甲殼、2個征戰塑像、5隻青銅甲蟲和5隻象牙甲蟲給安其拉的溫瑟拉。你還必須在諾茲多姆的子嗣達到尊敬聲望值才能完成這個任務。',0),
 (8639,'zhTW','死亡執行者的頭盔','將維克洛爾的王冠、2個戰爭塑像、5隻金色甲蟲和5隻泥土甲蟲帶給安其拉的安多葛斯。你還必須在諾茲多姆的子嗣達到友好聲望值才能完成此任務。',0),
 (8640,'zhTW','死亡執行者的護腿','帶回奧羅的外皮、2個夜晚塑像、5隻石甲蟲和5隻水晶甲蟲給在安其拉的坎多斯特拉茲。你還必須在諾茲多姆的子嗣達到友好的聲望值才能完成此任務。',0),
-(8641,'zhTW','死亡執行者的肩甲','將其拉命令束腕、2個太陽塑像、5隻銀色甲蟲和5隻泥土甲蟲帶給安其拉的安多葛斯。你一定要諾茲多姆的子嗣達到中立的聲望值才能完成這個任務。',0),
+(8641,'zhTW','死亡執行者的肩甲','將其拉命令束腕、2個太陽塑像、5隻銀色甲蟲和5隻泥土甲蟲帶給安其拉的安多葛斯。你一定要諾茲多姆的子嗣達到中立的聲望值才能完成這個任務。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8655,8656,8657,8658,8659,8660,8661,8662,8663,8664,8665,8666,8667,8668,8669,8687,8689,8690,8691,8692) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8655,'zhTW','復仇者的護脛','將其拉統御束腕、2個先知塑像、5隻青銅甲蟲和5隻泥土甲蟲帶給安其拉的坎多斯特拉茲。你一定要在諾茲多姆的子嗣達到中立的聲望值才能完成這個任務。',0),
 (8656,'zhTW','打擊者鍊衫','將上古之神的甲殼、2個生命塑像、5隻金色甲蟲和5隻泥土甲蟲帶給安其拉的溫瑟拉。你還必須在諾茲多姆的子嗣達到尊敬聲望值才能完成這個任務。',0),
 (8657,'zhTW','打擊者的王冠','將維克洛爾的王冠、2個征戰塑像、5隻青銅甲蟲和5隻象牙甲蟲帶給安其拉的安多葛斯。你必需在諾茲多姆的子嗣達到友好聲望值才能完成此項任務。',0),
-(8658,'zhTW','打擊者的護腿','將巨型沙蟲的皮、2個太陽塑像、5隻銀色甲蟲和5隻白骨甲蟲帶給安其拉裡面的坎多斯特拉茲。你還必須在諾茲多姆的子嗣達到友好聲望值才能完成此項任務。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8659,8660,8661,8662,8663,8664,8665,8666,8667,8668,8669,8687,8689,8690,8691,8692,8693,8694,8695,8696) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8658,'zhTW','打擊者的護腿','將巨型沙蟲的皮、2個太陽塑像、5隻銀色甲蟲和5隻白骨甲蟲帶給安其拉裡面的坎多斯特拉茲。你還必須在諾茲多姆的子嗣達到友好聲望值才能完成此項任務。',0),
 (8659,'zhTW','打擊者的肩鎧','將其拉命令束腕、2個戰爭塑像、5隻水晶甲蟲和5隻象牙甲蟲帶給安其拉的安多葛斯。你還必須在諾茲多姆的子嗣達到中立聲望才能完成此項任務。',0),
 (8660,'zhTW','厄運召喚者的裹足','將其拉統御束腕、2個夜晚塑像、5隻泥土甲蟲和5隻象牙甲蟲帶給安其拉的坎多斯特拉茲。這個任務需要在諾茲多姆的子嗣達到中立聲望值。',0),
 (8661,'zhTW','厄運召喚者的長袍','將上古之神的外殼、2個夜晚塑像、5隻石甲蟲和5隻水晶甲蟲帶給安其拉的溫瑟拉。你還必須在諾茲多姆的子嗣達到尊敬聲望值才能完成這個任務。',0),
@@ -10987,14 +10896,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8689,'zhTW','無盡智慧罩氅','帶1件其拉軍用披氅、2個翠玉塑像、5隻金色甲蟲和5隻泥土甲蟲給希利蘇斯的凱伊·迅爪。你還需要在塞納里奧議會達到崇敬聲望值才能完成此項任務。',0),
 (8690,'zhTW','聚集風暴披風','帶1件其拉帝王披氅、2個黑曜石塑像、5隻泥土甲蟲和5隻金色甲蟲給希利蘇斯的凱伊·迅爪。同時你必須在塞納里奧議會達到崇敬聲望值才能完成這項任務。',0),
 (8691,'zhTW','魔法秘密披氅','帶1件其拉軍用披氅、2個雪白塑像、5隻石甲蟲和5隻水晶甲蟲給希利蘇斯的凱伊·迅爪。你還需要在塞納里奧議會達到崇敬聲望才能完成這個任務。',0),
-(8692,'zhTW','不滅生命披風','帶1件其拉帝王披氅、2個朱紅塑像、5隻銀色甲蟲和5隻白骨甲蟲給希利蘇斯的凱伊·迅爪。同時你必須在塞納里奧議會達到崇敬聲望值才能完成這項任務。',0),
+(8692,'zhTW','不滅生命披風','帶1件其拉帝王披氅、2個朱紅塑像、5隻銀色甲蟲和5隻白骨甲蟲給希利蘇斯的凱伊·迅爪。同時你必須在塞納里奧議會達到崇敬聲望值才能完成這項任務。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8693,8694,8695,8696,8697,8698,8699,8700,8701,8702,8703,8704,8705,8706,8707,8708,8709,8710,8711,8712) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8693,'zhTW','矇矓之影披風','帶1件其拉軍用披氅、2個碧藍塑像、5隻青銅甲蟲和5隻象牙甲蟲給希利蘇斯的凱伊·迅爪。你還需要在塞納里奧議會達到崇敬聲望才能完成這個任務。',0),
 (8694,'zhTW','禁斷邪語罩氅','帶1件其拉帝王披氅、2個琥珀塑像、5隻象牙甲蟲和5隻青銅甲蟲給希利蘇斯的凱伊·迅爪。同時你必須在塞納里奧議會達到崇敬聲望值才能完成這項任務。',0),
 (8695,'zhTW','永恆公正斗篷','帶1件其拉帝王披氅、2個黑曜石塑像、5隻金色甲蟲和5隻泥土甲蟲給希利蘇斯的凱伊·迅爪。同時你必須在塞納里奧議會達到崇敬聲望值才能完成這項任務。',0),
-(8696,'zhTW','隱秘通途披風','帶1件其拉帝王披氅、2個柔光塑像、5隻石甲蟲和5隻水晶甲蟲給希利蘇斯的凱伊·迅爪。同時你必須在塞納里奧議會達到崇敬聲望值才能完成任務。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8697,8698,8699,8700,8701,8702,8703,8704,8705,8706,8707,8708,8709,8710,8711,8712,8728,8729,8730,8731) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8696,'zhTW','隱秘通途披風','帶1件其拉帝王披氅、2個柔光塑像、5隻石甲蟲和5隻水晶甲蟲給希利蘇斯的凱伊·迅爪。同時你必須在塞納里奧議會達到崇敬聲望值才能完成任務。',0),
 (8697,'zhTW','無盡智慧之戒','帶1枚其拉典禮戒指、2個黑曜石塑像、5隻銀色甲蟲和5隻白骨甲蟲給希利蘇斯的喚風者耶薩德拉。同時你必須在塞納里奧議會達到尊敬聲望值才能完成這項任務。',0),
 (8698,'zhTW','聚集風暴之戒','帶1枚其拉將領戒指、2個朱紅塑像、5隻銀色甲蟲和5隻白骨甲蟲給希利蘇斯的喚風者耶薩德拉。同時你必須在塞納里奧議會達到尊敬聲望值才能完成這項任務。',0),
 (8699,'zhTW','魔法秘密指環','帶1枚其拉將領戒指、2個碧藍塑像、5隻金色甲蟲和5隻泥土甲蟲給希利蘇斯的喚風者耶薩德拉。同時你必須在塞納里奧議會達到尊敬聲望值才能完成這項任務。',0),
@@ -11010,14 +10919,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8709,'zhTW','矇矓之影匕首','帶1把其拉尖刺刀柄、2個朱紅塑像、5隻金色甲蟲和5隻泥土甲蟲給希利蘇斯的守望者哈爾洛。同時你必須在塞納里奧議會達到崇拜聲望值才能完成這項任務。',0),
 (8710,'zhTW','禁斷邪語短劍','帶1把其拉華麗刀柄、2個瑪瑙塑像、5隻金色甲蟲和5隻泥土甲蟲給希利蘇斯的守望者哈爾洛。同時你必須在塞納里奧議會達到崇拜聲望值才能完成這項任務。',0),
 (8711,'zhTW','永恆公正之刃','帶1把其拉尖刺刀柄、2個琥珀塑像、5隻青銅甲蟲和5隻象牙甲蟲給希利蘇斯的守望者哈爾洛。同時你必須在塞納里奧議會達到崇拜聲望值才能完成這項任務。',0),
-(8712,'zhTW','隱秘通途之鐮','帶1把其拉尖刺刀柄、2個碧藍塑像、5隻銀色甲蟲和5隻白骨甲蟲給希利蘇斯的守望者哈爾洛。同時你必須在塞納里奧議會達到崇拜聲望值才能完成這項任務。',0),
+(8712,'zhTW','隱秘通途之鐮','帶1把其拉尖刺刀柄、2個碧藍塑像、5隻銀色甲蟲和5隻白骨甲蟲給希利蘇斯的守望者哈爾洛。同時你必須在塞納里奧議會達到崇拜聲望值才能完成這項任務。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8728,8729,8730,8731,8732,8733,8734,8735,8736,8737,8738,8739,8740,8743,8745,8747,8748,8749,8750,8751) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8728,'zhTW','好消息與壞消息','塔納利斯的納里安·柔想要你帶20個奧金錠、10個源質礦石、10個艾澤拉斯鑽石和10個藍寶石給他。',0),
 (8729,'zhTW','奈普圖隆的憤怒','在艾薩拉風暴海灣一帶的大漩渦使用奧金浮標。',0),
 (8730,'zhTW','奈法利斯的腐敗','殺死奈法利安，並拿到紅色權杖裂片。把裂片交給塔納利斯時光之穴入口處的安納克羅斯。你必須在5小時之內完成這個任務。',0),
-(8731,'zhTW','戰地任務','前往雷戈蟲巢，到那裡的奧格瑪軍團哨站向克魯格·碎顱報告。準備好未簽字的戰地任務報告，取得簽過字的戰地任務報告並帶給塞納里奧城堡的喚風者卡爾東。$b$b注意:給奧格瑞瑪軍團的士兵治療或者施放增益法術會打開你的PvP標誌。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8732,8733,8734,8735,8736,8737,8738,8739,8740,8743,8745,8747,8748,8749,8750,8751,8752,8753,8754,8755) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8731,'zhTW','戰地任務','前往雷戈蟲巢，到那裡的奧格瑪軍團哨站向克魯格·碎顱報告。準備好未簽字的戰地任務報告，取得簽過字的戰地任務報告並帶給塞納里奧城堡的喚風者卡爾東。$b$b注意:給奧格瑞瑪軍團的士兵治療或者施放增益法術會打開你的PvP標誌。',0),
 (8732,'zhTW','戰地任務報告',NULL,0),
 (8733,'zhTW','伊蘭尼庫斯，夢境暴君','到泰達希爾去找瑪法里恩的代理人，大約在達納蘇斯牆外某處。',0),
 (8734,'zhTW','泰蘭妲與雷姆洛斯','去月光林地和守護者雷姆洛斯談談。',0),
@@ -11033,14 +10942,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8748,'zhTW','保衛者之路',NULL,0),
 (8749,'zhTW','保衛者之路',NULL,0),
 (8750,'zhTW','保衛者之路',NULL,0),
-(8751,'zhTW','卡林多的保衛者',NULL,0),
+(8751,'zhTW','卡林多的保衛者',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8752,8753,8754,8755,8756,8757,8758,8759,8760,8761,8763,8764,8765,8766,8770,8771,8772,8773,8774,8775) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8752,'zhTW','征服者之路',NULL,0),
 (8753,'zhTW','征服者之路',NULL,0),
 (8754,'zhTW','征服者之路',NULL,0),
-(8755,'zhTW','征服者之路',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8756,8757,8758,8759,8760,8761,8763,8764,8765,8766,8770,8771,8772,8773,8774,8775,8776,8777,8778,8779) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8755,'zhTW','征服者之路',NULL,0),
 (8756,'zhTW','其拉蟲人的征服者',NULL,0),
 (8757,'zhTW','塑能師之道',NULL,0),
 (8758,'zhTW','塑能師之道',NULL,0),
@@ -11056,14 +10965,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8772,'zhTW','目標:佐拉守衛','殺死30隻佐拉守衛再到希利蘇斯的塞納里奧城堡向指揮官瑪爾利斯回報。你還必須將作戰任務簡報  VI帶去才能完成這個任務。',0),
 (8773,'zhTW','目標:佐拉搶奪者','殺死30隻佐拉搶奪者再到希利蘇斯的塞納里奧城堡向指揮官瑪爾利斯回報。你還必須將作戰任務簡報 IV帶去才能完成這個任務。',0),
 (8774,'zhTW','目標:雷戈伏擊者','殺死30隻雷戈伏擊者再到希利蘇斯的塞納里奧城堡向指揮官瑪爾利斯回報。你還必須將作戰任務簡報 VIII帶去才能完成這個任務。',0),
-(8775,'zhTW','目標:雷戈噴火者','殺死30隻雷戈噴火者再到希利蘇斯的塞納里奧城堡向指揮官瑪爾利斯回報。你還必須將作戰任務簡報  IX帶去才能完成這個任務。',0),
+(8775,'zhTW','目標:雷戈噴火者','殺死30隻雷戈噴火者再到希利蘇斯的塞納里奧城堡向指揮官瑪爾利斯回報。你還必須將作戰任務簡報  IX帶去才能完成這個任務。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8776,8777,8778,8779,8780,8781,8782,8783,8784,8785,8786,8787,8789,8790,8791,8792,8793,8794,8795,8796) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8776,'zhTW','目標:雷戈制奴者','殺死30隻雷戈制奴者再到希利蘇斯的塞納里奧城堡向指揮官瑪爾利斯回報。你還必須將作戰任務簡報  X帶去才能完成這個任務。',0),
 (8777,'zhTW','目標:雷戈掘洞者','殺死30隻雷戈掘洞者再到希利蘇斯的塞納里奧城堡向指揮官瑪爾利斯回報。你還必須將作戰任務簡報  XI帶去才能完成這個任務。',0),
 (8778,'zhTW','鐵爐堡軍旅需要爆裂物!','把6瓶獻祭之油、5瓶哥布林火箭燃油和10份緻密火藥粉交給希利蘇斯地區的佐拉蟲巢附近的秘術師諾斯賓。你還必須帶著後勤任務簡報 IV才能完成這個任務。',0),
-(8779,'zhTW','研究材料','將一個大塊魔光裂片，一個大塊強光裂片和一個巨型綠寶石帶到希利蘇斯給塞納里奧城堡的地理學家拉克斯班。你還必須將後勤任務簡報 V帶去才能完成這個任務。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8780,8781,8782,8783,8784,8785,8786,8787,8789,8790,8791,8792,8793,8794,8795,8796,8797,8798,8800,8801) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8779,'zhTW','研究材料','將一個大塊魔光裂片，一個大塊強光裂片和一個巨型綠寶石帶到希利蘇斯給塞納里奧城堡的地理學家拉克斯班。你還必須將後勤任務簡報 V帶去才能完成這個任務。',0),
 (8780,'zhTW','戰場上的護甲片','將8塊毛皮護甲片和8塊重型護甲片交給佐拉蟲巢附近的珍妮拉·鋼錘。你還必須將後勤任務簡報 VII帶去才能完成這個任務。',0),
 (8781,'zhTW','戰場上的武器','將2把月鋼寬劍帶到佐拉蟲巢外的鐵爐堡軍旅前哨給珍妮拉·鋼錘。你還必須將後勤任務簡報 VI帶去才能完成這個任務。',0),
 (8782,'zhTW','制服供應','把1塊月布、2卷符文布卷和1份鐵網蛛絲交給喚風者傲角。你還必須將後勤任務簡報 VIII帶去才能完成這個任務。',0),
@@ -11079,14 +10988,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8793,'zhTW','部落需要你的幫助!','和奧格瑪精神谷的督軍格爾庫克交談。',0),
 (8794,'zhTW','部落需要你的幫助!','和奧格瑪精神谷的督軍格爾庫克交談。',0),
 (8795,'zhTW','聯盟需要你的幫助!','和鐵爐堡軍事區的戰場元帥斯諾·落雪交談。',0),
-(8796,'zhTW','聯盟需要你的幫助!','和鐵爐堡軍事區的戰場元帥斯諾·落雪交談。',0),
+(8796,'zhTW','聯盟需要你的幫助!','和鐵爐堡軍事區的戰場元帥斯諾·落雪交談。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8797,8798,8800,8801,8802,8804,8805,8806,8807,8808,8809,8810,8811,8812,8813,8814,8815,8816,8817,8818) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8797,'zhTW','聯盟需要你的幫助!','和鐵爐堡軍事區的戰場元帥斯諾·落雪交談。',0),
 (8798,'zhTW','你自己的機械雪人',NULL,0),
 (8800,'zhTW','塞納里奧戰鬥工具','到希利蘇斯和塞納里奧城堡的瓦古斯談談。',0),
-(8801,'zhTW','克蘇恩的遺產','將克蘇恩之眼帶給安其拉神廟的卡拉史塔斯。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8802,8804,8805,8806,8807,8808,8809,8810,8811,8812,8813,8814,8815,8816,8817,8818,8819,8820,8821,8822) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8801,'zhTW','克蘇恩的遺產','將克蘇恩之眼帶給安其拉神廟的卡拉史塔斯。',0),
 (8802,'zhTW','卡林多的救星','把克蘇恩之眼帶給時光之穴的安納克羅斯。',0),
 (8804,'zhTW','沙漠生存包','帶4個純水之球，4個特強抗毒藥劑和4個沙漠肉丸子帶到希利蘇斯給塞納里奧城堡旅店的卡蘭德拉斯。你還必須將後勤任務簡報 I帶去才能完成這個任務。',0),
 (8805,'zhTW','衛兵的靴子','將3雙華麗秘銀戰靴帶到希利蘇斯給塞納里奧城堡的守衛隊長維斯·庫魯茲。你還必須將後勤任務簡報 II帶去才能完成這個任務。',0),
@@ -11102,14 +11011,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8815,'zhTW','一枚榮譽徽章',NULL,0),
 (8816,'zhTW','一枚榮譽徽章',NULL,0),
 (8817,'zhTW','一枚榮譽徽章',NULL,0),
-(8818,'zhTW','一枚榮譽徽章',NULL,0),
+(8818,'zhTW','一枚榮譽徽章',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8819,8820,8821,8822,8823,8824,8825,8826,8829,8830,8831,8832,8833,8834,8835,8836,8837,8838,8839,8840) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8819,'zhTW','十枚榮譽徽章',NULL,0),
 (8820,'zhTW','十枚榮譽徽章',NULL,0),
 (8821,'zhTW','十枚榮譽徽章',NULL,0),
-(8822,'zhTW','十枚榮譽徽章',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8823,8824,8825,8826,8829,8830,8831,8832,8833,8834,8835,8836,8837,8838,8839,8840,8841,8842,8843,8844) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8822,'zhTW','十枚榮譽徽章',NULL,0),
 (8823,'zhTW','十枚榮譽徽章',NULL,0),
 (8824,'zhTW','十枚榮譽徽章',NULL,0),
 (8825,'zhTW','十枚榮譽徽章',NULL,0),
@@ -11125,14 +11034,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8837,'zhTW','十枚榮譽徽章',NULL,0),
 (8838,'zhTW','一枚榮譽徽章',NULL,0),
 (8839,'zhTW','十枚榮譽徽章',NULL,0),
-(8840,'zhTW','一枚榮譽徽章',NULL,0),
+(8840,'zhTW','一枚榮譽徽章',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8841,8842,8843,8844,8845,8846,8847,8848,8849,8850,8851,8852,8853,8854,8855,8856,8857,8858,8859,8860) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8841,'zhTW','十枚榮譽徽章',NULL,0),
 (8842,'zhTW','一枚榮譽徽章',NULL,0),
 (8843,'zhTW','十枚榮譽徽章',NULL,0),
-(8844,'zhTW','一枚榮譽徽章',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8845,8846,8847,8848,8849,8850,8851,8852,8853,8854,8855,8856,8857,8858,8859,8860,8869,8893,8897,8898) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8844,'zhTW','一枚榮譽徽章',NULL,0),
 (8845,'zhTW','十枚榮譽徽章',NULL,0),
 (8846,'zhTW','五枚榮譽徽章換取物資',NULL,0),
 (8847,'zhTW','十枚榮譽徽章換取物資',NULL,0),
@@ -11148,14 +11057,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8857,'zhTW','巨像的秘密 - 亞什','將亞什巨像的甲殼帶給藏寶海灣的奧格索普·奧布諾提斯。',0),
 (8858,'zhTW','巨像的秘密 - 雷戈','把雷戈巨像的甲殼帶給灼熱峽谷的工頭奧菲斯特。',0),
 (8859,'zhTW','巨像的秘密 - 佐拉','把佐拉巨像的甲殼帶到東瘟疫之地的聖光之願禮拜堂給瑪克斯韋爾·泰羅索斯男爵。',0),
-(8860,'zhTW','新年慶典！','將燻木補給品帶給暴風城的旅店老闆奧里森。',0),
+(8860,'zhTW','新年慶典！','將燻木補給品帶給暴風城的旅店老闆奧里森。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8869,8893,8897,8898,8901,8905,8906,8907,8908,8909,8910,8911,8912,8913,8914,8915,8916,8917,8918,8919) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8869,'zhTW','甜美的平靜','到斯坦索姆去殺死紅衣鑄錘師。將紅衣鑄錘師的圍裙交給莉莉絲。',0),
 (8893,'zhTW','超級測蛋器',NULL,0),
 (8897,'zhTW','最親愛的克萊拉','將中尉賈克林·海德精心書寫的信件遞給克萊拉·迪恩，她在暴風城的銀行外面。',0),
-(8898,'zhTW','最親愛的克萊拉','將起皺的信件送給暴風城銀行外的克萊拉·迪恩。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8901,8905,8906,8907,8908,8909,8910,8911,8912,8913,8914,8915,8916,8917,8918,8919,8920,8921,8922,8923) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8898,'zhTW','最親愛的克萊拉','將起皺的信件送給暴風城銀行外的克萊拉·迪恩。',0),
 (8901,'zhTW','最親愛的艾妮亞','將仔細書寫的信送給幽暗城銀行旁邊的艾妮亞·海頓。',0),
 (8905,'zhTW','誠摯的建議','取得15滴冬泉血滴樣本，20金和1套野性之心護腕給鐵爐堡的德莉娜。',0),
 (8906,'zhTW','誠摯的建議','取得15滴冬泉血滴樣本，20金和1套馭獸者束腕給鐵爐堡的德莉娜。',0),
@@ -11171,14 +11080,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8916,'zhTW','誠摯的建議','取得15滴希利蘇斯毒液樣本，20金和1套虔誠護腕，帶給奧格瑪的莫克瓦。',0),
 (8917,'zhTW','誠摯的建議','取得15滴希利蘇斯毒液樣本，20金和1套迅影護腕，帶給奧格瑪的莫克瓦。',0),
 (8918,'zhTW','誠摯的建議','取得15滴希利蘇斯毒液樣本，20金和1套元素束腕，帶給奧格瑪的莫克瓦。',0),
-(8919,'zhTW','誠摯的建議','取得15滴希利蘇斯毒液樣本，20金和1套鬼霧護腕，帶給奧格瑪的莫克瓦。',0),
+(8919,'zhTW','誠摯的建議','取得15滴希利蘇斯毒液樣本，20金和1套鬼霧護腕，帶給奧格瑪的莫克瓦。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8920,8921,8922,8923,8924,8925,8926,8927,8928,8929,8930,8933,8935,8936,8940,8941,8942,8944,8945,8946) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8920,'zhTW','誠摯的建議','取得15份希利蘇斯血液樣本，20金和1套勇氣護腕，帶給奧格瑪的莫克瓦。',0),
 (8921,'zhTW','外膜蒸餾器','將1個精密奧金轉換器、4份強效不滅精華、10瓶石鱗魚油，25份火山灰和40金交給在加基森的莫克斯·法力爭奪者。',0),
 (8922,'zhTW','超自然儀器','將密封的鮮血採樣瓶帶到塔納利斯的加基森，交給莫克斯·法力爭奪者。',0),
-(8923,'zhTW','超自然儀器','將密封的毒液交給在加基森的莫克斯·法力爭奪者。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8924,8925,8926,8927,8928,8929,8930,8933,8935,8936,8940,8941,8942,8944,8945,8946,8947,8948,8949,8950) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8923,'zhTW','超自然儀器','將密封的毒液交給在加基森的莫克斯·法力爭奪者。',0),
 (8924,'zhTW','尋找外膜','前往東瘟疫之地，在無形的不死族附近使用外膜蒸餾器收集12個希利蘇斯燒焦的外膜、12個冬泉谷冰凍的外膜和12個東瘟疫之地穩定的外膜。將它們和外膜蒸餾器一起交給在加基森的莫克斯·法力爭奪者。',0),
 (8925,'zhTW','攜帶式能量泉源','去燃燒平原找到熔岩領主博克，取得他的岩漿之核帶給在加基森的莫克斯·法力爭奪者。',0),
 (8926,'zhTW','公平的補償','將野性之心腰帶，一套野性之心手套帶給鐵爐堡的德莉娜。',0),
@@ -11194,14 +11103,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8942,'zhTW','公平的補償','將元素之索和1套元素護手帶給奧格瑪的莫克瓦。',0),
 (8944,'zhTW','公平的補償','將勇氣腰帶和1套勇氣護手帶給奧格瑪的莫克瓦。',0),
 (8945,'zhTW','逝者的請求','前往斯坦索姆從瑞文戴爾男爵那裡救出亞希達·哈莫。',0),
-(8946,'zhTW','生命的證據','將亞希達的小墜子帶給東溫疫之地的安希恩·哈莫。',0),
+(8946,'zhTW','生命的證據','將亞希達的小墜子帶給東溫疫之地的安希恩·哈莫。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8947,8948,8949,8950,8951,8953,8954,8956,8958,8960,8961,8962,8963,8964,8965,8966,8967,8968,8969,8970) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8947,'zhTW','安希恩奇怪的要求','將3塊黑鐵錠，20塊附魔皮，3塊月布和4塊熟化毛皮帶給東溫疫之地的安希恩·哈莫。',0),
 (8948,'zhTW','安希恩的老朋友','將不完整的挑釁旗幟帶到厄運之槌的圖書館給法琳·樹形者。',0),
 (8949,'zhTW','法琳的仇恨','從厄運之槌或黑石塔的巨魔身上收集25個巨魔戰爭串珠再回到厄運之槌圖書館找法琳·樹形者。',0),
-(8950,'zhTW','教唆者的附魔','將以下的物品帶給厄運之槌的法琳·樹形者:1份嘲弄幽靈精華，4個黑暗符文和8個大塊魔光裂片。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8951,8953,8954,8956,8958,8960,8961,8962,8963,8964,8965,8966,8967,8968,8969,8970,8977,8978,8980,8982) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8950,'zhTW','教唆者的附魔','將以下的物品帶給厄運之槌的法琳·樹形者:1份嘲弄幽靈精華，4個黑暗符文和8個大塊魔光裂片。',0),
 (8951,'zhTW','安希恩的離別感言','帶著野性之心長靴，野性之心褶裙和野性之心肩甲回到鐵爐堡的德莉娜那裡。',0),
 (8953,'zhTW','安希恩的離別感言','帶著博學者長靴，博學者護腿和博學者披肩回到鐵爐堡的德莉娜那裡。',0),
 (8954,'zhTW','安希恩的離別感言','帶著光鑄戰靴，光鑄腿鎧和光鑄肩甲回到鐵爐堡的德莉娜那裡。',0),
@@ -11217,14 +11126,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8967,'zhTW','瓦薩拉克護符的左半塊','使用召喚火盆來召喚依薩利恩的靈魂並殺了她。帶著瓦薩拉克護符的左半塊和召喚火盆回到黑石山的布德利那裡。',0),
 (8968,'zhTW','瓦薩拉克領主護符的左半塊','使用召喚火盆來召喚賈林和索索斯並殺了他們。帶著瓦薩拉克領主護符的左半塊和召喚火盆回到黑石山的布德利那裡。',0),
 (8969,'zhTW','瓦薩拉克領主護符的左半塊','使用召喚火盆召喚科爾莫克的靈魂並殺了他。帶著瓦薩拉克領主護符的左半塊和召喚火盆回到黑石山的布德利那裡。',0),
-(8970,'zhTW','我看見你的未來有奧卡茲島……','在斯塔沙茲納迦身上收集20份血巨藻再回到黑石山的布德利那裡。',0),
+(8970,'zhTW','我看見你的未來有奧卡茲島……','在斯塔沙茲納迦身上收集20份血巨藻再回到黑石山的布德利那裡。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(8977,8978,8980,8982,8985,8986,8987,8988,8989,8990,8991,8993,8994,8995,8996,8997,8998,8999,9002,9004) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (8977,'zhTW','回到德莉娜那裡','將超空間鬼魂顯像機帶給鐵爐堡的德莉娜。',0),
 (8978,'zhTW','回到莫克瓦那裡','帶著超空間靈體顯像機回到奧格瑪的莫克瓦那裡。',0),
 (8980,'zhTW','金格的估計','回到幽暗城的銀行外找芬斯塔德·阿吉歐。',0),
-(8982,'zhTW','追溯來源','和幽暗城的旅店老闆諾曼談談。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(8985,8986,8987,8988,8989,8990,8991,8993,8994,8995,8996,8997,8998,8999,9002,9004,9006,9007,9009,9010) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(8982,'zhTW','追溯來源','和幽暗城的旅店老闆諾曼談談。',0),
 (8985,'zhTW','更多重要的材料','取得星風村聖物，再回到黑石山找布德利。',0),
 (8986,'zhTW','更多重要的材料','取得德魯伊的遺體，再回到黑石山找布德利。',0),
 (8987,'zhTW','更多重要的材料','取得光亮的狂熱之劍，再回到黑石山找布德利。',0),
@@ -11240,14 +11149,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8998,'zhTW','回到原點','回到奧格瑪智慧谷在索爾的堡壘中找莫克瓦談談。',0),
 (8999,'zhTW','最後的獎賞','將你的野性之心風帽和野性之心外衣交給德莉娜。',0),
 (9002,'zhTW','最後的獎賞','將你的光鑄頭盔和光鑄胸甲交給德莉娜。',0),
-(9004,'zhTW','最後的獎賞','將你的迅影罩帽和迅影外套交給德莉娜。',0),
+(9004,'zhTW','最後的獎賞','將你的迅影罩帽和迅影外套交給德莉娜。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9006,9007,9009,9010,9013,9015,9016,9017,9019,9020,9021,9022,9023,9024,9025,9026,9029,9030,9032,9033) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9006,'zhTW','最後的獎賞','將你的勇氣頭盔和勇氣胸甲交給德莉娜。',0),
 (9007,'zhTW','最後的獎賞','將你的野性之心兜帽和野性之心外衣交給莫克瓦。',0),
 (9009,'zhTW','最後的獎賞','將你的虔誠之冠和虔誠長袍交給莫克瓦。',0),
-(9010,'zhTW','最後的獎賞','將你的迅影罩帽和迅影外套交給莫克瓦。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9013,9015,9016,9017,9019,9020,9021,9022,9023,9024,9025,9026,9029,9030,9032,9033,9034,9036,9037,9038) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9010,'zhTW','最後的獎賞','將你的迅影罩帽和迅影外套交給莫克瓦。',0),
 (9013,'zhTW','最後的獎賞','將你的勇氣頭盔和勇氣胸甲交給莫克瓦。',0),
 (9015,'zhTW','挑戰','前往黑石深淵競技場並在你被裁決者格里斯通宣判時將挑釁旗幟放在它的中央。殺死瑟爾倫和他的戰士們，再帶著第一塊瓦薩拉克領主護符回到東瘟疫之地的安希恩·哈莫那裡。',0),
 (9016,'zhTW','安希恩的離別感言','帶著野性之心長靴，野性之心褶裙和野性之心肩甲回到奧格瑪的莫克瓦那裡。',0),
@@ -11263,14 +11172,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9029,'zhTW','冒泡的大鍋',NULL,0),
 (9030,'zhTW','安希恩的離別感言','與鐵爐堡的德莉娜談話。$b$b已提供物品：$b',0),
 (9032,'zhTW','布德利不幸之命運','到黑石山並使用超空間靈體顯像機，去黑石塔附近尋找布德利。',0),
-(9033,'zhTW','戰爭的回響','東瘟疫之地聖光之願禮拜堂的指揮官艾利格·攜晨者要你去殺死5名活巨怪，5名石膚石像鬼，8名死亡騎士隊長與3隻毒液捕獵者。',0),
+(9033,'zhTW','戰爭的回響','東瘟疫之地聖光之願禮拜堂的指揮官艾利格·攜晨者要你去殺死5名活巨怪，5名石膚石像鬼，8名死亡騎士隊長與3隻毒液捕獵者。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9034,9036,9037,9038,9039,9040,9041,9042,9043,9044,9045,9046,9047,9048,9049,9050,9051,9052,9053,9054) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9034,'zhTW','無畏胸甲','東瘟疫之地聖光之願禮拜堂的柯菲斯將為你製作無畏胸甲，只要你將下列物品帶給他:1件被褻瀆的胸甲，25個受戰爭破壞的鎧甲碎塊，4個奧金錠和2個聯結水晶。',0),
 (9036,'zhTW','無畏腿鎧','東瘟疫之地聖光之願禮拜堂的柯菲斯將為你製作無畏腿鎧，只要你將下列物品帶給他:1對被褻瀆的腿鎧，20個受戰爭破壞的鎧甲碎塊，4個奧金錠和3塊熟化毛皮。',0),
 (9037,'zhTW','無畏盔帽','東瘟疫之地聖光之願禮拜堂的柯菲斯將為你製作無畏盔帽，只要你將下列物品帶給他:1個被褻瀆的盔帽，15個受戰爭破壞的鎧甲碎塊，5個奧金錠和1個聯結水晶。',0),
-(9038,'zhTW','無畏肩鎧','東瘟疫之地聖光之願禮拜堂的柯菲斯將為你製作無畏肩鎧，只要你將下列物品帶給他:1對被褻瀆的肩鎧，12個受戰爭破壞的鎧甲碎塊，2個奧金錠和3塊熟化毛皮。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9039,9040,9041,9042,9043,9044,9045,9046,9047,9048,9049,9050,9051,9052,9053,9054,9055,9056,9057,9058) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9038,'zhTW','無畏肩鎧','東瘟疫之地聖光之願禮拜堂的柯菲斯將為你製作無畏肩鎧，只要你將下列物品帶給他:1對被褻瀆的肩鎧，12個受戰爭破壞的鎧甲碎塊，2個奧金錠和3塊熟化毛皮。',0),
 (9039,'zhTW','無畏馬靴','東瘟疫之地聖光之願禮拜堂的柯菲斯將為你製作無畏馬靴，只要你將下列物品帶給他：1雙被褻瀆的馬靴，12個受戰爭破壞的鎧甲碎片，2個奧金錠和3塊熟化毛皮。',0),
 (9040,'zhTW','無畏護手','東瘟疫之地聖光之願禮拜堂的柯菲斯將為你製作無畏護手，只要你將下列物品帶給他:1對被褻瀆的護手，8個受戰爭破壞的鎧甲碎塊，1個奧金錠和5塊熟化毛皮。',0),
 (9041,'zhTW','無畏護腰','東瘟疫之地聖光之願禮拜堂的柯菲斯將為你製作無畏護腰，只要你將下列物品帶給他:1個被褻瀆的護腰，8個受戰爭破壞的鎧甲碎塊，1個奧金錠和5塊熟化毛皮。',0),
@@ -11286,14 +11195,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9051,'zhTW','毒性測試','用魔暴龍倒鉤刺傷一隻魔暴龍。完成任務後再回到安戈洛環形山找托爾瓦·尋路者。',0),
 (9052,'zhTW','血瓣花之毒','收集8個血帽和8個格里什毒刺，交給安戈洛環形山的托爾瓦·尋路者。',0),
 (9053,'zhTW','更好的材料','前往沉沒的神廟底部，從守衛那取回腐爛的藤蔓並交給托爾瓦·尋路者。',0),
-(9054,'zhTW','地穴行者外套','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者外套，只要你將下列物品帶給他:1件被褻瀆的外套，25個受戰爭破壞的鍊甲碎塊，4個奧金錠和3塊熟化毛皮。',0),
+(9054,'zhTW','地穴行者外套','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者外套，只要你將下列物品帶給他:1件被褻瀆的外套，25個受戰爭破壞的鍊甲碎塊，4個奧金錠和3塊熟化毛皮。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9055,9056,9057,9058,9059,9060,9061,9063,9065,9068,9069,9070,9071,9072,9073,9074,9075,9077,9078,9079) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9055,'zhTW','地穴行者腿甲','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者腿甲，只要你將下列物品帶給他:1對被褻瀆的腿甲，20個受戰爭破壞的鍊甲碎塊，3個奧金錠和5塊熟化毛皮。',0),
 (9056,'zhTW','地穴行者首盔','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者首盔，只要你將下列物品帶給他:1個被褻瀆的首盔，15個受戰爭破壞的鍊甲碎塊，4個奧金錠和2個聯結水晶。',0),
 (9057,'zhTW','地穴行者肩甲','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者肩甲，只要你將下列物品帶給他:1對被褻瀆的肩甲，12個受戰爭破壞的鍊甲碎塊，2個奧金錠和3塊熟化毛皮。',0),
-(9058,'zhTW','地穴行者長靴','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者長靴，只要你將下列物品帶給他:1雙被褻瀆的長靴，12個受戰爭破壞的鍊甲碎塊，1個奧金錠和3個聯結水晶。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9059,9060,9061,9063,9065,9068,9069,9070,9071,9072,9073,9074,9075,9077,9078,9079,9080,9081,9082,9083) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9058,'zhTW','地穴行者長靴','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者長靴，只要你將下列物品帶給他:1雙被褻瀆的長靴，12個受戰爭破壞的鍊甲碎塊，1個奧金錠和3個聯結水晶。',0),
 (9059,'zhTW','地穴行者手甲','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者手甲，只要你將下列物品帶給他:1對被褻瀆的手甲，8個受戰爭破壞的鍊甲碎塊，1個奧金錠和5塊熟化毛皮。',0),
 (9060,'zhTW','地穴行者束腰','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者束腰，只要你將下列物品帶給他:1個被褻瀆的束腰，8個受戰爭破壞的鍊甲碎塊，1個奧金錠和3個聯結水晶。',0),
 (9061,'zhTW','地穴行者腕甲','東瘟疫之地聖光之願禮拜堂的獵人里歐波將為你製作地穴行者腕甲，只要你將下列物品帶給他:1對被褻瀆的束腕，6個受戰爭破壞的鍊甲碎塊，1個奧金錠和2塊熟化毛皮。',0),
@@ -11309,14 +11218,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9075,'zhTW','粉碎大地腕甲','東瘟疫之地聖光之願禮拜堂的林布拉特·大地粉碎者將為你製作粉碎大地腕甲，只要你將下列物品帶給他:1對被褻瀆的束腕，6個受戰爭破壞的鍊甲碎塊，1個奧金錠和2塊熟化毛皮。',0),
 (9077,'zhTW','骨鐮胸甲','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮胸甲，只要你將下列物品帶給他:1件被褻瀆的胸甲，25個受戰爭破壞的皮甲碎塊，2個奧金錠和6塊熟化毛皮。',0),
 (9078,'zhTW','骨鐮腿鎧','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮腿鎧，只要你將下列物品帶給他:1對被褻瀆的腿鎧，20個受戰爭破壞的皮甲碎塊，1個奧金錠，8塊熟化毛皮和100金。',0),
-(9079,'zhTW','骨鐮盔帽','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮盔帽，只要你將下列物品帶給他:1個被褻瀆的盔帽，15個受戰爭破壞的皮甲碎塊，8塊熟化毛皮，1個聯結水晶和75金。',0),
+(9079,'zhTW','骨鐮盔帽','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮盔帽，只要你將下列物品帶給他:1個被褻瀆的盔帽，15個受戰爭破壞的皮甲碎塊，8塊熟化毛皮，1個聯結水晶和75金。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9080,9081,9082,9083,9084,9085,9086,9087,9088,9089,9090,9091,9092,9093,9094,9095,9096,9097,9098,9099) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9080,'zhTW','骨鐮肩鎧','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮肩鎧，只要你將下列物品帶給他:1雙被褻瀆的肩鎧，12個受戰爭破壞的皮甲碎塊，5塊熟化毛皮，1個聯結水晶和50金。',0),
 (9081,'zhTW','骨鐮脛甲','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮重靴，只要你將下列物品帶給他:1雙被褻瀆的馬靴，12個受戰爭破壞的皮甲碎塊，3塊熟化毛皮，2個聯結水晶和25金。',0),
 (9082,'zhTW','骨鐮護手','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮護手，只要你將下列物品帶給他:1對被褻瀆的護手，8個受戰爭破壞的皮甲碎塊，1個奧金錠，和5塊熟化毛皮。',0),
-(9083,'zhTW','骨鐮護腰','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮護腰，只要你將下列物品帶給他:1個被褻瀆的護腰，8個受戰爭破壞的皮甲碎塊，5塊熟化毛皮，1個聯結水晶和15金。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9084,9085,9086,9087,9088,9089,9090,9091,9092,9093,9094,9095,9096,9097,9098,9099,9100,9101,9102,9103) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9083,'zhTW','骨鐮護腰','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮護腰，只要你將下列物品帶給他:1個被褻瀆的護腰，8個受戰爭破壞的皮甲碎塊，5塊熟化毛皮，1個聯結水晶和15金。',0),
 (9084,'zhTW','骨鐮護腕','東瘟疫之地聖光之願禮拜堂的『刺客』羅漢將為你製作骨鐮護腕，只要你將下列物品帶給他:1對被褻瀆的護腕，6個受戰爭破壞的皮甲碎塊，1個奧金錠，2塊熟化毛皮和10金。',0),
 (9085,'zhTW','死亡暗影','前往召喚法陣殺死一個末日之影，再回到東瘟疫之地的聖光之願禮拜堂找指揮官湯瑪士·海勒瑞。',0),
 (9086,'zhTW','夢行者外套','東瘟疫之地聖光之願禮拜堂的瑞恩將為你製作夢行者外套，只要你將下列物品帶給他:1件被褻瀆的外套，25個受戰爭破壞的皮甲碎塊，6塊熟化毛皮和2個聯結水晶。',0),
@@ -11332,14 +11241,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9096,'zhTW','霜火護腿','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將為你製作霜火護腿，只要你將下列物品帶給他:1對被褻瀆的護腿 ，20個受戰爭破壞的布甲碎塊，4塊月布和2個聯結水晶。',0),
 (9097,'zhTW','霜火頭環','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將為你製作霜火頭環，只要你將下列物品帶給他:1個被褻瀆的頭環，15個受戰爭破壞的布甲碎塊，3塊月布和3個聯結水晶。',0),
 (9098,'zhTW','霜火肩墊','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將為你製作霜火肩墊，只要你將下列物品帶給他:1對被褻瀆的肩墊，12個受戰爭破壞的布甲碎塊，2塊月布和3塊熟化毛皮。',0),
-(9099,'zhTW','霜火便鞋','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將為你製作霜火便鞋，只要你將下列物品帶給他:1雙被褻瀆的便鞋，12個受戰爭破壞的布甲碎塊，2塊月布和3塊熟化毛皮。',0),
+(9099,'zhTW','霜火便鞋','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將為你製作霜火便鞋，只要你將下列物品帶給他:1雙被褻瀆的便鞋，12個受戰爭破壞的布甲碎塊，2塊月布和3塊熟化毛皮。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9100,9101,9102,9103,9104,9105,9106,9107,9108,9109,9110,9111,9112,9113,9114,9115,9116,9117,9118,9122) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9100,'zhTW','霜火手套','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將為你製作霜火手套，只要你將下列物品帶給他:1對被褻瀆的手套，8個受戰爭破壞的布甲碎塊和4塊月布。',0),
 (9101,'zhTW','霜火腰帶','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將為你製作霜火腰帶，只要你將下列物品帶給他:1條被褻瀆的腰帶，8個受戰爭破壞的布甲碎塊，2個秘法水晶和2塊月布。',0),
 (9102,'zhTW','霜火束腕','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將為你製作霜火束腕，只要你將下列物品帶給他:1對被褻瀆的束腕，6個受戰爭破壞的布甲碎塊，1個秘法水晶和1個聯結水晶。',0),
-(9103,'zhTW','瘟疫之心長袍','東瘟疫之地聖光之願禮拜堂的『施怒者』麥特斯將為你製作瘟疫之心長袍，只要你將下列物品帶給他:1件被褻瀆的長袍，25個受戰爭破壞的布甲碎塊，4塊月布和2個聯結水晶。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9104,9105,9106,9107,9108,9109,9110,9111,9112,9113,9114,9115,9116,9117,9118,9122,9123,9125,9127,9129) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9103,'zhTW','瘟疫之心長袍','東瘟疫之地聖光之願禮拜堂的『施怒者』麥特斯將為你製作瘟疫之心長袍，只要你將下列物品帶給他:1件被褻瀆的長袍，25個受戰爭破壞的布甲碎塊，4塊月布和2個聯結水晶。',0),
 (9104,'zhTW','瘟疫之心護腿','東瘟疫之地聖光之願禮拜堂的『施怒者』麥特斯將為你製作瘟疫之心護腿，只要你將下列物品帶給他:1對被褻瀆的護腿，20個受戰爭破壞的布甲碎塊，4塊月布和2個聯結水晶。',0),
 (9105,'zhTW','瘟疫之心頭環','東瘟疫之地聖光之願禮拜堂的『施怒者』麥特斯將為你製作瘟疫之心頭環，只要你將下列物品帶給他:1個被褻瀆的頭環，15個受戰爭破壞的布甲碎塊，3塊月布和3個聯結水晶。',0),
 (9106,'zhTW','瘟疫之心肩墊','東瘟疫之地聖光之願禮拜堂的『施怒者』麥特斯將為你製作瘟疫之心肩墊，只要你將下列物品帶給他:1副被褻瀆的肩墊，12個受戰爭破壞的布甲碎塊，2塊月布和3塊熟化毛皮。',0),
@@ -11355,14 +11264,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9116,'zhTW','信仰手套','東瘟疫之地聖光之願禮拜堂的神父伊尼哥·蒙托將為你製作信仰手套，只要你幫他把下列的東西帶去:1副被褻瀆的手套，8個受戰爭破壞的布甲碎塊和4塊月布。',0),
 (9117,'zhTW','信仰腰帶','東瘟疫之地聖光之願禮拜堂的神父伊尼哥·蒙托將為你製作信仰腰帶，只要你幫他把下列的東西帶去:1條被褻瀆的腰帶，8個受戰爭破壞的布甲碎塊，2個秘法水晶和2塊月布。',0),
 (9118,'zhTW','信仰束腕','東瘟疫之地聖光之願禮拜堂的神父伊尼哥·蒙托將為你製作信仰束腕，只要你幫他把下列的東西帶去:1副被褻瀆的束腕，6個受戰爭破壞的布甲碎塊，1個秘法水晶和1個聯結水晶。',0),
-(9122,'zhTW','可怕的堡壘 - 納克薩瑪斯','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜需要2個秘法水晶，1個聯結水晶和30金。你一定要在銀色黎明達到崇敬聲望。',0),
+(9122,'zhTW','可怕的堡壘 - 納克薩瑪斯','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜需要2個秘法水晶，1個聯結水晶和30金。你一定要在銀色黎明達到崇敬聲望。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9123,9125,9127,9129,9132,9137,9142,9153,9154,9189,9208,9209,9210,9221,9222,9225,9226,9227,9228,9229) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9123,'zhTW','可怕的堡壘 - 納克薩瑪斯','東瘟疫之地聖光之願禮拜堂的大法師安琪拉·多桑杜將免費給你秘法掩護。你一定要在銀色黎明達到崇拜聲望。',0),
 (9125,'zhTW','地穴惡魔部位',NULL,0),
 (9127,'zhTW','骨頭碎片',NULL,0),
-(9129,'zhTW','元素之核',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9132,9137,9142,9153,9154,9189,9208,9209,9210,9221,9222,9225,9226,9227,9228,9229,9230,9232,9233,9234) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9129,'zhTW','元素之核',NULL,0),
 (9132,'zhTW','黑鐵碎塊',NULL,0),
 (9137,'zhTW','野性藻葉',NULL,0),
 (9142,'zhTW','工匠的令狀',NULL,0),
@@ -11378,14 +11287,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9226,'zhTW','精良級軍備之戰-銀色黎明聲望崇敬','付出7個黎明徽記和7個十字軍徽記就能換取銀色黎明藏寶庫裡的一樣強大的物品。',0),
 (9227,'zhTW','精良級軍備之戰-銀色黎明聲望崇拜','付出6個黎明徽記和6個十字軍徽記就能換取銀色黎明藏寶庫裡的一樣強大的物品。',0),
 (9228,'zhTW','史詩級軍備之戰-銀色黎明聲望崇拜','付出27個黎明徽記和27個十字軍徽記就能換取銀色黎明藏寶庫裡的一樣史詩級的物品。',0),
-(9229,'zhTW','羅馬拉丁尼的命運','進入納克薩瑪斯並找尋羅馬拉丁尼的命運。',0),
+(9229,'zhTW','羅馬拉丁尼的命運','進入納克薩瑪斯並找尋羅馬拉丁尼的命運。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9230,9232,9233,9234,9235,9236,9237,9238,9239,9240,9241,9242,9243,9244,9245,9246,9247,9248,9249,9250) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9230,'zhTW','羅馬拉丁尼的冰握','東瘟疫之地聖光之願禮拜堂的柯菲斯需要你帶給他1個冰凍符文，1顆藍寶石，還有1個奧金錠。',0),
 (9232,'zhTW','竭盡所能……','東瘟疫之地聖光之願禮拜堂的工匠維爾海姆需要你帶給他2個冰凍符文，2個水之精華 ，2顆藍寶石，還有30金。',0),
 (9233,'zhTW','歐瑪利安之手冊','把歐瑪利安之手冊交給工匠維爾海姆，他就在東瘟疫之地聖光之願禮拜堂。',0),
-(9234,'zhTW','冰剋護手','東瘟疫之地聖光之願禮拜堂的工匠維爾海姆需要你帶給他5個冰凍符文，12個瑟銀錠，2個奧金錠，2個水之精華，還有200金。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9235,9236,9237,9238,9239,9240,9241,9242,9243,9244,9245,9246,9247,9248,9249,9250,9251,9257,9259,9260) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9234,'zhTW','冰剋護手','東瘟疫之地聖光之願禮拜堂的工匠維爾海姆需要你帶給他5個冰凍符文，12個瑟銀錠，2個奧金錠，2個水之精華，還有200金。',0),
 (9235,'zhTW','冰剋護腕','東瘟疫之地聖光之願禮拜堂的工匠維爾海姆需要你帶給他4個冰凍符文，12個瑟銀錠，2個奧金錠，2個水之精華，還有200金。',0),
 (9236,'zhTW','冰剋胸甲','東瘟疫之地聖光之願禮拜堂的工匠維爾海姆需要你帶給他8個冰凍符文，16個瑟銀錠，2個奧金錠，4個水之精華，還有300金。同時你必須在銀色黎明達到崇拜聲望值，才能完成這項任務。',0),
 (9237,'zhTW','冰川披風','東瘟疫之地聖光之願禮拜堂的工匠維爾海姆需要你帶給他5個冰凍符文，4份符文布卷，2個水之精華，4份鐵網蛛絲，還有200金。同時你必須在銀色黎明達到崇拜聲望值，才能完成這項任務。',0),
@@ -11401,14 +11310,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9247,'zhTW','保管者的徵召','將名冊保管者的信交給在東瘟疫之地聖光之願禮拜堂的他。',0),
 (9248,'zhTW','謙卑的提議','希利蘇斯塞納里奧城堡裡的奧莉爾·金葉要你帶給她1個深淵節杖。同時你必須在塞納里奧議會達到尊敬聲望值，才能完成這項任務。',0),
 (9249,'zhTW','40張獎券 - 結構圖:蒸汽坦克遙控器',NULL,0),
-(9250,'zhTW','阿泰絲之杖的骨架','找人一起幫你尋找法杖的最後2塊部位，並和你一同淨化杖中的魔鬼。',0),
+(9250,'zhTW','阿泰絲之杖的骨架','找人一起幫你尋找法杖的最後2塊部位，並和你一同淨化杖中的魔鬼。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9251,9257,9259,9260,9261,9262,9263,9264,9265,9266,9267,9268,9270,9271,9272,9278,9279,9280,9283,9284) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9251,'zhTW','阿泰絲，被污損的守護者之杖','在塔納利斯的時光之穴裡，安納克羅斯要阿泰絲之杖的杖頭跟阿泰絲之杖的杖柄。',0),
 (9257,'zhTW','阿泰絲,守護者之杖','塔納利斯時光之穴的安納克羅斯要你帶著阿泰絲,守護者之杖前往斯坦索姆，在聖化之地上使用它。擊敗從法杖內被驅除的生物再回去找他。',0),
 (9259,'zhTW','血帆的叛徒',NULL,0),
-(9260,'zhTW','調查暴風城的天譴軍團','從暴風城外的天譴軍團身上收集3個黯淡的墓地之石並調查它們營地附近發光的符文法陣。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9261,9262,9263,9264,9265,9266,9267,9268,9270,9271,9272,9278,9279,9280,9283,9284,9285,9286,9287,9288) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9260,'zhTW','調查暴風城的天譴軍團','從暴風城外的天譴軍團身上收集3個黯淡的墓地之石並調查它們營地附近發光的符文法陣。',0),
 (9261,'zhTW','調查鐵爐堡的天譴軍團','從鐵爐堡外的天譴軍團身上收集3個黯淡的墓地之石並調查它們營地附近發光的符文法陣。',0),
 (9262,'zhTW','調查達納蘇斯的天譴軍團','從達納蘇斯外的天譴軍團身上收集3個黯淡的墓地之石並調查它們營地附近發光的符文法陣。',0),
 (9263,'zhTW','調查奧格瑪的天譴軍團','從奧格瑪外的天譴軍團身上收集3個黯淡的墓地之石並調查它們營地附近發光的符文法陣。',0),
@@ -11424,14 +11333,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9279,'zhTW','你活下來了!','和安曼谷失事地點的波尼特斯談談。',0),
 (9280,'zhTW','補充治療水晶','從附近的安曼谷飛蛾身上取得8瓶飛蛾血清，再回到安曼谷失事地點的波尼特斯那裡。',0),
 (9283,'zhTW','德萊尼生還者','對散落在安曼谷各處的其中一名德萊尼生還者使用那魯的祝福技能。之後再回到安曼谷失事地點找薩度恩。',0),
-(9284,'zhTW','奧多爾陣營測試',NULL,0),
+(9284,'zhTW','奧多爾陣營測試',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9285,9286,9287,9288,9289,9290,9291,9292,9295,9299,9300,9301,9302,9304,9308,9310,9317,9318,9320,9325) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9285,'zhTW','聯合團聲望測試',NULL,0),
 (9286,'zhTW','占卜者陣營',NULL,0),
 (9287,'zhTW','聖騎士訓練',NULL,0),
-(9288,'zhTW','獵人訓練',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9289,9290,9291,9292,9295,9299,9300,9301,9302,9304,9308,9310,9317,9318,9320,9325,9333,9334,9335,9336) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9288,'zhTW','獵人訓練',NULL,0),
 (9289,'zhTW','戰士訓練',NULL,0),
 (9290,'zhTW','法師訓練',NULL,0),
 (9291,'zhTW','牧師訓練',NULL,0),
@@ -11447,14 +11356,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9317,'zhTW','神聖的磨刀石',NULL,0),
 (9318,'zhTW','受祝福的法師之油',NULL,0),
 (9320,'zhTW','極效法力藥水',NULL,0),
-(9325,'zhTW','偷取雷霆崖之焰','將雷霆崖之焰交給節慶博學大師。',0),
+(9325,'zhTW','偷取雷霆崖之焰','將雷霆崖之焰交給節慶博學大師。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9333,9334,9335,9336,9337,9338,9340,9341,9342,9343,9344,9345,9346,9347,9348,9349,9351,9355,9356,9361) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9333,'zhTW','黎明徽記',NULL,0),
 (9334,'zhTW','受祝福的法師之油',NULL,0),
 (9335,'zhTW','神聖的磨刀石',NULL,0),
-(9336,'zhTW','極效治療藥水',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9337,9338,9340,9341,9342,9343,9344,9345,9346,9347,9348,9349,9351,9355,9356,9361,9362,9364,9366,9370) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9336,'zhTW','極效治療藥水',NULL,0),
 (9337,'zhTW','極效法力藥水',NULL,0),
 (9338,'zhTW','忠於塞納里奧議會',NULL,0),
 (9340,'zhTW','大裂縫','在獵鷹哨站的遊俠隊長范瑞要你去獵鷹哨站東邊的大裂縫殺死8個小石鐮掠奪者和3個石鐮突擊隊員。',0),
@@ -11470,14 +11379,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9351,'zhTW','野放的虛無行者','將10個濃縮的虛無行者精華帶給飛艇失事地的『驚嘆』史哥利德·幸運心。',0),
 (9355,'zhTW','聰明人的工作','殺死15名捕食中的地殼穿刺者再回到榮譽堡的工頭比干莫斯那裡。',0),
 (9356,'zhTW','技術高超','將12個豐滿的禿鷲翅膀交給飛艇失事地的雷噶西。',0),
-(9361,'zhTW','地獄野豬，另一種白肉','飛艇失事地的雷噶西要你去收集8個乾淨的地獄野豬肉。使用淨化藥劑來淨化你從瘋狂地獄野豬身上取的腐敗地獄野豬肉。',0),
+(9361,'zhTW','地獄野豬，另一種白肉','飛艇失事地的雷噶西要你去收集8個乾淨的地獄野豬肉。使用淨化藥劑來淨化你從瘋狂地獄野豬身上取的腐敗地獄野豬肉。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9362,9364,9366,9370,9372,9373,9374,9375,9376,9381,9382,9383,9384,9385,9387,9390,9391,9392,9393,9396) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9362,'zhTW','督軍克雷利安','為大法師克希雷姆取得稜彩貝殼。大法師就住在艾薩拉懸崖邊上的一座哨塔裡。',0),
 (9364,'zhTW','破碎的魔法','對艾薩拉的惡鞭者施放變形術並殺死幾秒後出現的複製物。等你殺夠了，再回去找艾薩拉的大法師克希雷姆。',0),
 (9366,'zhTW','需要魔化之血','地獄火半島獵鷹哨站的『憂鬱者』瑞安登要你從住在阿葛納爾之池的恐懼惡魔身上取回6份魔化之血樣本。',0),
-(9370,'zhTW','阻止淨化','前往阿葛納爾之池，將德萊尼信號寶石放在阿葛納爾祭壇附近，擊敗任何回應你召喚的德萊尼隱士。完成後帶著信號寶石回到獵鷹哨站的『憂鬱者』瑞安登那裡。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9372,9373,9374,9375,9376,9381,9382,9383,9384,9385,9387,9390,9391,9392,9393,9396,9397,9398,9399,9400) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9370,'zhTW','阻止淨化','前往阿葛納爾之池，將德萊尼信號寶石放在阿葛納爾祭壇附近，擊敗任何回應你召喚的德萊尼隱士。完成後帶著信號寶石回到獵鷹哨站的『憂鬱者』瑞安登那裡。',0),
 (9372,'zhTW','惡魔污染','地獄火半島上塞納里奧前哨的塞伊亞·紅髮要你從笨重的地獄野豬身上收集6份地獄野豬血的樣本。',0),
 (9373,'zhTW','丟失的公文','將磨損的皮箱交給塞伊亞·紅髮，他紮營在靠近西地獄火半島的夏納廢墟。',0),
 (9374,'zhTW','阿利恩的日記','地獄火半島，獵鷹哨站的博學者卡莉達要你去阿葛納爾之池取得阿利恩的日記。',0),
@@ -11493,14 +11402,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9391,'zhTW','記下路徑','獵鷹哨站的遊俠隊長范瑞要你前往地獄火半島的大裂縫點燃南方烽火臺、西方烽火臺和中央烽火臺。完成任務後帶著點燃的火炬回去找他。',0),
 (9392,'zhTW','盜賊訓練','和巡路者凱瑞爾 - 盜賊訓練師談談，他就在逐日者之島的日尖塔裡面。',0),
 (9393,'zhTW','獵人訓練','和遊俠薩琳娜 - 獵人訓練師談談，她就在逐日者之島的日尖塔裡面。',0),
-(9396,'zhTW','阿拉卡的魔法','帶回4個海艾斯卷軸到地獄火半島給獵鷹哨站的秘法師卡拉崔斯·晨星。',0),
+(9396,'zhTW','阿拉卡的魔法','帶回4個海艾斯卷軸到地獄火半島給獵鷹哨站的秘法師卡拉崔斯·晨星。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9397,9398,9399,9400,9401,9402,9403,9404,9405,9406,9407,9410,9415,9416,9417,9418,9419,9420,9421,9422) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9397,'zhTW','稀有的鳥類','前往地獄火半島的海艾斯洞穴捕捉一隻母卡里瑞幼鳥。用這個空的鳥籠捉住她，完成這個任務後再回去找獵鷹者崔娜·河風。',0),
 (9398,'zhTW','痛恨的掠奪者','地獄火半島特爾哈曼神廟的斥候范路娜要你去殺死8個小石鐮掠奪者和4個石鐮突擊隊員。',0),
 (9399,'zhTW','殘酷的監工','到夏納廢墟殺死4名伊利達瑞監工，再回到地獄火半島的特爾哈曼神廟找依坎。',0),
-(9400,'zhTW','刺客','納茲格雷爾要你前往地獄火堡壘北邊的道路尋找一個叫克魯恩·斷脊氏族的刺客。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9401,9402,9403,9404,9405,9406,9407,9410,9415,9416,9417,9418,9419,9420,9421,9422,9423,9424,9425,9426) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9400,'zhTW','刺客','納茲格雷爾要你前往地獄火堡壘北邊的道路尋找一個叫克魯恩·斷脊氏族的刺客。',0),
 (9401,'zhTW','奇怪的武器','將沉重的石斧帶到地獄火半島的索爾瑪交給納茲格雷爾。',0),
 (9402,'zhTW','去吧!','潛入靜語池底為導師安西歐取得碧藍之瓶。',0),
 (9403,'zhTW','純淨之水','導師安西歐要你去艾蘭達瀑布裝滿碧藍之瓶。',0),
@@ -11516,14 +11425,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9419,'zhTW','穿過沙漠','找到並將希利塞斯紅塵送到希利塞斯提取器那裡，再到佐拉蟲巢附近的聯盟營地和治安官藍牆談談。',0),
 (9420,'zhTW','完美的羽毛','地獄火半島的麥倫·長鬚要你從海艾斯洞穴不同種類的卡里瑞身上弄到8根卡里瑞羽毛。',0),
 (9421,'zhTW','薩滿訓練',NULL,0),
-(9422,'zhTW','穿過沙漠','找到並將希利塞斯紅塵送到希利塞斯提取器那裡，再到雷戈蟲巢附近的部落營地和奇立卡將軍談談。',0),
+(9422,'zhTW','穿過沙漠','找到並將希利塞斯紅塵送到希利塞斯提取器那裡，再到雷戈蟲巢附近的部落營地和奇立卡將軍談談。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9423,9424,9425,9426,9427,9428,9429,9430,9431,9432,9433,9434,9436,9437,9438,9439,9440,9441,9442,9444) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9423,'zhTW','回去找歐拜德','回到地獄火半島的特爾哈曼神廟找隱士歐拜德，告知他希戴的死訊',0),
 (9424,'zhTW','瑪酷魯的復仇','地獄火半島上特爾哈曼神廟的瑪酷魯要你帶給他10個瑪格哈先祖珠串。',0),
 (9425,'zhTW','向塔倫米爾報告','前往希爾斯布萊德丘陵的塔倫米爾和諫言者幽曦談談。',0),
-(9426,'zhTW','阿葛納爾之池','『智者』阿曼要你前往阿葛納爾之池，並殺掉6隻恐懼惡魔和6隻憤怒的腐泥怪。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9427,9428,9429,9430,9431,9432,9433,9434,9436,9437,9438,9439,9440,9441,9442,9444,9446,9447,9448,9449) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9426,'zhTW','阿葛納爾之池','『智者』阿曼要你前往阿葛納爾之池，並殺掉6隻恐懼惡魔和6隻憤怒的腐泥怪。',0),
 (9427,'zhTW','淨化水源','『智者』阿曼要你前往阿葛納爾之池並對阿葛納爾的屍體使用淨化的瓶子。當阿葛納爾的本質藉由瓶子裡的水得到淨化就回去找他。',0),
 (9428,'zhTW','向碎木崗哨回報','前往梣谷的碎木崗哨，和諫言者·日誓談談。',0),
 (9429,'zhTW','前往夜色鎮','到暮色森林的夜色鎮去找隱士·迪藍談談。',0),
@@ -11539,14 +11448,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9440,'zhTW','一點食物','將邪惡污染的食物餵給被失落者捕捉的動物。再帶著殘羹剩菜回到悲傷沼澤的斯通納德找瑟賽·幽歌者。',0),
 (9441,'zhTW','瑪格哈使者','索爾要你回到地獄火半島的瑪格哈崗哨找葛坎·血拳並協助他。',0),
 (9442,'zhTW','削弱力量的疾病','地獄火半島上瑪格哈崗哨的大地呼喚者瑞卡要你從大裂縫裡的洞穴帶1個乾頂磨菇給她。',0),
-(9444,'zhTW','褻瀆烏瑟之墓','褻瀆烏瑟之墓再回到西瘟疫之地的亡靈壁壘找瑪拉·曦刃。',0),
+(9444,'zhTW','褻瀆烏瑟之墓','褻瀆烏瑟之墓再回到西瘟疫之地的亡靈壁壘找瑪拉·曦刃。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9446,9447,9448,9449,9450,9451,9457,9460,9461,9462,9464,9465,9466,9467,9468,9469,9470,9471,9472,9474) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9446,'zhTW','光明使者之墓','護送隱士·楚恩到西瘟疫之地的烏瑟之墓。之後，再到西瘟疫之地的冰風營地和高階牧師瑪多妮爾談談。',0),
 (9447,'zhTW','使用藥膏','大地呼喚者瑞卡要你到地獄火半島的瑪格哈崗哨，對10個疲憊不堪的瑪格哈蠻兵使用治療藥膏。',0),
 (9448,'zhTW','憐憫被詛咒者','殺死3個被詛咒的失落者再回到悲傷沼澤的避難營找隱士·艾弗恩。',0),
-(9449,'zhTW','召喚大地','到安曼谷的神聖樹林和安曼谷之靈談談。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9450,9451,9457,9460,9461,9462,9464,9465,9466,9467,9468,9469,9470,9471,9472,9474,9475,9476,9483,9484) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9449,'zhTW','召喚大地','到安曼谷的神聖樹林和安曼谷之靈談談。',0),
 (9450,'zhTW','召喚大地','殺死4個不安的大地元素再回到安曼谷的神聖樹林找安曼谷之靈。',0),
 (9451,'zhTW','召喚大地','將大地水晶送到安曼谷給失事地點的法曼瓦。',0),
 (9457,'zhTW','稀有的庇護人','在奈亞斯祭壇附近使用奈亞斯的禮物來召喚水元素奈亞斯。擊敗他再帶著奈亞斯的心回到格羅姆高營地的奈米斯·鷹眼那裡。',0),
@@ -11562,14 +11471,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9470,'zhTW','展示好意','鷹巢山的洛勒斯大使要你去殺掉巫醫·梅金以及他的蜘蛛寵物恰克斯。',0),
 (9471,'zhTW','捕食掠奪者','鷹巢山的洛勒斯大使要你殺死10隻癩皮銀鬃狼和5隻銀鬃狼。',0),
 (9472,'zhTW','阿利恩的情婦','獵鷹哨站的博學者卡莉達要你引誘薇艾拉·陽語離開居住地再對她使用卡莉達的懲罰卷軸。',0),
-(9474,'zhTW','光明使者的印記','取得光明使者的印記帶回西瘟疫之地交給冰風營地的隱士·楚恩。',0),
+(9474,'zhTW','光明使者的印記','取得光明使者的印記帶回西瘟疫之地交給冰風營地的隱士·楚恩。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9475,9476,9483,9484,9485,9486,9487,9488,9489,9490,9491,9492,9493,9494,9495,9496,9498,9499,9500,9501) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9475,'zhTW','取回那些蛋','收集5顆獅鷲獸的蛋帶回去給鷹巢山的洛勒斯大使。',0),
 (9476,'zhTW','追蹤羽鬚','前往沙德拉洛尋找羽鬚的蹤跡。',0),
 (9483,'zhTW','生命中更棒的樂趣',NULL,0),
-(9484,'zhTW','馴服野獸','用馴獸棒來馴服瘋狂的龍鷹，然後再回到晨奔中尉那裡。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9485,9486,9487,9488,9489,9490,9491,9492,9493,9494,9495,9496,9498,9499,9500,9501,9502,9503,9504,9508) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9484,'zhTW','馴服野獸','用馴獸棒來馴服瘋狂的龍鷹，然後再回到晨奔中尉那裡。',0),
 (9485,'zhTW','馴服野獸','用馴獸棒來馴服迷霧蝙蝠，然後再回到晨奔中尉那裡。',0),
 (9486,'zhTW','馴服野獸','用馴獸棒來馴服年長的泉爪山貓，然後再回到晨奔中尉那裡。',0),
 (9487,'zhTW','秘法搶奪者','秘法師范德隆要你收集10個秘法碎片給他。',0),
@@ -11585,14 +11494,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9498,'zhTW','獵鷹哨站','到地獄火半島向獵鷹哨站的遊俠隊長范瑞報告。',0),
 (9499,'zhTW','獵鷹哨站','前往地獄火半島西南方的獵鷹哨站並向遊俠隊長范瑞報告。',0),
 (9500,'zhTW','水之召喚','與藍謎島中艾克索達裡水晶大廳的先知諾柏多談談。',0),
-(9501,'zhTW','水之召喚','到血謎島的隱秘沙洲和阿基歐斯談談。$b$b已提供物品：$b',0),
+(9501,'zhTW','水之召喚','到血謎島的隱秘沙洲和阿基歐斯談談。$b$b已提供物品：$b',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9502,9503,9504,9508,9509,9510,9520,9522,9524,9529,9532,9534,9535,9536,9543,9545,9547,9551,9552,9553) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9502,'zhTW','水之召喚','與藍謎島中艾克索達裡水晶大廳的先知諾柏多談談。',0),
 (9503,'zhTW','水之召喚','收集6份腐敗精華再帶回血謎島給隱秘沙洲的阿基歐斯。',0),
 (9504,'zhTW','水之召喚','裝滿空皮製水袋再回到血謎島的隱秘沙洲找阿基歐斯。',0),
-(9508,'zhTW','水之召喚','把泰阿希恩的頭顱帶到血謎島給隱秘沙洲的阿基歐斯。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9509,9510,9520,9522,9524,9529,9532,9534,9535,9536,9543,9545,9547,9551,9552,9553,9554,9555,9556,9558) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9508,'zhTW','水之召喚','把泰阿希恩的頭顱帶到血謎島給隱秘沙洲的阿基歐斯。',0),
 (9509,'zhTW','水之召喚','把純淨水瓶帶回藍謎島給艾克索達的先知諾柏多。',0),
 (9510,'zhTW',NULL,'此任務已經絕版。[Provisioner Braknar at Mag''har Post in Hellfire Peninsula wants you to bring him 5 Bristlehide Clefthoof Hides.]',0),
 (9520,'zhTW','殘忍計畫','將殘忍計畫送到梣谷給林歌神殿的復仇者維達。',0),
@@ -11608,14 +11517,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9547,'zhTW','風的召喚','與藍謎島中艾克索達裡水晶大廳的先知諾柏多談談。',0),
 (9551,'zhTW','風的召喚','與藍謎島中艾克索達裡水晶大廳的先知諾柏多談談。',0),
 (9552,'zhTW','風的召喚','到藍謎島的狂風山尖和維拉達談談。',0),
-(9553,'zhTW','風的召喚','到藍謎島的狂風山尖和蘇瑟拉斯談談。',0),
+(9553,'zhTW','風的召喚','到藍謎島的狂風山尖和蘇瑟拉斯談談。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9554,9555,9556,9558,9563,9572,9575,9582,9586,9587,9588,9589,9590,9591,9592,9593,9595,9598,9600,9601) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9554,'zhTW','風的召喚','帶著空氣漩渦回到藍謎島找艾克索達的先知諾柏多。',0),
 (9555,'zhTW','火焰的召喚','到艾克索達和水晶大廳的先知諾柏多談談。',0),
 (9556,'zhTW','給勝利者……','從斯坦索姆城裡取得一瓶斯坦索姆聖水，當你的陣營在東瘟疫之地獲得勝利，就把它交給暴風城或幽暗城法師區裡的羅德隆法師。',0),
-(9558,'zhTW','長鬚兄弟','前往海艾斯洞穴的西北邊找葛明尼·長鬚，在地獄火半島的榮譽堡西邊。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9563,9572,9575,9582,9586,9587,9588,9589,9590,9591,9592,9593,9595,9598,9599,9600,9601,9607,9608,9609) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9558,'zhTW','長鬚兄弟','前往海艾斯洞穴的西北邊找葛明尼·長鬚，在地獄火半島的榮譽堡西邊。',0),
 (9563,'zhTW','贏得麥倫的信任','麥倫·長鬚要你幫他帶來1杯守望苦味啤酒。同時你必須在榮譽堡達到友好聲望值才能完成這個任務。',0),
 (9572,'zhTW','削弱防禦','殺死看護者卡爾古瑪、無疤者歐瑪爾和納桑。將卡爾古瑪之手、歐瑪爾的蹄子和納桑之顱帶到地獄火半島的索爾瑪交給卡沙瑞斯。',0),
 (9575,'zhTW','削弱防禦','殺死看護者卡爾古瑪、無疤者歐瑪爾和納桑。將卡爾古瑪之手、歐瑪爾的蹄子和納桑之顱帶到地獄火半島的榮譽堡給甘尼。',0),
@@ -11630,15 +11539,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9593,'zhTW','馴服野獸','使用馴服圖騰和夜間潛伏者做朋友再回到女獵人凱拉·夜弓那裡。',0),
 (9595,'zhTW','控制魔法','殺死淤塞海岸的魚人來召喚奎爾德尼·法怨，然後擊敗它。完成之後，到艾克索達的聖光地窖和巴提談談。',0),
 (9598,'zhTW','救贖','研讀聖潔之書並且跟喬歐談話。',0),
-(9599,'zhTW',NULL,'和艾克索達的喬歐談談。',0),
 (9600,'zhTW','救贖','喬歐要你用生命符記復活一個年輕的熊怪薩滿再回去找她。',0),
-(9601,'zhTW','前進亡靈壁壘','和在亡靈壁壘的瑪拉·曦刃談談。',0),
+(9601,'zhTW','前進亡靈壁壘','和在亡靈壁壘的瑪拉·曦刃談談。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9607,9608,9609,9610,9612,9614,9615,9617,9618,9619,9626,9630,9631,9635,9636,9637,9638,9639,9640,9644) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9607,'zhTW','狂怒之心','徹底調查血熔爐再到地獄火半島的榮譽堡向軍隊指揮者達納斯·托爾貝恩回報。',0),
 (9608,'zhTW','狂怒之心','徹底調查血熔爐再到地獄火半島的索爾瑪向納茲格雷爾回報。',0),
-(9609,'zhTW','幫助看守者比格斯','在悲傷沼澤裡找到看守者比格斯。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9610,9612,9614,9615,9617,9618,9619,9626,9630,9631,9635,9636,9637,9638,9639,9640,9644,9645,9650,9651) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9609,'zhTW','幫助看守者比格斯','在悲傷沼澤裡找到看守者比格斯。',0),
 (9610,'zhTW','淚水之池','取得10個阿塔萊神器再回到悲傷沼澤的避難營找何拉魯。',0),
 (9612,'zhTW','衷心的感謝!','和藍色守望的主教米奈奧斯談談。',0),
 (9614,'zhTW',NULL,'此任務已經絕版。[Bring 40 Khorium Bars, 1 Void Crystal and 8 Primal Fires to Koren inside Karazhan.]',0),
@@ -11655,13 +11563,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9638,'zhTW','妥善保管','到卡拉贊和守護者圖書館的葛瑞戴談談。',0),
 (9639,'zhTW','康席斯','到卡拉贊和守護者圖書館的康席斯談談。',0),
 (9640,'zhTW','埃蘭之影','取得麥迪文的日記並帶到卡拉贊的守護者圖書館交給康席斯。',0),
-(9644,'zhTW','夜禍','前往卡拉贊的大師的露臺使用凱娜的骨灰罈來召喚夜禍。從夜禍的屍體取得微弱的秘法精華並帶給大法師艾特羅斯。',0),
+(9644,'zhTW','夜禍','前往卡拉贊的大師的露臺使用凱娜的骨灰罈來召喚夜禍。從夜禍的屍體取得微弱的秘法精華並帶給大法師艾特羅斯。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9645,9650,9651,9652,9653,9654,9655,9656,9657,9658,9659,9660,9661,9662,9664,9673,9675,9677,9678,9680) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9645,'zhTW','大師的露臺','前往卡拉贊的大師的露臺並閱讀麥迪文的日記。完成任務後帶著麥迪文的日記回到大法師艾特羅斯那裡。',0),
 (9650,'zhTW',NULL,'此任務已經絕版。[<TXT>]',0),
-(9651,'zhTW',NULL,'此任務已經絕版。[<TXT>]',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9652,9653,9654,9655,9656,9657,9658,9659,9660,9661,9662,9664,9673,9675,9677,9678,9680,9681,9684,9685) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9651,'zhTW',NULL,'此任務已經絕版。[<TXT>]',0),
 (9652,'zhTW',NULL,'此任務已經絕版。',0),
 (9653,'zhTW',NULL,'此任務已經絕版。',0),
 (9654,'zhTW',NULL,'此任務已經絕版。[The Facet of Keanna stored inside Keanna''s Will wants you to gather 20 Arcane Residues from the Arcane Anomalies in Karazhan.]',0),
@@ -11678,13 +11586,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9675,'zhTW','野獸訓練','到艾克索達的貿易區和加納談談。',0),
 (9677,'zhTW','騎士領主伯洛德瓦勒的召喚','到銀月城的遠行者廣場和騎士領主伯洛德瓦勒談談。',0),
 (9678,'zhTW','第一個試煉','前往騎士領主伯洛德瓦勒所描述的島，找到洞穴，並點燃火盆。當第一個試煉結束，回到銀月城的騎士領主·伯洛德瓦勒那裡。',0),
-(9680,'zhTW','發掘過去','大法師艾特羅斯要你去卡拉贊南方山脈的逆風小徑取回一個燒焦的白骨碎片。',0),
+(9680,'zhTW','發掘過去','大法師艾特羅斯要你去卡拉贊南方山脈的逆風小徑取回一個燒焦的白骨碎片。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9681,9684,9685,9686,9690,9691,9692,9697,9701,9702,9704,9705,9707,9708,9709,9710,9714,9715,9716,9717) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9681,'zhTW','學習力量','到血騎士總部底下隱藏的房間裡和博學者阿斯塔樂·血誓談談。',0),
 (9684,'zhTW','掌握聖光','在血精靈博學者身上使用幻光容器來裝滿它，再回到銀月城的騎士領主伯洛德瓦勒那裡。',0),
-(9685,'zhTW','解救亡者','帶著裝滿的幻光容器到銀月城旅店並使用它的魔法來復活桑古瑞斯·靜刃。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9686,9690,9691,9692,9697,9701,9702,9704,9705,9707,9708,9709,9710,9714,9715,9716,9717,9718,9719,9720) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9685,'zhTW','解救亡者','帶著裝滿的幻光容器到銀月城旅店並使用它的魔法來復活桑古瑞斯·靜刃。',0),
 (9686,'zhTW','第二個試煉','完成第二次的試煉，在大師克萊倫‧布勞德摩爾附近的亭子裡擊敗血怒勇士，勇士萊特蘭德，迅刃勇士，及勇士桑司瑞克。',0),
 (9690,'zhTW','第二個試煉','向大師克萊倫·布勞德摩爾回報。',0),
 (9691,'zhTW','回到銀月城','回到銀月城的騎士領主伯洛德瓦勒那裡。',0),
@@ -11701,13 +11609,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9714,'zhTW','再給我木槿花!',NULL,0),
 (9715,'zhTW','給我木槿花!','收集5朵血紅木槿再回到贊格沼澤的斯博格爾交給卡思汗特。',0),
 (9716,'zhTW','昂布拉凡湖的憂慮','調查昂布拉凡湖水量銳減的原因。再回到贊格沼澤的塞納里奧避難所找伊斯歐·風歌。',0),
-(9717,'zhTW','喔，開始吧!','收集一片地孢之葉交給贊格沼澤的斯博格爾的塔蘇。',0),
+(9717,'zhTW','喔，開始吧!','收集一片地孢之葉交給贊格沼澤的斯博格爾的塔蘇。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9718,9719,9720,9721,9723,9724,9725,9726,9727,9728,9729,9730,9731,9732,9733,9734,9735,9737,9738,9739) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9718,'zhTW','烏鴉高飛時','伊斯歐·風歌要你使用暴風烏鴉護符來探勘贊格沼澤的主要湖泊。',0),
 (9719,'zhTW','追蹤獵捕者','把黑色捕獵者的大腦帶給贊格沼澤的斯博格爾的奇尼克斯。',0),
-(9720,'zhTW','一定要保持平衡','伊斯歐·風歌要你在毒蛇之湖、昂布拉凡湖、沼澤光之湖和瀉湖的蒸汽泵使用鐵藤之種。再帶著未使用的種子回到贊格沼澤的塞納里奧避難所找她。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9721,9723,9724,9725,9726,9727,9728,9729,9730,9731,9732,9733,9734,9735,9737,9738,9739,9742,9743,9744) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9720,'zhTW','一定要保持平衡','伊斯歐·風歌要你在毒蛇之湖、昂布拉凡湖、沼澤光之湖和瀉湖的蒸汽泵使用鐵藤之種。再帶著未使用的種子回到贊格沼澤的塞納里奧避難所找她。',0),
 (9721,'zhTW','索拉納爾領主的召喚','和銀月城的索拉納爾·血怒領主談談。',0),
 (9723,'zhTW','承諾的手勢','帶40塊符文布，6個奧金錠，10根太陽草，5個黑暗符文和150金幣給銀月城的索拉納爾·血怒領主。',0),
 (9724,'zhTW','警告塞納里奧議會','到地獄火半島和塞納里奧前哨的艾咪希·迷霧長者談談。',0),
@@ -11724,15 +11632,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9735,'zhTW','聖光真正的主人','銀月城的索拉納爾·血怒領主要你幫他帶來提爾之手聖水。',0),
 (9737,'zhTW','聖光真正的主人','在阿隆索斯教堂的永恆火焰旁使用混合物撲滅劑來移除聖光的防護。準備和任何要保衛教堂的人作戰。',0),
 (9738,'zhTW','無法行動','調查大地束縛者瑞吉，自然學家拜特，威德·綠指和喚風者卡勞發生了什麼事。然後再回到贊格沼澤的盤牙蓄湖找看守者詹汗格。',0),
-(9739,'zhTW','孢子人的困境','重生峽谷的法斯恩要你收集10個成熟的孢子囊。',0),
+(9739,'zhTW','孢子人的困境','重生峽谷的法斯恩要你收集10個成熟的孢子囊。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9742,9743,9744,9747,9752,9757,9763,9764,9765,9766,9768,9769,9770,9771,9772,9773,9774,9775,9776,9777) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9742,'zhTW','更多孢子囊',NULL,0),
 (9743,'zhTW','自然天敵','贊格沼澤，重生峽谷的法斯恩要你幫他帶來6個泥沼領主藤鬚。',0),
-(9744,'zhTW','更多藤鬚!',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9747,9750,9752,9757,9763,9764,9765,9766,9768,9769,9770,9771,9772,9773,9774,9775,9776,9777,9778,9780) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9744,'zhTW','更多藤鬚!',NULL,0),
 (9747,'zhTW','昂布拉凡部族','塞納里奧避難所的伊奇言要你前往昂布拉凡村殺死卡塔魯，8個昂布拉凡先知，6個昂布拉凡巫醫和6個昂布拉凡神諭者。',0),
-(9750,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(9750))',0),
 (9752,'zhTW','逃離昂布拉凡','護送凱拉·長鬃回到贊格沼澤的塞納里奧避難所。完成任務後向伊斯歐·風歌回報。',0),
 (9757,'zhTW','尋找女獵人凱拉·夜弓','和瓦拉船台附近的女獵人凱拉·夜弓談談。',0),
 (9763,'zhTW','督軍的藏身之處','看守者詹汗格要你找到並殺死盤牙蓄湖裡的督軍卡利斯瑞。',0),
@@ -11748,12 +11655,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9774,'zhTW','厚多頭蛇鱗片','斯溫派特崗哨的祖瑞伊要你幫他帶來12片厚多頭蛇鱗片。',0),
 (9775,'zhTW','向暗影獵人丹傑回報','將祖瑞伊的報告帶給薩布拉金的暗影獵人丹傑。',0),
 (9776,'zhTW','奧雷伯爾港','和奧雷伯爾港的伊庫堤談談。',0),
-(9777,'zhTW','明亮孢子','帶6個明亮孢子給泰倫多爾的洛安瑪。',0),
-(9778,'zhTW','守望者漢姆特','到贊格沼澤的塞納里奧避難所向守望者漢姆特報告。',0),
-(9780,'zhTW','昂布拉凡鰻魚片','泰倫多爾的諾納尼要你幫她帶來8份鰻魚片。',0);
+(9777,'zhTW','明亮孢子','帶6個明亮孢子給泰倫多爾的洛安瑪。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9781,9782,9783,9784,9785,9786,9787,9788,9789,9790,9791,9792,9793,9796,9797,9800,9801,9802,9803,9804) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9778,9780,9781,9782,9783,9784,9785,9786,9787,9788,9789,9790,9791,9792,9793,9796,9797,9800,9801,9802) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9778,'zhTW','守望者漢姆特','到贊格沼澤的塞納里奧避難所向守望者漢姆特報告。',0),
+(9780,'zhTW','昂布拉凡鰻魚片','泰倫多爾的諾納尼要你幫她帶來8份鰻魚片。',0),
 (9781,'zhTW','僧多粥少','殺死10個污泥多頭蛇再回到泰倫多爾的哈爾隆恩那裡。',0),
 (9782,'zhTW','死亡污泥','將死亡污泥泥土樣本帶給泰倫多爾的復仇者伊達爾。',0),
 (9783,'zhTW','不尋常的乾旱','泰倫多爾的復仇者伊達爾要你去殺死12個枯萎的巨人。',0),
@@ -11771,12 +11678,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9797,'zhTW','卡拉達爾的援軍','到納葛蘭和卡拉達爾的隊長卡洛克汗談談。',0),
 (9800,'zhTW','稀有的豆子','納葛蘭，元素王座的元素師羅艾柏要你幫他帶來15個消化過的豆子。',0),
 (9801,'zhTW','尋找材料','泰倫多爾的隱士阿浩恩要你幫他帶來4個孢子蝙蝠眼睛和4個沼地行者觸鬚。',0),
-(9802,'zhTW','贊格沼澤的植物','帶10個未經辨認的植物組織到贊格沼澤給塞納里奧避難所的羅安娜·薩威爾。',0),
-(9803,'zhTW','菲拉芬的信差','到達波哈姆廢墟後喝下阿浩恩藥劑。在阿拉卡形態下和年長的克魯提談談。',0),
-(9804,'zhTW','天歌的焦慮精靈','納葛蘭，元素王座的元素師羅艾柏要你摧毀12個湖中水之靈。',0);
+(9802,'zhTW','贊格沼澤的植物','帶10個未經辨認的植物組織到贊格沼澤給塞納里奧避難所的羅安娜·薩威爾。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9805,9806,9807,9808,9809,9810,9813,9814,9815,9816,9817,9818,9819,9820,9821,9822,9823,9824,9825,9826) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9803,9804,9805,9806,9807,9808,9809,9810,9813,9814,9815,9816,9817,9818,9819,9820,9821,9822,9823,9824) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9803,'zhTW','菲拉芬的信差','到達波哈姆廢墟後喝下阿浩恩藥劑。在阿拉卡形態下和年長的克魯提談談。',0),
+(9804,'zhTW','天歌的焦慮精靈','納葛蘭，元素王座的元素師羅艾柏要你摧毀12個湖中水之靈。',0),
 (9805,'zhTW','辛納瑞塔斯的祝福','納葛蘭，元素王座的元素師羅艾柏要你摧毀風蘆村的大營房，西營房，南營房，和東營房。$b$b完成任務後將生命之火還給元素師羅艾柏。',0),
 (9806,'zhTW','豐饒孢子','吉薩夫要你從贊格沼澤不同的孢子蝙蝠和沼澤行者身上收集6份豐饒孢子。完成任務後回到斯博格爾找吉薩夫。',0),
 (9807,'zhTW','更多豐饒孢子',NULL,0),
@@ -11794,12 +11701,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9821,'zhTW','吃掉精髓','納葛蘭，元素王座的葛爾道格要你幫他帶回15個暴怒的粉碎者精髓。',0),
 (9822,'zhTW','逼近的攻擊','將安格拉斯攻擊計畫帶回薩布拉金給暗影獵人丹傑。',0),
 (9823,'zhTW','不是你死就是我活','殺了血拳主宰，10個安格拉斯蠻槌兵，和10個安格拉斯噬魂者再向薩布拉金的暗影獵人丹傑回報。',0),
-(9824,'zhTW','秘法干擾','到大師的地窖，在靠近地下水源的地方使用紫羅蘭占卜水晶再回到卡拉贊外面的大法師艾特羅斯那裡。',0),
-(9825,'zhTW','不安的活動','帶10個鬼魅精華給卡拉贊外面的大法師艾特羅斯。',0),
-(9826,'zhTW','達拉然的聯繫','將艾特羅斯的報告帶給達拉然郊區的大法師賽卓克。',0);
+(9824,'zhTW','秘法干擾','到大師的地窖，在靠近地下水源的地方使用紫羅蘭占卜水晶再回到卡拉贊外面的大法師艾特羅斯那裡。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9827,9828,9829,9830,9831,9832,9833,9834,9835,9836,9837,9838,9839,9840,9841,9842,9843,9844,9845,9846) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9825,9826,9827,9828,9829,9830,9831,9832,9833,9834,9835,9836,9837,9838,9839,9840,9841,9842,9843,9844) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9825,'zhTW','不安的活動','帶10個鬼魅精華給卡拉贊外面的大法師艾特羅斯。',0),
+(9826,'zhTW','達拉然的聯繫','將艾特羅斯的報告帶給達拉然郊區的大法師賽卓克。',0),
 (9827,'zhTW','枯萎的孢子臺','將枯萎的孢子臺帶到泰倫多爾給洛安瑪。',0),
 (9828,'zhTW','枯萎的孢子臺','將枯萎的孢子臺帶到斯溫派特崗哨給瑞伏基。',0),
 (9829,'zhTW','卡德加','將艾特羅斯的報告送到泰洛卡森林給撒塔斯城的卡德加。',0),
@@ -11817,12 +11724,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9841,'zhTW','以牙還牙','殺死8個沼光流血者再回薩布拉金的坎巴利卡那裡。',0),
 (9842,'zhTW','最鋒利的劍','帶10把沼牙分割者之刃給薩布拉金的坎巴利卡。',0),
 (9843,'zhTW','琪安娜的日誌','搜索卡拉贊的客房尋找琪安娜的日誌並帶給卡拉贊外的大法師艾特羅斯。',0),
-(9844,'zhTW','惡魔存在','大法師艾特羅斯要你去摧毀卡拉贊頂端的惡魔存在。',0),
-(9845,'zhTW','擊敗釣魚者的對手','殺死10個沼爪痛擊者再回到薩布拉金的祖賈亞那裡。',0),
-(9846,'zhTW','菲拉芬靈魂','帶10個菲拉芬防護圖騰給薩布拉金的先知賈尼迪。',0);
+(9844,'zhTW','惡魔存在','大法師艾特羅斯要你去摧毀卡拉贊頂端的惡魔存在。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9847,9848,9849,9850,9851,9852,9853,9854,9855,9856,9857,9858,9859,9860,9861,9862,9863,9864,9865,9866) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9845,9846,9847,9848,9849,9850,9851,9852,9853,9854,9855,9856,9857,9858,9859,9860,9861,9862,9863,9864) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9845,'zhTW','擊敗釣魚者的對手','殺死10個沼爪痛擊者再回到薩布拉金的祖賈亞那裡。',0),
+(9846,'zhTW','菲拉芬靈魂','帶10個菲拉芬防護圖騰給薩布拉金的先知賈尼迪。',0),
 (9847,'zhTW','靈魂助手?','帶著菲拉芬圖騰到波哈姆廢墟的樓梯底部並將它插在地上。將你的發現回報給薩布拉金的先知賈尼迪。',0),
 (9848,'zhTW','匕首沼地的秘密','將匕首沼地毒藥手冊和匕首沼地毒藥瓶帶給奧雷伯爾港的提莫斯·丹尼爾。',0),
 (9849,'zhTW','粉碎外表','納葛蘭，元素王座的葛爾道格要你殺死30個古羅克的爪牙。',0),
@@ -11840,12 +11747,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9861,'zhTW','哀嚎之風','在元素王座找到會講卡林多語的人再讓他看看哀嚎之風。',0),
 (9862,'zhTW','黑暗之血腐敗者','納葛蘭，元素王座的元素師莫夫要你去殺死8個黑暗之血腐化者。',0),
 (9863,'zhTW','邪惡的塑像','納葛蘭，卡拉達爾的先知可庫許要你幫他帶來20個黑暗之血塑像。',0),
-(9864,'zhTW','失蹤的戰友','試著找到失蹤的卡拉達爾戰友。',0),
-(9865,'zhTW','一朝為戰士','殺死40個黑暗之血拾荒者以及20個黑暗之血劫掠者。',0),
-(9866,'zhTW','他將走遍大地……','將消息送給卡拉達爾的先知科霍克。',0);
+(9864,'zhTW','失蹤的戰友','試著找到失蹤的卡拉達爾戰友。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9867,9868,9869,9870,9871,9872,9873,9874,9875,9876,9878,9879,9882,9883,9884,9885,9886,9887,9888,9889) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9865,9866,9867,9868,9869,9870,9871,9872,9873,9874,9875,9876,9878,9879,9882,9883,9884,9885,9886,9887) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9865,'zhTW','一朝為戰士','殺死40個黑暗之血拾荒者以及20個黑暗之血劫掠者。',0),
+(9866,'zhTW','他將走遍大地……','將消息送給卡拉達爾的先知科霍克。',0),
 (9867,'zhTW','黑暗之血領導者……','納葛蘭，卡拉達爾的先知馬卡戴斯要你幫他把黑暗之血奧拓爾的頭顱帶來。',0),
 (9868,'zhTW','卡達許圖騰','護送瑪格哈俘虜離開日春崗哨。如果你成功的話就和卡拉達爾的卡爾洛斯談談。',0),
 (9869,'zhTW','元素王座','元素師洛奇要你前往元素王座和元素師莎爾瓦克談談。',0),
@@ -11863,12 +11770,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9884,'zhTW','會員福利',NULL,0),
 (9885,'zhTW','會員福利',NULL,0),
 (9886,'zhTW','會員福利',NULL,0),
-(9887,'zhTW','會員福利',NULL,0),
-(9888,'zhTW','無能的領導者','喬林·亡眼要你找到科伊瑞斯並和他談談。',0),
-(9889,'zhTW','別殺那個胖子','泰洛卡森林的科伊瑞斯要你殺死10個石拳侵略者並鞭打無情的昂庫爾直到他說話為止。',0);
+(9887,'zhTW','會員福利',NULL,0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9890,9891,9892,9893,9894,9895,9896,9897,9898,9899,9900,9901,9902,9903,9904,9905,9906,9907,9908,9909) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9888,9889,9890,9891,9892,9893,9894,9895,9896,9897,9898,9899,9900,9901,9902,9903,9904,9905,9906,9907) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9888,'zhTW','無能的領導者','喬林·亡眼要你找到科伊瑞斯並和他談談。',0),
+(9889,'zhTW','別殺那個胖子','泰洛卡森林的科伊瑞斯要你殺死10個石拳侵略者並鞭打無情的昂庫爾直到他說話為止。',0),
 (9890,'zhTW','成功!','帶著你從昂庫爾那裡得知的消息去找泰洛卡森林的科伊瑞斯。',0),
 (9891,'zhTW','科伊瑞斯是懦夫','帶著你從昂庫爾那裡得知的消息去納葛蘭找卡拉達爾的喬林·亡眼。',0),
 (9892,'zhTW','更多黑曜石戰爭串珠',NULL,0),
@@ -11886,12 +11793,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9904,'zhTW','抓到恐懼之爪','殺了恐懼之爪再回到薩布拉金向祖賈亞回報。',0),
 (9905,'zhTW','瑪克吐的復仇','找到並殺死莫拉吉斯，再回到奧雷伯爾港向瑪克吐回報。',0),
 (9906,'zhTW','戰鬥的訊息','納葛蘭，卡拉達爾的喬林·亡眼要你殺死15個石拳粉碎者和15個石拳秘法師。',0),
-(9907,'zhTW','大膽前進','納葛蘭，卡拉達爾的喬林·亡眼要你殺死25個石拳戰士和25個石拳法師。',0),
-(9908,'zhTW',NULL,'此任務已經絕版。',0),
-(9909,'zhTW',NULL,'此任務已經絕版。',0);
+(9907,'zhTW','大膽前進','納葛蘭，卡拉達爾的喬林·亡眼要你殺死25個石拳戰士和25個石拳法師。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9910,9911,9912,9913,9914,9915,9916,9917,9918,9919,9920,9921,9922,9923,9924,9925,9926,9927,9928,9929) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9908,9909,9910,9911,9912,9913,9914,9915,9916,9917,9918,9919,9920,9921,9922,9923,9924,9925,9927,9928) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9908,'zhTW',NULL,'此任務已經絕版。',0),
+(9909,'zhTW',NULL,'此任務已經絕版。',0),
 (9910,'zhTW','軍旗與實行','納葛蘭，卡拉達爾的『秘法師』伊萊克根要你在第一個燃燒之劍柴堆、第二個燃燒之劍柴堆以及第三個燃燒之劍柴堆上使用瑪格哈戰鬥戰旗。完成後將瑪格哈戰鬥戰旗還給他。',0),
 (9911,'zhTW','沼澤的伯爵','將『伯爵』安古拉的上顎帶給看守者里薩歐。',0),
 (9912,'zhTW','塞納里奧遠征隊','到贊格沼澤的塞納里奧避難所和伊斯歐·風歌談談。',0),
@@ -11908,13 +11815,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9923,'zhTW','救命!','找到石拳鑰匙並釋放柯爾奇。成功後和泰拉的阿爾克隆談談。',0),
 (9924,'zhTW','柯爾奇又不見了!','泰拉的阿爾克隆要你找到並且釋放柯爾奇。',0),
 (9925,'zhTW','防禦之事','納葛蘭，艾瑞斯平臺的澤瑞德要你去歐夏剛附近殺死12個虛無再生者。',0),
-(9926,'zhTW',NULL,'此任務已經絕版。    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(9926))',0),
 (9927,'zhTW','殘忍的狡猾','納葛蘭，燃燒之劍氏族廢墟的『劍刃』蘭崔索要你將20個戰槌巨魔旗幟插在吉爾索洛堡壘的吉爾索洛成員屍體上。$b$b將未使用的戰槌巨魔旗幟交回。',0),
-(9928,'zhTW','欺騙的軍備','納葛蘭，燃燒之劍氏族廢墟的『劍刃』蘭崔索要你去收集20個吉爾索洛裝備。',0),
-(9929,'zhTW',NULL,'此任務已經絕版。[Travel northwest along the road toward Shattrath and search for evidence of what happened to Dugar.]',0);
+(9928,'zhTW','欺騙的軍備','納葛蘭，燃燒之劍氏族廢墟的『劍刃』蘭崔索要你去收集20個吉爾索洛裝備。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9930,9931,9932,9933,9934,9935,9936,9937,9938,9939,9940,9941,9942,9943,9944,9945,9946,9947,9948,9949) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9929,9930,9931,9932,9933,9934,9935,9936,9937,9938,9939,9940,9941,9942,9943,9944,9945,9946,9947,9948) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9929,'zhTW',NULL,'此任務已經絕版。[Travel northwest along the road toward Shattrath and search for evidence of what happened to Dugar.]',0),
 (9930,'zhTW',NULL,'此任務已經絕版。[Travel northwest along the road toward Shattrath and search for evidence of what happened to Deirom.]',0),
 (9931,'zhTW','回報','燃燒之劍氏族廢墟的『劍刃』蘭崔索要你將20個吉爾索洛旗幟插在獰笑骷髏氏族廢墟的戰槌巨魔屍體上。$b$b交回未使用的吉爾索洛旗幟。',0),
 (9932,'zhTW','證據的屍體','納葛蘭，燃燒之劍氏族廢墟的『劍刃』蘭崔索要你去獰笑骷髏庭院，在燃燒的戰槌柴堆使用潮濕的羊毛毯來通知他的巨魔。',0),
@@ -11933,11 +11839,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9945,'zhTW','戰槌之戰','納葛蘭，瑪格哈利隊伍的長老優兒利要你去殺死15個戰槌蠻卒和15個戰槌術士。',0),
 (9946,'zhTW','『掠取者』喬沃','納葛蘭，瑪格哈利隊伍的長老優兒利要你去殺死『掠取者』喬沃並取得喬沃的頭顱。',0),
 (9947,'zhTW',NULL,'此任務已經絕版。[Return to Rokag at Stonebreaker Hold with news of your findings.]',0),
-(9948,'zhTW','找到生還者','納葛蘭，瑪格哈利隊伍的長老昂古力斯要你釋放15名瑪格哈囚犯。',0),
-(9949,'zhTW',NULL,'此任務已經絕版。[Bring the Eye of Veil Skith, the Eye of Veil Shienor, and the Eye of Veil Reskk to Andarl at the Allerian Stronghold.]',0);
+(9948,'zhTW','找到生還者','納葛蘭，瑪格哈利隊伍的長老昂古力斯要你釋放15名瑪格哈囚犯。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9950,9951,9952,9953,9954,9955,9956,9957,9958,9959,9960,9961,9962,9963,9964,9965,9966,9967,9968,9969) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9949,9950,9951,9952,9953,9954,9955,9956,9957,9958,9959,9960,9961,9962,9963,9964,9965,9966,9967,9968) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9949,'zhTW',NULL,'此任務已經絕版。[Bring the Eye of Veil Skith, the Eye of Veil Shienor, and the Eye of Veil Reskk to Andarl at the Allerian Stronghold.]',0),
 (9950,'zhTW',NULL,'此任務已經絕版。[Bring the Eye of Veil Skith, the Eye of Veil Shienor, and the Eye of Veil Reskk to Kurgatok at Stonebreaker Hold.]',0),
 (9951,'zhTW','它在看著你!','殺了奈伏薩拉爾再回到泰洛卡森林找塞納里奧灌木林的守望者崔洛斯。',0),
 (9952,'zhTW',NULL,'此任務已經絕版。[Locate and speak with Prospector Balmoral.]',0),
@@ -11956,11 +11862,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9965,'zhTW',NULL,'此任務已經絕版。[Bring Mug''gok''s Head to Kokorek in Veil Lithic.]',0),
 (9966,'zhTW',NULL,'此任務已經絕版。[Bring Mug''gok''s Head to Kokorek in Veil Lithic.]',0),
 (9967,'zhTW','血色競技場:憂鬱兄弟黨','擊敗自稱憂鬱兄弟的黑暗之血雙子。擊敗他們之後跟食人妖僕人伍德林領取獎賞。',0),
-(9968,'zhTW','奇怪的能量','收集4個泰洛飛蛾樣本和4個兇惡的泰洛飛蛾樣本。再回到泰洛卡森林找塞納里奧灌木林外的大地束縛者塔伏格蘭。',0),
-(9969,'zhTW',NULL,'此任務已經絕版。[Bring 5 Warp Hunter Essences and 30 Terokkar Chokeberries to Kokorek in Veil Lithic.]',0);
+(9968,'zhTW','奇怪的能量','收集4個泰洛飛蛾樣本和4個兇惡的泰洛飛蛾樣本。再回到泰洛卡森林找塞納里奧灌木林外的大地束縛者塔伏格蘭。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9970,9971,9972,9973,9974,9975,9976,9977,9978,9979,9980,9981,9982,9983,9986,9987,9990,9991,9992,9993) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9969,9970,9971,9972,9973,9974,9975,9976,9977,9978,9979,9980,9981,9982,9983,9986,9987,9990,9991,9992) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9969,'zhTW',NULL,'此任務已經絕版。[Bring 5 Warp Hunter Essences and 30 Terokkar Chokeberries to Kokorek in Veil Lithic.]',0),
 (9970,'zhTW','血色競技場:『碎裂領主』洛克達','擊敗『碎裂領主』洛克達。獲勝之後跟食人妖僕人伍德林領取獎賞。',0),
 (9971,'zhTW','樹叢裡的線索','調查破碎的屍體旁邊的奇怪的物品來判定塞納里奧灌木林發生過什麼事。再回到泰洛卡森林外找大地束縛者塔伏格蘭。',0),
 (9972,'zhTW','血色競技場:史卡拉克斯','擊敗史卡拉克斯。獲勝之後跟食人妖僕人伍德林領取獎賞。',0),
@@ -11979,11 +11885,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9987,'zhTW','阻礙阿拉卡','殺死迷霧瑞斯克的阿斯卡斯，迷霧辛諾的阿翼特，和迷霧斯奇司的烏達克再回到碎石堡找瑞克格。',0),
 (9990,'zhTW','調查杜瑞','找到密封的箱子再將它送到泰洛卡森林交給塞納里奧灌木林外的大地束縛者塔伏格蘭。',0),
 (9991,'zhTW','調查土地','坐好享受旅程。等調查完成後和奧翠司談談。',0),
-(9992,'zhTW','奧萊姆貝種子','收集30顆奧萊姆貝種子交給艾蘭里堡壘的羅斯勒斯。',0),
-(9993,'zhTW','奧萊姆貝種子油','將30顆奧萊貝種子交給碎石堡的瑞克利亞。',0);
+(9992,'zhTW','奧萊姆貝種子','收集30顆奧萊姆貝種子交給艾蘭里堡壘的羅斯勒斯。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9994,9995,9996,9997,9998,9999,10000,10001,10002,10003,10004,10005,10006,10007,10008,10009,10010,10011,10012,10013) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9993,9994,9995,9996,9997,9998,9999,10000,10001,10002,10003,10004,10005,10006,10007,10008,10009,10010,10011,10012) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9993,'zhTW','奧萊姆貝種子油','將30顆奧萊貝種子交給碎石堡的瑞克利亞。',0),
 (9994,'zhTW','這些是什麼東西?','將一箱零件運回泰洛卡森林交給艾蘭里堡壘的珍奈·星語。',0),
 (9995,'zhTW','這些是什麼東西?','將一箱零件運回泰洛卡森林交給碎石堡的吐奇。',0),
 (9996,'zhTW','攻擊火翼崗哨','殺死10個火翼防衛者，10個火翼血守衛，10個火翼術士。再回到泰洛卡森林向艾蘭里哨站的莫瑞狄恩中尉回報。',0),
@@ -12002,11 +11908,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10009,'zhTW','解決一些傢伙','撒塔斯城的沙薩拉畢恩要你取回拉利克的欠款，庫庫許的債款和服倫之債。',0),
 (10010,'zhTW','就這麼簡單嗎?','撒塔斯城的沙薩拉畢恩要你回到西納葛蘭找『受難者』奧翠司。',0),
 (10011,'zhTW','煉冶場:徹底擊潰','納葛蘭西邊的『受難者』奧翠司要你去摧毀煉冶場:仇恨和煉冶場:恐懼。',0),
-(10012,'zhTW','魔獄獸人計畫','將魔獄獸人計畫交給艾蘭里堡壘的伯特泰歐。',0),
-(10013,'zhTW','看不見的手','將魔獄獸人計畫交給碎石堡的瑞克格。',0);
+(10012,'zhTW','魔獄獸人計畫','將魔獄獸人計畫交給艾蘭里堡壘的伯特泰歐。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10016,10017,10018,10019,10020,10021,10022,10023,10024,10025,10026,10027,10028,10030,10031,10033,10034,10035,10036,10037) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10013,10016,10017,10018,10019,10020,10021,10022,10023,10024,10025,10026,10027,10028,10030,10031,10033,10034,10035,10036) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10013,'zhTW','看不見的手','將魔獄獸人計畫交給碎石堡的瑞克格。',0),
 (10016,'zhTW','灰座狼尾巴','艾蘭里堡壘的伯特泰歐要你去幫他帶回來12個灰座狼尾巴。可以從灰座狼或灰座狼首領身上取得。',0),
 (10017,'zhTW','物資短缺','將8個懼牙毒囊交給撒塔斯城的薩尼爾。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
 (10018,'zhTW','狼魂法衣','將12塊灰座狼皮交給碎石堡的瑪魯卡茲。',0),
@@ -12025,11 +11931,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10033,'zhTW','懸賞:鞭骨者的死亡!','殺了20隻鞭骨者後回報給泰洛卡森林裡艾蘭里堡壘的泰伊拉·艾薇斯崔德。',0),
 (10034,'zhTW','懸賞:鞭骨者的死亡!','殺了20隻鞭骨者後回報給泰洛卡森林裡碎石堡的矛克·邪擊。',0),
 (10035,'zhTW','托茍斯!','利用崔奇拉的屍體引誘托苟斯出現。取得一根托茍斯的尾羽然後交給泰洛卡森林的艾蘭里堡壘的泰伊拉·艾薇斯崔德。',0),
-(10036,'zhTW','托茍斯!','利用崔奇拉的屍體引誘托苟斯出現。取得一根托苟斯的尾羽然後回到泰洛卡森林的碎石堡找矛克·邪擊。',0),
-(10037,'zhTW','當然是釣魚','將8隻新鮮閃鱗鰻交給撒塔斯的塞斯。',0);
+(10036,'zhTW','托茍斯!','利用崔奇拉的屍體引誘托苟斯出現。取得一根托苟斯的尾羽然後回到泰洛卡森林的碎石堡找矛克·邪擊。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10038,10039,10040,10041,10042,10043,10044,10045,10047,10048,10049,10050,10051,10052,10053,10054,10055,10056,10057,10058) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10037,10038,10039,10040,10041,10042,10043,10044,10045,10047,10048,10049,10050,10051,10052,10053,10054,10055,10056,10057) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10037,'zhTW','當然是釣魚','將8隻新鮮閃鱗鰻交給撒塔斯的塞斯。',0),
 (10038,'zhTW','與士兵維克斯談話','在泰洛卡森林的葛蘭戈瓦村北方入口處找到士兵維克斯並與他談話。',0),
 (10039,'zhTW','與斥候奈夫提斯談話','在泰洛卡森林的葛蘭戈瓦村南方入口處找到斥候奈夫提斯並與她談談。',0),
 (10040,'zhTW','他們是誰?','於偽裝中與幽暗的新兵，幽暗的工人及幽暗的諫言者說話。完成後回到泰洛卡森林的葛蘭戈瓦村中找士兵維克斯回報。',0),
@@ -12048,11 +11954,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10054,'zhTW',NULL,'此任務已經絕版。[Slay 15 Bleeding Hollow Grunts, 10 Bleeding Hollow Necrolytes, 5 Bleeding Hollow Peons, and Warlord Morkh, then make your report to Lieutenant Amadi at Honor Hold''s western tower.]',0),
 (10055,'zhTW','不浪費，就不缺乏','將8塊可利用的鐵及8塊可利用的木頭交給榮譽堡的戴夫利。',0),
 (10056,'zhTW',NULL,'此任務已經絕版。[Destroy 6 piles of Bleeding Hollow Supplies and report to Lieutenant Amadi at Honor Hold.]',0),
-(10057,'zhTW','與領導者同在','擊敗大法師辛特和少校薩沃斯的鬼魂後回到榮譽堡西北邊的塔中找榮譽守衛衛斯羅。',0),
-(10058,'zhTW','一份多年的禮物','取得光明的奧秘後回到榮譽堡交給神父摩葛·戴維迪克斯。',0);
+(10057,'zhTW','與領導者同在','擊敗大法師辛特和少校薩沃斯的鬼魂後回到榮譽堡西北邊的塔中找榮譽守衛衛斯羅。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10059,10060,10062,10068,10069,10070,10071,10072,10073,10074,10075,10076,10077,10078,10079,10080,10081,10082,10083,10084) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10058,10059,10060,10062,10068,10069,10070,10071,10072,10073,10074,10075,10076,10077,10078,10079,10080,10081,10082,10083) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10058,'zhTW','一份多年的禮物','取得光明的奧秘後回到榮譽堡交給神父摩葛·戴維迪克斯。',0),
 (10059,'zhTW',NULL,'此任務已經絕版。[Slay Grillok "Darkeye" and search his lair for the Bleeding Hollow Attack Plans.]',0),
 (10060,'zhTW',NULL,'此任務已經絕版。[Slay 15 Bleeding Hollow Grunts, 10 Bleeding Hollow Necrolytes, 5 Bleeding Hollow Peons, and Warlord Morkh. Then report to Stone Guard Ambelan at Spinebreaker Ridge.]',0),
 (10062,'zhTW',NULL,'此任務已經絕版。[Overcome the ghosts of Arch Mage Xintor and Lieutenant Commander Thalvos and return to Grelag at Spinebreaker Ridge.]',0),
@@ -12071,11 +11977,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10080,'zhTW',NULL,'此任務已經絕版。[Kill 10 Gan''arg Servants, 5 Forge Camp Legionnaires, and 5 Sisters of Grief, then search Forge Camp: Rage for evidence of the Legion''s intentions.]',0),
 (10081,'zhTW','與卡修爾母親會面','祖母吉雅要你與卡修爾母親談談。',0),
 (10082,'zhTW','焦慮的先祖們','卡修爾母親要你殺掉15個激動的獸人靈魂。',0),
-(10083,'zhTW',NULL,'此任務已經絕版。[Retrieve the Forge Camp: Spite Plans and return them to Field Marshal Rohamus at Expedition Point.]',0),
-(10084,'zhTW',NULL,'此任務已經絕版。[Kill Nightlord Malphas at Forge Base: Mageddon, and report to Force Commander Danath Trollbane at Honor Hold.]',0);
+(10083,'zhTW',NULL,'此任務已經絕版。[Retrieve the Forge Camp: Spite Plans and return them to Field Marshal Rohamus at Expedition Point.]',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10085,10086,10087,10088,10089,10090,10091,10092,10093,10094,10095,10096,10097,10098,10099,10100,10101,10102,10103,10104) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10084,10085,10086,10087,10088,10089,10090,10091,10092,10093,10094,10095,10096,10097,10098,10099,10100,10101,10102,10103) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10084,'zhTW',NULL,'此任務已經絕版。[Kill Nightlord Malphas at Forge Base: Mageddon, and report to Force Commander Danath Trollbane at Honor Hold.]',0),
 (10085,'zhTW','拜訪先祖們','納葛蘭上先祖之地的卡修爾母親要你去拜訪日春崗哨，獰笑骷髏廢墟，卡拉達爾以及血之谷廢墟。',0),
 (10086,'zhTW','我替……部落工作!','將8片可利用的金屬及8塊可利用的木頭交給索爾瑪的奴克巴斯。',0),
 (10087,'zhTW','為了部落……燒了它!','使用燃燒的火炬燒毀東邊的聯盟火砲還有西邊的聯盟火砲，然後回報索爾瑪的米希克·奴克巴斯。',0),
@@ -12094,11 +12000,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10100,'zhTW',NULL,'此任務已經絕版。[Locate and kill Urga''zz within the mines beneath Thrallmar, then return to Foreman Razelcraz.]',0),
 (10101,'zhTW','當靈魂們說話時','納葛蘭的先祖之地的卡修爾母親要你去找出擁有的幻象。去找歐夏剛的庫爾。',0),
 (10102,'zhTW','秘密的揭露','和撒塔斯城裡的阿達歐談談。',0),
-(10103,'zhTW','報告祖瑞伊','回報贊格沼澤的伊斯溫派特崗哨裡的祖瑞伊。',0),
-(10104,'zhTW','與杜瑞有關','與泰洛卡森林裡艾蘭里堡壘的安達爾歐談談。',0);
+(10103,'zhTW','報告祖瑞伊','回報贊格沼澤的伊斯溫派特崗哨裡的祖瑞伊。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10105,10106,10107,10108,10109,10110,10111,10112,10113,10114,10115,10116,10117,10118,10119,10120,10121,10123,10124,10126) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10104,10105,10106,10107,10108,10109,10110,10111,10112,10113,10114,10115,10116,10117,10118,10119,10120,10121,10123,10124) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10104,'zhTW','與杜瑞有關','與泰洛卡森林裡艾蘭里堡壘的安達爾歐談談。',0),
 (10105,'zhTW','給瑞克利亞的消息','與泰洛卡森林裡碎石堡的瑞克利亞談談。',0),
 (10106,'zhTW','地獄火防禦堡壘','占領望海崖，競技場和破碎之丘，完成後回到地獄火半島的榮譽堡找士官長崔西·波特威歐。',0),
 (10107,'zhTW','外交的衡量','納葛蘭裡卡拉達爾的喬林·亡眼要你去燃燒之劍廢墟尋找『劍刃』蘭崔索並與他談談。',0),
@@ -12117,11 +12023,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10120,'zhTW','抵達外域','地獄火半島上黑暗之門的歐萊恩中將要你將歐萊恩的報告交給法拉格·伏瑞菲德。',0),
 (10121,'zhTW','徹底消滅燃燒軍團','到索爾瑪城外東邊的補給營地找碎顱中士談談。',0),
 (10123,'zhTW','魔焰深谷','地獄火半島索爾瑪東邊補給商隊的碎顱中士要你殺掉4個烈焰行者小鬼，6個地獄火戰爭使者及1個恐懼呼喚者。',0),
-(10124,'zhTW','前方據點:搶奪者荒野','向搶奪者荒野的前線指揮官吐阿奇報到。',0),
-(10126,'zhTW',NULL,'此任務已經絕版。[Travel south along the west side of the South Rampart and search the next camp for signs of Private Imarion.]',0);
+(10124,'zhTW','前方據點:搶奪者荒野','向搶奪者荒野的前線指揮官吐阿奇報到。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10128,10129,10131,10132,10133,10134,10135,10136,10137,10138,10139,10140,10141,10142,10143,10144,10146,10147,10148,10149) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10126,10128,10129,10131,10132,10133,10134,10135,10136,10137,10138,10139,10140,10141,10142,10143,10144,10146,10147,10148) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10126,'zhTW',NULL,'此任務已經絕版。[Travel south along the west side of the South Rampart and search the next camp for signs of Private Imarion.]',0),
 (10128,'zhTW',NULL,'此任務已經絕版。[Continue south along the Southern Rampart and search for where Warboss Nekrogg is holding Private Imarion.]',0),
 (10129,'zhTW','任務:墨奇斯以及夏德拉茲入口','與空軍指揮布拉克談談，炸掉墨奇斯入口以及夏德拉茲入口，完成後回到搶奪者荒野找前線指揮官吐阿奇。',0),
 (10131,'zhTW',NULL,'此任務已經絕版。[Kill a Shattered Hand Grenadier and bring his Crude Explosives to Private Imarion at Gor''gaz Outpost.]',0),
@@ -12140,11 +12046,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10144,'zhTW','阻斷他們的援軍','殺掉格瑞之門和卡雷茲之門附近的敵人取得惡魔符文石。$b$b在格瑞之門和卡雷茲之門內使用金斯頓的書冊。$b$b帶著剩下的爆裂物回去找前線指揮官金斯頓。',0),
 (10146,'zhTW','任務:墨奇斯和夏德拉茲入口','與空軍指揮戴畢瑞交談，炸掉墨奇斯入口和夏德拉茲入口，然後回到遠征隊哨塔向前線指揮官金斯頓回報。',0),
 (10147,'zhTW',NULL,'此任務已經絕版。[Forward Commander Kingston at Expedition Point in Hellfire Peninsula has asked that you find and slay Arix''malidash and recover the Legion Missive.]',0),
-(10148,'zhTW',NULL,'此任務已經絕版。[Take the Legion Missive to Force Commander Danath Trollbane at Honor Hold in Hellfire Peninsula.]',0),
-(10149,'zhTW',NULL,'此任務已經絕版。[Force Commander Danath Trollbane at Honor Hold in Hellfire Peninsula has asked that you slay Arazzius the Cruel.$b]',0);
+(10148,'zhTW',NULL,'此任務已經絕版。[Take the Legion Missive to Force Commander Danath Trollbane at Honor Hold in Hellfire Peninsula.]',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10151,10153,10154,10155,10156,10157,10158,10159,10160,10161,10162,10163,10164,10165,10167,10168,10170,10171,10172,10173) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10149,10151,10153,10154,10155,10156,10157,10158,10159,10160,10161,10162,10163,10164,10165,10167,10168,10170,10171,10172) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10149,'zhTW',NULL,'此任務已經絕版。[Force Commander Danath Trollbane at Honor Hold in Hellfire Peninsula has asked that you slay Arazzius the Cruel.$b]',0),
 (10151,'zhTW',NULL,'此任務已經絕版。[Travel south along the west side of the Northern Rampart and search the next camp for signs of Scout Makha]',0),
 (10153,'zhTW',NULL,'此任務已經絕版。[Continue south across the Path of Glory to the Southern Rampart and search for where Warboss Nekrogg is holding Scout Makha.]',0),
 (10154,'zhTW',NULL,'此任務已經絕版。[Kill a Shattered Hand Grenadier and bring his Crude Explosives to Scout Makha at Gor''gaz Outpost.]',0),
@@ -12163,11 +12069,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10168,'zhTW','靈魂看見的','在奧奇奈地穴裡的某處找到一面靈魂之鏡，並且用它召喚來自納葛蘭的古老的獸人元祖的黯淡的靈魂前來。消滅15個黯淡的靈魂好讓那些先祖能夠安息。$b$b當任務完成後，回到先祖之地的卡修爾母親那裡。',0),
 (10170,'zhTW','回到祖母身邊','回到卡拉達爾找祖母吉雅談談。',0),
 (10171,'zhTW','極為傷心的酋長','卡拉達爾的祖母吉雅要你去與卡爾洛斯談談。',0),
-(10172,'zhTW','沒有希望了','去與祖母吉雅談談並告訴她卡爾洛斯跟你說了什麼。',0),
-(10173,'zhTW','大法師之杖','從『審判官』艾克爾拉斯那裡取回大法師瓦戈斯之杖，並且將它帶去給52區的羅樊德威。為了讓艾克爾拉斯現身，把喚魔粉末撒在在廢墟中心的火盆上。',0);
+(10172,'zhTW','沒有希望了','去與祖母吉雅談談並告訴她卡爾洛斯跟你說了什麼。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10174,10175,10176,10177,10178,10180,10182,10183,10184,10185,10186,10188,10189,10190,10191,10192,10193,10194,10195,10197) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10173,10174,10175,10176,10177,10178,10180,10182,10183,10184,10185,10186,10188,10189,10190,10191,10192,10193,10194,10195) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10173,'zhTW','大法師之杖','從『審判官』艾克爾拉斯那裡取回大法師瓦戈斯之杖，並且將它帶去給52區的羅樊德威。為了讓艾克爾拉斯現身，把喚魔粉末撒在在廢墟中心的火盆上。',0),
 (10174,'zhTW','紫羅蘭之塔的詛咒','使用大法師瓦戈斯之杖與大法師瓦戈斯連絡。$b$b如果你遺失了大法師瓦戈斯之杖，可以跟52區的羅樊德威談談取得一個替代品。$b$b已提供物品：$b',0),
 (10175,'zhTW','索爾，杜洛坦之子','到奧格瑪去將吉雅的訊息傳達給索爾。',0),
 (10176,'zhTW','守護者阿其羅斯','進入肯瑞瓦村莊中心的紫蘿蘭之塔打敗阿其羅斯，完成後與大法師瓦戈斯談談。',0),
@@ -12186,11 +12092,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10192,'zhTW','卡薩斯的手冊','從肯瑞瓦村莊的小鎮廣場取回卡薩斯的手冊 - 第一章，卡薩斯的手冊 - 第二章，和卡薩斯的手冊 - 第三章。拿到所有章節後使用大法師瓦戈斯之杖與大法師連絡。',0),
 (10193,'zhTW','高重要性的目標','52區的間諜大師薩洛迪恩要你去法力熔爐巴納爾殺掉2個日怒星移管理者，6個日怒星移工程師以及8個日怒地理學家。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
 (10194,'zhTW','隱形飛行','與52區外的維納妮雅交談並飛往法力熔爐寇魯。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
-(10195,'zhTW',NULL,'此任務已經絕版。[Bring 30 Arakkoa Feathers to Ros''eleth at the Allerian Stronghold.]',0),
-(10197,'zhTW','具說服力的偽裝','取得1套日怒秘法師長袍，1雙日怒調查員手套和1個日怒守衛勳章，完成後將這些帶回虛空風暴的法力熔爐寇魯給卡利迪斯·曙光。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0);
+(10195,'zhTW',NULL,'此任務已經絕版。[Bring 30 Arakkoa Feathers to Ros''eleth at the Allerian Stronghold.]',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10198,10199,10200,10201,10202,10203,10204,10205,10206,10208,10209,10210,10211,10212,10213,10216,10218,10220,10221,10222) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10197,10198,10199,10200,10201,10202,10203,10204,10205,10206,10208,10209,10210,10211,10212,10213,10216,10218,10220,10221) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10197,'zhTW','具說服力的偽裝','取得1套日怒秘法師長袍，1雙日怒調查員手套和1個日怒守衛勳章，完成後將這些帶回虛空風暴的法力熔爐寇魯給卡利迪斯·曙光。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
 (10198,'zhTW','收集資訊','使用日怒偽裝，進入法力熔爐寇魯聽取指揮官黎鑄與秘法師艾登尼斯的對話。完成任務後回報給卡利迪斯·曙光。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
 (10199,'zhTW','一點額外的刺激','替虛空風暴裡52區的布茲帶來5個虛空鰭刺。',0),
 (10200,'zhTW','回去找薩洛迪恩','回到虛空風暴的52區找間諜大師薩洛迪恩。',0),
@@ -12209,11 +12115,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10216,'zhTW','安全至上','工匠莫法利厄司要你去殺掉10個伊斯利盜墓者，5個伊斯利巫士，5個奈薩斯捕獵者及5個伊斯利縛法者。$b$b一旦完成後，找到在薩法爾之前一個房間的伊斯利傳送器並啟動它。',0),
 (10218,'zhTW','解決別人的難事','護送工程師薩希恩安全的穿越法力墓地讓他可以拾取那些薩法爾的精華收集器內的精華。$b$b完成後回到法力墓地外的聯合團紮營地找奈薩斯王子哈拉瑪德回報。',0),
 (10220,'zhTW','讓他們聽話','莫爾迪巴要你去斷脊氏族崗哨西方的遠征隊軍械庫殺掉12個不屈的士兵，8個不屈的騎士，以及6個不屈的魔巫士。',0),
-(10221,'zhTW','布姆博士!','殺掉布姆博士並將這個好消息帶給虛空風暴的52區給工兵領班布拉斯特費索。',0),
-(10222,'zhTW','日怒部隊','肯瑞瓦村莊的管理者戴沃斯要你去殺了10個日怒弓箭手。',0);
+(10221,'zhTW','布姆博士!','殺掉布姆博士並將這個好消息帶給虛空風暴的52區給工兵領班布拉斯特費索。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10223,10224,10225,10226,10227,10228,10229,10230,10231,10232,10233,10234,10235,10236,10237,10238,10239,10240,10241,10242) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10222,10223,10224,10225,10226,10227,10228,10229,10230,10231,10232,10233,10234,10235,10236,10237,10238,10239,10240,10241) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10222,'zhTW','日怒部隊','肯瑞瓦村莊的管理者戴沃斯要你去殺了10個日怒弓箭手。',0),
 (10223,'zhTW','擊倒戴利斯','肯瑞瓦村莊的管理者戴沃斯要你去殺掉大師戴利斯·黎擊。',0),
 (10224,'zhTW','引擎的精華','收集7個法力怨靈精華將它們帶回到虛空風暴的52區給首席工程師崔普。',0),
 (10225,'zhTW','回報工程師','將這些伊斯利母體水晶送到虛空風暴的52區給首席工程師崔普。',0),
@@ -12232,11 +12138,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10238,'zhTW','如何服務哥布林','從魔獄獸人營地救回曼尼、莫歐還有杰克然後回到索爾瑪西北方的礦坑找工頭瑞絲坎茲。',0),
 (10239,'zhTW','潛在的能量來源','肯瑞瓦村莊的莫爾蘭巫士中尉要你去從法力熔爐寇魯的血精靈行動中奪取10個能量隔離體回來。',0),
 (10240,'zhTW','建立結界','在東邊符文，東北邊符文，以及西邊符文附近使用符文啟動裝置。這些符文能夠在肯瑞瓦村莊的巫士街及小鎮廣場區週邊找到。完成任務後回去找莫爾蘭巫士中尉。',0),
-(10241,'zhTW','法力熔爐巴納爾的擾亂行動','殺掉8個日怒博學者及8個日怒血守衛，完成後回到52區找主教歐瑞利斯。$b$b為奧多爾完成任務會使你的占卜者聲望降低。',0),
-(10242,'zhTW','斷脊氏族崗哨','搶奪者荒野的藥劑師席蓮娜要你和空軍指揮布拉克談談以搭乘雙足翼龍到斷脊氏族崗哨，把血之谷鮮血樣本帶給斷脊氏族崗哨的藥劑師艾柏瑞克。',0);
+(10241,'zhTW','法力熔爐巴納爾的擾亂行動','殺掉8個日怒博學者及8個日怒血守衛，完成後回到52區找主教歐瑞利斯。$b$b為奧多爾完成任務會使你的占卜者聲望降低。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10243,10245,10246,10247,10248,10249,10250,10251,10252,10253,10254,10255,10256,10257,10258,10259,10261,10262,10263,10264) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10242,10243,10245,10246,10247,10248,10249,10250,10251,10252,10253,10254,10255,10256,10257,10258,10259,10261,10262,10263) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10242,'zhTW','斷脊氏族崗哨','搶奪者荒野的藥劑師席蓮娜要你和空軍指揮布拉克談談以搭乘雙足翼龍到斷脊氏族崗哨，把血之谷鮮血樣本帶給斷脊氏族崗哨的藥劑師艾柏瑞克。',0),
 (10243,'zhTW','那魯的技術','進入法力熔爐巴納爾找到巴納爾控制臺。$b$b為奧多爾完成任務會使你的占卜者聲望降低。',0),
 (10245,'zhTW','巴納爾控制臺謄本','將巴納爾控制臺謄本傳送到虛空風暴的52區給隱士卡爾加。$b$b為奧多爾完成任務會使你的占卜者聲望降低。',0),
 (10246,'zhTW','攻擊法力熔爐寇魯','到法力熔爐寇魯去殺掉8個日怒大法師及5個日怒調查員。完成後回報給主教歐瑞利斯。$b$b為奧多爾完成任務會使你的占卜者聲望降低。',0),
@@ -12255,11 +12161,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10259,'zhTW','進入裂縫中','殺掉6個入侵的惡魔守衛，然後回去找銀色特使波特威歐。',0),
 (10261,'zhTW','懸賞:殲滅者伺服電動機!','取得一部殲滅者伺服電動機，並且將它帶回虛空風暴的52區交給威勒老爹。',0),
 (10262,'zhTW','一堆伊斯利','收集10枚薩希斯徽記，並且將它們帶回虛空風暴的52區交給虛空行者凱澤。',0),
-(10263,'zhTW','協助聯合團','到虛空風暴的52區找虛空行者凱澤談談。',0),
-(10264,'zhTW','協助聯合團','到虛空風暴的52區找虛空行者凱澤談談。',0);
+(10263,'zhTW','協助聯合團','到虛空風暴的52區找虛空行者凱澤談談。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10265,10266,10267,10268,10269,10270,10271,10272,10273,10274,10275,10276,10277,10278,10279,10280,10281,10282,10283,10284) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10264,10265,10266,10267,10268,10269,10270,10271,10272,10273,10274,10275,10276,10277,10278,10279,10280,10281,10282,10283) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10264,'zhTW','協助聯合團','到虛空風暴的52區找虛空行者凱澤談談。',0),
 (10265,'zhTW','聯合團水晶收集','取得阿克隆水晶手工品，並且將它帶回虛空風暴的52區交給虛空行者凱澤。',0),
 (10266,'zhTW','要求幫助','尋找並提供加魯你的幫助。他就在虛空風暴的秘境領地裡的領地崗哨。',0),
 (10267,'zhTW','合法的回收','收集10箱勘探設備帶回虛空風暴秘境領地的領地崗哨給加魯。',0),
@@ -12278,11 +12184,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10280,'zhTW','給撒塔斯城的特件','將阿塔莫水晶送交到撒塔斯城的聖光露臺交給阿達歐。',0),
 (10281,'zhTW','正式自我介紹','在天國山脈的北端找到泰利並與她談談。',0),
 (10282,'zhTW','舊時的希爾斯布萊德','時光之穴的安杜姆要你到希爾斯布萊德丘陵去跟伊洛森談談。',0),
-(10283,'zhTW','塔蕾莎的聲東擊西','前往敦霍爾德城堡，使用伊洛森交給你的燃燒炸彈包裹在每一個拘留守衛室裡的桶中放置5個燃燒炸藥。$b$b當你引爆拘留守衛室後，與敦霍爾德城堡地牢裡的索爾談談。',0),
-(10284,'zhTW','逃離敦霍爾德','當你準備開始時，讓索爾知道。跟著索爾離開敦霍爾德城堡，並協助他釋放塔蕾莎以及完成他的天命。$b$b任務完成後到希爾斯布萊德找伊洛森談談。',0);
+(10283,'zhTW','塔蕾莎的聲東擊西','前往敦霍爾德城堡，使用伊洛森交給你的燃燒炸彈包裹在每一個拘留守衛室裡的桶中放置5個燃燒炸藥。$b$b當你引爆拘留守衛室後，與敦霍爾德城堡地牢裡的索爾談談。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10285,10286,10287,10288,10289,10290,10291,10293,10294,10295,10296,10297,10298,10299,10300,10301,10305,10306,10307,10308) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10284,10285,10286,10287,10288,10289,10290,10291,10293,10294,10295,10296,10297,10298,10299,10300,10301,10305,10306,10307) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10284,'zhTW','逃離敦霍爾德','當你準備開始時，讓索爾知道。跟著索爾離開敦霍爾德城堡，並協助他釋放塔蕾莎以及完成他的天命。$b$b任務完成後到希爾斯布萊德找伊洛森談談。',0),
 (10285,'zhTW','回去安杜姆身邊','回去塔納利斯沙漠的時光之穴找小孩安杜姆 。',0),
 (10286,'zhTW','阿利恩的秘密','博學者卡莉達要你詢問博學者阿勒迪斯，據說有人看到他從獵鷹哨站前往贊格沼澤。',0),
 (10287,'zhTW','情婦曝光','回去找獵鷹哨站的博學者卡莉達。',0),
@@ -12301,11 +12207,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10301,'zhTW','開啟手冊','從日怒要塞的法術搶奪者瑪拉希歐身上取得紫羅蘭眼睛。完成之後使用大法師瓦戈斯之杖與大法師連絡。$b$b如果你遺失了大法師瓦戈斯之杖，與52區的羅樊德威交談以取得一個替代品。',0),
 (10305,'zhTW','貝馬拉','找到貝馬拉在巫師街的所在處然後把書放回他的書櫃。完成後，與肯瑞瓦村莊的管理者戴沃斯談談。',0),
 (10306,'zhTW','咒術師盧瑞斯','找到咒術師盧瑞斯在巫師街的所在處並且把披肩放回他的衣櫃。然後，跟肯瑞瓦村莊的管理者戴沃斯談話。',0),
-(10307,'zhTW','考林·織霜者','找到考林·織霜者在巫師街的所在處並且把帽子放到它的小提箱裡。然後，跟肯瑞瓦村莊的管理者戴沃斯談話。',0),
-(10308,'zhTW','另一支伊斯利勢力',NULL,0);
+(10307,'zhTW','考林·織霜者','找到考林·織霜者在巫師街的所在處並且把帽子放到它的小提箱裡。然後，跟肯瑞瓦村莊的管理者戴沃斯談話。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10309,10310,10311,10312,10313,10314,10315,10316,10317,10318,10319,10320,10321,10322,10323,10325,10326,10327,10328,10329) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10308,10309,10310,10311,10312,10313,10314,10315,10316,10317,10318,10319,10320,10321,10322,10323,10325,10326,10327,10328) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10308,'zhTW','另一支伊斯利勢力',NULL,0),
 (10309,'zhTW','有心臟的惡魔搶奪者','取回惡魔搶奪者之心，並且把它交付給虛空風暴的聚集之地的閔坎普。',0),
 (10310,'zhTW','破壞星移門!','護送迪耶亞到位於侵略點:摧毀者的星移門，並注意在他破壞門的時候保護他的安全。完成後到虛空風暴上秘境領地裡的領地崗哨找加魯談談。',0),
 (10311,'zhTW','迪耶亞需要你的幫助','與虛空風暴的侵略點:摧毀者附近的迪耶亞交談。',0),
@@ -12324,11 +12230,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10325,'zhTW','基爾加丹印記','將10個基爾加丹印記交給撒塔斯城的『護光者』艾德伊恩。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
 (10326,'zhTW','更多的基爾加丹印記',NULL,0),
 (10327,'zhTW','單一基爾加丹印記',NULL,0),
-(10328,'zhTW','日怒簡報','前往法力熔爐杜羅並且從駐紮的日怒守軍中取得日怒軍情簡報和日怒機密簡報。當你完成這項任務時，返回主教歐瑞利斯那裡。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
-(10329,'zhTW','關閉法力熔爐巴納爾','回去法力熔爐巴納爾並從監督者瑞爾迪斯身上取得巴納爾控制水晶。將它用來關閉巴納爾控制臺，完成後回報給間諜大師薩洛迪恩。$b$b為占卜者完成任務會使你的奧多爾聲望降低。',0);
+(10328,'zhTW','日怒簡報','前往法力熔爐杜羅並且從駐紮的日怒守軍中取得日怒軍情簡報和日怒機密簡報。當你完成這項任務時，返回主教歐瑞利斯那裡。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10330,10331,10332,10333,10334,10335,10336,10337,10338,10339,10340,10341,10342,10343,10344,10345,10346,10347,10348,10349) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10329,10330,10331,10332,10333,10334,10335,10336,10337,10338,10339,10340,10341,10342,10343,10344,10345,10346,10347,10348) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10329,'zhTW','關閉法力熔爐巴納爾','回去法力熔爐巴納爾並從監督者瑞爾迪斯身上取得巴納爾控制水晶。將它用來關閉巴納爾控制臺，完成後回報給間諜大師薩洛迪恩。$b$b為占卜者完成任務會使你的奧多爾聲望降低。',0),
 (10330,'zhTW','關閉法力熔爐寇魯','從監督者塞琳娜那裡取得寇魯控制水晶。在寇魯控制臺使用它關閉法力熔爐，完成後回報卡利迪斯·光明。$b$b為占卜者完成任務會使你的奧多爾聲望降低。',0),
 (10331,'zhTW','必需的工具','跟肯瑞瓦學徒取回冶煉大錘然後交給肯瑞瓦村莊的學徒安崔森。',0),
 (10332,'zhTW','鐵匠大師朗瑟士','在肯瑞瓦村莊的學徒安崔森要你殺了小鎮的鐵匠大師，朗瑟士的鬼魂。',0),
@@ -12347,11 +12253,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10345,'zhTW','地上的屍體……','對12具腐敗的屍體使用護國者的點火器。在你的任務完成之後，將護國者的點火器還給在礦井之路通道外面的密探阿雷克斯。',0),
 (10346,'zhTW','回到深淵沙洲','在地獄火半島破碎崗哨的獅鷲專家風怒要你殺死20個甘納格苦工、5個莫阿格監督者還有5座惡魔火砲。',0),
 (10347,'zhTW','回到深淵沙洲','地獄火半島上搶奪者荒野的空軍指揮布拉克要你消滅20個甘納格苦工，5個莫阿格監督者和5座惡魔火砲。',0),
-(10348,'zhTW','新的機會','採集15朵象牙鈴，完成後回到領地崗哨找瑪戴德。',0),
-(10349,'zhTW','大地束縛者','將赤紅水晶裂片拿去地獄火半島的塞納里奧前哨交給大地束縛者卡拉崔亞·夜風。',0);
+(10348,'zhTW','新的機會','採集15朵象牙鈴，完成後回到領地崗哨找瑪戴德。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10350,10351,10352,10353,10354,10355,10358,10362,10363,10364,10365,10366,10367,10368,10369,10370,10371,10372,10380,10381) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10349,10350,10351,10352,10353,10354,10355,10358,10362,10363,10364,10365,10366,10367,10368,10369,10371,10372,10380,10381) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10349,'zhTW','大地束縛者','將赤紅水晶裂片拿去地獄火半島的塞納里奧前哨交給大地束縛者卡拉崔亞·夜風。',0),
 (10350,'zhTW','畢和瑪特','與艾克索達貿易區的畢和瑪特談談。',0),
 (10351,'zhTW','自然治療法','在大地束縛者之環使用新生之種去治癒水晶周遭的土地。然後，帶著任何你所獲得的情報返回地獄火半島的塞納里奧前哨找大地束縛者卡拉崔亞·夜風。',0),
 (10352,'zhTW','捐獻毛料',NULL,0),
@@ -12367,13 +12273,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10367,'zhTW','眾人的背叛者','在夏納廢墟的納拉杜要你從附近一所小屋裡取回夏納鑰匙。',0),
 (10368,'zhTW','崔互德長者','釋放夏納廢墟的『鼓風者』莫洛德，『召火者』阿庫羅及『喚水者』阿亞藍。完成後向納拉杜回報。',0),
 (10369,'zhTW','阿爾塞斯的死亡','對無情的阿爾塞斯使用崔互德長者法杖，並且在他失去力量之後殺死他。完成這項任務之後，返回夏納廢墟找納拉杜。',0),
-(10370,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(10370))',0),
 (10371,'zhTW','猶魯斯·麥酒','與猶魯斯·麥酒談話。',0),
 (10372,'zhTW','謹慎的要求','與安寧地的依蘭兒談談。',0),
 (10380,'zhTW','黑暗契約','虛空風暴的吐魯曼平臺的凱嵐要你殺死6個甘納格星移技工，3個命運之女還有3個莫阿格轉換大師。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
 (10381,'zhTW','奧多爾不再','回報52區的主教歐瑞利斯。$b$b為奧多爾完成任務會使你的占卜者聲望降低。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10382,10383,10384,10385,10388,10389,10390,10391,10392,10393,10394,10395,10396,10397,10398,10399,10400,10401,10402,10403) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10382,10383,10384,10385,10388,10389,10390,10391,10392,10393,10394,10395,10396,10397,10398,10399,10400,10401,10403,10405) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10382,'zhTW','到前線去','乘著一隻獅鷲獸去榮譽崗哨並與戰場元帥布洛克談談。',0),
 (10383,'zhTW','線索在這!','與強納森·樂卡夫特談論關於兔子的事。',0),
@@ -12393,12 +12298,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10399,'zhTW','黑暗之心','殺掉10個阿葛納爾之池的恐懼惡魔，完成後回到榮譽堡的主堡壘裡回報星移占卜師克里。',0),
 (10400,'zhTW','霸主','殺掉阿葛納爾之池的殘忍的阿拉薩爾斯，完成後回到榮譽堡要塞找軍隊指揮者達納斯·托爾貝恩。',0),
 (10401,'zhTW',NULL,'此任務已經絕版。[Nazgrel at Thrallmar in Hellfire Peninsula has asked that you slay Arazzius the Cruel.$b]',0),
-(10402,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(10402))',0),
-(10403,'zhTW','納拉杜','在夏納廢墟尋找納拉杜的下落。',0);
+(10403,'zhTW','納拉杜','在夏納廢墟尋找納拉杜的下落。',0),
+(10405,'zhTW','破-壞-行-動','伊斯利恩軍事要塞的指揮官阿密爾的影像 - 伊斯利恩傳送器VI - 要你取回1個準備好的伊斯利恩裹帶。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10405,10406,10407,10408,10409,10410,10411,10412,10413,10414,10415,10416,10417,10418,10419,10420,10421,10422,10423,10424) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10406,10407,10408,10409,10410,10411,10412,10413,10414,10415,10416,10417,10418,10419,10420,10421,10422,10423,10424,10425) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(10405,'zhTW','破-壞-行-動','伊斯利恩軍事要塞的指揮官阿密爾的影像 - 伊斯利恩傳送器VI - 要你取回1個準備好的伊斯利恩裹帶。',0),
 (10406,'zhTW','傳遞訊息','伊斯利恩軍事要塞的指揮官阿密爾的影像 - 伊斯利恩傳送器VI - 要你護送護國者破壞者到法力熔爐奧崔斯導管，並且在他破壞導管時保護他。',0),
 (10407,'zhTW','索奎薩爾的影子','52區的隱士卡爾加要你從熔爐基地:遺忘的鍛造大師莫爾洛克身上取得第一部分的索奎薩爾的傳送石，從熔爐基地:苦難的希洛斯身上取得第二部份的索奎薩爾的傳送石。$b$b為奧多爾完成任務會使你的占卜者聲望降低。',0),
 (10408,'zhTW','奈薩斯王薩哈達爾','伊斯利恩軍事要塞的指揮官阿密爾的影像 - 伊斯利恩傳送器VI - 要你使用護國者干擾器去打敗薩哈達爾的軍隊，然後消滅奈薩斯王薩哈達爾。',0),
@@ -12417,11 +12321,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10421,'zhTW','魔化武器',NULL,0),
 (10422,'zhTW','泰拉里斯上尉','在虛空風暴裡的護國者哨站的血肉處理者維迪厄斯已經要求你找到並釋放泰拉里斯上尉。',0),
 (10423,'zhTW','到風暴之尖','與風暴之尖的加巴交談。',0),
-(10424,'zhTW','診斷:關鍵','在桑什倫秘境生成器附近使用診斷儀器，並將診斷結果帶回風暴之尖給加巴。',0);
+(10424,'zhTW','診斷:關鍵','在桑什倫秘境生成器附近使用診斷儀器，並將診斷結果帶回風暴之尖給加巴。',0),
+(10425,'zhTW','逃離軍事要塞','護送被囚禁的護國者先鋒回到虛空風暴的護國者哨站。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10425,10426,10427,10429,10430,10431,10432,10433,10434,10435,10436,10437,10438,10439,10440,10442,10443,10444,10445,10446) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10426,10427,10429,10430,10431,10432,10433,10434,10435,10436,10437,10438,10439,10440,10442,10443,10444,10445,10446,10447) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(10425,'zhTW','逃離軍事要塞','護送被囚禁的護國者先鋒回到虛空風暴的護國者哨站。',0),
 (10426,'zhTW','秘境植物群','在法拉隆鞭笞者上使用能量磁場調幅器。當你已經進行10次試驗後，觀察結果並且回報給風暴之尖的阿魯尼·月火。',0),
 (10427,'zhTW','秘境的生物','幫阿魯尼·月火為風暴之尖的12隻塔巴克貼上標籤。你可以使用塔巴克標示器在塔巴克種鹿或者塔巴克的身上。',0),
 (10429,'zhTW','自然過頭時','風暴之尖的阿魯尼·月火要你為她帶來一個笨重的海蛇心。',0),
@@ -12440,11 +12344,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10443,'zhTW','協助塞納里奧前哨','『智者』阿曼希望你在塞納里奧前哨的地獄火半島向塞伊亞·紅髮貢獻你的力量。',0),
 (10444,'zhTW','到艾蘭里哨站報到','珍奈·星語要你去泰洛卡森林的艾蘭里哨站回報莫瑞狄恩中尉。',0),
 (10445,'zhTW','永恆之瓶','時光之穴的索芮朵蜜要你去從盤牙蓄湖的瓦許女士身上取得瓦許的殘存之瓶，從風暴要塞的凱爾薩斯·逐日者身上取得凱爾薩斯的殘存之瓶。',0),
-(10446,'zhTW','最終的密碼','莫瑞狄恩中尉要你使用最終的密碼去引爆法力炸彈。完成後回報給泰洛卡森林內艾蘭里堡壘的珍奈·星語。',0);
+(10446,'zhTW','最終的密碼','莫瑞狄恩中尉要你使用最終的密碼去引爆法力炸彈。完成後回報給泰洛卡森林內艾蘭里堡壘的珍奈·星語。',0),
+(10447,'zhTW','最終的密碼','丘尼士官要你使用最終密碼清單去引爆法力炸彈。完成後回報泰洛卡森林裡碎石堡的吐奇。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10447,10448,10449,10450,10451,10458,10476,10477,10478,10479,10480,10481,10482,10483,10484,10485,10490,10491,10492,10493) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10448,10449,10450,10451,10458,10476,10477,10478,10479,10480,10481,10482,10483,10484,10485,10490,10491,10492,10493,10494) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(10447,'zhTW','最終的密碼','丘尼士官要你使用最終密碼清單去引爆法力炸彈。完成後回報泰洛卡森林裡碎石堡的吐奇。',0),
 (10448,'zhTW','到碎石營地報到','吐奇要你去向泰洛卡森林裡碎石營地的丘尼士官報到。',0),
 (10449,'zhTW','藥劑師席蓮娜','索爾瑪的弗爾托克·破斧者要你把噬骨者鮮血樣本帶給搶奪者荒野的藥劑師席蓮娜。',0),
 (10450,'zhTW','噬骨者鮮血','帶12個噬骨者血瓶給索爾瑪的弗爾托克·破斧者。',0),
@@ -12463,11 +12367,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10490,'zhTW','水之召喚','與藍謎島中艾克索達裡水晶大廳的先知諾柏多談談。',0),
 (10491,'zhTW','風的召喚','與藍謎島中艾克索達裡水晶大廳的先知諾柏多談談。',0),
 (10492,'zhTW','誠摯的建議','取得15滴冬泉血滴樣本，20金和1套野性之心束腕給鐵爐堡的德莉娜。',0),
-(10493,'zhTW','誠摯的建議','取得15滴希利蘇斯毒液樣本，20金和1套光鑄護腕，帶給奧格瑪的莫克瓦。',0);
+(10493,'zhTW','誠摯的建議','取得15滴希利蘇斯毒液樣本，20金和1套光鑄護腕，帶給奧格瑪的莫克瓦。',0),
+(10494,'zhTW','公平的補償','將元素之索以及一雙元素護手帶給鐵爐堡的德莉娜。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10494,10500,10501,10507,10508,10509,10513,10514,10515,10519,10521,10522,10523,10527,10528,10529,10530,10531,10532,10534) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10500,10501,10507,10508,10509,10513,10514,10515,10519,10521,10522,10523,10527,10528,10529,10530,10531,10532,10534,10535) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(10494,'zhTW','公平的補償','將元素之索以及一雙元素護手帶給鐵爐堡的德莉娜。',0),
 (10500,'zhTW','部落需要你的幫助!','和奧格瑪精神谷的督軍格爾庫克交談。',0),
 (10501,'zhTW','聯盟需要你的幫助!','和鐵爐堡軍事區的戰場元帥斯諾·落雪交談。',0),
 (10507,'zhTW','轉捩點','在熔爐基地:遺忘的北邊的侵略點:主宰者使用索奎薩爾的傳送石，傳送你的隊伍到索奎薩爾的平臺。到達之後，使用沃藍索的禮物擊敗索奎薩爾。$b$b為占卜者完成任務會使你的奧多爾聲望降低。',0),
@@ -12486,11 +12390,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10530,'zhTW','獵人之道','與遠行者居所的晨奔中尉談談。',0),
 (10531,'zhTW','阿拉希盆地之戰!','進攻礦坑、伐木場、鐵匠鋪和農場，然後向避難谷地的奧斯萊特元帥覆命。',0),
 (10532,'zhTW','切斷阿拉索補給線','進入阿拉希盆地，獲得一箱阿拉希資源木箱，然後將它交給落錘鎮的亡靈哨兵莫提斯。',0),
-(10534,'zhTW','回家','艾克索達的希德摩斯要你去見他。',0);
+(10534,'zhTW','回家','艾克索達的希德摩斯要你去見他。',0),
+(10535,'zhTW','阿拉希盆地的資源!','獲得阿拉希盆地戰鬥的勝利，獲取一個阿拉希資源木箱，然後向避難谷地的瑪克里爾中士覆命。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10535,10537,10538,10539,10540,10541,10546,10547,10548,10550,10551,10552,10553,10554,10559,10561,10562,10563,10564,10568) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10537,10538,10539,10540,10541,10546,10547,10548,10550,10551,10552,10553,10554,10559,10561,10562,10563,10564,10568,10569) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(10535,'zhTW','阿拉希盆地的資源!','獲得阿拉希盆地戰鬥的勝利，獲取一個阿拉希資源木箱，然後向避難谷地的瑪克里爾中士覆命。',0),
 (10537,'zhTW','羅恩格隆，碎心之弓','影月谷內伊利達瑞崗哨的阿爾托之靈要你去從本地的惡魔手中取回羅恩格隆，碎心之弓。',0),
 (10538,'zhTW','沸騰的血','在詛咒熔爐使用血之谷鮮血來製造沸騰的血。帶12份沸騰的血給斷脊氏族崗哨的藥劑師艾柏瑞克。',0),
 (10539,'zhTW','回家','艾克索達的希德摩斯要你去見他。',0),
@@ -12509,11 +12413,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10562,'zhTW','圍困!','蠻錘要塞外面的空軍指揮官奴艾恩要你殺死10個地獄火攻擊者。',0),
 (10563,'zhTW','前往軍團要塞','前進到軍團要塞然後找到軍團傳輸設備。當你靠近傳輸設備的時候，使用你的偽裝然後打聽燃燒軍團的計畫。任務完成時向蠻錘要塞的空軍指揮官奴艾恩回報。',0),
 (10564,'zhTW','引爆地獄火!','當你站在軍團要塞的綠紋圈中的時候引爆魔化炸彈。任務完成時，回報給蠻錘要塞的空軍指揮官奴艾恩。',0),
-(10568,'zhTW','巴瑞碑文','薩塔祭壇的隱士希拉要你去巴瑞廢墟從地上或者灰舌勞工的身上收集12個巴瑞碑文。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0);
+(10568,'zhTW','巴瑞碑文','薩塔祭壇的隱士希拉要你去巴瑞廢墟從地上或者灰舌勞工的身上收集12個巴瑞碑文。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
+(10569,'zhTW','史凱瑟隆殘骸','自史凱瑟隆殘骸的黑暗議會阿拉卡身上取回史凱瑟隆指揮官日誌 - 第一頁，史凱瑟隆指揮官日誌 - 第二頁，和史凱瑟隆指揮官日誌 - 第三頁交給獅鷲騎士凱蘭。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10569,10570,10571,10572,10573,10574,10575,10576,10577,10578,10579,10582,10583,10585,10586,10587,10588,10589,10590,10592) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10570,10571,10572,10573,10574,10575,10576,10577,10578,10579,10582,10583,10585,10586,10587,10588,10589,10590,10592,10593) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(10569,'zhTW','史凱瑟隆殘骸','自史凱瑟隆殘骸的黑暗議會阿拉卡身上取回史凱瑟隆指揮官日誌 - 第一頁，史凱瑟隆指揮官日誌 - 第二頁，和史凱瑟隆指揮官日誌 - 第三頁交給獅鷲騎士凱蘭。',0),
 (10570,'zhTW','血薊花的陷阱','影月谷的日蝕崗哨附近橋上的柏爾拉克, 歐朗諾克之子要你取回怒風信件。',0),
 (10571,'zhTW','長者奧朗奴','薩塔祭壇的隱士希拉要你取回位在巴瑞廢墟的長者奧朗奴身上的阿卡瑪的命令。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
 (10572,'zhTW','製作炸彈','取得一個惡魔搶奪者能量核心，一個惡魔搶奪者能量母體，還有一個惡魔搶奪者鎧甲並將這些東西帶給蠻錘要塞的空軍指揮官奴艾恩。',0),
@@ -12532,11 +12436,11 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10588,'zhTW','毀滅密碼','在詛咒祭壇使用毀滅密碼，召喚『火焰之王』賽洛庫。$b$b殺死火焰之王賽洛庫然後去跟大地治癒者托爾洛克談話，你同樣可以在詛咒祭壇找到他。',0),
 (10589,'zhTW','進入的方法','將軍團傳送門控制器交給蠻錘要塞的空軍指揮官奴艾恩。軍團要塞的莫阿格武器鐵匠都會攜帶這種儀器。',0),
 (10590,'zhTW','復仇的證明','瑪拉·曦刃要你幫他帶回20個爪牙的天譴石。',0),
-(10592,'zhTW','女妖之王的智慧','將天譴石碎片交給幽暗城的希瓦娜斯·風行者。',0);
+(10592,'zhTW','女妖之王的智慧','將天譴石碎片交給幽暗城的希瓦娜斯·風行者。',0),
+(10593,'zhTW','古老的禍害','解開阿塔萊神廟的秘密釋放阿塔拉利恩，並且從他的肉體取回腐爛的藤蔓。當你已經完成時，返回亡靈壁壘的米哈爾那裡。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10593,10595,10596,10597,10598,10599,10600,10601,10602,10603,10604,10605,10606,10611,10612,10613,10616,10619,10621,10622) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10595,10596,10597,10598,10599,10600,10601,10602,10603,10604,10605,10606,10611,10612,10613,10619,10621,10622,10623,10624) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(10593,'zhTW','古老的禍害','解開阿塔萊神廟的秘密釋放阿塔拉利恩，並且從他的肉體取回腐爛的藤蔓。當你已經完成時，返回亡靈壁壘的米哈爾那裡。',0),
 (10595,'zhTW','圍困!','影月村外面的血衛士高莫克要你去殺10個地獄火攻擊者。',0),
 (10596,'zhTW','前往軍團要塞','去軍團要塞，找到軍團傳輸設備，然後在偽裝的狀態下打聽燃燒軍團的計畫。任務完成後向影月村的血衛士高莫克回報。',0),
 (10597,'zhTW','製作炸彈','取得惡魔搶奪者能量核心，惡魔搶奪者能量母體還有惡魔搶奪者鎧甲，把它們帶給影月村的血衛士高莫克。',0),
@@ -12552,15 +12456,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10611,'zhTW','惡魔搶奪者保養技術','殺死博士莫歐費卡斯取得博士的鑰匙 。使用鑰匙打開博士的保險箱取得惡魔搶奪者保養技術，然後將這本書交給災難侵佔崗哨的那卡西。',0),
 (10612,'zhTW','惡魔與狂熱','使用惡魔搶奪者控制平台控制一個惡魔搶奪者哨兵。在你的惡魔搶奪者失效之前摧毀60個死鑄地獄火。任務完成後，向侵略點:災難的普萊克希回報。',0),
 (10613,'zhTW','惡魔與狂熱','使用惡魔搶奪者控制平台控制一個惡魔搶奪者哨兵。在你的惡魔搶奪者失效之前摧毀60個死鑄地獄火。任務完成後，向侵略點:災難的那卡西回報。',0),
-(10616,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(10616))',0),
 (10619,'zhTW','灰舌部族','復仇者阿魯曼要你去巴瑞廢墟殺死3個灰舌駕馭者、4個灰舌戰士還有6個灰舌薩滿。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
 (10621,'zhTW','伊利達瑞毀滅裂片','將伊利達瑞毀滅裂片交給蠻錘要塞的歐爾汀·雷拳。',0),
-(10622,'zhTW','表明立場','殺死影月谷的典獄官監牢的薩卓瑞斯然後向杉諾魯回報。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10623,10624,10625,10626,10627,10628,10629,10630,10631,10633,10634,10635,10636,10637,10638,10639,10640,10641,10642,10643) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10622,'zhTW','表明立場','殺死影月谷的典獄官監牢的薩卓瑞斯然後向杉諾魯回報。',0),
 (10623,'zhTW','伊利達瑞毀滅裂片','將伊利達瑞毀滅裂片交給影月村的葛羅空·亡眼。',0),
-(10624,'zhTW','鬧鬼的過去','影月谷裡影月村的總藥劑師希爾達嘉要你帶給她15個永燃灰燼樣本。',0),
+(10624,'zhTW','鬧鬼的過去','影月谷裡影月村的總藥劑師希爾達嘉要你帶給她15個永燃灰燼樣本。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10625,10626,10627,10628,10629,10630,10631,10633,10634,10635,10636,10637,10638,10639,10640,10641,10642,10643,10644,10645) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10625,'zhTW','顯靈鏡','影月谷的影月村的總藥劑師希爾達嘉要你殺死12個影月狂熱者。',0),
 (10626,'zhTW','奪取武器','蠻錘要塞的歐爾汀·雷拳要你幫他取得馬卡瑞登的大刀還有莫爾葛洛朗的大刀。',0),
 (10627,'zhTW','奪取武器','影月村的葛羅空·亡眼要你帶給他馬卡瑞登的大刀還有莫爾葛洛朗的大刀。',0),
@@ -12578,12 +12481,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10640,'zhTW','奧翠司','去納葛蘭的西部找『受難者』奧翠司。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
 (10641,'zhTW','對抗軍團','『受難者』奧翠司要你從虛空風暴的熔爐基地:苦難的憤怒女牧師身上取得一個新鮮滴落的血液。將它灑在地上然後殺死薩撒爾的化身。任務完成後回去找奧翠司。',0),
 (10642,'zhTW','機械中的鬼魂','影月谷的蠻錘要塞的『執法官』索羅斯要你交給他15個永燃灰燼樣本。',0),
-(10643,'zhTW','影月先驅者','影月谷的蠻錘要塞的『執法官』索羅斯要你殺死12個影月先驅。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10644,10645,10646,10647,10648,10649,10650,10651,10652,10653,10654,10655,10656,10658,10659,10660,10661,10662,10663,10664) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10643,'zhTW','影月先驅者','影月谷的蠻錘要塞的『執法官』索羅斯要你殺死12個影月先驅。',0),
 (10644,'zhTW','泰朗·血魔-傳說與傳奇','影月谷的蠻錘要塞的『執法官』索羅斯要你找到古老的影月靈魂。$b$b假如你弄丟了你的顯靈鏡，『執法官』索羅斯可以幫你做一副新的。$b$b已提供物品：$b',0),
-(10645,'zhTW','其實我是……泰朗·血魔','古老的影月靈魂利用你把你當成了工具!現在你已經幫他收集到他所需要的物品，他就露出了他的真面目-泰朗·血魔。想破解他的附身，你必須照他的命令去殺死『遠古看守者』卡西亞斯。$b$b完成之後，回去找蠻錘要塞的『執法官』索羅斯。',0),
+(10645,'zhTW','其實我是……泰朗·血魔','古老的影月靈魂利用你把你當成了工具!現在你已經幫他收集到他所需要的物品，他就露出了他的真面目-泰朗·血魔。想破解他的附身，你必須照他的命令去殺死『遠古看守者』卡西亞斯。$b$b完成之後，回去找蠻錘要塞的『執法官』索羅斯。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10646,10647,10648,10649,10650,10651,10652,10653,10654,10655,10656,10658,10659,10660,10661,10662,10663,10664,10665,10666) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10646,'zhTW','伊利丹的弟子','聆聽奧翠司的故事。',0),
 (10647,'zhTW','懸賞:烏伏洛斯，影月谷的天譴軍團','殺死烏伏洛斯然後取回烏伏洛斯的火鬃。交給影月谷的影月村裡頭的公告員薩爾登·崔賴斯。',0),
 (10648,'zhTW','懸賞:烏伏洛斯，影月谷的天譴軍團','殺死烏伏洛斯然後取回烏伏洛斯的火鬃。交給影月谷的蠻錘要塞裡頭的公告員畢爾斯納特。',0),
@@ -12601,12 +12504,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10661,'zhTW','美味的脾臟!','影月谷的蠻錘要塞的葛諾瑪斯要你取得8個惡魔烈焰脾臟。',0),
 (10662,'zhTW','隱居的鐵匠','將一箱鑄塊帶到泰洛卡森林的韋恩的避難所給大衛·偉恩。',0),
 (10663,'zhTW','隱居的鐵匠','將一箱鑄塊帶到泰洛卡森林的韋恩的避難所給大衛·偉恩。',0),
-(10664,'zhTW','額外的材料','韋恩的避難所的大衛·偉恩要你帶給她一個堅鋼骨架、4張厚重境外皮革還有一個惡魔守護圖騰。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10665,10666,10667,10668,10669,10670,10672,10673,10676,10677,10678,10679,10680,10681,10683,10684,10685,10686,10687,10688) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10664,'zhTW','額外的材料','韋恩的避難所的大衛·偉恩要你帶給她一個堅鋼骨架、4張厚重境外皮革還有一個惡魔守護圖騰。',0),
 (10665,'zhTW','麥克納爾的容器','韋恩的避難所的大衛·偉恩要你交給他一個滿溢的法力容器。',0),
-(10666,'zhTW','惡魔詞典','從領導者瓦皮歐身上取得惡魔詞典然後交給韋恩的避難所的大衛·偉恩。',0),
+(10666,'zhTW','惡魔詞典','從領導者瓦皮歐身上取得惡魔詞典然後交給韋恩的避難所的大衛·偉恩。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10667,10668,10669,10670,10672,10673,10676,10677,10678,10679,10680,10681,10683,10684,10685,10686,10687,10688,10689,10691) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10667,'zhTW','地獄土壤','從海法師希斯比亞的身上取得一個瓶裝地獄土壤交給韋恩的避難所的大衛·偉恩。',0),
 (10668,'zhTW','對抗伊利達瑞','『受難者』奧翠司要你去殺影月谷的伊利達瑞崗哨的洛斯羅司。',0),
 (10669,'zhTW','挑戰不可能','『受難者』奧翠司要你在贊格沼澤的沼澤光之湖的傳送門使用灌魔銀矛以喚醒希樂斯。殺死他之後回去找奧翠司。',0),
@@ -12624,12 +12527,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10685,'zhTW','灰舌墮落者','從哈盧姆，伊肯尼恩，拉卡恩和烏拉魯那邊取回四個勳章碎片然後回到影月谷的星光聖所找秘法師賽利斯。$b$b為占卜者完成任務會使你的奧多爾聲望降低。',0),
 (10686,'zhTW','典獄官監牢','秘法師賽利斯要你前往位在巴瑞廢墟南邊的典獄官監牢。拷問杉諾魯關於阿卡瑪的下落。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
 (10687,'zhTW','卡拉伯爾訓練場','星光聖所的拉瑞莎·擊日者要你從星光聖所東北方，卡拉伯爾廢墟的惡魔獵人懇求者還有惡魔獵人見習生身上奪回8個日怒大刀。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
-(10688,'zhTW','製造混亂','拉瑞莎·擊日者要你回到卡拉伯爾廢墟，並且找出方法釋放阿薩羅斯。B$b為占卜者完成任務會讓你的奧多爾聲望降低。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10689,10691,10692,10693,10694,10695,10696,10697,10698,10699,10700,10701,10702,10703,10706,10707,10708,10719,10725,10726) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10688,'zhTW','製造混亂','拉瑞莎·擊日者要你回到卡拉伯爾廢墟，並且找出方法釋放阿薩羅斯。B$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
 (10689,'zhTW','奧翠司','前往西方的納葛蘭並且找到『受難者』奧翠司。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
-(10691,'zhTW','回到先知者身邊','與影月谷裡星光聖所的拉瑞莎·擊日者談談。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
+(10691,'zhTW','回到先知者身邊','與影月谷裡星光聖所的拉瑞莎·擊日者談談。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10692,10693,10694,10695,10696,10697,10698,10699,10700,10701,10702,10703,10706,10707,10708,10719,10725,10726,10727,10728) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10692,'zhTW','阻止瓦瑞迪斯','拉瑞莎·擊日者要你到卡拉伯爾廢墟殺掉艾倫狄恩、賽拉斯、奈斯瑞歐以及瓦瑞迪斯。在瓦瑞迪斯使用變形符文時用惡魔之名寶典來削弱他的力量。任務完成後帶著惡魔之名寶典回報拉瑞莎·擊日者$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
 (10693,'zhTW','一枚榮譽徽章',NULL,0),
 (10694,'zhTW','十枚榮譽徽章',NULL,0),
@@ -12647,12 +12550,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10708,'zhTW','阿卡瑪的承諾','將卡拉伯爾勳章交給撒塔斯城的阿達歐。',0),
 (10719,'zhTW','你拿到筆記了嗎?','將會見紙條交給劍刃山脈裡永恆樹林的林木守衛蕭恩。',0),
 (10725,'zhTW','紫羅蘭之眼中的地位','當你與紫羅蘭之眼的聲望到達崇拜後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0),
-(10726,'zhTW','紫羅蘭之眼中的地位','當你與紫羅蘭之眼的聲望到達崇拜後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10727,10728,10729,10730,10731,10732,10733,10734,10735,10736,10737,10738,10739,10740,10741,10743,10744,10745,10750,10751) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10726,'zhTW','紫羅蘭之眼中的地位','當你與紫羅蘭之眼的聲望到達崇拜後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0),
 (10727,'zhTW','紫羅蘭之眼中的地位','當你與紫羅蘭之眼的聲望到達崇拜後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0),
-(10728,'zhTW','紫羅蘭之眼中的地位','當你與紫羅蘭之眼的聲望到達崇拜後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0),
+(10728,'zhTW','紫羅蘭之眼中的地位','當你與紫羅蘭之眼的聲望到達崇拜後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10729,10730,10731,10732,10733,10734,10735,10736,10737,10738,10739,10740,10741,10744,10745,10750,10751,10754,10755,10756) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10729,'zhTW','紫羅蘭法師之路',NULL,0),
 (10730,'zhTW','紫羅蘭治癒者之路',NULL,0),
 (10731,'zhTW','紫羅蘭刺客之路',NULL,0),
@@ -12666,17 +12569,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10739,'zhTW','傑出的表現','當你與紫羅蘭之眼的聲望到達崇敬後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0),
 (10740,'zhTW','傑出的表現','當你與紫羅蘭之眼的聲望到達崇敬後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0),
 (10741,'zhTW','傑出的表現','當你與紫羅蘭之眼的聲望到達崇敬後，將你的紫羅蘭印記交給逆風小徑的大法師利瑞達。',0),
-(10743,'zhTW',NULL,'此任務已經絕版。    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(10743))',0),
 (10744,'zhTW','勝利的消息','回到蠻錘要塞與庫德蘭·蠻錘談談。',0),
 (10745,'zhTW','勝利的消息','回到影月村與歐巴洛卡赫霸主談談。',0),
 (10750,'zhTW','征服之路','前往影月谷的征服之路。一旦你完成這一區的初步偵察後，使用柯爾克隆信號槍對柯爾克隆飛龍騎士發送信號。$b$b萬一你遺失了你的柯爾克隆信號槍就跟歐巴洛卡赫霸主談談，他會給你一個替代品。',0),
-(10751,'zhTW','突破道路','殺掉20個伊克利普森士兵，10個伊克利普森騎士，以及10個伊克利普森縛法者，接著使用柯爾克隆信號槍發送信號給柯爾克隆飛龍騎士回去回報任務完成。$b$b萬一你遺失了你的柯爾克隆信號槍的話可以找影月谷裡影月村的歐巴洛卡赫霸主談談，他會給你一個替代品。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10754,10755,10756,10757,10758,10759,10760,10761,10762,10763,10764,10765,10766,10767,10768,10769,10772,10773,10774,10775) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10751,'zhTW','突破道路','殺掉20個伊克利普森士兵，10個伊克利普森騎士，以及10個伊克利普森縛法者，接著使用柯爾克隆信號槍發送信號給柯爾克隆飛龍騎士回去回報任務完成。$b$b萬一你遺失了你的柯爾克隆信號槍的話可以找影月谷裡影月村的歐巴洛卡赫霸主談談，他會給你一個替代品。',0),
 (10754,'zhTW','進入堡壘','將原始鑰匙模子帶去給地獄火半島上榮譽堡的軍隊指揮官達納斯。',0),
 (10755,'zhTW','進入堡壘','將原始鑰匙模子帶去給地獄火半島上索爾瑪的納茲格雷爾。',0),
-(10756,'zhTW','大師洛赫克','將原始鑰匙模子帶去給索爾瑪的洛赫克。',0),
+(10756,'zhTW','大師洛赫克','將原始鑰匙模子帶去給索爾瑪的洛赫克。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10757,10758,10759,10760,10761,10762,10763,10764,10765,10766,10767,10768,10769,10772,10773,10774,10775,10776,10777,10778) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10757,'zhTW','洛赫克的請求','帶4個魔鐵錠，2個魔塵和4個火焰微粒回到地獄火半島的索爾瑪交給洛赫克。',0),
 (10758,'zhTW','比地獄還熱','在地獄火半島破壞一部惡魔搶奪者，並且將未淬火的鑰匙模插入它的殘骸裡。將燒焦的鑰匙模型帶到洛赫克給索爾瑪。',0),
 (10759,'zhTW','找出背棄者','在熔岩平原上找到帕莎並與他交談。',0),
@@ -12693,13 +12595,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10772,'zhTW','征服之路','旅行到影月谷的征服之路。一旦你完成這地區的初步評估，使用蠻錘信號槍發出信號通知另一位蠻錘獅鷲騎士。$b$b萬一你失去你的蠻錘信號槍，與影月谷之蠻錘要塞的賽恩尼·憂瑞卡爾交談，並要求代替品。',0),
 (10773,'zhTW','突破道路','殺死20名伊克利普森士兵，10名伊克利普森騎士，和科難lJ的5個兒子，然後使用蠻錘信號槍發出信號通知另一名蠻錘獅鷲騎士報告你任務完成。$b$b萬一你失去你的蠻錘信號槍，與影月谷之蠻錘要塞的賽恩尼·憂瑞卡爾交談，並要求代替品。',0),
 (10774,'zhTW','血精靈 + 巨人 = ???','殺掉大法官血葉和偉大的科羅克，並取回伊利丹的命令。一旦你完成這項任務，使用蠻錘信號槍發出信號通知另一個蠻錘獅鷲騎士。$b$b萬一你失去你的蠻錘信號槍，與影月谷之蠻錘要塞的賽恩尼·憂瑞卡爾交談，並要求代替品。',0),
-(10775,'zhTW','伊利達瑞的外袍','收集10件伊利達瑞外袍，然後使用蠻錘信號槍發出信號給另一名蠻錘獅鷲騎士。$b$b萬一你失去你的蠻錘信號槍的話，與影月谷之蠻錘要塞的賽恩尼·憂瑞卡爾交談，並要求代替品。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10776,10777,10778,10779,10780,10781,10782,10788,10789,10790,10791,10792,10793,10794,10799,10800,10801,10804,10807,10808) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10775,'zhTW','伊利達瑞的外袍','收集10件伊利達瑞外袍，然後使用蠻錘信號槍發出信號給另一名蠻錘獅鷲騎士。$b$b萬一你失去你的蠻錘信號槍的話，與影月谷之蠻錘要塞的賽恩尼·憂瑞卡爾交談，並要求代替品。',0),
 (10776,'zhTW','行列中的歧見……','在偽裝為伊利丹的代理人時，殺掉5個瘋狂的巨像，並且返回影月谷之蠻錘要塞的賽恩尼·憂瑞卡爾那裡。同時將他的蠻錘信號槍交還給他。',0),
 (10777,'zhTW','阿斯格的圖騰','將史凱瑟隆戰爭圖騰帶給熔岩平原的帕莎。',0),
-(10778,'zhTW','利安瑟魔棒','從任何在日蝕崗哨的血精靈身上取得利安瑟的鑰匙，並用它打開利安瑟的保險箱並且取去利安瑟魔棒。返回熔岩平原將魔棒交給帕莎。',0),
+(10778,'zhTW','利安瑟魔棒','從任何在日蝕崗哨的血精靈身上取得利安瑟的鑰匙，並用它打開利安瑟的保險箱並且取去利安瑟魔棒。返回熔岩平原將魔棒交給帕莎。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10779,10780,10781,10782,10788,10789,10790,10791,10792,10793,10794,10799,10800,10801,10804,10807,10808,10809,10811,10813) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10779,'zhTW','獵人之道','與LOCATION的女獵人凱拉·夜弓談話。',0),
 (10780,'zhTW','史凱瑟隆羽毛','收集8根史凱瑟隆羽毛，並且把他們帶到在熔岩平原給帕莎。',0),
 (10781,'zhTW','赤紅守望的戰鬥','在赤紅守望的戰鬥與伊利丹的軍隊戰鬥，並且存活下來!$b$b一旦你勝利，回到在撒塔斯城的阿達歐那裡。',0),
@@ -12716,13 +12618,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10801,'zhTW','它是一個陷阱!','把龍火陷阱帶到劍刃山脈的永恆樹林交給指揮官海法斯·石牆。',0),
 (10804,'zhTW','好心','影月谷，虛空之翼農場的摩德奈要你餵食8隻成熟的虛空之翼龍。',0),
 (10807,'zhTW','灰舌破碎者','『感化者』瓦倫恩要你去巴瑞廢墟殺死3個灰舌駕馭者、4個灰舌戰士還有6個灰舌薩滿。為占卜者完成任務會讓你的奧多爾聲望降低。',0),
-(10808,'zhTW','阻礙黑暗議會','殺掉黑暗議會儀式者，並且使用帕莎之杖去結束黑暗議會的召喚儀式，然後返回熔岩平原的帕莎那裡。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10809,10811,10813,10814,10816,10817,10818,10820,10822,10823,10824,10826,10827,10828,10831,10832,10833,10834,10835,10836) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10808,'zhTW','阻礙黑暗議會','殺掉黑暗議會儀式者，並且使用帕莎之杖去結束黑暗議會的召喚儀式，然後返回熔岩平原的帕莎那裡。',0),
 (10809,'zhTW','懸賞告示:座狼大師科洛斯','殺死座狼大師科洛斯，並且將他的頭帶到斷脊氏族崗哨交給達克豪中尉。',0),
 (10811,'zhTW','尋找奈爾斯阿拉古','尋找奈爾斯阿拉古，虛空之翼軍團的庇護者。',0),
-(10813,'zhTW','葛銳洛克之眼','使用雷札克的裂片去俘虜一顆葛銳洛克之眼，然後靠近雷札克的大鍋去提煉它。在它被移除之後，把雷札克的裂片還給他。',0),
+(10813,'zhTW','葛銳洛克之眼','使用雷札克的裂片去俘虜一顆葛銳洛克之眼，然後靠近雷札克的大鍋去提煉它。在它被移除之後，把雷札克的裂片還給他。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10814,10816,10817,10818,10820,10822,10823,10824,10826,10827,10828,10831,10832,10833,10834,10835,10836,10837,10838,10839) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10814,'zhTW','奈爾斯阿拉古的傳說','與奈爾斯阿拉古交談並且聽他的故事。',0),
 (10816,'zhTW','開拓神聖之地','復仇者阿魯曼要你殺死8個影月殺戮者，8個影月挑選者和4個影月黑暗編織者。$b$b為奧多爾完成任務會讓你的占卜者聲望降低。',0),
 (10817,'zhTW','巨大的懲罰','『感化者』瓦倫恩要你殺死8個影月殺戮者，8個影月挑選者和4個影月黑暗編織者。$b$b為占卜者完成任務會讓你的奧多爾聲望降低。',0),
@@ -12739,13 +12641,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10833,'zhTW','成為一名影紋裁縫師','在暗影祭壇附近使用暗影深淵水晶，以加深你與祭壇的協調，然後回到撒塔斯陰鬱城中的安德利恩·暗紋紡織者那裡。$b$b*警告!*當完成此任務，你將成為一位暗影專家。你只能選擇一種專業技能。',0),
 (10834,'zhTW','葛銳洛克『暗眼』','殺死葛銳洛克『黑眼』並且將葛銳洛克的眼罩帶去給斷脊氏族崗哨的雷札克。',0),
 (10835,'zhTW','藥劑師安拓維奇','將艾柏瑞克的發現帶去索爾瑪給藥劑師安拓維奇。',0),
-(10836,'zhTW','滲入龍喉堡壘','影月谷，虛空之翼農場上方飛得很高的奈爾斯阿拉古要你殺死15個龍喉獸人。$b$b龍喉堡壘裡所有的龍喉獸人都可以。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10837,10838,10839,10840,10841,10842,10847,10848,10849,10850,10852,10854,10855,10856,10857,10858,10861,10862,10863,10864) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10836,'zhTW','滲入龍喉堡壘','影月谷，虛空之翼農場上方飛得很高的奈爾斯阿拉古要你殺死15個龍喉獸人。$b$b龍喉堡壘裡所有的龍喉獸人都可以。',0),
 (10837,'zhTW','前往虛空之翼岩架!','影月谷，虛空之翼農場上方飛得很高的奈爾斯阿拉古要你從虛空之翼岩架收集12顆幽藤水晶。',0),
 (10838,'zhTW','惡魔占卜器','在地獄火盆地裡使用惡魔占卜器，等它調和，然後帶走讀數。$b$b將惡魔占卜器和惡魔占卜器讀數帶回索爾瑪給藥劑師安拓維奇。',0),
-(10839,'zhTW','迷霧斯奇司:泰洛克黑石','在迷霧斯奇司的泰洛克黑石上使用淨化魔棒，並返回白骨荒野的難民商隊找奇瑞克。',0),
+(10839,'zhTW','迷霧斯奇司:泰洛克黑石','在迷霧斯奇司的泰洛克黑石上使用淨化魔棒，並返回白骨荒野的難民商隊找奇瑞克。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10840,10841,10842,10847,10848,10849,10850,10852,10854,10855,10856,10857,10858,10861,10862,10863,10864,10865,10866,10867) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10840,'zhTW','聖光之墓','高階祭司歐格蘭要你去進入聖光之墓，殺死10個伊斯利虛空術師和10個伊斯利掠奪者，然後回到難民商隊找他。',0),
 (10841,'zhTW',NULL,'此任務已經絕版。[[PH]  Activate the thingy.]',0),
 (10842,'zhTW','復仇先驅','高階祭司歐格蘭要你進入聖光之墓，並且在遠古德萊尼祭壇附近使用德萊尼墓地遺物。$b$b保衛墓穴守衛並戰勝復仇的先驅。當儀式完成時，與遠古德萊尼祭壇的德萊尼祖先談談。',0),
@@ -12762,13 +12664,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10861,'zhTW','迷霧里斯克:先發制人的攻擊','打破在迷霧里斯克受詛咒的蛋。在返回難民商隊找奇瑞克之前，救回3隻幼鳥並殺掉3隻有害的幼鳥。',0),
 (10862,'zhTW','向部落投降','瑞克格要你在撒塔斯城尋找『贖罪者』里拉克並且要求他跟他的人民歸順部落。',0),
 (10863,'zhTW','阿拉卡的秘密','戴娜·甘迺迪女士要你在撒塔斯城找到『贖罪者』里拉克向他探聽他願意分享的阿拉卡秘密。',0),
-(10864,'zhTW','靈魂的負擔','殺死20個破碎之手獸人，然後回到索爾瑪找藥劑師安拓維奇。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10865,10866,10867,10868,10869,10870,10872,10873,10874,10875,10876,10877,10878,10879,10880,10881,10882,10883,10884,10885) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10864,'zhTW','靈魂的負擔','殺死20個破碎之手獸人，然後回到索爾瑪找藥劑師安拓維奇。',0),
 (10865,'zhTW','通知李歐羅克斯!','招魂師多赫加要你去通知李歐羅克斯關於雷森伊斯利的企圖。他的位置在劍刃山脈的摩克納薩爾村。',0),
 (10866,'zhTW','『疲憊者』祖魯希德','殺死『疲憊者』祖魯希德然後取得祖魯希德的鑰匙。使用祖魯希德的鑰匙打開祖魯希德的鎖鍊釋放凱瑞納古。',0),
-(10867,'zhTW','唯一的回應','李歐羅克斯請你取回靈魂收集品然後帶回劍刃山脈的摩克納薩爾村交給招魂師多赫加。',0),
+(10867,'zhTW','唯一的回應','李歐羅克斯請你取回靈魂收集品然後帶回劍刃山脈的摩克納薩爾村交給招魂師多赫加。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10868,10869,10870,10872,10873,10874,10875,10876,10877,10878,10879,10880,10881,10882,10883,10884,10885,10886,10887,10889) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10868,'zhTW','阿拉卡作戰方式','諫言者菲拉要你殺死14個辛諾鷹爪還有6個辛諾巫士然後回到碎石堡找她。',0),
 (10869,'zhTW','抑制阿拉卡','葛拉伏汗中尉要你殺死14個辛諾爪牙還有6個辛諾巫士然後回到艾蘭里堡壘找他。',0),
 (10870,'zhTW','虛空之翼的盟友','讓凱瑞納古送你去虛空之翼農場見摩德奈。',0),
@@ -12785,14 +12687,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10882,'zhTW','厄運通報者','你的任務是去風暴要塞的亞克崔茲衛星殺死先驅者史蓋力司。任務完成後回去撒塔斯城的聖光露臺找阿達歐。',0),
 (10883,'zhTW','風暴之鑰','與撒塔斯城的阿達歐談談。',0),
 (10884,'zhTW','那魯的試煉:寬容','撒塔斯城的阿達歐要你自地獄火堡壘的破碎大廳取回劊子手的廢棄之斧。$b$b此任務必須在英雄難度副本裡完成。',0),
-(10885,'zhTW','那魯的試煉:力量','撒塔斯城的阿達歐要你去取回卡利斯瑞的三叉戟和莫爾墨的精華。$b$b此任務必須在英雄難度副本裡完成。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10886,10887,10889,10890,10891,10892,10895,10896,10897,10898,10899,10900,10901,10902,10903,10904,10905,10906,10907,10908) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10885,'zhTW','那魯的試煉:力量','撒塔斯城的阿達歐要你去取回卡利斯瑞的三叉戟和莫爾墨的精華。$b$b此任務必須在英雄難度副本裡完成。',0),
 (10886,'zhTW','那魯的試煉:堅毅','撒塔斯城的阿達歐要你去援救來自風暴要塞，亞克崔茲的米歐浩斯·曼納斯頓。$b$b此任務必須在英雄難度副本裡完成。',0),
 (10887,'zhTW','逃出墓穴','幫助阿庫諾回到泰洛卡森林的難民商隊。任務完成後跟麥克達交談。',0),
-(10889,'zhTW','回到撒塔斯城','去撒塔斯城跟里拉談話。',0),
-(10890,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(10890))',0),
+(10889,'zhTW','回到撒塔斯城','去撒塔斯城跟里拉談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10891,10892,10895,10896,10897,10898,10899,10900,10901,10902,10903,10904,10905,10906,10907,10908,10909,10911,10912,10913) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10891,'zhTW','帝國的金屬盔甲','與加基森的德羅泰恩交談。',0),
 (10892,'zhTW','帝國的金屬盔甲','與加基森的德羅泰恩交談。',0),
 (10895,'zhTW','薩斯葛爾必須被燒毀!','在每座薩斯葛爾的哨塔使用煙霧烽火，然後回到遠征隊哨塔找空軍指揮戴畢瑞。',0),
@@ -12808,14 +12709,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10905,'zhTW','大師級藥水','跟贊格沼澤的塞納里奧避難所的羅安娜·薩威爾交談。$b$b*警告!*你只能選擇一種鍊金術專精。',0),
 (10906,'zhTW','大師級藥劑','跟撒塔斯城的陰鬱城的羅洛其恩交談。$b$b*警告!*你只能選擇一種鍊金術專精。',0),
 (10907,'zhTW','大師級轉化','跟虛空風暴的風暴之尖的薩爾菲談話。$b$b*警告!*你只能選擇一種鍊金術專精。',0),
-(10908,'zhTW','跟『贖罪者』里拉克談談','『覺醒者』奇瑞克要你跟撒塔斯的陰鬱城區內的『贖罪者』里拉克談話。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10909,10911,10912,10913,10914,10915,10916,10917,10918,10919,10920,10921,10922,10923,10924,10925,10926,10929,10930,10935) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10908,'zhTW','跟『贖罪者』里拉克談談','『覺醒者』奇瑞克要你跟撒塔斯的陰鬱城區內的『贖罪者』里拉克談話。',0),
 (10909,'zhTW','惡魔靈魂','榮譽堡的克拉圖要你在榮譽堡西南方的葛卡茲哨站使用隱士聖物，殺死聖物附近的破碎之手狂戰士，再殺死10個被釋放的惡魔靈魂來為喬渥上校復仇。',0),
 (10911,'zhTW','自由開火!','使用同化彈藥以取得死亡之門的惡魔火砲控制權。使用它們來摧毀南方星移門還有北方星移門。然後，使用德魯伊信號召喚一個永恆樹林德魯伊來回報你的勝利。',0),
 (10912,'zhTW','魔犬之主','永恆樹林德魯伊告訴你最後的一件事是殺死『魔犬之主』貝爾蒙。任務完成後，回到劍刃山脈的永恆樹林向野蠻領主安德烈利安回報。',0),
-(10913,'zhTW','不適當的葬禮','泰洛卡森林白骨荒野，薩塔前哨的指揮官洛沃要你燒毀8個陣亡的奧奇奈戰士還有8個陣亡的薩塔復仇者。',0),
+(10913,'zhTW','不適當的葬禮','泰洛卡森林白骨荒野，薩塔前哨的指揮官洛沃要你燒毀8個陣亡的奧奇奈戰士還有8個陣亡的薩塔復仇者。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10914,10915,10916,10917,10918,10919,10920,10921,10922,10923,10924,10925,10926,10929,10930,10935,10936,10937,10944,10969) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10914,'zhTW','需要一位英雄','泰洛卡森林白骨荒野，薩塔前哨的指揮官洛沃要你殺死12個奧奇奈新教徒還有5個奧奇奈末日預言者。',0),
 (10915,'zhTW','墮落的主教','泰洛卡森林白骨荒野，薩塔前哨的指揮官洛沃要你摧毀奧奇奈棺材的內容物。',0),
 (10916,'zhTW','挖掘祈禱珠串','尋回德萊尼祈禱珠串然後交給榮譽堡的助手克拉圖。',0),
@@ -12831,14 +12732,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10926,'zhTW','回到薩塔營地','復仇者赫藍要你回到薩塔營地跟斥候納夫靈談話。',0),
 (10929,'zhTW','太鼓之音','白骨荒野的薩塔前哨的德拉弗懷玆要你帶給他8個成熟骨質分解屍體。',0),
 (10930,'zhTW','巨大白骨蟲','白骨荒野的薩塔前哨的德拉弗懷玆要你取得巨大的白骨蟲器官。$b$b他同時也想要回他的太鼓。',0),
-(10935,'zhTW','喬渥上校的驅邪儀式','跟隱士巴瑞達談話。使用祈禱珠串幫助祭儀進行，然後等上校得救以後跟他談話。最後，回報助手克拉圖。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10936,10937,10944,10969,10970,10971,10972,10973,10975,10977,10981,10982,10984,11002,11003,11022,11031,11032,11033,11034) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10935,'zhTW','喬渥上校的驅邪儀式','跟隱士巴瑞達談話。使用祈禱珠串幫助祭儀進行，然後等上校得救以後跟他談話。最後，回報助手克拉圖。',0),
 (10936,'zhTW','托爾貝恩正在找你','助手克拉圖告知你軍隊指揮者達納斯·托爾貝恩正在找你。到地獄火半島，榮譽堡裡的兵營跟他談話。',0),
 (10937,'zhTW','殺死訓練員蘇洛克','軍隊指揮者達納斯·托爾貝恩命令你盡快殺死訓練員蘇洛克。一旦殺了訓練員後就回到地獄火半島的榮譽堡向軍隊指揮者回報。',0),
 (10944,'zhTW','保守的秘密','前往影月谷的典獄官監牢並且跟阿卡瑪交談。',0),
-(10969,'zhTW','尋找阿密爾','去護國者哨站尋找指揮官阿密爾。',0),
+(10969,'zhTW','尋找阿密爾','去護國者哨站尋找指揮官阿密爾。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10970,10971,10972,10973,10975,10977,10981,10982,10984,11002,11003,11022,11031,11032,11033,11034,11037,11038,11039,11042) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10970,'zhTW','慈悲的任務','為虛空風暴內護國者哨站的指揮官阿密爾取得被搶救的伊斯利恩監獄鑰匙。',0),
 (10971,'zhTW','伊斯利恩的秘密','虛空風暴護國者哨站的指揮官阿密爾要你帶給他1個伊斯利恩囚犯身分標籤。',0),
 (10972,'zhTW','伊斯利恩囚犯身分編錄',NULL,0),
@@ -12854,14 +12755,14 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11031,'zhTW','不再是大法師',NULL,0),
 (11032,'zhTW','不再是保衛者',NULL,0),
 (11033,'zhTW','不再是刺客',NULL,0),
-(11034,'zhTW','不再是治療師',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11037,11038,11039,11042,11044,11045,11046,11048,11060,11087,11088,11115,11123,11124,11125,11126,11128,11133,11134,11136) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11034,'zhTW','不再是治療師',NULL,0),
 (11037,'zhTW','奇怪的景象','跟52區的火箭主管夫斯拉吉談話。',0),
 (11038,'zhTW','協助主教歐瑞利斯','跟52區的主教歐瑞利斯談話。',0),
 (11039,'zhTW','向間諜大師薩洛迪恩報到','向52區的間諜大師薩洛迪恩報到。',0),
-(11042,'zhTW','令人困惑的幻象','跟52區的火箭主管夫斯拉吉談話。',0),
+(11042,'zhTW','令人困惑的幻象','跟52區的火箭主管夫斯拉吉談話。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11044,11045,11046,11048,11060,11087,11088,11123,11124,11126,11128,11133,11134,11136,11137,11138,11139,11140,11141,11142) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11044,'zhTW','夢境中的災難','跟蠻錘要塞的空軍指揮官奴艾恩談話。',0),
 (11045,'zhTW','『執法官』索羅斯','和蠻錘要塞的『執法官』索羅斯談談。',0),
 (11046,'zhTW','總藥劑師希爾達嘉','跟影月村的總藥劑師希爾達嘉談話。',0),
@@ -12869,24 +12770,22 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11060,'zhTW','晶鑄暗色符文',NULL,0),
 (11087,'zhTW',NULL,'此任務已經絕版。时空之穴的Soridormi要你从盘牙水库Lady Vashj那儿取回Vashj''s Vial Remnant，并从风暴要塞Kael''thas Sunstrider那儿取回Kael''s Vial Remnant。',0),
 (11088,'zhTW',NULL,'此任務已經絕版。[Bring Jonathan LeCraft 10 pieces of Spellfire cloth.]',0),
-(11115,'zhTW',NULL,'此任務已經絕版。    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(11115))',0),
 (11123,'zhTW','調查廢墟','和樹蔭旅店的巡察員塔倫談談。',0),
 (11124,'zhTW','調查廢墟','和樹蔭旅店的巡察員塔倫談談。',0),
-(11125,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(11125))',0),
 (11126,'zhTW','叛徒就在我們之中','找出5個叛逃者煽動家，然後向塞拉摩碼頭的卡莉雅·哈斯丁回報。',0),
 (11128,'zhTW','宣傳戰','把叛逃者宣傳計畫帶給塞拉摩碼頭的卡莉雅·哈斯丁。',0),
 (11133,'zhTW','敗壞叛逃者的名聲','卡莉雅·哈斯丁要你把這些竄改過的傳單散發給6個塞拉摩守衛，然後回到塞拉摩的碼頭向她回報。',0),
 (11134,'zhTW','叛逃者的末日','抓住蓋維司·灰盾，然後向塞拉摩碼頭的卡莉雅·哈斯丁回報。',0),
-(11136,'zhTW','令人困擾的發展','向警戒崗哨的衛摩爾上尉回報。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11137,11138,11139,11140,11141,11142,11143,11144,11145,11146,11147,11148,11149,11150,11151,11152,11156,11158,11159,11160) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11136,'zhTW','令人困擾的發展','向警戒崗哨的衛摩爾上尉回報。',0),
 (11137,'zhTW','迪菲亞在塵泥沼澤?','從加爾恩·邁瑟斯身上取得迪菲亞指令，然後交給警戒崗哨的衛摩爾上尉。',0),
 (11138,'zhTW','瑞恩·麥格吉爾','把迪菲亞指令交給恐懼海岸的瑞恩·麥格吉爾。',0),
 (11139,'zhTW','二手的潛水裝備','把工具組和受損的潛水裝備帶給塵泥沼澤的瑞恩·麥格吉爾。',0),
 (11140,'zhTW','找回貨物!','把6個打撈起來的保險箱交給塵泥沼澤的瑞恩·麥格吉爾。',0),
 (11141,'zhTW','珍娜一定得知道','和塞拉摩的珍娜·普勞德摩爾談話。',0),
-(11142,'zhTW','偵察奧卡茲島','和卡莎·紅翼談談，並用她的獅鷲獸偵察奧卡茲島。當你的偵察結束之後，和塞拉摩的珍娜女士談談。',0),
+(11142,'zhTW','偵察奧卡茲島','和卡莎·紅翼談談，並用她的獅鷲獸偵察奧卡茲島。當你的偵察結束之後，和塞拉摩的珍娜女士談談。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11143,11144,11145,11146,11147,11148,11149,11150,11151,11152,11156,11158,11159,11160,11161,11162,11169,11172,11173,11174) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11143,'zhTW','一個恐懼的關聯','向北點哨塔的達利爾上尉回報。',0),
 (11144,'zhTW','確認嫌疑','把恐怖圖騰作戰計畫帶給北點哨塔的達利爾上尉。',0),
 (11145,'zhTW','恐怖圖騰的囚犯','北點哨塔的盧卡斯中士要你釋放5個塞拉摩囚犯。',0),
@@ -12900,16 +12799,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11156,'zhTW','恐角劫掠者','殺死12個恐角的恐怖圖騰，然後向塔貝薩農場的學徒莫蘭恩回報。',0),
 (11158,'zhTW','血沼羽毛','帶5根血沼羽毛給泥鏈營地的布洛葛。',0),
 (11159,'zhTW','吸引石槌之靈','泥鏈營地的布洛葛，希望你讓10個石槌之靈安息。',0),
-(11160,'zhTW','石槌軍旗','找到石槌軍旗並且把它帶給泥鏈營地的布洛葛。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11161,11162,11169,11172,11173,11174,11177,11180,11181,11183,11184,11185,11186,11191,11192,11193,11194,11198,11200,11201) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11160,'zhTW','石槌軍旗','找到石槌軍旗並且把它帶給泥鏈營地的布洛葛。',0),
 (11161,'zhTW','敵意的精華','帶10個黑龍精華給泥鏈營地的布洛葛。',0),
 (11162,'zhTW','挑戰黑龍軍團','把石槌軍旗插在奧妮克希亞的巢穴的入口，等待奧妮克希亞的回應，然後向泥鏈營地的布洛葛回報。',0),
 (11169,'zhTW','恐怖圖騰武器','塔貝薩農場的學徒加利昂希望你對10隻塵泥雜斑鱷魚或塵泥利齒鱷魚測試俘虜圖騰。',0),
 (11172,'zhTW','飛艇失事','跟比吉爾的飛艇殘骸的莫克希·鋼格談話。',0),
 (11173,'zhTW','試劑小偷','將6瓶沼澤毒液交給塔貝薩的農場的學徒加利昂。',0),
-(11174,'zhTW','預防腐蝕','莫克希·鋼格要你熔解10個軟泥怪然後回到比吉爾的飛艇殘骸向她回報。',0),
+(11174,'zhTW','預防腐蝕','莫克希·鋼格要你熔解10個軟泥怪然後回到比吉爾的飛艇殘骸向她回報。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11177,11180,11181,11183,11184,11185,11186,11191,11192,11193,11194,11198,11200,11201,11203,11204,11205,11206,11207,11208) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11177,'zhTW','水光莊園的隱士','跟水光莊園的『沼澤之眼』加爾談話。',0),
 (11180,'zhTW','是什麼在女巫嶺作祟?','水光莊園的莫丹特·格林思比希望你從10個復活之軀或復活之靈身上獲得情報。',0),
 (11181,'zhTW','女巫剋星','帶9株女巫剋星給水光莊園的莫丹特·格林思比。',0),
@@ -12923,16 +12822,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11194,'zhTW','這會是真的嗎?','到狂潮灣，納特的平臺，與納特·帕格談話。',0),
 (11198,'zhTW','打倒泰瑟爾!','泰拉摩碼頭的米爾斯少校要你打敗泰瑟爾。',0),
 (11200,'zhTW','過於巧合','蕨牆村的克羅格要你交給他7件黑蹄武裝。',0),
-(11201,'zhTW','恐怖圖騰的陰謀','將恐怖圖騰的作戰計畫交給蕨牆村的克羅格。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11203,11204,11205,11206,11207,11208,11209,11210,11211,11212,11213,11214,11215,11216,11217,11222,11223,11225,11321,11335) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11201,'zhTW','恐怖圖騰的陰謀','將恐怖圖騰的作戰計畫交給蕨牆村的克羅格。',0),
 (11203,'zhTW','尋找塔貝薩','跟泥潭沼澤的塔貝薩談話，她位在她的農場裡。',0),
 (11204,'zhTW','回報克羅格','跟蕨牆村的克羅格談話。',0),
 (11205,'zhTW','夷平恐角崗哨!','把恐角崗哨的北方帳棚、東方帳棚和東北方帳棚燒毀，然後回到塔貝薩的農場向她回報。',0),
 (11206,'zhTW','正義得伸','回到蕨牆村找克羅格。',0),
 (11207,'zhTW','收回貨物!','比吉爾的飛艇殘骸的莫克希·鋼格要你取得8個飛艇貨物。',0),
-(11208,'zhTW','替德拉席特送貨','把飛艇貨物交給泥鏈營地的德拉席特·滴栓。',0),
+(11208,'zhTW','替德拉席特送貨','把飛艇貨物交給泥鏈營地的德拉席特·滴栓。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11209,11210,11211,11212,11213,11214,11215,11216,11217,11222,11223,11225,11321,11335,11336,11338,11339,11340,11342,11354) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11209,'zhTW','納特的討價還價','納特平台的納特·帕格要你去測試他的新魚餌。',0),
 (11210,'zhTW','噢，這是真的','和塞拉摩碼頭的米爾斯少校談談。',0),
 (11211,'zhTW','幫助泥鏈營地','跟泥鏈營地的德拉席特·滴栓談話。',0),
@@ -12946,16 +12845,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11223,'zhTW','回覆珍娜','跟塞拉摩的珍娜·普勞德摩爾女士談話。',0),
 (11225,'zhTW','女巫嶺的隱士','和水光莊園的『沼澤之眼』加爾談談。',0),
 (11321,'zhTW','有人說「紀念品」嗎?','把啤酒節酒杯兌換券交給啤酒節營地的貝爾碧·迅移。',0),
-(11335,'zhTW','戰鬥的號角: 阿拉希盆地','在阿拉希盆地的戰場中獲勝，然後向任何一座首都或撒塔斯的聯盟准將回報。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11336,11338,11339,11340,11342,11354,11362,11363,11364,11369,11374,11377,11378,11379,11380,11381,11382,11383,11400,11413) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11335,'zhTW','戰鬥的號角: 阿拉希盆地','在阿拉希盆地的戰場中獲勝，然後向任何一座首都或撒塔斯的聯盟准將回報。',0),
 (11336,'zhTW','戰鬥的號角:奧特蘭克山谷','在奧特蘭克山谷的戰場中獲勝，然後向任何一座首都或撒塔斯的聯盟准將回報。',0),
 (11338,'zhTW','戰鬥的號角:戰歌峽谷','在戰歌峽谷的戰場中獲勝，然後向任何一座首都或撒塔斯的聯盟准將回報。',0),
 (11339,'zhTW','戰鬥的號角: 阿拉希盆地','在阿拉希盆地的戰場中獲勝，然後向任何一座首都或撒塔斯的部落戰爭使者回報。',0),
 (11340,'zhTW','戰鬥的號角:奧特蘭克山谷','在奧特蘭克山谷的戰場中獲勝，然後向任何一座首都或撒塔斯的部落戰爭使者回報。',0),
 (11342,'zhTW','戰鬥的號角:戰歌峽谷','在戰歌峽谷的戰場中獲勝，然後向任何一座部落主城或撒塔斯的部落戰爭使者回報。',0),
-(11354,'zhTW','懸賞:納桑的騎乘馬鞭','風之貿易者札令姆要你取得納桑的騎乘馬鞭。將這樣物品帶回撒塔斯陰鬱城交給他以領取賞金。$b$b這個任務只能在英雄難度下完成。',0),
+(11354,'zhTW','懸賞:納桑的騎乘馬鞭','風之貿易者札令姆要你取得納桑的騎乘馬鞭。將這樣物品帶回撒塔斯陰鬱城交給他以領取賞金。$b$b這個任務只能在英雄難度下完成。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11362,11363,11364,11369,11374,11377,11378,11379,11380,11381,11382,11383,11400,11413,11425,11442,11451,11497,11498,11499) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11362,'zhTW','懸賞:凱利丹的羽飾手杖','風之貿易者札令姆要你取得凱利丹的羽飾手杖。將手杖帶回撒塔斯陰鬱城交給他以領取賞金。$b$b這個任務只能在英雄難度下完成。',0),
 (11363,'zhTW','懸賞:刃拳的徽印','風之貿易者札令姆要你取得刃拳的徽印。將徽印帶回撒塔斯陰鬱城交給他以領取賞金。$b$b這個任務只能在英雄難度下完成。',0),
 (11364,'zhTW','懸賞:破碎之手百夫長','虛空行者瑪頓恩要你殺死4名破碎之手百夫長。完成之後回到撒塔斯陰鬱城找他領取賞金。',0),
@@ -12969,16 +12868,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11382,'zhTW','懸賞:艾奧那斯的沙漏','風之貿易者札令姆要你取得艾奧那斯的沙漏。帶到撒塔斯的陰鬱城交給他以換取賞金。$b$b這個任務只能在英雄難度下完成。',0),
 (11383,'zhTW','懸賞:裂縫領主','虛空行者瑪頓恩要你殺死4名裂縫領主。完成之後回到撒塔斯陰鬱城找他領取賞金。',0),
 (11400,'zhTW','啤酒節騎乘用山羊','將「榮譽釀酒者」手印交給保爾·安伯斯堤爾，他就在丹莫洛的啤酒營地入口附近。',0),
-(11413,'zhTW','有人說「紀念品」嗎?','把啤酒節酒杯兌換券交給啤酒節營地的布力克斯·修械。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11425,11442,11451,11497,11498,11499,11500,11502,11503,11505,11506,11531,11583,11771,11772,11773,11774,11775,11804,11805) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11413,'zhTW','有人說「紀念品」嗎?','把啤酒節酒杯兌換券交給啤酒節營地的布力克斯·修械。',0),
 (11425,'zhTW',NULL,'害蟲，開始憎恨他們。',0),
 (11442,'zhTW','歡迎來到啤酒節!',NULL,0),
 (11451,'zhTW','艾利西亞之詩','你被要求把艾利西亞之詩帶給外域撒塔斯城的凱莉·達克。',0),
 (11497,'zhTW','學習飛行','伊爾莎·咆釀談談，她在影月谷的蠻錘要塞。',0),
 (11498,'zhTW','學習飛行','和歐洛克談談，他在影月谷的影月村。',0),
-(11499,'zhTW','懸賞:凱爾薩斯王子的璽戒','風之貿易者札令姆要你取得凱爾薩斯王子的璽戒。帶到撒塔斯的陰鬱城交給他以換取賞金。$b$b這個任務只能在英雄難度下的博學者殿堂完成。',0),
+(11499,'zhTW','懸賞:凱爾薩斯王子的璽戒','風之貿易者札令姆要你取得凱爾薩斯王子的璽戒。帶到撒塔斯的陰鬱城交給他以換取賞金。$b$b這個任務只能在英雄難度下的博學者殿堂完成。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11500,11502,11503,11505,11506,11531,11583,11771,11772,11773,11774,11775,11804,11805,11806,11807,11808,11809,11810,11811) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11500,'zhTW','懸賞:折磨之女','虛空行者瑪頓恩要你解決4名折磨之女。完成之後回到撒塔斯的陰鬱城找他以換取賞金。',0),
 (11502,'zhTW','防衛哈剌','在哈剌擊敗10名敵對玩家，然後回去找泰拉的拉寇爾。',0),
 (11503,'zhTW','新敵與宿怨','在哈剌擊敗10名敵對玩家，然後回去找卡拉達爾的可托克。',0),
@@ -12992,16 +12891,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11774,'zhTW','褻瀆這些火焰!',NULL,0),
 (11775,'zhTW','褻瀆這些火焰!',NULL,0),
 (11804,'zhTW','榮耀火焰',NULL,0),
-(11805,'zhTW','榮耀火焰',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11806,11807,11808,11809,11810,11811,11812,11813,11814,11815,11816,11817,11818,11819,11820,11821,11822,11823,11824,11825) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11805,'zhTW','榮耀火焰',NULL,0),
 (11806,'zhTW','榮耀火焰',NULL,0),
 (11807,'zhTW','榮耀火焰',NULL,0),
 (11808,'zhTW','榮耀火焰',NULL,0),
 (11809,'zhTW','榮耀火焰',NULL,0),
 (11810,'zhTW','榮耀火焰',NULL,0),
-(11811,'zhTW','榮耀火焰',NULL,0),
+(11811,'zhTW','榮耀火焰',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11812,11813,11814,11815,11816,11817,11818,11819,11820,11821,11822,11823,11824,11825,11826,11827,11828,11829,11830,11831) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11812,'zhTW','榮耀火焰',NULL,0),
 (11813,'zhTW','榮耀火焰',NULL,0),
 (11814,'zhTW','榮耀火焰',NULL,0),
@@ -13015,16 +12914,16 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11822,'zhTW','榮耀火焰',NULL,0),
 (11823,'zhTW','榮耀火焰',NULL,0),
 (11824,'zhTW','榮耀火焰',NULL,0),
-(11825,'zhTW','榮耀火焰',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11826,11827,11828,11829,11830,11831,11832,11833,11834,11875,11877,11880,12513,12515,13294,13295,13296,13297,13298,13300) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11825,'zhTW','榮耀火焰',NULL,0),
 (11826,'zhTW','榮耀火焰',NULL,0),
 (11827,'zhTW','榮耀火焰',NULL,0),
 (11828,'zhTW','榮耀火焰',NULL,0),
 (11829,'zhTW','榮耀火焰',NULL,0),
 (11830,'zhTW','榮耀火焰',NULL,0),
-(11831,'zhTW','榮耀火焰',NULL,0),
+(11831,'zhTW','榮耀火焰',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11832,11833,11834,11875,11877,11880,12513,12515,13294,13295,13296,13297,13298,13300,13309,13335,13339,13431,14163,24216) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11832,'zhTW','榮耀火焰',NULL,0),
 (11833,'zhTW','榮耀火焰',NULL,0),
 (11834,'zhTW','榮耀火焰',NULL,0),
@@ -13038,21 +12937,18 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (13296,'zhTW','前進依米海姆!','與依米海姆的芙芮索·齒研交談。',0),
 (13297,'zhTW','中和瘟疫','破天者號上的薩沙理安要你在默德雷薩的瘟疫大鍋上使用膿汁脊髓液。$b$b你可以使用從膿創恐獸身上取得的巨人之脊來蒐集膿汁脊髓液。',0),
 (13298,'zhTW','污敗的寇普羅斯','破天者號上的薩沙理安要你在默德雷薩殺掉污敗的寇普羅斯。',0),
-(13300,'zhTW','搶救薩鋼礦奴','破天者號上的虔誠的亞柏薩倫請你去援救10名薩鋼礦坑奴隸。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(13309,13317,13335,13339,13431,14163,24216,24218,24226,24508,24509,24797) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(13300,'zhTW','搶救薩鋼礦奴','破天者號上的虔誠的亞柏薩倫請你去援救10名薩鋼礦坑奴隸。',0),
 (13309,'zhTW','空中突襲','依米海姆東面冰冠邊緣的地面指揮官庫普命令你操作破天者號鎮壓砲塔來保護破天者號軍隊運輸機直到部隊完成空降。',0),
-(13317,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(13317))',0),
 (13335,'zhTW','驚怖之門','破天者號上的薩沙理安希望你用烈性酸液來溶解6個骷髏劫奪者的屍體。',0),
 (13339,'zhTW','擊破碎片','將破損的驚怖裂片、破損的絕望裂片、破損的苦難裂片，帶回來給破天者號上的薩沙理安。',0),
 (13431,'zhTW',NULL,'此任務已經絕版。[Skar''this the Heretic in the heroic Slave Pens of Coilfang Reservoir wants you to bring him the Earthen Signet and the Blazing Signet.]',0),
 (14163,'zhTW','戰鬥的號角:征服之島','在征服之島的戰場中獲勝，然後向任何一座聯盟主城、冬握湖、達拉然或撒塔斯的聯盟准將回報。',0),
-(24216,'zhTW','戰鬥的號角:戰歌峽谷','在戰歌峽谷的戰場中獲勝，然後向任何一座部落主城、冬握湖、達拉然或撒塔斯的部落戰爭使者回報。',0),
+(24216,'zhTW','戰鬥的號角:戰歌峽谷','在戰歌峽谷的戰場中獲勝，然後向任何一座部落主城、冬握湖、達拉然或撒塔斯的部落戰爭使者回報。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(24218,24226,24797) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (24218,'zhTW','戰鬥的號角:戰歌峽谷','在戰歌峽谷的戰場中獲勝，然後向任何一座聯盟主城、冬握湖、達拉然或撒塔斯的聯盟准將回報。',0),
 (24226,'zhTW','戰鬥的號角: 阿拉希盆地','在阿拉希盆地的戰場中獲勝，然後向任何一座部落主城、冬握湖、達拉然或撒塔斯的部落戰爭使者回報。',0),
-(24508,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(24508))',0),
-(24509,'zhTW',NULL,'$b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(24509))',0),
 (24797,'zhTW',NULL,'此任務已經絕版。',0);
 
 -- Insert new entries, from TBC
@@ -13079,11 +12975,9 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8992,'zhTW','瓦薩拉克護符的右半塊','使用召喚火盆召喚科爾莫克的靈魂並殺了他。帶著重新組合的瓦薩拉克護符和召喚火盆回到黑石山的布德利那裡。',0);
 
 -- Insert new entries, from CATA
-DELETE FROM `quest_template_locale` WHERE `ID` IN(558,810,814,915,925,3241,4822,8274,8741,8931,8934,8937,8938,8943,8952,8955,8957,8959,9000,9001) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(558,915,925,3241,4822,8274,8741,8931,8934,8937,8938,8943,8952,8955,8957,8959,9000,9001,9003,9005) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (558,'zhTW',NULL,'此任務已經絕版。[Travel to Theramore to see about getting Lady Jaina Proudmoore''s autograph for your ward.]',0),
-(810,'zhTW',NULL,'找6個小型蠍殼帶給森金村的考格漢。',0),
-(814,'zhTW',NULL,'將10片大塊野豬肉交給剃刀嶺的廚師托爾卡。',0),
 (915,'zhTW',NULL,'此任務已經絕版。[Get some Strawberry Ice Cream for your ward.  The lad seems to prefer Tigule''s brand ice cream.]',0),
 (925,'zhTW',NULL,'此任務已經絕版。[Travel to Thunder Bluff to see about getting Cairne Bloodhoof''s hoofprint for your ward.]',0),
 (3241,'zhTW',NULL,'把他們帶給圖加·符文圖騰。',0),
@@ -13100,12 +12994,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (8957,'zhTW',NULL,'此任務已經絕版。[Return to Mokvar in Orgimmar with a set of Boots of Elements, Kilt of Elements and Pauldrons of Elements.]',0),
 (8959,'zhTW',NULL,'此任務已經絕版。[Return to Deliana in Ironforge with a set of Boots of Valor, Legplates of Valor and Spaulders of Valor.]',0),
 (9000,'zhTW',NULL,'此任務已經絕版。[Give Deliana your Beaststalker''s Cap and Beaststalker''s Tunic.]',0),
-(9001,'zhTW',NULL,'此任務已經絕版。[Give Deliana your Magister''s Crown and Magister''s Robes.]',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(9003,9005,9008,9011,9012,9014,9018,9296,9297) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(9001,'zhTW',NULL,'此任務已經絕版。[Give Deliana your Magister''s Crown and Magister''s Robes.]',0),
 (9003,'zhTW',NULL,'此任務已經絕版。[Give Deliana your Devout Crown and Devout Robe.]',0),
-(9005,'zhTW',NULL,'此任務已經絕版。[Give Deliana your Dreadmist Mask and Dreadmist Robe.]',0),
+(9005,'zhTW',NULL,'此任務已經絕版。[Give Deliana your Dreadmist Mask and Dreadmist Robe.]',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(9008,9011,9012,9014,9018,9296,9297) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (9008,'zhTW',NULL,'此任務已經絕版。[Give Mokvar your Beaststalker''s Cap and Beaststalker''s Tunic.]',0),
 (9011,'zhTW',NULL,'此任務已經絕版。[Give Mokvar your Coif of Elements and Vest of Elements.]',0),
 (9012,'zhTW',NULL,'此任務已經絕版。[Give Mokvar your Dreadmist Mask and Dreadmist Robe.]',0),
@@ -13115,54 +13009,104 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (9297,'zhTW',NULL,'把黯淡的墓地之石交給其他人。',0);
 
 -- Insert new entries, from RETAIL
-DELETE FROM `quest_template_locale` WHERE `ID` IN(108,171,241,259,352,402,462,497,548,636,807,820,839,909,912,1155,1158,1161,1162,1163) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(108,171,241,242,259,316,352,402,406,462,490,497,548,636,774,796,797,798,799,800) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (108,'zhTW',NULL,'此任務已經絕版。',0),
 (171,'zhTW','聯盟孤兒的看護者','從奎苟‧擺頂那邊買個海綿劍架，然後回到暴風城的教堂區，把人類孤兒哨交還給孤兒院的孤兒監護員南丁格爾。',0),
 (241,'zhTW','暫無內容','此任務被暴雪標記為過期，無法獲得或完成。日誌',0),
+(242,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。杀掉8个龙喉袭击者、3个龙喉白骨守卫和1个龙喉军官。',0),
 (259,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。和科尔特·托马森谈一谈。',0),
+(316,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。',0),
 (352,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0),
 (402,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Check back with Sirra later to see if he''s still busy.]',0),
+(406,'zhTW','暂无内容',NULL,0),
 (462,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。杀掉马鲁克·龙鳞。$b$b然后向米奈希尔港的瓦斯塔格·铁腭报告。',0),
+(490,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。达纳苏斯外的莎依拉·夜风想要你带给她20个瘤背熊怪的牙齿。',0),
 (497,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。到塔伦米尔去调查萨尔派出的小分队的状况。',0),
 (548,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。',0),
 (636,'zhTW','大地公主的传说','此任務被暴雪標記為過期，無法獲得或完成。找到密斯莱尔水晶碎块。',0),
-(807,'zhTW',NULL,'此任務已經絕版。[Bring 5 Scorched Hearts to Orgnil Soulscar in Razor Hill.]',0),
-(820,'zhTW',NULL,'此任務已經絕版。[Bring 8 Shimmerweed to Master Vornal in Sen''jin Village.]',0),
+(774,'zhTW','暂无内容',NULL,0),
+(796,'zhTW','暂无内容',NULL,0),
+(797,'zhTW','暂无内容',NULL,0),
+(798,'zhTW','暂无内容',NULL,0),
+(799,'zhTW','暂无内容',NULL,0),
+(800,'zhTW','暂无内容',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(801,802,803,810,814,839,909,912,946,987,1155,1157,1158,1161,1162,1163,1165,1277,1278,1279) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(801,'zhTW','暂无内容',NULL,0),
+(802,'zhTW','暂无内容',NULL,0),
+(803,'zhTW','暂无内容',NULL,0),
+(810,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。找6个Small Scorpid Carapaces 带给Sen''jin Village的Kor''ghan。',0),
+(814,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。收集10大块野猪肉，把它们交给剃刀岭的厨师托尔卡。',0),
 (839,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0),
 (909,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Bring the Strange Water Globe to Je''neu Sancrea at Zoram''gar Outpost, Ashenvale.]',0),
 (912,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。',0),
+(946,'zhTW','暂无内容',NULL,0),
+(987,'zhTW','暂无内容',NULL,0),
 (1155,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。x',0),
+(1157,'zhTW','暂无内容',NULL,0),
 (1158,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。x',0),
 (1161,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。x',0),
 (1162,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。x',0),
-(1163,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。x',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(1165,1277,1279,1288,1290,1441,2058,2868,2971,3064,3383,3384,3515,3885,4299,4323,4905,5053,5502,5532) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1163,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。x',0),
 (1165,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。',0),
 (1277,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。打倒他们！',0),
-(1279,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0),
+(1278,'zhTW','暂无内容',NULL,0),
+(1279,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(1280,1288,1290,1293,1294,1295,1296,1297,1299,1300,1460,1461,2868,2971,3064,3383,3384,3401,3403,3404) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(1280,'zhTW','暂无内容',NULL,0),
 (1288,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Bring Vimes''s Report to Lady Jaina Proudmoore in Theramore.]',0),
 (1290,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Talkie.]',0),
-(1441,'zhTW',NULL,'此任務已經絕版。',0),
-(2058,'zhTW',NULL,'此任務已經絕版。',0),
+(1293,'zhTW','暂无内容',NULL,0),
+(1294,'zhTW','暂无内容',NULL,0),
+(1295,'zhTW','暂无内容',NULL,0),
+(1296,'zhTW','暂无内容',NULL,0),
+(1297,'zhTW','暂无内容',NULL,0),
+(1299,'zhTW','暂无内容',NULL,0),
+(1300,'zhTW','暫無內容',NULL,0),
+(1460,'zhTW','暂无内容',NULL,0),
+(1461,'zhTW','暂无内容',NULL,0),
 (2868,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0),
 (2971,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。[PH] Log Description',0),
 (3064,'zhTW','暫無內容','此任務已經絕版。帶20頂完整的海賊帽給尤爾巴‧斯庫比格特。',0),
 (3383,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0),
 (3384,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0),
+(3401,'zhTW','暂无内容',NULL,0),
+(3403,'zhTW','暂无内容',NULL,0),
+(3404,'zhTW','暂无内容',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(3405,3422,3423,3424,3425,3515,3529,3622,3885,4299,4323,4905,5053,5205,5207,5208,5209,5502,5506,5512) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(3405,'zhTW','暂无内容',NULL,0),
+(3422,'zhTW','暂无内容',NULL,0),
+(3423,'zhTW','暂无内容',NULL,0),
+(3424,'zhTW','暂无内容',NULL,0),
+(3425,'zhTW','暂无内容',NULL,0),
 (3515,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0),
+(3529,'zhTW','暂无内容',NULL,0),
+(3622,'zhTW','暂无内容',NULL,0),
 (3885,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。Escort Petra and Dadanga!',0),
 (4299,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。把PX83型密码机放在七英雄之墓里，然后向麦克斯沃特·尤博格林复命。',0),
 (4323,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。把7条Spotted hyena Pelts带给Freewind Post的TESTTAUREN。',0),
 (4905,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。Defend Kanati Greycloud',0),
 (5053,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。Test quest to see if mail is sent to your mailbox. Just hit complete, then go check your mail.$b$bHave a nice day.',0),
+(5205,'zhTW','暂无内容',NULL,0),
+(5207,'zhTW','暂无内容',NULL,0),
+(5208,'zhTW','暂无内容',NULL,0),
+(5209,'zhTW','暂无内容',NULL,0),
 (5502,'zhTW','部落孤兒的看護者','從布雷克斯‧爆竹那邊買個海綿劍架，然後回到奧格瑪的暗巷區，把獸人孤兒哨交還給孤兒院的孤兒監護員巴特維爾。',0),
-(5532,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0);
+(5506,'zhTW','暂无内容',NULL,0),
+(5512,'zhTW','暂无内容',NULL,0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(6201,6221,6842,7069,7702,7863,7864,7866,7867,7904,8022,8024,8025,8244,8245,8458,8459,8742,8932,8939) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(5516,5520,5523,5532,6201,6221,6842,7069,7702,7863,7864,7866,7867,8022,8024,8025,8459,8742,8932,8939) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(5516,'zhTW','暂无内容',NULL,0),
+(5520,'zhTW','暂无内容',NULL,0),
+(5523,'zhTW','暂无内容',NULL,0),
+(5532,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。',0),
 (6201,'zhTW',NULL,'此任務已經絕版。',0),
 (6221,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Nafien would like you to kill 5 Deadwood Den Watchers, 5 Deadwood Avengers, and 5 Deadwood Shamans.]',0),
 (6842,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。x',0),
@@ -13172,13 +13116,9 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (7864,'zhTW','哨兵標準護理包',NULL,0),
 (7866,'zhTW','先遣騎基礎護理包',NULL,0),
 (7867,'zhTW','先遣騎標準護理包',NULL,0),
-(7904,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。',0),
 (8022,'zhTW','可口可乐宠物兑换券','此任務被暴雪標記為過期，無法獲得或完成。',0),
 (8024,'zhTW','可口可乐宠物兑换券','此任務被暴雪標記為過期，無法獲得或完成。',0),
 (8025,'zhTW','可口可乐宠物兑换券','此任務被暴雪標記為過期，無法獲得或完成。',0),
-(8244,'zhTW',NULL,'此任務已經絕版。',0),
-(8245,'zhTW',NULL,'此任務已經絕版。',0),
-(8458,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Bring a Shadowstalker Scalp to Maurin Bonesplitter in Desolace.]',0),
 (8459,'zhTW','暂无内容','此任務被暴雪標記為過期，無法獲得或完成。日志',0),
 (8742,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。',0),
 (8932,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Bring a Magister''s Belt and a set of Magister''s Gloves to Deliana in Ironforge.$b]',0),
@@ -13253,12 +13193,9 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10292,'zhTW','更多能量！','此任務被暴雪標記為過期，無法獲得或完成。伊格努比要你将8尊军团火炮带回风暴尖塔。',0),
 (10375,'zhTW','黑曜石戰爭串珠','此任務已經絕版。',0);
 
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10376,10377,10378,10379,10386,10387,10404,10441,10452,10453,10459,10460,10461,10462,10463,10464,10465,10466,10467,10468) AND `locale` = 'zhTW';
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10377,10386,10387,10404,10441,10452,10453,10459,10460,10461,10462,10463,10464,10465,10466,10467,10468,10469,10470,10471) AND `locale` = 'zhTW';
 INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
-(10376,'zhTW',NULL,'此任務已經絕版。    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(10376))',0),
 (10377,'zhTW',NULL,'此任務已經絕版。',0),
-(10378,'zhTW',NULL,'此任務已經絕版。    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(10378))',0),
-(10379,'zhTW',NULL,'此任務已經絕版。    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(10379))',0),
 (10386,'zhTW',NULL,'此任務已經絕版。[Speak with Overlord Hun Maimist.]',0),
 (10387,'zhTW',NULL,'此任務已經絕版。[Speak with Overlord Hun Maimist.]',0),
 (10404,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Exarch Orelis at Area 52 wants you to go to Forge Base: Oblivion and Forge Base: Gehenna and slay 12 Gan''arg Forgehands, 6 Mo''arg Forgelords and 6 Wrathbringers.$b$bPerforming quests for the Aldor will cause your Scryers reputation to decrease.]',0),
@@ -13274,13 +13211,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10465,'zhTW','治療師的誓約','當你的流沙之鱗聲望值到達尊敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
 (10466,'zhTW','勇士的誓約','當你的流沙之鱗聲望值到達尊敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
 (10467,'zhTW','防衛者的誓約','當你的流沙之鱗聲望值到達尊敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
-(10468,'zhTW','法師的誓願','當你的流沙之鱗聲望值到達崇敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10469,10470,10471,10472,10473,10474,10475,10495,10496,10497,10498,10499,10558,10716,10746,10815,10844,10871,10938,10939) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10468,'zhTW','法師的誓願','當你的流沙之鱗聲望值到達崇敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
 (10469,'zhTW','治療者的誓願','當你的流沙之鱗聲望值到達崇敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
 (10470,'zhTW','勇士的誓願','當你的流沙之鱗聲望值到達崇敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
-(10471,'zhTW','防衛者的誓願','當你的流沙之鱗聲望值到達崇敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
+(10471,'zhTW','防衛者的誓願','當你的流沙之鱗聲望值到達崇敬之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10472,10473,10474,10475,10495,10496,10497,10498,10499,10558,10716,10746,10815,10844,10871,10938,10939,10940,10941,10942) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10472,'zhTW','法師的盟約','當你的流沙之鱗聲望值到達崇拜之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
 (10473,'zhTW','治療者的盟約','當你的流沙之鱗聲望值到達崇拜之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
 (10474,'zhTW','勇士的盟約','當你的流沙之鱗聲望值到達崇拜之後帶著你的永恆指環給在時光之穴的索芮朵蜜。',0),
@@ -13297,13 +13234,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10844,'zhTW','DEPRECATED','此任務被暴雪標記為過期，無法獲得或完成。',0),
 (10871,'zhTW','虛空之翼的盟友','此任務已經絕版。讓凱瑞納古送你去虛空之翼農場見摩德奈。',0),
 (10938,'zhTW','暗月祝福套卡','當暗月馬戲團來到鎮上的時候，把祝福套卡交給他們。',0),
-(10939,'zhTW','暗月風暴套卡','當暗月馬戲團來到鎮上的時候，把風暴套卡交給他們。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10940,10941,10942,10943,10945,10950,10951,10952,10953,10954,10955,10956,10960,10961,10962,10963,10964,10965,10966,10967) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10939,'zhTW','暗月風暴套卡','當暗月馬戲團來到鎮上的時候，把風暴套卡交給他們。',0),
 (10940,'zhTW','暗月狂怒套卡','當暗月馬戲團來到鎮上的時候，把狂怒套卡交給他們。',0),
 (10941,'zhTW','暗月失心套卡','當暗月馬戲團來到鎮上的時候，把失心套卡交給他們。',0),
-(10942,'zhTW','兒童週','使用血精靈孤兒哨呼喚你在兒童週領養的小孩。$b$b已提供物品：$b',0),
+(10942,'zhTW','兒童週','使用血精靈孤兒哨呼喚你在兒童週領養的小孩。$b$b已提供物品：$b',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10943,10945,10950,10951,10952,10953,10954,10955,10956,10960,10961,10962,10963,10964,10965,10966,10967,10968,10978,10979) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10943,'zhTW','兒童週','使用德萊尼孤兒哨呼喚你在兒童週領養的小孩。$b$b已提供物品：$b',0),
 (10945,'zhTW','胡秋和蘑菇族民','帶著你的孤兒瑟蘭德雅前往贊格沼澤的斯博格爾。當你到達而她卻不在的話記得要召喚她。然後跟胡秋談話。',0),
 (10950,'zhTW','奧齊頓與儀式競技場','帶著你的孤兒朵娜到奧齊頓中央的儀式競技場集合石旁。而奧齊頓就在泰洛卡森林的白骨荒野中央。當你到達而她卻不在的話記得要召喚她。',0),
@@ -13320,13 +13257,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (10964,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Use the Ward of Waking to help Clintar Dreamwalker emerge from the Emerald Dream. When he is conscious, speak to him.]',0),
 (10965,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Protect Clintar Dreamwalker''s Spirit while it gathers the relics of Aviana, then speak to Dreamwarden Lurosa.]',0),
 (10966,'zhTW','返回孤兒院','把德萊尼孤兒哨交回陰鬱城給孤兒監護員瑪西將你的被保護人帶回撒塔斯城的孤兒院。',0),
-(10967,'zhTW','返回孤兒院','把血精靈孤兒哨交回陰鬱城給孤兒監護員瑪西將你的被保護人帶回撒塔斯城的孤兒院。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(10968,10978,10979,10980,10985,10986,10987,10988,10990,10991,10992,10993,11011,11012,11013,11014,11015,11016,11017,11018) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(10967,'zhTW','返回孤兒院','把血精靈孤兒哨交回陰鬱城給孤兒監護員瑪西將你的被保護人帶回撒塔斯城的孤兒院。',0),
 (10968,'zhTW','拜訪先知','帶著你的孤兒朵娜，拜訪位在藍謎島上艾克索達裡水晶大廳的先知諾柏多。當你到達時如果她不在的話記得要召喚她。$b$b記得你可以在城裡使用你的地圖。',0),
 (10978,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Bring the Relics of Aviana to Morthis Whisperwing at Cenarion Refuge in Zangarmarsh.]',0),
-(10979,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Speak with Arthorn Windsong at the Evergrove in Blade''s Edge Mountains.]',0),
+(10979,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Speak with Arthorn Windsong at the Evergrove in Blade''s Edge Mountains.]',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(10980,10985,10986,10987,10988,10990,10991,10992,10993,11011,11012,11013,11014,11015,11016,11017,11018,11019,11020,11027) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (10980,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Use an Aether Ray Eye with your Seer''s Stone to reveal the raven cult ghosts. Search the Vortex Pinnacle for the spirit of Sai''kkal the Elder and question him about the book of the raven, then return to Arthorn Windsong.]',0),
 (10985,'zhTW','替阿卡瑪製造混亂','在希瑞的手下製造混亂的時候護送阿卡瑪和瑪翼夫進入影月谷的黑暗神廟。',0),
 (10986,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Speak with Watcher Elaira at the Twilight Ridge in Nagrand.]',0),
@@ -13343,13 +13280,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11015,'zhTW','虛空之翼水晶','影月谷，龍喉營地的監工瓦庫歐‧龍息要你幫他帶來30個虛空之翼水晶。',0),
 (11016,'zhTW','虛空礦坑鐮奪怪皮革','影月谷，龍喉營地的監工瓦庫歐‧龍息要你幫他帶來35塊虛空礦坑鐮奪怪皮革。',0),
 (11017,'zhTW','虛空之塵花粉','影月谷，龍喉營地的監工瓦庫歐‧龍息要你幫他帶來40份虛空之塵花粉。',0),
-(11018,'zhTW','虛空聚晶礦石','影月谷，龍喉營地的監工瓦庫歐‧龍息要你幫他帶來40個虛空聚晶礦石。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11019,11020,11027,11035,11041,11049,11050,11052,11053,11054,11055,11063,11067,11068,11069,11070,11071,11074,11075,11076) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11018,'zhTW','虛空聚晶礦石','影月谷，龍喉營地的監工瓦庫歐‧龍息要你幫他帶來40個虛空聚晶礦石。',0),
 (11019,'zhTW','你在裡面的朋友',NULL,0),
 (11020,'zhTW','慢速死亡','影月谷，龍喉營地的商人亞吉歐要你使用亞吉歐的羊肉配上惡魔腺體來毒害12個龍喉苦工營地。',0),
-(11027,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。',0),
+(11027,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11035,11041,11049,11050,11052,11053,11054,11055,11063,11067,11068,11069,11070,11071,11074,11075,11076,11077,11081,11082) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11035,'zhTW','不太友善的航線...','影月谷裡龍喉營地的商人亞吉歐要你取得10個虛空之翼聖物。',0),
 (11041,'zhTW','未完成的工作...','殺死10個礦坑鐮奪怪和『獸穴之母』芭拉什。成功後回到龍喉營地找霸主莫格。',0),
 (11049,'zhTW','虛空之翼獵蛋行動','影月谷，龍喉營地的商人亞吉歐要你取得一顆虛空之翼蛋。',0),
@@ -13366,13 +13303,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11071,'zhTW','龍喉競賽:碎天者隊長','跟隨碎天者隊長並試著待在你的飛行坐騎上。如果你擊敗了碎天者隊長就將你的勝利回報給影月谷，龍喉營地的傑‧諾斯利。',0),
 (11074,'zhTW','子嗣的象徵','從司凱堤斯的時光流逝阿拉卡身上收集時光流逝卷軸，把它們帶到司凱堤斯，找到召喚法陣裡的顱骨堆。召喚並擊敗泰洛克敵人的子嗣再帶著阿卡萊之爪，凱羅格之刺，瓦奇茲的鱗片和吉札拉之爪回到海茲克那裡。',0),
 (11075,'zhTW','虛空之翼礦坑','找到虛空之翼岩架的礦坑夫人。',0),
-(11076,'zhTW','拾起貨品...','影月谷，虛空之翼礦坑的礦坑夫人要你取得15個虛空礦坑貨品箱。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11077,11081,11082,11083,11084,11086,11089,11090,11092,11094,11095,11096,11097,11099,11101,11103,11104,11105,11106,11107) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11076,'zhTW','拾起貨品...','影月谷，虛空之翼礦坑的礦坑夫人要你取得15個虛空礦坑貨品箱。',0),
 (11077,'zhTW','龍的問題不算什麼','影月谷，虛空之翼礦坑的龍喉工頭要你殺死15個虛空礦坑鐮奪怪和5個虛空礦坑劫毀者。',0),
 (11081,'zhTW','黑暗之血大反叛','將黑暗之血逃脫計畫交給礦坑夫人。',0),
-(11082,'zhTW','真相尋求者','找到一個黑暗之血監督者並審問他。帶著黑暗之血的訊息和監督者的手回到礦坑夫人那裡。',0),
+(11082,'zhTW','真相尋求者','找到一個黑暗之血監督者並審問他。帶著黑暗之血的訊息和監督者的手回到礦坑夫人那裡。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11083,11084,11086,11089,11090,11092,11094,11095,11096,11097,11099,11101,11103,11104,11105,11106,11107,11108,11109,11110) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11083,'zhTW','瘋狂混亂','影月谷，虛空之翼礦坑的『鞭奴者』羅納葛要你殺死瘋狂的黑暗之血工頭和5個瘋狂的黑暗之血礦工。',0),
 (11084,'zhTW','抬頭挺胸，隊長!','到影月谷和龍喉營地的霸主莫格談談。',0),
 (11086,'zhTW','瓦解暮光傳送門','影月谷，龍喉營地的霸主莫格要你殺死20個死亡之影密探。',0),
@@ -13389,13 +13326,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11104,'zhTW','不再是治療師',NULL,0),
 (11105,'zhTW','不再是勇士',NULL,0),
 (11106,'zhTW','不再是防衛者',NULL,0),
-(11107,'zhTW','向大領主鞠躬','到影月谷的龍喉營地和霸主莫格談談。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11108,11109,11110,11111,11112,11113,11114,11121,11163,11166,11171,11178,11179,11189,11195,11196,11245,11246,11247,11249) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11107,'zhTW','向大領主鞠躬','到影月谷的龍喉營地和霸主莫格談談。',0),
 (11108,'zhTW','伊利丹‧怒風','會見伊利丹‧怒風。如果你僥倖存活的話，去撒塔斯的陰鬱城找巴薩姆斯。',0),
 (11109,'zhTW','鈷藍虛空之翼龍喬瑞斯',NULL,0),
-(11110,'zhTW','紫色虛空之翼龍莫法斯',NULL,0),
+(11110,'zhTW','紫色虛空之翼龍莫法斯',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11111,11112,11113,11114,11121,11163,11166,11171,11178,11179,11189,11195,11196,11245,11246,11247,11249,11302,11334,11345) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11111,'zhTW','黑瑪瑙色虛空之翼龍奧尼克希安',NULL,0),
 (11112,'zhTW','藍色虛空之翼龍蘇拉庫',NULL,0),
 (11113,'zhTW','紫紅色虛空之翼龍弗拉納庫',NULL,0),
@@ -13412,13 +13349,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11245,'zhTW','厄運的哨塔','鎮西士官告訴你使用士官火焰信號來做為斯考恩四座高塔的砲擊標記會比較好。',0),
 (11246,'zhTW','駭人聽聞的必要工作','鎮西士官要你使用士官砍刀肢解20名斯考恩的溫特斯考恩部族維酷人。',0),
 (11247,'zhTW','燒啊，斯考恩，燒啊!','鎮西士官奉命要你使用士官火炬，在斯考恩東北與西北邊的長屋以及兵營縱火。',0),
-(11249,'zhTW','阻止飛升!','在族長的柴堆附近使用維酷飛升卷軸將他召喚出來並殺掉他。之後，由於儀式的類型，你確定鎮西要塞的雷瓦瑞爾神父肯定會對這份卷軸很感興趣。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11302,11334,11345,11349,11355,11392,11394,11396,11401,11402,11404,11410,11411,11414,11416,11418,11437,11438,11481,11492) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11249,'zhTW','阻止飛升!','在族長的柴堆附近使用維酷飛升卷軸將他召喚出來並殺掉他。之後，由於儀式的類型，你確定鎮西要塞的雷瓦瑞爾神父肯定會對這份卷軸很感興趣。',0),
 (11302,'zhTW','謎樣的冰霜水精','和冰凍林地的露麗兒談談。',0),
 (11334,'zhTW','射擊得分！','此任務已經絕版。[PH]瑞林要你射擊標靶，然後把標靶來福槍還給他。',0),
-(11345,'zhTW','彈丸的獎品','此任務已經絕版。[PH]瑞林要你射擊標靶，然後把標靶來福槍還給他。',0),
+(11345,'zhTW','彈丸的獎品','此任務已經絕版。[PH]瑞林要你射擊標靶，然後把標靶來福槍還給他。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11349,11355,11392,11394,11396,11401,11402,11404,11410,11411,11414,11416,11418,11437,11438,11481,11492,11494,11495,11515) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11349,'zhTW','精通符文','帶一組鐵符文雕刻工具給威德瓦堡壘的勘察員貝爾瓦。',0),
 (11355,'zhTW','巨人的行進','威德瓦堡壘的研究員艾德蘭要你對4個符文石巨人的屍體使用符文追尋之鎬。',0),
 (11392,'zhTW','召喚無頭騎士','帶著一根陰鬱蠟燭去零散翻覆的泥土那邊。',0),
@@ -13435,13 +13372,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11437,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[PH] Speak to a Brewfest Barker in any Beer Garden and receive a free pretzel.',0),
 (11438,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[PH] Speak to a Brewfest Barker in any Beer Garden and receive a free pretzel.',0),
 (11481,'zhTW','太陽之井的危機','撒塔斯城，奧多爾階梯的『護光者』艾德伊恩要求你前往太陽之井高地，和雷索爾談談。',0),
-(11492,'zhTW','大难不死','此任務被暴雪標記為過期，無法獲得或完成。卡雷苟斯要求你击败魔导师平台内的凯尔萨斯。取下凯尔萨斯的徽记之后，立刻向破碎残阳基地的主教拉雷索尔复命。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11494,11495,11515,11516,11521,11523,11525,11526,11533,11534,11536,11537,11540,11541,11543,11544,11546,11547,11548,11549) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11492,'zhTW','大难不死','此任務被暴雪標記為過期，無法獲得或完成。卡雷苟斯要求你击败魔导师平台内的凯尔萨斯。取下凯尔萨斯的徽记之后，立刻向破碎残阳基地的主教拉雷索尔复命。',0),
 (11494,'zhTW','閃電灌能神器','凜風峽灣的探險者協會前哨的渥特要你使用鐵符文傀儡收集資料的技能去收集15組鐵符文資料。$b$b一旦完成任務後，你可以點選寵物視窗選擇解散來取消傀儡。',0),
 (11495,'zhTW','微妙的雷聲','探險者協會前哨的渥特要你使用鐵符文傀儡去探勘巴爾古恩挖掘場裡傳出雷聲的洞穴。$b$b一旦你完成了任務，從寵物視窗中解散你的傀儡。',0),
-(11515,'zhTW','血債血償','基爾加丹王座的博學者賽菈要你對4名憔悴的魔化血精靈使用魔化虹管，然後再殺死他們。你會需要從附近憤怒傳令官身上取得的惡魔之血來強化血液虹吸。',0),
+(11515,'zhTW','血債血償','基爾加丹王座的博學者賽菈要你對4名憔悴的魔化血精靈使用魔化虹管，然後再殺死他們。你會需要從附近憤怒傳令官身上取得的惡魔之血來強化血液虹吸。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11516,11521,11523,11525,11526,11533,11534,11536,11537,11540,11541,11543,11544,11546,11547,11548,11549,11550,11554,11555) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11516,'zhTW','炸毀入口','基爾加丹王座的博學者賽菈要你使用高熱餘燼召喚出生命火花。然後殺死那些閃亮的魔化火光，直到它轉變為不穩定的生命火花。帶著不穩定的生命火花回到軍團入口摧毀它。',0),
 (11521,'zhTW','重新尋找你的根','日境港的瑪納要你去外域的刺棘高地收集5個刺棘根莖，然後再回來找她。',0),
 (11523,'zhTW','保護結界!','破碎之日會所的塞里斯‧曦爐上尉要你從惡癮者惡魔與惡癮者吞噬者身上取得4個法力殘餘。使用它們來替日境周遭建築的一個水晶結界充能。',0),
@@ -13458,13 +13395,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (11546,'zhTW','開張營業','日境港的瑪納要你從奎爾達納斯的樹叢收集5個血莓。',0),
 (11547,'zhTW','瞭解你的地脈','日境聖所的星術師達納里安要你對血水晶、曙光廣場的傳送門，以及綠鰓海岸的納迦祭壇使用星術師水晶。',0),
 (11548,'zhTW','你的持續支持','太陽之井島上日境的隱士艾悠里，希望你能夠捐助10枚金幣。',0),
-(11549,'zhTW','高尚的捐款人','隱士凱爾索斯希望你能夠捐獻1000枚金幣來協助隱士艾悠里的努力。如果完成這個任務的話，你將會以破碎之日的$n廣為人知。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(11550,11554,11555,11670,11939,11982,12001,12008,12015,12131,12138,12172,12173,12179,12193,12286,12586,12625,12744,12944) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(11549,'zhTW','高尚的捐款人','隱士凱爾索斯希望你能夠捐獻1000枚金幣來協助隱士艾悠里的努力。如果完成這個任務的話，你將會以破碎之日的$n廣為人知。',0),
 (11550,'zhTW','欺詐者的到來...','前往奎爾薩拉斯北方的奎爾達納斯之島，向大法師奈蘇爾報告。鐵爐堡和銀月城的飛行管理員能夠將你送到目的地。',0),
 (11554,'zhTW','在前線的朋友',NULL,0),
-(11555,'zhTW','被盟友所尊敬',NULL,0),
+(11555,'zhTW','被盟友所尊敬',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(11670,11939,11982,12001,12008,12015,12131,12138,12172,12173,12179,12193,12286,12586,12625,12744,12944,12945,12990,13150) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (11670,'zhTW','真的是獸人做的!','偽裝成戰歌獸人，將戰歌旌旗插在瑪格默斯瑞卡的屍體上。然後把偽裝還給嘶軸簡易機場的卡芙緹‧顛鏈。',0),
 (11939,'zhTW','????','此任務已經絕版。',0),
 (11982,'zhTW','降下毀滅','庫倫要你將巨礫丟入鐸爾莫丹的暴露區域以干擾鐵矮人的工作。他就在可以俯瞰鐸爾莫丹的山丘上。',0),
@@ -13481,13 +13418,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (12586,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Talk to <x> at <x>.]',0),
 (12625,'zhTW',NULL,'此任務已經絕版。[Report to Master Siegesmith Corvus on the garrison floor of Ebon Hold.]',0),
 (12744,'zhTW','特別驚喜','赤紅之焰禮拜堂的騎士指揮官瘟疫之拳命令你處決附近牢房裡關押的銀色黎明囚犯，多諾汎‧普佛羅斯特。',0),
-(12944,'zhTW','糖果桶',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(12945,12990,13150,13259,13266,13267,13278,13279,13280,13281,13282,13283,13284,13286,13287,13288,13289,13290,13291,13292) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(12944,'zhTW','糖果桶',NULL,0),
 (12945,'zhTW','糖果桶',NULL,0),
 (12990,'zhTW','虫洞','此任務被暴雪標記為過期，無法獲得或完成。为Jon LeCraft带一些材料来，防止他迅速死亡，然后学会一个很棒的新法术。',0),
-(13150,'zhTW',NULL,'此任務已經絕版。Repair the whatsit and return it to Timothy Jones at the Jewelcrafting shop in Dalaran.',0),
+(13150,'zhTW',NULL,'此任務已經絕版。Repair the whatsit and return it to Timothy Jones at the Jewelcrafting shop in Dalaran.',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(13259,13266,13267,13278,13279,13280,13281,13282,13283,13284,13286,13287,13288,13289,13290,13291,13292,13293,13299,13301) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (13259,'zhTW','先聲奪人','冰冠城塞裡的克瑞佳中士要求你，殺死10頭笨重的恐獸。',0),
 (13266,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Take the portal to Undercity located in Grommash Hold and report to Vol''jin.]',0),
 (13267,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Assist Thrall and Sylvanas in retaking the Undercity for the Horde.$b$bReport to Thrall should you succeed.]',0),
@@ -13504,13 +13441,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (13289,'zhTW','你的憎恶伙伴','破天号上的萨萨里安要你使用憎恶复活工具包制造一名复活的憎恶，然后利用它杀死15只冰寒食尸鬼、15只残忍的恶鬼和15名复活的联盟士兵。',0),
 (13290,'zhTW','照過來!','破天者號上的提督巴特勒要你去跟首席工程師栓鉗說話。',0),
 (13291,'zhTW','借來的科技','破天者號上的首席工程師栓鉗要你去破碎前線上使用私運溶劑。$b$b使用溶劑必須要具有被遺棄的頭盔、被遺棄的盔甲與骨堆，都可於破碎前線尋得。',0),
-(13292,'zhTW','溶劑就是好計','破天者號上的首席工程師栓鉗要你去破碎前線上使用私運溶劑。$b$b使用溶劑必須要具有被遺棄的頭盔、被遺棄的盔甲與骨堆，都可於破碎前線尋得。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(13293,13299,13301,13302,13304,13305,13306,13307,13308,13310,13314,13320,13322,13323,13324,13325,13326,13327,13333,13341) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(13292,'zhTW','溶劑就是好計','破天者號上的首席工程師栓鉗要你去破碎前線上使用私運溶劑。$b$b使用溶劑必須要具有被遺棄的頭盔、被遺棄的盔甲與骨堆，都可於破碎前線尋得。',0),
 (13293,'zhTW','前進依米海姆!','與依米海姆的轟擊‧雷彈交談。',0),
 (13299,'zhTW',NULL,'此任務已經絕版。',0),
-(13301,'zhTW','地面突襲','護送柯爾克隆軍隊抵達依米海姆的入口。回報給依米海姆北面冰冠邊緣的地面指揮官蘇加獲得你的任務報酬。',0),
+(13301,'zhTW','地面突襲','護送柯爾克隆軍隊抵達依米海姆的入口。回報給依米海姆北面冰冠邊緣的地面指揮官蘇加獲得你的任務報酬。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(13302,13304,13305,13306,13307,13308,13310,13314,13320,13322,13323,13324,13325,13326,13327,13333,13341,13344,13347,13369) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (13302,'zhTW','搶救薩鋼礦奴','奧格林之錘上的凱爾坦修士請你去援救10名薩鋼礦坑奴隸。',0),
 (13304,'zhTW','戰地搶修','奧格林之錘上的寇爾提拉‧亡織者要你從逝望山谷裡的食汙魂屍蒐集5個石毀車零件並把他們裝上損壞的石毀車。',0),
 (13305,'zhTW','別太認真','利用翻新的石毀車在逝望山谷摧毀150隻被分解的食屍鬼、20名霜顱法師、2名骸骨巨人。完成後與第一軍團前線營地的米希阿斯‧薩爾奈對話。',0),
@@ -13527,13 +13464,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (13326,'zhTW','暗月貴族套卡','當暗月馬戲團來到鎮上的時候，把貴族套卡交給他們。',0),
 (13327,'zhTW','暗月不死套卡','當暗月馬戲團來到鎮上的時候，把不死套卡交給他們。',0),
 (13333,'zhTW','攔截更多急件','從奧格林之錘斥候手中攔截6份奧格林之錘急件，並帶回給破天者號上的提督賈斯汀‧巴特勒。',0),
-(13341,'zhTW','聯合作戰','向依米海姆東側冰冠邊緣的地面指揮官庫普報到。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(13344,13347,13369,13370,13371,13387,13388,13389,13390,13391,13393,13396,13405,13407,13412,13413,13414,13427,13428,13432) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(13341,'zhTW','聯合作戰','向依米海姆東側冰冠邊緣的地面指揮官庫普報到。',0),
 (13344,'zhTW','不只是蟲子','破天者號上的薩沙理安要你在奧多薩蒐集5個黑暗物質來召喚黑暗信差。',0),
 (13347,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Gather Fordragon''s Shield from the field of battle at Angrathar the Wrath Gate and return it to King Varian Wrynn at Stormwind Keep in Stormwind City.]',0),
-(13369,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Assist Lady Jaina Proudmoore in Orgrimmar. Speak to the Warchief of the Horde, Thrall, at Orgrimmar on the continent of Kalimdor.]',0),
+(13369,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Assist Lady Jaina Proudmoore in Orgrimmar. Speak to the Warchief of the Horde, Thrall, at Orgrimmar on the continent of Kalimdor.]',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(13370,13371,13387,13388,13389,13390,13391,13393,13396,13405,13407,13412,13413,13414,13427,13428,13432,13473,13475,13476) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (13370,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Use the portal in Grommash Hold to return to Stormwind Keep and deliver Thrall''s message to King Varian Wrynn.]',0),
 (13371,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Use the Portal to the Undercity inside Stormwind Keep to teleport to the Undercity. Report to Broll Bearmantle when you arrive at your destination.]',0),
 (13387,'zhTW','確保周邊陣地','冰冠城塞的坎達爾上尉要你殺死10個笨重的恐獸。',0),
@@ -13550,13 +13487,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (13414,'zhTW','振翼高飛!','在凜懼島上的奧核之心，寇菈史卓莎要求你，騎乘她的飛龍並殺死5個誓鱗精英。',0),
 (13427,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Alterac Valley battleground match and return to an Alliance Brigadier General at any Alliance capital city, Wintergrasp, Dalaran or Shattrath.$b]',0),
 (13428,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Alterac Valley battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran or Shattrath.]',0),
-(13432,'zhTW','永恆之瓶','時光之穴的索芮朵蜜要你去從盤牙蓄湖的瓦許女士身上取得瓦許的殘存之瓶，從風暴要塞的凱爾薩斯‧逐日者身上取得凱爾薩斯的殘存之瓶。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(13473,13475,13476,13477,13478,13485,13486,13487,13488,13489,13490,13491,13492,13524,13571,13649,13654,13662,13850,13926) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(13432,'zhTW','永恆之瓶','時光之穴的索芮朵蜜要你去從盤牙蓄湖的瓦許女士身上取得瓦許的殘存之瓶，從風暴要塞的凱爾薩斯‧逐日者身上取得凱爾薩斯的殘存之瓶。',0),
 (13473,'zhTW','糖果桶',NULL,0),
 (13475,'zhTW',NULL,'此任務已經絕版。',0),
-(13476,'zhTW','無上的榮耀','此任務被暴雪標記為過期，無法獲得或完成。把每座戰場的榮譽獎章各一枚交給任何一座部落主城、撒塔斯、達拉然或冬握湖的部落戰爭使者。',0),
+(13476,'zhTW','無上的榮耀','此任務被暴雪標記為過期，無法獲得或完成。把每座戰場的榮譽獎章各一枚交給任何一座部落主城、撒塔斯、達拉然或冬握湖的部落戰爭使者。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(13477,13478,13485,13486,13487,13488,13489,13490,13491,13492,13524,13571,13649,13654,13662,13850,13926,13927,13929,13930) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (13477,'zhTW',NULL,'此任務已經絕版。',0),
 (13478,'zhTW','共同的努力','此任務被暴雪標記為過期，無法獲得或完成。把每座戰場的榮譽獎章各一枚交給任何一座聯盟主城、撒塔斯、達拉然或冬握湖的聯盟准將。',0),
 (13485,'zhTW','榮耀火焰',NULL,0),
@@ -13573,13 +13510,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (13654,'zhTW','侍從的秘密','從骷髏樵夫身上拿一根大型腿骨，用它敲昏瑪洛瑞克。從瑪洛瑞克身上搜尋證據，然後向銀白聯賽場地的十字軍萊達菈回報。',0),
 (13662,'zhTW','贏得認同',NULL,0),
 (13850,'zhTW','抗禦毒性','安戈洛環形山的莫維克聲稱如果暴露在毒皮暴掠龍的毒血之下達20次後，騎乘毒皮暴掠龍就不會被毒死。攻擊毒皮暴掠龍就有機會中毒。',0),
-(13926,'zhTW','神諭小孤兒阿若','和孤兒監護員阿瑞雅談談，然後使用神諭者孤兒哨來呼喚你在兒童週所領養的孤兒。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(13927,13929,13930,13933,13934,13937,13938,13950,13951,13954,13955,13956,13957,14088,14106,14119,14164,14178,14180,14181) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(13926,'zhTW','神諭小孤兒阿若','和孤兒監護員阿瑞雅談談，然後使用神諭者孤兒哨來呼喚你在兒童週所領養的孤兒。',0),
 (13927,'zhTW','獾狼小孤兒恰嘎','和孤兒監護員阿瑞雅談談，然後使用獾狼怪孤兒哨來呼喚你在兒童週所領養的孤兒。',0),
 (13929,'zhTW','有史以來最大的樹!','帶著你的孤兒，阿若，去參觀灰喉鎮。在你進入巨樹的樹幹時，如果他沒有在你身邊，記得叫他出來。',0),
-(13930,'zhTW','熊怪的家','帶著你的孤兒，恰嘎，去參觀灰喉鎮。在你進入巨樹的樹幹時，如果他沒有在你身邊，記得叫他出來。',0),
+(13930,'zhTW','熊怪的家','帶著你的孤兒，恰嘎，去參觀灰喉鎮。在你進入巨樹的樹幹時，如果他沒有在你身邊，記得叫他出來。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(13933,13934,13937,13938,13950,13951,13954,13955,13956,13957,14088,14106,14119,14164,14178,14180,14181,14183,24217,24219) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (13933,'zhTW','青銅龍殿','帶著你的孤兒，阿若，去參觀青銅龍殿。如果他沒有在你身邊，記得叫他出來。',0),
 (13934,'zhTW','青銅龍殿','帶著你的孤兒，恰嘎，去參觀青銅龍殿。如果他沒有在你身邊，記得叫他出來。',0),
 (13937,'zhTW','神奇玩具屋之旅','在神奇玩具屋買一個小紙飛艇並拋向你的孤兒，阿若。',0),
@@ -13596,13 +13533,13 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (14164,'zhTW','战斗的召唤：征服之岛','此任務被暴雪標記為過期，無法獲得或完成。在征服之岛战场中获得一场胜利，然后向任意部落主城、冬拥湖、达拉然或沙塔斯城中的部落战争使者复命。',0),
 (14178,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Arathi Basin battleground match and return to an Alliance Brigadier General at any Alliance capital city, Wintergrasp, Dalaran, or Shattrath.]',0),
 (14180,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win a Warsong Gulch battleground match and return to an Alliance Brigadier General at any Alliance capital city, Wintergrasp, Dalaran, or Shattrath.]',0),
-(14181,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Arathi Basin battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran, or Shattrath.]',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(14183,24217,24219,24220,24221,24222,24223,24224,24225,24426,24427,24522,24535,24638,24648,24649,24658,24661,24663,24746) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(14181,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Arathi Basin battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran, or Shattrath.]',0),
 (14183,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win a Warsong Gulch battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran, or Shattrath.$b]',0),
 (24217,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win a Warsong Gulch battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran, or Shattrath.$b]',0),
-(24219,'zhTW','戰鬥的號角:戰歌峽谷','此任務被暴雪標記為過期，無法獲得或完成。在戰歌峽谷的戰場中獲勝，然後向任何一座聯盟主城、冬握湖、達拉然或撒塔斯的聯盟准將回報。',0),
+(24219,'zhTW','戰鬥的號角:戰歌峽谷','此任務被暴雪標記為過期，無法獲得或完成。在戰歌峽谷的戰場中獲勝，然後向任何一座聯盟主城、冬握湖、達拉然或撒塔斯的聯盟准將回報。',0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(24220,24221,24222,24223,24224,24225,24426,24427,24508,24509,24522,24535,24638,24648,24649,24658,24663,24746,24790,24791) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (24220,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Arathi Basin battleground match and return to an Alliance Brigadier General at any Alliance capital city, Wintergrasp, Dalaran, or Shattrath.]',0),
 (24221,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Arathi Basin battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran, or Shattrath.]',0),
 (24222,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Eye of the Storm battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran,  or Shattrath.]',0),
@@ -13611,20 +13548,21 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (24225,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win a Warsong Gulch battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran, or Shattrath.$b]',0),
 (24426,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Alterac Valley battleground match and return to a Horde Warbringer at any Horde capital city, Wintergrasp, Dalaran or Shattrath.]',0),
 (24427,'zhTW',NULL,'此任務被暴雪標記為過期，無法獲得或完成。[Win an Alterac Valley battleground match and return to an Alliance Brigadier General at any Alliance capital city, Wintergrasp, Dalaran or Shattrath.$b]',0),
+(24508,'zhTW','临时任务记录',NULL,0),
+(24509,'zhTW','临时任务记录',NULL,0),
 (24522,'zhTW','前往太陽之井','在奎爾達納斯之島的太陽之井高地入口處與赫杜倫‧亮翼談話。',0),
 (24535,'zhTW','薩洛瑞安‧曦尋者','尋找薩洛瑞安‧曦尋者的遺骸，並取得他的祝福以使用奎爾德拉。',0),
 (24638,'zhTW','摧毀化學製藥公司','到杜洛塔的奧格瑪大門西邊，殺掉5名王冠公司僕從，並且使用凸栓的克銀炸彈來摧毀一台化學貨車，然後回奧格瑪找警探史內卜‧凸栓。',0),
 (24648,'zhTW','摧毀化學製藥公司','此任務被暴雪標記為過期，無法獲得或完成。到塵泥沼澤的塞拉摩外頭，殺掉5名王冠公司流氓，並且使用凸栓的克銀炸彈來摧毀一台化學貨車，然後回奧格瑪找警探史內卜‧凸栓。',0),
 (24649,'zhTW','摧毀化學製藥公司','此任務被暴雪標記為過期，無法獲得或完成。到辛特蘭的鷹巢山東邊，殺掉5名王冠公司密探，並且使用凸栓的克銀炸彈來摧毀一台化學貨車，然後回奧格瑪找警探史內卜‧凸栓。',0),
 (24658,'zhTW','摧毀化學製藥公司','此任務被暴雪標記為過期，無法獲得或完成。到艾爾文森林的西泉要塞東北邊，殺掉5名王冠公司僕從，並且使用凸栓的克銀炸彈來摧毀一台化學貨車，然後回暴風城找巡官史尼卜‧凸栓。',0),
-(24661,'zhTW',NULL,'此任務已經絕版。    $b        輸入以下代碼查看此任務是否已完成$b$b        /run print(C_QuestLog.IsQuestFlaggedCompleted(24661))',0),
 (24663,'zhTW','摧毀化學製藥公司','此任務被暴雪標記為過期，無法獲得或完成。到辛特蘭的鷹巢山東邊，殺掉5名王冠公司密探，並且使用凸栓的克銀炸彈來摧毀一台化學貨車，然後回暴風城找巡官史尼卜‧凸栓。',0),
-(24746,'zhTW',NULL,'此任務已經絕版。',0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(24790,24791,24803,24806,24836,24837,24838,24840,24841,24842,24843,24845,24846,24847,24881,24883,24884,24885,24886,24888) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(24746,'zhTW',NULL,'此任務已經絕版。',0),
 (24790,'zhTW','每日普通隨機（第一次）',NULL,0),
-(24791,'zhTW','每日普通隨機(第N次)',NULL,0),
+(24791,'zhTW','每日普通隨機(第N次)',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(24803,24806,24836,24837,24838,24840,24841,24842,24843,24845,24846,24847,24881,24883,24884,24885,24886,24888,24889,24891) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (24803,'zhTW','卡魯耶克釣魚大賽','此任務已經絕版。',0),
 (24806,'zhTW','下次會更好','此任務已經絕版。',0),
 (24836,'zhTW','改變心意',NULL,0),
@@ -13642,12 +13580,12 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 (24884,'zhTW','经典旧世随机 40-45级 （第一次）',NULL,0),
 (24885,'zhTW','经典旧世随机 46-55级 （第一次）',NULL,0),
 (24886,'zhTW','经典旧世随机 56-60级 （第一次）',NULL,0),
-(24888,'zhTW','经典旧世随机 65-70级 （第一次）',NULL,0);
-
-DELETE FROM `quest_template_locale` WHERE `ID` IN(24889,24891,24892,24893,24894,24896,24915,24916,24917,24918,24919,25229,25483,25484,25500) AND `locale` = 'zhTW';
-INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
+(24888,'zhTW','经典旧世随机 65-70级 （第一次）',NULL,0),
 (24889,'zhTW','艾澤拉斯隨機5至15(第N次)',NULL,0),
-(24891,'zhTW','经典旧世随机 24-34级 （第一次）',NULL,0),
+(24891,'zhTW','经典旧世随机 24-34级 （第一次）',NULL,0);
+
+DELETE FROM `quest_template_locale` WHERE `ID` IN(24892,24893,24894,24896,24915,24916,24917,24918,24919,25229,25483,25484,25500) AND `locale` = 'zhTW';
+INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `VerifiedBuild`) VALUES
 (24892,'zhTW','经典旧世随机 40-45级 （第N次）',NULL,0),
 (24893,'zhTW','经典旧世随机 46-55级 （第M次）',NULL,0),
 (24894,'zhTW','经典旧世随机 56-60 （第N次）',NULL,0),
@@ -13667,8 +13605,8 @@ INSERT INTO `quest_template_locale` (`ID`, `locale`, `Title`, `Details`, `Verifi
 -- List of entries using CLASSIC datas :
 -- 2358,8450,8489,5383,5530,8992
 -- List of entries using CATA datas :
--- 137,558,810,814,915,925,3241,4822,8274,8741,8931,8934,8937,8938,8943,8952,8955,8957,8959,9000,9001,9003,9005,9008,9011,9012,9014,9018,9296,9297
+-- 137,558,915,925,3241,4822,8274,8741,8931,8934,8937,8938,8943,8952,8955,8957,8959,9000,9001,9003,9005,9008,9011,9012,9014,9018,9296,9297
 -- List of entries using MOP datas :
 -- 7045,9339,9365
 -- List of entries using RETAIL datas :
--- 236,5659,6841,6984,7790,8264,8384,8386,8389,8390,8391,8392,8397,8404,8431,8440,8441,8442,8444,8445,8448,8449,8451,8452,8453,8454,8896,8971,8972,8973,8974,8975,8976,9168,9357,9767,10560,10946,10947,10948,10949,10957,10958,10959,10994,10999,11001,11004,11007,11010,11021,11024,11028,11030,11057,11061,11062,11064,11065,11066,11073,11079,11091,11098,11100,11102,11119,11122,11127,11130,11131,11132,11153,11154,11155,11157,11164,11165,11167,11168,11170,11175,11176,11182,11187,11188,11190,11199,11202,11218,11219,11221,11224,11227,11228,11229,11230,11231,11232,11233,11234,11235,11236,11237,11238,11239,11240,11241,11242,11243,11244,11248,11250,11251,11252,11253,11254,11255,11256,11257,11258,11259,11260,11261,11262,11263,11264,11265,11266,11267,11268,11269,11270,11271,11272,11273,11274,11275,11276,11277,11278,11279,11280,11281,11282,11283,11284,11285,11286,11287,11288,11289,11290,11291,11292,11295,11296,11297,11298,11299,11300,11301,11303,11304,11305,11306,11307,11308,11309,11310,11311,11312,11313,11314,11315,11316,11317,11319,11320,11322,11323,11324,11325,11326,11327,11328,11329,11330,11331,11332,11333,11343,11344,11346,11348,11350,11351,11352,11356,11357,11358,11359,11360,11361,11365,11366,11367,11390,11391,11393,11395,11397,11398,11399,11403,11405,11406,11407,11408,11412,11415,11417,11420,11421,11422,11423,11424,11426,11427,11428,11429,11430,11432,11433,11434,11435,11436,11439,11440,11443,11444,11445,11447,11448,11449,11450,11452,11453,11454,11455,11456,11457,11458,11459,11460,11462,11463,11464,11465,11466,11467,11468,11469,11470,11471,11472,11473,11474,11475,11476,11477,11478,11479,11480,11482,11483,11484,11485,11488,11489,11490,11491,11501,11504,11507,11508,11509,11510,11511,11512,11514,11517,11519,11520,11527,11529,11530,11535,11538,11539,11545,11551,11559,11560,11561,11562,11563,11564,11565,11566,11567,11568,11569,11570,11571,11572,11573,11574,11575,11576,11578,11579,11582,11585,11586,11587,11590,11591,11592,11593,11594,11595,11596,11597,11598,11599,11600,11601,11602,11603,11604,11605,11606,11607,11608,11609,11610,11611,11612,11613,11614,11615,11616,11617,11618,11619,11620,11621,11622,11623,11624,11625,11626,11627,11628,11629,11630,11631,11632,11633,11634,11635,11636,11637,11638,11639,11640,11641,11642,11643,11644,11645,11646,11647,11648,11649,11650,11651,11652,11653,11654,11655,11656,11658,11659,11660,11661,11662,11663,11664,11671,11672,11673,11674,11675,11676,11677,11678,11679,11680,11681,11682,11683,11684,11685,11686,11687,11688,11689,11690,11692,11693,11694,11695,11697,11698,11699,11700,11701,11702,11703,11704,11705,11706,11707,11708,11709,11710,11711,11712,11713,11714,11715,11716,11717,11718,11719,11720,11721,11722,11723,11724,11725,11726,11727,11728,11729,11730,11733,11788,11789,11790,11791,11792,11793,11794,11795,11796,11797,11798,11865,11866,11867,11868,11869,11870,11871,11872,11873,11876,11878,11879,11881,11887,11888,11889,11890,11892,11893,11894,11895,11896,11897,11898,11899,11901,11902,11903,11904,11905,11906,11907,11908,11909,11911,11913,11914,11916,11919,11920,11927,11928,11929,11930,11931,11932,11936,11938,11940,11941,11942,11943,11944,11945,11946,11949,11950,11951,11956,11957,11958,11959,11960,11961,11962,11963,11965,11967,11968,11969,11973,11975,11977,11978,11979,11980,11981,11983,11984,11985,11986,11987,11988,11989,11990,11991,11992,11995,11996,11997,11998,11999,12000,12002,12003,12004,12005,12006,12007,12009,12010,12011,12013,12014,12016,12017,12018,12021,12024,12025,12026,12027,12028,12029,12030,12031,12032,12033,12034,12035,12036,12038,12039,12040,12041,12042,12043,12044,12045,12046,12047,12048,12049,12050,12051,12052,12053,12054,12055,12056,12057,12058,12059,12060,12061,12063,12064,12065,12066,12067,12068,12069,12070,12071,12072,12073,12074,12075,12076,12077,12078,12079,12080,12082,12083,12084,12085,12086,12087,12088,12089,12090,12091,12092,12093,12094,12095,12096,12097,12098,12099,12100,12101,12102,12104,12105,12106,12107,12108,12109,12110,12111,12112,12113,12114,12115,12116,12117,12118,12119,12120,12121,12122,12123,12124,12125,12126,12127,12129,12130,12132,12133,12134,12135,12136,12137,12139,12140,12141,12142,12143,12144,12145,12146,12147,12148,12152,12153,12154,12155,12156,12157,12158,12159,12160,12161,12164,12165,12166,12167,12168,12169,12170,12171,12174,12175,12176,12177,12178,12181,12182,12183,12184,12185,12188,12189,12190,12192,12195,12196,12197,12198,12199,12200,12201,12202,12203,12204,12205,12206,12207,12208,12209,12210,12211,12212,12213,12214,12215,12216,12217,12218,12219,12220,12221,12222,12223,12224,12225,12226,12227,12229,12230,12231,12232,12233,12234,12235,12236,12237,12239,12240,12241,12242,12243,12244,12245,12246,12247,12248,12250,12251,12252,12253,12254,12255,12256,12257,12258,12259,12260,12261,12262,12263,12264,12265,12266,12267,12268,12269,12270,12271,12272,12273,12274,12275,12276,12277,12278,12279,12280,12281,12282,12283,12284,12285,12288,12289,12290,12291,12292,12293,12294,12295,12296,12297,12298,12299,12300,12301,12302,12303,12304,12305,12307,12308,12309,12310,12311,12312,12313,12314,12315,12316,12317,12318,12319,12320,12321,12323,12324,12325,12326,12327,12328,12329,12330,12346,12372,12411,12412,12413,12414,12415,12416,12417,12418,12419,12421,12422,12423,12424,12425,12426,12427,12428,12429,12430,12431,12432,12433,12434,12435,12436,12437,12439,12440,12443,12444,12446,12447,12448,12449,12450,12451,12452,12453,12454,12455,12457,12458,12459,12461,12462,12463,12464,12465,12466,12467,12468,12469,12470,12471,12472,12473,12474,12475,12476,12477,12478,12481,12482,12483,12484,12486,12487,12488,12489,12490,12495,12496,12497,12498,12499,12500,12501,12502,12503,12504,12505,12507,12508,12509,12511,12512,12514,12517,12518,12519,12520,12521,12522,12523,12524,12525,12526,12527,12528,12529,12530,12531,12532,12533,12534,12535,12536,12537,12538,12539,12540,12541,12542,12543,12544,12545,12546,12547,12548,12549,12550,12551,12552,12553,12555,12556,12557,12558,12559,12560,12561,12562,12563,12564,12565,12566,12568,12569,12570,12571,12572,12573,12574,12575,12576,12577,12578,12579,12580,12584,12585,12587,12588,12591,12592,12593,12594,12595,12596,12597,12598,12599,12601,12602,12603,12605,12606,12607,12608,12609,12610,12611,12612,12613,12614,12615,12617,12619,12620,12621,12622,12623,12624,12626,12627,12628,12629,12630,12631,12632,12633,12634,12635,12636,12637,12638,12639,12640,12641,12642,12643,12644,12645,12646,12647,12648,12649,12650,12651,12652,12653,12654,12655,12657,12658,12659,12660,12661,12662,12663,12664,12665,12666,12667,12668,12669,12670,12671,12672,12673,12674,12675,12676,12677,12678,12679,12680,12681,12682,12683,12684,12685,12686,12687,12688,12690,12691,12692,12695,12696,12697,12698,12700,12701,12702,12703,12704,12705,12706,12707,12708,12709,12710,12712,12713,12714,12715,12716,12717,12719,12720,12721,12722,12723,12724,12725,12726,12727,12728,12732,12733,12734,12735,12736,12737,12738,12739,12740,12741,12742,12743,12745,12746,12747,12748,12749,12750,12751,12752,12753,12754,12755,12756,12757,12758,12759,12760,12761,12762,12763,12766,12767,12768,12769,12770,12771,12772,12773,12774,12775,12776,12777,12778,12779,12780,12781,12782,12783,12784,12785,12786,12787,12788,12789,12790,12791,12792,12793,12794,12795,12796,12797,12798,12799,12800,12801,12802,12803,12804,12805,12806,12807,12808,12809,12810,12811,12812,12813,12814,12815,12816,12817,12819,12820,12821,12822,12823,12824,12825,12826,12828,12829,12830,12832,12833,12834,12835,12837,12838,12839,12840,12841,12842,12846,12848,12850,12851,12852,12853,12855,12856,12857,12858,12859,12860,12861,12862,12864,12865,12866,12867,12868,12869,12872,12873,12875,12876,12877,12878,12879,12880,12882,12883,12884,12886,12888,12889,12891,12892,12893,12894,12895,12896,12897,12898,12899,12900,12901,12902,12903,12904,12905,12906,12907,12908,12909,12910,12912,12913,12914,12915,12916,12917,12918,12920,12921,12924,12925,12926,12927,12928,12929,12931,12937,12938,12939,12942,12943,12949,12951,12952,12953,12955,12956,12957,12958,12959,12960,12961,12962,12963,12964,12965,12966,12967,12968,12969,12970,12971,12972,12973,12975,12976,12977,12978,12980,12981,12982,12983,12984,12985,12986,12987,12988,12989,12991,12992,12993,12994,12995,12996,12997,12998,12999,13000,13002,13003,13004,13005,13006,13007,13008,13009,13010,13011,13034,13035,13037,13038,13039,13040,13041,13042,13043,13044,13045,13046,13047,13048,13049,13050,13051,13052,13053,13054,13055,13056,13058,13059,13060,13061,13062,13063,13064,13068,13069,13070,13071,13072,13073,13074,13075,13076,13077,13078,13079,13080,13081,13082,13083,13084,13085,13086,13089,13090,13091,13092,13094,13095,13096,13097,13100,13101,13102,13103,13104,13105,13106,13107,13108,13109,13110,13112,13113,13114,13115,13116,13117,13118,13119,13120,13121,13122,13125,13126,13127,13128,13129,13130,13133,13134,13135,13136,13137,13138,13139,13140,13141,13142,13143,13144,13145,13146,13147,13148,13151,13152,13153,13154,13155,13157,13160,13165,13166,13168,13169,13170,13171,13172,13173,13174,13177,13178,13179,13180,13181,13183,13185,13186,13187,13188,13189,13190,13191,13192,13193,13194,13195,13196,13197,13198,13200,13201,13202,13205,13206,13207,13211,13212,13213,13214,13215,13216,13217,13218,13219,13220,13221,13222,13223,13224,13225,13227,13228,13229,13230,13232,13233,13234,13235,13236,13237,13238,13239,13242,13257,13258,13260,13261,13262,13263,13264,13271,13273,13274,13275,13276,13277,13285,13311,13312,13313,13315,13316,13318,13319,13321,13328,13329,13330,13331,13332,13334,13340,13342,13343,13345,13348,13349,13350,13351,13352,13353,13354,13355,13356,13357,13358,13359,13360,13361,13362,13363,13364,13365,13366,13367,13368,13372,13373,13374,13375,13376,13377,13378,13379,13380,13381,13382,13383,13384,13385,13386,13392,13394,13395,13397,13398,13399,13400,13401,13402,13403,13404,13406,13415,13416,13418,13419,13420,13422,13423,13424,13425,13426,13479,13480,13481,13482,13483,13484,13502,13503,13538,13539,13549,13556,13592,13593,13600,13603,13604,13606,13607,13609,13610,13611,13614,13616,13622,13625,13627,13629,13631,13633,13634,13641,13643,13663,13664,13665,13666,13667,13668,13669,13670,13671,13672,13673,13674,13675,13676,13677,13678,13679,13680,13681,13682,13684,13685,13688,13689,13690,13691,13692,13693,13694,13695,13696,13697,13699,13702,13703,13704,13705,13706,13707,13708,13709,13710,13711,13713,13714,13715,13716,13717,13718,13719,13720,13721,13722,13723,13724,13725,13726,13727,13728,13729,13731,13732,13733,13734,13735,13736,13737,13738,13739,13740,13741,13742,13743,13744,13745,13746,13747,13748,13749,13750,13752,13753,13754,13755,13756,13757,13758,13759,13760,13761,13762,13763,13764,13765,13767,13768,13769,13770,13771,13772,13773,13774,13775,13776,13777,13778,13779,13780,13781,13782,13783,13784,13785,13786,13787,13789,13790,13791,13793,13794,13795,13809,13810,13811,13812,13813,13814,13816,13817,13818,13819,13820,13821,13822,13823,13824,13828,13829,13830,13832,13833,13834,13835,13836,13837,13838,13839,13840,13845,13846,13847,13851,13852,13854,13855,13856,13857,13858,13859,13860,13862,13863,13864,13887,13889,13903,13904,13905,13906,13908,13914,13915,13916,13917,13931,13952,13959,13960,13986,13997,14016,14017,14022,14023,14024,14028,14030,14032,14033,14035,14036,14037,14040,14041,14043,14044,14047,14048,14051,14053,14054,14055,14058,14059,14060,14061,14062,14064,14065,14079,14081,14082,14083,14084,14085,14086,14087,14089,14092,14100,14111,14112,14136,14140,14141,14142,14143,14144,14145,14151,14160,14166,14167,14168,14169,14170,14171,14172,14173,14174,14175,14176,14177,14179,14182,14203,14349,14350,14351,14409,14418,14419,14420,14421,14436,14437,14438,14439,14440,14441,14443,14444,14457,14483,14488,20438,20439,24428,24429,24431,24451,24454,24461,24476,24480,24498,24499,24500,24506,24507,24510,24511,24536,24541,24545,24547,24548,24549,24554,24555,24556,24557,24558,24559,24560,24561,24562,24563,24576,24579,24584,24585,24586,24587,24588,24589,24590,24594,24597,24609,24610,24611,24612,24613,24614,24615,24629,24635,24636,24645,24647,24650,24651,24652,24655,24656,24657,24659,24660,24662,24664,24665,24666,24682,24683,24710,24711,24712,24713,24745,24748,24749,24756,24757,24792,24793,24795,24796,24798,24799,24800,24801,24802,24804,24805,24848,24849,24850,24851,24857,24869,24870,24871,24872,24873,24874,24875,24876,24877,24878,24879,24880,24914,25055,25092,25180,25181,25199,25212,25283,25285,25286,25287,25289,25295,25306,25393,25444,25445,25446,25461,25470,25480,25495,26012,26013,26034,108,171,241,259,352,402,462,497,548,636,807,820,839,909,912,1155,1158,1161,1162,1163,1165,1277,1279,1288,1290,1441,2058,2868,2971,3064,3383,3384,3515,3885,4299,4323,4905,5053,5502,5532,6201,6221,6842,7069,7702,7863,7864,7866,7867,7904,8022,8024,8025,8244,8245,8458,8459,8742,8932,8939,9031,9273,9298,9316,9321,9353,9354,9380,9408,9411,9412,9413,9414,9445,9458,9459,9477,9478,9479,9480,9481,9482,9511,9525,9568,9577,9583,9695,9712,9722,9736,9749,9880,9881,9984,9985,9988,9989,10014,10015,10029,10046,10061,10122,10125,10127,10130,10145,10150,10152,10169,10179,10187,10196,10207,10214,10244,10260,10292,10375,10376,10377,10378,10379,10386,10387,10404,10441,10452,10453,10459,10460,10461,10462,10463,10464,10465,10466,10467,10468,10469,10470,10471,10472,10473,10474,10475,10495,10496,10497,10498,10499,10558,10716,10746,10815,10844,10871,10938,10939,10940,10941,10942,10943,10945,10950,10951,10952,10953,10954,10955,10956,10960,10961,10962,10963,10964,10965,10966,10967,10968,10978,10979,10980,10985,10986,10987,10988,10990,10991,10992,10993,11011,11012,11013,11014,11015,11016,11017,11018,11019,11020,11027,11035,11041,11049,11050,11052,11053,11054,11055,11063,11067,11068,11069,11070,11071,11074,11075,11076,11077,11081,11082,11083,11084,11086,11089,11090,11092,11094,11095,11096,11097,11099,11101,11103,11104,11105,11106,11107,11108,11109,11110,11111,11112,11113,11114,11121,11163,11166,11171,11178,11179,11189,11195,11196,11245,11246,11247,11249,11302,11334,11345,11349,11355,11392,11394,11396,11401,11402,11404,11410,11411,11414,11416,11418,11437,11438,11481,11492,11494,11495,11515,11516,11521,11523,11525,11526,11533,11534,11536,11537,11540,11541,11543,11544,11546,11547,11548,11549,11550,11554,11555,11670,11939,11982,12001,12008,12015,12131,12138,12172,12173,12179,12193,12286,12586,12625,12744,12944,12945,12990,13150,13259,13266,13267,13278,13279,13280,13281,13282,13283,13284,13286,13287,13288,13289,13290,13291,13292,13293,13299,13301,13302,13304,13305,13306,13307,13308,13310,13314,13320,13322,13323,13324,13325,13326,13327,13333,13341,13344,13347,13369,13370,13371,13387,13388,13389,13390,13391,13393,13396,13405,13407,13412,13413,13414,13427,13428,13432,13473,13475,13476,13477,13478,13485,13486,13487,13488,13489,13490,13491,13492,13524,13571,13649,13654,13662,13850,13926,13927,13929,13930,13933,13934,13937,13938,13950,13951,13954,13955,13956,13957,14088,14106,14119,14164,14178,14180,14181,14183,24217,24219,24220,24221,24222,24223,24224,24225,24426,24427,24522,24535,24638,24648,24649,24658,24661,24663,24746,24790,24791,24803,24806,24836,24837,24838,24840,24841,24842,24843,24845,24846,24847,24881,24883,24884,24885,24886,24888,24889,24891,24892,24893,24894,24896,24915,24916,24917,24918,24919,25229,25483,25484,25500
+-- 236,1659,1660,5659,6165,6841,6984,7790,8264,8384,8386,8389,8390,8391,8392,8397,8404,8431,8440,8441,8442,8444,8445,8448,8449,8451,8452,8453,8454,8896,8971,8972,8973,8974,8975,8976,9168,9357,9767,10560,10946,10947,10948,10949,10957,10958,10959,10994,10999,11001,11004,11007,11010,11021,11024,11028,11030,11057,11061,11062,11064,11065,11066,11073,11079,11091,11098,11100,11102,11119,11122,11127,11130,11131,11132,11153,11154,11155,11157,11164,11165,11167,11168,11170,11175,11176,11182,11187,11188,11190,11199,11202,11218,11219,11221,11224,11227,11228,11229,11230,11231,11232,11233,11234,11235,11236,11237,11238,11239,11240,11241,11242,11243,11244,11248,11250,11251,11252,11253,11254,11255,11256,11257,11258,11259,11260,11261,11262,11263,11264,11265,11266,11267,11268,11269,11270,11271,11272,11273,11274,11275,11276,11277,11278,11279,11280,11281,11282,11283,11284,11285,11286,11287,11288,11289,11290,11291,11292,11295,11296,11297,11298,11299,11300,11301,11303,11304,11305,11306,11307,11308,11309,11310,11311,11312,11313,11314,11315,11316,11317,11319,11320,11322,11323,11324,11325,11326,11327,11328,11329,11330,11331,11332,11333,11343,11344,11346,11348,11350,11351,11352,11356,11357,11358,11359,11360,11361,11365,11366,11367,11390,11391,11393,11395,11397,11398,11399,11403,11405,11406,11407,11408,11412,11415,11417,11420,11421,11422,11423,11424,11426,11427,11428,11429,11430,11432,11433,11434,11435,11436,11439,11440,11443,11444,11445,11447,11448,11449,11450,11452,11453,11454,11455,11456,11457,11458,11459,11460,11462,11463,11464,11465,11466,11467,11468,11469,11470,11471,11472,11473,11474,11475,11476,11477,11478,11479,11480,11482,11483,11484,11485,11488,11489,11490,11491,11501,11504,11507,11508,11509,11510,11511,11512,11514,11517,11519,11520,11527,11529,11530,11535,11538,11539,11545,11551,11559,11560,11561,11562,11563,11564,11565,11566,11567,11568,11569,11570,11571,11572,11573,11574,11575,11576,11578,11579,11582,11585,11586,11587,11590,11591,11592,11593,11594,11595,11596,11597,11598,11599,11600,11601,11602,11603,11604,11605,11606,11607,11608,11609,11610,11611,11612,11613,11614,11615,11616,11617,11618,11619,11620,11621,11622,11623,11624,11625,11626,11627,11628,11629,11630,11631,11632,11633,11634,11635,11636,11637,11638,11639,11640,11641,11642,11643,11644,11645,11646,11647,11648,11649,11650,11651,11652,11653,11654,11655,11656,11658,11659,11660,11661,11662,11663,11664,11671,11672,11673,11674,11675,11676,11677,11678,11679,11680,11681,11682,11683,11684,11685,11686,11687,11688,11689,11690,11692,11693,11694,11695,11697,11698,11699,11700,11701,11702,11703,11704,11705,11706,11707,11708,11709,11710,11711,11712,11713,11714,11715,11716,11717,11718,11719,11720,11721,11722,11723,11724,11725,11726,11727,11728,11729,11730,11733,11788,11789,11790,11791,11792,11793,11794,11795,11796,11797,11798,11865,11866,11867,11868,11869,11870,11871,11872,11873,11876,11878,11879,11881,11887,11888,11889,11890,11892,11893,11894,11895,11896,11897,11898,11899,11901,11902,11903,11904,11905,11906,11907,11908,11909,11911,11913,11914,11916,11919,11920,11927,11928,11929,11930,11931,11932,11936,11938,11940,11941,11942,11943,11944,11945,11946,11949,11950,11951,11956,11957,11958,11959,11960,11961,11962,11963,11965,11967,11968,11969,11973,11975,11977,11978,11979,11980,11981,11983,11984,11985,11986,11987,11988,11989,11990,11991,11992,11995,11996,11997,11998,11999,12000,12002,12003,12004,12005,12006,12007,12009,12010,12011,12013,12014,12016,12017,12018,12021,12024,12025,12026,12027,12028,12029,12030,12031,12032,12033,12034,12035,12036,12038,12039,12040,12041,12042,12043,12044,12045,12046,12047,12048,12049,12050,12051,12052,12053,12054,12055,12056,12057,12058,12059,12060,12061,12063,12064,12065,12066,12067,12068,12069,12070,12071,12072,12073,12074,12075,12076,12077,12078,12079,12080,12082,12083,12084,12085,12086,12087,12088,12089,12090,12091,12092,12093,12094,12095,12096,12097,12098,12099,12100,12101,12102,12104,12105,12106,12107,12108,12109,12110,12111,12112,12113,12114,12115,12116,12117,12118,12119,12120,12121,12122,12123,12124,12125,12126,12127,12129,12130,12132,12133,12134,12135,12136,12137,12139,12140,12141,12142,12143,12144,12145,12146,12147,12148,12152,12153,12154,12155,12156,12157,12158,12159,12160,12161,12164,12165,12166,12167,12168,12169,12170,12171,12174,12175,12176,12177,12178,12181,12182,12183,12184,12185,12188,12189,12190,12192,12195,12196,12197,12198,12199,12200,12201,12202,12203,12204,12205,12206,12207,12208,12209,12210,12211,12212,12213,12214,12215,12216,12217,12218,12219,12220,12221,12222,12223,12224,12225,12226,12227,12229,12230,12231,12232,12233,12234,12235,12236,12237,12239,12240,12241,12242,12243,12244,12245,12246,12247,12248,12250,12251,12252,12253,12254,12255,12256,12257,12258,12259,12260,12261,12262,12263,12264,12265,12266,12267,12268,12269,12270,12271,12272,12273,12274,12275,12276,12277,12278,12279,12280,12281,12282,12283,12284,12285,12288,12289,12290,12291,12292,12293,12294,12295,12296,12297,12298,12299,12300,12301,12302,12303,12304,12305,12307,12308,12309,12310,12311,12312,12313,12314,12315,12316,12317,12318,12319,12320,12321,12323,12324,12325,12326,12327,12328,12329,12330,12346,12372,12411,12412,12413,12414,12415,12416,12417,12418,12419,12421,12422,12423,12424,12425,12426,12427,12428,12429,12430,12431,12432,12433,12434,12435,12436,12437,12439,12440,12443,12444,12446,12447,12448,12449,12450,12451,12453,12454,12455,12457,12458,12459,12461,12462,12463,12464,12465,12466,12467,12468,12469,12470,12471,12472,12473,12474,12475,12476,12477,12478,12481,12482,12483,12484,12486,12487,12488,12489,12490,12495,12496,12497,12498,12499,12500,12501,12502,12503,12504,12505,12507,12508,12509,12511,12512,12514,12517,12518,12519,12520,12521,12522,12523,12524,12525,12526,12527,12528,12529,12530,12531,12532,12533,12534,12535,12536,12537,12538,12539,12540,12541,12542,12543,12544,12545,12546,12547,12548,12549,12550,12551,12552,12553,12555,12556,12557,12558,12559,12560,12561,12562,12563,12564,12565,12566,12568,12569,12570,12571,12572,12573,12574,12575,12576,12577,12578,12579,12580,12584,12585,12587,12588,12591,12592,12593,12594,12595,12596,12597,12598,12599,12601,12602,12603,12605,12606,12607,12608,12609,12610,12611,12612,12613,12614,12615,12617,12619,12620,12621,12622,12623,12624,12626,12627,12628,12629,12630,12631,12632,12633,12634,12635,12636,12637,12638,12639,12640,12641,12642,12643,12644,12645,12646,12647,12648,12649,12650,12651,12652,12653,12654,12655,12657,12658,12659,12660,12661,12662,12663,12664,12665,12666,12667,12668,12669,12670,12671,12672,12673,12674,12675,12676,12677,12678,12679,12680,12681,12682,12683,12684,12685,12686,12687,12688,12690,12691,12692,12695,12696,12697,12698,12700,12701,12702,12703,12704,12705,12706,12707,12708,12709,12710,12712,12713,12714,12715,12716,12717,12719,12720,12721,12722,12723,12724,12725,12726,12727,12728,12732,12733,12734,12735,12736,12737,12738,12739,12740,12741,12742,12743,12745,12746,12747,12748,12749,12750,12751,12752,12753,12754,12755,12756,12757,12758,12759,12760,12761,12762,12763,12766,12767,12768,12769,12770,12771,12772,12773,12774,12775,12776,12777,12778,12779,12780,12781,12782,12783,12784,12785,12786,12787,12788,12789,12790,12791,12792,12793,12794,12795,12796,12797,12798,12799,12800,12801,12802,12803,12804,12805,12806,12807,12808,12809,12810,12811,12812,12813,12814,12815,12816,12817,12819,12820,12821,12822,12823,12824,12826,12828,12829,12830,12832,12833,12835,12838,12839,12840,12841,12842,12846,12848,12850,12851,12852,12853,12855,12856,12857,12858,12859,12860,12861,12862,12864,12865,12866,12867,12868,12869,12872,12873,12875,12876,12877,12878,12879,12880,12882,12883,12884,12886,12888,12889,12891,12892,12893,12894,12895,12896,12897,12898,12899,12900,12901,12902,12903,12904,12905,12906,12907,12908,12909,12910,12912,12913,12914,12915,12916,12917,12918,12920,12921,12924,12925,12926,12927,12928,12929,12931,12937,12938,12939,12942,12943,12949,12951,12952,12953,12955,12956,12957,12958,12959,12960,12961,12962,12963,12964,12965,12966,12967,12968,12969,12970,12971,12972,12973,12975,12976,12977,12978,12980,12981,12982,12983,12984,12985,12986,12987,12988,12989,12991,12992,12993,12994,12995,12996,12997,12998,12999,13000,13002,13003,13004,13005,13006,13007,13008,13009,13010,13011,13034,13035,13037,13038,13039,13040,13041,13042,13043,13044,13045,13046,13047,13048,13049,13050,13051,13052,13053,13054,13055,13056,13058,13059,13060,13061,13062,13063,13064,13068,13069,13070,13071,13072,13073,13074,13075,13076,13077,13078,13079,13080,13081,13082,13083,13084,13085,13086,13089,13090,13091,13092,13094,13095,13096,13097,13100,13101,13102,13103,13104,13105,13106,13107,13108,13109,13110,13112,13113,13114,13115,13116,13117,13118,13119,13120,13121,13122,13125,13126,13127,13128,13129,13130,13133,13134,13135,13136,13137,13138,13139,13140,13141,13142,13143,13144,13145,13146,13147,13148,13151,13152,13153,13154,13155,13157,13160,13165,13166,13168,13169,13170,13171,13172,13173,13174,13177,13178,13179,13180,13181,13183,13185,13186,13187,13188,13189,13190,13191,13192,13193,13194,13195,13196,13197,13198,13200,13201,13202,13205,13206,13207,13211,13212,13213,13214,13215,13216,13217,13218,13219,13220,13221,13222,13223,13224,13225,13227,13228,13229,13230,13232,13233,13234,13235,13236,13237,13238,13239,13242,13257,13258,13260,13261,13262,13263,13264,13271,13273,13274,13275,13276,13277,13285,13311,13312,13313,13315,13316,13318,13319,13321,13328,13329,13330,13331,13332,13334,13340,13342,13343,13345,13348,13349,13350,13351,13352,13353,13354,13355,13356,13357,13358,13359,13360,13361,13362,13363,13364,13365,13366,13367,13368,13372,13373,13374,13375,13376,13377,13378,13379,13380,13381,13382,13383,13384,13385,13386,13392,13394,13395,13397,13398,13399,13400,13401,13402,13403,13404,13406,13415,13416,13418,13419,13420,13422,13423,13424,13425,13426,13479,13480,13481,13482,13483,13484,13502,13503,13538,13539,13549,13556,13592,13593,13600,13603,13604,13606,13607,13609,13610,13611,13614,13616,13622,13625,13627,13629,13631,13633,13634,13641,13643,13663,13664,13665,13666,13667,13668,13669,13670,13671,13672,13673,13674,13675,13676,13677,13678,13679,13680,13681,13682,13684,13685,13688,13689,13690,13691,13692,13693,13694,13695,13696,13697,13699,13702,13703,13704,13705,13706,13707,13708,13709,13710,13711,13713,13714,13715,13716,13717,13718,13719,13720,13721,13722,13723,13724,13725,13726,13727,13728,13729,13731,13732,13733,13734,13735,13736,13737,13738,13739,13740,13741,13742,13743,13744,13745,13746,13747,13748,13749,13750,13752,13753,13754,13755,13756,13757,13758,13759,13760,13761,13762,13763,13764,13765,13767,13768,13769,13770,13771,13772,13773,13774,13775,13776,13777,13778,13779,13780,13781,13782,13783,13784,13785,13786,13787,13789,13790,13791,13793,13794,13795,13809,13810,13811,13812,13813,13814,13816,13817,13818,13819,13820,13821,13822,13823,13824,13828,13829,13830,13832,13833,13834,13835,13836,13837,13838,13839,13840,13845,13846,13847,13851,13852,13854,13855,13856,13857,13858,13859,13860,13862,13863,13864,13887,13889,13903,13904,13905,13906,13908,13914,13915,13916,13917,13931,13952,13959,13960,13986,13997,14016,14017,14022,14023,14024,14028,14030,14032,14033,14035,14036,14037,14040,14041,14043,14044,14047,14048,14051,14053,14054,14055,14058,14059,14060,14061,14062,14064,14065,14079,14081,14082,14083,14084,14085,14086,14087,14089,14092,14100,14111,14112,14136,14140,14141,14142,14143,14144,14145,14151,14160,14166,14167,14168,14169,14170,14171,14172,14173,14174,14175,14176,14177,14179,14182,14203,14349,14350,14351,14409,14418,14419,14420,14421,14436,14437,14438,14439,14440,14441,14443,14444,14457,14483,14488,20438,20439,24428,24429,24431,24451,24454,24461,24476,24480,24498,24499,24500,24506,24507,24510,24511,24536,24541,24545,24547,24548,24549,24554,24555,24556,24557,24558,24559,24560,24561,24562,24563,24576,24579,24584,24585,24586,24587,24588,24589,24590,24594,24597,24609,24610,24611,24612,24613,24614,24615,24629,24635,24636,24645,24647,24650,24651,24652,24655,24656,24657,24659,24660,24662,24664,24665,24666,24682,24683,24710,24711,24712,24713,24745,24748,24749,24756,24757,24792,24793,24795,24796,24798,24799,24800,24801,24802,24804,24805,24848,24849,24850,24851,24857,24869,24870,24871,24872,24873,24874,24875,24876,24877,24878,24879,24880,24914,25055,25092,25180,25181,25199,25212,25283,25285,25286,25287,25289,25295,25306,25393,25444,25445,25446,25461,25470,25480,25495,26012,26013,26034,108,171,241,242,259,316,352,402,406,462,490,497,548,636,774,796,797,798,799,800,801,802,803,810,814,839,909,912,946,987,1155,1157,1158,1161,1162,1163,1165,1277,1278,1279,1280,1288,1290,1293,1294,1295,1296,1297,1299,1300,1460,1461,2868,2971,3064,3383,3384,3401,3403,3404,3405,3422,3423,3424,3425,3515,3529,3622,3885,4299,4323,4905,5053,5205,5207,5208,5209,5502,5506,5512,5516,5520,5523,5532,6201,6221,6842,7069,7702,7863,7864,7866,7867,8022,8024,8025,8459,8742,8932,8939,9031,9273,9298,9316,9321,9353,9354,9380,9408,9411,9412,9413,9414,9445,9458,9459,9477,9478,9479,9480,9481,9482,9511,9525,9568,9577,9583,9695,9712,9722,9736,9749,9880,9881,9984,9985,9988,9989,10014,10015,10029,10046,10061,10122,10125,10127,10130,10145,10150,10152,10169,10179,10187,10196,10207,10214,10244,10260,10292,10375,10377,10386,10387,10404,10441,10452,10453,10459,10460,10461,10462,10463,10464,10465,10466,10467,10468,10469,10470,10471,10472,10473,10474,10475,10495,10496,10497,10498,10499,10558,10716,10746,10815,10844,10871,10938,10939,10940,10941,10942,10943,10945,10950,10951,10952,10953,10954,10955,10956,10960,10961,10962,10963,10964,10965,10966,10967,10968,10978,10979,10980,10985,10986,10987,10988,10990,10991,10992,10993,11011,11012,11013,11014,11015,11016,11017,11018,11019,11020,11027,11035,11041,11049,11050,11052,11053,11054,11055,11063,11067,11068,11069,11070,11071,11074,11075,11076,11077,11081,11082,11083,11084,11086,11089,11090,11092,11094,11095,11096,11097,11099,11101,11103,11104,11105,11106,11107,11108,11109,11110,11111,11112,11113,11114,11121,11163,11166,11171,11178,11179,11189,11195,11196,11245,11246,11247,11249,11302,11334,11345,11349,11355,11392,11394,11396,11401,11402,11404,11410,11411,11414,11416,11418,11437,11438,11481,11492,11494,11495,11515,11516,11521,11523,11525,11526,11533,11534,11536,11537,11540,11541,11543,11544,11546,11547,11548,11549,11550,11554,11555,11670,11939,11982,12001,12008,12015,12131,12138,12172,12173,12179,12193,12286,12586,12625,12744,12944,12945,12990,13150,13259,13266,13267,13278,13279,13280,13281,13282,13283,13284,13286,13287,13288,13289,13290,13291,13292,13293,13299,13301,13302,13304,13305,13306,13307,13308,13310,13314,13320,13322,13323,13324,13325,13326,13327,13333,13341,13344,13347,13369,13370,13371,13387,13388,13389,13390,13391,13393,13396,13405,13407,13412,13413,13414,13427,13428,13432,13473,13475,13476,13477,13478,13485,13486,13487,13488,13489,13490,13491,13492,13524,13571,13649,13654,13662,13850,13926,13927,13929,13930,13933,13934,13937,13938,13950,13951,13954,13955,13956,13957,14088,14106,14119,14164,14178,14180,14181,14183,24217,24219,24220,24221,24222,24223,24224,24225,24426,24427,24508,24509,24522,24535,24638,24648,24649,24658,24663,24746,24790,24791,24803,24806,24836,24837,24838,24840,24841,24842,24843,24845,24846,24847,24881,24883,24884,24885,24886,24888,24889,24891,24892,24893,24894,24896,24915,24916,24917,24918,24919,25229,25483,25484,25500
