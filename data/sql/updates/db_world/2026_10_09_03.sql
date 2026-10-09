@@ -1,3 +1,4 @@
+-- DB update 2026_10_09_02 -> 2026_10_09_03
 -- Kirin'Var spirits (Dathric, Belmara, Luminrath, Cohlien) turn neutral for players who took their quest.
 -- Sniffed: forced reaction 3 (Neutral) on factions 1006-1009 while the quest is accepted or rewarded, in Netherstorm only.
 DELETE FROM `spell_area` WHERE `spell` IN (36216, 36217, 36218, 36219);

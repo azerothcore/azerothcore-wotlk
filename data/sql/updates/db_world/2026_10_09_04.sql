@@ -1,3 +1,4 @@
+-- DB update 2026_10_09_03 -> 2026_10_09_04
 --
 -- Rothin the Decaying stands still when silenced instead of closing to melee, because his Shadow
 -- Bolt rows lack SMARTCAST_COMBAT_MOVE and his hand-rolled combat movement blocks the charge the
