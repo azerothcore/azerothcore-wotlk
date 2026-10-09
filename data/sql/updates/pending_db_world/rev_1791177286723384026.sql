@@ -3,7 +3,7 @@
 -- A text is kept only when the source's English matches AzerothCore's English for the same quest,
 -- or, for sources without English, when it passes length, placeholder and language checks.
 
-DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (97, 98, 219, 567, 898, 995, 1265, 1423, 1978, 2202, 2500, 2583, 2584, 2586, 4022, 4982, 4987, 5504, 5513, 7905, 8747, 8752, 8895, 8901, 8922, 9085, 9209, 9368, 9813, 9967, 9970, 9972, 9973, 9977, 9999, 10011, 10425, 10465, 10467, 10468, 10469, 10621, 10626, 10684, 10685, 10750, 10763, 10768, 10769, 10775, 10776, 10824, 10887, 10957, 10959, 11085, 11102, 11938, 12061, 12066, 12143, 12307, 12327, 12671, 12787, 12847, 12953, 12971, 13196, 13264, 13276, 13289, 13319, 13344, 13358, 13359, 13365, 13404, 13432, 13600, 13603, 13634, 13665, 13666, 13673, 13674, 13675, 13678, 13697, 13714, 13716, 13717, 13718, 13719, 13720, 13721, 13722, 13741, 13742, 13745, 13747, 13752, 13753, 13756, 13757, 13758, 13761, 13762, 13763, 13764, 13767, 13768, 13769, 13770, 13772, 13773, 13774, 13775, 13777, 13778, 13779, 13780, 13782, 13783, 13784, 13785, 13787);
+DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (97, 98, 219, 567, 898, 995, 1265, 1423, 1978, 2202, 2500, 2583, 2584, 2586, 4022, 4982, 4987, 5504, 5513, 7905, 8747, 8752, 8895, 8901, 8922, 9085, 9209, 9368, 9813, 9967, 9970, 9972, 9973, 9977, 9999, 10011, 10425, 10465, 10467, 10468, 10469, 10621, 10626, 10684, 10685, 10750, 10763, 10768, 10769, 10775, 10776, 10824, 10887, 10957, 10959, 11085, 11102, 11938, 12061, 12066, 12143, 12307, 12327, 12671, 12787, 12847, 12953, 12971, 13264, 13276, 13289, 13319, 13344, 13358, 13359, 13365, 13404, 13432, 13603, 13634, 13665, 13666, 13673, 13674, 13675, 13678, 13697, 13714, 13716, 13717, 13719, 13720, 13721, 13722, 13741, 13742, 13745, 13747, 13752, 13753, 13756, 13757, 13758, 13761, 13762, 13763, 13764, 13767, 13768, 13769, 13770, 13772, 13773, 13774, 13775, 13777, 13778, 13779, 13780, 13782, 13783, 13784, 13785, 13787);
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (97, 'frFR', 'Oui, $N ?', 0),
 (98, 'frFR', 'Oui, $N ?', 0),
@@ -73,7 +73,6 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (12847, 'frFR', 'Oui ?', 0),
 (12953, 'frFR', 'Oui ?', 0),
 (12971, 'frFR', 'Oui, $N ?', 0),
-(13196, 'frFR', 'Comment s''est passé la chasse ? J''ai entendu dire que cet endroit est hanté, c''est pourquoi je n''y vais jamais.', 0),
 (13264, 'frFR', 'Oui, $C ?', 0),
 (13276, 'frFR', 'Oui, $C ?', 0),
 (13289, 'frFR', 'Oui, $C ?', 0),
@@ -84,7 +83,6 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (13365, 'frFR', 'Oui, $C ?', 0),
 (13404, 'frFR', 'Continuez, $N. La bataille aérienne ne va pas se gagner toute seule !', 0),
 (13432, 'frFR', 'Je vous demande l''impossible, et pourtant j''attends votre victoire. Beaucoup de choses en dépendent.', 0),
-(13600, 'frFR', 'L''histoire du barde errant était vraie ? Vous m''avez apporté une lame ?', 0),
 (13603, 'frFR', 'Avez-vous pu récupérer la lame ?', 0),
 (13634, 'frFR', 'Vous avez trouvé des détails sur l''histoire du Chevalier noir ?', 0),
 (13665, 'frFR', 'Avez-vous terminé votre entraînement pour la grande mêlée ?', 0),
@@ -97,7 +95,6 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (13714, 'frFR', 'Êtes-vous prêt à prouver votre maîtrise des compétences de vaillant ?', 0),
 (13716, 'frFR', 'Êtes-vous prêt à prouver votre maîtrise des compétences de vaillant ?', 0),
 (13717, 'frFR', 'Êtes-vous prêt à prouver votre maîtrise des compétences de vaillant ?', 0),
-(13718, 'frFR', 'Êtes-vous prêt à prouver votre maîtrise des compétences de vaillant ?', 0),
 (13719, 'frFR', 'Êtes-vous prêt à prouver votre maîtrise des compétences de vaillant ?', 0),
 (13720, 'frFR', 'Êtes-vous prêt à prouver votre maîtrise des compétences de vaillant ?', 0),
 (13721, 'frFR', 'Êtes-vous prêt à prouver votre maîtrise des compétences de vaillant ?', 0),
