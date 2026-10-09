@@ -2124,6 +2124,1115 @@ class spell_crashing_wave : public SpellScript
     }
 };
 
+/*######
+## Banshee's Revenge (Quest 13142) - Overthane Balargarde outdoor encounter.
+##
+## Every participant is registered with the Possessed Vardmadra the War Horn summoned, and resolves
+## the others through that registry rather than by proximity. The horn has a 500s auto-close, so a
+## second player can start a second cast beside an abandoned one; a nearest-creature lookup then
+## engages the wrong boss, or despawns a roleplay sequence that is still running.
+######*/
+enum BansheesRevenge
+{
+    NPC_BALARGARDE                  = 31016,
+    NPC_POSSESSED_VARDMADRA         = 31029,
+    NPC_BALARGARDE_ELITE            = 31030,
+    NPC_SAFIRDRANG                  = 31050,
+    NPC_LICH_KING                   = 31083,
+    NPC_LADY_NIGHTSWOOD             = 31087,
+
+    GO_WAR_HORN_OF_JOTUNHEIM        = 193028,
+
+    QUEST_BANSHEES_REVENGE          = 13142,
+
+    SPELL_HEROIC_LEAP               = 60108,
+    SPELL_WHIRLWIND                 = 61076,
+    SPELL_FROSTBOLT                 = 15043,
+    SPELL_BLIZZARD                  = 61085,
+
+    SPELL_SAFIRDRANGS_CHILL         = 4020,
+    SPELL_SAFIRDRANGS_CHILL_RELAY   = 4307,
+    SPELL_ETHEREAL_TELEPORT         = 34427,
+    SPELL_ICEBOUND_VISAGE           = 53274,
+    SPELL_SUICIDE                   = 51744,
+    SPELL_LK_SPECIAL_2H             = 42904,
+
+    SOUND_LICH_KING_LAUGH           = 15714,
+
+    SAY_BALARGARDE_TO_SAFIRDRANG    = 1,
+    SAY_BALARGARDE_TO_VARDMADRA_1   = 2,
+    SAY_BALARGARDE_TO_VARDMADRA_2   = 3,
+    SAY_BALARGARDE_80PCT            = 4,
+    SAY_BALARGARDE_KNEEL            = 5,
+    SAY_BALARGARDE_MY_LORD          = 6,
+    SAY_BALARGARDE_DIE_DOGS         = 7,
+    SAY_VARDMADRA_ARRIVE            = 0,
+    SAY_VARDMADRA_CHALLENGE         = 1,
+    SAY_VARDMADRA_MY_LORD           = 2,
+    SAY_VARDMADRA_BUT               = 3,
+    SAY_LK_HONOR_GUARD              = 0,
+    SAY_LK_VARDMADRA                = 1,
+    SAY_LK_DISGUISE                 = 2,
+    SAY_LK_CONTINUE                 = 3,
+    SAY_LK_FINISH_THEM              = 4,
+    SAY_LK_BESTED                   = 5,
+    SAY_LK_FROZEN_HEART             = 6,
+    SAY_NIGHTSWOOD_EMOTE            = 0,
+
+    PHASE_ONE                       = 1,
+    PHASE_INTERLUDE                 = 2,
+    PHASE_RESUME                    = 3,
+    PHASE_OUTRO                     = 4,
+
+    ACTION_ELITE_DESPAWN            = 1,
+    ACTION_SAFIRDRANG_CHILL         = 2,
+    ACTION_SAFIRDRANG_DEPART        = 3,
+    ACTION_BALARGARDE_ENGAGE        = 4,
+    ACTION_BALARGARDE_RESUME        = 5,
+    ACTION_LK_FINALE                = 6,
+    ACTION_VARDMADRA_REVEAL         = 7,
+    ACTION_VARDMADRA_KNEEL          = 8,
+    ACTION_NIGHTSWOOD_EXIT          = 9,
+    ACTION_BALARGARDE_JUMP          = 10,
+    ACTION_BALARGARDE_SALUTE        = 11,
+    ACTION_VARDMADRA_VANISH         = 12,
+    ACTION_DESPAWN_ELITES           = 14,
+    ACTION_CLEANUP_ENCOUNTER        = 15,
+    ACTION_ELITE_START_PATROL       = 1000,
+
+    POINT_LK_CONFRONT               = 1,
+    POINT_LK_RETURN                 = 2,
+    POINT_LK_BODY                   = 3,
+    POINT_NIGHTSWOOD_HORN           = 4,
+    POINT_BALARGARDE_LEAP           = 5,
+    POINT_SAFIRDRANG_ASCEND         = 6,
+
+    EVENT_HEROIC_LEAP               = 1,
+    EVENT_WHIRLWIND                 = 2,
+    EVENT_FROSTBOLT                 = 3,
+    EVENT_BLIZZARD                  = 4,
+    EVENT_CHILL_RUN                 = 5
+};
+
+// Registry slots, addressed through UnitAI::SetGUID / UnitAI::GetGUID.
+enum BansheesData
+{
+    DATA_OWNER                      = 1,
+    DATA_VARDMADRA                  = 2,
+    DATA_SAFIRDRANG                 = 3,
+    DATA_BALARGARDE                 = 4,
+    DATA_LICH_KING                  = 5,
+    DATA_NIGHTSWOOD                 = 6,
+    DATA_ADD_SUMMON                 = 7
+};
+
+enum BansheesPaths
+{
+    PATH_VARDMADRA_INTRO            = 31029,
+    PATH_SAFIRDRANG_INTRO           = 31050,
+    PATH_SAFIRDRANG_DEPART          = 3105000,
+    PATH_LADY_NIGHTSWOOD            = 31087,
+    PATH_ELITE_BASE                 = 3103000
+};
+
+Position const SafirdrangSpawnPos      = { 7097.292f, 4416.581f, 831.8486f, 4.485496f };
+Position const LichKingSpawnPos        = { 7088.768f, 4385.59f,  872.4484f, 4.468043f };
+Position const LichKingConfrontPos     = { 7094.104f, 4331.222f, 871.5023f, 0.0f };
+Position const BalargardeLandPos       = { 7095.094f, 4363.894f, 872.05566f, 0.0f };
+float const BalargardeLeapSpeedXY      = 20.0f;
+float const BalargardeLeapSpeedZ       = 6.0f;
+float const LichKingWalkSpeed          = 5.5f;
+float const SafirdrangEntryFlightSpeed = 2.25f;
+float const EliteRearFlightSpeed       = 5.0f;
+float const EliteFrontFlightSpeed      = 18.0f;
+uint8 const EliteCount                 = 6;
+uint8 const EliteRearIndex             = 4;
+uint8 const EliteFrontIndex            = 5;
+// The arena itself. Decides who counts as taking part, so that a player passing overhead neither
+// holds the encounter open nor gets dragged into it.
+float const EncounterRadius            = 60.0f;
+// Abandonment watchdog: no player at all this close, this many ticks running, and the encounter
+// tears itself down instead of standing in the world until the grid unloads.
+float const AbandonRadius              = 200.0f;
+uint8 const AbandonTicksToCleanup      = 4;
+Position const BalargardeElitePos[6] =
+{
+    { 7108.229f, 4428.539f, 837.9857f, 4.782202f },
+    { 7092.146f, 4431.810f, 836.6280f, 4.590216f },
+    { 7118.420f, 4432.598f, 837.9554f, 4.869469f },
+    { 7083.883f, 4438.466f, 834.9834f, 4.572762f },
+    { 7111.272f, 4445.171f, 838.5065f, 4.834562f },
+    { 7090.730f, 4446.960f, 837.0818f, 3.402185f }
+};
+Position const NightswoodSpawnPos    = { 7094.104f,  4331.222f,  874.0f,     0.0f };
+Position const NightswoodHornPos     = { 7078.8545f, 4295.6245f, 875.26514f, 1.461f };
+
+static void BansheesMakeFlyer(Creature* creature)
+{
+    creature->SetCanFly(true);
+    creature->SetDisableGravity(true);
+    creature->SetAnimTier(AnimTier::Fly);
+    creature->SetReactState(REACT_PASSIVE);
+}
+
+// Shared plumbing: which encounter this creature belongs to, and how to reach the rest of it.
+struct BansheesParticipantAI : public ScriptedAI
+{
+    BansheesParticipantAI(Creature* creature) : ScriptedAI(creature) { }
+
+    void SetGUID(ObjectGuid const& guid, int32 id) override
+    {
+        if (id == DATA_OWNER)
+            _ownerGuid = guid;
+    }
+
+    ObjectGuid GetGUID(int32 id) const override
+    {
+        return id == DATA_OWNER ? _ownerGuid : ObjectGuid::Empty;
+    }
+
+protected:
+    Creature* GetOwner() const { return ObjectAccessor::GetCreature(*me, _ownerGuid); }
+
+    Creature* GetParticipant(int32 id) const
+    {
+        if (Creature* owner = GetOwner())
+            return ObjectAccessor::GetCreature(*me, owner->AI()->GetGUID(id));
+        return nullptr;
+    }
+
+    void NotifyOwner(int32 action) const
+    {
+        if (Creature* owner = GetOwner())
+            owner->AI()->DoAction(action);
+    }
+
+    // Hand a freshly summoned participant its owner and file it in the registry under `id`
+    // (0 for the elites, which are only ever addressed as a group). Active, because the flight
+    // paths and the Lich King interlude run well past the grids the players keep loaded.
+    void RegisterSummon(Creature* summon, int32 id = 0) const
+    {
+        summon->AI()->SetGUID(_ownerGuid, DATA_OWNER);
+        summon->setActive(true);
+        if (Creature* owner = GetOwner())
+        {
+            if (id)
+                owner->AI()->SetGUID(summon->GetGUID(), id);
+            owner->AI()->SetGUID(summon->GetGUID(), DATA_ADD_SUMMON);
+        }
+    }
+
+    ObjectGuid _ownerGuid;
+};
+
+/*######
+## Banshee's Revenge: npc_bansheesrevenge_vardmadra (31029) - War Horn summon; owns the encounter
+######*/
+class npc_bansheesrevenge_vardmadra : public CreatureScript
+{
+public:
+    npc_bansheesrevenge_vardmadra() : CreatureScript("npc_bansheesrevenge_vardmadra") { }
+
+    struct npc_bansheesrevenge_vardmadraAI : public BansheesParticipantAI
+    {
+        npc_bansheesrevenge_vardmadraAI(Creature* creature) : BansheesParticipantAI(creature) { }
+
+        void InitializeAI() override
+        {
+            _ownerGuid = me->GetGUID();
+            me->setActive(true);
+            BansheesMakeFlyer(me);
+            me->GetMotionMaster()->MovePath(PATH_VARDMADRA_INTRO, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+            ScheduleAbandonWatchdog();
+        }
+
+        void SetGUID(ObjectGuid const& guid, int32 id) override
+        {
+            switch (id)
+            {
+                case DATA_OWNER:      _ownerGuid = guid;             break;
+                case DATA_SAFIRDRANG: _safirdrangGuid = guid;        break;
+                case DATA_BALARGARDE: _balargardeGuid = guid;        break;
+                case DATA_LICH_KING:  _lichKingGuid = guid;          break;
+                case DATA_NIGHTSWOOD: _nightswoodGuid = guid;        break;
+                case DATA_ADD_SUMMON: _summonGuids.push_back(guid);  break;
+                default: break;
+            }
+        }
+
+        ObjectGuid GetGUID(int32 id) const override
+        {
+            switch (id)
+            {
+                case DATA_OWNER:      return _ownerGuid;
+                case DATA_VARDMADRA:  return me->GetGUID();
+                case DATA_SAFIRDRANG: return _safirdrangGuid;
+                case DATA_BALARGARDE: return _balargardeGuid;
+                case DATA_LICH_KING:  return _lichKingGuid;
+                case DATA_NIGHTSWOOD: return _nightswoodGuid;
+                default: break;
+            }
+            return ObjectGuid::Empty;
+        }
+
+        void MovementInform(uint32 type, uint32 /*id*/) override
+        {
+            if (type != ESCORT_MOTION_TYPE || !me->movespline->Finalized() || _introDone)
+                return;
+
+            _introDone = true;
+            Talk(SAY_VARDMADRA_ARRIVE);
+
+            if (Creature* safirdrang = me->SummonCreature(NPC_SAFIRDRANG, SafirdrangSpawnPos,
+                TEMPSUMMON_MANUAL_DESPAWN))
+                RegisterSummon(safirdrang, DATA_SAFIRDRANG);
+
+            for (uint8 i = 0; i < EliteRearIndex; ++i)
+                if (Creature* elite = me->SummonCreature(NPC_BALARGARDE_ELITE,
+                    BalargardeElitePos[i], TEMPSUMMON_MANUAL_DESPAWN))
+                {
+                    RegisterSummon(elite);
+                    elite->AI()->DoAction(ACTION_ELITE_START_PATROL + i);
+                }
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_VARDMADRA_KNEEL:
+                    me->SetCanFly(false);
+                    me->SetDisableGravity(false);
+                    me->SetAnimTier(AnimTier::Ground);
+                    me->GetMotionMaster()->MoveFall();
+                    scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
+                    {
+                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        if (Creature* lichKing = GetParticipant(DATA_LICH_KING))
+                            me->SetFacingToObject(lichKing);
+                    });
+                    break;
+                case ACTION_VARDMADRA_REVEAL:
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    Talk(SAY_VARDMADRA_BUT, 600ms);
+                    scheduler.Schedule(1s, [this](TaskContext /*context*/)
+                    {
+                        DoCastSelf(SPELL_SUICIDE, true);
+                    });
+                    break;
+                case ACTION_VARDMADRA_VANISH:
+                    // The body goes; this creature stays, because it holds the registry every
+                    // other participant resolves through until the final cleanup.
+                    me->SetVisible(false);
+                    break;
+                case ACTION_DESPAWN_ELITES:
+                    for (ObjectGuid const& guid : _summonGuids)
+                        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+                            if (summon->GetEntry() == NPC_BALARGARDE_ELITE)
+                                summon->AI()->DoAction(ACTION_ELITE_DESPAWN);
+                    break;
+                case ACTION_CLEANUP_ENCOUNTER:
+                    CleanupEncounter();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void CleanupEncounter()
+        {
+            scheduler.CancelAll();
+
+            for (ObjectGuid const& guid : _summonGuids)
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+                {
+                    summon->setActive(false);
+                    summon->DespawnOrUnsummon();
+                }
+            _summonGuids.clear();
+
+            if (GameObject* horn = me->FindNearestGameObject(GO_WAR_HORN_OF_JOTUNHEIM, AbandonRadius))
+                horn->ResetDoorOrButton();
+
+            me->setActive(false);
+            me->DespawnOrUnsummon();
+        }
+
+        // Nothing else tears the cast down if the player simply walks away. Balargarde is passive
+        // and immune for the whole intro, so he never engages and never evades, and the summons
+        // carry no despawn timer of their own.
+        void ScheduleAbandonWatchdog()
+        {
+            scheduler.Schedule(30s, [this](TaskContext context)
+            {
+                if (HasNearbyPlayer())
+                    _abandonTicks = 0;
+                else if (++_abandonTicks >= AbandonTicksToCleanup)
+                {
+                    CleanupEncounter();
+                    return;
+                }
+                context.Repeat(30s);
+            });
+        }
+
+        bool HasNearbyPlayer() const
+        {
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (Player* player = itr->GetSource())
+                    if (!player->IsGameMaster() && me->IsWithinDistInMap(player, AbandonRadius))
+                        return true;
+            return false;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            scheduler.Update(diff);
+        }
+
+    private:
+        ObjectGuid _safirdrangGuid;
+        ObjectGuid _balargardeGuid;
+        ObjectGuid _lichKingGuid;
+        ObjectGuid _nightswoodGuid;
+        GuidVector _summonGuids;
+        bool _introDone = false;
+        uint8 _abandonTicks = 0;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bansheesrevenge_vardmadraAI(creature);
+    }
+};
+
+/*######
+## Banshee's Revenge: npc_bansheesrevenge_overthane (31016)
+######*/
+class npc_bansheesrevenge_overthane : public CreatureScript
+{
+public:
+    npc_bansheesrevenge_overthane() : CreatureScript("npc_bansheesrevenge_overthane") { }
+
+    struct npc_bansheesrevenge_overthaneAI : public BansheesParticipantAI
+    {
+        npc_bansheesrevenge_overthaneAI(Creature* creature) : BansheesParticipantAI(creature) { }
+
+        void InitializeAI() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetImmuneToPC(true);
+            me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SAFIRDRANGS_CHILL_RELAY, true);
+        }
+
+        void Reset() override
+        {
+            _events.Reset();
+            scheduler.CancelAll();
+            _phase = PHASE_ONE;
+            _interludeStarted = false;
+            _chillActive = false;
+            _kneeling = false;
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_BALARGARDE_JUMP:
+                    me->ExitVehicle();
+                    me->GetMotionMaster()->MoveJump(BalargardeLandPos, BalargardeLeapSpeedXY,
+                        BalargardeLeapSpeedZ, POINT_BALARGARDE_LEAP);
+                    break;
+                case ACTION_BALARGARDE_ENGAGE:
+                    me->SetHomePosition(me->GetPosition());
+                    me->SetImmuneToPC(false);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    if (Player* player = me->SelectNearestPlayer(EncounterRadius))
+                        AttackStart(player);
+                    break;
+                case ACTION_BALARGARDE_SALUTE:
+                    _kneeling = false;
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    scheduler.Schedule(1s, [this](TaskContext /*context*/)
+                    {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    });
+                    break;
+                case ACTION_BALARGARDE_RESUME:
+                    ResumeCombat();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void ResumeCombat()
+        {
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ALL, false);
+            _phase = PHASE_RESUME;
+            RepullNearbyPlayers();
+            if (Player* player = me->SelectNearestPlayer(EncounterRadius))
+                AttackStart(player);
+            ScheduleCombatEvents();
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != EFFECT_MOTION_TYPE || id != POINT_BALARGARDE_LEAP)
+                return;
+
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                if (Creature* vardmadra = GetParticipant(DATA_VARDMADRA))
+                    me->SetFacingToObject(vardmadra);
+            });
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            ScheduleCombatEvents();
+        }
+
+        void ScheduleCombatEvents()
+        {
+            _events.Reset();
+            _events.ScheduleEvent(EVENT_HEROIC_LEAP, 10s);
+            _events.ScheduleEvent(EVENT_WHIRLWIND, 15s);
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 2s);
+            _events.ScheduleEvent(EVENT_BLIZZARD, 7s, 8s);
+            if (_chillActive)
+                _events.ScheduleEvent(EVENT_CHILL_RUN, 3s, 5s);
+        }
+
+        // Only players actually taking part keep the encounter alive. Anyone else within the old
+        // 200 yd sweep - someone questing at Jotunheim, a flyer passing over - would take threat
+        // and block the reset for good, leaving the next group a half-health boss out of position.
+        bool RepullNearbyPlayers()
+        {
+            std::vector<Player*> participants;
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (Player* player = itr->GetSource())
+                    if (player->IsAlive() && !player->IsGameMaster() && me->IsValidAttackTarget(player)
+                        && me->IsWithinDistInMap(player, EncounterRadius)
+                        && (player->GetQuestStatus(QUEST_BANSHEES_REVENGE) == QUEST_STATUS_INCOMPLETE
+                            || player->IsInCombatWith(me)))
+                        participants.push_back(player);
+
+            if (participants.empty())
+                return false;
+
+            me->SetHomePosition(me->GetPosition());
+            for (Player* player : participants)
+                DoAddThreat(player, 5.0f);
+            return true;
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (!_interludeStarted)
+            {
+                uint32 const minHealth = me->CountPctFromMaxHealth(50);
+                if (me->GetHealth() > minHealth && damage >= me->GetHealth() - minHealth)
+                {
+                    damage = me->GetHealth() - minHealth;
+                    StartInterlude();
+                    return;
+                }
+            }
+
+            if (!_chillActive && me->HealthBelowPctDamaged(80, damage))
+            {
+                _chillActive = true;
+                Talk(SAY_BALARGARDE_80PCT);
+                _events.ScheduleEvent(EVENT_CHILL_RUN, 3s, 5s);
+            }
+        }
+
+        void StartInterlude()
+        {
+            _interludeStarted = true;
+            _phase = PHASE_INTERLUDE;
+            _events.Reset();
+
+            me->AttackStop();
+            me->InterruptNonMeleeSpells(true);
+            me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
+            me->SetReactState(REACT_PASSIVE);
+            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ALL, true);
+            Talk(SAY_BALARGARDE_KNEEL);
+
+            Creature* lichKing = me->SummonCreature(NPC_LICH_KING, LichKingSpawnPos, TEMPSUMMON_MANUAL_DESPAWN);
+            if (!lichKing)
+            {
+                // Without the Lich King nothing ever advances the interlude, and EnterEvadeMode
+                // short-circuits on this phase: the boss would sit at 50% immune to every school,
+                // unable to evade, reset or die. Undo it and carry on fighting instead.
+                ResumeCombat();
+                return;
+            }
+
+            RegisterSummon(lichKing, DATA_LICH_KING);
+            me->SetFacingToObject(lichKing);
+
+            if (Creature* vardmadra = GetParticipant(DATA_VARDMADRA))
+                vardmadra->AI()->DoAction(ACTION_VARDMADRA_KNEEL);
+
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                _kneeling = true;
+            });
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _phase = PHASE_OUTRO;
+            if (Creature* lichKing = GetParticipant(DATA_LICH_KING))
+                lichKing->AI()->DoAction(ACTION_LK_FINALE);
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            if (_phase == PHASE_INTERLUDE)
+                return;
+
+            if ((_phase == PHASE_ONE || _phase == PHASE_RESUME) && RepullNearbyPlayers())
+                return;
+
+            ScriptedAI::EnterEvadeMode(why);
+            NotifyOwner(ACTION_CLEANUP_ENCOUNTER);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            scheduler.Update(diff);
+
+            if (_phase == PHASE_INTERLUDE)
+            {
+                if (_kneeling && me->getStandState() != UNIT_STAND_STATE_KNEEL)
+                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                return;
+            }
+
+            if (!UpdateVictim())
+                return;
+
+            _events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_HEROIC_LEAP:
+                        if (Unit* victim = me->GetVictim())
+                        {
+                            float const dist = me->GetDistance(victim);
+                            if (dist >= 8.0f && dist <= 25.0f)
+                                me->CastSpell(victim, SPELL_HEROIC_LEAP, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+                        }
+                        _events.Repeat(10s);
+                        break;
+                    case EVENT_WHIRLWIND:
+                        me->CastSpell(me, SPELL_WHIRLWIND, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+                        _events.Repeat(30s);
+                        break;
+                    case EVENT_FROSTBOLT:
+                        // Left to cost mana on purpose: the doubled ManaModifier on 31016 is what
+                        // video evidence shows, so the pool has to actually be spent.
+                        DoCastVictim(SPELL_FROSTBOLT);
+                        _events.Repeat(8s);
+                        break;
+                    case EVENT_BLIZZARD:
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                            me->CastSpell(target, SPELL_BLIZZARD, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+                        _events.Repeat(15s);
+                        break;
+                    case EVENT_CHILL_RUN:
+                        if (Creature* safirdrang = GetParticipant(DATA_SAFIRDRANG))
+                            safirdrang->AI()->DoAction(ACTION_SAFIRDRANG_CHILL);
+                        _events.Repeat(13s, 14s);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        EventMap _events;
+        uint8 _phase = PHASE_ONE;
+        bool _interludeStarted = false;
+        bool _chillActive = false;
+        bool _kneeling = false;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bansheesrevenge_overthaneAI(creature);
+    }
+};
+
+/*######
+## Banshee's Revenge: npc_bansheesrevenge_safirdrang (31050) - proto-drake that carries Overthane
+######*/
+class npc_bansheesrevenge_safirdrang : public CreatureScript
+{
+public:
+    npc_bansheesrevenge_safirdrang() : CreatureScript("npc_bansheesrevenge_safirdrang") { }
+
+    struct npc_bansheesrevenge_safirdrangAI : public BansheesParticipantAI
+    {
+        npc_bansheesrevenge_safirdrangAI(Creature* creature) : BansheesParticipantAI(creature) { }
+
+        void InitializeAI() override
+        {
+            BansheesMakeFlyer(me);
+
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = me->SummonCreature(NPC_BALARGARDE, *me, TEMPSUMMON_MANUAL_DESPAWN))
+                {
+                    RegisterSummon(balargarde, DATA_BALARGARDE);
+                    balargarde->EnterVehicleUnattackable(me, 0);
+                }
+
+                me->SetSpeedRate(MOVE_FLIGHT, SafirdrangEntryFlightSpeed);
+                me->GetMotionMaster()->MovePath(PATH_SAFIRDRANG_INTRO, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+            });
+        }
+
+        void MovementInform(uint32 type, uint32 /*id*/) override
+        {
+            if (type != ESCORT_MOTION_TYPE || !me->movespline->Finalized())
+                return;
+
+            if (!_introDone)
+            {
+                _introDone = true;
+                me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
+
+                for (uint8 i = EliteRearIndex; i < EliteCount; ++i)
+                    if (Creature* elite = me->SummonCreature(NPC_BALARGARDE_ELITE,
+                        BalargardeElitePos[i], TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        RegisterSummon(elite);
+                        elite->AI()->DoAction(ACTION_ELITE_START_PATROL + i);
+                    }
+
+                RunIntroDialogue();
+            }
+            else if (_departing)
+                me->DespawnOrUnsummon();
+        }
+
+        void RunIntroDialogue()
+        {
+            scheduler.Schedule(0s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                    balargarde->AI()->Talk(SAY_BALARGARDE_TO_SAFIRDRANG);
+            }).Schedule(6s, [this](TaskContext /*context*/)
+            {
+                if (Creature* vardmadra = GetParticipant(DATA_VARDMADRA))
+                    vardmadra->AI()->Talk(SAY_VARDMADRA_CHALLENGE);
+            }).Schedule(12s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                    balargarde->AI()->Talk(SAY_BALARGARDE_TO_VARDMADRA_1);
+            }).Schedule(15s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                    balargarde->AI()->DoAction(ACTION_BALARGARDE_JUMP);
+            }).Schedule(17s, [this](TaskContext /*context*/)
+            {
+                me->GetMotionMaster()->MovePoint(POINT_SAFIRDRANG_ASCEND,
+                    me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f);
+            }).Schedule(18s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                    balargarde->AI()->Talk(SAY_BALARGARDE_TO_VARDMADRA_2);
+            }).Schedule(26s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                    balargarde->AI()->DoAction(ACTION_BALARGARDE_ENGAGE);
+                me->SetHomePosition(me->GetPosition());
+            });
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_SAFIRDRANG_CHILL:
+                    if (Player* player = me->SelectNearestPlayer(EncounterRadius))
+                    {
+                        me->SetFacingToObject(player);
+                        DoCast(player, SPELL_SAFIRDRANGS_CHILL);
+                    }
+                    break;
+                case ACTION_SAFIRDRANG_DEPART:
+                    _departing = true;
+                    me->GetMotionMaster()->MovePath(PATH_SAFIRDRANG_DEPART,
+                        FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            scheduler.Update(diff);
+        }
+
+    private:
+        bool _introDone = false;
+        bool _departing = false;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bansheesrevenge_safirdrangAI(creature);
+    }
+};
+
+/*######
+## Banshee's Revenge: npc_bansheesrevenge_elite (31030) - vrykul elite; cosmetic-mounted flyer that patrols
+######*/
+class npc_bansheesrevenge_elite : public CreatureScript
+{
+public:
+    npc_bansheesrevenge_elite() : CreatureScript("npc_bansheesrevenge_elite") { }
+
+    struct npc_bansheesrevenge_eliteAI : public BansheesParticipantAI
+    {
+        npc_bansheesrevenge_eliteAI(Creature* creature) : BansheesParticipantAI(creature) { }
+
+        void InitializeAI() override
+        {
+            BansheesMakeFlyer(me);
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action >= ACTION_ELITE_START_PATROL)
+            {
+                uint32 const index = action - ACTION_ELITE_START_PATROL;
+                if (index == EliteRearIndex)
+                    me->SetSpeedRate(MOVE_FLIGHT, EliteRearFlightSpeed);
+                else if (index == EliteFrontIndex)
+                    me->SetSpeedRate(MOVE_FLIGHT, EliteFrontFlightSpeed);
+                me->GetMotionMaster()->MovePath(PATH_ELITE_BASE + 1 + index,
+                    FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+            }
+            else if (action == ACTION_ELITE_DESPAWN)
+            {
+                me->setActive(false);
+                me->DespawnOrUnsummon();
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 /*id*/) override
+        {
+            if (type != ESCORT_MOTION_TYPE || !me->movespline->Finalized() || _holdingPosition)
+                return;
+
+            _holdingPosition = true;
+            // Turn to face whoever is holding the floor. Once the Lich King is up that is final,
+            // so the task retires rather than re-running a grid search every second for the rest
+            // of the encounter - six elites doing that is a packet burst to every nearby client.
+            scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                if (Creature* lichKing = GetParticipant(DATA_LICH_KING))
+                {
+                    me->SetFacingToObject(lichKing);
+                    return;
+                }
+
+                if (Creature* safirdrang = GetParticipant(DATA_SAFIRDRANG))
+                    me->SetFacingToObject(safirdrang);
+
+                context.Repeat(5s);
+            });
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            scheduler.Update(diff);
+        }
+
+    private:
+        bool _holdingPosition = false;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bansheesrevenge_eliteAI(creature);
+    }
+};
+
+/*######
+## Banshee's Revenge: npc_bansheesrevenge_nightswood (31087) - revealed banshee, flees the arena
+######*/
+class npc_bansheesrevenge_nightswood : public CreatureScript
+{
+public:
+    npc_bansheesrevenge_nightswood() : CreatureScript("npc_bansheesrevenge_nightswood") { }
+
+    struct npc_bansheesrevenge_nightswoodAI : public BansheesParticipantAI
+    {
+        npc_bansheesrevenge_nightswoodAI(Creature* creature) : BansheesParticipantAI(creature) { }
+
+        void InitializeAI() override
+        {
+            BansheesMakeFlyer(me);
+            // She hovers over a fight in progress until Balargarde dies. Without this a stray
+            // cleave kills her and the closing beat never plays.
+            me->SetImmuneToPC(true);
+            me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SAFIRDRANGS_CHILL_RELAY, true);
+            me->GetMotionMaster()->MovePoint(POINT_NIGHTSWOOD_HORN, NightswoodHornPos);
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == POINT_MOTION_TYPE && id == POINT_NIGHTSWOOD_HORN)
+            {
+                if (Creature* lichKing = GetParticipant(DATA_LICH_KING))
+                    me->SetFacingToObject(lichKing);
+
+                scheduler.Schedule(3s, [this](TaskContext /*context*/)
+                {
+                    if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                        me->SetFacingToObject(balargarde);
+                });
+            }
+            else if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
+                me->DespawnOrUnsummon();
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action != ACTION_NIGHTSWOOD_EXIT)
+                return;
+
+            Talk(SAY_NIGHTSWOOD_EMOTE);
+            scheduler.Schedule(3s, [this](TaskContext /*context*/)
+            {
+                me->GetMotionMaster()->MovePath(PATH_LADY_NIGHTSWOOD, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+            });
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            scheduler.Update(diff);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bansheesrevenge_nightswoodAI(creature);
+    }
+};
+
+/*######
+## Banshee's Revenge: npc_bansheesrevenge_lich_king (31083) - drives the interlude and the death sequence
+######*/
+class npc_bansheesrevenge_lich_king : public CreatureScript
+{
+public:
+    npc_bansheesrevenge_lich_king() : CreatureScript("npc_bansheesrevenge_lich_king") { }
+
+    struct npc_bansheesrevenge_lich_kingAI : public BansheesParticipantAI
+    {
+        npc_bansheesrevenge_lich_kingAI(Creature* creature) : BansheesParticipantAI(creature) { }
+
+        void InitializeAI() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetImmuneToPC(true);
+            RunInterlude();
+        }
+
+        void RunInterlude()
+        {
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_ETHEREAL_TELEPORT, true);
+            }).Schedule(4s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_ICEBOUND_VISAGE, true);
+                FaceParticipant(DATA_VARDMADRA);
+            }).Schedule(6s, [this](TaskContext /*context*/)
+            {
+                Talk(SAY_LK_HONOR_GUARD);
+            }).Schedule(13s, [this](TaskContext /*context*/)
+            {
+                Talk(SAY_LK_VARDMADRA);
+                me->GetMotionMaster()->MovePoint(POINT_LK_CONFRONT, LichKingConfrontPos,
+                    FORCED_MOVEMENT_WALK, LichKingWalkSpeed);
+            });
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != POINT_MOTION_TYPE)
+                return;
+
+            if (id == POINT_LK_CONFRONT && !_confronted)
+            {
+                _confronted = true;
+                ConfrontVardmadra();
+            }
+            else if (id == POINT_LK_BODY)
+                RunOutro();
+        }
+
+        void ConfrontVardmadra()
+        {
+            FaceParticipant(DATA_VARDMADRA);
+
+            scheduler.Schedule(0s, [this](TaskContext /*context*/)
+            {
+                if (Creature* vardmadra = GetParticipant(DATA_VARDMADRA))
+                {
+                    vardmadra->AI()->Talk(SAY_VARDMADRA_MY_LORD);
+                    vardmadra->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    vardmadra->SetFacingToObject(me);
+                }
+            }).Schedule(4s, [this](TaskContext /*context*/)
+            {
+                FaceParticipant(DATA_VARDMADRA);
+                Talk(SAY_LK_DISGUISE);
+            }).Schedule(11s, [this](TaskContext /*context*/)
+            {
+                if (Creature* vardmadra = GetParticipant(DATA_VARDMADRA))
+                {
+                    DoCast(vardmadra, SPELL_LK_SPECIAL_2H, true);
+                    vardmadra->AI()->DoAction(ACTION_VARDMADRA_REVEAL);
+                }
+            }).Schedule(17s, [this](TaskContext /*context*/)
+            {
+                me->PlayDirectSound(SOUND_LICH_KING_LAUGH);
+            }).Schedule(20s, [this](TaskContext /*context*/)
+            {
+                Talk(SAY_LK_CONTINUE);
+                FaceParticipant(DATA_BALARGARDE);
+            }).Schedule(25s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                    balargarde->AI()->Talk(SAY_BALARGARDE_MY_LORD);
+            }).Schedule(29s, [this](TaskContext /*context*/)
+            {
+                Talk(SAY_LK_FINISH_THEM);
+            }).Schedule(33s, [this](TaskContext /*context*/)
+            {
+                me->GetMotionMaster()->MovePoint(POINT_LK_RETURN, LichKingSpawnPos,
+                    FORCED_MOVEMENT_WALK, LichKingWalkSpeed);
+            }).Schedule(34s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                    balargarde->AI()->DoAction(ACTION_BALARGARDE_SALUTE);
+
+                if (Creature* nightswood = me->SummonCreature(NPC_LADY_NIGHTSWOOD, NightswoodSpawnPos,
+                    TEMPSUMMON_MANUAL_DESPAWN))
+                    RegisterSummon(nightswood, DATA_NIGHTSWOOD);
+            }).Schedule(38s, [this](TaskContext /*context*/)
+            {
+                if (Creature* balargarde = GetParticipant(DATA_BALARGARDE))
+                {
+                    balargarde->AI()->Talk(SAY_BALARGARDE_DIE_DOGS);
+                    balargarde->AI()->DoAction(ACTION_BALARGARDE_RESUME);
+                }
+            });
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action != ACTION_LK_FINALE)
+                return;
+
+            scheduler.CancelAll();
+
+            if (Creature* safirdrang = GetParticipant(DATA_SAFIRDRANG))
+                safirdrang->AI()->DoAction(ACTION_SAFIRDRANG_DEPART);
+
+            if (Creature* nightswood = GetParticipant(DATA_NIGHTSWOOD))
+                nightswood->AI()->DoAction(ACTION_NIGHTSWOOD_EXIT);
+
+            if (Creature* vardmadra = GetParticipant(DATA_VARDMADRA))
+                vardmadra->AI()->DoAction(ACTION_VARDMADRA_VANISH);
+
+            if (Creature* corpse = GetParticipant(DATA_BALARGARDE))
+            {
+                float const angle = corpse->GetAbsoluteAngle(me);
+                float const x = corpse->GetPositionX() + 8.0f * std::cos(angle);
+                float const y = corpse->GetPositionY() + 8.0f * std::sin(angle);
+                me->GetMotionMaster()->MovePoint(POINT_LK_BODY, x, y, corpse->GetPositionZ(),
+                    FORCED_MOVEMENT_WALK, LichKingWalkSpeed);
+            }
+            else
+                RunOutro();
+        }
+
+        void RunOutro()
+        {
+            if (Player* player = me->SelectNearestPlayer(EncounterRadius))
+                me->SetFacingToObject(player);
+
+            scheduler.Schedule(3s, [this](TaskContext /*context*/)
+            {
+                Talk(SAY_LK_BESTED);
+            }).Schedule(11s, [this](TaskContext /*context*/)
+            {
+                Talk(SAY_LK_FROZEN_HEART);
+            }).Schedule(19s, [this](TaskContext /*context*/)
+            {
+                DoCastSelf(SPELL_ETHEREAL_TELEPORT, true);
+                NotifyOwner(ACTION_DESPAWN_ELITES);
+            }).Schedule(20s, [this](TaskContext /*context*/)
+            {
+                // The owner resets the horn and despawns everything still standing, this
+                // creature included.
+                NotifyOwner(ACTION_CLEANUP_ENCOUNTER);
+            });
+        }
+
+        void FaceParticipant(int32 id)
+        {
+            if (Creature* target = GetParticipant(id))
+                me->SetFacingToObject(target);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            scheduler.Update(diff);
+        }
+
+    private:
+        bool _confronted = false;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_bansheesrevenge_lich_kingAI(creature);
+    }
+};
+
 void AddSC_icecrown()
 {
     new npc_black_knight_graveyard();
@@ -2144,4 +3253,11 @@ void AddSC_icecrown()
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
     RegisterSpellScript(spell_crashing_wave);
+    // Quest 13142: Banshee's Revenge
+    new npc_bansheesrevenge_overthane();
+    new npc_bansheesrevenge_safirdrang();
+    new npc_bansheesrevenge_elite();
+    new npc_bansheesrevenge_vardmadra();
+    new npc_bansheesrevenge_nightswood();
+    new npc_bansheesrevenge_lich_king();
 }
