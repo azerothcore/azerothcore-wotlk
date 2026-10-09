@@ -3,7 +3,7 @@
 -- A text is kept only when the source's English matches AzerothCore's English for the same quest,
 -- or, for sources without English, when it passes length, placeholder and language checks.
 
-DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (76, 208, 8281, 8304, 8320, 8334, 8473, 8475, 8476, 8490, 8892, 8894, 9147, 9155, 9160, 9173, 9192, 9274, 9276, 9283, 9294, 9352, 9355, 9398, 9399, 9513, 9515, 9538, 9716, 9720, 9730, 9747, 9785, 9786, 9789, 9791, 9804, 9810, 9817, 9819, 9855, 9857, 9858, 9862, 9878, 9901, 9921, 9922, 9924, 9925, 9938, 10007, 10050, 10057, 10096, 10099, 10159, 10232, 10302, 10303, 10308, 10336, 10394, 10396, 10400, 10418, 10482, 10515, 10701, 10703, 10855, 10937, 11129, 11576, 11605, 11607, 11617, 11619, 11653, 11730, 11889, 11904, 11973, 12013, 12035, 12092, 12150, 12166, 12168, 12169, 12310, 12520, 12525, 12529, 12533, 12536, 12549, 12550, 12551, 12603, 12620, 12637, 12638, 12645, 12680, 12733, 12742, 12743, 12744, 12745, 12746, 12747, 12748, 12749, 12805, 12842, 12865, 12874, 12957, 12986, 13318, 13323, 13352, 13353, 13354, 13414, 13592, 13643, 13662, 13671, 13679, 13680, 13682, 13749, 13760, 13789, 13791, 13810, 13813, 13828, 13829, 13835, 13837, 13851, 13861, 13862, 13863, 13864);
+DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (76, 208, 8281, 8304, 8320, 8334, 8473, 8475, 8476, 8490, 8892, 8894, 9147, 9155, 9158, 9159, 9160, 9173, 9192, 9274, 9276, 9283, 9294, 9352, 9355, 9398, 9399, 9513, 9515, 9538, 9716, 9720, 9730, 9747, 9785, 9786, 9789, 9791, 9804, 9810, 9817, 9819, 9855, 9857, 9858, 9862, 9878, 9901, 9921, 9922, 9924, 9925, 9938, 10007, 10050, 10057, 10096, 10099, 10159, 10232, 10302, 10303, 10308, 10336, 10394, 10396, 10400, 10418, 10482, 10515, 10701, 10703, 10855, 10937, 11129, 11576, 11605, 11607, 11617, 11619, 11653, 11730, 11889, 11904, 11913, 11973, 12013, 12035, 12092, 12150, 12166, 12168, 12169, 12310, 12520, 12525, 12529, 12533, 12536, 12549, 12550, 12551, 12603, 12620, 12637, 12638, 12645, 12680, 12733, 12742, 12743, 12744, 12745, 12746, 12747, 12748, 12749, 12805, 12842, 12865, 12874, 12957, 12986, 13318, 13323, 13352, 13353, 13354, 13414, 13592, 13643, 13662, 13671, 13679, 13680, 13682, 13749, 13760, 13789, 13791, 13810, 13813, 13828, 13829, 13835, 13837, 13851, 13861, 13862, 13863, 13864);
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (76, 'frFR', 'Salut, $N. Quel est votre compte rendu ? Avez-vous exploré la Mine Veine-de-jaspe ?', 0),
 (208, 'frFR', 'Je vois que vous êtes de retour, $gmon grand:m''dame;. Je suis revenu plus d''une fois au camp sur les genoux à cause du roi Bangalash. Accrochez-vous.', 0),
@@ -19,6 +19,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (8894, 'frFR', 'Alors, avez-vous résolu le problème ? Avez-vous diminué le nombre de ces anomalies magiques ? Que vais-je faire si le magistère Ternesoir revient et que ces choses rôdent encore aux environs ?', 0),
 (9147, 'frFR', 'Alors, vous avez ce qu’il me faut ? Faites vite, sinon le jeune elfe de sang est cuit !', 0),
 (9155, 'frFR', 'Avez-vous déjà accompli votre tâche ?', 0),
+(9158, 'frFR', 'Avez-vous terminé le travail que je vous ai confié, $N ?', 0),
+(9159, 'frFR', 'Avez-vous terminé le travail que je vous ai confié, $N ?', 0),
 (9160, 'frFR', 'Alors, $C, quelles nouvelles d’An’daroth ? Que trament les elfes de la nuit ?', 0),
 (9173, 'frFR', 'J’espère que vous revenez pour m''annoncer que la flèche de Coursevent a été nettoyée de l’infection du Fléau ?', 0),
 (9192, 'frFR', 'Ce sont de bonnes ou de mauvaises nouvelle, $gmon brave:poupée; ?', 0),
@@ -87,6 +89,7 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (11730, 'frFR', 'Combien de robots avez-vous réussi à reprogrammer ?', 0),
 (11889, 'frFR', 'Vous êtes de retour. Avec de bonnes nouvelles, j''espère ?', 0),
 (11904, 'frFR', 'Le minerai, $N, est-il en sécurité ?', 0),
+(11913, 'frFR', 'Avez-vous fait ce que je vous ai demandé, $N ?', 0),
 (11973, 'frFR', 'Avez-vous pu la libérer de ses liens ?', 0),
 (12013, 'frFR', 'Pensez-vous que je sois crédule à ce point ? Arcanimus dévore toujours les âmes de mes frères et sœurs, $C !', 0),
 (12035, 'frFR', 'Déjà fini, $N ?', 0),
