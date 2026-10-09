@@ -1,5 +1,7 @@
--- frFR quest progress and completion texts missing from AzerothCore, taken from thegege/Trinitycore-6, French client sniffs.
--- Source: https://github.com/thegege/Trinitycore-6 (world/quest-request-items-fr.sql, world/quest_offer_reward-fr.sql). Licence: no licence file.
+-- frFR quest progress and completion texts missing from AzerothCore, taken from thegege/Trinitycore-6, French client
+-- sniffs.
+-- Source: https://github.com/thegege/Trinitycore-6 (world/quest-request-items-fr.sql, world/quest_offer_reward-fr.sql).
+-- Licence: no licence file.
 -- A text is kept only when the source's English matches AzerothCore's English for the same quest,
 -- or, for sources without English, when it passes length, placeholder and language checks.
 

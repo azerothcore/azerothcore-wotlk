@@ -1,5 +1,6 @@
 -- frFR quest progress and completion texts missing from AzerothCore, taken from SPP Classics, WotLK world locales.
--- Source: https://github.com/celguar/spp-classics-cmangos (Server/Sql/wotlk/locales.7z, quest_locale_all.sql). Licence: no licence file.
+-- Source: https://github.com/celguar/spp-classics-cmangos (Server/Sql/wotlk/locales.7z, quest_locale_all.sql). Licence:
+-- no licence file.
 -- A text is kept only when the source's English matches AzerothCore's English for the same quest,
 -- or, for sources without English, when it passes length, placeholder and language checks.
 

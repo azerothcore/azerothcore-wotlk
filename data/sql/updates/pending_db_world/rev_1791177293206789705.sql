@@ -1,5 +1,7 @@
 -- frFR rows that hold English text (or an exact copy of enUS) replaced with the French text.
--- Sources, in order of preference: the frFR text AzerothCore already has for the identical English text of another quest, SPP Classics, WotLK world locales, SPP Classics, TBC world locales, thegege/Trinitycore-6, French client sniffs, vmangos, Wowhead TBC fr quest pages, read by hand.
+-- Sources, in order of preference: the frFR text AzerothCore already has for the identical English text of another
+-- quest, SPP Classics, WotLK world locales, SPP Classics, TBC world locales, thegege/Trinitycore-6, French client
+-- sniffs, vmangos, Wowhead TBC fr quest pages, read by hand.
 
 DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (11219);
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES

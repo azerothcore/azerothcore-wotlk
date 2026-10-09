@@ -1,4 +1,5 @@
--- frFR quest progress and completion texts missing from AzerothCore, taken from the frFR text AzerothCore already has for the identical English text of another quest.
+-- frFR quest progress and completion texts missing from AzerothCore, taken from the frFR text AzerothCore already has
+-- for the identical English text of another quest.
 -- Source: acore world DB (quest_request_items_locale, quest_offer_reward_locale). Licence: AzerothCore data.
 -- A text is kept only when the source's English matches AzerothCore's English for the same quest,
 -- or, for sources without English, when it passes length, placeholder and language checks.
