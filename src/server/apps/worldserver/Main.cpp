@@ -112,7 +112,6 @@ private:
 
 void SignalHandler(boost::system::error_code const& error, int signalNumber);
 void ClearOnlineAccounts();
-std::string BuildRealmIdSqlFilter();
 bool StartDB();
 void StopDB();
 bool LoadRealmInfo(Acore::Asio::IoContext& ioContext);
@@ -295,7 +294,7 @@ int main(int argc, char** argv)
 
     // set server offline (not connectable)
     LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id IN ({})",
-        REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, BuildRealmIdSqlFilter());
+        REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.BuildIdSqlFilter());
 
     LoadRealmInfo(*ioContext);
 
@@ -385,7 +384,7 @@ int main(int argc, char** argv)
 
     // Set server online (allow connecting now)
     LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag & ~{}, population = 0 WHERE id IN ({})",
-        REALM_FLAG_VERSION_MISMATCH, BuildRealmIdSqlFilter());
+        REALM_FLAG_VERSION_MISMATCH, realm.BuildIdSqlFilter());
     realm.PopulationLevel = 0.0f;
     realm.Flags = RealmFlags(realm.Flags & ~uint32(REALM_FLAG_VERSION_MISMATCH));
 
@@ -433,7 +432,7 @@ int main(int argc, char** argv)
     // set server offline
     if (!sConfigMgr->GetOption<bool>("Network.UseSocketActivation", false))
         LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id IN ({})",
-            REALM_FLAG_OFFLINE, BuildRealmIdSqlFilter());
+            REALM_FLAG_OFFLINE, realm.BuildIdSqlFilter());
 
     LOG_INFO("server.worldserver", "Halting process...");
 
@@ -442,21 +441,6 @@ int main(int argc, char** argv)
     // 2 - restart command used, this code can be used by restarter for restart AzerothCore
 
     return World::GetExitCode();
-}
-
-/// Builds a SQL "id IN (...)" filter covering this worldserver's own RealmID
-/// plus any AdditionalRealmIDs aliases, for the realmlist flag-management
-/// queries below that need to keep every one of those rows in sync.
-std::string BuildRealmIdSqlFilter()
-{
-    std::string filter = std::to_string(realm.Id.Realm);
-    for (uint32 id : realm.AdditionalIds)
-    {
-        filter += ',';
-        filter += std::to_string(id);
-    }
-
-    return filter;
 }
 
 /// Initialize connection to the databases
@@ -517,7 +501,7 @@ bool StartDB()
     LOG_INFO("server.loading", "Loading World Information...");
     LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
     if (!realm.AdditionalIds.empty())
-        LOG_INFO("server.loading", "> AdditionalRealmIDs:   {}", BuildRealmIdSqlFilter());
+        LOG_INFO("server.loading", "> AdditionalRealmIDs:   {}", realm.BuildIdSqlFilter());
 
     ///- Clean the database before starting.
     /// Cluster.Enabled is read from config here because sToCloud9Sidecar->Init()

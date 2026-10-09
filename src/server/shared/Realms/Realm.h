@@ -87,6 +87,10 @@ struct AC_SHARED_API Realm
     float PopulationLevel;
 
     [[nodiscard]] boost::asio::ip::tcp_endpoint GetAddressForClient(boost::asio::ip::address const& clientAddr) const;
+
+    /// Builds a SQL "id IN (...)" filter covering Id.Realm plus every AdditionalIds alias, for
+    /// realmlist flag-management queries that need to keep every one of those rows in sync.
+    [[nodiscard]] std::string BuildIdSqlFilter() const;
 };
 
 #endif // Realm_h__
