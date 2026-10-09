@@ -574,6 +574,14 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
             return;
         }
 
+        // may have been the bracket's last pending invite, let the held waiters form a new instance
+        if (!ginfo.ArenaType)
+        {
+            BattlegroundTypeId typeId = bg->GetBgTypeID();
+            BattlegroundQueueTypeId queueTypeId = BattlegroundMgr::BGQueueTypeId(typeId, bg->GetArenaType());
+            sBattlegroundMgr->ScheduleQueueUpdate(0, 0, queueTypeId, typeId, bg->GetBracketId());
+        }
+
         LOG_DEBUG("bg.battleground", "Battleground: player {} {} joined battle for bg {}, bgtype {}, queue type {}.", _player->GetName(), _player->GetGUID().ToString(), bg->GetInstanceID(), bg->GetBgTypeID(), bgQueueTypeId);
     }
     else // leave queue

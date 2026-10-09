@@ -165,8 +165,17 @@ void WorldSession::HandleMoveWorldportAck()
             if (Battleground* bg = _player->GetBattleground(true))
                 if (_player->IsInvitedForBattlegroundInstance(bg->GetInstanceID()))
                 {
+                    BattlegroundTypeId bgTypeId = bg->GetBgTypeID();
+                    BattlegroundQueueTypeId queueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, bg->GetArenaType());
                     bg->DecreaseInvitedCount(_player->GetBgTeamId());
-                    _player->RemoveBattlegroundQueueId(BattlegroundMgr::BGQueueTypeId(bg->GetBgTypeID(), bg->GetArenaType()));
+                    _player->RemoveBattlegroundQueueId(queueTypeId);
+
+                    if (bg->HasFreeSlots())
+                    {
+                        bg->AddToBGFreeSlotQueue();
+                        if (bg->isBattleground())
+                            sBattlegroundMgr->ScheduleQueueUpdate(0, 0, queueTypeId, bgTypeId, bg->GetBracketId());
+                    }
                 }
 
             _player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
