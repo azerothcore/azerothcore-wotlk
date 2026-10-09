@@ -1,3 +1,4 @@
+-- DB update 2026_10_08_00 -> 2026_10_09_00
 --
 SET @NATASHA := 22465;
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = @NATASHA;
