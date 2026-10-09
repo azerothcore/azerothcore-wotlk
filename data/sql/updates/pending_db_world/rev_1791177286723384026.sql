@@ -4,7 +4,7 @@
 -- A text is kept only when the source's English matches AzerothCore's English for the same quest,
 -- or, for sources without English, when it passes length, placeholder and language checks.
 
-DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (97, 98, 219, 567, 898, 995, 1265, 1423, 1978, 2202, 2500, 2583, 2584, 2586, 4022, 4982, 4987, 5504, 5513, 7905, 8747, 8752, 8895, 8901, 8922, 9085, 9209, 9368, 9813, 9967, 9970, 9972, 9973, 9977, 9999, 10011, 10425, 10465, 10467, 10468, 10469, 10621, 10626, 10684, 10685, 10750, 10763, 10768, 10769, 10775, 10776, 10824, 10887, 10957, 10959, 11085, 11102, 11938, 12061, 12066, 12143, 12307, 12327, 12671, 12787, 12847, 12953, 12971, 13264, 13276, 13289, 13319, 13344, 13358, 13359, 13365, 13404, 13432, 13603, 13634, 13665, 13666, 13673, 13674, 13675, 13678, 13697, 13714, 13716, 13717, 13719, 13720, 13721, 13722, 13741, 13742, 13745, 13747, 13752, 13753, 13756, 13757, 13758, 13761, 13762, 13763, 13764, 13767, 13768, 13769, 13770, 13772, 13773, 13774, 13775, 13777, 13778, 13779, 13780, 13782, 13783, 13784, 13785, 13787);
+DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (97, 98, 219, 567, 898, 995, 1265, 1423, 1978, 2202, 2500, 2583, 2584, 2586, 4022, 4982, 4987, 5504, 5513, 7905, 8747, 8752, 8895, 8901, 8922, 9209, 9813, 9967, 9970, 9972, 9973, 9977, 9999, 10011, 10425, 10465, 10467, 10468, 10469, 10621, 10626, 10684, 10685, 10750, 10763, 10768, 10769, 10775, 10776, 10824, 10887, 10957, 10959, 11085, 11102, 11938, 12061, 12066, 12143, 12307, 12327, 12671, 12787, 12847, 12953, 12971, 13264, 13276, 13289, 13319, 13344, 13358, 13359, 13365, 13404, 13432, 13603, 13634, 13665, 13666, 13673, 13674, 13675, 13678, 13697, 13714, 13716, 13717, 13719, 13720, 13721, 13722, 13741, 13742, 13745, 13747, 13752, 13753, 13756, 13757, 13758, 13761, 13762, 13763, 13764, 13767, 13768, 13769, 13770, 13772, 13773, 13774, 13775, 13777, 13778, 13779, 13780, 13782, 13783, 13784, 13785, 13787);
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (97, 'frFR', 'Oui, $N ?', 0),
 (98, 'frFR', 'Oui, $N ?', 0),
@@ -31,9 +31,7 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (8895, 'frFR', 'Oui, $C ?', 0),
 (8901, 'frFR', 'Oh, et à qui dois-je ce plaisir ?', 0),
 (8922, 'frFR', 'Vous avez quelque chose pour moi ?', 0),
-(9085, 'frFR', 'Avez vous eu de la chance, $N ?', 0),
 (9209, 'frFR', 'Avez-vous l''arcanum ?', 0),
-(9368, 'frFR', 'Avez vous eu de la chance, $N ?', 0),
 (9813, 'frFR', 'Oui, $C ?', 0),
 (9967, 'frFR', 'Le combat se termine quand vous ou votre adversaire êtes mort sur le sol.', 0),
 (9970, 'frFR', 'Le combat se termine quand vous ou votre adversaire êtes mort sur le sol.', 0),
@@ -131,15 +129,12 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (13785, 'frFR', 'Avez-vous gagné la lame ?', 0),
 (13787, 'frFR', 'Avez-vous terminé votre entraînement pour la grande mêlée ?', 0);
 
-DELETE FROM `quest_offer_reward_locale` WHERE `locale` = 'frFR' AND `ID` IN (1499, 3763, 3787, 5403, 7462, 9221, 9225, 11517, 11922, 12193, 14179, 14180, 14181, 14182);
+DELETE FROM `quest_offer_reward_locale` WHERE `locale` = 'frFR' AND `ID` IN (1499, 3763, 3787, 5403, 11517, 11922, 12193, 14179, 14180, 14181, 14182);
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 (1499, 'frFR', 'Vous avez bien agi, $N.$B$BLes vils quasits ne sont que des marionnettes dirigées par des puissances agissant au sein de la Lame ardente, mais votre succès en présage de plus grands à l''avenir.', 0),
 (3763, 'frFR', 'Bien, $C… Puisque vous avez été informé que je dirigeais en personne ces recherches, vous êtes évidemment venu aussi vite que possible.$B$BMaintenant que vous êtes là, écoutez attentivement. J''ai horreur de me répéter.', 0),
 (3787, 'frFR', 'Je vous remercie d''être venu, las voyageur ! Permettez-moi de me présenter. Je me nomme Quintis Gentecime et suis druide et humble serviteur de Malfurion et du Cercle cénarien. Mes collègues (le général Shandris Pennelune et le Protectorat, vous avez peut-être entendu parler d''eux !) et moi-même souhaitions vous entretenir à propos des travaux que vous effectuez pour Fandral Forteramure à Darnassus.$B$BAvant de poursuivre, j''aimerais vous demander de garder secrète cette conversation. Si cela ne vous pose pas de problèmes, alors nous pouvons commencer.', 0),
 (5403, 'frFR', 'Félicitations, $N. Je suis heureux de vous donner une marque de valeur de l''Aube d''argent !$B$BChaque marque de valeur attribuée à un bénéficiaire méritant est un signe que le vent tourne contre le Fléau. Avec un nombre de plus en plus grand de héros combattant le Fléau sur ses propres terres, l''Aube d''argent sera assurément en bonne position quand le temps sera venu de porter l''attaque ultime contre le Fléau. J''espère que la valeur dont vous avez fait preuve pour gagner votre marque fera merveille à nouveau ce jour-là.', 0),
-(7462, 'frFR', 'Vous ouvrez le coffre pour trouver…', 0),
-(9221, 'frFR', 'Bonne journée, $N. Ce fut un plaisir de faire des affaires avec vous.', 0),
-(9225, 'frFR', 'Bonne journée, $N. Ce fut un plaisir de faire des affaires avec vous.', 0),
 (11517, 'frFR', 'C''est Portonuus qui vous envoie ? Bien, nous n''avons pas de temps à perdre !', 0),
 (11922, 'frFR', 'Bien joué ! Vous saurez jongler avec le feu en un rien de temps ! Et maintenant, préparez-vous ! La prochaine épreuve sera plus chaude.', 0),
 (12193, 'frFR', 'Oooh, ce n’est qu’un bon-cadeau pour un bock… Peut-être que vous préférez vous faire un peu désirer. Enfin… Voici la chope de cette année.$B$BMais j’ai l’impression que je vais vous revoir. Après tout, si vous voulez échanger des bons de la fête des Brasseurs, je suis toute à vous…$B$BOu peut-être à lui…$B$BOooohhhh… ou à lui, là…', 0),
