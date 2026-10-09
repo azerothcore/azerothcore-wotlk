@@ -24,7 +24,6 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
-#include "PathGenerator.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
@@ -898,61 +897,24 @@ private:
 };
 
 // 62828, 62831, 62835 - Recharge Robot
-// The core random destination can land inside scrap heap geometry; keep only points reachable from XT-002.
+// The core rolls a random point around the pile and takes its height from below, so a point that
+// lands on a scrap heap keeps the floor under it. Ask from above the heaps instead.
 class spell_xt002_recharge_robot : public SpellScript
 {
     PrepareSpellScript(spell_xt002_recharge_robot);
 
-    static constexpr uint8 MaxSpawnAttempts = 10;
-    static constexpr float SpawnDistanceTolerance = 5.0f;
-
-    static bool IsCompletePath(PathGenerator const& path)
-    {
-        PathType const type = path.GetPathType();
-        return (type & PATHFIND_NORMAL) && !(type & (PATHFIND_INCOMPLETE | PATHFIND_NOPATH
-            | PATHFIND_SHORT | PATHFIND_FARFROMPOLY)) && !path.GetPath().empty();
-    }
+    static constexpr float SearchAboveHeaps = 15.0f; // taller than any scrap heap in the room
 
     void SetDest(SpellDestination& dest)
     {
         Unit* caster = GetCaster();
-        InstanceScript* instance = caster->GetInstanceScript();
-        Creature* xt002 = instance ? instance->GetCreature(BOSS_XT002) : nullptr;
-        if (!xt002)
+
+        float const z = caster->GetMapHeight(dest._position.GetPositionX(), dest._position.GetPositionY(),
+            caster->GetPositionZ() + SearchAboveHeaps);
+        if (z <= INVALID_HEIGHT)
             return;
 
-        float const radius = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(caster);
-        float const orientation = dest._position.GetOrientation();
-
-        for (uint8 i = 0; i < MaxSpawnAttempts; ++i)
-        {
-            Position const candidate = i ? caster->GetRandomNearPosition(radius) : Position(dest._position);
-
-            PathGenerator path(xt002);
-            path.CalculatePath(candidate.GetPositionX(), candidate.GetPositionY(), candidate.GetPositionZ(), false);
-            if (!IsCompletePath(path))
-                continue;
-
-            G3D::Vector3 const& end = path.GetPath().back();
-            if (caster->GetExactDist2d(end.x, end.y) > radius + SpawnDistanceTolerance)
-                continue;
-
-            dest.Relocate(Position(end.x, end.y, end.z, orientation));
-            return;
-        }
-
-        // No reachable point found around the pile: use the reachable point closest to it
-        PathGenerator path(xt002);
-        path.CalculatePath(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), false);
-        if ((path.GetPathType() & (PATHFIND_NOPATH | PATHFIND_SHORT)) || path.GetPath().empty())
-            return;
-
-        // A path cut short can end anywhere between XT-002 and the pile
-        G3D::Vector3 const& end = path.GetPath().back();
-        if (caster->GetExactDist2d(end.x, end.y) > radius + SpawnDistanceTolerance)
-            return;
-
-        dest.Relocate(Position(end.x, end.y, end.z, orientation));
+        dest._position.m_positionZ = z;
     }
 
     void Register() override
