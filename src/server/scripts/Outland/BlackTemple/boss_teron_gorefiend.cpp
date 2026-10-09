@@ -69,7 +69,8 @@ struct ShadowOfDeathSelector
     ShadowOfDeathSelector(Unit const* tank) : _tank(tank) {}
     bool operator()(Unit const* target) const
     {
-        return target && !target->HasAura(SPELL_SHADOW_OF_DEATH) && !target->HasAura(SPELL_POSSESS_SPIRIT_IMMUNE) && target != _tank;
+        return target && target->IsPlayer() && !target->HasAura(SPELL_SHADOW_OF_DEATH) &&
+            !target->HasAura(SPELL_POSSESS_SPIRIT_IMMUNE) && target != _tank;
     }
 };
 
