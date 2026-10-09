@@ -1,3 +1,4 @@
+-- DB update 2026_10_09_07 -> 2026_10_09_08
 -- Nagrand (Nesingwary Safari): Gankly Rottenfist (18297) kept piling up in the camp.
 -- He has no spawns in creature, he only exists as a summon from Kristen Dipswitch's event,
 -- and the summon was created with summonType 8 and duration 0. TempSummon::InitStats turns
