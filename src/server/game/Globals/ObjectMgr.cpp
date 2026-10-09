@@ -20,6 +20,7 @@
 #include "ArenaTeamMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
+#include "ClassMgr.h"
 #include "Common.h"
 #include "Config.h"
 #include "Containers.h"
@@ -306,11 +307,6 @@ ObjectMgr::ObjectMgr():
     _gameObjectSpawnId(1),
     DBCLocaleIndex(LOCALE_enUS)
 {
-    for (uint8 i = 0; i < MAX_CLASSES; ++i)
-    {
-        _playerClassInfo[i] = nullptr;
-    }
-
     // Initialize default spawn groups
     _spawnGroupDataStore[0] = {0, "Default Group", SPAWNGROUP_MAP_UNSET, SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM)};
     _spawnGroupDataStore[1] = {1, "Legacy Group", SPAWNGROUP_MAP_UNSET, SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM | SPAWNGROUP_FLAG_COMPATIBILITY_MODE)};
@@ -325,16 +321,16 @@ ObjectMgr::~ObjectMgr()
         delete[] i->second;
 
     // free only if loaded
-    for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
+    for (PlayerClassInfo* classInfo : _playerClassInfo)
     {
-        if (_playerClassInfo[class_])
-            delete[] _playerClassInfo[class_]->levelInfo;
-        delete _playerClassInfo[class_];
+        if (classInfo)
+            delete[] classInfo->levelInfo;
+        delete classInfo;
     }
 
     for (int race = 0; race < sRaceMgr->GetMaxRaces(); ++race)
     {
-        for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
+        for (int class_ = 0; class_ < sClassMgr->GetMaxClasses(); ++class_)
         {
             if (_playerInfo[race][class_])
                 delete[] _playerInfo[race][class_]->levelInfo;
@@ -3584,7 +3580,7 @@ void ObjectMgr::LoadItemTemplates()
 
             if (req)
             {
-                if (!(itemTemplate.AllowableClass & CLASSMASK_ALL_PLAYABLE))
+                if (!(itemTemplate.AllowableClass & sClassMgr->GetPlayableClassMask()))
                     LOG_ERROR("sql.sql", "Item (Entry: {}) does not have any playable classes ({}) in `AllowableClass` and can't be equipped or used.", entry, itemTemplate.AllowableClass);
 
                 if (!(itemTemplate.AllowableRace & sRaceMgr->GetPlayableRaceMask()))
@@ -4352,7 +4348,13 @@ void ObjectMgr::LoadPlayerInfo()
             _playerInfo.clear();
             _playerInfo.resize(sRaceMgr->GetMaxRaces());
             for (auto& classVec : _playerInfo)
-                classVec.resize(MAX_CLASSES, nullptr);
+                classVec.resize(sClassMgr->GetMaxClasses(), nullptr);
+        }
+
+        if (_playerClassInfo.empty() || _playerClassInfo.size() != sClassMgr->GetMaxClasses())
+        {
+            _playerClassInfo.clear();
+            _playerClassInfo.resize(sClassMgr->GetMaxClasses(), nullptr);
         }
 
         uint32 oldMSTime = getMSTime();
@@ -4395,7 +4397,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                if (current_class >= MAX_CLASSES)
+                if (current_class >= sClassMgr->GetMaxClasses())
                 {
                     LOG_ERROR("sql.sql", "Wrong class {} in `playercreateinfo` table, ignoring.", current_class);
                     continue;
@@ -4467,7 +4469,7 @@ void ObjectMgr::LoadPlayerInfo()
                 }
 
                 uint32 current_class = fields[1].Get<uint8>();
-                if (current_class >= MAX_CLASSES)
+                if (current_class >= sClassMgr->GetMaxClasses())
                 {
                     LOG_ERROR("sql.sql", "Wrong class {} in `playercreateinfo_item` table, ignoring.", current_class);
                     continue;
@@ -4494,7 +4496,7 @@ void ObjectMgr::LoadPlayerInfo()
                     uint32 min_race = current_race ? current_race : 1;
                     uint32 max_race = current_race ? current_race + 1 : sRaceMgr->GetMaxRaces();
                     uint32 min_class = current_class ? current_class : 1;
-                    uint32 max_class = current_class ? current_class + 1 : MAX_CLASSES;
+                    uint32 max_class = current_class ? current_class + 1 : sClassMgr->GetMaxClasses();
                     for (uint32 r = min_race; r < max_race; ++r)
                         for (uint32 c = min_class; c < max_class; ++c)
                             PlayerCreateInfoAddItemHelper(r, c, item_id, amount);
@@ -4546,7 +4548,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask != 0 && !(classMask & sClassMgr->GetPlayableClassMask()))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_skills` table, ignoring.", classMask);
                     continue;
@@ -4562,7 +4564,7 @@ void ObjectMgr::LoadPlayerInfo()
                 {
                     if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
                     {
-                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
+                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < sClassMgr->GetMaxClasses(); ++classIndex)
                         {
                             if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
                             {
@@ -4613,7 +4615,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask != 0 && !(classMask & sClassMgr->GetPlayableClassMask()))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_spell_custom` table, ignoring.", classMask);
                     continue;
@@ -4623,7 +4625,7 @@ void ObjectMgr::LoadPlayerInfo()
                 {
                     if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
                     {
-                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
+                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < sClassMgr->GetMaxClasses(); ++classIndex)
                         {
                             if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
                             {
@@ -4671,7 +4673,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                if (classMask != 0 && !(classMask & CLASSMASK_ALL_PLAYABLE))
+                if (classMask != 0 && !(classMask & sClassMgr->GetPlayableClassMask()))
                 {
                     LOG_ERROR("sql.sql", "Wrong class mask {} in `playercreateinfo_cast_spell` table, ignoring.", classMask);
                     continue;
@@ -4681,7 +4683,7 @@ void ObjectMgr::LoadPlayerInfo()
                 {
                     if (raceMask == 0 || ((1 << (raceIndex - 1)) & raceMask))
                     {
-                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < MAX_CLASSES; ++classIndex)
+                        for (uint32 classIndex = CLASS_WARRIOR; classIndex < sClassMgr->GetMaxClasses(); ++classIndex)
                         {
                             if (classMask == 0 || ((1 << (classIndex - 1)) & classMask))
                             {
@@ -4730,7 +4732,7 @@ void ObjectMgr::LoadPlayerInfo()
                 }
 
                 uint32 current_class = fields[1].Get<uint8>();
-                if (current_class >= MAX_CLASSES)
+                if (current_class >= sClassMgr->GetMaxClasses())
                 {
                     LOG_ERROR("sql.sql", "Wrong class {} in `playercreateinfo_action` table, ignoring.", current_class);
                     continue;
@@ -4803,7 +4805,7 @@ void ObjectMgr::LoadPlayerInfo()
             Field* fields = result->Fetch();
 
             uint32 current_class = fields[0].Get<uint8>();
-            if (current_class >= MAX_CLASSES)
+            if (current_class >= sClassMgr->GetMaxClasses())
             {
                 LOG_ERROR("sql.sql", "Wrong class {} in `player_class_stats` table, ignoring.", current_class);
                 continue;
@@ -4856,7 +4858,7 @@ void ObjectMgr::LoadPlayerInfo()
             if (!sChrRacesStore.LookupEntry(race))
                 continue;
 
-            for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
+            for (int class_ = 0; class_ < sClassMgr->GetMaxClasses(); ++class_)
             {
                 // skip non existed classes
                 if (!sChrClassesStore.LookupEntry(class_))
@@ -4976,7 +4978,7 @@ void ObjectMgr::LoadPlayerInfo()
 
 void ObjectMgr::GetPlayerClassLevelInfo(uint32 class_, uint8 level, PlayerClassLevelInfo* info) const
 {
-    if (level < 1 || class_ >= MAX_CLASSES)
+    if (level < 1 || class_ >= sClassMgr->GetMaxClasses())
         return;
 
     PlayerClassInfo const* pInfo = _playerClassInfo[class_];
@@ -4989,7 +4991,7 @@ void ObjectMgr::GetPlayerClassLevelInfo(uint32 class_, uint8 level, PlayerClassL
 
 void ObjectMgr::GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const
 {
-    if (level < 1 || race >= sRaceMgr->GetMaxRaces() || class_ >= MAX_CLASSES)
+    if (level < 1 || race >= sRaceMgr->GetMaxRaces() || class_ >= sClassMgr->GetMaxClasses())
         return;
 
     PlayerInfo const* pInfo = _playerInfo[race][class_];
@@ -5352,7 +5354,7 @@ void ObjectMgr::LoadQuests()
         // RequiredClasses, can be 0/CLASSMASK_ALL_PLAYABLE to allow any class
         if (qinfo->RequiredClasses)
         {
-            if (!(qinfo->RequiredClasses & CLASSMASK_ALL_PLAYABLE))
+            if (!(qinfo->RequiredClasses & sClassMgr->GetPlayableClassMask()))
             {
                 LOG_ERROR("sql.sql", "Quest {} does not contain any playable classes in `RequiredClasses` ({}), value set to 0 (all classes).", qinfo->GetQuestId(), qinfo->RequiredClasses);
                 qinfo->RequiredClasses = 0;
@@ -10025,7 +10027,7 @@ void ObjectMgr::LoadTrainers()
             ASSERT(isNew);
             if (trainerType == Trainer::Type::Class)
             {
-                if (!requirement || requirement >= MAX_CLASSES)
+                if (!requirement || requirement >= sClassMgr->GetMaxClasses())
                     LOG_ERROR("sql.sql", "Table `trainer` has invalid class requirement for trainer {}, ignoring");
                 else
                 {
@@ -11039,7 +11041,7 @@ PlayerInfo const* ObjectMgr::GetPlayerInfo(uint32 race, uint32 class_) const
 {
     if (race >= sRaceMgr->GetMaxRaces())
         return nullptr;
-    if (class_ >= MAX_CLASSES)
+    if (class_ >= sClassMgr->GetMaxClasses())
         return nullptr;
     PlayerInfo const* info = _playerInfo[race][class_];
     if (!info)
