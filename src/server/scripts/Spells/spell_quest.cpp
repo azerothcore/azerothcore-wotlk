@@ -229,6 +229,13 @@ class spell_q12014_steady_as_a_rock : public SpellScript
     }
 };
 
+enum BanishTheDemons
+{
+    SPELL_BANISHMENT                = 40825,
+    SPELL_BANISH_KILL_CREDIT        = 40828,
+    NPC_BANISHING_CRYSTAL_BUNNY_02  = 23327
+};
+
 class spell_q11026_a11051_banish_the_demons_aura : public AuraScript
 {
     PrepareAuraScript(spell_q11026_a11051_banish_the_demons_aura)
@@ -237,13 +244,13 @@ class spell_q11026_a11051_banish_the_demons_aura : public AuraScript
     {
         Unit* ar = GetTarget();
         if (ar && !ar->IsAlive())
-            ar->CastSpell(ar, 40828, true); // Banish kill credit
+            ar->CastSpell(ar, SPELL_BANISH_KILL_CREDIT, true);
     }
 
     void Register() override
     {
         // aura spell only
-        if (m_scriptSpellId == 40825)
+        if (m_scriptSpellId == SPELL_BANISHMENT)
             OnEffectRemove += AuraEffectRemoveFn(spell_q11026_a11051_banish_the_demons_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -254,16 +261,19 @@ class spell_q11026_a11051_banish_the_demons : public SpellScript
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        if (Unit* target = GetHitUnit())
-            if (Unit* owner = target->ToTempSummon()->GetSummonerUnit())
-                if (owner->IsPlayer())
-                    owner->ToPlayer()->KilledMonsterCredit(23327); // Some trigger, just count
+        Unit* target = GetHitUnit();
+        if (!target || !target->IsSummon())
+            return;
+
+        if (Unit* summoner = target->ToTempSummon()->GetSummonerUnit())
+            if (Player* owner = summoner->ToPlayer())
+                owner->RewardPlayerAndGroupAtEvent(NPC_BANISHING_CRYSTAL_BUNNY_02, target);
     }
 
     void Register() override
     {
         // script effect only
-        if (m_scriptSpellId == 40828)
+        if (m_scriptSpellId == SPELL_BANISH_KILL_CREDIT)
             OnEffectHitTarget += SpellEffectFn(spell_q11026_a11051_banish_the_demons::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
@@ -2535,6 +2545,53 @@ class spell_q13413_wyrmrest_skytalon_ride_periodic : public AuraScript
     }
 };
 
+// 48268 - Container of Rats
+enum LetThemNotRise
+{
+    SPELL_SKELETAL_TRANSFORM    = 48255,
+    SPELL_SUMMON_RAT            = 48272,
+
+    DATA_EATEN_BY_RATS          = 1,
+
+    RAT_COUNT                   = 6
+};
+
+class spell_q12211_container_of_rats : public SpellScript
+{
+    PrepareSpellScript(spell_q12211_container_of_rats);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SKELETAL_TRANSFORM, SPELL_SUMMON_RAT });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Creature* corpse = GetHitCreature();
+        if (!corpse)
+            return;
+
+        // blocks a second use, cleared on respawn
+        if (CreatureAI* ai = corpse->AI())
+            ai->SetData(DATA_EATEN_BY_RATS, 1);
+
+        for (uint8 i = 0; i < RAT_COUNT; ++i)
+            corpse->CastSpell(corpse, SPELL_SUMMON_RAT, true);
+
+        // not cancelled if the corpse is removed, don't morph it after respawn
+        corpse->m_Events.AddEventAtOffset([corpse]()
+        {
+            if (!corpse->IsAlive())
+                corpse->CastSpell(corpse, SPELL_SKELETAL_TRANSFORM, true);
+        }, randtime(6900ms, 8600ms));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12211_container_of_rats::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_quest_spell_scripts()
 {
     RegisterSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator);
@@ -2609,4 +2666,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
     RegisterSpellScript(spell_q13413_wyrmrest_skytalon_ride_periodic);
+    RegisterSpellScript(spell_q12211_container_of_rats);
 }
