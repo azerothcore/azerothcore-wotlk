@@ -1309,11 +1309,22 @@ void World::Update(uint32 diff)
         stmt->SetData(3, uint32(GameTime::GetStartTime().count()));
         LoginDatabase.Execute(stmt);
 
-        // Re-assert this realm as online in case the offline flag was set externally (e.g. an authserver restart).
+        // Re-assert this realm as online in case the offline flag was set externally (e.g. an authserver
+        // restart). Covers realm.Id.Realm plus every AdditionalRealmIDs alias - authserver's blanket offline
+        // reset on startup hits every realmlist row, but only this worldserver's own uptime tick clears it
+        // back, so without this loop alias rows would stay offline until the worldserver itself restarts.
         LoginDatabasePreparedStatement* onlineStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_REALM_ONLINE);
         onlineStmt->SetData(0, uint8(REALM_FLAG_OFFLINE));
         onlineStmt->SetData(1, realm.Id.Realm);
         LoginDatabase.Execute(onlineStmt);
+
+        for (uint32 additionalId : realm.AdditionalIds)
+        {
+            LoginDatabasePreparedStatement* aliasStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_REALM_ONLINE);
+            aliasStmt->SetData(0, uint8(REALM_FLAG_OFFLINE));
+            aliasStmt->SetData(1, additionalId);
+            LoginDatabase.Execute(aliasStmt);
+        }
     }
 
     ///- Process Game events when necessary
