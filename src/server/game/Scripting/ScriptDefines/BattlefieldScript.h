@@ -30,6 +30,7 @@ enum BattlefieldHook
     BATTLEFIELDHOOK_BEFORE_INVITE_PLAYER_TO_WAR,   // 4 - fires in InvitePlayerToWar before InvitedPlayers insert
     BATTLEFIELDHOOK_ON_WAR_END,                    // 5 - fires in EndBattle before OnBattleEnd(), while PlayersInWar is still populated
     BATTLEFIELDHOOK_ON_PLAYER_KILL,                // 6 - fires in HandleKill for every player-kills-player event
+    BATTLEFIELDHOOK_ON_WAR_START,                  // 7 - fires in StartBattle after OnBattleStart(), before worldstates are sent
     BATTLEFIELDHOOK_END
 };
 
@@ -111,6 +112,13 @@ public:
      * @param victim The player who was killed
      */
     virtual void OnBattlefieldPlayerKill(Battlefield* /*bf*/, Player* /*killer*/, Player* /*victim*/) { }
+
+    /**
+     * @brief Called in StartBattle() once the battle is live, before the world states are sent.
+     *
+     * @param bf The Battlefield instance that just started
+     */
+    virtual void OnBattlefieldWarStart(Battlefield* /*bf*/) { }
 };
 
 #endif // SCRIPT_OBJECT_BATTLEFIELD_SCRIPT_H_

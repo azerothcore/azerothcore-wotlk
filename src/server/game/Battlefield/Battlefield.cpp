@@ -405,6 +405,8 @@ void Battlefield::StartBattle()
 
     OnBattleStart();
 
+    sScriptMgr->OnBattlefieldWarStart(this);
+
     SendUpdateWorldStates();
 }
 
