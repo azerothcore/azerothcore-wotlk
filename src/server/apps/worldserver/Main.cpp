@@ -250,7 +250,11 @@ int main(int argc, char** argv)
         delete del;
     });
 
-    ASSERT(numThreads > 0);
+    if (numThreads <= 0)
+    {
+        LOG_FATAL("server.worldserver", "The number of threads is 0 or less.");
+        ABORT();
+    }
 
     for (int i = 0; i < numThreads; ++i)
     {
