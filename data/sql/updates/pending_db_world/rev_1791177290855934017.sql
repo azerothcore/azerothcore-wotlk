@@ -2,6 +2,8 @@
 -- Source: https://github.com/vmangos/core (db_latest release, locales_quest). Licence: GPL-2.0.
 -- A text is kept only when the source's English matches AzerothCore's English for the same quest,
 -- or, for sources without English, when it passes length, placeholder and language checks.
+-- vmangos texts are used only for a quest and column that SPP also has: elsewhere its French appears to be a community
+-- translation rather than the client's text.
 
 DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (1692, 3114, 3511, 3907, 4083, 6027, 6301, 8243, 8428, 8429);
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
@@ -16,9 +18,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (8428, 'frFR', 'La bataille dans le goulet des Chanteguerres contre les Sentinelles d''Aile-argent est d''une grande importance. Sous le prétexte de protéger une forêt qui ne lui appartient pas, l''Alliance cherche à refuser à la Horde l''une de ses plus grandes ressources en bois.$B$BNe la laissez pas faire, $N ! Revenez me voir quand vous aurez la preuve que vous avez bien servi la Horde !', 0),
 (8429, 'frFR', 'La bataille dans le goulet des Chanteguerres contre les Sentinelles d''Aile-argent est d''une grande importance. Sous le prétexte de protéger une forêt qui ne lui appartient pas, l''Alliance cherche à refuser à la Horde l''une de ses plus grandes ressources en bois.$B$BNe la laissez pas faire, $N ! Revenez me voir quand vous aurez la preuve que vous avez bien servi la Horde !', 0);
 
-DELETE FROM `quest_offer_reward_locale` WHERE `locale` = 'frFR' AND `ID` IN (5629, 5634, 6568, 7623, 7884, 8101, 8233, 8420, 8424);
+DELETE FROM `quest_offer_reward_locale` WHERE `locale` = 'frFR' AND `ID` IN (5634, 6568, 7623, 7884, 8101, 8233, 8420, 8424);
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
-(5629, 'frFR', 'Merveilleux, tu es revenu, $N. Tyrande et moi-même sommes toujours heureux lorsque ceux que nous avons formés partent dans le monde et nous reviennent sains et saufs. Comment cela se passe-t-il pour toi ? Elune bénit-elle toujours tes voyages ? Une fois que nous aurons parlé de nos affaires, tu pourras peut-être m''en dire plus sur tes voyages.', 0),
 (5634, 'frFR', 'Vous avez rendu un grand service à la Lumière en devenant un exemple remarquable pour ceux qui voyagent dans et au-delà de ces contrées dangereuses. S''il vous plaît, veuillez accepter cette leçon en remerciement de tout ce que vous avez fait.', 0),
 (6568, 'frFR', '<Myranda tient la note, fait une pause et sourit. >$B$BComment va-t-il ? Je veux dire Rexxar. Oh, détendez-vous, ne soyez pas si confus. Cette lettre a intentionnellement été laissée blanche. Elle portait avec elle les intentions et les pensées de son créateur. À en juger par son contenu, pas la peine de se demander pourquoi Rexxar l''a laissée comme ça. Imaginez ce qui se serait passé, si par la capture ou dans la mort, ces informations vous avaient échappé !$B$BOh, aucune importance ! Myranda vous aidera, $N. Je dois au Chef de guerre une faveur ou deux.', 0),
 (7623, 'frFR', 'Ma patience couvre des millénaires, $C. Mais ne vous imaginez pas que cela vous donne droit à plus d’une seconde de mon temps…', 0),
