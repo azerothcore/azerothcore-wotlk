@@ -34,6 +34,7 @@
 #include "WorldSessionMgr.h"
 #include "RBAC.h"
 #include "zlib.h"
+#include <algorithm>
 #include <memory>
 
 #include "ServerPktHeader.h"
@@ -593,7 +594,11 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<ClientAuthSession> a
         return;
     }
 
-    if (!sToCloud9Sidecar->ClusterModeEnabled() && authSession->RealmID != realm.Id.Realm)
+    // A client may select any realmlist row whose id is either this worldserver's own RealmID,
+    // or one of its AdditionalRealmIDs aliases (see Realm.AdditionalIds / worldserver.conf.dist).
+    bool isKnownRealmId = authSession->RealmID == realm.Id.Realm ||
+        std::find(realm.AdditionalIds.begin(), realm.AdditionalIds.end(), authSession->RealmID) != realm.AdditionalIds.end();
+    if (!sToCloud9Sidecar->ClusterModeEnabled() && !isKnownRealmId)
     {
         SendAuthResponseError(REALM_LIST_REALM_NOT_FOUND);
         LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client {} requested connecting with realm id {} but this realm has id {} set in config.",

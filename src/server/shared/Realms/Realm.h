@@ -21,6 +21,7 @@
 #include "AsioHacksFwd.h"
 #include "Common.h"
 #include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
+#include <vector>
 
 enum RealmFlags
 {
@@ -67,6 +68,12 @@ enum RealmType
 struct AC_SHARED_API Realm
 {
     RealmHandle Id;
+    // Extra realmlist row ids (set via the worldserver's AdditionalRealmIDs
+    // config option) that this worldserver also accepts/manages, in addition
+    // to Id.Realm. Lets several realmlist rows (e.g. one address per
+    // network) alias the same worldserver, while still rejecting any id
+    // that isn't explicitly listed here.
+    std::vector<uint32> AdditionalIds;
     uint32 Build;
     std::unique_ptr<boost::asio::ip::address> ExternalAddress;
     std::unique_ptr<boost::asio::ip::address> LocalAddress;
