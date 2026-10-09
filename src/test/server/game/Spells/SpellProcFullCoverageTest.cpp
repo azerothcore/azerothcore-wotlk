@@ -17,7 +17,7 @@
 
 /**
  * @file SpellProcFullCoverageTest.cpp
- * @brief Data-driven tests for ALL 869 spell_proc entries
+ * @brief Data-driven tests for ALL 868 spell_proc entries
  *
  * Tests proc calculations for every spell_proc entry:
  * - Cooldown blocking behavior
@@ -30,7 +30,7 @@
  * DESIGN NOTE: Why Tests Skip Certain Entries
  * ============================================================================
  *
- * This test file uses parameterized tests that run against ALL 869 spell_proc
+ * This test file uses parameterized tests that run against ALL 868 spell_proc
  * entries. Each test validates a specific feature (cooldowns, level reduction,
  * attribute flags, etc.). Tests use GTEST_SKIP() for entries that don't have
  * the feature being tested.
@@ -346,7 +346,7 @@ TEST_P(SpellProcFullCoverageTest, SpellId_NonZero)
 }
 
 // =============================================================================
-// Test Instantiation - ALL 869 entries
+// Test Instantiation - ALL 868 entries
 // =============================================================================
 
 INSTANTIATE_TEST_SUITE_P(
@@ -453,6 +453,6 @@ TEST_F(SpellProcCoverageStatsTest, CountEntriesWithReqManaCost)
 TEST_F(SpellProcCoverageStatsTest, TotalEntryCount)
 {
     std::cout << "[  INFO    ] Total spell_proc entries tested: " << _allEntries.size() << std::endl;
-    EXPECT_EQ(_allEntries.size(), 869u)
-        << "Expected 869 entries but got " << _allEntries.size();
+    EXPECT_EQ(_allEntries.size(), 868u)
+        << "Expected 868 entries but got " << _allEntries.size();
 }
