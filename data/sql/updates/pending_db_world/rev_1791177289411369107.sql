@@ -5,7 +5,7 @@
 -- A text is kept only when the source's English matches AzerothCore's English for the same quest,
 -- or, for sources without English, when it passes length, placeholder and language checks.
 
-DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (76, 208, 833, 8281, 8304, 8320, 8334, 8473, 8475, 8476, 8490, 8892, 8894, 9147, 9155, 9158, 9159, 9160, 9173, 9192, 9274, 9276, 9283, 9294, 9352, 9355, 9398, 9399, 9513, 9515, 9538, 9716, 9720, 9730, 9747, 9785, 9786, 9789, 9791, 9804, 9810, 9817, 9819, 9855, 9857, 9858, 9862, 9878, 9901, 9921, 9922, 9924, 9925, 9938, 10007, 10050, 10057, 10096, 10099, 10159, 10232, 10302, 10303, 10308, 10336, 10394, 10396, 10400, 10418, 10482, 10515, 10701, 10703, 10855, 10937, 11129, 11576, 11605, 11607, 11617, 11619, 11653, 11730, 11889, 11904, 11913, 11973, 12013, 12035, 12092, 12150, 12166, 12168, 12169, 12310, 12520, 12525, 12529, 12533, 12536, 12549, 12550, 12551, 12603, 12620, 12637, 12638, 12645, 12680, 12733, 12742, 12743, 12744, 12745, 12746, 12747, 12748, 12749, 12805, 12842, 12865, 12874, 12957, 12986, 13318, 13323, 13352, 13353, 13354, 13414, 13592, 13643, 13662, 13671, 13679, 13680, 13682, 13749, 13760, 13789, 13791, 13810, 13813, 13828, 13829, 13835, 13837, 13851, 13861, 13862, 13863, 13864);
+DELETE FROM `quest_request_items_locale` WHERE `locale` = 'frFR' AND `ID` IN (76, 208, 833, 8281, 8304, 8320, 8334, 8473, 8475, 8476, 8490, 8892, 8894, 9147, 9155, 9158, 9159, 9160, 9173, 9192, 9274, 9276, 9283, 9294, 9352, 9355, 9398, 9399, 9513, 9515, 9538, 9716, 9720, 9730, 9747, 9785, 9786, 9789, 9791, 9804, 9810, 9817, 9819, 9855, 9857, 9858, 9862, 9878, 9901, 9921, 9922, 9924, 9925, 9938, 10007, 10050, 10057, 10096, 10099, 10159, 10232, 10302, 10303, 10308, 10336, 10394, 10396, 10400, 10418, 10482, 10515, 10701, 10703, 10855, 10937, 11129, 11576, 11605, 11607, 11617, 11619, 11653, 11730, 11889, 11904, 11913, 11973, 12013, 12035, 12092, 12150, 12166, 12168, 12169, 12520, 12525, 12529, 12533, 12536, 12549, 12550, 12551, 12603, 12620, 12637, 12638, 12645, 12680, 12733, 12742, 12743, 12744, 12745, 12746, 12747, 12748, 12749, 12805, 12842, 12865, 12874, 12957, 12986, 13318, 13323, 13352, 13353, 13354, 13414, 13592, 13643, 13662, 13671, 13679, 13680, 13682, 13749, 13760, 13789, 13791, 13810, 13813, 13828, 13829, 13835, 13837, 13851, 13861, 13862, 13863, 13864);
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (76, 'frFR', 'Salut, $N. Quel est votre compte rendu ? Avez-vous exploré la Mine Veine-de-jaspe ?', 0),
 (208, 'frFR', 'Je vois que vous êtes de retour, $gmon grand:m''dame;. Je suis revenu plus d''une fois au camp sur les genoux à cause du roi Bangalash. Accrochez-vous.', 0),
@@ -101,7 +101,6 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (12166, 'frFR', 'C''est une honte que nous soyons incapables de soigner les ours et les orignaux victimes de la présence du Fléau.$B$BAu moins pouvons-nous enrayer la propagation de la souillure.', 0),
 (12168, 'frFR', 'Je sens la proximité d''une chose infecte.$B$BC''est sur vous ! Qu''est-ce donc, $N ?', 0),
 (12169, 'frFR', 'Je sens que le haut-sectateur Zangus est toujours vivant.$B$BQuelque chose ne va pas, $N ? Peut-être avez-vous besoin de vous reposer d''abord ?', 0),
-(12310, 'frFR', 'Est-ce fait, %N?', 0),
 (12520, 'frFR', 'Alors, vous avez maîtrisé ces bêtes ou vous jetez l''éponge ?', 0),
 (12525, 'frFR', 'Vous êtes vous $goccupé:occupée; de Ricarnaque et de son garde du corps ?', 0),
 (12529, 'frFR', 'Vous encore $gvivant:vivante; ! Les Poings-durs vous mangent pas encore ?$B$BPeut-être ils vous mangent plus tard.', 0),
@@ -159,7 +158,3 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (13862, 'frFR', 'Avez-vous combattu l''ennemi dans la cour des Ossements ?', 0),
 (13863, 'frFR', 'Avez-vous combattu l''ennemi dans la cour des Ossements ?', 0),
 (13864, 'frFR', 'Avez-vous combattu l''ennemi dans la cour des Ossements ?', 0);
-
-DELETE FROM `quest_offer_reward_locale` WHERE `locale` = 'frFR' AND `ID` IN (24815);
-INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
-(24815, 'frFR', 'Pour expier les pêchés que j''ai commis en tant que chevalier de la mort du roi-liche, je me suis consacré à la création d''anneaux de grande puissance que nos frères et sœurs peuvent utiliser dans notre lutte.$B$BVous vous êtes $grévélé un allié:révélée une alliée; de valeur dans notre combat contre le Fléau, $N. Comme votre dévouement demeure, je peux améliorer la conception originelle de l''anneau.$B$BChoisissez votre voix avec soin. Changer d''opinion aura un prix.', 0);
