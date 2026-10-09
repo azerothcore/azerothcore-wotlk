@@ -73,9 +73,9 @@ struct boss_gyth : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         events.ScheduleEvent(EVENT_CORROSIVE_ACID, 8s, 16s);
         events.ScheduleEvent(EVENT_FREEZE, 8s, 16s);

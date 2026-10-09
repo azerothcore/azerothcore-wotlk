@@ -348,9 +348,9 @@ struct boss_sartharion : public BossAI
             DoCastSelf(SPELL_SARTHARION_TWILIGHT_REVENGE, true);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         DoCastSelf(SPELL_SARTHARION_PYROBUFFET, true);
         ScheduleEnrageTimer(SPELL_SARTHARION_ENRAGE, 15min);
         Talk(SAY_SARTHARION_AGGRO);

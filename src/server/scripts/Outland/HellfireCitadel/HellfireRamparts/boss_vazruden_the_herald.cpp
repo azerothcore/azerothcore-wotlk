@@ -96,14 +96,14 @@ struct boss_vazruden_the_herald : public BossAI
         }
     }
 
-    void SummonedCreatureDies(Creature* summon, Unit*) override
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
         summons.Despawn(summon);
         if (summon->GetEntry() == NPC_HELLFIRE_SENTRY && summons.size() == 0)
         {
             Talk(SAY_INTRO);
             me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 85.0f, FORCED_MOVEMENT_NONE, 0.f, false);
-            _JustEngagedWith();
+            _JustEngagedWith(killer);
         }
         else if (summons.size() == 0)
         {

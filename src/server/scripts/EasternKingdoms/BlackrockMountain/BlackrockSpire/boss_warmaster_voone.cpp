@@ -59,9 +59,9 @@ struct boss_warmaster_voone : public BossAI
 {
     boss_warmaster_voone(Creature* creature) : BossAI(creature, DATA_WARMASTER_VOONE) { }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         events.SetPhase(PHASE_BRAWLER);
         events.ScheduleEvent(EVENT_THRASH, 3s, GROUP_BRAWLER, PHASE_BRAWLER);

@@ -37,10 +37,10 @@ struct boss_the_maker : public BossAI
     boss_the_maker(Creature* creature) : BossAI(creature, DATA_THE_MAKER)
     {    }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         scheduler.Schedule(6s, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_EXPLODING_BEAKER);

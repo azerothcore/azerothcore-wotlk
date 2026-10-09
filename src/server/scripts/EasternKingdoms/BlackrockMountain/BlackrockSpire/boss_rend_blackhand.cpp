@@ -151,9 +151,9 @@ struct boss_rend_blackhand : public BossAI
         summon->AI()->DoZoneInCombat(nullptr, 100.0f);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_WHIRLWIND, 13s, 15s);
         events.ScheduleEvent(EVENT_CLEAVE, 15s, 17s);
         events.ScheduleEvent(EVENT_MORTAL_STRIKE, 17s, 19s);

@@ -87,9 +87,9 @@ struct boss_isalien : public BossAI
         summons.Summon(summon);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         _scheduler.Schedule(4s, 5s, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_NET);

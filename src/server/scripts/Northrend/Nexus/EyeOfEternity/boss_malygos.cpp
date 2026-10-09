@@ -311,9 +311,9 @@ struct boss_malygos : public BossAI
             me->RemoveAura(SPELL_POWER_SPARK_MALYGOS_BUFF);
     }
 
-    void JustEngagedWith(Unit*  /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.Reset();
         Talk(SAY_PHASE_1);
         events.RescheduleEvent(EVENT_INTRO_MOVE_CENTER, 0ms, 1);
