@@ -19,7 +19,7 @@ services:
       - ${DOCKER_VOL_DB:-ac-database}:/var/lib/mysql
     restart: unless-stopped
     healthcheck:
-      test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
+      test: "/usr/bin/mysql --user=root --password=\"$$MYSQL_ROOT_PASSWORD\" --execute \"SHOW DATABASES;\""
       interval: 5s
       timeout: 10s
       retries: 40
