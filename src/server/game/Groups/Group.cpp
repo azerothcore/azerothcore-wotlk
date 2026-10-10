@@ -769,6 +769,9 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
     // If group size before player removal <= 2 then disband it
     else
     {
+        // As in the branch above: a player who leaves or is kicked can't win a roll the disband settles
+        RemovePlayerFromRolls(guid);
+
         sScriptMgr->OnGroupRemoveMember(this, guid, method, kicker, reason);
         Disband();
         return false;
@@ -819,6 +822,11 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
 void Group::ForcedDisband(bool hideDestroy /* = false */)
 {
     sScriptMgr->OnGroupDisband(this);
+
+    // Settle open rolls: only CountTheRoll unblocks a rolled item, and the looted object's roll timer
+    // can't once the group is gone, so the item would stay locked
+    while (!RollId.empty())
+        CountTheRoll(RollId.begin());
 
     Player* player;
     uint32 instanceId = 0;
