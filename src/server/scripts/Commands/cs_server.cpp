@@ -590,7 +590,7 @@ public:
             localeConstant = GetLocaleByName(locale);
         else
         {
-            handler->SendErrorMessage("locale ({}) is not valid. Valid locales: enUS, koKR, frFR, deDE, zhCN, zhWE, esES, esMX, ruRU.", locale);
+            handler->SendErrorMessage("locale ({}) is not valid. Valid locales: enUS, koKR, frFR, deDE, zhCN, zhTW, esES, esMX, ruRU.", locale);
             return false;
         }
 
