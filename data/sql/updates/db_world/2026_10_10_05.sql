@@ -1,3 +1,4 @@
+-- DB update 2026_10_10_04 -> 2026_10_10_05
 --
 SET @TASKMASTER := 17058;
 SET @BRUTE := 16938;
