@@ -1335,8 +1335,13 @@ public:
     Item* EquipItem(uint16 pos, Item* pItem, bool update);
     void AutoUnequipOffhandIfNeed(bool force = false);
     bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
-    void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
-    void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false) { AutoStoreLoot(NULL_BAG, NULL_SLOT, loot_id, store, broadcast); }
+    void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false,
+        WorldObject* lootSource = nullptr);
+    void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false,
+        WorldObject* lootSource = nullptr)
+    {
+        AutoStoreLoot(NULL_BAG, NULL_SLOT, loot_id, store, broadcast, lootSource);
+    }
     LootItem* StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg);
     void UpdateLootAchievements(LootItem* item, Loot* loot);
     void UpdateTitansGrip();

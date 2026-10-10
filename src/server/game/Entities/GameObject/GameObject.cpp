@@ -3108,6 +3108,43 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     return nullptr;
 }
 
+uint32 GameObject::GetGatheringLockType() const
+{
+    // Three fishing holes carry no lock at all, so the type is what identifies them. Every other
+    // hole resolves through its lock below; answering here keeps all of them consistent.
+    if (GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
+        return LOCKTYPE_FISHING;
+
+    uint32 lockId = GetGOInfo()->GetLockId();
+    if (!lockId)
+        return 0;
+
+    LockEntry const* lock = sLockStore.LookupEntry(lockId);
+    if (!lock)
+        return 0;
+
+    // A lock can require several skills at once and the gathering one is not always listed first:
+    // Sanguine Hibiscus wants kneeling then herbalism, Chunk of Saronite wants tinkering then
+    // mining. Returning on the first skill entry would miss both, so every case is checked.
+    for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
+    {
+        if (lock->Type[i] != LOCK_KEY_SKILL)
+            continue;
+
+        switch (lock->Index[i])
+        {
+            case LOCKTYPE_MINING:
+            case LOCKTYPE_HERBALISM:
+            case LOCKTYPE_FISHING:
+                return lock->Index[i];
+            default:
+                break;
+        }
+    }
+
+    return 0;
+}
+
 void GameObject::AddToSkillupList(ObjectGuid const& playerGuid)
 {
     int32 timer = GetMap()->IsDungeon() ? -1 : 10 * MINUTE * IN_MILLISECONDS;

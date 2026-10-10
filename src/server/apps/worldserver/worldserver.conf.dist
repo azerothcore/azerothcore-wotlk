@@ -2870,6 +2870,66 @@ Rate.Drop.Item.ReferencedAmount = 1
 Rate.Drop.Item.GroupAmount = 1
 
 #
+#    Rate.Mining.DropAmount
+#    Rate.Herbalism.DropAmount
+#    Rate.Skinning.DropAmount
+#    Rate.Fishing.DropAmount
+#    Rate.Milling.DropAmount
+#    Rate.Prospecting.DropAmount
+#    Rate.Disenchanting.DropAmount
+#    Rate.Pickpocketing.DropAmount
+#        Description: Multiplier for how many items a profession action yields, per source.
+#                     Scales the stack size an item drops in, the same way raising mincount
+#                     and maxcount in the matching *_loot_template would. Unlike
+#                     Rate.Drop.Item.*, which decide whether an item drops at all, these
+#                     decide how much of it you get once it has dropped.
+#                     Example: Rate.Fishing.DropAmount = 3 catches three fish per cast.
+#                     Each rate follows the skill the loot actually requires, not the table it
+#                     comes from. Mining and Herbalism apply only to nodes and corpses requiring
+#                     that skill, so an ordinary chest is unaffected even though it shares the
+#                     same loot table, and a corpse that is mined or herbed rather than skinned
+#                     follows its own rate instead of Skinning's. Corpses looted with engineering
+#                     - mechanicals, and gas clouds emptied with a mote extractor - are left
+#                     blizzlike, since engineering has no rate here.
+#                     What decides whether a row scales is the row's own quest flag, not what the
+#                     object is for. Rows flagged as quest drops - the ones that only appear for a
+#                     player on the quest - are never scaled, since an objective's count is fixed.
+#                     An unflagged row scales even when it holds a Quest-class item and even on an
+#                     object that exists only for a quest, so a high Fishing rate multiplies
+#                     Speckled Tastyfish and shortens the Stranglethorn Fishing Extravaganza, and a
+#                     high Herbalism rate makes a Sanguine Hibiscus pick yield several at once.
+#                     Fishing covers open-water casts, fishing pools, and the junk caught when a
+#                     cast outside a pool fails.
+#                     Fractional values work by chance, since an item count is a whole number:
+#                     1.25 gives the extra item one time in four, so the average over many
+#                     gathers is 1.25 times blizzlike. Whole values are exact, so 2 is always
+#                     precisely double.
+#                     Values below 1 thin stacks but never remove an item that already
+#                     passed its drop roll, so a stack of one stays at one and a value below 1
+#                     has no effect on loot that only ever drops one. How much that matters
+#                     varies by profession: fishing is almost entirely single-catch, while
+#                     milling and prospecting roll several pigments or gems and thin as you
+#                     would expect.
+#                     A loot window holds at most 18 stacks, so very large values are capped by
+#                     that limit - and a node whose scaled rows fill all 18 stops granting quest
+#                     loot from the same node, since a quest row is never scaled and so has no
+#                     slot left to occupy. Where that starts depends on how many rows the node
+#                     drops and how large they stack, so it is worth checking any quest gathering
+#                     objective at the rate you intend to run. It is usually in the tens, but on
+#                     a pickpocket target whose items do not stack it can be single digits.
+#        Default:     1 - (Disabled, blizzlike amounts)
+#        Range:       a finite value > 0
+
+Rate.Mining.DropAmount        = 1
+Rate.Herbalism.DropAmount     = 1
+Rate.Skinning.DropAmount      = 1
+Rate.Fishing.DropAmount       = 1
+Rate.Milling.DropAmount       = 1
+Rate.Prospecting.DropAmount   = 1
+Rate.Disenchanting.DropAmount = 1
+Rate.Pickpocketing.DropAmount = 1
+
+#
 #    LootNeedBeforeGreedILvlRestriction
 #        Description: Specify level restriction for items below player's subclass in Need Before Greed loot mode in DF groups
 #        Default:     70
