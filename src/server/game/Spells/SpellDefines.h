@@ -162,12 +162,6 @@ enum TriggerCastFlags
     TRIGGERED_FULL_DEBUG_MASK                       = 0xFFFFFFFF
 };
 
-enum SpellImmuneBlockType
-{
-    SPELL_BLOCK_TYPE_ALL        = 0,
-    SPELL_BLOCK_TYPE_POSITIVE   = 1,
-};
-
 typedef std::pair<SpellValueMod, int32> CustomSpellValueMod;
 class CustomSpellValues : public std::vector<CustomSpellValueMod>
 {
