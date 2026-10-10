@@ -206,7 +206,7 @@ struct npc_voidtraveler : public ScriptedAI
         {
             if (Unit* vorpil = summon->GetSummonerUnit())
             {
-                me->GetMotionMaster()->MoveFollow(vorpil, 0.0f, 0.0f);
+                me->GetMotionMaster()->MoveFollow(vorpil, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, true, false);
             }
         }
 

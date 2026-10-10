@@ -142,6 +142,30 @@ enum barkTrigger
     QUEST_BARK_FOR_VOODOO               = 11408,
     QUEST_BARK_FOR_BARLEY               = 11293,
     QUEST_BARK_FOR_THUNDERBREW          = 11294,
+
+    // Bark for Drohn's Distillery!
+    SAY_DROHN_DISTILLERY_1              = 23520,
+    SAY_DROHN_DISTILLERY_2              = 23521,
+    SAY_DROHN_DISTILLERY_3              = 23522,
+    SAY_DROHN_DISTILLERY_4              = 23523,
+
+    // Bark for T'chali's Voodoo Brewery!
+    SAY_TCHALIS_VOODOO_1                = 23524,
+    SAY_TCHALIS_VOODOO_2                = 23525,
+    SAY_TCHALIS_VOODOO_3                = 23526,
+    SAY_TCHALIS_VOODOO_4                = 23527,
+
+    // Bark for the Barleybrews!
+    SAY_BARLEYBREW_1                    = 23464,
+    SAY_BARLEYBREW_2                    = 23465,
+    SAY_BARLEYBREW_3                    = 23466,
+    SAY_BARLEYBREW_4                    = 22941,
+
+    // Bark for the Thunderbrews!
+    SAY_THUNDERBREW_1                   = 23467,
+    SAY_THUNDERBREW_2                   = 23468,
+    SAY_THUNDERBREW_3                   = 23469,
+    SAY_THUNDERBREW_4                   = 22942
 };
 
 struct npc_brewfest_bark_trigger : public ScriptedAI
@@ -193,60 +217,27 @@ struct npc_brewfest_bark_trigger : public ScriptedAI
                 if (q_status.CreatureOrGOCount[me->GetEntry() - 24202] == 0)
                 {
                     player->KilledMonsterCredit(me->GetEntry());
-                    player->Say(GetTextFor(me->GetEntry(), quest).c_str(), LANG_UNIVERSAL, player);
+                    player->Say(GetTextFor(quest), player);
                 }
             }
         }
     }
 
-    std::string GetTextFor(uint32  /*entry*/, uint32 questId)
+    uint32 GetTextFor(uint32 questId)
     {
-        std::string str = "";
         switch (questId)
         {
             case QUEST_BARK_FOR_DROHN:
+                return RAND(SAY_DROHN_DISTILLERY_1, SAY_DROHN_DISTILLERY_2, SAY_DROHN_DISTILLERY_3, SAY_DROHN_DISTILLERY_4);
             case QUEST_BARK_FOR_VOODOO:
-                {
-                    switch (urand(0, 3))
-                    {
-                        case 0:
-                            str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " and drink for the horde!";
-                            break;
-                        case 1:
-                            str = "If you think an orc can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + ", only at Brewfest!";
-                            break;
-                        case 2:
-                            str = "Celebrate Brewfest with orcs that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " at Brewfest!";
-                            break;
-                        case 3:
-                            str = std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + "  knows how to party hard! Check them out at Brewfest!";
-                            break;
-                    }
-                    break;
-                }
+                return RAND(SAY_TCHALIS_VOODOO_1, SAY_TCHALIS_VOODOO_2, SAY_TCHALIS_VOODOO_3, SAY_TCHALIS_VOODOO_4);
             case QUEST_BARK_FOR_BARLEY:
+                return RAND(SAY_BARLEYBREW_1, SAY_BARLEYBREW_2, SAY_BARLEYBREW_3, SAY_BARLEYBREW_4);
             case QUEST_BARK_FOR_THUNDERBREW:
-                {
-                    switch (urand(0, 3))
-                    {
-                        case 0:
-                            str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " and drink for the alliance!";
-                            break;
-                        case 1:
-                            str = "If you think an dwarf can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + ", only at Brewfest!";
-                            break;
-                        case 2:
-                            str = "Celebrate Brewfest with dwarves that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " at Brewfest!";
-                            break;
-                        case 3:
-                            str = std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + "  knows how to party hard! Check them out at Brewfest!";
-                            break;
-                    }
-                    break;
-                }
+                return RAND(SAY_THUNDERBREW_1, SAY_THUNDERBREW_2, SAY_THUNDERBREW_3, SAY_THUNDERBREW_4);
+            default:
+                return 0;
         }
-
-        return str;
     }
 };
 

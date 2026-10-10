@@ -896,6 +896,34 @@ private:
     uint32 _lastSummonTime{};
 };
 
+// 62828, 62831, 62835 - Recharge Robot
+// The core rolls a random point around the pile and takes its height from below, so a point that
+// lands on a scrap heap keeps the floor under it. Ask from above the heaps instead.
+class spell_xt002_recharge_robot : public SpellScript
+{
+    PrepareSpellScript(spell_xt002_recharge_robot);
+
+    static constexpr float SearchAboveHeaps = 15.0f; // taller than any scrap heap in the room
+
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+
+        float const z = caster->GetMapHeight(dest._position.GetPositionX(), dest._position.GetPositionY(),
+            caster->GetPositionZ() + SearchAboveHeaps);
+        if (z <= INVALID_HEIGHT)
+            return;
+
+        dest._position.m_positionZ = z;
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_xt002_recharge_robot::SetDest, EFFECT_0,
+            TARGET_DEST_DEST_RANDOM);
+    }
+};
+
 // 62775 - Tympanic Tantrum
 class spell_xt002_tympanic_tantrum : public SpellScript
 {
@@ -1091,6 +1119,7 @@ void AddSC_boss_xt002()
     RegisterSpellScript(spell_xt002_gravity_bomb_damage);
     RegisterSpellScript(spell_xt002_heart_overload_periodic);
     RegisterUlduarCreatureAI(npc_xt_toy_pile);
+    RegisterSpellScript(spell_xt002_recharge_robot);
     RegisterSpellScript(spell_xt002_tympanic_tantrum);
     RegisterSpellScript(spell_xt002_321_boombot_aura);
     RegisterSpellScript(spell_xt002_exposed_heart);
