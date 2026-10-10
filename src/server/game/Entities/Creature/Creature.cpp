@@ -39,6 +39,7 @@
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
+#include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
@@ -229,9 +230,9 @@ bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
                 assistant->EngageWithTarget(victim);
 
                 // When nearby mobs aggro from another mob's initial call for assistance
-                // their leash timers become linked and attacking one will keep the rest from evading.
+                // their leashes become linked and attacking one will keep the rest from evading.
                 if (assistant->IsEngaged())
-                    assistant->SetLastLeashExtensionTimePtr(m_owner->GetLastLeashExtensionTimePtr());
+                    assistant->SetLeashPtr(m_owner->GetLeashPtr());
             }
         }
     }
@@ -268,7 +269,9 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_alreadyCallForHelp(false), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _gossipMenuId(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
-    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f),_sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), m_lastLeashExtensionTime(nullptr),
+    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr),
+    m_detectionDistance(20.0f), _sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr),
+    m_leash(nullptr), _leashRefreshSeen(0), _leashTimer(0), _leashBroken(false),
     _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _highestPlayerAttackerLevel(0), _isCombatMovementAllowed(true)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
@@ -864,16 +867,6 @@ void Creature::Update(uint32 diff)
                 }
                 else
                     m_moveCircleMovementTime -= diff;
-
-                // Periodically check if able to move, if not, extend leash timer
-                if (diff >= m_extendLeashTime)
-                {
-                    if (HasUnitState(UNIT_STATE_LOST_CONTROL))
-                        UpdateLeashExtensionTime();
-                    m_extendLeashTime = EXTEND_LEASH_CHECK_INTERVAL;
-                }
-                else
-                    m_extendLeashTime -= diff;
             }
 
             // Call for assistance if not disabled
@@ -906,6 +899,10 @@ void Creature::Update(uint32 diff)
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
             if (!IsAlive())
                 break;
+
+            // After the AI, so a spell it cast this update counts as attacking
+            if (Unit* victim = GetVictim())
+                UpdateLeash(victim, diff);
 
             m_regenTimer -= diff;
             if (m_regenTimer <= 0)
@@ -2734,10 +2731,13 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         if (!IsWithinDist(victim, visibility))
             return false;
 
-        // pussywizard: don't check distance to home position if recently damaged (allow kiting away from spawnpoint!)
         // xinef: this should include taunt auras
-        if (!isWorldBoss() && (GetLastLeashExtensionTime() + GetLeashTimer() > GameTime::GetGameTime().count() || HasTauntAura()))
+        if (HasTauntAura())
             return true;
+
+        // Leashes by time (UpdateLeash); a broken leash recovers when attacked or when the victim returns
+        if (IsEngaged())
+            return !_leashBroken || GetLeashPtr()->Refreshes != _leashRefreshSeen || IsWithinLeash(victim);
     }
 
     if (skipDistCheck)
@@ -2749,17 +2749,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         return victim->IsWithinDist(unit, visibilityDist);
     }
 
-    float dist = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
-    if (!dist)
-        return true;
-
-    float x, y, z;
-    x = y = z = 0.0f;
-    MovementGenerator* idleSlot = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE);
-    if (idleSlot && idleSlot->GetResetPosition(x, y, z))
-        return IsInDist2d(x, y, dist);
-    else
-        return IsInDist2d(&m_homePosition, dist);
+    return true;
 }
 
 CreatureAddon const* Creature::GetCreatureAddon() const
@@ -2894,6 +2884,10 @@ void Creature::AtEngage(Unit* target)
 {
     Unit::AtEngage(target);
 
+    // Before the AI engages, so pets and assistants can share it
+    ClearLeash();
+    m_leash = std::make_shared<CreatureLeash>(CreatureLeash{ GetPosition() });
+
     if (!IsStandState())
         SetStandState(UNIT_STAND_STATE_STAND);
 
@@ -2935,7 +2929,6 @@ void Creature::AtEngage(Unit* target)
     if (CreatureAI* ai = AI())
     {
         ai->JustEngagedWith(target);
-        UpdateLeashExtensionTime();
 
         if (CreatureGroup* formation = GetFormation())
             formation->MemberEngagingTarget(this, target);
@@ -3761,41 +3754,106 @@ bool Creature::IsNotReachableAndNeedRegen() const
     return CanNotReachTarget() && GetCombatManager().IsEvadeRegen();
 }
 
-std::shared_ptr<time_t> const& Creature::GetLastLeashExtensionTimePtr() const
+std::shared_ptr<CreatureLeash> const& Creature::GetLeashPtr() const
 {
-    if (m_lastLeashExtensionTime == nullptr)
-        m_lastLeashExtensionTime = std::make_shared<time_t>(GameTime::GetGameTime().count());
-    return m_lastLeashExtensionTime;
+    if (m_leash == nullptr)
+        m_leash = std::make_shared<CreatureLeash>(CreatureLeash{ GetPosition() });
+    return m_leash;
 }
 
-void Creature::SetLastLeashExtensionTimePtr(std::shared_ptr<time_t> const& timer)
+void Creature::SetLeashPtr(std::shared_ptr<CreatureLeash> const& leash)
 {
-    m_lastLeashExtensionTime = timer;
+    m_leash = leash;
 }
 
-void Creature::ClearLastLeashExtensionTimePtr()
+// Keeps whichever leash attacks have moved more
+void Creature::ShareLeashWith(Creature* other)
 {
-    m_lastLeashExtensionTime.reset();
+    if (other->GetLeashPtr()->Refreshes >= GetLeashPtr()->Refreshes)
+        SetLeashPtr(other->GetLeashPtr());
+    else
+        other->SetLeashPtr(GetLeashPtr());
 }
 
-time_t Creature::GetLastLeashExtensionTime() const
+void Creature::ClearLeash()
 {
-    return *GetLastLeashExtensionTimePtr();
+    m_leash.reset();
+    _leashRefreshSeen = 0;
+    _leashTimer = 0;
+    _leashBroken = false;
 }
 
-void Creature::UpdateLeashExtensionTime()
+// Moves the leash point to where the creature stands and restarts the count
+void Creature::RefreshLeash()
 {
-    (*GetLastLeashExtensionTimePtr()) = GameTime::GetGameTime().count();
+    CreatureLeash& leash = *GetLeashPtr();
+    leash.Point.Relocate(this);
+    ++leash.Refreshes;
 }
 
-uint8 Creature::GetLeashTimer() const
-{ // Based on testing on Classic, seems to range from ~11s for low level mobs (1-5) to ~16s for high level mobs (70+)
-    uint8 timerOffset = 11;
+// Fitted to TBC Classic sniffs: 15 s at the victim's level, 0.15 s less per level below it, 10 to 16 s
+uint32 Creature::GetLeashTime(Unit const* victim) const
+{
+    int32 const levelDiff = int32(GetLevel()) - int32(victim->GetLevel());
+    return uint32(std::clamp(15.0f + levelDiff * 0.15f, 10.0f, 16.0f) * IN_MILLISECONDS);
+}
 
-    uint8 timerModifier = uint8(GetCreatureTemplate()->minlevel / 10) - 2;
+// Fitted to TBC Classic sniffs: 24 yd at the victim's level, 3/4 yd less per level below it, at least 5 yd,
+// capped by the config (25 yd)
+float Creature::GetLeashRadius(Unit const* victim) const
+{
+    int32 const levelDiff = int32(GetLevel()) - int32(victim->GetLevel());
+    float const radius = std::max(5.0f, 24.0f + levelDiff * 0.75f);
+    return std::min(sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS), radius);
+}
 
-    // Formula is likely not quite correct, but better than flat timer
-    return std::max<uint8>(timerOffset, timerOffset + timerModifier);
+// Times how long the creature stays outside the leash, paused while it has lost control
+void Creature::UpdateLeash(Unit const* victim, uint32 diff)
+{
+    if (!sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS) || IsInEvadeMode() || GetCharmerOrOwnerGUID().IsPlayer())
+        return;
+
+    if (GetMap()->IsDungeon())
+        return;
+
+    CreatureLeash const& leash = *GetLeashPtr();
+    if (leash.Refreshes != _leashRefreshSeen)
+    {
+        _leashRefreshSeen = leash.Refreshes;
+        _leashTimer = 0;
+        _leashBroken = false;
+    }
+
+    if (HasUnitState(UNIT_STATE_LOST_CONTROL))
+        return;
+
+    uint32 const leashTime = GetLeashTime(victim);
+    if (IsWithinLeash(victim))
+        _leashTimer = 0;
+    else
+        _leashTimer = std::min(_leashTimer + diff, leashTime);
+
+    _leashBroken = _leashTimer >= leashTime;
+}
+
+// Within the leash while the creature can attack its victim: always if the victim stands still,
+// otherwise only while the creature is within the leash radius of the leash point
+bool Creature::IsWithinLeash(Unit const* victim) const
+{
+    // Melee range, or casting at it
+    bool attacking = IsWithinMeleeRange(victim);
+    for (CurrentSpellTypes type : { CURRENT_GENERIC_SPELL, CURRENT_CHANNELED_SPELL })
+        if (Spell const* spell = GetCurrentSpell(type))
+            attacking |= spell->m_targets.GetUnitTargetGUID() == victim->GetGUID();
+
+    // Includes victims it can't reach
+    if (!attacking)
+        return false;
+
+    if (!victim->isMoving() && victim->movespline->Finalized())
+        return true;
+
+    return GetExactDist2d(&GetLeashPtr()->Point) <= GetLeashRadius(victim);
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const
