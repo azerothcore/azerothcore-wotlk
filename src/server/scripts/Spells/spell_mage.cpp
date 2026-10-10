@@ -415,10 +415,10 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
     {
         PrepareAuraScript(spell_mage_combustion_proc);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION });
-    }
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION });
+        }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
@@ -427,7 +427,8 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
 
         void Register() override
         {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc::OnRemove, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc::OnRemove, EFFECT_0,
+                SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -1063,9 +1064,12 @@ class spell_mage_combustion : public AuraScript
             // it (this hook runs from Aura::GetProcEffectMask); defer it so the insert can't
             // invalidate the live iterator (aura containers are flat_multimaps).
             Unit* actor = eventInfo.GetActor();
-            actor->m_Events.AddEventAtOffset([actor]()
+            ObjectGuid actorGuid = actor->GetGUID();
+            actor->m_Events.AddEventAtOffset([actorGuid]()
             {
-                actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+                if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
+                    if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                        actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
             }, 1ms);
             return false;
         }
