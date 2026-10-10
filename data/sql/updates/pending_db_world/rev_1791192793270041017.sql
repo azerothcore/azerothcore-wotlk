@@ -14,10 +14,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21241, 0, 4, 5, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 19, 20723, 30, 0, 0, 0, 0, 0, 0, 'Bloodmaul Brutebane Stout Trigger - On Just Summoned - Send Target List to Korgaah'),
 (21241, 0, 5, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 19, 20723, 30, 0, 0, 0, 0, 0, 0, 'Bloodmaul Brutebane Stout Trigger - On Just Summoned - Set Data to Korgaah');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` IN (1, 4) AND `SourceEntry` = 21241 AND `SourceId` = 0;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` = 1 AND `SourceEntry` = 21241 AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 1, 21241, 0, 0, 29, 1, 20723, 30, 0, 1, 0, 0, '', 'Bloodmaul Brutebane Stout Trigger - Lure a Bladespire Brute only if no living Korgaah is within 30 yards'),
-(22, 4, 21241, 0, 0, 29, 1, 20723, 30, 0, 0, 0, 0, '', 'Bloodmaul Brutebane Stout Trigger - Lure Korgaah only if he is alive within 30 yards');
+(22, 1, 21241, 0, 0, 29, 1, 20723, 30, 0, 1, 0, 0, '', 'Bloodmaul Brutebane Stout Trigger - Lure a Bladespire Brute only if no living Korgaah is within 30 yards');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` = 4 AND `SourceEntry` = 20723 AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
