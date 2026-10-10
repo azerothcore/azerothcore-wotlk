@@ -9576,6 +9576,33 @@ bool ObjectMgr::LoadAcoreStrings()
             AddLocaleString(fields[i + 1].Get<std::string>(), LocaleConstant(i), data.Content);
     } while (result->NextRow());
 
+    // Texts in the locales that have no column in `acore_string`, such as the ones registered by modules
+    //                                     0      1       2
+    result = WorldDatabase.Query("SELECT entry, locale, content FROM acore_string_locale");
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 entry = fields[0].Get<uint32>();
+
+            auto itr = _acoreStringStore.find(entry);
+            if (itr == _acoreStringStore.end())
+            {
+                LOG_ERROR("sql.sql", "Table `acore_string_locale` has entry {} that is not in `acore_string`, skipped.",
+                    entry);
+                continue;
+            }
+
+            LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
+            if (locale == LOCALE_enUS)
+                continue;
+
+            AddLocaleString(fields[2].Get<std::string>(), locale, itr->second.Content);
+        } while (result->NextRow());
+    }
+
     LOG_INFO("server.loading", ">> Loaded {} Acore Strings in {} ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 

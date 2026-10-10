@@ -490,7 +490,7 @@ std::string CreatureTextMgr::GetLocalizedChatString(uint32 entry, uint8 gender, 
     if (groupItr == holderItr->second.end())
         return "";
 
-    if (locale > MAX_LOCALES)
+    if (locale >= GetTotalLocales())
         locale = DEFAULT_LOCALE;
 
     std::string baseText = "";
