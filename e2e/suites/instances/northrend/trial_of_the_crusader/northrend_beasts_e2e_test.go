@@ -291,7 +291,7 @@ func TestToC_GormokSnoboldMissedThrowReturns(t *testing.T) {
 
 	jump, ok := waitGo(spellJumpToHand, 0, pulledAt, throwWindow)
 	if !ok {
-		e2eharness.Preconditionf(t, "no Snobold cast Jump to Hand (%d) within %s of the pull", spellJumpToHand, throwWindow)
+		e2eharness.Assertf(t, "no Snobold cast Jump to Hand (%d) within %s of the pull", spellJumpToHand, throwWindow)
 	}
 	snobold := jump.caster
 	t.Logf("Snobold 0x%X jumped to Gormok's hand %s after the pull", snobold, jump.at.Sub(pulledAt).Round(time.Millisecond))
