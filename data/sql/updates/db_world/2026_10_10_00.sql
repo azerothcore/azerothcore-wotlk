@@ -1,3 +1,4 @@
+-- DB update 2026_10_09_09 -> 2026_10_10_00
 --
 UPDATE `creature` SET `unit_flags` = 33587968 WHERE `id` IN (19762, 19768, 19784) AND `guid` IN (70697, 70698, 70724, 70725, 70799, 70800);
 
