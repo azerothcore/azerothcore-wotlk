@@ -57,6 +57,22 @@ enum Misc
     DATA_OURO_HEALTH            = 0
 };
 
+static bool IsTargetableAtRange(Creature const* creature, Unit const* target)
+{
+    return creature->IsValidAttackTarget(target) && creature->CanSeeOrDetect(target)
+        && creature->_IsTargetAcceptable(target);
+}
+
+static bool HasTargetableThreat(Creature const* creature)
+{
+    // Ranged players are offline for Ouro's melee AI, but still count unless they cannot be targeted.
+    for (ThreatReference const* ref : creature->GetThreatMgr().GetUnsortedThreatList())
+        if (IsTargetableAtRange(creature, ref->GetVictim()))
+            return true;
+
+    return false;
+}
+
 struct npc_ouro_spawner : public ScriptedAI
 {
     npc_ouro_spawner(Creature* creature) : ScriptedAI(creature)
@@ -72,23 +88,24 @@ struct npc_ouro_spawner : public ScriptedAI
         DoCastSelf(SPELL_DIRTMOUND_PASSIVE);
     }
 
+    void AttackStart(Unit* /*who*/) override { }
+
     void MoveInLineOfSight(Unit* who) override
     {
         // Spawn Ouro on LoS check
-        if (!hasSummoned && who->IsPlayer() && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
+        if (!hasSummoned && who->IsPlayer() && me->IsWithinDistInMap(who, 40.0f) && IsTargetableAtRange(me, who))
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {
                 Creature* ouro = instance->GetCreature(DATA_OURO);
-                if (instance->GetBossState(DATA_OURO) != IN_PROGRESS && !ouro)
+                EncounterState state = instance->GetBossState(DATA_OURO);
+                if (state != IN_PROGRESS && state != DONE && !ouro)
                 {
                     DoCastSelf(SPELL_SUMMON_OURO);
                     hasSummoned = true;
                 }
             }
         }
-
-        ScriptedAI::MoveInLineOfSight(who);
     }
 
     void JustSummoned(Creature* creature) override
@@ -115,6 +132,13 @@ struct boss_ouro : public BossAI
         return me->IsWithinMeleeRange(victim);
     }
 
+    void JustEnteredCombat(Unit* who) override
+    {
+        // Ranged targets are offline on the threat list, but must still start the encounter.
+        if (!IsEngaged())
+            EngagementStart(who);
+    }
+
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (me->HealthBelowPctDamaged(20, damage) && !_enraged)
@@ -125,16 +149,32 @@ struct boss_ouro : public BossAI
             scheduler.Schedule(1s, [this](TaskContext context)
                 {
                     if (!IsPlayerWithinMeleeRange())
-                        DoSpellAttackToRandomTargetIfReady(SPELL_BOULDER);
+                        CastBoulderIfReady();
 
                     context.Repeat();
-                })
-                .Schedule(20s, [this](TaskContext context)
-                    {
-                        DoCastSelf(SPELL_SUMMON_OURO_MOUNDS, true);
-                        context.Repeat();
-                    });
+                });
         }
+    }
+
+    void CastBoulderIfReady()
+    {
+        if (me->IsActionPreventedByCasting() || !me->isAttackReady())
+            return;
+
+        std::vector<Unit*> targets;
+        SpellTargetSelector spellTarget(me, SPELL_BOULDER);
+        // CanAIAttack marks ranged participants offline; validate them for the spell instead.
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
+        {
+            Unit* target = ref->GetVictim();
+            if (target->IsPlayer() && IsTargetableAtRange(me, target)
+                && spellTarget(target) && me->IsWithinLOSInMap(target))
+                targets.push_back(target);
+        }
+
+        if (!targets.empty())
+            if (DoCast(Acore::Containers::SelectRandomContainerElement(targets), SPELL_BOULDER) == SPELL_CAST_OK)
+                me->resetAttackTimer();
     }
 
     void Submerge()
@@ -261,7 +301,9 @@ struct boss_ouro : public BossAI
 
     void Reset() override
     {
-        instance->SetBossState(DATA_OURO, NOT_STARTED);
+        // A new Ouro summoned by a moving mound continues the same encounter.
+        if (instance->GetBossState(DATA_OURO) != IN_PROGRESS)
+            instance->SetBossState(DATA_OURO, NOT_STARTED);
         scheduler.CancelAll();
         _submergeMelee = 0;
         _submerged = false;
@@ -270,14 +312,22 @@ struct boss_ouro : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        if (me->GetThreatMgr().IsThreatListEmpty())
-        {
-            DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
-            me->DespawnOrUnsummon(1s);
-            instance->SetBossState(DATA_OURO, FAIL);
-            if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
-                base->DespawnOrUnsummon();
-        }
+        // The moving mounds own the encounter while this Ouro is despawning.
+        if (_submerged)
+            return;
+
+        if (HasTargetableThreat(me))
+            return;
+
+        scheduler.CancelAll();
+        if (IsEngaged())
+            EngagementOver();
+
+        DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
+        me->DespawnOrUnsummon(1s);
+        instance->SetBossState(DATA_OURO, FAIL);
+        if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
+            base->DespawnOrUnsummon();
     }
 
     void JustEngagedWith(Unit* who) override
@@ -288,7 +338,13 @@ struct boss_ouro : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        if (_submerged)
+            return;
+
         UpdateVictim();
+
+        if (!IsEngaged())
+            return;
 
         scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
@@ -370,8 +426,22 @@ struct npc_dirt_mound : ScriptedAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
+        // Keep the encounter running while any mound or Ouro still has a targetable opponent.
+        if (HasTargetableThreat(me))
+            return;
+
+        std::list<Creature*> ouroMounds;
+        me->GetCreatureListWithEntryInGrid(ouroMounds, NPC_DIRT_MOUND, 200.0f);
+        for (Creature* mound : ouroMounds)
+            if (HasTargetableThreat(mound))
+                return;
+
         if (_instance)
         {
+            if (Creature* ouro = _instance->GetCreature(DATA_OURO))
+                if (HasTargetableThreat(ouro))
+                    return;
+
             _instance->SetBossState(DATA_OURO, FAIL);
         }
 
