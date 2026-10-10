@@ -1840,7 +1840,7 @@ void Spell::SelectImplicitDestDestTargets(SpellEffIndex effIndex, SpellImplicitT
                 dist *= float(rand_norm());
 
             Position pos = dest._position;
-            m_caster->MovePosition(pos, dist, angle);
+            m_caster->MovePositionToFirstCollision(pos, dist, angle);
 
             dest.Relocate(pos);
             break;
@@ -2458,16 +2458,12 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     sScriptMgr->OnScaleAuraUnitAdd(this, target, effectMask, checkIfValid, implicit, m_auraScaleMask, targetInfo);
 
     // Calculate hit result
-    if (m_originalCaster)
+    WorldObject* caster = m_originalCaster ? m_originalCaster : m_caster;
+    targetInfo.missCondition = caster->SpellHitResult(target, this, m_canReflect);
+    if (m_skipCheck && targetInfo.missCondition != SPELL_MISS_IMMUNE)
     {
-        targetInfo.missCondition = m_originalCaster->SpellHitResult(target, this, m_canReflect);
-        if (m_skipCheck && targetInfo.missCondition != SPELL_MISS_IMMUNE)
-        {
-            targetInfo.missCondition = SPELL_MISS_NONE;
-        }
+        targetInfo.missCondition = SPELL_MISS_NONE;
     }
-    else
-        targetInfo.missCondition = SPELL_MISS_EVADE; //SPELL_MISS_NONE;
 
     // Spell have speed - need calculate incoming time
     // Incoming time is zero for self casts. At least I think so.
@@ -3208,7 +3204,9 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             (m_diminishGroup == DIMINISHING_TAUNT && (flagsExtra & CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS)))) || type == DRTYPE_ALL)
         {
             // Do not apply diminish return if caster is NPC
-            if (unitCaster && unitCaster->IsCharmedOwnedByPlayerOrPlayer())
+            // resolve through the original caster - the direct caster can be a gameobject (e.g. hunter traps)
+            Unit* diminishSource = m_originalCaster ? m_originalCaster : unitCaster;
+            if (diminishSource && diminishSource->IsCharmedOwnedByPlayerOrPlayer())
             {
                 unit->IncrDiminishing(m_diminishGroup);
             }
@@ -3239,89 +3237,92 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             }
         }
 
-        if (m_originalCaster)
+        // prefer the unit original caster, fall back to the WorldObject caster (e.g. GameObject traps)
+        WorldObject* caster = m_originalCaster ? m_originalCaster : m_caster;
+
+        bool refresh = false;
+        bool refreshPeriodic = m_spellInfo->StackAmount < 2 && !HasTriggeredCastFlag(TRIGGERED_NO_PERIODIC_RESET);
+        m_spellAura = Aura::TryRefreshStackOrCreate(aurSpellInfo, effectMask, unit, m_originalCaster,
+                      (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, caster->GetGUID(), &refresh, refreshPeriodic);
+
+        // xinef: if aura was not refreshed, add proc ex
+        if (!refresh)
+            m_procEx |= PROC_EX_NO_AURA_REFRESH;
+
+        if (m_spellAura)
         {
-            bool refresh = false;
-            bool refreshPeriodic = m_spellInfo->StackAmount < 2 && !HasTriggeredCastFlag(TRIGGERED_NO_PERIODIC_RESET);
-            m_spellAura = Aura::TryRefreshStackOrCreate(aurSpellInfo, effectMask, unit, m_originalCaster,
-                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, ObjectGuid::Empty, &refresh, refreshPeriodic);
-
-            // xinef: if aura was not refreshed, add proc ex
-            if (!refresh)
-                m_procEx |= PROC_EX_NO_AURA_REFRESH;
-
-            if (m_spellAura)
+            // Set aura stack amount to desired value
+            if (m_spellValue->AuraStackAmount > 1)
             {
-                // Set aura stack amount to desired value
-                if (m_spellValue->AuraStackAmount > 1)
-                {
-                    if (!refresh)
-                        m_spellAura->SetStackAmount(m_spellValue->AuraStackAmount);
-                    else
-                        m_spellAura->ModStackAmount(m_spellValue->AuraStackAmount);
-                }
+                if (!refresh)
+                    m_spellAura->SetStackAmount(m_spellValue->AuraStackAmount);
+                else
+                    m_spellAura->ModStackAmount(m_spellValue->AuraStackAmount);
+            }
 
-                // Now Reduce spell duration using data received at spell hit
-                int32 duration = m_spellAura->GetMaxDuration();
-                int32 limitduration = GetDiminishingReturnsLimitDuration(m_diminishGroup, aurSpellInfo);
+            // Now Reduce spell duration using data received at spell hit
+            int32 duration = m_spellAura->GetMaxDuration();
+            int32 limitduration = GetDiminishingReturnsLimitDuration(m_diminishGroup, aurSpellInfo);
 
-                // Xinef: if unit == caster - test versus original unit if available
-                float diminishMod = 1.0f;
+            // Xinef: if unit == caster - test versus original unit if available
+            float diminishMod = 1.0f;
+            if (m_originalCaster)
+            {
                 if (unit == m_caster && m_targets.GetUnitTarget())
                     diminishMod = m_targets.GetUnitTarget()->ApplyDiminishingToDuration(m_diminishGroup, duration, m_originalCaster, m_diminishLevel, limitduration);
                 else
                     diminishMod = unit->ApplyDiminishingToDuration(m_diminishGroup, duration, m_originalCaster, m_diminishLevel, limitduration);
+            }
 
-                // unit is immune to aura if it was diminished to 0 duration
-                if (diminishMod == 0.0f)
+            // unit is immune to aura if it was diminished to 0 duration
+            if (diminishMod == 0.0f)
+            {
+                m_spellAura->Remove();
+                if (m_diminishGroup == DIMINISHING_TAUNT)
+                    return SPELL_MISS_IMMUNE;
+                bool found = false;
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                    if (effectMask & (1 << i) && m_spellInfo->Effects[i].Effect != SPELL_EFFECT_APPLY_AURA)
+                        found = true;
+                if (!found)
+                    return SPELL_MISS_IMMUNE;
+            }
+            else
+            {
+                ((UnitAura*)m_spellAura)->SetDiminishGroup(m_diminishGroup);
+
+                bool positive = m_spellAura->GetSpellInfo()->IsPositive();
+                if (AuraApplication* aurApp = m_spellAura->GetApplicationOfTarget(caster->GetGUID()))
+                    positive = aurApp->IsPositive();
+
+                duration = caster->ModSpellDuration(aurSpellInfo, unit, duration, positive, effectMask);
+
+                // xinef: haste affects duration of those spells twice
+                if (m_originalCaster && (m_originalCaster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, aurSpellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC)))
+                    duration = int32(duration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+
+                if (m_spellValue->AuraDuration != 0)
                 {
-                    m_spellAura->Remove();
-                    if (m_diminishGroup == DIMINISHING_TAUNT)
-                        return SPELL_MISS_IMMUNE;
-                    bool found = false;
-                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                        if (effectMask & (1 << i) && m_spellInfo->Effects[i].Effect != SPELL_EFFECT_APPLY_AURA)
-                            found = true;
-                    if (!found)
-                        return SPELL_MISS_IMMUNE;
-                }
-                else
-                {
-                    ((UnitAura*)m_spellAura)->SetDiminishGroup(m_diminishGroup);
-
-                    bool positive = m_spellAura->GetSpellInfo()->IsPositive();
-                    if (AuraApplication* aurApp = m_spellAura->GetApplicationOfTarget(m_originalCaster->GetGUID()))
-                        positive = aurApp->IsPositive();
-
-                    duration = m_originalCaster->ModSpellDuration(aurSpellInfo, unit, duration, positive, effectMask);
-
-                    // xinef: haste affects duration of those spells twice
-                    if (m_originalCaster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, aurSpellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
-                        duration = int32(duration * m_originalCaster->GetFloatValue(UNIT_MOD_CAST_SPEED));
-
-                    if (m_spellValue->AuraDuration != 0)
+                    if (m_spellAura->GetMaxDuration() != -1)
                     {
-                        if (m_spellAura->GetMaxDuration() != -1)
-                        {
-                            m_spellAura->SetMaxDuration(m_spellValue->AuraDuration);
-                        }
-
-                        m_spellAura->SetDuration(m_spellValue->AuraDuration);
-                    }
-                    else if (duration != m_spellAura->GetMaxDuration())
-                    {
-                        m_spellAura->SetMaxDuration(duration);
-                        m_spellAura->SetDuration(duration);
+                        m_spellAura->SetMaxDuration(m_spellValue->AuraDuration);
                     }
 
-                    // xinef: apply relic cooldown, imo best place to add this
-                    if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
-                        if (unitCaster)
-                            unitCaster->AddSpellCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), duration);
-
-                    m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
-                    m_spellAura->_RegisterForTargets();
+                    m_spellAura->SetDuration(m_spellValue->AuraDuration);
                 }
+                else if (duration != m_spellAura->GetMaxDuration())
+                {
+                    m_spellAura->SetMaxDuration(duration);
+                    m_spellAura->SetDuration(duration);
+                }
+
+                // xinef: apply relic cooldown, imo best place to add this
+                if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
+                    if (unitCaster)
+                        unitCaster->AddSpellCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), duration);
+
+                m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
+                m_spellAura->_RegisterForTargets();
             }
         }
     }
