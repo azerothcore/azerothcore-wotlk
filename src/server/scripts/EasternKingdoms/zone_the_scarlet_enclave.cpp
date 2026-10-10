@@ -24,15 +24,16 @@
 #include "GameObjectScript.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
+#include "PathGenerator.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "SmartAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ObjectAccessor.h"
 #include "SpellAuras.h"
 #include <limits>
+#include "WaypointMgr.h"
 #include "WorldStateDefines.h"
 
 /*######
@@ -1372,13 +1373,15 @@ enum LightOfDawnEncounter
     EVENT_START_COUNTDOWN_12,
     EVENT_START_COUNTDOWN_13,
     EVENT_START_COUNTDOWN_14,
+    EVENT_MARCH_BEHEMOTHS_KOLTIRA,
+    EVENT_MARCH_DARION,
+    EVENT_MARCH_ORBAZ_THASSARIAN,
     // Fight Events
     EVENT_SPELL_ANTI_MAGIC_ZONE,
     EVENT_SPELL_DEATH_STRIKE,
     EVENT_SPELL_DEATH_EMBRACE,
     EVENT_SPELL_UNHOLY_BLIGHT,
     EVENT_SPELL_DARION_MOD_DAMAGE,
-    EVENT_ENGAGE_IDLE_COMBATANTS,
     // Positioning
     EVENT_FINISH_FIGHT_1,
     EVENT_FINISH_FIGHT_2,
@@ -1457,8 +1460,6 @@ enum LightOfDawnEncounter
     ENCOUNTER_START_TIME                = 5,
     ENCOUNTER_TOTAL_DEFENDERS           = 300,
     ENCOUNTER_TOTAL_SCOURGE             = 10000,
-    ENCOUNTER_BATTLE_RADIUS             = 80,
-    ENCOUNTER_PLAYER_REACH              = 50,
 
     ENCOUNTER_STATE_NONE                = 0,
     ENCOUNTER_STATE_FIGHT               = 1,
@@ -1470,7 +1471,44 @@ enum LightOfDawnSummonGroups
     SUMMON_GROUP_SCOURGE_WAVE_1         = 0,
     SUMMON_GROUP_SCOURGE_WAVE_5         = 4,
     SUMMON_GROUP_DEFENDERS              = 5,
-    SUMMON_GROUP_SCOURGE_LEADERS        = 30
+    SUMMON_GROUP_SCOURGE_LEADERS        = 30,
+    SUMMON_GROUP_REPLACEMENTS           = 31, // never summoned, only read for its positions
+    SUMMON_GROUP_OUTRO_DEFENDERS        = 32,
+    SUMMON_GROUP_TIRION                 = 33,
+    SUMMON_GROUP_ALEXANDROS             = 34,
+    SUMMON_GROUP_DARION_GHOST           = 35,
+    SUMMON_GROUP_LICH_KING              = 36,
+
+    // Summoned by Highlord Tirion Fordring
+    SUMMON_GROUP_HOLY_LIGHTNING         = 0
+};
+
+enum LightOfDawnPaths
+{
+    PATH_DARION_MARCH                   = 291730,
+    PATH_ARMY_CHARGE_POINTS             = 291731, // not a route: each node is a destination of the opening wave
+    PATH_BEHEMOTH_MARCH_A               = 291732,
+    PATH_BEHEMOTH_MARCH_B_1             = 291733,
+    PATH_BEHEMOTH_MARCH_B_2             = 291734,
+    PATH_FIGHT_POINTS                   = 291735, // not a route: each node is a place the troops fight at
+    PATH_OUTRO_POINTS                   = 291736  // not a route: each node is a place an NPC walks to in the outro
+};
+
+// waypoint_data.point of the paths that are not routes
+enum LightOfDawnPoints
+{
+    FIGHT_POINT_MIDDLE                  = 1,
+
+    OUTRO_POINT_ORBAZ_FLEE              = 1,
+    OUTRO_POINT_KOLTIRA                 = 2,
+    OUTRO_POINT_THASSARIAN              = 3,
+    OUTRO_POINT_DARION                  = 4,
+    OUTRO_POINT_ALEXANDROS              = 5,
+    OUTRO_POINT_DARION_GHOST            = 6,
+    OUTRO_POINT_TIRION_1                = 7,
+    OUTRO_POINT_LICH_KING               = 8,
+    OUTRO_POINT_TIRION_2                = 9,
+    OUTRO_POINT_TIRION_3                = 10
 };
 
 enum LightOfDawnNPCs
@@ -1505,7 +1543,6 @@ enum LightOfDawnNPCs
 
 enum LightOfDawnGOs
 {
-    GO_HOLY_LIGHTNING                   = 191301,
     GO_LIGHT_OF_DAWN                    = 191330
 };
 
@@ -1515,6 +1552,7 @@ enum LightOfDawnSpells
     SPELL_CAMERA_SHAKE_INIT             = 36455,
     SPELL_CAMERA_SHAKE                  = 39983,
     SPELL_THE_MIGHT_OF_MOGRAINE         = 53642,
+    SPELL_BIRTH                         = 53603,
 
     // Mograine Fight
     SPELL_ANTI_MAGIC_ZONE1              = 52893,
@@ -1541,58 +1579,118 @@ enum LightOfDawnSpells
     SPELL_THE_LIGHT_OF_DAWN_Q           = 53606
 };
 
-const Position LightOfDawnPos[] =
+static void LightOfDawnAppendNode(Movement::PointsArray& path, Position const& node)
 {
-    {2304.2f, -5290.7f, 82.01f, 4.56f},         // 0  First Home Pos
-    {2253.5f, -5310.6f, 82.17f, 5.28f},         // 1  Second Home Pos
-    {2169.1f, -5227.1f, 82.59f, 5.7f},          // 2  Orbaz Flee Pos
-    {2289.259f, -5280.355f, 86.112f, 4.41f},    // 3  Koltira Loc1
-    {2273.289f, -5273.675f, 86.701f, 5.01f},    // 4  Thassarian Loc1
-    {2280.81f, -5284.09f, 86.608f, 4.76f},      // 5  Morgraine Loc1
-    {2165.711f, -5266.1235f, 95.5025f, 0.13962634f },   // 6  Tirion Summon loc
-    {2281.198f, -5257.397f, 80.224f, 4.66f},    // 7  Alexandros loc1
-    {2281.156f, -5259.934f, 80.647f, 0},        // 8  Alexandros loc2
-    {2281.294f, -5281.895f, 82.445f, 1.35f},    // 9  Darion loc1
-    {2281.093f, -5263.013f, 81.125f, 0},        // 10 Darion loc2
-    {2283.896f, -5287.914f, 83.066f, 1.55f},    // 11 Tirion Fordring loc2
-    {2280.304f, -5257.205f, 80.09781f, 4.6251f },// 12 Lich King spawns
-    {2280.687f, -5262.276f, 81.082634f, 0.0f   },// 13 Lich king moves forward
-    {2264.27f, -5267.29f, 80.16f, 0},           // 14 Tirion Fordring loc3
-    {2270.99f, -5278.00f, 81.89f, 0}            // 15 Tirion Fordring loc4
-};
+    path.emplace_back(node.GetPositionX(), node.GetPositionY(), node.GetPositionZ());
+}
 
-const Position LightOfDawnFightPos[] =
+// For the paths that are lists of positions, not routes. If the point is missing from the DB the position of the
+// mover itself is returned, so it stays where it is
+static Position LightOfDawnPoint(Unit const* mover, uint32 pathId, uint32 point)
 {
-    {2279.68f, -5256.75f, 79.79f, 4.8f},
-    {2280.40f, -5276.56f, 82.11f, 4.8f},
-    {2256.43f, -5281.3f, 82.29f, 5.0f},
-    {2251.87f, -5304.08f, 82.17f, 4.8f},
-    {2244.88f, -5256.03f, 74.88f, 5.8f},
-    {2294.29f, -5281.35f, 81.91f, 4.8f},
-    {2314.2f, -5268.1f, 82.43f, 3.6f},
-    {2289.72f, -5299.65f, 83.49f, 3.2f},
-    {2274.02f, -5303.58f, 85.05f, 1.4f},
-    {2258.42f, -5307.72f, 81.98f, 0.1f}
-};
+    WaypointPath const* points = sWaypointMgr->GetPath(pathId);
+    if (!points || !point || point > points->Nodes.size())
+        return mover->GetPosition();
 
-const Position LightOfDawnBattleCenter = {2275.0f, -5283.0f, 82.0f, 0.0f};
+    WaypointNode const& node = points->Nodes[point - 1];
+    return Position(node.X, node.Y, node.Z, node.Orientation.value_or(0.0f));
+}
 
-class DelayedSummonEvent : public BasicEvent
+static Position LightOfDawnRandomPoint(Unit const* mover, uint32 pathId)
 {
-public:
-    DelayedSummonEvent(Unit* owner, uint32 entry, Position pos) : _owner(owner), _entry(entry), _pos(pos) { }
+    WaypointPath const* points = sWaypointMgr->GetPath(pathId);
+    uint32 const count = points ? uint32(points->Nodes.size()) : 0;
+    return LightOfDawnPoint(mover, pathId, count ? urand(1, count) : 0);
+}
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+// path[0] must be the unit's position (the spline overwrites it) and the last point is the destination
+static void LightOfDawnStartMarch(Creature* unit, Movement::PointsArray& path)
+{
+    // The point generator only follows a given path of more than 2 points
+    if (path.size() == 2)
+        path.insert(path.begin() + 1, (path[0] + path[1]) / 2.0f);
+
+    G3D::Vector3 const dest = path.back();
+    unit->SetWalk(false);
+    // A troop that evades returns to its home position, so it has to be at the chapel
+    unit->SetHomePosition(dest.x, dest.y, dest.z, unit->GetOrientation());
+    unit->GetMotionMaster()->MoveCharge(dest.x, dest.y, dest.z, unit->GetSpeed(MOVE_RUN), POINT_ARMY_CHARGE, &path);
+}
+
+static bool LightOfDawnAppendPathLeg(Creature* unit, Movement::PointsArray& path, Position const& to)
+{
+    PathGenerator leg(unit);
+    G3D::Vector3 const from = path.back();
+    if (!leg.CalculatePath(from.x, from.y, from.z, to.GetPositionX(), to.GetPositionY(), to.GetPositionZ(), false))
+        return false;
+
+    if (!(leg.GetPathType() & PATHFIND_NORMAL) || (leg.GetPathType() & PATHFIND_INCOMPLETE))
+        return false;
+
+    path.insert(path.end(), std::next(leg.GetPath().begin()), leg.GetPath().end());
+    return true;
+}
+
+static void LightOfDawnMarchTo(Creature* unit, Position const& dest, bool viaCorridor)
+{
+    Movement::PointsArray path;
+    LightOfDawnAppendNode(path, unit->GetPosition());
+    if (!LightOfDawnAppendPathLeg(unit, path, dest))
     {
-        _owner->SummonCreature(_entry, _pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-        return true;
+        // Too far for a single path from the staging area: go through the corridor Darion takes
+        WaypointPath const* corridor = viaCorridor ? sWaypointMgr->GetPath(PATH_DARION_MARCH) : nullptr;
+        for (uint8 index : { 2, 4, 6 })
+        {
+            if (!corridor || index >= corridor->Nodes.size())
+                break;
+
+            Position const node(corridor->Nodes[index].X, corridor->Nodes[index].Y, corridor->Nodes[index].Z);
+            if (!LightOfDawnAppendPathLeg(unit, path, node))
+                LightOfDawnAppendNode(path, node);
+        }
+
+        if (!LightOfDawnAppendPathLeg(unit, path, dest))
+            LightOfDawnAppendNode(path, dest);
     }
 
-private:
-    Unit* _owner;
-    uint32 _entry;
-    Position _pos;
-};
+    LightOfDawnStartMarch(unit, path);
+}
+
+static void LightOfDawnScheduleMarch(Creature* unit, Milliseconds maxDelay)
+{
+    Position const dest = LightOfDawnRandomPoint(unit, PATH_ARMY_CHARGE_POINTS);
+    unit->m_Events.AddEventAtOffset([unit, dest] {
+        if (unit->IsAlive())
+            LightOfDawnMarchTo(unit, dest, true);
+    }, 0ms, maxDelay);
+}
+
+static void LightOfDawnMarchBehemoth(Creature* behemoth)
+{
+    // Each opening Behemoth takes the route that starts nearest to it. Route B has two sniffed variants
+    WaypointPath const* route = sWaypointMgr->GetPath(PATH_BEHEMOTH_MARCH_A);
+    WaypointPath const* routeB =
+        sWaypointMgr->GetPath(urand(0, 1) ? PATH_BEHEMOTH_MARCH_B_1 : PATH_BEHEMOTH_MARCH_B_2);
+    if (!route || route->Nodes.empty() || !routeB || routeB->Nodes.empty())
+        return;
+
+    WaypointNode const& startA = route->Nodes.front();
+    WaypointNode const& startB = routeB->Nodes.front();
+    if (behemoth->GetExactDist2dSq(startB.X, startB.Y) < behemoth->GetExactDist2dSq(startA.X, startA.Y))
+        route = routeB;
+
+    Movement::PointsArray path;
+    LightOfDawnAppendNode(path, behemoth->GetPosition());
+    for (WaypointNode const& node : route->Nodes)
+    {
+        // Some nodes of route B only have a sniffed x and y, so every z goes through the ground lookup
+        float z = node.Z;
+        behemoth->UpdateGroundPositionZ(node.X, node.Y, z);
+        path.emplace_back(node.X, node.Y, z);
+    }
+
+    LightOfDawnStartMarch(behemoth, path);
+}
 
 struct npc_highlord_darion_mograine : public ScriptedAI
 {
@@ -1662,7 +1760,10 @@ struct npc_highlord_darion_mograine : public ScriptedAI
             events.ScheduleEvent(EVENT_START_COUNTDOWN_10, 324s);
             events.ScheduleEvent(EVENT_START_COUNTDOWN_11, 332s);
             events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 335s);
-            events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337s + 500ms);
+            events.ScheduleEvent(EVENT_MARCH_BEHEMOTHS_KOLTIRA, 335s + 500ms);
+            events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337s + 600ms);
+            events.ScheduleEvent(EVENT_MARCH_DARION, 338s + 400ms);
+            events.ScheduleEvent(EVENT_MARCH_ORBAZ_THASSARIAN, 339s + 600ms);
             events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345s);
         }
     }
@@ -1711,22 +1812,10 @@ struct npc_highlord_darion_mograine : public ScriptedAI
     {
         summons.Summon(cr);
 
-        if (battleStarted == ENCOUNTER_STATE_FIGHT && armyReleased && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING)
-        {
-            PrepareCombatant(cr);
-
-            // Scourge replacements spawn in the staging area and charge into the battle
-            if (cr->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
-            {
-                SendIntoBattle(cr, LightOfDawnFightPos[urand(0, 9)]);
-                return;
-            }
-        }
-
         if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING &&
             cr->GetEntry() < NPC_RAMPAGING_ABOMINATION && battleStarted == ENCOUNTER_STATE_FIGHT)
         {
-            Position pos = LightOfDawnFightPos[urand(0, 9)];
+            Position pos = LightOfDawnRandomPoint(cr, PATH_FIGHT_POINTS);
             if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
                 if (target->IsCreature())
                     target->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
@@ -1748,9 +1837,11 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         if (battleStarted != ENCOUNTER_STATE_FIGHT)
             return;
 
-        Position pos = creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION ?
-            GetScourgeReinforcementPosition(creature) : creature->GetPosition();
-        me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), pos), 3s);
+        uint32 entry = creature->GetEntry();
+        Position pos = GetReplacementPosition(creature);
+        me->m_Events.AddEventAtOffset([this, entry, pos] {
+            SummonReplacement(entry, pos);
+        }, 3s);
         if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
         {
             --scourgeRemaining;
@@ -1777,7 +1868,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
     {
         armyReleased = false;
 
-        if (Creature* tirion = me->SummonCreature(NPC_HIGHLORD_TIRION_FORDRING, LightOfDawnPos[6], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600000))
+        if (Creature* tirion = SummonSingle(SUMMON_GROUP_TIRION))
         {
             tirion->LoadEquipment(0, true);
             tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25, 4s);
@@ -1793,10 +1884,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
             events.ScheduleEvent(EVENT_FINISH_FIGHT_4, 23s);
             events.ScheduleEvent(EVENT_FINISH_FIGHT_5, 24s);
 
-            tirion->SummonGameObject(GO_HOLY_LIGHTNING, 2254.84f, -5298.75f, 82.168f, 1.134f, 0, 0, 0.537102f, 0.843517f, 20);
-            tirion->SummonGameObject(GO_HOLY_LIGHTNING, 2296.24f, -5296.44f, 81.9964f, 5.3398f, 0, 0, 0.454395f, -0.8908f, 20);
-            tirion->SummonGameObject(GO_HOLY_LIGHTNING, 2314.29f, -5261.78f, 83.1349f, 3.05822f, 0, 0, 0.999131f, 0.0416735f, 20);
-            tirion->SummonGameObject(GO_HOLY_LIGHTNING, 2278.43f, -5270.14f, 81.7247f, 0.70988f, 0, 0, 0.347534f, 0.937667f, 20);
+            tirion->SummonGameObjectGroup(SUMMON_GROUP_HOLY_LIGHTNING);
         }
     }
 
@@ -1862,115 +1950,75 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         return nullptr;
     }
 
-    void PrepareCombatant(Creature* combatant)
+    // For the summon groups that hold a single creature
+    Creature* SummonSingle(uint8 group)
     {
-        // An evading creature refuses to attack and walks back home, which leaves it idle
-        if (SmartAI* ai = CAST_AI(SmartAI, combatant->AI()))
-            ai->SetEvadeDisabled(true);
+        std::list<TempSummon*> summoned;
+        me->SummonCreatureGroup(group, &summoned);
+        return summoned.empty() ? nullptr : summoned.front();
     }
 
-    void SendIntoBattle(Creature* combatant, Position const& dest)
+    Position OutroPoint(Unit const* mover, uint32 point)
     {
-        combatant->SetHomePosition(dest);
-        combatant->GetMotionMaster()->MovePoint(POINT_ARMY_CHARGE, dest.GetPositionX(), dest.GetPositionY(),
-            dest.GetPositionZ(), FORCED_MOVEMENT_RUN, 0.f, 0.f, true, false);
+        return LightOfDawnPoint(mover, PATH_OUTRO_POINTS, point);
     }
 
-    Creature* SelectNearestEnemy(Unit* fighter, std::vector<Creature*> const& candidates)
+    void ChargeToOutroPoint(Creature* unit, uint32 point)
     {
-        Creature* nearest = nullptr;
-        float nearestDistSq = std::numeric_limits<float>::max();
-        for (Creature* candidate : candidates)
-        {
-            if (candidate == fighter || !candidate->IsAlive() || !fighter->IsValidAttackTarget(candidate))
-                continue;
-
-            float distSq = fighter->GetExactDistSq(candidate);
-            if (distSq < nearestDistSq)
-            {
-                nearest = candidate;
-                nearestDistSq = distSq;
-            }
-        }
-        return nearest;
+        Position const pos = OutroPoint(unit, point);
+        unit->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), 4.0f, 2);
     }
 
-    void LeaveFarPlayerFight(Creature* combatant)
+    Position GetReplacementPosition(Creature const* dead)
     {
-        // With evade disabled nothing ends the combat of a player who left the battle, nor leashes a chasing combatant
-        // A player still in reach of a combatant inside the battle keeps fighting it, so it cannot be hit for free
-        bool combatantInBattle = combatant->IsWithinDist2d(&LightOfDawnBattleCenter, ENCOUNTER_BATTLE_RADIUS);
-        Unit* victim = combatant->GetVictim();
-        bool victimLeft = false;
-        std::vector<ObjectGuid> farPlayerSide;
-        for (auto const& [guid, ref] : combatant->GetCombatManager().GetPvECombatRefs())
-        {
-            Unit* other = ref->GetOther(combatant);
-            if (other->GetCharmerOrOwnerPlayerOrPlayerItself() &&
-                !other->IsWithinDist2d(&LightOfDawnBattleCenter, ENCOUNTER_BATTLE_RADIUS) &&
-                (!combatantInBattle || !other->IsWithinDist(combatant, ENCOUNTER_PLAYER_REACH)))
-            {
-                farPlayerSide.push_back(guid);
-                if (other == victim)
-                    victimLeft = true;
-            }
-        }
-
-        for (ObjectGuid const& guid : farPlayerSide)
-        {
-            auto const& refs = combatant->GetCombatManager().GetPvECombatRefs();
-            auto itr = refs.find(guid);
-            if (itr != refs.end())
-                itr->second->EndCombat();
-        }
-
-        if (victimLeft)
-            combatant->AttackStop();
-    }
-
-    void CollectCombatants(std::vector<Creature*>& out)
-    {
-        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                if (summon->IsAlive() && summon->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING)
-                    out.push_back(summon);
-
-        if (me->IsAlive())
-            out.push_back(me);
-    }
-
-    Position GetScourgeReinforcementPosition(Creature const* dead)
-    {
-        // Scourge staging area: the spawn positions of the dead creature's entry, else any wave position
-        std::vector<Position> positions;
-        std::vector<Position> wavePositions;
-        auto addGroup = [&](uint8 group)
+        // Sniffed points per entry. The Scourge leaders have none and come back on their staging area position
+        for (uint8 group : { SUMMON_GROUP_REPLACEMENTS, SUMMON_GROUP_SCOURGE_LEADERS })
         {
             std::vector<TempSummonData> const* data =
                 sObjectMgr->GetSummonGroup(me->GetEntry(), SUMMONER_TYPE_CREATURE, group);
             if (!data)
-                return;
+                continue;
 
+            std::vector<Position> positions;
             for (TempSummonData const& slot : *data)
-            {
                 if (slot.entry == dead->GetEntry())
                     positions.push_back(slot.pos);
-                if (group != SUMMON_GROUP_SCOURGE_LEADERS)
-                    wavePositions.push_back(slot.pos);
-            }
-        };
 
-        for (uint8 group = SUMMON_GROUP_SCOURGE_WAVE_1; group <= SUMMON_GROUP_SCOURGE_WAVE_5; ++group)
-            addGroup(group);
-        addGroup(SUMMON_GROUP_SCOURGE_LEADERS);
+            if (!positions.empty())
+                return Acore::Containers::SelectRandomContainerElement(positions);
+        }
 
-        if (positions.empty())
-            positions = wavePositions;
+        return dead->GetPosition();
+    }
 
-        if (positions.empty())
-            return dead->GetPosition();
+    void SummonReplacement(uint32 entry, Position const& pos)
+    {
+        Creature* cr = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+        if (!cr || battleStarted != ENCOUNTER_STATE_FIGHT || !armyReleased)
+            return;
 
-        return Acore::Containers::SelectRandomContainerElement(positions);
+        switch (entry)
+        {
+            case NPC_ACHERUS_GHOUL:
+            case NPC_WARRIOR_OF_THE_FROZEN_WASTES:
+                // Sniffs show them not attackable while they cast Birth (3.5s)
+                cr->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                cr->CastSpell(cr, SPELL_BIRTH, false);
+                cr->m_Events.AddEventAtOffset([cr] {
+                    cr->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                }, 3500ms);
+                break;
+            case NPC_FLESH_BEHEMOTH:
+                LightOfDawnMarchTo(cr, LightOfDawnPoint(cr, PATH_FIGHT_POINTS, FIGHT_POINT_MIDDLE), false);
+                break;
+            case NPC_KOLTIRA_DEATHWEAVER:
+            case NPC_THASSARIAN:
+            case NPC_ORBAZ_BLOODBANE:
+                LightOfDawnMarchTo(cr, LightOfDawnRandomPoint(cr, PATH_ARMY_CHARGE_POINTS), true);
+                break;
+            default:
+                break;
+        }
     }
 
     void MovementInform(uint32 type, uint32 point) override
@@ -2051,59 +2099,47 @@ struct npc_highlord_darion_mograine : public ScriptedAI
             case EVENT_START_COUNTDOWN_12:
                 summons.DoAction(ACTION_PLAY_EMOTE);
                 break;
+            case EVENT_MARCH_BEHEMOTHS_KOLTIRA:
+                armyReleased = true;
+                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                        if (summon->IsAlive() && summon->GetEntry() == NPC_FLESH_BEHEMOTH)
+                            LightOfDawnMarchBehemoth(summon);
+
+                if (Creature* koltira = GetEntryFromSummons(NPC_KOLTIRA_DEATHWEAVER))
+                    if (koltira->IsAlive())
+                        LightOfDawnMarchTo(koltira, LightOfDawnRandomPoint(koltira, PATH_ARMY_CHARGE_POINTS), true);
+                break;
             case EVENT_START_COUNTDOWN_13:
+                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                        if (summon->IsAlive() && (summon->GetEntry() == NPC_ACHERUS_GHOUL ||
+                            summon->GetEntry() == NPC_WARRIOR_OF_THE_FROZEN_WASTES))
+                            LightOfDawnScheduleMarch(summon, 1200ms);
+                break;
+            case EVENT_MARCH_DARION:
                 {
-                    uint8 first = 1;
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                    {
-                        if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                            if (summon->IsAlive())
-                            {
-                                PrepareCombatant(summon);
-                                SendIntoBattle(summon, LightOfDawnPos[first]);
-                            }
-                        first = first == 0 ? 1 : 0;
-                    }
-                    Position pos = LightOfDawnPos[first];
-                    me->SetHomePosition(pos);
-                    me->SetWalk(false);
-                    me->GetMotionMaster()->MovePoint(POINT_ARMY_CHARGE, pos.GetPositionX(), pos.GetPositionY(),
-                        pos.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, true, true);
+                    Movement::PointsArray path;
+                    LightOfDawnAppendNode(path, me->GetPosition());
+                    if (WaypointPath const* march = sWaypointMgr->GetPath(PATH_DARION_MARCH))
+                        for (WaypointNode const& node : march->Nodes)
+                            path.emplace_back(node.X, node.Y, node.Z);
+
+                    if (path.size() > 1)
+                        LightOfDawnStartMarch(me, path);
                     DoCastSelf(SPELL_THE_MIGHT_OF_MOGRAINE, true);
-                    armyReleased = true;
                     break;
                 }
+            case EVENT_MARCH_ORBAZ_THASSARIAN:
+                for (uint32 entry : { NPC_ORBAZ_BLOODBANE, NPC_THASSARIAN })
+                    if (Creature* leader = GetEntryFromSummons(entry))
+                        if (leader->IsAlive())
+                            LightOfDawnScheduleMarch(leader, 400ms);
+                break;
             case EVENT_START_COUNTDOWN_14:
                 me->SetImmuneToAll(false);
                 me->SummonCreatureGroup(SUMMON_GROUP_DEFENDERS);
-                events.ScheduleEvent(EVENT_ENGAGE_IDLE_COMBATANTS, 1s);
                 return;
-            case EVENT_ENGAGE_IDLE_COMBATANTS:
-                {
-                    if (battleStarted != ENCOUNTER_STATE_FIGHT || !armyReleased)
-                        break;
-
-                    std::vector<Creature*> combatants;
-                    CollectCombatants(combatants);
-                    for (Creature* combatant : combatants)
-                    {
-                        // Keep the leash from dropping targets that are far from home
-                        combatant->UpdateLeashExtensionTime();
-                        LeaveFarPlayerFight(combatant);
-
-                        // Darion re-targets in UpdateAI; unconscious defenders stay down;
-                        // charging units finish their charge
-                        if (combatant == me || combatant->GetVictim() || combatant->IsImmuneToNPC() ||
-                            combatant->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-                            continue;
-
-                        if (Creature* enemy = SelectNearestEnemy(combatant, combatants))
-                            combatant->AI()->AttackStart(enemy);
-                    }
-
-                    events.ScheduleEvent(EVENT_ENGAGE_IDLE_COMBATANTS, 1s);
-                    break;
-                }
             case EVENT_FINISH_FIGHT_1:
                 summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
                 battleStarted = ENCOUNTER_STATE_OUTRO;
@@ -2120,7 +2156,8 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                     {
                         orbaz->SetReactState(REACT_PASSIVE);
                         orbaz->AI()->Talk(EMOTE_LIGHT_OF_DAWN04);
-                        orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], FORCED_MOVEMENT_NONE, 0.f, true, true);
+                        orbaz->GetMotionMaster()->MovePoint(2, OutroPoint(orbaz, OUTRO_POINT_ORBAZ_FLEE),
+                            FORCED_MOVEMENT_NONE, 0.f, true, true);
                         orbaz->DespawnOrUnsummon(7s);
                     }
 
@@ -2143,10 +2180,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                     // Position main stars
                     summons.DoAction(ACTION_POSITION_NPCS);
 
-                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2276.66f, -5273.60f, 81.86f, 5.14f, TEMPSUMMON_CORPSE_DESPAWN);
-                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2272.11f, -5279.08f, 82.01f, 5.69f, TEMPSUMMON_CORPSE_DESPAWN);
-                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2285.11f, -5276.73f, 82.08f, 4.23f, TEMPSUMMON_CORPSE_DESPAWN);
-                    me->SummonCreature(NPC_DEFENDER_OF_THE_LIGHT, 2290.06f, -5286.41f, 82.51f, 3.16f, TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreatureGroup(SUMMON_GROUP_OUTRO_DEFENDERS);
                     break;
                 }
             case EVENT_FINISH_FIGHT_3:
@@ -2155,7 +2189,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                     koltira->SetWalk(true);
                     koltira->SetHomePosition(*koltira);
                     koltira->CastSpell(koltira, SPELL_THE_LIGHT_OF_DAWN, false);
-                    koltira->GetMotionMaster()->MoveCharge(LightOfDawnPos[3].GetPositionX(), LightOfDawnPos[3].GetPositionY(), LightOfDawnPos[3].GetPositionZ(), 4.0f, 2);
+                    ChargeToOutroPoint(koltira, OUTRO_POINT_KOLTIRA);
                 }
                 break;
             case EVENT_FINISH_FIGHT_4:
@@ -2164,7 +2198,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                     thassarin->SetWalk(true);
                     thassarin->SetHomePosition(*thassarin);
                     thassarin->CastSpell(thassarin, SPELL_THE_LIGHT_OF_DAWN, false);
-                    thassarin->GetMotionMaster()->MoveCharge(LightOfDawnPos[4].GetPositionX(), LightOfDawnPos[4].GetPositionY(), LightOfDawnPos[4].GetPositionZ(), 4.0f, 2);
+                    ChargeToOutroPoint(thassarin, OUTRO_POINT_THASSARIAN);
                 }
                 break;
             case EVENT_FINISH_FIGHT_5:
@@ -2172,7 +2206,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 me->SetHomePosition(*me);
                 me->RemoveAllAuras();
                 me->CastSpell(me, SPELL_THE_LIGHT_OF_DAWN, false);
-                me->GetMotionMaster()->MoveCharge(LightOfDawnPos[5].GetPositionX(), LightOfDawnPos[5].GetPositionY(), LightOfDawnPos[5].GetPositionZ(), 4.0f, 2);
+                ChargeToOutroPoint(me, OUTRO_POINT_DARION);
 
                 if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                     tirion->AI()->Talk(SAY_LIGHT_OF_DAWN26);
@@ -2199,10 +2233,10 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 Talk(SAY_LIGHT_OF_DAWN31);
                 break;
             case EVENT_OUTRO_SCENE_6:
-                if (Creature* alex = me->SummonCreature(NPC_HIGHLORD_ALEXANDROS_MOGRAINE, LightOfDawnPos[7].GetPositionX(), LightOfDawnPos[7].GetPositionY(), LightOfDawnPos[7].GetPositionZ(), LightOfDawnPos[7].GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                if (Creature* alex = SummonSingle(SUMMON_GROUP_ALEXANDROS))
                 {
                     alex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    alex->GetMotionMaster()->MovePoint(0, LightOfDawnPos[8].GetPositionX(), LightOfDawnPos[8].GetPositionY(), LightOfDawnPos[8].GetPositionZ());
+                    alex->GetMotionMaster()->MovePoint(0, OutroPoint(alex, OUTRO_POINT_ALEXANDROS));
                     alex->CastSpell(alex, SPELL_ALEXANDROS_MOGRAINE_SPAWN, true);
                     //alex->AI()->Talk(EMOTE_LIGHT_OF_DAWN06);
                 }
@@ -2223,7 +2257,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 Talk(SAY_LIGHT_OF_DAWN34);
                 break;
             case EVENT_OUTRO_SCENE_10:
-                if (Creature* darion = me->SummonCreature(NPC_DARION_MOGRAINE, LightOfDawnPos[9].GetPositionX(), LightOfDawnPos[9].GetPositionY(), LightOfDawnPos[9].GetPositionZ(), LightOfDawnPos[9].GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                if (Creature* darion = SummonSingle(SUMMON_GROUP_DARION_GHOST))
                 {
                     darion->AI()->Talk(SAY_LIGHT_OF_DAWN35);
                     darion->SetWalk(false);
@@ -2233,7 +2267,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 if (Creature* darion = GetEntryFromSummons(NPC_DARION_MOGRAINE))
                 {
                     //darion->AI()->Talk(EMOTE_LIGHT_OF_DAWN07);
-                    darion->GetMotionMaster()->MovePoint(0, LightOfDawnPos[10].GetPositionX(), LightOfDawnPos[10].GetPositionY(), LightOfDawnPos[10].GetPositionZ());
+                    darion->GetMotionMaster()->MovePoint(0, OutroPoint(darion, OUTRO_POINT_DARION_GHOST));
                 }
                 break;
             case EVENT_OUTRO_SCENE_12:
@@ -2257,7 +2291,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                     alex->AI()->Talk(SAY_LIGHT_OF_DAWN39);
 
                 if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
-                    tirion->GetMotionMaster()->MovePoint(0, LightOfDawnPos[11].GetPositionX(), LightOfDawnPos[11].GetPositionY(), LightOfDawnPos[11].GetPositionZ());
+                    tirion->GetMotionMaster()->MovePoint(0, OutroPoint(tirion, OUTRO_POINT_TIRION_1));
                 break;
             case EVENT_OUTRO_SCENE_17:
                 if (Creature* darion = GetEntryFromSummons(NPC_DARION_MOGRAINE))
@@ -2294,7 +2328,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 events.ScheduleEvent(EVENT_OUTRO_SCENE_36, 81s);
                 break;
             case EVENT_OUTRO_SCENE_20:
-                if (Creature* lk = me->SummonCreature(NPC_THE_LICH_KING, LightOfDawnPos[12].GetPositionX(), LightOfDawnPos[12].GetPositionY(), LightOfDawnPos[12].GetPositionZ(), LightOfDawnPos[12].GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                if (Creature* lk = SummonSingle(SUMMON_GROUP_LICH_KING))
                     lk->AI()->Talk(SAY_LIGHT_OF_DAWN43);
                 break;
             case EVENT_OUTRO_SCENE_21:
@@ -2325,7 +2359,7 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 break;
             case EVENT_OUTRO_SCENE_25:
                 if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
-                    lk->GetMotionMaster()->MovePoint(0, LightOfDawnPos[13].GetPositionX(), LightOfDawnPos[13].GetPositionY(), LightOfDawnPos[13].GetPositionZ());
+                    lk->GetMotionMaster()->MovePoint(0, OutroPoint(lk, OUTRO_POINT_LICH_KING));
                 break;
             case EVENT_OUTRO_SCENE_26:
                 me->CastSpell(me, SPELL_MOGRAINE_CHARGE, false);
@@ -2509,11 +2543,11 @@ struct npc_highlord_darion_mograine : public ScriptedAI
                 break;
             case EVENT_OUTRO_SCENE_50:
                 if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
-                    tirion->GetMotionMaster()->MovePoint(4, LightOfDawnPos[14].GetPositionX(), LightOfDawnPos[14].GetPositionY(), LightOfDawnPos[14].GetPositionZ());
+                    tirion->GetMotionMaster()->MovePoint(4, OutroPoint(tirion, OUTRO_POINT_TIRION_2));
                 break;
             case EVENT_OUTRO_SCENE_51:
                 if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
-                    tirion->GetMotionMaster()->MovePoint(4, LightOfDawnPos[15].GetPositionX(), LightOfDawnPos[15].GetPositionY(), LightOfDawnPos[15].GetPositionZ());
+                    tirion->GetMotionMaster()->MovePoint(4, OutroPoint(tirion, OUTRO_POINT_TIRION_3));
                 break;
             case EVENT_OUTRO_SCENE_52:
                 if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
@@ -2582,17 +2616,28 @@ struct npc_highlord_darion_mograine : public ScriptedAI
         if (battleStarted != ENCOUNTER_STATE_FIGHT)
             return;
 
-        // Re-target in the same tick, so a fight event is not dropped for lack of a victim
-        if (armyReleased && !me->GetVictim())
-        {
-            std::vector<Creature*> combatants;
-            CollectCombatants(combatants);
-            if (Creature* enemy = SelectNearestEnemy(me, combatants))
-                AttackStart(enemy);
-        }
+        // Darion is a boss mob: the core only lets him attack within the leash radius of his home position,
+        // and he never returns home during the battle
+        if (armyReleased)
+            me->SetHomePosition(me->GetPosition());
 
         if (!UpdateVictim())
+        {
+            // The event is already consumed and only JustEngagedWith schedules it, so retry it
+            switch (eventId)
+            {
+                case EVENT_SPELL_ANTI_MAGIC_ZONE:
+                case EVENT_SPELL_DEATH_STRIKE:
+                case EVENT_SPELL_DEATH_EMBRACE:
+                case EVENT_SPELL_UNHOLY_BLIGHT:
+                case EVENT_SPELL_DARION_MOD_DAMAGE:
+                    events.RescheduleEvent(eventId, 1s);
+                    break;
+                default:
+                    break;
+            }
             return;
+        }
 
         switch (eventId)
         {
