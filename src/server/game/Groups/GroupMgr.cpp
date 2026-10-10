@@ -114,7 +114,9 @@ void GroupMgr::LoadGroups()
 
         // Delete invalid lfg_data. GROUPTYPE_LFG (8) is a flag: premade Dungeon Finder groups are saved
         // without GROUPTYPE_LFG_RESTRICTED (4), so matching exactly 12 dropped their dungeon on restart.
-        CharacterDatabase.DirectExecute("DELETE lfg_data FROM lfg_data LEFT JOIN `groups` ON lfg_data.guid = groups.guid WHERE groups.guid IS NULL OR (groups.groupType & 8) = 0");
+        CharacterDatabase.DirectExecute("DELETE lfg_data FROM lfg_data "
+                                        "LEFT JOIN `groups` ON lfg_data.guid = groups.guid "
+                                        "WHERE groups.guid IS NULL OR (groups.groupType & 8) = 0");
         // CharacterDatabase.DirectExecute("DELETE `groups` FROM `groups` LEFT JOIN lfg_data ON groups.guid = lfg_data.guid WHERE groups.groupType=12 AND lfg_data.guid IS NULL"); // group should be left so binds are cleared when disbanded
 
         InitGroupIds();
