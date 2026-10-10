@@ -192,6 +192,11 @@ void ScriptMgr::OnPlayerBeforeSendChatMessage(Player* player, uint32& type, uint
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE, script->OnPlayerBeforeSendChatMessage(player, type, lang, msg));
 }
 
+bool ScriptMgr::OnPlayerCanSpeakUnlearnedLanguage(Player* player, uint32 type, uint32 lang)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_CAN_SPEAK_UNLEARNED_LANGUAGE, script->OnPlayerCanSpeakUnlearnedLanguage(player, type, lang));
+}
+
 void ScriptMgr::OnPlayerEmote(Player* player, uint32 emote)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_EMOTE, script->OnPlayerEmote(player, emote));
