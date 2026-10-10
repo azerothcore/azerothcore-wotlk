@@ -1,3 +1,4 @@
+-- DB update 2026_10_10_03 -> 2026_10_10_04
 --
 SET @IRONRIDGE := 21133;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = @IRONRIDGE AND `source_type` = 0;
