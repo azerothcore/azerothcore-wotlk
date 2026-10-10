@@ -3471,6 +3471,12 @@ bool Spell::UpdateChanneledTargetList()
     if (m_channelTargetEffectMask == 0)
         return true;
 
+    if (unitCaster && m_spellInfo->HasAttribute(SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL))
+        if (Creature* creature = unitCaster->ToCreature())
+            if (ObjectGuid const channelTarget = creature->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT);
+                !channelTarget.IsEmpty() && channelTarget != creature->GetGUID())
+                creature->UpdateChannelTargetFacing(m_spellInfo, channelTarget);
+
     uint8 channelTargetEffectMask = m_channelTargetEffectMask;
     uint8 channelAuraMask = 0;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -3521,9 +3527,6 @@ bool Spell::UpdateChanneledTargetList()
                                 unit->RemoveAura(aurApp);
                                 continue;
                             }
-                            // Xinef: Update Orientation server side (non players wont sent appropriate packets)
-                            else if (unitCaster && !unitCaster->IsPlayer() && m_spellInfo->HasAttribute(SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL))
-                                unitCaster->UpdateOrientation(unitCaster->GetAngle(unit));
                         }
                     }
                     else // aura is dispelled
