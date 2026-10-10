@@ -1,3 +1,4 @@
+-- DB update 2026_10_10_10 -> 2026_10_10_11
 --
 UPDATE `gossip_menu_option` SET `OptionText` = 'Send me to the Abyssal Shelf!' WHERE `MenuID` = 8096 AND `OptionID` = 0;
 UPDATE `gossip_menu_option` SET `OptionText` = 'Send me to Honor Point!' WHERE `MenuID` = 8096 AND `OptionID` = 1;
