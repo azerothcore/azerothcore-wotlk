@@ -193,6 +193,9 @@ int main(int argc, char** argv)
     // If logs are supposed to be handled async then we need to pass the IoContext into the Log singleton
     sLog->Initialize(sConfigMgr->GetOption<bool>("Log.Async.Enable", false) ? ioContext.get() : nullptr);
 
+    sConfigMgr->LoadModulesConfigs();
+    sLog->LoadAdditionalFromConfig();
+
     Acore::Banner::Show("worldserver-daemon",
         [](std::string_view text)
         {
@@ -265,9 +268,6 @@ int main(int argc, char** argv)
 
     // Set process priority according to configuration settings
     SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, true));
-
-    // Loading modules configs before scripts
-    sConfigMgr->LoadModulesConfigs();
 
     sScriptMgr->SetScriptLoader(AddScripts);
     sScriptMgr->SetModulesLoader(AddModulesScripts);
