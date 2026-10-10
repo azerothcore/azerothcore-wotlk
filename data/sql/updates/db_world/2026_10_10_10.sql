@@ -1,3 +1,4 @@
+-- DB update 2026_10_10_09 -> 2026_10_10_10
 --
 UPDATE `spell_scripts` SET `datalong` = 37895 WHERE (`id` = 37894) AND (`effIndex` = 0) AND (`command` = 15) AND (`datalong` = 37893);
 
