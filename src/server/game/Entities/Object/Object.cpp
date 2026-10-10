@@ -3540,7 +3540,7 @@ SpellMissInfo WorldObject::MagicSpellHitResult(Unit* victim, SpellInfo const* sp
     Unit const* unitCaster = ToUnit();
 
     // vehicles cant miss
-    if (unitCaster && unitCaster->IsVehicle())
+    if (unitCaster && unitCaster->IsCreature() && unitCaster->IsVehicle())
         return SPELL_MISS_NONE;
 
     // Spells with SPELL_ATTR3_ALWAYS_HIT will additionally fully ignore
