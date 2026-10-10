@@ -2243,19 +2243,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ENEMY);
     });
 
-    // Trial of the Crusader, Gormok, player vehicle spell, CUSTOM! (default jump to hand, not used)
-    ApplySpellFix({ 66342 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_SET_VEHICLE_ID;
-        spellInfo->Effects[EFFECT_0].MiscValue = 496;
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(25);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
-        spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CHANGE_MAP;
-    });
-
     // Trial of the Crusader, Gormok, Fire Bomb
     ApplySpellFix({ 66313 }, [](SpellInfo* spellInfo)
     {

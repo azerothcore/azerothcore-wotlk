@@ -5228,7 +5228,7 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
     // Xinef: allow entry specific spells to skip those checks
     if (m_spellInfo->Effects[effIndex].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && m_spellInfo->Effects[effIndex].TargetB.GetCheckType() != TARGET_CHECK_ENTRY)
     {
-        if (unitTarget->IsVehicle() && unitTarget->GetCreatureType() != CREATURE_TYPE_BEAST)
+        if (unitTarget->IsCreature() && unitTarget->IsVehicle() && unitTarget->GetCreatureType() != CREATURE_TYPE_BEAST)
             return;
 
         if (unitTarget->GetVehicle())

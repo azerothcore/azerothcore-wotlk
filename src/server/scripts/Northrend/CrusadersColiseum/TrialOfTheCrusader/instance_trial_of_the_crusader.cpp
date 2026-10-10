@@ -20,8 +20,14 @@
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "Vehicle.h"
 #include "WorldStateDefines.h"
 #include "trial_of_the_crusader.h"
+
+enum InstanceMisc
+{
+    VEHICLE_SNOBOLD_CARRIER = 497,
+};
 
 std::map<uint32, bool> validDedicatedInsanityItems;
 
@@ -178,6 +184,42 @@ public:
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0ms);
 
             NPC_ChampionGUIDs.clear();
+        }
+
+        // Retail makes every player a vehicle for the whole Northrend Beasts encounter so Snobold Vassals can ride them
+        void SetSnoboldCarrier(Player* player, bool apply)
+        {
+            Vehicle* kit = player->GetVehicleKit();
+            if (apply)
+            {
+                if (kit || !player->CreateVehicleKit(VEHICLE_SNOBOLD_CARRIER, 0))
+                    return;
+            }
+            else
+            {
+                if (!kit || kit->GetVehicleInfo()->m_ID != VEHICLE_SNOBOLD_CARRIER)
+                    return;
+
+                player->RemoveVehicleKit();
+            }
+
+            WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, player->GetPackGUID().size() + 4);
+            data << player->GetPackGUID();
+            data << uint32(apply ? VEHICLE_SNOBOLD_CARRIER : 0);
+            player->SendMessageToSet(&data, true);
+
+            if (apply)
+            {
+                data.Initialize(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
+                player->SendDirectMessage(&data);
+            }
+        }
+
+        void SetSnoboldCarriers(bool apply)
+        {
+            for (auto const& itr : instance->GetPlayers())
+                if (Player* player = itr.GetSource())
+                    SetSnoboldCarrier(player, apply);
         }
 
         bool IsEncounterInProgress() const override
@@ -388,6 +430,7 @@ public:
                         northrendBeastsMask = 0;
                         EncounterStatus = NOT_STARTED;
                         InstanceProgress = INSTANCE_PROGRESS_BEASTS_DEAD;
+                        SetSnoboldCarriers(false);
                         HandleGameObject(GO_EnterGateGUID, true);
                         events.CancelEvent(EVENT_NORTHREND_BEASTS_ENRAGE);
                         events.RescheduleEvent(EVENT_SCENE_BEASTS_DONE, 2500ms);
@@ -573,6 +616,11 @@ public:
                         {
                             InstanceCleanup();
                         }
+
+                        // Entering mounted loses the kit: the mount removal on arrival dismounts, which drops vehicle kits
+                        if (InstanceProgress == INSTANCE_PROGRESS_INTRO_DONE && EncounterStatus == IN_PROGRESS)
+                            SetSnoboldCarriers(true);
+
                         events.Repeat(5s);
                     }
                     break;
@@ -646,6 +694,7 @@ public:
                     break;
                 case EVENT_SUMMON_GORMOK:
                     {
+                        SetSnoboldCarriers(true);
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                             if (Creature* gormok = c->SummonCreature(NPC_GORMOK, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY(), Locs[LOC_BEHIND_GATE].GetPositionZ(), Locs[LOC_BEHIND_GATE].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
                                 gormok->GetMotionMaster()->MovePoint(0, Locs[LOC_GATE_FRONT].GetPositionX(), Locs[LOC_GATE_FRONT].GetPositionY(), Locs[LOC_GATE_FRONT].GetPositionZ());
@@ -1391,6 +1440,9 @@ public:
                 InstanceCleanup();
             }
 
+            if (InstanceProgress == INSTANCE_PROGRESS_INTRO_DONE && EncounterStatus == IN_PROGRESS)
+                SetSnoboldCarrier(plr, true);
+
             // if missing spawn anub'arak
             SpawnAnubArak();
 
@@ -1451,6 +1503,7 @@ public:
                         c->DespawnOrUnsummon();
                     NPC_IcehowlGUID.Clear();
                     northrendBeastsMask = 0;
+                    SetSnoboldCarriers(false);
                     break;
                 case INSTANCE_PROGRESS_BEASTS_DEAD:
                     if (Creature* c = instance->GetCreature(NPC_BarrettGUID))
