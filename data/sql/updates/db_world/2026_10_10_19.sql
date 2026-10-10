@@ -1,3 +1,4 @@
+-- DB update 2026_10_10_18 -> 2026_10_10_19
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 66342 AND `ScriptName` = 'spell_gormok_jump_to_hand';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
