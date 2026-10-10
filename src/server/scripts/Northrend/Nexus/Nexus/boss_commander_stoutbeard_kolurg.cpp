@@ -30,8 +30,8 @@ enum Spells
 enum Says
 {
     SAY_AGGRO                       = 0,
-    SAY_DEATH                       = 1,
-    SAY_KILL                        = 2
+    SAY_KILL                        = 1,
+    SAY_DEATH                       = 2
 };
 
 struct boss_commander_stoutbeard : public BossAI
