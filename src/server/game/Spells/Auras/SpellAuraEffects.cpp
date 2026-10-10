@@ -7043,14 +7043,16 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
         {
             float radius = GetSpellInfo()->Effects[GetEffIndex()].CalcRadius(caster);
 
+            Player const* assister = caster->GetAffectingPlayer();
+
             Unit*                                                         triggerTarget = nullptr;
-            Acore::MostHPMissingGroupInRange                              u_check(target, radius, 0);
+            Acore::MostHPMissingGroupInRange                              u_check(target, radius, 0, assister);
             Acore::UnitLastSearcher<Acore::MostHPMissingGroupInRange>     searcher(target, triggerTarget, u_check);
             Cell::VisitObjects(target, searcher, radius);
 
             if (triggerTarget)
             {
-                target->CastSpell(triggerTarget, SPELL_PRAYER_OF_MENDING_VISUAL, true);
+                target->CastSpell(triggerTarget, SPELL_PRAYER_OF_MENDING_VISUAL, true, nullptr, this, GetCasterGUID());
                 target->CastCustomSpell(triggerTarget, GetId(), &value, nullptr, nullptr, true, nullptr, this, GetCasterGUID());
                 if (Aura* aura = triggerTarget->GetAura(GetId(), GetCasterGUID()))
                     aura->SetCharges(jumps);

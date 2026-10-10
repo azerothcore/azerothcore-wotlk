@@ -1540,7 +1540,8 @@ namespace Acore
     class MostHPMissingGroupInRange
     {
     public:
-        MostHPMissingGroupInRange(Unit const* obj, float range, uint32 hp) : i_obj(obj), i_range(range), i_hp(hp) {}
+        MostHPMissingGroupInRange(Unit const* obj, float range, uint32 hp, Player const* assister = nullptr)
+            : i_obj(obj), i_range(range), i_hp(hp), i_assister(assister) {}
 
         bool operator()(Unit* u)
         {
@@ -1571,6 +1572,10 @@ namespace Acore
                 return false;
             }
 
+            // can't assist player which is dueling someone
+            if (i_assister && player != i_assister && player->duel)
+                return false;
+
             if (u->IsAlive() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) && u->GetMaxHealth() - u->GetHealth() >= i_hp)
             {
                 i_hp = u->GetMaxHealth() - u->GetHealth();
@@ -1584,6 +1589,7 @@ namespace Acore
         Unit const* i_obj;
         float       i_range;
         uint32      i_hp;
+        Player const* i_assister;
     };
 
     class AllDeadCreaturesInRange
