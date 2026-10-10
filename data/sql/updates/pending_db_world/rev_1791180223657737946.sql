@@ -6,11 +6,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21133, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 16387, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Respawn - Morph To Model 16387 - Woraround for modelid - Gender'),
 (21133, 0, 1, 0, 20, 0, 100, 0, 10483, 0, 0, 0, 0, 0, 80, 2113300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Quest ''Ill Omens'' Finished - Run Script'),
 (2113300, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Script - Say Line 0'),
-(2113300, 9, 1, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Script - Say Line 1'),
-(2113300, 9, 2, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.565634012222290039, 'Corporal Ironridge - On Script - Set Orientation'),
+(2113300, 9, 1, 0, 0, 0, 100, 0, 3000, 4700, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Script - Say Line 1'),
+(2113300, 9, 2, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.565634012222290039, 'Corporal Ironridge - On Script - Set Orientation'),
 (2113300, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Script - Say Line 2'),
-(2113300, 9, 4, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 1, 3, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Script - Say Line 3'),
-(2113300, 9, 5, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Script - Set Orientation Home Position');
+(2113300, 9, 4, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 1, 3, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Script - Say Line 3'),
+(2113300, 9, 5, 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Corporal Ironridge - On Script - Set Orientation Home Position');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = @IRONRIDGE;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
