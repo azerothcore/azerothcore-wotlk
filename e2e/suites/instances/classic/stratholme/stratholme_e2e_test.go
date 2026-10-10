@@ -15,6 +15,10 @@ import (
 const (
 	npcTimmyTheCruel   = uint32(10808)
 	npcCrimsonInitiate = uint32(10420)
+	goSupplyCrate1     = uint32(176304)
+	goSupplyCrate2     = uint32(176307)
+	goSupplyCrate3     = uint32(176308)
+	goSupplyCrate4     = uint32(176309)
 
 	stratholmeMap        = uint32(329)
 	triggerRadius        = float32(55)
@@ -168,4 +172,48 @@ func TestAC_26363_TimmyEmergesAfterSquareCleared(t *testing.T) {
 	timmy := waitForTimmy(t, bot, 15*time.Second)
 	bot.AssertWorldAlive(t)
 	t.Logf("PASS AC#26363 Timmy emerged as 0x%X only after all 15 relevant Scarlets died", timmy)
+}
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/12285
+// Proximity activation consumes the linked trap but leaves its parent crate.
+func TestAC_12285_SupplyCrateProximityLeavesParent(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"med", "instances", "gameobject", "issue", "serial"},
+		Runtime:  "med",
+		Issue:    12285,
+		Category: "instances/classic/stratholme",
+	})
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "SCProx",
+		Level:  80,
+	})
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
+
+	for _, crate := range trappedSupplyCrates {
+		if spawnID := bot.SpawnGameObject(t, crate.parent); spawnID == 0 {
+			e2eharness.Preconditionf(t, "failed to create cleanup-backed Supply Crate entry=%d", crate.parent)
+		}
+		crateGUID := bot.WaitGameObject(t, crate.parent, 10*time.Second)
+		trapGUID := bot.WaitGameObject(t, crate.trap, 10*time.Second)
+		var count func() int32
+		cancel := func() {}
+		if crate.parent == goSupplyCrate4 {
+			count, cancel = armSpellGoCounter(bot, spellPlagueMist)
+		}
+
+		// SpawnGameObject leaves GM mode enabled, so the environmental trap cannot
+		// select the player until CombatReady turns GM mode off.
+		bot.CombatReady(t)
+		assertGameObjectGone(t, bot, trapGUID, "proximity trap", 10*time.Second)
+		if bot.World.GetObject(crateGUID) == nil {
+			e2eharness.ConfirmedBugf(t, 12285, "Supply Crate %d disappeared with its proximity trap", crate.parent)
+		}
+		if count != nil {
+			assertSpellGoCount(t, count, spellPlagueMist, 1)
+		}
+		cancel()
+		bot.AssertWorldAlive(t)
+		t.Logf("PASS AC#12285 proximity trap left Supply Crate entry=%d guid=0x%X", crate.parent, crateGUID)
+	}
 }
