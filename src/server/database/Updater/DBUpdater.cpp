@@ -40,19 +40,26 @@ std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 
 bool DBUpdaterUtil::CheckExecutable()
 {
-    std::filesystem::path exe(GetCorrectedMySQLExecutable());
-    if (!is_regular_file(exe))
+    // absolute() without an error_code throws (an empty path, a missing working directory),
+    // and nothing up to main() catches filesystem_error
+    std::error_code ec;
+    std::filesystem::path const configured(GetCorrectedMySQLExecutable());
+    if (!is_regular_file(configured, ec))
     {
-        exe = Acore::SearchExecutableInPath("mysql");
-        if (!exe.empty() && is_regular_file(exe))
+        std::filesystem::path const found(Acore::SearchExecutableInPath("mysql"));
+        if (!found.empty() && is_regular_file(found, ec))
         {
-            // Correct the path to the cli
-            corrected_path() = absolute(exe).generic_string();
-            return true;
+            std::filesystem::path const absoluteFound = absolute(found, ec);
+            if (!ec)
+            {
+                // Correct the path to the cli
+                corrected_path() = absoluteFound.generic_string();
+                return true;
+            }
         }
 
         LOG_FATAL("sql.updates", "Didn't find any executable MySQL binary at \'{}\' or in path, correct the path in the *.conf (\"MySQLExecutable\").",
-            absolute(exe).generic_string());
+            configured.generic_string());
 
         return false;
     }
@@ -220,6 +227,9 @@ void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string co
 bool CreateDatabase(DatabaseUpdatePool& pool)
 {
     LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
+
+    if (!DBUpdaterUtil::CheckExecutable())
+        return false;
 
     char const* disableInteractive = std::getenv("AC_DISABLE_INTERACTIVE");
 
