@@ -369,7 +369,7 @@ public:
                             }
                         if (Creature* c = instance->GetCreature(NPC_ArgentChampionGUID))
                         {
-                            c->AI()->DoAction(-1); // paletress despawn memory
+                            c->AI()->DoAction(ACTION_DESPAWN_MEMORY);
                             c->DespawnOrUnsummon();
                         }
                         NPC_ArgentChampionGUID.Clear();
