@@ -1474,6 +1474,11 @@ class spell_hodir_toasty_fire_aura : public AuraScript
 {
     PrepareAuraScript(spell_hodir_toasty_fire_aura);
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActor() != eventInfo.GetProcTarget();
+    }
+
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_SINGED });
@@ -1498,6 +1503,7 @@ class spell_hodir_toasty_fire_aura : public AuraScript
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_hodir_toasty_fire_aura::CheckProc);
         AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
         OnEffectProc += AuraEffectProcFn(spell_hodir_toasty_fire_aura::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
