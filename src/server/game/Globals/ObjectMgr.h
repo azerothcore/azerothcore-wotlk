@@ -692,6 +692,14 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 
 bool normalizePlayerName(std::string& name);
 
+// Walks every (race, class) pair a playercreateinfo_* row selects through its raceMask/classMask.
+// A zero mask means "every value in range". Callers that cannot accept that must reject the row
+// themselves: playercreateinfo allocates the PlayerInfo entries, so a zero mask there would conjure
+// combinations the game does not have, such as a human shaman, and its loader refuses one.
+// Bits beyond maxRaces or MAX_CLASSES are ignored rather than indexed.
+void ForEachRaceClass(uint32 raceMask, uint32 classMask, uint8 maxRaces,
+    std::function<void(uint8 raceId, uint8 classId)> const& fn);
+
 struct LanguageDesc
 {
     Language lang_id;
