@@ -244,10 +244,18 @@ enum eTexts
     SAY_BK_DEATH                                    = 7,
 };
 
+enum ArgentChallengeActions
+{
+    ACTION_MEMORY_DIED                              = 1,
+    ACTION_DESPAWN_MEMORY                           = 2,
+};
+
 template <class AI, class T>
 inline AI* GetTrialOfTheChampionAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TrialOfTheChampionScriptName);
 }
+
+#define RegisterTrialOfTheChampionCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTrialOfTheChampionAI)
 
 #endif
