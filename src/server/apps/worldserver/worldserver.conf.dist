@@ -3005,7 +3005,7 @@ CreatureLeashRadius = 30
 #
 #    CreatureFamilyAssistanceRadius
 #        Description: Distance for creatures calling for assistance from other creatures without
-#                     moving.
+#                     moving, centre to centre.
 #        Default:     10 - (Enabled)
 #                     0  - (Disabled)
 
