@@ -119,6 +119,14 @@ void Pet::AddToWorld()
     }
 }
 
+void Pet::UpdateObjectVisibilityOnCreate()
+{
+    _newRisenGhoulVisible = GetEntry() == NPC_RISEN_GHOUL && (!isBeingLoaded() || _summonedRisenGhoul);
+    TempSummon::UpdateObjectVisibilityOnCreate();
+    _newRisenGhoulVisible = false;
+    _summonedRisenGhoul = false;
+}
+
 void Pet::RemoveFromWorld()
 {
     ///- Remove the pet from the accessor
@@ -213,7 +221,8 @@ std::pair<PetStable::PetInfo const*, PetSaveMode> Pet::GetLoadPetInfo(PetStable 
     return { nullptr, PET_SAVE_AS_DELETED };
 }
 
-bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct /*= 0*/, bool fullMana /*= false*/)
+bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct /*= 0*/,
+    bool fullMana /*= false*/, Position const* summonPosition /*= nullptr*/)
 {
     m_loading = true;
 
@@ -335,9 +344,14 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     SynchronizeLevelWithOwner();
 
     // Set pet's position after setting level, its size depends on it
-    float px, py, pz;
-    owner->GetClosePoint(px, py, pz, GetCombatReach(), PET_FOLLOW_DIST, GetFollowAngle());
-    Relocate(px, py, pz, owner->GetOrientation());
+    if (summonPosition)
+        Relocate(*summonPosition);
+    else
+    {
+        float px, py, pz;
+        owner->GetClosePoint(px, py, pz, GetCombatReach(), PET_FOLLOW_DIST, GetFollowAngle());
+        Relocate(px, py, pz, owner->GetOrientation());
+    }
     if (!IsPositionValid())
     {
         LOG_ERROR("entities.pet", "Pet {} not loaded. Suggested coordinates isn't valid (X: {} Y: {})",
@@ -387,19 +401,23 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         petInfo = &petStable->CurrentPet.value();
     }
 
-    // Send fake summon spell cast - this is needed for correct cooldown application for spells
-    // Example: 46584 - without this cooldown (which should be set always when pet is loaded) isn't set clientside
-    /// @todo pets should be summoned from real cast instead of just faking it?
+    // A loaded risen ghoul is not a new summon; send only the cooldown to its owner.
     if (petInfo->CreatedBySpellId && spellInfo && (spellInfo->CategoryRecoveryTime > 0 || spellInfo->RecoveryTime > 0))
     {
-        WorldPacket data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
-        data << owner->GetPackGUID();
-        data << owner->GetPackGUID();
-        data << uint8(0);
-        data << uint32(petInfo->CreatedBySpellId);
-        data << uint32(256); // CAST_FLAG_UNKNOWN3
-        data << uint32(0);
-        owner->SendMessageToSet(&data, true);
+        if (spellInfo->Id == SPELL_DK_RAISE_DEAD_PET)
+            owner->SendCooldownEvent(spellInfo, 0, nullptr, false);
+        else
+        {
+            // Other pets still use the existing summon packet to initialize their client cooldown.
+            WorldPacket data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
+            data << owner->GetPackGUID();
+            data << owner->GetPackGUID();
+            data << uint8(0);
+            data << uint32(petInfo->CreatedBySpellId);
+            data << uint32(256); // CAST_FLAG_UNKNOWN3
+            data << uint32(0);
+            owner->SendMessageToSet(&data, true);
+        }
     }
 
     owner->SetMinion(this, true);
@@ -407,6 +425,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     if (!isTemporarySummon)
         m_charmInfo->LoadPetActionBar(petInfo->ActionBar);
 
+    _summonedRisenGhoul = summonPosition && GetEntry() == NPC_RISEN_GHOUL;
     map->AddToMap(ToCreature(), true);
 
     //set last used pet number (for use in BG's)
@@ -1411,7 +1430,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
         AddAura(SPELL_ORC_RACIAL_COMMAND_DK, this);
 
-        AddAura(SPELL_RISEN_GHOUL_SELF_STUN, this);
+        if (!isBeingLoaded())
+            AddAura(SPELL_RISEN_GHOUL_SELF_STUN, this);
 
         // Avoidance, Night of the Dead
         if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))

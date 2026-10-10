@@ -3431,7 +3431,10 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     }
 
     float x, y, z;
-    owner->GetClosePoint(x, y, z, owner->GetObjectSize());
+    if (m_spellInfo->Id == SPELL_DK_RAISE_DEAD_PET && m_targets.HasDst())
+        m_targets.GetDstPos()->GetPosition(x, y, z);
+    else
+        owner->GetClosePoint(x, y, z, owner->GetObjectSize());
     Pet* pet = owner->SummonPet(petentry, x, y, z, owner->GetOrientation(), SUMMON_PET);
     if (!pet)
         return;
