@@ -5,6 +5,7 @@ on:
       - opened
       - reopened
       - synchronize
+      - ready_for_review
     paths:
       - data/**
       - "!README.md"
