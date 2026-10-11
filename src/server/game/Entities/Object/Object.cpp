@@ -4016,8 +4016,15 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
     if (Unit* owner = GetCharmerOrOwnerUnit())
         return unitTarget && owner->_IsValidAttackTarget(unitTarget, bySpell, this);
 
-    // ownerless world object: faction reaction decides
-    return unitTarget && IsHostileTo(unitTarget);
+    if (!unitTarget)
+        return false;
+
+    // ownerless world object: a creature needs a hostile side, a player only needs neither side friendly,
+    // so faction 0 traps (no faction template, always neutral) still hit players
+    if (!unitTarget->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+        return IsHostileTo(unitTarget) || unitTarget->IsHostileTo(this);
+
+    return !IsFriendlyTo(unitTarget) && !unitTarget->IsFriendlyTo(this);
 }
 
 bool WorldObject::IsValidAssistTarget(WorldObject const* target, SpellInfo const* bySpell /*= nullptr*/) const
