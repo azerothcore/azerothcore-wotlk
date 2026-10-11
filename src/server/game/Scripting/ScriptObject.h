@@ -32,7 +32,6 @@
  /*
      TODO: Add more script type classes.
 
-     SessionScript
      CollisionScript
      ArenaTeamScript
  */

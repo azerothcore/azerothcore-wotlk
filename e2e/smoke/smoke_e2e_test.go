@@ -8,8 +8,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
+	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
 
 // SMOKE-07 first: fresh-account create (run early — late runs saw flaky auth EOF

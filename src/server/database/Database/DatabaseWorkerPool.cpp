@@ -91,6 +91,11 @@ uint32 DatabaseWorkerPool<T>::Open()
     LOG_INFO("sql.driver", "Opening DatabasePool '{}'. Asynchronous connections: {}, synchronous connections: {}.",
         GetDatabaseName(), _async_threads, _synch_threads);
 
+    _queue->Cancel();
+    _connections[IDX_ASYNC].clear();
+    _connections[IDX_SYNCH].clear();
+    _queue->Reset();
+
     uint32 error = OpenConnections(IDX_ASYNC, _async_threads);
 
     if (error)

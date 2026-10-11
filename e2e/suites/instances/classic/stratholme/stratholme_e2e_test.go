@@ -125,11 +125,24 @@ func TestAC_26363_TimmyEmergesAfterSquareCleared(t *testing.T) {
 	// Center of the 15 relevant Scarlet spawns in Crusaders' Square. The 55-yard
 	// observation radius excludes other Scarlet spawns with the same entries.
 	bot.Teleport(t, 3660, -3180, 127, stratholmeMap)
+	bot.CombatReady(t)
 	triggers := waitForTimmyActivationSet(t, bot, 20*time.Second)
 	if len(triggers) != 15 {
 		e2eharness.Preconditionf(t, "loaded Timmy activation area has %d relevant Scarlets, want 15", len(triggers))
 	}
-	bot.CombatReady(t)
+	// Timmy's emerge tick can fire before this client's cache has the Square
+	// pack (same SHA on ephemeral CI flips pass / "already present"). One
+	// kill+.respawn after the pack is visible resets his SAI.
+	if leftover := bot.FindUnit(npcTimmyTheCruel, 100); leftover != 0 {
+		t.Logf("Timmy 0x%X in cache with Square loaded, killing + .respawn", leftover)
+		bot.DamageKill(t, []uint64{leftover}, 10_000_000, 10*time.Second)
+		bot.GM(t, ".respawn")
+		bot.FlushWorld(t)
+		triggers = waitForTimmyActivationSet(t, bot, 20*time.Second)
+		if len(triggers) != 15 {
+			e2eharness.Preconditionf(t, "after reset, activation area has %d relevant Scarlets, want 15", len(triggers))
+		}
+	}
 	if timmy := bot.FindUnit(npcTimmyTheCruel, 100); timmy != 0 {
 		e2eharness.ConfirmedBugf(t, 26363, "Timmy was already present as 0x%X before the Scarlet activation area was cleared", timmy)
 	}

@@ -1,6 +1,13 @@
 # E2E policy
 
-Mandatory when writing or changing live-stack e2e (`e2e/`). **When** to write tests. **How:** AzerothGhost `LLM_GUIDE.md` / `EXAMPLES.md` (this file does not replace them). Inventory: `e2e/README.md`. Stack: AC 3.3.5a auth+world+MySQL; `E2E_*` may point at a gateway.
+**Do not add, promote, or invent live-stack e2e tests unless the user explicitly asked.**
+Do not write `e2e/local/` scratch tests to validate a fix. Existing tests that fail after a
+behaviour change may be updated. Scratch, if any, stays in `e2e/local/` (gitignored) and is
+never committed. Do not mention missing coverage unless the user asked about it.
+
+The rest of this file applies only when the user asked to change `e2e/`, or an existing test
+broke. **How:** AzerothGhost `LLM_GUIDE.md` / `EXAMPLES.md` (this file does not replace them).
+Inventory: `e2e/README.md`. Stack: AC 3.3.5a auth+world+MySQL; `E2E_*` may point at a gateway.
 
 ## Terms
 
@@ -19,17 +26,15 @@ First match wins:
 | If | Then |
 |----|------|
 | Pure calc / parse / bit math / no world | UNIT. NEVER e2e. |
-| Covered by existing unit/mocks (`SpellProc*`, …) without login/map/DBC fidelity | UNIT or in-process integration. E2E only if unit cannot reach the path. |
+| Covered by existing unit/mocks (`SpellProc*`, …) without login/map/DBC fidelity | UNIT or in-process integration. No new e2e unless asked. |
 | SQL-only static (text, displayid, non-script loot) | No e2e. Manual optional. |
-| SmartAI / conditions / waypoints; outcome only in-world | E2E SHOULD if player-visible and deterministic; else document manual repro. |
-| Multi-system on a live session, or protocol/client-observed, or player-repro bugfix | E2E MUST (or update existing). Unit MAY still cover pure pieces. |
-| Refactor, no behaviour intent | Update tests that break. Add e2e only if a critical system below lacks an oracle. |
+| SmartAI / conditions / waypoints; outcome only in-world | No new e2e unless asked. Document a manual repro if useful. |
+| Multi-system on a live session, or protocol/client-observed, or player-repro bugfix | No new e2e unless asked. Unit MAY still cover pure pieces. |
+| Refactor, no behaviour intent | Update tests that break. Do not add e2e. |
 
-Bias: player-visible and MVT fits → prefer e2e over unit-only. Not a MUST trigger and unsure → do not invent e2e; file a gap.
+Do not invent e2e because a change is player-visible. File a gap only if the user asked for coverage.
 
-**MUST add or update e2e** when any of: player-visible bugfix (encode the repro); protocol change; multi-system (combat/aura/death/quest/loot/mount/pet/vehicle/instance/PvP/guild/relog/DB after `.save`); crash/hang/freeze on client action (`ProbeWorldAlive` / `AssertWorldAlive`); existing `TestAC_*` path touched (update, do not drop); critical system with no oracle; claimed blizzlike fix for a tracked issue (`ConfirmedBugf` until fixed).
-
-**MUST NOT** treat “tested in-game” as a substitute when MVT is feasible.
+**Update** an existing test when the user asked or that test broke. Do not add a new suite, `TestAC_*`, or `e2e/local/` scratch test unless the user asked.
 
 Harness cannot express it: extend harness or file a harness gap; inventory the gap; still unit-test pure logic.
 
@@ -106,7 +111,7 @@ Use these, not bare `t.Fatalf`, for classified outcomes:
 
 ## Critical systems
 
-A PR that implements, fixes, or refactors a row MUST add or update e2e for that oracle, or keep an existing test that still asserts it. If harness cannot: gap in `e2e/README.md` + unit for pure logic.
+Do not add e2e for a row just because a PR touches that system. Update an existing test only if it broke or the user asked. If harness cannot express something the user asked for: gap in `e2e/README.md` + unit for pure logic.
 
 | System | Oracle / drive |
 |--------|----------------|
@@ -129,11 +134,11 @@ Search consumer suite + Ghost `examples/` + `TestAC_*` for issue, spell, quest, 
 
 Same oracle → same test (extend / table-drive). Same setup, different oracle → helper or `t.Run`, not a second login. NEVER copy Ghost `examples/` without changing the oracle. One tracked issue → one primary `TestAC_<id>_…`; extra edges as `t.Run` or siblings only if isolation requires. Same root cause + same assertion surface → merge.
 
-Inventory (`e2e/README.md` + suite comments): category, one-sentence oracle, P0–P3, `covered` (test name) / `gap` / `blocked-harness` / `manual-only`, issue links, note. MUST update when adding coverage or finding a gap. `blocked-harness` MUST name the missing API (opcode, waiter, multi-realm, …). Closing a P0/P1 gap is preferred when touching that subsystem. When pruning, merge redundant tests and refresh the inventory.
+Inventory (`e2e/README.md` + suite comments): category, one-sentence oracle, P0–P3, `covered` (test name) / `gap` / `blocked-harness` / `manual-only`, issue links, note. Update it when the user asked you to add or remove coverage. `blocked-harness` MUST name the missing API (opcode, waiter, multi-realm, …). When pruning, merge redundant tests and refresh the inventory.
 
-Prefer one solid test per merged player-visible bugfix. Deepen critical categories over new weak ones. Every test: unique oracle + owner (issue or feature). Delete or merge tests that no longer map to a behaviour.
+Do not add a test per bugfix. Every existing test: unique oracle + owner (issue or feature). Delete or merge tests that no longer map to a behaviour.
 
-## Priority (next test)
+## Priority (only if the user asked for a new test)
 
 Highest feasible MVT:
 
@@ -144,7 +149,7 @@ Highest feasible MVT:
 | **P2** | Single-boss timers/waves/targeting; guild charter/bank; multi-bot PvP; realm-scoped GM / persisted visibility |
 | **P3** | QoL, display, nondeterministic farm; full raid clears (out of default growth) |
 
-On a PR: implement e2e for the highest-priority trigger the PR activates. Do not add P3 in the same change unless asked.
+On a PR: do not add e2e unless the user asked. If they did, pick the highest-priority trigger they named. Do not add P3 in the same change unless asked.
 
 ## Isolation, comments, flakes
 
@@ -167,6 +172,6 @@ NEVER let a test PASS while the product oracle is wrong. NEVER multi-retry + sof
 
 Update tests in the same PR as the behaviour change. Harness renames: update consumers in the same landing window. Ghost `e2e/examples/` are patterns; AC regressions live in the consumer suite.
 
-Scratch MUST be `e2e/local/` (gitignored except `local/README.md`). NEVER commit throwaways. Promote into `e2e/suites/` next to related tests in the same PR as the fix. Prefer live e2e over ad-hoc GM when the stack is up.
+Scratch MUST be `e2e/local/` (gitignored except `local/README.md`). NEVER commit throwaways. Do not promote scratch into `e2e/suites/` unless the user asked.
 
 Local (from `e2e/`): `go test -tags=e2e ./...`. Official-repo PR and master CI: full suite after nopch clang-18 (reuses those binaries). Dispatch `-f scope=smoke` for a smaller run. Touch `.github/workflows/e2e-live.yml` only when changing CI.

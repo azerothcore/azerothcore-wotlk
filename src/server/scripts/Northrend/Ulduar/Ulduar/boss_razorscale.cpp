@@ -299,7 +299,9 @@ struct boss_razorscale : public BossAI
                 me->SetDisableGravity(false);
                 me->RemoveAura(SPELL_STUN_SELF);
                 Talk(EMOTE_PERMA_GROUND);
-                DoCastSelf(SPELL_WING_BUFFET);
+                // A queued take-off means the harpoon phase finale already knocked the raid back
+                if (!events.HasTimeUntilEvent(EVENT_RESUME_AIR))
+                    DoCastSelf(SPELL_WING_BUFFET);
                 {
                     EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
                     summons.DoAction(ACTION_STOP_CONTROLLERS, trapperPred);
@@ -391,7 +393,10 @@ struct boss_razorscale : public BossAI
         {
             _permaGround = true;
             me->SetReactState(REACT_AGGRESSIVE);
-            DoAction(ACTION_START_PERMA_GROUND);
+            // Wing Buffet is a 35 yard sphere measured in 3D, so it misses the floor while she is
+            // still descending; the landing point runs the transition in that case
+            if (!me->IsFlying())
+                DoAction(ACTION_START_PERMA_GROUND);
         }
     }
 
@@ -447,6 +452,9 @@ struct boss_razorscale : public BossAI
         }
 
         summons.DespawnAll();
+        // the home flight starts before Reset() restores this, and her home position is in the air,
+        // so without the flag the destination gets clamped down to the arena floor
+        me->SetDisableGravity(true);
         _EnterEvadeMode();
         HandleMusic(false);
     }
@@ -639,6 +647,7 @@ struct npc_expedition_commander : public ScriptedAI
             case ACTION_START_PERMA_GROUND:
                 _started = false;
                 _events.Reset();
+                StopControllers();
                 DestroyHarpoons();
                 break;
             case ACTION_DESTROY_HARPOONS:

@@ -87,6 +87,7 @@ private:
     Unit* SelectNextTarget(bool allowAutoSelect) const;
     void HandleReturnMovement();
     void DoAttack(Unit* target, bool chase);
+    bool StartChase(Unit* target);
     bool CanAttack(Unit* target, SpellInfo const* spellInfo = nullptr);
     void ClearCharmInfoFlags();
 };

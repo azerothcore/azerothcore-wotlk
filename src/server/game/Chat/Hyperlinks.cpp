@@ -27,7 +27,19 @@
 
 using namespace Acore::Hyperlinks;
 
-inline uint8 toHex(char c) { return (c >= '0' && c <= '9') ? c - '0' + 0x10 : (c >= 'a' && c <= 'f') ? c - 'a' + 0x1a : 0x00; }
+inline uint8 toHex(char c)
+{
+    if (c >= '0' && c <= '9')
+        return c - '0' + 0x10;
+
+    if (c >= 'a' && c <= 'f')
+        return c - 'a' + 0x1a;
+
+    if (c >= 'A' && c <= 'F')
+        return c - 'A' + 0x1a;
+
+    return 0x00;
+}
 
 // Validates a single hyperlink
 HyperlinkInfo Acore::Hyperlinks::ParseSingleHyperlink(std::string_view str)
@@ -323,6 +335,20 @@ struct LinkValidator<LinkTags::trade>
     }
 };
 
+template <>
+struct LinkValidator<LinkTags::found>
+{
+    static bool IsTextValid(FoundLinkData const&, std::string_view text)
+    {
+        return !text.empty();
+    }
+
+    static bool IsColorValid(FoundLinkData const&, HyperlinkColor c)
+    {
+        return c == CHAT_LINK_COLOR_ACHIEVEMENT; // 0xffffff00 - yellow
+    }
+};
+
 template <typename TAG>
 static bool ValidateAs(HyperlinkInfo const& info)
 {
@@ -356,6 +382,7 @@ static bool ValidateLinkInfo(HyperlinkInfo const& info)
     TryValidateAs(creature);
     TryValidateAs(creature_entry);
     TryValidateAs(enchant);
+    TryValidateAs(found);
     TryValidateAs(gameevent);
     TryValidateAs(gameobject);
     TryValidateAs(gameobject_entry);

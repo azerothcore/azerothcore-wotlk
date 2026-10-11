@@ -63,7 +63,7 @@ struct GameEventData
     uint32 Occurence{0};       // time between end and start
     uint32 Length{0};          // length of the event (minutes) after finishing all conditions
     HolidayIds HolidayId{HOLIDAY_NONE};
-    uint8 HolidayStage;
+    uint8 HolidayStage{0};
     GameEventState State{GAMEEVENT_NORMAL};   // state of the game event, these are saved into the game_event table on change!
     GameEventConditionMap Conditions;  // conditions to finish
     std::set<uint16 /*gameevent id*/> PrerequisiteEvents;  // events that must be completed before starting this event
@@ -123,6 +123,7 @@ public:
     // Load the game event npc vendor table from the DB
     void LoadEventVendors();
     [[nodiscard]] uint32 GetHolidayEventId(uint32 holidayId) const;
+    [[nodiscard]] uint8 GetHolidayMainStage(uint32 holidayId) const;
 private:
     void LoadEvents();
     void LoadEventSaveData();
@@ -180,6 +181,7 @@ private:
     typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
     typedef std::vector<uint32> GameEventBitmask;
     typedef std::unordered_map<uint32, std::vector<uint32>> GameEventSeasonalQuestsMap;
+    typedef std::unordered_map<uint32 /*holiday id*/, uint8 /*stage*/> HolidayMainStageMap;
     GameEventQuestMap _gameEventCreatureQuests;
     GameEventQuestMap _gameEventGameObjectQuests;
     GameEventNPCVendorMap _gameEventVendors;
@@ -192,6 +194,7 @@ private:
     ActiveEvents _activeEvents;
     bool _isSystemInit;
     GameEventSeasonalQuestsMap _gameEventSeasonalQuestsMap;
+    HolidayMainStageMap _holidayMainStages;
 public:
     GameEventGuidMap  GameEventCreatureGuids;
     GameEventGuidMap  GameEventGameobjectGuids;
