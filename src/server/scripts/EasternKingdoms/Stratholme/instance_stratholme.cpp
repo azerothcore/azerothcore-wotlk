@@ -324,8 +324,10 @@ public:
                 // Pick the spawn point with a navmesh raycast from the player so it lands on walkable
                 // ground and stops at walls. Forcing z to the player's z + 1 put critters inside wall
                 // geometry or over gaps, where they drop out of the world (anyone chasing them follows).
-                Position const pos = player->GetFirstCollisionPosition(frand(0.0f, 8.0f), frand(0.0f, 2.0f * float(M_PI)));
-                if (Creature* critter = player->SummonCreature(uiEntry, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ() + 0.5f, 0, TEMPSUMMON_DEAD_DESPAWN, 0))
+                Position const pos = player->GetFirstCollisionPosition(frand(0.0f, 8.0f),
+                    frand(0.0f, 2.0f * float(M_PI)));
+                if (Creature* critter = player->SummonCreature(uiEntry, pos.GetPositionX(), pos.GetPositionY(),
+                    pos.GetPositionZ() + 0.5f, 0, TEMPSUMMON_DEAD_DESPAWN, 0))
                     if (critter->AI())
                         critter->AI()->AttackStart(player);
             }
