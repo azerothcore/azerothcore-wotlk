@@ -617,7 +617,7 @@ struct npc_boombot : public ScriptedAI
             {
                 if (Creature* xt002 = _instance->GetCreature(BOSS_XT002))
                 {
-                    if (!me->IsWithinMeleeRange(xt002) || !Detonate())
+                    if (!me->IsWithinMeleeRange(xt002) || !Detonate(true))
                         checkXt002.Repeat();
                 }
                 else
@@ -657,7 +657,7 @@ private:
         me->UpdateDamagePhysical(BASE_ATTACK);
     }
 
-    bool Detonate()
+    bool Detonate(bool onArrival = false)
     {
         if (_boomed)
             return false;
@@ -670,6 +670,13 @@ private:
         }
 
         _scheduler.CancelAll();
+
+        // Classic Wrath arrivals emit two Boom casts in the same tick. Keep the guard set
+        // across both casts so the self-instakill and nearby chain deaths cannot add more.
+        // Boom permits casting while dead; lethal damage still goes through JustDied once.
+        if (onArrival)
+            DoCastAOE(SPELL_BOOM, true);
+
         return true;
     }
 
