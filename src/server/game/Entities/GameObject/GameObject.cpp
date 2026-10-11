@@ -791,7 +791,11 @@ void GameObject::Update(uint32 diff)
                         if (goInfo->trap.type == 2)
                         {
                             if (goInfo->trap.spellId)
-                                CastSpell(nullptr, goInfo->trap.spellId);  // FIXME: null target won't work for target type 1
+                            {
+                                CastSpellExtraArgs args;
+                                args.SetOriginalCaster(GetOwnerGUID());
+                                CastSpell(nullptr, goInfo->trap.spellId, args); // FIXME: null target won't work for target type 1
+                            }
                             SetLootState(GO_JUST_DEACTIVATED);
                         }
                         else if (Unit* target = ObjectAccessor::GetUnit(*this, _lootStateUnitGUID))

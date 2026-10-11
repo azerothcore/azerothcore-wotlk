@@ -3060,7 +3060,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (spellHitTarget->IsCreature())
         {
             if (spellHitTarget->ToCreature()->IsAIEnabled)
-                spellHitTarget->ToCreature()->AI()->SpellHit(unitCaster, m_spellInfo);
+                spellHitTarget->ToCreature()->AI()->SpellHit(unitCaster ? unitCaster : m_originalCaster, m_spellInfo);
         }
 
         if (unitCaster && unitCaster->IsCreature() && unitCaster->ToCreature()->IsAIEnabled)
@@ -3440,7 +3440,7 @@ void Spell::DoAllEffectOnTarget(GOTargetInfo* target)
             HandleEffects(nullptr, nullptr, go, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
     // xinef: inform ai about spellhit
-    go->AI()->SpellHit(unitCaster, m_spellInfo);
+    go->AI()->SpellHit(unitCaster ? unitCaster : m_originalCaster, m_spellInfo);
 
     CallScriptOnHitHandlers();
 
