@@ -231,7 +231,7 @@ struct boss_illidan_stormrage : public BossAI
         ScheduleHealthCheckEvent(30, [&] {
             // Maiev Spawn Scene
             scheduler.CancelAll();
-            if (me->HasAura(SPELL_DEMON_FORM))
+            if (IsInDemonFormOrTransforming())
                 DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
             me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
             DoAction(ACTION_SHADOW_PRISON);
@@ -378,7 +378,7 @@ struct boss_illidan_stormrage : public BossAI
                 me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
                 scheduler.CancelAll();
 
-                if (me->HasAura(SPELL_DEMON_FORM))
+                if (IsInDemonFormOrTransforming())
                     DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
 
                 _dying = true;
@@ -588,7 +588,7 @@ struct boss_illidan_stormrage : public BossAI
                     else
                         ScheduleAbilities(PHASE_LANDING);
                     DoResetThreatList();
-                }, 60s);
+                }, 60s, GROUP_DEMON_FORM);
             }
             break;
             case PHASE_MAIEV:
@@ -683,6 +683,13 @@ private:
     bool _dying;
     bool _inCutscene;
     uint8 beamPosId;
+
+    // Demon Form is only applied partway through the transform, so check the transform auras too
+    bool IsInDemonFormOrTransforming() const
+    {
+        return me->HasAnyAuras(SPELL_DEMON_TRANSFORM_1, SPELL_DEMON_TRANSFORM_2, SPELL_DEMON_TRANSFORM_3,
+            SPELL_DEMON_FORM);
+    }
 
     void CycleBeamPos(uint8 &beamPosId)
     {
@@ -1426,9 +1433,19 @@ class spell_illidan_parasitic_shadowfiend_aura : public AuraScript
             GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
     }
 
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        // The DoT ignores immunities, but Shadow Prison should still stop its damage
+        if (GetTarget()->HasAura(SPELL_SHADOW_PRISON))
+            PreventDefaultAction();
+    }
+
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_aura::HandleEffectRemove,
+            EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_parasitic_shadowfiend_aura::HandlePeriodic,
+            EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1464,9 +1481,19 @@ class spell_illidan_parasitic_shadowfiend_trigger_aura : public AuraScript
             GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
     }
 
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        // The DoT ignores immunities, but Shadow Prison should still stop its damage
+        if (GetTarget()->HasAura(SPELL_SHADOW_PRISON))
+            PreventDefaultAction();
+    }
+
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_trigger_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_trigger_aura::HandleEffectRemove,
+            EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_parasitic_shadowfiend_trigger_aura::HandlePeriodic,
+            EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 

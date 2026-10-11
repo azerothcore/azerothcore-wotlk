@@ -68,6 +68,7 @@ enum LeviathanSpells
     SPELL_HODIRS_FURY_STUN              = 62297,
     SPELL_FREYA_WARD                    = 62906, // removed spawn effect
     SPELL_MIMIRONS_INFERNO              = 62909,
+    SPELL_MIMIRONS_INFERNO_DAMAGE       = 62910,
     SPELL_THORIMS_HAMMER                = 62911,
     SPELL_LASH                          = 65062,
 
@@ -786,6 +787,7 @@ struct boss_flame_leviathan_seat : public VehicleAI
         who->ApplySpellImmune(SPELL_BATTERING_RAM, IMMUNITY_ID, SPELL_BATTERING_RAM, apply);
         // 10yd ground-level AoE that cannot reach the seats ~15yd up on the boss' back
         who->ApplySpellImmune(SPELL_HODIRS_FURY_STUN, IMMUNITY_ID, SPELL_HODIRS_FURY_STUN, apply);
+        who->ApplySpellImmune(SPELL_MIMIRONS_INFERNO_DAMAGE, IMMUNITY_ID, SPELL_MIMIRONS_INFERNO_DAMAGE, apply);
 
         if (!me->GetVehicleKit())
             return;
@@ -961,6 +963,7 @@ struct npc_freya_ward_summon : public ScriptedAI
     void Reset() override
     {
         events.Reset();
+        me->SetCorpseDelay(5);
     }
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
@@ -1234,7 +1237,7 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
     {
         if (id == me->GetEntry())
         {
-            if (Creature* liquid = me->SummonCreature(NPC_LIQUID, *me))
+            if (Creature* liquid = me->SummonCreature(NPC_LIQUID, *me, TEMPSUMMON_TIMED_DESPAWN, 180 * IN_MILLISECONDS))
             {
                 liquid->CastSpell(liquid, SPELL_LIQUID_PYRITE, true);
                 liquid->CastSpell(liquid, SPELL_DUST_CLOUD_IMPACT, true);

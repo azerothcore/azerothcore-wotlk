@@ -45,7 +45,7 @@ enum Spells
 {
     // Rotface
     SPELL_SLIME_SPRAY                       = 69508,    // every 20 seconds
-    SPELL_MUTATED_INFECTION                 = 69674,    // hastens every 1:30
+    SPELL_MUTATED_INFECTION                 = 69674,    // hastens every 1:30 in 25-man only
 
     SPELL_VILE_GAS_H                        = 69240,
 
@@ -158,7 +158,9 @@ public:
             // schedule events
             events.Reset();
             events.ScheduleEvent(EVENT_SLIME_SPRAY, 20s);
-            events.ScheduleEvent(EVENT_HASTEN_INFECTIONS, 90s);
+            // Infection interval hastens every 1:30 in 25-man only; the 2010-03-04 hotfix removed it in 10-man
+            if (Is25ManRaid())
+                events.ScheduleEvent(EVENT_HASTEN_INFECTIONS, 90s);
             events.ScheduleEvent(EVENT_MUTATED_INFECTION, 14s);
             events.ScheduleEvent(EVENT_ROTFACE_OOZE_FLOOD, 8s);
             if (IsHeroic())

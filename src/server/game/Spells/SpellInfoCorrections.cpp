@@ -2243,19 +2243,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ENEMY);
     });
 
-    // Trial of the Crusader, Gormok, player vehicle spell, CUSTOM! (default jump to hand, not used)
-    ApplySpellFix({ 66342 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_SET_VEHICLE_ID;
-        spellInfo->Effects[EFFECT_0].MiscValue = 496;
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(25);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
-        spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CHANGE_MAP;
-    });
-
     // Trial of the Crusader, Gormok, Fire Bomb
     ApplySpellFix({ 66313 }, [](SpellInfo* spellInfo)
     {
@@ -2959,6 +2946,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // copied attributes from Green Ooze Channel
         spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Professor Putricide, Expunged Gas (Gas Cloud detonation)
+    ApplySpellFix({ 70701 }, [](SpellInfo* spellInfo)
+    {
+        // custom: the detonation is an unavoidable raid-wide hit, it must not be resisted away
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
