@@ -9411,6 +9411,11 @@ namespace Acore
                     if (_caster->IsFriendlyTo(unitTarget))
                         return false;
                     break;
+                case TARGET_CHECK_ENTRY:
+                    if (Unit const* unitCaster = _caster->ToUnit())
+                        if (unitCaster->IsAreaEffectPvPBlocked(unitTarget, _spellInfo) && !unitCaster->IsFriendlyTo(unitTarget))
+                            return false;
+                    break;
                 default:
                     break;
             }
