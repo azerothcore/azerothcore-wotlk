@@ -1845,7 +1845,7 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
     him, because it would be it's passenger, there's no such case where this gets to fail legitimacy, this problem
     cannot be solved from within the check in other way since target type cannot be called for the spell currently
     Spell examples: [ID - 52864 Devour Water, ID - 52862 Devour Wind, ID - 49370 Wyrmrest Defender: Destabilize Azure Dragonshrine Effect] */
-    if ((!unitCaster || !unitCaster->IsVehicle()) && (!unitCaster || unitCaster->GetCharmerOrOwner() != target))
+    if ((!unitCaster || !(unitCaster->IsCreature() && unitCaster->IsVehicle())) && (!unitCaster || unitCaster->GetCharmerOrOwner() != target))
     {
         if (TargetAuraState && !unitTarget->HasAuraState(AuraStateType(TargetAuraState), this, unitCaster))
             return SPELL_FAILED_TARGET_AURASTATE;

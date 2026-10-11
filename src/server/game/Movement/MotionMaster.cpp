@@ -697,8 +697,9 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
  * @brief Makes the unit travel a closed, cyclic path around (x, y, z).
  *
  * The path starts at the unit's bearing from the centre. Flight state decides whether z pins to
- * the argument or follows the terrain, and which speed is used; forcedMovement overrides the
- * walk/run choice, and FORCED_MOVEMENT_FLY flies a unit that is not fly-flagged.
+ * the argument or follows the terrain, raised by the unit's hover height, and which speed is
+ * used; forcedMovement overrides the walk/run choice, and FORCED_MOVEMENT_FLY flies a unit that
+ * is not fly-flagged.
  *
  * @param stepCount Number of points the path is built from, must be at least 2: a lower count
  *                  yields an empty or single-point path, which Launch() refuses, leaving the unit
@@ -735,7 +736,7 @@ void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool 
             point.z = z;
         else
         {
-            point.z = _owner->GetMap()->GetHeight(_owner->GetPhaseMask(), point.x, point.y, z);
+            point.z = _owner->GetMapHeight(point.x, point.y, z);
 
             if (point.z <= INVALID_HEIGHT)
             {
@@ -744,6 +745,8 @@ void MotionMaster::MoveCirclePath(float x, float y, float z, float radius, bool 
                     point.x, point.y, _owner->GetGUID().ToString());
                 return;
             }
+
+            point.z += _owner->GetHoverHeight();
         }
 
         init.Path().push_back(point);
