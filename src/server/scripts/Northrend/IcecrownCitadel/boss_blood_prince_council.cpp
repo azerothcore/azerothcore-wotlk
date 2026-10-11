@@ -867,20 +867,25 @@ public:
                     Unit::Kill(taldaram, taldaram);
         }
 
+        void ResetPrince()
+        {
+            _canDie = true;
+            me->setActive(false);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            me->SetHealth(me->GetMaxHealth());
+            DoAction(ACTION_CAST_INVOCATION);
+        }
+
         void JustRespawned() override
         {
             BossAI::JustRespawned();
-            JustReachedHome();
+            ResetPrince();
         }
 
         void JustReachedHome() override
         {
-            _canDie = true;
-            me->setActive(false);
+            ResetPrince();
             instance->SetBossState(DATA_BLOOD_PRINCE_COUNCIL, FAIL);
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-            me->SetHealth(me->GetMaxHealth());
-            DoAction(ACTION_CAST_INVOCATION);
         }
 
         void JustSummoned(Creature* summon) override

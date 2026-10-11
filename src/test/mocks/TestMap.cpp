@@ -24,6 +24,8 @@
 #include "ScriptDefines/UnitScript.h"
 #include "ScriptDefines/WorldObjectScript.h"
 #include "ScriptDefines/CommandScript.h"
+#include "ScriptDefines/ServerScript.h"
+#include "ScriptDefines/SessionScript.h"
 
 TestMap::TestMap()
     : Map(0, 0, REGULAR_DIFFICULTY, nullptr)
@@ -65,4 +67,6 @@ TestMap::~TestMap()
     ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
     ScriptRegistry<WorldObjectScript>::InitEnabledHooksIfNeeded(WORLDOBJECTHOOK_END);
     ScriptRegistry<CommandSC>::InitEnabledHooksIfNeeded(ALLCOMMANDHOOK_END);
+    ScriptRegistry<ServerScript>::InitEnabledHooksIfNeeded(SERVERHOOK_END);
+    ScriptRegistry<SessionScript>::InitEnabledHooksIfNeeded(SESSIONHOOK_END);
 }

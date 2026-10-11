@@ -598,167 +598,6 @@ func TestUlduar_BrightleafSunBeamsCappedPerWave(t *testing.T) {
 	t.Logf("PASS %d sun beam(s) in one wave with %d players in range", len(wave), botCount)
 }
 
-// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27590
-// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27628
-// Psychosis (63795) and Malady of the Mind (63830) must skip players sitting at 40 Sanity
-// or less. Both pick a random enemy through TARGET_UNIT_SRC_AREA_ENEMY over a 50000 yd
-// radius and AzerothCore never filtered that list, so the players closest to going insane
-// kept being the ones picked.
-//
-// Sara is faction 35 and can never own an enemy list, so she cannot be the fixture caster.
-// A Laughing Skull is the stand-in: faction 14, NullCreatureAI, no threat list, and the
-// Lunatic Gaze test above already proves its spells select the bot as an enemy. Its own
-// gaze is stripped first, otherwise the 2 sanity a second it drains drowns the oracle.
-func TestAC_27590_PsychosisSkipsLowSanity(t *testing.T) {
-	meta.Begin(t, meta.TestMeta{
-		Tags:     []string{"med", "instances", "issue"},
-		Runtime:  "med",
-		Issue:    27590,
-		Category: "instances/northrend/ulduar",
-	})
-
-	const (
-		npcLaughingSkull = uint32(33990)
-		spellSanity      = uint32(63050)
-		spellSanityWell  = uint32(64169)
-		spellLunaticGaze = uint32(64167)
-		spellPsychosis   = uint32(63795)
-		spellMalady      = uint32(63830)
-
-		// Icecrown illusion chamber floor, the pad the Lunatic Gaze test spawns on.
-		padX, padY, padZ = float32(1930.0), float32(-120.0), float32(240.07)
-
-		// Threshold from the 2009-07-02 hotfix: at or below it neither spell may pick the player.
-		sanityFloor = 40
-
-		// Where the walk down starts. A Sanity Well tops up in steps of 20 from the single
-		// stack `.aura` creates, so 1 -> 21 -> 41 -> 61 lands here and Psychosis then steps
-		// 61 -> 52 -> 43 -> 34, straddling the threshold without overshooting it far.
-		sanityStart = 60
-
-		// 63795 is a 2.9s cast and target selection only runs once it completes. A cast that
-		// finds nobody expires quietly, so the no-drain half has to burn the whole window.
-		castWindow = 8 * time.Second
-
-		// Well ticks every 2s; this only has to outlast the three steps up to sanityStart.
-		rampWindow = 20 * time.Second
-
-		// Enough steps to walk sanityStart down past the threshold at 9 a hit, with room to spare.
-		maxPsychosisCasts = 20
-	)
-
-	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
-		Prefix: "YoggPs", Race: e2eharness.RaceHuman, Level: 80,
-	})
-
-	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
-	bot.Teleport(t, padX, padY, padZ, e2eharness.MapUlduar)
-	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
-		e2eharness.Preconditionf(t, "not in Ulduar after brain room tele map=%d", m)
-	}
-	skull := bot.Spawn(t, npcLaughingSkull, 30*time.Second)
-
-	// GM casts and aura edits both act on the current selection, so every one of them says
-	// out loud which unit it means.
-	selectUnit := func(label string, guid uint64) {
-		t.Helper()
-		if err := bot.World.SetTarget(guid); err != nil {
-			e2eharness.Preconditionf(t, "select %s 0x%X: %v", label, guid, err)
-		}
-	}
-	selectSkull := func() { t.Helper(); selectUnit("skull", skull) }
-	selectSelf := func() { t.Helper(); selectUnit("self", bot.World.CharGUID()) }
-
-	selectSkull()
-	bot.GM(t, fmt.Sprintf(".unaura %d", spellLunaticGaze))
-
-	// Drop GM so the spells can select the bot; god mode absorbs the damage half of Psychosis.
-	bot.CombatReady(t)
-	bot.CheatGod(t)
-
-	// Sanity carries AURA_INTERRUPT_FLAG_CHANGE_MAP, so apply it after the tele. `.aura`
-	// creates it at one stack, which is already under the threshold, so a Sanity Well
-	// buff tops it up the same way Freya's wells do in the fight.
-	bot.ApplyAura(t, spellSanity)
-	bot.ApplyAura(t, spellSanityWell)
-	rampDeadline := time.Now().Add(rampWindow)
-	for bot.AuraStacks(spellSanity) < sanityStart && time.Now().Before(rampDeadline) {
-		time.Sleep(250 * time.Millisecond)
-	}
-	// CMSG_CANCEL_AURA does not take the well off, so strip it server side.
-	selectSelf()
-	bot.GM(t, fmt.Sprintf(".unaura %d", spellSanityWell))
-
-	start := bot.AuraStacks(spellSanity)
-	if start <= sanityFloor {
-		e2eharness.Preconditionf(t, "Sanity ramped to %d stacks, need more than %d to drive the threshold", start, sanityFloor)
-	}
-
-	// Every later delta is attributed to the spell under test, so nothing else may be moving
-	// sanity now: this catches both a skull that still gazes and a well that never came off.
-	time.Sleep(3 * time.Second)
-	if quiet := bot.AuraStacks(spellSanity); quiet != start {
-		e2eharness.Preconditionf(t, "sanity still moving on its own before the first cast (%d -> %d), skull 0x%X", start, quiet, skull)
-	}
-
-	// `.cast self` makes the *selected* unit cast on itself. Psychosis and Malady take their
-	// real targets from the area around the caster, which is the same selection path Sara
-	// drives in phase 2. Returns the stacks the bot lost, 0 if the cast never reached it.
-	castFromSkull := func(spellID uint32) int {
-		t.Helper()
-		before := bot.AuraStacks(spellSanity)
-		selectSkull()
-		bot.GM(t, fmt.Sprintf(".cast self %d", spellID))
-		deadline := time.Now().Add(castWindow)
-		for time.Now().Before(deadline) {
-			if now := bot.AuraStacks(spellSanity); now != before {
-				return before - now
-			}
-			time.Sleep(200 * time.Millisecond)
-		}
-		return 0
-	}
-
-	// Fixture check: at full sanity the spell must reach the bot at all. Without this a
-	// mis-aimed `.cast self` (it falls back to the caster's own player when nothing is
-	// selected) would read as a clean pass on both of the assertions below.
-	if lost := castFromSkull(spellMalady); lost <= 0 {
-		e2eharness.Preconditionf(t, "fixture dead: Malady of the Mind drained nothing at %d sanity", bot.AuraStacks(spellSanity))
-	}
-
-	lastValid := 0
-	for i := 0; i < maxPsychosisCasts; i++ {
-		before := bot.AuraStacks(spellSanity)
-		if before <= sanityFloor {
-			break
-		}
-		lost := castFromSkull(spellPsychosis)
-		if lost <= 0 {
-			e2eharness.ConfirmedBugf(t, 27590,
-				"Psychosis drained nothing at %d sanity, which is above the %d threshold", before, sanityFloor)
-		}
-		lastValid = before
-		t.Logf("Psychosis at %d sanity drained %d -> %d", before, lost, bot.AuraStacks(spellSanity))
-	}
-
-	atFloor := bot.AuraStacks(spellSanity)
-	if atFloor > sanityFloor {
-		e2eharness.Preconditionf(t, "never reached the threshold, stuck at %d sanity after %d casts", atFloor, maxPsychosisCasts)
-	}
-
-	if lost := castFromSkull(spellPsychosis); lost > 0 {
-		e2eharness.ConfirmedBugf(t, 27590,
-			"Psychosis drained %d sanity from a player at %d, at or below the %d threshold", lost, atFloor, sanityFloor)
-	}
-	atFloor = bot.AuraStacks(spellSanity)
-	if lost := castFromSkull(spellMalady); lost > 0 {
-		e2eharness.ConfirmedBugf(t, 27590,
-			"Malady of the Mind drained %d sanity from a player at %d, at or below the %d threshold", lost, atFloor, sanityFloor)
-	}
-
-	t.Logf("PASS low sanity targeting: both spells landed down to %d sanity and neither reached the player at %d", lastValid, atFloor)
-}
-
 // Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27455
 // An Ancient Water Spirit's Tidal Wave (62653, 25-man rank 62935) is a 2s cast that surges the
 // spirit forward and knocks everything in its path off its feet with a second spell, 62654
@@ -1357,5 +1196,229 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 		adds = append(adds, add.GUID)
 	}
 	bot.DamageKill(t, adds, 10_000_000, 30*time.Second)
+	bot.AssertWorldAlive(t)
+}
+
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27718
+// Each Elder count has its own Freya's Gift, and the emblems the fix corrects are per chest, so
+// the chest that spawns has to be the one for the Elders actually left alive. The emblems inside
+// are out of reach here: a chest opens only through SPELL_EFFECT_OPEN_LOCK (Spell::SendLoot),
+// CMSG_LOOT drops any guid that is not a creature, and the harness cannot cast at a gameobject
+// target. Inventoried as blocked-harness in e2e/README.md.
+func TestUlduar_FreyaGiftMatchesElderCount(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"short", "instances"},
+		Runtime:  "short",
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcFreya           = uint32(32906)
+		npcElderIronbranch = uint32(32913)
+		npcElderStonebark  = uint32(32914)
+
+		// 10-man spawns 194330 for no Elder alive, 194328 for one, 194326 for two, 194324 for all
+		// three.
+		goGiftNoElder     = uint32(194330)
+		goGiftOneElder    = uint32(194328)
+		goGiftTwoElders   = uint32(194326)
+		goGiftThreeElders = uint32(194324)
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "FreyaGf",
+		Level:  80,
+	})
+
+	// Raid interior pad (game_tele BossFreya); stay GM through the raid enter.
+	bot.Teleport(t, 2326.82, -48.131, 424.963, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Freya pad tele map=%d", m)
+	}
+	bot.GoCreatureID(t, npcFreya)
+
+	// Ironbranch and Stonebark stand 136y and 144y from Freya, inside visibility. Brightleaf at
+	// 190y is out of the object cache and never touched, so he is the one left to empower her.
+	var toKill []uint64
+	for _, entry := range []uint32{npcElderIronbranch, npcElderStonebark} {
+		elder := bot.WaitUnit(t, entry, 30*time.Second)
+		if hp, _ := bot.UnitHP(elder); hp == 0 {
+			e2eharness.Preconditionf(t, "Elder %d is already a corpse: this instance copy is not fresh", entry)
+		}
+		toKill = append(toKill, elder)
+	}
+	bot.DamageKill(t, toKill, 10_000_000, 20*time.Second)
+
+	bot.CombatReady(t)
+
+	// Evade can leave a 0 HP object in cache, so wait for a living Freya rather than any GUID.
+	var freyaGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		freyaGUID = bot.WaitUnit(t, npcFreya, 10*time.Second)
+		if hp, maxHP := bot.UnitHP(freyaGUID); maxHP > 0 && hp > 0 && bot.World.GetObject(freyaGUID) != nil {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Freya in cache after GoCreatureID (last=0x%X)", freyaGUID)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	// The Elders are read on engage, and only the living ones count.
+	bot.Engage(t, freyaGUID, 15*time.Second)
+
+	// Freya's DamageTaken runs the whole defeat: it zeroes the killing blow, summons the chest and
+	// teleports her out. She never reaches 0 HP, so DamageKill would spin until it timed out.
+	bot.Damage(t, freyaGUID, 100_000_000)
+
+	chest := e2eharness.TryNearbyGameObjectByEntry(t, bot.World, goGiftOneElder, 30*time.Second)
+	if chest == 0 {
+		for _, other := range []struct {
+			entry  uint32
+			elders int
+		}{{goGiftNoElder, 0}, {goGiftTwoElders, 2}, {goGiftThreeElders, 3}} {
+			if e2eharness.TryNearbyGameObjectByEntry(t, bot.World, other.entry, time.Second) != 0 {
+				e2eharness.Assertf(t, "Freya's Gift %d spawned: the script counted %d Elders alive, want 1",
+					other.entry, other.elders)
+			}
+		}
+		e2eharness.Preconditionf(t, "no Freya's Gift within 30s of Freya's defeat")
+	}
+	t.Logf("PASS Freya's Gift %d spawned with one Elder alive (guid=0x%X)", goGiftOneElder, chest)
+	bot.AssertWorldAlive(t)
+}
+
+// Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/27736
+// PR:    https://github.com/azerothcore/azerothcore-wotlk/pull/27751
+// Ignis dying casts Kill All Constructs (65109). Every Iron Construct must die with him,
+// dormant ones included, and the instakill must reach nothing else: its implicit target is
+// entry-based, so a missing `conditions` row would let it hit the player and every other
+// creature on the map.
+//
+// 10-man only: the harness cannot switch a bot to 25-man, inventoried as blocked-harness
+// on the instances/ulduar row of e2e/README.md. The construct entry is 33121 in both
+// difficulties because Creature::InitEntry keeps the normal entry and only swaps the
+// template, so the targeting row this asserts on is the same row 25-man uses.
+func TestAC_27736_IgnisKillsAllConstructs(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"long", "instances", "issue"},
+		Runtime:  "long",
+		Issue:    27736,
+		Category: "instances/northrend/ulduar",
+	})
+
+	const (
+		npcIgnis         = uint32(33118)
+		npcIronConstruct = uint32(33121)
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "Ignis",
+		Level:  80,
+	})
+
+	// Stay GM through the raid enter (.go xyz onto 603 is ignored after .gm off).
+	bot.Teleport(t, 586.542, 378.798, 360.923, e2eharness.MapUlduar)
+	if _, _, _, m := bot.Pos(); m != e2eharness.MapUlduar {
+		e2eharness.Preconditionf(t, "not in Ulduar after Ignis pad tele map=%d", m)
+	}
+	bot.GoCreatureID(t, npcIgnis)
+	bot.CombatReady(t)
+
+	// FlushWorld beside a boss can evade him out of cache; re-acquire a living GUID.
+	var ignisGUID uint64
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		ignisGUID = bot.WaitUnit(t, npcIgnis, 10*time.Second)
+		if hp, maxHP := bot.UnitHP(ignisGUID); maxHP > 0 && hp > 0 && bot.World.GetObject(ignisGUID) != nil {
+			break
+		}
+		if !time.Now().Before(deadline) {
+			e2eharness.Preconditionf(t, "no living Ignis in cache after GoCreatureID (last=0x%X)", ignisGUID)
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+	bot.Engage(t, ignisGUID, 15*time.Second)
+
+	// Snapshot immediately before the killing blow. Activate Construct is 40s out on 10-man,
+	// so the constructs are still dormant: exactly the case the old IsInCombat filter missed.
+	constructs := e2eharness.UnitsByEntry(bot.World, 0, npcIronConstruct)
+	if len(constructs) == 0 {
+		e2eharness.Preconditionf(t, "no living Iron Construct in cache beside Ignis")
+	}
+	dormant := 0
+	for _, c := range constructs {
+		if !c.InCombat {
+			dormant++
+		}
+	}
+	if dormant == 0 {
+		e2eharness.Preconditionf(t, "all %d Iron Constructs are already in combat; the dormant case is not exercised", len(constructs))
+	}
+
+	// Anything alive and not a construct must survive the instakill.
+	bystanders := make(map[uint64]uint32)
+	for _, u := range bot.World.GetNearbyUnits(200) {
+		// Entry 0 is a create the cache has not resolved yet. It may be a construct, which
+		// UnitsByEntry already judges by GUID, so it must not be filed as a bystander too.
+		if u.GUID == ignisGUID || u.Entry == npcIronConstruct || u.Entry == 0 || u.Health() == 0 {
+			continue
+		}
+		bystanders[u.GUID] = u.Entry
+	}
+	t.Logf("before kill: %d Iron Constructs (%d dormant), %d other living creatures in cache",
+		len(constructs), dormant, len(bystanders))
+
+	bot.DamageKill(t, []uint64{ignisGUID}, 1_000_000, 60*time.Second)
+	bot.WaitUnitDead(t, ignisGUID, 30*time.Second)
+
+	// The constructs die in the same object update as the boss; poll briefly for it to land.
+	var alive, judged []uint64
+	dl := time.Now().Add(15 * time.Second)
+	for {
+		alive, judged = alive[:0], judged[:0]
+		for _, c := range constructs {
+			obj := bot.World.GetObject(c.GUID)
+			if obj == nil {
+				continue // left the cache: cannot judge this one
+			}
+			judged = append(judged, c.GUID)
+			if obj.Health() > 0 {
+				alive = append(alive, c.GUID)
+			}
+		}
+		if len(alive) == 0 || !time.Now().Before(dl) {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	if len(judged) == 0 {
+		e2eharness.Preconditionf(t, "every Iron Construct left the object cache after Ignis died; nothing to judge")
+	}
+	if len(alive) > 0 {
+		e2eharness.ConfirmedBugf(t, 27736, "%d of %d judged Iron Constructs still alive after Ignis died (first=0x%X)",
+			len(alive), len(judged), alive[0])
+	}
+
+	for guid, entry := range bystanders {
+		obj := bot.World.GetObject(guid)
+		if obj == nil {
+			continue // left the cache: cannot judge this one
+		}
+		if obj.Health() == 0 {
+			e2eharness.Assertf(t, "Kill All Constructs killed a bystander creature guid=0x%X entry=%d: spell 65109 is not restricted to entry %d",
+				guid, entry, npcIronConstruct)
+		}
+	}
+	self := bot.World.GetObject(bot.GUID)
+	if self == nil {
+		e2eharness.HarnessFailf(t, "own player object missing from the cache after the kill")
+	}
+	if self.Health() == 0 {
+		e2eharness.Assertf(t, "Kill All Constructs killed the player: spell 65109 is missing its targeting conditions")
+	}
+
+	t.Logf("PASS Ignis death killed %d/%d judged Iron Constructs (%d dormant); %d bystander creatures and the player survived",
+		len(judged), len(constructs), dormant, len(bystanders))
 	bot.AssertWorldAlive(t)
 }

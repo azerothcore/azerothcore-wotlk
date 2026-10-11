@@ -863,16 +863,12 @@ public:
     {
         npc_gas_cloudAI(Creature* creature) : npc_putricide_oozeAI(creature, SPELL_EXPUNGED_GAS)
         {
-            _newTargetSelectTimer = 0;
         }
 
         void CastMainSpell() override
         {
             me->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, me, false);
         }
-
-    private:
-        uint32 _newTargetSelectTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1055,21 +1051,41 @@ class spell_putricide_gaseous_bloat_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_GASEOUS_BLOAT });
+        return ValidateSpellInfo({ SPELL_GASEOUS_BLOAT, SPELL_EXPUNGED_GAS });
     }
 
     void HandleExtraEffect(AuraEffect const* /*aurEff*/)
     {
-        Unit* target = GetTarget();
-        target->RemoveAuraFromStack(GetSpellInfo()->Id, GetCasterGUID());
-        /*if (!target->HasAura(GetId()))
-            if (Unit* caster = GetCaster())
-                caster->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, caster, false);*/
+        // every tick burns one stack, so the debuff decays over 10 ticks if the cloud never reaches its target
+        GetTarget()->RemoveAuraFromStack(GetSpellInfo()->Id, GetCasterGUID());
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // only the Gas Cloud that channelled this Gaseous Bloat detonates on contact
+        return eventInfo.GetActor() && eventInfo.GetActor()->GetGUID() == GetCasterGUID();
+    }
+
+    void HandleProc(ProcEventInfo& eventInfo)
+    {
+        // the raid eats the whole remaining DoT, not just one tick: the periodic amount is already
+        // perStack * remaining stacks and carries the difficulty scaling, so the sum of what is left
+        // is amount * (stacks + 1) / 2. Both reads have to happen before the bloat is removed.
+        AuraEffect const* bloat = GetEffect(EFFECT_0);
+        uint8 const stacks = GetStackAmount();
+        int32 const damage = bloat ? bloat->GetAmount() * (stacks + 1) / 2 : 0;
+
+        // the bloat is consumed by the detonation, just like the Volatile Ooze's adhesive
+        GetTarget()->RemoveAurasDueToSpell(GetId(), GetCasterGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
+
+        eventInfo.GetActor()->CastCustomSpell(SPELL_EXPUNGED_GAS, SPELLVALUE_BASE_POINT0, damage, nullptr, true);
     }
 
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_putricide_gaseous_bloat_aura::HandleExtraEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        DoCheckProc += AuraCheckProcFn(spell_putricide_gaseous_bloat_aura::CheckProc);
+        OnProc += AuraProcFn(spell_putricide_gaseous_bloat_aura::HandleProc);
     }
 };
 

@@ -130,6 +130,13 @@ struct PetitionData
 {
 };
 
+struct SessionOutcome
+{
+    SessionShutdownType Type = SHUTDOWN_TYPE_UNKNOWN;
+    uint8 ExitCode = SHUTDOWN_EXIT_CODE;
+    std::string Reason;
+};
+
 /// The World
 class World: public IWorld
 {
@@ -185,8 +192,13 @@ public:
     void ShutdownCancel() override;
     void ShutdownMsg(bool show = false, Player* player = nullptr, std::string const& reason = std::string()) override;
     static uint8 GetExitCode() { return _exitCode; }
-    static void StopNow(uint8 exitcode) { _stopEvent = true; _exitCode = exitcode; }
+    static void StopNow(uint8 exitcode) { _stoppedByStopNow = true; _stopEvent = true; _exitCode = exitcode; }
     static bool IsStopped() { return _stopEvent; }
+
+    /// Records how this session ended in `uptime`; `finished` marks the shutdown as complete (not a crash)
+    void SaveSessionEnd(bool finished) override;
+    [[nodiscard]] Optional<PreviousSessionInfo> const& GetPreviousSessionInfo() const override { return _previousSession; }
+    [[nodiscard]] uint32 GetLifetimeMaxPlayerCount() const override;
 
     void Update(uint32 diff) override;
 
@@ -243,6 +255,7 @@ public:
 protected:
     void _UpdateGameTime();
     bool RescheduleShutdownForWintergrasp();
+    void LoadPreviousSessionInfo();
     // callback for UpdateRealmCharacters
     void _UpdateRealmCharCount(PreparedQueryResult resultCharCount,uint32 accountId);
 
@@ -262,10 +275,16 @@ private:
     WorldConfig _worldConfig;
 
     static std::atomic_long _stopEvent;
-    static uint8 _exitCode;
+    static std::atomic<uint8> _exitCode;
+    // Set by StopNow, whose exit code replaces any scheduled shutdown's, so the scheduled details no longer apply
+    static std::atomic<bool> _stoppedByStopNow;
     uint32 _shutdownTimer;
     uint32 _shutdownMask;
     std::string _shutdownReason;
+
+    Optional<PreviousSessionInfo> _previousSession;
+    uint32 _lifetimeMaxPlayerCount;
+    Optional<SessionOutcome> _sessionOutcome;
 
     uint32 _cleaningFlags;
 
