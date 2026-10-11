@@ -30,6 +30,7 @@
 #include "WorldSession.h"
 #include "WorldStateDefines.h"
 #include "icecrown_citadel.h"
+#include <array>
 
 enum EventIds
 {
@@ -52,7 +53,29 @@ enum TimedEvents
     EVENT_QUAKE_SHATTER         = 2,
     EVENT_REBUILD_PLATFORM      = 3,
     EVENT_RESPAWN_GUNSHIP       = 4,
-    EVENT_RESPAWN_SINDRAGOSA    = 5
+    EVENT_RESPAWN_SINDRAGOSA    = 5,
+    EVENT_SPAWN_SAURFANG_EVENT  = 6,
+    EVENT_SAURFANG_ZEPPELIN_DOCK = 7,
+    EVENT_SAURFANG_OUTRO_TIMEOUT = 8,
+    EVENT_SAURFANG_ZEPPELIN_REMOVE = 9,
+    // The camp is built on screen, stage by stage.
+    EVENT_SAURFANG_CAMP_ACTIVATE    = 10,
+    EVENT_SAURFANG_CAMP_WORKERS     = 11,
+    EVENT_SAURFANG_CAMP_WORKER_0_RUN = 12,
+    EVENT_SAURFANG_CAMP_WORKER_1_RUN = 13,
+    EVENT_SAURFANG_CAMP_WORKER_0_WORK = 14,
+    EVENT_SAURFANG_CAMP_WORKER_1_WORK = 15,
+    EVENT_SAURFANG_CAMP_TENTS       = 16,
+    EVENT_SAURFANG_CAMP_VENDORS     = 17
+};
+
+// waypoint_data paths walking the camp vendors from their teleporter pads to their pitches.
+enum SaurfangCampPaths
+{
+    PATH_CAMP_SHELY_STEELBOWELS         = NPC_CAMP_SHELY_STEELBOWELS * 10,
+    PATH_CAMP_BRAZIE_GETZ               = NPC_CAMP_BRAZIE_GETZ * 10,
+    PATH_CAMP_APOTHECARY_CANDITH_TOMAS  = NPC_CAMP_APOTHECARY_CANDITH_TOMAS * 10,
+    PATH_CAMP_MORGAN_DAYBLAZE           = NPC_CAMP_MORGAN_DAYBLAZE * 10
 };
 
 enum Spells
@@ -63,7 +86,8 @@ enum Spells
     BLOOD_BEAM_VISUAL_LHAND = 72303,
     BLOOD_BEAM_VISUAL_LLEG  = 72302,
     BLOOD_BEAM_VISUAL_RLEG  = 72301,
-    VOID_ZONE_VISUAL        = 69422
+    VOID_ZONE_VISUAL        = 69422,
+    SPELL_SIMPLE_TELEPORT   = 12980     // the camp crew stepping off the teleporter pads
 };
 
 enum Say
@@ -161,6 +185,61 @@ Position const UtherSpawnPos    = { -26.58507f, 2211.524f, 30.19898f, 3.124139f 
 Position const SylvanasSpawnPos = { -41.45833f, 2222.891f, 27.98586f, 3.647738f };
 Position const SindragosaSpawnPos = { 4818.6997f, 2483.7102f, 287.06497f, 3.286661f };
 
+// The camps differ: the Horde raises two tents by its bonfire, forge and anvil, the Alliance a
+// tighter cluster with a banner and its own anvil and forge, and no bonfire.
+Position const SaurfangCampTentPosH[2] =
+{
+    { -532.86456f, 2229.0088f, 539.2921f, 2.530723f },
+    { -524.55730f, 2238.0920f, 539.2920f, 0.13962449f }
+};
+
+Position const SaurfangCampTentPosA[2] =
+{
+    { -532.52606f, 2229.6511f, 539.29193f, 5.480516f },
+    { -528.74830f, 2233.4705f, 539.29193f, 5.463047f }
+};
+
+Position const SaurfangCampBannerPosA   = { -533.14410f, 2233.9670f, 539.29224f, 5.463047f };
+Position const SaurfangCampAnvilPosA    = { -524.68580f, 2235.8855f, 539.29190f, 0.7853982f };
+Position const SaurfangCampForgePosA    = { -526.50867f, 2237.5417f, 539.29205f, 0.0f };
+
+Position const SaurfangCampTeleporterPos[2] =
+{
+    { -560.41840f, 2202.7500f, 539.28534f, 0.0f },
+    { -560.29517f, 2220.2153f, 539.28540f, 0.0f }
+};
+
+// Where the workers stand hammering, one per teleporter pad, short of the tent they raise.
+Position const SaurfangCampWorkPosH[2] =
+{
+    { -521.00696f, 2235.4844f, 539.29175f, 2.3f },
+    { -529.47220f, 2225.7360f, 539.29193f, 2.3f }
+};
+
+Position const SaurfangCampWorkPosA[2] =
+{
+    { -524.22050f, 2232.9392f, 539.27704f, 2.2165682f },
+    { -530.03820f, 2227.0989f, 539.27704f, 2.2863812f }
+};
+
+// The vendors' pitches, the end of their waypoint paths, for a camp not built on screen.
+Position const SaurfangCampBlacksmithPos    = { -520.94100f, 2233.1077f, 539.2769f, 5.3756142f };
+Position const SaurfangCampGeneralGoodsPos  = { -530.17017f, 2226.2310f, 539.2770f, 5.4628806f };
+Position const SaurfangCampBlacksmithPosA   = { -526.80206f, 2231.3682f, 539.2771f, 5.5152402f };
+Position const SaurfangCampGeneralGoodsPosA = { -530.60070f, 2227.6736f, 539.2771f, 5.4977870f };
+
+// Where the zeppelin comes to rest; it is frozen on arrival.
+Position const SaurfangOutroZeppelinPos     = { -527.66110f, 2254.6910f, 538.53300f, 0.6848107f };
+float const SaurfangOutroZeppelinDockRange  = 12.0f;
+// Saurfang's spot on deck while it flies in, relative to the transport.
+Position const SaurfangZeppelinPassengerOffset = { -1.122207f, -2.488975f, -17.782246f, 1.553343f };
+
+// Travel time of a mover at its run speed to a point, plus a margin for the spline to settle.
+static Milliseconds RunTimeTo(Unit const* who, Position const& to)
+{
+    return Milliseconds(uint32(who->GetExactDist2d(&to) / who->GetSpeed(MOVE_RUN) * 1000.0f)) + 300ms;
+}
+
 // Set position traps Spirit Alarm
 std::vector<Position> GoSpiritAlarm_1 = { { -160.96f, 2210.46f, 35.24f, 0.0f }, { -176.27f, 2201.93f, 35.24f, 0.0f}, { -207.83f, 2207.38f, 35.24f, 0.0f } };
 std::vector<Position> GoSpiritAlarm_2 = { { -178.41f, 2225.11f, 35.24f, 0.0f }, { -195.23f, 2221.55f, 35.24f, 0.0f}, { -209.94f, 2250.34f, 37.99f, 0.0f } };
@@ -216,6 +295,10 @@ public:
             LichKingHeroicAvailable = true;
             LichKingRandomWhisperTimer = 120 * IN_MILLISECONDS;
             DarkwhisperElevatorTimer = DARKWHISPER_ELEVATOR_DWELL_TIME;
+            _saurfangCampSpawned = false;
+            _saurfangOutroRunning = false;
+            _saurfangZeppelinDocked = false;
+            _saurfangZeppelinLeaving = false;
 
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
@@ -270,6 +353,14 @@ public:
 
             if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                 SpawnGunship();
+
+            // Also covers an instance whose Gunship Battle state was set directly, which would
+            // otherwise keep them hidden for good.
+            if (GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == DONE && !_saurfangOutroRunning)
+                RestoreHiddenSaurfangEventNpcs();
+
+            if (GetBossState(DATA_DEATHBRINGER_SAURFANG) == DONE && !_saurfangOutroRunning)
+                SpawnSaurfangCamp(false);
 
             if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && !Events.HasTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA))
             {
@@ -391,6 +482,11 @@ public:
                     DeathbringerSaurfangGUID = creature->GetGUID();
                     break;
                 case NPC_SE_HIGH_OVERLORD_SAURFANG:
+                    // Only the static spawn is the event NPC - the Alliance outro summons another
+                    // High Overlord Saurfang, which would otherwise clobber the guid.
+                    if (creature->IsSummon())
+                        break;
+
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                     {
                         creature->UpdateEntry(NPC_SE_MURADIN_BRONZEBEARD, true);
@@ -398,9 +494,14 @@ public:
                     }
                     DeathbringerSaurfangEventGUID = creature->GetGUID();
                     creature->LastUsedScriptID = creature->GetScriptId();
+                    HideSaurfangEventNpc(creature);
                     break;
                 case NPC_SE_MURADIN_BRONZEBEARD:
+                    if (creature->IsSummon())
+                        break;
+
                     DeathbringerSaurfangEventGUID = creature->GetGUID();
+                    HideSaurfangEventNpc(creature);
                     break;
                 case NPC_HIGH_OVERLORD_SAURFANG_DUMMY:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
@@ -410,8 +511,13 @@ public:
                     }
                     break;
                 case NPC_SE_KOR_KRON_REAVER:
+                    if (creature->IsSummon())
+                        break;
+
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_SE_SKYBREAKER_MARINE);
+                    SaurfangEventGuardGUIDs.push_back(creature->GetGUID());
+                    HideSaurfangEventNpc(creature);
                     break;
                 case NPC_FESTERGUT:
                     FestergutGUID = creature->GetGUID();
@@ -747,6 +853,18 @@ public:
                 case GO_SCOURGE_TRANSPORTER_SAURFANG:
                     SaurfangTeleportGUID = go->GetGUID();
                     break;
+                case GO_SAURFANG_CAMP_FORGE:
+                case GO_SAURFANG_CAMP_BONFIRE:
+                case GO_SAURFANG_CAMP_ANVIL:
+                    // Camp props belong to the aftermath; their spawn rows are unconditional, hence the despawn.
+                    SaurfangCampGUIDs.push_back(go->GetGUID());
+                    if (GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE)
+                        go->DespawnOrUnsummon(0ms, Seconds(WEEK));
+                    // The despawn is persisted, so an instance restarted after the outro comes back
+                    // with them hidden. Horde only - the Alliance camp summons its own props.
+                    else if (GetTeamIdInInstance() == TEAM_HORDE)
+                        go->Respawn();
+                    break;
                 case GO_PLAGUE_SIGIL:
                     PlagueSigilGUID = go->GetGUID();
                     if (GetBossState(DATA_PROFESSOR_PUTRICIDE) == DONE)
@@ -904,6 +1022,9 @@ public:
         {
             switch (type)
             {
+                case DATA_SAURFANG_OUTRO_ZEPPELIN:
+                    // DONE once it has come to rest, so the outro can wait for the ship instead of guessing.
+                    return _saurfangZeppelinDocked ? DONE : IN_PROGRESS;
                 case DATA_BUFF_AVAILABLE:
                     return (IsBuffAvailable ? 1 : 0);
                 case DATA_WEEKLY_QUEST_ID:
@@ -1096,6 +1217,9 @@ public:
                                     loot->SetLootRecipient(deathbringer);
                                 loot->RemoveGameObjectFlag(GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                             }
+
+                            // Not raised here: DONE fires the moment the boss dies. The outro asks
+                            // via SetData(DATA_SAURFANG_CAMP); OnPlayerEnter covers saved instances.
                             [[fallthrough]];
                         case NOT_STARTED:
                             if (GameObject* teleporter = instance->GetGameObject(SaurfangTeleportGUID))
@@ -1220,10 +1344,279 @@ public:
             }
         }
 
+        // Hidden rather than despawned: a despawned creature leaves the map and its guid would no
+        // longer resolve.
+        void HideSaurfangEventNpc(Creature* creature)
+        {
+            if (GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == DONE)
+                return;
+
+            creature->SetVisible(false);
+        }
+
+        void RestoreSaurfangEventNpc(Creature* creature)
+        {
+            float x, y, z, o;
+            creature->GetHomePosition(x, y, z, o);
+            creature->NearTeleportTo(x, y, z, o);
+            creature->SetStandState(UNIT_STAND_STATE_STAND);
+            creature->SetEmoteState(EMOTE_ONESHOT_NONE);
+            creature->SetSheath(SHEATH_STATE_UNARMED);
+            creature->SetVisible(true);
+        }
+
+        void SpawnSaurfangEventNpcs()
+        {
+            if (Creature* captain = instance->GetCreature(DeathbringerSaurfangEventGUID))
+                RestoreSaurfangEventNpc(captain);
+
+            for (ObjectGuid const& guid : SaurfangEventGuardGUIDs)
+                if (Creature* guard = instance->GetCreature(guid))
+                    RestoreSaurfangEventNpc(guard);
+        }
+
+        // Only the ones left hidden: a scene in progress has them visible and placed, and
+        // teleporting those to their spawn points would break it mid-run.
+        void RestoreHiddenSaurfangEventNpcs()
+        {
+            if (Creature* captain = instance->GetCreature(DeathbringerSaurfangEventGUID))
+                if (!captain->IsVisible())
+                    RestoreSaurfangEventNpc(captain);
+
+            for (ObjectGuid const& guid : SaurfangEventGuardGUIDs)
+                if (Creature* guard = instance->GetCreature(guid))
+                    if (!guard->IsVisible())
+                        RestoreSaurfangEventNpc(guard);
+        }
+
+        void DespawnSaurfangZeppelinPassenger()
+        {
+            if (Creature* passenger = instance->GetCreature(SaurfangZeppelinPassengerGUID))
+                passenger->DespawnOrUnsummon();
+            SaurfangZeppelinPassengerGUID.Clear();
+        }
+
+        // staged runs the on-screen build: teleporters and workers first, the tents once the workers
+        // have hammered a while, then the vendors walking in. Unstaged drops the finished camp at
+        // once, for an instance already DONE. The Horde crew is quicker off the mark than the Alliance one.
+        void SpawnSaurfangCamp(bool staged)
+        {
+            if (_saurfangCampSpawned || !instance->HavePlayers())
+                return;
+
+            _saurfangCampSpawned = true;
+            SummonSaurfangCampTeleporters();
+            SpawnSaurfangEventNpcs();
+            if (!staged)
+            {
+                ActivateSaurfangCampTeleporters();
+                SpawnSaurfangCampTents();
+                SummonSaurfangCampVendor(true, false);
+                SummonSaurfangCampVendor(false, false);
+                return;
+            }
+
+            bool const horde = GetTeamIdInInstance() == TEAM_HORDE;
+            Events.ScheduleEvent(EVENT_SAURFANG_CAMP_ACTIVATE, horde ? 2s : 1s + 700ms);
+            Events.ScheduleEvent(EVENT_SAURFANG_CAMP_WORKERS, horde ? 0s : 5s + 800ms);
+            Events.ScheduleEvent(EVENT_SAURFANG_CAMP_WORKER_0_RUN, horde ? 2s : 11s);
+            Events.ScheduleEvent(EVENT_SAURFANG_CAMP_WORKER_1_RUN, horde ? 2s : 8s + 200ms);
+            Events.ScheduleEvent(EVENT_SAURFANG_CAMP_TENTS, horde ? 26s + 800ms : 34s + 500ms);
+            Events.ScheduleEvent(EVENT_SAURFANG_CAMP_VENDORS, horde ? 30s + 400ms : 41s + 300ms);
+        }
+
+        // Summoned ready is the inert model; activating it is what turns the beam on.
+        void SummonSaurfangCampTeleporters()
+        {
+            uint32 const teleporter = GetTeamIdInInstance() == TEAM_HORDE ? GO_SAURFANG_CAMP_TELEPORTER_H : GO_SAURFANG_CAMP_TELEPORTER_A;
+            for (uint8 i = 0; i < 2; ++i)
+                if (GameObject* go = instance->SummonGameObject(teleporter, SaurfangCampTeleporterPos[i], 0.0f, 0.0f, 0.0f, 0.0f, WEEK))
+                    SaurfangCampTeleporterGUIDs[i] = go->GetGUID();
+        }
+
+        void ActivateSaurfangCampTeleporters()
+        {
+            for (ObjectGuid const& guid : SaurfangCampTeleporterGUIDs)
+                if (GameObject* go = instance->GetGameObject(guid))
+                    go->SetGoState(GO_STATE_ACTIVE);
+        }
+
+        void SpawnSaurfangCampWorkers()
+        {
+            uint32 const worker = GetTeamIdInInstance() == TEAM_HORDE ? NPC_CAMP_WARSONG_PEON : NPC_CAMP_ALLIANCE_MASON;
+            for (uint8 i = 0; i < 2; ++i)
+            {
+                if (Creature* builder = instance->SummonCreature(worker, SaurfangCampTeleporterPos[i]))
+                {
+                    SaurfangCampWorkerGUIDs[i] = builder->GetGUID();
+                    builder->SetReactState(REACT_PASSIVE);
+                    builder->CastSpell(builder, SPELL_SIMPLE_TELEPORT, true);
+                }
+            }
+        }
+
+        // The hammering only starts once he is standing at the site.
+        void SendSaurfangCampWorkerOut(uint8 i)
+        {
+            Creature* builder = instance->GetCreature(SaurfangCampWorkerGUIDs[i]);
+            if (!builder)
+                return;
+
+            Position const& site = GetTeamIdInInstance() == TEAM_HORDE ? SaurfangCampWorkPosH[i] : SaurfangCampWorkPosA[i];
+            builder->SetWalk(false);
+            builder->GetMotionMaster()->MovePoint(0, site);
+            Events.ScheduleEvent(i ? EVENT_SAURFANG_CAMP_WORKER_1_WORK : EVENT_SAURFANG_CAMP_WORKER_0_WORK, RunTimeTo(builder, site));
+        }
+
+        void SetSaurfangCampWorkerWorking(uint8 i)
+        {
+            Creature* builder = instance->GetCreature(SaurfangCampWorkerGUIDs[i]);
+            if (!builder)
+                return;
+
+            Position const& site = GetTeamIdInInstance() == TEAM_HORDE ? SaurfangCampWorkPosH[i] : SaurfangCampWorkPosA[i];
+            builder->SetFacingTo(site.GetOrientation());
+            builder->SetEmoteState(EMOTE_STATE_WORK_MINING);
+        }
+
+        void SpawnSaurfangCampTents()
+        {
+            bool const horde = GetTeamIdInInstance() == TEAM_HORDE;
+            uint32 const tents[2] =
+            {
+                static_cast<uint32>(horde ? GO_SAURFANG_CAMP_TENT_H1 : GO_SAURFANG_CAMP_TENT_A),
+                static_cast<uint32>(horde ? GO_SAURFANG_CAMP_TENT_H2 : GO_SAURFANG_CAMP_TENT_A)
+            };
+
+            Position const* tentPos = horde ? SaurfangCampTentPosH : SaurfangCampTentPosA;
+            for (uint8 i = 0; i < 2; ++i)
+                instance->SummonGameObject(tents[i], tentPos[i], 0.0f, 0.0f, 0.0f, 0.0f, WEEK);
+
+            if (horde)
+            {
+                for (ObjectGuid const& guid : SaurfangCampGUIDs)
+                    if (GameObject* camp = instance->GetGameObject(guid))
+                        camp->Respawn();
+            }
+            else
+            {
+                instance->SummonGameObject(GO_SAURFANG_CAMP_FORGE, SaurfangCampForgePosA, 0.0f, 0.0f, 0.0f, 0.0f, WEEK);
+                instance->SummonGameObject(GO_SAURFANG_CAMP_ANVIL_A, SaurfangCampAnvilPosA, 0.0f, 0.0f, 0.0f, 0.0f, WEEK);
+                instance->SummonGameObject(GO_SAURFANG_CAMP_BANNER_A, SaurfangCampBannerPosA, 0.0f, 0.0f, 0.0f, 0.0f, WEEK);
+            }
+        }
+
+        // They down tools the moment the tents drop, run back to their pads and vanish there.
+        void SendSaurfangCampWorkersBack()
+        {
+            for (uint8 i = 0; i < 2; ++i)
+            {
+                if (Creature* builder = instance->GetCreature(SaurfangCampWorkerGUIDs[i]))
+                {
+                    builder->SetEmoteState(EMOTE_ONESHOT_NONE);
+                    builder->SetWalk(false);
+                    builder->GetMotionMaster()->MovePoint(0, SaurfangCampTeleporterPos[i]);
+                    builder->DespawnOrUnsummon(RunTimeTo(builder, SaurfangCampTeleporterPos[i]));
+                }
+                SaurfangCampWorkerGUIDs[i].Clear();
+            }
+        }
+
+        // walkIn false drops the vendor straight on his pitch, for a camp not built on screen.
+        void SummonSaurfangCampVendor(bool smith, bool walkIn)
+        {
+            bool const horde = GetTeamIdInInstance() == TEAM_HORDE;
+            uint32 const entry = smith ? (horde ? NPC_CAMP_MORGAN_DAYBLAZE : NPC_CAMP_SHELY_STEELBOWELS)
+                                       : (horde ? NPC_CAMP_APOTHECARY_CANDITH_TOMAS : NPC_CAMP_BRAZIE_GETZ);
+            if (!walkIn)
+            {
+                instance->SummonCreature(entry, smith ? (horde ? SaurfangCampBlacksmithPos : SaurfangCampBlacksmithPosA)
+                                                      : (horde ? SaurfangCampGeneralGoodsPos : SaurfangCampGeneralGoodsPosA));
+                return;
+            }
+
+            Creature* vendor = instance->SummonCreature(entry, SaurfangCampTeleporterPos[smith ? 0 : 1]);
+            if (!vendor)
+                return;
+
+            vendor->CastSpell(vendor, SPELL_SIMPLE_TELEPORT, true);
+            // The path ends on the pitch, facing the customers.
+            vendor->GetMotionMaster()->MoveWaypoint(smith ? (horde ? PATH_CAMP_MORGAN_DAYBLAZE : PATH_CAMP_SHELY_STEELBOWELS)
+                                                          : (horde ? PATH_CAMP_APOTHECARY_CANDITH_TOMAS : PATH_CAMP_BRAZIE_GETZ), false);
+        }
+
         void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
+                case DATA_SAURFANG_CAMP:
+                    // The boss is DONE for the whole outro, so the encounter state alone cannot tell
+                    // "outro playing" from "outro over".
+                    if (data == IN_PROGRESS)
+                    {
+                        _saurfangOutroRunning = true;
+                        // Safety net: an instance emptying mid-outro would leave the flag set and
+                        // the camp could never be raised.
+                        Events.ScheduleEvent(EVENT_SAURFANG_OUTRO_TIMEOUT, 8min);
+                    }
+                    else if (data == DONE)
+                    {
+                        Events.CancelEvent(EVENT_SAURFANG_OUTRO_TIMEOUT);
+                        _saurfangOutroRunning = false;
+                        SpawnSaurfangCamp(true);
+                    }
+                    break;
+                case DATA_SAURFANG_OUTRO_ZEPPELIN:
+                    if (data == IN_PROGRESS)
+                    {
+                        if (SaurfangZeppelinGUID)
+                            break;
+
+                        _saurfangZeppelinDocked = false;
+                        _saurfangZeppelinLeaving = false;
+                        MotionTransport* zeppelin = sTransportMgr->CreateTransport(GO_SAURFANG_OUTRO_ZEPPELIN, 0, instance);
+                        if (!zeppelin)
+                            break;
+
+                        SaurfangZeppelinGUID = zeppelin->GetGUID();
+                        zeppelin->setActive(true);
+                        Events.ScheduleEvent(EVENT_SAURFANG_ZEPPELIN_DOCK, 1s);
+
+                        // Saurfang rides in on deck; the one stepping off at the edge replaces him.
+                        float x, y, z, o;
+                        SaurfangZeppelinPassengerOffset.GetPosition(x, y, z, o);
+                        zeppelin->CalculatePassengerPosition(x, y, z, &o);
+                        if (Creature* passenger = instance->SummonCreature(NPC_SE_HIGH_OVERLORD_SAURFANG, Position(x, y, z, o)))
+                        {
+                            zeppelin->AddPassenger(passenger, true);
+                            // Clients already got his create packet without the transport; the stop
+                            // spline carries the transport guid and puts him on deck for them.
+                            passenger->StopMovingOnCurrentPos();
+                            passenger->SetReactState(REACT_PASSIVE);
+                            passenger->SetSheath(SHEATH_STATE_MELEE);
+                            passenger->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                            SaurfangZeppelinPassengerGUID = passenger->GetGUID();
+                        }
+                    }
+                    else if (data == SPECIAL)
+                        DespawnSaurfangZeppelinPassenger();
+                    // Asked for twice (departure, then cleanup); without the guard the second call
+                    // would restart the removal timer.
+                    else if (SaurfangZeppelinGUID && !_saurfangZeppelinLeaving)
+                    {
+                        Events.CancelEvent(EVENT_SAURFANG_ZEPPELIN_DOCK);
+                        _saurfangZeppelinDocked = false;
+                        _saurfangZeppelinLeaving = true;
+                        if (GameObject* go = instance->GetGameObject(SaurfangZeppelinGUID))
+                            if (MotionTransport* zeppelin = go->ToMotionTransport())
+                                zeppelin->EnableMovement(true);
+
+                        // Releasing _pendingStop does not launch it: it leaves when the stop frame
+                        // DepartureTime comes round, ~24s, and takes about 50s more to fly back to
+                        // its berth above the rise. Removal is once it is back there.
+                        Events.ScheduleEvent(EVENT_SAURFANG_ZEPPELIN_REMOVE, 80s);
+                    }
+                    break;
                 case DATA_BUFF_AVAILABLE:
                     IsBuffAvailable = !!data;
                     if (!IsBuffAvailable)
@@ -1761,6 +2154,74 @@ public:
                         // Could happen more than once if more than one player enters before she respawns.
                         Events.CancelEvent(EVENT_RESPAWN_SINDRAGOSA);
                         break;
+                    case EVENT_SPAWN_SAURFANG_EVENT:
+                        SpawnSaurfangEventNpcs();
+                        break;
+                    case EVENT_SAURFANG_OUTRO_TIMEOUT:
+                        _saurfangOutroRunning = false;
+                        SetData(DATA_SAURFANG_OUTRO_ZEPPELIN, DONE);
+                        if (GetBossState(DATA_DEATHBRINGER_SAURFANG) == DONE)
+                        {
+                            SpawnSaurfangCamp(false);
+                            SpawnSaurfangEventNpcs();
+                        }
+                        break;
+                    case EVENT_SAURFANG_CAMP_ACTIVATE:
+                        ActivateSaurfangCampTeleporters();
+                        break;
+                    case EVENT_SAURFANG_CAMP_WORKERS:
+                        SpawnSaurfangCampWorkers();
+                        break;
+                    case EVENT_SAURFANG_CAMP_WORKER_0_RUN:
+                        SendSaurfangCampWorkerOut(0);
+                        break;
+                    case EVENT_SAURFANG_CAMP_WORKER_1_RUN:
+                        SendSaurfangCampWorkerOut(1);
+                        break;
+                    case EVENT_SAURFANG_CAMP_WORKER_0_WORK:
+                        SetSaurfangCampWorkerWorking(0);
+                        break;
+                    case EVENT_SAURFANG_CAMP_WORKER_1_WORK:
+                        SetSaurfangCampWorkerWorking(1);
+                        break;
+                    case EVENT_SAURFANG_CAMP_TENTS:
+                        SpawnSaurfangCampTents();
+                        SendSaurfangCampWorkersBack();
+                        break;
+                    case EVENT_SAURFANG_CAMP_VENDORS:
+                        SummonSaurfangCampVendor(true, true);
+                        SummonSaurfangCampVendor(false, true);
+                        break;
+                    case EVENT_SAURFANG_ZEPPELIN_REMOVE:
+                        DespawnSaurfangZeppelinPassenger();
+                        if (GameObject* go = instance->GetGameObject(SaurfangZeppelinGUID))
+                        {
+                            // A MO_TRANSPORT is not despawned like an ordinary gameobject.
+                            if (MotionTransport* zeppelin = go->ToMotionTransport())
+                            {
+                                zeppelin->EnableMovement(false);
+                                zeppelin->UnloadStaticPassengers();
+                            }
+                            go->AddObjectToRemoveList();
+                        }
+                        _saurfangZeppelinLeaving = false;
+                        SaurfangZeppelinGUID.Clear();
+                        break;
+                    case EVENT_SAURFANG_ZEPPELIN_DOCK:
+                        {
+                            // Reschedule unconditionally: giving up on a failed lookup would leave
+                            // it looping its path forever.
+                            GameObject* go = instance->GetGameObject(SaurfangZeppelinGUID);
+                            MotionTransport* zeppelin = go ? go->ToMotionTransport() : nullptr;
+                            if (zeppelin && zeppelin->GetExactDist2d(&SaurfangOutroZeppelinPos) <= SaurfangOutroZeppelinDockRange)
+                            {
+                                zeppelin->EnableMovement(false);
+                                _saurfangZeppelinDocked = true;
+                            }
+                            else if (SaurfangZeppelinGUID)
+                                Events.ScheduleEvent(EVENT_SAURFANG_ZEPPELIN_DOCK, 500ms);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -1803,6 +2264,8 @@ public:
                         }
                     if (Creature* captain = source->FindNearestCreature(GetTeamIdInInstance() == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
                         captain->AI()->DoAction(ACTION_EXIT_SHIP);
+                    // The captain despawns 18s into his walk off the ship; the event party appears with him.
+                    Events.ScheduleEvent(EVENT_SPAWN_SAURFANG_EVENT, 18s);
                     break;
 
                 case EVENT_QUAKE:
@@ -1930,6 +2393,16 @@ public:
         ObjectGuid DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
         ObjectGuid DeathbringersCacheGUID;
         ObjectGuid SaurfangTeleportGUID;
+        GuidList SaurfangCampGUIDs;
+        GuidList SaurfangEventGuardGUIDs;
+        std::array<ObjectGuid, 2> SaurfangCampTeleporterGUIDs;
+        std::array<ObjectGuid, 2> SaurfangCampWorkerGUIDs;
+        ObjectGuid SaurfangZeppelinGUID;
+        ObjectGuid SaurfangZeppelinPassengerGUID;
+        bool _saurfangCampSpawned;
+        bool _saurfangOutroRunning;
+        bool _saurfangZeppelinDocked;
+        bool _saurfangZeppelinLeaving;
         ObjectGuid PlagueSigilGUID;
         ObjectGuid BloodwingSigilGUID;
         ObjectGuid FrostwingSigilGUID;

@@ -238,7 +238,10 @@ enum GuildMemberFlags
 class EmblemInfo
 {
 public:
-    EmblemInfo() : m_style(0), m_color(0), m_borderStyle(0), m_borderColor(0), m_backgroundColor(0) { }
+    explicit EmblemInfo(uint32 style = 0, uint32 color = 0, uint32 borderStyle = 0, uint32 borderColor = 0,
+        uint32 backgroundColor = 0) :
+        m_style(style), m_color(color), m_borderStyle(borderStyle), m_borderColor(borderColor),
+        m_backgroundColor(backgroundColor) { }
 
     void LoadFromDB(Field* fields);
     void SaveToDB(uint32 guildId) const;
@@ -690,6 +693,8 @@ public:
     std::string const& GetInfo() const { return m_info; }
 
     bool SetName(std::string_view const& name);
+    void SetMOTD(std::string_view motd);
+    void SetInfo(std::string_view info);
 
     // Handle client commands
     void HandleRoster(WorldSession* session);
@@ -697,10 +702,13 @@ public:
     void HandleSetMOTD(WorldSession* session, std::string_view motd);
     void HandleSetInfo(WorldSession* session, std::string_view info);
     void HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo);
+    void HandleSetEmblem(EmblemInfo const& emblemInfo);
     void HandleSetLeader(WorldSession* session, std::string_view name);
     void HandleSetBankTabInfo(WorldSession* session, uint8 tabId, std::string_view name, std::string_view icon);
     void HandleSetMemberNote(WorldSession* session, std::string_view name, std::string_view note, bool isPublic);
     void HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_view name, uint32 rights, uint32 moneyPerDay, std::array<GuildBankRightsAndSlots, GUILD_BANK_MAX_TABS> const& rightsAndSlots);
+    void HandleSetRankInfo(uint8 rankId, Optional<std::string_view> name, Optional<uint32> rights = {},
+        Optional<uint32> moneyPerDay = {});
     void HandleBuyBankTab(WorldSession* session, uint8 tabId);
     void HandleInviteMember(WorldSession* session, std::string const& name);
     void HandleAcceptMember(WorldSession* session);
@@ -778,6 +786,11 @@ public:
 
     [[nodiscard]] bool ModifyBankMoney(CharacterDatabaseTransaction trans, uint64 const& amount, bool add) { return _ModifyBankMoney(trans, amount, add); }
     [[nodiscard]] uint32 GetMemberSize() const { return m_members.size(); }
+    [[nodiscard]] std::unordered_map<uint32, Member> const& GetUnorderedMembers() const { return m_members; }
+
+    bool HasRankRight(Player* player, uint32 right) const;
+    uint32 GetRankRights(uint8 rankId) const;
+    bool MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const;
 
 protected:
     uint32 m_id;

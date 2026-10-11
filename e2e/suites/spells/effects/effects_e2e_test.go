@@ -186,6 +186,14 @@ func TestAC_26997_SweepingStrikesExecuteNoCrash(t *testing.T) {
 	}
 
 	arms.CastMust(t, e2eharness.SpellSweepingStrikes, 0, 10*time.Second)
+	// CastMust returns on SMSG_SPELL_GO; the aura lands in a later aura update.
+	deadline = time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) {
+		if arms.HasAura(e2eharness.SpellSweepingStrikes) {
+			break
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
 	if !arms.HasAura(e2eharness.SpellSweepingStrikes) {
 		e2eharness.Preconditionf(t, "Sweeping Strikes aura %d missing", e2eharness.SpellSweepingStrikes)
 	}
