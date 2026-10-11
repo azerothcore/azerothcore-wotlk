@@ -119,19 +119,22 @@ func TestAC_27699_XTBoombotExplosion(t *testing.T) {
 				prepare(t)
 				// A 25-player Boombot has more health than one Boom. Lower it with a real
 				// nonlethal hit so the next explosion, not the fixture, triggers the chain.
-				hp, _ := bot.UnitHP(second)
-				bot.Damage(t, second, hp-1000)
-				bot.FlushWorld(t)
-				if !xtPoll(5*time.Second, func() bool {
-					left, _ := bot.UnitHP(second)
-					return left < hp || record.casts(second, xtBoom) > 0
-				}) {
-					e2eharness.Preconditionf(t, "nonlethal hit did not lower the secondary Boombot's health")
+				// The 10-player secondary stays at full health, matching the natural chain.
+				if mode == 1 {
+					hp, _ := bot.UnitHP(second)
+					bot.Damage(t, second, hp-1000)
+					bot.FlushWorld(t)
+					if !xtPoll(5*time.Second, func() bool {
+						left, _ := bot.UnitHP(second)
+						return left < hp || record.casts(second, xtBoom) > 0
+					}) {
+						e2eharness.Preconditionf(t, "nonlethal hit did not lower the secondary Boombot's health")
+					}
+					if left, _ := bot.UnitHP(second); left == 0 || left > 1000 || record.casts(second, xtBoom) != 0 {
+						e2eharness.ConfirmedBugf(t, 27699, "secondary Boombot exploded on nonlethal setup damage")
+					}
 				}
-				if left, _ := bot.UnitHP(second); left == 0 || left > 1000 || record.casts(second, xtBoom) != 0 {
-					e2eharness.ConfirmedBugf(t, 27699, "secondary Boombot exploded on nonlethal setup damage")
-				}
-				hp, _ = bot.UnitHP(first)
+				hp, _ := bot.UnitHP(first)
 				bot.Damage(t, first, hp)
 				xtRequireDeath(t, bot, record, first, bot.World.CharGUID(), 1, 5*time.Second)
 				xtRequireChainDeath(t, bot, record, second, first)
@@ -442,7 +445,10 @@ func xtObserve(t *testing.T, duration time.Duration, check func()) {
 	}
 }
 
-func xtRequireDeath(t *testing.T, bot *e2eharness.ScenarioBot, record *xtBoomRecord, guid, killer uint64, wantCasts int, timeout time.Duration) {
+func xtRequireDeath(
+	t *testing.T, bot *e2eharness.ScenarioBot, record *xtBoomRecord,
+	guid, killer uint64, wantCasts int, timeout time.Duration,
+) {
 	t.Helper()
 	credited := func() bool {
 		if killer == guid {
