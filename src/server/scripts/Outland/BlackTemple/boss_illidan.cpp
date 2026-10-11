@@ -136,6 +136,7 @@ enum Misc
     GROUP_BERSERK                       = 1,
     GROUP_PHASE_FLYING                  = 2,
     GROUP_DEMON_FORM                    = 3,
+    GROUP_WIPE_CHECK                    = 4,
 
     NPC_WORLD_TRIGGER                   = 22515,
     NPC_ILLIDAN_DB_TARGET               = 23070,
@@ -204,6 +205,7 @@ struct boss_illidan_stormrage : public BossAI
         me->m_Events.CancelEventGroup(GROUP_BERSERK);
         me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
         me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
+        me->m_Events.CancelEventGroup(GROUP_WIPE_CHECK);
         _dying = false;
         _inCutscene = false;
         beamPosId = urand(0, MAX_EYE_BEAM_POS - 1);
@@ -376,6 +378,7 @@ struct boss_illidan_stormrage : public BossAI
             case ACTION_ILLIDAN_DIE:
             {
                 me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
+                me->m_Events.CancelEventGroup(GROUP_WIPE_CHECK);
                 scheduler.CancelAll();
 
                 if (IsInDemonFormOrTransforming())
@@ -519,12 +522,6 @@ struct boss_illidan_stormrage : public BossAI
                 });
                 // Check for Phase Transition
                 scheduler.Schedule(5s, [this](TaskContext context) {
-                    if (!SelectTargetFromPlayerList(150.0f))
-                    {
-                        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-                        return;
-                    }
-
                     summons.RemoveNotExisting();
                     if (!summons.HasEntry(NPC_FLAME_OF_AZZINOTH))
                     {
@@ -619,11 +616,13 @@ struct boss_illidan_stormrage : public BossAI
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BERSERK, true);
         }, 25min, GROUP_BERSERK);
+
+        ScheduleWipeCheck();
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        if (_inCutscene)
+        if (_inCutscene || _dying)
             return;
 
         if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
@@ -635,6 +634,7 @@ struct boss_illidan_stormrage : public BossAI
         me->m_Events.CancelEventGroup(GROUP_BERSERK);
         me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
         me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
+        me->m_Events.CancelEventGroup(GROUP_WIPE_CHECK);
     }
 
     void JustSummoned(Creature* summon) override
@@ -670,6 +670,7 @@ struct boss_illidan_stormrage : public BossAI
 
     void JustDied(Unit* killer) override
     {
+        me->m_Events.CancelEventGroup(GROUP_WIPE_CHECK);
         summons.clear();
         BossAI::JustDied(killer);
     }
@@ -689,6 +690,21 @@ private:
     {
         return me->HasAnyAuras(SPELL_DEMON_TRANSFORM_1, SPELL_DEMON_TRANSFORM_2, SPELL_DEMON_TRANSFORM_3,
             SPELL_DEMON_FORM);
+    }
+
+    // Maiev and Akama cannot die and keep Illidan on their threat lists,
+    // which stops him from evading on his own after a wipe
+    void ScheduleWipeCheck()
+    {
+        me->m_Events.AddEventAtOffset([&] {
+            if (!_inCutscene && !SelectTargetFromPlayerList(150.0f))
+            {
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+                return;
+            }
+
+            ScheduleWipeCheck();
+        }, 5s, GROUP_WIPE_CHECK);
     }
 
     void CycleBeamPos(uint8 &beamPosId)
