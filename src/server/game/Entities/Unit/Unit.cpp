@@ -7019,8 +7019,8 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
                             target->GetCharmerGUID().IsPlayer()))
                         if (FactionTemplateEntry const* originalTargetFactionTemplateEntry =
                                 sFactionTemplateStore.LookupEntry(target->GetOldFactionId()))
-                            if (factionTemplateEntry->IsFriendlyTo(*originalTargetFactionTemplateEntry)
-                                    || originalTargetFactionTemplateEntry->IsFriendlyTo(*factionTemplateEntry))
+                            if (GetFactionReactionTo(factionTemplateEntry, originalTargetFactionTemplateEntry)
+                                    == REP_FRIENDLY)
                                 return REP_FRIENDLY;
 
                     return repRank;
