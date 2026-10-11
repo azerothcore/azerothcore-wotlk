@@ -606,12 +606,11 @@ public:
                     if (type == BOSS_HODIR && state == DONE)
                         setChestsLootable(BOSS_HODIR);
                     if (state == DONE)
-                    {
-                        uint8 keeperIdx = type - BOSS_FREYA;
-                        instance->SummonCreature(
-                            ObservationRingKeeperEntry[keeperIdx],
-                            ObservationRingKeepersPos[keeperIdx]);
-                    }
+                        for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; ++i)
+                            if (ObservationRingKeeperBoss[i] == type)
+                                instance->SummonCreature(
+                                    ObservationRingKeeperEntry[i],
+                                    ObservationRingKeepersPos[i]);
                     break;
                 case BOSS_YOGGSARON:
                     // Sara despawns the unchosen keepers on pull, bring them back after a wipe
