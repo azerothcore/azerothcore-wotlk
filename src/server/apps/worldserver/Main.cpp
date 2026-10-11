@@ -48,8 +48,10 @@
 #include "SecretMgr.h"
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
+#include "StringConvert.h"
 #include "Systemd.h"
 #include "TC9Sidecar.h"
+#include "Tokenize.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"
@@ -291,7 +293,8 @@ int main(int argc, char** argv)
     std::shared_ptr<void> sessionEndHandle(nullptr, [](void*) { sWorld->SaveSessionEnd(true); });
 
     // set server offline (not connectable)
-    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id IN ({})",
+        REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.BuildIdSqlFilter());
 
     LoadRealmInfo(*ioContext);
 
@@ -380,7 +383,8 @@ int main(int argc, char** argv)
     });
 
     // Set server online (allow connecting now)
-    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag & ~{}, population = 0 WHERE id = '{}'", REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
+    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag & ~{}, population = 0 WHERE id IN ({})",
+        REALM_FLAG_VERSION_MISMATCH, realm.BuildIdSqlFilter());
     realm.PopulationLevel = 0.0f;
     realm.Flags = RealmFlags(realm.Flags & ~uint32(REALM_FLAG_VERSION_MISMATCH));
 
@@ -427,7 +431,8 @@ int main(int argc, char** argv)
 
     // set server offline
     if (!sConfigMgr->GetOption<bool>("Network.UseSocketActivation", false))
-        LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id.Realm);
+        LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id IN ({})",
+            REALM_FLAG_OFFLINE, realm.BuildIdSqlFilter());
 
     LOG_INFO("server.worldserver", "Halting process...");
 
@@ -474,8 +479,29 @@ bool StartDB()
         return false;
     }
 
+    ///- Get any additional realmlist row ids this worldserver also accepts/manages
+    /// (e.g. one realmlist row per network/VPN address, all aliasing this one worldserver).
+    realm.AdditionalIds.clear();
+    std::string additionalRealmIdsOpt = sConfigMgr->GetOption<std::string>("AdditionalRealmIDs", "");
+    for (std::string_view token : Acore::Tokenize(additionalRealmIdsOpt, ',', false))
+    {
+        Optional<uint32> additionalId = Acore::StringTo<uint32>(token);
+        if (!additionalId || !*additionalId || *additionalId > 255)
+        {
+            LOG_ERROR("server.worldserver", "AdditionalRealmIDs contains an invalid realm id '{}' (must range 1-255)", token);
+            return false;
+        }
+
+        if (*additionalId == realm.Id.Realm)
+            continue;
+
+        realm.AdditionalIds.push_back(*additionalId);
+    }
+
     LOG_INFO("server.loading", "Loading World Information...");
     LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
+    if (!realm.AdditionalIds.empty())
+        LOG_INFO("server.loading", "> AdditionalRealmIDs:   {}", realm.BuildIdSqlFilter());
 
     ///- Clean the database before starting.
     /// Cluster.Enabled is read from config here because sToCloud9Sidecar->Init()
