@@ -799,7 +799,6 @@ struct instance_blackrock_depths : public InstanceScript
                 if (!patron->GetFormation())
                     patron->SearchFormation();
 
-                patron->RestoreFaction();
                 patron->GetMotionMaster()->MoveTargetedHome(true);
             }
         }
