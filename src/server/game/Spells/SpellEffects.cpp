@@ -724,19 +724,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                                     unitCaster->CastSpell(unitTarget, 66904, true);
                                 return;
                             }
-                        case 17731:
-                        case 69294:
-                            {
-                                if (!gameObjTarget || gameObjTarget->GetRespawnTime() > GameTime::GetGameTime().count())
-                                    return;
-
-                                gameObjTarget->SetRespawnTime(10);
-                                gameObjTarget->SendCustomAnim(gameObjTarget->GetGoAnimProgress());
-                                if (Creature* trigger = gameObjTarget->SummonCreature(12758, *gameObjTarget, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                                    trigger->CastSpell(trigger, 17731, false);
-
-                                return;
-                            }
                         // HoL, Arc Weld
                         case 59086:
                             {
@@ -3814,6 +3801,9 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             break;
         case OFF_ATTACK:
             unitMod = UNIT_MOD_DAMAGE_OFFHAND;
+            // Base damage is already halved in DBC for Threat of Thassarian off-hand spells
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+                fixed_bonus *= 2;
             break;
         case RANGED_ATTACK:
             unitMod = UNIT_MOD_DAMAGE_RANGED;
@@ -5238,7 +5228,7 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
     // Xinef: allow entry specific spells to skip those checks
     if (m_spellInfo->Effects[effIndex].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && m_spellInfo->Effects[effIndex].TargetB.GetCheckType() != TARGET_CHECK_ENTRY)
     {
-        if (unitTarget->IsVehicle() && unitTarget->GetCreatureType() != CREATURE_TYPE_BEAST)
+        if (unitTarget->IsCreature() && unitTarget->IsVehicle() && unitTarget->GetCreatureType() != CREATURE_TYPE_BEAST)
             return;
 
         if (unitTarget->GetVehicle())
@@ -6383,7 +6373,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         // xinef: do not use precalculated position for effect summon pet in this function
         // it means it was cast by NPC and should have its position overridden unless the
         // target position is specified in the DB AND the effect has no or zero radius
-        if ((totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET) ||
+        if ((numGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET) ||
             (GetSpellInfo()->Effects[i].TargetA.GetTarget() == TARGET_DEST_DB &&
             (!GetSpellInfo()->Effects[i].HasRadius() || GetSpellInfo()->Effects[i].RadiusEntry->RadiusMax == 0)))
         {

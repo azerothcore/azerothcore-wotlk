@@ -277,6 +277,8 @@ enum Misc
     SUMMON_GROUP_ICECROWN_TENTACLES     = 2,
     SUMMON_GROUP_STORMWIND_TENTACLES    = 3,
 
+    SUMMON_GROUP_CLOUDS                 = 0,
+
     // ACTION_SARA_UPDATE_SUMMON_KEEPERS = 4, // defined in ulduar.h
 
     EVENT_PHASE_ONE                     = 1,
@@ -427,14 +429,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
     void SpawnClouds()
     {
-        for (uint8 i = 0; i < 6; ++i)
-        {
-            float Zplus = i > 2 ? (i - 2) * 1.6f : 0;
-            if (i % 2)
-                me->SummonCreature(NPC_OMINOUS_CLOUD, me->GetPositionX() + 8 + i * 7, me->GetPositionY() + 8 + i * 7, 326 + Zplus, 0);
-            else
-                me->SummonCreature(NPC_OMINOUS_CLOUD, me->GetPositionX() - 8 - i * 7, me->GetPositionY() - 8 - i * 7, 326 + Zplus, 0);
-        }
+        me->SummonCreatureGroup(SUMMON_GROUP_CLOUDS);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -1023,6 +1018,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
 struct boss_yoggsaron_cloud : public PassiveAI
 {
+    static bool clockwise;
+
     boss_yoggsaron_cloud(Creature* creature) : PassiveAI(creature)
     {
         Reset();
@@ -1064,9 +1061,9 @@ struct boss_yoggsaron_cloud : public PassiveAI
 
     void MoveCircle()
     {
-        bool clockwise = me->GetPositionX() < Middle.GetPositionX();
         me->GetMotionMaster()->MoveCirclePath(Middle.GetPositionX(), Middle.GetPositionY(), me->GetPositionZ(),
             Middle.GetExactDist2d(me), clockwise, 16);
+        clockwise = !clockwise;
     }
 
     void UpdateAI(uint32 diff) override
@@ -1086,6 +1083,8 @@ struct boss_yoggsaron_cloud : public PassiveAI
         }
     }
 };
+
+bool boss_yoggsaron_cloud::clockwise = true;
 
 struct boss_yoggsaron_guardian_of_ys : public ScriptedAI
 {

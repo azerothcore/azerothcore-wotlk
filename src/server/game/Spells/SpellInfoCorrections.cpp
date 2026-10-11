@@ -1912,6 +1912,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
+    // Ulduar, Flame Leviathan, Flame Vents
+    // The channel carries no interrupt flags, so Electroshock and player interrupts could never stop it
+    ApplySpellFix({ 62396 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags |= CHANNEL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     // Ulduar, Mimiron, bomb bot explosion
     ApplySpellFix({ 63801 }, [](SpellInfo* spellInfo)
     {
@@ -2113,14 +2120,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(5);
     });
 
-    // Onyxia's Lair, Onyxia, Eruption
-    ApplySpellFix({ 17731, 69294 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_DUMMY;
-        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(3);
-        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_18_YARDS); // 18yd instead of 13yd to make sure all cracks erupt
-    });
-
     // Onyxia's Lair, Onyxia, Breath
     ApplySpellFix({
         18576, 18578, 18579, 18580, 18581, 18582, 18583, 18609, 18611, 18612, 18613, 18614, 18615, 18616, 18584,
@@ -2242,19 +2241,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 68193 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ENEMY);
-    });
-
-    // Trial of the Crusader, Gormok, player vehicle spell, CUSTOM! (default jump to hand, not used)
-    ApplySpellFix({ 66342 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_SET_VEHICLE_ID;
-        spellInfo->Effects[EFFECT_0].MiscValue = 496;
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(25);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
-        spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CHANGE_MAP;
     });
 
     // Trial of the Crusader, Gormok, Fire Bomb
@@ -2960,6 +2946,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         // copied attributes from Green Ooze Channel
         spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Professor Putricide, Expunged Gas (Gas Cloud detonation)
+    ApplySpellFix({ 70701 }, [](SpellInfo* spellInfo)
+    {
+        // custom: the detonation is an unavoidable raid-wide hit, it must not be resisted away
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
