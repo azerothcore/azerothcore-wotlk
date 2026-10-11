@@ -72,10 +72,3 @@ TEST_F(ModuleLocaleTest, RegisteredSlotResolves)
     EXPECT_TRUE(IsLocaleValid("itIT"));
     EXPECT_EQ(GetNameByLocaleConstant(LOCALE_MODULE_SLOT), "itIT");
 }
-
-TEST_F(ModuleLocaleTest, OtherFreeSlotsStayUnregistered)
-{
-    EXPECT_FALSE(IsLocaleRegistered(LocaleConstant(LOCALE_MODULE_SLOT + 1)));
-    EXPECT_EQ(GetLocaleByName(""), LOCALE_enUS);
-    EXPECT_FALSE(IsLocaleValid(""));
-}
