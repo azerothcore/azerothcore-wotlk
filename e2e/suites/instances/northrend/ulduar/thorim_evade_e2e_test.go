@@ -72,8 +72,8 @@ func TestUlduar_ThorimEvadeDespawnDoesNotYield(t *testing.T) {
 		outroWindow = 90 * time.Second
 
 		// instance.data is the DataHeader chars, then one EncounterState per boss, space separated.
-		saveHeaderFields = 2  // "UU"
-		bossThorim       = 10 // BOSS_THORIM in ulduar.h
+		saveHeaderFields = 2 // "UU"
+		bossThorim       = 8 // BOSS_THORIM in ulduar.h
 		encounterDone    = "3"
 	)
 
