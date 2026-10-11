@@ -433,6 +433,8 @@ public:
 
     void SaveCreatureRespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
     void RemoveCreatureRespawnTime(ObjectGuid::LowType dbGuid);
+    // Queues the spawn for the next respawn pass and lets it through the DONE-boss hold, as force bypasses CanRespawn in compat mode
+    void ForceCreatureRespawn(ObjectGuid::LowType dbGuid);
     void SaveGORespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
     void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
     [[nodiscard]] std::unordered_map<ObjectGuid::LowType, time_t> const& GetCreatureRespawnTimes() const { return _creatureRespawnTimes; }
@@ -649,6 +651,7 @@ private:
     void _RemoveObjectFromUpdateList(WorldObject* obj);
 
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
+    std::unordered_set<ObjectGuid::LowType> _forcedCreatureRespawns;
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
 
     // Time-ordered index for ProcessRespawns() — avoids O(n) full scan.
