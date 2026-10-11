@@ -33,7 +33,7 @@ class AC_GAME_API WorldSocketMgr : public SocketMgr<WorldSocket>
     typedef SocketMgr<WorldSocket> BaseSocketMgr;
 
 public:
-    static WorldSocketMgr& Instance();
+    static WorldSocketMgr* Instance();
 
     /// Start network, listen at address:port .
     bool StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int networkThreads);
@@ -52,7 +52,7 @@ protected:
 
     static void OnSocketAccept(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
-        Instance().OnSocketOpen(std::move(sock), threadIndex);
+        Instance()->OnSocketOpen(std::move(sock), threadIndex);
     }
 
 private:

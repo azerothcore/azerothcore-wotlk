@@ -174,13 +174,13 @@ int main(int argc, char** argv)
 
     std::string bindIp = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
 
-    if (!sAuthSocketMgr.StartNetwork(*ioContext, bindIp, port))
+    if (!sAuthSocketMgr->StartNetwork(*ioContext, bindIp, port))
     {
         LOG_ERROR("server.authserver", "Failed to initialize network");
         return 1;
     }
 
-    std::shared_ptr<void> sAuthSocketMgrHandle(nullptr, [](void*) { sAuthSocketMgr.StopNetwork(); });
+    std::shared_ptr<void> sAuthSocketMgrHandle(nullptr, [](void*) { sAuthSocketMgr->StopNetwork(); });
 
     // Set signal handlers
     boost::asio::signal_set signals(*ioContext, SIGINT, SIGTERM);
