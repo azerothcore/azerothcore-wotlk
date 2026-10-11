@@ -212,6 +212,12 @@ enum SpecializationQuests
     Q_MASTER_TRANSMUTE      = 10899,
     Q_MASTER_ELIXIR         = 10902,
     Q_MASTER_POTION         = 10897,
+
+    /* Blacksmithing */
+    Q_ARMORSMITH_ALLIANCE   = 5283, // The Art of the Armorsmith
+    Q_WEAPONSMITH_ALLIANCE  = 5284, // The Way of the Weaponsmith
+    Q_ARMORSMITH_HORDE      = 5301, // The Art of the Armorsmith
+    Q_WEAPONSMITH_HORDE     = 5302, // The Way of the Weaponsmith
 };
 
 // All referred to gossips (menu, menu_opt, actions)
@@ -645,7 +651,10 @@ public:
         //WEAPONSMITH & ARMORSMITH
         if (player->GetBaseSkillValue(SKILL_BLACKSMITHING) >= 225)
         {
-            if (player->GetQuestRewardStatus(5284) || player->GetQuestRewardStatus(5302) || player->GetQuestRewardStatus(5283) || player->GetQuestStatus(5301))
+            if (player->GetQuestRewardStatus(Q_ARMORSMITH_ALLIANCE) ||
+                player->GetQuestRewardStatus(Q_WEAPONSMITH_ALLIANCE) ||
+                player->GetQuestRewardStatus(Q_ARMORSMITH_HORDE) ||
+                player->GetQuestRewardStatus(Q_WEAPONSMITH_HORDE))
             {
                 switch (creatureId)
                 {
