@@ -144,7 +144,8 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
     _pendingTimeSyncRequests(),
-    _orderCounter(0)
+    _orderCounter(0),
+    _headless(!sock)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -160,12 +161,15 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
         ResetTimeOutTime(false);
         LoginDatabase.Execute("UPDATE account SET online = 1 WHERE id = {};", GetAccountId()); // One-time query
     }
+    else
+        m_Address = "headless";
 }
 
 /// WorldSession destructor
 WorldSession::~WorldSession()
 {
-    LoginDatabase.Execute("UPDATE account SET totaltime = {} WHERE id = {}", GetTotalTime(), GetAccountId());
+    if (!_headless)
+        LoginDatabase.Execute("UPDATE account SET totaltime = {} WHERE id = {}", GetTotalTime(), GetAccountId());
 
     ///- unload player if not unloaded
     if (_player)
@@ -185,7 +189,8 @@ WorldSession::~WorldSession()
     while (_recvQueue.next(packet))
         delete packet;
 
-    LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
+    if (!_headless)
+        LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
 }
 
 void WorldSession::UpdateAccountFlag(uint32 flag, bool remove /*= flase*/)
@@ -837,6 +842,8 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
         LOG_INFO("entities.player", "Account: {} (IP: {}) Logout Character:[{}] ({}) Level: {}",
             GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().ToString(), _player->GetLevel());
 
+        ObjectGuid const playerGuid = _player->GetGUID();
+
         //! Remove the player from the world
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map
@@ -855,8 +862,8 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
         SendPacket(WorldPackets::Character::LogoutComplete().Write());
         LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
 
-        //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
-        if (!redirecting)
+        //! Mark all characters of the account offline, unless a script running several per account handles it instead
+        if (!redirecting && sScriptMgr->OnPlayerCanMarkAccountOffline(playerGuid, GetAccountId()))
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
             stmt->SetData(0, GetAccountId());
@@ -1646,6 +1653,15 @@ void WorldSession::SetPacketLogging(bool state)
 {
     if (m_Socket)
         m_Socket->SetPacketLogging(state);
+}
+
+std::unique_ptr<WorldPacket> WorldSession::NextQueuedPacket()
+{
+    WorldPacket* packet = nullptr;
+    if (!_recvQueue.next(packet))
+        return nullptr;
+
+    return std::unique_ptr<WorldPacket>(packet);
 }
 
 void WorldSession::LoadPermissions()

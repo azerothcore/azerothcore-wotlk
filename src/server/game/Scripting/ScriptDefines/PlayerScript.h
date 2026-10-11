@@ -78,6 +78,7 @@ enum PlayerHook
     PLAYERHOOK_ON_LOGIN,
     PLAYERHOOK_ON_BEFORE_LOGOUT,
     PLAYERHOOK_ON_LOGOUT,
+    PLAYERHOOK_CAN_MARK_ACCOUNT_OFFLINE,
     PLAYERHOOK_ON_CREATE,
     PLAYERHOOK_ON_DELETE,
     PLAYERHOOK_ON_FAILED_DELETE,
@@ -358,6 +359,10 @@ public:
 
     // Called when a player logs out.
     virtual void OnPlayerLogout(Player* /*player*/) { }
+
+    // Called before every character of the account is marked offline on logout.
+    // Return false to keep the core from doing so, e.g. when a script holds several characters of one account online.
+    [[nodiscard]] virtual bool OnPlayerCanMarkAccountOffline(ObjectGuid /*guid*/, uint32 /*accountId*/) { return true; }
 
     // Called when a player is created.
     virtual void OnPlayerCreate(Player* /*player*/) { }
