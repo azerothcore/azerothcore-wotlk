@@ -41,11 +41,11 @@ public:
         instance_trial_of_the_crusader_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTERS);
             Initialize();
         }
 
         bool CLEANED;
-        uint32 EncounterStatus;
         uint32 InstanceProgress;
         uint32 AttemptsLeft;
         uint8 Counter;
@@ -171,7 +171,6 @@ public:
         void Initialize() override
         {
             CLEANED = false;
-            EncounterStatus = NOT_STARTED;
             InstanceProgress = INSTANCE_PROGRESS_INITIAL;
             AttemptsLeft = 50;
             Counter = 0;
@@ -220,19 +219,6 @@ public:
             for (auto const& itr : instance->GetPlayers())
                 if (Player* player = itr.GetSource())
                     SetSnoboldCarrier(player, apply);
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            Map::PlayerList const& pl = instance->GetPlayers();
-            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if (Player* plr = itr->GetSource())
-                    if (plr->IsAlive() && !plr->IsGameMaster())
-                        return EncounterStatus == IN_PROGRESS; // found alive player
-
-            if (EncounterStatus != NOT_STARTED)
-                *(const_cast<uint32*>(&EncounterStatus)) = NOT_STARTED;
-            return false;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -367,11 +353,9 @@ public:
                             trigger->SetInCombatWithZone();
                         }
 
-                        EncounterStatus = IN_PROGRESS;
-
                         northrendBeastsMask |= 1;
                         if ((northrendBeastsMask & 7) == 7)
-                            SetData(TYPE_NORTHREND_BEASTS_ALL, DONE);
+                            SetBossState(BOSS_NORTHREND_BEASTS, DONE);
                         else if ((northrendBeastsMask & 16) == 0)
                             events.RescheduleEvent(EVENT_SCENE_005, 2500ms);
                     }
@@ -397,16 +381,11 @@ public:
                                 DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_JORMUNGAR_ACHIEV);
                             AchievementTimer = 0;
 
-                            EncounterStatus = IN_PROGRESS;
-
                             northrendBeastsMask |= 2;
                             if ((northrendBeastsMask & 7) == 7)
-                                SetData(TYPE_NORTHREND_BEASTS_ALL, DONE);
+                                SetBossState(BOSS_NORTHREND_BEASTS, DONE);
                             else if ((northrendBeastsMask & 32) == 0)
-                            {
-                                Counter = 0;
                                 events.RescheduleEvent(EVENT_SCENE_006, 2500ms);
-                            }
                         }
                         else // first one died, start timer for achievement
                         {
@@ -421,91 +400,20 @@ public:
                     {
                         northrendBeastsMask |= 4;
                         if ((northrendBeastsMask & 7) == 7)
-                            SetData(TYPE_NORTHREND_BEASTS_ALL, DONE);
-                    }
-                    break;
-                case TYPE_NORTHREND_BEASTS_ALL:
-                    if (data == DONE)
-                    {
-                        northrendBeastsMask = 0;
-                        EncounterStatus = NOT_STARTED;
-                        InstanceProgress = INSTANCE_PROGRESS_BEASTS_DEAD;
-                        SetSnoboldCarriers(false);
-                        HandleGameObject(GO_EnterGateGUID, true);
-                        events.CancelEvent(EVENT_NORTHREND_BEASTS_ENRAGE);
-                        events.RescheduleEvent(EVENT_SCENE_BEASTS_DONE, 2500ms);
-                        SaveToDB();
-                    }
-                    break;
-                case TYPE_JARAXXUS:
-                    EncounterStatus = data == IN_PROGRESS ? IN_PROGRESS : NOT_STARTED;
-                    if (data == IN_PROGRESS)
-                        HandleGameObject(GO_EnterGateGUID, false);
-                    else if (data == DONE)
-                    {
-                        HandleGameObject(GO_EnterGateGUID, true);
-                        InstanceProgress = INSTANCE_PROGRESS_JARAXXUS_DEAD;
-                        events.RescheduleEvent(EVENT_SCENE_110, 2500ms);
-                        SaveToDB();
+                            SetBossState(BOSS_NORTHREND_BEASTS, DONE);
                     }
                     break;
                 case TYPE_FACTION_CHAMPIONS:
                     if (data == DONE)
                     {
                         if (++Counter >= NPC_ChampionGUIDs.size())
-                        {
-                            if (Creature* c = instance->GetCreature(NPC_TirionGUID))
-                                c->CastSpell(c, SPELL_FACTION_CHAMPIONS_KILL_CREDIT, true);
-                            Counter = 0;
-                            EncounterStatus = NOT_STARTED;
-                            InstanceProgress = INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD;
-                            events.RescheduleEvent(EVENT_SCENE_FACTION_CHAMPIONS_DEAD, 2500ms);
-
-                            for (ObjectGuid const& guid : NPC_ChampionGUIDs)
-                                if (Creature* c = instance->GetCreature(guid))
-                                    c->DespawnOrUnsummon(15s);
-                            NPC_ChampionGUIDs.clear();
-
-                            if (Creature* c = instance->GetCreature(NPC_TirionGUID))
-                            {
-                                uint32 cacheEntry = 0;
-                                switch (instance->GetDifficulty())
-                                {
-                                    case RAID_DIFFICULTY_10MAN_NORMAL:
-                                        cacheEntry = GO_CRUSADERS_CACHE_10;
-                                        break;
-                                    case RAID_DIFFICULTY_25MAN_NORMAL:
-                                        cacheEntry = GO_CRUSADERS_CACHE_25;
-                                        break;
-                                    case RAID_DIFFICULTY_10MAN_HEROIC:
-                                        cacheEntry = GO_CRUSADERS_CACHE_10_H;
-                                        break;
-                                    case RAID_DIFFICULTY_25MAN_HEROIC:
-                                        cacheEntry = GO_CRUSADERS_CACHE_25_H;
-                                        break;
-                                }
-
-                                if (GameObject* go = c->SummonGameObject(cacheEntry, Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), Locs[LOC_CENTER].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 630000000))
-                                {
-                                    go->SetLootRecipient(instance);
-                                }
-                            }
-
-                            HandleGameObject(GO_EnterGateGUID, true);
-
-                            if (AchievementTimer + 60 >= GameTime::GetGameTime().count())
-                                DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_RESILIENCE_WILL_FIX_IT_CREDIT);
-                            AchievementTimer = 0;
-
-                            SaveToDB();
-                        }
+                            SetBossState(BOSS_FACTION_CHAMPIONS, DONE);
                         else if (Counter == 1)
                             AchievementTimer = GameTime::GetGameTime().count();
                     }
                     break;
                 case TYPE_FACTION_CHAMPIONS_START:
                     {
-                        EncounterStatus = IN_PROGRESS;
                         AchievementTimer = 0;
                         for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                             if (Creature* c = instance->GetCreature(guid))
@@ -526,29 +434,102 @@ public:
                             pTemp->AI()->Talk(SAY_GARROSH_KILL_ALLIANCE_PLAYER_1);
                     }
                     break;
-                case TYPE_VALKYR:
-                    if (data == DONE && ++Counter >= 2)
+            }
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case BOSS_NORTHREND_BEASTS:
+                    if (state == DONE)
                     {
-                        Counter = 0;
-                        EncounterStatus = NOT_STARTED;
+                        northrendBeastsMask = 0;
+                        InstanceProgress = INSTANCE_PROGRESS_BEASTS_DEAD;
+                        SetSnoboldCarriers(false);
+                        HandleGameObject(GO_EnterGateGUID, true);
+                        events.CancelEvent(EVENT_NORTHREND_BEASTS_ENRAGE);
+                        events.RescheduleEvent(EVENT_SCENE_BEASTS_DONE, 2500ms);
+                        SaveToDB();
+                    }
+                    break;
+                case BOSS_JARAXXUS:
+                    if (state == IN_PROGRESS)
+                        HandleGameObject(GO_EnterGateGUID, false);
+                    else if (state == DONE)
+                    {
+                        HandleGameObject(GO_EnterGateGUID, true);
+                        InstanceProgress = INSTANCE_PROGRESS_JARAXXUS_DEAD;
+                        events.RescheduleEvent(EVENT_SCENE_110, 2500ms);
+                        SaveToDB();
+                    }
+                    break;
+                case BOSS_FACTION_CHAMPIONS:
+                    if (state == DONE)
+                    {
+                        if (Creature* c = instance->GetCreature(NPC_TirionGUID))
+                            c->CastSpell(c, SPELL_FACTION_CHAMPIONS_KILL_CREDIT, true);
+                        InstanceProgress = INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD;
+                        events.RescheduleEvent(EVENT_SCENE_FACTION_CHAMPIONS_DEAD, 2500ms);
+
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                            if (Creature* c = instance->GetCreature(guid))
+                                c->DespawnOrUnsummon(15s);
+                        NPC_ChampionGUIDs.clear();
+
+                        if (Creature* c = instance->GetCreature(NPC_TirionGUID))
+                        {
+                            uint32 cacheEntry = 0;
+                            switch (instance->GetDifficulty())
+                            {
+                                case RAID_DIFFICULTY_10MAN_NORMAL:
+                                    cacheEntry = GO_CRUSADERS_CACHE_10;
+                                    break;
+                                case RAID_DIFFICULTY_25MAN_NORMAL:
+                                    cacheEntry = GO_CRUSADERS_CACHE_25;
+                                    break;
+                                case RAID_DIFFICULTY_10MAN_HEROIC:
+                                    cacheEntry = GO_CRUSADERS_CACHE_10_H;
+                                    break;
+                                case RAID_DIFFICULTY_25MAN_HEROIC:
+                                    cacheEntry = GO_CRUSADERS_CACHE_25_H;
+                                    break;
+                            }
+
+                            if (GameObject* go = c->SummonGameObject(cacheEntry, Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), Locs[LOC_CENTER].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 630000000))
+                            {
+                                go->SetLootRecipient(instance);
+                            }
+                        }
+
+                        HandleGameObject(GO_EnterGateGUID, true);
+
+                        if (AchievementTimer + 60 >= GameTime::GetGameTime().count())
+                            DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_RESILIENCE_WILL_FIX_IT_CREDIT);
+                        AchievementTimer = 0;
+
+                        SaveToDB();
+                    }
+                    break;
+                case BOSS_TWIN_VALKYR:
+                    if (state == DONE)
+                    {
                         InstanceProgress = INSTANCE_PROGRESS_VALKYR_DEAD;
-                        DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 34497, 1); // Lightbane
-                        DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 34496, 1); // Darkbane
+                        DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_LIGHTBANE, 1);
+                        DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_DARKBANE, 1);
                         events.RescheduleEvent(EVENT_SCENE_VALKYR_DEAD, 2500ms);
                         HandleGameObject(GO_EnterGateGUID, true);
                         SaveToDB();
                     }
                     break;
-                case TYPE_ANUBARAK:
-                    if (data == IN_PROGRESS)
-                    {
-                        EncounterStatus = IN_PROGRESS;
+                case BOSS_ANUBARAK:
+                    if (state == IN_PROGRESS)
                         HandleGameObject(GO_WebDoorGUID, false);
-                    }
-                    else if (data == DONE)
+                    else if (state == DONE)
                     {
-                        Counter = 0;
-                        EncounterStatus = NOT_STARTED;
                         InstanceProgress = INSTANCE_PROGRESS_DONE;
                         HandleGameObject(GO_EnterGateGUID, true);
                         HandleGameObject(GO_WebDoorGUID, true);
@@ -565,7 +546,11 @@ public:
                             floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                     }
                     break;
+                default:
+                    break;
             }
+
+            return true;
         }
 
         uint32 GetData(uint32 type) const override
@@ -618,7 +603,7 @@ public:
                         }
 
                         // Entering mounted loses the kit: the mount removal on arrival dismounts, which drops vehicle kits
-                        if (InstanceProgress == INSTANCE_PROGRESS_INTRO_DONE && EncounterStatus == IN_PROGRESS)
+                        if (GetBossState(BOSS_NORTHREND_BEASTS) == IN_PROGRESS)
                             SetSnoboldCarriers(true);
 
                         events.Repeat(5s);
@@ -661,7 +646,7 @@ public:
                 case EVENT_SCENE_004:
                     {
                         InstanceProgress = INSTANCE_PROGRESS_INTRO_DONE;
-                        EncounterStatus = IN_PROGRESS;
+                        SetBossState(BOSS_NORTHREND_BEASTS, IN_PROGRESS);
 
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                             c->AI()->Talk(SAY_STAGE_0_02);
@@ -1123,6 +1108,8 @@ public:
                         for( std::vector<uint32>::iterator itr = vHealerEntries.begin(); itr != vHealerEntries.end(); ++itr )
                             vOtherEntries.push_back(*itr);
 
+                        // Counter can still hold the Jormungar kill count from the Northrend Beasts
+                        Counter = 0;
                         uint8 pos2 = 10;
                         for( std::vector<uint32>::iterator itr = vOtherEntries.begin(); itr != vOtherEntries.end(); ++itr )
                         {
@@ -1153,7 +1140,7 @@ public:
                         Map::PlayerList const& pl = instance->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             itr->GetSource()->AddToNotify(NOTIFY_AI_RELOCATION);
-                        EncounterStatus = IN_PROGRESS;
+                        SetBossState(BOSS_FACTION_CHAMPIONS, IN_PROGRESS);
                         break;
                     }
                 case EVENT_SCENE_FACTION_CHAMPIONS_DEAD:
@@ -1198,7 +1185,7 @@ public:
                 case EVENT_SCENE_304:
                     {
                         HandleGameObject(GO_MainGateGUID, false);
-                        EncounterStatus = IN_PROGRESS;
+                        SetBossState(BOSS_TWIN_VALKYR, IN_PROGRESS);
                         if (Creature* c = instance->GetCreature(NPC_LightbaneGUID))
                             c->GetMotionMaster()->MovePoint(0, Locs[LOC_VALKYR_DEST_2_RIGHT].GetPositionX(), Locs[LOC_VALKYR_DEST_2_RIGHT].GetPositionY(), Locs[LOC_VALKYR_DEST_2_RIGHT].GetPositionZ());
                         if (Creature* c = instance->GetCreature(NPC_DarkbaneGUID))
@@ -1250,7 +1237,6 @@ public:
                 case EVENT_SCENE_402:
                     {
                         HandleGameObject(GO_EnterGateGUID, false);
-                        EncounterStatus = IN_PROGRESS;
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                             if (Creature* t = c->SummonCreature(NPC_LICH_KING, Locs[LOC_ARTHAS_PORTAL]))
                             {
@@ -1438,7 +1424,7 @@ public:
                 InstanceCleanup();
             }
 
-            if (InstanceProgress == INSTANCE_PROGRESS_INTRO_DONE && EncounterStatus == IN_PROGRESS)
+            if (GetBossState(BOSS_NORTHREND_BEASTS) == IN_PROGRESS)
                 SetSnoboldCarrier(plr, true);
 
             // if missing spawn anub'arak
@@ -1475,6 +1461,9 @@ public:
             if (CLEANED)
                 return;
             CLEANED = true;
+
+            // Read before the switch: the Jaraxxus respawned below sets his boss state back to NOT_STARTED in Reset()
+            bool const encounterInProgress = IsEncounterInProgress();
 
             switch (InstanceProgress)
             {
@@ -1601,7 +1590,7 @@ public:
                     break;
             }
 
-            if (instance->IsHeroic() && AttemptsLeft > 0 && !fromFailed && EncounterStatus == IN_PROGRESS)
+            if (instance->IsHeroic() && AttemptsLeft > 0 && !fromFailed && encounterInProgress)
             {
                 --AttemptsLeft;
                 Map::PlayerList const& pl = instance->GetPlayers();
@@ -1618,7 +1607,9 @@ public:
             HandleGameObject(GO_EnterGateGUID, true);
             HandleGameObject(GO_WebDoorGUID, true);
             Counter = 0;
-            EncounterStatus = NOT_STARTED;
+            for (uint32 bossId = 0; bossId < MAX_ENCOUNTERS; ++bossId)
+                if (GetBossState(bossId) == IN_PROGRESS)
+                    SetBossState(bossId, NOT_STARTED);
             events.Reset();
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
