@@ -34,6 +34,7 @@ enum JaraxxusTexts
     EMOTE_INFERNAL_ERUPTION             = 7,
     SAY_INFERNAL_ERUPTION               = 8,
     SAY_DEATH                           = 10,
+    EMOTE_BERSERK                       = 11,
 };
 
 enum JaraxxusNPCs
@@ -52,6 +53,11 @@ enum JaraxxusSpells
     SPELL_SUMMON_VOLCANO                = 66258,
     SPELL_SUMMON_NETHER_PORTAL          = 66269,
     SPELL_SPELLSTEAL                    = 30449,
+    SPELL_BERSERK                       = 64238,
+
+    // Marks melee victims; Fel Lightning, Incinerate Flesh, Legion Flame and Spinning Pain Spike exclude marked targets
+    SPELL_LORD_JARAXXUS_HITTIN_YA       = 66327,
+    SPELL_LORD_JARAXXUS_HITTIN_YA_EFFECT = 66326,
 
     SPELL_FEL_STREAK                    = 66494,
     SPELL_FEL_STREAK_MORPH              = 66493,
@@ -79,9 +85,9 @@ enum JaraxxusEvents
     EVENT_SPELL_MISTRESS_KISS,
 };
 
-struct boss_jaraxxus : public ScriptedAI
+struct boss_jaraxxus : public BossAI
 {
-    boss_jaraxxus(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript()), summons(creature)
+    boss_jaraxxus(Creature* creature) : BossAI(creature, TYPE_JARAXXUS)
     {
         me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
         me->SetReactState(REACT_PASSIVE);
@@ -89,7 +95,8 @@ struct boss_jaraxxus : public ScriptedAI
 
     void Reset() override
     {
-        events.Reset();
+        _Reset();
+        DoCastSelf(SPELL_LORD_JARAXXUS_HITTIN_YA, true);
         instance->SetData(TYPE_JARAXXUS, NOT_STARTED);
 
         std::list<Creature*> creatures;
@@ -101,7 +108,7 @@ struct boss_jaraxxus : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        me->setActive(true);
+        _JustEngagedWith();
         events.Reset();
         events.RescheduleEvent(EVENT_SPELL_FEL_FIREBALL, 5s);
         events.RescheduleEvent(EVENT_SPELL_FEL_LIGHTNING, 10s, 15s);
@@ -111,9 +118,10 @@ struct boss_jaraxxus : public ScriptedAI
         // Portal and volcano alternate, each scheduling the other
         events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 20s);
 
+        ScheduleEnrageTimer(SPELL_BERSERK, 10min, EMOTE_BERSERK);
+
         me->RemoveAura(SPELL_JARAXXUS_CHAINS);
         Talk(SAY_AGGRO);
-        DoZoneInCombat();
         instance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
     }
 
@@ -157,12 +165,12 @@ struct boss_jaraxxus : public ScriptedAI
                 events.Repeat(10s, 15s);
                 break;
             case EVENT_SPELL_FEL_LIGHTNING:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_LORD_JARAXXUS_HITTIN_YA_EFFECT))
                     DoCast(target, SPELL_FEL_LIGHTNING);
                 events.Repeat(10s, 15s);
                 break;
             case EVENT_SPELL_INCINERATE_FLESH:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_LORD_JARAXXUS_HITTIN_YA_EFFECT))
                 {
                     Talk(EMOTE_INCINERATE, target);
                     Talk(SAY_INCINERATE);
@@ -176,7 +184,7 @@ struct boss_jaraxxus : public ScriptedAI
                 events.Repeat(25s, 45s);
                 break;
             case EVENT_SPELL_LEGION_FLAME:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_LORD_JARAXXUS_HITTIN_YA_EFFECT))
                 {
                     Talk(EMOTE_LEGION_FLAME, target);
                     DoCast(target, SPELL_LEGION_FLAME);
@@ -204,14 +212,9 @@ struct boss_jaraxxus : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        summons.DespawnAll();
+        _JustDied();
         Talk(SAY_DEATH);
         instance->SetData(TYPE_JARAXXUS, DONE);
-    }
-
-    void JustReachedHome() override
-    {
-        me->setActive(false);
     }
 
     void JustSummoned(Creature* summon) override
@@ -228,10 +231,6 @@ struct boss_jaraxxus : public ScriptedAI
     }
 
     void MoveInLineOfSight(Unit* /*who*/) override { }
-
-private:
-    InstanceScript* const instance;
-    SummonList summons;
 };
 
 struct npc_fel_infernal : public ScriptedAI
@@ -240,6 +239,7 @@ struct npc_fel_infernal : public ScriptedAI
 
     void Reset() override
     {
+        DoCastSelf(SPELL_LORD_JARAXXUS_HITTIN_YA, true);
         if (Unit* target = me->SelectNearestTarget(200.0f))
         {
             AttackStart(target);
@@ -297,6 +297,7 @@ struct npc_mistress_of_pain : public ScriptedAI
 
     void Reset() override
     {
+        DoCastSelf(SPELL_LORD_JARAXXUS_HITTIN_YA, true);
         if (Unit* target = me->SelectNearestTarget(200.0f))
         {
             AttackStart(target);
@@ -326,7 +327,7 @@ struct npc_mistress_of_pain : public ScriptedAI
                 events.Repeat(15s, 25s);
                 break;
             case EVENT_SPELL_SPINNING_PAIN_SPIKE:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true, true, -SPELL_LORD_JARAXXUS_HITTIN_YA_EFFECT))
                     DoCast(target, SPELL_SPINNING_PAIN_SPIKE);
                 events.Repeat(25s, 30s);
                 break;
