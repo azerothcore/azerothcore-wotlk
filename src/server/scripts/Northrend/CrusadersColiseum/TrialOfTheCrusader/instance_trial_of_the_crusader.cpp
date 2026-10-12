@@ -852,7 +852,21 @@ public:
                         if (Creature* c = instance->GetCreature(NPC_FizzlebangGUID))
                             c->AI()->Talk(SAY_STAGE_1_02);
 
+                        events.RescheduleEvent(EVENT_WILFRED_TALK_EMOTE, 3s);
+                        events.RescheduleEvent(EVENT_WILFRED_STOP_TALK_EMOTE, 10400ms);
                         events.RescheduleEvent(EVENT_SCENE_103, 11s);
+                        break;
+                    }
+                case EVENT_WILFRED_TALK_EMOTE:
+                    {
+                        if (Creature* c = instance->GetCreature(NPC_FizzlebangGUID))
+                            c->SetEmoteState(EMOTE_STATE_TALK);
+                        break;
+                    }
+                case EVENT_WILFRED_STOP_TALK_EMOTE:
+                    {
+                        if (Creature* c = instance->GetCreature(NPC_FizzlebangGUID))
+                            c->SetEmoteState(EMOTE_ONESHOT_NONE);
                         break;
                     }
                 case EVENT_SCENE_103:
@@ -879,6 +893,8 @@ public:
                             c->AI()->Talk(SAY_STAGE_1_04);
                         }
 
+                        events.RescheduleEvent(EVENT_WILFRED_TALK_EMOTE, 2600ms);
+                        events.RescheduleEvent(EVENT_WILFRED_STOP_TALK_EMOTE, 8700ms);
                         events.RescheduleEvent(EVENT_SCENE_105, 3s);
                         break;
                     }
@@ -886,9 +902,6 @@ public:
                     {
                         if (Creature* c = instance->GetCreature(NPC_JaraxxusGUID))
                             c->SetFacingTo(M_PI / 2);
-                        if (Creature* c = instance->GetCreature(NPC_PurpleGroundGUID))
-                            c->DespawnOrUnsummon();
-                        NPC_PurpleGroundGUID.Clear();
 
                         events.RescheduleEvent(EVENT_SCENE_106, 10s);
                         break;
@@ -905,6 +918,9 @@ public:
                     {
                         if (Creature* c = instance->GetCreature(NPC_FizzlebangGUID))
                             c->AI()->Talk(SAY_STAGE_1_06);
+                        if (Creature* c = instance->GetCreature(NPC_PurpleGroundGUID))
+                            c->DespawnOrUnsummon();
+                        NPC_PurpleGroundGUID.Clear();
 
                         events.RescheduleEvent(EVENT_SCENE_108, 800ms);
                         break;
