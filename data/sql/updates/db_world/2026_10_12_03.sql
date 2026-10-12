@@ -1,3 +1,4 @@
+-- DB update 2026_10_12_02 -> 2026_10_12_03
 -- 66319 Summon Fire Bomb (serverside): summons a Fire Bomb for 35s at the Fire Bomb's impact point
 UPDATE `spell_dbc` SET `DurationIndex` = 125, `Effect_1` = 28, `ImplicitTargetA_1` = 6, `ImplicitTargetB_1` = 53, `EffectMiscValue_1` = 34854, `EffectMiscValueB_1` = 64 WHERE `ID` = 66319;
 
