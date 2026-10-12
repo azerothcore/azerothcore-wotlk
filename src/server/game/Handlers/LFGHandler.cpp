@@ -266,6 +266,10 @@ void WorldSession::HandleLfrSearchJoinOpcode(WorldPacket& recvData)
 {
     uint32 dungeonId;
     recvData >> dungeonId;
+
+    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_RAID_BROWSER))
+        return;
+
     dungeonId = (dungeonId & 0x00FFFFFF); // remove the type from the dungeon entry
     sLFGMgr->LfrSearchAdd(GetPlayer(), dungeonId);
     sLFGMgr->SendRaidBrowserCachedList(GetPlayer(), dungeonId);

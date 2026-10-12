@@ -142,6 +142,30 @@ enum barkTrigger
     QUEST_BARK_FOR_VOODOO               = 11408,
     QUEST_BARK_FOR_BARLEY               = 11293,
     QUEST_BARK_FOR_THUNDERBREW          = 11294,
+
+    // Bark for Drohn's Distillery!
+    SAY_DROHN_DISTILLERY_1              = 23520,
+    SAY_DROHN_DISTILLERY_2              = 23521,
+    SAY_DROHN_DISTILLERY_3              = 23522,
+    SAY_DROHN_DISTILLERY_4              = 23523,
+
+    // Bark for T'chali's Voodoo Brewery!
+    SAY_TCHALIS_VOODOO_1                = 23524,
+    SAY_TCHALIS_VOODOO_2                = 23525,
+    SAY_TCHALIS_VOODOO_3                = 23526,
+    SAY_TCHALIS_VOODOO_4                = 23527,
+
+    // Bark for the Barleybrews!
+    SAY_BARLEYBREW_1                    = 23464,
+    SAY_BARLEYBREW_2                    = 23465,
+    SAY_BARLEYBREW_3                    = 23466,
+    SAY_BARLEYBREW_4                    = 22941,
+
+    // Bark for the Thunderbrews!
+    SAY_THUNDERBREW_1                   = 23467,
+    SAY_THUNDERBREW_2                   = 23468,
+    SAY_THUNDERBREW_3                   = 23469,
+    SAY_THUNDERBREW_4                   = 22942
 };
 
 struct npc_brewfest_bark_trigger : public ScriptedAI
@@ -193,60 +217,27 @@ struct npc_brewfest_bark_trigger : public ScriptedAI
                 if (q_status.CreatureOrGOCount[me->GetEntry() - 24202] == 0)
                 {
                     player->KilledMonsterCredit(me->GetEntry());
-                    player->Say(GetTextFor(me->GetEntry(), quest).c_str(), LANG_UNIVERSAL, player);
+                    player->Say(GetTextFor(quest), player);
                 }
             }
         }
     }
 
-    std::string GetTextFor(uint32  /*entry*/, uint32 questId)
+    uint32 GetTextFor(uint32 questId)
     {
-        std::string str = "";
         switch (questId)
         {
             case QUEST_BARK_FOR_DROHN:
+                return RAND(SAY_DROHN_DISTILLERY_1, SAY_DROHN_DISTILLERY_2, SAY_DROHN_DISTILLERY_3, SAY_DROHN_DISTILLERY_4);
             case QUEST_BARK_FOR_VOODOO:
-                {
-                    switch (urand(0, 3))
-                    {
-                        case 0:
-                            str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " and drink for the horde!";
-                            break;
-                        case 1:
-                            str = "If you think an orc can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + ", only at Brewfest!";
-                            break;
-                        case 2:
-                            str = "Celebrate Brewfest with orcs that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " at Brewfest!";
-                            break;
-                        case 3:
-                            str = std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + "  knows how to party hard! Check them out at Brewfest!";
-                            break;
-                    }
-                    break;
-                }
+                return RAND(SAY_TCHALIS_VOODOO_1, SAY_TCHALIS_VOODOO_2, SAY_TCHALIS_VOODOO_3, SAY_TCHALIS_VOODOO_4);
             case QUEST_BARK_FOR_BARLEY:
+                return RAND(SAY_BARLEYBREW_1, SAY_BARLEYBREW_2, SAY_BARLEYBREW_3, SAY_BARLEYBREW_4);
             case QUEST_BARK_FOR_THUNDERBREW:
-                {
-                    switch (urand(0, 3))
-                    {
-                        case 0:
-                            str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " and drink for the alliance!";
-                            break;
-                        case 1:
-                            str = "If you think an dwarf can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + ", only at Brewfest!";
-                            break;
-                        case 2:
-                            str = "Celebrate Brewfest with dwarves that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " at Brewfest!";
-                            break;
-                        case 3:
-                            str = std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + "  knows how to party hard! Check them out at Brewfest!";
-                            break;
-                    }
-                    break;
-                }
+                return RAND(SAY_THUNDERBREW_1, SAY_THUNDERBREW_2, SAY_THUNDERBREW_3, SAY_THUNDERBREW_4);
+            default:
+                return 0;
         }
-
-        return str;
     }
 };
 
@@ -1365,56 +1356,6 @@ struct npc_brew_bubble : public NullCreatureAI
     }
 };
 
-enum BrewfestRevelerEnum
-{
-    FACTION_ALLIANCE    = 1934,
-    FACTION_HORDE       = 1935,
-
-    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE          = 44003,
-    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE        = 44004,
-    SPELL_BREWFEST_REVELER_TRANSFORM_BE                   = 43907,
-    SPELL_BREWFEST_REVELER_TRANSFORM_ORC                  = 43914,
-    SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN               = 43915,
-    SPELL_BREWFEST_REVELER_TRANSFORM_TROLL                = 43916,
-    SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD               = 43917,
-
-    SPELL_DRUNKEN_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE  = 44096
-};
-
-class spell_brewfest_reveler_transform : public AuraScript
-{
-    PrepareAuraScript(spell_brewfest_reveler_transform);
-
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        uint32 factionId = FACTION_ALLIANCE;
-        switch (m_scriptSpellId)
-        {
-            case SPELL_BREWFEST_REVELER_TRANSFORM_BE:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_ORC:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_TROLL:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD:
-                factionId = FACTION_HORDE;
-                break;
-            case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
-            case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE:
-            case SPELL_DRUNKEN_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
-                factionId = FACTION_FRIENDLY;
-                break;
-            default:
-                break;
-        }
-
-        GetTarget()->SetFaction(factionId);
-    }
-
-    void Register() override
-    {
-        AfterEffectApply += AuraEffectApplyFn(spell_brewfest_reveler_transform::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class spell_brewfest_relay_race_force_cast : public SpellScript
 {
     PrepareSpellScript(spell_brewfest_relay_race_force_cast);
@@ -2080,7 +2021,6 @@ void AddSC_event_brewfest_scripts()
     RegisterSpellScript(spell_brewfest_unfill_keg);
     RegisterSpellScript(spell_brewfest_toss_mug);
     RegisterSpellScript(spell_brewfest_add_mug);
-    RegisterSpellScript(spell_brewfest_reveler_transform);
     RegisterSpellScript(spell_brewfest_relay_race_force_cast);
 
     // beer effect
