@@ -1,3 +1,4 @@
+-- DB update 2026_10_12_00 -> 2026_10_12_01
 --
 SET @ID := -431;
 DELETE FROM `creature_immunities` WHERE (`ID` = @ID);
