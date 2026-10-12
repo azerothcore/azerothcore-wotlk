@@ -179,24 +179,16 @@ public:
         }
 
         // Prefers players away from Gormok's melee, falling back to anyone when they are all on him
-        Player* SelectFireBombTarget() const
+        Unit* SelectFireBombTarget()
         {
             Creature* gormok = GetGormok();
-            std::vector<Player*> everyone;
-            std::vector<Player*> awayFromGormok;
-            for (auto const& itr : me->GetMap()->GetPlayers())
-            {
-                Player* player = itr.GetSource();
-                if (!player || !player->IsAlive() || player->IsGameMaster())
-                    continue;
+            if (!gormok || !gormok->IsAlive())
+                return SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
 
-                everyone.push_back(player);
-                if (!gormok || !gormok->IsAlive() || !player->IsWithinMeleeRange(gormok))
-                    awayFromGormok.push_back(player);
-            }
+            if (Unit* target = gormok->AI()->SelectTarget(SelectTargetMethod::Random, 0, [gormok](Unit* unit) { return unit->IsPlayer() && !unit->IsWithinMeleeRange(gormok); }))
+                return target;
 
-            std::vector<Player*> const& candidates = awayFromGormok.empty() ? everyone : awayFromGormok;
-            return candidates.empty() ? nullptr : Acore::Containers::SelectRandomContainerElement(candidates);
+            return gormok->AI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
         }
 
         bool BoardGormok(Creature* gormok)
@@ -307,7 +299,7 @@ public:
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
                     if (Dismounted || !t->IsPlayer())
-                        if (Player* target = SelectFireBombTarget())
+                        if (Unit* target = SelectFireBombTarget())
                             DoCast(target, SPELL_FIRE_BOMB);
                     events.Repeat(20s, 30s);
                     break;
@@ -342,6 +334,8 @@ public:
 
                     Dismounted = true;
                     scheduler.CancelAll();
+                    // Engaged but passive until the attack step, so their own threat lists feed the early Fire Bombs
+                    DoZoneInCombat();
                     events.Reset();
                     events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, 1s, 12s);
                     events.ScheduleEvent(EVENT_DISMOUNTED_ATTACK, 5s);
