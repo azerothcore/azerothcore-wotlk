@@ -38,7 +38,6 @@ enum GormokSpells
     SPELL_SNOBOLLED                     = 66406,
     SPELL_BATTER                        = 66408,
     SPELL_FIRE_BOMB                     = 66313,
-    SPELL_FIRE_BOMB_AURA                = 66318,
     SPELL_HEAD_CRACK                    = 66407,
     SPELL_FULL_HEAL                     = 17683,
 };
@@ -71,7 +70,6 @@ enum GormokData
 enum GormokNPCs
 {
     NPC_SNOBOLD_VASSAL                  = 34800,
-    NPC_FIRE_BOMB                       = 34854,
 };
 
 enum Yells
@@ -180,6 +178,19 @@ public:
             return pInstance ? ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) : nullptr;
         }
 
+        // Prefers players away from Gormok's melee, falling back to anyone when they are all on him
+        Unit* SelectFireBombTarget()
+        {
+            Creature* gormok = GetGormok();
+            if (!gormok || !gormok->IsAlive())
+                return SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+
+            if (Unit* target = gormok->AI()->SelectTarget(SelectTargetMethod::Random, 0, [gormok](Unit* unit) { return unit->IsPlayer() && !unit->IsWithinMeleeRange(gormok); }))
+                return target;
+
+            return gormok->AI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+        }
+
         bool BoardGormok(Creature* gormok)
         {
             if (Vehicle* vk = gormok->GetVehicleKit())
@@ -204,7 +215,7 @@ public:
                     return;
 
                 if (context.GetRepeatCounter() == 0)
-                    me->GetMotionMaster()->MoveFollow(gormok, 0.0f, 0.0f);
+                    me->GetMotionMaster()->MoveFollow(gormok, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false);
 
                 if (!me->IsWithinMeleeRange(gormok))
                 {
@@ -268,6 +279,12 @@ public:
                 case EVENT_DISMOUNTED_ATTACK:
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat();
+                    // An unengaged creature never evades, so a Snobold with nobody left to fight would idle forever
+                    if (!me->IsEngaged())
+                    {
+                        me->DespawnOrUnsummon();
+                        return;
+                    }
                     events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 1s, 5s);
                     break;
                 case EVENT_SPELL_SNOBOLLED:
@@ -281,31 +298,10 @@ public:
                     events.Repeat(6s, 8s);
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
-                    {
-                        if ((Dismounted || !t->IsPlayer()) && pInstance)
-                        {
-                            GuidVector validPlayers;
-                            Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK));
-
-                            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            {
-                                if (Player* p = itr->GetSource())
-                                    if (p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !gormok->IsAlive() || !p->IsWithinMeleeRange(gormok)))
-                                        validPlayers.push_back(p->GetGUID());
-                            }
-
-                            if (!validPlayers.empty())
-                                if (Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))))
-                                    if (Creature* trigger = me->SummonCreature(NPC_FIRE_BOMB, *p, TEMPSUMMON_TIMED_DESPAWN, 60000))
-                                    {
-                                        me->CastSpell(trigger, SPELL_FIRE_BOMB_AURA, true); // periodic damage aura, speed 14.0f
-                                        me->CastSpell(trigger, SPELL_FIRE_BOMB); // visual + initial damage 4k
-                                    }
-                        }
-
-                        events.Repeat(20s, 30s);
-                    }
+                    if (Dismounted || !t->IsPlayer())
+                        if (Unit* target = SelectFireBombTarget())
+                            DoCast(target, SPELL_FIRE_BOMB);
+                    events.Repeat(20s, 30s);
                     break;
                 case EVENT_SPELL_HEAD_CRACK:
                     if (t->IsPlayer())
@@ -338,6 +334,8 @@ public:
 
                     Dismounted = true;
                     scheduler.CancelAll();
+                    // Engaged but passive until the attack step, so their own threat lists feed the early Fire Bombs
+                    DoZoneInCombat();
                     events.Reset();
                     events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, 1s, 12s);
                     events.ScheduleEvent(EVENT_DISMOUNTED_ATTACK, 5s);
