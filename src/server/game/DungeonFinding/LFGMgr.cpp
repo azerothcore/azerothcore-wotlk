@@ -1065,6 +1065,44 @@ namespace lfg
         player->SendDirectMessage(&data);
     }
 
+    static RBInternalInfo BuildRBInternalInfo(Player* player, std::string const& comment, ObjectGuid groupGuid,
+        bool isGroupLeader, uint8 roles, uint32 encounterMask = 0, ObjectGuid instanceGuid = ObjectGuid::Empty)
+    {
+        auto rating = [player](CombatRating cr)
+        {
+            return player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(cr));
+        };
+
+        uint8 talents[3] = { 0, 0, 0 };
+        player->GetTalentTreePoints(talents);
+
+        int32 spellDamage = player->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_ALL);
+        int32 spellHeal = player->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_ALL);
+        // regen fields are per second, the client exposes these values as mana per 5 seconds
+        float mp5 = player->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * 5.0f;
+        float mp5combat = player->GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) * 5.0f;
+        float baseAP = player->GetTotalAttackPowerValue(BASE_ATTACK);
+        float rangedAP = player->GetTotalAttackPowerValue(RANGED_ATTACK);
+
+        uint32 maxPower = 0;
+        if (player->IsClass(CLASS_DRUID))
+            maxPower = player->GetMaxPower(POWER_MANA);
+        else if (player->getPowerType() == POWER_RAGE || player->getPowerType() == POWER_RUNIC_POWER)
+            maxPower = player->GetMaxPower(player->getPowerType()) / 10;
+        else
+            maxPower = player->GetMaxPower(player->getPowerType());
+
+        return RBInternalInfo(player->GetGUID(), comment, isGroupLeader, groupGuid, roles, encounterMask, instanceGuid,
+            1, player->GetLevel(), player->getClass(), player->getRace(), player->GetAverageItemLevel(),
+            talents, player->GetAreaId(), player->GetArmor(),
+            uint32(std::max<int32>(0, spellDamage)), uint32(std::max<int32>(0, spellHeal)),
+            rating(CR_CRIT_MELEE), rating(CR_CRIT_RANGED), rating(CR_CRIT_SPELL),
+            std::max<float>(0.0f, mp5), std::max<float>(0.0f, mp5combat),
+            std::max<uint32>(baseAP, rangedAP), uint32(player->GetStat(STAT_AGILITY)), player->GetMaxHealth(), maxPower,
+            rating(CR_DEFENSE_SKILL), rating(CR_DODGE), rating(CR_BLOCK), rating(CR_PARRY), rating(CR_HASTE_SPELL),
+            rating(CR_EXPERTISE));
+    }
+
     void LFGMgr::UpdateRaidBrowser(uint32 diff)
     {
         for (uint8 team = 0; team < 2; ++team)
@@ -1082,9 +1120,7 @@ namespace lfg
 
         ObjectGuid guid, groupGuid, instanceGuid;
         uint8 level, Class, race, talents[3];
-        float iLevel, mp5, mp5combat, baseAP, rangedAP;
-        int32 spellDamage, spellHeal;
-        uint32 dungeonId, encounterMask, maxPower;
+        uint32 dungeonId, encounterMask;
         uint32 deletedCounter, groupCounter, playerCounter;
         std::string emptyComment;
 
@@ -1132,29 +1168,8 @@ namespace lfg
                             encounterMask = bind->save->GetCompletedEncounterMask();
                         }
 
-                    talents[0] = 0;
-                    talents[1] = 0;
-                    talents[2] = 0;
-                    p->GetTalentTreePoints(talents);
-                    spellDamage = p->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_ALL);
-                    spellHeal = p->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_ALL);
-                    // regen fields are per second, the client exposes these values as mana per 5 seconds
-                    mp5 = p->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * 5.0f;
-                    mp5combat = p->GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) * 5.0f;
-                    baseAP = p->GetTotalAttackPowerValue(BASE_ATTACK);
-                    rangedAP = p->GetTotalAttackPowerValue(RANGED_ATTACK);
-                    maxPower = 0;
-                    if (p->IsClass(CLASS_DRUID))
-                        maxPower = p->GetMaxPower(POWER_MANA);
-                    else
-                        maxPower = (p->getPowerType() == POWER_RAGE || p->getPowerType() == POWER_RUNIC_POWER) ? p->GetMaxPower(p->getPowerType()) / 10 : p->GetMaxPower(p->getPowerType());
-
-                    currInternalInfoMap[sitr->first] = RBInternalInfo(guid, sitr->second.comment, !groupGuid.IsEmpty(), groupGuid, sitr->second.roles, encounterMask, instanceGuid,
-                                                       1, p->GetLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),
-                                                       talents, p->GetAreaId(), p->GetArmor(), (uint32)std::max<int32>(0, spellDamage), (uint32)std::max<int32>(0, spellHeal),
-                                                       p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_MELEE)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_RANGED)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_SPELL)), std::max<float>(0.0f, mp5), std::max<float>(0.0f, mp5combat),
-                                                       std::max<uint32>(baseAP, rangedAP), (uint32)p->GetStat(STAT_AGILITY), p->GetMaxHealth(), maxPower, p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_DEFENSE_SKILL)),
-                                                       p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_DODGE)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_BLOCK)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_PARRY)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_HASTE_SPELL)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_EXPERTISE)));
+                    currInternalInfoMap[sitr->first] = BuildRBInternalInfo(p, sitr->second.comment, groupGuid,
+                        !groupGuid.IsEmpty(), sitr->second.roles, encounterMask, instanceGuid);
 
                     if (!groupGuid)
                         continue;
@@ -1163,11 +1178,17 @@ namespace lfg
                         if (mitr->guid == sitr->first) // leader already added
                             continue;
 
-                        guid = mitr->guid;
+                        if (Player* member = ObjectAccessor::FindConnectedPlayer(mitr->guid))
+                        {
+                            currInternalInfoMap[mitr->guid] =
+                                BuildRBInternalInfo(member, emptyComment, groupGuid, false, 0);
+                            continue;
+                        }
+
+                        // offline: cached level/class/race, other stats are kept from when last seen online
                         level = 1;
                         Class = 0;
                         race = 0;
-                        iLevel = 0.0f;
                         talents[0] = 0;
                         talents[1] = 0;
                         talents[2] = 0;
@@ -1177,18 +1198,12 @@ namespace lfg
                             Class = gpd->Class;
                             race = gpd->Race;
                         }
-                        Player* mplr = ObjectAccessor::FindConnectedPlayer(guid);
-                        if (mplr)
-                        {
-                            iLevel = mplr->GetAverageItemLevel();
-                            mplr->GetTalentTreePoints(talents);
-                        }
-                        currInternalInfoMap[mitr->guid] = RBInternalInfo(guid, emptyComment, false, groupGuid, 0, 0, ObjectGuid::Empty,
-                                                          (mplr ? 1 : 0), level, Class, race, iLevel,
-                                                          talents, 0, 0, 0, 0,
-                                                          0, 0, 0, 0, 0,
-                                                          0, 0, 0, 0, 0,
-                                                          0, 0, 0, 0, 0);
+                        currInternalInfoMap[mitr->guid] = RBInternalInfo(mitr->guid, emptyComment, false, groupGuid,
+                            0, 0, ObjectGuid::Empty, 0, level, Class, race, 0.0f,
+                            talents, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0);
                     }
                 }
 
@@ -1333,7 +1348,9 @@ namespace lfg
     void LFGMgr::RBPacketAppendPlayer(RBInternalInfo const& info, ByteBuffer& buffer)
     {
         buffer << info.guid;
-        uint32 flags = LFG_UPDATE_FLAG_CHARACTERINFO | LFG_UPDATE_FLAG_ROLES | LFG_UPDATE_FLAG_COMMENT | (info.groupGuid ? LFG_UPDATE_FLAG_GROUPGUID : LFG_UPDATE_FLAG_BINDED) | (info.isGroupLeader ? LFG_UPDATE_FLAG_GROUPLEADER : 0) | (!info.groupGuid || info.isGroupLeader ? LFG_UPDATE_FLAG_AREA : 0);
+        uint32 flags = LFG_UPDATE_FLAG_CHARACTERINFO | LFG_UPDATE_FLAG_ROLES | LFG_UPDATE_FLAG_COMMENT
+            | LFG_UPDATE_FLAG_AREA | (info.groupGuid ? LFG_UPDATE_FLAG_GROUPGUID : LFG_UPDATE_FLAG_BINDED)
+            | (info.isGroupLeader ? LFG_UPDATE_FLAG_GROUPLEADER : 0);
         buffer << (uint32)flags;
 
         if (flags & LFG_UPDATE_FLAG_CHARACTERINFO)
