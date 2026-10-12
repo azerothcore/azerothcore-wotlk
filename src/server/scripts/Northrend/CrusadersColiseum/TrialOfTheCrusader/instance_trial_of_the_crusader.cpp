@@ -726,20 +726,22 @@ public:
                             c->AI()->Talk(SAY_STAGE_0_04);
 
                         events.RescheduleEvent(EVENT_OPEN_GATE, 3s);
-                        events.RescheduleEvent(EVENT_SUMMON_ACIDMAW_AND_DREADSCALE, 4s);
+                        events.RescheduleEvent(EVENT_SUMMON_DREADSCALE, 4s);
                         break;
                     }
-                case EVENT_SUMMON_ACIDMAW_AND_DREADSCALE:
+                case EVENT_SUMMON_DREADSCALE:
                     {
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))
-                        {
                             if (Creature* dreadscale = c->SummonCreature(NPC_DREADSCALE, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY(), Locs[LOC_BEHIND_GATE].GetPositionZ(), Locs[LOC_BEHIND_GATE].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
                                 dreadscale->GetMotionMaster()->MovePoint(0, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY() - 25.0f, Locs[LOC_BEHIND_GATE].GetPositionZ());
-                            if (Creature* acidmaw = c->SummonCreature(NPC_ACIDMAW, Locs[LOC_ACIDMAW].GetPositionX(), Locs[LOC_ACIDMAW].GetPositionY(), Locs[LOC_ACIDMAW].GetPositionZ(), Locs[LOC_ACIDMAW].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
-                                acidmaw->AddAura(53421, acidmaw);
-                        }
 
                         events.RescheduleEvent(EVENT_SCENE_005_2, 4s);
+                        break;
+                    }
+                case EVENT_SUMMON_ACIDMAW:
+                    {
+                        if (Creature* c = instance->GetCreature(NPC_TirionGUID))
+                            c->SummonCreature(NPC_ACIDMAW, Locs[LOC_ACIDMAW].GetPositionX(), Locs[LOC_ACIDMAW].GetPositionY(), Locs[LOC_ACIDMAW].GetPositionZ(), Locs[LOC_ACIDMAW].GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
                         break;
                     }
 
@@ -748,7 +750,8 @@ public:
                         if (Creature* dreadscale = instance->GetCreature(NPC_DreadscaleGUID))
                             dreadscale->GetMotionMaster()->MovePoint(0, Locs[LOC_DREADSCALE].GetPositionX(), Locs[LOC_DREADSCALE].GetPositionY(), Locs[LOC_DREADSCALE].GetPositionZ());
 
-                        events.RescheduleEvent(EVENT_ACIDMAW_AND_DREADSCALE_ATTACK, 7s);
+                        events.RescheduleEvent(EVENT_SUMMON_ACIDMAW, 4300ms);
+                        events.RescheduleEvent(EVENT_ACIDMAW_AND_DREADSCALE_ATTACK, 6700ms);
                         break;
                     }
                 case EVENT_ACIDMAW_AND_DREADSCALE_ATTACK:
@@ -772,8 +775,6 @@ public:
                             c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             if (Unit* target = c->SelectNearestTarget(200.0f))
                             {
-                                c->RemoveAura(53421);
-                                c->CastSpell(c, 66947, false);
                                 c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }

@@ -593,10 +593,14 @@ enum JormungarSpells
     SPELL_SWEEP_0                       = 66794,
     SPELL_SWEEP_1                       = 67646,
 
-    SPELL_EMERGE_0                      = 66947,
-    SPELL_SUBMERGE_0                    = 53421,
+    SPELL_SUBMERGE_STATIONARY           = 66936,
+    SPELL_SUBMERGE_MOBILE               = 66948,
+    SPELL_EMERGE_STATIONARY             = 66947,
+    SPELL_EMERGE_MOBILE                 = 66949,
     SPELL_ENRAGE                        = 68335,
     SPELL_CHURNING_GROUND               = 66969,
+    SPELL_CHURNING_GROUND_STATIONARY    = 68302,
+    SPELL_HATE_TO_ZERO                  = 63984,
 };
 
 enum Model
@@ -610,13 +614,22 @@ enum Model
 enum JormungarNPCs
 {
     NPC_SLIME_POOL                      = 35176,
+    NPC_MOBILE_BURROW_TARGET            = 35226,
+};
+
+enum JormungarPoints
+{
+    POINT_BURROW                        = 1,
 };
 
 enum JormungarEvents
 {
     EVENT_SUBMERGE = 1,
-    EVENT_EMERGE,
+    EVENT_SUBMERGED,
+    EVENT_CHURN_GROUND,
     EVENT_MOVE_UNDERGROUND,
+    EVENT_EMERGE,
+    EVENT_EMERGED,
 
     EVENT_SPELL_SPRAY,
     EVENT_SPELL_SWEEP,
@@ -636,6 +649,8 @@ struct boss_jormungarAI : public ScriptedAI
     InstanceScript* pInstance;
     EventMap events;
     bool bIsStationary;
+    bool Submerged = false;
+    Position BurrowDest;
 
     uint32 _SPELL_BITE;
     uint32 _SPELL_SPEW;
@@ -650,14 +665,14 @@ struct boss_jormungarAI : public ScriptedAI
         switch (param)
         {
             case -1:
-                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                if (!Submerged)
                     events.RescheduleEvent(EVENT_SUBMERGE, 1500ms);
                 break;
             case -2:
-                if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                if (Submerged)
                     bIsStationary = true; // it will come out mobile soon
                 else if (me->GetDisplayId() == _MODEL_STATIONARY )
-                    events.RescheduleEvent(EVENT_SUBMERGE, 1s);
+                    events.RescheduleEvent(EVENT_SUBMERGE, 2400ms);
                 else
                     events.CancelEvent(EVENT_SUBMERGE);
                 me->CastSpell(me, SPELL_ENRAGE, true);
@@ -686,10 +701,25 @@ struct boss_jormungarAI : public ScriptedAI
             events.RescheduleEvent(EVENT_SUBMERGE, 45s, 50s);
     }
 
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        if (me->GetDisplayId() == _MODEL_STATIONARY)
+            DoCastSelf(SPELL_CHURNING_GROUND_STATIONARY);
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         me->setActive(true);
         ScheduleEvents();
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE || id != POINT_BURROW)
+            return;
+
+        if (me->HasAura(SPELL_SUBMERGE_STATIONARY) || me->HasAura(SPELL_SUBMERGE_MOBILE))
+            events.RescheduleEvent(EVENT_EMERGE, 400ms);
     }
 
     void JustReachedHome() override
@@ -727,8 +757,18 @@ struct boss_jormungarAI : public ScriptedAI
             case EVENT_SUBMERGE:
                 {
                     bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    me->CastSpell(me, SPELL_SUBMERGE_0, false);
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveIdle();
+                    Submerged = true;
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    DoCastSelf(bIsStationary ? SPELL_SUBMERGE_STATIONARY : SPELL_SUBMERGE_MOBILE);
+
+                    float angle = me->GetAngle(Locs[LOC_CENTER].GetPositionX() + urand(0, 20) - 10.0f, Locs[LOC_CENTER].GetPositionY() + urand(0, 20) - 10.0f);
+                    float dist = urand(10, 35);
+                    BurrowDest.Relocate(Locs[LOC_CENTER].GetPositionX() + std::cos(angle) * dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * dist, me->GetPositionZ());
+                    me->SummonCreature(NPC_MOBILE_BURROW_TARGET, BurrowDest, TEMPSUMMON_TIMED_DESPAWN, 32000);
 
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if (pInstance)
@@ -736,48 +776,43 @@ struct boss_jormungarAI : public ScriptedAI
                             c->AI()->DoAction(-1);
 
                     events.Reset();
-                    events.RescheduleEvent(EVENT_MOVE_UNDERGROUND, 2500ms);
+                    events.RescheduleEvent(EVENT_SUBMERGED, bIsStationary ? 2s : 750ms);
+                    events.RescheduleEvent(EVENT_CHURN_GROUND, bIsStationary ? 2400ms : 1150ms);
                 }
+                break;
+            case EVENT_SUBMERGED:
+                me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                break;
+            case EVENT_CHURN_GROUND:
+                me->RemoveAurasDueToSpell(SPELL_CHURNING_GROUND_STATIONARY);
+                DoCastSelf(SPELL_CHURNING_GROUND);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                events.RescheduleEvent(EVENT_MOVE_UNDERGROUND, 1200ms);
                 break;
             case EVENT_MOVE_UNDERGROUND:
-                {
-                    float angle = me->GetAngle(Locs[LOC_CENTER].GetPositionX() + urand(0, 20) - 10.0f, Locs[LOC_CENTER].GetPositionY() + urand(0, 20) - 10.0f), dist = urand(10, 35);
-                    if (Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 6000))
-                    {
-                        c->SetSpeed(MOVE_RUN, 2.5f);
-                        c->CastSpell(c, SPELL_CHURNING_GROUND, true);
-                        c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
-                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ());
-                    }
-                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
-                    me->StopMovingOnCurrentPos();
-                    DoResetThreatList();
-
-                    events.RescheduleEvent(EVENT_EMERGE, 6s);
-                }
+                me->GetMotionMaster()->MovePoint(POINT_BURROW, BurrowDest, FORCED_MOVEMENT_NONE, 12.0f);
+                // Emerges where it stands if the burrow never reports arriving
+                events.RescheduleEvent(EVENT_EMERGE, 8s);
                 break;
             case EVENT_EMERGE:
-                {
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveIdle();
-                    me->StopMoving();
-                    if (bIsStationary)
-                    {
-                        me->SetNativeDisplayId(_MODEL_MOBILE);
-                        me->SetCombatMovement(true);
-                        if (Unit* victim = me->GetVictim())
-                            me->GetMotionMaster()->MoveChase(victim);
-                    }
-                    else
-                    {
-                        me->SetNativeDisplayId(_MODEL_STATIONARY);
-                        me->SetCombatMovement(false);
-                    }
-                    me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
-                    me->CastSpell(me, SPELL_EMERGE_0, false);
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    ScheduleEvents();
-                }
+                me->SetNativeDisplayId(bIsStationary ? _MODEL_MOBILE : _MODEL_STATIONARY);
+                me->SetCombatMovement(bIsStationary);
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_STATIONARY);
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_MOBILE);
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                DoCastSelf(bIsStationary ? SPELL_EMERGE_MOBILE : SPELL_EMERGE_STATIONARY);
+                events.RescheduleEvent(EVENT_EMERGED, bIsStationary ? 3650ms : 4100ms);
+                break;
+            case EVENT_EMERGED:
+                me->RemoveAurasDueToSpell(SPELL_CHURNING_GROUND);
+                if (me->GetDisplayId() == _MODEL_STATIONARY)
+                    DoCastSelf(SPELL_CHURNING_GROUND_STATIONARY);
+                DoCastAOE(SPELL_HATE_TO_ZERO);
+                Submerged = false;
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetReactState(REACT_AGGRESSIVE);
+                ScheduleEvents();
                 break;
             case EVENT_SPELL_SPRAY:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
@@ -804,7 +839,7 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
         }
 
-        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        if (!Submerged)
         {
             if (me->GetDisplayId() == _MODEL_STATIONARY )
                 DoSpellAttackIfReady(_SPELL_SPIT);
