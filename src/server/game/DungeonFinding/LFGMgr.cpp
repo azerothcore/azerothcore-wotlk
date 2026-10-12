@@ -1138,8 +1138,9 @@ namespace lfg
                     p->GetTalentTreePoints(talents);
                     spellDamage = p->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_ALL);
                     spellHeal = p->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_ALL);
-                    mp5 = p->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER);
-                    mp5combat = p->GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER);
+                    // regen fields are per second, the client exposes these values as mana per 5 seconds
+                    mp5 = p->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * 5.0f;
+                    mp5combat = p->GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) * 5.0f;
                     baseAP = p->GetTotalAttackPowerValue(BASE_ATTACK);
                     rangedAP = p->GetTotalAttackPowerValue(RANGED_ATTACK);
                     maxPower = 0;
@@ -1152,7 +1153,7 @@ namespace lfg
                                                        1, p->GetLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),
                                                        talents, p->GetAreaId(), p->GetArmor(), (uint32)std::max<int32>(0, spellDamage), (uint32)std::max<int32>(0, spellHeal),
                                                        p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_MELEE)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_RANGED)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_SPELL)), std::max<float>(0.0f, mp5), std::max<float>(0.0f, mp5combat),
-                                                       std::max<uint32>(baseAP, rangedAP), (uint32)p->GetStat(STAT_AGILITY), p->GetMaxHealth(), maxPower, p->GetDefenseSkillValue(),
+                                                       std::max<uint32>(baseAP, rangedAP), (uint32)p->GetStat(STAT_AGILITY), p->GetMaxHealth(), maxPower, p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_DEFENSE_SKILL)),
                                                        p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_DODGE)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_BLOCK)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_PARRY)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_HASTE_SPELL)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_EXPERTISE)));
 
                     if (!groupGuid)
@@ -1194,6 +1195,37 @@ namespace lfg
                 _rbCopy.clear();
                 _rbCopy = currInternalInfoMap; // will be saved as prev at the end
 
+                RBInternalInfoMap& prevInternalInfoMap = RBInternalInfoStorePrev[team][dungeonId];
+
+                // offline players keep their previous stats (itemLevel, talents, area, etc.)
+                for (auto const& [prevGuid, prevInfo] : prevInternalInfoMap)
+                {
+                    RBInternalInfoMap::iterator currItr = _rbCopy.find(prevGuid);
+                    if (currItr != _rbCopy.end() && !currItr->second._online)
+                        currItr->second.CopyStats(prevInfo);
+                }
+
+                // The client frees a group's linked players when the group is removed, but removing a grouped
+                // player on its own leaves a dangling entry in the group's member list. So grouped players are
+                // never removed individually: a group that lost a member or changed leader is dropped and
+                // re-sent with all of its members.
+                _rbPrevGroups.clear();
+                _rbDroppedGroups.clear();
+                for (auto const& [prevGuid, prevInfo] : prevInternalInfoMap)
+                {
+                    if (!prevInfo.groupGuid)
+                        continue;
+
+                    if (prevInfo.isGroupLeader)
+                        _rbPrevGroups.insert(prevInfo.groupGuid);
+
+                    RBInternalInfoMap::const_iterator currItr = _rbCopy.find(prevGuid);
+                    bool unchanged = currItr != _rbCopy.end() && currItr->second.groupGuid == prevInfo.groupGuid
+                        && currItr->second.isGroupLeader == prevInfo.isGroupLeader;
+                    if (!unchanged)
+                        _rbDroppedGroups.insert(prevInfo.groupGuid);
+                }
+
                 // compare prev with curr to build difference packet
                 deletedCounter = 0;
                 groupCounter = 0;
@@ -1201,93 +1233,57 @@ namespace lfg
                 _rbBufferDeleted.clear();
                 _rbBufferGroups.clear();
                 _rbBufferPlayers.clear();
-                _rbDeletedGroups.clear();
-                _rbDeletedGroupsToErase.clear();
 
-                RBInternalInfoMap& prevInternalInfoMap = RBInternalInfoStorePrev[team][dungeonId];
-                RBInternalInfoMap::iterator iter, iterTmp;
-                for (RBInternalInfoMap::const_iterator sitr = prevInternalInfoMap.begin(); sitr != prevInternalInfoMap.end(); ++sitr)
+                for (ObjectGuid const& droppedGroup : _rbDroppedGroups)
                 {
-                    iter = currInternalInfoMap.find(sitr->first);
-                    if (iter == currInternalInfoMap.end()) // was -> isn't
-                    {
-                        if (sitr->second.isGroupLeader)
-                            _rbDeletedGroups.insert(sitr->second.groupGuid);
+                    ++deletedCounter;
+                    _rbBufferDeleted << droppedGroup;
+                }
 
+                for (auto const& [prevGuid, prevInfo] : prevInternalInfoMap)
+                {
+                    if (!prevInfo.groupGuid && !_rbCopy.contains(prevGuid))
+                    {
                         ++deletedCounter;
-                        _rbBufferDeleted << sitr->second.guid;
-                    }
-                    else // was -> is
-                    {
-                        if (sitr->second.isGroupLeader) // was a leader
-                        {
-                            if (!iter->second.isGroupLeader) // leader -> no longer a leader
-                                _rbDeletedGroups.insert(sitr->second.groupGuid);
-                            else if (sitr->second.groupGuid != iter->second.groupGuid) // leader -> leader of another group
-                            {
-                                _rbDeletedGroups.insert(sitr->second.groupGuid);
-                                _rbDeletedGroupsToErase.insert(iter->second.groupGuid);
-                                ++groupCounter;
-                                RBPacketAppendGroup(iter->second, _rbBufferGroups);
-                            }
-                            else if (sitr->second.comment != iter->second.comment || sitr->second.encounterMask != iter->second.encounterMask || sitr->second.instanceGuid != iter->second.instanceGuid) // leader -> nothing changed
-                            {
-                                ++groupCounter;
-                                RBPacketAppendGroup(iter->second, _rbBufferGroups);
-                            }
-                        }
-                        else if (iter->second.isGroupLeader) // wasn't a leader -> is a leader
-                        {
-                            _rbDeletedGroupsToErase.insert(iter->second.groupGuid);
-                            ++groupCounter;
-                            RBPacketAppendGroup(iter->second, _rbBufferGroups);
-                        }
-
-                        if (!iter->second._online) // if offline, copy previous stats (itemLevel, talents, area, etc.)
-                        {
-                            iterTmp = _rbCopy.find(sitr->first); // copied container is for building a full packet, so modify it there (currInternalInfoMap is erased)
-                            iterTmp->second.CopyStats(sitr->second);
-                            if (!sitr->second.PlayerSameAs(iterTmp->second)) // player info changed
-                            {
-                                ++playerCounter;
-                                RBPacketAppendPlayer(iterTmp->second, _rbBufferPlayers);
-                            }
-                        }
-                        else if (!sitr->second.PlayerSameAs(iter->second)) // player info changed
-                        {
-                            ++playerCounter;
-                            RBPacketAppendPlayer(iter->second, _rbBufferPlayers);
-                        }
-                        currInternalInfoMap.erase(iter);
+                        _rbBufferDeleted << prevGuid;
                     }
                 }
-                // left entries (new)
-                for (RBInternalInfoMap::const_iterator sitr = currInternalInfoMap.begin(); sitr != currInternalInfoMap.end(); ++sitr)
+
+                for (auto const& [currGuid, currInfo] : _rbCopy)
                 {
-                    if (sitr->second.isGroupLeader)
+                    if (!currInfo.isGroupLeader)
+                        continue;
+
+                    bool sendGroup = !_rbPrevGroups.contains(currInfo.groupGuid)
+                        || _rbDroppedGroups.contains(currInfo.groupGuid);
+                    if (!sendGroup)
                     {
-                        _rbDeletedGroupsToErase.insert(sitr->second.groupGuid);
+                        RBInternalInfoMap::const_iterator prevItr = prevInternalInfoMap.find(currGuid);
+                        sendGroup = prevItr == prevInternalInfoMap.end() || prevItr->second.comment != currInfo.comment
+                            || prevItr->second.encounterMask != currInfo.encounterMask
+                            || prevItr->second.instanceGuid != currInfo.instanceGuid;
+                    }
+
+                    if (sendGroup)
+                    {
                         ++groupCounter;
-                        RBPacketAppendGroup(sitr->second, _rbBufferGroups);
-                    }
-                    ++playerCounter;
-                    RBPacketAppendPlayer(sitr->second, _rbBufferPlayers);
-                }
-
-                if (!_rbDeletedGroupsToErase.empty())
-                {
-                    for (ObjectGuid const& toErase : _rbDeletedGroupsToErase)
-                    {
-                        _rbDeletedGroups.erase(toErase);
+                        RBPacketAppendGroup(currInfo, _rbBufferGroups);
                     }
                 }
 
-                if (!_rbDeletedGroups.empty())
+                for (auto const& [currGuid, currInfo] : _rbCopy)
                 {
-                    for (ObjectGuid const& deletedGroup : _rbDeletedGroups)
+                    RBInternalInfoMap::const_iterator prevItr = prevInternalInfoMap.find(currGuid);
+                    // new, freed together with its previous group, in a group re-sent without members, or changed
+                    bool sendPlayer = prevItr == prevInternalInfoMap.end()
+                        || (prevItr->second.groupGuid && _rbDroppedGroups.contains(prevItr->second.groupGuid))
+                        || (currInfo.groupGuid && _rbDroppedGroups.contains(currInfo.groupGuid))
+                        || !prevItr->second.PlayerSameAs(currInfo);
+
+                    if (sendPlayer)
                     {
-                        ++deletedCounter;
-                        _rbBufferDeleted << deletedGroup;
+                        ++playerCounter;
+                        RBPacketAppendPlayer(currInfo, _rbBufferPlayers);
                     }
                 }
 
@@ -1360,9 +1356,9 @@ namespace lfg
             buffer << (uint32)info._agility;
             buffer << (uint32)info._health;
             buffer << (uint32)info._mana;
-            buffer << (uint32)info._online; // talentpoints, used as online/offline marker :D
-            buffer << (float)info._avgItemLevel; // avgitemlevel
-            buffer << (uint32)info._defenseSkill;
+            buffer << uint32(0); // gear rating, Blizzard's formula is unknown
+            buffer << (float)info._avgItemLevel;
+            buffer << (uint32)info._defenseRating;
             buffer << (uint32)info._dodgeRating;
             buffer << (uint32)info._blockRating;
             buffer << (uint32)info._parryRating;
