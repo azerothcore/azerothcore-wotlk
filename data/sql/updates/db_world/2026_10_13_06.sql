@@ -1,3 +1,4 @@
+-- DB update 2026_10_13_05 -> 2026_10_13_06
 --
 -- The three Skettis casters stand still when silenced instead of closing to melee, because their main
 -- attack lacks SMARTCAST_COMBAT_MOVE and their hand-rolled combat movement never fires in that case.
