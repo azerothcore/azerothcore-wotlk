@@ -476,7 +476,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         Talk(SAY_DEATH);
         if (pInstance)
         {
-            pInstance->SetData(TYPE_VALKYR, DONE);
+            pInstance->SetBossState(BOSS_TWIN_VALKYR, DONE);
             pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POWERING_UP);
         }
         if (Creature* twin = GetSister())
