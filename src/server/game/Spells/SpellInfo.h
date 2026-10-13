@@ -354,6 +354,8 @@ public:
     uint32 AttributesEx6;
     uint32 AttributesEx7;
     uint32 AttributesCu;
+    // Server-side opt-in: tracking channels may temporarily face an active taunter.
+    bool ChannelTracksTaunt = false;
     uint32 Stances;
     uint32 StancesNot;
     uint32 Targets;
