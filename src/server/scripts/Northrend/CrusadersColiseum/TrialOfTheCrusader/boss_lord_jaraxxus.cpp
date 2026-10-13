@@ -87,7 +87,7 @@ enum JaraxxusEvents
 
 struct boss_jaraxxus : public BossAI
 {
-    boss_jaraxxus(Creature* creature) : BossAI(creature, TYPE_JARAXXUS)
+    boss_jaraxxus(Creature* creature) : BossAI(creature, BOSS_JARAXXUS)
     {
         me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
         me->SetReactState(REACT_PASSIVE);
@@ -97,7 +97,6 @@ struct boss_jaraxxus : public BossAI
     {
         _Reset();
         DoCastSelf(SPELL_LORD_JARAXXUS_HITTIN_YA, true);
-        instance->SetData(TYPE_JARAXXUS, NOT_STARTED);
 
         std::list<Creature*> creatures;
         me->GetCreatureListWithEntryInGrid(creatures, NPC_INFERNAL_VOLCANO, 500.0f);
@@ -122,7 +121,6 @@ struct boss_jaraxxus : public BossAI
 
         me->RemoveAura(SPELL_JARAXXUS_CHAINS);
         Talk(SAY_AGGRO);
-        instance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
@@ -214,7 +212,6 @@ struct boss_jaraxxus : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
-        instance->SetData(TYPE_JARAXXUS, DONE);
     }
 
     void JustSummoned(Creature* summon) override
