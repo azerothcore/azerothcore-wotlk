@@ -1,3 +1,4 @@
+-- DB update 2026_10_14_04 -> 2026_10_14_05
 UPDATE `creature` SET `MovementType` = 0, `wander_distance` = 0 WHERE `guid` IN (42896, 42898) AND `id` = 15184;
 UPDATE `creature_addon` SET `path_id` = 0 WHERE `guid` IN (42896, 42898);
 
