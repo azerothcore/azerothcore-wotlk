@@ -4394,43 +4394,44 @@ void Spell::_handle_immediate_phase()
 
 void Spell::_handle_finish_phase()
 {
-    Unit* unitCaster = m_caster->ToUnit();
-    if (!unitCaster)
-        return;
-
-    // Take for real after all targets are processed
-    if (m_needComboPoints)
+    // GameObject casts (e.g. hunter traps) have no unit caster but must still
+    // reach the finish procs below through m_originalCaster (Entrapment, Lock and Load)
+    if (Unit* unitCaster = m_caster->ToUnit())
     {
-        unitCaster->ClearComboPoints();
-    }
-
-    // Real add combo points from effects
-    if (m_comboTarget && m_comboPointGain)
-    {
-        // remove Premed-like effects unless they were caused by ourselves
-        // (this Aura removes the already-added CP when it expires from duration - now that we've added CP, this shouldn't happen anymore!)
-        if (!m_spellInfo->HasAura(SPELL_AURA_RETAIN_COMBO_POINTS))
+        // Take for real after all targets are processed
+        if (m_needComboPoints)
         {
-            unitCaster->RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
+            unitCaster->ClearComboPoints();
         }
 
-        unitCaster->AddComboPoints(m_comboTarget, m_comboPointGain);
-    }
-
-    if (m_spellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
-    {
-        unitCaster->SetLastExtraAttackSpell(m_spellInfo->Id);
-    }
-
-    if (!IsAutoRepeat() && !IsNextMeleeSwingSpell())
-        if (unitCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
-            for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        // Real add combo points from effects
+        if (m_comboTarget && m_comboPointGain)
+        {
+            // remove Premed-like effects unless they were caused by ourselves
+            // (this Aura removes the already-added CP when it expires from duration - now that we've added CP, this shouldn't happen anymore!)
+            if (!m_spellInfo->HasAura(SPELL_AURA_RETAIN_COMBO_POINTS))
             {
-                // Xinef: Properly clear infinite cooldowns in some cases
-                if (ihit->targetGUID == unitCaster->GetGUID() && ihit->missCondition != SPELL_MISS_NONE)
-                    if (unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
-                        unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo);
+                unitCaster->RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
             }
+
+            unitCaster->AddComboPoints(m_comboTarget, m_comboPointGain);
+        }
+
+        if (m_spellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
+        {
+            unitCaster->SetLastExtraAttackSpell(m_spellInfo->Id);
+        }
+
+        if (!IsAutoRepeat() && !IsNextMeleeSwingSpell())
+            if (unitCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                {
+                    // Xinef: Properly clear infinite cooldowns in some cases
+                    if (ihit->targetGUID == unitCaster->GetGUID() && ihit->missCondition != SPELL_MISS_NONE)
+                        if (unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
+                            unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo);
+                }
+    }
 
     // Handle procs on finish
     if (m_originalCaster)
