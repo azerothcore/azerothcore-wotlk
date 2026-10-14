@@ -3464,9 +3464,9 @@ LFG.MailItemOnFullInventory = 0
 #                     LFG_OPTION_ENABLE_DUNGEON_FINDER  = 1, Enable the dungeon finder browser
 #                     LFG_OPTION_ENABLE_RAID_BROWSER    = 2, Enable the raid browser
 #                     LFG_OPTION_ENABLE_SEASONAL_BOSSES = 4, Enable seasonal bosses
-#        Default:     5
+#        Default:     7
 
-DungeonFinder.OptionsMask = 5
+DungeonFinder.OptionsMask = 7
 
 #
 #    LFG.Location.All
