@@ -1057,24 +1057,22 @@ class spell_mage_combustion : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // Do not take charges, add a stack of crit buff
-        if (!(eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
+        // Every hit adds a stack of the crit buff. The cast is deferred: this hook runs from
+        // Aura::GetProcEffectMask while the proc engine iterates the actor's aura map, and the
+        // insert could invalidate the live iterator (aura containers are flat_multimaps).
+        // HasAura drops the stack if Combustion ended in the meantime, e.g. on the crit that
+        // took the last charge.
+        Unit* actor = eventInfo.GetActor();
+        ObjectGuid actorGuid = actor->GetGUID();
+        actor->m_Events.AddEventAtOffset([actorGuid]()
         {
-            // Applying the stack mutates the actor's aura map while the proc engine iterates
-            // it (this hook runs from Aura::GetProcEffectMask); defer it so the insert can't
-            // invalidate the live iterator (aura containers are flat_multimaps).
-            Unit* actor = eventInfo.GetActor();
-            ObjectGuid actorGuid = actor->GetGUID();
-            actor->m_Events.AddEventAtOffset([actorGuid]()
-            {
-                if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
-                    if (actor->HasAura(SPELL_MAGE_COMBUSTION))
-                        actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
-            }, 1ms);
-            return false;
-        }
+            if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
+                if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                    actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+        }, 1ms);
 
-        return true;
+        // Only crits take a charge
+        return (eventInfo.GetHitMask() & PROC_HIT_CRITICAL) != 0;
     }
 
     void Register() override
