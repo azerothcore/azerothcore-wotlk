@@ -1,3 +1,4 @@
+-- DB update 2026_10_13_10 -> 2026_10_14_00
 -- BRD patrons use the instance script; keep the mug's Morja and Oozeling interactions outside BRD.
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 165578;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 165578) AND (`source_type` = 1);
