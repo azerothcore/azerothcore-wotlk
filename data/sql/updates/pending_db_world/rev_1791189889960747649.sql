@@ -1,2 +1,2 @@
 --
-UPDATE `creature` SET `position_x` = -3667.163, `position_y` = 2082.57, `position_z` = 10.45, `orientation` = 5.81 WHERE `guid` = 84861 AND `id` = 21287;
+UPDATE `creature` SET `position_x` = -3663.36, `position_y` = 2085.77, `position_z` = 10.524, `orientation` = 5.41052, `CreateObject` = 1, `VerifiedBuild` = 48069 WHERE `guid` = 84861 AND `id` = 21287;
