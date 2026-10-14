@@ -108,7 +108,7 @@ public:
             me->SetImmuneToAll(true);
             me->SetReactState(REACT_PASSIVE);
             if (pInstance)
-                pInstance->SetData(BOSS_BLACK_KNIGHT, NOT_STARTED);
+                pInstance->SetBossState(BOSS_BLACK_KNIGHT, NOT_STARTED);
 
             //me->SetLootMode(0); // [LOOT]
         }
@@ -157,7 +157,7 @@ public:
                 if (!pInstance)
                     return;
 
-                pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
+                pInstance->SetBossState(BOSS_BLACK_KNIGHT, IN_PROGRESS);
                 Talk(SAY_BK_AGGRO);
                 me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
                 if (Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)))
@@ -300,7 +300,7 @@ public:
             me->CastSpell((Unit*)nullptr, SPELL_BK_KILL_CREDIT, true);
             Talk(SAY_BK_DEATH);
             if (pInstance)
-                pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
+                pInstance->SetBossState(BOSS_BLACK_KNIGHT, DONE);
             if (me->ToTempSummon())
                 me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
         }

@@ -805,6 +805,7 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
         oldLeader->RemovePlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
 
     newLeader->SetPlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
+    ObjectGuid const oldLeaderGuid = m_leaderGuid;
     m_leaderGuid = newLeader->GetGUID();
     m_leaderName = newLeader->GetName();
     ToggleGroupMemberFlag(slot, MEMBER_FLAG_ASSISTANT, false);
@@ -813,7 +814,7 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
     data << slot->name;
     BroadcastPacket(&data, true);
 
-    sScriptMgr->OnGroupChangeLeader(this, newLeaderGuid, m_leaderGuid); // This hook should be executed at the end - Not used anywhere in the original core
+    sScriptMgr->OnGroupChangeLeader(this, newLeaderGuid, oldLeaderGuid); // This hook should be executed at the end
 }
 
 void Group::ForcedDisband(bool hideDestroy /* = false */)

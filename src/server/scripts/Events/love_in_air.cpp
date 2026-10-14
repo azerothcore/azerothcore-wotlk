@@ -288,7 +288,7 @@ class spell_love_in_air_perfume_immune : public AuraScript
         else
         {
             target->ApplySpellImmune(SPELL_PERFUME_PASSIVE_DAMAGE, IMMUNITY_ID, SPELL_PERFUME_PASSIVE_DAMAGE, true);
-            target->ApplySpellImmune(SPELL_ALLURING_PERFUME_SPRAY, IMMUNITY_ID, SPELL_ALLURING_PERFUME_SPRAY, true);
+            target->ApplySpellImmune(SPELL_PERFUME_PASSIVE_DAMAGE, IMMUNITY_ID, SPELL_ALLURING_PERFUME_SPRAY, true);
             target->ApplySpellImmune(68927, IMMUNITY_ID, 68927, true);
         }
     }

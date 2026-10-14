@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "SmartAI.h"
 #include "blackrock_depths.h"
 
 constexpr auto MAX_ENCOUNTER = 6;
@@ -33,7 +35,23 @@ enum Timers
 enum Distances
 {
     RADIUS_RING_OF_LAW      = 80,
-    DISTANCE_EMPEROR_ROOM   = 125
+    DISTANCE_EMPEROR_ROOM   = 125,
+    DISTANCE_DARK_IRON_ALE  = 20,
+    DISTANCE_VAULT_WARDER   = 15
+};
+
+enum DarkIronAle
+{
+    GO_DARK_IRON_ALE_MUG       = 165578,
+    NPC_GRIM_PATRON            = 9545,
+    NPC_GUZZLING_PATRON        = 9547,
+    NPC_HAMMERED_PATRON        = 9554,
+    DATA_DARK_IRON_ALE         = 1,
+    DATA_DARK_IRON_ALE_DRINK   = 4,
+    DATA_DARK_IRON_ALE_HOME    = 100,
+    DATA_DARK_IRON_ALE_REFORM  = 101,
+    DATA_DARK_IRON_ALE_DISBAND = 102,
+    DATA_DARK_IRON_ALE_EMOTE   = 103
 };
 
 enum PrincessQuests
@@ -65,6 +83,8 @@ enum GameObjects
     GO_THRONE_ROOM          = 170575, // Throne door
     GO_SPECTRAL_CHALICE     = 164869,
     GO_CHEST_SEVEN          = 169243,
+    GO_SECRET_DOOR          = 174553,
+    GO_SECRET_SAFE          = 161495,
 };
 
 enum MiscData
@@ -137,15 +157,23 @@ struct instance_blackrock_depths : public InstanceScript
 
     uint32 BarAleCount;
     uint32 GhostKillCount;
+    uint32 LovePotionEventState;
     ObjectGuid TombBossGUIDs[7];
     uint32 tombResetTimer;
     uint32 TombTimer;
     uint32 TombEventCounter;
     uint32 OpenedCoofers;
     uint32 IronhandCounter;
+    uint32 PhalanxActivationState;
 
     GuidList ArgelmachAdds;
     ObjectGuid ArgelmachGUID;
+
+    // The four Warbringer Constructs in the Relic Coffer room and Watchman Doomgrip
+    GuidList VaultWarderGUIDs;
+    ObjectGuid GoSecretDoorGUID;
+    ObjectGuid GoSecretSafeGUID;
+    Position VaultWarderCenter = Position(813.5f, -348.0f);
 
     TempSummon* TempSummonGrimstone = nullptr;
     Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
@@ -210,11 +238,13 @@ struct instance_blackrock_depths : public InstanceScript
 
         BarAleCount = 0;
         GhostKillCount = 0;
+        LovePotionEventState = NOT_STARTED;
         TombTimer = TIMER_TOMB_START;
         TombEventCounter = 0;
         tombResetTimer   = 0;
         OpenedCoofers = 0;
         IronhandCounter  = 0;
+        PhalanxActivationState = NOT_STARTED;
         ArenaSpectators.clear();
 
         // these are linked to the dungeon and not how many times the arena started.
@@ -280,7 +310,9 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case NPC_ARENA_SPECTATOR:
                 ArenaSpectators.push_back(creature->GetGUID());
-                if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                // note: reads GetData, not encounter[TYPE_RING_OF_LAW]: the types are 1-based
+                // while the array is 0-based, so the raw index would hit the vault slot
+                if (GetData(TYPE_RING_OF_LAW) == DONE) // added for crashes
                 {
                     creature->SetFaction(FACTION_NEUTRAL);
                     creature->SetReactState(REACT_DEFENSIVE);
@@ -290,7 +322,9 @@ struct instance_blackrock_depths : public InstanceScript
             case NPC_SHADOWFORCE_CITIZEN: // both do the same
                 if (creature->GetDistance2d(CenterOfRingOfLaw.GetPositionX(), CenterOfRingOfLaw.GetPositionY()) < (float)RADIUS_RING_OF_LAW)
                     ArenaSpectators.push_back(creature->GetGUID());
-                if (encounter[TYPE_RING_OF_LAW] == DONE) // added for crashes
+                // note: reads GetData, not encounter[TYPE_RING_OF_LAW]: the types are 1-based
+                // while the array is 0-based, so the raw index would hit the vault slot
+                if (GetData(TYPE_RING_OF_LAW) == DONE) // added for crashes
                 {
                     creature->SetFaction(FACTION_NEUTRAL);
                     creature->SetReactState(REACT_DEFENSIVE);
@@ -302,6 +336,32 @@ struct instance_blackrock_depths : public InstanceScript
                 if (creature->GetDistance2d(EmperorSpawnPos.GetPositionX(), EmperorSpawnPos.GetPositionY()) < (float)DISTANCE_EMPEROR_ROOM)
                     EmperorSenatorsVector.push_back(creature->GetGUID());
                 break;
+            case NPC_WARBRINGER_CONSTRUCT:
+                // only the four constructs in the Relic Coffer room belong to the vault event,
+                // the rest of the Black Vault spawns are regular trash
+                if (creature->GetDistance2d(VaultWarderCenter.GetPositionX(), VaultWarderCenter.GetPositionY()) > (float)DISTANCE_VAULT_WARDER)
+                    break;
+                // dead spawns with a pending respawn are loaded too: a corpse must not be frozen or
+                // counted, or the restarted event could not complete until its respawn timer expires
+                if (!creature->IsAlive())
+                    break;
+                // frozen until all 12 Relic Coffers have been opened. Stoned (statue visual) is cast
+                // here instead of creature_addon on purpose: addon auras get re-applied on every
+                // evade, which would turn the constructs back into statues after the event has started.
+                if (GetData(TYPE_VAULT) == NOT_STARTED)
+                {
+                    creature->CastSpell(creature, SPELL_STONED, true);
+                    creature->SetImmuneToPC(true);
+                    // untargetable while inert: the reference video (https://youtu.be/KE1nElNN1YY)
+                    // shows the statues cannot be targeted until activated; vmangos likewise clears
+                    // UNIT_FLAG_NOT_SELECTABLE on them when Doomgrip aggroes
+                    creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetReactState(REACT_PASSIVE);
+                }
+                [[fallthrough]];
+            case NPC_WATCHMAN_DOOMGRIP:
+                VaultWarderGUIDs.push_back(creature->GetGUID());
+                break;
             default:
                 break;
         }
@@ -311,6 +371,34 @@ struct instance_blackrock_depths : public InstanceScript
     {
         switch (go->GetEntry())
         {
+            case GO_DARK_IRON_ALE_MUG:
+            {
+                std::list<Creature*> patrons;
+                go->GetCreatureListWithEntryInGrid(patrons,
+                    { NPC_GRIM_PATRON, NPC_GUZZLING_PATRON, NPC_HAMMERED_PATRON }, DISTANCE_DARK_IRON_ALE);
+
+                Creature* closestPatron = nullptr;
+                SmartAI* closestPatronAI = nullptr;
+                float closestDistance = DISTANCE_DARK_IRON_ALE;
+                for (Creature* patron : patrons)
+                {
+                    SmartAI* patronAI = CAST_AI(SmartAI, patron->AI());
+                    float const distance = go->GetDistance(patron);
+                    if (!patronAI || !patron->IsAlive() || patron->IsInCombat() || patronAI->GetData(DATA_DARK_IRON_ALE) == DATA_DARK_IRON_ALE_DRINK || distance >= closestDistance)
+                        continue;
+
+                    closestPatron = patron;
+                    closestPatronAI = patronAI;
+                    closestDistance = distance;
+                }
+
+                if (closestPatronAI)
+                {
+                    closestPatron->SetEmoteState(EMOTE_STATE_NONE);
+                    closestPatronAI->SetData(DATA_DARK_IRON_ALE, DATA_DARK_IRON_ALE_DRINK, go);
+                }
+                break;
+            }
             case GO_ARENA1:
                 GoArena1GUID = go->GetGUID();
                 break;
@@ -343,6 +431,11 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case GO_BAR_DOOR:
                 GoBarDoorGUID = go->GetGUID();
+                go->AllowSaveToDB(true);
+                if (LovePotionEventState == DONE)
+                    go->SetGoState(GO_STATE_ACTIVE);
+                else if (GetData(TYPE_BAR) == DONE)
+                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                 break;
             case GO_TOMB_ENTER:
                 GoTombEnterGUID = go->GetGUID();
@@ -378,6 +471,17 @@ struct instance_blackrock_depths : public InstanceScript
             case GO_SPECTRAL_CHALICE:
                 GoSpectralChaliceGUID = go->GetGUID();
                 break;
+            case GO_SECRET_DOOR:
+                GoSecretDoorGUID = go->GetGUID();
+                if (GetData(TYPE_VAULT) == DONE)
+                    HandleGameObject(ObjectGuid::Empty, true, go);
+                break;
+            case GO_SECRET_SAFE:
+                GoSecretSafeGUID = go->GetGUID();
+                // non-interactable via gameobject_template_addon flags until the vault event is done
+                if (GetData(TYPE_VAULT) == DONE)
+                    go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                break;
         }
     }
 
@@ -394,6 +498,17 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case NPC_MAGMUS:
                 SetData(TYPE_IRON_HALL, DONE);
+                break;
+            case NPC_WARBRINGER_CONSTRUCT:
+            case NPC_WATCHMAN_DOOMGRIP:
+                if (GetData(TYPE_VAULT) == IN_PROGRESS)
+                {
+                    // regular Black Vault trash shares the entry but is not in the list,
+                    // remove() is a no-op for it
+                    VaultWarderGUIDs.remove(unit->GetGUID());
+                    if (VaultWarderGUIDs.empty())
+                        SetData(TYPE_VAULT, DONE);
+                }
                 break;
             case NPC_SHADOWFORGE_SENATOR:
                 deadSenators = 1; //hacky, but we cannot count the unit that just died through its state because OnUnitDeath() is called before the state is set.
@@ -458,12 +573,24 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case TYPE_VAULT:
                 encounter[1] = data;
+                if (data == DONE)
+                {
+                    // vault cleared: open the secret door and make the Secret Safe lootable
+                    HandleGameObject(GoSecretDoorGUID, true);
+                    if (GameObject* safe = instance->GetGameObject(GoSecretSafeGUID))
+                        safe->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                }
                 break;
             case TYPE_BAR:
                 if (data == SPECIAL)
                     ++BarAleCount;
                 else
                     encounter[2] = data;
+                break;
+            case DATA_LOVE_POTION_EVENT:
+                LovePotionEventState = data;
+                if (data == DONE)
+                    encounter[2] = DONE;
                 break;
             case TYPE_TOMB_OF_SEVEN:
                 encounter[3] = data;
@@ -510,9 +637,26 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case DATA_OPEN_COFFER_DOORS:
                 OpenedCoofers += 1;
-                if (OpenedCoofers == 12)
+                // the coffer doors reset on every map load while the vault state persists: reopening
+                // them after the event has started must not restart it or summon a second Doomgrip
+                if (OpenedCoofers == 12 && GetData(TYPE_VAULT) == NOT_STARTED)
                 {
-                    Position pos = {812.15f, -348.91f, -50.579f, 0.7f};
+                    SetData(TYPE_VAULT, IN_PROGRESS);
+
+                    // awaken the Warbringer Constructs guarding the vault
+                    for (ObjectGuid const& warderGUID : VaultWarderGUIDs)
+                    {
+                        if (Creature* warder = instance->GetCreature(warderGUID))
+                        {
+                            warder->RemoveAurasDueToSpell(SPELL_STONED);
+                            warder->SetImmuneToPC(false);
+                            warder->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            warder->SetReactState(REACT_AGGRESSIVE);
+                        }
+                    }
+
+                    // spawns at the room entrance, not amidst the constructs (position from cmangos)
+                    Position pos = {821.905f, -338.382f, -50.134f, 3.78736f};
                     if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
                         summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
                 }
@@ -584,6 +728,9 @@ struct instance_blackrock_depths : public InstanceScript
                 }
                 break;
             }
+            case DATA_PHALANX_ACTIVATED:
+                PhalanxActivationState = data;
+                break;
             default:
                 break;
         }
@@ -594,7 +741,8 @@ struct instance_blackrock_depths : public InstanceScript
 
             std::ostringstream saveStream;
             saveStream << encounter[0] << ' ' << encounter[1] << ' ' << encounter[2] << ' '
-                       << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount;
+                       << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount << ' '
+                       << PhalanxActivationState << ' ' << LovePotionEventState;
 
             str_data = saveStream.str();
 
@@ -628,8 +776,54 @@ struct instance_blackrock_depths : public InstanceScript
                 return arenaMobsToSpawn;
             case DATA_ARENA_BOSS:
                 return arenaBossToSpawn;
+            case DATA_PHALANX_ACTIVATED:
+                return PhalanxActivationState;
+            case DATA_LOVE_POTION_EVENT:
+                return LovePotionEventState;
         }
         return 0;
+    }
+
+    void SetGuidData(uint32 data, ObjectGuid guid) override
+    {
+        if (data != DATA_DARK_IRON_ALE_HOME && data != DATA_DARK_IRON_ALE_REFORM &&
+            data != DATA_DARK_IRON_ALE_DISBAND && data != DATA_DARK_IRON_ALE_EMOTE)
+            return;
+
+        if (Creature* patron = instance->GetCreature(guid))
+        {
+            if (data == DATA_DARK_IRON_ALE_EMOTE)
+            {
+                if (CreatureAddon const* addon = patron->GetCreatureAddon())
+                    patron->SetEmoteState(static_cast<Emote>(addon->emote));
+
+                return;
+            }
+
+            if (data == DATA_DARK_IRON_ALE_DISBAND)
+            {
+                if (CreatureGroup* formation = patron->GetFormation())
+                    sFormationMgr->RemoveCreatureFromGroup(formation, patron);
+
+                return;
+            }
+
+            if (data == DATA_DARK_IRON_ALE_REFORM)
+            {
+                if (!patron->GetFormation())
+                    patron->SearchFormation();
+
+                return;
+            }
+
+            if (patron->IsAlive() && !patron->IsInCombat())
+            {
+                if (!patron->GetFormation())
+                    patron->SearchFormation();
+
+                patron->GetMotionMaster()->MoveTargetedHome(true);
+            }
+        }
     }
 
     ObjectGuid GetGuidData(uint32 data) const override
@@ -697,6 +891,10 @@ struct instance_blackrock_depths : public InstanceScript
         std::istringstream loadStream(in);
         loadStream >> encounter[0] >> encounter[1] >> encounter[2] >> encounter[3]
                    >> encounter[4] >> encounter[5] >> GhostKillCount;
+        if (!(loadStream >> PhalanxActivationState) || PhalanxActivationState != DONE)
+            PhalanxActivationState = NOT_STARTED;
+        if (!(loadStream >> LovePotionEventState) || LovePotionEventState != DONE)
+            LovePotionEventState = NOT_STARTED;
 
         for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             if (encounter[i] == IN_PROGRESS)

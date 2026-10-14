@@ -248,7 +248,9 @@ public:
     Loot        loot;
 
     [[nodiscard]] Player* GetLootRecipient() const;
+    [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Group* GetLootRecipientGroup() const;
+    [[nodiscard]] ObjectGuid::LowType GetLootRecipientGroupGUID() const { return m_lootRecipientGroup; }
     void SetLootRecipient(Creature* creature);
     void SetLootRecipient(Map* map);
     bool IsLootAllowedFor(Player const* player) const;
@@ -279,12 +281,23 @@ public:
         if (Unit* owner = GetOwner())
             return owner->getLevelForTarget(target);
 
+        if (GetGoType() == GAMEOBJECT_TYPE_TRAP)
+        {
+            // use the level from the trap template, otherwise match the target
+            // so ownerless utility traps cannot miss through level difference
+            if (GetGOInfo()->trap.level)
+                return GetGOInfo()->trap.level;
+            if (Unit const* targetUnit = target->ToUnit())
+                return targetUnit->GetLevel();
+        }
+
         return 1;
     }
 
     GameObject* LookupFishingHoleAround(float range);
 
-    void CastSpell(Unit* target, uint32 spell);
+    using WorldObject::CastSpell;
+    void CastSpell(Unit* target, uint32 spellId);
     void SendCustomAnim(uint32 anim);
     bool IsInRange2d(float x, float y, float radius) const;
     bool IsInRange3d(float x, float y, float z, float radius) const;

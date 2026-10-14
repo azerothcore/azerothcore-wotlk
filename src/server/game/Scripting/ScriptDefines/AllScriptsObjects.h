@@ -58,6 +58,7 @@
 #include "PetScript.h"
 #include "PlayerScript.h"
 #include "ServerScript.h"
+#include "SessionScript.h"
 #include "SpellScriptLoader.h"
 #include "TicketScript.h"
 #include "TransportScript.h"
