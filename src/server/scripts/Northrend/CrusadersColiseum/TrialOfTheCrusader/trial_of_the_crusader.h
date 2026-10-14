@@ -25,6 +25,17 @@
 
 #define TrialOfTheCrusaderScriptName "instance_trial_of_the_crusader"
 
+enum TrialOfTheCrusaderBossIds
+{
+    // Boss IDs used by SetBossNumber/SetBossState, matching DungeonEncounter.dbc encounter indexes
+    BOSS_NORTHREND_BEASTS  = 0,
+    BOSS_JARAXXUS          = 1,
+    BOSS_FACTION_CHAMPIONS = 2,
+    BOSS_TWIN_VALKYR       = 3,
+    BOSS_ANUBARAK          = 4,
+    MAX_ENCOUNTERS
+};
+
 enum DataTypes
 {
     TYPE_NONE = 0,
@@ -37,14 +48,11 @@ enum DataTypes
     TYPE_DREADSCALE,
     TYPE_ACIDMAW,
     TYPE_ICEHOWL,
-    TYPE_JARAXXUS,
     TYPE_FACTION_CHAMPIONS,
     TYPE_FACTION_CHAMPIONS_PLAYER_DIED,
-    TYPE_VALKYR,
     TYPE_ANUBARAK,
 
     TYPE_FACTION_CHAMPIONS_START,
-    TYPE_NORTHREND_BEASTS_ALL,
 };
 
 enum Progress
@@ -74,7 +82,8 @@ enum Events
     EVENT_GORMOK_ATTACK,
     EVENT_SCENE_005,
     EVENT_SCENE_005_2,
-    EVENT_SUMMON_ACIDMAW_AND_DREADSCALE,
+    EVENT_SUMMON_DREADSCALE,
+    EVENT_SUMMON_ACIDMAW,
     EVENT_ACIDMAW_AND_DREADSCALE_ATTACK,
     EVENT_SCENE_006,
     EVENT_SUMMON_ICEHOWL,
@@ -85,7 +94,8 @@ enum Events
     EVENT_SCENE_101,
     EVENT_SCENE_102,
     EVENT_SCENE_103,
-    EVENT_SCENE_104,
+    EVENT_WILFRED_TALK_EMOTE,
+    EVENT_WILFRED_STOP_TALK_EMOTE,
     EVENT_SUMMON_JARAXXUS,
     EVENT_SCENE_105,
     EVENT_SCENE_106,
@@ -150,6 +160,7 @@ enum NPCs
     NPC_MISTRESS_OF_PAIN                            = 34826,
 
     NPC_PURPLE_GROUND                               = 35651,
+    NPC_OPEN_PORTAL_TARGET                          = 17965,
     NPC_WORLD_TRIGGER                               = 18721,
 
     NPC_ALLIANCE_DEATH_KNIGHT                       = 34461,
@@ -293,7 +304,8 @@ const Position Locs[] =
     {586.200562f, 162.145523f, 394.626129f, 0},         // 16 - Light essence 2
     {785.90f, 133.42f, 142.612f, M_PI},                 // 17
     {665.04f, 139.25f, 142.2f, 0.0f},                   // 18
-    {664.75f, 135.0f, 142.2f, 0.0f}
+    {664.75f, 135.0f, 142.2f, 0.0f},                    // 19
+    {563.6597f, 139.7569f, 399.2507f, 3 * M_PI / 2},    // 20
 };
 
 enum LocNames
@@ -318,6 +330,7 @@ enum LocNames
     LOC_ANUB,
     LOC_TIRION_FINAL,
     LOC_MAGE,
+    LOC_OPEN_PORTAL_TARGET,
 };
 
 const Position FactionChampionLoc[] =
@@ -348,6 +361,7 @@ const Position FactionChampionLoc[] =
 
 enum EventSpells
 {
+    SPELL_OPEN_PORTAL                               = 67864,
     SPELL_WILFRED_PORTAL                            = 68424,
     SPELL_JORMUNGAR_ACHIEV                          = 68523,
     SPELL_FACTION_CHAMPIONS_KILL_CREDIT             = 68184,
