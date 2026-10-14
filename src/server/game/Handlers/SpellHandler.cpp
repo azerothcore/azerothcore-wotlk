@@ -335,6 +335,10 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
 
     if (GameObject* obj = GetPlayer()->GetMap()->GetGameObject(guid))
     {
+        // despawned objects cannot be used (they are still visible and clickable for gamemasters)
+        if (!obj->isSpawned())
+            return;
+
         if (!obj->IsWithinDistInMap(GetPlayer(), obj->GetInteractionDistance()))
             return;
 
@@ -360,6 +364,10 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
 
     GameObject* go = GetPlayer()->GetMap()->GetGameObject(guid);
     if (!go)
+        return;
+
+    // despawned objects cannot be used (they are still visible and clickable for gamemasters)
+    if (!go->isSpawned())
         return;
 
     // Prevent use of GameObject if it is not selectable. Fixes hack.

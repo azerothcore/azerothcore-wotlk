@@ -1,0 +1,26 @@
+-- DB update 2026_10_03_13 -> 2026_10_03_14
+-- SPELL_ATTR0_CU_IGNORE_BINARY (512) for spells that must not be auto-classified as binary.
+-- Replaces the hardcoded id list in SpellMgr::LoadSpellInfoCustomAttributes.
+DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (62457, 62469, 62576, 62580, 62583, 62597, 62601, 62602, 62604, 62605, 65370, 69425, 69649, 70827, 71056, 71057, 71058, 73061, 73062, 73063, 73064);
+INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
+(62457, 512), -- Ice Shards (Hodir, small)
+(62469, 512), -- Freeze (Hodir)
+(62576, 512), -- Blizzard (Thorim 10m)
+(62580, 512), -- Frostbolt Volley (Thorim 10m)
+(62583, 512), -- Frostbolt (Thorim 10m)
+(62597, 512), -- Frost Nova (Thorim 10m)
+(62601, 512), -- Frostbolt (Thorim 25m)
+(62602, 512), -- Blizzard (Thorim 25m)
+(62604, 512), -- Frostbolt Volley (Thorim 25m)
+(62605, 512), -- Frost Nova (Thorim 25m)
+(65370, 512), -- Ice Shards (Hodir, big)
+(69425, 512), -- Ice Shards (Pit of Saron)
+(69649, 512), -- Frost Breath (Sindragosa)
+(70827, 512), -- Ice Shards (Pit of Saron)
+(71056, 512), -- Frost Breath (Sindragosa)
+(71057, 512), -- Frost Breath (Sindragosa)
+(71058, 512), -- Frost Breath (Sindragosa)
+(73061, 512), -- Frost Breath (Sindragosa)
+(73062, 512), -- Frost Breath (Sindragosa)
+(73063, 512), -- Frost Breath (Sindragosa)
+(73064, 512); -- Frost Breath (Sindragosa)

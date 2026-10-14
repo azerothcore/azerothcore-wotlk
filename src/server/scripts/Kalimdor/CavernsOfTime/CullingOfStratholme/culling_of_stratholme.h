@@ -23,6 +23,23 @@
 #define DataHeader "CS"
 #define CullingOfStratholmeScriptName "instance_culling_of_stratholme"
 
+enum Encounters
+{
+    BOSS_MEATHOOK,
+    BOSS_SALRAMM,
+    BOSS_EPOCH,
+    BOSS_MAL_GANIS,
+    BOSS_INFINITE_CORRUPTOR,
+    MAX_ENCOUNTERS
+};
+
+enum CoSPersistentData
+{
+    PERSISTENT_DATA_ARTHAS_EVENT,
+    PERSISTENT_DATA_GUARDIAN_TIMER,
+    PERSISTENT_DATA_COUNT
+};
+
 enum Data
 {
     DATA_ARTHAS_EVENT,

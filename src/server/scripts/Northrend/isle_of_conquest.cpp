@@ -350,10 +350,17 @@ class spell_ioc_bomb_blast_criteria : public SpellScript
 
     void HandleGameObjectDamage(SpellEffIndex /*effIndex*/)
     {
-        uint32 creditSpell = 0;
-        Unit* owner = GetCaster()->GetOwner();
+        // the bombs are gameobject casters owned by the player who placed them
+        Unit* owner = nullptr;
+        if (GameObject* go = GetGObjCaster())
+            owner = go->GetOwner();
+        else if (Unit* caster = GetCaster())
+            owner = caster->GetOwner();
+
         if (!owner)
             return;
+
+        uint32 creditSpell = 0;
 
         uint32 spellId = GetSpellInfo()->Id;
         if (spellId == SPELL_SEAFORIUM_BLAST || spellId == SPELL_SEAFORIUM_BLAST_H)
