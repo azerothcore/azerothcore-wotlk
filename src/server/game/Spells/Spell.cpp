@@ -6133,7 +6133,17 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                 losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
             }
 
-            if (!m_caster->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks((losChecks))))
+            // An owned GameObject is measured from its owner's height, as for a unit target
+            bool inLineOfSight = false;
+            if (std::optional<float> collisionHeight = GetLOSCollisionHeight())
+                inLineOfSight = m_caster->GetMap()->isInLineOfSight(m_caster->GetPositionX(), m_caster->GetPositionY(),
+                    m_caster->GetPositionZ() + *collisionHeight, x, y, z + *collisionHeight, m_caster->GetPhaseMask(),
+                    LineOfSightChecks(losChecks), VMAP::ModelIgnoreFlags::M2);
+            else
+                inLineOfSight = m_caster->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2,
+                    LineOfSightChecks(losChecks));
+
+            if (!inLineOfSight)
             {
                 return SPELL_FAILED_LINE_OF_SIGHT;
             }
