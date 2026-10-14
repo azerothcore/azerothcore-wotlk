@@ -158,7 +158,7 @@ public:
 
     virtual void SummonedCreatureEvade(Creature* /*summon*/) {}
 
-    // Called when hit by a spell
+    // Called when hit by a spell. caster is null for a spell cast by a GameObject without an owner.
     virtual void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) {}
 
     // Called when spell hits a target

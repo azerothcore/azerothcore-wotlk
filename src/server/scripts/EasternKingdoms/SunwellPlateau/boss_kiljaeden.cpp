@@ -74,6 +74,8 @@ enum Spells
     SPELL_ARMAGEDDON_MISSILE                    = 45909,
     SPELL_CUSTOM_08_STATE                       = 45800,
     SPELL_DESTROY_ALL_DRAKES                    = 46707,
+    SPELL_KNOCKBACK                             = 47113,
+    SPELL_SWAT                                  = 46548,
 
     // Sinister Reflections
     SPELL_SINISTER_REFLECTION_SUMMON            = 45891,
@@ -291,6 +293,8 @@ struct boss_kiljaeden : public BossAI
     void Reset() override
     {
         _phase = PHASE_NORMAL;
+        DoCastSelf(SPELL_KNOCKBACK, true);
+        DoCastSelf(SPELL_SWAT, true);
 
         ScheduleHealthCheckEvent(85, [&]{
             _phase = PHASE_DARKNESS;
