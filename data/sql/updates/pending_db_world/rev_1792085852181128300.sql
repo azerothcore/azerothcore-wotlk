@@ -1,3 +1,5 @@
 --
--- Hungering Plaguehound (31556): unselectable friendly auxiliary spawns in Icecrown
-DELETE FROM `creature` WHERE `id` = 31556 AND `guid` BETWEEN 121846 AND 121853;
+-- Hungering Plaguehound (31556): sleeping in the Weeping Quarry, as sniffed
+DELETE FROM `creature_template_addon` WHERE `entry` = 31556;
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(31556, 0, 0, 0, 1, 0, 0, '45787 18950');
