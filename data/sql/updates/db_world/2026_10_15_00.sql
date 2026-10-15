@@ -1,3 +1,4 @@
+-- DB update 2026_10_14_05 -> 2026_10_15_00
 --
 -- The Light of Dawn: aggro auras as seen in sniffs (53624 Scourge Aggro Aura, 53627 Hero Aggro Aura)
 UPDATE `creature_template_addon` SET `auras` = '' WHERE `entry` IN (29176, 29177, 29178, 29179, 29180, 29181, 29182);
