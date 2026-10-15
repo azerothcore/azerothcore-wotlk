@@ -25,6 +25,17 @@
 
 #define TrialOfTheCrusaderScriptName "instance_trial_of_the_crusader"
 
+enum TrialOfTheCrusaderBossIds
+{
+    // Boss IDs used by SetBossNumber/SetBossState, matching DungeonEncounter.dbc encounter indexes
+    BOSS_NORTHREND_BEASTS  = 0,
+    BOSS_JARAXXUS          = 1,
+    BOSS_FACTION_CHAMPIONS = 2,
+    BOSS_TWIN_VALKYR       = 3,
+    BOSS_ANUBARAK          = 4,
+    MAX_ENCOUNTERS
+};
+
 enum DataTypes
 {
     TYPE_NONE = 0,
@@ -37,14 +48,11 @@ enum DataTypes
     TYPE_DREADSCALE,
     TYPE_ACIDMAW,
     TYPE_ICEHOWL,
-    TYPE_JARAXXUS,
     TYPE_FACTION_CHAMPIONS,
     TYPE_FACTION_CHAMPIONS_PLAYER_DIED,
-    TYPE_VALKYR,
     TYPE_ANUBARAK,
 
     TYPE_FACTION_CHAMPIONS_START,
-    TYPE_NORTHREND_BEASTS_ALL,
 };
 
 enum Progress

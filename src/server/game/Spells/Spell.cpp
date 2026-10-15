@@ -4394,43 +4394,44 @@ void Spell::_handle_immediate_phase()
 
 void Spell::_handle_finish_phase()
 {
-    Unit* unitCaster = m_caster->ToUnit();
-    if (!unitCaster)
-        return;
-
-    // Take for real after all targets are processed
-    if (m_needComboPoints)
+    // GameObject casts (e.g. hunter traps) have no unit caster but must still
+    // reach the finish procs below through m_originalCaster (Entrapment, Lock and Load)
+    if (Unit* unitCaster = m_caster->ToUnit())
     {
-        unitCaster->ClearComboPoints();
-    }
-
-    // Real add combo points from effects
-    if (m_comboTarget && m_comboPointGain)
-    {
-        // remove Premed-like effects unless they were caused by ourselves
-        // (this Aura removes the already-added CP when it expires from duration - now that we've added CP, this shouldn't happen anymore!)
-        if (!m_spellInfo->HasAura(SPELL_AURA_RETAIN_COMBO_POINTS))
+        // Take for real after all targets are processed
+        if (m_needComboPoints)
         {
-            unitCaster->RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
+            unitCaster->ClearComboPoints();
         }
 
-        unitCaster->AddComboPoints(m_comboTarget, m_comboPointGain);
-    }
-
-    if (m_spellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
-    {
-        unitCaster->SetLastExtraAttackSpell(m_spellInfo->Id);
-    }
-
-    if (!IsAutoRepeat() && !IsNextMeleeSwingSpell())
-        if (unitCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
-            for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        // Real add combo points from effects
+        if (m_comboTarget && m_comboPointGain)
+        {
+            // remove Premed-like effects unless they were caused by ourselves
+            // (this Aura removes the already-added CP when it expires from duration - now that we've added CP, this shouldn't happen anymore!)
+            if (!m_spellInfo->HasAura(SPELL_AURA_RETAIN_COMBO_POINTS))
             {
-                // Xinef: Properly clear infinite cooldowns in some cases
-                if (ihit->targetGUID == unitCaster->GetGUID() && ihit->missCondition != SPELL_MISS_NONE)
-                    if (unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
-                        unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo);
+                unitCaster->RemoveAurasByType(SPELL_AURA_RETAIN_COMBO_POINTS);
             }
+
+            unitCaster->AddComboPoints(m_comboTarget, m_comboPointGain);
+        }
+
+        if (m_spellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
+        {
+            unitCaster->SetLastExtraAttackSpell(m_spellInfo->Id);
+        }
+
+        if (!IsAutoRepeat() && !IsNextMeleeSwingSpell())
+            if (unitCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                {
+                    // Xinef: Properly clear infinite cooldowns in some cases
+                    if (ihit->targetGUID == unitCaster->GetGUID() && ihit->missCondition != SPELL_MISS_NONE)
+                        if (unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
+                            unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo);
+                }
+    }
 
     // Handle procs on finish
     if (m_originalCaster)
@@ -6102,27 +6103,14 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if ((!unitCaster || !unitCaster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
                 !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
             {
-                bool castedByGameobject = false;
                 uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
-                if (m_originalCasterGUID.IsGameObject())
-                {
-                    castedByGameobject = m_caster->GetMap()->GetGameObject(m_originalCasterGUID) != nullptr;
-                }
-                else if (m_caster->GetEntry() == WORLD_TRIGGER)
-                {
-                    if (TempSummon* tempSummon = unitCaster ? unitCaster->ToTempSummon() : nullptr)
-                    {
-                        castedByGameobject = tempSummon->GetSummonerGameObject() != nullptr;
-                    }
-                }
-
-                if (castedByGameobject)
+                if (GetGameObjectCaster())
                 {
                     // If spell casted by gameobject then ignore M2 models
                     losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
                 }
 
-                if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks), GetLOSCollisionHeight()))
                 {
                     return SPELL_FAILED_LINE_OF_SIGHT;
                 }
@@ -6139,27 +6127,24 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
         if ((!unitCaster || !unitCaster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
             !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT))
         {
-            bool castedByGameobject = false;
             uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
-            if (m_originalCasterGUID.IsGameObject())
-            {
-                castedByGameobject = m_caster->GetMap()->GetGameObject(m_originalCasterGUID) != nullptr;
-            }
-            else if (m_caster->GetEntry() == WORLD_TRIGGER)
-            {
-                if (TempSummon* tempSummon = unitCaster ? unitCaster->ToTempSummon() : nullptr)
-                {
-                    castedByGameobject = tempSummon->GetSummonerGameObject() != nullptr;
-                }
-            }
-
-            if (castedByGameobject)
+            if (GetGameObjectCaster())
             {
                 // If spell casted by gameobject then ignore M2 models
                 losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
             }
 
-            if (!m_caster->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks((losChecks))))
+            // An owned GameObject is measured from its owner's height, as for a unit target
+            bool inLineOfSight = false;
+            if (std::optional<float> collisionHeight = GetLOSCollisionHeight())
+                inLineOfSight = m_caster->GetMap()->isInLineOfSight(m_caster->GetPositionX(), m_caster->GetPositionY(),
+                    m_caster->GetPositionZ() + *collisionHeight, x, y, z + *collisionHeight, m_caster->GetPhaseMask(),
+                    LineOfSightChecks(losChecks), VMAP::ModelIgnoreFlags::M2);
+            else
+                inLineOfSight = m_caster->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2,
+                    LineOfSightChecks(losChecks));
+
+            if (!inLineOfSight)
             {
                 return SPELL_FAILED_LINE_OF_SIGHT;
             }
@@ -8200,6 +8185,35 @@ Unit* Spell::GetOriginalTarget() const
     return ObjectAccessor::GetUnit(*m_caster, m_originalTargetGUID);
 }
 
+GameObject* Spell::GetGameObjectCaster() const
+{
+    if (GameObject* gameObject = m_caster->ToGameObject())
+        return gameObject;
+
+    if (m_originalCasterGUID.IsGameObject())
+        return m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
+
+    // spells cast for a GameObject through a summoned world trigger
+    if (m_caster->GetEntry() == WORLD_TRIGGER)
+        if (Unit* unitCaster = m_caster->ToUnit())
+            if (TempSummon* tempSummon = unitCaster->ToTempSummon())
+                return tempSummon->GetSummonerGameObject();
+
+    return nullptr;
+}
+
+std::optional<float> Spell::GetLOSCollisionHeight() const
+{
+    // A GameObject has no collision height, so a line of sight check from it starts on the
+    // floor and aims at the target's feet, which a WMO floor (dungeons) blocks. Measure an
+    // owned GameObject's casts at its owner's height, as the trap's own target search does.
+    if (GameObject const* gameObject = m_caster->ToGameObject())
+        if (Unit const* owner = gameObject->GetOwner())
+            return owner->GetCollisionHeight();
+
+    return { };
+}
+
 bool Spell::UpdatePointers()
 {
     Unit* unitCaster = m_caster->ToUnit();
@@ -8357,20 +8371,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
         default: // normal case
         {
             uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
-            GameObject* gobCaster = nullptr;
-            if (m_originalCasterGUID.IsGameObject())
-            {
-                gobCaster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
-            }
-            else if (m_caster->GetEntry() == WORLD_TRIGGER)
-            {
-                if (TempSummon* tempSummon = unitCaster ? unitCaster->ToTempSummon() : nullptr)
-                {
-                    gobCaster = tempSummon->GetSummonerGameObject();
-                }
-            }
-
-            if (gobCaster)
+            if (GameObject const* gobCaster = GetGameObjectCaster())
             {
                 if (gobCaster->GetGOInfo()->IsIgnoringLOSChecks())
                 {
@@ -8394,7 +8395,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                         return false;
                     }
                 }
-                else if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
+                else if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks), GetLOSCollisionHeight()))
                 {
                     return false;
                 }
