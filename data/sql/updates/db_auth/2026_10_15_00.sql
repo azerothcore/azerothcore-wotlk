@@ -1,3 +1,4 @@
+-- DB update 2026_09_27_00 -> 2026_10_15_00
 --
 ALTER TABLE `account` MODIFY `locale` varchar(4) NOT NULL DEFAULT 'enUS';
 
