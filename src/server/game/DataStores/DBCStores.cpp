@@ -227,7 +227,7 @@ inline void LoadDBC(uint32& availableDbcLocales, StoreProblemList& errors, DBCSt
     {
         for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
         {
-            if (!(availableDbcLocales & (1 << i)))
+            if (!(availableDbcLocales & (1 << i)) || !IsLocaleRegistered(LocaleConstant(i)))
                 continue;
 
             std::string localizedName(dbcPath);
