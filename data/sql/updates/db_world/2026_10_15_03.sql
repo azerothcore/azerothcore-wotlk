@@ -1,3 +1,4 @@
+-- DB update 2026_10_15_02 -> 2026_10_15_03
 -- Borrowed Time (buff): chain the ranks so spell_proc -59887 covers all of them
 DELETE FROM `spell_ranks` WHERE `spell_id` IN (59887, 59888, 59889, 59890, 59891);
 INSERT INTO `spell_ranks` (`first_spell_id`, `spell_id`, `rank`) VALUES
