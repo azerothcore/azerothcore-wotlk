@@ -30,31 +30,27 @@ const (
 )
 
 // trapToTrip is one hunter trap at the rank a level 80 hunter has, and how its effect
-// shows on the victim.
+// shows: an aura on the victim, or creatures summoned next to it.
 type trapToTrip struct {
 	name       string
 	spell      uint32 // places gameObject at the hunter's feet
 	gameObject uint32 // type 1 trap: despawns once it has cast
-	landed     func(observer *e2eharness.ScenarioBot, victim uint64) bool
-}
-
-func victimHasAura(spellID uint32) func(*e2eharness.ScenarioBot, uint64) bool {
-	return func(observer *e2eharness.ScenarioBot, victim uint64) bool {
-		return observer.UnitHasAura(victim, spellID)
-	}
+	aura       uint32
+	summons    []uint32
 }
 
 // Freezing Trap comes first at every spot: its freeze breaks on damage, and the other
 // traps leave burning ground and snakes behind.
 var trapsToTrip = []trapToTrip{
-	{"Freezing", 14311, 164877, victimHasAura(14309)},   // Freezing Trap Effect
-	{"Frost", 13809, 164639, victimHasAura(67035)},      // the slow cast on the victim
-	{"Immolation", 49056, 189319, victimHasAura(49054)}, // Immolation Trap DoT
-	{"Explosive", 49067, 189322, victimHasAura(49065)},  // Explosive Trap Effect burn
-	{"Snake", 34600, 183957, func(observer *e2eharness.ScenarioBot, _ uint64) bool {
-		return len(observer.UnitsByEntry(10, creatureViper, creatureVenomousSnake)) > 0
-	}},
+	{"Freezing", 14311, 164877, 14309, nil},   // Freezing Trap Effect
+	{"Frost", 13809, 164639, 67035, nil},      // the slow cast on the victim
+	{"Immolation", 49056, 189319, 49054, nil}, // Immolation Trap DoT
+	{"Explosive", 49067, 189322, 49065, nil},  // Explosive Trap Effect burn
+	{"Snake", 34600, 183957, 0, []uint32{creatureViper, creatureVenomousSnake}},
 }
+
+// Hunter traps share the 1.5s global cooldown, which `.cooldown` does not reset.
+const trapGlobalCooldown = 1500 * time.Millisecond
 
 // Since PR #26152 (https://github.com/azerothcore/azerothcore-wotlk/pull/26152) a trap's
 // spell is cast by the trap GameObject. A GameObject has no collision height, so
@@ -114,6 +110,7 @@ func TestTrap_EveryTrapAffectsItsVictimOnAnyFloor(t *testing.T) {
 		mapUtgardeKeep     uint32 = 574
 		mapUtgardePinnacle uint32 = 575
 	)
+	var lastCast time.Time
 	// The dungeon spots are creature spawn points, so they sit on the real floor, picked
 	// as far apart from each other as the instance allows.
 	for _, spot := range []struct {
@@ -139,7 +136,7 @@ func TestTrap_EveryTrapAffectsItsVictimOnAnyFloor(t *testing.T) {
 
 			for _, trap := range trapsToTrip {
 				t.Run(trap.name, func(t *testing.T) {
-					tripTrap(t, hunter, placer, trap)
+					tripTrap(t, hunter, placer, trap, &lastCast)
 				})
 			}
 		})
@@ -147,8 +144,8 @@ func TestTrap_EveryTrapAffectsItsVictimOnAnyFloor(t *testing.T) {
 }
 
 // tripTrap spawns a dummy under the hunter, has the hunter lay trap on it and asserts the
-// trap's effect reached the dummy.
-func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToTrip) {
+// trap's effect reached the dummy. lastCast is when the hunter last laid a trap.
+func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToTrip, lastCast *time.Time) {
 	t.Helper()
 	dummy := placer.Spawn(t, trapLOSDummy, 15*time.Second)
 	if dummy == 0 {
@@ -158,8 +155,30 @@ func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToT
 	placer.GM(t, fmt.Sprintf(".npc set level %d", trapLOSDummyLevel))
 	placer.FlushWorld(t)
 
+	// Snakes outlive the subtest that summoned them and can still be around at the next
+	// spot, so only a snake that was not already in sight counts.
+	staleSummons := map[uint64]struct{}{}
+	if len(trap.summons) > 0 {
+		for _, u := range placer.UnitsByEntry(100, trap.summons...) {
+			staleSummons[u.GUID] = struct{}{}
+		}
+	}
+	landed := func() bool {
+		if trap.aura != 0 {
+			return placer.UnitHasAura(dummy, trap.aura)
+		}
+		for _, u := range placer.UnitsByEntry(10, trap.summons...) {
+			if _, stale := staleSummons[u.GUID]; !stale {
+				return true
+			}
+		}
+		return false
+	}
+
 	hunter.GM(t, ".cooldown")
+	time.Sleep(time.Until(lastCast.Add(trapGlobalCooldown)))
 	hunter.CastMust(t, trap.spell, 0, 10*time.Second)
+	*lastCast = time.Now()
 	trapGO := waitTrapGO(placer, trap.gameObject, true, 5*time.Second)
 	if trapGO == 0 {
 		e2eharness.Preconditionf(t, "%s Trap GO %d never appeared", trap.name, trap.gameObject)
@@ -167,7 +186,7 @@ func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToT
 
 	deadline := time.Now().Add(6 * time.Second)
 	for time.Now().Before(deadline) {
-		if trap.landed(placer, dummy) {
+		if landed() {
 			t.Logf("PASS %s Trap affected dummy 0x%X", trap.name, dummy)
 			return
 		}
