@@ -277,6 +277,8 @@ enum Misc
     SUMMON_GROUP_ICECROWN_TENTACLES     = 2,
     SUMMON_GROUP_STORMWIND_TENTACLES    = 3,
 
+    SUMMON_GROUP_CLOUDS                 = 0,
+
     // ACTION_SARA_UPDATE_SUMMON_KEEPERS = 4, // defined in ulduar.h
 
     EVENT_PHASE_ONE                     = 1,
@@ -301,14 +303,6 @@ struct LocationsXY
     float x, y, z;
 };
 
-Position const GossipKeepersPos[4] =
-{
-    {1945.6823f, 33.342014f, 411.44083f, 5.270895f}, // Freya
-    {1945.7609f, -81.52171f,  411.4407f, 1.029744f}, // Hodir
-    {2028.7656f,  17.42014f, 411.44458f, 3.857178f}, // Mimiron
-    {2028.8219f, -65.73573f, 411.44257f, 2.460914f}  // Thorim
-};
-
 const Position KeepersPos[4] =
 {
     {1939.32f,   42.165f, 338.415f, 5.17955f}, // Freya
@@ -318,7 +312,6 @@ const Position KeepersPos[4] =
 };
 
 const uint32 TABLE_KEEPER_ENTRY[4] = {NPC_FREYA_KEEPER, NPC_HODIR_KEEPER, NPC_MIMIRON_KEEPER, NPC_THORIM_KEEPER};
-const uint32 TABLE_GOSSIP_ENTRY[4] = {NPC_FREYA_GOSSIP, NPC_HODIR_GOSSIP, NPC_MIMIRON_GOSSIP, NPC_THORIM_GOSSIP};
 
 static LocationsXY yoggPortalLoc[] =
 {
@@ -436,14 +429,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
     void SpawnClouds()
     {
-        for (uint8 i = 0; i < 6; ++i)
-        {
-            float Zplus = i > 2 ? (i - 2) * 1.6f : 0;
-            if (i % 2)
-                me->SummonCreature(NPC_OMINOUS_CLOUD, me->GetPositionX() + 8 + i * 7, me->GetPositionY() + 8 + i * 7, 326 + Zplus, 0);
-            else
-                me->SummonCreature(NPC_OMINOUS_CLOUD, me->GetPositionX() - 8 - i * 7, me->GetPositionY() - 8 - i * 7, 326 + Zplus, 0);
-        }
+        me->SummonCreatureGroup(SUMMON_GROUP_CLOUDS);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -579,11 +565,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
             DATA_MIMIRON_GOSSIP, DATA_THORIM_GOSSIP
         };
         for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; i++)
-        {
-            summons.DespawnEntry(TABLE_GOSSIP_ENTRY[i]);
             if (Creature* keeper = _instance->GetCreature(gossipData[i]))
                 keeper->DespawnOrUnsummon();
-        }
     }
 
     void UpdateKeeperSpawns()
@@ -734,10 +717,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
             summons.DespawnEntry(NPC_CONSTRICTOR_TENTACLE);
             summons.DespawnEntry(NPC_CORRUPTOR_TENTACLE);
             summons.DespawnEntry(NPC_BRAIN_OF_YOGG_SARON);
-            summons.DespawnEntry(NPC_MIMIRON_GOSSIP);
-            summons.DespawnEntry(NPC_HODIR_GOSSIP);
-            summons.DespawnEntry(NPC_FREYA_GOSSIP);
-            summons.DespawnEntry(NPC_THORIM_GOSSIP);
             summons.DespawnEntry(NPC_MIMIRON_KEEPER);
             summons.DespawnEntry(NPC_HODIR_KEEPER);
             summons.DespawnEntry(NPC_FREYA_KEEPER);
@@ -1039,6 +1018,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
 struct boss_yoggsaron_cloud : public PassiveAI
 {
+    static bool clockwise;
+
     boss_yoggsaron_cloud(Creature* creature) : PassiveAI(creature)
     {
         Reset();
@@ -1080,9 +1061,9 @@ struct boss_yoggsaron_cloud : public PassiveAI
 
     void MoveCircle()
     {
-        bool clockwise = me->GetPositionX() < Middle.GetPositionX();
         me->GetMotionMaster()->MoveCirclePath(Middle.GetPositionX(), Middle.GetPositionY(), me->GetPositionZ(),
             Middle.GetExactDist2d(me), clockwise, 16);
+        clockwise = !clockwise;
     }
 
     void UpdateAI(uint32 diff) override
@@ -1102,6 +1083,8 @@ struct boss_yoggsaron_cloud : public PassiveAI
         }
     }
 };
+
+bool boss_yoggsaron_cloud::clockwise = true;
 
 struct boss_yoggsaron_guardian_of_ys : public ScriptedAI
 {
