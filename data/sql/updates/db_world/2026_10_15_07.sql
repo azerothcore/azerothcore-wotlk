@@ -1,3 +1,4 @@
+-- DB update 2026_10_15_06 -> 2026_10_15_07
 --
 -- Hungering Plaguehound (31556): sleeping in the Weeping Quarry, as sniffed
 DELETE FROM `creature_template_addon` WHERE `entry` = 31556;
