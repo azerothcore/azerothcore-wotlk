@@ -9,5 +9,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (22878, 0, 1, 0, 0, 0, 100, 0, 7700, 14900, 6000, 8500, 0, 0, 11, 40099, 0, 0, 0, 0, 0, 5, 100, 1, 0, 0, 0, 0, 0, 0, 'Aqueous Lord - In Combat - Cast ''Vile Slime'''),
 (22878, 0, 2, 0, 0, 0, 100, 0, 14000, 18000, 30000, 40000, 0, 0, 11, 40101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aqueous Lord - In Combat - Cast ''Summon Aqueous Spawn''');
 
+-- Aqueous Spawn: the summon no longer expires, despawn 30 s after leaving combat so a wipe doesn't leave it behind
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 22883 AND `source_type` = 0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(22883, 0, 0, 0, 0, 0, 100, 0, 1000, 5000, 6500, 8000, 0, 0, 11, 40102, 0, 0, 0, 0, 0, 5, 30, 0, 0, 0, 0, 0, 0, 0, 'Aqueous Spawn - In Combat - Cast Sludge Nova'),
+(22883, 0, 1, 0, 0, 0, 100, 0, 5000, 5000, 5000, 5000, 0, 0, 11, 40106, 0, 0, 0, 0, 0, 19, 22878, 20, 0, 0, 0, 0, 0, 0, 'Aqueous Spawn - In Combat - Cast Merge'),
+(22883, 0, 2, 0, 1, 0, 100, 0, 30000, 30000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Aqueous Spawn - Out of Combat - Despawn Instant (No Repeat)');
+
 -- Translocate (serverside): Orb of Translocation casts, script effect on the user
 UPDATE `spell_dbc` SET `Effect_1` = 77, `ImplicitTargetA_1` = 25 WHERE `ID` IN (45367, 45370);
