@@ -1,6 +1,6 @@
 --
 -- Summon Aqueous Spawn (serverside): the Aqueous Lord summons one Aqueous Spawn (22883) per cast
-UPDATE `spell_dbc` SET `Effect_1` = 28, `ImplicitTargetA_1` = 32, `EffectRadiusIndex_1` = 15, `EffectMiscValue_1` = 22883, `EffectMiscValueB_1` = 61 WHERE `ID` = 40101;
+UPDATE `spell_dbc` SET `Effect_1` = 28, `ImplicitTargetA_1` = 32, `EffectRadiusIndex_1` = 15, `EffectMiscValue_1` = 22883, `EffectMiscValueB_1` = 61, `DurationIndex` = 21 WHERE `ID` = 40101;
 
 -- Aqueous Lord: the spell does the summon now, drop the linked Summon Creature workaround
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 22878 AND `source_type` = 0;
