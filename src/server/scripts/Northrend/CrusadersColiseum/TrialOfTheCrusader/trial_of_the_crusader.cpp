@@ -21,76 +21,66 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 
-enum MenuTexts
+enum BarrettMenus
 {
-    MSG_TESTED                      = 724001,
-    MSG_NEXT_STAGE                  = 724002,
-    MSG_CRUSADERS                   = 724003,
-    MSG_ANUBARAK                    = 724005,
+    MENU_NORTHREND_BEASTS_START         = 10600,
+    MENU_JARAXXUS_START                 = 10610,
+    MENU_FACTION_CHAMPIONS_START        = 10687,
+    MENU_VALKYR_START                   = 10688,
+    MENU_LICH_KING_START                = 10693,
 };
 
-class npc_announcer_toc10 : public CreatureScript
+struct npc_barrett_toc : public ScriptedAI
 {
-public:
-    npc_announcer_toc10() : CreatureScript("npc_announcer_toc10") { }
+    npc_barrett_toc(Creature* creature) : ScriptedAI(creature) { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    void sGossipSelect(Player* player, uint32 menuId, uint32 /*gossipListId*/) override
     {
-        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
-            return true;
-
-        InstanceScript* pInstance = creature->GetInstanceScript();
-        if (!pInstance)
-            return true;
-
-        uint32 gossipTextId = 0;
-        switch (pInstance->GetData(TYPE_INSTANCE_PROGRESS))
+        switch (menuId)
         {
-            case INSTANCE_PROGRESS_INITIAL:
-                gossipTextId = MSG_TESTED;
+            case MENU_NORTHREND_BEASTS_START:
+            case MENU_JARAXXUS_START:
+            case MENU_FACTION_CHAMPIONS_START:
+            case MENU_VALKYR_START:
+            case MENU_LICH_KING_START:
                 break;
-            case INSTANCE_PROGRESS_INTRO_DONE:
-            case INSTANCE_PROGRESS_BEASTS_DEAD:
-            case INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD:
-            case INSTANCE_PROGRESS_VALKYR_DEAD:
-                gossipTextId = MSG_NEXT_STAGE;
-                break;
-            case INSTANCE_PROGRESS_JARAXXUS_DEAD:
-                gossipTextId = MSG_CRUSADERS;
-                break;
-            case INSTANCE_PROGRESS_DONE:
-                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                return true;
             default:
-                return true;
-        }
-
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "We are ready!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1337);
-        SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 uiAction) override
-    {
-        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
-            return true;
-
-        InstanceScript* pInstance = creature->GetInstanceScript();
-        if (!pInstance)
-            return true;
-
-        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1337)
-        {
-            pInstance->SetData(TYPE_ANNOUNCER_GOSSIP_SELECT, 0);
-            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                return;
         }
 
         CloseGossipMenuFor(player);
-        return true;
+
+        if (!me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+            return;
+
+        if (InstanceScript* instance = me->GetInstanceScript())
+            instance->SetData(TYPE_ANNOUNCER_GOSSIP_SELECT, 0);
+
+        Leave();
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_BARRETT_LEAVE && me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+            Leave();
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_BARRETT_EXIT)
+            me->DespawnOrUnsummon();
+    }
+
+private:
+    void Leave()
+    {
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->GetMotionMaster()->MovePoint(POINT_BARRETT_EXIT, Locs[LOC_BARRETT_EXIT]);
     }
 };
 
 void AddSC_trial_of_the_crusader()
 {
-    new npc_announcer_toc10();
+    RegisterTrialOfTheCrusaderCreatureAI(npc_barrett_toc);
 }

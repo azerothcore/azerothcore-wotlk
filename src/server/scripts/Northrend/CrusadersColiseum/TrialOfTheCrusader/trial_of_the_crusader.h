@@ -90,6 +90,7 @@ enum Events
     EVENT_ICEHOWL_ATTACK,
     EVENT_SCENE_BEASTS_DONE,
     EVENT_NORTHREND_BEASTS_ENRAGE,
+    EVENT_SUMMON_BARRETT,
 
     EVENT_SCENE_101,
     EVENT_SCENE_102,
@@ -141,7 +142,12 @@ enum Events
 
 enum NPCs
 {
-    NPC_BARRENT                                     = 34816,
+    NPC_BARRETT_BEASTS                              = 34816,
+    NPC_BARRETT_BEASTS_HC                           = 35909,
+    NPC_BARRETT_JARAXXUS                            = 35035,
+    NPC_BARRETT_FACTION_CHAMPIONS                   = 35766,
+    NPC_BARRETT_VALKYR                              = 35770,
+    NPC_BARRETT_LICH_KING                           = 35771,
     NPC_TIRION                                      = 34996,
     NPC_GARROSH                                     = 34995,
     NPC_THRALL                                      = 34994,
@@ -306,6 +312,8 @@ const Position Locs[] =
     {665.04f, 139.25f, 142.2f, 0.0f},                   // 18
     {664.75f, 135.0f, 142.2f, 0.0f},                    // 19
     {563.6597f, 139.7569f, 399.2507f, 3 * M_PI / 2},    // 20
+    {559.1528f, 90.55729f, 395.2734f, 5.078908f},       // 21 - Barrett
+    {563.5371f, 78.77657f, 395.2087f, 0.0f},            // 22 - Barrett exit
 };
 
 enum LocNames
@@ -331,6 +339,14 @@ enum LocNames
     LOC_TIRION_FINAL,
     LOC_MAGE,
     LOC_OPEN_PORTAL_TARGET,
+    LOC_BARRETT,
+    LOC_BARRETT_EXIT,
+};
+
+enum BarrettMisc
+{
+    ACTION_BARRETT_LEAVE                            = 1,
+    POINT_BARRETT_EXIT                              = 1,
 };
 
 const Position FactionChampionLoc[] =
