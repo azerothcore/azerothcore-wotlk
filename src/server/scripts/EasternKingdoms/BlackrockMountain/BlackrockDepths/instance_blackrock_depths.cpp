@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "SmartAI.h"
 #include "blackrock_depths.h"
 
 constexpr auto MAX_ENCOUNTER = 6;
@@ -34,7 +36,22 @@ enum Distances
 {
     RADIUS_RING_OF_LAW      = 80,
     DISTANCE_EMPEROR_ROOM   = 125,
+    DISTANCE_DARK_IRON_ALE  = 20,
     DISTANCE_VAULT_WARDER   = 15
+};
+
+enum DarkIronAle
+{
+    GO_DARK_IRON_ALE_MUG       = 165578,
+    NPC_GRIM_PATRON            = 9545,
+    NPC_GUZZLING_PATRON        = 9547,
+    NPC_HAMMERED_PATRON        = 9554,
+    DATA_DARK_IRON_ALE         = 1,
+    DATA_DARK_IRON_ALE_DRINK   = 4,
+    DATA_DARK_IRON_ALE_HOME    = 100,
+    DATA_DARK_IRON_ALE_REFORM  = 101,
+    DATA_DARK_IRON_ALE_DISBAND = 102,
+    DATA_DARK_IRON_ALE_EMOTE   = 103
 };
 
 enum PrincessQuests
@@ -140,12 +157,14 @@ struct instance_blackrock_depths : public InstanceScript
 
     uint32 BarAleCount;
     uint32 GhostKillCount;
+    uint32 LovePotionEventState;
     ObjectGuid TombBossGUIDs[7];
     uint32 tombResetTimer;
     uint32 TombTimer;
     uint32 TombEventCounter;
     uint32 OpenedCoofers;
     uint32 IronhandCounter;
+    uint32 PhalanxActivationState;
 
     GuidList ArgelmachAdds;
     ObjectGuid ArgelmachGUID;
@@ -219,11 +238,13 @@ struct instance_blackrock_depths : public InstanceScript
 
         BarAleCount = 0;
         GhostKillCount = 0;
+        LovePotionEventState = NOT_STARTED;
         TombTimer = TIMER_TOMB_START;
         TombEventCounter = 0;
         tombResetTimer   = 0;
         OpenedCoofers = 0;
         IronhandCounter  = 0;
+        PhalanxActivationState = NOT_STARTED;
         ArenaSpectators.clear();
 
         // these are linked to the dungeon and not how many times the arena started.
@@ -350,6 +371,34 @@ struct instance_blackrock_depths : public InstanceScript
     {
         switch (go->GetEntry())
         {
+            case GO_DARK_IRON_ALE_MUG:
+            {
+                std::list<Creature*> patrons;
+                go->GetCreatureListWithEntryInGrid(patrons,
+                    { NPC_GRIM_PATRON, NPC_GUZZLING_PATRON, NPC_HAMMERED_PATRON }, DISTANCE_DARK_IRON_ALE);
+
+                Creature* closestPatron = nullptr;
+                SmartAI* closestPatronAI = nullptr;
+                float closestDistance = DISTANCE_DARK_IRON_ALE;
+                for (Creature* patron : patrons)
+                {
+                    SmartAI* patronAI = CAST_AI(SmartAI, patron->AI());
+                    float const distance = go->GetDistance(patron);
+                    if (!patronAI || !patron->IsAlive() || patron->IsInCombat() || patronAI->GetData(DATA_DARK_IRON_ALE) == DATA_DARK_IRON_ALE_DRINK || distance >= closestDistance)
+                        continue;
+
+                    closestPatron = patron;
+                    closestPatronAI = patronAI;
+                    closestDistance = distance;
+                }
+
+                if (closestPatronAI)
+                {
+                    closestPatron->SetEmoteState(EMOTE_STATE_NONE);
+                    closestPatronAI->SetData(DATA_DARK_IRON_ALE, DATA_DARK_IRON_ALE_DRINK, go);
+                }
+                break;
+            }
             case GO_ARENA1:
                 GoArena1GUID = go->GetGUID();
                 break;
@@ -382,6 +431,11 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case GO_BAR_DOOR:
                 GoBarDoorGUID = go->GetGUID();
+                go->AllowSaveToDB(true);
+                if (LovePotionEventState == DONE)
+                    go->SetGoState(GO_STATE_ACTIVE);
+                else if (GetData(TYPE_BAR) == DONE)
+                    go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                 break;
             case GO_TOMB_ENTER:
                 GoTombEnterGUID = go->GetGUID();
@@ -533,6 +587,11 @@ struct instance_blackrock_depths : public InstanceScript
                 else
                     encounter[2] = data;
                 break;
+            case DATA_LOVE_POTION_EVENT:
+                LovePotionEventState = data;
+                if (data == DONE)
+                    encounter[2] = DONE;
+                break;
             case TYPE_TOMB_OF_SEVEN:
                 encounter[3] = data;
                 switch (data)
@@ -669,6 +728,9 @@ struct instance_blackrock_depths : public InstanceScript
                 }
                 break;
             }
+            case DATA_PHALANX_ACTIVATED:
+                PhalanxActivationState = data;
+                break;
             default:
                 break;
         }
@@ -679,7 +741,8 @@ struct instance_blackrock_depths : public InstanceScript
 
             std::ostringstream saveStream;
             saveStream << encounter[0] << ' ' << encounter[1] << ' ' << encounter[2] << ' '
-                       << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount;
+                       << encounter[3] << ' ' << encounter[4] << ' ' << encounter[5] << ' ' << GhostKillCount << ' '
+                       << PhalanxActivationState << ' ' << LovePotionEventState;
 
             str_data = saveStream.str();
 
@@ -713,8 +776,54 @@ struct instance_blackrock_depths : public InstanceScript
                 return arenaMobsToSpawn;
             case DATA_ARENA_BOSS:
                 return arenaBossToSpawn;
+            case DATA_PHALANX_ACTIVATED:
+                return PhalanxActivationState;
+            case DATA_LOVE_POTION_EVENT:
+                return LovePotionEventState;
         }
         return 0;
+    }
+
+    void SetGuidData(uint32 data, ObjectGuid guid) override
+    {
+        if (data != DATA_DARK_IRON_ALE_HOME && data != DATA_DARK_IRON_ALE_REFORM &&
+            data != DATA_DARK_IRON_ALE_DISBAND && data != DATA_DARK_IRON_ALE_EMOTE)
+            return;
+
+        if (Creature* patron = instance->GetCreature(guid))
+        {
+            if (data == DATA_DARK_IRON_ALE_EMOTE)
+            {
+                if (CreatureAddon const* addon = patron->GetCreatureAddon())
+                    patron->SetEmoteState(static_cast<Emote>(addon->emote));
+
+                return;
+            }
+
+            if (data == DATA_DARK_IRON_ALE_DISBAND)
+            {
+                if (CreatureGroup* formation = patron->GetFormation())
+                    sFormationMgr->RemoveCreatureFromGroup(formation, patron);
+
+                return;
+            }
+
+            if (data == DATA_DARK_IRON_ALE_REFORM)
+            {
+                if (!patron->GetFormation())
+                    patron->SearchFormation();
+
+                return;
+            }
+
+            if (patron->IsAlive() && !patron->IsInCombat())
+            {
+                if (!patron->GetFormation())
+                    patron->SearchFormation();
+
+                patron->GetMotionMaster()->MoveTargetedHome(true);
+            }
+        }
     }
 
     ObjectGuid GetGuidData(uint32 data) const override
@@ -782,6 +891,10 @@ struct instance_blackrock_depths : public InstanceScript
         std::istringstream loadStream(in);
         loadStream >> encounter[0] >> encounter[1] >> encounter[2] >> encounter[3]
                    >> encounter[4] >> encounter[5] >> GhostKillCount;
+        if (!(loadStream >> PhalanxActivationState) || PhalanxActivationState != DONE)
+            PhalanxActivationState = NOT_STARTED;
+        if (!(loadStream >> LovePotionEventState) || LovePotionEventState != DONE)
+            LovePotionEventState = NOT_STARTED;
 
         for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             if (encounter[i] == IN_PROGRESS)

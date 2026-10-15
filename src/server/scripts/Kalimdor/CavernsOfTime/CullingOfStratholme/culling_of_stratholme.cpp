@@ -408,8 +408,20 @@ public:
         void SendNextWave(uint32 entry);
         void SpawnTimeRift();
 
+        // Despawning an engaged boss skips its evade, which would leave its state IN_PROGRESS
+        void ResetEngagedBosses()
+        {
+            if (!pInstance)
+                return;
+
+            for (uint32 bossId = BOSS_MEATHOOK; bossId <= BOSS_MAL_GANIS; ++bossId)
+                if (pInstance->GetBossState(bossId) == IN_PROGRESS)
+                    pInstance->SetBossState(bossId, NOT_STARTED);
+        }
+
         void JustDied(Unit*) override
         {
+            ResetEngagedBosses();
             summons.DespawnAll();
             RemoveEscortState(STATE_ESCORT_ESCORTING);
             if (pInstance)
@@ -516,6 +528,7 @@ public:
         {
             actionEvents.Reset();
             combatEvents.Reset();
+            ResetEngagedBosses();
             summons.DespawnAll();
             eventInRun = false;
             waveGroupId = 0;

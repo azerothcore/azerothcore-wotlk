@@ -24,6 +24,7 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SessionKeyGenerator.h"
 #include "Util.h"
 #include "WardenCheckMgr.h"
@@ -560,6 +561,25 @@ void WardenWin::RequestChecks()
     LOG_DEBUG("warden", "{}", stream.str());
 }
 
+std::vector<uint8> WardenWin::GetExpectedResult(WardenCheck const& check) const
+{
+    std::size_t const length = check.Type == MPQ_CHECK
+        ? Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES : check.Length;
+
+    std::vector<uint8> expected;
+    if (sScriptMgr->OnWardenCheckExpectedResult(_session, check, expected))
+    {
+        if (expected.size() == length)
+            return expected;
+
+        LOG_ERROR("warden", "Script returned {} expected bytes for CheckId {}, {} required, using the stored result",
+            expected.size(), check.CheckId, length);
+    }
+
+    // BigNumber drops leading zero bytes, pad to the check length so the comparison stays in bounds.
+    return sWardenCheckMgr->GetWardenResultById(check.CheckId)->Result.ToByteVector(static_cast<int32>(length), false);
+}
+
 void WardenWin::HandleData(ByteBuffer& buff)
 {
     LOG_DEBUG("warden", "Handle data");
@@ -648,12 +668,11 @@ void WardenWin::HandleData(ByteBuffer& buff)
                 continue;
             }
 
-            WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
-
-            std::vector<uint8> result = rs->Result.ToByteVector(0, false);
-            if (CRYPTO_memcmp(buff.contents() + buff.rpos(), result.data(), rd->Length) != 0)
+            std::vector<uint8> const expected = GetExpectedResult(*rd);
+            if (CRYPTO_memcmp(buff.contents() + buff.rpos(), expected.data(), rd->Length) != 0)
             {
-                LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId {} account Id {}", checkId, _session->GetAccountId());
+                LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId {} account Id {} locale {}", checkId,
+                    _session->GetAccountId(), GetNameByLocaleConstant(_session->GetSessionDbLocaleIndex()));
                 checkFailed = checkId;
                 buff.rpos(buff.rpos() + rd->Length);
                 continue;
@@ -731,10 +750,12 @@ void WardenWin::HandleData(ByteBuffer& buff)
                 continue;
             }
 
-            WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
-            if (CRYPTO_memcmp(buff.contents() + buff.rpos(), rs->Result.ToByteArray<20>(false).data(), Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0)
+            std::vector<uint8> const expected = GetExpectedResult(*rd);
+            if (CRYPTO_memcmp(buff.contents() + buff.rpos(), expected.data(),
+                Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0)
             {
-                LOG_DEBUG("warden", "RESULT MPQ_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
+                LOG_DEBUG("warden", "RESULT MPQ_CHECK fail, CheckId {} account Id {} locale {}", checkId,
+                    _session->GetAccountId(), GetNameByLocaleConstant(_session->GetSessionDbLocaleIndex()));
                 checkFailed = checkId;
                 buff.rpos(buff.rpos() + Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES);            // 20 bytes SHA1
                 continue;

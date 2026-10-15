@@ -198,7 +198,8 @@ public:
 
         map->GetInstanceScript()->SetBossState(encounterId, EncounterState(state));
         std::string stateName = InstanceScript::GetBossStateName(state);
-        handler->PSendSysMessage(LANG_COMMAND_INST_SET_BOSS_STATE, encounterId, state, stateName);
+        std::string bossName = GetBossName(GetEncounterNames(map), encounterId);
+        handler->PSendSysMessage(LANG_COMMAND_INST_SET_BOSS_STATE, encounterId, bossName, state, stateName);
         return true;
     }
 
@@ -233,7 +234,26 @@ public:
             return false;
         }
 
-        // Build a map of encounterIndex -> encounterName from DBC data
+        std::unordered_map<uint32, char const*> encounterNames = GetEncounterNames(map);
+
+        for (uint8 i = 0; i < map->GetInstanceScript()->GetEncounterCount(); ++i)
+        {
+            uint32 state = map->GetInstanceScript()->GetBossState(i);
+            std::string stateName = InstanceScript::GetBossStateName(state);
+            std::string bossName = GetBossName(encounterNames, i);
+
+            handler->PSendSysMessage(
+                LANG_COMMAND_INST_GET_BOSS_STATE,
+                i, bossName, state, stateName);
+        }
+
+        return true;
+    }
+
+private:
+    // Maps encounterIndex -> encounterName from DBC data
+    static std::unordered_map<uint32, char const*> GetEncounterNames(InstanceMap const* map)
+    {
         std::unordered_map<uint32, char const*> encounterNames;
         Difficulty difficulty = map->GetDifficulty();
 
@@ -266,21 +286,13 @@ public:
                     = encounter->dbcEntry->encounterName[0];
         }
 
-        for (uint8 i = 0; i < map->GetInstanceScript()->GetEncounterCount(); ++i)
-        {
-            uint32 state = map->GetInstanceScript()->GetBossState(i);
-            std::string stateName = InstanceScript::GetBossStateName(state);
+        return encounterNames;
+    }
 
-            auto it = encounterNames.find(i);
-            std::string bossName = (it != encounterNames.end()
-                && it->second) ? it->second : "Unknown";
-
-            handler->PSendSysMessage(
-                LANG_COMMAND_INST_GET_BOSS_STATE,
-                i, bossName, state, stateName);
-        }
-
-        return true;
+    static std::string GetBossName(std::unordered_map<uint32, char const*> const& encounterNames, uint32 encounterId)
+    {
+        auto it = encounterNames.find(encounterId);
+        return (it != encounterNames.end() && it->second) ? it->second : "Unknown";
     }
 };
 

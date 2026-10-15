@@ -415,10 +415,10 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
     {
         PrepareAuraScript(spell_mage_combustion_proc);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION });
-    }
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION });
+        }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
@@ -427,7 +427,8 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
 
         void Register() override
         {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc::OnRemove, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc::OnRemove, EFFECT_0,
+                SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -1056,21 +1057,22 @@ class spell_mage_combustion : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // Do not take charges, add a stack of crit buff
-        if (!(eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
+        // Every hit adds a stack of the crit buff. The cast is deferred: this hook runs from
+        // Aura::GetProcEffectMask while the proc engine iterates the actor's aura map, and the
+        // insert could invalidate the live iterator (aura containers are flat_multimaps).
+        // HasAura drops the stack if Combustion ended in the meantime, e.g. on the crit that
+        // took the last charge.
+        Unit* actor = eventInfo.GetActor();
+        ObjectGuid actorGuid = actor->GetGUID();
+        actor->m_Events.AddEventAtOffset([actorGuid]()
         {
-            // Applying the stack mutates the actor's aura map while the proc engine iterates
-            // it (this hook runs from Aura::GetProcEffectMask); defer it so the insert can't
-            // invalidate the live iterator (aura containers are flat_multimaps).
-            Unit* actor = eventInfo.GetActor();
-            actor->m_Events.AddEventAtOffset([actor]()
-            {
-                actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
-            }, 1ms);
-            return false;
-        }
+            if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
+                if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                    actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+        }, 1ms);
 
-        return true;
+        // Only crits take a charge
+        return (eventInfo.GetHitMask() & PROC_HIT_CRITICAL) != 0;
     }
 
     void Register() override
