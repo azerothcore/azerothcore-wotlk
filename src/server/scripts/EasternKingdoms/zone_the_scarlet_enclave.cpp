@@ -178,8 +178,14 @@ class spell_q12698_the_gift_that_keeps_on_giving : public SpellScript
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        if (GetOriginalCaster() && GetHitUnit())
-            GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
+        // cast by GO 190769, which is owned by the player who threw the Gift
+        Unit* thrower = GetOriginalCaster();
+        if (!thrower)
+            if (GameObject* go = GetGObjCaster())
+                thrower = go->GetOwner();
+
+        if (thrower && GetHitUnit())
+            thrower->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
     }
 
     void Register() override
