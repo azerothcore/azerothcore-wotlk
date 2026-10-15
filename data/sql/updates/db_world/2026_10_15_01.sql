@@ -1,3 +1,4 @@
+-- DB update 2026_10_15_00 -> 2026_10_15_01
 --
 DELETE FROM `spell_dbc` WHERE `ID` = 31338;
 INSERT INTO `spell_dbc` (`ID`, `Attributes`, `CastingTimeIndex`, `ProcChance`, `DurationIndex`, `RangeIndex`, `EquippedItemClass`, `Effect_1`, `ImplicitTargetA_1`, `EffectRadiusIndex_1`, `EffectMiscValue_1`, `EffectMiscValueB_1`, `EffectChainAmplitude_1`, `SchoolMask`, `Name_Lang_enUS`) VALUES
