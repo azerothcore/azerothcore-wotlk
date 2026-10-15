@@ -40,7 +40,7 @@ enum DataTypes
 {
     TYPE_NONE = 0,
     TYPE_INSTANCE_PROGRESS,
-    TYPE_ANNOUNCER_GOSSIP_SELECT,
+    TYPE_ANNOUNCER_GOSSIP_SELECT,                   // Set by value from Barrett's SmartAI
     TYPE_FAILED,
 
     TYPE_GORMOK,
@@ -313,7 +313,6 @@ const Position Locs[] =
     {664.75f, 135.0f, 142.2f, 0.0f},                    // 19
     {563.6597f, 139.7569f, 399.2507f, 3 * M_PI / 2},    // 20
     {559.1528f, 90.55729f, 395.2734f, 5.078908f},       // 21 - Barrett
-    {563.5371f, 78.77657f, 395.2087f, 0.0f},            // 22 - Barrett exit
 };
 
 enum LocNames
@@ -340,13 +339,12 @@ enum LocNames
     LOC_MAGE,
     LOC_OPEN_PORTAL_TARGET,
     LOC_BARRETT,
-    LOC_BARRETT_EXIT,
 };
 
 enum BarrettMisc
 {
+    // Barrett's SmartAI handles it through SMART_EVENT_ACTION_DONE
     ACTION_BARRETT_LEAVE                            = 1,
-    POINT_BARRETT_EXIT                              = 1,
 };
 
 const Position FactionChampionLoc[] =
