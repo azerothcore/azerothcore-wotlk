@@ -965,7 +965,7 @@ enum HeatedBattleWaveGroup : uint8
     WAVE_EAST_GEISTS                = 4,    // 6 Geists
     WAVE_EAST_ABOMINATION           = 5,    // Abomination + 7 Geists
     WAVE_SHRINE_GARRISON            = 6,    // Abomination + 6 Geists + 2 Necromancers, never moves
-    WAVE_HORDE_GEISTS               = 7,    // 4 Geists - unreferenced, see WaveGroupFor
+    WAVE_HORDE_GEISTS               = 7,    // 4 Geists
     WAVE_HORDE_ABOMINATION          = 8,    // Abomination + 6 Geists
     WAVE_HORDE_NECROMANCER          = 9     // Necromancer + 7 Geists
 };
@@ -1376,21 +1376,16 @@ private:
 
     [[nodiscard]] uint8 WaveGroupFor(uint8 wave) const
     {
+        // Random: the south order is unknown, and the Horde's sniffed 9/8 alternation has no slot
+        // for group 7.
         if (!IsIskandar())
-            return (wave % 2) ? WAVE_HORDE_ABOMINATION : WAVE_HORDE_NECROMANCER;
+            return RAND(WAVE_HORDE_GEISTS, WAVE_HORDE_ABOMINATION, WAVE_HORDE_NECROMANCER);
 
         if (_station == STATION_EAST_PASS)
             return (wave % 2) ? WAVE_EAST_ABOMINATION : WAVE_EAST_GEISTS;
 
-        switch (wave % 3)
-        {
-            case 0:
-                return WAVE_SOUTH_NECROMANCER;
-            case 1:
-                return WAVE_SOUTH_ABOMINATION_4;
-            default:
-                return WAVE_SOUTH_ABOMINATION_6;
-        }
+        return RAND(WAVE_SOUTH_NECROMANCER, WAVE_SOUTH_ABOMINATION_2, WAVE_SOUTH_ABOMINATION_4,
+            WAVE_SOUTH_ABOMINATION_6);
     }
 
     void SummonWave(uint8 group)

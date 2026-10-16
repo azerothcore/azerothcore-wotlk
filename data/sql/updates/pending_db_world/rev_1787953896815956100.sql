@@ -28,7 +28,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (@CGUID+0, @CGUID+7, 0),
 (@CGUID+0, @CGUID+8, 0);
 
-UPDATE `creature_template` SET `flags_extra` = `flags_extra`|134217728 WHERE (`entry` IN (27564, 27567));
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|134217728 WHERE (`entry` = 27564);
 
 -- Update the dragons nearby
 UPDATE `creature` SET `position_x`=3615.459961, `position_y`=753.809021, `position_z`=85.660202, `orientation`=1.390670, `wander_distance`=0.00, `MovementType`=0, `VerifiedBuild`=54261, `CreateObject`=1 WHERE `guid`=110006 AND `id`=27542;
@@ -315,7 +315,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 -- Path 2 node 1 (~3766-3769 / 675-685) sits 8-11 yd in front of the camp spawn points, so a
 -- squad starting at the camp skips it and goes straight to Path 2 node 2. Nodes below are
 -- byte-identical to Path 2 nodes 2..5 for 8 of the 9 slots, in BOTH camp runs.
--- The single exception is Soldier 8's first node (see its entry). Final facing is the same
+-- The single exception is Soldier 8's first node, 0.08 yd off Path 2 node 2. Final facing is the same
 -- 1.099557399749755859 as Path 2, for all 9.
 --
 -- The nodes are duplicated here rather than shared with Path 2, since waypoint_data has no way
@@ -536,7 +536,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 -- ==========================================================================
 -- SCOURGE ATTACK WAVES
 -- Summoned by the captains, one creature_summon_groups group per wave.
--- Groups 0-6 belong to Captain Iskandar, 7-8 to Captain Drayzen, so a path id stays
+-- Groups 0-6 belong to Captain Iskandar, 7-9 to Captain Drayzen, so a path id stays
 -- unique across both sides.
 --
 -- Route is a property of the spawn slot: every spawn point sighted more than once ran to
@@ -883,15 +883,19 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (2628600, 9, 3680.8594, 942.8113, 188.3308, 1, 1);
 
 -- The dragon leaves the moment its line runs out. SMART_EVENT_WAYPOINT_ENDED is filtered on
--- the path id, so these only ever fire for a strafing run: the Ruby Keeper's own rows for the
--- Ruby Dragonshrine acorn quest are untouched, and the static dragons never walk a path.
+-- the path id, so these only ever fire for a strafing run, and the static dragons never walk a
+-- path. Ruby Keeper rows 0-3 are the Ruby Dragonshrine acorn quest's, carried over unchanged.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 26286);
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 27530) AND (`id` IN (4, 5, 6));
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 26286);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` IN (27530, 26286));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(27530, 0, 0, 1, 8, 0, 100, 0, 49349, 0, 0, 0, 0, 0, 11, 49364, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'On spell hit - Cast Spell'),
+(27530, 0, 1, 2, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 41, 10000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Linked - Despawn'),
+(27530, 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 80, 2753000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Linked - Script9'),
+(27530, 0, 3, 0, 60, 0, 100, 512, 5000, 5000, 30000, 30000, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'On Update - Set Visible'),
 (27530, 0, 4, 0, 109, 0, 100, 0, 0, 2753000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On East Pass Strafe Ended - Despawn'),
 (27530, 0, 5, 0, 109, 0, 100, 0, 0, 2753001, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On South Pass Strafe Ended - Despawn'),
 (27530, 0, 6, 0, 109, 0, 100, 0, 0, 2753002, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On Horde Pass Strafe Ended - Despawn'),
+(27530, 0, 7, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 239, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On Just Summoned - Set AnimTier 3'),
 (26286, 0, 0, 0, 109, 0, 100, 0, 0, 2628600, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Emberwyrm - On Strafe Ended - Despawn');
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (49083, 49210, 49080, 49211));
@@ -925,7 +929,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (105167, 105012, 0),
 (105167, 105167, 0);
 
--- Also remove old stuff
+-- Drop the old attacker scripts, and the attackers no longer regenerate health
 UPDATE `creature_template` SET `RegenHealth` = 0, `ScriptName` = '' WHERE (`entry` IN (27686, 27687, 27531, 27685));
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27687;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27687);
@@ -933,7 +937,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27687, 0, 0, 0, 60, 0, 100, 0, 3200, 10000, 3200, 10000, 0, 0, 11, 50324, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Necromancer Attacker - On Update - Cast \'Bone Armor\''),
 (27687, 0, 1, 0, 0, 0, 100, 0, 0, 1200, 3600, 4800, 0, 0, 11, 9613, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Frigid Necromancer Attacker - In Combat - Cast \'Shadow Bolt\'');
 
--- Replace the creature_addon from Ruby Watchers
+-- Replace the Ruby Keeper's creature_template_addon
 DELETE FROM `creature_template_addon` WHERE (`entry` = 27530);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (27530, 0, 0, 0, 0, 0, 3, '');
@@ -946,7 +950,3 @@ INSERT INTO `creature_addon` (`guid`, `bytes2`, `visibilityDistanceType`, `auras
 (108316, 3, 3, '49132 55795 61204'),
 (108317, 3, 3, '49132 55795 61204'),
 (108318, 3, 3, '49132 55795 61204');
-
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 27530) AND (`source_type` = 0) AND (`id` IN (7));
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(27530, 0, 7, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 239, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On Just Summoned - Set AnimTier 3');

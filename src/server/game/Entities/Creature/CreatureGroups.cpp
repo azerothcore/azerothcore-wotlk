@@ -118,7 +118,8 @@ void FormationMgr::LoadCreatureFormations()
         {
             // Members can have 0 AI flags, same as the leader: the creature is then only grouped,
             // without any of the shared assist, evade or follow behaviour
-            if (group_member.groupAI && !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
+            if (group_member.groupAI &&
+                !group_member.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_SUPPORTED)))
             {
                 LOG_ERROR("sql.sql", "creature_formations table leader guid {} and member guid {} has unsupported GroupAI flag value ({}). Skipped", group_member.leaderGUID, memberGUID, group_member.groupAI);
                 continue;
