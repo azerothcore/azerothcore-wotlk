@@ -58,12 +58,13 @@ namespace
             if (dist >= _range)
                 return false;
 
+            // Before the ray: most units in range are ones the spell can't hit.
+            if (!_spellCheck(target))
+                return false;
+
             LineOfSightChecks losChecks = LineOfSightChecks(LINEOFSIGHT_ALL_CHECKS & ~LINEOFSIGHT_CHECK_GOBJECT_M2);
             float height = _owner->GetCollisionHeight();
             if (!_trap->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::Nothing, losChecks, height))
-                return false;
-
-            if (!_spellCheck(target))
                 return false;
 
             _range = dist;
