@@ -884,8 +884,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (2628600, 9, 3680.8594, 942.8113, 188.3308, 1, 1);
 
 -- The dragon leaves the moment its line runs out. SMART_EVENT_WAYPOINT_ENDED is filtered on
--- the path id, so these only ever fire for a strafing run, and the static dragons never walk a
--- path. Ruby Keeper rows 0-3 are the Ruby Dragonshrine acorn quest's, carried over unchanged.
+-- the path id, so these only ever fire for a strafing run: the two patrolling Emberwyrms
+-- (112386, 112387) walk other paths. Ruby Keeper rows 0-3 are the Ruby Dragonshrine acorn
+-- quest's, carried over unchanged.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 26286);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` IN (27530, 26286));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES

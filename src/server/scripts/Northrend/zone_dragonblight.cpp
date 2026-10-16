@@ -1258,7 +1258,7 @@ private:
                 if (itr.first != me && itr.first->IsAlive() && itr.first->AI())
                     itr.first->AI()->DoAction(march);
 
-        // Nothing is summoned while the squad is walking.
+        // Push the next volley back so the squad sets off first; a long march can still see one.
         scheduler.DelayGroup(GROUP_GHOUL, 15s, 20s);
 
         me->LoadPath(pathId);
