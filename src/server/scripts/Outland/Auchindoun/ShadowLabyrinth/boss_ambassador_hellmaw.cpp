@@ -185,13 +185,17 @@ struct boss_ambassador_hellmaw : public BossAI
         }
 
         // Make sure our attack is ready and we aren't currently casting before checking distance
+        bool mainHandSwung = false;
+
         if (me->isAttackReady())
         {
             me->AttackerStateUpdate(victim, BASE_ATTACK, false, ignoreCasting);
             me->resetAttackTimer();
+
+            mainHandSwung = true;
         }
 
-        if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
+        if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK) && !mainHandSwung)
         {
             me->AttackerStateUpdate(victim, OFF_ATTACK, false, ignoreCasting);
             me->resetAttackTimer(OFF_ATTACK);

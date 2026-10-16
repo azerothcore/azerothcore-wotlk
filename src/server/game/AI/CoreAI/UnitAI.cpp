@@ -51,13 +51,18 @@ void UnitAI::DoMeleeAttackIfReady()
         return;
 
     //Make sure our attack is ready and we aren't currently casting before checking distance
+    bool mainHandSwung = false;
+
     if (me->isAttackReady())
     {
         me->AttackerStateUpdate(victim);
         me->resetAttackTimer();
+
+        mainHandSwung = true;
     }
 
-    if (me->HasOffhandWeaponForAttack() && me->isAttackReady(OFF_ATTACK))
+    // The client draws one swing animation per frame, so let the main hand swing alone
+    if (me->HasOffhandWeaponForAttack() && me->isAttackReady(OFF_ATTACK) && !mainHandSwung)
     {
         me->AttackerStateUpdate(victim, OFF_ATTACK);
         me->resetAttackTimer(OFF_ATTACK);

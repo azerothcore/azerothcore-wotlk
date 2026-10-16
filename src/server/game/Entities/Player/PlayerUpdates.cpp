@@ -168,6 +168,8 @@ void Player::Update(uint32 p_time)
             // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
             bool const victimIsVehicleBase = GetVehicleBase() == victim;
 
+            bool mainHandSwung = false;
+
             if (isAttackReady(BASE_ATTACK))
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
@@ -199,10 +201,13 @@ void Player::Update(uint32 p_time)
 
                     // Blizzlike: Reset ranged swing timer when performing melee attack
                     resetAttackTimer(RANGED_ATTACK);
+
+                    mainHandSwung = true;
                 }
             }
 
-            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
+            // The client draws one swing animation per frame, so let the main hand swing alone
+            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK) && !mainHandSwung)
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
