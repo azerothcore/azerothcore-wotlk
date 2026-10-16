@@ -33,13 +33,13 @@ enum GormokSpells
     SPELL_IMPALE                        = 66331,
     SPELL_STAGGERING_STOMP              = 67648,
     SPELL_RISING_ANGER                  = 66636,
-    SPELL_CHANGE_VEHICLE                = 66342, // custom spell
+    SPELL_JUMP_TO_HAND                  = 66342,
     //Snobold
     SPELL_SNOBOLLED                     = 66406,
     SPELL_BATTER                        = 66408,
     SPELL_FIRE_BOMB                     = 66313,
-    SPELL_FIRE_BOMB_AURA                = 66318,
     SPELL_HEAD_CRACK                    = 66407,
+    SPELL_FULL_HEAL                     = 17683,
 };
 
 enum GormokEvents
@@ -47,7 +47,6 @@ enum GormokEvents
     EVENT_SPELL_IMPALE = 1,
     EVENT_SPELL_STAGGERING_STOMP,
     EVENT_PICK_SNOBOLD_TARGET,
-    EVENT_RELEASE_SNOBOLD,
 
     EVENT_SPELL_SNOBOLLED,
     EVENT_SPELL_BATTER,
@@ -59,12 +58,18 @@ enum GormokEvents
 enum GormokActions
 {
     ACTION_GORMOK_DIED = 1,
+    ACTION_SNOBOLD_MISSED,
+};
+
+enum GormokData
+{
+    DATA_RELEASED_SNOBOLD = 1,
+    DATA_SNOBOLD_CARRIER,
 };
 
 enum GormokNPCs
 {
     NPC_SNOBOLD_VASSAL                  = 34800,
-    NPC_FIRE_BOMB                       = 34854,
 };
 
 enum Yells
@@ -132,6 +137,16 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
+        void SetGUID(ObjectGuid const& guid, int32 id) override
+        {
+            if (id != DATA_SNOBOLD_CARRIER)
+                return;
+
+            TargetGUID = guid;
+            if (Player* carrier = ObjectAccessor::GetPlayer(*me, guid))
+                AttackStart(carrier);
+        }
+
         void EnterEvadeMode(EvadeReason why) override
         {
             // Nothing cleans up a dismounted snobold once Gormok's corpse is gone
@@ -144,33 +159,85 @@ public:
             ScriptedAI::EnterEvadeMode(why);
         }
 
-        void LoseCarrier(Unit* carrier)
+        void LoseCarrier()
         {
-            if (carrier)
-                carrier->RemoveAura(SPELL_CHANGE_VEHICLE);
             me->RemoveAllAuras();
             me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
             me->SetHealth(me->GetMaxHealth());
             TargetGUID.Clear();
-            Creature* gormok = pInstance ? ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) : nullptr;
+            Creature* gormok = GetGormok();
             if (gormok && gormok->IsAlive())
-            {
-                if (Vehicle* vk = gormok->GetVehicleKit())
-                    for (uint8 i = 0; i < 4; ++i)
-                        if (!vk->GetPassenger(i))
-                        {
-                            me->EnterVehicleUnattackable(gormok, i);
-                            Reset();
-                            break;
-                        }
-            }
+                BoardGormok(gormok);
             else // Gormok is dead or gone, so fight on like the Snobolds ejected from him
                 DoAction(ACTION_GORMOK_DIED);
         }
 
+        Creature* GetGormok() const
+        {
+            return pInstance ? ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) : nullptr;
+        }
+
+        // Prefers players away from Gormok's melee, falling back to anyone when they are all on him
+        Unit* SelectFireBombTarget()
+        {
+            Creature* gormok = GetGormok();
+            if (!gormok || !gormok->IsAlive())
+                return SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+
+            if (Unit* target = gormok->AI()->SelectTarget(SelectTargetMethod::Random, 0, [gormok](Unit* unit) { return unit->IsPlayer() && !unit->IsWithinMeleeRange(gormok); }))
+                return target;
+
+            return gormok->AI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+        }
+
+        bool BoardGormok(Creature* gormok)
+        {
+            if (Vehicle* vk = gormok->GetVehicleKit())
+                for (uint8 i = 0; i < 4; ++i)
+                    if (!vk->GetPassenger(i))
+                    {
+                        me->EnterVehicleUnattackable(gormok, i);
+                        Reset();
+                        return true;
+                    }
+
+            return false;
+        }
+
+        // Thrown at someone who can't carry it, the Snobold lands, walks back and climbs onto a free seat
+        void ReturnToGormok()
+        {
+            scheduler.Schedule(1100ms, [this](TaskContext context)
+            {
+                Creature* gormok = GetGormok();
+                if (!gormok || !gormok->IsAlive())
+                    return;
+
+                if (context.GetRepeatCounter() == 0)
+                    me->GetMotionMaster()->MoveFollow(gormok, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false);
+
+                if (!me->IsWithinMeleeRange(gormok))
+                {
+                    context.Repeat(250ms);
+                    return;
+                }
+
+                me->GetMotionMaster()->Clear();
+                if (BoardGormok(gormok))
+                    scheduler.Schedule(1200ms, [this](TaskContext /*context*/)
+                    {
+                        DoCastSelf(SPELL_FULL_HEAL);
+                    });
+                else
+                    me->DespawnOrUnsummon();
+            });
+        }
+
         void UpdateAI(uint32 diff) override
         {
+            scheduler.Update(diff);
+
             Unit* t = nullptr;
             if (Dismounted)
             {
@@ -181,21 +248,22 @@ public:
             }
             else
             {
-                if (!TargetGUID && !me->GetVehicle())
-                    return;
-
-                t = ObjectAccessor::GetUnit(*me, TargetGUID);
-                if (!t && !(t = me->GetVehicleBase()))
+                if (!me->GetVehicle())
                 {
-                    // The carrier left the map, which ejects its passengers
-                    LoseCarrier(nullptr);
+                    // Ejected because the carrier left the map or stopped being a vehicle when Northrend Beasts ended
+                    if (TargetGUID)
+                        LoseCarrier();
                     return;
                 }
+
+                t = ObjectAccessor::GetUnit(*me, TargetGUID);
+                if (!t)
+                    t = me->GetVehicleBase();
             }
 
             if (!Dismounted && t->isDead())
             {
-                LoseCarrier(t);
+                LoseCarrier();
                 return;
             }
 
@@ -211,6 +279,12 @@ public:
                 case EVENT_DISMOUNTED_ATTACK:
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat();
+                    // An unengaged creature never evades, so a Snobold with nobody left to fight would idle forever
+                    if (!me->IsEngaged())
+                    {
+                        me->DespawnOrUnsummon();
+                        return;
+                    }
                     events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 1s, 5s);
                     break;
                 case EVENT_SPELL_SNOBOLLED:
@@ -224,31 +298,10 @@ public:
                     events.Repeat(6s, 8s);
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
-                    {
-                        if ((Dismounted || !t->IsPlayer()) && pInstance)
-                        {
-                            GuidVector validPlayers;
-                            Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK));
-
-                            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            {
-                                if (Player* p = itr->GetSource())
-                                    if (p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !gormok->IsAlive() || !p->IsWithinMeleeRange(gormok)))
-                                        validPlayers.push_back(p->GetGUID());
-                            }
-
-                            if (!validPlayers.empty())
-                                if (Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))))
-                                    if (Creature* trigger = me->SummonCreature(NPC_FIRE_BOMB, *p, TEMPSUMMON_TIMED_DESPAWN, 60000))
-                                    {
-                                        me->CastSpell(trigger, SPELL_FIRE_BOMB_AURA, true); // periodic damage aura, speed 14.0f
-                                        me->CastSpell(trigger, SPELL_FIRE_BOMB); // visual + initial damage 4k
-                                    }
-                        }
-
-                        events.Repeat(20s, 30s);
-                    }
+                    if (Dismounted || !t->IsPlayer())
+                        if (Unit* target = SelectFireBombTarget())
+                            DoCast(target, SPELL_FIRE_BOMB);
+                    events.Repeat(20s, 30s);
                     break;
                 case EVENT_SPELL_HEAD_CRACK:
                     if (t->IsPlayer())
@@ -263,23 +316,31 @@ public:
         void JustDied(Unit* /*pKiller*/) override
         {
             if (Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID))
-            {
-                t->RemoveAura(SPELL_CHANGE_VEHICLE);
                 if (t->IsAlive())
                     t->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
-            }
         }
 
         void DoAction(int32 param) override
         {
-            // Gormok's death ejects his passengers; they keep bombing and join the fight shortly after landing
-            if (param != ACTION_GORMOK_DIED || TargetGUID)
-                return;
+            switch (param)
+            {
+                case ACTION_SNOBOLD_MISSED:
+                    ReturnToGormok();
+                    break;
+                case ACTION_GORMOK_DIED:
+                    // Gormok's death ejects his passengers; they keep bombing and join the fight shortly after landing
+                    if (TargetGUID)
+                        return;
 
-            Dismounted = true;
-            events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, 1s, 12s);
-            events.ScheduleEvent(EVENT_DISMOUNTED_ATTACK, 5s);
+                    Dismounted = true;
+                    scheduler.CancelAll();
+                    // Engaged but passive until the attack step, so their own threat lists feed the early Fire Bombs
+                    DoZoneInCombat();
+                    events.Reset();
+                    events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, 1s, 12s);
+                    events.ScheduleEvent(EVENT_DISMOUNTED_ATTACK, 5s);
+                    break;
+            }
         }
     };
 };
@@ -368,74 +429,83 @@ public:
                 case EVENT_PICK_SNOBOLD_TARGET:
                     if (Vehicle* vk = me->GetVehicleKit())
                         for( uint8 i = 0; i < 4; ++i )
-                            if (Unit* snobold = vk->GetPassenger(i))
+                            if (Unit* snobold = vk->GetPassenger(i); snobold && !snobold->HasUnitState(UNIT_STATE_CASTING))
                             {
                                 GuidVector validPlayers;
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                                 {
+                                    // Players who can't carry a Snobold are still picked; the throw then falls short
                                     if (Player* p = itr->GetSource())
-                                        if (p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() && !p->IsGameMaster())
+                                        if (p->IsAlive() && !p->IsGameMaster())
                                             validPlayers.push_back(p->GetGUID());
                                 }
 
                                 if (!validPlayers.empty())
                                     if (Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))))
                                     {
-                                        snobold->ChangeSeat(4); // switch to hand
+                                        // Untriggered so clients see the cast, as on retail. Its aura holds the Snobold in the
+                                        // hand and its expiry releases it, see SetGUID
+                                        snobold->CastSpell(me, SPELL_JUMP_TO_HAND, false);
                                         me->setAttackTimer(BASE_ATTACK, 3000);
                                         PlayerGUID = p->GetGUID();
-                                        events.RescheduleEvent(EVENT_RELEASE_SNOBOLD, 2500ms);
                                     }
 
                                 break;
                             }
                     events.Repeat(16s, 24s);
                     break;
-                case EVENT_RELEASE_SNOBOLD:
-                    {
-                        me->CastSpell(me, SPELL_RISING_ANGER, true);
-                        Player* p = ObjectAccessor::GetPlayer(*me, PlayerGUID);
-                        if (p && p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle())
-                        {
-                            if (Vehicle* vk = me->GetVehicleKit())
-                                if (Unit* snobold = vk->GetPassenger(4))
-                                {
-                                    if (snobold->IsCreature())
-                                    {
-                                        CAST_AI(npc_snobold_vassal::npc_snobold_vassalAI, snobold->ToCreature()->AI())->TargetGUID = PlayerGUID;
-                                        snobold->ToCreature()->AI()->AttackStart(p);
-                                    }
-                                    //Talk(EMOTE_SNOBOLLED);
-                                    p->CastSpell(p, SPELL_CHANGE_VEHICLE, true);
-                                    snobold->EnterVehicle(p, 0);
-                                    //snobold->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                                }
-                        }
-                        else if (Vehicle* vk = me->GetVehicleKit())
-                        {
-                            events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 5s);
-                            if (Unit* snobold = vk->GetPassenger(4))
-                                if (snobold->IsCreature())
-                                {
-                                    bool needDespawn = true;
-                                    for( uint8 i = 0; i < 4; ++i )
-                                        if (!vk->GetPassenger(i))
-                                        {
-                                            snobold->ChangeSeat(i);
-                                            needDespawn = false;
-                                            break;
-                                        }
-                                    if (needDespawn)
-                                        snobold->ToCreature()->DespawnOrUnsummon();
-                                }
-                        }
-                        PlayerGUID.Clear();
-                    }
-                    break;
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        void SetGUID(ObjectGuid const& guid, int32 id) override
+        {
+            if (id != DATA_RELEASED_SNOBOLD)
+                return;
+
+            Creature* snobold = ObjectAccessor::GetCreature(*me, guid);
+            if (!snobold)
+                return;
+
+            // Retail drops the Snobold 23 yards ahead of Gormok at hand height, even when he dies. The server
+            // places a hand passenger at Gormok's own position, so measure from him.
+            Position hand = me->GetPosition();
+            hand.m_positionZ += 6.5f;
+            Position dest = hand;
+            dest.m_positionX += 23.0f * std::cos(me->GetOrientation());
+            dest.m_positionY += 23.0f * std::sin(me->GetOrientation());
+            me->GetMap()->GetMapCollisionData().GetStaticTree().GetObjectHitPos(hand.GetPositionX(), hand.GetPositionY(), hand.GetPositionZ(),
+                dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), dest.m_positionX, dest.m_positionY, dest.m_positionZ, -CONTACT_DISTANCE);
+
+            snobold->DisableSpline();
+            snobold->UpdatePosition(dest, true);
+
+            Player* p = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+            PlayerGUID.Clear();
+
+            if (!me->IsAlive())
+            {
+                snobold->GetMotionMaster()->MoveFall();
+                return;
+            }
+
+            // A Fire Bomb started from the hand would block Rising Anger
+            snobold->InterruptNonMeleeSpells(false);
+            snobold->CastSpell(snobold, SPELL_RISING_ANGER, false);
+
+            Vehicle* kit = p ? p->GetVehicleKit() : nullptr;
+            if (kit && p->IsAlive() && !kit->GetPassenger(0) && !p->IsMounted() && !p->GetVehicle())
+            {
+                snobold->EnterVehicle(p, 0);
+                snobold->AI()->SetGUID(p->GetGUID(), DATA_SNOBOLD_CARRIER);
+            }
+            else
+            {
+                snobold->GetMotionMaster()->MoveFall();
+                snobold->AI()->DoAction(ACTION_SNOBOLD_MISSED);
+            }
         }
 
         void JustDied(Unit* /*pKiller*/) override
@@ -472,6 +542,35 @@ public:
     };
 };
 
+// 66342 - Jump to Hand
+class spell_gormok_jump_to_hand : public AuraScript
+{
+    PrepareAuraScript(spell_gormok_jump_to_hand);
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
+        if (removeMode != AURA_REMOVE_BY_EXPIRE && removeMode != AURA_REMOVE_BY_DEATH)
+            return;
+
+        Unit* snobold = GetCaster();
+        Creature* gormok = GetTarget()->ToCreature();
+        if (!snobold || !snobold->IsAlive() || !gormok)
+            return;
+
+        // The ride aura from the Snobold's previous seat is still on Gormok; removing it later would eject the Snobold from its carrier
+        if (removeMode == AURA_REMOVE_BY_EXPIRE)
+            gormok->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, snobold->GetGUID());
+
+        gormok->AI()->SetGUID(snobold->GetGUID(), DATA_RELEASED_SNOBOLD);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gormok_jump_to_hand::HandleRemove, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 /***********
 ** ACIDMAW AND DREADSCALE
 ***********/
@@ -482,6 +581,7 @@ enum JormungarSpells
     SPELL_ACID_SPEW                     = 66818,
     SPELL_PARALYTIC_SPRAY               = 66901,
     SPELL_PARALYTIC_BITE                = 66824,
+    SPELL_PARALYSIS                     = 66830,
 
     SPELL_FIRE_SPIT                     = 66796,
     SPELL_MOLTEN_SPEW                   = 66821,
@@ -493,10 +593,14 @@ enum JormungarSpells
     SPELL_SWEEP_0                       = 66794,
     SPELL_SWEEP_1                       = 67646,
 
-    SPELL_EMERGE_0                      = 66947,
-    SPELL_SUBMERGE_0                    = 53421,
+    SPELL_SUBMERGE_STATIONARY           = 66936,
+    SPELL_SUBMERGE_MOBILE               = 66948,
+    SPELL_EMERGE_STATIONARY             = 66947,
+    SPELL_EMERGE_MOBILE                 = 66949,
     SPELL_ENRAGE                        = 68335,
     SPELL_CHURNING_GROUND               = 66969,
+    SPELL_CHURNING_GROUND_STATIONARY    = 68302,
+    SPELL_HATE_TO_ZERO                  = 63984,
 };
 
 enum Model
@@ -510,13 +614,22 @@ enum Model
 enum JormungarNPCs
 {
     NPC_SLIME_POOL                      = 35176,
+    NPC_MOBILE_BURROW_TARGET            = 35226,
+};
+
+enum JormungarPoints
+{
+    POINT_BURROW                        = 1,
 };
 
 enum JormungarEvents
 {
     EVENT_SUBMERGE = 1,
-    EVENT_EMERGE,
+    EVENT_SUBMERGED,
+    EVENT_CHURN_GROUND,
     EVENT_MOVE_UNDERGROUND,
+    EVENT_EMERGE,
+    EVENT_EMERGED,
 
     EVENT_SPELL_SPRAY,
     EVENT_SPELL_SWEEP,
@@ -536,6 +649,8 @@ struct boss_jormungarAI : public ScriptedAI
     InstanceScript* pInstance;
     EventMap events;
     bool bIsStationary;
+    bool Submerged = false;
+    Position BurrowDest;
 
     uint32 _SPELL_BITE;
     uint32 _SPELL_SPEW;
@@ -550,14 +665,14 @@ struct boss_jormungarAI : public ScriptedAI
         switch (param)
         {
             case -1:
-                if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                if (!Submerged)
                     events.RescheduleEvent(EVENT_SUBMERGE, 1500ms);
                 break;
             case -2:
-                if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                if (Submerged)
                     bIsStationary = true; // it will come out mobile soon
                 else if (me->GetDisplayId() == _MODEL_STATIONARY )
-                    events.RescheduleEvent(EVENT_SUBMERGE, 1s);
+                    events.RescheduleEvent(EVENT_SUBMERGE, 2400ms);
                 else
                     events.CancelEvent(EVENT_SUBMERGE);
                 me->CastSpell(me, SPELL_ENRAGE, true);
@@ -586,10 +701,25 @@ struct boss_jormungarAI : public ScriptedAI
             events.RescheduleEvent(EVENT_SUBMERGE, 45s, 50s);
     }
 
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        if (me->GetDisplayId() == _MODEL_STATIONARY)
+            DoCastSelf(SPELL_CHURNING_GROUND_STATIONARY);
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         me->setActive(true);
         ScheduleEvents();
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE || id != POINT_BURROW)
+            return;
+
+        if (me->HasAura(SPELL_SUBMERGE_STATIONARY) || me->HasAura(SPELL_SUBMERGE_MOBILE))
+            events.RescheduleEvent(EVENT_EMERGE, 400ms);
     }
 
     void JustReachedHome() override
@@ -627,8 +757,18 @@ struct boss_jormungarAI : public ScriptedAI
             case EVENT_SUBMERGE:
                 {
                     bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    me->CastSpell(me, SPELL_SUBMERGE_0, false);
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveIdle();
+                    Submerged = true;
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    DoCastSelf(bIsStationary ? SPELL_SUBMERGE_STATIONARY : SPELL_SUBMERGE_MOBILE);
+
+                    float angle = me->GetAngle(Locs[LOC_CENTER].GetPositionX() + urand(0, 20) - 10.0f, Locs[LOC_CENTER].GetPositionY() + urand(0, 20) - 10.0f);
+                    float dist = urand(10, 35);
+                    BurrowDest.Relocate(Locs[LOC_CENTER].GetPositionX() + std::cos(angle) * dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * dist, me->GetPositionZ());
+                    me->SummonCreature(NPC_MOBILE_BURROW_TARGET, BurrowDest, TEMPSUMMON_TIMED_DESPAWN, 32000);
 
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if (pInstance)
@@ -636,51 +776,46 @@ struct boss_jormungarAI : public ScriptedAI
                             c->AI()->DoAction(-1);
 
                     events.Reset();
-                    events.RescheduleEvent(EVENT_MOVE_UNDERGROUND, 2500ms);
+                    events.RescheduleEvent(EVENT_SUBMERGED, bIsStationary ? 2s : 750ms);
+                    events.RescheduleEvent(EVENT_CHURN_GROUND, bIsStationary ? 2400ms : 1150ms);
                 }
+                break;
+            case EVENT_SUBMERGED:
+                me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                break;
+            case EVENT_CHURN_GROUND:
+                me->RemoveAurasDueToSpell(SPELL_CHURNING_GROUND_STATIONARY);
+                DoCastSelf(SPELL_CHURNING_GROUND);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                events.RescheduleEvent(EVENT_MOVE_UNDERGROUND, 1200ms);
                 break;
             case EVENT_MOVE_UNDERGROUND:
-                {
-                    float angle = me->GetAngle(Locs[LOC_CENTER].GetPositionX() + urand(0, 20) - 10.0f, Locs[LOC_CENTER].GetPositionY() + urand(0, 20) - 10.0f), dist = urand(10, 35);
-                    if (Creature* c = me->SummonCreature(NPC_WORLD_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 6000))
-                    {
-                        c->SetSpeed(MOVE_RUN, 2.5f);
-                        c->CastSpell(c, SPELL_CHURNING_GROUND, true);
-                        c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
-                        c->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ());
-                    }
-                    me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
-                    me->StopMovingOnCurrentPos();
-                    DoResetThreatList();
-
-                    events.RescheduleEvent(EVENT_EMERGE, 6s);
-                }
+                me->GetMotionMaster()->MovePoint(POINT_BURROW, BurrowDest, FORCED_MOVEMENT_NONE, 12.0f);
+                // Emerges where it stands if the burrow never reports arriving
+                events.RescheduleEvent(EVENT_EMERGE, 8s);
                 break;
             case EVENT_EMERGE:
-                {
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveIdle();
-                    me->StopMoving();
-                    if (bIsStationary)
-                    {
-                        me->SetNativeDisplayId(_MODEL_MOBILE);
-                        me->SetCombatMovement(true);
-                        if (Unit* victim = me->GetVictim())
-                            me->GetMotionMaster()->MoveChase(victim);
-                    }
-                    else
-                    {
-                        me->SetNativeDisplayId(_MODEL_STATIONARY);
-                        me->SetCombatMovement(false);
-                    }
-                    me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
-                    me->CastSpell(me, SPELL_EMERGE_0, false);
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    ScheduleEvents();
-                }
+                me->SetNativeDisplayId(bIsStationary ? _MODEL_MOBILE : _MODEL_STATIONARY);
+                me->SetCombatMovement(bIsStationary);
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_STATIONARY);
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_MOBILE);
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
+                DoCastSelf(bIsStationary ? SPELL_EMERGE_MOBILE : SPELL_EMERGE_STATIONARY);
+                events.RescheduleEvent(EVENT_EMERGED, bIsStationary ? 3650ms : 4100ms);
+                break;
+            case EVENT_EMERGED:
+                me->RemoveAurasDueToSpell(SPELL_CHURNING_GROUND);
+                if (me->GetDisplayId() == _MODEL_STATIONARY)
+                    DoCastSelf(SPELL_CHURNING_GROUND_STATIONARY);
+                DoCastAOE(SPELL_HATE_TO_ZERO);
+                Submerged = false;
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetReactState(REACT_AGGRESSIVE);
+                ScheduleEvents();
                 break;
             case EVENT_SPELL_SPRAY:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
                     me->CastSpell(target, _SPELL_SPRAY, false);
                 events.Repeat(20s);
                 break;
@@ -704,7 +839,7 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
         }
 
-        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        if (!Submerged)
         {
             if (me->GetDisplayId() == _MODEL_STATIONARY )
                 DoSpellAttackIfReady(_SPELL_SPIT);
@@ -789,6 +924,11 @@ class spell_jormungars_paralytic_toxin_aura : public AuraScript
 {
     PrepareAuraScript(spell_jormungars_paralytic_toxin_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PARALYSIS });
+    }
+
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* caster = GetCaster();
@@ -797,9 +937,39 @@ class spell_jormungars_paralytic_toxin_aura : public AuraScript
                 acidmaw->AI()->Talk(WHISPER_PARALYTIC_TOXIN, GetTarget());
     }
 
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_PARALYSIS);
+    }
+
+    // Keeps the accumulated slow across amount recalculations
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+    {
+        if (!canBeRecalculated)
+            amount = aurEff->GetAmount();
+
+        canBeRecalculated = false;
+    }
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        AuraEffect* slow = GetEffect(EFFECT_0);
+        if (!slow)
+            return;
+
+        int32 newAmount = std::max(slow->GetAmount() - 10, -100);
+        slow->ChangeAmount(newAmount);
+
+        if (newAmount == -100 && !GetTarget()->HasAura(SPELL_PARALYSIS))
+            GetTarget()->CastSpell(GetTarget(), SPELL_PARALYSIS, true, nullptr, slow, GetCasterGUID());
+    }
+
     void Register() override
     {
         AfterEffectApply += AuraEffectApplyFn(spell_jormungars_paralytic_toxin_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_jormungars_paralytic_toxin_aura::OnRemove, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_jormungars_paralytic_toxin_aura::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_jormungars_paralytic_toxin_aura::HandlePeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1148,6 +1318,7 @@ void AddSC_boss_northrend_beasts()
 {
     new boss_gormok();
     new npc_snobold_vassal();
+    RegisterSpellScript(spell_gormok_jump_to_hand);
 
     new boss_acidmaw();
     new boss_dreadscale();
