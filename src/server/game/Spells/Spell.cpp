@@ -8377,7 +8377,10 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
             if (GameObject const* gobCaster = GetGameObjectCaster())
             {
-                if (gobCaster->GetGOInfo()->IsIgnoringLOSChecks())
+                // A trap without an owner has no height to see from, so the floor under its target would block it.
+                // An owned trap sees from its owner's height (GetLOSCollisionHeight), so a wall still blocks it.
+                if (gobCaster->GetGOInfo()->IsIgnoringLOSChecks() ||
+                    (gobCaster->GetGoType() == GAMEOBJECT_TYPE_TRAP && !gobCaster->GetOwnerGUID()))
                 {
                     return true;
                 }

@@ -656,8 +656,6 @@ struct GameObjectTemplate
             return goober.losOK == 0;
         case GAMEOBJECT_TYPE_FLAGSTAND:
             return flagstand.losOK == 0;
-        case GAMEOBJECT_TYPE_TRAP:
-            return true;
         default:
             return false;
         }
