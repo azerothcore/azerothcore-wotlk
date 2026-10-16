@@ -2016,7 +2016,8 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     // It isn't possible in invisibility to detect something that can't detect the invisible object
     // (it's at least true for spell: 66)
     // It seems like that only Units are affected by this check (couldn't see arena doors with preparation invisibility)
-    if (obj->ToUnit())
+    // and only unit seers are subject to it - invisible trap gameobjects must still "see" their victims to cast at them
+    if (ToUnit() && obj->ToUnit())
     {
         // Permanently invisible creatures should be able to engage non-invisible targets.
         // ex. Skulking Witch (20882) / Greater Invisibility (16380)
@@ -3540,7 +3541,7 @@ SpellMissInfo WorldObject::MagicSpellHitResult(Unit* victim, SpellInfo const* sp
     Unit const* unitCaster = ToUnit();
 
     // vehicles cant miss
-    if (unitCaster && unitCaster->IsVehicle())
+    if (unitCaster && unitCaster->IsCreature() && unitCaster->IsVehicle())
         return SPELL_MISS_NONE;
 
     // Spells with SPELL_ATTR3_ALWAYS_HIT will additionally fully ignore
@@ -4015,8 +4016,15 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
     if (Unit* owner = GetCharmerOrOwnerUnit())
         return unitTarget && owner->_IsValidAttackTarget(unitTarget, bySpell, this);
 
-    // ownerless world object: faction reaction decides
-    return unitTarget && IsHostileTo(unitTarget);
+    if (!unitTarget)
+        return false;
+
+    // ownerless world object: a creature needs a hostile side, a player only needs neither side friendly,
+    // so faction 0 traps (no faction template, always neutral) still hit players
+    if (!unitTarget->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+        return IsHostileTo(unitTarget) || unitTarget->IsHostileTo(this);
+
+    return !IsFriendlyTo(unitTarget) && !unitTarget->IsFriendlyTo(this);
 }
 
 bool WorldObject::IsValidAssistTarget(WorldObject const* target, SpellInfo const* bySpell /*= nullptr*/) const
