@@ -17,7 +17,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20610, 0, 9, 10, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Doe - On Aggro - Say Line 0'),
 (20610, 0, 10, 11, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Doe - On Aggro - Store Targetlist'),
 (20610, 0, 11, 12, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 1, 0, 0, 0, 0, 0, 9, 20777, 0, 35, 1, 0, 0, 0, 0, 'Talbuk Doe - On Aggro - Send Target 1 (Talbuk Sire)'),
-(20610, 0, 12, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 9, 20777, 0, 35, 1, 0, 0, 0, 0, 'Talbuk Doe - On Aggro - Set Data 0 1 (Talbuk Sire)');
+(20610, 0, 12, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 1, 0, 0, 0, 0, 0, 9, 20777, 0, 35, 1, 0, 0, 0, 0, 'Talbuk Doe - On Aggro - Do Action ID 1 (Talbuk Sire)');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 20777 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -30,5 +30,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20777, 0, 6, 7, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 41, 10000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Sire - On Spell Hit - Despawn'),
 (20777, 0, 7, 8, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 18, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Sire - On Spell Hit - Set Unit Flags'),
 (20777, 0, 8, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Sire - On Spell Hit - Set Bytes0'),
-(20777, 0, 9, 10, 38, 0, 100, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Sire - On Data Set 0 1 - Say Line 1'),
-(20777, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Sire - On Data Set 0 1 - Start Attack Stored Target 1');
+(20777, 0, 9, 10, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Sire - On Action 1 Done - Say Line 1'),
+(20777, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Talbuk Sire - On Action 1 Done - Start Attack Stored Target 1');
