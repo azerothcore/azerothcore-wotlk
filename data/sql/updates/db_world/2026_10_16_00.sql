@@ -1,3 +1,4 @@
+-- DB update 2026_10_15_07 -> 2026_10_16_00
 --
 -- Barrett Ramsey is summoned per stage instead of standing in the arena
 DELETE FROM `creature` WHERE (`id` = 34816) AND (`guid` = 202957);
