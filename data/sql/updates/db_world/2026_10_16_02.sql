@@ -1,3 +1,4 @@
+-- DB update 2026_10_16_01 -> 2026_10_16_02
 -- Alterac Valley graveyard defender tiers: Seasoned Defender and Seasoned Guardsman are Alliance and pay
 -- Frostwolf Clan, the Veteran and Champion Defenders and Guardians pay like the lower tiers, in every bracket
 DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (13324, 22687, 32064, 37385, 13326, 22714, 32062, 37383, 13331, 22588, 32125, 37450, 13332, 22589, 32126, 37451, 13421, 22609, 31933, 37251, 13422, 22608, 31932, 37250);

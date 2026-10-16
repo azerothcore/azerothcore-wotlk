@@ -1,3 +1,4 @@
+-- DB update 2026_10_16_02 -> 2026_10_16_03
 -- Alterac Valley: the 61-70, 71-79 and 80 brackets use difficulty_entry_1, _2 and _3, which had no kill reputation.
 -- Each gets its base creature's row.
 -- 61-70
