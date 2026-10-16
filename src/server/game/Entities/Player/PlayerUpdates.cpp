@@ -193,12 +193,6 @@ void Player::Update(uint32 p_time)
                 {
                     m_swingErrorMsg = 0; // reset swing error state
 
-                    // prevent base and off attack in same time, delay attack at
-                    // 0.2 sec
-                    if (HasOffhandWeaponForAttack())
-                        if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                            setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-
                     // do attack
                     AttackerStateUpdate(victim, BASE_ATTACK);
                     resetAttackTimer(BASE_ATTACK);
@@ -216,11 +210,6 @@ void Player::Update(uint32 p_time)
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
-                    // prevent base and off attack in same time, delay attack at
-                    // 0.2 sec
-                    if (getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
-                        setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
-
                     // do attack
                     AttackerStateUpdate(victim, OFF_ATTACK);
                     resetAttackTimer(OFF_ATTACK);
