@@ -488,8 +488,7 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (27567
 -- do most of the killing, and quest credit has to land anyway. The corpse timer the script also
 -- set is now the summonTime below. 27685 is not in a summon group - it is the ghoul the
 -- conscripts and the captains summon themselves with 49329.
-UPDATE `creature_template` SET `ScriptName` = '', `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (27531, 27685));
-UPDATE `creature_template` SET `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (27686, 27687));
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|2097152 WHERE (`entry` IN (27531, 27685, 27686, 27687));
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 27567);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -549,6 +548,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 --
 -- summonType 6 (TEMPSUMMON_CORPSE_TIMED_DESPAWN) with 60s: a wave stays until it is killed,
 -- then the corpse lingers a minute before it is cleaned up.
+-- The shrine garrison (group 6) never moves, so it is summoned with summonType 1 and 120s
+-- instead: one left alone leaves with the squad, and the next push cannot stack a second.
 -- move_type 1: the attackers run. Groups 1 and 3 legitimately share three spawn points.
 -- ==========================================================================
 DELETE FROM `creature_summon_groups` WHERE (`summonerId` IN (27567, 27751)) AND (`summonerType` = 0);
@@ -596,15 +597,15 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (27567, 0, 5, 27686, 3768.9658, 753.6746, 58.78656, 6.021385669708251953, 6, 60000, 'EAST - Geist - path 2768655'),
 (27567, 0, 5, 27686, 3772.746, 756.7438, 58.82063, 2.809980154037475585, 6, 60000, 'EAST - Geist - path 2768656'),
 -- group 6: SHRINE -- Abomination + 6 Geists + 2 Necromancers   (seen 3x; coordinates from 19:51:05.404 packet 52279)
-(27567, 0, 6, 27531, 3675.567, 866.78033, 56.26623, 3.857177734375, 6, 60000, 'SHRINE - Abom - path 2753160'),
-(27567, 0, 6, 27686, 3659.7483, 876.86786, 56.944252, 4.921828269958496093, 6, 60000, 'SHRINE - Geist - path 2768660'),
-(27567, 0, 6, 27686, 3664.7622, 876.08655, 56.73396, 4.677482128143310546, 6, 60000, 'SHRINE - Geist - path 2768661'),
-(27567, 0, 6, 27686, 3668.9622, 872.8576, 56.08941, 4.345870018005371093, 6, 60000, 'SHRINE - Geist - path 2768662'),
-(27567, 0, 6, 27686, 3681.2483, 859.9791, 58.60043, 3.525565147399902343, 6, 60000, 'SHRINE - Geist - path 2768663'),
-(27567, 0, 6, 27686, 3684.188, 855.4685, 59.003628, 3.193952560424804687, 6, 60000, 'SHRINE - Geist - path 2768664'),
-(27567, 0, 6, 27686, 3686.5127, 848.71344, 57.36397, 2.792526721954345703, 6, 60000, 'SHRINE - Geist - path 2768665'),
-(27567, 0, 6, 27687, 3666.8298, 880.2456, 57.150173, 4.625122547149658203, 6, 60000, 'SHRINE - Necro - path 2768760'),
-(27567, 0, 6, 27687, 3688.361, 857.3421, 58.671318, 3.246312379837036132, 6, 60000, 'SHRINE - Necro - path 2768761'),
+(27567, 0, 6, 27531, 3675.567, 866.78033, 56.26623, 3.857177734375, 1, 120000, 'SHRINE - Abom - path 2753160'),
+(27567, 0, 6, 27686, 3659.7483, 876.86786, 56.944252, 4.921828269958496093, 1, 120000, 'SHRINE - Geist - path 2768660'),
+(27567, 0, 6, 27686, 3664.7622, 876.08655, 56.73396, 4.677482128143310546, 1, 120000, 'SHRINE - Geist - path 2768661'),
+(27567, 0, 6, 27686, 3668.9622, 872.8576, 56.08941, 4.345870018005371093, 1, 120000, 'SHRINE - Geist - path 2768662'),
+(27567, 0, 6, 27686, 3681.2483, 859.9791, 58.60043, 3.525565147399902343, 1, 120000, 'SHRINE - Geist - path 2768663'),
+(27567, 0, 6, 27686, 3684.188, 855.4685, 59.003628, 3.193952560424804687, 1, 120000, 'SHRINE - Geist - path 2768664'),
+(27567, 0, 6, 27686, 3686.5127, 848.71344, 57.36397, 2.792526721954345703, 1, 120000, 'SHRINE - Geist - path 2768665'),
+(27567, 0, 6, 27687, 3666.8298, 880.2456, 57.150173, 4.625122547149658203, 1, 120000, 'SHRINE - Necro - path 2768760'),
+(27567, 0, 6, 27687, 3688.361, 857.3421, 58.671318, 3.246312379837036132, 1, 120000, 'SHRINE - Necro - path 2768761'),
 -- group 7: HORDE -- 4 Geists   (seen 3x; coordinates from 19:53:47.155 packet 57651)
 (27751, 0, 7, 27686, 3637.799, 1113.7489, 80.1781, 2.059488534927368164, 6, 60000, 'HORDE - Geist - path 2768670'),
 (27751, 0, 7, 27686, 3640.551, 1111.3931, 77.90086, 2.600540637969970703, 6, 60000, 'HORDE - Geist - path 2768671'),

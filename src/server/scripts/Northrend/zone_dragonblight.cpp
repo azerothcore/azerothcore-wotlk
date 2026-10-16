@@ -1435,7 +1435,7 @@ struct npc_ruby_strafe_bunny : public NullCreatureAI
         DoCastSelf(fire, true);
 
         // The patch goes down about six and a half seconds behind the fire.
-        _scheduler.Schedule(6500ms, [this](TaskContext /*context*/)
+        scheduler.Schedule(6500ms, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_SUMMON_DAHLIAS_TEARS, true);
         });
@@ -1443,11 +1443,8 @@ struct npc_ruby_strafe_bunny : public NullCreatureAI
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
-
-private:
-    TaskScheduler _scheduler;
 };
 
 class spell_ruby_arrow : public SpellScript
