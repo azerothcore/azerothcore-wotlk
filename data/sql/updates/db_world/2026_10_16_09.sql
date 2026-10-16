@@ -1,3 +1,4 @@
+-- DB update 2026_10_16_08 -> 2026_10_16_09
 --
 SET @CGUID := 52066;
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+4 AND `id` = 18855;
