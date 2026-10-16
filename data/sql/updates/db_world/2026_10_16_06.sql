@@ -1,3 +1,4 @@
+-- DB update 2026_10_16_05 -> 2026_10_16_06
 -- Pool of Blood: Mostly-eaten Bonescale Snapper for players not on Blood Is Thicker
 DELETE FROM `gameobject_loot_template` WHERE `Entry` = 27003 AND `Item` = 45907;
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
