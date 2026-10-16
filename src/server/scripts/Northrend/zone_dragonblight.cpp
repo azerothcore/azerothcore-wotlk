@@ -910,7 +910,8 @@ class spell_call_wintergarde_gryphon : public SpellScript
 
 // Both captains hold a pass below the temple with a formation of conscripts and call in Scourge
 // waves. Iskandar also marches his squad between the southern pass, the eastern pass and the
-// shrine, and the waves depend on where he stands; Drayzen never leaves his.
+// shrine, and the waves depend on where he stands; Drayzen never leaves his, and his Ruby
+// Keeper strafes on its own clock.
 
 enum HeatedBattleCaptainNpcs
 {
@@ -982,6 +983,9 @@ constexpr Seconds WAVE_INTERVAL = 50s;
 // The captain warns his line as the dragon spawns and the squad moves 10.5s later
 constexpr Milliseconds STRAFE_TO_MARCH_DELAY = 10500ms;
 
+// Drayzen's dragon ignores his waves: 199.1-199.3s between runs in every capture
+constexpr Seconds HORDE_STRAFE_INTERVAL = 199s;
+
 enum RubyStrafeNpcs
 {
     NPC_RUBY_KEEPER                 = 27530,
@@ -1003,7 +1007,7 @@ enum RubyStrafeLane : uint8
 {
     LANE_EAST_PASS                  = 0,
     LANE_SOUTH_PASS                 = 1,
-    LANE_SHRINE                     = 2,
+    LANE_HORDE_PASS                 = 2,    // Drayzen's, straight down over his line
     LANE_EMBERWYRM                  = 3
 };
 
@@ -1128,8 +1132,6 @@ private:
         {
             case MARCH_EAST_TO_SOUTH:
                 return LANE_EAST_PASS;
-            case MARCH_SOUTH_TO_SHRINE:
-                return LANE_SHRINE;
             case MARCH_SOUTH_TO_EAST:
             case MARCH_CAMP_TO_SOUTH:
             default:
@@ -1140,7 +1142,7 @@ private:
     void SummonStrafingDragon(RubyStrafeLane lane) const
     {
         // waypoint_data at (entry * 100) + lane: 2753000-2753002 for the Ruby Keeper's three
-        // lanes, 2628600 for the Emberwyrm's only one.
+        // lanes (two Alliance, one Horde), 2628600 for the Emberwyrm's only one.
         bool const emberwyrm = lane == LANE_EMBERWYRM;
         uint32 const entry = emberwyrm ? NPC_EMBERWYRM : NPC_RUBY_KEEPER;
         uint32 const pathId = entry * 100 + (emberwyrm ? 0 : lane);
@@ -1301,6 +1303,16 @@ private:
             return;
         }
 
+        if (!IsIskandar())
+        {
+            scheduler.Schedule(HORDE_STRAFE_INTERVAL, GROUP_STATION, [this](TaskContext context)
+            {
+                SummonStrafingDragon(LANE_HORDE_PASS);
+                Talk(SAY_DRAGON_STRAFE);
+                context.Repeat();
+            });
+        }
+
         // Three waves at a pass before the squad moves on. TODO: the real trigger is unknown.
         scheduler.Schedule(10s, GROUP_STATION, [this](TaskContext context)
         {
@@ -1328,7 +1340,7 @@ private:
         if (_station == STATION_EAST_PASS)
             return MARCH_EAST_TO_SOUTH;
 
-        // TODO: what picks the shrine is unknown - the capture's one push had no strafe first.
+        // TODO: what picks the shrine is unknown.
         return roll_chance_i(50) ? MARCH_SOUTH_TO_SHRINE : MARCH_SOUTH_TO_EAST;
     }
 
@@ -1344,6 +1356,14 @@ private:
             }
 
             HeatedBattleCaptainMarch const march = NextMarch();
+
+            // None of the three captured pushes had a strafe before it.
+            if (march == MARCH_SOUTH_TO_SHRINE)
+            {
+                BeginMarch(march);
+                return;
+            }
+
             SummonStrafingDragon(LaneFor(march));
             Talk(SAY_DRAGON_STRAFE);
 

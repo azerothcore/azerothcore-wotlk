@@ -522,6 +522,17 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (27567, 5, 4, 'Make way!  A wyrm is coming to our aid!', 14, 0, 100, 0, 0, 0, 26863, 0, 'Captain Iskandar - Ruby Dragon Strafe'),
 (27567, 5, 5, 'Red dragon incoming!', 14, 0, 100, 0, 0, 0, 26864, 0, 'Captain Iskandar - Ruby Dragon Strafe');
 
+-- Drayzen only ever says the strafe lines (all six in the sniffs), kept in group 5 so both
+-- captains share SAY_DRAGON_STRAFE.
+DELETE FROM `creature_text` WHERE (`CreatureID` = 27751);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(27751, 5, 0, 'Incoming!  Get your heads down!', 14, 0, 100, 0, 0, 0, 26859, 0, 'Captain Drayzen - Ruby Dragon Strafe'),
+(27751, 5, 1, 'Heads up!  Strafe incoming!', 14, 0, 100, 0, 0, 0, 26860, 0, 'Captain Drayzen - Ruby Dragon Strafe'),
+(27751, 5, 2, 'Fire on the way, clear the field!', 14, 0, 100, 0, 0, 0, 26861, 0, 'Captain Drayzen - Ruby Dragon Strafe'),
+(27751, 5, 3, 'Burn, you fiends!', 14, 0, 100, 0, 0, 0, 26862, 0, 'Captain Drayzen - Ruby Dragon Strafe'),
+(27751, 5, 4, 'Make way!  A wyrm is coming to our aid!', 14, 0, 100, 0, 0, 0, 26863, 0, 'Captain Drayzen - Ruby Dragon Strafe'),
+(27751, 5, 5, 'Red dragon incoming!', 14, 0, 100, 0, 0, 0, 26864, 0, 'Captain Drayzen - Ruby Dragon Strafe');
+
 -- ==========================================================================
 -- SCOURGE ATTACK WAVES
 -- Summoned by the captains, one creature_summon_groups group per wave.
@@ -824,7 +835,7 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_ruby_strafe_bunny' WHERE (`en
 -- at speed_run 2.571428 for both entries - 18 yards a second, the RunSpeed the capture shows on
 -- every strafing dragon. Note that AC times a catmullrom spline as arc over velocity, so at 18 a
 -- run takes about a sixth longer than the durations the capture recorded (21540ms east, 25331ms
--- south, 32448ms shrine, 42361ms Emberwyrm); the dragon is despawned by the waypoint-ended row
+-- south, 32448ms Horde, 42361ms Emberwyrm); the dragon is despawned by the waypoint-ended row
 -- below rather than on a clock, so it always leaves exactly when its line runs out.
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2753000 AND 2753009;
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN 2628600 AND 2628609;
@@ -847,7 +858,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (2753001, 6, 3663.3264, 888.3453, 110.6812, 1, 1),
 (2753001, 7, 3658.1768, 1007.1526, 193.2367, 1, 1),
 
--- path 2753002 -- Ruby Keeper - shrine lane   (32448 ms, seen 2x)
+-- path 2753002 -- Ruby Keeper - Horde pass lane, Captain Drayzen's   (32448 ms, 37 runs in 24 sniffs)
+-- Not the shrine push: it flies straight down over Drayzen's line, he calls it within a second
+-- of every create, and it runs every 199.2s whatever Iskandar is doing.
 (2753002, 1, 3623.5344, 1366.4695, 209.6484, 1, 1),
 (2753002, 2, 3626.9695, 1345.0223, 193.3635, 1, 1),
 (2753002, 3, 3630.4045, 1323.5752, 177.0786, 1, 1),
@@ -878,7 +891,7 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = 26286
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (27530, 0, 4, 0, 109, 0, 100, 0, 0, 2753000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On East Pass Strafe Ended - Despawn'),
 (27530, 0, 5, 0, 109, 0, 100, 0, 0, 2753001, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On South Pass Strafe Ended - Despawn'),
-(27530, 0, 6, 0, 109, 0, 100, 0, 0, 2753002, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On Shrine Strafe Ended - Despawn'),
+(27530, 0, 6, 0, 109, 0, 100, 0, 0, 2753002, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruby Keeper - On Horde Pass Strafe Ended - Despawn'),
 (26286, 0, 0, 0, 109, 0, 100, 0, 0, 2628600, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Emberwyrm - On Strafe Ended - Despawn');
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (49083, 49210, 49080, 49211));
