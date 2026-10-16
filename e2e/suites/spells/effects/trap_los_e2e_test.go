@@ -132,10 +132,13 @@ func TestTrap_EveryTrapAffectsItsVictimOnAnyFloor(t *testing.T) {
 		t.Run(spot.name, func(t *testing.T) {
 			spot.place(t, hunter)
 			spot.place(t, placer)
-			clearSpot(t, placer)
+			spawned := clearSpot(t, placer)
 
 			for _, trap := range trapsToTrip {
 				t.Run(trap.name, func(t *testing.T) {
+					// A creature of the spot that came into sight late is killed before it can
+					// walk onto the trap.
+					killLiving(t, placer, spawned, map[uint64]struct{}{})
 					tripTrap(t, hunter, placer, trap, &lastCast)
 				})
 			}
@@ -179,11 +182,9 @@ func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToT
 	time.Sleep(time.Until(lastCast.Add(trapGlobalCooldown)))
 	hunter.CastMust(t, trap.spell, 0, 10*time.Second)
 	*lastCast = time.Now()
-	trapGO := waitTrapGO(placer, trap.gameObject, true, 5*time.Second)
-	if trapGO == 0 {
-		e2eharness.Preconditionf(t, "%s Trap GO %d never appeared", trap.name, trap.gameObject)
-	}
 
+	// Laid out of combat, the trap is armed at once and can fire and despawn before the
+	// placer ever sees it, so its effect is checked first.
 	deadline := time.Now().Add(6 * time.Second)
 	for time.Now().Before(deadline) {
 		if landed() {
@@ -193,56 +194,76 @@ func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToT
 		time.Sleep(40 * time.Millisecond)
 	}
 	// The trap despawns once it has cast; one still standing never triggered.
-	if waitTrapGO(placer, trap.gameObject, false, 2*time.Second) != 0 {
+	if trapGO := waitTrapGO(placer, trap.gameObject, false, 2*time.Second); trapGO != 0 {
 		e2eharness.Preconditionf(t, "%s Trap 0x%X never triggered on dummy 0x%X", trap.name, trapGO, dummy)
 	}
-	e2eharness.Assertf(t, "%s Trap 0x%X fired and despawned but its effect never reached dummy 0x%X",
-		trap.name, trapGO, dummy)
+	// The effect can land while the trap despawns.
+	if landed() {
+		t.Logf("PASS %s Trap affected dummy 0x%X", trap.name, dummy)
+		return
+	}
+	e2eharness.Assertf(t, "%s Trap %d fired and despawned but its effect never reached dummy 0x%X",
+		trap.name, trap.gameObject, dummy)
 }
 
 // clearSpot kills every living creature spawned within trapLOSClearRadius of the bot, so
-// the dummy is the only thing a trap there can fire on. Dungeon instances are private to
-// the test's group, so nothing outside the test sees it.
-func clearSpot(t *testing.T, bot *e2eharness.ScenarioBot) {
+// the dummy is the only thing a trap there can fire on, and returns their entries. Dungeon
+// instances are private to the test's group, so nothing outside the test sees it.
+func clearSpot(t *testing.T, bot *e2eharness.ScenarioBot) []uint32 {
 	t.Helper()
 	x, y, _, mapID := bot.Pos()
 	rows, err := bot.WorldDB.Query(
-		`SELECT DISTINCT id FROM creature WHERE map = ? AND POW(position_x - ?, 2) + POW(position_y - ?, 2) < ?`,
+		`SELECT id, COUNT(*) FROM creature WHERE map = ? AND spawnMask & 1 AND phaseMask & 1
+			AND POW(position_x - ?, 2) + POW(position_y - ?, 2) < ? GROUP BY id`,
 		mapID, x, y, trapLOSClearRadius*trapLOSClearRadius)
 	if err != nil {
 		e2eharness.HarnessFailf(t, "query creatures near %.1f, %.1f: %v", x, y, err)
 	}
 	var entries []uint32
+	spawns := 0
 	for rows.Next() {
 		var entry uint32
-		if err := rows.Scan(&entry); err != nil {
+		var count int
+		if err := rows.Scan(&entry, &count); err != nil {
 			_ = rows.Close()
 			e2eharness.HarnessFailf(t, "scan creature entry: %v", err)
 		}
 		entries = append(entries, entry)
+		spawns += count
 	}
 	_ = rows.Close()
 	if len(entries) == 0 {
+		return nil
+	}
+	// The object cache fills in over the first moments after a teleport, one creature at a
+	// time and slower on a loaded host, so keep sweeping until as many have been killed as
+	// are spawned here: one left alive can attack the hunter and stand on the trap, which
+	// then fires on it rather than the dummy.
+	killed := map[uint64]struct{}{}
+	for deadline := time.Now().Add(10 * time.Second); len(killed) < spawns && time.Now().Before(deadline); {
+		killLiving(t, bot, entries, killed)
+		time.Sleep(100 * time.Millisecond)
+	}
+	bot.FlushWorld(t)
+	t.Logf("cleared %d of %d creatures spawned around %.1f, %.1f (map %d)", len(killed), spawns, x, y, mapID)
+	return entries
+}
+
+// killLiving kills the living creatures of entries in bot's sight that are not in killed,
+// and adds them to it.
+func killLiving(t *testing.T, bot *e2eharness.ScenarioBot, entries []uint32, killed map[uint64]struct{}) {
+	t.Helper()
+	if len(entries) == 0 {
 		return
 	}
-	// The object cache fills in over the first moments after a teleport.
-	var nearby []e2eharness.UnitSnap
-	deadline := time.Now().Add(5 * time.Second)
-	for len(nearby) == 0 && time.Now().Before(deadline) {
-		time.Sleep(100 * time.Millisecond)
-		nearby = bot.UnitsByEntry(trapLOSClearRadius+10, entries...)
-	}
-	killed := 0
-	for _, u := range nearby {
-		if u.Health == 0 || u.Entry == trapLOSDummy {
+	for _, u := range bot.UnitsByEntry(trapLOSClearRadius+10, entries...) {
+		if _, done := killed[u.GUID]; done || u.Health == 0 || u.Entry == trapLOSDummy {
 			continue
 		}
 		_ = bot.World.SetTarget(u.GUID)
 		bot.GM(t, ".die")
-		killed++
+		killed[u.GUID] = struct{}{}
 	}
-	bot.FlushWorld(t)
-	t.Logf("cleared %d creatures around %.1f, %.1f (map %d)", killed, x, y, mapID)
 }
 
 // waitTrapGO waits for a trap GameObject to be present (want=true, returns its GUID) or
