@@ -194,6 +194,11 @@ func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToT
 	if trapGO := waitTrapGO(placer, trap.gameObject, false, 2*time.Second); trapGO != 0 {
 		e2eharness.Preconditionf(t, "%s Trap 0x%X never triggered on dummy 0x%X", trap.name, trapGO, dummy)
 	}
+	// The effect can land while the trap despawns.
+	if landed() {
+		t.Logf("PASS %s Trap affected dummy 0x%X", trap.name, dummy)
+		return
+	}
 	e2eharness.Assertf(t, "%s Trap %d fired and despawned but its effect never reached dummy 0x%X",
 		trap.name, trap.gameObject, dummy)
 }

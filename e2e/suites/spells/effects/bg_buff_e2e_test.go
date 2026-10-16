@@ -38,7 +38,7 @@ var bgBuffs = []bgBuff{
 // terrain, and where the Ulduar Antechamber teleporter stands, a floor known to block that ray.
 //
 // Oracle: each buff, walked into by a player, puts its aura on that player, and Restoration
-// then heals them by a tenth of their health.
+// then restores a tenth of their health and mana.
 func TestBattlegroundBuff_AppliesToPlayerOnAnyFloor(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells"},
@@ -48,7 +48,8 @@ func TestBattlegroundBuff_AppliesToPlayerOnAnyFloor(t *testing.T) {
 
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
 		Prefix: "BGBuff", Race: e2eharness.RaceHuman,
-		Class: e2eharness.ClassWarrior, Level: 80,
+		// A Paladin, for the mana Restoration restores.
+		Class: e2eharness.ClassPaladin, Level: 80,
 	})
 
 	// Spawn opens the world DB lazily and ties its Close to the calling subtest; opening it
@@ -90,6 +91,10 @@ func TestBattlegroundBuff_AppliesToPlayerOnAnyFloor(t *testing.T) {
 					_, full := bot.UnitHP(self)
 					bot.GM(t, fmt.Sprintf(".modify hp %d", full))
 					bot.GM(t, fmt.Sprintf(".damage %d", full/2))
+					// Nearly no mana: `.modify mana` sets current and maximum mana, then Arcane
+					// Intellect raises the maximum back up and leaves the current mana where it is.
+					bot.GM(t, ".modify mana 1")
+					bot.GM(t, ".aura 42995")
 
 					spawnID := bot.SpawnGameObject(t, buff.gameObject)
 					if at := spot.buffAt; at != nil {
@@ -106,6 +111,10 @@ func TestBattlegroundBuff_AppliesToPlayerOnAnyFloor(t *testing.T) {
 					if hpBefore == 0 || hpBefore >= maxHP {
 						e2eharness.Preconditionf(t, "bot health %d/%d after .damage, cannot see a heal", hpBefore, maxHP)
 					}
+					manaBefore, maxMana := bot.PlayerPower()
+					if manaBefore+maxMana/10 > maxMana {
+						e2eharness.Preconditionf(t, "bot mana %d/%d, cannot see a tenth restored", manaBefore, maxMana)
+					}
 
 					bot.GM(t, ".gm off")
 					bot.FlushWorld(t)
@@ -119,20 +128,29 @@ func TestBattlegroundBuff_AppliesToPlayerOnAnyFloor(t *testing.T) {
 						time.Sleep(50 * time.Millisecond)
 					}
 
-					// Each Restoration tick restores 10% of maximum health, far above regeneration.
+					// Each Restoration tick, one a second, restores 10% of maximum health and mana,
+					// far above what regeneration gives in the same time.
 					if buff.spell == 23493 {
-						healed := hpBefore + maxHP/10
-						for hp, _ := bot.UnitHP(self); hp < healed; hp, _ = bot.UnitHP(self) {
-							if time.Now().After(deadline) {
+						tickDeadline := time.Now().Add(3 * time.Second)
+						for hp, _ := bot.UnitHP(self); hp < hpBefore+maxHP/10; hp, _ = bot.UnitHP(self) {
+							if time.Now().After(tickDeadline) {
 								e2eharness.Assertf(t, "Restoration aura on the player at %s but health only went %d -> %d of %d",
 									spot.name, hpBefore, hp, maxHP)
 							}
 							time.Sleep(50 * time.Millisecond)
 						}
+						for mana, _ := bot.PlayerPower(); mana < manaBefore+maxMana/10; mana, _ = bot.PlayerPower() {
+							if time.Now().After(tickDeadline) {
+								e2eharness.Assertf(t, "Restoration aura on the player at %s but mana only went %d -> %d of %d",
+									spot.name, manaBefore, mana, maxMana)
+							}
+							time.Sleep(50 * time.Millisecond)
+						}
 					}
 					hp, _ := bot.UnitHP(self)
-					t.Logf("PASS %s buff put aura %d on the player at %s (health %d -> %d of %d)",
-						buff.name, buff.spell, spot.name, hpBefore, hp, maxHP)
+					mana, _ := bot.PlayerPower()
+					t.Logf("PASS %s buff put aura %d on the player at %s (health %d -> %d of %d, mana %d -> %d of %d)",
+						buff.name, buff.spell, spot.name, hpBefore, hp, maxHP, manaBefore, mana, maxMana)
 				})
 			}
 		})
