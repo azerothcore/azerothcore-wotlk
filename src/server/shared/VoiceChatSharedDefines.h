@@ -90,7 +90,7 @@ struct VoiceChatServerPktHeader
     uint16 size;
     uint8 cmd;
 
-    char const* data() const { return reinterpret_cast<const char*>(this); }
+    char const* data() const { return reinterpret_cast<char const*>(this); }
     std::size_t headerSize() const { return sizeof(VoiceChatServerPktHeader); }
 
     // largest internal packet payload is a handful of bytes, allow some headroom
@@ -107,7 +107,7 @@ public:
     }
     explicit VoiceChatServerPacket(VoiceChatServerOpcodes opcode, size_t res = 200) : ByteBuffer(res), _opcode(opcode) { }
     // copy constructor
-    VoiceChatServerPacket(const VoiceChatServerPacket& packet) : ByteBuffer(packet), _opcode(packet._opcode)
+    VoiceChatServerPacket(VoiceChatServerPacket const& packet) : ByteBuffer(packet), _opcode(packet._opcode)
     {
     }
 

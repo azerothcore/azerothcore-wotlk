@@ -30,8 +30,8 @@ if (APPS_BUILD MATCHES "-only")
   if (APPS_BUILD STREQUAL "world-only")
     list(APPEND BUILD_APPS_WHITELIST worldserver)
   endif()
-  
-    if (APPS_BUILD STREQUAL "voice-only")
+
+  if (APPS_BUILD STREQUAL "voice-only")
     list(APPEND BUILD_APPS_WHITELIST voiceserver)
   endif()
 endif()
