@@ -4916,6 +4916,9 @@ Respawn.ForceCompatibilityMode = 0
 #
 #    VoiceChat.VoiceAddress
 #         IP that game client should use to connect to voice chat server, should be available for client
+#         IPv4 only. Game clients only accept voice data sent from exactly this address and
+#         VoiceChat.VoicePort, so the voice server must reply from it (see ClientBindIP in
+#         voiceserver.conf)
 #         Default: 127.0.0.1
 #
 #    VoiceChat.MaxConnectAttempts

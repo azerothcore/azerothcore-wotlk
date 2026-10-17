@@ -39,6 +39,11 @@ ClientPort = 3724
 #
 #    ClientBindIP
 #        Description: Bind the voice data (UDP) socket to IP/hostname.
+#        Important:   Game clients only accept voice data sent from exactly the address and port
+#                     the worldserver gives them (its "VoiceChat.VoiceAddress" and
+#                     "VoiceChat.VoicePort" settings). On a host with several addresses bind to
+#                     that address, replies may leave from another one otherwise and the clients
+#                     hear nothing. A NAT in front of the voice server must keep the port as is.
 #        Default:     "0.0.0.0" - (Bind to all IPs on the system)
 
 ClientBindIP = "0.0.0.0"
