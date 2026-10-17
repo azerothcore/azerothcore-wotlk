@@ -103,9 +103,9 @@ public:
     void Execute(PreparedStatementBase* stmt);
     void DirectExecute(PreparedStatementBase* stmt);
     PreparedQueryResult Query(PreparedStatementBase* stmt);
+    QueryCallback AsyncQuery(PreparedStatementBase* stmt);
 
     QueryCallback AsyncQuery(std::string_view sql);
-    QueryCallback AsyncQuery(PreparedStatementBase* stmt);
 
     SQLQueryHolderCallback DelayQueryHolder(std::shared_ptr<SQLQueryHolderBase> holder);
 
