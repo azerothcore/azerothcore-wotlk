@@ -424,8 +424,9 @@ private:
     // set when a moderator turns voice off, joining members would turn it on again otherwise
     bool _voiceTurnedOff;
     VoiceChatMembers _voiceMembers;
-    // user ids handed out while this voice session exists; intentionally not
-    // reused so the client does not display stale character names
+    // user ids handed out while this voice session has members; not reused
+    // before it is empty again, clients keep departed members in their session
+    // and would show a new member under the old one's name
     std::unordered_map<ObjectGuid, uint8> _voiceUserIds;
     uint8 _lastVoiceUserId;
 };

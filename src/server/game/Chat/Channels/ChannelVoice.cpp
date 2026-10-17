@@ -280,6 +280,14 @@ void Channel::RemoveVoiceChatMember(ObjectGuid guid)
 
     _voiceMembers.erase(userId);
 
+    // the members that left were told to leave the session, so once it is empty
+    // no client holds it any more and its user ids may be handed out again
+    if (_voiceMembers.empty())
+    {
+        _voiceUserIds.clear();
+        _lastVoiceUserId = 0;
+    }
+
     if (!_voiceMembers.empty() && !_voiceDeleting)
         SendVoiceRoster();
 
