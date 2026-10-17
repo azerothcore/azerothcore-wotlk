@@ -583,6 +583,7 @@ public:
 
     uint64 CalculateDelayMomentForDst() const;
     void RecalculateDelayMomentForDst();
+    void SetRuneState(uint8 value) { m_runesState = value; }
     bool IsNeedSendToClient(bool go) const;
 
     CurrentSpellTypes GetCurrentContainer() const;
