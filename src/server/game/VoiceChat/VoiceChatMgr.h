@@ -30,6 +30,7 @@
 #include <mutex>
 
 class Channel;
+class Player;
 class VoiceChatSocket;
 class WorldSession;
 
@@ -163,9 +164,10 @@ public:
     void JoinAvailableVoiceChatChannels(WorldSession* session);
 
     // change user state on the voiceserver
-    // clientAddress: IP the player's game client connects from, the voiceserver only
-    // accepts UDP traffic for this slot from that address
-    void EnableChannelSlot(uint16 channelId, uint8 slotId, std::string const& clientAddress);
+    // player: the member's character. The voiceserver only accepts UDP traffic for this
+    // slot from the IP the player's game client connects from, the character details
+    // identify the speaker there
+    void EnableChannelSlot(uint16 channelId, uint8 slotId, Player const* player);
     void DisableChannelSlot(uint16 channelId, uint8 slotId);
     void VoiceChannelSlot(uint16 channelId, uint8 slotId);
     void DevoiceChannelSlot(uint16 channelId, uint8 slotId);

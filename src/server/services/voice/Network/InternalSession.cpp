@@ -158,20 +158,24 @@ void InternalSession::HandleAddMember(VoiceChatServerPacket& packet)
     uint16 channelId;
     uint8 userId;
     std::string clientAddressString;
+    VoiceChannelMember member;
     packet >> channelId;
     packet >> userId;
     packet >> clientAddressString;
+    packet >> member.CharacterGuid;
+    packet >> member.CharacterName;
+    packet >> member.AccountId;
 
     boost::system::error_code error;
-    boost::asio::ip::address const clientAddress = boost::asio::ip::make_address(clientAddressString, error);
+    member.ClientAddress = boost::asio::ip::make_address(clientAddressString, error);
     if (error)
     {
-        LOG_ERROR("voice-chat", "Invalid client address '{}' for channel {} member {}, member not added",
-            clientAddressString, channelId, userId);
+        LOG_ERROR("voice-chat", "Invalid client address '{}' for channel {} member {} ({}), member not added",
+            clientAddressString, channelId, userId, member.CharacterName);
         return;
     }
 
-    sChannelMgr.AddMember(this, channelId, userId, clientAddress);
+    sChannelMgr.AddMember(this, channelId, userId, member);
 }
 
 void InternalSession::HandleRemoveMember(VoiceChatServerPacket& packet)

@@ -523,15 +523,22 @@ void VoiceChatMgr::SendChannelSlotPacket(VoiceChatServerOpcodes opcode, uint16 c
     SendPacket(data);
 }
 
-void VoiceChatMgr::EnableChannelSlot(uint16 channelId, uint8 slotId, std::string const& clientAddress)
+void VoiceChatMgr::EnableChannelSlot(uint16 channelId, uint8 slotId, Player const* player)
 {
     if (!CanUseVoiceChat())
         return;
 
-    VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_ADD_MEMBER, 3 + clientAddress.size() + 1);
+    WorldSession* session = player->GetSession();
+    std::string const& clientAddress = session->GetRemoteAddress();
+    std::string const& name = player->GetName();
+
+    VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_ADD_MEMBER, 3 + clientAddress.size() + 1 + 8 + name.size() + 1 + 4);
     data << channelId;
     data << slotId;
     data << clientAddress;
+    data << player->GetGUID().GetRawValue();
+    data << name;
+    data << session->GetAccountId();
     SendPacket(data);
 }
 
@@ -729,7 +736,7 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
             if (!player)
                 continue;
 
-            EnableChannelSlot(voiceId, userId, player->GetSession()->GetRemoteAddress());
+            EnableChannelSlot(voiceId, userId, player);
             if (member.IsVoiced())
                 VoiceChannelSlot(voiceId, userId);
             if (member.IsMuted() || member.IsForceMuted())

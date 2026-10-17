@@ -54,7 +54,7 @@ VoiceChannelMember const* VoiceChannel::GetMember(uint8 userId) const
     return itr != _members.end() ? &itr->second : nullptr;
 }
 
-bool VoiceChannel::AddMember(uint8 userId, boost::asio::ip::address const& clientAddress)
+bool VoiceChannel::AddMember(uint8 userId, VoiceChannelMember const& member)
 {
     if (!userId)
         return false;
@@ -63,9 +63,12 @@ bool VoiceChannel::AddMember(uint8 userId, boost::asio::ip::address const& clien
         return false;
 
     // (re)adding a member resets its state
-    VoiceChannelMember member;
-    member.ClientAddress = NormalizeVoiceClientAddress(clientAddress);
-    _members[userId] = member;
+    VoiceChannelMember added;
+    added.ClientAddress = NormalizeVoiceClientAddress(member.ClientAddress);
+    added.CharacterGuid = member.CharacterGuid;
+    added.CharacterName = member.CharacterName;
+    added.AccountId = member.AccountId;
+    _members[userId] = std::move(added);
     return true;
 }
 

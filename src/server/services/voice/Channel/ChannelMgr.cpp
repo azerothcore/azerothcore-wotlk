@@ -80,8 +80,7 @@ void ChannelMgr::DeleteChannel(InternalSession const* session, uint16 channelId)
     LOG_DEBUG("voice-chat", "Channel {} deleted", channelId);
 }
 
-bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uint8 userId,
-    boost::asio::ip::address const& clientAddress)
+bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uint8 userId, VoiceChannelMember const& member)
 {
     std::lock_guard<std::mutex> guard(_lock);
 
@@ -89,13 +88,15 @@ bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uin
     if (!channel)
         return false;
 
-    if (!channel->AddMember(userId, clientAddress))
+    if (!channel->AddMember(userId, member))
     {
-        LOG_ERROR("voice-chat", "Could not add member {} to channel {} (invalid id or channel full)", userId, channelId);
+        LOG_ERROR("voice-chat", "Could not add member {} ({}) to channel {} (invalid id or channel full)",
+            userId, member.CharacterName, channelId);
         return false;
     }
 
-    LOG_DEBUG("voice-chat", "Channel {} member {} enabled", channelId, userId);
+    LOG_DEBUG("voice-chat", "Channel {} member {} enabled: {} (guid {}, account {})",
+        channelId, userId, member.CharacterName, member.CharacterGuid, member.AccountId);
     return true;
 }
 

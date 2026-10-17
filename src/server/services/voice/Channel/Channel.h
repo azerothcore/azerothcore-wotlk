@@ -23,6 +23,7 @@
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/udp.hpp>
 #include <map>
+#include <string>
 
 class InternalSession;
 
@@ -48,6 +49,11 @@ struct VoiceChannelMember
     bool Voiced = false;
     // may not send voice frames
     bool Muted = false;
+    // character in this slot as announced by the worldserver, only used to
+    // identify the speaker (e.g. in logs)
+    uint64 CharacterGuid = 0;
+    std::string CharacterName;
+    uint32 AccountId = 0;
 };
 
 class VoiceChannel
@@ -64,7 +70,8 @@ public:
     VoiceChannelMember* GetMember(uint8 userId);
     VoiceChannelMember const* GetMember(uint8 userId) const;
 
-    bool AddMember(uint8 userId, boost::asio::ip::address const& clientAddress);
+    // (re)adds a member, member carries its client address and character, its state is reset
+    bool AddMember(uint8 userId, VoiceChannelMember const& member);
     void RemoveMember(uint8 userId);
 
     std::map<uint8, VoiceChannelMember> const& GetMembers() const { return _members; }
