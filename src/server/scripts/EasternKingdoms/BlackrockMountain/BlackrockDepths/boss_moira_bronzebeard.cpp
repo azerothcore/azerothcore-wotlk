@@ -38,9 +38,9 @@ struct boss_moira_bronzebeard : public BossAI
 {
     // use a default value so we can inherit for priestess
     boss_moira_bronzebeard(Creature* creature, uint32 data = DATA_MOIRA) : BossAI(creature, data) {}
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_MINDBLAST, TIMER_MINDBLAST / 2);
         events.ScheduleEvent(SPELL_HEAL, TIMER_HEAL / 2);
         events.ScheduleEvent(SPELL_RENEW, TIMER_RENEW / 2);
@@ -94,9 +94,9 @@ struct boss_high_priestess_thaurissan : public boss_moira_bronzebeard
 {
     boss_high_priestess_thaurissan(Creature* creature) : boss_moira_bronzebeard(creature, DATA_PRIESTESS) {}
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(0);
         events.ScheduleEvent(SPELL_WORDPAIN, TIMER_WORDPAIN / 2);
         events.ScheduleEvent(SPELL_HEAL, TIMER_HEAL / 2);

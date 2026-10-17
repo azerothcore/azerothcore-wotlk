@@ -118,9 +118,9 @@ struct boss_high_king_maulgar : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(9500ms, [this](TaskContext context)

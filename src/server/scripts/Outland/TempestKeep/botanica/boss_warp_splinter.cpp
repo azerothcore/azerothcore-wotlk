@@ -41,9 +41,9 @@ struct boss_warp_splinter : public BossAI
 {
     boss_warp_splinter(Creature* creature) : BossAI(creature, DATA_WARP_SPLINTER) { }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(8s, [this](TaskContext context)

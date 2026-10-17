@@ -185,9 +185,9 @@ public:
             instance->SaveToDB();
         }
 
-        void JustEngagedWith(Unit* /*who*/) override
+        void JustEngagedWith(Unit* who) override
         {
-            _JustEngagedWith();
+            _JustEngagedWith(who);
             events.ScheduleEvent(EVENT_OVERPOWER, 1s);
             events.ScheduleEvent(EVENT_MORTAL_STRIKE, 14s, 28s);
             events.ScheduleEvent(EVENT_WHIRLWIND, 24s, 30s);

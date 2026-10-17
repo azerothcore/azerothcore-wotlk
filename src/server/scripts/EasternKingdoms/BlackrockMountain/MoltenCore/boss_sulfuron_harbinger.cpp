@@ -51,9 +51,9 @@ struct boss_sulfuron : public BossAI
 {
     boss_sulfuron(Creature* creature) : BossAI(creature, DATA_SULFURON) {}
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, 6s, 20s);
         events.ScheduleEvent(EVENT_INSPIRE, 7s, 10s);
         events.ScheduleEvent(EVENT_KNOCKDOWN, 6s);

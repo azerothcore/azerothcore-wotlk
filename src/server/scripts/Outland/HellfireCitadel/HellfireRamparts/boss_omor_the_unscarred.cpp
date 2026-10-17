@@ -59,10 +59,10 @@ struct boss_omor_the_unscarred : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         scheduler.Schedule(6s, [this](TaskContext context)
         {
             if (roll_chance_i(33))
