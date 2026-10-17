@@ -3451,9 +3451,12 @@ JoinBGAndLFG.Enable = 0
 #    LFG.MailItemOnFullInventory
 #        Description: When a player wins a group roll but their inventory is full, mail
 #                     the item to them instead of leaving it on the corpse.
+#                     Bitmask, combine values to enable several cases.
 #        Default:     0 - Disabled
-#                     1 - Only in LFG/RDF groups
+#                     1 - In LFG/RDF groups
 #                     2 - In all group types
+#                     4 - Inside raid instances
+#        Example:     5 - In LFG/RDF groups and inside raid instances
 
 LFG.MailItemOnFullInventory = 0
 
