@@ -165,9 +165,11 @@ private:
 
         if (!ec && _socket && _socket->is_open())
         {
-            _active = false;
+            // hand the socket over first: the owner may start a new attempt as
+            // soon as IsAttemptingConnection() returns false
             OnConnectionSuccess(std::move(_socket));
             _socket = nullptr;
+            _active = false;
         }
         else
         {
