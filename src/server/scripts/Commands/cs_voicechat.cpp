@@ -17,6 +17,7 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "RBAC.h"
 #include "VoiceChatMgr.h"
 #include "World.h"
 
@@ -31,10 +32,10 @@ public:
     {
         static ChatCommandTable voicechatcommandTable =
         {
-            { "disconnect", HandleVoiceChatDisconnectCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "disable",    HandleVoiceChatDisableCommand,    SEC_ADMINISTRATOR, Console::Yes },
-            { "enable",     HandleVoiceChatEnableCommand,     SEC_ADMINISTRATOR, Console::Yes },
-            { "stats",      HandleVoiceChatStatsCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "disconnect", HandleVoiceChatDisconnectCommand, rbac::RBAC_PERM_COMMAND_VOICECHAT_DISCONNECT, Console::Yes },
+            { "disable",    HandleVoiceChatDisableCommand,    rbac::RBAC_PERM_COMMAND_VOICECHAT_DISABLE,    Console::Yes },
+            { "enable",     HandleVoiceChatEnableCommand,     rbac::RBAC_PERM_COMMAND_VOICECHAT_ENABLE,     Console::Yes },
+            { "stats",      HandleVoiceChatStatsCommand,      rbac::RBAC_PERM_COMMAND_VOICECHAT_STATS,      Console::Yes },
         };
 
         static ChatCommandTable commandTable =
