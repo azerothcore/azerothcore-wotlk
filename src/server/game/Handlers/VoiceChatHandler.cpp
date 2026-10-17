@@ -371,3 +371,35 @@ void WorldSession::HandleChannelUnsilenceOpcode(WorldPackets::VoiceChat::Channel
     if (channel->IsOnVoice(playerGuid))
         channel->ForceUnmuteVoiceMember(playerGuid);
 }
+
+void WorldSession::HandleChannelSilenceAllOpcode(WorldPackets::VoiceChat::ChannelSilenceAll& packet)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_SILENCE_ALL");
+
+    if (!_player)
+        return;
+
+    if (!normalizePlayerName(packet.PlayerName))
+        return;
+
+    if (Channel* channel = sChannelMgr.GetChannel(_player->GetTeamId(), packet.ChannelName))
+        channel->SilenceAll(_player, packet.PlayerName, true);
+    else
+        ChannelMgr::SendNotOnPacket(_player, packet.ChannelName);
+}
+
+void WorldSession::HandleChannelUnsilenceAllOpcode(WorldPackets::VoiceChat::ChannelUnsilenceAll& packet)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_UNSILENCE_ALL");
+
+    if (!_player)
+        return;
+
+    if (!normalizePlayerName(packet.PlayerName))
+        return;
+
+    if (Channel* channel = sChannelMgr.GetChannel(_player->GetTeamId(), packet.ChannelName))
+        channel->SilenceAll(_player, packet.PlayerName, false);
+    else
+        ChannelMgr::SendNotOnPacket(_player, packet.ChannelName);
+}

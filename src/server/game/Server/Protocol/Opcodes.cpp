@@ -1101,9 +1101,9 @@ void OpcodeTable::Initialize()
     /*0x3CA*/ DEFINE_HANDLER(CMSG_GM_SHOW_COMPLAINTS,                                               STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x3CB*/ DEFINE_HANDLER(CMSG_GM_UNSQUELCH,                                                     STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x3CC*/ DEFINE_HANDLER(CMSG_CHANNEL_SILENCE_VOICE,                                            STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChannelSilenceOpcode               );
-    /*0x3CD*/ DEFINE_HANDLER(CMSG_CHANNEL_SILENCE_ALL,                                              STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x3CD*/ DEFINE_HANDLER(CMSG_CHANNEL_SILENCE_ALL,                                              STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChannelSilenceAllOpcode            );
     /*0x3CE*/ DEFINE_HANDLER(CMSG_CHANNEL_UNSILENCE_VOICE,                                          STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChannelUnsilenceOpcode             );
-    /*0x3CF*/ DEFINE_HANDLER(CMSG_CHANNEL_UNSILENCE_ALL,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x3CF*/ DEFINE_HANDLER(CMSG_CHANNEL_UNSILENCE_ALL,                                            STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChannelUnsilenceAllOpcode          );
     /*0x3D0*/ DEFINE_HANDLER(CMSG_TARGET_CAST,                                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x3D1*/ DEFINE_HANDLER(CMSG_TARGET_SCRIPT_CAST,                                               STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x3D2*/ DEFINE_HANDLER(CMSG_CHANNEL_DISPLAY_LIST,                                             STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleChannelDisplayListQuery            );

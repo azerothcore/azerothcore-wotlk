@@ -72,6 +72,18 @@ void WorldPackets::VoiceChat::ChannelUnsilence::Read()
     _worldPacket >> PlayerName;
 }
 
+void WorldPackets::VoiceChat::ChannelSilenceAll::Read()
+{
+    _worldPacket >> ChannelName;
+    _worldPacket >> PlayerName;
+}
+
+void WorldPackets::VoiceChat::ChannelUnsilenceAll::Read()
+{
+    _worldPacket >> ChannelName;
+    _worldPacket >> PlayerName;
+}
+
 WorldPacket const* WorldPackets::VoiceChat::AvailableVoiceChannel::Write()
 {
     _worldPacket << SessionId;

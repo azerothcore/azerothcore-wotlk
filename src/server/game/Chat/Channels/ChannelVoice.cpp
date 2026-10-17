@@ -145,6 +145,25 @@ bool Channel::CanSilenceVoiceMember(Player const* player, ObjectGuid victim)
     return true;
 }
 
+void Channel::SilenceAll(Player const* player, std::string const& name, bool silence)
+{
+    // the text mute checks the rights and reports errors like /mute does
+    if (!SetMode(player, name, false, silence))
+        return;
+
+    if (!GetVoiceId())
+        return;
+
+    Player* victim = ObjectAccessor::FindPlayerByName(name, false);
+    if (!victim)
+        return;
+
+    if (silence)
+        ForceMuteVoiceMember(victim->GetGUID());
+    else
+        ForceUnmuteVoiceMember(victim->GetGUID());
+}
+
 bool Channel::IsOnVoice(ObjectGuid guid) const
 {
     for (auto const& [userId, member] : _voiceMembers)

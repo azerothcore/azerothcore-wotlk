@@ -130,6 +130,28 @@ namespace WorldPackets
             std::string PlayerName = "";
         };
 
+        class ChannelSilenceAll final : public ClientPacket
+        {
+        public:
+            ChannelSilenceAll(WorldPacket&& packet) : ClientPacket(CMSG_CHANNEL_SILENCE_ALL, std::move(packet)) {}
+
+            void Read() override;
+
+            std::string ChannelName = "";
+            std::string PlayerName = "";
+        };
+
+        class ChannelUnsilenceAll final : public ClientPacket
+        {
+        public:
+            ChannelUnsilenceAll(WorldPacket&& packet) : ClientPacket(CMSG_CHANNEL_UNSILENCE_ALL, std::move(packet)) {}
+
+            void Read() override;
+
+            std::string ChannelName = "";
+            std::string PlayerName = "";
+        };
+
         class AvailableVoiceChannel final : public ServerPacket
         {
         public:

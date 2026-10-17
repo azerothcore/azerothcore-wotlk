@@ -216,7 +216,8 @@ public:
     void UnBan(Player const* player, std::string const& badname);
     void UnBan(ObjectGuid guid);
     void Password(Player const* player, std::string const& pass);
-    void SetMode(Player const* player, std::string const& p2n, bool mod, bool set);
+    // returns whether the moderator or mute flag was applied
+    bool SetMode(Player const* player, std::string const& p2n, bool mod, bool set);
     void SetOwner(ObjectGuid guid, bool exclaim = true);
     void SetOwner(Player const* player, std::string const& name);
     void SendWhoOwner(ObjectGuid guid);
@@ -260,6 +261,8 @@ public:
     void RequestVoiceOff(Player* player);
     // whether player may (un)silence victim on this channel, notifies player if not
     bool CanSilenceVoiceMember(Player const* player, ObjectGuid victim);
+    // handles CMSG_CHANNEL_(UN)SILENCE_ALL, (un)mutes the named player in text and voice
+    void SilenceAll(Player const* player, std::string const& name, bool silence);
 
     uint16 GetVoiceId() const { return _voiceId; }
     void SetVoiceId(uint16 voiceId) { _voiceId = voiceId; }

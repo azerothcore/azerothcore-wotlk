@@ -206,6 +206,8 @@ namespace WorldPackets
         class PartyUnsilence;
         class ChannelSilence;
         class ChannelUnsilence;
+        class ChannelSilenceAll;
+        class ChannelUnsilenceAll;
     }
 
     namespace Quest
@@ -699,6 +701,8 @@ public:
     void HandleDeleteVoiceIgnoreOpcode(WorldPackets::VoiceChat::DeleteVoiceIgnore& packet);
     void HandleChannelSilenceOpcode(WorldPackets::VoiceChat::ChannelSilence& packet);
     void HandleChannelUnsilenceOpcode(WorldPackets::VoiceChat::ChannelUnsilence& packet);
+    void HandleChannelSilenceAllOpcode(WorldPackets::VoiceChat::ChannelSilenceAll& packet);
+    void HandleChannelUnsilenceAllOpcode(WorldPackets::VoiceChat::ChannelUnsilenceAll& packet);
     void HandlePartySilenceOpcode(WorldPackets::VoiceChat::PartySilence& packet);
     void HandlePartyUnsilenceOpcode(WorldPackets::VoiceChat::PartyUnsilence& packet);
     void HandleChannelVoiceOnOpcode(WorldPackets::VoiceChat::ChannelVoiceOn& packet);

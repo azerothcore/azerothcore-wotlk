@@ -630,7 +630,7 @@ void Channel::Password(Player const* player, std::string const& pass)
     UpdateChannelInDB();
 }
 
-void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bool set)
+bool Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bool set)
 {
     ObjectGuid guid = player->GetGUID();
 
@@ -639,7 +639,7 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         WorldPacket data;
         MakeNotMember(&data);
         SendToOne(&data, guid);
-        return;
+        return false;
     }
 
     if (!playersStore[guid].IsModerator() && !player->GetSession()->HasPermission(rbac::RBAC_PERM_CHANGE_CHANNEL_NOT_MODERATOR))
@@ -647,11 +647,11 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         WorldPacket data;
         MakeNotModerator(&data);
         SendToOne(&data, guid);
-        return;
+        return false;
     }
 
     if (guid == _ownerGUID && std::string(p2n) == player->GetName() && mod)
-        return;
+        return false;
 
     Player* newp = ObjectAccessor::FindPlayerByName(p2n, false);
     ObjectGuid victim = newp ? newp->GetGUID() : ObjectGuid::Empty;
@@ -665,7 +665,7 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         WorldPacket data;
         MakePlayerNotFound(&data, p2n);
         SendToOne(&data, guid);
-        return;
+        return false;
     }
 
     if (_ownerGUID == victim && _ownerGUID != guid)
@@ -673,7 +673,7 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         WorldPacket data;
         MakeNotOwner(&data);
         SendToOne(&data, guid);
-        return;
+        return false;
     }
 
     if (mod)
@@ -692,12 +692,14 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
                 WorldPacket data;
                 MakeNotModerator(&data);
                 SendToOne(&data, guid);
-                return;
+                return false;
             }
         }
 
         SetMute(newp->GetGUID(), set);
     }
+
+    return true;
 }
 
 void Channel::SetOwner(Player const* player, std::string const& newname)
