@@ -595,6 +595,7 @@ struct npc_boombot : public ScriptedAI
 
     void Reset() override
     {
+        _boomed = false;
         DoCastSelf(SPELL_321_BOOMBOT_AURA);
         me->SetReactState(REACT_PASSIVE);
         _scheduler.CancelAll();
@@ -605,11 +606,7 @@ struct npc_boombot : public ScriptedAI
             return;
         }
 
-        // HACK/workaround:
-        // these values aren't confirmed - lack of data - and the values in DB are incorrect
-        // these values are needed for correct damage of Boom spell
-        me->SetFloatValue(UNIT_FIELD_MINDAMAGE, 15000.0f);
-        me->SetFloatValue(UNIT_FIELD_MAXDAMAGE, 18000.0f);
+        InitializeBoomDamage();
 
         if (Creature* xt002 = _instance->GetCreature(BOSS_XT002))
             xt002->AI()->JustSummoned(me);
@@ -625,9 +622,7 @@ struct npc_boombot : public ScriptedAI
             {
                 if (Creature* xt002 = _instance->GetCreature(BOSS_XT002))
                 {
-                    if (me->IsWithinMeleeRange(xt002))
-                        DoCastAOE(SPELL_BOOM);
-                    else
+                    if (!me->IsWithinMeleeRange(xt002) || !Detonate(true))
                         checkXt002.Repeat();
                 }
                 else
@@ -635,14 +630,11 @@ struct npc_boombot : public ScriptedAI
             });
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
+    void JustDied(Unit* /*killer*/) override
     {
-        if (damage >= (me->GetHealth() - me->GetMaxHealth() * 0.5f) && !_boomed)
-        {
-            _boomed = true; // Prevent recursive call
-            damage = 0;
-            DoCastAOE(SPELL_BOOM);
-        }
+        // Let the killing hit keep its attacker and credit before triggering the explosion.
+        // Arrival at XT sets _boomed before the self-instakill reaches this callback.
+        Detonate();
     }
 
     void UpdateAI(uint32 diff) override
@@ -651,6 +643,48 @@ struct npc_boombot : public ScriptedAI
     }
 
 private:
+    void InitializeBoomDamage()
+    {
+        // Keep the existing 15-18k weapon-damage estimate; exact retail values remain unconfirmed.
+        // Fire weapon spells recalculate damage, so writing UNIT_FIELD_MINDAMAGE/MAXDAMAGE has no effect.
+        CreatureTemplate const* creatureTemplate = me->GetCreatureTemplate();
+        float const baseValue = me->GetFlatModifierValue(UNIT_MOD_DAMAGE_MAINHAND, BASE_VALUE)
+            + me->GetTotalAttackPowerValue(BASE_ATTACK) / 14.0f * creatureTemplate->BaseVariance;
+        float const multiplier = creatureTemplate->DamageModifier
+            * me->GetPctModifierValue(UNIT_MOD_DAMAGE_MAINHAND, BASE_PCT) * me->GetAPMultiplier(BASE_ATTACK, false);
+        float const totalValue = me->GetFlatModifierValue(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE);
+
+        if (multiplier <= 0.0f)
+            return;
+
+        me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (15000.0f - totalValue) / multiplier - baseValue);
+        me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (18000.0f - totalValue) / multiplier - baseValue);
+        me->UpdateDamagePhysical(BASE_ATTACK);
+    }
+
+    bool Detonate(bool onArrival = false)
+    {
+        if (_boomed)
+            return false;
+
+        _boomed = true;
+        if (DoCastAOE(SPELL_BOOM, true) != SPELL_CAST_OK)
+        {
+            _boomed = false;
+            return false;
+        }
+
+        _scheduler.CancelAll();
+
+        // Classic Wrath arrivals emit two Boom casts in the same tick. Keep the guard set
+        // across both casts so the self-instakill and nearby chain deaths cannot add more.
+        // Boom permits casting while dead; lethal damage still goes through JustDied once.
+        if (onArrival)
+            DoCastAOE(SPELL_BOOM, true);
+
+        return true;
+    }
+
     InstanceScript* _instance;
     bool _boomed;
     TaskScheduler _scheduler;
