@@ -2447,22 +2447,6 @@ void Pet::ClearCastWhenWillAvailable()
     m_tempoldTarget = ObjectGuid::Empty;
 }
 
-void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
-{
-    m_CreatureSpellCooldowns.erase(spell_id);
-
-    if (update)
-    {
-        if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
-        {
-            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
-            data << uint32(spell_id);
-            data << GetGUID();
-            playerOwner->SendDirectMessage(&data);
-        }
-    }
-}
-
 void Pet::FillPetInfo(PetStable::PetInfo* petInfo) const
 {
     petInfo->PetNumber = m_charmInfo->GetPetNumber();
