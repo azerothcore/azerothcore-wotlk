@@ -16,12 +16,15 @@
  */
 
 #include "ChannelMgr.h"
+#include "Common.h"
 #include "InternalHandler.h"
 #include "InternalSession.h"
+#include "Timer.h"
 #include "VoiceChatSharedDefines.h"
 #include "VoiceScriptMgr.h"
 
-InternalSession::InternalSession(IoContextTcpSocket&& socket) : TcpSocket(std::move(socket))
+InternalSession::InternalSession(IoContextTcpSocket&& socket) : TcpSocket(std::move(socket)),
+    _lastPacketReceiveTime(getMSTime())
 {
     _headerBuffer.Resize(sizeof(VoiceChatServerPktHeader));
 }
@@ -46,6 +49,16 @@ bool InternalSession::Update()
     std::unique_ptr<VoiceChatServerPacket> queued;
     while (_queuedPackets.next(queued))
         SendPacket(*queued);
+
+    // the worldserver pings regularly, so a silent connection is dead (e.g. after
+    // a network split). It would keep its channels and their ids otherwise, and the
+    // reconnected worldserver could not create them again
+    if (IsOpen() && GetMSTimeDiffToNow(_lastPacketReceiveTime) > VOICECHAT_INTERNAL_TIMEOUT)
+    {
+        LOG_ERROR("voice-chat", "Worldserver {} sent nothing in {} seconds, dropping connection",
+            GetRemoteIpAddress().to_string(), VOICECHAT_INTERNAL_TIMEOUT / IN_MILLISECONDS);
+        CloseSocket();
+    }
 
     if (!InternalSocket::Update())
         return false;
@@ -90,6 +103,8 @@ ReadDataHandlerResult InternalSession::ReadDataHandler()
     }
 
     LOG_TRACE("voice-chat", "Received {} size {}", opHandle->_name, header->size);
+
+    _lastPacketReceiveTime = getMSTime();
 
     VoiceChatServerPacket packet(opcode, std::move(_packetBuffer));
 

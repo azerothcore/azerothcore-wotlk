@@ -84,6 +84,11 @@ enum class VoiceChatServerOpcodes : uint8
 // of it, all other packets are a handful of bytes.
 constexpr std::size_t VOICECHAT_MAX_INTERNAL_PACKET_SIZE = 8192;
 
+// the worldserver pings the voiceserver this often (milliseconds). Both sides
+// drop a connection that sent nothing for VOICECHAT_INTERNAL_TIMEOUT
+constexpr uint32 VOICECHAT_INTERNAL_PING_INTERVAL = 10 * 1000;
+constexpr uint32 VOICECHAT_INTERNAL_TIMEOUT = 30 * 1000;
+
 // Game clients sign every voice datagram with the key of its voice session:
 // HMAC-MD5 of everything after the signature field, folded to 32 bits by
 // XORing the four little endian words of the digest. Receiving clients drop

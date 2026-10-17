@@ -64,6 +64,8 @@ protected:
 private:
     // packets queued from other threads, sent by Update()
     LockedQueue<std::unique_ptr<VoiceChatServerPacket>> _queuedPackets;
+    // network thread only
+    uint32 _lastPacketReceiveTime;
 };
 
 #endif

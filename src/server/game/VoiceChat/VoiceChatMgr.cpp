@@ -38,12 +38,6 @@
 #include "WorldSocketMgr.h"
 #include <boost/asio/ip/address.hpp>
 
-namespace
-{
-    constexpr uint32 SOCKET_PING_INTERVAL = 10 * IN_MILLISECONDS;
-    constexpr uint32 SOCKET_NOREPLY_TIME  = 30 * IN_MILLISECONDS;
-}
-
 VoiceChatMgr::VoiceChatMgr() :
     _initialized(false),
     _enabled(false),
@@ -92,7 +86,7 @@ void VoiceChatMgr::Init()
 
     internalVoiceChatOpcodeTable.Init();
 
-    _pingTimer.SetInterval(SOCKET_PING_INTERVAL);
+    _pingTimer.SetInterval(VOICECHAT_INTERNAL_PING_INTERVAL);
 
     if (_enabled)
     {
@@ -449,9 +443,10 @@ void VoiceChatMgr::UpdateVoiceServerConnection(uint32 const diff)
         }
 
         // has it been too long since the last received packet? Drop the socket to allow a new connection
-        if (GetMSTimeDiffToNow(_voiceServerSocket->GetLastPacketReceiveTime()) > SOCKET_NOREPLY_TIME)
+        if (GetMSTimeDiffToNow(_voiceServerSocket->GetLastPacketReceiveTime()) > VOICECHAT_INTERNAL_TIMEOUT)
         {
-            LOG_ERROR("voice-chat", "Voiceserver did not reply in {} seconds, dropping connection", SOCKET_NOREPLY_TIME / IN_MILLISECONDS);
+            LOG_ERROR("voice-chat", "Voiceserver did not reply in {} seconds, dropping connection",
+                VOICECHAT_INTERNAL_TIMEOUT / IN_MILLISECONDS);
             _voiceServerSocket->CloseSocket();
         }
 
