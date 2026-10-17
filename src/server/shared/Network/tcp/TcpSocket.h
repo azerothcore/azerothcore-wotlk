@@ -271,6 +271,9 @@ protected:
             // just received fresh new payload
             ReadDataHandlerResult result = ReadDataHandler();
             _headerBuffer.Reset();
+            // handlers usually move the payload out, but not always (e.g. an ignored packet);
+            // a stale write position would make the next, smaller payload overflow the buffer
+            _packetBuffer.Reset();
 
             if (result != ReadDataHandlerResult::Ok)
             {
