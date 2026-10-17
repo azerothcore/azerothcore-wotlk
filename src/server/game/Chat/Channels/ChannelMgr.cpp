@@ -77,10 +77,19 @@ void ChannelMgr::LoadChannels()
         if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
             team = TEAM_ALLIANCE;
 
-        std::shared_ptr<Channel> newChannel = std::make_shared<Channel>(channelName, 0, channelDBId, team, fields[3].Get<uint8>(), fields[4].Get<uint8>());
-        newChannel->SetPassword(password);
         // lookups are case insensitive
         wstrToLower(channelWName);
+
+        // e.g. saved for both teams before cross faction channels were enabled, or
+        // differing only in case: keep the oldest, the others could never be found
+        if (_channelsByName[team].find(channelWName) != _channelsByName[team].end())
+        {
+            LOG_WARN("server.loading", "Skipped duplicate custom chat channel '{}' (id {}).", channelName, channelDBId);
+            continue;
+        }
+
+        std::shared_ptr<Channel> newChannel = std::make_shared<Channel>(channelName, 0, channelDBId, team, fields[3].Get<uint8>(), fields[4].Get<uint8>());
+        newChannel->SetPassword(password);
         _channelsByName[team][channelWName] = newChannel;
         _channelsByGuid[channelDBId] = newChannel;
 
