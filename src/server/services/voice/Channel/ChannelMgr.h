@@ -34,6 +34,8 @@ class InternalSession;
  * thread running the UDP voice socket, hence every entry point takes the
  * manager lock.
  *
+ * Script hooks are called after the manager lock was released.
+ *
  * InternalSession pointers are only stored to identify the owning
  * worldserver connection; they are compared, never dereferenced, since the
  * session may already be destroyed when a channel is cleaned up.
@@ -74,6 +76,9 @@ private:
     VoiceChannel* GetChannel(uint16 channelId);
     // requires _lock to be held, returns nullptr if the channel is not owned by session
     VoiceChannel* GetOwnedChannel(InternalSession const* session, uint16 channelId, char const* action);
+    // applies change to a member of a channel owned by session, reports a changed state to the scripts
+    void ChangeMemberState(InternalSession const* session, uint16 channelId, uint8 userId, char const* action,
+        bool logMissingMember, void (*change)(VoiceChannelMember& member));
 
     std::mutex _lock;
     std::map<uint16, VoiceChannel> _channels;

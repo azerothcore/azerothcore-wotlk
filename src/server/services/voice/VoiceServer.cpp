@@ -19,6 +19,7 @@
 #include "ChannelMgr.h"
 #include "InternalHandler.h"
 #include "Log.h"
+#include "VoiceScriptMgr.h"
 #include <boost/asio/ip/address.hpp>
 #include <vector>
 
@@ -31,11 +32,17 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
     if (packet.GetDataLength() == sizeof(UdpSocketPacketHeader))
     {
         if (sChannelMgr.HandleClientHandshake(header.channelId, header.userId, remoteEndpoint))
+        {
             LOG_DEBUG("voice-chat", "Client {}:{} announced itself for channel {} member {}",
                 remoteEndpoint.address().to_string(), remoteEndpoint.port(), header.channelId, header.userId);
+
+            sVoiceScriptMgr->OnClientHandshake(header.channelId, header.userId, remoteEndpoint);
+        }
         else
+        {
             LOG_DEBUG("voice-chat", "Client {}:{} sent handshake for unknown channel {} member {}",
                 remoteEndpoint.address().to_string(), remoteEndpoint.port(), header.channelId, header.userId);
+        }
 
         return;
     }
@@ -47,6 +54,9 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
 
     for (udp::endpoint const& target : targets)
         SendTo(target, packet.GetData(), packet.GetDataLength());
+
+    sVoiceScriptMgr->OnVoicePacket(header.channelId, header.userId,
+        std::span<uint8 const>(packet.GetPayload(), packet.GetPayloadLength()));
 }
 
 VoiceServer::VoiceServer()

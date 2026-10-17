@@ -33,6 +33,7 @@
 #include "ProcessPriority.h"
 #include "SharedDefines.h"
 #include "Util.h"
+#include "VoiceScriptMgr.h"
 #include "VoiceServer.h"
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/signal_set.hpp>
@@ -112,6 +113,16 @@ int main(int argc, char** argv)
         LOG_INFO("server.voiceserver", "Dry run completed, terminating.");
         return 0;
     }
+
+    sVoiceScriptMgr->OnStartup(*ioContext);
+
+    // released after the network handles below, so scripts shut down once all
+    // connections are closed but before the io context their timers may use is gone
+    std::shared_ptr<void> sScriptsHandle(nullptr, [](void*)
+    {
+        sVoiceScriptMgr->OnShutdown();
+        sVoiceScriptMgr->Unload();
+    });
 
     // Start the listening port (acceptor) for voiceserver connections
     uint32 const clientPort = sConfigMgr->GetOption<uint32>("ClientPort", 3724);

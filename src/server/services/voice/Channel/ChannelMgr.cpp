@@ -17,6 +17,7 @@
 
 #include "ChannelMgr.h"
 #include "Log.h"
+#include "VoiceScriptMgr.h"
 
 VoiceChannel* ChannelMgr::GetChannel(uint16 channelId)
 {
@@ -47,129 +48,177 @@ bool ChannelMgr::CreateChannel(InternalSession const* session, uint16 channelId,
     if (!channelId || type >= VoiceChatChannelType::Max)
         return false;
 
-    std::lock_guard<std::mutex> guard(_lock);
-
-    if (VoiceChannel* existing = GetChannel(channelId))
+    bool replaced = false;
     {
-        // the worldserver re-creates its channels after a reconnect,
-        // only ever re-use ids of the same connection
-        if (existing->GetOwner() != session)
+        std::lock_guard<std::mutex> guard(_lock);
+
+        if (VoiceChannel* existing = GetChannel(channelId))
         {
-            LOG_ERROR("voice-chat", "Worldserver requested creation of channel {} which is owned by another connection", channelId);
-            return false;
+            // the worldserver re-creates its channels after a reconnect,
+            // only ever re-use ids of the same connection
+            if (existing->GetOwner() != session)
+            {
+                LOG_ERROR("voice-chat", "Worldserver requested creation of channel {} which is owned by another connection",
+                    channelId);
+                return false;
+            }
+
+            _channels.erase(channelId);
+            replaced = true;
         }
 
-        _channels.erase(channelId);
+        _channels.emplace(std::piecewise_construct, std::forward_as_tuple(channelId),
+            std::forward_as_tuple(channelId, type, session));
     }
 
-    _channels.emplace(std::piecewise_construct, std::forward_as_tuple(channelId),
-        std::forward_as_tuple(channelId, type, session));
-
     LOG_DEBUG("voice-chat", "Channel {} created, type {}", channelId, uint32(type));
+
+    if (replaced)
+        sVoiceScriptMgr->OnChannelDeleted(channelId);
+
+    sVoiceScriptMgr->OnChannelCreated(channelId, type);
     return true;
 }
 
 void ChannelMgr::DeleteChannel(InternalSession const* session, uint16 channelId)
 {
-    std::lock_guard<std::mutex> guard(_lock);
+    {
+        std::lock_guard<std::mutex> guard(_lock);
 
-    if (!GetOwnedChannel(session, channelId, "delete channel"))
-        return;
+        if (!GetOwnedChannel(session, channelId, "delete channel"))
+            return;
 
-    _channels.erase(channelId);
+        _channels.erase(channelId);
+    }
+
     LOG_DEBUG("voice-chat", "Channel {} deleted", channelId);
+    sVoiceScriptMgr->OnChannelDeleted(channelId);
 }
 
-bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uint8 userId, VoiceChannelMember const& member)
+bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uint8 userId,
+    VoiceChannelMember const& member)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    VoiceChannel* channel = GetOwnedChannel(session, channelId, "add member");
-    if (!channel)
-        return false;
-
-    if (!channel->AddMember(userId, member))
+    VoiceChannelMember added;
     {
-        LOG_ERROR("voice-chat", "Could not add member {} ({}) to channel {} (invalid id or channel full)",
-            userId, member.CharacterName, channelId);
-        return false;
+        std::lock_guard<std::mutex> guard(_lock);
+
+        VoiceChannel* channel = GetOwnedChannel(session, channelId, "add member");
+        if (!channel)
+            return false;
+
+        if (!channel->AddMember(userId, member))
+        {
+            LOG_ERROR("voice-chat", "Could not add member {} ({}) to channel {} (invalid id or channel full)",
+                userId, member.CharacterName, channelId);
+            return false;
+        }
+
+        added = *channel->GetMember(userId);
     }
 
     LOG_DEBUG("voice-chat", "Channel {} member {} enabled: {} (guid {}, account {})",
-        channelId, userId, member.CharacterName, member.CharacterGuid, member.AccountId);
+        channelId, userId, added.CharacterName, added.CharacterGuid, added.AccountId);
+
+    sVoiceScriptMgr->OnMemberAdded(channelId, userId, added);
     return true;
 }
 
 void ChannelMgr::RemoveMember(InternalSession const* session, uint16 channelId, uint8 userId)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    if (VoiceChannel* channel = GetOwnedChannel(session, channelId, "remove member"))
     {
+        std::lock_guard<std::mutex> guard(_lock);
+
+        VoiceChannel* channel = GetOwnedChannel(session, channelId, "remove member");
+        if (!channel || !channel->GetMember(userId))
+            return;
+
         channel->RemoveMember(userId);
-        LOG_DEBUG("voice-chat", "Channel {} member {} removed", channelId, userId);
     }
+
+    LOG_DEBUG("voice-chat", "Channel {} member {} removed", channelId, userId);
+    sVoiceScriptMgr->OnMemberRemoved(channelId, userId);
+}
+
+void ChannelMgr::ChangeMemberState(InternalSession const* session, uint16 channelId, uint8 userId, char const* action,
+    bool logMissingMember, void (*change)(VoiceChannelMember& member))
+{
+    bool voiced;
+    bool muted;
+    {
+        std::lock_guard<std::mutex> guard(_lock);
+
+        VoiceChannel* channel = GetOwnedChannel(session, channelId, action);
+        if (!channel)
+            return;
+
+        VoiceChannelMember* member = channel->GetMember(userId);
+        if (!member)
+        {
+            if (logMissingMember)
+                LOG_ERROR("voice-chat", "Worldserver requested to {}: member {} not found in channel {}",
+                    action, userId, channelId);
+            return;
+        }
+
+        bool const wasVoiced = member->Voiced;
+        bool const wasMuted = member->Muted;
+        change(*member);
+        voiced = member->Voiced;
+        muted = member->Muted;
+
+        if (voiced == wasVoiced && muted == wasMuted)
+            return;
+    }
+
+    sVoiceScriptMgr->OnMemberStateChanged(channelId, userId, voiced, muted);
 }
 
 void ChannelMgr::VoiceMember(InternalSession const* session, uint16 channelId, uint8 userId)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    if (VoiceChannel* channel = GetOwnedChannel(session, channelId, "voice member"))
-    {
-        if (VoiceChannelMember* member = channel->GetMember(userId))
-            member->Voiced = true;
-        else
-            LOG_ERROR("voice-chat", "Voice member: member {} not found in channel {}", userId, channelId);
-    }
+    ChangeMemberState(session, channelId, userId, "voice member", true,
+        [](VoiceChannelMember& member) { member.Voiced = true; });
 }
 
 void ChannelMgr::DevoiceMember(InternalSession const* session, uint16 channelId, uint8 userId)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    if (VoiceChannel* channel = GetOwnedChannel(session, channelId, "devoice member"))
-    {
-        if (VoiceChannelMember* member = channel->GetMember(userId))
-            member->Voiced = false;
-    }
+    ChangeMemberState(session, channelId, userId, "devoice member", false,
+        [](VoiceChannelMember& member) { member.Voiced = false; });
 }
 
 void ChannelMgr::MuteMember(InternalSession const* session, uint16 channelId, uint8 userId)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    if (VoiceChannel* channel = GetOwnedChannel(session, channelId, "mute member"))
-    {
-        if (VoiceChannelMember* member = channel->GetMember(userId))
-            member->Muted = true;
-    }
+    ChangeMemberState(session, channelId, userId, "mute member", false,
+        [](VoiceChannelMember& member) { member.Muted = true; });
 }
 
 void ChannelMgr::UnmuteMember(InternalSession const* session, uint16 channelId, uint8 userId)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    if (VoiceChannel* channel = GetOwnedChannel(session, channelId, "unmute member"))
-    {
-        if (VoiceChannelMember* member = channel->GetMember(userId))
-            member->Muted = false;
-    }
+    ChangeMemberState(session, channelId, userId, "unmute member", false,
+        [](VoiceChannelMember& member) { member.Muted = false; });
 }
 
 void ChannelMgr::RemoveChannelsFor(InternalSession const* session)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    for (auto itr = _channels.begin(); itr != _channels.end();)
+    std::vector<uint16> removed;
     {
-        if (itr->second.GetOwner() == session)
+        std::lock_guard<std::mutex> guard(_lock);
+
+        for (auto itr = _channels.begin(); itr != _channels.end();)
         {
-            LOG_DEBUG("voice-chat", "Channel {} removed, worldserver connection dropped", itr->first);
-            itr = _channels.erase(itr);
+            if (itr->second.GetOwner() == session)
+            {
+                removed.push_back(itr->first);
+                itr = _channels.erase(itr);
+            }
+            else
+                ++itr;
         }
-        else
-            ++itr;
+    }
+
+    for (uint16 channelId : removed)
+    {
+        LOG_DEBUG("voice-chat", "Channel {} removed, worldserver connection dropped", channelId);
+        sVoiceScriptMgr->OnChannelDeleted(channelId);
     }
 }
 
