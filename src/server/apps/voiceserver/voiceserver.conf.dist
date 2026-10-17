@@ -28,6 +28,10 @@ LogsDir = ""
 #        Description: UDP port the game clients send voice data to.
 #        Important:   Must match the worldserver "VoiceChat.VoicePort" setting and must be
 #                     reachable by game clients.
+#                     A client may only use its voice slot from the IP address the worldserver
+#                     sees it connect from, so game clients must reach the voice server and the
+#                     worldserver from the same address (no TCP proxy in front of the worldserver
+#                     without PROXY protocol, no separate NAT paths).
 #        Default:     3724
 
 ClientPort = 3724
