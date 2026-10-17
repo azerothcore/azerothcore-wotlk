@@ -462,7 +462,17 @@ bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
 
     SubGroupCounterIncrease(subGroup);
 
-    player->SetGroupInvite(nullptr);
+    // Joining a normal group ends a pending invite; remove it on the group's side too, as logout only cleans
+    // up the invite the player still points to. A battleground or battlefield raid keeps it to accept there.
+    Group* invite = player->GetGroupInvite();
+    if (invite && !isBGGroup() && !isBFGroup())
+    {
+        if (invite == this)
+            RemoveInvite(player);
+        else
+            player->UninviteFromGroup();
+    }
+
     if (player->GetGroup())
     {
         if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
