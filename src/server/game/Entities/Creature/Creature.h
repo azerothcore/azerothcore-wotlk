@@ -43,6 +43,13 @@ class CreatureGroup;
 typedef std::vector<uint8> CreatureTextRepeatIds;
 typedef std::unordered_map<uint8, CreatureTextRepeatIds> CreatureTextRepeatGroup;
 
+// Creature's position at aggro, moved to where it was last attacked
+struct CreatureLeash
+{
+    Position Point;
+    uint32 Refreshes = 0;
+};
+
 class Creature : public Unit, public GridObject<Creature>, public MovableMapObject, public UpdatableMapObject
 {
 public:
@@ -400,12 +407,13 @@ public:
     [[nodiscard]] bool IsMovementPreventedByCasting() const override;
 
     // Part of Evade mechanics
-    std::shared_ptr<time_t> const& GetLastLeashExtensionTimePtr() const;
-    void SetLastLeashExtensionTimePtr(std::shared_ptr<time_t> const& timer);
-    void ClearLastLeashExtensionTimePtr();
-    time_t GetLastLeashExtensionTime() const;
-    void UpdateLeashExtensionTime();
-    uint8 GetLeashTimer() const;
+    std::shared_ptr<CreatureLeash> const& GetLeashPtr() const;
+    void SetLeashPtr(std::shared_ptr<CreatureLeash> const& leash);
+    void ShareLeashWith(Creature* other);
+    void ClearLeash();
+    void RefreshLeash();
+    [[nodiscard]] uint32 GetLeashTime(Unit const* victim) const;
+    [[nodiscard]] float GetLeashRadius(Unit const* victim) const;
 
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
     void SetTextRepeatId(uint8 textGroup, uint8 id);
@@ -417,10 +425,8 @@ public:
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
     static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
-    static constexpr uint32 EXTEND_LEASH_CHECK_INTERVAL = 3000;
     uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
     uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
-    uint32 m_extendLeashTime = EXTEND_LEASH_CHECK_INTERVAL;
 
     [[nodiscard]] bool HasSwimmingFlagOutOfCombat() const
     {
@@ -544,9 +550,14 @@ private:
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
 
-    // Shared timer between mobs who assist another.
-    // Damaging one extends leash range on all of them.
-    mutable std::shared_ptr<time_t> m_lastLeashExtensionTime;
+    void UpdateLeash(Unit const* victim, uint32 diff);
+    [[nodiscard]] bool IsWithinLeash(Unit const* victim) const;
+
+    // Shared with assistants, pets and owner
+    mutable std::shared_ptr<CreatureLeash> m_leash;
+    uint32 _leashRefreshSeen;
+    uint32 _leashTimer;
+    bool _leashBroken;
 
     ObjectGuid m_cannotReachTarget;
 

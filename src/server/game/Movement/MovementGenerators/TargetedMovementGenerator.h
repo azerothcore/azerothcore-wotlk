@@ -38,7 +38,7 @@ class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGe
 {
 public:
     ChaseMovementGenerator(Unit* target, Optional<ChaseRange> range = {}, Optional<ChaseAngle> angle = {})
-        : AbstractFollower(target), i_leashExtensionTimer(5000), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle), _fallbackPositioning(false), m_currentMode(CHASE_MODE_NORMAL) {}
+        : AbstractFollower(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle), _fallbackPositioning(false), m_currentMode(CHASE_MODE_NORMAL) {}
     ~ChaseMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -63,7 +63,6 @@ public:
     void DistanceYourself(T* owner, float distance);
     bool DispatchSplineToPosition(T* owner, float x, float y, float z, bool walk, bool cutPath, float maxTarget, bool forceDest, bool target = false);
 private:
-    TimeTrackerSmall i_leashExtensionTimer;
     std::unique_ptr<PathGenerator> i_path;
     TimeTrackerSmall i_recheckDistance;
     bool i_recalculateTravel;
