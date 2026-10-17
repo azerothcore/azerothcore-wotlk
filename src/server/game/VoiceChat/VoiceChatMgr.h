@@ -45,12 +45,35 @@ public:
     void OnConnectionFail() override;
 };
 
+enum class VoiceChatGroupEventType : uint8
+{
+    MemberAdded,
+    MemberRemoved,
+    BattlegroundMemberRemoved,
+    ConvertedToRaid,
+    LeaderChanged,
+    Disbanded,
+    BattlegroundRaidDisbanded
+};
+
+struct VoiceChatGroupEvent
+{
+    VoiceChatGroupEventType Type = VoiceChatGroupEventType::MemberAdded;
+    uint32 Id = 0;              // group id, or battleground instance id for battleground events
+    ObjectGuid Guid;            // added/removed member, or the new leader
+    ObjectGuid OldLeader;
+    TeamId Team = TEAM_NEUTRAL; // battleground raid team
+    bool Raid = false;
+    bool Battleground = false;
+};
+
 /*
  * Manages the connection to the voiceserver and all voice channels.
  *
  * Except for OfferVoiceServerSocket and QueueIncomingVoiceServerPacket (both
- * called from network threads and synchronized accordingly), all methods must
- * be called from the world thread.
+ * called from network threads) and the QueueGroup* / QueueBattleground* group
+ * hooks (also called from map threads), all of which are synchronized
+ * accordingly, all methods must be called from the world thread.
  */
 class VoiceChatMgr
 {
@@ -89,6 +112,17 @@ public:
     void OnConnectAttemptFailed() { ++_failedConnectAttempts; }
     // called from the socket read handler (network thread)
     void QueueIncomingVoiceServerPacket(std::unique_ptr<VoiceChatServerPacket> packet);
+
+    // Group hooks. Groups also change on map threads (e.g. when a player leaves a
+    // battleground), so these only queue the change; Update() applies it on the
+    // world thread.
+    void QueueGroupMemberAdded(ObjectGuid guid, uint32 groupId, bool raid, bool battleground);
+    void QueueGroupMemberRemoved(ObjectGuid guid, uint32 groupId);
+    void QueueBattlegroundMemberRemoved(ObjectGuid guid, uint32 instanceId, TeamId team);
+    void QueueGroupConvertedToRaid(uint32 groupId);
+    void QueueGroupLeaderChanged(uint32 groupId, ObjectGuid oldLeader, ObjectGuid newLeader);
+    void QueueGroupDisbanded(uint32 groupId);
+    void QueueBattlegroundRaidDisbanded(uint32 instanceId, TeamId team);
 
     // manage voice channels
     void CreateGroupVoiceChatChannel(uint32 groupId);
@@ -159,6 +193,7 @@ private:
     void SendChannelSlotPacket(VoiceChatServerOpcodes opcode, uint16 channelId, uint8 slotId);
 
     void UpdateVoiceServerConnection(uint32 const diff);
+    void ProcessGroupEvents();
     bool HasPendingSocket();
     void OnVoiceServerConnected();
     void OnVoiceServerDisconnected();
@@ -200,6 +235,9 @@ private:
     std::shared_ptr<VoiceChatSocket> _pendingSocket;
 
     LockedQueue<std::unique_ptr<VoiceChatServerPacket>> _voiceServerPacketQueue;
+
+    // group changes queued by the group hooks, possibly from map threads
+    LockedQueue<VoiceChatGroupEvent> _groupEvents;
 
     IntervalTimer _pingTimer;
 };

@@ -19,7 +19,6 @@
 #include "AreaDefines.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
-#include "Channel.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
@@ -44,6 +43,21 @@
 #include "WorldSession.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+
+namespace
+{
+    // team whose battleground raid the group is, TEAM_NEUTRAL if it is none of them
+    TeamId GetBattlegroundRaidTeam(Battleground const* bg, Group const* group)
+    {
+        if (bg->GetBgRaid(TEAM_ALLIANCE) == group)
+            return TEAM_ALLIANCE;
+
+        if (bg->GetBgRaid(TEAM_HORDE) == group)
+            return TEAM_HORDE;
+
+        return TEAM_NEUTRAL;
+    }
+}
 
 Roll::Roll(ObjectGuid _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
     itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
@@ -354,7 +368,7 @@ void Group::ConvertToRaid()
         sLFGMgr->LeaveLfg(GetLeaderGUID());
 
     if (!isBGGroup() && !isBFGroup())
-        sVoiceChatMgr->ConvertToRaidChannel(GetGroupId());
+        sVoiceChatMgr->QueueGroupConvertedToRaid(GetGroupId());
 }
 
 bool Group::AddInvite(Player* player)
@@ -581,18 +595,8 @@ bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
         if (m_maxEnchantingLevel < player->GetSkillValue(SKILL_ENCHANTING))
             m_maxEnchantingLevel = player->GetSkillValue(SKILL_ENCHANTING);
 
-        if (player->GetSession()->IsVoiceChatEnabled())
-        {
-            if (!isBGGroup() && !isBFGroup())
-            {
-                if (isRaidGroup())
-                    sVoiceChatMgr->AddToRaidVoiceChatChannel(player->GetGUID(), GetGroupId());
-                else
-                    sVoiceChatMgr->AddToGroupVoiceChatChannel(player->GetGUID(), GetGroupId());
-            }
-            else
-                sVoiceChatMgr->AddToBattlegroundVoiceChatChannel(player->GetGUID());
-        }
+        bool const battleground = isBGGroup() || isBFGroup();
+        sVoiceChatMgr->QueueGroupMemberAdded(player->GetGUID(), GetGroupId(), isRaidGroup(), battleground);
     }
 
     return true;
@@ -758,12 +762,13 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
         SendUpdate();
 
         if (!isBGGroup() && !isBFGroup())
+            sVoiceChatMgr->QueueGroupMemberRemoved(guid, GetGroupId());
+        else if (m_bgGroup)
         {
-            sVoiceChatMgr->RemoveFromGroupVoiceChatChannel(guid, GetGroupId());
-            sVoiceChatMgr->RemoveFromRaidVoiceChatChannel(guid, GetGroupId());
+            TeamId const team = GetBattlegroundRaidTeam(m_bgGroup, this);
+            if (team != TEAM_NEUTRAL)
+                sVoiceChatMgr->QueueBattlegroundMemberRemoved(guid, m_bgGroup->GetInstanceID(), team);
         }
-        else
-            sVoiceChatMgr->RemoveFromBattlegroundVoiceChatChannel(guid);
 
         if (!validLeader)
         {
@@ -828,18 +833,8 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
     }
 
     // update voice priorities: the new leader speaks with high priority
-    {
-        Channel* voiceChannel = sVoiceChatMgr->GetGroupVoiceChatChannel(GetGroupId());
-        if (!voiceChannel)
-            voiceChannel = sVoiceChatMgr->GetRaidVoiceChatChannel(GetGroupId());
-
-        if (voiceChannel)
-        {
-            voiceChannel->SetVoiceMemberPriority(m_leaderGuid, LOW_VOICE_PRIORITY);
-            voiceChannel->SetVoiceMemberPriority(newLeaderGuid, HIGH_VOICE_PRIORITY);
-            voiceChannel->SendVoiceRoster(true);
-        }
-    }
+    if (!isBGGroup() && !isBFGroup())
+        sVoiceChatMgr->QueueGroupLeaderChanged(GetGroupId(), m_leaderGuid, newLeaderGuid);
 
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
         oldLeader->RemovePlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
@@ -950,16 +945,12 @@ void Group::ForcedDisband(bool hideDestroy /* = false */)
     sInstanceSaveMgr->DeleteInstanceSavedData(instanceId);
 
     if (!isBGGroup() && !isBFGroup())
-    {
-        sVoiceChatMgr->DeleteGroupVoiceChatChannel(GetGroupId());
-        sVoiceChatMgr->DeleteRaidVoiceChatChannel(GetGroupId());
-    }
+        sVoiceChatMgr->QueueGroupDisbanded(GetGroupId());
     else if (m_bgGroup)
     {
-        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this)
-            sVoiceChatMgr->DeleteBattlegroundVoiceChatChannel(m_bgGroup->GetInstanceID(), TEAM_ALLIANCE);
-        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this)
-            sVoiceChatMgr->DeleteBattlegroundVoiceChatChannel(m_bgGroup->GetInstanceID(), TEAM_HORDE);
+        TeamId const team = GetBattlegroundRaidTeam(m_bgGroup, this);
+        if (team != TEAM_NEUTRAL)
+            sVoiceChatMgr->QueueBattlegroundRaidDisbanded(m_bgGroup->GetInstanceID(), team);
     }
 
     sGroupMgr->RemoveGroup(this);

@@ -205,6 +205,9 @@ void VoiceChatMgr::Update(uint32 const diff)
     if (!_initialized)
         return;
 
+    // always drained so the queue can not grow while voice chat is disabled
+    ProcessGroupEvents();
+
     // handle config changes from reload
     if (_enabled != sWorld->getBoolConfig(CONFIG_VOICE_CHAT_ENABLED))
     {
@@ -237,6 +240,132 @@ bool VoiceChatMgr::HasPendingSocket()
 void VoiceChatMgr::QueueIncomingVoiceServerPacket(std::unique_ptr<VoiceChatServerPacket> packet)
 {
     _voiceServerPacketQueue.emplace_back(std::move(packet));
+}
+
+// Warning: the group hooks below may be called from map threads
+void VoiceChatMgr::QueueGroupMemberAdded(ObjectGuid guid, uint32 groupId, bool raid, bool battleground)
+{
+    VoiceChatGroupEvent event;
+    event.Type = VoiceChatGroupEventType::MemberAdded;
+    event.Id = groupId;
+    event.Guid = guid;
+    event.Raid = raid;
+    event.Battleground = battleground;
+    _groupEvents.add(event);
+}
+
+void VoiceChatMgr::QueueGroupMemberRemoved(ObjectGuid guid, uint32 groupId)
+{
+    VoiceChatGroupEvent event;
+    event.Type = VoiceChatGroupEventType::MemberRemoved;
+    event.Id = groupId;
+    event.Guid = guid;
+    _groupEvents.add(event);
+}
+
+void VoiceChatMgr::QueueBattlegroundMemberRemoved(ObjectGuid guid, uint32 instanceId, TeamId team)
+{
+    VoiceChatGroupEvent event;
+    event.Type = VoiceChatGroupEventType::BattlegroundMemberRemoved;
+    event.Id = instanceId;
+    event.Guid = guid;
+    event.Team = team;
+    _groupEvents.add(event);
+}
+
+void VoiceChatMgr::QueueGroupConvertedToRaid(uint32 groupId)
+{
+    VoiceChatGroupEvent event;
+    event.Type = VoiceChatGroupEventType::ConvertedToRaid;
+    event.Id = groupId;
+    _groupEvents.add(event);
+}
+
+void VoiceChatMgr::QueueGroupLeaderChanged(uint32 groupId, ObjectGuid oldLeader, ObjectGuid newLeader)
+{
+    VoiceChatGroupEvent event;
+    event.Type = VoiceChatGroupEventType::LeaderChanged;
+    event.Id = groupId;
+    event.Guid = newLeader;
+    event.OldLeader = oldLeader;
+    _groupEvents.add(event);
+}
+
+void VoiceChatMgr::QueueGroupDisbanded(uint32 groupId)
+{
+    VoiceChatGroupEvent event;
+    event.Type = VoiceChatGroupEventType::Disbanded;
+    event.Id = groupId;
+    _groupEvents.add(event);
+}
+
+void VoiceChatMgr::QueueBattlegroundRaidDisbanded(uint32 instanceId, TeamId team)
+{
+    VoiceChatGroupEvent event;
+    event.Type = VoiceChatGroupEventType::BattlegroundRaidDisbanded;
+    event.Id = instanceId;
+    event.Team = team;
+    _groupEvents.add(event);
+}
+
+void VoiceChatMgr::ProcessGroupEvents()
+{
+    VoiceChatGroupEvent event;
+    while (_groupEvents.next(event))
+    {
+        switch (event.Type)
+        {
+            case VoiceChatGroupEventType::MemberAdded:
+            {
+                Player* player = ObjectAccessor::FindConnectedPlayer(event.Guid);
+                if (!player || !player->GetSession()->IsVoiceChatEnabled())
+                    break;
+
+                if (event.Battleground)
+                    AddToBattlegroundVoiceChatChannel(event.Guid);
+                else if (event.Raid)
+                    AddToRaidVoiceChatChannel(event.Guid, event.Id);
+                else
+                    AddToGroupVoiceChatChannel(event.Guid, event.Id);
+                break;
+            }
+            case VoiceChatGroupEventType::MemberRemoved:
+                RemoveFromGroupVoiceChatChannel(event.Guid, event.Id);
+                RemoveFromRaidVoiceChatChannel(event.Guid, event.Id);
+                break;
+            case VoiceChatGroupEventType::BattlegroundMemberRemoved:
+                // the player may already have left the battleground, so the
+                // channel is looked up by the ids captured when queueing
+                if (Channel* channel = GetBattlegroundVoiceChatChannel(event.Id, event.Team))
+                    channel->RemoveVoiceChatMember(event.Guid);
+                break;
+            case VoiceChatGroupEventType::ConvertedToRaid:
+                ConvertToRaidChannel(event.Id);
+                break;
+            case VoiceChatGroupEventType::LeaderChanged:
+            {
+                // the new leader speaks with high priority
+                Channel* channel = GetGroupVoiceChatChannel(event.Id);
+                if (!channel)
+                    channel = GetRaidVoiceChatChannel(event.Id);
+
+                if (channel)
+                {
+                    channel->SetVoiceMemberPriority(event.OldLeader, LOW_VOICE_PRIORITY);
+                    channel->SetVoiceMemberPriority(event.Guid, HIGH_VOICE_PRIORITY);
+                    channel->SendVoiceRoster(true);
+                }
+                break;
+            }
+            case VoiceChatGroupEventType::Disbanded:
+                DeleteGroupVoiceChatChannel(event.Id);
+                DeleteRaidVoiceChatChannel(event.Id);
+                break;
+            case VoiceChatGroupEventType::BattlegroundRaidDisbanded:
+                DeleteBattlegroundVoiceChatChannel(event.Id, event.Team);
+                break;
+        }
+    }
 }
 
 void VoiceChatMgr::UpdateVoiceServerConnection(uint32 const diff)
