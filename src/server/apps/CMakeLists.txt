@@ -131,18 +131,17 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
     PRIVATE
       acore-core-interface)
 
-  if (${APP_PROJECT_NAME} MATCHES "authserver" OR ${APP_PROJECT_NAME} MATCHES "voiceserver")
+  if (${APP_PROJECT_NAME} MATCHES "authserver")
+    target_link_libraries(${APP_PROJECT_NAME}
+      PUBLIC
+        shared)
+  elseif(${APP_PROJECT_NAME} MATCHES "voiceserver")
     target_link_libraries(${APP_PROJECT_NAME}
       PUBLIC
         shared
-        services)
-
-    # voiceserver parts of the modules, see modules/VoiceModules.cmake
-    if (${APP_PROJECT_NAME} MATCHES "voiceserver")
-      target_link_libraries(${APP_PROJECT_NAME}
-        PUBLIC
-          voicemodules)
-    endif()
+        services
+        # voiceserver parts of the modules, see modules/VoiceModules.cmake
+        voicemodules)
   elseif(${APP_PROJECT_NAME} MATCHES "worldserver")
     target_link_libraries(${APP_PROJECT_NAME}
       PUBLIC
