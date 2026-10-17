@@ -146,11 +146,15 @@ public:
         ASSERT(handler);
         Map* map = handler->GetSession()->GetPlayer()->GetMap();
 
-        // Copied out first: removing a creature from the world erases it from this store
+        // Copied out first: removing a creature from the world erases it from this store. Only visual waypoints:
+        // a stale wpguid can point at a spawn id that was given to another creature after a restart.
         std::vector<Creature*> creatures;
         auto const creatureRange = map->GetCreatureBySpawnIdStore().equal_range(guid);
         for (auto itr = creatureRange.first; itr != creatureRange.second; ++itr)
-            creatures.push_back(itr->second);
+        {
+            if (itr->second->GetEntry() == wpEntry)
+                creatures.push_back(itr->second);
+        }
 
         if (creatures.empty())
         {
@@ -158,7 +162,7 @@ public:
             // spawn is on this map. DeleteCreatureData also keeps it from spawning when the grid loads. Not on an
             // instanceable map, where another instance may have it spawned.
             CreatureData const* data = sObjectMgr->GetCreatureData(guid);
-            if (!data || data->mapid != map->GetId() || map->Instanceable())
+            if (!data || data->id != wpEntry || data->mapid != map->GetId() || map->Instanceable())
             {
                 handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
                 return false;
