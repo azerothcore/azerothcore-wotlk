@@ -52,7 +52,8 @@ VoiceChatMgr::VoiceChatMgr() :
     _voicePort(0),
     _maxConnectAttempts(-1),
     _failedConnectAttempts(0),
-    _wasConnected(false)
+    _wasConnected(false),
+    _shuttingDown(false)
 {
 }
 
@@ -128,6 +129,9 @@ void VoiceChatMgr::Stop()
 
     {
         std::lock_guard<std::mutex> guard(_pendingSocketLock);
+        // a connect may still complete on the voice network thread until it is
+        // stopped below; such a socket must not be kept past its io context
+        _shuttingDown = true;
         if (_pendingSocket)
         {
             _pendingSocket->CloseSocket();
@@ -227,6 +231,12 @@ void VoiceChatMgr::Update(uint32 const diff)
 void VoiceChatMgr::OfferVoiceServerSocket(std::shared_ptr<VoiceChatSocket> socket)
 {
     std::lock_guard<std::mutex> guard(_pendingSocketLock);
+    if (_shuttingDown)
+    {
+        socket->CloseSocket();
+        return;
+    }
+
     _pendingSocket = std::move(socket);
 }
 

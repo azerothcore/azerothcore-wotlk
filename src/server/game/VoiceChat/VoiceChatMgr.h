@@ -235,6 +235,8 @@ private:
     // socket handed over from the connector callback (network thread)
     std::mutex _pendingSocketLock;
     std::shared_ptr<VoiceChatSocket> _pendingSocket;
+    // set by Stop(), guarded by _pendingSocketLock
+    bool _shuttingDown;
 
     LockedQueue<std::unique_ptr<VoiceChatServerPacket>> _voiceServerPacketQueue;
 
