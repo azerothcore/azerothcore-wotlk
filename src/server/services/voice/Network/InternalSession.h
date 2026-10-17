@@ -19,10 +19,12 @@
 #define _INTERNAL_SESSION_H_
 
 #include "ByteBuffer.h"
+#include "LockedQueue.h"
 #include "TcpSocket.h"
+#include "VoiceChatSharedDefines.h"
 #include <boost/asio/ip/tcp.hpp>
-
-class VoiceChatServerPacket;
+#include <memory>
+#include <string>
 
 using boost::asio::ip::tcp;
 
@@ -38,7 +40,11 @@ public:
     void OnClose() override;
     bool Update() override;
 
+    // network thread only
     void SendPacket(VoiceChatServerPacket const& packet);
+    // thread-safe, the message is sent from the network thread. Returns false if
+    // it does not fit an internal packet.
+    bool QueueModuleMessage(std::string const& tag, ByteBuffer const& data);
 
     void HandlePing(VoiceChatServerPacket& packet);
     void HandleCreateVoiceSession(VoiceChatServerPacket& packet);
@@ -49,10 +55,15 @@ public:
     void HandleDevoiceMember(VoiceChatServerPacket& packet);
     void HandleMuteMember(VoiceChatServerPacket& packet);
     void HandleUnmuteMember(VoiceChatServerPacket& packet);
+    void HandleModuleMessage(VoiceChatServerPacket& packet);
 
 protected:
     bool ReadHeaderHandler() override;
     ReadDataHandlerResult ReadDataHandler() override;
+
+private:
+    // packets queued from other threads, sent by Update()
+    LockedQueue<std::unique_ptr<VoiceChatServerPacket>> _queuedPackets;
 };
 
 #endif

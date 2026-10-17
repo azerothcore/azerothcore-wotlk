@@ -21,6 +21,7 @@
 #include "ByteBuffer.h"
 #include <cstddef>
 #include <Define.h>
+#include <string>
 
 /*
  * Internal protocol spoken between the worldserver (client side) and the
@@ -49,6 +50,10 @@
  *   CMSG_DEVOICE_MEMBER                -> [uint16 channelId, uint8 userId]
  *   CMSG_MUTE_MEMBER                   -> [uint16 channelId, uint8 userId]
  *   CMSG_UNMUTE_MEMBER                 -> [uint16 channelId, uint8 userId]
+ *   CMSG_MODULE_MESSAGE                -> [string tag, uint8 data[] (rest of the packet)]
+ *   SMSG_MODULE_MESSAGE                -> [string tag, uint8 data[] (rest of the packet)]
+ *                                         (opaque data exchanged by the worldserver and voiceserver
+ *                                         parts of a module, tag names the module and message)
  */
 enum class VoiceChatServerOpcodes : uint8
 {
@@ -65,9 +70,15 @@ enum class VoiceChatServerOpcodes : uint8
     CMSG_DEVOICE_MEMBER,
     CMSG_MUTE_MEMBER,
     CMSG_UNMUTE_MEMBER,
+    CMSG_MODULE_MESSAGE,
+    SMSG_MODULE_MESSAGE,
 
     NUM_OPCODES,
 };
+
+// largest internal packet (cmd byte plus payload). Module messages may use most
+// of it, all other packets are a handful of bytes.
+constexpr std::size_t VOICECHAT_MAX_INTERNAL_PACKET_SIZE = 8192;
 
 // Voice channel types, shared with the game client protocol
 // (CMSG_SET_ACTIVE_VOICE_CHANNEL and friends use the same values).
@@ -96,8 +107,7 @@ struct VoiceChatServerPktHeader
     char const* data() const { return reinterpret_cast<char const*>(this); }
     std::size_t headerSize() const { return sizeof(VoiceChatServerPktHeader); }
 
-    // largest internal packet payload is a handful of bytes, allow some headroom
-    bool IsValidSize() const { return size >= 1 && size < 256; }
+    bool IsValidSize() const { return size >= 1 && size <= VOICECHAT_MAX_INTERNAL_PACKET_SIZE; }
     bool IsValidOpcode() const { return cmd > static_cast<uint8>(VoiceChatServerOpcodes::NULL_OPCODE) && cmd < static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES); }
 };
 
@@ -131,5 +141,31 @@ public:
 protected:
     VoiceChatServerOpcodes _opcode;
 };
+
+// Builds a CMSG_MODULE_MESSAGE or SMSG_MODULE_MESSAGE, returns false if tag is
+// empty or the message does not fit an internal packet
+inline bool BuildVoiceChatModuleMessage(VoiceChatServerPacket& packet, VoiceChatServerOpcodes opcode,
+    std::string const& tag, ByteBuffer const& data)
+{
+    std::size_t const size = sizeof(uint8) + tag.size() + 1 + data.wpos();
+    if (tag.empty() || size > VOICECHAT_MAX_INTERNAL_PACKET_SIZE)
+        return false;
+
+    packet.Initialize(opcode, size - sizeof(uint8));
+    packet << tag;
+    packet.append(data);
+    return true;
+}
+
+// Reads a CMSG_MODULE_MESSAGE or SMSG_MODULE_MESSAGE, data receives the bytes after the tag
+inline void ReadVoiceChatModuleMessage(VoiceChatServerPacket& packet, std::string& tag, ByteBuffer& data)
+{
+    packet >> tag;
+
+    if (packet.rpos() < packet.size())
+        data.append(packet.contents() + packet.rpos(), packet.size() - packet.rpos());
+
+    packet.rfinish();
+}
 
 #endif

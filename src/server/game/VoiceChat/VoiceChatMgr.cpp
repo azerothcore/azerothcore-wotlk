@@ -26,6 +26,7 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "VoiceChatInternalHandler.h"
 #include "VoiceChatPackets.h"
 #include "VoiceChatSocket.h"
@@ -183,6 +184,7 @@ void VoiceChatMgr::Disable()
     {
         _voiceServerSocket->CloseSocket();
         _voiceServerSocket = nullptr;
+        sScriptMgr->OnVoiceServerDisconnected();
     }
 
     // drop a connection that was still being handed over
@@ -494,6 +496,8 @@ void VoiceChatMgr::OnVoiceServerConnected()
 
     if (reconnect)
         SendVoiceChatServiceReconnected();
+
+    sScriptMgr->OnVoiceServerConnected();
 }
 
 void VoiceChatMgr::OnVoiceServerDisconnected()
@@ -502,6 +506,8 @@ void VoiceChatMgr::OnVoiceServerDisconnected()
 
     // channels stay registered and are restored once the connection is re-established
     SendVoiceChatServiceDisconnect();
+
+    sScriptMgr->OnVoiceServerDisconnected();
 }
 
 void VoiceChatMgr::SendPacket(VoiceChatServerPacket const& packet)
@@ -565,6 +571,32 @@ void VoiceChatMgr::MuteChannelSlot(uint16 channelId, uint8 slotId)
 void VoiceChatMgr::UnmuteChannelSlot(uint16 channelId, uint8 slotId)
 {
     SendChannelSlotPacket(VoiceChatServerOpcodes::CMSG_UNMUTE_MEMBER, channelId, slotId);
+}
+
+bool VoiceChatMgr::SendModuleMessage(std::string const& tag, ByteBuffer const& data)
+{
+    if (!CanUseVoiceChat())
+        return false;
+
+    VoiceChatServerPacket packet;
+    if (!BuildVoiceChatModuleMessage(packet, VoiceChatServerOpcodes::CMSG_MODULE_MESSAGE, tag, data))
+    {
+        LOG_ERROR("voice-chat", "Module message '{}' of {} bytes does not fit an internal packet", tag, data.wpos());
+        return false;
+    }
+
+    SendPacket(packet);
+    return true;
+}
+
+void VoiceChatMgr::HandleModuleMessageOpcode(VoiceChatServerPacket const& packet)
+{
+    VoiceChatServerPacket data(packet);
+    std::string tag;
+    ByteBuffer message;
+    ReadVoiceChatModuleMessage(data, tag, message);
+
+    sScriptMgr->OnVoiceServerModuleMessage(tag, message);
 }
 
 void VoiceChatMgr::HandlePongOpcode(VoiceChatServerPacket const& /*packet*/)

@@ -22,9 +22,12 @@
 #include "Define.h"
 #include "VoiceChatSharedDefines.h"
 #include <boost/asio/ip/udp.hpp>
+#include <memory>
 #include <span>
 #include <string>
 #include <vector>
+
+class InternalSession;
 
 namespace Acore::Asio
 {
@@ -42,7 +45,28 @@ enum VoiceScriptHook
     VOICEHOOK_ON_MEMBER_STATE_CHANGED,
     VOICEHOOK_ON_CLIENT_HANDSHAKE,
     VOICEHOOK_ON_VOICE_PACKET,
+    VOICEHOOK_ON_WORLD_MESSAGE,
     VOICEHOOK_END
+};
+
+// The worldserver connection a module message came from. Scripts may keep it to
+// answer at any later time, from any thread. It stays safe to use after the
+// connection closed, sending fails then.
+class VoiceWorldLink
+{
+public:
+    VoiceWorldLink() = default;
+    explicit VoiceWorldLink(std::weak_ptr<InternalSession> session) : _session(std::move(session)) { }
+
+    // queues a message for the worldserver part of the module, which receives it
+    // through VoiceChatScript::OnVoiceServerModuleMessage. Returns false if the
+    // connection is gone or the message does not fit an internal packet.
+    bool SendModuleMessage(std::string const& tag, ByteBuffer const& data) const;
+
+    [[nodiscard]] bool IsConnected() const;
+
+private:
+    std::weak_ptr<InternalSession> _session;
 };
 
 /*
@@ -107,6 +131,12 @@ public:
     // header, as encoded by the game client. Runs for every frame of every
     // speaker, keep it cheap.
     virtual void OnVoicePacket(uint16 /*channelId*/, uint8 /*userId*/, std::span<uint8 const> /*payload*/) { }
+
+    // Called when the worldserver part of a module sent a message (see
+    // VoiceChatMgr::SendModuleMessage). tag names the module and message, scripts
+    // ignore tags they do not know. Answer through link. Runs on the network
+    // thread of the worldserver connections.
+    virtual void OnWorldMessage(VoiceWorldLink const& /*link*/, std::string const& /*tag*/, ByteBuffer& /*data*/) { }
 
 private:
     std::string const _name;

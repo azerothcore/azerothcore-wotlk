@@ -19,6 +19,7 @@
 #include "InternalHandler.h"
 #include "InternalSession.h"
 #include "VoiceChatSharedDefines.h"
+#include "VoiceScriptMgr.h"
 
 InternalSession::InternalSession(IoContextTcpSocket&& socket) : TcpSocket(std::move(socket))
 {
@@ -42,6 +43,10 @@ void InternalSession::OnClose()
 
 bool InternalSession::Update()
 {
+    std::unique_ptr<VoiceChatServerPacket> queued;
+    while (_queuedPackets.next(queued))
+        SendPacket(*queued);
+
     if (!InternalSocket::Update())
         return false;
 
@@ -121,6 +126,34 @@ void InternalSession::SendPacket(VoiceChatServerPacket const& packet)
     QueuePacket(std::move(buffer));
 
     LOG_TRACE("voice-chat", "Sending opcode {} size {}", uint32(packet.GetOpcode()), packet.size());
+}
+
+bool InternalSession::QueueModuleMessage(std::string const& tag, ByteBuffer const& data)
+{
+    std::unique_ptr<VoiceChatServerPacket> packet = std::make_unique<VoiceChatServerPacket>();
+    if (!BuildVoiceChatModuleMessage(*packet, VoiceChatServerOpcodes::SMSG_MODULE_MESSAGE, tag, data))
+    {
+        LOG_ERROR("voice-chat", "Module message '{}' of {} bytes does not fit an internal packet", tag, data.wpos());
+        return false;
+    }
+
+    _queuedPackets.emplace_back(std::move(packet));
+    return true;
+}
+
+bool VoiceWorldLink::SendModuleMessage(std::string const& tag, ByteBuffer const& data) const
+{
+    std::shared_ptr<InternalSession> session = _session.lock();
+    if (!session || !session->IsOpen())
+        return false;
+
+    return session->QueueModuleMessage(tag, data);
+}
+
+bool VoiceWorldLink::IsConnected() const
+{
+    std::shared_ptr<InternalSession> session = _session.lock();
+    return session && session->IsOpen();
 }
 
 void InternalSession::HandlePing(VoiceChatServerPacket& /*packet*/)
@@ -226,4 +259,13 @@ void InternalSession::HandleUnmuteMember(VoiceChatServerPacket& packet)
     packet >> userId;
 
     sChannelMgr.UnmuteMember(this, channelId, userId);
+}
+
+void InternalSession::HandleModuleMessage(VoiceChatServerPacket& packet)
+{
+    std::string tag;
+    ByteBuffer data;
+    ReadVoiceChatModuleMessage(packet, tag, data);
+
+    sVoiceScriptMgr->OnWorldMessage(VoiceWorldLink(weak_from_this()), tag, data);
 }

@@ -57,6 +57,7 @@ public:
     void OnMemberStateChanged(uint16 channelId, uint8 userId, bool voiced, bool muted);
     void OnClientHandshake(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& endpoint);
     void OnVoicePacket(uint16 channelId, uint8 userId, std::span<uint8 const> payload);
+    void OnWorldMessage(VoiceWorldLink const& link, std::string const& tag, ByteBuffer& data);
 
 private:
     VoiceScriptMgr() = default;

@@ -28,6 +28,7 @@ void VoiceChatInternalOpcodeTable<VoiceChatMgr>::Init()
 
     DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::SMSG_PONG,                          &VoiceChatMgr::HandlePongOpcode);
     DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::SMSG_CREATE_VOICE_SESSION_RESPONSE, &VoiceChatMgr::HandleCreateVoiceSessionResponseOpcode);
+    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::SMSG_MODULE_MESSAGE,                &VoiceChatMgr::HandleModuleMessageOpcode);
 
 #undef DEFINE_INTERNAL_VOICECHAT_HANDLER
 }

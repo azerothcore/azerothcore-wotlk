@@ -174,6 +174,12 @@ public:
     void MuteChannelSlot(uint16 channelId, uint8 slotId);
     void UnmuteChannelSlot(uint16 channelId, uint8 slotId);
 
+    // Module messages: opaque data exchanged with the voiceserver part of a module,
+    // tag names the module and message. Answers arrive through
+    // VoiceChatScript::OnVoiceServerModuleMessage. Returns false if the voiceserver
+    // is not connected or the message does not fit an internal packet.
+    bool SendModuleMessage(std::string const& tag, ByteBuffer const& data);
+
     uint64 GetNewSessionId() { return _nextSessionId++; }
 
     VoiceChatStatistics GetStatistics();
@@ -181,6 +187,7 @@ public:
     // internal packet handlers, public so the opcode table can register them
     void HandlePongOpcode(VoiceChatServerPacket const& packet);
     void HandleCreateVoiceSessionResponseOpcode(VoiceChatServerPacket const& packet);
+    void HandleModuleMessageOpcode(VoiceChatServerPacket const& packet);
 
 private:
     ~VoiceChatMgr();

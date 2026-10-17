@@ -124,3 +124,13 @@ void VoiceScriptMgr::OnVoicePacket(uint16 channelId, uint8 userId, std::span<uin
     CallHooks(VOICEHOOK_ON_VOICE_PACKET,
         [&](VoiceScript* script) { script->OnVoicePacket(channelId, userId, payload); });
 }
+
+void VoiceScriptMgr::OnWorldMessage(VoiceWorldLink const& link, std::string const& tag, ByteBuffer& data)
+{
+    // every script reads the message from the start
+    CallHooks(VOICEHOOK_ON_WORLD_MESSAGE, [&](VoiceScript* script)
+    {
+        data.rpos(0);
+        script->OnWorldMessage(link, tag, data);
+    });
+}
