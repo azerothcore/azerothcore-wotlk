@@ -748,7 +748,7 @@ void Channel::SendWhoOwner(ObjectGuid guid)
     SendToOne(&data, guid);
 }
 
-void Channel::List(Player const* player, bool /*display*/)
+void Channel::List(Player const* player, bool display)
 {
     ObjectGuid guid = player->GetGUID();
 
@@ -762,7 +762,7 @@ void Channel::List(Player const* player, bool /*display*/)
 
     LOG_DEBUG("chat.system", "SMSG_CHANNEL_LIST {} Channel: {}", player->GetSession()->GetPlayerInfo(), GetName());
     WorldPacket data(SMSG_CHANNEL_LIST, 1 + (GetName().size() + 1) + 1 + 4 + playersStore.size() * (8 + 1));
-    data << uint8(1);                                   // channel type?
+    data << uint8(display ? 1 : 0);                     // 0 = /chatlist (printed to chat), 1 = channel pane
     data << GetName();                                  // channel name
     data << uint8(GetFlags());                          // channel flags?
 
