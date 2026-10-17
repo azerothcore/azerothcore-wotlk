@@ -857,6 +857,14 @@ void VoiceChatMgr::ConvertToRaidChannel(uint32 groupId)
     if (!channel)
         return;
 
+    // a group has at most one voice channel: if the raid channel already exists,
+    // its creation added every voice enabled member, so drop the party channel
+    if (GetRaidVoiceChatChannel(groupId))
+    {
+        DeleteGroupVoiceChatChannel(groupId);
+        return;
+    }
+
     channel->SetVoiceType(VoiceChatChannelType::Raid);
     channel->SendVoiceRoster(true);
 }
@@ -865,6 +873,13 @@ void VoiceChatMgr::AddToGroupVoiceChatChannel(ObjectGuid guid, uint32 groupId)
 {
     if (!groupId)
         return;
+
+    // the group may have become a raid since this change was queued
+    if (Channel* raidChannel = GetRaidVoiceChatChannel(groupId))
+    {
+        raidChannel->AddVoiceChatMember(guid);
+        return;
+    }
 
     Channel* channel = GetGroupVoiceChatChannel(groupId);
     if (!channel)
@@ -887,6 +902,14 @@ void VoiceChatMgr::AddToRaidVoiceChatChannel(ObjectGuid guid, uint32 groupId)
         return;
 
     Channel* channel = GetRaidVoiceChatChannel(groupId);
+    if (!channel && GetGroupVoiceChatChannel(groupId))
+    {
+        // the group's conversion to raid is still queued: apply it now instead
+        // of creating a second voice channel for the same group
+        ConvertToRaidChannel(groupId);
+        channel = GetRaidVoiceChatChannel(groupId);
+    }
+
     if (!channel)
     {
         CreateRaidVoiceChatChannel(groupId);
