@@ -71,13 +71,19 @@ public:
 
         if (!fields || !(*fields)[1].Get<uint32>() || (*fields)[3].Get<uint32>() != player.GetGUID().GetCounter())
         {
-            handler->SendErrorMessage(LANG_ITEM_RESTORE_MISSING);
+            handler->SendErrorMessage(LANG_ITEM_RESTORE_MISSING, restoreId);
             return false;
         }
 
         // Mail item to player
         uint32 itemEntry = (*fields)[1].Get<uint32>();
         uint32 itemCount = (*fields)[2].Get<uint32>();
+
+        if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry); proto && proto->IsTemporary())
+        {
+            handler->SendErrorMessage(LANG_ITEM_RESTORE_MISSING, restoreId);
+            return false;
+        }
 
         if (Player* onlinePlayer = player.GetConnectedPlayer())
         {
@@ -130,6 +136,7 @@ public:
             return false;
         }
 
+        bool listed = false;
         do
         {
             Field* fields    = disposedItems->Fetch();
@@ -140,11 +147,21 @@ public:
             std::string itemName = "";
             if (ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId))
             {
+                if (item->IsTemporary())
+                    continue;
+
                 itemName = item->Name1;
             }
 
             handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST, id, itemName, itemId, count);
+            listed = true;
         } while (disposedItems->NextRow());
+
+        if (!listed)
+        {
+            handler->SendErrorMessage(LANG_ITEM_RESTORE_LIST_EMPTY);
+            return false;
+        }
 
         return true;
     }
