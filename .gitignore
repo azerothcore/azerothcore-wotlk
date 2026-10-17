@@ -11,6 +11,7 @@
 !/modules/CMakeLists.txt
 !/modules/*.h
 !/modules/*.cmake
+!/modules/Rochenoire*/
 /build*/
 /var/*
 !/var/build/.gitkeep

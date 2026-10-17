@@ -46,6 +46,34 @@ Read the matching doc(s) BEFORE starting the task:
 
 External modules live in `modules/`, each a subdir with its own `CMakeLists.txt`. Disable with `-DDISABLED_AC_MODULES="mod1;mod2"`. See `modules/how_to_make_a_module.md`.
 
+## Rochenoire (branche `rochenoire`)
+
+Ce dépôt est le **dépôt serveur** du projet Rochenoire, piloté par le dépôt Contrat (`..\`, voir `..\AGENTS.md`
+et `..\docs\`). Les règles ci-dessus restent valables ; celles-ci s'y ajoutent et prévalent en cas de conflit.
+
+- **Branches** : `master` = miroir strict de `upstream/master` (jamais de commit Rochenoire) ; `rochenoire` =
+  hooks noyau + `modules/Rochenoire*/` ; `feature/*` et `test/*` partent de `rochenoire`. Rebaser `rochenoire`
+  sur `master` après chaque mise à jour de l'amont.
+- **Remotes** : `upstream` = `azerothcore/azerothcore-wotlk`. Le remote `origin` (`rochenoire-acore-2026`) sera
+  ajouté par le commanditaire ; aucun `push` sans demande explicite.
+- **R1** : le noyau ne reçoit que des hooks (`src/server/game/Scripting/ScriptDefines/`), rédigés pour être
+  proposables en amont. Un hook n'est ajouté que si aucun hook amont n'existe déjà. Toute la logique métier va
+  dans `modules/Rochenoire*/` (nommage `Rochenoire<Nom>`, options `Rochenoire.<Module>.<Option>`).
+- **R4/R5** : le serveur est seul juge des issues de jeu ; tout CMSG Rochenoire est hostile, borné et validé.
+  Revue de sécurité obligatoire sur tout code traitant un paquet entrant.
+- **R6** : opcodes et structures viennent du contrat (`contract/` du dépôt Contrat), copié à l'identique ;
+  aucun opcode inventé ici seul.
+- **R7** : ne configure/compile rien sans demande, sauf la cible `unit_tests` lors d'une étape
+  d'implémentation de plan (D13).
+- **R8** : SQL noyau uniquement dans `data/sql/updates/pending_db_*/` ou `data/sql/custom/` ; SQL de module dans
+  `modules/<Module>/data/sql/db-<base>/`, idempotent.
+- **R9** : aucune commande git modifiant l'état du dépôt sans demande explicite.
+- **R10** : créditer l'auteur d'origine de tout code repris (TrinityCore, cMaNGOS, Valkirie, 2023).
+- **R12** : aucune constante d'extension codée en dur ; tout passe par le profil `Rochenoire.Profile`.
+- **R13** : pas de fonctionnalité sans tests (N1/N2 dans les deux profils, N3 de caractérisation des fonctions
+  AzerothCore touchées, suite amont `unit_tests` verte). Voir `..\docs\TESTS.md`.
+- Les plans vivent dans le dépôt Contrat (`..\.agents\plans\`), pas ici.
+
 ## Persisting lessons
 
 When a user correction reveals a lesson that generalizes, offer to persist it into these docs (placement per `.agents/docs/README.md`): use the `/self-improve` skill if installed, otherwise suggest the user to install it and read this page: https://www.azerothcore.org/wiki/agentic-engineering
