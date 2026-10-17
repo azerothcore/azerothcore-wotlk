@@ -80,7 +80,8 @@ void ChannelMgr::DeleteChannel(InternalSession const* session, uint16 channelId)
     LOG_DEBUG("voice-chat", "Channel {} deleted", channelId);
 }
 
-bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uint8 userId)
+bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uint8 userId,
+    boost::asio::ip::address const& clientAddress)
 {
     std::lock_guard<std::mutex> guard(_lock);
 
@@ -88,7 +89,7 @@ bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uin
     if (!channel)
         return false;
 
-    if (!channel->AddMember(userId))
+    if (!channel->AddMember(userId, clientAddress))
     {
         LOG_ERROR("voice-chat", "Could not add member {} to channel {} (invalid id or channel full)", userId, channelId);
         return false;
@@ -182,6 +183,15 @@ bool ChannelMgr::HandleClientHandshake(uint16 channelId, uint8 userId, boost::as
     VoiceChannelMember* member = channel->GetMember(userId);
     if (!member)
         return false;
+
+    // the header is trivially forgeable, so only the client the worldserver
+    // announced for this slot may claim it (its port may change, e.g. behind NAT)
+    if (NormalizeVoiceClientAddress(endpoint.address()) != member->ClientAddress)
+    {
+        LOG_DEBUG("voice-chat", "Rejected handshake for channel {} member {} from {}:{}, expected address {}",
+            channelId, userId, endpoint.address().to_string(), endpoint.port(), member->ClientAddress.to_string());
+        return false;
+    }
 
     if (member->HasEndpoint && member->Endpoint != endpoint)
         LOG_DEBUG("voice-chat", "Channel {} member {} re-announced from a different endpoint {}:{}",

@@ -20,13 +20,26 @@
 
 #include "Define.h"
 #include "VoiceChatSharedDefines.h"
+#include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/udp.hpp>
 #include <map>
 
 class InternalSession;
 
+// IPv4 clients compare equal whether seen as plain IPv4 or as IPv4-mapped IPv6
+inline boost::asio::ip::address NormalizeVoiceClientAddress(boost::asio::ip::address const& address)
+{
+    if (address.is_v6() && address.to_v6().is_v4_mapped())
+        return boost::asio::ip::make_address_v4(boost::asio::ip::v4_mapped, address.to_v6());
+
+    return address;
+}
+
 struct VoiceChannelMember
 {
+    // IP the worldserver saw the player's game client connect from. Only UDP
+    // traffic from this address may claim the slot.
+    boost::asio::ip::address ClientAddress;
     // UDP endpoint the game client announced itself from (via the initial
     // header-only datagram). Voice frames are relayed to this endpoint.
     boost::asio::ip::udp::endpoint Endpoint;
@@ -51,7 +64,7 @@ public:
     VoiceChannelMember* GetMember(uint8 userId);
     VoiceChannelMember const* GetMember(uint8 userId) const;
 
-    bool AddMember(uint8 userId);
+    bool AddMember(uint8 userId, boost::asio::ip::address const& clientAddress);
     void RemoveMember(uint8 userId);
 
     std::map<uint8, VoiceChannelMember> const& GetMembers() const { return _members; }

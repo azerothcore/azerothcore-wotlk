@@ -504,9 +504,16 @@ void VoiceChatMgr::SendChannelSlotPacket(VoiceChatServerOpcodes opcode, uint16 c
     SendPacket(data);
 }
 
-void VoiceChatMgr::EnableChannelSlot(uint16 channelId, uint8 slotId)
+void VoiceChatMgr::EnableChannelSlot(uint16 channelId, uint8 slotId, std::string const& clientAddress)
 {
-    SendChannelSlotPacket(VoiceChatServerOpcodes::CMSG_ADD_MEMBER, channelId, slotId);
+    if (!CanUseVoiceChat())
+        return;
+
+    VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_ADD_MEMBER, 3 + clientAddress.size() + 1);
+    data << channelId;
+    data << slotId;
+    data << clientAddress;
+    SendPacket(data);
 }
 
 void VoiceChatMgr::DisableChannelSlot(uint16 channelId, uint8 slotId)
@@ -698,7 +705,12 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
 
         for (auto const& [userId, member] : channel->GetVoiceMembers())
         {
-            EnableChannelSlot(voiceId, userId);
+            // offline members are pruned by the roster update below
+            Player* player = ObjectAccessor::FindConnectedPlayer(member.Guid);
+            if (!player)
+                continue;
+
+            EnableChannelSlot(voiceId, userId, player->GetSession()->GetRemoteAddress());
             if (member.IsVoiced())
                 VoiceChannelSlot(voiceId, userId);
             if (member.IsMuted() || member.IsForceMuted())

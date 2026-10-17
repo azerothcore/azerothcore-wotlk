@@ -135,7 +135,7 @@ void Channel::AddVoiceChatMember(ObjectGuid guid)
     _voiceMembers[userId] = member;
 
     // activate the slot on the voice server
-    sVoiceChatMgr->EnableChannelSlot(GetVoiceId(), userId);
+    sVoiceChatMgr->EnableChannelSlot(GetVoiceId(), userId, session->GetRemoteAddress());
     if (member.IsMuted())
         sVoiceChatMgr->MuteChannelSlot(GetVoiceId(), userId);
 

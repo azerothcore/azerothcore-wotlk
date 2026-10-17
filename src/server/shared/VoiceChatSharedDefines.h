@@ -40,7 +40,8 @@
  *   CMSG_CREATE_VOICE_SESSION          -> [uint16 channelId, uint8 channelType (VoiceChatChannelType)]
  *   SMSG_CREATE_VOICE_SESSION_RESPONSE -> [uint16 channelId, uint8 error (0 = ok)]
  *   CMSG_DELETE_VOICE_SESSION          -> [uint16 channelId]
- *   CMSG_ADD_MEMBER                    -> [uint16 channelId, uint8 userId]
+ *   CMSG_ADD_MEMBER                    -> [uint16 channelId, uint8 userId, string clientAddress]
+ *                                         (only UDP traffic from clientAddress may claim the slot)
  *   CMSG_REMOVE_MEMBER                 -> [uint16 channelId, uint8 userId]
  *   CMSG_VOICE_MEMBER                  -> [uint16 channelId, uint8 userId]
  *   CMSG_DEVOICE_MEMBER                -> [uint16 channelId, uint8 userId]

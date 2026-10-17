@@ -50,7 +50,8 @@ public:
     // internal (TCP) side
     bool CreateChannel(InternalSession const* session, uint16 channelId, VoiceChatChannelType type);
     void DeleteChannel(InternalSession const* session, uint16 channelId);
-    bool AddMember(InternalSession const* session, uint16 channelId, uint8 userId);
+    bool AddMember(InternalSession const* session, uint16 channelId, uint8 userId,
+        boost::asio::ip::address const& clientAddress);
     void RemoveMember(InternalSession const* session, uint16 channelId, uint8 userId);
     void VoiceMember(InternalSession const* session, uint16 channelId, uint8 userId);
     void DevoiceMember(InternalSession const* session, uint16 channelId, uint8 userId);

@@ -163,7 +163,9 @@ public:
     void JoinAvailableVoiceChatChannels(WorldSession* session);
 
     // change user state on the voiceserver
-    void EnableChannelSlot(uint16 channelId, uint8 slotId);
+    // clientAddress: IP the player's game client connects from, the voiceserver only
+    // accepts UDP traffic for this slot from that address
+    void EnableChannelSlot(uint16 channelId, uint8 slotId, std::string const& clientAddress);
     void DisableChannelSlot(uint16 channelId, uint8 slotId);
     void VoiceChannelSlot(uint16 channelId, uint8 slotId);
     void DevoiceChannelSlot(uint16 channelId, uint8 slotId);
