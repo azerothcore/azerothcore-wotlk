@@ -91,7 +91,7 @@ std::shared_ptr<WorldSocket> WorldSocketMgr::OnWorldSocketOpen(IoContextTcpSocke
 
         if (err && err != boost::system::errc::not_supported)
         {
-            LOG_ERROR("network", "WorldSocketMgr::OnSocketOpen sock.set_option(boost::asio::socket_base::send_buffer_size) err = {}", err.message());
+            LOG_ERROR("network", "WorldSocketMgr::OnWorldSocketOpen sock.set_option(boost::asio::socket_base::send_buffer_size) err = {}", err.message());
             return nullptr;
         }
     }
@@ -104,7 +104,7 @@ std::shared_ptr<WorldSocket> WorldSocketMgr::OnWorldSocketOpen(IoContextTcpSocke
 
         if (err)
         {
-            LOG_ERROR("network", "WorldSocketMgr::OnSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = {}", err.message());
+            LOG_ERROR("network", "WorldSocketMgr::OnWorldSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = {}", err.message());
             return nullptr;
         }
     }

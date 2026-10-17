@@ -52,7 +52,7 @@ protected:
 
     static void OnSocketAccept(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
-        Instance().OnSocketOpen(std::move(sock), threadIndex);
+        Instance().OnWorldSocketOpen(std::move(sock), threadIndex);
     }
 
 private:
