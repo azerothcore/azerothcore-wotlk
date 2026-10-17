@@ -307,7 +307,12 @@ public:
     {
         ObjectGuid::LowType clusterGuid = 0;
         if (GetClusterGuid(high, realmId, clusterGuid))
+        {
+            if (clusterGuid >= ObjectGuid::GetMaxCounter(high) - 1)
+                HandleCounterOverflow(high);
+
             return clusterGuid;
+        }
 
         if (_nextGuid >= ObjectGuid::GetMaxCounter(high) - 1)
             HandleCounterOverflow(high);

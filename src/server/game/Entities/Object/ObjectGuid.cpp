@@ -16,6 +16,7 @@
  */
 
 #include "ObjectGuid.h"
+#include "Errors.h"
 #include "Log.h"
 #include "TC9Sidecar.h"
 #include "World.h"
@@ -93,6 +94,11 @@ ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid)
 
 void ObjectGuidGeneratorBase::HandleCounterOverflow(HighGuid high)
 {
+    // StopNow only flags the shutdown, so Generate would keep handing out wrapped guids until the world loop exits.
+    // For persisted guids those overwrite other rows on save (REPLACE INTO item_instance), so stop right here.
+    if (high == HighGuid::Item || high == HighGuid::Player)
+        ABORT("{} guid overflow!! Can't continue, renumber the guids before restarting.", ObjectGuid::GetTypeName(high));
+
     LOG_ERROR("entities.object", "{} guid overflow!! Can't continue, shutting down server. ", ObjectGuid::GetTypeName(high));
     World::StopNow(ERROR_EXIT_CODE);
 }
