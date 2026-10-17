@@ -28,9 +28,9 @@ public:
 
     Vec3D(float x0 = 0.0f, float y0 = 0.0f, float z0 = 0.0f) : x(x0), y(y0), z(z0) {}
 
-    Vec3D(const Vec3D& v) : x(v.x), y(v.y), z(v.z) {}
+    Vec3D(Vec3D const& v) : x(v.x), y(v.y), z(v.z) {}
 
-    Vec3D& operator= (const Vec3D& v)
+    Vec3D& operator= (Vec3D const& v)
     {
         x = v.x;
         y = v.y;
@@ -38,19 +38,19 @@ public:
         return *this;
     }
 
-    Vec3D operator+ (const Vec3D& v) const
+    Vec3D operator+ (Vec3D const& v) const
     {
         Vec3D r(x + v.x, y + v.y, z + v.z);
         return r;
     }
 
-    Vec3D operator- (const Vec3D& v) const
+    Vec3D operator- (Vec3D const& v) const
     {
         Vec3D r(x - v.x, y - v.y, z - v.z);
         return r;
     }
 
-    float operator* (const Vec3D& v) const
+    float operator* (Vec3D const& v) const
     {
         return x * v.x + y * v.y + z * v.z;
     }
@@ -61,18 +61,18 @@ public:
         return r;
     }
 
-    friend Vec3D operator* (float d, const Vec3D& v)
+    friend Vec3D operator* (float d, Vec3D const& v)
     {
         return v * d;
     }
 
-    Vec3D operator% (const Vec3D& v) const
+    Vec3D operator% (Vec3D const& v) const
     {
         Vec3D r(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
         return r;
     }
 
-    Vec3D& operator+= (const Vec3D& v)
+    Vec3D& operator+= (Vec3D const& v)
     {
         x += v.x;
         y += v.y;
@@ -80,7 +80,7 @@ public:
         return *this;
     }
 
-    Vec3D& operator-= (const Vec3D& v)
+    Vec3D& operator-= (Vec3D const& v)
     {
         x -= v.x;
         y -= v.y;
@@ -125,7 +125,7 @@ public:
         return in;
     }
 
-    friend std::ostream& operator<<(std::ostream& out, const Vec3D& v)
+    friend std::ostream& operator<<(std::ostream& out, Vec3D const& v)
     {
         out << v.x << " " << v.y << " " << v.z;
         return out;
@@ -151,28 +151,28 @@ public:
 
     Vec2D(float x0 = 0.0f, float y0 = 0.0f) : x(x0), y(y0) {}
 
-    Vec2D(const Vec2D& v) : x(v.x), y(v.y) {}
+    Vec2D(Vec2D const& v) : x(v.x), y(v.y) {}
 
-    Vec2D& operator= (const Vec2D& v)
+    Vec2D& operator= (Vec2D const& v)
     {
         x = v.x;
         y = v.y;
         return *this;
     }
 
-    Vec2D operator+ (const Vec2D& v) const
+    Vec2D operator+ (Vec2D const& v) const
     {
         Vec2D r(x + v.x, y + v.y);
         return r;
     }
 
-    Vec2D operator- (const Vec2D& v) const
+    Vec2D operator- (Vec2D const& v) const
     {
         Vec2D r(x - v.x, y - v.y);
         return r;
     }
 
-    float operator* (const Vec2D& v) const
+    float operator* (Vec2D const& v) const
     {
         return x * v.x + y * v.y;
     }
@@ -183,19 +183,19 @@ public:
         return r;
     }
 
-    friend Vec2D operator* (float d, const Vec2D& v)
+    friend Vec2D operator* (float d, Vec2D const& v)
     {
         return v * d;
     }
 
-    Vec2D& operator+= (const Vec2D& v)
+    Vec2D& operator+= (Vec2D const& v)
     {
         x += v.x;
         y += v.y;
         return *this;
     }
 
-    Vec2D& operator-= (const Vec2D& v)
+    Vec2D& operator-= (Vec2D const& v)
     {
         x -= v.x;
         y -= v.y;

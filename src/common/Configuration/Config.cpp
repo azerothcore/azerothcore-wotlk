@@ -359,7 +359,7 @@ namespace
         {
             return ParseFile(file, isOptional, isReload);
         }
-        catch (const std::exception& e)
+        catch (std::exception const& e)
         {
             PrintError(file, "> {}", e.what());
         }
@@ -376,7 +376,7 @@ namespace
     {
         std::string result;
 
-        const char* str = key.c_str();
+        char const* str = key.c_str();
         std::size_t n = key.length();
 
         char curr;

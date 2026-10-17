@@ -114,7 +114,6 @@ std::shared_ptr<WorldSocket> WorldSocketMgr::OnWorldSocketOpen(IoContextTcpSocke
 
 NetworkThread<WorldSocket>* WorldSocketMgr::CreateThreads() const
 {
-
     NetworkThread<WorldSocket>* threads = new WorldSocketThread[GetNetworkThreadCount()];
 
     bool proxyProtocolEnabled = sConfigMgr->GetOption<bool>("Network.EnableProxyProtocol", false, true);

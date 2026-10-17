@@ -58,20 +58,16 @@ public:
 
     struct boss_loathebAI : public BossAI
     {
-        explicit boss_loathebAI(Creature* c) : BossAI(c, BOSS_LOATHEB), summons(me)
+        explicit boss_loathebAI(Creature* c) : BossAI(c, BOSS_LOATHEB)
         {
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
         }
 
         uint8 doomCounter;
-        EventMap events;
-        SummonList summons;
 
         void Reset() override
         {
             BossAI::Reset();
-            events.Reset();
-            summons.DespawnAll();
             doomCounter = 0;
         }
 

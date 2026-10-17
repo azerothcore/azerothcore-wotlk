@@ -80,7 +80,7 @@ void ExtractGameobjectModels()
 
     fwrite(VMAP::RAW_VMAP_MAGIC, 1, 8, model_list);
 
-    for (const auto & it : dbc)
+    for (auto const& it : dbc)
     {
         path = it.getString(1);
 

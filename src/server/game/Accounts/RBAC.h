@@ -706,6 +706,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_ACCOUNT_FLAG_LIST                      = 942,
     RBAC_PERM_COMMAND_ACCOUNT_FLAG_ADD                       = 943,
     RBAC_PERM_COMMAND_ACCOUNT_FLAG_REMOVE                    = 944,
+    RBAC_PERM_COMMAND_ACCOUNT_INFO                           = 945,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

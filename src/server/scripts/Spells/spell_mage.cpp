@@ -415,10 +415,10 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
     {
         PrepareAuraScript(spell_mage_combustion_proc);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION });
-    }
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION });
+        }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
@@ -427,7 +427,8 @@ class spell_mage_glyph_of_eternal_water : public AuraScript
 
         void Register() override
         {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc::OnRemove, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_mage_combustion_proc::OnRemove, EFFECT_0,
+                SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -589,20 +590,29 @@ class spell_mage_focus_magic : public AuraScript
 
     bool Load() override
     {
-        _procTarget = nullptr;
+        _procTargetGUID.Clear();
         return true;
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        _procTarget = GetCaster();
-        return _procTarget && _procTarget->IsAlive();
+        Unit* caster = GetCaster();
+        if (caster && caster->IsAlive())
+        {
+            _procTargetGUID = caster->GetGUID();
+            return true;
+        }
+        return false;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(_procTarget, SPELL_MAGE_FOCUS_MAGIC_PROC, true, nullptr, aurEff);
+        Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
+        if (!procTarget)
+            return;
+
+        GetTarget()->CastSpell(procTarget, SPELL_MAGE_FOCUS_MAGIC_PROC, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -612,7 +622,7 @@ class spell_mage_focus_magic : public AuraScript
     }
 
 private:
-    Unit* _procTarget;
+    ObjectGuid _procTargetGUID;
 };
 
 // -11426 - Ice Barrier
@@ -621,7 +631,7 @@ class spell_mage_ice_barrier_aura : public spell_mage_incanters_absorbtion_base_
     PrepareAuraScript(spell_mage_ice_barrier_aura);
 
     /// @todo: Rework
-    static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
+    static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, AuraEffect const* aurEff)
     {
         // +80.68% from sp bonus
         float bonus = 0.8068f;
@@ -657,7 +667,7 @@ class spell_mage_ice_barrier : public SpellScript
     PrepareSpellScript(spell_mage_ice_barrier);
 
     /// @todo: Rework
-    static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
+    static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, AuraEffect const* aurEff)
     {
         // +80.68% from sp bonus
         float bonus = 0.8068f;
@@ -1047,21 +1057,22 @@ class spell_mage_combustion : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // Do not take charges, add a stack of crit buff
-        if (!(eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
+        // Every hit adds a stack of the crit buff. The cast is deferred: this hook runs from
+        // Aura::GetProcEffectMask while the proc engine iterates the actor's aura map, and the
+        // insert could invalidate the live iterator (aura containers are flat_multimaps).
+        // HasAura drops the stack if Combustion ended in the meantime, e.g. on the crit that
+        // took the last charge.
+        Unit* actor = eventInfo.GetActor();
+        ObjectGuid actorGuid = actor->GetGUID();
+        actor->m_Events.AddEventAtOffset([actorGuid]()
         {
-            // Applying the stack mutates the actor's aura map while the proc engine iterates
-            // it (this hook runs from Aura::GetProcEffectMask); defer it so the insert can't
-            // invalidate the live iterator (aura containers are flat_multimaps).
-            Unit* actor = eventInfo.GetActor();
-            actor->m_Events.AddEventAtOffset([actor]()
-            {
-                actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
-            }, 1ms);
-            return false;
-        }
+            if (Player* actor = ObjectAccessor::FindPlayer(actorGuid))
+                if (actor->HasAura(SPELL_MAGE_COMBUSTION))
+                    actor->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+        }, 1ms);
 
-        return true;
+        // Only crits take a charge
+        return (eventInfo.GetHitMask() & PROC_HIT_CRITICAL) != 0;
     }
 
     void Register() override
@@ -1126,7 +1137,7 @@ class spell_mage_gen_extra_effects : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         Unit* caster = eventInfo.GetActor();
-        // T8 4P bonus: prevent double proc on Arcane Missiles
+        // prevent double proc on Arcane Missiles
         if (GetSpellInfo()->Id == SPELL_MAGE_HOT_STREAK_PROC && caster->HasAura(SPELL_MAGE_T8_4P_BONUS))
         {
             SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
@@ -1134,6 +1145,12 @@ class spell_mage_gen_extra_effects : public AuraScript
                 (spellInfo->SpellFamilyFlags[0] & 0x00000800)) // Arcane Missiles
                 return false;
         }
+
+        // T8 4P bonus: chance to not consume the proc
+        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MAGE_T8_4P_BONUS, EFFECT_0))
+            if (roll_chance_i(aurEff->GetAmount()))
+                return false;
+
         return true;
     }
 

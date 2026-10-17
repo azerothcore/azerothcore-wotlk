@@ -22,6 +22,7 @@
 #include "MapMgr.h"
 #include "Player.h"
 #include "SharedDefines.h"
+#include "TC9Sidecar.h"
 #include "UnitAI.h"
 #include "Weather.h"
 #include "WorldState.h"
@@ -160,20 +161,27 @@ void WorldState::LoadWorldStates()
 // Setting a worldstate will save it to DB
 void WorldState::setWorldState(uint32 index, uint64 timeValue)
 {
-    auto const& it = _worldstates.find(index);
-    if (it != _worldstates.end())
+    // Crossrealm nodes must not persist worldstates: their CharacterDatabase is
+    // the routing proxy and the write would land in an arbitrary realm DB. The
+    // in-memory value still has to be updated so read-modify-write users
+    // (e.g. the Wintergrasp clock) keep working.
+    if (!sToCloud9Sidecar->IsCrossrealm())
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_WORLDSTATE);
-        stmt->SetData(0, uint32(timeValue));
-        stmt->SetData(1, index);
-        CharacterDatabase.Execute(stmt);
-    }
-    else
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_WORLDSTATE);
-        stmt->SetData(0, index);
-        stmt->SetData(1, uint32(timeValue));
-        CharacterDatabase.Execute(stmt);
+        auto const& it = _worldstates.find(index);
+        if (it != _worldstates.end())
+        {
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_WORLDSTATE);
+            stmt->SetData(0, uint32(timeValue));
+            stmt->SetData(1, index);
+            CharacterDatabase.Execute(stmt);
+        }
+        else
+        {
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_WORLDSTATE);
+            stmt->SetData(0, index);
+            stmt->SetData(1, uint32(timeValue));
+            CharacterDatabase.Execute(stmt);
+        }
     }
 
     _worldstates[index] = timeValue;
@@ -1761,7 +1769,7 @@ enum PallidHorrorPaths
     PATH_UNDERCITY_ROYAL_QUARTER  = 163944,
 };
 
-bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, const Position& position, uint32 spawnLoc)
+bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, Position const& position, uint32 spawnLoc)
 {
     AddPendingPallid(zone.zoneId);
     // Remove old pallid if required.

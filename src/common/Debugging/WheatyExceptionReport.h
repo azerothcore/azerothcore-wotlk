@@ -169,9 +169,9 @@ private:
     static BasicType GetBasicType(DWORD typeIndex, DWORD64 modBase);
     static DWORD_PTR DereferenceUnsafePointer(DWORD_PTR address);
 
-    static int __cdecl Log(const TCHAR* format, ...);
-    static int __cdecl StackLog(const TCHAR* format, va_list argptr);
-    static int __cdecl HeapLog(const TCHAR* format, va_list argptr);
+    static int __cdecl Log(TCHAR const* format, ...);
+    static int __cdecl StackLog(TCHAR const* format, va_list argptr);
+    static int __cdecl HeapLog(TCHAR const* format, va_list argptr);
 
     static bool StoreSymbol(DWORD type, DWORD_PTR offset);
     static void ClearSymbols();

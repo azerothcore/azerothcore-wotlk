@@ -352,7 +352,7 @@ TEST_F(SpellProcPPMTest, ShapeshiftBug_ItemSpellPath_AlreadyCorrect)
 
     struct FormScenario
     {
-        const char* name;
+        char const* name;
         uint32 formSpeed;
     };
 

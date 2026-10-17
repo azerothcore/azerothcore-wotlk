@@ -90,7 +90,7 @@ namespace VMAP
 
         virtual ~IVMapMgr() = default;
 
-        virtual LoadResult existsMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
+        virtual LoadResult existsMap(char const* pBasePath, unsigned int pMapId, int x, int y) = 0;
 
         /**
         send debug commands

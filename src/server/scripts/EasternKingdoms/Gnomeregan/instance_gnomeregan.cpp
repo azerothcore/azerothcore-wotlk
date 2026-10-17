@@ -91,7 +91,7 @@ public:
         }
 
     private:
-        uint32 _encounters[MAX_ENCOUNTERS];
+        uint32 _encounters[MAX_ENCOUNTERS]{};
     };
 };
 
@@ -110,7 +110,7 @@ public:
         return GetGnomereganAI<npc_kernobeeAI>(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_A_FINE_MESS)
         {

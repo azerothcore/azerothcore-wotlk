@@ -31,6 +31,7 @@ namespace lfg
         LFG_INCOMPATIBLES_HAS_IGNORES,
         LFG_INCOMPATIBLES_NO_ROLES,
         LFG_INCOMPATIBLES_NO_DUNGEONS,
+        LFG_INCOMPATIBLES_REJECTED_BY_SCRIPT,
         LFG_COMPATIBLES_WITH_LESS_PLAYERS,                     // Values under this = not compatible (do not modify order)
         LFG_COMPATIBLES_MATCH                                  // Must be the last one
     };
@@ -103,8 +104,8 @@ namespace lfg
         uint32 FindBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue);
         void UpdateBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue, Lfg5Guids const& key);
 
-        LfgCompatibility FindNewGroups(const ObjectGuid& newGuid);
-        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
+        LfgCompatibility FindNewGroups(ObjectGuid const& newGuid);
+        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, ObjectGuid const& newGuid, uint64& foundMask, uint32& foundCount, std::set<Lfg5Guids> const& currentCompatibles);
 
         // Queue
         uint32 m_QueueStatusTimer;                         // used to check interval of sending queue status

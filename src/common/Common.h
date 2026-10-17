@@ -66,7 +66,7 @@ enum AccountFlag
 {
     ACCOUNT_FLAG_GM                   = 0x1,        // Account is GM
     ACCOUNT_FLAG_NOKICK               = 0x2,        // Will not be logged out while AFK
-    ACCOUNT_FLAG_COLLECTOR            = 0x4,        // NYI Collector's Edition
+    ACCOUNT_FLAG_COLLECTOR            = 0x4,        // Collector's Edition
     ACCOUNT_FLAG_TRIAL                = 0x8,        // Trial account
     ACCOUNT_FLAG_CANCELLED            = 0x10,       // NYI UNK
     ACCOUNT_FLAG_IGR                  = 0x20,       // NYI Internet Game Room (Internet cafe?)
@@ -133,18 +133,21 @@ enum LocaleConstant
     LOCALE_esMX = 7,
     LOCALE_ruRU = 8,
 
-    TOTAL_LOCALES
+    // Slots 9..15 are free for locales registered by modules.
+    TOTAL_LOCALES = 16
 };
 
 #define DEFAULT_LOCALE LOCALE_enUS
 
-#define MAX_LOCALES 8
+#define MAX_LOCALES (TOTAL_LOCALES - 1)
 #define MAX_ACCOUNT_TUTORIAL_VALUES 8
 
 AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
+inline bool IsLocaleRegistered(LocaleConstant locale) { return locale < TOTAL_LOCALES && localeNames[locale]; }
+
 AC_COMMON_API bool IsLocaleValid(std::string const& locale);
-AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
+AC_COMMON_API LocaleConstant GetLocaleByName(std::string const& name);
 AC_COMMON_API const std::string GetNameByLocaleConstant(LocaleConstant localeConstant);
 AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 

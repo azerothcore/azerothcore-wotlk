@@ -39,7 +39,7 @@ class Player;
 class BattlefieldScript : public ScriptObject
 {
 protected:
-    BattlefieldScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    BattlefieldScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }

@@ -120,9 +120,18 @@ struct boss_ingvar_the_plunderer : public ScriptedAI
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
+        // Residual damage (e.g. DoT ticks) during the feign death would restart
+        // the death sequence, repeating the yell and delaying Annhylde
+        if (me->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH))
+        {
+            if (damage >= me->GetHealth())
+                damage = me->GetHealth() - 1;
+            return;
+        }
+
         if (me->GetDisplayId() == DISPLAYID_DEFAULT && damage >= me->GetHealth())
         {
-            damage = 0;
+            damage = me->GetHealth() - 1;
             me->InterruptNonMeleeSpells(true);
             me->RemoveAllAuras();
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);

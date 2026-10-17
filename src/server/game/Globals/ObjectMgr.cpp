@@ -1381,7 +1381,7 @@ void ObjectMgr::LoadGameObjectAddons()
 
         ObjectGuid::LowType guid = fields[0].Get<uint32>();
 
-        const GameObjectData* goData = GetGameObjectData(guid);
+        GameObjectData const* goData = GetGameObjectData(guid);
         if (!goData)
         {
             LOG_ERROR("sql.sql", "GameObject (GUID: {}) does not exist but has a record in `gameobject_addon`", guid);
@@ -1656,7 +1656,7 @@ CreatureModel const* ObjectMgr::ChooseDisplayId(CreatureTemplate const* cinfo, C
     return cinfo->GetFirstInvisibleModel();
 }
 
-void ObjectMgr::ChooseCreatureFlags(const CreatureTemplate* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, const CreatureData* data /*= nullptr*/)
+void ObjectMgr::ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data /*= nullptr*/)
 {
     npcflag = cinfo->npcflag;
     unit_flags = cinfo->unit_flags;
@@ -1947,7 +1947,7 @@ void ObjectMgr::LoadLinkedRespawn()
         {
             case CREATURE_TO_CREATURE:
                 {
-                    const CreatureData* slave = GetCreatureData(guidLow);
+                    CreatureData const* slave = GetCreatureData(guidLow);
                     if (!slave)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Creature (guid) {} not found in creature table", guidLow);
@@ -1955,7 +1955,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    const CreatureData* master = GetCreatureData(linkedGuidLow);
+                    CreatureData const* master = GetCreatureData(linkedGuidLow);
                     if (!master)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Creature (linkedGuid) {} not found in creature table", linkedGuidLow);
@@ -1984,7 +1984,7 @@ void ObjectMgr::LoadLinkedRespawn()
                 }
             case CREATURE_TO_GO:
                 {
-                    const CreatureData* slave = GetCreatureData(guidLow);
+                    CreatureData const* slave = GetCreatureData(guidLow);
                     if (!slave)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Creature (guid) {} not found in creature table", guidLow);
@@ -1992,7 +1992,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    const GameObjectData* master = GetGameObjectData(linkedGuidLow);
+                    GameObjectData const* master = GetGameObjectData(linkedGuidLow);
                     if (!master)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (linkedGuid) {} not found in gameobject table", linkedGuidLow);
@@ -2021,7 +2021,7 @@ void ObjectMgr::LoadLinkedRespawn()
                 }
             case GO_TO_GO:
                 {
-                    const GameObjectData* slave = GetGameObjectData(guidLow);
+                    GameObjectData const* slave = GetGameObjectData(guidLow);
                     if (!slave)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (guid) {} not found in gameobject table", guidLow);
@@ -2029,7 +2029,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    const GameObjectData* master = GetGameObjectData(linkedGuidLow);
+                    GameObjectData const* master = GetGameObjectData(linkedGuidLow);
                     if (!master)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (linkedGuid) {} not found in gameobject table", linkedGuidLow);
@@ -2058,7 +2058,7 @@ void ObjectMgr::LoadLinkedRespawn()
                 }
             case GO_TO_CREATURE:
                 {
-                    const GameObjectData* slave = GetGameObjectData(guidLow);
+                    GameObjectData const* slave = GetGameObjectData(guidLow);
                     if (!slave)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Gameobject (guid) {} not found in gameobject table", guidLow);
@@ -2066,7 +2066,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    const CreatureData* master = GetCreatureData(linkedGuidLow);
+                    CreatureData const* master = GetCreatureData(linkedGuidLow);
                     if (!master)
                     {
                         LOG_ERROR("sql.sql", "LinkedRespawn: Creature (linkedGuid) {} not found in creature table", linkedGuidLow);
@@ -2382,7 +2382,7 @@ void ObjectMgr::LoadCreatures()
         data.spawnMask          = fields[14].Get<uint8>();
         data.phaseMask          = fields[15].Get<uint32>();
         int16 gameEvent         = fields[16].Get<int16>();
-        uint32 PoolId           = fields[17].Get<uint32>();
+        data.poolId             = fields[17].Get<uint32>();
         data.npcflag            = fields[18].Get<uint32>();
         data.unit_flags         = fields[19].Get<uint32>();
         data.dynamicflags       = fields[20].Get<uint32>();
@@ -2490,8 +2490,9 @@ void ObjectMgr::LoadCreatures()
             WorldDatabase.Execute(stmt);
         }
 
-        // Add to grid if not managed by the game event or pool system
-        if (gameEvent == 0 && PoolId == 0)
+        // Add to grid if not managed by the game event. Pooled spawns are in
+        // the grid data too; the grid loader filters them by pool state.
+        if (gameEvent == 0)
             AddCreatureToGrid(spawnId, &data);
 
         ++count;
@@ -3035,7 +3036,7 @@ void ObjectMgr::LoadGameobjects()
 
         data.phaseMask      = fields[15].Get<uint32>();
         int16 gameEvent     = fields[16].Get<int16>();
-        uint32 PoolId        = fields[17].Get<uint32>();
+        data.poolId         = fields[17].Get<uint32>();
 
         if (data.rotation.x < -1.0f || data.rotation.x > 1.0f)
         {
@@ -3094,7 +3095,7 @@ void ObjectMgr::LoadGameobjects()
             WorldDatabase.Execute(stmt);
         }
 
-        if (gameEvent == 0 && PoolId == 0)                      // if not this is to be managed by GameEvent System or Pool system
+        if (gameEvent == 0)                      // if not this is to be managed by GameEvent System
             AddGameobjectToGrid(guid, &data);
     } while (result->NextRow());
 
@@ -5131,6 +5132,26 @@ void ObjectMgr::LoadQuests()
         Field* fields = result->Fetch();
 
         Quest* newQuest = new Quest(fields);
+
+        // a choice reward with zero quantity would be shown to the player but never given
+        bool hasZeroCountChoice = false;
+        for (uint8 j = 0; j < QUEST_REWARD_CHOICES_COUNT; ++j)
+        {
+            if (newQuest->RewardChoiceItemId[j] && !newQuest->RewardChoiceItemCount[j])
+            {
+                LOG_ERROR("sql.sql",
+                    "Quest {} has `RewardChoiceItemId{}` = {} but `RewardChoiceItemCount{}` = 0, quest skipped.",
+                    newQuest->GetQuestId(), j + 1, newQuest->RewardChoiceItemId[j], j + 1);
+                hasZeroCountChoice = true;
+            }
+        }
+
+        if (hasZeroCountChoice)
+        {
+            delete newQuest;
+            continue;
+        }
+
         _questTemplates[newQuest->GetQuestId()] = newQuest;
     } while (result->NextRow());
 
@@ -5604,13 +5625,6 @@ void ObjectMgr::LoadQuests()
                     LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but item with entry {} does not exist, quest will not reward this item.",
                                      qinfo->GetQuestId(), j + 1, id, id);
                     qinfo->RewardChoiceItemId[j] = 0;          // no changes, quest will not reward this
-                }
-
-                if (!qinfo->RewardChoiceItemCount[j])
-                {
-                    LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but `RewardChoiceItemCount{}` = 0, quest can't be done.",
-                                     qinfo->GetQuestId(), j + 1, id, j + 1);
-                    // no changes, quest can't be done
                 }
             }
             else if (qinfo->RewardChoiceItemCount[j] > 0)
@@ -6804,129 +6818,6 @@ void ObjectMgr::LoadNpcTextLocales()
     LOG_INFO("server.loading", ">> Loaded {} Npc Text Locale Strings in {} ms", (uint32)_npcTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
-void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
-{
-    uint32 oldMSTime = getMSTime();
-
-    time_t curTime = GameTime::GetGameTime().count();
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL);
-    stmt->SetData(0, uint32(curTime));
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-    if (!result)
-        return;
-
-    std::map<uint32 /*messageId*/, MailItemInfoVec> itemsCache;
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL_ITEMS);
-    stmt->SetData(0, uint32(curTime));
-    if (PreparedQueryResult items = CharacterDatabase.Query(stmt))
-    {
-        MailItemInfo item;
-        do
-        {
-            Field* fields = items->Fetch();
-            item.item_guid = fields[0].Get<uint32>();
-            item.item_template = fields[1].Get<uint32>();
-            uint32 mailId = fields[2].Get<uint32>();
-            itemsCache[mailId].push_back(item);
-        } while (items->NextRow());
-    }
-
-    uint32 deletedCount = 0;
-    uint32 returnedCount = 0;
-    do
-    {
-        Field* fields = result->Fetch();
-        Mail* m = new Mail;
-        m->messageID      = fields[0].Get<uint32>();
-        m->messageType    = fields[1].Get<uint8>();
-        m->sender         = fields[2].Get<uint32>();
-        m->receiver       = fields[3].Get<uint32>();
-        bool has_items    = fields[4].Get<bool>();
-        m->expire_time    = time_t(fields[5].Get<uint32>());
-        m->deliver_time   = time_t(0);
-        m->stationery     = fields[6].Get<uint8>();
-        m->checked        = fields[7].Get<uint8>();
-        m->mailTemplateId = fields[8].Get<int16>();
-
-        Player* player = nullptr;
-        if (serverUp)
-            player = ObjectAccessor::FindPlayerByLowGUID(m->receiver);
-
-        if (player) // don't modify mails of a logged in player
-        {
-            delete m;
-            continue;
-        }
-
-        // Delete or return mail
-        if (has_items)
-        {
-            // read items from cache
-            m->items.swap(itemsCache[m->messageID]);
-
-            // If it is mail from non-player, or if it's already return mail, it shouldn't be returned, but deleted
-            if (!m->IsSentByPlayer() || m->IsSentByGM() || (m->IsCODPayment() || m->IsReturnedMail()))
-            {
-                for (auto const& mailedItem : m->items)
-                {
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                    stmt->SetData(0, mailedItem.item_guid);
-                    CharacterDatabase.Execute(stmt);
-                }
-
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
-                stmt->SetData(0, m->messageID);
-                CharacterDatabase.Execute(stmt);
-            }
-            else
-            {
-                // Mail will be returned
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_RETURNED);
-                stmt->SetData(0, m->receiver);
-                stmt->SetData(1, m->sender);
-                stmt->SetData(2, uint32(curTime + 30 * DAY));
-                stmt->SetData(3, uint32(curTime));
-                stmt->SetData (4, uint8(MAIL_CHECK_MASK_RETURNED));
-                stmt->SetData(5, m->messageID);
-                CharacterDatabase.Execute(stmt);
-                for (auto const& mailedItem : m->items)
-                {
-                    // Update receiver in mail items for its proper delivery, and in instance_item for avoid lost item at sender delete
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_RECEIVER);
-                    stmt->SetData(0, m->sender);
-                    stmt->SetData(1, mailedItem.item_guid);
-                    CharacterDatabase.Execute(stmt);
-
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
-                    stmt->SetData(0, m->sender);
-                    stmt->SetData(1, mailedItem.item_guid);
-                    CharacterDatabase.Execute(stmt);
-                }
-
-                // xinef: update global data
-                sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->sender));
-                sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
-
-                delete m;
-                ++returnedCount;
-                continue;
-            }
-        }
-
-        sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
-
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
-        stmt->SetData(0, m->messageID);
-        CharacterDatabase.Execute(stmt);
-        delete m;
-        ++deletedCount;
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Processed {} expired mails: {} deleted and {} returned in {} ms", deletedCount + returnedCount, deletedCount, returnedCount, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
-}
-
 void ObjectMgr::LoadQuestAreaTriggers()
 {
     uint32 oldMSTime = getMSTime();
@@ -7623,7 +7514,7 @@ void ObjectMgr::LoadAccessRequirements()
         }
 
         //Sort all arrays for priority
-        auto sortFunction = [](const ProgressionRequirement* const a, const ProgressionRequirement* const b) {return a->priority > b->priority; };
+        auto sortFunction = [](ProgressionRequirement const* const a, ProgressionRequirement const* const b) {return a->priority > b->priority; };
         std::sort(ar->achievements.begin(), ar->achievements.end(), sortFunction);
         std::sort(ar->quests.begin(), ar->quests.end(), sortFunction);
         std::sort(ar->items.begin(), ar->items.end(), sortFunction);
@@ -7693,13 +7584,27 @@ AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 
 void ObjectMgr::SetHighestGuids()
 {
-    QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Player>().Set((*result)[0].Get<uint32>() + 1);
+    // Refuse to start once the next guid would already trip ObjectGuidGenerator's overflow check. At the cap,
+    // MAX(guid) + 1 wraps to 0 and the cleanup below deletes every item relation.
+    auto setNextGuid = [](ObjectGuidGeneratorBase& generator, HighGuid high, char const* table)
+    {
+        QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM {}", table);
+        if (!result)
+            return;
 
-    result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Item>().Set((*result)[0].Get<uint32>() + 1);
+        uint32 maxGuid = (*result)[0].Get<uint32>();
+        if (maxGuid >= ObjectGuid::GetMaxCounter(high) - 2)
+        {
+            LOG_FATAL("server.loading", "{} guid space is exhausted (MAX(guid) in `{}` is {}). Renumber the guids before starting the server.",
+                ObjectGuid::GetTypeName(high), table, maxGuid);
+            exit(1);
+        }
+
+        generator.Set(maxGuid + 1);
+    };
+
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Player>(), HighGuid::Player, "characters");
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Item>(), HighGuid::Item, "item_instance");
 
     // Cleanup other tables from not existed guids ( >= _hiItemGuid)
     CharacterDatabase.Execute("DELETE FROM character_inventory WHERE item >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());     // One-time query
@@ -7707,7 +7612,7 @@ void ObjectMgr::SetHighestGuids()
     CharacterDatabase.Execute("DELETE FROM auctionhouse WHERE itemguid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
     CharacterDatabase.Execute("DELETE FROM guild_bank_item WHERE item_guid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
 
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
+    QueryResult result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
         GetGuidSequenceGenerator<HighGuid::Mo_Transport>().Set((*result)[0].Get<uint32>() + 1);
 
@@ -9464,7 +9369,7 @@ bool ObjectMgr::IsValidCharterName(std::string_view name)
     return isValidString(wname, strictMask, true);
 }
 
-bool ObjectMgr::IsValidChannelName(const std::string& name)
+bool ObjectMgr::IsValidChannelName(std::string const& name)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -9676,10 +9581,26 @@ bool ObjectMgr::LoadAcoreStrings()
     uint32 oldMSTime = getMSTime();
 
     _acoreStringStore.clear(); // for reload case
-    QueryResult result = WorldDatabase.Query("SELECT entry, content_default, locale_koKR, locale_frFR, locale_deDE, locale_zhCN, locale_zhTW, locale_esES, locale_esMX, locale_ruRU FROM acore_string");
+
+    // content_default holds enUS. A locale registered by a module needs its own locale_<code> column.
+    std::string sql = "SELECT entry, content_default";
+    std::vector<LocaleConstant> columnLocales; // locale of fields[2 + k]
+    for (uint8 i = LOCALE_koKR; i < TOTAL_LOCALES; ++i)
+    {
+        if (!IsLocaleRegistered(LocaleConstant(i)))
+            continue;
+
+        sql += ", locale_";
+        sql += localeNames[i];
+        columnLocales.push_back(LocaleConstant(i));
+    }
+    sql += " FROM acore_string";
+
+    QueryResult result = WorldDatabase.Query(sql);
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_string` is empty "
+            "or a locale column is missing; queried: {}", sql);
         LOG_INFO("server.loading", " ");
         return false;
     }
@@ -9694,8 +9615,9 @@ bool ObjectMgr::LoadAcoreStrings()
 
         data.Content.resize(DEFAULT_LOCALE + 1);
 
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
-            AddLocaleString(fields[i + 1].Get<std::string>(), LocaleConstant(i), data.Content);
+        AddLocaleString(fields[1].Get<std::string>(), DEFAULT_LOCALE, data.Content);
+        for (std::size_t k = 0; k < columnLocales.size(); ++k)
+            AddLocaleString(fields[2 + k].Get<std::string>(), columnLocales[k], data.Content);
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Acore Strings in {} ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -9927,7 +9849,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string_view name, bool exactSearch) 
     wstrToLower(wname);
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
-    const GameTele* alt = nullptr;
+    GameTele const* alt = nullptr;
     for (GameTeleContainer::const_iterator itr = _gameTeleStore.begin(); itr != _gameTeleStore.end(); ++itr)
     {
         if (itr->second.wnameLow == wname)

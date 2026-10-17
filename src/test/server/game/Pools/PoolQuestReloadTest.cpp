@@ -86,7 +86,8 @@ protected:
     {
         PoolGroup<Quest> poolGroup;
         PoolObject obj(questId, 0.0f);
-        poolGroup.Spawn1Object(&obj);
+        SpawnedPoolData spawns(nullptr);
+        poolGroup.Spawn1Object(spawns, &obj);
     }
 
     /// Simulate what LoadQuestRelationsHelper does on reload:
@@ -230,7 +231,7 @@ protected:
         sPoolMgr->mQuestSearchMap[TEST_QUEST_ID] = TEST_POOL_ID;
 
         // Mark the quest as active/spawned
-        sPoolMgr->mSpawnedData.ActivateObject<Quest>(TEST_QUEST_ID, TEST_POOL_ID);
+        sPoolMgr->mQuestSpawnedData.AddSpawn<Quest>(TEST_QUEST_ID, TEST_POOL_ID);
 
         // Set up pool-side mapping: quest -> creature
         sPoolMgr->mQuestCreatureRelation.insert(
@@ -243,7 +244,7 @@ protected:
         sPoolMgr->mPoolTemplate.erase(TEST_POOL_ID);
         sPoolMgr->mPoolQuestGroups.erase(TEST_POOL_ID);
         sPoolMgr->mQuestSearchMap.erase(TEST_QUEST_ID);
-        sPoolMgr->mSpawnedData.RemoveObject<Quest>(TEST_QUEST_ID, TEST_POOL_ID);
+        sPoolMgr->mQuestSpawnedData.RemoveSpawn<Quest>(TEST_QUEST_ID, TEST_POOL_ID);
 
         auto range = sPoolMgr->mQuestCreatureRelation.equal_range(TEST_QUEST_ID);
         sPoolMgr->mQuestCreatureRelation.erase(range.first, range.second);
@@ -270,7 +271,8 @@ TEST_F(PoolQuestReloadFixTest, ReSpawnPoolQuestsRestoresQuestAfterReload)
     // 1. Spawn the quest onto the NPC (simulates normal startup)
     PoolGroup<Quest> poolGroup;
     PoolObject obj(TEST_QUEST_ID, 0.0f);
-    poolGroup.Spawn1Object(&obj);
+    SpawnedPoolData spawns(nullptr);
+    poolGroup.Spawn1Object(spawns, &obj);
 
     auto count = [&]() {
         uint32 n = 0;

@@ -33,13 +33,13 @@ void UpdateData::AddOutOfRangeGUID(ObjectGuid guid)
     m_outOfRangeGUIDs.push_back(guid);
 }
 
-void UpdateData::AddUpdateBlock(const ByteBuffer& block)
+void UpdateData::AddUpdateBlock(ByteBuffer const& block)
 {
     m_data.append(block);
     ++m_blockCount;
 }
 
-void UpdateData::AddUpdateBlock(const UpdateData& block)
+void UpdateData::AddUpdateBlock(UpdateData const& block)
 {
     m_data.append(block.m_data);
     m_blockCount += block.m_blockCount;

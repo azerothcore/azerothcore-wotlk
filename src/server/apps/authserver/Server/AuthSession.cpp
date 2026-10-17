@@ -30,7 +30,9 @@
 #include "StringConvert.h"
 #include "TOTP.h"
 #include "Util.h"
+#include <algorithm>
 #include <boost/lexical_cast.hpp>
+#include <cctype>
 
 using boost::asio::ip::tcp;
 
@@ -306,6 +308,11 @@ bool AuthSession::HandleLogonChallenge()
     for (int i = 0; i < 4; ++i)
         _localizationName[i] = challenge->country[4 - i - 1];
 
+    // Written to account.locale in the same update as the session key: non-text bytes would fail the login
+    auto isLetter = [](unsigned char c) { return std::isalpha(c); };
+    if (!std::all_of(_localizationName.begin(), _localizationName.end(), isLetter))
+        _localizationName = localeNames[DEFAULT_LOCALE];
+
     // Get the account details from the account table
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
     stmt->SetData(0, GetRemoteIpAddress().to_string());
@@ -442,8 +449,8 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
         if (securityFlags & 0x04)               // Security token input
             pkt << uint8(1);
 
-        LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] account {} is using '{}' locale ({})",
-            ipAddress, port, _accountInfo.Login, _localizationName, GetLocaleByName(_localizationName));
+        LOG_DEBUG("server.authserver", "'{}:{}' [AuthChallenge] account {} is using '{}' locale",
+            ipAddress, port, _accountInfo.Login, _localizationName);
 
         _status = STATUS_LOGON_PROOF;
     }
@@ -518,7 +525,7 @@ bool AuthSession::HandleLogonProof()
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
         stmt->SetData(0, _sessionKey);
         stmt->SetData(1, address);
-        stmt->SetData(2, GetLocaleByName(_localizationName));
+        stmt->SetData(2, _localizationName);
         stmt->SetData(3, _os);
         stmt->SetData(4, _accountInfo.Login);
         _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt)

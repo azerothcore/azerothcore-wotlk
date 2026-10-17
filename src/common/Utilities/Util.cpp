@@ -160,7 +160,7 @@ Optional<int32> MoneyStringToMoney(std::string_view moneyString)
     return money;
 }
 
-uint32 TimeStringToSecs(const std::string& timestring)
+uint32 TimeStringToSecs(std::string const& timestring)
 {
     uint32 secs       = 0;
     uint32 buffer     = 0;
@@ -291,7 +291,7 @@ bool Utf8toWStr(char const* utf8str, std::size_t csize, wchar_t* wstr, std::size
     {
         // Replace the converted string with an error message if there is enough space
         // Otherwise just return an empty string
-        const wchar_t* errorMessage = L"An error occurred converting string from UTF-8 to WStr";
+        wchar_t const* errorMessage = L"An error occurred converting string from UTF-8 to WStr";
         std::size_t errorMessageLength = std::char_traits<wchar_t>::length(errorMessage);
         if (wsize >= errorMessageLength)
         {
@@ -421,7 +421,7 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32_t declension)
 
     std::size_t const thisLen = wname.length();
     std::array<std::wstring const*, 7> const& endings = dropEnds[declension];
-    for (const std::wstring* endingPtr : endings)
+    for (std::wstring const* endingPtr : endings)
     {
         if (endingPtr == nullptr)
         {
@@ -498,7 +498,7 @@ bool Utf8FitTo(std::string_view str, std::wstring_view search)
     return true;
 }
 
-void utf8printf(FILE* out, const char* str, ...)
+void utf8printf(FILE* out, char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
@@ -506,7 +506,7 @@ void utf8printf(FILE* out, const char* str, ...)
     va_end(ap);
 }
 
-void vutf8printf(FILE* out, const char* str, va_list* ap)
+void vutf8printf(FILE* out, char const* str, va_list* ap)
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     char temp_buf[32 * 1024];

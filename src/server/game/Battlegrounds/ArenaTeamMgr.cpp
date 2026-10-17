@@ -55,7 +55,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamById(uint32 arenaTeamId) const
     return nullptr;
 }
 
-ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(const std::string& arenaTeamName) const
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(std::string const& arenaTeamName) const
 {
     std::string search = arenaTeamName;
     std::transform(search.begin(), search.end(), search.begin(), ::toupper);
@@ -267,6 +267,8 @@ void ArenaTeamMgr::DistributeArenaPoints()
             at->NotifyStatsChanged();
         }
     }
+
+    sScriptMgr->OnArenaWeekReset();
 
     ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_END);
 

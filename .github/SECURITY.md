@@ -72,17 +72,16 @@ We support the following versions of dependencies.
 
 | CLang |       Status       |     Recommended      |
 | :---- | :----------------: | :------------------: |
-| 18    | :white_check_mark: | :large_blue_diamond: |
-| 15    | :white_check_mark: |                      |
-| 14 ≤  |    :red_circle:    |                      |
+| 21    | :white_check_mark: | :large_blue_diamond: |
+| 18    | :white_check_mark: |                      |
+| 17 ≤  |    :red_circle:    |                      |
 
 ### Supported GCC Versions:
 
 | GCC  |       Status       |     Recommended      |
 | :--- | :----------------: | :------------------: |
-| 14   | :white_check_mark: | :large_blue_diamond: |
-| 12   | :white_check_mark: |                      |
-| 11 ≤ |    :red_circle:    |                      |
+| 15   | :white_check_mark: | :large_blue_diamond: |
+| 14 ≤ |    :red_circle:    |                      |
 
 > [!NOTE]
 > We do **NOT** support any repacks that may or may not have been made based on AzerothCore. This is because they are usually based on older versions and there is no way to know what is in the precompiled binaries. Instead, you should compile your binaries from the AzerothCore source. To get started, read the [Installation Guide](https://www.azerothcore.org/wiki/installation).

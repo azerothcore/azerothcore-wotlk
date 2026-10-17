@@ -17,6 +17,7 @@
 
 #include "AreaDefines.h"
 #include "Battleground.h"
+#include "DBCStores.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
@@ -561,15 +562,31 @@ class spell_item_toy_train_set : public SpellScript
 {
     PrepareSpellScript(spell_item_toy_train_set)
 
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([](WorldObject const* target) { return !target->IsPlayer(); });
+    }
+
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        if (Unit* target = GetHitUnit())
-            target->HandleEmoteCommand(EMOTE_ONESHOT_TRAIN);
+        Player* target = GetHitPlayer();
+        if (!target)
+            return;
+
+        target->HandleEmoteCommand(EMOTE_ONESHOT_TRAIN);
+
+        // EmotesTextSound.dbc holds the per race/gender "choo choo" voice line. SMSG_EMOTE only carries
+        // the animation, and EMOTE_ONESHOT_TRAIN is not enough for the client to pick the sound itself.
+        uint8 const race = target->getRace();
+        uint8 const gender = target->getGender();
+        if (EmotesTextSoundEntry const* soundEntry = FindTextSoundEmoteFor(TEXT_EMOTE_TRAIN, race, gender))
+            target->PlayDistanceSound(soundEntry->SoundId);
     }
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_item_toy_train_set::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ALLY);
         OnEffectHitTarget += SpellEffectFn(spell_item_toy_train_set::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
@@ -3310,41 +3327,6 @@ class spell_item_complete_raptor_capture : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_item_complete_raptor_capture::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
-enum ImpaleLeviroth
-{
-    NPC_LEVIROTH                = 26452,
-    SPELL_LEVIROTH_SELF_IMPALE  = 49882,
-};
-
-class spell_item_impale_leviroth : public SpellScript
-{
-    PrepareSpellScript(spell_item_impale_leviroth);
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        if (!sObjectMgr->GetCreatureTemplate(NPC_LEVIROTH))
-            return false;
-        return true;
-    }
-
-    void HandleDummy(SpellEffIndex /* effIndex */)
-    {
-        if (Creature* target = GetHitCreature())
-            if (target->GetEntry() == NPC_LEVIROTH && target->HealthAbovePct(94))
-            {
-                target->CastSpell(target, SPELL_LEVIROTH_SELF_IMPALE, true);
-                target->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 150);
-                target->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 200);
-                target->LowerPlayerDamageReq(target->GetMaxHealth());
-            }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_impale_leviroth::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -6183,7 +6165,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_socrethars_stone);
     RegisterSpellScript(spell_item_demon_broiled_surprise);
     RegisterSpellScript(spell_item_complete_raptor_capture);
-    RegisterSpellScript(spell_item_impale_leviroth);
     RegisterSpellScript(spell_item_brewfest_mount_transformation);
     RegisterSpellScript(spell_item_nitro_boots);
     RegisterSpellScript(spell_item_teach_language);

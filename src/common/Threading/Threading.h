@@ -68,8 +68,8 @@ namespace Acore
         static std::thread::id currentId();
 
     private:
-        Thread(const Thread&);
-        Thread& operator=(const Thread&);
+        Thread(Thread const&);
+        Thread& operator=(Thread const&);
 
         static void ThreadTask(void* param);
 

@@ -40,7 +40,7 @@ bool ScriptMgr::OnAreaTrigger(Player* player, AreaTrigger const* trigger)
     return tempScript ? tempScript->OnTrigger(player, trigger) : false;
 }
 
-AreaTriggerScript::AreaTriggerScript(const char* name)
+AreaTriggerScript::AreaTriggerScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<AreaTriggerScript>::AddScript(this);

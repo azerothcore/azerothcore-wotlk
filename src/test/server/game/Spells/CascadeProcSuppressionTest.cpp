@@ -134,7 +134,7 @@ TEST_F(CascadeProcSuppressionTest, SpellInfo_WithMixedBits_HasAttributeReturnsTr
 
 struct RealSpellTestCase
 {
-    const char* name;
+    char const* name;
     uint32 spellId;
     bool hasAttr;  // Whether the spell has SPELL_ATTR3_INSTANT_TARGET_PROCS
 };
@@ -148,7 +148,7 @@ TEST_P(CascadeProcRealSpellTest, VerifySuppressionForRealSpell)
     // Build a SpellInfo mimicking the real spell's AttributesEx3
     auto spellInfo = SpellInfoBuilder()
         .WithId(tc.spellId)
-        .WithAttributesEx3(tc.hasAttr ? SPELL_ATTR3_INSTANT_TARGET_PROCS : 0)
+        .WithAttributesEx3(tc.hasAttr ? static_cast<uint32>(SPELL_ATTR3_INSTANT_TARGET_PROCS) : 0u)
         .BuildUnique();
 
     // Verify attribute detection matches expectation

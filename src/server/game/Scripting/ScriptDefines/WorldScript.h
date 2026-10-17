@@ -43,7 +43,7 @@ enum WorldHook
 class WorldScript : public ScriptObject
 {
 protected:
-    WorldScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    WorldScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when the open/closed state of the world changes.

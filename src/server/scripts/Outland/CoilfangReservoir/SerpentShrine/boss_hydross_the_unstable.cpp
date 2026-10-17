@@ -35,7 +35,6 @@ enum Talk
 enum Spells
 {
     SPELL_CLEANSING_FIELD_AURA  = 37935,
-    SPELL_CLEANSING_FIELD       = 37934,
     SPELL_BLUE_BEAM             = 38015,
     SPELL_ELEMENTAL_SPAWNIN     = 25035,
     SPELL_PURIFY_ELEMENTAL      = 36461,
@@ -76,7 +75,14 @@ enum Misc
 
     NPC_PURIFIED_WATER_ELEMENTAL    = 21260,
     NPC_PURE_SPAWN_OF_HYDROSS       = 22035,
-    NPC_TAINTED_HYDROSS_ELEMENTAL   = 21253
+    NPC_TAINTED_HYDROSS_ELEMENTAL   = 21253,
+    NPC_HYDROSS_BEAM_HELPER         = 21933
+};
+
+enum Actions
+{
+    ACTION_ENTER_CLEANSING_FIELD    = 1,
+    ACTION_LEAVE_CLEANSING_FIELD    = 2
 };
 
 enum WaterElementalPathIds
@@ -103,13 +109,30 @@ struct boss_hydross_the_unstable : public BossAI
         }, 12s, 12s, GROUP_OOC_PURIFY_ELEMENTALS);
     }
 
-    void JustReachedHome() override
+    void SetBeams(bool enable)
     {
-        BossAI::JustReachedHome();
-        if (!me->HasAura(SPELL_BLUE_BEAM))
+        std::list<Creature*> helpers;
+        me->GetCreatureListWithEntryInGrid(helpers, NPC_HYDROSS_BEAM_HELPER, 200.0f);
+        for (Creature* helper : helpers)
         {
-            me->RemoveAurasDueToSpell(SPELL_CLEANSING_FIELD_AURA);
+            if (!enable)
+                helper->InterruptNonMeleeSpells(false);
+            else if (!helper->HasUnitState(UNIT_STATE_CASTING))
+                helper->CastSpell(helper, SPELL_BLUE_BEAM);
         }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action != ACTION_ENTER_CLEANSING_FIELD && action != ACTION_LEAVE_CLEANSING_FIELD)
+            return;
+
+        bool inside = action == ACTION_ENTER_CLEANSING_FIELD;
+        SetBeams(inside);
+
+        // Evade strips the field aura before the engaged flag clears, and on death it lingers on the corpse for a tick
+        if (me->IsAlive() && me->IsEngaged() && !me->IsInEvadeMode() && me->HasAura(SPELL_CORRUPTION) == inside)
+            SetForm(!inside, false);
     }
 
     void SummonMovementInform(Creature* summon, uint32 movementType, uint32 pathId) override
@@ -230,17 +253,10 @@ struct boss_hydross_the_unstable : public BossAI
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
-        SetForm(false, true);
+        SetForm(!me->HasAura(SPELL_CLEANSING_FIELD_AURA), true);
         me->m_Events.CancelEventGroup(GROUP_OOC_PURIFY_ELEMENTALS);
 
-        scheduler.Schedule(1s, [this](TaskContext context)
-        {
-            if (me->HasAura(SPELL_BLUE_BEAM) == me->HasAura(SPELL_CORRUPTION))
-            {
-                SetForm(!me->HasAura(SPELL_BLUE_BEAM), false);
-            }
-            context.Repeat(1s);
-        }).Schedule(10min, [this](TaskContext)
+        scheduler.Schedule(10min, [this](TaskContext)
         {
             DoCastSelf(SPELL_ENRAGE, true);
         });
@@ -291,39 +307,19 @@ class spell_hydross_cleansing_field_aura : public AuraScript
     void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+            GetTarget()->ToCreature()->AI()->DoAction(ACTION_ENTER_CLEANSING_FIELD);
     }
 
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
+            GetTarget()->ToCreature()->AI()->DoAction(ACTION_LEAVE_CLEANSING_FIELD);
     }
 
     void Register() override
     {
         AfterEffectApply += AuraEffectApplyFn(spell_hydross_cleansing_field_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_hydross_cleansing_field_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
-class spell_hydross_cleansing_field_command : public AuraScript
-{
-    PrepareAuraScript(spell_hydross_cleansing_field_command);
-
-    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (GetTarget()->HasUnitState(UNIT_STATE_CASTING))
-            GetTarget()->InterruptNonMeleeSpells(false);
-        else
-            GetTarget()->CastSpell(GetTarget(), SPELL_BLUE_BEAM, true);
-    }
-
-    void Register() override
-    {
-        AfterEffectRemove += AuraEffectApplyFn(spell_hydross_cleansing_field_command::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -346,6 +342,5 @@ void AddSC_boss_hydross_the_unstable()
 {
     RegisterSerpentShrineAI(boss_hydross_the_unstable);
     RegisterSpellScript(spell_hydross_cleansing_field_aura);
-    RegisterSpellScript(spell_hydross_cleansing_field_command);
     RegisterSpellScript(spell_hydross_mark_of_hydross);
 }

@@ -46,19 +46,19 @@ public:
 
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, VMAP::ModelIgnoreFlags ignoreFlags) const;
 
-    bool GetIntersectionTime(uint32 phasemask, const G3D::Ray& ray, const G3D::Vector3& endPos, float& maxDist) const;
+    bool GetIntersectionTime(uint32 phasemask, G3D::Ray const& ray, G3D::Vector3 const& endPos, float& maxDist) const;
 
     bool GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, Optional<uint8> reqLiquidType, VMAP::AreaAndLiquidData& data) const;
 
-    bool GetObjectHitPos(uint32 phasemask, const G3D::Vector3& pPos1,
-                         const G3D::Vector3& pPos2, G3D::Vector3& pResultHitPos,
+    bool GetObjectHitPos(uint32 phasemask, G3D::Vector3 const& pPos1,
+                         G3D::Vector3 const& pPos2, G3D::Vector3& pResultHitPos,
                          float pModifyDist) const;
 
     [[nodiscard]] float getHeight(float x, float y, float z, float maxSearchDist, uint32 phasemask) const;
 
-    void insert(const GameObjectModel&);
-    void remove(const GameObjectModel&);
-    [[nodiscard]] bool contains(const GameObjectModel&) const;
+    void insert(GameObjectModel const&);
+    void remove(GameObjectModel const&);
+    [[nodiscard]] bool contains(GameObjectModel const&) const;
     [[nodiscard]] int size() const;
 
     void balance();

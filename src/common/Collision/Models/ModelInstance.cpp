@@ -24,13 +24,13 @@ using G3D::Ray;
 
 namespace VMAP
 {
-    ModelInstance::ModelInstance(const ModelSpawn& spawn, std::shared_ptr<WorldModel> model): ModelSpawn(spawn), iModel(model)
+    ModelInstance::ModelInstance(ModelSpawn const& spawn, std::shared_ptr<WorldModel> model): ModelSpawn(spawn), iModel(model)
     {
         iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iRot.y / 180.f, G3D::pi() * iRot.x / 180.f, G3D::pi() * iRot.z / 180.f).inverse();
         iInvScale = 1.f / iScale;
     }
 
-    bool ModelInstance::intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit, ModelIgnoreFlags ignoreFlags) const
+    bool ModelInstance::intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool StopAtFirstHit, ModelIgnoreFlags ignoreFlags) const
     {
         if (!iModel)
         {
@@ -63,7 +63,7 @@ namespace VMAP
         return hit;
     }
 
-    bool ModelInstance::GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const
+    bool ModelInstance::GetLocationInfo(G3D::Vector3 const& p, LocationInfo& info) const
     {
         if (!iModel)
         {
@@ -107,7 +107,7 @@ namespace VMAP
         return false;
     }
 
-    bool ModelInstance::GetLiquidLevel(const G3D::Vector3& p, LocationInfo& info, float& liqHeight) const
+    bool ModelInstance::GetLiquidLevel(G3D::Vector3 const& p, LocationInfo& info, float& liqHeight) const
     {
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
@@ -170,7 +170,7 @@ namespace VMAP
         return true;
     }
 
-    bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn& spawn)
+    bool ModelSpawn::writeToFile(FILE* wf, ModelSpawn const& spawn)
     {
         uint32 check = 0;
         check += fwrite(&spawn.flags, sizeof(uint32), 1, wf);

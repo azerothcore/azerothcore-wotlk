@@ -40,18 +40,18 @@ namespace
 
 template<> struct HashTrait< GameObjectModel>
 {
-    static std::size_t hashCode(const GameObjectModel& g) { return (size_t)(void*)&g; }
+    static std::size_t hashCode(GameObjectModel const& g) { return (size_t)(void*)&g; }
 };
 
 template<> struct PositionTrait< GameObjectModel>
 {
-    static void GetPosition(const GameObjectModel& g, G3D::Vector3& p) { p = g.GetPosition(); }
+    static void GetPosition(GameObjectModel const& g, G3D::Vector3& p) { p = g.GetPosition(); }
 };
 
 template<> struct BoundsTrait< GameObjectModel>
 {
-    static void GetBounds(const GameObjectModel& g, G3D::AABox& out) { out = g.GetBounds();}
-    static void GetBounds2(const GameObjectModel* g, G3D::AABox& out) { out = g->GetBounds();}
+    static void GetBounds(GameObjectModel const& g, G3D::AABox& out) { out = g.GetBounds();}
+    static void GetBounds2(GameObjectModel const* g, G3D::AABox& out) { out = g->GetBounds();}
 };
 
 typedef RegularGrid2D<GameObjectModel, BIHWrap<GameObjectModel>> ParentTree;
@@ -67,13 +67,13 @@ struct DynTreeImpl : public ParentTree
     {
     }
 
-    void insert(const Model& mdl)
+    void insert(Model const& mdl)
     {
         base::insert(mdl);
         ++unbalanced_times;
     }
 
-    void remove(const Model& mdl)
+    void remove(Model const& mdl)
     {
         base::remove(mdl);
         ++unbalanced_times;
@@ -114,17 +114,17 @@ DynamicMapTree::~DynamicMapTree()
     delete impl;
 }
 
-void DynamicMapTree::insert(const GameObjectModel& mdl)
+void DynamicMapTree::insert(GameObjectModel const& mdl)
 {
     impl->insert(mdl);
 }
 
-void DynamicMapTree::remove(const GameObjectModel& mdl)
+void DynamicMapTree::remove(GameObjectModel const& mdl)
 {
     impl->remove(mdl);
 }
 
-bool DynamicMapTree::contains(const GameObjectModel& mdl) const
+bool DynamicMapTree::contains(GameObjectModel const& mdl) const
 {
     return impl->contains(mdl);
 }
@@ -149,7 +149,7 @@ struct DynamicTreeIntersectionCallback
     DynamicTreeIntersectionCallback(uint32 phasemask, VMAP::ModelIgnoreFlags ignoreFlags) :
         _didHit(false), _phaseMask(phasemask), _ignoreFlags(ignoreFlags) { }
 
-    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance, bool stopAtFirstHit)
+    bool operator()(G3D::Ray const& r, GameObjectModel const& obj, float& distance, bool stopAtFirstHit)
     {
         bool result = obj.intersectRay(r, distance, stopAtFirstHit, _phaseMask, _ignoreFlags);
         if (result)
@@ -196,7 +196,7 @@ private:
     GameObjectModel const* _hitModel;
 };
 
-bool DynamicMapTree::GetIntersectionTime(const uint32 phasemask, const G3D::Ray& ray, const G3D::Vector3& endPos, float& maxDist) const
+bool DynamicMapTree::GetIntersectionTime(const uint32 phasemask, G3D::Ray const& ray, G3D::Vector3 const& endPos, float& maxDist) const
 {
     float distance = maxDist;
     DynamicTreeIntersectionCallback callback(phasemask, VMAP::ModelIgnoreFlags::Nothing);
@@ -208,8 +208,8 @@ bool DynamicMapTree::GetIntersectionTime(const uint32 phasemask, const G3D::Ray&
     return callback.didHit();
 }
 
-bool DynamicMapTree::GetObjectHitPos(const uint32 phasemask, const G3D::Vector3& startPos,
-                                     const G3D::Vector3& endPos, G3D::Vector3& resultHit,
+bool DynamicMapTree::GetObjectHitPos(const uint32 phasemask, G3D::Vector3 const& startPos,
+                                     G3D::Vector3 const& endPos, G3D::Vector3& resultHit,
                                      float modifyDist) const
 {
     bool result = false;

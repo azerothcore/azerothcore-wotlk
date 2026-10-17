@@ -126,7 +126,7 @@ void ScriptMgr::OnGossipSelect(Player* player, Item* item, uint32 sender, uint32
     }
 }
 
-void ScriptMgr::OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code)
+void ScriptMgr::OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, char const* code)
 {
     ASSERT(player);
     ASSERT(item);
@@ -142,13 +142,13 @@ void ScriptMgr::OnGossipSelectCode(Player* player, Item* item, uint32 sender, ui
     }
 }
 
-AllItemScript::AllItemScript(const char* name) :
+AllItemScript::AllItemScript(char const* name) :
     ScriptObject(name)
 {
     ScriptRegistry<AllItemScript>::AddScript(this);
 }
 
-ItemScript::ItemScript(const char* name) :
+ItemScript::ItemScript(char const* name) :
     ScriptObject(name)
 {
     ScriptRegistry<ItemScript>::AddScript(this);

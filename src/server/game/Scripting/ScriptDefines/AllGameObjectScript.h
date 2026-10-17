@@ -23,7 +23,7 @@
 class AllGameObjectScript : public ScriptObject
 {
 protected:
-    AllGameObjectScript(const char* name);
+    AllGameObjectScript(char const* name);
 
 public:
     /**
@@ -59,7 +59,7 @@ public:
     [[nodiscard]] virtual bool CanGameObjectGossipSelect(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
 
     // Called when a player selects a gossip with a code in the gameobject's gossip menu.
-    [[nodiscard]] virtual bool CanGameObjectGossipSelectCode(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+    [[nodiscard]] virtual bool CanGameObjectGossipSelectCode(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/) { return false; }
 
     // Called when a player accepts a quest from the gameobject.
     [[nodiscard]] virtual bool CanGameObjectQuestAccept(Player* /*player*/, GameObject* /*go*/, Quest const* /*quest*/) { return false; }

@@ -30,7 +30,7 @@ enum LootHook
 class LootScript : public ScriptObject
 {
 protected:
-    LootScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    LootScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }

@@ -181,6 +181,14 @@ void ScriptMgr::OnUnloadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint
     });
 }
 
+bool ScriptMgr::CanSendObjectUpdatesToPlayer(Map* map, Player* player)
+{
+    ASSERT(map);
+    ASSERT(player);
+
+    CALL_ENABLED_BOOLEAN_HOOKS(AllMapScript, ALLMAPHOOK_CAN_SEND_OBJECT_UPDATES_TO_PLAYER, !script->CanSendObjectUpdatesToPlayer(map, player));
+}
+
 void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
 {
     ASSERT(map);
@@ -273,7 +281,7 @@ void ScriptMgr::OnDestroyInstance(MapInstanced* mapInstanced, Map* map)
     CALL_ENABLED_HOOKS(AllMapScript, ALLMAPHOOK_ON_DESTROY_INSTANCE, script->OnDestroyInstance(mapInstanced, map));
 }
 
-AllMapScript::AllMapScript(const char* name, std::vector<uint16> enabledHooks) : ScriptObject(name, ALLMAPHOOK_END)
+AllMapScript::AllMapScript(char const* name, std::vector<uint16> enabledHooks) : ScriptObject(name, ALLMAPHOOK_END)
 {
     // If empty - enable all available hooks.
     if (enabledHooks.empty())

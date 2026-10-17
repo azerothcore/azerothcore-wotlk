@@ -58,18 +58,42 @@ T* HashMapHolder<T>::Find(ObjectGuid guid)
     return (itr != GetContainer().end()) ? itr->second : nullptr;
 }
 
+// Both statics are intentionally never destroyed.
+//
+// As plain function-local statics they are destroyed during exit, in reverse
+// order of construction. Other global destructors still reach into them after
+// that point, and locking a destroyed std::shared_mutex is undefined
+// behaviour. Observed as ACCESS_VIOLATION (0xC0000005) on a normal graceful
+// shutdown, via:
+//
+//     exit -> GuildMgr::~GuildMgr -> Guild::~Guild -> Guild::_DeleteBankItems
+//          -> Guild::BankTab::Delete -> Object::ClearUpdateMask
+//          -> Item::RemoveFromObjectUpdate -> Item::GetOwner
+//          -> ObjectAccessor::FindPlayer -> HashMapHolder<Player>::Find
+//
+// GuildMgr tears down guild bank items and asks each item for its owning
+// player, after the player map and its lock have already gone.
+//
+// Leaking makes them outlive every other static, so a late lookup finds an
+// empty but valid map and returns nullptr rather than crashing. The memory is
+// reclaimed by the OS at process exit, so nothing is lost.
+//
+// This makes late lookups safe; it does not prevent them. Removing them would
+// mean destroying guilds inside World::Shutdown while the player map is still
+// alive, which is a much larger change to shutdown sequencing.
+
 template<class T>
 auto HashMapHolder<T>::GetContainer() -> MapType&
 {
-    static MapType _objectMap;
-    return _objectMap;
+    static MapType* _objectMap = new MapType();
+    return *_objectMap;
 }
 
 template<class T>
 std::shared_mutex* HashMapHolder<T>::GetLock()
 {
-    static std::shared_mutex _lock;
-    return &_lock;
+    static std::shared_mutex* _lock = new std::shared_mutex();
+    return _lock;
 }
 
 HashMapHolder<Player>::MapType const& ObjectAccessor::GetPlayers()

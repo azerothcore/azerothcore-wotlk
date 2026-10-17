@@ -86,7 +86,7 @@ void ScriptMgr::OnBeforeAuctionHouseMgrUpdate()
     CALL_ENABLED_HOOKS(AuctionHouseScript, AUCTIONHOUSEHOOK_ON_BEFORE_AUCTIONHOUSEMGR_UPDATE, script->OnBeforeAuctionHouseMgrUpdate());
 }
 
-AuctionHouseScript::AuctionHouseScript(const char* name, std::vector<uint16> enabledHooks)
+AuctionHouseScript::AuctionHouseScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, AUCTIONHOUSEHOOK_END)
 {
     // If empty - enable all available hooks.

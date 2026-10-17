@@ -61,7 +61,7 @@ public:
 
     [[nodiscard]] bool isVendorWithIconSpeak() const;
 
-    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
+    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, CreatureData const* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
@@ -110,7 +110,7 @@ public:
 
     [[nodiscard]] bool HasMechanicTemplateImmunity(uint64 mask) const;
     // redefine Unit::IsImmunedToSpell
-    bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster = nullptr) const override;
+    bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, WorldObject const* caster = nullptr) const override;
     // redefine Unit::IsImmunedToSpellEffect
     [[nodiscard]] bool isElite() const
     {
@@ -175,7 +175,7 @@ public:
 
     void UpdateMovementFlags();
     uint32 GetRandomId(uint32 id1, uint32 id2, uint32 id3);
-    bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true, bool updateAI = false);
+    bool UpdateEntry(uint32 entry, CreatureData const* data = nullptr, bool changelevel = true, bool updateAI = false);
     bool UpdateEntry(uint32 entry, bool updateAI) { return UpdateEntry(entry, nullptr, true, updateAI); }
     bool UpdateStats(Stats stat) override;
     bool UpdateAllStats() override;
@@ -342,15 +342,15 @@ public:
     [[nodiscard]] bool IsNotReachableAndNeedRegen() const;
 
     void SetPosition(float x, float y, float z, float o);
-    void SetPosition(const Position& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
+    void SetPosition(Position const& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
 
     void SetHomePosition(float x, float y, float z, float o) { m_homePosition.Relocate(x, y, z, o); }
-    void SetHomePosition(const Position& pos) { m_homePosition.Relocate(pos); }
+    void SetHomePosition(Position const& pos) { m_homePosition.Relocate(pos); }
     void GetHomePosition(float& x, float& y, float& z, float& ori) const { m_homePosition.GetPosition(x, y, z, ori); }
     [[nodiscard]] Position const& GetHomePosition() const { return m_homePosition; }
 
     void SetTransportHomePosition(float x, float y, float z, float o) { m_transportHomePosition.Relocate(x, y, z, o); }
-    void SetTransportHomePosition(const Position& pos) { m_transportHomePosition.Relocate(pos); }
+    void SetTransportHomePosition(Position const& pos) { m_transportHomePosition.Relocate(pos); }
     void GetTransportHomePosition(float& x, float& y, float& z, float& ori) const { m_transportHomePosition.GetPosition(x, y, z, ori); }
     [[nodiscard]] Position const& GetTransportHomePosition() const { return m_transportHomePosition; }
 
@@ -460,8 +460,8 @@ public:
     bool IsUpdateNeeded() override;
 
 protected:
-    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
-    bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
+    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, CreatureData const* data = nullptr);
+    bool InitEntry(uint32 entry, CreatureData const* data = nullptr);
 
     // vendor items
     VendorItemCounts m_vendorItemCounts;
@@ -511,12 +511,15 @@ protected:
 
     Position m_homePosition;
     Position m_transportHomePosition;
+    Position LastMovementFlagsPos; // where UpdateMovementFlags() last ran while wandering (swim/fly flag refresh cadence)
 
     bool DisableReputationReward;
     bool DisableLootReward;
 
     CreatureTemplate const* m_creatureInfo;   // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
+    mutable uint32 CachedScriptId = 0;      // GetScriptId() cache
+    mutable uint32 CachedScriptIdEntry = 0; // GetEntry() the cache was resolved for (0 = unresolved)
 
     float m_detectionDistance;
     uint16 m_LootMode;  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable

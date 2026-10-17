@@ -37,7 +37,7 @@ void BuildPlayerLockDungeonBlock(WorldPacket& data, lfg::LfgLockMap const& lock)
     }
 }
 
-void BuildPartyLockDungeonBlock(WorldPacket& data, const lfg::LfgLockPartyMap& lockMap)
+void BuildPartyLockDungeonBlock(WorldPacket& data, lfg::LfgLockPartyMap const& lockMap)
 {
     data << uint8(lockMap.size());
     for (lfg::LfgLockPartyMap::const_iterator it = lockMap.begin(); it != lockMap.end(); ++it)
@@ -266,6 +266,10 @@ void WorldSession::HandleLfrSearchJoinOpcode(WorldPacket& recvData)
 {
     uint32 dungeonId;
     recvData >> dungeonId;
+
+    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_RAID_BROWSER))
+        return;
+
     dungeonId = (dungeonId & 0x00FFFFFF); // remove the type from the dungeon entry
     sLFGMgr->LfrSearchAdd(GetPlayer(), dungeonId);
     sLFGMgr->SendRaidBrowserCachedList(GetPlayer(), dungeonId);

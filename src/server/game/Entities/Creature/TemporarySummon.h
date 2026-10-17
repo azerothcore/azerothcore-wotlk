@@ -71,7 +71,7 @@ public:
     void SetVisibleBySummonerOnly(bool visibleBySummonerOnly) { _visibleBySummonerOnly = visibleBySummonerOnly; }
     [[nodiscard]] bool IsVisibleBySummonerOnly() const { return _visibleBySummonerOnly; }
 
-    const SummonPropertiesEntry* const m_Properties;
+    SummonPropertiesEntry const* const m_Properties;
 
     std::string GetDebugInfo() const override;
 

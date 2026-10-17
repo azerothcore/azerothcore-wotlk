@@ -36,7 +36,7 @@ private:
 public:
     ProducerConsumerQueue() = default;
 
-    void Push(const T& value)
+    void Push(T const& value)
     {
         {
             std::lock_guard<std::mutex> lock(_queueLock);
@@ -100,6 +100,15 @@ public:
     {
         _shutdown = true;
         _condition.notify_all();
+    }
+
+    // Reopens the queue after Cancel()/Shutdown() so new consumers can be attached.
+    // Callers must make sure the previous consumers have already stopped.
+    void Reset()
+    {
+        std::lock_guard<std::mutex> lock(_queueLock);
+        _cancel = false;
+        _shutdown = false;
     }
 
 private:

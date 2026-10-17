@@ -315,7 +315,7 @@ void Metric::ScheduleOverallStatusLog()
     if (_enabled)
     {
         _overallStatusTimer->expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(_overallStatusTimerInterval));
-        _overallStatusTimer->async_wait([this](const boost::system::error_code&)
+        _overallStatusTimer->async_wait([this](boost::system::error_code const&)
         {
             _overallStatusTimerTriggered = true;
             ScheduleOverallStatusLog();

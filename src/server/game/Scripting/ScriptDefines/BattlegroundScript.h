@@ -23,7 +23,7 @@
 class BattlegroundScript : public ScriptObject
 {
 protected:
-    BattlegroundScript(const char* name);
+    BattlegroundScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }

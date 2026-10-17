@@ -13,8 +13,9 @@ concurrency:
   #
   # - PRs use `refs/pull/<PR_NUMBER>/merge`, so new commits cancel older
   #   in-progress runs for the same PR.
-  # - When a PR is merged, a push to the target branch starts a new group,
-  #   canceling any still-running PR CI.
+  # - A merge does NOT cancel the PR's own runs: this group is keyed on
+  #   refs/pull/<N>/merge and the master push on refs/heads/master, so they
+  #   never share a group. See the cancel-pr-runs-on-close workflow.
   # - Branch pushes are isolated by ref.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -36,7 +37,7 @@ jobs:
       && !github.event.pull_request.draft
       && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
         with:
           CC: ${{ matrix.compiler.CC }}

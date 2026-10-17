@@ -256,7 +256,7 @@ public:
         uint8 _phase;
     };
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest* quest, uint32 /*slot*/) override
+    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*slot*/) override
     {
         if (quest->GetQuestId() == QUEST_YOUVE_BEEN_SERVED)
         {

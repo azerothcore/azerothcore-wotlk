@@ -95,12 +95,12 @@ namespace Movement
          * @param path - array of points, shouldn't be empty
          * @param pointId - Id of fisrt point of the path. Example: when third path point will be done it will notify that pointId + 3 done
          */
-        void MovebyPath(const PointsArray& path, int32 pointId = 0);
+        void MovebyPath(PointsArray const& path, int32 pointId = 0);
 
         /* Initializes simple A to B motion, A is current unit's position, B is destination
          */
         void MoveTo(Vector3 const& start, Vector3 const& destination, bool generatePath = true, bool forceDestination = false);
-        void MoveTo(const Vector3& destination, bool generatePath = false, bool forceDestination = false);
+        void MoveTo(Vector3 const& destination, bool generatePath = false, bool forceDestination = false);
         void MoveTo(float x, float y, float z, bool generatePath = false, bool forceDestination = false);
 
         /* Sets Id of fisrt point of the path. When N-th path point will be done ILisener will notify that pointId + N done
@@ -165,7 +165,7 @@ namespace Movement
     inline void MoveSplineInit::SetTransportExit() { args.flags.EnableTransportExit(); }
     inline void MoveSplineInit::SetOrientationFixed(bool enable) { args.flags.orientationFixed = enable; }
 
-    inline void MoveSplineInit::MovebyPath(const PointsArray& controls, int32 path_offset)
+    inline void MoveSplineInit::MovebyPath(PointsArray const& controls, int32 path_offset)
     {
         args.path_Idx_offset = path_offset;
         args.path.resize(controls.size());

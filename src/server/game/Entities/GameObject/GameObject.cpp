@@ -29,7 +29,9 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "PoolMgr.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "Spell.h"
 #include "SpellMgr.h"
 #include "Transport.h"
 #include "UpdateFieldFlags.h"
@@ -37,6 +39,45 @@
 #include <G3D/Box.h>
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
+
+namespace
+{
+    // The nearest of a summoned trap's targets: those its spell may hit, in line of sight from the trap at its
+    // owner's height, so the trap is never triggered through a wall. Distance is 3D, so a unit on the floor
+    // above or below is not standing on the trap.
+    class TrapTargetCheck
+    {
+    public:
+        TrapTargetCheck(GameObject* trap, Unit const* owner, SpellInfo const* trapSpell,
+            SpellTargetCheckTypes checkType, float range)
+            : _trap(trap), _owner(owner), _range(range), _spellCheck(trap, trap, trapSpell, checkType, nullptr) { }
+
+        bool operator()(WorldObject* target)
+        {
+            float dist = _trap->GetDistance(target);
+            if (dist >= _range)
+                return false;
+
+            // Before the ray: most units in range are ones the spell can't hit.
+            if (!_spellCheck(target))
+                return false;
+
+            LineOfSightChecks losChecks = LineOfSightChecks(LINEOFSIGHT_ALL_CHECKS & ~LINEOFSIGHT_CHECK_GOBJECT_M2);
+            float height = _owner->GetCollisionHeight();
+            if (!_trap->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::Nothing, losChecks, height))
+                return false;
+
+            _range = dist;
+            return true;
+        }
+
+    private:
+        GameObject const* _trap;
+        Unit const* _owner;
+        float _range;
+        Acore::WorldObjectSpellTargetCheck _spellCheck;
+    };
+}
 
 bool QuaternionData::IsUnit() const
 {
@@ -392,6 +433,41 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
                 m_invisibility.AddFlag(INVISIBILITY_TRAP);
                 m_invisibility.AddValue(INVISIBILITY_TRAP, 300);
             }
+
+            m_goValue.Trap.TargetSearcherCheckType = TARGET_CHECK_ENEMY;
+            if (SpellInfo const* trapSpell = sSpellMgr->GetSpellInfo(goinfo->trap.spellId))
+            {
+                // positive spells may require enemy targets
+                if (trapSpell->IsPositive())
+                {
+                    bool targetsAlly = false;
+                    bool targetsEnemy = false;
+                    auto isAllyTarget = [](SpellImplicitTargetInfo const& targetInfo)
+                    {
+                        return targetInfo.GetObjectType() == TARGET_OBJECT_TYPE_UNIT &&
+                            targetInfo.GetCheckType() == TARGET_CHECK_ALLY;
+                    };
+                    auto isEnemyTarget = [](SpellImplicitTargetInfo const& targetInfo)
+                    {
+                        return targetInfo.GetObjectType() == TARGET_OBJECT_TYPE_UNIT &&
+                            targetInfo.GetCheckType() == TARGET_CHECK_ENEMY;
+                    };
+                    for (SpellEffectInfo const& spellEffectInfo : trapSpell->Effects)
+                    {
+                        if (!spellEffectInfo.IsEffect())
+                            continue;
+
+                        targetsAlly = targetsAlly || isAllyTarget(spellEffectInfo.TargetA) ||
+                            isAllyTarget(spellEffectInfo.TargetB);
+                        targetsEnemy = targetsEnemy || isEnemyTarget(spellEffectInfo.TargetA) ||
+                            isEnemyTarget(spellEffectInfo.TargetB);
+                    }
+
+                    if (targetsAlly)
+                        m_goValue.Trap.TargetSearcherCheckType = targetsEnemy ? TARGET_CHECK_DEFAULT
+                            : TARGET_CHECK_ALLY;
+                }
+            }
             break;
         default:
             SetGoAnimProgress(animprogress);
@@ -490,8 +566,10 @@ void GameObject::Update(uint32 diff)
                             // Bombs
                             if (goInfo->trap.type == 2)
                                 m_cooldownTime = GameTime::GetGameTimeMS().count() + 10 * IN_MILLISECONDS; // Hardcoded tooltip value
-                            else if (GetOwner())
-                                m_cooldownTime = GameTime::GetGameTimeMS().count() + goInfo->trap.startDelay * IN_MILLISECONDS;
+                            else if (Unit* owner = GetOwner())
+                                if (owner->IsInCombat())
+                                    m_cooldownTime = GameTime::GetGameTimeMS().count() +
+                                        goInfo->trap.startDelay * IN_MILLISECONDS;
 
                             m_lootState = GO_READY;
                             break;
@@ -634,7 +712,7 @@ void GameObject::Update(uint32 diff)
                                         WorldPacket data(SMSG_FISH_ESCAPED, 0);
                                         caster->ToPlayer()->SendDirectMessage(&data);
                                     }
-                                    // can be delete
+                                    // can be deleted
                                     m_lootState = GO_JUST_DEACTIVATED;
                                     return;
                                 }
@@ -666,7 +744,7 @@ void GameObject::Update(uint32 diff)
                         // respawn timer
                         uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
                         if (poolid)
-                            sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+                            sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
                         else
                             GetMap()->AddToMap(this);
                     }
@@ -706,13 +784,26 @@ void GameObject::Update(uint32 diff)
                         Unit* owner = GetOwner();
                         Unit* target = nullptr;                            // pointer to appropriate target if found any
 
-                        // Note: this hack with search required until GO casting not implemented
-                        // search unfriendly creature
-                        if (owner && goInfo->trap.autoCloseTime != -1) // hunter trap
+                        if (owner)
                         {
-                            Acore::NearestAttackableNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                            Acore::UnitSearcher<Acore::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
-                            Cell::VisitObjects(this, searcher, radius);
+                            // summoned traps: search targets fit to trap spell data
+                            if (SpellInfo const* trapSpell = sSpellMgr->GetSpellInfo(goInfo->trap.spellId))
+                            {
+                                WorldObject* worldObjectTarget = nullptr;
+                                TrapTargetCheck checker(this, owner, trapSpell,
+                                    SpellTargetCheckTypes(m_goValue.Trap.TargetSearcherCheckType), radius);
+                                Acore::WorldObjectLastSearcher<TrapTargetCheck> searcher(this, worldObjectTarget,
+                                    checker, GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER);
+                                Cell::VisitObjects(this, searcher, radius);
+                                target = worldObjectTarget ? worldObjectTarget->ToUnit() : nullptr;
+                            }
+                            else
+                            {
+                                using AttackableCheck = Acore::NearestAttackableNoTotemUnitInObjectRangeCheck;
+                                AttackableCheck checker(this, owner, radius);
+                                Acore::UnitSearcher<AttackableCheck> searcher(this, target, checker);
+                                Cell::VisitObjects(this, searcher, radius);
+                            }
                         }
                         else                                        // environmental trap
                         {
@@ -790,13 +881,21 @@ void GameObject::Update(uint32 diff)
                         if (goInfo->trap.type == 2)
                         {
                             if (goInfo->trap.spellId)
-                                CastSpell(nullptr, goInfo->trap.spellId);  // FIXME: null target won't work for target type 1
+                            {
+                                CastSpellExtraArgs args;
+                                args.SetOriginalCaster(GetOwnerGUID());
+                                CastSpell(nullptr, goInfo->trap.spellId, args); // FIXME: null target won't work for target type 1
+                            }
                             SetLootState(GO_JUST_DEACTIVATED);
                         }
                         else if (Unit* target = ObjectAccessor::GetUnit(*this, _lootStateUnitGUID))
                         {
                             if (goInfo->trap.spellId)
-                                CastSpell(target, goInfo->trap.spellId);
+                            {
+                                CastSpellExtraArgs args;
+                                args.SetOriginalCaster(GetOwnerGUID());
+                                CastSpell(target, goInfo->trap.spellId, args);
+                            }
 
                             m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
@@ -962,9 +1061,12 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
             }
 
             uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
-            if (poolid)
+
+            // Keep the current pooled gameobject reserved until its respawn timer expires.
+            // GameObject::Update() will update the pool when the object is ready to respawn.
+            if (poolid && !m_respawnTime)
             {
-                sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+                sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
             }
         }
     }
@@ -988,7 +1090,7 @@ void GameObject::Delete()
 
     uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
     if (poolid)
-        sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
+        sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
     else
         AddObjectToRemoveList();
 }
@@ -1031,7 +1133,7 @@ void GameObject::SaveToDB(bool saveAddon /*= false*/)
 
 void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool saveAddon /*= false*/)
 {
-    const GameObjectTemplate* goI = GetGOInfo();
+    GameObjectTemplate const* goI = GetGOInfo();
 
     if (!goI)
         return;
@@ -1313,6 +1415,21 @@ bool GameObject::ActivateToQuest(Player* target) const
     if (!GetGOInfo()->IsGameObjectForQuests())
         return false;
 
+    FactionTemplateEntry const* gameObjectFaction =
+        sFactionTemplateStore.LookupEntry(GetUInt32Value(GAMEOBJECT_FACTION));
+    FactionTemplateEntry const* playerFaction = target->GetFactionTemplateEntry();
+    if (gameObjectFaction && playerFaction &&
+        (gameObjectFaction->IsHostileToAlliancePlayers() || gameObjectFaction->IsHostileToHordePlayers()))
+    {
+        // Faction templates 101/102 have no ourMask, so check hostility from the gameobject to the player.
+        bool isHostile = gameObjectFaction->IsHostileTo(*playerFaction);
+        if (ReputationRank const* forcedRank = target->GetReputationMgr().GetForcedRankIfAny(gameObjectFaction))
+            isHostile = *forcedRank <= REP_HOSTILE;
+
+        if (isHostile)
+            return false;
+    }
+
     switch (GetGoType())
     {
         case GAMEOBJECT_TYPE_QUESTGIVER:
@@ -1397,6 +1514,15 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
     return ok;
 }
 
+void GameObject::CastSpell(Unit* target, uint32 spellId)
+{
+    // unlike WorldObject::CastSpell(WorldObject*), a null Unit* here means "no unit target"
+    if (target)
+        WorldObject::CastSpell(target, spellId);
+    else
+        WorldObject::CastSpell(nullptr, spellId);
+}
+
 void GameObject::ResetDoorOrButton()
 {
     if (m_lootState == GO_READY || m_lootState == GO_JUST_DEACTIVATED)
@@ -1431,7 +1557,7 @@ void GameObject::SetGoArtKit(uint8 kit)
 
 void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType lowguid)
 {
-    const GameObjectData* data = nullptr;
+    GameObjectData const* data = nullptr;
     if (go)
     {
         go->SetGoArtKit(artkit);
@@ -1519,7 +1645,11 @@ void GameObject::Use(Unit* user)
             {
                 GameObjectTemplate const* goInfo = GetGOInfo();
                 if (goInfo->trap.spellId)
-                    CastSpell(user, goInfo->trap.spellId);
+                {
+                    CastSpellExtraArgs args;
+                    args.SetOriginalCaster(GetOwnerGUID());
+                    CastSpell(user, goInfo->trap.spellId, args);
+                }
 
                 m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown :  uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
@@ -1772,10 +1902,8 @@ void GameObject::Use(Unit* user)
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
                             {
-                                //TODO: I do not understand this hack. Need some explanation.
-                                // prevent removing GO at spell cancel
-                                RemoveFromOwner();
-                                SetOwnerGUID(player->GetGUID());
+                                // Keep the bobber owned while loot is open, but clear the
+                                // spell id so finishing the fishing channel does not delete it.
                                 SetSpellId(0); // prevent removing unintended auras at Unit::RemoveGameObject
 
                                 // fishing pool catch
@@ -2077,71 +2205,6 @@ void GameObject::Use(Unit* user)
     }
     else
         CastSpell(user, spellId);
-}
-
-void GameObject::CastSpell(Unit* target, uint32 spellId)
-{
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (!spellInfo)
-        return;
-
-    bool self = true;
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (spellInfo->Effects[i].TargetA.GetReferenceType() != TARGET_REFERENCE_TYPE_CASTER || spellInfo->Effects[i].TargetB.GetTarget())
-        {
-            self = false;
-            break;
-        }
-    }
-
-    if (self && target && target->GetGUID() != GetGUID())
-    {
-        target->CastSpell(target, spellInfo, true);
-        return;
-    }
-
-    //summon world trigger
-    Creature* trigger = SummonTrigger(GetPositionX(), GetPositionY(), GetPositionZ(), 0, spellInfo->CalcCastTime() + 2000, true);
-    if (!trigger)
-        return;
-
-    if (Unit* owner = GetOwner())
-    {
-        trigger->SetLevel(owner->GetLevel(), false);
-        trigger->SetFaction(owner->GetFaction());
-        // needed for GO casts for proper target validation checks
-        trigger->SetOwnerGUID(owner->GetGUID());
-        // xinef: fixes some duel bugs with traps]
-        if (owner->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
-            trigger->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
-        if (owner->IsFFAPvP())
-        {
-            if (!trigger->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
-            {
-                sScriptMgr->OnFfaPvpStateUpdate(trigger, true);
-                trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-            }
-
-        }
-        // xinef: Remove Immunity flags
-        trigger->SetImmuneToNPC(false);
-        // xinef: set proper orientation, fixes cast against stealthed targets
-        if (target)
-            trigger->SetInFront(target);
-        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, owner->GetGUID());
-    }
-    else
-    {
-        // xinef: set faction of gameobject, if no faction - assume hostile
-        trigger->SetFaction(GetTemplateAddon() && GetTemplateAddon()->faction ? GetTemplateAddon()->faction : 14);
-        // Set owner guid for target if no owner availble - needed by trigger auras
-        // - trigger gets despawned and there's no caster avalible (see AuraEffect::TriggerSpell())
-        // xinef: set proper orientation, fixes cast against stealthed targets
-        if (target)
-            trigger->SetInFront(target);
-        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, target ? target->GetGUID() : ObjectGuid::Empty);
-    }
 }
 
 void GameObject::SendCustomAnim(uint32 anim)
@@ -2815,7 +2878,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
                             dynFlags |= GO_DYNFLAG_LO_SPARKLE;
                         break;
                     case GAMEOBJECT_TYPE_TRANSPORT:
-                        if (const StaticTransport* t = ToStaticTransport())
+                        if (StaticTransport const* t = ToStaticTransport())
                             if (t->GetPauseTime())
                             {
                                 if (GetGoState() == GO_STATE_READY)
@@ -2832,7 +2895,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
                         // else it's ignored
                         break;
                     case GAMEOBJECT_TYPE_MO_TRANSPORT:
-                        if (const MotionTransport* t = ToMotionTransport())
+                        if (MotionTransport const* t = ToMotionTransport())
                             pathProgress = int16(float(t->GetPathProgress()) / float(t->GetPeriod()) * 65535.0f);
                         break;
                     default:
@@ -2967,6 +3030,7 @@ public:
     explicit GameObjectModelOwnerImpl(GameObject* owner) : _owner(owner) { }
 
     bool IsSpawned() const override { return _owner->isSpawned(); }
+    bool IsTransport() const override { return _owner->IsTransport(); }
     uint32 GetDisplayId() const override { return _owner->GetDisplayId(); }
     uint32 GetPhaseMask() const override { return (_owner->GetGoState() == GO_STATE_READY || _owner->IsTransport()) ? _owner->GetPhaseMask() : 0; }
     G3D::Vector3 GetPosition() const override { return G3D::Vector3(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ()); }

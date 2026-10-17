@@ -468,8 +468,8 @@ enum PlayerFlags : uint32
     PLAYER_FLAGS_IN_PVP            = 0x00000200,
     PLAYER_FLAGS_HIDE_HELM         = 0x00000400,
     PLAYER_FLAGS_HIDE_CLOAK        = 0x00000800,
-    PLAYER_FLAGS_PLAYED_LONG_TIME  = 0x00001000,               // played long time
-    PLAYER_FLAGS_PLAYED_TOO_LONG   = 0x00002000,               // played too long time
+    PLAYER_FLAGS_PARTIAL_PLAY_TIME = 0x00001000,               // played long time
+    PLAYER_FLAGS_NO_PLAY_TIME      = 0x00002000,               // played too long time
     PLAYER_FLAGS_IS_OUT_OF_BOUNDS  = 0x00004000,
     PLAYER_FLAGS_DEVELOPER         = 0x00008000,               // <Dev> prefix for something?
     PLAYER_FLAGS_UNK16             = 0x00010000,               // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary
@@ -988,6 +988,7 @@ enum AdditionalSaving
     ADDITIONAL_SAVING_NONE                      = 0x00,
     ADDITIONAL_SAVING_INVENTORY_AND_GOLD        = 0x01,
     ADDITIONAL_SAVING_QUEST_STATUS              = 0x02,
+    ADDITIONAL_SAVING_ACHIEVEMENTS              = 0x04,
 };
 
 enum PlayerCommandStates
@@ -1362,7 +1363,7 @@ public:
     void RemoveItem(uint8 bag, uint8 slot, bool update);
     void MoveItemFromInventory(uint8 bag, uint8 slot, bool update);
     // in trade, auction, guild bank, mail....
-    void MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB = false);
+    Item* MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB = false);
     // in trade, guild bank, mail....
     void RemoveItemDependentAurasAndCasts(Item* pItem);
     void DestroyItem(uint8 bag, uint8 slot, bool update);
@@ -1454,7 +1455,7 @@ public:
     bool CanSeeStartQuest(Quest const* quest);
     bool CanTakeQuest(Quest const* quest, bool msg);
     bool CanAddQuest(Quest const* quest, bool msg);
-    bool CanCompleteQuest(uint32 quest_id, const QuestStatusData* q_savedStatus = nullptr);
+    bool CanCompleteQuest(uint32 quest_id, QuestStatusData const* q_savedStatus = nullptr);
     bool CanCompleteRepeatableQuest(Quest const* quest);
     bool CanRewardQuest(Quest const* quest, bool msg);
     bool CanRewardQuest(Quest const* quest, uint32 reward, bool msg);
@@ -1466,6 +1467,7 @@ public:
     void RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true, bool isLFGReward = false);
     void SetRewardedQuest(uint32 quest_id);
     void FailQuest(uint32 quest_id);
+    void FailQuestsOnDeath();
     bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestLevel(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestLog(bool msg);
@@ -1722,9 +1724,10 @@ public:
     void SendInitialSpells();
     void SendLearnPacket(uint32 spellId, bool learn);
     bool addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary = false, bool learnFromSkill = false);
-    bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill = false);
+    bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill = false,
+        bool sendPacket = true);
     void learnSpell(uint32 spellId, bool temporary = false, bool learnFromSkill = false);
-    void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary);
+    void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary, bool sendPacket = true);
     void resetSpells();
     void LearnCustomSpells();
     void LearnDefaultSkills();
@@ -1912,7 +1915,7 @@ public:
     bool IsInSameGroupWith(Player const* p) const;
     bool IsInSameRaidWith(Player const* p) const { return p == this || (GetGroup() != nullptr && GetGroup() == p->GetGroup()); }
     void UninviteFromGroup();
-    static void RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, const char* reason = nullptr);
+    static void RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, char const* reason = nullptr);
     void RemoveFromGroup(RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT) { RemoveFromGroup(GetGroup(), GetGUID(), method); }
     void SendUpdateToOutOfRangeGroupMembers();
 
@@ -2051,7 +2054,7 @@ public:
     void SendResetFailedNotify(uint32 mapid);
 
     bool UpdatePosition(float x, float y, float z, float orientation, bool teleport = false) override;
-    bool UpdatePosition(const Position& pos, bool teleport = false) { return UpdatePosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teleport); }
+    bool UpdatePosition(Position const& pos, bool teleport = false) { return UpdatePosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teleport); }
 
     void ProcessTerrainStatusUpdate() override;
 
@@ -2488,9 +2491,9 @@ public:
     [[nodiscard]] uint32 GetPendingBind() const { return _pendingBindId; }
     void SendRaidInfo();
     void SendSavedInstances();
-    void PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const;
-    void PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const;
-    void PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const;
+    void PrettyPrintRequirementsQuestList(std::vector<ProgressionRequirement const*> const& missingQuests) const;
+    void PrettyPrintRequirementsAchievementsList(std::vector<ProgressionRequirement const*> const& missingAchievements) const;
+    void PrettyPrintRequirementsItemsList(std::vector<ProgressionRequirement const*> const& missingItems) const;
     bool Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report = false);
     bool CheckInstanceLoginValid();
     [[nodiscard]] bool CheckInstanceCount(uint32 instanceId) const;
@@ -2514,7 +2517,7 @@ public:
     Group* GetGroupInvite() { return m_groupInvite; }
     void SetGroupInvite(Group* group) { m_groupInvite = group; }
     Group* GetGroup() { return m_group.getTarget(); }
-    [[nodiscard]] const Group* GetGroup() const { return (const Group*)m_group.getTarget(); }
+    [[nodiscard]] Group const* GetGroup() const { return (Group const*)m_group.getTarget(); }
     GroupReference& GetGroupRef() { return m_group; }
     void SetGroup(Group* group, int8 subgroup = -1);
     [[nodiscard]] uint8 GetSubGroup() const { return m_group.getSubGroup(); }
@@ -2619,7 +2622,7 @@ public:
     bool IsFreeFlying() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY); }
 
     // saving
-    void AdditionalSavingAddMask(uint8 mask) { m_additionalSaveTimer = 2000; m_additionalSaveMask |= mask; }
+    void AdditionalSavingAddMask(uint8 mask);
     // arena spectator
     [[nodiscard]] bool IsSpectator() const { return m_ExtraFlags & PLAYER_EXTRA_SPECTATOR_ON; }
     void SetIsSpectator(bool on);
@@ -2655,7 +2658,7 @@ public:
     [[nodiscard]] float GetRealParry() const { return m_realParry; }
     [[nodiscard]] float GetRealDodge() const { return m_realDodge; }
     // mt maps
-    [[nodiscard]] const PlayerTalentMap& GetTalentMap() const { return m_talents; }
+    [[nodiscard]] PlayerTalentMap const& GetTalentMap() const { return m_talents; }
     [[nodiscard]] uint32 GetNextSave() const { return m_nextSave; }
     [[nodiscard]] SpellModContainer const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
@@ -2699,12 +2702,14 @@ protected:
 
 public:
     std::deque<PendingSpellCastRequest> SpellQueue;
-    const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
+    PendingSpellCastRequest const* GetCastRequest(uint32 category) const;
     bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
     void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
     bool CanRequestSpellCast(SpellInfo const* spellInfo);
 
 protected:
+    Unit* SelectCharmedAIGroupTarget(float distance) const;
+
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
@@ -2815,6 +2820,7 @@ protected:
     void _SaveCharacter(bool create, CharacterDatabaseTransaction trans);
     void _SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans);
     void _SavePlayerSettings(CharacterDatabaseTransaction trans);
+    void UpdateAdditionalSaves(uint32 p_time);
 
     /*********************************************************/
     /***              ENVIRONMENTAL SYSTEM                 ***/
@@ -3010,6 +3016,8 @@ private:
     void SetMustDelayTeleport(bool setting) { m_bMustDelayTeleport = setting; }
     [[nodiscard]] bool HasDelayedTeleport() const { return m_bHasDelayedTeleport; }
     void SetHasDelayedTeleport(bool setting) { m_bHasDelayedTeleport = setting; }
+
+    uint8 GetLearnSpellSpecMask(uint32 spellId) const;
 
     MapReference m_mapRef;
 

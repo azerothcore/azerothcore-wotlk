@@ -47,8 +47,8 @@ namespace VMAP
         {
             iRotation = G3D::Matrix3::fromEulerAnglesZYX(G3D::pif() * iDir.y / 180.f, G3D::pif() * iDir.x / 180.f, G3D::pif() * iDir.z / 180.f);
         }
-        [[nodiscard]] G3D::Vector3 transform(const G3D::Vector3& pIn) const;
-        void moveToBasePos(const G3D::Vector3& pBasePos) { iPos -= pBasePos; }
+        [[nodiscard]] G3D::Vector3 transform(G3D::Vector3 const& pIn) const;
+        void moveToBasePos(G3D::Vector3 const& pBasePos) { iPos -= pBasePos; }
     };
 
     typedef std::map<uint32, ModelSpawn> UniqueEntryMap;
@@ -86,7 +86,7 @@ namespace VMAP
         uint32 RootWMOID;
         std::vector<GroupModel_Raw> groupsArray;
 
-        bool Read(const char* path);
+        bool Read(char const* path);
     };
 
     class TileAssembler
@@ -99,7 +99,7 @@ namespace VMAP
         std::set<std::string> spawnedModelFiles;
 
     public:
-        TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName);
+        TileAssembler(std::string const& pSrcDirName, std::string const& pDestDirName);
         virtual ~TileAssembler();
 
         bool convertWorld2();
@@ -107,7 +107,7 @@ namespace VMAP
         bool calculateTransformedBound(ModelSpawn& spawn);
         void exportGameobjectModels();
 
-        bool convertRawFile(const std::string& pModelFilename);
+        bool convertRawFile(std::string const& pModelFilename);
     };
 
 }                                                           // VMAP

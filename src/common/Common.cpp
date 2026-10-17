@@ -69,16 +69,16 @@ AccountFlagName const accountFlagNames[MAX_ACCOUNT_FLAG] =
 bool IsLocaleValid(std::string const& locale)
 {
     for (int i = 0; i < TOTAL_LOCALES; ++i)
-        if (locale == localeNames[i])
+        if (IsLocaleRegistered(LocaleConstant(i)) && locale == localeNames[i])
             return true;
 
     return false;
 }
 
-LocaleConstant GetLocaleByName(const std::string& name)
+LocaleConstant GetLocaleByName(std::string const& name)
 {
     for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-        if (name == localeNames[i])
+        if (IsLocaleRegistered(LocaleConstant(i)) && name == localeNames[i])
             return LocaleConstant(i);
 
     return LOCALE_enUS;                                     // including enGB case
@@ -86,12 +86,10 @@ LocaleConstant GetLocaleByName(const std::string& name)
 
 const std::string GetNameByLocaleConstant(LocaleConstant localeConstant)
 {
-    if (localeConstant < TOTAL_LOCALES)
-    {
+    if (IsLocaleRegistered(localeConstant))
         return localeNames[localeConstant];
-    }
 
-    return "enUS"; // Default value for unsupported or invalid LocaleConstant
+    return localeNames[DEFAULT_LOCALE];
 }
 
 void CleanStringForMysqlQuery(std::string& str)

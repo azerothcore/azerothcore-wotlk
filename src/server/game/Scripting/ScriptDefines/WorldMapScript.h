@@ -23,7 +23,7 @@
 class WorldMapScript : public ScriptObject, public MapScript<Map>
 {
 protected:
-    WorldMapScript(const char* name, uint32 mapId);
+    WorldMapScript(char const* name, uint32 mapId);
 
 public:
     [[nodiscard]] bool isAfterLoadScript() const override { return true; }

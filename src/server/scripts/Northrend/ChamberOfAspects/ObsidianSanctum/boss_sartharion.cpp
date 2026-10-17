@@ -84,6 +84,7 @@ enum Spells
     SPELL_SARTHARION_FLAME_BREATH               = 56908,
     SPELL_SARTHARION_TAIL_LASH                  = 56910,
     SPELL_CYCLONE_AURA_PERIODIC                 = 57598,
+    SPELL_LAVA_STRIKE                           = 57571,
     SPELL_LAVA_STRIKE_DUMMY                     = 57578,
     SPELL_LAVA_STRIKE_DUMMY_TRIGGER             = 57697,
     SPELL_LAVA_STRIKE_SUMMON                    = 57572,
@@ -213,11 +214,11 @@ const Position TenebronEggsPos[2][MAX_TENEBORN_EGGS_SUMMONS] =
 
 const Position CycloneSummonPos[MAX_CYCLONE_COUNT] =
 {
-    { 3235.28f, 591.180f, 57.0833f, 0.59037f },
-    { 3200.97f, 480.929f, 57.0833f, 5.86197f },
-    { 3281.57f, 507.984f, 57.0833f, 5.54346f },
-    { 3210.11f, 531.957f, 57.0833f, 3.76777f },
-    { 3286.42f, 585.010f, 57.0833f, 4.10307f },
+    { 3238.55f, 589.14f, 57.0f, 0.59037f },
+    { 3209.70f, 475.85f, 57.0f, 5.86197f },
+    { 3282.10f, 504.02f, 57.0f, 5.54346f },
+    { 3209.42f, 532.55f, 57.0f, 3.76777f },
+    { 3283.50f, 581.75f, 57.0f, 4.10307f },
 };
 
 const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
@@ -1380,20 +1381,23 @@ class spell_sartharion_lava_strike : public SpellScript
     bool Load() override
     {
         _spawned = false;
+        _dummyFired = false;
         return true;
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        if (!GetCaster() || !GetHitUnit())
+        if (!GetCaster() || !GetHitUnit() || _dummyFired)
             return;
 
-        GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ(), SPELL_LAVA_STRIKE_DUMMY_TRIGGER, true);
+        _dummyFired = true;
+
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE, true);
     }
 
     void HandleSchoolDamage(SpellEffIndex /*effIndex*/)
     {
-        if (!GetCaster() || !GetHitUnit() || _spawned)
+        if (!GetCaster() || !GetHitUnit() || !GetHitUnit()->IsPlayer() || _spawned)
             return;
 
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
@@ -1402,21 +1406,31 @@ class spell_sartharion_lava_strike : public SpellScript
             {
                 sarth->AI()->SetData(DATA_VOLCANO_BLOWS, GetHitUnit()->GetGUID().GetCounter());
                 sarth->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE_SUMMON, true);
-                _spawned = true;
             }
         }
+
+        _spawned = true;
+    }
+
+    void HandleSummon(SpellEffIndex effIndex)
+    {
+        if (GetCaster()->GetEntry() != NPC_SARTHARION)
+            PreventHitEffect(effIndex);
     }
 
     void Register() override
     {
         if (m_scriptSpellId == SPELL_LAVA_STRIKE_DUMMY)
             OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        else if (m_scriptSpellId == SPELL_LAVA_STRIKE_SUMMON)
+            OnEffectHit += SpellEffectFn(spell_sartharion_lava_strike::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
         else
             OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 
 private:
     bool _spawned{false};
+    bool _dummyFired{false};
 };
 
 // 57491 - Flame Tsunami

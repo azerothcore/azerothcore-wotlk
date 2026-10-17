@@ -1,0 +1,14 @@
+# we changed this because jemalloc/jemalloc#2900 isn't in a tagged release yet
+diff --git a/deps/jemalloc/src/jemalloc_cpp.cpp b/deps/jemalloc/src/jemalloc_cpp.cpp
+index da0441a7c..05d5c3a7c 100644
+--- a/deps/jemalloc/src/jemalloc_cpp.cpp
++++ b/deps/jemalloc/src/jemalloc_cpp.cpp
+@@ -67,7 +67,7 @@ handleOOM(std::size_t size, bool nothrow) {
+ 	}
+
+ 	if (ptr == nullptr && !nothrow)
+-		std::__throw_bad_alloc();
++		throw std::bad_alloc();
+ 	return ptr;
+ }
+

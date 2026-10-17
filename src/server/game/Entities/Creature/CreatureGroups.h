@@ -23,9 +23,11 @@
 #include "Unit.h"
 #include <map>
 #include <unordered_map>
+#include <vector>
 
 class Creature;
 class CreatureGroup;
+class Map;
 
 enum class GroupAIFlags : uint16
 {
@@ -71,6 +73,8 @@ struct FormationInfo
 };
 
 typedef std::unordered_map<ObjectGuid::LowType/*memberDBGUID*/, FormationInfo /*formationInfo*/>   CreatureGroupInfoType;
+typedef std::unordered_map<ObjectGuid::LowType/*leaderDBGUID*/, std::vector<ObjectGuid::LowType>/*memberDBGUIDs*/>
+    CreatureGroupMembersType;
 
 class FormationMgr
 {
@@ -84,6 +88,7 @@ public:
     void RemoveCreatureFromGroup(CreatureGroup* group, Creature* creature);
     void LoadCreatureFormations();
     CreatureGroupInfoType CreatureGroupMap;
+    CreatureGroupMembersType CreatureGroupMembers;
 };
 
 class CreatureGroup
@@ -102,7 +107,7 @@ public:
     bool IsEmpty() const { return m_members.empty(); }
     bool IsFormed() const { return m_Formed; }
 
-    const CreatureGroupMemberType& GetMembers() const { return m_members; }
+    CreatureGroupMemberType const& GetMembers() const { return m_members; }
 
     void AddMember(Creature* member);
     void RemoveMember(Creature* member);
@@ -114,6 +119,7 @@ public:
     void MemberEngagingTarget(Creature* member, Unit* target);
     Unit* GetNewTargetForMember(Creature* member);
     void MemberEvaded(Creature* member);
+    void RespawnRemovedMembers(Map* map);
     void DespawnFormation(Milliseconds timeToDespawn = 0ms, Seconds forcedRespawnTimer = 0s);
     void RespawnFormation(bool force = false);
     [[nodiscard]] bool IsFormationInCombat();

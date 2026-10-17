@@ -32,18 +32,18 @@ using std::pair;
 
 template<> struct BoundsTrait<VMAP::ModelSpawn*>
 {
-    static void GetBounds(const VMAP::ModelSpawn* const& obj, G3D::AABox& out) { out = obj->GetBounds(); }
+    static void GetBounds(VMAP::ModelSpawn const* const& obj, G3D::AABox& out) { out = obj->GetBounds(); }
 };
 
 namespace VMAP
 {
-    bool readChunk(FILE* rf, char* dest, const char* compare, uint32 len)
+    bool readChunk(FILE* rf, char* dest, char const* compare, uint32 len)
     {
         if (fread(dest, sizeof(char), len, rf) != len) { return false; }
         return memcmp(dest, compare, len) == 0;
     }
 
-    Vector3 ModelPosition::transform(const Vector3& pIn) const
+    Vector3 ModelPosition::transform(Vector3 const& pIn) const
     {
         Vector3 out = pIn * iScale;
         out = iRotation * out;
@@ -52,7 +52,7 @@ namespace VMAP
 
     //=================================================================
 
-    TileAssembler::TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName)
+    TileAssembler::TileAssembler(std::string const& pSrcDirName, std::string const& pDestDirName)
         : iDestDir(pDestDirName), iSrcDir(pSrcDirName)
     {
         boost::filesystem::create_directory(iDestDir);
@@ -156,7 +156,7 @@ namespace VMAP
             TileMap::iterator tile;
             for (tile = tileEntries.begin(); tile != tileEntries.end(); ++tile)
             {
-                const ModelSpawn& spawn = map_iter->second->UniqueEntries[tile->second];
+                ModelSpawn const& spawn = map_iter->second->UniqueEntries[tile->second];
                 if (spawn.flags & MOD_WORLDSPAWN) // WDT spawn, saved as tile 65/65 currently...
                 {
                     continue;
@@ -181,7 +181,7 @@ namespace VMAP
                         {
                             ++tile;
                         }
-                        const ModelSpawn& spawn2 = map_iter->second->UniqueEntries[tile->second];
+                        ModelSpawn const& spawn2 = map_iter->second->UniqueEntries[tile->second];
                         success = success && ModelSpawn::writeToFile(tilefile, spawn2);
                         // MapTree nodes to update when loading tile:
                         std::map<uint32, uint32>::iterator nIdx = modelNodeIdx.find(spawn2.ID);
@@ -331,7 +331,7 @@ namespace VMAP
     };
 #pragma pack(pop)
     //=================================================================
-    bool TileAssembler::convertRawFile(const std::string& pModelFilename)
+    bool TileAssembler::convertRawFile(std::string const& pModelFilename)
     {
         bool success = true;
         std::string filename = iSrcDir;
@@ -566,7 +566,7 @@ namespace VMAP
         delete liquid;
     }
 
-    bool WorldModel_Raw::Read(const char* path)
+    bool WorldModel_Raw::Read(char const* path)
     {
         FILE* rf = fopen(path, "rb");
         if (!rf)

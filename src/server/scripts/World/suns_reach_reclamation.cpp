@@ -23,7 +23,7 @@ class npc_suns_reach_reclamation : public CreatureScript
 public:
     npc_suns_reach_reclamation() : CreatureScript("npc_suns_reach_reclamation") { }
 
-    bool OnQuestReward(Player* /*player*/, Creature* /*creature*/, const Quest* quest, uint32 /*slot*/) override
+    bool OnQuestReward(Player* /*player*/, Creature* /*creature*/, Quest const* quest, uint32 /*slot*/) override
     {
         sWorldState->AddSunsReachProgress(quest->GetQuestId());
         return true;
@@ -35,7 +35,7 @@ class npc_sunwell_gate : public CreatureScript
 public:
     npc_sunwell_gate() : CreatureScript("npc_sunwell_gate") { }
 
-    bool OnQuestReward(Player* /*player*/, Creature* /*creature*/, const Quest* quest, uint32 /*slot*/) override
+    bool OnQuestReward(Player* /*player*/, Creature* /*creature*/, Quest const* quest, uint32 /*slot*/) override
     {
         sWorldState->AddSunwellGateProgress(quest->GetQuestId());
         return true;

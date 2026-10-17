@@ -42,7 +42,8 @@ ObjectData const creatureData[] =
 DoorData const doorData[] =
 {
     { AQ40_DOOR_SKERAM,      DATA_SKERAM,        DOOR_TYPE_PASSAGE },
-    { AQ40_DOOR_TE_ENTRANCE, DATA_TWIN_EMPERORS, DOOR_TYPE_ROOM },
+    { AQ40_DOOR_TE_ENTRANCE, DATA_HUHURAN,       DOOR_TYPE_PASSAGE },
+    { AQ40_DOOR_TE_ENTRANCE, DATA_TWIN_EMPERORS, DOOR_TYPE_ROOM    },
     { AQ40_DOOR_TE_EXIT,     DATA_TWIN_EMPERORS, DOOR_TYPE_PASSAGE },
     { 0,                     0,                  DOOR_TYPE_ROOM}
 };
@@ -70,6 +71,7 @@ public:
         void Initialize() override
         {
             BugTrioDeathCount = 0;
+            OuroSpawnerSpawnId = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -77,6 +79,7 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_OURO_SPAWNER:
+                    OuroSpawnerSpawnId = creature->GetSpawnId();
                     if (GetBossState(DATA_OURO) != DONE)
                         creature->Respawn();
                     break;
@@ -189,6 +192,28 @@ public:
             }
         }
 
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
+        {
+            if (_SkipCheckRequiredBosses(player))
+                return true;
+
+            switch (bossId)
+            {
+                case DATA_TWIN_EMPERORS:
+                    if (GetBossState(DATA_HUHURAN) != DONE)
+                        return false;
+                    break;
+                case DATA_CTHUN:
+                    if (GetBossState(DATA_TWIN_EMPERORS) != DONE)
+                        return false;
+                    break;
+                default:
+                    break;
+            }
+
+            return true;
+        }
+
         bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
@@ -201,6 +226,9 @@ public:
                     {
                         if (Creature* ouroSpawner = GetCreature(DATA_OURO_SPAWNER))
                             ouroSpawner->Respawn();
+                        // Dynamic respawns remove the creature object when the spawner despawns.
+                        else if (OuroSpawnerSpawnId)
+                            instance->ProcessCreatureRespawn(OuroSpawnerSpawnId);
                     }
                     break;
                 default:
@@ -213,6 +241,7 @@ public:
     private:
         GuidVector CThunGraspGUIDs;
         uint32 BugTrioDeathCount;
+        ObjectGuid::LowType OuroSpawnerSpawnId;
     };
 };
 

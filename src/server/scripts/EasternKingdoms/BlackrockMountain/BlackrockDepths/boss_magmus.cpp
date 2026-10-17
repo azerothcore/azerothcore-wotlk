@@ -21,8 +21,8 @@
 
 enum Spells
 {
-    SPELL_FIERYBURST                                       = 13900,
-    SPELL_WARSTOMP                                         = 24375
+    SPELL_FIERYBURST                                       = 15668,
+    SPELL_WARSTOMP                                         = 15593
 };
 
 struct boss_magmus : public BossAI
