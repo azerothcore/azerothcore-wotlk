@@ -367,6 +367,21 @@ Log* Log::instance()
     return &instance;
 }
 
+void Log::LoadAdditionalFromConfig()
+{
+    for (std::string const& configKey : sConfigMgr->GetKeysByString("Appender."))
+    {
+        if (!GetAppenderByName(configKey.substr(9)))
+            CreateAppenderFromConfig(configKey);
+    }
+
+    for (std::string const& configKey : sConfigMgr->GetKeysByString("Logger."))
+    {
+        if (loggers.find(configKey.substr(7)) == loggers.end())
+            CreateLoggerFromConfig(configKey);
+    }
+}
+
 void Log::Initialize(Acore::Asio::IoContext* ioContext)
 {
     if (ioContext)
