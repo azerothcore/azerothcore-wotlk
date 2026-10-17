@@ -234,10 +234,14 @@ void Channel::AddVoiceChatMember(ObjectGuid guid)
     member.SetVoiced(false);
     member.SetMuted(!session->IsMicEnabled());
 
-    // group and raid leaders speak with high priority
-    if (Group* group = player->GetGroup())
-        if (group->IsLeader(guid))
+    // group, raid and battleground leaders speak with high priority in their
+    // group's channel, in custom channels everyone is equal
+    if (GetVoiceType() != VoiceChatChannelType::Custom)
+    {
+        Group* group = player->GetGroup();
+        if (group && group->IsLeader(guid))
             member.SetHighPriority();
+    }
 
     _voiceMembers[userId] = member;
 
