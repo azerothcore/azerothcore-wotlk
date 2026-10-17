@@ -169,13 +169,20 @@ struct LinkValidator<LinkTags::item>
 
             if (randomSuffixes)
             {
-                std::string_view randomSuffix((*randomSuffixes)[i]);
-                if ((!randomSuffix.empty()) &&
-                  (text.length() == (name.length() + 1 + randomSuffix.length())) &&
-                  (text.substr(0, name.length()) == name) &&
-                  (text[name.length()] == ' ') &&
-                  (text.substr(name.length() + 1) == randomSuffix))
-                    return true;
+                // A locale registered by a module may have no DBC strings, the client appends the suffix of its own
+                // DBC locale to the translated name
+                uint8 first = (i <= LOCALE_ruRU) ? i : 0;
+                uint8 last = (i <= LOCALE_ruRU) ? i : TOTAL_LOCALES - 1;
+                for (uint8 dbcLocale = first; dbcLocale <= last; ++dbcLocale)
+                {
+                    std::string_view randomSuffix((*randomSuffixes)[dbcLocale]);
+                    if ((!randomSuffix.empty()) &&
+                      (text.length() == (name.length() + 1 + randomSuffix.length())) &&
+                      (text.substr(0, name.length()) == name) &&
+                      (text[name.length()] == ' ') &&
+                      (text.substr(name.length() + 1) == randomSuffix))
+                        return true;
+                }
             }
             else if (text == name)
                 return true;
