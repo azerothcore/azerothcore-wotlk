@@ -2090,7 +2090,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_SCALE:
         case SMART_ACTION_SUMMON_RADIAL:
         case SMART_ACTION_PLAY_SPELL_VISUAL:
-        case SMART_ACTION_FOLLOW_GROUP:
         case SMART_ACTION_SET_ORIENTATION_TARGET:
         case SMART_ACTION_WAYPOINT_START:
         case SMART_ACTION_WAYPOINT_DATA_RANDOM:
@@ -2102,6 +2101,15 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP:
         case SMART_ACTION_SPAWN_SPAWNGROUP:
         case SMART_ACTION_DESPAWN_SPAWNGROUP:
+            break;
+        case SMART_ACTION_FOLLOW_GROUP:
+            if (e.action.followGroup.followState &&
+                (e.action.followGroup.followType < FOLLOW_TYPE_CIRCLE || e.action.followGroup.followType >= FOLLOW_TYPE_MAX))
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid follow type {}, skipped.",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.followGroup.followType);
+                return false;
+            }
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

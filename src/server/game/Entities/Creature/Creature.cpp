@@ -2154,8 +2154,13 @@ void Creature::Respawn(bool force)
             if (m_spawnId)
             {
                 // Set respawn time to now so ProcessRespawns() picks it up
-                time_t now = GameTime::GetGameTime().count();
-                GetMap()->SaveCreatureRespawnTime(m_spawnId, now);
+                if (force)
+                    GetMap()->ForceCreatureRespawn(m_spawnId);
+                else
+                {
+                    time_t now = GameTime::GetGameTime().count();
+                    GetMap()->SaveCreatureRespawnTime(m_spawnId, now);
+                }
             }
             AddObjectToRemoveList();
         }
@@ -2335,7 +2340,9 @@ bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
 bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, WorldObject const* caster /*= nullptr*/) const
 {
     // Xinef: this should exclude self casts...
-    if (spellInfo->Effects[index].Mechanic > MECHANIC_NONE && HasMechanicTemplateImmunity(1ULL << spellInfo->Effects[index].Mechanic))
+    if (spellInfo->Effects[index].Mechanic > MECHANIC_NONE
+        && !spellInfo->HasAttribute(SPELL_ATTR0_CU_BYPASS_MECHANIC_IMMUNITY)
+        && HasMechanicTemplateImmunity(1ULL << spellInfo->Effects[index].Mechanic))
         return true;
 
     if (GetCreatureTemplate()->type == CREATURE_TYPE_MECHANICAL && spellInfo->Effects[index].Effect == SPELL_EFFECT_HEAL)
