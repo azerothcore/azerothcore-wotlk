@@ -10204,7 +10204,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     return uint32(std::max(tmpDamage, 0.0f));
 }
 
-void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType /*blockType*/)
+void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply)
 {
     if (apply)
     {
