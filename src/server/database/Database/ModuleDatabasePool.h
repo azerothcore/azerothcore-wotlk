@@ -124,7 +124,7 @@ public:
 protected:
     virtual MySQLConnection* CreateConnection(MySQLConnectionInfo& connInfo) = 0;
 
-    virtual MySQLConnection* CreateConnection(ProducerConsumerQueue<SQLOperation*>* queue,
+    virtual MySQLConnection* CreateAsyncConnection(ProducerConsumerQueue<SQLOperation*>* queue,
         MySQLConnectionInfo& connInfo);
 
 private:

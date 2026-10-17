@@ -71,7 +71,7 @@ void ModuleDatabasePool::SetConnectionInfo(std::string_view infoString, uint8 as
     _synchThreads = synchThreads;
 }
 
-MySQLConnection* ModuleDatabasePool::CreateConnection(ProducerConsumerQueue<SQLOperation*>* /*queue*/,
+MySQLConnection* ModuleDatabasePool::CreateAsyncConnection(ProducerConsumerQueue<SQLOperation*>* /*queue*/,
     MySQLConnectionInfo& /*connInfo*/)
 {
     return nullptr;
@@ -114,7 +114,7 @@ uint32 ModuleDatabasePool::OpenConnections(InternalIndex type, uint8 numConnecti
 {
     for (uint8 i = 0; i < numConnections; ++i)
     {
-        std::unique_ptr<MySQLConnection> conn(type == IDX_ASYNC ? CreateConnection(_queue.get(), _connectionInfo)
+        std::unique_ptr<MySQLConnection> conn(type == IDX_ASYNC ? CreateAsyncConnection(_queue.get(), _connectionInfo)
             : CreateConnection(_connectionInfo));
 
         if (!conn)
@@ -122,7 +122,7 @@ uint32 ModuleDatabasePool::OpenConnections(InternalIndex type, uint8 numConnecti
             if (type == IDX_ASYNC)
             {
                 LOG_ERROR("sql.driver", "ModuleDatabasePool: database `{}` was configured with {} asynchronous "
-                    "connections, but the module does not override the queue-taking CreateConnection overload.",
+                    "connections, but the module does not override CreateAsyncConnection(queue, connInfo).",
                     _connectionInfo.database, numConnections);
             }
             else
@@ -140,7 +140,7 @@ uint32 ModuleDatabasePool::OpenConnections(InternalIndex type, uint8 numConnecti
         {
             LOG_ERROR("sql.driver", "ModuleDatabasePool: async queries for database `{}` cannot run. No queue was "
                 "set on the asynchronous connection: pass `queue` to the connection's constructor in the module's "
-                "CreateConnection(queue, connInfo) override.", _connectionInfo.database);
+                "CreateAsyncConnection(queue, connInfo) override.", _connectionInfo.database);
 
             _queue->Cancel();
             _connections[type].clear();
