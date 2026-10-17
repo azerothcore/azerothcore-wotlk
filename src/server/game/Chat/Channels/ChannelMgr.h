@@ -57,7 +57,7 @@ public:
     void SetChannelRightsFor(std::string const& name, uint32 flags, uint32 speakDelay,
         std::string const& joinMessage, std::string const& speakMessage, std::set<uint32> const& moderators);
 
-    uint64 const GetNextChannelGuid() { return ++_nextChannelGuid; }
+    uint64 GetNextChannelGuid() { return ++_nextChannelGuid; }
 
     static void SendNotOnPacket(Player* player, std::string const& channelName);
 
