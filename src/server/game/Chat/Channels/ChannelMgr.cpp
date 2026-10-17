@@ -72,8 +72,15 @@ void ChannelMgr::LoadChannels()
             continue;
         }
 
+        // with cross faction channels enabled all channels share the alliance map,
+        // the same way GetOrCreateChannel/GetChannel look them up
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+            team = TEAM_ALLIANCE;
+
         std::shared_ptr<Channel> newChannel = std::make_shared<Channel>(channelName, 0, channelDBId, team, fields[3].Get<uint8>(), fields[4].Get<uint8>());
         newChannel->SetPassword(password);
+        // lookups are case insensitive
+        wstrToLower(channelWName);
         _channelsByName[team][channelWName] = newChannel;
         _channelsByGuid[channelDBId] = newChannel;
 
