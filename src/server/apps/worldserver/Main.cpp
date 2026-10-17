@@ -360,7 +360,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if (!sWorldSocketMgr.StartWorldNetwork(*ioContext, worldListener, worldPort, networkThreads))
+    if (!sWorldSocketMgr->StartWorldNetwork(*ioContext, worldListener, worldPort, networkThreads))
     {
         LOG_ERROR("server.worldserver", "Failed to initialize network");
         World::StopNow(ERROR_EXIT_CODE);
@@ -372,7 +372,7 @@ int main(int argc, char** argv)
         sWorldSessionMgr->KickAll();         // save and kick all players
         sWorldSessionMgr->UpdateSessions(1); // real players unload required UpdateSessions call
 
-        sWorldSocketMgr.StopNetwork();
+        sWorldSocketMgr->StopNetwork();
 
         ///- Clean database before leaving
         if (!sToCloud9Sidecar->ClusterModeEnabled())

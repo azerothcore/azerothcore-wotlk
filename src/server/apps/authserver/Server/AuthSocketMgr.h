@@ -27,10 +27,10 @@ class AuthSocketMgr : public SocketMgr<AuthSession>
     typedef SocketMgr<AuthSession> BaseSocketMgr;
 
 public:
-    static AuthSocketMgr& Instance()
+    static AuthSocketMgr* Instance()
     {
         static AuthSocketMgr instance;
-        return instance;
+        return &instance;
     }
 
     bool StartNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount = 1) override
@@ -56,7 +56,7 @@ protected:
 
     static void OnSocketAccept(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
-        Instance().OnSocketOpen(std::move(sock), threadIndex);
+        Instance()->OnSocketOpen(std::move(sock), threadIndex);
     }
 };
 
