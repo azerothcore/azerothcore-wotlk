@@ -860,11 +860,15 @@ void VoiceChatMgr::AddToGroupVoiceChatChannel(ObjectGuid guid, uint32 groupId)
     Channel* channel = GetGroupVoiceChatChannel(groupId);
     if (!channel)
     {
-        // adds all eligible group members
+        // adds all eligible members the group already lists
         CreateGroupVoiceChatChannel(groupId);
-        return;
+        channel = GetGroupVoiceChatChannel(groupId);
+        if (!channel)
+            return;
     }
 
+    // the group may not list the player yet (or not be registered at all while
+    // it is being created), so always add them explicitly; no-op if already added
     channel->AddVoiceChatMember(guid);
 }
 
@@ -877,9 +881,12 @@ void VoiceChatMgr::AddToRaidVoiceChatChannel(ObjectGuid guid, uint32 groupId)
     if (!channel)
     {
         CreateRaidVoiceChatChannel(groupId);
-        return;
+        channel = GetRaidVoiceChatChannel(groupId);
+        if (!channel)
+            return;
     }
 
+    // see AddToGroupVoiceChatChannel
     channel->AddVoiceChatMember(guid);
 }
 
@@ -893,9 +900,12 @@ void VoiceChatMgr::AddToBattlegroundVoiceChatChannel(ObjectGuid guid)
     if (!channel)
     {
         CreateBattlegroundVoiceChatChannel(player->GetBattlegroundId(), player->GetBgTeamId());
-        return;
+        channel = GetBattlegroundVoiceChatChannel(player->GetBattlegroundId(), player->GetBgTeamId());
+        if (!channel)
+            return;
     }
 
+    // see AddToGroupVoiceChatChannel
     channel->AddVoiceChatMember(guid);
 }
 
