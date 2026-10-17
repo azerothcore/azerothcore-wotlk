@@ -167,8 +167,40 @@ namespace Trainer
 
     SpellState Trainer::GetDefaultSpellState(Player const* player, Spell const* trainerSpell) const
     {
-        if (player->HasSpell(trainerSpell->SpellId))
+        auto hasSpellOrHigherRank = [player](uint32 spellId) -> bool
+        {
+            if (player->HasSpell(spellId))
+                return true;
+
+            while ((spellId = sSpellMgr->GetNextSpellInChain(spellId)))
+                if (player->HasSpell(spellId))
+                    return true;
+
+            return false;
+        };
+
+        auto isSkillRankKnown = [player](uint32 spellId) -> bool
+        {
+            if (SpellLearnSkillNode const* spellLearnSkill = sSpellMgr->GetSpellLearnSkill(spellId))
+            {
+                if (player->HasSkill(spellLearnSkill->skill))
+                {
+                    if (spellLearnSkill->maxvalue > 0 &&
+                        player->GetPureMaxSkillValue(spellLearnSkill->skill) >= spellLearnSkill->maxvalue)
+                        return true;
+
+                    if (spellLearnSkill->step > 0 &&
+                        player->GetSkillStep(spellLearnSkill->skill) >= spellLearnSkill->step)
+                        return true;
+                }
+            }
+            return false;
+        };
+
+        if (hasSpellOrHigherRank(trainerSpell->SpellId) || isSkillRankKnown(trainerSpell->SpellId))
             return SpellState::Known;
+
+        SpellInfo const* trainerSpellInfo = sSpellMgr->AssertSpellInfo(trainerSpell->SpellId);
 
         // check race/class requirement
         if (!player->IsSpellFitByClassAndRace(trainerSpell->SpellId))
@@ -179,7 +211,7 @@ namespace Trainer
             return SpellState::Unavailable;
 
         for (int32 reqAbility : trainerSpell->ReqAbility)
-            if (reqAbility && !player->HasSpell(reqAbility))
+            if (reqAbility && !hasSpellOrHigherRank(reqAbility) && !isSkillRankKnown(reqAbility))
                 return SpellState::Unavailable;
 
         // check level requirement
@@ -189,24 +221,24 @@ namespace Trainer
         // check ranks
         bool hasLearnSpellEffect = false;
         bool knowsAllLearnedSpells = true;
-        for (SpellEffectInfo const& spellEffectInfo : sSpellMgr->AssertSpellInfo(trainerSpell->SpellId)->GetEffects())
+        for (SpellEffectInfo const& spellEffectInfo : trainerSpellInfo->GetEffects())
         {
             if (!spellEffectInfo.IsEffect(SPELL_EFFECT_LEARN_SPELL))
                 continue;
 
             hasLearnSpellEffect = true;
-            if (!player->HasSpell(spellEffectInfo.TriggerSpell))
+            if (!hasSpellOrHigherRank(spellEffectInfo.TriggerSpell) && !isSkillRankKnown(spellEffectInfo.TriggerSpell))
                 knowsAllLearnedSpells = false;
 
             if (uint32 previousRankSpellId = sSpellMgr->GetPrevSpellInChain(spellEffectInfo.TriggerSpell))
-                if (!player->HasSpell(previousRankSpellId))
+                if (!hasSpellOrHigherRank(previousRankSpellId) && !isSkillRankKnown(previousRankSpellId))
                     return SpellState::Unavailable;
         }
 
         if (!hasLearnSpellEffect)
         {
             if (uint32 previousRankSpellId = sSpellMgr->GetPrevSpellInChain(trainerSpell->SpellId))
-                if (!player->HasSpell(previousRankSpellId))
+                if (!hasSpellOrHigherRank(previousRankSpellId) && !isSkillRankKnown(previousRankSpellId))
                     return SpellState::Unavailable;
         }
         else if (knowsAllLearnedSpells)
