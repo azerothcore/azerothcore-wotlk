@@ -22,8 +22,12 @@
 #include "SharedDefines.h"
 #include "VoiceChatSharedDefines.h"
 
-#define HIGH_VOICE_PRIORITY 0x80 // Magic number, ask Burlex
-#define LOW_VOICE_PRIORITY 0xC8 // Magic number, ask Burlex
+// Talker priority sent in the voice roster. The client plays up to 4 talkers at
+// once; another talker only takes the channel of the one with the lowest priority
+// if its own priority is higher, and a priority of 0 is never played. The client
+// gives every session priority 0x80 by default, which adds 0x80 << 8 for everyone.
+#define HIGH_VOICE_PRIORITY 0xC8
+#define LOW_VOICE_PRIORITY 0x80
 
 // the 3.3.5a client keeps the members of a voice session, itself included, in
 // fixed arrays of 40 entries and does not check a roster against that size
@@ -65,7 +69,8 @@ struct VoiceChatMember
         Priority = LOW_VOICE_PRIORITY;
     }
 
-    // TODO: Check proper names from client - MemberGUID, NetworkId, Flags, and Priority
+    // the roster lists the other members as guid, user id (the client's network id),
+    // priority and flags, the receiving member itself as guid, user id and flags
     ObjectGuid Guid;
     uint8 UserId;
     uint8 Flags;
