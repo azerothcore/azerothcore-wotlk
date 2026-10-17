@@ -252,8 +252,12 @@ public:
     // Voice chat
     bool IsVoiceEnabled() const { return HasFlag(CHANNEL_FLAG_VOICE); }
     void ToggleVoice(Player* player = nullptr);
-    // handles CMSG_CHANNEL_VOICE_ON: enables voice on this custom channel
+    // enables voice on this custom channel
     void VoiceOn(Player* player);
+    // handles CMSG_CHANNEL_VOICE_ON, needs the same rights as the other moderation commands
+    void RequestVoiceOn(Player* player);
+    // whether player may (un)silence victim on this channel, notifies player if not
+    bool CanSilenceVoiceMember(Player const* player, ObjectGuid victim);
 
     uint16 GetVoiceId() const { return _voiceId; }
     void SetVoiceId(uint16 voiceId) { _voiceId = voiceId; }
@@ -376,6 +380,8 @@ private:
 
     // Voice chat
     uint8 GenerateVoiceUserId(ObjectGuid guid);
+    // player is on the channel and a moderator (or may moderate any channel), notifies player if not
+    bool CheckVoiceModerator(Player const* player);
 
     typedef std::unordered_map<ObjectGuid, PlayerInfo> PlayerContainer;
     typedef std::unordered_map<ObjectGuid, uint32> BannedContainer;

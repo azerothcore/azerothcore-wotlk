@@ -83,7 +83,7 @@ void WorldSession::HandleChannelVoiceOnOpcode(WorldPackets::VoiceChat::ChannelVo
         return;
 
     if (Channel* channel = sChannelMgr.GetChannel(_player->GetTeamId(), packet.ChannelName))
-        channel->VoiceOn(_player);
+        channel->RequestVoiceOn(_player);
     else
         ChannelMgr::SendNotOnPacket(_player, packet.ChannelName);
 }
@@ -322,13 +322,12 @@ void WorldSession::HandleChannelSilenceOpcode(WorldPackets::VoiceChat::ChannelSi
     if (!channel || !channel->IsVoiceEnabled())
         return;
 
-    // only the channel owner or a moderator may silence members
-    uint8 const flags = channel->GetPlayerFlags(_player->GetGUID());
-    if (!(flags & MEMBER_FLAG_OWNER) && !(flags & MEMBER_FLAG_MODERATOR))
-        return;
-
     ObjectGuid playerGuid = sCharacterCache->GetCharacterGuidByName(packet.PlayerName);
     if (!playerGuid)
+        return;
+
+    // same rights as muting through the text channel commands
+    if (!channel->CanSilenceVoiceMember(_player, playerGuid))
         return;
 
     if (channel->IsOnVoice(playerGuid))
@@ -349,13 +348,12 @@ void WorldSession::HandleChannelUnsilenceOpcode(WorldPackets::VoiceChat::Channel
     if (!channel || !channel->IsVoiceEnabled())
         return;
 
-    // only the channel owner or a moderator may unsilence members
-    uint8 const flags = channel->GetPlayerFlags(_player->GetGUID());
-    if (!(flags & MEMBER_FLAG_OWNER) && !(flags & MEMBER_FLAG_MODERATOR))
-        return;
-
     ObjectGuid playerGuid = sCharacterCache->GetCharacterGuidByName(packet.PlayerName);
     if (!playerGuid)
+        return;
+
+    // same rights as muting through the text channel commands
+    if (!channel->CanSilenceVoiceMember(_player, playerGuid))
         return;
 
     if (channel->IsOnVoice(playerGuid))

@@ -21,6 +21,7 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "VoiceChatMgr.h"
 #include "VoiceChatPackets.h"
 #include "WorldSession.h"
@@ -58,6 +59,72 @@ void Channel::VoiceOn(Player* player)
 
     // creates the voice session and adds eligible members
     sVoiceChatMgr->CreateCustomVoiceChatChannel(GetName(), player->GetTeamId());
+}
+
+bool Channel::CheckVoiceModerator(Player const* player)
+{
+    ObjectGuid const guid = player->GetGUID();
+
+    PlayerContainer::const_iterator itr = playersStore.find(guid);
+    if (itr == playersStore.end())
+    {
+        WorldPacket data;
+        MakeNotMember(&data);
+        SendToOne(&data, guid);
+        return false;
+    }
+
+    WorldSession* session = player->GetSession();
+    if (!itr->second.IsModerator() && !session->HasPermission(rbac::RBAC_PERM_CHANGE_CHANNEL_NOT_MODERATOR))
+    {
+        WorldPacket data;
+        MakeNotModerator(&data);
+        SendToOne(&data, guid);
+        return false;
+    }
+
+    return true;
+}
+
+void Channel::RequestVoiceOn(Player* player)
+{
+    // the first voice enabled member joining turns voice on implicitly (JoinChannel),
+    // an explicit request from the channel menu needs moderator rights
+    if (!CheckVoiceModerator(player))
+        return;
+
+    VoiceOn(player);
+}
+
+bool Channel::CanSilenceVoiceMember(Player const* player, ObjectGuid victim)
+{
+    if (!CheckVoiceModerator(player))
+        return false;
+
+    ObjectGuid const guid = player->GetGUID();
+
+    // same rules as muting through SetMode: only the owner may silence the owner,
+    // and the channel rights may forbid it to everyone but GMs and constant moderators
+    if (_ownerGUID == victim && _ownerGUID != guid)
+    {
+        WorldPacket data;
+        MakeNotOwner(&data);
+        SendToOne(&data, guid);
+        return false;
+    }
+
+    WorldSession* session = player->GetSession();
+    bool const isConstantModerator = _channelRights.moderators.count(session->GetAccountId()) > 0;
+    if ((_channelRights.flags & CHANNEL_RIGHT_CANT_MUTE) && !isConstantModerator &&
+        !session->HasPermission(rbac::RBAC_PERM_CHANGE_CHANNEL_NOT_MODERATOR))
+    {
+        WorldPacket data;
+        MakeNotModerator(&data);
+        SendToOne(&data, guid);
+        return false;
+    }
+
+    return true;
 }
 
 bool Channel::IsOnVoice(ObjectGuid guid) const
