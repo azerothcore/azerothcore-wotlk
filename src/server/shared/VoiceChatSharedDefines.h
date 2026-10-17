@@ -28,8 +28,9 @@
  * Internal protocol spoken between the worldserver (client side) and the
  * voiceserver (server side) over TCP.
  *
- * Framing: VoiceChatServerPktHeader { uint16 size; uint8 cmd; } followed by
- * the payload. `size` counts the cmd byte plus the payload.
+ * Framing: VoiceChatServerPktHeader { uint16 size; uint8 cmd; } (3 bytes,
+ * size in big endian) followed by the payload. `size` counts the cmd byte plus
+ * the payload.
  *
  * Voice channel ids are allocated by the worldserver and pushed to the
  * voiceserver, so no id negotiation round trip is required. The voiceserver
@@ -115,17 +116,25 @@ enum class VoiceChatCreateSessionResult : uint8
     Failed          = 1,
 };
 
+#pragma pack(push, 1)
 struct VoiceChatServerPktHeader
 {
-    uint16 size;
-    uint8 cmd;
+    uint16 size = 0;
+    uint8 cmd = 0;
 
     char const* data() const { return reinterpret_cast<char const*>(this); }
     std::size_t headerSize() const { return sizeof(VoiceChatServerPktHeader); }
 
     bool IsValidSize() const { return size >= 1 && size <= VOICECHAT_MAX_INTERNAL_PACKET_SIZE; }
-    bool IsValidOpcode() const { return cmd > static_cast<uint8>(VoiceChatServerOpcodes::NULL_OPCODE) && cmd < static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES); }
+    bool IsValidOpcode() const
+    {
+        return cmd > static_cast<uint8>(VoiceChatServerOpcodes::NULL_OPCODE)
+            && cmd < static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES);
+    }
 };
+#pragma pack(pop)
+
+static_assert(sizeof(VoiceChatServerPktHeader) == 3, "the internal packet header is 3 bytes on the wire");
 
 class VoiceChatServerPacket : public ByteBuffer
 {
