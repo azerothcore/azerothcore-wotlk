@@ -73,6 +73,11 @@ bool VoiceServer::Start(Acore::Asio::IoContext& ioContext, std::string const& bi
 
 void VoiceServer::Stop()
 {
+    // the socket is bound to main()'s io context, which is destroyed before this
+    // singleton; it must not live on until static destruction
     if (_socket)
+    {
         _socket->Close();
+        _socket.reset();
+    }
 }

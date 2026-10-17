@@ -129,6 +129,12 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    // registered right away so the UDP socket is also released when a later step fails
+    std::shared_ptr<void> sVoiceServerHandle(nullptr, [](void*)
+    {
+        sVoiceServer.Stop();
+    });
+
     // by default only accept internal (worldserver) connections from localhost
     std::string const internalBindIp = sConfigMgr->GetOption<std::string>("InternalBindIP", "127.0.0.1");
     if (!sInternalSocketMgr.StartNetwork(*ioContext, internalBindIp, internalPort))
@@ -139,7 +145,6 @@ int main(int argc, char** argv)
 
     std::shared_ptr<void> sSocketMgrHandle(nullptr, [](void*)
     {
-        sVoiceServer.Stop();
         sInternalSocketMgr.StopNetwork();
     });
 
