@@ -3910,6 +3910,23 @@ Battleground.TrackDeserters.Enable = 0
 Battleground.InvitationType = 0
 
 #
+#    Battleground.WaitForPendingInvites
+#        Description: Do not open another instance of a battleground for a level bracket while
+#                     an instance of that bracket that has not started yet (preparation phase)
+#                     still has unanswered invites. Waiting players fill the slots that declines,
+#                     expired invites and logouts reopen. A further instance opens only once every
+#                     such invite is answered (an invite lasts up to 60 seconds, and rounds chain
+#                     while declines keep reopening slots) or the battle starts, and enough
+#                     uninvited players remain. With Battleground.PrepTime below 60 the battle can
+#                     start while first invites are still unanswered, which ends the wait early.
+#                     Arenas are not affected.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled, a second instance opens as soon as enough uninvited
+#                         players are queued, even while invites are still unanswered)
+
+Battleground.WaitForPendingInvites = 1
+
+#
 #    Battleground.ReportAFK.Timer
 #        Description: After a few minutes that battle started you can report the player.
 #        Default:     4
