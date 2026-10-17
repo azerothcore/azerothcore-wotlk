@@ -231,12 +231,15 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPackets::VoiceChat::AddVoiceI
     if (!_player)
         return;
 
-    if (!normalizePlayerName(packet.IgnoreName))
-        return;
+    ObjectGuid ignoreGuid;
+    if (normalizePlayerName(packet.IgnoreName))
+        ignoreGuid = sCharacterCache->GetCharacterGuidByName(packet.IgnoreName);
 
-    ObjectGuid ignoreGuid = sCharacterCache->GetCharacterGuidByName(packet.IgnoreName);
     if (!ignoreGuid)
+    {
+        sSocialMgr->SendFriendStatus(_player, FRIEND_MUTE_NOT_FOUND, ObjectGuid::Empty, false);
         return;
+    }
 
     LOG_DEBUG("network", "WORLD: {} asked to mute: '{}'", _player->GetName(), packet.IgnoreName);
 
