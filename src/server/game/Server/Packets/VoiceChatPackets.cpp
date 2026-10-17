@@ -53,11 +53,13 @@ void WorldPackets::VoiceChat::DeleteVoiceIgnore::Read()
 void WorldPackets::VoiceChat::PartySilence::Read()
 {
     _worldPacket >> SilenceGuid;
+    _worldPacket >> PvpRaid;
 }
 
 void WorldPackets::VoiceChat::PartyUnsilence::Read()
 {
     _worldPacket >> UnsilenceGuid;
+    _worldPacket >> PvpRaid;
 }
 
 void WorldPackets::VoiceChat::ChannelSilence::Read()

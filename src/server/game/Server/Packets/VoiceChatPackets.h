@@ -96,6 +96,7 @@ namespace WorldPackets
             void Read() override;
 
             ObjectGuid SilenceGuid;
+            uint8 PvpRaid = 0; // unused, the server finds the battleground channel itself
         };
 
         class PartyUnsilence final : public ClientPacket
@@ -106,6 +107,7 @@ namespace WorldPackets
             void Read() override;
 
             ObjectGuid UnsilenceGuid;
+            uint8 PvpRaid = 0; // unused, the server finds the battleground channel itself
         };
 
         class ChannelSilence final : public ClientPacket
