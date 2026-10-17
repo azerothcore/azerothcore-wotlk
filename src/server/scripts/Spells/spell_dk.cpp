@@ -16,6 +16,7 @@
  */
 
 #include "AreaDefines.h"
+#include "Pet.h"
 #include "PetDefines.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -25,6 +26,7 @@
 #include "SpellScriptLoader.h"
 #include "Totem.h"
 #include "UnitAI.h"
+#include "Pet/pet_dk.h"
 /*
  * Scripts for spells with SPELLFAMILY_DEATHKNIGHT and SPELLFAMILY_GENERIC spells used by deathknight players.
  * Ordered alphabetically using scriptname.
@@ -2174,9 +2176,23 @@ class spell_dk_raise_dead : public SpellScript
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(GetGhoulSpellId());
         SpellCastTargets targets;
-        targets.SetDst(*GetHitUnit());
+        if (spellInfo->Id == SPELL_DK_RAISE_DEAD_PET)
+        {
+            float x, y, z;
+            GetCaster()->GetClosePoint(x, y, z, GetCaster()->GetObjectSize());
+            targets.SetDst(x, y, z, GetCaster()->GetOrientation(), GetCaster()->GetMapId());
+        }
+        else
+            targets.SetDst(*GetHitUnit());
 
         GetCaster()->CastSpell(targets, spellInfo, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCaster()->GetGUID());
+
+        // Controllable pets bypass TempSummon::InitSummon and its IsSummonedBy callback.
+        if (GetCaster()->HasAura(SPELL_DK_MASTER_OF_GHOULS))
+            if (Pet* ghoul = GetCaster()->ToPlayer()->GetPet())
+                if (ghoul->GetEntry() == NPC_DK_RISEN_GHOUL && ghoul->IsAIEnabled)
+                    ghoul->AI()->DoAction(ACTION_DK_GHOUL_EMERGE);
+
         GetCaster()->ToPlayer()->RemoveSpellCooldown(GetSpellInfo()->Id, true);
     }
 
@@ -2193,6 +2209,40 @@ class spell_dk_raise_dead : public SpellScript
 private:
     SpellCastResult _result;
     bool _corpse;
+};
+
+// 46585, 52150 - Raise Dead summon
+class spell_dk_raise_dead_summon : public SpellScript
+{
+    PrepareSpellScript(spell_dk_raise_dead_summon);
+
+    void SetSpawnDestination(SpellDestination& dest)
+    {
+        WorldLocation const* originalDest = GetExplTargetDest();
+        if (!originalDest)
+            return;
+
+        if (GetSpellInfo()->Id == SPELL_DK_RAISE_DEAD_PET)
+        {
+            dest.Relocate(*originalDest);
+            return;
+        }
+
+        if (!GetCaster()->IsWithinDist2d(originalDest, 0.1f))
+            return;
+
+        float x, y, z;
+        if (!GetCaster()->GetClosePoint(x, y, z, GetCaster()->GetObjectSize()))
+            return;
+
+        dest.Relocate(Position(x, y, z, GetCaster()->GetOrientation()));
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(
+            spell_dk_raise_dead_summon::SetSpawnDestination, EFFECT_0, TARGET_DEST_DEST_RANDOM);
+    }
 };
 
 // 59754 - Rune Tap
@@ -3041,6 +3091,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_pestilence);
     RegisterSpellScript(spell_dk_presence);
     RegisterSpellScript(spell_dk_raise_dead);
+    RegisterSpellScript(spell_dk_raise_dead_summon);
     RegisterSpellScript(spell_dk_rune_tap_party);
     RegisterSpellScript(spell_dk_scent_of_blood);
     RegisterSpellScript(spell_dk_scourge_strike);
