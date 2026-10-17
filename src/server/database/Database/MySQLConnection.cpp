@@ -22,6 +22,7 @@
 #include "MySQLPreparedStatement.h"
 #include "PreparedStatement.h"
 #include "QueryResult.h"
+#include "SQLOperation.h"
 #include "StringConvert.h"
 #include "Timer.h"
 #include "Tokenize.h"
@@ -461,6 +462,12 @@ std::size_t MySQLConnection::EscapeString(char* to, char const* from, std::size_
 void MySQLConnection::Ping()
 {
     mysql_ping(m_Mysql);
+}
+
+bool PingOperation::Execute()
+{
+    m_conn->Ping();
+    return true;
 }
 
 uint32 MySQLConnection::GetLastError()
