@@ -24,9 +24,11 @@
 
 // Talker priority sent in the voice roster. The client plays up to 4 talkers at
 // once; another talker only takes the channel of the one with the lowest priority
-// if its own priority is higher, and a priority of 0 is never played. The client
-// gives every session priority 0x80 by default, which adds 0x80 << 8 for everyone.
-#define HIGH_VOICE_PRIORITY 0xC8
+// if its own priority is strictly higher, and a priority of 0 is never played.
+// The client only compares the values. It gives every talker 0x80 until a roster
+// sets one, and every session 0x80, which adds the same 0x80 << 8 for everyone.
+// LOW matches that default. HIGH is arbitrary: any value above 0x80 works the same.
+#define HIGH_VOICE_PRIORITY 0xFF
 #define LOW_VOICE_PRIORITY 0x80
 
 // the 3.3.5a client keeps the members of a voice session, itself included, in
