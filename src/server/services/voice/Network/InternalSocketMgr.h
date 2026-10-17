@@ -32,7 +32,8 @@ public:
         return instance;
     }
 
-    bool StartNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount = 1) override
+    bool StartNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port,
+        int threadCount = 1) override
     {
         if (!BaseSocketMgr::StartNetwork(ioContext, bindIp, port, threadCount))
             return false;

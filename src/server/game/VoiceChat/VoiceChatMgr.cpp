@@ -74,7 +74,8 @@ void VoiceChatMgr::LoadConfigs()
     }
     catch (boost::system::system_error const&)
     {
-        LOG_ERROR("voice-chat", "VoiceChat.VoiceAddress '{}' is not a valid IPv4 address, voice chat disabled", voiceAddressString);
+        LOG_ERROR("voice-chat", "VoiceChat.VoiceAddress '{}' is not a valid IPv4 address, voice chat disabled",
+            voiceAddressString);
         _voiceAddress = 0;
         _enabled = false;
         sWorld->setBoolConfig(CONFIG_VOICE_CHAT_ENABLED, false);
@@ -95,7 +96,8 @@ void VoiceChatMgr::Init()
         // the connector lives on the voice network thread's io context so the
         // resulting socket does all of its asio work on that single thread
         _voiceServerConnector = std::make_shared<VoiceServerConnector>(sVoiceChatSocketMgr.GetNetworkThreadIoContext());
-        LOG_INFO("voice-chat", "Voice chat enabled, connecting to voiceserver at {}:{}", _serverAddressString, _serverPort);
+        LOG_INFO("voice-chat", "Voice chat enabled, connecting to voiceserver at {}:{}",
+            _serverAddressString, _serverPort);
     }
     else
         LOG_INFO("voice-chat", "Voice chat disabled");
@@ -403,7 +405,8 @@ void VoiceChatMgr::UpdateVoiceServerConnection(uint32 const diff)
     // give up if the voiceserver could not be reached too many times
     if (_maxConnectAttempts > 0 && _failedConnectAttempts >= uint32(_maxConnectAttempts))
     {
-        LOG_ERROR("voice-chat", "Could not connect to the voiceserver after {} attempts, disabling voice chat", _failedConnectAttempts.load());
+        LOG_ERROR("voice-chat", "Could not connect to the voiceserver after {} attempts, disabling voice chat",
+            _failedConnectAttempts.load());
         sWorld->setBoolConfig(CONFIG_VOICE_CHAT_ENABLED, false);
         Disable();
         return;
@@ -413,7 +416,8 @@ void VoiceChatMgr::UpdateVoiceServerConnection(uint32 const diff)
     std::unique_ptr<VoiceChatServerPacket> packet;
     while (_voiceServerPacketQueue.next(packet))
     {
-        VoiceChatInternalOpcodeHandler<VoiceChatMgr> const* opHandle = internalVoiceChatOpcodeTable[packet->GetOpcode()];
+        VoiceChatInternalOpcodeHandler<VoiceChatMgr> const* opHandle =
+            internalVoiceChatOpcodeTable[packet->GetOpcode()];
         if (!opHandle)
         {
             LOG_ERROR("voice-chat", "Received unhandled opcode {} from voiceserver", uint32(packet->GetOpcode()));
@@ -466,7 +470,8 @@ void VoiceChatMgr::UpdateVoiceServerConnection(uint32 const diff)
         }
         catch (boost::system::system_error const&)
         {
-            LOG_ERROR("voice-chat", "VoiceChat.ServerAddress '{}' is not a valid address, voice chat disabled", _serverAddressString);
+            LOG_ERROR("voice-chat", "VoiceChat.ServerAddress '{}' is not a valid address, voice chat disabled",
+                _serverAddressString);
             sWorld->setBoolConfig(CONFIG_VOICE_CHAT_ENABLED, false);
             Disable();
         }
@@ -475,7 +480,8 @@ void VoiceChatMgr::UpdateVoiceServerConnection(uint32 const diff)
 
 void VoiceChatMgr::OnVoiceServerConnected()
 {
-    LOG_INFO("voice-chat", "Connected to voiceserver at {}:{}", _voiceServerSocket->GetRemoteIpAddress().to_string(), _voiceServerSocket->GetRemotePort());
+    LOG_INFO("voice-chat", "Connected to voiceserver at {}:{}", _voiceServerSocket->GetRemoteIpAddress().to_string(),
+        _voiceServerSocket->GetRemotePort());
 
     bool const reconnect = _wasConnected;
     _wasConnected = true;
@@ -537,7 +543,8 @@ void VoiceChatMgr::EnableChannelSlot(uint16 channelId, uint8 slotId, Player cons
     std::string const& clientAddress = session->GetRemoteAddress();
     std::string const& name = player->GetName();
 
-    VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_ADD_MEMBER, 3 + clientAddress.size() + 1 + 8 + name.size() + 1 + 4);
+    VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_ADD_MEMBER,
+        3 + clientAddress.size() + 1 + 8 + name.size() + 1 + 4);
     data << channelId;
     data << slotId;
     data << clientAddress;
@@ -687,7 +694,8 @@ void VoiceChatMgr::AddMembersAfterCreate(Channel* channel)
         }
         case VoiceChatChannelType::Battleground:
         {
-            if (Battleground* bg = sBattlegroundMgr->GetBattleground(channel->GetVoiceGroupId(), BATTLEGROUND_TYPE_NONE))
+            Battleground* bg = sBattlegroundMgr->GetBattleground(channel->GetVoiceGroupId(), BATTLEGROUND_TYPE_NONE);
+            if (bg)
             {
                 channel->SetVoiceMassAdding(true);
                 for (auto const& itr : bg->GetPlayers())
@@ -809,7 +817,8 @@ Channel* VoiceChatMgr::GetRaidVoiceChatChannel(uint32 groupId)
 Channel* VoiceChatMgr::GetBattlegroundVoiceChatChannel(uint32 instanceId, TeamId team)
 {
     for (auto const& [voiceId, channel] : _voiceChannels)
-        if (channel->GetVoiceType() == VoiceChatChannelType::Battleground && channel->GetVoiceGroupId() == instanceId && channel->GetTeamId() == team)
+        if (channel->GetVoiceType() == VoiceChatChannelType::Battleground && channel->GetVoiceGroupId() == instanceId &&
+            channel->GetTeamId() == team)
             return channel;
 
     return nullptr;
@@ -819,7 +828,8 @@ Channel* VoiceChatMgr::GetCustomVoiceChatChannel(std::string const& name, TeamId
 {
     TeamId const channelTeam = GetCustomChannelTeam(team);
     for (auto const& [voiceId, channel] : _voiceChannels)
-        if (channel->GetVoiceType() == VoiceChatChannelType::Custom && channel->GetTeamId() == channelTeam && channel->GetName() == name)
+        if (channel->GetVoiceType() == VoiceChatChannelType::Custom && channel->GetTeamId() == channelTeam &&
+            channel->GetName() == name)
             return channel;
 
     return nullptr;

@@ -34,7 +34,8 @@ public:
         return instance;
     }
 
-    VoiceChatSocketMgr() : BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(4096), _tcpNoDelay(true)
+    VoiceChatSocketMgr() : BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(4096),
+        _tcpNoDelay(true)
     {
     }
 
@@ -93,7 +94,10 @@ public:
 
             if (err && err != boost::system::errc::not_supported)
             {
-                LOG_ERROR("network", "VoiceChatSocketMgr::OnSocketOpen sock.set_option(boost::asio::socket_base::send_buffer_size) err = {}", err.message());
+                LOG_ERROR("network",
+                    "VoiceChatSocketMgr::OnSocketOpen sock.set_option(boost::asio::socket_base::send_buffer_size) "
+                    "err = {}",
+                    err.message());
                 return nullptr;
             }
         }
@@ -106,7 +110,9 @@ public:
 
             if (err)
             {
-                LOG_ERROR("network", "VoiceChatSocketMgr::OnSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = {}", err.message());
+                LOG_ERROR("network",
+                    "VoiceChatSocketMgr::OnSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = {}",
+                    err.message());
                 return nullptr;
             }
         }

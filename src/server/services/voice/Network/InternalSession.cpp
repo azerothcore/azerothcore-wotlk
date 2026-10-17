@@ -76,7 +76,8 @@ bool InternalSession::ReadHeaderHandler()
 
     if (!header->IsValidSize() || !header->IsValidOpcode())
     {
-        LOG_ERROR("voice-chat", "InternalSession::ReadHeaderHandler(): worldserver {} sent malformed packet (size: {}, cmd: {})",
+        LOG_ERROR("voice-chat",
+            "InternalSession::ReadHeaderHandler(): worldserver {} sent malformed packet (size: {}, cmd: {})",
             GetRemoteIpAddress().to_string(), header->size, header->cmd);
 
         return false;

@@ -50,7 +50,8 @@ public:
     }
 
 private:
-    void SetInternalServerOpcodeHandler(VoiceChatServerOpcodes const opcode, char const* name, void (Server::* handler)(VoiceChatServerPacket& packet))
+    void SetInternalServerOpcodeHandler(VoiceChatServerOpcodes const opcode, char const* name,
+        void (Server::* handler)(VoiceChatServerPacket& packet))
     {
         // Not a valid opcode
         if (opcode == VoiceChatServerOpcodes::NULL_OPCODE || opcode == VoiceChatServerOpcodes::NUM_OPCODES)
@@ -60,10 +61,12 @@ private:
         if (_opcodeTable[static_cast<uint8>(opcode)].get() != nullptr)
             ASSERT(false);
 
-        _opcodeTable[static_cast<uint8>(opcode)] = std::make_unique<VoiceChatInternalOpcodeHandler<Server>>(name, handler);
+        _opcodeTable[static_cast<uint8>(opcode)] =
+            std::make_unique<VoiceChatInternalOpcodeHandler<Server>>(name, handler);
     }
 
-    std::array<std::unique_ptr<VoiceChatInternalOpcodeHandler<Server>>, static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES)> _opcodeTable;
+    std::array<std::unique_ptr<VoiceChatInternalOpcodeHandler<Server>>,
+        static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES)> _opcodeTable;
 };
 
 extern VoiceChatInternalOpcodeTable<InternalSession> internalVoiceChatOpcodeTable;

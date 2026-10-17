@@ -55,7 +55,8 @@ using boost::asio::ip::tcp;
 using namespace boost::program_options;
 namespace fs = std::filesystem;
 
-void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int signalNumber);
+void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error,
+    int signalNumber);
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile);
 
 /// Launch the auth server
@@ -73,7 +74,8 @@ int main(int argc, char** argv)
         return 0;
 
     // Add file and args in config
-    sConfigMgr->Configure(configFile.generic_string(), std::vector<std::string>(argv, argv + argc), VOICE_CONFIG_FILE_LIST);
+    sConfigMgr->Configure(configFile.generic_string(), std::vector<std::string>(argv, argv + argc),
+        VOICE_CONFIG_FILE_LIST);
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
@@ -90,8 +92,10 @@ int main(int argc, char** argv)
         []()
         {
             LOG_INFO("server.voiceserver", "> Using configuration file       {}", sConfigMgr->GetFilename());
-            LOG_INFO("server.voiceserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
-            LOG_INFO("server.voiceserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+            LOG_INFO("server.voiceserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT,
+                OpenSSL_version(OPENSSL_VERSION));
+            LOG_INFO("server.voiceserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000,
+                BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
 
     // configs of the voiceserver parts of the modules
@@ -175,10 +179,12 @@ int main(int argc, char** argv)
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     signals.add(SIGBREAK);
 #endif
-    signals.async_wait(std::bind(&SignalHandler, std::weak_ptr<Acore::Asio::IoContext>(ioContext), std::placeholders::_1, std::placeholders::_2));
+    signals.async_wait(std::bind(&SignalHandler, std::weak_ptr<Acore::Asio::IoContext>(ioContext),
+        std::placeholders::_1, std::placeholders::_2));
 
     // Set process priority according to configuration settings
-    SetProcessPriority("server.voiceserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
+    SetProcessPriority("server.voiceserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0),
+        sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
 
     // Start the io service worker loop
     ioContext->run();
@@ -190,7 +196,8 @@ int main(int argc, char** argv)
     return 0;
 }
 
-void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int /*signalNumber*/)
+void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error,
+    int /*signalNumber*/)
 {
     if (!error)
     {
@@ -206,7 +213,8 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile)
         ("help,h", "print usage message")
         ("version,v", "print version build info")
         ("dry-run,d", "Dry run")
-        ("config,c", value<fs::path>(&configFile)->default_value(fs::path(sConfigMgr->GetConfigPath() + std::string(_ACORE_VOICE_CONFIG))), "use <arg> as configuration file");
+        ("config,c", value<fs::path>(&configFile)->default_value(fs::path(sConfigMgr->GetConfigPath() +
+            std::string(_ACORE_VOICE_CONFIG))), "use <arg> as configuration file");
 
     variables_map variablesMap;
 

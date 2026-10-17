@@ -32,10 +32,14 @@ public:
     {
         static ChatCommandTable voicechatcommandTable =
         {
-            { "disconnect", HandleVoiceChatDisconnectCommand, rbac::RBAC_PERM_COMMAND_VOICECHAT_DISCONNECT, Console::Yes },
-            { "disable",    HandleVoiceChatDisableCommand,    rbac::RBAC_PERM_COMMAND_VOICECHAT_DISABLE,    Console::Yes },
-            { "enable",     HandleVoiceChatEnableCommand,     rbac::RBAC_PERM_COMMAND_VOICECHAT_ENABLE,     Console::Yes },
-            { "stats",      HandleVoiceChatStatsCommand,      rbac::RBAC_PERM_COMMAND_VOICECHAT_STATS,      Console::Yes },
+            { "disconnect", HandleVoiceChatDisconnectCommand, rbac::RBAC_PERM_COMMAND_VOICECHAT_DISCONNECT,
+                Console::Yes },
+            { "disable",    HandleVoiceChatDisableCommand,    rbac::RBAC_PERM_COMMAND_VOICECHAT_DISABLE,
+                Console::Yes },
+            { "enable",     HandleVoiceChatEnableCommand,     rbac::RBAC_PERM_COMMAND_VOICECHAT_ENABLE,
+                Console::Yes },
+            { "stats",      HandleVoiceChatStatsCommand,      rbac::RBAC_PERM_COMMAND_VOICECHAT_STATS,
+                Console::Yes },
         };
 
         static ChatCommandTable commandTable =
@@ -98,7 +102,8 @@ public:
             handler->PSendSysMessage("Voice Chat server is not connected");
 
         VoiceChatStatistics stats = sVoiceChatMgr->GetStatistics();
-        handler->PSendSysMessage("Voice Chat: channels: {}, active users: {}, voice chat enabled: {}, microphone enabled: {}",
+        handler->PSendSysMessage(
+            "Voice Chat: channels: {}, active users: {}, voice chat enabled: {}, microphone enabled: {}",
             stats.Channels, stats.ActiveUsers, stats.TotalVoiceChatEnabled, stats.TotalVoiceMicEnabled);
         return true;
     }

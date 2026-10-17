@@ -50,7 +50,8 @@ namespace WorldPackets
         class SetActiveVoiceChannel final : public ClientPacket
         {
         public:
-            SetActiveVoiceChannel(WorldPacket&& packet) : ClientPacket(CMSG_SET_ACTIVE_VOICE_CHANNEL, std::move(packet)) {}
+            SetActiveVoiceChannel(WorldPacket&& packet)
+                : ClientPacket(CMSG_SET_ACTIVE_VOICE_CHANNEL, std::move(packet)) {}
 
             void Read() override;
 

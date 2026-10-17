@@ -37,7 +37,8 @@ VoiceChannel* ChannelMgr::GetOwnedChannel(InternalSession const* session, uint16
 
     if (channel->GetOwner() != session)
     {
-        LOG_ERROR("voice-chat", "Worldserver requested to {} on channel {} owned by another connection", action, channelId);
+        LOG_ERROR("voice-chat", "Worldserver requested to {} on channel {} owned by another connection",
+            action, channelId);
         return nullptr;
     }
 
@@ -60,7 +61,8 @@ bool ChannelMgr::CreateChannel(InternalSession const* session, uint16 channelId,
             // only ever re-use ids of the same connection
             if (existing->GetOwner() != session)
             {
-                LOG_ERROR("voice-chat", "Worldserver requested creation of channel {} which is owned by another connection",
+                LOG_ERROR("voice-chat",
+                    "Worldserver requested creation of channel {} which is owned by another connection",
                     channelId);
                 return false;
             }

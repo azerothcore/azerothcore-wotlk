@@ -23,12 +23,12 @@ VoiceChatInternalOpcodeTable<VoiceChatMgr> internalVoiceChatOpcodeTable;
 template <>
 void VoiceChatInternalOpcodeTable<VoiceChatMgr>::Init()
 {
-#define DEFINE_INTERNAL_VOICECHAT_HANDLER(opcode, handler) \
-    SetInternalServerOpcodeHandler(opcode, #opcode, handler)
+#define DEFINE_VOICE_HANDLER(opcode, handler) \
+    SetInternalServerOpcodeHandler(VoiceChatServerOpcodes::opcode, #opcode, handler)
 
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::SMSG_PONG,                          &VoiceChatMgr::HandlePongOpcode);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::SMSG_CREATE_VOICE_SESSION_RESPONSE, &VoiceChatMgr::HandleCreateVoiceSessionResponseOpcode);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::SMSG_MODULE_MESSAGE,                &VoiceChatMgr::HandleModuleMessageOpcode);
+    DEFINE_VOICE_HANDLER(SMSG_PONG,                          &VoiceChatMgr::HandlePongOpcode);
+    DEFINE_VOICE_HANDLER(SMSG_CREATE_VOICE_SESSION_RESPONSE, &VoiceChatMgr::HandleCreateVoiceSessionResponseOpcode);
+    DEFINE_VOICE_HANDLER(SMSG_MODULE_MESSAGE,                &VoiceChatMgr::HandleModuleMessageOpcode);
 
-#undef DEFINE_INTERNAL_VOICECHAT_HANDLER
+#undef DEFINE_VOICE_HANDLER
 }

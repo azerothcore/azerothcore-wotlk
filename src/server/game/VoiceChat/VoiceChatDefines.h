@@ -56,7 +56,8 @@ enum VoiceChatState
 
 struct VoiceChatMember
 {
-    explicit VoiceChatMember(ObjectGuid guid = ObjectGuid(), uint8 userId = 0, uint8 userFlags = VOICECHAT_MEMBER_FLAG_ENABLED)
+    explicit VoiceChatMember(ObjectGuid guid = ObjectGuid(), uint8 userId = 0,
+        uint8 userFlags = VOICECHAT_MEMBER_FLAG_ENABLED)
     {
         Guid = guid;
         UserId = userId;

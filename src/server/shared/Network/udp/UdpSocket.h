@@ -92,7 +92,8 @@ public:
                     return;
 
                 // silently drop datagrams that cannot possibly be valid packets
-                if (!errorCode && dataReceived >= sizeof(UdpSocketPacketHeader) && dataReceived <= UDP_SOCKET_PACKET_MAX_SIZE)
+                if (!errorCode && dataReceived >= sizeof(UdpSocketPacketHeader) &&
+                    dataReceived <= UDP_SOCKET_PACKET_MAX_SIZE)
                 {
                     UdpSocketPacket const packet(_buffer, dataReceived);
                     ProcessPacket(packet, _senderEndpoint);
@@ -108,7 +109,8 @@ public:
         _socket.send_to(boost::asio::buffer(data, length), target, 0, errorCode);
 
         if (errorCode)
-            LOG_DEBUG("network", "UdpSocket::SendTo failed sending {} bytes: {} ({})", length, errorCode.value(), errorCode.message());
+            LOG_DEBUG("network", "UdpSocket::SendTo failed sending {} bytes: {} ({})", length, errorCode.value(),
+                errorCode.message());
     }
 
     void Close()
@@ -120,7 +122,8 @@ public:
 protected:
     virtual void ProcessPacket(UdpSocketPacket const& packet, udp::endpoint const& remoteEndpoint)
     {
-        LOG_TRACE("network", "Received data on UDP socket from {}:{}. Payload size {}. Signature {}. UserID {} ChannelID {}",
+        LOG_TRACE("network",
+            "Received data on UDP socket from {}:{}. Payload size {}. Signature {}. UserID {} ChannelID {}",
             remoteEndpoint.address().to_string(), remoteEndpoint.port(), packet.GetPayloadLength(),
             packet.GetHeader().signature, packet.GetHeader().userId, packet.GetHeader().channelId);
     }

@@ -472,7 +472,8 @@ void Player::UpdateLFGChannel()
         return;
 
     ChatChannelsEntry const* cce = sChatChannelsStore.LookupEntry(26); /*LookingForGroup*/
-    Channel* cLFG = sChannelMgr.GetOrCreateChannel(GetTeamId(), cce->pattern[m_session->GetSessionDbcLocale()], cce->ChannelID);
+    Channel* cLFG = sChannelMgr.GetOrCreateChannel(GetTeamId(), cce->pattern[m_session->GetSessionDbcLocale()],
+        cce->ChannelID);
     if (!cLFG)
         return;
 

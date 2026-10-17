@@ -143,7 +143,8 @@ public:
     VoiceChatServerPacket() : ByteBuffer(0), _opcode(VoiceChatServerOpcodes::NULL_OPCODE)
     {
     }
-    explicit VoiceChatServerPacket(VoiceChatServerOpcodes opcode, size_t res = 200) : ByteBuffer(res), _opcode(opcode) { }
+    explicit VoiceChatServerPacket(VoiceChatServerOpcodes opcode, size_t res = 200)
+        : ByteBuffer(res), _opcode(opcode) { }
     // copy constructor
     VoiceChatServerPacket(VoiceChatServerPacket const& packet) : ByteBuffer(packet), _opcode(packet._opcode)
     {

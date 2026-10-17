@@ -23,19 +23,19 @@ VoiceChatInternalOpcodeTable<InternalSession> internalVoiceChatOpcodeTable;
 template <>
 void VoiceChatInternalOpcodeTable<InternalSession>::Init()
 {
-#define DEFINE_INTERNAL_VOICECHAT_HANDLER(opcode, handler) \
-    SetInternalServerOpcodeHandler(opcode, #opcode, handler)
+#define DEFINE_VOICE_HANDLER(opcode, handler) \
+    SetInternalServerOpcodeHandler(VoiceChatServerOpcodes::opcode, #opcode, handler)
 
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_PING,                 &InternalSession::HandlePing);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_CREATE_VOICE_SESSION, &InternalSession::HandleCreateVoiceSession);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_DELETE_VOICE_SESSION, &InternalSession::HandleDeleteVoiceSession);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_ADD_MEMBER,           &InternalSession::HandleAddMember);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_REMOVE_MEMBER,        &InternalSession::HandleRemoveMember);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_VOICE_MEMBER,         &InternalSession::HandleVoiceMember);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_DEVOICE_MEMBER,       &InternalSession::HandleDevoiceMember);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_MUTE_MEMBER,          &InternalSession::HandleMuteMember);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_UNMUTE_MEMBER,        &InternalSession::HandleUnmuteMember);
-    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_MODULE_MESSAGE,       &InternalSession::HandleModuleMessage);
+    DEFINE_VOICE_HANDLER(CMSG_PING,                 &InternalSession::HandlePing);
+    DEFINE_VOICE_HANDLER(CMSG_CREATE_VOICE_SESSION, &InternalSession::HandleCreateVoiceSession);
+    DEFINE_VOICE_HANDLER(CMSG_DELETE_VOICE_SESSION, &InternalSession::HandleDeleteVoiceSession);
+    DEFINE_VOICE_HANDLER(CMSG_ADD_MEMBER,           &InternalSession::HandleAddMember);
+    DEFINE_VOICE_HANDLER(CMSG_REMOVE_MEMBER,        &InternalSession::HandleRemoveMember);
+    DEFINE_VOICE_HANDLER(CMSG_VOICE_MEMBER,         &InternalSession::HandleVoiceMember);
+    DEFINE_VOICE_HANDLER(CMSG_DEVOICE_MEMBER,       &InternalSession::HandleDevoiceMember);
+    DEFINE_VOICE_HANDLER(CMSG_MUTE_MEMBER,          &InternalSession::HandleMuteMember);
+    DEFINE_VOICE_HANDLER(CMSG_UNMUTE_MEMBER,        &InternalSession::HandleUnmuteMember);
+    DEFINE_VOICE_HANDLER(CMSG_MODULE_MESSAGE,       &InternalSession::HandleModuleMessage);
 
-#undef DEFINE_INTERNAL_VOICECHAT_HANDLER
+#undef DEFINE_VOICE_HANDLER
 }

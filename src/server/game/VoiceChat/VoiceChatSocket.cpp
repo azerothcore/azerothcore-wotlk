@@ -83,7 +83,8 @@ bool VoiceChatSocket::ReadHeaderHandler()
 
     if (!header->IsValidSize() || !header->IsValidOpcode())
     {
-        LOG_ERROR("voice-chat", "VoiceChatSocket::ReadHeaderHandler(): voiceserver {} sent malformed packet (size: {}, cmd: {})",
+        LOG_ERROR("voice-chat",
+            "VoiceChatSocket::ReadHeaderHandler(): voiceserver {} sent malformed packet (size: {}, cmd: {})",
             GetRemoteIpAddress().to_string(), header->size, header->cmd);
 
         return false;
@@ -108,7 +109,8 @@ ReadDataHandlerResult VoiceChatSocket::ReadDataHandler()
     if (opcode == VoiceChatServerOpcodes::SMSG_PONG)
         return ReadDataHandlerResult::Ok;
 
-    std::unique_ptr<VoiceChatServerPacket> packet = std::make_unique<VoiceChatServerPacket>(opcode, std::move(_packetBuffer));
+    std::unique_ptr<VoiceChatServerPacket> packet =
+        std::make_unique<VoiceChatServerPacket>(opcode, std::move(_packetBuffer));
     sVoiceChatMgr->QueueIncomingVoiceServerPacket(std::move(packet));
 
     return ReadDataHandlerResult::Ok;
