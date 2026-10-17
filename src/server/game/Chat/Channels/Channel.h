@@ -291,7 +291,6 @@ public:
     void SendVoiceRoster(bool toAll = false, ObjectGuid toPlayer = ObjectGuid::Empty);
     void SendAvailableVoiceChannel(WorldSession* session);
     void SendLeaveVoiceSession(WorldSession* session) const;
-    void SendLeaveVoiceSessionToAll(ObjectGuid guid);
 
     void SetChannelRights(ChannelRights&& channelRights);
 

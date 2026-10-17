@@ -233,9 +233,9 @@ void Channel::RemoveVoiceChatMember(ObjectGuid guid)
         }
     }
 
-    // let the other members drop the leaver from their session
-    SendLeaveVoiceSessionToAll(guid);
-
+    // the other members learn about the leaver from the roster update below,
+    // SMSG_VOICE_SESSION_LEAVE would make each of them leave the whole session
+    // whatever guid it carries
     sVoiceChatMgr->DisableChannelSlot(GetVoiceId(), userId);
 
     _voiceMembers.erase(userId);
@@ -493,21 +493,4 @@ void Channel::SendLeaveVoiceSession(WorldSession* session) const
     voiceSessionLeave.PlayerGuid = player->GetGUID();
     voiceSessionLeave.SessionId = GetVoiceSessionId();
     session->SendPacket(voiceSessionLeave.Write());
-}
-
-void Channel::SendLeaveVoiceSessionToAll(ObjectGuid guid)
-{
-    for (auto const& [userId, member] : _voiceMembers)
-    {
-        if (member.Guid == guid)
-            continue;
-
-        if (Player* player = ObjectAccessor::FindConnectedPlayer(member.Guid))
-        {
-            WorldPackets::VoiceChat::VoiceSessionLeave voiceSessionLeave;
-            voiceSessionLeave.PlayerGuid = guid;
-            voiceSessionLeave.SessionId = GetVoiceSessionId();
-            player->GetSession()->SendPacket(voiceSessionLeave.Write());
-        }
-    }
 }
