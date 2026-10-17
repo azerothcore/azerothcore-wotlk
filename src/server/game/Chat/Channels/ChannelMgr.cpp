@@ -21,6 +21,18 @@
 #include "StringConvert.h"
 #include "Tokenize.h"
 #include "World.h"
+#include <algorithm>
+#include <cctype>
+
+namespace
+{
+    std::string ToLowerChannelName(std::string name)
+    {
+        std::transform(name.begin(), name.end(), name.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+        return name;
+    }
+}
 
 void ChannelMgr::LoadChannels()
 {
@@ -155,8 +167,9 @@ Channel* ChannelMgr::GetChannel(uint64 channelId)
 void ChannelMgr::LoadChannelRights()
 {
     uint32 oldMSTime = getMSTime();
+    _channelRights.clear();
 
-    QueryResult result = CharacterDatabase.Query("SELECT channelId, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
+    QueryResult result = CharacterDatabase.Query("SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 Channel Rights!");
@@ -178,7 +191,7 @@ void ChannelMgr::LoadChannelRights()
                 moderators.insert(moderator_acc);
         }
 
-        SetChannelRightsFor(fields[0].Get<uint32>(), fields[1].Get<uint32>(), fields[2].Get<uint32>(), fields[3].Get<std::string>(), fields[4].Get<std::string>(), moderators);
+        SetChannelRightsFor(fields[0].Get<std::string>(), fields[1].Get<uint32>(), fields[2].Get<uint32>(), fields[3].Get<std::string>(), fields[4].Get<std::string>(), moderators);
         ++count;
     } while (result->NextRow());
 
@@ -186,13 +199,19 @@ void ChannelMgr::LoadChannelRights()
     LOG_INFO("server.loading", " ");
 }
 
-void ChannelMgr::SetChannelRightsFor(uint32 const channelId, uint32 const flags, uint32 const speakDelay, std::string const& joinmessage, std::string const& speakmessage, std::set<uint32> const& moderators)
+ChannelRights const& ChannelMgr::GetChannelRightsFor(std::string const& name) const
 {
-    Channel* channel = GetChannel(channelId);
-    if (!channel)
-        return;
+    ChannelRightsMap::const_iterator itr = _channelRights.find(ToLowerChannelName(name));
+    if (itr != _channelRights.end())
+        return itr->second;
 
-    channel->SetChannelRights(ChannelRights(flags, speakDelay, joinmessage, speakmessage, moderators));
+    return _emptyChannelRights;
+}
+
+void ChannelMgr::SetChannelRightsFor(std::string const& name, uint32 flags, uint32 speakDelay,
+    std::string const& joinMessage, std::string const& speakMessage, std::set<uint32> const& moderators)
+{
+    _channelRights[ToLowerChannelName(name)] = ChannelRights(flags, speakDelay, joinMessage, speakMessage, moderators);
 }
 
 void ChannelMgr::SendNotOnPacket(Player* player, std::string const& channelName)

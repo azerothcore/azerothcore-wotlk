@@ -19,7 +19,9 @@
 #define __ACORE_CHANNELMGR_H
 
 #include "Channel.h"
+#include <map>
 #include <memory>
+#include <set>
 #include <string>
 
 class Player;
@@ -31,6 +33,7 @@ class ChannelMgr
 {
     typedef std::unordered_map<std::wstring, std::shared_ptr<Channel>> ChannelsByNameMap;
     typedef std::unordered_map<uint64, std::shared_ptr<Channel>> ChannelsByGUIDMap;
+    typedef std::map<std::string, ChannelRights> ChannelRightsMap;
 
 public:
     static ChannelMgr& Instance()
@@ -47,8 +50,12 @@ public:
     Channel* GetChannel(uint64 channelId);
 
     void LoadChannels();
+    // must run before LoadChannels: custom channels pick up their rights when they are created
     void LoadChannelRights();
-    void SetChannelRightsFor(uint32 const channelId, uint32 const flags, uint32 const speakDelay, std::string const& joinmessage, std::string const& speakmessage, std::set<uint32> const& moderators);
+    // rights of custom channels, by case insensitive channel name
+    ChannelRights const& GetChannelRightsFor(std::string const& name) const;
+    void SetChannelRightsFor(std::string const& name, uint32 flags, uint32 speakDelay,
+        std::string const& joinMessage, std::string const& speakMessage, std::set<uint32> const& moderators);
 
     uint64 const GetNextChannelGuid() { return ++_nextChannelGuid; }
 
@@ -57,6 +64,8 @@ public:
 private:
     ChannelsByNameMap _channelsByName[MAX_TEAMS];
     ChannelsByGUIDMap _channelsByGuid;
+    ChannelRightsMap _channelRights;
+    ChannelRights _emptyChannelRights;
 
     uint64 _nextChannelGuid;
 };

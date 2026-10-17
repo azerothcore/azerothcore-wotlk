@@ -71,6 +71,11 @@ Channel::Channel(std::string const& name, uint32 channelDBCId, uint64 channelGui
     {
         _flags |= CHANNEL_FLAG_CUSTOM;
 
+        // pussywizard:
+        SetChannelRights(ChannelRights(sChannelMgr.GetChannelRightsFor(_name)));
+        if (_channelRights.flags & CHANNEL_RIGHT_DONT_PRESERVE)
+            return;
+
         _IsSaved = true;
 
         // Xinef: loading
@@ -182,10 +187,6 @@ void Channel::CleanOldChannelsInDB()
         trans->Append(stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_OLD_CHANNELS_BANS);
-        trans->Append(stmt);
-
-        // drop rights of channels that no longer exist
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_OLD_CHANNELS_RIGHTS);
         trans->Append(stmt);
 
         CharacterDatabase.CommitTransaction(trans);

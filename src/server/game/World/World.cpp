@@ -1022,11 +1022,12 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Stored Loot Items...");
     sLootItemStorage->LoadStorageFromDB();
 
-    LOG_INFO("server.loading", "Load Channels...");
-    sChannelMgr.LoadChannels();
-
+    // rights first, channels pick them up when they are created
     LOG_INFO("server.loading", "Load Channel Rights...");
     sChannelMgr.LoadChannelRights();
+
+    LOG_INFO("server.loading", "Load Channels...");
+    sChannelMgr.LoadChannels();
 
     LOG_INFO("server.loading", "Loading AntiDos opcode policies");
     sWorldGlobals->LoadAntiDosOpcodePolicies();
