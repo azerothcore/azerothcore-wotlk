@@ -17,6 +17,7 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "RBAC.h"
 #include "WaypointMgr.h"
@@ -153,8 +154,21 @@ public:
 
         if (creatures.empty())
         {
-            handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
-            return false;
+            // Not spawned because its grid has not been loaded since the server started: delete the row if the
+            // spawn is on this map. DeleteCreatureData also keeps it from spawning when the grid loads. Not on an
+            // instanceable map, where another instance may have it spawned.
+            CreatureData const* data = sObjectMgr->GetCreatureData(guid);
+            if (!data || data->mapid != map->GetId() || map->Instanceable())
+            {
+                handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
+                return false;
+            }
+
+            sObjectMgr->DeleteCreatureData(guid);
+
+            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
+            stmt->SetData(0, guid);
+            WorldDatabase.Execute(stmt);
         }
 
         if (deleteFromWaypointData)
