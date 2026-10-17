@@ -39,8 +39,9 @@ void ChannelMgr::LoadChannels()
     uint32 oldMSTime = getMSTime();
     uint32 count = 0;
 
-    //                                                    0          1     2     3         4          5
-    QueryResult result = CharacterDatabase.Query("SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC");
+    // 0: channelId, 1: name, 2: team, 3: announce, 4: ownership, 5: password
+    CharacterDatabasePreparedStatement* channelsStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHANNELS);
+    PreparedQueryResult result = CharacterDatabase.Query(channelsStmt);
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 channels. DB table `channels` is empty.");
@@ -99,7 +100,9 @@ void ChannelMgr::LoadChannels()
         ++count;
     } while (result->NextRow());
 
-    if (QueryResult banResult = CharacterDatabase.Query("SELECT channelId, playerGUID, banTime FROM channels_bans"))
+    // 0: channelId, 1: playerGUID, 2: banTime
+    CharacterDatabasePreparedStatement* bansStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHANNELS_BANS);
+    if (PreparedQueryResult banResult = CharacterDatabase.Query(bansStmt))
     {
         do
         {
@@ -185,7 +188,9 @@ void ChannelMgr::LoadChannelRights()
     uint32 oldMSTime = getMSTime();
     _channelRights.clear();
 
-    QueryResult result = CharacterDatabase.Query("SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
+    // 0: name, 1: flags, 2: speakdelay, 3: joinmessage, 4: delaymessage, 5: moderators
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHANNELS_RIGHTS);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 Channel Rights!");
