@@ -81,6 +81,7 @@ bool VoiceServer::Start(Acore::Asio::IoContext& ioContext, std::string const& bi
     {
         boost::asio::ip::address address = boost::asio::ip::make_address(bindIp);
         _socket = std::make_unique<VoiceClientSocket>(udp::socket(ioContext, udp::endpoint(address, port)));
+        _socket->Start();
     }
     catch (boost::system::system_error const& err)
     {

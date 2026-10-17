@@ -77,31 +77,13 @@ public:
         if (errorCode)
             LOG_ERROR("network", "UdpSocket: could not make the socket non-blocking: {} ({})",
                 errorCode.value(), errorCode.message());
-
-        StartReceive();
     }
 
     virtual ~UdpSocket() = default;
 
-    void StartReceive()
-    {
-        _socket.async_receive_from(boost::asio::buffer(_buffer, UDP_SOCKET_BUFFER_SIZE), _senderEndpoint,
-            [this](boost::system::error_code const errorCode, std::size_t const dataReceived)
-            {
-                if (errorCode == boost::asio::error::operation_aborted)
-                    return;
-
-                // silently drop datagrams that cannot possibly be valid packets
-                if (!errorCode && dataReceived >= sizeof(UdpSocketPacketHeader) &&
-                    dataReceived <= UDP_SOCKET_PACKET_MAX_SIZE)
-                {
-                    UdpSocketPacket const packet(_buffer, dataReceived);
-                    ProcessPacket(packet, _senderEndpoint);
-                }
-
-                StartReceive();
-            });
-    }
+    // starts receiving datagrams. Called once the object is fully constructed: the
+    // receive handler calls ProcessPacket, which derived classes override
+    void Start() { StartReceive(); }
 
     void SendTo(udp::endpoint const& target, uint8 const* data, std::size_t length)
     {
@@ -129,6 +111,26 @@ protected:
     }
 
 private:
+    void StartReceive()
+    {
+        _socket.async_receive_from(boost::asio::buffer(_buffer, UDP_SOCKET_BUFFER_SIZE), _senderEndpoint,
+            [this](boost::system::error_code const errorCode, std::size_t const dataReceived)
+            {
+                if (errorCode == boost::asio::error::operation_aborted)
+                    return;
+
+                // silently drop datagrams that cannot possibly be valid packets
+                if (!errorCode && dataReceived >= sizeof(UdpSocketPacketHeader) &&
+                    dataReceived <= UDP_SOCKET_PACKET_MAX_SIZE)
+                {
+                    UdpSocketPacket const packet(_buffer, dataReceived);
+                    ProcessPacket(packet, _senderEndpoint);
+                }
+
+                StartReceive();
+            });
+    }
+
     udp::socket _socket;
     uint8 _buffer[UDP_SOCKET_BUFFER_SIZE] = { };
     udp::endpoint _senderEndpoint;
