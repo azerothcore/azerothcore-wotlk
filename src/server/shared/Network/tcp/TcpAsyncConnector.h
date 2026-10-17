@@ -144,6 +144,8 @@ private:
 
             if (_active.load() && _needsReconnect.load())
                 StartReconnectTimer();
+            else
+                _active = false; // a single attempt is over
         }
     }
 
@@ -177,6 +179,8 @@ private:
 
             if (_needsReconnect.load())
                 StartReconnectTimer();
+            else
+                _active = false; // a single attempt is over
         }
     }
 
