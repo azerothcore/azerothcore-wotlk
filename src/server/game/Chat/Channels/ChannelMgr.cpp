@@ -169,8 +169,6 @@ void ChannelMgr::LoadChannelRights()
     {
         Field* fields = result->Fetch();
         std::string_view moderatorList = fields[5].Get<std::string_view>();
-        if (moderatorList.empty())
-            continue;
 
         std::set<uint32> moderators;
         for (auto const& itr : Acore::Tokenize(moderatorList, ' ', false))
