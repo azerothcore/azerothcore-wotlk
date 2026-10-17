@@ -137,7 +137,6 @@ Network.UseSocketActivation = 0
 #                         0 - (None)
 #                         1 - (Console)
 #                         2 - (File)
-#                         3 - (DB)
 #
 #                     LogLevel
 #                         0 - (Disabled)

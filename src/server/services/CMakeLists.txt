@@ -34,7 +34,6 @@ target_link_libraries(services
   PRIVATE
     acore-core-interface
   PUBLIC
-    database
     shared)
 
 set_target_properties(services

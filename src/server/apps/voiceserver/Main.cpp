@@ -23,7 +23,6 @@
 * voice server
 */
 
-#include "AppenderDB.h"
 #include "Banner.h"
 #include "ChannelMgr.h"
 #include "Config.h"
@@ -81,7 +80,6 @@ int main(int argc, char** argv)
         return 1;
 
     // Init logging
-    sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize(nullptr);
 
     Acore::Banner::Show("voiceserver",
