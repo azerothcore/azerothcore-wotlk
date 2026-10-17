@@ -252,8 +252,11 @@ bool ChannelMgr::HandleClientHandshake(uint16 channelId, uint8 userId, boost::as
     return true;
 }
 
-bool ChannelMgr::GetRelayTargets(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& sender, std::vector<boost::asio::ip::udp::endpoint>& targets)
+bool ChannelMgr::GetRelayTargets(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& sender,
+    std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced)
 {
+    announced = false;
+
     std::lock_guard<std::mutex> guard(_lock);
 
     VoiceChannel* channel = GetChannel(channelId);
@@ -263,6 +266,17 @@ bool ChannelMgr::GetRelayTargets(uint16 channelId, uint8 userId, boost::asio::ip
     VoiceChannelMember* member = channel->GetMember(userId);
     if (!member)
         return false;
+
+    // the client only announces itself when it first talks to a voiceserver and
+    // after 10 seconds without sending, so a member that keeps talking is never
+    // announced if it was added after its announcement (e.g. restored after a
+    // voiceserver restart). Its first frame from the right address takes its place
+    if (!member->HasEndpoint && NormalizeVoiceClientAddress(sender.address()) == member->ClientAddress)
+    {
+        member->Endpoint = sender;
+        member->HasEndpoint = true;
+        announced = true;
+    }
 
     // voice frames must come from the endpoint the member announced itself
     // from - the header is trivially forgeable otherwise

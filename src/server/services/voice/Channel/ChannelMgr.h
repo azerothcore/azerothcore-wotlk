@@ -68,8 +68,10 @@ public:
     // registers the endpoint a client sends voice data from, returns false if the member is unknown
     bool HandleClientHandshake(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& endpoint);
     // collects the endpoints a voice frame should be relayed to,
-    // returns false if the sender is not allowed to speak
-    bool GetRelayTargets(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& sender, std::vector<boost::asio::ip::udp::endpoint>& targets);
+    // returns false if the sender is not allowed to speak.
+    // announced is set if the frame registered the sender's endpoint in place of a handshake
+    bool GetRelayTargets(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& sender,
+        std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced);
 
 private:
     // requires _lock to be held, may return nullptr

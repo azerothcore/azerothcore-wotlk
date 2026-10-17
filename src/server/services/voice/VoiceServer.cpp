@@ -49,7 +49,18 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
 
     // relay the voice frame unchanged to all other voiced members
     std::vector<udp::endpoint> targets;
-    if (!sChannelMgr.GetRelayTargets(header.channelId, header.userId, remoteEndpoint, targets))
+    bool announced = false;
+    bool const relay = sChannelMgr.GetRelayTargets(header.channelId, header.userId, remoteEndpoint, targets, announced);
+
+    if (announced)
+    {
+        LOG_DEBUG("voice-chat", "Client {}:{} announced itself for channel {} member {} by sending voice",
+            remoteEndpoint.address().to_string(), remoteEndpoint.port(), header.channelId, header.userId);
+
+        sVoiceScriptMgr->OnClientHandshake(header.channelId, header.userId, remoteEndpoint);
+    }
+
+    if (!relay)
         return;
 
     for (udp::endpoint const& target : targets)
