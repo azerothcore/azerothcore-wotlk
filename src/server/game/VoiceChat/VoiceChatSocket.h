@@ -41,8 +41,8 @@ public:
     uint32 GetLastPacketReceiveTime() const { return _lastPacketReceiveTime.load(); }
 
 protected:
-    bool ReadHeaderHandler();
-    ReadDataHandlerResult ReadDataHandler();
+    bool ReadHeaderHandler() override;
+    ReadDataHandlerResult ReadDataHandler() override;
 
 private:
     std::atomic<uint32> _lastPacketReceiveTime;

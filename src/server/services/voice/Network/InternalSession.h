@@ -51,8 +51,8 @@ public:
     void HandleUnmuteMember(VoiceChatServerPacket& packet);
 
 protected:
-    bool ReadHeaderHandler();
-    ReadDataHandlerResult ReadDataHandler();
+    bool ReadHeaderHandler() override;
+    ReadDataHandlerResult ReadDataHandler() override;
 };
 
 #endif

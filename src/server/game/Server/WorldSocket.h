@@ -91,8 +91,8 @@ public:
 protected:
     void OnClose() override;
     SocketReadCallbackResult ReadHandler() final;
-    bool ReadHeaderHandler();
-    ReadDataHandlerResult ReadDataHandler();
+    bool ReadHeaderHandler() override;
+    ReadDataHandlerResult ReadDataHandler() override;
 
 private:
     void CheckIpCallback(PreparedQueryResult result);

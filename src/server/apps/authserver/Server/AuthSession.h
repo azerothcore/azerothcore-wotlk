@@ -76,8 +76,8 @@ public:
     void SendPacket(ByteBuffer& packet);
 
 protected:
-    virtual bool ReadHeaderHandler() { return true; };
-    virtual ReadDataHandlerResult ReadDataHandler() { return ReadDataHandlerResult::Ok; };
+    bool ReadHeaderHandler() override { return true; }
+    ReadDataHandlerResult ReadDataHandler() override { return ReadDataHandlerResult::Ok; }
     SocketReadCallbackResult ReadHandler() final;
 
 private:
