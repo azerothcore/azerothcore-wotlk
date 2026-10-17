@@ -108,13 +108,19 @@ bool ObjectGuidGeneratorBase::GetClusterGuid(HighGuid high, uint16 realmId, Obje
     if (!sToCloud9Sidecar->ClusterModeEnabled())
         return false;
 
+    uint64 guid = 0;
     if (high == HighGuid::Player)
-        clusterGuid = ObjectGuid::LowType(sToCloud9Sidecar->GenerateCharacterGuid(realmId));
+        guid = sToCloud9Sidecar->GenerateCharacterGuid(realmId);
     else if (high == HighGuid::Item)
-        clusterGuid = ObjectGuid::LowType(sToCloud9Sidecar->GenerateItemGuid(realmId));
+        guid = sToCloud9Sidecar->GenerateItemGuid(realmId);
     else
         return false;
 
+    // Checked before narrowing: a cluster guid past the uint32 range would otherwise wrap into used guids
+    if (guid >= ObjectGuid::GetMaxCounter(high) - 1)
+        HandleCounterOverflow(high);
+
+    clusterGuid = ObjectGuid::LowType(guid);
     return true;
 }
 
