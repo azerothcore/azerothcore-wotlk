@@ -70,6 +70,14 @@ class UdpSocket
 public:
     explicit UdpSocket(udp::socket&& socket) : _socket(std::move(socket))
     {
+        // SendTo runs on the thread that receives, it must never wait for the
+        // network. Datagrams the system can not take right away are dropped
+        boost::system::error_code errorCode;
+        _socket.non_blocking(true, errorCode);
+        if (errorCode)
+            LOG_ERROR("network", "UdpSocket: could not make the socket non-blocking: {} ({})",
+                errorCode.value(), errorCode.message());
+
         StartReceive();
     }
 
