@@ -32,28 +32,26 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPackets::VoiceChat::Voice
 
     // sent by the client on login and whenever the voice settings change
 
-    if (!sVoiceChatMgr->CanSeeVoiceChat())
-        return;
+    // always remember the client's settings (also at the character screen or
+    // while the feature is disabled), they are used once voice becomes available;
+    // set before joining so the channels accept the player
+    _voiceEnabled = packet.VoiceEnabled;
+    _micEnabled = packet.MicrophoneEnabled;
 
-    if (!_player)
-    {
-        _voiceEnabled = packet.VoiceEnabled;
-        _micEnabled = packet.MicrophoneEnabled;
+    if (!sVoiceChatMgr->CanSeeVoiceChat() || !_player)
         return;
-    }
 
     if (!packet.VoiceEnabled)
     {
         sVoiceChatMgr->RemoveFromVoiceChatChannels(_player->GetGUID());
         SetCurrentVoiceChannelId(0);
+        return;
     }
-    else if (_player->IsInWorld() && !_voiceEnabled)
-    {
-        // enable before joining so the channels accept the player
-        _voiceEnabled = packet.VoiceEnabled;
-        _micEnabled = packet.MicrophoneEnabled;
+
+    // joining is idempotent, so (re)join whenever voice is enabled instead of
+    // only on a disabled -> enabled change, which a relog may never send
+    if (_player->IsInWorld())
         sVoiceChatMgr->JoinAvailableVoiceChatChannels(this);
-    }
 
     if (GetCurrentVoiceChannelId())
     {
@@ -65,9 +63,6 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPackets::VoiceChat::Voice
                 currentChannel->UnmuteVoiceMember(_player->GetGUID());
         }
     }
-
-    _voiceEnabled = packet.VoiceEnabled;
-    _micEnabled = packet.MicrophoneEnabled;
 }
 
 void WorldSession::HandleChannelVoiceOnOpcode(WorldPackets::VoiceChat::ChannelVoiceOn& packet)

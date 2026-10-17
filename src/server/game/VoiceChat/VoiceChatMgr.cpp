@@ -473,6 +473,15 @@ void VoiceChatMgr::OnVoiceServerConnected()
 
     RestoreVoiceChatChannels();
 
+    // channels that could not be created while there was no connection (groups
+    // formed or voice enabled during an outage, or everything after voice chat
+    // was disabled and enabled again)
+    ChatHandler(static_cast<WorldSession*>(nullptr)).DoForAllValidSessions([this](Player* player)
+    {
+        if (player->GetSession()->IsVoiceChatEnabled())
+            JoinAvailableVoiceChatChannels(player->GetSession());
+    });
+
     if (reconnect)
         SendVoiceChatServiceReconnected();
 }

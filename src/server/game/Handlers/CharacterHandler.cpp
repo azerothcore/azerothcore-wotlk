@@ -1124,6 +1124,11 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         }
     }
 
+    // join available voice channels; the voice state may already be known from
+    // the character screen or an earlier character of this session
+    if (IsVoiceChatEnabled())
+        sVoiceChatMgr->JoinAvailableVoiceChatChannels(this);
+
     sScriptMgr->OnPlayerLogin(pCurrChar);
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
