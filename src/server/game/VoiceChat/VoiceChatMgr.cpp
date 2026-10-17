@@ -303,6 +303,18 @@ void VoiceChatMgr::QueueGroupLeaderChanged(uint32 groupId, ObjectGuid oldLeader,
     _groupEvents.add(event);
 }
 
+void VoiceChatMgr::QueueBattlegroundLeaderChanged(uint32 instanceId, TeamId team, ObjectGuid oldLeader,
+    ObjectGuid newLeader)
+{
+    VoiceChatGroupEvent event;
+    event.Type = VoiceChatGroupEventType::BattlegroundLeaderChanged;
+    event.Id = instanceId;
+    event.Team = team;
+    event.Guid = newLeader;
+    event.OldLeader = oldLeader;
+    _groupEvents.add(event);
+}
+
 void VoiceChatMgr::QueueGroupDisbanded(uint32 groupId)
 {
     VoiceChatGroupEvent event;
@@ -369,6 +381,15 @@ void VoiceChatMgr::ProcessGroupEvents()
                 }
                 break;
             }
+            case VoiceChatGroupEventType::BattlegroundLeaderChanged:
+                // the new leader of the battleground raid speaks with high priority
+                if (Channel* channel = GetBattlegroundVoiceChatChannel(event.Id, event.Team))
+                {
+                    channel->SetVoiceMemberPriority(event.OldLeader, LOW_VOICE_PRIORITY);
+                    channel->SetVoiceMemberPriority(event.Guid, HIGH_VOICE_PRIORITY);
+                    channel->SendVoiceRoster(true);
+                }
+                break;
             case VoiceChatGroupEventType::Disbanded:
                 DeleteGroupVoiceChatChannel(event.Id);
                 DeleteRaidVoiceChatChannel(event.Id);

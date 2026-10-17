@@ -53,6 +53,7 @@ enum class VoiceChatGroupEventType : uint8
     BattlegroundMemberRemoved,
     ConvertedToRaid,
     LeaderChanged,
+    BattlegroundLeaderChanged,
     Disbanded,
     BattlegroundRaidDisbanded
 };
@@ -122,6 +123,7 @@ public:
     void QueueBattlegroundMemberRemoved(ObjectGuid guid, uint32 instanceId, TeamId team);
     void QueueGroupConvertedToRaid(uint32 groupId);
     void QueueGroupLeaderChanged(uint32 groupId, ObjectGuid oldLeader, ObjectGuid newLeader);
+    void QueueBattlegroundLeaderChanged(uint32 instanceId, TeamId team, ObjectGuid oldLeader, ObjectGuid newLeader);
     void QueueGroupDisbanded(uint32 groupId);
     void QueueBattlegroundRaidDisbanded(uint32 instanceId, TeamId team);
 

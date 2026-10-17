@@ -835,6 +835,13 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
     // update voice priorities: the new leader speaks with high priority
     if (!isBGGroup() && !isBFGroup())
         sVoiceChatMgr->QueueGroupLeaderChanged(GetGroupId(), m_leaderGuid, newLeaderGuid);
+    else if (m_bgGroup)
+    {
+        TeamId const team = GetBattlegroundRaidTeam(m_bgGroup, this);
+        if (team != TEAM_NEUTRAL)
+            sVoiceChatMgr->QueueBattlegroundLeaderChanged(m_bgGroup->GetInstanceID(), team, m_leaderGuid,
+                newLeaderGuid);
+    }
 
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
         oldLeader->RemovePlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
