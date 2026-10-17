@@ -289,8 +289,9 @@ public:
     void DevoiceMember(ObjectGuid guid);
     void MuteVoiceMember(ObjectGuid guid);
     void UnmuteVoiceMember(ObjectGuid guid);
-    void ForceMuteVoiceMember(ObjectGuid guid);
-    void ForceUnmuteVoiceMember(ObjectGuid guid);
+    // both return false if guid is not on voice in this channel
+    bool ForceMuteVoiceMember(ObjectGuid guid);
+    bool ForceUnmuteVoiceMember(ObjectGuid guid);
     void SetVoiceMemberPriority(ObjectGuid guid, uint8 priority);
 
     void SendVoiceRoster(bool toAll = false, ObjectGuid toPlayer = ObjectGuid::Empty);

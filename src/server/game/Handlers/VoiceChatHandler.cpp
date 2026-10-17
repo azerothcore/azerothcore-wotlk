@@ -19,6 +19,7 @@
 #include "ChannelMgr.h"
 #include "Group.h"
 #include "Log.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SocialMgr.h"
@@ -32,6 +33,22 @@ namespace
     bool CanSilencePartyMembers(Group const* group, ObjectGuid guid)
     {
         return group->IsLeader(guid) || (group->isRaidGroup() && group->IsAssistant(guid));
+    }
+
+    // shows "You have been silenced" to the target and "X has been silenced" to the source
+    void SendPartySquelch(Player const* source, ObjectGuid targetGuid, bool squelched)
+    {
+        if (Player* target = ObjectAccessor::FindConnectedPlayer(targetGuid))
+        {
+            WorldPackets::VoiceChat::NotifyPartySquelch notifyPartySquelch;
+            notifyPartySquelch.Squelched = squelched;
+            target->SendDirectMessage(notifyPartySquelch.Write());
+        }
+
+        WorldPackets::VoiceChat::EchoPartySquelch echoPartySquelch;
+        echoPartySquelch.PlayerGuid = targetGuid;
+        echoPartySquelch.Squelched = squelched;
+        source->SendDirectMessage(echoPartySquelch.Write());
     }
 }
 
@@ -283,7 +300,8 @@ void WorldSession::HandlePartySilenceOpcode(WorldPackets::VoiceChat::PartySilenc
     if (!voiceChannel)
         return;
 
-    voiceChannel->ForceMuteVoiceMember(packet.SilenceGuid);
+    if (voiceChannel->ForceMuteVoiceMember(packet.SilenceGuid))
+        SendPartySquelch(_player, packet.SilenceGuid, true);
 }
 
 void WorldSession::HandlePartyUnsilenceOpcode(WorldPackets::VoiceChat::PartyUnsilence& packet)
@@ -317,7 +335,8 @@ void WorldSession::HandlePartyUnsilenceOpcode(WorldPackets::VoiceChat::PartyUnsi
     if (!voiceChannel)
         return;
 
-    voiceChannel->ForceUnmuteVoiceMember(packet.UnsilenceGuid);
+    if (voiceChannel->ForceUnmuteVoiceMember(packet.UnsilenceGuid))
+        SendPartySquelch(_player, packet.UnsilenceGuid, false);
 }
 
 void WorldSession::HandleChannelSilenceOpcode(WorldPackets::VoiceChat::ChannelSilence& packet)

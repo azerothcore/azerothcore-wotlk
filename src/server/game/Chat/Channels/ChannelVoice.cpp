@@ -368,30 +368,31 @@ void Channel::UnmuteVoiceMember(ObjectGuid guid)
         sVoiceChatMgr->UnmuteChannelSlot(GetVoiceId(), member->UserId);
 }
 
-void Channel::ForceMuteVoiceMember(ObjectGuid guid)
+bool Channel::ForceMuteVoiceMember(ObjectGuid guid)
 {
     VoiceChatMember* member = GetVoiceChatMember(guid);
     if (!member)
-        return;
+        return false;
 
     if (member->IsForceMuted())
-        return;
+        return true;
 
     member->SetForceMuted(true);
 
     SendVoiceRoster();
 
     sVoiceChatMgr->MuteChannelSlot(GetVoiceId(), member->UserId);
+    return true;
 }
 
-void Channel::ForceUnmuteVoiceMember(ObjectGuid guid)
+bool Channel::ForceUnmuteVoiceMember(ObjectGuid guid)
 {
     VoiceChatMember* member = GetVoiceChatMember(guid);
     if (!member)
-        return;
+        return false;
 
     if (!member->IsForceMuted())
-        return;
+        return true;
 
     bool micEnabled = !member->IsMuted();
     if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
@@ -404,6 +405,8 @@ void Channel::ForceUnmuteVoiceMember(ObjectGuid guid)
     // do not let the member speak if their mic is disabled client side
     if (micEnabled)
         sVoiceChatMgr->UnmuteChannelSlot(GetVoiceId(), member->UserId);
+
+    return true;
 }
 
 void Channel::DisbandVoiceSession()

@@ -184,6 +184,29 @@ namespace WorldPackets
             WorldPacket const* Write() override { return &_worldPacket; };
         };
 
+        // tells a party member that it was (un)silenced
+        class NotifyPartySquelch final : public ServerPacket
+        {
+        public:
+            NotifyPartySquelch() : ServerPacket(MSG_NOTIFY_PARTY_SQUELCH, 4) {}
+
+            WorldPacket const* Write() override;
+
+            bool Squelched = false;
+        };
+
+        // tells the leader or assistant who (un)silenced a party member
+        class EchoPartySquelch final : public ServerPacket
+        {
+        public:
+            EchoPartySquelch() : ServerPacket(SMSG_ECHO_PARTY_SQUELCH, 8 + 4) {}
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid PlayerGuid;
+            bool Squelched = false;
+        };
+
         class VoiceChatStatus final : public ServerPacket
         {
         public:

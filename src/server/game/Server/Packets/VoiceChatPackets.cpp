@@ -105,6 +105,21 @@ WorldPacket const* WorldPackets::VoiceChat::VoiceSessionLeave::Write()
     return &_worldPacket;
 }
 
+WorldPacket const* WorldPackets::VoiceChat::NotifyPartySquelch::Write()
+{
+    _worldPacket << uint32(Squelched ? 1 : 0);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::VoiceChat::EchoPartySquelch::Write()
+{
+    _worldPacket << PlayerGuid;
+    _worldPacket << uint32(Squelched ? 1 : 0);
+
+    return &_worldPacket;
+}
+
 WorldPacket const* WorldPackets::VoiceChat::VoiceChatStatus::Write()
 {
     _worldPacket << Status;
