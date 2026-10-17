@@ -12786,12 +12786,12 @@ bool Unit::IsPolymorphed() const
 void Unit::RecalculateObjectScale()
 {
     int32 scaleAuras = GetTotalAuraModifier(SPELL_AURA_MOD_SCALE) + GetTotalAuraModifier(SPELL_AURA_MOD_SCALE_2);
-    float scale = GetNativeObjectScale() + CalculatePct(1.0f, scaleAuras);
+    float scale = _displayScale.value_or(GetNativeObjectScale()) + CalculatePct(1.0f, scaleAuras);
     float scaleMin = IsPlayer() ? 0.1f : 0.01f;
     SetObjectScale(std::max(scale, scaleMin));
 }
 
-void Unit::SetDisplayId(uint32 modelId, float displayScale /*=1.f*/)
+void Unit::SetDisplayId(uint32 modelId, std::optional<float> displayScale /*= {}*/)
 {
     SetUInt32Value(UNIT_FIELD_DISPLAYID, modelId);
 
@@ -12799,7 +12799,8 @@ void Unit::SetDisplayId(uint32 modelId, float displayScale /*=1.f*/)
     if (CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(modelId))
         SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
 
-    SetObjectScale(displayScale);
+    _displayScale = displayScale;
+    RecalculateObjectScale();
 
     sScriptMgr->OnDisplayIdChange(this, modelId);
 }
