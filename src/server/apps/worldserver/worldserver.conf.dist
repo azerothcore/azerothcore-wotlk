@@ -4922,9 +4922,9 @@ Respawn.ForceCompatibilityMode = 0
 #         Default: 127.0.0.1
 #
 #    VoiceChat.MaxConnectAttempts
-#         Maximum attempts to connect/reconnect to voice chat server
-#         Default: -1 (infinite)
-#                   0 (disabled)
+#         Failed attempts to connect/reconnect to voice chat server after which voice chat is disabled
+#         Default: -1 (unlimited)
+#                   0 (unlimited)
 #                   1+ (limited attempts)
 #
 ###################################################################################################################

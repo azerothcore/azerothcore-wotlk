@@ -64,7 +64,8 @@ void VoiceChatMgr::LoadConfigs()
     _serverAddressString = sConfigMgr->GetOption<std::string>("VoiceChat.ServerAddress", "127.0.0.1");
     _serverPort = uint16(sWorld->getIntConfig(CONFIG_VOICE_CHAT_SERVER_PORT));
     _voicePort = uint16(sWorld->getIntConfig(CONFIG_VOICE_CHAT_VOICE_PORT));
-    _maxConnectAttempts = int32(sWorld->getIntConfig(CONFIG_VOICE_CHAT_MAX_CONNECT_ATTEMPTS));
+    // signed, the world config only holds unsigned integers
+    _maxConnectAttempts = sConfigMgr->GetOption<int32>("VoiceChat.MaxConnectAttempts", -1);
 
     std::string const voiceAddressString = sConfigMgr->GetOption<std::string>("VoiceChat.VoiceAddress", "127.0.0.1");
     try
