@@ -180,7 +180,10 @@ void Channel::AddVoiceChatMember(ObjectGuid guid)
     if (!session->IsVoiceChatEnabled())
         return;
 
-    uint8 userId = GenerateVoiceUserId(guid);
+    uint8 userId = 0;
+    if (_voiceMembers.size() < VOICECHAT_MAX_CHANNEL_MEMBERS)
+        userId = GenerateVoiceUserId(guid);
+
     if (!userId)
     {
         LOG_DEBUG("voice-chat", "Could not add voice member to channel {}, no free slots!", GetVoiceId());

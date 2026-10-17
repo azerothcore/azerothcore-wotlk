@@ -25,6 +25,10 @@
 #define HIGH_VOICE_PRIORITY 0x80 // Magic number, ask Burlex
 #define LOW_VOICE_PRIORITY 0xC8 // Magic number, ask Burlex
 
+// the 3.3.5a client keeps the members of a voice session, itself included, in
+// fixed arrays of 40 entries and does not check a roster against that size
+constexpr uint32 VOICECHAT_MAX_CHANNEL_MEMBERS = 40;
+
 struct VoiceChatChannelRequest
 {
     uint32 Id;
