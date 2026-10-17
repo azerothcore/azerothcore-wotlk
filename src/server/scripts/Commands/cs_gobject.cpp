@@ -58,6 +58,7 @@ public:
             { "load",         HandleGameObjectLoadCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_LOAD,      Console::Yes },
             { "set phase",    HandleGameObjectSetPhaseCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, Console::No },
             { "set state",    HandleGameObjectSetStateCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, Console::No },
+            { "set scale",    HandleGameObjectSetScaleCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_SET_SCALE, Console::No },
             { "respawn",      HandleGameObjectRespawn,             rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No },
             { "spawngroup",   HandleGameObjectSpawnGroupCommand,   rbac::RBAC_PERM_COMMAND_GOBJECT_ADD,       Console::No },
             { "despawngroup", HandleGameObjectDespawnGroupCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_DELETE,    Console::No }
@@ -495,6 +496,42 @@ public:
 
         object->SetPhaseMask(phaseMask, true);
         object->SaveToDB();
+        return true;
+    }
+
+    static bool HandleGameObjectSetScaleCommand(ChatHandler* handler, GameObjectSpawnId guidLow, float scale)
+    {
+        if (!guidLow)
+            return false;
+
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
+        if (!object)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_OBJNOTFOUND, uint32(guidLow));
+            return false;
+        }
+
+        if (scale > 10.0f || scale < 0.1f)
+        {
+            handler->SendErrorMessage(LANG_BAD_VALUE);
+            return false;
+        }
+
+        Map* map = object->GetMap();
+        sObjectMgr->SetGameObjectAddonScale(guidLow, scale);
+
+        // Respawn with a new guid so the client applies the new size and the collision model is rebuilt
+        uint32 const entry = object->GetEntry();
+        object->Delete();
+
+        object = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
+        if (!object->LoadGameObjectFromDB(guidLow, map, true))
+        {
+            delete object;
+            return false;
+        }
+
+        handler->PSendSysMessage(LANG_COMMAND_SCALEOBJMESSAGE, object->GetSpawnId(), object->GetGOInfo()->name, object->GetSpawnId(), scale);
         return true;
     }
 
