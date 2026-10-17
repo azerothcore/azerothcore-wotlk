@@ -49,6 +49,10 @@ public:
         return instance;
     }
 
+    // voice frames a member may send per second, more are dropped. 0 = no limit.
+    // Only set at startup, before any traffic
+    void SetMaxPacketsPerSecond(uint32 maxPacketsPerSecond) { _maxPacketsPerSecond = maxPacketsPerSecond; }
+
     // internal (TCP) side
     // sessionKey: the key game clients sign their voice datagrams with
     bool CreateChannel(InternalSession const* session, uint16 channelId, VoiceChatChannelType type,
@@ -84,7 +88,10 @@ private:
     // applies change to a member of a channel owned by session, reports a changed state to the scripts
     void ChangeMemberState(InternalSession const* session, uint16 channelId, uint8 userId, char const* action,
         bool logMissingMember, void (*change)(VoiceChannelMember& member));
+    // requires _lock to be held, returns false if the member sent too many voice frames
+    bool ConsumePacketBudget(VoiceChannelMember& member) const;
 
+    uint32 _maxPacketsPerSecond = 0;
     std::mutex _lock;
     std::map<uint16, VoiceChannel> _channels;
 };

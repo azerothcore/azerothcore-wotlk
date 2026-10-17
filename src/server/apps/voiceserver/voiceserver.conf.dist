@@ -50,6 +50,16 @@ ClientPort = 3724
 ClientBindIP = "0.0.0.0"
 
 #
+#    ClientMaxPacketsPerSecond
+#        Description: Voice data packets a game client may send per second, the voice server drops
+#                     the packets above it instead of relaying them. A talking client sends about
+#                     10 packets per second, the limit allows bursts of up to one second worth.
+#        Default:     50
+#                     0  - (No limit)
+
+ClientMaxPacketsPerSecond = 50
+
+#
 #    InternalPort
 #        Description: TCP port the worldserver connects to.
 #        Important:   Must match the worldserver "VoiceChat.ServerPort" setting.

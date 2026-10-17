@@ -18,6 +18,7 @@
 #include "ChannelMgr.h"
 #include "Log.h"
 #include "VoiceScriptMgr.h"
+#include <algorithm>
 
 VoiceChannel* ChannelMgr::GetChannel(uint16 channelId)
 {
@@ -264,6 +265,25 @@ bool ChannelMgr::HandleClientHandshake(UdpSocketPacket const& packet, boost::asi
     return true;
 }
 
+bool ChannelMgr::ConsumePacketBudget(VoiceChannelMember& member) const
+{
+    if (!_maxPacketsPerSecond)
+        return true;
+
+    std::chrono::steady_clock::time_point const now = std::chrono::steady_clock::now();
+    float const elapsed = std::chrono::duration<float>(now - member.PacketBudgetTime).count();
+    member.PacketBudgetTime = now;
+
+    // allows a burst of up to one second worth of frames
+    float const maxBudget = float(_maxPacketsPerSecond);
+    member.PacketBudget = std::min(maxBudget, member.PacketBudget + elapsed * maxBudget);
+    if (member.PacketBudget < 1.0f)
+        return false;
+
+    member.PacketBudget -= 1.0f;
+    return true;
+}
+
 bool ChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
     std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced)
 {
@@ -305,6 +325,10 @@ bool ChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip:
         return false;
 
     if (member->Muted || !member->Voiced)
+        return false;
+
+    // checked last, so datagrams forged with the member's address can not use up its budget
+    if (!ConsumePacketBudget(*member))
         return false;
 
     targets.reserve(channel->GetMembers().size());

@@ -25,6 +25,7 @@
 
 #include "AppenderDB.h"
 #include "Banner.h"
+#include "ChannelMgr.h"
 #include "Config.h"
 #include "GitRevision.h"
 #include "InternalSocketMgr.h"
@@ -140,6 +141,8 @@ int main(int argc, char** argv)
         LOG_ERROR("server.voiceserver", "Specified port out of allowed range (1-65535)");
         return 1;
     }
+
+    sChannelMgr.SetMaxPacketsPerSecond(sConfigMgr->GetOption<uint32>("ClientMaxPacketsPerSecond", 50));
 
     std::string const clientBindIp = sConfigMgr->GetOption<std::string>("ClientBindIP", "0.0.0.0");
     if (!sVoiceServer.Start(*ioContext, clientBindIp, clientPort))

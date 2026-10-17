@@ -23,6 +23,7 @@
 #include "VoiceChatSharedDefines.h"
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/udp.hpp>
+#include <chrono>
 #include <map>
 #include <string>
 
@@ -50,6 +51,9 @@ struct VoiceChannelMember
     bool Voiced = false;
     // may not send voice frames
     bool Muted = false;
+    // voice frames the member may still send right now (rate limit), refilled over time
+    float PacketBudget = 0.0f;
+    std::chrono::steady_clock::time_point PacketBudgetTime;
     // character in this slot as announced by the worldserver, only used to
     // identify the speaker (e.g. in logs)
     uint64 CharacterGuid = 0;
