@@ -166,11 +166,13 @@ void InternalSession::HandleCreateVoiceSession(VoiceChatServerPacket& packet)
 {
     uint16 channelId;
     uint8 type;
+    VoiceChatSessionKey sessionKey;
     packet >> channelId;
     packet >> type;
+    packet.read(sessionKey);
 
     bool const created = type < static_cast<uint8>(VoiceChatChannelType::Max)
-        && sChannelMgr.CreateChannel(this, channelId, static_cast<VoiceChatChannelType>(type));
+        && sChannelMgr.CreateChannel(this, channelId, static_cast<VoiceChatChannelType>(type), sessionKey);
 
     VoiceChatServerPacket data(VoiceChatServerOpcodes::SMSG_CREATE_VOICE_SESSION_RESPONSE, 3);
     data << channelId;

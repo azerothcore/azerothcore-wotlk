@@ -50,7 +50,9 @@ public:
     }
 
     // internal (TCP) side
-    bool CreateChannel(InternalSession const* session, uint16 channelId, VoiceChatChannelType type);
+    // sessionKey: the key game clients sign their voice datagrams with
+    bool CreateChannel(InternalSession const* session, uint16 channelId, VoiceChatChannelType type,
+        VoiceChatSessionKey const& sessionKey);
     void DeleteChannel(InternalSession const* session, uint16 channelId);
     // member: client address and character of the new member
     bool AddMember(InternalSession const* session, uint16 channelId, uint8 userId, VoiceChannelMember const& member);
@@ -65,12 +67,13 @@ public:
 
     // UDP (game client) side
 
-    // registers the endpoint a client sends voice data from, returns false if the member is unknown
-    bool HandleClientHandshake(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& endpoint);
+    // registers the endpoint a client sends voice data from (the header-only packet),
+    // returns false if the member is unknown or the packet is not the member's
+    bool HandleClientHandshake(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& endpoint);
     // collects the endpoints a voice frame should be relayed to,
     // returns false if the sender is not allowed to speak.
     // announced is set if the frame registered the sender's endpoint in place of a handshake
-    bool GetRelayTargets(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& sender,
+    bool GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
         std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced);
 
 private:

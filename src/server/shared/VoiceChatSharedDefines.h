@@ -19,6 +19,7 @@
 #define _VOICECHATSHAREDDEFINES_H
 
 #include "ByteBuffer.h"
+#include <array>
 #include <cstddef>
 #include <Define.h>
 #include <string>
@@ -38,7 +39,10 @@
  * Payloads:
  *   CMSG_PING                          -> []
  *   SMSG_PONG                          -> []
- *   CMSG_CREATE_VOICE_SESSION          -> [uint16 channelId, uint8 channelType (VoiceChatChannelType)]
+ *   CMSG_CREATE_VOICE_SESSION          -> [uint16 channelId, uint8 channelType (VoiceChatChannelType),
+ *                                          uint8 sessionKey[VOICECHAT_SESSION_KEY_SIZE]]
+ *                                         (the key the game clients sign their voice datagrams with,
+ *                                         also sent to them in SMSG_VOICE_SESSION_ROSTER_UPDATE)
  *   SMSG_CREATE_VOICE_SESSION_RESPONSE -> [uint16 channelId, uint8 error (0 = ok)]
  *   CMSG_DELETE_VOICE_SESSION          -> [uint16 channelId]
  *   CMSG_ADD_MEMBER                    -> [uint16 channelId, uint8 userId, string clientAddress,
@@ -79,6 +83,13 @@ enum class VoiceChatServerOpcodes : uint8
 // largest internal packet (cmd byte plus payload). Module messages may use most
 // of it, all other packets are a handful of bytes.
 constexpr std::size_t VOICECHAT_MAX_INTERNAL_PACKET_SIZE = 8192;
+
+// Game clients sign every voice datagram with the key of its voice session:
+// HMAC-MD5 of everything after the signature field, folded to 32 bits by
+// XORing the four little endian words of the digest. Receiving clients drop
+// datagrams with a wrong signature.
+constexpr std::size_t VOICECHAT_SESSION_KEY_SIZE = 16;
+using VoiceChatSessionKey = std::array<uint8, VOICECHAT_SESSION_KEY_SIZE>;
 
 // Voice channel types, shared with the game client protocol
 // (CMSG_SET_ACTIVE_VOICE_CHANNEL and friends use the same values).

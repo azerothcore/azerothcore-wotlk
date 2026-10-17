@@ -16,6 +16,7 @@
  */
 
 #include "Channel.h"
+#include "HMAC.h"
 
 namespace
 {
@@ -35,11 +36,33 @@ namespace
                 return 0;
         }
     }
+
+    uint32 ReadUInt32LE(uint8 const* data)
+    {
+        return uint32(data[0]) | (uint32(data[1]) << 8) | (uint32(data[2]) << 16) | (uint32(data[3]) << 24);
+    }
 }
 
-VoiceChannel::VoiceChannel(uint16 channelId, VoiceChatChannelType type, InternalSession const* owner)
-    : _channelId(channelId), _type(type), _owner(owner), _maxMembers(GetMaxMembersForType(type))
+VoiceChannel::VoiceChannel(uint16 channelId, VoiceChatChannelType type, VoiceChatSessionKey const& sessionKey,
+    InternalSession const* owner)
+    : _channelId(channelId), _type(type), _sessionKey(sessionKey), _owner(owner),
+    _maxMembers(GetMaxMembersForType(type))
 {
+}
+
+bool VoiceChannel::HasValidSignature(UdpSocketPacket const& packet) const
+{
+    uint8 const* data = packet.GetData();
+    std::size_t const signatureSize = sizeof(UdpSocketPacketHeader::signature);
+
+    Acore::Crypto::HMAC_MD5::Digest const digest = Acore::Crypto::HMAC_MD5::GetDigestOf(_sessionKey,
+        data + signatureSize, packet.GetDataLength() - signatureSize);
+
+    uint32 expected = 0;
+    for (std::size_t i = 0; i < digest.size(); i += sizeof(uint32))
+        expected ^= ReadUInt32LE(digest.data() + i);
+
+    return ReadUInt32LE(data) == expected;
 }
 
 VoiceChannelMember* VoiceChannel::GetMember(uint8 userId)

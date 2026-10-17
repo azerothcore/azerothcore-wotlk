@@ -434,6 +434,7 @@ void Channel::DisbandVoiceSession()
 
     SetVoiceId(0);
     SetVoiceSessionId(0);
+    SetVoiceSessionKey({});
 }
 
 void Channel::SetVoiceMemberPriority(ObjectGuid guid, uint8 priority)
@@ -466,8 +467,6 @@ void Channel::SendVoiceRoster(bool toAll, ObjectGuid toPlayer)
     if (_voiceMembers.empty())
         return;
 
-    uint8 const encryptionKey[16] = { };
-
     WorldPacket data(SMSG_VOICE_SESSION_ROSTER_UPDATE, 34 + (_voiceMembers.size() * 11));
     data << uint64(GetVoiceSessionId());
     data << uint16(GetVoiceId());
@@ -476,7 +475,7 @@ void Channel::SendVoiceRoster(bool toAll, ObjectGuid toPlayer)
         data << GetName();
     else
         data << uint8(0);
-    data.append(encryptionKey, 16);
+    data.append(GetVoiceSessionKey());
     data << uint32(sVoiceChatMgr->GetVoiceServerVoiceAddress());
     data << uint16(sVoiceChatMgr->GetVoiceServerVoicePort());
     data << uint8(_voiceMembers.size());

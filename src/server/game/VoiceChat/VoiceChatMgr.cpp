@@ -21,6 +21,7 @@
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "Config.h"
+#include "CryptoRandom.h"
 #include "GameTime.h"
 #include "GroupMgr.h"
 #include "Log.h"
@@ -648,6 +649,7 @@ void VoiceChatMgr::CreateVoiceSession(Channel* channel, std::shared_ptr<Channel>
     uint16 const voiceId = GetNextVoiceChannelId();
     channel->SetVoiceId(voiceId);
     channel->SetVoiceSessionId(GetNewSessionId());
+    channel->SetVoiceSessionKey(Acore::Crypto::GetRandomBytes<VOICECHAT_SESSION_KEY_SIZE>());
 
     _voiceChannels[voiceId] = channel;
     if (ownedChannel)
@@ -655,9 +657,10 @@ void VoiceChatMgr::CreateVoiceSession(Channel* channel, std::shared_ptr<Channel>
 
     LOG_DEBUG("voice-chat", "Creating voice session {} type {}", voiceId, uint32(channel->GetVoiceType()));
 
-    VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_CREATE_VOICE_SESSION, 3);
+    VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_CREATE_VOICE_SESSION, 3 + VOICECHAT_SESSION_KEY_SIZE);
     data << voiceId;
     data << static_cast<uint8>(channel->GetVoiceType());
+    data.append(channel->GetVoiceSessionKey());
     SendPacket(data);
 
     AddMembersAfterCreate(channel);
@@ -756,9 +759,10 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
     {
         LOG_DEBUG("voice-chat", "Restoring voice session {} on voiceserver", voiceId);
 
-        VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_CREATE_VOICE_SESSION, 3);
+        VoiceChatServerPacket data(VoiceChatServerOpcodes::CMSG_CREATE_VOICE_SESSION, 3 + VOICECHAT_SESSION_KEY_SIZE);
         data << voiceId;
         data << static_cast<uint8>(channel->GetVoiceType());
+        data.append(channel->GetVoiceSessionKey());
         SendPacket(data);
 
         for (auto const& [userId, member] : channel->GetVoiceMembers())

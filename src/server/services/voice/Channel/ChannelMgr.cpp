@@ -43,7 +43,8 @@ VoiceChannel* ChannelMgr::GetOwnedChannel(InternalSession const* session, uint16
     return channel;
 }
 
-bool ChannelMgr::CreateChannel(InternalSession const* session, uint16 channelId, VoiceChatChannelType type)
+bool ChannelMgr::CreateChannel(InternalSession const* session, uint16 channelId, VoiceChatChannelType type,
+    VoiceChatSessionKey const& sessionKey)
 {
     if (!channelId || type >= VoiceChatChannelType::Max)
         return false;
@@ -68,7 +69,7 @@ bool ChannelMgr::CreateChannel(InternalSession const* session, uint16 channelId,
         }
 
         _channels.emplace(std::piecewise_construct, std::forward_as_tuple(channelId),
-            std::forward_as_tuple(channelId, type, session));
+            std::forward_as_tuple(channelId, type, sessionKey, session));
     }
 
     LOG_DEBUG("voice-chat", "Channel {} created, type {}", channelId, uint32(type));
@@ -222,8 +223,11 @@ void ChannelMgr::RemoveChannelsFor(InternalSession const* session)
     }
 }
 
-bool ChannelMgr::HandleClientHandshake(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& endpoint)
+bool ChannelMgr::HandleClientHandshake(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& endpoint)
 {
+    uint16 const channelId = packet.GetHeader().channelId;
+    uint8 const userId = packet.GetHeader().userId;
+
     std::lock_guard<std::mutex> guard(_lock);
 
     VoiceChannel* channel = GetChannel(channelId);
@@ -243,6 +247,14 @@ bool ChannelMgr::HandleClientHandshake(uint16 channelId, uint8 userId, boost::as
         return false;
     }
 
+    // and only with the key of the session
+    if (!channel->HasValidSignature(packet))
+    {
+        LOG_DEBUG("voice-chat", "Rejected handshake for channel {} member {} from {}:{}, wrong signature",
+            channelId, userId, endpoint.address().to_string(), endpoint.port());
+        return false;
+    }
+
     if (member->HasEndpoint && member->Endpoint != endpoint)
         LOG_DEBUG("voice-chat", "Channel {} member {} re-announced from a different endpoint {}:{}",
             channelId, userId, endpoint.address().to_string(), endpoint.port());
@@ -252,9 +264,11 @@ bool ChannelMgr::HandleClientHandshake(uint16 channelId, uint8 userId, boost::as
     return true;
 }
 
-bool ChannelMgr::GetRelayTargets(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& sender,
+bool ChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
     std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced)
 {
+    uint16 const channelId = packet.GetHeader().channelId;
+    uint8 const userId = packet.GetHeader().userId;
     announced = false;
 
     std::lock_guard<std::mutex> guard(_lock);
@@ -267,20 +281,27 @@ bool ChannelMgr::GetRelayTargets(uint16 channelId, uint8 userId, boost::asio::ip
     if (!member)
         return false;
 
+    // the header is trivially forgeable, so only the client the worldserver
+    // announced for this slot may use it, and only with the key of the session
+    if (NormalizeVoiceClientAddress(sender.address()) != member->ClientAddress)
+        return false;
+
+    if (!channel->HasValidSignature(packet))
+        return false;
+
     // the client only announces itself when it first talks to a voiceserver and
     // after 10 seconds without sending, so a member that keeps talking is never
     // announced if it was added after its announcement (e.g. restored after a
-    // voiceserver restart). Its first frame from the right address takes its place
-    if (!member->HasEndpoint && NormalizeVoiceClientAddress(sender.address()) == member->ClientAddress)
+    // voiceserver restart). Its first frame takes the place of the announcement
+    if (!member->HasEndpoint)
     {
         member->Endpoint = sender;
         member->HasEndpoint = true;
         announced = true;
     }
 
-    // voice frames must come from the endpoint the member announced itself
-    // from - the header is trivially forgeable otherwise
-    if (!member->HasEndpoint || member->Endpoint != sender)
+    // voice frames must come from the endpoint the member announced itself from
+    if (member->Endpoint != sender)
         return false;
 
     if (member->Muted || !member->Voiced)

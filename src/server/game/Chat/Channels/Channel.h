@@ -268,6 +268,9 @@ public:
     void SetVoiceId(uint16 voiceId) { _voiceId = voiceId; }
     uint64 GetVoiceSessionId() const { return _voiceSessionGuid; }
     void SetVoiceSessionId(uint64 sessionId) { _voiceSessionGuid = sessionId; }
+    // the key the members sign their voice datagrams with
+    VoiceChatSessionKey const& GetVoiceSessionKey() const { return _voiceSessionKey; }
+    void SetVoiceSessionKey(VoiceChatSessionKey const& sessionKey) { _voiceSessionKey = sessionKey; }
     VoiceChatChannelType GetVoiceType() const { return _voiceType; }
     void SetVoiceType(VoiceChatChannelType type) { _voiceType = type; }
     uint32 GetVoiceGroupId() const { return _voiceGroupId; }
@@ -412,6 +415,7 @@ private:
 
     // Voice chat
     uint64 _voiceSessionGuid;
+    VoiceChatSessionKey _voiceSessionKey{};
     uint16 _voiceId;
     VoiceChatChannelType _voiceType;
     uint32 _voiceGroupId;

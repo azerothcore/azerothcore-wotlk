@@ -19,6 +19,7 @@
 #define __Voice_Channel_H__
 
 #include "Define.h"
+#include "UdpSocket.h"
 #include "VoiceChatSharedDefines.h"
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/udp.hpp>
@@ -59,12 +60,16 @@ struct VoiceChannelMember
 class VoiceChannel
 {
 public:
-    VoiceChannel(uint16 channelId, VoiceChatChannelType type, InternalSession const* owner);
+    VoiceChannel(uint16 channelId, VoiceChatChannelType type, VoiceChatSessionKey const& sessionKey,
+        InternalSession const* owner);
 
     uint16 GetChannelId() const { return _channelId; }
     VoiceChatChannelType GetType() const { return _type; }
     InternalSession const* GetOwner() const { return _owner; }
     uint32 GetMaxMembers() const { return _maxMembers; }
+
+    // whether a game client signed the datagram with this channel's session key
+    bool HasValidSignature(UdpSocketPacket const& packet) const;
 
     // returns nullptr if the member does not exist
     VoiceChannelMember* GetMember(uint8 userId);
@@ -79,6 +84,7 @@ public:
 private:
     uint16 _channelId;
     VoiceChatChannelType _type;
+    VoiceChatSessionKey _sessionKey;
     // identifies the worldserver connection this channel belongs to, only
     // ever used for comparison - never dereference it
     InternalSession const* _owner;
