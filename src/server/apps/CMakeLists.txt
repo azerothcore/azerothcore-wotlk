@@ -136,6 +136,13 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
       PUBLIC
         shared
         services)
+
+    # voiceserver parts of the modules, see modules/VoiceModules.cmake
+    if (${APP_PROJECT_NAME} MATCHES "voiceserver")
+      target_link_libraries(${APP_PROJECT_NAME}
+        PUBLIC
+          voicemodules)
+    endif()
   elseif(${APP_PROJECT_NAME} MATCHES "worldserver")
     target_link_libraries(${APP_PROJECT_NAME}
       PUBLIC

@@ -33,6 +33,7 @@
 #include "ProcessPriority.h"
 #include "SharedDefines.h"
 #include "Util.h"
+#include "VoiceModulesLoader.h"
 #include "VoiceScriptMgr.h"
 #include "VoiceServer.h"
 #include <boost/asio/ip/tcp.hpp>
@@ -71,7 +72,7 @@ int main(int argc, char** argv)
         return 0;
 
     // Add file and args in config
-    sConfigMgr->Configure(configFile.generic_string(), std::vector<std::string>(argv, argv + argc));
+    sConfigMgr->Configure(configFile.generic_string(), std::vector<std::string>(argv, argv + argc), VOICE_CONFIG_FILE_LIST);
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
@@ -91,6 +92,9 @@ int main(int argc, char** argv)
             LOG_INFO("server.voiceserver", "> Using SSL version:             {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
             LOG_INFO("server.voiceserver", "> Using Boost version:           {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
         });
+
+    // configs of the voiceserver parts of the modules
+    sConfigMgr->LoadModulesConfigs();
 
     // voiceserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
@@ -113,6 +117,10 @@ int main(int argc, char** argv)
         LOG_INFO("server.voiceserver", "Dry run completed, terminating.");
         return 0;
     }
+
+    // create the voiceserver scripts of the modules
+    sVoiceScriptMgr->SetModulesLoader(AddVoiceModulesScripts);
+    sVoiceScriptMgr->Initialize();
 
     sVoiceScriptMgr->OnStartup(*ioContext);
 
