@@ -46,6 +46,7 @@ Channel::Channel(std::string const& name, uint32 channelDBCId, uint64 channelGui
     _voiceGroupId(0),
     _voiceMassAdding(false),
     _voiceDeleting(false),
+    _voiceTurnedOff(false),
     _lastVoiceUserId(0)
 {
     // set special flags if built-in channel
@@ -116,6 +117,7 @@ Channel::Channel(VoiceChatChannelType voiceChannelType, uint32 voiceGroupId, Tea
     _voiceGroupId(voiceGroupId),
     _voiceMassAdding(false),
     _voiceDeleting(false),
+    _voiceTurnedOff(false),
     _lastVoiceUserId(0)
 {
 }
@@ -286,8 +288,9 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         // voice chat
         if (!IsLFG() && sVoiceChatMgr->CanUseVoiceChat())
         {
-            // the first joining member with voice chat enabled turns voice on
-            if (!IsVoiceEnabled() && player->GetSession()->IsVoiceChatEnabled())
+            // the first joining member with voice chat enabled turns voice on,
+            // unless a moderator turned it off
+            if (!IsVoiceEnabled() && !_voiceTurnedOff && player->GetSession()->IsVoiceChatEnabled())
                 VoiceOn(player);
             else if (IsVoiceEnabled())
                 sVoiceChatMgr->AddToCustomVoiceChatChannel(guid, GetName(), player->GetTeamId());

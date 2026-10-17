@@ -93,7 +93,25 @@ void Channel::RequestVoiceOn(Player* player)
     if (!CheckVoiceModerator(player))
         return;
 
+    _voiceTurnedOff = false;
     VoiceOn(player);
+}
+
+void Channel::RequestVoiceOff(Player* player)
+{
+    if (!CheckVoiceModerator(player))
+        return;
+
+    // keep voice off, joining members would turn it on again otherwise
+    _voiceTurnedOff = true;
+
+    if (!IsVoiceEnabled())
+        return;
+
+    ToggleVoice(player);
+
+    // drops the voice session and its members
+    sVoiceChatMgr->DeleteCustomVoiceChatChannel(GetName(), player->GetTeamId());
 }
 
 bool Channel::CanSilenceVoiceMember(Player const* player, ObjectGuid victim)

@@ -256,6 +256,8 @@ public:
     void VoiceOn(Player* player);
     // handles CMSG_CHANNEL_VOICE_ON, needs the same rights as the other moderation commands
     void RequestVoiceOn(Player* player);
+    // handles CMSG_CHANNEL_VOICE_OFF, needs the same rights as voice on
+    void RequestVoiceOff(Player* player);
     // whether player may (un)silence victim on this channel, notifies player if not
     bool CanSilenceVoiceMember(Player const* player, ObjectGuid victim);
 
@@ -411,6 +413,8 @@ private:
     uint32 _voiceGroupId;
     bool _voiceMassAdding;
     bool _voiceDeleting;
+    // set when a moderator turns voice off, joining members would turn it on again otherwise
+    bool _voiceTurnedOff;
     VoiceChatMembers _voiceMembers;
     // user ids handed out while this voice session exists; intentionally not
     // reused so the client does not display stale character names

@@ -35,6 +35,11 @@ void WorldPackets::VoiceChat::SetActiveVoiceChannel::Read()
     _worldPacket >> ChannelName;
 }
 
+void WorldPackets::VoiceChat::ChannelVoiceOff::Read()
+{
+    _worldPacket >> ChannelName;
+}
+
 void WorldPackets::VoiceChat::AddVoiceIgnore::Read()
 {
     _worldPacket >> IgnoreName;

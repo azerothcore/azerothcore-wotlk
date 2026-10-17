@@ -63,7 +63,9 @@ namespace WorldPackets
         public:
             ChannelVoiceOff(WorldPacket&& packet) : ClientPacket(CMSG_CHANNEL_VOICE_OFF, std::move(packet)) {}
 
-            void Read() override {};
+            void Read() override;
+
+            std::string ChannelName = "";
         };
 
         class AddVoiceIgnore final : public ClientPacket

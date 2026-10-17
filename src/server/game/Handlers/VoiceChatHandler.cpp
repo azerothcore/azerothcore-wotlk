@@ -192,11 +192,19 @@ void WorldSession::SetActiveVoiceChannel(Channel* voiceChannel, Channel* current
     }
 }
 
-void WorldSession::HandleChannelVoiceOffOpcode(WorldPackets::VoiceChat::ChannelVoiceOff& /*packet*/)
+void WorldSession::HandleChannelVoiceOffOpcode(WorldPackets::VoiceChat::ChannelVoiceOff& packet)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_VOICE_OFF");
 
-    // not sent by the 3.3.5 client
+    // Disable Voice button in the channel context menu
+
+    if (!_player)
+        return;
+
+    if (Channel* channel = sChannelMgr.GetChannel(_player->GetTeamId(), packet.ChannelName))
+        channel->RequestVoiceOff(_player);
+    else
+        ChannelMgr::SendNotOnPacket(_player, packet.ChannelName);
 }
 
 void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPackets::VoiceChat::AddVoiceIgnore& packet)
