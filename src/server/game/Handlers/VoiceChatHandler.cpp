@@ -26,6 +26,15 @@
 #include "VoiceChatPackets.h"
 #include "WorldSession.h"
 
+namespace
+{
+    // the client offers silencing to the party leader, in a raid also to the assistants
+    bool CanSilencePartyMembers(Group const* group, ObjectGuid guid)
+    {
+        return group->IsLeader(guid) || (group->isRaidGroup() && group->IsAssistant(guid));
+    }
+}
+
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPackets::VoiceChat::VoiceSessionEnable& packet)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_VOICE_SESSION_ENABLE");
@@ -249,7 +258,7 @@ void WorldSession::HandlePartySilenceOpcode(WorldPackets::VoiceChat::PartySilenc
     if (!group || !group->IsMember(packet.SilenceGuid))
         return;
 
-    if (!group->IsLeader(_player->GetGUID()) && !group->IsMainAssistant(_player->GetGUID()))
+    if (!CanSilencePartyMembers(group, _player->GetGUID()))
         return;
 
     Channel* voiceChannel = nullptr;
@@ -283,7 +292,7 @@ void WorldSession::HandlePartyUnsilenceOpcode(WorldPackets::VoiceChat::PartyUnsi
     if (!group || !group->IsMember(packet.UnsilenceGuid))
         return;
 
-    if (!group->IsLeader(_player->GetGUID()) && !group->IsMainAssistant(_player->GetGUID()))
+    if (!CanSilencePartyMembers(group, _player->GetGUID()))
         return;
 
     Channel* voiceChannel = nullptr;
