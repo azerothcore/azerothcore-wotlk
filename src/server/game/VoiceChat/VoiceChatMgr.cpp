@@ -110,8 +110,15 @@ void VoiceChatMgr::Stop()
     if (!_initialized)
         return;
 
+    // the connector's timers and socket are bound to the voice network thread's
+    // io context, which sVoiceChatSocketMgr.Stop() destroys below. Drop our
+    // reference now so the connector goes away with its pending handlers instead
+    // of during static destruction, after its io context is already gone
     if (_voiceServerConnector)
+    {
         _voiceServerConnector->Stop();
+        _voiceServerConnector.reset();
+    }
 
     if (_voiceServerSocket)
     {

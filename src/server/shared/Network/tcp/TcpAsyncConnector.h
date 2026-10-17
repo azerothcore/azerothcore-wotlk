@@ -40,8 +40,9 @@ public:
     TcpAsyncConnector(Acore::Asio::IoContext& context) : _ioContext(&context), _socket(nullptr),
         _connectTimer(context), _reconnectTimer(context), _needsReconnect(false), _active(false) { }
 
-    // handlers keep this object alive, so it is only ever destroyed once no
-    // callbacks are pending - the timer/socket destructors clean up themselves
+    // pending handlers keep this object alive. Its timers and socket are bound to
+    // the io context, so the owner must drop its reference before that io context
+    // is destroyed; the last reference then goes away with the pending handlers
     virtual ~TcpAsyncConnector() = default;
 
     // Connect once to an endpoint with timeout
