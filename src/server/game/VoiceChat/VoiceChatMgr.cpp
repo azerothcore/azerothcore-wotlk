@@ -902,10 +902,10 @@ Channel* VoiceChatMgr::GetBattlegroundVoiceChatChannel(uint32 instanceId, TeamId
 
 Channel* VoiceChatMgr::GetCustomVoiceChatChannel(std::string const& name, TeamId team)
 {
-    // the session belongs to the chat channel, looked up like chat does (ignoring
-    // case) rather than by walking every voice session
+    // the session belongs to the chat channel (whose voice type is always Custom),
+    // looked up like chat does (ignoring case) rather than by walking every voice session
     Channel* channel = sChannelMgr.GetChannel(GetCustomChannelTeam(team), name);
-    if (channel && channel->GetVoiceId() && channel->GetVoiceType() == VoiceChatChannelType::Custom)
+    if (channel && channel->GetVoiceId())
         return channel;
 
     return nullptr;
@@ -966,7 +966,6 @@ void VoiceChatMgr::CreateCustomVoiceChatChannel(std::string const& name, TeamId 
     if (!channel->HasVoiceChatCandidate())
         return;
 
-    channel->SetVoiceType(VoiceChatChannelType::Custom);
     CreateVoiceSession(channel);
 }
 
