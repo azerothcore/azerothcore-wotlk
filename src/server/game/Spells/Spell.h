@@ -593,6 +593,10 @@ public:
     // (e.g. the owner of a trap) when set, otherwise the caster itself if it is a Unit.
     Unit* GetUnitCasterForEffectHandlers() const;
     Unit* GetOriginalTarget() const;
+    // the GameObject this spell is cast from, if any: the caster itself, a GameObject
+    // original caster, or the GameObject behind a summoned world trigger
+    GameObject* GetGameObjectCaster() const;
+    std::optional<float> GetLOSCollisionHeight() const;
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
     int32 GetPowerCost() const { return m_powerCost; }
 
