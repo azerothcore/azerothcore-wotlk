@@ -239,7 +239,6 @@ public:
     bool IsLeader(ObjectGuid guid) const;
     ObjectGuid GetMemberGUID(std::string const& name);
     bool IsAssistant(ObjectGuid guid) const;
-    // bool IsMainTank(ObjectGuid guid) const;
     bool IsMainAssistant(ObjectGuid guid) const;
 
     Player* GetInvited(ObjectGuid guid) const;
@@ -341,7 +340,7 @@ public:
 
     DataMap CustomData;
 
-    // hack to get a uint32 from 64bit GUID
+    // the counter of the group's guid, unique among groups
     uint32 GetGroupId();
 
 protected:

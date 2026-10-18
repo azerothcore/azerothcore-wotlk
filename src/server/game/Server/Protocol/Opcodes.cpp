@@ -1115,7 +1115,6 @@ void OpcodeTable::Initialize()
     /*0x3D8*/ DEFINE_HANDLER(CMSG_DEBUG_LIST_TARGETS,                                               STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x3D9*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_DEBUG_LIST_TARGETS,                                 STATUS_NEVER);
     /*0x3DA*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_AVAILABLE_VOICE_CHANNEL,                            STATUS_NEVER);
-    // TODO: MISSING SILENCES
     /*0x3DB*/ DEFINE_HANDLER(CMSG_ADD_VOICE_IGNORE,                                                 STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleAddVoiceIgnoreOpcode               );
     /*0x3DC*/ DEFINE_HANDLER(CMSG_DEL_VOICE_IGNORE,                                                 STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleDeleteVoiceIgnoreOpcode            );
     /*0x3DD*/ DEFINE_HANDLER(CMSG_PARTY_SILENCE,                                                    STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandlePartySilenceOpcode                 );

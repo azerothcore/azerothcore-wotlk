@@ -58,7 +58,7 @@ void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::sy
     int signalNumber);
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile);
 
-/// Launch the auth server
+/// Launch the voice server
 int main(int argc, char** argv)
 {
     Acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_VOICESERVER;
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            LOG_INFO("server.voiceserver", "Daemon PID: {}\n", pid); // outError for red color in console
+            LOG_INFO("server.voiceserver", "Daemon PID: {}\n", pid);
         else
         {
             LOG_ERROR("server.voiceserver", "Cannot create PID file {} (possible error: permission)\n", pidFile);
