@@ -379,7 +379,8 @@ private:
     void ResetVoiceUserIds();
     // player is on the channel and a moderator (or may moderate any channel), notifies player if not
     bool CheckVoiceModerator(Player const* player);
-    // custom channels: the channel rights let player speak and player is listed to the others
+    // custom channels: the channel rights let player speak, player is listed to the others
+    // and is on voice here or in fewer than VOICECHAT_MAX_PLAYER_CUSTOM_SESSIONS channels
     bool CanUseVoice(Player const* player) const;
 
     typedef std::unordered_map<ObjectGuid, PlayerInfo> PlayerContainer;

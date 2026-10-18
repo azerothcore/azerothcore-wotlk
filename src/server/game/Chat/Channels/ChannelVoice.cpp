@@ -93,7 +93,19 @@ bool Channel::CanUseVoice(Player const* player) const
 {
     // like text chat: nobody speaks in a channel whose rights forbid it, and silently
     // joined GMs are not listed to the other members (the roster lists everyone)
-    return !(_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK) && ShouldAnnouncePlayer(player);
+    if ((_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK) || !ShouldAnnouncePlayer(player))
+        return false;
+
+    ObjectGuid const guid = player->GetGUID();
+    if (IsOnVoice(guid))
+        return true;
+
+    uint32 sessions = 0;
+    for (Channel const* channel : player->GetJoinedChannels())
+        if (channel->IsOnVoice(guid))
+            ++sessions;
+
+    return sessions < VOICECHAT_MAX_PLAYER_CUSTOM_SESSIONS;
 }
 
 void Channel::RequestVoiceOn(Player* player)

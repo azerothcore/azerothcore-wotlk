@@ -35,6 +35,11 @@
 // fixed arrays of 40 entries and does not check a roster against that size
 constexpr uint32 VOICECHAT_MAX_CHANNEL_MEMBERS = 40;
 
+// the 3.3.5a client holds up to 32 voice sessions and ignores any beyond them. Custom
+// channels leave room for the party or raid and the battleground session, and the cap
+// keeps one player from taking every voice channel id by joining channels
+constexpr uint32 VOICECHAT_MAX_PLAYER_CUSTOM_SESSIONS = 30;
+
 enum VoiceChatMemberFlags
 {
     VOICECHAT_MEMBER_FLAG_ENABLED     = 0x4,
