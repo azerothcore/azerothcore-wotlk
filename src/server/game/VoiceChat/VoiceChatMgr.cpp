@@ -158,7 +158,6 @@ void VoiceChatMgr::Enable()
         return;
 
     LOG_INFO("voice-chat", "Enabling voice chat");
-    _enabled = true;
     _wasConnected = false;
     // start over, voice chat may have been disabled for reaching VoiceChat.MaxConnectAttempts
     _failedConnectAttempts = 0;
