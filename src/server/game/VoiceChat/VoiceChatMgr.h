@@ -157,7 +157,6 @@ public:
 
     void RemoveFromGroupVoiceChatChannel(ObjectGuid guid, uint32 groupId);
     void RemoveFromRaidVoiceChatChannel(ObjectGuid guid, uint32 groupId);
-    void RemoveFromBattlegroundVoiceChatChannel(ObjectGuid guid);
 
     // remove from all channels (on logout / voice disable)
     void RemoveFromVoiceChatChannels(ObjectGuid guid);
@@ -187,7 +186,6 @@ public:
     VoiceChatStatistics GetStatistics();
 
     // internal packet handlers, public so the opcode table can register them
-    void HandlePongOpcode(VoiceChatServerPacket const& packet);
     void HandleCreateVoiceSessionResponseOpcode(VoiceChatServerPacket const& packet);
     void HandleModuleMessageOpcode(VoiceChatServerPacket const& packet);
 

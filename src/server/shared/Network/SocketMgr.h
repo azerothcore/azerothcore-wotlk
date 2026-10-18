@@ -58,7 +58,6 @@ public:
             return false;
         }
 
-        _ioContext = &ioContext;
         _acceptor = std::move(acceptor);
         _threadCount = threadCount;
         _threads = std::unique_ptr<NetworkThread<SocketType>[]>(CreateThreads());
@@ -127,8 +126,6 @@ public:
         return { _threads[threadIndex].GetSocketForAccept(), threadIndex };
     }
 
-    Acore::Asio::IoContext& GetIoContext() { return *_ioContext; }
-
 protected:
     SocketMgr() = default;
 
@@ -137,7 +134,6 @@ protected:
     std::unique_ptr<AsyncAcceptor> _acceptor;
     std::unique_ptr<NetworkThread<SocketType>[]> _threads;
     int32 _threadCount{};
-    Acore::Asio::IoContext* _ioContext;
 };
 
 #endif // SocketMgr_h__

@@ -174,18 +174,6 @@ class Channel
             if (state) flags |= MEMBER_FLAG_MUTED;
             else flags &= ~MEMBER_FLAG_MUTED;
         }
-        [[nodiscard]] bool IsMicMuted() const { return flags & MEMBER_FLAG_MIC_MUTED; }
-        void SetMicMuted(bool state)
-        {
-            if (state) flags |= MEMBER_FLAG_MIC_MUTED;
-            else flags &= ~MEMBER_FLAG_MIC_MUTED;
-        }
-        [[nodiscard]] bool IsVoiced() const { return flags & MEMBER_FLAG_VOICED; }
-        void SetVoiced(bool state)
-        {
-            if (state) flags |= MEMBER_FLAG_VOICED;
-            else flags &= ~MEMBER_FLAG_VOICED;
-        }
     private:
         bool _gmStatus = false;
     };
@@ -277,7 +265,6 @@ public:
 
     bool IsOnVoice(ObjectGuid guid) const;
     VoiceChatMember* GetVoiceChatMember(ObjectGuid guid);
-    uint32 GetVoiceMemberCount() const { return _voiceMembers.size(); }
     std::map<uint8, VoiceChatMember> const& GetVoiceMembers() const { return _voiceMembers; }
     // drops all voice members and resets the voice session state
     void DisbandVoiceSession();

@@ -34,12 +34,11 @@ public:
         return instance;
     }
 
-    VoiceChatSocketMgr() : BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(4096),
-        _tcpNoDelay(true)
+    VoiceChatSocketMgr() : BaseSocketMgr(), _socketSystemSendBufferSize(-1), _tcpNoDelay(true)
     {
     }
 
-    void Init(Acore::Asio::IoContext& ioContext)
+    void Init()
     {
         if (_threads)
             return;
@@ -47,9 +46,7 @@ public:
         _tcpNoDelay = sConfigMgr->GetOption<bool>("Network.TcpNodelay", true);
         // -1 means use default
         _socketSystemSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutKBuff", -1);
-        _socketApplicationSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutUBuff", 4096);
 
-        _ioContext = &ioContext;
         _threadCount = 1;
         _threads = std::unique_ptr<NetworkThread<VoiceChatSocket>[]>(CreateThreads());
 
@@ -129,7 +126,6 @@ protected:
 
 private:
     int32 _socketSystemSendBufferSize;
-    int32 _socketApplicationSendBufferSize;
     bool _tcpNoDelay;
 };
 

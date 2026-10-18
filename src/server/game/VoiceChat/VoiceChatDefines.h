@@ -35,29 +35,12 @@
 // fixed arrays of 40 entries and does not check a roster against that size
 constexpr uint32 VOICECHAT_MAX_CHANNEL_MEMBERS = 40;
 
-struct VoiceChatChannelRequest
-{
-    uint32 Id;
-    uint8 Type;
-    uint32 GroupId;
-    std::string ChannelName;
-    TeamId Team;
-};
-
 enum VoiceChatMemberFlags
 {
     VOICECHAT_MEMBER_FLAG_ENABLED     = 0x4,
     VOICECHAT_MEMBER_FLAG_FORCE_MUTED = 0x8,
     VOICECHAT_MEMBER_FLAG_MIC_MUTED   = 0x20,
     VOICECHAT_MEMBER_FLAG_VOICED      = 0x40,
-};
-
-enum VoiceChatState
-{
-    VOICECHAT_DISCONNECTED  = 0,
-    VOICECHAT_NOT_CONNECTED = 1,
-    VOICECHAT_CONNECTED     = 2,
-    VOICECHAT_RECONNECTING  = 3,
 };
 
 struct VoiceChatMember

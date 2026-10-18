@@ -228,14 +228,6 @@ namespace WorldPackets
             WorldPacket const* Write() override { return &_worldPacket; };
         };
 
-        class ComSatConnectFail final : public ServerPacket
-        {
-        public:
-            ComSatConnectFail() : ServerPacket(SMSG_COMSAT_CONNECT_FAIL, 0) {}
-
-            WorldPacket const* Write() override { return &_worldPacket; };
-        };
-
         class ComSatReconnectTry final : public ServerPacket
         {
         public:

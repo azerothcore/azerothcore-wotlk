@@ -35,7 +35,6 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
-#include "WorldSocketMgr.h"
 #include <boost/asio/ip/address.hpp>
 #include <limits>
 
@@ -93,7 +92,7 @@ void VoiceChatMgr::Init()
 
     if (_enabled)
     {
-        sVoiceChatSocketMgr.Init(sWorldSocketMgr.GetIoContext());
+        sVoiceChatSocketMgr.Init();
         // the connector lives on the voice network thread's io context so the
         // resulting socket does all of its asio work on that single thread
         _voiceServerConnector = std::make_shared<VoiceServerConnector>(sVoiceChatSocketMgr.GetNetworkThreadIoContext());
@@ -165,7 +164,7 @@ void VoiceChatMgr::Enable()
     _failedConnectAttempts = 0;
 
     if (!sVoiceChatSocketMgr.IsInitialized())
-        sVoiceChatSocketMgr.Init(sWorldSocketMgr.GetIoContext());
+        sVoiceChatSocketMgr.Init();
 
     if (!_voiceServerConnector)
         _voiceServerConnector = std::make_shared<VoiceServerConnector>(sVoiceChatSocketMgr.GetNetworkThreadIoContext());
@@ -633,11 +632,6 @@ void VoiceChatMgr::HandleModuleMessageOpcode(VoiceChatServerPacket const& packet
     sScriptMgr->OnVoiceServerModuleMessage(tag, message);
 }
 
-void VoiceChatMgr::HandlePongOpcode(VoiceChatServerPacket const& /*packet*/)
-{
-    // nothing to do, receiving the packet already reset the socket receive timer
-}
-
 void VoiceChatMgr::HandleCreateVoiceSessionResponseOpcode(VoiceChatServerPacket const& packet)
 {
     uint16 channelId;
@@ -1065,16 +1059,6 @@ void VoiceChatMgr::RemoveFromGroupVoiceChatChannel(ObjectGuid guid, uint32 group
 void VoiceChatMgr::RemoveFromRaidVoiceChatChannel(ObjectGuid guid, uint32 groupId)
 {
     if (Channel* channel = GetRaidVoiceChatChannel(groupId))
-        channel->RemoveVoiceChatMember(guid);
-}
-
-void VoiceChatMgr::RemoveFromBattlegroundVoiceChatChannel(ObjectGuid guid)
-{
-    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
-    if (!player || !player->InBattleground())
-        return;
-
-    if (Channel* channel = GetBattlegroundVoiceChatChannel(player->GetBattlegroundId(), player->GetBgTeamId()))
         channel->RemoveVoiceChatMember(guid);
 }
 

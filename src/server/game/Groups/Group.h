@@ -239,7 +239,6 @@ public:
     bool IsLeader(ObjectGuid guid) const;
     ObjectGuid GetMemberGUID(std::string const& name);
     bool IsAssistant(ObjectGuid guid) const;
-    bool IsMainAssistant(ObjectGuid guid) const;
 
     Player* GetInvited(ObjectGuid guid) const;
     Player* GetInvited(std::string const& name) const;

@@ -1156,7 +1156,6 @@ public:
     uint32 GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 newfacialhair, BarberShopStyleEntry const* newSkin = nullptr);
 
     PlayerSocial* GetSocial() { return m_social; }
-    PlayerSocial const* GetSocial() const { return m_social; }
 
     PlayerTaxi m_taxi;
     void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(), getClass(), GetLevel()); }
