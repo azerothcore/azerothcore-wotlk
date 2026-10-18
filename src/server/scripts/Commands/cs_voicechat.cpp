@@ -53,7 +53,7 @@ public:
     {
         if (!sVoiceChatMgr->CanUseVoiceChat())
         {
-            handler->PSendSysMessage("Voice Chat is disabled or the voice chat server is not connected!");
+            handler->SendErrorMessage("Voice Chat is disabled or the voice chat server is not connected!");
             return false;
         }
 
@@ -94,7 +94,7 @@ public:
     {
         if (!sVoiceChatMgr->IsEnabled())
         {
-            handler->PSendSysMessage("Voice Chat is disabled");
+            handler->SendErrorMessage("Voice Chat is disabled");
             return false;
         }
 
