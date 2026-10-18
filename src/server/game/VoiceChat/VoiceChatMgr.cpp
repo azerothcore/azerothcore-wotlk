@@ -807,8 +807,10 @@ void VoiceChatMgr::DeleteVoiceChatChannel(Channel* channel, bool turnVoiceOff)
 
 void VoiceChatMgr::DeleteAllChannels()
 {
+    // custom chat channels keep voice on like those whose session was released,
+    // connecting again creates their sessions for the members with voice enabled
     while (!_voiceChannels.empty())
-        DeleteVoiceChatChannel(_voiceChannels.begin()->second);
+        DeleteVoiceChatChannel(_voiceChannels.begin()->second, false);
 }
 
 // re-create all registered channels on the voiceserver after (re)connecting

@@ -214,6 +214,7 @@ private:
     void OnVoiceServerDisconnected();
     // re-creates all registered channels on the voiceserver after a reconnect
     void RestoreVoiceChatChannels();
+    // deletes every voice session, custom chat channels keep voice on
     void DeleteAllChannels();
 
     static void SendVoiceChatStatus(bool status);
