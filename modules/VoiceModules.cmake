@@ -42,8 +42,18 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     continue()
   endif()
 
+  # a voiceserver part with only headers has no Add<module>VoiceScripts(), so
+  # only compiled files count
+  set(VOICE_MODULE_SOURCES "")
+  CollectSourceFiles(${MODULE_SOURCE_PATH}/voiceserver VOICE_MODULE_SOURCES)
+  set(VOICE_MODULE_COMPILED "${VOICE_MODULE_SOURCES}")
+  list(FILTER VOICE_MODULE_COMPILED INCLUDE REGEX "\\.(c|cc|cpp)$")
+  if (NOT VOICE_MODULE_COMPILED)
+    continue()
+  endif()
+
   list(APPEND VOICE_MODULES_LIST ${SOURCE_MODULE})
-  CollectSourceFiles(${MODULE_SOURCE_PATH}/voiceserver VOICE_MODULES_SOURCES)
+  list(APPEND VOICE_MODULES_SOURCES ${VOICE_MODULE_SOURCES})
   CollectIncludeDirectories(${MODULE_SOURCE_PATH}/voiceserver VOICE_MODULES_INCLUDES)
   list(APPEND VOICE_MODULES_INCLUDES ${MODULE_SOURCE_PATH})
 endforeach()

@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ChannelMgr_H__
-#define __ChannelMgr_H__
+#ifndef __VOICE_CHANNELMGR_H__
+#define __VOICE_CHANNELMGR_H__
 
 #include "Channel.h"
 #include "Define.h"
@@ -43,12 +43,12 @@
  * matched to the member with the sender's address in the channel whose session
  * key verifies their signature.
  */
-class ChannelMgr
+class VoiceChannelMgr
 {
 public:
-    static ChannelMgr& Instance()
+    static VoiceChannelMgr& Instance()
     {
-        static ChannelMgr instance;
+        static VoiceChannelMgr instance;
         return instance;
     }
 
@@ -105,6 +105,6 @@ private:
     std::map<ChannelKey, VoiceChannel> _channels;
 };
 
-#define sChannelMgr ChannelMgr::Instance()
+#define sVoiceChannelMgr VoiceChannelMgr::Instance()
 
 #endif

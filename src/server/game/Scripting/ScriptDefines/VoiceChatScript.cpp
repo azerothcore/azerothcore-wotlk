@@ -34,8 +34,12 @@ void ScriptMgr::OnVoiceServerDisconnected()
 void ScriptMgr::OnVoiceServerModuleMessage(std::string const& tag, ByteBuffer& data)
 {
     // every script reads the message from the start
-    CALL_ENABLED_HOOKS(VoiceChatScript, VOICECHATHOOK_ON_VOICE_SERVER_MODULE_MESSAGE,
-        data.rpos(0); script->OnVoiceServerModuleMessage(tag, data));
+    auto const& scripts = ScriptRegistry<VoiceChatScript>::EnabledHooks[VOICECHATHOOK_ON_VOICE_SERVER_MODULE_MESSAGE];
+    for (auto const& script : scripts)
+    {
+        data.rpos(0);
+        script->OnVoiceServerModuleMessage(tag, data);
+    }
 }
 
 VoiceChatScript::VoiceChatScript(char const* name, std::vector<uint16> enabledHooks)

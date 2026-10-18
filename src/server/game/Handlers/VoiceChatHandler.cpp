@@ -361,6 +361,9 @@ void WorldSession::HandleChannelSilenceOpcode(WorldPackets::VoiceChat::ChannelSi
     if (!channel || !channel->IsVoiceEnabled())
         return;
 
+    if (!normalizePlayerName(packet.PlayerName))
+        return;
+
     ObjectGuid playerGuid = sCharacterCache->GetCharacterGuidByName(packet.PlayerName);
     if (!playerGuid)
         return;
@@ -385,6 +388,9 @@ void WorldSession::HandleChannelUnsilenceOpcode(WorldPackets::VoiceChat::Channel
 
     Channel* channel = sChannelMgr.GetChannel(_player->GetTeamId(), packet.ChannelName);
     if (!channel || !channel->IsVoiceEnabled())
+        return;
+
+    if (!normalizePlayerName(packet.PlayerName))
         return;
 
     ObjectGuid playerGuid = sCharacterCache->GetCharacterGuidByName(packet.PlayerName);

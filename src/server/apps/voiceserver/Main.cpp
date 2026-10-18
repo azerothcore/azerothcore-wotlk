@@ -144,7 +144,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    sChannelMgr.SetMaxPacketsPerSecond(sConfigMgr->GetOption<uint32>("ClientMaxPacketsPerSecond", 50));
+    sVoiceChannelMgr.SetMaxPacketsPerSecond(sConfigMgr->GetOption<uint32>("ClientMaxPacketsPerSecond", 50));
 
     std::string const clientBindIp = sConfigMgr->GetOption<std::string>("ClientBindIP", "0.0.0.0");
     if (!sVoiceServer.Start(*ioContext, clientBindIp, clientPort))

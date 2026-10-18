@@ -20,7 +20,7 @@
 #include "VoiceScriptMgr.h"
 #include <algorithm>
 
-VoiceChannel* ChannelMgr::GetOwnedChannel(VoiceWorldLink const& world, uint16 channelId, char const* action)
+VoiceChannel* VoiceChannelMgr::GetOwnedChannel(VoiceWorldLink const& world, uint16 channelId, char const* action)
 {
     auto itr = _channels.find(ChannelKey(channelId, world.GetId()));
     if (itr == _channels.end())
@@ -33,7 +33,7 @@ VoiceChannel* ChannelMgr::GetOwnedChannel(VoiceWorldLink const& world, uint16 ch
     return &itr->second;
 }
 
-VoiceChannel* ChannelMgr::FindSenderChannel(UdpSocketPacket const& packet, boost::asio::ip::address const& address)
+VoiceChannel* VoiceChannelMgr::FindSenderChannel(UdpSocketPacket const& packet, boost::asio::ip::address const& address)
 {
     uint16 const channelId = packet.GetHeader().channelId;
     uint8 const userId = packet.GetHeader().userId;
@@ -53,7 +53,7 @@ VoiceChannel* ChannelMgr::FindSenderChannel(UdpSocketPacket const& packet, boost
     return nullptr;
 }
 
-bool ChannelMgr::CreateChannel(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type,
+bool VoiceChannelMgr::CreateChannel(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type,
     VoiceChatSessionKey const& sessionKey)
 {
     if (!channelId || type >= VoiceChatChannelType::Max)
@@ -81,7 +81,7 @@ bool ChannelMgr::CreateChannel(VoiceWorldLink const& world, uint16 channelId, Vo
     return true;
 }
 
-void ChannelMgr::DeleteChannel(VoiceWorldLink const& world, uint16 channelId)
+void VoiceChannelMgr::DeleteChannel(VoiceWorldLink const& world, uint16 channelId)
 {
     {
         std::lock_guard<std::mutex> guard(_lock);
@@ -96,7 +96,7 @@ void ChannelMgr::DeleteChannel(VoiceWorldLink const& world, uint16 channelId)
     sVoiceScriptMgr->OnChannelDeleted(world, channelId);
 }
 
-bool ChannelMgr::AddMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
+bool VoiceChannelMgr::AddMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
     VoiceChannelMember const& member)
 {
     VoiceChannelMember added;
@@ -125,7 +125,7 @@ bool ChannelMgr::AddMember(VoiceWorldLink const& world, uint16 channelId, uint8 
     return true;
 }
 
-void ChannelMgr::RemoveMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
+void VoiceChannelMgr::RemoveMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
     {
         std::lock_guard<std::mutex> guard(_lock);
@@ -141,7 +141,7 @@ void ChannelMgr::RemoveMember(VoiceWorldLink const& world, uint16 channelId, uin
     sVoiceScriptMgr->OnMemberRemoved(world, channelId, userId);
 }
 
-void ChannelMgr::ChangeMemberState(VoiceWorldLink const& world, uint16 channelId, uint8 userId, char const* action,
+void VoiceChannelMgr::ChangeMemberState(VoiceWorldLink const& world, uint16 channelId, uint8 userId, char const* action,
     bool logMissingMember, void (*change)(VoiceChannelMember& member))
 {
     bool voiced;
@@ -175,31 +175,31 @@ void ChannelMgr::ChangeMemberState(VoiceWorldLink const& world, uint16 channelId
     sVoiceScriptMgr->OnMemberStateChanged(world, channelId, userId, voiced, muted);
 }
 
-void ChannelMgr::VoiceMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
+void VoiceChannelMgr::VoiceMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
     ChangeMemberState(world, channelId, userId, "voice member", true,
         [](VoiceChannelMember& member) { member.Voiced = true; });
 }
 
-void ChannelMgr::DevoiceMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
+void VoiceChannelMgr::DevoiceMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
     ChangeMemberState(world, channelId, userId, "devoice member", false,
         [](VoiceChannelMember& member) { member.Voiced = false; });
 }
 
-void ChannelMgr::MuteMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
+void VoiceChannelMgr::MuteMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
     ChangeMemberState(world, channelId, userId, "mute member", false,
         [](VoiceChannelMember& member) { member.Muted = true; });
 }
 
-void ChannelMgr::UnmuteMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
+void VoiceChannelMgr::UnmuteMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
     ChangeMemberState(world, channelId, userId, "unmute member", false,
         [](VoiceChannelMember& member) { member.Muted = false; });
 }
 
-void ChannelMgr::RemoveChannelsFor(VoiceWorldLink const& world)
+void VoiceChannelMgr::RemoveChannelsFor(VoiceWorldLink const& world)
 {
     std::vector<uint16> removed;
     {
@@ -225,8 +225,8 @@ void ChannelMgr::RemoveChannelsFor(VoiceWorldLink const& world)
     }
 }
 
-bool ChannelMgr::HandleClientHandshake(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& endpoint,
-    VoiceWorldLink& world)
+bool VoiceChannelMgr::HandleClientHandshake(UdpSocketPacket const& packet,
+    boost::asio::ip::udp::endpoint const& endpoint, VoiceWorldLink& world)
 {
     std::lock_guard<std::mutex> guard(_lock);
 
@@ -247,7 +247,7 @@ bool ChannelMgr::HandleClientHandshake(UdpSocketPacket const& packet, boost::asi
     return true;
 }
 
-bool ChannelMgr::ConsumePacketBudget(VoiceChannelMember& member) const
+bool VoiceChannelMgr::ConsumePacketBudget(VoiceChannelMember& member) const
 {
     if (!_maxPacketsPerSecond)
         return true;
@@ -266,7 +266,7 @@ bool ChannelMgr::ConsumePacketBudget(VoiceChannelMember& member) const
     return true;
 }
 
-bool ChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
+bool VoiceChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
     std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced, VoiceWorldLink& world)
 {
     uint8 const userId = packet.GetHeader().userId;

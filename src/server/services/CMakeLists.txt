@@ -17,7 +17,7 @@ CollectSourceFiles(
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(services
+add_library(services STATIC
   ${PRIVATE_SOURCES})
 
 CollectIncludeDirectories(
