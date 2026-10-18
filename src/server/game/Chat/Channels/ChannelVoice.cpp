@@ -17,6 +17,7 @@
 
 #include "Channel.h"
 #include "Group.h"
+#include "GroupMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
@@ -301,7 +302,10 @@ void Channel::AddVoiceChatMember(ObjectGuid guid)
     // group's channel, in custom channels everyone is equal
     if (GetVoiceType() != VoiceChatChannelType::Custom)
     {
-        Group* group = player->GetGroup();
+        // inside a battleground the player's group is the battleground raid, so the
+        // party or raid of a group channel is looked up by the channel's group id
+        Group* group = GetVoiceType() == VoiceChatChannelType::Battleground ? player->GetGroup()
+            : sGroupMgr->GetGroupByGUID(GetVoiceGroupId());
         if (group && group->IsLeader(guid))
             member.SetHighPriority();
     }
