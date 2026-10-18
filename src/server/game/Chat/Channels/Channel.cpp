@@ -291,8 +291,9 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         if (!IsLFG() && sVoiceChatMgr->CanUseVoiceChat())
         {
             // the first joining member with voice chat enabled turns voice on,
-            // unless a moderator turned it off
-            if (!IsVoiceEnabled() && !_voiceTurnedOff && player->GetSession()->IsVoiceChatEnabled())
+            // unless a moderator turned it off or the member may not use voice here
+            if (!IsVoiceEnabled() && !_voiceTurnedOff && player->GetSession()->IsVoiceChatEnabled() &&
+                CanUseVoice(player))
                 VoiceOn(player);
             else if (IsVoiceEnabled())
                 sVoiceChatMgr->AddToCustomVoiceChatChannel(guid, GetName(), player->GetTeamId());

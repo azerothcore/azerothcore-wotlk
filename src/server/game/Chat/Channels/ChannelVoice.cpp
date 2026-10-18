@@ -88,11 +88,22 @@ bool Channel::CheckVoiceModerator(Player const* player)
     return true;
 }
 
+bool Channel::CanUseVoice(Player const* player) const
+{
+    // like text chat: nobody speaks in a channel whose rights forbid it, and silently
+    // joined GMs are not listed to the other members (the roster lists everyone)
+    return !(_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK) && ShouldAnnouncePlayer(player);
+}
+
 void Channel::RequestVoiceOn(Player* player)
 {
     // the first voice enabled member joining turns voice on implicitly (JoinChannel),
     // an explicit request from the channel menu needs moderator rights
     if (!CheckVoiceModerator(player))
+        return;
+
+    // nobody may speak in the channel, voice could have no members
+    if (_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK)
         return;
 
     _voiceTurnedOff = false;
@@ -263,6 +274,9 @@ void Channel::AddVoiceChatMember(ObjectGuid guid)
 
     WorldSession* session = player->GetSession();
     if (!session->IsVoiceChatEnabled())
+        return;
+
+    if (GetVoiceType() == VoiceChatChannelType::Custom && !CanUseVoice(player))
         return;
 
     uint8 userId = 0;
