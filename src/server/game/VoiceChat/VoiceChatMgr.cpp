@@ -933,8 +933,9 @@ void VoiceChatMgr::CreateCustomVoiceChatChannel(std::string const& name, TeamId 
     if (!CanUseVoiceChat())
         return;
 
+    // the chat channel lookup ignores case, a channel never gets a second session
     Channel* channel = sChannelMgr.GetChannel(GetCustomChannelTeam(team), name);
-    if (!channel || channel->IsConstant() || channel->IsLFG())
+    if (!channel || channel->GetVoiceId() || channel->IsConstant() || channel->IsLFG())
         return;
 
     channel->SetVoiceType(VoiceChatChannelType::Custom);
