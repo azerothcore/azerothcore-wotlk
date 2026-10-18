@@ -214,8 +214,11 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
         continue()
       endif()
 
-      # Modules with only voiceserver code have no worldserver loader
-      if (NOT MODULE_WORLDSERVER_SOURCES)
+      # Modules with only voiceserver code have no worldserver loader. Headers
+      # directly in src/ are shared by both parts, so only compiled files count
+      set(MODULE_WORLDSERVER_COMPILED "${MODULE_WORLDSERVER_SOURCES}")
+      list(FILTER MODULE_WORLDSERVER_COMPILED INCLUDE REGEX "\\.(c|cc|cpp)$")
+      if (NOT MODULE_WORLDSERVER_COMPILED)
         continue()
       endif()
 
@@ -230,8 +233,11 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     unset(MODULE_SOURCE_PRIVATE_SOURCES)
     CollectSourceFiles(${MODULE_SOURCE_PATH} MODULE_SOURCE_PRIVATE_SOURCES ${MODULE_SOURCE_PATH}/voiceserver)
 
-    # Modules with only voiceserver code have no worldserver library
-    if (NOT MODULE_SOURCE_PRIVATE_SOURCES)
+    # Modules with only voiceserver code have no worldserver library. Headers
+    # directly in src/ are shared by both parts, so only compiled files count
+    set(MODULE_SOURCE_COMPILED "${MODULE_SOURCE_PRIVATE_SOURCES}")
+    list(FILTER MODULE_SOURCE_COMPILED INCLUDE REGEX "\\.(c|cc|cpp)$")
+    if (NOT MODULE_SOURCE_COMPILED)
       continue()
     endif()
 
