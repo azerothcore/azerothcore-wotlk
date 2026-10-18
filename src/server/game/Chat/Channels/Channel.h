@@ -273,6 +273,8 @@ public:
     void RemoveVoiceChatMember(ObjectGuid guid);
     // adds all eligible players of this (custom) channel to voice after the voice session was created
     void AddVoiceChatMembersAfterCreate();
+    // a member with voice chat enabled may use voice in this (custom) channel
+    bool HasVoiceChatCandidate() const;
     void SetVoiceMassAdding(bool state) { _voiceMassAdding = state; }
 
     void VoiceMember(ObjectGuid guid);

@@ -97,15 +97,18 @@ bool Channel::CanUseVoice(Player const* player) const
         return false;
 
     ObjectGuid const guid = player->GetGUID();
-    if (IsOnVoice(guid))
-        return true;
+    return IsOnVoice(guid) ||
+        sVoiceChatMgr->GetCustomVoiceSessionCount(guid) < VOICECHAT_MAX_PLAYER_CUSTOM_SESSIONS;
+}
 
-    uint32 sessions = 0;
-    for (Channel const* channel : player->GetJoinedChannels())
-        if (channel->IsOnVoice(guid))
-            ++sessions;
+bool Channel::HasVoiceChatCandidate() const
+{
+    // the members AddVoiceChatMembersAfterCreate adds
+    for (auto const& [guid, playerInfo] : playersStore)
+        if (playerInfo.plrPtr->GetSession()->IsVoiceChatEnabled() && CanUseVoice(playerInfo.plrPtr))
+            return true;
 
-    return sessions < VOICECHAT_MAX_PLAYER_CUSTOM_SESSIONS;
+    return false;
 }
 
 void Channel::RequestVoiceOn(Player* player)
@@ -323,6 +326,8 @@ void Channel::AddVoiceChatMember(ObjectGuid guid)
     }
 
     _voiceMembers[userId] = member;
+    if (GetVoiceType() == VoiceChatChannelType::Custom)
+        sVoiceChatMgr->AddCustomVoiceSessionMember(guid);
 
     // activate the slot on the voice server
     sVoiceChatMgr->EnableChannelSlot(GetVoiceId(), userId, player);
@@ -363,6 +368,8 @@ void Channel::RemoveVoiceChatMember(ObjectGuid guid)
 
     _voiceMembers.erase(userId);
     _voiceUserIdFreedAt[userId] = ++_voiceUserIdClock;
+    if (GetVoiceType() == VoiceChatChannelType::Custom)
+        sVoiceChatMgr->RemoveCustomVoiceSessionMember(guid);
 
     // the members that left were told to leave the session, so once it is empty
     // no client holds it any more and its user ids may be handed out again
@@ -512,6 +519,9 @@ void Channel::DisbandVoiceSession()
 
     for (auto const& [userId, member] : _voiceMembers)
     {
+        if (GetVoiceType() == VoiceChatChannelType::Custom)
+            sVoiceChatMgr->RemoveCustomVoiceSessionMember(member.Guid);
+
         if (Player* player = ObjectAccessor::FindConnectedPlayer(member.Guid))
         {
             if (WorldSession* session = player->GetSession())

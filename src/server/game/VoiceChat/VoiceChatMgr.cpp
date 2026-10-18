@@ -760,6 +760,27 @@ void VoiceChatMgr::QueueEmptyCustomVoiceSession(uint16 voiceId)
     _emptyCustomVoiceSessions.push_back(voiceId);
 }
 
+void VoiceChatMgr::AddCustomVoiceSessionMember(ObjectGuid guid)
+{
+    ++_customVoiceSessionCounts[guid];
+}
+
+void VoiceChatMgr::RemoveCustomVoiceSessionMember(ObjectGuid guid)
+{
+    auto itr = _customVoiceSessionCounts.find(guid);
+    if (itr == _customVoiceSessionCounts.end())
+        return;
+
+    if (--itr->second == 0)
+        _customVoiceSessionCounts.erase(itr);
+}
+
+uint32 VoiceChatMgr::GetCustomVoiceSessionCount(ObjectGuid guid) const
+{
+    auto itr = _customVoiceSessionCounts.find(guid);
+    return itr != _customVoiceSessionCounts.end() ? itr->second : 0;
+}
+
 void VoiceChatMgr::ReleaseEmptyCustomVoiceSessions()
 {
     if (_emptyCustomVoiceSessions.empty())
@@ -881,11 +902,11 @@ Channel* VoiceChatMgr::GetBattlegroundVoiceChatChannel(uint32 instanceId, TeamId
 
 Channel* VoiceChatMgr::GetCustomVoiceChatChannel(std::string const& name, TeamId team)
 {
-    TeamId const channelTeam = GetCustomChannelTeam(team);
-    for (auto const& [voiceId, channel] : _voiceChannels)
-        if (channel->GetVoiceType() == VoiceChatChannelType::Custom && channel->GetTeamId() == channelTeam &&
-            channel->GetName() == name)
-            return channel;
+    // the session belongs to the chat channel, looked up like chat does (ignoring
+    // case) rather than by walking every voice session
+    Channel* channel = sChannelMgr.GetChannel(GetCustomChannelTeam(team), name);
+    if (channel && channel->GetVoiceId() && channel->GetVoiceType() == VoiceChatChannelType::Custom)
+        return channel;
 
     return nullptr;
 }
@@ -940,10 +961,15 @@ void VoiceChatMgr::CreateCustomVoiceChatChannel(std::string const& name, TeamId 
     if (!channel || channel->GetVoiceId() || channel->IsConstant() || channel->IsLFG())
         return;
 
+    // a session nobody can be added to would only hold a voice channel id, it is
+    // created once a member that can use voice joins or enables voice chat
+    if (!channel->HasVoiceChatCandidate())
+        return;
+
     channel->SetVoiceType(VoiceChatChannelType::Custom);
     CreateVoiceSession(channel);
 
-    // nobody could be added (e.g. created for a member without voice enabled):
+    // nobody could be added after all (e.g. the candidate is no longer connected):
     // do not hold the voice channel id either
     if (channel->GetVoiceId() && channel->GetVoiceMembers().empty())
         QueueEmptyCustomVoiceSession(channel->GetVoiceId());

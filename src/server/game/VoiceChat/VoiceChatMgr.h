@@ -28,6 +28,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 #include <vector>
 
 class Channel;
@@ -128,6 +129,12 @@ public:
     void QueueBattlegroundRaidDisbanded(uint32 instanceId, TeamId team);
     // a custom channel's voice session lost its last member, world thread only
     void QueueEmptyCustomVoiceSession(uint16 voiceId);
+
+    // the custom voice sessions each player is a member of, kept by Channel as it
+    // adds and removes voice members, world thread only
+    void AddCustomVoiceSessionMember(ObjectGuid guid);
+    void RemoveCustomVoiceSessionMember(ObjectGuid guid);
+    [[nodiscard]] uint32 GetCustomVoiceSessionCount(ObjectGuid guid) const;
 
     // manage voice channels
     void CreateGroupVoiceChatChannel(uint32 groupId);
@@ -259,6 +266,9 @@ private:
 
     // voice ids of custom channel sessions that lost their last member
     std::vector<uint16> _emptyCustomVoiceSessions;
+
+    // players on voice in custom channels: number of those sessions
+    std::unordered_map<ObjectGuid, uint32> _customVoiceSessionCounts;
 
     IntervalTimer _pingTimer;
 };
