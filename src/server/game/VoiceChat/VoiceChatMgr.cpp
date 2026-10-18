@@ -151,6 +151,12 @@ void VoiceChatMgr::Enable()
     if (_enabled)
         return;
 
+    // pick up settings changed since they were last read, e.g. by .reload config.
+    // An invalid VoiceChat.VoiceAddress leaves voice chat disabled
+    LoadConfigs();
+    if (!_enabled)
+        return;
+
     LOG_INFO("voice-chat", "Enabling voice chat");
     _enabled = true;
     _wasConnected = false;

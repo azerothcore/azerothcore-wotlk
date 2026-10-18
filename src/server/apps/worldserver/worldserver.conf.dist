@@ -4898,7 +4898,8 @@ Respawn.ForceCompatibilityMode = 0
 # VOICE CHAT CONFIG
 #
 #    VoiceChat.Enabled
-#         Enable Voice Chat
+#         Enable Voice Chat. The other VoiceChat settings are read again whenever voice chat is
+#         enabled (.voicechat enable, or VoiceChat.Enabled turned on by .reload config)
 #         Default: 0 - off
 #                  1 - on
 #
