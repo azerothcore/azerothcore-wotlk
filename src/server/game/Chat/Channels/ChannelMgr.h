@@ -42,7 +42,7 @@ public:
         return instance;
     }
 
-    ChannelMgr() : _nextChannelGuid(1) { }
+    ChannelMgr() : _channelIdMax(0) { }
     ~ChannelMgr() { }
 
     Channel* GetOrCreateChannel(TeamId team, std::string const& name, uint32 channelDBCId);
@@ -57,7 +57,8 @@ public:
     void SetChannelRightsFor(std::string const& name, uint32 flags, uint32 speakDelay,
         std::string const& joinMessage, std::string const& speakMessage, std::set<uint32> const& moderators);
 
-    uint64 GetNextChannelGuid() { return ++_nextChannelGuid; }
+    // one above the highest id in the channels table, skipped rows included
+    uint64 GetNextChannelGuid() { return ++_channelIdMax; }
 
     static void SendNotOnPacket(Player* player, std::string const& channelName);
 
@@ -67,7 +68,7 @@ private:
     ChannelRightsMap _channelRights;
     ChannelRights _emptyChannelRights;
 
-    uint64 _nextChannelGuid;
+    uint64 _channelIdMax;
 };
 
 #define sChannelMgr ChannelMgr::Instance()

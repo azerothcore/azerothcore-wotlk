@@ -58,6 +58,10 @@ void ChannelMgr::LoadChannels()
         TeamId team = TeamId(fields[2].Get<uint32>());
         std::string password = fields[5].Get<std::string>();
 
+        // counts every row, also the ones skipped below: their ids stay taken
+        if (channelDBId > _channelIdMax)
+            _channelIdMax = channelDBId;
+
         std::wstring channelWName;
         if (!Utf8toWStr(channelName, channelWName))
         {
@@ -82,20 +86,21 @@ void ChannelMgr::LoadChannels()
         wstrToLower(channelWName);
 
         // e.g. saved for both teams before cross faction channels were enabled, or
-        // differing only in case: keep the oldest, the others could never be found
-        if (_channelsByName[team].find(channelWName) != _channelsByName[team].end())
+        // differing only in case. Rows come by ascending id, so the newest one wins:
+        // it holds the latest settings
+        auto const existing = _channelsByName[team].find(channelWName);
+        if (existing != _channelsByName[team].end())
         {
-            LOG_WARN("server.loading", "Skipped duplicate custom chat channel '{}' (id {}).", channelName, channelDBId);
-            continue;
+            LOG_WARN("server.loading", "Custom chat channel '{}' is saved more than once, using id {} over id {}.",
+                channelName, channelDBId, existing->second->GetChannelDBId());
+            _channelsByGuid.erase(existing->second->GetChannelDBId());
+            --count;
         }
 
         std::shared_ptr<Channel> newChannel = std::make_shared<Channel>(channelName, 0, channelDBId, team, fields[3].Get<uint8>(), fields[4].Get<uint8>());
         newChannel->SetPassword(password);
         _channelsByName[team][channelWName] = newChannel;
         _channelsByGuid[channelDBId] = newChannel;
-
-        if (channelDBId >= _nextChannelGuid)
-            _nextChannelGuid = channelDBId + 1;
 
         ++count;
     } while (result->NextRow());
