@@ -19,9 +19,11 @@
 #define _VOICECHATSHAREDDEFINES_H
 
 #include "ByteBuffer.h"
+#include "Errors.h"
 #include <array>
 #include <cstddef>
 #include <Define.h>
+#include <memory>
 #include <string>
 
 /*
@@ -166,6 +168,51 @@ public:
 
 protected:
     VoiceChatServerOpcodes _opcode;
+};
+
+// Handlers of internal packets by opcode. The worldserver and the voiceserver each
+// keep a table for the packets they receive and register their handlers in Init()
+template<typename Server>
+class VoiceChatInternalOpcodeHandler
+{
+public:
+    VoiceChatInternalOpcodeHandler(char const* name, void (Server::* handler)(VoiceChatServerPacket& packet))
+        : _name(name), _handler(handler) { }
+    virtual ~VoiceChatInternalOpcodeHandler() = default;
+
+    char const* _name;
+    void (Server::* _handler)(VoiceChatServerPacket& packet);
+};
+
+template<typename Server>
+class VoiceChatInternalOpcodeTable
+{
+public:
+    void Init();
+
+    VoiceChatInternalOpcodeHandler<Server> const* operator[](VoiceChatServerOpcodes const index) const
+    {
+        return _opcodeTable[static_cast<uint8>(index)].get();
+    }
+
+private:
+    void SetInternalServerOpcodeHandler(VoiceChatServerOpcodes const opcode, char const* name,
+        void (Server::* handler)(VoiceChatServerPacket& packet))
+    {
+        // Not a valid opcode
+        if (opcode == VoiceChatServerOpcodes::NULL_OPCODE || opcode == VoiceChatServerOpcodes::NUM_OPCODES)
+            ASSERT(false);
+
+        // Tried to overwrite an existing opcode
+        if (_opcodeTable[static_cast<uint8>(opcode)].get() != nullptr)
+            ASSERT(false);
+
+        _opcodeTable[static_cast<uint8>(opcode)] =
+            std::make_unique<VoiceChatInternalOpcodeHandler<Server>>(name, handler);
+    }
+
+    std::array<std::unique_ptr<VoiceChatInternalOpcodeHandler<Server>>,
+        static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES)> _opcodeTable;
 };
 
 // Builds a CMSG_MODULE_MESSAGE or SMSG_MODULE_MESSAGE, returns false if tag is

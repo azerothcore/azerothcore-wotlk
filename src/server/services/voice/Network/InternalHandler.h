@@ -18,56 +18,9 @@
 #ifndef __INTERNALHANDLER_H__
 #define __INTERNALHANDLER_H__
 
-#include "Errors.h"
 #include "VoiceChatSharedDefines.h"
-#include <array>
-#include <memory>
 
 class InternalSession;
-
-template<typename Server>
-class VoiceChatInternalOpcodeHandler
-{
-public:
-    VoiceChatInternalOpcodeHandler(char const* name, void (Server::* handler)(VoiceChatServerPacket& packet))
-        : _name(name), _handler(handler) {
-    }
-    virtual ~VoiceChatInternalOpcodeHandler() = default;
-
-    char const* _name;
-    void (Server::* _handler)(VoiceChatServerPacket& packet);
-};
-
-template<typename Server>
-class VoiceChatInternalOpcodeTable
-{
-public:
-    void Init();
-
-    VoiceChatInternalOpcodeHandler<Server> const* operator[](VoiceChatServerOpcodes const index) const
-    {
-        return _opcodeTable[static_cast<uint8>(index)].get();
-    }
-
-private:
-    void SetInternalServerOpcodeHandler(VoiceChatServerOpcodes const opcode, char const* name,
-        void (Server::* handler)(VoiceChatServerPacket& packet))
-    {
-        // Not a valid opcode
-        if (opcode == VoiceChatServerOpcodes::NULL_OPCODE || opcode == VoiceChatServerOpcodes::NUM_OPCODES)
-            ASSERT(false);
-
-        // Tried to overwrite an existing opcode
-        if (_opcodeTable[static_cast<uint8>(opcode)].get() != nullptr)
-            ASSERT(false);
-
-        _opcodeTable[static_cast<uint8>(opcode)] =
-            std::make_unique<VoiceChatInternalOpcodeHandler<Server>>(name, handler);
-    }
-
-    std::array<std::unique_ptr<VoiceChatInternalOpcodeHandler<Server>>,
-        static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES)> _opcodeTable;
-};
 
 extern VoiceChatInternalOpcodeTable<InternalSession> internalVoiceChatOpcodeTable;
 

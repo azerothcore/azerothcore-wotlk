@@ -63,7 +63,7 @@ public:
     static void SendNotOnPacket(Player* player, std::string const& channelName);
 
 private:
-    ChannelsByNameMap _channelsByName[MAX_TEAMS];
+    ChannelsByNameMap _channelsByName[PVP_TEAMS_COUNT];
     ChannelsByGUIDMap _channelsByGuid;
     ChannelRightsMap _channelRights;
     ChannelRights _emptyChannelRights;

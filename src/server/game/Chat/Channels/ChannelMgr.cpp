@@ -70,7 +70,7 @@ void ChannelMgr::LoadChannels()
             continue;
         }
 
-        if (team >= MAX_TEAMS)
+        if (team >= PVP_TEAMS_COUNT)
         {
             LOG_ERROR("server.loading", "Failed to load custom chat channel '{}' from database - invalid team {}. Deleted.", channelName, team);
             toDelete.emplace_back(channelName, team);
@@ -135,7 +135,7 @@ void ChannelMgr::LoadChannels()
 
 Channel* ChannelMgr::GetOrCreateChannel(TeamId team, std::string const& name, uint32 channelDBCId)
 {
-    if (team >= MAX_TEAMS)
+    if (team >= PVP_TEAMS_COUNT)
         return nullptr;
 
     // Crossfaction handling, force TEAM_ALLIANCE
@@ -161,7 +161,7 @@ Channel* ChannelMgr::GetOrCreateChannel(TeamId team, std::string const& name, ui
 
 Channel* ChannelMgr::GetChannel(TeamId team, std::string const& name)
 {
-    if (team >= MAX_TEAMS)
+    if (team >= PVP_TEAMS_COUNT)
         return nullptr;
 
     // Crossfaction handling, force TEAM_ALLIANCE

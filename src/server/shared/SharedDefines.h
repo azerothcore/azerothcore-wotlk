@@ -750,8 +750,6 @@ enum TeamId : uint8
     TEAM_NEUTRAL,
 };
 
-#define MAX_TEAMS 2
-
 enum Team
 {
     HORDE               = 67,

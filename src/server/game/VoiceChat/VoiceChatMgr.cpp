@@ -622,23 +622,21 @@ bool VoiceChatMgr::SendModuleMessage(std::string const& tag, ByteBuffer const& d
     return true;
 }
 
-void VoiceChatMgr::HandleModuleMessageOpcode(VoiceChatServerPacket const& packet)
+void VoiceChatMgr::HandleModuleMessageOpcode(VoiceChatServerPacket& packet)
 {
-    VoiceChatServerPacket data(packet);
     std::string tag;
     ByteBuffer message;
-    ReadVoiceChatModuleMessage(data, tag, message);
+    ReadVoiceChatModuleMessage(packet, tag, message);
 
     sScriptMgr->OnVoiceServerModuleMessage(tag, message);
 }
 
-void VoiceChatMgr::HandleCreateVoiceSessionResponseOpcode(VoiceChatServerPacket const& packet)
+void VoiceChatMgr::HandleCreateVoiceSessionResponseOpcode(VoiceChatServerPacket& packet)
 {
     uint16 channelId;
     uint8 error;
-    VoiceChatServerPacket data(packet);
-    data >> channelId;
-    data >> error;
+    packet >> channelId;
+    packet >> error;
 
     if (error == static_cast<uint8>(VoiceChatCreateSessionResult::Ok))
         return;

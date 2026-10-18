@@ -186,8 +186,8 @@ public:
     VoiceChatStatistics GetStatistics();
 
     // internal packet handlers, public so the opcode table can register them
-    void HandleCreateVoiceSessionResponseOpcode(VoiceChatServerPacket const& packet);
-    void HandleModuleMessageOpcode(VoiceChatServerPacket const& packet);
+    void HandleCreateVoiceSessionResponseOpcode(VoiceChatServerPacket& packet);
+    void HandleModuleMessageOpcode(VoiceChatServerPacket& packet);
 
 private:
     ~VoiceChatMgr();
