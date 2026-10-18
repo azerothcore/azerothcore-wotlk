@@ -71,6 +71,7 @@
 #    CUSTOM
 #    DEBUG
 #    DYNAMIC RESPAWN SETTINGS
+#    VOICE CHAT
 #
 #  CLUSTER SETTINGS
 #
@@ -4894,8 +4895,8 @@ Respawn.ForceCompatibilityMode = 0
 #
 ###################################################################################################
 
-###################################################################################################################
-# VOICE CHAT CONFIG
+###################################################################################################
+# VOICE CHAT
 #
 #    VoiceChat.Enabled
 #         Enable Voice Chat. The other VoiceChat settings are read again whenever voice chat is
@@ -4928,7 +4929,7 @@ Respawn.ForceCompatibilityMode = 0
 #                   0 (unlimited)
 #                   1+ (limited attempts)
 #
-###################################################################################################################
+###################################################################################################
 
 VoiceChat.Enabled = 0
 VoiceChat.ServerPort = 3725
