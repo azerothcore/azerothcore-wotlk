@@ -950,13 +950,13 @@ void VoiceChatMgr::CreateBattlegroundVoiceChatChannel(uint32 instanceId, TeamId 
 
 void VoiceChatMgr::CreateCustomVoiceChatChannel(std::string const& name, TeamId team)
 {
-    if (name.empty() || GetCustomVoiceChatChannel(name, team))
+    if (name.empty())
         return;
 
     if (!CanUseVoiceChat())
         return;
 
-    // the chat channel lookup ignores case, a channel never gets a second session
+    // a channel that already has a voice session (voice id) never gets a second one
     Channel* channel = sChannelMgr.GetChannel(GetCustomChannelTeam(team), name);
     if (!channel || channel->GetVoiceId() || channel->IsConstant() || channel->IsLFG())
         return;
