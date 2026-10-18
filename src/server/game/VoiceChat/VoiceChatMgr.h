@@ -94,11 +94,10 @@ public:
     void Update(uint32 const diff);
     void Stop();
 
+    // enabled, the client may show the voice chat interface
     bool IsEnabled() const { return _enabled; }
     // enabled and connected to the voiceserver
     bool CanUseVoiceChat() const;
-    // enabled, the client may show the voice chat interface
-    bool CanSeeVoiceChat() const { return _enabled; }
 
     void Enable();
     void Disable();

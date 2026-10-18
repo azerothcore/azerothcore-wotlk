@@ -64,7 +64,7 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPackets::VoiceChat::Voice
     _voiceEnabled = packet.VoiceEnabled;
     _micEnabled = packet.MicrophoneEnabled;
 
-    if (!sVoiceChatMgr->CanSeeVoiceChat() || !_player)
+    if (!sVoiceChatMgr->IsEnabled() || !_player)
         return;
 
     if (!packet.VoiceEnabled)
