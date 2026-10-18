@@ -218,6 +218,7 @@ void VoiceChatMgr::Update(uint32 const diff)
 
     // always drained so the queue can not grow while voice chat is disabled
     ProcessGroupEvents();
+    ReleaseEmptyCustomVoiceSessions();
 
     // handle config changes from reload
     if (_enabled != sWorld->getBoolConfig(CONFIG_VOICE_CHAT_ENABLED))
@@ -753,7 +754,30 @@ void VoiceChatMgr::AddMembersAfterCreate(Channel* channel)
     }
 }
 
-void VoiceChatMgr::DeleteVoiceChatChannel(Channel* channel)
+void VoiceChatMgr::QueueEmptyCustomVoiceSession(uint16 voiceId)
+{
+    // released on the next update, the caller may be iterating the channels
+    _emptyCustomVoiceSessions.push_back(voiceId);
+}
+
+void VoiceChatMgr::ReleaseEmptyCustomVoiceSessions()
+{
+    if (_emptyCustomVoiceSessions.empty())
+        return;
+
+    std::vector<uint16> voiceIds;
+    voiceIds.swap(_emptyCustomVoiceSessions);
+
+    for (uint16 voiceId : voiceIds)
+    {
+        // skip sessions a member was added to again since
+        Channel* channel = GetVoiceChatChannel(voiceId);
+        if (channel && channel->GetVoiceType() == VoiceChatChannelType::Custom && channel->GetVoiceMembers().empty())
+            DeleteVoiceChatChannel(channel, false);
+    }
+}
+
+void VoiceChatMgr::DeleteVoiceChatChannel(Channel* channel, bool turnVoiceOff)
 {
     if (!channel)
         return;
@@ -767,7 +791,7 @@ void VoiceChatMgr::DeleteVoiceChatChannel(Channel* channel)
     channel->DisbandVoiceSession();
 
     // disable voice on the custom chat channel
-    if (channel->GetVoiceType() == VoiceChatChannelType::Custom && channel->IsVoiceEnabled())
+    if (turnVoiceOff && channel->GetVoiceType() == VoiceChatChannelType::Custom && channel->IsVoiceEnabled())
         channel->ToggleVoice();
 
     if (CanUseVoiceChat())
@@ -915,6 +939,11 @@ void VoiceChatMgr::CreateCustomVoiceChatChannel(std::string const& name, TeamId 
 
     channel->SetVoiceType(VoiceChatChannelType::Custom);
     CreateVoiceSession(channel);
+
+    // nobody could be added (e.g. created for a member without voice enabled):
+    // do not hold the voice channel id either
+    if (channel->GetVoiceId() && channel->GetVoiceMembers().empty())
+        QueueEmptyCustomVoiceSession(channel->GetVoiceId());
 }
 
 void VoiceChatMgr::DeleteGroupVoiceChatChannel(uint32 groupId)
@@ -1095,17 +1124,12 @@ void VoiceChatMgr::JoinAvailableVoiceChatChannels(WorldSession* session)
             AddToGroupVoiceChatChannel(player->GetGUID(), group->GetGroupId());
     }
 
-    // custom channels the player is on with voice enabled
-    for (auto const& [voiceId, channel] : _voiceChannels)
+    // custom channels the player is on with voice on, their voice session is
+    // created again if everyone had left it
+    for (Channel* channel : player->GetJoinedChannels())
     {
-        if (channel->GetVoiceType() != VoiceChatChannelType::Custom)
-            continue;
-
-        if (channel->GetTeamId() != GetCustomChannelTeam(player->GetTeamId()))
-            continue;
-
-        if (channel->IsOn(player->GetGUID()) && !channel->IsBanned(player->GetGUID()) && channel->IsVoiceEnabled())
-            channel->AddVoiceChatMember(player->GetGUID());
+        if (channel->IsVoiceEnabled() && !channel->IsBanned(player->GetGUID()))
+            AddToCustomVoiceChatChannel(player->GetGUID(), channel->GetName(), player->GetTeamId());
     }
 }
 

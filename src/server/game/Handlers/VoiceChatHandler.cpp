@@ -133,7 +133,12 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPackets::VoiceChat::Se
                 !channel->IsVoiceEnabled())
                 return;
 
-            Channel* voiceChannel = sVoiceChatMgr->GetCustomVoiceChatChannel(packet.ChannelName, _player->GetTeamId());
+            // the voice session is created again if everyone had left it
+            TeamId const team = _player->GetTeamId();
+            if (!sVoiceChatMgr->GetCustomVoiceChatChannel(packet.ChannelName, team))
+                sVoiceChatMgr->AddToCustomVoiceChatChannel(_player->GetGUID(), packet.ChannelName, team);
+
+            Channel* voiceChannel = sVoiceChatMgr->GetCustomVoiceChatChannel(packet.ChannelName, team);
             SetActiveVoiceChannel(voiceChannel, currentChannel, _player);
             break;
         }

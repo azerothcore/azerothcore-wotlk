@@ -337,7 +337,15 @@ void Channel::RemoveVoiceChatMember(ObjectGuid guid)
     // the members that left were told to leave the session, so once it is empty
     // no client holds it any more and its user ids may be handed out again
     if (_voiceMembers.empty())
+    {
         ResetVoiceUserIds();
+
+        // custom channels are never deleted, their voice session would keep its voice
+        // channel id for good: give it back. Voice stays on, the session is created
+        // again when a member with voice enabled is added
+        if (GetVoiceType() == VoiceChatChannelType::Custom && !_voiceDeleting)
+            sVoiceChatMgr->QueueEmptyCustomVoiceSession(GetVoiceId());
+    }
 
     if (!_voiceMembers.empty() && !_voiceDeleting)
         SendVoiceRoster();

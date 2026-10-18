@@ -28,6 +28,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 class Channel;
 class Player;
@@ -126,6 +127,8 @@ public:
     void QueueBattlegroundLeaderChanged(uint32 instanceId, TeamId team, ObjectGuid oldLeader, ObjectGuid newLeader);
     void QueueGroupDisbanded(uint32 groupId);
     void QueueBattlegroundRaidDisbanded(uint32 instanceId, TeamId team);
+    // a custom channel's voice session lost its last member, world thread only
+    void QueueEmptyCustomVoiceSession(uint16 voiceId);
 
     // manage voice channels
     void CreateGroupVoiceChatChannel(uint32 groupId);
@@ -196,7 +199,9 @@ private:
 
     // registers channel, assigns ids and creates the session on the voiceserver
     void CreateVoiceSession(Channel* channel, std::shared_ptr<Channel> ownedChannel = nullptr);
-    void DeleteVoiceChatChannel(Channel* channel);
+    // turnVoiceOff: also turn voice off on a custom chat channel
+    void DeleteVoiceChatChannel(Channel* channel, bool turnVoiceOff = true);
+    void ReleaseEmptyCustomVoiceSessions();
     // adds eligible players after the voice session was created
     void AddMembersAfterCreate(Channel* channel);
 
@@ -251,6 +256,9 @@ private:
 
     // group changes queued by the group hooks, possibly from map threads
     LockedQueue<VoiceChatGroupEvent> _groupEvents;
+
+    // voice ids of custom channel sessions that lost their last member
+    std::vector<uint16> _emptyCustomVoiceSessions;
 
     IntervalTimer _pingTimer;
 };
