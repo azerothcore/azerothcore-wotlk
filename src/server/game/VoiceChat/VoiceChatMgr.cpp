@@ -37,6 +37,7 @@
 #include "WorldSessionMgr.h"
 #include "WorldSocketMgr.h"
 #include <boost/asio/ip/address.hpp>
+#include <limits>
 
 VoiceChatMgr::VoiceChatMgr() :
     _initialized(false),
@@ -656,12 +657,15 @@ void VoiceChatMgr::HandleCreateVoiceSessionResponseOpcode(VoiceChatServerPacket 
 
 uint16 VoiceChatMgr::GetNextVoiceChannelId()
 {
-    // skip 0 and ids that are still in use
-    do
+    // skip 0 and ids that are still in use, 0 once every id is in use
+    for (uint32 tries = 0; tries <= std::numeric_limits<uint16>::max(); ++tries)
+    {
         ++_nextVoiceChannelId;
-    while (!_nextVoiceChannelId || _voiceChannels.find(_nextVoiceChannelId) != _voiceChannels.end());
+        if (_nextVoiceChannelId && _voiceChannels.find(_nextVoiceChannelId) == _voiceChannels.end())
+            return _nextVoiceChannelId;
+    }
 
-    return _nextVoiceChannelId;
+    return 0;
 }
 
 // if cross faction channels are enabled, team is always ALLIANCE
@@ -679,6 +683,13 @@ void VoiceChatMgr::CreateVoiceSession(Channel* channel, std::shared_ptr<Channel>
         return;
 
     uint16 const voiceId = GetNextVoiceChannelId();
+    if (!voiceId)
+    {
+        LOG_ERROR("voice-chat", "Could not create a voice session of type {}, every voice channel id is in use",
+            uint32(channel->GetVoiceType()));
+        return;
+    }
+
     channel->SetVoiceId(voiceId);
     channel->SetVoiceSessionId(GetNewSessionId());
     channel->SetVoiceSessionKey(Acore::Crypto::GetRandomBytes<VOICECHAT_SESSION_KEY_SIZE>());
