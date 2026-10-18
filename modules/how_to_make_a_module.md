@@ -29,6 +29,7 @@ linked into the voiceserver instead:
 - create scripts deriving from `VoiceScript` (see `src/server/services/voice/Scripting/VoiceScript.h`) from
   `void Add<module>VoiceScripts()`, where `<module>` is the module folder name with `-` replaced by `_`
 - headers directly in `src/` are visible to both the worldserver and the voiceserver part
-- voiceserver configs go in `conf/voiceserver/*.conf.dist` and are installed to `configs/modules/voiceserver/`
+- voiceserver configs go in `conf/voiceserver/*.conf.dist` and are installed to `configs/modules/` with the
+  worldserver configs, so their names must differ from every worldserver config of the modules
 
 See `VoiceModules.cmake` for details.

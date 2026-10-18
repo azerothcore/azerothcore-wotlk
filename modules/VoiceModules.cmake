@@ -20,7 +20,8 @@
 #   where <module> is the module directory name with '-' replaced by '_'
 # - headers directly in src/ are visible to both halves of a module
 # - voiceserver configs go in conf/voiceserver/*.conf.dist and are installed
-#   to configs/modules/voiceserver/
+#   to configs/modules/ with the worldserver ones, so their names must differ
+#   from every worldserver config of the modules
 #
 # Voiceserver parts are always linked statically. A disabled module has no
 # voiceserver part either.
@@ -80,9 +81,11 @@ set_target_properties(voicemodules
     FOLDER
       "modules")
 
-# Installs a voiceserver config of a module to configs/modules/voiceserver/
+# Installs a voiceserver config of a module to configs/modules/, like CopyModuleConfig
+# does for the worldserver ones (which needs the modules target, absent from a
+# build without the worldserver)
 function(CopyVoiceModuleConfig configFile)
-  set(postPath "configs/modules/voiceserver")
+  set(postPath "configs/modules")
 
   if(WIN32)
     if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
@@ -103,13 +106,25 @@ function(CopyVoiceModuleConfig configFile)
   endif()
 
   if(UNIX)
-    install(FILES "${configFile}" DESTINATION "${CONF_DIR}/modules/voiceserver")
+    install(FILES "${configFile}" DESTINATION "${CONF_DIR}/modules")
   elseif(WIN32)
     install(FILES "${configFile}" DESTINATION "${CMAKE_INSTALL_PREFIX}/${postPath}")
   endif()
 endfunction()
 
 set(VOICE_MODULES_CONFIG_LIST "")
+
+# configs of both servers share configs/modules/: names already taken by the
+# worldserver configs of the modules, and by the voiceserver configs seen so far
+set(MODULE_CONFIG_NAMES "")
+foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
+  ModuleNameToVariable(${SOURCE_MODULE} MODULE_MODULE_VARIABLE)
+  if (NOT ("${${MODULE_MODULE_VARIABLE}}" STREQUAL "disabled"))
+    file(GLOB MODULE_WORLD_CONFIGS RELATIVE "${CMAKE_SOURCE_DIR}/modules/${SOURCE_MODULE}/conf"
+      "${CMAKE_SOURCE_DIR}/modules/${SOURCE_MODULE}/conf/*.conf.dist")
+    list(APPEND MODULE_CONFIG_NAMES ${MODULE_WORLD_CONFIGS})
+  endif()
+endforeach()
 
 message(STATUS "* Voiceserver modules:
   |")
@@ -121,9 +136,15 @@ foreach(VOICE_MODULE ${VOICE_MODULES_LIST})
   file(GLOB VOICE_MODULE_CONFIGS RELATIVE ${VOICE_MODULE_CONFIG_PATH} ${VOICE_MODULE_CONFIG_PATH}/*.conf.dist)
 
   foreach(configFileName ${VOICE_MODULE_CONFIGS})
+    if (configFileName IN_LIST MODULE_CONFIG_NAMES)
+      message(FATAL_ERROR "Voiceserver config ${configFileName} of module ${VOICE_MODULE} has the name of another "
+        "module config. Both are installed to configs/modules/, give it a name of its own.")
+    endif()
+    list(APPEND MODULE_CONFIG_NAMES ${configFileName})
+
     CopyVoiceModuleConfig("${VOICE_MODULE_CONFIG_PATH}/${configFileName}")
     string(REGEX REPLACE "\\.dist$" "" configFileName ${configFileName})
-    set(VOICE_MODULES_CONFIG_LIST "${VOICE_MODULES_CONFIG_LIST}voiceserver/${configFileName},")
+    set(VOICE_MODULES_CONFIG_LIST "${VOICE_MODULES_CONFIG_LIST}${configFileName},")
     message(STATUS "  |  * ${configFileName}")
   endforeach()
 endforeach()
