@@ -388,6 +388,8 @@ private:
 
     // Voice chat
     uint8 GenerateVoiceUserId(ObjectGuid guid);
+    uint8 ReuseVoiceUserId();
+    void ResetVoiceUserIds();
     // player is on the channel and a moderator (or may moderate any channel), notifies player if not
     bool CheckVoiceModerator(Player const* player);
 
@@ -424,10 +426,14 @@ private:
     // set when a moderator turns voice off, joining members would turn it on again otherwise
     bool _voiceTurnedOff;
     VoiceChatMembers _voiceMembers;
-    // user ids handed out while this voice session has members; not reused
-    // before it is empty again, clients keep departed members in their session
-    // and would show a new member under the old one's name
+    // user ids handed out while this voice session has members. Clients keep
+    // departed members in their session and play voice as the first member with
+    // the sender's id, so an id is only handed out again once no client is left
+    // that was in the session together with its previous holder
     std::unordered_map<ObjectGuid, uint8> _voiceUserIds;
     uint8 _lastVoiceUserId;
+    // orders joins and leaves: when each id was last freed, members store when they joined
+    uint64 _voiceUserIdClock;
+    std::unordered_map<uint8, uint64> _voiceUserIdFreedAt;
 };
 #endif

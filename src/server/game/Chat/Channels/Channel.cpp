@@ -47,7 +47,8 @@ Channel::Channel(std::string const& name, uint32 channelDBCId, uint64 channelGui
     _voiceMassAdding(false),
     _voiceDeleting(false),
     _voiceTurnedOff(false),
-    _lastVoiceUserId(0)
+    _lastVoiceUserId(0),
+    _voiceUserIdClock(0)
 {
     // set special flags if built-in channel
     if (ChatChannelsEntry const* ch = sChatChannelsStore.LookupEntry(channelDBCId)) // check whether it's a built-in channel
@@ -118,7 +119,8 @@ Channel::Channel(VoiceChatChannelType voiceChannelType, uint32 voiceGroupId, Tea
     _voiceMassAdding(false),
     _voiceDeleting(false),
     _voiceTurnedOff(false),
-    _lastVoiceUserId(0)
+    _lastVoiceUserId(0),
+    _voiceUserIdClock(0)
 {
 }
 

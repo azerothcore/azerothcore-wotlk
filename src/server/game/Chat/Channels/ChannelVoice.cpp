@@ -25,6 +25,8 @@
 #include "VoiceChatMgr.h"
 #include "VoiceChatPackets.h"
 #include "WorldSession.h"
+#include <algorithm>
+#include <limits>
 
 void Channel::ToggleVoice(Player* player)
 {
@@ -184,18 +186,64 @@ VoiceChatMember* Channel::GetVoiceChatMember(ObjectGuid guid)
 
 uint8 Channel::GenerateVoiceUserId(ObjectGuid guid)
 {
-    // give a character the id it already had while this session exists,
-    // ids are not reused to avoid the client showing stale character names
+    // give a character the id it already had while this session exists, clients
+    // that still hold it in their session know it under that id
     auto itr = _voiceUserIds.find(guid);
     if (itr != _voiceUserIds.end())
         return itr->second;
 
-    if (_lastVoiceUserId >= 250)
+    uint8 const newId = _lastVoiceUserId < 250 ? ++_lastVoiceUserId : ReuseVoiceUserId();
+    if (newId)
+        _voiceUserIds[guid] = newId;
+
+    return newId;
+}
+
+uint8 Channel::ReuseVoiceUserId()
+{
+    // A client never forgets a departed member while it stays in the session (the
+    // roster update misses it) and plays voice as the first member it holds with
+    // the sender's id. So an id may only be reused when every current member
+    // joined after its previous holder left: none of their clients ever saw it.
+    // The joining member's client starts out empty, the SMSG_AVAILABLE_VOICE_CHANNEL
+    // sent when it joins recreates its session
+    uint64 firstJoinedAt = std::numeric_limits<uint64>::max();
+    for (auto const& [userId, member] : _voiceMembers)
+        firstJoinedAt = std::min(firstJoinedAt, member.JoinedAt);
+
+    // the id freed longest ago
+    uint8 reusedId = 0;
+    uint64 reusedFreedAt = firstJoinedAt;
+    for (auto const& [userId, freedAt] : _voiceUserIdFreedAt)
+    {
+        if (freedAt < reusedFreedAt && _voiceMembers.find(userId) == _voiceMembers.end())
+        {
+            reusedId = userId;
+            reusedFreedAt = freedAt;
+        }
+    }
+
+    if (!reusedId)
         return 0;
 
-    uint8 newId = ++_lastVoiceUserId;
-    _voiceUserIds[guid] = newId;
-    return newId;
+    // the previous holder gets a new id if it comes back
+    for (auto itr = _voiceUserIds.begin(); itr != _voiceUserIds.end();)
+    {
+        if (itr->second == reusedId)
+            itr = _voiceUserIds.erase(itr);
+        else
+            ++itr;
+    }
+
+    _voiceUserIdFreedAt.erase(reusedId);
+    return reusedId;
+}
+
+void Channel::ResetVoiceUserIds()
+{
+    _voiceUserIds.clear();
+    _voiceUserIdFreedAt.clear();
+    _lastVoiceUserId = 0;
 }
 
 void Channel::AddVoiceChatMember(ObjectGuid guid)
@@ -230,6 +278,7 @@ void Channel::AddVoiceChatMember(ObjectGuid guid)
     }
 
     VoiceChatMember member(guid, userId);
+    member.JoinedAt = ++_voiceUserIdClock;
     member.SetEnabled(true);
     member.SetVoiced(false);
     member.SetMuted(!session->IsMicEnabled());
@@ -283,14 +332,12 @@ void Channel::RemoveVoiceChatMember(ObjectGuid guid)
     sVoiceChatMgr->DisableChannelSlot(GetVoiceId(), userId);
 
     _voiceMembers.erase(userId);
+    _voiceUserIdFreedAt[userId] = ++_voiceUserIdClock;
 
     // the members that left were told to leave the session, so once it is empty
     // no client holds it any more and its user ids may be handed out again
     if (_voiceMembers.empty())
-    {
-        _voiceUserIds.clear();
-        _lastVoiceUserId = 0;
-    }
+        ResetVoiceUserIds();
 
     if (!_voiceMembers.empty() && !_voiceDeleting)
         SendVoiceRoster();
@@ -440,8 +487,7 @@ void Channel::DisbandVoiceSession()
     }
 
     _voiceMembers.clear();
-    _voiceUserIds.clear();
-    _lastVoiceUserId = 0;
+    ResetVoiceUserIds();
     _voiceDeleting = false;
 
     SetVoiceId(0);

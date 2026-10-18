@@ -77,6 +77,8 @@ struct VoiceChatMember
     uint8 UserId;
     uint8 Flags;
     uint8 Priority;
+    // when the member joined the voice session, see Channel::ReuseVoiceUserId
+    uint64 JoinedAt = 0;
 
     inline bool HasFlag(uint8 flag) const { return (Flags & flag) != 0; }
     void SetFlag(uint8 flag, bool state) { if (state) Flags |= flag; else Flags &= ~flag; }
