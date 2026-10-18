@@ -968,11 +968,6 @@ void VoiceChatMgr::CreateCustomVoiceChatChannel(std::string const& name, TeamId 
 
     channel->SetVoiceType(VoiceChatChannelType::Custom);
     CreateVoiceSession(channel);
-
-    // nobody could be added after all (e.g. the candidate is no longer connected):
-    // do not hold the voice channel id either
-    if (channel->GetVoiceId() && channel->GetVoiceMembers().empty())
-        QueueEmptyCustomVoiceSession(channel->GetVoiceId());
 }
 
 void VoiceChatMgr::DeleteGroupVoiceChatChannel(uint32 groupId)
