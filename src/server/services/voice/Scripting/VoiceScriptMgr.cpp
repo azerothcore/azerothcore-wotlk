@@ -86,43 +86,49 @@ void VoiceScriptMgr::OnShutdown()
     CallHooks(VOICEHOOK_ON_SHUTDOWN, [](VoiceScript* script) { script->OnShutdown(); });
 }
 
-void VoiceScriptMgr::OnChannelCreated(uint16 channelId, VoiceChatChannelType type)
+void VoiceScriptMgr::OnChannelCreated(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type)
 {
-    CallHooks(VOICEHOOK_ON_CHANNEL_CREATED, [&](VoiceScript* script) { script->OnChannelCreated(channelId, type); });
+    CallHooks(VOICEHOOK_ON_CHANNEL_CREATED,
+        [&](VoiceScript* script) { script->OnChannelCreated(world, channelId, type); });
 }
 
-void VoiceScriptMgr::OnChannelDeleted(uint16 channelId)
+void VoiceScriptMgr::OnChannelDeleted(VoiceWorldLink const& world, uint16 channelId)
 {
-    CallHooks(VOICEHOOK_ON_CHANNEL_DELETED, [&](VoiceScript* script) { script->OnChannelDeleted(channelId); });
+    CallHooks(VOICEHOOK_ON_CHANNEL_DELETED, [&](VoiceScript* script) { script->OnChannelDeleted(world, channelId); });
 }
 
-void VoiceScriptMgr::OnMemberAdded(uint16 channelId, uint8 userId, VoiceChannelMember const& member)
+void VoiceScriptMgr::OnMemberAdded(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
+    VoiceChannelMember const& member)
 {
     CallHooks(VOICEHOOK_ON_MEMBER_ADDED,
-        [&](VoiceScript* script) { script->OnMemberAdded(channelId, userId, member); });
+        [&](VoiceScript* script) { script->OnMemberAdded(world, channelId, userId, member); });
 }
 
-void VoiceScriptMgr::OnMemberRemoved(uint16 channelId, uint8 userId)
+void VoiceScriptMgr::OnMemberRemoved(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
-    CallHooks(VOICEHOOK_ON_MEMBER_REMOVED, [&](VoiceScript* script) { script->OnMemberRemoved(channelId, userId); });
+    CallHooks(VOICEHOOK_ON_MEMBER_REMOVED,
+        [&](VoiceScript* script) { script->OnMemberRemoved(world, channelId, userId); });
 }
 
-void VoiceScriptMgr::OnMemberStateChanged(uint16 channelId, uint8 userId, bool voiced, bool muted)
+void VoiceScriptMgr::OnMemberStateChanged(VoiceWorldLink const& world, uint16 channelId, uint8 userId, bool voiced,
+    bool muted)
 {
     CallHooks(VOICEHOOK_ON_MEMBER_STATE_CHANGED,
-        [&](VoiceScript* script) { script->OnMemberStateChanged(channelId, userId, voiced, muted); });
+        [&](VoiceScript* script) { script->OnMemberStateChanged(world, channelId, userId, voiced, muted); });
 }
 
-void VoiceScriptMgr::OnClientHandshake(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& endpoint)
+void VoiceScriptMgr::OnClientHandshake(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
+    boost::asio::ip::udp::endpoint const& endpoint)
 {
     CallHooks(VOICEHOOK_ON_CLIENT_HANDSHAKE,
-        [&](VoiceScript* script) { script->OnClientHandshake(channelId, userId, endpoint); });
+        [&](VoiceScript* script) { script->OnClientHandshake(world, channelId, userId, endpoint); });
 }
 
-void VoiceScriptMgr::OnVoicePacket(uint16 channelId, uint8 userId, std::span<uint8 const> payload)
+void VoiceScriptMgr::OnVoicePacket(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
+    std::span<uint8 const> payload)
 {
     CallHooks(VOICEHOOK_ON_VOICE_PACKET,
-        [&](VoiceScript* script) { script->OnVoicePacket(channelId, userId, payload); });
+        [&](VoiceScript* script) { script->OnVoicePacket(world, channelId, userId, payload); });
 }
 
 void VoiceScriptMgr::OnWorldMessage(VoiceWorldLink const& link, std::string const& tag, ByteBuffer& data)

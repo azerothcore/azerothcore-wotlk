@@ -21,13 +21,11 @@
 #include "Channel.h"
 #include "Define.h"
 #include "VoiceChatSharedDefines.h"
+#include "VoiceWorldLink.h"
 #include <boost/asio/ip/udp.hpp>
-#include <memory>
 #include <span>
 #include <string>
 #include <vector>
-
-class InternalSession;
 
 namespace Acore::Asio
 {
@@ -49,26 +47,6 @@ enum VoiceScriptHook
     VOICEHOOK_END
 };
 
-// The worldserver connection a module message came from. Scripts may keep it to
-// answer at any later time, from any thread. It stays safe to use after the
-// connection closed, sending fails then.
-class VoiceWorldLink
-{
-public:
-    VoiceWorldLink() = default;
-    explicit VoiceWorldLink(std::weak_ptr<InternalSession> session) : _session(std::move(session)) { }
-
-    // queues a message for the worldserver part of the module, which receives it
-    // through VoiceChatScript::OnVoiceServerModuleMessage. Returns false if the
-    // connection is gone or the message does not fit an internal packet.
-    bool SendModuleMessage(std::string const& tag, ByteBuffer const& data) const;
-
-    [[nodiscard]] bool IsConnected() const;
-
-private:
-    std::weak_ptr<InternalSession> _session;
-};
-
 /*
  * Base class of voiceserver scripts, the voiceserver's counterpart to the
  * worldserver script hooks. Modules keep their voiceserver code in
@@ -82,6 +60,10 @@ private:
  * run concurrently, so scripts synchronize the state they share between them.
  * No hook is called while the voiceserver holds a lock, so scripts may call
  * back into it.
+ *
+ * Several worldservers may share the voiceserver, each numbering its voice
+ * channels on its own: the channel and member hooks pass the worldserver a
+ * channel belongs to, key channels by world.GetId() and channelId together.
  */
 class VoiceScript
 {
@@ -107,30 +89,34 @@ public:
 
     // Called when a worldserver created a voice channel. A channel created again
     // under the same id is reported as deleted first.
-    virtual void OnChannelCreated(uint16 /*channelId*/, VoiceChatChannelType /*type*/) { }
+    virtual void OnChannelCreated(VoiceWorldLink const& /*world*/, uint16 /*channelId*/,
+        VoiceChatChannelType /*type*/) { }
 
     // Called when a voice channel was deleted, also when the worldserver owning it
     // disconnected. Its members are gone without an OnMemberRemoved each.
-    virtual void OnChannelDeleted(uint16 /*channelId*/) { }
+    virtual void OnChannelDeleted(VoiceWorldLink const& /*world*/, uint16 /*channelId*/) { }
 
     // Called when a member was added to a channel. Adding an existing slot again
     // (e.g. after a worldserver reconnect) resets it and calls this again.
-    virtual void OnMemberAdded(uint16 /*channelId*/, uint8 /*userId*/, VoiceChannelMember const& /*member*/) { }
+    virtual void OnMemberAdded(VoiceWorldLink const& /*world*/, uint16 /*channelId*/, uint8 /*userId*/,
+        VoiceChannelMember const& /*member*/) { }
 
-    virtual void OnMemberRemoved(uint16 /*channelId*/, uint8 /*userId*/) { }
+    virtual void OnMemberRemoved(VoiceWorldLink const& /*world*/, uint16 /*channelId*/, uint8 /*userId*/) { }
 
     // Called when the state of a member changed. voiced: receives voice, muted: may not speak
-    virtual void OnMemberStateChanged(uint16 /*channelId*/, uint8 /*userId*/, bool /*voiced*/, bool /*muted*/) { }
+    virtual void OnMemberStateChanged(VoiceWorldLink const& /*world*/, uint16 /*channelId*/, uint8 /*userId*/,
+        bool /*voiced*/, bool /*muted*/) { }
 
     // Called when a game client announced the endpoint it sends voice from
-    virtual void OnClientHandshake(uint16 /*channelId*/, uint8 /*userId*/,
+    virtual void OnClientHandshake(VoiceWorldLink const& /*world*/, uint16 /*channelId*/, uint8 /*userId*/,
         boost::asio::ip::udp::endpoint const& /*endpoint*/) { }
 
     // Called for every voice frame accepted from a member that may speak, after it
     // was relayed (possibly to nobody). payload is the frame without the packet
     // header, as encoded by the game client. Runs for every frame of every
     // speaker, keep it cheap.
-    virtual void OnVoicePacket(uint16 /*channelId*/, uint8 /*userId*/, std::span<uint8 const> /*payload*/) { }
+    virtual void OnVoicePacket(VoiceWorldLink const& /*world*/, uint16 /*channelId*/, uint8 /*userId*/,
+        std::span<uint8 const> /*payload*/) { }
 
     // Called when the worldserver part of a module sent a message (see
     // VoiceChatMgr::SendModuleMessage). tag names the module and message, scripts

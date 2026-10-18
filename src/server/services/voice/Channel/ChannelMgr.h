@@ -20,12 +20,12 @@
 
 #include "Channel.h"
 #include "Define.h"
+#include "VoiceWorldLink.h"
 #include <boost/asio/ip/udp.hpp>
 #include <map>
 #include <mutex>
+#include <utility>
 #include <vector>
-
-class InternalSession;
 
 /*
  * Owns all voice channels of the voiceserver.
@@ -36,9 +36,12 @@ class InternalSession;
  *
  * Script hooks are called after the manager lock was released.
  *
- * InternalSession pointers are only stored to identify the owning
- * worldserver connection; they are compared, never dereferenced, since the
- * session may already be destroyed when a channel is cleaned up.
+ * Several worldservers (realms) may share the voiceserver. Each numbers its
+ * voice channels on its own, so channels are kept per worldserver connection
+ * and a channel id is only unique together with its VoiceWorldLink id. The
+ * datagrams of the game clients only carry the channel and user id: they are
+ * matched to the member with the sender's address in the channel whose session
+ * key verifies their signature.
  */
 class ChannelMgr
 {
@@ -53,47 +56,53 @@ public:
     // Only set at startup, before any traffic
     void SetMaxPacketsPerSecond(uint32 maxPacketsPerSecond) { _maxPacketsPerSecond = maxPacketsPerSecond; }
 
-    // internal (TCP) side
+    // internal (TCP) side, world: the worldserver connection the request came from
     // sessionKey: the key game clients sign their voice datagrams with
-    bool CreateChannel(InternalSession const* session, uint16 channelId, VoiceChatChannelType type,
+    bool CreateChannel(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type,
         VoiceChatSessionKey const& sessionKey);
-    void DeleteChannel(InternalSession const* session, uint16 channelId);
+    void DeleteChannel(VoiceWorldLink const& world, uint16 channelId);
     // member: client address and character of the new member
-    bool AddMember(InternalSession const* session, uint16 channelId, uint8 userId, VoiceChannelMember const& member);
-    void RemoveMember(InternalSession const* session, uint16 channelId, uint8 userId);
-    void VoiceMember(InternalSession const* session, uint16 channelId, uint8 userId);
-    void DevoiceMember(InternalSession const* session, uint16 channelId, uint8 userId);
-    void MuteMember(InternalSession const* session, uint16 channelId, uint8 userId);
-    void UnmuteMember(InternalSession const* session, uint16 channelId, uint8 userId);
+    bool AddMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId, VoiceChannelMember const& member);
+    void RemoveMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId);
+    void VoiceMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId);
+    void DevoiceMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId);
+    void MuteMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId);
+    void UnmuteMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId);
 
     // removes every channel owned by a dropped worldserver connection
-    void RemoveChannelsFor(InternalSession const* session);
+    void RemoveChannelsFor(VoiceWorldLink const& world);
 
-    // UDP (game client) side
+    // UDP (game client) side, world receives the worldserver of the sender's channel
 
     // registers the endpoint a client sends voice data from (the header-only packet),
     // returns false if the member is unknown or the packet is not the member's
-    bool HandleClientHandshake(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& endpoint);
+    bool HandleClientHandshake(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& endpoint,
+        VoiceWorldLink& world);
     // collects the endpoints a voice frame should be relayed to,
     // returns false if the sender is not allowed to speak.
     // announced is set if the frame registered the sender's endpoint in place of a handshake
     bool GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
-        std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced);
+        std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced, VoiceWorldLink& world);
 
 private:
-    // requires _lock to be held, may return nullptr
-    VoiceChannel* GetChannel(uint16 channelId);
-    // requires _lock to be held, returns nullptr if the channel is not owned by session
-    VoiceChannel* GetOwnedChannel(InternalSession const* session, uint16 channelId, char const* action);
-    // applies change to a member of a channel owned by session, reports a changed state to the scripts
-    void ChangeMemberState(InternalSession const* session, uint16 channelId, uint8 userId, char const* action,
+    // channel id, VoiceWorldLink id
+    using ChannelKey = std::pair<uint16, uint32>;
+
+    // requires _lock to be held, returns nullptr if world has no such channel
+    VoiceChannel* GetOwnedChannel(VoiceWorldLink const& world, uint16 channelId, char const* action);
+    // requires _lock to be held: the channel a game client's datagram belongs to, the one
+    // with the datagram's channel id holding its user id with address as client address
+    // and whose session key verifies the signature. nullptr if there is none
+    VoiceChannel* FindSenderChannel(UdpSocketPacket const& packet, boost::asio::ip::address const& address);
+    // applies change to a member of a channel owned by world, reports a changed state to the scripts
+    void ChangeMemberState(VoiceWorldLink const& world, uint16 channelId, uint8 userId, char const* action,
         bool logMissingMember, void (*change)(VoiceChannelMember& member));
     // requires _lock to be held, returns false if the member sent too many voice frames
     bool ConsumePacketBudget(VoiceChannelMember& member) const;
 
     uint32 _maxPacketsPerSecond = 0;
     std::mutex _lock;
-    std::map<uint16, VoiceChannel> _channels;
+    std::map<ChannelKey, VoiceChannel> _channels;
 };
 
 #define sChannelMgr ChannelMgr::Instance()

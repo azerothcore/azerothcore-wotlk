@@ -21,13 +21,12 @@
 #include "Define.h"
 #include "UdpSocket.h"
 #include "VoiceChatSharedDefines.h"
+#include "VoiceWorldLink.h"
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/udp.hpp>
 #include <chrono>
 #include <map>
 #include <string>
-
-class InternalSession;
 
 // IPv4 clients compare equal whether seen as plain IPv4 or as IPv4-mapped IPv6
 inline boost::asio::ip::address NormalizeVoiceClientAddress(boost::asio::ip::address const& address)
@@ -64,12 +63,13 @@ struct VoiceChannelMember
 class VoiceChannel
 {
 public:
-    VoiceChannel(uint16 channelId, VoiceChatChannelType type, VoiceChatSessionKey const& sessionKey,
-        InternalSession const* owner);
+    VoiceChannel(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type,
+        VoiceChatSessionKey const& sessionKey);
 
+    // the worldserver the channel belongs to, channelId is only unique together with it
+    VoiceWorldLink const& GetWorld() const { return _world; }
     uint16 GetChannelId() const { return _channelId; }
     VoiceChatChannelType GetType() const { return _type; }
-    InternalSession const* GetOwner() const { return _owner; }
     uint32 GetMaxMembers() const { return _maxMembers; }
 
     // whether a game client signed the datagram with this channel's session key
@@ -86,12 +86,10 @@ public:
     std::map<uint8, VoiceChannelMember> const& GetMembers() const { return _members; }
 
 private:
+    VoiceWorldLink _world;
     uint16 _channelId;
     VoiceChatChannelType _type;
     VoiceChatSessionKey _sessionKey;
-    // identifies the worldserver connection this channel belongs to, only
-    // ever used for comparison - never dereference it
-    InternalSession const* _owner;
     uint32 _maxMembers;
     std::map<uint8, VoiceChannelMember> _members;
 };

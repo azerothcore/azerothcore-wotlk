@@ -22,6 +22,7 @@
 #include "LockedQueue.h"
 #include "TcpSocket.h"
 #include "VoiceChatSharedDefines.h"
+#include "VoiceWorldLink.h"
 #include <boost/asio/ip/tcp.hpp>
 #include <memory>
 #include <string>
@@ -39,6 +40,11 @@ public:
     void Start() override;
     void OnClose() override;
     bool Update() override;
+
+    // identifies this connection, its voice channels are kept apart from those
+    // of other worldservers sharing the voiceserver
+    [[nodiscard]] uint32 GetWorldId() const { return _worldId; }
+    VoiceWorldLink GetWorldLink() { return VoiceWorldLink(weak_from_this(), _worldId); }
 
     // network thread only
     void SendPacket(VoiceChatServerPacket const& packet);
@@ -62,6 +68,7 @@ protected:
     ReadDataHandlerResult ReadDataHandler() override;
 
 private:
+    uint32 const _worldId;
     // packets queued from other threads, sent by Update()
     LockedQueue<std::unique_ptr<VoiceChatServerPacket>> _queuedPackets;
     // network thread only

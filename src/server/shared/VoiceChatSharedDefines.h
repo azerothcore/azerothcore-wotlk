@@ -39,6 +39,11 @@
  * answers channel creation with SMSG_CREATE_VOICE_SESSION_RESPONSE so the
  * worldserver can tear the channel down again if creation failed.
  *
+ * Several worldservers (realms) may connect to one voiceserver, each numbering
+ * its channels on its own: the voiceserver keeps the channels of every
+ * connection apart and tells the game clients' datagrams, which only carry the
+ * channel and user id, apart by the session key they are signed with.
+ *
  * Payloads:
  *   CMSG_PING                          -> []
  *   SMSG_PONG                          -> []

@@ -20,32 +20,40 @@
 #include "VoiceScriptMgr.h"
 #include <algorithm>
 
-VoiceChannel* ChannelMgr::GetChannel(uint16 channelId)
+VoiceChannel* ChannelMgr::GetOwnedChannel(VoiceWorldLink const& world, uint16 channelId, char const* action)
 {
-    auto itr = _channels.find(channelId);
-    return itr != _channels.end() ? &itr->second : nullptr;
-}
-
-VoiceChannel* ChannelMgr::GetOwnedChannel(InternalSession const* session, uint16 channelId, char const* action)
-{
-    VoiceChannel* channel = GetChannel(channelId);
-    if (!channel)
+    auto itr = _channels.find(ChannelKey(channelId, world.GetId()));
+    if (itr == _channels.end())
     {
-        LOG_ERROR("voice-chat", "Worldserver requested to {} on nonexistent channel {}", action, channelId);
+        LOG_ERROR("voice-chat", "Worldserver #{} requested to {} on nonexistent channel {}", world.GetId(), action,
+            channelId);
         return nullptr;
     }
 
-    if (channel->GetOwner() != session)
-    {
-        LOG_ERROR("voice-chat", "Worldserver requested to {} on channel {} owned by another connection",
-            action, channelId);
-        return nullptr;
-    }
-
-    return channel;
+    return &itr->second;
 }
 
-bool ChannelMgr::CreateChannel(InternalSession const* session, uint16 channelId, VoiceChatChannelType type,
+VoiceChannel* ChannelMgr::FindSenderChannel(UdpSocketPacket const& packet, boost::asio::ip::address const& address)
+{
+    uint16 const channelId = packet.GetHeader().channelId;
+    uint8 const userId = packet.GetHeader().userId;
+    boost::asio::ip::address const clientAddress = NormalizeVoiceClientAddress(address);
+
+    // the header is trivially forgeable: only the client the worldserver announced for
+    // the slot may use it, and only with the key of the session. Worldservers sharing
+    // the voiceserver may all use this channel id, only the right session key verifies
+    for (auto itr = _channels.lower_bound(ChannelKey(channelId, 0));
+        itr != _channels.end() && itr->first.first == channelId; ++itr)
+    {
+        VoiceChannelMember const* member = itr->second.GetMember(userId);
+        if (member && member->ClientAddress == clientAddress && itr->second.HasValidSignature(packet))
+            return &itr->second;
+    }
+
+    return nullptr;
+}
+
+bool ChannelMgr::CreateChannel(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type,
     VoiceChatSessionKey const& sessionKey)
 {
     if (!channelId || type >= VoiceChatChannelType::Max)
@@ -55,95 +63,85 @@ bool ChannelMgr::CreateChannel(InternalSession const* session, uint16 channelId,
     {
         std::lock_guard<std::mutex> guard(_lock);
 
-        if (VoiceChannel* existing = GetChannel(channelId))
-        {
-            // the worldserver re-creates its channels after a reconnect,
-            // only ever re-use ids of the same connection
-            if (existing->GetOwner() != session)
-            {
-                LOG_ERROR("voice-chat",
-                    "Worldserver requested creation of channel {} which is owned by another connection",
-                    channelId);
-                return false;
-            }
+        // the worldserver re-creates its channels after a reconnect (as a new
+        // connection), it may also create a channel again under the same id
+        ChannelKey const key(channelId, world.GetId());
+        replaced = _channels.erase(key) > 0;
 
-            _channels.erase(channelId);
-            replaced = true;
-        }
-
-        _channels.emplace(std::piecewise_construct, std::forward_as_tuple(channelId),
-            std::forward_as_tuple(channelId, type, sessionKey, session));
+        _channels.emplace(std::piecewise_construct, std::forward_as_tuple(key),
+            std::forward_as_tuple(world, channelId, type, sessionKey));
     }
 
-    LOG_DEBUG("voice-chat", "Channel {} created, type {}", channelId, uint32(type));
+    LOG_DEBUG("voice-chat", "Channel {} of worldserver #{} created, type {}", channelId, world.GetId(), uint32(type));
 
     if (replaced)
-        sVoiceScriptMgr->OnChannelDeleted(channelId);
+        sVoiceScriptMgr->OnChannelDeleted(world, channelId);
 
-    sVoiceScriptMgr->OnChannelCreated(channelId, type);
+    sVoiceScriptMgr->OnChannelCreated(world, channelId, type);
     return true;
 }
 
-void ChannelMgr::DeleteChannel(InternalSession const* session, uint16 channelId)
+void ChannelMgr::DeleteChannel(VoiceWorldLink const& world, uint16 channelId)
 {
     {
         std::lock_guard<std::mutex> guard(_lock);
 
-        if (!GetOwnedChannel(session, channelId, "delete channel"))
+        if (!GetOwnedChannel(world, channelId, "delete channel"))
             return;
 
-        _channels.erase(channelId);
+        _channels.erase(ChannelKey(channelId, world.GetId()));
     }
 
-    LOG_DEBUG("voice-chat", "Channel {} deleted", channelId);
-    sVoiceScriptMgr->OnChannelDeleted(channelId);
+    LOG_DEBUG("voice-chat", "Channel {} of worldserver #{} deleted", channelId, world.GetId());
+    sVoiceScriptMgr->OnChannelDeleted(world, channelId);
 }
 
-bool ChannelMgr::AddMember(InternalSession const* session, uint16 channelId, uint8 userId,
+bool ChannelMgr::AddMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
     VoiceChannelMember const& member)
 {
     VoiceChannelMember added;
     {
         std::lock_guard<std::mutex> guard(_lock);
 
-        VoiceChannel* channel = GetOwnedChannel(session, channelId, "add member");
+        VoiceChannel* channel = GetOwnedChannel(world, channelId, "add member");
         if (!channel)
             return false;
 
         if (!channel->AddMember(userId, member))
         {
-            LOG_ERROR("voice-chat", "Could not add member {} ({}) to channel {} (invalid id or channel full)",
-                userId, member.CharacterName, channelId);
+            LOG_ERROR("voice-chat",
+                "Could not add member {} ({}) to channel {} of worldserver #{} (invalid id or channel full)",
+                userId, member.CharacterName, channelId, world.GetId());
             return false;
         }
 
         added = *channel->GetMember(userId);
     }
 
-    LOG_DEBUG("voice-chat", "Channel {} member {} enabled: {} (guid {}, account {})",
-        channelId, userId, added.CharacterName, added.CharacterGuid, added.AccountId);
+    LOG_DEBUG("voice-chat", "Channel {} of worldserver #{} member {} enabled: {} (guid {}, account {})",
+        channelId, world.GetId(), userId, added.CharacterName, added.CharacterGuid, added.AccountId);
 
-    sVoiceScriptMgr->OnMemberAdded(channelId, userId, added);
+    sVoiceScriptMgr->OnMemberAdded(world, channelId, userId, added);
     return true;
 }
 
-void ChannelMgr::RemoveMember(InternalSession const* session, uint16 channelId, uint8 userId)
+void ChannelMgr::RemoveMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
     {
         std::lock_guard<std::mutex> guard(_lock);
 
-        VoiceChannel* channel = GetOwnedChannel(session, channelId, "remove member");
+        VoiceChannel* channel = GetOwnedChannel(world, channelId, "remove member");
         if (!channel || !channel->GetMember(userId))
             return;
 
         channel->RemoveMember(userId);
     }
 
-    LOG_DEBUG("voice-chat", "Channel {} member {} removed", channelId, userId);
-    sVoiceScriptMgr->OnMemberRemoved(channelId, userId);
+    LOG_DEBUG("voice-chat", "Channel {} of worldserver #{} member {} removed", channelId, world.GetId(), userId);
+    sVoiceScriptMgr->OnMemberRemoved(world, channelId, userId);
 }
 
-void ChannelMgr::ChangeMemberState(InternalSession const* session, uint16 channelId, uint8 userId, char const* action,
+void ChannelMgr::ChangeMemberState(VoiceWorldLink const& world, uint16 channelId, uint8 userId, char const* action,
     bool logMissingMember, void (*change)(VoiceChannelMember& member))
 {
     bool voiced;
@@ -151,7 +149,7 @@ void ChannelMgr::ChangeMemberState(InternalSession const* session, uint16 channe
     {
         std::lock_guard<std::mutex> guard(_lock);
 
-        VoiceChannel* channel = GetOwnedChannel(session, channelId, action);
+        VoiceChannel* channel = GetOwnedChannel(world, channelId, action);
         if (!channel)
             return;
 
@@ -159,8 +157,8 @@ void ChannelMgr::ChangeMemberState(InternalSession const* session, uint16 channe
         if (!member)
         {
             if (logMissingMember)
-                LOG_ERROR("voice-chat", "Worldserver requested to {}: member {} not found in channel {}",
-                    action, userId, channelId);
+                LOG_ERROR("voice-chat", "Worldserver #{} requested to {}: member {} not found in channel {}",
+                    world.GetId(), action, userId, channelId);
             return;
         }
 
@@ -174,34 +172,34 @@ void ChannelMgr::ChangeMemberState(InternalSession const* session, uint16 channe
             return;
     }
 
-    sVoiceScriptMgr->OnMemberStateChanged(channelId, userId, voiced, muted);
+    sVoiceScriptMgr->OnMemberStateChanged(world, channelId, userId, voiced, muted);
 }
 
-void ChannelMgr::VoiceMember(InternalSession const* session, uint16 channelId, uint8 userId)
+void ChannelMgr::VoiceMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
-    ChangeMemberState(session, channelId, userId, "voice member", true,
+    ChangeMemberState(world, channelId, userId, "voice member", true,
         [](VoiceChannelMember& member) { member.Voiced = true; });
 }
 
-void ChannelMgr::DevoiceMember(InternalSession const* session, uint16 channelId, uint8 userId)
+void ChannelMgr::DevoiceMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
-    ChangeMemberState(session, channelId, userId, "devoice member", false,
+    ChangeMemberState(world, channelId, userId, "devoice member", false,
         [](VoiceChannelMember& member) { member.Voiced = false; });
 }
 
-void ChannelMgr::MuteMember(InternalSession const* session, uint16 channelId, uint8 userId)
+void ChannelMgr::MuteMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
-    ChangeMemberState(session, channelId, userId, "mute member", false,
+    ChangeMemberState(world, channelId, userId, "mute member", false,
         [](VoiceChannelMember& member) { member.Muted = true; });
 }
 
-void ChannelMgr::UnmuteMember(InternalSession const* session, uint16 channelId, uint8 userId)
+void ChannelMgr::UnmuteMember(VoiceWorldLink const& world, uint16 channelId, uint8 userId)
 {
-    ChangeMemberState(session, channelId, userId, "unmute member", false,
+    ChangeMemberState(world, channelId, userId, "unmute member", false,
         [](VoiceChannelMember& member) { member.Muted = false; });
 }
 
-void ChannelMgr::RemoveChannelsFor(InternalSession const* session)
+void ChannelMgr::RemoveChannelsFor(VoiceWorldLink const& world)
 {
     std::vector<uint16> removed;
     {
@@ -209,9 +207,9 @@ void ChannelMgr::RemoveChannelsFor(InternalSession const* session)
 
         for (auto itr = _channels.begin(); itr != _channels.end();)
         {
-            if (itr->second.GetOwner() == session)
+            if (itr->first.second == world.GetId())
             {
-                removed.push_back(itr->first);
+                removed.push_back(itr->first.first);
                 itr = _channels.erase(itr);
             }
             else
@@ -221,49 +219,31 @@ void ChannelMgr::RemoveChannelsFor(InternalSession const* session)
 
     for (uint16 channelId : removed)
     {
-        LOG_DEBUG("voice-chat", "Channel {} removed, worldserver connection dropped", channelId);
-        sVoiceScriptMgr->OnChannelDeleted(channelId);
+        LOG_DEBUG("voice-chat", "Channel {} of worldserver #{} removed, worldserver connection dropped", channelId,
+            world.GetId());
+        sVoiceScriptMgr->OnChannelDeleted(world, channelId);
     }
 }
 
-bool ChannelMgr::HandleClientHandshake(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& endpoint)
+bool ChannelMgr::HandleClientHandshake(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& endpoint,
+    VoiceWorldLink& world)
 {
-    uint16 const channelId = packet.GetHeader().channelId;
-    uint8 const userId = packet.GetHeader().userId;
-
     std::lock_guard<std::mutex> guard(_lock);
 
-    VoiceChannel* channel = GetChannel(channelId);
+    VoiceChannel* channel = FindSenderChannel(packet, endpoint.address());
     if (!channel)
         return false;
 
-    VoiceChannelMember* member = channel->GetMember(userId);
-    if (!member)
-        return false;
-
-    // the header is trivially forgeable, so only the client the worldserver
-    // announced for this slot may claim it (its port may change, e.g. behind NAT)
-    if (NormalizeVoiceClientAddress(endpoint.address()) != member->ClientAddress)
-    {
-        LOG_DEBUG("voice-chat", "Rejected handshake for channel {} member {} from {}:{}, expected address {}",
-            channelId, userId, endpoint.address().to_string(), endpoint.port(), member->ClientAddress.to_string());
-        return false;
-    }
-
-    // and only with the key of the session
-    if (!channel->HasValidSignature(packet))
-    {
-        LOG_DEBUG("voice-chat", "Rejected handshake for channel {} member {} from {}:{}, wrong signature",
-            channelId, userId, endpoint.address().to_string(), endpoint.port());
-        return false;
-    }
-
+    // the client's port may change, e.g. behind NAT
+    VoiceChannelMember* member = channel->GetMember(packet.GetHeader().userId);
     if (member->HasEndpoint && member->Endpoint != endpoint)
-        LOG_DEBUG("voice-chat", "Channel {} member {} re-announced from a different endpoint {}:{}",
-            channelId, userId, endpoint.address().to_string(), endpoint.port());
+        LOG_DEBUG("voice-chat", "Channel {} of worldserver #{} member {} re-announced from a different endpoint {}:{}",
+            channel->GetChannelId(), channel->GetWorld().GetId(), packet.GetHeader().userId,
+            endpoint.address().to_string(), endpoint.port());
 
     member->Endpoint = endpoint;
     member->HasEndpoint = true;
+    world = channel->GetWorld();
     return true;
 }
 
@@ -287,29 +267,19 @@ bool ChannelMgr::ConsumePacketBudget(VoiceChannelMember& member) const
 }
 
 bool ChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
-    std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced)
+    std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced, VoiceWorldLink& world)
 {
-    uint16 const channelId = packet.GetHeader().channelId;
     uint8 const userId = packet.GetHeader().userId;
     announced = false;
 
     std::lock_guard<std::mutex> guard(_lock);
 
-    VoiceChannel* channel = GetChannel(channelId);
+    VoiceChannel* channel = FindSenderChannel(packet, sender.address());
     if (!channel)
         return false;
 
     VoiceChannelMember* member = channel->GetMember(userId);
-    if (!member)
-        return false;
-
-    // the header is trivially forgeable, so only the client the worldserver
-    // announced for this slot may use it, and only with the key of the session
-    if (NormalizeVoiceClientAddress(sender.address()) != member->ClientAddress)
-        return false;
-
-    if (!channel->HasValidSignature(packet))
-        return false;
+    world = channel->GetWorld();
 
     // the client only announces itself when it first talks to a voiceserver and
     // after 10 seconds without sending, so a member that keeps talking is never

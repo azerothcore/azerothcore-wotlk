@@ -50,13 +50,14 @@ public:
     // hooks, see VoiceScript
     void OnStartup(Acore::Asio::IoContext& ioContext);
     void OnShutdown();
-    void OnChannelCreated(uint16 channelId, VoiceChatChannelType type);
-    void OnChannelDeleted(uint16 channelId);
-    void OnMemberAdded(uint16 channelId, uint8 userId, VoiceChannelMember const& member);
-    void OnMemberRemoved(uint16 channelId, uint8 userId);
-    void OnMemberStateChanged(uint16 channelId, uint8 userId, bool voiced, bool muted);
-    void OnClientHandshake(uint16 channelId, uint8 userId, boost::asio::ip::udp::endpoint const& endpoint);
-    void OnVoicePacket(uint16 channelId, uint8 userId, std::span<uint8 const> payload);
+    void OnChannelCreated(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type);
+    void OnChannelDeleted(VoiceWorldLink const& world, uint16 channelId);
+    void OnMemberAdded(VoiceWorldLink const& world, uint16 channelId, uint8 userId, VoiceChannelMember const& member);
+    void OnMemberRemoved(VoiceWorldLink const& world, uint16 channelId, uint8 userId);
+    void OnMemberStateChanged(VoiceWorldLink const& world, uint16 channelId, uint8 userId, bool voiced, bool muted);
+    void OnClientHandshake(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
+        boost::asio::ip::udp::endpoint const& endpoint);
+    void OnVoicePacket(VoiceWorldLink const& world, uint16 channelId, uint8 userId, std::span<uint8 const> payload);
     void OnWorldMessage(VoiceWorldLink const& link, std::string const& tag, ByteBuffer& data);
 
 private:

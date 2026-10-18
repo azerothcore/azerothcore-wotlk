@@ -22,26 +22,34 @@
 #include "Timer.h"
 #include "VoiceChatSharedDefines.h"
 #include "VoiceScriptMgr.h"
+#include <atomic>
+
+namespace
+{
+    // starts at 1, VoiceWorldLink ids of 0 belong to no connection
+    std::atomic<uint32> NextWorldId{ 1 };
+}
 
 InternalSession::InternalSession(IoContextTcpSocket&& socket) : TcpSocket(std::move(socket)),
-    _lastPacketReceiveTime(getMSTime())
+    _worldId(NextWorldId++), _lastPacketReceiveTime(getMSTime())
 {
     _headerBuffer.Resize(sizeof(VoiceChatServerPktHeader));
 }
 
 void InternalSession::Start()
 {
-    LOG_INFO("voice-chat", "Accepted worldserver connection from {}", GetRemoteIpAddress().to_string());
+    LOG_INFO("voice-chat", "Accepted worldserver #{} connection from {}", _worldId,
+        GetRemoteIpAddress().to_string());
 
     AsyncRead();
 }
 
 void InternalSession::OnClose()
 {
-    LOG_INFO("voice-chat", "Worldserver connection from {} closed", GetRemoteIpAddress().to_string());
+    LOG_INFO("voice-chat", "Worldserver #{} connection from {} closed", _worldId, GetRemoteIpAddress().to_string());
 
     // drop everything the disconnected worldserver owned
-    sChannelMgr.RemoveChannelsFor(this);
+    sChannelMgr.RemoveChannelsFor(GetWorldLink());
 }
 
 bool InternalSession::Update()
@@ -188,7 +196,7 @@ void InternalSession::HandleCreateVoiceSession(VoiceChatServerPacket& packet)
     packet.read(sessionKey);
 
     bool const created = type < static_cast<uint8>(VoiceChatChannelType::Max)
-        && sChannelMgr.CreateChannel(this, channelId, static_cast<VoiceChatChannelType>(type), sessionKey);
+        && sChannelMgr.CreateChannel(GetWorldLink(), channelId, static_cast<VoiceChatChannelType>(type), sessionKey);
 
     VoiceChatServerPacket data(VoiceChatServerOpcodes::SMSG_CREATE_VOICE_SESSION_RESPONSE, 3);
     data << channelId;
@@ -201,7 +209,7 @@ void InternalSession::HandleDeleteVoiceSession(VoiceChatServerPacket& packet)
     uint16 channelId;
     packet >> channelId;
 
-    sChannelMgr.DeleteChannel(this, channelId);
+    sChannelMgr.DeleteChannel(GetWorldLink(), channelId);
 }
 
 void InternalSession::HandleAddMember(VoiceChatServerPacket& packet)
@@ -226,7 +234,7 @@ void InternalSession::HandleAddMember(VoiceChatServerPacket& packet)
         return;
     }
 
-    sChannelMgr.AddMember(this, channelId, userId, member);
+    sChannelMgr.AddMember(GetWorldLink(), channelId, userId, member);
 }
 
 void InternalSession::HandleRemoveMember(VoiceChatServerPacket& packet)
@@ -236,7 +244,7 @@ void InternalSession::HandleRemoveMember(VoiceChatServerPacket& packet)
     packet >> channelId;
     packet >> userId;
 
-    sChannelMgr.RemoveMember(this, channelId, userId);
+    sChannelMgr.RemoveMember(GetWorldLink(), channelId, userId);
 }
 
 void InternalSession::HandleVoiceMember(VoiceChatServerPacket& packet)
@@ -246,7 +254,7 @@ void InternalSession::HandleVoiceMember(VoiceChatServerPacket& packet)
     packet >> channelId;
     packet >> userId;
 
-    sChannelMgr.VoiceMember(this, channelId, userId);
+    sChannelMgr.VoiceMember(GetWorldLink(), channelId, userId);
 }
 
 void InternalSession::HandleDevoiceMember(VoiceChatServerPacket& packet)
@@ -256,7 +264,7 @@ void InternalSession::HandleDevoiceMember(VoiceChatServerPacket& packet)
     packet >> channelId;
     packet >> userId;
 
-    sChannelMgr.DevoiceMember(this, channelId, userId);
+    sChannelMgr.DevoiceMember(GetWorldLink(), channelId, userId);
 }
 
 void InternalSession::HandleMuteMember(VoiceChatServerPacket& packet)
@@ -266,7 +274,7 @@ void InternalSession::HandleMuteMember(VoiceChatServerPacket& packet)
     packet >> channelId;
     packet >> userId;
 
-    sChannelMgr.MuteMember(this, channelId, userId);
+    sChannelMgr.MuteMember(GetWorldLink(), channelId, userId);
 }
 
 void InternalSession::HandleUnmuteMember(VoiceChatServerPacket& packet)
@@ -276,7 +284,7 @@ void InternalSession::HandleUnmuteMember(VoiceChatServerPacket& packet)
     packet >> channelId;
     packet >> userId;
 
-    sChannelMgr.UnmuteMember(this, channelId, userId);
+    sChannelMgr.UnmuteMember(GetWorldLink(), channelId, userId);
 }
 
 void InternalSession::HandleModuleMessage(VoiceChatServerPacket& packet)
@@ -285,5 +293,5 @@ void InternalSession::HandleModuleMessage(VoiceChatServerPacket& packet)
     ByteBuffer data;
     ReadVoiceChatModuleMessage(packet, tag, data);
 
-    sVoiceScriptMgr->OnWorldMessage(VoiceWorldLink(weak_from_this()), tag, data);
+    sVoiceScriptMgr->OnWorldMessage(GetWorldLink(), tag, data);
 }

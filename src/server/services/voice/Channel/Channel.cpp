@@ -43,9 +43,9 @@ namespace
     }
 }
 
-VoiceChannel::VoiceChannel(uint16 channelId, VoiceChatChannelType type, VoiceChatSessionKey const& sessionKey,
-    InternalSession const* owner)
-    : _channelId(channelId), _type(type), _sessionKey(sessionKey), _owner(owner),
+VoiceChannel::VoiceChannel(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type,
+    VoiceChatSessionKey const& sessionKey)
+    : _world(world), _channelId(channelId), _type(type), _sessionKey(sessionKey),
     _maxMembers(GetMaxMembersForType(type))
 {
 }

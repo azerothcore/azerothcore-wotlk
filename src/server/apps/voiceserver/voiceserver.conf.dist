@@ -61,7 +61,8 @@ ClientMaxPacketsPerSecond = 50
 
 #
 #    InternalPort
-#        Description: TCP port the worldserver connects to.
+#        Description: TCP port the worldserver connects to. Several worldservers (realms) may
+#                     connect, the voice channels of each are kept apart.
 #        Important:   Must match the worldserver "VoiceChat.ServerPort" setting.
 #        Default:     3725
 

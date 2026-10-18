@@ -26,21 +26,25 @@
 void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoint const& remoteEndpoint)
 {
     UdpSocketPacketHeader const& header = packet.GetHeader();
+    // the worldserver of the sender's channel
+    VoiceWorldLink world;
 
     // a header-only datagram announces the endpoint the client will be
     // sending voice data from
     if (packet.GetDataLength() == sizeof(UdpSocketPacketHeader))
     {
-        if (sChannelMgr.HandleClientHandshake(packet, remoteEndpoint))
+        if (sChannelMgr.HandleClientHandshake(packet, remoteEndpoint, world))
         {
-            LOG_DEBUG("voice-chat", "Client {}:{} announced itself for channel {} member {}",
-                remoteEndpoint.address().to_string(), remoteEndpoint.port(), header.channelId, header.userId);
+            LOG_DEBUG("voice-chat", "Client {}:{} announced itself for channel {} of worldserver #{} member {}",
+                remoteEndpoint.address().to_string(), remoteEndpoint.port(), header.channelId, world.GetId(),
+                header.userId);
 
-            sVoiceScriptMgr->OnClientHandshake(header.channelId, header.userId, remoteEndpoint);
+            sVoiceScriptMgr->OnClientHandshake(world, header.channelId, header.userId, remoteEndpoint);
         }
         else
         {
-            LOG_DEBUG("voice-chat", "Client {}:{} sent handshake for unknown channel {} member {}",
+            LOG_DEBUG("voice-chat",
+                "Client {}:{} sent handshake for channel {} member {}, no such member with its address and key",
                 remoteEndpoint.address().to_string(), remoteEndpoint.port(), header.channelId, header.userId);
         }
 
@@ -50,14 +54,16 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
     // relay the voice frame unchanged to all other voiced members
     std::vector<udp::endpoint> targets;
     bool announced = false;
-    bool const relay = sChannelMgr.GetRelayTargets(packet, remoteEndpoint, targets, announced);
+    bool const relay = sChannelMgr.GetRelayTargets(packet, remoteEndpoint, targets, announced, world);
 
     if (announced)
     {
-        LOG_DEBUG("voice-chat", "Client {}:{} announced itself for channel {} member {} by sending voice",
-            remoteEndpoint.address().to_string(), remoteEndpoint.port(), header.channelId, header.userId);
+        LOG_DEBUG("voice-chat",
+            "Client {}:{} announced itself for channel {} of worldserver #{} member {} by sending voice",
+            remoteEndpoint.address().to_string(), remoteEndpoint.port(), header.channelId, world.GetId(),
+            header.userId);
 
-        sVoiceScriptMgr->OnClientHandshake(header.channelId, header.userId, remoteEndpoint);
+        sVoiceScriptMgr->OnClientHandshake(world, header.channelId, header.userId, remoteEndpoint);
     }
 
     if (!relay)
@@ -66,7 +72,7 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
     for (udp::endpoint const& target : targets)
         SendTo(target, packet.GetData(), packet.GetDataLength());
 
-    sVoiceScriptMgr->OnVoicePacket(header.channelId, header.userId,
+    sVoiceScriptMgr->OnVoicePacket(world, header.channelId, header.userId,
         std::span<uint8 const>(packet.GetPayload(), packet.GetPayloadLength()));
 }
 

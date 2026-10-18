@@ -4912,7 +4912,8 @@ Respawn.ForceCompatibilityMode = 0
 #         Default: 3725
 #
 #    VoiceChat.ServerAddress
-#         IP that world server should use to connect to voice chat server
+#         IP that world server should use to connect to voice chat server. Several realms may
+#         share one voice chat server
 #         Default: 127.0.0.1
 #
 #    VoiceChat.VoicePort
