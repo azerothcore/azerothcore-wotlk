@@ -1722,28 +1722,23 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
 
     // School Immune check
     uint8 immunedMask = 0;
-    bool hasNonPhysicalSchoolMask = false;
-    for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-    {
-        if (damageInfo->target->IsImmunedToDamageOrSchool(SpellSchoolMask(damageInfo->damages[i].damageSchoolMask)))
-        {
-            immunedMask |= (1 << i);
-            if (damageInfo->damages[i].damageSchoolMask != SPELL_SCHOOL_MASK_NORMAL)
-            {
-                hasNonPhysicalSchoolMask = true;
-            }
-        }
-    }
+    float minDamage = 0.0f;
+    float maxDamage = 0.0f;
 
-    // School Immune check
-    if (immunedMask & ((1 << 0) | (1 << 1)))
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+        if (damageInfo->target->IsImmunedToDamageOrSchool(SpellSchoolMask(damageInfo->damages[i].damageSchoolMask)))
+            immunedMask |= (1 << i);
+
+    // Part 0 always carries attack power damage, so the swing can only be immune if part 0 is immune.
+    // Part 1 then blocks immunity only when it carries damage (0 for an empty slot and for creatures).
+    if (immunedMask & (1 << 0) && !(immunedMask & (1 << 1)))
+        CalculateMinMaxDamage(attackType, false, true, minDamage, maxDamage, 1);
+
+    if (immunedMask & (1 << 0) && (immunedMask & (1 << 1) || maxDamage <= 0))
     {
-        if (hasNonPhysicalSchoolMask || immunedMask == ((1 << 0) | (1 << 1)))
-        {
-            damageInfo->HitInfo |= HITINFO_NORMALSWING;
-            damageInfo->TargetState = VICTIMSTATE_IS_IMMUNE;
-            return;
-        }
+        damageInfo->HitInfo |= HITINFO_NORMALSWING;
+        damageInfo->TargetState = VICTIMSTATE_IS_IMMUNE;
+        return;
     }
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
