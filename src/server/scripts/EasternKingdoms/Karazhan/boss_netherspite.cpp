@@ -255,8 +255,24 @@ struct boss_netherspite : public BossAI
             return;
         }).Schedule(10s, BANISH_PHASE, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_NETHERBREATH, 0, 40.0f, true);
-            context.Repeat(5s, 7s);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
+            {
+                // root blocks SetInFront, so turn him by hand, the breath cone fires along his facing
+                float angle = me->GetAngle(target);
+                me->SetOrientation(angle);
+                me->SetFacingTo(angle);
+                DoCast(target, SPELL_NETHERBREATH);
+                scheduler.Schedule(3500ms, BANISH_PHASE, [this](TaskContext)
+                {
+                    if (Unit* victim = me->GetVictim())
+                    {
+                        float victimAngle = me->GetAngle(victim);
+                        me->SetOrientation(victimAngle);
+                        me->SetFacingTo(victimAngle);
+                    }
+                });
+            }
+            context.Repeat(5s);
         });
 
         for (uint8 i = 0; i < 3; ++i)
