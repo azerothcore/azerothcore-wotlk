@@ -1,3 +1,4 @@
+-- DB update 2026_10_17_03 -> 2026_10_19_00
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 66688 AND `ScriptName` = 'spell_icehowl_arctic_breath';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
