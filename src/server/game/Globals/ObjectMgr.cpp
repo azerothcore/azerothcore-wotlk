@@ -5132,6 +5132,26 @@ void ObjectMgr::LoadQuests()
         Field* fields = result->Fetch();
 
         Quest* newQuest = new Quest(fields);
+
+        // a choice reward with zero quantity would be shown to the player but never given
+        bool hasZeroCountChoice = false;
+        for (uint8 j = 0; j < QUEST_REWARD_CHOICES_COUNT; ++j)
+        {
+            if (newQuest->RewardChoiceItemId[j] && !newQuest->RewardChoiceItemCount[j])
+            {
+                LOG_ERROR("sql.sql",
+                    "Quest {} has `RewardChoiceItemId{}` = {} but `RewardChoiceItemCount{}` = 0, quest skipped.",
+                    newQuest->GetQuestId(), j + 1, newQuest->RewardChoiceItemId[j], j + 1);
+                hasZeroCountChoice = true;
+            }
+        }
+
+        if (hasZeroCountChoice)
+        {
+            delete newQuest;
+            continue;
+        }
+
         _questTemplates[newQuest->GetQuestId()] = newQuest;
     } while (result->NextRow());
 
@@ -5605,13 +5625,6 @@ void ObjectMgr::LoadQuests()
                     LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but item with entry {} does not exist, quest will not reward this item.",
                                      qinfo->GetQuestId(), j + 1, id, id);
                     qinfo->RewardChoiceItemId[j] = 0;          // no changes, quest will not reward this
-                }
-
-                if (!qinfo->RewardChoiceItemCount[j])
-                {
-                    LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but `RewardChoiceItemCount{}` = 0, quest can't be done.",
-                                     qinfo->GetQuestId(), j + 1, id, j + 1);
-                    // no changes, quest can't be done
                 }
             }
             else if (qinfo->RewardChoiceItemCount[j] > 0)
@@ -7571,13 +7584,27 @@ AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 
 void ObjectMgr::SetHighestGuids()
 {
-    QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Player>().Set((*result)[0].Get<uint32>() + 1);
+    // Refuse to start once the next guid would already trip ObjectGuidGenerator's overflow check. At the cap,
+    // MAX(guid) + 1 wraps to 0 and the cleanup below deletes every item relation.
+    auto setNextGuid = [](ObjectGuidGeneratorBase& generator, HighGuid high, char const* table)
+    {
+        QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM {}", table);
+        if (!result)
+            return;
 
-    result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Item>().Set((*result)[0].Get<uint32>() + 1);
+        uint32 maxGuid = (*result)[0].Get<uint32>();
+        if (maxGuid >= ObjectGuid::GetMaxCounter(high) - 2)
+        {
+            LOG_FATAL("server.loading", "{} guid space is exhausted (MAX(guid) in `{}` is {}). Renumber the guids before starting the server.",
+                ObjectGuid::GetTypeName(high), table, maxGuid);
+            exit(1);
+        }
+
+        generator.Set(maxGuid + 1);
+    };
+
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Player>(), HighGuid::Player, "characters");
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Item>(), HighGuid::Item, "item_instance");
 
     // Cleanup other tables from not existed guids ( >= _hiItemGuid)
     CharacterDatabase.Execute("DELETE FROM character_inventory WHERE item >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());     // One-time query
@@ -7585,7 +7612,7 @@ void ObjectMgr::SetHighestGuids()
     CharacterDatabase.Execute("DELETE FROM auctionhouse WHERE itemguid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
     CharacterDatabase.Execute("DELETE FROM guild_bank_item WHERE item_guid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
 
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
+    QueryResult result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
         GetGuidSequenceGenerator<HighGuid::Mo_Transport>().Set((*result)[0].Get<uint32>() + 1);
 
@@ -9554,10 +9581,26 @@ bool ObjectMgr::LoadAcoreStrings()
     uint32 oldMSTime = getMSTime();
 
     _acoreStringStore.clear(); // for reload case
-    QueryResult result = WorldDatabase.Query("SELECT entry, content_default, locale_koKR, locale_frFR, locale_deDE, locale_zhCN, locale_zhTW, locale_esES, locale_esMX, locale_ruRU FROM acore_string");
+
+    // content_default holds enUS. A locale registered by a module needs its own locale_<code> column.
+    std::string sql = "SELECT entry, content_default";
+    std::vector<LocaleConstant> columnLocales; // locale of fields[2 + k]
+    for (uint8 i = LOCALE_koKR; i < TOTAL_LOCALES; ++i)
+    {
+        if (!IsLocaleRegistered(LocaleConstant(i)))
+            continue;
+
+        sql += ", locale_";
+        sql += localeNames[i];
+        columnLocales.push_back(LocaleConstant(i));
+    }
+    sql += " FROM acore_string";
+
+    QueryResult result = WorldDatabase.Query(sql);
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_string` is empty "
+            "or a locale column is missing; queried: {}", sql);
         LOG_INFO("server.loading", " ");
         return false;
     }
@@ -9572,8 +9615,9 @@ bool ObjectMgr::LoadAcoreStrings()
 
         data.Content.resize(DEFAULT_LOCALE + 1);
 
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
-            AddLocaleString(fields[i + 1].Get<std::string>(), LocaleConstant(i), data.Content);
+        AddLocaleString(fields[1].Get<std::string>(), DEFAULT_LOCALE, data.Content);
+        for (std::size_t k = 0; k < columnLocales.size(); ++k)
+            AddLocaleString(fields[2 + k].Get<std::string>(), columnLocales[k], data.Content);
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Acore Strings in {} ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));

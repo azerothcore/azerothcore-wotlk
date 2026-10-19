@@ -163,6 +163,7 @@ public: /* ServerScript */
 
 public: /* SessionScript */
     void OnSessionUpdate(WorldSession* session, uint32 diff);
+    bool OnWardenCheckExpectedResult(WorldSession* session, WardenCheck const& check, std::vector<uint8>& expected);
 
 public: /* WorldScript */
     void OnLoadCustomDatabaseTable();
