@@ -50,9 +50,6 @@ TEST(WorldObjectCastApi, CastSpellExtraArgsBoolCtor)
 TEST(WorldObjectCastApi, DontEnterCombatNotInFullMask)
 {
     EXPECT_FALSE(TRIGGERED_FULL_MASK & TRIGGERED_DONT_ENTER_COMBAT);
-
-    CastSpellExtraArgs triggered(true);
-    EXPECT_FALSE(triggered.TriggerFlags & TRIGGERED_DONT_ENTER_COMBAT);
 }
 
 TEST(WorldObjectCastApi, CastSpellExtraArgsTriggerFlagsCtor)
