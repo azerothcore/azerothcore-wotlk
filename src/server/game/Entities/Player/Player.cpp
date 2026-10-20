@@ -15517,7 +15517,7 @@ void Player::ActivateSpec(uint8 spec)
     if (GetActiveSpec() == spec)
         return;
 
-    if (spec > GetSpecsCount())
+    if (spec >= GetSpecsCount())
         return;
 
     // xinef: interrupt currently casted spell just in case
