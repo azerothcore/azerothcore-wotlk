@@ -54,9 +54,9 @@ bool ScriptMgr::CanSaveArenaStatsForMember(ArenaTeam* team, ObjectGuid playerGui
     CALL_ENABLED_BOOLEAN_HOOKS(ArenaScript, ARENAHOOK_CAN_SAVE_ARENA_STATS_FOR_MEMBER, !script->CanSaveArenaStatsForMember(team, playerGuid));
 }
 
-void ScriptMgr::OnGetStartPersonalRating(ArenaTeam* team, ObjectGuid playerGuid, uint32& personalRating)
+void ScriptMgr::OnAddMember(ArenaTeam* team, ArenaTeamMember& member)
 {
-    CALL_ENABLED_HOOKS(ArenaScript, ARENAHOOK_ON_GET_START_PERSONAL_RATING, script->OnGetStartPersonalRating(team, playerGuid, personalRating));
+    CALL_ENABLED_HOOKS(ArenaScript, ARENAHOOK_ON_ADD_MEMBER, script->OnAddMember(team, member));
 }
 
 ArenaScript::ArenaScript(char const* name, std::vector<uint16> enabledHooks)

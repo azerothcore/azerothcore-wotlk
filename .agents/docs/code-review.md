@@ -14,7 +14,9 @@ line, not as background reading.
 - Review codestyle on every changed line, even when style is not the change's subject. Run both
   linters and report violations as findings: `python apps/codestyle/codestyle-cpp.py` and
   `python apps/codestyle/codestyle-sql.py`.
-- Title and description follow the [commit message guidelines](https://www.azerothcore.org/wiki/commit-message-guidelines).
+- Title and description follow the [commit message guidelines](https://www.azerothcore.org/wiki/commit-message-guidelines):
+  the title says what the change does, in the imperative (`Correct X loot`); the symptom belongs in
+  the description, not the title.
 - Prefer data over code: when a C++ or script change is also achievable through world DB data
   (SmartAI, conditions, templates), flag the DB-only alternative (see `cpp-scripts.md`).
 - Never take a claim as fact, neither the PR description's nor a comment's. Verify game-data
@@ -26,10 +28,10 @@ line, not as background reading.
   call leaves a null result, not just what enables it.
 - Check the change is still needed against current `master`: the surrounding code may have moved,
   or another change may have landed the same fix.
-- On an existing PR, walk every discussion item one by one: what was raised, whether it was
-  answered, and whether it still applies to the current head. Never skip one because it looks
-  resolved, old, or minor; this walk overrides any read-comments-lightly default of the reviewing
-  skill. `gh pr view` misses review bodies and inline threads; pull all three:
+- On an existing PR, walk every discussion item one by one, bot reviews included: what was raised,
+  whether it was answered, and whether it still applies to the current head. Never skip one
+  because it looks resolved, old, or minor; this walk overrides any read-comments-lightly default
+  of the reviewing skill. `gh pr view` misses review bodies and inline threads; pull all three:
 
   ```
   gh api repos/azerothcore/azerothcore-wotlk/issues/<N>/comments --paginate  # conversation comments

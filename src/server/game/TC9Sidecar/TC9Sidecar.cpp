@@ -44,6 +44,71 @@ ToCloud9Sidecar::ToCloud9Sidecar() : _clusterModeEnabled(false), _isCrossrealm(f
 {
 }
 
+bool ToCloud9Sidecar::CheckLibsidecarAbi()
+{
+    if (!sConfigMgr->GetOption<bool>("Cluster.Enabled", false))
+        return true;
+
+    int libMajor = 0;
+    int libMinor = 0;
+    int libPatch = 0;
+    TC9GetVersion(&libMajor, &libMinor, &libPatch);
+    char const* libVersionStr = TC9GetVersionString();
+
+#if defined(TC9_LIBSIDECAR_IS_STUB)
+    char const* libKind = "stub";
+#else
+    char const* libKind = "shared library";
+#endif
+
+#if defined(TC9_LIBSIDECAR_IS_STUB)
+    // Stub always "matches" its own macros; fail here instead of after the realm
+    // is online when TC9InitLib panics.
+    // SetSynchronous first: this runs before the io_context pool starts, so async
+    // LOG_* would never print on early return. Success path leaves async alone.
+    sLog->SetSynchronous();
+    LOG_INFO("server", "libsidecar ({}) runtime {}.{}.{} ({}) - headers {}.{}.{} ({})",
+        libKind,
+        libMajor, libMinor, libPatch,
+        libVersionStr ? libVersionStr : "?",
+        TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH,
+        TC9_VERSION_STRING);
+    LOG_ERROR("server",
+        "Cluster.Enabled requires the real libsidecar shared library. "
+        "This worldserver was built with the stub (default). "
+        "Rebuild with -DUSE_REAL_LIBSIDECAR=ON and place matching headers + library "
+        "from the same libsidecar release under deps/libsidecar.");
+    return false;
+#else
+    if (TC9CheckAbiCompatible(TC9_VERSION_MAJOR, TC9_VERSION_MINOR) != 0)
+    {
+        sLog->SetSynchronous();
+        LOG_INFO("server", "libsidecar ({}) runtime {}.{}.{} ({}) - headers {}.{}.{} ({})",
+            libKind,
+            libMajor, libMinor, libPatch,
+            libVersionStr ? libVersionStr : "?",
+            TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH,
+            TC9_VERSION_STRING);
+        LOG_ERROR("server",
+            "libsidecar ABI mismatch: worldserver was built for {}.{}.{} (headers {}), "
+            "but loaded library is {}.{}.{} ({}). "
+            "Copy matching headers + library from the same libsidecar build/release.",
+            TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH, TC9_VERSION_STRING,
+            libMajor, libMinor, libPatch,
+            libVersionStr ? libVersionStr : "?");
+        return false;
+    }
+
+    LOG_INFO("server", "libsidecar ({}) runtime {}.{}.{} ({}) - headers {}.{}.{} ({})",
+        libKind,
+        libMajor, libMinor, libPatch,
+        libVersionStr ? libVersionStr : "?",
+        TC9_VERSION_MAJOR, TC9_VERSION_MINOR, TC9_VERSION_PATCH,
+        TC9_VERSION_STRING);
+    return true;
+#endif
+}
+
 void ToCloud9Sidecar::Init(uint16 port, int realmId)
 {
     _clusterModeEnabled = sConfigMgr->GetOption<bool>("Cluster.Enabled", false);
@@ -148,14 +213,14 @@ bool ToCloud9Sidecar::IsMapAssigned(uint32 mapId)
     return _assignedMapsByID[mapId];
 }
 
-uint32 ToCloud9Sidecar::GenerateCharacterGuid(uint16 realmId)
+uint64 ToCloud9Sidecar::GenerateCharacterGuid(uint16 realmId)
 {
-    return uint32(TC9GetNextAvailableCharacterGuid(realmId));
+    return TC9GetNextAvailableCharacterGuid(realmId);
 }
 
-uint32 ToCloud9Sidecar::GenerateItemGuid(uint16 realmId)
+uint64 ToCloud9Sidecar::GenerateItemGuid(uint16 realmId)
 {
-    return uint32(TC9GetNextAvailableItemGuid(realmId));
+    return TC9GetNextAvailableItemGuid(realmId);
 }
 
 uint32 ToCloud9Sidecar::GenerateInstanceGuid(uint16 realmId)

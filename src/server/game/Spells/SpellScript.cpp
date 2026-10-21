@@ -400,7 +400,12 @@ bool SpellScript::IsInEffectHook() const
 
 Unit* SpellScript::GetCaster()
 {
-    return m_spell->GetCaster();
+    return m_spell->GetCaster()->ToUnit();
+}
+
+GameObject* SpellScript::GetGObjCaster()
+{
+    return m_spell->GetCaster()->ToGameObject();
 }
 
 Unit* SpellScript::GetOriginalCaster()
@@ -1035,6 +1040,13 @@ ObjectGuid AuraScript::GetCasterGUID() const
 Unit* AuraScript::GetCaster() const
 {
     return m_aura->GetCaster();
+}
+
+GameObject* AuraScript::GetGObjCaster() const
+{
+    if (WorldObject* caster = m_aura->GetCaster())
+        return caster->ToGameObject();
+    return nullptr;
 }
 
 WorldObject* AuraScript::GetOwner() const

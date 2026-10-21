@@ -51,6 +51,12 @@ enum EvadeState : uint8
  * To put two units in combat with each other, call SetInCombatWith. Note that this is not guaranteed to succeed.                                       *
  *  - The return value of SetInCombatWith is the new combat state between the units (identical to calling IsInCombatWith at that time).                 *
  *                                                                                                                                                      *
+ * PvP combat references time out PVP_COMBAT_TIMEOUT after the last PvP interaction between the two units.                                              *
+ *  - When a unit dies, its PvP references are suppressed on its own side and their timers restarted (RestartPvPCombatTimers),                          *
+ *    so its enemies leave combat a full PVP_COMBAT_TIMEOUT after the death - or earlier, when the dead unit leaves the world                           *
+ *    (e.g. a non-hunter pet is removed right after dying), since references never outlive a unit in the world.                                         *
+ *  - SetInCombatWith never refreshes a PvP reference while either unit is dead.                                                                        *
+ *                                                                                                                                                      *
  * Note that (threat => combat) is a strong guarantee provided in conjunction with ThreatManager. Thus:                                                 *
  *  - Ending combat between two units will also delete any threat references that may exist between them.                                               *
  *  - Adding threat will also create a combat reference between the units if one doesn't exist yet.                                                     *
@@ -141,6 +147,8 @@ public:
     void EndCombatBeyondRange(float range, bool includingPvP = false);
     // flags any pvp refs for suppression on owner's side - these refs will not generate combat until refreshed
     void SuppressPvPCombat();
+    // gives every unit in pvp combat with the owner a full PVP_COMBAT_TIMEOUT from now (used when the owner dies)
+    void RestartPvPCombatTimers();
     void EndAllPvECombat();
     void RevalidateCombat();
     void EndAllPvPCombat();

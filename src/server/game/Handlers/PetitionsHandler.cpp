@@ -494,6 +494,8 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
             break;
         }
 
+    sScriptMgr->OnPlayerBeforePetitionSign(_player, petitionGuid, found);
+
     if (found)
     {
         WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));

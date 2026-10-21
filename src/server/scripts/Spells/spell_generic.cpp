@@ -329,9 +329,15 @@ class spell_gen_mine_sweeper : public SpellScript
 
     void HandleSchoolDMG(SpellEffIndex  /*effIndex*/)
     {
-        Unit* caster = GetCaster();
         Player* target = GetHitPlayer();
         if (!target)
+            return;
+
+        // land mines are gameobject casters - knock the player back from the mine itself
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
+        if (!caster)
             return;
 
         target->RemoveAurasByType(SPELL_AURA_MOUNTED);
@@ -622,11 +628,18 @@ class spell_gen_rallying_cry_of_the_dragonslayer : public SpellScript
     {
         targets.clear();
 
+        // can be cast by a unit (head turn-in npcs) or by the Rallying Call trap gameobject
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
+        if (!caster)
+            return;
+
         uint32 zoneId = AREA_STORMWIND_CITY;
-        if (GetCaster()->GetMapId() == MAP_KALIMDOR)
+        if (caster->GetMapId() == MAP_KALIMDOR)
             zoneId = AREA_ORGRIMMAR;
 
-        Map::PlayerList const& pList = GetCaster()->GetMap()->GetPlayers();
+        Map::PlayerList const& pList = caster->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
             if (itr->GetSource()->GetZoneId() == zoneId)
                 targets.push_back(itr->GetSource());
@@ -1077,10 +1090,17 @@ class spell_gen_random_target32 : public SpellScript
 
     void ModDest(SpellDestination& dest)
     {
-        float dist = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
+        // can be cast by a unit (21809) or by the Warpwood Pod trap gameobjects (22803/22821)
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
+        if (!caster)
+            return;
+
+        float dist = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(caster);
         float angle = frand(0.0f, 2 * M_PI);
 
-        Position pos = GetCaster()->GetNearPosition(dist, angle);
+        Position pos = caster->GetNearPosition(dist, angle);
         dest.Relocate(pos);
     }
 
@@ -2441,8 +2461,10 @@ class spell_gen_seaforium_blast : public SpellScript
 
     bool Load() override
     {
-        // OriginalCaster is always available in Spell::prepare
-        return GetOriginalCaster()->IsPlayer();
+        // cast by the player-summoned charge gameobject - check the owner guid without
+        // resolving it, the owner may be gone by the time the fuse runs out
+        GameObject* go = GetGObjCaster();
+        return go && go->GetOwnerGUID().IsPlayer();
     }
 
     void AchievementCredit(SpellEffIndex /*effIndex*/)
@@ -2555,7 +2577,8 @@ class spell_gen_allow_cast_from_item_only : public SpellScript
 
 enum VehicleScaling
 {
-    SPELL_GEAR_SCALING      = 66668
+    SPELL_GEAR_SCALING        = 66668,
+    SPELL_GEAR_SCALING_ULDUAR = 65266,
 };
 
 // 65266, 65635, 65636, 66666, 66667, 66668 - Gear Scaling
@@ -2592,26 +2615,35 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
     {
         Player* player = GetCaster()->ToPlayer();
 
+        float factor;
+        uint16 baseItemLevel;
+
         /// @todo Reserach coeffs for different vehicles
         switch (GetId())
         {
-            case SPELL_GEAR_SCALING:
-            {
-                float avgILvl = player->GetAverageItemLevel();
-                if (avgILvl < 205.0f)
-                    return;
-
-                amount = static_cast<int32>(avgILvl - 205.0f);
-                break;
-            }
-            default:
+            case SPELL_GEAR_SCALING_ULDUAR:
             {
                 float totalILvl = player->GetTotalItemLevel();
-                float result = (totalILvl - 2500.0f) / 5.0f / 100.0f;
-                amount = static_cast<int32>(std::max(0.1f, result));
-                break;
+                float scaling = (totalILvl - 2500.0f) / 5.0f / 100.0f;
+                scaling = std::max(0.1f, scaling);
+                amount = static_cast<int32>(std::round((scaling - 1.0f) * 100.0f));
+                return;
             }
+            case SPELL_GEAR_SCALING:
+                factor = 1.0f;
+                baseItemLevel = 205;
+                break;
+            default:
+                factor = 1.0f;
+                baseItemLevel = 170;
+                break;
         }
+
+        float avgILvl = player->GetAverageItemLevel();
+        if (avgILvl < baseItemLevel)
+            return;                     /// @todo Research possibility of scaling down
+
+        amount = uint16((avgILvl - baseItemLevel) * factor);
     }
 
     void Register() override

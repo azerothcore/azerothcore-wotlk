@@ -43,8 +43,8 @@
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 
-Roll::Roll(ObjectGuid _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
-    itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
+Roll::Roll(ObjectGuid _guid, LootItem const& li, bool _lootedInRaid) : itemGUID(_guid), itemid(li.itemid),
+    itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count), lootedInRaid(_lootedInRaid),
     totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0),
     rollVoteMask(ROLL_ALL_TYPE_NO_DISENCHANT)
 {
@@ -96,6 +96,23 @@ static void SendRollWonItemViaMail(Player* player, LootItem const* lootItem, uin
     }
 
     player->SendItemRetrievalMail(mailItem);
+}
+
+static bool ShouldMailRollWonItem(Group const* group, Roll const* roll, InventoryResult msg)
+{
+    // Only mail when bags are genuinely full. Unique/max-count failures must
+    // leave the item on the corpse so it can be re-rolled or freely looted.
+    if (msg != EQUIP_ERR_INVENTORY_FULL)
+        return false;
+
+    uint32 mask = sWorld->getIntConfig(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY);
+    if (mask & MAIL_ITEM_ON_FULL_INVENTORY_FLAG_ALL_GROUPS)
+        return true;
+
+    if ((mask & MAIL_ITEM_ON_FULL_INVENTORY_FLAG_LFG) && group->isLFGGroup())
+        return true;
+
+    return (mask & MAIL_ITEM_ON_FULL_INVENTORY_FLAG_RAID) && roll->lootedInRaid;
 }
 
 Group::Group() : m_leaderName(""), m_groupType(GROUPTYPE_NORMAL),
@@ -385,19 +402,21 @@ bool Group::AddLeaderInvite(Player* player)
 
 void Group::RemoveInvite(Player* player)
 {
-    if (player)
-    {
-        if (!m_invitees.empty())
-            m_invitees.erase(player);
+    if (!player)
+        return;
+
+    m_invitees.erase(player);
+
+    // Clear pending invite from current group, Keep an invite from another group.
+    if (player->GetGroupInvite() == this)
         player->SetGroupInvite(nullptr);
-    }
 }
 
 void Group::RemoveAllInvites()
 {
-    for (InvitesList::iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
-        if (*itr)
-            (*itr)->SetGroupInvite(nullptr);
+    for (Player* invitee : m_invitees)
+        if (invitee && invitee->GetGroupInvite() == this)
+            invitee->SetGroupInvite(nullptr);
 
     m_invitees.clear();
 }
@@ -460,7 +479,10 @@ bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
 
     SubGroupCounterIncrease(subGroup);
 
-    player->SetGroupInvite(nullptr);
+    // The inviting group keeps a raw Player* that would dangle once the player logs out
+    if (Group* invitingGroup = player->GetGroupInvite())
+        invitingGroup->RemoveInvite(player);
+
     if (player->GetGroup())
     {
         if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
@@ -803,6 +825,7 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
         oldLeader->RemovePlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
 
     newLeader->SetPlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
+    ObjectGuid const oldLeaderGuid = m_leaderGuid;
     m_leaderGuid = newLeader->GetGUID();
     m_leaderName = newLeader->GetName();
     ToggleGroupMemberFlag(slot, MEMBER_FLAG_ASSISTANT, false);
@@ -811,7 +834,7 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
     data << slot->name;
     BroadcastPacket(&data, true);
 
-    sScriptMgr->OnGroupChangeLeader(this, newLeaderGuid, m_leaderGuid); // This hook should be executed at the end - Not used anywhere in the original core
+    sScriptMgr->OnGroupChangeLeader(this, newLeaderGuid, oldLeaderGuid); // This hook should be executed at the end
 }
 
 void Group::ForcedDisband(bool hideDestroy /* = false */)
@@ -1138,7 +1161,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
         if (item->Quality >= uint32(m_lootThreshold))
         {
             ObjectGuid newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
-            Roll* r = new Roll(newitemGUID, *i);
+            Roll* r = new Roll(newitemGUID, *i, pLootedObject->GetMap()->IsRaid());
 
             //a vector is filled with only near party members
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -1228,7 +1251,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
         }
 
         ObjectGuid newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
-        Roll* r = new Roll(newitemGUID, *i);
+        Roll* r = new Roll(newitemGUID, *i, pLootedObject->GetMap()->IsRaid());
 
         //a vector is filled with only near party members
         for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -1297,7 +1320,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
         if (item->Quality >= uint32(m_lootThreshold))
         {
             ObjectGuid newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
-            Roll* r = new Roll(newitemGUID, *i);
+            Roll* r = new Roll(newitemGUID, *i, lootedObject->GetMap()->IsRaid());
 
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
             {
@@ -1376,7 +1399,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
 
         item = sObjectMgr->GetItemTemplate(i->itemid);
         ObjectGuid newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
-        Roll* r = new Roll(newitemGUID, *i);
+        Roll* r = new Roll(newitemGUID, *i, lootedObject->GetMap()->IsRaid());
 
         for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
         {
@@ -1548,7 +1571,18 @@ void Group::EndRoll(Loot* pLoot)
     {
         if ((*itr)->getLoot() == pLoot)
         {
-            CountTheRoll(itr);           //i don't have to edit player votes, who didn't vote ... he will pass
+            Roll* roll = *itr;
+            for (auto& [playerGuid, vote] : roll->playerVote)
+            {
+                if (vote != NOT_EMITED_YET)
+                    continue;
+
+                vote = PASS;
+                ++roll->totalPass;
+                SendLootRoll(roll->itemGUID, playerGuid, 128, ROLL_PASS, *roll);
+            }
+
+            CountTheRoll(itr);
             itr = RollId.begin();
         }
         else
@@ -1629,7 +1663,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
 
             if (maxguid) // pussywizard: added condition
             {
-                SendLootRollWon(ObjectGuid::Empty, maxguid, maxresul, ROLL_NEED, *roll);
+                SendLootRollWon(roll->itemGUID, maxguid, maxresul, ROLL_NEED, *roll);
                 player = ObjectAccessor::FindPlayer(maxguid);
 
                 if (player)
@@ -1652,10 +1686,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                     }
                     else
                     {
-                        uint32 mailOnFull = sWorld->getIntConfig(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY);
-                        // Only mail when bags are genuinely full. Unique/max-count failures must
-                        // leave the item on the corpse so it can be re-rolled or freely looted.
-                        if (msg == EQUIP_ERR_INVENTORY_FULL && (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE || (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY && isLFGGroup())))
+                        if (ShouldMailRollWonItem(this, roll, msg))
                         {
                             item->is_looted = true;
                             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
@@ -1710,7 +1741,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
 
             if (maxguid) // pussywizard: added condition
             {
-                SendLootRollWon(ObjectGuid::Empty, maxguid, maxresul, rollvote, *roll);
+                SendLootRollWon(roll->itemGUID, maxguid, maxresul, rollvote, *roll);
                 player = ObjectAccessor::FindPlayer(maxguid);
 
                 if (player)
@@ -1736,10 +1767,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                         }
                         else
                         {
-                            uint32 mailOnFull = sWorld->getIntConfig(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY);
-                            // Only mail when bags are genuinely full. Unique/max-count failures must
-                            // leave the item on the corpse so it can be re-rolled or freely looted.
-                            if (msg == EQUIP_ERR_INVENTORY_FULL && (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE || (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY && isLFGGroup())))
+                            if (ShouldMailRollWonItem(this, roll, msg))
                             {
                                 item->is_looted = true;
                                 roll->getLoot()->NotifyItemRemoved(roll->itemSlot);

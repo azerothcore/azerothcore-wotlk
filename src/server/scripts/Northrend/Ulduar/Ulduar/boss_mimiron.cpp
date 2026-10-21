@@ -69,6 +69,8 @@ enum SpellData
     SPELL_RAPID_BURST_DAMAGE_1                      = 63387,
     SPELL_RAPID_BURST_DAMAGE_2                      = 64019,
     SPELL_SUMMON_BURST_TARGET                       = 64840,
+    SPELL_RAPID_BURST_TARGET_ME                     = 64841,
+    NPC_BURST_TARGET                                = 34211,
 
     SPELL_SPINNING_UP                               = 63414,
 
@@ -152,6 +154,8 @@ enum HardMode
     SPELL_ENTER_VEHICLE_2                           = 63314,
     SPELL_ENTER_VEHICLE_4                           = 63316,
 };
+
+constexpr uint32 MIMIRON_MAX_ACTIVE_FLAMES = 75;
 
 enum EVENTS
 {
@@ -297,6 +301,7 @@ struct boss_mimiron : public BossAI
         _achievBombBot = false;
         _achievRocketStrike = false;
         _allowedFlameSpreadTime = 0;
+        _activeFlames.clear();
         _outOfCombatTimer = 0;
         _changeAllowedFlameSpreadTime = false;
         ResetGameObjects();
@@ -304,6 +309,21 @@ struct boss_mimiron : public BossAI
 
         if (!instance->IsBossDone(BOSS_MIMIRON))
             _Reset();
+    }
+
+    void RegisterFlame(ObjectGuid guid)
+    {
+        _activeFlames.push_back(guid);
+    }
+
+    void UnregisterFlame(ObjectGuid guid)
+    {
+        _activeFlames.remove(guid);
+    }
+
+    uint32 GetActiveFlameCount() const
+    {
+        return static_cast<uint32>(_activeFlames.size());
     }
 
     void AttackStart(Unit* who) override
@@ -354,13 +374,13 @@ struct boss_mimiron : public BossAI
         else
         {
             events.ScheduleEvent(EVENT_MIMIRON_SAY_HARDMODE, 7s);
-            events.ScheduleEvent(EVENT_BERSERK, Is25ManRaid() ? 10min : 8min);
+            events.ScheduleEvent(EVENT_BERSERK, 10min);
 
             if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
                 computer->AI()->Talk(TALK_COMPUTER_INITIATED);
 
             events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, 3s);
-            _minutesTalkNum = Is25ManRaid() ? TALK_COMPUTER_TEN : TALK_COMPUTER_EIGHT;
+            _minutesTalkNum = TALK_COMPUTER_TEN;
             for (uint32 i = 0; i < uint32(TALK_COMPUTER_ZERO - _minutesTalkNum - 1); ++i)
                 events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((i + 1) * 60000));
             events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((TALK_COMPUTER_ZERO - _minutesTalkNum) * 60000));
@@ -446,8 +466,6 @@ struct boss_mimiron : public BossAI
             case EVENT_BERSERK:
                 _berserk = true;
                 Talk(SAY_BERSERK);
-                if (_hardmode)
-                    me->SummonCreature(33576, 2744.78f, 2569.47f, 364.32f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 120000);
                 events.ScheduleEvent(EVENT_BERSERK_2, 0ms);
                 break;
             case EVENT_BERSERK_2:
@@ -737,7 +755,6 @@ struct boss_mimiron : public BossAI
                     me->GetMotionMaster()->Clear();
                     summons.DoAction(DO_DESPAWN_SUMMONS);
                     summons.DespawnEntry(NPC_FLAMES_INITIAL);
-                    summons.DespawnEntry(33576);
 
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
@@ -940,6 +957,7 @@ private:
     bool _changeAllowedFlameSpreadTime;
     uint8 _minutesTalkNum;
     uint32 _outOfCombatTimer;
+    GuidList _activeFlames;
 };
 
 struct npc_ulduar_leviathan_mkii : public ScriptedAI
@@ -1259,6 +1277,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
         _leftArm = false;
         me->SetRegeneratingHealth(false);
         _events.Reset();
+        scheduler.CancelAll();
     }
 
     void AttackStart(Unit* /*who*/) override {}
@@ -1370,6 +1389,8 @@ struct npc_ulduar_vx001 : public ScriptedAI
             return;
 
         _events.Update(diff);
+        // before the casting guard: the windup facing task must tick while Spinning Up channels
+        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -1399,12 +1420,11 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 }
                 break;
             case EVENT_SPELL_RAPID_BURST:
+                // 64840 parks a Burst Target where the player stands; the channel is aimed at it from SpellHit
+                // so the damage cones hold one line instead of following the player around
                 if (Player* p = SelectTargetFromPlayerList(80.0f))
-                {
-                    me->CastSpell(p, SPELL_RAPID_BURST, true);
-                    me->SetFacingToObject(p);
-                }
-                _events.Repeat(3200ms);
+                    DoCast(p, SPELL_SUMMON_BURST_TARGET);
+                _events.Repeat(3600ms);
                 break;
             case EVENT_HAND_PULSE:
                 if (Player* p = SelectTargetFromPlayerList(80.0f))
@@ -1438,7 +1458,18 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 if (Creature* dbTarget = instance->GetCreature(DATA_MIMIRON_DB_TARGET))
                     me->SetTarget(dbTarget->GetGUID());
                 FaceBarrageArc(me);
-                me->CastSpell(me, SPELL_SPINNING_UP, true);
+                // untargeted: conditions send EFFECT_0 to the DB Target (channel object, barrage
+                // chain) and EFFECT_1 to the MK II (self-cast 66490 root+pacify for the barrage)
+                me->CastSpell((Unit*)nullptr, SPELL_SPINNING_UP, true);
+                // the DB Target moves ~42 degrees during the windup; track it or the barrage opens off the telegraph
+                scheduler.Schedule(400ms, [this](TaskContext context)
+                {
+                    if (me->FindCurrentSpellBySpellId(SPELL_SPINNING_UP))
+                    {
+                        FaceBarrageArc(me);
+                        context.Repeat();
+                    }
+                });
                 if (Unit* vehicle = me->GetVehicleBase())
                 {
                     vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
@@ -1497,12 +1528,28 @@ struct npc_ulduar_vx001 : public ScriptedAI
             p->ToCreature()->DespawnOrUnsummon(8s);
     }
 
-    void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_BURST_TARGET)
+        {
+            // 64840 has no usable duration, so the aim point is despawned by hand: sniffs put its
+            // lifetime near 11s, which keeps three of them alive across a chain of volleys
+            summon->DespawnOrUnsummon(11s);
+            summon->CastSpell(me, SPELL_RAPID_BURST_TARGET_ME);
+        }
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_SELF_REPAIR)
         {
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetReactState(REACT_AGGRESSIVE);
+        }
+        else if (caster && spell->Id == SPELL_RAPID_BURST_TARGET_ME && !me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            me->SetFacingToObject(caster);
+            DoCast(caster, SPELL_RAPID_BURST, true);
         }
     }
 
@@ -1598,7 +1645,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
                 me->GetMotionMaster()->MoveFall();
                 me->SetHover(false);
-                _events.DelayEvents(25s);
+                _events.DelayEvents(23s);
                 break;
             case DO_ENABLE_AERIAL:
                 if (_isDefeated)
@@ -1670,7 +1717,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || me->HasAura(SPELL_MAGNETIC_CORE))
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             return;
 
         if (!UpdateVictim())
@@ -1713,7 +1760,8 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 break;
         }
 
-        DoSpellAttackIfReady(_phase == 3 ? SPELL_PLASMA_BALL_P1 : SPELL_PLASMA_BALL_P2);
+        if (!me->HasAura(SPELL_MAGNETIC_CORE))
+            DoSpellAttackIfReady(_phase == 3 ? SPELL_PLASMA_BALL_P1 : SPELL_PLASMA_BALL_P2);
     }
 
     void MoveInLineOfSight(Unit* /*mover*/) override {}
@@ -2137,7 +2185,8 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            uint32 id = (aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_2 : SPELL_RAPID_BURST_DAMAGE_1;
+            // The first tick of every volley fires 63387; the two barrels alternate from there
+            uint32 id = (aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_1 : SPELL_RAPID_BURST_DAMAGE_2;
             caster->CastSpell((Unit*)nullptr, id, true);
         }
     }
@@ -2213,11 +2262,14 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
         _createTime = GameTime::GetGameTime().count();
         _events.Reset();
         _events.ScheduleEvent(EVENT_FLAMES_SPREAD, 5750ms);
-        if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f))
-        {
-            _flameList.push_back(flame->GetGUID());
-            flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
-        }
+        if (boss_mimiron* mimironAI = GetMimironAI())
+            if (mimironAI->GetActiveFlameCount() < MIMIRON_MAX_ACTIVE_FLAMES)
+                if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f))
+                {
+                    _flameList.push_back(flame->GetGUID());
+                    mimironAI->RegisterFlame(flame->GetGUID());
+                    flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
+                }
     }
 
     void DoAction(int32 action) override
@@ -2228,23 +2280,36 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
 
     void SpreadFlame(float x, float y)
     {
-        if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, x, y, 364.32f, 0.0f))
-        {
-            _flameList.push_back(flame->GetGUID());
-            if (Creature* c = me->FindNearestCreature(NPC_FLAMES_SPREAD, 10.0f))
-                if (c->GetExactDist2d(flame->GetPositionX(), flame->GetPositionY()) <= 4.0f)
-                    return;
-            flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
-        }
+        if (boss_mimiron* mimironAI = GetMimironAI())
+            if (mimironAI->GetActiveFlameCount() < MIMIRON_MAX_ACTIVE_FLAMES)
+                if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, x, y, 364.32f, 0.0f))
+                {
+                    if (Creature* c = me->FindNearestCreature(NPC_FLAMES_SPREAD, 10.0f))
+                        if (c->GetExactDist2d(flame->GetPositionX(), flame->GetPositionY()) <= 4.0f)
+                        {
+                            flame->DespawnOrUnsummon();
+                            return;
+                        }
+
+                    _flameList.push_back(flame->GetGUID());
+                    mimironAI->RegisterFlame(flame->GetGUID());
+                    flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
+                }
     }
 
     void RemoveFlame(ObjectGuid guid)
     {
         _flameList.remove(guid);
+        if (boss_mimiron* mimironAI = GetMimironAI())
+            mimironAI->UnregisterFlame(guid);
     }
 
     void RemoveAll()
     {
+        if (boss_mimiron* mimironAI = GetMimironAI())
+            for (ObjectGuid const& guid : _flameList)
+                mimironAI->UnregisterFlame(guid);
+
         for (ObjectGuid const& guid : _flameList)
             if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                 c->DespawnOrUnsummon();
@@ -2309,6 +2374,14 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
     }
 
 private:
+    boss_mimiron* GetMimironAI() const
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* mimiron = instance->GetCreature(BOSS_MIMIRON))
+                return CAST_AI(boss_mimiron, mimiron->AI());
+        return nullptr;
+    }
+
     GuidList _flameList;
     EventMap _events;
     uint32 _createTime;

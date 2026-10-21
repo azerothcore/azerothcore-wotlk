@@ -43,7 +43,6 @@ namespace
 {
     // Arcane Potency buff spell IDs
     constexpr uint32 ARCANE_POTENCY_R1 = 57529;
-    constexpr uint32 ARCANE_POTENCY_R2 = 57531;
 
     // SpellFamilyMask from spell_proc for Arcane Potency
     constexpr uint32 AP_FAMILY_MASK0 = 0x61401035;
@@ -304,6 +303,7 @@ TEST_F(ArcanePotencyProcTest, ReqSpellmod_AuraWithoutCharges_SkipsCheck)
         .Build();
 
     EXPECT_FALSE(aura->IsUsingCharges());
+    EXPECT_TRUE(procEntry.AttributesMask & PROC_ATTR_REQ_SPELLMOD);
     // Even though PROC_ATTR_REQ_SPELLMOD is set, the condition
     // (IsUsingCharges() || USE_STACKS_FOR_CHARGES) would be false
     // so the spellmod check would be skipped

@@ -535,7 +535,7 @@ void SpellMgr::SetSpellDifficultyId(uint32 spellId, uint32 id)
     mSpellDifficultySearcherMap[spellId] = id;
 }
 
-uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) const
+uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, WorldObject const* caster) const
 {
     if (!GetSpellInfo(spellId))
         return spellId;
@@ -577,7 +577,7 @@ uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) con
     return uint32(difficultyEntry->SpellID[mode]);
 }
 
-SpellInfo const* SpellMgr::GetSpellForDifficultyFromSpell(SpellInfo const* spell, Unit const* caster) const
+SpellInfo const* SpellMgr::GetSpellForDifficultyFromSpell(SpellInfo const* spell, WorldObject const* caster) const
 {
     uint32 newSpellId = GetSpellIdForDifficulty(spell->Id, caster);
     SpellInfo const* newSpell = GetSpellInfo(newSpellId);
@@ -3177,8 +3177,12 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
     }
     else
     {
-        for (count = 0; result->NextRow(); ++count)
+        count = 0;
+
+        do
         {
+            ++count;
+
             Field const* fields = result->Fetch();
 
             uint32 const spellId = fields[0].Get<uint32>();
@@ -3237,7 +3241,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             }
 
             spellInfo->AttributesCu |= attributes;
-        }
+        } while (result->NextRow());
+
         LOG_INFO("server.loading", ">> Loaded {} spell custom attributes from DB in {} ms", count, GetMSTimeDiffToNow(customAttrTime));
     }
 
@@ -3352,13 +3357,6 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 case SPELL_EFFECT_CREATE_ITEM:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
                     break;
-                case SPELL_EFFECT_CHARGE:
-                case SPELL_EFFECT_CHARGE_DEST:
-                case SPELL_EFFECT_JUMP:
-                case SPELL_EFFECT_JUMP_DEST:
-                case SPELL_EFFECT_LEAP_BACK:
-                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_CHARGE;
-                    break;
                 case SPELL_EFFECT_PICKPOCKET:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_PICKPOCKET;
                     break;
@@ -3400,7 +3398,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         }
 
         // Xinef: spells ignoring hit result should not be binary
-        if (!spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
+        if (!spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT) && !spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_BINARY))
         {
             for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
             {
@@ -3438,14 +3436,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))))
                                 continue;
 
-                            if (spellInfo->Id == 69649 || spellInfo->Id == 71056 || spellInfo->Id == 71057 || spellInfo->Id == 71058 ||
-                                spellInfo->Id == 73061 || spellInfo->Id == 73062 || spellInfo->Id == 73063 || spellInfo->Id == 73064)
-                                continue;
-
                             if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[0] & 0x20)) // Frostbolt
-                                continue;
-
-                            if (spellInfo->Id == 55095) // Frost Fever
                                 continue;
 
                             if (spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&

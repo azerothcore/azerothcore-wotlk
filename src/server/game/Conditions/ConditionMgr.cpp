@@ -1437,7 +1437,7 @@ bool ConditionMgr::addToGossipMenus(Condition* cond)
         }
     }
 
-    LOG_ERROR("sql.sql", "addToGossipMenus: GossipMenu {} not found", cond->SourceGroup);
+    LOG_ERROR("sql.sql", "addToGossipMenus: GossipMenu {} Text {} not found", cond->SourceGroup, cond->SourceEntry);
     return false;
 }
 

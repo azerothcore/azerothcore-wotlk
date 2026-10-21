@@ -59,6 +59,11 @@ void ScriptMgr::OnBeforeAuraRankForLevel(SpellInfo const* spellInfo, SpellInfo c
     CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_BEFORE_AURA_RANK_FOR_LEVEL, script->OnBeforeAuraRankForLevel(spellInfo, latestSpellInfo, level));
 }
 
+void ScriptMgr::OnIsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo, SpellInfo const* otherSpellInfo, bool& isExclusive)
+{
+    CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_IS_AURA_EXCLUSIVE_BY_SPECIFIC_WITH, script->OnIsAuraExclusiveBySpecificWith(spellInfo, otherSpellInfo, isExclusive));
+}
+
 void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget)
 {
     CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_DUMMY_EFFECT_GAMEOBJECT, script->OnDummyEffect(caster, spellID, effIndex, gameObjTarget));
