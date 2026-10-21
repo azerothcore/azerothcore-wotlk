@@ -2035,7 +2035,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         }
 
         // is arena team captain
-        if (sArenaTeamMgr->GetArenaTeamByCaptain(factionChangeInfo->Guid))
+        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA) && sArenaTeamMgr->GetArenaTeamByCaptain(factionChangeInfo->Guid))
         {
             SendCharFactionChange(CHAR_CREATE_CHARACTER_ARENA_LEADER, factionChangeInfo.get());
             return;
@@ -2352,7 +2352,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             }
 
             // Leave Arena Teams
-            Player::LeaveAllArenaTeams(factionChangeInfo->Guid);
+            if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA))
+                Player::LeaveAllArenaTeams(factionChangeInfo->Guid);
 
             // Reset homebind and position
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);

@@ -112,6 +112,17 @@ public:
 
         }
 
+        void OnPlayerLeave(Player* player) override
+        {
+            InstanceScript::OnPlayerLeave(player);
+
+            player->RemoveAurasDueToSpell(SPELL_TWILIGHT_SHIFT);
+            player->RemoveAurasDueToSpell(SPELL_TWILIGHT_TORMENT_SARTHARION);
+            player->RemoveAurasDueToSpell(SPELL_TWILIGHT_TORMENT_VESPERON);
+            player->RemoveAurasDueToSpell(SPELL_SARTHARION_PYROBUFFET_TRIGGER);
+            player->RemoveAurasDueToSpell(SPELL_FADE_ARMOR);
+        }
+
         void DoAction(int32 action) override
         {
             switch (action)
