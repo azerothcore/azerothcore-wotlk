@@ -589,7 +589,6 @@ enum JormungarSpells
     SPELL_BURNING_BITE                  = 66879,
 
     SUMMON_SLIME_POOL                   = 66883,
-    SPELL_SLIME_POOL_EFFECT             = 66882,
     SPELL_SWEEP_0                       = 66794,
     SPELL_SWEEP_1                       = 67646,
 
@@ -613,7 +612,6 @@ enum Model
 
 enum JormungarNPCs
 {
-    NPC_SLIME_POOL                      = 35176,
     NPC_MOBILE_BURROW_TARGET            = 35226,
 };
 
@@ -669,36 +667,29 @@ struct boss_jormungarAI : public ScriptedAI
                     events.RescheduleEvent(EVENT_SUBMERGE, 1500ms);
                 break;
             case -2:
-                if (Submerged)
-                    bIsStationary = true; // it will come out mobile soon
-                else if (me->GetDisplayId() == _MODEL_STATIONARY )
-                    events.RescheduleEvent(EVENT_SUBMERGE, 2400ms);
-                else
-                    events.CancelEvent(EVENT_SUBMERGE);
                 me->CastSpell(me, SPELL_ENRAGE, true);
                 Talk(EMOTE_ENRAGE);
                 break;
         }
     }
 
-    void ScheduleEvents()
+    void ScheduleEvents(bool emerged = false)
     {
         events.Reset();
         if (me->GetDisplayId() == _MODEL_STATIONARY )
         {
             me->SetAttackTime(BASE_ATTACK, 1500);
-            events.RescheduleEvent(EVENT_SPELL_SPRAY, (me->GetEntry() == NPC_ACIDMAW ? 20s : 15s));
+            events.RescheduleEvent(EVENT_SPELL_SPRAY, (me->GetEntry() == NPC_ACIDMAW ? 10s : 15s));
             events.RescheduleEvent(EVENT_SPELL_SWEEP, 15s, 30s);
         }
         else
         {
             me->SetAttackTime(BASE_ATTACK, 2000);
-            events.RescheduleEvent(EVENT_SPELL_BITE, (me->GetEntry() == NPC_ACIDMAW ? 20s : 15s));
-            events.RescheduleEvent(EVENT_SPELL_SPEW, 15s, 30s);
-            events.RescheduleEvent(EVENT_SPELL_SLIME_POOL, 15s);
+            events.RescheduleEvent(EVENT_SPELL_BITE, 6s);
+            events.RescheduleEvent(EVENT_SPELL_SPEW, emerged ? 0s : 11s);
+            events.RescheduleEvent(EVENT_SPELL_SLIME_POOL, 14500ms);
         }
-        if (!me->HasAura(SPELL_ENRAGE))
-            events.RescheduleEvent(EVENT_SUBMERGE, 45s, 50s);
+        events.RescheduleEvent(EVENT_SUBMERGE, 45s, 50s);
     }
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
@@ -812,7 +803,7 @@ struct boss_jormungarAI : public ScriptedAI
                 Submerged = false;
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
-                ScheduleEvents();
+                ScheduleEvents(true);
                 break;
             case EVENT_SPELL_SPRAY:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
@@ -826,16 +817,15 @@ struct boss_jormungarAI : public ScriptedAI
             case EVENT_SPELL_BITE:
                 if (Unit* victim = me->GetVictim())
                     me->CastSpell(victim, _SPELL_BITE, false);
-                events.Repeat(20s);
+                events.Repeat(16s);
                 break;
             case EVENT_SPELL_SPEW:
                 me->CastSpell(me->GetVictim(), _SPELL_SPEW, false);
-                events.Repeat(15s, 30s);
+                events.Repeat(22s);
                 break;
             case EVENT_SPELL_SLIME_POOL:
-                if (Creature* c = me->SummonCreature(NPC_SLIME_POOL, *me, TEMPSUMMON_TIMED_DESPAWN, 30000))
-                    c->CastSpell(c, SPELL_SLIME_POOL_EFFECT, true);
-                events.Repeat(30s);
+                DoCastSelf(SUMMON_SLIME_POOL);
+                events.Repeat(12s);
                 break;
         }
 
@@ -981,7 +971,7 @@ enum IcehowlSpells
 {
     SPELL_FEROCIOUS_BUTT                = 66770,
     SPELL_WHIRL                         = 67345,
-    SPELL_ARCTIC_BREATH                 = 66689,
+    SPELL_ARCTIC_BREATH                 = 66688,
 
     SPELL_MASSIVE_CRASH                 = 66683,
     SPELL_ROAR                          = 66736,
@@ -1060,9 +1050,9 @@ public:
         {
             me->setActive(true);
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, 15s, 30s);
-            events.RescheduleEvent(EVENT_SPELL_WHIRL, 10s, 12s);
-            events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, 14s);
+            events.ScheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, 8500ms, 9s);
+            events.RescheduleEvent(EVENT_SPELL_WHIRL, 16s);
+            events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, 17s, 20s);
             events.RescheduleEvent(EVENT_JUMP_MIDDLE, 35s);
         }
 
@@ -1137,15 +1127,15 @@ public:
                 case EVENT_SPELL_FEROCIOUS_BUTT:
                     if (Unit* victim = me->GetVictim())
                         me->CastSpell(victim, SPELL_FEROCIOUS_BUTT, false);
-                    events.Repeat(15s, 30s);
+                    events.Repeat(14s, 17s);
                     break;
                 case EVENT_SPELL_WHIRL:
                     me->CastSpell((Unit*)nullptr, SPELL_WHIRL, false);
-                    events.Repeat(15s, 20s);
+                    events.Repeat(16s);
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
-                        me->CastSpell(target, SPELL_ARCTIC_BREATH, false);
+                        DoCast(target, SPELL_ARCTIC_BREATH);
                     events.Repeat(20s, 30s);
                     break;
                 case EVENT_JUMP_MIDDLE:
@@ -1264,6 +1254,28 @@ public:
     };
 };
 
+// 66688 - Arctic Breath
+class spell_icehowl_arctic_breath : public SpellScript
+{
+    PrepareSpellScript(spell_icehowl_arctic_breath);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ static_cast<uint32>(spellInfo->Effects[EFFECT_0].CalcValue()) });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, static_cast<uint32>(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_icehowl_arctic_breath::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // 66733 - Jump Back
 class spell_icehowl_jump_back : public SpellScript
 {
@@ -1325,6 +1337,7 @@ void AddSC_boss_northrend_beasts()
     RegisterSpellScript(spell_jormungars_paralytic_toxin_aura);
 
     new boss_icehowl();
+    RegisterSpellScript(spell_icehowl_arctic_breath);
     RegisterSpellScript(spell_icehowl_jump_back);
     RegisterSpellScript(spell_icehowl_massive_crash);
 }
