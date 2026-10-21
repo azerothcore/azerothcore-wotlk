@@ -133,15 +133,18 @@ enum LocaleConstant
     LOCALE_esMX = 7,
     LOCALE_ruRU = 8,
 
-    TOTAL_LOCALES
+    // Slots 9..15 are free for locales registered by modules.
+    TOTAL_LOCALES = 16
 };
 
 #define DEFAULT_LOCALE LOCALE_enUS
 
-#define MAX_LOCALES 8
+#define MAX_LOCALES (TOTAL_LOCALES - 1)
 #define MAX_ACCOUNT_TUTORIAL_VALUES 8
 
 AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
+
+inline bool IsLocaleRegistered(LocaleConstant locale) { return locale < TOTAL_LOCALES && localeNames[locale]; }
 
 AC_COMMON_API bool IsLocaleValid(std::string const& locale);
 AC_COMMON_API LocaleConstant GetLocaleByName(std::string const& name);

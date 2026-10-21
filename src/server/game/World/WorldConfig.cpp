@@ -166,7 +166,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_PRESERVE_CUSTOM_CHANNELS, "PreserveCustomChannels", false);
     SetConfigValue<uint32>(CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION, "PreserveCustomChannelDuration", 14);
     SetConfigValue<uint32>(CONFIG_INTERVAL_SAVE, "PlayerSaveInterval", 900000);
-    SetConfigValue<uint32>(CONFIG_INTERVAL_DISCONNECT_TOLERANCE, "DisconnectToleranceInterval", 0);
+    SetConfigValue<uint32>(CONFIG_INTERVAL_DISCONNECT_TOLERANCE, "DisconnectToleranceInterval", 60, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value >= 20; }, ">= 20");
     SetConfigValue<bool>(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT, "PlayerSave.Stats.SaveOnlyOnLogout", true);
     SetConfigValue<uint32>(CONFIG_ADDITIONAL_SAVES, "PlayerSave.AdditionalSaves", 0);
     SetConfigValue<bool>(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS, "ValidateSkillLearnedBySpells", true);
@@ -586,7 +586,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_WARDEN_CLIENT_RESPONSE_DELAY, "Warden.ClientResponseDelay", 600);
 
     // Dungeon finder
-    SetConfigValue<uint32>(CONFIG_LFG_OPTIONSMASK, "DungeonFinder.OptionsMask", 5);
+    SetConfigValue<uint32>(CONFIG_LFG_OPTIONSMASK, "DungeonFinder.OptionsMask", 7);
     SetConfigValue<bool>(CONFIG_LFG_CAST_DESERTER, "DungeonFinder.CastDeserter", true);
     SetConfigValue<bool>(CONFIG_LFG_ALLOW_COMPLETED, "DungeonFinder.AllowCompleted", true);
     SetConfigValue<uint32>(CONFIG_LFG_DUNGEON_SELECTION_COOLDOWN, "DungeonFinder.DungeonSelectionCooldown", 0);
