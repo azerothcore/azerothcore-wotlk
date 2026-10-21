@@ -343,8 +343,8 @@ void CombatManager::EndAllPvECombat()
 
 void CombatManager::RevalidateCombat()
 {
-    // EndCombat runs JustExitedCombat on the other unit's AI, which may end or create more of our refs,
-    // so no iterator may be held across it: collect the invalid guids first, then look each one up again
+    // EndCombat can run AI and script callbacks that end or create more of our refs, so no iterator
+    // may be held across it: collect the invalid guids first, then look each one up again
     auto endInvalidCombat = [this](auto& refs)
     {
         std::vector<ObjectGuid> invalid;
