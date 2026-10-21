@@ -36,6 +36,13 @@ inputs:
     description: Flag to continue build after errors
     required: false
     type: boolean
+  extra-data-dir:
+    default: ''
+    description: >-
+      Folder laid out like the server data dir (dbc/, maps/, ...), copied over the client data
+      before the dry run
+    required: false
+    type: string
 runs:
   using: composite
   steps:
@@ -186,6 +193,21 @@ runs:
       shell: bash
       run: |
         git clone --depth 1 --branch master --single-branch https://github.com/ac-data/ac-data.git "$AC_DATA_DIR"
+
+    - name: Copy extra data files
+      if: inputs.extra-data-dir != ''
+      shell: bash
+      env:
+        EXTRA_DATA_DIR: ${{ inputs.extra-data-dir }}
+      run: |
+        if [[ ! -d "$EXTRA_DATA_DIR" ]]; then
+          echo "extra-data-dir '$EXTRA_DATA_DIR' is not a directory"
+          exit 1
+        fi
+        cp -r "$EXTRA_DATA_DIR/." "$AC_DATA_DIR/"
+        for dir in "$EXTRA_DATA_DIR"/*/; do
+          echo "$(basename "$dir"): $(find "$dir" -type f | wc -l) files"
+        done
 
     - name: Start MySQL container
       shell: bash

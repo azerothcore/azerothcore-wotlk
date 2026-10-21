@@ -70,16 +70,9 @@ struct npc_medivh_bm : public ScriptedAI
     {
         _instance = creature->GetInstanceScript();
 
-        _groundArray.clear();
         _airArray.clear();
 
-        _groundArray.push_back(G3D::Vector3(creature->GetPositionX() + 8.0f, creature->GetPositionY(), creature->GetPositionZ()));
         _airArray.push_back(G3D::Vector3(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ()));
-
-        for (uint8 i = 0; i < 10; ++i)
-        {
-            _groundArray.push_back(G3D::Vector3(creature->GetPositionX() + 8.0f * cos(2.0f * M_PI * i / 10.0f), creature->GetPositionY() + 8.0f * std::sin(2.0f * M_PI * i / 10.0f), creature->GetPositionZ()));
-        }
 
         for (uint8 i = 0; i < 40; ++i)
         {
@@ -116,10 +109,8 @@ struct npc_medivh_bm : public ScriptedAI
         else if (summon->GetEntry() == NPC_DP_EMITTER_STALKER)
         {
             summon->CastSpell(summon, SPELL_BLACK_CRYSTAL, true);
-            Movement::MoveSplineInit init(summon);
-            init.MovebyPath(_groundArray);
-            init.SetCyclic(); // TODO: Add support for cyclic paths in motion master
-            init.Launch();
+            summon->GetMotionMaster()->MoveCirclePath(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 8.0f,
+                false, 10, FORCED_MOVEMENT_RUN);
         }
     }
 
@@ -244,7 +235,6 @@ struct npc_medivh_bm : public ScriptedAI
 private:
     InstanceScript* _instance;
     EventMap _events;
-    Movement::PointsArray _groundArray;
     Movement::PointsArray _airArray;
 };
 
