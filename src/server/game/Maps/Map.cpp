@@ -828,7 +828,9 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
     Cell old_cell = creature->GetCurrentCell();
     Cell new_cell(x, y);
 
-    if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
+    bool const cellChanged = old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell);
+
+    if (cellChanged)
     {
         if (old_cell.DiffGrid(new_cell))
             EnsureGridLoaded(new_cell);
@@ -841,7 +843,27 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
     creature->Relocate(x, y, z, o);
     if (creature->IsVehicle())
         creature->GetVehicleKit()->RelocatePassengers();
-    creature->UpdatePositionData();
+
+    // Terrain status (zone / area / floor / liquid) is derived lazily: the getters recompute it on
+    // demand, the same as for GameObjects. GetFullTerrainStatusForPosition() is VMAP-heavy and used to
+    // run on every spline sub-step, so a wandering creature that nothing is querying now costs no
+    // raycast. Re-derive eagerly here only when the result must be exact immediately and nothing is
+    // guaranteed to read it:
+    //  - the creature changed grid cell;
+    //  - it is in combat or evading home (a mob chasing / returning through water must have the
+    //    correct swim state at once);
+    //  - it is zone-wide visible (world boss / event NPC) - ProcessPositionDataChanged() moves it
+    //    between zone visibility maps only on a real derive, so throttling could hide it from players
+    //    after it crosses a zone border.
+    // For a plain wandering creature, Creature::Update() keeps the swim / fly / hover flags in step
+    // with the terrain it moves over.
+    if (cellChanged || creature->IsInCombat() || creature->IsInEvadeMode() || creature->IsZoneWideVisible())
+    {
+        creature->UpdatePositionData();
+    }
+    else
+        creature->SetPositionDataUpdate();
+
     creature->UpdateObjectVisibility(false);
 }
 
@@ -1721,6 +1743,12 @@ void Map::SendObjectUpdates()
     WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
     for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
+        if (!sScriptMgr->CanSendObjectUpdatesToPlayer(this, iter->first))
+        {
+            iter->second.Clear();
+            continue;
+        }
+
         iter->second.BuildPacket(packet);
         iter->first->SendDirectMessage(&packet);
         packet.clear();                                     // clean the string
@@ -2491,6 +2519,13 @@ void Map::RemoveCreatureRespawnTime(ObjectGuid::LowType spawnId)
     CharacterDatabase.Execute(stmt);
 }
 
+void Map::ForceCreatureRespawn(ObjectGuid::LowType spawnId)
+{
+    time_t now = GameTime::GetGameTime().count();
+    SaveCreatureRespawnTime(spawnId, now);
+    _forcedCreatureRespawns.insert(spawnId);
+}
+
 void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
 {
     if (!respawnTime)
@@ -2782,6 +2817,9 @@ void Map::ProcessRespawns()
 
 void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 {
+    // Consumed by every attempt, or a mark set on a continent would never go away
+    bool const forced = _forcedCreatureRespawns.erase(spawnId) != 0;
+
     // Pool members are handled entirely by the pool system on this map's pool data
     if (uint32 poolId = sPoolMgr->IsPartOfAPool<Creature>(spawnId))
     {
@@ -2832,14 +2870,25 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
         }
     }
 
+    // A spawn whose BossAI bound it to a DONE encounter stays down, as BossAI::CanRespawn keeps
+    // compat-mode spawns down. The expired row is kept so a reload still loads the boss dead, and
+    // the check repeats like an inactive group's. A forced Respawn() passes, as force does in compat mode.
+    if (InstanceMap* instanceMap = ToInstanceMap())
+        if (InstanceScript* script = instanceMap->GetInstanceScript())
+            if (!forced && script->IsBossSpawnDone(spawnId))
+            {
+                _respawnQueue.insert({GameTime::GetGameTime().count() + 5, SPAWN_TYPE_CREATURE, spawnId});
+                return;
+            }
+
     // Check linked_respawn: don't spawn if the master creature is still dead.
     // This mirrors the check in Creature::Respawn() for compat-mode creatures:
-    // hard-reset creatures bypass it (they despawn on evade and must always
-    // come back), and a creature linked to itself never auto-respawns.
+    // hard-reset creatures and forced respawns bypass it (the former despawn on
+    // evade and must always come back), and a creature linked to itself never auto-respawns.
     ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(data->id, spawnId);
     time_t linkedRespawntime = GetLinkedRespawnTime(dbtableHighGuid);
     CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(data->id);
-    if (linkedRespawntime && !(cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))
+    if (linkedRespawntime && !forced && !(cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))
     {
         time_t now = GameTime::GetGameTime().count();
         time_t newRespawnTime;

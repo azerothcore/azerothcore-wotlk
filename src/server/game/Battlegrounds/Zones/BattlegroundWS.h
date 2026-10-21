@@ -177,6 +177,9 @@ struct BattlegroundWGScore final : public BattlegroundScore
 {
     friend class BattlegroundWS;
 
+    [[nodiscard]] uint32 GetFlagCaptures() const { return FlagCaptures; }
+    [[nodiscard]] uint32 GetFlagReturns() const { return FlagReturns; }
+
 protected:
     BattlegroundWGScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
 

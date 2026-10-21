@@ -406,7 +406,11 @@ public:
 
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
-        creature->DespawnOrUnsummon();
+        // Force the respawn timer: creatures already dead (captains speared by Svalna) keep the
+        // m_respawnTime their long corpse delay set, which ForcedDespawn recomputes only when forced.
+        // Under the default dynamic respawn mode RemoveCorpse keeps that stale time (it only ever
+        // pushes it further out), so without the timer they would not come back for a full day.
+        creature->DespawnOrUnsummon(0ms, 2s);
 
         creature->SetCorpseDelay(corpseDelay);
         creature->SetRespawnDelay(respawnDelay);
@@ -1340,7 +1344,11 @@ public:
 
         me->GetMotionMaster()->Clear(false);
         if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+        {
+            // MoveFollow never clears the evade state _EnterEvadeMode sets, unlike MoveTargetedHome
+            me->ClearUnitState(UNIT_STATE_EVADE);
             me->GetMotionMaster()->MoveFollow(crok, FollowDist, FollowAngle, MOTION_SLOT_IDLE);
+        }
         else
             me->GetMotionMaster()->MoveTargetedHome();
 
@@ -2721,14 +2729,21 @@ class spell_icc_sprit_alarm : public SpellScript
                 return;
         }
 
-        if (GameObject* trap = GetCaster()->FindNearestGameObject(trapId, 5.0f))
+        // the alarms are ownerless trap gameobjects casting on their own
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
+        if (!caster)
+            return;
+
+        if (GameObject* trap = caster->FindNearestGameObject(trapId, 5.0f))
         {
             trap->SetRespawnTime(trap->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS);
         }
 
         std::list<Creature*> wards;
-        GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
-        wards.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        caster->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
+        wards.sort(Acore::ObjectDistanceOrderPred(caster));
         for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
         {
             if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
@@ -2754,7 +2769,15 @@ class spell_icc_geist_alarm : public SpellScript
     void HandleEvent(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+
+        // the alarms are ownerless trap gameobjects casting on their own
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
+        if (!caster)
+            return;
+
+        if (InstanceScript* instance = caster->GetInstanceScript())
         {
             Position p = {4356.77f, 2971.90f, 360.52f, M_PI / 2};
             if (Creature* l = instance->instance->SummonCreature(NPC_VENGEFUL_FLESHREAPER, p))

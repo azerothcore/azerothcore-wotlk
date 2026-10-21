@@ -5863,6 +5863,13 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 continue;
             }
 
+            // auras without a caster guid cannot be restored (Aura::TryCreate requires one)
+            if (!caster_guid)
+            {
+                LOG_ERROR("entities.player", "Aura (spellid {}) with empty caster guid, ignore.", spellid);
+                continue;
+            }
+
             // Xinef: leave this
             if (spellInfo->HasAura(SPELL_AURA_MOUNTED))
             {
@@ -6187,6 +6194,8 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
             }
             else if (proto->HolidayId)
             {
+                // matches on holiday id alone, unlike IsHolidayActive(): a stage aware check here
+                // would delete holiday items on login while a building stage runs
                 remove = true;
                 GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
                 GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr->GetActiveEventList();
