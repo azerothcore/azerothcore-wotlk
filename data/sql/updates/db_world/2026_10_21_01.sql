@@ -1,3 +1,4 @@
+-- DB update 2026_10_21_00 -> 2026_10_21_01
 --
 -- Copy of -286, removal of SILENCE and STUN immunities
 SET @ID := -432;
