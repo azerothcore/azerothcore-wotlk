@@ -129,11 +129,11 @@ enum lfgGroupFlags
     GROUP_LFG_FLAG_IS_HEROIC                = 0x004
 };
 
-enum MailItemOnFullInventory
+enum MailItemOnFullInventoryFlags
 {
-    MAIL_ITEM_ON_FULL_INVENTORY_DISABLED    = 0,
-    MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY    = 1,
-    MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE  = 2,
+    MAIL_ITEM_ON_FULL_INVENTORY_FLAG_LFG        = 0x1,
+    MAIL_ITEM_ON_FULL_INVENTORY_FLAG_ALL_GROUPS = 0x2,
+    MAIL_ITEM_ON_FULL_INVENTORY_FLAG_RAID       = 0x4,
 };
 
 enum DifficultyPreventionChangeType
@@ -150,7 +150,7 @@ static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1
 class Roll : public LootValidatorRef
 {
 public:
-    Roll(ObjectGuid _guid, LootItem const& li);
+    Roll(ObjectGuid _guid, LootItem const& li, bool _lootedInRaid);
     ~Roll();
     void setLoot(Loot* pLoot);
     Loot* getLoot();
@@ -160,7 +160,8 @@ public:
     uint32 itemid;
     int32  itemRandomPropId;
     uint32 itemRandomSuffix;
-    uint8 itemCount;
+    uint32 itemCount;
+    bool lootedInRaid;
     typedef std::map<ObjectGuid, RollVote> PlayerVote;
     PlayerVote playerVote;                              //vote position correspond with player position (in group)
     uint8 totalPlayersRolling;
@@ -270,6 +271,7 @@ public:
     void SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid);
     void SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag);
     void RemoveUniqueGroupMemberFlag(GroupMemberFlags flag);
+    [[nodiscard]] ObjectGuid GetTargetIcon(uint8 id) const { return id < TARGETICONCOUNT ? m_targetIcons[id] : ObjectGuid::Empty; }
 
     Difficulty GetDifficulty(bool isRaid) const;
     Difficulty GetDungeonDifficulty() const;
@@ -310,6 +312,9 @@ public:
     bool CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choise);
     void EndRoll(Loot* loot);
     void RemovePlayerFromRolls(ObjectGuid guid);
+
+    // Snapshot of the active rolls, roll is deleted after a roll finishes. Do not cache the pointers across ticks.
+    [[nodiscard]] std::vector<Roll const*> GetRolls() const { return { RollId.begin(), RollId.end() }; }
 
     // related to disenchant rolls
     void ResetMaxEnchantingLevel();

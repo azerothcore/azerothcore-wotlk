@@ -64,6 +64,9 @@ public:
     void SetFriendlyFaction() { SetFaction(35); }
     void SetFaction(uint32 faction);
 
+    // Mark as player-controlled; two player-controlled units get a PvPCombatReference
+    void SetControlledByPlayer(bool controlled) { m_ControlledByPlayer = controlled; }
+
     // Complete setup for combat/threat testing
     // Sets creature to be alive, in-world, hostile, and initializes managers
     void SetupForCombatTest(Map* map, ObjectGuid::LowType guidLow, uint32 entry);
