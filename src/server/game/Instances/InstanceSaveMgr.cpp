@@ -360,10 +360,12 @@ void InstanceSaveMgr::LoadResetTimes()
             // calculate the next reset time
             t = (t / DAY) * DAY;
             t += ((today - t) / period + 1) * period + diff;
+            SetResetTimeFor(mapid, difficulty, t);
             CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
         }
 
-        SetExtendedResetTimeFor(mapid, difficulty, t);
+        // An extended lock runs one period past the reset, as _ResetOrWarnAll sets it after a runtime reset
+        SetExtendedResetTimeFor(mapid, difficulty, t + period);
 
         // schedule the global reset/warning
         uint8 type;
@@ -791,6 +793,7 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
 
 InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, InstanceSave* save, bool permanent, Player* player /*= nullptr*/)
 {
+    bool const persistBinding = !sToCloud9Sidecar->ClusterModeEnabled() || sToCloud9Sidecar->IsMapAssigned(save->GetMapId());
     InstancePlayerBind& bind = playerBindStorage[guid]->m[save->GetDifficulty()][save->GetMapId()];
     ASSERT(!bind.perm || permanent); // ensure there's no changing permanent to temporary, this can be done only by unbinding
 
@@ -805,7 +808,8 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
             stmt->SetData(1, permanent);
             stmt->SetData(2, guid.GetCounter());
             stmt->SetData(3, bind.save->GetInstanceId());
-            CharacterDatabase.Execute(stmt);
+            if (persistBinding)
+                CharacterDatabase.Execute(stmt);
         }
     }
     else
@@ -832,7 +836,8 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
         stmt->SetData(0, guid.GetCounter());
         stmt->SetData(1, save->GetInstanceId());
         stmt->SetData(2, permanent);
-        CharacterDatabase.Execute(stmt);
+        if (persistBinding)
+            CharacterDatabase.Execute(stmt);
 
         if (player)
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID, 1);

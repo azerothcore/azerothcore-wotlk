@@ -195,15 +195,8 @@ protected:
 
     // Test if a proc entry would trigger with given event info
     bool TestCanProc(SpellProcEntry const& procEntry, uint32_t typeMask,
-                     uint32_t hitMask, SpellInfo const* triggerSpell = nullptr)
+                     uint32_t hitMask, SpellInfo const* = nullptr)
     {
-        DamageInfo* damageInfoPtr = nullptr;
-        HealInfo* healInfoPtr = nullptr;
-
-        // Create real DamageInfo/HealInfo if we have a trigger spell
-        // Note: This requires the actual game classes, which may need adjustment
-        // For now, we use the stub approach
-
         auto eventInfo = ProcEventInfoBuilder()
             .WithTypeMask(typeMask)
             .WithHitMask(hitMask)

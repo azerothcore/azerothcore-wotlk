@@ -1998,7 +1998,9 @@ enum SmartFollowType
     FOLLOW_TYPE_SEMI_CIRCLE_FRONT          = 3,                  // 180 degrees in front of leader
     FOLLOW_TYPE_LINE                       = 4,                  // front -> back -> front -> back
     FOLLOW_TYPE_COLUMN                     = 5,                  // left -> right -> left -> right
-    FOLLOW_TYPE_ANGULAR                    = 6                   // geese-like formation 135 and 225 degrees behind leader
+    FOLLOW_TYPE_ANGULAR                    = 6,                  // geese-like formation 135 and 225 degrees behind leader
+    FOLLOW_TYPE_SINGLE_FILE                = 7,                  // directly behind leader with increasing distance
+    FOLLOW_TYPE_MAX
 };
 
 // one line in DB is one event

@@ -356,6 +356,11 @@ public:
     virtual void JustExitedCombat() { }
 
     /**
+     * @brief Called when the unit is about to be removed from the world (despawn, grid unload, corpse disappearing, player logging out etc.)
+     */
+    virtual void OnDespawn() { }
+
+    /**
      * @brief Called when evade timer expires (target unreachable for too long)
      */
     virtual void EvadeTimerExpired();

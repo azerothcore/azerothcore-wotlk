@@ -268,6 +268,8 @@ void ArenaTeamMgr::DistributeArenaPoints()
         }
     }
 
+    sScriptMgr->OnArenaWeekReset();
+
     ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_END);
 
     ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_END);

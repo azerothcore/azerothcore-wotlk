@@ -63,6 +63,7 @@ public:
     virtual void OnGameEvent(bool /*start*/, uint16 /*eventId*/) {}
     virtual void OnStateChanged(uint32 /*state*/, Unit* /*unit*/) {}
     virtual void EventInform(uint32 /*eventId*/) {}
+    // unit is null for a spell cast by a GameObject without an owner
     virtual void SpellHit(Unit* /*unit*/, SpellInfo const* /*spellInfo*/) {}
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
 

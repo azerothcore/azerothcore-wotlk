@@ -121,6 +121,7 @@ struct ScalingStatValuesEntry;
 struct SpellModifier;
 struct TargetInfo;
 struct VendorItem;
+struct WardenCheck;
 struct SkillLineAbilityEntry;
 
 // Dynamic linking class
@@ -134,6 +135,7 @@ struct OutdoorPvPData;
 
 namespace lfg
 {
+    class Lfg5Guids;
     struct LFGDungeonData;
 }
 

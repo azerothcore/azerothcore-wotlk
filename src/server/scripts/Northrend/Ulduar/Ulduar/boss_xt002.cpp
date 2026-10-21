@@ -290,7 +290,7 @@ struct boss_xt002 : public BossAI
             _healthRecovered = true;
         }
         else if (seatId == HEART_VEHICLE_SEAT_EXPOSED)
-            who->CastSpell(who, SPELL_EXPOSED_HEART);   // Channeled
+            who->CastSpell(who, SPELL_EXPOSED_HEART, true);   // Channeled
     }
 
     void MovementInform(uint32 type, uint32 point) override
@@ -335,8 +335,13 @@ struct boss_xt002 : public BossAI
                 if (!_hardMode)
                 {
                     uint32 transferHealth = data;
-                    if (transferHealth >= me->GetHealth())
-                        transferHealth = me->GetHealth() - 1;
+                    uint32 currentHealth = me->GetHealth();
+                    if (transferHealth >= currentHealth)
+                    {
+                        me->LowerPlayerDamageReq(currentHealth);
+                        Unit::Kill(nullptr, me);
+                        break;
+                    }
 
                     me->ModifyHealth(-static_cast<int32>(transferHealth));
                     me->LowerPlayerDamageReq(transferHealth);
@@ -744,7 +749,8 @@ class spell_xt002_searing_light_spawn_life_spark : public AuraScript
     {
         if (Player* player = GetOwner()->ToPlayer())
             if (Unit* xt002 = GetCaster())
-                if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
+                // Heartbreak (hard mode) is death-persistent, so without this a corpse still summons
+                if (xt002->IsAlive() && xt002->HasAura(aurEff->GetAmount()))
                     xt002->CastSpell(player, SPELL_SUMMON_LIFE_SPARK, true);
     }
 
@@ -768,7 +774,8 @@ class spell_xt002_gravity_bomb_aura : public AuraScript
     {
         if (Player* player = GetOwner()->ToPlayer())
             if (Unit* xt002 = GetCaster())
-                if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
+                // Heartbreak (hard mode) is death-persistent, so without this a corpse still summons
+                if (xt002->IsAlive() && xt002->HasAura(aurEff->GetAmount()))
                     xt002->CastSpell(player, SPELL_SUMMON_VOID_ZONE, true);
     }
 
@@ -887,6 +894,34 @@ struct npc_xt_toy_pile : public ScriptedAI
 
 private:
     uint32 _lastSummonTime{};
+};
+
+// 62828, 62831, 62835 - Recharge Robot
+// The core rolls a random point around the pile and takes its height from below, so a point that
+// lands on a scrap heap keeps the floor under it. Ask from above the heaps instead.
+class spell_xt002_recharge_robot : public SpellScript
+{
+    PrepareSpellScript(spell_xt002_recharge_robot);
+
+    static constexpr float SearchAboveHeaps = 15.0f; // taller than any scrap heap in the room
+
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+
+        float const z = caster->GetMapHeight(dest._position.GetPositionX(), dest._position.GetPositionY(),
+            caster->GetPositionZ() + SearchAboveHeaps);
+        if (z <= INVALID_HEIGHT)
+            return;
+
+        dest._position.m_positionZ = z;
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_xt002_recharge_robot::SetDest, EFFECT_0,
+            TARGET_DEST_DEST_RANDOM);
+    }
 };
 
 // 62775 - Tympanic Tantrum
@@ -1084,6 +1119,7 @@ void AddSC_boss_xt002()
     RegisterSpellScript(spell_xt002_gravity_bomb_damage);
     RegisterSpellScript(spell_xt002_heart_overload_periodic);
     RegisterUlduarCreatureAI(npc_xt_toy_pile);
+    RegisterSpellScript(spell_xt002_recharge_robot);
     RegisterSpellScript(spell_xt002_tympanic_tantrum);
     RegisterSpellScript(spell_xt002_321_boombot_aura);
     RegisterSpellScript(spell_xt002_exposed_heart);

@@ -34,6 +34,11 @@ private:
 public:
     static ToCloud9Sidecar* instance();
 
+    /// When Cluster.Enabled, validate libsidecar (real library required; ABI match).
+    /// Call after config and logging are ready, before DB/network startup.
+    /// @return false if worldserver should exit with code 1.
+    bool CheckLibsidecarAbi();
+
     void Init(uint16 port, int realmId);
     void Deinit();
 
@@ -49,8 +54,8 @@ public:
     void ProcessGrpcOrHttpRequests();
     void ProcessAsyncTasks();
 
-    uint32 GenerateCharacterGuid(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID);
-    uint32 GenerateItemGuid(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID);
+    uint64 GenerateCharacterGuid(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID);
+    uint64 GenerateItemGuid(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID);
     uint32 GenerateInstanceGuid(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID);
 
     void OnPlayerLeftBattleground(uint64 playerGUID, uint32 realmID, uint32 instanceID);

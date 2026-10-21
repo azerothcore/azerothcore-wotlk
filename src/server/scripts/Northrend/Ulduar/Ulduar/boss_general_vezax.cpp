@@ -416,7 +416,7 @@ class spell_aura_of_despair_aura : public AuraScript
 
                 if (target->HasSpell(SPELL_SHAMANISTIC_RAGE))
                     caster->CastSpell(target, SPELL_CORRUPTED_RAGE, true);
-                else if (target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2))
+                else if (target->HasAnyAuras(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1, SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1, SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2))
                     caster->CastSpell(target, SPELL_CORRUPTED_WISDOM, true);
             }
     }

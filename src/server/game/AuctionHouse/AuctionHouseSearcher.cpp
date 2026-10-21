@@ -465,7 +465,7 @@ void SearchableAuctionEntry::SetItemNames()
 
     for (uint32 locale = 0; locale < TOTAL_LOCALES; ++locale)
     {
-        if (proto->Name1.empty())
+        if (proto->Name1.empty() || !IsLocaleRegistered(LocaleConstant(locale)))
             continue;
 
         std::string itemName = proto->Name1;

@@ -86,6 +86,7 @@ enum ForcedMovement
     FORCED_MOVEMENT_NONE    = 0,
     FORCED_MOVEMENT_WALK    = 1,
     FORCED_MOVEMENT_RUN     = 2,
+    FORCED_MOVEMENT_FLY     = 3,
 
     FORCED_MOVEMENT_MAX
 };
@@ -251,11 +252,13 @@ public:
 
     void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, Movement::PointsArray const* path = nullptr, bool generatePath = false, float orientation = 0.0f, ObjectGuid targetGUID = ObjectGuid::Empty);
     void MoveCharge(PathGenerator const& path, float speed = SPEED_CHARGE, ObjectGuid targetGUID = ObjectGuid::Empty);
-    void MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ);
+    void MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ, bool allowClientControlled = false);
     void MoveJumpTo(float angle, float speedXY, float speedZ);
     void MoveJump(Position const& pos, float speedXY, float speedZ, uint32 id = 0)
     { MoveJump(pos.m_positionX, pos.m_positionY, pos.m_positionZ, speedXY, speedZ, id); };
     void MoveJump(float x, float y, float z, float speedXY, float speedZ, uint32 id = 0, Unit const* target = nullptr);
+    void MoveCirclePath(float x, float y, float z, float radius, bool clockwise, uint8 stepCount,
+        ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, float speed = 0.0f);
     void MoveFall(uint32 id = 0, bool addFlagForNPC = false);
 
     void MoveSeekAssistance(float x, float y, float z);
@@ -264,6 +267,8 @@ public:
     void MoveDistract(uint32 time);
     void MoveWaypoint(uint32 path_id, bool repeatable, PathSource pathSource = PathSource::WAYPOINT_MGR);
     void MoveRotate(uint32 time, RotateDirection direction);
+    void MovePointBackwards(uint32 id, float x, float y, float z, bool generatePath = true,
+        bool forceDestination = true, MovementSlot slot = MOTION_SLOT_ACTIVE, float orientation = 0.0f);
 
     [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
     [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
