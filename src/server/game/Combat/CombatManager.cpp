@@ -343,8 +343,8 @@ void CombatManager::EndAllPvECombat()
 
 void CombatManager::RevalidateCombat()
 {
-    // EndCombat can run AI and script callbacks that end or create more of our refs, so no iterator
-    // may be held across it: collect the invalid guids first, then look each one up again
+    // EndCombat's combat-exit handling (AI, scripts, aura removal) can end or create more of our refs, so no
+    // iterator may be held across it: collect the invalid guids first, then look each one up again
     auto endInvalidCombat = [this](auto& refs)
     {
         std::vector<ObjectGuid> invalid;
