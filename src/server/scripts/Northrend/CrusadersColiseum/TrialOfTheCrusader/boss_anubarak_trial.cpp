@@ -176,6 +176,8 @@ public:
 
         void Reset() override
         {
+            if (pInstance)
+                pInstance->SetBossState(BOSS_ANUBARAK, NOT_STARTED);
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             summons.DespawnAll();
@@ -234,7 +236,7 @@ public:
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             if (pInstance)
-                pInstance->SetData(TYPE_ANUBARAK, IN_PROGRESS);
+                pInstance->SetBossState(BOSS_ANUBARAK, IN_PROGRESS);
         }
 
         void JustReachedHome() override
@@ -381,7 +383,7 @@ public:
             summons.DespawnAll();
             Talk(SAY_DEATH);
             if (pInstance)
-                pInstance->SetData(TYPE_ANUBARAK, DONE);
+                pInstance->SetBossState(BOSS_ANUBARAK, DONE);
         }
 
         void KilledUnit(Unit* who) override
