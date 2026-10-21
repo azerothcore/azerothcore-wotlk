@@ -7584,13 +7584,27 @@ AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 
 void ObjectMgr::SetHighestGuids()
 {
-    QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Player>().Set((*result)[0].Get<uint32>() + 1);
+    // Refuse to start once the next guid would already trip ObjectGuidGenerator's overflow check. At the cap,
+    // MAX(guid) + 1 wraps to 0 and the cleanup below deletes every item relation.
+    auto setNextGuid = [](ObjectGuidGeneratorBase& generator, HighGuid high, char const* table)
+    {
+        QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM {}", table);
+        if (!result)
+            return;
 
-    result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Item>().Set((*result)[0].Get<uint32>() + 1);
+        uint32 maxGuid = (*result)[0].Get<uint32>();
+        if (maxGuid >= ObjectGuid::GetMaxCounter(high) - 2)
+        {
+            LOG_FATAL("server.loading", "{} guid space is exhausted (MAX(guid) in `{}` is {}). Renumber the guids before starting the server.",
+                ObjectGuid::GetTypeName(high), table, maxGuid);
+            exit(1);
+        }
+
+        generator.Set(maxGuid + 1);
+    };
+
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Player>(), HighGuid::Player, "characters");
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Item>(), HighGuid::Item, "item_instance");
 
     // Cleanup other tables from not existed guids ( >= _hiItemGuid)
     CharacterDatabase.Execute("DELETE FROM character_inventory WHERE item >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());     // One-time query
@@ -7598,7 +7612,7 @@ void ObjectMgr::SetHighestGuids()
     CharacterDatabase.Execute("DELETE FROM auctionhouse WHERE itemguid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
     CharacterDatabase.Execute("DELETE FROM guild_bank_item WHERE item_guid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
 
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
+    QueryResult result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
         GetGuidSequenceGenerator<HighGuid::Mo_Transport>().Set((*result)[0].Get<uint32>() + 1);
 

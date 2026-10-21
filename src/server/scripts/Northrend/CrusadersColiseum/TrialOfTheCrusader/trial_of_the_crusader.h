@@ -40,7 +40,7 @@ enum DataTypes
 {
     TYPE_NONE = 0,
     TYPE_INSTANCE_PROGRESS,
-    TYPE_ANNOUNCER_GOSSIP_SELECT,
+    TYPE_ANNOUNCER_GOSSIP_SELECT,                   // Set by value from Barrett's SmartAI
     TYPE_FAILED,
 
     TYPE_GORMOK,
@@ -90,6 +90,7 @@ enum Events
     EVENT_ICEHOWL_ATTACK,
     EVENT_SCENE_BEASTS_DONE,
     EVENT_NORTHREND_BEASTS_ENRAGE,
+    EVENT_SUMMON_BARRETT,
 
     EVENT_SCENE_101,
     EVENT_SCENE_102,
@@ -141,7 +142,12 @@ enum Events
 
 enum NPCs
 {
-    NPC_BARRENT                                     = 34816,
+    NPC_BARRETT_BEASTS                              = 34816,
+    NPC_BARRETT_BEASTS_HC                           = 35909,
+    NPC_BARRETT_JARAXXUS                            = 35035,
+    NPC_BARRETT_FACTION_CHAMPIONS                   = 35766,
+    NPC_BARRETT_VALKYR                              = 35770,
+    NPC_BARRETT_LICH_KING                           = 35771,
     NPC_TIRION                                      = 34996,
     NPC_GARROSH                                     = 34995,
     NPC_THRALL                                      = 34994,
@@ -306,6 +312,7 @@ const Position Locs[] =
     {665.04f, 139.25f, 142.2f, 0.0f},                   // 18
     {664.75f, 135.0f, 142.2f, 0.0f},                    // 19
     {563.6597f, 139.7569f, 399.2507f, 3 * M_PI / 2},    // 20
+    {559.1528f, 90.55729f, 395.2734f, 5.078908f},       // 21 - Barrett
 };
 
 enum LocNames
@@ -331,6 +338,13 @@ enum LocNames
     LOC_TIRION_FINAL,
     LOC_MAGE,
     LOC_OPEN_PORTAL_TARGET,
+    LOC_BARRETT,
+};
+
+enum BarrettMisc
+{
+    // Barrett's SmartAI handles it through SMART_EVENT_ACTION_DONE
+    ACTION_BARRETT_LEAVE                            = 1,
 };
 
 const Position FactionChampionLoc[] =

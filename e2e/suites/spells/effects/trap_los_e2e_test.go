@@ -30,31 +30,27 @@ const (
 )
 
 // trapToTrip is one hunter trap at the rank a level 80 hunter has, and how its effect
-// shows on the victim.
+// shows: an aura on the victim, or creatures summoned next to it.
 type trapToTrip struct {
 	name       string
 	spell      uint32 // places gameObject at the hunter's feet
 	gameObject uint32 // type 1 trap: despawns once it has cast
-	landed     func(observer *e2eharness.ScenarioBot, victim uint64) bool
-}
-
-func victimHasAura(spellID uint32) func(*e2eharness.ScenarioBot, uint64) bool {
-	return func(observer *e2eharness.ScenarioBot, victim uint64) bool {
-		return observer.UnitHasAura(victim, spellID)
-	}
+	aura       uint32
+	summons    []uint32
 }
 
 // Freezing Trap comes first at every spot: its freeze breaks on damage, and the other
 // traps leave burning ground and snakes behind.
 var trapsToTrip = []trapToTrip{
-	{"Freezing", 14311, 164877, victimHasAura(14309)},   // Freezing Trap Effect
-	{"Frost", 13809, 164639, victimHasAura(67035)},      // the slow cast on the victim
-	{"Immolation", 49056, 189319, victimHasAura(49054)}, // Immolation Trap DoT
-	{"Explosive", 49067, 189322, victimHasAura(49065)},  // Explosive Trap Effect burn
-	{"Snake", 34600, 183957, func(observer *e2eharness.ScenarioBot, _ uint64) bool {
-		return len(observer.UnitsByEntry(10, creatureViper, creatureVenomousSnake)) > 0
-	}},
+	{"Freezing", 14311, 164877, 14309, nil},   // Freezing Trap Effect
+	{"Frost", 13809, 164639, 67035, nil},      // the slow cast on the victim
+	{"Immolation", 49056, 189319, 49054, nil}, // Immolation Trap DoT
+	{"Explosive", 49067, 189322, 49065, nil},  // Explosive Trap Effect burn
+	{"Snake", 34600, 183957, 0, []uint32{creatureViper, creatureVenomousSnake}},
 }
+
+// Hunter traps share the 1.5s global cooldown, which `.cooldown` does not reset.
+const trapGlobalCooldown = 1500 * time.Millisecond
 
 // Since PR #26152 (https://github.com/azerothcore/azerothcore-wotlk/pull/26152) a trap's
 // spell is cast by the trap GameObject. A GameObject has no collision height, so
@@ -114,6 +110,7 @@ func TestTrap_EveryTrapAffectsItsVictimOnAnyFloor(t *testing.T) {
 		mapUtgardeKeep     uint32 = 574
 		mapUtgardePinnacle uint32 = 575
 	)
+	var lastCast time.Time
 	// The dungeon spots are creature spawn points, so they sit on the real floor, picked
 	// as far apart from each other as the instance allows.
 	for _, spot := range []struct {
@@ -135,11 +132,14 @@ func TestTrap_EveryTrapAffectsItsVictimOnAnyFloor(t *testing.T) {
 		t.Run(spot.name, func(t *testing.T) {
 			spot.place(t, hunter)
 			spot.place(t, placer)
-			clearSpot(t, placer)
+			spawned := clearSpot(t, placer)
 
 			for _, trap := range trapsToTrip {
 				t.Run(trap.name, func(t *testing.T) {
-					tripTrap(t, hunter, placer, trap)
+					// A creature of the spot that came into sight late is killed before it can
+					// walk onto the trap.
+					killLiving(t, placer, spawned, map[uint64]struct{}{})
+					tripTrap(t, hunter, placer, trap, &lastCast)
 				})
 			}
 		})
@@ -147,8 +147,8 @@ func TestTrap_EveryTrapAffectsItsVictimOnAnyFloor(t *testing.T) {
 }
 
 // tripTrap spawns a dummy under the hunter, has the hunter lay trap on it and asserts the
-// trap's effect reached the dummy.
-func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToTrip) {
+// trap's effect reached the dummy. lastCast is when the hunter last laid a trap.
+func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToTrip, lastCast *time.Time) {
 	t.Helper()
 	dummy := placer.Spawn(t, trapLOSDummy, 15*time.Second)
 	if dummy == 0 {
@@ -158,72 +158,112 @@ func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToT
 	placer.GM(t, fmt.Sprintf(".npc set level %d", trapLOSDummyLevel))
 	placer.FlushWorld(t)
 
-	hunter.GM(t, ".cooldown")
-	hunter.CastMust(t, trap.spell, 0, 10*time.Second)
-	trapGO := waitTrapGO(placer, trap.gameObject, true, 5*time.Second)
-	if trapGO == 0 {
-		e2eharness.Preconditionf(t, "%s Trap GO %d never appeared", trap.name, trap.gameObject)
+	// Snakes outlive the subtest that summoned them and can still be around at the next
+	// spot, so only a snake that was not already in sight counts.
+	staleSummons := map[uint64]struct{}{}
+	if len(trap.summons) > 0 {
+		for _, u := range placer.UnitsByEntry(100, trap.summons...) {
+			staleSummons[u.GUID] = struct{}{}
+		}
+	}
+	landed := func() bool {
+		if trap.aura != 0 {
+			return placer.UnitHasAura(dummy, trap.aura)
+		}
+		for _, u := range placer.UnitsByEntry(10, trap.summons...) {
+			if _, stale := staleSummons[u.GUID]; !stale {
+				return true
+			}
+		}
+		return false
 	}
 
+	hunter.GM(t, ".cooldown")
+	time.Sleep(time.Until(lastCast.Add(trapGlobalCooldown)))
+	hunter.CastMust(t, trap.spell, 0, 10*time.Second)
+	*lastCast = time.Now()
+
+	// Laid out of combat, the trap is armed at once and can fire and despawn before the
+	// placer ever sees it, so its effect is checked first.
 	deadline := time.Now().Add(6 * time.Second)
 	for time.Now().Before(deadline) {
-		if trap.landed(placer, dummy) {
+		if landed() {
 			t.Logf("PASS %s Trap affected dummy 0x%X", trap.name, dummy)
 			return
 		}
 		time.Sleep(40 * time.Millisecond)
 	}
 	// The trap despawns once it has cast; one still standing never triggered.
-	if waitTrapGO(placer, trap.gameObject, false, 2*time.Second) != 0 {
+	if trapGO := waitTrapGO(placer, trap.gameObject, false, 2*time.Second); trapGO != 0 {
 		e2eharness.Preconditionf(t, "%s Trap 0x%X never triggered on dummy 0x%X", trap.name, trapGO, dummy)
 	}
-	e2eharness.Assertf(t, "%s Trap 0x%X fired and despawned but its effect never reached dummy 0x%X",
-		trap.name, trapGO, dummy)
+	// The effect can land while the trap despawns.
+	if landed() {
+		t.Logf("PASS %s Trap affected dummy 0x%X", trap.name, dummy)
+		return
+	}
+	e2eharness.Assertf(t, "%s Trap %d fired and despawned but its effect never reached dummy 0x%X",
+		trap.name, trap.gameObject, dummy)
 }
 
 // clearSpot kills every living creature spawned within trapLOSClearRadius of the bot, so
-// the dummy is the only thing a trap there can fire on. Dungeon instances are private to
-// the test's group, so nothing outside the test sees it.
-func clearSpot(t *testing.T, bot *e2eharness.ScenarioBot) {
+// the dummy is the only thing a trap there can fire on, and returns their entries. Dungeon
+// instances are private to the test's group, so nothing outside the test sees it.
+func clearSpot(t *testing.T, bot *e2eharness.ScenarioBot) []uint32 {
 	t.Helper()
 	x, y, _, mapID := bot.Pos()
 	rows, err := bot.WorldDB.Query(
-		`SELECT DISTINCT id FROM creature WHERE map = ? AND POW(position_x - ?, 2) + POW(position_y - ?, 2) < ?`,
+		`SELECT id, COUNT(*) FROM creature WHERE map = ? AND spawnMask & 1 AND phaseMask & 1
+			AND POW(position_x - ?, 2) + POW(position_y - ?, 2) < ? GROUP BY id`,
 		mapID, x, y, trapLOSClearRadius*trapLOSClearRadius)
 	if err != nil {
 		e2eharness.HarnessFailf(t, "query creatures near %.1f, %.1f: %v", x, y, err)
 	}
 	var entries []uint32
+	spawns := 0
 	for rows.Next() {
 		var entry uint32
-		if err := rows.Scan(&entry); err != nil {
+		var count int
+		if err := rows.Scan(&entry, &count); err != nil {
 			_ = rows.Close()
 			e2eharness.HarnessFailf(t, "scan creature entry: %v", err)
 		}
 		entries = append(entries, entry)
+		spawns += count
 	}
 	_ = rows.Close()
 	if len(entries) == 0 {
+		return nil
+	}
+	// The object cache fills in over the first moments after a teleport, one creature at a
+	// time and slower on a loaded host, so keep sweeping until as many have been killed as
+	// are spawned here: one left alive can attack the hunter and stand on the trap, which
+	// then fires on it rather than the dummy.
+	killed := map[uint64]struct{}{}
+	for deadline := time.Now().Add(10 * time.Second); len(killed) < spawns && time.Now().Before(deadline); {
+		killLiving(t, bot, entries, killed)
+		time.Sleep(100 * time.Millisecond)
+	}
+	bot.FlushWorld(t)
+	t.Logf("cleared %d of %d creatures spawned around %.1f, %.1f (map %d)", len(killed), spawns, x, y, mapID)
+	return entries
+}
+
+// killLiving kills the living creatures of entries in bot's sight that are not in killed,
+// and adds them to it.
+func killLiving(t *testing.T, bot *e2eharness.ScenarioBot, entries []uint32, killed map[uint64]struct{}) {
+	t.Helper()
+	if len(entries) == 0 {
 		return
 	}
-	// The object cache fills in over the first moments after a teleport.
-	var nearby []e2eharness.UnitSnap
-	deadline := time.Now().Add(5 * time.Second)
-	for len(nearby) == 0 && time.Now().Before(deadline) {
-		time.Sleep(100 * time.Millisecond)
-		nearby = bot.UnitsByEntry(trapLOSClearRadius+10, entries...)
-	}
-	killed := 0
-	for _, u := range nearby {
-		if u.Health == 0 || u.Entry == trapLOSDummy {
+	for _, u := range bot.UnitsByEntry(trapLOSClearRadius+10, entries...) {
+		if _, done := killed[u.GUID]; done || u.Health == 0 || u.Entry == trapLOSDummy {
 			continue
 		}
 		_ = bot.World.SetTarget(u.GUID)
 		bot.GM(t, ".die")
-		killed++
+		killed[u.GUID] = struct{}{}
 	}
-	bot.FlushWorld(t)
-	t.Logf("cleared %d creatures around %.1f, %.1f (map %d)", killed, x, y, mapID)
 }
 
 // waitTrapGO waits for a trap GameObject to be present (want=true, returns its GUID) or

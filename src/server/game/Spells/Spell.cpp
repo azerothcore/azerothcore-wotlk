@@ -6100,7 +6100,11 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), unitCaster))
                 return SPELL_FAILED_NOT_INFRONT;
 
-            if ((!unitCaster || !unitCaster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
+            // Ignore LOS for gameobject casts: one has no collision height, so the ray would start on its floor
+            // position, which the floor under a player standing on it can block. CheckEffectTarget still checks
+            // LOS for gameobjects that do not ignore it.
+            if (!m_caster->IsGameObject() && (!unitCaster || !unitCaster->IsTotem() || !m_spellInfo->IsPositive()) &&
+                !m_spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT) &&
                 !m_spellInfo->HasAttribute(SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
             {
                 uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
@@ -6110,7 +6114,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                     losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
                 }
 
-                if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks), GetLOSCollisionHeight()))
+                if (!m_caster->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LineOfSightChecks(losChecks)))
                 {
                     return SPELL_FAILED_LINE_OF_SIGHT;
                 }
@@ -8373,7 +8377,10 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
             if (GameObject const* gobCaster = GetGameObjectCaster())
             {
-                if (gobCaster->GetGOInfo()->IsIgnoringLOSChecks())
+                // A trap without an owner has no height to see from, so the floor under its target would block it.
+                // An owned trap sees from its owner's height (GetLOSCollisionHeight), so a wall still blocks it.
+                if (gobCaster->GetGOInfo()->IsIgnoringLOSChecks() ||
+                    (gobCaster->GetGoType() == GAMEOBJECT_TYPE_TRAP && !gobCaster->GetOwnerGUID()))
                 {
                     return true;
                 }
