@@ -479,7 +479,10 @@ bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
 
     SubGroupCounterIncrease(subGroup);
 
-    player->SetGroupInvite(nullptr);
+    // The inviting group keeps a raw Player* that would dangle once the player logs out
+    if (Group* invitingGroup = player->GetGroupInvite())
+        invitingGroup->RemoveInvite(player);
+
     if (player->GetGroup())
     {
         if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
