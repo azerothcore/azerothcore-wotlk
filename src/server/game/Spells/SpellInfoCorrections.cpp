@@ -2244,15 +2244,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Trial of the Crusader, Gormok, Fire Bomb
-    ApplySpellFix({ 66313 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ANY);
-        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
-        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ANY);
-        spellInfo->Effects[EFFECT_1].Effect  = 0;
-    });
-
     ApplySpellFix({ 66317 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT;
@@ -2262,9 +2253,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     ApplySpellFix({ 66318 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
-        spellInfo->Speed = 14.0f;
         spellInfo->Attributes |= SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT;
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
