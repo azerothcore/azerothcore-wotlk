@@ -2690,7 +2690,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     m_spellAura = nullptr; // Set aura to null for every target-make sure that pointer is not used for unit without aura applied
 
-    if (m_originalCaster && missInfo != SPELL_MISS_EVADE && !m_originalCaster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) && (m_spellInfo->HasInitialAggro() || effectUnit->IsEngaged()))
+    if (m_originalCaster && missInfo != SPELL_MISS_EVADE && !HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT) &&
+        !m_originalCaster->IsFriendlyTo(effectUnit) &&
+        (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) &&
+        (m_spellInfo->HasInitialAggro() || effectUnit->IsEngaged()))
         effectUnit->SetInCombatWith(m_originalCaster);
 
     PrepareScriptHitHandlers();
@@ -2881,6 +2884,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             // Fill base damage struct (unitTarget - is real spell target)
             SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
+            damageInfo.skipCombat = HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT);
 
             // Check damage immunity
             if (unitTarget->IsImmunedToDamage(caster, m_spellInfo))
@@ -3035,7 +3039,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         if (missInfo != SPELL_MISS_EVADE && !unitCaster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
         {
-            if (!m_triggeredByAuraSpell.spellInfo || m_damage || (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo))))
+            if (!HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT) &&
+                (!m_triggeredByAuraSpell.spellInfo || m_damage ||
+                    (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell
+                        == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo)))))
                 unitCaster->AtTargetAttacked(effectUnit, !(m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT) || m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS)));
 
             // Spells that don't initiate combat shouldn't affect stand state (e.g. Premeditation, Storm Giant/Felreaver Passive)
@@ -3602,7 +3609,16 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     if (triggeredByAura)
     {
         m_triggeredByAuraSpell.Init(triggeredByAura);
+
+        // e.g. Living Bomb exploding on an enemy after its mage died and got resurrected
+        if (triggeredByAura->GetCasterGUID() == m_originalCasterGUID &&
+            triggeredByAura->GetBase()->HasCasterDiedSinceApply())
+            _triggeredCastFlags = TriggerCastFlags(_triggeredCastFlags | TRIGGERED_DONT_ENTER_COMBAT);
     }
+
+    // e.g. Darkmoon Card: Death proccing off a bleed tick the druid applied before dying
+    if (m_originalCaster && m_originalCaster->IsInPreDeathAuraTick())
+        _triggeredCastFlags = TriggerCastFlags(_triggeredCastFlags | TRIGGERED_DONT_ENTER_COMBAT);
 
     // create and add update event for this spell
     _spellEvent = new SpellEvent(this);
@@ -5815,6 +5831,8 @@ void Spell::HandleThreatSpells()
         else
         {
             if (!target->CanHaveThreatList())
+                continue;
+            if (HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT) && !target->IsEngagedBy(unitCaster))
                 continue;
             target->GetThreatMgr().AddThreat(unitCaster, threatToAdd, m_spellInfo, true);
         }
@@ -8653,7 +8671,8 @@ void Spell::HandleLaunchPhase()
             }
         }
 
-        if (m_originalCaster && target.missCondition != SPELL_MISS_EVADE)
+        if (m_originalCaster && target.missCondition != SPELL_MISS_EVADE &&
+            !HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT))
         {
             Unit* targetUnit = m_caster->GetGUID() == target.targetGUID ? unitCaster : ObjectAccessor::GetUnit(*m_caster, target.targetGUID);
             if (targetUnit && !m_originalCaster->IsFriendlyTo(targetUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) && (m_spellInfo->HasInitialAggro() || targetUnit->IsEngaged()))

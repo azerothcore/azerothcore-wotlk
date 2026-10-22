@@ -1113,8 +1113,38 @@ void AuraEffect::SendTickImmune(Unit* target, Unit* caster) const
         caster->SendSpellDamageImmune(target, m_spellInfo->Id);
 }
 
+namespace
+{
+    class PreDeathAuraTickScope
+    {
+    public:
+        PreDeathAuraTickScope(Unit* caster, bool active) : _caster(active ? caster : nullptr),
+            _wasInTick(_caster && _caster->IsInPreDeathAuraTick())
+        {
+            if (_caster)
+                _caster->SetInPreDeathAuraTick(true);
+        }
+
+        ~PreDeathAuraTickScope()
+        {
+            if (_caster)
+                _caster->SetInPreDeathAuraTick(_wasInTick);
+        }
+
+        PreDeathAuraTickScope(PreDeathAuraTickScope const&) = delete;
+        PreDeathAuraTickScope& operator=(PreDeathAuraTickScope const&) = delete;
+
+    private:
+        Unit* const _caster;
+        bool const _wasInTick;
+    };
+}
+
 void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
 {
+    // spells the caster casts from this tick's procs and scripts skip combat, see Spell::prepare
+    PreDeathAuraTickScope preDeathTick(caster, GetBase()->HasCasterDiedSinceApply(caster));
+
     bool prevented = GetBase()->CallScriptEffectPeriodicHandlers(this, aurApp);
     if (prevented)
         return;
