@@ -637,8 +637,6 @@ enum SpellCooldownFlags
 
 typedef std::unordered_map<uint32, uint32> PacketCooldowns;
 
-// delay time next attack to prevent client attack animation problems
-#define ATTACK_DISPLAY_DELAY 200
 #define MAX_PLAYER_STEALTH_DETECT_RANGE 30.0f               // max distance for detection targets by player
 
 enum class SpeedOpcodeIndex : uint32
