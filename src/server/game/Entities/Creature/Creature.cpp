@@ -290,6 +290,7 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
 
     ResetLootMode(); // restore default loot mode
     TriggerJustRespawned = true;
+    _firstAppearance = true;
     _focusSpell = nullptr;
 
     m_respawnedTime = time_t(0);
@@ -722,6 +723,8 @@ void Creature::Update(uint32 diff)
                 m_vehicleKit->Reset();
             AI()->JustRespawned();
         }
+
+        _firstAppearance = false;
     }
 
     switch (m_deathState)
