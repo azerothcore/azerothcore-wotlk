@@ -192,6 +192,7 @@ struct boss_shade_of_akama : public BossAI
                 DoCast(akama, SPELL_THREAT, true);
                 me->AddThreat(akama, 900000.0f);
                 akama->AI()->DoCast(me, SPELL_FIXATE, true);
+                akama->AI()->AttackStart(me);
                 AttackStart(akama);
             }
 
