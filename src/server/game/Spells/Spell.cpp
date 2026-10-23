@@ -9503,8 +9503,9 @@ namespace Acore
                         effectiveRange += unitTarget->GetCombatReach();
 
                 // override the range check for entry area targets
+                // players stay 3d, retail never hits them in 2d
                 float dist = target->GetExactDist(_position);
-                if (_targetSelectionType == TARGET_CHECK_ENTRY)
+                if (_targetSelectionType == TARGET_CHECK_ENTRY && !target->IsPlayer())
                     dist = target->GetExactDist2d(_position);
                 if (dist > effectiveRange)
                     return false;
