@@ -25,7 +25,7 @@
 
 class AuraEffect;
 class Item;
-class Position;
+struct Position;
 class SpellCastTargets;
 class WorldObject;
 
@@ -159,6 +159,7 @@ enum TriggerCastFlags
     TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT      = 0x00080000,   //! Will ignore equipped item requirements
     TRIGGERED_NO_PERIODIC_RESET                     = 0x00100000,   //! Periodic aura tick wont be reset on override
     TRIGGERED_IGNORE_EFFECTS                        = 0x00200000,   //! Ignore spell effects - used for ritual portals
+    TRIGGERED_DONT_ENTER_COMBAT                     = 0x00400000,   //! Skips hostile-target combat calls on launch/hit
     TRIGGERED_FULL_DEBUG_MASK                       = 0xFFFFFFFF
 };
 
@@ -177,17 +178,6 @@ public:
         push_back(std::make_pair(mod, value));
     }
 };
-
-struct SpellImmune
-{
-    SpellImmune() : spellId(0), type(IMMUNITY_EFFECT), blockType(SPELL_BLOCK_TYPE_ALL) { }
-
-    uint32 spellId;
-    uint32 type;
-    uint32 blockType;
-};
-
-typedef std::vector<SpellImmune> SpellImmuneList;
 
 // AzerothCore note: TC keeps SpellCastTargets in SpellDefines.h, so its
 // CastSpellTargetArg can hold an Optional<SpellCastTargets> by value.

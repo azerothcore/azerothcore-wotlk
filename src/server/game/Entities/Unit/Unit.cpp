@@ -457,6 +457,14 @@ Unit::Unit() : WorldObject(),
 // Methods of class Unit
 Unit::~Unit()
 {
+    // Detach any AbstractFollowers still targeting this unit (e.g. a summoned pet/guardian/totem's
+    // FollowMovementGenerator) before it is destroyed. RemoveAllFollowers() is otherwise only called
+    // from RemoveFromWorld(), itself skipped entirely if this unit was already out of world -- so a
+    // unit destroyed without going through that path can leave a follower holding a dangling _target,
+    // crashing later in AbstractFollower::SetTarget when it tries to unregister itself. No-op/safe if
+    // m_followingMe is already empty.
+    RemoveAllFollowers();
+
     // set current spells as deletable
     for (uint8 i = 0; i < CURRENT_MAX_SPELL; ++i)
         if (m_currentSpells[i])
@@ -1072,6 +1080,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             SpellInfo const* spell = (*i)->GetSpellInfo();
 
             uint32 shareDamage = CalculatePct(damage, (*i)->GetAmount());
+            bool const hasSharedDamage = shareDamage != 0;
 
             uint32 shareAbsorb = 0;
             uint32 shareResist = 0;
@@ -1095,6 +1104,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             {
                 attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, shareResist, damagetype == DIRECT_DAMAGE, 0, false, true);
             }
+
+            // Shared damage is a hostile interaction for its recipient too.
+            if (hasSharedDamage && attacker && !attacker->IsFriendlyTo(shareDamageTarget))
+                attacker->AtTargetAttacked(shareDamageTarget, !spellProto || spellProto->HasInitialAggro());
 
             Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask, spellProto, false, false, damageSpell);
         }
@@ -1251,7 +1264,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         if (!victim->IsPlayer())
         {
-            /// @fix: Hack to avoid premature leashing
+            // DoT ticks and passive damage (e.g. Thorns) do not reset leash timer
             if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
                 victim->ToCreature()->UpdateLeashExtensionTime();
 
@@ -2091,7 +2104,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
     // If this is a creature and it attacks from behind it has a probability to daze it's victim
     if ((damageInfo->damages[0].damage + damageInfo->damages[1].damage) && ((damageInfo->hitOutCome == MELEE_HIT_CRIT || damageInfo->hitOutCome == MELEE_HIT_CRUSHING || damageInfo->hitOutCome == MELEE_HIT_NORMAL || damageInfo->hitOutCome == MELEE_HIT_GLANCING) &&
                                !IsPlayer() && !ToCreature()->IsControlledByPlayer() && !victim->HasInArc(M_PI, this)
-                               && (victim->IsPlayer() || !victim->ToCreature()->isWorldBoss()) && !victim->IsVehicle()))
+                               && (victim->IsPlayer() || (!victim->ToCreature()->isWorldBoss() && !victim->IsVehicle()))))
     {
         // -probability is between 0% and 40%
         // 20% base chance
@@ -2549,6 +2562,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
             if (!caster || (caster == victim) || !caster->IsInWorld() || !caster->IsAlive())
                 continue;
 
+            SpellInfo const* splitSpellInfo = (*itr)->GetSpellInfo();
             int32 splitDamage = (*itr)->GetAmount();
 
             // absorb must be smaller than the damage itself
@@ -2588,11 +2602,16 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
 
             if (attacker)
             {
-                attacker->SendSpellNonMeleeDamageLog(caster, (*itr)->GetSpellInfo(), splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
+                attacker->SendSpellNonMeleeDamageLog(caster, splitSpellInfo, splitted, schoolMask, splitted_absorb, splitted_resist, false, 0, false, true);
             }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, (*itr)->GetSpellInfo(), false);
+
+            // Split damage is a hostile interaction for its recipient too.
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
+
+            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo, false);
         }
 
         // We're going to call functions which can modify content of the list during iteration over it's elements
@@ -2665,6 +2684,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
             }
 
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+
+            // Split damage is a hostile interaction for its recipient too.
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+                attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
+
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, splitSchoolMask, splitSpellInfo, false);
         }
     }
@@ -2761,6 +2785,16 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
 
     if (attType != BASE_ATTACK && attType != OFF_ATTACK)
         return;                                             // ignore ranged case
+
+    // Let the pet know we've started attacking someting. Handles melee attacks only
+    // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
+    if (IsPlayer())
+    {
+        for (Unit* controlled : m_Controlled)
+            if (Creature* cControlled = controlled->ToCreature())
+                if (CreatureAI* controlledAI = cControlled->AI())
+                    controlledAI->OwnerAttacked(victim);
+    }
 
     if (!extra && _lastExtraAttackSpell)
     {
@@ -4322,6 +4356,18 @@ bool Unit::IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType aur
             if (!diff)
                 for (int32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     diff += int32((auraEffectMask & (1 << i)) >> i) - int32((existingAurEff->GetBase()->GetEffectMask() & (1 << i)) >> i);
+
+            if (!diff && spellInfo->GetFirstRankSpell()->Id != existingAurEff->GetSpellInfo()->GetFirstRankSpell()->Id)
+            {
+                int32 newDuration = spellInfo->GetMaxDuration();
+                int32 existingDuration = existingAurEff->GetBase()->GetMaxDuration();
+                if (newDuration == -1 && existingDuration != -1)
+                    diff = 1;
+                else if (newDuration != -1 && existingDuration == -1)
+                    diff = -1;
+                else
+                    diff = newDuration - existingDuration;
+            }
 
             if (diff > 0)
             {
@@ -6693,7 +6739,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo)
         data << uint32(0);
 
     //! Probably used for debugging purposes, as it is not known to appear on retail servers
-    if (damageInfo->HitInfo & HITINFO_UNK1)
+    if (damageInfo->HitInfo & HITINFO_DEBUG)
     {
         data << uint32(0);
         data << float(0);
@@ -6978,6 +7024,13 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
         }
     }
 
+    return GetFactionReactionTo(factionTemplateEntry, targetFactionTemplateEntry);
+}
+
+ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, FactionTemplateEntry const* targetFactionTemplateEntry)
+{
+    if (!factionTemplateEntry || !targetFactionTemplateEntry)
+        return REP_NEUTRAL;
     // common faction based check
     if (factionTemplateEntry->IsHostileTo(*targetFactionTemplateEntry))
         return REP_HOSTILE;
@@ -6987,6 +7040,7 @@ ReputationRank Unit::GetFactionReactionTo(FactionTemplateEntry const* factionTem
         return REP_FRIENDLY;
     if (factionTemplateEntry->factionFlags & FACTION_TEMPLATE_FLAG_HATES_ALL_EXCEPT_FRIENDS)
         return REP_HOSTILE;
+
     // neutral by default
     return REP_NEUTRAL;
 }
@@ -7080,6 +7134,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     if (HasUnattackableAura())
         RemoveAurasByType(SPELL_AURA_MOD_UNATTACKABLE);
 
+    bool const isNewAttack = !m_attacking;
+
     if (m_attacking)
     {
         if (m_attacking == victim)
@@ -7169,22 +7225,14 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
     }
 
-    // delay offhand weapon attack by 50% of the base attack time
-    if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
+    // delay offhand weapon attack by 50% of the base attack time, on a new attack only
+    // unlike the timer writes this replaced, this runs once per attack start rather than once
+    // per swing, so it staggers the offhand without locking the two swing intervals together
+    if (isNewAttack && HasOffhandWeaponForAttack())
         setAttackTimer(OFF_ATTACK, std::max(getAttackTimer(OFF_ATTACK), getAttackTimer(BASE_ATTACK) + int32(CalculatePct(GetFloatValue(UNIT_FIELD_BASEATTACKTIME), 50))));
 
     if (meleeAttack)
         SendMeleeAttackStart(victim);
-
-    // Let the pet know we've started attacking someting. Handles melee attacks only
-    // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
-    if (IsPlayer())
-    {
-        for (Unit* controlled : m_Controlled)
-            if (Creature* cControlled = controlled->ToCreature())
-                if (CreatureAI* controlledAI = cControlled->AI())
-                    controlledAI->OwnerAttacked(victim);
-    }
 
     return true;
 }
@@ -7226,7 +7274,7 @@ bool Unit::AttackStop()
     return true;
 }
 
-void Unit::CombatStop(bool includingCast, bool mutualPvP)
+void Unit::CombatStop(bool includingCast, bool mutualPvP, bool keepPvPForOthers)
 {
     if (includingCast && IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
@@ -7239,7 +7287,7 @@ void Unit::CombatStop(bool includingCast, bool mutualPvP)
         pCreature->ClearLastLeashExtensionTimePtr();
 
     if (mutualPvP)
-        ClearInCombat();
+        ClearInCombat(keepPvPForOthers);
     else
     {
         GetCombatManager().EndAllPvECombat();
@@ -9762,9 +9810,12 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster, Spel
     // Spells that don't have effectMechanics.
     if (uint32 mechanic = spellInfo->Mechanic)
     {
-        SpellImmuneContainer const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
-        if (mechanicList.count(mechanic) > 0)
-            return true;
+        if (!spellInfo->HasAttribute(SPELL_ATTR0_CU_BYPASS_MECHANIC_IMMUNITY))
+        {
+            SpellImmuneContainer const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+            if (mechanicList.count(mechanic) > 0)
+                return true;
+        }
     }
 
     bool immuneToAllEffects = true;
@@ -9838,9 +9889,12 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Worl
 
     if (uint32 mechanic = spellInfo->Effects[index].Mechanic)
     {
-        auto const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
-        if (mechanicList.count(mechanic) > 0)
-            return true;
+        if (!spellInfo->HasAttribute(SPELL_ATTR0_CU_BYPASS_MECHANIC_IMMUNITY))
+        {
+            auto const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+            if (mechanicList.count(mechanic) > 0)
+                return true;
+        }
     }
 
     if (!spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
@@ -10154,29 +10208,33 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     return uint32(std::max(tmpDamage, 0.0f));
 }
 
-class spellIdImmunityPredicate
-{
-public:
-    spellIdImmunityPredicate(uint32 type) : _type(type) {}
-    bool operator()(SpellImmune const& spellImmune) { return spellImmune.spellId == 0 && spellImmune.type == _type; }
-
-private:
-    uint32 _type;
-};
-
 void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType /*blockType*/)
 {
     if (apply)
+    {
+        // Immunities with spellId 0 are applied by scripts and are meant to exist only once per type.
+        if (!spellId)
+        {
+            auto bounds = m_spellImmune[op].equal_range(type);
+            for (auto itr = bounds.first; itr != bounds.second; ++itr)
+                if (!itr->second)
+                    return;
+        }
+
         m_spellImmune[op].emplace(type, spellId);
+    }
     else
     {
+        // Remove a single entry: the same spell can be applied by several casters at once (e.g. the four
+        // Magic Barrier channels on Lady Vashj), and each removal must drop only the application it belongs to.
         auto bounds = m_spellImmune[op].equal_range(type);
-        for (auto itr = bounds.first; itr != bounds.second;)
+        for (auto itr = bounds.first; itr != bounds.second; ++itr)
         {
             if (itr->second == spellId)
-                itr = m_spellImmune[op].erase(itr);
-            else
-                ++itr;
+            {
+                m_spellImmune[op].erase(itr);
+                break;
+            }
         }
     }
 }
@@ -10366,12 +10424,18 @@ void Unit::SetImmuneToNPC(bool apply, bool keepCombat)
         RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
 }
 
-void Unit::ClearInCombat()
+void Unit::ClearInCombat(bool keepPvPForOthers)
 {
     m_CombatTimer = 0;
     // Let CombatManager handle flag removal through UpdateOwnerCombatState
     // so that AtExitCombat/AtDisengage callbacks properly fire.
-    GetCombatManager().EndAllCombat();
+    if (keepPvPForOthers)
+    {
+        GetCombatManager().EndAllPvECombat();
+        GetCombatManager().SuppressPvPCombat();
+    }
+    else
+        GetCombatManager().EndAllCombat();
     // If flag is still set (e.g. set by old code path without CombatReference),
     // remove it directly.
     if (IsInCombat())
@@ -10437,6 +10501,18 @@ bool Unit::isTargetableForAttack(bool checkFakeDeath, Unit const* byWho) const
 bool Unit::IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell) const
 {
     return _IsValidAttackTarget(target, bySpell);
+}
+
+bool Unit::IsAreaEffectPvPBlocked(Unit const* target, SpellInfo const* bySpell) const
+{
+    if (!bySpell || !bySpell->IsAffectingArea() || bySpell->HasAttribute(SPELL_ATTR5_IGNORE_AREA_EFFECT_PVP_CHECK))
+        return false;
+
+    // only player controlled units take part in PvP, PvP flagged creatures remain valid targets
+    if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) || !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+        return false;
+
+    return !IsPvP();
 }
 
 // function based on function Unit::CanAttack from 13850 client
@@ -10558,7 +10634,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
     // additional checks - only PvP case
     if (playerAffectingAttacker && playerAffectingTarget)
     {
-        if (!IsPvP() && bySpell && bySpell->IsAffectingArea() && !bySpell->HasAttribute(SPELL_ATTR5_IGNORE_AREA_EFFECT_PVP_CHECK))
+        if (IsAreaEffectPvPBlocked(target, bySpell))
             return false;
 
         if (target->IsPvP())
@@ -11069,13 +11145,18 @@ void Unit::SendSpeedToController(UnitMoveType mtype, Player* target) const
 
 void Unit::setDeathState(DeathState s, bool despawn)
 {
+    bool const wasAlive = IsAlive();
+
     // death state needs to be updated before RemoveAllAurasOnDeath() calls HandleChannelDeathItem(..) so that
     // it can be used to check creation of death items (such as soul shards).
     m_deathState = s;
 
     if (s != DeathState::Alive && s != DeathState::JustRespawned)
     {
-        CombatStop();
+        // restart our pvp timers so units fighting us get a full pvp timeout from our death (#27967)
+        if (wasAlive)
+            GetCombatManager().RestartPvPCombatTimers();
+        CombatStop(false, /*mutualPvP*/ true, /*keepPvPForOthers*/ true);
         ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
         if (IsNonMeleeSpellCast(false))
@@ -11160,6 +11241,12 @@ void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
 {
     if (!target->IsEngaged() && !canInitialAggro)
         return;
+
+    if (Creature* cTarget = target->ToCreature())
+    {
+        if (!cTarget->GetOwnerGUID().IsPlayer())
+            cTarget->UpdateLeashExtensionTime();
+    }
 
     target->EngageWithTarget(this);
     if (Unit* targetOwner = target->GetCharmerOrOwner())
@@ -13684,8 +13771,9 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
                 //Remove all expected to remove at death auras (most important negative case like DoT or periodic triggers)
                 victim->RemoveAllAurasOnDeath();
 
-                // Stop attacks
-                victim->CombatStop();
+                // Stop attacks - units in pvp combat with us keep a full pvp timeout, as on a real death
+                victim->GetCombatManager().RestartPvPCombatTimers();
+                victim->CombatStop(false, /*mutualPvP*/ true, /*keepPvPForOthers*/ true);
 
                 // restore for use at real death
                 victim->SetUInt32Value(PLAYER_SELF_RES_SPELL, ressSpellId);
@@ -13782,6 +13870,9 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
                 }
             }
         }
+
+        if (player)
+            sScriptMgr->OnPlayerCreatureKillCredit(player, creature);
 
         // Dungeon specific stuff, only applies to players killing creatures
         if (creature->GetInstanceId())
@@ -15760,7 +15851,10 @@ void Unit::OutDebugInfo() const
 class AuraMunchingQueue : public BasicEvent
 {
 public:
-    AuraMunchingQueue(Unit& owner, ObjectGuid targetGUID, int32 basePoints, uint32 spellId, AuraEffect* aurEff, AuraType auraType) : _owner(owner), _targetGUID(targetGUID), _basePoints(basePoints), _spellId(spellId), _aurEff(aurEff), _auraType(auraType) { }
+    AuraMunchingQueue(Unit& owner, ObjectGuid targetGUID, int32 basePoints, uint32 spellId, AuraEffect* aurEff,
+        AuraType auraType, TriggerCastFlags triggerFlags)
+        : _owner(owner), _targetGUID(targetGUID), _basePoints(basePoints), _spellId(spellId), _aurEff(aurEff),
+        _auraType(auraType), _triggerFlags(triggerFlags) { }
 
     bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
     {
@@ -15776,7 +15870,8 @@ public:
                 if (!auraFound)
                     _aurEff = nullptr;
 
-                _owner.CastCustomSpell(_spellId, SPELLVALUE_BASE_POINT0, _basePoints, target, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_NO_PERIODIC_RESET), nullptr, _aurEff, _owner.GetGUID());
+                _owner.CastCustomSpell(_spellId, SPELLVALUE_BASE_POINT0, _basePoints, target, _triggerFlags, nullptr,
+                    _aurEff, _owner.GetGUID());
             }
 
         return true;
@@ -15789,9 +15884,11 @@ private:
     uint32 _spellId;
     AuraEffect* _aurEff;
     AuraType _auraType;
+    TriggerCastFlags _triggerFlags;
 };
 
-void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex)
+void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount,
+    uint8 effectIndex, TriggerCastFlags extraTriggerFlags)
 {
     AuraEffect* aurEff = nullptr;
     for (AuraEffectList::iterator i = m_modAuras[auraType].begin(); i != m_modAuras[auraType].end(); ++i)
@@ -15804,11 +15901,16 @@ void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, Aura
         break;
     }
 
+    TriggerCastFlags triggerFlags =
+        TriggerCastFlags((TRIGGERED_FULL_MASK & ~TRIGGERED_NO_PERIODIC_RESET) | extraTriggerFlags);
+
     // xinef: delay only for casting on different unit
     if (this == caster || !sWorld->getBoolConfig(CONFIG_MUNCHING_BLIZZLIKE))
-        caster->CastCustomSpell(spellId, SPELLVALUE_BASE_POINT0, addAmount, this, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_NO_PERIODIC_RESET), nullptr, aurEff, caster->GetGUID());
+        caster->CastCustomSpell(spellId, SPELLVALUE_BASE_POINT0, addAmount, this, triggerFlags, nullptr, aurEff,
+            caster->GetGUID());
     else
-        caster->m_Events.AddEvent(new AuraMunchingQueue(*caster, GetGUID(), addAmount, spellId, aurEff, auraType), caster->m_Events.CalculateQueueTime(400));
+        caster->m_Events.AddEvent(new AuraMunchingQueue(*caster, GetGUID(), addAmount, spellId, aurEff, auraType,
+            triggerFlags), caster->m_Events.CalculateQueueTime(400));
 }
 
 void Unit::SendClearTarget()

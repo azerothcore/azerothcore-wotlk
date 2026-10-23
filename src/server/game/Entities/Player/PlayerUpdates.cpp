@@ -168,6 +168,8 @@ void Player::Update(uint32 p_time)
             // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
             bool const victimIsVehicleBase = GetVehicleBase() == victim;
 
+            bool mainHandSwung = false;
+
             if (isAttackReady(BASE_ATTACK))
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
@@ -193,22 +195,19 @@ void Player::Update(uint32 p_time)
                 {
                     m_swingErrorMsg = 0; // reset swing error state
 
-                    // prevent base and off attack in same time, delay attack at
-                    // 0.2 sec
-                    if (HasOffhandWeaponForAttack())
-                        if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                            setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-
                     // do attack
                     AttackerStateUpdate(victim, BASE_ATTACK);
                     resetAttackTimer(BASE_ATTACK);
 
                     // Blizzlike: Reset ranged swing timer when performing melee attack
                     resetAttackTimer(RANGED_ATTACK);
+
+                    mainHandSwung = true;
                 }
             }
 
-            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
+            // The client draws one swing animation per frame, so let the main hand swing alone
+            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK) && !mainHandSwung)
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
@@ -216,11 +215,6 @@ void Player::Update(uint32 p_time)
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
-                    // prevent base and off attack in same time, delay attack at
-                    // 0.2 sec
-                    if (getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
-                        setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
-
                     // do attack
                     AttackerStateUpdate(victim, OFF_ATTACK);
                     resetAttackTimer(OFF_ATTACK);
@@ -428,6 +422,7 @@ void Player::Update(uint32 p_time)
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
+    sScriptMgr->OnPlayerAfterUpdate(this, p_time);
 }
 
 void Player::UpdateMirrorTimers()
@@ -2050,7 +2045,16 @@ void Player::UpdateCharmedAI()
 
     if (!target || !IsValidAttackTarget(target))
     {
-        target = SelectNearbyTarget(nullptr, GetMap()->IsDungeon() ? 100.f : 30.f);
+        float const targetSearchDistance = GetMap()->IsDungeon() ? 100.f : 30.f;
+
+        // NPC mind controls should turn a player against their group before
+        // considering unrelated nearby units.
+        if (charmer->IsCreature())
+            target = SelectCharmedAIGroupTarget(targetSearchDistance);
+
+        if (!target)
+            target = SelectNearbyTarget(nullptr, targetSearchDistance);
+
         if (!target)
         {
             if (!HasUnitState(UNIT_STATE_FOLLOW))
@@ -2185,6 +2189,32 @@ void Player::UpdateCharmedAI()
             }
         }
     }
+}
+
+Unit* Player::SelectCharmedAIGroupTarget(float distance) const
+{
+    Group const* group = GetGroup();
+    if (!group)
+        return nullptr;
+
+    Player* target = nullptr;
+    for (GroupReference const* itr = group->GetFirstMember(); itr; itr = itr->next())
+    {
+        Player* member = itr->GetSource();
+        if (!member || member == this || !member->IsInWorld())
+            continue;
+
+        if (!IsWithinDistInMap(member, distance) || !IsWithinLOSInMap(member))
+            continue;
+
+        if ((!IsHostileTo(member) && !member->IsHostileTo(this)) || !IsValidAttackTarget(member))
+            continue;
+
+        if (!target || GetDistanceOrder(member, target))
+            target = member;
+    }
+
+    return target;
 }
 
 void Player::UpdateLootAchievements(LootItem* item, Loot* loot)

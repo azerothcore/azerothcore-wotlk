@@ -21,7 +21,6 @@
 #include "MoveSplineInit.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "TaskScheduler.h"
 #include "World.h"
 #include <algorithm>
@@ -75,49 +74,6 @@ public:
     }
 };
 
-/******************************************
-***** Shady Gnome - A Suitable Disguise **
-****************************************/
-
-enum DisguiseEvent
-{
-    ACTION_SHANDY_INTRO         = 0,
-    ACTION_WATER                = 1,
-    ACTION_SHIRTS               = 2,
-    ACTION_PANTS                = 3,
-    ACTION_UNMENTIONABLES       = 4,
-
-    EVENT_INTRO_DH1             = 1,
-    EVENT_INTRO_DH2             = 2,
-    EVENT_INTRO_DH3             = 3,
-    EVENT_INTRO_DH4             = 4,
-    EVENT_INTRO_DH5             = 5,
-    EVENT_INTRO_DH6             = 6,
-    EVENT_OUTRO_DH              = 7,
-
-    SAY_SHANDY1                 = 0,
-    SAY_SHANDY2                 = 1,
-    SAY_SHANDY3                 = 2,
-    SAY_SHANDY_WATER            = 3, // shirts = 4, pants = 5, unmentionables = 6
-    SAY_SHANDY4                 = 7,
-    SAY_SHANDY5                 = 8,
-    SAY_SHANDY6                 = 9,
-};
-
-enum DisguiseMisc
-{
-    QUEST_SUITABLE_DISGUISE_A       = 20438,
-    QUEST_SUITABLE_DISGUISE_H       = 24556,
-
-    SPELL_EVOCATION_VISUAL          = 69659,
-
-    NPC_AQUANOS_ENTRY               = 36851,
-
-    GOSSIP_MENU_AQUANOS             = 10854,
-    GOSSIP_AQUANOS_ALLIANCE         = 0,
-    GOSSIP_AQUANOS_HORDE            = 1,
-};
-
 enum spells
 {
     // Sewers Warrior Spells
@@ -134,146 +90,6 @@ enum spells
     SPELL_FROSTFIRE                 = 44614
 };
 
-class npc_shandy_dalaran : public CreatureScript
-{
-public:
-    npc_shandy_dalaran() : CreatureScript("npc_shandy_dalaran") { }
-
-    struct npc_shandy_dalaranAI : public ScriptedAI
-    {
-        npc_shandy_dalaranAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            _events.Reset();
-            _aquanosGUID.Clear();
-        }
-
-        void SetData(uint32 type, uint32 /*data*/) override
-        {
-            switch (type)
-            {
-                case ACTION_SHANDY_INTRO:
-                    if (Creature* aquanos = me->FindNearestCreature(NPC_AQUANOS_ENTRY, 30, true))
-                        _aquanosGUID = aquanos->GetGUID();
-
-                    _events.Reset();
-                    _lCount = 0;
-                    _lSource = 0;
-                    _canWash = false;
-                    Talk(SAY_SHANDY1);
-                    _events.ScheduleEvent(EVENT_INTRO_DH1, 5s);
-                    _events.ScheduleEvent(EVENT_OUTRO_DH, 10min);
-                    break;
-                default:
-                    if (_lSource == type && _canWash)
-                    {
-                        _canWash = false;
-                        _events.ScheduleEvent(EVENT_INTRO_DH2, type == ACTION_UNMENTIONABLES ? 4s : 10s);
-                        Talk(SAY_SHANDY2);
-                        if (Creature* aquanos = ObjectAccessor::GetCreature(*me, _aquanosGUID))
-                            aquanos->CastSpell(aquanos, SPELL_EVOCATION_VISUAL, false);
-                    }
-                    break;
-            }
-        }
-
-        void RollTask()
-        {
-            _lSource = urand(ACTION_SHIRTS, ACTION_UNMENTIONABLES);
-            if (_lCount == 1 || _lCount == 4)
-                _lSource = ACTION_WATER;
-
-            Talk(SAY_SHANDY_WATER + _lSource - 1);
-            _canWash = true;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-            switch (_events.ExecuteEvent())
-            {
-                case EVENT_INTRO_DH1:
-                    Talk(SAY_SHANDY3);
-                    _events.ScheduleEvent(EVENT_INTRO_DH2, 15s);
-                    break;
-                case EVENT_INTRO_DH2:
-                    if (_lCount++ > 6)
-                        _events.ScheduleEvent(EVENT_INTRO_DH3, 6s);
-                    else
-                        RollTask();
-
-                    break;
-                case EVENT_INTRO_DH3:
-                    Talk(SAY_SHANDY4);
-                    _events.ScheduleEvent(EVENT_INTRO_DH4, 20s);
-                    break;
-                case EVENT_INTRO_DH4:
-                    Talk(SAY_SHANDY5);
-                    _events.ScheduleEvent(EVENT_INTRO_DH5, 3s);
-                    break;
-                case EVENT_INTRO_DH5:
-                    me->SummonGameObject(201384, 5798.74f, 693.19f, 657.94f, 0.91f, 0, 0, 0, 0, 90000000);
-                    _events.ScheduleEvent(EVENT_INTRO_DH6, 1s);
-                    break;
-                case EVENT_INTRO_DH6:
-                    me->SetWalk(true);
-                    me->GetMotionMaster()->MovePoint(0, 5797.55f, 691.97f, 657.94f);
-                    _events.RescheduleEvent(EVENT_OUTRO_DH, 30s);
-                    break;
-                case EVENT_OUTRO_DH:
-                    me->GetMotionMaster()->MoveTargetedHome();
-                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                    _events.Reset();
-                    break;
-            }
-        }
-
-    private:
-        EventMap _events;
-        ObjectGuid _aquanosGUID;
-        uint8 _lCount;
-        uint32 _lSource;
-
-        bool _canWash;
-    };
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_A) == QUEST_STATUS_INCOMPLETE ||
-                player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_H) == QUEST_STATUS_INCOMPLETE)
-        {
-            if (player->GetTeamId() == TEAM_ALLIANCE)
-                AddGossipItemFor(player, GOSSIP_MENU_AQUANOS, GOSSIP_AQUANOS_ALLIANCE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            else
-                AddGossipItemFor(player, GOSSIP_MENU_AQUANOS, GOSSIP_AQUANOS_HORDE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        }
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-                CloseGossipMenuFor(player);
-                creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-                creature->AI()->SetData(ACTION_SHANDY_INTRO, 0);
-                break;
-        }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_shandy_dalaranAI(creature);
-    }
-};
 enum ArchmageLandalockQuests
 {
     QUEST_SARTHARION_MUST_DIE               = 24579,
@@ -904,7 +720,6 @@ void AddSC_dalaran()
     // our
     new npc_steam_powered_auctioneer();
     new npc_mei_francis_mount();
-    new npc_shandy_dalaran();
     new npc_archmage_landalock();
     new npc_dalaran_mage();
     new npc_dalaran_warrior();

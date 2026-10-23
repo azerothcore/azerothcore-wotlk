@@ -74,6 +74,8 @@ enum Spells
     SPELL_ARMAGEDDON_MISSILE                    = 45909,
     SPELL_CUSTOM_08_STATE                       = 45800,
     SPELL_DESTROY_ALL_DRAKES                    = 46707,
+    SPELL_KNOCKBACK                             = 47113,
+    SPELL_SWAT                                  = 46548,
 
     // Sinister Reflections
     SPELL_SINISTER_REFLECTION_SUMMON            = 45891,
@@ -107,7 +109,9 @@ enum Misc
 
     ACTION_START_POST_EVENT         = 1,
     ACTION_NO_KILL_TALK             = 2,
-    ACTION_START_AERIAL_SUPPORT     = 3
+    ACTION_START_AERIAL_SUPPORT     = 3,
+
+    DATA_HAND_ENGAGED               = 1
 };
 
 class CastArmageddon : public BasicEvent
@@ -197,26 +201,50 @@ struct npc_kiljaeden_controller : public NullCreatureAI
         }
     }
 
+    void StartEncounter()
+    {
+        if (instance->GetBossState(DATA_KILJAEDEN) != NOT_STARTED)
+            return;
+
+        // Set before pulling the Hands in, their aggro calls back into here
+        instance->SetBossState(DATA_KILJAEDEN, IN_PROGRESS);
+        summons.DoZoneInCombat(NPC_HAND_OF_THE_DECEIVER);
+
+        scheduler.Schedule(1s, [this](TaskContext context) {
+            auto const& playerList = me->GetMap()->GetPlayers();
+            for (auto const& playerRef : playerList)
+                if (Player* player = playerRef.GetSource())
+                    if (!player->IsGameMaster() && me->GetDistance2d(player) < 60.0f && player->IsAlive())
+                    {
+                        context.Repeat();
+                        return;
+                    }
+
+            CreatureAI::EnterEvadeMode();
+        });
+    }
+
+    void SetData(uint32 type, uint32 /*data*/) override
+    {
+        if (type == DATA_HAND_ENGAGED)
+            StartEncounter();
+    }
+
+    void SummonedCreatureEvade(Creature* summon) override
+    {
+        if (summon->GetEntry() != NPC_HAND_OF_THE_DECEIVER || instance->GetBossState(DATA_KILJAEDEN) != IN_PROGRESS)
+            return;
+
+        CreatureAI::EnterEvadeMode();
+    }
+
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
         summons.Despawn(summon);
 
         if (summon->GetEntry() == NPC_HAND_OF_THE_DECEIVER)
         {
-            instance->SetBossState(DATA_KILJAEDEN, IN_PROGRESS);
-
-            scheduler.Schedule(1s, [this](TaskContext context) {
-                auto const& playerList = me->GetMap()->GetPlayers();
-                for (auto const& playerRef : playerList)
-                    if (Player* player = playerRef.GetSource())
-                        if (!player->IsGameMaster() && me->GetDistance2d(player) < 60.0f && player->IsAlive())
-                        {
-                            context.Repeat();
-                            return;
-                        }
-
-                CreatureAI::EnterEvadeMode();
-            });
+            StartEncounter();
 
             if (!summons.HasEntry(NPC_HAND_OF_THE_DECEIVER))
             {
@@ -265,6 +293,8 @@ struct boss_kiljaeden : public BossAI
     void Reset() override
     {
         _phase = PHASE_NORMAL;
+        DoCastSelf(SPELL_KNOCKBACK, true);
+        DoCastSelf(SPELL_SWAT, true);
 
         ScheduleHealthCheckEvent(85, [&]{
             _phase = PHASE_DARKNESS;
@@ -457,23 +487,8 @@ struct boss_kiljaeden : public BossAI
                     float x = me->GetPositionX() + 18.0f * cos((i * 2.0f - 1.0f) * M_PI / 3.0f);
                     float y = me->GetPositionY() + 18.0f * std::sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
                     if (Creature* orb = me->SummonCreature(NPC_SHIELD_ORB, x, y, 40.0f, 0, TEMPSUMMON_CORPSE_DESPAWN))
-                    {
-                        Movement::PointsArray movementArray;
-                        movementArray.push_back(G3D::Vector3(x, y, 40.0f));
-
-                        // generate movement array
-                        for (uint8 j = 1; j < 20; ++j)
-                        {
-                            x = me->GetPositionX() + 18.0f * cos(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
-                            y = me->GetPositionY() + 18.0f * std::sin(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
-                            movementArray.push_back(G3D::Vector3(x, y, 40.0f));
-                        }
-
-                        Movement::MoveSplineInit init(orb);
-                        init.MovebyPath(movementArray);
-                        init.SetCyclic();
-                        init.Launch();
-                    }
+                        orb->GetMotionMaster()->MoveCirclePath(me->GetPositionX(), me->GetPositionY(), 40.0f, 18.0f,
+                            false, 20, FORCED_MOVEMENT_FLY);
                 }
             }, 40s);
         }
