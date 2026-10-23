@@ -1575,6 +1575,8 @@ enum AcoreStrings
 
     LANG_REMOVEITEM_NONE_LEFT           = 35480,
     LANG_CHARACTER_ONLINE               = 35481,
-    LANG_CHARACTER_OFFLINE              = 35482
+    LANG_CHARACTER_OFFLINE              = 35482,
+
+    LANG_COMMAND_SCALEOBJMESSAGE        = 35483
 };
 #endif
