@@ -1,4 +1,5 @@
--- creature_template levels from WotLK Classic sniffs (seen on CreateObject; summons excluded)
+-- creature_template levels from WotLK Classic sniffs (seen on CreateObject; creatures the sniffs show as summoned
+-- are excluded)
 -- Level outside the sniffed range
 UPDATE `creature_template` SET `minlevel` = 32, `maxlevel` = 32 WHERE `entry` = 2435; -- Southshore Crier (was 45)
 UPDATE `creature_template` SET `minlevel` = 25, `maxlevel` = 25 WHERE `entry` = 2436; -- Farmer Kent (was 45)
@@ -9,7 +10,6 @@ UPDATE `creature_template` SET `minlevel` = 19, `maxlevel` = 19 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 19, `maxlevel` = 19 WHERE `entry` = 6246; -- Latherion (was 1)
 UPDATE `creature_template` SET `minlevel` = 48, `maxlevel` = 48 WHERE `entry` = 11016; -- Captured Arko'narin (was 51)
 UPDATE `creature_template` SET `minlevel` = 48, `maxlevel` = 48 WHERE `entry` = 11018; -- Arko'narin (was 51)
-UPDATE `creature_template` SET `minlevel` = 50, `maxlevel` = 54 WHERE `entry` = 11280; -- Caer Darrow Cannoneer (was 54)
 UPDATE `creature_template` SET `minlevel` = 3, `maxlevel` = 3 WHERE `entry` = 12297; -- Cured Gazelle (was 1)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 75 WHERE `entry` = 12786; -- Guard Quine (was 62)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 75 WHERE `entry` = 12787; -- Guard Hammon (was 62)
@@ -88,6 +88,7 @@ UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82 WHERE `entry` = 33962; -- Turned Champion (was 80)
 UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82 WHERE `entry` = 34070; -- Urel Stoneheart (was 80)
 UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82 WHERE `entry` = 34196; -- Rune Etched Sentry (was 80)
+UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 36824; -- Spirit Warden (was 83)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 36993; -- Lady Jaina Proudmoore (was 83)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 37221; -- Lady Jaina Proudmoore (was 83)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 37671; -- Crown Supply Guard (was 70-75)
@@ -145,6 +146,7 @@ UPDATE `creature_template` SET `minlevel` = 54, `maxlevel` = 55 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 54, `maxlevel` = 55 WHERE `entry` = 10659; -- Cobalt Whelp (was 55)
 UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 2 WHERE `entry` = 11153; -- Red Skeletal Horse (was 1)
 UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 2 WHERE `entry` = 11154; -- Blue Skeletal Horse (was 1)
+UPDATE `creature_template` SET `minlevel` = 50, `maxlevel` = 54 WHERE `entry` = 11280; -- Caer Darrow Cannoneer (was 54)
 UPDATE `creature_template` SET `minlevel` = 58, `maxlevel` = 60 WHERE `entry` = 11284; -- Dark Shade (was 60)
 UPDATE `creature_template` SET `minlevel` = 13, `maxlevel` = 15 WHERE `entry` = 11321; -- Molten Elemental (was 13)
 UPDATE `creature_template` SET `minlevel` = 27, `maxlevel` = 28 WHERE `entry` = 11684; -- Warsong Shredder (was 27)
@@ -465,8 +467,6 @@ UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 35748; -- Velanaa (3) (was 83)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 35749; -- Vivienne Blackwhisper (3) (was 83)
 -- creature_template money: #27769 model re-run on the new maxlevel
-UPDATE `creature_template` SET `mingold` = 5, `maxgold` = 34 WHERE `entry` = 550; -- Defias Messenger (was 5-37)
-UPDATE `creature_template` SET `mingold` = 15, `maxgold` = 106 WHERE `entry` = 615; -- Blackrock Tracker (was 15-105)
 UPDATE `creature_template` SET `mingold` = 55, `maxgold` = 382 WHERE `entry` = 742; -- Green Wyrmkin (was 54-380)
 UPDATE `creature_template` SET `mingold` = 58, `maxgold` = 403 WHERE `entry` = 744; -- Green Scalebane (was 56-393)
 UPDATE `creature_template` SET `mingold` = 41, `maxgold` = 286 WHERE `entry` = 873; -- Saltscale Oracle (was 38-267)
@@ -499,7 +499,7 @@ UPDATE `creature_template` SET `mingold` = 1056, `maxgold` = 7392 WHERE `entry` 
 UPDATE `creature_template` SET `mingold` = 1056, `maxgold` = 7392 WHERE `entry` = 24069; -- Dragonflayer Bonecrusher (was 1001-7008)
 UPDATE `creature_template` SET `mingold` = 1056, `maxgold` = 7392 WHERE `entry` = 24071; -- Dragonflayer Heartsplitter (was 1001-7008)
 UPDATE `creature_template` SET `mingold` = 1056, `maxgold` = 7392 WHERE `entry` = 24849; -- Proto-Drake Rider (was 1001-7008)
-UPDATE `creature_template` SET `mingold` = 343, `maxgold` = 2404 WHERE `entry` = 25429; -- Magmoth Forager (was 352-2464)
+UPDATE `creature_template` SET `mingold` = 334, `maxgold` = 2336 WHERE `entry` = 25429; -- Magmoth Forager (was 352-2464)
 UPDATE `creature_template` SET `mingold` = 1673, `maxgold` = 11712 WHERE `entry` = 26550; -- Dragonflayer Deathseeker (was 1448-10137)
 UPDATE `creature_template` SET `mingold` = 1146, `maxgold` = 8022 WHERE `entry` = 26621; -- Ghoul Tormentor (was 1110-7770)
 UPDATE `creature_template` SET `mingold` = 1294, `maxgold` = 9060 WHERE `entry` = 26626; -- Scourge Reanimator (was 1236-8655)
@@ -554,7 +554,7 @@ UPDATE `creature_template` SET `VerifiedBuild` = 52237 WHERE `entry` IN (615,330
 35689,35690,35691,35692,35693,35694,35695,35696,35697,35699,35700,35701,35702,35703,35704,35705,35706,35707,35708,
 35709,35710,35711,35712,35713,35714,35715,35716,35718,35719,35720,35721,35722,35723,35724,35725,35726,35728,35729,
 35730,35731,35732,35733,35734,35735,35736,35737,35738,35739,35740,35741,35742,35743,35744,35745,35746,35747,35748,
-35749,36993,37221,37671,37763,37764,38188,39296);
+35749,36824,36993,37221,37671,37763,37764,38188,39296);
 UPDATE `creature_template` SET `VerifiedBuild` = 53622 WHERE `entry` IN (1358,1360,2812,7671,8519,11321,17160,17695,
 18539,18882,19830,21763,22243,31094);
 UPDATE `creature_template` SET `VerifiedBuild` = 53788 WHERE `entry` IN (80,123,206,456,550,579,2140,3105,3556,4463,
