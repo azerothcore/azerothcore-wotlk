@@ -3672,7 +3672,7 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, Unit const* victi
         Unit::ApplyResilience(victim, &crit, nullptr, false, CR_CRIT_TAKEN_RANGED);
 
     // Apply crit chance from defence skill
-    crit += (int32(GetMaxSkillValueForLevel(victim)) - int32(victim->GetDefenseSkillValue(this))) * 0.04f;
+    crit += GetCritChanceFromSkillDiff(victim);
 
     // xinef: SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE should be calculated at the end
     crit += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE);
@@ -3680,6 +3680,20 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, Unit const* victi
     if (crit < 0.0f)
         crit = 0.0f;
     return crit;
+}
+
+float Unit::GetCritChanceFromSkillDiff(Unit const* victim) const
+{
+    int32 const skillDiff = int32(victim->GetDefenseSkillValue(this)) - int32(GetMaxSkillValueForLevel(victim));
+    if (victim->IsPlayer() || skillDiff <= 0)
+        return -skillDiff * 0.04f;
+
+    // crit suppression vs higher level creatures, 4.8% against a +3 boss
+    float suppression = skillDiff * 0.12f;
+    if (skillDiff >= 15)
+        suppression += 3.0f;
+
+    return -suppression;
 }
 
 uint32 Unit::GetWeaponSkillValue (WeaponAttackType attType, Unit const* target) const
@@ -9135,7 +9149,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
 
                 // Apply crit chance from defence skill
                 if (caster)
-                    crit_chance += (int32(caster->GetMaxSkillValueForLevel(this)) - int32(GetDefenseSkillValue(caster))) * 0.04f;
+                    crit_chance += caster->GetCritChanceFromSkillDiff(this);
 
                 break;
             }
