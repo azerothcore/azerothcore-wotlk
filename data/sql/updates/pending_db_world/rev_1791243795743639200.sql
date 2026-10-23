@@ -34,7 +34,6 @@ UPDATE `creature_template` SET `minlevel` = 68, `maxlevel` = 68 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 69 WHERE `entry` = 20541; -- Orc Prisoner (1) (was 65)
 UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 69 WHERE `entry` = 20544; -- Skarloc's Mount (1) (was 1)
 UPDATE `creature_template` SET `minlevel` = 71, `maxlevel` = 71 WHERE `entry` = 20548; -- Thrall (1) (was 67)
-UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 1 WHERE `entry` = 21861; -- Vision of the Raven God (was 67)
 UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73 WHERE `entry` = 21932; -- Hydross the Unstable (was 63)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 23175; -- Tarren Mill Guardsman (was 70)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 23176; -- Tarren Mill Guardsman (was 70)
@@ -477,7 +476,6 @@ UPDATE `creature_template` SET `mingold` = 35, `maxgold` = 247 WHERE `entry` = 4
 UPDATE `creature_template` SET `mingold` = 70, `maxgold` = 489 WHERE `entry` = 5261; -- Enthralled Atal'ai (was 68-477)
 UPDATE `creature_template` SET `mingold` = 66, `maxgold` = 459 WHERE `entry` = 5295; -- Enraged Feral Scar (was 64-445)
 UPDATE `creature_template` SET `mingold` = 88, `maxgold` = 613 WHERE `entry` = 7105; -- Jadefire Satyr (was 83-581)
-UPDATE `creature_template` SET `mingold` = 185, `maxgold` = 1293 WHERE `entry` = 7286; -- Zul'Farrak Zombie (was 186-1438)
 UPDATE `creature_template` SET `mingold` = 397, `maxgold` = 2781 WHERE `entry` = 9264; -- Firebrand Pyromancer (was 373-2613)
 UPDATE `creature_template` SET `mingold` = 8, `maxgold` = 54 WHERE `entry` = 17341; -- Axxarien Trickster (was 8-53)
 UPDATE `creature_template` SET `mingold` = 610, `maxgold` = 4269 WHERE `entry` = 17371; -- Shadowmoon Warlock (was 598-4188)
@@ -524,7 +522,7 @@ UPDATE `creature_template` SET `mingold` = 1396, `maxgold` = 9774 WHERE `entry` 
 UPDATE `creature_template` SET `mingold` = 1673, `maxgold` = 11712 WHERE `entry` = 28368; -- Ymirjar Necromancer (was 1645-11514)
 UPDATE `creature_template` SET `mingold` = 1673, `maxgold` = 11712 WHERE `entry` = 28578; -- Hardened Steel Reaver (was 1623-11361)
 UPDATE `creature_template` SET `mingold` = 1673, `maxgold` = 11712 WHERE `entry` = 28836; -- Stormforged Runeshaper (was 1396-9774)
-UPDATE `creature_template` SET `mingold` = 1537, `maxgold` = 10756 WHERE `entry` = 29920; -- Ruins Dweller (was 1673-11712)
+UPDATE `creature_template` SET `mingold` = 1396, `maxgold` = 9774 WHERE `entry` = 29920; -- Ruins Dweller (was 1673-11712)
 UPDATE `creature_template` SET `mingold` = 1294, `maxgold` = 9060 WHERE `entry` = 30111; -- Twilight Worshipper (was 1236-8655)
 UPDATE `creature_template` SET `mingold` = 1294, `maxgold` = 9060 WHERE `entry` = 30319; -- Twilight Darkcaster (was 1236-8655)
 -- VerifiedBuild
@@ -564,7 +562,7 @@ UPDATE `creature_template` SET `VerifiedBuild` = 53788 WHERE `entry` IN (80,123,
 UPDATE `creature_template` SET `VerifiedBuild` = 54261 WHERE `entry` IN (742,744,752,873,1245,2164,2319,2436,2679,2907,
 2909,3815,4624,5295,5334,5434,7031,7044,8276,8522,9264,10299,10659,11016,11018,11684,12786,12787,12797,12798,13546,
 16866,16996,17006,17052,17093,17095,17097,17636,18070,18547,18948,18949,18950,18965,18970,18971,18972,18986,19000,
-19426,19432,19477,19992,20232,20324,20496,21861,22298,23643,23780,23781,25235,25397,25429,25478,25629,25989,26155,
+19426,19432,19477,19992,20232,20324,20496,22298,23643,23780,23781,25235,25397,25429,25478,25629,25989,26155,
 26484,27750,29087,29934,30596,32380,32834,33220,39349);
 -- reference_loot_template: vanilla beast elite root for level 15 (1000015 with the elite chances)
 DELETE FROM `reference_loot_template` WHERE `Entry` = 1000215;
@@ -581,6 +579,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (1000215, 11, 1080620, 0.5, 0, 1, 6, 1, 1, 'Vanilla Patterns 6-20 Level Range'),
 (1000215, 12, 1081225, 0.5, 0, 1, 6, 1, 1, 'Vanilla Patterns 12-25 Level Range');
 -- Flesheating Ghoul (1) shared the normal mode loot table, which carried its level 80-81 roots
+-- Both Flesheating Ghoul tables also gain the 3% Dungeon Trash Rares roll their Drak'Tharon neighbours carry
 UPDATE `creature_template` SET `lootid` = 31346 WHERE `entry` = 31346; -- Flesheating Ghoul (1) (was 27871)
 -- creature_loot_template: #24398 world loot roots follow the new level ranges
 DELETE FROM `creature_loot_template` WHERE `Entry` = 123 AND `Reference` IN (1000113, 1000114);
