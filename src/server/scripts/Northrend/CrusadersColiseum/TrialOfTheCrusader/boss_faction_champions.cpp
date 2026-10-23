@@ -930,7 +930,7 @@ public:
 
     struct npc_toc_warlockAI : public boss_faction_championsAI
     {
-        npc_toc_warlockAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_RANGED)
+        npc_toc_warlockAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_RANGED), summons(me)
         {
             SetEquipmentSlots(false, 49992, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
             events.Reset();
@@ -946,16 +946,42 @@ public:
         }
 
         EventMap events;
+        SummonList summons;
 
         bool myCanCast()
         {
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag(UNIT_FLAG_SILENCED) || IsCCed());
         }
 
-        void JustSummoned(Creature* c) override
+        void JustSummoned(Creature* summon) override
         {
-            if (Unit* target = c->SelectNearestTarget(200.0f))
-                c->AI()->AttackStart(target);
+            summons.Summon(summon);
+            summon->SetReactState(REACT_AGGRESSIVE);
+            if (Unit* target = summon->SelectNearestTarget(200.0f))
+                summon->AI()->AttackStart(target);
+            DoZoneInCombat(summon);
+        }
+
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            summons.Despawn(summon);
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            boss_faction_championsAI::JustDied(killer);
+            summons.DespawnAll();
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            summons.DespawnAll();
+            boss_faction_championsAI::EnterEvadeMode(why);
+        }
+
+        void OnDespawn() override
+        {
+            summons.DespawnAll();
         }
 
         void UpdateAI(uint32 diff) override
@@ -1221,7 +1247,7 @@ public:
 
     struct npc_toc_hunterAI : public boss_faction_championsAI
     {
-        npc_toc_hunterAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_RANGED)
+        npc_toc_hunterAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_RANGED), summons(me)
         {
             SetEquipmentSlots(false, 47156, EQUIP_NO_CHANGE, 48711);
             events.Reset();
@@ -1237,16 +1263,42 @@ public:
         }
 
         EventMap events;
+        SummonList summons;
 
         bool myCanCast()
         {
             return !(me->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitFlag2(UNIT_FLAG2_DISARM_RANGED) || IsCCed());
         }
 
-        void JustSummoned(Creature* c) override
+        void JustSummoned(Creature* summon) override
         {
-            if (Unit* target = c->SelectNearestTarget(200.0f))
-                c->AI()->AttackStart(target);
+            summons.Summon(summon);
+            summon->SetReactState(REACT_AGGRESSIVE);
+            if (Unit* target = summon->SelectNearestTarget(200.0f))
+                summon->AI()->AttackStart(target);
+            DoZoneInCombat(summon);
+        }
+
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            summons.Despawn(summon);
+        }
+
+        void JustDied(Unit* killer) override
+        {
+            boss_faction_championsAI::JustDied(killer);
+            summons.DespawnAll();
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            summons.DespawnAll();
+            boss_faction_championsAI::EnterEvadeMode(why);
+        }
+
+        void OnDespawn() override
+        {
+            summons.DespawnAll();
         }
 
         void UpdateAI(uint32 diff) override
