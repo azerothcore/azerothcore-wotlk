@@ -1142,7 +1142,8 @@ namespace
 
 void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
 {
-    // spells the caster casts from this tick's procs and scripts skip combat, see Spell::prepare
+    // the tick's damage and spells the caster casts from its procs and scripts skip combat,
+    // see Unit::DealDamage and Spell::prepare
     PreDeathAuraTickScope preDeathTick(caster, GetBase()->HasCasterDiedSinceApply(caster));
 
     bool prevented = GetBase()->CallScriptEffectPeriodicHandlers(this, aurApp);

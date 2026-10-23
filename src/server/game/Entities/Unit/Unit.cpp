@@ -1009,7 +1009,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
 
-    if (damageSpell && damageSpell->HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT))
+    if ((damageSpell && damageSpell->IsFromPreDeathAura()) || (attacker && attacker->IsInPreDeathAuraTick()))
         skipCombat = true;
 
     // Signal to pets that their owner was attacked - except when DOT.

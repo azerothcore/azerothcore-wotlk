@@ -2884,7 +2884,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             // Fill base damage struct (unitTarget - is real spell target)
             SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
-            damageInfo.skipCombat = HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT);
+            damageInfo.skipCombat = IsFromPreDeathAura();
 
             // Check damage immunity
             if (unitTarget->IsImmunedToDamage(caster, m_spellInfo))
@@ -3610,14 +3610,17 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     {
         m_triggeredByAuraSpell.Init(triggeredByAura);
 
-        // e.g. Living Bomb exploding on an enemy after its mage died and got resurrected
+        // e.g. Seed of Corruption detonating on an enemy after its warlock died and got resurrected
         if (triggeredByAura->GetCasterGUID() == m_originalCasterGUID &&
             triggeredByAura->GetBase()->HasCasterDiedSinceApply())
-            _triggeredCastFlags = TriggerCastFlags(_triggeredCastFlags | TRIGGERED_DONT_ENTER_COMBAT);
+            _fromPreDeathAura = true;
     }
 
     // e.g. Darkmoon Card: Death proccing off a bleed tick the druid applied before dying
     if (m_originalCaster && m_originalCaster->IsInPreDeathAuraTick())
+        _fromPreDeathAura = true;
+
+    if (_fromPreDeathAura)
         _triggeredCastFlags = TriggerCastFlags(_triggeredCastFlags | TRIGGERED_DONT_ENTER_COMBAT);
 
     // create and add update event for this spell
@@ -5832,7 +5835,7 @@ void Spell::HandleThreatSpells()
         {
             if (!target->CanHaveThreatList())
                 continue;
-            if (HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT) && !target->IsEngagedBy(unitCaster))
+            if (IsFromPreDeathAura() && !target->IsEngagedBy(unitCaster))
                 continue;
             target->GetThreatMgr().AddThreat(unitCaster, threatToAdd, m_spellInfo, true);
         }
