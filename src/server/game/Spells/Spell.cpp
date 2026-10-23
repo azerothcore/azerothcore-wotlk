@@ -5049,7 +5049,13 @@ void Spell::SendSpellGo()
                 {
                     // float casts ensure the division is performed on floats as we need float result
                     float baseCd = float(player->GetRuneBaseCooldown(i, true));
-                    data << uint8((baseCd - float(player->GetRuneCooldown(i))) / baseCd * 255); // rune cooldown passed
+                    uint32 cooldown = player->GetRuneCooldown(i);
+                    float progressValue = (baseCd - float(cooldown)) / baseCd * 255;
+                    // The client does not replace an active rune timer when processing another spend.
+                    // Round short cooldown progress upward so quantization cannot extend the client
+                    // timer beyond server readiness and suppress the subsequent cooldown update.
+                    uint8 progress = uint8(cooldown <= RUNE_MISS_COOLDOWN ? std::ceil(progressValue) : progressValue);
+                    data << progress; // rune cooldown passed
                 }
             }
         }
