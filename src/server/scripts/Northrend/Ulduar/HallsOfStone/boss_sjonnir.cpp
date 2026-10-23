@@ -214,9 +214,9 @@ public:
             });
         }
 
-        void JustEngagedWith(Unit*  /*who*/) override
+        void JustEngagedWith(Unit* who) override
         {
-            _JustEngagedWith();
+            _JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
             if (GameObject* doors = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_DOOR)))

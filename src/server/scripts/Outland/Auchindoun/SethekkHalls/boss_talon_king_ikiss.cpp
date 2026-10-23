@@ -84,9 +84,9 @@ struct boss_talon_king_ikiss : public BossAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         scheduler.Schedule(5s, [this](TaskContext context)
         {

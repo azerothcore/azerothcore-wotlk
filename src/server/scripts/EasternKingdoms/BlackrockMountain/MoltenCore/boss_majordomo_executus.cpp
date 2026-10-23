@@ -222,12 +222,12 @@ struct boss_majordomo : public BossAI
         Talk(SAY_SLAY, victim);
     }
 
-    void JustEngagedWith(Unit* /*attacker*/) override
+    void JustEngagedWith(Unit* who) override
     {
         if (!events.IsInPhase(PHASE_COMBAT))
             return;
 
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         DoCastAOE(SPELL_SEPARATION_ANXIETY);
         Talk(SAY_AGGRO);
         DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);

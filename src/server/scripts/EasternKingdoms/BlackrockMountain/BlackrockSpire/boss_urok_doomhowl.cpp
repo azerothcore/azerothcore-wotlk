@@ -58,9 +58,9 @@ struct boss_urok_doomhowl : public BossAI
             pile->DespawnOrUnsummon(0ms, Seconds(MONTH));
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_REND, 17s, 20s);
         events.ScheduleEvent(SPELL_STRIKE, 10s, 12s);
         events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, 25s, 30s);
