@@ -512,7 +512,8 @@ public:
 
     SpellCastResult CheckShapeshift(uint32 form) const;
     SpellCastResult CheckLocation(uint32 map_id, uint32 zone_id, uint32 area_id, Player* player = nullptr, bool strict = true) const;
-    SpellCastResult CheckTarget(WorldObject const* caster, WorldObject const* target, bool implicit = true) const;
+    SpellCastResult CheckTarget(WorldObject const* caster, WorldObject const* target, bool implicit = true,
+        Unit const* originalCaster = nullptr) const;
     SpellCastResult CheckExplicitTarget(WorldObject const* caster, WorldObject const* target, Item const* itemTarget = nullptr) const;
     bool CheckTargetCreatureType(Unit const* target) const;
 
