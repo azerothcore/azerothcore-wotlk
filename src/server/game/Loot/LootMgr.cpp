@@ -107,6 +107,7 @@ public:
 
     void Verify(LootStore const& lootstore, uint32 id, uint8 group_id) const;
     void CollectLootIds(LootIdSet& set) const;
+    void CollectItemIds(std::set<uint32>& itemIds, std::set<LootTemplate const*>& visited) const;
     void CheckLootRefs(LootStore const& lootstore, uint32 Id, LootIdSet* ref_set) const;
     LootStoreItemList* GetExplicitlyChancedItemList() { return &ExplicitlyChanced; }
     LootStoreItemList* GetEqualChancedItemList() { return &EqualChanced; }
@@ -1547,6 +1548,56 @@ void LootTemplate::AddEntry(LootStoreItem* item)
     }
     else                                            // Non-grouped entries
         Entries.push_back(item);
+}
+
+void LootTemplate::CollectItemIds(std::set<uint32>& itemIds) const
+{
+    std::set<LootTemplate const*> visited;
+    CollectItemIds(itemIds, visited);
+}
+
+void LootTemplate::CollectItemIds(std::set<uint32>& itemIds, std::set<LootTemplate const*>& visited) const
+{
+    if (!visited.insert(this).second)
+        return;
+
+    for (LootStoreItem* item : Entries)
+    {
+        if (item->reference)
+        {
+            if (LootTemplate const* referenced = LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
+                referenced->CollectItemIds(itemIds, visited);
+        }
+        else if (item->itemid)
+            itemIds.insert(item->itemid);
+    }
+
+    for (LootGroup* group : Groups)
+    {
+        if (group)
+            group->CollectItemIds(itemIds, visited);
+    }
+}
+
+void LootTemplate::LootGroup::CollectItemIds(std::set<uint32>& itemIds,
+                                             std::set<LootTemplate const*>& visited) const
+{
+    auto collect = [&](LootStoreItemList const& list)
+    {
+        for (LootStoreItem* item : list)
+        {
+            if (item->reference)
+            {
+                if (LootTemplate const* referenced = LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
+                    referenced->CollectItemIds(itemIds, visited);
+            }
+            else if (item->itemid)
+                itemIds.insert(item->itemid);
+        }
+    };
+
+    collect(ExplicitlyChanced);
+    collect(EqualChanced);
 }
 
 void LootTemplate::CopyConditions(ConditionList conditions)
