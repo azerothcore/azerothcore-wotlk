@@ -1099,6 +1099,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             else
             {
                 DamageInfo sharedDamageInfo(attacker, shareDamageTarget, shareDamage, spellProto, damageSchoolMask, damagetype);
+                sharedDamageInfo.SetSkipCombat(skipCombat);
                 Unit::CalcAbsorbResist(sharedDamageInfo, true);
                 shareAbsorb = sharedDamageInfo.GetAbsorb();
                 shareResist = sharedDamageInfo.GetResist();
@@ -2351,6 +2352,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
     uint32 damage = dmgInfo.GetDamage();
     SpellSchoolMask schoolMask = dmgInfo.GetSchoolMask();
     SpellInfo const* spellInfo = dmgInfo.GetSpellInfo();
+    bool const skipCombat = dmgInfo.SkipsCombat() || (attacker && attacker->IsInPreDeathAuraTick());
 
     if (!victim || !victim->IsAlive() || !damage)
         return;
@@ -2583,6 +2585,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
 
             uint32 procAttacker = 0, procVictim = 0;
             DamageInfo splittedDmgInfo(attacker, caster, splitted, spellInfo, schoolMask, dmgInfo.GetDamageType());
+            splittedDmgInfo.SetSkipCombat(skipCombat);
             splittedDmgInfo.AddHitMask(PROC_HIT_NORMAL);
             if (caster->IsImmunedToDamageOrSchool(schoolMask))
             {
@@ -2615,11 +2618,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
 
             // Split damage is a hostile interaction for its recipient too.
-            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster) && !dmgInfo.SkipsCombat())
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster) && !skipCombat)
                 attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo,
-                false, false, nullptr, dmgInfo.SkipsCombat());
+                false, false, nullptr, skipCombat);
         }
 
         // We're going to call functions which can modify content of the list during iteration over it's elements
@@ -2662,6 +2665,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
 
             uint32 procAttacker = 0, procVictim = 0;
             DamageInfo splittedDmgInfo(attacker, caster, splitted, spellInfo, splitSchoolMask, dmgInfo.GetDamageType());
+            splittedDmgInfo.SetSkipCombat(skipCombat);
             splittedDmgInfo.AddHitMask(PROC_HIT_NORMAL);
             if (caster->IsImmunedToDamageOrSchool(schoolMask))
             {
@@ -2694,11 +2698,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
 
             // Split damage is a hostile interaction for its recipient too.
-            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster) && !dmgInfo.SkipsCombat())
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster) && !skipCombat)
                 attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, splitSchoolMask, splitSpellInfo,
-                false, false, nullptr, dmgInfo.SkipsCombat());
+                false, false, nullptr, skipCombat);
         }
     }
 }
