@@ -54,6 +54,7 @@
 #include "World.h"
 #include <boost/algorithm/string.hpp>
 #include <numeric>
+#include <unordered_set>
 
 #include "ItemEnchantmentMgr.h"
 
@@ -9582,12 +9583,27 @@ bool ObjectMgr::LoadAcoreStrings()
 
     _acoreStringStore.clear(); // for reload case
 
-    // content_default holds enUS. A locale registered by a module needs its own locale_<code> column.
+    // A locale registered by a module keeps its texts either in its own locale_<code> column or in
+    // `acore_string_locale`, so only the module columns that exist are queried
+    std::unordered_set<std::string> localeColumns;
+    if (QueryResult columns = WorldDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS "
+        "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'acore_string' AND COLUMN_NAME LIKE 'locale\\_%'"))
+    {
+        do
+        {
+            localeColumns.insert(columns->Fetch()[0].Get<std::string>());
+        } while (columns->NextRow());
+    }
+
+    // content_default holds enUS
     std::string sql = "SELECT entry, content_default";
     std::vector<LocaleConstant> columnLocales; // locale of fields[2 + k]
     for (uint8 i = LOCALE_koKR; i < TOTAL_LOCALES; ++i)
     {
         if (!IsLocaleRegistered(LocaleConstant(i)))
+            continue;
+
+        if (i > LOCALE_ruRU && !localeColumns.contains(std::string("locale_") + localeNames[i]))
             continue;
 
         sql += ", locale_";
@@ -9619,6 +9635,33 @@ bool ObjectMgr::LoadAcoreStrings()
         for (std::size_t k = 0; k < columnLocales.size(); ++k)
             AddLocaleString(fields[2 + k].Get<std::string>(), columnLocales[k], data.Content);
     } while (result->NextRow());
+
+    // Texts in the locales that have no column in `acore_string`, such as the ones registered by modules
+    //                                     0      1       2
+    result = WorldDatabase.Query("SELECT entry, locale, content FROM acore_string_locale");
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 entry = fields[0].Get<uint32>();
+
+            auto itr = _acoreStringStore.find(entry);
+            if (itr == _acoreStringStore.end())
+            {
+                LOG_ERROR("sql.sql", "Table `acore_string_locale` has entry {} that is not in `acore_string`, skipped.",
+                    entry);
+                continue;
+            }
+
+            LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
+            if (locale == LOCALE_enUS)
+                continue;
+
+            AddLocaleString(fields[2].Get<std::string>(), locale, itr->second.Content);
+        } while (result->NextRow());
+    }
 
     LOG_INFO("server.loading", ">> Loaded {} Acore Strings in {} ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
