@@ -933,6 +933,8 @@ public:
     }
 
 private:
+    friend class BattlegroundICWorldStatesTest;
+
     uint32 closeFortressDoorsTimer;
     bool doorsClosed;
     uint32 docksTimer;
