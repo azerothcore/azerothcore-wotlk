@@ -7134,6 +7134,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     if (HasUnattackableAura())
         RemoveAurasByType(SPELL_AURA_MOD_UNATTACKABLE);
 
+    bool const isNewAttack = !m_attacking;
+
     if (m_attacking)
     {
         if (m_attacking == victim)
@@ -7223,8 +7225,10 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
     }
 
-    // delay offhand weapon attack by 50% of the base attack time
-    if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
+    // delay offhand weapon attack by 50% of the base attack time, on a new attack only
+    // unlike the timer writes this replaced, this runs once per attack start rather than once
+    // per swing, so it staggers the offhand without locking the two swing intervals together
+    if (isNewAttack && HasOffhandWeaponForAttack())
         setAttackTimer(OFF_ATTACK, std::max(getAttackTimer(OFF_ATTACK), getAttackTimer(BASE_ATTACK) + int32(CalculatePct(GetFloatValue(UNIT_FIELD_BASEATTACKTIME), 50))));
 
     if (meleeAttack)
