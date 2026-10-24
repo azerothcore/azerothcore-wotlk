@@ -378,7 +378,6 @@ public:
     [[nodiscard]] uint32 GetResist() const { return m_resist; };
     [[nodiscard]] uint32 GetBlock() const { return m_block; };
     [[nodiscard]] bool SkipsCombat() const { return m_skipCombat; }
-    void SetSkipCombat(bool value) { m_skipCombat = value; }
 
     [[nodiscard]] uint32 GetHitMask() const;
     void AddHitMask(uint32 hitMask) { m_hitMask |= hitMask; }

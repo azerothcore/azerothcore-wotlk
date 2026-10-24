@@ -1099,7 +1099,6 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             else
             {
                 DamageInfo sharedDamageInfo(attacker, shareDamageTarget, shareDamage, spellProto, damageSchoolMask, damagetype);
-                sharedDamageInfo.SetSkipCombat(skipCombat);
                 Unit::CalcAbsorbResist(sharedDamageInfo, true);
                 shareAbsorb = sharedDamageInfo.GetAbsorb();
                 shareResist = sharedDamageInfo.GetResist();
@@ -2585,7 +2584,6 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
 
             uint32 procAttacker = 0, procVictim = 0;
             DamageInfo splittedDmgInfo(attacker, caster, splitted, spellInfo, schoolMask, dmgInfo.GetDamageType());
-            splittedDmgInfo.SetSkipCombat(skipCombat);
             splittedDmgInfo.AddHitMask(PROC_HIT_NORMAL);
             if (caster->IsImmunedToDamageOrSchool(schoolMask))
             {
@@ -2665,7 +2663,6 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
 
             uint32 procAttacker = 0, procVictim = 0;
             DamageInfo splittedDmgInfo(attacker, caster, splitted, spellInfo, splitSchoolMask, dmgInfo.GetDamageType());
-            splittedDmgInfo.SetSkipCombat(skipCombat);
             splittedDmgInfo.AddHitMask(PROC_HIT_NORMAL);
             if (caster->IsImmunedToDamageOrSchool(schoolMask))
             {
