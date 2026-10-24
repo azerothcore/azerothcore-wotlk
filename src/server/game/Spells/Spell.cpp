@@ -2884,6 +2884,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             // Fill base damage struct (unitTarget - is real spell target)
             SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
+            damageInfo.skipCombat = IsFromPreDeathAura();
 
             // Check damage immunity
             if (unitTarget->IsImmunedToDamage(caster, m_spellInfo))
@@ -3608,7 +3609,19 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     if (triggeredByAura)
     {
         m_triggeredByAuraSpell.Init(triggeredByAura);
+
+        // e.g. Seed of Corruption detonating on an enemy after its warlock died and got resurrected
+        if (triggeredByAura->GetCasterGUID() == m_originalCasterGUID &&
+            triggeredByAura->GetBase()->HasCasterDiedSinceApply(m_originalCaster))
+            _fromPreDeathAura = true;
     }
+
+    // e.g. Darkmoon Card: Death proccing off a bleed tick the druid applied before dying
+    if (m_originalCaster && m_originalCaster->IsInPreDeathAuraTick())
+        _fromPreDeathAura = true;
+
+    if (_fromPreDeathAura)
+        _triggeredCastFlags = TriggerCastFlags(_triggeredCastFlags | TRIGGERED_DONT_ENTER_COMBAT);
 
     // create and add update event for this spell
     _spellEvent = new SpellEvent(this);
@@ -3954,7 +3967,8 @@ void Spell::_cast(bool skipCheck)
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only
         // This prevents spells such as Hunter's Mark from triggering pet attack
         // xinef: take into account SPELL_ATTR3_SUPPRESS_TARGET_PROCS
-        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS))
+        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE &&
+            !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS) && !IsFromPreDeathAura())
             if (!playerCaster->m_Controlled.empty())
                 for (Unit::ControlSet::iterator itr = playerCaster->m_Controlled.begin(); itr != playerCaster->m_Controlled.end(); ++itr)
                     if (Unit* pet = *itr)
@@ -5821,6 +5835,8 @@ void Spell::HandleThreatSpells()
         else
         {
             if (!target->CanHaveThreatList())
+                continue;
+            if (IsFromPreDeathAura() && !target->IsEngagedBy(unitCaster))
                 continue;
             target->GetThreatMgr().AddThreat(unitCaster, threatToAdd, m_spellInfo, true);
         }
