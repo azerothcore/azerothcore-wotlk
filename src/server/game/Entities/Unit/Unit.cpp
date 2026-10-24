@@ -11232,6 +11232,11 @@ void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask /*schoolMask*/
 
 void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
 {
+    // Swings and hostile spells on its victim, triggered ones too, count as attacking for the leash
+    if (Creature* creature = ToCreature())
+        if (creature->GetVictim() == target)
+            creature->SetLeashVictimHit();
+
     if (!target->IsEngaged() && !canInitialAggro)
         return;
 

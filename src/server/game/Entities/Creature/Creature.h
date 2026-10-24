@@ -412,6 +412,7 @@ public:
     void ShareLeashWith(Creature* other);
     void ClearLeash();
     void RefreshLeash();
+    void SetLeashVictimHit() { _leashVictimHit = true; }
     [[nodiscard]] uint32 GetLeashTime(Unit const* victim) const;
     [[nodiscard]] float GetLeashRadius(Unit const* victim) const;
 
@@ -558,6 +559,7 @@ private:
     uint32 _leashRefreshSeen;
     uint32 _leashTimer;
     bool _leashBroken;
+    bool _leashVictimHit;
 
     ObjectGuid m_cannotReachTarget;
 

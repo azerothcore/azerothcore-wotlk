@@ -38,7 +38,8 @@ class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGe
 {
 public:
     ChaseMovementGenerator(Unit* target, Optional<ChaseRange> range = {}, Optional<ChaseAngle> angle = {})
-        : AbstractFollower(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle), _fallbackPositioning(false), m_currentMode(CHASE_MODE_NORMAL) {}
+        : AbstractFollower(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range),
+          _angle(angle), _fallbackPositioning(false), m_currentMode(CHASE_MODE_NORMAL) {}
     ~ChaseMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }

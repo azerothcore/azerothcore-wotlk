@@ -271,7 +271,7 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _gossipMenuId(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr),
     m_detectionDistance(20.0f), _sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr),
-    m_leash(nullptr), _leashRefreshSeen(0), _leashTimer(0), _leashBroken(false),
+    m_leash(nullptr), _leashRefreshSeen(0), _leashTimer(0), _leashBroken(false), _leashVictimHit(false),
     _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _highestPlayerAttackerLevel(0), _isCombatMovementAllowed(true)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
@@ -903,6 +903,7 @@ void Creature::Update(uint32 diff)
             // After the AI, so a spell it cast this update counts as attacking
             if (Unit* victim = GetVictim())
                 UpdateLeash(victim, diff);
+            _leashVictimHit = false;
 
             m_regenTimer -= diff;
             if (m_regenTimer <= 0)
@@ -3781,6 +3782,7 @@ void Creature::ClearLeash()
     _leashRefreshSeen = 0;
     _leashTimer = 0;
     _leashBroken = false;
+    _leashVictimHit = false;
 }
 
 // Moves the leash point to where the creature stands and restarts the count
@@ -3840,8 +3842,8 @@ void Creature::UpdateLeash(Unit const* victim, uint32 diff)
 // otherwise only while the creature is within the leash radius of the leash point
 bool Creature::IsWithinLeash(Unit const* victim) const
 {
-    // Melee range, or casting at it
-    bool attacking = IsWithinMeleeRange(victim);
+    // Melee range, casting at it, or hit it this update (triggered casts are never current spells)
+    bool attacking = _leashVictimHit || IsWithinMeleeRange(victim);
     for (CurrentSpellTypes type : { CURRENT_GENERIC_SPELL, CURRENT_CHANNELED_SPELL })
         if (Spell const* spell = GetCurrentSpell(type))
             attacking |= spell->m_targets.GetUnitTargetGUID() == victim->GetGUID();
