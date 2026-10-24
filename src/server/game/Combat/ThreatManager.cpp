@@ -247,6 +247,8 @@ void ThreatManager::Update(uint32 tdiff)
 
 Unit* ThreatManager::GetCurrentVictim()
 {
+    if (!CanHaveThreatList())
+        return nullptr;
     if (!_currentVictimRef || _currentVictimRef->ShouldBeOffline())
         UpdateVictim();
     ASSERT(!_currentVictimRef || _currentVictimRef->IsAvailable());
@@ -547,8 +549,11 @@ void ThreatManager::TauntUpdate()
 
     // immediately reselect victim so taunt takes effect without waiting
     // for the next THREAT_UPDATE_INTERVAL (1 s) timer tick
-    UpdateVictim();
-    _updateTimer = THREAT_UPDATE_INTERVAL;
+    if (CanHaveThreatList())
+    {
+        UpdateVictim();
+        _updateTimer = THREAT_UPDATE_INTERVAL;
+    }
 }
 
 void ThreatManager::SetTauntStateForTesting(
@@ -616,6 +621,9 @@ Unit* ThreatManager::GetFixateTarget() const
 
 void ThreatManager::UpdateVictim()
 {
+    if (!CanHaveThreatList())
+        return;
+
     ThreatReference const* const newVictim = ReselectVictim();
     bool const newHighest = newVictim && (newVictim != _currentVictimRef);
 
@@ -686,7 +694,10 @@ ThreatReference const* ThreatManager::ReselectVictim()
 
 void ThreatManager::ProcessAIUpdates()
 {
-    CreatureAI* ai = ASSERT_NOTNULL(_owner->ToCreature())->AI();
+    Creature* ownerCreature = _owner->ToCreature();
+    if (!ownerCreature)
+        return;
+    CreatureAI* ai = ownerCreature->AI();
     std::vector<ObjectGuid> v(std::move(_needsAIUpdate)); // _needsAIUpdate is now empty in case this triggers a recursive call
     if (!ai)
         return;
