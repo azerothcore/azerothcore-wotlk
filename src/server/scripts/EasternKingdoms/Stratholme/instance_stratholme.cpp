@@ -321,11 +321,15 @@ public:
             uint32 uiEntry = aPlaguedCritters[urand(0, 2)];
             for (uint8 i = 0; i < 30; ++i)
             {
-                float x, y, z;
-                const Position pPos = { player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation() };
-                player->GetRandomPoint(pPos, 8.0f, x, y, z);
-                z = player->GetPositionZ() + 1;
-                player->SummonCreature(uiEntry, x, y, z, 0, TEMPSUMMON_DEAD_DESPAWN, 0)->AI()->AttackStart(player);
+                // Pick the spawn point with a navmesh raycast from the player so it lands on walkable
+                // ground and stops at walls. Forcing z to the player's z + 1 put critters inside wall
+                // geometry or over gaps, where they drop out of the world (anyone chasing them follows).
+                Position const pos = player->GetFirstCollisionPosition(frand(0.0f, 8.0f),
+                    frand(0.0f, 2.0f * float(M_PI)));
+                if (Creature* critter = player->SummonCreature(uiEntry, pos.GetPositionX(), pos.GetPositionY(),
+                    pos.GetPositionZ() + 0.5f, 0, TEMPSUMMON_DEAD_DESPAWN, 0))
+                    if (critter->AI())
+                        critter->AI()->AttackStart(player);
             }
         }
 
