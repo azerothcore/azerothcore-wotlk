@@ -453,7 +453,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (12966, 0.65, 1.95, 2, 0, 50664), -- Gordok Mastiff
 (12969, 0.9747, 4.05, 0, 0, 45572), -- Ruul Snowhoof
 (13029, 2, 3, 0, 0, 49345), -- Flamewaker Healer
-(13069, 0.005, 0.01, 0, 0, 54261), -- Flame of Ragnaros
+(13069, 0.005, 0.6, 0, 0, 54261), -- Flame of Ragnaros
 (13093, 2.09855, 3.525, 0, 0, 41446), -- Gordok Spirit
 (13097, 0.5, 1, 2, 0, 50664), -- Carrion Swarmer
 (13111, 1.122, 0.9, 2, 0, 50664), -- Carrion Swarmer
@@ -599,7 +599,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (15502, 0.306, 1.5, 0, 0, 61582), -- Batrider Pele'keiki
 (15503, 0.383, 1.5, 1, 0, 61582), -- Apothecary Jezel
 (15506, 0.2635, 0, 2, 0, 53788), -- Springpaw Lynx
-(15507, 0.217, 0, 2, 0, 53788), -- Springpaw Cub
+(15507, 0.217, 0.7, 2, 0, 53788), -- Springpaw Cub
 (15508, 0.306, 1.5, 1, 0, 61582), -- Skinner Jamani
 (15535, 0.236, 1.5, 1, 0, 61582), -- Sergeant Umala
 (15536, 0.383, 1.5, 0, 0, 61582), -- Doctor Serratus
@@ -934,7 +934,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (17726, 0.41667, 1.8, 0, 0, 53622), -- Shattered Hand Zealot
 (17727, 0.41667, 1.8, 0, 0, 53622), -- Shattered Hand Scout
 (17728, 2, 0, 0, 0, 52237), -- Mennu the Betrayer
-(17747, 2, 0, 0, 17748, 52237), -- Warmaul Champion
+(17747, 2, 3, 0, 17748, 52237), -- Warmaul Champion
 (17748, 0.6, 2, 0, 0, 45770), -- Warmaul Champion
 (17755, 1.3, 0, 0, 0, 50664), -- Murkblood Healer
 (17756, 1.75, 0, 0, 0, 53788), -- Murkblood Tribesman
@@ -1262,7 +1262,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (20238, 2.5, 2.5, 2, 0, 53622), -- Ravenous Flayer
 (20239, 1.55, 5, 2, 0, 53788), -- Ravenous Flayer Matriarch
 (20253, 1.2, 1.8, 1, 20254, 54261), -- Wyrmcult Zealot
-(20254, 1.2, 0, 0, 20253, 54261), -- Wyrmcult Zealot
+(20254, 1.2, 1.8, 0, 20253, 54261), -- Wyrmcult Zealot
 (20255, 1.1, 0, 0, 20258, 54261), -- Wyrmcult Acolyte
 (20258, 1.1, 1.65, 0, 20255, 52237), -- Wyrmcult Acolyte
 (20275, 0.383, 1.5, 0, 0, 43400), -- Envoy Icarius
@@ -1293,7 +1293,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (20478, 1, 0, 0, 0, 53622), -- Ashtongue Handler
 (20479, 4.5, 4.5, 0, 0, 54261), -- Phantom Leotheras
 (20482, 1.15, 1.725, 1, 20483, 54261), -- Wyrmcult Hewer
-(20483, 1.15, 0, 0, 20482, 54261), -- Wyrmcult Hewer
+(20483, 1.15, 1.725, 0, 20482, 54261), -- Wyrmcult Hewer
 (20487, 1.1, 1.65, 0, 20486, 54261), -- Wyrmcult Poacher
 (20489, 0.372, 1.5, 0, 20490, 45704), -- Shadowmoon Zealot
 (20490, 0.372, 1.5, 0, 20489, 45704), -- Shadowmoon Zealot
@@ -1356,7 +1356,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (20780, 0.766, 3, 0, 0, 52237), -- Torloth the Magnificent
 (20782, 1, 1, 2, 0, 54261), -- Water Globule
 (20801, 2.25, 1.875, 2, 0, 52237), -- Terokkar Wolf Spirit
-(20808, 0.62, 0, 2, 0, 54261), -- Tethik
+(20808, 0.62, 2, 2, 0, 54261), -- Tethik
 (20810, 3, 6, 2, 0, 53622), -- Kraator
 (20812, 0.7285, 7.05, 2, 0, 54261), -- Underbog Colossus
 (20816, 0.155, 0.75, 2, 0, 53788), -- Enraged Earth Shard
@@ -1637,7 +1637,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (22548, 2, 2, 2, 0, 52237), -- Alliance Banner
 (22611, 1.25, 0, 0, 0, 54261), -- Spearfang Worg
 (22613, 0.306, 1.5, 1, 0, 52237), -- Becanna Edune
-(22657, 1, 0, 0, 0, 54261), -- Vrykul Proto-dragon Mount
+(22657, 1, 4, 0, 0, 54261), -- Vrykul Proto-dragon Mount
 (22719, 1, 0, 2, 0, 54261), -- Steel Gate Flying Machine
 (22732, 0.2325, 1.5, 0, 0, 50664), -- Pink Elekk
 (22735, 0.383, 1.5, 0, 0, 43638), -- Shattered Sun Channeler
@@ -1846,7 +1846,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (25437, 0.383, 1.5, 1, 0, 51943), -- DK (Forsaken Female)
 (25438, 0.383, 1.5, 1, 0, 52237), -- DK (Forsaken Female)
 (25440, 0.8725, 3.75, 1, 0, 50664), -- DK (Tauren Female)
-(25446, 0.47875, 0, 0, 0, 53622), -- Koltira Deathweaver
+(25446, 0.47875, 1.875, 0, 0, 53622), -- Koltira Deathweaver
 (25473, 0.1872, 1.35, 1, 0, 49345), -- Blood Vat Corpse
 (25474, 0.2754, 1.35, 0, 0, 49345), -- Blood Vat Corpse
 (25485, 0.69444, 3, 0, 0, 54261), -- Chulo the Mad
@@ -1862,7 +1862,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (25692, 4, 0, 2, 0, 54261), -- Darmuk
 (25748, 0.31, 0, 0, 0, 54261), -- Iron Rune Runemaster
 (25754, 0.31, 0, 0, 0, 54261), -- Iron Rune Steelguard
-(25755, 0.31, 0, 0, 0, 54261), -- Iron Rune Guardian
+(25755, 0.31, 1, 0, 0, 54261), -- Iron Rune Guardian
 (25756, 0.31, 0, 0, 0, 54261), -- Rune Reaver
 (25757, 0.31, 0, 0, 0, 54261), -- Iron Rune Binder
 (25758, 0.31, 0, 0, 0, 54261), -- Binder Murdis
@@ -2478,7 +2478,7 @@ INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`,
 (31852, 0.306, 1.5, 0, 0, 52237), -- Steamwheedle Shyster
 (31881, 0.3519, 1.725, 1, 0, 54261); -- Elgin Clickspring
 
--- creature_model_info: boss models, combat reach changes by 2+ yards
+-- creature_model_info: BoundingRadius/CombatReach from sniffed creature updates (unscaled), part 2
 DELETE FROM `creature_model_info` WHERE `DisplayID` IN (7691,7972,10115,11380,13992,14367,14992,15218,15267,15288,15686,15932,15945,16040,17053,17067,17068,17469,17644,18650,20514,20568,20662,20748,21601,24564,27101,27569,27788,28381,28548,28611,28638,28743,28787,28817,28821,28822,28875,28951,29185,29268,29614,29816);
 INSERT INTO `creature_model_info` (`DisplayID`, `BoundingRadius`, `CombatReach`, `Gender`, `DisplayID_Other_Gender`, `VerifiedBuild`) VALUES
 (7691, 2.5, 2.5, 2, 0, 53788), -- High Marshal Whirlaxis
