@@ -61,7 +61,6 @@ public:
 
     float GetNativeObjectScale() const override;
     void SetObjectScale(float scale) override;
-    void SetDisplayId(uint32 displayId, float displayScale = 1.f) override;
     void SetDisplayFromModel(uint32 modelIdx);
 
     void DisappearAndDie();
@@ -577,6 +576,7 @@ private:
     bool _damagedByPlayer;
     uint8 _highestPlayerAttackerLevel;
     bool _isCombatMovementAllowed;
+    float _nativeObjectScale = 1.0f; ///< DisplayScale of the native model, set in InitEntry
 };
 
 class AssistDelayEvent : public BasicEvent
