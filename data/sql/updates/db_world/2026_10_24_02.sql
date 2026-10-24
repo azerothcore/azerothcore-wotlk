@@ -1,3 +1,4 @@
+-- DB update 2026_10_24_01 -> 2026_10_24_02
 --
 DELETE FROM `creature` WHERE `guid` = 84497 AND `id` = 19673;
 DELETE FROM `creature_addon` WHERE `guid` = 84497;
