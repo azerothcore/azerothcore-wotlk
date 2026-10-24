@@ -15456,6 +15456,18 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!vehicleInfo || vehicleInfo->m_ID != 341)
     {
         Movement::MoveSplineInit init(this);
+
+        // A corpse leaving a flying vehicle has to drop to the ground instead of hanging at the seat's height
+        if (player && !IsAlive())
+        {
+            float groundZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, MAX_FALL_DISTANCE);
+            if (groundZ > INVALID_HEIGHT && pos.GetPositionZ() > groundZ)
+            {
+                pos.m_positionZ = groundZ;
+                init.SetFall();
+            }
+        }
+
         init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
         init.SetFacing(vehicleBase->GetOrientation());
         init.SetTransportExit();
