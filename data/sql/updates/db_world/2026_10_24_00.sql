@@ -1,3 +1,4 @@
+-- DB update 2026_10_23_00 -> 2026_10_24_00
 --
 UPDATE `gameobject` SET `spawntimesecs` = 300
 WHERE `id` IN (141812, 141857, 141858, 141859)
