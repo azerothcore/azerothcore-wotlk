@@ -1172,6 +1172,7 @@ public:
 
     [[nodiscard]] float GetUnitMissChance(WeaponAttackType attType) const;
     float GetUnitCriticalChance(WeaponAttackType attackType, Unit const* victim) const;
+    [[nodiscard]] float GetCritChanceFromSkillDiff(Unit const* victim) const;
     MeleeHitOutcome RollMeleeOutcomeAgainst (Unit const* victim, WeaponAttackType attType) const;
     MeleeHitOutcome RollMeleeOutcomeAgainst (Unit const* victim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance) const;
 

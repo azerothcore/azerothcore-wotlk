@@ -1913,10 +1913,13 @@ void Unit::CalculateMeleeDamage(Unit* victim, CalcDamageInfo* damageInfo, Weapon
         {
             damageInfo->HitInfo     |= HITINFO_GLANCING;
             damageInfo->TargetState  = VICTIMSTATE_HIT;
-            int32 leveldif = int32(victim->GetLevel()) - int32(GetLevel());
-            if (leveldif > 3)
-                leveldif = 3;
-            float reducePercent = 1 - leveldif * 0.1f;
+            int32 leveldif = int32(victim->getLevelForTarget(this)) - int32(GetLevel());
+            leveldif = std::min(std::max(leveldif, 1), 3);
+
+            // 1-10% damage reduction against same level and +1 targets, up to 20-30% against a +3 boss
+            int32 const reductionMax = leveldif * 10;
+            int32 const reductionMin = std::max(1, reductionMax - 10);
+            float reducePercent = 1.0f - irand(reductionMin, reductionMax) / 100.0f;
 
             for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
             {
@@ -3115,20 +3118,21 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         }
     }
 
-    // Max 40% chance to score a glancing blow against mobs that are higher level (can do only players and pets and not with ranged weapon)
+    // Max 40% chance to score a glancing blow against mobs of the same or higher level (can do only players and pets and not with ranged weapon)
     if (attType != RANGED_ATTACK &&
             (IsPlayer() || IsPet()) &&
             !victim->IsPlayer() && !victim->IsPet() &&
-            GetLevel() < victim->getLevelForTarget(this))
+            GetLevel() <= victim->getLevelForTarget(this))
     {
         // cap possible value (with bonuses > max skill)
         int32 skill = attackerWeaponSkill;
         int32 maxskill = attackerMaxSkillValueForLevel;
         skill = (skill > maxskill) ? maxskill : skill;
 
-        tmp = (10 + (victimDefenseSkill - skill)) * 100;
+        // 6% against same level targets, 24% against a +3 boss
+        tmp = 600 + (victimDefenseSkill - skill) * 120;
         tmp = tmp > 4000 ? 4000 : tmp;
-        if (roll < (sum += tmp))
+        if (tmp > 0 && roll < (sum += tmp))
         {
             LOG_DEBUG("entities.unit", "RollMeleeOutcomeAgainst: GLANCING <{}, {})", sum - 4000, sum);
             return MELEE_HIT_GLANCING;
@@ -3667,7 +3671,7 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, Unit const* victi
         Unit::ApplyResilience(victim, &crit, nullptr, false, CR_CRIT_TAKEN_RANGED);
 
     // Apply crit chance from defence skill
-    crit += (int32(GetMaxSkillValueForLevel(victim)) - int32(victim->GetDefenseSkillValue(this))) * 0.04f;
+    crit += GetCritChanceFromSkillDiff(victim);
 
     // xinef: SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE should be calculated at the end
     crit += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE);
@@ -3675,6 +3679,20 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, Unit const* victi
     if (crit < 0.0f)
         crit = 0.0f;
     return crit;
+}
+
+float Unit::GetCritChanceFromSkillDiff(Unit const* victim) const
+{
+    int32 const skillDiff = int32(victim->GetDefenseSkillValue(this)) - int32(GetMaxSkillValueForLevel(victim));
+    if (victim->IsPlayer() || skillDiff <= 0)
+        return -skillDiff * 0.04f;
+
+    // crit suppression vs higher level creatures, 4.8% against a +3 boss
+    float suppression = skillDiff * 0.12f;
+    if (skillDiff >= 15)
+        suppression += 3.0f;
+
+    return -suppression;
 }
 
 uint32 Unit::GetWeaponSkillValue (WeaponAttackType attType, Unit const* target) const
@@ -9074,6 +9092,16 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                             }
                             break;
                     }
+
+                    // spell crit suppression vs higher level creatures: none at +1, 0.3% at +2, 2.1% against a +3 boss
+                    if (IsCreature() && !spellProto->IsPositive())
+                    {
+                        int32 const levelDiff = int32(getLevelForTarget(caster)) - int32(caster->GetLevel());
+                        if (levelDiff == 2)
+                            crit_chance -= 0.3f;
+                        else if (levelDiff >= 3)
+                            crit_chance -= 2.1f + (levelDiff - 3) * 0.7f;
+                    }
                 }
                 break;
             }
@@ -9130,7 +9158,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
 
                 // Apply crit chance from defence skill
                 if (caster)
-                    crit_chance += (int32(caster->GetMaxSkillValueForLevel(this)) - int32(GetDefenseSkillValue(caster))) * 0.04f;
+                    crit_chance += caster->GetCritChanceFromSkillDiff(this);
 
                 break;
             }
