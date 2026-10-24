@@ -50,6 +50,7 @@
 #include "SteadyTimer.h"
 #include "Systemd.h"
 #include "TC9Sidecar.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"
@@ -367,10 +368,15 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    // Initialize the connection to the voiceserver (if enabled)
+    sVoiceChatMgr->Init();
+
     std::shared_ptr<void> sWorldSocketMgrHandle(nullptr, [](void*)
     {
         sWorldSessionMgr->KickAll();         // save and kick all players
         sWorldSessionMgr->UpdateSessions(1); // real players unload required UpdateSessions call
+
+        sVoiceChatMgr->Stop();
 
         sWorldSocketMgr.StopNetwork();
 

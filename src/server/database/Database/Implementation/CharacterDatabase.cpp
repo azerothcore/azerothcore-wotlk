@@ -226,6 +226,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_DEL_OLD_CHANNELS_BANS, "DELETE cb.* FROM channels_bans cb LEFT JOIN channels cn ON cb.channelId=cn.channelId WHERE cn.channelId IS NULL OR cb.banTime <= UNIX_TIMESTAMP()", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_CHANNEL_BAN, "REPLACE INTO channels_bans VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHANNEL_BAN, "DELETE FROM channels_bans WHERE channelId = ? AND playerGUID = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SEL_CHANNELS, "SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_CHANNELS_BANS, "SELECT channelId, playerGUID, banTime FROM channels_bans", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_CHANNELS_RIGHTS, "SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights", CONNECTION_SYNCH);
 
     // Equipmentsets
     PrepareStatement(CHAR_UPD_EQUIP_SET, "UPDATE character_equipmentsets SET name=?, iconname=?, ignore_mask=?, item0=?, item1=?, item2=?, item3=?, "

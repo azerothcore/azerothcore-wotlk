@@ -593,16 +593,15 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     }
                 }
 
-                if (ChannelMgr* cMgr = ChannelMgr::forTeam(sender->GetTeamId()))
+                if (Channel* chn = sChannelMgr.GetChannel(sender->GetTeamId(), channel))
                 {
-                    if (Channel* chn = cMgr->GetChannel(channel, sender))
-                    {
-                        if (!sScriptMgr->OnPlayerCanUseChat(sender, type, lang, msg, chn))
-                            return;
+                    if (!sScriptMgr->OnPlayerCanUseChat(sender, type, lang, msg, chn))
+                        return;
 
-                        chn->Say(sender->GetGUID(), msg.c_str(), lang);
-                    }
+                    chn->Say(sender->GetGUID(), msg.c_str(), lang);
                 }
+                else
+                    ChannelMgr::SendNotOnPacket(GetPlayer(), channel);
             }
             break;
         case CHAT_MSG_AFK:

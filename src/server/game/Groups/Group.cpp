@@ -37,11 +37,27 @@
 #include "TC9Sidecar.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+
+namespace
+{
+    // team whose battleground raid the group is, TEAM_NEUTRAL if it is none of them
+    TeamId GetBattlegroundRaidTeam(Battleground const* bg, Group const* group)
+    {
+        if (bg->GetBgRaid(TEAM_ALLIANCE) == group)
+            return TEAM_ALLIANCE;
+
+        if (bg->GetBgRaid(TEAM_HORDE) == group)
+            return TEAM_HORDE;
+
+        return TEAM_NEUTRAL;
+    }
+}
 
 Roll::Roll(ObjectGuid _guid, LootItem const& li, bool _lootedInRaid) : itemGUID(_guid), itemid(li.itemid),
     itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count), lootedInRaid(_lootedInRaid),
@@ -367,6 +383,9 @@ void Group::ConvertToRaid()
     // pussywizard: client automatically clears df "eye" near minimap, so remove from raid browser
     if (sLFGMgr->GetState(GetLeaderGUID()) == lfg::LFG_STATE_RAIDBROWSER)
         sLFGMgr->LeaveLfg(GetLeaderGUID());
+
+    if (!isBGGroup() && !isBFGroup())
+        sVoiceChatMgr->QueueGroupConvertedToRaid(GetGroupId());
 }
 
 bool Group::AddInvite(Player* player)
@@ -595,6 +614,9 @@ bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
 
         if (m_maxEnchantingLevel < player->GetSkillValue(SKILL_ENCHANTING))
             m_maxEnchantingLevel = player->GetSkillValue(SKILL_ENCHANTING);
+
+        bool const battleground = isBGGroup() || isBFGroup();
+        sVoiceChatMgr->QueueGroupMemberAdded(player->GetGUID(), GetGroupId(), isRaidGroup(), battleground);
     }
 
     return true;
@@ -759,6 +781,15 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
 
         SendUpdate();
 
+        if (!isBGGroup() && !isBFGroup())
+            sVoiceChatMgr->QueueGroupMemberRemoved(guid, GetGroupId());
+        else if (m_bgGroup)
+        {
+            TeamId const team = GetBattlegroundRaidTeam(m_bgGroup, this);
+            if (team != TEAM_NEUTRAL)
+                sVoiceChatMgr->QueueBattlegroundMemberRemoved(guid, m_bgGroup->GetInstanceID(), team);
+        }
+
         if (!validLeader)
         {
             // pussywizard: temp do nothing, something causes crashes in MakeNewGroup
@@ -819,6 +850,17 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
         CharacterDatabase.CommitTransaction(trans);
 
         sInstanceSaveMgr->CopyBinds(m_leaderGuid, newLeaderGuid, newLeader);
+    }
+
+    // update voice priorities: the new leader speaks with high priority
+    if (!isBGGroup() && !isBFGroup())
+        sVoiceChatMgr->QueueGroupLeaderChanged(GetGroupId(), m_leaderGuid, newLeaderGuid);
+    else if (m_bgGroup)
+    {
+        TeamId const team = GetBattlegroundRaidTeam(m_bgGroup, this);
+        if (team != TEAM_NEUTRAL)
+            sVoiceChatMgr->QueueBattlegroundLeaderChanged(m_bgGroup->GetInstanceID(), team, m_leaderGuid,
+                newLeaderGuid);
     }
 
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
@@ -928,6 +970,15 @@ void Group::ForcedDisband(bool hideDestroy /* = false */)
 
     // Cleaning up instance saved data for gameobjects when a group is disbanded
     sInstanceSaveMgr->DeleteInstanceSavedData(instanceId);
+
+    if (!isBGGroup() && !isBFGroup())
+        sVoiceChatMgr->QueueGroupDisbanded(GetGroupId());
+    else if (m_bgGroup)
+    {
+        TeamId const team = GetBattlegroundRaidTeam(m_bgGroup, this);
+        if (team != TEAM_NEUTRAL)
+            sVoiceChatMgr->QueueBattlegroundRaidDisbanded(m_bgGroup->GetInstanceID(), team);
+    }
 
     sGroupMgr->RemoveGroup(this);
     delete this;
@@ -2784,4 +2835,9 @@ void Group::DoForAllMembers(std::function<void(Player*)> const& worker)
 
         worker(member);
     }
+}
+
+uint32 Group::GetGroupId()
+{
+    return GetGUID().GetCounter();
 }

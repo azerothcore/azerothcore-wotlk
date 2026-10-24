@@ -90,6 +90,7 @@
 #include "Util.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "VoiceChatMgr.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
@@ -1021,11 +1022,12 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Stored Loot Items...");
     sLootItemStorage->LoadStorageFromDB();
 
+    // rights first, channels pick them up when they are created
     LOG_INFO("server.loading", "Load Channel Rights...");
-    ChannelMgr::LoadChannelRights();
+    sChannelMgr.LoadChannelRights();
 
     LOG_INFO("server.loading", "Load Channels...");
-    ChannelMgr::LoadChannels();
+    sChannelMgr.LoadChannels();
 
     LOG_INFO("server.loading", "Loading AntiDos opcode policies");
     sWorldGlobals->LoadAntiDosOpcodePolicies();
@@ -1293,6 +1295,11 @@ void World::Update(uint32 diff)
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process query callbacks"));
         // execute callbacks from sql queries that were queued recently
         ProcessQueryCallbacks();
+    }
+
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Voice chat update"));
+        sVoiceChatMgr->Update(diff);
     }
 
     /// <li> Update uptime table

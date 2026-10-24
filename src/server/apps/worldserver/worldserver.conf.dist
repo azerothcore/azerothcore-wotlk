@@ -71,6 +71,7 @@
 #    CUSTOM
 #    DEBUG
 #    DYNAMIC RESPAWN SETTINGS
+#    VOICE CHAT
 #
 #  CLUSTER SETTINGS
 #
@@ -4898,6 +4899,53 @@ Respawn.DynamicEscortNPC = 0
 #        Default:     0 - (Disabled, spawn groups control respawn mode)
 
 Respawn.ForceCompatibilityMode = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+# VOICE CHAT
+#
+#    VoiceChat.Enabled
+#         Enable Voice Chat. The other VoiceChat settings are read again whenever voice chat is
+#         enabled (.voicechat enable, or VoiceChat.Enabled turned on by .reload config)
+#         Default: 0 - off
+#                  1 - on
+#
+#    VoiceChat.ServerPort
+#         TCP port that world server should use to connect to voice chat server
+#         Default: 3725
+#
+#    VoiceChat.ServerAddress
+#         IP that world server should use to connect to voice chat server. Several realms may
+#         share one voice chat server
+#         Default: 127.0.0.1
+#
+#    VoiceChat.VoicePort
+#         UDP port that game client should use to connect to voice chat server, should be available for client
+#         Default: 3724
+#
+#    VoiceChat.VoiceAddress
+#         IP that game client should use to connect to voice chat server, should be available for client
+#         IPv4 only. Game clients only accept voice data sent from exactly this address and
+#         VoiceChat.VoicePort, so the voice server must reply from it (see ClientBindIP in
+#         voiceserver.conf)
+#         Default: 127.0.0.1
+#
+#    VoiceChat.MaxConnectAttempts
+#         Failed attempts to connect/reconnect to voice chat server after which voice chat is disabled
+#         Default: -1 (unlimited)
+#                   0 (unlimited)
+#                   1+ (limited attempts)
+#
+###################################################################################################
+
+VoiceChat.Enabled = 0
+VoiceChat.ServerPort = 3725
+VoiceChat.ServerAddress = 127.0.0.1
+VoiceChat.VoicePort = 3724
+VoiceChat.VoiceAddress = 127.0.0.1
+VoiceChat.MaxConnectAttempts = -1
 
 #
 ###################################################################################################

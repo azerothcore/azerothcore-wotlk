@@ -54,8 +54,10 @@ namespace
         std::size_t foundAuth = fileName.find("authserver.conf");
         std::size_t foundWorld = fileName.find("worldserver.conf");
         std::size_t foundImport = fileName.find("dbimport.conf");
+        std::size_t foundVoice = fileName.find("voiceserver.conf");
 
-        return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos || foundImport != std::string_view::npos;
+        return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos ||
+            foundImport != std::string_view::npos || foundVoice != std::string_view::npos;
     }
 
     // Check logging system configs like Appender.* and Logger.*

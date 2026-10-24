@@ -50,6 +50,7 @@
 #include "Transport.h"
 #include "Tokenize.h"
 #include "Vehicle.h"
+#include "VoiceChatMgr.h"
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldGlobals.h"
@@ -140,6 +141,9 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
     _calendarEventCreationCooldown(0),
+    _micEnabled(false),
+    _voiceEnabled(false),
+    _currentVoiceChannel(0),
     _addonMessageReceiveCount(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
@@ -826,6 +830,10 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
                     _player->TeleportToEntryPoint();
             }
         }
+
+        // Leave voice chat if player disconnects (or is redirected to another node)
+        sVoiceChatMgr->RemoveFromVoiceChatChannels(_player->GetGUID());
+        SetCurrentVoiceChannelId(0);
 
         if (!redirecting)
         {

@@ -730,6 +730,12 @@ public: /* DatabaseScript */
     void OnDatabaseWarnAboutSyncQueries(bool apply);
     void OnDatabaseGetDBRevision(std::map<std::string, std::string>& revisions);
 
+public: /* VoiceChatScript */
+
+    void OnVoiceServerConnected();
+    void OnVoiceServerDisconnected();
+    void OnVoiceServerModuleMessage(std::string const& tag, ByteBuffer& data);
+
 public: /* WorldObjectScript */
 
     void OnWorldObjectDestroy(WorldObject* object);

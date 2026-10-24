@@ -18,7 +18,7 @@
 #ifndef __RASESSION_H__
 #define __RASESSION_H__
 
-#include "Socket.h"
+#include "TcpSocket.h"
 #include <boost/asio/streambuf.hpp>
 #include <future>
 
