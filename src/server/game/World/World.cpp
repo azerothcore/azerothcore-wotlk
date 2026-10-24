@@ -1071,7 +1071,12 @@ void World::SetInitialWorldSettings()
 
     if (sConfigMgr->isDryRun())
     {
+        // exit() below skips the ordered teardown in main() (mapManagementHandle):
+        // OutdoorPvP holds raw Map pointers and must go before the maps
+        sBattlegroundMgr->DeleteAllBattlegrounds();
+        sOutdoorPvPMgr->Die();
         sMapMgr->UnloadAll();
+        sScriptMgr->OnAfterUnloadAllMaps();
 
         if (uint32 failed = DBUpdaterUtil::GetFailedUpdateCount())
         {
