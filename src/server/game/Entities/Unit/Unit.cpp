@@ -9093,6 +9093,14 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                             }
                             break;
                     }
+
+                    // spell crit suppression vs higher level creatures, 2.1% against a +3 boss
+                    if (IsCreature() && !spellProto->IsPositive())
+                    {
+                        int32 const levelDiff = int32(getLevelForTarget(caster)) - int32(caster->GetLevel());
+                        if (levelDiff > 0)
+                            crit_chance -= levelDiff * 0.7f;
+                    }
                 }
                 break;
             }
