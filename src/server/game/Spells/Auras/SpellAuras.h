@@ -127,7 +127,6 @@ public:
     void Update(uint32 diff, Unit* caster);
 
     time_t GetApplyTime() const { return m_applyTime; }
-    bool HasCasterDiedSinceApply() const { return HasCasterDiedSinceApply(GetCaster()); }
     bool HasCasterDiedSinceApply(Unit const* caster) const;
     int32 GetMaxDuration() const { return m_maxDuration; }
     void SetMaxDuration(int32 duration) { m_maxDuration = duration; }
