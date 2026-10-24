@@ -1264,14 +1264,15 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         if (!victim->IsPlayer())
         {
-            // DoT ticks and passive damage (e.g. Thorns) do not reset leash timer
-            if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
-                victim->ToCreature()->UpdateLeashExtensionTime();
-
             if (attacker && attacker != victim)
             {
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
             }
+
+            // Not DoT ticks or Thorns. After the threat, so a damage pull refreshes the leash it creates.
+            if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer()
+                && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
+                victim->ToCreature()->RefreshLeash();
         }
         else                                                // victim is a player
         {
@@ -7206,16 +7207,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         }
     }
 
-    // Share leash timer with controlled unit
-    if (controlledCreatureWithSameVictim)
-        creature->SetLastLeashExtensionTimePtr(controlledCreatureWithSameVictim->GetLastLeashExtensionTimePtr());
-    // Share leash timer with owner
-    else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
-        creature->SetLastLeashExtensionTimePtr(ownerCreature->GetLastLeashExtensionTimePtr());
-    // Update leash timer when attacking creatures
-    else if (victim->IsCreature())
-        victim->ToCreature()->UpdateLeashExtensionTime();
-
     // Player-controlled creatures (pets, charms) enter combat on contact instead
     // (melee swing execution or spell launch/hit, see Unit::AtTargetAttacked).
     // Non-controllable guardians (e.g. Shaman Elementals, Infernal) have no attack
@@ -7238,6 +7229,12 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
             SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         }
     }
+
+    // Share leash with controlled unit or owner, after engaging creates one
+    if (controlledCreatureWithSameVictim)
+        creature->ShareLeashWith(controlledCreatureWithSameVictim);
+    else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
+        creature->ShareLeashWith(ownerCreature);
 
     // delay offhand weapon attack by 50% of the base attack time, on a new attack only
     // unlike the timer writes this replaced, this runs once per attack start rather than once
@@ -7298,7 +7295,7 @@ void Unit::CombatStop(bool includingCast, bool mutualPvP, bool keepPvPForOthers)
     if (IsPlayer())
         ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
     if (Creature* pCreature = ToCreature())
-        pCreature->ClearLastLeashExtensionTimePtr();
+        pCreature->ClearLeash();
 
     if (mutualPvP)
         ClearInCombat(keepPvPForOthers);
@@ -11263,20 +11260,24 @@ void Unit::AddThreat(Unit* victim, float fThreat, SpellSchoolMask /*schoolMask*/
 
 void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
 {
+    // Swings and hostile spells on its victim, triggered ones too, count as attacking for the leash
+    if (Creature* creature = ToCreature())
+        if (creature->GetVictim() == target)
+            creature->SetLeashVictimHit();
+
     if (!target->IsEngaged() && !canInitialAggro)
         return;
-
-    if (Creature* cTarget = target->ToCreature())
-    {
-        if (!cTarget->GetOwnerGUID().IsPlayer())
-            cTarget->UpdateLeashExtensionTime();
-    }
 
     target->EngageWithTarget(this);
     if (Unit* targetOwner = target->GetCharmerOrOwner())
         targetOwner->EngageWithTarget(this);
     if (Unit* myOwner = GetCharmerOrOwner())
         target->EngageWithTarget(myOwner);
+
+    // Swings and hostile spells (debuffs too) move the leash point; after engaging, like damage
+    if (Creature* cTarget = target->ToCreature())
+        if (cTarget->IsEngaged() && !cTarget->GetOwnerGUID().IsPlayer())
+            cTarget->RefreshLeash();
 
     // Patch 3.0.8: All player spells which cause a creature to become aggressive
     // to you will now also immediately cause the creature to be tapped.
