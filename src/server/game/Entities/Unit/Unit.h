@@ -1670,7 +1670,8 @@ public:
     float CalculateLevelPenalty(SpellInfo const* spellProto) const;
 
     uint32 GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const;
-    void CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex = 0);
+    void CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount,
+        uint8 effectIndex = 0, TriggerCastFlags extraTriggerFlags = TRIGGERED_NONE);
 
     // SpellCastResult methods
     // WorldObject spellcasting port: bring the inherited entry point into
