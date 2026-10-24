@@ -31,6 +31,7 @@
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "Spell.h"
 #include "SpellMgr.h"
 #include "Transport.h"
 #include "UpdateFieldFlags.h"
@@ -38,6 +39,45 @@
 #include <G3D/Box.h>
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
+
+namespace
+{
+    // The nearest of a summoned trap's targets: those its spell may hit, in line of sight from the trap at its
+    // owner's height, so the trap is never triggered through a wall. Distance is 3D, so a unit on the floor
+    // above or below is not standing on the trap.
+    class TrapTargetCheck
+    {
+    public:
+        TrapTargetCheck(GameObject* trap, Unit const* owner, SpellInfo const* trapSpell,
+            SpellTargetCheckTypes checkType, float range)
+            : _trap(trap), _owner(owner), _range(range), _spellCheck(trap, trap, trapSpell, checkType, nullptr) { }
+
+        bool operator()(WorldObject* target)
+        {
+            float dist = _trap->GetDistance(target);
+            if (dist >= _range)
+                return false;
+
+            // Before the ray: most units in range are ones the spell can't hit.
+            if (!_spellCheck(target))
+                return false;
+
+            LineOfSightChecks losChecks = LineOfSightChecks(LINEOFSIGHT_ALL_CHECKS & ~LINEOFSIGHT_CHECK_GOBJECT_M2);
+            float height = _owner->GetCollisionHeight();
+            if (!_trap->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::Nothing, losChecks, height))
+                return false;
+
+            _range = dist;
+            return true;
+        }
+
+    private:
+        GameObject const* _trap;
+        Unit const* _owner;
+        float _range;
+        Acore::WorldObjectSpellTargetCheck _spellCheck;
+    };
+}
 
 bool QuaternionData::IsUnit() const
 {
@@ -393,6 +433,41 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
                 m_invisibility.AddFlag(INVISIBILITY_TRAP);
                 m_invisibility.AddValue(INVISIBILITY_TRAP, 300);
             }
+
+            m_goValue.Trap.TargetSearcherCheckType = TARGET_CHECK_ENEMY;
+            if (SpellInfo const* trapSpell = sSpellMgr->GetSpellInfo(goinfo->trap.spellId))
+            {
+                // positive spells may require enemy targets
+                if (trapSpell->IsPositive())
+                {
+                    bool targetsAlly = false;
+                    bool targetsEnemy = false;
+                    auto isAllyTarget = [](SpellImplicitTargetInfo const& targetInfo)
+                    {
+                        return targetInfo.GetObjectType() == TARGET_OBJECT_TYPE_UNIT &&
+                            targetInfo.GetCheckType() == TARGET_CHECK_ALLY;
+                    };
+                    auto isEnemyTarget = [](SpellImplicitTargetInfo const& targetInfo)
+                    {
+                        return targetInfo.GetObjectType() == TARGET_OBJECT_TYPE_UNIT &&
+                            targetInfo.GetCheckType() == TARGET_CHECK_ENEMY;
+                    };
+                    for (SpellEffectInfo const& spellEffectInfo : trapSpell->Effects)
+                    {
+                        if (!spellEffectInfo.IsEffect())
+                            continue;
+
+                        targetsAlly = targetsAlly || isAllyTarget(spellEffectInfo.TargetA) ||
+                            isAllyTarget(spellEffectInfo.TargetB);
+                        targetsEnemy = targetsEnemy || isEnemyTarget(spellEffectInfo.TargetA) ||
+                            isEnemyTarget(spellEffectInfo.TargetB);
+                    }
+
+                    if (targetsAlly)
+                        m_goValue.Trap.TargetSearcherCheckType = targetsEnemy ? TARGET_CHECK_DEFAULT
+                            : TARGET_CHECK_ALLY;
+                }
+            }
             break;
         default:
             SetGoAnimProgress(animprogress);
@@ -491,8 +566,10 @@ void GameObject::Update(uint32 diff)
                             // Bombs
                             if (goInfo->trap.type == 2)
                                 m_cooldownTime = GameTime::GetGameTimeMS().count() + 10 * IN_MILLISECONDS; // Hardcoded tooltip value
-                            else if (GetOwner())
-                                m_cooldownTime = GameTime::GetGameTimeMS().count() + goInfo->trap.startDelay * IN_MILLISECONDS;
+                            else if (Unit* owner = GetOwner())
+                                if (owner->IsInCombat())
+                                    m_cooldownTime = GameTime::GetGameTimeMS().count() +
+                                        goInfo->trap.startDelay * IN_MILLISECONDS;
 
                             m_lootState = GO_READY;
                             break;
@@ -707,13 +784,26 @@ void GameObject::Update(uint32 diff)
                         Unit* owner = GetOwner();
                         Unit* target = nullptr;                            // pointer to appropriate target if found any
 
-                        // Note: this hack with search required until GO casting not implemented
-                        // search unfriendly creature
-                        if (owner && goInfo->trap.autoCloseTime != -1) // hunter trap
+                        if (owner)
                         {
-                            Acore::NearestAttackableNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
-                            Acore::UnitSearcher<Acore::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
-                            Cell::VisitObjects(this, searcher, radius);
+                            // summoned traps: search targets fit to trap spell data
+                            if (SpellInfo const* trapSpell = sSpellMgr->GetSpellInfo(goInfo->trap.spellId))
+                            {
+                                WorldObject* worldObjectTarget = nullptr;
+                                TrapTargetCheck checker(this, owner, trapSpell,
+                                    SpellTargetCheckTypes(m_goValue.Trap.TargetSearcherCheckType), radius);
+                                Acore::WorldObjectLastSearcher<TrapTargetCheck> searcher(this, worldObjectTarget,
+                                    checker, GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER);
+                                Cell::VisitObjects(this, searcher, radius);
+                                target = worldObjectTarget ? worldObjectTarget->ToUnit() : nullptr;
+                            }
+                            else
+                            {
+                                using AttackableCheck = Acore::NearestAttackableNoTotemUnitInObjectRangeCheck;
+                                AttackableCheck checker(this, owner, radius);
+                                Acore::UnitSearcher<AttackableCheck> searcher(this, target, checker);
+                                Cell::VisitObjects(this, searcher, radius);
+                            }
                         }
                         else                                        // environmental trap
                         {
