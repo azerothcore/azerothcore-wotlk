@@ -130,9 +130,13 @@ func TestTrap_EveryTrapAffectsItsVictimOnAnyFloor(t *testing.T) {
 		{"UtgardePinnacle4", at(541.58, -290.40, 119.78, mapUtgardePinnacle)},
 	} {
 		t.Run(spot.name, func(t *testing.T) {
-			spot.place(t, hunter)
+			// The placer clears the spot before the hunter arrives. Creatures standing on the
+			// spot (the Tunneling Ghouls at UtgardeKeep4) attack a hunter who lands among them
+			// within a second, and once they do the placer may not see them before the trap
+			// fires on one of them.
 			spot.place(t, placer)
 			spawned := clearSpot(t, placer)
+			spot.place(t, hunter)
 
 			for _, trap := range trapsToTrip {
 				t.Run(trap.name, func(t *testing.T) {
