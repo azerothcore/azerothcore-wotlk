@@ -5247,6 +5247,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SpellLevel = 10;
     });
 
+    // Diminish Power
+    ApplySpellFix({ 64145 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
