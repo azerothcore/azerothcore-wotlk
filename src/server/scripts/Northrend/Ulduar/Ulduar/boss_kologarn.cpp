@@ -535,10 +535,7 @@ struct boss_kologarn_eyebeam : public ScriptedAI
             me->GetMotionMaster()->MoveChase(player);
 
             if (Creature* cr = _instance->GetCreature(BOSS_KOLOGARN))
-            {
                 me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
-                cr->AI()->Talk(EMOTE_EYES, player);
-            }
         }
     }
 
@@ -596,9 +593,21 @@ class spell_kologarn_focused_eyebeam : public SpellScript
         targets.push_back(*head);
     }
 
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+        Player* target = GetHitPlayer();
+        Creature* creature = GetCaster()->ToCreature();
+        if (!target || !creature)
+            return;
+
+        creature->AI()->Talk(EMOTE_EYES, target);
+    }
+
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_focused_eyebeam::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_kologarn_focused_eyebeam::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
