@@ -1,3 +1,4 @@
+-- DB update 2026_10_25_00 -> 2026_10_25_01
 --
 -- Three named Eversong and Ghostlands casters stand still when silenced or interrupted instead of closing
 -- to melee, because their main attack lacks SMARTCAST_COMBAT_MOVE and their hand-rolled combat movement
