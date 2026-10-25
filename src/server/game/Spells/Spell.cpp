@@ -2690,7 +2690,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     m_spellAura = nullptr; // Set aura to null for every target-make sure that pointer is not used for unit without aura applied
 
-    if (m_originalCaster && missInfo != SPELL_MISS_EVADE && !m_originalCaster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) && (m_spellInfo->HasInitialAggro() || effectUnit->IsEngaged()))
+    if (m_originalCaster && missInfo != SPELL_MISS_EVADE && !HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT) &&
+        !m_originalCaster->IsFriendlyTo(effectUnit) &&
+        (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) &&
+        (m_spellInfo->HasInitialAggro() || effectUnit->IsEngaged()))
         effectUnit->SetInCombatWith(m_originalCaster);
 
     PrepareScriptHitHandlers();
@@ -3035,7 +3038,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         if (missInfo != SPELL_MISS_EVADE && !unitCaster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
         {
-            if (!m_triggeredByAuraSpell.spellInfo || m_damage || (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo))))
+            if (!HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT) &&
+                (!m_triggeredByAuraSpell.spellInfo || m_damage ||
+                    (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell
+                        == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo)))))
                 unitCaster->AtTargetAttacked(effectUnit, !(m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT) || m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS)));
 
             // Spells that don't initiate combat shouldn't affect stand state (e.g. Premeditation, Storm Giant/Felreaver Passive)
@@ -8653,7 +8659,8 @@ void Spell::HandleLaunchPhase()
             }
         }
 
-        if (m_originalCaster && target.missCondition != SPELL_MISS_EVADE)
+        if (m_originalCaster && target.missCondition != SPELL_MISS_EVADE &&
+            !HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT))
         {
             Unit* targetUnit = m_caster->GetGUID() == target.targetGUID ? unitCaster : ObjectAccessor::GetUnit(*m_caster, target.targetGUID);
             if (targetUnit && !m_originalCaster->IsFriendlyTo(targetUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) && (m_spellInfo->HasInitialAggro() || targetUnit->IsEngaged()))
@@ -8695,7 +8702,7 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
                 // Xinef: Area Auras, AoE Targetting spells AND Chain Target spells (cleave etc.)
                 if (m_spellInfo->Effects[i].IsAreaAuraEffect() || m_spellInfo->Effects[i].IsTargetingArea() || (m_spellInfo->Effects[i].ChainTarget > 1 && m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MAGIC))
                 {
-                    bool npcCaster = (unitCaster && !unitCaster->IsControlledByPlayer()) || GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE);
+                    bool npcCaster = (m_originalCaster && !m_originalCaster->IsControlledByPlayer()) || GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE);
                     m_damage = unit->CalculateAOEDamageReduction(m_damage, m_spellInfo->SchoolMask, npcCaster);
                     if (unitCaster && unitCaster->IsPlayer())
                     {
@@ -9484,8 +9491,9 @@ namespace Acore
                         effectiveRange += unitTarget->GetCombatReach();
 
                 // override the range check for entry area targets
+                // players stay 3d, retail never hits them in 2d
                 float dist = target->GetExactDist(_position);
-                if (_targetSelectionType == TARGET_CHECK_ENTRY)
+                if (_targetSelectionType == TARGET_CHECK_ENTRY && !target->IsPlayer())
                     dist = target->GetExactDist2d(_position);
                 if (dist > effectiveRange)
                     return false;

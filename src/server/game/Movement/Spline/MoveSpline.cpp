@@ -60,7 +60,7 @@ namespace Movement
             }
 
             if (splineflags.orientationInversed)
-                c.orientation = -c.orientation;
+                c.orientation = Position::NormalizeOrientation(c.orientation + float(M_PI));
         }
         return c;
     }
