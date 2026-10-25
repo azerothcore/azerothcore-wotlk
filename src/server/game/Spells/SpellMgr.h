@@ -636,6 +636,8 @@ inline bool IsProfessionOrRidingSkill(uint32 skill)
 
 bool IsPartOfSkillLine(uint32 skillId, uint32 spellId);
 
+bool IsBinarySpell(SpellInfo const& spellInfo);
+
 // spell diminishing returns
 DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto, bool triggered);
 DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group);
