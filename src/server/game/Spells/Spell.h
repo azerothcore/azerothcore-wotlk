@@ -737,6 +737,8 @@ public:
     void AddItemTarget(Item* item, uint32 effectMask);
     void AddDestTarget(SpellDestination const& dest, uint32 effIndex);
 
+    [[nodiscard]] uint32 GetOnlyOneAreaHitWindow(uint32 effectMask) const;
+
     void DoAllEffectOnTarget(TargetInfo* target);
     SpellMissInfo DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleAura);
     void DoTriggersOnSpellHit(Unit* unit, uint8 effMask);

@@ -2436,6 +2436,11 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
         }
     }
 
+    // Allow only 1 area hit of this spell per period on our targets if a custom flag is set.
+    if (uint32 window = GetOnlyOneAreaHitWindow(effectMask))
+        if (target->HasRecentAreaSpellHit(m_spellInfo->Id, window))
+            return;
+
     // This is new target calculate data for him
 
     // Get spell hit result on target
@@ -2522,6 +2527,29 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     // Add target to list
     m_UniqueTargetInfo.push_back(targetInfo);
+}
+
+// SPELL_ATTR0_CU_ONLY_ONE_AREA_AURA: every area-targeted effect of a flagged spell, persistent area auras included,
+// hits a target once per period even when many emitters cast it (e.g. Illidan's Demon Fire).
+// Returns the dedupe window in ms, or 0 if the rule does not apply.
+uint32 Spell::GetOnlyOneAreaHitWindow(uint32 effectMask) const
+{
+    if (!m_spellInfo->HasAttribute(SPELL_ATTR0_CU_ONLY_ONE_AREA_AURA))
+        return 0;
+
+    bool areaHit = false;
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS && !areaHit; ++i)
+        areaHit = (effectMask & (1 << i)) && m_spellInfo->Effects[i].IsTargetingArea();
+
+    if (!areaHit)
+        return 0;
+
+    // Half the emitters' tick period: absorbs the update jitter between emitters without eating the next legit tick
+    if (m_triggeredByAuraSpell)
+        if (uint32 amplitude = m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].Amplitude)
+            return amplitude / 2;
+
+    return 500;
 }
 
 void Spell::AddGOTarget(GameObject* go, uint32 effectMask)
@@ -2673,6 +2701,15 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             effectUnit->m_lastSanctuaryTime &&
             GameTime::GetGameTimeMS().count() <= (effectUnit->m_lastSanctuaryTime + 400))
         return;                                             // No missinfo in that case
+
+    // Re-check on hit: a delayed spell may have selected the target before another caster's hit landed
+    if (uint32 window = GetOnlyOneAreaHitWindow(target->effectMask))
+    {
+        if (effectUnit->HasRecentAreaSpellHit(m_spellInfo->Id, window))
+            return;
+
+        effectUnit->RegisterAreaSpellHit(m_spellInfo->Id);
+    }
 
     // Get original caster (if exist) and calculate damage/healing from him data
     // (can be nullptr for GameObject casts with no owner - unit-dependent handling is skipped then)

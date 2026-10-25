@@ -4355,6 +4355,31 @@ bool Unit::IsHighestExclusiveAura(Aura const* aura, bool removeOtherAuraApplicat
     return true;
 }
 
+bool Unit::HasRecentAreaSpellHit(uint32 spellId, uint32 windowMs) const
+{
+    uint32 now = GameTime::GetGameTimeMS().count();
+    for (auto const& [hitSpellId, hitTime] : _recentAreaSpellHits)
+        if (hitSpellId == spellId)
+            return now - hitTime < windowMs;
+
+    return false;
+}
+
+void Unit::RegisterAreaSpellHit(uint32 spellId)
+{
+    uint32 now = GameTime::GetGameTimeMS().count();
+    for (auto& [hitSpellId, hitTime] : _recentAreaSpellHits)
+    {
+        if (hitSpellId == spellId)
+        {
+            hitTime = now;
+            return;
+        }
+    }
+
+    _recentAreaSpellHits.emplace_back(spellId, now);
+}
+
 bool Unit::IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType auraType, int32 effectAmount, uint8 auraEffectMask, bool removeOtherAuraApplications /*= false*/)
 {
     AuraEffectList const& auras = GetAuraEffectsByType(auraType);
