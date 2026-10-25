@@ -346,6 +346,7 @@ Unit::Unit() : WorldObject(),
     m_race(0),
     m_AutoRepeatFirstCast(false),
     m_procDeep(0),
+    m_periodicTickDepth(0),
     m_removedAurasCount(0),
     i_motionMaster(new MotionMaster(this)),
     m_regenTimer(0),
@@ -13378,6 +13379,17 @@ void Unit::SetCantProc(bool apply)
     {
         ASSERT(m_procDeep);
         --m_procDeep;
+    }
+}
+
+void Unit::SetCausingPeriodicTick(bool apply)
+{
+    if (apply)
+        ++m_periodicTickDepth;
+    else
+    {
+        ASSERT(m_periodicTickDepth);
+        --m_periodicTickDepth;
     }
 }
 
