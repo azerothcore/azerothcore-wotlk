@@ -1,3 +1,4 @@
+-- DB update 2026_10_24_07 -> 2026_10_25_00
 --
 CREATE TABLE IF NOT EXISTS `acore_string_locale` (
   `entry` int unsigned NOT NULL COMMENT 'acore_string.entry',
