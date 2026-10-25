@@ -363,7 +363,7 @@ struct boss_hodir : public BossAI
                 events.Reset();
 
                 // Manually despawn helpers
-                summons.DespawnIf([this](ObjectGuid guid) -> bool
+                summons.RemoveIf([this](ObjectGuid guid) -> bool
                 {
                     return std::ranges::none_of(Helpers, [guid](ObjectGuid Helper) { return guid == Helper; });
                 });

@@ -94,7 +94,7 @@ public:
     bool IsAnyCreatureInCombat() const;
 
     template <typename T>
-    void DespawnIf(T const& predicate)
+    void RemoveIf(T const& predicate)
     {
         storage_.remove_if(predicate);
     }

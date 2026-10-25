@@ -613,7 +613,7 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_TEAR_GAS_PERIODIC_TRIGGER);
                     DoCastAOE(SPELL_TEAR_GAS_CANCEL);
                     if (_phase == 3)
-                        summons.DespawnIf(AbominationDespawner(me));
+                        summons.RemoveIf(AbominationDespawner(me));
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GAS_VARIABLE);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_OOZE_VARIABLE);
                     break;
