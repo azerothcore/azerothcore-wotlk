@@ -975,7 +975,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_SUMMON_FELHUNTER:
-                    DoSummon(35465, *me);
+                    DoSummon(NPC_ZHAAGRYM, *me);
 
                     break;
                 case EVENT_SPELL_HELLFIRE:
@@ -1266,7 +1266,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_CALL_PET:
-                    DoSummon(35610, *me);
+                    DoSummon(NPC_CAT, *me);
 
                     break;
                 case EVENT_SPELL_AIMED_SHOT:

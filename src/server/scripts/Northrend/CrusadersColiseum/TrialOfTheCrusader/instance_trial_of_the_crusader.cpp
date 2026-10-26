@@ -69,6 +69,8 @@ public:
         ObjectGuid NPC_IcehowlGUID;
         ObjectGuid NPC_JaraxxusGUID;
         GuidVector NPC_ChampionGUIDs;
+        // kept out of NPC_ChampionGUIDs, its size is the kill count that completes the encounter
+        GuidVector NPC_ChampionPetGUIDs;
         ObjectGuid NPC_LightbaneGUID;
         ObjectGuid NPC_DarkbaneGUID;
         ObjectGuid NPC_LichKingGUID;
@@ -216,6 +218,15 @@ public:
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0ms);
 
             NPC_ChampionGUIDs.clear();
+            NPC_ChampionPetGUIDs.clear();
+        }
+
+        void DespawnChampionPets()
+        {
+            for (ObjectGuid const& guid : NPC_ChampionPetGUIDs)
+                if (Creature* c = instance->GetCreature(guid))
+                    c->DespawnOrUnsummon();
+            NPC_ChampionPetGUIDs.clear();
         }
 
         // Retail makes every player a vehicle for the whole Northrend Beasts encounter so Snobold Vassals can ride them
@@ -293,6 +304,10 @@ public:
                     break;
                 case NPC_JARAXXUS:
                     NPC_JaraxxusGUID = creature->GetGUID();
+                    break;
+                case NPC_ZHAAGRYM:
+                case NPC_CAT:
+                    NPC_ChampionPetGUIDs.push_back(creature->GetGUID());
                     break;
                 case NPC_LIGHTBANE:
                     NPC_LightbaneGUID = creature->GetGUID();
@@ -520,6 +535,7 @@ public:
                             if (Creature* c = instance->GetCreature(guid))
                                 c->DespawnOrUnsummon(15s);
                         NPC_ChampionGUIDs.clear();
+                        DespawnChampionPets();
 
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                         {
@@ -1561,6 +1577,7 @@ public:
                         if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
                     NPC_ChampionGUIDs.clear();
+                    DespawnChampionPets();
                     break;
                 case INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD:
                     if (Creature* c = instance->GetCreature(NPC_DarkbaneGUID))
