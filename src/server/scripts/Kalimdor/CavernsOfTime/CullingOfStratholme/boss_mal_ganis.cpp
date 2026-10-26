@@ -59,39 +59,39 @@ public:
         return GetCullingOfStratholmeAI<boss_mal_ganisAI>(creature);
     }
 
-    struct boss_mal_ganisAI : public ScriptedAI
+    struct boss_mal_ganisAI : public BossAI
     {
-        boss_mal_ganisAI(Creature* c) : ScriptedAI(c)
+        boss_mal_ganisAI(Creature* creature) : BossAI(creature, BOSS_MAL_GANIS)
         {
             finished = false;
         }
 
-        EventMap events;
         bool finished;
 
         void Reset() override
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
-            events.Reset();
+
+            // He never dies: the evade at 0 HP lands here, and _Reset would set his state back to NOT_STARTED
             if (finished)
             {
+                events.Reset();
                 Talk(SAY_OUTRO);
                 me->DespawnOrUnsummon(20s);
             }
+            else
+                _Reset();
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _JustEngagedWith();
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_CARRION_SWARM, 6s);
             events.ScheduleEvent(EVENT_SPELL_MIND_BLAST, 11s);
             events.ScheduleEvent(EVENT_SPELL_SLEEP, 20s);
             events.ScheduleEvent(EVENT_SPELL_VAMPIRIC_TOUCH, 15s);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
         }
 
         void KilledUnit(Unit*  /*victim*/) override
@@ -112,15 +112,14 @@ public:
                 me->SetImmuneToAll(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_PASSIVE);
-                if (InstanceScript* instance = me->GetInstanceScript())
-                {
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ARTHAS)))
-                        cr->AI()->DoAction(ACTION_KILLED_MALGANIS);
+                instance->SetBossState(BOSS_MAL_GANIS, DONE);
 
-                    // give credit to players
-                    me->CastSpell(me, 58630, true);
-                    instance->instance->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 7 * DAY * IN_MILLISECONDS);
-                }
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ARTHAS)))
+                    cr->AI()->DoAction(ACTION_KILLED_MALGANIS);
+
+                // give credit to players
+                me->CastSpell(me, 58630, true);
+                instance->instance->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 7 * DAY * IN_MILLISECONDS);
 
                 // quest completion
                 if (who)

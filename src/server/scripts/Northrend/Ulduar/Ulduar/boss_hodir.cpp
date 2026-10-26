@@ -392,12 +392,7 @@ struct boss_hodir : public BossAI
         if (!UpdateVictim())
         {
             if (me->IsInCombat())
-            {
-                Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                    itr->GetSource()->CastSpell(itr->GetSource(), SPELL_FLASH_FREEZE_INSTAKILL, true);
                 EnterEvadeMode();
-            }
             return;
         }
 
@@ -1479,6 +1474,11 @@ class spell_hodir_toasty_fire_aura : public AuraScript
 {
     PrepareAuraScript(spell_hodir_toasty_fire_aura);
 
+    bool CheckProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActor() != eventInfo.GetProcTarget();
+    }
+
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_SINGED });
@@ -1503,6 +1503,7 @@ class spell_hodir_toasty_fire_aura : public AuraScript
 
     void Register() override
     {
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_hodir_toasty_fire_aura::CheckProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
         AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
         OnEffectProc += AuraEffectProcFn(spell_hodir_toasty_fire_aura::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
