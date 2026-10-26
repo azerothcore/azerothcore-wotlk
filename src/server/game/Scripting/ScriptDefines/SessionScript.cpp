@@ -26,6 +26,15 @@ void ScriptMgr::OnSessionUpdate(WorldSession* session, uint32 diff)
     CALL_ENABLED_HOOKS(SessionScript, SESSIONHOOK_ON_UPDATE, script->OnSessionUpdate(session, diff));
 }
 
+bool ScriptMgr::OnWardenCheckExpectedResult(WorldSession* session, WardenCheck const& check,
+    std::vector<uint8>& expected)
+{
+    ASSERT(session);
+
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(SessionScript, SESSIONHOOK_ON_WARDEN_CHECK_EXPECTED_RESULT,
+        script->OnWardenCheckExpectedResult(session, check, expected));
+}
+
 SessionScript::SessionScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, SESSIONHOOK_END)
 {
