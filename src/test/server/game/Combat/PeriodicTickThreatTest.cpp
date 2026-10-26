@@ -50,12 +50,12 @@ public:
     void CalculateThreat(Unit* hatedUnit, float& /*threat*/, SpellInfo const* /*threatSpell*/) override
     {
         ++Calls;
-        LastUnit = hatedUnit;
+        LastUnit = hatedUnit->GetGUID();
         LastWasTick = hatedUnit->IsCausingPeriodicTick();
     }
 
     int Calls = 0;
-    Unit* LastUnit = nullptr;
+    ObjectGuid LastUnit;
     bool LastWasTick = false;
 };
 
@@ -127,7 +127,7 @@ protected:
 TEST_F(PeriodicTickThreatTest, DirectThreatIsNotATick)
 {
     EXPECT_EQ(_ai->Calls, 1);
-    EXPECT_EQ(_ai->LastUnit, _player);
+    EXPECT_EQ(_ai->LastUnit, _player->GetGUID());
     EXPECT_FALSE(_ai->LastWasTick);
 }
 
@@ -140,7 +140,7 @@ TEST_F(PeriodicTickThreatTest, DotTickIsATick)
     Tick(dot, _creature, _player);
 
     EXPECT_EQ(_ai->Calls, callsBefore + 1);
-    EXPECT_EQ(_ai->LastUnit, _player);
+    EXPECT_EQ(_ai->LastUnit, _player->GetGUID());
     EXPECT_TRUE(_ai->LastWasTick);
     EXPECT_FALSE(_player->IsCausingPeriodicTick());
 }
@@ -154,7 +154,7 @@ TEST_F(PeriodicTickThreatTest, HotTickIsATick)
     Tick(hot, _player, _player);
 
     EXPECT_EQ(_ai->Calls, callsBefore + 1);
-    EXPECT_EQ(_ai->LastUnit, _player);
+    EXPECT_EQ(_ai->LastUnit, _player->GetGUID());
     EXPECT_TRUE(_ai->LastWasTick);
     EXPECT_FALSE(_player->IsCausingPeriodicTick());
 }
