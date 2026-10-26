@@ -355,6 +355,7 @@ private:
     uint32 m_block;
     uint32 m_cleanDamage;
     uint32 m_hitMask;
+    bool m_skipCombat{false};
 
     // amalgamation constructor (used for proc)
     DamageInfo(DamageInfo const& dmg1, DamageInfo const& dmg2);
@@ -381,6 +382,7 @@ public:
     [[nodiscard]] uint32 GetAbsorb() const { return m_absorb; };
     [[nodiscard]] uint32 GetResist() const { return m_resist; };
     [[nodiscard]] uint32 GetBlock() const { return m_block; };
+    [[nodiscard]] bool SkipsCombat() const { return m_skipCombat; }
 
     [[nodiscard]] uint32 GetHitMask() const;
     void AddHitMask(uint32 hitMask) { m_hitMask |= hitMask; }
@@ -516,7 +518,8 @@ struct SpellNonMeleeDamage
 {
     SpellNonMeleeDamage(Unit* _attacker, Unit* _target, SpellInfo const* _spellInfo, uint32 _schoolMask)
         : target(_target), attacker(_attacker), spellInfo(_spellInfo), damage(0), overkill(0), schoolMask(_schoolMask),
-          absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0)
+          absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0),
+          skipCombat(false)
     {}
 
     Unit* target;
@@ -533,6 +536,7 @@ struct SpellNonMeleeDamage
     uint32 HitInfo;
     // Used for help
     uint32 cleanDamage;
+    bool skipCombat;
 };
 
 struct SpellPeriodicAuraLogInfo
@@ -1239,7 +1243,10 @@ public:
     /*********************************************************/
     /***       METHODS RELATED TO DAMAGE CACULATIONS       ***/
     /*********************************************************/
-    static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* spellProto = nullptr, bool durabilityLoss = true, bool allowGM = false, Spell const* spell = nullptr);
+    static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr,
+        DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL,
+        SpellInfo const* spellProto = nullptr, bool durabilityLoss = true, bool allowGM = false,
+        Spell const* spell = nullptr, bool skipCombat = false);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
     void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss, Spell const* spell = nullptr);
     void DealDamageShieldDamage(Unit* victim);
@@ -1802,6 +1809,9 @@ public:
     // DeathState
     DeathState getDeathState() { return m_deathState; };
     virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
+    [[nodiscard]] Milliseconds GetLastDeathTime() const { return m_lastDeathTime; }
+    [[nodiscard]] bool IsInPreDeathAuraTick() const { return m_inPreDeathAuraTick; }
+    void SetInPreDeathAuraTick(bool value) { m_inPreDeathAuraTick = value; }
 
     [[nodiscard]] bool IsAlive() const { return (m_deathState == DeathState::Alive); };
     [[nodiscard]] bool isDying() const { return (m_deathState == DeathState::JustDied); };
@@ -2166,6 +2176,8 @@ protected:
     Unit* m_attacking;
 
     DeathState m_deathState;
+    Milliseconds m_lastDeathTime{Milliseconds::min()};
+    bool m_inPreDeathAuraTick{false};
 
     int32 m_procDeep;
 
