@@ -1974,16 +1974,20 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
 
 void Spell::EffectEnergize(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
-    if (!unitCaster)
-        return;
-
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
         return;
     if (!unitTarget->IsAlive())
+        return;
+
+    // A gameobject without an owner, such as Mana Thistle's linked trap, has no unit to energize from, so the target
+    // energizes itself
+    Unit* unitCaster = GetUnitCasterForEffectHandlers();
+    if (!unitCaster && m_caster->IsGameObject())
+        unitCaster = unitTarget;
+    if (!unitCaster)
         return;
 
     if (unitTarget->IsImmunedToAuraPeriodicTick(unitCaster, m_spellInfo))
@@ -2086,16 +2090,20 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
 
 void Spell::EffectEnergizePct(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
-    if (!unitCaster)
-        return;
-
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
         return;
     if (!unitTarget->IsAlive())
+        return;
+
+    // A gameobject without an owner, such as Ulduar's Repair-o-matic Station, has no unit to energize from, so
+    // the target energizes itself
+    Unit* unitCaster = GetUnitCasterForEffectHandlers();
+    if (!unitCaster && m_caster->IsGameObject())
+        unitCaster = unitTarget;
+    if (!unitCaster)
         return;
 
     if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
@@ -2507,24 +2515,67 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             break;
     }
 
+    auto summonWild = [&]()
+    {
+        float radius = m_spellInfo->Effects[effIndex].CalcRadius();
+
+        TempSummonType summonType = (duration <= 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
+
+        WorldObject* summoner = caster;
+        if (Unit* unitSummoner = summoner->ToUnit())
+            if (unitSummoner->IsPet())
+                if (Unit* owner = unitSummoner->GetOwner())
+                    summoner = owner;
+
+        for (uint32 count = 0; count < numSummons; ++count)
+        {
+            Position pos;
+            if (count == 0)
+                pos = *destTarget;
+            else
+                // randomize position for multiple summons
+                pos = caster->GetRandomPoint(*destTarget, radius);
+
+            summon = summoner->SummonCreature(entry, pos, summonType, duration, 0, nullptr, personalSpawn);
+            if (!summon)
+                continue;
+
+            summon->SetTempSummonType(summonType);
+
+            if (properties->Category == SUMMON_CATEGORY_ALLY)
+            {
+                summon->SetOwnerGUID(summoner->GetGUID());
+                summon->SetFaction(summoner->GetFaction());
+            }
+
+            ExecuteLogEffectSummonObject(effIndex, summon);
+        }
+    };
+
     switch (properties->Category)
     {
         case SUMMON_CATEGORY_WILD:
         case SUMMON_CATEGORY_ALLY:
         case SUMMON_CATEGORY_UNK:
-            if (properties->Flags & 512)
+        {
+            bool const guardian = (properties->Flags & 512) || properties->Type == SUMMON_TYPE_PET ||
+                properties->Type == SUMMON_TYPE_GUARDIAN || properties->Type == SUMMON_TYPE_GUARDIAN2 ||
+                properties->Type == SUMMON_TYPE_MINION;
+            if (guardian)
             {
+                // A guardian needs a unit to follow, which a gameobject without an owner, such as a Land Mine, lacks
+                if (!unitCaster && m_caster->IsGameObject())
+                {
+                    summonWild();
+                    return;
+                }
+
                 SummonGuardian(effIndex, entry, properties, numSummons, personalSpawn);
                 break;
             }
+
             switch (properties->Type)
             {
-                case SUMMON_TYPE_PET:
-                case SUMMON_TYPE_GUARDIAN:
-                case SUMMON_TYPE_GUARDIAN2:
-                case SUMMON_TYPE_MINION:
-                    SummonGuardian(effIndex, entry, properties, numSummons, personalSpawn);
-                    break;
                 // Summons a vehicle, but doesn't force anyone to enter it (see SUMMON_CATEGORY_VEHICLE)
                 case SUMMON_TYPE_VEHICLE:
                 case SUMMON_TYPE_VEHICLE2:
@@ -2591,44 +2642,11 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                         break;
                     }
                 default:
-                    {
-                        float radius = m_spellInfo->Effects[effIndex].CalcRadius();
-
-                        TempSummonType summonType = (duration <= 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
-
-                        WorldObject* summoner = caster;
-                        if (Unit* unitSummoner = summoner->ToUnit())
-                            if (unitSummoner->IsPet())
-                                if (Unit* owner = unitSummoner->GetOwner())
-                                    summoner = owner;
-
-                        for (uint32 count = 0; count < numSummons; ++count)
-                        {
-                            Position pos;
-                            if (count == 0)
-                                pos = *destTarget;
-                            else
-                                // randomize position for multiple summons
-                                pos = caster->GetRandomPoint(*destTarget, radius);
-
-                            summon = summoner->SummonCreature(entry, pos, summonType, duration, 0, nullptr, personalSpawn);
-                            if (!summon)
-                                continue;
-
-                            summon->SetTempSummonType(summonType);
-
-                            if (properties->Category == SUMMON_CATEGORY_ALLY)
-                            {
-                                summon->SetOwnerGUID(summoner->GetGUID());
-                                summon->SetFaction(summoner->GetFaction());
-                            }
-
-                            ExecuteLogEffectSummonObject(effIndex, summon);
-                        }
-                        return;
-                    }
+                    summonWild();
+                    return;
             }//switch
             break;
+        }
         case SUMMON_CATEGORY_PET:
             // Xinef: SummonGuardian function can summon a few npcs of same type, remove old summons with same entry here
             if (m_originalCaster)
