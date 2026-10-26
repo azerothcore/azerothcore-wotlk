@@ -607,6 +607,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_DB_PING_INTERVAL, "MaxPingTime", 30);
 
     // misc
+    SetConfigValue<std::string>(CONFIG_PDUMP_DIR, "PlayerDump.Dir", "");
     SetConfigValue<bool>(CONFIG_PDUMP_NO_PATHS, "PlayerDump.DisallowPaths", true);
     SetConfigValue<bool>(CONFIG_PDUMP_NO_OVERWRITE, "PlayerDump.DisallowOverwrite", true);
     SetConfigValue<bool>(CONFIG_ENABLE_MMAPS, "MoveMaps.Enable", true);
