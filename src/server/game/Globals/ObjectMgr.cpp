@@ -54,6 +54,7 @@
 #include "World.h"
 #include <boost/algorithm/string.hpp>
 #include <numeric>
+#include <unordered_set>
 
 #include "ItemEnchantmentMgr.h"
 
@@ -7584,13 +7585,27 @@ AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 
 void ObjectMgr::SetHighestGuids()
 {
-    QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Player>().Set((*result)[0].Get<uint32>() + 1);
+    // Refuse to start once the next guid would already trip ObjectGuidGenerator's overflow check. At the cap,
+    // MAX(guid) + 1 wraps to 0 and the cleanup below deletes every item relation.
+    auto setNextGuid = [](ObjectGuidGeneratorBase& generator, HighGuid high, char const* table)
+    {
+        QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM {}", table);
+        if (!result)
+            return;
 
-    result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Item>().Set((*result)[0].Get<uint32>() + 1);
+        uint32 maxGuid = (*result)[0].Get<uint32>();
+        if (maxGuid >= ObjectGuid::GetMaxCounter(high) - 2)
+        {
+            LOG_FATAL("server.loading", "{} guid space is exhausted (MAX(guid) in `{}` is {}). Renumber the guids before starting the server.",
+                ObjectGuid::GetTypeName(high), table, maxGuid);
+            exit(1);
+        }
+
+        generator.Set(maxGuid + 1);
+    };
+
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Player>(), HighGuid::Player, "characters");
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Item>(), HighGuid::Item, "item_instance");
 
     // Cleanup other tables from not existed guids ( >= _hiItemGuid)
     CharacterDatabase.Execute("DELETE FROM character_inventory WHERE item >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());     // One-time query
@@ -7598,7 +7613,7 @@ void ObjectMgr::SetHighestGuids()
     CharacterDatabase.Execute("DELETE FROM auctionhouse WHERE itemguid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
     CharacterDatabase.Execute("DELETE FROM guild_bank_item WHERE item_guid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
 
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
+    QueryResult result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
         GetGuidSequenceGenerator<HighGuid::Mo_Transport>().Set((*result)[0].Get<uint32>() + 1);
 
@@ -9567,10 +9582,41 @@ bool ObjectMgr::LoadAcoreStrings()
     uint32 oldMSTime = getMSTime();
 
     _acoreStringStore.clear(); // for reload case
-    QueryResult result = WorldDatabase.Query("SELECT entry, content_default, locale_koKR, locale_frFR, locale_deDE, locale_zhCN, locale_zhTW, locale_esES, locale_esMX, locale_ruRU FROM acore_string");
+
+    // A locale registered by a module keeps its texts either in its own locale_<code> column or in
+    // `acore_string_locale`, so only the module columns that exist are queried
+    std::unordered_set<std::string> localeColumns;
+    if (QueryResult columns = WorldDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS "
+        "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'acore_string' AND COLUMN_NAME LIKE 'locale\\_%'"))
+    {
+        do
+        {
+            localeColumns.insert(columns->Fetch()[0].Get<std::string>());
+        } while (columns->NextRow());
+    }
+
+    // content_default holds enUS
+    std::string sql = "SELECT entry, content_default";
+    std::vector<LocaleConstant> columnLocales; // locale of fields[2 + k]
+    for (uint8 i = LOCALE_koKR; i < TOTAL_LOCALES; ++i)
+    {
+        if (!IsLocaleRegistered(LocaleConstant(i)))
+            continue;
+
+        if (i > LOCALE_ruRU && !localeColumns.contains(std::string("locale_") + localeNames[i]))
+            continue;
+
+        sql += ", locale_";
+        sql += localeNames[i];
+        columnLocales.push_back(LocaleConstant(i));
+    }
+    sql += " FROM acore_string";
+
+    QueryResult result = WorldDatabase.Query(sql);
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_strings` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_string` is empty "
+            "or a locale column is missing; queried: {}", sql);
         LOG_INFO("server.loading", " ");
         return false;
     }
@@ -9585,9 +9631,37 @@ bool ObjectMgr::LoadAcoreStrings()
 
         data.Content.resize(DEFAULT_LOCALE + 1);
 
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
-            AddLocaleString(fields[i + 1].Get<std::string>(), LocaleConstant(i), data.Content);
+        AddLocaleString(fields[1].Get<std::string>(), DEFAULT_LOCALE, data.Content);
+        for (std::size_t k = 0; k < columnLocales.size(); ++k)
+            AddLocaleString(fields[2 + k].Get<std::string>(), columnLocales[k], data.Content);
     } while (result->NextRow());
+
+    // Texts in the locales that have no column in `acore_string`, such as the ones registered by modules
+    //                                     0      1       2
+    result = WorldDatabase.Query("SELECT entry, locale, content FROM acore_string_locale");
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 entry = fields[0].Get<uint32>();
+
+            auto itr = _acoreStringStore.find(entry);
+            if (itr == _acoreStringStore.end())
+            {
+                LOG_ERROR("sql.sql", "Table `acore_string_locale` has entry {} that is not in `acore_string`, skipped.",
+                    entry);
+                continue;
+            }
+
+            LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
+            if (locale == LOCALE_enUS)
+                continue;
+
+            AddLocaleString(fields[2].Get<std::string>(), locale, itr->second.Content);
+        } while (result->NextRow());
+    }
 
     LOG_INFO("server.loading", ">> Loaded {} Acore Strings in {} ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");

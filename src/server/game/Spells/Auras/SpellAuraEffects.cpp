@@ -1113,8 +1113,39 @@ void AuraEffect::SendTickImmune(Unit* target, Unit* caster) const
         caster->SendSpellDamageImmune(target, m_spellInfo->Id);
 }
 
+namespace
+{
+    class PreDeathAuraTickScope
+    {
+    public:
+        PreDeathAuraTickScope(Unit* caster, bool active) : _caster(active ? caster : nullptr),
+            _wasInTick(_caster && _caster->IsInPreDeathAuraTick())
+        {
+            if (_caster)
+                _caster->SetInPreDeathAuraTick(true);
+        }
+
+        ~PreDeathAuraTickScope()
+        {
+            if (_caster)
+                _caster->SetInPreDeathAuraTick(_wasInTick);
+        }
+
+        PreDeathAuraTickScope(PreDeathAuraTickScope const&) = delete;
+        PreDeathAuraTickScope& operator=(PreDeathAuraTickScope const&) = delete;
+
+    private:
+        Unit* const _caster;
+        bool const _wasInTick;
+    };
+}
+
 void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
 {
+    // the tick's damage and spells the caster casts from its procs and scripts skip combat,
+    // see Unit::DealDamage and Spell::prepare
+    PreDeathAuraTickScope preDeathTick(caster, GetBase()->HasCasterDiedSinceApply(caster));
+
     bool prevented = GetBase()->CallScriptEffectPeriodicHandlers(this, aurApp);
     if (prevented)
         return;
@@ -6030,20 +6061,18 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             }
                             break;
                         // Restoration
+                        // The battleground buff casts it itself, so the player it lands on is the one healed.
                         case 24379:
                         case 23493:
                             {
-                                if (caster)
-                                {
-                                    int32 heal = caster->CountPctFromMaxHealth(10);
-                                    HealInfo healInfo(caster, target, heal, auraSpellInfo, auraSpellInfo->GetSchoolMask());
-                                    caster->HealBySpell(healInfo);
+                                int32 heal = target->CountPctFromMaxHealth(10);
+                                HealInfo healInfo(target, target, heal, auraSpellInfo, auraSpellInfo->GetSchoolMask());
+                                target->HealBySpell(healInfo);
 
-                                    if (int32 mana = caster->GetMaxPower(POWER_MANA))
-                                    {
-                                        mana /= 10;
-                                        caster->EnergizeBySpell(caster, 23493, mana, POWER_MANA);
-                                    }
+                                if (int32 mana = target->GetMaxPower(POWER_MANA))
+                                {
+                                    mana /= 10;
+                                    target->EnergizeBySpell(target, auraId, mana, POWER_MANA);
                                 }
                                 return;
                             }

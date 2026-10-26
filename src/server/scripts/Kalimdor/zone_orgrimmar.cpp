@@ -142,6 +142,10 @@ enum ThrallWarchief : uint32
     // What the Wind Carries (ID: 6566)
     QUEST_WHAT_THE_WIND_CARRIES    = 6566,
 
+    // The Brokering of Peace (ID: 8485)
+    QUEST_BROKERING_OF_PEACE       = 8485,
+    SAY_THRALL_BROKERING_OF_PEACE  = 2,
+
     // Deathknight Starting Zone End
     QUEST_WARCHIEFS_BLESSING       = 13189,
 };
@@ -161,6 +165,10 @@ public:
             case (QUEST_FOR_THE_HORDE):
                 if (creature && creature->AI())
                     creature->AI()->DoAction(ACTION_START_TALKING);
+                break;
+            case (QUEST_BROKERING_OF_PEACE):
+                if (creature && creature->AI())
+                    creature->AI()->Talk(SAY_THRALL_BROKERING_OF_PEACE, player, 1s);
                 break;
             case (QUEST_WARCHIEFS_BLESSING):
                 sLFGMgr->InitializeLockedDungeons(player);

@@ -354,14 +354,14 @@ void InstanceSaveMgr::LoadResetTimes()
             CharacterDatabase.DirectExecute("INSERT INTO instance_reset VALUES ('{}', '{}', '{}')", mapid, difficulty, (uint32)t);
         }
 
-        if (t < now)
+        // A reset missed while the server was down is scheduled below as overdue, and the first Update()
+        // runs it like a live one, chaining one per missed period. Two resets clear every lock (the first
+        // ends extensions), so skip all but the last two. The startup cleanup in LoadInstances() misses
+        // these: raid and heroic instances are saved with resettime 0.
+        if (now - t >= time_t(2) * period)
         {
-            // assume that expired instances have already been cleaned
-            // calculate the next reset time
-            t = (t / DAY) * DAY;
-            t += ((today - t) / period + 1) * period + diff;
+            t += ((now - t) / period - 1) * period;
             SetResetTimeFor(mapid, difficulty, t);
-            CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
         }
 
         // An extended lock runs one period past the reset, as _ResetOrWarnAll sets it after a runtime reset
@@ -745,11 +745,13 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
         ScheduleReset(time_t(next_reset - 3600), InstResetEvent(1, mapid, difficulty));
 
-        // update it in the DB
+        // update it in the DB; only forward, as an overdue reset at startup can queue two updates for the row
+        // and async workers may commit them out of order
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
         stmt->SetData(0, next_reset);
         stmt->SetData(1, uint16(mapid));
         stmt->SetData(2, uint8(difficulty));
+        stmt->SetData(3, next_reset);
         CharacterDatabase.Execute(stmt);
 
         // remove all binds to instances of the given map and delete from db (delete per instance id, no mass deletion!)
