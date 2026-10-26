@@ -1173,6 +1173,9 @@ struct boss_freya_summons : public ScriptedAI
         if (!freya)
             return;
 
+        if (_setId != freya->AI()->GetData(DATA_CURRENT_SET_ID))
+            return;
+
         // A member only comes back while at least one of its allies is still up
         if (freya->AI()->GetData(DATA_TRIO_DOWN) >= 3)
             return;

@@ -1037,7 +1037,7 @@ namespace Acore
         AnyGroupedUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool raid) : _source(obj), _refUnit(funit), _range(range), _raid(raid) {}
         bool operator()(Unit* u)
         {
-            if (u->IsVehicle())
+            if (u->IsCreature() && u->IsVehicle())
                 return false;
 
             if (_raid)
@@ -1303,8 +1303,8 @@ namespace Acore
             if (!u->CanAssistTo(i_funit, i_enemy))
                 return false;
 
-            // too far
-            if (!i_funit->IsWithinDistInMap(u, i_range))
+            // too far, centre to centre: Classic testing shows no combat reach added
+            if (!i_funit->IsWithinDistInMap(u, i_range, true, false, false))
                 return false;
 
             // only if see assisted creature

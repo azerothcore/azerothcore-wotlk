@@ -69,7 +69,8 @@ struct ShadowOfDeathSelector
     ShadowOfDeathSelector(Unit const* tank) : _tank(tank) {}
     bool operator()(Unit const* target) const
     {
-        return target && !target->HasAura(SPELL_SHADOW_OF_DEATH) && !target->HasAura(SPELL_POSSESS_SPIRIT_IMMUNE) && target != _tank;
+        return target && target->IsPlayer() && !target->HasAura(SPELL_SHADOW_OF_DEATH) &&
+            !target->HasAura(SPELL_POSSESS_SPIRIT_IMMUNE) && target != _tank;
     }
 };
 
@@ -90,7 +91,7 @@ struct boss_teron_gorefiend : public BossAI
     {
         ScheduleTimedEvent(20s, 30s, [&]
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
                 if (roll_chance_i(50))
                     Talk(SAY_INCINERATE);

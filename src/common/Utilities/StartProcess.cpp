@@ -31,6 +31,7 @@ using namespace boost::process;
 #include <boost/process/v1/args.hpp>
 #include <boost/process/v1/child.hpp>
 #include <boost/process/v1/env.hpp>
+#include <boost/process/v1/exception.hpp>
 #include <boost/process/v1/exe.hpp>
 #include <boost/process/v1/io.hpp>
 #include <boost/process/v1/search_path.hpp>
@@ -107,26 +108,35 @@ namespace Acore
                 fclose(ptr);
         });
 
-        // Start the child process
-        child c = [&]()
+        std::error_code ec;
+        std::string const absoluteExecutable = std::filesystem::absolute(executable, ec).string();
+        if (ec)
+        {
+            LOG_ERROR(logger, "Failed to resolve the path of \"{}\": {}", executable, ec.message());
+            return EXIT_FAILURE;
+        }
+
+        // Start the child process; boost throws process_error when it can't be launched
+        Optional<child> c;
+        try
         {
             if (inputFile)
             {
                 // With binding stdin
-                return child{
-                    exe = std::filesystem::absolute(executable).string(),
+                c.emplace(
+                    exe = absoluteExecutable,
                     args = argsVector,
                     env = environment(boost::this_process::environment()),
                     std_in = inputFile.get(),
                     std_out = outStream,
                     std_err = errStream
-                };
+                );
             }
             else
             {
                 // Without binding stdin
-                return child{
-                    exe = std::filesystem::absolute(executable).string(),
+                c.emplace(
+                    exe = absoluteExecutable,
                     args = argsVector,
                     env = environment(boost::this_process::environment()),
 #if BOOST_VERSION < 108800
@@ -136,9 +146,14 @@ namespace Acore
 #endif
                     std_out = outStream,
                     std_err = errStream
-                };
+                );
             }
-        }();
+        }
+        catch (process_error const& e)
+        {
+            LOG_ERROR(logger, "Failed to start process \"{}\": {}", absoluteExecutable, e.what());
+            return EXIT_FAILURE;
+        }
 
         auto outInfo = MakeACLogSink([&](std::string const& msg)
         {
@@ -155,7 +170,7 @@ namespace Acore
 
         // Call the waiter in the current scope to prevent
         // the streams from closing too early on leaving the scope.
-        int const result = waiter(c);
+        int const result = waiter(*c);
 
         if (!secure)
         {

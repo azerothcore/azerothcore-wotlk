@@ -48,6 +48,11 @@ typedef std::unordered_map<uint32, GameObjectQuestItemList> GameObjectQuestItemM
 
 union GameObjectValue
 {
+    //6 GAMEOBJECT_TYPE_TRAP
+    struct
+    {
+        uint8 TargetSearcherCheckType; // SpellTargetCheckTypes
+    } Trap;
     //11 GAMEOBJECT_TYPE_TRANSPORT
     struct
     {
@@ -281,12 +286,23 @@ public:
         if (Unit* owner = GetOwner())
             return owner->getLevelForTarget(target);
 
+        if (GetGoType() == GAMEOBJECT_TYPE_TRAP)
+        {
+            // use the level from the trap template, otherwise match the target
+            // so ownerless utility traps cannot miss through level difference
+            if (GetGOInfo()->trap.level)
+                return GetGOInfo()->trap.level;
+            if (Unit const* targetUnit = target->ToUnit())
+                return targetUnit->GetLevel();
+        }
+
         return 1;
     }
 
     GameObject* LookupFishingHoleAround(float range);
 
-    void CastSpell(Unit* target, uint32 spell);
+    using WorldObject::CastSpell;
+    void CastSpell(Unit* target, uint32 spellId);
     void SendCustomAnim(uint32 anim);
     bool IsInRange2d(float x, float y, float radius) const;
     bool IsInRange3d(float x, float y, float z, float radius) const;

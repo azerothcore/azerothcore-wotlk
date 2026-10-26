@@ -2035,7 +2035,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         }
 
         // is arena team captain
-        if (sArenaTeamMgr->GetArenaTeamByCaptain(factionChangeInfo->Guid))
+        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA) && sArenaTeamMgr->GetArenaTeamByCaptain(factionChangeInfo->Guid))
         {
             SendCharFactionChange(CHAR_CREATE_CHARACTER_ARENA_LEADER, factionChangeInfo.get());
             return;
@@ -2259,6 +2259,10 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                     };
 
                     uint32 nodeId = itr.first;
+                    // TaxiPath.dbc has a path from node 0, which has no bit in the mask
+                    if (!nodeId || nodeId > TaxiMaskSize * 32)
+                        continue;
+
                     uint8 field = (uint8)((nodeId - 1) / 32);
                     uint32 submask = 1 << ((nodeId - 1) % 32);
 
@@ -2303,7 +2307,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                         continue;
                     }
 
-                    LFGDungeonEntry const* lfgDungeon = GetZoneLFGDungeonEntry(zone->area_name[GetSessionDbLocaleIndex()], GetSessionDbLocaleIndex());
+                    LocaleConstant dbcLocale = GetSessionDbcLocale();
+                    LFGDungeonEntry const* lfgDungeon = GetZoneLFGDungeonEntry(zone->area_name[dbcLocale], dbcLocale);
                     if (!lfgDungeon)
                     {
                         FillTaxiMask(field, 0);
@@ -2352,7 +2357,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             }
 
             // Leave Arena Teams
-            Player::LeaveAllArenaTeams(factionChangeInfo->Guid);
+            if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA))
+                Player::LeaveAllArenaTeams(factionChangeInfo->Guid);
 
             // Reset homebind and position
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
