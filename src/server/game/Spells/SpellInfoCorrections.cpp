@@ -2282,6 +2282,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(85); // summon for 18 seconds, 15 not enough
     });
 
+    // Trial of the Crusader, Jaraxxus, Infernal Eruption (heroic)
+    ApplySpellFix({ 67068, 67069 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Amplitude = 10000;
+    });
+
     // Trial of the Crusader, Jaraxxus, Spinning Pain Spike
     ApplySpellFix({ 66281 }, [](SpellInfo* spellInfo)
     {
