@@ -41,7 +41,8 @@ struct boss_faction_championsAI : public ScriptedAI
     boss_faction_championsAI(Creature* pCreature, uint32 aitype) : ScriptedAI(pCreature)
     {
         pInstance = pCreature->GetInstanceScript();
-        me->SetReactState(REACT_PASSIVE);
+        // pets are summoned mid-fight, the instance only releases the champions
+        me->SetReactState(aitype == AI_PET ? REACT_AGGRESSIVE : REACT_PASSIVE);
         mAIType = aitype;
         threatTimer = 2000;
         powerTimer = 1000;
