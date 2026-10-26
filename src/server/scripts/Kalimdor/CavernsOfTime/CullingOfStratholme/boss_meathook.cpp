@@ -51,18 +51,16 @@ public:
         return GetCullingOfStratholmeAI<boss_meathookAI>(creature);
     }
 
-    struct boss_meathookAI : public ScriptedAI
+    struct boss_meathookAI : public BossAI
     {
-        boss_meathookAI(Creature* c) : ScriptedAI(c)
+        boss_meathookAI(Creature* creature) : BossAI(creature, BOSS_MEATHOOK)
         {
             Talk(SAY_SPAWN);
         }
 
-        EventMap events;
-        void Reset() override { events.Reset(); }
-
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _JustEngagedWith();
             Talk(SAY_AGGRO);
             events.RescheduleEvent(EVENT_SPELL_CONSTRICTING_CHAINS, 15s);
             events.RescheduleEvent(EVENT_SPELL_DISEASE_EXPULSION, 4s);
@@ -71,6 +69,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
+            _JustDied();
             Talk(SAY_DEATH);
         }
 

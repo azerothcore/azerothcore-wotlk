@@ -606,12 +606,11 @@ public:
                     if (type == BOSS_HODIR && state == DONE)
                         setChestsLootable(BOSS_HODIR);
                     if (state == DONE)
-                    {
-                        uint8 keeperIdx = type - BOSS_FREYA;
-                        instance->SummonCreature(
-                            ObservationRingKeeperEntry[keeperIdx],
-                            ObservationRingKeepersPos[keeperIdx]);
-                    }
+                        for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; ++i)
+                            if (ObservationRingKeeperBoss[i] == type)
+                                instance->SummonCreature(
+                                    ObservationRingKeeperEntry[i],
+                                    ObservationRingKeepersPos[i]);
                     break;
                 case BOSS_YOGGSARON:
                     // Sara despawns the unchosen keepers on pull, bring them back after a wipe
@@ -1150,9 +1149,6 @@ public:
         void Load(char const* data) override
         {
             InstanceScript::Load(data);
-
-            if (!data)
-                StorePersistentData(PERSISTENT_DATA_UNBROKEN, 1);
 
             uint32 algalonTimer =
                 GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
