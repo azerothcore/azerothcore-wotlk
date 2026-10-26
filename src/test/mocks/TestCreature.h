@@ -67,6 +67,10 @@ public:
     // Mark as player-controlled; two player-controlled units get a PvPCombatReference
     void SetControlledByPlayer(bool controlled) { m_ControlledByPlayer = controlled; }
 
+    // Native object scale used by scale tests instead of the template models
+    float GetNativeObjectScale() const override { return _testNativeObjectScale; }
+    void SetTestNativeObjectScale(float scale) { _testNativeObjectScale = scale; }
+
     // Complete setup for combat/threat testing
     // Sets creature to be alive, in-world, hostile, and initializes managers
     void SetupForCombatTest(Map* map, ObjectGuid::LowType guidLow, uint32 entry);
@@ -83,6 +87,7 @@ public:
 
 private:
     Map* _testMap = nullptr;
+    float _testNativeObjectScale = 1.0f;
     static CreatureTemplate* _fakeCreatureTemplate;
     static bool _fakeTemplateInitialized;
 };

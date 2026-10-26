@@ -427,6 +427,14 @@ void ThreatManager::AddThreat(Unit* target, float amount, SpellInfo const* spell
     if (!ignoreModifiers)
         amount = CalculateModifiedThreat(amount, target, spell);
 
+    // the owner's AI sees the threat once, before any of it is redirected; the redirected shares are not reported again
+    if (!ignoreRedirects)
+    {
+        if (Creature* creatureOwner = _owner->ToCreature())
+            if (creatureOwner->IsAIEnabled)
+                creatureOwner->AI()->CalculateThreat(target, amount, spell);
+    }
+
     // if we're increasing threat, send some/all of it to redirection targets instead if applicable
     if (!ignoreRedirects && amount > 0.0f)
     {

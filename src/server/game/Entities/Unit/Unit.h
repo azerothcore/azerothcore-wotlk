@@ -31,6 +31,7 @@
 #include "ThreatManager.h"
 #include "UnitDefines.h"
 #include "UnitUtils.h"
+#include <array>
 #include <boost/container/flat_map.hpp>
 #include <functional>
 #include <utility>
@@ -210,8 +211,12 @@ enum class DeathState : uint8
     JustRespawned = 4,
 };
 
-extern float baseMoveSpeed[MAX_MOVE_TYPE];
-extern float playerBaseMoveSpeed[MAX_MOVE_TYPE];
+extern std::array<float, MAX_MOVE_TYPE> baseMoveSpeed;
+extern std::array<float, MAX_MOVE_TYPE> playerBaseMoveSpeed;
+
+// Sets baseMoveSpeed (NPCs) and playerBaseMoveSpeed to the default speeds times
+// the given rates. Recomputed from the defaults, so a config reload doesn't compound.
+void ApplyMoveSpeedRates(float npcRate, float playerRate);
 
 enum WeaponAttackType : uint8
 {
@@ -350,6 +355,7 @@ private:
     uint32 m_block;
     uint32 m_cleanDamage;
     uint32 m_hitMask;
+    bool m_skipCombat{false};
 
     // amalgamation constructor (used for proc)
     DamageInfo(DamageInfo const& dmg1, DamageInfo const& dmg2);
@@ -376,6 +382,7 @@ public:
     [[nodiscard]] uint32 GetAbsorb() const { return m_absorb; };
     [[nodiscard]] uint32 GetResist() const { return m_resist; };
     [[nodiscard]] uint32 GetBlock() const { return m_block; };
+    [[nodiscard]] bool SkipsCombat() const { return m_skipCombat; }
 
     [[nodiscard]] uint32 GetHitMask() const;
     void AddHitMask(uint32 hitMask) { m_hitMask |= hitMask; }
@@ -511,7 +518,8 @@ struct SpellNonMeleeDamage
 {
     SpellNonMeleeDamage(Unit* _attacker, Unit* _target, SpellInfo const* _spellInfo, uint32 _schoolMask)
         : target(_target), attacker(_attacker), spellInfo(_spellInfo), damage(0), overkill(0), schoolMask(_schoolMask),
-          absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0)
+          absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), cleanDamage(0),
+          skipCombat(false)
     {}
 
     Unit* target;
@@ -528,6 +536,7 @@ struct SpellNonMeleeDamage
     uint32 HitInfo;
     // Used for help
     uint32 cleanDamage;
+    bool skipCombat;
 };
 
 struct SpellPeriodicAuraLogInfo
@@ -637,8 +646,6 @@ enum SpellCooldownFlags
 
 typedef std::unordered_map<uint32, uint32> PacketCooldowns;
 
-// delay time next attack to prevent client attack animation problems
-#define ATTACK_DISPLAY_DELAY 200
 #define MAX_PLAYER_STEALTH_DETECT_RANGE 30.0f               // max distance for detection targets by player
 
 enum class SpeedOpcodeIndex : uint32
@@ -1174,6 +1181,7 @@ public:
 
     [[nodiscard]] float GetUnitMissChance(WeaponAttackType attType) const;
     float GetUnitCriticalChance(WeaponAttackType attackType, Unit const* victim) const;
+    [[nodiscard]] float GetCritChanceFromSkillDiff(Unit const* victim) const;
     MeleeHitOutcome RollMeleeOutcomeAgainst (Unit const* victim, WeaponAttackType attType) const;
     MeleeHitOutcome RollMeleeOutcomeAgainst (Unit const* victim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance) const;
 
@@ -1235,7 +1243,10 @@ public:
     /*********************************************************/
     /***       METHODS RELATED TO DAMAGE CACULATIONS       ***/
     /*********************************************************/
-    static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* spellProto = nullptr, bool durabilityLoss = true, bool allowGM = false, Spell const* spell = nullptr);
+    static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr,
+        DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL,
+        SpellInfo const* spellProto = nullptr, bool durabilityLoss = true, bool allowGM = false,
+        Spell const* spell = nullptr, bool skipCombat = false);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
     void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss, Spell const* spell = nullptr);
     void DealDamageShieldDamage(Unit* victim);
@@ -1672,7 +1683,8 @@ public:
     float CalculateLevelPenalty(SpellInfo const* spellProto) const;
 
     uint32 GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const;
-    void CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex = 0);
+    void CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount,
+        uint8 effectIndex = 0, TriggerCastFlags extraTriggerFlags = TRIGGERED_NONE);
 
     // SpellCastResult methods
     // WorldObject spellcasting port: bring the inherited entry point into
@@ -1797,6 +1809,9 @@ public:
     // DeathState
     DeathState getDeathState() { return m_deathState; };
     virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
+    [[nodiscard]] Milliseconds GetLastDeathTime() const { return m_lastDeathTime; }
+    [[nodiscard]] bool IsInPreDeathAuraTick() const { return m_inPreDeathAuraTick; }
+    void SetInPreDeathAuraTick(bool value) { m_inPreDeathAuraTick = value; }
 
     [[nodiscard]] bool IsAlive() const { return (m_deathState == DeathState::Alive); };
     [[nodiscard]] bool isDying() const { return (m_deathState == DeathState::JustDied); };
@@ -1983,7 +1998,7 @@ public:
     virtual float GetNativeObjectScale() const { return 1.0f; }
     virtual void RecalculateObjectScale();
     [[nodiscard]] uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
-    virtual void SetDisplayId(uint32 modelId, float displayScale = 1.f);
+    virtual void SetDisplayId(uint32 modelId, std::optional<float> displayScale = {});
     [[nodiscard]] uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
     void RestoreDisplayId();
     void SetNativeDisplayId(uint32 displayId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, displayId); }
@@ -2161,6 +2176,8 @@ protected:
     Unit* m_attacking;
 
     DeathState m_deathState;
+    Milliseconds m_lastDeathTime{Milliseconds::min()};
+    bool m_inPreDeathAuraTick{false};
 
     int32 m_procDeep;
 
@@ -2263,6 +2280,7 @@ private:
     uint32 _lastExtraAttackSpell;
     std::unordered_map<ObjectGuid /*guid*/, uint32 /*count*/> extraAttacksTargets;
     ObjectGuid _lastDamagedTargetGuid;
+    std::optional<float> _displayScale; ///< scale passed with the current display, empty = native scale
 
     typedef std::unordered_map<uint64 /*visibleFlag(uint32) + updateType(uint8)*/, BuildValuesCachedBuffer>  ValuesUpdateCache;
     ValuesUpdateCache _valuesUpdateCache;
