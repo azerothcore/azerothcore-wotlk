@@ -229,7 +229,8 @@ void GameObject::RemoveFromWorld()
     {
         sScriptMgr->OnGameObjectRemoveWorld(this);
 
-        if (m_zoneScript)
+        // Shutdown frees OutdoorPvP zone scripts before the maps unload (Main.cpp), so the pointer is dangling then.
+        if (m_zoneScript && !World::IsStopped())
             m_zoneScript->OnGameObjectRemove(this);
 
         RemoveFromOwner();
