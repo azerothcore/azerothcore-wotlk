@@ -950,6 +950,19 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     if (input.fail() && !input.eof())
         return DUMP_FILE_BROKEN;
 
+    // Imported items and the character take guids from the generators' next values without going through their overflow check
+    if (uint64(itemLowGuidOffset) + items.size() >= ObjectGuid::GetMaxCounter(HighGuid::Item) - 1)
+    {
+        LOG_ERROR("misc", "PlayerDump: importing {} items from next guid {} would overflow the item guid space", items.size(), itemLowGuidOffset);
+        return DUMP_GUID_OVERFLOW;
+    }
+
+    if (incHighest && guid >= ObjectGuid::GetMaxCounter(HighGuid::Player) - 1)
+    {
+        LOG_ERROR("misc", "PlayerDump: importing a character with next guid {} would overflow the player guid space", guid);
+        return DUMP_GUID_OVERFLOW;
+    }
+
     CharacterDatabase.CommitTransaction(trans);
 
     // in case of name conflict player has to rename at login anyway

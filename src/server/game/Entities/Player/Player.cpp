@@ -1526,8 +1526,9 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 UnsummonPetTemporaryIfAny();
         }
 
+        // a dead player releasing spirit on the same map must not end its killer's pvp timeout (#27967)
         if (!(options & TELE_TO_NOT_LEAVE_COMBAT))
-            CombatStop();
+            CombatStop(false, /*mutualPvP*/ true, /*keepPvPForOthers*/ !IsAlive());
 
         // this will be used instead of the current location in SaveToDB
         teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
