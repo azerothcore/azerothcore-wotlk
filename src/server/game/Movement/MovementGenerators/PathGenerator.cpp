@@ -131,12 +131,6 @@ PathGenerator::PathGenerator(WorldObject const* owner) :
 {
     memset(_pathPolyRefs, 0, sizeof(_pathPolyRefs));
 
-    //if (sDisableMgr->IsPathfindingEnabled(_sourceUnit->FindMap()))
-    {
-        _navMesh = _source->GetMap()->GetMapCollisionData().GetMMapData().GetNavMesh();
-        _navMeshQuery = _source->GetMap()->GetMapCollisionData().GetMMapData().GetNavMeshQuery();
-    }
-
     CreateFilter();
 }
 
@@ -154,6 +148,24 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
 
 bool PathGenerator::CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest)
 {
+    // prevent NavMesh reading while a different thread is altering NavMesh
+    std::lock_guard<std::recursive_mutex> lock(_source->GetMap()->_gridLock);
+
+    _navMesh = _source->GetMap()->GetMapCollisionData().GetMMapData().GetNavMesh();
+
+    // fetch/creates a thread local NavMeshQuery for this specific thread and map
+    uint32 mapId = _source->GetMapId();
+    auto& cacheEntry = t_navMeshQueries[mapId];
+
+    // creates a new query if it doesnt exist yet or the map was reloaded
+    if (cacheEntry.first != _navMesh || !cacheEntry.second)
+    {
+        cacheEntry.first = _navMesh;
+        cacheEntry.second = MMAP::MMapMgr::CreateNavMeshQuery(const_cast<dtNavMesh*>(_navMesh));
+    }
+
+    _navMeshQuery = cacheEntry.second.get();
+
     if (!Acore::IsValidMapCoord(destX, destY, destZ) || !Acore::IsValidMapCoord(x, y, z))
         return false;
 

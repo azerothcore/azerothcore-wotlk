@@ -95,6 +95,7 @@ class Unit;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+class MapPartition;
 struct FactionTemplateEntry;
 class Spell;
 class SpellInfo;
@@ -438,6 +439,7 @@ private:
 class UpdatableMapObject
 {
     friend class Map;
+    friend class MapPartition;
 
 public:
     enum UpdateState : uint8

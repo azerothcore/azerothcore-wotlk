@@ -45,6 +45,8 @@
 #include "VMapMgr2.h"
 #include "Weather.h"
 #include "WeatherMgr.h"
+#include "MapPartition.h"
+#include <future>
 
 #define MAP_INVALID_ZONE        0xFFFFFFFF
 
@@ -81,6 +83,12 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
 
     _weatherUpdateTimer.SetInterval(1 * IN_MILLISECONDS);
     _corpseUpdateTimer.SetInterval(20 * MINUTE * IN_MILLISECONDS);
+    // Splits the 64x64 map grid into 4 quadrants, this is good for 4 core cpu
+    // Can expand the num of partitions, but they should be equal to the num of cpu cores the server is run on
+    _partitions.push_back(std::make_unique<MapPartition>(this, 0, 31, 0, 31)); //Northwest
+    _partitions.push_back(std::make_unique<MapPartition>(this, 32, 63, 0, 31)); //Northeast
+    _partitions.push_back(std::make_unique<MapPartition>(this, 0, 31, 32, 63)); //Southwest
+    _partitions.push_back(std::make_unique<MapPartition>(this, 32, 63, 32, 63)); //Southeast
 
     _poolData = sPoolMgr->InitPoolsForMap(this);
 }
@@ -182,11 +190,15 @@ void Map::DeleteFromWorld(Player* player)
 
 void Map::EnsureGridCreated(GridCoord const& gridCoord)
 {
+    // prevent concurrent MapGridManager memory corruption
+    std::lock_guard<std::recursive_mutex> lock(_gridLock);
     _mapGridManager.CreateGrid(gridCoord.x_coord, gridCoord.y_coord);
 }
 
 bool Map::EnsureGridLoaded(Cell const& cell)
 {
+    // prevent concurrent NavMesh corruption from addTile()
+    std::lock_guard<std::recursive_mutex> lock(_gridLock);
     EnsureGridCreated(GridCoord(cell.GridX(), cell.GridY()));
 
     if (_mapGridManager.LoadGrid(cell.GridX(), cell.GridY()))
@@ -539,44 +551,23 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
 void Map::UpdateNonPlayerObjects(uint32 const diff)
 {
-    for (WorldObject* obj : _pendingAddUpdatableObjectList)
-        _AddObjectToUpdateList(obj);
-    _pendingAddUpdatableObjectList.clear();
-
-    if (_updatableObjectListRecheckTimer.Passed())
+    // Fork-Join Model Multithreading
+    // Dispatches partitions simultaneously to C++ async thread pool
+    std::vector<std::future<void>> futures;
+    for (auto& partition : _partitions)
     {
-        for (uint32 i = 0; i < _updatableObjectList.size();)
+        MapPartition* rawPartition = partition.get();
+        futures.push_back(std::async(std::launch::async, [rawPartition, diff]()
         {
-            WorldObject* obj = _updatableObjectList[i];
-            if (!obj->IsInWorld())
-            {
-                ++i;
-                continue;
-            }
-
-            obj->Update(diff);
-
-            if (!obj->IsUpdateNeeded())
-            {
-                _RemoveObjectFromUpdateList(obj);
-                // Intentional no iteration here, obj is swapped with last element in
-                // _updatableObjectList so next loop will update that object at the same index
-            }
-            else
-                ++i;
-        }
-        _updatableObjectListRecheckTimer.Reset();
+            // Runs on separate cpu thread
+            rawPartition->Update(diff);
+        }));
     }
-    else
-    {
-        for (uint32 i = 0; i < _updatableObjectList.size(); ++i)
-        {
-            WorldObject* obj = _updatableObjectList[i];
-            if (!obj->IsInWorld())
-                continue;
 
-            obj->Update(diff);
-        }
+    // stop master thread until cores finish calculations
+    for (auto& future : futures)
+    {
+        future.get();
     }
 }
 
@@ -589,35 +580,13 @@ void Map::AddObjectToPendingUpdateList(WorldObject* obj)
     if (!mapUpdatableObject || mapUpdatableObject->GetUpdateState() != UpdatableMapObject::UpdateState::NotUpdating)
         return;
 
-    _pendingAddUpdatableObjectList.insert(obj);
-    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::PendingAdd);
-}
-
-// Internal use only
-void Map::_AddObjectToUpdateList(WorldObject* obj)
-{
-    UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    ASSERT(mapUpdatableObject && mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::PendingAdd);
-
-    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::Updating);
-    mapUpdatableObject->SetMapUpdateListOffset(_updatableObjectList.size());
-    _updatableObjectList.push_back(obj);
-}
-
-// Internal use only
-void Map::_RemoveObjectFromUpdateList(WorldObject* obj)
-{
-    UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    ASSERT(mapUpdatableObject && mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating);
-
-    if (obj != _updatableObjectList.back())
+    GridCoord coord = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
+    MapPartition* p = GetPartition(coord.x_coord, coord.y_coord);
+    if (p)
     {
-        dynamic_cast<UpdatableMapObject*>(_updatableObjectList.back())->SetMapUpdateListOffset(mapUpdatableObject->GetMapUpdateListOffset());
-        std::swap(_updatableObjectList[mapUpdatableObject->GetMapUpdateListOffset()], _updatableObjectList.back());
+        mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::Updating);
+        p->QueueTransfer(obj);
     }
-
-    _updatableObjectList.pop_back();
-    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::NotUpdating);
 }
 
 void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
@@ -626,10 +595,15 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
         return;
 
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::PendingAdd)
-        _pendingAddUpdatableObjectList.erase(obj);
-    else if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating)
-        _RemoveObjectFromUpdateList(obj);
+    if (!mapUpdatableObject)
+        return;
+    if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating)
+    {
+        for (auto& p : _partitions)
+        {
+            p->RemoveObject(obj);
+        }
+    }
 }
 
 // Used in VisibilityDistanceType::Large and VisibilityDistanceType::Gigantic
@@ -697,11 +671,17 @@ ZoneWideVisibleWorldObjectsSet const* Map::GetZoneWideVisibleWorldObjectsForZone
 
 void Map::HandleDelayedVisibility()
 {
-    if (i_objectsForDelayedVisibility.empty())
-        return;
-    for (std::unordered_set<Unit*>::iterator itr = i_objectsForDelayedVisibility.begin(); itr != i_objectsForDelayedVisibility.end(); ++itr)
+    std::unordered_set<Unit*> localCopy;
+    {
+        // Lock set and safely move the contents to a local copy to prevent deadlocks
+        std::lock_guard<std::mutex> lock(_delayedVisibilityLock);
+        if (i_objectsForDelayedVisibility.empty())
+            return;
+        localCopy = std::move(i_objectsForDelayedVisibility);
+    }
+
+    for (std::unordered_set<Unit*>::iterator itr = localCopy.begin(); itr != localCopy.end(); ++itr)
         (*itr)->ExecuteDelayedUnitRelocationEvent();
-    i_objectsForDelayedVisibility.clear();
 }
 
 struct ResetNotifier
@@ -874,9 +854,7 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
 
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
-        if (old_cell.DiffGrid(new_cell))
-            EnsureGridLoaded(new_cell);
-
+        EnsureGridLoaded(new_cell);
         AddGameObjectToMoveList(go);
     }
     else
@@ -910,6 +888,7 @@ void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float
 
 void Map::AddCreatureToMoveList(Creature* c)
 {
+    std::lock_guard<std::mutex> lock(_moveListLock);
     if (c->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         _creaturesToMove.push_back(c);
     c->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -923,6 +902,7 @@ void Map::RemoveCreatureFromMoveList(Creature* c)
 
 void Map::AddGameObjectToMoveList(GameObject* go)
 {
+    std::lock_guard<std::mutex> lock(_moveListLock);
     if (go->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         _gameObjectsToMove.push_back(go);
     go->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -936,6 +916,7 @@ void Map::RemoveGameObjectFromMoveList(GameObject* go)
 
 void Map::AddDynamicObjectToMoveList(DynamicObject* dynObj)
 {
+    std::lock_guard<std::mutex> lock(_moveListLock);
     if (dynObj->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         _dynamicObjectsToMove.push_back(dynObj);
     dynObj->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -1047,6 +1028,8 @@ void Map::MoveAllDynamicObjectsInMoveList()
 
 bool Map::UnloadGrid(MapGridType& grid)
 {
+    // prevent concurrent NavMesh corruption from removeTile()
+    std::lock_guard<std::recursive_mutex> lock(_gridLock);
     _mapGridManager.UnloadGrid(grid.GetX(), grid.GetY());
 
     ASSERT(i_objectsToRemove.empty());
@@ -3632,4 +3615,25 @@ std::string InstanceMap::GetDebugInfo() const
         << std::boolalpha
         << "ScriptId: " << GetScriptId() << " ScriptName: " << GetScriptName();
     return sstr.str();
+}
+
+// Finds which of the partitions the coordinates belongs to
+MapPartition* Map::GetPartition(uint16 gridX, uint16 gridY)
+{
+    for (auto& partition : _partitions)
+    {
+        if (partition->Contains(gridX, gridY))
+        {
+            return partition.get();
+        }
+    }
+    return nullptr;
+}
+
+size_t Map::GetUpdatableObjectsCount() const
+{
+    size_t count = 0;
+    for (auto const& p : _partitions)
+        count += p->GetUpdatableObjectsCount();
+    return count;
 }

@@ -30,6 +30,7 @@
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
 #include <G3D/Vector3.h>
+#include <mutex>
 
 using VMAP::ModelInstance;
 
@@ -256,6 +257,8 @@ bool DynamicMapTree::GetObjectHitPos(const uint32 phasemask, G3D::Vector3 const&
 
 bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, VMAP::ModelIgnoreFlags ignoreFlags) const
 {
+    // Shared lock to allow concurrent reads across map partitions
+    std::shared_lock<std::shared_mutex> lock(_lock);
     G3D::Vector3 v1(x1, y1, z1), v2(x2, y2, z2);
 
     float maxDist = (v2 - v1).magnitude();
@@ -274,6 +277,8 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
 
 float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, uint32 phasemask) const
 {
+    // Shared lock to allow concurrent reads across map partitions
+    std::shared_lock<std::shared_mutex> lock(_lock);
     G3D::Vector3 v(x, y, z);
     G3D::Ray r(v, G3D::Vector3(0, 0, -1));
     DynamicTreeIntersectionCallback callback(phasemask, VMAP::ModelIgnoreFlags::Nothing);
@@ -291,6 +296,8 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, 
 
 bool DynamicMapTree::GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, Optional<uint8> reqLiquidType, VMAP::AreaAndLiquidData& data) const
 {
+    // Shared lock to allow concurrent reads across map partitions
+    std::shared_lock<std::shared_mutex> lock(_lock);
     G3D::Vector3 v(x, y, z + 0.5f);
     DynamicTreeLocationInfoCallback intersectionCallBack(phasemask);
     impl->intersectPoint(v, intersectionCallBack);

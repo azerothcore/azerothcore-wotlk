@@ -44,6 +44,7 @@
 #include <memory>
 #include <set>
 #include <shared_mutex>
+#include <mutex>
 
 class Unit;
 class WorldPacket;
@@ -68,6 +69,7 @@ class StaticTransport;
 class MotionTransport;
 class PathGenerator;
 class WorldSession;
+class MapPartition;
 class SpawnedPoolData;
 
 enum WeatherState : uint32;
@@ -535,15 +537,17 @@ public:
 
     void AddUpdateObject(Object* obj)
     {
+        std::lock_guard<std::mutex> lock(_updateObjectsLock);
         _updateObjects.insert(obj);
     }
 
     void RemoveUpdateObject(Object* obj)
     {
+        std::lock_guard<std::mutex> lock(_updateObjectsLock);
         _updateObjects.erase(obj);
     }
 
-    size_t GetUpdatableObjectsCount() const { return _updatableObjectList.size(); }
+    size_t GetUpdatableObjectsCount() const;
 
     virtual std::string GetDebugInfo() const;
 
@@ -575,6 +579,14 @@ public:
     MapCollisionData& GetMapCollisionData() { return _mapCollisionData; }
     MapCollisionData const& GetMapCollisionData()  const { return _mapCollisionData; }
 
+    MapPartition* GetPartition(uint16 gridX, uint16 gridY);
+    std::vector<std::unique_ptr<MapPartition>> const& GetPartitions() const { return _partitions; }
+
+    // protects i_objectsForDelayedVisibility when multiple partitions Uint::Update call insert() concurrently
+    std::mutex _delayedVisibilityLock;
+    // protects MapGridManager and NavMesh from concurrent memory corruption and infinite loops
+    std::recursive_mutex _gridLock;
+
 private:
 
     template<class T> void InitializeObject(T* obj);
@@ -588,6 +600,7 @@ private:
     std::vector<Creature*> _creaturesToMove;
     std::vector<GameObject*> _gameObjectsToMove;
     std::vector<DynamicObject*> _dynamicObjectsToMove;
+    std::vector<std::unique_ptr<MapPartition>> _partitions;
 
     bool EnsureGridLoaded(Cell const& cell);
     MapGridType* GetMapGrid(uint16 const x, uint16 const y);
