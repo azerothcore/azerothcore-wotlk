@@ -27,8 +27,8 @@
 enum EyeData
 {
     DATA_ALAR               = 0,
-    DATA_ASTROMANCER        = 1,
-    DATA_REAVER             = 2,
+    DATA_REAVER             = 1,
+    DATA_ASTROMANCER        = 2,
     DATA_KAELTHAS           = 3,
     MAX_ENCOUNTER           = 4,
 
