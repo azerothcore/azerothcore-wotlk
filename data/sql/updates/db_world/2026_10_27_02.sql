@@ -1,3 +1,4 @@
+-- DB update 2026_10_27_01 -> 2026_10_27_02
 -- Basic Chemistry (13279 Horde / 13295 Alliance) and its repeatables Neutralizing the Plague
 -- (13281 / 13297) - the plague cauldrons of Mord'rethar.
 -- Moves the event off SmartAI and onto zone_icecrown.cpp, and replaces the hand-written wave
