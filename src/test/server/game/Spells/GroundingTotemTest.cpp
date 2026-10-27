@@ -17,6 +17,7 @@
 
 #include "GameObject.h"
 #include "IntegrationTestFixture.h"
+#include "MovementGenerator.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellInfoTestHelper.h"
@@ -96,9 +97,14 @@ protected:
     {
         IntegrationTestFixture::SetUp();
 
+        // Death handling needs the idle movement factory.
+        if (!sMovementGeneratorRegistry->HasItem(IDLE_MOTION_TYPE))
+            (new IdleMovementFactory())->RegisterSelf();
+
         _hunter = CreateTestCreature(1, 99001, TEST_FACTION_HOSTILE_TO_MONSTERS);
         _shaman = CreateTestCreature(2, 99002, TEST_FACTION_HOSTILE_TO_ALL);
         _groundingTotem = CreateTestCreature(3, 5925, TEST_FACTION_HOSTILE_TO_ALL);
+        _groundingTotem->AddUnitTypeMask(UNIT_MASK_TOTEM);
         for (Creature* creature : {_hunter, _shaman, _groundingTotem})
             GetTestMap()->GetObjectsStore().Insert<Creature>(creature->GetGUID(), creature);
 
@@ -176,6 +182,7 @@ TEST_F(GroundingTotemTargetTest, UnitCastRedirectsAndConsumesGrounding)
 
     _groundingTotem->m_Events.Update(100);
     EXPECT_FALSE(_shaman->HasSpellMagnetAura());
+    EXPECT_FALSE(_groundingTotem->IsAlive());
 }
 
 TEST_F(GroundingTotemTargetTest, FreezingTrapRedirectsAndConsumesGrounding)
@@ -186,6 +193,7 @@ TEST_F(GroundingTotemTargetTest, FreezingTrapRedirectsAndConsumesGrounding)
 
     _groundingTotem->m_Events.Update(100);
     EXPECT_FALSE(_shaman->HasSpellMagnetAura());
+    EXPECT_FALSE(_groundingTotem->IsAlive());
 }
 
 TEST_F(GroundingTotemTargetTest, FreezingTrapWithoutGroundingKeepsOriginalTarget)
@@ -204,6 +212,7 @@ TEST_F(GroundingTotemTargetTest, NonRedirectableTrapKeepsOriginalTargetAndGround
     _groundingTotem->m_Events.Update(100);
     ASSERT_TRUE(_shaman->HasSpellMagnetAura());
     EXPECT_EQ(_shaman->GetAura(SPELL_GROUNDING_TOTEM_EFFECT)->GetCharges(), 1);
+    EXPECT_TRUE(_groundingTotem->IsAlive());
 }
 
 TEST_F(GroundingTotemTargetTest, AreaTrapKeepsOriginalTargetAndGrounding)
@@ -215,5 +224,6 @@ TEST_F(GroundingTotemTargetTest, AreaTrapKeepsOriginalTargetAndGrounding)
     _groundingTotem->m_Events.Update(100);
     ASSERT_TRUE(_shaman->HasSpellMagnetAura());
     EXPECT_EQ(_shaman->GetAura(SPELL_GROUNDING_TOTEM_EFFECT)->GetCharges(), 1);
+    EXPECT_TRUE(_groundingTotem->IsAlive());
 }
 }
