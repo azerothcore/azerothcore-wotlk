@@ -482,6 +482,12 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if (Creature* twin = GetSister())
             if (twin->IsAlive())
             {
+                // she kills herself, so Unit::Kill has nobody to reward and no loot unless she gets our tap
+                if (Player* recipient = me->GetLootRecipient())
+                {
+                    twin->LowerPlayerDamageReq(twin->GetMaxHealth());
+                    twin->SetLootRecipient(recipient);
+                }
                 twin->SetHealth(1);
                 Unit::Kill(twin, twin);
             }
