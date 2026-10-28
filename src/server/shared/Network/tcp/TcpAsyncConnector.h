@@ -36,15 +36,22 @@ using boost::asio::ip::tcp;
  * ever touched from the io context thread; the public entry points post their
  * work there. The On* callbacks are invoked on the io context thread.
  *
- * The host (an IPv4 address or a hostname) is looked up again before every
- * attempt, with a blocking lookup on the io context thread. A host that does
- * not resolve fails that attempt like a refused connection.
+ * The host (an IPv4 address, or a hostname resolved to IPv4 like the realm
+ * addresses) is looked up again before every attempt, with a blocking lookup
+ * on the io context thread. A host that does not resolve fails that attempt
+ * like a refused connection.
+ *
+ * Every connection request gets a number, and Stop moves it on too. Handlers
+ * still pending for an earlier request (a lookup, a connect, a timer) see that
+ * they are out of date and do nothing, so a stopped request never touches the
+ * timers, socket or failure count of the one that follows it.
  */
 class TcpAsyncConnector : public std::enable_shared_from_this<TcpAsyncConnector>
 {
 public:
     TcpAsyncConnector(Acore::Asio::IoContext& context) : _ioContext(&context), _socket(nullptr), _resolver(context),
-        _port(0), _connectTimer(context), _reconnectTimer(context), _needsReconnect(false), _active(false) { }
+        _port(0), _connectTimer(context), _reconnectTimer(context), _needsReconnect(false), _active(false),
+        _request(0) { }
 
     // pending handlers keep this object alive. Its timers and socket are bound to
     // the io context, so the owner must drop its reference before that io context
@@ -58,7 +65,7 @@ public:
             return false; // connection attempt already in progress
 
         _needsReconnect = false;
-        Start(std::move(host), port, timeout, std::chrono::seconds(0));
+        Start(++_request, std::move(host), port, timeout, std::chrono::seconds(0));
         return true;
     }
 
@@ -71,7 +78,7 @@ public:
             return false; // connection attempt already in progress
 
         _needsReconnect = true;
-        Start(std::move(host), port, timeout, reconnectTime);
+        Start(++_request, std::move(host), port, timeout, reconnectTime);
         return true;
     }
 
@@ -80,6 +87,7 @@ public:
     {
         _needsReconnect = false;
         _active = false;
+        ++_request;
 
         Acore::Asio::post(*_ioContext, [self = shared_from_this()]() { self->HandleStop(); });
     }
@@ -91,20 +99,27 @@ private:
     virtual void OnConnectionFail() { }
     virtual void OnConnectionTimeout() { }
 
-    // the settings are handed to the io context thread with the attempt: an attempt
+    // the settings are handed to the io context thread with the request: a request
     // stopped just before may still be using them there (e.g. in a slow lookup)
-    void Start(std::string host, uint16 port, std::chrono::seconds timeout, std::chrono::seconds reconnectTime)
+    void Start(uint32 request, std::string host, uint16 port, std::chrono::seconds timeout,
+        std::chrono::seconds reconnectTime)
     {
         Acore::Asio::post(*_ioContext,
-            [self = shared_from_this(), host = std::move(host), port, timeout, reconnectTime]()
+            [self = shared_from_this(), request, host = std::move(host), port, timeout, reconnectTime]()
             {
+                if (!self->IsCurrent(request))
+                    return;
+
                 self->_host = host;
                 self->_port = port;
                 self->_timeout = timeout;
                 self->_reconnectTime = reconnectTime;
-                self->TryConnect();
+                self->TryConnect(request);
             });
     }
+
+    // false for a request that was stopped, or replaced by a newer one
+    bool IsCurrent(uint32 request) const { return request == _request.load(); }
 
     // everything below runs on the io context thread
 
@@ -121,22 +136,22 @@ private:
         }
     }
 
-    void TryConnect()
+    void TryConnect(uint32 request)
     {
-        if (!_active.load())
+        if (!IsCurrent(request))
             return;
 
         // looked up again for every attempt: a host may come up, or move, later
         Optional<tcp::endpoint> resolved = _resolver.Resolve(tcp::v4(), _host, "");
 
-        // stopped during the lookup
-        if (!_active.load())
+        // stopped (and maybe started again) during the lookup
+        if (!IsCurrent(request))
             return;
 
         if (!resolved)
         {
             LOG_ERROR("network", "TcpAsyncConnector could not resolve host '{}'", _host);
-            AttemptFailed();
+            AttemptFailed(request);
             return;
         }
 
@@ -153,16 +168,16 @@ private:
 
             // start the timeout timer
             _connectTimer.expires_after(_timeout);
-            _connectTimer.async_wait([self = shared_from_this()](boost::system::error_code const& ec)
+            _connectTimer.async_wait([self = shared_from_this(), request](boost::system::error_code const& ec)
             {
-                self->ConnectionTimeout(ec);
+                self->ConnectionTimeout(ec, request);
             });
 
             // start the async connect
             _socket = std::make_unique<IoContextTcpSocket>(*_ioContext);
-            _socket->async_connect(_endpoint, [self = shared_from_this()](boost::system::error_code const& ec)
+            _socket->async_connect(_endpoint, [self = shared_from_this(), request](boost::system::error_code const& ec)
             {
-                self->SocketConnected(ec);
+                self->SocketConnected(ec, request);
             });
         }
         catch (boost::system::system_error const& err)
@@ -170,25 +185,18 @@ private:
             LOG_ERROR("network", "TcpAsyncConnector::TryConnect to {}:{} ({}) failed: {}",
                 _host, _port, _endpoint.address().to_string(), err.what());
 
-            AttemptFailed();
+            AttemptFailed(request);
         }
     }
 
-    void SocketConnected(boost::system::error_code const& ec)
+    void SocketConnected(boost::system::error_code const& ec, uint32 request)
     {
-        _connectTimer.cancel();
-
-        // stopped while the connect was in flight
-        if (!_active.load())
-        {
-            if (_socket)
-            {
-                boost::system::error_code errorCode;
-                _socket->close(errorCode);
-                _socket = nullptr;
-            }
+        // stopped while the connect was in flight: HandleStop closes the socket, and
+        // the timer and socket may already belong to the request that followed
+        if (!IsCurrent(request))
             return;
-        }
+
+        _connectTimer.cancel();
 
         if (!ec && _socket && _socket->is_open())
         {
@@ -199,16 +207,16 @@ private:
             _active = false;
         }
         else
-            AttemptFailed();
+            AttemptFailed(request);
     }
 
-    void ConnectionTimeout(boost::system::error_code const& ec)
+    void ConnectionTimeout(boost::system::error_code const& ec, uint32 request)
     {
         // canceled - the connect completed or the connector was stopped
         if (ec)
             return;
 
-        if (!_active.load())
+        if (!IsCurrent(request))
             return;
 
         OnConnectionTimeout();
@@ -222,28 +230,28 @@ private:
         }
     }
 
-    void AttemptFailed()
+    void AttemptFailed(uint32 request)
     {
         OnConnectionFail();
 
-        if (_active.load() && _needsReconnect.load())
-            StartReconnectTimer();
+        if (_needsReconnect.load())
+            StartReconnectTimer(request);
         else
             _active = false; // a single attempt is over
     }
 
-    void StartReconnectTimer()
+    void StartReconnectTimer(uint32 request)
     {
         _reconnectTimer.expires_after(_reconnectTime);
-        _reconnectTimer.async_wait([self = shared_from_this()](boost::system::error_code const& ec)
+        _reconnectTimer.async_wait([self = shared_from_this(), request](boost::system::error_code const& ec)
         {
             if (ec)
                 return;
 
-            if (!self->_active.load() || !self->_needsReconnect.load())
+            if (!self->IsCurrent(request) || !self->_needsReconnect.load())
                 return;
 
-            self->TryConnect();
+            self->TryConnect(request);
         });
     }
 
@@ -262,6 +270,8 @@ private:
 
     std::atomic<bool> _needsReconnect;
     std::atomic<bool> _active;
+    // number of the latest ConnectOnce/ConnectRepeat/Stop
+    std::atomic<uint32> _request;
 };
 
 #endif

@@ -55,12 +55,12 @@ enum VoiceScriptHook
  * Add<module>VoiceScripts(), see modules/VoiceModules.cmake.
  *
  * Threads: OnStartup and OnShutdown run on the main thread, which also runs
- * the UDP socket (OnClientHandshake, OnVoicePacket) and anything posted to
- * the io context passed to OnStartup. The channel and member hooks run on
- * the network thread of the worldserver connections. Hooks of the two groups
- * run concurrently, so scripts synchronize the state they share between them.
- * No hook is called while the voiceserver holds a lock, so scripts may call
- * back into it.
+ * the UDP socket (OnClientHandshake, OnVoicePacket, OnRelayVoicePacket) and
+ * anything posted to the io context passed to OnStartup. The channel and
+ * member hooks run on the network thread of the worldserver connections.
+ * Hooks of the two groups run concurrently, so scripts synchronize the state
+ * they share between them. No hook is called while the voiceserver holds a
+ * lock, so scripts may call back into it.
  *
  * Several worldservers may share the voiceserver, each numbering its voice
  * channels on its own: the channel and member hooks pass the worldserver a
@@ -120,7 +120,9 @@ public:
         std::span<uint8 const> /*payload*/) { }
 
     // Like OnVoicePacket, but before the frame is relayed to targets, the voiced members
-    // it goes to. Scripts may remove targets or give one a changed payload.
+    // it goes to. Scripts may remove targets or give one a changed payload (see
+    // VoiceRelayTarget::Payload: empty sends the frame unchanged, at most
+    // VOICE_RELAY_MAX_PAYLOAD_SIZE bytes).
     virtual void OnRelayVoicePacket(VoiceWorldLink const& /*world*/, uint16 /*channelId*/, uint8 /*userId*/,
         std::span<uint8 const> /*payload*/, std::vector<VoiceRelayTarget>& /*targets*/) { }
 

@@ -85,6 +85,15 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
             continue;
         }
 
+        // the game client would cut the datagram short and drop it
+        if (target.Payload.size() > VOICE_RELAY_MAX_PAYLOAD_SIZE)
+        {
+            LOG_ERROR("voice-chat", "A script gave user {} of channel {} a voice payload of {} bytes, more than "
+                "the {} a game client takes, not sent", target.UserId, header.channelId, target.Payload.size(),
+                VOICE_RELAY_MAX_PAYLOAD_SIZE);
+            continue;
+        }
+
         auto datagram = std::find_if(changed.begin(), changed.end(), [&target](std::vector<uint8> const& data)
         {
             return std::equal(data.begin() + sizeof(UdpSocketPacketHeader), data.end(), target.Payload.begin(),

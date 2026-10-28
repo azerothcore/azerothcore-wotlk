@@ -61,12 +61,16 @@ struct VoiceChannelMember
     uint32 AccountId = 0;
 };
 
+// game clients take voice datagrams of at most UDP_SOCKET_PACKET_MAX_SIZE bytes, header included
+constexpr std::size_t VOICE_RELAY_MAX_PAYLOAD_SIZE = UDP_SOCKET_PACKET_MAX_SIZE - sizeof(UdpSocketPacketHeader);
+
 // a member a voice frame is relayed to, see VoiceScript::OnRelayVoicePacket
 struct VoiceRelayTarget
 {
     uint8 UserId = 0;
     boost::asio::ip::udp::endpoint Endpoint;
-    // if set, sent in place of the frame's payload and signed by the voiceserver
+    // empty: the frame is sent unchanged. Otherwise sent in place of the frame's payload and
+    // signed by the voiceserver, at most VOICE_RELAY_MAX_PAYLOAD_SIZE bytes (a longer one is not sent)
     std::vector<uint8> Payload;
 };
 
