@@ -179,7 +179,11 @@ void VoiceChatMgr::Disable()
 
     DeleteAllChannels();
 
-    SendVoiceChatServiceDisconnect();
+    // "lost connection" only while connected: a lost connection already told the
+    // clients, and without one (e.g. giving up on VoiceChat.MaxConnectAttempts)
+    // they never had voice chat services
+    if (_voiceServerSocket)
+        SendVoiceChatServiceDisconnect();
     SendVoiceChatStatus(false);
 
     if (_voiceServerConnector)
@@ -490,18 +494,10 @@ void VoiceChatMgr::UpdateVoiceServerConnection(uint32 const diff)
     }
     else if (_voiceServerConnector && !_voiceServerConnector->IsAttemptingConnection() && !HasPendingSocket())
     {
-        try
-        {
-            boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::make_address(_serverAddressString), _serverPort);
-            _voiceServerConnector->ConnectRepeat(endpoint);
-        }
-        catch (boost::system::system_error const&)
-        {
-            LOG_ERROR("voice-chat", "VoiceChat.ServerAddress '{}' is not a valid address, voice chat disabled",
-                _serverAddressString);
-            sWorld->setBoolConfig(CONFIG_VOICE_CHAT_ENABLED, false);
-            Disable();
-        }
+        // VoiceChat.ServerAddress is looked up on the voice network thread before each attempt
+        // (nothing else runs there without a connection), one that does not resolve is retried
+        // and counted against VoiceChat.MaxConnectAttempts like a refused connection
+        _voiceServerConnector->ConnectRepeat(_serverAddressString, _serverPort);
     }
 }
 

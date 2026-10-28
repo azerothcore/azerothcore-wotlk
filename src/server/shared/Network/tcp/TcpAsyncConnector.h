@@ -20,10 +20,12 @@
 
 #include "IoContext.h"
 #include "Log.h"
+#include "Resolver.h"
 #include "TcpSocket.h"
 #include <atomic>
 #include <boost/asio.hpp>
 #include <memory>
+#include <string>
 
 using boost::asio::ip::tcp;
 
@@ -33,46 +35,43 @@ using boost::asio::ip::tcp;
  * ConnectOnce/ConnectRepeat/Stop are thread safe. All asio objects are only
  * ever touched from the io context thread; the public entry points post their
  * work there. The On* callbacks are invoked on the io context thread.
+ *
+ * The host (an IPv4 address or a hostname) is looked up again before every
+ * attempt, with a blocking lookup on the io context thread. A host that does
+ * not resolve fails that attempt like a refused connection.
  */
 class TcpAsyncConnector : public std::enable_shared_from_this<TcpAsyncConnector>
 {
 public:
-    TcpAsyncConnector(Acore::Asio::IoContext& context) : _ioContext(&context), _socket(nullptr),
-        _connectTimer(context), _reconnectTimer(context), _needsReconnect(false), _active(false) { }
+    TcpAsyncConnector(Acore::Asio::IoContext& context) : _ioContext(&context), _socket(nullptr), _resolver(context),
+        _port(0), _connectTimer(context), _reconnectTimer(context), _needsReconnect(false), _active(false) { }
 
     // pending handlers keep this object alive. Its timers and socket are bound to
     // the io context, so the owner must drop its reference before that io context
     // is destroyed; the last reference then goes away with the pending handlers
     virtual ~TcpAsyncConnector() = default;
 
-    // Connect once to an endpoint with timeout
-    bool ConnectOnce(tcp::endpoint const& endpoint, std::chrono::seconds timeout = std::chrono::seconds(10))
+    // Connect once to host:port with timeout
+    bool ConnectOnce(std::string host, uint16 port, std::chrono::seconds timeout = std::chrono::seconds(10))
     {
         if (_active.exchange(true))
             return false; // connection attempt already in progress
 
-        _endpoint = endpoint;
-        _timeout = timeout;
         _needsReconnect = false;
-
-        Acore::Asio::post(*_ioContext, [self = shared_from_this()]() { self->TryConnect(); });
+        Start(std::move(host), port, timeout, std::chrono::seconds(0));
         return true;
     }
 
-    // Connect to an endpoint with timeout, retrying until successful
-    bool ConnectRepeat(tcp::endpoint const& endpoint,
+    // Connect to host:port with timeout, retrying until successful
+    bool ConnectRepeat(std::string host, uint16 port,
         std::chrono::seconds timeout = std::chrono::seconds(10),
         std::chrono::seconds reconnectTime = std::chrono::seconds(30))
     {
         if (_active.exchange(true))
             return false; // connection attempt already in progress
 
-        _endpoint = endpoint;
-        _timeout = timeout;
-        _reconnectTime = reconnectTime;
         _needsReconnect = true;
-
-        Acore::Asio::post(*_ioContext, [self = shared_from_this()]() { self->TryConnect(); });
+        Start(std::move(host), port, timeout, reconnectTime);
         return true;
     }
 
@@ -91,6 +90,21 @@ private:
     virtual void OnConnectionSuccess(std::unique_ptr<IoContextTcpSocket> /*socket*/) { }
     virtual void OnConnectionFail() { }
     virtual void OnConnectionTimeout() { }
+
+    // the settings are handed to the io context thread with the attempt: an attempt
+    // stopped just before may still be using them there (e.g. in a slow lookup)
+    void Start(std::string host, uint16 port, std::chrono::seconds timeout, std::chrono::seconds reconnectTime)
+    {
+        Acore::Asio::post(*_ioContext,
+            [self = shared_from_this(), host = std::move(host), port, timeout, reconnectTime]()
+            {
+                self->_host = host;
+                self->_port = port;
+                self->_timeout = timeout;
+                self->_reconnectTime = reconnectTime;
+                self->TryConnect();
+            });
+    }
 
     // everything below runs on the io context thread
 
@@ -111,6 +125,22 @@ private:
     {
         if (!_active.load())
             return;
+
+        // looked up again for every attempt: a host may come up, or move, later
+        Optional<tcp::endpoint> resolved = _resolver.Resolve(tcp::v4(), _host, "");
+
+        // stopped during the lookup
+        if (!_active.load())
+            return;
+
+        if (!resolved)
+        {
+            LOG_ERROR("network", "TcpAsyncConnector could not resolve host '{}'", _host);
+            AttemptFailed();
+            return;
+        }
+
+        _endpoint = tcp::endpoint(resolved->address(), _port);
 
         try
         {
@@ -137,15 +167,10 @@ private:
         }
         catch (boost::system::system_error const& err)
         {
-            LOG_ERROR("network", "TcpAsyncConnector::TryConnect to {}:{} failed: {}",
-                _endpoint.address().to_string(), _endpoint.port(), err.what());
+            LOG_ERROR("network", "TcpAsyncConnector::TryConnect to {}:{} ({}) failed: {}",
+                _host, _port, _endpoint.address().to_string(), err.what());
 
-            OnConnectionFail();
-
-            if (_active.load() && _needsReconnect.load())
-                StartReconnectTimer();
-            else
-                _active = false; // a single attempt is over
+            AttemptFailed();
         }
     }
 
@@ -174,14 +199,7 @@ private:
             _active = false;
         }
         else
-        {
-            OnConnectionFail();
-
-            if (_needsReconnect.load())
-                StartReconnectTimer();
-            else
-                _active = false; // a single attempt is over
-        }
+            AttemptFailed();
     }
 
     void ConnectionTimeout(boost::system::error_code const& ec)
@@ -204,6 +222,16 @@ private:
         }
     }
 
+    void AttemptFailed()
+    {
+        OnConnectionFail();
+
+        if (_active.load() && _needsReconnect.load())
+            StartReconnectTimer();
+        else
+            _active = false; // a single attempt is over
+    }
+
     void StartReconnectTimer()
     {
         _reconnectTimer.expires_after(_reconnectTime);
@@ -221,7 +249,10 @@ private:
 
     Acore::Asio::IoContext* _ioContext;
     std::unique_ptr<IoContextTcpSocket> _socket;
+    Acore::Asio::Resolver _resolver;
 
+    std::string _host;
+    uint16 _port;
     tcp::endpoint _endpoint;
     std::chrono::seconds _timeout;
     std::chrono::seconds _reconnectTime;

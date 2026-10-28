@@ -44,7 +44,8 @@ public:
 
     void OnConnectionSuccess(std::unique_ptr<IoContextTcpSocket> socket) override;
     // Note: a connect timeout also fires OnConnectionFail through the aborted
-    // connect, so only the failure hook counts attempts
+    // connect, so only the failure hook counts attempts (an address that does
+    // not resolve counts as one too)
     void OnConnectionFail() override;
 };
 
