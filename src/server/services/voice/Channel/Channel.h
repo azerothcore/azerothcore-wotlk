@@ -27,6 +27,7 @@
 #include <chrono>
 #include <map>
 #include <string>
+#include <vector>
 
 // IPv4 clients compare equal whether seen as plain IPv4 or as IPv4-mapped IPv6
 inline boost::asio::ip::address NormalizeVoiceClientAddress(boost::asio::ip::address const& address)
@@ -60,6 +61,19 @@ struct VoiceChannelMember
     uint32 AccountId = 0;
 };
 
+// a member a voice frame is relayed to, see VoiceScript::OnRelayVoicePacket
+struct VoiceRelayTarget
+{
+    uint8 UserId = 0;
+    boost::asio::ip::udp::endpoint Endpoint;
+    // if set, sent in place of the frame's payload and signed by the voiceserver
+    std::vector<uint8> Payload;
+};
+
+// signs a voice datagram (header and payload) with a channel's session key, the way
+// game clients sign theirs
+void SignVoiceDatagram(VoiceChatSessionKey const& sessionKey, uint8* datagram, std::size_t length);
+
 class VoiceChannel
 {
 public:
@@ -71,6 +85,7 @@ public:
     uint16 GetChannelId() const { return _channelId; }
     VoiceChatChannelType GetType() const { return _type; }
     uint32 GetMaxMembers() const { return _maxMembers; }
+    VoiceChatSessionKey const& GetSessionKey() const { return _sessionKey; }
 
     // whether a game client signed the datagram with this channel's session key
     bool HasValidSignature(UdpSocketPacket const& packet) const;

@@ -140,3 +140,10 @@ void VoiceScriptMgr::OnWorldMessage(VoiceWorldLink const& link, std::string cons
         script->OnWorldMessage(link, tag, data);
     });
 }
+
+void VoiceScriptMgr::OnRelayVoicePacket(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
+    std::span<uint8 const> payload, std::vector<VoiceRelayTarget>& targets)
+{
+    CallHooks(VOICEHOOK_ON_RELAY_VOICE_PACKET,
+        [&](VoiceScript* script) { script->OnRelayVoicePacket(world, channelId, userId, payload, targets); });
+}

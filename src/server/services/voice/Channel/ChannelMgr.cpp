@@ -267,7 +267,7 @@ bool VoiceChannelMgr::ConsumePacketBudget(VoiceChannelMember& member) const
 }
 
 bool VoiceChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
-    std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced, VoiceWorldLink& world)
+    std::vector<VoiceRelayTarget>& targets, bool& announced, VoiceWorldLink& world, VoiceChatSessionKey& sessionKey)
 {
     uint8 const userId = packet.GetHeader().userId;
     announced = false;
@@ -280,6 +280,7 @@ bool VoiceChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio
 
     VoiceChannelMember* member = channel->GetMember(userId);
     world = channel->GetWorld();
+    sessionKey = channel->GetSessionKey();
 
     // the client only announces itself when it first talks to a voiceserver and
     // after 10 seconds without sending, so a member that keeps talking is never
@@ -312,7 +313,9 @@ bool VoiceChannelMgr::GetRelayTargets(UdpSocketPacket const& packet, boost::asio
         if (!other.Voiced || !other.HasEndpoint)
             continue;
 
-        targets.push_back(other.Endpoint);
+        VoiceRelayTarget& target = targets.emplace_back();
+        target.UserId = otherId;
+        target.Endpoint = other.Endpoint;
     }
 
     return true;

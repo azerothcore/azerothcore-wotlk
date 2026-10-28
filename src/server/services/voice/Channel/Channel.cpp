@@ -41,6 +41,28 @@ namespace
     {
         return uint32(data[0]) | (uint32(data[1]) << 8) | (uint32(data[2]) << 16) | (uint32(data[3]) << 24);
     }
+
+    // HMAC-MD5 of the datagram after the signature, folded to 32 bits
+    uint32 ComputeSignature(VoiceChatSessionKey const& sessionKey, uint8 const* datagram, std::size_t length)
+    {
+        std::size_t const signatureSize = sizeof(UdpSocketPacketHeader::signature);
+
+        Acore::Crypto::HMAC_MD5::Digest const digest = Acore::Crypto::HMAC_MD5::GetDigestOf(sessionKey,
+            datagram + signatureSize, length - signatureSize);
+
+        uint32 signature = 0;
+        for (std::size_t i = 0; i < digest.size(); i += sizeof(uint32))
+            signature ^= ReadUInt32LE(digest.data() + i);
+
+        return signature;
+    }
+}
+
+void SignVoiceDatagram(VoiceChatSessionKey const& sessionKey, uint8* datagram, std::size_t length)
+{
+    uint32 const signature = ComputeSignature(sessionKey, datagram, length);
+    for (std::size_t i = 0; i < sizeof(signature); ++i)
+        datagram[i] = uint8(signature >> (8 * i));
 }
 
 VoiceChannel::VoiceChannel(VoiceWorldLink const& world, uint16 channelId, VoiceChatChannelType type,
@@ -52,17 +74,7 @@ VoiceChannel::VoiceChannel(VoiceWorldLink const& world, uint16 channelId, VoiceC
 
 bool VoiceChannel::HasValidSignature(UdpSocketPacket const& packet) const
 {
-    uint8 const* data = packet.GetData();
-    std::size_t const signatureSize = sizeof(UdpSocketPacketHeader::signature);
-
-    Acore::Crypto::HMAC_MD5::Digest const digest = Acore::Crypto::HMAC_MD5::GetDigestOf(_sessionKey,
-        data + signatureSize, packet.GetDataLength() - signatureSize);
-
-    uint32 expected = 0;
-    for (std::size_t i = 0; i < digest.size(); i += sizeof(uint32))
-        expected ^= ReadUInt32LE(digest.data() + i);
-
-    return ReadUInt32LE(data) == expected;
+    return ReadUInt32LE(packet.GetData()) == ComputeSignature(_sessionKey, packet.GetData(), packet.GetDataLength());
 }
 
 VoiceChannelMember* VoiceChannel::GetMember(uint8 userId)

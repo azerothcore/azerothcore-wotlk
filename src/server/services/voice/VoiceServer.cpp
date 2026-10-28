@@ -20,6 +20,7 @@
 #include "InternalHandler.h"
 #include "Log.h"
 #include "VoiceScriptMgr.h"
+#include <algorithm>
 #include <boost/asio/ip/address.hpp>
 #include <vector>
 
@@ -51,10 +52,12 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
         return;
     }
 
-    // relay the voice frame unchanged to all other voiced members
-    std::vector<udp::endpoint> targets;
+    // relay the voice frame to all other voiced members, as scripts change it
+    std::vector<VoiceRelayTarget> targets;
     bool announced = false;
-    bool const relay = sVoiceChannelMgr.GetRelayTargets(packet, remoteEndpoint, targets, announced, world);
+    VoiceChatSessionKey sessionKey{};
+    bool const relay = sVoiceChannelMgr.GetRelayTargets(packet, remoteEndpoint, targets, announced, world,
+        sessionKey);
 
     if (announced)
     {
@@ -69,11 +72,37 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
     if (!relay)
         return;
 
-    for (udp::endpoint const& target : targets)
-        SendTo(target, packet.GetData(), packet.GetDataLength());
+    std::span<uint8 const> const payload(packet.GetPayload(), packet.GetPayloadLength());
+    sVoiceScriptMgr->OnRelayVoicePacket(world, header.channelId, header.userId, payload, targets);
 
-    sVoiceScriptMgr->OnVoicePacket(world, header.channelId, header.userId,
-        std::span<uint8 const>(packet.GetPayload(), packet.GetPayloadLength()));
+    // payloads changed by scripts, each signed once
+    std::vector<std::vector<uint8>> changed;
+    for (VoiceRelayTarget const& target : targets)
+    {
+        if (target.Payload.empty())
+        {
+            SendTo(target.Endpoint, packet.GetData(), packet.GetDataLength());
+            continue;
+        }
+
+        auto datagram = std::find_if(changed.begin(), changed.end(), [&target](std::vector<uint8> const& data)
+        {
+            return std::equal(data.begin() + sizeof(UdpSocketPacketHeader), data.end(), target.Payload.begin(),
+                target.Payload.end());
+        });
+
+        if (datagram == changed.end())
+        {
+            datagram = changed.emplace(changed.end(), packet.GetData(),
+                packet.GetData() + sizeof(UdpSocketPacketHeader));
+            datagram->insert(datagram->end(), target.Payload.begin(), target.Payload.end());
+            SignVoiceDatagram(sessionKey, datagram->data(), datagram->size());
+        }
+
+        SendTo(target.Endpoint, datagram->data(), datagram->size());
+    }
+
+    sVoiceScriptMgr->OnVoicePacket(world, header.channelId, header.userId, payload);
 }
 
 VoiceServer::VoiceServer()

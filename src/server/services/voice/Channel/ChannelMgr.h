@@ -78,11 +78,13 @@ public:
     // returns false if the member is unknown or the packet is not the member's
     bool HandleClientHandshake(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& endpoint,
         VoiceWorldLink& world);
-    // collects the endpoints a voice frame should be relayed to,
+    // collects the members a voice frame should be relayed to,
     // returns false if the sender is not allowed to speak.
-    // announced is set if the frame registered the sender's endpoint in place of a handshake
+    // announced is set if the frame registered the sender's endpoint in place of a handshake,
+    // sessionKey receives the key of the sender's channel
     bool GetRelayTargets(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& sender,
-        std::vector<boost::asio::ip::udp::endpoint>& targets, bool& announced, VoiceWorldLink& world);
+        std::vector<VoiceRelayTarget>& targets, bool& announced, VoiceWorldLink& world,
+        VoiceChatSessionKey& sessionKey);
 
 private:
     // channel id, VoiceWorldLink id

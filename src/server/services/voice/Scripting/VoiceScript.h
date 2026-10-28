@@ -44,6 +44,7 @@ enum VoiceScriptHook
     VOICEHOOK_ON_CLIENT_HANDSHAKE,
     VOICEHOOK_ON_VOICE_PACKET,
     VOICEHOOK_ON_WORLD_MESSAGE,
+    VOICEHOOK_ON_RELAY_VOICE_PACKET,
     VOICEHOOK_END
 };
 
@@ -117,6 +118,11 @@ public:
     // speaker, keep it cheap.
     virtual void OnVoicePacket(VoiceWorldLink const& /*world*/, uint16 /*channelId*/, uint8 /*userId*/,
         std::span<uint8 const> /*payload*/) { }
+
+    // Like OnVoicePacket, but before the frame is relayed to targets, the voiced members
+    // it goes to. Scripts may remove targets or give one a changed payload.
+    virtual void OnRelayVoicePacket(VoiceWorldLink const& /*world*/, uint16 /*channelId*/, uint8 /*userId*/,
+        std::span<uint8 const> /*payload*/, std::vector<VoiceRelayTarget>& /*targets*/) { }
 
     // Called when the worldserver part of a module sent a message (see
     // VoiceChatMgr::SendModuleMessage). tag names the module and message, scripts

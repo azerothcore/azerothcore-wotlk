@@ -59,6 +59,8 @@ public:
         boost::asio::ip::udp::endpoint const& endpoint);
     void OnVoicePacket(VoiceWorldLink const& world, uint16 channelId, uint8 userId, std::span<uint8 const> payload);
     void OnWorldMessage(VoiceWorldLink const& link, std::string const& tag, ByteBuffer& data);
+    void OnRelayVoicePacket(VoiceWorldLink const& world, uint16 channelId, uint8 userId,
+        std::span<uint8 const> payload, std::vector<VoiceRelayTarget>& targets);
 
 private:
     VoiceScriptMgr() = default;
