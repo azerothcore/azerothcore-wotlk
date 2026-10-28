@@ -235,6 +235,7 @@ enum PlayerHook
     PLAYERHOOK_ON_BEFORE_RECEIVE_SPELL_LIST_FROM_TRAINER,
     PLAYERHOOK_ON_GET_TRAINER_SPELL_STATE,
     PLAYERHOOK_ON_AFTER_TRAIN_SPELL,
+    PLAYERHOOK_ON_GET_QUEST_MIN_LEVEL,
     PLAYERHOOK_END
 };
 
@@ -966,6 +967,18 @@ public:
      * @param spellId The id of the trainer spell that was bought
      */
     virtual void OnPlayerAfterTrainSpell(Player* /*player*/, Creature* /*trainer*/, uint32 /*spellId*/) {}
+
+    /**
+     * @brief This hook is called when the minimum level of a quest is checked for a player, and can change it.
+     *
+     * It is used both when the player takes the quest (Player::SatisfyQuestLevel) and when a quest giver decides
+     * whether to offer it (Player::CanSeeStartQuest).
+     *
+     * @param player Contains information about the Player
+     * @param quest Contains information about the Quest
+     * @param minLevel The quest's minimum level (Quest::GetMinLevel), to raise or lower for this player
+     */
+    virtual void OnPlayerGetQuestMinLevel(Player const* /*player*/, Quest const* /*quest*/, uint32& /*minLevel*/) {}
 };
 
 #endif
