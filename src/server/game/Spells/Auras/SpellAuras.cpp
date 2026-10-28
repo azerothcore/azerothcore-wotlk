@@ -2776,22 +2776,6 @@ bool Aura::CallScriptCheckEffectProcHandlers(AuraEffect const* aurEff, AuraAppli
     return result;
 }
 
-bool Aura::CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-{
-    bool result = isTriggeredAtSpellProcEvent;
-    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
-    {
-        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_AFTER_CHECK_PROC, aurApp);
-        std::list<AuraScript::AfterCheckProcHandler>::iterator hookItrEnd = (*scritr)->DoAfterCheckProc.end(), hookItr = (*scritr)->DoAfterCheckProc.begin();
-        for (; hookItr != hookItrEnd; ++hookItr)
-            result &= hookItr->Call(*scritr, eventInfo, isTriggeredAtSpellProcEvent);
-
-        (*scritr)->_FinishScriptCall();
-    }
-
-    return result;
-}
-
 bool Aura::CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo)
 {
     bool prepare = true;
