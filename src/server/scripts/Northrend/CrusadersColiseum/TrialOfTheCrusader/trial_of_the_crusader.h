@@ -199,6 +199,9 @@ enum NPCs
     NPC_HORDE_WARLOCK                               = 34450,
     NPC_HORDE_WARRIOR                               = 34453,
 
+    NPC_ZHAAGRYM                                    = 35465,
+    NPC_CAT                                         = 35610,
+
     NPC_LIGHTBANE                                   = 34497,
     NPC_DARKBANE                                    = 34496,
 

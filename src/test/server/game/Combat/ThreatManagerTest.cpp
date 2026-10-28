@@ -15,6 +15,7 @@
 
 #include "ThreatManager.h"
 #include "CombatManager.h"
+#include "CreatureAI.h"
 #include "DBCStores.h"
 #include "TestCreature.h"
 #include "TestMap.h"
@@ -137,6 +138,56 @@ TEST_F(ThreatManagerIntegrationTest, AddThreat_ImpliesCombat)
 
     EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
     EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+}
+
+// ============================================================================
+// CreatureAI::CalculateThreat hook
+// ============================================================================
+
+class ThreatRecordingAI : public CreatureAI
+{
+public:
+    explicit ThreatRecordingAI(Creature* creature) : CreatureAI(creature) { }
+
+    void UpdateAI(uint32 /*diff*/) override { }
+
+    void CalculateThreat(Unit* hatedUnit, float& threat, SpellInfo const* /*threatSpell*/) override
+    {
+        ++Calls;
+        LastUnit = hatedUnit;
+        LastThreat = threat;
+        threat *= Factor;
+    }
+
+    int Calls = 0;
+    Unit* LastUnit = nullptr;
+    float LastThreat = 0.0f;
+    float Factor = 1.0f;
+};
+
+TEST_F(ThreatManagerIntegrationTest, AddThreat_CallsOwnerCalculateThreat)
+{
+    ThreatRecordingAI* ai = new ThreatRecordingAI(_creatureA);
+    _creatureA->SetAI(ai);
+    _creatureA->IsAIEnabled = true;
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    EXPECT_EQ(ai->Calls, 1);
+    EXPECT_EQ(ai->LastUnit, _creatureB);
+    EXPECT_FLOAT_EQ(ai->LastThreat, 100.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest, AddThreat_CalculateThreatCanChangeAmount)
+{
+    ThreatRecordingAI* ai = new ThreatRecordingAI(_creatureA);
+    ai->Factor = 0.5f;
+    _creatureA->SetAI(ai);
+    _creatureA->IsAIEnabled = true;
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 50.0f);
 }
 
 // ============================================================================
