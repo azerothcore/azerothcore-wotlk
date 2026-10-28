@@ -49,6 +49,7 @@ enum KologarnSpells
     SPELL_ONEARMED_OVERHEAD_SMASH       = 63573,
     SPELL_PETRIFYING_BREATH             = 62030,
     SPELL_STONE_SHOUT                   = 63716,
+    SPELL_BERSERK                       = 64238,
 
     // EYEBEAM
     SPELL_FOCUSED_EYEBEAM_SUMMON        = 63342,
@@ -82,6 +83,7 @@ enum KologarnEvents
     EVENT_FOCUSED_EYEBEAM               = 6,
     EVENT_STONE_SHOUT                   = 7,
     EVENT_PREPARE_BREATH                = 8, // Kologarn can't cast breath on pull
+    EVENT_ENRAGE                        = 9,
 };
 
 enum KologarnNPCs
@@ -310,7 +312,7 @@ struct boss_kologarn : public BossAI
             events.ScheduleEvent(EVENT_GRIP, 15s);
             events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 10s);
             events.ScheduleEvent(EVENT_PREPARE_BREATH, 3s);
-            //events.ScheduleEvent(EVENT_ENRAGE, x); no info
+            events.ScheduleEvent(EVENT_ENRAGE, 8min);
 
             Talk(SAY_AGGRO);
             me->setActive(true);
@@ -383,6 +385,10 @@ struct boss_kologarn : public BossAI
                 case EVENT_RESTORE_ARM_RIGHT:
                     // shouldn't happen
                     AttachRightArm();
+                    return;
+                case EVENT_ENRAGE:
+                    DoCastSelf(SPELL_BERSERK, true);
+                    Talk(SAY_BERSERK);
                     return;
             }
 
@@ -535,10 +541,7 @@ struct boss_kologarn_eyebeam : public ScriptedAI
             me->GetMotionMaster()->MoveChase(player);
 
             if (Creature* cr = _instance->GetCreature(BOSS_KOLOGARN))
-            {
                 me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
-                cr->AI()->Talk(EMOTE_EYES, player);
-            }
         }
     }
 
@@ -596,9 +599,21 @@ class spell_kologarn_focused_eyebeam : public SpellScript
         targets.push_back(*head);
     }
 
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+        Player* target = GetHitPlayer();
+        Creature* creature = GetCaster()->ToCreature();
+        if (!target || !creature)
+            return;
+
+        creature->AI()->Talk(EMOTE_EYES, target);
+    }
+
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_focused_eyebeam::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_kologarn_focused_eyebeam::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 

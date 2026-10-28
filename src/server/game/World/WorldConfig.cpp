@@ -134,7 +134,7 @@ void WorldConfig::BuildConfigCache()
     // Controls all npc movespeed rate.
     SetConfigValue<float>(RATE_MOVESPEED_NPC, "Rate.MoveSpeed.NPC", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
 
-    SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0.5f);
+    SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0.5f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 1.0f; }, ">= 0 && <= 1");
 
     SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_DEATH, "DurabilityLoss.OnDeath", 10.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 100.0f; }, ">= 0 && <= 100");
 

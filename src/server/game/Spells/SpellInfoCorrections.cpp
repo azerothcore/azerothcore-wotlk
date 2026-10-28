@@ -4847,14 +4847,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
     });
 
-    ApplySpellFix({
-        45662, // Encapsulate
-        45642  // Fire Bloom
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
-    });
-
     // Torch (Death Knights near the Chapel)
     ApplySpellFix({ 52953 }, [](SpellInfo* spellInfo)
         {
@@ -5253,6 +5245,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->SpellLevel = 10;
+    });
+
+    // Diminish Power
+    ApplySpellFix({ 64145 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
