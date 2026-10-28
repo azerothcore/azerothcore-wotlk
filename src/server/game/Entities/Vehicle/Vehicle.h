@@ -37,6 +37,9 @@ public:
     Unit* GetBase() const { return _me; }
     VehicleEntry const* GetVehicleInfo() const { return _vehicleInfo; }
     uint32 GetCreatureEntry() const { return _creatureEntry; }
+    bool IsBoardableByPlayers() const { return _boardableByPlayers; }
+    // On a player base, false hides the board cursor and makes CMSG_PLAYER_VEHICLE_ENTER fail
+    void SetBoardableByPlayers(bool boardable);
 
     bool HasEmptySeat(int8 seatId) const;
     Unit* GetPassenger(int8 seatId) const;
@@ -97,6 +100,7 @@ private:
     uint32 _creatureEntry;         // Can be different than me->GetBase()->GetEntry() in case of players
     Status _status;
     bool _accessoriesInstalled;
+    bool _boardableByPlayers;
 };
 
 class VehicleDespawnEvent : public BasicEvent
