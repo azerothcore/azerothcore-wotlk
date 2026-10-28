@@ -145,7 +145,7 @@ go test -tags=e2e ./local/... -count=1 -v -timeout 30m -parallel 1
 | combat/charm | apply/cancel aura | P1 | covered; Yogg MC logout `blocked-harness` (no charm/MC drive) | #25506 |
 | combat/death | die → ghost → release → reclaim | P1 | covered | — |
 | combat/pets | summon / GUID / attack / dismiss | P1 | covered; dungeon Raise Dead `blocked-harness` (ready-check / instance summon) | #27081 |
-| combat/threat | engage / taunt switch / kill clears combat | P1 | covered | — |
+| combat/threat | engage / taunt switch / kill clears combat; a tank's Thunder Clap turns a mob another player pulled at once, not on the next 1s threat tick; in a dungeon, a rogue's Vanish inside the mob's combat reach turns it to the next player at once, not on the next tick | P1 | covered (`TestAC_28289_*`, `TestThreat_VanishInDungeonDropsAggroWithoutTick`) | #28289 #28301 |
 | instances/trial_of_the_crusader | spike retains protected target on arrival; full immunity releases target; reacquire without speed reset | P1 | covered (`TestAC_14076_PursuingSpikesImmunity`); [fixture and scenarios](suites/instances/trial_of_the_crusader/spikes.md) | #14076 |
 | combat/vehicles | spellclick steed enter/exit | P2 | covered | — |
 | spells/aura | apply/query; CC broken by damage; mount persist; paladin same-aura per-caster + Aura Mastery; Beacon applies its target's Improved Devotion Aura healing bonus exactly once for Holy Light, Flash of Light, Holy Shock and Lay on Hands | P1 | covered (`TestAC_26130_*`, `TestAC_25765_*`, `TestAC_27756_*`) | #26130 #25765 #27756 |
