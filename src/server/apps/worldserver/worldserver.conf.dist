@@ -710,6 +710,7 @@ Logger.sql=4,Console Server
 Logger.time.update=4,Console Server
 Logger.module=4,Console Server
 Logger.spells.scripts=2,Console Errors
+Logger.voice-chat=4,Console Server
 # Logger.achievement=4,Console Server
 # Logger.addon=4,Console Server
 # Logger.auctionHouse=4,Console Server

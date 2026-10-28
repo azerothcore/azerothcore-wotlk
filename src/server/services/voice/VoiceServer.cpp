@@ -77,6 +77,7 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
 
     // payloads changed by scripts, each signed once
     std::vector<std::vector<uint8>> changed;
+    std::size_t oversized = 0;
     for (VoiceRelayTarget const& target : targets)
     {
         if (target.Payload.empty())
@@ -88,9 +89,7 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
         // the game client would cut the datagram short and drop it
         if (target.Payload.size() > VOICE_RELAY_MAX_PAYLOAD_SIZE)
         {
-            LOG_ERROR("voice-chat", "A script gave user {} of channel {} a voice payload of {} bytes, more than "
-                "the {} a game client takes, not sent", target.UserId, header.channelId, target.Payload.size(),
-                VOICE_RELAY_MAX_PAYLOAD_SIZE);
+            ++oversized;
             continue;
         }
 
@@ -110,6 +109,12 @@ void VoiceClientSocket::ProcessPacket(UdpSocketPacket const& packet, udp::endpoi
 
         SendTo(target.Endpoint, datagram->data(), datagram->size());
     }
+
+    // once per frame, not per target
+    if (oversized)
+        LOG_ERROR("voice-chat", "A script gave {} targets of user {} in channel {} of worldserver #{} a voice "
+            "payload over the {} bytes a game client takes, not sent", oversized, header.userId, header.channelId,
+            world.GetId(), VOICE_RELAY_MAX_PAYLOAD_SIZE);
 
     sVoiceScriptMgr->OnVoicePacket(world, header.channelId, header.userId, payload);
 }

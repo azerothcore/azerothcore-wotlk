@@ -136,11 +136,9 @@ private:
         }
     }
 
+    // callers make sure request is current
     void TryConnect(uint32 request)
     {
-        if (!IsCurrent(request))
-            return;
-
         // looked up again for every attempt: a host may come up, or move, later
         Optional<tcp::endpoint> resolved = _resolver.Resolve(tcp::v4(), _host, "");
 
