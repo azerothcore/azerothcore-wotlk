@@ -159,6 +159,7 @@ enum TriggerCastFlags
     TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT      = 0x00080000,   //! Will ignore equipped item requirements
     TRIGGERED_NO_PERIODIC_RESET                     = 0x00100000,   //! Periodic aura tick wont be reset on override
     TRIGGERED_IGNORE_EFFECTS                        = 0x00200000,   //! Ignore spell effects - used for ritual portals
+    TRIGGERED_DONT_ENTER_COMBAT                     = 0x00400000,   //! Skips hostile-target combat calls on launch/hit
     TRIGGERED_FULL_DEBUG_MASK                       = 0xFFFFFFFF
 };
 

@@ -498,7 +498,10 @@ bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
 
     SubGroupCounterIncrease(subGroup);
 
-    player->SetGroupInvite(nullptr);
+    // The inviting group keeps a raw Player* that would dangle once the player logs out
+    if (Group* invitingGroup = player->GetGroupInvite())
+        invitingGroup->RemoveInvite(player);
+
     if (player->GetGroup())
     {
         if (isBGGroup() || isBFGroup()) // if player is in group and he is being added to BG raid group, then call SetBattlegroundRaid()
@@ -817,6 +820,9 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
     // If group size before player removal <= 2 then disband it
     else
     {
+        // As in the branch above: a player who leaves or is kicked can't win a roll the disband settles
+        RemovePlayerFromRolls(guid);
+
         sScriptMgr->OnGroupRemoveMember(this, guid, method, kicker, reason);
         Disband();
         return false;
@@ -879,6 +885,11 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
 void Group::ForcedDisband(bool hideDestroy /* = false */)
 {
     sScriptMgr->OnGroupDisband(this);
+
+    // Settle open rolls: only CountTheRoll unblocks a rolled item, and the looted object's roll timer
+    // can't once the group is gone, so the item would stay locked
+    while (!RollId.empty())
+        CountTheRoll(RollId.begin());
 
     Player* player;
     uint32 instanceId = 0;

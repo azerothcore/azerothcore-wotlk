@@ -168,6 +168,8 @@ void Player::Update(uint32 p_time)
             // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
             bool const victimIsVehicleBase = GetVehicleBase() == victim;
 
+            bool mainHandSwung = false;
+
             if (isAttackReady(BASE_ATTACK))
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
@@ -193,22 +195,19 @@ void Player::Update(uint32 p_time)
                 {
                     m_swingErrorMsg = 0; // reset swing error state
 
-                    // prevent base and off attack in same time, delay attack at
-                    // 0.2 sec
-                    if (HasOffhandWeaponForAttack())
-                        if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                            setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-
                     // do attack
                     AttackerStateUpdate(victim, BASE_ATTACK);
                     resetAttackTimer(BASE_ATTACK);
 
                     // Blizzlike: Reset ranged swing timer when performing melee attack
                     resetAttackTimer(RANGED_ATTACK);
+
+                    mainHandSwung = true;
                 }
             }
 
-            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
+            // The client draws one swing animation per frame, so let the main hand swing alone
+            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK) && !mainHandSwung)
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
@@ -216,11 +215,6 @@ void Player::Update(uint32 p_time)
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
-                    // prevent base and off attack in same time, delay attack at
-                    // 0.2 sec
-                    if (getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
-                        setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
-
                     // do attack
                     AttackerStateUpdate(victim, OFF_ATTACK);
                     resetAttackTimer(OFF_ATTACK);
