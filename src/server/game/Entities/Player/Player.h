@@ -1469,6 +1469,7 @@ public:
     void FailQuestsOnDeath();
     bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestLevel(Quest const* qInfo, bool msg) const;
+    [[nodiscard]] uint32 GetQuestMinLevel(Quest const* quest) const;
     bool SatisfyQuestLog(bool msg);
     bool SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestClass(Quest const* qInfo, bool msg) const;
