@@ -318,6 +318,9 @@ public:
             if (Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID))
                 if (t->IsAlive())
                     t->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
+
+            // Dead passengers aren't unseated, so the corpse would ride the carrier and keep its seat taken
+            me->ExitVehicle();
         }
 
         void DoAction(int32 param) override
@@ -383,12 +386,6 @@ public:
             events.RescheduleEvent(EVENT_SPELL_IMPALE, 9s, 10s);
             events.RescheduleEvent(EVENT_SPELL_STAGGERING_STOMP, 15s);
             events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 16s, 24s);
-
-            // refresh snobold position
-            if (Vehicle* vk = me->GetVehicleKit())
-                for( uint8 i = 0; i < 4; ++i )
-                    if (Unit* snobold = vk->GetPassenger(i))
-                        snobold->SendMovementFlagUpdate();
         }
 
         void JustReachedHome() override
