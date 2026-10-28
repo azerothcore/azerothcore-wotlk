@@ -410,6 +410,25 @@ TEST_F(ThreatManagerIntegrationTest, ResetAllMyThreatOnOthers_ZerosThreatOnAllCr
     delete creatureC;
 }
 
+TEST_F(ThreatManagerIntegrationTest, ResetAllMyThreatOnOthers_VictimSwitchesOnNextUpdate)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 50.0f);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // e.g. Feign Death or Vanish inside an encounter: A drops B on its next update, long before the timer
+    _creatureB->TestGetThreatMgr().ResetAllMyThreatOnOthers();
+    _creatureA->TestGetThreatMgr().Update(1);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
 TEST_F(ThreatManagerIntegrationTest, ResetAllMyThreatOnOthers_NoEntries_DoesNothing)
 {
     // creatureB is not on anyone's threat list

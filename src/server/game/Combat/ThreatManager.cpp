@@ -850,7 +850,11 @@ void ThreatManager::ForwardThreatForAssistingMe(Unit* assistant, float baseAmoun
 void ThreatManager::ResetAllMyThreatOnOthers()
 {
     for (auto const& pair : _threatenedByMe)
+    {
         pair.second->ScaleThreat(0.0f);
+        // the creature drops us on its next update, not on its 1s timer (Feign Death, Vanish)
+        pair.second->_mgr._victimUpdatePending = true;
+    }
 }
 
 void ThreatManager::RemoveMeFromThreatLists()
