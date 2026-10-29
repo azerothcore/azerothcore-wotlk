@@ -462,7 +462,6 @@ private:
     HealInfo* _healInfo;
     SpellInfo const* const _triggeredByAuraSpell;
     int8 _procAuraEffectIndex;
-    std::optional<float> _chance;
 
 public:
     explicit ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell const* spell, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell = nullptr, int8 procAuraEffectIndex = -1);
@@ -482,9 +481,6 @@ public:
     [[nodiscard]] int8 GetTriggerAuraEffectIndex() const { return _procAuraEffectIndex; }
     [[nodiscard]] uint32 GetProcCooldown() const { return _cooldown; }
     void SetProcCooldown(uint32 cooldown) { _cooldown = cooldown; }
-    [[nodiscard]] std::optional<float> GetProcChance() const { return _chance; }
-    void SetProcChance(float chance) { _chance = chance; }
-    void ResetProcChance() { _chance.reset(); }
 };
 
 // Struct for use in Unit::CalculateMeleeDamage
