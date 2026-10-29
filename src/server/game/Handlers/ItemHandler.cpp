@@ -1485,7 +1485,8 @@ bool WorldSession::recoveryItem(Item* pItem)
 {
     if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD)
             && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY)
-            && pItem->GetTemplate()->ItemLevel >= sWorld->getIntConfig(CONFIG_ITEMDELETE_ITEM_LEVEL))
+            && pItem->GetTemplate()->ItemLevel >= sWorld->getIntConfig(CONFIG_ITEMDELETE_ITEM_LEVEL)
+            && !pItem->GetTemplate()->IsTemporary())
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
 
