@@ -27,6 +27,7 @@
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
+#include <cmath>
 /*
  * Scripts for spells with SPELLFAMILY_WARLOCK and SPELLFAMILY_GENERIC spells used by warlock players.
  * Ordered alphabetically using scriptname.
@@ -821,13 +822,26 @@ class spell_warl_life_tap : public SpellScript
         return ValidateSpellInfo({ SPELL_WARLOCK_LIFE_TAP_ENERGIZE, SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2 });
     }
 
+    // Wrath downranking: the spell power bonus drops by 5% per level once the caster
+    // is more than 2 levels above the rank's max level (gone at max level + 22)
+    float GetDownrankFactor(Player const* caster) const
+    {
+        uint32 maxLevel = GetSpellInfo()->MaxLevel;
+        if (!maxLevel)
+            return 1.0f;
+
+        return std::clamp((22.0f + float(maxLevel) - float(caster->GetLevel())) / 20.0f, 0.0f, 1.0f);
+    }
+
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
         if (Unit* target = GetHitUnit())
         {
+            // Health cost scales with caster level up to the rank's max level (DBC RealPointsPerLevel)
             int32 spellEffect = GetEffectValue();
-            int32 mana = int32(spellEffect + (caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.5f));
+            float spellPowerBonus = caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.5f * GetDownrankFactor(caster);
+            int32 mana = int32(std::round(spellEffect + spellPowerBonus));
 
             // Shouldn't Appear in Combat Log
             target->ModifyHealth(-spellEffect);
@@ -853,7 +867,7 @@ class spell_warl_life_tap : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue())))
+        if ((int32(GetCaster()->GetHealth()) > GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster())))
             return SPELL_CAST_OK;
         return SPELL_FAILED_FIZZLE;
     }
