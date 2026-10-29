@@ -824,7 +824,7 @@ class spell_warl_life_tap : public SpellScript
 
     // Wrath downranking: the spell power bonus drops by 5% per level once the caster
     // is more than 2 levels above the rank's max level (gone at max level + 22)
-    float GetDownrankFactor(Player const* caster) const
+    float GetDownrankFactor(Player const* caster)
     {
         uint32 maxLevel = GetSpellInfo()->MaxLevel;
         if (!maxLevel)
