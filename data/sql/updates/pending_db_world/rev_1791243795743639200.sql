@@ -9,8 +9,6 @@ UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 67 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 19, `maxlevel` = 19 WHERE `entry` = 6245; -- Anathera (was 1)
 UPDATE `creature_template` SET `minlevel` = 19, `maxlevel` = 19 WHERE `entry` = 6246; -- Latherion (was 1)
 UPDATE `creature_template` SET `minlevel` = 48, `maxlevel` = 48 WHERE `entry` = 11016; -- Captured Arko'narin (was 51)
-UPDATE `creature_template` SET `minlevel` = 48, `maxlevel` = 48 WHERE `entry` = 11018; -- Arko'narin (was 51)
-UPDATE `creature_template` SET `minlevel` = 3, `maxlevel` = 3 WHERE `entry` = 12297; -- Cured Gazelle (was 1)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 75 WHERE `entry` = 12786; -- Guard Quine (was 62)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 75 WHERE `entry` = 12787; -- Guard Hammon (was 62)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 75 WHERE `entry` = 12797; -- Grunt Korf (was 62)
@@ -28,18 +26,14 @@ UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 69 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 69 WHERE `entry` = 18473; -- Talon King Ikiss (was 68)
 UPDATE `creature_template` SET `minlevel` = 65, `maxlevel` = 65 WHERE `entry` = 18798; -- Skarloc's Mount (was 1)
 UPDATE `creature_template` SET `minlevel` = 62, `maxlevel` = 62 WHERE `entry` = 19214; -- Hand of the Highlord (was 63)
-UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 70 WHERE `entry` = 20075; -- Darkwater Crocolisk (was 67-68)
 UPDATE `creature_template` SET `minlevel` = 60, `maxlevel` = 60 WHERE `entry` = 20493; -- Green Wind Rider (was 70)
-UPDATE `creature_template` SET `minlevel` = 68, `maxlevel` = 68 WHERE `entry` = 20496; -- Kirin'Var Spectre (was 60)
 UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 69 WHERE `entry` = 20541; -- Orc Prisoner (1) (was 65)
 UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 69 WHERE `entry` = 20544; -- Skarloc's Mount (1) (was 1)
 UPDATE `creature_template` SET `minlevel` = 71, `maxlevel` = 71 WHERE `entry` = 20548; -- Thrall (1) (was 67)
 UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73 WHERE `entry` = 21932; -- Hydross the Unstable (was 63)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 23175; -- Tarren Mill Guardsman (was 70)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 23176; -- Tarren Mill Guardsman (was 70)
-UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73 WHERE `entry` = 23284; -- Lady Sinestra (was 72)
 UPDATE `creature_template` SET `minlevel` = 71, `maxlevel` = 71 WHERE `entry` = 25562; -- Selin Fireheart (1) (was 72)
-UPDATE `creature_template` SET `minlevel` = 71, `maxlevel` = 71 WHERE `entry` = 25629; -- Lord Kryxix (was 70)
 UPDATE `creature_template` SET `minlevel` = 25, `maxlevel` = 25 WHERE `entry` = 25888; -- Azuremyst Isle Flame Warden (was 40)
 UPDATE `creature_template` SET `minlevel` = 65, `maxlevel` = 65 WHERE `entry` = 25889; -- Blade's Edge Flame Warden (was 40)
 UPDATE `creature_template` SET `minlevel` = 20, `maxlevel` = 20 WHERE `entry` = 25891; -- Bloodmyst Isle Flame Warden (was 40)
@@ -51,12 +45,10 @@ UPDATE `creature_template` SET `minlevel` = 79, `maxlevel` = 80 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 72, `maxlevel` = 72 WHERE `entry` = 26716; -- Azure Warder (was 71)
 UPDATE `creature_template` SET `minlevel` = 72, `maxlevel` = 72 WHERE `entry` = 26722; -- Azure Magus (was 71)
 UPDATE `creature_template` SET `minlevel` = 72, `maxlevel` = 72 WHERE `entry` = 26731; -- Grand Magus Telestra (was 71)
-UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 1 WHERE `entry` = 27485; -- Vengeful Bambina (was 71)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 75 WHERE `entry` = 28743; -- Apothecary Society Messenger (was 70)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 28835; -- Stormforged Construct (was 78)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 28836; -- Stormforged Runeshaper (was 78)
 UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73 WHERE `entry` = 29087; -- Bishop Lazaril (was 70)
-UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 29620; -- Dreadlord Mal'Ganis (was 82)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80 WHERE `entry` = 29621; -- Grand Admiral Westwind (was 82)
 UPDATE `creature_template` SET `minlevel` = 78, `maxlevel` = 78 WHERE `entry` = 29920; -- Ruins Dweller (was 80)
 UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82 WHERE `entry` = 30295; -- Thorim (was 83)
@@ -82,7 +74,6 @@ UPDATE `creature_template` SET `minlevel` = 83, `maxlevel` = 83 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 75 WHERE `entry` = 32483; -- Engorged Blight Worm (was 83)
 UPDATE `creature_template` SET `minlevel` = 76, `maxlevel` = 76 WHERE `entry` = 32511; -- Khanok the Impassable (was 80)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 75 WHERE `entry` = 32834; -- Knight-Lieutenant Moonstrike (was 65)
-UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 1 WHERE `entry` = 33220; -- Maiden of Ashwood Lake (was 80)
 UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73 WHERE `entry` = 33437; -- King Llane (was 83)
 UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82 WHERE `entry` = 33442; -- Immolated Champion (was 80)
 UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82 WHERE `entry` = 33962; -- Turned Champion (was 80)
@@ -141,7 +132,6 @@ UPDATE `creature_template` SET `minlevel` = 54, `maxlevel` = 55 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 57, `maxlevel` = 58 WHERE `entry` = 8522; -- Plague Monstrosity (was 58)
 UPDATE `creature_template` SET `minlevel` = 53, `maxlevel` = 54 WHERE `entry` = 8547; -- Death Cultist (was 54)
 UPDATE `creature_template` SET `minlevel` = 57, `maxlevel` = 58 WHERE `entry` = 9264; -- Firebrand Pyromancer (was 57)
-UPDATE `creature_template` SET `minlevel` = 54, `maxlevel` = 55 WHERE `entry` = 10296; -- Vaelan (was 55)
 UPDATE `creature_template` SET `minlevel` = 54, `maxlevel` = 55 WHERE `entry` = 10299; -- Scarshield Infiltrator (was 55)
 UPDATE `creature_template` SET `minlevel` = 54, `maxlevel` = 55 WHERE `entry` = 10659; -- Cobalt Whelp (was 55)
 UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 2 WHERE `entry` = 11153; -- Red Skeletal Horse (was 1)
@@ -151,7 +141,6 @@ UPDATE `creature_template` SET `minlevel` = 58, `maxlevel` = 60 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 13, `maxlevel` = 15 WHERE `entry` = 11321; -- Molten Elemental (was 13)
 UPDATE `creature_template` SET `minlevel` = 27, `maxlevel` = 28 WHERE `entry` = 11684; -- Warsong Shredder (was 27)
 UPDATE `creature_template` SET `minlevel` = 57, `maxlevel` = 59 WHERE `entry` = 11745; -- Cyclone Warrior (was 57)
-UPDATE `creature_template` SET `minlevel` = 13, `maxlevel` = 14 WHERE `entry` = 11836; -- Captured Rabid Thistle Bear (was 13)
 UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 70 WHERE `entry` = 12380; -- Unliving Resident (was 70)
 UPDATE `creature_template` SET `minlevel` = 56, `maxlevel` = 57 WHERE `entry` = 13546; -- Seasoned Coldmine Explorer (was 57)
 UPDATE `creature_template` SET `minlevel` = 57, `maxlevel` = 58 WHERE `entry` = 14395; -- Griniblix the Spectator (was 57)
@@ -195,7 +184,6 @@ UPDATE `creature_template` SET `minlevel` = 64, `maxlevel` = 66 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 66, `maxlevel` = 67 WHERE `entry` = 19201; -- Mountain Gronn (was 66)
 UPDATE `creature_template` SET `minlevel` = 55, `maxlevel` = 56 WHERE `entry` = 19426; -- Peon Overseer (was 55)
 UPDATE `creature_template` SET `minlevel` = 57, `maxlevel` = 59 WHERE `entry` = 19432; -- Injured Grunt (was 57-58)
-UPDATE `creature_template` SET `minlevel` = 56, `maxlevel` = 57 WHERE `entry` = 19477; -- Fleeing Dreghood Warrior (was 57)
 UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 70 WHERE `entry` = 19633; -- Bloodwarder Mender (was 69)
 UPDATE `creature_template` SET `minlevel` = 68, `maxlevel` = 69 WHERE `entry` = 19759; -- Newly Crafted Infernal (was 69)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 19830; -- Arcanist Ardonis (was 67)
@@ -217,7 +205,6 @@ UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 23178; -- Tarren Mill Lookout (was 67)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 23180; -- Tarren Mill Protector (was 67)
 UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 71 WHERE `entry` = 23581; -- Amani'shi Medicine Man (was 71)
-UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 71 WHERE `entry` = 23643; -- Unstable Mur'ghoul (was 70)
 UPDATE `creature_template` SET `minlevel` = 72, `maxlevel` = 73 WHERE `entry` = 23780; -- High Executor Anselm (was 72)
 UPDATE `creature_template` SET `minlevel` = 72, `maxlevel` = 73 WHERE `entry` = 23781; -- Apothecary Celestine (was 73)
 UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 71 WHERE `entry` = 23960; -- Dragonflayer Runecaster (was 70)
@@ -257,8 +244,6 @@ UPDATE `creature_template` SET `minlevel` = 79, `maxlevel` = 80 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 79, `maxlevel` = 80 WHERE `entry` = 26670; -- Ymirjar Flesh Hunter (was 79)
 UPDATE `creature_template` SET `minlevel` = 79, `maxlevel` = 80 WHERE `entry` = 26694; -- Ymirjar Dusk Shaman (was 79)
 UPDATE `creature_template` SET `minlevel` = 79, `maxlevel` = 80 WHERE `entry` = 26696; -- Ymirjar Berserker (was 80)
-UPDATE `creature_template` SET `minlevel` = 74, `maxlevel` = 75 WHERE `entry` = 26783; -- Freed Giant (was 74)
-UPDATE `creature_template` SET `minlevel` = 74, `maxlevel` = 75 WHERE `entry` = 26872; -- Weakened Giant (was 74)
 UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 74 WHERE `entry` = 26892; -- Coldwind Witch (was 73)
 UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 74 WHERE `entry` = 27374; -- Unholy Archon (was 74)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 76 WHERE `entry` = 27431; -- Drakkari Commander (was 75)
@@ -290,7 +275,6 @@ UPDATE `creature_template` SET `minlevel` = 60, `maxlevel` = 62 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 52, `maxlevel` = 53 WHERE `entry` = 28060; -- Nyuni (was 52)
 UPDATE `creature_template` SET `minlevel` = 79, `maxlevel` = 80 WHERE `entry` = 28368; -- Ymirjar Necromancer (was 79)
 UPDATE `creature_template` SET `minlevel` = 79, `maxlevel` = 80 WHERE `entry` = 28578; -- Hardened Steel Reaver (was 79)
-UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 76 WHERE `entry` = 28805; -- Hand of Drakuru (was 75)
 UPDATE `creature_template` SET `minlevel` = 58, `maxlevel` = 59 WHERE `entry` = 29193; -- Scarlet Deserter (was 59)
 UPDATE `creature_template` SET `minlevel` = 75, `maxlevel` = 76 WHERE `entry` = 29934; -- Acolyte of Agony (was 75)
 UPDATE `creature_template` SET `minlevel` = 78, `maxlevel` = 79 WHERE `entry` = 29976; -- Fallen Frostborn Warrior (was 78)
@@ -304,7 +288,6 @@ UPDATE `creature_template` SET `minlevel` = 74, `maxlevel` = 75 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 74, `maxlevel` = 75 WHERE `entry` = 30419; -- Bound Water Elemental (was 74)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 81 WHERE `entry` = 30748; -- Prince Keleseth (1) (was 81)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 81 WHERE `entry` = 30806; -- Scourge Hulk (1) (was 81)
-UPDATE `creature_template` SET `minlevel` = 79, `maxlevel` = 80 WHERE `entry` = 30884; -- Iskalder (was 80)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 81 WHERE `entry` = 30906; -- Phantasmal Air (1) (was 80)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 81 WHERE `entry` = 30909; -- Phantasmal Mammoth (1) (was 80)
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 81 WHERE `entry` = 30910; -- Phantasmal Murloc (1) (was 80)
@@ -490,10 +473,8 @@ UPDATE `creature_template` SET `mingold` = 834, `maxgold` = 5841 WHERE `entry` =
 UPDATE `creature_template` SET `mingold` = 1001, `maxgold` = 7008 WHERE `entry` = 19633; -- Bloodwarder Mender (was 961-6726)
 UPDATE `creature_template` SET `mingold` = 292, `maxgold` = 2044 WHERE `entry` = 19830; -- Arcanist Ardonis (was 278-1947)
 UPDATE `creature_template` SET `mingold` = 264, `maxgold` = 1848 WHERE `entry` = 19992; -- Bloodmaul Shaman (was 248-1739)
-UPDATE `creature_template` SET `mingold` = 292, `maxgold` = 2044 WHERE `entry` = 20496; -- Kirin'Var Spectre (was 185-1297)
 UPDATE `creature_template` SET `mingold` = 654, `maxgold` = 4578 WHERE `entry` = 21126; -- Coilfang Scale-Healer (was 610-4269)
 UPDATE `creature_template` SET `mingold` = 876, `maxgold` = 6132 WHERE `entry` = 23176; -- Tarren Mill Guardsman (was 1001-7008)
-UPDATE `creature_template` SET `mingold` = 352, `maxgold` = 2464 WHERE `entry` = 23643; -- Unstable Mur'ghoul (was 343-2398)
 UPDATE `creature_template` SET `mingold` = 1056, `maxgold` = 7392 WHERE `entry` = 23960; -- Dragonflayer Runecaster (was 1001-7008)
 UPDATE `creature_template` SET `mingold` = 1056, `maxgold` = 7392 WHERE `entry` = 24069; -- Dragonflayer Bonecrusher (was 1001-7008)
 UPDATE `creature_template` SET `mingold` = 1056, `maxgold` = 7392 WHERE `entry` = 24071; -- Dragonflayer Heartsplitter (was 1001-7008)
@@ -534,35 +515,33 @@ UPDATE `creature_template` SET `VerifiedBuild` = 49345 WHERE `entry` IN (6245,62
 UPDATE `creature_template` SET `VerifiedBuild` = 49822 WHERE `entry` IN (33437);
 UPDATE `creature_template` SET `VerifiedBuild` = 50172 WHERE `entry` IN (25888,25889,25891,25892,25899,26216);
 UPDATE `creature_template` SET `VerifiedBuild` = 50250 WHERE `entry` IN (25903,25951,25980,26222,26223);
-UPDATE `creature_template` SET `VerifiedBuild` = 50664 WHERE `entry` IN (2435,13976,16059,28052,28060,28805,34070);
-UPDATE `creature_template` SET `VerifiedBuild` = 51739 WHERE `entry` IN (20075);
+UPDATE `creature_template` SET `VerifiedBuild` = 50664 WHERE `entry` IN (2435,13976,16059,28052,28060,34070);
 UPDATE `creature_template` SET `VerifiedBuild` = 51943 WHERE `entry` IN (16407,19214,25562,25567,27374,27635,27638,
-27642,27645,27647,27648,27649,27653,28578,28835,28836,29193,31342,31442,31443,31449,31450,31452,31453,31454,31455,
-31457,31459,31460,31466,31470,31471,31472,31475,31505,31587,31598,31603,31604,31648,34196);
-UPDATE `creature_template` SET `VerifiedBuild` = 52237 WHERE `entry` IN (615,3301,3762,4718,6141,7105,7108,8547,10296,
-11153,11154,11284,11745,11836,12297,12380,14395,15961,17341,17941,18319,18323,18325,18328,18472,18473,18702,18794,
-19201,19633,20524,20526,20541,20544,20546,20548,20692,20701,21126,21776,23960,24069,24071,24137,24734,24735,24736,
-24849,26406,26550,26553,26554,26555,26621,26622,26624,26626,26635,26636,26637,26638,26667,26669,26670,26694,26696,
-26716,26722,26731,26783,26872,27431,27485,27633,27636,27639,27640,27641,27871,27960,27961,27962,27963,27964,27965,
-27969,27971,28368,28743,29620,29621,29920,29976,30111,30114,30179,30295,30319,30329,30416,30418,30419,30593,30748,
-30806,30884,30906,30909,30910,30911,30913,30927,30929,30932,30933,30935,30936,30939,30941,30942,31374,31378,31385,
-31431,31526,31530,31565,31591,31596,31609,31674,31679,31739,31797,31844,32159,32261,32315,32367,32389,32401,32402,
-32483,32511,34441,34442,34443,34444,34445,34447,34448,34449,34450,34451,34453,34454,34455,34456,34458,34459,34460,
-34461,34463,34465,34466,34467,34468,34469,34470,34471,34472,34473,34474,34475,34980,35662,35663,35664,35665,35666,
-35667,35668,35669,35670,35671,35672,35673,35674,35675,35676,35680,35681,35682,35683,35684,35685,35686,35687,35688,
-35689,35690,35691,35692,35693,35694,35695,35696,35697,35699,35700,35701,35702,35703,35704,35705,35706,35707,35708,
-35709,35710,35711,35712,35713,35714,35715,35716,35718,35719,35720,35721,35722,35723,35724,35725,35726,35728,35729,
-35730,35731,35732,35733,35734,35735,35736,35737,35738,35739,35740,35741,35742,35743,35744,35745,35746,35747,35748,
-35749,36824,36993,37221,37671,37763,37764,38188,39296);
+27642,27645,27647,27648,27649,27653,28578,28835,28836,29193,31342,31442,31443,31449,31450,31452,31453,31454,31455,31457,
+31459,31460,31466,31470,31471,31472,31475,31505,31587,31598,31603,31604,31648,34196);
+UPDATE `creature_template` SET `VerifiedBuild` = 52237 WHERE `entry` IN (615,3301,3762,4718,6141,7105,7108,8547,11153,
+11154,11284,11745,12380,14395,15961,17341,17941,18319,18323,18325,18328,18472,18473,18702,18794,19201,19633,20524,20526,
+20541,20544,20546,20548,20692,20701,21126,21776,23960,24069,24071,24137,24734,24735,24736,24849,26406,26550,26553,26554,
+26555,26621,26622,26624,26626,26635,26636,26637,26638,26667,26669,26670,26694,26696,26716,26722,26731,27431,27633,27636,
+27639,27640,27641,27871,27960,27961,27962,27963,27964,27965,27969,27971,28368,28743,29621,29920,29976,30111,30114,30179,
+30295,30319,30329,30416,30418,30419,30593,30748,30806,30906,30909,30910,30911,30913,30927,30929,30932,30933,30935,30936,
+30939,30941,30942,31374,31378,31385,31431,31526,31530,31565,31591,31596,31609,31674,31679,31739,31797,31844,32159,32261,
+32315,32367,32389,32401,32402,32483,32511,34441,34442,34443,34444,34445,34447,34448,34449,34450,34451,34453,34454,34455,
+34456,34458,34459,34460,34461,34463,34465,34466,34467,34468,34469,34470,34471,34472,34473,34474,34475,34980,35662,35663,
+35664,35665,35666,35667,35668,35669,35670,35671,35672,35673,35674,35675,35676,35680,35681,35682,35683,35684,35685,35686,
+35687,35688,35689,35690,35691,35692,35693,35694,35695,35696,35697,35699,35700,35701,35702,35703,35704,35705,35706,35707,
+35708,35709,35710,35711,35712,35713,35714,35715,35716,35718,35719,35720,35721,35722,35723,35724,35725,35726,35728,35729,
+35730,35731,35732,35733,35734,35735,35736,35737,35738,35739,35740,35741,35742,35743,35744,35745,35746,35747,35748,35749,
+36824,36993,37221,37671,37763,37764,38188,39296);
 UPDATE `creature_template` SET `VerifiedBuild` = 53622 WHERE `entry` IN (1358,1360,2812,7671,8519,11321,17160,17695,
 18539,18882,19830,21763,22243,31094);
 UPDATE `creature_template` SET `VerifiedBuild` = 53788 WHERE `entry` IN (80,123,206,456,550,579,2140,3105,3556,4463,
-4638,5261,7170,11280,17287,18454,19759,20493,21908,23284,23581,26892,27712,35092,40413);
+4638,5261,7170,11280,17287,18454,19759,20493,21908,23581,26892,27712,35092,40413);
 UPDATE `creature_template` SET `VerifiedBuild` = 54261 WHERE `entry` IN (742,744,752,873,1245,2164,2319,2436,2679,2907,
-2909,3815,4624,5295,5334,5434,7031,7044,8276,8522,9264,10299,10659,11016,11018,11684,12786,12787,12797,12798,13546,
-16866,16996,17006,17052,17093,17095,17097,17636,18070,18547,18948,18949,18950,18965,18970,18971,18972,18986,19000,
-19426,19432,19477,19992,20232,20324,20496,22298,23643,23780,23781,25235,25397,25429,25478,25629,25989,26155,
-26484,27750,29087,29934,30596,32380,32834,33220,39349);
+2909,3815,4624,5295,5334,5434,7031,7044,8276,8522,9264,10299,10659,11016,11684,12786,12787,12797,12798,13546,16866,
+16996,17006,17052,17093,17095,17097,17636,18070,18547,18948,18949,18950,18965,18970,18971,18972,18986,19000,19426,19432,
+19992,20232,20324,22298,23643,23780,23781,25235,25397,25429,25478,25989,26155,26484,27750,29087,29934,30596,32380,32834,
+39349);
 -- reference_loot_template: vanilla beast elite root for level 15 (1000015 with the elite chances)
 DELETE FROM `reference_loot_template` WHERE `Entry` = 1000215;
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -789,9 +768,6 @@ DELETE FROM `creature_loot_template` WHERE `Entry` = 20324 AND `Reference` IN (1
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (20324, 1, 1100061, 0, 0, 1, 5, 1, 1, 'Parched Hydra - World Loot Level 61'),
 (20324, 2, 1100062, 0, 0, 1, 5, 1, 1, 'Parched Hydra - World Loot Level 62');
-DELETE FROM `creature_loot_template` WHERE `Entry` = 20496 AND `Reference` IN (1100160, 1100168);
-INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(20496, 1, 1100168, 0, 0, 1, 5, 1, 1, 'Kirin''Var Spectre - World Loot Level 68');
 DELETE FROM `creature_loot_template` WHERE `Entry` = 21126 AND `Reference` IN (1100362, 1100363);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (21126, 1, 1100362, 0, 0, 1, 5, 1, 1, 'Coilfang Scale-Healer - World Loot Level 62'),
@@ -808,10 +784,6 @@ DELETE FROM `creature_loot_template` WHERE `Entry` = 23581 AND `Reference` IN (1
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (23581, 1, 1100370, 0, 0, 1, 5, 1, 1, 'Amani''shi Medicine Man - World Loot Level 70'),
 (23581, 2, 1100371, 0, 0, 1, 5, 1, 1, 'Amani''shi Medicine Man - World Loot Level 71');
-DELETE FROM `creature_loot_template` WHERE `Entry` = 23643 AND `Reference` IN (1200170, 1200171);
-INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(23643, 1, 1200170, 0, 0, 1, 5, 1, 1, 'Unstable Mur''ghoul - World Loot Level 70'),
-(23643, 2, 1200171, 0, 0, 1, 5, 1, 1, 'Unstable Mur''ghoul - World Loot Level 71');
 DELETE FROM `creature_loot_template` WHERE `Entry` = 23960 AND `Reference` IN (1200370, 1200371);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (23960, 1, 1200370, 0, 0, 1, 5, 1, 1, 'Dragonflayer Runecaster - World Loot Level 70'),
@@ -907,10 +879,6 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 DELETE FROM `creature_loot_template` WHERE `Entry` = 26722 AND `Reference` IN (1200371, 1200372);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (26722, 1, 1200372, 0, 0, 1, 5, 1, 1, 'Azure Magus - World Loot Level 72');
-DELETE FROM `creature_loot_template` WHERE `Entry` = 26872 AND `Reference` IN (1200074, 1200075);
-INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(26872, 1, 1200074, 0, 0, 1, 5, 1, 1, 'Weakened Giant - World Loot Level 74'),
-(26872, 2, 1200075, 0, 0, 1, 5, 1, 1, 'Weakened Giant - World Loot Level 75');
 DELETE FROM `creature_loot_template` WHERE `Entry` = 27431 AND `Reference` IN (1200375, 1200376);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (27431, 1, 1200375, 0, 0, 1, 5, 1, 1, 'Drakkari Commander - World Loot Level 75'),
