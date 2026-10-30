@@ -39,9 +39,9 @@ struct boss_epoch_hunter : public BossAI
 {
     boss_epoch_hunter(Creature* creature) : BossAI(creature, DATA_EPOCH_HUNTER) { }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         scheduler.Schedule(8s, [this](TaskContext context)
         {

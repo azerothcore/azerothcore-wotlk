@@ -38,9 +38,9 @@ struct boss_gehennas : public BossAI
 {
     boss_gehennas(Creature* creature) : BossAI(creature, DATA_GEHENNAS) {}
 
-    void JustEngagedWith(Unit* /*attacker*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_GEHENNAS_CURSE, 6s, 9s);
         events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10s);
         events.ScheduleEvent(EVENT_SHADOW_BOLT, 3s, 5s);

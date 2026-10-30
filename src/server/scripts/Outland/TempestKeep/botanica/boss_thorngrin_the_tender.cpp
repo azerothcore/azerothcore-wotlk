@@ -68,9 +68,9 @@ struct boss_thorngrin_the_tender : public BossAI
         BossAI::MoveInLineOfSight(who);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(6s, [this](TaskContext context)

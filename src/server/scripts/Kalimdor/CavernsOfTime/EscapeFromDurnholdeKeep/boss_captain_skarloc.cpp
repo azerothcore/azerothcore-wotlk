@@ -156,9 +156,9 @@ struct boss_captain_skarloc : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         DoCastSelf(SPELL_DEVOTION_AURA);
         scheduler.Schedule(15s, [this](TaskContext context)
         {
