@@ -7587,25 +7587,31 @@ void ObjectMgr::SetHighestGuids()
 {
     // Refuse to start once the next guid would already trip ObjectGuidGenerator's overflow check. At the cap,
     // MAX(guid) + 1 wraps to 0 and the cleanup below deletes every item relation.
-    auto setNextGuid = [](ObjectGuidGeneratorBase& generator, HighGuid high, char const* table)
+    auto setNextGuid = [](ObjectGuidGeneratorBase& generator, HighGuid high, char const* query)
     {
-        QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM {}", table);
+        QueryResult result = CharacterDatabase.Query(query);
         if (!result)
             return;
 
         uint32 maxGuid = (*result)[0].Get<uint32>();
         if (maxGuid >= ObjectGuid::GetMaxCounter(high) - 2)
         {
-            LOG_FATAL("server.loading", "{} guid space is exhausted (MAX(guid) in `{}` is {}). Renumber the guids before starting the server.",
-                ObjectGuid::GetTypeName(high), table, maxGuid);
+            LOG_FATAL("server.loading",
+                "{} guid space is exhausted (highest reserved guid is {}). Renumber the guids before starting the server.",
+                ObjectGuid::GetTypeName(high), maxGuid);
             exit(1);
         }
 
         generator.Set(maxGuid + 1);
     };
 
-    setNextGuid(GetGuidSequenceGenerator<HighGuid::Player>(), HighGuid::Player, "characters");
-    setNextGuid(GetGuidSequenceGenerator<HighGuid::Item>(), HighGuid::Item, "item_instance");
+    // Deleted characters retain Realm First! achievements; reserve their GUIDs too.
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Player>(), HighGuid::Player,
+        "SELECT GREATEST("
+        "COALESCE((SELECT MAX(guid) FROM characters), 0), "
+        "COALESCE((SELECT MAX(guid) FROM character_achievement), 0))");
+    setNextGuid(GetGuidSequenceGenerator<HighGuid::Item>(), HighGuid::Item,
+        "SELECT MAX(guid) FROM item_instance");
 
     // Cleanup other tables from not existed guids ( >= _hiItemGuid)
     CharacterDatabase.Execute("DELETE FROM character_inventory WHERE item >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());     // One-time query
