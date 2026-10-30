@@ -5253,6 +5253,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     });
 
+    // Oil of Immolation
+    ApplySpellFix({ 11350 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
+        spellInfo->CategoryEntry = sSpellCategoryStore.LookupEntry(79);
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
