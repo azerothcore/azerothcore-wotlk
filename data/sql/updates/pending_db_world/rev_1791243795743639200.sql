@@ -212,7 +212,6 @@ UPDATE `creature_template` SET `minlevel` = 62, `maxlevel` = 63 WHERE `entry` = 
 UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 71 WHERE `entry` = 21763; -- Time-Lost Skettis Worshipper (was 71)
 UPDATE `creature_template` SET `minlevel` = 69, `maxlevel` = 70 WHERE `entry` = 21776; -- Illidari Temptress (was 69)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 21908; -- Spellbound Terrorguard (was 67)
-UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 72 WHERE `entry` = 22243; -- Bash'ir Arcanist (was 71-72)
 UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 71 WHERE `entry` = 22298; -- Vile Fire-Soul (was 71)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 23177; -- Tarren Mill Lookout (was 67)
 UPDATE `creature_template` SET `minlevel` = 67, `maxlevel` = 68 WHERE `entry` = 23178; -- Tarren Mill Lookout (was 67)
@@ -801,11 +800,6 @@ DELETE FROM `creature_loot_template` WHERE `Entry` = 21763 AND `Reference` IN (1
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (21763, 1, 1100170, 0, 0, 1, 5, 1, 1, 'Time-Lost Skettis Worshipper - World Loot Level 70'),
 (21763, 2, 1100171, 0, 0, 1, 5, 1, 1, 'Time-Lost Skettis Worshipper - World Loot Level 71');
-DELETE FROM `creature_loot_template` WHERE `Entry` = 22243 AND `Reference` IN (1100170, 1100171, 1100172);
-INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(22243, 1, 1100170, 0, 0, 1, 5, 1, 1, 'Bash''ir Arcanist - World Loot Level 70'),
-(22243, 2, 1100171, 0, 0, 1, 5, 1, 1, 'Bash''ir Arcanist - World Loot Level 71'),
-(22243, 3, 1100172, 0, 0, 1, 5, 1, 1, 'Bash''ir Arcanist - World Loot Level 72');
 DELETE FROM `creature_loot_template` WHERE `Entry` = 22298 AND `Reference` IN (1100070, 1100071);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (22298, 1, 1100070, 0, 0, 1, 5, 1, 1, 'Vile Fire-Soul - World Loot Level 70'),
