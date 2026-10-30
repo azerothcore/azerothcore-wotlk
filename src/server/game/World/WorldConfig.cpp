@@ -449,6 +449,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER, "Battleground.QueueAnnouncer.Timer", 30000);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE, "Battleground.StoreStatistics.Enable", false);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_TRACK_DESERTERS, "Battleground.TrackDeserters.Enable", false);
+    SetConfigValue<bool>(CONFIG_BATTLEGROUND_WAIT_FOR_PENDING_INVITES, "Battleground.WaitForPendingInvites", true);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER, "Battleground.PrematureFinishTimer", 300000);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_INVITATION_TYPE, "Battleground.InvitationType", 0);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH, "Battleground.PremadeGroupWaitForMatch", 1800000);
