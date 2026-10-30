@@ -342,6 +342,10 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
         if (!obj->IsWithinDistInMap(GetPlayer(), obj->GetInteractionDistance()))
             return;
 
+        // fishing holes are only looted through a fishing bobber
+        if (obj->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
+            return;
+
         // ignore for remote control state
         if (GetPlayer()->m_mover != GetPlayer())
             if (!(GetPlayer()->IsOnVehicle(GetPlayer()->m_mover) || GetPlayer()->IsMounted()) && !obj->GetGOInfo()->IsUsableMounted())
