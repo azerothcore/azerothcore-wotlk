@@ -153,6 +153,15 @@ public:
             InstanceScript::OnGameObjectCreate(go);
         }
 
+        uint32 GetData(uint32 type) const override
+        {
+            // Read by Akama's gossip conditions
+            if (type == DATA_ILLIDAN_GATE)
+                return GetPersistentData(PERSISTENT_DATA_ILLIDAN_GATE);
+
+            return 0;
+        }
+
         bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
