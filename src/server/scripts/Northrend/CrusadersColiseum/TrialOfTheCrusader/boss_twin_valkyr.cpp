@@ -825,7 +825,7 @@ class spell_valkyr_touch_aura : public AuraScript
         Unit* caster = GetCaster();
         // Only the touched player takes damage, and the matching essence absorbs it
         Unit* target = GetTarget();
-        if (!caster || caster->GetMap()->GetId() != 649 || !target->IsAlive() || target->HasSpiritOfRedemptionAura())
+        if (!caster || !caster->GetMap()->IsHeroic() || !target->IsAlive() || target->HasSpiritOfRedemptionAura())
             return;
 
         int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
