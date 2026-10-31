@@ -802,7 +802,7 @@ void PathGenerator::CreateFilter()
     if (headless)
     {
         _filter.setAreaCost(NAV_GROUND_STEEP, 40.0f);
-        _filter.setAreaCost(NAV_WATER, 20.0f);
+        _filter.setAreaCost(NAV_WATER, 5.0f);
     }
 
     UpdateFilter();
