@@ -144,7 +144,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
     {
         switch (a)
         {
-            case -1:
+            case ACTION_DESPAWN_SUMMONS:
                 summons.DespawnAll();
                 if (pInstance && me->GetEntry() == NPC_LIGHTBANE )
                 {
@@ -183,6 +183,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             empoweredId2 = 67218;
                             touchId2 = 67283;
                             break;
+                        default:
+                            break;
                     }
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(essenceId1);
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(empoweredId1);
@@ -197,12 +199,14 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 me->CastSpell(me, SPELL_TWIN_POWER, true);
                 events.RescheduleEvent(EVENT_REMOVE_DUAL_WIELD, 15s);
                 break;
+            default:
+                break;
         }
     }
 
     Creature* GetSister()
     {
-        return ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(me->GetEntry() == NPC_DARKBANE ? NPC_LIGHTBANE : NPC_DARKBANE));
+        return ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(me->GetEntry() == NPC_DARKBANE ? DATA_LIGHTBANE : DATA_DARKBANE));
     }
 
     /*void AttackStart(Unit* victim)
@@ -472,7 +476,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        DoAction(-1);
+        DoAction(ACTION_DESPAWN_SUMMONS);
         Talk(SAY_DEATH);
         if (pInstance)
         {
@@ -875,7 +879,7 @@ class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         if (Unit* target = GetTarget())
-            if (target->GetDisplayId() != 11686)
+            if (target->GetDisplayId() != MODEL_INVISIBLE_STALKER)
                 if (Creature* creature = target->ToCreature())
                     if (Player* player = creature->SelectNearestPlayer(2.75f))
                         if (creature->GetExactDist2d(player) <= 2.75f)
@@ -883,7 +887,7 @@ class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
                             creature->AI()->DoAction(1); // despawning = true;
                             creature->GetMotionMaster()->MoveIdle();
                             creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
-                            creature->SetDisplayId(11686);
+                            creature->SetDisplayId(MODEL_INVISIBLE_STALKER);
                             creature->DespawnOrUnsummon(1500ms);
                         }
     }
