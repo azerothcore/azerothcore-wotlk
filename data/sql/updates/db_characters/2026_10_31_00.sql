@@ -1,3 +1,4 @@
+-- DB update 2026_08_15_00 -> 2026_10_31_00
 --
 -- Keep only the most recently saved current pet per owner, move the others out of the current slot
 UPDATE `character_pet` AS `cp`
