@@ -160,8 +160,6 @@ public:
         {
             pInstance = (InstanceScript*)pCreature->GetInstanceScript();
             events.Reset();
-            bIntro = false;
-            bPhase3 = false;
             me->ApplySpellImmune(0, IMMUNITY_ID, sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me), true);
             me->m_SightDistance = 90.0f; // for MoveInLineOfSight distance
         }
@@ -178,6 +176,8 @@ public:
         {
             if (pInstance)
                 pInstance->SetBossState(BOSS_ANUBARAK, NOT_STARTED);
+            bIntro = false;
+            bPhase3 = false;
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             summons.DespawnAll();
