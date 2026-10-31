@@ -345,7 +345,8 @@ void Creature::RemoveFromWorld()
     {
         sScriptMgr->OnCreatureRemoveWorld(this);
 
-        if (GetZoneScript())
+        // Shutdown frees OutdoorPvP zone scripts before the maps unload (Main.cpp), so the pointer is dangling then.
+        if (GetZoneScript() && !World::IsStopped())
             GetZoneScript()->OnCreatureRemove(this);
 
         if (m_formation)
