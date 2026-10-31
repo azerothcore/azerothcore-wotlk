@@ -465,12 +465,9 @@ void Player::UpdateLFGChannel()
     if (!sWorld->getBoolConfig(CONFIG_RESTRICTED_LFG_CHANNEL))
         return;
 
-    ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeamId());
-    if (!cMgr)
-        return;
-
     ChatChannelsEntry const* cce = sChatChannelsStore.LookupEntry(26); /*LookingForGroup*/
-    Channel* cLFG = cMgr->GetJoinChannel(cce->pattern[m_session->GetSessionDbcLocale()], cce->ChannelID);
+    Channel* cLFG = sChannelMgr.GetOrCreateChannel(GetTeamId(), cce->pattern[m_session->GetSessionDbcLocale()],
+        cce->ChannelID);
     if (!cLFG)
         return;
 
@@ -510,10 +507,6 @@ void Player::UpdateLocalChannels(uint32 newZone)
 
     AreaTableEntry const* current_zone = sAreaTableStore.LookupEntry(newZone);
     if (!current_zone)
-        return;
-
-    ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeamId());
-    if (!cMgr)
         return;
 
     std::string current_zone_name =
@@ -560,7 +553,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
                              channel->pattern[m_session->GetSessionDbcLocale()],
                              currentNameExt.c_str());
 
-                    joinChannel = cMgr->GetJoinChannel(new_channel_name_buf,
+                    joinChannel = sChannelMgr.GetOrCreateChannel(GetTeamId(), new_channel_name_buf,
                                                        channel->ChannelID);
                     if (usedChannel)
                     {
@@ -575,7 +568,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
                     }
                 }
                 else
-                    joinChannel = cMgr->GetJoinChannel(
+                    joinChannel = sChannelMgr.GetOrCreateChannel(GetTeamId(),
                         channel->pattern[m_session->GetSessionDbcLocale()],
                         channel->ChannelID);
             }

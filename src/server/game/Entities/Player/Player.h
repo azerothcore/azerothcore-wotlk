@@ -2097,6 +2097,7 @@ public:
 
     void JoinedChannel(Channel* c);
     void LeftChannel(Channel* c);
+    [[nodiscard]] std::list<Channel*> const& GetJoinedChannels() const { return m_channels; }
     void CleanupChannels();
     void ClearChannelWatch();
     void UpdateLFGChannel();

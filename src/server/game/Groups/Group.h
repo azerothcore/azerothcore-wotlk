@@ -340,6 +340,9 @@ public:
 
     DataMap CustomData;
 
+    // the counter of the group's guid, unique among groups
+    uint32 GetGroupId();
+
 protected:
     void _homebindIfInstance(Player* player);
     void _cancelHomebindIfInstance(Player* player);

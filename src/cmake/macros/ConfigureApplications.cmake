@@ -12,6 +12,7 @@
 
 set(BUILD_APPLICATION_AUTHSERVER 0)
 set(BUILD_APPLICATION_WORLDSERVER 0)
+set(BUILD_APPLICATION_VOICESERVER 0)
 
 # Returns the base path to the apps directory in the source directory
 function(GetApplicationsBasePath variable)
@@ -78,6 +79,10 @@ function(CheckApplicationsBuildList)
     if (APPS_BUILD STREQUAL "world-only")
       list(APPEND BUILD_APPS_WHITELIST worldserver)
     endif()
+
+    if (APPS_BUILD STREQUAL "voice-only")
+      list(APPEND BUILD_APPS_WHITELIST voiceserver)
+    endif()
   endif()
 
   foreach(APPLICATION_BUILD_NAME ${APPLICATIONS_BUILD_LIST})
@@ -102,6 +107,8 @@ function(CheckApplicationsBuildList)
         set (BUILD_APPLICATION_AUTHSERVER 1 PARENT_SCOPE)
       elseif(${APPLICATION_BUILD_NAME} MATCHES "worldserver")
         set (BUILD_APPLICATION_WORLDSERVER 1 PARENT_SCOPE)
+      elseif(${APPLICATION_BUILD_NAME} MATCHES "voiceserver")
+        set (BUILD_APPLICATION_VOICESERVER 1 PARENT_SCOPE)
       endif()
     endif()
   endforeach()

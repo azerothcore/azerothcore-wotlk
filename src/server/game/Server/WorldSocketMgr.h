@@ -41,7 +41,7 @@ public:
     /// Stops all network threads, It will wait for all running threads .
     void StopNetwork() override;
 
-    void OnSocketOpen(IoContextTcpSocket&& sock, uint32 threadIndex) override;
+    std::shared_ptr<WorldSocket> OnWorldSocketOpen(IoContextTcpSocket&& sock, uint32 threadIndex);
 
     std::size_t GetApplicationSendBufferSize() const { return _socketApplicationSendBufferSize; }
 
@@ -52,7 +52,7 @@ protected:
 
     static void OnSocketAccept(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
-        Instance().OnSocketOpen(std::move(sock), threadIndex);
+        Instance().OnWorldSocketOpen(std::move(sock), threadIndex);
     }
 
 private:

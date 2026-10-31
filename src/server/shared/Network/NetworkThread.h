@@ -22,7 +22,7 @@
 #include "Errors.h"
 #include "IoContext.h"
 #include "Log.h"
-#include "Socket.h"
+#include "TcpSocket.h"
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <atomic>
@@ -92,6 +92,8 @@ public:
     }
 
     IoContextTcpSocket* GetSocketForAccept() { return &_acceptSocket; }
+
+    Acore::Asio::IoContext& GetIoContext() { return _ioContext; }
 
     void EnableProxyProtocol() { _proxyHeaderReadingEnabled = true; }
 
