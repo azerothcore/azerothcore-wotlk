@@ -162,6 +162,7 @@ enum NPCs
     NPC_DREADSCALE                                  = 34799,
     NPC_ACIDMAW                                     = 35144,
     NPC_ICEHOWL                                     = 34797,
+    NPC_BEASTS_COMBAT_STALKER                       = 36549,
     NPC_JARAXXUS                                    = 34780,
     NPC_MISTRESS_OF_PAIN                            = 34826,
 
@@ -316,6 +317,7 @@ const Position Locs[] =
     {664.75f, 135.0f, 142.2f, 0.0f},                    // 19
     {563.6597f, 139.7569f, 399.2507f, 3 * M_PI / 2},    // 20
     {559.1528f, 90.55729f, 395.2734f, 5.078908f},       // 21 - Barrett
+    {563.8941f, 137.3333f, 405.8467f, 0.0f},            // 22 - Beasts Combat Stalker
 };
 
 enum LocNames
@@ -342,6 +344,7 @@ enum LocNames
     LOC_MAGE,
     LOC_OPEN_PORTAL_TARGET,
     LOC_BARRETT,
+    LOC_BEASTS_COMBAT_STALKER,
 };
 
 enum BarrettMisc
