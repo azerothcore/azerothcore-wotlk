@@ -237,6 +237,8 @@ public:
             {
                 if (kit || !player->CreateVehicleKit(VEHICLE_SNOBOLD_CARRIER, 0))
                     return;
+
+                player->GetVehicleKit()->SetBoardableByPlayers(false);
             }
             else
             {
