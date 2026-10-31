@@ -1,3 +1,4 @@
+-- DB update 2026_10_28_01 -> 2026_10_31_00
 --
 -- Move the acore_string texts from the locale_* columns to acore_string_locale.
 -- A non-empty row already in acore_string_locale wins over the column, as it did in the loader.
