@@ -6122,6 +6122,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), unitCaster))
                 return SPELL_FAILED_NOT_INFRONT;
 
+            // A unit riding a player sits on their back (Gormok's Snobold Vassals), out of reach of their targeted harmful spells
+            if (unitCaster && unitCaster->IsPlayer() && target->GetVehicleBase() == unitCaster && !m_spellInfo->IsPositive())
+                return SPELL_FAILED_BAD_TARGETS;
+
             // Ignore LOS for gameobject casts: one has no collision height, so the ray would start on its floor
             // position, which the floor under a player standing on it can block. CheckEffectTarget still checks
             // LOS for gameobjects that do not ignore it.
@@ -7382,8 +7386,6 @@ SpellCastResult Spell::CheckRange(bool strict)
             // orientation can be stale; never fail range or facing against the vehicle
             // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
             bool const targetIsVehicleBase = unitCaster->GetVehicleBase() == target;
-            // A unit riding the caster sits on their back (Gormok's Snobold Vassals), so it is never in front of them
-            bool const targetRidesCaster = target->GetVehicleBase() == unitCaster;
 
             // Xinef: Spells with 5yd range can hit target 9yd away?
             if (range_type == SPELL_RANGE_MELEE)
@@ -7401,7 +7403,7 @@ SpellCastResult Spell::CheckRange(bool strict)
             else if (!targetIsVehicleBase && !unitCaster->IsWithinCombatRange(target, max_range))
                 return SPELL_FAILED_OUT_OF_RANGE; //0x5A;
 
-            if (unitCaster->IsPlayer() && (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && (targetRidesCaster || (!targetIsVehicleBase && !unitCaster->HasInArc(static_cast<float>(M_PI), target) && !unitCaster->IsWithinBoundaryRadius(target))))
+            if (!targetIsVehicleBase && unitCaster->IsPlayer() && (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !unitCaster->HasInArc(static_cast<float>(M_PI), target) && !unitCaster->IsWithinBoundaryRadius(target))
                 return SPELL_FAILED_UNIT_NOT_INFRONT;
         }
         // Non-Unit casters (e.g. a GameObject trap) have no combat reach/facing of their own;
