@@ -823,38 +823,30 @@ class spell_valkyr_touch_aura : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = GetCaster();
-        if (!caster)
+        // Only the touched player takes damage; switching to the matching essence removes the touch
+        Unit* target = GetTarget();
+        if (!caster || !target->IsAlive() || target->HasSpiritOfRedemptionAura())
             return;
-        if (caster->GetMap()->GetId() == 649 )
-        {
-            uint32 excludedID = GetSpellInfo()->ExcludeTargetAuraSpell;
-            Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
-            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if (Player* plr = itr->GetSource())
-                    if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasSpiritOfRedemptionAura())
-                    {
-                        uint32 absorb = 0;
-                        uint32 resist = 0;
-                        CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-                        int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
-                        uint32 damage = dmg;
-                        int32 resilienceReduction = damage;
-                        if (caster->CanApplyResilience())
-                            Unit::ApplyResilience(plr, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
-                        resilienceReduction = damage - resilienceReduction;
-                        damage -= resilienceReduction;
-                        uint32 mitigated_damage = resilienceReduction;
-                        DamageInfo dmgInfo(caster, plr, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
-                        Unit::CalcAbsorbResist(dmgInfo);
-                        Unit::DealDamageMods(plr, damage, &absorb);
-                        int32 overkill = damage - plr->GetHealth();
-                        if (overkill < 0)
-                            overkill = 0;
-                        SpellPeriodicAuraLogInfo pInfo(aurEff, damage, overkill, absorb, resist, 0.0f, false);
-                        plr->SendPeriodicAuraLog(&pInfo);
-                        Unit::DealDamage(caster, plr, damage, 0, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
-                    }
-        }
+
+        uint32 absorb = 0;
+        uint32 resist = 0;
+        int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
+        uint32 damage = dmg;
+        int32 resilienceReduction = damage;
+        if (caster->CanApplyResilience())
+            Unit::ApplyResilience(target, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
+        resilienceReduction = damage - resilienceReduction;
+        damage -= resilienceReduction;
+        uint32 mitigated_damage = resilienceReduction;
+        DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
+        Unit::CalcAbsorbResist(dmgInfo);
+        Unit::DealDamageMods(target, damage, &absorb);
+        int32 overkill = damage - target->GetHealth();
+        if (overkill < 0)
+            overkill = 0;
+        SpellPeriodicAuraLogInfo pInfo(aurEff, damage, overkill, absorb, resist, 0.0f, false);
+        target->SendPeriodicAuraLog(&pInfo);
+        Unit::DealDamage(caster, target, damage, 0, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
     }
 
     void Register() override
