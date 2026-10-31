@@ -201,6 +201,8 @@ public:
                 case ACTION_DESPAWN_SUMMONS:
                     summons.DespawnAll();
                     break;
+                default:
+                    break;
             }
         }
 

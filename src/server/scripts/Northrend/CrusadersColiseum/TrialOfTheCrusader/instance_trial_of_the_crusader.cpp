@@ -17,7 +17,6 @@
 
 #include "Containers.h"
 #include "GameTime.h"
-#include "Group.h"
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -26,6 +25,9 @@
 #include "trial_of_the_crusader.h"
 #include <algorithm>
 #include <array>
+#include <list>
+#include <utility>
+#include <vector>
 
 enum InstanceMisc
 {
@@ -1365,6 +1367,8 @@ private:
                 {
                     anubarak->AI()->DoAction(ACTION_DESPAWN_SUMMONS);
                     anubarak->DespawnOrUnsummon();
+                    // The removal is deferred; free the slot now so SpawnAnubArak() in OnPlayerEnter can resummon him
+                    RemoveObject(anubarak, DATA_ANUBARAK);
                 }
                 break;
             case INSTANCE_PROGRESS_DONE:

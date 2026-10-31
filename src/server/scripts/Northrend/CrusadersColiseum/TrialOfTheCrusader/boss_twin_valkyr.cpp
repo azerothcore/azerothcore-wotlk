@@ -183,6 +183,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             empoweredId2 = 67218;
                             touchId2 = 67283;
                             break;
+                        default:
+                            break;
                     }
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(essenceId1);
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(empoweredId1);
@@ -196,6 +198,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 me->SetCanDualWield(true);
                 me->CastSpell(me, SPELL_TWIN_POWER, true);
                 events.RescheduleEvent(EVENT_REMOVE_DUAL_WIELD, 15s);
+                break;
+            default:
                 break;
         }
     }
