@@ -27,7 +27,7 @@ class WorldSocketThread : public NetworkThread<WorldSocket>
 public:
     void SocketAdded(std::shared_ptr<WorldSocket> const& sock) override
     {
-        sock->SetSendBufferSize(sWorldSocketMgr.GetApplicationSendBufferSize());
+        sock->SetSendBufferSize(sWorldSocketMgr->GetApplicationSendBufferSize());
         sScriptMgr->OnSocketOpen(sock);
     }
 
@@ -42,10 +42,10 @@ WorldSocketMgr::WorldSocketMgr() :
 {
 }
 
-WorldSocketMgr& WorldSocketMgr::Instance()
+WorldSocketMgr* WorldSocketMgr::Instance()
 {
     static WorldSocketMgr instance;
-    return instance;
+    return &instance;
 }
 
 bool WorldSocketMgr::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount)
