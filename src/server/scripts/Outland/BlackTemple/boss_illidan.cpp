@@ -807,13 +807,24 @@ struct npc_akama_illidan : public ScriptedAI
         me->SetControlled(false, UNIT_STATE_ROOT);
     }
 
+    void JustRespawned() override
+    {
+        Reset();
+
+        // After a restart with the Council dead and the gate shut, return Akama to the Council
+        if (instance->GetBossState(DATA_ILLIDARI_COUNCIL) == DONE &&
+            instance->GetPersistentData(PERSISTENT_DATA_ILLIDAN_GATE) != DONE &&
+            instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE)
+            DoAction(ACTION_ILLIDARI_COUNCIL_DONE);
+    }
+
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
     {
         CloseGossipMenuFor(player);
         me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
         me->setActive(true);
 
-        if (instance->GetBossState(DATA_AKAMA_ILLIDAN) != DONE)
+        if (instance->GetPersistentData(PERSISTENT_DATA_ILLIDAN_GATE) != DONE)
         {
             me->GetMotionMaster()->MoveWaypoint(PATH_AKAMA_ILLIDARI_COUNCIL_2, false);
         }
@@ -988,8 +999,8 @@ struct npc_akama_illidan : public ScriptedAI
                         udalo->InterruptNonMeleeSpells(false);
                     if (Creature* olum = me->FindNearestCreature(NPC_SPIRIT_OF_OLUM, 15.0f))
                         olum->InterruptNonMeleeSpells(false);
-                    instance->SetBossState(DATA_AKAMA_ILLIDAN, NOT_STARTED);
-                    instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
+                    instance->StorePersistentData(PERSISTENT_DATA_ILLIDAN_GATE, DONE);
+                    instance->HandleGameObject(DATA_ILLIDAN_GATE, true);
                 }, 50680ms); // 20ms
                 me->m_Events.AddEventAtOffset([&] {
                     Talk(SAY_AKAMA_SALUTE);
