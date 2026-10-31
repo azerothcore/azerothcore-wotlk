@@ -1,3 +1,4 @@
+-- DB update 2026_10_31_00 -> 2026_10_31_01
 -- Beasts Combat Stalker: passive combat holder for the Northrend Beasts encounter
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80, `AIName` = 'NullCreatureAI', `VerifiedBuild` = 50664 WHERE `entry` = 36549;
 
