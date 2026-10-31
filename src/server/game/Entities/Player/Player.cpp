@@ -4646,6 +4646,10 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
 void Player::KillPlayer()
 {
+    // Death only releases a vehicle we control (via the charm), so a dead passenger would keep its seat
+    // and the client would never offer to release the spirit
+    ExitVehicle();
+
     if (IsFlying() && !GetTransport())
         GetMotionMaster()->MoveFall();
 
