@@ -23,27 +23,22 @@
 #define KarazhanScriptName "instance_karazhan"
 #define DataHeader "KZ"
 
-uint32 const EncounterCount = 12;
+uint32 const EncounterCount = 11;
 
 enum KZDataTypes
 {
     DATA_ATTUMEN                    = 0,
     DATA_MOROES                     = 1,
     DATA_MAIDEN                     = 2,
-    DATA_OPTIONAL_BOSS              = 3,
-    DATA_OPERA_PERFORMANCE          = 4,
-    DATA_CURATOR                    = 5,
+    DATA_OPERA_PERFORMANCE          = 3,
+    DATA_CURATOR                    = 4,
+    DATA_TERESTIAN                  = 5,
     DATA_ARAN                       = 6,
-    DATA_TERESTIAN                  = 7,
-    DATA_NETHERSPITE                = 8,
-    DATA_CHESS_EVENT                = 9,
-    DATA_MALCHEZAAR                 = 10,
-    DATA_NIGHTBANE                  = 11,
-    DATA_SERVANT_QUARTERS           = 12,
+    DATA_NETHERSPITE                = 7,
+    DATA_CHESS_EVENT                = 8,
+    DATA_MALCHEZAAR                 = 9,
+    DATA_NIGHTBANE                  = 10,
     DATA_OPERA_OZ_DEATHCOUNT        = 13,
-    DATA_KILREK                     = 14,
-
-    MAX_ENCOUNTERS                  = 15,
 
     DATA_GO_CURTAINS                = 18,
     DATA_GO_STAGEDOORLEFT           = 19,
@@ -171,10 +166,15 @@ enum KZGameObjectIds
 
 enum KZMisc
 {
+    // Persistent data
+    DATA_SERVANT_QUARTERS_KILLED            = 0,
+
     OPTIONAL_BOSS_REQUIRED_DEATH_COUNT      = 50,
 
     ACTION_CHESS_PIECE_RESET_ORIENTATION    = 1
 };
+
+uint32 constexpr PersistentDataCount = 1;
 
 enum KarazhanSpells
 {
