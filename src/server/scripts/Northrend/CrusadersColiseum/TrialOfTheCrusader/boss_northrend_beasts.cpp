@@ -117,17 +117,6 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, 10s, 30s);
         }
 
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            if (Dismounted)
-                return;
-
-            events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_SNOBOLLED, 1500ms);
-            events.ScheduleEvent(EVENT_SPELL_BATTER, 5s);
-            events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 25s);
-        }
-
         void AttackStart(Unit* who) override
         {
             if (!Dismounted && who->GetGUID() != TargetGUID)
@@ -145,6 +134,12 @@ public:
             TargetGUID = guid;
             if (Player* carrier = ObjectAccessor::GetPlayer(*me, guid))
                 AttackStart(carrier);
+
+            // Started on every latch: a Snobold that reboarded Gormok is still engaged, so JustEngagedWith won't fire again
+            events.Reset();
+            events.ScheduleEvent(EVENT_SPELL_SNOBOLLED, 1100ms);
+            events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 2700ms);
+            events.ScheduleEvent(EVENT_SPELL_BATTER, 1100ms);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -293,9 +288,14 @@ public:
 
                     break;
                 case EVENT_SPELL_BATTER:
-                    if (t->IsPlayer())
+                    // Batter is an interrupt, only used once the carrier starts a cast
+                    if (t->IsPlayer() && t->IsNonMeleeSpellCast(false, false, true))
+                    {
                         me->CastSpell(t, SPELL_BATTER);
-                    events.Repeat(6s, 8s);
+                        events.Repeat(8s);
+                    }
+                    else
+                        events.Repeat(250ms);
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
                     if (Dismounted || !t->IsPlayer())
