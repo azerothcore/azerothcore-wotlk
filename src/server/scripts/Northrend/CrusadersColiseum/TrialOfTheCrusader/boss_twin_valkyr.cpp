@@ -823,13 +823,11 @@ class spell_valkyr_touch_aura : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = GetCaster();
-        // Only the touched player takes damage; switching to the matching essence removes the touch
+        // Only the touched player takes damage, and the matching essence absorbs it
         Unit* target = GetTarget();
-        if (!caster || !target->IsAlive() || target->HasSpiritOfRedemptionAura())
+        if (!caster || caster->GetMap()->GetId() != 649 || !target->IsAlive() || target->HasSpiritOfRedemptionAura())
             return;
 
-        uint32 absorb = 0;
-        uint32 resist = 0;
         int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
         uint32 damage = dmg;
         int32 resilienceReduction = damage;
@@ -840,6 +838,9 @@ class spell_valkyr_touch_aura : public AuraScript
         uint32 mitigated_damage = resilienceReduction;
         DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
         Unit::CalcAbsorbResist(dmgInfo);
+        uint32 absorb = dmgInfo.GetAbsorb();
+        uint32 resist = dmgInfo.GetResist();
+        damage = dmgInfo.GetDamage();
         Unit::DealDamageMods(target, damage, &absorb);
         int32 overkill = damage - target->GetHealth();
         if (overkill < 0)
