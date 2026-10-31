@@ -34,22 +34,33 @@ const Position OptionalSpawn[] =
     { -10899.903320f, -2085.573730f, 49.474449f, 1.38f }  // Rokad the Ravager
 };
 
+// Every boss is listed, even those this script never looks up:
+// mod-playerbots strategies find them through GetCreature().
 ObjectData const creatureData[] =
 {
-    { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN   },
-    { NPC_SHADE_OF_ARAN,        DATA_ARAN      },
-    { NPC_MIDNIGHT,             DATA_MIDNIGHT  },
-    { NPC_DOROTHEE,             DATA_DOROTHEE  },
-    { NPC_TITO,                 DATA_TITO      },
-    { NPC_ROAR,                 DATA_ROAR      },
-    { NPC_STRAWMAN,             DATA_STRAWMAN  },
-    { NPC_TINHEAD,              DATA_TINHEAD   },
-    { NPC_ROMULO,               DATA_ROMULO    },
-    { NPC_JULIANNE,             DATA_JULIANNE  },
-    { NPC_NIGHTBANE,            DATA_NIGHTBANE },
-    { NPC_TERESTIAN_ILLHOOF,    DATA_TERESTIAN },
-    { NPC_TENRIS_MIRKBLOOD,     DATA_MIRKBLOOD },
-    { 0,                        0              }
+    { NPC_ATTUMEN_THE_HUNTSMAN,         DATA_ATTUMEN         },
+    { NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED, DATA_ATTUMEN_MOUNTED },
+    { NPC_MOROES,                       DATA_MOROES          },
+    { NPC_MAIDEN_OF_VIRTUE,             DATA_MAIDEN          },
+    { NPC_CURATOR,                      DATA_CURATOR         },
+    { NPC_NETHERSPITE,                  DATA_NETHERSPITE     },
+    { NPC_PRINCE_MALCHEZAAR,            DATA_MALCHEZAAR      },
+    { NPC_ECHO_OF_MEDIVH,               DATA_ECHO_OF_MEDIVH  },
+    { NPC_SHADE_OF_ARAN,                DATA_ARAN            },
+    { NPC_MIDNIGHT,                     DATA_MIDNIGHT        },
+    { NPC_DOROTHEE,                     DATA_DOROTHEE        },
+    { NPC_TITO,                         DATA_TITO            },
+    { NPC_ROAR,                         DATA_ROAR            },
+    { NPC_STRAWMAN,                     DATA_STRAWMAN        },
+    { NPC_TINHEAD,                      DATA_TINHEAD         },
+    { NPC_THE_CRONE,                    DATA_CRONE           },
+    { NPC_ROMULO,                       DATA_ROMULO          },
+    { NPC_JULIANNE,                     DATA_JULIANNE        },
+    { NPC_BIG_BAD_WOLF,                 DATA_BIG_BAD_WOLF    },
+    { NPC_NIGHTBANE,                    DATA_NIGHTBANE       },
+    { NPC_TERESTIAN_ILLHOOF,            DATA_TERESTIAN       },
+    { NPC_TENRIS_MIRKBLOOD,             DATA_MIRKBLOOD       },
+    { 0,                                0                    }
 };
 
 ObjectData const gameObjectData[] =
@@ -137,9 +148,6 @@ public:
                     break;
                 case NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES:
                     _medivhCheatFiresGUID.insert(creature->GetGUID());
-                    break;
-                case NPC_ECHO_OF_MEDIVH:
-                    _echoOfMedivhGUID = creature->GetGUID();
                     break;
                 case NPC_FIENDISH_IMP:
                     if (Creature* terestrian = GetCreature(DATA_TERESTIAN))
@@ -474,7 +482,7 @@ public:
                 case DATA_NIGHTBANE:
                     return m_uiNightBaneGUID;
                 case DATA_ECHO_OF_MEDIVH:
-                    return _echoOfMedivhGUID;
+                    return GetObjectGuid(DATA_ECHO_OF_MEDIVH);
                 case DATA_DUST_COVERED_CHEST:
                     return DustCoveredChest;
             }
@@ -501,7 +509,6 @@ public:
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
         ObjectGuid _barnesGUID;
-        ObjectGuid _echoOfMedivhGUID;
 
         GuidVector _operaDecorations[EVENT_RAJ];
         GuidSet _chessPiecesGUID;

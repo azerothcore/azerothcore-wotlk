@@ -70,7 +70,11 @@ enum KZDataTypes
     DATA_TINHEAD                    = 43,
     DATA_TITO                       = 44,
 
-    DATA_MIRKBLOOD                  = 45
+    DATA_MIRKBLOOD                  = 45,
+
+    DATA_ATTUMEN_MOUNTED            = 46,
+    DATA_BIG_BAD_WOLF               = 47,
+    DATA_CRONE                      = 48
 };
 
 enum KZOperaEvents
@@ -92,6 +96,10 @@ enum KZCreatures
     NPC_MIDNIGHT                        = 16151,
     NPC_NIGHTBANE                       = 17225,
     NPC_SHADE_OF_ARAN                   = 16524,
+    NPC_MAIDEN_OF_VIRTUE                = 16457,
+    NPC_CURATOR                         = 15691,
+    NPC_NETHERSPITE                     = 15689,
+    NPC_PRINCE_MALCHEZAAR               = 15690,
 
     // Trash
     NPC_COLDMIST_WIDOW                  = 16171,
@@ -112,6 +120,8 @@ enum KZCreatures
     NPC_ROAR                            = 17546,
     NPC_STRAWMAN                        = 17543,
     NPC_TINHEAD                         = 17547,
+    NPC_THE_CRONE                       = 18168,
+    NPC_BIG_BAD_WOLF                    = 17521,
     NPC_FIENDISH_IMP                    = 17267,
 
     // Chess Event

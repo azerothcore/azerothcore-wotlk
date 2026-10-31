@@ -53,6 +53,7 @@ enum CreatureIds
     NPC_HEXLORD                         = 24239,
     NPC_HALAZZI                         = 23577,
     NPC_NALORAKK                        = 23576,
+    NPC_AKILZON                         = 23574,
     NPC_SPIRIT_LYNX                     = 24143,
     NPC_AMANISHI_SAVAGE                 = 23889,
     NPC_AMANISHI_WARBRINGER             = 23580,

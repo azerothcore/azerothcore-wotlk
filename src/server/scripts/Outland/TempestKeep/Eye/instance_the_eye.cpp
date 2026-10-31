@@ -21,9 +21,13 @@
 #include "SpellScriptLoader.h"
 #include "the_eye.h"
 
+// Every boss is listed, even those this script never looks up:
+// mod-playerbots strategies find them through GetCreature().
 ObjectData const creatureData[] =
 {
     { NPC_ALAR,             DATA_ALAR           },
+    { NPC_VOID_REAVER,      DATA_REAVER         },
+    { NPC_ASTROMANCER,      DATA_ASTROMANCER    },
     { NPC_KAELTHAS,         DATA_KAELTHAS       },
     { NPC_THALADRED,        DATA_THALADRED      },
     { NPC_LORD_SANGUINAR,   DATA_LORD_SANGUINAR },

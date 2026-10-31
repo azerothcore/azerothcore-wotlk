@@ -44,6 +44,8 @@ enum EyeData
 enum EyeNPCs
 {
     NPC_ALAR                = 19514,
+    NPC_VOID_REAVER         = 19516,
+    NPC_ASTROMANCER         = 18805,
     NPC_KAELTHAS            = 19622,
     NPC_THALADRED           = 20064,
     NPC_LORD_SANGUINAR      = 20060,

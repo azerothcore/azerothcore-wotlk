@@ -26,10 +26,17 @@ DoorData const doorData[] =
     { 0,                0,              DOOR_TYPE_ROOM    } // END
 };
 
+// Every boss is listed, even those this script never looks up:
+// mod-playerbots strategies find them through GetCreature().
 ObjectData const creatureData[] =
 {
-    { NPC_MAULGAR, DATA_MAULGAR },
-    { 0,           0            }
+    { NPC_MAULGAR,            DATA_MAULGAR            },
+    { NPC_KROSH_FIREHAND,     DATA_KROSH_FIREHAND     },
+    { NPC_OLM_THE_SUMMONER,   DATA_OLM_THE_SUMMONER   },
+    { NPC_KIGGLER_THE_CRAZED, DATA_KIGGLER_THE_CRAZED },
+    { NPC_BLINDEYE_THE_SEER,  DATA_BLINDEYE_THE_SEER  },
+    { NPC_GRUUL,              DATA_GRUUL              },
+    { 0,                      0                       }
 };
 
 MinionData const minionData[] =

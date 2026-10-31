@@ -31,7 +31,12 @@ enum DataTypes
     MAX_ENCOUNTER               = 2,
 
     DATA_ADDS_KILLED            = 10,
-    MAX_ADD_NUMBER              = 4
+    MAX_ADD_NUMBER              = 4,
+
+    DATA_KROSH_FIREHAND         = 11,
+    DATA_OLM_THE_SUMMONER       = 12,
+    DATA_KIGGLER_THE_CRAZED     = 13,
+    DATA_BLINDEYE_THE_SEER      = 14
 };
 
 enum CreatureIds
@@ -40,7 +45,8 @@ enum CreatureIds
     NPC_KROSH_FIREHAND          = 18832,
     NPC_OLM_THE_SUMMONER        = 18834,
     NPC_KIGGLER_THE_CRAZED      = 18835,
-    NPC_BLINDEYE_THE_SEER       = 18836
+    NPC_BLINDEYE_THE_SEER       = 18836,
+    NPC_GRUUL                   = 19044
 };
 
 enum GameObjectIds
