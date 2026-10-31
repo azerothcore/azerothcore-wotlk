@@ -1612,7 +1612,7 @@ public:
 
                     if (Creature* c = instance->GetCreature(NPC_AnubarakGUID))
                     {
-                        c->AI()->DoAction(-1);
+                        c->AI()->DoAction(ACTION_ANUBARAK_DESPAWN_SUMMONS);
                         c->DespawnOrUnsummon();
                     }
                     NPC_AnubarakGUID.Clear();

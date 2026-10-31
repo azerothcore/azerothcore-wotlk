@@ -353,6 +353,11 @@ enum BarrettMisc
     ACTION_BARRETT_LEAVE                            = 1,
 };
 
+enum AnubarakActions
+{
+    ACTION_ANUBARAK_DESPAWN_SUMMONS                 = 1,
+};
+
 const Position FactionChampionLoc[] =
 {
     {514.231f, 105.569f, 418.234f, 0},                  // 0 - Horde Initial Pos 0
