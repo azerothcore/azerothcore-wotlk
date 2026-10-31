@@ -67,11 +67,6 @@ enum GormokData
     DATA_SNOBOLD_CARRIER,
 };
 
-enum GormokNPCs
-{
-    NPC_SNOBOLD_VASSAL                  = 34800,
-};
-
 enum Yells
 {
     // Gormok
@@ -170,7 +165,7 @@ public:
 
         Creature* GetGormok() const
         {
-            return pInstance ? ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) : nullptr;
+            return pInstance ? ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_GORMOK)) : nullptr;
         }
 
         // Prefers players away from Gormok's melee, falling back to anyone when they are all on him
@@ -522,7 +517,7 @@ public:
         {
             switch (param)
             {
-                case -1:
+                case ACTION_DESPAWN_SUMMONS:
                     summons.DespawnAll();
                     break;
             }
@@ -870,7 +865,7 @@ public:
             _SPELL_SPRAY = SPELL_PARALYTIC_SPRAY;
             _MODEL_STATIONARY = MODEL_ACIDMAW_STATIONARY;
             _MODEL_MOBILE = MODEL_ACIDMAW_MOBILE;
-            _TYPE_OTHER = TYPE_DREADSCALE;
+            _TYPE_OTHER = DATA_DREADSCALE;
             me->SetCombatMovement(false);
         }
     };
@@ -896,7 +891,7 @@ public:
             _SPELL_SPRAY = SPELL_BURNING_SPRAY;
             _MODEL_STATIONARY = MODEL_DREADSCALE_STATIONARY;
             _MODEL_MOBILE = MODEL_DREADSCALE_MOBILE;
-            _TYPE_OTHER = TYPE_ACIDMAW;
+            _TYPE_OTHER = DATA_ACIDMAW;
         }
     };
 

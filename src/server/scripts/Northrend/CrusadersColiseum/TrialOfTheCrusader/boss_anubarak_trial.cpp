@@ -198,7 +198,7 @@ public:
         {
             switch (param)
             {
-                case -1:
+                case ACTION_DESPAWN_SUMMONS:
                     summons.DespawnAll();
                     break;
             }
@@ -589,7 +589,7 @@ public:
                 {
                     permafrostTimer = 0;
                     me->RemoveAurasDueToSpell(SPELL_FROST_SPHERE);
-                    me->SetDisplayId(11686);
+                    me->SetDisplayId(MODEL_INVISIBLE_STALKER);
                     me->SetObjectScale(2.0f);
                     me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 142.7f, me->GetOrientation(), false);
                     me->SetFacingTo(me->GetOrientation());
@@ -620,9 +620,8 @@ public:
         {
             // I am summoned by another npc (SPELL_EFFECT_FORCE_CAST), inform Anub'arak
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (ObjectGuid guid = pInstance->GetGuidData(TYPE_ANUBARAK))
-                    if (Creature* anub = pInstance->instance->GetCreature(guid))
-                        CAST_AI(boss_anubarak_trial::boss_anubarak_trialAI, anub->AI())->JustSummoned(me);
+                if (Creature* anub = pInstance->GetCreature(DATA_ANUBARAK))
+                    CAST_AI(boss_anubarak_trial::boss_anubarak_trialAI, anub->AI())->JustSummoned(me);
         }
 
         EventMap events;
