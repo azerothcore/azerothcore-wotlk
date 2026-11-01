@@ -13777,7 +13777,12 @@ void Player::ResyncRunes(uint8 count)
     for (uint32 i = 0; i < count; ++i)
     {
         data << uint8(GetCurrentRune(i));                   // rune type
-        data << uint8(255 - (GetRuneCooldown(i) * 51));     // passed cooldown time (0-255)
+
+        // passed cooldown time (0-255), encoded like the rune list of SMSG_SPELL_GO
+        // cd >= baseCd when a regen aura shortened the base mid-cooldown: send just spent, never ready
+        float cd = float(GetRuneCooldown(i));
+        float baseCd = float(GetRuneBaseCooldown(i, true));
+        data << uint8(!cd ? 255 : cd >= baseCd ? 0 : (baseCd - cd) / baseCd * 255);
     }
     SendDirectMessage(&data);
 }
