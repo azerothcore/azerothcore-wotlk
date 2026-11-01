@@ -21,6 +21,8 @@
 #include "WaypointDefines.h"
 #include <unordered_map>
 
+class WaypointMgrTestAccessor;
+
 class WaypointMgr
 {
 public:
@@ -46,6 +48,8 @@ public:
     }
 
 private:
+    friend class WaypointMgrTestAccessor;
+
     WaypointMgr() { }
 
     std::unordered_map<uint32, WaypointPath> _waypointStore;

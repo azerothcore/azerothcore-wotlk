@@ -82,7 +82,7 @@ bool FormationMovementGenerator::DoUpdate(Creature* owner, uint32 diff)
         {
             if (CreatureGroup* formation = target->ToCreature()->GetFormation())
             {
-                if (Creature* leader = formation->GetLeader())
+                if (Creature* leader = formation->GetMovementLeader())
                 {
                     uint32 currentWaypoint = leader->GetCurrentWaypointID() + 1;
                     if (currentWaypoint == _point1 || currentWaypoint == _point2)
