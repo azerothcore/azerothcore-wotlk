@@ -94,9 +94,20 @@ public:
     bool IsAnyCreatureInCombat() const;
 
     template <typename T>
-    void DespawnIf(T const& predicate)
+    void RemoveIf(T const& predicate)
     {
         storage_.remove_if(predicate);
+    }
+
+    /// Despawns every summon matching the predicate.
+    template <typename T>
+    void DespawnMatching(T predicate)
+    {
+        StorageType copy = storage_;
+        for (ObjectGuid guid : copy)
+            if (predicate(guid))
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+                    summon->DespawnOrUnsummon();
     }
 
     void DoAction(int32 info, uint16 max = 0)
