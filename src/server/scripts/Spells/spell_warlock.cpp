@@ -1466,9 +1466,19 @@ class spell_warl_glyph_of_life_tap : public AuraScript
         caster->CastSpell(caster, SPELL_WARLOCK_GLYPH_OF_LIFE_TAP_TRIGGERED, true, nullptr, aurEff);
     }
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        // Normally procs from both Life Tap cast and energize effect
+        // Block the energizesso that it only procs once
+        return spellInfo && spellInfo->Id != SPELL_WARLOCK_LIFE_TAP_ENERGIZE
+                         && spellInfo->Id != SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2;
+    }
+
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_warl_glyph_of_life_tap::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        DoCheckProc += AuraCheckProcFn(spell_warl_glyph_of_life_tap::CheckProc);
     }
 };
 
