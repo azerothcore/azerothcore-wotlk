@@ -779,6 +779,7 @@ public:
     EquipmentInfo const* GetEquipmentInfo(uint32 entry, int8& id);
     CreatureAddon const* GetCreatureAddon(ObjectGuid::LowType lowguid);
     GameObjectAddon const* GetGameObjectAddon(ObjectGuid::LowType lowguid);
+    void SetGameObjectAddonScale(ObjectGuid::LowType lowguid, float scale);
     [[nodiscard]] GameObjectTemplateAddon const* GetGameObjectTemplateAddon(uint32 entry) const;
     CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
     CreatureMovementData const* GetCreatureMovementOverride(ObjectGuid::LowType spawnId) const;
