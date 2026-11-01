@@ -23,7 +23,6 @@
 #include "QueryResult.h"
 #include "Timer.h"
 #include "Util.h"
-#include <cmath>
 #include <functional>
 #include <vector>
 
@@ -108,7 +107,9 @@ uint32 GetItemEnchantMod(int32 entry)
     }
 
     //we could get here only if sum of all enchantment chances is lower than 100%
-    dRoll = (irand(0, (int)std::floor(fCount * 100) + 1)) / 100;
+    // Reroll over what the group adds up to. Dividing an int by an int landed the roll on
+    // whole percents only, which gave rows of equal chance unequal odds.
+    dRoll = rand_chance() * fCount / 100.0;
     fCount = 0;
 
     for (EnchStoreList::const_iterator ench_iter = tab->second.begin(); ench_iter != tab->second.end(); ++ench_iter)
