@@ -51,9 +51,9 @@ struct boss_lieutenant_drake : public BossAI
         me->GetMotionMaster()->MoveWaypoint(pathId, false);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         scheduler.Schedule(4s, [this](TaskContext context)
         {

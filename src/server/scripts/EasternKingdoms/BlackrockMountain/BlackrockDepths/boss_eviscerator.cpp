@@ -36,9 +36,9 @@ struct boss_eviscerator : public BossAI
 
     bool SpellShieldReady = false;
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY / 5);
         events.ScheduleEvent(SPELL_REND, TIMER_REND / 5);
         events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD / 5);

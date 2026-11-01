@@ -54,9 +54,9 @@ public:
             BossAI::Reset();
         }
 
-        void JustEngagedWith(Unit* /*who*/) override
+        void JustEngagedWith(Unit* who) override
         {
-            _JustEngagedWith();
+            _JustEngagedWith(who);
             events.ScheduleEvent(EVENT_AVATAR, 20s, 30s);
             events.ScheduleEvent(EVENT_GROUND_TREMOR, 15s, 25s);
             events.ScheduleEvent(EVENT_ENTANGLING_ROOTS, 5s, 15s);

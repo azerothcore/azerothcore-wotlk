@@ -70,9 +70,9 @@ struct boss_hazzarah : public BossAI
         summon->DespawnOrUnsummon();
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_SLEEP, 12s, 15s);
         events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
         events.ScheduleEvent(EVENT_CHAIN_BURN, 12s, 28s);

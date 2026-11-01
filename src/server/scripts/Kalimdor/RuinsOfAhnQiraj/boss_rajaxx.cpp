@@ -87,9 +87,9 @@ struct boss_rajaxx : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_DISARM, 10s);
         events.ScheduleEvent(EVENT_THUNDERCRASH, 12s);
     }
