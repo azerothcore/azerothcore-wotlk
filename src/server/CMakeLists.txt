@@ -16,11 +16,15 @@ if ((APPS_BUILD AND NOT APPS_BUILD STREQUAL "none") OR BUILD_TOOLS_DB_IMPORT)
   add_subdirectory(database)
 endif()
 
-if (BUILD_APPLICATION_AUTHSERVER OR BUILD_APPLICATION_WORLDSERVER)
+if (BUILD_APPLICATION_AUTHSERVER OR BUILD_APPLICATION_WORLDSERVER OR BUILD_APPLICATION_VOICESERVER)
   add_subdirectory(shared)
 endif()
 
 if (BUILD_APPLICATION_WORLDSERVER)
   add_subdirectory(game)
   add_subdirectory(scripts)
+endif()
+
+if (BUILD_APPLICATION_VOICESERVER)
+  add_subdirectory(services)
 endif()
