@@ -14254,6 +14254,9 @@ void Unit::SetFeared(bool apply, Unit* fearedBy /*= nullptr*/, bool isFear /*= f
             m_movedByPlayer->ToPlayer()->SetClientControl(this, !apply); // verified
         //else
         //  ToPlayer()->SetClientControl(this, !apply);
+
+        if (!apply)
+            ToPlayer()->ResyncCanFlyToClient();
     }
 }
 
@@ -14286,6 +14289,9 @@ void Unit::SetConfused(bool apply)
             m_movedByPlayer->ToPlayer()->SetClientControl(this, !apply); // verified
         //else
         //  ToPlayer()->SetClientControl(this, !apply);
+
+        if (!apply)
+            ToPlayer()->ResyncCanFlyToClient();
     }
 }
 
@@ -16262,6 +16268,15 @@ bool Unit::SetSwim(bool enable)
 void Unit::SetCanFly(bool enable)
 {
     bool isClientControlled = IsClientControlled();
+
+    // The owning client ignores the spline packet for its own mover, so replay it once Fear/Confuse ends
+    if (Player* player = ToPlayer())
+    {
+        if (isClientControlled)
+            player->ClearPendingCanFlyResync();
+        else if (HasUnitFlag(UNIT_FLAG_FLEEING) || HasUnitFlag(UNIT_FLAG_CONFUSED))
+            player->SetPendingCanFlyResync(enable);
+    }
 
     if (!isClientControlled)
     {
