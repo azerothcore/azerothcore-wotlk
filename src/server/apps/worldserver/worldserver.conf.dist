@@ -4706,6 +4706,20 @@ Rate.Auction.Cut     = 1
 ###################################################################################################
 # PLAYER DUMP
 #
+#    PlayerDump.Dir
+#        Description: Directory in which player dump files are written by .pdump write
+#                     and read by .pdump load.
+#                     Relative paths are resolved from the worldserver working directory.
+#                     A trailing directory separator is optional. The directory is created
+#                     on write if it does not exist.
+#        Examples:    "pdumps"                 - (relative to worldserver working directory)
+#                     "/srv/acore/pdumps/"     - (unix absolute path)
+#                     "C:\AzerothCore\pdumps\" - (windows absolute path)
+#        Default:     "" - (Worldserver working directory)
+
+PlayerDump.Dir = ""
+
+#
 #    PlayerDump.DisallowPaths
 #        Description: Disallow using paths in PlayerDump output files
 #        Default:     1
