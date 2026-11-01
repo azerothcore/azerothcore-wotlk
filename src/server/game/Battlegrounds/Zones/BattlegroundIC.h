@@ -557,6 +557,13 @@ const Position BG_IC_HangarTrigger[2] =
     {7.305609f, -0.095246f, 40.51022f, 3.159046f}
 };
 
+const Position BG_IC_HangarTeleport[2] =
+{
+    {-25.73f, -0.09f, 26.1f, 3.211406f},
+    // Sniffed portal destination; the target trigger is six yards above this position.
+    {7.305609f, -0.095246f, 34.51022f, 3.159046f}
+};
+
 const Position BG_IC_HangarCaptains[4] =
 {
     {825.6667f, -994.00520f, 134.3569f, 3.403392f},
