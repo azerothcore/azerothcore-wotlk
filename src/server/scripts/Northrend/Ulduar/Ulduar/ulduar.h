@@ -67,6 +67,7 @@ enum UlduarData
     DATA_UNBROKEN_ACHIEVEMENT               = 105,
     DATA_LEVIATHAN_DOORS                    = 106,
     DATA_LEVIATHAN_VEHICLES_USABLE          = 107,
+    DATA_MECHANOSTRIKERS_SPAWN              = 108,
 
     // Mimiron creatures
     DATA_MIMIRON_LEVIATHAN_MKII             = 301,
@@ -232,6 +233,7 @@ enum UlduarNPCs
     NPC_IRONWORK_CANNON                     = 33264,
     NPC_ULDUAR_GAUNTLET_GENERATOR           = 33571,
     NPC_DEFENDER_GENERATED                  = 33572,
+    NPC_MECHANOSTRIKER_54_A                 = 34161,
     NPC_ARCHMAGE_RHYDIAN                    = 33696,
     NPC_RUNEFORGED_SENTRY                   = 34234,
     NPC_BRANN_FORMATION_GROUNDS             = 34119,
@@ -381,6 +383,10 @@ enum UlduarMisc
     SUMMON_GROUP_LEVIATHAN_OUTRO_BRANN      = 4, // Brann at the landed machine (kill)
     SUMMON_GROUP_LEVIATHAN_OUTRO_MAGES      = 5, // 12 Kirin Tor Mages flanking Brann's spot
     SUMMON_GROUP_LEVIATHAN_OUTRO_BATTLE_MAGES = 7, // 2 sustaining the portal + 1 at the Formation Grounds teleporter
+    SUMMON_GROUP_MECHANOSTRIKER_NW          = 8,
+    SUMMON_GROUP_MECHANOSTRIKER_SW          = 9,
+    SUMMON_GROUP_MECHANOSTRIKER_NE          = 10,
+    SUMMON_GROUP_MECHANOSTRIKER_SE          = 11,
 
     // gameobject_summon_groups: the Dalaran portal behind the formation
     GO_SUMMON_GROUP_LEVIATHAN_PORTAL        = 1,
@@ -390,6 +396,13 @@ enum UlduarMisc
     PATH_BRANN_FORMATION_GROUNDS            = 341190,
     PATH_RHYDIAN_TO_BRANN                   = 336960,
     PATH_FLYING_MACHINE_APPROACH            = 341200,
+    PATH_MECHANOSTRIKER_NW                  = 341610,
+    PATH_MECHANOSTRIKER_SW                  = 341611,
+    PATH_MECHANOSTRIKER_NE                  = 341612,
+    PATH_MECHANOSTRIKER_SE                  = 341613,
+
+    AREATRIGGER_MECHANOSTRIKER_WEST         = 5428,
+    AREATRIGGER_MECHANOSTRIKER_EAST         = 5442,
 
     // Gossip Keepers, Kirin Tor Mages: teleport-in flash
     SPELL_SIMPLE_TELEPORT_VISUAL            = 12980,
