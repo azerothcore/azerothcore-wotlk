@@ -93,6 +93,23 @@
 RealmID = 1
 
 #
+#    AdditionalRealmIDs
+#        Description: Comma-separated list of additional realmlist row ids
+#                      this worldserver also accepts and manages, as aliases
+#                      of RealmID - e.g. one realmlist row per network/VPN
+#                      address, all pointing at this same worldserver. A
+#                      client that selects one of these ids is accepted the
+#                      same as one that selects RealmID, and every "realm
+#                      online/offline" flag update this worldserver performs
+#                      at startup/shutdown covers RealmID plus every id
+#                      listed here, so alias rows never get stuck offline.
+#                      Each id must range from 1 to 255, same as RealmID.
+#        Default:     "" - (None; only RealmID is accepted/managed)
+#        Example:     "2,3"
+
+AdditionalRealmIDs =
+
+#
 #    WorldServerPort
 #        Description: TCP port to reach the world server.
 #        Default:     8085
