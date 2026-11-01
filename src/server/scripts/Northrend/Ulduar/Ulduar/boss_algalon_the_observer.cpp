@@ -786,6 +786,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 break;
             case EVENT_ENRAGE:
                 DoCastSelf(SPELL_BERSERK, true);
+                Talk(SAY_ALGALON_OUT_OF_TIME);
                 break;
             case EVENT_ANNIHILATE_RAID:
                 DoAction(ACTION_ASCEND);
