@@ -1543,6 +1543,19 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             SetCanTeleport(true);
             Position oldPos = GetPosition();
             Relocate(x, y, z, orientation);
+
+            // Sync the transport offset with the teleport destination, otherwise the
+            // transport repositions us from the stale offset on the next tick.
+            if (m_transport)
+            {
+                float offsetX = x;
+                float offsetY = y;
+                float offsetZ = z;
+                float offsetO = orientation;
+                m_transport->CalculatePassengerOffset(offsetX, offsetY, offsetZ, &offsetO);
+                m_movementInfo.transport.pos.Relocate(offsetX, offsetY, offsetZ, offsetO);
+            }
+
             SendTeleportAckPacket();
             SendTeleportPacket(oldPos); // this automatically relocates to oldPos in order to broadcast the packet in the right place
         }
