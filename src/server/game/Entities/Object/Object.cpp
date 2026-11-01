@@ -3658,7 +3658,8 @@ SpellMissInfo WorldObject::MagicSpellHitResult(Unit* victim, SpellInfo const* sp
             tmp += victim->GetMaxNegativeAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(spellInfo->Dispel)) * 100;
         }
 
-        if (spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL) && (spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_HOLY)) == 0)
+        // Spells with no partial resists get the all-or-nothing roll instead of graded resistance
+        if ((spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL) || spellInfo->HasAttribute(SPELL_ATTR5_NO_PARTIAL_RESISTS)) && (spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_HOLY)) == 0)
             tmp += int32(Unit::GetEffectiveResistChance(unitCaster, spellInfo->GetSchoolMask(), victim, spellInfo) * 10000.0f);
     }
 
