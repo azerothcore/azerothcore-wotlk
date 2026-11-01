@@ -15755,13 +15755,13 @@ void Player::GetTalentTreePoints(uint8 (&specPoints)[3]) const
 
 uint8 Player::GetMostPointsTalentTree() const
 {
-    uint32 specPoints[3] = {0, 0, 0};
+    uint32 specPoints[MAX_TALENT_TABS] = {};
     PlayerTalentMap const& talentMap = GetTalentMap();
     for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
         if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec()))
             if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(itr->second->talentID))
                 if (TalentTabEntry const* tab = sTalentTabStore.LookupEntry(talentInfo->TalentTab))
-                    if (tab->tabpage < 3)
+                    if (tab->tabpage < MAX_TALENT_TABS)
                     {
                         // find current talent rank
                         uint8 currentTalentRank = 0;
@@ -15775,7 +15775,7 @@ uint8 Player::GetMostPointsTalentTree() const
                     }
     uint8 maxIndex = 0;
     uint8 maxCount = specPoints[0];
-    for (uint8 i = 1; i < 3; ++i)
+    for (uint8 i = 1; i < MAX_TALENT_TABS; ++i)
         if (specPoints[i] > maxCount)
         {
             maxIndex = i;
