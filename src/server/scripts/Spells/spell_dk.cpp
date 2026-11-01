@@ -2179,7 +2179,8 @@ class spell_dk_raise_dead : public SpellScript
         targets.SetDst(*GetHitUnit());
 
         GetCaster()->CastSpell(targets, spellInfo, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCaster()->GetGUID());
-        GetCaster()->ToPlayer()->RemoveSpellCooldown(GetSpellInfo()->Id, true);
+        // No cooldown clear here: Raise Dead is cooldown-on-event and its event is sent when the ghoul goes
+        // (Unit::SetMinion). A clear now would also wipe the client's GCD.
     }
 
     void Register() override
