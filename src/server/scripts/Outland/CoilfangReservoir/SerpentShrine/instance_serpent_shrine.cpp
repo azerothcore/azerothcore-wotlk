@@ -27,10 +27,18 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+// Every boss is listed, even those this script never looks up:
+// mod-playerbots strategies find them through GetCreature().
 ObjectData const creatureData[] =
 {
+    { NPC_HYDROSS_THE_UNSTABLE,   DATA_HYDROSS_THE_UNSTABLE   },
+    { NPC_THE_LURKER_BELOW,       DATA_THE_LURKER_BELOW       },
     { NPC_LEOTHERAS_THE_BLIND,    DATA_LEOTHERAS_THE_BLIND    },
     { NPC_FATHOM_LORD_KARATHRESS, DATA_FATHOM_LORD_KARATHRESS },
+    { NPC_FATHOM_GUARD_SHARKKIS,  DATA_FATHOM_GUARD_SHARKKIS  },
+    { NPC_FATHOM_GUARD_TIDALVESS, DATA_FATHOM_GUARD_TIDALVESS },
+    { NPC_FATHOM_GUARD_CARIBDIS,  DATA_FATHOM_GUARD_CARIBDIS  },
+    { NPC_MOROGRIM_TIDEWALKER,    DATA_MOROGRIM_TIDEWALKER    },
     { NPC_LADY_VASHJ,             DATA_LADY_VASHJ             },
     { NPC_SEER_OLUM,              DATA_SEER_OLUM              },
     { 0,                          0                           }

@@ -50,6 +50,8 @@ ObjectData const gameObjectData[] =
     { 0,               0                 }
 };
 
+// Every boss is listed, even those this script never looks up:
+// mod-playerbots strategies find them through GetCreature().
 ObjectData const creatureData[] =
 {
     { NPC_HIGH_WARLORD_NAJENTUS,     DATA_HIGH_WARLORD_NAJENTUS     },
@@ -59,6 +61,9 @@ ObjectData const creatureData[] =
     { NPC_TERON_GOREFIEND,           DATA_TERON_GOREFIEND           },
     { NPC_GURTOGG_BLOODBOIL,         DATA_GURTOGG_BLOODBOIL         },
     { NPC_RELIQUARY_OF_THE_LOST,     DATA_RELIQUARY_OF_SOULS        },
+    { NPC_ESSENCE_OF_SUFFERING,      DATA_ESSENCE_OF_SUFFERING      },
+    { NPC_ESSENCE_OF_DESIRE,         DATA_ESSENCE_OF_DESIRE         },
+    { NPC_ESSENCE_OF_ANGER,          DATA_ESSENCE_OF_ANGER          },
     { NPC_MOTHER_SHAHRAZ,            DATA_MOTHER_SHAHRAZ            },
     { NPC_ILLIDARI_COUNCIL,          DATA_ILLIDARI_COUNCIL          },
     { NPC_GATHIOS_THE_SHATTERER,     DATA_GATHIOS_THE_SHATTERER     },

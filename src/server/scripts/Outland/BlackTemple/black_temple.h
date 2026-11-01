@@ -44,7 +44,10 @@ enum DataTypes
     DATA_VERAS_DARKSHADOW           = 15,
     DATA_BLACK_TEMPLE_TRIGGER       = 16,
     DATA_AKAMA_ILLIDAN              = 17,
-    DATA_ILLIDAN_GATE               = 18
+    DATA_ILLIDAN_GATE               = 18,
+    DATA_ESSENCE_OF_SUFFERING       = 19,
+    DATA_ESSENCE_OF_DESIRE          = 20,
+    DATA_ESSENCE_OF_ANGER           = 21
 };
 
 enum BTPersistentData
@@ -69,6 +72,9 @@ enum CreatureIds
     NPC_HUNGERING_SOUL_FRAGMENT     = 23401,
     NPC_SUFFERING_SOUL_FRAGMENT     = 23399,
     NPC_RELIQUARY_OF_THE_LOST       = 22856,
+    NPC_ESSENCE_OF_SUFFERING        = 23418,
+    NPC_ESSENCE_OF_DESIRE           = 23419,
+    NPC_ESSENCE_OF_ANGER            = 23420,
     NPC_ENSLAVED_SOUL               = 23469,
     NPC_MOTHER_SHAHRAZ              = 22947,
     NPC_GATHIOS_THE_SHATTERER       = 22949,
