@@ -15,6 +15,40 @@ package manage or by using the [documentation from docker](https://docs.docker.c
 
 ### Running the Build
 
+Docker builds retain an incremental Ninja workspace in a locked BuildKit cache, in
+addition to ccache. Unchanged source files keep their timestamps even after a fresh
+checkout. A changed source file rebuilds its dependents instead of replaying every
+compiler invocation through ccache. The install directory is regenerated on every
+build so removed targets cannot leave obsolete artifacts in the runtime image.
+
+Changing build options, CMake configuration files, toolchain packages, the build helper, or the set of source
+paths/symlink targets resets the binary directory. The stamp is updated before
+configuration, so a failed build cannot leave another configuration marked reusable.
+The ccache namespace uses toolchain/options and include paths/symlink targets;
+CMake edits and added translation units reset Ninja without throwing away compatible
+ccache entries. New shadow headers still invalidate direct-cache hits. Losing the
+cache is safe: the next build starts cold.
+
+Git metadata is mounted outside the persistent workspace, allowing clone and worktree
+contexts to share a builder. The db-import image explicitly uses `/azerothcore` as its
+SQL source directory rather than the cached build-time source path.
+
+The workspace stays local to the BuildKit builder; a fresh CI runner or cache
+eviction still requires a rebuild. An unchanged Docker layer may skip the build
+entirely, which is different from a fast incremental compilation. `CACHEBUST` forces
+the build instruction to run without discarding its compatible workspace.
+
+Use `--build-arg BUILD_JOBS=3` with `docker build` to bound compiler parallelism.
+The default remains the number of available processors plus one. The helper prints
+`BUILD_CACHE_TIMINGS` with separate configure, build and install wall times.
+
+Regression tests for the workspace helper (requires CMake, Ninja, Clang, ccache,
+rsync and dpkg-query, as provided by the build image):
+
+```console
+python3 apps/docker/tests/test_build_cache.py
+```
+
 1. Build containers with command
 
 ```console
