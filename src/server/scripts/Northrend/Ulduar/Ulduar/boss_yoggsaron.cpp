@@ -1090,34 +1090,58 @@ struct boss_yoggsaron_guardian_of_ys : public ScriptedAI
 {
     boss_yoggsaron_guardian_of_ys(Creature* creature) : ScriptedAI(creature) { }
 
-    uint32 _spellTimer;
-
     void Reset() override
     {
-        _spellTimer = 0;
+        scheduler.CancelAll();
+        _dying = false;
         me->SetInCombatWithZone();
+
+        ScheduleTimedEvent(8s, [this]
+        {
+            if (!_dying && me->GetVictim())
+                DoCastSelf(SPELL_DARK_VOLLEY);
+        }, 8s);
     }
 
-    void JustDied(Unit*) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
+        if (_dying)
+        {
+            damage = 0;
+            return;
+        }
+
+        if (damage < me->GetHealth())
+            return;
+
+        damage = me->GetHealth() - 1;
+        _dying = true;
+        me->InterruptNonMeleeSpells(false);
         DoCastAOE(SPELL_SHADOW_NOVA, true);
+
+        ScheduleUniqueTimedEvent(100ms, [this]()
+        {
+            me->KillSelf();
+        }, 1);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
         DoCastAOE(SPELL_SHADOW_NOVA_SARA, true);
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
-            return;
+        scheduler.Update(diff);
 
-        _spellTimer += diff;
-        if (_spellTimer > 8000)
-        {
-            me->CastSpell(me, SPELL_DARK_VOLLEY, false);
-            _spellTimer = 0;
-        }
+        if (_dying || !UpdateVictim())
+            return;
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    bool _dying = false;
 };
 
 struct boss_yoggsaron : public ScriptedAI
