@@ -65,7 +65,6 @@
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
 #include "Totem.h"
-#include "TotemAI.h"
 #include "Transport.h"
 #include "UpdateFieldFlags.h"
 #include "UpdateFields.h"
@@ -7937,43 +7936,6 @@ bool RedirectSpellEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     }
 
     return true;
-}
-
-Unit* Unit::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
-{
-    if (!spellInfo->CanBeRedirectedBySpellMagnet())
-        return victim;
-
-    Unit::AuraEffectList const& magnetAuras = victim->GetAuraEffectsByType(SPELL_AURA_SPELL_MAGNET);
-    for (Unit::AuraEffectList::const_iterator itr = magnetAuras.begin(); itr != magnetAuras.end(); ++itr)
-    {
-        if (Unit* magnet = (*itr)->GetBase()->GetUnitOwner())
-            if (spellInfo->CheckExplicitTarget(this, magnet) == SPELL_CAST_OK
-                    //&& spellInfo->CheckTarget(this, magnet, false) == SPELL_CAST_OK
-                    && _IsValidAttackTarget(magnet, spellInfo)
-                    /*&& IsWithinLOSInMap(magnet)*/)
-            {
-                // Xinef: We should choose minimum between flight time and queue time as in reflect, however we dont know flight time at this point, use arbitrary small number
-                magnet->m_Events.AddEvent(new RedirectSpellEvent(*magnet, victim->GetGUID(), *itr), magnet->m_Events.CalculateQueueTime(100));
-
-                if (magnet->IsTotem())
-                {
-                    uint64 queueTime = magnet->m_Events.CalculateQueueTime(100);
-                    if (spellInfo->Speed > 0.0f)
-                    {
-                        float dist = GetDistance(magnet->GetPositionX(), magnet->GetPositionY(), magnet->GetPositionZ());
-                        if (dist < 5.0f)
-                            dist = 5.0f;
-                        queueTime = magnet->m_Events.CalculateTime((uint64)std::floor(dist / spellInfo->Speed * 1000.0f));
-                    }
-
-                    magnet->m_Events.AddEvent(new KillMagnetEvent(*magnet), queueTime);
-                }
-
-                return magnet;
-            }
-    }
-    return victim;
 }
 
 Unit* Unit::GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
