@@ -1001,8 +1001,10 @@ void Player::UpdateRuneRegen(RuneType rune)
     SetFloatValue(PLAYER_RUNE_REGEN_1 + uint8(rune), regen);
 
     // the client times death runes by this rate, the server by their base rune: slowest so the client is never early
-    SetFloatValue(PLAYER_RUNE_REGEN_1 + RUNE_DEATH, std::min({ GetFloatValue(PLAYER_RUNE_REGEN_1 + RUNE_BLOOD),
-        GetFloatValue(PLAYER_RUNE_REGEN_1 + RUNE_UNHOLY), GetFloatValue(PLAYER_RUNE_REGEN_1 + RUNE_FROST) }));
+    SetFloatValue(PLAYER_RUNE_REGEN_1 + uint8(RUNE_DEATH), std::min({
+        GetFloatValue(PLAYER_RUNE_REGEN_1 + uint8(RUNE_BLOOD)),
+        GetFloatValue(PLAYER_RUNE_REGEN_1 + uint8(RUNE_UNHOLY)),
+        GetFloatValue(PLAYER_RUNE_REGEN_1 + uint8(RUNE_FROST)) }));
 }
 
 void Player::_ApplyAllStatBonuses()
