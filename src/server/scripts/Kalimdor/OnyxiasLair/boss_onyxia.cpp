@@ -775,7 +775,10 @@ class spell_onyxia_disturb_lava_fissure : public SpellScript
 
     void FilterFissures(std::list<WorldObject*>& targets)
     {
-        Unit* caster = GetCaster();
+        // Bellowing Roar is cast by Onyxia, an Eruption by the fissure itself
+        WorldObject* caster = GetCaster();
+        if (!caster)
+            caster = GetGObjCaster();
         if (!caster)
             return;
 
@@ -787,9 +790,7 @@ class spell_onyxia_disturb_lava_fissure : public SpellScript
         if (GetSpellInfo()->Id == SPELL_BELLOWINGROAR)
             return;
 
-        // A fissure's Eruption is cast by a trigger the fissure summons
-        TempSummon* trigger = caster->ToTempSummon();
-        GameObject* fissure = trigger ? trigger->GetSummonerGameObject() : nullptr;
+        GameObject* fissure = GetGObjCaster();
         if (!fissure)
             return;
 
@@ -797,12 +798,23 @@ class spell_onyxia_disturb_lava_fissure : public SpellScript
             targets.clear();
     }
 
-    // The default effect sets the fissure off; every hit also plays its crack animation, even while the fissure's
-    // trap cooldown keeps it from erupting again
+    // Every hit plays the fissure's crack animation, even while its trap cooldown keeps it from erupting again
     void HandleActivateObject(SpellEffIndex /*effIndex*/)
     {
-        if (GameObject* fissure = GetHitGObj())
-            fissure->SendCustomAnim(0);
+        GameObject* fissure = GetHitGObj();
+        if (!fissure)
+            return;
+
+        fissure->SendCustomAnim(0);
+
+        // The default effect only sets a gameobject off for a unit caster, which leaves out an Eruption, cast by the
+        // fissure itself; Onyxia's Roar started the chain, so it is passed on in her name
+        if (!GetGObjCaster())
+            return;
+
+        if (InstanceScript* instance = fissure->GetInstanceScript())
+            if (Creature* onyxia = instance->GetCreature(DATA_ONYXIA))
+                fissure->Use(onyxia);
     }
 
     void Register() override
