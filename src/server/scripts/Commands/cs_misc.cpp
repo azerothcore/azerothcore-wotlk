@@ -2901,12 +2901,11 @@ public:
         Player* target = player->GetConnectedPlayer();
         uint32 accountId = target ? target->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
 
-        // find only player from same account if any
-        if (!target)
-            if (WorldSession* session = sWorldSessionMgr->FindSession(accountId))
-            {
-                target = session->GetPlayer();
-            }
+        // The account may be online on another character or idle at character select, where
+        // the session has no player but keeps its mute time for every character it logs in.
+        WorldSession* session = target ? target->GetSession() : sWorldSessionMgr->FindSession(accountId);
+        if (!target && session)
+            target = session->GetPlayer();
 
         // must have strong lesser security level
         if (handler->HasLowerSecurity(target, player->GetGUID(), true))
@@ -2937,11 +2936,11 @@ public:
             muteBy = handler->GetAcoreString(LANG_CONSOLE);
         }
 
-        if (target)
+        if (session)
         {
-            // Target is online, mute will be in effect right away.
+            // Account is online, mute will be in effect right away.
             int64 muteTime = GameTime::GetGameTime().count() + muteDuration;
-            target->GetSession()->m_muteTime = muteTime;
+            session->m_muteTime = muteTime;
             stmt->SetData(0, muteTime);
             std::string nameLink = handler->playerLink(player->GetName());
 
@@ -2950,11 +2949,12 @@ public:
                 handler->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
             }
 
-            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(muteDuration, true), muteBy, muteReasonStr);
+            if (target)
+                ChatHandler(session).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(muteDuration, true), muteBy, muteReasonStr);
         }
         else
         {
-            // Target is offline, mute will be in effect starting from the next login.
+            // Account is offline, mute will be in effect starting from the next login.
             stmt->SetData(0, -int32(muteDuration));
         }
 
@@ -2972,7 +2972,7 @@ public:
 
         std::string nameLink = handler->playerLink(player->GetName());
 
-        if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
+        if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !session)
         {
             handler->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
         }
@@ -2983,7 +2983,7 @@ public:
             HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
             for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->second->GetSession()->GetSecurity())
-                    ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED,
+                    ChatHandler(itr->second->GetSession()).PSendSysMessage(session ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED,
                             (handler->GetSession() ? handler->GetSession()->GetPlayerName() : handler->GetAcoreString(LANG_CONSOLE)), nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
         }
 
@@ -3006,14 +3006,10 @@ public:
         Player* playerTarget = target->GetConnectedPlayer();
         uint32 accountId = playerTarget ? playerTarget->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(target->GetGUID());
 
-        // find only player from same account if any
-        if (!playerTarget)
-        {
-            if (WorldSession* session = sWorldSessionMgr->FindSession(accountId))
-            {
-                playerTarget = session->GetPlayer();
-            }
-        }
+        // The account may be online on another character or idle at character select.
+        WorldSession* session = playerTarget ? playerTarget->GetSession() : sWorldSessionMgr->FindSession(accountId);
+        if (!playerTarget && session)
+            playerTarget = session->GetPlayer();
 
         // must have strong lesser security level
         if (handler->HasLowerSecurity(playerTarget, target->GetGUID(), true))
@@ -3021,15 +3017,15 @@ public:
             return false;
         }
 
-        if (playerTarget)
+        if (session)
         {
-            if (playerTarget->CanSpeak())
+            if (session->m_muteTime <= GameTime::GetGameTime().count())
             {
                 handler->SendErrorMessage(LANG_CHAT_ALREADY_ENABLED);
                 return false;
             }
 
-            playerTarget->GetSession()->m_muteTime = 0;
+            session->m_muteTime = 0;
         }
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);

@@ -67,8 +67,11 @@ public:
         ObjectGuid NPC_DreadscaleGUID;
         ObjectGuid NPC_AcidmawGUID;
         ObjectGuid NPC_IcehowlGUID;
+        ObjectGuid NPC_BeastsCombatStalkerGUID;
         ObjectGuid NPC_JaraxxusGUID;
         GuidVector NPC_ChampionGUIDs;
+        // kept out of NPC_ChampionGUIDs, its size is the kill count that completes the encounter
+        GuidVector NPC_ChampionPetGUIDs;
         ObjectGuid NPC_LightbaneGUID;
         ObjectGuid NPC_DarkbaneGUID;
         ObjectGuid NPC_LichKingGUID;
@@ -216,6 +219,22 @@ public:
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0ms);
 
             NPC_ChampionGUIDs.clear();
+            NPC_ChampionPetGUIDs.clear();
+        }
+
+        void DespawnChampionPets()
+        {
+            for (ObjectGuid const& guid : NPC_ChampionPetGUIDs)
+                if (Creature* c = instance->GetCreature(guid))
+                    c->DespawnOrUnsummon();
+            NPC_ChampionPetGUIDs.clear();
+        }
+
+        void DespawnBeastsCombatStalker()
+        {
+            if (Creature* c = instance->GetCreature(NPC_BeastsCombatStalkerGUID))
+                c->DespawnOrUnsummon();
+            NPC_BeastsCombatStalkerGUID.Clear();
         }
 
         // Retail makes every player a vehicle for the whole Northrend Beasts encounter so Snobold Vassals can ride them
@@ -226,6 +245,8 @@ public:
             {
                 if (kit || !player->CreateVehicleKit(VEHICLE_SNOBOLD_CARRIER, 0))
                     return;
+
+                player->GetVehicleKit()->SetBoardableByPlayers(false);
             }
             else
             {
@@ -291,8 +312,15 @@ public:
                 case NPC_ICEHOWL:
                     NPC_IcehowlGUID = creature->GetGUID();
                     break;
+                case NPC_BEASTS_COMBAT_STALKER:
+                    NPC_BeastsCombatStalkerGUID = creature->GetGUID();
+                    break;
                 case NPC_JARAXXUS:
                     NPC_JaraxxusGUID = creature->GetGUID();
+                    break;
+                case NPC_ZHAAGRYM:
+                case NPC_CAT:
+                    NPC_ChampionPetGUIDs.push_back(creature->GetGUID());
                     break;
                 case NPC_LIGHTBANE:
                     NPC_LightbaneGUID = creature->GetGUID();
@@ -386,14 +414,6 @@ public:
                 case TYPE_GORMOK:
                     if (data == DONE)
                     {
-                        if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
-                        {
-                            trigger->SetDisplayId(11686);
-                            trigger->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
-                            trigger->SetFaction(FACTION_MONSTER);
-                            trigger->SetInCombatWithZone();
-                        }
-
                         northrendBeastsMask |= 1;
                         if ((northrendBeastsMask & 7) == 7)
                             SetBossState(BOSS_NORTHREND_BEASTS, DONE);
@@ -406,14 +426,6 @@ public:
                     {
                         if (++Counter == 2)
                         {
-                            if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
-                            {
-                                trigger->SetDisplayId(11686);
-                                trigger->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
-                                trigger->SetFaction(FACTION_MONSTER);
-                                trigger->SetInCombatWithZone();
-                            }
-
                             if (Creature* c = instance->GetCreature(NPC_AcidmawGUID))
                                 c->DespawnOrUnsummon(10s);
                             if (Creature* c = instance->GetCreature(NPC_DreadscaleGUID))
@@ -491,6 +503,7 @@ public:
                         northrendBeastsMask = 0;
                         InstanceProgress = INSTANCE_PROGRESS_BEASTS_DEAD;
                         SetSnoboldCarriers(false);
+                        DespawnBeastsCombatStalker();
                         HandleGameObject(GO_EnterGateGUID, true);
                         events.CancelEvent(EVENT_NORTHREND_BEASTS_ENRAGE);
                         events.RescheduleEvent(EVENT_SCENE_BEASTS_DONE, 2500ms);
@@ -520,6 +533,7 @@ public:
                             if (Creature* c = instance->GetCreature(guid))
                                 c->DespawnOrUnsummon(15s);
                         NPC_ChampionGUIDs.clear();
+                        DespawnChampionPets();
 
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                         {
@@ -693,6 +707,13 @@ public:
                             c->AI()->Talk(SAY_STAGE_0_02);
                         HandleGameObject(GO_MainGateGUID, true);
                         HandleGameObject(GO_EnterGateGUID, false);
+
+                        // Keeps the raid in combat from the gate opening until the last beast dies
+                        if (Creature* stalker = instance->SummonCreature(NPC_BEASTS_COMBAT_STALKER, Locs[LOC_BEASTS_COMBAT_STALKER]))
+                        {
+                            stalker->SetCombatPulseDelay(5);
+                            stalker->AI()->DoZoneInCombat();
+                        }
 
                         events.RescheduleEvent(EVENT_SUMMON_GORMOK, 1s);
                         if (instance->IsHeroic())
@@ -1529,6 +1550,7 @@ public:
                     if (Creature* c = instance->GetCreature(NPC_IcehowlGUID))
                         c->DespawnOrUnsummon();
                     NPC_IcehowlGUID.Clear();
+                    DespawnBeastsCombatStalker();
                     northrendBeastsMask = 0;
                     SetSnoboldCarriers(false);
                     break;
@@ -1561,6 +1583,7 @@ public:
                         if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
                     NPC_ChampionGUIDs.clear();
+                    DespawnChampionPets();
                     break;
                 case INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD:
                     if (Creature* c = instance->GetCreature(NPC_DarkbaneGUID))

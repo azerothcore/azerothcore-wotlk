@@ -39,10 +39,15 @@ DoorData const doorData[] =
     { GO_MOTHER_SHAHRAZ_DOOR,   DATA_MOTHER_SHAHRAZ,        DOOR_TYPE_PASSAGE  },
     { GO_COUNCIL_DOOR_1,        DATA_ILLIDARI_COUNCIL,      DOOR_TYPE_ROOM     },
     { GO_COUNCIL_DOOR_2,        DATA_ILLIDARI_COUNCIL,      DOOR_TYPE_ROOM     },
-    { GO_ILLIDAN_GATE,          DATA_AKAMA_ILLIDAN,         DOOR_TYPE_PASSAGE  },
     { GO_ILLIDAN_DOOR_L,        DATA_ILLIDAN_STORMRAGE,     DOOR_TYPE_ROOM     },
     { GO_ILLIDAN_DOOR_R,        DATA_ILLIDAN_STORMRAGE,     DOOR_TYPE_ROOM     },
     { 0,                        0,                          DOOR_TYPE_ROOM     }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { GO_ILLIDAN_GATE, DATA_ILLIDAN_GATE },
+    { 0,               0                 }
 };
 
 ObjectData const creatureData[] =
@@ -102,9 +107,10 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            SetPersistentDataCount(PERSISTENT_DATA_COUNT);
             LoadDoorData(doorData);
             LoadBossBoundaries(boundaries);
-            LoadObjectData(creatureData, nullptr);
+            LoadObjectData(creatureData, gameObjectData);
             LoadSummonData(summonData);
 
             ashtongueGUIDs.clear();
@@ -140,17 +146,20 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            // If created after Illidari Council is done, then skip Akama's event. Used for crashes/reset
+            // The gate spawns open in the DB; keep it shut until Akama's scene opens it (saved)
             if (go->GetEntry() == GO_ILLIDAN_GATE)
-            {
-                if (GetBossState(DATA_ILLIDARI_COUNCIL) == DONE)
-                {
-                    SetBossState(DATA_AKAMA_ILLIDAN, DONE);
-                    HandleGameObject(ObjectGuid::Empty, true, go);
-                }
-            }
+                HandleGameObject(ObjectGuid::Empty, GetPersistentData(PERSISTENT_DATA_ILLIDAN_GATE) == DONE, go);
 
             InstanceScript::OnGameObjectCreate(go);
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            // Read by Akama's gossip conditions
+            if (type == DATA_ILLIDAN_GATE)
+                return GetPersistentData(PERSISTENT_DATA_ILLIDAN_GATE);
+
+            return 0;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override

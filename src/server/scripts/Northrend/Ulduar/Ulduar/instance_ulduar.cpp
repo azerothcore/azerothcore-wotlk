@@ -1150,9 +1150,6 @@ public:
         {
             InstanceScript::Load(data);
 
-            if (!data)
-                StorePersistentData(PERSISTENT_DATA_UNBROKEN, 1);
-
             uint32 algalonTimer =
                 GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
             if (algalonTimer == TIMER_ALGALON_SUMMONED)

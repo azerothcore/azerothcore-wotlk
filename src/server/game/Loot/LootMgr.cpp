@@ -427,10 +427,10 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
         return false;
 
     // not show loot for not own team
-    if (pProto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && player->GetTeamId(true) != TEAM_HORDE)
-        return false;
+    bool otherFactionItem = (pProto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && player->GetTeamId(true) != TEAM_HORDE) ||
+        (pProto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && player->GetTeamId(true) != TEAM_ALLIANCE);
 
-    if (pProto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && player->GetTeamId(true) != TEAM_ALLIANCE)
+    if (otherFactionItem && !sScriptMgr->CanLootOtherFactionItem(player, pProto, source))
         return false;
 
     // profession / recipe checks

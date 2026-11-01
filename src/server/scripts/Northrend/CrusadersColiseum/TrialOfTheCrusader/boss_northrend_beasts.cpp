@@ -117,17 +117,6 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, 10s, 30s);
         }
 
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            if (Dismounted)
-                return;
-
-            events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_SNOBOLLED, 1500ms);
-            events.ScheduleEvent(EVENT_SPELL_BATTER, 5s);
-            events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 25s);
-        }
-
         void AttackStart(Unit* who) override
         {
             if (!Dismounted && who->GetGUID() != TargetGUID)
@@ -145,6 +134,12 @@ public:
             TargetGUID = guid;
             if (Player* carrier = ObjectAccessor::GetPlayer(*me, guid))
                 AttackStart(carrier);
+
+            // Started on every latch: a Snobold that reboarded Gormok is still engaged, so JustEngagedWith won't fire again
+            events.Reset();
+            events.ScheduleEvent(EVENT_SPELL_SNOBOLLED, 1100ms);
+            events.ScheduleEvent(EVENT_SPELL_HEAD_CRACK, 2700ms);
+            events.ScheduleEvent(EVENT_SPELL_BATTER, 1100ms);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -293,9 +288,14 @@ public:
 
                     break;
                 case EVENT_SPELL_BATTER:
-                    if (t->IsPlayer())
+                    // Batter is an interrupt, only used once the carrier starts a cast
+                    if (t->IsPlayer() && t->IsNonMeleeSpellCast(false, false, true))
+                    {
                         me->CastSpell(t, SPELL_BATTER);
-                    events.Repeat(6s, 8s);
+                        events.Repeat(8s);
+                    }
+                    else
+                        events.Repeat(250ms);
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
                     if (Dismounted || !t->IsPlayer())
@@ -318,6 +318,9 @@ public:
             if (Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID))
                 if (t->IsAlive())
                     t->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
+
+            // Dead passengers aren't unseated, so the corpse would ride the carrier and keep its seat taken
+            me->ExitVehicle();
         }
 
         void DoAction(int32 param) override
@@ -383,12 +386,6 @@ public:
             events.RescheduleEvent(EVENT_SPELL_IMPALE, 9s, 10s);
             events.RescheduleEvent(EVENT_SPELL_STAGGERING_STOMP, 15s);
             events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 16s, 24s);
-
-            // refresh snobold position
-            if (Vehicle* vk = me->GetVehicleKit())
-                for( uint8 i = 0; i < 4; ++i )
-                    if (Unit* snobold = vk->GetPassenger(i))
-                        snobold->SendMovementFlagUpdate();
         }
 
         void JustReachedHome() override
