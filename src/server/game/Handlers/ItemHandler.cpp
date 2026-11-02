@@ -17,6 +17,7 @@
 
 #include "Common.h"
 #include "Item.h"
+#include "ItemRecovery.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -307,7 +308,7 @@ void WorldSession::HandleDestroyItemOpcode(WorldPackets::Item::DestroyItem& pack
         return;
     }
 
-    recoveryItem(pItem);
+    ItemRecovery::Save(pItem, packet.Count ? std::min<uint32>(packet.Count, pItem->GetCount()) : pItem->GetCount(), RECOVERY_ITEM_SOURCE_DESTROYED);
 
     if (packet.Count)
     {
@@ -660,9 +661,6 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem& packet)
                     return;
                 }
 
-                if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
-                    recoveryItem(pItem);
-
                 uint32 maxDurability = pItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
                 if (maxDurability)
                 {
@@ -702,6 +700,7 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem& packet)
                     }
                 }
 
+                Item* soldItem = pItem;
                 if (packet.Count < pItem->GetCount())               // need split items
                 {
                     Item* pNewItem = pItem->CloneItem(packet.Count, _player);
@@ -723,6 +722,8 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem& packet)
                     _player->AddItemToBuyBackSlot(pNewItem, money);
                     if (_player->IsInWorld())
                         pNewItem->SendUpdateToPlayer(_player);
+
+                    soldItem = pNewItem;
                 }
                 else
                 {
@@ -732,6 +733,9 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem& packet)
                     _player->AddItemToBuyBackSlot(pItem, money);
                     _player->UpdateTitansGrip();
                 }
+
+                if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
+                    ItemRecovery::Save(soldItem, packet.Count, RECOVERY_ITEM_SOURCE_VENDORED, money);
 
                 _player->ModifyMoney(money);
                 _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS, money);
@@ -778,7 +782,8 @@ void WorldSession::HandleBuybackItem(WorldPackets::Item::BuybackItem& packet)
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
                 stmt->SetData(0, _player->GetGUID().GetCounter());
                 stmt->SetData(1, pItem->GetEntry());
-                stmt->SetData(2, pItem->GetCount());
+                stmt->SetData(2, pItem->GetGUID().GetCounter());
+                stmt->SetData(3, uint8(RECOVERY_ITEM_SOURCE_VENDORED));
                 CharacterDatabase.Execute(stmt);
             }
 
@@ -1479,24 +1484,4 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
     }
 
     SendPacket(&data);
-}
-
-bool WorldSession::recoveryItem(Item* pItem)
-{
-    if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD)
-            && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY)
-            && pItem->GetTemplate()->ItemLevel >= sWorld->getIntConfig(CONFIG_ITEMDELETE_ITEM_LEVEL))
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
-
-        stmt->SetData(0, pItem->GetOwnerGUID().GetCounter());
-        stmt->SetData(1, pItem->GetTemplate()->ItemId);
-        stmt->SetData(2, pItem->GetCount());
-
-        CharacterDatabase.Query(stmt);
-
-        return true;
-    }
-
-    return false;
 }

@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "ItemRecovery.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -64,48 +65,25 @@ public:
             return false;
         }
 
-        // Check existence of item in recovery table
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM);
-        stmt->SetData(0, restoreId);
-        PreparedQueryResult fields = CharacterDatabase.Query(stmt);
-
-        if (!fields || !(*fields)[1].Get<uint32>() || (*fields)[3].Get<uint32>() != player.GetGUID().GetCounter())
+        std::optional<RecoveryItem> recovery = ItemRecovery::Load(restoreId);
+        if (!recovery || !recovery->ItemEntry || recovery->OwnerGuid != player.GetGUID().GetCounter())
         {
-            handler->SendErrorMessage(LANG_ITEM_RESTORE_MISSING);
+            handler->SendErrorMessage(LANG_ITEM_RESTORE_MISSING, restoreId);
             return false;
         }
 
-        // Mail item to player
-        uint32 itemEntry = (*fields)[1].Get<uint32>();
-        uint32 itemCount = (*fields)[2].Get<uint32>();
-
-        if (Player* onlinePlayer = player.GetConnectedPlayer())
+        Player* onlinePlayer = player.GetConnectedPlayer();
+        if (onlinePlayer && recovery->Source == RECOVERY_ITEM_SOURCE_VENDORED && ItemRecovery::IsInBuyback(onlinePlayer, *recovery))
         {
-            onlinePlayer->SendItemRetrievalMail({ { itemEntry, itemCount } });
+            handler->SendErrorMessage(LANG_ITEM_RESTORE_IN_BUYBACK, recovery->ItemEntry);
+            return false;
         }
 
-        else
+        if (!ItemRecovery::Restore(*recovery, onlinePlayer))
         {
-            MailSender sender(MAIL_CREATURE, 34337 /* The Postmaster */);
-            MailDraft draft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed.");
-
-            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-            // Save to prevent loss at next mail load. Item deletes on fail
-            if (Item* item = Item::CreateItem(itemEntry, itemCount, 0))
-            {
-                item->SaveToDB(trans);
-                draft.AddItem(item);
-            }
-
-            draft.SendMailTo(trans, MailReceiver(player.GetGUID().GetCounter()), sender);
-            CharacterDatabase.CommitTransaction(trans);
+            handler->SendErrorMessage(LANG_ITEM_RESTORE_MISSING, restoreId);
+            return false;
         }
-
-        // Remove from recovery table
-        CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_RECOVERY_ID);
-        delStmt->SetData(0, (*fields)[0].Get<uint32>());
-        CharacterDatabase.Execute(delStmt);
 
         std::string nameLink = handler->playerLink(player.GetName());
         handler->PSendSysMessage(LANG_MAIL_SENT, nameLink);
@@ -136,17 +114,46 @@ public:
             uint32 id        = fields[0].Get<uint32>();
             uint32 itemId    = fields[1].Get<uint32>();
             uint32 count     = fields[2].Get<uint32>();
+            uint8 source     = fields[3].Get<uint8>();
+            uint32 money     = fields[4].Get<uint32>();
 
-            std::string itemName = "";
-            if (ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId))
+            std::string itemName = GetItemName(itemId);
+
+            switch (source)
             {
-                itemName = item->Name1;
-            }
+                case RECOVERY_ITEM_SOURCE_VENDORED:
+                    handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST_VENDORED, id, itemName, itemId, count,
+                        Acore::StringFormat("{}g {}s {}c", money / GOLD, (money % GOLD) / SILVER, money % SILVER));
+                    break;
+                case RECOVERY_ITEM_SOURCE_DISENCHANTED:
+                {
+                    std::string materials;
+                    for (auto const& [lootEntry, lootCount] : ItemRecovery::LoadLoot(id))
+                    {
+                        if (!materials.empty())
+                            materials += ", ";
 
-            handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST, id, itemName, itemId, count);
+                        materials += Acore::StringFormat("{}x {} ({})", lootCount, GetItemName(lootEntry), lootEntry);
+                    }
+
+                    handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST_DISENCHANTED, id, itemName, itemId, count, materials);
+                    break;
+                }
+                default:
+                    handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST, id, itemName, itemId, count);
+                    break;
+            }
         } while (disposedItems->NextRow());
 
         return true;
+    }
+
+    static std::string GetItemName(uint32 itemId)
+    {
+        if (ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId))
+            return item->Name1;
+
+        return "";
     }
 
     /// @todo - move item to other slot
