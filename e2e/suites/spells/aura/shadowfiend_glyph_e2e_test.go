@@ -233,8 +233,8 @@ func TestAura_GlyphOfShadowfiendOnlyOnDeath(t *testing.T) {
 		nextCast := time.Now()
 		for deadline := time.Now().Add(hitsWindow); time.Now().Before(deadline); time.Sleep(50 * time.Millisecond) {
 			_, hits := log.counts()
-			hp, max := priest.UnitHP(fiend)
-			if hits-hits0 >= fiendMinHits || (max > 0 && float64(hp) < minFiendHP*float64(max)) {
+			hp, maxHP := priest.UnitHP(fiend)
+			if hits-hits0 >= fiendMinHits || (maxHP > 0 && float64(hp) < minFiendHP*float64(maxHP)) {
 				break
 			}
 			if time.Now().After(nextCast) {
@@ -251,9 +251,9 @@ func TestAura_GlyphOfShadowfiendOnlyOnDeath(t *testing.T) {
 		if hits < fiendMinHits {
 			e2eharness.Preconditionf(t, "Shadowfiend 0x%X took only %d hits in %s", fiend, hits, hitsWindow)
 		}
-		hp, max := priest.UnitHP(fiend)
+		hp, maxHP := priest.UnitHP(fiend)
 		t.Logf("Shadowfiend 0x%X took %d hits (now %d/%d hp): %d Glyph of Shadowfiend mana casts", fiend, hits, hp,
-			max, casts)
+			maxHP, casts)
 		if casts != 0 {
 			e2eharness.Assertf(t, "Glyph of Shadowfiend (%d) fired %d times while the living fiend took %d hits",
 				fiendSpellGlyphMana, casts, hits)
