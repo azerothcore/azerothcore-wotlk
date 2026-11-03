@@ -612,6 +612,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_RECOVERY_ITEM, "SELECT Id, Guid, ItemEntry, ItemGuid, Count, Source, Money, RandomPropertyId, Enchantments, CreatorGuid, Bound FROM recovery_item WHERE Id = ?", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_RECOVERY_ITEM_LOOT, "SELECT ItemEntry, Count FROM recovery_item_loot WHERE RecoveryId = ?", CONNECTION_SYNCH);
     PrepareStatement(CHAR_SEL_RECOVERY_ITEM_LIST, "SELECT Id, ItemEntry, Count, Source, Money FROM recovery_item WHERE Guid = ? ORDER BY Id DESC", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_RECOVERY_ITEM_LOOT_BY_GUID, "SELECT ril.RecoveryId, ril.ItemEntry, ril.Count FROM recovery_item_loot ril INNER JOIN recovery_item ri ON ri.Id = ril.RecoveryId WHERE ri.Guid = ?", CONNECTION_SYNCH);
     PrepareStatement(CHAR_DEL_RECOVERY_ITEM, "DELETE FROM recovery_item WHERE Guid = ? AND ItemEntry = ? AND ItemGuid = ? AND Source = ? ORDER BY Id DESC LIMIT 1", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_RECOVERY_ITEM_BY_RECOVERY_ID, "DELETE FROM recovery_item WHERE Id = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_RECOVERY_ITEM_LOOT_BY_RECOVERY_ID, "DELETE FROM recovery_item_loot WHERE RecoveryId = ?", CONNECTION_ASYNC);

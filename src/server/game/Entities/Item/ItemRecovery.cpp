@@ -39,6 +39,24 @@ namespace
         BONUS_ENCHANTMENT_SLOT,
         PRISMATIC_ENCHANTMENT_SLOT
     };
+
+    RecoveryItemLoot LoadLoot(uint32 recoveryId)
+    {
+        RecoveryItemLoot loot;
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LOOT);
+        stmt->SetData(0, recoveryId);
+        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                loot.emplace_back(fields[0].Get<uint32>(), fields[1].Get<uint32>());
+            } while (result->NextRow());
+        }
+
+        return loot;
+    }
 }
 
 bool ItemRecovery::Save(Item const* item, uint32 count, RecoveryItemSource source, uint32 money, RecoveryItemLoot const& loot)
@@ -110,24 +128,6 @@ std::optional<RecoveryItem> ItemRecovery::Load(uint32 recoveryId)
     return recovery;
 }
 
-RecoveryItemLoot ItemRecovery::LoadLoot(uint32 recoveryId)
-{
-    RecoveryItemLoot loot;
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LOOT);
-    stmt->SetData(0, recoveryId);
-    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-    {
-        do
-        {
-            Field* fields = result->Fetch();
-            loot.emplace_back(fields[0].Get<uint32>(), fields[1].Get<uint32>());
-        } while (result->NextRow());
-    }
-
-    return loot;
-}
-
 bool ItemRecovery::Restore(RecoveryItem const& recovery, Player* owner)
 {
     if (!sObjectMgr->GetItemTemplate(recovery.ItemEntry))
@@ -137,6 +137,9 @@ bool ItemRecovery::Restore(RecoveryItem const& recovery, Player* owner)
     Item* item = Item::CreateItem(recovery.ItemEntry, recovery.Count, nullptr, false, uint32(recovery.RandomPropertyId));
     if (!item)
         return false;
+
+    // An online receiver takes this very object from the mail, and a soulbound item must already be theirs
+    item->SetOwnerGUID(ObjectGuid::Create<HighGuid::Player>(recovery.OwnerGuid));
 
     // Item::SetEnchantment reports the change to the owner, and a mailed item has none yet
     std::vector<std::string_view> enchantments = Acore::Tokenize(recovery.Enchantments, ' ', false);

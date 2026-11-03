@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "RBAC.h"
+#include <unordered_map>
 
 using namespace Acore::ChatCommands;
 
@@ -108,6 +109,18 @@ public:
             return false;
         }
 
+        std::unordered_map<uint32, RecoveryItemLoot> lootByRecoveryId;
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_LOOT_BY_GUID);
+        stmt->SetData(0, player.GetGUID().GetCounter());
+        if (PreparedQueryResult loot = CharacterDatabase.Query(stmt))
+        {
+            do
+            {
+                Field* lootFields = loot->Fetch();
+                lootByRecoveryId[lootFields[0].Get<uint32>()].emplace_back(lootFields[1].Get<uint32>(), lootFields[2].Get<uint32>());
+            } while (loot->NextRow());
+        }
+
         do
         {
             Field* fields    = disposedItems->Fetch();
@@ -128,7 +141,7 @@ public:
                 case RECOVERY_ITEM_SOURCE_DISENCHANTED:
                 {
                     std::string materials;
-                    for (auto const& [lootEntry, lootCount] : ItemRecovery::LoadLoot(id))
+                    for (auto const& [lootEntry, lootCount] : lootByRecoveryId[id])
                     {
                         if (!materials.empty())
                             materials += ", ";

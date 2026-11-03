@@ -58,7 +58,6 @@ namespace ItemRecovery
     // Returns false when the item is filtered out by the ItemDelete.* settings.
     bool Save(Item const* item, uint32 count, RecoveryItemSource source, uint32 money = 0, RecoveryItemLoot const& loot = { });
     [[nodiscard]] std::optional<RecoveryItem> Load(uint32 recoveryId);
-    [[nodiscard]] RecoveryItemLoot LoadLoot(uint32 recoveryId);
 
     // Mails the item as it was recorded and deletes the recovery row. owner may be null when offline.
     bool Restore(RecoveryItem const& recovery, Player* owner);

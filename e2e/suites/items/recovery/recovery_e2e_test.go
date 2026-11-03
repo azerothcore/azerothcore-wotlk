@@ -80,6 +80,7 @@ type recoveryRow struct {
 type itemInstance struct {
 	GUID             uint32
 	Entry            uint32
+	Owner            uint32
 	Flags            uint32
 	Enchantments     string
 	RandomPropertyID int32
@@ -154,6 +155,10 @@ func TestRecovery_DestroyRestoresItemAsItWas(t *testing.T) {
 	assertSameEnchants(t, "restored bracer", original.Enchantments, restoredBracer.Enchantments)
 	if restoredBracer.Flags&itemFlagSoulbound == 0 {
 		e2eharness.Assertf(t, "restored bracer flags=0x%X, want soulbound", restoredBracer.Flags)
+	}
+	// Taking a soulbound item from the mail fails with EQUIP_ERR_DONT_OWN_THAT_ITEM unless it already belongs to the receiver
+	if uint64(restoredBracer.Owner) != bot.GUID {
+		e2eharness.Assertf(t, "restored bracer owner_guid=%d, want the receiver %d", restoredBracer.Owner, bot.GUID)
 	}
 
 	want := map[int32]int{}
@@ -372,7 +377,7 @@ func itemGUIDsByEntry(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, w
 func loadItemInstance(t *testing.T, db *sql.DB, query string, args ...any) (itemInstance, bool) {
 	t.Helper()
 	var ii itemInstance
-	err := db.QueryRow(query, args...).Scan(&ii.GUID, &ii.Entry, &ii.Flags, &ii.Enchantments, &ii.RandomPropertyID)
+	err := db.QueryRow(query, args...).Scan(&ii.GUID, &ii.Entry, &ii.Owner, &ii.Flags, &ii.Enchantments, &ii.RandomPropertyID)
 	if err == sql.ErrNoRows {
 		return ii, false
 	}
@@ -388,7 +393,7 @@ func waitItemInstance(t *testing.T, bot *e2eharness.ScenarioBot, guid uint32, wh
 	done := poll(func() bool {
 		var found bool
 		ii, found = loadItemInstance(t, bot.CharDB,
-			`SELECT guid, itemEntry, flags, enchantments, randomPropertyId FROM item_instance WHERE guid = ?`, guid)
+			`SELECT guid, itemEntry, owner_guid, flags, enchantments, randomPropertyId FROM item_instance WHERE guid = ?`, guid)
 		return found && ok(ii)
 	})
 	if !done {
@@ -402,7 +407,7 @@ func waitMailedItems(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, wa
 	var items []itemInstance
 	pollOutcome(t, fmt.Sprintf("restore mail with %d item(s) of entry %d", want, entry), func() bool {
 		rows, err := bot.CharDB.Query(`
-			SELECT ii.guid, ii.itemEntry, ii.flags, ii.enchantments, ii.randomPropertyId
+			SELECT ii.guid, ii.itemEntry, ii.owner_guid, ii.flags, ii.enchantments, ii.randomPropertyId
 			FROM mail_items mi INNER JOIN item_instance ii ON ii.guid = mi.item_guid
 			WHERE mi.receiver = ? AND ii.itemEntry = ? ORDER BY ii.guid`, bot.GUID, entry)
 		if err != nil {
@@ -412,7 +417,7 @@ func waitMailedItems(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32, wa
 		items = items[:0]
 		for rows.Next() {
 			var ii itemInstance
-			if err := rows.Scan(&ii.GUID, &ii.Entry, &ii.Flags, &ii.Enchantments, &ii.RandomPropertyID); err != nil {
+			if err := rows.Scan(&ii.GUID, &ii.Entry, &ii.Owner, &ii.Flags, &ii.Enchantments, &ii.RandomPropertyID); err != nil {
 				e2eharness.HarnessFailf(t, "mail_items scan: %v", err)
 			}
 			items = append(items, ii)
