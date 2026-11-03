@@ -158,7 +158,7 @@ bool ItemRecovery::Restore(RecoveryItem const& recovery, Player* owner)
     // An online receiver takes this very object from the mail, and a soulbound item must already be theirs
     item->SetOwnerGUID(ObjectGuid::Create<HighGuid::Player>(recovery.OwnerGuid));
 
-    // Item::SetEnchantment reports the change to the owner, and a mailed item has none yet
+    // Item::SetEnchantment logs to and queues the item for its owner, who may be offline and does not hold it yet
     std::vector<std::string_view> enchantments = Acore::Tokenize(recovery.Enchantments, ' ', false);
     if (enchantments.size() == MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET)
     {
