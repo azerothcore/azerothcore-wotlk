@@ -55,11 +55,6 @@ enum AnubActions
     ACTION_SPIKE_FAIL                           = 2,
 };
 
-enum AnubModels
-{
-    MODEL_INVISIBLE_STALKER                     = 11686,
-};
-
 Position const AnubLocs[] =
 {
     // scarab's beginning pos
@@ -160,8 +155,6 @@ struct boss_anubarak_trial : public BossAI
 {
     boss_anubarak_trial(Creature* creature) : BossAI(creature, BOSS_ANUBARAK)
     {
-        _intro = false;
-        _phase3 = false;
         me->ApplySpellImmune(0, IMMUNITY_ID, sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me), true);
         me->m_SightDistance = 90.0f; // for MoveInLineOfSight distance
     }
@@ -169,6 +162,8 @@ struct boss_anubarak_trial : public BossAI
     void Reset() override
     {
         _Reset();
+        _intro = false;
+        _phase3 = false;
         me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         for (uint8 i = 0; i < 10; ++i)
@@ -186,7 +181,7 @@ struct boss_anubarak_trial : public BossAI
 
     void DoAction(int32 param) override
     {
-        if (param == ACTION_ANUBARAK_DESPAWN_SUMMONS)
+        if (param == ACTION_DESPAWN_SUMMONS)
             summons.DespawnAll();
     }
 
@@ -544,9 +539,8 @@ struct npc_nerubian_burrower : public ScriptedAI
     {
         // I am summoned by another npc (SPELL_EFFECT_FORCE_CAST), inform Anub'arak
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (ObjectGuid guid = instance->GetGuidData(TYPE_ANUBARAK))
-                if (Creature* anub = instance->instance->GetCreature(guid))
-                    anub->AI()->JustSummoned(me);
+            if (Creature* anub = instance->GetCreature(DATA_ANUBARAK))
+                anub->AI()->JustSummoned(me);
     }
 
     void Reset() override
