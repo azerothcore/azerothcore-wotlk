@@ -370,6 +370,8 @@ enum SpellGroupStackRule
 typedef std::unordered_map<SpellGroup, SpellGroupStackRule> SpellGroupStackMap;
 
 typedef std::unordered_map<SpellGroup, std::unordered_set<uint32 /*auraName*/>> SameEffectStackMap;
+typedef std::unordered_map<SpellGroup, std::set<std::pair<uint32 /*auraName*/, int32 /*miscValue*/>>>
+    SameEffectStackSharedMiscMap;
 
 struct SpellThreatEntry
 {
@@ -702,7 +704,8 @@ public:
     void GetSetOfSpellsInSpellGroup(SpellGroup group_id, std::set<uint32>& foundSpells, std::set<SpellGroup>& usedGroups) const;
 
     // Spell Group Stack Rules table
-    bool AddSameEffectStackRuleSpellGroups(SpellInfo const* spellInfo, uint32 auraType, int32 amount, std::map<SpellGroup, int32>& groups) const;
+    bool AddSameEffectStackRuleSpellGroups(SpellInfo const* spellInfo, uint32 auraType, int32 miscValue,
+        int32 amount, std::map<SpellGroup, int32>& groups) const;
     SpellGroupStackRule CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2) const;
     SpellGroupStackRule GetSpellGroupStackRule(SpellGroup group_id) const;
 
@@ -822,6 +825,7 @@ private:
     SpellGroupSpellMap         mSpellGroupSpell;
     SpellGroupStackMap         mSpellGroupStack;
     SameEffectStackMap         mSpellSameEffectStack;
+    SameEffectStackSharedMiscMap mSpellSameEffectSharedMisc;
     SpellProcMap               mSpellProcMap;
     CreatureImmunitiesMap      mCreatureImmunities;
     SpellBonusMap              mSpellBonusMap;
