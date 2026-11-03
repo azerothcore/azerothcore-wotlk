@@ -3,8 +3,10 @@
 package onyxiaslair_test
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"math"
 	"sort"
 	"strings"
@@ -46,8 +48,11 @@ type castSeen struct {
 	at     time.Time
 	caster uint64
 	spell  uint32
-	// Onyxia's position when a Roar landed, as cached on arrival.
+	// The Lava Fissures the cast hit, from its SMSG_SPELL_GO.
+	hits map[uint32]bool
+	// Where a Roar was cast from: Onyxia's position as the server had it when it landed.
 	x, y, z float32
+	hasSrc  bool
 }
 
 type animSeen struct {
@@ -85,12 +90,9 @@ func newEruptionObserver(t *testing.T, bot *e2eharness.ScenarioBot, onyxia uint6
 					o.roarStarts = append(o.roarStarts, c)
 					return
 				}
-				if u := bot.World.GetObject(onyxia); u != nil {
-					c.x, c.y, c.z = u.PosX, u.PosY, u.PosZ
-				}
-				o.roarGos = append(o.roarGos, c)
+				o.roarGos = append(o.roarGos, withTargets(c, data))
 			case opcode == client.SmsgSpellGo && (spell == spellEruption || spell == spellEruption25):
-				o.eruptions = append(o.eruptions, castSeen{at: now, caster: caster, spell: spell})
+				o.eruptions = append(o.eruptions, withTargets(castSeen{at: now, caster: caster, spell: spell}, data))
 			}
 		case smsgGameObjectCustomAnim:
 			if len(data) < 12 {
@@ -281,18 +283,14 @@ func dist3(ax, ay, az, bx, by, bz float32) float32 {
 	return float32(math.Sqrt(float64((ax-bx)*(ax-bx) + (ay-by)*(ay-by) + (az-bz)*(az-bz))))
 }
 
-// Onyxia's cached Z is the start of her last spline, which after the landing is still her flight
-// height, so distances from her are measured flat.
-func dist2(ax, ay, bx, by float32) float32 {
-	return float32(math.Hypot(float64(ax-bx), float64(ay-by)))
-}
-
 // Phase 3 Eruption, measured against retail sniffs: Bellowing Roar's own activate-object effect
 // sets off every Lava Fissure within 13y of Onyxia when the cast lands, and each fissure casts
 // Eruption itself. Only a fissure above the lair floor passes it on, to every fissure within 13y
 // in the same tick, so a Roar erupts a cluster around her and never the whole floor. Every hit
 // plays the fissure's crack animation. A fissure's 10s trap cooldown keeps it from erupting twice
-// in a row, and nothing erupts before a Roar lands.
+// in a row, and nothing erupts before a Roar lands. Who hit what is read from each cast's
+// SMSG_SPELL_GO hit list, and the Roar's reach from the position it was cast from, since the
+// client's cached position for Onyxia is only where her last spline started.
 // PR: https://github.com/azerothcore/azerothcore-wotlk/pull/27843
 func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
@@ -302,9 +300,10 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 	})
 
 	const (
-		// Three fissures within 7y, so once Onyxia is on the ground and chasing the bot her Roars
-		// have fissures in range.
-		padX, padY, padZ = float32(-14.0), float32(-214.0), float32(-88.5)
+		// West of fissures 176827-176830. Onyxia chasing the bot Roars from among them, and the ones
+		// above the floor pass the Eruption on to fissures well beyond her reach, so every run has
+		// eruptions that only a working chain sets off.
+		padX, padY, padZ = float32(-37.0), float32(-205.0), float32(-87.5)
 
 		sampleEvery = 100 * time.Millisecond
 		// Walk to the takeoff spot, a ~10s climb, the flight north, then the first Fireball.
@@ -443,11 +442,16 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 		}
 	}
 
-	// Per Roar: the fissures near Onyxia erupt, the rest are chained from an erupting fissure above
-	// the floor, nothing else erupts, and every erupting fissure plays its crack animation.
-	judged := 0
+	// Per Roar, judged from the hit lists the server sent: the Roar hits every fissure near Onyxia, an
+	// erupting fissure above the floor hits every fissure near it and a sunk one hits none, everything
+	// hit erupts unless its cooldown still runs, nothing else erupts, and every erupting fissure plays
+	// its crack animation.
+	judged, chainedTotal := 0, 0
 	var summary []string
 	for r, g := range gos {
+		if !g.hasSrc {
+			e2eharness.HarnessFailf(t, "Roar %d: SMSG_SPELL_GO carried no source location to place Onyxia by", r+1)
+		}
 		erupted := map[uint32]castSeen{}
 		for i, e := range eruptions {
 			if windowOf[i] == r {
@@ -456,30 +460,53 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 			}
 		}
 
-		var names []string
-		for entry := range erupted {
-			names = append(names, fmt.Sprint(entry))
-		}
-		sort.Strings(names)
-		t.Logf("roar %d: Onyxia at (%.1f, %.1f), erupted %s", r+1, g.x, g.y, strings.Join(names, " "))
+		t.Logf("roar %d: Onyxia at (%.1f, %.1f, %.1f), hit %s, erupted %s",
+			r+1, g.x, g.y, g.z, fissureNames(g.hits), fissureNames(erupted))
 
-		// Whether p lies within radius of Onyxia or of an erupting fissure that passes Eruption on.
-		reachedBy := func(entry uint32, p fissurePos, radius float32) bool {
-			if dist2(g.x, g.y, p.x, p.y) <= radius {
-				return true
+		// What set each fissure off this Roar.
+		hitBy := map[uint32]string{}
+		for entry := range g.hits {
+			p := fissures[entry]
+			if d := dist3(g.x, g.y, g.z, p.x, p.y, p.z); d > roarRadius+rangeSlack {
+				e2eharness.Assertf(t, "Roar %d hit fissure %d %.1fy from Onyxia, beyond its %.0fy", r+1, entry, d, roarRadius)
 			}
-			for other := range erupted {
-				if o := fissures[other]; other != entry && lavaFissuresAboveFloor[other] && dist3(o.x, o.y, o.z, p.x, p.y, p.z) <= radius {
-					return true
-				}
-			}
-			return false
+			hitBy[entry] = "the Roar"
 		}
-
 		for entry, p := range fissures {
-			if !reachedBy(entry, p, mustEruptWithin) {
+			if d := dist3(g.x, g.y, g.z, p.x, p.y, p.z); d <= mustEruptWithin && !g.hits[entry] {
+				e2eharness.Assertf(t, "Roar %d missed fissure %d %.1fy from Onyxia", r+1, entry, d)
+			}
+		}
+
+		for source, e := range erupted {
+			if e.hits == nil {
+				e2eharness.HarnessFailf(t, "Roar %d: could not read the hit list of fissure %d's Eruption", r+1, source)
+			}
+			if !lavaFissuresAboveFloor[source] {
+				if len(e.hits) > 0 {
+					e2eharness.Assertf(t, "Roar %d: fissure %d sits below the floor, yet its Eruption hit %s; only fissures above the floor pass an Eruption on",
+						r+1, source, fissureNames(e.hits))
+				}
 				continue
 			}
+			s := fissures[source]
+			for entry := range e.hits {
+				p := fissures[entry]
+				if d := dist3(s.x, s.y, s.z, p.x, p.y, p.z); d > fissureRadius+rangeSlack {
+					e2eharness.Assertf(t, "Roar %d: fissure %d's Eruption hit fissure %d %.1fy away, beyond its %.0fy", r+1, source, entry, d, fissureRadius)
+				}
+				if _, ok := hitBy[entry]; !ok {
+					hitBy[entry] = fmt.Sprintf("fissure %d's Eruption", source)
+				}
+			}
+			for entry, p := range fissures {
+				if d := dist3(s.x, s.y, s.z, p.x, p.y, p.z); entry != source && d <= mustEruptWithin && !e.hits[entry] {
+					e2eharness.Assertf(t, "Roar %d: fissure %d's Eruption missed fissure %d %.1fy away", r+1, source, entry, d)
+				}
+			}
+		}
+
+		for entry, by := range hitBy {
 			if _, ok := erupted[entry]; ok {
 				continue
 			}
@@ -491,21 +518,18 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 				}
 			}
 			if !onCooldown {
-				e2eharness.Assertf(t, "Roar %d landed with Onyxia at (%.1f, %.1f): fissure %d, %.1fy from her, is in reach of her or an erupting fissure above the floor but did not erupt",
-					r+1, g.x, g.y, entry, dist2(g.x, g.y, p.x, p.y))
+				e2eharness.Assertf(t, "Roar %d: fissure %d was hit by %s but did not erupt", r+1, entry, by)
 			}
 		}
 
 		direct, chained := 0, 0
 		for entry, e := range erupted {
-			p := fissures[entry]
-			if dist2(g.x, g.y, p.x, p.y) <= roarRadius+rangeSlack {
+			switch by, ok := hitBy[entry]; {
+			case !ok:
+				e2eharness.Assertf(t, "Roar %d: fissure %d erupted without being hit by the Roar or by an erupting fissure above the floor", r+1, entry)
+			case by == "the Roar":
 				direct++
-			} else {
-				if !reachedBy(entry, p, fissureRadius+rangeSlack) {
-					e2eharness.Assertf(t, "Roar %d: fissure %d erupted %.1fy from Onyxia with no erupting fissure above the floor within %.0fy; only those pass an Eruption on",
-						r+1, entry, dist2(g.x, g.y, p.x, p.y), fissureRadius)
-				}
+			default:
 				chained++
 			}
 			animated := false
@@ -522,16 +546,149 @@ func TestOnyxia_EruptionFollowsBellowingRoar(t *testing.T) {
 		if len(erupted) > 0 {
 			judged++
 		}
+		chainedTotal += chained
 		summary = append(summary, fmt.Sprintf("roar %d at %+.1fs: %d fissures (%d direct, %d chained)",
 			r+1, g.at.Sub(phase3At).Seconds(), len(erupted), direct, chained))
 	}
 	if judged == 0 {
 		e2eharness.Preconditionf(t, "none of the %d Roars landed near a Lava Fissure: %s", len(gos), strings.Join(summary, "; "))
 	}
+	if chainedTotal == 0 {
+		e2eharness.Preconditionf(t, "no fissure erupted only through a chain, so passing an Eruption on went unjudged; Onyxia Roared too far from the pad's cluster: %s",
+			strings.Join(summary, "; "))
+	}
 
 	t.Logf("%s", strings.Join(summary, "; "))
-	t.Logf("PASS eruptions: %d Roars, %d Eruptions, %d crack animations, all set off by a landing Roar and chained only through fissures above the floor, none inside a fissure's cooldown",
-		len(gos), len(eruptions), len(anims))
+	t.Logf("PASS eruptions: %d Roars, %d Eruptions (%d only through a chain), %d crack animations, all set off by a landing Roar and chained only through fissures above the floor, none inside a fissure's cooldown",
+		len(gos), len(eruptions), chainedTotal, len(anims))
+}
+
+func fissureNames[V any](set map[uint32]V) string {
+	var names []string
+	for entry := range set {
+		names = append(names, fmt.Sprint(entry))
+	}
+	sort.Strings(names)
+	return strings.Join(names, " ")
+}
+
+// withTargets adds what an SMSG_SPELL_GO says about c's targets: the Lava Fissures it hit and, for a
+// cast from the caster's own position, where that was. hits stays nil when the packet cannot be read.
+func withTargets(c castSeen, data []byte) castSeen {
+	hits, src, hasSrc, ok := spellGoTargets(data)
+	if !ok {
+		return c
+	}
+	c.hits = map[uint32]bool{}
+	for _, guid := range hits {
+		if high := uint16(guid >> 48); high != 0xF110 && high != 0xF111 {
+			continue
+		}
+		if entry := uint32((guid >> 24) & 0xFFFFFF); isLavaFissure(entry) {
+			c.hits[entry] = true
+		}
+	}
+	c.x, c.y, c.z, c.hasSrc = src[0], src[1], src[2], hasSrc
+	return c
+}
+
+// spellGoTargets reads an SMSG_SPELL_GO as Spell::SendSpellGo writes it: the cast-item and caster
+// packed GUIDs, the cast counter, spell id, cast flags and timestamp, the hit GUIDs, the misses, then
+// SpellCastTargets::Write, of which only the source location is kept.
+func spellGoTargets(data []byte) (hits []uint64, src [3]float32, hasSrc, ok bool) {
+	const (
+		targetFlagUnit           = 0x00000002
+		targetFlagItem           = 0x00000010
+		targetFlagSourceLocation = 0x00000020
+		targetFlagCorpseEnemy    = 0x00000200
+		targetFlagGameObject     = 0x00000800
+		targetFlagTradeItem      = 0x00001000
+		targetFlagCorpseAlly     = 0x00008000
+		targetFlagUnitMinipet    = 0x00010000
+		spellMissReflect         = 11
+	)
+	r := bytes.NewReader(data)
+	for i := 0; i < 2; i++ {
+		if _, err := readPackedGUID(r); err != nil {
+			return
+		}
+	}
+	var head struct {
+		CastCount          uint8
+		Spell, Flags, Time uint32
+	}
+	if binary.Read(r, binary.LittleEndian, &head) != nil {
+		return
+	}
+	var count uint8
+	if binary.Read(r, binary.LittleEndian, &count) != nil {
+		return
+	}
+	hits = make([]uint64, count)
+	if binary.Read(r, binary.LittleEndian, hits) != nil {
+		return
+	}
+	if binary.Read(r, binary.LittleEndian, &count) != nil {
+		return
+	}
+	for i := 0; i < int(count); i++ {
+		var miss struct {
+			GUID   uint64
+			Reason uint8
+		}
+		if binary.Read(r, binary.LittleEndian, &miss) != nil {
+			return
+		}
+		if miss.Reason == spellMissReflect {
+			if _, err := r.ReadByte(); err != nil {
+				return
+			}
+		}
+	}
+	var mask uint32
+	if binary.Read(r, binary.LittleEndian, &mask) != nil {
+		return
+	}
+	if mask&(targetFlagUnit|targetFlagCorpseAlly|targetFlagGameObject|targetFlagCorpseEnemy|targetFlagUnitMinipet) != 0 {
+		if _, err := readPackedGUID(r); err != nil {
+			return
+		}
+	}
+	if mask&(targetFlagItem|targetFlagTradeItem) != 0 {
+		if _, err := readPackedGUID(r); err != nil {
+			return
+		}
+	}
+	if mask&targetFlagSourceLocation != 0 {
+		// The transport GUID the position is relative to, empty on the lair floor.
+		if _, err := readPackedGUID(r); err != nil {
+			return
+		}
+		if binary.Read(r, binary.LittleEndian, &src) != nil {
+			return
+		}
+		hasSrc = true
+	}
+	return hits, src, hasSrc, true
+}
+
+func readPackedGUID(r io.ByteReader) (uint64, error) {
+	mask, err := r.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	var guid uint64
+	for bit := 0; bit < 8; bit++ {
+		if mask&(1<<uint(bit)) == 0 {
+			continue
+		}
+		b, err := r.ReadByte()
+		if err != nil {
+			return 0, err
+		}
+		guid |= uint64(b) << (8 * uint(bit))
+	}
+	return guid, nil
 }
 
 // castHeader reads the caster GUID and spell id from an SMSG_SPELL_START or SMSG_SPELL_GO header:

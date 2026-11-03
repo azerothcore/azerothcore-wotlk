@@ -505,10 +505,28 @@ void Pet::SavePetToDB(PetSaveMode mode)
     if (!GetOwnerGUID().IsPlayer())
         return;
 
-    // dont allow to save pet when it is loaded, possibly bugs action bar!, save only fully controlled creature
+    // save only fully controlled creature
     Player* owner = GetOwner()->ToPlayer();
-    if (!owner || m_loading || !GetEntry() || !isControlled())
+    if (!owner || !GetEntry() || !isControlled())
         return;
+
+    // Spells and auras are not loaded yet and saving them would wipe the stored ones,
+    // but the caller still updates the pet stable, so a slot change or deletion must reach the DB.
+    if (m_loading)
+    {
+        if (mode == PET_SAVE_AS_DELETED)
+            DeleteFromDB(m_charmInfo->GetPetNumber());
+        else if (mode > PET_SAVE_AS_CURRENT)
+        {
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+            stmt->SetData(0, uint8(mode));
+            stmt->SetData(1, GetOwnerGUID().GetCounter());
+            stmt->SetData(2, m_charmInfo->GetPetNumber());
+            CharacterDatabase.Execute(stmt);
+        }
+
+        return;
+    }
 
     // not save pet as current if another pet temporary unsummoned
     if (mode == PET_SAVE_AS_CURRENT && owner->GetTemporaryUnsummonedPetNumber() &&
@@ -555,6 +573,16 @@ void Pet::SavePetToDB(PetSaveMode mode)
             stmt->SetData(0, ownerLowGUID);
             stmt->SetData(1, uint8(PET_SAVE_AS_CURRENT));
             stmt->SetData(2, uint8(PET_SAVE_LAST_STABLE_SLOT));
+            trans->Append(stmt);
+        }
+        // other pets keep their rows when unsummoned, so only move them out of the current slot
+        else if (mode == PET_SAVE_AS_CURRENT)
+        {
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_SLOT_EXCLUDE_ID);
+            stmt->SetData(0, uint8(PET_SAVE_NOT_IN_SLOT));
+            stmt->SetData(1, ownerLowGUID);
+            stmt->SetData(2, uint8(PET_SAVE_AS_CURRENT));
+            stmt->SetData(3, m_charmInfo->GetPetNumber());
             trans->Append(stmt);
         }
 

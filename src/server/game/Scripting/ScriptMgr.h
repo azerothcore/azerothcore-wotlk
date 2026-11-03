@@ -549,6 +549,7 @@ public: /* GlobalScript */
     void OnLoadSpellCustomAttr(SpellInfo* spell);
     bool OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source);
     bool OnAllowedToLootContainerCheck(Player const* player, ObjectGuid source);
+    bool CanLootOtherFactionItem(Player const* player, ItemTemplate const* proto, ObjectGuid source);
     void OnInstanceIdRemoved(uint32 instanceId);
     void OnBeforeSetBossState(uint32 id, EncounterState newState, EncounterState oldState, Map* instance);
     void AfterInstanceGameObjectCreate(Map* instance, GameObject* go);
