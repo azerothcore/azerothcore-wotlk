@@ -296,7 +296,6 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
     : _actor(actor), _actionTarget(actionTarget), _procTarget(procTarget), _typeMask(typeMask), _spellTypeMask(spellTypeMask), _spellPhaseMask(spellPhaseMask),
       _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell), _procAuraEffectIndex(procAuraEffectIndex)
 {
-    _chance.reset();
 }
 
 SpellInfo const* ProcEventInfo::GetSpellInfo() const

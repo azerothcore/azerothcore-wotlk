@@ -291,10 +291,26 @@ public:
             packet.Worldstates.reserve(2);
             packet.Worldstates.emplace_back(
                 WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED,
-                (algalonTimer && algalonTimer <= 60) ? 1 : 0);
+                (algalonTimer && algalonTimer <= TIMER_ALGALON_MINUTES) ? 1 : 0);
             packet.Worldstates.emplace_back(
                 WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER,
-                std::min<uint32>(algalonTimer, 60));
+                std::min<uint32>(algalonTimer, TIMER_ALGALON_MINUTES));
+        }
+
+        uint32 AlgalonMinutesLeft() const
+        {
+            uint32 now = uint32(GameTime::GetGameTime().count());
+            uint32 deadline = GetPersistentData(PERSISTENT_DATA_ALGALON_DEADLINE);
+            if (deadline <= now)
+                return 0;
+            return std::min<uint32>((deadline - now + MINUTE - 1) / MINUTE, TIMER_ALGALON_MINUTES);
+        }
+
+        void ExpireAlgalonCountdown()
+        {
+            SetData(DATA_ALGALON_DEFEATED, 1);
+            if (Creature* algalon = GetCreature(BOSS_ALGALON))
+                algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);
         }
 
         void DespawnLeviathanGauntlet()
@@ -524,7 +540,7 @@ public:
             // the evade, so wait long enough for that respawn to land first.
             uint32 algalonTimer = GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
             if (!GetCreature(BOSS_ALGALON) && algalonTimer
-                && (algalonTimer <= 60 || algalonTimer == TIMER_ALGALON_TO_SUMMON)
+                && (algalonTimer <= TIMER_ALGALON_MINUTES || algalonTimer == TIMER_ALGALON_TO_SUMMON)
                 && !_events.HasTimeUntilEvent(EVENT_RESUMMON_ALGALON))
                 _events.ScheduleEvent(EVENT_RESUMMON_ALGALON, 30s);
         }
@@ -668,14 +684,30 @@ public:
                     }
                     break;
                 case NPC_ALGALON:
-                    if (!GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER))
+                {
+                    uint32 algalonTimer = GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
+                    if (!algalonTimer || (algalonTimer == TIMER_ALGALON_DEFEATED && GetBossState(BOSS_ALGALON) == DONE))
+                    {
+                        _algalonArrivalPending = false;
                         creature->DespawnOrUnsummon();
+                    }
+                    else if (algalonTimer == TIMER_ALGALON_DEFEATED)
+                    {
+                        _algalonArrivalPending = false;
+                        creature->AI()->DoAction(ACTION_START_INTRO);
+                        scheduler.Schedule(6s, [this, guid = creature->GetGUID()](TaskContext /*context*/)
+                        {
+                            if (Creature* algalon = instance->GetCreature(guid))
+                                algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);
+                        });
+                    }
                     else if (_algalonArrivalPending)
                     {
                         _algalonArrivalPending = false;
                         creature->AI()->DoAction(ACTION_START_INTRO);
                     }
                     break;
+                }
                 // Gone for good once Flame Leviathan is defeated
                 case NPC_STEELFORGED_DEFENDER:
                 case NPC_DEFENDER_GENERATED:
@@ -977,8 +1009,10 @@ public:
                     return;
                 case DATA_DESPAWN_ALGALON:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);
-                    DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 60);
-                    StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, 60);
+                    DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, TIMER_ALGALON_MINUTES);
+                    StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, TIMER_ALGALON_MINUTES);
+                    StorePersistentData(PERSISTENT_DATA_ALGALON_DEADLINE,
+                        uint32(GameTime::GetGameTime().count()) + TIMER_ALGALON_MINUTES * MINUTE);
                     _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                     return;
                 case DATA_ALGALON_SUMMON_STATE:
@@ -988,6 +1022,7 @@ public:
                         type == DATA_ALGALON_DEFEATED
                             ? TIMER_ALGALON_DEFEATED
                             : TIMER_ALGALON_SUMMONED);
+                    StorePersistentData(PERSISTENT_DATA_ALGALON_DEADLINE, 0);
                     _events.CancelEvent(EVENT_UPDATE_ALGALON_TIMER);
                     return;
                 // Achievement
@@ -1157,19 +1192,28 @@ public:
                 StorePersistentData(
                     PERSISTENT_DATA_ALGALON_TIMER,
                     TIMER_ALGALON_TO_SUMMON);
+                algalonTimer = TIMER_ALGALON_TO_SUMMON;
             }
 
-            algalonTimer =
-                GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
-            if (algalonTimer && algalonTimer <= 60
-                && GetBossState(BOSS_ALGALON) != DONE)
+            if (!algalonTimer || algalonTimer > TIMER_ALGALON_MINUTES
+                || GetBossState(BOSS_ALGALON) == DONE)
+                return;
+
+            if (!GetPersistentData(PERSISTENT_DATA_ALGALON_DEADLINE))
+                StorePersistentData(PERSISTENT_DATA_ALGALON_DEADLINE,
+                    uint32(GameTime::GetGameTime().count()) + algalonTimer * MINUTE);
+
+            uint32 minutesLeft = AlgalonMinutesLeft();
+            if (!minutesLeft)
             {
-                DoUpdateWorldState(
-                    WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);
-                DoUpdateWorldState(
-                    WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER,
-                    algalonTimer);
+                ExpireAlgalonCountdown();
+                return;
             }
+
+            StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, minutesLeft);
+            DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);
+            DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, minutesLeft);
+            _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
         }
 
         void Update(uint32 diff) override
@@ -1184,40 +1228,33 @@ public:
             {
                 case EVENT_UPDATE_ALGALON_TIMER:
                 {
-                    uint32 algalonTimer =
-                        GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
-                    if (algalonTimer == TIMER_ALGALON_DEFEATED)
+                    if (GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER) == TIMER_ALGALON_DEFEATED)
                         return;
 
-                    StorePersistentData(
-                        PERSISTENT_DATA_ALGALON_TIMER,
-                        --algalonTimer);
-                    DoUpdateWorldState(
-                        WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER,
-                        algalonTimer);
-                    if (algalonTimer)
+                    uint32 minutesLeft = AlgalonMinutesLeft();
+                    if (!minutesLeft)
                     {
-                        _events.Repeat(1min);
-                        return;
+                        ExpireAlgalonCountdown();
+                        break;
                     }
 
-                    SetData(DATA_ALGALON_DEFEATED, 1);
-                    if (Creature* algalon = GetCreature(BOSS_ALGALON))
-                        algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);
+                    StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, minutesLeft);
+                    DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, minutesLeft);
+                    _events.Repeat(1min);
                     break;
                 }
                 case EVENT_RESUMMON_ALGALON:
                 {
                     uint32 algalonTimer = GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
                     if (GetCreature(BOSS_ALGALON) || !algalonTimer
-                        || (algalonTimer > 60 && algalonTimer != TIMER_ALGALON_TO_SUMMON))
+                        || (algalonTimer > TIMER_ALGALON_MINUTES && algalonTimer != TIMER_ALGALON_TO_SUMMON))
                         break;
 
                     TempSummon* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonLandPos);
                     if (!algalon)
                         break;
 
-                    if (algalonTimer <= 60)
+                    if (algalonTimer <= TIMER_ALGALON_MINUTES)
                     {
                         _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                         algalon->AI()->DoAction(ACTION_INIT_ALGALON);
