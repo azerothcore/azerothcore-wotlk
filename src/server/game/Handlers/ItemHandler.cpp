@@ -734,10 +734,11 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem& packet)
                     _player->UpdateTitansGrip();
                 }
 
+                // A trial account at its money cap is refused the credit, and then nothing is owed back
+                bool const paid = _player->ModifyMoney(money);
                 if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
-                    ItemRecovery::Save(soldItem, packet.Count, RECOVERY_ITEM_SOURCE_VENDORED, money);
+                    ItemRecovery::Save(soldItem, packet.Count, RECOVERY_ITEM_SOURCE_VENDORED, paid ? money : 0);
 
-                _player->ModifyMoney(money);
                 _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS, money);
             }
             else
@@ -784,7 +785,8 @@ void WorldSession::HandleBuybackItem(WorldPackets::Item::BuybackItem& packet)
                 stmt->SetData(1, pItem->GetEntry());
                 stmt->SetData(2, pItem->GetGUID().GetCounter());
                 stmt->SetData(3, uint8(RECOVERY_ITEM_SOURCE_VENDORED));
-                CharacterDatabase.Execute(stmt);
+                // Synchronous: the item leaves the buyback tab below, and a restore must not find the row after that
+                CharacterDatabase.DirectExecute(stmt);
             }
 
             _player->ModifyMoney(-(int32)price);

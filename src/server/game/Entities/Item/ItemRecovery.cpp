@@ -26,6 +26,8 @@
 #include "World.h"
 #include <array>
 #include <map>
+#include <mutex>
+#include <unordered_set>
 
 namespace
 {
@@ -39,6 +41,11 @@ namespace
         BONUS_ENCHANTMENT_SLOT,
         PRISMATIC_ENCHANTMENT_SLOT
     };
+
+    // The restore transaction deletes its row asynchronously, so a repeated restore could still load it.
+    // Recovery ids are never reused, so remembering them for the process lifetime is enough.
+    std::mutex RestoredIdsLock;
+    std::unordered_set<uint32> RestoredIds;
 
     RecoveryItemLoot LoadLoot(uint32 recoveryId)
     {
@@ -133,10 +140,20 @@ bool ItemRecovery::Restore(RecoveryItem const& recovery, Player* owner)
     if (!sObjectMgr->GetItemTemplate(recovery.ItemEntry))
         return false;
 
+    {
+        std::lock_guard<std::mutex> lock(RestoredIdsLock);
+        if (!RestoredIds.insert(recovery.Id).second)
+            return false;
+    }
+
     // A zero id rolls a new random property, which only matters for legacy rows recorded without one
     Item* item = Item::CreateItem(recovery.ItemEntry, recovery.Count, nullptr, false, uint32(recovery.RandomPropertyId));
     if (!item)
+    {
+        std::lock_guard<std::mutex> lock(RestoredIdsLock);
+        RestoredIds.erase(recovery.Id);
         return false;
+    }
 
     // An online receiver takes this very object from the mail, and a soulbound item must already be theirs
     item->SetOwnerGUID(ObjectGuid::Create<HighGuid::Player>(recovery.OwnerGuid));

@@ -130,7 +130,7 @@ public:
             uint8 source     = fields[3].Get<uint8>();
             uint32 money     = fields[4].Get<uint32>();
 
-            std::string itemName = GetItemName(itemId);
+            std::string itemName = GetItemName(handler, itemId);
 
             switch (source)
             {
@@ -146,7 +146,7 @@ public:
                         if (!materials.empty())
                             materials += ", ";
 
-                        materials += Acore::StringFormat("{}x {} ({})", lootCount, GetItemName(lootEntry), lootEntry);
+                        materials += Acore::StringFormat("{}x {} ({})", lootCount, GetItemName(handler, lootEntry), lootEntry);
                     }
 
                     handler->PSendSysMessage(LANG_ITEM_RESTORE_LIST_DISENCHANTED, id, itemName, itemId, count, materials);
@@ -161,12 +161,19 @@ public:
         return true;
     }
 
-    static std::string GetItemName(uint32 itemId)
+    static std::string GetItemName(ChatHandler* handler, uint32 itemId)
     {
-        if (ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId))
-            return item->Name1;
+        ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId);
+        if (!item)
+            return "";
 
-        return "";
+        std::string name = item->Name1;
+        int localeIndex = handler->GetSessionDbLocaleIndex();
+        if (localeIndex >= 0)
+            if (ItemLocale const* locale = sObjectMgr->GetItemLocale(itemId))
+                ObjectMgr::GetLocaleString(locale->Name, localeIndex, name);
+
+        return name;
     }
 
     /// @todo - move item to other slot
