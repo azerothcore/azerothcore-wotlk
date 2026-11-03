@@ -700,6 +700,7 @@ struct GameObjectAddon
     QuaternionData ParentRotation;
     InvisibilityType invisibilityType;
     uint32 InvisibilityValue;
+    float Scale;
 };
 
 // client side GO show states

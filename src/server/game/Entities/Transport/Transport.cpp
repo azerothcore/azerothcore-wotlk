@@ -880,7 +880,8 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     else
         SetTransportPathRotation(rotation.x, rotation.y, rotation.z, rotation.w);
 
-    SetObjectScale(goinfo->size);
+    GameObjectAddon const* gameObjectAddon = sObjectMgr->GetGameObjectAddon(GetSpawnId());
+    SetObjectScale(gameObjectAddon && gameObjectAddon->Scale > 0.0f ? gameObjectAddon->Scale : goinfo->size);
 
     if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
     {

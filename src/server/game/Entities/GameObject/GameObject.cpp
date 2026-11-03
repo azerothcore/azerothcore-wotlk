@@ -359,7 +359,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     SetTransportPathRotation(parentRotation.x, parentRotation.y, parentRotation.z, parentRotation.w);
 
-    SetObjectScale(goinfo->size);
+    SetObjectScale(gameObjectAddon && gameObjectAddon->Scale > 0.0f ? gameObjectAddon->Scale : goinfo->size);
 
     if (GameObjectTemplateAddon const* templateAddon = GetTemplateAddon())
     {
