@@ -1,3 +1,4 @@
+-- DB update 2026_11_03_00 -> 2026_11_03_01
 --
 -- Sunwell Plateau: Moorba's teleport gossip uses the shifted boss ids (Eredar Twins 3, M'uru 4)
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9286) AND (`SourceEntry` IN (3, 4, 5)) AND (`SourceId` = 0);

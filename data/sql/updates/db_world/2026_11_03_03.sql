@@ -1,3 +1,4 @@
+-- DB update 2026_11_03_02 -> 2026_11_03_03
 --
 UPDATE `quest_template_addon` SET `SpecialFlags` = `SpecialFlags`|1 WHERE `ID` IN (1793, 1794);
 
