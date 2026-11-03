@@ -114,6 +114,11 @@ bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, ObjectGuid s
     CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_ALLOWED_TO_LOOT_CONTAINER_CHECK, script->OnAllowedToLootContainerCheck(player, source));
 }
 
+bool ScriptMgr::CanLootOtherFactionItem(Player const* player, ItemTemplate const* proto, ObjectGuid source)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(GlobalScript, GLOBALHOOK_CAN_LOOT_OTHER_FACTION_ITEM, script->CanLootOtherFactionItem(player, proto, source));
+}
+
 /**
  * @brief Called when an instance Id is deleted, usually because it expired or no players are bound to it anymore.
  *
