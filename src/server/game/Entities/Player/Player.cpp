@@ -54,6 +54,7 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
+#include "ItemRecovery.h"
 #include "LFGMgr.h"
 #include "Log.h"
 #include "LootItemStorage.h"
@@ -4398,6 +4399,15 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
 
+                // Loot rows are found through their recovery_item row, so they go first
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_LOOT_BY_GUID);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_GUID);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
                 Corpse::DeleteFromDB(playerGuid, trans);
 
                 sScriptMgr->OnPlayerDeleteFromDB(trans, lowGuid);
@@ -4494,19 +4504,22 @@ void Player::DeleteOldRecoveryItems(uint32 keepDays)
     if (result)
     {
         LOG_INFO("server.loading", "Player::DeleteOldRecoveryItems: Found {} item(s) to delete", result->GetRowCount());
+
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         do
         {
             Field* fields = result->Fetch();
 
-            uint32 guid = fields[0].Get<uint32>();
-            uint32 itemEntry = fields[1].Get<uint32>();
+            uint32 recoveryId = fields[0].Get<uint32>();
+            uint32 guid = fields[1].Get<uint32>();
+            uint32 itemEntry = fields[2].Get<uint32>();
 
-            CharacterDatabasePreparedStatement* deleteStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_GUID);
-            deleteStmt->SetData(0, guid);
-            CharacterDatabase.Execute(deleteStmt);
+            ItemRecovery::DeleteFromDB(trans, recoveryId);
 
             LOG_INFO("server.loading", "Deleted item from recovery_item table where guid {} and item id {}", guid, itemEntry);
         } while (result->NextRow());
+
+        CharacterDatabase.CommitTransaction(trans);
     }
 }
 
