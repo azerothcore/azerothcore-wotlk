@@ -987,26 +987,6 @@ class spell_warr_heroic_strike : public SpellScript
     }
 };
 
-class spell_war_sudden_death_aura : public AuraScript
-{   PrepareAuraScript(spell_war_sudden_death_aura);
-
-    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-    {
-        // Check PROC_SPELL_PHASE_FINISH only for Execute
-        if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_FINISH)
-            return isTriggeredAtSpellProcEvent;
-        if (Spell const* procSpell = eventInfo.GetProcSpell())
-            if (procSpell->GetSpellInfo()->GetFirstRankSpell()->Id == SPELL_WARRIOR_EXECUTE_R1)
-                return isTriggeredAtSpellProcEvent;
-        return false;
-    }
-
-    void Register() override
-    {
-        DoAfterCheckProc += AuraAfterCheckProcFn(spell_war_sudden_death_aura::AfterCheckProc);
-    }
-};
-
 // Second Wind - triggers health regen when stunned or immobilized
 class spell_warr_second_wind : public AuraScript
 {
@@ -1265,7 +1245,6 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_warriors_wrath);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
     RegisterSpellScript(spell_warr_heroic_strike);
-    RegisterSpellScript(spell_war_sudden_death_aura);
     RegisterSpellScript(spell_warr_second_wind);
     RegisterSpellScript(spell_warr_deep_wounds_aura);
     RegisterSpellScript(spell_warr_extra_proc);
