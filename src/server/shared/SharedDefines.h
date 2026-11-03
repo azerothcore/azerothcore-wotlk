@@ -136,14 +136,13 @@ enum Classes
     CLASS_DRUID         = 11 // TITLE Druid
 };
 
-// max+1 for player class
+// Declared size of the hand-written per-class data tables only (max+1 of the stock class ids).
+// It is NOT the validity bound: use sClassMgr->GetMaxClasses() to validate a class id.
 #define MAX_CLASSES       12
 
-#define CLASSMASK_ALL_PLAYABLE \
-    ((1<<(CLASS_WARRIOR-1))|(1<<(CLASS_PALADIN-1))|(1<<(CLASS_HUNTER-1))| \
-    (1<<(CLASS_ROGUE-1))  |(1<<(CLASS_PRIEST-1)) |(1<<(CLASS_SHAMAN-1))| \
-    (1<<(CLASS_MAGE-1))   |(1<<(CLASS_WARLOCK-1))|(1<<(CLASS_DRUID-1)) | \
-    (1<<(CLASS_DEATH_KNIGHT-1)))
+// DEPRECATED: static mask of the stock playable classes, kept only so external modules still compile.
+// It ignores classes added via ChrClasses.dbc. Use ClassMgr::GetPlayableClassMask() instead.
+#define CLASSMASK_ALL_PLAYABLE     ((1<<(CLASS_WARRIOR-1))|(1<<(CLASS_PALADIN-1))|(1<<(CLASS_HUNTER-1))|     (1<<(CLASS_ROGUE-1))  |(1<<(CLASS_PRIEST-1)) |(1<<(CLASS_SHAMAN-1))|     (1<<(CLASS_MAGE-1))   |(1<<(CLASS_WARLOCK-1))|(1<<(CLASS_DRUID-1)) |     (1<<(CLASS_DEATH_KNIGHT-1)))
 
 // valid classes for creature_template.unit_class
 #define CLASSMASK_ALL_CREATURES ((1<<(CLASS_WARRIOR-1)) | (1<<(CLASS_PALADIN-1)) | (1<<(CLASS_ROGUE-1)) | (1<<(CLASS_MAGE-1)))

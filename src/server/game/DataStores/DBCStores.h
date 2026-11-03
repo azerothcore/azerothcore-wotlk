@@ -54,7 +54,8 @@ MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty& di
 
 bool IsSharedDifficultyMap(uint32 mapid);
 
-uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls);
+void BuildTalentTabPages(); // requires ClassMgr::LoadClasses() to have run
+uint32 const* /*[MAX_TALENT_TABS]*/ GetTalentTabPages(uint8 cls); // nullptr for an unknown class
 
 uint32 GetLiquidFlags(uint32 liquidType);
 

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ClassMgr.h"
 #include "Config.h"
 #include "Creature.h"
 #include "Pet.h"
@@ -723,6 +724,20 @@ const float m_diminishing_k[MAX_CLASSES] =
     0.9720f   // Druid
 };
 
+// Diminishing returns cap and k of a class (pclass = class - 1); false for a class without data in the stat tables:
+// no row, or a zero-filled one (cap and k of 0 would turn the formula into 0 / 0)
+static bool GetDiminishingParams(float const (&capTable)[MAX_CLASSES], uint32 pclass, float& cap, float& k)
+{
+    float const* capRow = GetClassTableRow(capTable, pclass);
+    float const* kRow = GetClassTableRow(m_diminishing_k, pclass);
+    if (!capRow || !kRow || *capRow <= 0.0f || *kRow <= 0.0f)
+        return false;
+
+    cap = *capRow;
+    k = *kRow;
+    return true;
+}
+
 float Player::GetMissPercentageFromDefence() const
 {
     float const miss_cap[MAX_CLASSES] =
@@ -747,7 +762,13 @@ float Player::GetMissPercentageFromDefence() const
 
     // apply diminishing formula to diminishing miss chance
     uint32 pclass = getClass() - 1;
-    return nondiminishing + (diminishing * miss_cap[pclass] / (diminishing + miss_cap[pclass] * m_diminishing_k[pclass]));
+
+    // class without data: no diminishing returns
+    float cap, k;
+    if (!GetDiminishingParams(miss_cap, pclass, cap, k))
+        return nondiminishing + diminishing;
+
+    return nondiminishing + (diminishing * cap / (diminishing + cap * k));
 }
 
 void Player::UpdateParryPercentage()
@@ -771,7 +792,10 @@ void Player::UpdateParryPercentage()
     float value = 0.0f;
     m_realParry = 0.0f;
     uint32 pclass = getClass() - 1;
-    if (CanParry() && parry_cap[pclass] > 0.0f)
+
+    // a class without data cannot parry
+    float cap, k;
+    if (CanParry() && GetDiminishingParams(parry_cap, pclass, cap, k) && cap > 0.0f)
     {
         float nondiminishing  = 5.0f;
         // Parry from rating
@@ -782,7 +806,7 @@ void Player::UpdateParryPercentage()
         // Parry from SPELL_AURA_MOD_PARRY_PERCENT aura
         nondiminishing += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
         // apply diminishing formula to diminishing parry chance
-        m_realParry = nondiminishing + diminishing * parry_cap[pclass] / (diminishing + parry_cap[pclass] * m_diminishing_k[pclass]);
+        m_realParry = nondiminishing + diminishing * cap / (diminishing + cap * k);
         m_realParry = m_realParry < 0.0f ? 0.0f : m_realParry;
 
         value = std::max(diminishing + nondiminishing, 0.0f);
@@ -824,7 +848,13 @@ void Player::UpdateDodgePercentage()
     diminishing += GetRatingBonusValue(CR_DODGE);
     // apply diminishing formula to diminishing dodge chance
     uint32 pclass = getClass() - 1;
-    m_realDodge = nondiminishing + (diminishing * dodge_cap[pclass] / (diminishing + dodge_cap[pclass] * m_diminishing_k[pclass]));
+
+    // class without data: no diminishing returns
+    float cap, k;
+    if (GetDiminishingParams(dodge_cap, pclass, cap, k))
+        m_realDodge = nondiminishing + (diminishing * cap / (diminishing + cap * k));
+    else
+        m_realDodge = nondiminishing + diminishing;
 
     m_realDodge = m_realDodge < 0.0f ? 0.0f : m_realDodge;
     float value = std::max(diminishing + nondiminishing, 0.0f);
