@@ -144,7 +144,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
     {
         switch (a)
         {
-            case -1:
+            case ACTION_DESPAWN_SUMMONS:
                 summons.DespawnAll();
                 if (pInstance && me->GetEntry() == NPC_LIGHTBANE )
                 {
@@ -183,6 +183,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             empoweredId2 = 67218;
                             touchId2 = 67283;
                             break;
+                        default:
+                            break;
                     }
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(essenceId1);
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(empoweredId1);
@@ -197,12 +199,14 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 me->CastSpell(me, SPELL_TWIN_POWER, true);
                 events.RescheduleEvent(EVENT_REMOVE_DUAL_WIELD, 15s);
                 break;
+            default:
+                break;
         }
     }
 
     Creature* GetSister()
     {
-        return ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(me->GetEntry() == NPC_DARKBANE ? NPC_LIGHTBANE : NPC_DARKBANE));
+        return ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(me->GetEntry() == NPC_DARKBANE ? DATA_LIGHTBANE : DATA_DARKBANE));
     }
 
     /*void AttackStart(Unit* victim)
@@ -472,7 +476,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        DoAction(-1);
+        DoAction(ACTION_DESPAWN_SUMMONS);
         Talk(SAY_DEATH);
         if (pInstance)
         {
@@ -823,38 +827,31 @@ class spell_valkyr_touch_aura : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = GetCaster();
-        if (!caster)
+        // Only the touched player takes damage, and the matching essence absorbs it
+        Unit* target = GetTarget();
+        if (!caster || !caster->GetMap()->IsHeroic() || !target->IsAlive() || target->HasSpiritOfRedemptionAura())
             return;
-        if (caster->GetMap()->GetId() == 649 )
-        {
-            uint32 excludedID = GetSpellInfo()->ExcludeTargetAuraSpell;
-            Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
-            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if (Player* plr = itr->GetSource())
-                    if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasSpiritOfRedemptionAura())
-                    {
-                        uint32 absorb = 0;
-                        uint32 resist = 0;
-                        CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-                        int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
-                        uint32 damage = dmg;
-                        int32 resilienceReduction = damage;
-                        if (caster->CanApplyResilience())
-                            Unit::ApplyResilience(plr, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
-                        resilienceReduction = damage - resilienceReduction;
-                        damage -= resilienceReduction;
-                        uint32 mitigated_damage = resilienceReduction;
-                        DamageInfo dmgInfo(caster, plr, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
-                        Unit::CalcAbsorbResist(dmgInfo);
-                        Unit::DealDamageMods(plr, damage, &absorb);
-                        int32 overkill = damage - plr->GetHealth();
-                        if (overkill < 0)
-                            overkill = 0;
-                        SpellPeriodicAuraLogInfo pInfo(aurEff, damage, overkill, absorb, resist, 0.0f, false);
-                        plr->SendPeriodicAuraLog(&pInfo);
-                        Unit::DealDamage(caster, plr, damage, 0, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
-                    }
-        }
+
+        int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
+        uint32 damage = dmg;
+        int32 resilienceReduction = damage;
+        if (caster->CanApplyResilience())
+            Unit::ApplyResilience(target, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
+        resilienceReduction = damage - resilienceReduction;
+        damage -= resilienceReduction;
+        uint32 mitigated_damage = resilienceReduction;
+        DamageInfo dmgInfo(caster, target, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
+        Unit::CalcAbsorbResist(dmgInfo);
+        uint32 absorb = dmgInfo.GetAbsorb();
+        uint32 resist = dmgInfo.GetResist();
+        damage = dmgInfo.GetDamage();
+        Unit::DealDamageMods(target, damage, &absorb);
+        int32 overkill = damage - target->GetHealth();
+        if (overkill < 0)
+            overkill = 0;
+        SpellPeriodicAuraLogInfo pInfo(aurEff, damage, overkill, absorb, resist, 0.0f, false);
+        target->SendPeriodicAuraLog(&pInfo);
+        Unit::DealDamage(caster, target, damage, 0, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
     }
 
     void Register() override
@@ -875,7 +872,7 @@ class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         if (Unit* target = GetTarget())
-            if (target->GetDisplayId() != 11686)
+            if (target->GetDisplayId() != MODEL_INVISIBLE_STALKER)
                 if (Creature* creature = target->ToCreature())
                     if (Player* player = creature->SelectNearestPlayer(2.75f))
                         if (creature->GetExactDist2d(player) <= 2.75f)
@@ -883,7 +880,7 @@ class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
                             creature->AI()->DoAction(1); // despawning = true;
                             creature->GetMotionMaster()->MoveIdle();
                             creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
-                            creature->SetDisplayId(11686);
+                            creature->SetDisplayId(MODEL_INVISIBLE_STALKER);
                             creature->DespawnOrUnsummon(1500ms);
                         }
     }

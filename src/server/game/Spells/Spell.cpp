@@ -6122,6 +6122,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), unitCaster))
                 return SPELL_FAILED_NOT_INFRONT;
 
+            // A unit riding a player sits on their back (Gormok's Snobold Vassals), out of reach of their targeted harmful spells
+            if (unitCaster && unitCaster->IsPlayer() && target->GetVehicleBase() == unitCaster && !m_spellInfo->IsPositive())
+                return SPELL_FAILED_BAD_TARGETS;
+
             // Ignore LOS for gameobject casts: one has no collision height, so the ray would start on its floor
             // position, which the floor under a player standing on it can block. CheckEffectTarget still checks
             // LOS for gameobjects that do not ignore it.
