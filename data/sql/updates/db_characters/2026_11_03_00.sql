@@ -1,3 +1,4 @@
+-- DB update 2026_10_31_00 -> 2026_11_03_00
 --
 ALTER TABLE `recovery_item`
     ADD COLUMN `ItemGuid` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'item_instance guid of the lost item' AFTER `ItemEntry`,

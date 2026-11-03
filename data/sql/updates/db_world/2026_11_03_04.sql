@@ -1,3 +1,4 @@
+-- DB update 2026_11_03_03 -> 2026_11_03_04
 --
 DELETE FROM `acore_string` WHERE `entry` IN (35483, 35484, 35485);
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
