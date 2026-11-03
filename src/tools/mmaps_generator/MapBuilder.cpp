@@ -59,7 +59,7 @@ namespace MMAP
 
     // Recast merges spans whose tops are within walkableClimb and keeps the higher area id. The NavTerrain flag
     // values pick the wrong winner, so triangles are rasterized with these ranks and mapped back afterwards.
-    // Ground beats water, so shallow water stays walkable; lava, slime and steep ground beat ground; deep water
+    // Ground beats water, so shallow water stays walkable; steep beats ground; lava and slime beat both; deep water
     // loses to everything, so it never spreads onto a shore. Same idea as TrinityCore's NavArea ordering.
     static unsigned char ToMergeRank(unsigned char terrain)
     {
@@ -68,9 +68,9 @@ namespace MMAP
             case NAV_DEEP_WATER:   return 1;
             case NAV_WATER:        return 2;
             case NAV_GROUND:       return 3;
-            case NAV_MAGMA:        return 4;
-            case NAV_SLIME:        return 5;
-            case NAV_GROUND_STEEP: return 6;
+            case NAV_GROUND_STEEP: return 4;
+            case NAV_MAGMA:        return 5;
+            case NAV_SLIME:        return 6;
             default:               return terrain;
         }
     }
@@ -82,9 +82,9 @@ namespace MMAP
             case 1:  return NAV_DEEP_WATER;
             case 2:  return NAV_WATER;
             case 3:  return NAV_GROUND;
-            case 4:  return NAV_MAGMA;
-            case 5:  return NAV_SLIME;
-            case 6:  return NAV_GROUND_STEEP;
+            case 4:  return NAV_GROUND_STEEP;
+            case 5:  return NAV_MAGMA;
+            case 6:  return NAV_SLIME;
             default: return rank;
         }
     }
