@@ -1,3 +1,4 @@
+-- DB update 2026_11_04_01 -> 2026_11_04_02
 --
 -- Quest 9678 "The First Trial": kill credit only, Gilded Brazier (181956) and Sangrias Stillblade (17716) in SmartAI
 UPDATE `quest_template_addon` SET `SpecialFlags` = `SpecialFlags` & ~2 WHERE `ID` = 9678;
