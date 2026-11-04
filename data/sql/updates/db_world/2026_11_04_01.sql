@@ -1,3 +1,4 @@
+-- DB update 2026_11_04_00 -> 2026_11_04_01
 --
 -- Warrior: Sword Specialization (-12281) and Sudden Death (-29723) must also proc from melee
 -- abilities that require a main-hand weapon but deal no direct damage (Hamstring, Rend,
