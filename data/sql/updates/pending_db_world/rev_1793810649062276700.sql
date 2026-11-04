@@ -19,12 +19,11 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 17716 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (17716, 0, 0, 0, 1, 0, 100, 257, 2000, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - Out of Combat - Say Line 0 (No Repeat) (Dont Reset)'),
-(17716, 0, 1, 2, 1, 0, 100, 1, 2000, 2000, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - Out of Combat - Set Run On (No Repeat)'),
-(17716, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 8051.857, -7543.9897, 149.69759, 0, 'Sangrias Stillblade - Out of Combat - Move To Point 1'),
-(17716, 0, 3, 4, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - On Point 1 Reached - Set Home Position'),
-(17716, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 1771600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - On Point 1 Reached - Run Script'),
-(17716, 0, 5, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - On Aggro - Set Npc Flags None'),
-(17716, 0, 6, 0, 9, 0, 100, 1, 0, 0, 0, 0, 8, 25, 11, 22120, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - Within 8-25 Range - Cast \'Charge\' (No Repeat)');
+(17716, 0, 1, 0, 1, 0, 100, 1, 2000, 2000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 8051.857, -7543.9897, 149.69759, 0, 'Sangrias Stillblade - Out of Combat - Move To Point 1 (No Repeat)'),
+(17716, 0, 2, 3, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - On Point 1 Reached - Set Home Position'),
+(17716, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 1771600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - On Point 1 Reached - Run Script'),
+(17716, 0, 4, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - On Aggro - Set Npc Flags None'),
+(17716, 0, 5, 0, 9, 0, 100, 1, 0, 0, 0, 0, 8, 25, 11, 22120, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Sangrias Stillblade - Within 8-25 Range - Cast \'Charge\' (No Repeat)');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1771600 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
