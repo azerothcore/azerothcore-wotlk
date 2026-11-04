@@ -3091,6 +3091,22 @@ bool Creature::HasSpellCooldown(uint32 spell_id) const
     return (itr != m_CreatureSpellCooldowns.end() && itr->second.end > GameTime::GetGameTimeMS().count());
 }
 
+void Creature::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
+{
+    m_CreatureSpellCooldowns.erase(spell_id);
+
+    if (update)
+    {
+        if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
+            data << uint32(spell_id);
+            data << GetGUID();
+            playerOwner->SendDirectMessage(&data);
+        }
+    }
+}
+
 bool Creature::HasSpell(uint32 spellID) const
 {
     uint8 i;
