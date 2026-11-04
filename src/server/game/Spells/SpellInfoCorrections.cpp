@@ -4876,21 +4876,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_UNK;
     });
 
-    // Life Tap
-    ApplySpellFix({ 1454 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
-    });
-
-    // Life Tap
-    ApplySpellFix({ 1455, 1456, 11687, 11688, 11689, 27222, 57946 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
-        spellInfo->MaxLevel = 16;
-        spellInfo->BaseLevel = 6;
-        spellInfo->SpellLevel = 6;
-    });
-
     // Explosive Sheep
     ApplySpellFix({ 4074 }, [](SpellInfo* spellInfo)
     {
