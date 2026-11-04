@@ -1,3 +1,4 @@
+-- DB update 2026_11_04_02 -> 2026_11_04_03
 --
 -- Rising Anger (Gormok): SPELL_ATTR0_CU_SINGLE_AURA_STACK, so every Snobold's cast stacks on one aura
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 66636;
