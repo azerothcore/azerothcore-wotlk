@@ -34,6 +34,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
+#include "Pet.h"
 #include "Physics.h"
 #include "Player.h"
 #include "ReputationMgr.h"
@@ -202,8 +203,11 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
         if (isType(TYPEMASK_DYNAMICOBJECT) || isType(TYPEMASK_CORPSE) || isType(TYPEMASK_PLAYER))
             updatetype = UPDATETYPE_CREATE_OBJECT2;
 
-        // UPDATETYPE_CREATE_OBJECT2 for pets...
-        if (target->GetPetGUID() == GetGUID())
+        // Only a newly summoned risen ghoul should replay its birth animation.
+        Pet* pet = IsUnit() && ToUnit()->IsPet() ? ToUnit()->ToPet() : nullptr;
+        bool isRisenGhoul = pet && pet->GetEntry() == NPC_RISEN_GHOUL;
+        if ((isRisenGhoul && pet->IsNewRisenGhoulVisible()) ||
+            (!isRisenGhoul && target->GetPetGUID() == GetGUID()))
             updatetype = UPDATETYPE_CREATE_OBJECT2;
 
         // UPDATETYPE_CREATE_OBJECT2 for some gameobject types...
