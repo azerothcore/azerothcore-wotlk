@@ -214,7 +214,8 @@ void ThreatReference::HeapNotifyDecreased()
 }
 
 ThreatManager::ThreatManager(Unit* owner) : _owner(owner), _ownerCanHaveThreatList(false), _needClientUpdate(false), _updateTimer(THREAT_UPDATE_INTERVAL),
-    _sortedThreatList(std::make_unique<Heap>()), _currentVictimRef(nullptr), _fixateRef(nullptr)
+    _victimUpdatePending(false), _sortedThreatList(std::make_unique<Heap>()), _currentVictimRef(nullptr),
+    _fixateRef(nullptr)
 {
     for (int8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
         _singleSchoolModifiers[i] = 1.0f;
@@ -242,7 +243,12 @@ void ThreatManager::Update(uint32 tdiff)
         _updateTimer = THREAT_UPDATE_INTERVAL;
     }
     else
+    {
         _updateTimer -= tdiff;
+        // a threat change since the last update put someone past the current victim: switch now, not on the timer
+        if (_victimUpdatePending)
+            UpdateVictimIfChanged();
+    }
 }
 
 Unit* ThreatManager::GetCurrentVictim()
@@ -485,6 +491,7 @@ void ThreatManager::AddThreat(Unit* target, float amount, SpellInfo const* spell
         if (ref->IsOnline())
             ref->AddThreat(amount);
 
+        FlagVictimUpdateIfOvertaken();
         return;
     }
 
@@ -501,14 +508,20 @@ void ThreatManager::AddThreat(Unit* target, float amount, SpellInfo const* spell
     if (!_currentVictimRef)
         UpdateVictim();
     else
+    {
+        FlagVictimUpdateIfOvertaken();
         ProcessAIUpdates();
+    }
 }
 
 void ThreatManager::ScaleThreat(Unit* target, float factor)
 {
     auto it = _myThreatListEntries.find(target->GetGUID());
-    if (it != _myThreatListEntries.end())
-        it->second->ScaleThreat(std::max<float>(factor, 0.0f));
+    if (it == _myThreatListEntries.end())
+        return;
+
+    it->second->ScaleThreat(std::max<float>(factor, 0.0f));
+    FlagVictimUpdateIfOvertaken();
 }
 
 void ThreatManager::MatchUnitThreatToHighestThreat(Unit* target)
@@ -628,10 +641,47 @@ void ThreatManager::UpdateVictim()
     bool const newHighest = newVictim && (newVictim != _currentVictimRef);
 
     _currentVictimRef = newVictim;
+    _victimUpdatePending = false;
     if (newHighest || _needClientUpdate)
     {
         SendThreatListToClients(newHighest);
         _needClientUpdate = false;
+    }
+
+    ProcessAIUpdates();
+}
+
+// runs on every threat change, so it only compares against the top of the list and leaves the reselect to Update():
+// a script's reset-then-set (or a loop over the whole list) is then seen as one change, like the timer tick sees it
+void ThreatManager::FlagVictimUpdateIfOvertaken()
+{
+    if (_victimUpdatePending || !_currentVictimRef || _sortedThreatList->empty())
+        return;
+
+    // a fixated target always wins; taunt updates the victim itself
+    if (_fixateRef && _fixateRef->IsAvailable())
+        return;
+
+    // nothing can take over unless the top of the list beats the current victim by the 110% melee margin
+    ThreatReference const* highest = _sortedThreatList->top();
+    if (highest != _currentVictimRef && CompareReferencesLT(_currentVictimRef, highest, 1.1f))
+        _victimUpdatePending = true;
+}
+
+// UpdateVictim() for a flagged threat change: only a new victim is sent to the clients, the timer tick sends the rest
+void ThreatManager::UpdateVictimIfChanged()
+{
+    _victimUpdatePending = false;
+
+    ThreatReference const* const newVictim = ReselectVictim();
+    if (newVictim != _currentVictimRef)
+    {
+        _currentVictimRef = newVictim;
+        if (newVictim)
+        {
+            SendThreatListToClients(true);
+            _needClientUpdate = false;
+        }
     }
 
     ProcessAIUpdates();
@@ -800,7 +850,11 @@ void ThreatManager::ForwardThreatForAssistingMe(Unit* assistant, float baseAmoun
 void ThreatManager::ResetAllMyThreatOnOthers()
 {
     for (auto const& pair : _threatenedByMe)
+    {
         pair.second->ScaleThreat(0.0f);
+        // the creature drops us on its next update, not on its 1s timer (Feign Death, Vanish)
+        pair.second->_mgr._victimUpdatePending = true;
+    }
 }
 
 void ThreatManager::RemoveMeFromThreatLists()
