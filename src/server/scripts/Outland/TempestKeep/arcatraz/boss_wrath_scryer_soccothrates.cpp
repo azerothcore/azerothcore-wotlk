@@ -106,9 +106,9 @@ struct boss_wrath_scryer_soccothrates : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events2.Reset();
 
         Talk(SAY_AGGRO);

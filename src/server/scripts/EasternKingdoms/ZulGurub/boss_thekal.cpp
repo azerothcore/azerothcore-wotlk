@@ -133,9 +133,9 @@ struct boss_thekal : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         scheduler.CancelAll();
         scheduler.Schedule(4s, [this](TaskContext context)

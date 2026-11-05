@@ -47,9 +47,9 @@ struct boss_drakkisath : public BossAI
         _conflagrateThreat = 0.0f;
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_FLAMESTRIKE, 6s);
         events.ScheduleEvent(EVENT_CLEAVE, 8s);
         events.ScheduleEvent(EVENT_CONFLAGRATION, 15s);

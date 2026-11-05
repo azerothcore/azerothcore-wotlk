@@ -40,9 +40,9 @@ struct boss_highlord_omokk : public BossAI
         _Reset();
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_FRENZY, 20s);
         events.ScheduleEvent(EVENT_KNOCK_AWAY, 18s);
     }

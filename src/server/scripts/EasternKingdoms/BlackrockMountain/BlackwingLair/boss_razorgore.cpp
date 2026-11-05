@@ -110,9 +110,9 @@ struct boss_razorgore : public BossAI
         return !(target->IsCreature() && !secondPhase);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         events.ScheduleEvent(EVENT_CLEAVE, 15s);
         events.ScheduleEvent(EVENT_STOMP, 35s);

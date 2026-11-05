@@ -192,7 +192,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
             return;
         }
 
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         DoAction(ACTION_CANCEL_INTRO);
 
         scheduler.CancelAll();

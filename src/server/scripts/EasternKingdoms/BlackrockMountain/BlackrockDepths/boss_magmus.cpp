@@ -35,10 +35,10 @@ struct boss_magmus : public BossAI
         instance->SetData(TYPE_IRON_HALL, NOT_STARTED);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         instance->SetData(TYPE_IRON_HALL, IN_PROGRESS);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_WARSTOMP, 8s, 12s);
         events.ScheduleEvent(SPELL_FIERYBURST, 4s, 8s);
     }

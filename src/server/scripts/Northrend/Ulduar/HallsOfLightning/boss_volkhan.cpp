@@ -90,9 +90,9 @@ struct boss_volkhan : public BossAI
         instance->SetData(DATA_VOLKHAN_ACHIEVEMENT, true);
     }
 
-    void JustEngagedWith(Unit*) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         me->SetInCombatWithZone();
         Talk(SAY_AGGRO);
         events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, randtime(9s, 14s));

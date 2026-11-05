@@ -35,9 +35,9 @@ struct boss_grizzle : public BossAI
 
     Milliseconds nextTremorTime;
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_GROUNDTREMOR, TIMER_GROUNDTREMOR / 5);
         events.ScheduleEvent(SPELL_FRENZY, TIMER_FRENZY / 5);
     }

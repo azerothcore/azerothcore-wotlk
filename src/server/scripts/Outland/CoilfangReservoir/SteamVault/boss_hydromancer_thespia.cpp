@@ -54,10 +54,10 @@ struct boss_hydromancer_thespia : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         scheduler.Schedule(9800ms, [this](TaskContext context)
         {

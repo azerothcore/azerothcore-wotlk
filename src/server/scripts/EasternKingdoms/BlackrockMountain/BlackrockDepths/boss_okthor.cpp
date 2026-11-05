@@ -36,9 +36,9 @@ struct boss_okthor : public BossAI
 {
     boss_okthor(Creature* creature) : BossAI(creature, DATA_OKTHOR) {}
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_ARCANE_BOLT, TIMER_ARCANE_BOLT / 5);
         events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, TIMER_ARCANE_EXPLOSION / 5);
         events.ScheduleEvent(SPELL_POLYMORPH, TIMER_POLYMORPH / 5);
