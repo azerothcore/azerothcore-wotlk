@@ -2750,7 +2750,9 @@ class spell_dk_rime : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_dk_rime::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_dk_rime::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+        // After Freezing Fog is applied: the client redraws Howling Blast's cooldown on the reset, and only
+        // shows it ready once the free-cost modifier is already there.
+        AfterEffectProc += AuraEffectProcFn(spell_dk_rime::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
