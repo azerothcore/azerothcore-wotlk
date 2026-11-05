@@ -7716,7 +7716,28 @@ void Unit::SetMinion(Minion* minion, bool apply)
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(minion->GetUInt32Value(UNIT_CREATED_BY_SPELL));
             // Remove infinity cooldown
             if (spellInfo && spellInfo->IsCooldownStartedOnEvent())
+            {
                 ToPlayer()->SendCooldownEvent(spellInfo);
+
+                // Other cooldown-on-event spells of the same category (Raise Dead for its ghoul) are waiting
+                // on the client for their own event too. Packet only: the category cooldown was just set above.
+                SpellCategoryStore::const_iterator itr = sSpellsByCategoryStore.find(spellInfo->GetCategory());
+                if (spellInfo->GetCategory() && itr != sSpellsByCategoryStore.end())
+                {
+                    for (auto const& [isItem, spellId] : itr->second)
+                    {
+                        if (isItem || spellId == spellInfo->Id)
+                            continue;
+
+                        SpellInfo const* sibling = sSpellMgr->GetSpellInfo(spellId);
+                        if (!sibling || !sibling->IsCooldownStartedOnEvent()
+                            || sibling->SpellFamilyName != spellInfo->SpellFamilyName)
+                            continue;
+
+                        ToPlayer()->SendCooldownEvent(sibling, 0, nullptr, false);
+                    }
+                }
+            }
 
             // xinef: clear spell book
             if (m_Controlled.empty())
