@@ -15,11 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "SharedDefines.h"
-#include "Spell.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -37,13 +34,11 @@ enum Spells
     SPELL_PLAGUE_STRIKE             = 67724,
     SPELL_ICY_TOUCH                 = 67718,
     SPELL_DEATH_RESPITE             = 67745,
-    SPELL_DEATH_RESPITE_DUMMY       = 66798,
     SPELL_OBLITERATE                = 67725,
 
     // phase 2 (+ abilities from phase 1 without death respite)
     SPELL_ARMY_DEAD                 = 67761,
     SPELL_DESECRATION               = 67778,
-    SPELL_DESECRATION_SUMMON        = 67779,
     SPELL_BK_GHOUL_EXPLODE          = 67751,
 
     // phase 3
@@ -52,401 +47,337 @@ enum Spells
 
     // ghouls
     SPELL_CLAW                      = 67774,
-    SPELL_CLAW_H                    = 67879,
     SPELL_EXPLODE                   = 67729,
-    SPELL_EXPLODE_H                   = 67886,
     SPELL_LEAP                      = 67749,
 };
 
-enum Events
+enum Phases
 {
-    EVENT_ANNOUNCER_SAY_ZOMBIE = 1,
-    EVENT_SPELL_PLAGUE_STRIKE,
-    EVENT_SPELL_ICY_TOUCH,
-    EVENT_SPELL_DEATH_RESPITE,
-    EVENT_SPELL_OBLITERATE,
-    EVENT_SPELL_DESECRATION,
-    EVENT_SPELL_DEATH_BITE,
-    EVENT_SPELL_MARKED_DEATH,
+    PHASE_ONE                       = 1,
+    PHASE_TWO                       = 2,
+    PHASE_THREE                     = 3,
 };
 
-enum NPCs
-{
-    NPC_RISEN_CHAMPION              = 35590,
-};
-
-enum Models
+enum ModelIds
 {
     MODEL_SKELETON                  = 29846,
     MODEL_GHOST                     = 21300
 };
 
-class boss_black_knight : public CreatureScript
+enum GryphonWaypoints
 {
-public:
-    boss_black_knight() : CreatureScript("boss_black_knight") { }
+    WAYPOINT_GRYPHON_LANDING        = 12, // lands and pauses here, the instance resumes the run after the scene
+};
 
-    struct boss_black_knightAI : public ScriptedAI
+struct boss_black_knight : public BossAI
+{
+    boss_black_knight(Creature* creature) : BossAI(creature, BOSS_BLACK_KNIGHT) { }
+
+    void Reset() override
     {
-        boss_black_knightAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+        BossAI::Reset();
+        _phase = PHASE_ONE;
+        me->SetDisplayId(me->GetNativeDisplayId());
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetImmuneToAll(true);
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->DespawnOrUnsummon(1ms);
+        BossAI::EnterEvadeMode(why);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/,
+        SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
         {
-            pInstance = pCreature->GetInstanceScript();
+            damage = 0;
+            return;
         }
 
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-        uint8 Phase;
-
-        void Reset() override
+        if (_phase < PHASE_THREE && damage >= me->GetHealth())
         {
-            events.Reset();
-            summons.DespawnAll();
-            Phase = 1;
-            me->SetDisplayId(me->GetNativeDisplayId());
+            damage = 0;
+            me->SetHealth(me->GetMaxHealth());
+            scheduler.CancelAll();
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetImmuneToAll(true);
-            me->SetReactState(REACT_PASSIVE);
-            if (pInstance)
-                pInstance->SetBossState(BOSS_BLACK_KNIGHT, NOT_STARTED);
+            me->RemoveAllAuras();
+            me->SetControlled(true, UNIT_STATE_STUNNED);
+            DoCastSelf(SPELL_BK_GHOUL_EXPLODE, true);
+            summons.clear();
 
-            //me->SetLootMode(0); // [LOOT]
+            DoCastSelf(SPELL_BK_FEIGN_DEATH, true);
+            me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+            me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+            me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+            me->AddUnitState(UNIT_STATE_DIED);
         }
+    }
 
-        void EnterEvadeMode(EvadeReason why) override
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_DESPAWN_SUMMONS)
         {
-            me->DespawnOrUnsummon(1ms);
-            ScriptedAI::EnterEvadeMode(why);
+            summons.DespawnAll();
         }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        else if (action == ACTION_START_ENCOUNTER)
         {
-            if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-            {
-                damage = 0;
+            if (!instance)
                 return;
-            }
 
-            if (Phase < 3 && damage >= me->GetHealth())
-            {
-                damage = 0;
-                me->SetHealth(me->GetMaxHealth());
-                events.Reset();
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->RemoveAllAuras();
-                me->SetControlled(true, UNIT_STATE_STUNNED);
-                me->CastSpell(me, SPELL_BK_GHOUL_EXPLODE, true);
-                summons.clear();
+            instance->SetBossState(BOSS_BLACK_KNIGHT, IN_PROGRESS);
+            Talk(SAY_BK_AGGRO);
+            bool const isHorde = instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE;
+            DoCastAOE(isHorde ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS);
+            if (Creature* announcer = instance->GetCreature(DATA_ANNOUNCER))
+                announcer->DespawnOrUnsummon();
 
-                me->CastSpell(me, SPELL_BK_FEIGN_DEATH, true);
-                me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
-                me->AddUnitState(UNIT_STATE_DIED);
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == -1)
+            scheduler.CancelAll();
+            scheduler.Schedule(2500ms, PHASE_ONE, [this](TaskContext /*context*/)
             {
-                summons.DespawnAll();
-            }
-            else if (param == 1)
-            {
-                if (!pInstance)
+                if (!instance || summons.empty())
                     return;
 
-                pInstance->SetBossState(BOSS_BLACK_KNIGHT, IN_PROGRESS);
-                Talk(SAY_BK_AGGRO);
-                me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
-                if (Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)))
-                    announcer->DespawnOrUnsummon();
-
-                events.Reset();
-                events.ScheduleEvent(EVENT_ANNOUNCER_SAY_ZOMBIE, 2500ms);
-                events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, 7s, 9s);
-                events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7s);
-                events.ScheduleEvent(EVENT_SPELL_DEATH_RESPITE, 13s, 15s);
-                events.ScheduleEvent(EVENT_SPELL_OBLITERATE, 11s, 19s);
-            }
+                if (Creature* ghoul = me->GetMap()->GetCreature(*summons.begin()))
+                    if (urand(0, 1))
+                        /// @todo: Multiple variations + not always happening, from video sources,
+                        /// needs sniff to transition from DB.
+                        ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL);
+            });
+            SchedulePhaseOneAbilities();
         }
+    }
 
-        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
+    void SchedulePhaseOneAbilities()
+    {
+        scheduler.Schedule(7s, 9s, PHASE_ONE, [this](TaskContext context)
         {
-            switch (spell->Id)
+            DoCastVictim(SPELL_PLAGUE_STRIKE);
+            context.Repeat(10s, 12s);
+        });
+        scheduler.Schedule(3500ms, 7s, PHASE_ONE, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_ICY_TOUCH);
+            context.Repeat(5s, 6s);
+        });
+        scheduler.Schedule(13s, 15s, PHASE_ONE, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_DEATH_RESPITE, 0, 50.0f, true);
+            context.Repeat(13s, 15s);
+        });
+        scheduler.Schedule(11s, 19s, PHASE_ONE, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_OBLITERATE);
+            context.Repeat(15s, 17s);
+        });
+    }
+
+    void SchedulePhaseTwoAbilities()
+    {
+        scheduler.Schedule(7s, 9s, PHASE_TWO, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_PLAGUE_STRIKE);
+            context.Repeat(10s, 12s);
+        });
+        scheduler.Schedule(3500ms, 7s, PHASE_TWO, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_ICY_TOUCH);
+            context.Repeat(5s, 6s);
+        });
+        scheduler.Schedule(11s, 19s, PHASE_TWO, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_OBLITERATE);
+            context.Repeat(15s, 17s);
+        });
+        scheduler.Schedule(2s, 3s, PHASE_TWO, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_DESECRATION, 0, 50.0f, true);
+            context.Repeat(14s, 17s);
+        });
+    }
+
+    void SchedulePhaseThreeAbilities()
+    {
+        scheduler.Schedule(2s, PHASE_THREE, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_DEATH_BITE);
+            context.Repeat(2s, 4s);
+        });
+        scheduler.Schedule(1s, PHASE_THREE, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_MARKED_DEATH, 0, 0.0f, true);
+            context.Repeat(9s);
+        });
+    }
+
+    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    {
+        if (spell->Id != SPELL_BLACK_KNIGHT_RES)
+            return;
+
+        me->SetHealth(me->GetMaxHealth());
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetImmuneToAll(false);
+        me->SetControlled(false, UNIT_STATE_STUNNED);
+
+        me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+        me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+        me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
+        me->ClearUnitState(UNIT_STATE_DIED);
+
+        ++_phase;
+
+        switch (_phase)
+        {
+            case PHASE_TWO:
+                me->SetDisplayId(MODEL_SKELETON);
+                Talk(SAY_BK_PHASE_2);
+                DoCastSelf(SPELL_ARMY_DEAD);
+
+                scheduler.CancelAll();
+                SchedulePhaseTwoAbilities();
+                break;
+            case PHASE_THREE:
+                me->SetDisplayId(MODEL_GHOST);
+                Talk(SAY_BK_PHASE_3);
+
+                scheduler.CancelAll();
+                SchedulePhaseThreeAbilities();
+                break;
+            default:
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+        }
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        BossAI::JustSummoned(summon);
+        if (Unit* target = summon->SelectNearestTarget(200.0f))
+            summon->AI()->AttackStart(target);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
+            Talk(SAY_BK_KILL_PLAYER);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        DoCastAOE(SPELL_BK_KILL_CREDIT, true);
+        Talk(SAY_BK_DEATH);
+        if (me->ToTempSummon())
+            me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+
+        BossAI::JustDied(killer);
+    }
+
+private:
+    uint8 _phase = PHASE_ONE;
+};
+
+struct npc_black_knight_skeletal_gryphon : public npc_escortAI
+{
+    npc_black_knight_skeletal_gryphon(Creature* creature) : npc_escortAI(creature) { }
+
+    void Reset() override
+    {
+        Start(false);
+        SetDespawnAtEnd(true);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetImmuneToAll(true);
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RESUME_ESCORT)
+        {
+            me->SetControlled(false, UNIT_STATE_ROOT);
+            me->DisableRotate(false);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+            SetEscortPaused(false);
+        }
+    }
+
+    using CreatureAI::WaypointReached;
+    void WaypointReached(uint32 point) override
+    {
+        if (point == WAYPOINT_GRYPHON_LANDING)
+        {
+            SetEscortPaused(true);
+            me->SetOrientation(3.62f);
+            me->SetControlled(true, UNIT_STATE_ROOT);
+            me->DisableRotate(true);
+            me->SetFacingTo(3.62f);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_MOUNT_SPECIAL);
+            if (InstanceScript* instance = me->GetInstanceScript())
+                instance->SetData(DATA_SKELETAL_GRYPHON_LANDED, 0);
+        }
+    }
+};
+
+struct npc_black_knight_ghoul : public CreatureAI
+{
+    npc_black_knight_ghoul(Creature* creature) : CreatureAI(creature) { }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.CancelAll();
+
+        if (me->GetEntry() == NPC_RISEN_JAEREN || me->GetEntry() == NPC_RISEN_ARELAS)
+        {
+            scheduler.Schedule(1s, [this](TaskContext context)
             {
-                case SPELL_BLACK_KNIGHT_RES:
-                    me->SetHealth(me->GetMaxHealth());
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetImmuneToAll(false);
-                    me->SetControlled(false, UNIT_STATE_STUNNED);
-
-                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
-                    me->ClearUnitState(UNIT_STATE_DIED);
-
-                    ++Phase;
-
-                    switch (Phase)
+                if (Unit* victim = me->GetVictim())
+                    if (me->GetDistance(victim) > 5.0f && me->GetDistance(victim) < 30.0f)
                     {
-                        case 2:
-                            me->SetDisplayId(MODEL_SKELETON);
-                            Talk(SAY_BK_PHASE_2);
-                            me->CastSpell(me, SPELL_ARMY_DEAD, false);
-
-                            events.Reset();
-                            events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, 7s, 9s);
-                            events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7s);
-                            events.ScheduleEvent(EVENT_SPELL_OBLITERATE, 11s, 19s);
-                            events.ScheduleEvent(EVENT_SPELL_DESECRATION, 2s, 3s);
-                            break;
-                        case 3:
-                            me->SetDisplayId(MODEL_GHOST);
-                            Talk(SAY_BK_PHASE_3);
-
-                            events.Reset();
-                            events.ScheduleEvent(EVENT_SPELL_DEATH_BITE, 2s);
-                            events.ScheduleEvent(EVENT_SPELL_MARKED_DEATH, 1s);
-                            break;
-                        default:
-                            EnterEvadeMode(EVADE_REASON_OTHER);
-                            break;
+                        DoCast(victim, SPELL_LEAP);
+                        return; // the leap is used once, it is not repeated
                     }
-                    break;
-            }
+
+                context.Repeat(1s);
+            });
         }
 
-        void UpdateAI(uint32 diff) override
+        scheduler.Schedule(3s, 4s, [this](TaskContext context)
         {
-            if (!UpdateVictim())
-                return;
+            DoCastVictim(SPELL_CLAW);
+            context.Repeat(6s, 8s);
+        });
+    }
 
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_ANNOUNCER_SAY_ZOMBIE:
-                    if (pInstance && !summons.empty())
-                        if (Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()))
-                            if (urand(0, 1))
-                                ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL); /// @todo: Multiple variations + not always happening, from video sources, needs sniff to transition from DB.
-                    break;
-                case EVENT_SPELL_PLAGUE_STRIKE:
-                    if (me->GetVictim())
-                        me->CastSpell(me->GetVictim(), SPELL_PLAGUE_STRIKE, false);
-                    events.Repeat(10s, 12s);
-                    break;
-                case EVENT_SPELL_ICY_TOUCH:
-                    if (me->GetVictim())
-                        me->CastSpell(me->GetVictim(), SPELL_ICY_TOUCH, false);
-                    events.Repeat(5s, 6s);
-                    break;
-                case EVENT_SPELL_DEATH_RESPITE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_DEATH_RESPITE, false);
-                    events.Repeat(13s, 15s);
-                    break;
-                case EVENT_SPELL_OBLITERATE:
-                    if (me->GetVictim())
-                        me->CastSpell(me->GetVictim(), SPELL_OBLITERATE, false);
-                    events.Repeat(15s, 17s);
-                    break;
-                case EVENT_SPELL_DESECRATION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_DESECRATION, false);
-                    events.Repeat(14s, 17s);
-                    break;
-                case EVENT_SPELL_DEATH_BITE:
-                    me->CastSpell((Unit*)nullptr, SPELL_DEATH_BITE, false);
-                    events.Repeat(2s, 4s);
-                    break;
-                case EVENT_SPELL_MARKED_DEATH:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.000000f, true))
-                        me->CastSpell(target, SPELL_MARKED_DEATH, false);
-                    events.Repeat(9s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            if (Unit* target = summon->SelectNearestTarget(200.0f))
-            {
-                summon->AI()->AttackStart(target);
-                DoZoneInCombat(summon);
-            }
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->IsPlayer())
-            {
-                Talk(SAY_BK_KILL_PLAYER);
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            me->CastSpell((Unit*)nullptr, SPELL_BK_KILL_CREDIT, true);
-            Talk(SAY_BK_DEATH);
-            if (pInstance)
-                pInstance->SetBossState(BOSS_BLACK_KNIGHT, DONE);
-            if (me->ToTempSummon())
-                me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
-        return GetTrialOfTheChampionAI<boss_black_knightAI>(pCreature);
+        if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
+        {
+            me->RemoveUnitFlag(UNIT_FLAG_STUNNED);
+            DoCastSelf(SPELL_EXPLODE);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        DoMeleeAttackIfReady();
     }
 };
 
-class npc_black_knight_skeletal_gryphon : public CreatureScript
-{
-public:
-    npc_black_knight_skeletal_gryphon() : CreatureScript("npc_black_knight_skeletal_gryphon") {}
-
-    struct npc_black_knight_skeletal_gryphonAI : public npc_escortAI
-    {
-        npc_black_knight_skeletal_gryphonAI(Creature* pCreature) : npc_escortAI(pCreature) {}
-
-        void Reset() override
-        {
-            Start(false, ObjectGuid::Empty, nullptr);
-            SetDespawnAtEnd(true);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetImmuneToAll(true);
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == 1)
-            {
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                me->DisableRotate(false);
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                SetEscortPaused(false);
-            }
-        }
-
-        using CreatureAI::WaypointReached;
-        void WaypointReached(uint32 i) override
-        {
-            if (i == 12)
-            {
-                SetEscortPaused(true);
-                me->SetOrientation(3.62f);
-                me->SetControlled(true, UNIT_STATE_ROOT);
-                me->DisableRotate(true);
-                me->SetFacingTo(3.62f);
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_MOUNT_SPECIAL);
-                if (InstanceScript* pInstance = me->GetInstanceScript())
-                    pInstance->SetData(DATA_SKELETAL_GRYPHON_LANDED, 0);
-            }
-        }
-
-        void UpdateAI(uint32 uiDiff) override
-        {
-            npc_escortAI::UpdateAI(uiDiff);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetTrialOfTheChampionAI<npc_black_knight_skeletal_gryphonAI>(pCreature);
-    }
-};
-
-class npc_black_knight_ghoul : public CreatureScript
-{
-public:
-    npc_black_knight_ghoul() : CreatureScript("npc_black_knight_ghoul") { }
-
-    struct npc_black_knight_ghoulAI : public ScriptedAI
-    {
-        npc_black_knight_ghoulAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-            pInstance = pCreature->GetInstanceScript();
-        }
-
-        InstanceScript* pInstance;
-        EventMap events;
-
-        void Reset() override
-        {
-            events.Reset();
-        }
-
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            events.Reset();
-            if (me->GetEntry() == NPC_RISEN_JAEREN || me->GetEntry() == NPC_RISEN_ARELAS)
-                events.RescheduleEvent(1, 1s); // leap
-            events.RescheduleEvent(2, 3s, 4s); // claw
-        }
-
-        void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_STUNNED);
-                me->CastSpell(me, SPELL_EXPLODE, false);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case 1: // leap
-                    if (Unit* target = me->GetVictim())
-                        if (me->GetDistance(target) > 5.0f && me->GetDistance(target) < 30.0f)
-                        {
-                            me->CastSpell(target, SPELL_LEAP, false);
-
-                            break;
-                        }
-                    events.Repeat(1s);
-                    break;
-                case 2: // claw
-                    if (Unit* target = me->GetVictim())
-                        me->CastSpell(target, SPELL_CLAW, false);
-                    events.Repeat(6s, 8s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetTrialOfTheChampionAI<npc_black_knight_ghoulAI>(pCreature);
-    }
-};
-
-//67774,67879
 class spell_black_knight_ghoul_claw : public SpellScript
 {
     PrepareSpellScript(spell_black_knight_ghoul_claw);
@@ -455,7 +386,7 @@ class spell_black_knight_ghoul_claw : public SpellScript
     {
         if (Unit* caster = GetCaster())
         {
-            GetCaster()->GetThreatMgr().ResetAllThreat();
+            caster->GetThreatMgr().ResetAllThreat();
             if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
             {
                 caster->AddThreat(target, 100.0f);
@@ -463,13 +394,14 @@ class spell_black_knight_ghoul_claw : public SpellScript
             }
         }
     }
+
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_black_knight_ghoul_claw::HandleSpellHit, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+        OnEffectHitTarget += SpellEffectFn(spell_black_knight_ghoul_claw::HandleSpellHit, EFFECT_0,
+            SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
     }
 };
 
-//67886
 class spell_black_knight_ghoul_explode : public SpellScript
 {
     PrepareSpellScript(spell_black_knight_ghoul_explode);
@@ -478,19 +410,21 @@ class spell_black_knight_ghoul_explode : public SpellScript
     {
         if (GetHitUnit()->IsPlayer())
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                instance->SetData(DATA_ACHIEV_IVE_HAD_WORSE, 0);
+                instance->SetData(DATA_ACHIEVEMENT_IVE_HAD_WORSE, 0);
     }
+
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_black_knight_ghoul_explode::HandleSpellHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectHitTarget += SpellEffectFn(spell_black_knight_ghoul_explode::HandleSpellHit, EFFECT_0,
+            SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
 void AddSC_boss_black_knight()
 {
-    new boss_black_knight();
-    new npc_black_knight_skeletal_gryphon();
-    new npc_black_knight_ghoul();
+    RegisterTrialOfTheChampionCreatureAI(boss_black_knight);
+    RegisterTrialOfTheChampionCreatureAI(npc_black_knight_skeletal_gryphon);
+    RegisterTrialOfTheChampionCreatureAI(npc_black_knight_ghoul);
     RegisterSpellScript(spell_black_knight_ghoul_claw);
     RegisterSpellScript(spell_black_knight_ghoul_explode);
 }
