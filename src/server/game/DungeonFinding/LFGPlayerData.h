@@ -20,6 +20,7 @@
 
 #include "LFG.h"
 #include "SharedDefines.h"
+#include <ctime>
 
 namespace lfg
 {
@@ -46,6 +47,8 @@ namespace lfg
         void SetRoles(uint8 roles);
         void SetComment(std::string const& comment);
         void SetSelectedDungeons(LfgDungeonSet const& dungeons);
+        void SetDeclineCooldown(time_t expiresAt) { m_DeclineCooldown = expiresAt; }
+        [[nodiscard]] bool HasDeclineCooldown(time_t now) const { return now < m_DeclineCooldown; }
 
         // General
         [[nodiscard]] LfgState GetState() const;
@@ -77,6 +80,7 @@ namespace lfg
         uint8 m_Roles;                                     ///< Roles the player selected when joined LFG
         std::string m_Comment;                             ///< Player comment used when joined LFG
         LfgDungeonSet m_SelectedDungeons;                  ///< Selected Dungeons when joined LFG
+        time_t m_DeclineCooldown{0};                       ///< Kept across queue resets and logout, not server restarts
     };
 
 } // namespace lfg
