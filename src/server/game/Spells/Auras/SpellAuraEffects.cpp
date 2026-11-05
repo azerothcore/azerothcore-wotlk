@@ -1146,9 +1146,18 @@ void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
     // see Unit::DealDamage and Spell::prepare
     PreDeathAuraTickScope preDeathTick(caster, GetBase()->HasCasterDiedSinceApply(caster));
 
+    // Also around the aura scripts, which may handle the tick themselves (Death and Decay)
+    if (caster)
+        caster->SetCausingPeriodicTick(true);
+
     bool prevented = GetBase()->CallScriptEffectPeriodicHandlers(this, aurApp);
     if (prevented)
+    {
+        if (caster)
+            caster->SetCausingPeriodicTick(false);
+
         return;
+    }
 
     Unit* target = aurApp->GetTarget();
 
@@ -1209,6 +1218,9 @@ void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
         default:
             break;
     }
+
+    if (caster)
+        caster->SetCausingPeriodicTick(false);
 }
 
 bool AuraEffect::CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventInfo) const

@@ -286,7 +286,11 @@ public:
         {
             if (_chargeTarget.first == hatedUnit->GetGUID())
             {
-                // Do not count DOTs/HOTs
+                // Do not count DOTs/HOTs: the tick of an aura cast earlier is not an action,
+                // unless the player is channeling
+                if (hatedUnit->IsCausingPeriodicTick() && !hatedUnit->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                    return;
+
                 if (!(threatSpell && (threatSpell->HasAura(SPELL_AURA_DAMAGE_SHIELD) || threatSpell->HasAttribute(SPELL_ATTR0_CU_NO_INITIAL_THREAT))))
                 {
                     _chargeTarget.second += threat;
