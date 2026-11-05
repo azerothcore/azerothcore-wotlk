@@ -5095,6 +5095,12 @@ void Spell::SendSpellGo()
     }
 
     m_caster->SendMessageToSet(&data, true);
+
+    // the client skips the rune list for runes it still has a timer on, the resync overwrites them all
+    if (castFlags & CAST_FLAG_RUNE_LIST)
+        if (Player* player = unitCaster ? unitCaster->ToPlayer() : nullptr)
+            if (player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+                player->ResyncRunes(MAX_RUNES);
 }
 
 void Spell::WriteAmmoToPacket(WorldPacket* data)

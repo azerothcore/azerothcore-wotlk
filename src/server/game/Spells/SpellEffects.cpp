@@ -6157,8 +6157,6 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
         }
     }
 
-    // is needed to push through to the client that the rune is active
-    //player->ResyncRunes(MAX_RUNES);
     unitCaster->CastSpell(unitCaster, 47804, true);
 }
 
