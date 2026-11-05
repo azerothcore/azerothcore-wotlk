@@ -863,9 +863,13 @@ void SmartAI::JustRespawned()
     mDespawnTime = 0;
     mDespawnState = 0;
     mEscortState = SMART_ESCORT_NONE;
-    me->SetVisible(true);
-    if (me->GetFaction() != me->GetCreatureTemplate()->faction)
-        me->RestoreFaction();
+    // on spawn, keep a faction or visibility a script set (e.g. in OnCreatureCreate)
+    if (!me->IsFirstAppearance())
+    {
+        me->SetVisible(true);
+        if (me->GetFaction() != me->GetCreatureTemplate()->faction)
+            me->RestoreFaction();
+    }
     mJustReset = true;
     JustReachedHome();
     GetScript()->ProcessEventsFor(SMART_EVENT_RESPAWN);
