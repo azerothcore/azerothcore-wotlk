@@ -1531,6 +1531,81 @@ TEST_F(ThreatManagerIntegrationTest,
 }
 
 TEST_F(ThreatManagerIntegrationTest,
+       AddThreat_OvertakingCurrentVictim_SwitchesOnNextUpdate)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // below the 110% margin nothing changes
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 105.0f);
+    _creatureA->TestGetThreatMgr().Update(1);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // pushing an existing entry past 110% switches on the next update, long before the timer
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 10.0f);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+    _creatureA->TestGetThreatMgr().Update(1);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    // so does dropping the current victim's threat below the others
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(1);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+    _creatureA->TestGetThreatMgr().ResetThreat(_creatureB);
+    _creatureA->TestGetThreatMgr().Update(1);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       AddThreat_NewEntryOvertakingCurrentVictim_SwitchesOnNextUpdate)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // e.g. social aggro at zero threat, then a tank's first threat-causing hit
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 0.0f);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 50.0f);
+    _creatureA->TestGetThreatMgr().Update(1);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ResetThenRestoreThreat_KeepsCurrentVictim)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 95.0f);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // e.g. TemporaryThreatModifierEvent or a boss RecalculateThreat(): zero then set again within one call
+    _creatureA->TestGetThreatMgr().ResetThreat(_creatureB);
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true, true);
+    _creatureA->TestGetThreatMgr().Update(1);
+
+    // C never got past 110% of the final value, so the victim must not have flipped to C in between
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
        Update_ZeroDiff_DoesNotCrash)
 {
     _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
