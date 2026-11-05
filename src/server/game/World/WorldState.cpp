@@ -148,6 +148,8 @@ void WorldState::LoadWorldStates()
         return;
     }
 
+    std::lock_guard<std::mutex> guard(_worldstatesMutex);
+
     do
     {
         Field* fields = result->Fetch();
@@ -161,6 +163,10 @@ void WorldState::LoadWorldStates()
 // Setting a worldstate will save it to DB
 void WorldState::setWorldState(uint32 index, uint64 timeValue)
 {
+    // Held across the lookup and the write: the find() below decides INSERT vs UPDATE, so an
+    // unguarded gap would let two threads both miss and both INSERT the same index.
+    std::lock_guard<std::mutex> guard(_worldstatesMutex);
+
     // Crossrealm nodes must not persist worldstates: their CharacterDatabase is
     // the routing proxy and the write would land in an arbitrary realm DB. The
     // in-memory value still has to be updated so read-modify-write users
@@ -189,6 +195,8 @@ void WorldState::setWorldState(uint32 index, uint64 timeValue)
 
 uint64 WorldState::getWorldState(uint32 index) const
 {
+    std::lock_guard<std::mutex> guard(_worldstatesMutex);
+
     auto const& itr = _worldstates.find(index);
     return itr != _worldstates.end() ? itr->second : 0;
 }
