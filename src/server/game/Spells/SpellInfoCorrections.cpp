@@ -775,14 +775,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_ALLOW_WHILE_STEALTHED;
     });
 
-    // Blood Tap visual cd reset
-    ApplySpellFix({ 47804 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_2].Effect = 0;
-        spellInfo->Effects[EFFECT_1].Effect = 0;
-        spellInfo->RuneCostID = 442;
-    });
-
     // Chains of Ice
     ApplySpellFix({ 45524 }, [](SpellInfo* spellInfo)
     {
