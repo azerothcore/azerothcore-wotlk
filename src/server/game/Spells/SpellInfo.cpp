@@ -20,7 +20,9 @@
 #include "ConditionMgr.h"
 #include "Corpse.h"
 #include "DBCStores.h"
+#include "GameObject.h"
 #include "LootMgr.h"
+#include "Map.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
@@ -1679,8 +1681,19 @@ SpellCastResult SpellInfo::CheckTarget(WorldObject const* caster, WorldObject co
     if (AttributesEx & SPELL_ATTR1_EXCLUDE_CASTER && caster == target)
         return SPELL_FAILED_BAD_TARGETS;
 
-    // check visibility - ignore stealth for implicit (area) targets
-    if (!(AttributesEx6 & SPELL_ATTR6_IGNORE_PHASE_SHIFT) && !caster->CanSeeOrDetect(target, implicit))
+    bool isBuffPickup = false;
+    if (GameObject const* gameObject = caster->ToGameObject())
+    {
+        GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
+        // Pickups use cooldown 3: BG buffs have zero diameter, arena eyes despawn after casting.
+        isBuffPickup = gameObject->IsInWorld() && gameObject->GetMap()->IsBattlegroundOrArena() &&
+            goInfo->type == GAMEOBJECT_TYPE_TRAP && gameObject->GetOwnerGUID().IsEmpty() &&
+            goInfo->trap.spellId == Id && goInfo->trap.cooldown == 3 &&
+            (goInfo->trap.diameter == 0 || goInfo->trap.type == 1);
+    }
+
+    if (!(AttributesEx6 & SPELL_ATTR6_IGNORE_PHASE_SHIFT) &&
+        !caster->CanSeeOrDetect(target, implicit || isBuffPickup))
         return SPELL_FAILED_BAD_TARGETS;
 
     Unit const* unitCaster = caster->ToUnit();
