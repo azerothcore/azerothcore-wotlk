@@ -1,0 +1,3 @@
+--
+DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (62311, 62457, 62469, 62576, 62580, 62583, 62597, 62601, 62602, 62604, 62605, 63038, 63830, 64596, 65370, 69425, 69649, 70827, 71056, 71057, 71058, 73061, 73062, 73063, 73064)
+UPDATE `spell_custom_attr` SET `attributes` = `attributes` & ~512 WHERE `spell_id` = 64619;
