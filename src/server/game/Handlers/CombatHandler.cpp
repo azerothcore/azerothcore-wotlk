@@ -62,7 +62,13 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
         }
     }
 
-    _player->Attack(pEnemy, true);
+    // Attack() also returns false when already melee attacking pEnemy
+    if (!_player->Attack(pEnemy, true) &&
+        !(_player->GetVictim() == pEnemy && _player->HasUnitState(UNIT_STATE_MELEE_ATTACKING)))
+    {
+        if (!_player->AttackStop())
+            _player->SendMeleeAttackStop(pEnemy);
+    }
 }
 
 void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recvData*/)
