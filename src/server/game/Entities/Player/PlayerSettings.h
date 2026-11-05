@@ -31,13 +31,10 @@ enum CharacterSettingIndexes : uint8
 
 enum AnnouncerFlags : uint8
 {
-    ANNOUNCER_FLAG_DISABLE_BG_QUEUE      = 1,
-    ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE   = 2,
-    ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST = 4,
-    ANNOUNCER_FLAG_DISABLE_PVP_START     = 8,
-    ANNOUNCER_FLAG_DISABLE_PVP_ALL       = ANNOUNCER_FLAG_DISABLE_BG_QUEUE
-                                         | ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE
-                                         | ANNOUNCER_FLAG_DISABLE_PVP_START
+    // Bits 1, 2, and 8 belong to PvP announcements provided by the
+    // BG queue announcer (now a module). They share this setting index,
+    // so will change meaning if reused here.
+    ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST = 4
 };
 
 struct PlayerSetting
