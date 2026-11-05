@@ -534,7 +534,8 @@ public:
 
     SpellInfo const* const m_spellInfo;
     Item* m_CastItem;
-    Item* m_weaponItem;
+    // Caster's weapon at CheckItems() time, kept by GUID: the item may be destroyed before the proc reads it
+    ObjectGuid m_weaponItemGUID;
     ObjectGuid m_castItemGUID;
     uint8 m_cast_count;
     uint32 m_glyphIndex;
