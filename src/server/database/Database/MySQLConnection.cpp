@@ -50,6 +50,8 @@ MySQLConnectionInfo::MySQLConnectionInfo(std::string_view infoString)
 MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo) :
     m_reconnecting(false),
     m_prepareError(false),
+    m_inTransaction(false),
+    m_lostTransactionError(0),
     m_Mysql(nullptr),
     m_queue(nullptr),
     m_connectionInfo(connInfo),
@@ -58,6 +60,8 @@ MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo) :
 MySQLConnection::MySQLConnection(ProducerConsumerQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo) :
     m_reconnecting(false),
     m_prepareError(false),
+    m_inTransaction(false),
+    m_lostTransactionError(0),
     m_Mysql(nullptr),
     m_queue(queue),
     m_connectionInfo(connInfo),
@@ -95,6 +99,7 @@ uint32 MySQLConnection::Open()
 
     uint32 port;
     char const* unix_socket;
+    char const* host = m_connectionInfo.host.c_str();
 
     mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, "utf8");
 
@@ -116,7 +121,7 @@ uint32 MySQLConnection::Open()
     {
         unsigned int opt = MYSQL_PROTOCOL_SOCKET;
         mysql_options(mysqlInit, MYSQL_OPT_PROTOCOL, (char const*)&opt);
-        m_connectionInfo.host = "localhost";
+        host = "localhost";
         port = 0;
         unix_socket = m_connectionInfo.port_or_socket.c_str();
     }
@@ -138,7 +143,7 @@ uint32 MySQLConnection::Open()
         mysql_options(mysqlInit, MYSQL_OPT_SSL_MODE, (char const*)&opt_use_ssl);
     }
 
-    m_Mysql = reinterpret_cast<MySQLHandle*>(mysql_real_connect(mysqlInit, m_connectionInfo.host.c_str(), m_connectionInfo.user.c_str(),
+    m_Mysql = reinterpret_cast<MySQLHandle*>(mysql_real_connect(mysqlInit, host, m_connectionInfo.user.c_str(),
         m_connectionInfo.password.c_str(), m_connectionInfo.database.c_str(), port, unix_socket, 0));
 
     if (m_Mysql)
@@ -149,7 +154,7 @@ uint32 MySQLConnection::Open()
             LOG_INFO("sql.sql", "MySQL server ver: {} ", mysql_get_server_info(m_Mysql));
         }
 
-        LOG_INFO("sql.sql", "Connected to MySQL database at {}", m_connectionInfo.host);
+        LOG_INFO("sql.sql", "Connected to MySQL database at {}", host);
         mysql_autocommit(m_Mysql, 1);
 
         // set connection properties to UTF8 to properly handle locales for different
@@ -159,7 +164,7 @@ uint32 MySQLConnection::Open()
     }
     else
     {
-        LOG_ERROR("sql.driver", "Could not connect to MySQL database at {}: {}", m_connectionInfo.host, mysql_error(mysqlInit));
+        LOG_ERROR("sql.driver", "Could not connect to MySQL database at {}: {}", host, mysql_error(mysqlInit));
         uint32 errorCode = mysql_errno(mysqlInit);
         mysql_close(mysqlInit);
         return errorCode;
@@ -228,6 +233,10 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
         if (_HandleMySQLErrno(lErrno, mysql_stmt_error(msql_STMT)))  // If it returns true, an error was handled successfully (i.e. reconnection)
             return Execute(stmt);       // Try again
 
+        // Reconnected inside a transaction: m_mStmt was replaced by the new connection's statements
+        if (m_lostTransactionError)
+            return false;
+
         m_mStmt->ClearParameters();
         return false;
     }
@@ -239,6 +248,10 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
 
         if (_HandleMySQLErrno(lErrno, mysql_stmt_error(msql_STMT)))  // If it returns true, an error was handled successfully (i.e. reconnection)
             return Execute(stmt);       // Try again
+
+        // Reconnected inside a transaction: m_mStmt was replaced by the new connection's statements
+        if (m_lostTransactionError)
+            return false;
 
         m_mStmt->ClearParameters();
         return false;
@@ -381,11 +394,38 @@ void MySQLConnection::CommitTransaction()
 
 int MySQLConnection::ExecuteTransaction(std::shared_ptr<TransactionBase> transaction)
 {
-    std::vector<SQLElementData> const& queries = transaction->m_queries;
-    if (queries.empty())
+    if (transaction->m_queries.empty())
         return -1;
 
+    // The server rolls back a transaction whose connection is lost, so one lost before COMMIT can run again
+    static constexpr uint8 MAX_TRANSACTION_ATTEMPTS = 3;
+
+    for (uint8 attempt = 1; ; ++attempt)
+    {
+        bool lostBeforeCommit = false;
+        int errorCode = ExecuteTransactionAttempt(transaction, lostBeforeCommit);
+
+        if (!lostBeforeCommit)
+            return errorCode;
+
+        if (attempt == MAX_TRANSACTION_ATTEMPTS)
+        {
+            LOG_ERROR("sql.sql", "Transaction lost its connection {} times. {} queries not executed.",
+                attempt, transaction->m_queries.size());
+            return errorCode;
+        }
+
+        LOG_WARN("sql.sql", "Transaction lost its connection before COMMIT, running it again.");
+    }
+}
+
+int MySQLConnection::ExecuteTransactionAttempt(std::shared_ptr<TransactionBase> const& transaction,
+    bool& lostBeforeCommit)
+{
+    std::vector<SQLElementData> const& queries = transaction->m_queries;
+
     BeginTransaction();
+    m_inTransaction = true;
 
     for (auto const& data : queries)
     {
@@ -408,12 +448,7 @@ int MySQLConnection::ExecuteTransaction(std::shared_ptr<TransactionBase> transac
                 ASSERT(stmt);
 
                 if (!Execute(stmt))
-                {
-                    LOG_WARN("sql.sql", "Transaction aborted. {} queries not executed.", queries.size());
-                    int errorCode = GetLastError();
-                    RollbackTransaction();
-                    return errorCode;
-                }
+                    return AbortTransaction(queries.size(), lostBeforeCommit);
             }
             break;
             case SQL_ELEMENT_RAW:
@@ -433,12 +468,7 @@ int MySQLConnection::ExecuteTransaction(std::shared_ptr<TransactionBase> transac
                 ASSERT(!sql.empty());
 
                 if (!Execute(sql))
-                {
-                    LOG_WARN("sql.sql", "Transaction aborted. {} queries not executed.", queries.size());
-                    uint32 errorCode = GetLastError();
-                    RollbackTransaction();
-                    return errorCode;
-                }
+                    return AbortTransaction(queries.size(), lostBeforeCommit);
             }
             break;
         }
@@ -450,7 +480,32 @@ int MySQLConnection::ExecuteTransaction(std::shared_ptr<TransactionBase> transac
     // and not while iterating over every element.
 
     CommitTransaction();
+    m_inTransaction = false;
+
+    if (m_lostTransactionError)
+    {
+        LOG_ERROR("sql.sql", "Lost the connection during COMMIT. The transaction may or may not have been written, "
+            "so it is not run again.");
+        return std::exchange(m_lostTransactionError, 0);
+    }
+
     return 0;
+}
+
+int MySQLConnection::AbortTransaction(std::size_t queryCount, bool& lostBeforeCommit)
+{
+    // The server already rolled the transaction back when the connection was lost
+    if (m_lostTransactionError)
+    {
+        lostBeforeCommit = true;
+        return std::exchange(m_lostTransactionError, 0);
+    }
+
+    LOG_WARN("sql.sql", "Transaction aborted. {} queries not executed.", queryCount);
+    int errorCode = GetLastError();
+    m_inTransaction = false;
+    RollbackTransaction();
+    return errorCode;
 }
 
 std::size_t MySQLConnection::EscapeString(char* to, char const* from, std::size_t length)
@@ -593,6 +648,15 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, char const* err, uint8 att
                         (m_connectionFlags & CONNECTION_ASYNC) ? "asynchronous" : "synchronous");
 
                 m_reconnecting = false;
+
+                // The server rolled back the open transaction, so its next statements must not run in autocommit
+                if (m_inTransaction)
+                {
+                    m_inTransaction = false;
+                    m_lostTransactionError = errNo;
+                    return false;
+                }
+
                 return true;
             }
 

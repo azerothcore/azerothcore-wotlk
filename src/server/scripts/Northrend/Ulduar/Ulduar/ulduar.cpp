@@ -64,7 +64,6 @@ enum UldActions
 
 enum UldNPCs
 {
-    NPC_WINTER_JORMUNGAR        = 34137,
     NPC_SNOW_MOUND_4            = 34146,
     NPC_SNOW_MOUND_6            = 34150,
     NPC_SNOW_MOUND_8            = 34151
@@ -78,7 +77,9 @@ enum UldGameObjects
 enum UldSpells
 {
     SPELL_KEEPER_TELEPORT       = 62940,
+    SPELL_ANCHOR_HERE           = 45313,
     SPELL_SNOW_MOUND_PARTICLES  = 64615,
+    SPELL_EJECT_PASSENGER_1     = 64629,
     SPELL_ENERGY_SAP_10         = 64740,
 
     // Arachnopod Destroyer
@@ -305,20 +306,32 @@ struct npc_ulduar_snow_mound : public ScriptedAI
 
                 _scheduler.Schedule(0s, [this](TaskContext context)
                 {
-                    _counter++;
-                    float a = rand_norm() * 2 * M_PI; //needs verification from sniffs
-                    float d = rand_norm() * 4.0f;
-                    if (Creature* jormungar = me->SummonCreature(NPC_WINTER_JORMUNGAR, me->GetPositionX() + cos(a) * d, me->GetPositionY() + std::sin(a) * d, me->GetPositionZ() + 1.0f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000))
-                    {
-                        jormungar->SetInCombatWithZone();
-                    }
-                    if (_counter < _count)
-                    {
-                        context.Repeat(2s);
-                    }
+                    DoCastSelf(SPELL_EJECT_PASSENGER_1 + _counter, true);
+                    if (++_counter < _count)
+                        context.Repeat(3200ms);
                 });
             }
         }
+    }
+
+    void PassengerBoarded(Unit* passenger, int8 /*seatId*/, bool apply) override
+    {
+        passenger->SetImmuneToPC(apply);
+        if (apply)
+            return;
+
+        ObjectGuid const wormGUID = passenger->GetGUID();
+        _scheduler.Schedule(1500ms, [this, wormGUID](TaskContext /*context*/)
+        {
+            Creature* worm = ObjectAccessor::GetCreature(*me, wormGUID);
+            if (!worm || !worm->IsAlive())
+                return;
+
+            // Anchor Here has no effect handler in AC, so the home position is set here
+            worm->SetHomePosition(worm->GetPosition());
+            worm->CastSpell(worm, SPELL_ANCHOR_HERE, true);
+            worm->SetInCombatWithZone();
+        });
     }
 
     void UpdateAI(uint32 diff) override

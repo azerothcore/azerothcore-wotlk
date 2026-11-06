@@ -34,16 +34,23 @@ enum DataTypes
     DATA_RELIQUARY_OF_SOULS         = 5,
     DATA_MOTHER_SHAHRAZ             = 6,
     DATA_ILLIDARI_COUNCIL           = 7,
-    DATA_AKAMA_ILLIDAN              = 8,
-    DATA_ILLIDAN_STORMRAGE          = 9,
-    MAX_ENCOUNTERS                  = 10,
+    DATA_ILLIDAN_STORMRAGE          = 8,
+    MAX_ENCOUNTERS                  = 9,
 
     DATA_AKAMA_SHADE                = 11,
     DATA_GATHIOS_THE_SHATTERER      = 12,
     DATA_HIGH_NETHERMANCER_ZEREVOR  = 13,
     DATA_LADY_MALANDE               = 14,
     DATA_VERAS_DARKSHADOW           = 15,
-    DATA_BLACK_TEMPLE_TRIGGER       = 16
+    DATA_BLACK_TEMPLE_TRIGGER       = 16,
+    DATA_AKAMA_ILLIDAN              = 17,
+    DATA_ILLIDAN_GATE               = 18
+};
+
+enum BTPersistentData
+{
+    PERSISTENT_DATA_ILLIDAN_GATE,
+    PERSISTENT_DATA_COUNT
 };
 
 enum CreatureIds

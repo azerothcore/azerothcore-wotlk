@@ -229,8 +229,6 @@ struct boss_flame_leviathan : public BossAI
     void JustReachedHome() override
     {
         _JustReachedHome();
-        // For achievement
-        instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN, 0);
         me->setActive(false);
         me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
     }
@@ -238,6 +236,7 @@ struct boss_flame_leviathan : public BossAI
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
     {
         CreatureAI::EnterEvadeMode(why);
+        instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN_FAIL, 1);
     }
 
     void MoveInLineOfSight(Unit* unit) override {
@@ -1399,7 +1398,7 @@ class spell_auto_repair : public SpellScript
 
         // Achievement
         if (InstanceScript* instance = vehicle->GetBase()->GetInstanceScript())
-            instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN, 0);
+            instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN_FAIL, 1);
     }
 
     void Register() override
@@ -1963,11 +1962,11 @@ class achievement_flame_leviathan_unbroken : public AchievementCriteriaScript
 public:
     achievement_flame_leviathan_unbroken() : AchievementCriteriaScript("achievement_flame_leviathan_unbroken") {}
 
-    bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
+    bool OnCheck(Player* source, Unit* /*target*/, uint32 /*criteria_id*/) override
     {
-        InstanceScript* instance = player->GetInstanceScript();
+        InstanceScript* instance = source->GetInstanceScript();
         return instance
-            && instance->GetPersistentData(PERSISTENT_DATA_UNBROKEN);
+            && !instance->GetPersistentData(PERSISTENT_DATA_UNBROKEN_FAIL);
     }
 };
 
