@@ -14,7 +14,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (7764, 0, 1, 0, 40, 0, 100, 0, 1, 7764, 0, 0, 0, 0, 54, 7000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Troyas Moonbreeze - On Point 1 of Path 7764 Reached - Pause Waypoint'),
 (7764, 0, 2, 0, 40, 0, 100, 0, 1, 7764, 0, 0, 0, 0, 80, 776401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Troyas Moonbreeze - On Point 1 of Path 7764 Reached - Run Script'),
 (7764, 0, 3, 0, 40, 0, 100, 0, 2, 7764, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0.951991, 'Troyas Moonbreeze - On Point 2 of Path 7764 Reached - Set Orientation'),
-(7764, 0, 4, 0, 40, 0, 100, 0, 2, 7764, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Troyas Moonbreeze - On Point 2 of Path 7764 Reached - Add Npc Flag Questgiver');
+(7764, 0, 4, 0, 40, 0, 100, 0, 2, 7764, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Troyas Moonbreeze - On Point 2 of Path 7764 Reached - Add Npc Flag Questgiver'),
+(7764, 0, 5, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Troyas Moonbreeze - On Reached Home - Add Npc Flag Questgiver');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 776400 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
