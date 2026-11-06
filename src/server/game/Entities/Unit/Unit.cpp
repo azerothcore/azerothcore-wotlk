@@ -295,7 +295,6 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
     : _actor(actor), _actionTarget(actionTarget), _procTarget(procTarget), _typeMask(typeMask), _spellTypeMask(spellTypeMask), _spellPhaseMask(spellPhaseMask),
       _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell), _procAuraEffectIndex(procAuraEffectIndex)
 {
-    _chance.reset();
 }
 
 SpellInfo const* ProcEventInfo::GetSpellInfo() const
@@ -14217,6 +14216,9 @@ void Unit::SetFeared(bool apply, Unit* fearedBy /*= nullptr*/, bool isFear /*= f
             m_movedByPlayer->ToPlayer()->SetClientControl(this, !apply); // verified
         //else
         //  ToPlayer()->SetClientControl(this, !apply);
+
+        if (!apply)
+            ToPlayer()->ResyncCanFlyToClient();
     }
 }
 
@@ -14249,6 +14251,9 @@ void Unit::SetConfused(bool apply)
             m_movedByPlayer->ToPlayer()->SetClientControl(this, !apply); // verified
         //else
         //  ToPlayer()->SetClientControl(this, !apply);
+
+        if (!apply)
+            ToPlayer()->ResyncCanFlyToClient();
     }
 }
 
@@ -16225,6 +16230,15 @@ bool Unit::SetSwim(bool enable)
 void Unit::SetCanFly(bool enable)
 {
     bool isClientControlled = IsClientControlled();
+
+    // The owning client ignores the spline packet for its own mover, so replay it once Fear/Confuse ends
+    if (Player* player = ToPlayer())
+    {
+        if (isClientControlled)
+            player->ClearPendingCanFlyResync();
+        else if (HasUnitFlag(UNIT_FLAG_FLEEING) || HasUnitFlag(UNIT_FLAG_CONFUSED))
+            player->SetPendingCanFlyResync(enable);
+    }
 
     if (!isClientControlled)
     {
