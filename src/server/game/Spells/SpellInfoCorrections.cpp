@@ -4731,13 +4731,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
-    // Conjure Refreshment Table (Rank 1, Rank 2)
-    ApplySpellFix({ 43985, 58661 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_FRONT);
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
-    });
-
     ApplySpellFix({
         698, // Ritual of Summoning (portal for clicking)
         61993 // Ritual of Summoning (summons the closet)
