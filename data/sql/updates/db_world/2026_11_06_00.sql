@@ -1,3 +1,4 @@
+-- DB update 2026_11_04_03 -> 2026_11_06_00
 -- The Thandol Span (quests 631 and 632): bombardier ambush
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 2652 AND `source_type` = 1;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (265200) AND `source_type` = 9;
