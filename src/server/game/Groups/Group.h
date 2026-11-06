@@ -129,11 +129,11 @@ enum lfgGroupFlags
     GROUP_LFG_FLAG_IS_HEROIC                = 0x004
 };
 
-enum MailItemOnFullInventory
+enum MailItemOnFullInventoryFlags
 {
-    MAIL_ITEM_ON_FULL_INVENTORY_DISABLED    = 0,
-    MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY    = 1,
-    MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE  = 2,
+    MAIL_ITEM_ON_FULL_INVENTORY_FLAG_LFG        = 0x1,
+    MAIL_ITEM_ON_FULL_INVENTORY_FLAG_ALL_GROUPS = 0x2,
+    MAIL_ITEM_ON_FULL_INVENTORY_FLAG_RAID       = 0x4,
 };
 
 enum DifficultyPreventionChangeType
@@ -150,7 +150,7 @@ static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1
 class Roll : public LootValidatorRef
 {
 public:
-    Roll(ObjectGuid _guid, LootItem const& li);
+    Roll(ObjectGuid _guid, LootItem const& li, bool _lootedInRaid);
     ~Roll();
     void setLoot(Loot* pLoot);
     Loot* getLoot();
@@ -161,6 +161,7 @@ public:
     int32  itemRandomPropId;
     uint32 itemRandomSuffix;
     uint32 itemCount;
+    bool lootedInRaid;
     typedef std::map<ObjectGuid, RollVote> PlayerVote;
     PlayerVote playerVote;                              //vote position correspond with player position (in group)
     uint8 totalPlayersRolling;

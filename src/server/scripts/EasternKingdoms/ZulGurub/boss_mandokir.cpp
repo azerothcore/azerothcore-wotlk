@@ -335,23 +335,18 @@ public:
                 return;
 
             //Make sure our attack is ready and we aren't currently casting before checking distance
+            bool mainHandSwung = false;
+
             if (me->isAttackReady())
             {
-                // xinef: prevent base and off attack in same time, delay attack at 0.2 sec
-                if (me->haveOffhandWeapon())
-                    if (me->getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                        me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-
                 me->AttackerStateUpdate(victim, BASE_ATTACK, false, ignoreCasting);
                 me->resetAttackTimer();
+
+                mainHandSwung = true;
             }
 
-            if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
+            if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK) && !mainHandSwung)
             {
-                // xinef: delay main hand attack if both will hit at the same time (players code)
-                if (me->getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
-                    me->setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
-
                 me->AttackerStateUpdate(victim, OFF_ATTACK, false, ignoreCasting);
                 me->resetAttackTimer(OFF_ATTACK);
             }

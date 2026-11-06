@@ -190,6 +190,15 @@ enum Heartpierce
     SPELL_INVIGORATION_MANA_HERO    = 71888
 };
 
+enum MeteoricInspiration
+{
+    SPELL_PENANCE_R1_HEAL_CHANNEL           = 47757,
+    SPELL_PENANCE_R1_DAMAGE_CHANNEL         = 47758,
+    SPELL_BEACON_OF_LIGHT_HOLY_LIGHT        = 53652,
+    SPELL_BEACON_OF_LIGHT_FLASH_OF_LIGHT    = 53653,
+    SPELL_BEACON_OF_LIGHT_HOLY_SHOCK        = 53654
+};
+
 enum MarkOfConquest
 {
     SPELL_MARK_OF_CONQUEST_ENERGIZE = 39599
@@ -6071,6 +6080,75 @@ class spell_item_living_root_of_the_wildheart : public AuraScript
     }
 };
 
+// 64999 - Meteoric Inspiration
+class spell_item_meteoric_inspiration : public AuraScript
+{
+    PrepareAuraScript(spell_item_meteoric_inspiration);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_PENANCE_R1_HEAL_CHANNEL,
+            SPELL_PENANCE_R1_DAMAGE_CHANNEL,
+            SPELL_BEACON_OF_LIGHT_HOLY_LIGHT,
+            SPELL_BEACON_OF_LIGHT_FLASH_OF_LIGHT,
+            SPELL_BEACON_OF_LIGHT_HOLY_SHOCK
+        });
+    }
+
+    static bool HasManaCost(SpellInfo const* spellInfo)
+    {
+        return spellInfo->PowerType == POWER_MANA && (spellInfo->ManaCost || spellInfo->ManaCostPercentage);
+    }
+
+    // Penance channels cost no mana and nothing links them back to the 47540 cast
+    static bool IsPenanceChannel(SpellInfo const* spellInfo)
+    {
+        return spellInfo->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PENANCE_R1_HEAL_CHANNEL)) ||
+            spellInfo->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PENANCE_R1_DAMAGE_CHANNEL));
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Spell const* spell = eventInfo.GetProcSpell();
+        if (!spell)
+            return false;
+
+        SpellInfo const* spellInfo = spell->GetSpellInfo();
+
+        // totems cast by Call of the Elements are triggered
+        if (!spell->IsTriggered() || spellInfo->HasAttribute(SPELL_ATTR7_CAN_BE_MULTI_CAST))
+            return HasManaCost(spellInfo);
+
+        if (!spellInfo->HasAttribute(SPELL_ATTR3_NOT_A_PROC))
+            return false;
+
+        switch (spellInfo->Id)
+        {
+            case SPELL_BEACON_OF_LIGHT_HOLY_LIGHT:
+            case SPELL_BEACON_OF_LIGHT_FLASH_OF_LIGHT:
+            case SPELL_BEACON_OF_LIGHT_HOLY_SHOCK:
+            {
+                // copy is cast inside the source heal's hit, so the generic slot still holds that heal.
+                // 53654 also copies Lay on Hands, so the copy's id alone can't tell
+                Spell const* origin = eventInfo.GetActor()->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+                return origin && HasManaCost(origin->GetSpellInfo());
+            }
+            default:
+                break;
+        }
+
+        SpellInfo const* channel = spell->GetTriggeredByAuraSpellInfo();
+        return channel && channel->IsChanneled() && (HasManaCost(channel) || IsPenanceChannel(channel));
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_item_meteoric_inspiration::CheckProc);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -6251,4 +6329,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_purified_shard_of_the_scale);
     RegisterSpellScript(spell_item_shiny_shard_of_the_scale);
     RegisterSpellScript(spell_item_living_root_of_the_wildheart);
+    RegisterSpellScript(spell_item_meteoric_inspiration);
 }

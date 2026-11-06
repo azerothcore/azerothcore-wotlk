@@ -16,15 +16,18 @@
  */
 
 #include "CreatureScript.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 
 // 2784 - King Magni Bronzebeard
 enum KingMagniBronzebeard
 {
-    SOUND_AGGRO      = 5896,
-    SPELL_AVATAR     = 19135,
-    SPELL_KNOCK_AWAY = 20686,
-    SPELL_STORM_BOLT = 20685
+    SOUND_AGGRO              = 5896,
+    SPELL_AVATAR             = 19135,
+    SPELL_KNOCK_AWAY         = 20686,
+    SPELL_STORM_BOLT         = 20685,
+    SAY_BROKERING_OF_PEACE   = 1,
+    QUEST_BROKERING_OF_PEACE = 8484
 };
 
 struct npc_king_magni_bronzebeard : public ScriptedAI
@@ -54,6 +57,12 @@ struct npc_king_magni_bronzebeard : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         DoRewardPlayersInArea();
+    }
+
+    void sQuestReward(Player* player, Quest const* quest, uint32 /*opt*/) override
+    {
+        if (quest->GetQuestId() == QUEST_BROKERING_OF_PEACE)
+            Talk(SAY_BROKERING_OF_PEACE, player, 1s);
     }
 
     void UpdateAI(uint32 diff) override

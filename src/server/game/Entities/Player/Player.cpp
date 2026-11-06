@@ -54,6 +54,7 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
+#include "ItemRecovery.h"
 #include "LFGMgr.h"
 #include "Log.h"
 #include "LootItemStorage.h"
@@ -1526,8 +1527,9 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 UnsummonPetTemporaryIfAny();
         }
 
+        // a dead player releasing spirit on the same map must not end its killer's pvp timeout (#27967)
         if (!(options & TELE_TO_NOT_LEAVE_COMBAT))
-            CombatStop();
+            CombatStop(false, /*mutualPvP*/ true, /*keepPvPForOthers*/ !IsAlive());
 
         // this will be used instead of the current location in SaveToDB
         teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
@@ -4397,6 +4399,15 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
 
+                // Loot rows are found through their recovery_item row, so they go first
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_LOOT_BY_GUID);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_GUID);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
                 Corpse::DeleteFromDB(playerGuid, trans);
 
                 sScriptMgr->OnPlayerDeleteFromDB(trans, lowGuid);
@@ -4493,19 +4504,22 @@ void Player::DeleteOldRecoveryItems(uint32 keepDays)
     if (result)
     {
         LOG_INFO("server.loading", "Player::DeleteOldRecoveryItems: Found {} item(s) to delete", result->GetRowCount());
+
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         do
         {
             Field* fields = result->Fetch();
 
-            uint32 guid = fields[0].Get<uint32>();
-            uint32 itemEntry = fields[1].Get<uint32>();
+            uint32 recoveryId = fields[0].Get<uint32>();
+            uint32 guid = fields[1].Get<uint32>();
+            uint32 itemEntry = fields[2].Get<uint32>();
 
-            CharacterDatabasePreparedStatement* deleteStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_GUID);
-            deleteStmt->SetData(0, guid);
-            CharacterDatabase.Execute(deleteStmt);
+            ItemRecovery::DeleteFromDB(trans, recoveryId);
 
             LOG_INFO("server.loading", "Deleted item from recovery_item table where guid {} and item id {}", guid, itemEntry);
         } while (result->NextRow());
+
+        CharacterDatabase.CommitTransaction(trans);
     }
 }
 
@@ -13246,6 +13260,20 @@ void Player::SetMover(Unit* target)
     m_mover->m_movedByPlayer = this;
     if (m_mover->IsCreature())
         m_mover->GetMotionMaster()->Initialize();
+}
+
+void Player::ResyncCanFlyToClient()
+{
+    if (!_pendingCanFlyResync || GetClientControlling() != this)
+        return;
+
+    // a queued fear/confuse keeps the client out of control even without its unit flag
+    if (HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED))
+        return;
+
+    bool const enable = *_pendingCanFlyResync;
+    _pendingCanFlyResync.reset();
+    SetCanFly(enable);
 }
 
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const

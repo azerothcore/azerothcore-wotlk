@@ -573,7 +573,16 @@ TeamId BattlegroundWS::GetPrematureWinner()
     if (GetTeamScore(TEAM_ALLIANCE) > GetTeamScore(TEAM_HORDE))
         return TEAM_ALLIANCE;
 
-    return GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE) ? TEAM_HORDE : Battleground::GetPrematureWinner();
+    if (GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE))
+        return TEAM_HORDE;
+
+    if (GetTeamScore(TEAM_ALLIANCE) == 0 && GetTeamScore(TEAM_HORDE) == 0)
+        return TEAM_NEUTRAL;
+
+    if (_lastFlagCaptureTeam != TEAM_NEUTRAL)
+        return _lastFlagCaptureTeam;
+
+    return Battleground::GetPrematureWinner();
 }
 
 uint32 BattlegroundWS::GetAssaultSpellId() const

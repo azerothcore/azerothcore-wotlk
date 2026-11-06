@@ -47,6 +47,11 @@ TEST(WorldObjectCastApi, CastSpellExtraArgsBoolCtor)
     EXPECT_EQ(untriggered.TriggerFlags, TRIGGERED_NONE);
 }
 
+TEST(WorldObjectCastApi, DontEnterCombatNotInFullMask)
+{
+    EXPECT_FALSE(TRIGGERED_FULL_MASK & TRIGGERED_DONT_ENTER_COMBAT);
+}
+
 TEST(WorldObjectCastApi, CastSpellExtraArgsTriggerFlagsCtor)
 {
     CastSpellExtraArgs args(TRIGGERED_IGNORE_GCD);

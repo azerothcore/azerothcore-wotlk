@@ -47,7 +47,7 @@ public:
     void RemoveFromWorld() override;
 
     float GetNativeObjectScale() const override;
-    void SetDisplayId(uint32 modelId, float displayScale = 1.f) override;
+    void SetDisplayId(uint32 modelId, std::optional<float> displayScale = {}) override;
 
     PetType getPetType() const { return m_petType; }
     void setPetType(PetType type) { m_petType = type; }
@@ -99,7 +99,6 @@ public:
 
     void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive = false);
     void ClearCastWhenWillAvailable();
-    void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
 
     void _SaveSpellCooldowns(CharacterDatabaseTransaction trans);
     void _SaveAuras(CharacterDatabaseTransaction trans);

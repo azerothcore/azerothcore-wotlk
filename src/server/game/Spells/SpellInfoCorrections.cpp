@@ -4847,14 +4847,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
     });
 
-    ApplySpellFix({
-        45662, // Encapsulate
-        45642  // Fire Bloom
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
-    });
-
     // Torch (Death Knights near the Chapel)
     ApplySpellFix({ 52953 }, [](SpellInfo* spellInfo)
         {
@@ -4882,21 +4874,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_UNK;
-    });
-
-    // Life Tap
-    ApplySpellFix({ 1454 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
-    });
-
-    // Life Tap
-    ApplySpellFix({ 1455, 1456, 11687, 11688, 11689, 27222, 57946 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
-        spellInfo->MaxLevel = 16;
-        spellInfo->BaseLevel = 6;
-        spellInfo->SpellLevel = 6;
     });
 
     // Explosive Sheep
@@ -5253,6 +5230,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->SpellLevel = 10;
+    });
+
+    // Diminish Power
+    ApplySpellFix({ 64145 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+    });
+
+    // Oil of Immolation
+    ApplySpellFix({ 11350 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
+        spellInfo->CategoryEntry = sSpellCategoryStore.LookupEntry(79);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

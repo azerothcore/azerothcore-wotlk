@@ -77,7 +77,6 @@ enum Spells
     SPELL_SHADOW_FISSURE                        = 57579,
     SPELL_SUMMON_TWILIGHT_WHELP                 = 58035,
     SPELL_GIFT_OF_TWILIGHT_SHADOW               = 57835,
-    SPELL_TWILIGHT_TORMENT_VESPERON             = 57935,
 
     // Sartharion
     SPELL_SARTHARION_CLEAVE                     = 56909,
@@ -105,10 +104,8 @@ enum Spells
     SPELL_FLAME_TSUNAMI_VISUAL                  = 57494,
 
     // Misc
-    SPELL_FADE_ARMOR                            = 60708,
     SPELL_FLAME_TSUNAMI_DAMAGE_AURA             = 57492,
     SPELL_FLAME_TSUNAMI_LEAP                    = 60241,
-    SPELL_SARTHARION_PYROBUFFET_TRIGGER         = 57557,
     SPELL_FULL_HEAL                             = 43978,
 };
 

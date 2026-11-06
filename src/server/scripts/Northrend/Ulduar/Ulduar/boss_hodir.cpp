@@ -350,6 +350,7 @@ struct boss_hodir : public BossAI
                     instance->SetBossState(BOSS_HODIR, DONE);
                     me->CastSpell(me, 64899, true); // credit
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
+                    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FLASH_FREEZE_CAST);
                 }
 
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -362,10 +363,10 @@ struct boss_hodir : public BossAI
 
                 events.Reset();
 
-                // Manually despawn helpers
-                summons.DespawnIf([this](ObjectGuid guid) -> bool
+                // Helpers stay for their outro; despawn everything else Hodir summoned.
+                summons.DespawnMatching([this](ObjectGuid guid)
                 {
-                    return std::ranges::none_of(Helpers, [guid](ObjectGuid Helper) { return guid == Helper; });
+                    return std::ranges::none_of(Helpers, [guid](ObjectGuid helper) { return guid == helper; });
                 });
 
                 // Start victory emote sequence on surviving helpers
@@ -525,9 +526,6 @@ struct boss_hodir : public BossAI
                 continue;
             }
 
-            // Stop combat behavior and start victory emote chain
-            helper->AI()->DoAction(ACTION_VICTORY_EMOTE);
-
             // Thaw if still frozen
             if (helper->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
             {
@@ -535,6 +533,12 @@ struct boss_hodir : public BossAI
                 if (Creature* iceBlock = helper->FindNearestCreature(NPC_FLASH_FREEZE_NPC, 5.0f))
                     iceBlock->DespawnOrUnsummon();
             }
+
+            // Keep other NPCs from tagging the helper during the outro
+            helper->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+
+            // Stop combat behavior and start victory emote chain
+            helper->AI()->DoAction(ACTION_VICTORY_EMOTE);
 
             // First cheer
             helper->HandleEmoteCommand(EMOTE_ONESHOT_CHEER_NO_SHEATHE);
@@ -1384,6 +1388,11 @@ class spell_hodir_flash_freeze_aura : public AuraScript
             Unit* caster = GetCaster();
             if (!target || !caster || !caster->IsCreature())
                 return;
+
+            // A Flash Freeze landing after the kill would re-trap a helper and pull it out of its victory outro.
+            if (InstanceScript* instance = caster->GetInstanceScript())
+                if (instance->GetBossState(BOSS_HODIR) == DONE)
+                    return;
 
             if (Aura* aur = target->GetAura(target->IsPlayer() ? SPELL_FLASH_FREEZE_TRAPPED_PLAYER : SPELL_FLASH_FREEZE_TRAPPED_NPC))
             {
