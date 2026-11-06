@@ -17,6 +17,7 @@
 
 #include "AreaDefines.h"
 #include "Battleground.h"
+#include "ClassMgr.h"
 #include "DBCStores.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -5214,11 +5215,12 @@ class spell_item_aura_of_madness : public AuraScript
 
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
-        std::vector<uint32> const& randomSpells = triggeredSpells[caster->getClass()];
-        if (randomSpells.empty())
+        // a class without a row in the table above has no spells to trigger
+        std::vector<uint32> const* randomSpells = GetClassTableRow(triggeredSpells, caster->getClass());
+        if (!randomSpells || randomSpells->empty())
             return;
 
-        uint32 spellId = Acore::Containers::SelectRandomContainerElement(randomSpells);
+        uint32 spellId = Acore::Containers::SelectRandomContainerElement(*randomSpells);
         caster->CastSpell(caster, spellId, true, nullptr, aurEff);
 
         if (roll_chance_i(10))
@@ -5326,11 +5328,12 @@ class spell_item_deathbringers_will_normal : public AuraScript
 
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
-        std::vector<uint32> const& randomSpells = triggeredSpells[caster->getClass()];
-        if (randomSpells.empty())
+        // a class without a row in the table above has no spells to trigger
+        std::vector<uint32> const* randomSpells = GetClassTableRow(triggeredSpells, caster->getClass());
+        if (!randomSpells || randomSpells->empty())
             return;
 
-        uint32 spellId = Acore::Containers::SelectRandomContainerElement(randomSpells);
+        uint32 spellId = Acore::Containers::SelectRandomContainerElement(*randomSpells);
         caster->CastSpell(caster, spellId, true, nullptr, aurEff);
     }
 
@@ -5373,11 +5376,12 @@ class spell_item_deathbringers_will_heroic : public AuraScript
 
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
-        std::vector<uint32> const& randomSpells = triggeredSpells[caster->getClass()];
-        if (randomSpells.empty())
+        // a class without a row in the table above has no spells to trigger
+        std::vector<uint32> const* randomSpells = GetClassTableRow(triggeredSpells, caster->getClass());
+        if (!randomSpells || randomSpells->empty())
             return;
 
-        uint32 spellId = Acore::Containers::SelectRandomContainerElement(randomSpells);
+        uint32 spellId = Acore::Containers::SelectRandomContainerElement(*randomSpells);
         caster->CastSpell(caster, spellId, true, nullptr, aurEff);
     }
 

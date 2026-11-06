@@ -804,7 +804,7 @@ public:
 
     [[nodiscard]] PlayerClassInfo const* GetPlayerClassInfo(uint32 class_) const
     {
-        if (class_ >= MAX_CLASSES)
+        if (class_ >= _playerClassInfo.size())
             return nullptr;
         return _playerClassInfo[class_];
     }
@@ -1627,7 +1627,7 @@ private:
     // PetLevelInfoContainer[creature_id][level]
     PetLevelInfoContainer _petInfoStore;                            // [creature_id][level]
 
-    PlayerClassInfo* _playerClassInfo[MAX_CLASSES];
+    std::vector<PlayerClassInfo*> _playerClassInfo;
 
     void BuildPlayerLevelInfo(uint8 race, uint8 class_, uint8 level, PlayerLevelInfo* plinfo) const;
 
