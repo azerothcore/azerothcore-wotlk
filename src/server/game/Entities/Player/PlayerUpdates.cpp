@@ -167,6 +167,8 @@ void Player::Update(uint32 p_time)
             // orientation can be stale; never fail swing range or facing against the vehicle
             // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
             bool const victimIsVehicleBase = GetVehicleBase() == victim;
+            // A unit riding this player sits on their back (Gormok's Snobold Vassals), so it is never in front of them
+            bool const victimRidesMe = victim->GetVehicleBase() == this;
 
             bool mainHandSwung = false;
 
@@ -182,7 +184,7 @@ void Player::Update(uint32 p_time)
                     }
                 }
                 // 120 degrees of radiant range, if player is not in boundary radius
-                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (victimRidesMe || (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim)))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 2) // send single time (client auto repeat)
@@ -211,7 +213,7 @@ void Player::Update(uint32 p_time)
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
-                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (victimRidesMe || (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim)))
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
