@@ -850,8 +850,6 @@ void Pet::CastPendingSpell()
     charmInfo->SetIsReturning(false);
     charmInfo->SaveStayPosition(true);
 
-    AddSpellCooldown(tempSpell, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
-
     CastSpell(tempSpellTarget, tempSpell, false);
     m_tempspell = 0;
     m_tempspellTarget = ObjectGuid::Empty;
