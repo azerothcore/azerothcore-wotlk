@@ -5899,12 +5899,19 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_CASTER_AURASTATE) && unitCaster->ToPlayer()->HasPlayerFlag(PLAYER_ALLOW_ONLY_ABILITY) && !IsNextMeleeSwingSpell())
                 return SPELL_FAILED_SPELL_IN_PROGRESS;
 
-            if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && unitCaster->ToPlayer()->HasSpellCooldown(m_spellInfo->Id))
+            if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD))
             {
-                if (m_triggeredByAuraSpell)
-                    return SPELL_FAILED_DONT_REPORT;
-                else
-                    return SPELL_FAILED_NOT_READY;
+                // the cooldown of a spell granted by a use-spell item enchantment is owned by that item entry
+                bool const onCooldown = (m_CastItem && IsCastItemUseSpellEnchant())
+                    ? unitCaster->ToPlayer()->HasSpellItemCooldown(m_spellInfo->Id, m_CastItem->GetEntry())
+                    : unitCaster->ToPlayer()->HasSpellCooldown(m_spellInfo->Id);
+                if (onCooldown)
+                {
+                    if (m_triggeredByAuraSpell)
+                        return SPELL_FAILED_DONT_REPORT;
+                    else
+                        return SPELL_FAILED_NOT_READY;
+                }
             }
 
             // check if we are using a potion in combat for the 2nd+ time. Cooldown is added only after caster gets out of combat
@@ -8450,6 +8457,31 @@ bool Spell::IsNextMeleeSwingSpell() const
 bool Spell::IsIgnoringCooldowns() const
 {
     return HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) != 0;
+}
+
+// Whether the cast item grants this spell through a use-spell item enchantment, in which case the spell's
+// cooldown belongs to that item entry instead of to the spell alone.
+bool Spell::IsCastItemUseSpellEnchant() const
+{
+    if (!m_CastItem || !m_spellInfo)
+        return false;
+
+    for (uint8 slot = 0; slot < MAX_ENCHANTMENT_SLOT; ++slot)
+    {
+        uint32 const enchantId = m_CastItem->GetEnchantmentId(EnchantmentSlot(slot));
+        SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
+        if (!enchant)
+            continue;
+
+        for (uint8 effect = 0; effect < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++effect)
+        {
+            if (enchant->type[effect] == ITEM_ENCHANTMENT_TYPE_USE_SPELL
+                && enchant->spellid[effect] == m_spellInfo->Id)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 bool Spell::IsAutoActionResetSpell() const

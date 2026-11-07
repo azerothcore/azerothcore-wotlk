@@ -688,9 +688,9 @@ class spell_hun_readiness : public SpellScript
         std::set<std::pair<uint32, bool>> spellsToRemove;
         std::set<uint32> categoriesToRemove;
 
-        for (auto const& [spellId, cooldown] : cooldowns)
+        for (auto const& [key, cooldown] : cooldowns)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(key.spellId);
             if (spellInfo
             && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
             && spellInfo->Id != SPELL_HUNTER_READINESS
