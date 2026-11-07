@@ -65,12 +65,11 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     if (isdigit(channelName[0]))
         return;
 
-    if (channelName.size() >= 100 || !DisallowHyperlinksAndMaybeKick(channelName))
+    if (channelName.size() >= MAX_CHANNEL_NAME_STR || !DisallowHyperlinksAndMaybeKick(channelName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetJoinChannel(channelName, channelId))
-            channel->JoinChannel(GetPlayer(), password);
+    if (Channel* channel = sChannelMgr.GetOrCreateChannel(GetPlayer()->GetTeamId(), channelName, channelId))
+        channel->JoinChannel(GetPlayer(), password);
 }
 
 void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
@@ -84,9 +83,10 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     if (channelName.empty())
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->LeaveChannel(GetPlayer(), true);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->LeaveChannel(GetPlayer(), true);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelList(WorldPacket& recvPacket)
@@ -94,12 +94,16 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> channelName;
 
+    bool display = recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST;
+
     LOG_DEBUG("chat.system", "{} {} Channel: {}",
-                   recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
+        display ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
                    GetPlayerInfo(), channelName);
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->List(GetPlayer());
+
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->List(GetPlayer(), display);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
@@ -112,9 +116,10 @@ void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
     if (password.length() > MAX_CHANNEL_PASS_STR)
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->Password(GetPlayer(), password);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->Password(GetPlayer(), password);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
@@ -127,9 +132,10 @@ void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->SetOwner(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->SetOwner(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelOwner(WorldPacket& recvPacket)
@@ -139,9 +145,11 @@ void WorldSession::HandleChannelOwner(WorldPacket& recvPacket)
 
     LOG_DEBUG("chat.system", "CMSG_CHANNEL_OWNER {} Channel: {}",
                    GetPlayerInfo(), channelName);
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->SendWhoOwner(GetPlayer()->GetGUID());
+
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->SendWhoOwner(GetPlayer()->GetGUID());
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
@@ -154,9 +162,10 @@ void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->SetModerator(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->SetModerator(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
@@ -169,9 +178,10 @@ void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->UnsetModerator(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->UnsetModerator(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
@@ -184,9 +194,10 @@ void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->SetMute(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->SetMute(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
@@ -199,9 +210,10 @@ void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->UnsetMute(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->UnsetMute(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
@@ -214,9 +226,10 @@ void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->Invite(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->Invite(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
@@ -229,9 +242,10 @@ void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->Kick(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->Kick(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
@@ -244,9 +258,10 @@ void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->Ban(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->Ban(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
@@ -259,9 +274,10 @@ void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
     if (!normalizePlayerName(targetName))
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->UnBan(GetPlayer(), targetName);
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->UnBan(GetPlayer(), targetName);
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
@@ -271,9 +287,11 @@ void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
 
     LOG_DEBUG("chat.system", "CMSG_CHANNEL_ANNOUNCEMENTS {} Channel: {}",
         GetPlayerInfo(), channelName);
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->Announce(GetPlayer());
+
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->Announce(GetPlayer());
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelModerateOpcode(WorldPacket& recvPacket)
@@ -284,9 +302,10 @@ void WorldSession::HandleChannelModerateOpcode(WorldPacket& recvPacket)
     LOG_DEBUG("chat.system", "CMSG_CHANNEL_MODERATE {} Channel: {}",
         GetPlayerInfo(), channelName);
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* chn = cMgr->GetChannel(channelName, GetPlayer()))
-            chn->ToggleModeration(GetPlayer());
+    if (Channel* chn = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        chn->ToggleModeration(GetPlayer());
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleChannelDisplayListQuery(WorldPacket& recvPacket)
@@ -302,20 +321,20 @@ void WorldSession::HandleGetChannelMemberCount(WorldPacket& recvPacket)
 
     LOG_DEBUG("chat.system", "CMSG_GET_CHANNEL_MEMBER_COUNT {} Channel: {}",
                    GetPlayerInfo(), channelName);
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-    {
-        if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-        {
-            LOG_DEBUG("chat.system", "SMSG_CHANNEL_MEMBER_COUNT {} Channel: {} Count: {}",
-                           GetPlayerInfo(), channelName, channel->GetNumPlayers());
 
-            WorldPacket data(SMSG_CHANNEL_MEMBER_COUNT, channel->GetName().size() + 1 + 4);
-            data << channel->GetName();
-            data << uint8(channel->GetFlags());
-            data << uint32(channel->GetNumPlayers());
-            SendPacket(&data);
-        }
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+    {
+        LOG_DEBUG("chat.system", "SMSG_CHANNEL_MEMBER_COUNT {} Channel: {} Count: {}",
+                        GetPlayerInfo(), channelName, channel->GetNumPlayers());
+
+        WorldPacket data(SMSG_CHANNEL_MEMBER_COUNT, channel->GetName().size() + 1 + 1 + 4);
+        data << channel->GetName();
+        data << uint8(channel->GetFlags());
+        data << uint32(channel->GetNumPlayers());
+        SendPacket(&data);
     }
+    else
+        ChannelMgr::SendNotOnPacket(GetPlayer(), channelName);
 }
 
 void WorldSession::HandleSetChannelWatch(WorldPacket& recvPacket)
@@ -328,9 +347,8 @@ void WorldSession::HandleSetChannelWatch(WorldPacket& recvPacket)
     if (channelName.empty())
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, nullptr, false))
-            channel->AddWatching(GetPlayer());
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->AddWatching(GetPlayer());
 }
 
 void WorldSession::HandleClearChannelWatch(WorldPacket& recvPacket)
@@ -341,7 +359,6 @@ void WorldSession::HandleClearChannelWatch(WorldPacket& recvPacket)
     if (channelName.empty())
         return;
 
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, nullptr, false))
-            channel->RemoveWatching(GetPlayer());
+    if (Channel* channel = sChannelMgr.GetChannel(GetPlayer()->GetTeamId(), channelName))
+        channel->RemoveWatching(GetPlayer());
 }

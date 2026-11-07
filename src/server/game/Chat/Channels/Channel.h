@@ -18,13 +18,17 @@
 #ifndef _CHANNEL_H
 #define _CHANNEL_H
 
+#include "VoiceChatDefines.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
+#include <map>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 class Player;
+class WorldSession;
 
-#define CHANNEL_BAN_DURATION            DAY*60
+#define CHANNEL_BAN_DURATION DAY*60
 
 // EnumUtils: DESCRIBE THIS
 enum ChatNotify : uint8
@@ -175,10 +179,13 @@ class Channel
     };
 
 public:
-    Channel(std::string const& name, uint32 channel_id, uint32 channelDBId, TeamId teamId = TEAM_NEUTRAL, bool announce = true, bool ownership = true);
+    Channel(std::string const& name, uint32 channelDBCId, uint64 channelGuid, TeamId teamId = TEAM_NEUTRAL, bool announce = true, bool ownership = true);
+    // constructs a voice-only channel (group/raid/battleground), owned by VoiceChatMgr
+    Channel(VoiceChatChannelType voiceChannelType, uint32 voiceGroupId, TeamId teamId = TEAM_NEUTRAL);
     [[nodiscard]] std::string const& GetName() const { return _name; }
     [[nodiscard]] uint32 GetChannelId() const { return _channelId; }
     [[nodiscard]] uint32 GetChannelDBId() const { return _channelDBId; }
+    [[nodiscard]] TeamId GetTeamId() const { return _teamId; }
     [[nodiscard]] bool IsConstant() const { return _channelId != 0; }
     [[nodiscard]] bool IsAnnounce() const { return _announce; }
     [[nodiscard]] bool IsLFG() const { return HasFlag(CHANNEL_FLAG_LFG); }
@@ -197,7 +204,8 @@ public:
     void UnBan(Player const* player, std::string const& badname);
     void UnBan(ObjectGuid guid);
     void Password(Player const* player, std::string const& pass);
-    void SetMode(Player const* player, std::string const& p2n, bool mod, bool set);
+    // returns whether the moderator or mute flag was applied
+    bool SetMode(Player const* player, std::string const& p2n, bool mod, bool set);
     void SetOwner(ObjectGuid guid, bool exclaim = true);
     void SetOwner(Player const* player, std::string const& name);
     void SendWhoOwner(ObjectGuid guid);
@@ -205,7 +213,7 @@ public:
     void UnsetModerator(Player const* player, std::string const& newname) { SetMode(player, newname, true, false); }
     void SetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, true); }
     void UnsetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, false); }
-    void List(Player const* player);
+    void List(Player const* player, bool display = false);
     void Announce(Player const* player);
     void Say(ObjectGuid guid, std::string const& what, uint32 lang);
     void Invite(Player const* player, std::string const& newp);
@@ -217,48 +225,111 @@ public:
     static void CleanOldChannelsInDB();
     void ToggleModeration(Player* p);
 
+    [[nodiscard]] bool IsOn(ObjectGuid who) const { return playersStore.find(who) != playersStore.end(); }
+    [[nodiscard]] bool IsBanned(ObjectGuid guid) const;
+
     // pussywizard:
     void AddWatching(Player* p);
     void RemoveWatching(Player* p);
+
+    [[nodiscard]] uint8 GetPlayerFlags(ObjectGuid guid) const
+    {
+        PlayerContainer::const_iterator itr = playersStore.find(guid);
+        return itr != playersStore.end() ? itr->second.flags : 0;
+    }
+
+    // Voice chat
+    bool IsVoiceEnabled() const { return HasFlag(CHANNEL_FLAG_VOICE); }
+    void ToggleVoice(Player* player = nullptr);
+    // enables voice on this custom channel
+    void VoiceOn(Player* player);
+    // handles CMSG_CHANNEL_VOICE_ON, needs the same rights as the other moderation commands
+    void RequestVoiceOn(Player* player);
+    // handles CMSG_CHANNEL_VOICE_OFF, needs the same rights as voice on
+    void RequestVoiceOff(Player* player);
+    // whether player may (un)silence victim on this channel, notifies player if not
+    bool CanSilenceVoiceMember(Player const* player, ObjectGuid victim);
+    // handles CMSG_CHANNEL_(UN)SILENCE_ALL, (un)mutes the named player in text and voice
+    void SilenceAll(Player const* player, std::string const& name, bool silence);
+
+    uint16 GetVoiceId() const { return _voiceId; }
+    void SetVoiceId(uint16 voiceId) { _voiceId = voiceId; }
+    uint64 GetVoiceSessionId() const { return _voiceSessionGuid; }
+    void SetVoiceSessionId(uint64 sessionId) { _voiceSessionGuid = sessionId; }
+    // the key the members sign their voice datagrams with
+    VoiceChatSessionKey const& GetVoiceSessionKey() const { return _voiceSessionKey; }
+    void SetVoiceSessionKey(VoiceChatSessionKey const& sessionKey) { _voiceSessionKey = sessionKey; }
+    VoiceChatChannelType GetVoiceType() const { return _voiceType; }
+    void SetVoiceType(VoiceChatChannelType type) { _voiceType = type; }
+    uint32 GetVoiceGroupId() const { return _voiceGroupId; }
+
+    bool IsOnVoice(ObjectGuid guid) const;
+    VoiceChatMember* GetVoiceChatMember(ObjectGuid guid);
+    std::map<uint8, VoiceChatMember> const& GetVoiceMembers() const { return _voiceMembers; }
+    // drops all voice members and resets the voice session state
+    void DisbandVoiceSession();
+
+    void AddVoiceChatMember(ObjectGuid guid);
+    void RemoveVoiceChatMember(ObjectGuid guid);
+    // adds all eligible players of this (custom) channel to voice after the voice session was created
+    void AddVoiceChatMembersAfterCreate();
+    // a member with voice chat enabled may use voice in this (custom) channel
+    bool HasVoiceChatCandidate() const;
+    void SetVoiceMassAdding(bool state) { _voiceMassAdding = state; }
+
+    void VoiceMember(ObjectGuid guid);
+    void DevoiceMember(ObjectGuid guid);
+    void MuteVoiceMember(ObjectGuid guid);
+    void UnmuteVoiceMember(ObjectGuid guid);
+    // both return false if guid is not on voice in this channel
+    bool ForceMuteVoiceMember(ObjectGuid guid);
+    bool ForceUnmuteVoiceMember(ObjectGuid guid);
+    void SetVoiceMemberPriority(ObjectGuid guid, uint8 priority);
+
+    void SendVoiceRoster(bool toAll = false, ObjectGuid toPlayer = ObjectGuid::Empty);
+    void SendAvailableVoiceChannel(WorldSession* session);
+    void SendLeaveVoiceSession(WorldSession* session) const;
+
+    void SetChannelRights(ChannelRights&& channelRights);
 
 private:
     // initial packet data (notify type and channel name)
     void MakeNotifyPacket(WorldPacket* data, uint8 notify_type);
     // type specific packet data
-    void MakeJoined(WorldPacket* data, ObjectGuid guid);                        //+ 0x00
-    void MakeLeft(WorldPacket* data, ObjectGuid guid);                          //+ 0x01
-    void MakeYouJoined(WorldPacket* data);                                      //+ 0x02
-    void MakeYouLeft(WorldPacket* data);                                        //+ 0x03
-    void MakeWrongPassword(WorldPacket* data);                                  //? 0x04
-    void MakeNotMember(WorldPacket* data);                                      //? 0x05
-    void MakeNotModerator(WorldPacket* data);                                   //? 0x06
-    void MakePasswordChanged(WorldPacket* data, ObjectGuid guid);               //+ 0x07
-    void MakeOwnerChanged(WorldPacket* data, ObjectGuid guid);                  //? 0x08
-    void MakePlayerNotFound(WorldPacket* data, std::string const& name);        //+ 0x09
-    void MakeNotOwner(WorldPacket* data);                                       //? 0x0A
-    void MakeChannelOwner(WorldPacket* data);                                   //? 0x0B
-    void MakeModeChange(WorldPacket* data, ObjectGuid guid, uint8 oldflags);    //+ 0x0C
-    void MakeAnnouncementsOn(WorldPacket* data, ObjectGuid guid);               //+ 0x0D
-    void MakeAnnouncementsOff(WorldPacket* data, ObjectGuid guid);              //+ 0x0E
-    void MakeMuted(WorldPacket* data);                                          //? 0x11
-    void MakePlayerKicked(WorldPacket* data, ObjectGuid bad, ObjectGuid good);  //? 0x12
-    void MakeBanned(WorldPacket* data);                                         //? 0x13
-    void MakePlayerBanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good);  //? 0x14
-    void MakePlayerUnbanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good);//? 0x15
-    void MakePlayerNotBanned(WorldPacket* data, std::string const& name);       //? 0x16
-    void MakePlayerAlreadyMember(WorldPacket* data, ObjectGuid guid);           //+ 0x17
-    void MakeInvite(WorldPacket* data, ObjectGuid guid);                        //? 0x18
-    void MakeInviteWrongFaction(WorldPacket* data);                             //? 0x19
-    void MakeWrongFaction(WorldPacket* data);                                   //? 0x1A
-    void MakeInvalidName(WorldPacket* data);                                    //? 0x1B
-    void MakeNotModerated(WorldPacket* data);                                   //? 0x1C
-    void MakePlayerInvited(WorldPacket* data, std::string const& name);         //+ 0x1D
-    void MakePlayerInviteBanned(WorldPacket* data, std::string const& name);    //? 0x1E
-    void MakeThrottled(WorldPacket* data);                                      //? 0x1F
-    void MakeNotInArea(WorldPacket* data);                                      //? 0x20
-    void MakeNotInLfg(WorldPacket* data);                                       //? 0x21
-    void MakeVoiceOn(WorldPacket* data, ObjectGuid guid);                       //+ 0x22
-    void MakeVoiceOff(WorldPacket* data, ObjectGuid guid);                      //+ 0x23
+    void MakeJoined(WorldPacket* data, ObjectGuid guid);                         //+ 0x00
+    void MakeLeft(WorldPacket* data, ObjectGuid guid);                           //+ 0x01
+    void MakeYouJoined(WorldPacket* data);                                       //+ 0x02
+    void MakeYouLeft(WorldPacket* data);                                         //+ 0x03
+    void MakeWrongPassword(WorldPacket* data);                                   //? 0x04
+    void MakeNotMember(WorldPacket* data);                                       //? 0x05
+    void MakeNotModerator(WorldPacket* data);                                    //? 0x06
+    void MakePasswordChanged(WorldPacket* data, ObjectGuid guid);                //+ 0x07
+    void MakeOwnerChanged(WorldPacket* data, ObjectGuid guid);                   //? 0x08
+    void MakePlayerNotFound(WorldPacket* data, std::string const& name);         //+ 0x09
+    void MakeNotOwner(WorldPacket* data);                                        //? 0x0A
+    void MakeChannelOwner(WorldPacket* data);                                    //? 0x0B
+    void MakeModeChange(WorldPacket* data, ObjectGuid guid, uint8 oldflags);     //+ 0x0C
+    void MakeAnnouncementsOn(WorldPacket* data, ObjectGuid guid);                //+ 0x0D
+    void MakeAnnouncementsOff(WorldPacket* data, ObjectGuid guid);               //+ 0x0E
+    void MakeMuted(WorldPacket* data);                                           //? 0x11
+    void MakePlayerKicked(WorldPacket* data, ObjectGuid bad, ObjectGuid good);   //? 0x12
+    void MakeBanned(WorldPacket* data);                                          //? 0x13
+    void MakePlayerBanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good);   //? 0x14
+    void MakePlayerUnbanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good); //? 0x15
+    void MakePlayerNotBanned(WorldPacket* data, std::string const& name);        //? 0x16
+    void MakePlayerAlreadyMember(WorldPacket* data, ObjectGuid guid);            //+ 0x17
+    void MakeInvite(WorldPacket* data, ObjectGuid guid);                         //? 0x18
+    void MakeInviteWrongFaction(WorldPacket* data);                              //? 0x19
+    void MakeWrongFaction(WorldPacket* data);                                    //? 0x1A
+    void MakeInvalidName(WorldPacket* data);                                     //? 0x1B
+    void MakeNotModerated(WorldPacket* data);                                    //? 0x1C
+    void MakePlayerInvited(WorldPacket* data, std::string const& name);          //+ 0x1D
+    void MakePlayerInviteBanned(WorldPacket* data, std::string const& name);     //? 0x1E
+    void MakeThrottled(WorldPacket* data);                                       //? 0x1F
+    void MakeNotInArea(WorldPacket* data);                                       //? 0x20
+    void MakeNotInLfg(WorldPacket* data);                                        //? 0x21
+    void MakeVoiceOn(WorldPacket* data, ObjectGuid guid);                        //+ 0x22
+    void MakeVoiceOff(WorldPacket* data, ObjectGuid guid);                       //+ 0x23
     void MakeModerationOn(WorldPacket* data, ObjectGuid guid);
     void MakeModerationOff(WorldPacket* data, ObjectGuid guid);
 
@@ -269,19 +340,10 @@ private:
 
     bool ShouldAnnouncePlayer(Player const* player) const;
 
-    [[nodiscard]] bool IsOn(ObjectGuid who) const { return playersStore.find(who) != playersStore.end(); }
-    [[nodiscard]] bool IsBanned(ObjectGuid guid) const;
-
     void UpdateChannelInDB() const;
     void UpdateChannelUseageInDB() const;
     void AddChannelBanToDB(ObjectGuid guid, uint32 time) const;
     void RemoveChannelBanFromDB(ObjectGuid guid) const;
-
-    [[nodiscard]] uint8 GetPlayerFlags(ObjectGuid guid) const
-    {
-        PlayerContainer::const_iterator itr = playersStore.find(guid);
-        return itr != playersStore.end() ? itr->second.flags : 0;
-    }
 
     void SetModerator(ObjectGuid guid, bool set)
     {
@@ -313,9 +375,20 @@ private:
         }
     }
 
+    // Voice chat
+    uint8 GenerateVoiceUserId(ObjectGuid guid);
+    uint8 ReuseVoiceUserId();
+    void ResetVoiceUserIds();
+    // player is on the channel and a moderator (or may moderate any channel), notifies player if not
+    bool CheckVoiceModerator(Player const* player);
+    // custom channels: the channel rights let player speak, player is listed to the others
+    // and is on voice here or in fewer than VOICECHAT_MAX_PLAYER_CUSTOM_SESSIONS channels
+    bool CanUseVoice(Player const* player) const;
+
     typedef std::unordered_map<ObjectGuid, PlayerInfo> PlayerContainer;
     typedef std::unordered_map<ObjectGuid, uint32> BannedContainer;
     typedef std::unordered_set<Player*> PlayersWatchingContainer;
+    typedef std::map<uint8, VoiceChatMember> VoiceChatMembers;
 
     bool _announce;
     bool _moderation;
@@ -333,5 +406,26 @@ private:
     PlayerContainer playersStore;
     BannedContainer bannedStore;
     PlayersWatchingContainer playersWatchingStore;
+
+    // Voice chat
+    uint64 _voiceSessionGuid;
+    VoiceChatSessionKey _voiceSessionKey{};
+    uint16 _voiceId;
+    VoiceChatChannelType _voiceType;
+    uint32 _voiceGroupId;
+    bool _voiceMassAdding;
+    bool _voiceDeleting;
+    // set when a moderator turns voice off, joining members would turn it on again otherwise
+    bool _voiceTurnedOff;
+    VoiceChatMembers _voiceMembers;
+    // user ids handed out while this voice session has members. Clients keep
+    // departed members in their session and play voice as the first member with
+    // the sender's id, so an id is only handed out again once no client is left
+    // that was in the session together with its previous holder
+    std::unordered_map<ObjectGuid, uint8> _voiceUserIds;
+    uint8 _lastVoiceUserId;
+    // orders joins and leaves: when each id was last freed, members store when they joined
+    uint64 _voiceUserIdClock;
+    std::unordered_map<uint8, uint64> _voiceUserIdFreedAt;
 };
 #endif
