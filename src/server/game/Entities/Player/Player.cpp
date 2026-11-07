@@ -59,6 +59,7 @@
 #include "LootItemStorage.h"
 #include "MapMgr.h"
 #include "MiscPackets.h"
+#include "MovementTypedefs.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
@@ -370,6 +371,7 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), _cinematicMgr(*thi
 
     m_lastFallTime = 0;
     m_lastFallZ = 0;
+    m_lastFallFromClient = false;
 
     m_grantableLevels = 0;
 
@@ -14203,6 +14205,8 @@ static constexpr float   FALL_DMG_EQU_SLOPE         = 0.018f;
 static constexpr float   FALL_DMG_EQU_INTERCEPT     = -0.2426f;
 static constexpr float   MIN_FALL_DMG_DIST          = 13.48f;       // Minimum fall distance that deals damage
 // 13.48 can be calculated by resolving damageperc to 0 in the fall damage equation below, and assuming safe_fall reduction = 0
+static constexpr float   FALL_TIME_TOLERANCE        = 0.1f;         // seconds, client frame granularity
+static constexpr float   FALL_DIST_TOLERANCE        = 5.0f;         // yards, start height comes from the last packet before the fall
 
 static constexpr uint32  SPELL_GUST_OF_WIND         = 43621;
 static constexpr uint32  SPELL_DIVINE_PROTECTION    = 498;
@@ -14211,6 +14215,28 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 {
     // calculate total z distance of the fall
     float z_diff = m_lastFallZ - movementInfo.pos.GetPositionZ();
+
+    // A glitched start height must not count more than the reported fall time allows. Starts set server side
+    // (spline falls, vehicle exits, teleports) and transport falls (moving frame) keep the plain height difference.
+    if (m_lastFallFromClient && !movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT) &&
+        !m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    {
+        // m_movementInfo is the previous packet here, since relocation runs after HandleFall. zspeed is positive
+        // downwards (knockbacks send -speedZ); an upward start is ignored, which can only loosen the bound.
+        float startSpeed = 0.0f;
+        if (m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING) && m_movementInfo.jump.zspeed > 0.0f)
+            startSpeed = m_movementInfo.jump.zspeed;
+
+        float maxFallDist = Movement::computeFallElevation(Movement::MSToSec(movementInfo.fallTime) + FALL_TIME_TOLERANCE,
+            false, startSpeed) + FALL_DIST_TOLERANCE;
+
+        if (z_diff > maxFallDist)
+        {
+            LOG_DEBUG("entities.player", "Player::HandleFall: {} fall height {} capped to {} (fallTime {})",
+                GetGUID().ToString(), z_diff, maxFallDist, movementInfo.fallTime);
+            z_diff = maxFallDist;
+        }
+    }
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     if (z_diff >= MIN_FALL_DMG_DIST && !isDead() && !IsGameMaster() && !GetCommandStatus(CHEAT_GOD) &&
