@@ -30,6 +30,10 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+#include <boost/dll/runtime_symbol_info.hpp>
+#endif
+
 namespace
 {
     std::string _filename;
@@ -706,7 +710,9 @@ std::string const ConfigMgr::GetConfigPath()
     std::lock_guard<std::mutex> lock(_configLock);
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-    return "configs/";
+    std::error_code ec;
+    auto const& executablePath = boost::dll::program_location(ec);
+    return !ec ? (executablePath.parent_path() / "configs/").generic_string() : "configs/";
 #else
     return std::string(_CONF_DIR) + "/";
 #endif
