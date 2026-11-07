@@ -459,6 +459,9 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         loot = &creature->loot;
         if (loot->isLooted())
         {
+            if (loot->pendingCorpseRollCleanup)
+                loot->CloseLootSessions(*creature);
+
             // skip pickpocketing loot for speed, skinning timer reduction is no-op in fact
             if (!creature->IsAlive())
                 creature->AllLootRemovedFromCorpse();
