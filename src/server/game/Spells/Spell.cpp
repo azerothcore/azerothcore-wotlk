@@ -2405,7 +2405,8 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     if (checkIfValid)
     {
-        SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit);
+        SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit,
+            m_triggeredByAuraSpell ? m_originalCaster : nullptr);
         if (res != SPELL_CAST_OK)
             return;
     }
@@ -2884,6 +2885,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             // Fill base damage struct (unitTarget - is real spell target)
             SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
+            damageInfo.skipCombat = IsFromPreDeathAura();
 
             // Check damage immunity
             if (unitTarget->IsImmunedToDamage(caster, m_spellInfo))
@@ -3608,7 +3610,19 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     if (triggeredByAura)
     {
         m_triggeredByAuraSpell.Init(triggeredByAura);
+
+        // e.g. Seed of Corruption detonating on an enemy after its warlock died and got resurrected
+        if (triggeredByAura->GetCasterGUID() == m_originalCasterGUID &&
+            triggeredByAura->GetBase()->HasCasterDiedSinceApply(m_originalCaster))
+            _fromPreDeathAura = true;
     }
+
+    // e.g. Darkmoon Card: Death proccing off a bleed tick the druid applied before dying
+    if (m_originalCaster && m_originalCaster->IsInPreDeathAuraTick())
+        _fromPreDeathAura = true;
+
+    if (_fromPreDeathAura)
+        _triggeredCastFlags = TriggerCastFlags(_triggeredCastFlags | TRIGGERED_DONT_ENTER_COMBAT);
 
     // create and add update event for this spell
     _spellEvent = new SpellEvent(this);
@@ -3954,7 +3968,8 @@ void Spell::_cast(bool skipCheck)
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only
         // This prevents spells such as Hunter's Mark from triggering pet attack
         // xinef: take into account SPELL_ATTR3_SUPPRESS_TARGET_PROCS
-        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS))
+        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE &&
+            !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS) && !IsFromPreDeathAura())
             if (!playerCaster->m_Controlled.empty())
                 for (Unit::ControlSet::iterator itr = playerCaster->m_Controlled.begin(); itr != playerCaster->m_Controlled.end(); ++itr)
                     if (Unit* pet = *itr)
@@ -5822,6 +5837,8 @@ void Spell::HandleThreatSpells()
         {
             if (!target->CanHaveThreatList())
                 continue;
+            if (IsFromPreDeathAura() && !target->IsEngagedBy(unitCaster))
+                continue;
             target->GetThreatMgr().AddThreat(unitCaster, threatToAdd, m_spellInfo, true);
         }
     }
@@ -6092,7 +6109,8 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
     if (Unit* target = m_targets.GetUnitTarget())
     {
-        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false);
+        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false,
+            m_triggeredByAuraSpell ? m_originalCaster : nullptr);
         if (castResult != SPELL_CAST_OK)
             return castResult;
 
@@ -6105,6 +6123,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             // Target must be facing you
             if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), unitCaster))
                 return SPELL_FAILED_NOT_INFRONT;
+
+            // A unit riding a player sits on their back (Gormok's Snobold Vassals), out of reach of their targeted harmful spells
+            if (unitCaster && unitCaster->IsPlayer() && target->GetVehicleBase() == unitCaster && !m_spellInfo->IsPositive())
+                return SPELL_FAILED_BAD_TARGETS;
 
             // Ignore LOS for gameobject casts: one has no collision height, so the ray would start on its floor
             // position, which the floor under a player standing on it can block. CheckEffectTarget still checks

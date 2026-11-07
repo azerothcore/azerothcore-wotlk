@@ -184,7 +184,7 @@ DamageInfo::DamageInfo(SpellNonMeleeDamage const& spellNonMeleeDamage, DamageEff
     : m_attacker(spellNonMeleeDamage.attacker), m_victim(spellNonMeleeDamage.target), m_damage(spellNonMeleeDamage.damage),
       m_spellInfo(spellNonMeleeDamage.spellInfo), m_schoolMask(SpellSchoolMask(spellNonMeleeDamage.schoolMask)), m_damageType(damageType),
       m_attackType(attackType), m_absorb(spellNonMeleeDamage.absorb), m_resist(spellNonMeleeDamage.resist), m_block(spellNonMeleeDamage.blocked),
-      m_cleanDamage(spellNonMeleeDamage.cleanDamage), m_hitMask(hitMask)
+      m_cleanDamage(spellNonMeleeDamage.cleanDamage), m_hitMask(hitMask), m_skipCombat(spellNonMeleeDamage.skipCombat)
 {
     if (spellNonMeleeDamage.blocked)
         m_hitMask |= PROC_HIT_BLOCK;
@@ -196,7 +196,8 @@ DamageInfo::DamageInfo(SpellNonMeleeDamage const& spellNonMeleeDamage, DamageEff
     : m_attacker(spellNonMeleeDamage.attacker), m_victim(spellNonMeleeDamage.target), m_damage(spellNonMeleeDamage.damage),
       m_spellInfo(spellNonMeleeDamage.spellInfo), m_schoolMask(SpellSchoolMask(spellNonMeleeDamage.schoolMask)), m_damageType(damageType),
       m_attackType(attackType), m_absorb(spellNonMeleeDamage.absorb), m_resist(spellNonMeleeDamage.resist), m_block(spellNonMeleeDamage.blocked),
-      m_cleanDamage(spellNonMeleeDamage.cleanDamage), m_hitMask(PROC_HIT_NONE)
+      m_cleanDamage(spellNonMeleeDamage.cleanDamage), m_hitMask(PROC_HIT_NONE),
+      m_skipCombat(spellNonMeleeDamage.skipCombat)
 {
     // Compute hitMask from SpellMissInfo
     if (missInfo != SPELL_MISS_NONE)
@@ -295,7 +296,6 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
     : _actor(actor), _actionTarget(actionTarget), _procTarget(procTarget), _typeMask(typeMask), _spellTypeMask(spellTypeMask), _spellPhaseMask(spellPhaseMask),
       _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell), _procAuraEffectIndex(procAuraEffectIndex)
 {
-    _chance.reset();
 }
 
 SpellInfo const* ProcEventInfo::GetSpellInfo() const
@@ -987,7 +987,9 @@ void Unit::DealDamageMods(Unit const* victim, uint32& damage, uint32* absorb)
     }
 }
 
-uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, bool /*allowGM*/, Spell const* damageSpell /*= nullptr*/)
+uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage,
+    DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss,
+    bool /*allowGM*/, Spell const* damageSpell /*= nullptr*/, bool skipCombat /*= false*/)
 {
     damage = sScriptMgr->DealDamage(attacker, victim, damage, damagetype);
     // Xinef: initialize damage done for rage calculations
@@ -1006,8 +1008,11 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
 
+    if ((damageSpell && damageSpell->IsFromPreDeathAura()) || (attacker && attacker->IsInPreDeathAuraTick()))
+        skipCombat = true;
+
     // Signal to pets that their owner was attacked - except when DOT.
-    if (attacker != victim && damagetype != DOT)
+    if (attacker != victim && damagetype != DOT && !skipCombat)
     {
         for (Unit* controlled : victim->m_Controlled)
             if (Creature* cControlled = controlled->ToCreature())
@@ -1025,7 +1030,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     }
 
     // Signal the pet it was attacked so the AI can respond if needed
-    if (victim->IsCreature() && attacker != victim && victim->IsPet() && victim->IsAlive())
+    if (victim->IsCreature() && attacker != victim && victim->IsPet() && victim->IsAlive() && !skipCombat)
         victim->ToPet()->AI()->AttackedBy(attacker);
 
     if (damagetype != NODAMAGE)
@@ -1106,10 +1111,11 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             }
 
             // Shared damage is a hostile interaction for its recipient too.
-            if (hasSharedDamage && attacker && !attacker->IsFriendlyTo(shareDamageTarget))
+            if (hasSharedDamage && attacker && !attacker->IsFriendlyTo(shareDamageTarget) && !skipCombat)
                 attacker->AtTargetAttacked(shareDamageTarget, !spellProto || spellProto->HasInitialAggro());
 
-            Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask, spellProto, false, false, damageSpell);
+            Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask,
+                spellProto, false, false, damageSpell, skipCombat);
         }
     }
 
@@ -1268,7 +1274,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
                 victim->ToCreature()->UpdateLeashExtensionTime();
 
-            if (attacker && attacker != victim)
+            if (attacker && attacker != victim && (!skipCombat || victim->IsEngagedBy(attacker)))
             {
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
             }
@@ -2342,6 +2348,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
     uint32 damage = dmgInfo.GetDamage();
     SpellSchoolMask schoolMask = dmgInfo.GetSchoolMask();
     SpellInfo const* spellInfo = dmgInfo.GetSpellInfo();
+    bool const skipCombat = dmgInfo.SkipsCombat() || (attacker && attacker->IsInPreDeathAuraTick());
 
     if (!victim || !victim->IsAlive() || !damage)
         return;
@@ -2606,10 +2613,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
 
             // Split damage is a hostile interaction for its recipient too.
-            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster) && !skipCombat)
                 attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
-            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo, false);
+            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo,
+                false, false, nullptr, skipCombat);
         }
 
         // We're going to call functions which can modify content of the list during iteration over it's elements
@@ -2684,10 +2692,11 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
             CleanDamage cleanDamage = CleanDamage(splitted, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
 
             // Split damage is a hostile interaction for its recipient too.
-            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster))
+            if (splitDamage && attacker && !attacker->IsFriendlyTo(caster) && !skipCombat)
                 attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
-            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, splitSchoolMask, splitSpellInfo, false);
+            Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, splitSchoolMask, splitSpellInfo,
+                false, false, nullptr, skipCombat);
         }
     }
 }
@@ -4457,6 +4466,7 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
 
             // try to increase stack amount
             foundAura->ModStackAmount(1, AURA_REMOVE_BY_DEFAULT, periodicReset);
+            foundAura->m_refreshTime = GameTime::GetGameTimeMS();
             sScriptMgr->OnAuraApply(this, foundAura);
             return foundAura;
         }
@@ -6000,7 +6010,8 @@ int32 Unit::GetTotalAuraModifier(AuraType auraType, std::function<bool(AuraEffec
         {
             // Check if the Aura Effect has a the Same Effect Stack Rule and if so, use the highest amount of that SpellGroup
             // If the Aura Effect does not have this Stack Rule, it returns false so we can add to the multiplier as usual
-            if (!sSpellMgr->AddSameEffectStackRuleSpellGroups(aurEff->GetSpellInfo(), static_cast<uint32>(auraType), aurEff->GetAmount(), sameEffectSpellGroup))
+            if (!sSpellMgr->AddSameEffectStackRuleSpellGroups(aurEff->GetSpellInfo(), static_cast<uint32>(auraType),
+                aurEff->GetMiscValue(), aurEff->GetAmount(), sameEffectSpellGroup))
                 modifier += aurEff->GetAmount();
         }
     }
@@ -6027,7 +6038,8 @@ float Unit::GetTotalAuraMultiplier(AuraType auraType, std::function<bool(AuraEff
         {
             // Check if the Aura Effect has a the Same Effect Stack Rule and if so, use the highest amount of that SpellGroup
             // If the Aura Effect does not have this Stack Rule, it returns false so we can add to the multiplier as usual
-            if (!sSpellMgr->AddSameEffectStackRuleSpellGroups(aurEff->GetSpellInfo(), static_cast<uint32>(auraType), aurEff->GetAmount(), sameEffectSpellGroup))
+            if (!sSpellMgr->AddSameEffectStackRuleSpellGroups(aurEff->GetSpellInfo(), static_cast<uint32>(auraType),
+                aurEff->GetMiscValue(), aurEff->GetAmount(), sameEffectSpellGroup))
                 AddPct(multiplier, aurEff->GetAmount());
         }
     }
@@ -11177,9 +11189,12 @@ void Unit::setDeathState(DeathState s, bool despawn)
 
     if (s != DeathState::Alive && s != DeathState::JustRespawned)
     {
-        // restart our pvp timers so units fighting us get a full pvp timeout from our death (#27967)
         if (wasAlive)
+        {
+            m_lastDeathTime = GameTime::GetGameTimeMS();
+            // restart our pvp timers so units fighting us get a full pvp timeout from our death (#27967)
             GetCombatManager().RestartPvPCombatTimers();
+        }
         CombatStop(false, /*mutualPvP*/ true, /*keepPvPForOthers*/ true);
         ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
@@ -14239,6 +14254,9 @@ void Unit::SetFeared(bool apply, Unit* fearedBy /*= nullptr*/, bool isFear /*= f
             m_movedByPlayer->ToPlayer()->SetClientControl(this, !apply); // verified
         //else
         //  ToPlayer()->SetClientControl(this, !apply);
+
+        if (!apply)
+            ToPlayer()->ResyncCanFlyToClient();
     }
 }
 
@@ -14271,6 +14289,9 @@ void Unit::SetConfused(bool apply)
             m_movedByPlayer->ToPlayer()->SetClientControl(this, !apply); // verified
         //else
         //  ToPlayer()->SetClientControl(this, !apply);
+
+        if (!apply)
+            ToPlayer()->ResyncCanFlyToClient();
     }
 }
 
@@ -16247,6 +16268,15 @@ bool Unit::SetSwim(bool enable)
 void Unit::SetCanFly(bool enable)
 {
     bool isClientControlled = IsClientControlled();
+
+    // The owning client ignores the spline packet for its own mover, so replay it once Fear/Confuse ends
+    if (Player* player = ToPlayer())
+    {
+        if (isClientControlled)
+            player->ClearPendingCanFlyResync();
+        else if (HasUnitFlag(UNIT_FLAG_FLEEING) || HasUnitFlag(UNIT_FLAG_CONFUSED))
+            player->SetPendingCanFlyResync(enable);
+    }
 
     if (!isClientControlled)
     {

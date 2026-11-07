@@ -54,6 +54,7 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
+#include "ItemRecovery.h"
 #include "LFGMgr.h"
 #include "Log.h"
 #include "LootItemStorage.h"
@@ -4398,6 +4399,15 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
 
+                // Loot rows are found through their recovery_item row, so they go first
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_LOOT_BY_GUID);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_GUID);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
                 Corpse::DeleteFromDB(playerGuid, trans);
 
                 sScriptMgr->OnPlayerDeleteFromDB(trans, lowGuid);
@@ -4494,19 +4504,22 @@ void Player::DeleteOldRecoveryItems(uint32 keepDays)
     if (result)
     {
         LOG_INFO("server.loading", "Player::DeleteOldRecoveryItems: Found {} item(s) to delete", result->GetRowCount());
+
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         do
         {
             Field* fields = result->Fetch();
 
-            uint32 guid = fields[0].Get<uint32>();
-            uint32 itemEntry = fields[1].Get<uint32>();
+            uint32 recoveryId = fields[0].Get<uint32>();
+            uint32 guid = fields[1].Get<uint32>();
+            uint32 itemEntry = fields[2].Get<uint32>();
 
-            CharacterDatabasePreparedStatement* deleteStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_GUID);
-            deleteStmt->SetData(0, guid);
-            CharacterDatabase.Execute(deleteStmt);
+            ItemRecovery::DeleteFromDB(trans, recoveryId);
 
             LOG_INFO("server.loading", "Deleted item from recovery_item table where guid {} and item id {}", guid, itemEntry);
         } while (result->NextRow());
+
+        CharacterDatabase.CommitTransaction(trans);
     }
 }
 
@@ -12903,6 +12916,28 @@ bool Player::CanNoReagentCast(SpellInfo const* spellInfo) const
 
 void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
 {
+    // Disarm keeps the weapon equipped, keep active auras (e.g. Deterrence)
+    auto hasDisarmedFitWeapon = [this, pItem](SpellInfo const* spellInfo)
+    {
+        if (spellInfo->EquippedItemClass != ITEM_CLASS_WEAPON || spellInfo->IsPassive())
+            return false;
+
+        static constexpr std::pair<uint8, AuraType> disarmSlots[] =
+        {
+            { EQUIPMENT_SLOT_MAINHAND, SPELL_AURA_MOD_DISARM },
+            { EQUIPMENT_SLOT_OFFHAND,  SPELL_AURA_MOD_DISARM_OFFHAND },
+            { EQUIPMENT_SLOT_RANGED,   SPELL_AURA_MOD_DISARM_RANGED }
+        };
+
+        for (auto const& [slot, disarmAura] : disarmSlots)
+            if (HasAuraType(disarmAura))
+                if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                    if (item != pItem && item->IsFitToSpellRequirements(spellInfo))
+                        return true;
+
+        return false;
+    };
+
     for (AuraMap::iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end();)
     {
         Aura* aura = itr->second;
@@ -12916,7 +12951,7 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
         }
 
         // skip if not item dependent or have alternative item
-        if (HasItemFitToSpellRequirements(spellInfo, pItem))
+        if (HasItemFitToSpellRequirements(spellInfo, pItem) || hasDisarmedFitWeapon(spellInfo))
         {
             ++itr;
             continue;
@@ -13247,6 +13282,20 @@ void Player::SetMover(Unit* target)
     m_mover->m_movedByPlayer = this;
     if (m_mover->IsCreature())
         m_mover->GetMotionMaster()->Initialize();
+}
+
+void Player::ResyncCanFlyToClient()
+{
+    if (!_pendingCanFlyResync || GetClientControlling() != this)
+        return;
+
+    // a queued fear/confuse keeps the client out of control even without its unit flag
+    if (HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED))
+        return;
+
+    bool const enable = *_pendingCanFlyResync;
+    _pendingCanFlyResync.reset();
+    SetCanFly(enable);
 }
 
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const

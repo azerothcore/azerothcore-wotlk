@@ -127,6 +127,7 @@ public:
     void Update(uint32 diff, Unit* caster);
 
     time_t GetApplyTime() const { return m_applyTime; }
+    bool HasCasterDiedSinceApply(Unit const* caster) const;
     int32 GetMaxDuration() const { return m_maxDuration; }
     void SetMaxDuration(int32 duration) { m_maxDuration = duration; }
     int32 CalcMaxDuration() const { return CalcMaxDuration(GetCaster()); }
@@ -229,7 +230,6 @@ public:
     // Spell Proc Hooks
     bool CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     bool CallScriptCheckEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
-    bool CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent);
     bool CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     bool CallScriptProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     void CallScriptAfterProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
@@ -260,6 +260,7 @@ protected:
     ObjectGuid const m_castItemGuid;                    // it is NOT safe to keep a pointer to the item because it may get deleted
     uint32 const m_castItemEntry;                       // when deleted, we could retrieve some information from template instead
     time_t const m_applyTime;
+    Milliseconds m_refreshTime;                         // last apply or refresh, m_applyTime stays at the first one
     WorldObject* const m_owner;
 
     int32 m_maxDuration;                                // Max aura duration
