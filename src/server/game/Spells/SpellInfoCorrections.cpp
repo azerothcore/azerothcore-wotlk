@@ -544,6 +544,22 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask[2] = 0x8000000;
     });
 
+    // Retribution Aura - damage shield hits cannot miss
+    ApplySpellFix({
+        7294,   // Retribution Aura (Rank 1)
+        10298,  // Retribution Aura (Rank 2)
+        10299,  // Retribution Aura (Rank 3)
+        10300,  // Retribution Aura (Rank 4)
+        10301,  // Retribution Aura (Rank 5)
+        27150,  // Retribution Aura (Rank 6)
+        54043,  // Retribution Aura (Rank 7)
+        8990,   // Retribution Aura (NPC)
+        13008   // Retribution Aura (NPC)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_NO_ATTACK_MISS;
+    });
+
     // Seal of Light trigger
     ApplySpellFix({ 20167 }, [](SpellInfo* spellInfo)
     {
