@@ -2856,8 +2856,10 @@ void Player::SendInitialSpells()
 
     data.put<uint16>(countPos, spellCount);                  // write real count value
 
-    uint16 spellCooldowns = m_spellCooldowns.size();
-    data << uint16(spellCooldowns);
+    // the client reads exactly this many rows, so count the ones written (the loop skips some entries)
+    std::size_t cooldownCountPos = data.wpos();
+    uint16 spellCooldowns = 0;
+    data << uint16(spellCooldowns);                         // spell cooldown count placeholder
     for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
     {
         if (!itr->second.needSendToClient)
@@ -2866,6 +2868,8 @@ void Player::SendInitialSpells()
         SpellInfo const* sEntry = sSpellMgr->GetSpellInfo(itr->first.spellId);
         if (!sEntry)
             continue;
+
+        ++spellCooldowns;
 
         data << uint32(itr->first.spellId);
 
@@ -2884,6 +2888,8 @@ void Player::SendInitialSpells()
         data << uint32(itr->second.category ? 0 : cooldown);    // cooldown
         data << uint32(itr->second.category ? cooldown : 0);    // category cooldown
     }
+
+    data.put<uint16>(cooldownCountPos, spellCooldowns);     // write real count value
 
     SendDirectMessage(&data);
 }
