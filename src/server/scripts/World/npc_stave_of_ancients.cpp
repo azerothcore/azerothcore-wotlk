@@ -1008,8 +1008,13 @@ public:
                     events.Repeat(2s);
                     break;
                 case NELSON_EVENT_DREADFUL_FRIGHT:
-                    me->CastSpell(me->GetVictim(), NELSON_SPELL_DREADFUL_FRIGHT, false);
-                    events.Repeat(12s, 19s);
+                    // Only while a root aura holds him. If the cast fails (e.g. stunned or silenced),
+                    // try again soon instead of skipping a whole cycle.
+                    if (me->HasUnitState(UNIT_STATE_ROOT)
+                        && DoCastVictim(NELSON_SPELL_DREADFUL_FRIGHT) == SPELL_CAST_OK)
+                        events.Repeat(12s, 19s);
+                    else
+                        events.Repeat(2s);
                     break;
                 case NELSON_EVENT_CREEPING_DOOM:
                     me->CastSpell(me->GetVictim(), NELSON_SPELL_CREEPING_DOOM, false);
