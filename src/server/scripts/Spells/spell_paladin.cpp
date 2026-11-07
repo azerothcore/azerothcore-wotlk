@@ -23,6 +23,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "UnitAI.h"
+#include <cmath>
 /*
  * Scripts for spells with SPELLFAMILY_PALADIN and SPELLFAMILY_GENERIC spells used by paladin players.
  * Ordered alphabetically using scriptname.
@@ -1217,7 +1218,8 @@ class spell_pal_seal_of_righteousness : public AuraScript
             holy += aurEffPaladin->GetAmount();
         }
 
-        int32 bp = std::max<int32>(0, int32((ap * 0.022f + 0.044f * holy) * GetTarget()->GetAttackTime(BASE_ATTACK) / 1000));
+        float damage = (ap * 0.022f + 0.044f * holy) * GetTarget()->GetAttackTime(BASE_ATTACK) / 1000.0f;
+        int32 bp = std::max<int32>(0, int32(std::round(damage)));
         GetTarget()->CastCustomSpell(SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);
 
         // Judgements of the Just: Seal of Righteousness procs
