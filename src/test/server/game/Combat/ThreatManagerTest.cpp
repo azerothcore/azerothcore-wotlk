@@ -17,6 +17,8 @@
 #include "CombatManager.h"
 #include "CreatureAI.h"
 #include "DBCStores.h"
+#include "SpellAuras.h"
+#include "SpellInfoTestHelper.h"
 #include "TestCreature.h"
 #include "TestMap.h"
 #include "WorldMock.h"
@@ -2629,6 +2631,306 @@ TEST_F(ThreatManagerIntegrationTest,
 
     creatureC->CleanupCombatState();
     delete creatureC;
+}
+
+// ============================================================================
+// Taunt on a suppressed taunter
+// A taunter that is suppressed (e.g. immune to the owner's melee damage) must
+// become the victim as soon as the taunt aura is applied, and the threat
+// matched by the taunt must be added to its suppressed reference.
+// ============================================================================
+
+static constexpr uint32 SPELL_TEST_TAUNT        = 355;
+static constexpr uint32 SPELL_TEST_TAUNT_SECOND = 62124;
+
+std::unique_ptr<SpellInfo> BuildTauntAuraInfo(uint32 spellId)
+{
+    // Permanent aura, removed by the tests themselves
+    static SpellDurationEntry permanentDuration = { };
+    permanentDuration.Duration[0] = -1;
+    permanentDuration.Duration[1] = -1;
+    permanentDuration.Duration[2] = -1;
+
+    std::unique_ptr<SpellInfo> info = SpellInfoBuilder()
+        .WithId(spellId)
+        .WithEffect(0, SPELL_EFFECT_APPLY_AURA, SPELL_AURA_MOD_TAUNT)
+        .BuildUnique();
+    info->DurationEntry = &permanentDuration;
+    return info;
+}
+
+ThreatReference const* FindRef(ThreatManager& mgr, Unit const* victim)
+{
+    for (ThreatReference const* ref : mgr.GetUnsortedThreatList())
+        if (ref->GetVictim() == victim)
+            return ref;
+
+    return nullptr;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntAura_SuppressedTaunter_BecomesVictimImmediately)
+{
+    std::unique_ptr<SpellInfo> tauntInfo = BuildTauntAuraInfo(SPELL_TEST_TAUNT);
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    ThreatManager& mgr = _creatureA->TestGetThreatMgr();
+    mgr.AddThreat(creatureC, 800.0f);
+    mgr.AddThreat(_creatureB, 100.0f);
+    EXPECT_EQ(mgr.GetCurrentVictim(), creatureC);
+
+    // B becomes immune to A's melee damage -> B's ref is suppressed
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    ThreatReference const* refB = FindRef(mgr, _creatureB);
+    ASSERT_NE(refB, nullptr);
+    EXPECT_TRUE(refB->IsSuppressed());
+
+    // Taunt aura only, no threat match before it (Challenging Shout, Mocking Blow order)
+    Aura* aura = _creatureB->AddAura(tauntInfo.get(), 0x1, _creatureA);
+    ASSERT_NE(aura, nullptr);
+
+    // No Update(): the switch must happen on the taunt update itself
+    EXPECT_EQ(mgr.GetCurrentVictim(), _creatureB);
+    EXPECT_TRUE(refB->IsOnline());
+    EXPECT_TRUE(refB->IsTaunting());
+
+    _creatureA->RemoveAurasDueToSpell(SPELL_TEST_TAUNT);
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       MatchUnitThreatToHighestThreat_SuppressedTarget_MatchesHighest)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    ThreatManager& mgr = _creatureA->TestGetThreatMgr();
+    mgr.AddThreat(creatureC, 800.0f);
+    mgr.AddThreat(_creatureB, 100.0f);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    mgr.MatchUnitThreatToHighestThreat(_creatureB);
+
+    EXPECT_FLOAT_EQ(mgr.GetThreat(_creatureB, true), 800.0f);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntAura_EndsWhileImmune_ReturnsToSuppressed)
+{
+    std::unique_ptr<SpellInfo> tauntInfo = BuildTauntAuraInfo(SPELL_TEST_TAUNT);
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    ThreatManager& mgr = _creatureA->TestGetThreatMgr();
+    mgr.AddThreat(creatureC, 800.0f);
+    mgr.AddThreat(_creatureB, 100.0f);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    Aura* aura = _creatureB->AddAura(tauntInfo.get(), 0x1, _creatureA);
+    ASSERT_NE(aura, nullptr);
+    EXPECT_EQ(mgr.GetCurrentVictim(), _creatureB);
+
+    // Taunt ends while B is still immune
+    _creatureA->RemoveAurasDueToSpell(SPELL_TEST_TAUNT);
+
+    ThreatReference const* refB = FindRef(mgr, _creatureB);
+    ASSERT_NE(refB, nullptr);
+    EXPECT_TRUE(refB->IsSuppressed());
+    EXPECT_EQ(mgr.GetCurrentVictim(), creatureC);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntAura_EndsAfterImmunity_StaysOnline)
+{
+    std::unique_ptr<SpellInfo> tauntInfo = BuildTauntAuraInfo(SPELL_TEST_TAUNT);
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    ThreatManager& mgr = _creatureA->TestGetThreatMgr();
+    mgr.AddThreat(creatureC, 800.0f);
+    mgr.AddThreat(_creatureB, 100.0f);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    Aura* aura = _creatureB->AddAura(tauntInfo.get(), 0x1, _creatureA);
+    ASSERT_NE(aura, nullptr);
+
+    // Immunity ends first (no EvaluateSuppressed), then the taunt ends
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+    _creatureA->RemoveAurasDueToSpell(SPELL_TEST_TAUNT);
+
+    ThreatReference const* refB = FindRef(mgr, _creatureB);
+    ASSERT_NE(refB, nullptr);
+    EXPECT_TRUE(refB->IsOnline());
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntAura_SuppressedTaunterNotOnList_BecomesVictim)
+{
+    std::unique_ptr<SpellInfo> tauntInfo = BuildTauntAuraInfo(SPELL_TEST_TAUNT);
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    ThreatManager& mgr = _creatureA->TestGetThreatMgr();
+    mgr.AddThreat(creatureC, 800.0f);
+
+    // B is immune and not on A's threat list yet
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+
+    mgr.MatchUnitThreatToHighestThreat(_creatureB);
+
+    ThreatReference const* refB = FindRef(mgr, _creatureB);
+    ASSERT_NE(refB, nullptr);
+    EXPECT_TRUE(refB->IsSuppressed());
+    EXPECT_FLOAT_EQ(mgr.GetThreat(_creatureB, true), 800.0f);
+
+    Aura* aura = _creatureB->AddAura(tauntInfo.get(), 0x1, _creatureA);
+    ASSERT_NE(aura, nullptr);
+
+    EXPECT_EQ(mgr.GetCurrentVictim(), _creatureB);
+
+    _creatureA->RemoveAurasDueToSpell(SPELL_TEST_TAUNT);
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       MatchUnitThreatToHighestThreat_SuppressedTargetAlreadyHighest_KeepsThreat)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    ThreatManager& mgr = _creatureA->TestGetThreatMgr();
+    mgr.AddThreat(_creatureB, 1000.0f);
+    mgr.AddThreat(creatureC, 800.0f);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    mgr.MatchUnitThreatToHighestThreat(_creatureB);
+
+    // A taunt never lowers threat
+    EXPECT_FLOAT_EQ(mgr.GetThreat(_creatureB, true), 1000.0f);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntAura_TwoTauntsWhileImmune_SwitchesOnFirst)
+{
+    std::unique_ptr<SpellInfo> tauntInfo = BuildTauntAuraInfo(SPELL_TEST_TAUNT);
+    std::unique_ptr<SpellInfo> secondTauntInfo = BuildTauntAuraInfo(SPELL_TEST_TAUNT_SECOND);
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    ThreatManager& mgr = _creatureA->TestGetThreatMgr();
+    mgr.AddThreat(creatureC, 800.0f);
+    mgr.AddThreat(_creatureB, 100.0f);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    ThreatReference const* refB = FindRef(mgr, _creatureB);
+    ASSERT_NE(refB, nullptr);
+
+    Aura* aura = _creatureB->AddAura(tauntInfo.get(), 0x1, _creatureA);
+    ASSERT_NE(aura, nullptr);
+    EXPECT_EQ(mgr.GetCurrentVictim(), _creatureB);
+
+    Aura* secondAura = _creatureB->AddAura(secondTauntInfo.get(), 0x1, _creatureA);
+    ASSERT_NE(secondAura, nullptr);
+    EXPECT_EQ(mgr.GetCurrentVictim(), _creatureB);
+
+    // One taunt still active: B stays online and the victim
+    _creatureA->RemoveAurasDueToSpell(SPELL_TEST_TAUNT);
+    EXPECT_TRUE(refB->IsOnline());
+    EXPECT_EQ(mgr.GetCurrentVictim(), _creatureB);
+
+    // Both taunts gone while immune: B is suppressed again
+    _creatureA->RemoveAurasDueToSpell(SPELL_TEST_TAUNT_SECOND);
+    EXPECT_TRUE(refB->IsSuppressed());
+    EXPECT_EQ(mgr.GetCurrentVictim(), creatureC);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntAura_OtherSuppressedRef_StaysSuppressed)
+{
+    std::unique_ptr<SpellInfo> tauntInfo = BuildTauntAuraInfo(SPELL_TEST_TAUNT);
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    ThreatManager& mgr = _creatureA->TestGetThreatMgr();
+    mgr.AddThreat(creatureC, 800.0f);
+    mgr.AddThreat(_creatureB, 100.0f);
+    mgr.AddThreat(creatureD, 300.0f);
+
+    // D gets suppressed, then its immunity ends without new threat or re-evaluation
+    creatureD->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    creatureD->TestGetThreatMgr().EvaluateSuppressed();
+    creatureD->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+
+    ThreatReference const* refD = FindRef(mgr, creatureD);
+    ASSERT_NE(refD, nullptr);
+    EXPECT_TRUE(refD->IsSuppressed());
+
+    // B (not immune) taunts: D must not be touched
+    Aura* aura = _creatureB->AddAura(tauntInfo.get(), 0x1, _creatureA);
+    ASSERT_NE(aura, nullptr);
+    EXPECT_TRUE(refD->IsSuppressed());
+
+    _creatureA->RemoveAurasDueToSpell(SPELL_TEST_TAUNT);
+    EXPECT_TRUE(refD->IsSuppressed());
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
 }
 
 } // namespace
