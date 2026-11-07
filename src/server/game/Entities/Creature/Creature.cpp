@@ -751,12 +751,15 @@ void Creature::Update(uint32 diff)
             if (loot.pendingCorpseRollCleanup)
             {
                 loot.pendingCorpseRollCleanup = false;
-                if (loot.loot_type == LOOT_CORPSE && loot.isLooted() && HasDynamicFlag(UNIT_DYNFLAG_LOOTABLE))
+                if (loot.loot_type == LOOT_CORPSE && loot.isLooted())
                 {
                     loot.CloseLootSessions(*this);
-                    AllLootRemovedFromCorpse();
-                    RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
-                    loot.clear();
+                    if (HasDynamicFlag(UNIT_DYNFLAG_LOOTABLE))
+                    {
+                        AllLootRemovedFromCorpse();
+                        RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+                        loot.clear();
+                    }
                 }
             }
 
