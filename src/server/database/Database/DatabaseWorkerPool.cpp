@@ -41,16 +41,6 @@
 #include <sstream>
 #endif
 
-class PingOperation : public SQLOperation
-{
-    //! Operation for idle delaythreads
-    bool Execute() override
-    {
-        m_conn->Ping();
-        return true;
-    }
-};
-
 template <class T>
 DatabaseWorkerPool<T>::DatabaseWorkerPool() :
     _queue(new ProducerConsumerQueue<SQLOperation*>()),
