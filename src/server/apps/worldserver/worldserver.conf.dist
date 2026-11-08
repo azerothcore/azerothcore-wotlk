@@ -2802,11 +2802,22 @@ ItemDelete.Method = 0
 
 #
 #    ItemDelete.Vendor
-#        Description: Saving items into database when the player sells items to vendor
+#        Description: Saving items into database when the player sells items to vendor.
+#                     Requires ItemDelete.Method = 1. ItemDelete.Quality and ItemDelete.ItemLevel also apply.
 #        Default:     0 (disabled)
 #                     1 (enabled)
 
 ItemDelete.Vendor = 0
+
+#
+#    ItemDelete.Disenchant
+#        Description: Saving items into database when the player disenchants them, along with
+#                     the materials looted from them.
+#                     Requires ItemDelete.Method = 1. ItemDelete.Quality and ItemDelete.ItemLevel also apply.
+#        Default:     0 (disabled)
+#                     1 (enabled)
+
+ItemDelete.Disenchant = 0
 
 #
 #    ItemDelete.Quality
@@ -3033,7 +3044,7 @@ CreatureLeashRadius = 30
 #
 #    CreatureFamilyAssistanceRadius
 #        Description: Distance for creatures calling for assistance from other creatures without
-#                     moving.
+#                     moving, centre to centre.
 #        Default:     10 - (Enabled)
 #                     0  - (Disabled)
 
@@ -3090,8 +3101,9 @@ Corpse.Decay.WORLDBOSS = 3600
 
 #
 #    Rate.Corpse.Decay.Looted
-#        Description: Multiplier for Corpse.Decay.* to configure how long creature corpses stay
-#                     after they have been looted.
+#        Description: Multiplier for the time a creature corpse has left (see Corpse.Decay.*) once
+#                     it has been looted, or when it dies with nothing to loot.
+#                     From 0 to 1: 1 keeps the full time, 0 removes the corpse at once.
 #         Default:    0.5
 
 Rate.Corpse.Decay.Looted = 0.5

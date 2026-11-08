@@ -593,7 +593,7 @@ public:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK_UNARMED);
                     if (Creature* armorer = me->FindNearestCreature(NPC_DURNHOLDE_ARMORER, 30.0f))
                     {
-                        DoCast(armorer, SPELL_KNOCKOUT_ARMORER, true);
+                        DoCast(armorer, SPELL_KNOCKOUT_ARMORER);
                         armorer->SetStandState(UNIT_STAND_STATE_DEAD);
                     }
                     break;

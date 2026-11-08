@@ -525,7 +525,7 @@ struct boss_lady_malande : public boss_illidari_council_memberAI
             events.ScheduleEvent(EVENT_SPELL_REFLECTIVE_SHIELD, 40s);
             break;
         case EVENT_SPELL_DIVINE_WRATH:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                 me->CastSpell(target, SPELL_DIVINE_WRATH);
             events.ScheduleEvent(EVENT_SPELL_DIVINE_WRATH, 20s);
             break;

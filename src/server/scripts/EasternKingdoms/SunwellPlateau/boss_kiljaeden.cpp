@@ -171,9 +171,9 @@ struct npc_kiljaeden_controller : public NullCreatureAI
     {
         EntryCheckPredicate kilCheck(NPC_KILJAEDEN);
         EntryCheckPredicate kalCheck(NPC_KALECGOS_KJ);
-        summons.DespawnIf(kilCheck);
+        summons.RemoveIf(kilCheck);
         summons.DoAction(ACTION_START_POST_EVENT, kalCheck);
-        summons.DespawnIf(kalCheck);
+        summons.RemoveIf(kalCheck);
 
         DoCastAOE(SPELL_DESTROY_ALL_DRAKES, true);
         summons.DespawnAll();

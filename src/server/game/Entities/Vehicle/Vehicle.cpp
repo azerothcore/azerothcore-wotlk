@@ -35,7 +35,7 @@ enum PowerDisplayIds
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE),
-    _accessoriesInstalled(false)
+    _accessoriesInstalled(false), _boardableByPlayers(true)
 {
     for (uint32 i = 0; i < MAX_VEHICLE_SEATS; ++i)
     {
@@ -145,7 +145,7 @@ void Vehicle::Reset(bool evading /*= false*/)
     LOG_DEBUG("vehicles", "Vehicle::Reset: {}", _me->GetGUID().ToString());
     if (_me->IsPlayer())
     {
-        if (_usableSeatNum)
+        if (_usableSeatNum && _boardableByPlayers)
             _me->SetNpcFlag(UNIT_NPC_FLAG_PLAYER_VEHICLE);
     }
     else
@@ -160,6 +160,19 @@ void Vehicle::Reset(bool evading /*= false*/)
 
     if (GetBase()->IsCreature())
         sScriptMgr->OnReset(this);
+}
+
+void Vehicle::SetBoardableByPlayers(bool boardable)
+{
+    _boardableByPlayers = boardable;
+
+    if (!_me->IsPlayer())
+        return;
+
+    if (boardable && _usableSeatNum)
+        _me->SetNpcFlag(UNIT_NPC_FLAG_PLAYER_VEHICLE);
+    else
+        _me->RemoveNpcFlag(UNIT_NPC_FLAG_PLAYER_VEHICLE);
 }
 
 void Vehicle::ApplyAllImmunities()
@@ -393,7 +406,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         --_usableSeatNum;
         if (!_usableSeatNum)
             _me->RemoveNpcFlag(_me->IsPlayer() ? UNIT_NPC_FLAG_PLAYER_VEHICLE : UNIT_NPC_FLAG_SPELLCLICK);
-        else
+        else if (!_me->IsPlayer() || _boardableByPlayers)
             _me->SetNpcFlag(_me->IsPlayer() ?  UNIT_NPC_FLAG_PLAYER_VEHICLE : UNIT_NPC_FLAG_SPELLCLICK);
     }
 
@@ -506,7 +519,8 @@ void Vehicle::RemovePassenger(Unit* unit)
     LOG_DEBUG("vehicles", "Unit {} exit vehicle entry {} id {} ({}) seat {}",
         unit->GetName(), _me->GetEntry(), _vehicleInfo->m_ID, _me->GetGUID().ToString(), (int32)seat->first);
 
-    if (seat->second.SeatInfo->CanEnterOrExit() && ++_usableSeatNum)
+    if (seat->second.SeatInfo->CanEnterOrExit() && ++_usableSeatNum &&
+        (!_me->IsPlayer() || _boardableByPlayers))
         _me->SetNpcFlag((_me->IsPlayer() ? UNIT_NPC_FLAG_PLAYER_VEHICLE : UNIT_NPC_FLAG_SPELLCLICK));
 
     // Remove UNIT_FLAG_NOT_SELECTABLE if passenger did not have it before entering vehicle
