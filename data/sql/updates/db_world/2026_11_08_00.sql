@@ -1,3 +1,4 @@
+-- DB update 2026_11_06_01 -> 2026_11_08_00
 -- Troyas Moonbreeze (7764): roleplay on quest 'Return to Troyas' (2943) reward
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 7764;
 

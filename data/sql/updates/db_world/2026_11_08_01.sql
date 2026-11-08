@@ -1,3 +1,4 @@
+-- DB update 2026_11_08_00 -> 2026_11_08_01
 --
 DELETE FROM `creature_text` WHERE `CreatureID` IN (30449, 30452) AND `GroupID` = 6;
 DELETE FROM `creature_text` WHERE `CreatureID` IN (30449, 30451, 30452) AND `GroupID` = 7;
