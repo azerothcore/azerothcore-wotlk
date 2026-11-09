@@ -3965,6 +3965,12 @@ void Spell::EffectInterruptCast(SpellEffIndex effIndex)
                 }
                 ExecuteLogEffectInterruptCast(effIndex, unitTarget, curSpellInfo->Id);
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
+
+                // Procs run on hit, after this launch handler; let them see this target was interrupted.
+                // A reflected spell hits its caster, normally not in the target list, so nothing is marked.
+                auto itr = std::ranges::find(m_UniqueTargetInfo, unitTarget->GetGUID(), &TargetInfo::targetGUID);
+                if (itr != m_UniqueTargetInfo.end())
+                    itr->procHitMask |= PROC_HIT_INTERRUPT;
             }
         }
     }

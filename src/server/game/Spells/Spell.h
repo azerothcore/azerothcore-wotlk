@@ -276,6 +276,7 @@ struct TargetInfo
     bool   scaleAura:1;
     int32  damage;
     int32  damageBeforeTakenMods;
+    uint32 procHitMask;                                     // ProcFlagsHit that effects add for this target
 };
 
 static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
