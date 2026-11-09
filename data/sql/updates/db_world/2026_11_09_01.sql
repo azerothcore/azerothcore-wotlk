@@ -1,3 +1,4 @@
+-- DB update 2026_11_09_00 -> 2026_11_09_01
 --
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` & ~256 WHERE `entry` = 5391;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5391);
