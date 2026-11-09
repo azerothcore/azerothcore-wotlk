@@ -115,6 +115,7 @@ protected:
 };
 
 // https://github.com/azerothcore/azerothcore-wotlk/pull/28396
+// cppcheck-suppress syntaxError
 TEST_F(DamageCombatTest, DirectDoTDoesNotStartPvPCombat)
 {
     DealDirectDamage(DOT);
