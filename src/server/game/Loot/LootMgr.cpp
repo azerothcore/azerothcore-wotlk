@@ -56,9 +56,11 @@ LootStore LootTemplates_Spell("spell_loot_template",                 "spell id (
 LootStore LootTemplates_Player("player_loot_template",               "team id",                         true);
 
 // Selects invalid loot items to be removed from group possible entries (before rolling)
+// For personal loot (player set), also removes items whose conditions the player doesn't meet
 struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, bool>
 {
-    explicit LootGroupInvalidSelector(Loot const& loot, uint16 lootMode) : _loot(loot), _lootMode(lootMode) { }
+    explicit LootGroupInvalidSelector(Loot const& loot, uint16 lootMode, Player const* player) :
+        _loot(loot), _lootMode(lootMode), _player(player) { }
 
     bool operator()(LootStoreItem* item) const
     {
@@ -69,6 +71,9 @@ struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, b
         {
             ItemTemplate const* _proto = sObjectMgr->GetItemTemplate(item->itemid);
             if (!_proto)
+                return true;
+
+            if (_player && !sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(_player), item->conditions))
                 return true;
 
             uint8 foundDuplicates = 0;
@@ -89,6 +94,7 @@ struct LootGroupInvalidSelector : public Acore::unary_function<LootStoreItem*, b
 private:
     Loot const& _loot;
     uint16 _lootMode;
+    Player const* _player;
 };
 
 class LootTemplate::LootGroup                               // A set of loot definitions for items (refs are not allowed)
@@ -101,7 +107,9 @@ public:
     bool HasQuestDrop(LootTemplateMap const& store) const;  // True if group includes at least 1 quest drop entry
     bool HasQuestDropForPlayer(Player const* player, LootTemplateMap const& store) const;
     // The same for active quests of the player
-    void Process(Loot& loot, Player const* player, LootStore const& lootstore, uint16 lootMode, uint16 nonRefIterationsLeft) const;    // Rolls an item from the group (if any) and adds the item to the loot
+    // Rolls an item from the group (if any) and adds the item to the loot
+    void Process(Loot& loot, Player const* player, LootStore const& lootstore,
+        uint16 lootMode, uint16 nonRefIterationsLeft, bool personal) const;
     float RawTotalChance() const;                       // Overall chance for the group (without equal chanced items)
     float TotalChance() const;                          // Overall chance for the group
 
@@ -115,7 +123,9 @@ private:
     LootStoreItemList ExplicitlyChanced;                // Entries with chances defined in DB
     LootStoreItemList EqualChanced;                     // Zero chances - every entry takes the same chance
 
-    LootStoreItem const* Roll(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode) const;   // Rolls an item from the group, returns nullptr if all miss their chances
+    // Rolls an item from the group, returns nullptr if all miss their chances
+    LootStoreItem const* Roll(Loot& loot, Player const* player, LootStore const& store,
+        uint16 lootMode, bool personal) const;
 
     // This class must never be copied - storing pointers
     LootGroup(LootGroup const&);
@@ -557,8 +567,8 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
 
-    // Initial group is 0, top level set to True
-    tab->Process(*this, store, lootMode, lootOwner, 0, true);          // Processing is done there, callback via Loot::AddItem()
+    // Initial group is 0, top level set to True. Processing is done there, callback via Loot::AddItem()
+    tab->Process(*this, store, lootMode, lootOwner, 0, true, personal);
 
     sScriptMgr->OnAfterLootTemplateProcess(this, tab, store, lootOwner, personal, noEmptyError, lootMode);
 
@@ -1259,10 +1269,15 @@ void LootTemplate::LootGroup::AddEntry(LootStoreItem* item)
 }
 
 // Rolls an item from the group, returns nullptr if all miss their chances
-LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode) const
+LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* player, LootStore const& store,
+    uint16 lootMode, bool personal) const
 {
+    // Only personal loot skips the items whose conditions the looter doesn't meet
+    Player const* conditionsLooter = personal ? player : nullptr;
+    LootGroupInvalidSelector invalidSelector(loot, lootMode, conditionsLooter);
+
     LootStoreItemList possibleLoot = ExplicitlyChanced;
-    possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
+    possibleLoot.remove_if(invalidSelector);
 
     if (!possibleLoot.empty())                             // First explicitly chanced entries are checked
     {
@@ -1289,7 +1304,7 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
         return nullptr;
 
     possibleLoot = EqualChanced;
-    possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
+    possibleLoot.remove_if(invalidSelector);
     if (!possibleLoot.empty())                              // If nothing selected yet - an item is taken from equal-chanced part
         return Acore::Containers::SelectRandomContainerElement(possibleLoot);
 
@@ -1406,9 +1421,10 @@ void LootTemplate::LootGroup::CopyConditions(ConditionList /*conditions*/)
 }
 
 // Rolls an item from the group (if any takes its chance) and adds the item to the loot
-void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode, uint16 nonRefIterationsLeft) const
+void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStore const& store,
+    uint16 lootMode, uint16 nonRefIterationsLeft, bool personal) const
 {
-    if (LootStoreItem const* item = Roll(loot, player, store, lootMode))
+    if (LootStoreItem const* item = Roll(loot, player, store, lootMode, personal))
     {
         bool rate = store.IsRatesAllowed();
 
@@ -1421,7 +1437,7 @@ void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStor
                 for (uint32 loop = 0; loop < maxcount; ++loop) // Ref multiplicator
                     // This reference needs to be processed further, but it is marked isTopLevel=false so that any groups inside
                     // the reference are not multiplied by Rate.Drop.Item.GroupAmount
-                    Referenced->Process(loot, store, lootMode, player, 0, false);
+                    Referenced->Process(loot, store, lootMode, player, 0, false, personal);
             }
         }
         else
@@ -1435,7 +1451,7 @@ void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStor
             // However, if this is a quest item we shouldn't multiply this group.
             if (nonRefIterationsLeft > 1 && !item->needs_quest)
             {
-                this->Process(loot, player, store, lootMode, nonRefIterationsLeft-1);
+                this->Process(loot, player, store, lootMode, nonRefIterationsLeft-1, personal);
             }
         }
     }
@@ -1664,7 +1680,8 @@ bool LootTemplate::CopyConditions(LootItem* li, uint32 conditionLootId) const
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot
-void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId, bool isTopLevel) const
+void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player,
+    uint8 groupId, bool isTopLevel, bool personal) const
 {
     bool rate = store.IsRatesAllowed();
 
@@ -1679,11 +1696,12 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
         // Rate.Drop.Item.GroupAmount is only in effect for the top loot template level
         if (isTopLevel)
         {
-            Groups[groupId - 1]->Process(loot, player, store, lootMode, sWorld->getRate(RATE_DROP_ITEM_GROUP_AMOUNT));
+            Groups[groupId - 1]->Process(loot, player, store, lootMode,
+                sWorld->getRate(RATE_DROP_ITEM_GROUP_AMOUNT), personal);
         }
         else
         {
-            Groups[groupId - 1]->Process(loot, player, store, lootMode, 0);
+            Groups[groupId - 1]->Process(loot, player, store, lootMode, 0, personal);
         }
         return;
     }
@@ -1707,7 +1725,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
             sScriptMgr->OnAfterRefCount(player, loot, rate, lootMode, item, maxcount, store);
             for (uint32 loop = 0; loop < maxcount; ++loop)      // Ref multiplicator
                 // we're no longer in the top level, so isTopLevel is false
-                Referenced->Process(loot, store, lootMode, player, item->groupid, false);
+                Referenced->Process(loot, store, lootMode, player, item->groupid, false, personal);
         }
         else
         {
@@ -1726,11 +1744,11 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
             {
                 uint32 groupAmount = sWorld->getRate(RATE_DROP_ITEM_GROUP_AMOUNT);
                 sScriptMgr->OnAfterCalculateLootGroupAmount(player, loot, lootMode, groupAmount, store);
-                group->Process(loot, player, store, lootMode, groupAmount);
+                group->Process(loot, player, store, lootMode, groupAmount, personal);
             }
             else
             {
-                group->Process(loot, player, store, lootMode, 0);
+                group->Process(loot, player, store, lootMode, 0, personal);
             }
         }
 }
