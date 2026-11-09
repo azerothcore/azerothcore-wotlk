@@ -1,3 +1,4 @@
+-- DB update 2026_11_08_02 -> 2026_11_09_00
 -- The Beast's Chamber (UBRS): add spell focus spawns so the Brazier of Beckoning (Lord Valthalak)
 -- and the Brazier of Invocation work across the whole room, not only near its south end
 SET @OGUID := 2434;
