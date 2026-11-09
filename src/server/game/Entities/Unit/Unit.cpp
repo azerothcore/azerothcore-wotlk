@@ -989,9 +989,9 @@ void Unit::DealDamageMods(Unit const* victim, uint32& damage, uint32* absorb)
 
 namespace
 {
-bool ShouldEngageForRedirectedDamage(Unit const* attacker, Unit const* target, bool isPeriodicDamage)
+bool ShouldEngageForDamage(Unit const* attacker, Unit const* target, bool isPeriodicDamage)
 {
-    // Periodic transfers must not create or refresh PvP combat.
+    // Periodic damage must not create or refresh PvP combat.
     return !isPeriodicDamage || !attacker->IsControlledByPlayer() || !target->IsControlledByPlayer();
 }
 }
@@ -1124,7 +1124,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
             // Shared damage is a hostile interaction for its recipient too.
             if (hasSharedDamage && attacker && !attacker->IsFriendlyTo(shareDamageTarget) && !skipCombat &&
-                ShouldEngageForRedirectedDamage(attacker, shareDamageTarget, isPeriodicDamage))
+                ShouldEngageForDamage(attacker, shareDamageTarget, isPeriodicDamage))
                 attacker->AtTargetAttacked(shareDamageTarget, !spellProto || spellProto->HasInitialAggro());
 
             Unit::DealDamage(attacker, shareDamageTarget, shareDamage, cleanDamage, NODAMAGE, damageSchoolMask,
@@ -1287,9 +1287,9 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
                 victim->ToCreature()->UpdateLeashExtensionTime();
 
-            // Charmed recipients can refresh PvP combat through threat.
+            // Charmed creatures can refresh PvP combat through threat.
             if (attacker && attacker != victim && (!skipCombat || victim->IsEngagedBy(attacker)) &&
-                ShouldEngageForRedirectedDamage(attacker, victim, isPeriodicTransfer))
+                ShouldEngageForDamage(attacker, victim, isPeriodicDamage))
             {
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
             }
@@ -2630,7 +2630,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
 
             // Split damage is a hostile interaction for its recipient too.
             if (splitDamage && attacker && !attacker->IsFriendlyTo(caster) && !skipCombat &&
-                ShouldEngageForRedirectedDamage(attacker, caster, isPeriodicDamage))
+                ShouldEngageForDamage(attacker, caster, isPeriodicDamage))
                 attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, schoolMask, splitSpellInfo,
@@ -2710,7 +2710,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited, uint8 casterLevel
 
             // Split damage is a hostile interaction for its recipient too.
             if (splitDamage && attacker && !attacker->IsFriendlyTo(caster) && !skipCombat &&
-                ShouldEngageForRedirectedDamage(attacker, caster, isPeriodicDamage))
+                ShouldEngageForDamage(attacker, caster, isPeriodicDamage))
                 attacker->AtTargetAttacked(caster, !spellInfo || spellInfo->HasInitialAggro());
 
             Unit::DealDamage(attacker, caster, splitted, &cleanDamage, DIRECT_DAMAGE, splitSchoolMask, splitSpellInfo,
