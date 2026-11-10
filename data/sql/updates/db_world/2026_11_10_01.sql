@@ -1,3 +1,4 @@
+-- DB update 2026_11_10_00 -> 2026_11_10_01
 --
 -- Barrett Ramsey (35909) offered the Trial of the Grand Crusader only for the raid size whose Call of the Crusade
 -- the player owned, because each achievement was ANDed with a matching 10/25 player heroic spawn mask.
