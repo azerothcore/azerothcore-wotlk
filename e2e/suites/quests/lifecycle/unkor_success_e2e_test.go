@@ -39,14 +39,13 @@ func TestAC_26277_UnkorSubmitsForSuccess(t *testing.T) {
 	})
 	bot.TeleportPad(t, e2eharness.PackagePad(t))
 
-	bot.AddQuest(t, questDontKillTheFatOne)
+	bot.GM(t, fmt.Sprintf(".quest add %d", questDontKillTheFatOne))
 	bot.GM(t, fmt.Sprintf(".quest complete %d", questDontKillTheFatOne))
 	bot.GM(t, fmt.Sprintf(".quest reward %d", questDontKillTheFatOne))
-	bot.Save(t)
-	if !questRewarded(t, bot, questDontKillTheFatOne) {
+	if !waitQuestRewarded(t, bot, questDontKillTheFatOne, 10*time.Second) {
 		e2eharness.Preconditionf(t, "quest %d was not rewarded by GM setup", questDontKillTheFatOne)
 	}
-	if _, inLog := bot.QuestStatus(t, questSuccess); inLog || questRewarded(t, bot, questSuccess) {
+	if _, inLog := bot.QuestStatus(t, questSuccess); inLog || waitQuestRewarded(t, bot, questSuccess, 0) {
 		e2eharness.Preconditionf(t, "quest %d already taken before Unkor submits", questSuccess)
 	}
 
@@ -67,11 +66,15 @@ func TestAC_26277_UnkorSubmitsForSuccess(t *testing.T) {
 	}
 	bot.FlushWorld(t)
 
-	status, accepted := bot.QuestStatusAfterSave(t, questSuccess)
+	// .save is throttled to once per 20s on accounts without RBAC "save without delay";
+	// the logout save in Relog always runs.
+	bot.Relog(t)
+	status, accepted := bot.QuestStatus(t, questSuccess)
 	if !accepted {
 		e2eharness.ConfirmedBugf(t, 26277, "Unkor did not submit, quest %d could not be accepted", questSuccess)
 	}
-	if status != e2eharness.QuestStatusIncomplete {
+	// Success! has no objectives, so it is complete as soon as it is accepted.
+	if status != e2eharness.QuestStatusComplete {
 		e2eharness.Assertf(t, "quest %d accepted with unexpected status=%s", questSuccess,
 			e2eharness.QuestStatusName(status))
 	}
@@ -79,14 +82,21 @@ func TestAC_26277_UnkorSubmitsForSuccess(t *testing.T) {
 		e2eharness.QuestStatusName(status))
 }
 
-func questRewarded(t *testing.T, bot *e2eharness.ScenarioBot, questID uint32) bool {
+// Rewarding a quest saves the character asynchronously, so the row can land a moment later.
+func waitQuestRewarded(t *testing.T, bot *e2eharness.ScenarioBot, questID uint32, timeout time.Duration) bool {
 	t.Helper()
-	var rewarded int
-	if err := bot.CharDB.QueryRow(
-		"SELECT COUNT(*) FROM character_queststatus_rewarded WHERE guid = ? AND quest = ?",
-		bot.GUID, questID,
-	).Scan(&rewarded); err != nil {
-		e2eharness.HarnessFailf(t, "query rewarded quest=%d: %v", questID, err)
+	deadline := time.Now().Add(timeout)
+	for {
+		var rewarded int
+		if err := bot.CharDB.QueryRow(
+			"SELECT COUNT(*) FROM character_queststatus_rewarded WHERE guid = ? AND quest = ?",
+			bot.GUID, questID,
+		).Scan(&rewarded); err != nil {
+			e2eharness.HarnessFailf(t, "query rewarded quest=%d: %v", questID, err)
+		}
+		if rewarded == 1 || !time.Now().Before(deadline) {
+			return rewarded == 1
+		}
+		time.Sleep(200 * time.Millisecond)
 	}
-	return rewarded == 1
 }
