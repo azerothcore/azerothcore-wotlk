@@ -425,6 +425,8 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), _cinematicMgr(*thi
     _expectingChangeTransport = false;
     _pendingFlightChangeCounter = 0;
     _mapChangeOrderCounter = 0;
+
+    _suppressZoneChannelChangesTimer = 0;
 }
 
 Player::~Player()
