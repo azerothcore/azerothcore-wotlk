@@ -359,7 +359,8 @@ struct boss_midnight : public BossAI
             }
             if (!CanMeleeHit())
             {
-                BossAI::EnterEvadeMode(EvadeReason::EVADE_REASON_BOUNDARY);
+                EnterEvadeMode(EvadeReason::EVADE_REASON_BOUNDARY);
+                return;
             }
         }
         scheduler.Update(diff, std::bind(&BossAI::DoMeleeAttackIfReady, this));
