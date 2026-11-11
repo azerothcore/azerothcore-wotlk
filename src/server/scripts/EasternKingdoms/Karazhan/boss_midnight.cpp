@@ -331,10 +331,11 @@ struct boss_midnight : public BossAI
         });
     }
 
-    void EnterEvadeMode(EvadeReason /*why*/) override
+    void EnterEvadeMode(EvadeReason why) override
     {
-        me->DespawnOnEvade(10s);
         _phase = PHASE_NONE;
+        BossAI::EnterEvadeMode(why);
+        me->DespawnOnEvade(10s);
     }
 
     void KilledUnit(Unit* /*victim*/) override
