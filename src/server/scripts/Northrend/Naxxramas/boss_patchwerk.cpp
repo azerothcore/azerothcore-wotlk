@@ -17,6 +17,8 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum Yells
@@ -30,7 +32,8 @@ enum Yells
 
 enum Spells
 {
-    SPELL_HATEFUL_STRIKE            = 41926,
+    SPELL_HATEFUL_STRIKE_PRIMER     = 28307,
+    SPELL_HATEFUL_STRIKE            = 28308,
     SPELL_FRENZY                    = 28131,
     SPELL_BERSERK                   = 26662,
     SPELL_SLIME_BOLT                = 32309
@@ -46,7 +49,8 @@ enum Events
 
 enum Misc
 {
-    ACHIEV_TIMED_START_EVENT        = 10286
+    ACHIEV_TIMED_START_EVENT        = 10286,
+    HATEFUL_THREAT_AMT              = 500
 };
 
 class boss_patchwerk : public CreatureScript
@@ -112,41 +116,10 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_HATEFUL_STRIKE:
-                    {
-                        // Scan melee targets (melee range), choose target according to mechanics:
-                        // - If only 1 melee target exists, hit the tank (current victim).
-                        // - Otherwise select the top RAID_MODE(1,2) threat targets (excluding current victim)
-                        //   among melee targets and hit the one with the highest HP.
-                        // - The target hit gains 500 flat threat.
-
-                        Unit* victim = me->GetVictim();
-                        if (!victim)
-                        {
-                            events.RescheduleEvent(EVENT_HATEFUL_STRIKE, 1s);
-                            break;
-                        }
-
-                        Unit* hatefulTarget = victim; // default to current victim if no other target is available
-
-                        std::list<Unit*> meleeTargets;
-                        constexpr float HATEFUL_STRIKE_RANGE = 5.0f;
-                        SelectTargetList(meleeTargets, RAID_MODE(1, 2), SelectTargetMethod::MaxThreat, 0, [&](Unit const* target)
-                        {
-                            return target && target->IsPlayer() && target != victim && me->IsWithinCombatRange(target, HATEFUL_STRIKE_RANGE);
-                        });
-
-                        if (!meleeTargets.empty())
-                        {
-                            meleeTargets.sort(Acore::HealthOrderPred(false));
-                            hatefulTarget = meleeTargets.front();
-                        }
-
-                        me->CastSpell(hatefulTarget, SPELL_HATEFUL_STRIKE, false);
-                        me->AddThreat(hatefulTarget, 500.0f);
-
-                        events.Repeat(1s);
-                        break;
-                    }
+                    // target selection, threat and damage are handled by the primer spell script
+                    DoCastSelf(SPELL_HATEFUL_STRIKE_PRIMER, true);
+                    events.Repeat(1s);
+                    break;
                 case EVENT_BERSERK:
                     Talk(EMOTE_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
@@ -171,7 +144,66 @@ public:
     };
 };
 
+// 28307 - Hateful Strike Primer
+class spell_patchwerk_hateful_strike_primer : public SpellScript
+{
+    PrepareSpellScript(spell_patchwerk_hateful_strike_primer);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HATEFUL_STRIKE });
+    }
+
+    void SelectTargets(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+
+        uint32 targetLimit = caster->GetMap()->Is25ManRaid() ? 3 : 2;
+        std::array<Unit*, 3> newTargets = { };
+        auto newTargetsItr = newTargets.begin();
+        auto newTargetsEnd = newTargetsItr + targetLimit;
+
+        for (ThreatReference const* threatRef : caster->GetThreatMgr().GetSortedThreatList())
+        {
+            Unit* threatVictim = threatRef->GetVictim();
+            if (!threatRef->IsOnline() || !threatVictim->IsPlayer() || !caster->IsWithinMeleeRange(threatVictim))
+                continue;
+
+            *newTargetsItr = threatVictim;
+            if (++newTargetsItr == newTargetsEnd)
+                break;
+        }
+
+        // Hateful Strike damages the higher HP target out of the two highest non-MT threats in melee range on 25man
+        if (newTargets[1] && newTargets[2] && newTargets[1]->GetHealth() < newTargets[2]->GetHealth())
+            std::swap(newTargets[1], newTargets[2]);
+
+        targets.assign(newTargets.begin(), newTargetsItr);
+    }
+
+    void HandleEffect(SpellEffIndex effIndex)
+    {
+        Unit* caster = GetCaster();
+
+        // all targets get threat increase
+        caster->GetThreatMgr().AddThreat(GetHitUnit(), HATEFUL_THREAT_AMT, GetSpellInfo());
+
+        // Hateful Strike damages the second unit on target list (not the MT)
+        // or MT if it is the only target
+        if (GetUnitTargetIndexForEffect(GetHitUnit()->GetGUID(), effIndex) == 1
+            || GetUnitTargetCountForEffect(effIndex) == 1)
+            caster->CastSpell(GetHitUnit(), SPELL_HATEFUL_STRIKE, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_patchwerk_hateful_strike_primer::SelectTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_patchwerk_hateful_strike_primer::HandleEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_patchwerk()
 {
     new boss_patchwerk();
+    RegisterSpellScript(spell_patchwerk_hateful_strike_primer);
 }
