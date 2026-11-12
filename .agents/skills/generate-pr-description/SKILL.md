@@ -2,7 +2,7 @@
 name: generate-pr-description
 description: Generate the PR title and description from the current branch changes, following the repo's PR template.
 metadata:
-  version: "1.1"
+  version: "1.2"
 ---
 
 # Generate PR description
@@ -37,7 +37,7 @@ carry, contradictory information. Missing fill-in facts are never a reason to as
 
 ## Title
 
-`type(Scope/Subscope): short description` — imperative, max 50 chars. Types: `feat`, `fix`,
+`type(Scope/Subscope): short description` — imperative, max 72 chars. Types: `feat`, `fix`,
 `refactor`, `style`, `docs`, `test`, `chore`; scopes: `Core`, `Scripts`, `DB`. Copy subscope naming
 from recent commits touching the same areas (`git log --oneline -- <paths>`).
 
