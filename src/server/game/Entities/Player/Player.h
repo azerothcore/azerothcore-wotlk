@@ -2996,6 +2996,9 @@ protected:
 
     bool m_needZoneUpdate;
 
+    // Used to prevent triggering of area change if for example you fly Ashenvale -> Azshara -> Ashenvale within the channel change suppression timer.
+    int32 _suppressZoneChannelChangesTimer;
+
 private:
     // internal common parts for CanStore/StoreItem functions
     InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
