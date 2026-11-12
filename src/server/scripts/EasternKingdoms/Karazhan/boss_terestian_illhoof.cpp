@@ -144,7 +144,7 @@ struct boss_terestian_illhoof : public BossAI
     void SummonKilrek()
     {
         me->RemoveAurasDueToSpell(SPELL_BROKEN_PACT);
-        DoCastSelf(SPELL_SUMMON_IMP);
+        DoCastSelf(SPELL_SUMMON_IMP, true);
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -185,7 +185,7 @@ struct boss_terestian_illhoof : public BossAI
             DoCastAOE(SPELL_FIENDISH_PORTAL_1);
         }).Schedule(10min, [this](TaskContext /*context*/)
         {
-            DoCastSelf(SPELL_BERSERK);
+            DoCastSelf(SPELL_BERSERK, true);
         });
     }
 
