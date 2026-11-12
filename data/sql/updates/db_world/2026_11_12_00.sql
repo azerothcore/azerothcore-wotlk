@@ -1,3 +1,4 @@
+-- DB update 2026_11_11_00 -> 2026_11_12_00
 --
 -- AQ40 boss state ids now match DungeonEncounter.dbc encounter indexes (Skeram 0 ... C'thun 8), so the
 -- Andorgos gossip conditions that check Twin Emperors and Ouro have to move down by one as well.
