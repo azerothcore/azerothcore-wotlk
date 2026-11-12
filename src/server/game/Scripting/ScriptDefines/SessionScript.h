@@ -24,6 +24,7 @@
 enum SessionHook
 {
     SESSIONHOOK_ON_UPDATE,
+    SESSIONHOOK_ON_WARDEN_CHECK_EXPECTED_RESULT,
     SESSIONHOOK_END
 };
 
@@ -41,6 +42,22 @@ public:
      * @param diff Contains information about the diff time
      */
     virtual void OnSessionUpdate(WorldSession* /*session*/, uint32 /*diff*/) { }
+
+    /**
+     * @brief This hook is called when Warden evaluates the client's answer to a MEM_CHECK or MPQ_CHECK,
+     * right before the answer is compared with the expected bytes.
+     *
+     * A script may replace the expected bytes (warden_checks.result) for this session only, for example
+     * for a client build whose memory or files legitimately differ from the stock client.
+     *
+     * @param session Contains information about the WorldSession
+     * @param check The warden check being evaluated
+     * @param expected Receives the bytes the client must return: check.Length bytes for a MEM_CHECK,
+     * 20 (SHA1) for an MPQ_CHECK
+     * @return true if expected was filled; the first script returning true wins
+     */
+    virtual bool OnWardenCheckExpectedResult(WorldSession* /*session*/, WardenCheck const& /*check*/,
+        std::vector<uint8>& /*expected*/) { return false; }
 };
 
 #endif

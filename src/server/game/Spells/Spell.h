@@ -568,6 +568,7 @@ public:
     bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
     bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
     [[nodiscard]] bool IsProcDisabled() const { return HasTriggeredCastFlag(TRIGGERED_DISALLOW_PROC_EVENTS); }
+    [[nodiscard]] bool IsFromPreDeathAura() const { return _fromPreDeathAura; }
     bool IsChannelActive() const { return m_caster->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0; }
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;
@@ -593,6 +594,10 @@ public:
     // (e.g. the owner of a trap) when set, otherwise the caster itself if it is a Unit.
     Unit* GetUnitCasterForEffectHandlers() const;
     Unit* GetOriginalTarget() const;
+    // the GameObject this spell is cast from, if any: the caster itself, a GameObject
+    // original caster, or the GameObject behind a summoned world trigger
+    GameObject* GetGameObjectCaster() const;
+    std::optional<float> GetLOSCollisionHeight() const;
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
     int32 GetPowerCost() const { return m_powerCost; }
 
@@ -793,6 +798,7 @@ public:
 
     SpellEvent* _spellEvent;
     TriggerCastFlags _triggeredCastFlags;
+    bool _fromPreDeathAura{false};
 
     // if need this can be replaced by Aura copy
     // we can't store original aura link to prevent access to deleted auras

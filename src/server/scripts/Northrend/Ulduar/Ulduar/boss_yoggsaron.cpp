@@ -1692,6 +1692,16 @@ struct boss_yoggsaron_corruptor_tentacle : public ScriptedAI
     boss_yoggsaron_corruptor_tentacle(Creature* creature) : ScriptedAI(creature)
     {
         me->SetCombatMovement(false);
+
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
     }
 
     void DoAction(int32 param) override
@@ -1720,16 +1730,18 @@ struct boss_yoggsaron_corruptor_tentacle : public ScriptedAI
         return target;
     }
 
-    void UpdateAI(uint32  /*diff*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        if (Unit* target = SelectCorruptionTarget())
+        ScheduleTimedEvent(500ms, [&]
         {
-            uint32 spellid = RAND(SPELL_APATHY, SPELL_BLACK_PLAGUE, SPELL_DRAINING_POISON, SPELL_CURSE_OF_DOOM);
-            me->CastSpell(target, spellid, false);
-        }
+            if (Unit* target = SelectCorruptionTarget())
+                DoCast(target, RAND(SPELL_APATHY, SPELL_BLACK_PLAGUE, SPELL_DRAINING_POISON, SPELL_CURSE_OF_DOOM));
+        }, 2s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
     }
 };
 
@@ -2385,12 +2397,24 @@ class spell_yogg_saron_diminish_power_aura : public AuraScript
 {
     PrepareAuraScript(spell_yogg_saron_diminish_power_aura);
 
+    static bool IsJudgementDamageSpell(SpellInfo const* spellInfo)
+    {
+        return spellInfo &&
+            spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN &&
+            (spellInfo->SpellFamilyFlags[0] & 0x800000);
+    }
+
     // Serverside proc (no triggered spell in DBC): taken melee hits and melee
     // abilities break the Diminish Power channel. Sniffed: only the active
     // channel breaks, the initial 1.5s cast is not interruptible by damage
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || IsJudgementDamageSpell(eventInfo.GetSpellInfo()))
+            return;
+
         if (Spell* spell = GetTarget()->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             if (spell->getState() == SPELL_STATE_CASTING)
                 GetTarget()->InterruptSpell(CURRENT_CHANNELED_SPELL);

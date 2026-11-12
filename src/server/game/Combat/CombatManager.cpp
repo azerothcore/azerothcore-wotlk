@@ -216,6 +216,9 @@ bool CombatManager::SetInCombatWith(Unit* who, bool addSecondUnitSuppressed)
     // Are we already in combat? If yes, refresh pvp combat
     if (PvPCombatReference* existingPvpRef = Acore::Containers::MapGetValuePtr(_pvpRefs, who->GetGUID()))
     {
+        // a ref kept alive past a death runs out on its own - don't extend it or pull the corpse back into combat
+        if (!_owner->IsAlive() || !who->IsAlive())
+            return true;
         existingPvpRef->RefreshTimer();
         existingPvpRef->Refresh();
         return true;
@@ -332,6 +335,12 @@ void CombatManager::SuppressPvPCombat()
             ownerAI->JustExitedCombat();
 }
 
+void CombatManager::RestartPvPCombatTimers()
+{
+    for (auto const& pair : _pvpRefs)
+        pair.second->RefreshTimer();
+}
+
 void CombatManager::EndAllPvECombat()
 {
     // cannot have threat without combat
@@ -343,31 +352,23 @@ void CombatManager::EndAllPvECombat()
 
 void CombatManager::RevalidateCombat()
 {
-    auto it = _pveRefs.begin(), end = _pveRefs.end();
-    while (it != end)
+    // EndCombat's combat-exit handling (AI, scripts, aura removal) can end or create more of our refs, so no
+    // iterator may be held across it: collect the invalid guids first, then look each one up again
+    auto endInvalidCombat = [this](auto& refs)
     {
-        CombatReference* const ref = it->second;
-        if (!CanBeginCombat(_owner, ref->GetOther(_owner)))
-        {
-            it = _pveRefs.erase(it), end = _pveRefs.end(); // erase manually here to avoid iterator invalidation
-            ref->EndCombat();
-        }
-        else
-            ++it;
-    }
+        std::vector<ObjectGuid> invalid;
+        for (auto const& [guid, ref] : refs)
+            if (!CanBeginCombat(_owner, ref->GetOther(_owner)))
+                invalid.push_back(guid);
 
-    auto it2 = _pvpRefs.begin(), end2 = _pvpRefs.end();
-    while (it2 != end2)
-    {
-        CombatReference* const ref = it2->second;
-        if (!CanBeginCombat(_owner, ref->GetOther(_owner)))
-        {
-            it2 = _pvpRefs.erase(it2), end2 = _pvpRefs.end(); // erase manually here to avoid iterator invalidation
-            ref->EndCombat();
-        }
-        else
-            ++it2;
-    }
+        for (ObjectGuid const& guid : invalid)
+            if (auto* ref = Acore::Containers::MapGetValuePtr(refs, guid))
+                if (!CanBeginCombat(_owner, ref->GetOther(_owner)))
+                    ref->EndCombat();
+    };
+
+    endInvalidCombat(_pveRefs);
+    endInvalidCombat(_pvpRefs);
 }
 
 void CombatManager::EndAllPvPCombat()

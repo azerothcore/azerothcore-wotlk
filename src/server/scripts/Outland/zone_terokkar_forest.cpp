@@ -230,6 +230,7 @@ enum UnkorTheRuthless
 
     FACTION_HOSTILE                 = 45,
     QUEST_DONTKILLTHEFATONE         = 9889,
+    QUEST_SUCCESS                   = 9890,
 
     SPELL_PULVERIZE                 = 2676,
 
@@ -265,10 +266,15 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override { }
 
-        bool HasQuestActive(Player* player) const
+        bool CanMakeSubmit(Player* player) const
         {
             QuestStatus status = player->GetQuestStatus(QUEST_DONTKILLTHEFATONE);
-            return status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE;
+            if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE)
+                return true;
+
+            // Unkor is the only starter of Success!, so players who turned in 9889 but missed
+            // the friendly window must be able to beat him into submission again.
+            return status == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_SUCCESS) == QUEST_STATUS_NONE;
         }
 
         void Submit()
@@ -292,7 +298,7 @@ public:
             if (!player)
                 if (Unit* owner = done_by->GetOwner())
                     player = owner->ToPlayer();
-            if (!player || !HasQuestActive(player))
+            if (!player || !CanMakeSubmit(player))
                 return;
 
             // Cap damage from quest holders so DoTs/pets/burst can't kill him.

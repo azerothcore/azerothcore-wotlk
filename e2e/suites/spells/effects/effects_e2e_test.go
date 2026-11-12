@@ -128,7 +128,7 @@ func TestAC_26997_SweepingStrikesExecuteNoCrash(t *testing.T) {
 	const (
 		spellExecuteMax = uint32(47471) // WotLK Execute rank 9
 		// High-HP test dummies with empty ScriptName (they take damage). L1-L6
-		// world mobs die to a L80 autoattack during DamageToFraction.
+		// world mobs die to a L80 autoattack before reaching Execute range.
 		unkillableDummy80      = uint32(32171)
 		unkillableDummy80Armor = uint32(32847) // different entry — Spawn despawns nearby same-entry
 	)
@@ -173,8 +173,8 @@ func TestAC_26997_SweepingStrikesExecuteNoCrash(t *testing.T) {
 	if c1 == 0 || c2 == 0 {
 		e2eharness.Preconditionf(t, "failed to spawn Execute targets c1=0x%X c2=0x%X", c1, c2)
 	}
-	arms.DamageToFraction(t, c1, 0.19, 20*time.Second)
-	arms.DamageToFraction(t, c2, 0.19, 20*time.Second)
+	damageToExecuteRange(t, arms, c1)
+	damageToExecuteRange(t, arms, c2)
 	for _, v := range []struct {
 		name string
 		g    uint64
@@ -209,6 +209,35 @@ func TestAC_26997_SweepingStrikesExecuteNoCrash(t *testing.T) {
 		e2eharness.Assertf(t, "Execute failed reason=%s", e2eharness.SpellFailReasonName(res.FailReason))
 	}
 	t.Logf("PASS AC#26997 Sweeping Strikes Execute world alive (c1=0x%X c2=0x%X)", c1, c2)
+}
+
+// damageToExecuteRange takes guid to 15% health with a single `.damage` sized from a fresh read,
+// then waits for the health update. DamageToFraction sends a 1/5-health chunk every 50ms against
+// the cached health, so on a slow world tick the cache trails the hits and every chunk lands: CI
+// killed 32171 at 0/25200000 that way. `.damage <amount>` is a plain DealDamage, so one hit is exact.
+func damageToExecuteRange(t *testing.T, bot *e2eharness.ScenarioBot, guid uint64) {
+	t.Helper()
+	hp, maxHP := bot.WaitUnitHPKnown(t, guid, 5*time.Second)
+	if want := maxHP / 100 * 15; hp > want {
+		bot.Damage(t, guid, hp-want)
+	}
+	deadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		hp, maxHP = bot.UnitHP(guid)
+		if maxHP == 0 {
+			time.Sleep(40 * time.Millisecond)
+			continue
+		}
+		if hp == 0 {
+			e2eharness.Preconditionf(t, "unit 0x%X died while damaged to Execute range (max=%d)", guid, maxHP)
+		}
+		if float64(hp)/float64(maxHP) <= 0.2 {
+			t.Logf("damaged unit 0x%X to Execute range (hp=%d/%d)", guid, hp, maxHP)
+			return
+		}
+		time.Sleep(40 * time.Millisecond)
+	}
+	e2eharness.Preconditionf(t, "unit 0x%X not in Execute range after .damage (hp=%d/%d)", guid, hp, maxHP)
 }
 
 // FX-04: grounding totem summon exists (#26584 ecosystem).

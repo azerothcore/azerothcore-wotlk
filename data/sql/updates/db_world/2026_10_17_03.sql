@@ -1,0 +1,5 @@
+-- DB update 2026_10_17_02 -> 2026_10_17_03
+DELETE FROM `creature_text` WHERE (`CreatureID` = 2784 AND `GroupID` = 1) OR (`CreatureID` = 4949 AND `GroupID` = 2);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(2784, 1, 0, 'Let it be known that $n - Alliance $C - has earned the undying respect of Ironforge and the Alliance as a whole.  $GHe : She; has engaged in great diplomacy with Timbermaw Hold and performed valiant actions for them on our behalf.   $GHe : She; has gone above and beyond the call of duty.  Three cheers for $n - a true hero of the Alliance!', 14, 0, 100, 5, 0, 0, 11308, 2, 'King Magni Bronzebeard - The Brokering of Peace'),
+(4949, 2, 0, 'Let it be known that $n - Horde $C - has earned the undying respect of the Warchief.   $GHe : She; has engaged in great diplomacy with Timbermaw Hold and performed valiant actions for them on our behalf.   $GHe : She; has gone above and beyond the call of duty.  Three cheers for $n - a true hero of the Horde!', 14, 0, 100, 5, 0, 0, 11307, 2, 'Thrall - The Brokering of Peace');

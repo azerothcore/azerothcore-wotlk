@@ -26,7 +26,6 @@
 
 DoorData const doorData[] =
 {
-    { GO_FIRE_BARRIER,     DATA_FELMYST_DOORS,  DOOR_TYPE_PASSAGE },
     { GO_MURUS_GATE_1,     DATA_MURU,     DOOR_TYPE_ROOM   },
     { GO_MURUS_GATE_2,     DATA_MURU,     DOOR_TYPE_PASSAGE },
     { GO_BOSS_COLLISION_1, DATA_KALECGOS, DOOR_TYPE_ROOM   },
@@ -54,6 +53,7 @@ ObjectData const creatureData[] =
 ObjectData const gameObjectData[] =
 {
     { GO_ICE_BARRIER,                   DATA_ICEBARRIER                     },
+    { GO_FIRE_BARRIER,                  DATA_FIRE_BARRIER                   },
     { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT1, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 },
     { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT2, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2 },
     { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT3, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3 },
@@ -86,6 +86,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            SetPersistentDataCount(PERSISTENT_DATA_COUNT);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, gameObjectData);
             LoadSummonData(summonData);
@@ -100,7 +101,22 @@ public:
                 if (IsBossDone(DATA_BRUTALLUS) && !IsBossDone(DATA_FELMYST))
                     if (Creature* madrigosa = GetCreature(DATA_MADRIGOSA))
                         madrigosa->CastSpell((Unit*)nullptr, SPELL_SUMMON_FELBLAZE, true);
+
+                // Felmyst died but the instance unloaded before Kalecgos opened the fire barrier: replay his flight
+                if (IsBossDone(DATA_FELMYST) && GetPersistentData(PERSISTENT_DATA_FIRE_BARRIER) != DONE)
+                    if (Creature* kalec = instance->SummonCreature(NPC_KALECGOS_FELMYST, KalecgosFelmystSpawnPos))
+                        kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS_FELMYST, KalecgosFelmystLandPos,
+                                                            FORCED_MOVEMENT_NONE, 0.f, false, true);
             });
+        }
+
+        void OnGameObjectCreate(GameObject* go) override
+        {
+            // Opened by Kalecgos after Felmyst dies (saved)
+            if (go->GetEntry() == GO_FIRE_BARRIER)
+                HandleGameObject(ObjectGuid::Empty, GetPersistentData(PERSISTENT_DATA_FIRE_BARRIER) == DONE, go);
+
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         void OnPlayerEnter(Player* player) override

@@ -121,6 +121,7 @@ struct ScalingStatValuesEntry;
 struct SpellModifier;
 struct TargetInfo;
 struct VendorItem;
+struct WardenCheck;
 struct SkillLineAbilityEntry;
 
 // Dynamic linking class

@@ -36,7 +36,6 @@ void AddSC_trial_of_the_champion();
 void AddSC_boss_anubarak_trial();        //Trial of the Crusader
 void AddSC_boss_faction_champions();
 void AddSC_boss_jaraxxus();
-void AddSC_trial_of_the_crusader();
 void AddSC_boss_twin_valkyr();
 void AddSC_boss_northrend_beasts();
 void AddSC_instance_trial_of_the_crusader();
@@ -202,7 +201,6 @@ void AddNorthrendScripts()
     AddSC_boss_anubarak_trial();        //Trial of the Crusader
     AddSC_boss_faction_champions();
     AddSC_boss_jaraxxus();
-    AddSC_trial_of_the_crusader();
     AddSC_boss_twin_valkyr();
     AddSC_boss_northrend_beasts();
     AddSC_instance_trial_of_the_crusader();

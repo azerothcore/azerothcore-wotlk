@@ -1974,16 +1974,20 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
 
 void Spell::EffectEnergize(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
-    if (!unitCaster)
-        return;
-
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
         return;
+
     if (!unitTarget->IsAlive())
+        return;
+
+    Unit* unitCaster = GetUnitCasterForEffectHandlers();
+    if (!unitCaster && m_caster->IsGameObject())
+        unitCaster = unitTarget;
+
+    if (!unitCaster)
         return;
 
     if (unitTarget->IsImmunedToAuraPeriodicTick(unitCaster, m_spellInfo))
@@ -2086,16 +2090,20 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
 
 void Spell::EffectEnergizePct(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
-    if (!unitCaster)
-        return;
-
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
         return;
+
     if (!unitTarget->IsAlive())
+        return;
+
+    Unit* unitCaster = GetUnitCasterForEffectHandlers();
+    if (!unitCaster && m_caster->IsGameObject())
+        unitCaster = unitTarget;
+
+    if (!unitCaster)
         return;
 
     if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
@@ -5702,8 +5710,12 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(name_id) ? new StaticTransport() : new GameObject();
 
-    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), unitCaster->GetOrientation());
-    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, unitCaster->GetPhaseMask(), fx, fy, fz, unitCaster->GetOrientation(), rotation, 100, GO_STATE_READY))
+    // A summoned gameobject faces the way its actual caster faces: a ritual object casting on its owner's behalf
+    // keeps its own orientation.
+    float orientation = m_caster->GetOrientation();
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), orientation);
+    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, unitCaster->GetPhaseMask(),
+        fx, fy, fz, orientation, rotation, 100, GO_STATE_READY))
     {
         delete pGameObj;
         return;

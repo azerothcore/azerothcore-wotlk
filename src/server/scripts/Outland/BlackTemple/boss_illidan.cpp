@@ -74,6 +74,7 @@ enum Spells
 
     // Phase 3
     SPELL_AGONIZING_FLAMES              = 40932,
+    SPELL_AGONIZING_FLAMES_SELECTOR     = 40834,
     SPELL_SUMMON_MAIEV                  = 40403,
     SPELL_SHADOW_PRISON                 = 40647,
 
@@ -136,6 +137,7 @@ enum Misc
     GROUP_BERSERK                       = 1,
     GROUP_PHASE_FLYING                  = 2,
     GROUP_DEMON_FORM                    = 3,
+    GROUP_WIPE_CHECK                    = 4,
 
     NPC_WORLD_TRIGGER                   = 22515,
     NPC_ILLIDAN_DB_TARGET               = 23070,
@@ -204,6 +206,7 @@ struct boss_illidan_stormrage : public BossAI
         me->m_Events.CancelEventGroup(GROUP_BERSERK);
         me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
         me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
+        me->m_Events.CancelEventGroup(GROUP_WIPE_CHECK);
         _dying = false;
         _inCutscene = false;
         beamPosId = urand(0, MAX_EYE_BEAM_POS - 1);
@@ -376,6 +379,7 @@ struct boss_illidan_stormrage : public BossAI
             case ACTION_ILLIDAN_DIE:
             {
                 me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
+                me->m_Events.CancelEventGroup(GROUP_WIPE_CHECK);
                 scheduler.CancelAll();
 
                 if (IsInDemonFormOrTransforming())
@@ -517,14 +521,15 @@ struct boss_illidan_stormrage : public BossAI
                         me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_HOVER, airHoverPos[beamPosId], FORCED_MOVEMENT_NONE, 0.f, false, true);
                     }, 20s, GROUP_PHASE_FLYING);
                 });
+                if (roll_chance_i(50))
+                {
+                    scheduler.Schedule(1s, 20s, [this](TaskContext /*context*/)
+                    {
+                        DoCastRandomTarget(SPELL_DARK_BARRAGE, 0U, 150.0f);
+                    });
+                }
                 // Check for Phase Transition
                 scheduler.Schedule(5s, [this](TaskContext context) {
-                    if (!SelectTargetFromPlayerList(150.0f))
-                    {
-                        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-                        return;
-                    }
-
                     summons.RemoveNotExisting();
                     if (!summons.HasEntry(NPC_FLAME_OF_AZZINOTH))
                     {
@@ -556,7 +561,7 @@ struct boss_illidan_stormrage : public BossAI
                 }, 25s, 30s);
 
                 ScheduleTimedEvent(25s, [&] {
-                    DoCastSelf(SPELL_AGONIZING_FLAMES);
+                    DoCastSelf(SPELL_AGONIZING_FLAMES_SELECTOR);
                 }, 24s);
 
                 ScheduleTimedEvent(60s, [&] {
@@ -619,11 +624,13 @@ struct boss_illidan_stormrage : public BossAI
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BERSERK, true);
         }, 25min, GROUP_BERSERK);
+
+        ScheduleWipeCheck();
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        if (_inCutscene)
+        if (_inCutscene || _dying)
             return;
 
         if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
@@ -635,6 +642,7 @@ struct boss_illidan_stormrage : public BossAI
         me->m_Events.CancelEventGroup(GROUP_BERSERK);
         me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
         me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
+        me->m_Events.CancelEventGroup(GROUP_WIPE_CHECK);
     }
 
     void JustSummoned(Creature* summon) override
@@ -670,6 +678,7 @@ struct boss_illidan_stormrage : public BossAI
 
     void JustDied(Unit* killer) override
     {
+        me->m_Events.CancelEventGroup(GROUP_WIPE_CHECK);
         summons.clear();
         BossAI::JustDied(killer);
     }
@@ -689,6 +698,21 @@ private:
     {
         return me->HasAnyAuras(SPELL_DEMON_TRANSFORM_1, SPELL_DEMON_TRANSFORM_2, SPELL_DEMON_TRANSFORM_3,
             SPELL_DEMON_FORM);
+    }
+
+    // Maiev and Akama cannot die and keep Illidan on their threat lists,
+    // which stops him from evading on his own after a wipe
+    void ScheduleWipeCheck()
+    {
+        me->m_Events.AddEventAtOffset([&] {
+            if (!_inCutscene && !SelectTargetFromPlayerList(150.0f))
+            {
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+                return;
+            }
+
+            ScheduleWipeCheck();
+        }, 5s, GROUP_WIPE_CHECK);
     }
 
     void CycleBeamPos(uint8 &beamPosId)
@@ -783,13 +807,24 @@ struct npc_akama_illidan : public ScriptedAI
         me->SetControlled(false, UNIT_STATE_ROOT);
     }
 
+    void JustRespawned() override
+    {
+        Reset();
+
+        // After a restart with the Council dead and the gate shut, return Akama to the Council
+        if (instance->GetBossState(DATA_ILLIDARI_COUNCIL) == DONE &&
+            instance->GetPersistentData(PERSISTENT_DATA_ILLIDAN_GATE) != DONE &&
+            instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE)
+            DoAction(ACTION_ILLIDARI_COUNCIL_DONE);
+    }
+
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
     {
         CloseGossipMenuFor(player);
         me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
         me->setActive(true);
 
-        if (instance->GetBossState(DATA_AKAMA_ILLIDAN) != DONE)
+        if (instance->GetPersistentData(PERSISTENT_DATA_ILLIDAN_GATE) != DONE)
         {
             me->GetMotionMaster()->MoveWaypoint(PATH_AKAMA_ILLIDARI_COUNCIL_2, false);
         }
@@ -964,8 +999,8 @@ struct npc_akama_illidan : public ScriptedAI
                         udalo->InterruptNonMeleeSpells(false);
                     if (Creature* olum = me->FindNearestCreature(NPC_SPIRIT_OF_OLUM, 15.0f))
                         olum->InterruptNonMeleeSpells(false);
-                    instance->SetBossState(DATA_AKAMA_ILLIDAN, NOT_STARTED);
-                    instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
+                    instance->StorePersistentData(PERSISTENT_DATA_ILLIDAN_GATE, DONE);
+                    instance->HandleGameObject(DATA_ILLIDAN_GATE, true);
                 }, 50680ms); // 20ms
                 me->m_Events.AddEventAtOffset([&] {
                     Talk(SAY_AKAMA_SALUTE);
@@ -1702,6 +1737,36 @@ class spell_illidan_found_target : public SpellScript
     }
 };
 
+// 40834 - Agonizing Flames
+class spell_illidan_agonizing_flames : public SpellScript
+{
+    PrepareSpellScript(spell_illidan_agonizing_flames);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_AGONIZING_FLAMES });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        // Maiev and Akama are hostile to Illidan too, only players are valid targets
+        targets.remove_if([](WorldObject const* target) { return !target->IsPlayer(); });
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_AGONIZING_FLAMES, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_illidan_agonizing_flames::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_agonizing_flames::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 class spell_illidan_cage_trap : public SpellScript
 {
     PrepareSpellScript(spell_illidan_cage_trap);
@@ -1778,6 +1843,7 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_demon_transform2_aura);
     RegisterSpellScript(spell_illidan_flame_burst);
     RegisterSpellScript(spell_illidan_found_target);
+    RegisterSpellScript(spell_illidan_agonizing_flames);
     RegisterSpellScript(spell_illidan_cage_trap);
     RegisterSpellScript(spell_illidan_cage_trap_stun_aura);
 }
