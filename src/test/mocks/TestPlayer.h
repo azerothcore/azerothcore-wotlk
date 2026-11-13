@@ -24,6 +24,7 @@ class TestPlayer : public Player
 {
 public:
     using Player::Player;
+    using Unit::_UpdateAutoRepeatSpell;
 
     void UpdateObjectVisibility(bool /*forced*/ = true, bool /*fromUpdate*/ = false) override { }
 
