@@ -1429,6 +1429,9 @@ public:
     static bool IsValidCharterName(std::string_view name);
     static bool IsValidChannelName(std::string const& name);
 
+    // highest quest RequiredSkillPoints that is valid data, independent of a lowered MaxPlayerLevel
+    static uint32 GetMaxQuestRequiredSkillPoints();
+
     static bool CheckDeclinedNames(std::wstring w_ownname, DeclinedName const& names);
 
     [[nodiscard]] GameTele const* GetGameTele(uint32 id) const
