@@ -54,3 +54,15 @@ boost::asio::ip::tcp_endpoint Realm::GetAddressForClient(boost::asio::ip::addres
     // Return external IP
     return { realmIp, Port };
 }
+
+std::string Realm::BuildIdSqlFilter() const
+{
+    std::string filter = std::to_string(Id.Realm);
+    for (uint32 id : AdditionalIds)
+    {
+        filter += ',';
+        filter += std::to_string(id);
+    }
+
+    return filter;
+}
