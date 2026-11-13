@@ -1016,7 +1016,7 @@ void SmartAI::DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType /*damag
 
 void SmartAI::SummonedCreatureDespawn(Creature* unit)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMON_DESPAWNED, unit);
+    GetScript()->ProcessEventsFor(SMART_EVENT_SUMMON_DESPAWNED, unit, unit->GetEntry());
     GetScript()->RemoveCreatureSummon(unit->GetGUID());
 }
 
