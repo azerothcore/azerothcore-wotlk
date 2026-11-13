@@ -32,8 +32,9 @@ Read the matching doc(s) BEFORE starting the task:
 - `src/server/game/` — core gameplay; compiled into worldserver.
 - `src/server/scripts/` — content scripts grouped by region (`EasternKingdoms/`, `Northrend/`, …), class (`Spells/spell_mage.cpp`, …), and domain (`Commands/`, `Pet/`, `OutdoorPvP/`, `World/`).
 - `src/server/database/` — DB abstraction and schema updater.
-- `src/server/shared/` — code shared by auth and world servers.
-- `src/server/apps/{authserver,worldserver}/` — entry points (ports 3724 and 8085).
+- `src/server/shared/` — code shared by the auth, world and voice servers.
+- `src/server/services/` — voiceserver libraries (voice channels, the internal protocol with the worldserver, voice scripts), built only with the voiceserver.
+- `src/server/apps/{authserver,worldserver,voiceserver}/` — entry points (ports 3724 and 8085; voiceserver: UDP 3724 for game clients, TCP 3725 for the worldserver).
 - `src/test/` — unit tests + mocks.
 - `e2e/` — live-stack Go e2e (AzerothGhost harness); see `e2e/README.md`.
 - `data/sql/` — `base/` (historical schema), `updates/db_*/` (merged), `updates/pending_db_*/` (in-flight), `custom/` (gitignored).

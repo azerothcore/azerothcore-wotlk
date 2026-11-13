@@ -28,6 +28,17 @@ else()
   set(MODULES_DEFAULT_LINKAGE "disabled")
 endif()
 
+# The voiceserver parts of the modules (src/voiceserver/) build into a
+# library of their own, see VoiceModules.cmake
+if (BUILD_APPLICATION_VOICESERVER)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/VoiceModules.cmake)
+endif()
+
+# Everything below builds the worldserver parts of the modules
+if (NOT BUILD_APPLICATION_WORLDSERVER)
+  return()
+endif()
+
 # Add support old api modules
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_LIST")
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_INCLUDE")
@@ -190,13 +201,24 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     list(APPEND DISABLED_SCRIPT_MODULE_PROJECTS ${INSTALL_OFFSET}/${SCRIPT_MODULE_OUTPUT_NAME})
     if(${MODULE_MODULE_VARIABLE} STREQUAL "static")
 
-      # Add the module content to the whole static module
-      CollectSourceFiles(${MODULE_SOURCE_PATH} PRIVATE_SOURCES_MODULES)
-      CollectIncludeDirectories(${MODULE_SOURCE_PATH} PUBLIC_INCLUDES)
+      # Add the module content to the whole static module,
+      # src/voiceserver/ belongs to the voiceserver (see VoiceModules.cmake)
+      unset(MODULE_WORLDSERVER_SOURCES)
+      CollectSourceFiles(${MODULE_SOURCE_PATH} MODULE_WORLDSERVER_SOURCES ${MODULE_SOURCE_PATH}/voiceserver)
+      list(APPEND PRIVATE_SOURCES_MODULES ${MODULE_WORLDSERVER_SOURCES})
+      CollectIncludeDirectories(${MODULE_SOURCE_PATH} PUBLIC_INCLUDES ${MODULE_SOURCE_PATH}/voiceserver)
 
       # Skip deprecated api loaders
       if (AC_SCRIPTS_INCLUDES MATCHES "${SOURCE_MODULE}")
         message("> Module (${SOURCE_MODULE}) using deprecated loader api")
+        continue()
+      endif()
+
+      # Modules with only voiceserver code have no worldserver loader. Headers
+      # directly in src/ are shared by both parts, so only compiled files count
+      set(MODULE_WORLDSERVER_COMPILED "${MODULE_WORLDSERVER_SOURCES}")
+      list(FILTER MODULE_WORLDSERVER_COMPILED INCLUDE REGEX "\\.(c|cc|cpp)$")
+      if (NOT MODULE_WORLDSERVER_COMPILED)
         continue()
       endif()
 
@@ -209,8 +231,17 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     # Generate an own dynamic module which is loadable on runtime
     # Add the module content to the whole static module
     unset(MODULE_SOURCE_PRIVATE_SOURCES)
-    CollectSourceFiles(${MODULE_SOURCE_PATH} MODULE_SOURCE_PRIVATE_SOURCES)
-    CollectIncludeDirectories(${MODULE_SOURCE_PATH} PUBLIC_INCLUDES)
+    CollectSourceFiles(${MODULE_SOURCE_PATH} MODULE_SOURCE_PRIVATE_SOURCES ${MODULE_SOURCE_PATH}/voiceserver)
+
+    # Modules with only voiceserver code have no worldserver library. Headers
+    # directly in src/ are shared by both parts, so only compiled files count
+    set(MODULE_SOURCE_COMPILED "${MODULE_SOURCE_PRIVATE_SOURCES}")
+    list(FILTER MODULE_SOURCE_COMPILED INCLUDE REGEX "\\.(c|cc|cpp)$")
+    if (NOT MODULE_SOURCE_COMPILED)
+      continue()
+    endif()
+
+    CollectIncludeDirectories(${MODULE_SOURCE_PATH} PUBLIC_INCLUDES ${MODULE_SOURCE_PATH}/voiceserver)
 
     # Configure the scriptloader
     ConfigureScriptLoader(${SOURCE_MODULE} SCRIPT_MODULE_PRIVATE_SCRIPTLOADER ON ${SOURCE_MODULE})

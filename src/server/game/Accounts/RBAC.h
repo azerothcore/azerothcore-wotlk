@@ -707,6 +707,10 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_ACCOUNT_FLAG_ADD                       = 943,
     RBAC_PERM_COMMAND_ACCOUNT_FLAG_REMOVE                    = 944,
     RBAC_PERM_COMMAND_ACCOUNT_INFO                           = 945,
+    RBAC_PERM_COMMAND_VOICECHAT_DISCONNECT                   = 946,
+    RBAC_PERM_COMMAND_VOICECHAT_DISABLE                      = 947,
+    RBAC_PERM_COMMAND_VOICECHAT_ENABLE                       = 948,
+    RBAC_PERM_COMMAND_VOICECHAT_STATS                        = 949,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

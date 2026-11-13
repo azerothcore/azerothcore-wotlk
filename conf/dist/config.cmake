@@ -13,7 +13,7 @@
 
 set(SCRIPTS_AVAILABLE_OPTIONS none static dynamic minimal-static minimal-dynamic)
 set(MODULES_AVAILABLE_OPTIONS none static dynamic)
-set(BUILD_APPS_AVAILABLE_OPTIONS none all auth-only world-only)
+set(BUILD_APPS_AVAILABLE_OPTIONS none all auth-only world-only voice-only)
 set(BUILD_TOOLS_AVAILABLE_OPTIONS none all db-only maps-only)
 
 set(SCRIPTS "static" CACHE STRING "Build core with scripts")
