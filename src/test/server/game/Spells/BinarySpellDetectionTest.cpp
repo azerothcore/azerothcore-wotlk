@@ -17,35 +17,22 @@
 
 #include "SpellInfoTestHelper.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SharedDefines.h"
 #include "gtest/gtest.h"
 
 /**
- * @brief Tests for the binary spell detection condition used in
+ * @brief Tests for IsBinarySpell, the binary spell classification used by
  *        SpellMgr::LoadSpellInfoCustomAttributes.
  *
- * The condition determines whether a non-damage aura effect should mark
- * a spell as binary (fully resistable via spell resistance).
+ * A spell is binary, all-or-nothing instead of partially resisted, when it has an effect with a value that
+ * shares its implicit targets with one of its damage effects. A spell without damage effects is binary as
+ * soon as one effect has a value, which is the polymorph, fear and root case.
  *
- * Correct logic: CalcValue() || ((INTERRUPT_CAST || DONT_BREAK_STEALTH) && !NO_IMMUNITIES)
- *
- * A spell should be marked binary if:
- * - Its effect has a non-zero CalcValue (e.g. Fear, Polymorph, Frost Nova), OR
- * - It is an interrupt/stealth spell without the NO_IMMUNITIES attribute
+ * An effect has a value when CalcValue() is non-zero, or when the spell is an interrupt or breaks stealth
+ * and does not have NO_IMMUNITIES. Dummy, script, heal, force-cast, knockback and trigger effects never make
+ * a spell binary, and neither do SPELL_ATTR3_ALWAYS_HIT or SPELL_ATTR0_CU_IGNORE_BINARY.
  */
-
-namespace
-{
-    // Replicates the binary detection condition from SpellMgr.cpp
-    // Returns true if the effect should mark the spell as binary
-    bool ShouldMarkBinary(SpellInfo const* spellInfo, uint8 effIndex)
-    {
-        return spellInfo->Effects[effIndex].CalcValue() ||
-            ((spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_INTERRUPT_CAST ||
-              spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) &&
-             !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES));
-    }
-}
 
 class BinarySpellDetectionTest : public ::testing::Test
 {
@@ -63,7 +50,7 @@ TEST_F(BinarySpellDetectionTest, AuraWithCalcValue_IsBinary)
         .WithSchoolMask(SPELL_SCHOOL_MASK_SHADOW)
         .BuildUnique();
 
-    EXPECT_TRUE(ShouldMarkBinary(spell.get(), 0));
+    EXPECT_TRUE(IsBinarySpell(*spell));
 }
 
 // Aura with zero CalcValue and no special attributes should NOT be binary
@@ -76,7 +63,7 @@ TEST_F(BinarySpellDetectionTest, AuraWithZeroCalcValue_NotBinary)
         .WithSchoolMask(SPELL_SCHOOL_MASK_SHADOW)
         .BuildUnique();
 
-    EXPECT_FALSE(ShouldMarkBinary(spell.get(), 0));
+    EXPECT_FALSE(IsBinarySpell(*spell));
 }
 
 // INTERRUPT_CAST effect without NO_IMMUNITIES should be binary
@@ -89,7 +76,7 @@ TEST_F(BinarySpellDetectionTest, InterruptCast_IsBinary)
         .WithSchoolMask(SPELL_SCHOOL_MASK_SHADOW)
         .BuildUnique();
 
-    EXPECT_TRUE(ShouldMarkBinary(spell.get(), 0));
+    EXPECT_TRUE(IsBinarySpell(*spell));
 }
 
 // INTERRUPT_CAST with NO_IMMUNITIES should NOT be binary
@@ -103,11 +90,11 @@ TEST_F(BinarySpellDetectionTest, InterruptCastWithNoImmunities_NotBinary)
         .WithSchoolMask(SPELL_SCHOOL_MASK_SHADOW)
         .BuildUnique();
 
-    EXPECT_FALSE(ShouldMarkBinary(spell.get(), 0));
+    EXPECT_FALSE(IsBinarySpell(*spell));
 }
 
 // Fear-like spell: APPLY_AURA MOD_FEAR with BasePoints=-1, DieSides=1
-// CalcValue = -1 + 1 = 0, but second effect has value
+// CalcValue = -1 + 1 = 0, but the second effect has one
 TEST_F(BinarySpellDetectionTest, FearLikeSpell_SecondEffectHasValue_IsBinary)
 {
     auto spell = SpellInfoBuilder()
@@ -120,10 +107,7 @@ TEST_F(BinarySpellDetectionTest, FearLikeSpell_SecondEffectHasValue_IsBinary)
         .WithSchoolMask(SPELL_SCHOOL_MASK_SHADOW)
         .BuildUnique();
 
-    // Effect 0 has CalcValue 0, should not mark binary
-    EXPECT_FALSE(ShouldMarkBinary(spell.get(), 0));
-    // Effect 1 has CalcValue 25, should mark binary
-    EXPECT_TRUE(ShouldMarkBinary(spell.get(), 1));
+    EXPECT_TRUE(IsBinarySpell(*spell));
 }
 
 // Polymorph-like: APPLY_AURA MOD_CONFUSE with positive BasePoints
@@ -136,7 +120,7 @@ TEST_F(BinarySpellDetectionTest, PolymorphLikeSpell_IsBinary)
         .WithSchoolMask(SPELL_SCHOOL_MASK_ARCANE)
         .BuildUnique();
 
-    EXPECT_TRUE(ShouldMarkBinary(spell.get(), 0));
+    EXPECT_TRUE(IsBinarySpell(*spell));
 }
 
 // Frost Nova-like: APPLY_AURA MOD_ROOT with positive BasePoints
@@ -149,5 +133,144 @@ TEST_F(BinarySpellDetectionTest, FrostNovaLikeSpell_IsBinary)
         .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
         .BuildUnique();
 
-    EXPECT_TRUE(ShouldMarkBinary(spell.get(), 0));
+    EXPECT_TRUE(IsBinarySpell(*spell));
+}
+
+// Damage and a slow on the same unit target
+TEST_F(BinarySpellDetectionTest, DamageAndSlowOnSameTarget_IsBinary)
+{
+    auto spell = SpellInfoBuilder()
+        .WithEffect(0, SPELL_EFFECT_SCHOOL_DAMAGE)
+        .WithEffectBasePoints(0, 0)
+        .WithEffectDieSides(0, 1)
+        .WithEffectImplicitTargets(0, TARGET_UNIT_TARGET_ENEMY)
+        .WithEffect(1, SPELL_EFFECT_APPLY_AURA, SPELL_AURA_MOD_DECREASE_SPEED)
+        .WithEffectBasePoints(1, 0)
+        .WithEffectDieSides(1, 1)
+        .WithEffectImplicitTargets(1, TARGET_UNIT_TARGET_ENEMY)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
+        .BuildUnique();
+
+    EXPECT_TRUE(IsBinarySpell(*spell));
+}
+
+// The same pair, but the slow lands on another target: a self buff next to a nuke is not binary
+TEST_F(BinarySpellDetectionTest, DamageAndSlowOnDifferentTarget_NotBinary)
+{
+    auto spell = SpellInfoBuilder()
+        .WithEffect(0, SPELL_EFFECT_SCHOOL_DAMAGE)
+        .WithEffectBasePoints(0, 0)
+        .WithEffectDieSides(0, 1)
+        .WithEffectImplicitTargets(0, TARGET_UNIT_TARGET_ENEMY)
+        .WithEffect(1, SPELL_EFFECT_APPLY_AURA, SPELL_AURA_MOD_DECREASE_SPEED)
+        .WithEffectBasePoints(1, 0)
+        .WithEffectDieSides(1, 1)
+        .WithEffectImplicitTargets(1, TARGET_UNIT_CASTER_AREA_PARTY)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
+        .BuildUnique();
+
+    EXPECT_FALSE(IsBinarySpell(*spell));
+}
+
+// A knockback is not resistable, so it must not turn an otherwise plain nuke binary
+TEST_F(BinarySpellDetectionTest, DamageAndKnockBack_NotBinary)
+{
+    auto spell = SpellInfoBuilder()
+        .WithEffect(0, SPELL_EFFECT_SCHOOL_DAMAGE)
+        .WithEffectBasePoints(0, 0)
+        .WithEffectDieSides(0, 1)
+        .WithEffectImplicitTargets(0, TARGET_UNIT_CONE_ENEMY_24)
+        .WithEffect(1, SPELL_EFFECT_KNOCK_BACK)
+        .WithEffectBasePoints(1, 0)
+        .WithEffectDieSides(1, 1)
+        .WithEffectImplicitTargets(1, TARGET_UNIT_CONE_ENEMY_24)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
+        .BuildUnique();
+
+    EXPECT_FALSE(IsBinarySpell(*spell));
+}
+
+// Dummy effects are script hooks and never make a spell binary, even with a value
+TEST_F(BinarySpellDetectionTest, DamageAndDummyEffect_NotBinary)
+{
+    auto spell = SpellInfoBuilder()
+        .WithEffect(0, SPELL_EFFECT_SCHOOL_DAMAGE)
+        .WithEffectBasePoints(0, 0)
+        .WithEffectDieSides(0, 1)
+        .WithEffectImplicitTargets(0, TARGET_UNIT_TARGET_ENEMY)
+        .WithEffect(1, SPELL_EFFECT_DUMMY)
+        .WithEffectBasePoints(1, 10)
+        .WithEffectDieSides(1, 1)
+        .WithEffectImplicitTargets(1, TARGET_UNIT_TARGET_ENEMY)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
+        .BuildUnique();
+
+    EXPECT_FALSE(IsBinarySpell(*spell));
+}
+
+// A trigger spell with a value is not a resistable effect on its own
+TEST_F(BinarySpellDetectionTest, TriggerSpellEffectOnly_NotBinary)
+{
+    auto spell = SpellInfoBuilder()
+        .WithEffect(0, SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE)
+        .WithEffectBasePoints(0, 10)
+        .WithEffectDieSides(0, 1)
+        .WithEffectImplicitTargets(0, TARGET_UNIT_TARGET_ENEMY)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
+        .BuildUnique();
+
+    EXPECT_FALSE(IsBinarySpell(*spell));
+}
+
+// SPELL_ATTR0_CU_IGNORE_BINARY wins over the classification
+TEST_F(BinarySpellDetectionTest, IgnoreBinaryOverride_NotBinary)
+{
+    auto spell = SpellInfoBuilder()
+        .WithEffect(0, SPELL_EFFECT_SCHOOL_DAMAGE)
+        .WithEffectBasePoints(0, 0)
+        .WithEffectDieSides(0, 1)
+        .WithEffectImplicitTargets(0, TARGET_UNIT_TARGET_ENEMY)
+        .WithEffect(1, SPELL_EFFECT_APPLY_AURA, SPELL_AURA_MOD_DECREASE_SPEED)
+        .WithEffectBasePoints(1, 0)
+        .WithEffectDieSides(1, 1)
+        .WithEffectImplicitTargets(1, TARGET_UNIT_TARGET_ENEMY)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
+        .BuildUnique();
+
+    spell->AttributesCu |= SPELL_ATTR0_CU_IGNORE_BINARY;
+
+    EXPECT_FALSE(IsBinarySpell(*spell));
+}
+
+// SPELL_ATTR3_ALWAYS_HIT spells cannot be resisted at all, so they are never binary
+TEST_F(BinarySpellDetectionTest, AlwaysHit_NotBinary)
+{
+    auto spell = SpellInfoBuilder()
+        .WithEffect(0, SPELL_EFFECT_SCHOOL_DAMAGE)
+        .WithEffectBasePoints(0, 0)
+        .WithEffectDieSides(0, 1)
+        .WithEffectImplicitTargets(0, TARGET_UNIT_TARGET_ENEMY)
+        .WithEffect(1, SPELL_EFFECT_APPLY_AURA, SPELL_AURA_MOD_DECREASE_SPEED)
+        .WithEffectBasePoints(1, 0)
+        .WithEffectDieSides(1, 1)
+        .WithEffectImplicitTargets(1, TARGET_UNIT_TARGET_ENEMY)
+        .WithAttributesEx3(SPELL_ATTR3_ALWAYS_HIT)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
+        .BuildUnique();
+
+    EXPECT_FALSE(IsBinarySpell(*spell));
+}
+
+// Pure damage takes graded resists, it is not binary
+TEST_F(BinarySpellDetectionTest, PureDamage_NotBinary)
+{
+    auto spell = SpellInfoBuilder()
+        .WithEffect(0, SPELL_EFFECT_SCHOOL_DAMAGE)
+        .WithEffectBasePoints(0, 0)
+        .WithEffectDieSides(0, 1)
+        .WithEffectImplicitTargets(0, TARGET_UNIT_TARGET_ENEMY)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FROST)
+        .BuildUnique();
+
+    EXPECT_FALSE(IsBinarySpell(*spell));
 }

@@ -57,6 +57,128 @@ bool IsPartOfSkillLine(uint32 skillId, uint32 spellId)
     return false;
 }
 
+namespace
+{
+    /**
+     * @brief Effects that deal damage, and that graded resistance applies to
+     */
+    bool IsSpellEffectDamage(SpellEffectInfo const& effect)
+    {
+        if (!effect.IsEffect())
+            return false;
+
+        switch (effect.ApplyAuraName)
+        {
+            case SPELL_AURA_PERIODIC_DAMAGE:
+            case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+            case SPELL_AURA_PERIODIC_LEECH:
+            case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+                return true;
+            case SPELL_AURA_NONE:
+                break;
+            default:
+                return false;
+        }
+
+        switch (effect.Effect)
+        {
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * @brief Effects that never make a spell binary, nothing about them can be resisted
+     */
+    bool IsSpellEffectIgnoredForBinary(SpellEffectInfo const& effect)
+    {
+        if (effect.ApplyAuraName == SPELL_AURA_DUMMY || effect.ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
+            return true;
+
+        switch (effect.Effect)
+        {
+            case SPELL_EFFECT_DUMMY:
+            case SPELL_EFFECT_SCRIPT_EFFECT:
+            case SPELL_EFFECT_HEAL:
+            case SPELL_EFFECT_FORCE_CAST:
+            case SPELL_EFFECT_KNOCK_BACK:
+            case SPELL_EFFECT_KNOCK_BACK_DEST:
+            case SPELL_EFFECT_TRIGGER_SPELL:
+            case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
+            case SPELL_EFFECT_TRIGGER_SPELL_2:
+            case SPELL_EFFECT_TRIGGER_MISSILE:
+            case SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE:
+                return true;
+            default:
+                return false;
+        }
+    }
+}
+
+/**
+ * @brief Checks whether a spell is binary, i.e. all-or-nothing instead of partially resisted
+ *
+ * A spell is binary when it has an effect with a value that shares its implicit targets with one of its damage
+ * effects, and also when it has no damage effects at all and one effect has a value (polymorph, fear, root).
+ * SPELL_ATTR3_ALWAYS_HIT and SPELL_ATTR0_CU_IGNORE_BINARY are checked first. This is the first pass only, the
+ * PERIODIC_TRIGGER_SPELL check in SpellMgr::LoadSpellInfoCustomAttributes can still clear the flag afterwards.
+ */
+bool IsBinarySpell(SpellInfo const& spellInfo)
+{
+    if (spellInfo.HasAttribute(SPELL_ATTR3_ALWAYS_HIT) || spellInfo.HasAttribute(SPELL_ATTR0_CU_IGNORE_BINARY))
+        return false;
+
+    bool hasDamageEffect = false;
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (IsSpellEffectDamage(spellInfo.Effects[i]))
+        {
+            hasDamageEffect = true;
+            break;
+        }
+    }
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        SpellEffectInfo const& effect = spellInfo.Effects[i];
+
+        if (!effect.IsEffect() || IsSpellEffectDamage(effect) || IsSpellEffectIgnoredForBinary(effect))
+            continue;
+
+        if (!(effect.CalcValue() ||
+            ((effect.Effect == SPELL_EFFECT_INTERRUPT_CAST ||
+                spellInfo.HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) &&
+                !spellInfo.HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))))
+            continue;
+
+        if (!hasDamageEffect)
+            return true;
+
+        for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+        {
+            SpellEffectInfo const& damageEffect = spellInfo.Effects[j];
+            if (!IsSpellEffectDamage(damageEffect))
+                continue;
+
+            bool const sameTargets = damageEffect.TargetA.GetTarget() == effect.TargetA.GetTarget() &&
+                damageEffect.TargetB.GetTarget() == effect.TargetB.GetTarget();
+
+            if (sameTargets)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 CreatureImmunities const* SpellMgr::GetCreatureImmunities(int32 creatureImmunitiesId) const
 {
     return Acore::Containers::MapGetValuePtr(mCreatureImmunities, creatureImmunitiesId);
@@ -3439,57 +3561,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         }
 
         // Xinef: spells ignoring hit result should not be binary
-        if (!spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT) && !spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_BINARY))
-        {
-            for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
-            {
-                if (spellInfo->Effects[j].Effect)
-                {
-                    switch (spellInfo->Effects[j].Effect)
-                    {
-                        case SPELL_EFFECT_SCHOOL_DAMAGE:
-                        case SPELL_EFFECT_WEAPON_DAMAGE:
-                        case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
-                        case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-                        case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                        case SPELL_EFFECT_TRIGGER_SPELL:
-                        case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
-                            continue;
-                        case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-                        case SPELL_EFFECT_APPLY_AURA:
-                        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-                        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
-                        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
-                        case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
-                        case SPELL_EFFECT_APPLY_AREA_AURA_PET:
-                        case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
-                            if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE ||
-                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
-                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_DUMMY ||
-                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_LEECH ||
-                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_HEALTH_FUNNEL ||
-                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
-                                continue;
-                            [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
-                        default:
-                            if (!(spellInfo->Effects[j].CalcValue() ||
-                                ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) &&
-                                !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))))
-                                continue;
-
-                            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[0] & 0x20)) // Frostbolt
-                                continue;
-
-                            if (spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&
-                                ((spellInfo->SpellFamilyFlags[1] & 0x40000) || (spellInfo->SpellFamilyFlags[0] & 0x4000))) // Haunt/Drain Soul
-                                continue;
-
-                            spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-                            break;
-                    }
-                }
-            }
-        }
+        if (IsBinarySpell(*spellInfo))
+            spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
 
         // pussywizard:
         if ((spellInfo->SchoolMask & SPELL_SCHOOL_MASK_NORMAL) && (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_MAGIC))
