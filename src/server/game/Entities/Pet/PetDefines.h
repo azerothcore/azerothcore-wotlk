@@ -132,6 +132,16 @@ enum NPCEntries
     NPC_GENERIC_VOIDWALKER      = 8996
 };
 
+enum PetAIActions
+{
+    ACTION_DK_GHOUL_EMERGE = 1,
+};
+
+enum PetSummonSpells
+{
+    SPELL_DK_RAISE_DEAD_PET = 52150,
+};
+
 enum PetScalingSpells
 {
     SPELL_PET_AVOIDANCE                 = 32233,
