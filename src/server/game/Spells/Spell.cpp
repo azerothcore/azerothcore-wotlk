@@ -652,9 +652,12 @@ Spell::Spell(WorldObject* caster, SpellInfo const* info, TriggerCastFlags trigge
     {
         // wand case
         if (m_attackType == RANGED_ATTACK)
-            if ((playerCaster->getClassMask() & CLASSMASK_WAND_USERS) != 0)
+            if (playerCaster->IsClass(CLASS_PRIEST, CLASS_CONTEXT_WAND_SCHOOL)
+                || playerCaster->IsClass(CLASS_MAGE, CLASS_CONTEXT_WAND_SCHOOL)
+                || playerCaster->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_WAND_SCHOOL))
                 if (Item* pItem = playerCaster->GetWeaponForAttack(RANGED_ATTACK))
-                    m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+                    if (pItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+                        m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
     }
 
     if (originalCasterGUID)
