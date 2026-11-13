@@ -503,7 +503,7 @@ class spell_mage_cold_snap : public SpellScript
             SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
             if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
             {
-                SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
+                SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(SpellCooldownKey{ spellInfo->Id, 0 });
                 if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
                     caster->RemoveSpellCooldown(spellInfo->Id, true);
                 else

@@ -690,6 +690,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Enchant Custom Attributes...");
     sSpellMgr->LoadEnchantCustomAttr();
 
+    LOG_INFO("server.loading", "Loading Use Spell Enchantment Spells...");
+    sSpellMgr->LoadUseSpellEnchantmentSpells();
+
     LOG_INFO("server.loading", "Loading linked Spells...");
     sSpellMgr->LoadSpellLinked();
 

@@ -196,6 +196,17 @@ typedef std::unordered_set<SpellModifier*> SpellModContainer;
 
 typedef GuidList WhisperListContainer;
 
+struct SpellCooldownKey
+{
+    uint32 spellId;
+    uint32 itemId;              // 0 for the spell's own cooldown, otherwise the item entry owning it
+
+    bool operator<(SpellCooldownKey const& other) const
+    {
+        return spellId != other.spellId ? spellId < other.spellId : itemId < other.itemId;
+    }
+};
+
 struct SpellCooldown
 {
     uint32 end;
@@ -206,7 +217,7 @@ struct SpellCooldown
     bool needSendToClient: 1;
 };
 
-typedef std::map<uint32, SpellCooldown> SpellCooldowns;
+typedef std::map<SpellCooldownKey, SpellCooldown> SpellCooldowns;
 typedef std::unordered_map<uint32 /*instanceId*/, time_t/*releaseTime*/> InstanceTimeMap;
 
 enum ActionButtonUpdateState
@@ -1821,9 +1832,10 @@ public:
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
     [[nodiscard]] bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const override;
     [[nodiscard]] uint32 GetSpellCooldownDelay(uint32 spell_id) const;
+    [[nodiscard]] uint32 GetSpellItemCooldownDelay(uint32 spell_id, uint32 itemid) const;
     void AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
     void AddSpellCooldown(uint32 spell_id, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
-    void _AddSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);
+    void _AddSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false, bool perItemCooldown = false);
     void ModifySpellCooldown(uint32 spellId, int32 cooldown);
     void SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId = 0, Spell* spell = nullptr, bool setCooldown = true);
     void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
