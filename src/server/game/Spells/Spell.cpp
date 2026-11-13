@@ -1562,6 +1562,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             prevZ = tstZ;
                         }
 
+                        float const prevGround = ground;
                         tstZ = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true);
                         ground = tstZ;
 
@@ -1573,15 +1574,18 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                 {
                                     beforewaterz = prevZ;
                                 }
-                                tstZ = beforewaterz;
+                                // Keep the water entry height, but never below the bottom: in shallow water the
+                                // floor can rise above it and the caster would end up under the ground.
+                                tstZ = std::max(beforewaterz, ground);
                                 srange = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
                                 //LOG_ERROR("spells", "(start was from land) step in water , number of cycle = {} , distance of step = {}, total path = {}, Z = {}", j, srange, totalpath, tstZ);
                             }
                         }
                         else if (map->IsInWater(phasemask, tstX, tstY, tstZ, collisionHeight))
                         {
-                            prevZ = pos.GetPositionZ();
-                            tstZ = pos.GetPositionZ();
+                            // Swim at the starting height, but never below the bottom (shallow water).
+                            prevZ = std::max(pos.GetPositionZ(), prevGround);
+                            tstZ = std::max(pos.GetPositionZ(), ground);
                             srange = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
 
                             inwater = true;
