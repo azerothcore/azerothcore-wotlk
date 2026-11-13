@@ -400,7 +400,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_DETECT_POS_COLLISION, "DetectPosCollision", true);
 
-    SetConfigValue<bool>(CONFIG_RESTRICTED_LFG_CHANNEL, "Channel.RestrictedLfg", true);
+    SetConfigValue<bool>(CONFIG_RESTRICTED_LFG_CHANNEL, "Channel.RestrictedLfg", false);
     SetConfigValue<bool>(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL, "Channel.SilentlyGMJoin", false);
 
     SetConfigValue<bool>(CONFIG_TALENTS_INSPECTING, "TalentsInspecting", true);

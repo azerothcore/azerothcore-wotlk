@@ -4426,10 +4426,12 @@ Chat.MuteTimeFirstLogin = 120
 #
 #    Channel.RestrictedLfg
 #        Description: Restrict LookupForGroup channel to characters registered in the LFG tool.
-#        Default:     1 - (Enabled, Allow join to channel only if registered in LFG)
-#                     0 - (Disabled, Allow join to channel in any time)
+#        Default:     0 - (Disabled, Allow join to channel in any time)
+#                     1 - (Enabled, Allow join to channel only if registered in LFG)
+#        Note:        The client expect the LFG channel to be always available in capital cities.
+#                     If this option is enabled, players will receive a Lua error when visiting a capital city.
 
-Channel.RestrictedLfg = 1
+Channel.RestrictedLfg = 0
 
 #
 #    Channel.SilentlyGMJoin
