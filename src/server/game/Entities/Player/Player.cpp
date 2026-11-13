@@ -35,6 +35,7 @@
 #include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
+#include "ClassMgr.h"
 #include "CombatLogPackets.h"
 #include "Common.h"
 #include "ConditionMgr.h"
@@ -5339,7 +5340,9 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
 
     // Dodge per agility is proportional to crit per agility, which is available from DBC files
     GtChanceToMeleeCritEntry  const* dodgeRatio = sGtChanceToMeleeCritStore.LookupEntry((pclass - 1) * GT_MAX_LEVEL + level - 1);
-    if (!dodgeRatio || pclass > MAX_CLASSES)
+    float const* dodgeBase = GetClassTableRow(dodge_base, pclass - 1);
+    float const* critToDodge = GetClassTableRow(crit_to_dodge, pclass - 1);
+    if (!dodgeRatio || !dodgeBase || !critToDodge)
         return;
 
     /// @todo: research if talents/effects that increase total agility by x% should increase non-diminishing part
@@ -5347,8 +5350,8 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
     float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
 
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
-    diminishing = 100.0f * bonus_agility * dodgeRatio->ratio * crit_to_dodge[pclass - 1];
-    nondiminishing = 100.0f * (dodge_base[pclass - 1] + base_agility * dodgeRatio->ratio * crit_to_dodge[pclass - 1]);
+    diminishing = 100.0f * bonus_agility * dodgeRatio->ratio * *critToDodge;
+    nondiminishing = 100.0f * (*dodgeBase + base_agility * dodgeRatio->ratio * *critToDodge);
 }
 
 float Player::GetSpellCritFromIntellect()
@@ -16458,6 +16461,8 @@ uint32 Player::GetSpec(int8 spec)
             specIdx = spec;
         // find class talent tabs (all players have 3 talent tabs)
         uint32 const* talentTabIds = GetTalentTabPages(getClass());
+        if (!talentTabIds)
+            return 0;
 
         for (uint8 i = 0; i < MAX_TALENT_TABS; ++i)
         {
