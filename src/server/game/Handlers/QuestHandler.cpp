@@ -283,6 +283,10 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
         {
             _player->RewardQuest(quest, reward, object);
 
+            if (Battleground* bg = _player->GetBattleground())
+                if (bg->GetBgTypeID(true) == BATTLEGROUND_AV)
+                    bg->ToBattlegroundAV()->HandleQuestComplete(questId, _player);
+
             // Special dialog status update (client does not query this)
             if (!quest->GetQuestMethod())
             {
@@ -500,10 +504,6 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
                            _player->GetName(), _player->GetGUID().ToString(), questId);
             return;
         }
-
-        if (Battleground* bg = _player->GetBattleground())
-            if (bg->GetBgTypeID(true) == BATTLEGROUND_AV)
-                bg->ToBattlegroundAV()->HandleQuestComplete(questId, _player);
 
         if (_player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE)
         {
