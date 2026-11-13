@@ -1682,7 +1682,11 @@ public:
         loot.clear();
         loot.items.reserve(MAX_NR_LOOT_ITEMS);
         loot.quest_items.reserve(MAX_NR_QUEST_ITEMS);
-        tab->Process(loot, store, LOOT_MODE_DEFAULT, player);
+
+        // Filter by the looter's conditions only for loot types that are always personal loot.
+        // Creature loot never is, and gameobject and reference loot depend on the looter's group.
+        bool personal = type != "creature" && type != "gameobject" && type != "reference";
+        tab->Process(loot, store, LOOT_MODE_DEFAULT, player, 0, true, personal);
 
         if (type == "creature")
         {
