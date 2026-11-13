@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "StringConvert.h"
 #include "World.h"
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 
@@ -59,6 +60,12 @@ typedef std::unique_ptr<FILE, FileCloser> FileHandle;
 inline FileHandle GetFileHandle(char const* path, char const* mode)
 {
     return FileHandle(fopen(path, mode), FileCloser());
+}
+
+// operator/ inserts a native separator only when the directory lacks a trailing one
+inline std::filesystem::path GetDumpDir()
+{
+    return std::filesystem::path(sWorld->getStringConfig(CONFIG_PDUMP_DIR));
 }
 
 struct BaseTable
@@ -721,14 +728,29 @@ DumpReturn PlayerDumpWriter::WriteDumpToFile(std::string const& file, ObjectGuid
         if (strchr(file.c_str(), '\\') || strchr(file.c_str(), '/'))
             return DUMP_FILE_OPEN_ERROR;
 
+    std::filesystem::path const dir = GetDumpDir();
+    std::string const path = (dir / file).string();
+
+    if (!dir.empty())
+    {
+        std::error_code ec;
+        std::filesystem::create_directories(dir, ec);
+        if (ec)
+        {
+            LOG_ERROR("misc", "PlayerDumpWriter: Unable to create dump directory '{}': {}",
+                dir.string(), ec.message());
+            return DUMP_FILE_OPEN_ERROR;
+        }
+    }
+
     if (sWorld->getBoolConfig(CONFIG_PDUMP_NO_OVERWRITE))
     {
         // check if file exists already
-        if (GetFileHandle(file.c_str(), "r"))
+        if (GetFileHandle(path.c_str(), "r"))
             return DUMP_FILE_OPEN_ERROR;
     }
 
-    FileHandle fout = GetFileHandle(file.c_str(), "w");
+    FileHandle fout = GetFileHandle(path.c_str(), "w");
     if (!fout)
         return DUMP_FILE_OPEN_ERROR;
 
@@ -989,7 +1011,7 @@ DumpReturn PlayerDumpReader::LoadDumpFromString(std::string const& dump, uint32 
 
 DumpReturn PlayerDumpReader::LoadDumpFromFile(std::string const& file, uint32 account, std::string name, ObjectGuid::LowType guid)
 {
-    std::ifstream input(file);
+    std::ifstream input(GetDumpDir() / file);
     if (!input)
         return DUMP_FILE_OPEN_ERROR;
     return LoadDump(input, account, name, guid);
