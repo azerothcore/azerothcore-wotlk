@@ -327,6 +327,8 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
             pet->NearTeleportTo(plMover->GetPositionX(), plMover->GetPositionY(), plMover->GetPositionZ(), pet->GetOrientation());
     }
 
+    plMover->TeleportControllableGuardiansToSelf();
+
     if (oldPos.GetExactDist2d(plMover) > 100.0f)
     {
         uint32 newzone, newarea;

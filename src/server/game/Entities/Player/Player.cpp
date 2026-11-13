@@ -14679,6 +14679,41 @@ bool Player::CanResummonPet(uint32 spellid)
     return HasSpell(spellid);
 }
 
+void Player::TeleportControllableGuardiansToSelf()
+{
+    // Controllable guardians (e.g. temporary Water Elemental) are not covered by GetPet().
+    // Everything stays behind the distance check so short teleports like Blink leave them untouched.
+    std::vector<Unit*> controlled(m_Controlled.begin(), m_Controlled.end());
+    for (Unit* unit : controlled)
+    {
+        if (!unit->IsInWorld() || !unit->IsAlive() || unit->GetMap() != GetMap())
+            continue;
+
+        if (unit->IsPet() || !unit->IsControllableGuardian())
+            continue;
+
+        CharmInfo* charmInfo = unit->GetCharmInfo();
+        if (!charmInfo || unit->IsWithinDist3d(this, GetMap()->GetVisibilityRange() - 5.0f))
+            continue;
+
+        unit->AttackStop();
+        unit->InterruptNonMeleeSpells(false);
+        unit->ClearInPetCombat();
+        unit->NearTeleportTo(GetPositionX(), GetPositionY(), GetPositionZ(), unit->GetOrientation());
+        unit->GetMotionMaster()->MoveFollow(this, PET_FOLLOW_DIST, unit->GetFollowAngle());
+
+        charmInfo->SetCommandState(COMMAND_FOLLOW);
+        charmInfo->SetIsCommandAttack(false);
+        charmInfo->SetIsAtStay(false);
+        charmInfo->SetIsReturning(true);
+        charmInfo->SetIsCommandFollow(true);
+        charmInfo->SetIsFollowing(false);
+        charmInfo->RemoveStayPosition();
+        charmInfo->SetForcedSpell(0);
+        charmInfo->SetForcedTargetGUID();
+    }
+}
+
 bool Player::CanSeeSpellClickOn(Creature const* c) const
 {
     if (!c->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
