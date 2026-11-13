@@ -208,7 +208,7 @@ enum ProcFlagsExLegacy
     PROC_EX_DEFLECT             = 0x0000200,
     PROC_EX_ABSORB              = 0x0000400,
     PROC_EX_REFLECT             = 0x0000800,
-    PROC_EX_INTERRUPT           = 0x0001000,                 // Melee hit result can be Interrupt (not used)
+    PROC_EX_INTERRUPT           = 0x0001000,                 // Same bit as PROC_HIT_INTERRUPT
     PROC_EX_FULL_BLOCK          = 0x0002000,                 // block all attack damage
     PROC_EX_RESERVED2           = 0x0004000,
     PROC_EX_NOT_ACTIVE_SPELL    = 0x0008000,                 // Spell mustn't do damage/heal to proc
@@ -266,9 +266,9 @@ enum ProcFlagsHit
     PROC_HIT_DEFLECT             = 0x0000200,
     PROC_HIT_ABSORB              = 0x0000400, // partial or full absorb
     PROC_HIT_REFLECT             = 0x0000800,
-    PROC_HIT_INTERRUPT           = 0x0001000, // (not used atm)
+    PROC_HIT_INTERRUPT           = 0x0001000, // set per target when SPELL_EFFECT_INTERRUPT_CAST interrupted a cast
     PROC_HIT_FULL_BLOCK          = 0x0002000,
-    PROC_HIT_MASK_ALL            = 0x0002FFF,
+    PROC_HIT_MASK_ALL            = 0x0003FFF,
 };
 
 enum ProcAttributes
