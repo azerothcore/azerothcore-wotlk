@@ -433,6 +433,15 @@ Guardian::Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner) : 
 
 void Guardian::InitStats(uint32 duration)
 {
+    // The Gargoyle's SummonProperties are not PET, so the constructor never marks it
+    // controllable and /petattack does nothing. Must be set before Minion::InitStats below,
+    // which is what calls SetMinion. It still auto-targets when no command was issued.
+    if (GetEntry() == NPC_EBON_GARGOYLE && !IsControllableGuardian())
+    {
+        AddUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN);
+        InitCharmInfo();
+    }
+
     Minion::InitStats(duration);
 
     if (Unit* m_owner = GetOwner())
