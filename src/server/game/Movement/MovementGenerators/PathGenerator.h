@@ -26,6 +26,7 @@
 #include "SharedDefines.h"
 #include <G3D/Vector3.h>
 
+struct LiquidData;
 class Unit;
 class WorldObject;
 
@@ -81,6 +82,8 @@ class PathGenerator
         void SetUseStraightPath(bool useStraightPath) { _useStraightPath = useStraightPath; }
         void SetPathLengthLimit(float distance) { _pointPathLimit = std::min<uint32>(uint32(distance/SMOOTH_PATH_STEP_SIZE), MAX_POINT_PATH_LENGTH); }
         void SetUseRaycast(bool useRaycast) { _useRaycast = useRaycast; }
+        void SetNavTerrainCost(NavTerrain terrain, float cost) { _filter.setAreaCost(terrain, cost); }
+        void SetExcludeFlags(uint16 flags) { _filter.setExcludeFlags(flags); }
 
         // result getters
         [[nodiscard]] G3D::Vector3 const& GetStartPosition() const { return _startPosition; }
@@ -168,6 +171,8 @@ class PathGenerator
         void BuildShortcut();
 
         [[nodiscard]] NavTerrain GetNavTerrain(float x, float y, float z) const;
+        [[nodiscard]] static NavTerrain GetNavTerrain(LiquidData const& liquidData);
+        [[nodiscard]] bool IsHeadlessSource() const;
         void CreateFilter();
         void UpdateFilter();
 

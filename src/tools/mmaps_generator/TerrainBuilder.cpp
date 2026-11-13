@@ -80,6 +80,8 @@ struct map_liquidHeader
 #define MAP_LIQUID_TYPE_SLIME       0x08
 #define MAP_LIQUID_TYPE_DARK_WATER  0x10
 
+uint32 GetLiquidFlags(uint32 liquidId);
+
 namespace MMAP
 {
     static char const* const MAP_FILE_NAME_FORMAT  = "{}/{:03}{:02}{:02}.map";
@@ -424,29 +426,18 @@ namespace MMAP
                 }
                 else
                 {
+                    // the extractor ORs dark water onto the liquid type (ocean | dark water), so test bits
                     liquidType = getLiquidType(i, liquid_flags);
-                    switch (liquidType)
-                    {
-                        default:
-                            useLiquid = false;
-                            break;
-                        case MAP_LIQUID_TYPE_WATER:
-                        case MAP_LIQUID_TYPE_OCEAN:
-                            // merge different types of water
-                            liquidType = NAV_WATER;
-                            break;
-                        case MAP_LIQUID_TYPE_MAGMA:
-                            liquidType = NAV_MAGMA;
-                            break;
-                        case MAP_LIQUID_TYPE_SLIME:
-                            liquidType = NAV_SLIME;
-                            break;
-                        case MAP_LIQUID_TYPE_DARK_WATER:
-                            // players should not be here, so logically neither should creatures
-                            useTerrain = false;
-                            useLiquid = false;
-                            break;
-                    }
+                    if (liquidType & MAP_LIQUID_TYPE_MAGMA)
+                        liquidType = NAV_MAGMA;
+                    else if (liquidType & MAP_LIQUID_TYPE_SLIME)
+                        liquidType = NAV_SLIME;
+                    else if (liquidType & MAP_LIQUID_TYPE_DARK_WATER)
+                        liquidType = NAV_DEEP_WATER;
+                    else if (liquidType & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN))
+                        liquidType = NAV_WATER; // merge different types of water
+                    else
+                        useLiquid = false;
                 }
 
                 // if there is no terrain, don't use terrain
@@ -750,19 +741,14 @@ namespace MMAP
                         float* data = liquid->GetHeightStorage();
                         uint8 type = NAV_EMPTY;
 
-                        switch (liquid->GetType() & 3)
-                        {
-                            case 0:
-                            case 1:
-                                type = NAV_WATER;
-                                break;
-                            case 2:
-                                type = NAV_MAGMA;
-                                break;
-                            case 3:
-                                type = NAV_SLIME;
-                                break;
-                        }
+                        // GetType() is a LiquidType.dbc id
+                        uint32 liquidFlags = GetLiquidFlags(liquid->GetType());
+                        if (liquidFlags & MAP_LIQUID_TYPE_MAGMA)
+                            type = NAV_MAGMA;
+                        else if (liquidFlags & MAP_LIQUID_TYPE_SLIME)
+                            type = NAV_SLIME;
+                        else if (liquidFlags & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN))
+                            type = NAV_WATER;
 
                         // indexing is weird...
                         // after a lot of trial and error, this is what works:
