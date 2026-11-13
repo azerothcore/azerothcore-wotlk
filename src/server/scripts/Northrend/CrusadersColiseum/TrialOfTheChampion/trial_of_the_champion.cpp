@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "trial_of_the_champion.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "trial_of_the_champion.h"
 
-enum Texts
+enum GossipIds
 {
     NPC_TEXT_NOT_MOUNTED_H = 15043,  // Horde text
     NPC_TEXT_NOT_MOUNTED_A = 14757,  // Alliance text
@@ -39,115 +39,66 @@ enum Texts
 
 };
 
-class npc_announcer_toc5 : public CreatureScript
+struct npc_announcer_toc5 : public CreatureAI
 {
-public:
-    npc_announcer_toc5() : CreatureScript("npc_announcer_toc5") {}
+    npc_announcer_toc5(Creature* creature) : CreatureAI(creature), _instance(creature->GetInstanceScript()) { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    void Reset() override
     {
-        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
-            return true;
+        if (!_instance)
+            return;
 
-        InstanceScript* pInstance = creature->GetInstanceScript();
-        if (!pInstance)
-            return true;
+        if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE)
+            me->UpdateEntry(NPC_ARELAS);
 
-        uint32 gossipTextId = 0;
-        switch (pInstance->GetData(DATA_INSTANCE_PROGRESS))
-        {
-            case INSTANCE_PROGRESS_INITIAL:
-                if (!player->GetVehicle())
-                {
-                    if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
-                        gossipTextId = NPC_TEXT_NOT_MOUNTED_H;
-                    else
-                        gossipTextId = NPC_TEXT_NOT_MOUNTED_A;
-                }
-                else
-                {
-                    gossipTextId = NPC_TEXT_CHALLENGE_1;
-                    AddGossipItemFor(player, GOSSIP_MENU_STAGE, GOSSIP_START_EVENT_1A, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    AddGossipItemFor(player, GOSSIP_MENU_STAGE, GOSSIP_START_EVENT_1B, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                }
-                break;
-            case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
-                gossipTextId = NPC_TEXT_CHALLENGE_2;
-                AddGossipItemFor(player, GOSSIP_MENU_STAGE, GOSSIP_START_EVENT_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                break;
-            case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
-                gossipTextId = NPC_TEXT_CHALLENGE_3;
-                AddGossipItemFor(player, GOSSIP_MENU_STAGE, GOSSIP_START_EVENT_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                break;
-            default:
-                return true;
-        }
-        SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
-        return true;
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); // removed during the black knight scene
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/,
+        SpellSchoolMask /*damageSchoolMask*/) override
     {
-        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
-            return true;
+        if (damage >= me->GetHealth()) // for the bk scene so strangulate doesn't kill him
+            damage = me->GetHealth() - 1;
+    }
 
-        InstanceScript* pInstance = creature->GetInstanceScript();
-        if (!pInstance)
-            return true;
+    void MovementInform(uint32 type, uint32 /*id*/) override
+    {
+        if (type != EFFECT_MOTION_TYPE)
+            return;
 
-        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1 || uiAction == GOSSIP_ACTION_INFO_DEF + 2 || uiAction == GOSSIP_ACTION_INFO_DEF + 3 || uiAction == GOSSIP_ACTION_INFO_DEF + 4)
+        if (!_instance)
+            return;
+
+        if (_instance->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED)
+            return;
+
+        me->KillSelf(); // for the bk scene, die after knockback
+    }
+
+    void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+    {
+        if (!me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+            return;
+
+        if (!_instance)
+            return;
+
+        if (gossipListId <= GOSSIP_START_EVENT_1B)
         {
-            pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF + 2 ? 1 : 0));
-            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            _instance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, gossipListId == GOSSIP_START_EVENT_1B ? 1 : 0);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         CloseGossipMenuFor(player);
-        return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetTrialOfTheChampionAI<npc_announcer_toc5AI>(creature);
-    }
+    void UpdateAI(uint32 /*diff*/) override { }
 
-    struct npc_announcer_toc5AI : public CreatureAI
-    {
-        npc_announcer_toc5AI(Creature* creature) : CreatureAI(creature) {}
-
-        void Reset() override
-        {
-            InstanceScript* pInstance = me->GetInstanceScript();
-            if (!pInstance)
-                return;
-            if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE )
-                me->UpdateEntry(NPC_ARELAS);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); // removed during black knight scene
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth()) // for bk scene so strangulate doesn't kill him
-                damage = me->GetHealth() - 1;
-        }
-
-        void MovementInform(uint32 type, uint32 /*id*/) override
-        {
-            if (type != EFFECT_MOTION_TYPE)
-                return;
-            InstanceScript* pInstance = me->GetInstanceScript();
-            if (!pInstance)
-                return;
-            if (pInstance->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED)
-                return;
-
-            me->KillSelf(); // for bk scene, die after knockback
-        }
-
-        void UpdateAI(uint32 /*diff*/) override { }
-    };
+private:
+    InstanceScript* _instance;
 };
 
 void AddSC_trial_of_the_champion()
 {
-    new npc_announcer_toc5();
+    RegisterTrialOfTheChampionCreatureAI(npc_announcer_toc5);
 }
