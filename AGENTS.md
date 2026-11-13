@@ -15,7 +15,7 @@ AzerothCore is a C++ MMORPG server emulator for World of Warcraft 3.3.5a (WotLK)
 
 Read the matching doc(s) BEFORE starting the task:
 
-- Compiling, configuring, or running tests → `.agents/docs/build.md`
+- Compiling, configuring, or running tests, plan-given commands included → `.agents/docs/build.md`
 - Writing or modifying C++ → `.agents/docs/cpp-guidelines.md`
   - Script work (under `src/server/scripts/`) → also `.agents/docs/cpp-scripts.md`
 - Creating or modifying SQL → `.agents/docs/sql-guidelines.md`
