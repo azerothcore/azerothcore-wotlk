@@ -155,9 +155,9 @@ struct boss_solakar_flamewreath : public BossAI
         DoZoneInCombat(nullptr, 100.0f);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(SPELL_WAR_STOMP, 17s, 20s);
         resetTimer = 0;
     }

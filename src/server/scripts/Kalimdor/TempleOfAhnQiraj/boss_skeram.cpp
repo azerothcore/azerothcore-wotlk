@@ -145,7 +145,7 @@ struct boss_skeram : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.Reset();
 
         events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 6s, 12s);

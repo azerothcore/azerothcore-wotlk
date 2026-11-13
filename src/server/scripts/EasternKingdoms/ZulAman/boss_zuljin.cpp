@@ -150,9 +150,9 @@ struct boss_zuljin : public BossAI
             formation->RespawnFormation(true);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         DoZoneInCombat();
 
         Talk(SAY_INTRO);

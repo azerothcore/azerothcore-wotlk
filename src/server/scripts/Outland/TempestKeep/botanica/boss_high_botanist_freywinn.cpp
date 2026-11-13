@@ -49,11 +49,11 @@ struct boss_high_botanist_freywinn : public BossAI
 {
     boss_high_botanist_freywinn(Creature* creature) : BossAI(creature, DATA_HIGH_BOTANIST_FREYWINN) { }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         scheduler.ClearValidator();
 
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(6s, [this](TaskContext context)

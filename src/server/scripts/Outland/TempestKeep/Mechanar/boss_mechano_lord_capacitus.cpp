@@ -51,9 +51,9 @@ struct boss_mechano_lord_capacitus : public BossAI
 {
     boss_mechano_lord_capacitus(Creature* creature) : BossAI(creature, DATA_MECHANOLORD_CAPACITUS) { }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         scheduler.Schedule(6s, [this](TaskContext context)

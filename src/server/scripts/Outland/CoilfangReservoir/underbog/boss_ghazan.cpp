@@ -57,7 +57,7 @@ struct boss_ghazan : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         scheduler.Schedule(3s, [this](TaskContext context)
         {
@@ -73,7 +73,7 @@ struct boss_ghazan : public BossAI
             context.Repeat(7s, 9s);
         });
 
-        _JustEngagedWith();
+        _JustEngagedWith(who);
     }
 
     void DoAction(int32 type) override

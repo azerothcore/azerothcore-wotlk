@@ -64,10 +64,10 @@ struct boss_kelidan_the_breaker : public BossAI
         DoCastSelf(SPELL_EVOCATION);
     }
 
-    void JustEngagedWith(Unit*  /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_WAKE);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         me->InterruptNonMeleeSpells(false);
 
         scheduler.Schedule(1s, [this](TaskContext context)

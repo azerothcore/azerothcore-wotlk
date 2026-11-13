@@ -57,9 +57,9 @@ struct boss_darkweaver_syth : public BossAI
         });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         scheduler.Schedule(2s, [this](TaskContext context)
         {

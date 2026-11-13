@@ -128,7 +128,7 @@ struct boss_murmur : public BossAI
     {
         // Boss engages mobs during roleplay, this checks prevents it from setting the zone in combat before players engage it.
         if (who->IsControlledByPlayer())
-            _JustEngagedWith();
+            _JustEngagedWith(who);
 
         scheduler.Schedule(28s, [this](TaskContext context)
         {

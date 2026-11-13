@@ -51,9 +51,9 @@ struct boss_magmadar : public BossAI
 {
     boss_magmadar(Creature* creature) : BossAI(creature, DATA_MAGMADAR) {}
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         events.ScheduleEvent(EVENT_FRENZY, 8500ms);
         events.ScheduleEvent(EVENT_PANIC, 9500ms);
         events.ScheduleEvent(EVENT_LAVA_BOMB, 12s);
