@@ -3,12 +3,25 @@ on:
   push:
     branches:
       - 'master'
+    # Skip when every changed file is docs or non-build GitHub config. A
+    # filtered-out workflow never starts, so it can't cancel an in-progress
+    # run for the same ref either.
+    paths-ignore:
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/FUNDING.yml'
+      - '.github/labeler.yml'
   pull_request:
     types:
       - opened
       - reopened
       - synchronize
       - ready_for_review
+    paths-ignore:
+      - '**/*.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/FUNDING.yml'
+      - '.github/labeler.yml'
 
 concurrency:
   # One concurrency group per workflow + ref.
