@@ -544,6 +544,22 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask[2] = 0x8000000;
     });
 
+    // Retribution Aura - damage shield hits cannot miss
+    ApplySpellFix({
+        7294,   // Retribution Aura (Rank 1)
+        10298,  // Retribution Aura (Rank 2)
+        10299,  // Retribution Aura (Rank 3)
+        10300,  // Retribution Aura (Rank 4)
+        10301,  // Retribution Aura (Rank 5)
+        27150,  // Retribution Aura (Rank 6)
+        54043,  // Retribution Aura (Rank 7)
+        8990,   // Retribution Aura (NPC)
+        13008   // Retribution Aura (NPC)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_NO_ATTACK_MISS;
+    });
+
     // Seal of Light trigger
     ApplySpellFix({ 20167 }, [](SpellInfo* spellInfo)
     {
@@ -4731,13 +4747,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
-    // Conjure Refreshment Table (Rank 1, Rank 2)
-    ApplySpellFix({ 43985, 58661 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_FRONT);
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
-    });
-
     ApplySpellFix({
         698, // Ritual of Summoning (portal for clicking)
         61993 // Ritual of Summoning (summons the closet)
@@ -4874,21 +4883,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_UNK;
-    });
-
-    // Life Tap
-    ApplySpellFix({ 1454 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
-    });
-
-    // Life Tap
-    ApplySpellFix({ 1455, 1456, 11687, 11688, 11689, 27222, 57946 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
-        spellInfo->MaxLevel = 16;
-        spellInfo->BaseLevel = 6;
-        spellInfo->SpellLevel = 6;
     });
 
     // Explosive Sheep
@@ -5251,6 +5245,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 64145 }, [](SpellInfo* spellInfo)
     {
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+    });
+
+    // Oil of Immolation
+    ApplySpellFix({ 11350 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
+        spellInfo->CategoryEntry = sSpellCategoryStore.LookupEntry(79);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

@@ -101,12 +101,6 @@ enum RazorscaleEvents
     EVENT_FUSE_ARMOR,
     EVENT_RESUME_CHASE,
 
-    EVENT_BUILD_HARPOON_1,
-    EVENT_BUILD_HARPOON_2,
-    EVENT_BUILD_HARPOON_3,
-    EVENT_BUILD_HARPOON_4,
-    EVENT_DESTROY_HARPOONS,
-
     EVENT_START_COMBAT,
     EVENT_HEROIC_STRIKE,
     EVENT_BATTLE_SHOUT,
@@ -121,17 +115,13 @@ enum RazorscaleActions
     ACTION_START_FIGHT = 1,
     ACTION_GROUND_PHASE,
     ACTION_START_PERMA_GROUND,
-    ACTION_BUILD_HARPOON_1,
-    ACTION_BUILD_HARPOON_2,
-    ACTION_BUILD_HARPOON_3,
-    ACTION_BUILD_HARPOON_4,
-    ACTION_DESTROY_HARPOONS,
     ACTION_STOP_CONTROLLERS,
     ACTION_ENGINEER_DEAD,
 
     // Harpoon fire state actions
-    ACTION_FIRE_STATE_RESET,
+    ACTION_FIRE_STATE_BREAK,
     ACTION_FIRE_STATE_REPAIR,
+    ACTION_FIRE_STATE_CLEANUP,
 };
 
 enum RazorscalePhases
@@ -163,7 +153,11 @@ enum RazorscaleMisc
 
     // Harpoon fire state data
     FIRE_STATE_REPAIR       = 2,
-    FIRE_STATE_MAX_PROGRESS = 25
+    FIRE_STATE_BURNING      = 3,
+    FIRE_STATE_MAX_PROGRESS = 25,
+
+    // Harpoon turret positions, one per NPC_HARPOON_FIRE_STATE
+    MAX_TURRETS             = 4
 };
 
 enum RazorscaleSays
@@ -191,6 +185,58 @@ static Position const HarpoonPositions[4] = {
     {559.1199f, -140.5058f, 391.1803f, 5.061456f},
     {606.2297f, -136.7212f, 391.1803f, 4.537859f}
 };
+
+// the turret position a fire state stands at; the positions are 18+ yd apart
+static uint8 TurretIndexAt(Position const& pos)
+{
+    uint8 index = 0;
+    float nearest = std::numeric_limits<float>::max();
+
+    for (uint8 i = 0; i < MAX_TURRETS; ++i)
+    {
+        float dist = pos.GetExactDist2dSq(BrokenHarpoonPos[i]);
+        if (dist < nearest)
+        {
+            nearest = dist;
+            index = i;
+        }
+    }
+
+    return index;
+}
+
+// gun entry per position, by raid size
+static uint32 HarpoonEntry(uint8 index, bool is25ManRaid)
+{
+    if (is25ManRaid)
+    {
+        switch (index)
+        {
+            case 0:
+                return GO_RAZOR_HARPOON_3;
+            case 1:
+                return GO_RAZOR_HARPOON_1;
+            case 2:
+                return GO_RAZOR_HARPOON_2;
+            case 3:
+                return GO_RAZOR_HARPOON_4;
+            default:
+                break;
+        }
+    }
+
+    switch (index)
+    {
+        case 0:
+            return GO_RAZOR_HARPOON_1;
+        case 1:
+            return GO_RAZOR_HARPOON_2;
+        default:
+            break;
+    }
+
+    return 0;
+}
 
 static Position const DefenderPositions[6] = {
     {624.3065f, -154.4163f, 391.6442f, 0.0f},
@@ -309,6 +355,8 @@ struct boss_razorscale : public BossAI
                     summons.DoAction(ACTION_START_PERMA_GROUND, commanderPred);
                     EntryCheckPredicate engineerPred(NPC_EXPEDITION_ENGINEER);
                     summons.DoAction(ACTION_START_PERMA_GROUND, engineerPred);
+                    EntryCheckPredicate fireStatePred(NPC_HARPOON_FIRE_STATE);
+                    summons.DoAction(ACTION_START_PERMA_GROUND, fireStatePred);
                 }
                 events.ScheduleEvent(EVENT_RESUME_CHASE, 1s);
                 ScheduleGroundEvents();
@@ -407,6 +455,15 @@ struct boss_razorscale : public BossAI
             summon->AI()->SetData(0, _defenderCnt++);
         else if (summon->GetEntry() == NPC_EXPEDITION_TRAPPER)
             summon->AI()->SetData(0, _trapperCnt++);
+    }
+
+    void SummonedCreatureDespawn(Creature* summon) override
+    {
+        // a turret keeps its own parts, so they go with it
+        if (summon->GetEntry() == NPC_HARPOON_FIRE_STATE)
+            summon->AI()->DoAction(ACTION_FIRE_STATE_CLEANUP);
+
+        BossAI::SummonedCreatureDespawn(summon);
     }
 
     void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
@@ -535,6 +592,10 @@ struct boss_razorscale : public BossAI
                     break;
                 case EVENT_RESUME_AIR:
                 {
+                    // the fire is up, so the turrets break before the engineers go out again
+                    EntryCheckPredicate fireStatePred(NPC_HARPOON_FIRE_STATE);
+                    summons.DoAction(ACTION_FIRE_STATE_BREAK, fireStatePred);
+
                     me->SetDisableGravity(true);
                     events.SetPhase(PHASE_AIR);
                     me->SetReactState(REACT_PASSIVE);
@@ -582,79 +643,26 @@ struct npc_expedition_commander : public ScriptedAI
 {
     explicit npc_expedition_commander(Creature* creature) :
         ScriptedAI(creature),
-        _instance(creature->GetInstanceScript()),
-        _is25(Is25ManRaid()),
-        _building(false),
-        _destroyCd(false),
-        _stopCtrl(false),
-        _started(false)
+        _stopCtrl(false)
     { }
 
     void Reset() override
     {
-        _events.Reset();
-        _started = false;
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-        BuildBrokenHarpoons();
-    }
-
-    void BuildBrokenHarpoons()
-    {
-        uint8 n = _is25 ? 4 : 2;
-        for (uint8 i = 0; i < n; ++i)
-            me->SummonGameObject(GO_RAZOR_BROKEN_HARPOON, BrokenHarpoonPos[i].GetPositionX(), BrokenHarpoonPos[i].GetPositionY(), BrokenHarpoonPos[i].GetPositionZ(),
-                BrokenHarpoonPos[i].GetOrientation(), 0.0f, 0.0f, -0.8987932f, 0.4383728f, 0);
     }
 
     void DoAction(int32 action) override
     {
-        if (_building && action != ACTION_ENGINEER_DEAD)
-            return;
-
         switch (action)
         {
-            case ACTION_START_FIGHT:
-                _started = true;
-                break;
             case ACTION_GROUND_PHASE:
                 Talk(1);
                 break;
             case ACTION_ENGINEER_DEAD:
                 Talk(2);
-                _events.Reset();
-                _building = false;
-                break;
-            case ACTION_BUILD_HARPOON_1:
-                _building = true;
-                BuildHarpoon(0);
-                _building = false;
-                break;
-            case ACTION_BUILD_HARPOON_2:
-                _building = true;
-                BuildHarpoon(1);
-                _building = false;
-                break;
-            case ACTION_BUILD_HARPOON_3:
-                _building = true;
-                BuildHarpoon(2);
-                _building = false;
-                break;
-            case ACTION_BUILD_HARPOON_4:
-                _building = true;
-                BuildHarpoon(3);
-                _building = false;
                 break;
             case ACTION_START_PERMA_GROUND:
-                _started = false;
-                _events.Reset();
                 StopControllers();
-                DestroyHarpoons();
-                break;
-            case ACTION_DESTROY_HARPOONS:
-                if (_destroyCd)
-                    return;
-                _destroyCd = true;
-                DestroyHarpoons();
                 break;
             case ACTION_STOP_CONTROLLERS:
                 if (_stopCtrl)
@@ -667,17 +675,6 @@ struct npc_expedition_commander : public ScriptedAI
         }
     }
 
-    void DestroyHarpoons()
-    {
-        for (ObjectGuid guid : _harpoonGUIDs)
-            if (GameObject* harpoon = ObjectAccessor::GetGameObject(*me, guid))
-                harpoon->RemoveFromWorld();
-
-        _harpoonGUIDs.clear();
-        BuildBrokenHarpoons();
-        _events.ScheduleEvent(EVENT_DESTROY_HARPOONS, 10s);
-    }
-
     void StopControllers()
     {
         std::list<Creature*> creatureList;
@@ -685,55 +682,6 @@ struct npc_expedition_commander : public ScriptedAI
         for (Creature* controller : creatureList)
             controller->InterruptNonMeleeSpells(false);
         _stopCtrl = false;
-    }
-
-    void BuildHarpoon(uint8 index)
-    {
-        if (GameObject* harpoon = me->SummonGameObject(HarpoonEntry(index), HarpoonPositions[index].GetPositionX(), HarpoonPositions[index].GetPositionY(),
-                HarpoonPositions[index].GetPositionZ(), HarpoonPositions[index].GetOrientation(), 0.0f, 0.0f, -0.573576f, 0.8191524f, 0))
-            _harpoonGUIDs.push_back(harpoon->GetGUID());
-    }
-
-    uint32 HarpoonEntry(uint8 index) const
-    {
-        if (_is25)
-        {
-            switch (index)
-            {
-                case 0:
-                    return GO_RAZOR_HARPOON_3;
-                case 1:
-                    return GO_RAZOR_HARPOON_1;
-                case 2:
-                    return GO_RAZOR_HARPOON_2;
-                case 3:
-                    return GO_RAZOR_HARPOON_4;
-                default:
-                    break;
-            }
-        }
-        switch (index)
-        {
-            case 0:
-                return GO_RAZOR_HARPOON_1;
-            case 1:
-                return GO_RAZOR_HARPOON_2;
-            default:
-                break;
-        }
-        return 0;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!_started)
-            return;
-        _events.Update(diff);
-        while (uint32 eventId = _events.ExecuteEvent())
-        {
-            if (eventId == EVENT_DESTROY_HARPOONS)
-                _destroyCd = false;
-        }
     }
 
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
@@ -756,10 +704,7 @@ struct npc_expedition_commander : public ScriptedAI
     }
 
 private:
-    InstanceScript* _instance;
-    GuidVector _harpoonGUIDs;
-    EventMap _events;
-    bool _is25, _building, _destroyCd, _stopCtrl, _started;
+    bool _stopCtrl;
 };
 
 struct npc_expedition_defender : public ScriptedAI
@@ -880,12 +825,15 @@ struct npc_expedition_engineer : public NullCreatureAI
             me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
         }
         else if (action == ACTION_START_PERMA_GROUND)
-        {
-            _state = 0;
-            _harpoonGUID.Clear();
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
-            me->GetMotionMaster()->MoveTargetedHome();
-        }
+            StopRepairing();
+    }
+
+    void StopRepairing()
+    {
+        _state = 0;
+        _harpoonGUID.Clear();
+        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+        me->GetMotionMaster()->MoveTargetedHome();
     }
 
     [[nodiscard]] bool IsEast() const
@@ -905,7 +853,13 @@ struct npc_expedition_engineer : public NullCreatureAI
             {
                 if (Creature* fireState = ObjectAccessor::GetCreature(*me, _harpoonGUID))
                 {
-                    if (me->GetExactDist2dSq(fireState) <= 25.0f)
+                    // caught fire: let it burn out
+                    if (fireState->AI()->GetData(FIRE_STATE_BURNING))
+                    {
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+                        _harpoonGUID.Clear();
+                    }
+                    else if (me->GetExactDist2dSq(fireState) <= 25.0f)
                     {
                         if (me->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_STATE_WORK)
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_WORK);
@@ -918,37 +872,45 @@ struct npc_expedition_engineer : public NullCreatureAI
                             _harpoonGUID.Clear();
                     }
                 }
+                else
+                    _harpoonGUID.Clear(); // gone, pick another
             }
             if (!_harpoonGUID)
             {
                 Creature* razorscale = _instance->GetCreature(BOSS_RAZORSCALE);
                 if (!razorscale || !razorscale->IsInCombat() || razorscale->AI()->GetData(DATA_PERMA_GROUND))
                 {
-                    _state = 0;
-                    me->GetMotionMaster()->MoveTargetedHome();
+                    StopRepairing();
                     return;
                 }
                 std::list<Creature*> fireStates;
                 me->GetCreaturesWithEntryInRange(fireStates, 300.0f, NPC_HARPOON_FIRE_STATE);
                 fireStates.sort([](Creature const* first, Creature const* second) { return first->GetPositionX() < second->GetPositionX(); });
+                bool burning = false;
                 for (Creature* fireState : fireStates)
                 {
-                    if (!fireState->AI()->GetData(FIRE_STATE_REPAIR))
+                    if (fireState->AI()->GetData(FIRE_STATE_REPAIR))
+                        continue;
+
+                    // burning yet: keep waiting
+                    if (fireState->AI()->GetData(FIRE_STATE_BURNING))
                     {
-                        float ang = rand_norm() * M_PI;
-                        me->GetMotionMaster()->MovePoint(0, fireState->GetPositionX() + 3.0f * cos(ang), fireState->GetPositionY() + 3.0f * std::sin(ang), fireState->GetPositionZ());
-                        _harpoonGUID = fireState->GetGUID();
-                        return;
+                        burning = true;
+                        continue;
                     }
+
+                    float ang = rand_norm() * M_PI;
+                    me->GetMotionMaster()->MovePoint(0, fireState->GetPositionX() + 3.0f * cos(ang), fireState->GetPositionY() + 3.0f * std::sin(ang), fireState->GetPositionZ());
+                    _harpoonGUID = fireState->GetGUID();
+                    return;
                 }
-                _state = 0;
-                me->GetMotionMaster()->MoveTargetedHome();
+                // all repaired, or all remaining ones burning: retry next tick
+                if (!burning)
+                    StopRepairing();
             }
         }
         else
             _timer -= diff;
-        if (_state == 0 && me->GetUInt32Value(UNIT_NPC_EMOTESTATE) == EMOTE_STATE_WORK)
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
     }
 
 private:
@@ -986,63 +948,99 @@ struct npc_razorscale_spawner : public ScriptedAI
 
 struct npc_razorscale_harpoon_fire_state : public NullCreatureAI
 {
-    explicit npc_razorscale_harpoon_fire_state(Creature* creature) : NullCreatureAI(creature), _repairProgress(0)
+    explicit npc_razorscale_harpoon_fire_state(Creature* creature) : NullCreatureAI(creature), _index(0), _repairProgress(0)
     { }
 
     void Reset() override
     {
+        _index = TurretIndexAt(*me);
         _repairProgress = 0;
-    }
+        _gunGUID.Clear();
+        _propGUID.Clear();
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
-    {
-        if (spellInfo->Id == SPELL_FIREBOLT)
-        {
-            DoCastSelf(SPELL_HARPOON_FIRE_STATE);
-            _repairProgress = 0;
-            if (Creature* commander = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 200.0f))
-                commander->AI()->DoAction(ACTION_DESTROY_HARPOONS);
-        }
+        // a part is an independent GO, not a summon of this NPC
+        Position const& pos = BrokenHarpoonPos[_index];
+        if (GameObject* prop = me->SummonGameObject(GO_RAZOR_BROKEN_HARPOON, pos.GetPositionX(), pos.GetPositionY(),
+                pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, -0.8987932f, 0.4383728f, 0, true, GO_SUMMON_TIMED_DESPAWN))
+            _propGUID = prop->GetGUID();
     }
 
     void DoAction(int32 action) override
     {
-        if (action == ACTION_FIRE_STATE_RESET)
+        switch (action)
         {
-            _repairProgress = 0;
-            return;
-        }
-        if (action == ACTION_FIRE_STATE_REPAIR && _repairProgress < FIRE_STATE_MAX_PROGRESS)
-        {
-            if (++_repairProgress >= FIRE_STATE_MAX_PROGRESS)
+            case ACTION_FIRE_STATE_BREAK:
             {
-                if (GameObject* brokenHarpoon = me->FindNearestGameObject(GO_RAZOR_BROKEN_HARPOON, 5.0f))
-                {
-                    int32 buildAction = 0;
-                    for (uint8 i = 0; i < 4; ++i)
-                        if (brokenHarpoon->GetExactDist2dSq(BrokenHarpoonPos[i].GetPositionX(), BrokenHarpoonPos[i].GetPositionY()) < 1.0f)
-                        {
-                            buildAction = ACTION_BUILD_HARPOON_1 + i;
-                            break;
-                        }
+                RemovePart(_gunGUID);
+                _repairProgress = 0;
 
-                    brokenHarpoon->RemoveFromWorld();
+                // the Firebolt usually puts this fire up
+                if (!me->HasAura(SPELL_HARPOON_FIRE_STATE))
+                    DoCastSelf(SPELL_HARPOON_FIRE_STATE);
 
-                    if (Creature* commander = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 200.0f))
-                        if (buildAction)
-                            commander->AI()->DoAction(buildAction);
-                }
+                Position const& pos = BrokenHarpoonPos[_index];
+                if (GameObject* prop = me->SummonGameObject(GO_RAZOR_BROKEN_HARPOON, pos.GetPositionX(), pos.GetPositionY(),
+                        pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, -0.8987932f, 0.4383728f, 0, true, GO_SUMMON_TIMED_DESPAWN))
+                    _propGUID = prop->GetGUID();
+                break;
             }
+            case ACTION_FIRE_STATE_REPAIR:
+            {
+                if (!_gunGUID.IsEmpty() || me->HasAura(SPELL_HARPOON_FIRE_STATE))
+                    break;
+
+                if (++_repairProgress < FIRE_STATE_MAX_PROGRESS)
+                    break;
+
+                Position const& pos = HarpoonPositions[_index];
+                GameObject* gun = me->SummonGameObject(HarpoonEntry(_index, me->GetMap()->Is25ManRaid()), pos.GetPositionX(),
+                    pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, -0.573576f, 0.8191524f, 0, true,
+                    GO_SUMMON_TIMED_DESPAWN);
+                if (!gun)
+                {
+                    --_repairProgress;
+                    break;
+                }
+
+                _gunGUID = gun->GetGUID();
+                RemovePart(_propGUID);
+                break;
+            }
+            case ACTION_START_PERMA_GROUND:
+                RemovePart(_gunGUID);
+                _repairProgress = 0;
+                break;
+            case ACTION_FIRE_STATE_CLEANUP:
+                RemovePart(_gunGUID);
+                RemovePart(_propGUID);
+                break;
+            default:
+                break;
         }
     }
 
     [[nodiscard]] uint32 GetData(uint32 id) const override
     {
-        return (id == FIRE_STATE_REPAIR && _repairProgress >= FIRE_STATE_MAX_PROGRESS) ? 1 : 0;
+        if (id == FIRE_STATE_REPAIR)
+            return _gunGUID.IsEmpty() ? 0 : 1;
+        if (id == FIRE_STATE_BURNING)
+            return me->HasAura(SPELL_HARPOON_FIRE_STATE) ? 1 : 0;
+        return 0;
     }
 
 private:
+    void RemovePart(ObjectGuid& guid)
+    {
+        if (GameObject* part = ObjectAccessor::GetGameObject(*me, guid))
+            part->RemoveFromWorld();
+
+        guid.Clear();
+    }
+
+    uint8 _index;
     uint8 _repairProgress;
+    ObjectGuid _gunGUID;
+    ObjectGuid _propGUID;
 };
 
 struct npc_razorscale_devouring_flame : public NullCreatureAI
@@ -1277,31 +1275,31 @@ public:
 
     bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
-        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-        if (Creature* controller = go->FindNearestCreature(NPC_RAZORSCALE_CONTROLLER, 10.0f))
-        {
-            if (controller->HasUnitState(UNIT_STATE_CASTING))
-                return true;
+        Creature* controller = go->FindNearestCreature(NPC_RAZORSCALE_CONTROLLER, 10.0f);
 
-            uint32 spell = 0;
-            switch (go->GetEntry())
-            {
-                case GO_RAZOR_HARPOON_1:
-                    spell = SPELL_HARPOON_SHOT_1;
-                    break;
-                case GO_RAZOR_HARPOON_2:
-                    spell = SPELL_HARPOON_SHOT_2;
-                    break;
-                case GO_RAZOR_HARPOON_3:
-                    spell = SPELL_HARPOON_SHOT_3;
-                    break;
-                case GO_RAZOR_HARPOON_4:
-                    spell = SPELL_HARPOON_SHOT_4;
-                    break;
-            }
-            if (spell)
-                controller->CastSpell(controller, spell, true);
+        uint32 spell = 0;
+        switch (go->GetEntry())
+        {
+            case GO_RAZOR_HARPOON_1:
+                spell = SPELL_HARPOON_SHOT_1;
+                break;
+            case GO_RAZOR_HARPOON_2:
+                spell = SPELL_HARPOON_SHOT_2;
+                break;
+            case GO_RAZOR_HARPOON_3:
+                spell = SPELL_HARPOON_SHOT_3;
+                break;
+            case GO_RAZOR_HARPOON_4:
+                spell = SPELL_HARPOON_SHOT_4;
+                break;
         }
+
+        if (!spell || !controller)
+            return true;
+
+        // spend it only once it fired
+        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+        controller->CastSpell(controller, spell, true);
         return true;
     }
 
@@ -1316,9 +1314,6 @@ public:
             {
                 if (Creature* controller = me->FindNearestCreature(NPC_RAZORSCALE_CONTROLLER, 10.0f))
                     controller->AI()->Talk(0);
-
-                if (GameObject* brokenHarpoon = me->FindNearestGameObject(GO_RAZOR_BROKEN_HARPOON, 5.0f))
-                    brokenHarpoon->RemoveFromWorld();
             });
         }
 

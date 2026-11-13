@@ -1447,8 +1447,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 if (aur->GetEffect(0))
                     aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
 
-        // Added to perm ghoul by default
-        if (!IsPet())
+        // only the permanent ghoul is a pet
+        if (IsPet())
         {
             AddAura(SPELL_DK_PET_SCALING_01, this);
             AddAura(SPELL_DK_PET_SCALING_02, this);
@@ -2473,22 +2473,6 @@ void Pet::ClearCastWhenWillAvailable()
     m_tempspell = 0;
     m_tempspellTarget = ObjectGuid::Empty;
     m_tempoldTarget = ObjectGuid::Empty;
-}
-
-void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
-{
-    m_CreatureSpellCooldowns.erase(spell_id);
-
-    if (update)
-    {
-        if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
-        {
-            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
-            data << uint32(spell_id);
-            data << GetGUID();
-            playerOwner->SendDirectMessage(&data);
-        }
-    }
 }
 
 void Pet::FillPetInfo(PetStable::PetInfo* petInfo) const
