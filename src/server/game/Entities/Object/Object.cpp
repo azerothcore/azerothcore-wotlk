@@ -48,6 +48,7 @@
 #include "TemporarySummon.h"
 #include "Tokenize.h"
 #include "Totem.h"
+#include "TotemAI.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -4054,9 +4055,37 @@ bool WorldObject::IsValidAssistTarget(WorldObject const* target, SpellInfo const
 
 Unit* WorldObject::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
 {
-    // non-Unit casters cannot have their spells redirected
-    if (Unit* unitSelf = ToUnit())
-        return unitSelf->GetMagicHitRedirectTarget(victim, spellInfo);
+    if (!spellInfo->CanBeRedirectedBySpellMagnet())
+        return victim;
+
+    for (AuraEffect* auraEffect : victim->GetAuraEffectsByType(SPELL_AURA_SPELL_MAGNET))
+    {
+        if (Unit* magnet = auraEffect->GetBase()->GetUnitOwner())
+            if (spellInfo->CheckExplicitTarget(this, magnet) == SPELL_CAST_OK
+                    && IsValidAttackTarget(magnet, spellInfo))
+            {
+                // Flight time is unavailable during target selection, so use a short queue delay for the charge drop.
+                magnet->m_Events.AddEvent(new RedirectSpellEvent(*magnet, victim->GetGUID(), auraEffect),
+                    magnet->m_Events.CalculateQueueTime(100));
+
+                if (magnet->IsTotem())
+                {
+                    uint64 queueTime = magnet->m_Events.CalculateQueueTime(100);
+                    if (spellInfo->Speed > 0.0f)
+                    {
+                        float dist = GetDistance(magnet->GetPositionX(), magnet->GetPositionY(), magnet->GetPositionZ());
+                        if (dist < 5.0f)
+                            dist = 5.0f;
+                        queueTime = magnet->m_Events.CalculateTime(
+                            (uint64)std::floor(dist / spellInfo->Speed * 1000.0f));
+                    }
+
+                    magnet->m_Events.AddEvent(new KillMagnetEvent(*magnet), queueTime);
+                }
+
+                return magnet;
+            }
+    }
 
     return victim;
 }
