@@ -1574,6 +1574,11 @@ public:
     bool CanProc() { return !m_procDeep; }
     void SetCantProc(bool apply);
 
+    // True while a periodic aura cast by this unit ticks (a DoT or HoT),
+    // so threat hooks can tell the tick from an action of the unit
+    [[nodiscard]] bool IsCausingPeriodicTick() const { return m_periodicTickDepth > 0; }
+    void SetCausingPeriodicTick(bool apply);
+
     static void ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellInfo const* procSpellInfo = nullptr, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr, uint32 procPhase = 2 /*PROC_SPELL_PHASE_HIT*/);
     void ProcSkillsAndReactives(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura = nullptr, int8 procAuraEffectIndex = -1, Spell const* procSpell = nullptr, DamageInfo* damageInfo = nullptr, HealInfo* healInfo = nullptr, uint32 procPhase = 2 /*PROC_SPELL_PHASE_HIT*/);
 
@@ -2176,6 +2181,7 @@ protected:
     bool m_inPreDeathAuraTick{false};
 
     int32 m_procDeep;
+    uint8 m_periodicTickDepth;
 
     typedef std::list<DynamicObject*> DynObjectList;
     DynObjectList m_dynObj;
