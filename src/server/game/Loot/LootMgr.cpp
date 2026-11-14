@@ -21,6 +21,7 @@
 #include "Group.h"
 #include "ItemEnchantmentMgr.h"
 #include "Log.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -754,6 +755,21 @@ void Loot::NotifyItemRemoved(uint8 lootIndex)
         else
             PlayersLooting.erase(i);
     }
+}
+
+void Loot::CloseLootSessions(WorldObject const& source)
+{
+    for (ObjectGuid const& guid : PlayersLooting)
+    {
+        Player* player = ObjectAccessor::GetPlayer(source, guid);
+        if (player && player->GetLootGUID() == source.GetGUID())
+        {
+            player->SetLootGUID(ObjectGuid::Empty);
+            player->SendLootRelease(source.GetGUID());
+            player->RemoveUnitFlag(UNIT_FLAG_LOOTING);
+        }
+    }
+    PlayersLooting.clear();
 }
 
 void Loot::NotifyMoneyRemoved()

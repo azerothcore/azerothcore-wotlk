@@ -1639,6 +1639,8 @@ void Group::CountTheRoll(Rolls::iterator rollI)
         return;
     }
 
+    bool const hadLoot = !roll->getLoot()->isLooted();
+
     //end of the roll
     if (roll->totalNeed > 0)
     {
@@ -1836,14 +1838,17 @@ void Group::CountTheRoll(Rolls::iterator rollI)
             item->is_blocked = false;
     }
 
-    if (Loot* loot = roll->getLoot(); loot && loot->isLooted() && loot->sourceGameObject)
+    if (Loot* loot = roll->getLoot(); loot && loot->isLooted())
     {
-        GameObjectTemplate const* goInfo = loot->sourceGameObject->GetGOInfo();
-        if (goInfo && goInfo->type == GAMEOBJECT_TYPE_CHEST)
+        if (loot->sourceGameObject)
         {
+            GameObjectTemplate const* goInfo = loot->sourceGameObject->GetGOInfo();
             // Deactivate chest if the last item was rolled in group
-            loot->sourceGameObject->SetLootState(GO_JUST_DEACTIVATED);
+            if (goInfo && goInfo->type == GAMEOBJECT_TYPE_CHEST)
+                loot->sourceGameObject->SetLootState(GO_JUST_DEACTIVATED);
         }
+        else if (hadLoot && loot->loot_type == LOOT_CORPSE && loot->sourceWorldObjectGUID.IsCreatureOrVehicle())
+            loot->pendingCorpseRollCleanup = true;
     }
 
     RollId.erase(rollI);
