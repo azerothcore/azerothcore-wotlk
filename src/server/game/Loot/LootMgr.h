@@ -231,6 +231,8 @@ public:
     [[nodiscard]] char const* GetName() const { return m_name; }
     [[nodiscard]] char const* GetEntryName() const { return m_entryName; }
     [[nodiscard]] bool IsRatesAllowed() const { return m_ratesAllowed; }
+
+    friend class LootTemplateCollectItemIdsTest;
 protected:
     uint32 LoadLootTable();
     void Clear();
@@ -268,7 +270,13 @@ public:
     bool addConditionItem(Condition* cond);
     [[nodiscard]] bool isReference(uint32 id) const;
 
+    // Collects every item id this template can produce, including grouped entries and referenced
+    // templates. No chance rolls: answers "what can this ever drop", not "what drops this time".
+    void CollectItemIds(std::set<uint32>& itemIds) const;
+
 private:
+    void CollectItemIds(std::set<uint32>& itemIds, std::set<LootTemplate const*>& visited) const;
+
     LootStoreItemList Entries;                          // not grouped only
     LootGroups        Groups;                           // groups have own (optimised) processing, grouped entries go there
 
