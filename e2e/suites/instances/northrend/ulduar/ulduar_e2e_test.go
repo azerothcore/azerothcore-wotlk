@@ -1134,8 +1134,8 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 
 		addSearchRange = float32(100)
 
-		// npc_freya_ward resets its cast timer to 25s and casts at 29s, so the first lasher lands
-		// ~4s after the ward spawns. One extra 29s cycle covers a ward that missed that window.
+		// npc_freya_ward casts its first wave 1.6s after it spawns, so the first Writhing Lasher
+		// lands ~5.3s in once the missile flight is added, five per beam per wave.
 		firstLasherWindow = 40 * time.Second
 
 		// 62947 carries SpellDuration 1 (10s). A lasher still in the cache this long after it
@@ -1170,8 +1170,8 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 	appeared := time.Now()
 	t.Logf("Writhing Lasher 0x%X summoned by ward 0x%X", lasher, ward)
 
-	// Pin the GUID: the ward keeps summoning every 29s, so "some lasher is in the cache" would
-	// still be true on an unfixed core and would hide the despawn.
+	// Pin the GUID: the ward keeps summoning five fresh lashers every 32.4s, so "some lasher is
+	// in the cache" would still be true on an unfixed core and would hide the despawn.
 	deadline := appeared.Add(outliveWindow)
 	for time.Now().Before(deadline) {
 		if bot.World.GetObject(lasher) == nil {
@@ -1189,7 +1189,7 @@ func TestUlduar_FreyaWardLasherOutlivesSummonDuration(t *testing.T) {
 
 	// A MANUAL_DESPAWN summon has nothing of its own to remove it, and deleting the ward does not
 	// take its adds with it, so they have to be killed here. The ward dies first: while it lives it
-	// summons another pair every 29s, and a sweep taken before that would race the next cycle.
+	// summons another wave every 32.4s, and a sweep taken before that would race the next cycle.
 	bot.DamageKill(t, []uint64{ward}, 10_000_000, 30*time.Second)
 	var adds []uint64
 	for _, add := range bot.UnitsByEntry(addSearchRange, npcWrithingLasher, npcWardOfLife) {
