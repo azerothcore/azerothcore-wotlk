@@ -5399,10 +5399,11 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->RequiredSkillPoints)
         {
-            if (qinfo->RequiredSkillPoints > sWorld->GetConfigMaxSkillValue())
+            uint32 const maxSkillPoints = GetMaxQuestRequiredSkillPoints();
+            if (qinfo->RequiredSkillPoints > maxSkillPoints)
             {
                 LOG_ERROR("sql.sql", "Quest {} has `RequiredSkillPoints` = {} but max possible skill is {}, quest can't be done.",
-                                 qinfo->GetQuestId(), qinfo->RequiredSkillPoints, sWorld->GetConfigMaxSkillValue());
+                                 qinfo->GetQuestId(), qinfo->RequiredSkillPoints, maxSkillPoints);
                 // no changes, quest can't be done for this requirement
             }
         }
@@ -9341,6 +9342,13 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
         return CHAR_NAME_PROFANE;
 
     return CHAR_NAME_SUCCESS;
+}
+
+uint32 ObjectMgr::GetMaxQuestRequiredSkillPoints()
+{
+    // 450 is the 3.3.5a client maximum; a lower MaxPlayerLevel only delays reaching it
+    static constexpr uint32 MAX_WOTLK_SKILL_VALUE = 450;
+    return std::max<uint32>(MAX_WOTLK_SKILL_VALUE, sWorld->GetConfigMaxSkillValue());
 }
 
 bool ObjectMgr::IsValidCharterName(std::string_view name)
