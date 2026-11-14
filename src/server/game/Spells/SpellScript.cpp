@@ -398,6 +398,13 @@ bool SpellScript::IsInEffectHook() const
     return (m_currentScriptState >= SPELL_SCRIPT_HOOK_EFFECT_LAUNCH && m_currentScriptState <= SPELL_SCRIPT_HOOK_EFFECT_HIT_TARGET);
 }
 
+bool SpellScript::IsAfterTargetSelectionPhase() const
+{
+    return IsInHitPhase()
+        || m_currentScriptState == SPELL_SCRIPT_HOOK_ON_CAST
+        || m_currentScriptState == SPELL_SCRIPT_HOOK_AFTER_CAST;
+}
+
 Unit* SpellScript::GetCaster()
 {
     return m_spell->GetCaster()->ToUnit();
@@ -448,6 +455,28 @@ GameObject* SpellScript::GetExplTargetGObj()
 Item* SpellScript::GetExplTargetItem()
 {
     return m_spell->m_targets.GetItemTarget();
+}
+
+int32 SpellScript::GetUnitTargetCountForEffect(SpellEffIndex effect) const
+{
+    if (!IsAfterTargetSelectionPhase())
+    {
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetUnitTargetCountForEffect was called, but function has no effect in current hook! (spell has not selected targets yet)", m_scriptName->c_str(), m_scriptSpellId);
+        return 0;
+    }
+
+    return m_spell->GetUnitTargetCountForEffect(effect);
+}
+
+int32 SpellScript::GetUnitTargetIndexForEffect(ObjectGuid const& target, SpellEffIndex effect) const
+{
+    if (!IsAfterTargetSelectionPhase())
+    {
+        LOG_ERROR("spells.scripts", "Script: `{}` Spell: `{}`: function SpellScript::GetUnitTargetIndexForEffect was called, but function has no effect in current hook! (spell has not selected targets yet)", m_scriptName->c_str(), m_scriptSpellId);
+        return -1;
+    }
+
+    return m_spell->GetUnitTargetIndexForEffect(target, effect);
 }
 
 Unit* SpellScript::GetHitUnit()

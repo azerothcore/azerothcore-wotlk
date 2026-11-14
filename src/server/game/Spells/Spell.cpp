@@ -2392,6 +2392,31 @@ void Spell::CleanupTargetList()
     m_delayTrajectory = 0;
 }
 
+int32 Spell::GetUnitTargetCountForEffect(SpellEffIndex effect) const
+{
+    return static_cast<int32>(std::count_if(m_UniqueTargetInfo.begin(), m_UniqueTargetInfo.end(), [effect](TargetInfo const& targetInfo)
+    {
+        return targetInfo.missCondition == SPELL_MISS_NONE && targetInfo.effectMask & (1 << effect);
+    }));
+}
+
+int32 Spell::GetUnitTargetIndexForEffect(ObjectGuid const& target, SpellEffIndex effect) const
+{
+    int32 index = 0;
+    for (TargetInfo const& targetInfo : m_UniqueTargetInfo)
+    {
+        if (targetInfo.missCondition == SPELL_MISS_NONE && targetInfo.effectMask & (1 << effect))
+        {
+            if (targetInfo.targetGUID == target)
+                return index;
+
+            ++index;
+        }
+    }
+
+    return -1;
+}
+
 void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*= true*/, bool implicit /*= true*/)
 {
     Unit* unitCaster = m_caster->ToUnit();

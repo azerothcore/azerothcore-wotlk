@@ -257,7 +257,7 @@ class spell_ruby_sanctum_rallying_shout : public SpellScript
 
     void CountAllies()
     {
-        uint32 count = GetSpell()->GetUniqueTargetInfo()->size();
+        uint32 count = static_cast<uint32>(GetUnitTargetCountForEffect(EFFECT_0));
         if (count == GetCaster()->GetAuraCount(SPELL_RALLY))
             return;
 
