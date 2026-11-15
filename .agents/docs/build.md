@@ -9,6 +9,8 @@ cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/azeroth-server -DCMAKE_BUILD_TYPE=RelWithD
 make -j$(nproc) && make install
 ```
 
-C++20 required (`CMAKE_CXX_STANDARD 20`). Useful flags: `BUILD_TESTING=ON` (Google Test), `NOPCH=1` (disable precompiled headers). Full set in `conf/dist/config.cmake`. `compile_commands.json` is exported automatically.
+C++20 required (`CMAKE_CXX_STANDARD 20`). Useful flags: `NOPCH=1` (disable precompiled headers); full set in
+`conf/dist/config.cmake`. `compile_commands.json` is exported automatically.
 
-Tests (Google Test, in `src/test/`): configure `-DBUILD_TESTING=ON`, then `ctest` or `./src/test/unit_tests` from the build dir.
+Tests (Google Test, in `src/test/`): configure `-DBUILD_TESTING=ON`, then `ctest` or `./src/test/unit_tests` from the
+build dir.
