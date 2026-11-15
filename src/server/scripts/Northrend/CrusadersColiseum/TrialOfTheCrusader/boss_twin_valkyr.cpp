@@ -148,7 +148,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 summons.DespawnAll();
                 if (pInstance && me->GetEntry() == NPC_LIGHTBANE )
                 {
-                    uint32 essenceId1 = 0, empoweredId1 = 0, touchId1 = 0, essenceId2 = 0, empoweredId2 = 0, touchId2 = 0;
+                    uint32 essenceId1 = 0, empoweredId1 = 0, touchId1 = 0, essenceId2 = 0, empoweredId2 = 0, touchId2 = 0, poweringUpId = 0;
                     switch (me->GetMap()->GetDifficulty())
                     {
                         case 0:
@@ -158,6 +158,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             essenceId2 = 65686;
                             empoweredId2 = 65748;
                             touchId2 = 66001;
+                            poweringUpId = 67590;
                             break;
                         case 1:
                             essenceId1 = 67176;
@@ -166,6 +167,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             essenceId2 = 67222;
                             empoweredId2 = 67216;
                             touchId2 = 67281;
+                            poweringUpId = 67602;
                             break;
                         case 2:
                             essenceId1 = 67177;
@@ -174,6 +176,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             essenceId2 = 67223;
                             empoweredId2 = 67217;
                             touchId2 = 67282;
+                            poweringUpId = 67603;
                             break;
                         case 3:
                             essenceId1 = 67178;
@@ -182,6 +185,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             essenceId2 = 67224;
                             empoweredId2 = 67218;
                             touchId2 = 67283;
+                            poweringUpId = 67604;
                             break;
                         default:
                             break;
@@ -192,6 +196,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(essenceId2);
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(empoweredId2);
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(touchId2);
+                    pInstance->DoRemoveAurasDueToSpellOnPlayers(poweringUpId);
                 }
                 break;
             case -3:
@@ -479,10 +484,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         DoAction(ACTION_DESPAWN_SUMMONS);
         Talk(SAY_DEATH);
         if (pInstance)
-        {
             pInstance->SetBossState(BOSS_TWIN_VALKYR, DONE);
-            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POWERING_UP);
-        }
         if (Creature* twin = GetSister())
             if (twin->IsAlive())
             {
