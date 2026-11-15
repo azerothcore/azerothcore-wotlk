@@ -41,9 +41,11 @@ type trapToTrip struct {
 
 // Freezing Trap comes first at every spot: its freeze breaks on damage, and the other
 // traps leave burning ground and snakes behind.
+// Frost Trap's initial slow (67035) lasts only 100ms; check its persistent slowing aura
+// instead, since the initial aura can expire between client-cache polls.
 var trapsToTrip = []trapToTrip{
 	{"Freezing", 14311, 164877, 14309, nil},   // Freezing Trap Effect
-	{"Frost", 13809, 164639, 67035, nil},      // the slow cast on the victim
+	{"Frost", 13809, 164639, 13810, nil},      // persistent Frost Trap slowing aura
 	{"Immolation", 49056, 189319, 49054, nil}, // Immolation Trap DoT
 	{"Explosive", 49067, 189322, 49065, nil},  // Explosive Trap Effect burn
 	{"Snake", 34600, 183957, 0, []uint32{creatureViper, creatureVenomousSnake}},
