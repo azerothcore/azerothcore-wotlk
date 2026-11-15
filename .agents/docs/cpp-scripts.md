@@ -31,4 +31,3 @@ Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).
   `LoadSummonData`/`SummonData` or `instance->GetCreature(DATA_*)`, or summoning a creature in an instance's scripts
   → `systems/instance-scripts.md`
 - `SpellScript`/`AuraScript` → `systems/spells-and-summons.md`
-- Adding/changing a retail value (spell id or unit flag) → `systems/retail-evidence.md`

@@ -49,11 +49,13 @@ this page: https://www.azerothcore.org/wiki/agentic-engineering
 
 ## Read also
 
-BEFORE starting the task, read every doc whose trigger matches, then follow each doc's own "Read also" list:
+BEFORE starting the task, and again once you know what you will change, read every doc whose trigger matches, then
+follow each doc's own "Read also" list:
 
 - Writing or modifying any C++ (`src/**`, `modules/**`) → `.agents/docs/cpp-guidelines.md`
 - Any change under `src/server/scripts/**` → `.agents/docs/cpp-scripts.md`
 - Creating or modifying any SQL (`*.sql`) → `.agents/docs/sql-guidelines.md`
+- Any change under `src/server/scripts/**` or `data/sql/updates/pending_db_world/**` → `.agents/docs/retail-evidence.md`
 - Compiling, configuring or running tests, plan-given commands included → `.agents/docs/build.md`
 - Reviewing a changeset or PR, or opening or updating a PR → `.agents/docs/code-review.md`
 - Self-reviewing, or opening or updating a PR → also `.agents/docs/self-review-rules.md`

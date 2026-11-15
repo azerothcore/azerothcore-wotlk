@@ -27,12 +27,9 @@ Run the linter before claiming a change is done: `python apps/codestyle/codestyl
 
 ## Read also
 
-- `smart_scripts` or an `AIName` → `systems/smartai.md`, and the "Scope of a fix" section of `cpp-scripts.md`
-- SmartAI on a trigger NPC (`flags_extra` 0x80) or a helper NPC that never evades → "Trigger and helper NPCs" in
-  `systems/creature-ai.md`
+- `smart_scripts` or an `AIName` → `systems/smartai.md`, the "Scope of a fix" section of `cpp-scripts.md` and
+  "Trigger and helper NPCs" in `systems/creature-ai.md`
 - A summon (SAI 12 or 107, `creature_summon_groups`) in an instance map → "ObjectData slots" in
   `systems/instance-scripts.md`
 - `creature_template`, `creature_template_model`, `creature_immunities` → `systems/templates.md`
 - `spell_script_names` → `systems/spells-and-summons.md`
-- Adding/changing a retail value (spell ids, `unit_flags`/`unit_flags2`/`dynamicflags` incl. SAI set/remove-flag
-  actions) → `systems/retail-evidence.md`
