@@ -10,8 +10,8 @@ AzerothCore is a C++ MMORPG server emulator for World of Warcraft 3.3.5a (WotLK)
 - Formatting follows `.editorconfig`: UTF-8, LF, max 120 cols, trailing newline, no trailing whitespace; 4-space indent
   for C++ (tabs forbidden), 2-space for JSON/YAML/sh/ts/js.
 - **Do not write live-stack e2e tests unless the user explicitly asks**, nor `e2e/local/` scratch tests to validate a
-  fix; don't mention missing coverage unless asked. Existing `e2e/` tests that break after a change may be updated:
-  before changing one (only then, or when asked), read `e2e/README.md` and `.agents/docs/e2e-policy.md`.
+  fix; don't mention missing coverage unless asked. Existing `e2e/` tests that break after a change may be updated.
+  Before writing or changing any `e2e/` test, read `e2e/README.md` and `.agents/docs/e2e-policy.md`.
 - Planning docs go in `.agents/plans/<task-slug>/` (gitignored), named `<task-slug>.<TYPE>.md` (`PLAN`, `REQUIREMENTS`,
   `ANALYSIS`, …).
 - **Credit upstream authors.** Code, a mechanism, or data mirrored from another core (TrinityCore, cMaNGOS, …) is

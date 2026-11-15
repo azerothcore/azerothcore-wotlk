@@ -31,3 +31,5 @@ Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).
   `LoadSummonData`/`SummonData` or `instance->GetCreature(DATA_*)`, or summoning a creature in an instance's scripts
   → `systems/instance-scripts.md`
 - `SpellScript`/`AuraScript` → `systems/spells-and-summons.md`
+- `SetData`/`DoAction` on a creature or gameobject whose `AIName` is `SmartAI`/`SmartGameObjectAI` →
+  `systems/smartai.md`
