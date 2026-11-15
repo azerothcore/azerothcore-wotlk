@@ -39,6 +39,7 @@ enum Yells
     SAY_KILL_PLAYER         = 6,
     SAY_BERSERK             = 7,
     SAY_DEATH               = 8,
+    EMOTE_BERSERK           = 10, // Eydis only
 };
 
 enum Equipment
@@ -122,7 +123,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
 
             // special events here
-            events.RescheduleEvent(EVENT_BERSERK, IsHeroic() ? 6min : 10min);
+            events.RescheduleEvent(EVENT_BERSERK, IsHeroic() ? 6min : 8min);
             events.RescheduleEvent(EVENT_SUMMON_BALLS_1, 10s, 15s);
             events.RescheduleEvent(EVENT_SPECIAL, 45s);
         }
@@ -311,6 +312,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 if (Creature* twin = GetSister())
                 {
                     twin->CastSpell(twin, SPELL_BERSERK, true);
+                    twin->AI()->Talk(EMOTE_BERSERK);
                     twin->AI()->Talk(SAY_BERSERK);
                 }
 
