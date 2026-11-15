@@ -360,7 +360,7 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
 Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID /*= ObjectGuid::Empty*/) :
     m_spellInfo(spellproto), m_casterGuid(casterGUID ? casterGUID : (caster ? caster->GetGUID() : ObjectGuid::Empty)),
     m_castItemGuid(itemGUID ? itemGUID : castItem ? castItem->GetGUID() : ObjectGuid::Empty), m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(GameTime::GetGameTime().count()),
-    m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
+    m_refreshTime(GameTime::GetGameTimeMS()), m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
     m_casterLevel(caster ? caster->GetLevel() : m_spellInfo->SpellLevel), m_procCharges(0), m_stackAmount(1),
     m_isRemoved(false), m_isSingleTarget(false), m_isUsingCharges(false), m_triggeredByAuraSpellInfo(nullptr)
 {
@@ -429,6 +429,12 @@ Unit* Aura::GetCaster() const
     return ObjectAccessor::GetUnit(*GetOwner(), GetCasterGUID());
 }
 
+bool Aura::HasCasterDiedSinceApply(Unit const* caster) const
+{
+    // auras on the caster itself that survive its death are passives or death persistent, never left behind
+    return caster && caster != GetOwner() && caster->GetLastDeathTime() >= m_refreshTime;
+}
+
 AuraObjectType Aura::GetType() const
 {
     if (!m_owner)
@@ -495,7 +501,10 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
         }
         else
         {
-            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, 0);
+            Creature* creatureCaster = caster->ToCreature();
+            // Drop the infinite cooldown set on apply, a longer running cooldown would otherwise be kept
+            creatureCaster->RemoveSpellCooldown(m_spellInfo->Id, false);
+            creatureCaster->AddSpellCooldown(m_spellInfo->Id, 0, 0);
 
             if (Unit* owner = caster->GetCharmerOrOwner())
             {
@@ -926,6 +935,8 @@ void Aura::RefreshDuration(bool withMods)
     if (!caster)
         return;
 
+    m_refreshTime = GameTime::GetGameTimeMS();
+
     if (withMods && caster)
     {
         int32 duration = m_spellInfo->GetMaxDuration();
@@ -1036,11 +1047,20 @@ bool Aura::ModCharges(int32 num, AuraRemoveMode removeMode)
 
 void Aura::SetStackAmount(uint8 stackAmount)
 {
+    uint8 const oldStackAmount = m_stackAmount;
     m_stackAmount = stackAmount;
     Unit* caster = GetCaster();
 
     if (!caster)
+    {
+        // can't recalc without the caster (its bonuses would be lost), so scale the current amount instead
+        if (oldStackAmount && oldStackAmount != stackAmount)
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                if (HasEffect(i))
+                    m_effects[i]->ChangeAmount(
+                        int32(int64(m_effects[i]->GetAmount()) * stackAmount / oldStackAmount), false, false);
         return;
+    }
 
     std::list<AuraApplication*> applications;
     GetApplicationList(applications);
@@ -2761,22 +2781,6 @@ bool Aura::CallScriptCheckEffectProcHandlers(AuraEffect const* aurEff, AuraAppli
         for (; effItr != effEndItr; ++effItr)
             if (effItr->IsEffectAffected(m_spellInfo, aurEff->GetEffIndex()))
                 result &= effItr->Call(*scritr, aurEff, eventInfo);
-
-        (*scritr)->_FinishScriptCall();
-    }
-
-    return result;
-}
-
-bool Aura::CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-{
-    bool result = isTriggeredAtSpellProcEvent;
-    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
-    {
-        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_AFTER_CHECK_PROC, aurApp);
-        std::list<AuraScript::AfterCheckProcHandler>::iterator hookItrEnd = (*scritr)->DoAfterCheckProc.end(), hookItr = (*scritr)->DoAfterCheckProc.begin();
-        for (; hookItr != hookItrEnd; ++hookItr)
-            result &= hookItr->Call(*scritr, eventInfo, isTriggeredAtSpellProcEvent);
 
         (*scritr)->_FinishScriptCall();
     }

@@ -192,6 +192,7 @@ struct boss_shade_of_akama : public BossAI
                 DoCast(akama, SPELL_THREAT, true);
                 me->AddThreat(akama, 900000.0f);
                 akama->AI()->DoCast(me, SPELL_FIXATE, true);
+                akama->AI()->AttackStart(me);
                 AttackStart(akama);
             }
 
@@ -284,12 +285,8 @@ struct npc_akama_shade : public ScriptedAI
 
     void DamageTaken(Unit* /*unit*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (me->HealthBelowPctDamaged(20, damage) && !_sayLowHealth)
-        {
-            _sayLowHealth = true;
-            Talk(SAY_LOW_HEALTH);
-        }
-        else if (damage >= me->GetHealth() && !_died)
+        // before the 20% yell, or a lethal hit crossing 20% skips the reset
+        if (damage >= me->GetHealth() && !_died)
         {
             _died = true;
             std::list<Creature*> generators;
@@ -308,6 +305,20 @@ struct npc_akama_shade : public ScriptedAI
             me->DespawnOrUnsummon();
             ScriptedAI::EnterEvadeMode(EvadeReason::EVADE_REASON_OTHER);
         }
+        else if (me->HealthBelowPctDamaged(20, damage) && !_sayLowHealth)
+        {
+            _sayLowHealth = true;
+            Talk(SAY_LOW_HEALTH);
+        }
+    }
+
+    // direct Unit::Kill calls (e.g. .die) never reach DamageTaken
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
+            if (shade->IsAlive())
+                shade->AI()->EnterEvadeMode();
     }
 
     void DoAction(int32 param) override

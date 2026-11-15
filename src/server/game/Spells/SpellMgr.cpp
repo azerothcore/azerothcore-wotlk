@@ -774,38 +774,50 @@ void SpellMgr::GetSetOfSpellsInSpellGroup(SpellGroup group_id, std::set<uint32>&
     }
 }
 
-bool SpellMgr::AddSameEffectStackRuleSpellGroups(SpellInfo const* spellInfo, uint32 auraType, int32 amount, std::map<SpellGroup, int32>& groups) const
+bool SpellMgr::AddSameEffectStackRuleSpellGroups(SpellInfo const* spellInfo, uint32 auraType, int32 miscValue,
+    int32 amount, std::map<SpellGroup, int32>& groups) const
 {
     uint32 spellId = spellInfo->GetFirstRankSpell()->Id;
     auto spellGroupBounds = GetSpellSpellGroupMapBounds(spellId);
     // Find group with SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT if it belongs to one
+    // A spell can be in several such groups for the same auraType (one per stat, e.g. K'iru's Song of Victory),
+    // prefer the group where another spell has the same auraType and miscValue, else the first matching group
+    SpellGroup group = SPELL_GROUP_NONE;
     for (auto itr = spellGroupBounds.first; itr != spellGroupBounds.second; ++itr)
     {
-        SpellGroup group = itr->second;
-        auto found = mSpellSameEffectStack.find(group);
-        if (found != mSpellSameEffectStack.end())
-        {
-            // check auraTypes
-            if (!found->second.count(auraType))
-                continue;
+        auto found = mSpellSameEffectStack.find(itr->second);
+        // check auraTypes
+        if (found == mSpellSameEffectStack.end() || !found->second.count(auraType))
+            continue;
 
-            // Put the highest amount in the map
-            auto groupItr = groups.find(group);
-            if (groupItr == groups.end())
-                groups.emplace(group, amount);
-            else
-            {
-                int32 curr_amount = groups[group];
-                // Take absolute value because this also counts for the highest negative aura
-                if (std::abs(curr_amount) < std::abs(amount))
-                    groupItr->second = amount;
-            }
-            // return because a spell should be in only one SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT group per auraType
-            return true;
+        if (group == SPELL_GROUP_NONE)
+            group = itr->second;
+
+        auto shared = mSpellSameEffectSharedMisc.find(itr->second);
+        if (shared != mSpellSameEffectSharedMisc.end() && shared->second.count({ auraType, miscValue }))
+        {
+            group = itr->second;
+            break;
         }
     }
+
     // Not in a SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT group, so return false
-    return false;
+    if (group == SPELL_GROUP_NONE)
+        return false;
+
+    // Put the highest amount in the map
+    auto groupItr = groups.find(group);
+    if (groupItr == groups.end())
+        groups.emplace(group, amount);
+    else
+    {
+        int32 curr_amount = groups[group];
+        // Take absolute value because this also counts for the highest negative aura
+        if (std::abs(curr_amount) < std::abs(amount))
+            groupItr->second = amount;
+    }
+
+    return true;
 }
 
 SpellGroupStackRule SpellMgr::CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2) const
@@ -1784,6 +1796,7 @@ void SpellMgr::LoadSpellGroupStackRules()
 
     mSpellGroupStack.clear();                                  // need for reload case
     mSpellSameEffectStack.clear();
+    mSpellSameEffectSharedMisc.clear();
 
     std::vector<uint32> sameEffectGroups;
 
@@ -1922,6 +1935,34 @@ void SpellMgr::LoadSpellGroupStackRules()
             // not found either, log error
             if (!found)
                 LOG_ERROR("sql.sql", "SpellId {} listed in `spell_group` with stack rule 3 does not share aura assigned for group {}", spellId, group_id);
+        }
+
+        // a spell can be in several groups for the same aura type (one per stat, e.g. K'iru's Song of Victory),
+        // keep the (auraType, miscValue) pairs carried by at least two spells to tell which group an effect is in
+        {
+            std::map<std::pair<uint32 /*auraName*/, int32 /*miscValue*/>, uint32 /*spellCount*/> miscCount;
+            for (uint32 spellId : spellIds)
+            {
+                std::set<std::pair<uint32, int32>> spellPairs;
+                SpellInfo const* spellInfo = AssertSpellInfo(spellId);
+                for (; spellInfo; spellInfo = spellInfo->GetNextRankSpell())
+                {
+                    for (SpellEffectInfo const& spellEffectInfo : spellInfo->GetEffects())
+                    {
+                        if (!spellEffectInfo.IsAura() || !auraTypes.count(spellEffectInfo.ApplyAuraName))
+                            continue;
+
+                        spellPairs.emplace(uint32(spellEffectInfo.ApplyAuraName), spellEffectInfo.MiscValue);
+                    }
+                }
+
+                for (auto const& spellPair : spellPairs)
+                    ++miscCount[spellPair];
+            }
+
+            for (auto const& [spellPair, spellCount] : miscCount)
+                if (spellCount >= 2)
+                    mSpellSameEffectSharedMisc[SpellGroup(group_id)].insert(spellPair);
         }
 
         mSpellSameEffectStack[SpellGroup(group_id)] = auraTypes;

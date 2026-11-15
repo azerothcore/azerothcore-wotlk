@@ -65,7 +65,7 @@ enum Says
     // MISC
     WHISPER_LAVA_CHURN                          = 9,
     WHISPER_OPEN_PORTAL                         = 6,
-    WHISPER_HATCH_EGGS                          = 6,
+    WHISPER_HATCH_EGGS                          = 7,
     WHISPER_SUMMON_DICIPLE                      = 7,
 };
 
@@ -1265,7 +1265,7 @@ struct boss_sartharion_vesperon : public boss_sartharion_dragonAI
             case EVENT_MINIBOSS_SHADOW_BREATH:
             {
                 if (!urand(0, 10))
-                    Talk(SAY_SHADRON_BREATH);
+                    Talk(SAY_VESPERON_BREATH);
 
                 DoCastVictim(SPELL_SHADOW_BREATH, false);
                 events.Repeat(17s + 500ms);

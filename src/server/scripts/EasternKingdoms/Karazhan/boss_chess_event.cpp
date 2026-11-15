@@ -207,7 +207,7 @@ struct npc_echo_of_medivh : public ScriptedAI
 
         _summons.DespawnAll();
 
-        _cheatTimer = urand(45 * IN_MILLISECONDS, 100 * IN_MILLISECONDS);
+        _cheatTimer = 108 * IN_MILLISECONDS;
     }
 
     void JustSummoned(Creature* summon) override
@@ -1337,7 +1337,7 @@ struct npc_echo_of_medivh : public ScriptedAI
             if (_cheatTimer <= diff)
             {
                 HandleCheat();
-                _cheatTimer = urand(45000, 100000);
+                _cheatTimer = 108 * IN_MILLISECONDS;
             }
             else
             {
@@ -1379,6 +1379,7 @@ struct npc_echo_of_medivh : public ScriptedAI
             case MEDIVH_GOSSIP_START_PVE:
                 _instance->SetData(DATA_CHESS_GAME_PHASE, CHESS_PHASE_PVE_WARMUP);
                 SetupBoard();
+                _cheatTimer = 108 * IN_MILLISECONDS;
                 _instance->SetData(DATA_CHESS_EVENT, IN_PROGRESS);
                 Talk(TALK_EVENT_BEGIN);
                 break;

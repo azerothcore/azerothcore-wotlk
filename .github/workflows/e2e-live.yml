@@ -247,6 +247,10 @@ jobs:
             echo "AC_WARDEN_ENABLED=0"
             echo "AC_BEEP_AT_START=0"
             echo "AC_REALMS_STATE_UPDATE_DELAY=1"
+            # suites/items/recovery drives destroy, sell and disenchant recording
+            echo "AC_ITEM_DELETE_METHOD=1"
+            echo "AC_ITEM_DELETE_VENDOR=1"
+            echo "AC_ITEM_DELETE_DISENCHANT=1"
             echo "E2E_AUTH_ADDR=127.0.0.1:3724"
             echo "E2E_AUTH_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_auth"
             echo "E2E_CHAR_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_characters"

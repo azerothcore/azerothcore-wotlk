@@ -91,7 +91,7 @@ struct boss_teron_gorefiend : public BossAI
     {
         ScheduleTimedEvent(20s, 30s, [&]
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
             {
                 if (roll_chance_i(50))
                     Talk(SAY_INCINERATE);
