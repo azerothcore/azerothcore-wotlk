@@ -1,5 +1,10 @@
 # Templates
 
+## creature_template
+
+- Set `flags_extra` on every `difficulty_entry_*` template, not only the base entry: whether the engine reads the base
+  or the difficulty entry varies by call site.
+
 ## creature_template_model
 
 - Rows were generated from the old `modelid1`-`modelid4` columns, and that migration copied

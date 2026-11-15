@@ -27,8 +27,8 @@ every changed line, not as background reading.
   in the latest push" against the current diff.
 - When a change touches control flow (early returns, new branches, removed guards), trace the states it
   can leave behind (null, empty, fall-through) into every consumer, including unchanged lines the new
-  flow now reaches, and verify what runs when an acquire/attack/GetX call returns null, not just what
-  enables it.
+  flow now reaches, and verify what runs when an acquire/attack/GetX call leaves a null result, not just
+  what enables it.
 - Check the change is still needed against current `master`: the surrounding code may have moved, or
   another change may have landed the same fix.
 

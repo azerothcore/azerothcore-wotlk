@@ -25,11 +25,11 @@ Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).
 
 ## Read also
 
-- Class deriving `ScriptedAI`, `BossAI`, `CreatureAI` or another creature AI base, or registered via
-  `RegisterCreatureAI` → `systems/creature-ai.md`
+- Class deriving `ScriptedAI`, `BossAI`, `CreatureAI`, `GameObjectAI` or another AI base, or registered via
+  `RegisterCreatureAI`/`RegisterGameObjectAI` → `systems/creature-ai.md`
 - `instance_*.cpp`, a class deriving `InstanceScript`/`InstanceMapScript`, calls to `LoadObjectData`/`ObjectData`,
   `LoadSummonData`/`SummonData` or `instance->GetCreature(DATA_*)`, or summoning a creature in an instance's scripts
   → `systems/instance-scripts.md`
-- `SpellScript`/`AuraScript` → `systems/spells-and-summons.md`
+- `SpellScript`/`AuraScript` → `systems/spells.md`
 - `SetData`/`DoAction` on a creature or gameobject whose `AIName` is `SmartAI`/`SmartGameObjectAI` →
   `systems/smartai.md`

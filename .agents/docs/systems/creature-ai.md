@@ -1,6 +1,6 @@
 # Creature AI
 
-C++ creature AI: `ScriptedAI`/`BossAI` scripts and the AI bases in `src/server/game/AI/`.
+C++ AI: `ScriptedAI`/`BossAI`/`GameObjectAI` scripts and the AI bases in `src/server/game/AI/`.
 
 ## Helpers
 

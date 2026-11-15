@@ -14,8 +14,6 @@ Run the linter before claiming a change is done: `python apps/codestyle/codestyl
 
 - Sniff-backed changes stamp `VerifiedBuild` (the sniff's client build) on every row the sniff validated, including
   rows the fix doesn't otherwise touch.
-- Set `flags_extra` on every `difficulty_entry_*` template, not only the base entry: whether the engine reads the base
-  or the difficulty entry varies by call site.
 
 ## The three databases
 
@@ -29,7 +27,7 @@ Run the linter before claiming a change is done: `python apps/codestyle/codestyl
 
 - `smart_scripts` or an `AIName` → `systems/smartai.md`, the "Scope of a fix" section of `cpp-scripts.md` and
   "Trigger and helper NPCs" in `systems/creature-ai.md`
-- A summon (SAI 12 or 107, `creature_summon_groups`) in an instance map → "ObjectData slots" in
+- A creature summon in an instance map (any SAI summon action or cast of a summon spell, `creature_summon_groups`) →
   `systems/instance-scripts.md`
 - `creature_template`, `creature_template_model`, `creature_immunities` → `systems/templates.md`
-- `spell_script_names` → `systems/spells-and-summons.md`
+- `spell_script_names` → `systems/spells.md`

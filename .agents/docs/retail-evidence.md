@@ -7,6 +7,6 @@
 
 ## Unit flags
 
-- `unit_flags`, `unit_flags2` and `dynamicflags` (SAI set/remove-flag actions, C++
-  `SetUnitFlag*`/`ReplaceAllUnitFlags*`/`SetDynamicFlag`): set only with sniff or upstream evidence (the same flag in
+- `unit_flags`, `unit_flags2` and `dynamicflags` (SAI set/add-flag actions, C++
+  `SetUnitFlag*`/`ReplaceAllUnitFlags*`/`SetDynamicFlag`): add only with sniff or upstream evidence (the same flag in
   another script is none).
