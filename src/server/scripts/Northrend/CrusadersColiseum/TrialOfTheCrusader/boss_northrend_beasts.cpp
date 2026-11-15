@@ -378,9 +378,9 @@ public:
         {
             me->setActive(true);
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_IMPALE, 9s, 10s);
-            events.RescheduleEvent(EVENT_SPELL_STAGGERING_STOMP, 15s);
-            events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 16s, 24s);
+            events.RescheduleEvent(EVENT_SPELL_IMPALE, 11s);
+            events.RescheduleEvent(EVENT_SPELL_STAGGERING_STOMP, 16s);
+            events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 21s);
         }
 
         void JustReachedHome() override
@@ -409,14 +409,14 @@ public:
                     {
                         if (Unit* victim = me->GetVictim())
                             me->CastSpell(victim, SPELL_IMPALE, false);
-                        events.Repeat(9s, 10s);
+                        events.Repeat(11s);
                     }
                     else
                         events.Repeat(2500ms);
                     break;
                 case EVENT_SPELL_STAGGERING_STOMP:
                     me->CastSpell((Unit*)nullptr, SPELL_STAGGERING_STOMP, false);
-                    events.Repeat(20s, 25s);
+                    events.Repeat(21s);
                     break;
                 case EVENT_PICK_SNOBOLD_TARGET:
                     if (Vehicle* vk = me->GetVehicleKit())
@@ -445,7 +445,7 @@ public:
 
                                 break;
                             }
-                    events.Repeat(16s, 24s);
+                    events.Repeat(21s);
                     break;
             }
 
@@ -667,21 +667,24 @@ struct boss_jormungarAI : public ScriptedAI
         }
     }
 
-    void ScheduleEvents(bool emerged = false)
+    void ScheduleEvents()
     {
         events.Reset();
         if (me->GetDisplayId() == _MODEL_STATIONARY )
         {
             me->SetAttackTime(BASE_ATTACK, 1500);
-            events.RescheduleEvent(EVENT_SPELL_SPRAY, (me->GetEntry() == NPC_ACIDMAW ? 10s : 15s));
-            events.RescheduleEvent(EVENT_SPELL_SWEEP, 15s, 30s);
+            if (me->GetEntry() == NPC_ACIDMAW)
+                events.RescheduleEvent(EVENT_SPELL_SPRAY, 8s, 10s);
+            else
+                events.RescheduleEvent(EVENT_SPELL_SPRAY, 19s, 21s);
+            events.RescheduleEvent(EVENT_SPELL_SWEEP, 16s, 18s);
         }
         else
         {
             me->SetAttackTime(BASE_ATTACK, 2000);
             events.RescheduleEvent(EVENT_SPELL_BITE, 6s);
-            events.RescheduleEvent(EVENT_SPELL_SPEW, emerged ? 0s : 11s);
-            events.RescheduleEvent(EVENT_SPELL_SLIME_POOL, 14500ms);
+            events.RescheduleEvent(EVENT_SPELL_SPEW, 11s);
+            events.RescheduleEvent(EVENT_SPELL_SLIME_POOL, 15s, 16s);
         }
         events.RescheduleEvent(EVENT_SUBMERGE, 45s, 50s);
     }
@@ -797,16 +800,19 @@ struct boss_jormungarAI : public ScriptedAI
                 Submerged = false;
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
-                ScheduleEvents(true);
+                ScheduleEvents();
                 break;
             case EVENT_SPELL_SPRAY:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
                     me->CastSpell(target, _SPELL_SPRAY, false);
-                events.Repeat(20s);
+                if (me->GetEntry() == NPC_ACIDMAW)
+                    events.Repeat(17s, 18s);
+                else
+                    events.Repeat(22s, 23s);
                 break;
             case EVENT_SPELL_SWEEP:
                 me->CastSpell((Unit*)nullptr, SPELL_SWEEP_0, false);
-                events.Repeat(15s, 30s);
+                events.Repeat(17s, 18s);
                 break;
             case EVENT_SPELL_BITE:
                 if (Unit* victim = me->GetVictim())
@@ -819,7 +825,7 @@ struct boss_jormungarAI : public ScriptedAI
                 break;
             case EVENT_SPELL_SLIME_POOL:
                 DoCastSelf(SUMMON_SLIME_POOL);
-                events.Repeat(12s);
+                events.Repeat(13s);
                 break;
         }
 
@@ -1076,10 +1082,6 @@ public:
             else if (id == EVENT_CHARGE)
             {
                 events.Reset();
-                events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, 5s, 15s);
-                events.RescheduleEvent(EVENT_SPELL_WHIRL, 2s, 5s);
-                events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, 5s, 8s);
-                events.RescheduleEvent(EVENT_JUMP_MIDDLE, 30s, 50s);
 
                 float angle = me->GetAngle(&Locs[LOC_CENTER]);
                 angle = angle >= M_PI ? angle - M_PI : angle + M_PI;
@@ -1092,10 +1094,18 @@ public:
                     me->CastSpell(me, SPELL_STAGGERED_DAZE, true);
                     me->CastSpell((Unit*)nullptr, SPELL_TRAMPLE, true);
                     Talk(EMOTE_TRAMPLE_CRASH);
-                    events.DelayEvents(15s);
+                    // Abilities resume as the 15s Staggered Daze fades
+                    events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, 21s, 23s);
+                    events.RescheduleEvent(EVENT_SPELL_WHIRL, 15s, 16s);
+                    events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, 15s, 16s);
+                    events.RescheduleEvent(EVENT_JUMP_MIDDLE, 44s, 47s);
                 }
                 else
                 {
+                    events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, 5s, 15s);
+                    events.RescheduleEvent(EVENT_SPELL_WHIRL, 2s, 5s);
+                    events.RescheduleEvent(EVENT_SPELL_ARCTIC_BREATH, 5s, 8s);
+                    events.RescheduleEvent(EVENT_JUMP_MIDDLE, 30s, 50s);
                     Talk(EMOTE_TRAMPLE_FAIL);
                     me->CastSpell(me, SPELL_FROTHING_RAGE, true);
                 }

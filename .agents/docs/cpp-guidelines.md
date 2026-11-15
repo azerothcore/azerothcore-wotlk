@@ -41,5 +41,6 @@ Hard rules (CI builds with `-Werror` and runs `cppcheck`):
 - A class deriving a hook script type from `ScriptDefines/*.h` (`PlayerScript`, `WorldScript`, `ServerScript`, …) →
   `systems/scripting.md`
 - A new `sConfigMgr->GetOption` call → `systems/config.md`
+- `SpellInfoCorrections.cpp` → `systems/spells-and-summons.md`
 - `src/server/game/AI/**` outside `SmartScripts/`, or a creature AI class (`ScriptedAI`, `BossAI`, `CreatureAI`, …)
   under `modules/` → `systems/creature-ai.md`

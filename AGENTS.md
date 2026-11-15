@@ -54,7 +54,7 @@ BEFORE starting the task, read every doc whose trigger matches, then follow each
 - Writing or modifying any C++ (`src/**`, `modules/**`) → `.agents/docs/cpp-guidelines.md`
 - Any change under `src/server/scripts/**` → `.agents/docs/cpp-scripts.md`
 - Creating or modifying any SQL (`*.sql`) → `.agents/docs/sql-guidelines.md`
-- Compiling, configuring or running tests → `.agents/docs/build.md`
+- Compiling, configuring or running tests, plan-given commands included → `.agents/docs/build.md`
 - Reviewing a changeset or PR, or opening or updating a PR → `.agents/docs/code-review.md`
 - Self-reviewing, or opening or updating a PR → also `.agents/docs/self-review-rules.md`
 - Capturing a lesson or adding/updating agent docs → `.agents/docs/README.md`
