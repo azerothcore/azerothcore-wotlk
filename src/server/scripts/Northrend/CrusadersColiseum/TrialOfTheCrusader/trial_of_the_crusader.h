@@ -232,6 +232,8 @@ enum NPCs
     NPC_DARKBANE                                    = 34496,
 
     NPC_ANUBARAK                                    = 34564,
+    NPC_SCARAB                                      = 34605,
+    NPC_BURROWER                                    = 34607,
 };
 
 enum GOs

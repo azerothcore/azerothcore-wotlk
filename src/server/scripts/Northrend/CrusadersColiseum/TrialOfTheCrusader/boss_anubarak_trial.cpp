@@ -44,8 +44,6 @@ enum AnubNPCs
 {
     NPC_FROST_SPHERE                            = 34606,
     NPC_BURROW                                  = 34862,
-    NPC_BURROWER                                = 34607,
-    NPC_SCARAB                                  = 34605,
     NPC_SPIKE                                   = 34660,
 };
 
@@ -209,10 +207,7 @@ struct boss_anubarak_trial : public BossAI
         }
         summons.clear();
         for (uint8 i = 0; i < 4; ++i)
-        {
-            if (Creature* burrow = me->SummonCreature(NPC_BURROW, AnubLocs[i + 1]))
-                _burrowGUIDs[i] = burrow->GetGUID();
-        }
+            me->SummonCreature(NPC_BURROW, AnubLocs[i + 1]);
         for (uint8 i = 0; i < 6; ++i)
         {
             if (Creature* sphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]))
@@ -302,22 +297,16 @@ struct boss_anubarak_trial : public BossAI
                     events.CancelEvent(EVENT_SPELL_PENETRATING_COLD);
                     events.RescheduleEvent(EVENT_EMERGE, 1min);
                     events.RescheduleEvent(EVENT_SPELL_SUMMON_SPIKE, 2500ms);
-                    events.RescheduleEvent(EVENT_SUMMON_SCARAB, 3s);
+                    events.RescheduleEvent(EVENT_SUMMON_SCARAB, 2500ms);
                 }
                 break;
             case EVENT_SUMMON_SCARAB:
-                {
-                    uint8 i = urand(0, 3);
-                    if (Creature* burrow = ObjectAccessor::GetCreature(*me, _burrowGUIDs[i]))
-                        DoCast(burrow, SPELL_SUMMON_SCARAB, true);
-                    events.Repeat(4s);
-                }
+                DoCastAOE(SPELL_SUMMON_SCARAB, true);
                 break;
             case EVENT_EMERGE:
                 {
                     DoCastSelf(SPELL_SPIKE_TELE, true);
                     summons.DespawnEntry(NPC_SPIKE);
-                    events.CancelEvent(EVENT_SUMMON_SCARAB);
                     events.RescheduleEvent(EVENT_EMERGE_2, 2s);
                 }
                 break;
@@ -400,7 +389,6 @@ private:
     bool _intro;
     bool _phase3;
     ObjectGuid _sphereGUIDs[6];
-    ObjectGuid _burrowGUIDs[4];
 };
 
 struct npc_swarm_scarab : public ScriptedAI
@@ -535,13 +523,7 @@ struct npc_frost_sphere : public NullCreatureAI
 
 struct npc_nerubian_burrower : public ScriptedAI
 {
-    npc_nerubian_burrower(Creature* creature) : ScriptedAI(creature)
-    {
-        // I am summoned by another npc (SPELL_EFFECT_FORCE_CAST), inform Anub'arak
-        if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* anub = instance->GetCreature(DATA_ANUBARAK))
-                anub->AI()->JustSummoned(me);
-    }
+    npc_nerubian_burrower(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
@@ -792,6 +774,24 @@ class spell_pursuing_spikes_aura : public AuraScript
     }
 };
 
+// 66339 - Summon Scarab
+class spell_anubarak_summon_scarab_aura : public AuraScript
+{
+    PrepareAuraScript(spell_anubarak_summon_scarab_aura);
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        // Sniffed burrows summon on roughly a third of their ticks; nothing in the DBC rolls this.
+        if (!roll_chance_i(35))
+            PreventDefaultAction();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_anubarak_summon_scarab_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 // 66118 Leeching Swarm
 enum LeechingSwarmSpells
 {
@@ -860,6 +860,7 @@ void AddSC_boss_anubarak_trial()
     RegisterTrialOfTheCrusaderCreatureAI(npc_nerubian_burrower);
     RegisterTrialOfTheCrusaderCreatureAI(npc_anubarak_spike);
     RegisterSpellScript(spell_pursuing_spikes_aura);
+    RegisterSpellScript(spell_anubarak_summon_scarab_aura);
     RegisterSpellScript(spell_gen_leeching_swarm_aura);
     RegisterSpellScript(spell_gen_leeching_swarm_dmg);
 }

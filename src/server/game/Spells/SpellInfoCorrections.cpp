@@ -2536,14 +2536,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         //spellInfo->EffectTriggerSpell[0] = 0;
     });
 
-    // Trial of the Crusader, Anub'arak, Summon Scarab
-    ApplySpellFix({ 66339 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(35);
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(25);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
-    });
-
     // Trial of the Crusader, Anub'arak, Achievements: The Traitor King
     ApplySpellFix({
         68186,  // Anub'arak Scarab Achievement 10
