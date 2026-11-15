@@ -63,8 +63,8 @@ public:
 
         static ChatCommandTable accountLockCommandTable
         {
-            { "country",    HandleAccountLockCountryCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_COUNTRY, Console::Yes  },
-            { "ip",         HandleAccountLockIpCommand,       rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_IP, Console::Yes  }
+            { "country",    HandleAccountLockCountryCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_COUNTRY, Console::No  },
+            { "ip",         HandleAccountLockIpCommand,       rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_IP, Console::No  }
         };
 
         static ChatCommandTable account2faCommandTable
