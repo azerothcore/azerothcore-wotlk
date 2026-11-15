@@ -2365,6 +2365,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].DieSides = 0;
     });
 
+    // Trial of the Crusader, Twin Valkyr, Clear Val'kyr Essence
+    ApplySpellFix({ 67547 }, [](SpellInfo* spellInfo)
+    {
+        // Light and Dark Essence persist through death, so dead players must be cleared too
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_ALLOW_DEAD_TARGET;
+    });
+
     // Trial of the Crusader, Twin Valkyr, Touch of Light/Darkness, Light/Dark Surge
     ApplySpellFix({
         65950   // light 0
