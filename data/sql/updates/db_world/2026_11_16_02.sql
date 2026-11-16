@@ -1,3 +1,4 @@
+-- DB update 2026_11_16_01 -> 2026_11_16_02
 DELETE FROM `command` WHERE `name` = 'instance bind';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('instance bind', 2, 'Syntax: .instance bind [$instanceId] [$playername]\nBinds the selected player, yourself, or the named character, online or offline, to instance $instanceId. Without an instance id, binds to the instance you are in. Fails if the character is already bound to that map and difficulty. From the console both arguments are required.');
