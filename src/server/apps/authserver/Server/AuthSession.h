@@ -26,7 +26,7 @@
 #include "Optional.h"
 #include "QueryResult.h"
 #include "SRP6.h"
-#include "Socket.h"
+#include "TcpSocket.h"
 #include <boost/asio/ip/tcp.hpp>
 
 using boost::asio::ip::tcp;
@@ -61,9 +61,9 @@ struct AccountInfo
     AccountTypes SecurityLevel = SEC_PLAYER;
 };
 
-class AuthSession final : public Socket<AuthSession>
+class AuthSession final : public TcpSocket<AuthSession>
 {
-    typedef Socket<AuthSession> AuthSocket;
+    typedef TcpSocket<AuthSession> AuthSocket;
 
 public:
     static std::unordered_map<uint8, AuthHandler> InitHandlers();
@@ -76,6 +76,8 @@ public:
     void SendPacket(ByteBuffer& packet);
 
 protected:
+    bool ReadHeaderHandler() override { return true; }
+    ReadDataHandlerResult ReadDataHandler() override { return ReadDataHandlerResult::Ok; }
     SocketReadCallbackResult ReadHandler() final;
 
 private:

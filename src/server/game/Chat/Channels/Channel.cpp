@@ -25,22 +25,33 @@
 #include "Player.h"
 #include "RBAC.h"
 #include "SocialMgr.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 
-Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId, bool announce, bool ownership):
+Channel::Channel(std::string const& name, uint32 channelDBCId, uint64 channelGuid, TeamId teamId, bool announce, bool ownership):
     _announce(announce),
+    _moderation(false),
     _ownership(ownership),
     _IsSaved(false),
     _isOwnerGM(false),
     _flags(0),
-    _channelId(channelId),
-    _channelDBId(channelDBId),
+    _channelId(channelDBCId),
+    _channelDBId(static_cast<uint32>(channelGuid)),
     _teamId(teamId),
     _name(name),
-    _password("")
+    _password(""),
+    _voiceSessionGuid(0),
+    _voiceId(0),
+    _voiceType(VoiceChatChannelType::Custom),
+    _voiceGroupId(0),
+    _voiceMassAdding(false),
+    _voiceDeleting(false),
+    _voiceTurnedOff(false),
+    _lastVoiceUserId(0),
+    _voiceUserIdClock(0)
 {
     // set special flags if built-in channel
-    if (ChatChannelsEntry const* ch = sChatChannelsStore.LookupEntry(channelId)) // check whether it's a built-in channel
+    if (ChatChannelsEntry const* ch = sChatChannelsStore.LookupEntry(channelDBCId)) // check whether it's a built-in channel
     {
         _announce = false;                                 // no join/leave announces
         _ownership = false;                                // no ownership handout
@@ -63,26 +74,20 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
         _flags |= CHANNEL_FLAG_CUSTOM;
 
         // pussywizard:
-        _channelRights = ChannelMgr::GetChannelRightsFor(_name);
-        if (_channelRights.flags & CHANNEL_RIGHT_FORCE_NO_ANNOUNCEMENTS)
-            _announce = false;
-        if (_channelRights.flags & CHANNEL_RIGHT_FORCE_ANNOUNCEMENTS)
-            _announce = true;
-        if (_channelRights.flags & CHANNEL_RIGHT_NO_OWNERSHIP)
-            _ownership = false;
+        SetChannelRights(ChannelRights(sChannelMgr.GetChannelRightsFor(_name)));
         if (_channelRights.flags & CHANNEL_RIGHT_DONT_PRESERVE)
             return;
 
         _IsSaved = true;
 
         // Xinef: loading
-        if (channelDBId > 0)
+        if (channelGuid > 0)
             return;
 
         // If storing custom channels in the db is enabled either load or save the channel
         if (sWorld->getBoolConfig(CONFIG_PRESERVE_CUSTOM_CHANNELS))
         {
-            _channelDBId = ++ChannelMgr::_channelIdMax;
+            _channelDBId = static_cast<uint32>(sChannelMgr.GetNextChannelGuid());
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL);
             stmt->SetData(0, _channelDBId);
@@ -92,6 +97,43 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
             CharacterDatabase.Execute(stmt);
         }
     }
+}
+
+// voice-only channel (group/raid/battleground), owned by VoiceChatMgr
+Channel::Channel(VoiceChatChannelType voiceChannelType, uint32 voiceGroupId, TeamId teamId):
+    _announce(false),
+    _moderation(false),
+    _ownership(false),
+    _IsSaved(false),
+    _isOwnerGM(false),
+    _flags(CHANNEL_FLAG_VOICE),
+    _channelId(0),
+    _channelDBId(0),
+    _teamId(teamId),
+    _name(""),
+    _password(""),
+    _voiceSessionGuid(0),
+    _voiceId(0),
+    _voiceType(voiceChannelType),
+    _voiceGroupId(voiceGroupId),
+    _voiceMassAdding(false),
+    _voiceDeleting(false),
+    _voiceTurnedOff(false),
+    _lastVoiceUserId(0),
+    _voiceUserIdClock(0)
+{
+}
+
+void Channel::SetChannelRights(ChannelRights&& channelRights)
+{
+    _channelRights = std::move(channelRights);
+
+    if (_channelRights.flags & CHANNEL_RIGHT_FORCE_NO_ANNOUNCEMENTS)
+        _announce = false;
+    if (_channelRights.flags & CHANNEL_RIGHT_FORCE_ANNOUNCEMENTS)
+        _announce = true;
+    if (_channelRights.flags & CHANNEL_RIGHT_NO_OWNERSHIP)
+        _ownership = false;
 }
 
 bool Channel::IsBanned(ObjectGuid guid) const
@@ -244,6 +286,18 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
         if (_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK)
             playersStore[guid].SetMuted(true);
+
+        // voice chat
+        if (!IsLFG() && sVoiceChatMgr->CanUseVoiceChat())
+        {
+            // the first joining member with voice chat enabled turns voice on,
+            // unless a moderator turned it off or the member may not use voice here
+            if (!IsVoiceEnabled() && !_voiceTurnedOff && player->GetSession()->IsVoiceChatEnabled() &&
+                CanUseVoice(player))
+                VoiceOn(player);
+            else if (IsVoiceEnabled())
+                sVoiceChatMgr->AddToCustomVoiceChatChannel(guid, GetName(), player->GetTeamId());
+        }
     }
 }
 
@@ -282,6 +336,10 @@ void Channel::LeaveChannel(Player* player, bool send)
 
     RemoveWatching(player);
     LeaveNotify(player);
+
+    // voice chat
+    if (IsVoiceEnabled() && GetVoiceId())
+        RemoveVoiceChatMember(guid);
 
     if (!IsConstant())
     {
@@ -440,6 +498,11 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     if (isOnChannel)
     {
         playersStore.erase(victim);
+
+        // voice chat
+        if (IsVoiceEnabled() && GetVoiceId())
+            RemoveVoiceChatMember(victim);
+
         bad->LeftChannel(this);
         RemoveWatching(bad);
         LeaveNotify(bad);
@@ -570,7 +633,7 @@ void Channel::Password(Player const* player, std::string const& pass)
     UpdateChannelInDB();
 }
 
-void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bool set)
+bool Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bool set)
 {
     ObjectGuid guid = player->GetGUID();
 
@@ -579,7 +642,7 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         WorldPacket data;
         MakeNotMember(&data);
         SendToOne(&data, guid);
-        return;
+        return false;
     }
 
     if (!playersStore[guid].IsModerator() && !player->GetSession()->HasPermission(rbac::RBAC_PERM_CHANGE_CHANNEL_NOT_MODERATOR))
@@ -587,11 +650,11 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         WorldPacket data;
         MakeNotModerator(&data);
         SendToOne(&data, guid);
-        return;
+        return false;
     }
 
     if (guid == _ownerGUID && std::string(p2n) == player->GetName() && mod)
-        return;
+        return false;
 
     Player* newp = ObjectAccessor::FindPlayerByName(p2n, false);
     ObjectGuid victim = newp ? newp->GetGUID() : ObjectGuid::Empty;
@@ -605,7 +668,7 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         WorldPacket data;
         MakePlayerNotFound(&data, p2n);
         SendToOne(&data, guid);
-        return;
+        return false;
     }
 
     if (_ownerGUID == victim && _ownerGUID != guid)
@@ -613,7 +676,7 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         WorldPacket data;
         MakeNotOwner(&data);
         SendToOne(&data, guid);
-        return;
+        return false;
     }
 
     if (mod)
@@ -632,12 +695,14 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
                 WorldPacket data;
                 MakeNotModerator(&data);
                 SendToOne(&data, guid);
-                return;
+                return false;
             }
         }
 
         SetMute(newp->GetGUID(), set);
     }
+
+    return true;
 }
 
 void Channel::SetOwner(Player const* player, std::string const& newname)
@@ -686,7 +751,7 @@ void Channel::SendWhoOwner(ObjectGuid guid)
     SendToOne(&data, guid);
 }
 
-void Channel::List(Player const* player)
+void Channel::List(Player const* player, bool display)
 {
     ObjectGuid guid = player->GetGUID();
 
@@ -700,7 +765,7 @@ void Channel::List(Player const* player)
 
     LOG_DEBUG("chat.system", "SMSG_CHANNEL_LIST {} Channel: {}", player->GetSession()->GetPlayerInfo(), GetName());
     WorldPacket data(SMSG_CHANNEL_LIST, 1 + (GetName().size() + 1) + 1 + 4 + playersStore.size() * (8 + 1));
-    data << uint8(1);                                   // channel type?
+    data << uint8(display ? 1 : 0);                     // 0 = /chatlist (printed to chat), 1 = channel pane
     data << GetName();                                  // channel name
     data << uint8(GetFlags());                          // channel flags?
 

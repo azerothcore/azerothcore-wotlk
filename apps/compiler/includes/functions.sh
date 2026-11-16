@@ -176,6 +176,8 @@ function comp_compile() {
             cp -v "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
         [[ -f "$confDir/dbimport.conf.dist" && ! -f "$confDir/dbimport.conf" ]] && \
             cp -v "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
+        [[ -f "$confDir/voiceserver.conf.dist" && ! -f "$confDir/voiceserver.conf" ]] && \
+            cp -v "$confDir/voiceserver.conf.dist" "$confDir/voiceserver.conf"
 
         for f in "$confDir/modules/"*.dist
         do

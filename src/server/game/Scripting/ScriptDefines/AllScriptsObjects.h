@@ -64,6 +64,7 @@
 #include "TransportScript.h"
 #include "UnitScript.h"
 #include "VehicleScript.h"
+#include "VoiceChatScript.h"
 #include "WeatherScript.h"
 #include "WorldMapScript.h"
 #include "WorldObjectScript.h"

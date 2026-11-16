@@ -20,7 +20,7 @@
 
 #include "IpAddress.h"
 #include "Log.h"
-#include "Socket.h"
+#include "TcpSocket.h"
 #include "Systemd.h"
 #include <atomic>
 #include <boost/asio/ip/tcp.hpp>

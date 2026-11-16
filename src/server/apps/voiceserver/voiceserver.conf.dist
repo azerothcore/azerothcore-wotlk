@@ -1,0 +1,212 @@
+###################################################################################################
+#  AzerothCore Voice Server configuration file                                                    #
+###################################################################################################
+[voiceserver]
+
+###################################################################################################
+# SECTION INDEX
+#
+#    VOICE SERVER SETTINGS
+#    NETWORK
+#    LOGGING SYSTEM SETTINGS
+#
+###################################################################################################
+
+###################################################################################################
+# VOICE SERVER SETTINGS
+#
+#    LogsDir
+#        Description: Logs directory setting.
+#        Important:   LogsDir needs to be quoted, as the string might contain space characters.
+#                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/azerothcore/logs"
+#        Default:     "" - (Log files will be stored in the current path)
+
+LogsDir = ""
+
+#
+#    ClientPort
+#        Description: UDP port the game clients send voice data to.
+#        Important:   Must match the worldserver "VoiceChat.VoicePort" setting and must be
+#                     reachable by game clients.
+#                     A client may only use its voice slot from the IP address the worldserver
+#                     sees it connect from, so game clients must reach the voice server and the
+#                     worldserver from the same address (no TCP proxy in front of the worldserver
+#                     without PROXY protocol, no separate NAT paths).
+#        Default:     3724
+
+ClientPort = 3724
+
+#
+#    ClientBindIP
+#        Description: Bind the voice data (UDP) socket to IP/hostname.
+#        Important:   Game clients only accept voice data sent from exactly the address and port
+#                     the worldserver gives them (its "VoiceChat.VoiceAddress" and
+#                     "VoiceChat.VoicePort" settings). On a host with several addresses bind to
+#                     that address, replies may leave from another one otherwise and the clients
+#                     hear nothing. A NAT in front of the voice server must keep the port as is.
+#        Default:     "0.0.0.0" - (Bind to all IPs on the system)
+
+ClientBindIP = "0.0.0.0"
+
+#
+#    ClientMaxPacketsPerSecond
+#        Description: Voice data packets a game client may send per second, the voice server drops
+#                     the packets above it instead of relaying them. A talking client sends about
+#                     10 packets per second, the limit allows bursts of up to one second worth.
+#        Default:     50
+#                     0  - (No limit)
+
+ClientMaxPacketsPerSecond = 50
+
+#
+#    InternalPort
+#        Description: TCP port the worldserver connects to. Several worldservers (realms) may
+#                     connect, the voice channels of each are kept apart.
+#        Important:   Must match the worldserver "VoiceChat.ServerPort" setting.
+#        Default:     3725
+
+InternalPort = 3725
+
+#
+#    InternalBindIP
+#        Description: Bind the internal (worldserver) TCP socket to IP/hostname.
+#        Important:   The internal protocol is unauthenticated. Do not expose this port to
+#                     untrusted networks. Keep it on localhost or a private network.
+#        Default:     "127.0.0.1" - (Bind to localhost)
+
+InternalBindIP = "127.0.0.1"
+
+#
+#    PidFile
+#        Description: Voice server PID file.
+#        Example:     "./voiceserver.pid"  - (Enabled)
+#        Default:     ""                   - (Disabled)
+
+PidFile = ""
+
+#
+#    UseProcessors
+#        Description: Processors mask for Windows and Linux based multi-processor systems.
+#        Example:     A computer with 2 CPUs:
+#                     1 - 1st CPU only, 2 - 2nd CPU only, 3 - 1st and 2nd CPU, because 1 | 2 is 3
+#        Default:     0  - (Selected by OS)
+#                     1+ - (Bit mask value of selected processors)
+
+UseProcessors = 0
+
+#
+#    ProcessPriority
+#        Description: Process priority setting for Windows and Linux based systems.
+#        Details:     On Linux, a nice value of -15 is used. (requires superuser). On Windows, process is set to HIGH class.
+#        Default:     0 - (Normal)
+#                     1 - (High)
+
+ProcessPriority = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+# NETWORK
+#
+#    Network.UseSocketActivation
+#        Description: [LINUX ONLY FEATURE] Enable systemd socket activation support for the
+#                     internal (worldserver) port. When enabled and the process is started by
+#                     systemd socket activation, the server will use the socket passed by
+#                     systemd instead of creating and binding its own listening socket.
+#                     Disabled by default.
+#
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.UseSocketActivation = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+#  LOGGING SYSTEM SETTINGS
+#
+#  Appender config values: Given an appender "name"
+#    Appender.name
+#        Description: Defines 'where to log'.
+#        Format:      Type,LogLevel,Flags,optional1,optional2,optional3
+#
+#                     Type
+#                         0 - (None)
+#                         1 - (Console)
+#                         2 - (File)
+#
+#                     LogLevel
+#                         0 - (Disabled)
+#                         1 - (Fatal)
+#                         2 - (Error)
+#                         3 - (Warning)
+#                         4 - (Info)
+#                         5 - (Debug)
+#                         6 - (Trace)
+#
+#                     Flags:
+#                         0 - None
+#                         1 - Prefix Timestamp to the text
+#                         2 - Prefix Log Level to the text
+#                         4 - Prefix Log Filter type to the text
+#                         8 - Append timestamp to the log file name. Format: YYYY-MM-DD_HH-MM-SS
+#                             (Only used with Type = 2)
+#                        16 - Make a backup of existing file before overwrite
+#                             (Only used with Mode = w)
+#
+#                     Colors (read as optional1 if Type = Console)
+#                         Format: "fatal error warn info debug trace"
+#                         0 - BLACK
+#                         1 - RED
+#                         2 - GREEN
+#                         3 - BROWN
+#                         4 - BLUE
+#                         5 - MAGENTA
+#                         6 - CYAN
+#                         7 - GREY
+#                         8 - YELLOW
+#                         9 - WHITE
+#                        10 - LRED
+#                        11 - LGREEN
+#                        12 - LBLUE
+#                        13 - LMAGENTA
+#                        14 - LCYAN
+#                        15 - WHITE
+#
+#                     File: Name of the file (read as optional1 if Type = File)
+#                         Allows to use one "%s" to create dynamic files
+#
+#                     Mode: Mode to open the file (read as optional2 if Type = File)
+#                          a - (Append)
+#                          w - (Overwrite)
+#
+#                     Backup: Timestamp of the backed up file (read as optional3 if Type = File)
+
+Appender.Console=1,4,0,"1 9 3 6 5 8"
+Appender.Voice=2,5,0,Voice.log,w
+
+#  Logger config values: Given a logger "name"
+#    Logger.name
+#        Description: Defines 'What to log'.
+#        Format:      LogLevel,AppenderList
+#
+#                     LogLevel
+#                         0 - (Disabled)
+#                         1 - (Fatal)
+#                         2 - (Error)
+#                         3 - (Warning)
+#                         4 - (Info)
+#                         5 - (Debug)
+#                         6 - (Trace)
+#
+#                     AppenderList: List of appenders linked to logger
+#                     (Using spaces as separator).
+
+Logger.root=4,Console Voice
+
+#
+###################################################################################################

@@ -34,6 +34,7 @@
 #include "QueryPackets.h"
 #include "QuestPackets.h"
 #include "TotemPackets.h"
+#include "VoiceChatPackets.h"
 #include "WorldStatePackets.h"
 
 #endif // AllPackets_h__

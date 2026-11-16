@@ -87,6 +87,7 @@ namespace
         ScriptTypeInfo<TransportScript,           0,                       true,      true>,
         ScriptTypeInfo<UnitScript,                UNITHOOK_END>,
         ScriptTypeInfo<VehicleScript,             0,                       false,     true>,
+        ScriptTypeInfo<VoiceChatScript,           VOICECHATHOOK_END>,
         ScriptTypeInfo<WeatherScript,             0,                       true,      true>,
         ScriptTypeInfo<WorldMapScript,            0,                       true,      true>,
         ScriptTypeInfo<WorldObjectScript,         WORLDOBJECTHOOK_END>,
@@ -95,8 +96,8 @@ namespace
     // These counts mirror the four hand-maintained lists this consolidation
     // replaced. If a flag is mistyped or a type is added without its metadata,
     // the build fails here instead of silently drifting.
-    static_assert(Acore::size_v<ScriptRegistryTypes> == 49, "Update count when adding a script registry type");
-    static_assert(Acore::count_if<ScriptRegistryTypes>([]<typename Info>() { return Info::HasEnabledHooks; }) == 28, "Enabled-hook script type count changed");
+    static_assert(Acore::size_v<ScriptRegistryTypes> == 50, "Update count when adding a script registry type");
+    static_assert(Acore::count_if<ScriptRegistryTypes>([]<typename Info>() { return Info::HasEnabledHooks; }) == 29, "Enabled-hook script type count changed");
     static_assert(Acore::count_if<ScriptRegistryTypes>([]<typename Info>() { return Info::PromotedAfterDbLoad; }) == 14, "After-load script type count changed");
     static_assert(Acore::count_if<ScriptRegistryTypes>([]<typename Info>() { return Info::LegacyDbValidationCandidate; }) == 34, "Database-check script type count changed");
 }

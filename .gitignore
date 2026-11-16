@@ -83,6 +83,7 @@ nbproject/
 cmake-build-*/*
 coverage-report/
 .vs
+*.aps
 
 .vscode/*
 !.vscode/settings.json

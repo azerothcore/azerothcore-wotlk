@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SOCKET_H__
-#define __SOCKET_H__
+#ifndef __TCPSOCKET_H__
+#define __TCPSOCKET_H__
 
+#include "Errors.h"
 #include "Log.h"
 #include "MessageBuffer.h"
 #include <atomic>
@@ -63,18 +64,25 @@ enum ProxyHeaderAddressFamilyAndProtocol {
     PROXY_HEADER_ADDRESS_FAMILY_AND_PROTOCOL_TCP_V6 = 0x21,
 };
 
+enum class ReadDataHandlerResult
+{
+    Ok = 0,
+    Error = 1,
+    WaitingForQuery = 2
+};
+
 template<class T>
-class Socket : public std::enable_shared_from_this<T>
+class TcpSocket : public std::enable_shared_from_this<T>
 {
 public:
-    explicit Socket(IoContextTcpSocket&& socket) : _socket(std::move(socket)), _remoteAddress(_socket.remote_endpoint().address()),
+    explicit TcpSocket(IoContextTcpSocket&& socket) : _socket(std::move(socket)), _remoteAddress(_socket.remote_endpoint().address()),
         _remotePort(_socket.remote_endpoint().port()), _readBuffer(), _state(SocketState::Open), _isWritingAsync(false),
         _proxyHeaderReadingState(PROXY_HEADER_READING_STATE_NOT_STARTED)
     {
         _readBuffer.Resize(READ_BLOCK_SIZE);
     }
 
-    virtual ~Socket()
+    virtual ~TcpSocket()
     {
         _state = SocketState::Closed;
         boost::system::error_code error;
@@ -124,7 +132,7 @@ public:
         _readBuffer.Normalize();
         _readBuffer.EnsureFreeSpace();
         _socket.async_read_some(boost::asio::buffer(_readBuffer.GetWritePointer(), _readBuffer.GetRemainingSpace()),
-            std::bind(&Socket<T>::ReadHandlerInternal, this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+            std::bind(&TcpSocket<T>::ReadHandlerInternal, this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
     }
 
     void AsyncReadProxyHeader()
@@ -139,7 +147,7 @@ public:
         _readBuffer.Normalize();
         _readBuffer.EnsureFreeSpace();
         _socket.async_read_some(boost::asio::buffer(_readBuffer.GetWritePointer(), _readBuffer.GetRemainingSpace()),
-            std::bind(&Socket<T>::ProxyReadHeaderHandler, this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+            std::bind(&TcpSocket<T>::ProxyReadHeaderHandler, this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
     }
 
     void AsyncReadWithCallback(void (T::*callback)(boost::system::error_code, std::size_t))
@@ -190,6 +198,16 @@ public:
         OnClose();
     }
 
+    void SetNoDelay(bool enable)
+    {
+        boost::system::error_code err;
+        _socket.set_option(tcp::no_delay(enable), err);
+
+        if (err)
+            LOG_DEBUG("network", "Socket::SetNoDelay: failed to set_option(boost::asio::ip::tcp::no_delay) for {} - {} ({})",
+                GetRemoteIpAddress().to_string(), err.value(), err.message());
+    }
+
     /// Marks the socket for closing after write buffer becomes empty
     void DelayedCloseSocket()
     {
@@ -201,7 +219,73 @@ public:
 
 protected:
     virtual void OnClose() { }
-    virtual SocketReadCallbackResult ReadHandler() = 0;
+    virtual bool ReadHeaderHandler() = 0;
+    virtual ReadDataHandlerResult ReadDataHandler() = 0;
+
+    virtual SocketReadCallbackResult ReadHandler()
+    {
+        if (!IsOpen())
+            return SocketReadCallbackResult::Stop;
+
+        MessageBuffer& packet = GetReadBuffer();
+        while (packet.GetActiveSize() > 0)
+        {
+            if (_headerBuffer.GetRemainingSpace() > 0)
+            {
+                // need to receive the header
+                std::size_t readHeaderSize = std::min(packet.GetActiveSize(), _headerBuffer.GetRemainingSpace());
+                _headerBuffer.Write(packet.GetReadPointer(), readHeaderSize);
+                packet.ReadCompleted(readHeaderSize);
+
+                if (_headerBuffer.GetRemainingSpace() > 0)
+                {
+                    // Couldn't receive the whole header this time.
+                    ASSERT(packet.GetActiveSize() == 0);
+                    break;
+                }
+
+                // We just received nice new header
+                if (!ReadHeaderHandler())
+                {
+                    CloseSocket();
+                    return SocketReadCallbackResult::Stop;
+                }
+            }
+
+            // We have full read header, now check the data payload
+            if (_packetBuffer.GetRemainingSpace() > 0)
+            {
+                // need more data in the payload
+                std::size_t readDataSize = std::min(packet.GetActiveSize(), _packetBuffer.GetRemainingSpace());
+                _packetBuffer.Write(packet.GetReadPointer(), readDataSize);
+                packet.ReadCompleted(readDataSize);
+
+                if (_packetBuffer.GetRemainingSpace() > 0)
+                {
+                    // Couldn't receive the whole data this time.
+                    ASSERT(packet.GetActiveSize() == 0);
+                    break;
+                }
+            }
+
+            // just received fresh new payload
+            ReadDataHandlerResult result = ReadDataHandler();
+            _headerBuffer.Reset();
+            // handlers usually move the payload out, but not always (e.g. an ignored packet);
+            // a stale write position would make the next, smaller payload overflow the buffer
+            _packetBuffer.Reset();
+
+            if (result != ReadDataHandlerResult::Ok)
+            {
+                if (result != ReadDataHandlerResult::WaitingForQuery)
+                    CloseSocket();
+
+                return SocketReadCallbackResult::Stop;
+            }
+        }
+
+        return SocketReadCallbackResult::KeepReading;
+    }
 
     bool AsyncProcessQueue()
     {
@@ -212,7 +296,7 @@ protected:
 
 #ifdef AC_SOCKET_USE_IOCP
         MessageBuffer& buffer = _writeQueue.front();
-        _socket.async_write_some(boost::asio::buffer(buffer.GetReadPointer(), buffer.GetActiveSize()), std::bind(&Socket<T>::WriteHandler,
+        _socket.async_write_some(boost::asio::buffer(buffer.GetReadPointer(), buffer.GetActiveSize()), std::bind(&TcpSocket<T>::WriteHandler,
             this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
 #else
         _socket.async_wait(boost::asio::socket_base::wait_write, [self = this->shared_from_this()](boost::system::error_code error)
@@ -223,15 +307,8 @@ protected:
         return false;
     }
 
-    void SetNoDelay(bool enable)
-    {
-        boost::system::error_code err;
-        _socket.set_option(tcp::no_delay(enable), err);
-
-        if (err)
-            LOG_DEBUG("network", "Socket::SetNoDelay: failed to set_option(boost::asio::ip::tcp::no_delay) for {} - {} ({})",
-                GetRemoteIpAddress().to_string(), err.value(), err.message());
-    }
+    MessageBuffer _headerBuffer;
+    MessageBuffer _packetBuffer;
 
 private:
     void ReadHandlerInternal(boost::system::error_code error, std::size_t transferredBytes)

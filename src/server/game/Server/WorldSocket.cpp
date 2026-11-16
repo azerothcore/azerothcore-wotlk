@@ -119,7 +119,7 @@ void EncryptableAndCompressiblePacket::CompressIfNeeded()
 }
 
 WorldSocket::WorldSocket(IoContextTcpSocket&& socket)
-    : Socket(std::move(socket)), _OverSpeedPings(0), _worldSession(nullptr), _authed(false), _sendBufferSize(4096), _loggingPackets(false)
+    : TcpSocket(std::move(socket)), _OverSpeedPings(0), _worldSession(nullptr), _authed(false), _sendBufferSize(4096), _loggingPackets(false)
 {
     Acore::Crypto::GetRandomBytes(_authSeed);
     _headerBuffer.Resize(sizeof(ClientPktHeader));
@@ -309,9 +309,7 @@ bool WorldSocket::ReadHeaderHandler()
     ASSERT(_headerBuffer.GetActiveSize() == sizeof(ClientPktHeader));
 
     if (_authCrypt.IsInitialized())
-    {
         _authCrypt.DecryptRecv(_headerBuffer.GetReadPointer(), sizeof(ClientPktHeader));
-    }
 
     ClientPktHeader* header = reinterpret_cast<ClientPktHeader*>(_headerBuffer.GetReadPointer());
     EndianConvertReverse(header->size);
@@ -397,7 +395,7 @@ struct AccountInfo
     }
 };
 
-WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
+ReadDataHandlerResult WorldSocket::ReadDataHandler()
 {
     ClientPktHeader* header = reinterpret_cast<ClientPktHeader*>(_headerBuffer.GetReadPointer());
     OpcodeClient opcode = static_cast<OpcodeClient>(header->cmd);

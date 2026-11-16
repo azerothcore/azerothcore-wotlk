@@ -55,6 +55,12 @@ public:
         _queue.push_back(std::move(item));
     }
 
+    void emplace_back(T&& item)
+    {
+        std::lock_guard<std::mutex> lock(_lock);
+        _queue.emplace_back(std::move(item));
+    }
+
     /**
      * @brief Adds a range of items to the front of the queue.
      *

@@ -138,7 +138,7 @@ CU_RUN_HOOK("BEFORE_SRC_LOAD")
 # add core sources
 add_subdirectory(src)
 
-if (BUILD_APPLICATION_WORLDSERVER)
+if (BUILD_APPLICATION_WORLDSERVER OR BUILD_APPLICATION_VOICESERVER)
   # add modules sources
   add_subdirectory(modules)
 endif()
