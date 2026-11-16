@@ -1,3 +1,4 @@
+-- DB update 2026_11_16_04 -> 2026_11_16_05
 -- Instant Poison, all ranks (2010-01-07 hotfix: AP bonus -10%)
 UPDATE `spell_bonus_data` SET `ap_bonus` = 0.09
 WHERE `entry` IN (8680, 8685, 8689, 11335, 11336, 11337, 26890, 57964, 57965);
