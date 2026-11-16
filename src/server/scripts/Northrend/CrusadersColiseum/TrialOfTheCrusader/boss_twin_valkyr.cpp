@@ -25,7 +25,7 @@
 #include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
 /*
-    (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
+    (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, ETC.) SINCE THEY DIE SIMULTANEOUSLY
 */
 
 enum Yells
@@ -89,6 +89,9 @@ enum ValkyrSpells
 
     SPELL_TWIN_POWER            = 65916,
     SPELL_BERSERK               = 64238,
+
+    SPELL_TWIN_EMPATHY_DARK     = 66132,
+    SPELL_TWIN_EMPATHY_LIGHT    = 66133,
 };
 
 enum ValkyrEvents
@@ -111,7 +114,6 @@ struct boss_twin_valkyrAI : public ScriptedAI
         me->SetReactState(REACT_PASSIVE);
         me->SetStatPctModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
         me->UpdateDamagePhysical(OFF_ATTACK);
-        LastSynchroHP = (int32)me->GetMaxHealth();
         SpecialMask = 0;
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HASTE_SPELLS, true);
 
@@ -137,7 +139,6 @@ struct boss_twin_valkyrAI : public ScriptedAI
     InstanceScript* pInstance;
     SummonList summons;
     EventMap events;
-    int32 LastSynchroHP;
     uint8 SpecialMask;
 
     void DoAction(int32 a) override
@@ -214,6 +215,21 @@ struct boss_twin_valkyrAI : public ScriptedAI
         return ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(me->GetEntry() == NPC_DARKBANE ? DATA_LIGHTBANE : DATA_DARKBANE));
     }
 
+    static void ApplyTwinEmpathy(Creature* caster, Creature* sister)
+    {
+        caster->AddAura(caster->GetEntry() == NPC_LIGHTBANE ? SPELL_TWIN_EMPATHY_DARK : SPELL_TWIN_EMPATHY_LIGHT, sister);
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        // The first twin is summoned alone, so the second links both before anyone can hit them
+        if (Creature* twin = GetSister())
+        {
+            ApplyTwinEmpathy(me, twin);
+            ApplyTwinEmpathy(twin, me);
+        }
+    }
+
     /*void AttackStart(Unit* victim)
     {
         if (victim && me->Attack(victim, true))
@@ -226,9 +242,12 @@ struct boss_twin_valkyrAI : public ScriptedAI
         me->LowerPlayerDamageReq(me->GetMaxHealth());
         DoZoneInCombat();
         if (Creature* twin = GetSister())
+        {
+            ApplyTwinEmpathy(me, twin);
             if (!twin->IsInCombat())
                 if (Unit* target = twin->SelectNearestTarget(200.0f))
                     twin->AI()->AttackStart(target);
+        }
 
         Talk(SAY_AGGRO);
         me->CastSpell(me, me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_SURGE : SPELL_DARK_SURGE, true);
@@ -271,29 +290,11 @@ struct boss_twin_valkyrAI : public ScriptedAI
         }
     }
 
-    void UpdateSharedHealth()
-    {
-        // lightbane synchronizes
-        if (me->GetEntry() == NPC_LIGHTBANE )
-            if (Creature* twin = GetSister())
-                if (twin->IsAlive() && me->IsAlive())
-                {
-                    int32 d = CAST_AI(boss_twin_valkyrAI, twin->AI())->LastSynchroHP - (int32)twin->GetHealth();
-                    int32 newhealth = (int32)me->GetHealth() - d;
-                    if (newhealth <= 0)
-                        newhealth = 1;
-                    me->SetHealth( (uint32)newhealth );
-                    twin->SetHealth(me->GetHealth());
-                    CAST_AI(boss_twin_valkyrAI, twin->AI())->LastSynchroHP = (int32)twin->GetHealth();
-                }
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;
 
-        UpdateSharedHealth();
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
