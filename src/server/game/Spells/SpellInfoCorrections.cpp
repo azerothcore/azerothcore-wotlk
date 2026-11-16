@@ -2510,13 +2510,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ExcludeTargetAuraSpell = 67178;
     });
 
-    // Trial of the Crusader, Twin Valkyr, Twin's Pact
-    ApplySpellFix({ 65875, 67303, 67304, 67305, 65876, 67306, 67307, 67308 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = 0;
-        spellInfo->Effects[EFFECT_2].Effect = 0;
-    });
-
     // Trial of the Crusader, Anub'arak, Emerge
     ApplySpellFix({ 65982 }, [](SpellInfo* spellInfo)
     {
