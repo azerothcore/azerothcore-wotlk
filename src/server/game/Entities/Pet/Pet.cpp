@@ -1447,8 +1447,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 if (aur->GetEffect(0))
                     aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
 
-        // Added to perm ghoul by default
-        if (!IsPet())
+        // only the permanent ghoul is a pet
+        if (IsPet())
         {
             AddAura(SPELL_DK_PET_SCALING_01, this);
             AddAura(SPELL_DK_PET_SCALING_02, this);

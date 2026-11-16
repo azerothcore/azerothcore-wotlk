@@ -544,6 +544,22 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask[2] = 0x8000000;
     });
 
+    // Retribution Aura - damage shield hits cannot miss
+    ApplySpellFix({
+        7294,   // Retribution Aura (Rank 1)
+        10298,  // Retribution Aura (Rank 2)
+        10299,  // Retribution Aura (Rank 3)
+        10300,  // Retribution Aura (Rank 4)
+        10301,  // Retribution Aura (Rank 5)
+        27150,  // Retribution Aura (Rank 6)
+        54043,  // Retribution Aura (Rank 7)
+        8990,   // Retribution Aura (NPC)
+        13008   // Retribution Aura (NPC)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_NO_ATTACK_MISS;
+    });
+
     // Seal of Light trigger
     ApplySpellFix({ 20167 }, [](SpellInfo* spellInfo)
     {
@@ -2492,13 +2508,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->ExcludeTargetAuraSpell = 67178;
-    });
-
-    // Trial of the Crusader, Twin Valkyr, Twin's Pact
-    ApplySpellFix({ 65875, 67303, 67304, 67305, 65876, 67306, 67307, 67308 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = 0;
-        spellInfo->Effects[EFFECT_2].Effect = 0;
     });
 
     // Trial of the Crusader, Anub'arak, Emerge
@@ -4729,13 +4738,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
-    });
-
-    // Conjure Refreshment Table (Rank 1, Rank 2)
-    ApplySpellFix({ 43985, 58661 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_FRONT);
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
     });
 
     ApplySpellFix({

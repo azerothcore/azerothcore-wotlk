@@ -1379,9 +1379,12 @@ struct boss_thorim_runic_colossus : public ScriptedAI
         void JustEngagedWith(Unit*) override
         {
             events.CancelEvent(EVENT_RC_RUNIC_SMASH);
-            events.ScheduleEvent(EVENT_RC_RUNIC_BARRIER, 10s);
-            events.ScheduleEvent(EVENT_RC_SMASH, 18s);
-            events.ScheduleEvent(EVENT_RC_CHARGE, 15s);
+            events.ScheduleEvent(EVENT_RC_SMASH, 12s, 35s);
+            events.ScheduleEvent(EVENT_RC_CHARGE, 10s, 30s);
+            if (Is25ManRaid())
+                events.ScheduleEvent(EVENT_RC_RUNIC_BARRIER, 10s, 24s);
+            else
+                events.ScheduleEvent(EVENT_RC_RUNIC_BARRIER, 6s, 15s);
 
             me->InterruptNonMeleeSpells(false);
             _checkTarget = true;
@@ -1419,23 +1422,23 @@ struct boss_thorim_runic_colossus : public ScriptedAI
             {
                 case EVENT_RC_RUNIC_SMASH:
                     if (urand(0, 1))
-                        me->CastSpell(me, SPELL_RUNIC_SMASH_LEFT, false);
+                        DoCastSelf(SPELL_RUNIC_SMASH_LEFT, false);
                     else
-                        me->CastSpell(me, SPELL_RUNIC_SMASH_RIGHT, false);
-                    events.Repeat(11s);
+                        DoCastSelf(SPELL_RUNIC_SMASH_RIGHT, false);
+                    events.Repeat(8s);
                     break;
                 case EVENT_RC_RUNIC_BARRIER:
-                    me->CastSpell(me, SPELL_RUNIC_BARRIER, false);
+                    DoCastSelf(SPELL_RUNIC_BARRIER, false);
                     Talk(SAY_COLOSSUS_RUNIC_BARRIER);
-                    events.Repeat(20s);
+                    events.Repeat(45s);
                     break;
                 case EVENT_RC_SMASH:
-                    me->CastSpell(me->GetVictim(), SPELL_SMASH, false);
-                    events.Repeat(10s);
+                    DoCast(me->GetVictim(), SPELL_SMASH, false);
+                    events.Repeat(15s, 22s);
                     break;
                 case EVENT_RC_CHARGE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_CHARGE, false);
+                        DoCast(target, SPELL_COLOSSUS_CHARGE, false);
                     events.Repeat(15s);
                     break;
             }

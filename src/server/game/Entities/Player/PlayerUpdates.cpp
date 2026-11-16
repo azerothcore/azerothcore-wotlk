@@ -2241,9 +2241,19 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type,
 void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo,
                                          uint16              opcode)
 {
+    // A knockback restarts the client fall timer but keeps the fall start, so the timer no longer bounds the fall
+    if (opcode == CMSG_MOVE_KNOCK_BACK_ACK)
+    {
+        m_lastFallFromClient = false;
+        return;
+    }
+
     if (m_lastFallTime >= minfo.fallTime ||
         m_lastFallZ <= minfo.pos.GetPositionZ() || opcode == MSG_MOVE_FALL_LAND)
+    {
         SetFallInformation(minfo.fallTime, minfo.pos.GetPositionZ());
+        m_lastFallFromClient = true;
+    }
 }
 
 void Player::UpdateSpecCount(uint8 count)
