@@ -1088,26 +1088,19 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             bool const hasSharedDamage = shareDamage != 0;
 
             uint32 shareAbsorb = 0;
-            uint32 shareResist = 0;
 
+            // The copy is already mitigated on the victim, so it skips the recipient's absorbs and resists
             if (shareDamageTarget->IsImmunedToDamageOrSchool(damageSchoolMask))
             {
                 shareAbsorb = shareDamage;
                 shareDamage = 0;
             }
             else
-            {
-                DamageInfo sharedDamageInfo(attacker, shareDamageTarget, shareDamage, spellProto, damageSchoolMask, damagetype);
-                Unit::CalcAbsorbResist(sharedDamageInfo, true);
-                shareAbsorb = sharedDamageInfo.GetAbsorb();
-                shareResist = sharedDamageInfo.GetResist();
-                shareDamage = sharedDamageInfo.GetDamage();
                 Unit::DealDamageMods(shareDamageTarget, shareDamage, &shareAbsorb);
-            }
 
             if (attacker && shareDamageTarget->IsPlayer())
             {
-                attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, shareResist, damagetype == DIRECT_DAMAGE, 0, false, true);
+                attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, 0, damagetype == DIRECT_DAMAGE, 0, false, true);
             }
 
             // Shared damage is a hostile interaction for its recipient too.
