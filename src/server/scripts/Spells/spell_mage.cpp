@@ -993,8 +993,8 @@ class spell_mage_fingers_of_frost : public AuraScript
             PreventDefaultAction();
     }
 
-    // A projectile spell spending the last charge keeps the frozen effect until its impact:
-    // 44544 gets one internal charge that lasts for the spell's travel time
+    // A spell queued behind the cast that spent the last charge runs in the next update, after this
+    // aura is gone: keep 44544 with one internal charge until that update (spell batching)
     void HandleAfterProc(ProcEventInfo& eventInfo)
     {
         if (GetCharges())
@@ -1004,20 +1004,25 @@ class spell_mage_fingers_of_frost : public AuraScript
         if (!spell || spell->IsTriggered() || !(eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST))
             return;
 
-        SpellInfo const* spellInfo = spell->GetSpellInfo();
-        if (spellInfo->Speed <= 0.0f || spellInfo->IsChanneled() || !spell->GetDelayMoment())
+        Unit* target = GetTarget();
+        Aura* aurastate = target->GetAura(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
+        if (!aurastate)
             return;
 
-        if (Aura* aurastate = GetTarget()->GetAura(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA))
+        aurastate->SetCharges(1);
+
+        // runs after the next update's spell queue, unless a new proc refreshed 44544 meanwhile
+        target->m_Events.AddEventAtOffset([target]()
         {
-            aurastate->SetCharges(1);
-            aurastate->SetDuration(int32(spell->GetDelayMoment()));
-        }
+            if (Aura* aura = target->GetAura(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA))
+                if (aura->IsUsingCharges())
+                    aura->Remove();
+        }, 1ms);
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        // Keep 44544 while the last-charge window is open, it removes itself once used or expired
+        // Keep 44544 while the last-charge window is open, it goes once used or at the next update
         Aura const* aurastate = GetTarget()->GetAura(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
         if (aurastate && aurastate->IsUsingCharges())
             return;
