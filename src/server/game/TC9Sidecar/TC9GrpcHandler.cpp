@@ -142,15 +142,28 @@ RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuids
     }
 
     // Don't forget to delete on "that" side.
-    uint64_t* itemsResult = (uint64_t*)malloc(sizeof(uint64_t) * itemsFound);
+    // Nothing removed: no array, as in the itemsLen <= 0 case above.
+    uint64_t* itemsResult = nullptr;
     int itemsResultsItr = 0;
-    for (int i = 0; i < itemsLen; i++)
+    if (itemsFound > 0)
     {
-        if (deletedItems[i] == 0)
-            continue;
+        itemsResult = static_cast<uint64_t*>(malloc(sizeof(uint64_t) * itemsFound));
+        if (itemsResult)
+        {
+            for (int i = 0; i < itemsLen; i++)
+            {
+                if (deletedItems[i] == 0)
+                    continue;
 
-        itemsResult[itemsResultsItr] = deletedItems[i];
-        itemsResultsItr++;
+                itemsResult[itemsResultsItr] = deletedItems[i];
+                itemsResultsItr++;
+            }
+        }
+        else
+        {
+            // The items are already removed and committed; the sidecar API has no error code to report this.
+            ABORT("ToCloud9GrpcHandler::RemoveItemsWithGuidsFromPlayer: out of memory for {} item guids", itemsFound);
+        }
     }
 
     RemoveItemsWithGuidsFromPlayerResponse resp;
