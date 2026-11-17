@@ -21,6 +21,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
@@ -39,6 +40,7 @@ enum Yells
     SAY_KILL_PLAYER         = 6,
     SAY_BERSERK             = 7,
     SAY_DEATH               = 8,
+    EMOTE_BERSERK           = 10, // Eydis only
 };
 
 enum Equipment
@@ -92,6 +94,9 @@ enum ValkyrSpells
 
     SPELL_TWIN_EMPATHY_DARK     = 66132,
     SPELL_TWIN_EMPATHY_LIGHT    = 66133,
+
+    SPELL_CLEAR_VALKYR_ESSENCE  = 67547,
+    SPELL_CLEAR_VALKYR_TOUCH    = 68084,
 };
 
 enum ValkyrEvents
@@ -124,7 +129,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
 
             // special events here
-            events.RescheduleEvent(EVENT_BERSERK, IsHeroic() ? 6min : 10min);
+            events.RescheduleEvent(EVENT_BERSERK, IsHeroic() ? 6min : 8min);
             events.RescheduleEvent(EVENT_SUMMON_BALLS_1, 10s, 15s);
             events.RescheduleEvent(EVENT_SPECIAL, 45s);
         }
@@ -147,57 +152,10 @@ struct boss_twin_valkyrAI : public ScriptedAI
         {
             case ACTION_DESPAWN_SUMMONS:
                 summons.DespawnAll();
-                if (pInstance && me->GetEntry() == NPC_LIGHTBANE )
+                if (me->GetEntry() == NPC_LIGHTBANE)
                 {
-                    uint32 essenceId1 = 0, empoweredId1 = 0, touchId1 = 0, essenceId2 = 0, empoweredId2 = 0, touchId2 = 0, poweringUpId = 0;
-                    switch (me->GetMap()->GetDifficulty())
-                    {
-                        case 0:
-                            essenceId1 = 65684;
-                            empoweredId1 = 65724;
-                            touchId1 = 65950;
-                            essenceId2 = 65686;
-                            empoweredId2 = 65748;
-                            touchId2 = 66001;
-                            poweringUpId = 67590;
-                            break;
-                        case 1:
-                            essenceId1 = 67176;
-                            empoweredId1 = 67213;
-                            touchId1 = 67296;
-                            essenceId2 = 67222;
-                            empoweredId2 = 67216;
-                            touchId2 = 67281;
-                            poweringUpId = 67602;
-                            break;
-                        case 2:
-                            essenceId1 = 67177;
-                            empoweredId1 = 67214;
-                            touchId1 = 67297;
-                            essenceId2 = 67223;
-                            empoweredId2 = 67217;
-                            touchId2 = 67282;
-                            poweringUpId = 67603;
-                            break;
-                        case 3:
-                            essenceId1 = 67178;
-                            empoweredId1 = 67215;
-                            touchId1 = 67298;
-                            essenceId2 = 67224;
-                            empoweredId2 = 67218;
-                            touchId2 = 67283;
-                            poweringUpId = 67604;
-                            break;
-                        default:
-                            break;
-                    }
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(essenceId1);
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(empoweredId1);
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(touchId1);
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(essenceId2);
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(empoweredId2);
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(touchId2);
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(poweringUpId);
+                    DoCastAOE(SPELL_CLEAR_VALKYR_ESSENCE, true);
+                    DoCastAOE(SPELL_CLEAR_VALKYR_TOUCH, true);
                 }
                 break;
             case -3:
@@ -312,6 +270,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 if (Creature* twin = GetSister())
                 {
                     twin->CastSpell(twin, SPELL_BERSERK, true);
+                    twin->AI()->Talk(EMOTE_BERSERK);
                     twin->AI()->Talk(SAY_BERSERK);
                 }
 
@@ -901,6 +860,26 @@ class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
     }
 };
 
+// 67547 - Clear Val'kyr Essence
+// 68084 - Clear Val'kyr Touch of Light/Dark
+class spell_valkyr_clear_auras : public SpellScript
+{
+    PrepareSpellScript(spell_valkyr_clear_auras);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        // Each effect's base points hold the 10-player Normal id of an aura to remove
+        for (SpellEffectInfo const& effect : GetSpellInfo()->GetEffects())
+            if (uint32 spellId = effect.CalcValue())
+                GetHitUnit()->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(spellId, GetCaster()));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_valkyr_clear_auras::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_twin_valkyr()
 {
     new boss_fjola();
@@ -910,4 +889,5 @@ void AddSC_boss_twin_valkyr()
     RegisterSpellScript(spell_valkyr_essence_aura);
     RegisterSpellScript(spell_valkyr_touch_aura);
     RegisterSpellScript(spell_valkyr_ball_periodic_dummy_aura);
+    RegisterSpellScript(spell_valkyr_clear_auras);
 }
