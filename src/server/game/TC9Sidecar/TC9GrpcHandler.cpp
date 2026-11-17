@@ -50,8 +50,22 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
             itemsFound++;
     }
 
+    // None of the items found: no array, as in the itemsLen <= 0 case above.
+    if (!itemsFound)
+    {
+        GetPlayerItemsByGuidsResponse resp;
+        resp.errorCode = PlayerItemErrorCodeNoError;
+        resp.items = nullptr;
+        resp.itemsSize = 0;
+        return resp;
+    }
+
     // Don't forget to delete on "that" side.
     PlayerItem* itemsResult = static_cast<PlayerItem *>(malloc(sizeof(PlayerItem) * itemsFound));
+    // The sidecar API has no error code for a failed allocation.
+    if (!itemsResult)
+        ABORT("ToCloud9GrpcHandler::GetPlayerItemsByGuids: out of memory for {} items", itemsFound);
+
     int itemsResultsItr = 0;
     for (int i = 0; i < itemsLen; i++)
     {
@@ -73,11 +87,17 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
         item.randomPropertyID = pItem->GetItemRandomPropertyId();
 
         // Don't forget to delete on "that" side.
-        char *text = (char*)malloc(sizeof(char) * (pItem->GetText().length() + 1));
-        strcpy(text, pItem->GetText().c_str());
+        char* text = static_cast<char*>(malloc(sizeof(char) * (pItem->GetText().length() + 1)));
+        if (text)
+            strcpy(text, pItem->GetText().c_str());
+        else
+            ABORT("ToCloud9GrpcHandler::GetPlayerItemsByGuids: out of memory for the text of item {}",
+                pItem->GetGUID().ToString());
         item.text = text;
 
-        itemsResult[itemsResultsItr] = item;
+        // Explicit check: ABORT above doesn't return, but cppcheck runs without include paths.
+        if (itemsResult)
+            itemsResult[itemsResultsItr] = item;
 
         itemsResultsItr++;
     }
