@@ -1,3 +1,4 @@
+-- DB update 2026_11_16_05 -> 2026_11_17_00
 -- Pristine Spider Silk (1940), Items of Power (1948), Power in Uldaman (1956): POIs match 3.4.3 51831 sniffs
 UPDATE `quest_poi` SET `VerifiedBuild` = 51831
 WHERE (`QuestID`, `id`) IN ((1940,0), (1948,0), (1948,1), (1948,2), (1956,0));
