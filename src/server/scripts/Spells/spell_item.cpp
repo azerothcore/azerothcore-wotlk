@@ -1642,7 +1642,7 @@ class spell_item_valanyr_hammer_of_ancient_kings : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
+        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetEffectiveHeal() > 0;
     }
 
     void Register() override

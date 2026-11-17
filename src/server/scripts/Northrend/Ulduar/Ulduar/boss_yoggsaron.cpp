@@ -296,6 +296,8 @@ enum Misc
     DATA_GET_SARA_PHASE                 = 3,
     DATA_GET_DRIVE_ME_CRAZY             = 4,
     DATA_YOGG_SARON_HEALTH              = 5,
+
+    LOOT_MODE_REFORGED_HAMMER = 32
 };
 
 struct LocationsXY
@@ -1189,6 +1191,9 @@ struct boss_yoggsaron : public ScriptedAI
         {
             me->KillSelf();
         }, 500ms);
+
+        if (me->HasAura(SPELL_IN_THE_MAWS_OF_THE_OLD_GOD))
+            me->AddLootMode(LOOT_MODE_REFORGED_HAMMER);
     }
 
     void JustDied(Unit*  /*who*/) override
@@ -1282,12 +1287,6 @@ struct boss_yoggsaron : public ScriptedAI
     {
         if (param == DATA_YOGG_SARON_HEALTH)
             me->SetHealth(me->GetMaxHealth() * value / 100.0f);
-    }
-
-    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
-    {
-        if (spellInfo->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
-            me->AddLootMode(32);
     }
 
     void UpdateAI(uint32 diff) override

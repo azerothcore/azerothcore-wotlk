@@ -2365,6 +2365,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].DieSides = 0;
     });
 
+    // Trial of the Crusader, Twin Valkyr, Clear Val'kyr Essence
+    ApplySpellFix({ 67547 }, [](SpellInfo* spellInfo)
+    {
+        // Light and Dark Essence persist through death, so dead players must be cleared too
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_ALLOW_DEAD_TARGET;
+    });
+
     // Trial of the Crusader, Twin Valkyr, Touch of Light/Darkness, Light/Dark Surge
     ApplySpellFix({
         65950   // light 0
@@ -2510,13 +2517,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ExcludeTargetAuraSpell = 67178;
     });
 
-    // Trial of the Crusader, Twin Valkyr, Twin's Pact
-    ApplySpellFix({ 65875, 67303, 67304, 67305, 65876, 67306, 67307, 67308 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = 0;
-        spellInfo->Effects[EFFECT_2].Effect = 0;
-    });
-
     // Trial of the Crusader, Anub'arak, Emerge
     ApplySpellFix({ 65982 }, [](SpellInfo* spellInfo)
     {
@@ -2541,14 +2541,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
         //spellInfo->EffectTriggerSpell[0] = 0;
-    });
-
-    // Trial of the Crusader, Anub'arak, Summon Scarab
-    ApplySpellFix({ 66339 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(35);
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(25);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
     // Trial of the Crusader, Anub'arak, Achievements: The Traitor King
