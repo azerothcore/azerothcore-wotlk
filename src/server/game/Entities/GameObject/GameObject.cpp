@@ -214,9 +214,9 @@ void GameObject::AddToWorld()
         if (m_zoneScript)
             m_zoneScript->OnGameObjectCreate(this);
 
-        GetMap()->GetObjectsStore().Insert<GameObject>(GetGUID(), this);
+        GetMap()->AddToObjectStore(this);
         if (m_spawnId)
-            GetMap()->GetGameObjectBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
+            GetMap()->AddToSpawnIdStore(this);
 
         if (m_model)
         {
@@ -262,8 +262,8 @@ void GameObject::RemoveFromWorld()
         WorldObject::RemoveFromWorld();
 
         if (m_spawnId)
-            Acore::Containers::MultimapErasePair(GetMap()->GetGameObjectBySpawnIdStore(), m_spawnId, this);
-        GetMap()->GetObjectsStore().Remove<GameObject>(GetGUID());
+            GetMap()->RemoveFromSpawnIdStore(this);
+        GetMap()->RemoveFromObjectStore(this);
     }
 }
 
@@ -761,7 +761,7 @@ void GameObject::Update(uint32 diff)
                         // respawn timer
                         uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
                         if (poolid)
-                            sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
+                            GetMap()->UpdatePool(SPAWN_TYPE_GAMEOBJECT, poolid, m_spawnId);
                         else
                             GetMap()->AddToMap(this);
                     }
@@ -1083,7 +1083,7 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
             // GameObject::Update() will update the pool when the object is ready to respawn.
             if (poolid && !m_respawnTime)
             {
-                sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
+                GetMap()->UpdatePool(SPAWN_TYPE_GAMEOBJECT, poolid, m_spawnId);
             }
         }
     }
@@ -1107,7 +1107,7 @@ void GameObject::Delete()
 
     uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
     if (poolid)
-        sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
+        GetMap()->UpdatePool(SPAWN_TYPE_GAMEOBJECT, poolid, m_spawnId);
     else
         AddObjectToRemoveList();
 }

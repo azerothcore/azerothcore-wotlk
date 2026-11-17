@@ -87,9 +87,10 @@ bool PartitionLayout::IsBorderOnAxis(uint32 cellCoord) const
 }
 
 MapPartitioned::MapPartitioned(uint32 id, PartitionLayout const& layout, bool debugOwnershipChecks)
-    : Map(id, 0, REGULAR_DIFFICULTY), _layout(layout), _inParallelPhase(false)
+    : Map(id, 0, REGULAR_DIFFICULTY), _layout(layout)
 {
     _debugOwnershipChecks = debugOwnershipChecks;
+    _objectStoreLock = &_objectStoreMutex;
 
     uint32 const count = _layout.GetPartitionCount();
     _partitions.reserve(count);
@@ -331,19 +332,20 @@ void MapPartitioned::SchedulePartitions(MapUpdater& updater, uint32 t_diff, uint
 {
     _inParallelPhase.store(true, std::memory_order_release);
 
-    // One update per populated partition. The serial set is never scheduled: it is updated on the
-    // world thread in PostUpdate.
-    // Sequential fan-out: the partitions run one after another on this (world) thread until the
-    // shared stores (grid loading, object stores, guid generators) are thread-safe (PLAN.md Step 5),
-    // when they move to MapUpdater::schedule_partition_update.
-    (void)updater;
+    // Fork: one task per populated partition, run in parallel by the MapUpdater workers. The serial
+    // set is never scheduled: it is updated on the world thread in PostUpdate.
     for (std::unique_ptr<MapPartition>& partition : _partitions)
     {
         if (partition->IsEmpty())
             continue;
 
-        MapPartition::Scope scope(*partition);
-        partition->Update(t_diff, s_diff);
+        if (updater.activated())
+            updater.schedule_partition_update(*partition, t_diff, s_diff);
+        else
+        {
+            MapPartition::Scope scope(*partition);
+            partition->Update(t_diff, s_diff);
+        }
     }
 }
 

@@ -18,6 +18,7 @@
 #include "Map.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Containers.h"
 #include "Chat.h"
 #include "DisableMgr.h"
 #include "DynamicTree.h"
@@ -86,6 +87,16 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     _corpseUpdateTimer.SetInterval(20 * MINUTE * IN_MILLISECONDS);
 
     _poolData = sPoolMgr->InitPoolsForMap(this);
+
+    // Every map-specific guid generator exists up front: GetGuidSequenceGenerator() would otherwise
+    // insert into _guidGenerators lazily, from whichever partition first spawns that type.
+    GetGuidSequenceGenerator<HighGuid::Transport>();
+    GetGuidSequenceGenerator<HighGuid::Unit>();
+    GetGuidSequenceGenerator<HighGuid::Vehicle>();
+    GetGuidSequenceGenerator<HighGuid::Pet>();
+    GetGuidSequenceGenerator<HighGuid::GameObject>();
+    GetGuidSequenceGenerator<HighGuid::DynamicObject>();
+    GetGuidSequenceGenerator<HighGuid::Corpse>();
 }
 
 // Hook called after map is created AND after added to map list
@@ -978,6 +989,7 @@ void Map::Balance()
         return;
     }
 
+    AssertSerialPhase("DynamicMapTree");
     _mapCollisionData.GetDynamicTree().balance();
 }
 
@@ -989,6 +1001,7 @@ void Map::RemoveGameObjectModel(GameObjectModel const& model)
         return;
     }
 
+    AssertSerialPhase("DynamicMapTree");
     _mapCollisionData.GetDynamicTree().remove(model);
 }
 
@@ -1000,6 +1013,7 @@ void Map::InsertGameObjectModel(GameObjectModel const& model)
         return;
     }
 
+    AssertSerialPhase("DynamicMapTree");
     _mapCollisionData.GetDynamicTree().insert(model);
 }
 
@@ -1069,6 +1083,12 @@ void Map::ApplyPartitionOutbox(MapPartition& partition)
     for (WorldObject* obj : outbox.DeferredUpdatableAdds)
         if (obj->IsInWorld() && obj->FindMap() == this)
             AddObjectToPendingUpdateList(obj);
+
+    for (MapPartition::Outbox::PoolUpdate const& poolUpdate : outbox.PoolUpdates)
+        UpdatePool(poolUpdate.Type, poolUpdate.PoolId, poolUpdate.SpawnId);
+
+    for (MapPartition::Outbox::ScheduledRespawn const& respawn : outbox.ScheduledRespawns)
+        ScheduleCreatureRespawn(respawn.Guid, respawn.Timer, respawn.Pos);
 
     // Last: a far teleport takes the player out of the map.
     std::vector<ObjectGuid> const farTeleports = std::move(outbox.PendingFarTeleports);
@@ -2989,22 +3009,121 @@ void BattlegroundMap::RemoveAllPlayers()
 
 Corpse* Map::GetCorpse(ObjectGuid const& guid)
 {
+    std::shared_lock<std::shared_mutex> lock = LockObjectStoreForRead();
     return _objectsStore.Find<Corpse>(guid);
 }
 
 Creature* Map::GetCreature(ObjectGuid const& guid)
 {
+    std::shared_lock<std::shared_mutex> lock = LockObjectStoreForRead();
     return _objectsStore.Find<Creature>(guid);
 }
 
 GameObject* Map::GetGameObject(ObjectGuid const& guid)
 {
+    std::shared_lock<std::shared_mutex> lock = LockObjectStoreForRead();
     return _objectsStore.Find<GameObject>(guid);
 }
 
 Pet* Map::GetPet(ObjectGuid const& guid)
 {
-    return dynamic_cast<Pet*>(_objectsStore.Find<Creature>(guid));
+    return dynamic_cast<Pet*>(GetCreature(guid));
+}
+
+std::unique_lock<std::shared_mutex> Map::LockObjectStoreForWrite()
+{
+    if (_objectStoreLock && IsInParallelPhase())
+        return std::unique_lock<std::shared_mutex>(*_objectStoreLock);
+
+    return {};
+}
+
+std::shared_lock<std::shared_mutex> Map::LockObjectStoreForRead()
+{
+    if (_objectStoreLock && IsInParallelPhase())
+        return std::shared_lock<std::shared_mutex>(*_objectStoreLock);
+
+    return {};
+}
+
+std::unique_lock<std::recursive_mutex> Map::LockRespawnData() const
+{
+    if (IsInParallelPhase())
+        return std::unique_lock<std::recursive_mutex>(_respawnLock);
+
+    return {};
+}
+
+void Map::AddToObjectStore(Creature* creature)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _objectsStore.Insert<Creature>(creature->GetGUID(), creature);
+}
+
+void Map::AddToObjectStore(GameObject* go)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _objectsStore.Insert<GameObject>(go->GetGUID(), go);
+}
+
+void Map::AddToObjectStore(DynamicObject* dynObj)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _objectsStore.Insert<DynamicObject>(dynObj->GetGUID(), dynObj);
+}
+
+void Map::AddToObjectStore(Corpse* corpse)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _objectsStore.Insert<Corpse>(corpse->GetGUID(), corpse);
+}
+
+void Map::RemoveFromObjectStore(Creature* creature)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _objectsStore.Remove<Creature>(creature->GetGUID());
+}
+
+void Map::RemoveFromObjectStore(GameObject* go)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _objectsStore.Remove<GameObject>(go->GetGUID());
+}
+
+void Map::RemoveFromObjectStore(DynamicObject* dynObj)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _objectsStore.Remove<DynamicObject>(dynObj->GetGUID());
+}
+
+void Map::RemoveFromObjectStore(Corpse* corpse)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _objectsStore.Remove<Corpse>(corpse->GetGUID());
+}
+
+void Map::AddToSpawnIdStore(Creature* creature)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _creatureBySpawnIdStore.insert(std::make_pair(creature->GetSpawnId(), creature));
+}
+
+void Map::AddToSpawnIdStore(GameObject* go)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    _gameobjectBySpawnIdStore.insert(std::make_pair(go->GetSpawnId(), go));
+}
+
+void Map::RemoveFromSpawnIdStore(Creature* creature)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    Acore::Containers::MultimapErasePair(_creatureBySpawnIdStore, creature->GetSpawnId(), creature);
+}
+
+void Map::RemoveFromSpawnIdStore(GameObject* go)
+{
+    std::unique_lock<std::shared_mutex> lock = LockObjectStoreForWrite();
+    Acore::Containers::MultimapErasePair(_gameobjectBySpawnIdStore, go->GetSpawnId(), go);
 }
 
 Transport* Map::GetTransport(ObjectGuid const& guid)
@@ -3018,6 +3137,7 @@ Transport* Map::GetTransport(ObjectGuid const& guid)
 
 DynamicObject* Map::GetDynamicObject(ObjectGuid const& guid)
 {
+    std::shared_lock<std::shared_mutex> lock = LockObjectStoreForRead();
     return _objectsStore.Find<DynamicObject>(guid);
 }
 
@@ -3029,8 +3149,29 @@ void Map::UpdateIteratorBack(Player* player)
     // Partitioned maps tick per-partition player vectors instead; OnWorldObjectUnlinked() drops the player from them.
 }
 
+time_t Map::GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const
+{
+    std::unique_lock<std::recursive_mutex> lock = LockRespawnData();
+    std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
+    if (itr != _creatureRespawnTimes.end())
+        return itr->second;
+
+    return time_t(0);
+}
+
+time_t Map::GetGORespawnTime(ObjectGuid::LowType dbGuid) const
+{
+    std::unique_lock<std::recursive_mutex> lock = LockRespawnData();
+    std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
+    if (itr != _goRespawnTimes.end())
+        return itr->second;
+
+    return time_t(0);
+}
+
 void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
 {
+    std::unique_lock<std::recursive_mutex> lock = LockRespawnData();
     if (!respawnTime)
     {
         // Delete only
@@ -3060,6 +3201,7 @@ void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTi
 
 void Map::RemoveCreatureRespawnTime(ObjectGuid::LowType spawnId)
 {
+    std::unique_lock<std::recursive_mutex> lock = LockRespawnData();
     auto itr = _creatureRespawnTimes.find(spawnId);
     if (itr != _creatureRespawnTimes.end())
     {
@@ -3076,6 +3218,7 @@ void Map::RemoveCreatureRespawnTime(ObjectGuid::LowType spawnId)
 
 void Map::ForceCreatureRespawn(ObjectGuid::LowType spawnId)
 {
+    std::unique_lock<std::recursive_mutex> lock = LockRespawnData();
     time_t now = GameTime::GetGameTime().count();
     SaveCreatureRespawnTime(spawnId, now);
     _forcedCreatureRespawns.insert(spawnId);
@@ -3083,6 +3226,7 @@ void Map::ForceCreatureRespawn(ObjectGuid::LowType spawnId)
 
 void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
 {
+    std::unique_lock<std::recursive_mutex> lock = LockRespawnData();
     if (!respawnTime)
     {
         // Delete only
@@ -3112,6 +3256,7 @@ void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
 
 void Map::RemoveGORespawnTime(ObjectGuid::LowType spawnId)
 {
+    std::unique_lock<std::recursive_mutex> lock = LockRespawnData();
     auto itr = _goRespawnTimes.find(spawnId);
     if (itr != _goRespawnTimes.end())
     {
@@ -3203,6 +3348,7 @@ bool Map::IsSpawnGroupActive(uint32 groupId) const
 
 bool Map::SpawnGroupSpawn(uint32 groupId, bool ignoreRespawn /*= false*/, bool force /*= false*/)
 {
+    AssertSerialPhase("spawn group toggles");
     SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(groupId);
     if (!groupData || (groupData->flags & SPAWNGROUP_FLAG_SYSTEM))
     {
@@ -3287,6 +3433,7 @@ bool Map::SpawnGroupSpawn(uint32 groupId, bool ignoreRespawn /*= false*/, bool f
 
 bool Map::SpawnGroupDespawn(uint32 groupId, bool deleteRespawnTimes /*= false*/)
 {
+    AssertSerialPhase("spawn group toggles");
     SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(groupId);
     if (!groupData || (groupData->flags & SPAWNGROUP_FLAG_SYSTEM))
     {
@@ -3346,6 +3493,7 @@ bool Map::SpawnGroupDespawn(uint32 groupId, bool deleteRespawnTimes /*= false*/)
 
 void Map::ProcessRespawns()
 {
+    AssertSerialPhase("respawn queue");
     time_t now = GameTime::GetGameTime().count();
 
     // Process due respawns from the time-ordered queue.
@@ -3757,8 +3905,30 @@ void Map::RemoveOldCorpses()
     }
 }
 
+void Map::UpdatePool(SpawnObjectType type, uint32 poolId, ObjectGuid::LowType spawnId)
+{
+    if (MapPartition* partition = GetParallelPartition())
+    {
+        partition->GetOutbox().PoolUpdates.push_back({ type, poolId, spawnId });
+        return;
+    }
+
+    if (type == SPAWN_TYPE_CREATURE)
+        sPoolMgr->UpdatePool<Creature>(GetPoolData(), poolId, spawnId);
+    else
+        sPoolMgr->UpdatePool<GameObject>(GetPoolData(), poolId, spawnId);
+}
+
 void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer, Position pos)
 {
+    // The map-wide event queue is only written serially.
+    if (MapPartition* partition = GetParallelPartition())
+    {
+        partition->GetOutbox().ScheduledRespawns.push_back({ creatureGuid, respawnTimer, pos });
+        return;
+    }
+
+    AssertSerialPhase("map event queue");
     Events.AddEventAtOffset([this, creatureGuid, pos]()
     {
         if (Creature* creature = GetCreature(creatureGuid))

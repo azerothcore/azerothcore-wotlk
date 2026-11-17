@@ -20,7 +20,10 @@
 
 #include "Define.h"
 #include "GridDefines.h"
+#include "Duration.h"
 #include "ObjectGuid.h"
+#include "Position.h"
+#include "SpawnData.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -120,6 +123,25 @@ public:
         bool CollisionBalanceRequested = false;
         // Grids that must be loaded before a recorded cell move can be applied.
         std::vector<GridCoord> GridLoadRequests;
+
+        struct PoolUpdate
+        {
+            SpawnObjectType Type;
+            uint32 PoolId;
+            ObjectGuid::LowType SpawnId;
+        };
+
+        struct ScheduledRespawn
+        {
+            ObjectGuid Guid;
+            Milliseconds Timer;
+            Position Pos;
+        };
+
+        // Pool member despawned: sPoolMgr->UpdatePool may spawn another member anywhere on the map.
+        std::vector<PoolUpdate> PoolUpdates;
+        // Map::ScheduleCreatureRespawn: adds to the map-wide event queue.
+        std::vector<ScheduledRespawn> ScheduledRespawns;
 
         [[nodiscard]] bool IsEmpty() const;
         void Clear();

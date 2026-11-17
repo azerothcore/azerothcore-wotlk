@@ -21,8 +21,8 @@
 #include "GridDefines.h"
 #include "Map.h"
 #include "MapPartition.h"
-#include <atomic>
 #include <memory>
+#include <shared_mutex>
 #include <unordered_set>
 #include <vector>
 
@@ -90,8 +90,8 @@ private:
  * pet/owner, charm, vehicle, shared vision, far sight, duel, formation, periodic aura caster) to
  * an entity outside its partition. PreUpdate recomputes ownership and hands entities over.
  *
- * Until the shared stores are thread-safe (PLAN.md Step 5) the partitions are updated one after
- * another on the world thread, not on MapUpdater workers.
+ * Partitions are updated in parallel on MapUpdater workers (sequentially, on the world thread,
+ * when MapUpdate.Threads is 0).
  */
 class MapPartitioned : public Map
 {
@@ -111,8 +111,6 @@ public:
     MapPartition* GetPartitionForCell(CellCoord const& cell);
     // The serial set is the map's default partition (see Map::GetDefaultPartition).
     MapPartition& GetSerialSet() { return GetDefaultPartition(); }
-
-    [[nodiscard]] bool IsInParallelPhase() const { return _inParallelPhase.load(std::memory_order_acquire); }
 
     // Fork-Join tick phases, driven by MapMgr::Update on the world thread:
     //   PreUpdate -> SchedulePartitions -> MapUpdater::wait() -> PostUpdate.
@@ -143,7 +141,7 @@ private:
 
     PartitionLayout const _layout;
     std::vector<std::unique_ptr<MapPartition>> _partitions;
-    std::atomic<bool> _inParallelPhase;
+    std::shared_mutex _objectStoreMutex;
     std::unordered_set<ObjectGuid> _pinnedToSerialSet;
 };
 

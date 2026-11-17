@@ -312,10 +312,10 @@ void Creature::AddToWorld()
         // it's also initialized in AIM_Initialize(), few lines below, but it's not a problem
         Motion_Initialize();
 
-        GetMap()->GetObjectsStore().Insert<Creature>(GetGUID(), this);
+        GetMap()->AddToObjectStore(this);
         if (m_spawnId)
         {
-            GetMap()->GetCreatureBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
+            GetMap()->AddToSpawnIdStore(this);
         }
         Unit::AddToWorld();
 
@@ -357,9 +357,9 @@ void Creature::RemoveFromWorld()
         Unit::RemoveFromWorld();
 
         if (m_spawnId)
-            Acore::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_spawnId, this);
+            GetMap()->RemoveFromSpawnIdStore(this);
 
-        GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
+        GetMap()->RemoveFromObjectStore(this);
     }
 }
 
@@ -2134,7 +2134,7 @@ void Creature::Respawn(bool force)
 
                 uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
                 if (poolid)
-                    sPoolMgr->UpdatePool<Creature>(GetMap()->GetPoolData(), poolid, m_spawnId);
+                    GetMap()->UpdatePool(SPAWN_TYPE_CREATURE, poolid, m_spawnId);
 
                 //Re-initialize reactstate that could be altered by movementgenerators
                 InitializeReactState();

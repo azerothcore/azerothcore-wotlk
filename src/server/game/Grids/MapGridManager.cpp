@@ -1,10 +1,11 @@
 #include "MapGridManager.h"
 #include "GridObjectLoader.h"
 #include "GridTerrainLoader.h"
+#include "Map.h"
 
 void MapGridManager::CreateGrid(uint16 const x, uint16 const y)
 {
-    std::lock_guard<std::mutex> guard(_gridLock);
+    std::lock_guard<std::recursive_mutex> guard(_gridLock);
     if (IsGridCreated(x, y))
         return;
 
@@ -32,6 +33,10 @@ void MapGridManager::CreateGrid(uint16 const x, uint16 const y)
 // Loads objects, terrain already loaded in CreateGrid
 bool MapGridManager::LoadGrid(uint16 const x, uint16 const y)
 {
+    // Spawning a grid's objects touches map-wide state: never while partitions run.
+    _map->AssertSerialPhase("grid loading");
+    std::lock_guard<std::recursive_mutex> guard(_gridLock);
+
     MapGridType* grid = GetGrid(x, y);
     if (!grid || grid->IsObjectDataLoaded())
         return false;

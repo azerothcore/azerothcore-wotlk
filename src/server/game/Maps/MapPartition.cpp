@@ -32,7 +32,9 @@ bool MapPartition::Outbox::IsEmpty() const
         && CorpseOps.empty()
         && CollisionModelOps.empty()
         && !CollisionBalanceRequested
-        && GridLoadRequests.empty();
+        && GridLoadRequests.empty()
+        && PoolUpdates.empty()
+        && ScheduledRespawns.empty();
 }
 
 void MapPartition::Outbox::Clear()
@@ -47,6 +49,8 @@ void MapPartition::Outbox::Clear()
     CollisionModelOps.clear();
     CollisionBalanceRequested = false;
     GridLoadRequests.clear();
+    PoolUpdates.clear();
+    ScheduledRespawns.clear();
 }
 
 MapPartition::MapPartition(Map& owner, uint32 index)

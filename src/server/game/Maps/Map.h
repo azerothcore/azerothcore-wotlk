@@ -40,8 +40,10 @@
 #include "SpawnData.h"
 #include "Timer.h"
 #include "GridTerrainData.h"
+#include <atomic>
 #include <bitset>
 #include <functional>
+#include <mutex>
 #include <list>
 #include <memory>
 #include <set>
@@ -239,6 +241,31 @@ public:
 
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
+    // True between the fork and the join of a partitioned map's tick (partitions may be running on
+    // MapUpdater workers). Always false for plain maps.
+    [[nodiscard]] bool IsInParallelPhase() const { return _inParallelPhase.load(std::memory_order_acquire); }
+    // Fails when called while partitions run: for map-wide state that is only touched serially.
+    void AssertSerialPhase(char const* what) const
+    {
+        ASSERT(!IsInParallelPhase(), "Map partitioning: {} of map {} accessed while partitions are running",
+            what, GetId());
+    }
+
+    // Object store mutations. While partitions run they take the partitioned map's object store lock;
+    // GetCreature() & co. take it shared.
+    void AddToObjectStore(Creature* creature);
+    void AddToObjectStore(GameObject* go);
+    void AddToObjectStore(DynamicObject* dynObj);
+    void AddToObjectStore(Corpse* corpse);
+    void RemoveFromObjectStore(Creature* creature);
+    void RemoveFromObjectStore(GameObject* go);
+    void RemoveFromObjectStore(DynamicObject* dynObj);
+    void RemoveFromObjectStore(Corpse* corpse);
+    void AddToSpawnIdStore(Creature* creature);
+    void AddToSpawnIdStore(GameObject* go);
+    void RemoveFromSpawnIdStore(Creature* creature);
+    void RemoveFromSpawnIdStore(GameObject* go);
+
     // Plain maps: the only partition. MapPartitioned: the serial set (updated on the world thread).
     MapPartition& GetDefaultPartition() { return _defaultPartition; }
     // Non-serial partition of this map currently updated by this thread during the parallel UPDATE
@@ -396,8 +423,19 @@ public:
         return nullptr;
     }
 
-    SpawnedPoolData& GetPoolData() { return *_poolData; }
-    [[nodiscard]] SpawnedPoolData const& GetPoolData() const { return *_poolData; }
+    // Serial phases only: pool updates from a running partition go through UpdatePool().
+    SpawnedPoolData& GetPoolData()
+    {
+        AssertSerialPhase("SpawnedPoolData");
+        return *_poolData;
+    }
+    [[nodiscard]] SpawnedPoolData const& GetPoolData() const
+    {
+        AssertSerialPhase("SpawnedPoolData");
+        return *_poolData;
+    }
+    // sPoolMgr->UpdatePool for this map's pools; deferred to POST-UPDATE when called from a running partition.
+    void UpdatePool(SpawnObjectType type, uint32 poolId, ObjectGuid::LowType spawnId);
 
     MapInstanced* ToMapInstanced() { if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return nullptr;  }
     [[nodiscard]] MapInstanced const* ToMapInstanced() const { if (Instanceable())  return (MapInstanced const*)((MapInstanced*)this); else return nullptr;  }
@@ -434,23 +472,10 @@ public:
         RESPAWN TIMES
     */
     [[nodiscard]] time_t GetLinkedRespawnTime(ObjectGuid guid) const;
-    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const
-    {
-        std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
-        if (itr != _creatureRespawnTimes.end())
-            return itr->second;
-
-        return time_t(0);
-    }
-
-    [[nodiscard]] time_t GetGORespawnTime(ObjectGuid::LowType dbGuid) const
-    {
-        std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
-        if (itr != _goRespawnTimes.end())
-            return itr->second;
-
-        return time_t(0);
-    }
+    // Respawn times are written when creatures / gameobjects die or despawn, which happens inside
+    // partitions: while partitions run, these functions lock _respawnLock.
+    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const;
+    [[nodiscard]] time_t GetGORespawnTime(ObjectGuid::LowType dbGuid) const;
 
     void SaveCreatureRespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
     void RemoveCreatureRespawnTime(ObjectGuid::LowType dbGuid);
@@ -771,6 +796,15 @@ private:
     MapPartition _defaultPartition;
 protected:
     bool _debugOwnershipChecks = false;
+    std::atomic<bool> _inParallelPhase{false};
+    // Owned by MapPartitioned; nullptr on plain maps.
+    std::shared_mutex* _objectStoreLock = nullptr;
+    // Respawn times and queue (see GetCreatureRespawnTime). Recursive: Save* calls Remove*.
+    mutable std::recursive_mutex _respawnLock;
+    // Unique lock of _objectStoreLock if partitions are running, otherwise no lock.
+    [[nodiscard]] std::unique_lock<std::shared_mutex> LockObjectStoreForWrite();
+    [[nodiscard]] std::shared_lock<std::shared_mutex> LockObjectStoreForRead();
+    [[nodiscard]] std::unique_lock<std::recursive_mutex> LockRespawnData() const;
 private:
     IntervalTimer _updatableObjectListRecheckTimer;
     ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;

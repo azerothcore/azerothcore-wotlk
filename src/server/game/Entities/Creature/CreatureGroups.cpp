@@ -46,6 +46,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
         return;
     }
 
+    map->AssertSerialPhase("CreatureGroupHolder");
     CreatureGroupHolderType::iterator itr = map->CreatureGroupHolder.find(groupId);
 
     //Add member to an existing group
@@ -78,6 +79,7 @@ void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* membe
         }
 
         LOG_DEBUG("entities.unit", "Deleting group with InstanceID {}", member->GetInstanceId());
+        map->AssertSerialPhase("CreatureGroupHolder");
         map->CreatureGroupHolder.erase(group->GetId());
         delete group;
     }

@@ -23,6 +23,7 @@
 #include "MapDefines.h"
 #include "MapGrid.h"
 
+#include <atomic>
 #include <mutex>
 
 class Map;
@@ -52,10 +53,11 @@ public:
 private:
     Map* _map;
 
-    uint32 _createdGridsCount;
-    uint32 _loadedGridsCount;
+    std::atomic<uint32> _createdGridsCount;
+    std::atomic<uint32> _loadedGridsCount;
 
-    std::mutex _gridLock;
+    // Recursive: loading a grid spawns objects, which can create / load grids again on this thread.
+    std::recursive_mutex _gridLock;
     std::unique_ptr<MapGridType> _mapGrid[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
 };
 
