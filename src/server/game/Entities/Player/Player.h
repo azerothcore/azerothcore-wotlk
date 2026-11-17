@@ -2189,12 +2189,6 @@ public:
     void SetHonorPoints(uint32 value);
     void SetArenaPoints(uint32 value);
 
-    // duel health and mana reset methods
-    void SaveHealthBeforeDuel()     { healthBeforeDuel = GetHealth(); }
-    void SaveManaBeforeDuel()       { manaBeforeDuel = GetPower(POWER_MANA); }
-    void RestoreHealthAfterDuel()   { SetHealth(healthBeforeDuel); }
-    void RestoreManaAfterDuel()     { SetPower(POWER_MANA, manaBeforeDuel); }
-
     //End of PvP System
 
     [[nodiscard]] inline SpellCooldowns GetSpellCooldowns() const { return m_spellCooldowns; }
@@ -3067,10 +3061,6 @@ private:
     uint32 _pendingBindTimer;
 
     uint32 _activeCheats;
-
-    // duel health and mana reset attributes
-    uint32 healthBeforeDuel;
-    uint32 manaBeforeDuel;
 
     bool m_isInstantFlightOn;
 
