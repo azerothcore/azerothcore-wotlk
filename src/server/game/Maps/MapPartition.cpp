@@ -24,6 +24,8 @@ thread_local MapPartition* MapPartition::_currentPartition = nullptr;
 bool MapPartition::Outbox::IsEmpty() const
 {
     return PendingGridAdds.empty()
+        && DeferredUpdatableAdds.empty()
+        && DeferredUpdateObjectRemovals.empty()
         && PendingFarTeleports.empty()
         && ZonePlayerCountDeltas.empty()
         && VisibilityMapOps.empty()
@@ -36,6 +38,8 @@ bool MapPartition::Outbox::IsEmpty() const
 void MapPartition::Outbox::Clear()
 {
     PendingGridAdds.clear();
+    DeferredUpdatableAdds.clear();
+    DeferredUpdateObjectRemovals.clear();
     PendingFarTeleports.clear();
     ZonePlayerCountDeltas.clear();
     VisibilityMapOps.clear();

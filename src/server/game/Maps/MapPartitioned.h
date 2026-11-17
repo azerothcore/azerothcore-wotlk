@@ -23,6 +23,7 @@
 #include "MapPartition.h"
 #include <atomic>
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 class MapUpdater;
@@ -84,14 +85,18 @@ private:
  *
  * MapMgr creates it for the maps in MapPartitioning.Maps when MapPartitioning.Enable is set.
  *
- * Until entity ownership is introduced (PLAN.md Step 4) every entity belongs to the serial
- * set, so the geometric partitions stay empty and the whole map is ticked serially on the
- * world thread in PostUpdate.
+ * Entity ownership: an entity belongs to the geometric partition of its cell, or to the serial
+ * set when it is in a border cell, on a transport, zone-wide visible, pinned, or linked (combat,
+ * pet/owner, charm, vehicle, shared vision, far sight, duel, formation, periodic aura caster) to
+ * an entity outside its partition. PreUpdate recomputes ownership and hands entities over.
+ *
+ * Until the shared stores are thread-safe (PLAN.md Step 5) the partitions are updated one after
+ * another on the world thread, not on MapUpdater workers.
  */
 class MapPartitioned : public Map
 {
 public:
-    MapPartitioned(uint32 id, PartitionLayout const& layout);
+    MapPartitioned(uint32 id, PartitionLayout const& layout, bool debugOwnershipChecks = false);
     ~MapPartitioned() override;
 
     MapPartitioned* ToMapPartitioned() override { return this; }
@@ -117,16 +122,29 @@ public:
     void PostUpdate(uint32 t_diff, uint32 s_diff);
 
     void ForEachPartition(std::function<void(MapPartition&)> const& visitor) override;
+    MapPartition& GetOwnerForNewObject(WorldObject* obj) override;
+
+    // Owner an entity should have now (geometric partition or serial set), see the class comment.
+    MapPartition& ComputeOwner(WorldObject* obj);
+
+    // Keeps an entity in the serial set regardless of position (e.g. scripts with map-wide reach).
+    void PinToSerialSet(ObjectGuid guid) { _pinnedToSerialSet.insert(guid); }
+    void UnpinFromSerialSet(ObjectGuid guid) { _pinnedToSerialSet.erase(guid); }
+    [[nodiscard]] bool IsPinnedToSerialSet(ObjectGuid guid) const { return _pinnedToSerialSet.contains(guid); }
 
 private:
-    // Refills every partition's player vector from the map's player list.
-    void RebuildPartitionPlayers();
-    // Partition that ticks an entity. Until entity ownership exists (PLAN.md Step 4), always the serial set.
-    MapPartition& GetOwningPartition(WorldObject* object);
+    // PRE-UPDATE ownership pass: players every tick (their tick vectors are rebuilt), updatable
+    // objects on full ticks; entities whose owner changed are handed over to the new partition.
+    void ReassignOwnership(bool includeUpdatableObjects);
+    // Geometric partition index of an object's cell, or INVALID_PARTITION for a border cell,
+    // an invalid position, or an object that isn't in this map (when requireInWorld).
+    uint32 GetPositionalPartitionIndex(WorldObject const* obj, bool requireInWorld) const;
+    template<class Visitor> void ForEachLinkPartner(WorldObject* obj, Visitor&& visitor);
 
     PartitionLayout const _layout;
     std::vector<std::unique_ptr<MapPartition>> _partitions;
     std::atomic<bool> _inParallelPhase;
+    std::unordered_set<ObjectGuid> _pinnedToSerialSet;
 };
 
 #endif // ACORE_MAP_PARTITIONED_H

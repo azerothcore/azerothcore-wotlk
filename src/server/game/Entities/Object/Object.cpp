@@ -2219,6 +2219,9 @@ void WorldObject::SetMap(Map* map)
     m_currMap = map;
     m_mapId = map->GetId();
     m_InstanceId = map->GetInstanceId();
+    // Provisional owner (serial set on a partitioned map): the position may not be final yet.
+    // AddToMap / AddPlayerToMap assign the real owner once the object enters the map.
+    _partition = &map->GetDefaultPartition();
 
     sScriptMgr->OnWorldObjectSetMap(this, map);
 }
@@ -2230,6 +2233,7 @@ void WorldObject::ResetMap()
 
     sScriptMgr->OnWorldObjectResetMap(this);
 
+    m_currMap->OnWorldObjectUnlinked(this);
     m_currMap = nullptr;
     //maybe not for corpse
     //m_mapId = 0;

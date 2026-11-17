@@ -34,6 +34,7 @@ void GridObjectLoader::AddObjectHelper(Map* map, T* obj)
     Cell cell(cellCoord);
 
     map->AddToGrid<T>(obj, cell);
+    obj->SetPartition(&map->GetOwnerForNewObject(obj));
     obj->AddToWorld();
 }
 

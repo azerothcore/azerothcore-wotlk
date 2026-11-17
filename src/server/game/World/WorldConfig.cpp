@@ -586,7 +586,8 @@ void WorldConfig::BuildConfigCache()
         ">= 1 && <= MAX_NUMBER_OF_GRIDS");
     SetConfigValue<uint32>(CONFIG_MAP_PARTITIONING_BORDER_CELLS, "MapPartitioning.BorderCells", 2,
         ConfigValueCache::Reloadable::No);
-    SetConfigValue<bool>(CONFIG_MAP_PARTITIONING_DEBUG_OWNERSHIP_CHECKS, "MapPartitioning.DebugOwnershipChecks", false);
+    SetConfigValue<bool>(CONFIG_MAP_PARTITIONING_DEBUG_OWNERSHIP_CHECKS, "MapPartitioning.DebugOwnershipChecks", false,
+        ConfigValueCache::Reloadable::No);
     SetConfigValue<uint32>(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS, "Command.LookupMaxResults", 0);
 
     // Warden

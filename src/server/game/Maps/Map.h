@@ -239,6 +239,16 @@ public:
 
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
+    // Plain maps: the only partition. MapPartitioned: the serial set (updated on the world thread).
+    MapPartition& GetDefaultPartition() { return _defaultPartition; }
+    // Non-serial partition of this map currently updated by this thread during the parallel UPDATE
+    // phase, or nullptr. Shared mutations are deferred to its outbox when this is set.
+    MapPartition* GetParallelPartition();
+    // Owner partition for an object entering the map. Plain maps: the default partition.
+    virtual MapPartition& GetOwnerForNewObject(WorldObject* obj);
+    // Called by WorldObject::ResetMap: drops the object from its partition's local lists.
+    void OnWorldObjectUnlinked(WorldObject* obj);
+
     // pussywizard: queue a unit's delayed relocation/visibility event for HandleDelayedVisibility().
     // Writes go to the calling thread's partition (see GetWritePartition), never to a shared container.
     void AddDelayedVisibility(Unit* unit);
@@ -590,6 +600,15 @@ private:
     void RemoveDynamicObjectFromMoveList(DynamicObject* go);
 
     template<class T> void MoveAllObjectsInMoveList(std::vector<T*>& moveList);
+    void AddPlayerToMoveList(Player* player);
+    void RemovePlayerFromMoveList(Player* player);
+    // Loads the grid of a cell now, or (parallel UPDATE phase) requests it through the outbox.
+    void RequestGridLoad(Cell const& cell);
+    // Second half of AddToMap: transport boarding, initialization, create-visibility, vehicle accessories.
+    template<class T> void FinishAddToMap(T* obj, bool checkTransport);
+    // Grid insertion + FinishAddToMap for an object added during the parallel UPDATE phase.
+    template<class T> void FinishDeferredAddToMap(T* obj, bool checkTransport);
+    void FinishDeferredAddToMap(MapPartition::Outbox::PendingGridAdd const& pendingAdd);
     // Calls worker for each player ticked by the partition (plain maps: every player of the map).
     template<class Worker> void ForEachTickPlayer(MapPartition& partition, Worker&& worker);
     void RemoveObjectInRemoveList(WorldObject* obj);
@@ -629,14 +648,20 @@ protected:
     void ApplyPartitionOutbox(MapPartition& partition);
     IntervalTimer& GetUpdatableObjectListRecheckTimer() { return _updatableObjectListRecheckTimer; }
 
-    // Plain maps: the only partition. MapPartitioned: the serial set (updated on the world thread).
-    MapPartition& GetDefaultPartition() { return _defaultPartition; }
     // Partition that per-tick writes of the calling thread belong to: the partition this thread is
     // updating if it belongs to this map, otherwise the default partition.
     MapPartition& GetWritePartition();
-    // Non-serial partition of this map currently updated by this thread during the parallel UPDATE
-    // phase, or nullptr. Shared mutations are deferred to its outbox when this is set.
-    MapPartition* GetParallelPartition();
+    // Partition owning the object's per-tick state: its own partition for a WorldObject, its owner's
+    // for an Item, otherwise the write partition.
+    MapPartition& GetOwnerPartition(Object const* obj);
+    // Moves every queued field update into its owner partition's set (serial phases only). Outside the
+    // parallel UPDATE phase each queued object then sits in exactly one set: its owner's.
+    void RehomeUpdateObjects();
+    // Moves an updatable object's update-list membership to another partition (serial phases only).
+    void MoveUpdatableToPartition(WorldObject* obj, MapPartition& target);
+    // MapPartitioning.DebugOwnershipChecks: during the parallel UPDATE phase, an object may only be
+    // modified by the thread running its owner partition (or be owned by the serial set).
+    void AssertOwnership(Object const* obj);
     // Visits the default partition, then (MapPartitioned) every geometric partition.
     virtual void ForEachPartition(std::function<void(MapPartition&)> const& visitor);
     [[nodiscard]] bool IsRemoveListEmpty();
@@ -744,6 +769,9 @@ private:
 
     // Per-tick mutable lists (updatables, update objects, move lists, remove list, delayed visibility).
     MapPartition _defaultPartition;
+protected:
+    bool _debugOwnershipChecks = false;
+private:
     IntervalTimer _updatableObjectListRecheckTimer;
     ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
 

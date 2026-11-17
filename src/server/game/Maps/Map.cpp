@@ -26,6 +26,7 @@
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "InstanceScript.h"
+#include "Item.h"
 #include "IVMapMgr.h"
 #include "LFGMgr.h"
 #include "MapGrid.h"
@@ -150,6 +151,8 @@ void Map::AddToGrid(Player* obj, Cell const& cell)
 {
     MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+
+    obj->SetCurrentCell(cell);
 }
 
 template<>
@@ -274,6 +277,7 @@ bool Map::AddPlayerToMap(Player* player)
     // Check if we are adding to correct map
     ASSERT (player->GetMap() == this);
     player->SetMap(this);
+    player->SetPartition(&GetOwnerForNewObject(player));
     player->AddToWorld();
 
     SendInitTransports(player);
@@ -328,6 +332,19 @@ bool Map::AddToMap(T* obj, bool checkTransport)
         return false; //Should delete object
     }
 
+    obj->SetPartition(&GetOwnerForNewObject(obj));
+
+    // Partitioned map, parallel UPDATE phase: grids are frozen. The object enters the world now (so the
+    // caller can use it), the grid insertion and everything that depends on it happen in POST-UPDATE.
+    if (MapPartition* partition = GetParallelPartition())
+    {
+        //Must already be set before AddToMap. Usually during obj->Create.
+        //obj->SetMap(this);
+        obj->AddToWorld();
+        partition->GetOutbox().PendingGridAdds.push_back({ obj, checkTransport });
+        return true;
+    }
+
     Cell cell(cellCoord);
     if (obj->isActiveObject())
         EnsureGridLoaded(cell);
@@ -340,6 +357,13 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     //obj->SetMap(this);
     obj->AddToWorld();
 
+    FinishAddToMap(obj, checkTransport);
+    return true;
+}
+
+template<class T>
+void Map::FinishAddToMap(T* obj, bool checkTransport)
+{
     if (checkTransport)
         if (!(obj->IsGameObject() && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
             if (Transport* transport = GetTransportForPos(obj->GetPhaseMask(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj))
@@ -355,7 +379,48 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     if (obj->IsCreature())
         if (Vehicle* vehicle = obj->ToCreature()->GetVehicleKit())
             vehicle->Reset();
-    return true;
+}
+
+template<class T>
+void Map::FinishDeferredAddToMap(T* obj, bool checkTransport)
+{
+    // Removed from the map (or moved to another one) before POST-UPDATE.
+    if (!obj->IsInWorld() || obj->FindMap() != this || obj->IsInGrid())
+        return;
+
+    // Current position: the object may have moved since it was added.
+    Cell cell(obj->GetPositionX(), obj->GetPositionY());
+    if (obj->isActiveObject())
+        EnsureGridLoaded(cell);
+    else
+        EnsureGridCreated(GridCoord(cell.GridX(), cell.GridY()));
+
+    AddToGrid(obj, cell);
+    FinishAddToMap(obj, checkTransport);
+}
+
+void Map::FinishDeferredAddToMap(MapPartition::Outbox::PendingGridAdd const& pendingAdd)
+{
+    WorldObject* obj = pendingAdd.Target;
+    switch (obj->GetTypeId())
+    {
+        case TYPEID_UNIT:
+            FinishDeferredAddToMap(obj->ToCreature(), pendingAdd.CheckTransport);
+            break;
+        case TYPEID_GAMEOBJECT:
+            FinishDeferredAddToMap(obj->ToGameObject(), pendingAdd.CheckTransport);
+            break;
+        case TYPEID_DYNAMICOBJECT:
+            FinishDeferredAddToMap(static_cast<DynamicObject*>(obj), pendingAdd.CheckTransport);
+            break;
+        case TYPEID_CORPSE:
+            FinishDeferredAddToMap(static_cast<Corpse*>(obj), pendingAdd.CheckTransport);
+            break;
+        default:
+            LOG_ERROR("maps", "Map::FinishDeferredAddToMap: unexpected object type {} ({})",
+                obj->GetTypeId(), obj->GetGUID().ToString());
+            break;
+    }
 }
 
 template<>
@@ -590,8 +655,11 @@ void Map::ProcessCellMoves()
     MoveAllCreaturesInMoveList();
     MoveAllGameObjectsInMoveList();
     MoveAllDynamicObjectsInMoveList();
-    // Players are still re-gridded immediately by PlayerRelocation(); deferring them (the partitions'
-    // players-to-move lists) needs a cell move state on Player, which Player lacks (not a MovableMapObject).
+    // Only partitioned maps defer player cell changes (see PlayerRelocation).
+    ForEachPartition([this](MapPartition& partition)
+    {
+        MoveAllObjectsInMoveList(partition.GetPlayersToMove());
+    });
 }
 
 void Map::FinishTick(uint32 t_diff)
@@ -666,10 +734,19 @@ void Map::AddObjectToPendingUpdateList(WorldObject* obj)
     if (!mapUpdatableObject || mapUpdatableObject->GetUpdateState() != UpdatableMapObject::UpdateState::NotUpdating)
         return;
 
-    MapPartition& partition = GetWritePartition();
-    partition.GetPendingAddUpdatableObjectList().insert(obj);
+    // The object joins the update list of the partition that ticks it.
+    MapPartition& owner = GetOwnerPartition(obj);
+    if (MapPartition* current = GetParallelPartition(); current && current != &owner)
+    {
+        // Owned by the serial set: its lists are not written while partitions run.
+        AssertOwnership(obj);
+        current->GetOutbox().DeferredUpdatableAdds.push_back(obj);
+        return;
+    }
+
+    owner.GetPendingAddUpdatableObjectList().insert(obj);
     mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::PendingAdd);
-    mapUpdatableObject->SetMapUpdatePartition(&partition);
+    mapUpdatableObject->SetMapUpdatePartition(&owner);
 }
 
 // Internal use only
@@ -714,7 +791,11 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
 
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
     if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::PendingAdd)
+    {
         mapUpdatableObject->GetMapUpdatePartition()->GetPendingAddUpdatableObjectList().erase(obj);
+        mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::NotUpdating);
+        mapUpdatableObject->SetMapUpdatePartition(nullptr);
+    }
     else if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating)
         _RemoveObjectFromUpdateList(obj);
 }
@@ -744,18 +825,142 @@ void Map::ForEachPartition(std::function<void(MapPartition&)> const& visitor)
     visitor(_defaultPartition);
 }
 
+MapPartition& Map::GetOwnerForNewObject(WorldObject* /*obj*/)
+{
+    return _defaultPartition;
+}
+
+MapPartition& Map::GetOwnerPartition(Object const* obj)
+{
+    MapPartition* partition = nullptr;
+    if (obj->IsItem())
+    {
+        if (Player* owner = static_cast<Item const*>(obj)->GetOwner())
+            partition = owner->GetPartition();
+    }
+    else if (obj->isType(TYPEMASK_UNIT | TYPEMASK_PLAYER | TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT
+        | TYPEMASK_CORPSE))
+        partition = static_cast<WorldObject const*>(obj)->GetPartition();
+
+    if (partition && &partition->GetOwner() == this)
+        return *partition;
+
+    return GetWritePartition();
+}
+
+void Map::AssertOwnership(Object const* obj)
+{
+    if (!_debugOwnershipChecks)
+        return;
+
+    MapPartition* current = GetParallelPartition();
+    if (!current)
+        return;
+
+    MapPartition const& owner = GetOwnerPartition(obj);
+    ASSERT(&owner == current || owner.IsSerialSet(),
+        "Map partitioning: {} owned by partition {} of map {} was modified while partition {} was updating",
+        obj->GetGUID().ToString(), owner.GetIndex(), GetId(), current->GetIndex());
+}
+
+void Map::MoveUpdatableToPartition(WorldObject* obj, MapPartition& target)
+{
+    UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
+    if (!mapUpdatableObject)
+        return;
+
+    MapPartition* from = mapUpdatableObject->GetMapUpdatePartition();
+    if (from == &target)
+        return;
+
+    switch (mapUpdatableObject->GetUpdateState())
+    {
+        case UpdatableMapObject::UpdateState::PendingAdd:
+            from->GetPendingAddUpdatableObjectList().erase(obj);
+            break;
+        case UpdatableMapObject::UpdateState::Updating:
+            _RemoveObjectFromUpdateList(obj);
+            break;
+        default:
+            return;
+    }
+
+    // Joins the target's update list when the target merges its pending list (same tick).
+    target.GetPendingAddUpdatableObjectList().insert(obj);
+    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::PendingAdd);
+    mapUpdatableObject->SetMapUpdatePartition(&target);
+}
+
+void Map::OnWorldObjectUnlinked(WorldObject* obj)
+{
+    if (ToMapPartitioned())
+    {
+        AssertOwnership(obj);
+
+        if (MapPartition* partition = obj->GetPartition(); partition && &partition->GetOwner() == this)
+        {
+            if (Player* player = obj->ToPlayer())
+                partition->RemovePlayer(player);
+
+            // Not ticked by this map any more; lets the object join the next map's update list.
+            RemoveObjectFromMapUpdateList(obj);
+        }
+    }
+
+    obj->SetPartition(nullptr);
+}
+
 void Map::AddUpdateObject(Object* obj)
 {
-    GetWritePartition().GetUpdateObjects().insert(obj);
+    AssertOwnership(obj);
+
+    // While partitions run, each one only writes its own set (a serial-set object touched from a
+    // partition is queued there). In the serial phases the owner partition gets it.
+    if (MapPartition* current = GetParallelPartition())
+        current->GetUpdateObjects().insert(obj);
+    else
+        GetOwnerPartition(obj).GetUpdateObjects().insert(obj);
 }
 
 void Map::RemoveUpdateObject(Object* obj)
 {
-    if (GetWritePartition().GetUpdateObjects().erase(obj))
+    MapPartition& owner = GetOwnerPartition(obj);
+
+    if (MapPartition* current = GetParallelPartition())
+    {
+        current->GetUpdateObjects().erase(obj);
+
+        // An entry may also sit in the owner's set (queued in a serial phase). Another partition's set
+        // must not be written now: drop it in POST-UPDATE, before the update packets are built.
+        if (&owner != current)
+            current->GetOutbox().DeferredUpdateObjectRemovals.push_back(obj);
+        return;
+    }
+
+    // Serial phase: RehomeUpdateObjects() keeps every entry in its owner's set.
+    if (owner.GetUpdateObjects().erase(obj))
         return;
 
-    // Queued from another partition (partitioned maps only).
+    // The owner changed without a rehome (e.g. an item given to a player of another partition):
+    // look everywhere, every set may be written in a serial phase.
     ForEachPartition([obj](MapPartition& partition) { partition.GetUpdateObjects().erase(obj); });
+}
+
+void Map::RehomeUpdateObjects()
+{
+    std::vector<std::pair<Object*, MapPartition*>> moves;
+    ForEachPartition([&](MapPartition& partition)
+    {
+        for (Object* obj : partition.GetUpdateObjects())
+            if (&GetOwnerPartition(obj) != &partition)
+                moves.emplace_back(obj, &partition);
+    });
+
+    for (auto const& [obj, from] : moves)
+    {
+        from->GetUpdateObjects().erase(obj);
+        GetOwnerPartition(obj).GetUpdateObjects().insert(obj);
+    }
 }
 
 size_t Map::GetUpdatableObjectsCount()
@@ -804,11 +1009,12 @@ void Map::ApplyPartitionOutbox(MapPartition& partition)
     if (outbox.IsEmpty())
         return;
 
-    // Nothing defers these yet: their producers arrive with entity ownership (PLAN.md Step 4).
-    ASSERT(outbox.PendingGridAdds.empty(), "Map::ApplyPartitionOutbox: deferred grid adds aren't supported yet");
-    ASSERT(outbox.PendingFarTeleports.empty(), "Map::ApplyPartitionOutbox: deferred teleports aren't supported yet");
     // AddCorpse() / RemoveCorpse() change the corpse's map immediately and callers rely on it, so they aren't deferred.
     ASSERT(outbox.CorpseOps.empty(), "Map::ApplyPartitionOutbox: deferred corpse operations are not supported");
+
+    // Before SendObjectUpdates(): these objects left the world.
+    for (Object* obj : outbox.DeferredUpdateObjectRemovals)
+        ForEachPartition([obj](MapPartition& p) { p.GetUpdateObjects().erase(obj); });
 
     for (auto const& [zoneId, delta] : outbox.ZonePlayerCountDeltas)
     {
@@ -846,7 +1052,7 @@ void Map::ApplyPartitionOutbox(MapPartition& partition)
             RemoveGameObjectModel(*op.Model);
     }
 
-    // Grids needed by recorded cell moves; must run before ProcessCellMoves().
+    // Grids needed by recorded cell moves and deferred adds; must run before ProcessCellMoves().
     bool gridLoaded = false;
     for (GridCoord const& gridCoord : outbox.GridLoadRequests)
     {
@@ -857,7 +1063,21 @@ void Map::ApplyPartitionOutbox(MapPartition& partition)
     if (outbox.CollisionBalanceRequested || gridLoaded)
         Balance();
 
+    for (MapPartition::Outbox::PendingGridAdd const& pendingAdd : outbox.PendingGridAdds)
+        FinishDeferredAddToMap(pendingAdd);
+
+    for (WorldObject* obj : outbox.DeferredUpdatableAdds)
+        if (obj->IsInWorld() && obj->FindMap() == this)
+            AddObjectToPendingUpdateList(obj);
+
+    // Last: a far teleport takes the player out of the map.
+    std::vector<ObjectGuid> const farTeleports = std::move(outbox.PendingFarTeleports);
     outbox.Clear();
+
+    for (ObjectGuid const& guid : farTeleports)
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+            if (player->FindMap() == this)
+                player->ExecuteDeferredFarTeleport();
 }
 
 // Used in VisibilityDistanceType::Large and VisibilityDistanceType::Gigantic
@@ -953,6 +1173,7 @@ ZoneWideVisibleWorldObjectsSet const* Map::GetZoneWideVisibleWorldObjectsForZone
 
 void Map::AddDelayedVisibility(Unit* unit)
 {
+    AssertOwnership(unit);
     GetWritePartition().GetObjectsForDelayedVisibility().insert(unit);
 }
 
@@ -1077,17 +1298,39 @@ void Map::RemoveFromMap(Transport* obj, bool remove)
 
 void Map::PlayerRelocation(Player* player, float x, float y, float z, float o)
 {
-    Cell old_cell(player->GetPositionX(), player->GetPositionY());
-    Cell new_cell(x, y);
+    AssertOwnership(player);
 
-    if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
+    if (ToMapPartitioned())
     {
-        player->RemoveFromGrid();
+        // Grids may be read across partitions while partitions run: defer the cell change to
+        // POST-UPDATE, like creatures. The current cell is where the player sits in the grid.
+        Cell const& old_cell = player->GetCurrentCell();
+        Cell new_cell(x, y);
 
-        if (old_cell.DiffGrid(new_cell))
-            EnsureGridLoaded(new_cell);
+        if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
+        {
+            if (old_cell.DiffGrid(new_cell))
+                RequestGridLoad(new_cell);
 
-        AddToGrid(player, new_cell);
+            AddPlayerToMoveList(player);
+        }
+        else
+            RemovePlayerFromMoveList(player);
+    }
+    else
+    {
+        Cell old_cell(player->GetPositionX(), player->GetPositionY());
+        Cell new_cell(x, y);
+
+        if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
+        {
+            player->RemoveFromGrid();
+
+            if (old_cell.DiffGrid(new_cell))
+                EnsureGridLoaded(new_cell);
+
+            AddToGrid(player, new_cell);
+        }
     }
 
     player->Relocate(x, y, z, o);
@@ -1099,6 +1342,8 @@ void Map::PlayerRelocation(Player* player, float x, float y, float z, float o)
 
 void Map::CreatureRelocation(Creature* creature, float x, float y, float z, float o)
 {
+    AssertOwnership(creature);
+
     Cell old_cell = creature->GetCurrentCell();
     Cell new_cell(x, y);
 
@@ -1107,7 +1352,7 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
     if (cellChanged)
     {
         if (old_cell.DiffGrid(new_cell))
-            EnsureGridLoaded(new_cell);
+            RequestGridLoad(new_cell);
 
         AddCreatureToMoveList(creature);
     }
@@ -1143,13 +1388,15 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
 
 void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float o)
 {
+    AssertOwnership(go);
+
     Cell old_cell = go->GetCurrentCell();
     Cell new_cell(x, y);
 
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
         if (old_cell.DiffGrid(new_cell))
-            EnsureGridLoaded(new_cell);
+            RequestGridLoad(new_cell);
 
         AddGameObjectToMoveList(go);
     }
@@ -1164,13 +1411,15 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
 
 void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float z, float o)
 {
+    AssertOwnership(dynObj);
+
     Cell old_cell = dynObj->GetCurrentCell();
     Cell new_cell(x, y);
 
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
         if (old_cell.DiffGrid(new_cell))
-            EnsureGridLoaded(new_cell);
+            RequestGridLoad(new_cell);
 
         AddDynamicObjectToMoveList(dynObj);
     }
@@ -1182,8 +1431,35 @@ void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float
     dynObj->UpdateObjectVisibility(false);
 }
 
+void Map::RequestGridLoad(Cell const& cell)
+{
+    if (MapPartition* partition = GetParallelPartition())
+    {
+        GridCoord const gridCoord(cell.GridX(), cell.GridY());
+        if (!IsGridLoaded(gridCoord))
+            partition->GetOutbox().GridLoadRequests.push_back(gridCoord);
+        return;
+    }
+
+    EnsureGridLoaded(cell);
+}
+
+void Map::AddPlayerToMoveList(Player* player)
+{
+    if (player->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
+        GetWritePartition().GetPlayersToMove().push_back(player);
+    player->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+}
+
+void Map::RemovePlayerFromMoveList(Player* player)
+{
+    if (player->_moveState == MAP_OBJECT_CELL_MOVE_ACTIVE)
+        player->_moveState = MAP_OBJECT_CELL_MOVE_INACTIVE;
+}
+
 void Map::AddCreatureToMoveList(Creature* c)
 {
+    AssertOwnership(c);
     if (c->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         GetWritePartition().GetCreaturesToMove().push_back(c);
     c->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -1197,6 +1473,7 @@ void Map::RemoveCreatureFromMoveList(Creature* c)
 
 void Map::AddGameObjectToMoveList(GameObject* go)
 {
+    AssertOwnership(go);
     if (go->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         GetWritePartition().GetGameObjectsToMove().push_back(go);
     go->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -1210,6 +1487,7 @@ void Map::RemoveGameObjectFromMoveList(GameObject* go)
 
 void Map::AddDynamicObjectToMoveList(DynamicObject* dynObj)
 {
+    AssertOwnership(dynObj);
     if (dynObj->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         GetWritePartition().GetDynamicObjectsToMove().push_back(dynObj);
     dynObj->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -2748,9 +3026,7 @@ void Map::UpdateIteratorBack(Player* player)
     if (m_mapRefIter == player->GetMapRef())
         m_mapRefIter = m_mapRefIter->nocheck_prev();
 
-    // Partitioned maps tick per-partition player vectors (rebuilt in PRE-UPDATE); drop the player from them.
-    if (ToMapPartitioned())
-        ForEachPartition([player](MapPartition& partition) { partition.RemovePlayer(player); });
+    // Partitioned maps tick per-partition player vectors instead; OnWorldObjectUnlinked() drops the player from them.
 }
 
 void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)

@@ -96,8 +96,19 @@ public:
             bool Insert;
         };
 
-        // Objects added to the map during UPDATE: grid insertion and create-visibility are deferred.
-        std::vector<WorldObject*> PendingGridAdds;
+        struct PendingGridAdd
+        {
+            WorldObject* Target;
+            bool CheckTransport;
+        };
+
+        // Objects added to the map during UPDATE: they are in world, but grid insertion, transport
+        // boarding, create-visibility and vehicle accessories are deferred.
+        std::vector<PendingGridAdd> PendingGridAdds;
+        // Objects owned by another partition (the serial set) that need to join its update list.
+        std::vector<WorldObject*> DeferredUpdatableAdds;
+        // Objects not owned by this partition that left the world: drop their queued field updates.
+        std::vector<Object*> DeferredUpdateObjectRemovals;
         // Players whose far teleport was requested during UPDATE.
         std::vector<ObjectGuid> PendingFarTeleports;
         // zoneId -> player count delta (Map::UpdatePlayerZoneStats).

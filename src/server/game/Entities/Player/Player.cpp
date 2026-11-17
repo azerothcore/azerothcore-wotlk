@@ -1585,6 +1585,20 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 return true;
             }
 
+            // Partitioned map: leaving the map unlinks the player from the grid and the map's player
+            // list, which must not happen while partitions run. POST-UPDATE runs the teleport.
+            if (oldmap)
+            {
+                if (MapPartition* partition = oldmap->GetParallelPartition())
+                {
+                    SetSemaphoreTeleportFar(GameTime::GetGameTime().count());
+                    teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
+                    teleportStore_options = options;
+                    partition->GetOutbox().PendingFarTeleports.push_back(GetGUID());
+                    return true;
+                }
+            }
+
             SetSelection(ObjectGuid::Empty);
 
             CombatStop();

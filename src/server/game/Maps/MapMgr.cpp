@@ -91,7 +91,8 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             {
                 PartitionLayout const layout(sWorld->getIntConfig(CONFIG_MAP_PARTITIONING_GRIDS_PER_PARTITION),
                     sWorld->getIntConfig(CONFIG_MAP_PARTITIONING_BORDER_CELLS));
-                map = new MapPartitioned(id, layout);
+                map = new MapPartitioned(id, layout,
+                    sWorld->getBoolConfig(CONFIG_MAP_PARTITIONING_DEBUG_OWNERSHIP_CHECKS));
                 LOG_INFO("maps", "Map {} is partitioned: {}x{} partitions of {}x{} grids, border strip {} cells",
                     id, layout.GetPartitionsPerSide(), layout.GetPartitionsPerSide(),
                     layout.GetGridsPerPartition(), layout.GetGridsPerPartition(), layout.GetBorderCells());

@@ -641,6 +641,11 @@ public:
 
     virtual void SetMap(Map* map);
     virtual void ResetMap();
+
+    // Map partition that ticks this object and owns its per-tick bookkeeping (map partitioning).
+    // On a plain map it is the map's only partition. Set by SetMap / AddToMap, cleared by ResetMap.
+    [[nodiscard]] MapPartition* GetPartition() const { return _partition; }
+    void SetPartition(MapPartition* partition) { _partition = partition; }
     [[nodiscard]] Map* GetMap() const { ASSERT(m_currMap); return m_currMap; }
     [[nodiscard]] Map* FindMap() const { return m_currMap; }
     //used to check all object's GetMap() calls when object is not in world!
@@ -832,6 +837,7 @@ protected:
     virtual bool IsAlwaysDetectableFor(WorldObject const* /*seer*/) const { return false; }
 private:
     Map* m_currMap;                                    //current object's Map location
+    MapPartition* _partition{nullptr};
     Milliseconds _heartbeatTimer;
     //uint32 m_mapId;                                     // object at map with map_id
     uint32 m_InstanceId;                                // in map copy with instance id

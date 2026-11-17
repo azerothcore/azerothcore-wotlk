@@ -1082,7 +1082,7 @@ struct PendingSpellCastRequest
         : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel) {}
 };
 
-class Player : public Unit, public GridObject<Player>
+class Player : public Unit, public GridObject<Player>, public MovableMapObject
 {
     friend class WorldSession;
     friend class CinematicMgr;
@@ -1105,6 +1105,8 @@ public:
     }
 
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr, bool newInstance = false);
+    // Runs a far teleport that a partitioned map deferred out of its parallel UPDATE phase.
+    void ExecuteDeferredFarTeleport() { TeleportTo(teleportStore_dest, teleportStore_options); }
     bool TeleportTo(WorldLocation const& loc, uint32 options = 0, Unit* target = nullptr)
     {
         return TeleportTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation(), options, target);

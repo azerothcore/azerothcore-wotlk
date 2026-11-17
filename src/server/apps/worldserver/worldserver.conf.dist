@@ -1374,7 +1374,8 @@ MapPartitioning.BorderCells = 2
 #
 #    MapPartitioning.DebugOwnershipChecks
 #        Description: Assert that entities are only modified by the thread updating the
-#                     partition that owns them. Costly, for debugging only.
+#                     partition that owns them (or are owned by the serial set). Costly, for
+#                     debugging only. Needs a restart to change.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 

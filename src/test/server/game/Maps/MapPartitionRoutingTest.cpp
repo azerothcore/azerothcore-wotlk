@@ -23,6 +23,7 @@
  */
 
 #include "MapPartitioned.h"
+#include "TestCreature.h"
 #include "TestMap.h"
 #include "WorldMock.h"
 #include "gmock/gmock.h"
@@ -41,6 +42,7 @@ public:
 
     using Map::ApplyPartitionOutbox;
     using Map::GetDefaultPartition;
+    using Map::RehomeUpdateObjects;
     using Map::GetParallelPartition;
     using Map::GetWritePartition;
 };
@@ -56,7 +58,6 @@ public:
 // Stand-ins that are only stored and compared, never dereferenced.
 alignas(16) unsigned char FakeStorage[4][16];
 
-Object* FakeObject(std::size_t i) { return reinterpret_cast<Object*>(FakeStorage[i]); }
 Unit* FakeUnit(std::size_t i) { return reinterpret_cast<Unit*>(FakeStorage[i]); }
 Player* FakePlayer(std::size_t i) { return reinterpret_cast<Player*>(FakeStorage[i]); }
 
@@ -83,6 +84,9 @@ protected:
 
     void TearDown() override
     {
+        for (TestCreature* creature : _creatures)
+            delete creature;
+
         delete _plain;
         delete _partitioned;
         sWorld = std::move(_previousWorld);
@@ -92,6 +96,16 @@ protected:
     NiceMock<WorldMock>* _worldMock = nullptr;
     PartitionedMapProbe* _partitioned = nullptr;
     PlainMapProbe* _plain = nullptr;
+    std::vector<TestCreature*> _creatures;
+
+    // AddUpdateObject() inspects the object (type, owner partition), so it needs a real one.
+    TestCreature* SpawnOn(Map* map)
+    {
+        TestCreature* creature = new TestCreature();
+        creature->SetupForCombatTest(map, ObjectGuid::LowType(_creatures.size() + 1), 12345);
+        _creatures.push_back(creature);
+        return creature;
+    }
 };
 
 } // namespace
@@ -133,24 +147,32 @@ TEST_F(MapPartitionRoutingTest, PartitionedMapRoutesToCurrentPartition)
 TEST_F(MapPartitionRoutingTest, UpdateObjectsAndDelayedVisibilityAreQueuedPerPartition)
 {
     MapPartition* partition = _partitioned->GetPartition(7);
+    TestCreature* touched = SpawnOn(_partitioned);
+    TestCreature* other = SpawnOn(_partitioned);
 
     {
         MapPartition::Scope scope(*partition);
-        _partitioned->AddUpdateObject(FakeObject(0));
+        _partitioned->AddUpdateObject(touched);
         _partitioned->AddDelayedVisibility(FakeUnit(1));
     }
-    _partitioned->AddUpdateObject(FakeObject(2));
+    // Serial phase: queued on the owner (the serial set, provisional owner after SetMap).
+    _partitioned->AddUpdateObject(other);
 
-    EXPECT_EQ(partition->GetUpdateObjects().count(FakeObject(0)), 1u);
+    EXPECT_EQ(partition->GetUpdateObjects().count(touched), 1u);
     EXPECT_EQ(partition->GetObjectsForDelayedVisibility().count(FakeUnit(1)), 1u);
-    EXPECT_EQ(_partitioned->GetSerialSet().GetUpdateObjects().count(FakeObject(2)), 1u);
+    EXPECT_EQ(_partitioned->GetSerialSet().GetUpdateObjects().count(other), 1u);
     EXPECT_TRUE(_partitioned->GetSerialSet().GetObjectsForDelayedVisibility().empty());
 
-    // Removal from outside the partition's scope still finds the object.
-    _partitioned->RemoveUpdateObject(FakeObject(0));
+    // POST-UPDATE starts by moving partition-queued entries to their owner (the serial set here)...
+    _partitioned->RehomeUpdateObjects();
     EXPECT_TRUE(partition->GetUpdateObjects().empty());
+    EXPECT_EQ(_partitioned->GetSerialSet().GetUpdateObjects().count(touched), 1u);
 
-    _partitioned->RemoveUpdateObject(FakeObject(2));
+    // ...so a serial-phase removal finds it with a direct lookup.
+    _partitioned->RemoveUpdateObject(touched);
+    EXPECT_EQ(_partitioned->GetSerialSet().GetUpdateObjects().count(touched), 0u);
+
+    _partitioned->RemoveUpdateObject(other);
     EXPECT_TRUE(_partitioned->GetSerialSet().GetUpdateObjects().empty());
 
     partition->GetObjectsForDelayedVisibility().clear();
@@ -158,10 +180,13 @@ TEST_F(MapPartitionRoutingTest, UpdateObjectsAndDelayedVisibilityAreQueuedPerPar
 
 TEST_F(MapPartitionRoutingTest, PlainMapQueuesUpdateObjectsInDefaultPartition)
 {
-    _plain->AddUpdateObject(FakeObject(0));
-    EXPECT_EQ(_plain->GetDefaultPartition().GetUpdateObjects().count(FakeObject(0)), 1u);
+    TestCreature* creature = SpawnOn(_plain);
+    EXPECT_EQ(creature->GetPartition(), &_plain->GetDefaultPartition());
 
-    _plain->RemoveUpdateObject(FakeObject(0));
+    _plain->AddUpdateObject(creature);
+    EXPECT_EQ(_plain->GetDefaultPartition().GetUpdateObjects().count(creature), 1u);
+
+    _plain->RemoveUpdateObject(creature);
     EXPECT_TRUE(_plain->GetDefaultPartition().GetUpdateObjects().empty());
 }
 
