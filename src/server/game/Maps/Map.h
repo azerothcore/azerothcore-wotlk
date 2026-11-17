@@ -61,6 +61,7 @@ struct ScriptAction;
 struct Position;
 class Battleground;
 class MapInstanced;
+class MapPartitioned;
 class InstanceMap;
 class BattlegroundMap;
 class Transport;
@@ -392,6 +393,10 @@ public:
 
     BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return nullptr;  }
     [[nodiscard]] BattlegroundMap const* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return nullptr; }
+
+    // Virtual (not derived from MapEntry flags): a partitioned map is an ordinary non-instanceable map entry.
+    virtual MapPartitioned* ToMapPartitioned() { return nullptr; }
+    [[nodiscard]] virtual MapPartitioned const* ToMapPartitioned() const { return nullptr; }
 
     float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
