@@ -26,12 +26,15 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapInstanced.h"
+#include "MapPartitioned.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "StringConvert.h"
 #include "TC9Sidecar.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
@@ -84,6 +87,15 @@ Map* MapMgr::CreateBaseMap(uint32 id)
 
             if (entry->Instanceable())
                 map = new MapInstanced(id);
+            else if (IsPartitionedMapId(id))
+            {
+                PartitionLayout const layout(sWorld->getIntConfig(CONFIG_MAP_PARTITIONING_GRIDS_PER_PARTITION),
+                    sWorld->getIntConfig(CONFIG_MAP_PARTITIONING_BORDER_CELLS));
+                map = new MapPartitioned(id, layout);
+                LOG_INFO("maps", "Map {} is partitioned: {}x{} partitions of {}x{} grids, border strip {} cells",
+                    id, layout.GetPartitionsPerSide(), layout.GetPartitionsPerSide(),
+                    layout.GetGridsPerPartition(), layout.GetGridsPerPartition(), layout.GetBorderCells());
+            }
             else
                 map = new Map(id, 0, REGULAR_DIFFICULTY);
 
@@ -101,6 +113,51 @@ Map* MapMgr::CreateBaseMap(uint32 id)
 
     ASSERT(map);
     return map;
+}
+
+bool MapMgr::IsPartitionedMapId(uint32 mapId)
+{
+    std::call_once(_partitionedMapIdsOnce, [this]() { LoadPartitionedMapIds(); });
+    return _partitionedMapIds.contains(mapId);
+}
+
+void MapMgr::LoadPartitionedMapIds()
+{
+    if (!sWorld->getBoolConfig(CONFIG_MAP_PARTITIONING_ENABLE))
+        return;
+
+    std::string const mapList(sWorld->getStringConfig(CONFIG_MAP_PARTITIONING_MAPS));
+    for (std::string_view token : Acore::Tokenize(mapList, ',', false))
+    {
+        // Allow "0, 1" as well as "0,1".
+        while (!token.empty() && token.front() == ' ')
+            token.remove_prefix(1);
+        while (!token.empty() && token.back() == ' ')
+            token.remove_suffix(1);
+
+        Optional<uint32> mapId = Acore::StringTo<uint32>(token);
+        if (!mapId)
+        {
+            LOG_ERROR("server.loading", "MapPartitioning.Maps: '{}' is not a map id, ignored.", token);
+            continue;
+        }
+
+        MapEntry const* entry = sMapStore.LookupEntry(*mapId);
+        if (!entry)
+        {
+            LOG_ERROR("server.loading", "MapPartitioning.Maps: map {} does not exist, ignored.", *mapId);
+            continue;
+        }
+
+        if (entry->Instanceable())
+        {
+            LOG_ERROR("server.loading", "MapPartitioning.Maps: map {} is instanceable, only continents can be "
+                "partitioned. Ignored.", *mapId);
+            continue;
+        }
+
+        _partitionedMapIds.insert(*mapId);
+    }
 }
 
 Map* MapMgr::FindBaseNonInstanceMap(uint32 mapId) const
@@ -253,31 +310,49 @@ void MapMgr::Update(uint32 diff)
     for (uint8 i = 0; i < 4; ++i)
         i_timer[i].Update(diff);
 
-    // pussywizard: lfg compatibles update, schedule before maps so it is processed from the very beginning
-    //if (mapUpdateStep == 0)
+    // Diff for a map's full update this tick: only the map category of the current step gets one,
+    // the others get 0 (sessions and players only).
+    auto getMapDiff = [this](Map const* map) -> uint32
     {
-        if (m_updater.activated())
-        {
-            m_updater.schedule_lfg_update(diff);
-        }
-        else
-        {
-            sLFGMgr->Update(diff, 1);
-        }
-    }
+        bool full = mapUpdateStep < 3
+            && ((mapUpdateStep == 0 && !map->IsBattlegroundOrArena() && !map->IsDungeon())
+                || (mapUpdateStep == 1 && map->IsBattlegroundOrArena())
+                || (mapUpdateStep == 2 && map->IsDungeon()));
+        return uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0);
+    };
 
+    // Fork-join tick for partitioned maps.
+    // PRE-UPDATE (serial, world thread)
+    for (auto& [mapId, map] : i_maps)
+        if (MapPartitioned* partitioned = map->ToMapPartitioned())
+            partitioned->PreUpdate(getMapDiff(map), diff);
+
+    // pussywizard: lfg compatibles update, schedule before maps so it is processed from the very beginning
+    if (m_updater.activated())
+        m_updater.schedule_lfg_update(diff);
+    else
+        sLFGMgr->Update(diff, 1);
+
+    // UPDATE: fork. Partitioned maps fan out one task per partition, other maps are one task each.
     MapMapType::iterator iter = i_maps.begin();
     for (; iter != i_maps.end(); ++iter)
     {
-        bool full = mapUpdateStep < 3 && ((mapUpdateStep == 0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep == 1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep == 2 && iter->second->IsDungeon()));
-        if (m_updater.activated())
-            m_updater.schedule_update(*iter->second, uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
+        if (MapPartitioned* partitioned = iter->second->ToMapPartitioned())
+            partitioned->SchedulePartitions(m_updater, getMapDiff(iter->second), diff);
+        else if (m_updater.activated())
+            m_updater.schedule_update(*iter->second, getMapDiff(iter->second), diff);
         else
-            iter->second->Update(uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
+            iter->second->Update(getMapDiff(iter->second), diff);
     }
 
+    // Join
     if (m_updater.activated())
         m_updater.wait();
+
+    // POST-UPDATE (serial, world thread)
+    for (auto& [mapId, map] : i_maps)
+        if (MapPartitioned* partitioned = map->ToMapPartitioned())
+            partitioned->PostUpdate(getMapDiff(map), diff);
 
     if (mapUpdateStep < 3)
     {

@@ -1337,6 +1337,50 @@ MapUpdateInterval = 10
 MapUpdate.Threads = 1
 
 #
+#    MapPartitioning.Enable
+#        Description: Split the maps listed in MapPartitioning.Maps into partitions that are
+#                     updated in a fork-join cycle (serial pre-update, parallel partition update,
+#                     serial post-update). Experimental. Needs a restart to change.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+MapPartitioning.Enable = 0
+
+#
+#    MapPartitioning.Maps
+#        Description: Comma separated list of non-instanced map IDs to partition.
+#                     Instanceable maps in the list are ignored. Needs a restart to change.
+#        Default:     "0,1,530,571" - (Eastern Kingdoms, Kalimdor, Outland, Northrend)
+
+MapPartitioning.Maps = "0,1,530,571"
+
+#
+#    MapPartitioning.GridsPerPartition
+#        Description: Side length of a partition in grids (1 grid = 533.33 yards, 64x64 grids
+#                     per map). Needs a restart to change.
+#        Default:     8 - (8x8 grids per partition, up to 64 partitions per map)
+
+MapPartitioning.GridsPerPartition = 8
+
+#
+#    MapPartitioning.BorderCells
+#        Description: Width in cells (1 cell = 66.67 yards) of the strip on each side of a
+#                     partition edge whose entities are updated serially on the world thread.
+#                     Interactions shorter than this never cross threads. Needs a restart.
+#        Default:     2 - (~133 yards)
+
+MapPartitioning.BorderCells = 2
+
+#
+#    MapPartitioning.DebugOwnershipChecks
+#        Description: Assert that entities are only modified by the thread updating the
+#                     partition that owns them. Costly, for debugging only.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+MapPartitioning.DebugOwnershipChecks = 0
+
+#
 #    MoveMaps.Enable
 #        Description: Enable/Disable pathfinding using mmaps - recommended.
 #        Default:     0 - (Disabled)

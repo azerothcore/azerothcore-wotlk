@@ -574,6 +574,19 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_SHOW_MUTE_IN_WORLD, "ShowMuteInWorld", false);
     SetConfigValue<bool>(CONFIG_SHOW_BAN_IN_WORLD, "ShowBanInWorld", false);
     SetConfigValue<uint32>(CONFIG_NUMTHREADS, "MapUpdate.Threads", 1);
+
+    // Map partitioning (continent maps). Maps are built at startup, so the layout can't change on reload.
+    SetConfigValue<bool>(CONFIG_MAP_PARTITIONING_ENABLE, "MapPartitioning.Enable", false,
+        ConfigValueCache::Reloadable::No);
+    SetConfigValue<std::string>(CONFIG_MAP_PARTITIONING_MAPS, "MapPartitioning.Maps", "0,1,530,571",
+        ConfigValueCache::Reloadable::No);
+    SetConfigValue<uint32>(CONFIG_MAP_PARTITIONING_GRIDS_PER_PARTITION, "MapPartitioning.GridsPerPartition", 8,
+        ConfigValueCache::Reloadable::No,
+        [](uint32 const& value) { return value >= 1 && value <= MAX_NUMBER_OF_GRIDS; },
+        ">= 1 && <= MAX_NUMBER_OF_GRIDS");
+    SetConfigValue<uint32>(CONFIG_MAP_PARTITIONING_BORDER_CELLS, "MapPartitioning.BorderCells", 2,
+        ConfigValueCache::Reloadable::No);
+    SetConfigValue<bool>(CONFIG_MAP_PARTITIONING_DEBUG_OWNERSHIP_CHECKS, "MapPartitioning.DebugOwnershipChecks", false);
     SetConfigValue<uint32>(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS, "Command.LookupMaxResults", 0);
 
     // Warden

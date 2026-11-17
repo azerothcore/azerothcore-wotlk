@@ -82,8 +82,7 @@ private:
  *   -> SchedulePartitions (one PartitionUpdateRequest per populated partition)
  *   -> PostUpdate (serial, world thread, after MapUpdater::wait()).
  *
- * Step 1 scaffolding: the phases forward to the existing Map::Update
- * behaviour and nothing constructs this class yet (MapMgr wiring is Step 2).
+ * MapMgr creates it for the maps in MapPartitioning.Maps when MapPartitioning.Enable is set.
  */
 class MapPartitioned : public Map
 {
@@ -105,7 +104,10 @@ public:
 
     [[nodiscard]] bool IsInParallelPhase() const { return _inParallelPhase.load(std::memory_order_acquire); }
 
-    // Fork-Join tick phases. Step 1: forward to the existing single-threaded Map::Update.
+    // Fork-Join tick phases, driven by MapMgr::Update on the world thread:
+    //   PreUpdate -> SchedulePartitions -> MapUpdater::wait() -> PostUpdate.
+    // Until Step 3 moves the map state into the partitions, SchedulePartitions still runs the
+    // whole-map Map::Update as one task and Pre/PostUpdate only record metrics.
     void PreUpdate(uint32 t_diff, uint32 s_diff);
     void SchedulePartitions(MapUpdater& updater, uint32 t_diff, uint32 s_diff);
     void PostUpdate(uint32 t_diff, uint32 s_diff);

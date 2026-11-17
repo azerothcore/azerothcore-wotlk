@@ -25,6 +25,8 @@
 #include "MapUpdater.h"
 #include "Object.h"
 #include "Timer.h"
+#include <mutex>
+#include <unordered_set>
 
 class Transport;
 class StaticTransport;
@@ -168,8 +170,14 @@ private:
     MapMgr(MapMgr const&);
     MapMgr& operator=(MapMgr const&);
 
+    // MapPartitioning.Maps, parsed once (on first map creation) because it isn't reloadable.
+    bool IsPartitionedMapId(uint32 mapId);
+    void LoadPartitionedMapIds();
+
     std::mutex Lock;
     MapMapType i_maps;
+    std::once_flag _partitionedMapIdsOnce;
+    std::unordered_set<uint32> _partitionedMapIds;
     IntervalTimer i_timer[4]; // continents, bgs/arenas, instances, total from the beginning
     uint8 mapUpdateStep;
 

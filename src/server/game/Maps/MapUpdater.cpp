@@ -21,6 +21,8 @@
 #include "Log.h"
 #include "Map.h"
 #include "MapMgr.h"
+#include "MapPartition.h"
+#include "MapPartitioned.h"
 #include "Metric.h"
 
 class UpdateRequest
@@ -52,6 +54,37 @@ private:
     MapUpdater& m_updater;
     uint32 m_diff;
     uint32 s_diff;
+};
+
+// One partition of a MapPartitioned map, run during the parallel UPDATE phase of the fork-join tick.
+class PartitionUpdateRequest : public UpdateRequest
+{
+public:
+    PartitionUpdateRequest(MapPartition& partition, MapUpdater& updater, uint32 diff, uint32 sDiff)
+        : _partition(partition), _updater(updater), _diff(diff), _sDiff(sDiff)
+    {
+    }
+
+    void call() override
+    {
+        {
+            METRIC_TIMER("map_partition_update_time_diff",
+                METRIC_TAG("map_id", std::to_string(_partition.GetOwner().GetId())),
+                METRIC_TAG("partition", std::to_string(_partition.GetIndex())));
+
+            MapPartition::Scope scope(_partition);
+            _partition.Update(_diff, _sDiff);
+        }
+
+        // Last: the world thread may run POST-UPDATE as soon as the pending count drops to zero.
+        _updater.update_finished();
+    }
+
+private:
+    MapPartition& _partition;
+    MapUpdater& _updater;
+    uint32 _diff;
+    uint32 _sDiff;
 };
 
 class MapPreloadRequest : public UpdateRequest
@@ -141,6 +174,11 @@ void MapUpdater::schedule_task(UpdateRequest* request)
 void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
     schedule_task(new MapUpdateRequest(map, *this, diff, s_diff));
+}
+
+void MapUpdater::schedule_partition_update(MapPartition& partition, uint32 diff, uint32 s_diff)
+{
+    schedule_task(new PartitionUpdateRequest(partition, *this, diff, s_diff));
 }
 
 void MapUpdater::schedule_map_preload(uint32 mapid)

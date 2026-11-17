@@ -17,6 +17,7 @@
 
 #include "MapPartitioned.h"
 #include "MapUpdater.h"
+#include "Metric.h"
 #include <algorithm>
 
 PartitionLayout::PartitionLayout(uint32 gridsPerPartition, uint32 borderCells)
@@ -100,19 +101,47 @@ MapPartition* MapPartitioned::GetPartitionForCell(CellCoord const& cell)
 
 void MapPartitioned::PreUpdate(uint32 /*t_diff*/, uint32 /*s_diff*/)
 {
-    // Step 1: nothing to do. The serial PRE-UPDATE work still runs inside Map::Update.
+    METRIC_TIMER("map_partition_pre_update_time_diff", METRIC_TAG("map_id", std::to_string(GetId())));
+
+    // Serial PRE-UPDATE work (grid loads, ownership handoff, respawns, map Events, scripts)
+    // still runs inside Map::Update until Step 3 moves it here.
 }
 
 void MapPartitioned::SchedulePartitions(MapUpdater& updater, uint32 t_diff, uint32 s_diff)
 {
-    // Step 1: the whole map is one task, exactly as MapMgr::Update schedules a plain Map today.
+    _inParallelPhase.store(true, std::memory_order_release);
+
+    // Until Step 3 moves the map state into the partitions, the whole-map body still runs
+    // as a single task, exactly as MapMgr::Update schedules a plain Map.
     if (updater.activated())
         updater.schedule_update(*this, t_diff, s_diff);
     else
         Update(t_diff, s_diff);
+
+    // Fan out one task per populated partition. The serial set is never scheduled:
+    // it is updated on the world thread in PostUpdate.
+    for (std::unique_ptr<MapPartition>& partition : _partitions)
+    {
+        if (partition->IsEmpty())
+            continue;
+
+        if (updater.activated())
+            updater.schedule_partition_update(*partition, t_diff, s_diff);
+        else
+        {
+            MapPartition::Scope scope(*partition);
+            partition->Update(t_diff, s_diff);
+        }
+    }
 }
 
 void MapPartitioned::PostUpdate(uint32 /*t_diff*/, uint32 /*s_diff*/)
 {
-    // Step 1: nothing to do. The serial POST-UPDATE work still runs inside Map::Update.
+    // Called after MapUpdater::wait(): every partition task of this map has finished.
+    _inParallelPhase.store(false, std::memory_order_release);
+
+    METRIC_TIMER("map_partition_post_update_time_diff", METRIC_TAG("map_id", std::to_string(GetId())));
+
+    // Serial POST-UPDATE work (serial set, outboxes, cell moves, delayed visibility, packets,
+    // DynamicMapTree) still runs inside Map::Update until Step 3 moves it here.
 }
