@@ -16,6 +16,8 @@
  */
 
 #include "MapPartition.h"
+#include "Map.h"
+#include <algorithm>
 
 thread_local MapPartition* MapPartition::_currentPartition = nullptr;
 
@@ -43,7 +45,7 @@ void MapPartition::Outbox::Clear()
     GridLoadRequests.clear();
 }
 
-MapPartition::MapPartition(MapPartitioned& owner, uint32 index)
+MapPartition::MapPartition(Map& owner, uint32 index)
     : _owner(owner), _index(index)
 {
 }
@@ -55,10 +57,32 @@ bool MapPartition::IsEmpty() const
         && _pendingAddUpdatableObjectList.empty();
 }
 
-void MapPartition::Update(uint32 /*t_diff*/, uint32 /*s_diff*/)
+void MapPartition::Update(uint32 t_diff, uint32 s_diff)
 {
-    // Step 1 scaffolding: the per-partition UPDATE body (sessions, players,
-    // local updatables, recorded movement) is implemented in Step 3.
+    // Cells were marked map-wide in PRE-UPDATE, and the recheck timer is only reset in POST-UPDATE.
+    _owner.UpdateSessionsAndPlayers(*this, t_diff, s_diff, false);
+
+    if (!t_diff)
+        return;
+
+    _owner.UpdateNonPlayerObjects(*this, t_diff, _owner._updatableObjectListRecheckTimer.Passed());
+}
+
+bool MapPartition::RemovePlayer(Player* player)
+{
+    auto itr = std::find(_players.begin(), _players.end(), player);
+    if (itr == _players.end())
+        return false;
+
+    std::size_t const index = std::size_t(itr - _players.begin());
+    _players.erase(itr);
+
+    // Keep the running loop on the next unvisited player. Unsigned wrap-around from 0 is intended:
+    // the loop's ++ brings it back to 0.
+    if (_iteratingPlayers && index <= _playerIterIndex)
+        --_playerIterIndex;
+
+    return true;
 }
 
 MapPartition::Scope::Scope(MapPartition& partition)

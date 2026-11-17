@@ -30,7 +30,7 @@ class Creature;
 class DynamicObject;
 class GameObject;
 class GameObjectModel;
-class MapPartitioned;
+class Map;
 class Object;
 class Player;
 class Unit;
@@ -39,16 +39,18 @@ class WorldObject;
 /*
  * MapPartition
  *
- * A logical slice of a MapPartitioned continent. It owns the per-tick mutable
- * containers that Map keeps map-wide today. During the parallel UPDATE phase a
- * partition is only ever touched by the worker running it. Shared mutations are
- * recorded in the Outbox and applied in the serial POST-UPDATE phase.
+ * Owner of a map's per-tick mutable containers: players to tick, updatable objects,
+ * pending update-list additions, objects with pending field updates, delayed
+ * visibility, cell move lists and the remove list.
  *
- * The serial set is a MapPartition too (IsSerialSet() == true). It holds border-strip
- * and cross-partition-linked entities and is updated on the world thread.
+ * Every Map has a default partition (index SERIAL_SET_INDEX). On a plain map it is the
+ * only one and Map::Update drives it. On a MapPartitioned continent it is the serial set
+ * (border-strip and cross-partition-linked entities, updated on the world thread), and
+ * the geometric partitions are updated in parallel by PartitionUpdateRequests. While a
+ * partition runs in parallel it is only touched by its worker; shared mutations go to
+ * the Outbox and are applied in the serial POST-UPDATE phase.
  *
- * Step 1 scaffolding: the containers are declared but nothing populates them
- * yet, and Update() is a stub. See .agents/plans/map-partitioning/PLAN.md.
+ * See .agents/plans/map-partitioning/PLAN.md.
  */
 class MapPartition
 {
@@ -115,7 +117,7 @@ public:
     typedef std::vector<WorldObject*> UpdatableObjectList;
     typedef std::unordered_set<WorldObject*> PendingAddUpdatableObjectList;
 
-    MapPartition(MapPartitioned& owner, uint32 index);
+    MapPartition(Map& owner, uint32 index);
     ~MapPartition() = default;
 
     MapPartition(MapPartition const&) = delete;
@@ -123,14 +125,19 @@ public:
 
     [[nodiscard]] uint32 GetIndex() const { return _index; }
     [[nodiscard]] bool IsSerialSet() const { return _index == SERIAL_SET_INDEX; }
-    [[nodiscard]] MapPartitioned& GetOwner() { return _owner; }
-    [[nodiscard]] MapPartitioned const& GetOwner() const { return _owner; }
+    [[nodiscard]] Map& GetOwner() { return _owner; }
+    [[nodiscard]] Map const& GetOwner() const { return _owner; }
 
     // True when the partition has nothing to tick (not scheduled during fan-out).
     [[nodiscard]] bool IsEmpty() const;
 
-    // Per-partition body of the UPDATE phase. Step 1: stub, does nothing.
+    // Per-partition body of the UPDATE phase: sessions, players and updatable objects of this
+    // partition only. Map-wide work belongs to the owner's PRE/POST-UPDATE phases.
     void Update(uint32 t_diff, uint32 s_diff);
+
+    // Removes a player from the tick vector. Safe while the vector is being iterated by
+    // Map::UpdateSessions/UpdatePlayers (the iteration index is adjusted). Returns false if absent.
+    bool RemovePlayer(Player* player);
 
     std::vector<Player*>& GetPlayers() { return _players; }
     UpdatableObjectList& GetUpdatableObjectList() { return _updatableObjectList; }
@@ -141,6 +148,7 @@ public:
     std::vector<Creature*>& GetCreaturesToMove() { return _creaturesToMove; }
     std::vector<GameObject*>& GetGameObjectsToMove() { return _gameObjectsToMove; }
     std::vector<DynamicObject*>& GetDynamicObjectsToMove() { return _dynamicObjectsToMove; }
+    std::unordered_set<WorldObject*>& GetObjectsToRemove() { return _objectsToRemove; }
     Outbox& GetOutbox() { return _outbox; }
 
     // Partition currently being updated by this thread; nullptr outside the parallel UPDATE phase.
@@ -161,7 +169,9 @@ public:
     };
 
 private:
-    MapPartitioned& _owner;
+    friend class Map;
+
+    Map& _owner;
     uint32 const _index;
 
     std::vector<Player*> _players;
@@ -173,7 +183,12 @@ private:
     std::vector<Creature*> _creaturesToMove;
     std::vector<GameObject*> _gameObjectsToMove;
     std::vector<DynamicObject*> _dynamicObjectsToMove;
+    std::unordered_set<WorldObject*> _objectsToRemove;
     Outbox _outbox;
+
+    // Index of the player being ticked while _players is iterated (see RemovePlayer).
+    std::size_t _playerIterIndex = 0;
+    bool _iteratingPlayers = false;
 
     static thread_local MapPartition* _currentPartition;
 };

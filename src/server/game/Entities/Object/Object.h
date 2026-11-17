@@ -435,6 +435,8 @@ private:
     MapObjectCellMoveState _moveState{MAP_OBJECT_CELL_MOVE_NONE};
 };
 
+class MapPartition;
+
 class UpdatableMapObject
 {
     friend class Map;
@@ -473,9 +475,14 @@ private:
         return _mapUpdateState;
     }
 
+    // Partition whose pending-add list (PendingAdd) or update list (Updating) holds this object.
+    void SetMapUpdatePartition(MapPartition* partition) { _mapUpdatePartition = partition; }
+    MapPartition* GetMapUpdatePartition() const { return _mapUpdatePartition; }
+
 private:
     std::size_t _mapUpdateListOffset;
     UpdateState _mapUpdateState;
+    MapPartition* _mapUpdatePartition{nullptr};
 };
 
 class WorldObject : public Object, public WorldLocation

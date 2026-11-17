@@ -528,7 +528,7 @@ void Unit::Update(uint32 p_time)
             {
                 m_delayed_unit_relocation_timer = 0;
                 //ExecuteDelayedUnitRelocationEvent();
-                FindMap()->i_objectsForDelayedVisibility.insert(this);
+                FindMap()->AddDelayedVisibility(this);
             }
             else
                 m_delayed_unit_relocation_timer -= p_time;

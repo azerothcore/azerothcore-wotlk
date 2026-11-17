@@ -30,6 +30,7 @@
 #include "Timer.h"
 #include "MapCollisionData.h"
 #include "MapGridManager.h"
+#include "MapPartition.h"
 #include "MapRefMgr.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
@@ -40,6 +41,7 @@
 #include "Timer.h"
 #include "GridTerrainData.h"
 #include <bitset>
+#include <functional>
 #include <list>
 #include <memory>
 #include <set>
@@ -168,6 +170,7 @@ enum EncounterCreditType : uint8
 class Map : public GridRefMgr<MapGridType>
 {
     friend class MapReference;
+    friend class MapPartition;
     friend class GridObjectLoader;
 public:
     Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
@@ -236,8 +239,9 @@ public:
 
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
-    // pussywizard:
-    std::unordered_set<Unit*> i_objectsForDelayedVisibility;
+    // pussywizard: queue a unit's delayed relocation/visibility event for HandleDelayedVisibility().
+    // Writes go to the calling thread's partition (see GetWritePartition), never to a shared container.
+    void AddDelayedVisibility(Unit* unit);
     void HandleDelayedVisibility();
 
     // some calls like isInWater should not use vmaps due to processor power
@@ -405,9 +409,11 @@ public:
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true) const;
-    void Balance() { _mapCollisionData.GetDynamicTree().balance(); }
-    void RemoveGameObjectModel(GameObjectModel const& model) { _mapCollisionData.GetDynamicTree().remove(model); }
-    void InsertGameObjectModel(GameObjectModel const& model) { _mapCollisionData.GetDynamicTree().insert(model); }
+    // DynamicMapTree mutations. During the parallel UPDATE phase they are deferred to the
+    // partition outbox and applied in POST-UPDATE: the tree is read-only while partitions run.
+    void Balance();
+    void RemoveGameObjectModel(GameObjectModel const& model);
+    void InsertGameObjectModel(GameObjectModel const& model);
     [[nodiscard]] bool ContainsGameObjectModel(GameObjectModel const& model) const { return _mapCollisionData.GetDynamicTree().contains(model);}
     [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _mapCollisionData.GetDynamicTree(); }
     [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
@@ -538,17 +544,10 @@ public:
         return GetGuidSequenceGenerator<high>().Generate();
     }
 
-    void AddUpdateObject(Object* obj)
-    {
-        _updateObjects.insert(obj);
-    }
+    void AddUpdateObject(Object* obj);
+    void RemoveUpdateObject(Object* obj);
 
-    void RemoveUpdateObject(Object* obj)
-    {
-        _updateObjects.erase(obj);
-    }
-
-    size_t GetUpdatableObjectsCount() const { return _updatableObjectList.size(); }
+    size_t GetUpdatableObjectsCount();
 
     virtual std::string GetDebugInfo() const;
 
@@ -590,20 +589,58 @@ private:
     void AddDynamicObjectToMoveList(DynamicObject* go);
     void RemoveDynamicObjectFromMoveList(DynamicObject* go);
 
-    std::vector<Creature*> _creaturesToMove;
-    std::vector<GameObject*> _gameObjectsToMove;
-    std::vector<DynamicObject*> _dynamicObjectsToMove;
+    template<class T> void MoveAllObjectsInMoveList(std::vector<T*>& moveList);
+    // Calls worker for each player ticked by the partition (plain maps: every player of the map).
+    template<class Worker> void ForEachTickPlayer(MapPartition& partition, Worker&& worker);
+    void RemoveObjectInRemoveList(WorldObject* obj);
 
     bool EnsureGridLoaded(Cell const& cell);
     MapGridType* GetMapGrid(uint16 const x, uint16 const y);
 
-    void ScriptsProcess();
-
-    void SendObjectUpdates();
-
     void UpdatePlayersRedirectKickEvent(uint32 diff);
 
 protected:
+    /*
+     * Tick building blocks. Map::Update composes them in the historical order; MapPartitioned
+     * spreads them over its PRE-UPDATE / UPDATE (per partition) / POST-UPDATE phases.
+     */
+    // Sessions of the partition's players; on a non-full tick (t_diff == 0) also Player::Update.
+    void UpdateSessions(MapPartition& partition, uint32 t_diff, uint32 s_diff);
+    // Player::Update for the partition's players (full tick), optionally marking nearby cells.
+    void UpdatePlayers(MapPartition& partition, uint32 s_diff, bool markNearbyCells);
+    // UpdateSessions then, on a full tick, UpdatePlayers.
+    void UpdateSessionsAndPlayers(MapPartition& partition, uint32 t_diff, uint32 s_diff, bool markNearbyCells);
+    // Merges the partition's pending-add list, then updates its updatable objects.
+    void UpdateNonPlayerObjects(MapPartition& partition, uint32 diff, bool recheckUpdatableObjects);
+    // Applies the recorded cell changes of every partition (grid membership changes).
+    void ProcessCellMoves();
+    // End-of-tick map-wide work: redirect-kick, weather, corpses, OnMapUpdate hook, metrics.
+    void FinishTick(uint32 t_diff);
+    // ProcessRespawns() every 5 seconds (non compatibility mode).
+    void UpdateRespawns(uint32 t_diff);
+    // Merges every partition's object update set, then builds and sends the update packets.
+    void SendObjectUpdates();
+    void ScriptsProcess();
+    // ScriptsProcess() under the script lock, if anything is scheduled.
+    void ProcessScriptSchedule();
+    // MarkNearbyCellsOf() for the player and its far-sight viewpoint.
+    void MarkNearbyCellsOfPlayer(Player* player);
+    // Applies the shared mutations a partition deferred during the parallel UPDATE phase (serial phases only).
+    void ApplyPartitionOutbox(MapPartition& partition);
+    IntervalTimer& GetUpdatableObjectListRecheckTimer() { return _updatableObjectListRecheckTimer; }
+
+    // Plain maps: the only partition. MapPartitioned: the serial set (updated on the world thread).
+    MapPartition& GetDefaultPartition() { return _defaultPartition; }
+    // Partition that per-tick writes of the calling thread belong to: the partition this thread is
+    // updating if it belongs to this map, otherwise the default partition.
+    MapPartition& GetWritePartition();
+    // Non-serial partition of this map currently updated by this thread during the parallel UPDATE
+    // phase, or nullptr. Shared mutations are deferred to its outbox when this is set.
+    MapPartition* GetParallelPartition();
+    // Visits the default partition, then (MapPartitioned) every geometric partition.
+    virtual void ForEachPartition(std::function<void(MapPartition&)> const& visitor);
+    [[nodiscard]] bool IsRemoveListEmpty();
+
     // Type specific code for add/remove to/from grid
     template<class T>
     void AddToGrid(T* object, Cell const& cell);
@@ -642,7 +679,6 @@ private:
     std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
 
     bool i_scriptLock;
-    std::unordered_set<WorldObject*> i_objectsToRemove;
 
     typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
     ScriptScheduleMap m_scriptSchedule;
@@ -650,9 +686,7 @@ private:
     template<class T>
     void DeleteFromWorld(T*);
 
-    void UpdateNonPlayerObjects(uint32 const diff);
-
-    void _AddObjectToUpdateList(WorldObject* obj);
+    void _AddObjectToUpdateList(MapPartition& partition, WorldObject* obj);
     void _RemoveObjectFromUpdateList(WorldObject* obj);
 
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
@@ -708,10 +742,8 @@ private:
     std::unordered_map<ObjectGuid, Corpse*> _corpsesByPlayer;
     std::unordered_set<Corpse*> _corpseBones;
 
-    std::unordered_set<Object*> _updateObjects;
-
-    UpdatableObjectList _updatableObjectList;
-    PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
+    // Per-tick mutable lists (updatables, update objects, move lists, remove list, delayed visibility).
+    MapPartition _defaultPartition;
     IntervalTimer _updatableObjectListRecheckTimer;
     ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
 

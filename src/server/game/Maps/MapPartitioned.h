@@ -83,6 +83,10 @@ private:
  *   -> PostUpdate (serial, world thread, after MapUpdater::wait()).
  *
  * MapMgr creates it for the maps in MapPartitioning.Maps when MapPartitioning.Enable is set.
+ *
+ * Until entity ownership is introduced (PLAN.md Step 4) every entity belongs to the serial
+ * set, so the geometric partitions stay empty and the whole map is ticked serially on the
+ * world thread in PostUpdate.
  */
 class MapPartitioned : public Map
 {
@@ -100,22 +104,28 @@ public:
     MapPartition* GetPartition(uint32 index);
     // Geometric partition of a cell. Assigning an entity to the serial set is the ownership pass's job (Step 4).
     MapPartition* GetPartitionForCell(CellCoord const& cell);
-    MapPartition& GetSerialSet() { return _serialSet; }
+    // The serial set is the map's default partition (see Map::GetDefaultPartition).
+    MapPartition& GetSerialSet() { return GetDefaultPartition(); }
 
     [[nodiscard]] bool IsInParallelPhase() const { return _inParallelPhase.load(std::memory_order_acquire); }
 
     // Fork-Join tick phases, driven by MapMgr::Update on the world thread:
     //   PreUpdate -> SchedulePartitions -> MapUpdater::wait() -> PostUpdate.
-    // Until Step 3 moves the map state into the partitions, SchedulePartitions still runs the
-    // whole-map Map::Update as one task and Pre/PostUpdate only record metrics.
+    // Map::Update is not used for a partitioned map.
     void PreUpdate(uint32 t_diff, uint32 s_diff);
     void SchedulePartitions(MapUpdater& updater, uint32 t_diff, uint32 s_diff);
     void PostUpdate(uint32 t_diff, uint32 s_diff);
 
+    void ForEachPartition(std::function<void(MapPartition&)> const& visitor) override;
+
 private:
+    // Refills every partition's player vector from the map's player list.
+    void RebuildPartitionPlayers();
+    // Partition that ticks an entity. Until entity ownership exists (PLAN.md Step 4), always the serial set.
+    MapPartition& GetOwningPartition(WorldObject* object);
+
     PartitionLayout const _layout;
     std::vector<std::unique_ptr<MapPartition>> _partitions;
-    MapPartition _serialSet;
     std::atomic<bool> _inParallelPhase;
 };
 

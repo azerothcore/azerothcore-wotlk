@@ -17,6 +17,8 @@
 
 #include "MapPartitioned.h"
 #include "MapUpdater.h"
+#include "MapRefMgr.h"
+#include "Player.h"
 #include "Metric.h"
 #include <algorithm>
 
@@ -75,8 +77,7 @@ bool PartitionLayout::IsBorderOnAxis(uint32 cellCoord) const
 }
 
 MapPartitioned::MapPartitioned(uint32 id, PartitionLayout const& layout)
-    : Map(id, 0, REGULAR_DIFFICULTY), _layout(layout),
-    _serialSet(*this, MapPartition::SERIAL_SET_INDEX), _inParallelPhase(false)
+    : Map(id, 0, REGULAR_DIFFICULTY), _layout(layout), _inParallelPhase(false)
 {
     uint32 const count = _layout.GetPartitionCount();
     _partitions.reserve(count);
@@ -99,24 +100,56 @@ MapPartition* MapPartitioned::GetPartitionForCell(CellCoord const& cell)
     return GetPartition(_layout.GetPartitionIndex(cell));
 }
 
-void MapPartitioned::PreUpdate(uint32 /*t_diff*/, uint32 /*s_diff*/)
+void MapPartitioned::ForEachPartition(std::function<void(MapPartition&)> const& visitor)
+{
+    Map::ForEachPartition(visitor);
+    for (std::unique_ptr<MapPartition>& partition : _partitions)
+        visitor(*partition);
+}
+
+MapPartition& MapPartitioned::GetOwningPartition(WorldObject* /*object*/)
+{
+    return GetSerialSet();
+}
+
+void MapPartitioned::RebuildPartitionPlayers()
+{
+    ForEachPartition([](MapPartition& partition) { partition.GetPlayers().clear(); });
+
+    for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+        if (Player* player = itr->GetSource())
+            GetOwningPartition(player).GetPlayers().push_back(player);
+}
+
+void MapPartitioned::PreUpdate(uint32 t_diff, uint32 /*s_diff*/)
 {
     METRIC_TIMER("map_partition_pre_update_time_diff", METRIC_TAG("map_id", std::to_string(GetId())));
 
-    // Serial PRE-UPDATE work (grid loads, ownership handoff, respawns, map Events, scripts)
-    // still runs inside Map::Update until Step 3 moves it here.
+    RebuildPartitionPlayers();
+
+    // Map-wide events may touch any entity: serial only.
+    Events.Update(t_diff);
+
+    if (!t_diff)
+        return;
+
+    UpdateRespawns(t_diff);
+    ProcessScriptSchedule();
+
+    // The marked-cells bitset spans partition borders, so it is only written here.
+    IntervalTimer& recheckTimer = GetUpdatableObjectListRecheckTimer();
+    recheckTimer.Update(t_diff);
+    resetMarkedCells();
+    if (recheckTimer.Passed())
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+            if (Player* player = itr->GetSource())
+                if (player->IsInWorld())
+                    MarkNearbyCellsOfPlayer(player);
 }
 
 void MapPartitioned::SchedulePartitions(MapUpdater& updater, uint32 t_diff, uint32 s_diff)
 {
     _inParallelPhase.store(true, std::memory_order_release);
-
-    // Until Step 3 moves the map state into the partitions, the whole-map body still runs
-    // as a single task, exactly as MapMgr::Update schedules a plain Map.
-    if (updater.activated())
-        updater.schedule_update(*this, t_diff, s_diff);
-    else
-        Update(t_diff, s_diff);
 
     // Fan out one task per populated partition. The serial set is never scheduled:
     // it is updated on the world thread in PostUpdate.
@@ -135,13 +168,39 @@ void MapPartitioned::SchedulePartitions(MapUpdater& updater, uint32 t_diff, uint
     }
 }
 
-void MapPartitioned::PostUpdate(uint32 /*t_diff*/, uint32 /*s_diff*/)
+void MapPartitioned::PostUpdate(uint32 t_diff, uint32 s_diff)
 {
     // Called after MapUpdater::wait(): every partition task of this map has finished.
     _inParallelPhase.store(false, std::memory_order_release);
 
     METRIC_TIMER("map_partition_post_update_time_diff", METRIC_TAG("map_id", std::to_string(GetId())));
 
-    // Serial POST-UPDATE work (serial set, outboxes, cell moves, delayed visibility, packets,
-    // DynamicMapTree) still runs inside Map::Update until Step 3 moves it here.
+    // Border-strip and cross-partition-linked entities, on the world thread.
+    {
+        MapPartition& serialSet = GetSerialSet();
+        MapPartition::Scope scope(serialSet);
+        serialSet.Update(t_diff, s_diff);
+    }
+
+    // Shared mutations deferred by the partitions (grid loads needed by cell moves included).
+    ForEachPartition([this](MapPartition& partition) { ApplyPartitionOutbox(partition); });
+
+    if (!t_diff)
+    {
+        HandleDelayedVisibility();
+        return;
+    }
+
+    IntervalTimer& recheckTimer = GetUpdatableObjectListRecheckTimer();
+    if (recheckTimer.Passed())
+        recheckTimer.Reset();
+
+    // Same order as Map::Update: packets, cell moves, then visibility.
+    SendObjectUpdates();
+    ProcessCellMoves();
+    HandleDelayedVisibility();
+
+    _mapCollisionData.GetDynamicTree().update(t_diff);
+
+    FinishTick(t_diff);
 }
