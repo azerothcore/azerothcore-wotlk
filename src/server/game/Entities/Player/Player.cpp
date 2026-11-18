@@ -7246,6 +7246,26 @@ void Player::UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot)
         ApplyItemObtainSpells(item, true);
 }
 
+// Items dropped while the inventory loads never go through RemoveItem/DestroyItem,
+// so their saved obtain auras would otherwise stay on the player forever.
+void Player::RemoveOrphanedItemObtainSpells()
+{
+    bool removed = false;
+    RemoveOwnedAuras([&](Aura const* aura)
+    {
+        ObjectGuid castItemGuid = aura->GetCastItemGUID();
+        if (!castItemGuid || aura->GetCasterGUID() != GetGUID() || !sObjectMgr->IsItemObtainSpell(aura->GetId()) || GetItemByGuid(castItemGuid))
+            return false;
+
+        removed = true;
+        return true;
+    });
+
+    // another held item may grant the same spell and skipped its cast while the stale aura was up
+    if (removed)
+        CastAllObtainSpells();
+}
+
 // this one rechecks weapon auras and stores them in BaseModGroup container
 // needed for things like axe specialization applying only to axe weapons in case of dual-wield
 void Player::UpdateWeaponDependentCritAuras(WeaponAttackType attackType)

@@ -3886,6 +3886,10 @@ void ObjectMgr::LoadItemTemplates()
                     sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].emplace(true, itemTemplate.Spells[i].SpellId);
             }
 
+        for (_Spell const& spell : itemTemplate.Spells)
+            if (spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE && spell.SpellId > 0)
+                _itemObtainSpells.insert(spell.SpellId);
+
         ++count;
     } while (result->NextRow());
 
