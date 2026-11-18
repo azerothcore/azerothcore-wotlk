@@ -46,3 +46,4 @@ Hard rules (CI builds with `-Werror` and runs `cppcheck`):
   …) under `modules/` → `systems/creature-ai.md`
 - A `SpellScript`/`AuraScript` under `modules/` → `systems/spells.md`
 - An `InstanceScript`/`InstanceMapScript` under `modules/` → `systems/instance-scripts.md`
+- Porting C++ from TrinityCore/cMaNGOS → `systems/ports-and-rewrites.md`
