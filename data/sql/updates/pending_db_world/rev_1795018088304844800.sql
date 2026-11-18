@@ -276,7 +276,7 @@ DELETE FROM `smart_scripts` WHERE `entryorguid`=-102808 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-102808, 0, 0, 1, 1, 0, 100, 0, 10000, 16000, 10000, 16000, 0, 0, 10, 3, 25, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Out of Combat - Play Random Emote (3, 25)'),
 (-102808, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 86, 43754, 0, 10, 106934, 24398, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Out of Combat - Cross Cast ''Throw Dynamite'' (thrower)'),
-(-102808, 0, 2, 0, 8, 0, 100, 0, 43754, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Spellhit ''Throw Dynamite'' - Say Line 0');
+(-102808, 0, 2, 0, 8, 0, 25, 0, 43754, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Spellhit ''Throw Dynamite'' - Say Line 0');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=-102799 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -335,7 +335,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE `entryorguid`=-103161 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-103161, 0, 0, 0, 108, 0, 100, 0, 23, 1031610, 0, 0, 0, 0, 223, 1, 0, 0, 0, 0, 0, 10, 106951, 24401, 0, 0, 0, 0, 0, 0, 'Steel Gate Archaeologist - On Point 23 of Path 1031610 Reached - Do Action 1 (pack mule)'),
-(-103161, 0, 1, 0, 108, 0, 100, 0, 44, 1031610, 0, 0, 0, 0, 80, 10316144, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Archaeologist - On Point 44 of Path 1031610 Reached - Run Script');
+(-103161, 0, 1, 0, 108, 0, 100, 0, 44, 1031610, 0, 0, 0, 0, 80, 10316144, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Archaeologist - On Point 44 of Path 1031610 Reached - Run Script'),
+(-103161, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, 106951, 24401, 0, 0, 0, 0, 0, 0, 'Steel Gate Archaeologist - On Death - Do Action 2 (pack mule)');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=10316144 AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -385,4 +386,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=-106951 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-106951, 0, 0, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 29, 2, 180, 0, 0, 0, 0, 10, 103161, 24400, 0, 0, 0, 0, 0, 0, 'Steel Gate Pack Mule - On Action 1 Done - Follow Archaeologist');
+(-106951, 0, 0, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 29, 2, 180, 0, 0, 0, 0, 10, 103161, 24400, 0, 0, 0, 0, 0, 0, 'Steel Gate Pack Mule - On Action 1 Done - Follow Archaeologist'),
+(-106951, 0, 1, 2, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Pack Mule - On Action 2 Done - Stop Follow'),
+(-106951, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Pack Mule - On Action 2 Done - Set Walk'),
+(-106951, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2086.836, -3293.2607, 82.50323, 4.20624352, 'Steel Gate Pack Mule - On Action 2 Done - Move To Spawn');
