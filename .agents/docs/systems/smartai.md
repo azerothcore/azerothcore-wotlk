@@ -14,3 +14,5 @@ Data-driven behaviour in the world DB's `smart_scripts` (engine: `src/server/gam
   `AIName` = `SmartAI`. A guid script replaces the entry script for that spawn, so also set
   `CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI` (`flags_extra` 0x08000000) to load both; it is template-wide and
   changes nothing for spawns without a guid script.
+- `TALK` (action 1) to a creature target (not a pet): `action_param3` = 0 makes the target speak its own line; 1 has
+  the script owner speak, with the target as `$n`. With target `SELF`, the last invoker is `$n`.
