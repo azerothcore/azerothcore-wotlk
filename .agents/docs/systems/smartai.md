@@ -13,6 +13,7 @@ Data-driven behaviour in the world DB's `smart_scripts` (engine: `src/server/gam
 - Per-spawn behaviour (one spawn's path, emote loop or RP) goes in guid SAI: `entryorguid` = `-guid`, template
   `AIName` = `SmartAI`. A guid script replaces the entry script for that spawn, so also set
   `CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI` (`flags_extra` 0x08000000) to load both; it is template-wide and
-  changes nothing for spawns without a guid script.
+  changes nothing for spawns without a guid script. Both then share one event list, and `link` resolves to the first
+  row with that `id`, so number the guid rows clear of the entry script's (from 1000).
 - `TALK` (action 1) to a creature target (not a pet): `action_param3` = 0 makes the target speak its own line; 1 has
-  the script owner speak, with the target as `$n`. With target `SELF`, the last invoker is `$n`.
+  the script owner speak, with the target as `$n`. Target `SELF` with 0 makes the last invoker `$n`.
