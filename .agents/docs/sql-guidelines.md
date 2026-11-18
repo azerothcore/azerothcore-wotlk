@@ -25,8 +25,8 @@ Run the linter before claiming a change is done: `python apps/codestyle/codestyl
 
 ## Read also
 
-- `smart_scripts` or an `AIName` → `systems/smartai.md`, the "Scope of a fix" section of `cpp-scripts.md` and
-  "Trigger and helper NPCs" in `systems/creature-ai.md`
+- `smart_scripts`, SmartEvent `conditions` (`SourceTypeOrReferenceId` 22), or an `AIName` → `systems/smartai.md`,
+  the "Scope of a fix" section of `cpp-scripts.md` and "Trigger and helper NPCs" in `systems/creature-ai.md`
 - A creature summon in an instance map (any SAI summon action or cast of a summon spell, `creature_summon_groups`) →
   `systems/instance-scripts.md`
 - `creature_template`, `creature_template_model`, `creature_immunities` → `systems/templates.md`
