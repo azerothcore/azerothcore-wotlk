@@ -265,7 +265,7 @@ INSERT INTO `waypoint_data_addon` (`PathID`, `PointID`, `SplinePointIndex`, `Pos
 (1027990, 6, 2, 2093.0637, -3214.4565, 137.10022),
 (1027990, 6, 3, 2089.4326, -3219.0437, 122.2113);
 
--- Guid SAI, loaded alongside any entry script
+-- Guid SAI; DONT_OVERRIDE_ENTRY_SAI so a later entry script still loads beside it
 UPDATE `creature_template` SET `AIName`='SmartAI', `flags_extra`=`flags_extra`|0x08000000 WHERE `entry` IN (24398, 24400, 24401);
 
 DELETE FROM `creature_text` WHERE `CreatureID`=24398;
@@ -276,15 +276,15 @@ DELETE FROM `smart_scripts` WHERE `entryorguid`=-102808 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-102808, 0, 0, 1, 1, 0, 100, 0, 10000, 16000, 10000, 16000, 0, 0, 10, 3, 25, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Out of Combat - Play Random Emote (3, 25)'),
 (-102808, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 86, 43754, 0, 10, 106934, 24398, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Out of Combat - Cross Cast ''Throw Dynamite'' (thrower)'),
-(-102808, 0, 2, 0, 8, 0, 25, 0, 43754, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Spellhit ''Throw Dynamite'' - Say Line 0');
+(-102808, 0, 2, 0, 8, 0, 25, 0, 43754, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Spellhit ''Throw Dynamite'' - Say Line 0 (thrower)');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=-102799 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-102799, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 43831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Reset - Cast ''Emote State Work (Sheathed)'''),
 (-102799, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 86, 43834, 0, 10, 119544, 23033, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Reset - Cross Cast ''Rope Beam'' (stalker)'),
 (-102799, 0, 2, 0, 108, 0, 100, 0, 1, 1027990, 0, 0, 0, 0, 80, 10279901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Point 1 of Path 1027990 Reached - Run Script'),
-(-102799, 0, 3, 0, 108, 0, 100, 0, 2, 1027990, 0, 0, 0, 0, 80, 10279902, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Point 2 of Path 1027990 Reached - Run Script'),
-(-102799, 0, 4, 0, 108, 0, 100, 0, 3, 1027990, 0, 0, 0, 0, 80, 10279903, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Point 3 of Path 1027990 Reached - Run Script'),
+(-102799, 0, 3, 0, 108, 0, 100, 0, 2, 1027990, 0, 0, 0, 0, 80, 10279901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Point 2 of Path 1027990 Reached - Run Script'),
+(-102799, 0, 4, 0, 108, 0, 100, 0, 3, 1027990, 0, 0, 0, 0, 80, 10279901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Point 3 of Path 1027990 Reached - Run Script'),
 (-102799, 0, 5, 0, 108, 0, 100, 0, 4, 1027990, 0, 0, 0, 0, 28, 43831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Point 4 of Path 1027990 Reached - Remove Aura ''Emote State Work (Sheathed)'''),
 (-102799, 0, 6, 0, 108, 0, 100, 0, 5, 1027990, 0, 0, 0, 0, 11, 37744, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Point 5 of Path 1027990 Reached - Cast ''Emote State: Swim'''),
 (-102799, 0, 7, 0, 108, 0, 100, 0, 6, 1027990, 0, 0, 0, 0, 28, 37744, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - On Point 6 of Path 1027990 Reached - Remove Aura ''Emote State: Swim'''),
@@ -294,16 +294,6 @@ DELETE FROM `smart_scripts` WHERE `entryorguid`=10279901 AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (10279901, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 43831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Actionlist - Remove Aura ''Emote State Work (Sheathed)'''),
 (10279901, 9, 1, 0, 0, 0, 100, 0, 3800, 3800, 0, 0, 0, 0, 11, 43831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Actionlist - Cast ''Emote State Work (Sheathed)''');
-
-DELETE FROM `smart_scripts` WHERE `entryorguid`=10279902 AND `source_type`=9;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10279902, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 43831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Actionlist - Remove Aura ''Emote State Work (Sheathed)'''),
-(10279902, 9, 1, 0, 0, 0, 100, 0, 3800, 3800, 0, 0, 0, 0, 11, 43831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Actionlist - Cast ''Emote State Work (Sheathed)''');
-
-DELETE FROM `smart_scripts` WHERE `entryorguid`=10279903 AND `source_type`=9;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(10279903, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 43831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Actionlist - Remove Aura ''Emote State Work (Sheathed)'''),
-(10279903, 9, 1, 0, 0, 0, 100, 0, 3800, 3800, 0, 0, 0, 0, 11, 43831, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Steel Gate Excavator - Actionlist - Cast ''Emote State Work (Sheathed)''');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=10279907 AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
