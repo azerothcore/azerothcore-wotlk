@@ -1,3 +1,4 @@
+-- DB update 2026_11_17_00 -> 2026_11_18_00
 -- Steel Gate (Howling Fjord, area 3999): Excavators, Archaeologists and Pack Mule rebuilt from sniffs.
 -- Positions: CO2 points from 12.0.0.65512 (Retail) and CO1 points agreed by 40+ WotLK Classic captures.
 -- Paths: one repeating cycle per patroller (65512), nodes taken from WotLK Classic (3.4.2.50664, 3.4.3.52237)
