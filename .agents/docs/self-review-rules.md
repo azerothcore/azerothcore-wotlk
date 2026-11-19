@@ -24,11 +24,12 @@ Every change gets the full review; go deeper the farther it can reach:
 - SQL: beyond the usual review, watch for the classic side effect — a DELETE/UPDATE whose
   WHERE clause catches rows it shouldn't.
 
-## Upstream attribution
+## Attribution
 
-Any changed code, mechanism, or data mirrored from another core must carry that upstream commit's
-author via `--author` (extras as `Co-authored-by`) with the template's cherry-pick box checked; a
-missing credit is a finding.
+Missing credit is a finding:
+
+- Code, mechanism or data mirrored from another core: credited per AGENTS.md and the template's
+  cherry-pick box ticked.
 
 ## In-game testing
 

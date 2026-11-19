@@ -81,7 +81,7 @@ public:
         if (triggeredStr)
         {
             if (StringStartsWith("triggered", *triggeredStr)) // check if "triggered" starts with *triggeredStr (e.g. "trig", "trigger", etc.)
-                return TRIGGERED_FULL_DEBUG_MASK;
+                return TriggerCastFlags(TRIGGERED_FULL_DEBUG_MASK & ~TRIGGERED_DONT_ENTER_COMBAT);
             else
                 return std::nullopt;
         }

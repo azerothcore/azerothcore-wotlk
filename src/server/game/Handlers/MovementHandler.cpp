@@ -669,7 +669,7 @@ bool WorldSession::ProcessMovementInfo(MovementInfo& movementInfo, Unit* mover, 
 
     HandleMoverRelocation(movementInfo, mover);
 
-    if (plrMover && opcode != CMSG_MOVE_KNOCK_BACK_ACK)
+    if (plrMover)
         plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
     return true;

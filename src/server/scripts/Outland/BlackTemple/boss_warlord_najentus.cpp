@@ -88,7 +88,7 @@ struct boss_najentus : public BossAI
 
         ScheduleTimedEvent(21s, [&]
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
             {
                 DoCast(target, SPELL_IMPALING_SPINE);
                 target->CastSpell(target, SPELL_SUMMON_IMPALING_SPINE, true);
@@ -121,6 +121,13 @@ class spell_najentus_needle_spine : public SpellScript
 {
     PrepareSpellScript(spell_najentus_needle_spine);
 
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        // Needle Spine's damage spell (39835) can only target players, and its linked explosion (39968)
+        // fires only when 39835 hits. Thus, the targeting spell (39992) needs to be limited to player targets.
+        targets.remove_if([](WorldObject const* target) { return !target->IsPlayer(); });
+    }
+
     void HandleDummy(SpellEffIndex  /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
@@ -129,6 +136,8 @@ class spell_najentus_needle_spine : public SpellScript
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_najentus_needle_spine::FilterTargets,
+            EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
         OnEffectHitTarget += SpellEffectFn(spell_najentus_needle_spine::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };

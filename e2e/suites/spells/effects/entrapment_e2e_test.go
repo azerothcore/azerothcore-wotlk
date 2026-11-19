@@ -94,6 +94,9 @@ func TestAC_17825_EntrapmentRootsTrapVictim(t *testing.T) {
 		}
 	}
 	hunter.CombatReady(t)
+	// A trap laid out of combat fires at once, so the next cast comes inside the 1.5s global
+	// cooldown, which .cooldown does not clear.
+	hunter.GM(t, ".cheat cooldown on")
 
 	for i, tc := range []struct {
 		name string
@@ -124,7 +127,7 @@ func TestAC_17825_EntrapmentRootsTrapVictim(t *testing.T) {
 				e2eharness.Preconditionf(t, "failed to spawn dummy %d on the trap", entrapDummy)
 			}
 
-			// The trap arms 1s after placement; Frost Trap Aura on the dummy is the proof
+			// Laid out of combat, the trap is armed at once; Frost Trap Aura on the dummy is the proof
 			// it fired, so a missing root below is Entrapment's fault and not the trap's.
 			if !waitUnitAura(placer, dummy, spellFrostTrapAura, 10*time.Second) {
 				e2eharness.Preconditionf(t, "Frost Trap never fired on dummy 0x%X (no aura %d)", dummy, spellFrostTrapAura)

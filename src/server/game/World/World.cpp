@@ -194,11 +194,7 @@ void World::LoadConfigSettings(bool reload)
 
     _worldConfig.Initialize(reload);
 
-    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
-        playerBaseMoveSpeed[i] = baseMoveSpeed[i] * getRate(RATE_MOVESPEED_PLAYER);
-
-    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
-        baseMoveSpeed[i] *= getRate(RATE_MOVESPEED_NPC);
+    ApplyMoveSpeedRates(getRate(RATE_MOVESPEED_NPC), getRate(RATE_MOVESPEED_PLAYER));
 
     if (reload)
     {
@@ -1071,7 +1067,12 @@ void World::SetInitialWorldSettings()
 
     if (sConfigMgr->isDryRun())
     {
+        // exit() below skips the ordered teardown in main() (mapManagementHandle):
+        // OutdoorPvP holds raw Map pointers and must go before the maps
+        sBattlegroundMgr->DeleteAllBattlegrounds();
+        sOutdoorPvPMgr->Die();
         sMapMgr->UnloadAll();
+        sScriptMgr->OnAfterUnloadAllMaps();
 
         if (uint32 failed = DBUpdaterUtil::GetFailedUpdateCount())
         {

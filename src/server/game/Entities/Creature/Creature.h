@@ -54,7 +54,6 @@ public:
 
     float GetNativeObjectScale() const override;
     void SetObjectScale(float scale) override;
-    void SetDisplayId(uint32 displayId, float displayScale = 1.f) override;
     void SetDisplayFromModel(uint32 modelIdx);
 
     void DisappearAndDie();
@@ -167,6 +166,7 @@ public:
     void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
     [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
     [[nodiscard]] uint32 GetSpellCooldown(uint32 spell_id) const;
+    void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
     void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
     [[nodiscard]] bool IsSpellProhibited(SpellSchoolMask idSchoolMask) const;
     void ClearProhibitedSpellTimers();
@@ -564,6 +564,7 @@ private:
     bool _damagedByPlayer;
     uint8 _highestPlayerAttackerLevel;
     bool _isCombatMovementAllowed;
+    float _nativeObjectScale = 1.0f; ///< DisplayScale of the native model, set in InitEntry
 };
 
 class AssistDelayEvent : public BasicEvent

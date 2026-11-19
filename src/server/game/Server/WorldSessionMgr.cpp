@@ -38,7 +38,7 @@ WorldSessionMgr::WorldSessionMgr()
     _maxQueuedSessionCount = 0;
     _playerCount = 0;
     _maxPlayerCount = 0;
-    _accountsPlayHistoryPruneTimer = 0;
+    _stalePruneTimer = 0;
 }
 
 WorldSessionMgr::~WorldSessionMgr()
@@ -92,17 +92,29 @@ WorldSession* WorldSessionMgr::FindOfflineSessionForCharacterGUID(ObjectGuid::Lo
 
 void WorldSessionMgr::UpdateSessions(uint32 const diff)
 {
-    // Drop play-history entries past the reset window so the map stays bounded even for
-    // accounts that disconnect and never reconnect (login only erases their own entry).
-    _accountsPlayHistoryPruneTimer += diff;
-    if (_accountsPlayHistoryPruneTimer >= 10 * MINUTE * IN_MILLISECONDS)
+    _stalePruneTimer += diff;
+    if (_stalePruneTimer >= 10 * MINUTE * IN_MILLISECONDS)
     {
-        _accountsPlayHistoryPruneTimer = 0;
+        _stalePruneTimer = 0;
         Seconds const now = GameTime::GetGameTime();
+
+        // Drop play-history entries past the reset window so the map stays bounded even for
+        // accounts that disconnect and never reconnect (login only erases their own entry).
         for (auto itr = _accountsPlayHistory.begin(); itr != _accountsPlayHistory.end();)
         {
             if ((now - itr->second.logoutTime) >= PLAY_TIME_LIMIT_FULL)
                 itr = _accountsPlayHistory.erase(itr);
+            else
+                ++itr;
+        }
+
+        // Drop disconnect entries past the tolerance window so the map stays bounded on realms that never
+        // reach PlayerLimit (HasRecentlyDisconnected only prunes _disconnects while the queue is active).
+        time_t const tolerance = sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE);
+        for (auto itr = _disconnects.begin(); itr != _disconnects.end();)
+        {
+            if ((now.count() - itr->second) >= tolerance)
+                itr = _disconnects.erase(itr);
             else
                 ++itr;
         }
@@ -191,7 +203,11 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         next = itr;
         ++next;
         WorldSession* pSession = itr->second;
-        if (!pSession->GetPlayer() || pSession->GetOfflineTime() + 60 < currTime || pSession->IsKicked())
+        // A session with a logout already running leaves when that countdown ends, so closing the client early
+        // with EXIT NOW doesn't shorten it. A client crash (or sudden ALT+F4) waits out the full interval so a
+        // dropped connection can be reclaimed.
+        if (!pSession->GetPlayer() || pSession->IsKicked() || pSession->ShouldLogOut(currTime) ||
+            pSession->GetOfflineTime() + sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE) < currTime)
         {
             _offlineSessions.erase(itr);
             delete pSession;
@@ -351,9 +367,7 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
             _offlineSessions[oldSession->GetAccountId()] = oldSession;
         }
         else
-        {
             delete oldSession;
-        }
     }
     else
     {

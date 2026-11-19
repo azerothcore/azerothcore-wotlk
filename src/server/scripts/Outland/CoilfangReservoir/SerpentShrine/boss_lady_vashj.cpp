@@ -68,6 +68,11 @@ enum Misc
     NPC_TRIGGER                     = 15384
 };
 
+enum Actions
+{
+    ACTION_MAGIC_BARRIER_REMOVED    = 1
+};
+
 struct boss_lady_vashj : public BossAI
 {
     boss_lady_vashj(Creature* creature) : BossAI(creature, DATA_LADY_VASHJ)
@@ -80,6 +85,7 @@ struct boss_lady_vashj : public BossAI
         _count = 0;
         _batTimer = 20s;
         _playerAngle = 0.0f;
+        _shieldPhase = false;
         BossAI::Reset();
 
         ScheduleHealthCheckEvent(70, [&]{
@@ -168,6 +174,7 @@ struct boss_lady_vashj : public BossAI
 
         me->AddUnitState(UNIT_STATE_ROOT);
         me->SetFacingTo(me->GetHomePosition().GetOrientation());
+        _shieldPhase = true;
         instance->SetData(DATA_ACTIVATE_SHIELD, 0);
         scheduler.Schedule(2400ms, [this](TaskContext context)
         {
@@ -194,26 +201,37 @@ struct boss_lady_vashj : public BossAI
         {
             DoCastSelf(SPELL_SUMMON_TAINTED_ELEMENTAL, true);
             context.Repeat(50s);
-        }).Schedule(1s, [this](TaskContext context)
-        {
-            if (!me->HasAura(SPELL_MAGIC_BARRIER))
-            {
-                Talk(SAY_PHASE3);
-                me->ClearUnitState(UNIT_STATE_ROOT);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
-                scheduler.CancelAll();
+        });
+    }
 
-                ScheduleSpells();
-                scheduler.Schedule(5s, [this](TaskContext context)
-                {
-                    DoCastSelf(SPELL_SUMMON_TOXIC_SPOREBAT, true);
-                    _batTimer = 20s - static_cast<std::chrono::seconds>(std::min(_count++, 16));
-                    context.Repeat(_batTimer);
-                });
-            }
-            else
-                context.Repeat(1s);
+    void DoAction(int32 action) override
+    {
+        if (action != ACTION_MAGIC_BARRIER_REMOVED)
+            return;
+
+        if (!_shieldPhase || !me->IsAlive() || me->IsInEvadeMode())
+            return;
+
+        if (me->HasAura(SPELL_MAGIC_BARRIER))
+            return;
+
+        StartPhaseThree();
+    }
+
+    void StartPhaseThree()
+    {
+        _shieldPhase = false;
+        Talk(SAY_PHASE3);
+        me->ClearUnitState(UNIT_STATE_ROOT);
+        me->SetReactState(REACT_AGGRESSIVE);
+        scheduler.CancelAll();
+
+        ScheduleSpells();
+        scheduler.Schedule(5s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_SUMMON_TOXIC_SPOREBAT, true);
+            _batTimer = 20s - static_cast<std::chrono::seconds>(std::min(_count++, 16));
+            context.Repeat(_batTimer);
         });
     }
 
@@ -250,6 +268,7 @@ struct boss_lady_vashj : public BossAI
 private:
     float _playerAngle;
     bool _intro;
+    bool _shieldPhase;
     int32 _count;
     std::chrono::seconds _batTimer;
 };
@@ -260,7 +279,12 @@ class spell_lady_vashj_magic_barrier : public AuraScript
 
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(5));
+        Unit* target = GetTarget();
+        Unit::DealDamage(target, target, target->CountPctFromMaxHealth(5));
+
+        // The removed barrier is already off the aura list, so HasAura in DoAction only sees the remaining ones
+        if (target->GetEntry() == NPC_LADY_VASHJ)
+            target->ToCreature()->AI()->DoAction(ACTION_MAGIC_BARRIER_REMOVED);
     }
 
     void Register() override
