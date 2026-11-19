@@ -148,7 +148,8 @@ void WorldSession::HandleEnterPlayerVehicle(WorldPacket& data)
 
     if (Player* player = ObjectAccessor::GetPlayer(*_player, guid))
     {
-        if (!player->GetVehicleKit())
+        Vehicle* vehicle = player->GetVehicleKit();
+        if (!vehicle || !vehicle->IsBoardableByPlayers())
             return;
         if (!player->IsInRaidWith(_player))
             return;

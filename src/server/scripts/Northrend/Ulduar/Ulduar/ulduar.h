@@ -353,13 +353,14 @@ enum UlduarPersistentData
 {
     PERSISTENT_DATA_WATCHERS_MASK           = 0,
     PERSISTENT_DATA_CONSPEEDATORY,
-    PERSISTENT_DATA_UNBROKEN,
+    PERSISTENT_DATA_UNBROKEN_FAIL,
     PERSISTENT_DATA_ALGALON_TIMER,
     PERSISTENT_DATA_C_OF_ULDUAR_MASK,
     PERSISTENT_DATA_MAGE_BARRIER,
     PERSISTENT_DATA_ALGALON_FIRST_PULL,
     // Set when Brann's action list unlocks the salvaged vehicles, they stay boardable for the rest of the lockout
     PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE,
+    PERSISTENT_DATA_ALGALON_DEADLINE,
     MAX_PERSISTENT_DATA
 };
 
@@ -421,6 +422,7 @@ enum UlduarMisc
     TIMER_ALGALON_DEFEATED                  = 300,
     TIMER_ALGALON_TO_SUMMON                 = 200,
     TIMER_ALGALON_SUMMONED                  = 100,
+    TIMER_ALGALON_MINUTES                   = 60,
 
     // Algalon the Observer, Freya, Hodir, Mimiron, Thorim, Gossip Keepers
     SPELL_TELEPORT                          = 62940,

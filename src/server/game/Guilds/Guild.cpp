@@ -1075,14 +1075,12 @@ bool Guild::Create(Player* pLeader, std::string_view name)
     LOG_DEBUG("guild", "GUILD: creating guild [{}] for leader {} ({})",
               m_name, pLeader->GetName(), m_leaderGuid.ToString());
 
+    // Nothing to delete first: a new id is MAX(guildid) + 1, never reused while running, and
+    // orphaned rows are removed at startup. A DELETE here could run after AddMember()'s INSERT.
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_MEMBERS);
-    stmt->SetData(0, m_id);
-    trans->Append(stmt);
-
     uint8 index = 0;
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD);
     stmt->SetData(  index, m_id);
     stmt->SetData(++index, m_name);
     stmt->SetData(++index, m_leaderGuid.GetCounter());
@@ -1097,8 +1095,8 @@ bool Guild::Create(Player* pLeader, std::string_view name)
     stmt->SetData(++index, m_bankMoney);
     trans->Append(stmt);
 
+    _CreateDefaultGuildRanks(trans, pLeaderSession->GetSessionDbLocaleIndex()); // Create default ranks
     CharacterDatabase.CommitTransaction(trans);
-    _CreateDefaultGuildRanks(pLeaderSession->GetSessionDbLocaleIndex()); // Create default ranks
     bool ret = AddMember(m_leaderGuid, GR_GUILDMASTER);                  // Add guildmaster
 
     for (short i = 0; i < static_cast<short>(sWorld->getIntConfig(CONFIG_GUILD_BANK_INITIAL_TABS)); i++)
@@ -1671,8 +1669,14 @@ void Guild::HandleAddNewRank(WorldSession* session, std::string_view name)
 
     // Only leader can add new rank
     if (_IsLeader(session->GetPlayer()))
-        if (_CreateRank(name, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK))
+    {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        if (_CreateRank(trans, name, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK))
+        {
+            CharacterDatabase.CommitTransaction(trans);
             _BroadcastEvent(GE_RANK_UPDATED, ObjectGuid::Empty, std::to_string(size), name, std::to_string(m_ranks.size()));
+        }
+    }
 }
 
 void Guild::HandleRemoveLowestRank(WorldSession* session)
@@ -2135,8 +2139,25 @@ bool Guild::Validate()
 
     if (broken_ranks)
     {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+        // Only delete when there are rank rows: a DELETE on an empty range takes gap
+        // locks that deadlock against the INSERTs of guilds repaired in parallel.
+        // Bank rights are written with ON DUPLICATE KEY UPDATE.
+        if (!m_ranks.empty())
+        {
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_RANKS);
+            stmt->SetData(0, m_id);
+            trans->Append(stmt);
+
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_BANK_RIGHTS);
+            stmt->SetData(0, m_id);
+            trans->Append(stmt);
+        }
+
         m_ranks.clear();
-        _CreateDefaultGuildRanks(DEFAULT_LOCALE);
+        _CreateDefaultGuildRanks(trans, DEFAULT_LOCALE);
+        CharacterDatabase.CommitTransaction(trans);
     }
 
     // Validate members' data
@@ -2463,24 +2484,19 @@ void Guild::_CreateNewBankTab()
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void Guild::_CreateDefaultGuildRanks(LocaleConstant loc)
+// Old rows, if any, must be deleted by the caller in the same transaction: as separate
+// async jobs, a pool with more than one worker can run a DELETE after these INSERTs.
+void Guild::_CreateDefaultGuildRanks(CharacterDatabaseTransaction trans, LocaleConstant loc)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_RANKS);
-    stmt->SetData(0, m_id);
-    CharacterDatabase.Execute(stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_BANK_RIGHTS);
-    stmt->SetData(0, m_id);
-    CharacterDatabase.Execute(stmt);
-
-    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_MASTER,   loc), GR_RIGHT_ALL);
-    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_OFFICER,  loc), GR_RIGHT_ALL);
-    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_VETERAN,  loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
-    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_MEMBER,   loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
-    _CreateRank(sObjectMgr->GetAcoreString(LANG_GUILD_INITIATE, loc), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
+    uint32 const chatRights = GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK;
+    _CreateRank(trans, sObjectMgr->GetAcoreString(LANG_GUILD_MASTER,   loc), GR_RIGHT_ALL);
+    _CreateRank(trans, sObjectMgr->GetAcoreString(LANG_GUILD_OFFICER,  loc), GR_RIGHT_ALL);
+    _CreateRank(trans, sObjectMgr->GetAcoreString(LANG_GUILD_VETERAN,  loc), chatRights);
+    _CreateRank(trans, sObjectMgr->GetAcoreString(LANG_GUILD_MEMBER,   loc), chatRights);
+    _CreateRank(trans, sObjectMgr->GetAcoreString(LANG_GUILD_INITIATE, loc), chatRights);
 }
 
-bool Guild::_CreateRank(std::string_view name, uint32 rights)
+bool Guild::_CreateRank(CharacterDatabaseTransaction trans, std::string_view name, uint32 rights)
 {
     uint8 newRankId = _GetRanksSize();
     if (newRankId >= GUILD_RANKS_MAX_COUNT)
@@ -2490,10 +2506,8 @@ bool Guild::_CreateRank(std::string_view name, uint32 rights)
     RankInfo info(m_id, newRankId, name, rights, 0);
     m_ranks.push_back(info);
 
-    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     info.CreateMissingTabsIfNeeded(_GetPurchasedTabsSize(), trans);
     info.SaveToDB(trans);
-    CharacterDatabase.CommitTransaction(trans);
 
     return true;
 }

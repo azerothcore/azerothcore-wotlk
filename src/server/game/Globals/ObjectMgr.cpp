@@ -3889,6 +3889,12 @@ void ObjectMgr::LoadItemTemplates()
         ++count;
     } while (result->NextRow());
 
+    // built from the store so templates without an item.dbc entry, which skip the checks above, are included
+    for (auto const& [entry, itemTemplate] : _itemTemplateStore)
+        for (_Spell const& spell : itemTemplate.Spells)
+            if (spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE && spell.SpellId > 0)
+                _itemObtainSpells.insert(spell.SpellId);
+
     // pussywizard:
     {
         uint32 max = 0;
@@ -9582,25 +9588,11 @@ bool ObjectMgr::LoadAcoreStrings()
 
     _acoreStringStore.clear(); // for reload case
 
-    // content_default holds enUS. A locale registered by a module needs its own locale_<code> column.
-    std::string sql = "SELECT entry, content_default";
-    std::vector<LocaleConstant> columnLocales; // locale of fields[2 + k]
-    for (uint8 i = LOCALE_koKR; i < TOTAL_LOCALES; ++i)
-    {
-        if (!IsLocaleRegistered(LocaleConstant(i)))
-            continue;
-
-        sql += ", locale_";
-        sql += localeNames[i];
-        columnLocales.push_back(LocaleConstant(i));
-    }
-    sql += " FROM acore_string";
-
-    QueryResult result = WorldDatabase.Query(sql);
+    //                                               0      1
+    QueryResult result = WorldDatabase.Query("SELECT entry, content_default FROM acore_string");
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_string` is empty "
-            "or a locale column is missing; queried: {}", sql);
+        LOG_WARN("server.loading", ">> Loaded 0 acore strings. DB table `acore_string` is empty.");
         LOG_INFO("server.loading", " ");
         return false;
     }
@@ -9615,10 +9607,36 @@ bool ObjectMgr::LoadAcoreStrings()
 
         data.Content.resize(DEFAULT_LOCALE + 1);
 
+        // content_default holds enUS
         AddLocaleString(fields[1].Get<std::string>(), DEFAULT_LOCALE, data.Content);
-        for (std::size_t k = 0; k < columnLocales.size(); ++k)
-            AddLocaleString(fields[2 + k].Get<std::string>(), columnLocales[k], data.Content);
     } while (result->NextRow());
+
+    // Texts in all other locales, including the ones registered by modules
+    //                                     0      1       2
+    result = WorldDatabase.Query("SELECT entry, locale, content FROM acore_string_locale");
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 entry = fields[0].Get<uint32>();
+
+            auto itr = _acoreStringStore.find(entry);
+            if (itr == _acoreStringStore.end())
+            {
+                LOG_ERROR("sql.sql", "Table `acore_string_locale` has entry {} that is not in `acore_string`, skipped.",
+                    entry);
+                continue;
+            }
+
+            LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
+            if (locale == LOCALE_enUS)
+                continue;
+
+            AddLocaleString(fields[2].Get<std::string>(), locale, itr->second.Content);
+        } while (result->NextRow());
+    }
 
     LOG_INFO("server.loading", ">> Loaded {} Acore Strings in {} ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");

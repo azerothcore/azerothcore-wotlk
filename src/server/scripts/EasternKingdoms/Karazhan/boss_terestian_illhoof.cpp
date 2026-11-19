@@ -56,15 +56,11 @@ enum Creatures
 
 struct npc_kilrek : public ScriptedAI
 {
-    npc_kilrek(Creature* creature) : ScriptedAI(creature)
-    {
-        instance = creature->GetInstanceScript();
-    }
+    npc_kilrek(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
         _scheduler.CancelAll();
-        TerestianGUID.Clear();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -79,15 +75,7 @@ struct npc_kilrek : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        ObjectGuid TerestianGuid = instance->GetGuidData(DATA_TERESTIAN);
-        if (TerestianGuid)
-        {
-            Unit* Terestian = ObjectAccessor::GetUnit(*me, TerestianGuid);
-            if (Terestian && Terestian->IsAlive())
-            {
-                DoCast(Terestian, SPELL_BROKEN_PACT, true);
-            }
-        }
+        DoCastAOE(SPELL_BROKEN_PACT, true);
         me->DespawnOrUnsummon(15s);
     }
 
@@ -105,8 +93,6 @@ struct npc_kilrek : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    InstanceScript* instance;
-    ObjectGuid TerestianGUID;
 };
 
 struct npc_demon_chain : public ScriptedAI
@@ -158,7 +144,7 @@ struct boss_terestian_illhoof : public BossAI
     void SummonKilrek()
     {
         me->RemoveAurasDueToSpell(SPELL_BROKEN_PACT);
-        DoCastSelf(SPELL_SUMMON_IMP);
+        DoCastSelf(SPELL_SUMMON_IMP, true);
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -199,7 +185,7 @@ struct boss_terestian_illhoof : public BossAI
             DoCastAOE(SPELL_FIENDISH_PORTAL_1);
         }).Schedule(10min, [this](TaskContext /*context*/)
         {
-            DoCastSelf(SPELL_BERSERK);
+            DoCastSelf(SPELL_BERSERK, true);
         });
     }
 

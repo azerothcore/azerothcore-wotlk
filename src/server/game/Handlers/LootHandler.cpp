@@ -19,6 +19,7 @@
 #include "Creature.h"
 #include "GameObject.h"
 #include "Group.h"
+#include "ItemRecovery.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
 #include "Object.h"
@@ -27,6 +28,7 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -431,6 +433,17 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         }
         else if (pItem->loot.isLooted() || !proto->HasFlag(ITEM_FLAG_HAS_LOOT))
         {
+            if (loot->loot_type == LOOT_DISENCHANTING && sWorld->getBoolConfig(CONFIG_ITEMDELETE_DISENCHANT))
+            {
+                // Materials left in the loot window vanish with the item, so only looted ones are owed back
+                RecoveryItemLoot looted;
+                for (LootItem const& lootItem : loot->items)
+                    if (lootItem.is_looted)
+                        looted.emplace_back(lootItem.itemid, lootItem.count);
+
+                ItemRecovery::Save(pItem, pItem->GetCount(), RECOVERY_ITEM_SOURCE_DISENCHANTED, 0, looted);
+            }
+
             player->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
             return;
         }

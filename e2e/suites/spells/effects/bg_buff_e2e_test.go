@@ -27,6 +27,17 @@ var bgBuffs = []bgBuff{
 	{"Berserking", 179905, 23505},
 }
 
+// bgBuffStealths are the stealth states a player walks into a buff in: none, Stealth, and
+// Vanish, whose aura 26888 adds to the Stealth level.
+var bgBuffStealths = []struct {
+	name  string
+	auras []uint32
+}{
+	{"Visible", nil},
+	{"Stealth", []uint32{1784}},
+	{"Vanish", []uint32{1784, 26888}},
+}
+
 // Since PR #26152 (https://github.com/azerothcore/azerothcore-wotlk/pull/26152) a
 // battleground buff casts its spell itself instead of through a trigger creature that made
 // the player the original caster. In Warsong Gulch both Berserking buffs and the Horde
@@ -37,8 +48,13 @@ var bgBuffs = []bgBuff{
 // The harness cannot queue for a battleground, so the buffs are spawned instead: on outdoor
 // terrain, and where the Ulduar Antechamber teleporter stands, a floor known to block that ray.
 //
-// Oracle: each buff, walked into by a player, puts its aura on that player, and Restoration
-// then restores a tenth of their health and mana.
+// A stealthed player used up a buff without getting it
+// (https://github.com/chromiecraft/chromiecraft/issues/10347): the trap fires on any player in
+// range, but its spell's explicit target check made the buff detect the player's stealth. It
+// only could from in front of it and up close, and never through Vanish's added Stealth level.
+//
+// Oracle: each buff, walked into by a player, visible or stealthed, puts its aura on that
+// player, and Restoration then restores a tenth of their health and mana.
 func TestBattlegroundBuff_AppliesToPlayerOnAnyFloor(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"med", "spells"},
@@ -77,80 +93,98 @@ func TestBattlegroundBuff_AppliesToPlayerOnAnyFloor(t *testing.T) {
 		}, &e2eharness.Position3{X: 1498.05, Y: -24.3509, Z: 420.966, Map: e2eharness.MapUlduar}},
 	} {
 		t.Run(spot.name, func(t *testing.T) {
-			for _, buff := range bgBuffs {
-				t.Run(buff.name, func(t *testing.T) {
-					// A game master is invisible to the buff and is never picked as its target.
-					bot.GM(t, ".gm on")
-					spot.place(t)
-					self := bot.World.CharGUID()
-					_ = bot.World.SetTarget(self)
-					bot.GM(t, ".unaura all")
-					// Half health, so a Restoration tick shows.
-					bot.GM(t, ".revive")
-					bot.FlushWorld(t)
-					_, full := bot.UnitHP(self)
-					bot.GM(t, fmt.Sprintf(".modify hp %d", full))
-					bot.GM(t, fmt.Sprintf(".damage %d", full/2))
-					// Nearly no mana: `.modify mana` sets current and maximum mana, then Arcane
-					// Intellect raises the maximum back up and leaves the current mana where it is.
-					bot.GM(t, ".modify mana 1")
-					bot.GM(t, ".aura 42995")
+			for _, stealth := range bgBuffStealths {
+				t.Run(stealth.name, func(t *testing.T) {
+					for _, buff := range bgBuffs {
+						t.Run(buff.name, func(t *testing.T) {
+							// A game master is invisible to the buff and is never picked as its target.
+							bot.GM(t, ".gm on")
+							spot.place(t)
+							self := bot.World.CharGUID()
+							_ = bot.World.SetTarget(self)
+							bot.GM(t, ".unaura all")
+							// Half health, so a Restoration tick shows.
+							bot.GM(t, ".revive")
+							bot.FlushWorld(t)
+							_, full := bot.UnitHP(self)
+							bot.GM(t, fmt.Sprintf(".modify hp %d", full))
+							bot.GM(t, fmt.Sprintf(".damage %d", full/2))
+							// Nearly no mana: `.modify mana` sets current and maximum mana, then Arcane
+							// Intellect raises the maximum back up and leaves the current mana where it is.
+							bot.GM(t, ".modify mana 1")
+							bot.GM(t, ".aura 42995")
 
-					spawnID := bot.SpawnGameObject(t, buff.gameObject)
-					if at := spot.buffAt; at != nil {
-						if spawnID == 0 {
-							e2eharness.Preconditionf(t, "%s buff GO %d spawn id unknown, cannot move it", buff.name, buff.gameObject)
-						}
-						bot.GM(t, fmt.Sprintf(".gobject move %d %.4f %.4f %.4f", spawnID, at.X, at.Y, at.Z))
-						bot.Teleport(t, at.X, at.Y, at.Z+0.5, at.Map)
-					}
-					if waitTrapGO(bot, buff.gameObject, true, 5*time.Second) == 0 {
-						e2eharness.Preconditionf(t, "%s buff GO %d never appeared", buff.name, buff.gameObject)
-					}
-					hpBefore, maxHP := bot.UnitHP(self)
-					if hpBefore == 0 || hpBefore >= maxHP {
-						e2eharness.Preconditionf(t, "bot health %d/%d after .damage, cannot see a heal", hpBefore, maxHP)
-					}
-					manaBefore, maxMana := bot.PlayerPower()
-					if manaBefore+maxMana/10 > maxMana {
-						e2eharness.Preconditionf(t, "bot mana %d/%d, cannot see a tenth restored", manaBefore, maxMana)
-					}
-
-					bot.GM(t, ".gm off")
-					bot.FlushWorld(t)
-
-					deadline := time.Now().Add(6 * time.Second)
-					for !bot.UnitHasAura(self, buff.spell) {
-						if time.Now().After(deadline) {
-							e2eharness.Assertf(t, "%s buff %d never put aura %d on the player at %s",
-								buff.name, buff.gameObject, buff.spell, spot.name)
-						}
-						time.Sleep(50 * time.Millisecond)
-					}
-
-					// Each Restoration tick, one a second, restores 10% of maximum health and mana,
-					// far above what regeneration gives in the same time.
-					if buff.spell == 23493 {
-						tickDeadline := time.Now().Add(3 * time.Second)
-						for hp, _ := bot.UnitHP(self); hp < hpBefore+maxHP/10; hp, _ = bot.UnitHP(self) {
-							if time.Now().After(tickDeadline) {
-								e2eharness.Assertf(t, "Restoration aura on the player at %s but health only went %d -> %d of %d",
-									spot.name, hpBefore, hp, maxHP)
+							spawnID := bot.SpawnGameObject(t, buff.gameObject)
+							if at := spot.buffAt; at != nil {
+								if spawnID == 0 {
+									e2eharness.Preconditionf(t, "%s buff GO %d spawn id unknown, cannot move it", buff.name, buff.gameObject)
+								}
+								bot.GM(t, fmt.Sprintf(".gobject move %d %.4f %.4f %.4f", spawnID, at.X, at.Y, at.Z))
+								bot.Teleport(t, at.X, at.Y, at.Z+0.5, at.Map)
 							}
-							time.Sleep(50 * time.Millisecond)
-						}
-						for mana, _ := bot.PlayerPower(); mana < manaBefore+maxMana/10; mana, _ = bot.PlayerPower() {
-							if time.Now().After(tickDeadline) {
-								e2eharness.Assertf(t, "Restoration aura on the player at %s but mana only went %d -> %d of %d",
-									spot.name, manaBefore, mana, maxMana)
+							if waitTrapGO(bot, buff.gameObject, true, 5*time.Second) == 0 {
+								e2eharness.Preconditionf(t, "%s buff GO %d never appeared", buff.name, buff.gameObject)
 							}
-							time.Sleep(50 * time.Millisecond)
-						}
+							hpBefore, maxHP := bot.UnitHP(self)
+							if hpBefore == 0 || hpBefore >= maxHP {
+								e2eharness.Preconditionf(t, "bot health %d/%d after .damage, cannot see a heal", hpBefore, maxHP)
+							}
+							manaBefore, maxMana := bot.PlayerPower()
+							if manaBefore+maxMana/10 > maxMana {
+								e2eharness.Preconditionf(t, "bot mana %d/%d, cannot see a tenth restored", manaBefore, maxMana)
+							}
+							// Last, as the damage above would break it.
+							for _, aura := range stealth.auras {
+								bot.GM(t, fmt.Sprintf(".aura %d", aura))
+							}
+							// Aura updates reach the client on the next unit update, after the command's reply.
+							for _, aura := range stealth.auras {
+								auraDeadline := time.Now().Add(2 * time.Second)
+								for !bot.UnitHasAura(self, aura) {
+									if time.Now().After(auraDeadline) {
+										e2eharness.Preconditionf(t, "%s aura %d never landed on the player", stealth.name, aura)
+									}
+									time.Sleep(50 * time.Millisecond)
+								}
+							}
+
+							bot.GM(t, ".gm off")
+							bot.FlushWorld(t)
+
+							deadline := time.Now().Add(6 * time.Second)
+							for !bot.UnitHasAura(self, buff.spell) {
+								if time.Now().After(deadline) {
+									e2eharness.Assertf(t, "%s buff %d never put aura %d on the %s player at %s",
+										buff.name, buff.gameObject, buff.spell, stealth.name, spot.name)
+								}
+								time.Sleep(50 * time.Millisecond)
+							}
+
+							// Each Restoration tick, one a second, restores 10% of maximum health and mana,
+							// far above what regeneration gives in the same time.
+							if buff.spell == 23493 {
+								tickDeadline := time.Now().Add(3 * time.Second)
+								for hp, _ := bot.UnitHP(self); hp < hpBefore+maxHP/10; hp, _ = bot.UnitHP(self) {
+									if time.Now().After(tickDeadline) {
+										e2eharness.Assertf(t, "Restoration aura on the player at %s but health only went %d -> %d of %d",
+											spot.name, hpBefore, hp, maxHP)
+									}
+									time.Sleep(50 * time.Millisecond)
+								}
+								for mana, _ := bot.PlayerPower(); mana < manaBefore+maxMana/10; mana, _ = bot.PlayerPower() {
+									if time.Now().After(tickDeadline) {
+										e2eharness.Assertf(t, "Restoration aura on the player at %s but mana only went %d -> %d of %d",
+											spot.name, manaBefore, mana, maxMana)
+									}
+									time.Sleep(50 * time.Millisecond)
+								}
+							}
+							hp, _ := bot.UnitHP(self)
+							mana, _ := bot.PlayerPower()
+							t.Logf("PASS %s buff put aura %d on the %s player at %s (health %d -> %d of %d, mana %d -> %d of %d)",
+								buff.name, buff.spell, stealth.name, spot.name, hpBefore, hp, maxHP, manaBefore, mana, maxMana)
+						})
 					}
-					hp, _ := bot.UnitHP(self)
-					mana, _ := bot.PlayerPower()
-					t.Logf("PASS %s buff put aura %d on the player at %s (health %d -> %d of %d, mana %d -> %d of %d)",
-						buff.name, buff.spell, spot.name, hpBefore, hp, maxHP, manaBefore, mana, maxMana)
 				})
 			}
 		})

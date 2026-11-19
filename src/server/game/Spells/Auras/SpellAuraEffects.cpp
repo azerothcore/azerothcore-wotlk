@@ -1113,8 +1113,39 @@ void AuraEffect::SendTickImmune(Unit* target, Unit* caster) const
         caster->SendSpellDamageImmune(target, m_spellInfo->Id);
 }
 
+namespace
+{
+    class PreDeathAuraTickScope
+    {
+    public:
+        PreDeathAuraTickScope(Unit* caster, bool active) : _caster(active ? caster : nullptr),
+            _wasInTick(_caster && _caster->IsInPreDeathAuraTick())
+        {
+            if (_caster)
+                _caster->SetInPreDeathAuraTick(true);
+        }
+
+        ~PreDeathAuraTickScope()
+        {
+            if (_caster)
+                _caster->SetInPreDeathAuraTick(_wasInTick);
+        }
+
+        PreDeathAuraTickScope(PreDeathAuraTickScope const&) = delete;
+        PreDeathAuraTickScope& operator=(PreDeathAuraTickScope const&) = delete;
+
+    private:
+        Unit* const _caster;
+        bool const _wasInTick;
+    };
+}
+
 void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
 {
+    // the tick's damage and spells the caster casts from its procs and scripts skip combat,
+    // see Unit::DealDamage and Spell::prepare
+    PreDeathAuraTickScope preDeathTick(caster, GetBase()->HasCasterDiedSinceApply(caster));
+
     bool prevented = GetBase()->CallScriptEffectPeriodicHandlers(this, aurApp);
     if (prevented)
         return;
@@ -4213,7 +4244,8 @@ void AuraEffect::HandleAuraModStat(AuraApplication const* aurApp, uint8 mode, bo
         if (GetMiscValue() < 0 || GetMiscValue() == i)
         {
             if (spellGroupVal)
-                target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(GetAmount()), !apply);
+                target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE,
+                    float(spellGroupVal), !apply);
 
             target->HandleStatFlatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(GetAmount()), apply);
             if (target->IsPlayer() || target->IsPet())
@@ -7041,14 +7073,16 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
         {
             float radius = GetSpellInfo()->Effects[GetEffIndex()].CalcRadius(caster);
 
+            Player const* assister = caster->GetAffectingPlayer();
+
             Unit*                                                         triggerTarget = nullptr;
-            Acore::MostHPMissingGroupInRange                              u_check(target, radius, 0);
+            Acore::MostHPMissingGroupInRange                              u_check(target, radius, 0, assister);
             Acore::UnitLastSearcher<Acore::MostHPMissingGroupInRange>     searcher(target, triggerTarget, u_check);
             Cell::VisitObjects(target, searcher, radius);
 
             if (triggerTarget)
             {
-                target->CastSpell(triggerTarget, SPELL_PRAYER_OF_MENDING_VISUAL, true);
+                target->CastSpell(triggerTarget, SPELL_PRAYER_OF_MENDING_VISUAL, true, nullptr, this, GetCasterGUID());
                 target->CastCustomSpell(triggerTarget, GetId(), &value, nullptr, nullptr, true, nullptr, this, GetCasterGUID());
                 if (Aura* aura = triggerTarget->GetAura(GetId(), GetCasterGUID()))
                     aura->SetCharges(jumps);

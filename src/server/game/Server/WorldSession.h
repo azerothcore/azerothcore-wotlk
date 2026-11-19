@@ -645,6 +645,7 @@ public:
     // Locales
     LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
     LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
+    void SetSessionDbLocaleIndex(LocaleConstant locale);
     std::string GetAcoreString(uint32 entry) const;
     std::string const* GetModuleString(std::string module, uint32 id) const;
 
@@ -1272,8 +1273,6 @@ private:
     void moveItems(Item* myItems[], Item* hisItems[]);
 
     bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
-
-    bool recoveryItem(Item* pItem);
 
     // logging helper
     void LogUnexpectedOpcode(WorldPacket* packet, char const* status, char const* reason);

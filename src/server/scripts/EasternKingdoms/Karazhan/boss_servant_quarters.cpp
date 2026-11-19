@@ -33,9 +33,9 @@ enum Spells
     SPELL_RAVAGE                = 29906
 };
 
-struct boss_servant_quarters : public BossAI
+struct boss_servant_quarters : public ScriptedAI
 {
-    boss_servant_quarters(Creature* creature) : BossAI(creature, DATA_SERVANT_QUARTERS) { }
+    boss_servant_quarters(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
@@ -45,6 +45,11 @@ struct boss_servant_quarters : public BossAI
         {
             DoCastSelf(SPELL_SNEAK, true);
         }
+    }
+
+    void JustReachedHome() override
+    {
+        me->setActive(false);
     }
 
     void JustEngagedWith(Unit*  /*who*/) override
@@ -89,10 +94,6 @@ struct boss_servant_quarters : public BossAI
                 context.Repeat(10500ms);
             });
         }
-    }
-
-    void JustDied(Unit* /*who*/) override
-    {
     }
 
     void MovementInform(uint32 type, uint32 point) override

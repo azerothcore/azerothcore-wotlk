@@ -25,17 +25,17 @@
 
 enum DataTypes
 {
-    DATA_SKERAM             = 1,
-    DATA_BUG_TRIO           = 2,
-    DATA_SARTURA            = 3,
-    DATA_FANKRISS           = 4,
-    DATA_VISCIDUS           = 5,
-    DATA_HUHURAN            = 6,
-    DATA_TWIN_EMPERORS      = 7,
-    DATA_OURO               = 8,
-    DATA_CTHUN              = 9,
+    DATA_SKERAM             = 0,
+    DATA_BUG_TRIO           = 1,
+    DATA_SARTURA            = 2,
+    DATA_FANKRISS           = 3,
+    DATA_VISCIDUS           = 4,
+    DATA_HUHURAN            = 5,
+    DATA_TWIN_EMPERORS      = 6,
+    DATA_OURO               = 7,
+    DATA_CTHUN              = 8,
 
-    MAX_BOSS_NUMBER         = 10,
+    MAX_BOSS_NUMBER         = 9,
 
     DATA_KRI                = 10,
     DATA_VEM                = 11,

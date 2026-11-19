@@ -195,7 +195,7 @@ namespace lfg
         uint32 _agility;
         uint32 _health;
         uint32 _mana;
-        uint32 _defenseSkill;
+        uint32 _defenseRating;
         // --
         uint32 _dodgeRating;
         uint32 _blockRating;
@@ -208,22 +208,22 @@ namespace lfg
                        uint8 _online, uint8 _level, uint8 _class, uint8 _race, float _avgItemLevel,
                        uint8 (&_talents)[3], uint32 _area, uint32 _armor, uint32 _spellDamage, uint32 _spellHeal,
                        uint32 _critRatingMelee, uint32 _critRatingRanged, uint32 _critRatingSpell, float _mp5, float _mp5combat,
-                       uint32 _attackPower, uint32 _agility, uint32 _health, uint32 _mana, uint32 _defenseSkill,
+                       uint32 _attackPower, uint32 _agility, uint32 _health, uint32 _mana, uint32 _defenseRating,
                        uint32 _dodgeRating, uint32 _blockRating, uint32 _parryRating, uint32 _hasteRating, uint32 _expertiseRating)
             : guid(guid), comment(std::move(comment)), isGroupLeader(isGroupLeader), groupGuid(groupGuid), roles(roles), encounterMask(encounterMask), instanceGuid(instanceGuid),
               _online(_online), _level(_level), _class(_class), _race(_race), _avgItemLevel(_avgItemLevel),
               _talents0(_talents[0]), _talents1(_talents[1]), _talents2(_talents[2]), _area(_area), _armor(_armor), _spellDamage(_spellDamage), _spellHeal(_spellHeal),
               _critRatingMelee(_critRatingMelee), _critRatingRanged(_critRatingRanged), _critRatingSpell(_critRatingSpell), _mp5(_mp5), _mp5combat(_mp5combat),
-              _attackPower(_attackPower), _agility(_agility), _health(_health), _mana(_mana), _defenseSkill(_defenseSkill),
+              _attackPower(_attackPower), _agility(_agility), _health(_health), _mana(_mana), _defenseRating(_defenseRating),
               _dodgeRating(_dodgeRating), _blockRating(_blockRating), _parryRating(_parryRating), _hasteRating(_hasteRating), _expertiseRating(_expertiseRating)
         {}
         [[nodiscard]] bool PlayerSameAs(RBInternalInfo const& i) const
         {
             return isGroupLeader == i.isGroupLeader && groupGuid == i.groupGuid && roles == i.roles && (isGroupLeader || (comment == i.comment && encounterMask == i.encounterMask && instanceGuid == i.instanceGuid))
-                   && _online == i._online && _level == i._level && _class == i._class && _race == i._race && std::fabs(_avgItemLevel - i._avgItemLevel) < 0.01f
+                   && _level == i._level && _class == i._class && _race == i._race && std::fabs(_avgItemLevel - i._avgItemLevel) < 0.01f
                    && _talents0 == i._talents0 && _talents1 == i._talents1 && _talents2 == i._talents2 && _area == i._area && _armor == i._armor && _spellDamage == i._spellDamage && _spellHeal == i._spellHeal
                    && _critRatingMelee == i._critRatingMelee && _critRatingRanged == i._critRatingRanged && _critRatingSpell == i._critRatingSpell && std::fabs(_mp5 - i._mp5) < 0.01f && std::fabs(_mp5combat - i._mp5combat) < 0.01f
-                   && _attackPower == i._attackPower && _agility == i._agility && _health == i._health && _mana == i._mana && _defenseSkill == i._defenseSkill
+                   && _attackPower == i._attackPower && _agility == i._agility && _health == i._health && _mana == i._mana && _defenseRating == i._defenseRating
                    && _dodgeRating == i._dodgeRating && _blockRating == i._blockRating && _parryRating == i._parryRating && _hasteRating == i._hasteRating && _expertiseRating == i._expertiseRating;
         }
         void CopyStats(RBInternalInfo const& i)
@@ -245,7 +245,7 @@ namespace lfg
             _agility = i._agility;
             _health = i._health;
             _mana = i._mana;
-            _defenseSkill = i._defenseSkill;
+            _defenseRating = i._defenseRating;
             _dodgeRating = i._dodgeRating;
             _blockRating = i._blockRating;
             _parryRating = i._parryRating;
@@ -631,8 +631,8 @@ namespace lfg
         ByteBuffer _rbBufferDeleted;
         ByteBuffer _rbBufferGroups;
         ByteBuffer _rbBufferPlayers;
-        GuidSet _rbDeletedGroups;
-        GuidSet _rbDeletedGroupsToErase;
+        GuidSet _rbPrevGroups;
+        GuidSet _rbDroppedGroups;
         RBInternalInfoMap _rbCopy;
 
         LfgQueueContainer QueuesStore;                     ///< Queues

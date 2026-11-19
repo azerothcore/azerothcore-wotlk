@@ -416,7 +416,7 @@ void BattlegroundAV::PostUpdateImpl(uint32 diff)
                 if (i == 0)
                 {
                     CastSpellOnTeam(AV_BUFF_A_CAPTAIN, TEAM_ALLIANCE);
-                    Creature* creature = GetBGCreature(AV_CPLACE_MAX + 61);
+                    Creature* creature = GetBGCreature(AV_CPLACE_A_CAPTAIN);
                     if (creature)
                     {
                         std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 0, 0, DEFAULT_LOCALE);
@@ -426,7 +426,7 @@ void BattlegroundAV::PostUpdateImpl(uint32 diff)
                 else
                 {
                     CastSpellOnTeam(AV_BUFF_H_CAPTAIN, TEAM_HORDE);
-                    Creature* creature = GetBGCreature(AV_CPLACE_MAX + 59); //TODO: make the captains a dynamic creature
+                    Creature* creature = GetBGCreature(AV_CPLACE_H_CAPTAIN); //TODO: make the captains a dynamic creature
                     if (creature)
                     {
                         std::string creatureText = sCreatureTextMgr->GetLocalizedChatString(creature->GetEntry(), creature->getGender(), 2, 0, DEFAULT_LOCALE);
@@ -810,15 +810,16 @@ void BattlegroundAV::PopulateNode(BG_AV_Nodes node)
 
     if (node >= BG_AV_NODES_MAX)//fail safe
         return;
-    Creature* trigger = GetBgMap()->GetCreature(BgCreatures[node + 302]);//0-302 other creatures
+    uint32 const triggerType = static_cast<uint32>(node) + AV_CPLACE_TRIGGER01;
+    Creature* trigger = GetBgMap()->GetCreature(BgCreatures[triggerType]);
     if (!trigger)
     {
         trigger = AddCreature(WORLD_TRIGGER,
-                                node + 302,
-                                BG_AV_CreaturePos[node + 302][0],
-                                BG_AV_CreaturePos[node + 302][1],
-                                BG_AV_CreaturePos[node + 302][2],
-                                BG_AV_CreaturePos[node + 302][3]);
+                                triggerType,
+                                BG_AV_CreaturePos[triggerType][0],
+                                BG_AV_CreaturePos[triggerType][1],
+                                BG_AV_CreaturePos[triggerType][2],
+                                BG_AV_CreaturePos[triggerType][3]);
     }
 
     //add bonus honor aura trigger creature when node is accupied
@@ -828,7 +829,7 @@ void BattlegroundAV::PopulateNode(BG_AV_Nodes node)
     {
         if (ownerId != TEAM_ALLIANCE && ownerId != TEAM_HORDE)//node can be neutral, remove trigger
         {
-            DelCreature(node + 302);
+            DelCreature(triggerType);
             return;
         }
         trigger->SetFaction(ownerId == TEAM_ALLIANCE ? FACTION_ALLIANCE_GENERIC : FACTION_HORDE_GENERIC);
@@ -854,7 +855,7 @@ void BattlegroundAV::DePopulateNode(BG_AV_Nodes node, bool ignoreSpiritGuide)
 
     //remove bonus honor aura trigger creature when node is lost
     if (node < BG_AV_NODES_MAX)//fail safe
-        DelCreature(node + 302);//nullptr checks are in DelCreature! 0-302 spirit guides
+        DelCreature(static_cast<uint32>(node) + AV_CPLACE_TRIGGER01);//nullptr checks are in DelCreature!
 }
 
 BG_AV_Nodes BattlegroundAV::GetNodeThroughObject(uint32 object)

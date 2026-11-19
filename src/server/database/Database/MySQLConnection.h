@@ -106,9 +106,14 @@ protected:
     PreparedStatementContainer m_stmts; //! PreparedStatements storage
     bool m_reconnecting;  //! Are we reconnecting?
     bool m_prepareError;  //! Was there any error while preparing statements?
+    bool m_inTransaction; //! Is a transaction open on this connection?
+    uint32 m_lostTransactionError; //! Error that lost the open transaction's connection, 0 if none
     MySQLHandle* m_Mysql; //! MySQL Handle.
 
 private:
+    int ExecuteTransactionAttempt(std::shared_ptr<TransactionBase> const& transaction, bool& lostBeforeCommit);
+    int AbortTransaction(std::size_t queryCount, bool& lostBeforeCommit);
+
     ProducerConsumerQueue<SQLOperation*>* m_queue;      //! Queue shared with other asynchronous connections.
     std::unique_ptr<DatabaseWorker> m_worker;           //! Core worker task.
     MySQLConnectionInfo& m_connectionInfo;              //! Connection info (used for logging)

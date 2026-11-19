@@ -103,7 +103,7 @@ enum BG_AV_Sounds
 
 enum BG_AV_OTHER_VALUES
 {
-    AV_STATICCPLACE_MAX         = 123,
+    AV_STATICCPLACE_MAX         = 122,
     AV_NORTH_MINE               = 0,
     AV_SOUTH_MINE               = 1,
     AV_MINE_TICK_TIMER          = 45000,
@@ -794,55 +794,57 @@ enum BG_AV_CreaturePlace
     //irondeep
     //miner:
     AV_CPLACE_MINE_N_1_MIN      = 77,
-    AV_CPLACE_MINE_N_1_MAX      = 136,
+    AV_CPLACE_MINE_N_1_MAX      = 135,
     //special types
-    AV_CPLACE_MINE_N_2_MIN      = 137,
-    AV_CPLACE_MINE_N_2_MAX      = 192,
+    AV_CPLACE_MINE_N_2_MIN      = 136,
+    AV_CPLACE_MINE_N_2_MAX      = 190,
     //boss
-    AV_CPLACE_MINE_N_3          = 193,
+    AV_CPLACE_MINE_N_3          = 191,
     //coldtooth
     //miner:
-    AV_CPLACE_MINE_S_1_MIN      = 194,
-    AV_CPLACE_MINE_S_1_MAX      = 250,
+    AV_CPLACE_MINE_S_1_MIN      = 192,
+    AV_CPLACE_MINE_S_1_MAX      = 248,
     //special types
-    AV_CPLACE_MINE_S_2_MIN      = 251,
-    AV_CPLACE_MINE_S_2_MAX      = 289,
+    AV_CPLACE_MINE_S_2_MIN      = 249,
+    AV_CPLACE_MINE_S_2_MAX      = 287,
     //vermin
-    AV_CPLACE_MINE_S_S_MIN      = 290,
-    AV_CPLACE_MINE_S_S_MAX      = 299,
+    AV_CPLACE_MINE_S_S_MIN      = 288,
+    AV_CPLACE_MINE_S_S_MAX      = 297,
     //boss
-    AV_CPLACE_MINE_S_3          = 300,
+    AV_CPLACE_MINE_S_3          = 298,
 
     //herald
-    AV_CPLACE_HERALD          = 301,
+    AV_CPLACE_HERALD          = 299,
 
     //node aura triggers
-    AV_CPLACE_TRIGGER01       = 302,
-    AV_CPLACE_TRIGGER02       = 303,
-    AV_CPLACE_TRIGGER03       = 304,
-    AV_CPLACE_TRIGGER04       = 305,
-    AV_CPLACE_TRIGGER05       = 306,
-    AV_CPLACE_TRIGGER06       = 307,
-    AV_CPLACE_TRIGGER07       = 308,
-    AV_CPLACE_TRIGGER08       = 309,
-    AV_CPLACE_TRIGGER09       = 310,
-    AV_CPLACE_TRIGGER10       = 311,
-    AV_CPLACE_TRIGGER11       = 312,
-    AV_CPLACE_TRIGGER12       = 313,
-    AV_CPLACE_TRIGGER13       = 314,
-    AV_CPLACE_TRIGGER14       = 315,
-    AV_CPLACE_TRIGGER15       = 316,
+    AV_CPLACE_TRIGGER01       = 300,
+    AV_CPLACE_TRIGGER02       = 301,
+    AV_CPLACE_TRIGGER03       = 302,
+    AV_CPLACE_TRIGGER04       = 303,
+    AV_CPLACE_TRIGGER05       = 304,
+    AV_CPLACE_TRIGGER06       = 305,
+    AV_CPLACE_TRIGGER07       = 306,
+    AV_CPLACE_TRIGGER08       = 307,
+    AV_CPLACE_TRIGGER09       = 308,
+    AV_CPLACE_TRIGGER10       = 309,
+    AV_CPLACE_TRIGGER11       = 310,
+    AV_CPLACE_TRIGGER12       = 311,
+    AV_CPLACE_TRIGGER13       = 312,
+    AV_CPLACE_TRIGGER14       = 313,
+    AV_CPLACE_TRIGGER15       = 314,
 
     //boss, captain triggers
-    AV_CPLACE_TRIGGER16       = 317,
-    AV_CPLACE_TRIGGER17       = 318,
-    AV_CPLACE_TRIGGER18       = 319,
-    AV_CPLACE_TRIGGER19       = 320,
+    AV_CPLACE_TRIGGER16       = 315,
+    AV_CPLACE_TRIGGER17       = 316,
+    AV_CPLACE_TRIGGER18       = 317,
+    AV_CPLACE_TRIGGER19       = 318,
 
-    AV_CPLACE_MAX             = 321,
+    AV_CPLACE_MAX             = 319,
 
-    AV_CPLACE_A_BOSS          = 381,
-    AV_CPLACE_H_BOSS          = 443
+    AV_CPLACE_A_BOSS          = AV_CPLACE_MAX + 59,
+    AV_CPLACE_H_BOSS          = AV_CPLACE_MAX + 121,
+    AV_CPLACE_A_CAPTAIN       = AV_CPLACE_MAX + 60,
+    AV_CPLACE_H_CAPTAIN       = AV_CPLACE_MAX + 58
 };
 
 //x, y, z, o
@@ -966,7 +968,6 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
     {916.852f, -393.891f, 60.1726f, 2.71695f},
     {914.568f, -326.21f, 66.1733f, 2.25147f},
     {913.064f, -395.773f, 60.1364f, 4.41568f},
-    {909.246f, -474.576f, 58.2067f, 0.226893f},
     {909.246f, -474.576f, 58.2901f, 0.226893f},
     {907.209f, -428.267f, 59.8065f, 1.8675f},
     {905.973f, -459.528f, 58.7594f, 1.37189f},
@@ -1046,7 +1047,6 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
     {924.729f, -397.453f, 60.213f, 2.71695f},
     {902.195f, -475.891f, 58.312f, 1.39626f},
     {897.464f, -338.758f, 68.1715f, 2.94961f},
-    {884.237f, -407.597f, 61.566f, 0.820305f},
     {882.517f, -344.111f, 66.7887f, 3.46962f},
     {881.437f, -400.254f, 61.2028f, 0.263427f},
     {880.156f, -400.678f, 61.3113f, 3.41373f},
@@ -1343,7 +1343,6 @@ const float BG_AV_StaticCreaturePos[AV_STATICCPLACE_MAX][5] =
     {265.838f, -315.846f, -16.5429f, 3.15917f, 11 }, //10986 - Snowblind Harpy
     {426.485f, -51.1927f, -5.66286f, 1.60347f, 11 }, //10986 - Snowblind Harpy
     {452.044f, -33.9594f, -0.044651f, 2.72815f, 11 }, //10986 - Snowblind Harpy
-    {266.032f, -315.639f, -16.5429f, 4.67962f, 11 }, //10986 - Snowblind Harpy
     {532.64f, -54.5863f, 20.7024f, 2.93215f, 11 }, //10986 - Snowblind Harpy
     {295.183f, -299.908f, -34.6123f, 0.135851f, 12 }, //10990 - Alterac Ram
     {421.08f, -225.006f, -23.73f, 0.166754f, 12 }, //10990 - Alterac Ram

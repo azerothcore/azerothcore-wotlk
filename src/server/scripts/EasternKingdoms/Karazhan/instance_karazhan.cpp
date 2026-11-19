@@ -88,6 +88,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
+            SetPersistentDataCount(PersistentDataCount);
             LoadBossBoundaries(boundaries);
             LoadObjectData(creatureData, gameObjectData);
             LoadDoorData(doorData);
@@ -173,7 +174,7 @@ public:
                 case NPC_PHASE_HOUND:
                 case NPC_DREADBEAST:
                 case NPC_SHADOWBEAST:
-                    if (GetBossState(DATA_OPTIONAL_BOSS) == TO_BE_DECIDED)
+                    if (!GetPersistentData(DATA_SERVANT_QUARTERS_KILLED))
                     {
                         ++OptionalBossCount;
                         if (OptionalBossCount == OPTIONAL_BOSS_REQUIRED_DEATH_COUNT)
@@ -196,7 +197,7 @@ public:
                 case NPC_HYAKISS_THE_LURKER:
                 case NPC_SHADIKITH_THE_GLIDER:
                 case NPC_ROKAD_THE_RAVAGER:
-                    SetBossState(DATA_OPTIONAL_BOSS, DONE);
+                    StorePersistentData(DATA_SERVANT_QUARTERS_KILLED, 1);
                     instance->ToInstanceMap()->PermBindAllPlayers();
                     break;
                 default:
