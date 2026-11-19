@@ -10,3 +10,8 @@ Data-driven behaviour in the world DB's `smart_scripts` (engine: `src/server/gam
   gameobject sender — as action invoker, or (creature only) as condition target 0; `ACTION_DONE` passes none, so
   `ACTION_INVOKER` falls back to a stale last invoker — or when the receiver is a gameobject (no `ACTION_DONE` on
   gameobject SmartAI). A C++ AI receiver gets whichever of `SetData` / `DoAction` it implements.
+- Caster combat movement is cast flag 64 (`SMARTCAST_COMBAT_MOVE`) on the main spell's cast rows: the caster stands
+  while it casts and moves on range, OOM or LOS. Replace hand-scripted combat movement (`ALLOW_COMBAT_MOVEMENT`,
+  action 21, with phase rows keyed on mana or range) on sight when rewriting a block.
+- A timed self-buff is kept up by `UPDATE` (event 60) on a short timer with cast flag 32
+  (`SMARTCAST_AURA_NOT_PRESENT`), not by random out-of-combat recast timers.
