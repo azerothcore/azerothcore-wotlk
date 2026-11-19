@@ -189,6 +189,7 @@ enum NPCs
     NPC_BEASTS_COMBAT_STALKER                       = 36549,
     NPC_JARAXXUS                                    = 34780,
     NPC_MISTRESS_OF_PAIN                            = 34826,
+    NPC_FELFLAME_INFERNAL                           = 34815,
 
     NPC_PURPLE_GROUND                               = 35651,
     NPC_OPEN_PORTAL_TARGET                          = 17965,
@@ -231,6 +232,8 @@ enum NPCs
     NPC_DARKBANE                                    = 34496,
 
     NPC_ANUBARAK                                    = 34564,
+    NPC_SCARAB                                      = 34605,
+    NPC_BURROWER                                    = 34607,
 };
 
 enum GOs
