@@ -2,6 +2,57 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(lldb) Attach Worldserver",
+            "type": "lldb",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/env/dist/bin/worldserver",
+        },
+        {
+            "name": "(gdb) Attach Wordserver",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/env/dist/bin/worldserver",
+            "cwd": "${workspaceFolder}",
+            "args": [],
+            "environment": [],
+            "externalConsole": false,
+            // "sourceFileMap": {
+            // "/azerothcore": "${workspaceFolder}"
+            // },
+            "linux": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": false
+                    }
+                ]
+            }
+        },
+{
+    "name": "(gdb) Attach Worldserver (Remote)",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/env/dist/bin/worldserver",
+    "cwd": "${workspaceFolder}",
+    "args": [],
+    "environment": [],
+    "externalConsole": false,
+    "MIMode": "gdb",
+    "miDebuggerPath": "/usr/bin/gdb",
+    "miDebuggerServerAddress": "localhost:1235",
+    "setupCommands": [
+        {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": false
+        }
+    ]
+},
+        {
             "name": "Linux/Docker debug",
             "type": "cppdbg",
             "request": "launch",
@@ -38,7 +89,11 @@
                 "debuggerPath": "/usr/bin/gdb",
                 "pipeProgram": "docker compose",
                 "pipeArgs": [
-                    "exec", "-T", "ac-worldserver", "sh", "-c"
+                    "exec",
+                    "-T",
+                    "ac-worldserver",
+                    "sh",
+                    "-c"
                 ],
                 "pipeCwd": "${workspaceFolder}"
             },
