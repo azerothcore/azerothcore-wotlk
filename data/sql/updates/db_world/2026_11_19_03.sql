@@ -1,3 +1,4 @@
+-- DB update 2026_11_19_02 -> 2026_11_19_03
 
 -- Add Seer Nakha Spawn Point.
 DELETE FROM `creature` WHERE `id` = 23265 AND `guid` = 109724;
