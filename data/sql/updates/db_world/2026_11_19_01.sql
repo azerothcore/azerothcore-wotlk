@@ -1,3 +1,4 @@
+-- DB update 2026_11_19_00 -> 2026_11_19_01
 --
 -- Gerenzo's Orders (quest 1090): wave paths for the Windshear attackers
 DELETE FROM `waypoint_data` WHERE `id` IN (427601, 427602);
