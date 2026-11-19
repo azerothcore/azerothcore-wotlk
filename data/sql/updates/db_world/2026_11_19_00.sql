@@ -1,3 +1,4 @@
+-- DB update 2026_11_18_00 -> 2026_11_19_00
 --
 -- Add missing TextID entries
 DELETE FROM `gossip_menu` WHERE `MenuID` = 10614 AND `TextID` IN (14757, 15043);
