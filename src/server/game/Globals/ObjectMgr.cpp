@@ -3886,12 +3886,14 @@ void ObjectMgr::LoadItemTemplates()
                     sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].emplace(true, itemTemplate.Spells[i].SpellId);
             }
 
+        ++count;
+    } while (result->NextRow());
+
+    // built from the store so templates without an item.dbc entry, which skip the checks above, are included
+    for (auto const& [entry, itemTemplate] : _itemTemplateStore)
         for (_Spell const& spell : itemTemplate.Spells)
             if (spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE && spell.SpellId > 0)
                 _itemObtainSpells.insert(spell.SpellId);
-
-        ++count;
-    } while (result->NextRow());
 
     // pussywizard:
     {
