@@ -324,7 +324,7 @@ struct Loot
     ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
     ObjectGuid lootOwnerGUID;
     LootType loot_type{LOOT_NONE};      // required for achievement system
-    bool pendingCorpseRollCleanup{false}; // Consumed by the corpse on its map update.
+    bool pendingCorpseLootCleanup{false}; // Consumed by the corpse on its map update.
 
     // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
     ObjectGuid containerGUID;
@@ -363,7 +363,7 @@ struct Loot
         roundRobinPlayer.Clear();
         i_LootValidatorRefMgr.clearReferences();
         loot_type = LOOT_NONE;
-        pendingCorpseRollCleanup = false;
+        pendingCorpseLootCleanup = false;
     }
 
     [[nodiscard]] bool empty() const { return items.empty() && gold == 0; }

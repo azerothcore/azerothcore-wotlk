@@ -1848,7 +1848,7 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                 loot->sourceGameObject->SetLootState(GO_JUST_DEACTIVATED);
         }
         else if (hadLoot && loot->loot_type == LOOT_CORPSE && loot->sourceWorldObjectGUID.IsCreatureOrVehicle())
-            loot->pendingCorpseRollCleanup = true;
+            loot->pendingCorpseLootCleanup = true;
     }
 
     RollId.erase(rollI);

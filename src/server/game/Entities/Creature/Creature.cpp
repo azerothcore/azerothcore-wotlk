@@ -748,18 +748,15 @@ void Creature::Update(uint32 diff)
             if (m_deathState != DeathState::Corpse)
                 break;
 
-            if (loot.pendingCorpseRollCleanup)
+            if (loot.pendingCorpseLootCleanup)
             {
-                loot.pendingCorpseRollCleanup = false;
+                loot.pendingCorpseLootCleanup = false;
                 if (loot.loot_type == LOOT_CORPSE && loot.isLooted())
                 {
                     loot.CloseLootSessions(*this);
-                    if (HasDynamicFlag(UNIT_DYNFLAG_LOOTABLE))
-                    {
-                        AllLootRemovedFromCorpse();
-                        RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
-                        loot.clear();
-                    }
+                    AllLootRemovedFromCorpse();
+                    RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+                    loot.clear();
                 }
             }
 

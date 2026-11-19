@@ -459,7 +459,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         loot = &creature->loot;
         if (loot->isLooted())
         {
-            if (loot->pendingCorpseRollCleanup)
+            if (loot->pendingCorpseLootCleanup)
                 loot->CloseLootSessions(*creature);
 
             // skip pickpocketing loot for speed, skinning timer reduction is no-op in fact
@@ -586,4 +586,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     loot->NotifyItemRemoved(slotid);
     --loot->unlootedCount;
+
+    if (loot->isLooted() && loot->loot_type == LOOT_CORPSE && lootguid.IsCreatureOrVehicle())
+        loot->pendingCorpseLootCleanup = true;
 }
