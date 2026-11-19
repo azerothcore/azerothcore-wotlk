@@ -814,7 +814,13 @@ class spell_anubarak_shadow_strike : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        GetCaster()->CastSpell(GetHitUnit(), SPELL_SHADOW_STRIKE);
+        Unit* caster = GetCaster();
+        // A creature cast replaces the one in progress, so striking now would cancel a Submerge
+        // halfway and leave the burrower unselectable above ground.
+        if (caster->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || caster->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        caster->CastSpell(GetHitUnit(), SPELL_SHADOW_STRIKE);
     }
 
     void Register() override
