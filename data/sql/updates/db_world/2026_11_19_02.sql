@@ -1,3 +1,4 @@
+-- DB update 2026_11_19_01 -> 2026_11_19_02
 
 -- Add new conditions with boss state and delete the old ones.
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` IN (14, 15) AND `SourceGroup` = 7868;
