@@ -27,12 +27,12 @@ UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3854.93, `position_y`=3
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3734.68, `position_y`=3309.81, `position_z`=293.574, `orientation`=3.0369, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21644 AND `guid`=75533;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3727.73, `position_y`=3320.53, `position_z`=291.755, `orientation`=2.6878, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21644 AND `guid`=75534;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3840.9, `position_y`=3775.09, `position_z`=285.732, `orientation`=0.6632, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21644 AND `guid`=132778;
-UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3712.35, `position_y`=3710.6, `position_z`=277.875, `orientation`=4.486, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75563;
+UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3712.35, `position_y`=3710.6, `position_z`=277.875, `orientation`=4.486, `wander_distance`=3, `MovementType`=1, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75563;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3739.6, `position_y`=3748.64, `position_z`=273.822, `orientation`=0.0698, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75564;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3801.34, `position_y`=3785.97, `position_z`=275.574, `orientation`=1.5882, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75567;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4074.62, `position_y`=3411.43, `position_z`=296.01, `orientation`=2.1467, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75571;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4095.32, `position_y`=3349.39, `position_z`=285.753, `orientation`=0.0873, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75572;
-UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4179.07, `position_y`=3211.85, `position_z`=314.277, `orientation`=2.6015, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75574;
+UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4179.07, `position_y`=3211.85, `position_z`=314.277, `orientation`=2.6015, `wander_distance`=2, `MovementType`=1, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75574;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4095.24, `position_y`=3187.52, `position_z`=297.125, `orientation`=4.7298, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75576;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4173.23, `position_y`=3116.24, `position_z`=322.085, `orientation`=3.9199, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75579;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4110.59, `position_y`=3119.43, `position_z`=319.222, `orientation`=2.3038, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75581;
@@ -47,7 +47,7 @@ UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3958.68, `position_y`=3
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3945.96, `position_y`=3314.51, `position_z`=288.136, `orientation`=0.9599, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75592;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3874.46, `position_y`=3280.49, `position_z`=275.767, `orientation`=0.1396, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75593;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3674.94, `position_y`=3319.43, `position_z`=283.569, `orientation`=2.6005, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=75597;
-UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4194.8, `position_y`=3170.41, `position_z`=317.686, `orientation`=3.6568, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=132780;
+UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4194.8, `position_y`=3170.41, `position_z`=317.686, `orientation`=3.6568, `wander_distance`=3, `MovementType`=1, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21649 AND `guid`=132780;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3796.52, `position_y`=3751.35, `position_z`=278.421, `orientation`=2.6529, `wander_distance`=0, `MovementType`=2, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21650 AND `guid`=75603;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3685.11, `position_y`=3707.43, `position_z`=277.898, `orientation`=5.1313, `wander_distance`=0, `MovementType`=0, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21650 AND `guid`=75604;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3708.66, `position_y`=3783.71, `position_z`=270.607, `orientation`=5.2709, `wander_distance`=0, `MovementType`=2, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21650 AND `guid`=75605;
@@ -172,41 +172,39 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (756100, 2, -3925.668, 3125.6785, 328.9043, NULL, 0, 7400, 0, 0, 0, 100, 0),
 (756100, 3, -3917.2766, 3121.8152, 328.5911, NULL, 0, 1000, 0, 0, 0, 100, 0);
 
--- Guid SAI; DONT_OVERRIDE_ENTRY_SAI so the entry combat scripts keep loading beside it
+-- Guid SAI; DONT_OVERRIDE_ENTRY_SAI so the entry combat scripts keep loading beside it (guid ids from 1000)
 UPDATE `creature_template` SET `flags_extra`=`flags_extra`|0x08000000 WHERE `entry` IN (21649, 21650);
 DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (-75612, -75611, -75610, -75608, -75607, -75606, -75605, -75604, -75603, -75591, -75579, -75576, -75564, -75486, -75485, -75481, -75480, -75479, -75478, -75477);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-75612, 0, 0, 0, 1, 0, 100, 0, 0, 40000, 32000, 40000, 0, 0, 80, 2165002, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script'),
-(-75611, 0, 0, 0, 1, 0, 100, 0, 0, 40000, 32000, 40000, 0, 0, 80, 2165002, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script'),
-(-75610, 0, 0, 0, 108, 0, 100, 0, 2, 756100, 0, 0, 0, 0, 80, 7561002, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756100 Reached - Run Script'),
-(-75608, 0, 0, 0, 108, 0, 100, 0, 4, 756080, 0, 0, 0, 0, 80, 7560804, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 4 of Path 756080 Reached - Run Script'),
-(-75607, 0, 0, 0, 108, 0, 100, 0, 2, 756070, 0, 0, 0, 0, 80, 2165001, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756070 Reached - Run Script'),
-(-75606, 0, 0, 0, 108, 0, 100, 0, 2, 756060, 0, 0, 0, 0, 80, 7560602, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756060 Reached - Run Script'),
-(-75605, 0, 0, 0, 108, 0, 100, 0, 2, 756050, 0, 0, 0, 0, 80, 7560502, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756050 Reached - Run Script'),
-(-75604, 0, 0, 0, 1, 0, 100, 0, 0, 40000, 32000, 40000, 0, 0, 80, 2165002, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script'),
-(-75603, 0, 0, 0, 108, 0, 100, 0, 2, 756030, 0, 0, 0, 0, 80, 7560302, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756030 Reached - Run Script'),
-(-75591, 0, 0, 0, 1, 0, 100, 0, 0, 168000, 95000, 168000, 0, 0, 80, 2164901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
-(-75579, 0, 0, 0, 1, 0, 100, 0, 0, 38000, 30000, 38000, 0, 0, 80, 7557901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
-(-75576, 0, 0, 0, 1, 0, 100, 0, 3643, 6494, 3643, 6494, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Play Emote 1'),
-(-75564, 0, 0, 0, 1, 0, 100, 0, 0, 553000, 128000, 553000, 0, 0, 80, 2164901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
-(-75486, 0, 0, 0, 1, 0, 100, 0, 0, 203000, 51000, 203000, 0, 0, 80, 7548601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script'),
-(-75485, 0, 0, 0, 108, 0, 100, 0, 4, 754850, 0, 0, 0, 0, 80, 7548504, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 4 of Path 754850 Reached - Run Script'),
-(-75481, 0, 0, 0, 108, 0, 100, 0, 2, 754810, 0, 0, 0, 0, 80, 7548102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 754810 Reached - Run Script'),
-(-75480, 0, 0, 0, 108, 0, 100, 0, 2, 754800, 0, 0, 0, 0, 80, 2165001, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 754800 Reached - Run Script'),
-(-75479, 0, 0, 0, 108, 0, 100, 0, 7, 754790, 0, 0, 0, 0, 80, 7547907, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 7 of Path 754790 Reached - Run Script'),
-(-75478, 0, 0, 0, 108, 0, 100, 0, 2, 754780, 0, 0, 0, 0, 80, 7547802, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 754780 Reached - Run Script'),
-(-75477, 0, 0, 0, 1, 0, 100, 0, 0, 178000, 129000, 178000, 0, 0, 80, 7547701, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script');
-DELETE FROM `smart_scripts` WHERE `source_type`=9 AND `entryorguid` IN (2164901, 2165001, 2165002, 7547701, 7547802, 7547907, 7548102, 7548504, 7548601, 7557901, 7560302, 7560502, 7560602, 7560804, 7561002);
+(-75612, 0, 1000, 0, 1, 0, 100, 0, 0, 40000, 32000, 40000, 0, 0, 80, 2164902, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script'),
+(-75611, 0, 1000, 0, 1, 0, 100, 0, 0, 40000, 32000, 40000, 0, 0, 80, 2164902, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script'),
+(-75610, 0, 1000, 0, 108, 0, 100, 0, 2, 756100, 0, 0, 0, 0, 80, 7561002, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756100 Reached - Run Script'),
+(-75608, 0, 1000, 0, 108, 0, 100, 0, 4, 756080, 0, 0, 0, 0, 80, 7560804, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 4 of Path 756080 Reached - Run Script'),
+(-75607, 0, 1000, 0, 108, 0, 100, 0, 2, 756070, 0, 0, 0, 0, 80, 2165001, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756070 Reached - Run Script'),
+(-75606, 0, 1000, 0, 108, 0, 100, 0, 2, 756060, 0, 0, 0, 0, 80, 7560602, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756060 Reached - Run Script'),
+(-75605, 0, 1000, 0, 108, 0, 100, 0, 2, 756050, 0, 0, 0, 0, 80, 7560502, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756050 Reached - Run Script'),
+(-75604, 0, 1000, 0, 1, 0, 100, 0, 0, 40000, 32000, 40000, 0, 0, 80, 2164902, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script'),
+(-75603, 0, 1000, 0, 108, 0, 100, 0, 2, 756030, 0, 0, 0, 0, 80, 7560302, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 756030 Reached - Run Script'),
+(-75591, 0, 1000, 0, 1, 0, 100, 0, 0, 168000, 95000, 168000, 0, 0, 80, 2164901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
+(-75579, 0, 1000, 0, 1, 0, 100, 0, 0, 38000, 30000, 38000, 0, 0, 80, 2164902, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
+(-75576, 0, 1000, 0, 1, 0, 100, 0, 3643, 6494, 3643, 6494, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Play Emote 1'),
+(-75564, 0, 1000, 0, 1, 0, 100, 0, 0, 553000, 128000, 553000, 0, 0, 80, 2164901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
+(-75486, 0, 1000, 0, 1, 0, 100, 0, 0, 203000, 51000, 203000, 0, 0, 80, 7548601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script'),
+(-75485, 0, 1000, 0, 108, 0, 100, 0, 4, 754850, 0, 0, 0, 0, 80, 7548504, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 4 of Path 754850 Reached - Run Script'),
+(-75481, 0, 1000, 0, 108, 0, 100, 0, 2, 754810, 0, 0, 0, 0, 80, 7548102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 754810 Reached - Run Script'),
+(-75480, 0, 1000, 0, 108, 0, 100, 0, 2, 754800, 0, 0, 0, 0, 80, 2165001, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 754800 Reached - Run Script'),
+(-75479, 0, 1000, 0, 108, 0, 100, 0, 7, 754790, 0, 0, 0, 0, 80, 7547907, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 7 of Path 754790 Reached - Run Script'),
+(-75478, 0, 1000, 0, 108, 0, 100, 0, 2, 754780, 0, 0, 0, 0, 80, 7547802, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - On Point 2 of Path 754780 Reached - Run Script'),
+(-75477, 0, 1000, 0, 1, 0, 100, 0, 0, 178000, 129000, 178000, 0, 0, 80, 2164901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Out of Combat - Run Script');
+DELETE FROM `smart_scripts` WHERE `source_type`=9 AND `entryorguid` IN (2164901, 2164902, 2165001, 7547802, 7547907, 7548102, 7548504, 7548601, 7560302, 7560502, 7560602, 7560804, 7561002);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2164901, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Set Emote State 69'),
-(2164901, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Set Emote State 0'),
+(2164901, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Set Emote State 69'),
+(2164901, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Set Emote State 0'),
+(2164902, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Remove Bytes1 8 (Stand)'),
+(2164902, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 5, 61, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Play Emote 61'),
+(2164902, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Set Bytes1 8 (Kneel)'),
 (2165001, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 69'),
 (2165001, 9, 1, 0, 0, 0, 100, 0, 6300, 6300, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 0'),
-(2165002, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Remove Bytes1 8 (Stand)'),
-(2165002, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 5, 61, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Play Emote 61'),
-(2165002, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Bytes1 8 (Kneel)'),
-(7547701, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 69'),
-(7547701, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 0'),
 (7547802, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 69'),
 (7547802, 9, 1, 0, 0, 0, 100, 0, 6600, 6600, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 0'),
 (7547907, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 69'),
@@ -217,9 +215,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (7548504, 9, 1, 0, 0, 0, 100, 0, 7700, 7700, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Remove Bytes1 8 (Kneel)'),
 (7548601, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 69'),
 (7548601, 9, 1, 0, 0, 0, 100, 0, 27000, 27000, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 0'),
-(7557901, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Remove Bytes1 8 (Stand)'),
-(7557901, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 5, 61, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Play Emote 61'),
-(7557901, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Set Bytes1 8 (Kneel)'),
 (7560302, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 69'),
 (7560302, 9, 1, 0, 0, 0, 100, 0, 6800, 6800, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 0'),
 (7560502, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 69, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Talonite - Actionlist - Set Emote State 69'),
@@ -369,11 +364,6 @@ UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3876.89, `position_y`=3
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3967.03, `position_y`=3204.66, `position_z`=334.124, `orientation`=4.2682, `wander_distance`=0, `MovementType`=2, `VerifiedBuild`=55141, `CreateObject`=2 WHERE `id`=21911 AND `guid`=132840;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-3848.12, `position_y`=3418.07, `position_z`=324.521, `orientation`=0.4073, `wander_distance`=0, `MovementType`=2, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21911 AND `guid`=132841;
 UPDATE `creature` SET `spawntimesecs`=300, `position_x`=-4166.77, `position_y`=3162.57, `position_z`=316.658, `orientation`=6.0343, `wander_distance`=5, `MovementType`=1, `VerifiedBuild`=52237, `CreateObject`=2 WHERE `id`=21911 AND `guid`=132842;
-
--- Skettis Windwalkers left standing above: wander, and two walk to a Kneel Target to channel
-UPDATE `creature` SET `spawntimesecs`=300, `wander_distance`=3, `MovementType`=1 WHERE `id`=21649 AND `guid`=75563;
-UPDATE `creature` SET `spawntimesecs`=300, `wander_distance`=2, `MovementType`=1 WHERE `id`=21649 AND `guid`=75574;
-UPDATE `creature` SET `spawntimesecs`=300, `wander_distance`=3, `MovementType`=1 WHERE `id`=21649 AND `guid`=132780;
 
 -- Missing spawns
 DELETE FROM `creature` WHERE `id`=21911 AND `guid` IN (75492, 75493, 75494, 75495, 75496, 75497, 75499, 75500, 75501, 75502, 75503, 75504, 75505, 75506);
@@ -877,9 +867,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (1328410, 12, -3837.9353, 3431.9197, 325.0981, NULL, 0, 0, 0, 0, 0, 100, 0);
 
 -- Entry SAI: Reaver spawn visual (every sniffed spawn, 44/44 CO2, casts 24240 as it appears); Reaver and High
--- Priest idle casts, picked by UNIT_STATE_ROAMING (wanderers kneel and shout / keep up 16592, statics keep up
--- Battle Shout / 41912); unroot on aggro for the creatures whose idle actionlists root them. Soulcaller combat
--- movement is cast flag 64 on Shadow Bolt.
+-- Priest casts, picked by UNIT_STATE_ROAMING: wanderers kneel and shout out of combat and keep up 16592, statics
+-- keep up Battle Shout / 41912 (buffs kept up in and out of combat); unroot on aggro for the creatures whose idle
+-- actionlists root them. Soulcaller combat movement is cast flag 64 on Shadow Bolt.
 DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (21649, 21651, 21787, 21911);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (21649, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 0, 0, 11, 13901, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - On Aggro - Cast ''Arcane Bolt'' (No Repeat)'),
@@ -910,78 +900,82 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 6, 21651, 0, 0, 21, 1, 16, 0, 0, 1, 0, 0, '', 'Time-Lost Skettis Reaver - Object doesn''t have unit state UNIT_STATE_ROAMING'),
 (22, 4, 21787, 0, 0, 21, 1, 16, 0, 0, 0, 0, 0, '', 'Time-Lost Skettis High Priest - Object has unit state UNIT_STATE_ROAMING'),
 (22, 5, 21787, 0, 0, 21, 1, 16, 0, 0, 1, 0, 0, '', 'Time-Lost Skettis High Priest - Object doesn''t have unit state UNIT_STATE_ROAMING');
--- Guid SAI; DONT_OVERRIDE_ENTRY_SAI so the entry combat scripts keep loading beside it
+-- Guid SAI; DONT_OVERRIDE_ENTRY_SAI so the entry combat scripts keep loading beside it (guid ids from 1000)
 UPDATE `creature_template` SET `flags_extra`=`flags_extra`|0x08000000 WHERE `entry` IN (21649, 21911);
 DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (-132842, -132841, -132840, -132839, -132780, -76676, -76675, -76674, -76673, -76672, -76671, -76670, -76669, -76668, -76667, -76666, -76665, -76664, -76663, -76662, -76661, -76660, -76659, -76658, -76657, -76656, -75574, -75506, -75505, -75504, -75503, -75502, -75501, -75500, -75499, -75497, -75496, -75495, -75494, -75493, -75492);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-132842, 0, 0, 0, 1, 0, 100, 0, 5000, 58300, 35600, 58300, 0, 0, 80, 2191106, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-132842, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-132841, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-132840, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-132839, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-132780, 0, 0, 0, 1, 0, 100, 0, 5000, 59500, 35600, 59500, 0, 0, 80, 13278001, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
-(-132780, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164902, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - On Point 1 Reached - Run Script'),
-(-76676, 0, 0, 0, 1, 0, 100, 0, 5000, 58300, 39300, 58300, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76676, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76675, 0, 0, 0, 1, 0, 100, 0, 5000, 58300, 37200, 58300, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76675, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76674, 0, 0, 0, 1, 0, 100, 0, 5000, 59900, 38800, 59900, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76674, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76673, 0, 0, 0, 1, 0, 100, 0, 5000, 56300, 40500, 56300, 0, 0, 80, 2191106, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76673, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76672, 0, 0, 0, 108, 0, 100, 0, 5, 766720, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 5 of Path 766720 Reached - Run Script'),
-(-76671, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76670, 0, 0, 0, 1, 0, 100, 0, 5000, 56600, 32000, 56600, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76670, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76669, 0, 0, 0, 108, 0, 100, 0, 1, 766690, 0, 0, 0, 0, 80, 7666901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 of Path 766690 Reached - Run Script'),
-(-76669, 0, 1, 0, 108, 0, 100, 0, 2, 766690, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 766690 Reached - Run Script'),
-(-76668, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76667, 0, 0, 0, 108, 0, 100, 0, 3, 766670, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 3 of Path 766670 Reached - Run Script'),
-(-76666, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76665, 0, 0, 0, 1, 0, 100, 0, 5000, 82600, 46900, 82600, 0, 0, 80, 2191106, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76665, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76664, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76663, 0, 0, 0, 108, 0, 100, 0, 1, 766630, 0, 0, 0, 0, 80, 2191107, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 of Path 766630 Reached - Run Script'),
-(-76663, 0, 1, 0, 108, 0, 100, 0, 2, 766630, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 766630 Reached - Run Script'),
-(-76662, 0, 0, 0, 1, 0, 100, 0, 5000, 77800, 49100, 77800, 0, 0, 80, 2191105, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76662, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76661, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76660, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76659, 0, 0, 0, 1, 0, 100, 0, 5000, 65600, 41600, 65600, 0, 0, 80, 2191106, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76659, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76658, 0, 0, 0, 1, 0, 100, 0, 5000, 95600, 74500, 95600, 0, 0, 80, 2191106, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76658, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76657, 0, 0, 0, 1, 0, 100, 0, 5000, 53300, 35700, 53300, 0, 0, 80, 2191105, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-76657, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-76656, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75574, 0, 0, 0, 1, 0, 100, 0, 5000, 49400, 39400, 49400, 0, 0, 80, 7557401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
-(-75574, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164902, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - On Point 1 Reached - Run Script'),
-(-75506, 0, 0, 0, 1, 0, 100, 0, 5000, 74100, 55100, 74100, 0, 0, 80, 2191106, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75506, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-75505, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75504, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75503, 0, 0, 0, 108, 0, 100, 0, 1, 755030, 0, 0, 0, 0, 80, 2191107, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 of Path 755030 Reached - Run Script'),
-(-75503, 0, 1, 0, 108, 0, 100, 0, 2, 755030, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 755030 Reached - Run Script'),
-(-75502, 0, 0, 0, 108, 0, 100, 0, 2, 755020, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 755020 Reached - Run Script'),
-(-75501, 0, 0, 0, 1, 0, 100, 0, 5000, 84200, 53400, 84200, 0, 0, 80, 2191106, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75501, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-75500, 0, 0, 0, 1, 0, 100, 0, 5000, 84200, 51800, 84200, 0, 0, 80, 2191105, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75500, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-75499, 0, 0, 0, 108, 0, 100, 0, 1, 754990, 0, 0, 0, 0, 80, 7549901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 of Path 754990 Reached - Run Script'),
-(-75497, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75496, 0, 0, 0, 108, 0, 100, 0, 2, 754960, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 754960 Reached - Run Script'),
-(-75495, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75494, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75493, 0, 0, 0, 1, 0, 100, 0, 5000, 92400, 52100, 92400, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
-(-75493, 0, 1, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
-(-75492, 0, 0, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script');
-DELETE FROM `smart_scripts` WHERE `source_type`=9 AND `entryorguid` IN (2164902, 2165101, 2191101, 2191102, 2191103, 2191104, 2191105, 2191106, 2191107, 7549901, 7557401, 7666901, 13278001);
+(-132842, 0, 1000, 0, 1, 0, 100, 0, 5000, 58300, 35600, 58300, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-132842, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-132841, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-132840, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-132839, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-132780, 0, 1000, 0, 1, 0, 100, 0, 5000, 59500, 35600, 59500, 0, 0, 80, 2164905, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
+(-132780, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - On Point 1 Reached - Run Script'),
+(-76676, 0, 1000, 0, 1, 0, 100, 0, 5000, 58300, 39300, 58300, 0, 0, 80, 2164905, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76676, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76675, 0, 1000, 0, 1, 0, 100, 0, 5000, 58300, 37200, 58300, 0, 0, 80, 2164903, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76675, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76674, 0, 1000, 0, 1, 0, 100, 0, 5000, 59900, 38800, 59900, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76674, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76673, 0, 1000, 0, 1, 0, 100, 0, 5000, 56300, 40500, 56300, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76673, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76672, 0, 1000, 0, 108, 0, 100, 0, 5, 766720, 0, 0, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 5 of Path 766720 Reached - Run Script'),
+(-76671, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76670, 0, 1000, 0, 1, 0, 100, 0, 5000, 56600, 32000, 56600, 0, 0, 80, 2164903, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76670, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76669, 0, 1000, 0, 108, 0, 100, 0, 1, 766690, 0, 0, 0, 0, 80, 7666901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 of Path 766690 Reached - Run Script'),
+(-76669, 0, 1001, 0, 108, 0, 100, 0, 2, 766690, 0, 0, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 766690 Reached - Run Script'),
+(-76668, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76667, 0, 1000, 0, 108, 0, 100, 0, 3, 766670, 0, 0, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 3 of Path 766670 Reached - Run Script'),
+(-76666, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76665, 0, 1000, 0, 1, 0, 100, 0, 5000, 82600, 46900, 82600, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76665, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76664, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76663, 0, 1000, 0, 108, 0, 100, 0, 1, 766630, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 of Path 766630 Reached - Run Script'),
+(-76663, 0, 1001, 0, 108, 0, 100, 0, 2, 766630, 0, 0, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 766630 Reached - Run Script'),
+(-76662, 0, 1000, 0, 1, 0, 100, 0, 5000, 77800, 49100, 77800, 0, 0, 80, 2164905, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76662, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76661, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76660, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76659, 0, 1000, 0, 1, 0, 100, 0, 5000, 65600, 41600, 65600, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76659, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76658, 0, 1000, 0, 1, 0, 100, 0, 5000, 95600, 74500, 95600, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76658, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76657, 0, 1000, 0, 1, 0, 100, 0, 5000, 53300, 35700, 53300, 0, 0, 80, 2164905, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-76657, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-76656, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75574, 0, 1000, 0, 1, 0, 100, 0, 5000, 49400, 39400, 49400, 0, 0, 80, 2164903, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Out of Combat - Run Script'),
+(-75574, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - On Point 1 Reached - Run Script'),
+(-75506, 0, 1000, 0, 1, 0, 100, 0, 5000, 74100, 55100, 74100, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75506, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-75505, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75504, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75503, 0, 1000, 0, 108, 0, 100, 0, 1, 755030, 0, 0, 0, 0, 80, 2191104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 of Path 755030 Reached - Run Script'),
+(-75503, 0, 1001, 0, 108, 0, 100, 0, 2, 755030, 0, 0, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 755030 Reached - Run Script'),
+(-75502, 0, 1000, 0, 108, 0, 100, 0, 2, 755020, 0, 0, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 755020 Reached - Run Script'),
+(-75501, 0, 1000, 0, 1, 0, 100, 0, 5000, 84200, 53400, 84200, 0, 0, 80, 2191103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75501, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-75500, 0, 1000, 0, 1, 0, 100, 0, 5000, 84200, 51800, 84200, 0, 0, 80, 2164905, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75500, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-75499, 0, 1000, 0, 108, 0, 100, 0, 1, 754990, 0, 0, 0, 0, 80, 7549901, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 of Path 754990 Reached - Run Script'),
+(-75497, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75496, 0, 1000, 0, 108, 0, 100, 0, 2, 754960, 0, 0, 0, 0, 80, 2191102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 2 of Path 754960 Reached - Run Script'),
+(-75495, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75494, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75493, 0, 1000, 0, 1, 0, 100, 0, 5000, 92400, 52100, 92400, 0, 0, 80, 2164903, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script'),
+(-75493, 0, 1001, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2164904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - On Point 1 Reached - Run Script'),
+(-75492, 0, 1000, 0, 1, 0, 100, 0, 30000, 200000, 100000, 200000, 0, 0, 80, 2191101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Out of Combat - Run Script');
+DELETE FROM `smart_scripts` WHERE `source_type`=9 AND `entryorguid` IN (2164903, 2164904, 2164905, 2165101, 2191101, 2191102, 2191103, 2191104, 7549901, 7666901);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2164902, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Set Rooted On'),
-(2164902, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 21794, 20, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Set Orientation Closest Creature ''Skettis Arakkoa Spell Origin 01'''),
-(2164902, 9, 2, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 0, 11, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Cast ''Arakkoa Channeling (no duration)'''),
-(2164902, 9, 3, 0, 0, 0, 100, 0, 9700, 9700, 0, 0, 0, 0, 28, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Remove Aura ''Arakkoa Channeling (no duration)'''),
-(2164902, 9, 4, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Set Rooted Off'),
+(2164903, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Set Run Off'),
+(2164903, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 19, 21791, 58, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Move To Closest Creature ''Skettis Kneel Target 01'''),
+(2164904, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Set Rooted On'),
+(2164904, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 21794, 20, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Set Orientation Closest Creature ''Skettis Arakkoa Spell Origin 01'''),
+(2164904, 9, 2, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 0, 11, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Cast ''Arakkoa Channeling (no duration)'''),
+(2164904, 9, 3, 0, 0, 0, 100, 0, 9700, 9700, 0, 0, 0, 0, 28, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Remove Aura ''Arakkoa Channeling (no duration)'''),
+(2164904, 9, 4, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Set Rooted Off'),
+(2164905, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Set Run Off'),
+(2164905, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 19, 21792, 58, 0, 0, 0, 0, 0, 0, 'Skettis NPC - Actionlist - Move To Closest Creature ''Skettis Kneel Target 02'''),
 (2165101, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Time-Lost Skettis Reaver - Actionlist - Set Rooted On'),
 (2165101, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Time-Lost Skettis Reaver - Actionlist - Set Bytes1 8 (Kneel)'),
 (2165101, 9, 2, 0, 0, 0, 100, 0, 19500, 19500, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Time-Lost Skettis Reaver - Actionlist - Remove Bytes1 8 (Kneel)'),
@@ -990,29 +984,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2191101, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 235, 9700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Pause Movement'),
 (2191101, 9, 1, 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
 (2191101, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
-(2191102, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Set Run Off'),
-(2191102, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 19, 21791, 58, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Move To Closest Creature ''Skettis Kneel Target 01'''),
-(2191103, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Set Rooted On'),
-(2191103, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 21794, 20, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Set Orientation Closest Creature ''Skettis Arakkoa Spell Origin 01'''),
-(2191103, 9, 2, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 0, 11, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Cast ''Arakkoa Channeling (no duration)'''),
-(2191103, 9, 3, 0, 0, 0, 100, 0, 9700, 9700, 0, 0, 0, 0, 28, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Remove Aura ''Arakkoa Channeling (no duration)'''),
-(2191103, 9, 4, 0, 0, 0, 100, 0, 1500, 1500, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Set Rooted Off'),
-(2191104, 9, 0, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 0, 11, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Cast ''Arakkoa Channeling (no duration)'''),
-(2191104, 9, 1, 0, 0, 0, 100, 0, 9700, 9700, 0, 0, 0, 0, 28, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Remove Aura ''Arakkoa Channeling (no duration)'''),
-(2191105, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Set Run Off'),
-(2191105, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 19, 21792, 58, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Move To Closest Creature ''Skettis Kneel Target 02'''),
-(2191106, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Set Run Off'),
-(2191106, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 19, 21793, 58, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Move To Closest Creature ''Skettis Kneel Target 03'''),
-(2191107, 9, 0, 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
-(2191107, 9, 1, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
+(2191102, 9, 0, 0, 0, 0, 100, 0, 1400, 1400, 0, 0, 0, 0, 11, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Cast ''Arakkoa Channeling (no duration)'''),
+(2191102, 9, 1, 0, 0, 0, 100, 0, 9700, 9700, 0, 0, 0, 0, 28, 37679, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Remove Aura ''Arakkoa Channeling (no duration)'''),
+(2191103, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Set Run Off'),
+(2191103, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 19, 21793, 58, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Move To Closest Creature ''Skettis Kneel Target 03'''),
+(2191104, 9, 0, 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
+(2191104, 9, 1, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
 (7549901, 9, 0, 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 5, 61, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 61'),
-(7557401, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Set Run Off'),
-(7557401, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 19, 21791, 58, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Move To Closest Creature ''Skettis Kneel Target 01'''),
 (7666901, 9, 0, 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
 (7666901, 9, 1, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
-(7666901, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1'),
-(13278001, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Set Run Off'),
-(13278001, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 1, 0, 0, 19, 21792, 58, 0, 0, 0, 0, 0, 0, 'Skettis Windwalker - Actionlist - Move To Closest Creature ''Skettis Kneel Target 02''');
+(7666901, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skettis Soulcaller - Actionlist - Play Emote 1');
 
 -- Skettis: Skettis Surger, Blackwind Warp Chaser and Blackwind Sabercat spawns
 -- (#19517), from 89 sniffs over the area (63 WotLK Classic 3.4.x; Retail, Cata Classic 4.4.0, TBC, MoP).
