@@ -17,3 +17,8 @@ Data-driven behaviour in the world DB's `smart_scripts` (engine: `src/server/gam
   row with that `id`, so number the guid rows clear of the entry script's (from 1000).
 - `TALK` (action 1) to a creature target (not a pet): `action_param3` = 0 makes the target speak its own line; 1 has
   the script owner speak, with the target as `$n`. Target `SELF` with 0 makes the last invoker `$n`.
+- Caster combat movement is cast flag 64 (`SMARTCAST_COMBAT_MOVE`) on the main spell's cast rows: the caster stands
+  while it casts and moves on range, OOM or LOS. Replace hand-scripted combat movement (`ALLOW_COMBAT_MOVEMENT`,
+  action 21, with phase rows keyed on mana or range) on sight when rewriting a block.
+- A timed self-buff is kept up by `UPDATE` (event 60) on a short timer with cast flag 32
+  (`SMARTCAST_AURA_NOT_PRESENT`), not by random out-of-combat recast timers.
