@@ -57,7 +57,7 @@ func guidEntry(guid uint64) uint32 {
 }
 
 // pullAnubarak spawns a temp Anub'arak in his chamber and pulls him onto the bot, which leaves GM
-// mode but stays in god mode so it survives until a test kills it.
+// mode but stays in god mode so it survives the fight.
 func pullAnubarak(t *testing.T, bot *e2eharness.ScenarioBot) (boss uint64, pulledAt time.Time) {
 	t.Helper()
 
