@@ -1,3 +1,4 @@
+-- DB update 2026_11_19_03 -> 2026_11_19_04
 -- creature_template levels from WotLK Classic sniffs (seen on CreateObject; creatures the sniffs show as summoned
 -- are excluded)
 -- Level outside the sniffed range
