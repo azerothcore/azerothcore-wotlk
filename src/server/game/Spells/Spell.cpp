@@ -2405,7 +2405,8 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     if (checkIfValid)
     {
-        SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit);
+        SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit,
+            m_triggeredByAuraSpell ? m_originalCaster : nullptr);
         if (res != SPELL_CAST_OK)
             return;
     }
@@ -6108,7 +6109,8 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
     if (Unit* target = m_targets.GetUnitTarget())
     {
-        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false);
+        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false,
+            m_triggeredByAuraSpell ? m_originalCaster : nullptr);
         if (castResult != SPELL_CAST_OK)
             return castResult;
 
@@ -6121,6 +6123,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             // Target must be facing you
             if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), unitCaster))
                 return SPELL_FAILED_NOT_INFRONT;
+
+            // A unit riding a player sits on their back (Gormok's Snobold Vassals), out of reach of their targeted harmful spells
+            if (unitCaster && unitCaster->IsPlayer() && target->GetVehicleBase() == unitCaster && !m_spellInfo->IsPositive())
+                return SPELL_FAILED_BAD_TARGETS;
 
             // Ignore LOS for gameobject casts: one has no collision height, so the ray would start on its floor
             // position, which the floor under a player standing on it can block. CheckEffectTarget still checks

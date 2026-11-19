@@ -77,6 +77,18 @@ namespace
         float _range;
         Acore::WorldObjectSpellTargetCheck _spellCheck;
     };
+
+    // A ritual result that puts a gameobject at its caster's spot belongs on the ritual object itself: the spell
+    // places it at "the caster", and the right caster is the ritual object, not its owner.
+    bool IsCastByRitualObject(SpellInfo const* spellInfo)
+    {
+        for (SpellEffectInfo const& spellEffectInfo : spellInfo->GetEffects())
+            if (spellEffectInfo.IsEffect(SPELL_EFFECT_TRANS_DOOR)
+                && spellEffectInfo.TargetA.GetTarget() == TARGET_DEST_CASTER)
+                return true;
+
+        return false;
+    }
 }
 
 bool QuaternionData::IsUnit() const
@@ -657,7 +669,12 @@ void GameObject::Update(uint32 diff)
                                 SetLootState(GO_READY);
 
                             ClearRitualList();
-                            spellCaster->CastSpell(spellCaster, spellId, true);
+
+                            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                            if (spellInfo && IsCastByRitualObject(spellInfo))
+                                CastSpell(nullptr, spellInfo, CastSpellExtraArgs(spellCaster->GetGUID()));
+                            else
+                                spellCaster->CastSpell(spellCaster, spellId, true);
                             return;
                         }
                     case GAMEOBJECT_TYPE_CHEST:

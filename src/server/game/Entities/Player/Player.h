@@ -2242,6 +2242,7 @@ public:
     void CastAllObtainSpells();
     void ApplyItemObtainSpells(Item* item, bool apply);
     void UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot);
+    void RemoveOrphanedItemObtainSpells();
 
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
@@ -2386,6 +2387,7 @@ public:
     {
         m_lastFallTime = time;
         m_lastFallZ = z;
+        m_lastFallFromClient = false;
     }
     void HandleFall(MovementInfo const& movementInfo);
 
@@ -2688,6 +2690,11 @@ public:
 
     uint32 GetPendingFlightChange() const { return _pendingFlightChangeCounter; }
     void SetPendingFlightChange(uint32 counter) { _pendingFlightChangeCounter = counter; }
+
+    [[nodiscard]] Optional<bool> GetPendingCanFlyResync() const { return _pendingCanFlyResync; }
+    void SetPendingCanFlyResync(bool enable) { _pendingCanFlyResync = enable; }
+    void ClearPendingCanFlyResync() { _pendingCanFlyResync.reset(); }
+    void ResyncCanFlyToClient();
 
     void SetMapChangeOrderCounter() { _mapChangeOrderCounter = GetSession()->GetOrderCounter(); }
     uint32 GetMapChangeOrderCounter() { return _mapChangeOrderCounter; }
@@ -3024,6 +3031,7 @@ private:
 
     uint32 m_lastFallTime;
     float  m_lastFallZ;
+    bool   m_lastFallFromClient;
 
     int32 m_MirrorTimer[MAX_TIMERS];
     uint8 m_MirrorTimerFlags;
@@ -3081,6 +3089,7 @@ private:
 
     bool _expectingChangeTransport;
     uint32 _pendingFlightChangeCounter;
+    Optional<bool> _pendingCanFlyResync = { };
     uint32 _mapChangeOrderCounter;
 };
 

@@ -42,6 +42,7 @@ enum Spells
     SPELL_PHASE_PUNCH                   = 64412,
     SPELL_BIG_BANG                      = 64443,
     SPELL_ASCEND_TO_THE_HEAVENS         = 64487,
+    SPELL_BERSERK                       = 47008,
     SPELL_COSMIC_SMASH                  = 62301,
     SPELL_COSMIC_SMASH_TRIGGERED        = 62304,
     SPELL_COSMIC_SMASH_VISUAL_STATE     = 62300,
@@ -152,6 +153,8 @@ enum Events
     EVENT_DESPAWN_ALGALON_3         = 39,
     EVENT_DESPAWN_ALGALON_4         = 40,
     EVENT_DESPAWN_ALGALON_5         = 41,
+    EVENT_ENRAGE                    = 46,
+    EVENT_ANNIHILATE_RAID           = 47,
 
     EVENT_INTRO_CHANNEL             = 42,
     EVENT_INTRO_SUMMON              = 43,
@@ -191,7 +194,7 @@ enum Texts
     EMOTE_ALGALON_COLLAPSING_STAR   = 6,
     SAY_ALGALON_BIG_BANG            = 7,
     EMOTE_ALGALON_BIG_BANG          = 8,
-    SAY_ALGALON_ASCEND              = 9,
+    SAY_ALGALON_OUT_OF_TIME         = 9,
     EMOTE_ALGALON_COSMIC_SMASH      = 10,
     SAY_ALGALON_PHASE_TWO           = 11,
     SAY_ALGALON_OUTRO_1             = 12,
@@ -456,6 +459,11 @@ struct boss_algalon_the_observer : public ScriptedAI
                     break;
                 }
             case ACTION_DESPAWN_ALGALON:
+            {
+                if (_fightWon)
+                    return;
+
+                bool pulledInCombat = me->IsInCombat();
                 _fightWon = true;
                 events.Reset();
                 summons.DespawnAll();
@@ -463,7 +471,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 events.ScheduleEvent(EVENT_DESPAWN_ALGALON_1, 5s);
                 events.ScheduleEvent(EVENT_DESPAWN_ALGALON_2, 17s);
                 events.ScheduleEvent(EVENT_DESPAWN_ALGALON_3, 26s);
-                if (me->IsInCombat())
+                if (pulledInCombat)
                     events.ScheduleEvent(EVENT_DESPAWN_ALGALON_4, 26s);
                 events.ScheduleEvent(EVENT_DESPAWN_ALGALON_5, 32s);
                 me->DespawnOrUnsummon(39s);
@@ -473,9 +481,12 @@ struct boss_algalon_the_observer : public ScriptedAI
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->InterruptNonMeleeSpells(false);
+                if (pulledInCombat)
+                    Talk(SAY_ALGALON_OUT_OF_TIME);
                 if (_instance)
                     _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
                 break;
+            }
             case ACTION_INIT_ALGALON:
                 _firstPull = false;
                 _fedOnTears = false;
@@ -538,7 +549,8 @@ struct boss_algalon_the_observer : public ScriptedAI
         events.ScheduleEvent(EVENT_COSMIC_SMASH, 26s + introDelay, GROUP_COMBAT);
         events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 60s + introDelay);
         events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
-        events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
+        events.ScheduleEvent(EVENT_ENRAGE, 360s + introDelay);
+        events.ScheduleEvent(EVENT_ANNIHILATE_RAID, 480s + introDelay);
         events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
         DoCheckHeraldOfTheTitans();
     }
@@ -772,9 +784,15 @@ struct boss_algalon_the_observer : public ScriptedAI
                 me->SetCombatMovement(true);
                 me->ResumeChasingVictim();
                 break;
+            case EVENT_ENRAGE:
+                DoCastSelf(SPELL_BERSERK, true);
+                Talk(SAY_ALGALON_OUT_OF_TIME);
+                break;
+            case EVENT_ANNIHILATE_RAID:
+                DoAction(ACTION_ASCEND);
+                break;
             case EVENT_ASCEND_TO_THE_HEAVENS:
-                Talk(SAY_ALGALON_ASCEND);
-                me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
+                DoCastAOE(SPELL_ASCEND_TO_THE_HEAVENS);
                 events.ScheduleEvent(EVENT_EVADE, 2500ms);
                 events.CancelEvent(EVENT_RESUME_UPDATING);
                 me->SetCombatMovement(true);

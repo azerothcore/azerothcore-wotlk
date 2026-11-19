@@ -296,7 +296,6 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
     : _actor(actor), _actionTarget(actionTarget), _procTarget(procTarget), _typeMask(typeMask), _spellTypeMask(spellTypeMask), _spellPhaseMask(spellPhaseMask),
       _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell), _procAuraEffectIndex(procAuraEffectIndex)
 {
-    _chance.reset();
 }
 
 SpellInfo const* ProcEventInfo::GetSpellInfo() const
@@ -1089,26 +1088,19 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             bool const hasSharedDamage = shareDamage != 0;
 
             uint32 shareAbsorb = 0;
-            uint32 shareResist = 0;
 
+            // The copy is already mitigated on the victim, so it skips the recipient's absorbs and resists
             if (shareDamageTarget->IsImmunedToDamageOrSchool(damageSchoolMask))
             {
                 shareAbsorb = shareDamage;
                 shareDamage = 0;
             }
             else
-            {
-                DamageInfo sharedDamageInfo(attacker, shareDamageTarget, shareDamage, spellProto, damageSchoolMask, damagetype);
-                Unit::CalcAbsorbResist(sharedDamageInfo, true);
-                shareAbsorb = sharedDamageInfo.GetAbsorb();
-                shareResist = sharedDamageInfo.GetResist();
-                shareDamage = sharedDamageInfo.GetDamage();
                 Unit::DealDamageMods(shareDamageTarget, shareDamage, &shareAbsorb);
-            }
 
             if (attacker && shareDamageTarget->IsPlayer())
             {
-                attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, shareResist, damagetype == DIRECT_DAMAGE, 0, false, true);
+                attacker->SendSpellNonMeleeDamageLog(shareDamageTarget, spell, shareDamage, damageSchoolMask, shareAbsorb, 0, damagetype == DIRECT_DAMAGE, 0, false, true);
             }
 
             // Shared damage is a hostile interaction for its recipient too.
@@ -14255,6 +14247,9 @@ void Unit::SetFeared(bool apply, Unit* fearedBy /*= nullptr*/, bool isFear /*= f
             m_movedByPlayer->ToPlayer()->SetClientControl(this, !apply); // verified
         //else
         //  ToPlayer()->SetClientControl(this, !apply);
+
+        if (!apply)
+            ToPlayer()->ResyncCanFlyToClient();
     }
 }
 
@@ -14287,6 +14282,9 @@ void Unit::SetConfused(bool apply)
             m_movedByPlayer->ToPlayer()->SetClientControl(this, !apply); // verified
         //else
         //  ToPlayer()->SetClientControl(this, !apply);
+
+        if (!apply)
+            ToPlayer()->ResyncCanFlyToClient();
     }
 }
 
@@ -16263,6 +16261,15 @@ bool Unit::SetSwim(bool enable)
 void Unit::SetCanFly(bool enable)
 {
     bool isClientControlled = IsClientControlled();
+
+    // The owning client ignores the spline packet for its own mover, so replay it once Fear/Confuse ends
+    if (Player* player = ToPlayer())
+    {
+        if (isClientControlled)
+            player->ClearPendingCanFlyResync();
+        else if (HasUnitFlag(UNIT_FLAG_FLEEING) || HasUnitFlag(UNIT_FLAG_CONFUSED))
+            player->SetPendingCanFlyResync(enable);
+    }
 
     if (!isClientControlled)
     {

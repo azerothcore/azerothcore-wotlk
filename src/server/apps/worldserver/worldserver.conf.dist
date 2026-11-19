@@ -2779,11 +2779,22 @@ ItemDelete.Method = 0
 
 #
 #    ItemDelete.Vendor
-#        Description: Saving items into database when the player sells items to vendor
+#        Description: Saving items into database when the player sells items to vendor.
+#                     Requires ItemDelete.Method = 1. ItemDelete.Quality and ItemDelete.ItemLevel also apply.
 #        Default:     0 (disabled)
 #                     1 (enabled)
 
 ItemDelete.Vendor = 0
+
+#
+#    ItemDelete.Disenchant
+#        Description: Saving items into database when the player disenchants them, along with
+#                     the materials looted from them.
+#                     Requires ItemDelete.Method = 1. ItemDelete.Quality and ItemDelete.ItemLevel also apply.
+#        Default:     0 (disabled)
+#                     1 (enabled)
+
+ItemDelete.Disenchant = 0
 
 #
 #    ItemDelete.Quality
