@@ -131,6 +131,10 @@ enum AnubSpells
     SPELL_EXPOSE_WEAKNESS                       = 67720,
     SPELL_SHADOW_STRIKE                         = 66134,
     SPELL_RECENTLY_AWAKENED                     = 66311,
+    SPELL_BURROWER_SUBMERGE                     = 67322,
+    SPELL_SUBMERGE_BURROWER                     = 68394,
+    SPELL_PERSISTENT_DIRT                       = 68048,
+    SPELL_FULL_HEAL                             = 43978,
     SPELL_SUBMERGE_EFFECT                       = 53421,
     SPELL_EMERGE_EFFECT                         = 66947,
 };
@@ -543,7 +547,7 @@ struct npc_nerubian_burrower : public ScriptedAI
         DoCastSelf(SPELL_SPIDER_FRENZY, true);
         DoCastSelf(SPELL_RECENTLY_AWAKENED, true);
         events.Reset();
-        events.RescheduleEvent(EVENT_SUBMERGE, 30s);
+        events.RescheduleEvent(EVENT_SUBMERGE, 1600ms);
         if (Unit* target = me->SelectNearestTarget(250.0f))
         {
             AttackStart(target);
@@ -570,6 +574,27 @@ struct npc_nerubian_burrower : public ScriptedAI
         }
     }
 
+    void OnSpellCast(SpellInfo const* spell) override
+    {
+        switch (spell->Id)
+        {
+            case SPELL_BURROWER_SUBMERGE:
+                me->GetMotionMaster()->MoveIdle();
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                DoCastSelf(SPELL_SUBMERGE_BURROWER);
+                break;
+            case SPELL_SUBMERGE_BURROWER:
+                DoCastSelf(SPELL_PERSISTENT_DIRT, true);
+                DoCastSelf(SPELL_FULL_HEAL, true);
+                events.CancelEvent(EVENT_SUBMERGE);
+                events.DelayEvents(31s);
+                events.RescheduleEvent(EVENT_EMERGE, 31s);
+                break;
+            default:
+                break;
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -583,29 +608,20 @@ struct npc_nerubian_burrower : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_SUBMERGE:
-                if (HealthBelowPct(80) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me))) // not having permafrost - allow submerge
-                {
-                    me->GetMotionMaster()->MoveIdle();
-                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-                    DoCastSelf(SPELL_EXPOSE_WEAKNESS, true);
-                    DoCastSelf(SPELL_SPIDER_FRENZY, true);
-                    DoCastSelf(SPELL_SUBMERGE);
-
-                    events.DelayEvents(15s);
-                    events.RescheduleEvent(EVENT_EMERGE, 10s);
-                }
+                if (HealthBelowPct(80) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me))
+                    && DoCastSelf(SPELL_BURROWER_SUBMERGE) == SPELL_CAST_OK)
+                    events.Repeat(16s);
                 else
-                    events.Repeat(3s);
+                    events.Repeat(1600ms);
                 break;
             case EVENT_EMERGE:
-                me->SetHealth(me->GetMaxHealth());
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveAura(SPELL_SUBMERGE_BURROWER);
                 DoCastSelf(SPELL_EMERGE);
-                me->RemoveAura(SPELL_SUBMERGE);
+                DoCastSelf(SPELL_SPIDER_FRENZY, true);
 
-                events.RescheduleEvent(EVENT_SUBMERGE, 30s);
+                events.RescheduleEvent(EVENT_SUBMERGE, 1600ms);
                 break;
             default:
                 break;
