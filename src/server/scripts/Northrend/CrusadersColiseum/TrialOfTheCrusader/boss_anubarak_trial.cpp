@@ -101,6 +101,7 @@ enum AnubSpells
     SPELL_SUMMON_SCARAB                         = 66339,
     SPELL_SUMMON_BURROWER                       = 66332,
     SPELL_LEECHING_SWARM                        = 66118,
+    SPELL_FORCE_SHADOW_STRIKE                   = 66379,
 
     // Anub'arak Pursue
     SPELL_MARK                                  = 67574,
@@ -129,6 +130,7 @@ enum AnubSpells
     SPELL_SPIDER_FRENZY                         = 66128,
     SPELL_EXPOSE_WEAKNESS                       = 67720,
     SPELL_SHADOW_STRIKE                         = 66134,
+    SPELL_RECENTLY_AWAKENED                     = 66311,
     SPELL_SUBMERGE_EFFECT                       = 53421,
     SPELL_EMERGE_EFFECT                         = 66947,
 };
@@ -192,7 +194,9 @@ struct boss_anubarak_trial : public BossAI
         events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
         events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
         events.RescheduleEvent(EVENT_SUBMERGE, 80s);
-        if (!IsHeroic())
+        if (IsHeroic())
+            events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 30s);
+        else
             events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4s);
 
         for (ObjectGuid const& guid : summons)
@@ -282,6 +286,10 @@ struct boss_anubarak_trial : public BossAI
                     events.Repeat(45s);
                 }
                 break;
+            case EVENT_SPELL_SHADOW_STRIKE:
+                DoCastAOE(SPELL_FORCE_SHADOW_STRIKE, true);
+                events.Repeat(30500ms);
+                break;
             case EVENT_SUBMERGE:
                 {
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -295,6 +303,7 @@ struct boss_anubarak_trial : public BossAI
                     events.CancelEvent(EVENT_SUMMON_NERUBIAN);
                     events.CancelEvent(EVENT_SPELL_FREEZING_SLASH);
                     events.CancelEvent(EVENT_SPELL_PENETRATING_COLD);
+                    events.CancelEvent(EVENT_SPELL_SHADOW_STRIKE);
                     events.RescheduleEvent(EVENT_EMERGE, 1min);
                     events.RescheduleEvent(EVENT_SPELL_SUMMON_SPIKE, 2500ms);
                     events.RescheduleEvent(EVENT_SUMMON_SCARAB, 2500ms);
@@ -321,6 +330,8 @@ struct boss_anubarak_trial : public BossAI
                     events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 7s, 15s);
                     events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
                     events.RescheduleEvent(EVENT_SUBMERGE, 80s);
+                    if (IsHeroic())
+                        events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 35s);
                 }
                 break;
             case EVENT_SPELL_SUMMON_SPIKE:
@@ -530,10 +541,9 @@ struct npc_nerubian_burrower : public ScriptedAI
         me->SetCorpseDelay(10 * 60);
         DoCastSelf(SPELL_EXPOSE_WEAKNESS, true);
         DoCastSelf(SPELL_SPIDER_FRENZY, true);
+        DoCastSelf(SPELL_RECENTLY_AWAKENED, true);
         events.Reset();
         events.RescheduleEvent(EVENT_SUBMERGE, 30s);
-        if (IsHeroic())
-            events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 30s, 45s);
         if (Unit* target = me->SelectNearestTarget(250.0f))
         {
             AttackStart(target);
@@ -572,11 +582,6 @@ struct npc_nerubian_burrower : public ScriptedAI
 
         switch (events.ExecuteEvent())
         {
-            case EVENT_SPELL_SHADOW_STRIKE:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
-                    DoCast(target, SPELL_SHADOW_STRIKE);
-                events.Repeat(30s, 45s);
-                break;
             case EVENT_SUBMERGE:
                 if (HealthBelowPct(80) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me))) // not having permafrost - allow submerge
                 {
@@ -792,6 +797,33 @@ class spell_anubarak_summon_scarab_aura : public AuraScript
     }
 };
 
+// 66135 - Shadow Strike
+class spell_anubarak_shadow_strike : public SpellScript
+{
+    PrepareSpellScript(spell_anubarak_shadow_strike);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOW_STRIKE });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_SHADOW_STRIKE);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_anubarak_shadow_strike::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_anubarak_shadow_strike::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 // 66118 Leeching Swarm
 enum LeechingSwarmSpells
 {
@@ -861,6 +893,7 @@ void AddSC_boss_anubarak_trial()
     RegisterTrialOfTheCrusaderCreatureAI(npc_anubarak_spike);
     RegisterSpellScript(spell_pursuing_spikes_aura);
     RegisterSpellScript(spell_anubarak_summon_scarab_aura);
+    RegisterSpellScript(spell_anubarak_shadow_strike);
     RegisterSpellScript(spell_gen_leeching_swarm_aura);
     RegisterSpellScript(spell_gen_leeching_swarm_dmg);
 }
