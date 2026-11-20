@@ -103,6 +103,16 @@ func spawnPoints(t *testing.T, db *sql.DB, table string, mapID, anyEntry uint32)
 	return points
 }
 
+// visit puts the bot on a spawn point with a fresh view of it. The harness drops its
+// object cache on every teleport, while the server only sends the objects that newly come
+// into view, so a hop between two nearby points leaves the cache without the objects both
+// points see. Going through the package pad first makes the server send everything again.
+func visit(t *testing.T, bot *e2eharness.ScenarioBot, p spawnPoint, mapID uint32) {
+	t.Helper()
+	bot.TeleportPad(t, e2eharness.PackagePad(t))
+	bot.Teleport(t, p.x, p.y, p.z, mapID)
+}
+
 func dist2D(ax, ay, bx, by float32) float32 {
 	return float32(math.Hypot(float64(ax-bx), float64(ay-by)))
 }
@@ -132,20 +142,27 @@ func livingAt(bot *e2eharness.ScenarioBot, p spawnPoint, radius float32, entries
 	return out
 }
 
-// waitLivingAt polls until exactly one living creature of the list stands on the point.
-func waitLivingAt(t *testing.T, bot *e2eharness.ScenarioBot, p spawnPoint, timeout time.Duration) e2eharness.UnitSnap {
-	t.Helper()
+// tryLivingAt polls until exactly one living creature of the list stands on the point.
+func tryLivingAt(bot *e2eharness.ScenarioBot, p spawnPoint, timeout time.Duration) (e2eharness.UnitSnap, int) {
 	deadline := time.Now().Add(timeout)
 	var last []e2eharness.UnitSnap
 	for time.Now().Before(deadline) {
 		if last = livingAt(bot, p, spotRadius, p.entries); len(last) == 1 {
-			return last[0]
+			return last[0], 1
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
-	e2eharness.Assertf(t, "spawn %d: %d living creatures of %v on its point after %s, want exactly 1",
-		p.spawnID, len(last), p.entries, timeout)
-	return e2eharness.UnitSnap{}
+	return e2eharness.UnitSnap{}, len(last)
+}
+
+func waitLivingAt(t *testing.T, bot *e2eharness.ScenarioBot, p spawnPoint, timeout time.Duration) e2eharness.UnitSnap {
+	t.Helper()
+	unit, count := tryLivingAt(bot, p, timeout)
+	if count != 1 {
+		e2eharness.Assertf(t, "spawn %d: %d living creatures of %v on its point after %s, want exactly 1",
+			p.spawnID, count, p.entries, timeout)
+	}
+	return unit
 }
 
 // gameObjectAt returns the gameobject of the list standing on the point (0 if none) and
@@ -166,21 +183,33 @@ func gameObjectAt(bot *e2eharness.ScenarioBot, p spawnPoint) (guid uint64, entry
 	return
 }
 
-func waitGameObjectAt(t *testing.T, bot *e2eharness.ScenarioBot, p spawnPoint, notGUID uint64, timeout time.Duration) (uint64, uint32) {
-	t.Helper()
+// tryGameObjectAt polls until exactly one gameobject of the list, other than notGUID,
+// stands on the point.
+func tryGameObjectAt(bot *e2eharness.ScenarioBot, p spawnPoint, notGUID uint64, timeout time.Duration) (uint64, uint32, int) {
 	deadline := time.Now().Add(timeout)
 	count := 0
 	for time.Now().Before(deadline) {
 		var guid uint64
 		var entry uint32
 		if guid, entry, count = gameObjectAt(bot, p); count == 1 && guid != notGUID {
-			return guid, entry
+			return guid, entry, 1
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
-	e2eharness.Assertf(t, "gameobject spawn %d: %d objects of %v on its point after %s, want exactly 1 new one",
-		p.spawnID, count, p.entries, timeout)
-	return 0, 0
+	if count == 1 {
+		count = 0 // only the old object is there
+	}
+	return 0, 0, count
+}
+
+func waitGameObjectAt(t *testing.T, bot *e2eharness.ScenarioBot, p spawnPoint, notGUID uint64, timeout time.Duration) (uint64, uint32) {
+	t.Helper()
+	guid, entry, count := tryGameObjectAt(bot, p, notGUID, timeout)
+	if count != 1 {
+		e2eharness.Assertf(t, "gameobject spawn %d: %d objects of %v on its point after %s, want exactly 1 new one",
+			p.spawnID, count, p.entries, timeout)
+	}
+	return guid, entry
 }
 
 // lootChest opens a chest the way a player does (the Opening spell on the object), takes
@@ -262,23 +291,37 @@ func TestSpawnEntry_GameObjectRollsItsEntry(t *testing.T) {
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "SpnGo", Race: e2eharness.RaceHuman, Level: 80})
 	bot.AddQuest(t, questRocketParts) // the rubble only drops its quest item to a player on the quest
 
+	// A point can be empty for a while (looted by someone else), and two objects on one
+	// point is always wrong. The census needs most points up, not all of them.
 	var census []uint32
+	var up []spawnPoint
 	rolledAway := 0
 	for _, p := range points[:censusPoints] {
-		bot.Teleport(t, p.x, p.y, p.z, mapKalimdor)
-		_, entry := waitGameObjectAt(t, bot, p, 0, 20*time.Second)
+		visit(t, bot, p, mapKalimdor)
+		_, entry, count := tryGameObjectAt(bot, p, 0, 6*time.Second)
+		if count > 1 {
+			e2eharness.Assertf(t, "gameobject spawn %d: %d objects of %v on one point", p.spawnID, count, p.entries)
+		}
+		if count == 0 {
+			t.Logf("gameobject spawn %d: nothing on its point, skipped", p.spawnID)
+			continue
+		}
+		up = append(up, p)
 		census = append(census, entry)
 		if entry != p.ownID {
 			rolledAway++
 		}
 	}
-	t.Logf("census over %d points: entries %v, %d not on the spawn's own id", censusPoints, census, rolledAway)
+	t.Logf("census: %d of %d points up, entries %v, %d not on the spawn's own id", len(up), censusPoints, census, rolledAway)
+	if len(up) < censusPoints*2/3 {
+		e2eharness.Preconditionf(t, "only %d of %d rubble points hold a rubble", len(up), censusPoints)
+	}
 	if len(distinct(census)) < 2 {
-		e2eharness.Assertf(t, "all %d rubble points hold entry %d: the entry lists are not rolled", censusPoints, census[0])
+		e2eharness.Assertf(t, "all %d rubble points hold entry %d: the entry lists are not rolled", len(up), census[0])
 	}
 
-	p := points[0]
-	bot.Teleport(t, p.x, p.y, p.z, mapKalimdor)
+	p := up[0]
+	visit(t, bot, p, mapKalimdor)
 	guid, entry := waitGameObjectAt(t, bot, p, 0, 20*time.Second)
 	seen := []uint32{entry}
 	for i := 0; i < respawns; i++ {
@@ -321,18 +364,33 @@ func TestSpawnEntry_CreatureRollsItsEntry(t *testing.T) {
 	// Horde, with GM mode left on: the points are inside Warsong Hold.
 	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{Prefix: "SpnCr", Race: e2eharness.RaceOrc, Level: 80})
 
+	// These creatures fight the Nerubians that raid the hold, so a point can be empty for a
+	// while. The census needs most points up, not all of them.
 	var census []uint32
+	var up []spawnPoint
 	for _, p := range points {
-		bot.Teleport(t, p.x, p.y, p.z, mapNorthrend)
-		census = append(census, waitLivingAt(t, bot, p, 20*time.Second).Entry)
+		visit(t, bot, p, mapNorthrend)
+		unit, count := tryLivingAt(bot, p, 6*time.Second)
+		if count > 1 {
+			e2eharness.Assertf(t, "spawn %d: %d living creatures of %v on one point", p.spawnID, count, p.entries)
+		}
+		if count == 0 {
+			t.Logf("spawn %d: nobody alive on its point, skipped", p.spawnID)
+			continue
+		}
+		up = append(up, p)
+		census = append(census, unit.Entry)
 	}
-	t.Logf("census over %d points: entries %v", len(points), census)
-	if len(points) >= 8 && len(distinct(census)) < 2 {
-		e2eharness.Assertf(t, "all %d Injured Warsong points hold entry %d: the entry lists are not rolled", len(points), census[0])
+	t.Logf("census: %d of %d points up, entries %v", len(up), len(points), census)
+	if len(up) < 8 {
+		e2eharness.Preconditionf(t, "only %d of %d Injured Warsong points hold a living creature", len(up), len(points))
+	}
+	if len(distinct(census)) < 2 {
+		e2eharness.Assertf(t, "all %d Injured Warsong points hold entry %d: the entry lists are not rolled", len(up), census[0])
 	}
 
-	p := points[0]
-	bot.Teleport(t, p.x, p.y, p.z, mapNorthrend)
+	p := up[0]
+	visit(t, bot, p, mapNorthrend)
 	unit := waitLivingAt(t, bot, p, 20*time.Second)
 	seen := []uint32{unit.Entry}
 	for i := 0; i < respawns; i++ {
@@ -361,15 +419,17 @@ type groupLimit struct {
 }
 
 // packMembers returns the living creatures of the group's entries that stay on a member
-// point through a whole observation window. A patrol walks through this pack's points, so
-// one look cannot tell a member from a passer-by.
+// point through an observation window. A patrol walks through this pack's points, so one
+// look cannot tell a member from a passer-by; a member is on its point in nearly every
+// sample, a passer-by in a few.
 func packMembers(bot *e2eharness.ScenarioBot, members []spawnPoint, entries []uint32, window time.Duration) map[uint32]e2eharness.UnitSnap {
 	const memberRadius = float32(6) // the members wander 3 yards around points at least 6.8 apart
-	onPoint := map[uint64]uint32{}  // creature guid -> spawn id it stood on in every sample so far
+	onPoint := map[uint64]uint32{}  // creature guid -> spawn id of the point it was last seen on
+	sightings := map[uint64]int{}
 	units := map[uint64]e2eharness.UnitSnap{}
-	first := true
-	for deadline := time.Now().Add(window); time.Now().Before(deadline); time.Sleep(500 * time.Millisecond) {
-		now := map[uint64]uint32{}
+	samples := 0
+	for deadline := time.Now().Add(window); time.Now().Before(deadline); time.Sleep(250 * time.Millisecond) {
+		samples++
 		for _, u := range bot.UnitsByEntry(60, entries...) {
 			obj := bot.World.GetObject(u.GUID)
 			if obj == nil {
@@ -382,18 +442,15 @@ func packMembers(bot *e2eharness.ScenarioBot, members []spawnPoint, entries []ui
 				}
 			}
 			if nearest != 0 {
-				now[u.GUID] = nearest
+				onPoint[u.GUID] = nearest
 				units[u.GUID] = u
+				sightings[u.GUID]++
 			}
 		}
-		if first {
-			onPoint, first = now, false
-			continue
-		}
-		for guid := range onPoint {
-			if _, still := now[guid]; !still {
-				delete(onPoint, guid)
-			}
+	}
+	for guid, seen := range sightings {
+		if seen*4 < samples*3 {
+			delete(onPoint, guid)
 		}
 	}
 	out := map[uint32]e2eharness.UnitSnap{}
@@ -492,7 +549,9 @@ func TestSpawnGroup_EntryMinimumsHoldAcrossRespawns(t *testing.T) {
 
 	soleHolderCycles := 0
 	for i := 0; i < respawns; i++ {
-		// Prefer the only holder of an entry with a minimum: it has no choice on respawn.
+		// Alternate between the only holder of an entry with a minimum, which has no choice on
+		// respawn, and a member that is free to change.
+		wantForced := i%2 == 0
 		var victimSpawn uint32
 		var victim e2eharness.UnitSnap
 		forced := false
@@ -503,7 +562,7 @@ func TestSpawnGroup_EntryMinimumsHoldAcrossRespawns(t *testing.T) {
 					sole = true
 				}
 			}
-			if victimSpawn == 0 || (sole && !forced) {
+			if victimSpawn == 0 || (sole == wantForced && forced != wantForced) {
 				victimSpawn, victim, forced = spawnID, u, sole
 			}
 		}
