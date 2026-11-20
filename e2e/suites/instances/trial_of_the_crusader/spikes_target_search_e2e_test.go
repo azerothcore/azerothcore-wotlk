@@ -27,18 +27,17 @@ type spikeEmote struct {
 	at       time.Time
 }
 
-// In retail sniffs the pursuing spike starts every pursuit, the first one and each restart after
-// breaking on a Frost Sphere, by casting 65920 and the 67470 area dummy on every player in the same
-// tick, then marks one player with 67574 and emotes 1.6s later. A target lost mid-pursuit is
-// re-marked at once, without 67470.
+// In retail sniffs the pursuing spike idles 1.6s after spawning, then starts every pursuit, the
+// first one and each restart after breaking on a Frost Sphere, by casting 65920 and the 67470 area
+// dummy on every player in the same tick, then marks one player with 67574 and emotes 1.6s later.
+// A target lost mid-pursuit is re-marked at once, without 67470.
 //
 // Drive: the real spike summon (66169) in Anub'arak's chamber, with both paladins standing on a
 // Frost Sphere turned into Permafrost, so the first pursuit breaks on arrival and restarts. The
 // first marked player casts Divine Shield on the way.
-// Oracle: the spike's SMSG_SPELL_GO packets, timed by their server timestamps, and its emote. The
-// first pursuit's 67470 goes out before the bots know the spike, so for it only the held position
-// and the delayed mark are checked; the restart checks 67470 itself. 65920 is never checked: it is
-// cast triggered and has no visual, so the core sends no SPELL_GO for it.
+// Oracle: the spike's SMSG_SPELL_GO packets, timed by their server timestamps, and its emote.
+// 65920 is never checked: it is cast triggered and has no visual, so the core sends no SPELL_GO
+// for it.
 func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags: []string{"med", "instances", "multi_bot"}, Runtime: "med",
@@ -57,8 +56,10 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 		// EVENT_SPIKE_MARK is 1.6s; creatures in a dungeon can update a few world ticks late.
 		markMin = 1500 * time.Millisecond
 		markMax = 2300 * time.Millisecond
-		// The spike's appearance is read by polling the object cache, so it lags its spawn.
-		firstMarkMin = 1300 * time.Millisecond
+		// The 1.6s spawn idle, timed from the spike's appearance, which is read by polling the
+		// object cache and so lags its spawn.
+		firstSearchMin = 1000 * time.Millisecond
+		firstSearchMax = 2300 * time.Millisecond
 		// Anub'arak's position (trial_of_the_crusader.h LOC_ANUB) and a spot 35 yards west of it.
 		casterX, casterY = float32(785.90), float32(133.42)
 		playerX, playerY = float32(750.90), float32(133.42)
@@ -241,15 +242,18 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 		a.GM(t, ".npc delete")
 	})
 
-	// The first pursuit starts in Reset() while the spike is being added to the map, before any
-	// client has its create packet, so its 67470 never reaches the bots. Time that mark
-	// from the spike's appearance instead; the restart below checks the 67470 burst itself.
-	iMark := waitMarkHoldingStill("first pursuit", 0, appeared, spike)
-	first := castAt(iMark)
-	if gap := first.at.Sub(appeared); gap < firstMarkMin || gap > markMax {
-		e2eharness.Assertf(t, "first pursuit: 67574 landed %s after the spike appeared, want %s-%s", gap, firstMarkMin, markMax)
+	iSearch := waitCast(0, search, firstSearchMax+time.Second)
+	if iSearch < 0 {
+		e2eharness.Assertf(t, "first pursuit: no 67470 within %s of the spike appearing", firstSearchMax+time.Second)
 	}
-	t.Logf("first pursuit: mark on %X %s after the spike appeared", first.hits, first.at.Sub(appeared).Round(time.Millisecond))
+	if n := castsBetween(0, iSearch, mark); n != 0 {
+		e2eharness.Assertf(t, "first pursuit: spike marked %d times before its 67470", n)
+	}
+	if gap := castAt(iSearch).at.Sub(appeared); gap < firstSearchMin || gap > firstSearchMax {
+		e2eharness.Assertf(t, "first pursuit: 67470 landed %s after the spike appeared, want %s-%s", gap, firstSearchMin, firstSearchMax)
+	}
+	iMark := checkPursuitStart("first pursuit", iSearch, spike, []uint64{a.GUID, b.GUID})
+	first := castAt(iMark)
 	if len(first.hits) != 1 || (first.hits[0] != a.GUID && first.hits[0] != b.GUID) {
 		e2eharness.Assertf(t, "first pursuit: 67574 hit %X, want one of the players", first.hits)
 	}
@@ -257,8 +261,7 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 	if first.hits[0] == b.GUID {
 		marked, other = b, a
 	}
-	checkEmote("first pursuit", iMark)
-	t.Log("PASS: first pursuit holds still, then marks and emotes 1.6s after the spike appears")
+	t.Log("PASS: first pursuit idles 1.6s, casts 67470 on the players, then marks and emotes 1.6s later")
 
 	// A re-mark through the 1.6s EVENT_SPIKE_MARK would land outside this window.
 	const remarkMax = time.Second

@@ -129,11 +129,11 @@ func TestToC_AnubarakScarabsFromAllBurrows(t *testing.T) {
 	const (
 		// Submerge, a 2s cast, starts 80s after the pull.
 		submergeWindow = 95 * time.Second
-		// Summon Scarab follows the Submerge cast by 0.5s.
+		// Summon Scarab follows the Submerge cast by 1.2s.
 		auraWindow = 5 * time.Second
 		// The 50s aura's last tick can land as it expires.
 		lastScarabMax = 54 * time.Second
-		// Emerge comes about 60s after the Submerge cast.
+		// Emerge comes about 64s after the Submerge cast.
 		emergeWindow = 75 * time.Second
 		// A burrow summons right where it stands.
 		burrowRadius  = float32(15)
@@ -326,7 +326,7 @@ func TestToC_AnubarakBurrowerSubmerge(t *testing.T) {
 	})
 
 	const (
-		// The first burrower comes 5 to 8s into the fight.
+		// The first burrower comes 11s into the fight.
 		burrowerWindow = 20 * time.Second
 		// Several of the burrower's 1.6s health checks.
 		fullHealthHold = 5 * time.Second
