@@ -103,4 +103,5 @@ Reviewer conventions, not linted; apply them to new or changed code only, never 
   `systems/spells.md`
 - `src/server/game/AI/**` outside `SmartScripts/`, or an AI class (`ScriptedAI`, `BossAI`, `CreatureAI`, `GameObjectAI`,
   …) under `modules/` → `systems/creature-ai.md`
+- `src/server/game/AI/SmartScripts/**` → `systems/smartai.md`
 - An `InstanceScript`/`InstanceMapScript` under `modules/` → `systems/instance-scripts.md`

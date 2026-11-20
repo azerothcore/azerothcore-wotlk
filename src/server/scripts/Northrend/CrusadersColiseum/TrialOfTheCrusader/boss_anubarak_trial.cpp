@@ -45,19 +45,18 @@ enum AnubNPCs
     NPC_FROST_SPHERE                            = 34606,
     NPC_BURROW                                  = 34862,
     NPC_SPIKE                                   = 34660,
+    NPC_SKITTERING_SCARAB                       = 35763,
 };
 
 enum AnubActions
 {
-    ACTION_SCARAB_SUBMERGE                      = 1,
+    ACTION_SCARAB_SUBMERGE                      = 1, // read by the Skittering Scarab SmartAI (ACTION_DONE)
     ACTION_SPIKE_FAIL                           = 2,
+    ACTION_INTRO_EMERGE                         = 3, // sent by the SmartAI of areatrigger 5475 (his chamber)
 };
 
 Position const AnubLocs[] =
 {
-    // scarab's beginning pos
-    {722.65f, 135.41f, 142.16f, M_PI},
-
     // churning ground spawns
     {694.886353f, 102.484665f, 142.119614f, 0.0f},
     {731.987244f, 83.3824690f, 142.119614f, 0.0f},
@@ -65,12 +64,12 @@ Position const AnubLocs[] =
     {740.184509f, 193.443390f, 142.117584f, 0.0f},
 
     // sphere spawns
-    { 786.6439f, 108.2498f, 155.6701f, 0.0f },
-    { 806.8429f, 150.5902f, 155.6701f, 0.0f },
-    { 759.1386f, 163.9654f, 155.6701f, 0.0f },
-    { 744.3701f, 119.5211f, 155.6701f, 0.0f },
-    { 710.0211f, 120.8152f, 155.6701f, 0.0f },
-    { 706.6383f, 161.5266f, 155.6701f, 0.0f },
+    { 779.8038f, 150.6580f, 158.1426f, 0.0f },
+    { 736.0243f, 113.4201f, 158.0226f, 0.0f },
+    { 712.5712f, 160.9948f, 158.4368f, 0.0f },
+    { 701.4271f, 126.4740f, 158.0205f, 0.0f },
+    { 747.9202f, 155.0920f, 158.0613f, 0.0f },
+    { 769.6285f, 121.1024f, 158.0504f, 0.0f },
 };
 
 class HideNpcEvent : public BasicEvent
@@ -95,12 +94,16 @@ enum AnubSpells
     SPELL_EMERGE                                = 65982,
     SPELL_BERSERK                               = 26662,
     SPELL_CLEAR_ALL_DEBUFFS                     = 34098,
+    SPELL_DAZE_IMMUNITY                         = 53757,
+    SPELL_DAZE_IMMUNITY_CANCEL                  = 59556,
+    SPELL_RESET_CLEANUP                         = 66508,
 
     SPELL_FREEZING_SLASH                        = 66012,
     SPELL_PENETRATING_COLD                      = 66013,
     SPELL_SUMMON_SCARAB                         = 66339,
     SPELL_SUMMON_BURROWER                       = 66332,
     SPELL_LEECHING_SWARM                        = 66118,
+    SPELL_FORCE_SHADOW_STRIKE                   = 66379,
 
     // Anub'arak Pursue
     SPELL_MARK                                  = 67574,
@@ -111,6 +114,7 @@ enum AnubSpells
     SPELL_SPIKE_SPEED3                          = 65923,
     SPELL_SPIKE_FAIL                            = 66181,
     SPELL_SPIKE_TELE                            = 66170,
+    SPELL_SPIKE_TARGET_SEARCH                   = 67470,
     SPELL_IMPALE                                = 65919,
 
     // Scarab
@@ -124,11 +128,17 @@ enum AnubSpells
     SPELL_FROST_SPHERE                          = 67539,
     SPELL_PERMAFROST                            = 66193,
     SPELL_PERMAFROST_VISUAL                     = 65882,
+    SPELL_PERMAFROST_MODEL                      = 66185,
 
     // Burrower
     SPELL_SPIDER_FRENZY                         = 66128,
     SPELL_EXPOSE_WEAKNESS                       = 67720,
     SPELL_SHADOW_STRIKE                         = 66134,
+    SPELL_RECENTLY_AWAKENED                     = 66311,
+    SPELL_BURROWER_SUBMERGE                     = 67322,
+    SPELL_SUBMERGE_BURROWER                     = 68394,
+    SPELL_PERSISTENT_DIRT                       = 68048,
+    SPELL_FULL_HEAL                             = 43978,
     SPELL_SUBMERGE_EFFECT                       = 53421,
     SPELL_EMERGE_EFFECT                         = 66947,
 };
@@ -143,9 +153,8 @@ enum AnubEvents
     EVENT_SUBMERGE,
     EVENT_EMERGE,
     EVENT_EMERGE_2,
-    EVENT_SPELL_SUMMON_SPIKE,
+    EVENT_SUBMERGED,
     EVENT_SPELL_SHADOW_STRIKE,
-    EVENT_SUMMON_SCARAB,
     EVENT_SPELL_DETERMINATION,
 };
 
@@ -154,63 +163,72 @@ struct boss_anubarak_trial : public BossAI
     boss_anubarak_trial(Creature* creature) : BossAI(creature, BOSS_ANUBARAK)
     {
         me->ApplySpellImmune(0, IMMUNITY_ID, sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me), true);
-        me->m_SightDistance = 90.0f; // for MoveInLineOfSight distance
     }
 
     void Reset() override
     {
         _Reset();
-        _intro = false;
+        _introPending = false;
         _phase3 = false;
-        me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        for (uint8 i = 0; i < 10; ++i)
-        {
-            float angle = rand_norm() * 2 * M_PI;
-            float dist = rand_norm() * 40.0f;
-            if (Creature* scarab = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + std::sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
-            {
-                scarab->SetFaction(FACTION_PREY);
-                scarab->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                scarab->GetMotionMaster()->MoveRandom(15.0f);
-            }
-        }
     }
 
     void DoAction(int32 param) override
     {
-        if (param == ACTION_DESPAWN_SUMMONS)
-            summons.DespawnAll();
+        switch (param)
+        {
+            case ACTION_DESPAWN_SUMMONS:
+                summons.DespawnAll();
+                break;
+            case ACTION_ANUBARAK_INTRO_SUBMERGE:
+                _introPending = true;
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(true);
+                DoCastSelf(SPELL_SUBMERGE);
+                break;
+            case ACTION_INTRO_EMERGE:
+                if (!_introPending)
+                    break;
+                _introPending = false;
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveAura(SPELL_SUBMERGE);
+                DoCastSelf(SPELL_EMERGE);
+                Talk(SAY_INTRO);
+                me->m_Events.AddEventAtOffset([this]()
+                {
+                    me->SetImmuneToAll(false);
+                }, 7s);
+                break;
+            default:
+                break;
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
+        DoCastAOE(SPELL_DAZE_IMMUNITY, true);
         events.Reset();
         events.RescheduleEvent(EVENT_ENRAGE, 10min);
-        events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 7s, 15s);
-        events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
-        events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
+        events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 21s, 28s);
+        events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 17s, 30s);
+        events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 11s);
         events.RescheduleEvent(EVENT_SUBMERGE, 80s);
-        if (!IsHeroic())
+        if (IsHeroic())
+            events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 30s);
+        else
             events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4s);
 
-        for (ObjectGuid const& guid : summons)
-        {
-            if (Creature* scarab = instance->instance->GetCreature(guid))
-            {
-                scarab->GetMotionMaster()->MoveIdle();
-                scarab->StopMoving();
-                scarab->CastSpell(scarab, SPELL_SUBMERGE, false);
-                scarab->AI()->DoAction(ACTION_SCARAB_SUBMERGE);
-            }
-        }
-        summons.clear();
+        // The scarabs submerge and despawn for their week-long respawn time, so they stay gone through wipes.
+        std::list<Creature*> scarabs;
+        me->GetCreatureListWithEntryInGrid(scarabs, NPC_SKITTERING_SCARAB, 150.0f);
+        for (Creature* scarab : scarabs)
+            scarab->AI()->DoAction(ACTION_SCARAB_SUBMERGE);
+
         for (uint8 i = 0; i < 4; ++i)
-            me->SummonCreature(NPC_BURROW, AnubLocs[i + 1]);
+            me->SummonCreature(NPC_BURROW, AnubLocs[i]);
         for (uint8 i = 0; i < 6; ++i)
         {
-            if (Creature* sphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]))
+            if (Creature* sphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 4]))
                 _sphereGUIDs[i] = sphere->GetGUID();
         }
 
@@ -255,7 +273,7 @@ struct boss_anubarak_trial : public BossAI
                         if (Creature* sphere = ObjectAccessor::GetCreature(*me, _sphereGUIDs[i]))
                             if (!sphere->HasAura(SPELL_FROST_SPHERE))
                             {
-                                if (Creature* newSphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]))
+                                if (Creature* newSphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 4]))
                                     _sphereGUIDs[i] = newSphere->GetGUID();
                                 break;
                             }
@@ -267,13 +285,17 @@ struct boss_anubarak_trial : public BossAI
             case EVENT_SPELL_FREEZING_SLASH:
                 {
                     DoCastVictim(SPELL_FREEZING_SLASH);
-                    events.Repeat(15s, 20s);
+                    events.Repeat(21s, 28s);
                 }
                 break;
             case EVENT_SPELL_PENETRATING_COLD:
                 {
+                    // Keeps going while submerged. Sniffed intervals are 18-21s there and spread wider on the surface.
                     me->CastCustomSpell(SPELL_PENETRATING_COLD, SPELLVALUE_MAX_TARGETS, RAID_MODE(2, 5, 2, 5));
-                    events.Repeat(18s);
+                    if (me->HasAura(SPELL_SUBMERGE))
+                        events.Repeat(18s, 21s);
+                    else
+                        events.Repeat(18s, 26s);
                 }
                 break;
             case EVENT_SUMMON_NERUBIAN:
@@ -282,32 +304,36 @@ struct boss_anubarak_trial : public BossAI
                     events.Repeat(45s);
                 }
                 break;
+            case EVENT_SPELL_SHADOW_STRIKE:
+                DoCastAOE(SPELL_FORCE_SHADOW_STRIKE, true);
+                events.Repeat(30500ms);
+                break;
             case EVENT_SUBMERGE:
                 {
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    bool berserk = me->HasAura(SPELL_BERSERK);
-                    DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-                    if (berserk)
-                        DoCastSelf(SPELL_BERSERK, true);
                     Talk(EMOTE_SUBMERGE);
                     Talk(EMOTE_BURROWER);
                     DoCastSelf(SPELL_SUBMERGE);
                     events.CancelEvent(EVENT_SUMMON_NERUBIAN);
                     events.CancelEvent(EVENT_SPELL_FREEZING_SLASH);
-                    events.CancelEvent(EVENT_SPELL_PENETRATING_COLD);
-                    events.RescheduleEvent(EVENT_EMERGE, 1min);
-                    events.RescheduleEvent(EVENT_SPELL_SUMMON_SPIKE, 2500ms);
-                    events.RescheduleEvent(EVENT_SUMMON_SCARAB, 2500ms);
+                    events.CancelEvent(EVENT_SPELL_SHADOW_STRIKE);
+                    events.RescheduleEvent(EVENT_EMERGE, 64700ms);
+                    events.RescheduleEvent(EVENT_SUBMERGED, 3200ms);
                 }
                 break;
-            case EVENT_SUMMON_SCARAB:
+            case EVENT_SUBMERGED:
+                DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
+                // Berserk lasts 5 minutes; refreshing it on each submerge keeps the 10-minute enrage up.
+                if (me->HasAura(SPELL_BERSERK))
+                    DoCastSelf(SPELL_BERSERK, true);
+                DoCastSelf(SPELL_SUMMON_SPIKE, true);
                 DoCastAOE(SPELL_SUMMON_SCARAB, true);
                 break;
             case EVENT_EMERGE:
                 {
                     DoCastSelf(SPELL_SPIKE_TELE, true);
                     summons.DespawnEntry(NPC_SPIKE);
-                    events.RescheduleEvent(EVENT_EMERGE_2, 2s);
+                    events.RescheduleEvent(EVENT_EMERGE_2, 1600ms);
                 }
                 break;
             case EVENT_EMERGE_2:
@@ -317,14 +343,12 @@ struct boss_anubarak_trial : public BossAI
                     me->setAttackTimer(BASE_ATTACK, 3000);
                     me->RemoveAura(SPELL_SUBMERGE);
                     DoCastSelf(SPELL_EMERGE);
-                    events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
-                    events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 7s, 15s);
-                    events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
-                    events.RescheduleEvent(EVENT_SUBMERGE, 80s);
+                    events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s);
+                    events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 6s, 18s);
+                    events.RescheduleEvent(EVENT_SUBMERGE, 74500ms);
+                    if (IsHeroic())
+                        events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 35s);
                 }
-                break;
-            case EVENT_SPELL_SUMMON_SPIKE:
-                DoCastSelf(SPELL_SUMMON_SPIKE, true);
                 break;
             default:
                 break;
@@ -345,6 +369,7 @@ struct boss_anubarak_trial : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
+        DoResetCleanup();
         Talk(SAY_DEATH);
     }
 
@@ -356,28 +381,11 @@ struct boss_anubarak_trial : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
+        DoResetCleanup();
         events.Reset();
         summons.DespawnAll();
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         instance->SetData(TYPE_FAILED, 1);
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!who->IsPlayer() || me->GetExactDistSq(who) > 6400.0f) // 80yd*80yd
-            return;
-
-        if (me->getStandState() != UNIT_STAND_STATE_STAND)
-            me->SetStandState(UNIT_STAND_STATE_STAND);
-
-        if (!_intro)
-        {
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            if (!me->IsInCombat())
-                Talk(SAY_INTRO);
-            _intro = true;
-        }
-        ScriptedAI::MoveInLineOfSight(who);
     }
 
     bool CanAIAttack(Unit const* target) const override
@@ -386,46 +394,39 @@ struct boss_anubarak_trial : public BossAI
     }
 
 private:
-    bool _intro;
+    void DoResetCleanup()
+    {
+        DoCastAOE(SPELL_DAZE_IMMUNITY_CANCEL, true);
+        DoCastAOE(SPELL_RESET_CLEANUP, true);
+    }
+
+    bool _introPending;
     bool _phase3;
     ObjectGuid _sphereGUIDs[6];
 };
 
 struct npc_swarm_scarab : public ScriptedAI
 {
-    npc_swarm_scarab(Creature* creature) : ScriptedAI(creature), _submerged(false) {}
-
-    void DoAction(int32 param) override
-    {
-        if (param == ACTION_SCARAB_SUBMERGE)
-        {
-            _submerged = true;
-            scheduler.Schedule(2s, [this](TaskContext /*context*/)
-            {
-                me->DisappearAndDie();
-            });
-        }
-    }
+    npc_swarm_scarab(Creature* creature) : ScriptedAI(creature) {}
 
     void Reset() override
     {
         me->SetCorpseDelay(10 * 60);
         DoCastSelf(SPELL_ACID_MANDIBLE, true);
         events.Reset();
-        events.ScheduleEvent(EVENT_SPELL_DETERMINATION, 10s, 50s);
-        _submerged = false;
-        scheduler.CancelAll();
-        if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
-            if (Unit* target = me->SelectNearestTarget(250.0f))
+        // Sniffed scarabs cast it at most once, and only about a quarter of them ever do.
+        if (roll_chance_i(25))
+            events.ScheduleEvent(EVENT_SPELL_DETERMINATION, 1s, 50s);
+        if (Unit* target = me->SelectNearestTarget(250.0f))
+        {
+            AttackStart(target);
+            DoZoneInCombat();
+            if (Unit* randomTarget = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
             {
-                AttackStart(target);
-                DoZoneInCombat();
-                if (Unit* randomTarget = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
-                {
-                    me->AddThreat(randomTarget, 20000.0f);
-                    AttackStart(randomTarget);
-                }
+                me->AddThreat(randomTarget, 20000.0f);
+                AttackStart(randomTarget);
             }
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -435,22 +436,13 @@ struct npc_swarm_scarab : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        scheduler.Update(diff);
-
-        // Submerged scarabs only wait for their despawn.
-        if (_submerged)
-            return;
-
         if (!UpdateVictim())
             return;
 
         events.Update(diff);
 
         if (events.ExecuteEvent() == EVENT_SPELL_DETERMINATION)
-        {
             DoCastSelf(SPELL_DETERMINATION);
-            events.Repeat(20s, 60s);
-        }
 
         DoMeleeAttackIfReady();
     }
@@ -463,11 +455,8 @@ struct npc_swarm_scarab : public ScriptedAI
 
     bool CanAIAttack(Unit const* target) const override
     {
-        return target->GetEntry() != NPC_FROST_SPHERE && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        return target->GetEntry() != NPC_FROST_SPHERE;
     }
-
-private:
-    bool _submerged;
 };
 
 struct npc_frost_sphere : public NullCreatureAI
@@ -494,8 +483,7 @@ struct npc_frost_sphere : public NullCreatureAI
                 scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
                 {
                     me->RemoveAurasDueToSpell(SPELL_FROST_SPHERE);
-                    me->SetDisplayId(MODEL_INVISIBLE_STALKER);
-                    me->SetObjectScale(2.0f);
+                    DoCastSelf(SPELL_PERMAFROST_MODEL, true);
                     me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 142.7f, me->GetOrientation(), false);
                     me->SetFacingTo(me->GetOrientation());
                     DoCastSelf(SPELL_PERMAFROST_VISUAL, true);
@@ -510,7 +498,8 @@ struct npc_frost_sphere : public NullCreatureAI
     {
         if (spell->Id == SPELL_SPIKE_FAIL)
         {
-            me->RemoveAllAuras();
+            // Keep the Permafrost model until the despawn instead of flashing back to a sphere.
+            me->RemoveAllAurasExceptType(SPELL_AURA_TRANSFORM);
             me->DespawnOrUnsummon(1500ms);
         }
     }
@@ -530,15 +519,21 @@ struct npc_nerubian_burrower : public ScriptedAI
         me->SetCorpseDelay(10 * 60);
         DoCastSelf(SPELL_EXPOSE_WEAKNESS, true);
         DoCastSelf(SPELL_SPIDER_FRENZY, true);
+        DoCastSelf(SPELL_RECENTLY_AWAKENED, true);
         events.Reset();
-        events.RescheduleEvent(EVENT_SUBMERGE, 30s);
-        if (IsHeroic())
-            events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 30s, 45s);
+        events.RescheduleEvent(EVENT_SUBMERGE, 1600ms);
         if (Unit* target = me->SelectNearestTarget(250.0f))
         {
             AttackStart(target);
             DoZoneInCombat();
         }
+    }
+
+    // Reset runs from AddToWorld, before any client has the burrower, so its Emerge visual
+    // would never be sent; IsSummonedBy runs once the create packet is out.
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        DoCastSelf(SPELL_EMERGE);
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -560,6 +555,27 @@ struct npc_nerubian_burrower : public ScriptedAI
         }
     }
 
+    void OnSpellCast(SpellInfo const* spell) override
+    {
+        switch (spell->Id)
+        {
+            case SPELL_BURROWER_SUBMERGE:
+                me->GetMotionMaster()->MoveIdle();
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                DoCastSelf(SPELL_SUBMERGE_BURROWER);
+                break;
+            case SPELL_SUBMERGE_BURROWER:
+                DoCastSelf(SPELL_PERSISTENT_DIRT, true);
+                DoCastSelf(SPELL_FULL_HEAL, true);
+                events.CancelEvent(EVENT_SUBMERGE);
+                events.DelayEvents(31s);
+                events.RescheduleEvent(EVENT_EMERGE, 31s);
+                break;
+            default:
+                break;
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -572,35 +588,21 @@ struct npc_nerubian_burrower : public ScriptedAI
 
         switch (events.ExecuteEvent())
         {
-            case EVENT_SPELL_SHADOW_STRIKE:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
-                    DoCast(target, SPELL_SHADOW_STRIKE);
-                events.Repeat(30s, 45s);
-                break;
             case EVENT_SUBMERGE:
-                if (HealthBelowPct(80) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me))) // not having permafrost - allow submerge
-                {
-                    me->GetMotionMaster()->MoveIdle();
-                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-                    DoCastSelf(SPELL_EXPOSE_WEAKNESS, true);
-                    DoCastSelf(SPELL_SPIDER_FRENZY, true);
-                    DoCastSelf(SPELL_SUBMERGE);
-
-                    events.DelayEvents(15s);
-                    events.RescheduleEvent(EVENT_EMERGE, 10s);
-                }
+                if (HealthBelowPct(80) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me))
+                    && DoCastSelf(SPELL_BURROWER_SUBMERGE) == SPELL_CAST_OK)
+                    events.Repeat(16s);
                 else
-                    events.Repeat(3s);
+                    events.Repeat(1600ms);
                 break;
             case EVENT_EMERGE:
-                me->SetHealth(me->GetMaxHealth());
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveAura(SPELL_SUBMERGE_BURROWER);
                 DoCastSelf(SPELL_EMERGE);
-                me->RemoveAura(SPELL_SUBMERGE);
+                DoCastSelf(SPELL_SPIDER_FRENZY, true);
 
-                events.RescheduleEvent(EVENT_SUBMERGE, 30s);
+                events.RescheduleEvent(EVENT_SUBMERGE, 1600ms);
                 break;
             default:
                 break;
@@ -634,6 +636,7 @@ struct npc_anubarak_spike : public ScriptedAI
         EVENT_SPIKE_SPEED_3,
         EVENT_SPIKE_RESUME,
         EVENT_SPIKE_REACQUIRE,
+        EVENT_SPIKE_MARK,
     };
 
     void DoAction(int32 param) override
@@ -643,11 +646,19 @@ struct npc_anubarak_spike : public ScriptedAI
             if (Unit* target = ObjectAccessor::GetPlayer(*me, _targetGUID))
                 target->RemoveAura(SPELL_MARK);
             _targetGUID.Clear();
-            me->RemoveAllAuras();
+            RemoveSpeedAuras();
             me->GetMotionMaster()->MoveIdle();
             events.Reset();
             events.RescheduleEvent(EVENT_SPIKE_RESUME, 4s);
         }
+    }
+
+    // The trail stays up for the spike's whole life; only the speed stages restart.
+    void RemoveSpeedAuras()
+    {
+        me->RemoveAurasDueToSpell(SPELL_SPIKE_SPEED1);
+        me->RemoveAurasDueToSpell(SPELL_SPIKE_SPEED2);
+        me->RemoveAurasDueToSpell(SPELL_SPIKE_SPEED3);
     }
 
     bool CanPursue(Unit* target) const
@@ -667,16 +678,22 @@ struct npc_anubarak_spike : public ScriptedAI
         _targetGUID.Clear();
         me->AttackStop();
         me->GetMotionMaster()->MoveIdle();
+        DoZoneInCombat();
         if (!next)
         {
             events.Reset();
-            me->RemoveAllAuras();
+            RemoveSpeedAuras();
             // Start the pursuit even if everyone is currently immune, so acquisition can retry.
             DoCastSelf(SPELL_SPIKE_SPEED1, true);
-            DoCastSelf(SPELL_SPIKE_TRAIL, true);
+            if (!me->HasAura(SPELL_SPIKE_TRAIL))
+                DoCastSelf(SPELL_SPIKE_TRAIL, true);
+            // Not triggered: the core sends no SPELL_GO for a triggered spell without a visual.
+            DoCastAOE(SPELL_SPIKE_TARGET_SEARCH);
             events.RescheduleEvent(EVENT_SPIKE_SPEED_2, 7s);
+            // The spike holds still until the mark lands; losing the target mid-pursuit re-marks at once.
+            events.RescheduleEvent(EVENT_SPIKE_MARK, 1600ms);
+            return;
         }
-        DoZoneInCombat();
         DoResetThreatList();
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* candidate)
         {
@@ -695,7 +712,8 @@ struct npc_anubarak_spike : public ScriptedAI
 
     void Reset() override
     {
-        SelectNewTarget(false);
+        events.Reset();
+        events.RescheduleEvent(EVENT_SPIKE_RESUME, 1600ms);
     }
 
     void UpdateAI(uint32 diff) override
@@ -723,8 +741,9 @@ struct npc_anubarak_spike : public ScriptedAI
 
                 break;
             case EVENT_SPIKE_RESUME:
-                Reset();
+                SelectNewTarget(false);
                 break;
+            case EVENT_SPIKE_MARK:
             case EVENT_SPIKE_REACQUIRE:
                 SelectNewTarget(true);
                 break;
@@ -781,14 +800,69 @@ class spell_anubarak_summon_scarab_aura : public AuraScript
 
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        // Sniffed burrows summon on roughly a third of their ticks; nothing in the DBC rolls this.
-        if (!roll_chance_i(35))
+        // Sniffed burrows summon on roughly a quarter of their ticks; nothing in the DBC rolls this.
+        if (!roll_chance_i(24))
             PreventDefaultAction();
     }
 
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_anubarak_summon_scarab_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+// 66135 - Shadow Strike
+class spell_anubarak_shadow_strike : public SpellScript
+{
+    PrepareSpellScript(spell_anubarak_shadow_strike);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOW_STRIKE });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        // A creature cast replaces the one in progress, so striking now would cancel a Submerge
+        // halfway and leave the burrower unselectable above ground.
+        if (caster->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || caster->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        caster->CastSpell(GetHitUnit(), SPELL_SHADOW_STRIKE);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_anubarak_shadow_strike::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_anubarak_shadow_strike::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 66508 - Reset Cleanup
+class spell_anubarak_reset_cleanup : public SpellScript
+{
+    PrepareSpellScript(spell_anubarak_reset_cleanup);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->Effects[EFFECT_1].CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        // The basepoints hold the 10-man normal Acid-Drenched Mandibles; the scarabs apply the difficulty variant
+        GetHitUnit()->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), GetCaster()));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_anubarak_reset_cleanup::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -861,6 +935,8 @@ void AddSC_boss_anubarak_trial()
     RegisterTrialOfTheCrusaderCreatureAI(npc_anubarak_spike);
     RegisterSpellScript(spell_pursuing_spikes_aura);
     RegisterSpellScript(spell_anubarak_summon_scarab_aura);
+    RegisterSpellScript(spell_anubarak_shadow_strike);
+    RegisterSpellScript(spell_anubarak_reset_cleanup);
     RegisterSpellScript(spell_gen_leeching_swarm_aura);
     RegisterSpellScript(spell_gen_leeching_swarm_dmg);
 }
