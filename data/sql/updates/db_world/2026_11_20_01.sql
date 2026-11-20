@@ -1,3 +1,4 @@
+-- DB update 2026_11_20_00 -> 2026_11_20_01
 --
 -- 59555 Daze Immunity (serverside): self-applied mechanic immunity to Daze, dropped on leaving the map
 UPDATE `spell_dbc` SET `AuraInterruptFlags` = 0x80000, `Effect_1` = 6, `ImplicitTargetA_1` = 1, `EffectAura_1` = 77, `EffectMiscValue_1` = 27 WHERE `ID` = 59555;
