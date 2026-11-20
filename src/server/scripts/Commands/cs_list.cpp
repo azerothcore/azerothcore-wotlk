@@ -77,9 +77,14 @@ public:
         QueryResult result;
 
         uint32 creatureCount = 0;
-        result = WorldDatabase.Query("SELECT COUNT(guid) FROM creature WHERE id = '{}' "
-            "OR guid IN (SELECT guid FROM creature_spawn_entry WHERE entry = '{}')",
-            uint32(creatureId), uint32(creatureId));
+        // Spawns of that `id`, and spawns that can roll it from their own list or their spawn group's
+        std::string const where = Acore::StringFormat("id = {0} "
+            "OR guid IN (SELECT guid FROM creature_spawn_entry WHERE entry = {0}) "
+            "OR guid IN (SELECT g.spawnId FROM spawn_group g JOIN spawn_group_entry e "
+            "ON e.groupId = g.groupId AND e.spawnType = g.spawnType WHERE g.spawnType = 0 AND e.entry = {0})",
+            uint32(creatureId));
+
+        result = WorldDatabase.Query("SELECT COUNT(guid) FROM creature WHERE {}", where);
         if (result)
             creatureCount = (*result)[0].Get<uint64>();
 
@@ -88,14 +93,12 @@ public:
             Player* player = handler->GetSession()->GetPlayer();
             result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map, "
                 "(POW(position_x - '{}', 2) + POW(position_y - '{}', 2) + POW(position_z - '{}', 2)) AS order_ "
-                "FROM creature WHERE id = '{}' "
-                "OR guid IN (SELECT guid FROM creature_spawn_entry WHERE entry = '{}') ORDER BY order_ ASC LIMIT {}",
-                                          player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), uint32(creatureId), uint32(creatureId), count);
+                "FROM creature WHERE {} ORDER BY order_ ASC LIMIT {}",
+                player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), where, count);
         }
         else
             result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map FROM creature "
-                "WHERE id = '{}' OR guid IN (SELECT guid FROM creature_spawn_entry WHERE entry = '{}') LIMIT {}",
-                                          uint32(creatureId), uint32(creatureId), count);
+                "WHERE {} LIMIT {}", where, count);
 
         if (result)
         {

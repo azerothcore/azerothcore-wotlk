@@ -8662,7 +8662,8 @@ bool ObjectMgr::IsValidSpawnEntry(SpawnObjectType type, ObjectGuid::LowType spaw
     }
 
     // The object class is picked from the spawn's own `id`, before its entry is rolled
-    if (IsGameObjectStaticTransport(entry) || IsGameObjectStaticTransport(GetGameObjectData(spawnId)->id))
+    if (gInfo->type == GAMEOBJECT_TYPE_TRANSPORT || gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT ||
+        IsGameObjectStaticTransport(GetGameObjectData(spawnId)->id))
     {
         LOG_ERROR("sql.sql",
             "Table `gameobject_spawn_entry` has gameobject (GUID: {}) with entry {}, but a transport spawn can't "
@@ -8973,9 +8974,16 @@ void ObjectMgr::LoadSpawnGroupEntries()
         }
 
         // The object class of a gameobject is picked from the spawn's own `id`, so no transports here
-        bool validEntry = type == SPAWN_TYPE_CREATURE
-            ? GetCreatureTemplate(entry) && !IsCreatureDifficultyEntry(entry)
-            : GetGameObjectTemplate(entry) && !IsGameObjectStaticTransport(entry);
+        bool validEntry;
+        if (type == SPAWN_TYPE_CREATURE)
+            validEntry = GetCreatureTemplate(entry) && !IsCreatureDifficultyEntry(entry);
+        else
+        {
+            GameObjectTemplate const* gInfo = GetGameObjectTemplate(entry);
+            validEntry = gInfo && gInfo->type != GAMEOBJECT_TYPE_TRANSPORT &&
+                gInfo->type != GAMEOBJECT_TYPE_MO_TRANSPORT;
+        }
+
         if (!validEntry)
         {
             LOG_ERROR("sql.sql",
@@ -9006,15 +9014,16 @@ void ObjectMgr::LoadSpawnGroupEntries()
     } while (result->NextRow());
 
     // A group's entries replace the roll of its members, and its minimums have to fit in them
-    for (auto const& [groupId, rolls] : _spawnGroupRollStore)
+    for (auto& [groupId, rolls] : _spawnGroupRollStore)
     {
         for (uint8 type = 0; type < SPAWN_TYPE_MAX; ++type)
         {
-            SpawnGroupRollData const& roll = rolls[type];
+            SpawnGroupRollData& roll = rolls[type];
             if (roll.entries.empty())
                 continue;
 
             uint32 members = 0;
+            bool hasTransport = false;
             auto range = _spawnGroupMapStore.equal_range(groupId);
             for (auto itr = range.first; itr != range.second; ++itr)
             {
@@ -9023,11 +9032,24 @@ void ObjectMgr::LoadSpawnGroupEntries()
                     continue;
 
                 ++members;
+                if (type == SPAWN_TYPE_GAMEOBJECT &&
+                    IsGameObjectStaticTransport(static_cast<GameObjectData const*>(member)->id))
+                    hasTransport = true;
+
                 if (GetSpawnEntries(member->type, member->spawnId))
                     LOG_ERROR("sql.sql",
                         "Spawn ({},{}) has its own spawn entries, but spawn group {} sets the entries of its members: "
                         "the spawn's own are ignored.",
                         uint32(type), member->spawnId, groupId);
+            }
+
+            if (hasTransport)
+            {
+                LOG_ERROR("sql.sql",
+                    "Table `spawn_group_entry` sets gameobject entries for spawn group {}, which has a transport "
+                    "member, and a transport spawn can't change entry: the group's entries are ignored.", groupId);
+                roll.entries.clear();
+                continue;
             }
 
             uint32 minimum = 0;

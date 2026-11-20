@@ -166,7 +166,8 @@ func waitLivingAt(t *testing.T, bot *e2eharness.ScenarioBot, p spawnPoint, timeo
 }
 
 // gameObjectAt returns the gameobject of the list standing on the point (0 if none) and
-// how many of them stand there.
+// how many of them stand there. The harness finds one object per entry, so two objects of
+// the same entry on one point count as one.
 func gameObjectAt(bot *e2eharness.ScenarioBot, p spawnPoint) (guid uint64, entry uint32, count int) {
 	for _, e := range p.entries {
 		g := bot.World.FindGameObjectByEntry(e, 30)
@@ -426,6 +427,7 @@ func packMembers(bot *e2eharness.ScenarioBot, members []spawnPoint, entries []ui
 	const memberRadius = float32(6) // the members wander 3 yards around points at least 6.8 apart
 	onPoint := map[uint64]uint32{}  // creature guid -> spawn id of the point it was last seen on
 	sightings := map[uint64]int{}
+	moved := map[uint64]bool{} // seen on two points: a passer-by, however long it lingered
 	units := map[uint64]e2eharness.UnitSnap{}
 	samples := 0
 	for deadline := time.Now().Add(window); time.Now().Before(deadline); time.Sleep(250 * time.Millisecond) {
@@ -442,6 +444,9 @@ func packMembers(bot *e2eharness.ScenarioBot, members []spawnPoint, entries []ui
 				}
 			}
 			if nearest != 0 {
+				if prev, ok := onPoint[u.GUID]; ok && prev != nearest {
+					moved[u.GUID] = true
+				}
 				onPoint[u.GUID] = nearest
 				units[u.GUID] = u
 				sightings[u.GUID]++
@@ -449,7 +454,7 @@ func packMembers(bot *e2eharness.ScenarioBot, members []spawnPoint, entries []ui
 		}
 	}
 	for guid, seen := range sightings {
-		if seen*4 < samples*3 {
+		if seen*4 < samples*3 || moved[guid] {
 			delete(onPoint, guid)
 		}
 	}

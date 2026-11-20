@@ -1242,6 +1242,12 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
         return false;
     }
 
+    // A respawn that came due while the grid was unloaded is rolled here: the timer is dropped below
+    // without going through Update()
+    if (time_t respawnTime = map->GetGORespawnTime(spawnId))
+        if (respawnTime <= GameTime::GetGameTime().count())
+            map->RerollSpawnGroupEntry(data, spawnId);
+
     uint32 entry = map->ChooseSpawnEntry(data, spawnId, data->id);
     if (!entry) // its spawn group left this spawn point out
         return false;
@@ -1309,17 +1315,21 @@ void GameObject::DeleteFromDB()
     GetMap()->RemoveGORespawnTime(m_spawnId);
     sObjectMgr->DeleteGOData(m_spawnId);
 
+    WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
+
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
     stmt->SetData(0, m_spawnId);
-    WorldDatabase.Execute(stmt);
+    trans->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_EVENT_GAMEOBJECT);
     stmt->SetData(0, m_spawnId);
-    WorldDatabase.Execute(stmt);
+    trans->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT_SPAWN_ENTRY);
     stmt->SetData(0, m_spawnId);
-    WorldDatabase.Execute(stmt);
+    trans->Append(stmt);
+
+    WorldDatabase.CommitTransaction(trans);
 }
 
 /*********************************************************/
@@ -2322,9 +2332,10 @@ void GameObject::EventInform(uint32 eventId)
 
 uint32 GameObject::GetScriptId() const
 {
+    // The spawn's script belongs to its own `id`: a spawn that rolled another entry uses that template's
     if (GameObjectData const* gameObjectData = GetGameObjectData())
-        if (uint32 scriptId = gameObjectData->ScriptId)
-            return scriptId;
+        if (gameObjectData->ScriptId && GetEntry() == gameObjectData->id)
+            return gameObjectData->ScriptId;
 
     return GetGOInfo()->ScriptId;
 }
