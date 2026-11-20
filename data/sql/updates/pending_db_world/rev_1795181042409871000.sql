@@ -27,3 +27,14 @@ DELETE FROM `spawn_group_entry` WHERE `groupId` = 105;
 INSERT INTO `spawn_group_entry` (`groupId`, `spawnType`, `entry`, `minCount`, `maxCount`, `chance`) VALUES
 (105, 0, 11371, 1, 0, 0), -- Razzashi Serpent
 (105, 0, 11372, 1, 0, 0); -- Razzashi Adder
+
+-- Zul'Gurub entrance snake patrol (49090 leading 49091): both spawn points are sniffed spawn packets.
+-- The leader spawns beside its follower, not on the first node of its path.
+UPDATE `creature` SET `position_x` = -11862.2, `position_y` = -1317.21, `position_z` = 79.0372, `orientation` = 4.15388, `CreateObject` = 2, `VerifiedBuild` = 44400 WHERE `guid` = 49090 AND `id` = 11371;
+UPDATE `creature` SET `CreateObject` = 2, `VerifiedBuild` = 51739 WHERE `guid` = 49091 AND `id` = 11371;
+
+-- Both entries were seen on both spawn points
+UPDATE `creature_spawn_entry` SET `VerifiedBuild` = 44400 WHERE `guid` = 49090 AND `entry` = 11371; -- Razzashi Serpent
+UPDATE `creature_spawn_entry` SET `VerifiedBuild` = 48019 WHERE `guid` = 49090 AND `entry` = 11372; -- Razzashi Adder
+UPDATE `creature_spawn_entry` SET `VerifiedBuild` = 51739 WHERE `guid` = 49091 AND `entry` = 11371; -- Razzashi Serpent
+UPDATE `creature_spawn_entry` SET `VerifiedBuild` = 48019 WHERE `guid` = 49091 AND `entry` = 11372; -- Razzashi Adder
