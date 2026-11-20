@@ -1,3 +1,4 @@
+-- DB update 2026_11_20_03 -> 2026_11_20_04
 -- Skittering Scarab: ambient scarabs in Anub'arak's chamber, submerging and emerging at random until the pull
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `VerifiedBuild` = 50375 WHERE `entry` = 35763;
 
