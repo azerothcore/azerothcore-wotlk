@@ -25,10 +25,11 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (13414, 35763, 649, 0, 0, 15, 1, 0, 745.6689, 146.6562, 142.3419, 5.497787, 604800, 20, 0, 1, 0, 1, 0, 0, 0, '', 50375, 1, NULL), -- centre of wander area
 (13415, 35763, 649, 0, 0, 15, 1, 0, 722.6933, 88.1701, 142.3107, 5.497787, 604800, 20, 0, 1, 0, 1, 0, 0, 0, '', 50375, 1, NULL); -- centre of wander area
 
--- Phase 1: emerged and wandering, phase 2: submerged, phase 3: submerged for good after Anub'arak's pull
+-- Phase 1: emerged and wandering, phase 2: submerged, phase 3: submerged for good after Anub'arak's pull,
+-- phase 4: submerged since spawn until players come near
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 35763 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(35763, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Reset - Set Event Phase 2'),
+(35763, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Reset - Set Event Phase 4'),
 (35763, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Set Flags Not Selectable'),
 (35763, 0, 2, 3, 1, 1, 100, 0, 16000, 31000, 16000, 31000, 0, 0, 11, 66845, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - Out of Combat - Cast \'Submerge\' (Phase 1)'),
 (35763, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Set Event Phase 2'),
@@ -39,4 +40,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (35763, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Set Event Phase 1'),
 (35763, 0, 9, 10, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 22, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Action 1 Done - Set Event Phase 3'),
 (35763, 0, 10, 11, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 66845, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Cast \'Submerge\' (Aura Not Present)'),
-(35763, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 3000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Despawn In 3000 ms');
+(35763, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 3000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Despawn In 3000 ms'),
+(35763, 0, 12, 0, 101, 8, 100, 0, 1, 100, 1000, 1000, 1000, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On 1 Player Within 100 Yards - Set Event Phase 2 (Phase 4)');
