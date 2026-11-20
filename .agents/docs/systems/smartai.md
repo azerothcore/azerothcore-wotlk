@@ -17,3 +17,6 @@ Data-driven behaviour in the world DB's `smart_scripts` (engine: `src/server/gam
   row with that `id`, so number the guid rows clear of the entry script's (from 1000).
 - `TALK` (action 1) to a creature target (not a pet): `action_param3` = 0 makes the target speak its own line; 1 has
   the script owner speak, with the target as `$n`. Target `SELF` with 0 makes the last invoker `$n`.
+- A new or changed SmartAI event, action or target parameter (`SmartScriptMgr.h` enum comment or param struct) needs
+  follow-up PRs to the wiki `smart_scripts` page and to Keira3's SmartAI editor (`azerothcore/Keira3`); list both in
+  the plan and the PR's TODO list.
