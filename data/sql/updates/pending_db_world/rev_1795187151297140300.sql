@@ -5,6 +5,11 @@ DELETE FROM `creature_template_movement` WHERE `CreatureId` = 35763;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (35763, 1, 1, 0, 0, 0, 2, NULL);
 
+-- They spawn submerged
+DELETE FROM `creature_template_addon` WHERE `entry` = 35763;
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(35763, 0, 0, 0, 1, 0, 0, '66845');
+
 -- Week-long respawn: the pull despawns them for the rest of the lockout
 DELETE FROM `creature` WHERE `id` = 35763 AND `guid` BETWEEN 13405 AND 13415;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
@@ -23,14 +28,15 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 -- Phase 1: emerged and wandering, phase 2: submerged, phase 3: submerged for good after Anub'arak's pull
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 35763 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(35763, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Reset - Set Event Phase 1'),
-(35763, 0, 1, 2, 1, 1, 100, 0, 1000, 31000, 16000, 31000, 0, 0, 11, 66845, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - Out of Combat - Cast \'Submerge\' (Phase 1)'),
-(35763, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Set Event Phase 2'),
-(35763, 0, 3, 0, 8, 0, 100, 0, 66845, 0, 0, 0, 0, 0, 18, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Spellhit \'Submerge\' - Set Flags Not Selectable'),
-(35763, 0, 4, 5, 1, 2, 100, 0, 8000, 23000, 8000, 23000, 0, 0, 28, 66845, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - Out of Combat - Remove Aura \'Submerge\' (Phase 2)'),
-(35763, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Remove Flags Not Selectable'),
-(35763, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 65982, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Cast \'Emerge\''),
-(35763, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Set Event Phase 1'),
-(35763, 0, 8, 9, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 22, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Action 1 Done - Set Event Phase 3'),
-(35763, 0, 9, 10, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 66845, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Cast \'Submerge\' (Aura Not Present)'),
-(35763, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 3000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Despawn In 3000 ms');
+(35763, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Reset - Set Event Phase 2'),
+(35763, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Set Flags Not Selectable'),
+(35763, 0, 2, 3, 1, 1, 100, 0, 16000, 31000, 16000, 31000, 0, 0, 11, 66845, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - Out of Combat - Cast \'Submerge\' (Phase 1)'),
+(35763, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Set Event Phase 2'),
+(35763, 0, 4, 0, 8, 0, 100, 0, 66845, 0, 0, 0, 0, 0, 18, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Spellhit \'Submerge\' - Set Flags Not Selectable'),
+(35763, 0, 5, 6, 1, 2, 100, 0, 1000, 6000, 8000, 23000, 0, 0, 28, 66845, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - Out of Combat - Remove Aura \'Submerge\' (Phase 2)'),
+(35763, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Remove Flags Not Selectable'),
+(35763, 0, 7, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 65982, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Cast \'Emerge\''),
+(35763, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Set Event Phase 1'),
+(35763, 0, 9, 10, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 22, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Action 1 Done - Set Event Phase 3'),
+(35763, 0, 10, 11, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 66845, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Cast \'Submerge\' (Aura Not Present)'),
+(35763, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 3000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Skittering Scarab - On Link - Despawn In 3000 ms');
