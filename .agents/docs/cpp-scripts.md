@@ -1,27 +1,35 @@
 # C++ scripts
 
-Scripts inherit from a `ScriptObject` subclass (`SpellScript`, `AuraScript`, `CreatureScript`, `InstanceMapScript`, `GameObjectScript`, `CommandScript`, …). Two registration styles coexist:
+Scripts derive from a `ScriptObject` subclass (`SpellScript`, `AuraScript`, `CreatureScript`, `InstanceMapScript`,
+`GameObjectScript`, `CommandScript`, …) and register inside `AddSC_<name>()`:
 
-- **Spell / aura scripts**: `RegisterSpellScript(ClassName)` (or `RegisterSpellAndAuraScriptPair(...)`) inside `AddSC_<name>()`.
-- **Creature scripts**: prefer `RegisterCreatureAI(ClassName)` for new code; legacy zones still use `new ClassName();`. Match the surrounding pattern.
+- Spell/aura scripts: `RegisterSpellScript(ClassName)` or `RegisterSpellAndAuraScriptPair(...)`.
+- Creature scripts: `RegisterCreatureAI(ClassName)` for new code; legacy zones use `new ClassName();`. Match the
+  surrounding pattern.
 
-Then declare and call `AddSC_<name>()` from the regional loader (`Spells/spells_script_loader.cpp`, `EasternKingdoms/eastern_kingdoms_script_loader.cpp`, …).
-
-**SmartAI** (data-driven creature behaviour) lives in the world DB's `smart_scripts` table, not C++ (engine: `src/server/game/AI/SmartScripts/`). For new creature behaviour prefer SmartAI (via the SQL update workflow); reach for `CreatureScript` only when SmartAI's event/action vocabulary isn't enough.
-
-**Module hooks** (e.g. `OnPlayerLogin`, `OnWorldUpdate`, `OnSpellCast`) are declared in `src/server/game/Scripting/ScriptDefines/*.h`. Implement by inheriting the matching base (`PlayerScript`, `WorldScript`, …) and registering with `new MyClass();` (or its `RegisterXxxScript` macro) inside `AddSC_<name>()`. Full list: https://www.azerothcore.org/wiki/hooks-script.
-
-**Conventions:**
-
-- Script ids (action/event/data/phase) get named enum entries — never raw literals, even when the file already uses them: add the entry and convert that literal's every call site and handler in the same change.
-- In AI code, prefer the `DoCast` helpers (`DoCastSelf`, `DoCastVictim`, `DoCastAOE`, …) over raw `me->CastSpell` where possible (use `me->CastSpell` when you need positional casts or custom `CastSpellExtraArgs`).
-- A `SpellScript`/`AuraScript` without a matching `spell_script_names` row is inert — ship the binding SQL update in the same change as the C++ registration.
-- Never add `UNIT_FLAG*` / `UNIT_FLAG2*` / `UNIT_DYNFLAG*` values without sniff or upstream evidence; the same flag used in another script is not evidence.
-- Trigger NPCs (`creature_template.flags_extra` 0x80) have no threat list — `SelectTarget` / `AddThreat` / `UpdateVictim` chains on them silently do nothing. A never-evading helper NPC left on a boss's threatened-by list also stalls the boss's evade/reset forever; make such helpers `IMMUNE_TO_NPC`.
-- `InstanceScript` object storage (the `ObjectData` tables passed to `LoadObjectData`) maps each listed entry to a `DATA_*` slot holding a single guid: `OnCreatureCreate` overwrites that slot unconditionally and `OnCreatureRemove` erases it when the current holder despawns. Summoning a second creature with an entry in that table redirects every `instance->GetCreature(DATA_X)` to the summon and, once it despawns, leaves the slot empty while the original spawn still lives. Never summon an entry that is in the `ObjectData` table; use a dedicated entry or track the summon through the summoner's `SummonList`/guid member.
-- SmartAI `SET_DATA` (action 45) stores the value on a SmartAI target, readable by `CONDITION_AI_DATA` and `INC_DATA`, and raises `DATA_SET` (event 38). Toward a SmartAI receiver, use it only when the value must persist; a pure signal uses `DO_ACTION` (action 223) → `ACTION_DONE` (event 72). `SET_DATA` stays when the receiver uses its creature or gameobject sender — as action invoker, or (creature only) as condition target 0; `ACTION_DONE` passes none, so `ACTION_INVOKER` falls back to a stale last invoker — or when the receiver is a gameobject (no `ACTION_DONE` on gameobject SmartAI). A C++ AI receiver gets whichever of `SetData` / `DoAction` it implements.
-- `JustSummoned` fires only on the direct summoner: boss adds spawned by an intermediate creature (e.g. a portal NPC casting the summon) skip the boss's `SummonList` and outlive its death and evade. Register them through the instance's `SummonData` table (`LoadSummonData`: add entry → boss `DATA_*` slot), never per-add `JustSummoned` calls; the boss must be in `ObjectData` and any `OnCreatureCreate` override must call the base.
-- A spell id missing from Wowhead is inconclusive — check the world DB's `spell_dbc` table (server-side spells) before concluding a sniffed id doesn't exist.
-- A new or changed SmartAI event, action or target parameter (`SmartScriptMgr.h` enum comment or param struct) needs follow-up PRs to the wiki `smart_scripts` page and to Keira3's SmartAI editor (`azerothcore/Keira3`); list both in the plan and the PR's TODO list.
+Declare and call `AddSC_<name>()` from the regional loader (`Spells/spells_script_loader.cpp`,
+`EasternKingdoms/eastern_kingdoms_script_loader.cpp`, …).
 
 Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).
+
+## Conventions
+
+- Script ids (action/event/data/phase) get named enum entries, never raw literals, even where the file already uses
+  them: add the entry and convert that literal's every call site and handler in the same change.
+
+## Scope of a fix
+
+- New creature behaviour goes in SmartAI (world DB `smart_scripts`, via the SQL update workflow; engine in
+  `src/server/game/AI/SmartScripts/`); write a `CreatureScript` only when SmartAI's event/action vocabulary isn't
+  enough.
+
+## Read also
+
+- Class deriving `ScriptedAI`, `BossAI`, `CreatureAI`, `GameObjectAI` or another AI base, or registered via
+  `RegisterCreatureAI`/`RegisterGameObjectAI` → `systems/creature-ai.md`
+- `instance_*.cpp`, a class deriving `InstanceScript`/`InstanceMapScript`, calls to `LoadObjectData`/`ObjectData`,
+  `LoadSummonData`/`SummonData` or `instance->GetCreature(DATA_*)`, or summoning a creature in an instance's scripts
+  → `systems/instance-scripts.md`
+- `SpellScript`/`AuraScript` → `systems/spells.md`
+- `SetData`/`DoAction` on a creature or gameobject whose `AIName` is `SmartAI`/`SmartGameObjectAI` →
+  `systems/smartai.md`

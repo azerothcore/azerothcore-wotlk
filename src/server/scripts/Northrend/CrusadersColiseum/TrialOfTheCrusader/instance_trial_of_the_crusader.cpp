@@ -114,6 +114,8 @@ ObjectData const summonData[] =
 {
     { NPC_MISTRESS_OF_PAIN,  DATA_JARAXXUS }, // summoned by a Nether Portal, not Jaraxxus
     { NPC_FELFLAME_INFERNAL, DATA_JARAXXUS }, // summoned by an Infernal Volcano, not Jaraxxus
+    { NPC_SCARAB,            DATA_ANUBARAK }, // summoned by a Nerubian Burrow, not Anub'arak
+    { NPC_BURROWER,          DATA_ANUBARAK }, // summoned by a Nerubian Burrow, not Anub'arak
     { 0,                     0             }
 };
 

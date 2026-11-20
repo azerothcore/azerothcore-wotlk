@@ -28,22 +28,8 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 		shield     = uint32(642)
 		speed2     = uint32(65922)
 	)
-	bots := newSpikeBots(t)
+	bots := newSpikeRaid(t)
 	a, b := bots[0], bots[1]
-	e2eharness.FormPartyAtPad(t, e2eharness.PackagePad(t), a, b)
-	// CMSG_GROUP_RAID_CONVERT has no payload (GroupHandler.cpp).
-	// AzerothGhost v1.0.8 exposes raw packets but no raid conversion helper.
-	const groupRaidConvert = uint16(0x28e)
-	if err := a.World.SendPacketRaw(groupRaidConvert, nil); err != nil {
-		e2eharness.HarnessFailf(t, "convert party to raid: %v", err)
-	}
-	if !waitSpikeCondition(3*time.Second, func() bool { return a.GroupState().GroupType&2 != 0 }) {
-		e2eharness.Preconditionf(t, "raid conversion not acknowledged")
-	}
-	for _, bot := range bots {
-		bot.GM(t, ".gm on")
-		bot.FlushWorld(t)
-	}
 	// Empty arena above Anub'arak: no Frost Spheres or encounter waves.
 	a.Teleport(t, 563, 140, 394, 649)
 	b.Teleport(t, 563, 140, 394, 649)
@@ -180,6 +166,28 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 			t.Log("PASS: spike reaches protected player, keeps the mark and target, and accelerates")
 		})
 	}
+}
+
+// newSpikeRaid returns two level-80 paladins in a fresh raid, in GM mode so they can enter ToC.
+func newSpikeRaid(t *testing.T) []*e2eharness.ScenarioBot {
+	t.Helper()
+	bots := newSpikeBots(t)
+	a, b := bots[0], bots[1]
+	e2eharness.FormPartyAtPad(t, e2eharness.PackagePad(t), a, b)
+	// CMSG_GROUP_RAID_CONVERT has no payload (GroupHandler.cpp).
+	// AzerothGhost v1.0.8 exposes raw packets but no raid conversion helper.
+	const groupRaidConvert = uint16(0x28e)
+	if err := a.World.SendPacketRaw(groupRaidConvert, nil); err != nil {
+		e2eharness.HarnessFailf(t, "convert party to raid: %v", err)
+	}
+	if !waitSpikeCondition(3*time.Second, func() bool { return a.GroupState().GroupType&2 != 0 }) {
+		e2eharness.Preconditionf(t, "raid conversion not acknowledged")
+	}
+	for _, bot := range bots {
+		bot.GM(t, ".gm on")
+		bot.FlushWorld(t)
+	}
+	return bots
 }
 
 func selectSpikeUnit(t *testing.T, bot *e2eharness.ScenarioBot, guid uint64) {
