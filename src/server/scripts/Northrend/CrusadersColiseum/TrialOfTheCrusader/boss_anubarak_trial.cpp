@@ -524,6 +524,13 @@ struct npc_nerubian_burrower : public ScriptedAI
         }
     }
 
+    // Reset runs from AddToWorld, before any client has the burrower, so its Emerge visual
+    // would never be sent; IsSummonedBy runs once the create packet is out.
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        DoCastSelf(SPELL_EMERGE);
+    }
+
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (!target || !spell)
