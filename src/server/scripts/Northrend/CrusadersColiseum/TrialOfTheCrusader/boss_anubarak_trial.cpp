@@ -698,7 +698,8 @@ struct npc_anubarak_spike : public ScriptedAI
             // Start the pursuit even if everyone is currently immune, so acquisition can retry.
             DoCastSelf(SPELL_SPIKE_SPEED1, true);
             DoCastSelf(SPELL_SPIKE_TRAIL, true);
-            DoCastAOE(SPELL_SPIKE_TARGET_SEARCH, true);
+            // Not triggered: the core sends no SPELL_GO for a triggered spell without a visual.
+            DoCastAOE(SPELL_SPIKE_TARGET_SEARCH);
             events.RescheduleEvent(EVENT_SPIKE_SPEED_2, 7s);
             // The spike holds still until the mark lands; losing the target mid-pursuit re-marks at once.
             events.RescheduleEvent(EVENT_SPIKE_MARK, 1600ms);
