@@ -42,3 +42,28 @@ included. PR #19684 was merged independently in August 2024.
 
 For test results and environment, see the
 [PR description](https://github.com/azerothcore/azerothcore-wotlk/pull/27733).
+
+## Pursuit start (`TestToC_PursuingSpikesTargetSearch`)
+
+```sh
+go test -tags=e2e ./suites/instances/trial_of_the_crusader -run TestToC_PursuingSpikesTargetSearch -count=1 -p 1 -parallel 1 -v
+```
+
+Same raid and summon as above, but in Anub'arak's chamber: a killed Frost Sphere
+falls to the chamber floor (z 143) and casts Permafrost, which it cannot do from
+the arena. Both paladins stand in the Permafrost 35 yards from the World Trigger,
+so the spike's first pursuit breaks on arrival and restarts after 4s.
+
+Oracles, read from the spike's `SMSG_SPELL_GO` server timestamps and its raid boss
+emote:
+
+- First pursuit: no target and no movement until Pursued by Anub'arak (67574) lands
+  about 1.6s after the spike appears, with the emote naming the marked player.
+- Divine Shield on the marked player: the other is re-marked within a second,
+  without a new 67470.
+- Restart: 67470 hits the player who is not shielded, and the mark and emote
+  follow 1.6s later without the spike moving first.
+
+The first pursuit's 67470 is cast from `Reset()` while the spike is added to the
+map, before any client has its create packet, so no bot receives it. 65920 is cast
+triggered and has no spell visual, so the core sends no `SMSG_SPELL_GO` for it.

@@ -44,5 +44,6 @@ Hard rules (CI builds with `-Werror` and runs `cppcheck`):
 - `SpellInfoCorrections.cpp` → `systems/spells.md`
 - `src/server/game/AI/**` outside `SmartScripts/`, or an AI class (`ScriptedAI`, `BossAI`, `CreatureAI`, `GameObjectAI`,
   …) under `modules/` → `systems/creature-ai.md`
+- `src/server/game/AI/SmartScripts/**` → `systems/smartai.md`
 - A `SpellScript`/`AuraScript` under `modules/` → `systems/spells.md`
 - An `InstanceScript`/`InstanceMapScript` under `modules/` → `systems/instance-scripts.md`
