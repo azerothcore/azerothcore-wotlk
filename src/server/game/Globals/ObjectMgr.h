@@ -42,6 +42,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_set>
 
 class Item;
 struct DungeonProgressionRequirements;
@@ -787,6 +788,7 @@ public:
     ItemTemplate const* GetItemTemplate(uint32 entry);
     [[nodiscard]] ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
     [[nodiscard]] std::vector<ItemTemplate*> const* GetItemTemplateStoreFast() const { return &_itemTemplateStoreFast; }
+    [[nodiscard]] bool IsItemObtainSpell(uint32 spellId) const { return _itemObtainSpells.contains(spellId); }
 
     uint32 GetModelForTotem(SummonSlot totemSlot, Races race) const;
 
@@ -1725,6 +1727,7 @@ private:
     BroadcastTextContainer _broadcastTextStore;
     ItemTemplateContainer _itemTemplateStore;
     std::vector<ItemTemplate*> _itemTemplateStoreFast; // pussywizard
+    std::unordered_set<uint32> _itemObtainSpells; // spells any item template casts on obtain
     ItemLocaleContainer _itemLocaleStore;
     ItemSetNameLocaleContainer _itemSetNameLocaleStore;
     QuestLocaleContainer _questLocaleStore;
