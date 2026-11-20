@@ -127,6 +127,7 @@ enum AnubSpells
     SPELL_FROST_SPHERE                          = 67539,
     SPELL_PERMAFROST                            = 66193,
     SPELL_PERMAFROST_VISUAL                     = 65882,
+    SPELL_PERMAFROST_MODEL                      = 66185,
 
     // Burrower
     SPELL_SPIDER_FRENZY                         = 66128,
@@ -477,8 +478,7 @@ struct npc_frost_sphere : public NullCreatureAI
                 scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
                 {
                     me->RemoveAurasDueToSpell(SPELL_FROST_SPHERE);
-                    me->SetDisplayId(MODEL_INVISIBLE_STALKER);
-                    me->SetObjectScale(2.0f);
+                    DoCastSelf(SPELL_PERMAFROST_MODEL, true);
                     me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 142.7f, me->GetOrientation(), false);
                     me->SetFacingTo(me->GetOrientation());
                     DoCastSelf(SPELL_PERMAFROST_VISUAL, true);
@@ -493,7 +493,8 @@ struct npc_frost_sphere : public NullCreatureAI
     {
         if (spell->Id == SPELL_SPIKE_FAIL)
         {
-            me->RemoveAllAuras();
+            // Keep the Permafrost model until the despawn instead of flashing back to a sphere.
+            me->RemoveAllAurasExceptType(SPELL_AURA_TRANSFORM);
             me->DespawnOrUnsummon(1500ms);
         }
     }
