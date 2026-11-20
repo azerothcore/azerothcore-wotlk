@@ -59,10 +59,10 @@ emote:
 
 - First pursuit: no target and no movement until Pursued by Anub'arak (67574) lands
   about 1.6s after the spike appears, with the emote naming the marked player.
-- Divine Shield on the marked player: the other is re-marked at once, without a
-  new 67470.
-- Restart: 67470 hits the player who is not shielded, and the mark follows 1.6s
-  later without the spike moving first.
+- Divine Shield on the marked player: the other is re-marked within a second,
+  without a new 67470.
+- Restart: 67470 hits the player who is not shielded, and the mark and emote
+  follow 1.6s later without the spike moving first.
 
 The first pursuit's 67470 is cast from `Reset()` while the spike is added to the
 map, before any client has its create packet, so no bot receives it. 65920 is cast

@@ -4,6 +4,7 @@ package trial_of_the_crusader_test
 
 import (
 	"encoding/binary"
+	"fmt"
 	"slices"
 	"sync"
 	"testing"
@@ -47,7 +48,6 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 		npcSphere = uint32(34606)
 		npcSpike  = uint32(34660)
 
-		speed1     = uint32(65920)
 		search     = uint32(67470)
 		mark       = uint32(67574)
 		spikeFail  = uint32(66181)
@@ -141,16 +141,35 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 		})
 		return found
 	}
-	castsBetween := func(from, to int, spells ...uint32) []uint32 {
+	castsBetween := func(from, to int, spell uint32) int {
 		mu.Lock()
 		defer mu.Unlock()
-		var out []uint32
+		n := 0
 		for _, c := range casts[from:to] {
-			if slices.Contains(spells, c.spell) {
-				out = append(out, c.spell)
+			if c.spell == spell {
+				n++
 			}
 		}
-		return out
+		return n
+	}
+	// checkEmote asserts the raid boss emote naming the player the mark at index iMark hit.
+	checkEmote := func(label string, iMark int) {
+		m := castAt(iMark)
+		if len(m.hits) == 0 {
+			e2eharness.Assertf(t, "%s: 67574 hit nobody", label)
+		}
+		if !waitSpikeCondition(time.Second, func() bool {
+			mu.Lock()
+			defer mu.Unlock()
+			for _, e := range emotes {
+				if e.receiver == m.hits[0] && e.at.Sub(m.at).Abs() < 500*time.Millisecond {
+					return true
+				}
+			}
+			return false
+		}) {
+			e2eharness.Assertf(t, "%s: no raid boss emote naming 0x%X with the mark", label, m.hits[0])
+		}
 	}
 	// waitMarkHoldingStill waits for the first mark at or after index from and returns its index.
 	// From since until the mark, the spike must not target anyone or move.
@@ -168,19 +187,25 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 			if time.Since(since) < grace {
 				continue
 			}
+			violation := ""
 			if target := a.UnitTarget(spike); target != 0 {
-				e2eharness.Assertf(t, "%s: spike targets 0x%X before marking anyone", label, target)
+				violation = fmt.Sprintf("targets 0x%X", target)
+			} else if obj := a.World.GetObject(spike); obj != nil && obj.HasKnownPosition() {
+				x, y, z := obj.InterpolatedPosition()
+				if !anchored {
+					sx, sy, sz, anchored = x, y, z, true
+				} else if d := e2eharness.Distance3D(x, y, z, sx, sy, sz); d > 1.5 {
+					violation = fmt.Sprintf("moved %.1f yards", d)
+				}
 			}
-			obj := a.World.GetObject(spike)
-			if obj == nil || !obj.HasKnownPosition() {
+			if violation == "" {
 				continue
 			}
-			x, y, z := obj.InterpolatedPosition()
-			if !anchored {
-				sx, sy, sz, anchored = x, y, z, true
-			} else if d := e2eharness.Distance3D(x, y, z, sx, sy, sz); d > 1.5 {
-				e2eharness.Assertf(t, "%s: spike moved %.1f yards before marking anyone", label, d)
+			// The mark and the target update can both arrive between the two reads above.
+			if iMark = waitCast(from, mark, 0); iMark >= 0 {
+				break
 			}
+			e2eharness.Assertf(t, "%s: spike %s before marking anyone", label, violation)
 		}
 		if iMark < 0 {
 			e2eharness.Assertf(t, "%s: no 67574 mark within %s", label, markMax+time.Second)
@@ -202,6 +227,7 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 			e2eharness.Assertf(t, "%s: 67574 landed %s after 67470, want %s-%s", label, gap, markMin, markMax)
 		}
 		t.Logf("%s: 67470 hits=%X, mark on 0x%X %s later", label, start.hits, castAt(iMark).hits, gap)
+		checkEmote(label, iMark)
 		return iMark
 	}
 
@@ -231,30 +257,26 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 	if first.hits[0] == b.GUID {
 		marked, other = b, a
 	}
-	if !waitSpikeCondition(time.Second, func() bool {
-		mu.Lock()
-		defer mu.Unlock()
-		for _, e := range emotes {
-			if e.receiver == marked.GUID && e.at.Sub(first.at).Abs() < 500*time.Millisecond {
-				return true
-			}
-		}
-		return false
-	}) {
-		e2eharness.Assertf(t, "first pursuit: no raid boss emote naming 0x%X with the mark", marked.GUID)
-	}
+	checkEmote("first pursuit", iMark)
 	t.Log("PASS: first pursuit holds still, then marks and emotes 1.6s after the spike appears")
 
+	// A re-mark through the 1.6s EVENT_SPIKE_MARK would land outside this window.
+	const remarkMax = time.Second
+	shieldSent := time.Now()
 	marked.CastMust(t, shield, marked.GUID, 5*time.Second)
 	iRemark := waitCast(iMark+1, mark, 3*time.Second)
 	if iRemark < 0 {
 		e2eharness.Assertf(t, "mid-pursuit: spike did not re-mark after Divine Shield on 0x%X", marked.GUID)
 	}
-	if hits := castAt(iRemark).hits; !slices.Contains(hits, other.GUID) {
-		e2eharness.Assertf(t, "mid-pursuit: re-mark hit %X, want 0x%X", hits, other.GUID)
+	remark := castAt(iRemark)
+	if !slices.Contains(remark.hits, other.GUID) {
+		e2eharness.Assertf(t, "mid-pursuit: re-mark hit %X, want 0x%X", remark.hits, other.GUID)
 	}
-	if extra := castsBetween(iMark+1, iRemark, speed1, search); len(extra) != 0 {
-		e2eharness.Assertf(t, "mid-pursuit: spike restarted the pursuit (%v) instead of re-marking", extra)
+	if gap := remark.at.Sub(shieldSent); gap > remarkMax {
+		e2eharness.Assertf(t, "mid-pursuit: re-mark landed %s after Divine Shield, want under %s", gap, remarkMax)
+	}
+	if n := castsBetween(iMark+1, iRemark, search); n != 0 {
+		e2eharness.Assertf(t, "mid-pursuit: spike cast 67470 %d times before re-marking", n)
 	}
 	t.Log("PASS: a target lost mid-pursuit is re-marked at once, without 67470")
 
@@ -274,7 +296,7 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 	}
 	// The first marked player may still be under Divine Shield, so only the other must be hit.
 	checkPursuitStart("restart", iSearch2, spike, []uint64{other.GUID})
-	t.Log("PASS: a restart after a Frost Sphere casts 67470 on the players, then marks 1.6s later")
+	t.Log("PASS: a restart after a Frost Sphere casts 67470 on the players, then marks and emotes 1.6s later")
 }
 
 // parseSpikeSpellGo reads a 3.3.5 SMSG_SPELL_GO: packed item caster and caster guids, cast count,
