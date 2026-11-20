@@ -1,6 +1,8 @@
 --
 -- The pilot's attack command reaches AttackStart; the script adds the melee VehicleAI lacks.
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_warbear_matriarch' WHERE `entry` = 29918;
+-- Warbear Matriarch: DamageModifier 7.5 -> 3 (ridden stat sheet, WotLK Classic: 1264.69-1759.46 at 642 AP, 2000 ms)
+UPDATE `creature_template` SET `DamageModifier` = 3 WHERE `entry` = 29918;
 
 -- Kirgaraak: the bear's swings can skip the 0-5% health window, so keep him alive until it runs.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 29352);
