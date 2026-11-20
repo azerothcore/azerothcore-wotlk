@@ -181,7 +181,7 @@ public:
             if ((bhd & BHSF_FINISHED) == 0)
                 return true;
 
-        instance->SetData(DATA_BATTERED_HILT, 1);
+        instance->SetData(DATA_BATTERED_HILT, BATTERED_HILT_DISABLE);
 
         ClearGossipMenuFor(player);
         switch (uiAction)
@@ -283,7 +283,7 @@ public:
                 shortver = false;
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                 me->GetMotionMaster()->MovePoint(0, MoveThronePos);
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                 {
                     loralen->LoadEquipment(true);
                     loralen->SetVisible(true);
@@ -305,7 +305,7 @@ public:
                 shortver = true;
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, (me->GetEntry() == NPC_JAINA_PART1 ? EMOTE_STATE_READY2H : EMOTE_STATE_READY1H));
                 me->GetMotionMaster()->MovePoint(0, MoveThronePos);
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     loralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
                 events.ScheduleEvent(EVENT_INTRO_LK_1, 0ms);
                 break;
@@ -320,13 +320,13 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_A2_3, 10s);
                 break;
             case EVENT_INTRO_A2_3:
-                instance->HandleGameObject(GO_FROSTMOURNE, true);
+                instance->HandleGameObject(DATA_FROSTMOURNE, true);
                 DoCastSelf(SPELL_FROSTMOURNE_SPAWN_SOUND, true);
                 //DoCastSelf(SPELL_ARCANE_CAST_VISUAL);// the sniff is missing from the alliance
                 events.ScheduleEvent(EVENT_INTRO_A2_4, 10s);
                 break;
             case EVENT_INTRO_A2_4:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                     uther->SetVisible(true);
@@ -336,7 +336,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_A2_5, 2s);
                 break;
             case EVENT_INTRO_A2_5:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->AI()->Talk(SAY_UTHER_INTRO_A2_1);
                     events.ScheduleEvent(EVENT_INTRO_A2_6, 3s);
@@ -347,7 +347,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_A2_7, 6s);
                 break;
             case EVENT_INTRO_A2_7:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     uther->AI()->Talk(SAY_UTHER_INTRO_A2_2);
                 events.ScheduleEvent(EVENT_INTRO_A2_8, 6500ms);
                 break;
@@ -356,7 +356,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_A2_9, 2s);
                 break;
             case EVENT_INTRO_A2_9:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     uther->AI()->Talk(SAY_UTHER_INTRO_A2_3);
                 events.ScheduleEvent(EVENT_INTRO_A2_10, 9s);
                 break;
@@ -365,7 +365,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_A2_11, 5s);
                 break;
             case EVENT_INTRO_A2_11:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     uther->AI()->Talk(SAY_UTHER_INTRO_A2_4);
                 events.ScheduleEvent(EVENT_INTRO_A2_12, 11s);
                 break;
@@ -374,7 +374,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_A2_13, 4s);
                 break;
             case EVENT_INTRO_A2_13:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     uther->AI()->Talk(SAY_UTHER_INTRO_A2_5);
                 events.ScheduleEvent(EVENT_INTRO_A2_14, 12s + 500ms);
                 break;
@@ -383,12 +383,12 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_A2_15, 10s);
                 break;
             case EVENT_INTRO_A2_15:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     uther->AI()->Talk(SAY_UTHER_INTRO_A2_6);
                 events.ScheduleEvent(EVENT_INTRO_A2_16, 24s);
                 break;
             case EVENT_INTRO_A2_16:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     uther->AI()->Talk(SAY_UTHER_INTRO_A2_7);
                 events.ScheduleEvent(EVENT_INTRO_A2_17, 4s);
                 break;
@@ -397,7 +397,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_A2_18, 2s);
                 break;
             case EVENT_INTRO_A2_18:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     uther->AI()->Talk(SAY_UTHER_INTRO_A2_8);
@@ -411,12 +411,12 @@ public:
 
                 // H2 Intro Events
             case EVENT_LORALEN_MOVE_1:
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     loralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
                 break;
 
             case EVENT_LORALEN_MOVE_2:
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     loralen->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
                 break;
 
@@ -440,7 +440,7 @@ public:
 
             case EVENT_INTRO_H2_3_1:
                 DoCastSelf(SPELL_FROSTMOURNE_SPAWN_SOUND);
-                instance->HandleGameObject(GO_FROSTMOURNE, true);
+                instance->HandleGameObject(DATA_FROSTMOURNE, true);
                 events.ScheduleEvent(EVENT_INTRO_H2_3_2, 3s);
                 break;
 
@@ -449,7 +449,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_H2_4, 2s);
                 break;
             case EVENT_INTRO_H2_4:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->SetVisible(true);
                     if (Aura* a = uther->AddAura(SPELL_SHADOWMOURNE_VISUAL, uther))
@@ -459,7 +459,7 @@ public:
                 break;
 
             case EVENT_INTRO_H2_5:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     uther->AI()->Talk(SAY_UTHER_INTRO_H2_1);
@@ -472,7 +472,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_H2_7, 2s + 500ms);
                 break;
             case EVENT_INTRO_H2_7:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     uther->AI()->Talk(SAY_UTHER_INTRO_H2_2);
@@ -485,7 +485,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_H2_9, 5s);
                 break;
             case EVENT_INTRO_H2_9:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     uther->AI()->Talk(SAY_UTHER_INTRO_H2_3);
@@ -498,7 +498,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_H2_11, 3s);
                 break;
             case EVENT_INTRO_H2_11:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     uther->AI()->Talk(SAY_UTHER_INTRO_H2_4);
@@ -511,7 +511,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_H2_13, 3s + 500ms);
                 break;
             case EVENT_INTRO_H2_13:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     uther->AI()->Talk(SAY_UTHER_INTRO_H2_5);
@@ -519,7 +519,7 @@ public:
                 events.ScheduleEvent(EVENT_INTRO_H2_14, 12s + 500ms);
                 break;
             case EVENT_INTRO_H2_14:
-                if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
                     uther->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     uther->AI()->Talk(SAY_UTHER_INTRO_H2_6);
@@ -534,10 +534,10 @@ public:
 
                 // Remaining Intro Events common for both faction
             case EVENT_INTRO_LK_1:
-                if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_EVENT))
+                if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING_EVENT))
                 {
 
-                    instance->HandleGameObject(GO_ARTHAS_DOOR, true);
+                    instance->HandleGameObject(DATA_ARTHAS_DOOR, true);
                     lichKing->SetVisible(true);
 
                     lichKing->GetMotionMaster()->MovePoint(0, LichKingMoveMidlelThronePos, FORCED_MOVEMENT_NONE, 0.f, false);
@@ -545,7 +545,7 @@ public:
                 }
 
                 if (!shortver)
-                    if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                    if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     {
                         uther->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                         if (me->GetEntry() == NPC_JAINA_PART1)
@@ -562,7 +562,7 @@ public:
                 break;
 
             case EVENT_INTRO_LK_1_1:
-                if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_EVENT))
+                if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING_EVENT))
                 {
                     lichKing->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                     lichKing->AI()->Talk(SAY_LK_INTRO_1);
@@ -571,7 +571,7 @@ public:
 
             case EVENT_INTRO_LK_1_2:
                 if (!shortver)
-                    if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                    if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     {
                         uther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
                         uther->SetFacingTo(0.89f);
@@ -579,12 +579,12 @@ public:
                 break;
 
             case EVENT_INTRO_LK_1_3:
-                instance->HandleGameObject(GO_ARTHAS_DOOR, false);
+                instance->HandleGameObject(DATA_ARTHAS_DOOR, false);
                 break;
 
             case EVENT_INTRO_LK_2:
                 if (!shortver)
-                    if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_EVENT))
+                    if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING_EVENT))
                     {
                         lichKing->SetVisible(true);
                         lichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, FORCED_MOVEMENT_NONE, 0.f, false);
@@ -594,7 +594,7 @@ public:
 
             case EVENT_INTRO_LK_2_1:
                 if (!shortver)
-                    if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                    if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     {
                         uther->SendPlaySpellVisual(SPELL_UTHER_DESPAWN);
                         uther->CastSpell(uther, SPELL_UTHER_DESPAWN, true);
@@ -604,13 +604,13 @@ public:
 
             case EVENT_INTRO_LK_3:
                 if (!shortver)
-                    if (Creature* uther = instance->GetCreature(NPC_UTHER))
+                    if (Creature* uther = instance->GetCreature(DATA_UTHER))
                         uther->SetVisible(false);
                 events.ScheduleEvent(EVENT_INTRO_LK_4, 6s);
                 break;
 
             case EVENT_INTRO_LK_4:
-                if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_EVENT))
+                if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING_EVENT))
                 {
                     lichKing->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                     lichKing->AI()->Talk(SAY_LK_INTRO_2);
@@ -619,20 +619,20 @@ public:
                 break;
 
             case EVENT_INTRO_LK_4_2:
-                if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_EVENT))
+                if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING_EVENT))
                 {
                     lichKing->LoadEquipment(1, true);
                     lichKing->SendMovementFlagUpdate();
                     lichKing->CastSpell(lichKing, SPELL_FROSTMOURNE_EQUIP);
-                    instance->HandleGameObject(GO_FROSTMOURNE, false);
+                    instance->HandleGameObject(DATA_FROSTMOURNE, false);
                     events.ScheduleEvent(EVENT_INTRO_LK_4_3, 1750ms);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_5, 6s);
                 break;
 
             case EVENT_INTRO_LK_4_3:
-                if (GameObject* go = instance->GetGameObject(GO_FROSTMOURNE))
-                    go->SetPhaseMask(2, true);
+                if (GameObject* go = instance->GetGameObject(DATA_FROSTMOURNE))
+                    go->SetPhaseMask(PHASEMASK_HIDDEN, true);
                 break;
             case EVENT_INTRO_LK_5:
                 if (Creature* falric = instance->GetCreature(DATA_FALRIC))
@@ -666,7 +666,7 @@ public:
                 break;
 
             case EVENT_INTRO_LK_5_1:
-                if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_EVENT))
+                if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING_EVENT))
                 {
                     lichKing->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     lichKing->AI()->Talk(SAY_LK_INTRO_3);
@@ -674,7 +674,7 @@ public:
                 break;
 
             case EVENT_INTRO_LK_5_2:
-                if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_EVENT))
+                if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING_EVENT))
                     lichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, FORCED_MOVEMENT_NONE, 0.f, false);
                 break;
 
@@ -682,7 +682,7 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.6);
                 me->SetSheath(SHEATH_STATE_MELEE);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                 {
                     loralen->SetSheath(SHEATH_STATE_MELEE);
                     loralen->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
@@ -713,8 +713,8 @@ public:
                 if (Creature* falric = instance->GetCreature(DATA_FALRIC))
                 {
                     falric->AI()->Talk(SAY_FALRIC_INTRO_2);
-                    instance->SetData(ACTION_SHOW_TRASH, 1);
-                    instance->HandleGameObject(GO_ARTHAS_DOOR, true);
+                    instance->SetData(DATA_SHOW_TRASH, 1);
+                    instance->HandleGameObject(DATA_ARTHAS_DOOR, true);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_9, 6s);
                 break;
@@ -730,27 +730,27 @@ public:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                     me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     loralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk1, FORCED_MOVEMENT_NONE, 0.f, false);
                 events.ScheduleEvent(EVENT_INTRO_LK_10, 1s + 500ms);
                 break;
 
             case EVENT_INTRO_LK_10:
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     loralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk2, FORCED_MOVEMENT_NONE, 0.f, false);
                 events.ScheduleEvent(EVENT_INTRO_LK_11, 2s);
                 break;
 
             case EVENT_INTRO_LK_11:
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     loralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk3, FORCED_MOVEMENT_NONE, 0.f, false);
                 events.ScheduleEvent(EVENT_INTRO_LK_12, 5s + 500ms);
                 break;
 
             case EVENT_INTRO_LK_12:
-                if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_EVENT))
+                if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING_EVENT))
                     lichKing->SetVisible(false);
-                if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     loralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, FORCED_MOVEMENT_NONE, 0.f, false);
                 events.ScheduleEvent(EVENT_INTRO_LK_13, 2s);
                     break;
@@ -760,12 +760,12 @@ public:
                     break;
 
                 case EVENT_INTRO_END:
-                    instance->HandleGameObject(GO_ARTHAS_DOOR, false);
-                    instance->HandleGameObject(GO_FRONT_DOOR, false);
+                    instance->HandleGameObject(DATA_ARTHAS_DOOR, false);
+                    instance->HandleGameObject(DATA_FRONT_DOOR, false);
                     events.ScheduleEvent(EVENT_INTRO_END_SET, 3s);
                     break;
                 case EVENT_INTRO_END_SET:
-                    if (Creature* loralen = instance->GetCreature(NPC_DARK_RANGER_LORALEN))
+                    if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     {
                         loralen->UpdatePosition(5369.71289f, 2083.6330f, 707.695129f, 0.188739f, true);
                         loralen->StopMovingOnCurrentPos();
@@ -871,7 +871,7 @@ struct npc_ghostly_priest: public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1)
+        if (action == ACTION_WAVE_ENGAGE)
         {
             me->SetInCombatWithZone();
             if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
@@ -963,7 +963,7 @@ struct npc_phantom_mage: public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1)
+        if (action == ACTION_WAVE_ENGAGE)
         {
             me->SetInCombatWithZone();
             if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
@@ -1092,7 +1092,7 @@ struct npc_shadowy_mercenary: public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1)
+        if (action == ACTION_WAVE_ENGAGE)
         {
             me->SetInCombatWithZone();
             if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
@@ -1183,7 +1183,7 @@ struct npc_spectral_footman: public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1)
+        if (action == ACTION_WAVE_ENGAGE)
         {
             me->SetInCombatWithZone();
             if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
@@ -1262,7 +1262,7 @@ struct npc_tortured_rifleman  : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1)
+        if (action == ACTION_WAVE_ENGAGE)
         {
             me->SetInCombatWithZone();
             if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0f, true))
@@ -1355,7 +1355,7 @@ struct boss_frostsworn_general : public ScriptedAI
         Talk(SAY_FROSTSWORN_GENERAL_AGGRO);
         events.ScheduleEvent(EVENT_ACTIVATE_REFLECTIONS, 8s);
         events.ScheduleEvent(EVENT_THROW_SHIELD, 6s);
-        instance->SetData(ACTION_SPIRITUAL_REFLECTIONS_COPY, 1);
+        instance->SetData(DATA_SPIRITUAL_REFLECTIONS_COPY, 1);
     }
 
     void UpdateAI(uint32 diff) override
@@ -1379,7 +1379,7 @@ struct boss_frostsworn_general : public ScriptedAI
         {
             case EVENT_ACTIVATE_REFLECTIONS:
                 DoCastAOE(SPELL_SUMMON_REFLECTIONS_DUMMY);
-                instance->SetData(ACTION_SPIRITUAL_REFLECTIONS_ACTIVATE, 1);
+                instance->SetData(DATA_SPIRITUAL_REFLECTIONS_ACTIVATE, 1);
                 break;
             case EVENT_THROW_SHIELD:
                 if (Unit* target = SelectTargetFromPlayerList(40.0f, 0, true))
@@ -1400,7 +1400,7 @@ struct boss_frostsworn_general : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        instance->SetData(ACTION_SPIRITUAL_REFLECTIONS_HIDE, 1);
+        instance->SetData(DATA_SPIRITUAL_REFLECTIONS_HIDE, 1);
         ScriptedAI::EnterEvadeMode(why);
     }
 };
@@ -1531,7 +1531,7 @@ struct npc_hor_lich_king : public NullCreatureAI
     void WallCompleted()
     {
         ++currentWall;
-        instance->SetData(ACTION_DELETE_ICE_WALL, 1);
+        instance->SetData(DATA_DELETE_ICE_WALL, 1);
         if (currentWall <= 3)
         {
             events.ScheduleEvent(EVENT_LK_SUMMON_NEXT_ICE_WALL, 1s);
@@ -1539,8 +1539,8 @@ struct npc_hor_lich_king : public NullCreatureAI
         }
         else
             me->RemoveAura(SPELL_REMORSELESS_WINTER);
-        if (Creature* c = instance->GetCreature(NPC_SYLVANAS_PART2))
-            c->AI()->DoAction(ACTION_INFORM_WALL_DESTROYED);
+        if (Creature* leader = instance->GetCreature(DATA_SYLVANAS_PART2))
+            leader->AI()->DoAction(ACTION_INFORM_WALL_DESTROYED);
     }
 
     void MovementInform(uint32 type, uint32  /*id*/) override
@@ -1553,7 +1553,7 @@ struct npc_hor_lich_king : public NullCreatureAI
             {
                 Talk(SAY_LK_IW_1);
                 me->SetOrientation(4.15f);
-                if (Creature* icewall = instance->instance->GetCreature(instance->GetGuidData(NPC_ICE_WALL_TARGET)))
+                if (Creature* icewall = instance->instance->GetCreature(instance->GetGuidData(DATA_ICE_WALL_TARGET_1)))
                 {
                     me->SetFacingToObject(icewall);
                     me->CastSpell(icewall, SPELL_SUMMON_ICE_WALL);
@@ -1617,7 +1617,7 @@ struct npc_hor_lich_king : public NullCreatureAI
             case EVENT_LK_CHECK_COMBAT:
                 if (me->isActiveObject()) // during fight
                 {
-                    if (Creature* leader = instance->GetCreature(NPC_SYLVANAS_PART2))
+                    if (Creature* leader = instance->GetCreature(DATA_SYLVANAS_PART2))
                         if (leader->IsAlive() && leader->GetPositionX() < 5575.0f && me->GetExactDist2d(leader) <= 12.5f && !leader->HasAura(SPELL_HARVEST_SOUL) && me->HasAura(SPELL_REMORSELESS_WINTER))
                         {
                             me->GetMotionMaster()->MovementExpired();
@@ -1649,13 +1649,13 @@ struct npc_hor_lich_king : public NullCreatureAI
                     else
                     {
                         summons.DespawnAll();
-                        instance->SetData(ACTION_STOP_LK_FIGHT, 1);
+                        instance->SetData(DATA_STOP_LK_FIGHT, 1);
                     }
                 }
                 events.ScheduleEvent(EVENT_LK_CHECK_COMBAT, 1s);
                 break;
             case EVENT_LK_KILL_LEADER:
-                if (Creature* leader = instance->GetCreature(NPC_SYLVANAS_PART2))
+                if (Creature* leader = instance->GetCreature(DATA_SYLVANAS_PART2))
                 {
                     leader->CastSpell(leader, SPELL_HOR_SUICIDE, true);
                     Unit::Kill(me, leader);
@@ -1731,8 +1731,8 @@ struct npc_hor_lich_king : public NullCreatureAI
                 break;
             case EVENT_LK_SUMMON_NEXT_ICE_WALL:
                 Talk(SAY_LK_IW_1 + currentWall);
-                if (Creature* c = instance->instance->GetCreature(instance->GetGuidData(NPC_ICE_WALL_TARGET + currentWall)))
-                    me->CastSpell(c, SPELL_SUMMON_ICE_WALL);
+                if (Creature* icewall = instance->instance->GetCreature(instance->GetGuidData(DATA_ICE_WALL_TARGET_1 + currentWall)))
+                    me->CastSpell(icewall, SPELL_SUMMON_ICE_WALL);
                 break;
         }
     }
@@ -1839,30 +1839,30 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_LK_SAY_AGGRO:
-                    if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                     {
                         me->Attack(lichKing, true),
                         lichKing->AI()->Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_LK_AGGRO_ALLY : SAY_LK_AGGRO_HORDE);
                     }
                     break;
                 case EVENT_LK_BATTLE_1:
-                    if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                         lichKing->CastSpell(lichKing, SPELL_SOUL_REAPER);
                     break;
                 case EVENT_LK_BATTLE_2:
                     //horda
-                    if (Creature* leader = instance->GetCreature(NPC_SYLVANAS_PART2))
+                    if (Creature* leader = instance->GetCreature(DATA_SYLVANAS_PART2))
                         leader->CastSpell(leader, SPELL_EVASION, true);
-                    if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                         lichKing->SetFacingToObject(me);
-                    if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                     {
                         lichKing->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK2HTIGHT);
                         me->SetFacingToObject(lichKing);
                     }
                     break;
                 case EVENT_JAINA_IMMOBILIZE_LK:
-                    if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                     {
                         lichKing->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_SPELL_OMNI);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
@@ -1871,7 +1871,7 @@ public:
                     }
                     break;
                 case EVENT_SYLVANAS_IMMOBILIZE_JUMP:
-                    if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                     {
                         me->AttackStop();
                         me->SetSheath(SHEATH_STATE_MELEE);
@@ -1883,7 +1883,7 @@ public:
                     }
                     break;
                 case EVENT_SYLVANAS_DARK_BINDING:
-                    if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                         me->CastSpell(lichKing, SPELL_SYLVANAS_DARK_BINDING);
                     events.ScheduleEvent(EVENT_SAY_LEAVE, 2s);
                     break;
@@ -1908,10 +1908,10 @@ public:
                     break;
                 case EVENT_START_RUN:
                     {
-                        instance->SetData(ACTION_START_LK_FIGHT, 1);
+                        instance->SetData(DATA_START_LK_FIGHT, 1);
                         me->setActive(true);
                         MoveToNextStopPoint();
-                        if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
+                        if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                         {
                             lichKing->setActive(true);
                             lichKing->SetInCombatWithZone();
@@ -2136,7 +2136,7 @@ public:
     {
         if (player->HasAura(SPELL_QUELDELAR_COMPULSION))
             if (InstanceScript* instance = player->GetInstanceScript())
-                instance->SetData(DATA_BATTERED_HILT, 2);
+                instance->SetData(DATA_BATTERED_HILT, BATTERED_HILT_START);
         return true;
     }
 };
@@ -2156,7 +2156,7 @@ public:
                     return true;
                 player->CastSpell(player, SPELL_QUELDELAR_WILL, true);
                 player->DestroyItemCount(49766, 1, true);
-                instance->SetData(DATA_BATTERED_HILT, 3);
+                instance->SetData(DATA_BATTERED_HILT, BATTERED_HILT_THROW);
             }
         return true;
     }
