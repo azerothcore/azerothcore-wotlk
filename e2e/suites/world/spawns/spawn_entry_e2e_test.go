@@ -420,14 +420,15 @@ type groupLimit struct {
 }
 
 // packMembers returns the living creatures of the group's entries that stay on a member
-// point through an observation window. A patrol walks through this pack's points, so one
-// look cannot tell a member from a passer-by; a member is on its point in nearly every
-// sample, a passer-by in a few.
+// point through an observation window. A patrol of the same entries walks through this
+// pack: its path passes 1.5 yards from one member point, so one look cannot tell a member
+// from a passer-by. A member is on its point in nearly every sample; the patrol needs under
+// 4 seconds to cross a point's radius, so the window has to be well above that.
 func packMembers(bot *e2eharness.ScenarioBot, members []spawnPoint, entries []uint32, window time.Duration) map[uint32]e2eharness.UnitSnap {
-	const memberRadius = float32(6) // the members wander 3 yards around points at least 6.8 apart
-	onPoint := map[uint64]uint32{}  // creature guid -> spawn id of the point it was last seen on
-	sightings := map[uint64]int{}
-	moved := map[uint64]bool{} // seen on two points: a passer-by, however long it lingered
+	// The members wander 3 yards around points at least 6.8 apart: some slack for a
+	// position read mid-move, and the nearest point wins where two radii overlap.
+	const memberRadius = float32(4.5)
+	sightings := map[uint64]map[uint32]int{} // creature guid -> spawn id of a point -> samples seen on it
 	units := map[uint64]e2eharness.UnitSnap{}
 	samples := 0
 	for deadline := time.Now().Add(window); time.Now().Before(deadline); time.Sleep(250 * time.Millisecond) {
@@ -444,23 +445,31 @@ func packMembers(bot *e2eharness.ScenarioBot, members []spawnPoint, entries []ui
 				}
 			}
 			if nearest != 0 {
-				if prev, ok := onPoint[u.GUID]; ok && prev != nearest {
-					moved[u.GUID] = true
+				if sightings[u.GUID] == nil {
+					sightings[u.GUID] = map[uint32]int{}
 				}
-				onPoint[u.GUID] = nearest
+				sightings[u.GUID][nearest]++
 				units[u.GUID] = u
-				sightings[u.GUID]++
 			}
 		}
 	}
-	for guid, seen := range sightings {
-		if seen*4 < samples*3 || moved[guid] {
-			delete(onPoint, guid)
-		}
-	}
+
+	// A creature belongs to the point it was seen on most, and is a member when it was on
+	// the pack's points in at least 3 of 4 samples. Where two claim a point, the steadier wins.
 	out := map[uint32]e2eharness.UnitSnap{}
-	for guid, spawnID := range onPoint {
-		out[spawnID] = units[guid]
+	held := map[uint32]int{}
+	for guid, points := range sightings {
+		total, home, most := 0, uint32(0), 0
+		for spawnID, seen := range points {
+			total += seen
+			if seen > most {
+				home, most = spawnID, seen
+			}
+		}
+		if total*4 < samples*3 || total <= held[home] {
+			continue
+		}
+		out[home], held[home] = units[guid], total
 	}
 	return out
 }
@@ -575,9 +584,9 @@ func TestSpawnGroup_EntryMinimumsHoldAcrossRespawns(t *testing.T) {
 		bot.DamageKill(t, []uint64{victim.GUID}, 0, 15*time.Second)
 		bot.GM(t, fmt.Sprintf(".respawn creature guid %d", victimSpawn))
 
-		deadline := time.Now().Add(30 * time.Second)
+		deadline := time.Now().Add(40 * time.Second)
 		for {
-			pack = packMembers(bot, members, entries, 4*time.Second)
+			pack = packMembers(bot, members, entries, 8*time.Second)
 			if _, back := pack[victimSpawn]; back || time.Now().After(deadline) {
 				break
 			}
