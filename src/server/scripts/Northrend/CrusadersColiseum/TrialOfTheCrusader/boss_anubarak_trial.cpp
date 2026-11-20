@@ -45,19 +45,17 @@ enum AnubNPCs
     NPC_FROST_SPHERE                            = 34606,
     NPC_BURROW                                  = 34862,
     NPC_SPIKE                                   = 34660,
+    NPC_SKITTERING_SCARAB                       = 35763,
 };
 
 enum AnubActions
 {
-    ACTION_SCARAB_SUBMERGE                      = 1,
+    ACTION_SCARAB_SUBMERGE                      = 1, // read by the Skittering Scarab SmartAI (ACTION_DONE)
     ACTION_SPIKE_FAIL                           = 2,
 };
 
 Position const AnubLocs[] =
 {
-    // scarab's beginning pos
-    {722.65f, 135.41f, 142.16f, M_PI},
-
     // churning ground spawns
     {694.886353f, 102.484665f, 142.119614f, 0.0f},
     {731.987244f, 83.3824690f, 142.119614f, 0.0f},
@@ -170,17 +168,6 @@ struct boss_anubarak_trial : public BossAI
         _phase3 = false;
         me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        for (uint8 i = 0; i < 10; ++i)
-        {
-            float angle = rand_norm() * 2 * M_PI;
-            float dist = rand_norm() * 40.0f;
-            if (Creature* scarab = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + std::sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
-            {
-                scarab->SetFaction(FACTION_PREY);
-                scarab->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                scarab->GetMotionMaster()->MoveRandom(15.0f);
-            }
-        }
     }
 
     void DoAction(int32 param) override
@@ -203,22 +190,17 @@ struct boss_anubarak_trial : public BossAI
         else
             events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4s);
 
-        for (ObjectGuid const& guid : summons)
-        {
-            if (Creature* scarab = instance->instance->GetCreature(guid))
-            {
-                scarab->GetMotionMaster()->MoveIdle();
-                scarab->StopMoving();
-                scarab->CastSpell(scarab, SPELL_SUBMERGE, false);
-                scarab->AI()->DoAction(ACTION_SCARAB_SUBMERGE);
-            }
-        }
-        summons.clear();
+        // The scarabs submerge and despawn for their week-long respawn time, so they stay gone through wipes.
+        std::list<Creature*> scarabs;
+        me->GetCreatureListWithEntryInGrid(scarabs, NPC_SKITTERING_SCARAB, 150.0f);
+        for (Creature* scarab : scarabs)
+            scarab->AI()->DoAction(ACTION_SCARAB_SUBMERGE);
+
         for (uint8 i = 0; i < 4; ++i)
-            me->SummonCreature(NPC_BURROW, AnubLocs[i + 1]);
+            me->SummonCreature(NPC_BURROW, AnubLocs[i]);
         for (uint8 i = 0; i < 6; ++i)
         {
-            if (Creature* sphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]))
+            if (Creature* sphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 4]))
                 _sphereGUIDs[i] = sphere->GetGUID();
         }
 
@@ -263,7 +245,7 @@ struct boss_anubarak_trial : public BossAI
                         if (Creature* sphere = ObjectAccessor::GetCreature(*me, _sphereGUIDs[i]))
                             if (!sphere->HasAura(SPELL_FROST_SPHERE))
                             {
-                                if (Creature* newSphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]))
+                                if (Creature* newSphere = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 4]))
                                     _sphereGUIDs[i] = newSphere->GetGUID();
                                 break;
                             }
@@ -408,19 +390,7 @@ private:
 
 struct npc_swarm_scarab : public ScriptedAI
 {
-    npc_swarm_scarab(Creature* creature) : ScriptedAI(creature), _submerged(false) {}
-
-    void DoAction(int32 param) override
-    {
-        if (param == ACTION_SCARAB_SUBMERGE)
-        {
-            _submerged = true;
-            scheduler.Schedule(2s, [this](TaskContext /*context*/)
-            {
-                me->DisappearAndDie();
-            });
-        }
-    }
+    npc_swarm_scarab(Creature* creature) : ScriptedAI(creature) {}
 
     void Reset() override
     {
@@ -428,19 +398,16 @@ struct npc_swarm_scarab : public ScriptedAI
         DoCastSelf(SPELL_ACID_MANDIBLE, true);
         events.Reset();
         events.ScheduleEvent(EVENT_SPELL_DETERMINATION, 10s, 50s);
-        _submerged = false;
-        scheduler.CancelAll();
-        if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
-            if (Unit* target = me->SelectNearestTarget(250.0f))
+        if (Unit* target = me->SelectNearestTarget(250.0f))
+        {
+            AttackStart(target);
+            DoZoneInCombat();
+            if (Unit* randomTarget = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
             {
-                AttackStart(target);
-                DoZoneInCombat();
-                if (Unit* randomTarget = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
-                {
-                    me->AddThreat(randomTarget, 20000.0f);
-                    AttackStart(randomTarget);
-                }
+                me->AddThreat(randomTarget, 20000.0f);
+                AttackStart(randomTarget);
             }
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -450,12 +417,6 @@ struct npc_swarm_scarab : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        scheduler.Update(diff);
-
-        // Submerged scarabs only wait for their despawn.
-        if (_submerged)
-            return;
-
         if (!UpdateVictim())
             return;
 
@@ -478,11 +439,8 @@ struct npc_swarm_scarab : public ScriptedAI
 
     bool CanAIAttack(Unit const* target) const override
     {
-        return target->GetEntry() != NPC_FROST_SPHERE && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        return target->GetEntry() != NPC_FROST_SPHERE;
     }
-
-private:
-    bool _submerged;
 };
 
 struct npc_frost_sphere : public NullCreatureAI
