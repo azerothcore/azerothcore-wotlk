@@ -70,7 +70,7 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 				}
 			}
 			selectSpikeUnit(t, a, caster)
-			// Same spell as EVENT_SPELL_SUMMON_SPIKE. No "triggered" suffix:
+			// Same spell Anub'arak casts in EVENT_SUBMERGED. No "triggered" suffix:
 			// the GM command's debug mask would ignore the summon effect.
 			a.GM(t, ".cast self 66169")
 			spike := a.WaitUnit(t, 34660, 10*time.Second)
@@ -80,7 +80,8 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 				a.GM(t, ".npc delete")
 			})
 			if tc.name == "initially_immune" {
-				a.WaitUnitAura(t, spike, speed2, 8*time.Second)
+				// 65922 lands 7s into the pursuit, which starts after the spike's 1.6s spawn idle.
+				a.WaitUnitAura(t, spike, speed2, 10*time.Second)
 				a.AssertHasAura(t, shield)
 				b.AssertHasAura(t, shield)
 				if a.UnitTarget(spike) != 0 || a.HasAura(mark) || b.HasAura(mark) {
@@ -95,7 +96,8 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 				t.Log("PASS: initially all immune -> acquisition resumes without resetting acceleration")
 				return
 			}
-			if !waitSpikeCondition(3*time.Second, func() bool { return a.HasAura(mark) != b.HasAura(mark) }) {
+			// The mark lands about 3.2s after the summon: 1.6s spawn idle, then 1.6s target search.
+			if !waitSpikeCondition(5*time.Second, func() bool { return a.HasAura(mark) != b.HasAura(mark) }) {
 				e2eharness.Preconditionf(t, "expected exactly one marked player")
 			}
 			marked, other := a, b
