@@ -298,14 +298,12 @@ struct boss_anubarak_trial : public BossAI
                 }
                 break;
             case EVENT_SUBMERGED:
-                {
-                    bool berserk = me->HasAura(SPELL_BERSERK);
-                    DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-                    if (berserk)
-                        DoCastSelf(SPELL_BERSERK, true);
-                    DoCastSelf(SPELL_SUMMON_SPIKE, true);
-                    DoCastAOE(SPELL_SUMMON_SCARAB, true);
-                }
+                DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
+                // Berserk lasts 5 minutes; refreshing it on each submerge keeps the 10-minute enrage up.
+                if (me->HasAura(SPELL_BERSERK))
+                    DoCastSelf(SPELL_BERSERK, true);
+                DoCastSelf(SPELL_SUMMON_SPIKE, true);
+                DoCastAOE(SPELL_SUMMON_SCARAB, true);
                 break;
             case EVENT_EMERGE:
                 {

@@ -70,7 +70,7 @@ func TestAC_14076_PursuingSpikesImmunity(t *testing.T) {
 				}
 			}
 			selectSpikeUnit(t, a, caster)
-			// Same spell as EVENT_SPELL_SUMMON_SPIKE. No "triggered" suffix:
+			// Same spell Anub'arak casts in EVENT_SUBMERGED. No "triggered" suffix:
 			// the GM command's debug mask would ignore the summon effect.
 			a.GM(t, ".cast self 66169")
 			spike := a.WaitUnit(t, 34660, 10*time.Second)

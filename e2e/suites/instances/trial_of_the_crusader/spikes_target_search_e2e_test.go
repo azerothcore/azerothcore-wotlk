@@ -233,7 +233,7 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 	}
 
 	selectSpikeUnit(t, a, caster)
-	// Same spell as EVENT_SPELL_SUMMON_SPIKE; see TestAC_14076_PursuingSpikesImmunity.
+	// Same spell Anub'arak casts in EVENT_SUBMERGED; see TestAC_14076_PursuingSpikesImmunity.
 	a.GM(t, ".cast self 66169")
 	spike := a.WaitUnit(t, npcSpike, 10*time.Second)
 	appeared := time.Now()
