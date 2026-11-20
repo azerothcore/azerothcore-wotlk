@@ -381,6 +381,10 @@ func TestToC_AnubarakBurrowerSubmerge(t *testing.T) {
 			}
 			return
 		}
+		// Burrowers also cast Emerge on spawn; only the one after Submerge Burrower counts.
+		if spell == spellEmerge && gos[spellSubmergeBurrower].IsZero() {
+			return
+		}
 		if _, seen := gos[spell]; !seen {
 			gos[spell] = time.Now()
 		}
