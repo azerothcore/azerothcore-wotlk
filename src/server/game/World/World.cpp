@@ -588,6 +588,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Gameobject Data...");
     sObjectMgr->LoadGameobjects();
 
+    LOG_INFO("server.loading", "Loading Spawn Entries...");
+    sObjectMgr->LoadSpawnEntries();                                // must be after LoadCreatures(), LoadGameobjects()
+
     LOG_INFO("server.loading", "Loading Spawn Group Data...");
     sObjectMgr->LoadSpawnGroups();                                 // must be after LoadCreatures() and LoadGameobjects()
 

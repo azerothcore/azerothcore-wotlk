@@ -700,7 +700,9 @@ void GameObject::Update(uint32 diff)
                     time_t now = GameTime::GetGameTime().count();
                     if (m_respawnTime <= now)            // timer expired
                     {
-                        ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::GameObject>(GetEntry(), m_spawnId);
+                        // Linked respawns are keyed by the spawn's own id, not by the entry it rolled
+                        uint32 spawnEntry = m_goData ? m_goData->id : GetEntry();
+                        ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::GameObject>(spawnEntry, m_spawnId);
                         time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                         if (linkedRespawntime)             // Can't respawn, the master is dead
                         {
@@ -762,6 +764,21 @@ void GameObject::Update(uint32 diff)
                         uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
                         if (poolid)
                             sPoolMgr->UpdatePool<GameObject>(GetMap()->GetPoolData(), poolid, m_spawnId);
+                        else if (m_spawnId && m_goData && sObjectMgr->RollsSpawnEntry(m_goData, m_spawnId))
+                        {
+                            // The entry is part of the object guid, so a spawn that rolls its entry
+                            // respawns as a new object that rolls again, as pool members do
+                            Map* map = GetMap();
+                            ObjectGuid::LowType spawnId = m_spawnId;
+                            map->RerollSpawnGroupEntry(m_goData, spawnId);
+                            AddObjectToRemoveList();
+
+                            GameObject* go = new GameObject();
+                            if (!go->LoadGameObjectFromDB(spawnId, map, true))
+                                delete go;
+
+                            return;
+                        }
                         else
                             GetMap()->AddToMap(this);
                     }
@@ -1225,7 +1242,10 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
         return false;
     }
 
-    uint32 entry = data->id;
+    uint32 entry = map->ChooseSpawnEntry(data, spawnId, data->id);
+    if (!entry) // its spawn group left this spawn point out
+        return false;
+
     //uint32 map_id = data->mapid;                          // already used before call
     uint32 phaseMask = data->phaseMask;
     float x = data->posX;
@@ -1294,6 +1314,10 @@ void GameObject::DeleteFromDB()
     WorldDatabase.Execute(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_EVENT_GAMEOBJECT);
+    stmt->SetData(0, m_spawnId);
+    WorldDatabase.Execute(stmt);
+
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT_SPAWN_ENTRY);
     stmt->SetData(0, m_spawnId);
     WorldDatabase.Execute(stmt);
 }

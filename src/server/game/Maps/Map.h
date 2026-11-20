@@ -39,6 +39,7 @@
 #include "SpawnData.h"
 #include "Timer.h"
 #include "GridTerrainData.h"
+#include <array>
 #include <bitset>
 #include <list>
 #include <memory>
@@ -449,6 +450,11 @@ public:
     bool SpawnGroupSpawn(uint32 groupId, bool ignoreRespawn = false, bool force = false);
     bool SpawnGroupDespawn(uint32 groupId, bool deleteRespawnTimes = false);
     [[nodiscard]] bool IsSpawnGroupActive(uint32 groupId) const;
+    /// Entry the spawn takes on this map: rolled with its spawn group when the group sets entries or
+    /// member chances, else from the spawn's own entries. 0 means the spawn stays down
+    [[nodiscard]] uint32 ChooseSpawnEntry(SpawnData const* data, ObjectGuid::LowType spawnId, uint32 ownEntry);
+    /// Rolls a group member's entry again for its respawn, within what the other members leave open
+    void RerollSpawnGroupEntry(SpawnData const* data, ObjectGuid::LowType spawnId);
     void ProcessRespawns();
     void ProcessCreatureRespawn(ObjectGuid::LowType spawnId);
     void ProcessGameObjectRespawn(ObjectGuid::LowType spawnId);
@@ -675,6 +681,10 @@ private:
     std::unique_ptr<SpawnedPoolData> _poolData;
 
     std::unordered_set<uint32> _toggledSpawnGroupIds;
+
+    void RollSpawnGroup(uint32 groupId, SpawnObjectType type, SpawnGroupRollData const& roll);
+    // Entry each member of a rolled spawn group holds on this map, by spawn id; 0 = it stays down
+    std::array<std::unordered_map<ObjectGuid::LowType, uint32>, SPAWN_TYPE_MAX> _spawnGroupChosenEntries;
     uint32 _respawnCheckTimer{0};
 
     std::unordered_map<uint32, uint32> _zonePlayerCountMap;

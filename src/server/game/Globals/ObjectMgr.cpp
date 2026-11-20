@@ -2498,72 +2498,6 @@ void ObjectMgr::LoadCreatures()
         ++count;
     } while (result->NextRow());
 
-    // Load alternate entries from creature_multispawn
-    QueryResult variantResult = WorldDatabase.Query("SELECT spawnId, entry FROM creature_multispawn ORDER BY spawnId");
-    if (variantResult)
-    {
-        uint32 variantCount = 0;
-        do
-        {
-            Field* fields = variantResult->Fetch();
-            ObjectGuid::LowType spawnId = fields[0].Get<uint32>();
-            uint32 entry = fields[1].Get<uint32>();
-
-            auto creatureDataIt = _creatureDataStore.find(spawnId);
-            if (creatureDataIt == _creatureDataStore.end())
-            {
-                LOG_ERROR("sql.sql", "Table `creature_multispawn` has entry for non-existing creature spawn (SpawnId: {}), skipped.", spawnId);
-                continue;
-            }
-
-            CreatureData* data = &creatureDataIt->second;
-
-            CreatureTemplate const* variantInfo = GetCreatureTemplate(entry);
-            if (!variantInfo)
-            {
-                LOG_ERROR("sql.sql", "Table `creature_multispawn` has creature (SpawnId: {}) with non-existing creature entry {}, skipped.", spawnId, entry);
-                continue;
-            }
-
-            // Check difficulty entries for variant
-            bool diffOk = true;
-            for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && diffOk; ++diff)
-            {
-                if (_difficultyEntries[diff].find(entry) != _difficultyEntries[diff].end())
-                {
-                    LOG_ERROR("sql.sql", "Table `creature_multispawn` has creature (SpawnId: {}) with entry {} listed as difficulty template in `creature_template`, skipped.",
-                        spawnId, entry);
-                    diffOk = false;
-                }
-            }
-            if (!diffOk)
-                continue;
-
-            // Validate equipment for variant entry
-            if (data->equipmentId != 0 && !GetEquipmentInfo(entry, data->equipmentId))
-            {
-                LOG_ERROR("sql.sql", "Table `creature_multispawn` has creature (SpawnId: {}) with entry {} where equipment_id {} not found in `creature_equip_template`.",
-                    spawnId, entry, data->equipmentId);
-            }
-
-            // Populate id2/id3 fields
-            if (!data->id2)
-            {
-                data->id2 = entry;
-                ++variantCount;
-            }
-            else if (!data->id3)
-            {
-                data->id3 = entry;
-                ++variantCount;
-            }
-            else
-                LOG_ERROR("sql.sql", "Table `creature_multispawn` has more than 2 variant entries for creature (SpawnId: {}), extra entry {} skipped.", spawnId, entry);
-        } while (variantResult->NextRow());
-
-        LOG_INFO("server.loading", ">> Loaded {} creature spawn variants", variantCount);
-    }
-
     LOG_INFO("server.loading", ">> Loaded {} Creatures in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
@@ -2620,49 +2554,6 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
 
     if (!creatureData.ScriptId)
         creatureData.ScriptId = cInfo->ScriptID;
-
-    // Load alternate entries from creature_multispawn
-    QueryResult variantResult = WorldDatabase.Query("SELECT entry FROM creature_multispawn WHERE spawnId = {} ORDER BY entry", spawnId);
-    if (variantResult)
-    {
-        do
-        {
-            uint32 variantEntry = variantResult->Fetch()[0].Get<uint32>();
-            if (!GetCreatureTemplate(variantEntry))
-            {
-                LOG_ERROR("sql.sql", "Table `creature_multispawn` has creature (SpawnId: {}) with non-existing entry {}, skipped.", spawnId, variantEntry);
-                continue;
-            }
-
-            // Check difficulty entries for variant
-            bool diffOk = true;
-            for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && diffOk; ++diff)
-            {
-                if (_difficultyEntries[diff].find(variantEntry) != _difficultyEntries[diff].end())
-                {
-                    LOG_ERROR("sql.sql", "Table `creature_multispawn` has creature (SpawnId: {}) with entry {} listed as difficulty template in `creature_template`, skipped.",
-                        spawnId, variantEntry);
-                    diffOk = false;
-                }
-            }
-            if (!diffOk)
-                continue;
-
-            // Validate equipment for variant entry
-            if (creatureData.equipmentId != 0 && !GetEquipmentInfo(variantEntry, creatureData.equipmentId))
-            {
-                LOG_ERROR("sql.sql", "Table `creature_multispawn` has creature (SpawnId: {}) with entry {} where equipment_id {} not found in `creature_equip_template`.",
-                    spawnId, variantEntry, creatureData.equipmentId);
-            }
-
-            if (!creatureData.id2)
-                creatureData.id2 = variantEntry;
-            else if (!creatureData.id3)
-                creatureData.id3 = variantEntry;
-            else
-                LOG_ERROR("sql.sql", "Table `creature_multispawn` has more than 2 variant entries for creature (SpawnId: {}), extra entry {} skipped.", spawnId, variantEntry);
-        } while (variantResult->NextRow());
-    }
 
     MapEntry const* mapEntry = sMapStore.LookupEntry(creatureData.mapid);
     if (!mapEntry)
@@ -2740,6 +2631,8 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
             spawnId, creatureId);
         creatureData.phaseMask = 1;
     }
+
+    LoadSpawnEntriesOfType(SPAWN_TYPE_CREATURE, spawnId);
 
     return &creatureData;
 }
@@ -2878,8 +2771,6 @@ ObjectGuid::LowType ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, f
     data.spawnId = spawnId;
     data.spawnMask = spawnId;
     data.id = entry;
-    data.id2 = 0;
-    data.id3 = 0;
     data.mapid = mapId;
     data.displayid = 0;
     data.equipmentId = 0;
@@ -3228,6 +3119,8 @@ GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType sp
         LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `phaseMask`=0 (not visible for anyone), set to 1.", spawnId, entry);
         goData.phaseMask = 1;
     }
+
+    LoadSpawnEntriesOfType(SPAWN_TYPE_GAMEOBJECT, spawnId);
 
     return &goData;
 }
@@ -8662,9 +8555,13 @@ void ObjectMgr::DeleteCreatureData(ObjectGuid::LowType guid)
     // remove mapid*cellid -> guid_set map
     CreatureData const* data = GetCreatureData(guid);
     if (data)
+    {
         RemoveCreatureFromGrid(guid, data);
+        OnDeleteSpawnData(data); // its spawn group must not keep a pointer to it
+    }
 
     _creatureDataStore.erase(guid);
+    _spawnEntryStore[SPAWN_TYPE_CREATURE].erase(guid);
 }
 
 void ObjectMgr::DeleteGOData(ObjectGuid::LowType guid)
@@ -8672,9 +8569,13 @@ void ObjectMgr::DeleteGOData(ObjectGuid::LowType guid)
     // remove mapid*cellid -> guid_set map
     GameObjectData const* data = GetGameObjectData(guid);
     if (data)
+    {
         RemoveGameobjectFromGrid(guid, data);
+        OnDeleteSpawnData(data); // its spawn group must not keep a pointer to it
+    }
 
     _gameObjectDataStore.erase(guid);
+    _spawnEntryStore[SPAWN_TYPE_GAMEOBJECT].erase(guid);
 }
 
 SpawnData const* ObjectMgr::GetSpawnData(SpawnObjectType type, ObjectGuid::LowType spawnId) const
@@ -8688,6 +8589,170 @@ SpawnData const* ObjectMgr::GetSpawnData(SpawnObjectType type, ObjectGuid::LowTy
         default:
             return nullptr;
     }
+}
+
+uint32 ObjectMgr::ChooseSpawnEntry(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 defaultEntry) const
+{
+    SpawnEntryList const* entries = GetSpawnEntries(type, spawnId);
+    if (!entries)
+        return defaultEntry;
+
+    // A zero total weight rolls every entry at equal odds, as creature_template_model does
+    return Acore::Containers::SelectRandomWeightedContainerElement(*entries,
+        [](SpawnEntryChoice const& choice) -> double
+    {
+        return choice.probability;
+    })->entry;
+}
+
+bool ObjectMgr::IsValidSpawnEntry(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 entry)
+{
+    if (type == SPAWN_TYPE_CREATURE)
+    {
+        if (!GetCreatureTemplate(entry))
+        {
+            LOG_ERROR("sql.sql",
+                "Table `creature_spawn_entry` has creature (SpawnId: {}) with non-existing creature entry {}, skipped.",
+                spawnId, entry);
+            return false;
+        }
+
+        if (IsCreatureDifficultyEntry(entry))
+        {
+            LOG_ERROR("sql.sql",
+                "Table `creature_spawn_entry` has creature (SpawnId: {}) with entry {} listed as difficulty template "
+                "in `creature_template`, skipped.",
+                spawnId, entry);
+            return false;
+        }
+
+        // Copied: GetEquipmentInfo() overwrites a random (-1) id with the one it picked
+        int8 equipmentId = GetCreatureData(spawnId)->equipmentId;
+        if (equipmentId != 0 && !GetEquipmentInfo(entry, equipmentId))
+            LOG_ERROR("sql.sql",
+                "Table `creature_spawn_entry` has creature (SpawnId: {}) with entry {} where equipment_id {} not found "
+                "in `creature_equip_template`.",
+                spawnId, entry, equipmentId);
+
+        return true;
+    }
+
+    GameObjectTemplate const* gInfo = GetGameObjectTemplate(entry);
+    if (!gInfo)
+    {
+        LOG_ERROR("sql.sql",
+            "Table `gameobject_spawn_entry` has gameobject (GUID: {}) with non-existing gameobject entry {}, skipped.",
+            spawnId, entry);
+        return false;
+    }
+
+    if (gInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(gInfo->displayId))
+    {
+        LOG_ERROR("sql.sql",
+            "Table `gameobject_spawn_entry` has gameobject (GUID: {}) with entry {} that has an invalid displayId "
+            "({}), skipped.",
+            spawnId, entry, gInfo->displayId);
+        return false;
+    }
+
+    // The object class is picked from the spawn's own `id`, before its entry is rolled
+    if (IsGameObjectStaticTransport(entry) || IsGameObjectStaticTransport(GetGameObjectData(spawnId)->id))
+    {
+        LOG_ERROR("sql.sql",
+            "Table `gameobject_spawn_entry` has gameobject (GUID: {}) with entry {}, but a transport spawn can't "
+            "change entry, skipped.", spawnId, entry);
+        return false;
+    }
+
+    return true;
+}
+
+uint32 ObjectMgr::LoadSpawnEntriesOfType(SpawnObjectType type, ObjectGuid::LowType spawnId /*= 0*/)
+{
+    char const* table = type == SPAWN_TYPE_CREATURE ? "creature_spawn_entry" : "gameobject_spawn_entry";
+    SpawnEntryContainer& store = _spawnEntryStore[type];
+
+    QueryResult result;
+    if (spawnId)
+    {
+        store.erase(spawnId);
+        //                                      0     1      2
+        result = WorldDatabase.Query("SELECT guid, entry, Probability FROM {} WHERE guid = {} ORDER BY Idx",
+            table, spawnId);
+    }
+    else
+    {
+        store.clear();
+        result = WorldDatabase.Query("SELECT guid, entry, Probability FROM {} ORDER BY guid, Idx", table);
+    }
+
+    if (!result)
+        return 0;
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        ObjectGuid::LowType guid = fields[0].Get<uint32>();
+        uint32 entry             = fields[1].Get<uint32>();
+        float probability        = fields[2].Get<float>();
+
+        if (!GetSpawnData(type, guid))
+        {
+            LOG_ERROR("sql.sql",
+                "Table `{}` has entry {} for non-existing spawn (GUID: {}), skipped.", table, entry, guid);
+            continue;
+        }
+
+        if (!IsValidSpawnEntry(type, guid, entry))
+            continue;
+
+        if (probability < 0.0f)
+        {
+            LOG_ERROR("sql.sql",
+                "Table `{}` has spawn (GUID: {}) with entry {} at negative `Probability` {}, skipped.",
+                table, guid, entry, probability);
+            continue;
+        }
+
+        store[guid].push_back({ entry, probability });
+        ++count;
+    } while (result->NextRow());
+
+    // The table holds a spawn's whole roll, so its own `id` has to be one of the rows to ever spawn
+    auto checkOwnEntry = [&](ObjectGuid::LowType guid, SpawnEntryList const& entries)
+    {
+        uint32 ownEntry = type == SPAWN_TYPE_CREATURE ? GetCreatureData(guid)->id : GetGameObjectData(guid)->id;
+        if (std::none_of(entries.begin(), entries.end(),
+            [ownEntry](SpawnEntryChoice const& choice) { return choice.entry == ownEntry; }))
+            LOG_ERROR("sql.sql",
+                "Table `{}` does not list spawn (GUID: {}) under its own `id` {}, so it never spawns as that entry.",
+                table, guid, ownEntry);
+    };
+
+    if (spawnId)
+    {
+        if (SpawnEntryList const* entries = GetSpawnEntries(type, spawnId))
+            checkOwnEntry(spawnId, *entries);
+    }
+    else
+        for (auto const& [guid, entries] : store)
+            checkOwnEntry(guid, entries);
+
+    return count;
+}
+
+void ObjectMgr::LoadSpawnEntries()
+{
+    uint32 oldMSTime = getMSTime();
+
+    uint32 count = 0;
+    for (uint8 type = 0; type < SPAWN_TYPE_MAX; ++type)
+        count += LoadSpawnEntriesOfType(SpawnObjectType(type));
+
+    LOG_INFO("server.loading", ">> Loaded {} spawn entries in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void ObjectMgr::LoadSpawnGroupTemplates()
@@ -8719,7 +8784,8 @@ void ObjectMgr::LoadSpawnGroupTemplates()
             if ((flags & SPAWNGROUP_FLAG_SYSTEM) && (flags & SPAWNGROUP_FLAG_MANUAL_SPAWN))
             {
                 flags &= ~SPAWNGROUP_FLAG_MANUAL_SPAWN;
-                LOG_ERROR("sql.sql", "System spawn group {} ({}) has invalid manual spawn flag. Ignored.", groupId, group.name);
+                LOG_ERROR("sql.sql",
+                    "System spawn group {} ({}) has invalid manual spawn flag. Ignored.", groupId, group.name);
             }
             group.flags = SpawnGroupFlags(flags);
         } while (result->NextRow());
@@ -8755,13 +8821,20 @@ void ObjectMgr::LoadSpawnGroups()
     // Reset prior state for hot-reload support
     // Preserve the forced legacy group for spawns on transport maps (set in LoadCreatures/LoadGameobjects).
     _spawnGroupMapStore.clear();
+    _spawnGroupRollStore.clear();
     for (auto& [id, data] : _creatureDataStore)
+    {
         data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
+        data.spawnGroupChance = 0.0f;
+    }
     for (auto& [id, data] : _gameObjectDataStore)
+    {
         data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
+        data.spawnGroupChance = 0.0f;
+    }
 
-    //                                               0        1          2
-    QueryResult result = WorldDatabase.Query("SELECT groupId, spawnType, spawnId FROM spawn_group");
+    //                                               0        1          2        3
+    QueryResult result = WorldDatabase.Query("SELECT groupId, spawnType, spawnId, chance FROM spawn_group");
 
     if (!result)
     {
@@ -8793,7 +8866,9 @@ void ObjectMgr::LoadSpawnGroups()
         }
         if (data->spawnGroupId)
         {
-            LOG_ERROR("sql.sql", "Spawn with ID ({},{}) is listed as a member of spawn group {}, but is already a member of spawn group {}. Skipping.",
+            LOG_ERROR("sql.sql",
+                "Spawn with ID ({},{}) is listed as a member of spawn group {}, but is already a member of spawn group "
+                "{}. Skipping.",
                 uint32(spawnType), spawnId, groupId, data->spawnGroupId);
             continue;
         }
@@ -8801,7 +8876,9 @@ void ObjectMgr::LoadSpawnGroups()
         auto it = _spawnGroupDataStore.find(groupId);
         if (it == _spawnGroupDataStore.end())
         {
-            LOG_ERROR("sql.sql", "Spawn group {} assigned to spawn ID ({},{}), but group is not found!", groupId, uint32(spawnType), spawnId);
+            LOG_ERROR("sql.sql",
+                "Spawn group {} assigned to spawn ID ({},{}), but group is not found!",
+                groupId, uint32(spawnType), spawnId);
             continue;
         }
 
@@ -8810,7 +8887,8 @@ void ObjectMgr::LoadSpawnGroups()
             groupTemplate.mapId = data->mapid;
         else if (groupTemplate.mapId != data->mapid && !(groupTemplate.flags & SPAWNGROUP_FLAG_SYSTEM))
         {
-            LOG_ERROR("sql.sql", "Spawn group {} has map ID {}, but spawn ({},{}) has map id {} - spawn NOT added to group!",
+            LOG_ERROR("sql.sql",
+                "Spawn group {} has map ID {}, but spawn ({},{}) has map id {} - spawn NOT added to group!",
                 groupId, groupTemplate.mapId, uint32(spawnType), spawnId, data->mapid);
             continue;
         }
@@ -8831,12 +8909,132 @@ void ObjectMgr::LoadSpawnGroups()
 
         const_cast<SpawnData*>(data)->spawnGroupId = groupId;
         if (!(groupTemplate.flags & SPAWNGROUP_FLAG_SYSTEM))
+        {
             _spawnGroupMapStore.emplace(groupId, data);
+
+            float chance = fields[3].Get<float>();
+            if (chance < 0.0f || chance > 100.0f)
+                LOG_ERROR("sql.sql",
+                    "Spawn ({},{}) of spawn group {} has `chance` {} outside 0-100, ignored.",
+                    uint32(spawnType), spawnId, groupId, chance);
+            else if (chance > 0.0f)
+            {
+                const_cast<SpawnData*>(data)->spawnGroupChance = chance;
+                _spawnGroupRollStore[groupId][spawnType].hasChancedMembers = true;
+            }
+        }
         ++numMembers;
     } while (result->NextRow());
 
+    LoadSpawnGroupEntries();
+
     LOG_INFO("server.loading", ">> Loaded {} spawn group members in {} ms", numMembers, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::LoadSpawnGroupEntries()
+{
+    //                                               0        1          2      3         4         5
+    QueryResult result = WorldDatabase.Query(
+        "SELECT groupId, spawnType, entry, minCount, maxCount, chance FROM spawn_group_entry");
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 groupId  = fields[0].Get<uint32>();
+        uint32 type     = fields[1].Get<uint8>();
+        uint32 entry    = fields[2].Get<uint32>();
+        uint32 minCount = fields[3].Get<uint32>();
+        uint32 maxCount = fields[4].Get<uint32>();
+        float chance    = fields[5].Get<float>();
+
+        SpawnGroupTemplateData const* groupTemplate = GetSpawnGroupData(groupId);
+        if (!groupTemplate || (groupTemplate->flags & SPAWNGROUP_FLAG_SYSTEM))
+        {
+            LOG_ERROR("sql.sql",
+                "Table `spawn_group_entry` lists entry {} for spawn group {}, which is missing or a system group, "
+                "skipped.", entry, groupId);
+            continue;
+        }
+
+        if (type >= SPAWN_TYPE_MAX)
+        {
+            LOG_ERROR("sql.sql",
+                "Table `spawn_group_entry` has invalid `spawnType` {} for spawn group {}, skipped.", type, groupId);
+            continue;
+        }
+
+        // The object class of a gameobject is picked from the spawn's own `id`, so no transports here
+        bool validEntry = type == SPAWN_TYPE_CREATURE
+            ? GetCreatureTemplate(entry) && !IsCreatureDifficultyEntry(entry)
+            : GetGameObjectTemplate(entry) && !IsGameObjectStaticTransport(entry);
+        if (!validEntry)
+        {
+            LOG_ERROR("sql.sql",
+                "Table `spawn_group_entry` has spawn group {} with entry {} (spawnType {}) that is missing, a "
+                "difficulty template or a transport, skipped.",
+                groupId, entry, type);
+            continue;
+        }
+
+        if (chance < 0.0f || chance > 100.0f)
+        {
+            LOG_ERROR("sql.sql",
+                "Table `spawn_group_entry` has spawn group {} with entry {} at `chance` {} outside 0-100, skipped.",
+                groupId, entry, chance);
+            continue;
+        }
+
+        if (maxCount && minCount > maxCount)
+        {
+            LOG_ERROR("sql.sql",
+                "Table `spawn_group_entry` has spawn group {} with entry {} at `minCount` {} above `maxCount` {}, "
+                "`maxCount` raised to match.",
+                groupId, entry, minCount, maxCount);
+            maxCount = minCount;
+        }
+
+        _spawnGroupRollStore[groupId][type].entries.push_back({ entry, minCount, maxCount, chance });
+    } while (result->NextRow());
+
+    // A group's entries replace the roll of its members, and its minimums have to fit in them
+    for (auto const& [groupId, rolls] : _spawnGroupRollStore)
+    {
+        for (uint8 type = 0; type < SPAWN_TYPE_MAX; ++type)
+        {
+            SpawnGroupRollData const& roll = rolls[type];
+            if (roll.entries.empty())
+                continue;
+
+            uint32 members = 0;
+            auto range = _spawnGroupMapStore.equal_range(groupId);
+            for (auto itr = range.first; itr != range.second; ++itr)
+            {
+                SpawnData const* member = itr->second;
+                if (member->type != type)
+                    continue;
+
+                ++members;
+                if (GetSpawnEntries(member->type, member->spawnId))
+                    LOG_ERROR("sql.sql",
+                        "Spawn ({},{}) has its own spawn entries, but spawn group {} sets the entries of its members: "
+                        "the spawn's own are ignored.",
+                        uint32(type), member->spawnId, groupId);
+            }
+
+            uint32 minimum = 0;
+            for (SpawnGroupEntryLimit const& limit : roll.entries)
+                minimum += limit.minCount;
+
+            if (minimum > members)
+                LOG_ERROR("sql.sql",
+                    "Table `spawn_group_entry` asks for at least {} spawns in spawn group {} (spawnType {}), which has "
+                    "{} members.",
+                    minimum, groupId, uint32(type), members);
+        }
+    }
 }
 
 void ObjectMgr::OnDeleteSpawnData(SpawnData const* data)
