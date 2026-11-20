@@ -11,6 +11,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/azerothcore/AzerothGhost/client"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
@@ -24,6 +25,9 @@ const (
 	spellSubmerge     = uint32(65981)
 	spellEmerge       = uint32(65982)
 	spellSummonScarab = uint32(66339)
+
+	spellBurrowerSubmerge = uint32(67322)
+	spellSubmergeBurrower = uint32(68394)
 
 	// Anub'arak's chamber (trial_of_the_crusader.h LOC_ANUB).
 	anubX, anubY, anubZ = float32(785.90), float32(133.42), float32(142.612)
@@ -50,6 +54,47 @@ func spellGoCaster(data []byte) (caster uint64, spell uint32, ok bool) {
 
 func guidEntry(guid uint64) uint32 {
 	return uint32((guid >> 24) & 0xFFFFFF)
+}
+
+// pullAnubarak spawns a temp Anub'arak in his chamber and pulls him onto the bot, which leaves GM
+// mode but stays in god mode so it survives the fight.
+func pullAnubarak(t *testing.T, bot *e2eharness.ScenarioBot) (boss uint64, pulledAt time.Time) {
+	t.Helper()
+
+	// Stay GM through the raid enter (.go xyz onto a raid map is ignored after .gm off).
+	bot.Teleport(t, anubX, anubY, anubZ, mapTrialOfTheCrusader)
+	if _, _, _, m := bot.Pos(); m != mapTrialOfTheCrusader {
+		e2eharness.Preconditionf(t, "bot not in Trial of the Crusader after tele map=%d", m)
+	}
+
+	e2eharness.SpawnNPC(t, bot.World, npcAnubarak)
+	for deadline := time.Now().Add(20 * time.Second); boss == 0 && time.Now().Before(deadline); time.Sleep(sampleEvery) {
+		for _, u := range bot.NearbyUnits(2000) {
+			if guidEntry(u.GUID) == npcAnubarak && u.Health() > 0 {
+				boss = u.GUID
+				break
+			}
+		}
+	}
+	if boss == 0 {
+		e2eharness.Preconditionf(t, "no living Anub'arak after .npc add temp")
+	}
+	t.Logf("Anub'arak guid=0x%X", boss)
+	t.Cleanup(func() {
+		if hp, _ := bot.UnitHP(boss); hp == 0 {
+			return
+		}
+		if err := bot.World.SetTarget(boss); err == nil {
+			bot.GM(t, ".npc delete")
+		}
+	})
+
+	e2eharness.CombatReady(t, bot.World, e2eharness.CombatReadyOpts{God: true})
+	pulledAt = time.Now()
+	bot.Damage(t, boss, 1)
+	bot.WaitUnitCombat(t, boss, 10*time.Second)
+	t.Logf("Anub'arak engaged")
+	return boss, pulledAt
 }
 
 // nearestBurrow returns the index of the burrow spot closest to (x, y) and its distance.
@@ -103,35 +148,7 @@ func TestToC_AnubarakScarabsFromAllBurrows(t *testing.T) {
 		Prefix: "AnubScb", Race: e2eharness.RaceHuman,
 		Class: e2eharness.ClassWarrior, Level: 80, LearnAllClass: true,
 	})
-
-	// Stay GM through the raid enter (.go xyz onto a raid map is ignored after .gm off).
-	bot.Teleport(t, anubX, anubY, anubZ, mapTrialOfTheCrusader)
-	if _, _, _, m := bot.Pos(); m != mapTrialOfTheCrusader {
-		e2eharness.Preconditionf(t, "bot not in Trial of the Crusader after tele map=%d", m)
-	}
-
-	e2eharness.SpawnNPC(t, bot.World, npcAnubarak)
-	var boss uint64
-	for deadline := time.Now().Add(20 * time.Second); boss == 0 && time.Now().Before(deadline); time.Sleep(sampleEvery) {
-		for _, u := range bot.NearbyUnits(2000) {
-			if guidEntry(u.GUID) == npcAnubarak && u.Health() > 0 {
-				boss = u.GUID
-				break
-			}
-		}
-	}
-	if boss == 0 {
-		e2eharness.Preconditionf(t, "no living Anub'arak after .npc add temp")
-	}
-	t.Logf("Anub'arak guid=0x%X", boss)
-	t.Cleanup(func() {
-		if hp, _ := bot.UnitHP(boss); hp == 0 {
-			return
-		}
-		if err := bot.World.SetTarget(boss); err == nil {
-			bot.GM(t, ".npc delete")
-		}
-	})
+	boss, pulledAt := pullAnubarak(t, bot)
 
 	unhook := bot.World.AddPacketHook(func(opcode uint16, data []byte) {
 		if opcode != 0x0132 { // SMSG_SPELL_GO
@@ -154,13 +171,6 @@ func TestToC_AnubarakScarabsFromAllBurrows(t *testing.T) {
 		defer mu.Unlock()
 		return gos[spell]
 	}
-
-	// Out of GM mode so Anub'arak fights the bot; god keeps it up until the wipe below.
-	e2eharness.CombatReady(t, bot.World, e2eharness.CombatReadyOpts{God: true})
-	pulledAt := time.Now()
-	bot.Damage(t, boss, 1)
-	bot.WaitUnitCombat(t, boss, 10*time.Second)
-	t.Logf("Anub'arak engaged")
 
 	var submergedAt time.Time
 	for deadline := pulledAt.Add(submergeWindow); submergedAt.IsZero() && time.Now().Before(deadline); time.Sleep(poll) {
@@ -297,4 +307,166 @@ func TestToC_AnubarakScarabsFromAllBurrows(t *testing.T) {
 	}
 	t.Logf("PASS Summon Scarab on all %d burrows, %d scarabs from %d burrows, %d adds despawned %s after the wipe",
 		len(burrows), len(scarabs), len(used), len(adds), time.Since(diedAt).Round(time.Millisecond))
+}
+
+// A Nerubian Burrower below 80% health and off Permafrost starts Submerge (67322), a 2s cast. When
+// it completes the burrower turns unselectable and casts Submerge Burrower (68394), which lands
+// with a Full Heal, and it comes back up with Emerge (65982) 31s later.
+//
+// Drive: Anub'arak pulled onto a god-mode bot; his first burrower is left at full health for a few
+// seconds, then `.damage`d below 80%.
+// Oracle: no Submerge while above 80%, Submerge within one health check of dropping below it, the
+// burrower unselectable, at full health and under Submerge Burrower, then Emerge 31s later with
+// the flag and the aura gone.
+func TestToC_AnubarakBurrowerSubmerge(t *testing.T) {
+	meta.Begin(t, meta.TestMeta{
+		Tags:     []string{"long", "instances"},
+		Runtime:  "long",
+		Category: "instances/northrend/trial_of_the_crusader",
+	})
+
+	const (
+		// The first burrower comes 5 to 8s into the fight.
+		burrowerWindow = 20 * time.Second
+		// Several of the burrower's 1.6s health checks.
+		fullHealthHold = 5 * time.Second
+		// One health check plus latency.
+		submergeStartWindow = 4 * time.Second
+		// Submerge and Submerge Burrower are 2s casts.
+		underWindow = 8 * time.Second
+		healWindow  = 3 * time.Second
+		// The burrower stays under for 31s.
+		emergeMin, emergeMax  = 29 * time.Second, 35 * time.Second
+		emergedWindow         = 3 * time.Second
+		unitFlagNotSelectable = uint32(0x02000000)
+		poll                  = 100 * time.Millisecond
+	)
+
+	bot := e2eharness.NewSolo(t, e2eharness.ScenarioOpts{
+		Prefix: "AnubBur", Race: e2eharness.RaceHuman,
+		Class: e2eharness.ClassWarrior, Level: 80, LearnAllClass: true,
+	})
+	_, pulledAt := pullAnubarak(t, bot)
+
+	var burrower uint64
+	for deadline := pulledAt.Add(burrowerWindow); burrower == 0 && time.Now().Before(deadline); time.Sleep(poll) {
+		for _, u := range bot.NearbyUnits(2000) {
+			if guidEntry(u.GUID) == npcBurrower && u.Health() > 0 {
+				burrower = u.GUID
+				break
+			}
+		}
+	}
+	if burrower == 0 {
+		e2eharness.Preconditionf(t, "no Nerubian Burrower within %s of the pull", burrowerWindow)
+	}
+	t.Logf("burrower guid=0x%X %s after the pull", burrower, time.Since(pulledAt).Round(time.Millisecond))
+
+	var mu sync.Mutex
+	var starts []time.Time
+	gos := map[uint32]time.Time{}
+	unhook := bot.World.AddPacketHook(func(opcode uint16, data []byte) {
+		if opcode != 0x0131 && opcode != 0x0132 { // SMSG_SPELL_START, SMSG_SPELL_GO
+			return
+		}
+		caster, spell, ok := spellGoCaster(data)
+		if !ok || caster != burrower {
+			return
+		}
+		mu.Lock()
+		defer mu.Unlock()
+		if opcode == 0x0131 {
+			if spell == spellBurrowerSubmerge {
+				starts = append(starts, time.Now())
+			}
+			return
+		}
+		if _, seen := gos[spell]; !seen {
+			gos[spell] = time.Now()
+		}
+	})
+	t.Cleanup(unhook)
+
+	startCount := func() int {
+		mu.Lock()
+		defer mu.Unlock()
+		return len(starts)
+	}
+	burrowerGo := func(spell uint32) time.Time {
+		mu.Lock()
+		defer mu.Unlock()
+		return gos[spell]
+	}
+	notSelectable := func() bool {
+		o := bot.World.GetObject(burrower)
+		return o != nil && o.Value(client.UnitFieldFlags)&unitFlagNotSelectable != 0
+	}
+
+	if hp, maxHP := bot.WaitUnitHPKnown(t, burrower, 5*time.Second); hp*5 < maxHP*4 {
+		e2eharness.Preconditionf(t, "burrower already below 80%% health (%d/%d) before the damage", hp, maxHP)
+	}
+	for deadline := time.Now().Add(fullHealthHold); time.Now().Before(deadline); time.Sleep(poll) {
+		if n := startCount(); n > 0 {
+			hp, maxHP := bot.UnitHP(burrower)
+			e2eharness.Assertf(t, "burrower started Submerge (%d) at %d/%d health; it only tries below 80%%",
+				spellBurrowerSubmerge, hp, maxHP)
+		}
+	}
+
+	bot.DamageToFraction(t, burrower, 0.7, 10*time.Second)
+	droppedAt := time.Now()
+	for deadline := droppedAt.Add(submergeStartWindow); startCount() == 0 && time.Now().Before(deadline); {
+		time.Sleep(poll)
+	}
+	if startCount() == 0 {
+		e2eharness.Assertf(t, "burrower did not start Submerge (%d) within %s of dropping below 80%% health",
+			spellBurrowerSubmerge, submergeStartWindow)
+	}
+	mu.Lock()
+	startedAt := starts[0]
+	mu.Unlock()
+	t.Logf("Submerge started %s after the damage", startedAt.Sub(droppedAt).Round(time.Millisecond))
+
+	var underAt time.Time
+	for deadline := startedAt.Add(underWindow); underAt.IsZero() && time.Now().Before(deadline); time.Sleep(poll) {
+		underAt = burrowerGo(spellSubmergeBurrower)
+	}
+	if underAt.IsZero() {
+		e2eharness.Assertf(t, "no Submerge Burrower (%d) within %s of the Submerge start (Submerge completed: %t)",
+			spellSubmergeBurrower, underWindow, !burrowerGo(spellBurrowerSubmerge).IsZero())
+	}
+	t.Logf("Submerge Burrower landed %s after the Submerge start", underAt.Sub(startedAt).Round(time.Millisecond))
+
+	healed := false
+	for deadline := underAt.Add(healWindow); !healed && time.Now().Before(deadline); time.Sleep(poll) {
+		hp, maxHP := bot.UnitHP(burrower)
+		healed = maxHP > 0 && hp == maxHP && notSelectable() && bot.UnitHasAura(burrower, spellSubmergeBurrower)
+	}
+	if !healed {
+		hp, maxHP := bot.UnitHP(burrower)
+		e2eharness.Assertf(t, "submerged burrower at %d/%d health, unselectable %t, Submerge Burrower aura %t; want full health, unselectable and the aura",
+			hp, maxHP, notSelectable(), bot.UnitHasAura(burrower, spellSubmergeBurrower))
+	}
+
+	var emergedAt time.Time
+	for deadline := underAt.Add(emergeMax); emergedAt.IsZero() && time.Now().Before(deadline); time.Sleep(poll) {
+		emergedAt = burrowerGo(spellEmerge)
+	}
+	if emergedAt.IsZero() {
+		e2eharness.Assertf(t, "burrower did not Emerge (%d) within %s of going under", spellEmerge, emergeMax)
+	}
+	if under := emergedAt.Sub(underAt); under < emergeMin {
+		e2eharness.Assertf(t, "burrower emerged %s after going under; it stays under 31s", under.Round(time.Millisecond))
+	}
+
+	up := false
+	for deadline := emergedAt.Add(emergedWindow); !up && time.Now().Before(deadline); time.Sleep(poll) {
+		up = !notSelectable() && !bot.UnitHasAura(burrower, spellSubmergeBurrower)
+	}
+	if !up {
+		e2eharness.Assertf(t, "emerged burrower still unselectable (%t) or under Submerge Burrower (%t)",
+			notSelectable(), bot.UnitHasAura(burrower, spellSubmergeBurrower))
+	}
+	t.Logf("PASS burrower submerged %s after dropping below 80%%, stayed under %s",
+		startedAt.Sub(droppedAt).Round(time.Millisecond), emergedAt.Sub(underAt).Round(time.Millisecond))
 }
