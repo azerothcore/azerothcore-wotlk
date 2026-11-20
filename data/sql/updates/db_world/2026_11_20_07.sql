@@ -1,3 +1,4 @@
+-- DB update 2026_11_20_06 -> 2026_11_20_07
 --
 -- Glyph of Shadowfiend: proc only when the Shadowfiend is killed (PROC_FLAG_KILLED) instead of on every hit it takes
 DELETE FROM `spell_proc` WHERE `SpellId` = 57989;
