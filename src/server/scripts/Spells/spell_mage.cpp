@@ -32,6 +32,7 @@ enum MageSpells
 {
     SPELL_MAGE_ARCANE_MISSILES_R1                = 5143,
     SPELL_MAGE_BLAZING_SPEED                     = 31643,
+    SPELL_MAGE_BURNING_DETERMINATION_BUFF        = 54748,
     SPELL_MAGE_MAGIC_ABSORPTION_MANA             = 29442,
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
     SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
@@ -131,23 +132,49 @@ class spell_mage_burning_determination : public AuraScript
         // Xinef: immuned effect should just eat charge
         if (eventInfo.GetHitMask() & PROC_EX_IMMUNE)
         {
-            target->m_Events.AddEventAtOffset([target]() { target->RemoveAurasDueToSpell(54748); }, 1ms);
+            target->m_Events.AddEventAtOffset([target]()
+            {
+                target->RemoveAurasDueToSpell(SPELL_MAGE_BURNING_DETERMINATION_BUFF);
+            }, 1ms);
             return false;
         }
-        if (Aura* aura = target->GetAura(54748))
+        if (Aura* aura = target->GetAura(SPELL_MAGE_BURNING_DETERMINATION_BUFF))
         {
             if (aura->GetDuration() < aura->GetMaxDuration())
-                target->m_Events.AddEventAtOffset([target]() { target->RemoveAurasDueToSpell(54748); }, 1ms);
+            {
+                target->m_Events.AddEventAtOffset([target]()
+                {
+                    target->RemoveAurasDueToSpell(SPELL_MAGE_BURNING_DETERMINATION_BUFF);
+                }, 1ms);
+            }
             return false;
         }
 
-        return true;
+        // Only the talent gets here (the buff always finds itself above). It procs only when the
+        // hit actually interrupted a cast, or when the spell's silence aura is now on the target.
+        // Read-only: nothing is added or removed during the proc walk.
+        if (eventInfo.GetHitMask() & PROC_HIT_INTERRUPT)
+            return true;
+
+        if (Unit* actor = eventInfo.GetActor())
+        {
+            SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+            if (AuraApplication const* aurApp = target->GetAuraApplication(spellInfo->Id, actor->GetGUID()))
+            {
+                SpellInfo const* auraSpellInfo = aurApp->GetBase()->GetSpellInfo();
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                    if (aurApp->HasEffect(i) && (auraSpellInfo->GetEffectMechanicMask(i) & (1ULL << MECHANIC_SILENCE)))
+                        return true;
+            }
+        }
+
+        return false;
     }
 
     void HandleProc(ProcEventInfo&  /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetUnitOwner()->CastSpell(GetUnitOwner(), 54748, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_MAGE_BURNING_DETERMINATION_BUFF, true);
     }
 
     void Register() override
