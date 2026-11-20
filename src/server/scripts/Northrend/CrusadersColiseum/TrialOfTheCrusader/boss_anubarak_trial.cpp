@@ -95,6 +95,9 @@ enum AnubSpells
     SPELL_EMERGE                                = 65982,
     SPELL_BERSERK                               = 26662,
     SPELL_CLEAR_ALL_DEBUFFS                     = 34098,
+    SPELL_DAZE_IMMUNITY                         = 53757,
+    SPELL_DAZE_IMMUNITY_CANCEL                  = 59556,
+    SPELL_RESET_CLEANUP                         = 66508,
 
     SPELL_FREEZING_SLASH                        = 66012,
     SPELL_PENETRATING_COLD                      = 66013,
@@ -192,6 +195,7 @@ struct boss_anubarak_trial : public BossAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
+        DoCastAOE(SPELL_DAZE_IMMUNITY, true);
         events.Reset();
         events.RescheduleEvent(EVENT_ENRAGE, 10min);
         events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 7s, 15s);
@@ -360,6 +364,7 @@ struct boss_anubarak_trial : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
+        DoResetCleanup();
         Talk(SAY_DEATH);
     }
 
@@ -371,6 +376,7 @@ struct boss_anubarak_trial : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
+        DoResetCleanup();
         events.Reset();
         summons.DespawnAll();
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -401,6 +407,12 @@ struct boss_anubarak_trial : public BossAI
     }
 
 private:
+    void DoResetCleanup()
+    {
+        DoCastAOE(SPELL_DAZE_IMMUNITY_CANCEL, true);
+        DoCastAOE(SPELL_RESET_CLEANUP, true);
+    }
+
     bool _intro;
     bool _phase3;
     ObjectGuid _sphereGUIDs[6];
@@ -846,6 +858,28 @@ class spell_anubarak_shadow_strike : public SpellScript
     }
 };
 
+// 66508 - Reset Cleanup
+class spell_anubarak_reset_cleanup : public SpellScript
+{
+    PrepareSpellScript(spell_anubarak_reset_cleanup);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->Effects[EFFECT_1].CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        // The basepoints hold the 10-man normal Acid-Drenched Mandibles; the scarabs apply the difficulty variant
+        GetHitUnit()->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), GetCaster()));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_anubarak_reset_cleanup::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // 66118 Leeching Swarm
 enum LeechingSwarmSpells
 {
@@ -916,6 +950,7 @@ void AddSC_boss_anubarak_trial()
     RegisterSpellScript(spell_pursuing_spikes_aura);
     RegisterSpellScript(spell_anubarak_summon_scarab_aura);
     RegisterSpellScript(spell_anubarak_shadow_strike);
+    RegisterSpellScript(spell_anubarak_reset_cleanup);
     RegisterSpellScript(spell_gen_leeching_swarm_aura);
     RegisterSpellScript(spell_gen_leeching_swarm_dmg);
 }

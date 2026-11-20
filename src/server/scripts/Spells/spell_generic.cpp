@@ -6227,6 +6227,27 @@ class spell_gen_submerge_visual : public AuraScript
     }
 };
 
+// 59556 - Daze Immunity Cancel
+class spell_gen_cancel_aura : public SpellScript
+{
+    PrepareSpellScript(spell_gen_cancel_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->Effects[EFFECT_0].CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_cancel_aura::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -6417,4 +6438,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_black_bow_of_the_betrayer);
     RegisterSpellScript(spell_gen_filter_party_level_80);
     RegisterSpellScript(spell_gen_submerge_visual);
+    RegisterSpellScript(spell_gen_cancel_aura);
 }
