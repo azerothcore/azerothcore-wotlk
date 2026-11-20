@@ -384,6 +384,8 @@ enum TrialOfTheCrusaderActions
 {
     // Sent by the instance to Gormok, the Twin Val'kyr and Anub'arak on a wipe
     ACTION_DESPAWN_SUMMONS                          = -1,
+    // Sent by the instance to Anub'arak when the floor breaks; respawns after a wipe skip the intro
+    ACTION_ANUBARAK_INTRO_SUBMERGE                  = 1,
 };
 
 enum TrialOfTheCrusaderModels
