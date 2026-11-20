@@ -112,6 +112,7 @@ enum AnubSpells
     SPELL_SPIKE_SPEED3                          = 65923,
     SPELL_SPIKE_FAIL                            = 66181,
     SPELL_SPIKE_TELE                            = 66170,
+    SPELL_SPIKE_TARGET_SEARCH                   = 67470,
     SPELL_IMPALE                                = 65919,
 
     // Scarab
@@ -655,6 +656,7 @@ struct npc_anubarak_spike : public ScriptedAI
         EVENT_SPIKE_SPEED_3,
         EVENT_SPIKE_RESUME,
         EVENT_SPIKE_REACQUIRE,
+        EVENT_SPIKE_MARK,
     };
 
     void DoAction(int32 param) override
@@ -688,6 +690,7 @@ struct npc_anubarak_spike : public ScriptedAI
         _targetGUID.Clear();
         me->AttackStop();
         me->GetMotionMaster()->MoveIdle();
+        DoZoneInCombat();
         if (!next)
         {
             events.Reset();
@@ -695,9 +698,12 @@ struct npc_anubarak_spike : public ScriptedAI
             // Start the pursuit even if everyone is currently immune, so acquisition can retry.
             DoCastSelf(SPELL_SPIKE_SPEED1, true);
             DoCastSelf(SPELL_SPIKE_TRAIL, true);
+            DoCastAOE(SPELL_SPIKE_TARGET_SEARCH, true);
             events.RescheduleEvent(EVENT_SPIKE_SPEED_2, 7s);
+            // The spike holds still until the mark lands; losing the target mid-pursuit re-marks at once.
+            events.RescheduleEvent(EVENT_SPIKE_MARK, 1600ms);
+            return;
         }
-        DoZoneInCombat();
         DoResetThreatList();
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* candidate)
         {
@@ -746,6 +752,7 @@ struct npc_anubarak_spike : public ScriptedAI
             case EVENT_SPIKE_RESUME:
                 Reset();
                 break;
+            case EVENT_SPIKE_MARK:
             case EVENT_SPIKE_REACQUIRE:
                 SelectNewTarget(true);
                 break;
