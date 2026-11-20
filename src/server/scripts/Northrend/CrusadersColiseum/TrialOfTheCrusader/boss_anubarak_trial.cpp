@@ -52,6 +52,7 @@ enum AnubActions
 {
     ACTION_SCARAB_SUBMERGE                      = 1, // read by the Skittering Scarab SmartAI (ACTION_DONE)
     ACTION_SPIKE_FAIL                           = 2,
+    ACTION_INTRO_EMERGE                         = 3, // sent by the SmartAI of areatrigger 5475 (his chamber)
 };
 
 Position const AnubLocs[] =
@@ -162,22 +163,44 @@ struct boss_anubarak_trial : public BossAI
     boss_anubarak_trial(Creature* creature) : BossAI(creature, BOSS_ANUBARAK)
     {
         me->ApplySpellImmune(0, IMMUNITY_ID, sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me), true);
-        me->m_SightDistance = 90.0f; // for MoveInLineOfSight distance
     }
 
     void Reset() override
     {
         _Reset();
-        _intro = false;
+        _introPending = false;
         _phase3 = false;
-        me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
     }
 
     void DoAction(int32 param) override
     {
-        if (param == ACTION_DESPAWN_SUMMONS)
-            summons.DespawnAll();
+        switch (param)
+        {
+            case ACTION_DESPAWN_SUMMONS:
+                summons.DespawnAll();
+                break;
+            case ACTION_ANUBARAK_INTRO_SUBMERGE:
+                _introPending = true;
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(true);
+                DoCastSelf(SPELL_SUBMERGE);
+                break;
+            case ACTION_INTRO_EMERGE:
+                if (!_introPending)
+                    break;
+                _introPending = false;
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveAura(SPELL_SUBMERGE);
+                DoCastSelf(SPELL_EMERGE);
+                Talk(SAY_INTRO);
+                me->m_Events.AddEventAtOffset([this]()
+                {
+                    me->SetImmuneToAll(false);
+                }, 7s);
+                break;
+            default:
+                break;
+        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -365,24 +388,6 @@ struct boss_anubarak_trial : public BossAI
         instance->SetData(TYPE_FAILED, 1);
     }
 
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!who->IsPlayer() || me->GetExactDistSq(who) > 6400.0f) // 80yd*80yd
-            return;
-
-        if (me->getStandState() != UNIT_STAND_STATE_STAND)
-            me->SetStandState(UNIT_STAND_STATE_STAND);
-
-        if (!_intro)
-        {
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            if (!me->IsInCombat())
-                Talk(SAY_INTRO);
-            _intro = true;
-        }
-        ScriptedAI::MoveInLineOfSight(who);
-    }
-
     bool CanAIAttack(Unit const* target) const override
     {
         return target->GetEntry() != NPC_FROST_SPHERE;
@@ -395,7 +400,7 @@ private:
         DoCastAOE(SPELL_RESET_CLEANUP, true);
     }
 
-    bool _intro;
+    bool _introPending;
     bool _phase3;
     ObjectGuid _sphereGUIDs[6];
 };

@@ -888,6 +888,8 @@ struct instance_trial_of_the_crusader : public InstanceScript
 
                     _instanceProgress = INSTANCE_PROGRESS_ANUB_ARAK;
                     SpawnAnubArak();
+                    if (Creature* anubarak = GetCreature(DATA_ANUBARAK))
+                        anubarak->AI()->DoAction(ACTION_ANUBARAK_INTRO_SUBMERGE);
                 }
 
                 _events.RescheduleEvent(EVENT_SCENE_410, 2s);
