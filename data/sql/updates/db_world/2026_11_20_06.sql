@@ -1,3 +1,4 @@
+-- DB update 2026_11_20_05 -> 2026_11_20_06
 --
 -- The pilot's attack command reaches AttackStart; the script adds the melee VehicleAI lacks.
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_warbear_matriarch' WHERE `entry` = 29918;
