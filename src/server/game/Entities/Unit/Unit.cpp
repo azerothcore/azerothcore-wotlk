@@ -5088,12 +5088,36 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, U
             // Cast duration to unsigned to prevent permanent aura's such as Righteous Fury being permanently added to caster
             uint32 dur = std::min(2u * MINUTE * IN_MILLISECONDS, uint32(aura->GetDuration()));
 
-            if (Aura* oldAura = stealer->GetAura(aura->GetId(), aura->GetCasterGUID()))
+            // Stolen copies are cast by the stealer, so this also finds its own cast of the spell. Only add a stack or
+            // charge to it: refreshing a non-stacking own cast (Ice Barrier, Arcane Intellect) would re-fill or shorten it
+            Aura* oldAura = nullptr;
+            if (stealCharge || aura->GetSpellInfo()->StackAmount > 1)
+                oldAura = stealer->GetAura(aura->GetId(), stealer->GetGUID());
+
+            if (oldAura)
             {
                 if (stealCharge)
                     oldAura->ModCharges(1);
                 else
+                {
+                    uint8 const oldStackAmount = oldAura->GetStackAmount();
+                    int32 oldAmount[MAX_SPELL_EFFECTS] = { };
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                        if (AuraEffect* aurEff = oldAura->GetEffect(i))
+                            oldAmount[i] = aurEff->GetAmount();
+
                     oldAura->ModStackAmount(1);
+
+                    // The stack change recalculated amounts and max duration with the stealer as caster, keep the
+                    // original caster's ones like a newly stolen copy does
+                    bool const stacked = oldAura->GetStackAmount() > oldStackAmount;
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                        if (AuraEffect* aurEff = oldAura->GetEffect(i))
+                            aurEff->ChangeAmount(oldAmount[i] + (stacked ? damage[i] : 0));
+
+                    oldAura->SetMaxDuration(aura->GetMaxDuration());
+                }
+
                 oldAura->SetDuration(int32(dur));
             }
             else
