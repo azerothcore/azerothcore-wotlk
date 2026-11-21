@@ -117,6 +117,8 @@ enum RazorscaleActions
     ACTION_START_PERMA_GROUND,
     ACTION_STOP_CONTROLLERS,
     ACTION_ENGINEER_DEAD,
+    ACTION_PREPARE_TURRETS,
+    ACTION_REBUILD_TURRETS,
 
     // Harpoon fire state actions
     ACTION_FIRE_STATE_BREAK,
@@ -165,6 +167,18 @@ enum RazorscaleSays
     EMOTE_PERMA_GROUND  = 0,
     EMOTE_BREATH        = 1,
     EMOTE_BERSERK       = 2,
+};
+
+enum ExpeditionSays
+{
+    // Expedition Commander
+    SAY_COMMANDER_AGGRO          = 0,
+    SAY_COMMANDER_GROUND_PHASE   = 1,
+    SAY_COMMANDER_ENGINEERS_DEAD = 2,
+
+    // Expedition Engineer
+    SAY_ENGINEER_PREPARE         = 0,
+    SAY_ENGINEER_START_REPAIR    = 1,
 };
 
 static Position const RazorFlightPos = {585.3610f, -173.5592f, 456.8430f, 1.526665f};
@@ -325,12 +339,17 @@ struct boss_razorscale : public BossAI
         switch (action)
         {
             case ACTION_START_FIGHT:
+            {
                 me->SetImmuneToPC(false);
                 me->SetSpeedRate(MOVE_RUN, 3.0f);
                 me->StopMoving();
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_FLIGHT, RazorFlightPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
+                EntryCheckPredicate engineerPred(NPC_EXPEDITION_ENGINEER);
+                summons.DoAction(ACTION_PREPARE_TURRETS, engineerPred);
                 break;
+            }
             case ACTION_GROUND_PHASE:
+            {
                 if (_permaGround)
                     break;
                 me->InterruptNonMeleeSpells(false);
@@ -340,7 +359,10 @@ struct boss_razorscale : public BossAI
                 _harpoonHits = 0;
                 me->SetSpeedRate(MOVE_RUN, 3.0f);
                 me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_LAND, RazorLandPos, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
+                EntryCheckPredicate commanderPred(NPC_EXPEDITION_COMMANDER);
+                summons.DoAction(ACTION_GROUND_PHASE, commanderPred);
                 break;
+            }
             case ACTION_START_PERMA_GROUND:
                 me->SetDisableGravity(false);
                 me->RemoveAura(SPELL_STUN_SELF);
@@ -395,8 +417,6 @@ struct boss_razorscale : public BossAI
                 {
                     EntryCheckPredicate trapperPred(NPC_EXPEDITION_TRAPPER);
                     summons.DoAction(ACTION_GROUND_PHASE, trapperPred);
-                    EntryCheckPredicate commanderPred(NPC_EXPEDITION_COMMANDER);
-                    summons.DoAction(ACTION_GROUND_PHASE, commanderPred);
                     events.ScheduleEvent(EVENT_FLAME_BREATH, 30s, 0, PHASE_GROUND);
                 }
                 break;
@@ -601,7 +621,7 @@ struct boss_razorscale : public BossAI
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_FLIGHT_2, RazorFlightPos2, FORCED_MOVEMENT_NONE, 0.0f, false, false, AnimTier::Fly);
                     EntryCheckPredicate pred(NPC_EXPEDITION_ENGINEER);
-                    summons.DoAction(ACTION_START_FIGHT, pred);
+                    summons.DoAction(ACTION_REBUILD_TURRETS, pred);
                     break;
                 }
                 case EVENT_FIREBOLT:
@@ -656,10 +676,10 @@ struct npc_expedition_commander : public ScriptedAI
         switch (action)
         {
             case ACTION_GROUND_PHASE:
-                Talk(1);
+                Talk(SAY_COMMANDER_GROUND_PHASE);
                 break;
             case ACTION_ENGINEER_DEAD:
-                Talk(2);
+                Talk(SAY_COMMANDER_ENGINEERS_DEAD);
                 break;
             case ACTION_START_PERMA_GROUND:
                 StopControllers();
@@ -696,11 +716,20 @@ struct npc_expedition_commander : public ScriptedAI
         if (!razorscale || razorscale->IsInCombat())
             return;
 
-        Talk(0);
+        scheduler.Schedule(2s, [this](TaskContext)
+        {
+            Talk(SAY_COMMANDER_AGGRO);
+        });
 
         razorscale->SetImmuneToPC(false);
         razorscale->AI()->DoAction(ACTION_START_FIGHT);
         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+        ScriptedAI::UpdateAI(diff);
     }
 
 private:
@@ -808,6 +837,7 @@ struct npc_expedition_engineer : public NullCreatureAI
         _state = 0;
         _timer = 0;
         _harpoonGUID.Clear();
+        scheduler.CancelAll();
         me->SetReactState(REACT_PASSIVE);
     }
 
@@ -815,17 +845,46 @@ struct npc_expedition_engineer : public NullCreatureAI
     {
         if (!me->IsAlive())
             return;
-        if (action == ACTION_START_FIGHT)
+
+        switch (action)
         {
-            if (IsEast())
-                Talk(0);
-            _state = 1;
-            _timer = 0;
-            _harpoonGUID.Clear();
-            me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+            case ACTION_PREPARE_TURRETS:
+                AnnounceRepairs(30s);
+                break;
+            case ACTION_START_FIGHT:
+                StartRepairing();
+                break;
+            case ACTION_REBUILD_TURRETS:
+                AnnounceRepairs(28s);
+                StartRepairing();
+                break;
+            case ACTION_START_PERMA_GROUND:
+                scheduler.CancelAll();
+                StopRepairing();
+                break;
+            default:
+                break;
         }
-        else if (action == ACTION_START_PERMA_GROUND)
-            StopRepairing();
+    }
+
+    void AnnounceRepairs(Milliseconds startRepairDelay)
+    {
+        if (!IsEast())
+            return;
+
+        Talk(SAY_ENGINEER_PREPARE);
+        scheduler.Schedule(startRepairDelay, [this](TaskContext)
+        {
+            Talk(SAY_ENGINEER_START_REPAIR);
+        });
+    }
+
+    void StartRepairing()
+    {
+        _state = 1;
+        _timer = 0;
+        _harpoonGUID.Clear();
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void StopRepairing()
@@ -843,6 +902,8 @@ struct npc_expedition_engineer : public NullCreatureAI
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (_state == 0)
             return;
 
