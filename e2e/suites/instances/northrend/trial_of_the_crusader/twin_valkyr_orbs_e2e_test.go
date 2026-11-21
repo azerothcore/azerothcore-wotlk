@@ -103,8 +103,8 @@ func TestToC_TwinValkyrOrbsExplodeOnPlayers(t *testing.T) {
 		e2eharness.Preconditionf(t, "no Light Bullet Stalker (%d) under the bot; are the stalker spawns applied?", npcBulletStalkerLight)
 	}
 
-	fjola := spawnTwin(t, bot, npcFjola)
-	eydis := spawnTwin(t, bot, npcEydis)
+	fjola := spawnTemp(t, bot, npcFjola)
+	eydis := spawnTemp(t, bot, npcEydis)
 	twins := map[uint64]string{fjola: "Fjola", eydis: "Eydis"}
 	for guid, name := range twins {
 		if err := bot.World.SetTarget(guid); err != nil {
