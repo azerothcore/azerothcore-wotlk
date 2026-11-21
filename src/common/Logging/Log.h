@@ -64,6 +64,7 @@ public:
     void Initialize(Acore::Asio::IoContext* ioContext = nullptr);
     void SetSynchronous();  // Not threadsafe - should only be called from main() after all threads are joined
     void LoadFromConfig();
+    void LoadAdditionalFromConfig();
     void Close();
     [[nodiscard]] bool ShouldLog(std::string const& type, LogLevel level) const;
     bool SetLogLevel(std::string const& name, int32 level, bool isLogger = true);
