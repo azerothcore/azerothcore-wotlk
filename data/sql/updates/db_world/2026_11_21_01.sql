@@ -1,3 +1,4 @@
+-- DB update 2026_11_21_00 -> 2026_11_21_01
 -- Skettis (Terokkar Forest, area 3679): Skettis Wing Guard, Windwalker, Talonite and Kaliri rebuilt from sniffs.
 -- Positions: CO2 points from 4.4.0.55141 (Cata Classic CO2 farm of the arakkoa) and WotLK Classic 3.4.x, plus CO1
 -- points that stayed put for 2+ minutes. Talonite work walks and idle loops from the same farm (3.4.3.52237,
