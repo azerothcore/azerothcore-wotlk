@@ -17,3 +17,13 @@ Data-driven behaviour in the world DB's `smart_scripts` (engine: `src/server/gam
   row with that `id`, so number the guid rows clear of the entry script's (from 1000).
 - `TALK` (action 1) to a creature target (not a pet): `action_param3` = 0 makes the target speak its own line; 1 has
   the script owner speak, with the target as `$n`. Target `SELF` with 0 makes the last invoker `$n`.
+- Caster combat movement is cast flag 64 (`SMARTCAST_COMBAT_MOVE`) on the main spell's cast rows: a successful cast
+  stops combat movement and only a failed attempt (range, OOM, LOS) restarts it, so give that row a short repeat
+  timer. When rewriting a block, replace hand-scripted combat movement (`ALLOW_COMBAT_MOVEMENT`, action 21, with
+  phase rows keyed on mana or range) with it, after tracing the `event_phase_mask` and `link` of every row those
+  phases gate: keep or move their other effects (e.g. a phase-1-only Frost Nova), and clear masks that no phase sets.
+- A timed self-buff is kept up by `UPDATE` (event 60) on a short timer with cast flag 32
+  (`SMARTCAST_AURA_NOT_PRESENT`), not by random out-of-combat recast timers.
+- A new or changed SmartAI event, action or target parameter (`SmartScriptMgr.h` enum comment or param struct) needs
+  follow-up PRs to the wiki `smart_scripts` page and to Keira3's SmartAI editor (`azerothcore/Keira3`); list both in
+  the plan and the PR's TODO list.
