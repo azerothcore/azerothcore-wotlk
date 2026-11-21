@@ -12,6 +12,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/azerothcore/AzerothGhost/client"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
@@ -20,11 +21,9 @@ const (
 	npcChampionDeathKnight = uint32(34461)
 
 	spellChampionDeathGrip = uint32(66017)
+	spellMisery            = uint32(33198)
 	spellDivineShield      = uint32(642)
 	spellSpellReflection   = uint32(23920)
-
-	opSpellGo     = uint16(0x0132)
-	opMonsterMove = uint16(0x00DD)
 
 	missImmune  = uint8(7)
 	missImmune2 = uint8(8)
@@ -128,10 +127,10 @@ func dist2d(x1, y1, x2, y2 float32) float32 {
 // Drive: a temp Death Knight in the arena casts Death Grip through `.cast back` at a warrior bot 20
 // yards away. Champions are passive and only attack once the encounter starts them, which needs
 // Barrett's gossip, so a temp one never runs his own Death Grip event; its unit flags are cleared as
-// the encounter start clears them. One case per bot state: none,
-// Divine Shield, Spell Reflection (100% reflect, so the reflect case is deterministic). 49560 and the
-// jump spells carry no spell visual, so AC sends no SMSG_SPELL_GO for them; the jump shows only as a
-// parabolic SMSG_MONSTER_MOVE.
+// the encounter start clears them. One case per bot state, each deterministic: Misery (+3% chance to
+// be hit by spells, covering the 1% miss of a champion that counts as three levels above its target),
+// Divine Shield, and Spell Reflection (100% reflect). 49560 and the jump spells carry no spell visual,
+// so AC sends no SMSG_SPELL_GO for them; the jump shows only as a parabolic SMSG_MONSTER_MOVE.
 // Oracle: the 66017 SMSG_SPELL_GO outcome on the bot, then which unit, if any, starts a parabolic
 // spline and where it lands.
 func TestToC_ChampionDeathGripPullsOnlyOnHit(t *testing.T) {
@@ -168,7 +167,7 @@ func TestToC_ChampionDeathGripPullsOnlyOnHit(t *testing.T) {
 	jumps := map[uint64][3]float32{}
 	unhook := bot.World.AddPacketHook(func(opcode uint16, data []byte) {
 		switch opcode {
-		case opSpellGo:
+		case client.SmsgSpellGo:
 			caster, spell, hits, misses, ok := spellGoOutcome(data)
 			if !ok || spell != spellChampionDeathGrip {
 				return
@@ -184,7 +183,7 @@ func TestToC_ChampionDeathGripPullsOnlyOnHit(t *testing.T) {
 			}
 			g.reason, g.missed = misses[bot.GUID]
 			grip = g
-		case opMonsterMove:
+		case client.SmsgMonsterMove:
 			mover, dest, ok := parabolicDest(data)
 			if !ok {
 				return
@@ -215,7 +214,7 @@ func TestToC_ChampionDeathGripPullsOnlyOnHit(t *testing.T) {
 		name string
 		aura uint32
 	}{
-		{"hit", 0},
+		{"hit", spellMisery},
 		{"divine shield", spellDivineShield},
 		{"spell reflection", spellSpellReflection},
 	} {
@@ -245,13 +244,11 @@ func TestToC_ChampionDeathGripPullsOnlyOnHit(t *testing.T) {
 			bot.Teleport(t, botSpot[0], botSpot[1], botSpot[2], mapTrialOfTheCrusader)
 			t.Cleanup(func() { bot.CombatStop(t) })
 
-			if c.aura != 0 {
-				bot.ApplyAura(t, c.aura)
-				t.Cleanup(func() {
-					_ = bot.World.SetTarget(bot.GUID)
-					bot.GM(t, fmt.Sprintf(".unaura %d", c.aura))
-				})
-			}
+			bot.ApplyAura(t, c.aura)
+			t.Cleanup(func() {
+				_ = bot.World.SetTarget(bot.GUID)
+				bot.GM(t, fmt.Sprintf(".unaura %d", c.aura))
+			})
 
 			mu.Lock()
 			dk, grip = knight, nil
@@ -275,7 +272,7 @@ func TestToC_ChampionDeathGripPullsOnlyOnHit(t *testing.T) {
 			}
 
 			switch c.aura {
-			case 0:
+			case spellMisery:
 				if !got.hit {
 					e2eharness.Preconditionf(t, "Death Grip did not hit the bot (miss reason %d); the hit case needs a hit", got.reason)
 				}

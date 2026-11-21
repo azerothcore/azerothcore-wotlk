@@ -23,8 +23,8 @@ const (
 )
 
 // spawnTemp summons a temp creature at the bot and returns the new living unit, deleted on cleanup.
-// Encounter intros need Barrett's gossip, which the harness cannot send, so the instance never
-// summons the bosses itself.
+// The instance only summons encounter bosses from Barrett's gossip once the earlier encounters are
+// done, so tests spawn them directly.
 func spawnTemp(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32) uint64 {
 	t.Helper()
 
