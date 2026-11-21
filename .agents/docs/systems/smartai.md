@@ -28,13 +28,14 @@ the `SMART_EVENT_`/`SMART_ACTION_`/`SMART_TARGET_` prefix; numbers are their ids
 
 ## Entry and GUID scripts
 
-- A GUID script (`entryorguid` = -spawn guid, template `AIName` = `SmartAI`) fully replaces the entry script for that
-  spawn. Only exception: `CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI` (`flags_extra` 0x08000000) on a creature
-  template loads both into one event list, where `link` resolves to the first row with that `id`, so GUID rows must not
-  reuse any entry-script `id` (use 1000+ or continue after the entry's highest id). Gameobjects have no such flag.
-- When only some spawns of an entry need extra or different SmartAI (one spawn's path, emote loop or RP), set that flag
-  and give those spawns GUID scripts holding only the spawn-specific rows. Never copy entry rows into a new GUID
-  script, condition entry rows on a spawn's own guid (see https://www.azerothcore.org/wiki/introduction-to-smartai,
+- A GUID script (`entryorguid` = -spawn guid, template `AIName` = `SmartAI`, `SmartGameObjectAI` for a gameobject)
+  fully replaces the entry script for that spawn. Only exception: `CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI`
+  (`flags_extra` 0x08000000) on a creature template loads both into one event list, where `link` resolves to the first
+  row with that `id`, so GUID rows must not reuse any entry-script `id` (use 1000+ or continue after the entry's
+  highest id). Gameobjects have no such flag: their GUID scripts hold every entry row the spawn still needs.
+- When only some spawns of a creature entry need extra or different SmartAI (one spawn's path, emote loop or RP), set
+  that flag and give those spawns GUID scripts holding only the spawn-specific rows. Never copy entry rows into a new
+  GUID script, condition entry rows on a spawn's own guid (see https://www.azerothcore.org/wiki/introduction-to-smartai,
   part III), or replay actions through waypoint paths. Entry rows that apply only to some spawns (e.g. a shorter
   respawn in one area) move into those spawns' GUID scripts.
 - The flag changes nothing for spawns without a GUID script, but makes all GUID scripts of the template's spawns run
@@ -79,8 +80,9 @@ the `SMART_EVENT_`/`SMART_ACTION_`/`SMART_TARGET_` prefix; numbers are their ids
 
 - OOC setup that should hold whenever the creature is idle at home (infinite channels, react state, emote/stand
   state) starts from `RESET` (25): it fires on spawn, respawn and on getting home after an evade, so needs no "not
-  evading" condition. Several RESET rows run in order without `LINK`. Prefer it over a non-repeatable OOC `UPDATE`,
-  which re-arms on every reset anyway.
+  evading" condition. Several RESET rows run in `id` order without `LINK`, GUID rows before entry rows when
+  `CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI` loads both. Prefer it over a non-repeatable OOC `UPDATE`, which re-arms
+  on every reset anyway.
 - Keep a self-buff up, including a timed one that expires (e.g. a 30-min armor buff), with a repeating `UPDATE` (60)
   (initial delay, ~5s repeat) casting on self with `SMARTCAST_AURA_NOT_PRESENT` (32). Not random OOC recast timers,
   nor a `HAS_AURA` (23) missing-aura row, which recasts instantly after a dispel such as Purge, unlike retail.
