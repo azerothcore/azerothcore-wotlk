@@ -1685,6 +1685,7 @@ enum eDeathKnightSpells
     SPELL_CHAINS_OF_ICE    = 66020,
     SPELL_DEATH_COIL          = 66019,
     SPELL_DEATH_GRIP          = 66017,
+    SPELL_DEATH_GRIP_PULL     = 64431,
     SPELL_FROST_STRIKE      = 66047,
     SPELL_ICEBOUND_FORTITUDE  = 66023,
     SPELL_ICY_TOUCH        = 66021,
@@ -1773,11 +1774,6 @@ public:
                     if (me->GetVictim() && me->GetDistance2d(me->GetVictim()) <= 30.0f && me->GetDistance2d(me->GetVictim()) >= 12.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_DEATH_GRIP, false);
-                        Position pos;
-                        float x, y, z;
-                        me->GetClosePoint(x, y, z, 3.0f);
-                        pos.Relocate(x, y, z);
-                        me->GetVictim()->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), 49575, true);
                         events.Repeat(35s);
                         EventMapGCD(events, 2s);
                     }
@@ -2459,6 +2455,31 @@ class spell_faction_champion_warl_unstable_affliction_aura : public AuraScript
     }
 };
 
+// 66017, 68753, 68754, 68755 - Death Grip
+class spell_faction_champion_death_grip : public SpellScript
+{
+    PrepareSpellScript(spell_faction_champion_death_grip);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DEATH_GRIP_PULL });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            if (Unit* caster = GetCaster())
+                target->CastSpell(caster, SPELL_DEATH_GRIP_PULL, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_faction_champion_death_grip::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_faction_champions()
 {
     new npc_toc_druid();
@@ -2478,4 +2499,5 @@ void AddSC_boss_faction_champions()
     new npc_toc_pet_warlock();
     new npc_toc_pet_hunter();
     RegisterSpellScript(spell_faction_champion_warl_unstable_affliction_aura);
+    RegisterSpellScript(spell_faction_champion_death_grip);
 }
