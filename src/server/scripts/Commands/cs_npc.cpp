@@ -655,6 +655,34 @@ public:
         return false;
     }
 
+    // Every entry the spawn point can spawn as, for the "of (...)" part of LANG_NPCINFO_CHAR
+    static std::string GetSpawnEntriesString(ObjectGuid::LowType spawnId, CreatureData const* cData,
+        uint32 defaultEntry)
+    {
+        std::string result;
+        auto add = [&result](uint32 entry)
+        {
+            if (!result.empty())
+                result += ", ";
+
+            result += std::to_string(entry);
+        };
+
+        // A spawn group that sets entries replaces the spawn's own list, as in Map::ChooseSpawnEntry()
+        SpawnGroupRollData const* roll =
+            cData ? sObjectMgr->GetSpawnGroupRollData(cData->spawnGroupId, SPAWN_TYPE_CREATURE) : nullptr;
+        if (roll && !roll->entries.empty())
+            for (SpawnGroupEntryLimit const& limit : roll->entries)
+                add(limit.entry);
+        else if (SpawnEntryList const* entries = sObjectMgr->GetSpawnEntries(SPAWN_TYPE_CREATURE, spawnId))
+            for (SpawnEntryChoice const& choice : *entries)
+                add(choice.entry);
+        else
+            add(defaultEntry);
+
+        return result;
+    }
+
     static bool HandleNpcInfoCommandShowCreature(ChatHandler* handler, Creature* target)
     {
         CreatureTemplate const* cInfo = target->GetCreatureTemplate();
@@ -674,15 +702,8 @@ public:
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 entry = target->GetEntry();
-        uint32 id1 = 0;
-        uint32 id2 = 0;
-        uint32 id3 = 0;
-        if (CreatureData const* cData = target->GetCreatureData())
-        {
-            id1 = cData->id;
-            id2 = cData->id2;
-            id3 = cData->id3;
-        }
+        CreatureData const* cData = target->GetCreatureData();
+        std::string spawnEntries = GetSpawnEntriesString(target->GetSpawnId(), cData, cData ? cData->id : entry);
 
         int64 curRespawnDelay = target->GetRespawnTimeEx() - GameTime::GetGameTime().count();
         if (curRespawnDelay < 0)
@@ -691,7 +712,8 @@ public:
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
 
-        handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetSpawnId(), target->GetGUID().ToString(), entry, id1, id2, id3, displayid, nativeid, faction, npcflags);
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetSpawnId(), target->GetGUID().ToString(), entry,
+            spawnEntries, displayid, nativeid, faction, npcflags);
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->GetLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
         handler->PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
@@ -733,7 +755,7 @@ public:
         handler->PSendSysMessage("(Not in world - showing DB data)");
         uint32 scriptId = cData->ScriptId ? cData->ScriptId : cInfo->ScriptID;
         handler->PSendSysMessage(LANG_NPCINFO_CHAR, lowGuid, ObjectGuid::Create<HighGuid::Unit>(cData->id, lowGuid).ToString(), cData->id,
-            cData->id, cData->id2, cData->id3, cData->displayid, cData->displayid, cInfo->faction,
+            GetSpawnEntriesString(lowGuid, cData, cData->id), cData->displayid, cData->displayid, cInfo->faction,
             cData->npcflag);
         handler->PSendSysMessage(LANG_NPCINFO_PHASEMASK, cData->phaseMask);
         handler->PSendSysMessage(LANG_NPCINFO_POSITION, cData->posX, cData->posY, cData->posZ);
@@ -760,17 +782,11 @@ public:
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 entry = target->GetEntry();
-        uint32 id1 = 0;
-        uint32 id2 = 0;
-        uint32 id3 = 0;
-        if (CreatureData const* cData = target->GetCreatureData())
-        {
-            id1 = cData->id;
-            id2 = cData->id2;
-            id3 = cData->id3;
-        }
+        CreatureData const* cData = target->GetCreatureData();
+        std::string spawnEntries = GetSpawnEntriesString(target->GetSpawnId(), cData, cData ? cData->id : entry);
 
-        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetSpawnId(), target->GetGUID().ToString(), entry, id1, id2, id3, displayid, nativeid, faction, npcflags);
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR, target->GetSpawnId(), target->GetGUID().ToString(), entry,
+            spawnEntries, displayid, nativeid, faction, npcflags);
 
         return true;
     }

@@ -21,6 +21,7 @@
 #include "Define.h"
 #include "ObjectGuid.h"
 #include <string>
+#include <vector>
 
 enum SpawnObjectType : uint8
 {
@@ -62,6 +63,31 @@ struct SpawnGroupTemplateData
     SpawnGroupFlags flags;
 };
 
+// One entry a spawn point can spawn as, from `creature_spawn_entry` / `gameobject_spawn_entry`
+struct SpawnEntryChoice
+{
+    uint32 entry;
+    float probability; // relative weight, as in `creature_template_model`
+};
+
+typedef std::vector<SpawnEntryChoice> SpawnEntryList;
+
+// Limits of one entry inside a spawn group, from `spawn_group_entry`
+struct SpawnGroupEntryLimit
+{
+    uint32 entry;
+    uint32 minCount; // members that take this entry before any random pick
+    uint32 maxCount; // members that can hold this entry at once, 0 = no limit
+    float chance;    // percent; 0 = picked at equal odds once no chanced entry hit
+};
+
+// What a spawn group rolls for its members of one spawn type
+struct SpawnGroupRollData
+{
+    std::vector<SpawnGroupEntryLimit> entries;
+    bool hasChancedMembers{false}; // some member has a `spawn_group`.`chance`
+};
+
 struct SpawnData
 {
     SpawnObjectType const type;
@@ -76,6 +102,7 @@ struct SpawnData
     uint32 ScriptId{0};
     bool dbData{true};
     uint32 spawnGroupId{0};
+    float spawnGroupChance{0.0f}; // percent chance to spawn at all, 0 = always; from `spawn_group`.`chance`
     uint32 poolId{0};
 
 protected:
