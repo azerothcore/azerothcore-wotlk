@@ -30,6 +30,65 @@
 
 namespace MMAP
 {
+    // Slopes steeper than this, but still under walkableSlopeAngle, are tagged NAV_GROUND_STEEP: walkable,
+    // but a path filter can avoid them or give them a cost.
+    static constexpr float STEEP_SLOPE_ANGLE = 50.0f;
+
+    static void AlmostUnwalkableTriangles(float walkableSlopeAngle, float const* verts, int const* tris, int nt,
+                                          unsigned char* areas)
+    {
+        float const walkableThr = std::cos(walkableSlopeAngle / 180.0f * static_cast<float>(M_PI));
+
+        for (int i = 0; i < nt; ++i)
+        {
+            if (areas[i] == RC_NULL_AREA)
+                continue;
+
+            int const* tri = &tris[i * 3];
+
+            float e0[3], e1[3], norm[3];
+            rcVsub(e0, &verts[tri[1] * 3], &verts[tri[0] * 3]);
+            rcVsub(e1, &verts[tri[2] * 3], &verts[tri[0] * 3]);
+            rcVcross(norm, e0, e1);
+            rcVnormalize(norm);
+
+            if (norm[1] <= walkableThr)
+                areas[i] = NAV_GROUND_STEEP;
+        }
+    }
+
+    // Recast merges spans whose tops are within walkableClimb and keeps the higher area id. The NavTerrain flag
+    // values pick the wrong winner, so triangles are rasterized with these ranks and mapped back afterwards.
+    // Ground beats water, so shallow water stays walkable; steep beats ground; lava and slime beat both; deep water
+    // loses to everything, so it never spreads onto a shore. Same idea as TrinityCore's NavArea ordering.
+    static unsigned char ToMergeRank(unsigned char terrain)
+    {
+        switch (terrain)
+        {
+            case NAV_DEEP_WATER:   return 1;
+            case NAV_WATER:        return 2;
+            case NAV_GROUND:       return 3;
+            case NAV_GROUND_STEEP: return 4;
+            case NAV_MAGMA:        return 5;
+            case NAV_SLIME:        return 6;
+            default:               return terrain;
+        }
+    }
+
+    static unsigned char FromMergeRank(unsigned char rank)
+    {
+        switch (rank)
+        {
+            case 1:  return NAV_DEEP_WATER;
+            case 2:  return NAV_WATER;
+            case 3:  return NAV_GROUND;
+            case 4:  return NAV_GROUND_STEEP;
+            case 5:  return NAV_MAGMA;
+            case 6:  return NAV_SLIME;
+            default: return rank;
+        }
+    }
+
     TileBuilder::TileBuilder(MapBuilder* mapBuilder, bool skipLiquid, bool debugOutput) :
             m_debugOutput(debugOutput),
             m_mapBuilder(mapBuilder),
@@ -603,7 +662,9 @@ namespace MMAP
         int lVertCount = meshData.liquidVerts.size() / 3;
         int* lTris = meshData.liquidTris.getCArray();
         int lTriCount = meshData.liquidTris.size() / 3;
-        uint8* lTriFlags = meshData.liquidType.getCArray();
+        std::vector<unsigned char> lTriRanks(meshData.liquidType.size());
+        for (int i = 0; i < meshData.liquidType.size(); ++i)
+            lTriRanks[i] = ToMergeRank(meshData.liquidType[i]);
 
         ResolvedMeshConfig cfg = m_mapBuilder->getConfig().GetConfigForTile(mapID, tileX, tileY);
         int tilesPerMap = cfg.tilesPerMapEdge;
@@ -658,6 +719,9 @@ namespace MMAP
                 unsigned char* triFlags = new unsigned char[tTriCount];
                 memset(triFlags, NAV_GROUND, tTriCount * sizeof(unsigned char));
                 rcClearUnwalkableTriangles(m_rcContext, tileCfg.walkableSlopeAngle, tVerts, tVertCount, tTris, tTriCount, triFlags);
+                AlmostUnwalkableTriangles(STEEP_SLOPE_ANGLE, tVerts, tTris, tTriCount, triFlags);
+                for (int i = 0; i < tTriCount; ++i)
+                    triFlags[i] = ToMergeRank(triFlags[i]);
                 rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, triFlags, tTriCount, *tile.solid, config.walkableClimb);
                 delete[] triFlags;
 
@@ -666,7 +730,8 @@ namespace MMAP
                 rcFilterWalkableLowHeightSpans(m_rcContext, tileCfg.walkableHeight, *tile.solid);
 
                 // add liquid triangles
-                rcRasterizeTriangles(m_rcContext, lVerts, lVertCount, lTris, lTriFlags, lTriCount, *tile.solid, config.walkableClimb);
+                rcRasterizeTriangles(m_rcContext, lVerts, lVertCount, lTris, lTriRanks.data(), lTriCount,
+                                     *tile.solid, config.walkableClimb);
 
                 // compact heightfield spans
                 tile.chf = rcAllocCompactHeightfield();
@@ -763,8 +828,13 @@ namespace MMAP
         // set polygons as walkable
         /// @todo: special flags for DYNAMIC polygons, ie surfaces that can be turned on and off
         for (int i = 0; i < iv.polyMesh->npolys; ++i)
+        {
             if (iv.polyMesh->areas[i] & RC_WALKABLE_AREA)
+            {
+                iv.polyMesh->areas[i] = FromMergeRank(iv.polyMesh->areas[i]);
                 iv.polyMesh->flags[i] = iv.polyMesh->areas[i];
+            }
+        }
 
         // setup mesh parameters
         dtNavMeshCreateParams params;
