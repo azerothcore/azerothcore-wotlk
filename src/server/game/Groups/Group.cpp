@@ -1131,7 +1131,7 @@ void Group::SendLooter(Creature* creature, Player* groupLooter)
     BroadcastPacket(&data, false);
 }
 
-bool CanRollOnItem(LootItem const& item, Player const* player, Loot* loot)
+bool CanRollOnItem(LootItem const& item, Player* player, Loot* loot)
 {
     // Players can't roll on unique items if they already reached the maximum quantity of that item
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
@@ -1144,6 +1144,11 @@ bool CanRollOnItem(LootItem const& item, Player const* player, Loot* loot)
 
     if (!item.AllowedForPlayer(player, loot->sourceWorldObjectGUID))
         return false;
+
+    // Conditions can become true after loot generation. Register the eligible
+    // looter and count the item before an award can make the corpse look empty.
+    if (!item.needs_quest && !item.conditions.empty())
+        loot->FillNonQuestNonFFAConditionalLoot(player);
 
     return true;
 }

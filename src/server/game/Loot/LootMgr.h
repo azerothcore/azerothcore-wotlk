@@ -388,11 +388,11 @@ struct Loot
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
     void FillNotNormalLootFor(Player* player);
+    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
 
 private:
     QuestItemList* FillFFALoot(Player* player);
     QuestItemList* FillQuestLoot(Player* player);
-    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
 
     typedef GuidSet PlayersLootingSet;
     PlayersLootingSet PlayersLooting;

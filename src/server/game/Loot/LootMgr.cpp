@@ -606,9 +606,7 @@ void Loot::FillNotNormalLootFor(Player* player)
     if (qmapitr == PlayerFFAItems.end())
         FillFFALoot(player);
 
-    qmapitr = PlayerNonQuestNonFFAConditionalItems.find(playerGuid);
-    if (qmapitr == PlayerNonQuestNonFFAConditionalItems.end())
-        FillNonQuestNonFFAConditionalLoot(player);
+    FillNonQuestNonFFAConditionalLoot(player);
 
     // Process currency items
     uint32 max_slot = GetMaxSlotInLootFor(player);
@@ -708,7 +706,9 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
 
 QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 {
-    QuestItemList* ql = new QuestItemList();
+    auto itr = PlayerNonQuestNonFFAConditionalItems.find(player->GetGUID());
+    QuestItemList* ql = itr != PlayerNonQuestNonFFAConditionalItems.end()
+        ? itr->second : new QuestItemList();
 
     for (uint8 i = 0; i < items.size(); ++i)
     {
@@ -720,7 +720,11 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 
             if (!item.conditions.empty())
             {
-                ql->push_back(QuestItem(i));
+                // Keep existing entries (including their looted state), but allow
+                // newly eligible items to join an already populated player list.
+                if (std::none_of(ql->begin(), ql->end(),
+                    [i](QuestItem const& entry) { return entry.index == i; }))
+                    ql->push_back(QuestItem(i));
                 if (!item.is_counted)
                 {
                     ++unlootedCount;
