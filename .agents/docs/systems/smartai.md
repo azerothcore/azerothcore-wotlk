@@ -8,6 +8,9 @@ the `SMART_EVENT_`/`SMART_ACTION_`/`SMART_TARGET_` prefix; numbers are their ids
   allowOverride).
 - Edits rewrite the full block: `DELETE` + `INSERT` of every row for the `(entryorguid, source_type)` pair, the
   `DELETE` matching both columns; never a partial `UPDATE`, not even for a comment-only fix.
+- A new or changed event, action or target param (`SmartScriptMgr.h` enum comment or param struct) needs follow-up PRs
+  to the wiki `smart_scripts` page and to Keira3's SmartAI editor (`azerothcore/Keira3`); list both in the plan and the
+  PR's TODO list.
 
 ## Evidence
 
@@ -25,18 +28,19 @@ the `SMART_EVENT_`/`SMART_ACTION_`/`SMART_TARGET_` prefix; numbers are their ids
 
 ## Entry and GUID scripts
 
-- A GUID script (`entryorguid` = -spawn guid) fully replaces the entry script for that spawn. Only exception:
-  `CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI` (`flags_extra` 0x08000000) on a creature template loads both into one
-  event list, so GUID rows must not reuse any entry-script `id` (use 1000+ or continue after the entry's highest id).
-  Gameobjects have no such flag.
-- When only some spawns of an entry need extra or different SmartAI, set that flag and give those spawns GUID scripts
-  holding only the spawn-specific rows. Never copy entry rows into a new GUID script, condition entry rows on a spawn's
-  own guid (see https://www.azerothcore.org/wiki/introduction-to-smartai, part III), or replay actions through
-  waypoint paths. Entry rows that apply only to some spawns (e.g. a shorter respawn in one area) move into those spawns'
-  GUID scripts.
-- The flag makes all GUID scripts of the template's spawns run the entry rows too: when setting it, turn each existing
-  one into a continuation of the entry script. Before changing an entry's `smart_scripts`, check its spawns' GUID
-  scripts: mirror the change into each one that copies the changed rows or calls the same actionlists, or set the flag.
+- A GUID script (`entryorguid` = -spawn guid, template `AIName` = `SmartAI`) fully replaces the entry script for that
+  spawn. Only exception: `CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI` (`flags_extra` 0x08000000) on a creature
+  template loads both into one event list, where `link` resolves to the first row with that `id`, so GUID rows must not
+  reuse any entry-script `id` (use 1000+ or continue after the entry's highest id). Gameobjects have no such flag.
+- When only some spawns of an entry need extra or different SmartAI (one spawn's path, emote loop or RP), set that flag
+  and give those spawns GUID scripts holding only the spawn-specific rows. Never copy entry rows into a new GUID
+  script, condition entry rows on a spawn's own guid (see https://www.azerothcore.org/wiki/introduction-to-smartai,
+  part III), or replay actions through waypoint paths. Entry rows that apply only to some spawns (e.g. a shorter
+  respawn in one area) move into those spawns' GUID scripts.
+- The flag changes nothing for spawns without a GUID script, but makes all GUID scripts of the template's spawns run
+  the entry rows too: when setting it, turn each existing one into a continuation of the entry script. Before changing
+  an entry's `smart_scripts`, check its spawns' GUID scripts: mirror the change into each one that copies the changed
+  rows or calls the same actionlists, or set the flag.
 
 ## Signals and targets
 
@@ -47,6 +51,8 @@ the `SMART_EVENT_`/`SMART_ACTION_`/`SMART_TARGET_` prefix; numbers are their ids
   the receiver is a gameobject (no `ACTION_DONE` on gameobject SmartAI). If the receiver's existing signals use
   `SET_DATA`, keep it rather than mixing in `DO_ACTION`. A C++ AI receiver gets whichever of `SetData`/`DoAction` it
   implements.
+- `TALK` (1) to a creature target (not a pet): `action_param3` = 0 makes the target speak its own line; 1 has the
+  script owner speak, with the target as `$n`. Target `SELF` with 0 makes the last invoker `$n`.
 - Address a creature the script just summoned by storing it from `SUMMONED_UNIT` (17) with `STORE_TARGET_LIST` (64) and
   targeting `STORED` (12), not by range targets. Storing replaces the list, so acting on it right after each summon
   reaches that summon. To keep several same-entry summons addressable later, give each its own list id, e.g. switch
@@ -76,12 +82,17 @@ the `SMART_EVENT_`/`SMART_ACTION_`/`SMART_TARGET_` prefix; numbers are their ids
   evading" condition. Several RESET rows run in order without `LINK`. Prefer it over a non-repeatable OOC `UPDATE`,
   which re-arms on every reset anyway.
 - Keep a self-buff up, including a timed one that expires (e.g. a 30-min armor buff), with a repeating `UPDATE` (60)
-  (initial delay, ~5s repeat) casting on self with `SMARTCAST_AURA_NOT_PRESENT` (32). Not a `HAS_AURA` (23)
-  missing-aura row: it recasts instantly after a dispel such as Purge, unlike retail.
+  (initial delay, ~5s repeat) casting on self with `SMARTCAST_AURA_NOT_PRESENT` (32). Not random OOC recast timers,
+  nor a `HAS_AURA` (23) missing-aura row, which recasts instantly after a dispel such as Purge, unlike retail.
 - No cast flag 1 (`SMARTCAST_INTERRUPT_PREVIOUS`, in `CAST`/`SELF_CAST`/`CROSS_CAST`/`INVOKER_CAST`/`CUSTOM_CAST`)
   on new rows: it's legacy (unrelated to `event_flags` 1 = not repeatable). On a rewritten row that inherited it, drop
   it unless the script really must cut the caster's current cast. Without it, only `CAST`/`CUSTOM_CAST` on timed
   events (`UPDATE`, `HEALTH_PCT`, actionlist steps, …) wait for a cast in progress.
+- Caster combat movement is cast flag 64 (`SMARTCAST_COMBAT_MOVE`) on the main spell's cast rows: a successful cast
+  stops combat movement and only a failed attempt (range, OOM, LOS) restarts it, so give that row a short repeat
+  timer. When rewriting a block, replace hand-scripted combat movement (`ALLOW_COMBAT_MOVEMENT` (21) with phase rows
+  keyed on mana or range) with it, after tracing the `event_phase_mask` and `link` of every row those phases gate:
+  keep or move their other effects (e.g. a phase-1-only Frost Nova), and clear masks that no phase sets.
 
 ## Removing and renumbering
 
