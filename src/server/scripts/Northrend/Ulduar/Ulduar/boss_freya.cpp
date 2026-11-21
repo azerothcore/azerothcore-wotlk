@@ -17,10 +17,12 @@
 
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
@@ -356,7 +358,7 @@ struct boss_freya : public BossAI
         if (spellInfo->Id == SPELL_TELEPORT)
         {
             me->DespawnOrUnsummon();
-            instance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+            instance->SetData(DATA_KEEPER_TELEPORTED, DONE);
         }
     }
 

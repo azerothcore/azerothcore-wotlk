@@ -17,6 +17,7 @@
 
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

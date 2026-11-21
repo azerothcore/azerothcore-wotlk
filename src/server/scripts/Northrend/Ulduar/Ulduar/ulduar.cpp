@@ -143,7 +143,7 @@ public:
                 instance->StorePersistentData(
                     PERSISTENT_DATA_WATCHERS_MASK,
                     mask | (1 << _keeper));
-                instance->SetData(EVENT_KEEPER_TELEPORTED, 0);
+                instance->SetData(DATA_KEEPER_TELEPORTED, 0);
             }
         }
 
