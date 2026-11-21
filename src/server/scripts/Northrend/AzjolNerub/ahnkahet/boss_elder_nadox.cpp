@@ -91,9 +91,9 @@ struct boss_elder_nadox : public BossAI
         respectYourElders = true;
     }
 
-    void JustEngagedWith(Unit * /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         events.ScheduleEvent(EVENT_SWARMER, 10s);

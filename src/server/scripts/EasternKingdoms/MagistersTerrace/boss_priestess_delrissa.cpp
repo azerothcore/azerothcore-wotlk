@@ -124,10 +124,10 @@ struct boss_priestess_delrissa : public BossAI
         ++HelpersKilled;
     }
 
-    void JustEngagedWith(Unit*  /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_AGGRO);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
 
         // Prevent Splitting
         DoZoneInCombat();

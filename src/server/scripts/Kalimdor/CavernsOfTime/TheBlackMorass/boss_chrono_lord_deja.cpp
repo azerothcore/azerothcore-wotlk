@@ -48,10 +48,10 @@ enum Spells
          }
      }
 
-     void JustEngagedWith(Unit* /*who*/) override
+     void JustEngagedWith(Unit* who) override
      {
          OwnTalk(SAY_AGGRO);
-         _JustEngagedWith();
+         _JustEngagedWith(who);
 
          scheduler.Schedule(10s, [this](TaskContext context)
          {

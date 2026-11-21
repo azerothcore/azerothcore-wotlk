@@ -124,10 +124,10 @@ struct boss_loken : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit*) override
+    void JustEngagedWith(Unit* who) override
     {
         me->m_Events.KillAllEvents(false);
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
     }
 

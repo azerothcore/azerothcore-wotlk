@@ -47,9 +47,9 @@ struct boss_commander_sarannis : public BossAI
 {
     boss_commander_sarannis(Creature* creature) : BossAI(creature, DATA_COMMANDER_SARANNIS) { }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
         if (!IsHeroic())

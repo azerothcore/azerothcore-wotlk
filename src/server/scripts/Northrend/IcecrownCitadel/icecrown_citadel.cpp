@@ -1117,9 +1117,9 @@ public:
                     }
         }
 
-        void JustEngagedWith(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* who) override
         {
-            _JustEngagedWith();
+            _JustEngagedWith(who);
             me->LowerPlayerDamageReq(me->GetMaxHealth());
             if (Creature* crok = instance->GetCreature(DATA_CROK_SCOURGEBANE))
             {

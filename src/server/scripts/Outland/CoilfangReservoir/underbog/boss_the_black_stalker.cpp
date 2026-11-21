@@ -56,7 +56,7 @@ struct boss_the_black_stalker : public BossAI
     boss_the_black_stalker(Creature* creature) : BossAI(creature, DATA_BLACK_STALKER)
     {    }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         scheduler.Schedule(8s, 12s, [this](TaskContext context)
         {
@@ -90,7 +90,7 @@ struct boss_the_black_stalker : public BossAI
             });
         }
 
-        _JustEngagedWith();
+        _JustEngagedWith(who);
     }
 
     void JustSummoned(Creature* summon) override

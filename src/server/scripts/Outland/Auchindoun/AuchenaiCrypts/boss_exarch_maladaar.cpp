@@ -85,9 +85,9 @@ struct boss_exarch_maladaar : public BossAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void JustEngagedWith(Unit*) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         Talk(SAY_AGGRO);
         scheduler.Schedule(15s, [this] (TaskContext context)
         {

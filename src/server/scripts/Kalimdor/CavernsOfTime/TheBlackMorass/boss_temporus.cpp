@@ -46,9 +46,9 @@ struct boss_temporus : public BossAI
             Talk(id);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        _JustEngagedWith();
+        _JustEngagedWith(who);
         scheduler.Schedule(12s, [this](TaskContext context)
         {
             DoCastSelf(SPELL_HASTEN);
