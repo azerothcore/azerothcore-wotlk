@@ -56,8 +56,8 @@ func waitUnitStacks(bot *e2eharness.ScenarioBot, guid uint64, spellID uint32, wa
 
 // A mage's Spellsteal on Lord Jaraxxus takes his Nether Power through the core steal effect: the
 // server logs the steal with SMSG_SPELLSTEALLOG, one stack leaves him per cast and the buff lands on
-// the mage. The buff used to carry a forced SPELL_ATTR4_CANNOT_BE_STOLEN that made the core skip it,
-// with the boss script moving a stack by hand instead, which sent no steal log.
+// the mage.
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/28515
 //
 // Drive: a temp Jaraxxus in the arena, made attackable with `.modify faction` since the harness
 // cannot run his intro, casts Nether Power on himself through `.cast self`, which his script raises
