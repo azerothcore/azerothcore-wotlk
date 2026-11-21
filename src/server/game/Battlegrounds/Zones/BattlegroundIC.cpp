@@ -27,6 +27,7 @@
 #include "Vehicle.h"
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
+#include <iterator>
 
 void BattlegroundICScore::BuildObjectivesBlock(WorldPacket& data)
 {
@@ -384,7 +385,8 @@ bool BattlegroundIC::UpdatePlayerScore(Player* player, uint32 type, uint32 value
 
 void BattlegroundIC::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.reserve(4+MAX_FORTRESS_GATES_SPAWNS+MAX_NODE_TYPES+1);
+    packet.Worldstates.reserve(packet.Worldstates.size() + 4 + MAX_FORTRESS_GATES_SPAWNS * 2
+        + MAX_NODE_TYPES * std::size(nodePoint[0].worldStates));
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_ALLIANCE_REINFORCEMENT_SET, 1);
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_REINFORCEMENT_SET, 1);
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_ALLIANCE_REINFORCEMENT, factionReinforcements[TEAM_ALLIANCE]);
@@ -392,14 +394,16 @@ void BattlegroundIC::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
 
     for (uint8 i = 0; i < MAX_FORTRESS_GATES_SPAWNS; ++i)
     {
-        uint32 uws = GetWorldStateFromGateEntry(BG_IC_ObjSpawnlocs[i].entry, (GateStatus[GetGateIDFromEntry(BG_IC_ObjSpawnlocs[i].entry)] == BG_IC_GATE_DESTROYED));
-        packet.Worldstates.emplace_back(uws, 1);
+        uint32 entry = BG_IC_ObjSpawnlocs[i].entry;
+        bool destroyed = GateStatus[GetGateIDFromEntry(entry)] == BG_IC_GATE_DESTROYED;
+        packet.Worldstates.emplace_back(GetWorldStateFromGateEntry(entry, false), !destroyed);
+        packet.Worldstates.emplace_back(GetWorldStateFromGateEntry(entry, true), destroyed);
     }
 
-    for (uint8 i = 0; i < MAX_NODE_TYPES; ++i)
-        packet.Worldstates.emplace_back(nodePoint[i].worldStates[nodePoint[i].nodeState], 1);
-
-    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_REINFORCEMENT_SET, 1);
+    // Clear inactive icons too: the client can retain world states from a previous match.
+    for (ICNodePoint const& node : nodePoint)
+        for (uint32 worldState : node.worldStates)
+            packet.Worldstates.emplace_back(worldState, worldState == node.worldStates[node.nodeState]);
 }
 
 bool BattlegroundIC::SetupBattleground()
