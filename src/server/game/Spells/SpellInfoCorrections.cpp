@@ -2321,12 +2321,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
     });
 
-    // tempfix, make Nether Power not stealable
-    ApplySpellFix({ 66228, 67106, 67107, 67108 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_CANNOT_BE_STOLEN;
-    });
-
     // Trial of the Crusader, Faction Champions, Druid - Tranquality
     ApplySpellFix({ 66086, 67974, 67975, 67976 }, [](SpellInfo* spellInfo)
     {

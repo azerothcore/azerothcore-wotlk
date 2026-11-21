@@ -52,7 +52,6 @@ enum JaraxxusSpells
     SPELL_LEGION_FLAME                  = 66197,
     SPELL_SUMMON_VOLCANO                = 66258,
     SPELL_SUMMON_NETHER_PORTAL          = 66269,
-    SPELL_SPELLSTEAL                    = 30449,
     SPELL_BERSERK                       = 64238,
 
     // Marks melee victims; Fel Lightning, Incinerate Flesh, Legion Flame and Spinning Pain Spike exclude marked targets
@@ -123,27 +122,13 @@ struct boss_jaraxxus : public BossAI
         Talk(SAY_AGGRO);
     }
 
-    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
     {
-        uint32 const netherPowerId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NETHER_POWER, me);
+        if (spellInfo->Id != sSpellMgr->GetSpellIdForDifficulty(SPELL_NETHER_POWER, me))
+            return;
 
-        if (spellInfo->Id == netherPowerId)
-        {
-            if (Aura* aura = me->GetAura(netherPowerId))
-                aura->SetStackAmount(spellInfo->StackAmount);
-        }
-        else if (spellInfo->Id == SPELL_SPELLSTEAL && caster)
-        {
-            if (Aura* aura = me->GetAura(netherPowerId))
-            {
-                if (aura->GetStackAmount() > 1)
-                    aura->ModStackAmount(-1);
-                else
-                    aura->Remove();
-
-                caster->CastSpell(caster, SPELL_NETHER_POWER, true);
-            }
-        }
+        if (Aura* aura = me->GetAura(spellInfo->Id))
+            aura->SetStackAmount(spellInfo->StackAmount);
     }
 
     void UpdateAI(uint32 diff) override
