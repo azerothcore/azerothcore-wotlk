@@ -7,8 +7,9 @@ to `VehicleAI` would make every drivable cannon and catapult swing.
 
 ## Helpers
 
-- Timed actions: `EventMap` (event id → delay; simple) or `TaskScheduler` (lambdas, repeats, cancellation), both
-  `CreatureAI` members; never hand-rolled tick counters.
+- Timed actions: prefer `TaskScheduler` (`scheduler`, lambdas) over the legacy `EventMap` (`events`), both
+  `CreatureAI` members; unconditional simple sequences (e.g. RP lines) can be lambdas on
+  `me->m_Events.AddEventAtOffset`. Never hand-rolled tick counters.
 - Casts: prefer the `DoCast` helpers (`DoCastSelf`, `DoCastVictim`, `DoCastAOE`, …) over `me->CastSpell`, which stays
   for positional casts or custom `CastSpellExtraArgs`.
 - Caster kept at range: `AttackStartCaster(who, <hard-coded dist>)`, not a distance computed from `SpellInfo`.
