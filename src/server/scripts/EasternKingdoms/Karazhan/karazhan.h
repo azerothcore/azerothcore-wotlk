@@ -128,6 +128,7 @@ enum KZCreatures
     NPC_ROOK_A                          = 21160,
     NPC_KING_H                          = 21752,
     NPC_KING_A                          = 21684,
+    NPC_CHESS_STATUS_BAR                = 22520,
     NPC_CHESS_EVENT_MEDIVH_CHEAT_FIRES  = 22521,
 
     // Malchezaar Helpers
