@@ -605,6 +605,7 @@ public:
                     // Summon in case of instance unload
                     if (GetBossState(DATA_THE_LICH_KING) == DONE)
                         SummonLichKingOutroNpcs();
+
                     break;
                 case NPC_SE_HIGH_OVERLORD_SAURFANG:
                     // Only the static spawn is the event NPC - the Alliance outro summons another
@@ -905,14 +906,17 @@ public:
                 case GO_PLAGUE_SIGIL:
                     if (GetBossState(DATA_PROFESSOR_PUTRICIDE) == DONE)
                         HandleGameObject(go->GetGUID(), false, go);
+
                     break;
                 case GO_BLOODWING_SIGIL:
                     if (GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == DONE)
                         HandleGameObject(go->GetGUID(), false, go);
+
                     break;
                 case GO_SIGIL_OF_THE_FROSTWING:
                     if (GetBossState(DATA_SINDRAGOSA) == DONE)
                         HandleGameObject(go->GetGUID(), false, go);
+
                     break;
                 case GO_SCIENTIST_AIRLOCK_DOOR_COLLISION:
                     HandleGameObject(go->GetGUID(), AreBothPutricideValvesUsed(), go);
@@ -922,12 +926,14 @@ public:
                         go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     else
                         HandleGameObject(go->GetGUID(), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE), go);
+
                     break;
                 case GO_SCIENTIST_AIRLOCK_DOOR_GREEN:
                     if (AreBothPutricideValvesUsed())
                         go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     else
                         HandleGameObject(go->GetGUID(), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE), go);
+
                     break;
                 case GO_DOODAD_ICECROWN_ORANGETUBES02:
                     if (_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE)
@@ -972,14 +978,17 @@ public:
                 case GO_FROZEN_LAVAMAN:
                     if (GetBossState(DATA_THE_LICH_KING) == DONE)
                         go->SetRespawnTime(WEEK);
+
                     break;
                 case GO_LAVAMAN_PILLARS_CHAINED:
                     if (GetBossState(DATA_THE_LICH_KING) == DONE)
                         go->SetRespawnTime(WEEK);
+
                     break;
                 case GO_LAVAMAN_PILLARS_UNCHAINED:
                     if (GetBossState(DATA_THE_LICH_KING) == DONE)
                         go->SetRespawnTime(WEEK);
+
                     break;
                 case GO_SCOURGE_TRANSPORTER_FIRST:
                     AddDoor(go);
@@ -1219,6 +1228,7 @@ public:
                     }
                     else if (state == FAIL)
                         _events.ScheduleEvent(EVENT_RESPAWN_GUNSHIP, 30s);
+
                     break;
                 case DATA_DEATHBRINGER_SAURFANG:
                     switch (state)
@@ -1273,6 +1283,7 @@ public:
                         HandleUpperSpireBossDone();
                     else if (state == FAIL)
                         HandleDropAttempt();
+
                     break;
                 case DATA_BLOOD_QUEEN_LANA_THEL:
                     HandleGameObject(DATA_BLOODWING_SIGIL, state != DONE);
@@ -1280,6 +1291,7 @@ public:
                         HandleUpperSpireBossDone();
                     else if (state == FAIL)
                         HandleDropAttempt();
+
                     break;
                 case DATA_VALITHRIA_DREAMWALKER:
                     if (state == DONE)

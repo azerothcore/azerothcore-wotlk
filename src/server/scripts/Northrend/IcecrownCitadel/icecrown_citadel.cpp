@@ -3061,6 +3061,7 @@ public:
                     else
                         crok->AI()->DoAction(ACTION_START_GAUNTLET);
                 }
+
         return true;
     }
 };
@@ -4379,6 +4380,7 @@ public:
             if (instance->GetBossState(DATA_SINDRAGOSA_GAUNTLET) == NOT_STARTED)
                 if (Creature* gauntlet = instance->GetCreature(DATA_SINDRAGOSA_GAUNTLET_NPC))
                     gauntlet->AI()->DoAction(ACTION_START_GAUNTLET);
+
         return true;
     }
 };
@@ -4394,6 +4396,7 @@ public:
             if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED)
                 if (Creature* trap = instance->GetCreature(DATA_PUTRICIDE_TRAP))
                     trap->AI()->DoAction(ACTION_START_GAUNTLET);
+
         return true;
     }
 };

@@ -243,6 +243,7 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankTargetSelector(me)))
                         if (Creature* professor = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE))
                             professor->CastSpell(target, SPELL_MALLABLE_GOO_H, true);
+
                     events.ScheduleEvent(EVENT_FESTERGUT_GOO, 15s, 20s);
                 default:
                     break;

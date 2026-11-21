@@ -1180,6 +1180,7 @@ public:
             if (instance->GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
                 if (Creature* ladyDeathwhisper = instance->GetCreature(DATA_LADY_DEATHWHISPER))
                         ladyDeathwhisper->AI()->DoAction(ACTION_START_INTRO);
+
         return true;
     }
 };

@@ -2601,6 +2601,7 @@ public:
                         if (!target)
                             if (Creature* lichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                                 target = lichKing->AI()->SelectTarget(SelectTargetMethod::Random, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
+
                         if (target)
                             me->CastSpell(target, SPELL_LIFE_SIPHON, false);
                         _events.ScheduleEvent(EVENT_LIFE_SIPHON, 2500ms);
@@ -3055,6 +3056,7 @@ public:
                             path.push_back(G3D::Vector3(lichKing->GetPositionX() + dist * cos(angle), lichKing->GetPositionY() + dist * std::sin(angle), 843.0f));
                             me->GetMotionMaster()->MoveSplinePath(&path);
                         }
+
                     break;
                 case EVENT_DESPAWN_SELF:
                     if (Creature* lichKing = _instance->GetCreature(DATA_THE_LICH_KING))
