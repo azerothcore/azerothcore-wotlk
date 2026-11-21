@@ -919,21 +919,9 @@ public:
 
                     break;
                 case GO_SCIENTIST_AIRLOCK_DOOR_COLLISION:
-                    HandleGameObject(go->GetGUID(), AreBothPutricideValvesUsed(), go);
-                    break;
                 case GO_SCIENTIST_AIRLOCK_DOOR_ORANGE:
-                    if (AreBothPutricideValvesUsed())
-                        go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                    else
-                        HandleGameObject(go->GetGUID(), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE), go);
-
-                    break;
                 case GO_SCIENTIST_AIRLOCK_DOOR_GREEN:
-                    if (AreBothPutricideValvesUsed())
-                        go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                    else
-                        HandleGameObject(go->GetGUID(), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE), go);
-
+                    UpdatePutricideAirlockObject(go);
                     break;
                 case GO_DOODAD_ICECROWN_ORANGETUBES02:
                     if (_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE)
@@ -1025,6 +1013,7 @@ public:
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_02:
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_03:
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_04:
+                case GO_SINDRAGOSA_ENTRANCE_DOOR:
                 case GO_SINDRAGOSA_SHORTCUT_ENTRANCE_DOOR:
                 case GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR:
                 case GO_ICE_WALL:
@@ -1158,21 +1147,39 @@ public:
             return (_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE) && (_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE);
         }
 
+        // Takes the object itself: OnGameObjectCreate runs before the object storage can resolve it
+        void UpdatePutricideAirlockObject(GameObject* go)
+        {
+            switch (go->GetEntry())
+            {
+                case GO_SCIENTIST_AIRLOCK_DOOR_COLLISION:
+                    HandleGameObject(go->GetGUID(), AreBothPutricideValvesUsed(), go);
+                    break;
+                case GO_SCIENTIST_AIRLOCK_DOOR_ORANGE:
+                    if (AreBothPutricideValvesUsed())
+                        go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                    else
+                        HandleGameObject(go->GetGUID(), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE), go);
+
+                    break;
+                case GO_SCIENTIST_AIRLOCK_DOOR_GREEN:
+                    if (AreBothPutricideValvesUsed())
+                        go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                    else
+                        HandleGameObject(go->GetGUID(), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE), go);
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
         // Collision and both airlock gates follow the valves: all open once both are used, otherwise each gate until its valve is
         void UpdatePutricideAirlock()
         {
-            HandleGameObject(DATA_PUTRICIDE_COLLISION, AreBothPutricideValvesUsed());
-            if (AreBothPutricideValvesUsed())
-            {
-                for (uint32 gateData : { DATA_PUTRICIDE_GATE_ORANGE, DATA_PUTRICIDE_GATE_GREEN })
-                    if (GameObject* gate = GetGameObject(gateData))
-                        gate->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-            }
-            else
-            {
-                HandleGameObject(DATA_PUTRICIDE_GATE_ORANGE, !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE));
-                HandleGameObject(DATA_PUTRICIDE_GATE_GREEN, !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE));
-            }
+            for (uint32 airlockData : { DATA_PUTRICIDE_COLLISION, DATA_PUTRICIDE_GATE_ORANGE, DATA_PUTRICIDE_GATE_GREEN })
+                if (GameObject* go = GetGameObject(airlockData))
+                    UpdatePutricideAirlockObject(go);
         }
 
         // Upper Spire wing bosses: open the Frozen Throne teleporter once all are down, and a normal kill locks the heroic Lich King
