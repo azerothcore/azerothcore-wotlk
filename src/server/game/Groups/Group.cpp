@@ -1131,7 +1131,7 @@ void Group::SendLooter(Creature* creature, Player* groupLooter)
     BroadcastPacket(&data, false);
 }
 
-bool CanRollOnItem(LootItem const& item, Player* player, Loot* loot)
+bool CanRollOnItem(LootItem& item, Player const* player, Loot* loot)
 {
     // Players can't roll on unique items if they already reached the maximum quantity of that item
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid);
@@ -1145,11 +1145,7 @@ bool CanRollOnItem(LootItem const& item, Player* player, Loot* loot)
     if (!item.AllowedForPlayer(player, loot->sourceWorldObjectGUID))
         return false;
 
-    // Conditions can become true after loot generation. Register the eligible
-    // looter and count the item before an award can make the corpse look empty.
-    if (!item.needs_quest && !item.conditions.empty())
-        loot->FillNonQuestNonFFAConditionalLoot(player);
-
+    loot->RegisterSharedDrop(item, player->GetGUID());
     return true;
 }
 
@@ -1509,6 +1505,31 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
 
         if (canLoot)
         {
+            // Count late-eligible drops before assigning any slot. This does not
+            // change which players may trade an item after it has been awarded.
+            auto countIfEligible = [&](LootItem& item)
+            {
+                if (!item.is_counted && !item.freeforall && item.AllowedForPlayer(looter, loot->sourceWorldObjectGUID))
+                    loot->CountSharedDrop(item);
+            };
+            for (LootItem& item : loot->items)
+            {
+                if (item.is_blocked && !item.conditions.empty())
+                {
+                    if (item.AllowedForPlayer(looter, loot->sourceWorldObjectGUID))
+                    {
+                        loot->RegisterSharedDrop(item, looter->GetGUID());
+                        // The master distributes this slot even if only the recipient qualifies.
+                        loot->RegisterSharedDrop(item, GetMasterLooterGuid());
+                    }
+                }
+                else
+                    countIfEligible(item);
+            }
+            for (LootItem& item : loot->quest_items)
+                if (item.follow_loot_rules)
+                    countIfEligible(item);
+
             looters.push_back(looter);
         }
     }

@@ -533,7 +533,7 @@ void Loot::AddItem(LootStoreItem const& item)
         // free for all items are counted in FillFFALoot(),
         // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
         if (!item.needs_quest && item.conditions.empty() && !proto->HasFlag(ITEM_FLAG_MULTI_DROP))
-            ++unlootedCount;
+            CountSharedDrop(lootItems.back());
     }
 }
 
@@ -594,6 +594,34 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     return true;
 }
 
+void Loot::CountSharedDrop(LootItem& item)
+{
+    if (!item.freeforall && !item.is_looted && !item.is_counted)
+    {
+        ++unlootedCount;
+        item.is_counted = true;
+    }
+}
+
+// A player who qualifies at roll time also needs a slot for a later manual claim.
+void Loot::RegisterSharedDrop(LootItem& item, ObjectGuid playerGuid)
+{
+    if (item.freeforall || item.is_looted)
+        return;
+
+    CountSharedDrop(item);
+    if (!item.needs_quest && item.conditions.empty())
+        return;
+
+    QuestItemMap& views = item.needs_quest ? PlayerQuestItems : PlayerNonQuestNonFFAConditionalItems;
+    QuestItemList*& view = views[playerGuid];
+    if (!view)
+        view = new QuestItemList();
+
+    if (std::none_of(view->begin(), view->end(), [&](QuestItem const& entry) { return entry.index == item.itemIndex; }))
+        view->emplace_back(item.itemIndex);
+}
+
 void Loot::FillNotNormalLootFor(Player* player)
 {
     ObjectGuid playerGuid = player->GetGUID();
@@ -606,7 +634,9 @@ void Loot::FillNotNormalLootFor(Player* player)
     if (qmapitr == PlayerFFAItems.end())
         FillFFALoot(player);
 
-    FillNonQuestNonFFAConditionalLoot(player);
+    qmapitr = PlayerNonQuestNonFFAConditionalItems.find(playerGuid);
+    if (qmapitr == PlayerNonQuestNonFFAConditionalItems.end())
+        FillNonQuestNonFFAConditionalLoot(player);
 
     // Process currency items
     uint32 max_slot = GetMaxSlotInLootFor(player);
@@ -683,11 +713,8 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
             {
                 ++unlootedCount;
             }
-            else if (!item.is_counted)
-            {
-                ++unlootedCount;
-                item.is_counted = true;
-            }
+            else
+                CountSharedDrop(item);
         }
 
         if (items.size() + ql->size() == MAX_NR_LOOT_ITEMS)
@@ -706,9 +733,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
 
 QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 {
-    auto itr = PlayerNonQuestNonFFAConditionalItems.find(player->GetGUID());
-    QuestItemList* ql = itr != PlayerNonQuestNonFFAConditionalItems.end()
-        ? itr->second : new QuestItemList();
+    QuestItemList* ql = new QuestItemList();
 
     for (uint8 i = 0; i < items.size(); ++i)
     {
@@ -720,16 +745,8 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 
             if (!item.conditions.empty())
             {
-                // Keep existing entries (including their looted state), but allow
-                // newly eligible items to join an already populated player list.
-                if (std::none_of(ql->begin(), ql->end(),
-                    [i](QuestItem const& entry) { return entry.index == i; }))
-                    ql->push_back(QuestItem(i));
-                if (!item.is_counted)
-                {
-                    ++unlootedCount;
-                    item.is_counted = true;
-                }
+                ql->push_back(QuestItem(i));
+                CountSharedDrop(item);
             }
         }
     }
@@ -1021,7 +1038,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                 // blocked rolled items and quest items, and !ffa items
                 for (uint8 i = 0; i < l.items.size(); ++i)
                 {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && (l.items[i].conditions.empty() || isMasterLooter) && l.items[i].AllowedForPlayer(lv.viewer, l.sourceWorldObjectGUID))
+                    if (!l.items[i].is_looted && !l.items[i].freeforall && (l.items[i].conditions.empty() || (isMasterLooter && !l.items[i].is_blocked)) && l.items[i].AllowedForPlayer(lv.viewer, l.sourceWorldObjectGUID))
                     {
                         uint8 slot_type = 0;
 
@@ -1213,7 +1230,9 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             {
                 b << uint8(ci->index);
                 b << item;
-                if (item.follow_loot_rules)
+                if (item.is_blocked && lv.permission == RESTRICTED_PERMISSION)
+                    b << uint8(LOOT_SLOT_TYPE_LOCKED);
+                else if (item.follow_loot_rules)
                 {
                     switch (lv.permission)
                     {

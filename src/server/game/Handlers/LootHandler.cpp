@@ -572,6 +572,12 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (item.is_looted || !item.count)
+        return;
+
+    // Recipient eligibility may also have changed since the first loot window.
+    loot->CountSharedDrop(item);
+
     // list of players allowed to receive this item in trade
     AllowedLooterSet looters = item.GetAllowedLooters();
 
