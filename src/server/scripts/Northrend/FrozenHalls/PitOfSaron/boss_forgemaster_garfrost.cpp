@@ -38,19 +38,24 @@ enum Yells
     EMOTE_DEEP_FREEZE               = 7,
 };
 
-enum MiscData
+enum Equipment
 {
     EQUIP_ID_SWORD                  = 49345,
     EQUIP_ID_MACE                   = 49344,
+};
+
+enum GameObjects
+{
     GO_SARONITE_ROCK                = 196485,
 };
 
-Position const northForgePos = {722.5643f, -234.1615f, 527.182f, 2.16421f};
-Position const southForgePos = {639.257f, -210.1198f, 529.015f, 0.523599f};
+Position const NorthForgePos = {722.5643f, -234.1615f, 527.182f, 2.16421f};
+Position const SouthForgePos = {639.257f, -210.1198f, 529.015f, 0.523599f};
 
 enum Spells
 {
     SPELL_PERMAFROST                = 70326,
+    SPELL_PERMAFROST_DEBUFF         = 70336,
     SPELL_THROW_SARONITE            = 68788,
     SPELL_THUNDERING_STOMP          = 68771,
 
@@ -70,6 +75,18 @@ enum Events
     EVENT_SPELL_DEEP_FREEZE,
 };
 
+enum Phases
+{
+    PHASE_ONE,
+    PHASE_FORGE_BLADE,
+    PHASE_FORGE_MACE,
+};
+
+enum MovePoints
+{
+    POINT_FORGE                     = 0,
+};
+
 class boss_garfrost : public CreatureScript
 {
 public:
@@ -79,13 +96,8 @@ public:
     {
         boss_garfrostAI(Creature* creature) : ScriptedAI(creature)
         {
-            pInstance = creature->GetInstanceScript();
+            _instance = creature->GetInstanceScript();
         }
-
-        InstanceScript* pInstance;
-        EventMap events;
-        uint8 phase;
-        bool bCanSayBoulderHit;
 
         void Reset() override
         {
@@ -94,37 +106,35 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
-            phase = 0;
-            bCanSayBoulderHit = true;
+            _phase = PHASE_ONE;
+            _canSayBoulderHit = true;
 
             events.Reset();
-            if (pInstance)
-                pInstance->SetData(DATA_GARFROST, NOT_STARTED);
+            _instance->SetData(DATA_GARFROST, NOT_STARTED);
         }
 
-        void SetData(uint32 id, uint32  /*data*/) override
+        void SetData(uint32 type, uint32 /*data*/) override
         {
-            if (id == 1 && pInstance)
-                pInstance->SetData(DATA_ACHIEV_ELEVEN, 0);
+            if (type == DATA_ACHIEV_ELEVEN)
+                _instance->SetData(DATA_ACHIEV_ELEVEN, 0);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            me->CastSpell(me, SPELL_PERMAFROST, true);
+            DoCastSelf(SPELL_PERMAFROST, true);
 
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             events.RescheduleEvent(EVENT_SPELL_THROW_SARONITE, 5s, 7500ms);
 
-            if (pInstance)
-                pInstance->SetData(DATA_GARFROST, IN_PROGRESS);
+            _instance->SetData(DATA_GARFROST, IN_PROGRESS);
         }
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
-            if (phase == 0 && !HealthAbovePct(66) && !me->HasUnitState(UNIT_STATE_ROOT))
+            if (_phase == PHASE_ONE && !HealthAbovePct(66) && !me->HasUnitState(UNIT_STATE_ROOT))
             {
-                phase = 1;
+                _phase = PHASE_FORGE_BLADE;
                 me->SetReactState(REACT_PASSIVE);
                 me->SetTarget();
                 me->SendMeleeAttackStop(me->GetVictim());
@@ -134,10 +144,10 @@ public:
                 return;
             }
 
-            if (phase == 1 && !HealthAbovePct(33) && !me->HasUnitState(UNIT_STATE_ROOT))
+            if (_phase == PHASE_FORGE_BLADE && !HealthAbovePct(33) && !me->HasUnitState(UNIT_STATE_ROOT))
             {
                 events.CancelEvent(EVENT_SPELL_CHILLING_WAVE);
-                phase = 2;
+                _phase = PHASE_FORGE_MACE;
                 me->SetReactState(REACT_PASSIVE);
                 me->SetTarget();
                 me->SendMeleeAttackStop(me->GetVictim());
@@ -150,10 +160,10 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type != EFFECT_MOTION_TYPE || id != 0)
+            if (type != EFFECT_MOTION_TYPE || id != POINT_FORGE)
                 return;
 
-            if (phase == 1)
+            if (_phase == PHASE_FORGE_BLADE)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 if (me->CastSpell(me, SPELL_FORGE_BLADE, false) == SPELL_CAST_OK)
@@ -171,7 +181,7 @@ public:
                 }
                 Talk(SAY_HP_66);
             }
-            else if (phase == 2)
+            else if (_phase == PHASE_FORGE_MACE)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_FORGE_BLADE, me));
@@ -192,13 +202,13 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
+        void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
         {
             if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_SARONITE_TRIGGERED, me))
             {
-                if (bCanSayBoulderHit)
+                if (_canSayBoulderHit)
                 {
-                    bCanSayBoulderHit = false;
+                    _canSayBoulderHit = false;
                     Talk(SAY_BOULDER_HIT);
                 }
             }
@@ -217,12 +227,11 @@ public:
                 {
                     me->SetHealth(me->GetMaxHealth());
                     EnterEvadeMode(EVADE_REASON_OTHER);
-                    if (CreatureGroup* f = me->GetFormation())
+                    if (CreatureGroup* formation = me->GetFormation())
                     {
-                        CreatureGroup::CreatureGroupMemberType const& m = f->GetMembers();
-                        for (CreatureGroup::CreatureGroupMemberType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
-                            if (itr->first->IsAlive() && itr->first->IsInCombat() && !itr->first->IsInEvadeMode() && itr->first->IsAIEnabled)
-                                itr->first->AI()->EnterEvadeMode();
+                        for (auto const& [member, formationInfo] : formation->GetMembers())
+                            if (member->IsAlive() && member->IsInCombat() && !member->IsInEvadeMode() && member->IsAIEnabled)
+                                member->AI()->EnterEvadeMode();
                     }
                     return;
                 }
@@ -235,36 +244,36 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
                 case EVENT_SPELL_THROW_SARONITE:
-                    bCanSayBoulderHit = true;
+                    _canSayBoulderHit = true;
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true))
                     {
                         Talk(WHISPER_BOULDER, target);
-                        me->CastSpell(target, SPELL_THROW_SARONITE, false);
+                        DoCast(target, SPELL_THROW_SARONITE);
                     }
                     events.Repeat(12s + 500ms, 20s);
                     break;
                 case EVENT_JUMP:
                     me->DisableRotate(true);
-                    if (phase == 1)
-                        me->GetMotionMaster()->MoveJump(northForgePos.GetPositionX(), northForgePos.GetPositionY(), northForgePos.GetPositionZ(), 25.0f, 15.0f, 0);
-                    else if (phase == 2)
-                        me->GetMotionMaster()->MoveJump(southForgePos.GetPositionX(), southForgePos.GetPositionY(), southForgePos.GetPositionZ(), 25.0f, 15.0f, 0);
+                    if (_phase == PHASE_FORGE_BLADE)
+                        me->GetMotionMaster()->MoveJump(NorthForgePos.GetPositionX(), NorthForgePos.GetPositionY(), NorthForgePos.GetPositionZ(), 25.0f, 15.0f, POINT_FORGE);
+                    else if (_phase == PHASE_FORGE_MACE)
+                        me->GetMotionMaster()->MoveJump(SouthForgePos.GetPositionX(), SouthForgePos.GetPositionY(), SouthForgePos.GetPositionZ(), 25.0f, 15.0f, POINT_FORGE);
 
                     break;
                 case EVENT_SPELL_CHILLING_WAVE:
-                    me->CastSpell(me->GetVictim(), SPELL_CHILLING_WAVE, false);
+                    DoCastVictim(SPELL_CHILLING_WAVE);
                     events.Repeat(35s);
                     break;
                 case EVENT_SPELL_DEEP_FREEZE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         Talk(EMOTE_DEEP_FREEZE, target);
-                        me->CastSpell(target, SPELL_DEEP_FREEZE, false);
+                        DoCast(target, SPELL_DEEP_FREEZE);
                     }
                     events.Repeat(35s);
+                    break;
+                default:
                     break;
             }
 
@@ -274,8 +283,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(DATA_GARFROST, DONE);
+            _instance->SetData(DATA_GARFROST, DONE);
         }
 
         void KilledUnit(Unit* who) override
@@ -290,6 +298,11 @@ public:
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode(why);
         }
+
+    private:
+        InstanceScript* _instance;
+        uint8 _phase;
+        bool _canSayBoulderHit;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -302,11 +315,9 @@ class spell_garfrost_permafrost : public SpellScript
 {
     PrepareSpellScript(spell_garfrost_permafrost);
 
-    std::list<WorldObject*> targetList;
-
     void Unload() override
     {
-        targetList.clear();
+        _targetList.clear();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)
@@ -318,40 +329,42 @@ class spell_garfrost_permafrost : public SpellScript
 
             if (!blockList.empty())
             {
-                for (std::list<WorldObject*>::iterator itrU = targets.begin(); itrU != targets.end(); ++itrU)
-                    if (WorldObject* target = (*itrU))
+                for (WorldObject* target : targets)
+                {
+                    if (!target)
+                        continue;
+
+                    bool valid = true;
+                    if (!caster->IsWithinMeleeRange(target->ToUnit()))
+                        for (GameObject* block : blockList)
+                            if (!block->IsInvisibleDueToDespawn() && block->IsInBetween(caster, target, 4.0f))
+                            {
+                                valid = false;
+                                break;
+                            }
+
+                    if (valid)
                     {
-                        bool valid = true;
-                        if (!caster->IsWithinMeleeRange(target->ToUnit()))
-                            for (std::list<GameObject*>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
-                                if (!(*itr)->IsInvisibleDueToDespawn())
-                                    if ((*itr)->IsInBetween(caster, target, 4.0f))
-                                    {
-                                        valid = false;
-                                        break;
-                                    }
-                        if (valid)
-                        {
-                            if (Aura* aur = target->ToUnit()->GetAura(70336))
-                                if (aur->GetStackAmount() >= 10 && caster->IsCreature())
-                                    caster->ToCreature()->AI()->SetData(1, aur->GetStackAmount());
-                            targetList.push_back(*itrU);
-                        }
+                        if (Aura* aura = target->ToUnit()->GetAura(SPELL_PERMAFROST_DEBUFF))
+                            if (aura->GetStackAmount() >= 10 && caster->IsCreature())
+                                caster->ToCreature()->AI()->SetData(DATA_ACHIEV_ELEVEN, aura->GetStackAmount());
+                        _targetList.push_back(target);
                     }
+                }
             }
             else
             {
-                targetList = targets;
+                _targetList = targets;
                 return;
             }
         }
 
-        targets = targetList;
+        targets = _targetList;
     }
 
     void FilterTargetsNext(std::list<WorldObject*>& targets)
     {
-        targets = targetList;
+        targets = _targetList;
     }
 
     void Register() override
@@ -360,6 +373,9 @@ class spell_garfrost_permafrost : public SpellScript
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost::FilterTargetsNext, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost::FilterTargetsNext, EFFECT_2, TARGET_UNIT_DEST_AREA_ENEMY);
     }
+
+private:
+    std::list<WorldObject*> _targetList;
 };
 
 void AddSC_boss_garfrost()
