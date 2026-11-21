@@ -125,6 +125,12 @@ void CliThread()
         ::rl_completer_word_break_characters = &BLANK;
     }
     ::rl_event_hook = &Acore::Impl::Readline::cli_hook_func;
+    // SIGINT and SIGTERM are handled in Main.cpp. Readline's own handlers would
+    // take them while it waits for input and raise them again with kill(), and
+    // another thread may only take that signal after readline has put its
+    // handlers back. Under a debugger that happens nearly every time, and the
+    // shutdown can hang for minutes.
+    ::rl_catch_signals = 0;
 #endif
 
     if (sConfigMgr->GetOption<bool>("BeepAtStart", true))
