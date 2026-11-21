@@ -1,3 +1,4 @@
+-- DB update 2026_11_21_03 -> 2026_11_21_04
 --
 -- Potent Fungus removes Mini through spell_amanitar_potent_fungus, which also consumes the fungus
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger` = 56648 AND `spell_effect` = -57055 AND `type` = 1;
