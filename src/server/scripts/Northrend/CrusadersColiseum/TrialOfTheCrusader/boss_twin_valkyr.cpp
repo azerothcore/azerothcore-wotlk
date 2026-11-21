@@ -18,7 +18,6 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -551,115 +550,6 @@ public:
     };
 };
 
-class npc_essence_of_twin : public CreatureScript
-{
-public:
-    npc_essence_of_twin() : CreatureScript("npc_essence_of_twin") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        switch (creature->GetEntry())
-        {
-            case NPC_LIGHT_ESSENCE:
-                {
-                    uint32 essenceId = 0;
-                    uint32 effect2Id = 0;
-                    //uint32 empoweredId = 0;
-                    uint32 touchId1 = 0;
-                    //uint32 touchId2 = 0;
-                    switch (creature->GetMap()->GetDifficulty())
-                    {
-                        case 0:
-                            essenceId = 65684;
-                            //empoweredId = 65724;
-                            touchId1 = 65950;
-                            //touchId2 = 66001;
-                            effect2Id = 65827;
-                            break;
-                        case 1:
-                            essenceId = 67176;
-                            //empoweredId = 67213;
-                            touchId1 = 67296;
-                            //touchId2 = 67281;
-                            effect2Id = 67179;
-                            break;
-                        case 2:
-                            essenceId = 67177;
-                            //empoweredId = 67214;
-                            touchId1 = 67297;
-                            //touchId2 = 67282;
-                            effect2Id = 67180;
-                            break;
-                        case 3:
-                            essenceId = 67178;
-                            //empoweredId = 67215;
-                            touchId1 = 67298;
-                            //touchId2 = 67283;
-                            effect2Id = 67181;
-                            break;
-                    }
-                    player->RemoveAura(essenceId);
-                    player->RemoveAura(effect2Id);
-                    player->RemoveAura(touchId1);
-                    //player->RemoveAura(touchId2); // dont remove black touch here - only white can have black touch - so white changing to white - so no change of color
-                    //player->RemoveAura(empoweredId); // apply new empowered?
-                    player->CastSpell(player, SPELL_LIGHT_ESSENCE, true);
-                }
-                break;
-            case NPC_DARK_ESSENCE:
-                {
-                    uint32 essenceId = 0;
-                    uint32 effect2Id = 0;
-                    //uint32 empoweredId = 0;
-                    //uint32 touchId1 = 0;
-                    uint32 touchId2 = 0;
-                    switch (creature->GetMap()->GetDifficulty())
-                    {
-                        case 0:
-                            essenceId = 65686;
-                            //empoweredId = 65748;
-                            //touchId1 = 65950;
-                            touchId2 = 66001;
-                            effect2Id = 65811;
-                            break;
-                        case 1:
-                            essenceId = 67222;
-                            //empoweredId = 67216;
-                            //touchId1 = 67296;
-                            touchId2 = 67281;
-                            effect2Id = 67511;
-                            break;
-                        case 2:
-                            essenceId = 67223;
-                            //empoweredId = 67217;
-                            //touchId1 = 67297;
-                            touchId2 = 67282;
-                            effect2Id = 67512;
-                            break;
-                        case 3:
-                            essenceId = 67224;
-                            //empoweredId = 67218;
-                            //touchId1 = 67298;
-                            touchId2 = 67283;
-                            effect2Id = 67513;
-                            break;
-                    }
-                    player->RemoveAura(essenceId);
-                    player->RemoveAura(effect2Id);
-                    //player->RemoveAura(touchId1); // dont remove white touch here - only black can have white touch - so black changing to black - so no change of color
-                    player->RemoveAura(touchId2);
-                    //player->RemoveAura(empoweredId); // apply new empowered?
-                    player->CastSpell(player, SPELL_DARK_ESSENCE, true);
-                }
-                break;
-            default:
-                break;
-        }
-        CloseGossipMenuFor(player);
-        return true;
-    }
-};
-
 // 34628 - Concentrated Darkness, 34630 - Concentrated Light
 struct npc_concentrated_ball : public ScriptedAI
 {
@@ -718,7 +608,7 @@ class spell_valkyr_essence_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_POWERING_UP, SPELL_SURGE_OF_SPEED });
+        return ValidateSpellInfo({ SPELL_POWERING_UP, SPELL_SURGE_OF_SPEED, SPELL_LIGHT_ESSENCE, SPELL_DARK_ESSENCE, SPELL_LIGHT_TOUCH, SPELL_DARK_TOUCH });
     }
 
     void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
@@ -791,9 +681,19 @@ class spell_valkyr_essence_aura : public AuraScript
             }
     }
 
+    // Taking an essence removes the other one and clears the Touch of its own colour, which can no longer harm the player
+    void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        bool const isLight = GetId() == sSpellMgr->GetSpellIdForDifficulty(SPELL_LIGHT_ESSENCE, target);
+        target->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(isLight ? SPELL_DARK_ESSENCE : SPELL_LIGHT_ESSENCE, target));
+        target->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(isLight ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, target));
+    }
+
     void Register() override
     {
         AfterEffectAbsorb += AuraEffectAbsorbFn(spell_valkyr_essence_aura::HandleAfterEffectAbsorb, EFFECT_0);
+        AfterEffectApply += AuraEffectApplyFn(spell_valkyr_essence_aura::HandleAfterApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -946,7 +846,6 @@ void AddSC_boss_twin_valkyr()
 {
     new boss_fjola();
     new boss_eydis();
-    new npc_essence_of_twin();
     RegisterTrialOfTheCrusaderCreatureAI(npc_concentrated_ball);
     RegisterSpellScript(spell_valkyr_essence_aura);
     RegisterSpellScript(spell_valkyr_touch_aura);
