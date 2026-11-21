@@ -89,8 +89,10 @@ enum ValkyrSpells
     SPELL_DARK_VORTEX           = 66058,
     SPELL_DARK_TOUCH            = 67282,
 
-    SPELL_TWIN_POWER            = 65916,
+    SPELL_TWIN_POWER_LIGHT      = 65916,
+    SPELL_TWIN_POWER_DARK       = 65879,
     SPELL_BERSERK               = 64238,
+    SPELL_BERSERK_TWIN          = 68378,
 
     SPELL_TWIN_EMPATHY_DARK     = 66132,
     SPELL_TWIN_EMPATHY_LIGHT    = 66133,
@@ -126,6 +128,12 @@ enum ValkyrEvents
     EVENT_SPELL_TOUCH,
     EVENT_SPECIAL,
     EVENT_REMOVE_DUAL_WIELD,
+};
+
+enum ValkyrActions
+{
+    // Twin's Pact: the sister of the casting twin gains Power of the Twins
+    ACTION_TWIN_POWER = 1,
 };
 
 struct boss_twin_valkyrAI : public ScriptedAI
@@ -179,9 +187,9 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     DoCastAOE(SPELL_CLEAR_VALKYR_TOUCH, true);
                 }
                 break;
-            case -3:
+            case ACTION_TWIN_POWER:
                 me->SetCanDualWield(true);
-                me->CastSpell(me, SPELL_TWIN_POWER, true);
+                DoCastSelf(me->GetEntry() == NPC_LIGHTBANE ? SPELL_TWIN_POWER_LIGHT : SPELL_TWIN_POWER_DARK, true);
                 events.RescheduleEvent(EVENT_REMOVE_DUAL_WIELD, 15s);
                 break;
             default:
@@ -292,11 +300,12 @@ struct boss_twin_valkyrAI : public ScriptedAI
             case 0:
                 break;
             case EVENT_BERSERK:
-                me->CastSpell(me, SPELL_BERSERK, true);
                 Talk(SAY_BERSERK);
                 if (Creature* twin = GetSister())
                 {
+                    // Eydis enrages both twins; the second spell reaches Fjola through its target conditions
                     twin->CastSpell(twin, SPELL_BERSERK, true);
+                    twin->CastSpell(me, SPELL_BERSERK_TWIN, true);
                     twin->AI()->Talk(EMOTE_BERSERK);
                     twin->AI()->Talk(SAY_BERSERK);
                 }
@@ -417,7 +426,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             if (Creature* twin = GetSister())
                             {
                                 twin->AI()->Talk(SAY_TWINK_PACT);
-                                twin->AI()->DoAction(-3);
+                                twin->AI()->DoAction(ACTION_TWIN_POWER);
                             }
                             me->CastSpell(me, SPELL_LIGHT_SHIELD, true);
                             me->CastSpell(me, SPELL_LIGHT_TWIN_PACT, false);
@@ -430,7 +439,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                                 Talk(SAY_TWINK_PACT);
                                 twin->CastSpell(twin, SPELL_DARK_SHIELD, true);
                                 twin->CastSpell(twin, SPELL_DARK_TWIN_PACT, false);
-                                DoAction(-3);
+                                DoAction(ACTION_TWIN_POWER);
                             }
                             break;
                     }
