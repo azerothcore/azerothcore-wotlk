@@ -424,6 +424,19 @@ void Player::Update(uint32 p_time)
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
+
+    // While on a flight path, after flying between areas, the local channel update is delayed by 3-4 seconds.
+    // What we do is reset the timer whenever we fly over an area, so that channels change only if player has flown over an area for at least 3 seconds.
+    if (_suppressZoneChannelChangesTimer > 0)
+    {
+        _suppressZoneChannelChangesTimer -= p_time;
+        if (_suppressZoneChannelChangesTimer <= 0)
+        {
+            _suppressZoneChannelChangesTimer = 0;
+            UpdateLocalChannels(GetZoneId());
+        }
+    }
+
     sScriptMgr->OnPlayerAfterUpdate(this, p_time);
 }
 
@@ -1371,7 +1384,10 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea, bool force)
 
     // recent client version not send leave/join channel packets for built-in
     // local channels
-    UpdateLocalChannels(newZone);
+    if (IsInFlight())
+        _suppressZoneChannelChangesTimer = 3 * IN_MILLISECONDS; // If we're on a flight path, activate (or reset) the channel change timer.
+    else
+        UpdateLocalChannels(newZone);
 
     UpdateZoneDependentAuras(newZone);
 }
