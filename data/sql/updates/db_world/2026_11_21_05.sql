@@ -1,3 +1,4 @@
+-- DB update 2026_11_21_04 -> 2026_11_21_05
 --
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_patchwerk_hateful_strike_primer';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
