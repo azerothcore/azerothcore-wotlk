@@ -210,6 +210,7 @@ private:
 
     bool _needClientUpdate;
     uint32 _updateTimer;
+    bool _victimUpdatePending;
     std::unique_ptr<Heap> _sortedThreatList;
     std::unordered_map<ObjectGuid, ThreatReference*> _myThreatListEntries;
 
@@ -218,6 +219,8 @@ private:
     std::vector<ObjectGuid> _needsAIUpdate;
 
     void UpdateVictim();
+    void FlagVictimUpdateIfOvertaken();
+    void UpdateVictimIfChanged();
     ThreatReference const* ReselectVictim();
     ThreatReference const* _currentVictimRef;
     ThreatReference const* _fixateRef;
