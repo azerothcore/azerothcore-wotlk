@@ -1403,6 +1403,7 @@ void WorldSession::HandleSocketOpcode(WorldPackets::Item::SocketGems& packet)
     _player->ToggleMetaGemsActive(slot, true);              //turn on all metagems (except for target item)
 
     _player->RemoveTradeableItem(itemTarget);
+    itemTarget->SetNotRefundable(_player);
     itemTarget->ClearSoulboundTradeable(_player);           // clear tradeable flag
 
     itemTarget->SendUpdateSockets();
