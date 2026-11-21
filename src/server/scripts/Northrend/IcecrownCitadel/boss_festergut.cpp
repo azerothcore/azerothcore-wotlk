@@ -20,13 +20,13 @@
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "SharedDefines.h"
+#include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
 
 enum ScriptTexts
 {

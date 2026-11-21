@@ -756,6 +756,7 @@ public:
 
                     if (Creature* ladyDeathwhisper = _instance->GetCreature(DATA_LADY_DEATHWHISPER))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
+
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
@@ -877,6 +878,7 @@ public:
 
                     if (Creature* ladyDeathwhisper = _instance->GetCreature(DATA_LADY_DEATHWHISPER))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
+
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);

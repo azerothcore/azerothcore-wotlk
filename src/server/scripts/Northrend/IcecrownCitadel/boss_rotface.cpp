@@ -373,6 +373,7 @@ public:
         {
             if (Creature* rotface = instance->GetCreature(DATA_ROTFACE))
                 rotface->AI()->SummonedCreatureDespawn(me);
+
             me->DespawnOrUnsummon(0ms);
         }
 
@@ -449,6 +450,7 @@ public:
         {
             if (Creature* rotface = instance->GetCreature(DATA_ROTFACE))
                 rotface->AI()->SummonedCreatureDespawn(me);
+
             me->DespawnOrUnsummon();
         }
 

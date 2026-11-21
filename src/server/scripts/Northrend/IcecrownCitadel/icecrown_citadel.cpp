@@ -814,6 +814,7 @@ public:
                 me->SetImmuneToAll(true);
                 if (Creature* svalna = _instance->GetCreature(DATA_SISTER_SVALNA))
                     svalna->AI()->DoAction(ACTION_START_GAUNTLET);
+
                 for (uint32 i = 0; i < 4; ++i)
                     if (Creature* crusader = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
                         crusader->AI()->DoAction(ACTION_START_GAUNTLET);
@@ -902,11 +903,13 @@ public:
                     minY = 2550.0f;
                     if (Creature* svalna = _instance->GetCreature(DATA_SISTER_SVALNA))
                         svalna->AI()->DoAction(ACTION_KILL_CAPTAIN);
+
                     break;
                 case 2:
                     minY = 2515.0f;
                     if (Creature* svalna = _instance->GetCreature(DATA_SISTER_SVALNA))
                         svalna->AI()->DoAction(ACTION_KILL_CAPTAIN);
+
                     break;
                 case 4:
                     minY = 2475.0f;
@@ -997,6 +1000,7 @@ public:
                 case EVENT_ARNATH_INTRO_2:
                     if (Creature* arnath = _instance->GetCreature(DATA_CAPTAIN_ARNATH))
                         arnath->AI()->Talk(SAY_ARNATH_INTRO_2);
+
                     break;
                 case EVENT_CROK_INTRO_3:
                     Talk(SAY_CROK_INTRO_3);

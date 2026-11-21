@@ -22,9 +22,9 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "SpellMgr.h"
 
 enum ScriptTexts
 {
@@ -472,7 +472,7 @@ public:
             if (type != POINT_MOTION_TYPE && id != POINT_SAURFANG)
                 return;
 
-            instance->HandleGameObject(instance->GetGuidData(DATA_SAURFANG_DOOR), false);
+            instance->HandleGameObject(DATA_SAURFANG_DOOR, false);
         }
 
         void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
@@ -666,7 +666,7 @@ public:
                         _events.SetPhase(PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5s, 0, PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 21s + 400ms, 0, PHASE_INTRO_H);
-                        _instance->HandleGameObject(_instance->GetGuidData(DATA_SAURFANG_DOOR), true);
+                        _instance->HandleGameObject(DATA_SAURFANG_DOOR, true);
 
                         if (GameObject* teleporter = _instance->GetGameObject(DATA_SAURFANG_TELEPORT))
                         {
@@ -748,6 +748,7 @@ public:
                     case POINT_CORPSE:
                         if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                             me->SetFacingToObject(deathbringer);
+
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_WEEP, 2s + 700ms);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_CEREMONY, 11s + 200ms);
@@ -784,6 +785,7 @@ public:
                 case EVENT_INTRO_HORDE_2:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_HORDE_2);
+
                     break;
                 case EVENT_INTRO_HORDE_3:
                     for (ObjectGuid const& guid : _guardList)
@@ -795,6 +797,7 @@ public:
                 case EVENT_INTRO_HORDE_4:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_HORDE_4);
+
                     _events.ScheduleEvent(EVENT_INTRO_HORDE_QUESTION, 3s + 800ms, 0, PHASE_INTRO_H);
                     break;
                 case EVENT_INTRO_HORDE_5:
@@ -820,10 +823,12 @@ public:
                 case EVENT_INTRO_HORDE_9:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
+
                     break;
                 case EVENT_INTRO_HORDE_10:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_HORDE_9);
+
                     break;
                 case EVENT_INTRO_HORDE_TALK:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
@@ -834,6 +839,7 @@ public:
                 case EVENT_INTRO_HORDE_QUESTION:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+
                     break;
                 case EVENT_INTRO_FINISH:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
@@ -1006,7 +1012,7 @@ public:
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 1s, 0, PHASE_INTRO_A);
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 18s + 400ms, 0, PHASE_INTRO_A);
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 24s + 500ms, 0, PHASE_INTRO_A);
-                        _instance->HandleGameObject(_instance->GetGuidData(DATA_SAURFANG_DOOR), true);
+                        _instance->HandleGameObject(DATA_SAURFANG_DOOR, true);
 
                         if (GameObject* teleporter = _instance->GetGameObject(DATA_SAURFANG_TELEPORT))
                         {
@@ -1119,10 +1125,12 @@ public:
                 case EVENT_INTRO_ALLIANCE_2:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_2);
+
                     break;
                 case EVENT_INTRO_ALLIANCE_3:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_3);
+
                     break;
                 case EVENT_INTRO_ALLIANCE_4:
                     for (ObjectGuid const& guid : _guardList)
@@ -1141,6 +1149,7 @@ public:
                 case EVENT_INTRO_ALLIANCE_6:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
+
                     break;
                 case EVENT_INTRO_ALLIANCE_7:
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
@@ -1321,6 +1330,7 @@ public:
                     {
                         if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                             saurfang->SetFacingToObject(deathbringer);
+
                         saurfang->SetStandState(UNIT_STAND_STATE_KNEEL);
                     }
                     _events.ScheduleEvent(EVENT_OUTRO_A_SAURFANG_ORCISH, 1s + 800ms);
@@ -1409,6 +1419,7 @@ public:
                     // The body goes with him: despawned later it would drop a revived Deathbringer on the rise.
                     if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->DespawnOrUnsummon();
+
                     _outroSaurfangGUID.Clear();
                     if (Creature* jaina = ObjectAccessor::GetCreature(*me, _outroJainaGUID))
                         jaina->AI()->Talk(SAY_OUTRO_ALLIANCE_17);
@@ -1478,6 +1489,7 @@ public:
                     {
                         if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                             deathbringer->DespawnOrUnsummon();
+
                         if (Creature* varian = ObjectAccessor::GetCreature(*me, _outroVarianGUID))
                             varian->DespawnOrUnsummon();
                         if (Creature* jaina = ObjectAccessor::GetCreature(*me, _outroJainaGUID))

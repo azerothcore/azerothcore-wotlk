@@ -17,12 +17,12 @@
 
 #include "CreatureScript.h"
 #include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "PassiveAI.h"
 
 enum Texts
 {
@@ -270,6 +270,7 @@ public:
             if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 if (!taldaram->IsInEvadeMode())
                     taldaram->SetInCombatWithZone();
+
             if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 if (!valanar->IsInEvadeMode())
                     valanar->SetInCombatWithZone();
@@ -311,6 +312,7 @@ public:
             if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 if (taldaram->IsAlive())
                     Unit::Kill(taldaram, taldaram);
+
             if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 if (valanar->IsAlive())
                     Unit::Kill(valanar, valanar);
@@ -435,8 +437,10 @@ public:
             _evading = true;
             if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 taldaram->AI()->EnterEvadeMode();
+
             if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 valanar->AI()->EnterEvadeMode();
+
             ScriptedAI::EnterEvadeMode(why);
             _evading = false;
         }
@@ -530,6 +534,7 @@ public:
             if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 if (!keleseth->IsInEvadeMode())
                     keleseth->SetInCombatWithZone();
+
             if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 if (!valanar->IsInEvadeMode())
                     valanar->SetInCombatWithZone();
@@ -566,6 +571,7 @@ public:
             if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 if (keleseth->IsAlive())
                     Unit::Kill(keleseth, keleseth);
+
             if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 if (valanar->IsAlive())
                     Unit::Kill(valanar, valanar);
@@ -720,8 +726,10 @@ public:
             _evading = true;
             if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 keleseth->AI()->EnterEvadeMode(why);
+
             if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 valanar->AI()->EnterEvadeMode(why);
+
             ScriptedAI::EnterEvadeMode(why);
             _evading = false;
         }
@@ -817,6 +825,7 @@ public:
             if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 if (!keleseth->IsInEvadeMode())
                     keleseth->SetInCombatWithZone();
+
             if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 if (!taldaram->IsInEvadeMode())
                     taldaram->SetInCombatWithZone();
@@ -862,6 +871,7 @@ public:
             if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 if (keleseth->IsAlive())
                     Unit::Kill(keleseth, keleseth);
+
             if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 if (taldaram->IsAlive())
                     Unit::Kill(taldaram, taldaram);
@@ -1065,8 +1075,10 @@ public:
             _evading = true;
             if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 keleseth->AI()->EnterEvadeMode(why);
+
             if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 taldaram->AI()->EnterEvadeMode(why);
+
             BossAI::EnterEvadeMode(why);
             _evading = false;
         }

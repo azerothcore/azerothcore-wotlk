@@ -24,6 +24,7 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -33,7 +34,6 @@
 #include "Vehicle.h"
 #include "Weather.h"
 #include "icecrown_citadel.h"
-#include "PassiveAI.h"
 
 enum Texts
 {
@@ -677,7 +677,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);
 
-            if (!instance->GetCreature(DATA_HIGHLORD_TIRION_FORDRING))
+            if (!ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                 me->SummonCreature(NPC_HIGHLORD_TIRION_FORDRING_LK, TirionSpawn, TEMPSUMMON_MANUAL_DESPAWN);
         }
 
@@ -743,7 +743,7 @@ public:
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_BROKEN_FROSTMOURNE, true);
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_BROKEN_FROSTMOURNE_2, false);
                     SetEquipmentSlots(false, EQUIP_BROKEN_FROSTMOURNE);
-                    if (Creature* tirion = instance->GetCreature(DATA_HIGHLORD_TIRION_FORDRING))
+                    if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                         tirion->AI()->DoAction(ACTION_BREAK_FROSTMOURNE);
                     break;
                 case ACTION_TELEPORT_BACK:
@@ -808,7 +808,7 @@ public:
                 me->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE, false);
                 me->SetWalk(true);
 
-                if (Creature* tirion = instance->GetCreature(DATA_HIGHLORD_TIRION_FORDRING))
+                if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     tirion->AI()->DoAction(ACTION_OUTRO);
                 return;
             }
@@ -834,7 +834,7 @@ public:
                 if (!_bFordringMustFallYell && me->GetHealth() < 500000)
                 {
                     _bFordringMustFallYell = true;
-                    if (Creature* tirion = instance->GetCreature(DATA_HIGHLORD_TIRION_FORDRING))
+                    if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
                         tirion->AI()->Talk(SAY_TIRION_OUTRO_3);
                     }
@@ -1268,7 +1268,7 @@ public:
             BossAI::EnterEvadeMode(why);
             me->SetReactState(REACT_AGGRESSIVE);
 
-            if (Creature* tirion = instance->GetCreature(DATA_HIGHLORD_TIRION_FORDRING))
+            if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                 tirion->DespawnOrUnsummon();
         }
     };
@@ -1423,10 +1423,12 @@ public:
                 case EVENT_INTRO_LK_EMOTE_CAST_SHOUT:
                     if (Creature* theLichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                         theLichKing->CastSpell(theLichKing, SPELL_EMOTE_SHOUT_NO_SHEATH, false);
+
                     break;
                 case EVENT_INTRO_LK_EMOTE_1:
                     if (Creature* theLichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                         theLichKing->HandleEmoteCommand(EMOTE_ONESHOT_POINT_NO_SHEATHE);
+
                     break;
                 case EVENT_INTRO_LK_CAST_FREEZE:
                     if (Creature* theLichKing = _instance->GetCreature(DATA_THE_LICH_KING))
@@ -1491,6 +1493,7 @@ public:
                 case EVENT_OUTRO_LK_EMOTE_TALK:
                     if (Creature* theLichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                         theLichKing->HandleEmoteCommand(EMOTE_ONESHOT_TALK_NO_SHEATHE);
+
                     break;
                 case EVENT_OUTRO_LK_TALK_3:
                     if (Creature* theLichKing = _instance->GetCreature(DATA_THE_LICH_KING))
@@ -1608,10 +1611,12 @@ public:
                 case EVENT_OUTRO_LK_TALK_7:
                     if (Creature* theLichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_7);
+
                     break;
                 case EVENT_OUTRO_LK_TALK_8:
                     if (Creature* theLichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_8);
+
                     break;
                 case EVENT_OUTRO_FORDRING_TALK_1:
                     Talk(SAY_TIRION_OUTRO_1);
@@ -2257,6 +2262,7 @@ public:
         {
             if (Creature* lichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                 lichKing->AI()->SummonedCreatureDespawn(me);
+
             if (TempSummon* summon = me->ToTempSummon())
             {
                 summon->SetTimer(5000);
@@ -3053,6 +3059,7 @@ public:
                 case EVENT_DESPAWN_SELF:
                     if (Creature* lichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                         lichKing->AI()->SummonedCreatureDespawn(me);
+
                     me->DespawnOrUnsummon(1ms);
                     break;
                 default:
@@ -3167,6 +3174,7 @@ public:
                 case EVENT_TELEPORT_BACK:
                     if (Creature* lichKing = _instance->GetCreature(DATA_THE_LICH_KING))
                         lichKing->AI()->DoAction(ACTION_TELEPORT_BACK);
+
                     break;
                 default:
                     break;
@@ -3244,6 +3252,7 @@ class spell_the_lich_king_restore_soul : public SpellScript
                 target->RemoveAurasDueToSpell(target->GetMap()->IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
         if (Creature* lichKing = _instance->GetCreature(DATA_THE_LICH_KING))
             lichKing->AI()->DoAction(ACTION_TELEPORT_BACK);
+
         if (Creature* spawner = GetCaster()->FindNearestCreature(NPC_WORLD_TRIGGER_INFINITE_AOI, 50.0f, true))
         {
             spawner->RemoveAllAuras();
@@ -3290,7 +3299,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* terenas = _instance->GetCreature(DATA_TERENAS_MENETHIL))
+            if (Creature* terenas = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_TERENAS_MENETHIL)))
                 terenas->AI()->DoAction(ACTION_TELEPORT_BACK);
         }
 

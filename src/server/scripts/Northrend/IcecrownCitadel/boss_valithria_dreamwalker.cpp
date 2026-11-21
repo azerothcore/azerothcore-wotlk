@@ -22,11 +22,11 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "PassiveAI.h"
 
 enum Texts
 {
@@ -390,8 +390,10 @@ public:
                 me->DespawnOrUnsummon(4s);
                 if (Creature* trigger = _instance->GetCreature(DATA_VALITHRIA_TRIGGER))
                     Unit::Kill(me, trigger);
+
                 if (Creature* lichKing = _instance->GetCreature(DATA_VALITHRIA_LICH_KING))
                     lichKing->CastSpell(lichKing, SPELL_SPAWN_CHEST, false);
+
                 _instance->SetData(DATA_WEEKLY_QUEST_ID, 0); // show hidden npc if necessary
             }
         }
@@ -522,6 +524,7 @@ public:
             instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
             if (Creature* valithria = instance->GetCreature(DATA_VALITHRIA_DREAMWALKER))
                 valithria->AI()->DoAction(ACTION_ENTER_COMBAT);
+
             if (Creature* lichKing = instance->GetCreature(DATA_VALITHRIA_LICH_KING))
                 lichKing->AI()->DoAction(ACTION_ENTER_COMBAT);
 
