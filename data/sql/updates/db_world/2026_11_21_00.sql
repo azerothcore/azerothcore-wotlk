@@ -1,3 +1,4 @@
+-- DB update 2026_11_20_08 -> 2026_11_21_00
 -- Twin Val'kyr: Bullet Controller and Bullet Stalkers drive the Concentrated Light/Darkness orbs
 DELETE FROM `creature` WHERE `id` IN (34704, 34720, 34743) AND `guid` BETWEEN 141600 AND 141688;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
