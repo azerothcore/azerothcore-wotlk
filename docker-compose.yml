@@ -8,11 +8,15 @@
 services:
   ac-database:
     container_name: ac-database
-    image: ${DOCKER_DB_IMAGE:-mysql:8.4}
+    image: ${DOCKER_DB_IMAGE:-acore/ac-wotlk-dbserver}
     networks:
       - ac-network
     ports:
       - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
+    build:
+      context: .
+      target: dbserver
+      dockerfile: apps/docker/Dockerfile.dbserver
     environment:
       - MYSQL_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD:-password}
     volumes:
@@ -23,6 +27,7 @@ services:
       interval: 5s
       timeout: 10s
       retries: 40
+
 
   ac-db-import:
     container_name: ac-db-import
