@@ -8,26 +8,22 @@
 services:
   ac-database:
     container_name: ac-database
-    image: ${DOCKER_DB_IMAGE:-acore/ac-wotlk-dbserver}
+    image: ${DOCKER_DB_IMAGE:-mysql:8.4}
     networks:
       - ac-network
     ports:
       - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
-    build:
-      context: .
-      target: dbserver
-      dockerfile: apps/docker/Dockerfile.dbserver
     environment:
       - MYSQL_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD:-password}
     volumes:
       - ${DOCKER_VOL_DB:-ac-database}:/var/lib/mysql
+      - ${DOCKER_VOL_MYCNF:-./apps/docker-mysql/acore_disable_binlog.cnf}:/etc/mysql/conf.d/acore.cnf:ro
     restart: unless-stopped
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=\"$$MYSQL_ROOT_PASSWORD\" --execute \"SHOW DATABASES;\""
       interval: 5s
       timeout: 10s
       retries: 40
-
 
   ac-db-import:
     container_name: ac-db-import

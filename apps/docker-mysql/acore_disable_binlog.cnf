@@ -1,0 +1,4 @@
+# for use in the ac-database docker container
+# link as a ro file in /etc/mysql/conf.d/
+[mysqld]
+skip-log-bin
