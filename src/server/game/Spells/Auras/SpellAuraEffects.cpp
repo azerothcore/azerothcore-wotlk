@@ -1261,7 +1261,7 @@ bool AuraEffect::CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventIn
         {
             // Skip melee hits and spells with wrong school or zero cost
             if (!spellInfo || !(spellInfo->GetSchoolMask() & GetMiscValue())
-                    || !spellInfo->ManaCost || !spellInfo->ManaCostPercentage)
+                    || (!spellInfo->ManaCost && !spellInfo->ManaCostPercentage))
                 return false;
             break;
         }
