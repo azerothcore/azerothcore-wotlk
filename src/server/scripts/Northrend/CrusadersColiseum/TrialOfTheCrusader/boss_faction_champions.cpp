@@ -1685,7 +1685,7 @@ enum eDeathKnightSpells
     SPELL_CHAINS_OF_ICE    = 66020,
     SPELL_DEATH_COIL          = 66019,
     SPELL_DEATH_GRIP          = 66017,
-    SPELL_DEATH_GRIP_PULL     = 64431,
+    SPELL_DEATH_GRIP_PULL     = 49560,
     SPELL_FROST_STRIKE      = 66047,
     SPELL_ICEBOUND_FORTITUDE  = 66023,
     SPELL_ICY_TOUCH        = 66021,
@@ -2472,16 +2472,16 @@ class spell_faction_champion_death_grip : public SpellScript
         if (!caster || !target)
             return;
 
-        // A reflected grip hits its own caster: pull the caster to the reflecting target instead
+        // A reflected grip hits its own caster: the reflecting target grips the caster instead
         if (target == caster)
         {
             if (Unit* reflector = GetExplTargetUnit())
-                caster->CastSpell(reflector, SPELL_DEATH_GRIP_PULL, true);
+                reflector->CastSpell(caster, SPELL_DEATH_GRIP_PULL, true);
 
             return;
         }
 
-        target->CastSpell(caster, SPELL_DEATH_GRIP_PULL, true);
+        caster->CastSpell(target, SPELL_DEATH_GRIP_PULL, true);
     }
 
     void Register() override
