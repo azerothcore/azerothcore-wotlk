@@ -129,7 +129,6 @@ enum Events
     EVENT_THORIMS_HAMMER                = 9,
     EVENT_SOUND_BEGINNING               = 10,
     EVENT_EJECT_PLAYERS                 = 11,
-    EVENT_CHECK_PLAYERS                 = 12,
     EVENT_LASH                          = 13,
     EVENT_FREYA_WARD_WAVE               = 14,
 };
@@ -259,6 +258,29 @@ struct boss_flame_leviathan : public BossAI
     }
 
     void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
+
+    void SummonedCreatureDespawnAll() override
+    {
+        BossAI::SummonedCreatureDespawnAll();
+        DespawnAccessories(vehicle);
+    }
+
+    static void DespawnAccessories(Vehicle* kit)
+    {
+        std::vector<Creature*> accessories;
+        for (auto const& seat : kit->Seats)
+            if (Creature* accessory = ObjectAccessor::GetCreature(*kit->GetBase(), seat.second.Passenger.Guid))
+                accessories.push_back(accessory);
+
+        for (Creature* accessory : accessories)
+        {
+            if (Vehicle* accessoryKit = accessory->GetVehicleKit())
+                DespawnAccessories(accessoryKit);
+
+            accessory->DespawnOrUnsummon();
+        }
+    }
+
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
     void JustDied(Unit*) override;
     void KilledUnit(Unit* who) override;
@@ -330,7 +352,10 @@ struct boss_flame_leviathan : public BossAI
         else
         {
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
+
+            if (!me->IsInEvadeMode())
+                instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
+
             _startTimer = 0;
         }
 
@@ -406,6 +431,12 @@ struct boss_flame_leviathan : public BossAI
             return;
         }
 
+        if (me->IsEngaged() && !IsInCombatWithPlayer())
+        {
+            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+            return;
+        }
+
         if (!UpdateVictim())
             return;
 
@@ -465,13 +496,6 @@ struct boss_flame_leviathan : public BossAI
                         if (Vehicle* seatVehicle = seat->GetVehicleKit())
                             if (Unit* player = seatVehicle->GetPassenger(SEAT_PLAYER))
                                 player->ExitVehicle();
-                return;
-            case EVENT_CHECK_PLAYERS:
-                // Empty vehicles keep the boss in combat
-                if (me->IsInCombat() && !IsInCombatWithPlayer())
-                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-                else
-                    events.Repeat(5s);
                 return;
         }
 
@@ -588,7 +612,6 @@ void boss_flame_leviathan::TurnHealStations(bool _apply)
 
 void boss_flame_leviathan::ScheduleEvents()
 {
-    events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
     events.RescheduleEvent(EVENT_MISSILE, 5s);
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);

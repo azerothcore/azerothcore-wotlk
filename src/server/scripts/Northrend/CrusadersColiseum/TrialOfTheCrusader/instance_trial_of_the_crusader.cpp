@@ -112,11 +112,13 @@ ObjectData const gameObjectData[] =
 
 ObjectData const summonData[] =
 {
-    { NPC_MISTRESS_OF_PAIN,  DATA_JARAXXUS }, // summoned by a Nether Portal, not Jaraxxus
-    { NPC_FELFLAME_INFERNAL, DATA_JARAXXUS }, // summoned by an Infernal Volcano, not Jaraxxus
-    { NPC_SCARAB,            DATA_ANUBARAK }, // summoned by a Nerubian Burrow, not Anub'arak
-    { NPC_BURROWER,          DATA_ANUBARAK }, // summoned by a Nerubian Burrow, not Anub'arak
-    { 0,                     0             }
+    { NPC_MISTRESS_OF_PAIN,   DATA_JARAXXUS  }, // summoned by a Nether Portal, not Jaraxxus
+    { NPC_FELFLAME_INFERNAL,  DATA_JARAXXUS  }, // summoned by an Infernal Volcano, not Jaraxxus
+    { NPC_SCARAB,             DATA_ANUBARAK  }, // summoned by a Nerubian Burrow, not Anub'arak
+    { NPC_BURROWER,           DATA_ANUBARAK  }, // summoned by a Nerubian Burrow, not Anub'arak
+    { NPC_CONCENTRATED_DARK,  DATA_LIGHTBANE }, // summoned by a Bullet Stalker, not Fjola
+    { NPC_CONCENTRATED_LIGHT, DATA_LIGHTBANE }, // summoned by a Bullet Stalker, not Fjola
+    { 0,                      0              }
 };
 
 struct instance_trial_of_the_crusader : public InstanceScript
@@ -888,6 +890,8 @@ struct instance_trial_of_the_crusader : public InstanceScript
 
                     _instanceProgress = INSTANCE_PROGRESS_ANUB_ARAK;
                     SpawnAnubArak();
+                    if (Creature* anubarak = GetCreature(DATA_ANUBARAK))
+                        anubarak->AI()->DoAction(ACTION_ANUBARAK_INTRO_SUBMERGE);
                 }
 
                 _events.RescheduleEvent(EVENT_SCENE_410, 2s);

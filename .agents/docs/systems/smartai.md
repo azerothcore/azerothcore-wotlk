@@ -24,3 +24,6 @@ Data-driven behaviour in the world DB's `smart_scripts` (engine: `src/server/gam
   phases gate: keep or move their other effects (e.g. a phase-1-only Frost Nova), and clear masks that no phase sets.
 - A timed self-buff is kept up by `UPDATE` (event 60) on a short timer with cast flag 32
   (`SMARTCAST_AURA_NOT_PRESENT`), not by random out-of-combat recast timers.
+- A new or changed SmartAI event, action or target parameter (`SmartScriptMgr.h` enum comment or param struct) needs
+  follow-up PRs to the wiki `smart_scripts` page and to Keira3's SmartAI editor (`azerothcore/Keira3`); list both in
+  the plan and the PR's TODO list.
