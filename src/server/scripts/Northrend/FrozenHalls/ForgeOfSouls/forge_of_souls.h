@@ -19,28 +19,29 @@
 #define DEF_FORGE_OF_SOULS_H
 
 #include "CreatureAIImpl.h"
-#include "GridNotifiers.h"
+#include "Position.h"
+#include <array>
 
-#define DataHeader "FOS"
+constexpr char const* DataHeader = "FOS";
 
-#define ForgeOfSoulsScriptName "instance_forge_of_souls"
+constexpr char const* ForgeOfSoulsScriptName = "instance_forge_of_souls";
 
-enum Data
+enum DataTypes
 {
     DATA_BRONJAHM,
     DATA_DEVOURER,
     MAX_ENCOUNTER,
 
-    DATA_LEADER_FIRST,
-    DATA_LEADER_SECOND,
-    DATA_GUARD_FIRST,
-    DATA_GUARD_SECOND,
+    DATA_THREE_FACED,
 };
 
 enum Creatures
 {
     NPC_BRONJAHM                                  = 36497,
     NPC_DEVOURER                                  = 36502,
+    NPC_CORRUPTED_SOUL_FRAGMENT                   = 36535,
+    NPC_UNLEASHED_SOUL                            = 36595,
+    NPC_CRUCIBLE_OF_SOULS                         = 37094,
 
     NPC_SYLVANAS_PART1                            = 37596,
     NPC_SYLVANAS_PART2                            = 38161,
@@ -58,26 +59,31 @@ enum Creatures
     NPC_CHAMPION_2_ALLIANCE                       = 37497,
 };
 
-// OUTRO:
-
-struct outroPosition
+enum MovementPoints
 {
-    uint32 entry[2];
-    Position startPosition;
-    uint32 pathId;
+    POINT_BRONJAHM                                = 0,
+    POINT_OUTRO                                   = 1,
 };
 
-#define PATH_BEGIN_VALUE 3000100
-
-const outroPosition outroPositions[] =
+struct OutroPosition
 {
+    uint32 Entry[2];
+    Position StartPosition;
+    uint32 PathId;
+};
+
+constexpr uint32 PATH_BEGIN_VALUE = 3000100;
+
+// Entry is indexed by TeamId
+std::array<OutroPosition, 20> const OutroPositions =
+{{
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5590.47f, 2427.79f, 705.935f, 0.802851f }, PATH_BEGIN_VALUE + 14 },
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5593.59f, 2428.34f, 705.935f, 0.977384f }, PATH_BEGIN_VALUE + 15 },
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5600.81f, 2429.31f, 705.935f, 0.890118f }, PATH_BEGIN_VALUE + 5 },
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5600.81f, 2421.12f, 705.935f, 0.890118f }, PATH_BEGIN_VALUE + 18 },
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5601.43f, 2426.53f, 705.935f, 0.890118f }, PATH_BEGIN_VALUE + 6 },
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5601.55f, 2418.36f, 705.935f, 1.15192f }, PATH_BEGIN_VALUE + 17 },
-    { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5598, 2429.14f, 705.935f, 1.0472f }, PATH_BEGIN_VALUE + 4 },
+    { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5598.0f, 2429.14f, 705.935f, 1.0472f }, PATH_BEGIN_VALUE + 4 },
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5594.04f, 2424.87f, 705.935f, 1.15192f }, PATH_BEGIN_VALUE + 16 },
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 5597.89f, 2421.54f, 705.935f, 0.610865f }, PATH_BEGIN_VALUE + 19 },
     { { NPC_CHAMPION_2_ALLIANCE, NPC_CHAMPION_2_HORDE }, { 5598.57f, 2434.62f, 705.935f, 1.13446f }, PATH_BEGIN_VALUE + 2 },
@@ -92,11 +98,9 @@ const outroPosition outroPositions[] =
 
     { { NPC_KORELN, NPC_LORALEN }, { 5602.58f, 2435.95f, 705.935f, 0.959931f }, PATH_BEGIN_VALUE + 0 },
     { { NPC_ELANDRA, NPC_KALIRA }, { 5606.13f, 2433.16f, 705.935f, 0.785398f }, PATH_BEGIN_VALUE + 1 },
+}};
 
-    { { 0, 0 }, { 0.0f, 0.0f, 0.0f, 0.0f }, 0 }
-};
-
-const Position outroSpawnPoint = {5618.139f, 2451.873f, 705.854f, 0.0f};
+Position const OutroSpawnPoint = { 5618.139f, 2451.873f, 705.854f, 0.0f };
 
 template <class AI, class T>
 inline AI* GetForgeOfSoulsAI(T* obj)
@@ -106,4 +110,4 @@ inline AI* GetForgeOfSoulsAI(T* obj)
 
 #define RegisterForgeOfSoulsCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetForgeOfSoulsAI)
 
-#endif
+#endif // DEF_FORGE_OF_SOULS_H
