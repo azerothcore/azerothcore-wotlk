@@ -15,29 +15,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "InstanceMapScript.h"
+#include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "forge_of_souls.h"
-#include "Group.h"
+#include <algorithm>
+#include <cmath>
+#include <list>
+
+enum AchievementCriteria
+{
+    CRITERIA_SOUL_POWER                 = 12752,
+    CRITERIA_THREE_FACED                = 12976,
+};
 
 enum Misc
 {
-    NPC_CORRUPTED_SOUL_FRAGMENT         = 36535,
-
-    ACHIEV_CRITERIA_SOUL_POWER          = 12752,
-    ACHIEV_CRITERIA_THREE_FACED         = 12976,
-
     SOUL_POWER_FRAGMENT_COUNT           = 4,
 };
 
-BossBoundaryData const boundaries =
+Position const LeaderSecondRespawnPosition = { 5658.15f, 2502.564f, 708.83f, 0.885207f };
+
+BossBoundaryData const Boundaries =
 {
-    { DATA_BRONJAHM,    new CircleBoundary(Position(5297.3f, 2506.45f), 100.96)                                                                                   },
+    { DATA_BRONJAHM,    new CircleBoundary(Position(5297.3f, 2506.45f), 100.96f)                                                            },
     { DATA_DEVOURER,    new ParallelogramBoundary(Position(5663.56f, 2570.53f), Position(5724.39f, 2520.45f), Position(5570.36f, 2461.42f)) }
 };
 
-static ObjectData const creatureData[] =
+ObjectData const CreatureObjectData[] =
 {
     { NPC_BRONJAHM, DATA_BRONJAHM },
     { NPC_DEVOURER, DATA_DEVOURER },
@@ -47,7 +54,7 @@ static ObjectData const creatureData[] =
 class instance_forge_of_souls : public InstanceMapScript
 {
 public:
-    instance_forge_of_souls() : InstanceMapScript("instance_forge_of_souls", MAP_THE_FORGE_OF_SOULS) { }
+    instance_forge_of_souls() : InstanceMapScript(ForgeOfSoulsScriptName, MAP_THE_FORGE_OF_SOULS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
@@ -60,25 +67,17 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
-            LoadObjectData(creatureData, nullptr);
-            LoadBossBoundaries(boundaries);
+            LoadObjectData(CreatureObjectData, nullptr);
+            LoadBossBoundaries(Boundaries);
         }
-
-        ObjectGuid LeaderFirstGUID;
-        ObjectGuid LeaderSecondGUID;
-        ObjectGuid GuardFirstGUID;
-        ObjectGuid GuardSecondGUID;
 
         void OnPlayerEnter(Player* player) override
         {
             InstanceScript::OnPlayerEnter(player);
 
-            // this will happen only after crash and loading the instance from db
-            if (AllBossesDone() && (!LeaderSecondGUID || !instance->GetCreature(LeaderSecondGUID)))
-            {
-                Position pos = {5658.15f, 2502.564f, 708.83f, 0.885207f};
-                instance->SummonCreature(NPC_SYLVANAS_PART2, pos);
-            }
+            // Only reached when the instance is loaded from the DB with all bosses already done
+            if (AllBossesDone() && !instance->GetCreature(_leaderSecondGUID))
+                instance->SummonCreature(NPC_SYLVANAS_PART2, LeaderSecondRespawnPosition);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -90,7 +89,6 @@ public:
                 case NPC_SYLVANAS_PART1:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
-                    LeaderFirstGUID = creature->GetGUID();
 
                     if (AllBossesDone())
                         creature->SetVisible(false);
@@ -98,14 +96,16 @@ public:
                 case NPC_SYLVANAS_PART2:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART2);
-                    LeaderSecondGUID = creature->GetGUID();
+
+                    _leaderSecondGUID = creature->GetGUID();
                     break;
                 case NPC_LORALEN:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ELANDRA);
-                    if (!GuardFirstGUID)
+
+                    if (!_guardFirstGUID)
                     {
-                        GuardFirstGUID = creature->GetGUID();
+                        _guardFirstGUID = creature->GetGUID();
                         if (AllBossesDone())
                             creature->SetVisible(false);
                     }
@@ -113,32 +113,40 @@ public:
                 case NPC_KALIRA:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_KORELN);
-                    if (!GuardSecondGUID)
+
+                    if (!_guardSecondGUID)
                     {
-                        GuardSecondGUID = creature->GetGUID();
+                        _guardSecondGUID = creature->GetGUID();
                         if (AllBossesDone())
                             creature->SetVisible(false);
                     }
+                    break;
+                default:
                     break;
             }
         }
 
         void HandleOutro()
         {
-            if (!LeaderSecondGUID || !instance->GetCreature(LeaderSecondGUID))
-                if (Creature* leader = instance->SummonCreature(NPC_SYLVANAS_PART2, outroSpawnPoint))
+            if (!instance->GetCreature(_leaderSecondGUID))
+            {
+                if (Creature* leader = instance->SummonCreature(NPC_SYLVANAS_PART2, OutroSpawnPoint))
+                {
                     if (Creature* boss = GetCreature(DATA_DEVOURER))
                     {
                         float angle = boss->GetAngle(leader);
-                        leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * std::sin(angle), boss->GetPositionZ());
+                        leader->GetMotionMaster()->MovePoint(POINT_OUTRO, boss->GetPositionX() + 10.0f * std::cos(angle), boss->GetPositionY() + 10.0f * std::sin(angle), boss->GetPositionZ());
                     }
-
-            if (GetTeamIdInInstance() < TEAM_NEUTRAL) // Shouldn't happen, but just in case.
-            {
-                for (int8 i = 0; outroPositions[i].entry[GetTeamIdInInstance()] != 0; ++i)
-                    if (Creature* summon = instance->SummonCreature(outroPositions[i].entry[GetTeamIdInInstance()], outroPositions[i].startPosition))
-                        summon->GetMotionMaster()->MoveWaypoint(outroPositions[i].pathId, false);
+                }
             }
+
+            TeamId teamId = GetTeamIdInInstance();
+            if (teamId == TEAM_NEUTRAL)
+                return;
+
+            for (OutroPosition const& outro : OutroPositions)
+                if (Creature* summon = instance->SummonCreature(outro.Entry[teamId], outro.StartPosition))
+                    summon->GetMotionMaster()->MoveWaypoint(outro.PathId, false);
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -152,11 +160,11 @@ public:
             return true;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
+        bool CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
         {
-            switch (criteria_id)
+            switch (criteriaId)
             {
-                case ACHIEV_CRITERIA_SOUL_POWER:
+                case CRITERIA_SOUL_POWER:
                     if (Creature* bronjahm = GetCreature(DATA_BRONJAHM))
                     {
                         std::list<Creature*> fragments;
@@ -165,13 +173,22 @@ public:
                             [](Creature const* fragment) { return fragment->IsAlive(); }) >= SOUL_POWER_FRAGMENT_COUNT;
                     }
                     break;
-                case ACHIEV_CRITERIA_THREE_FACED:
+                case CRITERIA_THREE_FACED:
                     if (Creature* devourer = GetCreature(DATA_DEVOURER))
-                        return devourer->AI()->GetData(1) != 0;
+                        return devourer->AI()->GetData(DATA_THREE_FACED) != 0;
+
+                    break;
+                default:
                     break;
             }
+
             return false;
         }
+
+    private:
+        ObjectGuid _leaderSecondGUID;
+        ObjectGuid _guardFirstGUID;
+        ObjectGuid _guardSecondGUID;
     };
 };
 
