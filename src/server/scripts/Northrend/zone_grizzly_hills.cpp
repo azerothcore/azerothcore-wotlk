@@ -871,6 +871,39 @@ class spell_shredder_delivery : public SpellScript
     }
 };
 
+enum RefurbishedShredder
+{
+    SPELL_SELF_DESTRUCT_EFFECT = 49033
+};
+
+// 49025 - Self Destruct
+class spell_refurbished_shredder_self_destruct_aura : public AuraScript
+{
+    PrepareAuraScript(spell_refurbished_shredder_self_destruct_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SELF_DESTRUCT_EFFECT });
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* shredder = GetTarget();
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE || !shredder->IsCreature())
+            return;
+
+        // Explode while the rider still controls the shredder, so the blast uses the rider's faction
+        shredder->CastSpell(shredder, SPELL_SELF_DESTRUCT_EFFECT, true);
+        shredder->KillSelf();
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_refurbished_shredder_self_destruct_aura::HandleRemove,
+            EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 enum InfectedWorgenBite
 {
     SPELL_INFECTED_WORGEN_BITE = 53094,
@@ -1094,6 +1127,7 @@ void AddSC_grizzly_hills()
     new npc_venture_co_straggler();
     new npc_lake_frog();
     RegisterSpellScript(spell_shredder_delivery);
+    RegisterSpellScript(spell_refurbished_shredder_self_destruct_aura);
     RegisterSpellScript(spell_infected_worgen_bite_aura);
     RegisterSpellScript(spell_z_check_aura);
     RegisterSpellScript(spell_warhead_detonate);
