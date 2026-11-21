@@ -39,6 +39,7 @@ enum Yells
     SAY_BERSERK             = 7,
     SAY_DEATH               = 8,
     EMOTE_BERSERK           = 10, // Eydis only
+    EMOTE_TOUCH             = 11,
 };
 
 enum Equipment
@@ -732,9 +733,17 @@ class spell_valkyr_touch_aura : public AuraScript
         Unit::DealDamage(caster, target, damage, 0, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
     }
 
+    void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (Creature* valkyr = caster->ToCreature())
+                valkyr->AI()->Talk(EMOTE_TOUCH, GetTarget());
+    }
+
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_touch_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        AfterEffectApply += AuraEffectApplyFn(spell_valkyr_touch_aura::HandleAfterApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
