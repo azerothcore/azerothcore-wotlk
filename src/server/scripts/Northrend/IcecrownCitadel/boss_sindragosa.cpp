@@ -143,15 +143,6 @@ enum Events
     EVENT_GROUP_LAND_PHASE          = 1,
 };
 
-enum FrostwingData
-{
-    DATA_MYSTIC_BUFFET_STACK    = 0,
-    DATA_FROSTWYRM_OWNER        = 1,
-    DATA_WHELP_MARKER           = 2,
-    DATA_LINKED_GAMEOBJECT      = 3,
-    DATA_TRAPPED_PLAYER         = 4,
-};
-
 enum MovementPoints
 {
     POINT_FROSTWYRM_FLY_IN  = 1,

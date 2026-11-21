@@ -4373,7 +4373,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_SINDRAGOSA_GAUNTLET) == NOT_STARTED)
-                if (Creature* gauntlet = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_SINDRAGOSA_GAUNTLET)))
+                if (Creature* gauntlet = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SINDRAGOSA_GAUNTLET_NPC)))
                     gauntlet->AI()->DoAction(ACTION_START_GAUNTLET);
         return true;
     }
@@ -4388,7 +4388,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED)
-                if (Creature* trap = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_PUTRICADES_TRAP)))
+                if (Creature* trap = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_PUTRICIDE_TRAP)))
                     trap->AI()->DoAction(ACTION_START_GAUNTLET);
         return true;
     }

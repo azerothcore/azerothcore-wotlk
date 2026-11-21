@@ -472,7 +472,7 @@ public:
             if (type != POINT_MOTION_TYPE && id != POINT_SAURFANG)
                 return;
 
-            instance->HandleGameObject(instance->GetGuidData(GO_SAURFANG_S_DOOR), false);
+            instance->HandleGameObject(instance->GetGuidData(DATA_SAURFANG_DOOR), false);
         }
 
         void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
@@ -666,9 +666,9 @@ public:
                         _events.SetPhase(PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5s, 0, PHASE_INTRO_H);
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 21s + 400ms, 0, PHASE_INTRO_H);
-                        _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
+                        _instance->HandleGameObject(_instance->GetGuidData(DATA_SAURFANG_DOOR), true);
 
-                        if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
+                        if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_SAURFANG_TELEPORT)))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
                             teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
@@ -1006,9 +1006,9 @@ public:
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 1s, 0, PHASE_INTRO_A);
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 18s + 400ms, 0, PHASE_INTRO_A);
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 24s + 500ms, 0, PHASE_INTRO_A);
-                        _instance->HandleGameObject(_instance->GetGuidData(GO_SAURFANG_S_DOOR), true);
+                        _instance->HandleGameObject(_instance->GetGuidData(DATA_SAURFANG_DOOR), true);
 
-                        if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
+                        if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_SAURFANG_TELEPORT)))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
                             teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
