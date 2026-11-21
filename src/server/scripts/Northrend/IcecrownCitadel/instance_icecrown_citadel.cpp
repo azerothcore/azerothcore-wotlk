@@ -177,12 +177,111 @@ DoorData const Doors[] =
     { 0,                                      0,                          DOOR_TYPE_ROOM       }
 };
 
+// Object storage slots only this script reads; they share the GetGuidData key space with DataTypes
+enum InstanceObjects
+{
+    DATA_THE_LICH_KING_LH               = 100,
+    DATA_LADY_DEATHWHISPER_ELEVATOR     = 101,
+    DATA_GUNSHIP_ARMORY                 = 102,
+    DATA_DEATHBRINGERS_CACHE            = 103,
+    DATA_PUTRICIDE_ENTRANCE_DOOR        = 104,
+    DATA_PUTRICIDE_COLLISION            = 105,
+    DATA_PUTRICIDE_GATE_ORANGE          = 106,
+    DATA_PUTRICIDE_GATE_GREEN           = 107,
+    DATA_PUTRICIDE_PIPE_ORANGE          = 108,
+    DATA_PUTRICIDE_PIPE_GREEN           = 109,
+    DATA_GAS_RELEASE_VALVE              = 110,
+    DATA_OOZE_RELEASE_VALVE             = 111,
+    DATA_PLAGUE_SIGIL                   = 112,
+    DATA_BLOODWING_SIGIL                = 113,
+    DATA_FROSTWING_SIGIL                = 114,
+    DATA_LICH_KING_TELEPORT             = 115,
+    DATA_FROZEN_THRONE_EDGE             = 116,
+    DATA_FROZEN_THRONE_WIND             = 117,
+    DATA_FROZEN_THRONE_WARNING          = 118,
+    DATA_FROZEN_BOLVAR                  = 119,
+    DATA_PILLARS_CHAINED                = 120,
+    DATA_PILLARS_UNCHAINED              = 121,
+    DATA_SCOURGE_TRANSPORTER_FIRST      = 122,
+};
+
 ObjectData const CreatureObjectData[] =
 {
-    { NPC_SINDRAGOSA,     DATA_SINDRAGOSA     },
-    { NPC_THE_SKYBREAKER, DATA_THE_SKYBREAKER },
-    { NPC_ORGRIMS_HAMMER, DATA_ORGRIMS_HAMMER },
-    { 0,                  0                   }
+    { NPC_LADY_DEATHWHISPER,                DATA_LADY_DEATHWHISPER          },
+    { NPC_THE_SKYBREAKER,                   DATA_THE_SKYBREAKER             },
+    { NPC_ORGRIMS_HAMMER,                   DATA_ORGRIMS_HAMMER             },
+    { NPC_DEATHBRINGER_SAURFANG,            DATA_DEATHBRINGER_SAURFANG      },
+    { NPC_FESTERGUT,                        DATA_FESTERGUT                  },
+    { NPC_ROTFACE,                          DATA_ROTFACE                    },
+    { NPC_PROFESSOR_PUTRICIDE,              DATA_PROFESSOR_PUTRICIDE        },
+    { NPC_PUTRICADES_TRAP,                  DATA_PUTRICIDE_TRAP             },
+    { NPC_PRINCE_KELESETH,                  DATA_PRINCE_KELESETH_GUID       },
+    { NPC_PRINCE_TALDARAM,                  DATA_PRINCE_TALDARAM_GUID       },
+    { NPC_PRINCE_VALANAR,                   DATA_PRINCE_VALANAR_GUID        },
+    { NPC_BLOOD_ORB_CONTROLLER,             DATA_BLOOD_PRINCES_CONTROL      },
+    { NPC_BLOOD_QUEEN_LANA_THEL,            DATA_BLOOD_QUEEN_LANA_THEL      },
+    { NPC_CROK_SCOURGEBANE,                 DATA_CROK_SCOURGEBANE           },
+    { NPC_CAPTAIN_ARNATH,                   DATA_CAPTAIN_ARNATH             },
+    { NPC_CAPTAIN_BRANDON,                  DATA_CAPTAIN_BRANDON            },
+    { NPC_CAPTAIN_GRONDEL,                  DATA_CAPTAIN_GRONDEL            },
+    { NPC_CAPTAIN_RUPERT,                   DATA_CAPTAIN_RUPERT             },
+    { NPC_SISTER_SVALNA,                    DATA_SISTER_SVALNA              },
+    { NPC_VALITHRIA_DREAMWALKER,            DATA_VALITHRIA_DREAMWALKER      },
+    { NPC_THE_LICH_KING_VALITHRIA,          DATA_VALITHRIA_LICH_KING        },
+    { NPC_GREEN_DRAGON_COMBAT_TRIGGER,      DATA_VALITHRIA_TRIGGER          },
+    { NPC_SINDRAGOSA_GAUNTLET,              DATA_SINDRAGOSA_GAUNTLET_NPC    },
+    { NPC_SINDRAGOSA,                       DATA_SINDRAGOSA                 },
+    { NPC_SPINESTALKER,                     DATA_SPINESTALKER               },
+    { NPC_RIMEFANG,                         DATA_RIMEFANG                   },
+    { NPC_THE_LICH_KING,                    DATA_THE_LICH_KING              },
+    { NPC_THE_LICH_KING_LH,                 DATA_THE_LICH_KING_LH           },
+    { NPC_HIGHLORD_TIRION_FORDRING_LK,      DATA_HIGHLORD_TIRION_FORDRING   },
+    { NPC_TERENAS_MENETHIL_FROSTMOURNE,     DATA_TERENAS_MENETHIL           },
+    { NPC_TERENAS_MENETHIL_FROSTMOURNE_H,   DATA_TERENAS_MENETHIL           },
+    { 0,                                    0                               }
+};
+
+ObjectData const GameObjectObjectData[] =
+{
+    { GO_SCOURGE_TRANSPORTER_FIRST,         DATA_SCOURGE_TRANSPORTER_FIRST  },
+    { GO_LADY_DEATHWHISPER_ELEVATOR,        DATA_LADY_DEATHWHISPER_ELEVATOR },
+    { GO_THE_SKYBREAKER_H,                  DATA_ENEMY_GUNSHIP              },
+    { GO_ORGRIMS_HAMMER_A,                  DATA_ENEMY_GUNSHIP              },
+    { GO_GUNSHIP_ARMORY_H_10N,              DATA_GUNSHIP_ARMORY             },
+    { GO_GUNSHIP_ARMORY_H_25N,              DATA_GUNSHIP_ARMORY             },
+    { GO_GUNSHIP_ARMORY_H_10H,              DATA_GUNSHIP_ARMORY             },
+    { GO_GUNSHIP_ARMORY_H_25H,              DATA_GUNSHIP_ARMORY             },
+    { GO_GUNSHIP_ARMORY_A_10N,              DATA_GUNSHIP_ARMORY             },
+    { GO_GUNSHIP_ARMORY_A_25N,              DATA_GUNSHIP_ARMORY             },
+    { GO_GUNSHIP_ARMORY_A_10H,              DATA_GUNSHIP_ARMORY             },
+    { GO_GUNSHIP_ARMORY_A_25H,              DATA_GUNSHIP_ARMORY             },
+    { GO_SAURFANG_S_DOOR,                   DATA_SAURFANG_DOOR              },
+    { GO_SCOURGE_TRANSPORTER_SAURFANG,      DATA_SAURFANG_TELEPORT          },
+    { GO_DEATHBRINGER_S_CACHE_10N,          DATA_DEATHBRINGERS_CACHE        },
+    { GO_DEATHBRINGER_S_CACHE_25N,          DATA_DEATHBRINGERS_CACHE        },
+    { GO_DEATHBRINGER_S_CACHE_10H,          DATA_DEATHBRINGERS_CACHE        },
+    { GO_DEATHBRINGER_S_CACHE_25H,          DATA_DEATHBRINGERS_CACHE        },
+    { GO_SCIENTIST_ENTRANCE,                DATA_PUTRICIDE_ENTRANCE_DOOR    },
+    { GO_SCIENTIST_AIRLOCK_DOOR_COLLISION,  DATA_PUTRICIDE_COLLISION        },
+    { GO_SCIENTIST_AIRLOCK_DOOR_ORANGE,     DATA_PUTRICIDE_GATE_ORANGE      },
+    { GO_SCIENTIST_AIRLOCK_DOOR_GREEN,      DATA_PUTRICIDE_GATE_GREEN       },
+    { GO_DOODAD_ICECROWN_ORANGETUBES02,     DATA_PUTRICIDE_PIPE_ORANGE      },
+    { GO_DOODAD_ICECROWN_GREENTUBES02,      DATA_PUTRICIDE_PIPE_GREEN       },
+    { GO_GAS_RELEASE_VALVE,                 DATA_GAS_RELEASE_VALVE          },
+    { GO_OOZE_RELEASE_VALVE,                DATA_OOZE_RELEASE_VALVE         },
+    { GO_DRINK_ME,                          DATA_PUTRICIDE_TABLE            },
+    { GO_PLAGUE_SIGIL,                      DATA_PLAGUE_SIGIL               },
+    { GO_BLOODWING_SIGIL,                   DATA_BLOODWING_SIGIL            },
+    { GO_SIGIL_OF_THE_FROSTWING,            DATA_FROSTWING_SIGIL            },
+    { GO_SCOURGE_TRANSPORTER_LK,            DATA_LICH_KING_TELEPORT         },
+    { GO_ARTHAS_PLATFORM,                   DATA_ARTHAS_PLATFORM            },
+    { GO_DOODAD_ICECROWN_THRONEFROSTYEDGE01, DATA_FROZEN_THRONE_EDGE        },
+    { GO_DOODAD_ICECROWN_THRONEFROSTYWIND01, DATA_FROZEN_THRONE_WIND        },
+    { GO_DOODAD_ICECROWN_SNOWEDGEWARNING01, DATA_FROZEN_THRONE_WARNING      },
+    { GO_FROZEN_LAVAMAN,                    DATA_FROZEN_BOLVAR              },
+    { GO_LAVAMAN_PILLARS_CHAINED,           DATA_PILLARS_CHAINED            },
+    { GO_LAVAMAN_PILLARS_UNCHAINED,         DATA_PILLARS_UNCHAINED          },
+    { 0,                                    0                               }
 };
 
 // Not only questgivers: related quest spawns are listed too
@@ -345,7 +444,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             SetPersistentDataCount(MAX_DATA_INDEXES);
             LoadBossBoundaries(Boundaries);
-            LoadObjectData(CreatureObjectData, nullptr);
+            LoadObjectData(CreatureObjectData, GameObjectObjectData);
             LoadDoorData(Doors);
             _heroicAttempts = MaxHeroicAttempts;
             _isBonedEligible = true;
@@ -511,12 +610,6 @@ public:
                     if (GetBossState(DATA_THE_LICH_KING) == DONE)
                         SummonLichKingOutroNpcs();
                     break;
-                case NPC_LADY_DEATHWHISPER:
-                    _ladyDeathwhisperGUID = creature->GetGUID();
-                    break;
-                case NPC_DEATHBRINGER_SAURFANG:
-                    _deathbringerSaurfangGUID = creature->GetGUID();
-                    break;
                 case NPC_SE_HIGH_OVERLORD_SAURFANG:
                     // Only the static spawn is the event NPC - the Alliance outro summons another
                     // High Overlord Saurfang, which would otherwise clobber the guid.
@@ -555,75 +648,17 @@ public:
                     _saurfangEventGuardGUIDs.push_back(creature->GetGUID());
                     HideSaurfangEventNpc(creature);
                     break;
-                case NPC_FESTERGUT:
-                    _festergutGUID = creature->GetGUID();
-                    break;
-                case NPC_ROTFACE:
-                    _rotfaceGUID = creature->GetGUID();
-                    break;
                 case NPC_PROFESSOR_PUTRICIDE:
-                    _professorPutricideGUID = creature->GetGUID();
                     if (GetBossState(DATA_ROTFACE) == DONE && GetBossState(DATA_FESTERGUT) == DONE && !_heroicAttempts && GetData(DATA_HAS_LIMITED_ATTEMPTS) && creature->IsAlive())
                         creature->SetVisible(false);
                     break;
-                case NPC_PRINCE_KELESETH:
-                    _bloodCouncilGUIDs[0] = creature->GetGUID();
-                    break;
-                case NPC_PRINCE_TALDARAM:
-                    _bloodCouncilGUIDs[1] = creature->GetGUID();
-                    break;
-                case NPC_PRINCE_VALANAR:
-                    _bloodCouncilGUIDs[2] = creature->GetGUID();
-                    break;
-                case NPC_BLOOD_ORB_CONTROLLER:
-                    _bloodCouncilControllerGUID = creature->GetGUID();
-                    break;
                 case NPC_BLOOD_QUEEN_LANA_THEL:
-                    _bloodQueenLanaThelGUID = creature->GetGUID();
                     if (!_heroicAttempts && GetData(DATA_HAS_LIMITED_ATTEMPTS) && creature->IsAlive())
                         creature->SetVisible(false);
-                    break;
-                case NPC_CROK_SCOURGEBANE:
-                    _crokScourgebaneGUID = creature->GetGUID();
-                    break;
-                // we can only do this because there are no gaps in their entries
-                case NPC_CAPTAIN_ARNATH:
-                case NPC_CAPTAIN_BRANDON:
-                case NPC_CAPTAIN_GRONDEL:
-                case NPC_CAPTAIN_RUPERT:
-                    _crokCaptainGUIDs[creature->GetEntry() - NPC_CAPTAIN_ARNATH] = creature->GetGUID();
-                    break;
-                case NPC_SISTER_SVALNA:
-                    _sisterSvalnaGUID = creature->GetGUID();
-                    break;
-                case NPC_VALITHRIA_DREAMWALKER:
-                    _valithriaDreamwalkerGUID = creature->GetGUID();
-                    break;
-                case NPC_THE_LICH_KING_VALITHRIA:
-                    _valithriaLichKingGUID = creature->GetGUID();
-                    break;
-                case NPC_THE_LICH_KING_LH:
-                    _theLichKingLhGUID = creature->GetGUID();
-                    break;
-                case NPC_GREEN_DRAGON_COMBAT_TRIGGER:
-                    _valithriaTriggerGUID = creature->GetGUID();
-                    break;
-                case NPC_PUTRICADES_TRAP:
-                    _putricideTrapGUID = creature->GetGUID();
-                    break;
-                case NPC_SINDRAGOSA_GAUNTLET:
-                    _sindragosaGauntletGUID = creature->GetGUID();
                     break;
                 case NPC_SINDRAGOSA:
-                    _sindragosaGUID = creature->GetGUID();
                     if (!_heroicAttempts && GetData(DATA_HAS_LIMITED_ATTEMPTS) && creature->IsAlive())
                         creature->SetVisible(false);
-                    break;
-                case NPC_SPINESTALKER:
-                    _spinestalkerGUID = creature->GetGUID();
-                    break;
-                case NPC_RIMEFANG:
-                    _rimefangGUID = creature->GetGUID();
                     break;
                 case NPC_INVISIBLE_STALKER:
                     // Teleporter visual at center
@@ -631,16 +666,8 @@ public:
                         creature->CastSpell(creature, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
                     break;
                 case NPC_THE_LICH_KING:
-                    _theLichKingGUID = creature->GetGUID();
                     if (!_heroicAttempts && GetData(DATA_HAS_LIMITED_ATTEMPTS) && creature->IsAlive())
                         creature->SetVisible(false);
-                    break;
-                case NPC_HIGHLORD_TIRION_FORDRING_LK:
-                    _highlordTirionFordringGUID = creature->GetGUID();
-                    break;
-                case NPC_TERENAS_MENETHIL_FROSTMOURNE:
-                case NPC_TERENAS_MENETHIL_FROSTMOURNE_H:
-                    _terenasMenethilGUID = creature->GetGUID();
                     break;
                 case NPC_INFILTRATOR_MINCHAR_BQ:
                     if (_bloodQuickeningState == DONE)
@@ -672,14 +699,6 @@ public:
             }
 
             InstanceScript::OnCreatureCreate(creature);
-        }
-
-        void OnCreatureRemove(Creature* creature) override
-        {
-            if (creature->GetEntry() == NPC_SINDRAGOSA)
-                _sindragosaGUID.Clear();
-
-            InstanceScript::OnCreatureRemove(creature);
         }
 
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
@@ -764,7 +783,7 @@ public:
                 case NPC_YMIRJAR_FROSTBINDER:
                 case NPC_YMIRJAR_HUNTRESS:
                 case NPC_YMIRJAR_WARLORD:
-                    if (Creature* crok = instance->GetCreature(_crokScourgebaneGUID))
+                    if (Creature* crok = GetCreature(DATA_CROK_SCOURGEBANE))
                         crok->AI()->SetGUID(creature->GetGUID(), ACTION_VRYKUL_DEATH);
                     break;
                 case NPC_FROSTWING_WHELP:
@@ -775,14 +794,14 @@ public:
                     {
                         _spinestalkerTrash.erase(creature->GetSpawnId());
                         if (_spinestalkerTrash.empty())
-                            if (Creature* spinestalker = instance->GetCreature(_spinestalkerGUID))
+                            if (Creature* spinestalker = GetCreature(DATA_SPINESTALKER))
                                 spinestalker->AI()->DoAction(ACTION_START_FROSTWYRM);
                     }
                     else
                     {
                         _rimefangTrash.erase(creature->GetSpawnId());
                         if (_rimefangTrash.empty())
-                            if (Creature* rimefang = instance->GetCreature(_rimefangGUID))
+                            if (Creature* rimefang = GetCreature(DATA_RIMEFANG))
                                 rimefang->AI()->DoAction(ACTION_START_FROSTWYRM);
                     }
                     break;
@@ -814,6 +833,9 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
+            // Doors are added per entry below instead of through the base, which would also register the 25-man-only portcullises on 10-man
+            AddObject(go);
+
             switch (go->GetEntry())
             {
                 case GO_SPIRIT_ALARM_1:
@@ -845,47 +867,17 @@ public:
                 case GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR:
                 case GO_ICE_WALL:
                 case GO_SINDRAGOSA_ENTRANCE_DOOR:
+                case GO_SAURFANG_S_DOOR:
                     AddDoor(go);
                     break;
                 case GO_SCIENTIST_ENTRANCE:
-                    _putricideEntranceDoorGUID = go->GetGUID();
-                    HandleGameObject(_putricideEntranceDoorGUID, _putricideEventProgress & PUTRICIDE_EVENT_FLAG_TRAP_FINISHED, go);
+                    HandleGameObject(go->GetGUID(), _putricideEventProgress & PUTRICIDE_EVENT_FLAG_TRAP_FINISHED, go);
                     break;
                 // these 2 gates are functional only on 25man modes
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_01:
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_04:
                     if (instance->Is25ManRaid())
                         AddDoor(go);
-                    break;
-                case GO_LADY_DEATHWHISPER_ELEVATOR:
-                    _ladyDeathwhisperElevatorGUID = go->GetGUID();
-                    break;
-                case GO_THE_SKYBREAKER_H:
-                case GO_ORGRIMS_HAMMER_A:
-                    _enemyGunshipGUID = go->GetGUID();
-                    break;
-                case GO_GUNSHIP_ARMORY_H_10N:
-                case GO_GUNSHIP_ARMORY_H_25N:
-                case GO_GUNSHIP_ARMORY_H_10H:
-                case GO_GUNSHIP_ARMORY_H_25H:
-                case GO_GUNSHIP_ARMORY_A_10N:
-                case GO_GUNSHIP_ARMORY_A_25N:
-                case GO_GUNSHIP_ARMORY_A_10H:
-                case GO_GUNSHIP_ARMORY_A_25H:
-                    _gunshipArmoryGUID = go->GetGUID();
-                    break;
-                case GO_SAURFANG_S_DOOR:
-                    _deathbringerSaurfangDoorGUID = go->GetGUID();
-                    AddDoor(go);
-                    break;
-                case GO_DEATHBRINGER_S_CACHE_10N:
-                case GO_DEATHBRINGER_S_CACHE_25N:
-                case GO_DEATHBRINGER_S_CACHE_10H:
-                case GO_DEATHBRINGER_S_CACHE_25H:
-                    _deathbringersCacheGUID = go->GetGUID();
-                    break;
-                case GO_SCOURGE_TRANSPORTER_SAURFANG:
-                    _saurfangTeleportGUID = go->GetGUID();
                     break;
                 case GO_SAURFANG_CAMP_FORGE:
                 case GO_SAURFANG_CAMP_BONFIRE:
@@ -900,72 +892,58 @@ public:
                         go->Respawn();
                     break;
                 case GO_PLAGUE_SIGIL:
-                    _plagueSigilGUID = go->GetGUID();
                     if (GetBossState(DATA_PROFESSOR_PUTRICIDE) == DONE)
-                        HandleGameObject(_plagueSigilGUID, false, go);
+                        HandleGameObject(go->GetGUID(), false, go);
                     break;
                 case GO_BLOODWING_SIGIL:
-                    _bloodwingSigilGUID = go->GetGUID();
                     if (GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == DONE)
-                        HandleGameObject(_bloodwingSigilGUID, false, go);
+                        HandleGameObject(go->GetGUID(), false, go);
                     break;
                 case GO_SIGIL_OF_THE_FROSTWING:
-                    _frostwingSigilGUID = go->GetGUID();
                     if (GetBossState(DATA_SINDRAGOSA) == DONE)
-                        HandleGameObject(_frostwingSigilGUID, false, go);
+                        HandleGameObject(go->GetGUID(), false, go);
                     break;
                 case GO_SCIENTIST_AIRLOCK_DOOR_COLLISION:
-                    _putricideCollisionGUID = go->GetGUID();
-                    HandleGameObject(_putricideCollisionGUID, AreBothPutricideValvesUsed(), go);
+                    HandleGameObject(go->GetGUID(), AreBothPutricideValvesUsed(), go);
                     break;
                 case GO_SCIENTIST_AIRLOCK_DOOR_ORANGE:
-                    _putricideGateGUIDs[0] = go->GetGUID();
                     if (AreBothPutricideValvesUsed())
                         go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     else
-                        HandleGameObject(_putricideGateGUIDs[0], !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE), go);
+                        HandleGameObject(go->GetGUID(), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE), go);
                     break;
                 case GO_SCIENTIST_AIRLOCK_DOOR_GREEN:
-                    _putricideGateGUIDs[1] = go->GetGUID();
                     if (AreBothPutricideValvesUsed())
                         go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     else
-                        HandleGameObject(_putricideGateGUIDs[1], !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE), go);
+                        HandleGameObject(go->GetGUID(), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE), go);
                     break;
                 case GO_DOODAD_ICECROWN_ORANGETUBES02:
-                    _putricidePipeGUIDs[0] = go->GetGUID();
                     if (_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE)
-                        HandleGameObject(_putricidePipeGUIDs[0], true, go);
+                        HandleGameObject(go->GetGUID(), true, go);
                     break;
                 case GO_DOODAD_ICECROWN_GREENTUBES02:
-                    _putricidePipeGUIDs[1] = go->GetGUID();
                     if (_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE)
-                        HandleGameObject(_putricidePipeGUIDs[1], true, go);
+                        HandleGameObject(go->GetGUID(), true, go);
                     break;
                 case GO_GAS_RELEASE_VALVE:
-                    _gasReleaseValveGUID = go->GetGUID();
                     if (GetBossState(DATA_FESTERGUT) != DONE)
                         go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                     break;
                 case GO_OOZE_RELEASE_VALVE:
-                    _oozeReleaseValveGUID = go->GetGUID();
                     if (GetBossState(DATA_ROTFACE) != DONE)
                         go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
-                    break;
-                case GO_DRINK_ME:
-                    _putricideTableGUID = go->GetGUID();
                     break;
                 case GO_CACHE_OF_THE_DREAMWALKER_10N:
                 case GO_CACHE_OF_THE_DREAMWALKER_25N:
                 case GO_CACHE_OF_THE_DREAMWALKER_10H:
                 case GO_CACHE_OF_THE_DREAMWALKER_25H:
-                    if (Creature* valithria = instance->GetCreature(_valithriaDreamwalkerGUID))
+                    if (Creature* valithria = GetCreature(DATA_VALITHRIA_DREAMWALKER))
                         go->SetLootRecipient(valithria);
 
                     go->RemoveGameObjectFlag(GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
                     break;
                 case GO_SCOURGE_TRANSPORTER_LK:
-                    _theLichKingTeleportGUID = go->GetGUID();
                     if (AreUpperSpireWingsDone())
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
@@ -973,38 +951,24 @@ public:
                     // this enables movement at The Frozen Throne, when printed this value is 0.000000f
                     // however, when represented as integer client will accept only this value
                     go->SetUInt32Value(GAMEOBJECT_PARENTROTATION, 5535469);
-                    _arthasPlatformGUID = go->GetGUID();
                     break;
                 case GO_ARTHAS_PRECIPICE:
                     go->SetUInt32Value(GAMEOBJECT_PARENTROTATION, 4178312);
                     break;
-                case GO_DOODAD_ICECROWN_THRONEFROSTYEDGE01:
-                    _frozenThroneEdgeGUID = go->GetGUID();
-                    break;
-                case GO_DOODAD_ICECROWN_THRONEFROSTYWIND01:
-                    _frozenThroneWindGUID = go->GetGUID();
-                    break;
-                case GO_DOODAD_ICECROWN_SNOWEDGEWARNING01:
-                    _frozenThroneWarningGUID = go->GetGUID();
-                    break;
                 case GO_FROZEN_LAVAMAN:
-                    _frozenBolvarGUID = go->GetGUID();
                     if (GetBossState(DATA_THE_LICH_KING) == DONE)
                         go->SetRespawnTime(WEEK);
                     break;
                 case GO_LAVAMAN_PILLARS_CHAINED:
-                    _pillarsChainedGUID = go->GetGUID();
                     if (GetBossState(DATA_THE_LICH_KING) == DONE)
                         go->SetRespawnTime(WEEK);
                     break;
                 case GO_LAVAMAN_PILLARS_UNCHAINED:
-                    _pillarsUnchainedGUID = go->GetGUID();
                     if (GetBossState(DATA_THE_LICH_KING) == DONE)
                         go->SetRespawnTime(WEEK);
                     break;
                 case GO_SCOURGE_TRANSPORTER_FIRST:
                     AddDoor(go);
-                    _scourgeTransporterFirstGUID = go->GetGUID();
                     if (GetBossState(DATA_LORD_MARROWGAR) == DONE)
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
@@ -1015,6 +979,8 @@ public:
 
         void OnGameObjectRemove(GameObject* go) override
         {
+            RemoveObject(go);
+
             switch (go->GetEntry())
             {
                 case GO_DOODAD_ICECROWN_ICEWALL02:
@@ -1101,76 +1067,15 @@ public:
         {
             switch (type)
             {
-                case DATA_LADY_DEATHWHISPER:
-                    return _ladyDeathwhisperGUID;
                 case DATA_ICECROWN_GUNSHIP_BATTLE:
                     return _gunshipGUID;
-                case DATA_ENEMY_GUNSHIP:
-                    return _enemyGunshipGUID;
-                case DATA_DEATHBRINGER_SAURFANG:
-                    return _deathbringerSaurfangGUID;
                 case DATA_SAURFANG_EVENT_NPC:
                     return _deathbringerSaurfangEventGUID;
-                case DATA_SAURFANG_DOOR:
-                    return _deathbringerSaurfangDoorGUID;
-                case DATA_SAURFANG_TELEPORT:
-                    return _saurfangTeleportGUID;
-                case DATA_FESTERGUT:
-                    return _festergutGUID;
-                case DATA_ROTFACE:
-                    return _rotfaceGUID;
-                case DATA_PROFESSOR_PUTRICIDE:
-                    return _professorPutricideGUID;
-                case DATA_PUTRICIDE_TABLE:
-                    return _putricideTableGUID;
-                case DATA_PRINCE_KELESETH_GUID:
-                    return _bloodCouncilGUIDs[0];
-                case DATA_PRINCE_TALDARAM_GUID:
-                    return _bloodCouncilGUIDs[1];
-                case DATA_PRINCE_VALANAR_GUID:
-                    return _bloodCouncilGUIDs[2];
-                case DATA_BLOOD_PRINCES_CONTROL:
-                    return _bloodCouncilControllerGUID;
-                case DATA_BLOOD_QUEEN_LANA_THEL:
-                    return _bloodQueenLanaThelGUID;
-                case DATA_CROK_SCOURGEBANE:
-                    return _crokScourgebaneGUID;
-                case DATA_CAPTAIN_ARNATH:
-                case DATA_CAPTAIN_BRANDON:
-                case DATA_CAPTAIN_GRONDEL:
-                case DATA_CAPTAIN_RUPERT:
-                    return _crokCaptainGUIDs[type - DATA_CAPTAIN_ARNATH];
-                case DATA_SISTER_SVALNA:
-                    return _sisterSvalnaGUID;
-                case DATA_VALITHRIA_DREAMWALKER:
-                    return _valithriaDreamwalkerGUID;
-                case DATA_VALITHRIA_LICH_KING:
-                    return _valithriaLichKingGUID;
-                case DATA_VALITHRIA_TRIGGER:
-                    return _valithriaTriggerGUID;
-                case DATA_SINDRAGOSA_GAUNTLET_NPC:
-                    return _sindragosaGauntletGUID;
-                case DATA_PUTRICIDE_TRAP:
-                    return _putricideTrapGUID;
-                case DATA_SINDRAGOSA:
-                    return _sindragosaGUID;
-                case DATA_SPINESTALKER:
-                    return _spinestalkerGUID;
-                case DATA_RIMEFANG:
-                    return _rimefangGUID;
-                case DATA_THE_LICH_KING:
-                    return _theLichKingGUID;
-                case DATA_HIGHLORD_TIRION_FORDRING:
-                    return _highlordTirionFordringGUID;
-                case DATA_ARTHAS_PLATFORM:
-                    return _arthasPlatformGUID;
-                case DATA_TERENAS_MENETHIL:
-                    return _terenasMenethilGUID;
                 default:
                     break;
             }
 
-            return ObjectGuid::Empty;
+            return InstanceScript::GetGuidData(type);
         }
 
         void HandleDropAttempt(bool drop = true)
@@ -1189,19 +1094,19 @@ public:
                 return;
 
             if (GetBossState(DATA_ROTFACE) == DONE && GetBossState(DATA_FESTERGUT) == DONE)
-                if (Creature* professor = instance->GetCreature(_professorPutricideGUID))
+                if (Creature* professor = GetCreature(DATA_PROFESSOR_PUTRICIDE))
                     if (professor->IsAlive())
                         professor->SetVisible(false);
 
-            if (Creature* bloodQueen = instance->GetCreature(_bloodQueenLanaThelGUID))
+            if (Creature* bloodQueen = GetCreature(DATA_BLOOD_QUEEN_LANA_THEL))
                 if (bloodQueen->IsAlive())
                     bloodQueen->SetVisible(false);
 
-            if (Creature* sindragosa = instance->GetCreature(_sindragosaGUID))
+            if (Creature* sindragosa = GetCreature(DATA_SINDRAGOSA))
                 if (sindragosa->IsAlive())
                     sindragosa->SetVisible(false);
 
-            if (Creature* theLichKing = instance->GetCreature(_theLichKingGUID))
+            if (Creature* theLichKing = GetCreature(DATA_THE_LICH_KING))
                 if (theLichKing->IsAlive())
                     theLichKing->SetVisible(false);
         }
@@ -1226,17 +1131,17 @@ public:
         // Collision and both airlock gates follow the valves: all open once both are used, otherwise each gate until its valve is
         void UpdatePutricideAirlock()
         {
-            HandleGameObject(_putricideCollisionGUID, AreBothPutricideValvesUsed());
+            HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_COLLISION), AreBothPutricideValvesUsed());
             if (AreBothPutricideValvesUsed())
             {
-                for (ObjectGuid const& guid : _putricideGateGUIDs)
-                    if (GameObject* gate = instance->GetGameObject(guid))
+                for (uint32 gateData : { DATA_PUTRICIDE_GATE_ORANGE, DATA_PUTRICIDE_GATE_GREEN })
+                    if (GameObject* gate = GetGameObject(gateData))
                         gate->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             }
             else
             {
-                HandleGameObject(_putricideGateGUIDs[0], !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE));
-                HandleGameObject(_putricideGateGUIDs[1], !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE));
+                HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_GATE_ORANGE), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE));
+                HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_GATE_GREEN), !(_putricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE));
             }
         }
 
@@ -1272,7 +1177,7 @@ public:
                     {
                         _weeklyQuestId10 = RAND(QUEST_BLOOD_QUICKENING_10, QUEST_RESIDUE_RENDEZVOUS_10, QUEST_RESPITE_FOR_A_TORMENTED_SOUL_10, QUEST_DEPROGRAMMING_10, QUEST_SECURING_THE_RAMPARTS_10);
                         SetData(DATA_WEEKLY_QUEST_ID, 0); // show required hidden npcs
-                        if (GameObject* transporter = instance->GetGameObject(_scourgeTransporterFirstGUID))
+                        if (GameObject* transporter = GetGameObject(DATA_SCOURGE_TRANSPORTER_FIRST))
                             transporter->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         SaveToDB();
                     }
@@ -1284,7 +1189,7 @@ public:
                 case DATA_ICECROWN_GUNSHIP_BATTLE:
                     if (state == DONE)
                     {
-                        if (GameObject* loot = instance->GetGameObject(_gunshipArmoryGUID))
+                        if (GameObject* loot = GetGameObject(DATA_GUNSHIP_ARMORY))
                         {
                             loot->SetLootRecipient(instance);
                             loot->RemoveGameObjectFlag(GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
@@ -1297,9 +1202,9 @@ public:
                     switch (state)
                     {
                         case DONE:
-                            if (GameObject* loot = instance->GetGameObject(_deathbringersCacheGUID))
+                            if (GameObject* loot = GetGameObject(DATA_DEATHBRINGERS_CACHE))
                             {
-                                if (Creature* deathbringer = instance->GetCreature(_deathbringerSaurfangGUID))
+                                if (Creature* deathbringer = GetCreature(DATA_DEATHBRINGER_SAURFANG))
                                     loot->SetLootRecipient(deathbringer);
 
                                 loot->RemoveGameObjectFlag(GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
@@ -1309,9 +1214,9 @@ public:
                             // via SetData(DATA_SAURFANG_CAMP); OnPlayerEnter covers saved instances.
                             [[fallthrough]];
                         case NOT_STARTED:
-                            if (GameObject* teleporter = instance->GetGameObject(_saurfangTeleportGUID))
+                            if (GameObject* teleporter = GetGameObject(DATA_SAURFANG_TELEPORT))
                             {
-                                HandleGameObject(_saurfangTeleportGUID, true, teleporter);
+                                HandleGameObject(GetObjectGuid(DATA_SAURFANG_TELEPORT), true, teleporter);
                                 teleporter->RemoveGameObjectFlag(GO_FLAG_IN_USE);
                             }
                             break;
@@ -1322,7 +1227,7 @@ public:
                 case DATA_FESTERGUT:
                     if (state == DONE)
                     {
-                        if (GameObject* go = instance->GetGameObject(_gasReleaseValveGUID))
+                        if (GameObject* go = GetGameObject(DATA_GAS_RELEASE_VALVE))
                             go->RemoveGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                         if (GetBossState(DATA_ROTFACE) == DONE)
                             HandleDropAttempt(false);
@@ -1331,22 +1236,22 @@ public:
                 case DATA_ROTFACE:
                     if (state == DONE)
                     {
-                        if (GameObject* go = instance->GetGameObject(_oozeReleaseValveGUID))
+                        if (GameObject* go = GetGameObject(DATA_OOZE_RELEASE_VALVE))
                             go->RemoveGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                         if (GetBossState(DATA_FESTERGUT) == DONE)
                             HandleDropAttempt(false);
                     }
                     break;
                 case DATA_PROFESSOR_PUTRICIDE:
-                    HandleGameObject(_putricideEntranceDoorGUID, (_putricideEventProgress & PUTRICIDE_EVENT_FLAG_TRAP_FINISHED) && state != IN_PROGRESS);
-                    HandleGameObject(_plagueSigilGUID, state != DONE);
+                    HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_ENTRANCE_DOOR), (_putricideEventProgress & PUTRICIDE_EVENT_FLAG_TRAP_FINISHED) && state != IN_PROGRESS);
+                    HandleGameObject(GetObjectGuid(DATA_PLAGUE_SIGIL), state != DONE);
                     if (state == DONE)
                         HandleUpperSpireBossDone();
                     else if (state == FAIL)
                         HandleDropAttempt();
                     break;
                 case DATA_BLOOD_QUEEN_LANA_THEL:
-                    HandleGameObject(_bloodwingSigilGUID, state != DONE);
+                    HandleGameObject(GetObjectGuid(DATA_BLOODWING_SIGIL), state != DONE);
                     if (state == DONE)
                         HandleUpperSpireBossDone();
                     else if (state == FAIL)
@@ -1357,7 +1262,7 @@ public:
                         SetData(DATA_WEEKLY_QUEST_ID, GetData(DATA_WEEKLY_QUEST_ID)); // will show weekly quest npc if necessary
                     break;
                 case DATA_SINDRAGOSA:
-                    HandleGameObject(_frostwingSigilGUID, state != DONE);
+                    HandleGameObject(GetObjectGuid(DATA_FROSTWING_SIGIL), state != DONE);
                     if (state == DONE)
                         HandleUpperSpireBossDone();
                     else if (state == FAIL)
@@ -1380,13 +1285,13 @@ public:
 
                     if (state == DONE)
                     {
-                        if (GameObject* bolvar = instance->GetGameObject(_frozenBolvarGUID))
+                        if (GameObject* bolvar = GetGameObject(DATA_FROZEN_BOLVAR))
                             bolvar->SetRespawnTime(WEEK);
 
-                        if (GameObject* pillars = instance->GetGameObject(_pillarsChainedGUID))
+                        if (GameObject* pillars = GetGameObject(DATA_PILLARS_CHAINED))
                             pillars->SetRespawnTime(WEEK);
 
-                        if (GameObject* pillars = instance->GetGameObject(_pillarsUnchainedGUID))
+                        if (GameObject* pillars = GetGameObject(DATA_PILLARS_UNCHAINED))
                             pillars->SetRespawnTime(WEEK);
 
                         SummonLichKingOutroNpcs();
@@ -1749,16 +1654,16 @@ public:
                     else if (data == IN_PROGRESS)
                     {
                         _putricideEventProgress |= PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
-                        HandleGameObject(_putricideCollisionGUID, false);
-                        HandleGameObject(_putricideGateGUIDs[0], false);
-                        HandleGameObject(_putricideGateGUIDs[1], false);
+                        HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_COLLISION), false);
+                        HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_GATE_ORANGE), false);
+                        HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_GATE_GREEN), false);
                         SaveToDB();
                     }
                     else if (data == DONE)
                     {
                         _putricideEventProgress &= ~PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS;
                         _putricideEventProgress |= PUTRICIDE_EVENT_FLAG_TRAP_FINISHED;
-                        HandleGameObject(_putricideEntranceDoorGUID, true);
+                        HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_ENTRANCE_DOOR), true);
                         UpdatePutricideAirlock();
                         SaveToDB();
                     }
@@ -2027,7 +1932,7 @@ public:
             if (!AreUpperSpireWingsDone())
                 return;
 
-            GameObject* teleporter = instance->GetGameObject(_theLichKingTeleportGUID);
+            GameObject* teleporter = GetGameObject(DATA_LICH_KING_TELEPORT);
             if (!teleporter)
                 return;
 
@@ -2093,7 +1998,7 @@ public:
 
         void UpdateDeathwhisperElevator(uint32 diff)
         {
-            GameObject* elevator = instance->GetGameObject(_ladyDeathwhisperElevatorGUID);
+            GameObject* elevator = GetGameObject(DATA_LADY_DEATHWHISPER_ELEVATOR);
             if (!elevator)
                 return;
 
@@ -2130,7 +2035,7 @@ public:
             if (!player || player->GetQuestStatus(QUEST_A_FEAST_OF_SOULS) != QUEST_STATUS_INCOMPLETE)
                 return;
 
-            if (Creature* theLichKing = instance->GetCreature(_theLichKingLhGUID))
+            if (Creature* theLichKing = GetCreature(DATA_THE_LICH_KING_LH))
                 theLichKing->AI()->Talk(SAY_SOULS_LICH_KING_RAND_WHISPER, player);
         }
 
@@ -2160,36 +2065,36 @@ public:
                         {
                             _bloodQuickeningState = DONE;
                             DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, 0);
-                            if (Creature* bloodQueen = instance->GetCreature(_bloodQueenLanaThelGUID))
+                            if (Creature* bloodQueen = GetCreature(DATA_BLOOD_QUEEN_LANA_THEL))
                                 bloodQueen->AI()->DoAction(ACTION_KILL_MINCHAR);
                         }
 
                         SaveToDB();
                         break;
                     case EVENT_QUAKE_SHATTER:
-                        if (GameObject* platform = instance->GetGameObject(_arthasPlatformGUID))
+                        if (GameObject* platform = GetGameObject(DATA_ARTHAS_PLATFORM))
                             platform->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
 
-                        if (GameObject* edge = instance->GetGameObject(_frozenThroneEdgeGUID))
+                        if (GameObject* edge = GetGameObject(DATA_FROZEN_THRONE_EDGE))
                             edge->SetGoState(GO_STATE_ACTIVE);
 
-                        if (GameObject* wind = instance->GetGameObject(_frozenThroneWindGUID))
+                        if (GameObject* wind = GetGameObject(DATA_FROZEN_THRONE_WIND))
                             wind->SetGoState(GO_STATE_READY);
 
-                        if (GameObject* warning = instance->GetGameObject(_frozenThroneWarningGUID))
+                        if (GameObject* warning = GetGameObject(DATA_FROZEN_THRONE_WARNING))
                             warning->SetGoState(GO_STATE_READY);
 
-                        if (Creature* theLichKing = instance->GetCreature(_theLichKingGUID))
+                        if (Creature* theLichKing = GetCreature(DATA_THE_LICH_KING))
                             theLichKing->AI()->DoAction(ACTION_RESTORE_LIGHT);
                         break;
                     case EVENT_REBUILD_PLATFORM:
-                        if (GameObject* platform = instance->GetGameObject(_arthasPlatformGUID))
+                        if (GameObject* platform = GetGameObject(DATA_ARTHAS_PLATFORM))
                             platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
 
-                        if (GameObject* edge = instance->GetGameObject(_frozenThroneEdgeGUID))
+                        if (GameObject* edge = GetGameObject(DATA_FROZEN_THRONE_EDGE))
                             edge->SetGoState(GO_STATE_READY);
 
-                        if (GameObject* wind = instance->GetGameObject(_frozenThroneWindGUID))
+                        if (GameObject* wind = GetGameObject(DATA_FROZEN_THRONE_WIND))
                             wind->SetGoState(GO_STATE_ACTIVE);
                         break;
                     case EVENT_RESPAWN_GUNSHIP:
@@ -2334,13 +2239,13 @@ public:
                     _events.ScheduleEvent(EVENT_SPAWN_SAURFANG_EVENT, 18s);
                     break;
                 case EVENT_QUAKE:
-                    if (GameObject* warning = instance->GetGameObject(_frozenThroneWarningGUID))
+                    if (GameObject* warning = GetGameObject(DATA_FROZEN_THRONE_WARNING))
                         warning->SetGoState(GO_STATE_ACTIVE);
 
                     _events.ScheduleEvent(EVENT_QUAKE_SHATTER, 5s);
                     break;
                 case EVENT_SECOND_REMORSELESS_WINTER:
-                    if (GameObject* platform = instance->GetGameObject(_arthasPlatformGUID))
+                    if (GameObject* platform = GetGameObject(DATA_ARTHAS_PLATFORM))
                     {
                         platform->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
                         _events.ScheduleEvent(EVENT_REBUILD_PLATFORM, 1500ms);
@@ -2367,37 +2272,36 @@ public:
                     }
                     break;
                 case EVENT_FESTERGUT_VALVE_USED:
-                    HandlePutricideValveUsed(PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE, _gasReleaseValveGUID, 0);
+                    HandlePutricideValveUsed(PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE, DATA_GAS_RELEASE_VALVE, DATA_PUTRICIDE_GATE_ORANGE, DATA_PUTRICIDE_PIPE_ORANGE);
                     break;
                 case EVENT_ROTFACE_VALVE_USED:
-                    HandlePutricideValveUsed(PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE, _oozeReleaseValveGUID, 1);
+                    HandlePutricideValveUsed(PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE, DATA_OOZE_RELEASE_VALVE, DATA_PUTRICIDE_GATE_GREEN, DATA_PUTRICIDE_PIPE_GREEN);
                     break;
                 default:
                     break;
             }
         }
 
-        // side: 0 for the Festergut (orange) wing, 1 for the Rotface (green) wing
-        void HandlePutricideValveUsed(uint32 valveFlag, ObjectGuid valveGUID, uint8 side)
+        void HandlePutricideValveUsed(uint32 valveFlag, uint32 valveData, uint32 gateData, uint32 pipeData)
         {
             if (_putricideEventProgress & valveFlag)
                 return;
 
-            if (GameObject* valve = instance->GetGameObject(valveGUID))
+            if (GameObject* valve = GetGameObject(valveData))
                 valve->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
 
             _putricideEventProgress |= valveFlag;
             if (AreBothPutricideValvesUsed())
             {
-                HandleGameObject(_putricideCollisionGUID, true);
-                for (ObjectGuid const& guid : _putricideGateGUIDs)
-                    if (GameObject* gate = instance->GetGameObject(guid))
+                HandleGameObject(GetObjectGuid(DATA_PUTRICIDE_COLLISION), true);
+                for (uint32 gateData : { DATA_PUTRICIDE_GATE_ORANGE, DATA_PUTRICIDE_GATE_GREEN })
+                    if (GameObject* gate = GetGameObject(gateData))
                         gate->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             }
             else
-                HandleGameObject(_putricideGateGUIDs[side], false);
+                HandleGameObject(GetObjectGuid(gateData), false);
 
-            HandleGameObject(_putricidePipeGUIDs[side], true);
+            HandleGameObject(GetObjectGuid(pipeData), true);
             SaveToDB();
         }
 
@@ -2429,25 +2333,13 @@ public:
         bool _isBuffAvailable;
         uint32 _weeklyQuestId10; // contains id from 10man for any difficulty (for simplicity)
         ObjectGuid _weeklyQuestNpcGUIDs[WeeklyNPCs];
-        ObjectGuid _putricideEntranceDoorGUID;
         uint32 _putricideEventProgress;
-        ObjectGuid _gasReleaseValveGUID;
-        ObjectGuid _oozeReleaseValveGUID;
         bool _lichKingHeroicAvailable;
         uint32 _deathwhisperElevatorTimer;
-        ObjectGuid _scourgeTransporterFirstGUID;
 
         EventMap _events;
-        ObjectGuid _ladyDeathwhisperGUID;
-        ObjectGuid _ladyDeathwhisperElevatorGUID;
         ObjectGuid _gunshipGUID;
-        ObjectGuid _enemyGunshipGUID;
-        ObjectGuid _gunshipArmoryGUID;
-        ObjectGuid _deathbringerSaurfangGUID;
-        ObjectGuid _deathbringerSaurfangDoorGUID;
         ObjectGuid _deathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
-        ObjectGuid _deathbringersCacheGUID;
-        ObjectGuid _saurfangTeleportGUID;
         GuidList _saurfangCampGUIDs;
         GuidList _saurfangEventGuardGUIDs;
         std::array<ObjectGuid, 2> _saurfangCampTeleporterGUIDs;
@@ -2458,42 +2350,6 @@ public:
         bool _saurfangOutroRunning;
         bool _saurfangZeppelinDocked;
         bool _saurfangZeppelinLeaving;
-        ObjectGuid _plagueSigilGUID;
-        ObjectGuid _bloodwingSigilGUID;
-        ObjectGuid _frostwingSigilGUID;
-        ObjectGuid _putricidePipeGUIDs[2];
-        ObjectGuid _putricideGateGUIDs[2];
-        ObjectGuid _putricideCollisionGUID;
-        ObjectGuid _festergutGUID;
-        ObjectGuid _rotfaceGUID;
-        ObjectGuid _professorPutricideGUID;
-        ObjectGuid _putricideTableGUID;
-        ObjectGuid _bloodCouncilGUIDs[3];
-        ObjectGuid _bloodCouncilControllerGUID;
-        ObjectGuid _bloodQueenLanaThelGUID;
-        ObjectGuid _crokScourgebaneGUID;
-        ObjectGuid _crokCaptainGUIDs[4];
-        ObjectGuid _sisterSvalnaGUID;
-        ObjectGuid _valithriaDreamwalkerGUID;
-        ObjectGuid _valithriaLichKingGUID;
-        ObjectGuid _valithriaTriggerGUID;
-        ObjectGuid _putricideTrapGUID;
-        ObjectGuid _sindragosaGauntletGUID;
-        ObjectGuid _sindragosaGUID;
-        ObjectGuid _spinestalkerGUID;
-        ObjectGuid _rimefangGUID;
-        ObjectGuid _theLichKingTeleportGUID;
-        ObjectGuid _theLichKingGUID;
-        ObjectGuid _theLichKingLhGUID;
-        ObjectGuid _highlordTirionFordringGUID;
-        ObjectGuid _terenasMenethilGUID;
-        ObjectGuid _arthasPlatformGUID;
-        ObjectGuid _frozenThroneEdgeGUID;
-        ObjectGuid _frozenThroneWindGUID;
-        ObjectGuid _frozenThroneWarningGUID;
-        ObjectGuid _frozenBolvarGUID;
-        ObjectGuid _pillarsChainedGUID;
-        ObjectGuid _pillarsUnchainedGUID;
         uint32 _coldflameJetsState;
         std::set<ObjectGuid::LowType> _frostwyrmSpawnIds;
         std::set<ObjectGuid::LowType> _spinestalkerTrash;

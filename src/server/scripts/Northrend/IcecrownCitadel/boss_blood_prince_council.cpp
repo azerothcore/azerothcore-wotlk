@@ -267,10 +267,10 @@ public:
             DoCastSelf(SPELL_CLEAR_ALL_STATUS_AILMENTS, true);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 if (!taldaram->IsInEvadeMode())
                     taldaram->SetInCombatWithZone();
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 if (!valanar->IsInEvadeMode())
                     valanar->SetInCombatWithZone();
 
@@ -308,10 +308,10 @@ public:
             }
 
             Talk(SAY_KELESETH_DEATH);
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 if (taldaram->IsAlive())
                     Unit::Kill(taldaram, taldaram);
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 if (valanar->IsAlive())
                     Unit::Kill(valanar, valanar);
         }
@@ -433,9 +433,9 @@ public:
             me->SetHealth(me->GetMaxHealth());
             DoAction(ACTION_REMOVE_INVOCATION);
             _evading = true;
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 taldaram->AI()->EnterEvadeMode();
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 valanar->AI()->EnterEvadeMode();
             ScriptedAI::EnterEvadeMode(why);
             _evading = false;
@@ -527,10 +527,10 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 if (!keleseth->IsInEvadeMode())
                     keleseth->SetInCombatWithZone();
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 if (!valanar->IsInEvadeMode())
                     valanar->SetInCombatWithZone();
 
@@ -563,10 +563,10 @@ public:
             }
 
             Talk(EMOTE_TALDARAM_DEATH);
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 if (keleseth->IsAlive())
                     Unit::Kill(keleseth, keleseth);
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 if (valanar->IsAlive())
                     Unit::Kill(valanar, valanar);
         }
@@ -718,9 +718,9 @@ public:
             me->SetHealth(me->GetMaxHealth());
             DoAction(ACTION_REMOVE_INVOCATION);
             _evading = true;
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 keleseth->AI()->EnterEvadeMode(why);
-            if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
+            if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 valanar->AI()->EnterEvadeMode(why);
             ScriptedAI::EnterEvadeMode(why);
             _evading = false;
@@ -814,10 +814,10 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 if (!keleseth->IsInEvadeMode())
                     keleseth->SetInCombatWithZone();
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 if (!taldaram->IsInEvadeMode())
                     taldaram->SetInCombatWithZone();
 
@@ -859,10 +859,10 @@ public:
 
             Talk(SAY_VALANAR_DEATH);
             instance->SetBossState(DATA_BLOOD_PRINCE_COUNCIL, DONE);
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 if (keleseth->IsAlive())
                     Unit::Kill(keleseth, keleseth);
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 if (taldaram->IsAlive())
                     Unit::Kill(taldaram, taldaram);
         }
@@ -1063,9 +1063,9 @@ public:
             me->SetHealth(me->GetMaxHealth());
             DoAction(ACTION_REMOVE_INVOCATION);
             _evading = true;
-            if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
+            if (Creature* keleseth = instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 keleseth->AI()->EnterEvadeMode(why);
-            if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
+            if (Creature* taldaram = instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 taldaram->AI()->EnterEvadeMode(why);
             BossAI::EnterEvadeMode(why);
             _evading = false;
@@ -1154,15 +1154,15 @@ public:
                 me->GetMotionMaster()->MovePoint(POINT_INTRO_DESPAWN, introFinalPos);
                 _events.Reset();
 
-                if (Creature* keleseth = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PRINCE_KELESETH_GUID)))
+                if (Creature* keleseth = _instance->GetCreature(DATA_PRINCE_KELESETH_GUID))
                 {
                     keleseth->AI()->DoAction(ACTION_STAND_UP);
                 }
-                if (Creature* taldaram = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
+                if (Creature* taldaram = _instance->GetCreature(DATA_PRINCE_TALDARAM_GUID))
                 {
                     taldaram->AI()->DoAction(ACTION_STAND_UP);
                 }
-                if (Creature* valanar = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
+                if (Creature* valanar = _instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 {
                     valanar->AI()->DoAction(ACTION_STAND_UP);
                 }
@@ -1384,7 +1384,7 @@ public:
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {
-                if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_VALANAR_GUID)))
+                if (Creature* valanar = instance->GetCreature(DATA_PRINCE_VALANAR_GUID))
                 {
                     valanar->AI()->JustSummoned(me);
                 }

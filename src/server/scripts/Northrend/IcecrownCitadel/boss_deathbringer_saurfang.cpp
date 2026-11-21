@@ -645,7 +645,7 @@ public:
                         if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
                             return;
 
-                        Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG));
+                        Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG);
                         if (!deathbringer || deathbringer->IsInEvadeMode())
                             return;
 
@@ -668,7 +668,7 @@ public:
                         _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 21s + 400ms, 0, PHASE_INTRO_H);
                         _instance->HandleGameObject(_instance->GetGuidData(DATA_SAURFANG_DOOR), true);
 
-                        if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_SAURFANG_TELEPORT)))
+                        if (GameObject* teleporter = _instance->GetGameObject(DATA_SAURFANG_TELEPORT))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
                             teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
@@ -746,7 +746,7 @@ public:
                         _events.ScheduleEvent(EVENT_INTRO_FINISH,  66s + 200ms, 0, PHASE_INTRO_H);
                         break;
                     case POINT_CORPSE:
-                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                        if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                             me->SetFacingToObject(deathbringer);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_WEEP, 2s + 700ms);
@@ -758,7 +758,7 @@ public:
                         break;
                     case POINT_FINAL:
                         {
-                            if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                            if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                                 deathbringer->DespawnOrUnsummon();
 
                             float x, y, z, o;
@@ -782,7 +782,7 @@ public:
                 case 0:
                     break;
                 case EVENT_INTRO_HORDE_2:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_HORDE_2);
                     break;
                 case EVENT_INTRO_HORDE_3:
@@ -793,7 +793,7 @@ public:
                     me->GetMotionMaster()->MovePoint(POINT_FIRST_STEP, firstStepPos.GetPositionX(), firstStepPos.GetPositionY(), firstStepPos.GetPositionZ());
                     break;
                 case EVENT_INTRO_HORDE_4:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_HORDE_4);
                     _events.ScheduleEvent(EVENT_INTRO_HORDE_QUESTION, 3s + 800ms, 0, PHASE_INTRO_H);
                     break;
@@ -818,11 +818,11 @@ public:
                     me->GetMotionMaster()->MoveCharge(chargePos[0].GetPositionX(), chargePos[0].GetPositionY(), chargePos[0].GetPositionZ(), 8.5f, POINT_CHARGE);
                     break;
                 case EVENT_INTRO_HORDE_9:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
                     break;
                 case EVENT_INTRO_HORDE_10:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_HORDE_9);
                     break;
                 case EVENT_INTRO_HORDE_TALK:
@@ -832,11 +832,11 @@ public:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_NO);
                     break;
                 case EVENT_INTRO_HORDE_QUESTION:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                     break;
                 case EVENT_INTRO_FINISH:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
                         deathbringer->SetImmuneToPC(false);
@@ -867,7 +867,7 @@ public:
                     break;
                 case EVENT_OUTRO_WALK:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                     {
                         float x, y, z;
                         deathbringer->GetClosePoint(x, y, z, deathbringer->GetObjectSize());
@@ -883,7 +883,7 @@ public:
                     _events.ScheduleEvent(EVENT_OUTRO_HORDE_PICKUP, 6s);
                     break;
                 case EVENT_OUTRO_HORDE_PICKUP:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                     {
                         // Revive before the cast - Unit::_EnterVehicle refuses a dead passenger.
                         deathbringer->setDeathState(DeathState::Alive);
@@ -983,7 +983,7 @@ public:
                         if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
                             return;
 
-                        Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG));
+                        Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG);
                         if (!deathbringer || deathbringer->IsInEvadeMode())
                             return;
 
@@ -1008,7 +1008,7 @@ public:
                         _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 24s + 500ms, 0, PHASE_INTRO_A);
                         _instance->HandleGameObject(_instance->GetGuidData(DATA_SAURFANG_DOOR), true);
 
-                        if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_SAURFANG_TELEPORT)))
+                        if (GameObject* teleporter = _instance->GetGameObject(DATA_SAURFANG_TELEPORT))
                         {
                             _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
                             teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
@@ -1117,11 +1117,11 @@ public:
                 case 0:
                     break;
                 case EVENT_INTRO_ALLIANCE_2:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_2);
                     break;
                 case EVENT_INTRO_ALLIANCE_3:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_3);
                     break;
                 case EVENT_INTRO_ALLIANCE_4:
@@ -1139,17 +1139,17 @@ public:
                     me->GetMotionMaster()->MoveCharge(chargePos[0].GetPositionX(), chargePos[0].GetPositionY(), chargePos[0].GetPositionZ(), 8.5f, POINT_CHARGE);
                     break;
                 case EVENT_INTRO_ALLIANCE_6:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
                     break;
                 case EVENT_INTRO_ALLIANCE_7:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                     {
                         deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_6);
                     }
                     break;
                 case EVENT_INTRO_FINISH:
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                     {
                         deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
                         deathbringer->SetImmuneToPC(false);
@@ -1301,7 +1301,7 @@ public:
                 {
                     // He carries the rest of the scene; without him or the body, skip to the cleanup.
                     Creature* saurfang = ObjectAccessor::GetCreature(*me, _outroSaurfangGUID);
-                    Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG));
+                    Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG);
                     if (!saurfang || !deathbringer)
                     {
                         _events.ScheduleEvent(EVENT_OUTRO_A_DISMISS, 1s);
@@ -1319,7 +1319,7 @@ public:
                 case EVENT_OUTRO_A_SAURFANG_KNEEL:
                     if (Creature* saurfang = ObjectAccessor::GetCreature(*me, _outroSaurfangGUID))
                     {
-                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                        if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                             saurfang->SetFacingToObject(deathbringer);
                         saurfang->SetStandState(UNIT_STAND_STATE_KNEEL);
                     }
@@ -1333,7 +1333,7 @@ public:
                 case EVENT_OUTRO_A_PICKUP:
                     if (Creature* saurfang = ObjectAccessor::GetCreature(*me, _outroSaurfangGUID))
                     {
-                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                        if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         {
                             // Revive before the cast - Unit::_EnterVehicle refuses a dead passenger.
                             deathbringer->setDeathState(DeathState::Alive);
@@ -1407,7 +1407,7 @@ public:
                     if (Creature* saurfang = ObjectAccessor::GetCreature(*me, _outroSaurfangGUID))
                         saurfang->DespawnOrUnsummon();
                     // The body goes with him: despawned later it would drop a revived Deathbringer on the rise.
-                    if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                    if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                         deathbringer->DespawnOrUnsummon();
                     _outroSaurfangGUID.Clear();
                     if (Creature* jaina = ObjectAccessor::GetCreature(*me, _outroJainaGUID))
@@ -1476,7 +1476,7 @@ public:
                     break;
                 case EVENT_OUTRO_A_DISMISS:
                     {
-                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
+                        if (Creature* deathbringer = _instance->GetCreature(DATA_DEATHBRINGER_SAURFANG))
                             deathbringer->DespawnOrUnsummon();
                         if (Creature* varian = ObjectAccessor::GetCreature(*me, _outroVarianGUID))
                             varian->DespawnOrUnsummon();

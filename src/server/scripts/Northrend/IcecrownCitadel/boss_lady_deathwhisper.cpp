@@ -754,7 +754,7 @@ public:
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_FANATIC_S_DETERMINATION);
 
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
+                    if (Creature* ladyDeathwhisper = _instance->GetCreature(DATA_LADY_DEATHWHISPER))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
@@ -875,7 +875,7 @@ public:
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_ADHERENT_S_DETERMINATION);
 
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
+                    if (Creature* ladyDeathwhisper = _instance->GetCreature(DATA_LADY_DEATHWHISPER))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
@@ -1176,7 +1176,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
-                if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
+                if (Creature* ladyDeathwhisper = instance->GetCreature(DATA_LADY_DEATHWHISPER))
                         ladyDeathwhisper->AI()->DoAction(ACTION_START_INTRO);
         return true;
     }

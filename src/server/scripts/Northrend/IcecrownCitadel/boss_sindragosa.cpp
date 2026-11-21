@@ -1530,16 +1530,16 @@ public:
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             if (!instance->GetData(DATA_SPINESTALKER))
-                if (Creature* spinestalker = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SPINESTALKER)))
+                if (Creature* spinestalker = instance->GetCreature(DATA_SPINESTALKER))
                     spinestalker->AI()->DoAction(ACTION_START_FROSTWYRM);
 
             if (!instance->GetData(DATA_RIMEFANG))
-                if (Creature* rimefang = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_RIMEFANG)))
+                if (Creature* rimefang = instance->GetCreature(DATA_RIMEFANG))
                     rimefang->AI()->DoAction(ACTION_START_FROSTWYRM);
 
             if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && instance->GetBossState(DATA_SINDRAGOSA) != IN_PROGRESS)
             {
-                if (Creature* sindragosa = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SINDRAGOSA)))
+                if (Creature* sindragosa = instance->GetCreature(DATA_SINDRAGOSA))
                     sindragosa->AI()->DoAction(ACTION_START_FROSTWYRM);
             }
         }
