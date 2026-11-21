@@ -55,6 +55,11 @@ enum AnubActions
     ACTION_INTRO_EMERGE                         = 3, // sent by the SmartAI of areatrigger 5475 (his chamber)
 };
 
+enum AnubPoints
+{
+    POINT_FALL_GROUND                           = 1,
+};
+
 Position const AnubLocs[] =
 {
     // churning ground spawns
@@ -478,20 +483,31 @@ struct npc_frost_sphere : public NullCreatureAI
             if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             {
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveAllAuras();
                 me->GetMotionMaster()->MoveIdle();
-                me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), 143.0f, 20.0f);
-                scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
-                {
-                    me->RemoveAurasDueToSpell(SPELL_FROST_SPHERE);
-                    DoCastSelf(SPELL_PERMAFROST_MODEL, true);
-                    me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 142.7f, me->GetOrientation(), false);
-                    me->SetFacingTo(me->GetOrientation());
-                    DoCastSelf(SPELL_PERMAFROST_VISUAL, true);
-                    DoCastSelf(SPELL_PERMAFROST, true);
-                    me->SetCanFly(false);
-                });
+
+                // MoveFall launches nothing this close to the ground, so no MovementInform would follow.
+                float groundZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
+                if (groundZ <= INVALID_HEIGHT || std::fabs(me->GetPositionZ() - groundZ) < 0.1f)
+                    Land();
+                else
+                    me->GetMotionMaster()->MoveFall(POINT_FALL_GROUND);
             }
         }
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == EFFECT_MOTION_TYPE && id == POINT_FALL_GROUND)
+            Land();
+    }
+
+    void Land()
+    {
+        DoCastSelf(SPELL_PERMAFROST_VISUAL, true);
+        DoCastSelf(SPELL_PERMAFROST, true);
+        DoCastSelf(SPELL_PERMAFROST_MODEL, true);
+        me->SetCanFly(false);
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -502,11 +518,6 @@ struct npc_frost_sphere : public NullCreatureAI
             me->RemoveAllAurasExceptType(SPELL_AURA_TRANSFORM);
             me->DespawnOrUnsummon(1500ms);
         }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        scheduler.Update(diff);
     }
 };
 

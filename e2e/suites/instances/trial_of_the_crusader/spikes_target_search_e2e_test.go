@@ -90,15 +90,13 @@ func TestToC_PursuingSpikesTargetSearch(t *testing.T) {
 			a.GM(t, ".npc delete")
 		}
 	})
-	// npc_frost_sphere takes no lethal damage: it drops to the floor and casts Permafrost, a
-	// persistent area aura whose slow lands on the players standing in it.
+	// npc_frost_sphere takes no lethal damage: it falls to the floor and casts Permafrost, a
+	// persistent area aura whose slow lands on the players standing in it. The slow on both players
+	// shows it landed under them; the sphere's own position can't, since AzerothGhost v1.0.8 parses
+	// a Falling spline (flag 0x200) as Parabolic and misreads its destination.
 	a.Damage(t, sphere, 10000000)
 	a.WaitUnitAura(t, a.GUID, permafrost, 5*time.Second)
-	if obj := a.World.GetObject(sphere); obj == nil || !obj.HasKnownPosition() {
-		e2eharness.Preconditionf(t, "Permafrost sphere 0x%X has no known position", sphere)
-	} else if x, y, z := obj.InterpolatedPosition(); e2eharness.Distance3D(x, y, z, playerX, playerY, floorZ) > 4 {
-		e2eharness.Preconditionf(t, "Permafrost sphere landed at (%.1f, %.1f, %.1f), too far from the players", x, y, z)
-	}
+	b.WaitUnitAura(t, b.GUID, permafrost, 5*time.Second)
 
 	var mu sync.Mutex
 	var casts []spikeCast
