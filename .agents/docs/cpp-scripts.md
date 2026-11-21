@@ -17,9 +17,9 @@ Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).
 - Script ids (spell/action/event/data/phase) get named entries in the file's existing enum, never raw literals or
   `static constexpr` class members, even where the file already uses them: add the entry and convert that literal's
   every call site and handler in the same change; a touched line holding a raw spell id gets converted too. A new
-  entry continues its enum's numbering (no jump to e.g. 100); define each value once (no enum entry duplicating a
-  `constexpr`). Timer durations are exempt: inline (`events.Repeat(4900ms)`), or named where the file already names
-  its timers.
+  action/event/data/phase entry continues its enum's numbering (no jump to e.g. 100); a spell entry keeps its spell
+  id. Define each value once (no enum entry duplicating a `constexpr`). Timer durations are exempt: inline
+  (`events.Repeat(4900ms)`), or named where the file already names its timers.
 - File-local free helper functions are `static`, never in an anonymous namespace.
 - Remove from what the change adds or touches: commented-out enum entries, actions and constants nothing uses, and
   unreachable code (e.g. after the `return` in `Reset()`'s `DONE` branch). Before deleting an unused spell constant,

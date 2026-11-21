@@ -38,4 +38,5 @@ change to it:
 - A creature's `SummonGameObject` with the default `GO_SUMMON_TIMED_OR_CORPSE_DESPAWN` ties the gameobject to the
   creature, which deletes it on despawn or leaving the world. Summon loot chests and other gameobjects that must
   outlive the boss through the map (`me->GetMap()->SummonGameObject(...)`, preferred) or at least with
-  `GO_SUMMON_TIMED_DESPAWN`.
+  `GO_SUMMON_TIMED_DESPAWN`. The map call spawns in `PHASEMASK_NORMAL`: in a phased encounter, set the phase on the
+  returned object.

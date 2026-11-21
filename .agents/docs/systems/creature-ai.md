@@ -12,7 +12,8 @@ to `VehicleAI` would make every drivable cannon and catapult swing.
 - Casts: prefer the `DoCast` helpers (`DoCastSelf`, `DoCastVictim`, `DoCastAOE`, …) over `me->CastSpell`, which stays
   for positional casts or custom `CastSpellExtraArgs`.
 - Caster kept at range: `AttackStartCaster(who, <hard-coded dist>)`, not a distance computed from `SpellInfo`.
-- Difficulty in a `ScriptedAI`: `Is25ManRaid()`, not `me->GetMap()->Is25ManRaid()`.
+- Difficulty in a raid-only `ScriptedAI`: `Is25ManRaid()`, not `me->GetMap()->Is25ManRaid()`. It skips the raid
+  check, so in a heroic dungeon it returns true: keep the map call in scripts that also run in dungeons.
 
 ## Trigger and helper NPCs
 

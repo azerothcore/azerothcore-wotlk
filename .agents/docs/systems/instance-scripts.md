@@ -21,11 +21,14 @@ read or write it.
   `OnGameObjectCreate`) decides whether an event already ran from persisted state (boss state, saved fields, a DB
   spawn's saved respawn time), not from runtime members alone or the creature's current position, and resumes the
   event from it instead of replaying it.
-- Append new fields at the end of `WriteSaveDataMore`/`ReadSaveDataMore`, so old saves keep the default. The save
-  stream runs headers, boss states, persistent data slots, then More: a new boss or persistent data slot misaligns
-  an old save's later values.
+- Append new fields at the end of `WriteSaveDataMore`/`ReadSaveDataMore` and read each with
+  `if (!(data >> x)) x = <default>;`, so old saves keep the default (a failed `>>` writes 0). The save stream runs
+  headers, boss states, persistent data slots, then More: a new boss or persistent data slot misaligns an old save's
+  later values.
 - To remove a DB-spawned object for the rest of the lockout, `DespawnOrUnsummon(0ms, <respawn>)`, which saves the
   respawn time; `Delete()` saves none, so the object returns when the map reloads. For a summoned object either works.
+  A DB gameobject whose template can't despawn (neither `GetDespawnPossibility()` nor `IsDespawnAtAction()`) ignores
+  its saved respawn time on load: remove it from persisted instance state in `OnGameObjectCreate`.
 
 ## ObjectData slots
 
