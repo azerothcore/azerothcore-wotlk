@@ -21,9 +21,9 @@
 #include "CreatureAIImpl.h"
 #include "Player.h"
 
-#define DataHeader "HOR"
+constexpr char const* DataHeader = "HOR";
 
-#define HallsOfReflectionScriptName "instance_halls_of_reflection"
+constexpr char const* HallsOfReflectionScriptName = "instance_halls_of_reflection";
 
 enum Data
 {
@@ -41,15 +41,32 @@ enum Data
     DATA_WAVE_NUMBER,
     DATA_LK_BATTLE,
     DATA_SHIP_CAPTAIN,
+    DATA_SHOW_TRASH,
+    DATA_SPIRITUAL_REFLECTIONS_COPY,
+    DATA_SPIRITUAL_REFLECTIONS_ACTIVATE,
+    DATA_SPIRITUAL_REFLECTIONS_HIDE,
+    DATA_START_LK_FIGHT,
+    DATA_STOP_LK_FIGHT,
+    DATA_DELETE_ICE_WALL,
 
-    // Actions
-    ACTION_SHOW_TRASH,
-    ACTION_SPIRITUAL_REFLECTIONS_COPY,
-    ACTION_SPIRITUAL_REFLECTIONS_ACTIVATE,
-    ACTION_SPIRITUAL_REFLECTIONS_HIDE,
-    ACTION_START_LK_FIGHT,
-    ACTION_STOP_LK_FIGHT,
-    ACTION_DELETE_ICE_WALL,
+    // Object guids (ObjectData slots and GetGuidData)
+    DATA_SYLVANAS_PART1,
+    DATA_DARK_RANGER_LORALEN,
+    DATA_UTHER,
+    DATA_LICH_KING_EVENT,
+    DATA_SYLVANAS_PART2,
+    DATA_ALTAR_BUNNY,
+    DATA_ICE_WALL_TARGET_1,
+    DATA_ICE_WALL_TARGET_2,
+    DATA_ICE_WALL_TARGET_3,
+    DATA_ICE_WALL_TARGET_4,
+    DATA_FROSTMOURNE,
+    DATA_FROSTMOURNE_ALTAR,
+    DATA_FRONT_DOOR,
+    DATA_ARTHAS_DOOR,
+    DATA_CAVE_IN,
+    DATA_DOOR_BEFORE_THRONE,
+    DATA_DOOR_AFTER_THRONE,
 };
 
 enum Creatures
@@ -106,6 +123,20 @@ enum GameObjects
     GO_PORTAL_TO_DALARAN                          = 195682,
 };
 
+// DATA_BATTERED_HILT values; BATTERED_HILT_QUEL_ARRIVED is sent by Quel'Delar's SmartAI
+enum BatteredHiltSteps
+{
+    BATTERED_HILT_DISABLE        = 1,
+    BATTERED_HILT_START          = 2,
+    BATTERED_HILT_THROW          = 3,
+    BATTERED_HILT_QUEL_SUMMONED  = 4,
+    BATTERED_HILT_QUEL_ARRIVED   = 5,
+    BATTERED_HILT_QUEL_LAND      = 6,
+    BATTERED_HILT_QUEL_PREPARE   = 7,
+    BATTERED_HILT_QUEL_ATTACK    = 8,
+    BATTERED_HILT_FINISHED       = 9,
+};
+
 enum BatteredHiltStatusFlags
 {
     BHSF_NONE = 0,
@@ -125,9 +156,12 @@ enum HoRPersistentData
 
 constexpr uint8 MAX_SPIRITUAL_REFLECTIONS = 5;
 constexpr uint8 MAX_ICE_WALL_TARGETS      = 4;
-#define NUM_OF_TRASH 34
-#define MAX_DIST_FROM_CENTER_IN_COMBAT 70.5f
-#define MAX_DIST_FROM_CENTER_TO_START 40.0f
+constexpr uint8 MAX_WAVE_COMPOSITIONS     = 8;
+constexpr uint8 MAX_WAVE_MOBS             = 5;
+constexpr uint32 PHASEMASK_HIDDEN         = 2;
+constexpr uint8 NUM_OF_TRASH              = 34;
+constexpr float MAX_DIST_FROM_CENTER_IN_COMBAT = 70.5f;
+constexpr float MAX_DIST_FROM_CENTER_TO_START  = 40.0f;
 
 enum hYells
 {
@@ -255,6 +289,7 @@ enum hMisc
     ACTION_SKIP_INTRO,
     ACTION_START_LK_FIGHT_REAL,
     ACTION_INFORM_WALL_DESTROYED,
+    ACTION_WAVE_ENGAGE,
 
     QUEST_DELIVRANCE_FROM_THE_PIT_A2              = 24710,
     QUEST_DELIVRANCE_FROM_THE_PIT_H2              = 24712,
@@ -313,7 +348,7 @@ enum hMisc
     SPELL_QUELDELAR_WILL                          = 70698,
 };
 
-const uint32 allowedCompositions[8][5] =
+uint32 const allowedCompositions[MAX_WAVE_COMPOSITIONS][MAX_WAVE_MOBS] =
 {
     {NPC_WAVE_MERCENARY, NPC_WAVE_PRIEST, NPC_WAVE_RIFLEMAN, 0, 0},
     {NPC_WAVE_MAGE, NPC_WAVE_RIFLEMAN, NPC_WAVE_FOOTMAN, 0, 0},
@@ -325,35 +360,35 @@ const uint32 allowedCompositions[8][5] =
     {NPC_WAVE_MERCENARY, NPC_WAVE_MAGE, NPC_WAVE_PRIEST, NPC_WAVE_FOOTMAN, NPC_WAVE_FOOTMAN}
 };
 
-const Position CenterPos             = {5309.459473f, 2006.478516f, 711.595459f, 0.0f};
-const Position SpawnPos              = {5263.22412f, 1950.95544f, 707.695862f, 0.808736f}; // Jaina/Sylvanas Beginning Position
-const Position LoralenMidleFollowPos = {5274.25634f, 1976.04760f, 707.694763f, 0.929097f}; // Sniffed
-const Position LoralenFollowPos      = {5283.29296f, 1992.43078f, 707.694763f, 0.549238f}; // Sniffed
-const Position LoralenFollowLk1      = {5292.94921f, 2008.25451f, 707.695801f, 1.047967f}; // Sniffed
-const Position LoralenFollowLk2      = {5298.94335f, 2016.37097f, 707.695801f, 0.694538f}; // Sniffed
-const Position LoralenFollowLk3      = {5336.94044f, 2040.21814f, 707.695801f, 0.439284f}; // Sniffed
-const Position LoralenFollowLkFinal  = {5361.96777f, 2065.68310f, 707.693848f, 0.831989f}; // Sniffed
-const Position LoralenDeadPos        = {5369.71289f, 2083.6330f, 707.695129f, 0.188739f}; // Sniffed
-const Position MoveThronePos         = {5306.98535f, 1998.10302f, 709.341187f, 1.277278f}; // Jaina/Sylvanas walks to throne
-const Position UtherSpawnPos         = {5308.310059f, 2003.857178f, 709.341431f, 4.650315f}; // Uther starting position
-const Position LichKingSpawnPos      = {5362.917480f, 2062.307129f, 707.695374f, 3.945812f};
-const Position LichKingMoveMidlelThronePos   = {5333.48437f, 2032.02648f, 707.695679f, 3.973301f}; // Lich King moves and hits Uther [sniff]
-const Position LichKingMoveThronePos   = {5312.79638f, 2010.07141f, 709.3942183f, 3.973301f}; // Lich King walks to throne [sniff]
-const Position LichKingMoveAwayPos   = {5400.069824f, 2102.7131689f, 707.69525f, 0.843803f}; // Lich King walks away [sniff]
-const Position FalricMovePos         = {5284.161133f, 2030.691650f, 709.319336f, 5.489386f};
-const Position MarwynMovePos         = {5335.330078f, 1982.376221f, 709.319580f, 2.339942f};
-const Position LeaderEscapePos       = {5576.80566f, 2235.55004f, 733.012268f, 2.782125f}; //Sniff
-const Position ShipMasterSummonPos   = {5262.773926f, 1669.980103f, 715.000000f, 0.000000f};
-const Position WalkCaveInPos         = {5267.594238f, 1678.750000f, 784.302856f, 1.041739f};
-const Position AllyPortalPos         = {5205.015625f, 1605.680298f, 806.444458f, 0.884375f};
-const Position AllyChestPos          = {5194.341797f, 1611.271484f, 806.408569f, 0.907936f};
-const Position HordePortalPos        = {5222.733887f, 1568.052124f, 819.590881f, 1.198878f};
-const Position HordeChestPos         = {5215.394531f, 1569.726074f, 819.149048f, 1.151754f};
+Position const CenterPos             = {5309.459473f, 2006.478516f, 711.595459f, 0.0f};
+Position const SpawnPos              = {5263.22412f, 1950.95544f, 707.695862f, 0.808736f}; // Jaina/Sylvanas Beginning Position
+Position const LoralenMidleFollowPos = {5274.25634f, 1976.04760f, 707.694763f, 0.929097f}; // Sniffed
+Position const LoralenFollowPos      = {5283.29296f, 1992.43078f, 707.694763f, 0.549238f}; // Sniffed
+Position const LoralenFollowLk1      = {5292.94921f, 2008.25451f, 707.695801f, 1.047967f}; // Sniffed
+Position const LoralenFollowLk2      = {5298.94335f, 2016.37097f, 707.695801f, 0.694538f}; // Sniffed
+Position const LoralenFollowLk3      = {5336.94044f, 2040.21814f, 707.695801f, 0.439284f}; // Sniffed
+Position const LoralenFollowLkFinal  = {5361.96777f, 2065.68310f, 707.693848f, 0.831989f}; // Sniffed
+Position const LoralenDeadPos        = {5369.71289f, 2083.6330f, 707.695129f, 0.188739f}; // Sniffed
+Position const MoveThronePos         = {5306.98535f, 1998.10302f, 709.341187f, 1.277278f}; // Jaina/Sylvanas walks to throne
+Position const UtherSpawnPos         = {5308.310059f, 2003.857178f, 709.341431f, 4.650315f}; // Uther starting position
+Position const LichKingSpawnPos      = {5362.917480f, 2062.307129f, 707.695374f, 3.945812f};
+Position const LichKingMoveMidlelThronePos   = {5333.48437f, 2032.02648f, 707.695679f, 3.973301f}; // Lich King moves and hits Uther [sniff]
+Position const LichKingMoveThronePos   = {5312.79638f, 2010.07141f, 709.3942183f, 3.973301f}; // Lich King walks to throne [sniff]
+Position const LichKingMoveAwayPos   = {5400.069824f, 2102.7131689f, 707.69525f, 0.843803f}; // Lich King walks away [sniff]
+Position const FalricMovePos         = {5284.161133f, 2030.691650f, 709.319336f, 5.489386f};
+Position const MarwynMovePos         = {5335.330078f, 1982.376221f, 709.319580f, 2.339942f};
+Position const LeaderEscapePos       = {5576.80566f, 2235.55004f, 733.012268f, 2.782125f}; //Sniff
+Position const ShipMasterSummonPos   = {5262.773926f, 1669.980103f, 715.000000f, 0.000000f};
+Position const WalkCaveInPos         = {5267.594238f, 1678.750000f, 784.302856f, 1.041739f};
+Position const AllyPortalPos         = {5205.015625f, 1605.680298f, 806.444458f, 0.884375f};
+Position const AllyChestPos          = {5194.341797f, 1611.271484f, 806.408569f, 0.907936f};
+Position const HordePortalPos        = {5222.733887f, 1568.052124f, 819.590881f, 1.198878f};
+Position const HordeChestPos         = {5215.394531f, 1569.726074f, 819.149048f, 1.151754f};
 
-#define PATH_WP_COUNT 19
-const uint8 WP_STOP[6] = {0, 5, 8, 10, 14, 18};
+constexpr uint8 PATH_WP_COUNT = 19;
+uint8 const WP_STOP[6] = {0, 5, 8, 10, 14, 18};
 
-const Position PathWaypoints[PATH_WP_COUNT] =
+Position const PathWaypoints[PATH_WP_COUNT] =
 {
     {5588.055664f, 2229.327393f, 733.011353f, 5.440755f},
     {5605.567383f, 2203.448486f, 731.304626f, 5.059827f},
@@ -376,7 +411,7 @@ const Position PathWaypoints[PATH_WP_COUNT] =
     {5262.773926f, 1669.980103f, 784.301697f, 1.015049f}
 };
 
-const Position CannonFirePos[2][3] =
+Position const CannonFirePos[2][3] =
 {
     {
         {5231.177734f, 1617.087280f, 813.603755f, 0.990318f},
@@ -390,7 +425,7 @@ const Position CannonFirePos[2][3] =
     }
 };
 
-const Position StairsPos[2][3] =
+Position const StairsPos[2][3] =
 {
     {   // Alliance stairs
         {5226.36f, 1640.87f, 785.737f, 5.56137f},

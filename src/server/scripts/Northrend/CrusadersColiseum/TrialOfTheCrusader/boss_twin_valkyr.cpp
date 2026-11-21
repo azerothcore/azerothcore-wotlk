@@ -16,7 +16,6 @@
  */
 
 #include "CreatureScript.h"
-#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
@@ -55,10 +54,11 @@ enum Equipment
 
 enum ValkyrNPCs
 {
-    NPC_DARK_ESSENCE      = 34567,
-    NPC_LIGHT_ESSENCE     = 34568,
-    NPC_CONCENTRATED_DARK = 34628,
-    NPC_CONCENTRATED_LIGHT = 34630,
+    NPC_DARK_ESSENCE         = 34567,
+    NPC_LIGHT_ESSENCE        = 34568,
+    NPC_BULLET_STALKER_DARK  = 34704,
+    NPC_BULLET_STALKER_LIGHT = 34720,
+    NPC_BULLET_CONTROLLER    = 34743,
 };
 
 enum ValkyrSpells
@@ -97,14 +97,28 @@ enum ValkyrSpells
 
     SPELL_CLEAR_VALKYR_ESSENCE  = 67547,
     SPELL_CLEAR_VALKYR_TOUCH    = 68084,
+
+    SPELL_BULLET_CONTROLLER_PERIODIC     = 66149,
+    SPELL_BULLET_CONTROLLER_SUMMON_LIGHT = 66152,
+    SPELL_BULLET_CONTROLLER_SUMMON_DARK  = 66153,
+    SPELL_BULLET_SUMMON_TRIGGER          = 66077,
+    SPELL_LIGHT_BALL_PASSIVE             = 65794,
+    SPELL_DARK_BALL_PASSIVE              = 65796,
+    SPELL_LIGHT_BALL_PASSIVE_TRIGGER     = 66312,
+    SPELL_DARK_BALL_PASSIVE_TRIGGER      = 66314,
+};
+
+enum ValkyrBullets
+{
+    // The periodic controller summons an orb only while fewer than this many of its colour are alive
+    BULLET_CONTROLLER_ORB_CAP = 16,
+    POINT_BULLET_STALKER      = 1,
 };
 
 enum ValkyrEvents
 {
     EVENT_BERSERK = 1,
-    EVENT_SUMMON_BALLS_1,
-    EVENT_SUMMON_BALLS_2,
-    EVENT_SUMMON_BALLS_3,
+    EVENT_BULLET_BURST,
     EVENT_SPELL_SPIKE,
     EVENT_SPELL_TOUCH,
     EVENT_SPECIAL,
@@ -120,6 +134,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         me->SetStatPctModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
         me->UpdateDamagePhysical(OFF_ATTACK);
         SpecialMask = 0;
+        _firstBulletBurst = true;
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HASTE_SPELLS, true);
 
         events.Reset();
@@ -130,7 +145,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
             // special events here
             events.RescheduleEvent(EVENT_BERSERK, IsHeroic() ? 6min : 8min);
-            events.RescheduleEvent(EVENT_SUMMON_BALLS_1, 10s, 15s);
+            events.RescheduleEvent(EVENT_BULLET_BURST, 24s);
             events.RescheduleEvent(EVENT_SPECIAL, 45s);
         }
         events.RescheduleEvent(EVENT_SPELL_SPIKE, 5s, 8s);
@@ -145,6 +160,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
     SummonList summons;
     EventMap events;
     uint8 SpecialMask;
+    bool _firstBulletBurst;
 
     void DoAction(int32 a) override
     {
@@ -154,6 +170,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 summons.DespawnAll();
                 if (me->GetEntry() == NPC_LIGHTBANE)
                 {
+                    if (Creature* controller = me->FindNearestCreature(NPC_BULLET_CONTROLLER, 200.0f))
+                        controller->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_BULLET_CONTROLLER_PERIODIC, controller));
                     DoCastAOE(SPELL_CLEAR_VALKYR_ESSENCE, true);
                     DoCastAOE(SPELL_CLEAR_VALKYR_TOUCH, true);
                 }
@@ -210,8 +228,14 @@ struct boss_twin_valkyrAI : public ScriptedAI
         Talk(SAY_AGGRO);
         me->CastSpell(me, me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_SURGE : SPELL_DARK_SURGE, true);
 
-        if (pInstance && me->GetEntry() == NPC_LIGHTBANE )
-            pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
+        if (me->GetEntry() == NPC_LIGHTBANE)
+        {
+            if (pInstance)
+                pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
+
+            if (Creature* controller = me->FindNearestCreature(NPC_BULLET_CONTROLLER, 200.0f))
+                controller->CastSpell(controller, SPELL_BULLET_CONTROLLER_PERIODIC, true);
+        }
     }
 
     void JustReachedHome() override
@@ -275,34 +299,17 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 }
 
                 break;
-            case EVENT_SUMMON_BALLS_1:
-            case EVENT_SUMMON_BALLS_2:
-            case EVENT_SUMMON_BALLS_3:
+            case EVENT_BULLET_BURST:
                 {
-                    uint8 count = 0;
-                    if (IsHeroic())
-                        count = eventId == EVENT_SUMMON_BALLS_3 ? 36 : 6;
-                    else
-                        count = eventId == EVENT_SUMMON_BALLS_3 ? 24 : 4;
-                    for( uint8 i = 0; i < count; ++i )
-                    {
-                        float angle = rand_norm() * 2 * M_PI;
-                        if (Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500))
-                            boss_twin_valkyrAI::JustSummoned(ball);
-                    }
-
-                    switch (eventId)
-                    {
-                        case EVENT_SUMMON_BALLS_1:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_2, 8s);
-                            break;
-                        case EVENT_SUMMON_BALLS_2:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_3, 8s);
-                            break;
-                        case EVENT_SUMMON_BALLS_3:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_1, 15s);
-                            break;
-                    }
+                    // Base points carry how many stalkers of each colour summon an orb.
+                    // Only the first burst has Dark orbs, and none in 25-player.
+                    int32 lightCount = Is25ManRaid() ? (_firstBulletBurst ? 15 : urand(11, 13)) : 10;
+                    int32 darkCount = (_firstBulletBurst && !Is25ManRaid()) ? 10 : 0;
+                    me->CastSpell(me, SPELL_BULLET_SUMMON_TRIGGER, CastSpellExtraArgs(TRIGGERED_FULL_MASK)
+                        .AddSpellMod(SPELLVALUE_BASE_POINT0, lightCount)
+                        .AddSpellMod(SPELLVALUE_BASE_POINT1, darkCount));
+                    _firstBulletBurst = false;
+                    events.Repeat(45s, 100s);
                 }
                 break;
             case EVENT_SPELL_SPIKE:
@@ -535,7 +542,12 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature*  /*s*/) override {}
+        // Orbs are summoned by the Bullet Stalkers and handed over by the instance's summon data
+        void JustSummoned(Creature* summon) override
+        {
+            if (summon->GetEntry() == NPC_CONCENTRATED_LIGHT || summon->GetEntry() == NPC_CONCENTRATED_DARK)
+                boss_twin_valkyrAI::JustSummoned(summon);
+        }
     };
 };
 
@@ -648,59 +660,56 @@ public:
     }
 };
 
-class npc_concentrated_ball : public CreatureScript
+// 34628 - Concentrated Darkness, 34630 - Concentrated Light
+struct npc_concentrated_ball : public ScriptedAI
 {
-public:
-    npc_concentrated_ball() : CreatureScript("npc_concentrated_ball") { }
+    npc_concentrated_ball(Creature* creature) : ScriptedAI(creature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void Reset() override
     {
-        return GetTrialOfTheCrusaderAI<npc_concentrated_ballAI>(pCreature);
+        scheduler.CancelAll();
+        me->SetReactState(REACT_PASSIVE);
+        DoCastSelf(me->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_LIGHT_BALL_PASSIVE : SPELL_DARK_BALL_PASSIVE, true);
+        scheduler.Schedule(2900ms, 3600ms, [this](TaskContext /*context*/)
+        {
+            MoveToRandomStalker();
+        });
     }
 
-    struct npc_concentrated_ballAI : public NullCreatureAI
+    // Orbs roam from one Bullet Stalker of either colour to another until a player touches them
+    void MoveToRandomStalker()
     {
-        npc_concentrated_ballAI(Creature* pCreature) : NullCreatureAI(pCreature)
+        std::list<Creature*> stalkers;
+        me->GetCreatureListWithEntryInGrid(stalkers, { NPC_BULLET_STALKER_DARK, NPC_BULLET_STALKER_LIGHT }, 200.0f);
+        if (stalkers.empty())
+            return;
+
+        Creature* stalker = Acore::Containers::SelectRandomContainerElement(stalkers);
+        me->GetMotionMaster()->MovePoint(POINT_BULLET_STALKER, stalker->GetPosition());
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE || id != POINT_BULLET_STALKER)
+            return;
+
+        scheduler.Schedule(0ms, 1300ms, [this](TaskContext /*context*/)
         {
-            me->SetReactState(REACT_PASSIVE);
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->CastSpell(me, 100101, true); // custom periodic dummy spell
-            despawning = false;
-        }
+            MoveToRandomStalker();
+        });
+    }
 
-        bool despawning;
+    // Unleashed Light/Dark kills the orb through Quiet Suicide; the corpse lingers briefly
+    void JustDied(Unit* /*killer*/) override
+    {
+        scheduler.CancelAll();
+        me->DespawnOrUnsummon(randtime(1s, 2600ms));
+    }
 
-        void DoAction(int32 param) override
-        {
-            if (param == 1)
-                despawning = true;
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type != POINT_MOTION_TYPE || id != 0)
-                return;
-
-            if (urand(0, 2))
-                me->DespawnOrUnsummon(0ms);
-        }
-
-        void MoveToNextPoint()
-        {
-            float angle = rand_norm() * 2 * M_PI;
-            me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, me->GetPositionZ());
-        }
-
-        void UpdateAI(uint32  /*diff*/) override
-        {
-            if (despawning)
-                return;
-
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE )
-                MoveToNextPoint();
-        }
-    };
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
 };
 
 class spell_valkyr_essence_aura : public AuraScript
@@ -829,34 +838,87 @@ class spell_valkyr_touch_aura : public AuraScript
     }
 };
 
-class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
+// 66312 - Light Ball Passive
+// 66314 - Dark Ball Passive
+class spell_valkyr_ball_passive : public SpellScript
 {
-    PrepareAuraScript(spell_valkyr_ball_periodic_dummy_aura);
+    PrepareSpellScript(spell_valkyr_ball_passive);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_UNLEASHED_LIGHT, SPELL_UNLEASHED_DARK });
     }
 
-    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        if (Unit* target = GetTarget())
-            if (target->GetDisplayId() != MODEL_INVISIBLE_STALKER)
-                if (Creature* creature = target->ToCreature())
-                    if (Player* player = creature->SelectNearestPlayer(2.75f))
-                        if (creature->GetExactDist2d(player) <= 2.75f)
-                        {
-                            creature->AI()->DoAction(1); // despawning = true;
-                            creature->GetMotionMaster()->MoveIdle();
-                            creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
-                            creature->SetDisplayId(MODEL_INVISIBLE_STALKER);
-                            creature->DespawnOrUnsummon(1500ms);
-                        }
+        // The first player hit already made the orb explode and die
+        Unit* caster = GetCaster();
+        if (!caster->IsAlive())
+            return;
+
+        caster->CastSpell(caster, GetSpellInfo()->Id == SPELL_LIGHT_BALL_PASSIVE_TRIGGER ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, true);
     }
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_ball_periodic_dummy_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectHitTarget += SpellEffectFn(spell_valkyr_ball_passive::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 66149, 68396 - Bullet Controller Periodic
+class spell_valkyr_bullet_controller : public AuraScript
+{
+    PrepareAuraScript(spell_valkyr_bullet_controller);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BULLET_CONTROLLER_SUMMON_LIGHT, SPELL_BULLET_CONTROLLER_SUMMON_DARK });
+    }
+
+    void SummonBelowCap(uint32 summonSpellId, uint32 orbEntry)
+    {
+        Unit* controller = GetTarget();
+        std::list<Creature*> orbs;
+        controller->GetCreatureListWithEntryInGrid(orbs, orbEntry, 200.0f);
+        if (std::count_if(orbs.begin(), orbs.end(), [](Creature const* orb) { return orb->IsAlive(); }) >= BULLET_CONTROLLER_ORB_CAP)
+            return;
+
+        controller->CastSpell(controller, summonSpellId, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddSpellMod(SPELLVALUE_MAX_TARGETS, 1));
+    }
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        SummonBelowCap(SPELL_BULLET_CONTROLLER_SUMMON_LIGHT, NPC_CONCENTRATED_LIGHT);
+        SummonBelowCap(SPELL_BULLET_CONTROLLER_SUMMON_DARK, NPC_CONCENTRATED_DARK);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_bullet_controller::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+// 66077, 67152, 67153, 67154 - Bullet Summon Trigger
+class spell_valkyr_bullet_summon_trigger : public SpellScript
+{
+    PrepareSpellScript(spell_valkyr_bullet_summon_trigger);
+
+    // The caster sets each effect's base points to the number of stalkers that summon an orb
+    void HandleForceCast(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        int32 stalkerCount = GetEffectValue();
+        if (stalkerCount <= 0)
+            return;
+
+        Unit* target = GetHitUnit();
+        target->CastSpell(target, GetSpellInfo()->Effects[effIndex].TriggerSpell, CastSpellExtraArgs(TRIGGERED_FULL_MASK).AddSpellMod(SPELLVALUE_MAX_TARGETS, stalkerCount));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_valkyr_bullet_summon_trigger::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
+        OnEffectHitTarget += SpellEffectFn(spell_valkyr_bullet_summon_trigger::HandleForceCast, EFFECT_1, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
@@ -885,9 +947,11 @@ void AddSC_boss_twin_valkyr()
     new boss_fjola();
     new boss_eydis();
     new npc_essence_of_twin();
-    new npc_concentrated_ball();
+    RegisterTrialOfTheCrusaderCreatureAI(npc_concentrated_ball);
     RegisterSpellScript(spell_valkyr_essence_aura);
     RegisterSpellScript(spell_valkyr_touch_aura);
-    RegisterSpellScript(spell_valkyr_ball_periodic_dummy_aura);
+    RegisterSpellScript(spell_valkyr_ball_passive);
+    RegisterSpellScript(spell_valkyr_bullet_controller);
+    RegisterSpellScript(spell_valkyr_bullet_summon_trigger);
     RegisterSpellScript(spell_valkyr_clear_auras);
 }

@@ -116,14 +116,12 @@ struct boss_supremus : public BossAI
         else
         {
             DoCastSelf(SPELL_SNARE_SELF, true);
+            Talk(EMOTE_GROUND_CRACK);
 
             scheduler.Schedule(5s, [this](TaskContext context)
             {
                 context.SetGroup(GROUP_ABILITIES);
-
-                if (DoCastRandomTarget(SPELL_VOLCANIC_ERUPTION, 0, 100.f, true) == SPELL_CAST_OK)
-                    Talk(EMOTE_GROUND_CRACK);
-
+                DoCastRandomTarget(SPELL_VOLCANIC_ERUPTION, 0, 100.f, true);
                 context.Repeat(10s, 18s);
             }).Schedule(0s, [this](TaskContext context)
             {
