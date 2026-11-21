@@ -151,9 +151,9 @@ struct boss_twin_valkyrAI : public ScriptedAI
             events.RescheduleEvent(EVENT_BULLET_BURST, 24s);
             events.RescheduleEvent(EVENT_SPECIAL, 45s);
         }
-        events.RescheduleEvent(EVENT_SPELL_SPIKE, 5s, 8s);
+        events.RescheduleEvent(EVENT_SPELL_SPIKE, 11s, 16s);
         if (IsHeroic())
-            events.RescheduleEvent(EVENT_SPELL_TOUCH, 10s, 25s, 1);
+            events.RescheduleEvent(EVENT_SPELL_TOUCH, 16s, 1);
 
         me->SetCanFly(true);
         me->SetDisableGravity(true);
@@ -317,7 +317,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 break;
             case EVENT_SPELL_SPIKE:
                 me->CastSpell(me->GetVictim(), me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TWIN_SPIKE : SPELL_DARK_TWIN_SPIKE, false);
-                events.Repeat(7s, 10s);
+                events.Repeat(21s);
                 break;
             case EVENT_SPELL_TOUCH:
                 {
@@ -380,7 +380,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             if (Player* target = ObjectAccessor::GetPlayer(*me, tList[urand(0, tList.size() - 1)]))
                             {
                                 me->CastSpell(target, me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
-                                events.Repeat(45s, 50s);
+                                events.Repeat(45s);
                                 break;
                             }
                     }
