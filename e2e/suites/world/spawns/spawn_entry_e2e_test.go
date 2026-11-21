@@ -413,6 +413,28 @@ func TestSpawnEntry_CreatureRollsItsEntry(t *testing.T) {
 	t.Logf("PASS creature spawn %d rolled %v over %d respawns", p.spawnID, seen, respawns)
 }
 
+// describeUnits lists the living creatures of the entries the bot sees, each with the
+// member point nearest to it, for a failure message.
+func describeUnits(bot *e2eharness.ScenarioBot, members []spawnPoint, entries []uint32) string {
+	px, py, _, _, _ := bot.World.Position()
+	out := fmt.Sprintf("bot at (%.1f, %.1f)", px, py)
+	for _, u := range bot.UnitsByEntry(100, entries...) {
+		obj := bot.World.GetObject(u.GUID)
+		if obj == nil {
+			continue
+		}
+		nearest, best := uint32(0), float32(math.MaxFloat32)
+		for _, m := range members {
+			if d := dist2D(obj.PosX, obj.PosY, m.x, m.y); d < best {
+				nearest, best = m.spawnID, d
+			}
+		}
+		out += fmt.Sprintf("; %#x entry %d hp %d/%d at (%.1f, %.1f), %.1f from point %d",
+			u.GUID, u.Entry, u.Health, u.MaxHealth, obj.PosX, obj.PosY, best, nearest)
+	}
+	return out
+}
+
 type groupLimit struct {
 	entry    uint32
 	minCount int
@@ -593,7 +615,8 @@ func TestSpawnGroup_EntryMinimumsHoldAcrossRespawns(t *testing.T) {
 		}
 		back, ok := pack[victimSpawn]
 		if !ok {
-			e2eharness.Assertf(t, "respawn %d: member %d did not come back on its point", i+1, victimSpawn)
+			e2eharness.Assertf(t, "respawn %d: member %d did not come back on its point; in sight: %s",
+				i+1, victimSpawn, describeUnits(bot, members, entries))
 		}
 		counts = checkGroupLimits(t, fmt.Sprintf("respawn %d of member %d", i+1, victimSpawn), pack, limits, always, len(members))
 		if forced {
