@@ -370,12 +370,7 @@ class spell_mistress_kiss_area : public SpellScript
     {
         targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
         targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
-        if (targets.empty())
-            return;
-
-        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-        targets.clear();
-        targets.push_back(target);
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 5 : 2);
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
