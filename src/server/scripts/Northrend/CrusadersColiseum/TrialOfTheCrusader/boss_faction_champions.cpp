@@ -2467,11 +2467,21 @@ class spell_faction_champion_death_grip : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        if (Unit* target = GetHitUnit())
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+        if (!caster || !target)
+            return;
+
+        // A reflected grip hits its own caster: pull the caster to the reflecting target instead
+        if (target == caster)
         {
-            if (Unit* caster = GetCaster())
-                target->CastSpell(caster, SPELL_DEATH_GRIP_PULL, true);
+            if (Unit* reflector = GetExplTargetUnit())
+                caster->CastSpell(reflector, SPELL_DEATH_GRIP_PULL, true);
+
+            return;
         }
+
+        target->CastSpell(caster, SPELL_DEATH_GRIP_PULL, true);
     }
 
     void Register() override
