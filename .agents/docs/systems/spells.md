@@ -35,8 +35,9 @@ change to it:
   removing the summons (e.g. on wipe). `BossAI` does so by default (`JustSummoned` adds every summon to `summons`,
   which `_Reset`/`_JustDied` despawn): keep those retail lets expire after a kill out of
   `BossAI::JustSummoned`/`summons`.
-- A creature's `SummonGameObject` with the default `GO_SUMMON_TIMED_OR_CORPSE_DESPAWN` ties the gameobject to the
-  creature, which deletes it on despawn or leaving the world. Summon loot chests and other gameobjects that must
+- A creature's `SummonGameObject` with the default `GO_SUMMON_TIMED_OR_CORPSE_DESPAWN` and a slot-summon spell
+  (`SPELL_EFFECT_SUMMON_OBJECT_SLOT*`) tie the gameobject to the caster, which deletes it on despawn or leaving the
+  world; a wild summon (`SPELL_EFFECT_SUMMON_OBJECT_WILD`) doesn't. Summon loot chests and other gameobjects that must
   outlive the boss through the map (`me->GetMap()->SummonGameObject(...)`, preferred) or at least with
-  `GO_SUMMON_TIMED_DESPAWN`. The map call spawns in `PHASEMASK_NORMAL`: in a phased encounter, set the phase on the
-  returned object.
+  `GO_SUMMON_TIMED_DESPAWN`, even when a slot-summon spell encodes them. The map call spawns in `PHASEMASK_NORMAL`: in
+  a phased encounter, set the phase on the returned object.

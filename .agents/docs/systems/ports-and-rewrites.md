@@ -27,6 +27,7 @@ Porting C++, SQL or SAI from TrinityCore, cMaNGOS or tbc-db, and rewriting an ex
   - texts and yells
   - actions at waypoint and path ends (e.g. GO activation)
   - the respawn/reload path of an encounter already `DONE`
-- An entry moved to a C++ script providing an AI (`GetAI`) never uses its AIName (`FactorySelector::SelectAI`
-  picks the script AI first, pets excepted): clear AIName and delete its `smart_scripts` rows and their conditions.
-  A ScriptName without `GetAI` (e.g. gossip-only) still falls back to AIName; keep that SmartAI.
+- An entry moved to a C++ script whose `GetAI` returns an AI wherever the entry spawns never uses its AIName
+  (`FactorySelector::SelectAI` picks the script AI first, pets excepted): clear AIName and delete its `smart_scripts`
+  rows and their conditions. A null `GetAI` falls back to AIName, so keep the SmartAI where that happens: a ScriptName
+  without `GetAI` (e.g. gossip-only), or a `GetInstanceAI` script whose entry also spawns outside that instance.
