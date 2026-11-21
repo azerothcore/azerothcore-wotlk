@@ -31,5 +31,6 @@ Run the linter before claiming a change is done: `python apps/codestyle/codestyl
   `systems/instance-scripts.md`
 - `creature_template`, `creature_template_model`, `creature_immunities` → `systems/templates.md`
 - `spell_script_names` → `systems/spells.md`
+- `waypoint_data` → `systems/waypoints.md`
 - Porting rows from TrinityCore/cMaNGOS/tbc-db, or deleting `smart_scripts`/clearing `AIName` for a C++ script →
   `systems/ports-and-rewrites.md`
