@@ -1,3 +1,4 @@
+-- DB update 2026_11_21_02 -> 2026_11_21_03
 -- Dark Essence and Light Essence are clicked through spellclick, not gossip
 UPDATE `creature_template` SET `npcflag` = 16777216, `ScriptName` = '', `VerifiedBuild` = 50664 WHERE `entry` IN (34567, 34568);
 
