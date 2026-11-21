@@ -230,6 +230,8 @@ enum NPCs
 
     NPC_LIGHTBANE                                   = 34497,
     NPC_DARKBANE                                    = 34496,
+    NPC_CONCENTRATED_DARK                           = 34628,
+    NPC_CONCENTRATED_LIGHT                          = 34630,
 
     NPC_ANUBARAK                                    = 34564,
     NPC_SCARAB                                      = 34605,
