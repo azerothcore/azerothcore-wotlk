@@ -1123,13 +1123,13 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         }
     }
 
-    sScriptMgr->OnPlayerLogin(pCurrChar);
-
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
     {
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
         sScriptMgr->OnPlayerFirstLogin(pCurrChar);
     }
+
+    sScriptMgr->OnPlayerLogin(pCurrChar);
 
     METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 }
