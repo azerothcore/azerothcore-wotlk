@@ -2577,6 +2577,30 @@ void SpellMgr::LoadEnchantCustomAttr()
     LOG_INFO("server.loading", " ");
 }
 
+// Collect the spells granted by a use-spell item enchantment, so a stored spell cooldown can be recognised as
+// belonging to one item entry even though no item instance exists while loading
+void SpellMgr::LoadUseSpellEnchantmentSpells()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _useSpellEnchantmentSpells.clear();                            // need for reload case
+
+    uint32 size = sSpellItemEnchantmentStore.GetNumRows();
+    for (uint32 i = 0; i < size; ++i)
+    {
+        SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(i);
+        if (!enchant)
+            continue;
+
+        for (uint8 effect = 0; effect < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++effect)
+            if (enchant->type[effect] == ITEM_ENCHANTMENT_TYPE_USE_SPELL && enchant->spellid[effect])
+                _useSpellEnchantmentSpells.insert(enchant->spellid[effect]);
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} use-spell enchantment spells in {} ms", _useSpellEnchantmentSpells.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
 void SpellMgr::LoadSpellEnchantProcData()
 {
     uint32 oldMSTime = getMSTime();

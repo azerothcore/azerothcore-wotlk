@@ -775,6 +775,9 @@ public:
     [[nodiscard]] bool HasSpellCooldownOverride(uint32 spellId) const;
     [[nodiscard]] SpellCooldownOverride GetSpellCooldownOverride(uint32 spellId) const;
 
+    // spells granted by a use-spell item enchantment own their cooldown per item entry
+    [[nodiscard]] bool IsUseSpellEnchantmentSpell(uint32 spellId) const { return _useSpellEnchantmentSpells.count(spellId) != 0; }
+
 private:
     SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
 
@@ -797,6 +800,7 @@ public:
     void LoadSkillLineAbilityMap();
     void LoadSpellPetAuras();
     void LoadEnchantCustomAttr();
+    void LoadUseSpellEnchantmentSpells();
     void LoadSpellEnchantProcData();
     void LoadSpellLinked();
     void LoadPetLevelupSpellMap();
@@ -835,6 +839,7 @@ private:
     SpellLinkedMap             mSpellLinkedMap;
     SpellEnchantProcEventMap   mSpellEnchantProcEventMap;
     EnchantCustomAttribute     mEnchantCustomAttr;
+    std::unordered_set<uint32> _useSpellEnchantmentSpells;
     SpellAreaMap               mSpellAreaMap;
     SpellAreaForQuestMap       mSpellAreaForQuestMap;
     SpellAreaForQuestMap       mSpellAreaForQuestEndMap;
