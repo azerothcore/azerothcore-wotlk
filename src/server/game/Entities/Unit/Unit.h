@@ -1239,10 +1239,11 @@ public:
     /*********************************************************/
     /***       METHODS RELATED TO DAMAGE CACULATIONS       ***/
     /*********************************************************/
+    // Keep periodic transfer origin for combat and threat checks.
     static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr,
         DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL,
         SpellInfo const* spellProto = nullptr, bool durabilityLoss = true, bool allowGM = false,
-        Spell const* spell = nullptr, bool skipCombat = false);
+        Spell const* spell = nullptr, bool skipCombat = false, bool isPeriodicTransfer = false);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
     void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss, Spell const* spell = nullptr);
     void DealDamageShieldDamage(Unit* victim);
