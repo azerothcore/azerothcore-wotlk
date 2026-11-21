@@ -31,10 +31,10 @@ const (
 // One of the Light Bullet Stalkers on the north edge of the arena.
 var lightStalkerPos = [3]float32{563.5851, 79.60764, 395.2964}
 
-// Unleashed Light and Unleashed Dark on every difficulty.
-var unleashedSpells = map[uint32]bool{
-	65795: true, 67238: true, 67239: true, 67240: true,
-	65808: true, 67172: true, 67173: true, 67174: true,
+// Unleashed Light and Unleashed Dark on every difficulty, mapped to the orb that casts each.
+var unleashedOrb = map[uint32]uint32{
+	65795: npcConcentratedLight, 67238: npcConcentratedLight, 67239: npcConcentratedLight, 67240: npcConcentratedLight,
+	65808: npcConcentratedDark, 67172: npcConcentratedDark, 67173: npcConcentratedDark, 67174: npcConcentratedDark,
 }
 
 // spellGoHits reads the caster guid, spell id and hit guids from a 3.3.5 SMSG_SPELL_GO: cast-item and
@@ -154,7 +154,7 @@ func TestToC_TwinValkyrOrbsExplodeOnPlayers(t *testing.T) {
 			return
 		}
 		entry := guidEntry(caster)
-		if !unleashedSpells[spell] || (entry != npcConcentratedLight && entry != npcConcentratedDark) {
+		if unleashedOrb[spell] == 0 || (entry != npcConcentratedLight && entry != npcConcentratedDark) {
 			return
 		}
 		if _, seen := explosions[entry]; !seen {
@@ -198,6 +198,9 @@ func TestToC_TwinValkyrOrbsExplodeOnPlayers(t *testing.T) {
 		}
 		if !seen {
 			e2eharness.Assertf(t, "%s summoned by the stalker (%d) cast no Unleashed on the bot standing on it within %s", c.name, c.summon, explodeWindow)
+		}
+		if unleashedOrb[got.spell] != c.orb {
+			e2eharness.Assertf(t, "%s cast the other colour's Unleashed (%d)", c.name, got.spell)
 		}
 
 		hitBot := false
