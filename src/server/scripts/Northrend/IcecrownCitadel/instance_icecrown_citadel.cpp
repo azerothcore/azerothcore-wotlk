@@ -990,36 +990,10 @@ public:
 
         void OnGameObjectRemove(GameObject* go) override
         {
-            RemoveObject(go);
+            InstanceScript::OnGameObjectRemove(go);
 
             switch (go->GetEntry())
             {
-                case GO_DOODAD_ICECROWN_ICEWALL02:
-                case GO_ICEWALL:
-                case GO_LORD_MARROWGAR_S_ENTRANCE:
-                case GO_ORATORY_OF_THE_DAMNED_ENTRANCE:
-                case GO_SAURFANG_S_DOOR:
-                case GO_ORANGE_PLAGUE_MONSTER_ENTRANCE:
-                case GO_GREEN_PLAGUE_MONSTER_ENTRANCE:
-                case GO_SCIENTIST_ENTRANCE:
-                case GO_CRIMSON_HALL_DOOR:
-                case GO_BLOOD_ELF_COUNCIL_DOOR:
-                case GO_BLOOD_ELF_COUNCIL_DOOR_RIGHT:
-                case GO_DOODAD_ICECROWN_BLOODPRINCE_DOOR_01:
-                case GO_DOODAD_ICECROWN_GRATE_01:
-                case GO_GREEN_DRAGON_BOSS_ENTRANCE:
-                case GO_GREEN_DRAGON_BOSS_EXIT:
-                case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_01:
-                case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_02:
-                case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_03:
-                case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_04:
-                case GO_SINDRAGOSA_ENTRANCE_DOOR:
-                case GO_SINDRAGOSA_SHORTCUT_ENTRANCE_DOOR:
-                case GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR:
-                case GO_ICE_WALL:
-                case GO_SCOURGE_TRANSPORTER_FIRST:
-                    RemoveDoor(go);
-                    break;
                 case GO_THE_SKYBREAKER_A:
                 case GO_ORGRIMS_HAMMER_H:
                     _gunshipGUID.Clear();

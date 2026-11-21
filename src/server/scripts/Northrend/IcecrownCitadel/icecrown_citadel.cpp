@@ -816,7 +816,7 @@ public:
                     svalna->AI()->DoAction(ACTION_START_GAUNTLET);
 
                 for (uint32 i = 0; i < 4; ++i)
-                    if (Creature* crusader = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
+                    if (Creature* crusader = _instance->GetCreature(DATA_CAPTAIN_ARNATH + i))
                         crusader->AI()->DoAction(ACTION_START_GAUNTLET);
 
                 Talk(SAY_CROK_INTRO_1);
@@ -1104,7 +1104,7 @@ public:
 
             Milliseconds delay = 6s;
             for (uint32 i = 0; i < 4; ++i)
-                if (Creature* crusader = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
+                if (Creature* crusader = instance->GetCreature(DATA_CAPTAIN_ARNATH + i))
                     if (crusader->IsAlive())
                     {
                         if (crusader->GetEntry() == crusader->GetCreatureData()->id)
