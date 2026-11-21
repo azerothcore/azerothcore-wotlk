@@ -225,7 +225,7 @@ public:
         {
             shortver = false;
             events.Reset();
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+            me->ClearEmoteState();
             if (instance && !instance->GetPersistentData(PERSISTENT_DATA_INTRO))
             {
                 events.ScheduleEvent(EVENT_PRE_INTRO_1, 10s);
@@ -281,7 +281,7 @@ public:
                 break;
             case EVENT_START_INTRO:
                 shortver = false;
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                me->ClearEmoteState();
                 me->GetMotionMaster()->MovePoint(0, MoveThronePos);
                 if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                 {
@@ -303,7 +303,7 @@ public:
 
             case EVENT_SKIP_INTRO:
                 shortver = true;
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, (me->GetEntry() == NPC_JAINA_PART1 ? EMOTE_STATE_READY2H : EMOTE_STATE_READY1H));
+                me->SetEmoteState(me->GetEntry() == NPC_JAINA_PART1 ? EMOTE_STATE_READY2H : EMOTE_STATE_READY1H);
                 me->GetMotionMaster()->MovePoint(0, MoveThronePos);
                 if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                     loralen->GetMotionMaster()->MovePoint(0, LoralenFollowPos);
@@ -328,7 +328,7 @@ public:
             case EVENT_INTRO_A2_4:
                 if (Creature* uther = instance->GetCreature(DATA_UTHER))
                 {
-                    uther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                    uther->ClearEmoteState();
                     uther->SetVisible(true);
                     if (Aura* a = uther->AddAura(SPELL_SHADOWMOURNE_VISUAL, uther))
                         a->SetDuration(8000);
@@ -573,7 +573,7 @@ public:
                 if (!shortver)
                     if (Creature* uther = instance->GetCreature(DATA_UTHER))
                     {
-                        uther->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+                        uther->SetEmoteState(EMOTE_STATE_COWER);
                         uther->SetFacingTo(0.89f);
                     }
                 break;
@@ -679,13 +679,13 @@ public:
                 break;
 
             case EVENT_INTRO_LK_5_3:
-                me->SetSpeed(MOVE_RUN, 1.6);
+                me->SetSpeed(MOVE_RUN, 1.6f);
                 me->SetSheath(SHEATH_STATE_MELEE);
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                me->SetEmoteState(EMOTE_ONESHOT_READY1H);
                 if (Creature* loralen = instance->GetCreature(DATA_DARK_RANGER_LORALEN))
                 {
                     loralen->SetSheath(SHEATH_STATE_MELEE);
-                    loralen->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                    loralen->SetEmoteState(EMOTE_ONESHOT_READY1H);
                     loralen->SetWalk(false);
                     loralen->LoadEquipment(true);
                 }
@@ -1857,15 +1857,15 @@ public:
                         lichKing->SetFacingToObject(me);
                     if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                     {
-                        lichKing->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK2HTIGHT);
+                        lichKing->SetEmoteState(EMOTE_ONESHOT_ATTACK2HTIGHT);
                         me->SetFacingToObject(lichKing);
                     }
                     break;
                 case EVENT_JAINA_IMMOBILIZE_LK:
                     if (Creature* lichKing = instance->GetCreature(DATA_LICH_KING))
                     {
-                        lichKing->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_SPELL_OMNI);
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                        lichKing->SetEmoteState(EMOTE_STATE_READY_SPELL_OMNI);
+                        me->ClearEmoteState();
                         me->CastSpell(lichKing, SPELL_JAINA_ICE_PRISON);
                         events.ScheduleEvent(EVENT_SAY_LEAVE, 5s);
                     }
@@ -1875,9 +1875,9 @@ public:
                     {
                         me->AttackStop();
                         me->SetSheath(SHEATH_STATE_MELEE);
-                        lichKing->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_SPELL_OMNI);
+                        lichKing->SetEmoteState(EMOTE_STATE_READY_SPELL_OMNI);
                         lichKing->CastSpell(me, SPELL_BLIDING_RETREAT);
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                        me->ClearEmoteState();
                         me->KnockbackFrom(lichKing->GetPositionX(), lichKing->GetPositionY(), 34.3f, 4.0f);
                         events.ScheduleEvent(EVENT_SYLVANAS_DARK_BINDING, 2s +500ms);
                     }
@@ -1947,7 +1947,7 @@ public:
                         else
                         {
                             me->SetFacingTo(PathWaypoints[PATH_WP_COUNT - 1].GetOrientation());
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                            me->SetEmoteState(EMOTE_ONESHOT_READY1H);
                         }
                     }
                     break;

@@ -194,7 +194,6 @@ ObjectData const gameObjectData[] =
     { GO_CAVE_IN,            DATA_CAVE_IN            },
     { GO_DOOR_BEFORE_THRONE, DATA_DOOR_BEFORE_THRONE },
     { GO_DOOR_AFTER_THRONE,  DATA_DOOR_AFTER_THRONE  },
-    { GO_ICE_WALL,           DATA_ICE_WALL           },
     { 0,                     0                       }
 };
 
@@ -377,6 +376,9 @@ public:
                 break;
             case GO_ARTHAS_DOOR:
                 HandleGameObject(ObjectGuid::Empty, GetBossState(DATA_MARWYN) == DONE, go);
+                break;
+            case GO_ICE_WALL:
+                _iceWallGuid = go->GetGUID();
                 break;
             default:
                 break;
@@ -579,7 +581,7 @@ public:
                 _outroStep = OUTRO_NONE;
                 [[fallthrough]];
             case DATA_DELETE_ICE_WALL:
-                HandleGameObject(DATA_ICE_WALL, true);
+                HandleGameObject(_iceWallGuid, true);
                 break;
             case DATA_BATTERED_HILT:
             {
@@ -1183,8 +1185,9 @@ private:
     ObjectGuid _spiritualReflectionGUID[MAX_SPIRITUAL_REFLECTIONS];
     ObjectGuid _iceWallTargetGUID[MAX_ICE_WALL_TARGETS];
     ObjectGuid _trashGUID[NUM_OF_TRASH];
-    // Summoned by Uther's spell, so kept out of ObjectData
+    // Spell summons, so kept out of ObjectData
     ObjectGuid _quelDelarGuid;
+    ObjectGuid _iceWallGuid;
 
     // Runtime state (not persisted)
     uint32 _batteredHiltStatus{};
