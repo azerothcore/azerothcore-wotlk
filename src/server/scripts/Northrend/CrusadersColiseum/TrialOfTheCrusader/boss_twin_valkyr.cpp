@@ -98,6 +98,9 @@ enum ValkyrSpells
     SPELL_CLEAR_VALKYR_ESSENCE  = 67547,
     SPELL_CLEAR_VALKYR_TOUCH    = 68084,
 
+    SPELL_INSTAKILL_DARK_VALKYR  = 68400,
+    SPELL_INSTAKILL_LIGHT_VALKYR = 68401,
+
     SPELL_BULLET_CONTROLLER_PERIODIC     = 66149,
     SPELL_BULLET_CONTROLLER_SUMMON_LIGHT = 66152,
     SPELL_BULLET_CONTROLLER_SUMMON_DARK  = 66153,
@@ -449,22 +452,27 @@ struct boss_twin_valkyrAI : public ScriptedAI
     void JustDied(Unit* /*pKiller*/) override
     {
         DoAction(ACTION_DESPAWN_SUMMONS);
-        Talk(SAY_DEATH);
+        if (me->GetEntry() == NPC_LIGHTBANE)
+            Talk(SAY_DEATH);
+
+        Creature* twin = GetSister();
+        if (twin && twin->IsAlive())
+        {
+            // The instakill is not player damage, so without a player hit she would have no tap and drop no loot
+            if (!twin->hasLootRecipient())
+                if (Player* recipient = me->GetLootRecipient())
+                {
+                    twin->LowerPlayerDamageReq(twin->GetMaxHealth());
+                    twin->SetLootRecipient(recipient);
+                }
+
+            // Her JustDied runs inside this cast and completes the encounter
+            DoCastAOE(me->GetEntry() == NPC_LIGHTBANE ? SPELL_INSTAKILL_DARK_VALKYR : SPELL_INSTAKILL_LIGHT_VALKYR, true);
+            return;
+        }
+
         if (pInstance)
             pInstance->SetBossState(BOSS_TWIN_VALKYR, DONE);
-        if (Creature* twin = GetSister())
-            if (twin->IsAlive())
-            {
-                // she kills herself, so if no player hit her she has no tap and drops no loot
-                if (!twin->hasLootRecipient())
-                    if (Player* recipient = me->GetLootRecipient())
-                    {
-                        twin->LowerPlayerDamageReq(twin->GetMaxHealth());
-                        twin->SetLootRecipient(recipient);
-                    }
-                twin->SetHealth(1);
-                Unit::Kill(twin, twin);
-            }
     }
 
     void JustSummoned(Creature* s) override
