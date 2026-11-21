@@ -94,9 +94,9 @@ Missing credit is a finding:
 - Code, SQL or data someone else wrote and the PR takes in (a reviewer's commit or patch,
   sniff-derived SQL posted in a comment), even adapted: `Co-authored-by` on that commit. Taking up
   only their idea or review suggestion needs no credit.
-- Credit missing once pushed: never rewrite history; add a follow-up commit with one
-  `Co-authored-by: Name <email>` trailer per author, which the squash merge keeps. Only that plain
-  form registers, never a markdown link or @mention.
+- Credit missing once pushed, even an upstream `--author`: never rewrite history; add a follow-up
+  commit with one `Co-authored-by: Name <email>` trailer per author, which the squash merge keeps.
+  Only that plain form registers, never a markdown link or @mention.
 
 ## In-game testing
 

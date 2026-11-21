@@ -49,8 +49,8 @@ every changed line, not as background reading.
 - Check the change is still needed against current `master`: the surrounding code may have moved, or
   another change may have landed the same fix.
 - Check overlap with open PRs too: the same linked issue, functions or files, or persisted state (e.g.
-  fields appended to an instance save string). Each is a finding naming the other PR, the collision (same
-  fix, merge conflict, incompatible save format) and which PR should keep the shared change.
+  fields appended to an instance save string). Only a collision (same fix, merge conflict, incompatible
+  save format) is a finding, naming the other PR, the collision and which PR should keep the shared change.
 
 ## Existing PR discussion
 
