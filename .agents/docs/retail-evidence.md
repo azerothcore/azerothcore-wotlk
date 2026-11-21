@@ -44,5 +44,6 @@ creature at contact distance); hand-picked or in-game-estimated coordinates are 
   sniff or upstream evidence (the same flag in another script is none). A sniff showing the flag absent → get the
   behaviour another way (e.g. a creature that must not start attacks: On Respawn Set ReactState Passive instead of
   `IMMUNE_TO_NPC`). Leave flags unrelated to the fix untouched.
+- Flags common in hacks (`UNIT_FLAG_DISABLE_MOVE`, `UNIT_FLAG_NON_ATTACKABLE`, …) need unambiguous evidence.
 - AC-only fields (`flags_extra`, `AIName`) can't be sniffed and are out of sniff scope. Change `flags_extra` only when
   the fix needs it, and say why.

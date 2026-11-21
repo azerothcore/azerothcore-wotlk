@@ -32,7 +32,9 @@ can't apply.
   from SQL or C++.
 - Flag columns (`flags_extra`, `unit_flags`, `unit_flags2`, `npcflag`, `dynamicflags`, …): set bits with `x` = `x` | N,
   clear with `x` = `x` & ~N, keeping the row's other bits, sniffed values included. Assign an absolute value only when
-  the whole field is the intended data, e.g. a deliberate reset such as `npcflag` = 0.
+  the whole field is the intended data, e.g. a deliberate template reset such as `npcflag` = 0. A `creature` spawn's
+  `npcflag`, `unit_flags` or `dynamicflags` of 0 means the template's value: compute a spawn edit from that effective
+  value; writing 0 there restores inheritance, it never clears.
 - New `creature`/`gameobject` guids: prefer free gaps (Keira3's unused-guid finder, or a gap query over base, merged
   updates and `pending_db_world`) over appending past the max, and confirm each is unused: the idempotency `DELETE` on
   `guid` and `id` leaves a different entry on that guid, so the import fails on a duplicate `PRIMARY` key.
@@ -63,6 +65,6 @@ can't apply.
   `creature_immunities`, `*_loot_template` → `systems/templates.md`
 - `waypoint_data`, `waypoints`, `script_waypoint`, `path_id`/`MovementType`/`wander_distance` columns of
   `creature`/`creature_addon`/`creature_template_addon`/`creature_template`, `creature_template_movement`,
-  `creature_movement_override`, `creature_template.speed_walk`/`speed_run`, or SAI movement and root/fly/hover actions
+  `creature_movement_override`, `creature_template.speed_*`, or SAI movement and root/fly/hover actions
   (53, 60, 69, 103, 113, 204, 207, 232, 233, `RANDOM_MOVE`) → `systems/movement.md`
 - `spell_script_names` → `systems/spells.md`
