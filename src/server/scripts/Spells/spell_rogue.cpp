@@ -17,12 +17,12 @@
 
 #include "AreaDefines.h"
 #include "CellImpl.h"
-#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include <algorithm>
 /*
  * Scripts for spells with SPELLFAMILY_ROGUE and SPELLFAMILY_GENERIC spells used by rogue players.
  * Ordered alphabetically using scriptname.
@@ -553,6 +553,21 @@ class spell_rog_rupture : public AuraScript
 {
     PrepareAuraScript(spell_rog_rupture);
 
+public:
+    void ExtendWithBackstab(int32 duration)
+    {
+        int32 extension = std::min(duration, 6 * IN_MILLISECONDS - _backstabExtension);
+        if (extension <= 0)
+            return;
+
+        _backstabExtension += extension;
+        GetAura()->SetMaxDuration(GetAura()->GetMaxDuration() + extension);
+        GetAura()->SetDuration(GetAura()->GetDuration() + extension);
+    }
+
+private:
+    int32 _backstabExtension = 0;
+
     bool Load() override
     {
         Unit* caster = GetCaster();
@@ -583,9 +598,16 @@ class spell_rog_rupture : public AuraScript
         }
     }
 
+    void ResetBackstabExtension(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        _backstabExtension = 0;
+    }
+
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_rog_rupture::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        AfterEffectApply += AuraEffectApplyFn(spell_rog_rupture::ResetBackstabExtension, EFFECT_0,
+            SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -806,13 +828,8 @@ class spell_rog_glyph_of_backstab : public AuraScript
         {
             Aura* rupture = ruptureEff->GetBase();
             if (!rupture->IsRemoved() && rupture->GetDuration() > 0)
-            {
-                // Check if we can extend (max 5 seconds extension per glyph)
-                if ((rupture->GetApplyTime() + rupture->GetMaxDuration() / 1000 + 5) > (GameTime::GetGameTime().count() + rupture->GetDuration() / 1000))
-                {
-                    rupture->SetDuration(rupture->GetDuration() + aurEff->GetAmount() * IN_MILLISECONDS);
-                }
-            }
+                if (spell_rog_rupture* script = rupture->GetScript<spell_rog_rupture>("spell_rog_rupture"))
+                    script->ExtendWithBackstab(aurEff->GetAmount() * IN_MILLISECONDS);
         }
     }
 
