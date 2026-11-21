@@ -18,8 +18,17 @@
 #include "DBCDatabaseLoader.h"
 #include "DatabaseEnv.h"
 #include "Errors.h"
+#include "Log.h"
 #include "QueryResult.h"
 #include "StringFormat.h"
+#include <cstring>
+#include <limits>
+
+namespace
+{
+    // Anything above this is a negative ID stored in a signed column
+    constexpr uint32 MAX_DBC_INDEX = std::numeric_limits<int32>::max();
+}
 
 DBCDatabaseLoader::DBCDatabaseLoader(char const* tableName, char const* dbcFormatString, std::vector<char*>& stringPool)
     : _sqlTableName(tableName),
@@ -53,8 +62,18 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
         return nullptr;
     }
 
-    // Resize index table
+    // Negative IDs sort last, so this only skips rows when every ID is invalid
     // database query *MUST* contain ORDER BY `index_field` DESC clause
+    while ((*result)[_sqlIndexPos].Get<uint32>() > MAX_DBC_INDEX)
+    {
+        LOG_ERROR("server.loading", "Table `{}` has a row with invalid ID {}, skipped.",
+            _sqlTableName, int32((*result)[_sqlIndexPos].Get<uint32>()));
+
+        if (!result->NextRow())
+            return nullptr;
+    }
+
+    // Resize index table
     uint32 indexTableSize = std::max(records, (*result)[_sqlIndexPos].Get<uint32>() + 1);
     if (indexTableSize > records)
     {
@@ -74,6 +93,13 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     {
         Field* fields = result->Fetch();
         uint32 indexValue = fields[_sqlIndexPos].Get<uint32>();
+        if (indexValue > MAX_DBC_INDEX)
+        {
+            LOG_ERROR("server.loading", "Table `{}` has a row with invalid ID {}, skipped.",
+                _sqlTableName, int32(indexValue));
+            continue;
+        }
+
         char* oldDataValue = indexTable[indexValue];
 
         // If exist in DBC file override from DB
@@ -82,26 +108,55 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 
         uint32 dataOffset = 0;
         uint32 sqlColumnNumber = 0;
+        uint32 nullWithoutDbcValue = 0;
         char const* dbcFormat = _dbcFormat;
 
         for (; (*dbcFormat); ++dbcFormat)
         {
+            // a NULL column means "not overridden": keep the value loaded from the DBC file.
+            // Without a DBC record to fall back on, NULL reads as 0.
+            bool const keepDbcValue = oldDataValue && fields[sqlColumnNumber].IsNull();
+
             switch (*dbcFormat)
             {
                 case FT_FLOAT:
-                    *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<float>();
+                    if (keepDbcValue)
+                        memcpy(&dataValue[dataOffset], &oldDataValue[dataOffset], sizeof(float));
+                    else if (fields[sqlColumnNumber].IsNull()) // Field::Get<float>() returns 1.0f on NULL
+                        *reinterpret_cast<float*>(&dataValue[dataOffset]) = 0.0f;
+                    else
+                        *reinterpret_cast<float*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<float>();
+
+                    if (!oldDataValue && fields[sqlColumnNumber].IsNull())
+                        ++nullWithoutDbcValue;
+
                     dataOffset += sizeof(float);
                     break;
                 case FT_IND:
                 case FT_INT:
-                    *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<uint32>();
+                    if (keepDbcValue)
+                        memcpy(&dataValue[dataOffset], &oldDataValue[dataOffset], sizeof(uint32));
+                    else
+                        *reinterpret_cast<uint32*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<uint32>();
+
+                    if (!oldDataValue && fields[sqlColumnNumber].IsNull())
+                        ++nullWithoutDbcValue;
+
                     dataOffset += sizeof(uint32);
                     break;
                 case FT_BYTE:
-                    *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<uint8>();
+                    if (keepDbcValue)
+                        memcpy(&dataValue[dataOffset], &oldDataValue[dataOffset], sizeof(uint8));
+                    else
+                        *reinterpret_cast<uint8*>(&dataValue[dataOffset]) = fields[sqlColumnNumber].Get<uint8>();
+
+                    if (!oldDataValue && fields[sqlColumnNumber].IsNull())
+                        ++nullWithoutDbcValue;
+
                     dataOffset += sizeof(uint8);
                     break;
                 case FT_STRING:
+                    // NULL strings are expected in new records, do not count them
                     // an empty column means "not overridden", not "blank it"
                     if (fields[sqlColumnNumber].Get<std::string>().empty() && oldDataValue)
                         *reinterpret_cast<char**>(&dataValue[dataOffset]) = *reinterpret_cast<char**>(&oldDataValue[dataOffset]);
@@ -124,9 +179,14 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 
         ASSERT(sqlColumnNumber == result->GetFieldCount(), "SQL format string does not match database for table: '{}'", _sqlTableName);
         ASSERT(dataOffset == _recordSize);
+
+        // valid for a new record, but also how a partial override with a wrong ID shows up
+        if (nullWithoutDbcValue)
+            LOG_DEBUG("server.loading", "Table `{}` ID {} has no DBC record, {} NULL column(s) loaded as 0.",
+                _sqlTableName, indexValue, nullWithoutDbcValue);
     } while (result->NextRow());
 
-    ASSERT(newRecords == result->GetRowCount());
+    ASSERT(newRecords <= result->GetRowCount());
 
     // insert new records to index table
     for (uint32 i = 0; i < newRecords; ++i)
