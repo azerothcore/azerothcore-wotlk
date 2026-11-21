@@ -33,6 +33,9 @@
 #include "SpellMgr.h"
 #include "WorldState.h"
 
+// Highest base skill value of the 3.3.5a client (Grand Master, level 80)
+static constexpr uint32 MAX_CONDITION_SKILL_VALUE = 450;
+
 // Checks if object meets the condition
 // Can have CONDITION_SOURCE_TYPE_NONE && !mReferenceId if called from a special event (ie: eventAI)
 bool Condition::Meets(ConditionSourceInfo& sourceInfo)
@@ -2121,7 +2124,10 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             return false;
         }
 
-        if (cond->ConditionValue2 < 1 || cond->ConditionValue2 > sWorld->GetConfigMaxSkillValue())
+        // A lower MaxPlayerLevel must not drop WotLK skill conditions: a dropped condition lifts its
+        // restriction, while a kept one simply fails until the level cap is raised.
+        uint32 const maxSkillValue = std::max<uint32>(MAX_CONDITION_SKILL_VALUE, sWorld->GetConfigMaxSkillValue());
+        if (cond->ConditionValue2 < 1 || cond->ConditionValue2 > maxSkillValue)
         {
             LOG_ERROR("sql.sql", "Skill condition specifies invalid skill value ({}), skipped", cond->ConditionValue2);
             return false;
