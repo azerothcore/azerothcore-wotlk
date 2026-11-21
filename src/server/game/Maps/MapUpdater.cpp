@@ -160,8 +160,9 @@ bool MapUpdater::activated()
 
 void MapUpdater::update_finished()
 {
-    // Atomic decrement for pending_requests
-    if (pending_requests.fetch_sub(1, std::memory_order_acquire) == 1)
+    // Release, so the acquire load in wait() synchronizes with every worker's decrement and sees
+    // the map updates they made: the decrements are RMWs, so they all extend one release sequence.
+    if (pending_requests.fetch_sub(1, std::memory_order_release) == 1)
     {
         // Only notify when pending_requests becomes 0 (i.e., all tasks are finished)
         std::lock_guard<std::mutex> lock(_lock);  // Lock only for condition variable notification
