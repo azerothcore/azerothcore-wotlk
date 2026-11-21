@@ -16,7 +16,9 @@
  */
 
 #include "PassiveAI.h"
+#include "CombatManager.h"
 #include "Creature.h"
+#include "MotionMaster.h"
 
 PassiveAI::PassiveAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
 PossessedAI::PossessedAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
@@ -76,18 +78,29 @@ void PossessedAI::KilledUnit(Unit*  /*victim*/)
 
 void CritterAI::JustEngagedWith(Unit* who)
 {
-    if (!me->HasUnitState(UNIT_STATE_FLEEING))
-    {
+    // A stunned or confused critter starts fleeing once that effect ends, see UpdateAI
+    if (!me->HasUnitState(UNIT_STATE_CONTROLLED))
         me->SetControlled(true, UNIT_STATE_FLEEING, who);
-    }
 }
 
 void CritterAI::MovementInform(uint32 type, uint32 /*id*/)
 {
-    if (type == TIMED_FLEEING_MOTION_TYPE)
-    {
+    // The flee also reports here when a confusion effect replaces it, which is not the end of the flee
+    if (type == TIMED_FLEEING_MOTION_TYPE && !me->HasUnitState(UNIT_STATE_CONFUSED))
         EnterEvadeMode(EVADE_REASON_OTHER);
-    }
+}
+
+void CritterAI::UpdateAI(uint32 /*diff*/)
+{
+    // Engaged with nothing controlling the movement: a control effect interrupted or delayed the flee
+    if (!IsEngaged() || me->HasUnitState(UNIT_STATE_CONTROLLED) ||
+        me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE)
+        return;
+
+    if (Unit* target = me->GetCombatManager().GetAnyTarget())
+        me->SetControlled(true, UNIT_STATE_FLEEING, target);
+    else
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
 }
 
 void CritterAI::EnterEvadeMode(EvadeReason why)
