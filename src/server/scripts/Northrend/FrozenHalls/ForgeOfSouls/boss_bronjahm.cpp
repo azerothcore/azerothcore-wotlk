@@ -16,12 +16,16 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "forge_of_souls.h"
+#include <algorithm>
+#include <array>
+#include <list>
 
 enum Yells
 {
@@ -41,14 +45,22 @@ enum Spells
     SPELL_MAGICS_BANE               = 68793,
     SPELL_CORRUPT_SOUL              = 68839,
     SPELL_CONSUME_SOUL              = 68861,
-    //SPELL_CONSUME_SOUL_HEAL       = 68858,
 
     SPELL_TELEPORT                  = 68988,
     SPELL_TELEPORT_VISUAL           = 52096,
 
     SPELL_SOULSTORM_VISUAL          = 68870,
-    SPELL_SOULSTORM_VISUAL2         = 68904,
     SPELL_SOULSTORM                 = 68872,
+
+    SPELL_SOULSTORM_VISUAL_1        = 68886,
+    SPELL_SOULSTORM_VISUAL_2        = 68896,
+    SPELL_SOULSTORM_VISUAL_3        = 68897,
+    SPELL_SOULSTORM_VISUAL_4        = 68898,
+
+    SPELL_SOULSTORM_OOC_VISUAL_1    = 68904,
+    SPELL_SOULSTORM_OOC_VISUAL_2    = 68905,
+    SPELL_SOULSTORM_OOC_VISUAL_3    = 68906,
+    SPELL_SOULSTORM_OOC_VISUAL_4    = 68907,
 };
 
 enum Events
@@ -58,6 +70,16 @@ enum Events
     EVENT_SPELL_MAGICS_BANE,
     EVENT_SPELL_CORRUPT_SOUL,
     EVENT_START_SOULSTORM,
+};
+
+std::array<uint32, 4> const SoulstormVisualSpells =
+{
+    SPELL_SOULSTORM_VISUAL_1, SPELL_SOULSTORM_VISUAL_2, SPELL_SOULSTORM_VISUAL_3, SPELL_SOULSTORM_VISUAL_4
+};
+
+std::array<uint32, 4> const SoulstormOocVisualSpells =
+{
+    SPELL_SOULSTORM_OOC_VISUAL_1, SPELL_SOULSTORM_OOC_VISUAL_2, SPELL_SOULSTORM_OOC_VISUAL_3, SPELL_SOULSTORM_OOC_VISUAL_4
 };
 
 struct boss_bronjahm : public BossAI
@@ -155,6 +177,8 @@ struct boss_bronjahm : public BossAI
                 DoCastSelf(SPELL_TELEPORT_VISUAL, true);
                 DoCastSelf(SPELL_SOULSTORM_VISUAL, true);
                 break;
+            default:
+                break;
         }
 
         DoMeleeAttackIfReady();
@@ -187,45 +211,40 @@ struct boss_bronjahm : public BossAI
 
 struct npc_fos_corrupted_soul_fragment : public NullCreatureAI
 {
-    npc_fos_corrupted_soul_fragment(Creature* creature) : NullCreatureAI(creature)
-    {
-        Instance = me->GetInstanceScript();
-    }
-
-    uint32 Timer = 0;
-    InstanceScript* Instance = nullptr;
+    npc_fos_corrupted_soul_fragment(Creature* creature) : NullCreatureAI(creature), _instance(creature->GetInstanceScript()) { }
 
     void Reset() override
     {
-        Timer = 0;
+        scheduler.CancelAll();
+        scheduler.Schedule(0ms, [this](TaskContext context)
+        {
+            if (Creature* bronjahm = _instance->GetCreature(DATA_BRONJAHM))
+                if (!me->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+                    me->GetMotionMaster()->MovePoint(POINT_BRONJAHM, *bronjahm);
+
+            context.Repeat(1s);
+        });
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (!Instance)
-            return;
-
-        Creature* bronjahm = Instance->GetCreature(DATA_BRONJAHM);
+        Creature* bronjahm = _instance->GetCreature(DATA_BRONJAHM);
         if (!bronjahm)
             return;
 
         if (me->GetExactDist2d(bronjahm) <= 2.0f)
         {
             me->GetMotionMaster()->MoveIdle();
-            me->CastSpell(bronjahm, SPELL_CONSUME_SOUL, true);
+            DoCast(bronjahm, SPELL_CONSUME_SOUL, true);
             me->DespawnOrUnsummon(1ms);
             return;
         }
 
-        if (Timer <= diff)
-        {
-            if (!me->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
-                me->GetMotionMaster()->MovePoint(0, *bronjahm);
-            Timer = 1000;
-        }
-        else
-            Timer -= diff;
+        scheduler.Update(diff);
     }
+
+private:
+    InstanceScript* _instance;
 };
 
 class spell_bronjahm_magic_bane : public SpellScript
@@ -239,7 +258,7 @@ class spell_bronjahm_magic_bane : public SpellScript
 
         if (Unit* caster = GetCaster())
         {
-            int32 const maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
+            int32 const maxDamage = caster->GetMap()->IsHeroic() ? 15000 : 10000;
             int32 newDamage = GetHitDamage();
             newDamage += GetHitUnit()->GetMaxPower(POWER_MANA) / 2;
             newDamage = std::min<int32>(maxDamage, newDamage);
@@ -260,13 +279,13 @@ class spell_bronjahm_soulstorm_channel_ooc_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_SOULSTORM_VISUAL2, SPELL_SOULSTORM_VISUAL2+1, SPELL_SOULSTORM_VISUAL2+2, SPELL_SOULSTORM_VISUAL2+3 });
+        return ValidateSpellInfo({ SPELL_SOULSTORM_OOC_VISUAL_1, SPELL_SOULSTORM_OOC_VISUAL_2, SPELL_SOULSTORM_OOC_VISUAL_3, SPELL_SOULSTORM_OOC_VISUAL_4 });
     }
 
     void HandlePeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_SOULSTORM_VISUAL2 + (aurEff->GetTickNumber() % 4), true);
+        GetTarget()->CastSpell(GetTarget(), SoulstormOocVisualSpells[aurEff->GetTickNumber() % SoulstormOocVisualSpells.size()], true);
     }
 
     void Register() override
@@ -281,29 +300,13 @@ class spell_bronjahm_soulstorm_visual_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 68886, 68896, 68897, 68898 });
+        return ValidateSpellInfo({ SPELL_SOULSTORM_VISUAL_1, SPELL_SOULSTORM_VISUAL_2, SPELL_SOULSTORM_VISUAL_3, SPELL_SOULSTORM_VISUAL_4 });
     }
 
     void HandlePeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        uint32 spellId = 0;
-        switch (aurEff->GetTickNumber() % 4)
-        {
-            case 0:
-                spellId = 68886;
-                break;
-            case 1:
-                spellId = 68896;
-                break;
-            case 2:
-                spellId = 68897;
-                break;
-            case 3:
-                spellId = 68898;
-                break;
-        }
-        GetTarget()->CastSpell(GetTarget(), spellId, true);
+        GetTarget()->CastSpell(GetTarget(), SoulstormVisualSpells[aurEff->GetTickNumber() % SoulstormVisualSpells.size()], true);
     }
 
     void Register() override
