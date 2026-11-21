@@ -3320,11 +3320,12 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                     switch (spellInfo->Id)
                     {
                         // Exceptions
+                        case 37411: // Skettis Corrupted Ghosts (Time-Lost Skettis, seen with Elixir of Shadows)
+                        case 43062: // Alpha Worg: Garwal's Invisibility
                         case 44801: // Spectral Invisibility (Kalecgos, SWP)
+                        case 45614: // Shroud of the Scourge (Blending In, Temple City of En'kilah)
                         case 46021: // Spectral Realm (SWP)
                         case 52951: // Chapel Invisibility (DK starting zone)
-                        case 43062: // Alpha Worg: Garwal's Invisibility
-                        case 45614: // Shroud of the Scourge (Blending In, Temple City of En'kilah)
                             break;
                         default:
                             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;

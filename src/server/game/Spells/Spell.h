@@ -612,6 +612,11 @@ public:
     void LoadScripts();
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
 
+    // number of units hit by the given effect - only meaningful once targets have been fully selected
+    [[nodiscard]] int32 GetUnitTargetCountForEffect(SpellEffIndex effect) const;
+    // position of the unit in the list of units hit by the given effect, -1 when it is not part of that list
+    [[nodiscard]] int32 GetUnitTargetIndexForEffect(ObjectGuid const& target, SpellEffIndex effect) const;
+
     [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
     [[nodiscard]] SpellInfo const* GetTriggeredByAuraSpellInfo() const { return m_triggeredByAuraSpell.spellInfo; }
 

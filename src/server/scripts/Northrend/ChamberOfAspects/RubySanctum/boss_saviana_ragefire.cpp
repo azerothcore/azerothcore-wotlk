@@ -17,9 +17,9 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ruby_sanctum.h"
-#include "SpellScript.h"
 
 enum Texts
 {
@@ -33,9 +33,9 @@ enum Spells
 {
     SPELL_CONFLAGRATION         = 74452,
     SPELL_FLAME_BEACON          = 74453,
-    SPELL_CONFLAGRATION_MISSLE  = 74454,
+    SPELL_CONFLAGRATION_MISSILE = 74454,
     SPELL_ENRAGE                = 78722,
-    SPELL_FLAME_BREATH          = 74403,
+    SPELL_FLAME_BREATH          = 74403
 };
 
 enum Events
@@ -49,12 +49,15 @@ enum Events
     EVENT_LAND_BACK             = 7
 };
 
-enum Misc
+enum Points
 {
     POINT_FLIGHT                = 1,
     POINT_LAND                  = 2,
-    POINT_TAKEOFF               = 3,
+    POINT_TAKEOFF               = 3
+};
 
+enum Sounds
+{
     SOUND_ID_DEATH              = 17531
 };
 
@@ -65,9 +68,7 @@ public:
 
     struct boss_saviana_ragefireAI : public BossAI
     {
-        boss_saviana_ragefireAI(Creature* creature) : BossAI(creature, DATA_SAVIANA_RAGEFIRE)
-        {
-        }
+        boss_saviana_ragefireAI(Creature* creature) : BossAI(creature, DATA_SAVIANA_RAGEFIRE) { }
 
         void Reset() override
         {
@@ -108,6 +109,8 @@ public:
                     me->SetDisableGravity(false);
                     events.ScheduleEvent(EVENT_LAND_GROUND, 500ms);
                     break;
+                default:
+                    break;
             }
         }
 
@@ -118,7 +121,7 @@ public:
             me->SetHover(false);
         }
 
-        void KilledUnit(Unit*  /*victim*/) override
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_KILL);
         }
@@ -135,38 +138,39 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_FLIGHT:
-                    {
-                        me->SetReactState(REACT_PASSIVE);
-                        me->AttackStop();
-                        me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
-                        events.ScheduleEvent(EVENT_FLIGHT, 50s);
-                        events.DelayEvents(15s);
-                        events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2s);
-                        break;
-                    }
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    me->SetDisableGravity(true);
+                    me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, FORCED_MOVEMENT_NONE, 0.0f, 0.0f, false);
+                    events.ScheduleEvent(EVENT_FLIGHT, 50s);
+                    events.DelayEvents(15s);
+                    events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2s);
+                    break;
                 case EVENT_CONFLAGRATION:
                     me->CastCustomSpell(SPELL_CONFLAGRATION, SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 6, 3, 6), me, true);
                     break;
                 case EVENT_ENRAGE:
-                    me->CastSpell(me, SPELL_ENRAGE, false);
+                    DoCastSelf(SPELL_ENRAGE);
                     Talk(EMOTE_ENRAGED);
                     events.ScheduleEvent(EVENT_ENRAGE, 15s, 20s);
                     break;
                 case EVENT_FLAME_BREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_FLAME_BREATH, false);
+                    DoCastVictim(SPELL_FLAME_BREATH);
                     events.ScheduleEvent(EVENT_FLAME_BREATH, 20s, 30s);
                     break;
                 case EVENT_AIR_MOVEMENT:
-                    me->GetMotionMaster()->MovePoint(POINT_FLIGHT, 3155.51f, 683.844f, 95.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
+                    me->GetMotionMaster()->MovePoint(POINT_FLIGHT, 3155.51f, 683.844f, 95.0f, FORCED_MOVEMENT_NONE, 0.0f, 0.0f, false);
                     break;
                 case EVENT_LAND_BACK:
-                    me->GetMotionMaster()->MovePoint(POINT_LAND, 3151.07f, 636.443f, 80.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
+                    me->GetMotionMaster()->MovePoint(POINT_LAND, 3151.07f, 636.443f, 80.0f, FORCED_MOVEMENT_NONE, 0.0f, 0.0f, false);
                     break;
                 case EVENT_LAND_GROUND:
                     me->SetReactState(REACT_AGGRESSIVE);
                     if (me->GetVictim())
-                        me->GetMotionMaster()->MoveChase(me->GetVictim());
+                        me->ResumeChasingVictim();
+
+                    break;
+                default:
                     break;
             }
 
@@ -186,14 +190,14 @@ class spell_saviana_conflagration_init : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_FLAME_BEACON, SPELL_CONFLAGRATION_MISSLE });
+        return ValidateSpellInfo({ SPELL_FLAME_BEACON, SPELL_CONFLAGRATION_MISSILE });
     }
 
     void HandleDummy(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
         GetCaster()->CastSpell(GetHitUnit(), SPELL_FLAME_BEACON, true);
-        GetCaster()->CastSpell(GetHitUnit(), SPELL_CONFLAGRATION_MISSLE, true);
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_CONFLAGRATION_MISSILE, true);
     }
 
     void Register() override

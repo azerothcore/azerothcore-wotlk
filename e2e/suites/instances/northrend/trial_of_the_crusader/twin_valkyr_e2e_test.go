@@ -22,8 +22,9 @@ const (
 	spellLightTwinPact    = uint32(65876)
 )
 
-// spawnTemp summons a temp creature at the bot and returns the new living unit. Boss intros need
-// Barrett's gossip, which the harness cannot send, so the instance never summons the bosses.
+// spawnTemp summons a temp creature at the bot and returns the new living unit, deleted on cleanup.
+// The instance only summons encounter bosses from Barrett's gossip once the earlier encounters are
+// done, so tests spawn them directly.
 func spawnTemp(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32) uint64 {
 	t.Helper()
 
@@ -43,7 +44,7 @@ func spawnTemp(t *testing.T, bot *e2eharness.ScenarioBot, entry uint32) uint64 {
 		}
 	}
 	if guid == 0 {
-		e2eharness.Preconditionf(t, "no new living creature %d after .npc add temp", entry)
+		e2eharness.Preconditionf(t, "no new living %d after .npc add temp", entry)
 	}
 	t.Cleanup(func() {
 		if hp, _ := bot.UnitHP(guid); hp == 0 {

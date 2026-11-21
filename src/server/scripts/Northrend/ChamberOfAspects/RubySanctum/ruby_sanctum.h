@@ -39,19 +39,23 @@ enum DataTypes
 
     // Etc
     DATA_ZARITHRIAN_SPAWN_STALKER_1         = 8,
-    DATA_ZARITHRIAN_SPAWN_STALKER_2         = 9
+    DATA_ZARITHRIAN_SPAWN_STALKER_2         = 9,
+    DATA_XERESTRASZA                        = 10,
+    DATA_TWILIGHT_HALION                    = 11,
+    DATA_HALION_CONTROLLER                  = 12,
+    DATA_ORB_CARRIER                        = 13,
+    DATA_FLAME_RING                         = 14
 };
 
 enum SharedActions
 {
-    ACTION_INTRO_HALION                     = -4014601,
+    ACTION_INTRO_HALION                     = -4014601
 };
 
 enum CreaturesIds
 {
     // Baltharus the Warborn
     NPC_BALTHARUS_THE_WARBORN               = 39751,
-    NPC_BALTHARUS_THE_WARBORN_CLONE         = 39899,
     NPC_XERESTRASZA                         = 40429,
 
     // General Zarithrian
@@ -76,15 +80,12 @@ enum CreaturesIds
     NPC_METEOR_STRIKE_SOUTH                 = 40044,
     NPC_METEOR_STRIKE_FLAME                 = 40055,
     NPC_COMBUSTION                          = 40001,
-    NPC_CONSUMPTION                         = 40135,
-    NPC_COMBAT_STALKER                      = 40151 // Seen in sniffs but not used, so no wonder.
+    NPC_CONSUMPTION                         = 40135
 };
 
 enum GameObjectsIds
 {
     GO_HALION_PORTAL_1                      = 202794,
-    GO_HALION_PORTAL_2                      = 202795,
-    GO_HALION_PORTAL_EXIT                   = 202796,
     GO_FIRE_FIELD                           = 203005,
     GO_FLAME_WALLS                          = 203006,
     GO_FLAME_RING                           = 203007,

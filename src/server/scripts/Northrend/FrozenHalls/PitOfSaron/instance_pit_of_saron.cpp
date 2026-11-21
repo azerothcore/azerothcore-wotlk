@@ -15,17 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
+#include "Creature.h"
+#include "CreatureData.h"
+#include "GameObject.h"
 #include "InstanceMapScript.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
+#include "InstanceScript.h"
+#include "Map.h"
 #include "pit_of_saron.h"
-#include "Group.h"
+#include <algorithm>
+#include <sstream>
 
 class instance_pit_of_saron : public InstanceMapScript
 {
 public:
-    instance_pit_of_saron() : InstanceMapScript("instance_pit_of_saron", MAP_PIT_OF_SARON) { }
+    instance_pit_of_saron() : InstanceMapScript(PitOfSaronScriptName, MAP_PIT_OF_SARON) { }
 
     struct instance_pit_of_saron_InstanceScript : public InstanceScript
     {
@@ -34,42 +37,20 @@ public:
             SetHeaders(DataHeader);
         }
 
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint32 InstanceProgress;
-        std::string str_data;
-
-        ObjectGuid NPC_LeaderFirstGUID;
-        ObjectGuid NPC_LeaderSecondGUID;
-        ObjectGuid NPC_TyrannusEventGUID;
-        ObjectGuid NPC_Necrolyte1GUID;
-        ObjectGuid NPC_Necrolyte2GUID;
-        ObjectGuid NPC_GuardFirstGUID;
-        ObjectGuid NPC_GuardSecondGUID;
-        ObjectGuid NPC_SindragosaGUID;
-
-        ObjectGuid NPC_GarfrostGUID;
-        ObjectGuid NPC_MartinOrGorkunGUID;
-        ObjectGuid NPC_RimefangGUID;
-        ObjectGuid NPC_TyrannusGUID;
-
-        ObjectGuid GO_IceWallGUID;
-
-        bool bAchievEleven;
-        bool bAchievDontLookUp;
-
         void Initialize() override
         {
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            InstanceProgress = INSTANCE_PROGRESS_NONE;
+            std::fill_n(_encounters, MAX_ENCOUNTER, NOT_STARTED);
+            _instanceProgress = INSTANCE_PROGRESS_NONE;
 
-            bAchievEleven = true;
-            bAchievDontLookUp = true;
+            _achievEleven = true;
+            _achievDontLookUp = true;
         }
 
         bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                if (m_auiEncounter[i] == IN_PROGRESS) return true;
+                if (_encounters[i] == IN_PROGRESS)
+                    return true;
 
             return false;
         }
@@ -78,8 +59,8 @@ public:
         {
             InstanceScript::OnPlayerEnter(player);
 
-            if (Creature* c = instance->GetCreature(GetGuidData(DATA_LEADER_FIRST_GUID)))
-                c->AI()->SetData(DATA_START_INTRO, 0);
+            if (Creature* leader = instance->GetCreature(_leaderFirstGUID))
+                leader->AI()->SetData(DATA_START_INTRO, 0);
         }
 
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
@@ -95,6 +76,8 @@ public:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         return 0;
                     break;
+                default:
+                    break;
             }
 
             return entry;
@@ -107,9 +90,9 @@ public:
                 case NPC_SYLVANAS_PART1:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
-                    NPC_LeaderFirstGUID = creature->GetGUID();
+                    _leaderFirstGUID = creature->GetGUID();
 
-                    switch (InstanceProgress)
+                    switch (_instanceProgress)
                     {
                         case INSTANCE_PROGRESS_FINISHED_INTRO:
                             creature->SetPosition(LeaderIntroPos);
@@ -121,17 +104,19 @@ public:
                         case INSTANCE_PROGRESS_TYRANNUS_INTRO:
                             creature->SetPosition(SBSLeaderEndPos);
                             break;
+                        default:
+                            break;
                     }
                     break;
                 case NPC_SYLVANAS_PART2:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART2);
-                    NPC_LeaderSecondGUID = creature->GetGUID();
+                    _leaderSecondGUID = creature->GetGUID();
                     break;
                 case NPC_TYRANNUS_EVENT:
-                    if (!NPC_TyrannusEventGUID)
+                    if (!_tyrannusEventGUID)
                     {
-                        switch (InstanceProgress)
+                        switch (_instanceProgress)
                         {
                             case INSTANCE_PROGRESS_FINISHED_INTRO:
                                 creature->SetPosition(SBSTyrannusStartPos);
@@ -149,21 +134,23 @@ public:
                             case INSTANCE_PROGRESS_TYRANNUS_INTRO:
                                 creature->SetPosition(SBSTyrannusStartPos);
                                 break;
+                            default:
+                                break;
                         }
-                        NPC_TyrannusEventGUID = creature->GetGUID();
+                        _tyrannusEventGUID = creature->GetGUID();
                     }
                     break;
                 case NPC_LORALEN:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ELANDRA);
-                    if (!NPC_GuardFirstGUID)
-                        NPC_GuardFirstGUID = creature->GetGUID();
+                    if (!_guardFirstGUID)
+                        _guardFirstGUID = creature->GetGUID();
                     break;
                 case NPC_KALIRA:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_KORELN);
-                    if (!NPC_GuardSecondGUID)
-                        NPC_GuardSecondGUID = creature->GetGUID();
+                    if (!_guardSecondGUID)
+                        _guardSecondGUID = creature->GetGUID();
                     break;
                 case NPC_HORDE_SLAVE_1:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
@@ -186,7 +173,7 @@ public:
                         creature->UpdateEntry(NPC_MARTIN_VICTUS_1);
                     break;
                 case NPC_GARFROST:
-                    NPC_GarfrostGUID = creature->GetGUID();
+                    _garfrostGUID = creature->GetGUID();
                     break;
                 case NPC_FREED_SLAVE_1_HORDE:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
@@ -201,32 +188,32 @@ public:
                         creature->UpdateEntry(NPC_FREED_SLAVE_3_ALLIANCE);
                     break;
                 case NPC_GORKUN_IRONSKULL_2:
-                    if (NPC_MartinOrGorkunGUID)
-                        if (Creature* c = instance->GetCreature(NPC_MartinOrGorkunGUID))
-                        {
-                            c->AI()->DoAction(1); // despawn summons
-                            c->DespawnOrUnsummon();
-                        }
+                    if (Creature* general = instance->GetCreature(_martinOrGorkunGUID))
+                    {
+                        general->AI()->DoAction(ACTION_DESPAWN_SUMMONS);
+                        general->DespawnOrUnsummon();
+                    }
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_MARTIN_VICTUS_2);
-                    NPC_MartinOrGorkunGUID = creature->GetGUID();
+                    _martinOrGorkunGUID = creature->GetGUID();
                     break;
                 case NPC_RIMEFANG:
-                    NPC_RimefangGUID = creature->GetGUID();
-                    if (m_auiEncounter[2] == DONE)
+                    _rimefangGUID = creature->GetGUID();
+                    if (_encounters[DATA_TYRANNUS] == DONE)
                         creature->SetVisible(false);
                     break;
                 case NPC_TYRANNUS:
-                    if (NPC_TyrannusGUID)
-                        if (Creature* c = instance->GetCreature(NPC_TyrannusGUID))
-                            c->DespawnOrUnsummon();
-                    NPC_TyrannusGUID = creature->GetGUID();
+                    if (Creature* tyrannus = instance->GetCreature(_tyrannusGUID))
+                        tyrannus->DespawnOrUnsummon();
+                    _tyrannusGUID = creature->GetGUID();
 
-                    if (m_auiEncounter[2] == DONE)
+                    if (_encounters[DATA_TYRANNUS] == DONE)
                         creature->SetVisible(false);
                     break;
                 case NPC_SINDRAGOSA:
-                    NPC_SindragosaGUID = creature->GetGUID();
+                    _sindragosaGUID = creature->GetGUID();
+                    break;
+                default:
                     break;
             }
         }
@@ -236,9 +223,11 @@ public:
             switch (go->GetEntry())
             {
                 case GO_ICE_WALL:
-                    GO_IceWallGUID = go->GetGUID();
+                    _iceWallGUID = go->GetGUID();
                     if (GetData(DATA_GARFROST) == DONE && GetData(DATA_ICK) == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                default:
                     break;
             }
         }
@@ -248,39 +237,41 @@ public:
             switch (type)
             {
                 case DATA_INSTANCE_PROGRESS:
-                    if (InstanceProgress < data)
+                    if (_instanceProgress < data)
                     {
-                        InstanceProgress = data;
-                        if (InstanceProgress == INSTANCE_PROGRESS_TYRANNUS_INTRO && instance->GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC && bAchievDontLookUp) // achiev Don't Look Up (4525)
-                            DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 72845);
+                        _instanceProgress = data;
+                        if (_instanceProgress == INSTANCE_PROGRESS_TYRANNUS_INTRO && instance->GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC && _achievDontLookUp)
+                            DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEVEMENT_CHECK_DONT_LOOK_UP);
                     }
                     break;
                 case DATA_GARFROST:
-                    m_auiEncounter[0] = data;
+                    _encounters[DATA_GARFROST] = data;
                     if (data == DONE)
                         instance->SummonCreature(NPC_GORKUN_IRONSKULL_1, FBSSpawnPos);
                     else // NOT_STARTED, IN_PROGRESS
-                        bAchievEleven = true;
+                        _achievEleven = true;
                     if (data == DONE && GetData(DATA_ICK) == DONE)
-                        if (GameObject* icewall = instance->GetGameObject(GO_IceWallGUID))
-                            icewall->SetGoState(GO_STATE_ACTIVE);
+                        if (GameObject* iceWall = instance->GetGameObject(_iceWallGUID))
+                            iceWall->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case DATA_ICK:
-                    m_auiEncounter[1] = data;
+                    _encounters[DATA_ICK] = data;
                     if (data == DONE && GetData(DATA_GARFROST) == DONE)
-                        if (GameObject* icewall = instance->GetGameObject(GO_IceWallGUID))
-                            icewall->SetGoState(GO_STATE_ACTIVE);
+                        if (GameObject* iceWall = instance->GetGameObject(_iceWallGUID))
+                            iceWall->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case DATA_TYRANNUS:
-                    m_auiEncounter[2] = data;
+                    _encounters[DATA_TYRANNUS] = data;
                     if (data == DONE)
                         instance->SummonCreature(NPC_SYLVANAS_PART2, TSLeaderSpawnPos);
                     break;
                 case DATA_ACHIEV_ELEVEN:
-                    bAchievEleven = false;
+                    _achievEleven = false;
                     break;
                 case DATA_ACHIEV_DONT_LOOK_UP:
-                    bAchievDontLookUp = false;
+                    _achievDontLookUp = false;
+                    break;
+                default:
                     break;
             }
 
@@ -293,13 +284,15 @@ public:
             switch (type)
             {
                 case DATA_NECROLYTE_1_GUID:
-                    NPC_Necrolyte1GUID = data;
+                    _necrolyte1GUID = data;
                     break;
                 case DATA_NECROLYTE_2_GUID:
-                    NPC_Necrolyte2GUID = data;
+                    _necrolyte2GUID = data;
                     break;
                 case DATA_MARTIN_OR_GORKUN_GUID:
-                    NPC_MartinOrGorkunGUID = data;
+                    _martinOrGorkunGUID = data;
+                    break;
+                default:
                     break;
             }
         }
@@ -309,15 +302,15 @@ public:
             switch (type)
             {
                 case DATA_INSTANCE_PROGRESS:
-                    return InstanceProgress;
+                    return _instanceProgress;
                 case DATA_TEAMID_IN_INSTANCE:
                     return GetTeamIdInInstance();
                 case DATA_GARFROST:
-                    return m_auiEncounter[0];
                 case DATA_ICK:
-                    return m_auiEncounter[1];
                 case DATA_TYRANNUS:
-                    return m_auiEncounter[2];
+                    return _encounters[type];
+                default:
+                    break;
             }
 
             return 0;
@@ -328,59 +321,87 @@ public:
             switch (type)
             {
                 case DATA_TYRANNUS_EVENT_GUID:
-                    return NPC_TyrannusEventGUID;
+                    return _tyrannusEventGUID;
                 case DATA_NECROLYTE_1_GUID:
-                    return NPC_Necrolyte1GUID;
+                    return _necrolyte1GUID;
                 case DATA_NECROLYTE_2_GUID:
-                    return NPC_Necrolyte2GUID;
+                    return _necrolyte2GUID;
                 case DATA_GUARD_1_GUID:
-                    return NPC_GuardFirstGUID;
+                    return _guardFirstGUID;
                 case DATA_GUARD_2_GUID:
-                    return NPC_GuardSecondGUID;
+                    return _guardSecondGUID;
                 case DATA_LEADER_FIRST_GUID:
-                    return NPC_LeaderFirstGUID;
+                    return _leaderFirstGUID;
                 case DATA_GARFROST_GUID:
-                    return NPC_GarfrostGUID;
+                    return _garfrostGUID;
                 case DATA_MARTIN_OR_GORKUN_GUID:
-                    return NPC_MartinOrGorkunGUID;
+                    return _martinOrGorkunGUID;
                 case DATA_RIMEFANG_GUID:
-                    return NPC_RimefangGUID;
+                    return _rimefangGUID;
                 case DATA_TYRANNUS_GUID:
-                    return NPC_TyrannusGUID;
+                    return _tyrannusGUID;
                 case DATA_LEADER_SECOND_GUID:
-                    return NPC_LeaderSecondGUID;
+                    return _leaderSecondGUID;
                 case DATA_SINDRAGOSA_GUID:
-                    return NPC_SindragosaGUID;
+                    return _sindragosaGUID;
+                default:
+                    break;
             }
 
             return ObjectGuid::Empty;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
+        bool CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
         {
-            switch (criteria_id)
+            switch (criteriaId)
             {
-                case 12993: // Doesn't Go to Eleven (4524)
-                    return bAchievEleven;
+                case CRITERIA_DOESNT_GO_TO_ELEVEN:
+                    return _achievEleven;
+                default:
+                    break;
             }
+
             return false;
         }
 
         void ReadSaveDataMore(std::istringstream& data) override
         {
-            data >> m_auiEncounter[0];
-            data >> m_auiEncounter[1];
-            data >> m_auiEncounter[2];
-            data >> InstanceProgress;
+            data >> _encounters[DATA_GARFROST];
+            data >> _encounters[DATA_ICK];
+            data >> _encounters[DATA_TYRANNUS];
+            data >> _instanceProgress;
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
         {
-            data << m_auiEncounter[0] << ' '
-                << m_auiEncounter[1] << ' '
-                << m_auiEncounter[2] << ' '
-                << InstanceProgress;
+            data << _encounters[DATA_GARFROST] << ' '
+                << _encounters[DATA_ICK] << ' '
+                << _encounters[DATA_TYRANNUS] << ' '
+                << _instanceProgress;
         }
+
+    private:
+        uint32 _encounters[MAX_ENCOUNTER];
+        uint32 _instanceProgress;
+
+        ObjectGuid _leaderFirstGUID;
+        ObjectGuid _leaderSecondGUID;
+        ObjectGuid _tyrannusEventGUID;
+        ObjectGuid _necrolyte1GUID;
+        ObjectGuid _necrolyte2GUID;
+        ObjectGuid _guardFirstGUID;
+        ObjectGuid _guardSecondGUID;
+        ObjectGuid _sindragosaGUID;
+
+        ObjectGuid _garfrostGUID;
+        ObjectGuid _martinOrGorkunGUID;
+        ObjectGuid _rimefangGUID;
+        ObjectGuid _tyrannusGUID;
+
+        ObjectGuid _iceWallGUID;
+
+        bool _achievEleven;
+        bool _achievDontLookUp;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
