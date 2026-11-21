@@ -54,6 +54,11 @@ void ScriptMgr::OnBattlefieldPlayerKill(Battlefield* bf, Player* killer, Player*
     CALL_ENABLED_HOOKS(BattlefieldScript, BATTLEFIELDHOOK_ON_PLAYER_KILL, script->OnBattlefieldPlayerKill(bf, killer, victim));
 }
 
+void ScriptMgr::OnBattlefieldWarStart(Battlefield* bf)
+{
+    CALL_ENABLED_HOOKS(BattlefieldScript, BATTLEFIELDHOOK_ON_WAR_START, script->OnBattlefieldWarStart(bf));
+}
+
 BattlefieldScript::BattlefieldScript(char const* name, std::vector<uint16> enabledHooks) :
     ScriptObject(name, BATTLEFIELDHOOK_END)
 {

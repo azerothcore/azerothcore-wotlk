@@ -440,13 +440,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG, "Battleground.DisableQuestShareInBG", false);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG, "Battleground.DisableReadyCheckInBG", false);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_CAST_DESERTER, "Battleground.CastDeserter", true);
-    SetConfigValue<bool>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE, "Battleground.QueueAnnouncer.Enable", false);
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL, "Battleground.QueueAnnouncer.Limit.MinLevel", 0);
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS, "Battleground.QueueAnnouncer.Limit.MinPlayers", 3);
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY, "Battleground.QueueAnnouncer.SpamProtection.Delay", 30);
-    SetConfigValue<bool>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY, "Battleground.QueueAnnouncer.PlayerOnly", false);
-    SetConfigValue<bool>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED, "Battleground.QueueAnnouncer.Timed", false);
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER, "Battleground.QueueAnnouncer.Timer", 30000);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE, "Battleground.StoreStatistics.Enable", false);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_TRACK_DESERTERS, "Battleground.TrackDeserters.Enable", false);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER, "Battleground.PrematureFinishTimer", 300000);
@@ -482,9 +475,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(CONFIG_ARENA_WIN_RATING_MODIFIER_2, "Arena.ArenaWinRatingModifier2", 24.0f);
     SetConfigValue<float>(CONFIG_ARENA_LOSE_RATING_MODIFIER, "Arena.ArenaLoseRatingModifier", 24.0f);
     SetConfigValue<float>(CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER, "Arena.ArenaMatchmakerRatingModifier", 24.0f);
-    SetConfigValue<bool>(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE, "Arena.QueueAnnouncer.Enable", false);
-    SetConfigValue<bool>(CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY, "Arena.QueueAnnouncer.PlayerOnly", false);
-    SetConfigValue<uint32>(CONFIG_ARENA_QUEUE_ANNOUNCER_DETAIL, "Arena.QueueAnnouncer.Detail", 3);
 
     SetConfigValue<bool>(CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN, "OffhandCheckAtSpellUnlearn", true);
     SetConfigValue<bool>(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS, "Creature.RepositionAgainstNpcs", true);
