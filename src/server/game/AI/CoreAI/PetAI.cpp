@@ -22,6 +22,7 @@
 #include "Group.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
+#include "PetDefines.h"
 #include "Player.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -44,6 +45,21 @@ int32 PetAI::Permissible(Creature const* creature)
 PetAI::PetAI(Creature* c) : CreatureAI(c), i_tracker(TIME_INTERVAL_LOOK)
 {
     UpdateAllies();
+}
+
+void PetAI::DoAction(int32 action)
+{
+    if (action != ACTION_DK_GHOUL_EMERGE || me->GetEntry() != NPC_RISEN_GHOUL || _emerging)
+        return;
+
+    _emerging = true;
+    me->SetControlled(true, UNIT_STATE_ROOT);
+    me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+    scheduler.Schedule(5s, [this](TaskContext /*context*/)
+    {
+        me->SetControlled(false, UNIT_STATE_ROOT);
+        _emerging = false;
+    });
 }
 
 bool PetAI::_needToStop()
@@ -147,7 +163,12 @@ bool PetAI::_canMeleeAttack()
 
 void PetAI::UpdateAI(uint32 diff)
 {
+    scheduler.Update(diff);
+
     if (!me->IsAlive() || !me->GetCharmInfo())
+        return;
+
+    if (_emerging)
         return;
 
     Unit* owner = me->GetCharmerOrOwner();
