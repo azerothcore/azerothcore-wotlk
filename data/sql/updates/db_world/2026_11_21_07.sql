@@ -1,3 +1,4 @@
+-- DB update 2026_11_21_06 -> 2026_11_21_07
 --
 -- Brann Bronzebeard (33579) actionlist: drop the Set Instance Data 801 row, it raised an emote no sniff shows
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 3357900 AND `source_type` = 9;
