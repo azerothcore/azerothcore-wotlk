@@ -52,6 +52,7 @@ enum LeviathanSpells
     SPELL_NAPALM_25                     = 65026,
     SPELL_INVIS_AND_STEALTH_DETECT      = 18950,
     SPELL_TRANSITUS_SHIELD_IMPACT       = 48387,
+    SPELL_OVERLOAD                      = 63618,
 
     // Shutdown spells
     SPELL_SYSTEMS_SHUTDOWN              = 62475,
@@ -240,6 +241,9 @@ struct boss_flame_leviathan : public BossAI
 
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
     {
+        if (why == EVADE_REASON_BOUNDARY)
+            DoCastSelf(SPELL_OVERLOAD, true);
+
         CreatureAI::EnterEvadeMode(why);
         instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN_FAIL, 1);
     }
