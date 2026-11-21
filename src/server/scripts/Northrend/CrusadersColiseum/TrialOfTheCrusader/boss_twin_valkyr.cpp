@@ -487,12 +487,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void KilledUnit(Unit* who) override
     {
-        if (who->IsPlayer())
-        {
-            Talk(SAY_KILL_PLAYER);
-            if (Creature* twin = GetSister())
-                twin->AI()->Talk(SAY_KILL_PLAYER);
-        }
+        Talk(SAY_KILL_PLAYER, who);
     }
 
     void EnterEvadeMode(EvadeReason /* why */) override
