@@ -42,6 +42,7 @@
 #include "WorldSession.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+#include <optional>
 
 Roll::Roll(ObjectGuid _guid, LootItem const& li, bool _lootedInRaid) : itemGUID(_guid), itemid(li.itemid),
     itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count), lootedInRaid(_lootedInRaid),
@@ -953,28 +954,63 @@ void Group::Disband(bool hideDestroy /* = false */)
 /***                   LOOT SYSTEM                     ***/
 /*********************************************************/
 
-void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, Roll const& r)
+// Quest slots follow the ordinary items in each player's filtered quest list.
+static std::optional<uint32> GetQuestRollSlot(Loot const& loot, uint32 questIndex, ObjectGuid playerGuid)
 {
-    WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
-    data << r.itemGUID;                                     // guid of rolled item
-    data << uint32(mapid);                                  // 3.3.3 mapid
-    data << uint32(r.itemSlot);                             // itemslot
-    data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
-    data << uint32(r.itemRandomSuffix);                     // randomSuffix
-    data << uint32(r.itemRandomPropId);                     // item random property ID
-    data << uint32(r.itemCount);                            // items in stack
-    data << uint32(CountDown);                              // the countdown time to choose "need" or "greed"
-    data << uint8(r.rollVoteMask);                          // roll type mask
-
-    for (Roll::PlayerVote::const_iterator itr = r.playerVote.begin(); itr != r.playerVote.end(); ++itr)
+    auto const& views = loot.GetPlayerQuestItems();
+    auto view = views.find(playerGuid);
+    if (view != views.end() && view->second)
     {
-        Player* p = ObjectAccessor::FindConnectedPlayer(itr->first);
-        if (!p)
+        uint32 slot = loot.items.size();
+        for (QuestItem const& item : *view->second)
+        {
+            if (slot >= MAX_NR_LOOT_ITEMS)
+                break;
+            if (item.index == questIndex && !item.is_looted)
+                return slot;
+            ++slot;
+        }
+    }
+    return std::nullopt;
+}
+
+static std::optional<uint32> GetRollSlotForPlayer(Roll const& roll, ObjectGuid playerGuid)
+{
+    Loot const* loot = roll.getTarget();
+    if (!loot)
+        return std::nullopt;
+
+    if (roll.itemSlot < loot->items.size())
+        return roll.itemSlot;
+
+    return GetQuestRollSlot(*loot, roll.itemSlot - loot->items.size(), playerGuid);
+}
+
+static void BroadcastRollUpdate(Roll const& roll, WorldPacket& data)
+{
+    for (auto const& [guid, vote] : roll.playerVote)
+    {
+        if (vote == NOT_VALID)
             continue;
 
-        if (itr->second == NOT_EMITED_YET)
-            p->SendDirectMessage(&data);
+        Player* player = ObjectAccessor::FindConnectedPlayer(guid);
+        if (!player)
+            continue;
+
+        if (auto slot = GetRollSlotForPlayer(roll, guid))
+        {
+            // The vote, win and all-passed messages place the slot after the GUID.
+            data.put<uint32>(sizeof(uint64), *slot);
+            player->SendDirectMessage(&data);
+        }
     }
+}
+
+void Group::SendLootStartRoll(uint32 countDown, uint32 mapId, Roll const& roll)
+{
+    for (auto const& [guid, vote] : roll.playerVote)
+        if (vote == NOT_EMITED_YET)
+            SendLootStartRollToPlayer(countDown, mapId, ObjectAccessor::FindConnectedPlayer(guid), true, roll);
 }
 
 void Group::SendPendingRollsToPlayer(Player* player, Map* map)
@@ -1026,10 +1062,14 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p,
     if (!p)
         return;
 
+    auto slot = GetRollSlotForPlayer(r, p->GetGUID());
+    if (!slot)
+        return;
+
     WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
     data << r.itemGUID;                                     // guid of rolled item
     data << uint32(mapId);                                  // 3.3.3 mapid
-    data << uint32(r.itemSlot);                             // itemslot
+    data << *slot;                             // itemslot
     data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
     data << uint32(r.itemRandomSuffix);                     // randomSuffix
     data << uint32(r.itemRandomPropId);                     // item random property ID
@@ -1056,15 +1096,7 @@ void Group::SendLootRoll(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rol
     data << uint8(rollType);                                // 0: "Need for: [item name]" 0: "You have selected need for [item name] 1: need roll 2: greed roll
     data << uint8(autoPass);                                // 1: "You automatically passed on: %s because you cannot loot that item."
 
-    for (Roll::PlayerVote::const_iterator itr = roll.playerVote.begin(); itr != roll.playerVote.end(); ++itr)
-    {
-        Player* p = ObjectAccessor::FindConnectedPlayer(itr->first);
-        if (!p)
-            continue;
-
-        if (itr->second != NOT_VALID)
-            p->SendDirectMessage(&data);
-    }
+    BroadcastRollUpdate(roll, data);
 }
 
 void Group::SendLootRollWon(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll)
@@ -1079,15 +1111,7 @@ void Group::SendLootRollWon(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 
     data << uint8(rollNumber);                              // rollnumber realted to SMSG_LOOT_ROLL
     data << uint8(rollType);                                // rollType related to SMSG_LOOT_ROLL
 
-    for (Roll::PlayerVote::const_iterator itr = roll.playerVote.begin(); itr != roll.playerVote.end(); ++itr)
-    {
-        Player* p = ObjectAccessor::FindConnectedPlayer(itr->first);
-        if (!p)
-            continue;
-
-        if (itr->second != NOT_VALID)
-            p->SendDirectMessage(&data);
-    }
+    BroadcastRollUpdate(roll, data);
 }
 
 void Group::SendLootAllPassed(Roll const& roll)
@@ -1099,15 +1123,7 @@ void Group::SendLootAllPassed(Roll const& roll)
     data << uint32(roll.itemRandomPropId);                     // Item random property ID
     data << uint32(roll.itemRandomSuffix);                     // Item random suffix ID
 
-    for (Roll::PlayerVote::const_iterator itr = roll.playerVote.begin(); itr != roll.playerVote.end(); ++itr)
-    {
-        Player* player = ObjectAccessor::FindConnectedPlayer(itr->first);
-        if (!player)
-            continue;
-
-        if (itr->second != NOT_VALID)
-            player->SendDirectMessage(&data);
-    }
+    BroadcastRollUpdate(roll, data);
 }
 
 // notify group members which player is the allowed looter for the given creature
@@ -1145,8 +1161,10 @@ bool CanRollOnItem(LootItem& item, Player const* player, Loot* loot)
     if (!item.AllowedForPlayer(player, loot->sourceWorldObjectGUID))
         return false;
 
-    loot->RegisterSharedDrop(item, player->GetGUID());
-    return true;
+    if (item.freeforall)
+        return GetQuestRollSlot(*loot, item.itemIndex, player->GetGUID()).has_value();
+
+    return loot->RegisterSharedDrop(item, player->GetGUID());
 }
 
 void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
@@ -1287,7 +1305,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
             }
         }
 
-        if (r->totalPlayersRolling > 0)
+        if (r->totalPlayersRolling > r->totalPass)
         {
             r->setLoot(loot);
             r->itemSlot = itemSlot;
@@ -1431,7 +1449,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
             }
         }
 
-        if (r->totalPlayersRolling > 0)
+        if (r->totalPlayersRolling > r->totalPass)
         {
             r->setLoot(loot);
             r->itemSlot = itemSlot;
@@ -1505,30 +1523,31 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
 
         if (canLoot)
         {
-            // Count late-eligible drops before assigning any slot. This does not
-            // change which players may trade an item after it has been awarded.
-            auto countIfEligible = [&](LootItem& item)
+            auto registerDrop = [&](LootItem& item)
             {
-                if (!item.is_counted && !item.freeforall && item.AllowedForPlayer(looter, loot->sourceWorldObjectGUID))
+                if (item.freeforall || item.is_looted || (item.is_counted && !item.needs_quest && item.conditions.empty()))
+                    return;
+
+                if (!item.AllowedForPlayer(looter, loot->sourceWorldObjectGUID))
+                    return;
+
+                if (item.is_blocked && !loot->RegisterSharedDrop(item, GetMasterLooterGuid()))
+                {
+                    // A fresh master window can reuse a quest slot once it becomes available.
+                    // Ordinary items reserve their indices for the lifetime of the loot.
+                    if (loot->items.size() >= MAX_NR_LOOT_ITEMS)
+                        return;
+
                     loot->CountSharedDrop(item);
+                }
+
+                loot->RegisterSharedDrop(item, looter->GetGUID());
             };
             for (LootItem& item : loot->items)
-            {
-                if (item.is_blocked && !item.conditions.empty())
-                {
-                    if (item.AllowedForPlayer(looter, loot->sourceWorldObjectGUID))
-                    {
-                        loot->RegisterSharedDrop(item, looter->GetGUID());
-                        // The master distributes this slot even if only the recipient qualifies.
-                        loot->RegisterSharedDrop(item, GetMasterLooterGuid());
-                    }
-                }
-                else
-                    countIfEligible(item);
-            }
+                registerDrop(item);
             for (LootItem& item : loot->quest_items)
                 if (item.follow_loot_rules)
-                    countIfEligible(item);
+                    registerDrop(item);
 
             looters.push_back(looter);
         }

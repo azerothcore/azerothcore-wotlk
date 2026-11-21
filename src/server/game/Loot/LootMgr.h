@@ -389,7 +389,7 @@ struct Loot
     [[nodiscard]] bool hasOverThresholdItem() const;
     void FillNotNormalLootFor(Player* player);
     void CountSharedDrop(LootItem& item);
-    void RegisterSharedDrop(LootItem& item, ObjectGuid playerGuid);
+    bool RegisterSharedDrop(LootItem& item, ObjectGuid playerGuid);
 
 private:
     QuestItemList* FillFFALoot(Player* player);
