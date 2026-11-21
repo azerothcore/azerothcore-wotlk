@@ -356,8 +356,6 @@ void PetAI::UpdateAI(uint32 diff)
                     me->SendUpdateToPlayer(owner->ToPlayer());
             }
 
-            me->AddSpellCooldown(spell->m_spellInfo->Id, 0, 0);
-
             spell->prepare(&targets);
 
             // Stop the current spline before the next movement update can interrupt a stationary channel.
