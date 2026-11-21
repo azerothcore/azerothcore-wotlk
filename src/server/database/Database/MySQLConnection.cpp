@@ -30,6 +30,7 @@
 #include <errmsg.h>
 #include <mysql.h>
 #include <mysqld_error.h>
+#include <utility>
 
 MySQLConnectionInfo::MySQLConnectionInfo(std::string_view infoString)
 {
