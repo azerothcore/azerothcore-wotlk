@@ -16,14 +16,16 @@
  */
 
 #include "AreaTriggerScript.h"
-#include "CellImpl.h"
-#include "CreatureAIImpl.h"
 #include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "naxxramas.h"
+#include <algorithm>
+#include <array>
+#include <iterator>
+#include <set>
 
 BossBoundaryData const boundaries =
 {
@@ -49,14 +51,14 @@ BossBoundaryData const boundaries =
     { BOSS_PATCHWERK, new CircleBoundary(Position(3130.8576f, -3210.36f), Position(3085.37f, -3219.85f), true) }, // entrance slime circle blocker
     { BOSS_GROBBULUS, new CircleBoundary(Position(3204.0f, -3241.4f), 240.0f) },
     { BOSS_GROBBULUS, new RectangleBoundary(3295.0f, 3340.0f, -3254.2f, -3230.18f, true) }, // entrance door blocker
-    { BOSS_GLUTH,     new CircleBoundary(Position(3293.0f, -3142.0f), 80.0) },
+    { BOSS_GLUTH,     new CircleBoundary(Position(3293.0f, -3142.0f), 80.0f) },
     { BOSS_GLUTH,     new ParallelogramBoundary(Position(3401.0f, -3149.0f), Position(3261.0f, -3028.0f), Position(3320.0f, -3267.0f)) },
     { BOSS_GLUTH,     new ZRangeBoundary(285.0f, 310.0f) },
     { BOSS_THADDIUS,  new ParallelogramBoundary(Position(3478.3f, -3070.0f), Position(3370.0f, -2961.5f), Position(3580.0f, -2961.5f)) },
 
     /* Frostwyrm Lair */
-    { BOSS_SAPPHIRON, new CircleBoundary(Position(3517.627f, -5255.5f), 110.0) },
-    { BOSS_KELTHUZAD, new CircleBoundary(Position(3716.0f, -5107.0f), 85.0) }
+    { BOSS_SAPPHIRON, new CircleBoundary(Position(3517.627f, -5255.5f), 110.0f) },
+    { BOSS_KELTHUZAD, new CircleBoundary(Position(3716.0f, -5107.0f), 85.0f) }
 };
 
 struct LivingPoisonData
@@ -66,23 +68,28 @@ struct LivingPoisonData
     uint32 DespawnTime {};
 };
 
-static const LivingPoisonData LivingPoisonDataList[3]
+static LivingPoisonData const LivingPoisonDataList[]
 {
-    { Position { 3128.59, -3118.81, 293.346, 4.76754 }, Position { 3130.322, -3156.51,  293.324 }, 15200 },
-    { Position { 3154.25, -3125.7,  293.43,  4.47694 }, Position { 3144.779, -3158.416, 293.324 }, 14800 },
-    { Position { 3175.42, -3134.86, 293.34,  4.284   }, Position { 3158.778, -3164.201, 293.312 }, 14800 }
+    { Position { 3128.59f, -3118.81f, 293.346f, 4.76754f }, Position { 3130.322f, -3156.51f,  293.324f }, 15200 },
+    { Position { 3154.25f, -3125.7f,  293.43f,  4.47694f }, Position { 3144.779f, -3158.416f, 293.324f }, 14800 },
+    { Position { 3175.42f, -3134.86f, 293.34f,  4.284f   }, Position { 3158.778f, -3164.201f, 293.312f }, 14800 }
 };
 
-static const float HeiganPos[2]
-{
-    2796, -3707
-};
+static float const LivingPoisonExplodeRadius = 1.5f;
 
-static const float HeiganEruptionSlope[3]
+// Only Bile Retchers and Sludge Belchers beyond this Y stand inside Patchwerk's room, not in the corridor before it
+static float const PatchwerkRoomMinY = -3258.0f;
+
+static Position const HeiganPos = { 2796.0f, -3707.0f };
+
+// Tolerance on the axes through Heigan's position, which bound the first and last eruption sections
+static float const HeiganSectionEdgeMargin = 1.0f;
+
+static float const HeiganEruptionSlope[HeiganEruptSectionCount - 1]
 {
-    (-3685 - HeiganPos[1]) / (2724 - HeiganPos[0]),
-    (-3647 - HeiganPos[1]) / (2749 - HeiganPos[0]),
-    (-3637 - HeiganPos[1]) / (2771 - HeiganPos[0]),
+    (-3685.0f - HeiganPos.GetPositionY()) / (2724.0f - HeiganPos.GetPositionX()),
+    (-3647.0f - HeiganPos.GetPositionY()) / (2749.0f - HeiganPos.GetPositionX()),
+    (-3637.0f - HeiganPos.GetPositionY()) / (2771.0f - HeiganPos.GetPositionX())
 };
 
 static constexpr std::array<uint32, HorsemanCount> HorsemanDataGroup
@@ -183,15 +190,7 @@ public:
         LoadObjectData(creatureData, gameObjectData);
         LoadBossBoundaries(boundaries);
 
-        // GameObjects
-        for (auto& i : _heiganEruption)
-            i.clear();
-
-        // NPCs
-        _patchwerkRoomTrash.clear();
-
         // Controls
-        _events.Reset();
         _currentWingTaunt = SAY_FIRST_WING_TAUNT;
         _horsemanLoaded = 0;
         _thaddiusScreamsScheduled = false;
@@ -206,19 +205,19 @@ public:
         _horsemanAchievement = true;
     }
 
-    inline void CreatureTalk(uint32 dataCreature, uint8 dialog)
+    void CreatureTalk(uint32 dataCreature, uint8 dialog)
     {
         if (Creature* creature = GetCreature(dataCreature))
             creature->AI()->Talk(dialog);
     }
 
-    inline void SetGoState(uint32 dataGameObject, GOState state)
+    void SetGoState(uint32 dataGameObject, GOState state)
     {
         if (GameObject* go = GetGameObject(dataGameObject))
             go->SetGoState(state);
     }
 
-    inline void ActivateWingPortal(GameObject* go, EncounterState state)
+    void ActivateWingPortal(GameObject* go, EncounterState state)
     {
         if (!go || state != DONE)
             return;
@@ -227,31 +226,33 @@ public:
         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
     }
 
-    inline void ActivateWingPortal(uint32 wingPortal)
+    void ActivateWingPortal(uint32 wingPortal)
     {
         ActivateWingPortal(GetGameObject(wingPortal), DONE);
         _events.RescheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6s);
     }
 
-    static inline uint8 GetEruptionSection(float x, float y)
+    static uint8 GetEruptionSection(float x, float y)
     {
-        y -= HeiganPos[1];
-        if (y < 1.0f)
+        y -= HeiganPos.GetPositionY();
+        if (y < HeiganSectionEdgeMargin)
             return 0;
 
-        x -= HeiganPos[0];
-        if (x > -1.0f)
-            return 3;
+        x -= HeiganPos.GetPositionX();
+        if (x > -HeiganSectionEdgeMargin)
+            return HeiganEruptSectionCount - 1;
 
         float slope = y / x;
-        for (uint32 i = 0; i < 3; ++i)
+        for (uint8 i = 0; i < std::size(HeiganEruptionSlope); ++i)
+        {
             if (slope > HeiganEruptionSlope[i])
                 return i;
+        }
 
-        return 3;
+        return HeiganEruptSectionCount - 1;
     }
 
-    inline void HeiganEruptSections(uint32 section)
+    void HeiganEruptSections(uint32 section)
     {
         for (uint8 i = 0; i < HeiganEruptSectionCount; ++i)
         {
@@ -289,8 +290,9 @@ public:
                 return;
             case NPC_BILE_RETCHER:
             case NPC_SLUDGE_BELCHER:
-                if (creature->GetPositionY() > -3258.0f) // we want only those inside the room, not before
+                if (creature->GetPositionY() > PatchwerkRoomMinY)
                     _patchwerkRoomTrash.push_back(creature->GetGUID());
+
                 return;
             case NPC_BARON_RIVENDARE:
             case NPC_SIR_ZELIEK:
@@ -298,6 +300,7 @@ public:
             case NPC_THANE_KORTHAZZ:
                 if (++_horsemanLoaded == HorsemanCount)
                     SetBossState(BOSS_HORSEMAN, GetBossState(BOSS_HORSEMAN));
+
                 break;
             default:
                 break;
@@ -323,6 +326,7 @@ public:
             case GO_SAPPHIRON_GATE:
                 if (GetBossState(BOSS_SAPPHIRON) == DONE)
                     go->SetGoState(GO_STATE_ACTIVE);
+
                 break;
             case GO_LOATHEB_PORTAL:
                 ActivateWingPortal(go, GetBossState(BOSS_LOATHEB));
@@ -358,8 +362,9 @@ public:
         switch (go->GetEntry())
         {
             case GO_SAPPHIRON_BIRTH:
-                if (Creature* cr = GetCreature(DATA_SAPPHIRON_BOSS))
-                    cr->AI()->DoAction(ACTION_SAPPHIRON_BIRTH);
+                if (Creature* sapphiron = GetCreature(DATA_SAPPHIRON_BOSS))
+                    sapphiron->AI()->DoAction(ACTION_SAPPHIRON_BIRTH);
+
                 break;
             default:
                 break;
@@ -368,9 +373,9 @@ public:
         InstanceScript::OnGameObjectRemove(go);
     }
 
-    bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
+    bool CheckAchievementCriteriaMeet(uint32 criteriaId, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
     {
-        switch (criteria_id)
+        switch (criteriaId)
         {
             case ACHIEV_CRITERIA_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER_10_PLAYER:
             case ACHIEV_CRITERIA_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER_25_PLAYER:
@@ -381,8 +386,8 @@ public:
             case ACHIEV_CRITERIA_MOMMA_SAID_KNOCK_YOU_OUT_10_PLAYER:
             case ACHIEV_CRITERIA_MOMMA_SAID_KNOCK_YOU_OUT_25_PLAYER:
                 return _faerlinaAchievement;
-            case ACHIEV_CRITERIA_SHOKING_10_PLAYER:
-            case ACHIEV_CRITERIA_SHOKING_25_PLAYER:
+            case ACHIEV_CRITERIA_SHOCKING_10_PLAYER:
+            case ACHIEV_CRITERIA_SHOCKING_25_PLAYER:
                 return _thaddiusAchievement;
             case ACHIEV_CRITERIA_SPORE_LOSER_10_PLAYER:
             case ACHIEV_CRITERIA_SPORE_LOSER_25_PLAYER:
@@ -437,7 +442,7 @@ public:
             case ACHIEV_CRITERIA_THE_IMMORTAL_THADDIUS:
             {
                 uint32 currentBoss;
-                switch (criteria_id)
+                switch (criteriaId)
                 {
                     case ACHIEV_CRITERIA_THE_UNDYING_KELTHUZAD:
                     case ACHIEV_CRITERIA_THE_IMMORTAL_KELTHUZAD:
@@ -464,8 +469,10 @@ public:
                 }
 
                 for (uint32 i = 0; i < MAX_ENCOUNTERS; ++i)
+                {
                     if (i != currentBoss && GetBossState(i) != DONE)
                         return false;
+                }
 
                 return !GetPersistentData(PERSISTENT_DATA_IMMORTAL_FAIL);
             }
@@ -518,9 +525,9 @@ public:
                 {
                     if (Unit* target = patchwerk->GetThreatMgr().GetCurrentVictim())
                     {
-                        for (auto& itr : _patchwerkRoomTrash)
+                        for (ObjectGuid const& guid : _patchwerkRoomTrash)
                         {
-                            Creature* trash = ObjectAccessor::GetCreature(*patchwerk, itr);
+                            Creature* trash = ObjectAccessor::GetCreature(*patchwerk, guid);
                             if (trash && trash->IsAlive() && !trash->IsInCombat())
                                 trash->AI()->AttackStart(target);
                         }
@@ -584,10 +591,10 @@ public:
             }
             case BOSS_HORSEMAN:
             {
-                uint32 horsemanKilled = std::count_if(HorsemanDataGroup.begin(), HorsemanDataGroup.end(), [this](auto&& entry)
+                uint32 horsemanKilled = std::count_if(HorsemanDataGroup.begin(), HorsemanDataGroup.end(), [this](uint32 data)
                 {
-                    Creature* cr = GetCreature(entry);
-                    return cr && !cr->IsAlive();
+                    Creature* horseman = GetCreature(data);
+                    return horseman && !horseman->IsAlive();
                 });
 
                 switch (state)
@@ -600,12 +607,12 @@ public:
                         if (!horsemanKilled)
                             break;
 
-                        for (auto&& entry : HorsemanDataGroup)
+                        for (uint32 data : HorsemanDataGroup)
                         {
-                            if (Creature* cr = GetCreature(entry))
+                            if (Creature* horseman = GetCreature(data))
                             {
-                                cr->SetPosition(cr->GetHomePosition());
-                                cr->Respawn();
+                                horseman->SetPosition(horseman->GetHomePosition());
+                                horseman->Respawn();
                             }
                         }
 
@@ -613,9 +620,11 @@ public:
                     }
                     case IN_PROGRESS:
                     {
-                        for (auto&& entry : HorsemanDataGroup)
-                            if (Creature* cr = GetCreature(entry))
-                                cr->SetInCombatWithZone();
+                        for (uint32 data : HorsemanDataGroup)
+                        {
+                            if (Creature* horseman = GetCreature(data))
+                                horseman->SetInCombatWithZone();
+                        }
 
                         break;
                     }
@@ -632,8 +641,8 @@ public:
                         if (horsemanKilled != HorsemanCount)
                             return false;
 
-                        if (Creature* cr = GetCreature(DATA_BARON_RIVENDARE_BOSS))
-                            cr->CastSpell(cr, SPELL_THE_FOUR_HORSEMAN_CREDIT, true);
+                        if (Creature* baron = GetCreature(DATA_BARON_RIVENDARE_BOSS))
+                            baron->CastSpell(baron, SPELL_THE_FOUR_HORSEMAN_CREDIT, true);
 
                         ActivateWingPortal(DATA_HORSEMAN_PORTAL);
                         break;
@@ -692,7 +701,7 @@ public:
                 if (GetBossState(BOSS_THADDIUS) == DONE)
                     break;
 
-                instance->PlayDirectSoundToMap(SOUND_SCREAM + urand(0, 3));
+                instance->PlayDirectSoundToMap(SOUND_SCREAM + urand(0, ThaddiusScreamSoundCount - 1));
                 return _events.ScheduleEvent(EVENT_THADDIUS_SCREAMS, 5min, 10min);
             }
             case EVENT_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER:
@@ -727,6 +736,7 @@ public:
                 SetGoState(DATA_SAPPHIRON_GATE, GO_STATE_ACTIVE);
                 if (GetBossState(BOSS_KELTHUZAD) != DONE)
                     _events.ScheduleEvent(EVENT_KELTHUZAD_LICH_KING_TALK1, 5s);
+
                 break;
             case EVENT_KELTHUZAD_LICH_KING_TALK1:
                 CreatureTalk(DATA_KELTHUZAD_BOSS, SAY_SAPP_DIALOG1);
@@ -777,7 +787,7 @@ private:
 class npc_mr_bigglesworth : public CritterAI
 {
 public:
-    npc_mr_bigglesworth(Creature* c) : CritterAI(c) { }
+    npc_mr_bigglesworth(Creature* creature) : CritterAI(creature) { }
 
     void JustDied(Unit* /*killer*/) override
     {
@@ -785,22 +795,22 @@ public:
         if (!instance)
             return;
 
-        Creature* kelThuzard = instance->GetCreature(DATA_KELTHUZAD_BOSS);
-        if (!kelThuzard)
+        Creature* kelThuzad = instance->GetCreature(DATA_KELTHUZAD_BOSS);
+        if (!kelThuzad)
             return;
 
-        kelThuzard->AI()->Talk(SAY_CAT_DIED);
+        kelThuzad->AI()->Talk(SAY_CAT_DIED);
     }
 };
 
 class npc_living_poison : public NullCreatureAI
 {
 public:
-    npc_living_poison(Creature* c) : NullCreatureAI(c) { }
+    npc_living_poison(Creature* creature) : NullCreatureAI(creature) { }
 
     void UpdateAI(uint32 /*diff*/) override
     {
-        if (me->SelectNearestTarget(1.5f, true))
+        if (me->SelectNearestTarget(LivingPoisonExplodeRadius, true))
             me->CastSpell(me, SPELL_EXPLODE, true);
     }
 };
@@ -808,7 +818,7 @@ public:
 class npc_naxxramas_trigger : public NullCreatureAI
 {
 public:
-    npc_naxxramas_trigger(Creature* c) : NullCreatureAI(c) { }
+    npc_naxxramas_trigger(Creature* creature) : NullCreatureAI(creature) { }
 
     void Reset() override
     {
@@ -824,11 +834,13 @@ public:
             case EVENT_SUMMON_LIVING_POISON:
             {
                 for (LivingPoisonData const& entry : LivingPoisonDataList)
-                    if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, entry.Start, TEMPSUMMON_TIMED_DESPAWN, entry.DespawnTime))
+                {
+                    if (Creature* poison = me->SummonCreature(NPC_LIVING_POISON, entry.Start, TEMPSUMMON_TIMED_DESPAWN, entry.DespawnTime))
                     {
-                        cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        cr->GetMotionMaster()->MovePoint(0, entry.End, FORCED_MOVEMENT_NONE, 0.f, false);
+                        poison->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                        poison->GetMotionMaster()->MovePoint(0, entry.End, FORCED_MOVEMENT_NONE, 0.0f, false);
                     }
+                }
 
                 _events.Repeat(5s);
                 break;
