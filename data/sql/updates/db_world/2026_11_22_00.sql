@@ -1,3 +1,4 @@
+-- DB update 2026_11_21_10 -> 2026_11_22_00
 --
 -- Berserk 68378 targets the nearest creature of a listed entry: Fjola for Eydis, Noth himself for Noth
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceEntry` = 68378;
