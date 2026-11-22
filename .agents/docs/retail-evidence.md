@@ -47,3 +47,9 @@ creature at contact distance); hand-picked or in-game-estimated coordinates are 
 - Flags common in hacks (`UNIT_FLAG_DISABLE_MOVE`, `UNIT_FLAG_NON_ATTACKABLE`, …) need unambiguous evidence.
 - AC-only fields (`flags_extra`, `AIName`) can't be sniffed and are out of sniff scope. Change `flags_extra` only when
   the fix needs it, and say why.
+
+## Spells
+
+- Implementing from a sniff or original script: cast every spell it shows, with its caster, target and timing, even one
+  AC doesn't handle, with no clear purpose, or cosmetic. Prefer it over hand-rolled logic doing the same job. Build
+  what it needs (script, conditions, core support) or report the blocker; never drop it.
