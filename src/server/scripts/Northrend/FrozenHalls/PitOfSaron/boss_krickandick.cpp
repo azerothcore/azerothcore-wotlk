@@ -66,6 +66,24 @@ enum Events
     EVENT_SPELL_SHADOW_BOLT,
     EVENT_SPECIAL,
     EVENT_SET_REACT_AGGRESSIVE,
+
+    EVENT_OUTRO_RESET_LEADER,
+    EVENT_OUTRO_KRICK_1,
+    EVENT_OUTRO_LEADER_1,
+    EVENT_OUTRO_KRICK_2,
+    EVENT_OUTRO_LEADER_2,
+    EVENT_OUTRO_KRICK_3,
+    EVENT_OUTRO_TYRANNUS_1,
+    EVENT_OUTRO_STRANGULATE,
+    EVENT_OUTRO_KRICK_4,
+    EVENT_OUTRO_KRICK_DIES,
+    EVENT_OUTRO_TYRANNUS_2,
+    EVENT_OUTRO_LEADER_3,
+};
+
+enum Actions
+{
+    ACTION_START_KRICK_OUTRO            = 1,
 };
 
 class boss_ick : public CreatureScript
@@ -77,29 +95,25 @@ public:
     {
         boss_ickAI(Creature* creature) : ScriptedAI(creature)
         {
-            pInstance = creature->GetInstanceScript();
+            _instance = creature->GetInstanceScript();
         }
-
-        InstanceScript* pInstance;
-        EventMap events;
 
         void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
             events.Reset();
-            if (pInstance)
-                pInstance->SetData(DATA_ICK, NOT_STARTED);
+            _instance->SetData(DATA_ICK, NOT_STARTED);
         }
 
-        bool CanAIAttack(Unit const*  /*who*/) const override
+        bool CanAIAttack(Unit const* /*who*/) const override
         {
-            return pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_FINISHED_INTRO;
+            return _instance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_FINISHED_INTRO;
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            if (Creature* k = GetKrick())
-                k->AI()->Talk(SAY_AGGRO);
+            if (Creature* krick = GetKrick())
+                krick->AI()->Talk(SAY_AGGRO);
             DoZoneInCombat();
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_TOXIC_WASTE, 3s, 5s);
@@ -107,8 +121,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_SHADOW_BOLT, 10s);
             events.RescheduleEvent(EVENT_SPECIAL, 25s);
 
-            if (pInstance)
-                pInstance->SetData(DATA_ICK, IN_PROGRESS);
+            _instance->SetData(DATA_ICK, IN_PROGRESS);
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
@@ -126,10 +139,10 @@ public:
 
         Creature* GetKrick()
         {
-            if (Vehicle* v = me->GetVehicleKit())
-                if (Unit* p = v->GetPassenger(0))
-                    return p->ToCreature();
-            return (Creature*)nullptr;
+            if (Vehicle* vehicle = me->GetVehicleKit())
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                    return passenger->ToCreature();
+            return nullptr;
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -139,17 +152,18 @@ public:
                 {
                     krick->InterruptNonMeleeSpells(true);
                     krick->RemoveAllAuras();
-                    Position myPos(*me), exitPos;
-                    float ang = me->GetOrientation() + 3 * M_PI / 2;
+                    Position myPos(*me);
+                    Position exitPos;
+                    float angle = me->GetOrientation() + 3 * M_PI / 2;
                     float dist = 3.0f;
-                    exitPos.Relocate(myPos.GetPositionX() + dist * cos(ang), myPos.GetPositionY() + dist * std::sin(ang), 515.0f, M_PI);
+                    exitPos.Relocate(myPos.GetPositionX() + dist * std::cos(angle), myPos.GetPositionY() + dist * std::sin(angle), 515.0f, M_PI);
                     exitPos.m_positionZ = me->GetMap()->GetHeight(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.GetPositionZ());
 
                     if (exitPos.GetPositionZ() < 505.0f || exitPos.GetPositionZ() > 512.0f || !me->IsWithinLOS(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.GetPositionZ()))
                         exitPos.Relocate(myPos);
 
                     krick->_ExitVehicle(&exitPos);
-                    krick->AI()->DoAction(1);
+                    krick->AI()->DoAction(ACTION_START_KRICK_OUTRO);
                 }
         }
 
@@ -177,29 +191,27 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
                 case EVENT_SPELL_TOXIC_WASTE:
-                    if (Creature* k = GetKrick())
-                        if (!k->HasUnitState(UNIT_STATE_CASTING))
+                    if (Creature* krick = GetKrick())
+                        if (!krick->HasUnitState(UNIT_STATE_CASTING))
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                             {
-                                k->CastSpell(target, SPELL_TOXIC_WASTE);
+                                krick->CastSpell(target, SPELL_TOXIC_WASTE);
                                 events.Repeat(7s, 10s);
                                 break;
                             }
                     events.Repeat(2500ms);
                     break;
                 case EVENT_SPELL_MIGHTY_KICK:
-                    me->CastSpell(me->GetVictim(), SPELL_MIGHTY_KICK, false);
+                    DoCastVictim(SPELL_MIGHTY_KICK);
                     events.Repeat(20s, 25s);
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
-                    if (Creature* k = GetKrick())
-                        if (!k->HasUnitState(UNIT_STATE_CASTING))
+                    if (Creature* krick = GetKrick())
+                        if (!krick->HasUnitState(UNIT_STATE_CASTING))
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                             {
-                                k->CastSpell(target, SPELL_SHADOW_BOLT);
+                                krick->CastSpell(target, SPELL_SHADOW_BOLT);
                                 events.Repeat(14s);
                                 break;
                             }
@@ -215,33 +227,37 @@ public:
                     switch (urand(0, 2))
                     {
                         case 0: // Pursuit
-                            if (Creature* k = GetKrick())
-                                k->AI()->Talk(SAY_CHASE);
+                            if (Creature* krick = GetKrick())
+                                krick->AI()->Talk(SAY_CHASE);
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 70.0f, true))
-                                me->CastSpell(target, SPELL_PURSUIT, false);
+                                DoCast(target, SPELL_PURSUIT);
                             break;
                         case 1: // Poison Nova
-                            if (Creature* k = GetKrick())
+                            if (Creature* krick = GetKrick())
                             {
-                                k->AI()->Talk(SAY_POISON_NOVA);
+                                krick->AI()->Talk(SAY_POISON_NOVA);
                                 Talk(EMOTE_ICK_POISON_NOVA);
                             }
-                            me->CastSpell(me, SPELL_POISON_NOVA, false);
+                            DoCastSelf(SPELL_POISON_NOVA);
                             break;
                         case 2: // Explosive Barrage
-                            if (Creature* k = GetKrick())
+                            if (Creature* krick = GetKrick())
                             {
-                                k->AI()->Talk(SAY_BARRAGE_1);
-                                k->AI()->Talk(SAY_BARRAGE_2);
-                                k->InterruptNonMeleeSpells(false);
+                                krick->AI()->Talk(SAY_BARRAGE_1);
+                                krick->AI()->Talk(SAY_BARRAGE_2);
+                                krick->InterruptNonMeleeSpells(false);
                                 me->InterruptNonMeleeSpells(false);
-                                k->CastSpell(k, SPELL_EXPLOSIVE_BARRAGE_KRICK, false);
-                                me->CastSpell(me, SPELL_EXPLOSIVE_BARRAGE_ICK, false);
+                                krick->CastSpell(krick, SPELL_EXPLOSIVE_BARRAGE_KRICK, false);
+                                DoCastSelf(SPELL_EXPLOSIVE_BARRAGE_ICK);
                             }
                             events.DelayEvents(20s);
                             break;
+                        default:
+                            break;
                     }
                     events.Repeat(25s, 30s);
+                    break;
+                default:
                     break;
             }
 
@@ -250,8 +266,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (pInstance)
-                pInstance->SetData(DATA_ICK, DONE);
+            _instance->SetData(DATA_ICK, DONE);
             me->RemoveAllAuras();
         }
 
@@ -263,13 +278,12 @@ public:
                     me->SetReactState(REACT_AGGRESSIVE);
 
             if (who->IsPlayer())
-                if (Creature* k = GetKrick())
-                    k->AI()->Talk(SAY_SLAY);
+                if (Creature* krick = GetKrick())
+                    krick->AI()->Talk(SAY_SLAY);
         }
 
-        void JustSummoned(Creature*  /*summon*/) override
-        {
-        }
+    private:
+        InstanceScript* _instance;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -287,18 +301,15 @@ public:
     {
         boss_krickAI(Creature* creature) : NullCreatureAI(creature)
         {
-            pInstance = creature->GetInstanceScript();
+            _instance = creature->GetInstanceScript();
         }
 
-        InstanceScript* pInstance;
-        EventMap events;
-
-        void DoAction(int32 a) override
+        void DoAction(int32 action) override
         {
-            if (a == 1)
+            if (action == ACTION_START_KRICK_OUTRO)
             {
                 me->setActive(true);
-                events.RescheduleEvent(20, 0ms);
+                events.RescheduleEvent(EVENT_OUTRO_RESET_LEADER, 0ms);
             }
         }
 
@@ -307,109 +318,93 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
-                case 20:
-                    if (pInstance)
-                    {
-                        pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_KRICK_SCENE);
+                case EVENT_OUTRO_RESET_LEADER:
+                    _instance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_KRICK_SCENE);
 
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
-                        {
-                            c->GetMotionMaster()->Clear();
-                            c->UpdatePosition(SBSLeaderStartPos, true);
-                            c->StopMovingOnCurrentPos();
-                            c->AI()->Reset();
-                        }
+                    if (Creature* leader = _instance->instance->GetCreature(_instance->GetGuidData(DATA_LEADER_FIRST_GUID)))
+                    {
+                        leader->GetMotionMaster()->Clear();
+                        leader->UpdatePosition(SBSLeaderStartPos, true);
+                        leader->StopMovingOnCurrentPos();
+                        leader->AI()->Reset();
                     }
 
-                    events.RescheduleEvent(1, 3s);
+                    events.RescheduleEvent(EVENT_OUTRO_KRICK_1, 3s);
                     break;
-                case 1:
+                case EVENT_OUTRO_KRICK_1:
                     Talk(SAY_OUTRO_KRICK_1);
-                    if (pInstance)
+                    if (Creature* leader = _instance->instance->GetCreature(_instance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
-                        {
-                            float angle = me->GetAngle(c);
-                            me->SetFacingTo(angle);
-                            float x = me->GetPositionX() + cos(angle) * 7.0f;
-                            float y = me->GetPositionY() + std::sin(angle) * 7.0f;
-                            c->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
-                        }
-
-                        for (uint8 i = 0; i < 2; ++i)
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
-                                c->DespawnOrUnsummon();
+                        float angle = me->GetAngle(leader);
+                        me->SetFacingTo(angle);
+                        float x = me->GetPositionX() + std::cos(angle) * 7.0f;
+                        float y = me->GetPositionY() + std::sin(angle) * 7.0f;
+                        leader->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
                     }
 
-                    events.RescheduleEvent(2, 7s);
-                    break;
-                case 2:
-                    if (pInstance)
-                    {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                        {
-                            c->setActive(true);
-                            c->UpdatePosition(SBSTyrannusStartPos, true);
-                            c->SetHomePosition(SBSTyrannusStartPos);
-                        }
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
-                            c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_1 : SAY_SYLVANAS_KRICK_1);
-                    }
+                    for (uint8 i = 0; i < 2; ++i)
+                        if (Creature* guard = _instance->instance->GetCreature(_instance->GetGuidData(DATA_GUARD_1_GUID + i)))
+                            guard->DespawnOrUnsummon();
 
-                    events.RescheduleEvent(3, 6500ms);
+                    events.RescheduleEvent(EVENT_OUTRO_LEADER_1, 7s);
                     break;
-                case 3:
+                case EVENT_OUTRO_LEADER_1:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                    {
+                        tyrannus->setActive(true);
+                        tyrannus->UpdatePosition(SBSTyrannusStartPos, true);
+                        tyrannus->SetHomePosition(SBSTyrannusStartPos);
+                    }
+                    if (Creature* leader = _instance->instance->GetCreature(_instance->GetGuidData(DATA_LEADER_FIRST_GUID)))
+                        leader->AI()->Talk(leader->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_1 : SAY_SYLVANAS_KRICK_1);
+
+                    events.RescheduleEvent(EVENT_OUTRO_KRICK_2, 6500ms);
+                    break;
+                case EVENT_OUTRO_KRICK_2:
                     Talk(SAY_OUTRO_KRICK_2);
 
-                    events.RescheduleEvent(4, 17s);
+                    events.RescheduleEvent(EVENT_OUTRO_LEADER_2, 17s);
                     break;
-                case 4:
-                    if (pInstance)
-                    {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 10, false);
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
-                            c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_2 : SAY_SYLVANAS_KRICK_2);
-                    }
+                case EVENT_OUTRO_LEADER_2:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->GetMotionMaster()->MoveWaypoint(PATH_TYRANNUS_KRICK_OUTRO, false);
+                    if (Creature* leader = _instance->instance->GetCreature(_instance->GetGuidData(DATA_LEADER_FIRST_GUID)))
+                        leader->AI()->Talk(leader->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_2 : SAY_SYLVANAS_KRICK_2);
 
-                    events.RescheduleEvent(5, 6500ms);
+                    events.RescheduleEvent(EVENT_OUTRO_KRICK_3, 6500ms);
                     break;
-                case 5:
+                case EVENT_OUTRO_KRICK_3:
                     Talk(SAY_OUTRO_KRICK_3);
 
-                    events.RescheduleEvent(6, 6500ms);
+                    events.RescheduleEvent(EVENT_OUTRO_TYRANNUS_1, 6500ms);
                     break;
-                case 6:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                        {
-                            c->SetFacingToObject(me);
-                            c->AI()->Talk(SAY_TYRANNUS_KRICK_1);
-                        }
+                case EVENT_OUTRO_TYRANNUS_1:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                    {
+                        tyrannus->SetFacingToObject(me);
+                        tyrannus->AI()->Talk(SAY_TYRANNUS_KRICK_1);
+                    }
 
-                    events.RescheduleEvent(7, 4s);
+                    events.RescheduleEvent(EVENT_OUTRO_STRANGULATE, 4s);
                     break;
-                case 7:
-                    me->CastSpell(me, 69413, true);
+                case EVENT_OUTRO_STRANGULATE:
+                    DoCastSelf(SPELL_STRANGULATING, true);
                     me->SendMeleeAttackStop(me->GetVictim());
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 9.0f, 0.5f * 7.0f);
 
-                    events.RescheduleEvent(8, 2s);
+                    events.RescheduleEvent(EVENT_OUTRO_KRICK_4, 2s);
                     break;
-                case 8:
+                case EVENT_OUTRO_KRICK_4:
                     Talk(SAY_OUTRO_KRICK_4);
 
-                    events.RescheduleEvent(9, 1500ms);
+                    events.RescheduleEvent(EVENT_OUTRO_KRICK_DIES, 1500ms);
                     break;
-                case 9:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->CastSpell(c, 69753, false);
+                case EVENT_OUTRO_KRICK_DIES:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->CastSpell(tyrannus, SPELL_NECROMANTIC_POWER, false);
 
                     me->SetReactState(REACT_PASSIVE);
                     me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
@@ -418,37 +413,38 @@ public:
                     me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
                     me->AddUnitState(UNIT_STATE_DIED);
 
-                    me->CastSpell(me, SPELL_KRICK_KILL_CREDIT, true);
+                    DoCastSelf(SPELL_KRICK_KILL_CREDIT, true);
 
                     me->RemoveAllAuras();
                     me->GetMotionMaster()->MoveFall(0, true);
 
-                    events.RescheduleEvent(10, 5s);
+                    events.RescheduleEvent(EVENT_OUTRO_TYRANNUS_2, 5s);
                     break;
-                case 10:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->AI()->Talk(SAY_TYRANNUS_KRICK_2);
+                case EVENT_OUTRO_TYRANNUS_2:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->AI()->Talk(SAY_TYRANNUS_KRICK_2);
 
-                    events.RescheduleEvent(11, 9s);
+                    events.RescheduleEvent(EVENT_OUTRO_LEADER_3, 9s);
                     break;
-                case 11:
-                    if (pInstance)
+                case EVENT_OUTRO_LEADER_3:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->GetMotionMaster()->MovePoint(POINT_TYRANNUS_KRICK_OUTRO_END, 809.39f, 74.69f, 541.54f);
+                    if (Creature* leader = _instance->instance->GetCreature(_instance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->GetMotionMaster()->MovePoint(1, 809.39f, 74.69f, 541.54f);
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
-                        {
-                            c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_3 : SAY_SYLVANAS_KRICK_3);
-                            c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 11, false);
-                        }
+                        leader->AI()->Talk(leader->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_3 : SAY_SYLVANAS_KRICK_3);
+                        leader->GetMotionMaster()->MoveWaypoint(PATH_LEADER_KRICK_OUTRO, false);
                     }
                     me->setActive(false);
                     me->KillSelf();
 
                     break;
+                default:
+                    break;
             }
         }
+
+    private:
+        InstanceScript* _instance;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -472,9 +468,8 @@ class spell_krick_explosive_barrage_aura : public AuraScript
         if (Unit* caster = GetCaster())
             if (caster->IsCreature())
             {
-                Map::PlayerList const& players = caster->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if (Player* player = itr->GetSource())
+                for (auto const& ref : caster->GetMap()->GetPlayers())
+                    if (Player* player = ref.GetSource())
                         if (player->IsWithinDist(caster, 100.0f))
                             caster->CastSpell(player, SPELL_EXPLOSIVE_BARRAGE_SUMMON, true);
             }

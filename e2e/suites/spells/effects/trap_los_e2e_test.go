@@ -3,7 +3,11 @@
 package effects_test
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
+	"slices"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -27,28 +31,30 @@ const (
 
 	creatureViper         uint32 = 19921
 	creatureVenomousSnake uint32 = 19833
+
+	smsgAuraUpdate uint16 = 0x496
 )
 
 // trapToTrip is one hunter trap at the rank a level 80 hunter has, and how its effect
-// shows: an aura on the victim, or creatures summoned next to it.
+// shows: any of auras on the victim, or creatures summoned next to it.
 type trapToTrip struct {
 	name       string
 	spell      uint32 // places gameObject at the hunter's feet
 	gameObject uint32 // type 1 trap: despawns once it has cast
-	aura       uint32
+	auras      []uint32
 	summons    []uint32
 }
 
 // Freezing Trap comes first at every spot: its freeze breaks on damage, and the other
 // traps leave burning ground and snakes behind.
-// Frost Trap's initial slow (67035) lasts only 100ms; check its persistent slowing aura
-// instead, since the initial aura can expire between client-cache polls.
 var trapsToTrip = []trapToTrip{
-	{"Freezing", 14311, 164877, 14309, nil},   // Freezing Trap Effect
-	{"Frost", 13809, 164639, 13810, nil},      // persistent Frost Trap slowing aura
-	{"Immolation", 49056, 189319, 49054, nil}, // Immolation Trap DoT
-	{"Explosive", 49067, 189322, 49065, nil},  // Explosive Trap Effect burn
-	{"Snake", 34600, 183957, 0, []uint32{creatureViper, creatureVenomousSnake}},
+	{"Freezing", 14311, 164877, []uint32{14309}, nil}, // Freezing Trap Effect
+	// The trap's 63487 casts both on its victim. 67035 lasts 100ms and expires unseen when a
+	// world tick runs longer than that; 13810 is the Frost Trap Aura area it leaves behind.
+	{"Frost", 13809, 164639, []uint32{67035, 13810}, nil},
+	{"Immolation", 49056, 189319, []uint32{49054}, nil}, // Immolation Trap DoT
+	{"Explosive", 49067, 189322, []uint32{49065}, nil},  // Explosive Trap Effect burn
+	{"Snake", 34600, 183957, nil, []uint32{creatureViper, creatureVenomousSnake}},
 }
 
 // Hunter traps share the 1.5s global cooldown, which `.cooldown` does not reset.
@@ -172,9 +178,28 @@ func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToT
 			staleSummons[u.GUID] = struct{}{}
 		}
 	}
+	// An aura as short as Frost Trap's 100ms slow can come and go between two polls of the
+	// object cache, so its arrival is latched from the aura update itself.
+	var auraSeen atomic.Bool
+	if len(trap.auras) > 0 {
+		cancel := placer.World.AddPacketHook(func(opcode uint16, data []byte) {
+			if opcode == smsgAuraUpdate && auraUpdateApplies(data, dummy, trap.auras) {
+				auraSeen.Store(true)
+			}
+		})
+		defer cancel()
+	}
 	landed := func() bool {
-		if trap.aura != 0 {
-			return placer.UnitHasAura(dummy, trap.aura)
+		if len(trap.auras) > 0 {
+			if auraSeen.Load() {
+				return true
+			}
+			for _, aura := range trap.auras {
+				if placer.UnitHasAura(dummy, aura) {
+					return true
+				}
+			}
+			return false
 		}
 		for _, u := range placer.UnitsByEntry(10, trap.summons...) {
 			if _, stale := staleSummons[u.GUID]; !stale {
@@ -210,6 +235,24 @@ func tripTrap(t *testing.T, hunter, placer *e2eharness.ScenarioBot, trap trapToT
 	}
 	e2eharness.Assertf(t, "%s Trap %d fired and despawned but its effect never reached dummy 0x%X",
 		trap.name, trap.gameObject, dummy)
+}
+
+// auraUpdateApplies reports whether an SMSG_AURA_UPDATE applies one of auras to target. The
+// server sends one slot per packet: the target's packed GUID, the slot, then the spell id,
+// which is 0 when the slot is cleared.
+func auraUpdateApplies(data []byte, target uint64, auras []uint32) bool {
+	r := bytes.NewReader(data)
+	if guid, err := readPackedGUID(r); err != nil || guid != target {
+		return false
+	}
+	var slot struct {
+		Slot  uint8
+		Spell uint32
+	}
+	if binary.Read(r, binary.LittleEndian, &slot) != nil || slot.Spell == 0 {
+		return false
+	}
+	return slices.Contains(auras, slot.Spell)
 }
 
 // clearSpot kills every living creature spawned within trapLOSClearRadius of the bot, so
