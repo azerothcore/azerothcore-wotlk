@@ -4320,6 +4320,10 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
 
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE_BY_OWNER);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SOCIAL_BY_FRIEND);
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
@@ -7244,6 +7248,26 @@ void Player::UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot)
         ApplyItemObtainSpells(item, false);
     else if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
         ApplyItemObtainSpells(item, true);
+}
+
+// Items dropped while the inventory loads never go through RemoveItem/DestroyItem,
+// so their saved obtain auras would otherwise stay on the player forever.
+void Player::RemoveOrphanedItemObtainSpells()
+{
+    bool removed = false;
+    RemoveOwnedAuras([&](Aura const* aura)
+    {
+        ObjectGuid castItemGuid = aura->GetCastItemGUID();
+        if (!castItemGuid || aura->GetCasterGUID() != GetGUID() || !sObjectMgr->IsItemObtainSpell(aura->GetId()) || GetItemByGuid(castItemGuid))
+            return false;
+
+        removed = true;
+        return true;
+    });
+
+    // another held item may grant the same spell and skipped its cast while the stale aura was up
+    if (removed)
+        CastAllObtainSpells();
 }
 
 // this one rechecks weapon auras and stores them in BaseModGroup container

@@ -812,10 +812,11 @@ public:
                 me->setActive(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(true);
-                if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
+                if (Creature* svalna = _instance->GetCreature(DATA_SISTER_SVALNA))
                     svalna->AI()->DoAction(ACTION_START_GAUNTLET);
+
                 for (uint32 i = 0; i < 4; ++i)
-                    if (Creature* crusader = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
+                    if (Creature* crusader = _instance->GetCreature(DATA_CAPTAIN_ARNATH + i))
                         crusader->AI()->DoAction(ACTION_START_GAUNTLET);
 
                 Talk(SAY_CROK_INTRO_1);
@@ -848,7 +849,7 @@ public:
                     {
                         _handledWP4 = true;
                         Talk(SAY_CROK_FINAL_WP);
-                        if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
+                        if (Creature* svalna = _instance->GetCreature(DATA_SISTER_SVALNA))
                             svalna->AI()->DoAction(ACTION_RESURRECT_CAPTAINS);
                     }
                 }
@@ -880,7 +881,7 @@ public:
                     {
                         _handledWP4 = true;
                         Talk(SAY_CROK_FINAL_WP);
-                        if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
+                        if (Creature* svalna = _instance->GetCreature(DATA_SISTER_SVALNA))
                             svalna->AI()->DoAction(ACTION_RESURRECT_CAPTAINS);
                     }
                     break;
@@ -900,13 +901,15 @@ public:
                     break;
                 case 1:
                     minY = 2550.0f;
-                    if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
+                    if (Creature* svalna = _instance->GetCreature(DATA_SISTER_SVALNA))
                         svalna->AI()->DoAction(ACTION_KILL_CAPTAIN);
+
                     break;
                 case 2:
                     minY = 2515.0f;
-                    if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
+                    if (Creature* svalna = _instance->GetCreature(DATA_SISTER_SVALNA))
                         svalna->AI()->DoAction(ACTION_KILL_CAPTAIN);
+
                     break;
                 case 4:
                     minY = 2475.0f;
@@ -995,8 +998,9 @@ public:
             switch (_events.ExecuteEvent())
             {
                 case EVENT_ARNATH_INTRO_2:
-                    if (Creature* arnath = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_CAPTAIN_ARNATH)))
+                    if (Creature* arnath = _instance->GetCreature(DATA_CAPTAIN_ARNATH))
                         arnath->AI()->Talk(SAY_ARNATH_INTRO_2);
+
                     break;
                 case EVENT_CROK_INTRO_3:
                     Talk(SAY_CROK_INTRO_3);
@@ -1095,12 +1099,12 @@ public:
             _JustDied();
             Talk(SAY_SVALNA_DEATH);
 
-            if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE))) // _isEventDone = true, setActive(false)
+            if (Creature* crok = instance->GetCreature(DATA_CROK_SCOURGEBANE)) // _isEventDone = true, setActive(false)
                 crok->AI()->DoAction(ACTION_RESET_EVENT);
 
             Milliseconds delay = 6s;
             for (uint32 i = 0; i < 4; ++i)
-                if (Creature* crusader = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
+                if (Creature* crusader = instance->GetCreature(DATA_CAPTAIN_ARNATH + i))
                     if (crusader->IsAlive())
                     {
                         if (crusader->GetEntry() == crusader->GetCreatureData()->id)
@@ -1117,7 +1121,7 @@ public:
         {
             _JustEngagedWith();
             me->LowerPlayerDamageReq(me->GetMaxHealth());
-            if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+            if (Creature* crok = instance->GetCreature(DATA_CROK_SCOURGEBANE))
             {
                 crok->AI()->Talk(SAY_CROK_COMBAT_SVALNA);
                 crok->AI()->AttackStart(me);
@@ -1316,7 +1320,7 @@ public:
     {
         if (action == ACTION_START_GAUNTLET)
         {
-            if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+            if (Creature* crok = instance->GetCreature(DATA_CROK_SCOURGEBANE))
             {
                 FollowAngle = me->GetAngle(crok) + me->GetOrientation();
                 FollowDist = me->GetDistance2d(crok);
@@ -1343,7 +1347,7 @@ public:
             return;
 
         me->GetMotionMaster()->Clear(false);
-        if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+        if (Creature* crok = instance->GetCreature(DATA_CROK_SCOURGEBANE))
         {
             // MoveFollow never clears the evade state _EnterEvadeMode sets, unlike MoveTargetedHome
             me->ClearUnitState(UNIT_STATE_EVADE);
@@ -3045,7 +3049,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_SISTER_SVALNA) != DONE)
-                if (Creature* crok = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_CROK_SCOURGEBANE)))
+                if (Creature* crok = instance->GetCreature(DATA_CROK_SCOURGEBANE))
                 {
                     if (!crok->IsAlive())
                     {
@@ -3057,6 +3061,7 @@ public:
                     else
                         crok->AI()->DoAction(ACTION_START_GAUNTLET);
                 }
+
         return true;
     }
 };
@@ -4373,8 +4378,9 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_SINDRAGOSA_GAUNTLET) == NOT_STARTED)
-                if (Creature* gauntlet = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_SINDRAGOSA_GAUNTLET)))
+                if (Creature* gauntlet = instance->GetCreature(DATA_SINDRAGOSA_GAUNTLET_NPC))
                     gauntlet->AI()->DoAction(ACTION_START_GAUNTLET);
+
         return true;
     }
 };
@@ -4388,8 +4394,9 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED)
-                if (Creature* trap = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_PUTRICADES_TRAP)))
+                if (Creature* trap = instance->GetCreature(DATA_PUTRICIDE_TRAP))
                     trap->AI()->DoAction(ACTION_START_GAUNTLET);
+
         return true;
     }
 };

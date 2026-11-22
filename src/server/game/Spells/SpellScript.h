@@ -306,6 +306,7 @@ public:
     bool IsInTargetHook() const;
     bool IsInHitPhase() const;
     bool IsInEffectHook() const;
+    bool IsAfterTargetSelectionPhase() const;
 private:
     Spell* m_spell;
     uint8 m_hitPreventEffectMask;
@@ -416,6 +417,12 @@ public:
 
     // returns: Item which was selected as an explicit spell target or nullptr if there's no target
     Item* GetExplTargetItem();
+
+    // methods usable only after spell targets have been fully selected:
+    // returns: number of units hit by the given effect
+    int32 GetUnitTargetCountForEffect(SpellEffIndex effect) const;
+    // returns: position of the unit in the list of units hit by the given effect, -1 when it is not part of that list
+    int32 GetUnitTargetIndexForEffect(ObjectGuid const& target, SpellEffIndex effect) const;
 
     // methods useable only during spell hit on target, or during spell launch on target:
     // returns: target of current effect if it was Unit otherwise nullptr

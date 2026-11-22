@@ -63,8 +63,8 @@ public:
 
         static ChatCommandTable accountLockCommandTable
         {
-            { "country",    HandleAccountLockCountryCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_COUNTRY, Console::Yes  },
-            { "ip",         HandleAccountLockIpCommand,       rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_IP, Console::Yes  }
+            { "country",    HandleAccountLockCountryCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_COUNTRY, Console::No  },
+            { "ip",         HandleAccountLockIpCommand,       rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK_IP, Console::No  }
         };
 
         static ChatCommandTable account2faCommandTable
@@ -471,37 +471,38 @@ public:
 
         std::string param = (char*)args;
 
-        if (!param.empty())
+        if (param != "on" && param != "off")
         {
-            if (param == "on")
-            {
-                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(handler->GetSession()->GetRemoteAddress()))
-                {
-                    auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
-                    stmt->SetData(0, location->CountryCode);
-                    stmt->SetData(1, handler->GetSession()->GetAccountId());
-                    LoginDatabase.Execute(stmt);
-                    handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
-                }
-                else
-                {
-                    handler->SendErrorMessage("No IP2Location information - account not locked");
-                    return false;
-                }
-            }
-            else if (param == "off")
-            {
-                auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
-                stmt->SetData(0, "00");
-                stmt->SetData(1, handler->GetSession()->GetAccountId());
-                LoginDatabase.Execute(stmt);
-                handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
-            }
-            return true;
+            handler->SendErrorMessage(LANG_USE_BOL);
+            return false;
         }
 
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
+        if (param == "on")
+        {
+            if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(handler->GetSession()->GetRemoteAddress()))
+            {
+                auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+                stmt->SetData(0, location->CountryCode);
+                stmt->SetData(1, handler->GetSession()->GetAccountId());
+                LoginDatabase.Execute(stmt);
+                handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
+            }
+            else
+            {
+                handler->SendErrorMessage("No IP2Location information - account not locked");
+                return false;
+            }
+        }
+        else
+        {
+            auto* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_COUNTRY);
+            stmt->SetData(0, "00");
+            stmt->SetData(1, handler->GetSession()->GetAccountId());
+            LoginDatabase.Execute(stmt);
+            handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
+        }
+
+        return true;
     }
 
     static bool HandleAccountLockIpCommand(ChatHandler* handler, char const* args)
@@ -514,29 +515,29 @@ public:
 
         std::string param = (char*)args;
 
-        if (!param.empty())
+        if (param != "on" && param != "off")
         {
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK);
-
-            if (param == "on")
-            {
-                stmt->SetData(0, true);                                     // locked
-                handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
-            }
-            else if (param == "off")
-            {
-                stmt->SetData(0, false);                                    // unlocked
-                handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
-            }
-
-            stmt->SetData(1, handler->GetSession()->GetAccountId());
-
-            LoginDatabase.Execute(stmt);
-            return true;
+            handler->SendErrorMessage(LANG_USE_BOL);
+            return false;
         }
 
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK);
+
+        if (param == "on")
+        {
+            stmt->SetData(0, true);                                         // locked
+            handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
+        }
+        else
+        {
+            stmt->SetData(0, false);                                        // unlocked
+            handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
+        }
+
+        stmt->SetData(1, handler->GetSession()->GetAccountId());
+
+        LoginDatabase.Execute(stmt);
+        return true;
     }
 
     static bool HandleAccountPasswordCommand(ChatHandler* handler, char const* args)

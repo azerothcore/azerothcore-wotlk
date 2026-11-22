@@ -15,13 +15,58 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Group.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "MapMgr.h"
 #include "Transport.h"
+#include "TransportMgr.h"
 #include "WorldStateDefines.h"
 #include "halls_of_reflection.h"
+#include <algorithm>
+#include <cstring>
+#include <iterator>
+
+enum UtherBatteredHiltSteps
+{
+    UTHER_STEP_APPEAR = 1,
+    UTHER_STEP_HALT,
+    UTHER_STEP_SUMMON_QUEL,
+    UTHER_STEP_MOVE_ASIDE,
+    UTHER_STEP_KNEEL,
+    UTHER_STEP_QUEL_LAND,
+    UTHER_STEP_QUEL_PREPARE,
+    UTHER_STEP_QUEL_ATTACK,
+    UTHER_STEP_OUTRO_1,
+    UTHER_STEP_OUTRO_2,
+    UTHER_STEP_OUTRO_3,
+    UTHER_STEP_OUTRO_4,
+    UTHER_STEP_HOLY_LIGHT,
+    UTHER_STEP_DESPAWN
+};
+
+enum WaveResumeSteps
+{
+    WAVE_RESUME_NONE,
+    WAVE_RESUME_SHOW_BOSSES,
+    WAVE_RESUME_SHOW_TRASH,
+    WAVE_RESUME_HIDE_ALL
+};
+
+enum LichKingOutroSteps
+{
+    OUTRO_NONE,
+    OUTRO_HARVEST_SOUL,
+    OUTRO_SUMMON_GUNSHIP,
+    OUTRO_GUNSHIP_FIRE,
+    OUTRO_CAVE_IN,
+    OUTRO_HIDE_LICH_KING,
+    OUTRO_GUNSHIP_MOVE,
+    OUTRO_SUMMON_STAIRS,
+    OUTRO_BOARD_GUNSHIP,
+    OUTRO_LEADER_FINAL,
+    OUTRO_QUEST_CREDIT,
+    OUTRO_QUEST_GIVER,
+    OUTRO_FINISH
+};
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -32,74 +77,74 @@ public:
     {
         switch (_eventId)
         {
-            case 1:
+            case UTHER_STEP_APPEAR:
                 _owner.UpdatePosition(5300.53f, 1987.80f, 707.70f, 3.89f, true);
                 _owner.StopMovingOnCurrentPos();
                 _owner.GetMotionMaster()->Clear();
                 _owner.SetVisible(true);
                 _owner.NearTeleportTo(5300.53f, 1987.80f, 707.70f, 3.89f);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 2), 1s);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_HALT), 1s);
                 break;
-            case 2:
+            case UTHER_STEP_HALT:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_HALT);
                 break;
-            case 3:
+            case UTHER_STEP_SUMMON_QUEL:
                 _owner.CastSpell((Unit*)nullptr, SPELL_SUMMON_EVIL_QUEL, true);
                 _owner.AI()->Talk(SAY_BATTERED_HILT_REALIZE);
                 if (InstanceScript* inst = _owner.GetInstanceScript())
-                    inst->SetData(DATA_BATTERED_HILT, 4);
+                    inst->SetData(DATA_BATTERED_HILT, BATTERED_HILT_QUEL_SUMMONED);
                 if (Creature* quel = _owner.FindNearestCreature(NPC_QUEL_DELAR, 50))
                     quel->AI()->Talk(EMOTE_QUEL_SPAWN);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 4), 3500ms);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_MOVE_ASIDE), 3500ms);
                 break;
-            case 4:
+            case UTHER_STEP_MOVE_ASIDE:
                 _owner.SetWalk(false);
                 _owner.GetMotionMaster()->MovePoint(0, 5337.53f, 1981.21f, 709.32f);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 5), 6s);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_KNEEL), 6s);
                 break;
-            case 5:
+            case UTHER_STEP_KNEEL:
                 _owner.SetFacingTo(2.82f);
                 _owner.SetStandState(UNIT_STAND_STATE_KNEEL);
                 break;
-            case 6:
+            case UTHER_STEP_QUEL_LAND:
                 if (InstanceScript* inst = _owner.GetInstanceScript())
-                    inst->SetData(DATA_BATTERED_HILT, 6);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 7), 2s);
+                    inst->SetData(DATA_BATTERED_HILT, BATTERED_HILT_QUEL_LAND);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_QUEL_PREPARE), 2s);
                 break;
-            case 7:
+            case UTHER_STEP_QUEL_PREPARE:
                 if (InstanceScript* inst = _owner.GetInstanceScript())
-                    inst->SetData(DATA_BATTERED_HILT, 7);
+                    inst->SetData(DATA_BATTERED_HILT, BATTERED_HILT_QUEL_PREPARE);
                 if (Creature* quel = _owner.FindNearestCreature(NPC_QUEL_DELAR, 50))
                     quel->AI()->Talk(EMOTE_QUEL_PREPARE);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 8), 4s);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_QUEL_ATTACK), 4s);
                 break;
-            case 8:
+            case UTHER_STEP_QUEL_ATTACK:
                 _owner.SetReactState(REACT_AGGRESSIVE);
                 _owner.SetImmuneToAll(false);
                 if (InstanceScript* inst = _owner.GetInstanceScript())
-                    inst->SetData(DATA_BATTERED_HILT, 8);
+                    inst->SetData(DATA_BATTERED_HILT, BATTERED_HILT_QUEL_ATTACK);
                 break;
-            case 9:
+            case UTHER_STEP_OUTRO_1:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_OUTRO1);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 11s);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_OUTRO_2), 11s);
                 break;
-            case 10:
+            case UTHER_STEP_OUTRO_2:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_OUTRO2);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 7500ms);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_OUTRO_3), 7500ms);
                 break;
-            case 11:
+            case UTHER_STEP_OUTRO_3:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_OUTRO3);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 8s);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_OUTRO_4), 8s);
                 break;
-            case 12:
+            case UTHER_STEP_OUTRO_4:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_OUTRO4);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 5s);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_HOLY_LIGHT), 5s);
                 break;
-            case 13:
+            case UTHER_STEP_HOLY_LIGHT:
                 _owner.CastSpell((Unit*)nullptr, SPELL_UTHER_HOLY_LIGHT_VISUAL, true);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 3s);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, UTHER_STEP_DESPAWN), 3s);
                 break;
-            case 14:
+            case UTHER_STEP_DESPAWN:
             {
                 Position homePos = _owner.GetHomePosition();
                 _owner.SetReactState(REACT_PASSIVE);
@@ -109,9 +154,11 @@ public:
                 _owner.StopMovingOnCurrentPos();
                 _owner.GetMotionMaster()->Clear();
                 if (InstanceScript* inst = _owner.GetInstanceScript())
-                    inst->SetData(DATA_BATTERED_HILT, 9);
+                    inst->SetData(DATA_BATTERED_HILT, BATTERED_HILT_FINISHED);
                 break;
             }
+            default:
+                break;
         }
         return true;
     }
@@ -125,15 +172,14 @@ ObjectData const creatureData[] =
 {
     { NPC_FALRIC,                      DATA_FALRIC                      },
     { NPC_MARWYN,                      DATA_MARWYN                      },
-    { NPC_SYLVANAS_PART1,              NPC_SYLVANAS_PART1               },
-    { NPC_DARK_RANGER_LORALEN,         NPC_DARK_RANGER_LORALEN          },
-    { NPC_UTHER,                       NPC_UTHER                        },
-    { NPC_LICH_KING_EVENT,             NPC_LICH_KING_EVENT              },
-    { NPC_FROSTSWORN_GENERAL,          NPC_FROSTSWORN_GENERAL           },
-    { NPC_LICH_KING_BOSS,              NPC_LICH_KING_BOSS               },
-    { NPC_SYLVANAS_PART2,              NPC_SYLVANAS_PART2               },
-    { NPC_ALTAR_BUNNY,                 NPC_ALTAR_BUNNY                  },
-    { NPC_QUEL_DELAR,                  NPC_QUEL_DELAR                   },
+    { NPC_SYLVANAS_PART1,              DATA_SYLVANAS_PART1              },
+    { NPC_DARK_RANGER_LORALEN,         DATA_DARK_RANGER_LORALEN         },
+    { NPC_UTHER,                       DATA_UTHER                       },
+    { NPC_LICH_KING_EVENT,             DATA_LICH_KING_EVENT             },
+    { NPC_FROSTSWORN_GENERAL,          DATA_FROSTSWORN_GENERAL          },
+    { NPC_LICH_KING_BOSS,              DATA_LICH_KING                   },
+    { NPC_SYLVANAS_PART2,              DATA_SYLVANAS_PART2              },
+    { NPC_ALTAR_BUNNY,                 DATA_ALTAR_BUNNY                 },
     { NPC_HIGH_CAPTAIN_JUSTIN_BARLETT, DATA_SHIP_CAPTAIN                },
     { NPC_SKY_REAVER_KORM_BLACKSKAR,   DATA_SHIP_CAPTAIN                },
     { 0,                               0                                }
@@ -141,15 +187,14 @@ ObjectData const creatureData[] =
 
 ObjectData const gameObjectData[] =
 {
-    { GO_FROSTMOURNE,        GO_FROSTMOURNE        },
-    { GO_FROSTMOURNE_ALTAR,  GO_FROSTMOURNE_ALTAR  },
-    { GO_FRONT_DOOR,         GO_FRONT_DOOR         },
-    { GO_ARTHAS_DOOR,        GO_ARTHAS_DOOR        },
-    { GO_CAVE_IN,            GO_CAVE_IN            },
-    { GO_DOOR_BEFORE_THRONE, GO_DOOR_BEFORE_THRONE },
-    { GO_DOOR_AFTER_THRONE,  GO_DOOR_AFTER_THRONE  },
-    { GO_ICE_WALL,           GO_ICE_WALL           },
-    { 0,                     0                     }
+    { GO_FROSTMOURNE,        DATA_FROSTMOURNE        },
+    { GO_FROSTMOURNE_ALTAR,  DATA_FROSTMOURNE_ALTAR  },
+    { GO_FRONT_DOOR,         DATA_FRONT_DOOR         },
+    { GO_ARTHAS_DOOR,        DATA_ARTHAS_DOOR        },
+    { GO_CAVE_IN,            DATA_CAVE_IN            },
+    { GO_DOOR_BEFORE_THRONE, DATA_DOOR_BEFORE_THRONE },
+    { GO_DOOR_AFTER_THRONE,  DATA_DOOR_AFTER_THRONE  },
+    { 0,                     0                       }
 };
 
 class instance_halls_of_reflection : public InstanceScript
@@ -172,14 +217,14 @@ public:
         _nextWaveTimer = 0;
         _playerCheckTimer = 5000;
         _waveResumeTimer = 0;
-        _waveResumeStep = 0;
+        _waveResumeStep = WAVE_RESUME_NONE;
         _falricPhaseComplete = false;
         _remainingTrashKills = 0;
         _isLichKingFightActive = false;
         _batteredHiltStatus = 0;
         _outroTimer = 0;
-        _outroStep = 0;
-        _transport = nullptr;
+        _outroStep = OUTRO_NONE;
+        _gunshipGuid.Clear();
     }
 
     bool IsEncounterInProgress() const override
@@ -195,7 +240,7 @@ public:
         {
             case NPC_SYLVANAS_PART1:
                 creature->SetVisible(false);
-                creature->SetSpeed(MOVE_RUN, 1.1);
+                creature->SetSpeed(MOVE_RUN, 1.1f);
                 if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                     creature->UpdateEntry(NPC_JAINA_PART1);
                 creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -255,7 +300,7 @@ public:
                     creature->SetVisible(false);
                 if (!GetPersistentData(PERSISTENT_DATA_LK_INTRO))
                 {
-                    creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK2HTIGHT);
+                    creature->SetEmoteState(EMOTE_ONESHOT_ATTACK2HTIGHT);
                     creature->CastSpell(creature, SPELL_SOUL_REAPER, true);
                 }
                 else if (GetBossState(DATA_LICH_KING) != DONE)
@@ -279,7 +324,7 @@ public:
                 if (!GetPersistentData(PERSISTENT_DATA_LK_INTRO))
                 {
                     creature->SetSheath(SHEATH_STATE_MELEE);
-                    creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, GetTeamIdInInstance() == TEAM_ALLIANCE ? EMOTE_ONESHOT_ATTACK2HTIGHT : EMOTE_ONESHOT_ATTACK1H);
+                    creature->SetEmoteState(GetTeamIdInInstance() == TEAM_ALLIANCE ? EMOTE_ONESHOT_ATTACK2HTIGHT : EMOTE_ONESHOT_ATTACK1H);
                     creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     creature->CastSpell(creature, GetTeamIdInInstance() == TEAM_ALLIANCE ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS, true);
                 }
@@ -309,7 +354,10 @@ public:
                     _iceWallTargetGUID[3] = creature->GetGUID();
                 break;
             case NPC_QUEL_DELAR:
+                _quelDelarGuid = creature->GetGUID();
                 creature->SetReactState(REACT_PASSIVE);
+                break;
+            default:
                 break;
         }
     }
@@ -321,13 +369,18 @@ public:
             case GO_FROSTMOURNE:
                 HandleGameObject(ObjectGuid::Empty, false, go);
                 if (GetPersistentData(PERSISTENT_DATA_INTRO))
-                    go->SetPhaseMask(2, true);
+                    go->SetPhaseMask(PHASEMASK_HIDDEN, true);
                 break;
             case GO_FRONT_DOOR:
                 HandleGameObject(ObjectGuid::Empty, true, go);
                 break;
             case GO_ARTHAS_DOOR:
                 HandleGameObject(ObjectGuid::Empty, GetBossState(DATA_MARWYN) == DONE, go);
+                break;
+            case GO_ICE_WALL:
+                _iceWallGuid = go->GetGUID();
+                break;
+            default:
                 break;
         }
 
@@ -357,12 +410,12 @@ public:
                         HandleWaveWipe();
                     else if (state == DONE)
                     {
-                        HandleGameObject(GO_FRONT_DOOR, true);
-                        HandleGameObject(GO_ARTHAS_DOOR, true);
-                        if (Creature* general = GetCreature(NPC_FROSTSWORN_GENERAL))
+                        HandleGameObject(DATA_FRONT_DOOR, true);
+                        HandleGameObject(DATA_ARTHAS_DOOR, true);
+                        if (Creature* general = GetCreature(DATA_FROSTSWORN_GENERAL))
                         {
                             general->SetVisible(true);
-                            general->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                            general->ClearEmoteState();
                             general->SetReactState(REACT_AGGRESSIVE);
                             general->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
                         }
@@ -379,18 +432,20 @@ public:
             case DATA_LICH_KING:
                 if (state == DONE)
                 {
-                    if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                    if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                         leader->setActive(false);
-                    if (Creature* lichKing = GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = GetCreature(DATA_LICH_KING))
                     {
                         lichKing->GetThreatMgr().ClearAllThreat();
                         lichKing->CombatStop(true);
                         lichKing->setActive(false);
                     }
                     _isLichKingFightActive = false;
-                    _outroStep = 1;
+                    _outroStep = OUTRO_HARVEST_SOUL;
                     _outroTimer = 0;
                 }
+                break;
+            default:
                 break;
         }
 
@@ -405,20 +460,20 @@ public:
                 StorePersistentData(PERSISTENT_DATA_INTRO, 1);
                 StartNextWave();
                 break;
-            case ACTION_SHOW_TRASH:
+            case DATA_SHOW_TRASH:
                 RandomizeCompositionsAndShow();
                 break;
             case DATA_FROSTSWORN_GENERAL:
                 StorePersistentData(PERSISTENT_DATA_FROSTSWORN_GENERAL, 1);
                 if (data == DONE)
                 {
-                    if (Creature* lichKing = GetCreature(NPC_LICH_KING_BOSS))
+                    if (Creature* lichKing = GetCreature(DATA_LICH_KING))
                         lichKing->SetVisible(true);
-                    if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                    if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                         leader->SetVisible(true);
                 }
                 break;
-            case ACTION_SPIRITUAL_REFLECTIONS_COPY:
+            case DATA_SPIRITUAL_REFLECTIONS_COPY:
             {
                 uint8 reflectionIdx = 0;
                 instance->DoForAllPlayers([&](Player* player)
@@ -434,20 +489,20 @@ public:
                     reflection->SetDisableGravity(true);
                     reflection->SetVisible(true);
 
-                    Item* weapon = player->GetWeaponForAttack(BASE_ATTACK);
-                    reflection->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, weapon ? weapon->GetEntry() : 0);
-                    weapon = player->GetWeaponForAttack(OFF_ATTACK);
-                    reflection->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, weapon ? weapon->GetEntry() : 0);
-                    weapon = player->GetWeaponForAttack(RANGED_ATTACK);
-                    reflection->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, weapon ? weapon->GetEntry() : 0);
+                    // Virtual item slots 0-2 line up with the weapon attack types
+                    for (WeaponAttackType attackType : { BASE_ATTACK, OFF_ATTACK, RANGED_ATTACK })
+                    {
+                        Item* weapon = player->GetWeaponForAttack(attackType);
+                        reflection->SetVirtualItem(attackType, weapon ? weapon->GetEntry() : 0);
+                    }
                     player->CastSpell(reflection, SPELL_HOR_CLONE, true);
                     player->CastSpell(reflection, SPELL_HOR_CLONE_NAME, true);
                 });
                 break;
             }
-            case ACTION_SPIRITUAL_REFLECTIONS_ACTIVATE:
+            case DATA_SPIRITUAL_REFLECTIONS_ACTIVATE:
             {
-                Creature* general = GetCreature(NPC_FROSTSWORN_GENERAL);
+                Creature* general = GetCreature(DATA_FROSTSWORN_GENERAL);
                 if (!general)
                     break;
                 for (uint8 i = 0; i < MAX_SPIRITUAL_REFLECTIONS; ++i)
@@ -461,26 +516,26 @@ public:
                         }
                 break;
             }
-            case ACTION_SPIRITUAL_REFLECTIONS_HIDE:
+            case DATA_SPIRITUAL_REFLECTIONS_HIDE:
                 for (uint8 i = 0; i < MAX_SPIRITUAL_REFLECTIONS; ++i)
                     if (Creature* reflection = instance->GetCreature(_spiritualReflectionGUID[i]))
                         reflection->AI()->EnterEvadeMode();
                 break;
             case DATA_LK_INTRO:
                 StorePersistentData(PERSISTENT_DATA_LK_INTRO, 1);
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                     leader->AI()->DoAction(ACTION_START_INTRO);
                 break;
-            case ACTION_START_LK_FIGHT:
+            case DATA_START_LK_FIGHT:
                 SetBossState(DATA_LICH_KING, IN_PROGRESS);
                 _isLichKingFightActive = true;
                 DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_RETREATING_TIMED_EVENT);
                 DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_RETREATING_TIMED_EVENT);
                 break;
-            case ACTION_STOP_LK_FIGHT:
+            case DATA_STOP_LK_FIGHT:
                 if (!_isLichKingFightActive)
                     break;
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                 {
                     if (!leader->IsAlive())
                     {
@@ -501,9 +556,9 @@ public:
                     leader->AI()->Reset();
                     leader->setActive(false);
                     leader->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                    leader->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                    leader->ClearEmoteState();
                 }
-                if (Creature* lichKing = GetCreature(NPC_LICH_KING_BOSS))
+                if (Creature* lichKing = GetCreature(DATA_LICH_KING))
                 {
                     lichKing->GetThreatMgr().ClearAllThreat();
                     lichKing->CombatStop(true);
@@ -517,16 +572,16 @@ public:
                     lichKing->AI()->Reset();
                     lichKing->setActive(false);
                     lichKing->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                    lichKing->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                    lichKing->ClearEmoteState();
                     lichKing->SetSpeed(MOVE_RUN, lichKing->GetCreatureTemplate()->speed_run);
                 }
                 _isLichKingFightActive = false;
                 SetBossState(DATA_LICH_KING, FAIL);
                 _outroTimer = 0;
-                _outroStep = 0;
+                _outroStep = OUTRO_NONE;
                 [[fallthrough]];
-            case ACTION_DELETE_ICE_WALL:
-                HandleGameObject(GO_ICE_WALL, true);
+            case DATA_DELETE_ICE_WALL:
+                HandleGameObject(_iceWallGuid, true);
                 break;
             case DATA_BATTERED_HILT:
             {
@@ -535,62 +590,66 @@ public:
 
                 switch (data)
                 {
-                    case 1:
+                    case BATTERED_HILT_DISABLE:
                         StorePersistentData(PERSISTENT_DATA_BATTERED_HILT, 1);
                         break;
-                    case 2:
+                    case BATTERED_HILT_START:
                         if (_batteredHiltStatus)
                             break;
                         _batteredHiltStatus |= BHSF_STARTED;
-                        if (Creature* bunny = GetCreature(NPC_ALTAR_BUNNY))
+                        if (Creature* bunny = GetCreature(DATA_ALTAR_BUNNY))
                             bunny->CastSpell(bunny, SPELL_FROSTMOURNE_ALTAR_GLOW, true);
-                        if (Creature* uther = GetCreature(NPC_UTHER))
-                            uther->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*uther, 1), 3s);
+                        if (Creature* uther = GetCreature(DATA_UTHER))
+                            uther->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*uther, UTHER_STEP_APPEAR), 3s);
                         break;
-                    case 3:
+                    case BATTERED_HILT_THROW:
                         if (!(_batteredHiltStatus & BHSF_STARTED) || (_batteredHiltStatus & BHSF_THROWN))
                             break;
                         _batteredHiltStatus |= BHSF_THROWN;
-                        if (Creature* uther = GetCreature(NPC_UTHER))
-                            uther->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*uther, 3), 5500ms);
+                        if (Creature* uther = GetCreature(DATA_UTHER))
+                            uther->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*uther, UTHER_STEP_SUMMON_QUEL), 5500ms);
                         break;
-                    case 4:
-                        if (Creature* quelDelar = GetCreature(NPC_QUEL_DELAR))
+                    case BATTERED_HILT_QUEL_SUMMONED:
+                        if (Creature* quelDelar = instance->GetCreature(_quelDelarGuid))
                         {
                             quelDelar->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             quelDelar->SetSpeed(MOVE_RUN, 2.5f);
                         }
                         break;
-                    case 5:
-                        if (Creature* uther = GetCreature(NPC_UTHER))
-                            uther->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*uther, 6), 3s);
+                    case BATTERED_HILT_QUEL_ARRIVED:
+                        if (Creature* uther = GetCreature(DATA_UTHER))
+                            uther->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*uther, UTHER_STEP_QUEL_LAND), 3s);
                         break;
-                    case 6:
-                        if (Creature* quelDelar = GetCreature(NPC_QUEL_DELAR))
+                    case BATTERED_HILT_QUEL_LAND:
+                        if (Creature* quelDelar = instance->GetCreature(_quelDelarGuid))
                         {
                             quelDelar->SetSpeed(MOVE_RUN, quelDelar->GetCreatureTemplate()->speed_run);
                             quelDelar->GetMotionMaster()->MoveLand(0, quelDelar->GetPositionX(), quelDelar->GetPositionY(), 707.70f, 7.0f);
                         }
                         break;
-                    case 7:
-                        if (Creature* quelDelar = GetCreature(NPC_QUEL_DELAR))
+                    case BATTERED_HILT_QUEL_PREPARE:
+                        if (Creature* quelDelar = instance->GetCreature(_quelDelarGuid))
                         {
                             quelDelar->SetReactState(REACT_AGGRESSIVE);
                             quelDelar->SetImmuneToAll(false);
                             quelDelar->RemoveAurasDueToSpell(SPELL_QUEL_DELAR_HATRED);
                         }
                         break;
-                    case 8:
-                        if (Creature* quelDelar = GetCreature(NPC_QUEL_DELAR))
+                    case BATTERED_HILT_QUEL_ATTACK:
+                        if (Creature* quelDelar = instance->GetCreature(_quelDelarGuid))
                             quelDelar->SetInCombatWithZone();
                         break;
-                    case 9:
+                    case BATTERED_HILT_FINISHED:
                         StorePersistentData(PERSISTENT_DATA_BATTERED_HILT, 1);
                         _batteredHiltStatus |= BHSF_FINISHED;
+                        break;
+                    default:
                         break;
                 }
                 return;
             }
+            default:
+                break;
         }
     }
 
@@ -602,6 +661,8 @@ public:
                 return static_cast<uint32>(_waveNumber);
             case DATA_BATTERED_HILT:
                 return _batteredHiltStatus;
+            default:
+                break;
         }
 
         return 0;
@@ -611,11 +672,11 @@ public:
     {
         switch (type)
         {
-            case NPC_ICE_WALL_TARGET:
-            case NPC_ICE_WALL_TARGET + 1:
-            case NPC_ICE_WALL_TARGET + 2:
-            case NPC_ICE_WALL_TARGET + 3:
-                return _iceWallTargetGUID[type - NPC_ICE_WALL_TARGET];
+            case DATA_ICE_WALL_TARGET_1:
+            case DATA_ICE_WALL_TARGET_2:
+            case DATA_ICE_WALL_TARGET_3:
+            case DATA_ICE_WALL_TARGET_4:
+                return _iceWallTargetGUID[type - DATA_ICE_WALL_TARGET_1];
             default:
                 return GetObjectGuid(type);
         }
@@ -635,16 +696,18 @@ public:
                     if ((--_remainingTrashKills) == 0 && _waveNumber % 5 && _nextWaveTimer > 5000)
                         _nextWaveTimer = 5000;
                     break;
+                default:
+                    break;
             }
         }
 
         if (unit->GetEntry() == NPC_QUEL_DELAR)
-            if (Creature* uther = GetCreature(NPC_UTHER))
+            if (Creature* uther = GetCreature(DATA_UTHER))
             {
                 uther->SetStandState(UNIT_STAND_STATE_STAND);
                 uther->SetWalk(false);
                 uther->GetMotionMaster()->MovePoint(0, 5313.92f, 1989.36f, 707.70f);
-                uther->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*uther, 9), 7s);
+                uther->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*uther, UTHER_STEP_OUTRO_1), 7s);
             }
     }
 
@@ -652,26 +715,30 @@ public:
     {
         uint8 r1 = urand(0, 1);
         uint8 r2 = urand(2, 3);
-        for (uint8 i = 0; i < MAX_SPIRITUAL_REFLECTIONS; ++i)
+        for (uint8 i = 0; i < MAX_WAVE_MOBS; ++i)
         {
             _chosenComposition[0][i] = allowedCompositions[r1][i];
             _chosenComposition[1][i] = allowedCompositions[r1 == 0 ? 1 : 0][i];
             _chosenComposition[2][i] = allowedCompositions[r2][i];
             _chosenComposition[3][i] = allowedCompositions[r2 == 2 ? 3 : 2][i];
         }
-        bool left[4] = {true, true, true, true};
-        for (uint8 k = 4; k > 0; --k)
+
+        // The second half of the compositions fills the waves after Falric in random order
+        constexpr uint8 shuffledCount = MAX_WAVE_COMPOSITIONS / 2;
+        bool left[shuffledCount];
+        std::fill(std::begin(left), std::end(left), true);
+        for (uint8 k = shuffledCount; k > 0; --k)
         {
             uint8 r = urand(0, k - 1);
             uint8 ur = 0;
-            for (uint8 j = 0; j < 4; ++j)
+            for (uint8 j = 0; j < shuffledCount; ++j)
                 if (left[j])
                 {
                     if (ur == r)
                     {
                         left[j] = false;
-                        for (uint8 i = 0; i < MAX_SPIRITUAL_REFLECTIONS; ++i)
-                            _chosenComposition[8 - k][i] = allowedCompositions[j + 4][i];
+                        for (uint8 i = 0; i < MAX_WAVE_MOBS; ++i)
+                            _chosenComposition[MAX_WAVE_COMPOSITIONS - k][i] = allowedCompositions[shuffledCount + j][i];
                         break;
                     }
                     ++ur;
@@ -689,11 +756,11 @@ public:
                     bool forward = !!urand(0, 1);
                     for (int8 j = (forward ? 0 : NUM_OF_TRASH - 1); (forward ? j < NUM_OF_TRASH : j >= 0); (forward ? ++j : --j))
                         if (!_trashActive[j])
-                            if (Creature* c = instance->GetCreature(_trashGUID[j]))
-                                if (c->GetEntry() == entry)
+                            if (Creature* creature = instance->GetCreature(_trashGUID[j]))
+                                if (creature->GetEntry() == entry)
                                 {
                                     _trashActive[j] = true;
-                                    Unit::Kill(c, c);
+                                    Unit::Kill(creature, creature);
                                     break;
                                 }
                 }
@@ -703,10 +770,10 @@ public:
 
         for (uint8 i = 0; i < NUM_OF_TRASH; ++i)
             if (!_trashActive[i])
-                if (Creature* c = instance->GetCreature(_trashGUID[i]))
+                if (Creature* creature = instance->GetCreature(_trashGUID[i]))
                 {
-                    c->SetVisible(true);
-                    c->CastSpell(c, SPELL_WELL_OF_SOULS_VISUAL, false);
+                    creature->SetVisible(true);
+                    creature->CastSpell(creature, SPELL_WELL_OF_SOULS_VISUAL, false);
                 }
     }
 
@@ -721,13 +788,13 @@ public:
 
         DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVES_ENABLED, 1);
         DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVE_COUNT, _waveNumber);
-        HandleGameObject(GO_FRONT_DOOR, false);
+        HandleGameObject(DATA_FRONT_DOOR, false);
 
         for (uint8 i = 0; i < NUM_OF_TRASH; ++i)
             if (_trashActive[i])
-                if (Creature* c = instance->GetCreature(_trashGUID[i]))
-                    if (c->IsAlive() && !c->IsInCombat())
-                        c->AI()->DoAction(1);
+                if (Creature* creature = instance->GetCreature(_trashGUID[i]))
+                    if (creature->IsAlive() && !creature->IsInCombat())
+                        creature->AI()->DoAction(ACTION_WAVE_ENGAGE);
 
         if (_waveNumber == 5 || _waveNumber == 10)
         {
@@ -737,7 +804,7 @@ public:
                 if (Creature* falric = GetCreature(DATA_FALRIC))
                 {
                     if (falric->IsAlive())
-                        falric->AI()->DoAction(1);
+                        falric->AI()->DoAction(ACTION_WAVE_ENGAGE);
                     else
                         _nextWaveTimer = 1;
                 }
@@ -746,7 +813,7 @@ public:
             {
                 if (Creature* marwyn = GetCreature(DATA_MARWYN))
                     if (marwyn->IsAlive())
-                        marwyn->AI()->DoAction(1);
+                        marwyn->AI()->DoAction(ACTION_WAVE_ENGAGE);
             }
         }
         else
@@ -765,13 +832,13 @@ public:
                 bool forward = !!urand(0, 1);
                 for (int8 j = (forward ? 0 : NUM_OF_TRASH - 1); (forward ? j < NUM_OF_TRASH : j >= 0); (forward ? ++j : --j))
                     if (!_trashActive[j])
-                        if (Creature* c = instance->GetCreature(_trashGUID[j]))
-                            if (c->GetEntry() == entry)
+                        if (Creature* creature = instance->GetCreature(_trashGUID[j]))
+                            if (creature->GetEntry() == entry)
                             {
                                 _trashActive[j] = true;
-                                c->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                                c->SetImmuneToAll(false);
-                                c->AI()->DoAction(1);
+                                creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                                creature->SetImmuneToAll(false);
+                                creature->AI()->DoAction(ACTION_WAVE_ENGAGE);
                                 break;
                             }
             }
@@ -785,7 +852,7 @@ public:
 
         DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVES_ENABLED, 0);
         DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVE_COUNT, 0);
-        HandleGameObject(GO_FRONT_DOOR, true);
+        HandleGameObject(DATA_FRONT_DOOR, true);
 
         _trashCounter = NUM_OF_TRASH;
         _waveNumber = 0;
@@ -794,16 +861,16 @@ public:
 
         for (uint8 i = 0; i < NUM_OF_TRASH; ++i)
             if (_trashActive[i])
-                if (Creature* c = instance->GetCreature(_trashGUID[i]))
+                if (Creature* creature = instance->GetCreature(_trashGUID[i]))
                 {
-                    c->GetThreatMgr().ClearAllThreat();
-                    c->CombatStop(true);
-                    c->InterruptNonMeleeSpells(true);
-                    c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    c->SetImmuneToAll(true);
-                    c->Respawn(true);
-                    c->UpdatePosition(c->GetHomePosition(), true);
-                    c->StopMovingOnCurrentPos();
+                    creature->GetThreatMgr().ClearAllThreat();
+                    creature->CombatStop(true);
+                    creature->InterruptNonMeleeSpells(true);
+                    creature->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    creature->SetImmuneToAll(true);
+                    creature->Respawn(true);
+                    creature->UpdatePosition(creature->GetHomePosition(), true);
+                    creature->StopMovingOnCurrentPos();
                 }
         std::fill(std::begin(_trashActive), std::end(_trashActive), false);
         if (Creature* falric = GetCreature(DATA_FALRIC))
@@ -812,7 +879,7 @@ public:
             marwyn->AI()->EnterEvadeMode();
 
         _waveResumeTimer = 5000;
-        _waveResumeStep = 2;
+        _waveResumeStep = WAVE_RESUME_HIDE_ALL;
         _remainingTrashKills = 0;
     }
 
@@ -833,12 +900,12 @@ public:
                     bool outOfRange = false;
                     for (auto itr = pl.begin(); itr != pl.end(); ++itr)
                     {
-                        Player* p = itr->GetSource();
-                        if (!p || p->IsGameMaster())
+                        Player* player = itr->GetSource();
+                        if (!player || player->IsGameMaster())
                             continue;
-                        if (p->IsAlive())
+                        if (player->IsAlive())
                             allDead = false;
-                        if (p->GetExactDist2d(&CenterPos) > MAX_DIST_FROM_CENTER_IN_COMBAT)
+                        if (player->GetExactDist2d(&CenterPos) > MAX_DIST_FROM_CENTER_IN_COMBAT)
                         {
                             outOfRange = true;
                             break;
@@ -852,10 +919,10 @@ public:
                     bool allInRange = (instance->GetPlayersCountExceptGMs() > 0);
                     for (auto itr = pl.begin(); itr != pl.end(); ++itr)
                     {
-                        Player* p = itr->GetSource();
-                        if (!p || p->IsGameMaster())
+                        Player* player = itr->GetSource();
+                        if (!player || player->IsGameMaster())
                             continue;
-                        if (p->GetExactDist2d(&CenterPos) > MAX_DIST_FROM_CENTER_TO_START || !p->IsAlive())
+                        if (player->GetExactDist2d(&CenterPos) > MAX_DIST_FROM_CENTER_TO_START || !player->IsAlive())
                         {
                             allInRange = false;
                             break;
@@ -864,7 +931,7 @@ public:
                     if (allInRange)
                     {
                         _waveResumeTimer = 1;
-                        _waveResumeStep = 0;
+                        _waveResumeStep = WAVE_RESUME_SHOW_BOSSES;
                     }
                 }
             }
@@ -889,7 +956,7 @@ public:
             {
                 switch (_waveResumeStep)
                 {
-                    case 0:
+                    case WAVE_RESUME_SHOW_BOSSES:
                         if (Creature* falric = GetCreature(DATA_FALRIC))
                         {
                             falric->UpdatePosition(5274.9f, 2039.2f, 709.319f, 5.4619f, true);
@@ -915,10 +982,10 @@ public:
                             }
                             marwyn->AI()->Talk(EMOTE_MARWYN_INTRO_SPIRIT);
                         }
-                        ++_waveResumeStep;
+                        _waveResumeStep = WAVE_RESUME_SHOW_TRASH;
                         _waveResumeTimer = 7500;
                         break;
-                    case 1:
+                    case WAVE_RESUME_SHOW_TRASH:
                         if (Creature* falric = GetCreature(DATA_FALRIC))
                         {
                             if (falric->IsAlive())
@@ -926,21 +993,23 @@ public:
                             else if (Creature* marwyn = GetCreature(DATA_MARWYN))
                                 marwyn->AI()->Talk(SAY_MARWYN_WIPE_AFTER_FALRIC);
                         }
-                        SetData(ACTION_SHOW_TRASH, 1);
-                        _waveResumeStep = 0;
+                        SetData(DATA_SHOW_TRASH, 1);
+                        _waveResumeStep = WAVE_RESUME_NONE;
                         _waveResumeTimer = 0;
                         _nextWaveTimer = 7000;
                         break;
-                    default:
+                    case WAVE_RESUME_HIDE_ALL:
                         for (uint8 i = 0; i < NUM_OF_TRASH; ++i)
-                            if (Creature* c = instance->GetCreature(_trashGUID[i]))
-                                c->SetVisible(false);
+                            if (Creature* creature = instance->GetCreature(_trashGUID[i]))
+                                creature->SetVisible(false);
                         if (Creature* falric = GetCreature(DATA_FALRIC))
                             falric->SetVisible(false);
                         if (Creature* marwyn = GetCreature(DATA_MARWYN))
                             marwyn->SetVisible(false);
-                        _waveResumeStep = 0;
+                        _waveResumeStep = WAVE_RESUME_NONE;
                         _waveResumeTimer = 0;
+                        break;
+                    default:
                         break;
                 }
             }
@@ -962,66 +1031,67 @@ private:
     {
         switch (_outroStep)
         {
-            case 1:
-                if (Creature* lk = GetCreature(NPC_LICH_KING_BOSS))
+            case OUTRO_HARVEST_SOUL:
+                if (Creature* lk = GetCreature(DATA_LICH_KING))
                 {
                     lk->UpdatePosition(PathWaypoints[PATH_WP_COUNT - 2], true);
                     lk->StopMovingOnCurrentPos();
                     lk->RemoveAllAuras();
-                    lk->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CUSTOM_SPELL_02);
+                    lk->SetEmoteState(EMOTE_ONESHOT_CUSTOM_SPELL_02);
                     if (!lk->IsVisible())
                         lk->SetVisible(true);
-                    if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                    if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                     {
                         leader->UpdatePosition(PathWaypoints[PATH_WP_COUNT - 1], true);
                         leader->StopMovingOnCurrentPos();
                         leader->RemoveAllAuras();
-                        leader->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
+                        leader->SetEmoteState(EMOTE_ONESHOT_READY1H);
                         if (!leader->IsVisible())
                             leader->SetVisible(true);
                         lk->CastSpell(leader, SPELL_HARVEST_SOUL, false);
                     }
                 }
-                ++_outroStep;
+                _outroStep = OUTRO_SUMMON_GUNSHIP;
                 _outroTimer = 500;
                 break;
-            case 2:
+            case OUTRO_SUMMON_GUNSHIP:
             {
                 uint32 entry = GetTeamIdInInstance() == TEAM_ALLIANCE ? GO_THE_SKYBREAKER : GO_ORGRIMS_HAMMER;
-                _transport = sTransportMgr->CreateTransport(entry, 0, instance);
-                ++_outroStep;
+                if (MotionTransport* gunship = sTransportMgr->CreateTransport(entry, 0, instance))
+                    _gunshipGuid = gunship->GetGUID();
+                _outroStep = OUTRO_GUNSHIP_FIRE;
                 _outroTimer = GetTeamIdInInstance() == TEAM_ALLIANCE ? 10000 : 10500;
                 break;
             }
-            case 3:
-                if (_transport)
-                    _transport->EnableMovement(false);
+            case OUTRO_GUNSHIP_FIRE:
+                if (MotionTransport* gunship = GetGunship())
+                    gunship->EnableMovement(false);
                 if (Creature* captain = GetCreature(DATA_SHIP_CAPTAIN))
                     captain->AI()->Talk(GetTeamIdInInstance() == TEAM_ALLIANCE ? SAY_FIRE_ALLY : SAY_FIRE_HORDE);
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                 {
                     leader->RemoveAllAuras();
                     leader->CastSpell(leader, SPELL_GUNSHIP_CANNON_FIRE_PERIODIC, true);
                 }
-                if (Creature* lichKing = GetCreature(NPC_LICH_KING_BOSS))
+                if (Creature* lichKing = GetCreature(DATA_LICH_KING))
                 {
                     lichKing->InterruptNonMeleeSpells(true);
                     lichKing->RemoveAllAuras();
                 }
-                ++_outroStep;
+                _outroStep = OUTRO_CAVE_IN;
                 _outroTimer = 5000;
                 break;
-            case 4:
-                HandleGameObject(GO_CAVE_IN, false);
-                ++_outroStep;
+            case OUTRO_CAVE_IN:
+                HandleGameObject(DATA_CAVE_IN, false);
+                _outroStep = OUTRO_HIDE_LICH_KING;
                 _outroTimer = 3000;
                 break;
-            case 5:
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
-                    leader->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                if (Creature* lichKing = GetCreature(NPC_LICH_KING_BOSS))
+            case OUTRO_HIDE_LICH_KING:
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
+                    leader->ClearEmoteState();
+                if (Creature* lichKing = GetCreature(DATA_LICH_KING))
                 {
-                    lichKing->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                    lichKing->ClearEmoteState();
                     lichKing->GetThreatMgr().ClearAllThreat();
                     lichKing->CombatStop(true);
                     lichKing->InterruptNonMeleeSpells(true);
@@ -1029,83 +1099,95 @@ private:
                 }
                 if (instance->IsHeroic())
                     instance->ToInstanceMap()->PermBindAllPlayers();
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                     leader->CastSpell(leader, SPELL_ACHIEVEMENT_CHECK, true);
-                ++_outroStep;
+                _outroStep = OUTRO_GUNSHIP_MOVE;
                 _outroTimer = 1000;
                 break;
-            case 6:
-                if (_transport)
-                    _transport->EnableMovement(true);
-                ++_outroStep;
+            case OUTRO_GUNSHIP_MOVE:
+                if (MotionTransport* gunship = GetGunship())
+                    gunship->EnableMovement(true);
+                _outroStep = OUTRO_SUMMON_STAIRS;
                 _outroTimer = 3500;
                 break;
-            case 7:
-                if (_transport)
-                    _transport->EnableMovement(false);
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+            case OUTRO_SUMMON_STAIRS:
+                if (MotionTransport* gunship = GetGunship())
+                    gunship->EnableMovement(false);
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                 {
                     uint8 index = GetTeamIdInInstance() == TEAM_ALLIANCE ? 0 : 1;
-                    for (uint8 i = 0; i < 3; ++i)
-                        if (StairsPos[index][i].GetPositionX())
-                            if (GameObject* go = leader->SummonGameObject(GetTeamIdInInstance() == TEAM_ALLIANCE ? GO_STAIRS_ALLIANCE : GO_STAIRS_HORDE, StairsPos[index][i].GetPositionX(), StairsPos[index][i].GetPositionY(), StairsPos[index][i].GetPositionZ(), StairsPos[index][i].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
+                    for (Position const& stairsPos : StairsPos[index])
+                        if (stairsPos.GetPositionX())
+                            if (GameObject* go = leader->SummonGameObject(GetTeamIdInInstance() == TEAM_ALLIANCE ? GO_STAIRS_ALLIANCE : GO_STAIRS_HORDE, stairsPos.GetPositionX(), stairsPos.GetPositionY(), stairsPos.GetPositionZ(), stairsPos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
                                 go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                 }
-                ++_outroStep;
+                _outroStep = OUTRO_BOARD_GUNSHIP;
                 _outroTimer = 1000;
                 break;
-            case 8:
+            case OUTRO_BOARD_GUNSHIP:
                 if (Creature* captain = GetCreature(DATA_SHIP_CAPTAIN))
                     captain->AI()->Talk(GetTeamIdInInstance() == TEAM_ALLIANCE ? SAY_ONBOARD_ALLY : SAY_ONBOARD_HORDE);
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                 {
                     leader->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                     leader->GetMotionMaster()->MovePoint(0, WalkCaveInPos);
                     leader->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 }
-                ++_outroStep;
+                _outroStep = OUTRO_LEADER_FINAL;
                 _outroTimer = 6000;
                 break;
-            case 9:
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+            case OUTRO_LEADER_FINAL:
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                     leader->AI()->Talk(GetTeamIdInInstance() == TEAM_ALLIANCE ? SAY_JAINA_FINAL_1 : SAY_SYLVANA_FINAL);
-                HandleGameObject(GO_CAVE_IN, true);
-                ++_outroStep;
+                HandleGameObject(DATA_CAVE_IN, true);
+                _outroStep = OUTRO_QUEST_CREDIT;
                 _outroTimer = 11000;
                 break;
-            case 10:
-                ++_outroStep;
+            case OUTRO_QUEST_CREDIT:
+                _outroStep = OUTRO_QUEST_GIVER;
                 _outroTimer = 0;
                 instance->DoForAllPlayers([](Player* player)
                 {
                     player->KilledMonsterCredit(NPC_WRATH_OF_THE_LICH_KING_CREDIT);
                 });
                 if (GetTeamIdInInstance() == TEAM_ALLIANCE)
-                    if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+                    if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                     {
                         leader->AI()->Talk(SAY_JAINA_FINAL_2);
                         _outroTimer = 10000;
                     }
                 break;
-            case 11:
-                if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
+            case OUTRO_QUEST_GIVER:
+                if (Creature* leader = GetCreature(DATA_SYLVANAS_PART2))
                     leader->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                ++_outroStep;
+                _outroStep = OUTRO_FINISH;
                 _outroTimer = 300 * 1000;
                 break;
-            case 12:
-                _outroStep = 0;
+            case OUTRO_FINISH:
+                _outroStep = OUTRO_NONE;
                 _outroTimer = 0;
-                if (_transport)
-                    _transport->setActive(false);
+                if (MotionTransport* gunship = GetGunship())
+                    gunship->setActive(false);
+                break;
+            default:
                 break;
         }
+    }
+
+    MotionTransport* GetGunship()
+    {
+        if (Transport* transport = instance->GetTransport(_gunshipGuid))
+            return transport->ToMotionTransport();
+        return nullptr;
     }
 
     // GUIDs not handled by ObjectData (arrays with position-based assignment)
     ObjectGuid _spiritualReflectionGUID[MAX_SPIRITUAL_REFLECTIONS];
     ObjectGuid _iceWallTargetGUID[MAX_ICE_WALL_TARGETS];
     ObjectGuid _trashGUID[NUM_OF_TRASH];
+    // Spell summons, so kept out of ObjectData
+    ObjectGuid _quelDelarGuid;
+    ObjectGuid _iceWallGuid;
 
     // Runtime state (not persisted)
     uint32 _batteredHiltStatus{};
@@ -1113,7 +1195,7 @@ private:
     // Wave system
     bool _trashActive[NUM_OF_TRASH]{};
     uint8 _trashCounter{};
-    uint32 _chosenComposition[8][5]{};
+    uint32 _chosenComposition[MAX_WAVE_COMPOSITIONS][MAX_WAVE_MOBS]{};
     uint8 _waveNumber{};
     uint32 _nextWaveTimer{};
     uint16 _playerCheckTimer{};
@@ -1126,7 +1208,7 @@ private:
     bool _isLichKingFightActive{};
     uint32 _outroTimer{};
     uint8 _outroStep{};
-    MotionTransport* _transport{};
+    ObjectGuid _gunshipGuid;
 };
 
 void AddSC_instance_halls_of_reflection()

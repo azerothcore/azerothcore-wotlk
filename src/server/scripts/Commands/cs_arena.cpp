@@ -135,7 +135,7 @@ public:
 
         if (sArenaTeamMgr->GetArenaTeamByName(newName))
         {
-            handler->SendErrorMessage(LANG_ARENA_ERROR_NAME_EXISTS, oldName);
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NAME_EXISTS, newName);
             return false;
         }
 

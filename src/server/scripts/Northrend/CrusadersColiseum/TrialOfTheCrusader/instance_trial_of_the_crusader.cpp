@@ -110,6 +110,17 @@ ObjectData const gameObjectData[] =
     { 0,                             0                          }
 };
 
+ObjectData const summonData[] =
+{
+    { NPC_MISTRESS_OF_PAIN,   DATA_JARAXXUS  }, // summoned by a Nether Portal, not Jaraxxus
+    { NPC_FELFLAME_INFERNAL,  DATA_JARAXXUS  }, // summoned by an Infernal Volcano, not Jaraxxus
+    { NPC_SCARAB,             DATA_ANUBARAK  }, // summoned by a Nerubian Burrow, not Anub'arak
+    { NPC_BURROWER,           DATA_ANUBARAK  }, // summoned by a Nerubian Burrow, not Anub'arak
+    { NPC_CONCENTRATED_DARK,  DATA_LIGHTBANE }, // summoned by a Bullet Stalker, not Fjola
+    { NPC_CONCENTRATED_LIGHT, DATA_LIGHTBANE }, // summoned by a Bullet Stalker, not Fjola
+    { 0,                      0              }
+};
+
 struct instance_trial_of_the_crusader : public InstanceScript
 {
     instance_trial_of_the_crusader(Map* map) : InstanceScript(map)
@@ -117,6 +128,7 @@ struct instance_trial_of_the_crusader : public InstanceScript
         SetHeaders(DataHeader);
         SetBossNumber(MAX_ENCOUNTERS);
         LoadObjectData(creatureData, gameObjectData);
+        LoadSummonData(summonData);
         Initialize();
     }
 
@@ -188,7 +200,7 @@ struct instance_trial_of_the_crusader : public InstanceScript
         if (DoNeedCleanup(player))
             InstanceCleanup();
 
-        if (GetBossState(BOSS_NORTHREND_BEASTS) == IN_PROGRESS)
+        if (AreSnoboldCarriersActive())
             SetSnoboldCarrier(player, true);
 
         // if missing spawn anub'arak
@@ -253,7 +265,7 @@ struct instance_trial_of_the_crusader : public InstanceScript
                 break;
             case TYPE_GORMOK:
                 if (data == DONE && !SetBeastDead(BEASTS_MASK_GORMOK_DEAD) && !(_northrendBeastsMask & BEASTS_MASK_JORMUNGARS_RELEASED))
-                    _events.RescheduleEvent(EVENT_SCENE_005, 2500ms);
+                    _events.RescheduleEvent(EVENT_SCENE_005, 0ms);
                 break;
             case TYPE_JORMUNGAR:
                 if (data == DONE)
@@ -269,7 +281,7 @@ struct instance_trial_of_the_crusader : public InstanceScript
                         _achievementTimer = 0s;
 
                         if (!SetBeastDead(BEASTS_MASK_JORMUNGARS_DEAD) && !(_northrendBeastsMask & BEASTS_MASK_ICEHOWL_RELEASED))
-                            _events.RescheduleEvent(EVENT_SCENE_006, 2500ms);
+                            _events.RescheduleEvent(EVENT_SCENE_006, 0ms);
                     }
                     else // first one died, start timer for achievement
                         _achievementTimer = GameTime::GetGameTime();
@@ -336,7 +348,7 @@ struct instance_trial_of_the_crusader : public InstanceScript
                     DespawnBeastsCombatStalker();
                     HandleGameObject(DATA_ENTER_GATE, true);
                     _events.CancelEvent(EVENT_NORTHREND_BEASTS_ENRAGE);
-                    _events.RescheduleEvent(EVENT_SCENE_BEASTS_DONE, 2500ms);
+                    _events.RescheduleEvent(EVENT_SCENE_BEASTS_DONE, 0ms);
                     SaveToDB();
                 }
                 break;
@@ -435,51 +447,22 @@ struct instance_trial_of_the_crusader : public InstanceScript
                     InstanceCleanup();
 
                 // Entering mounted loses the kit: the mount removal on arrival dismounts, which drops vehicle kits
-                if (GetBossState(BOSS_NORTHREND_BEASTS) == IN_PROGRESS)
+                if (AreSnoboldCarriersActive())
                     SetSnoboldCarriers(true);
 
                 _events.Repeat(5s);
                 break;
-            case EVENT_OPEN_GATE:
-                HandleGameObject(DATA_MAIN_GATE, true);
-                break;
-            case EVENT_CLOSE_GATE:
-                HandleGameObject(DATA_MAIN_GATE, false);
-                break;
             case EVENT_SCENE_001:
                 CreatureTalk(DATA_TIRION, SAY_STAGE_0_01);
-                _events.RescheduleEvent(EVENT_SCENE_002, 22s);
-                break;
-            case EVENT_SCENE_002:
-                CreatureTalk(DATA_VARIAN, SAY_STAGE_0_03a);
-                _events.RescheduleEvent(EVENT_SCENE_003, 5s);
-                break;
-            case EVENT_SCENE_003:
-                CreatureTalk(DATA_GARROSH, SAY_STAGE_0_03h);
-                _events.RescheduleEvent(EVENT_SCENE_004, 8s);
+                _events.RescheduleEvent(EVENT_SCENE_004, 25500ms);
                 break;
             case EVENT_SCENE_004:
                 _instanceProgress = INSTANCE_PROGRESS_INTRO_DONE;
                 SetBossState(BOSS_NORTHREND_BEASTS, IN_PROGRESS);
 
                 CreatureTalk(DATA_TIRION, SAY_STAGE_0_02);
-                HandleGameObject(DATA_MAIN_GATE, true);
                 HandleGameObject(DATA_ENTER_GATE, false);
-
-                // Keeps the raid in combat from the gate opening until the last beast dies
-                if (Creature* stalker = instance->SummonCreature(NPC_BEASTS_COMBAT_STALKER, Locs[LOC_BEASTS_COMBAT_STALKER]))
-                {
-                    stalker->SetCombatPulseDelay(5);
-                    stalker->AI()->DoZoneInCombat();
-                }
-
-                _events.RescheduleEvent(EVENT_SUMMON_GORMOK, 1s);
-                if (instance->IsHeroic())
-                {
-                    _events.RescheduleEvent(EVENT_SCENE_005, 150s);
-                    _events.RescheduleEvent(EVENT_SCENE_006, 340s);
-                    _events.RescheduleEvent(EVENT_NORTHREND_BEASTS_ENRAGE, 520s);
-                }
+                _events.RescheduleEvent(EVENT_SUMMON_GORMOK, 12800ms);
                 break;
             case EVENT_NORTHREND_BEASTS_ENRAGE:
                 for (uint32 type : { DATA_GORMOK, DATA_ACIDMAW, DATA_DREADSCALE, DATA_ICEHOWL })
@@ -488,67 +471,80 @@ struct instance_trial_of_the_crusader : public InstanceScript
                             beast->CastSpell(beast, SPELL_BERSERK, true);
                 break;
             case EVENT_SUMMON_GORMOK:
+                if (GetTeamIdInInstance() == TEAM_ALLIANCE)
+                    CreatureTalk(DATA_VARIAN, SAY_STAGE_0_03a);
+                else
+                    CreatureTalk(DATA_GARROSH, SAY_STAGE_0_03h);
+
+                HandleGameObject(DATA_MAIN_GATE, true);
+
+                // Keeps the raid in combat from the gate opening until the last beast dies
+                if (Creature* stalker = instance->SummonCreature(NPC_BEASTS_COMBAT_STALKER, Locs[LOC_BEASTS_COMBAT_STALKER]))
+                {
+                    stalker->SetCombatPulseDelay(5);
+                    stalker->AI()->DoZoneInCombat();
+                }
+
                 SetSnoboldCarriers(true);
                 if (Creature* tirion = GetCreature(DATA_TIRION))
                     if (Creature* gormok = tirion->SummonCreature(NPC_GORMOK, Locs[LOC_BEHIND_GATE], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
                         gormok->GetMotionMaster()->MovePoint(0, Locs[LOC_GATE_FRONT].GetPositionX(), Locs[LOC_GATE_FRONT].GetPositionY(), Locs[LOC_GATE_FRONT].GetPositionZ());
 
-                _events.RescheduleEvent(EVENT_GORMOK_ATTACK, 10s);
-                _events.RescheduleEvent(EVENT_CLOSE_GATE, 6s);
+                _events.RescheduleEvent(EVENT_GORMOK_ATTACK, 11350ms);
                 break;
             case EVENT_GORMOK_ATTACK:
+                HandleGameObject(DATA_MAIN_GATE, false);
                 _northrendBeastsMask = 0;
                 StartAttack(DATA_GORMOK);
+                if (instance->IsHeroic())
+                {
+                    _events.RescheduleEvent(EVENT_SCENE_005, 150s);
+                    _events.RescheduleEvent(EVENT_SCENE_006, 340s);
+                    _events.RescheduleEvent(EVENT_NORTHREND_BEASTS_ENRAGE, 520s);
+                }
                 break;
             case EVENT_SCENE_005:
                 _northrendBeastsMask |= BEASTS_MASK_JORMUNGARS_RELEASED;
                 CreatureTalk(DATA_TIRION, SAY_STAGE_0_04);
-                _events.RescheduleEvent(EVENT_OPEN_GATE, 3s);
-                _events.RescheduleEvent(EVENT_SUMMON_DREADSCALE, 4s);
-                break;
-            case EVENT_SUMMON_DREADSCALE:
+                HandleGameObject(DATA_MAIN_GATE, true);
                 if (Creature* tirion = GetCreature(DATA_TIRION))
                     if (Creature* dreadscale = tirion->SummonCreature(NPC_DREADSCALE, Locs[LOC_BEHIND_GATE], TEMPSUMMON_MANUAL_DESPAWN))
                         dreadscale->GetMotionMaster()->MovePoint(0, Locs[LOC_BEHIND_GATE].GetPositionX(), Locs[LOC_BEHIND_GATE].GetPositionY() - 25.0f, Locs[LOC_BEHIND_GATE].GetPositionZ());
 
                 _events.RescheduleEvent(EVENT_SCENE_005_2, 4s);
-                break;
-            case EVENT_SUMMON_ACIDMAW:
-                if (Creature* tirion = GetCreature(DATA_TIRION))
-                    tirion->SummonCreature(NPC_ACIDMAW, Locs[LOC_ACIDMAW], TEMPSUMMON_MANUAL_DESPAWN);
+                _events.RescheduleEvent(EVENT_SUMMON_ACIDMAW, 14300ms);
+                _events.RescheduleEvent(EVENT_ACIDMAW_AND_DREADSCALE_ATTACK, 14800ms);
                 break;
             case EVENT_SCENE_005_2:
                 if (Creature* dreadscale = GetCreature(DATA_DREADSCALE))
                     dreadscale->GetMotionMaster()->MovePoint(0, Locs[LOC_DREADSCALE].GetPositionX(), Locs[LOC_DREADSCALE].GetPositionY(), Locs[LOC_DREADSCALE].GetPositionZ());
-
-                _events.RescheduleEvent(EVENT_SUMMON_ACIDMAW, 4300ms);
-                _events.RescheduleEvent(EVENT_ACIDMAW_AND_DREADSCALE_ATTACK, 6700ms);
+                break;
+            case EVENT_SUMMON_ACIDMAW:
+                HandleGameObject(DATA_MAIN_GATE, false);
+                if (Creature* tirion = GetCreature(DATA_TIRION))
+                    tirion->SummonCreature(NPC_ACIDMAW, Locs[LOC_ACIDMAW], TEMPSUMMON_MANUAL_DESPAWN);
                 break;
             case EVENT_ACIDMAW_AND_DREADSCALE_ATTACK:
-                HandleGameObject(DATA_MAIN_GATE, false);
                 StartAttack(DATA_DREADSCALE);
                 StartAttack(DATA_ACIDMAW);
                 break;
             case EVENT_SCENE_006:
                 _northrendBeastsMask |= BEASTS_MASK_ICEHOWL_RELEASED;
                 CreatureTalk(DATA_TIRION, SAY_STAGE_0_05);
-                _events.RescheduleEvent(EVENT_OPEN_GATE, 2s);
-                _events.RescheduleEvent(EVENT_SUMMON_ICEHOWL, 3s);
-                break;
-            case EVENT_SUMMON_ICEHOWL:
+                HandleGameObject(DATA_MAIN_GATE, true);
                 if (Creature* tirion = GetCreature(DATA_TIRION))
                     if (Creature* icehowl = tirion->SummonCreature(NPC_ICEHOWL, Locs[LOC_BEHIND_GATE], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 630000000))
                         icehowl->GetMotionMaster()->MovePoint(0, Locs[LOC_GATE_FRONT].GetPositionX(), Locs[LOC_GATE_FRONT].GetPositionY(), Locs[LOC_GATE_FRONT].GetPositionZ());
 
-                _events.RescheduleEvent(EVENT_ICEHOWL_ATTACK, 10s);
-                _events.RescheduleEvent(EVENT_CLOSE_GATE, 6s);
+                _events.RescheduleEvent(EVENT_ICEHOWL_ATTACK, 11300ms);
                 break;
             case EVENT_ICEHOWL_ATTACK:
+                HandleGameObject(DATA_MAIN_GATE, false);
                 StartAttack(DATA_ICEHOWL);
                 break;
             case EVENT_SCENE_BEASTS_DONE:
                 CreatureTalk(DATA_TIRION, SAY_STAGE_0_06);
-                _events.RescheduleEvent(EVENT_SUMMON_BARRETT, 5200ms);
+                _events.RescheduleEvent(EVENT_SUMMON_BARRETT, 9s);
                 break;
             case EVENT_SUMMON_BARRETT:
                 SummonBarrett();
@@ -878,6 +874,8 @@ struct instance_trial_of_the_crusader : public InstanceScript
 
                     _instanceProgress = INSTANCE_PROGRESS_ANUB_ARAK;
                     SpawnAnubArak();
+                    if (Creature* anubarak = GetCreature(DATA_ANUBARAK))
+                        anubarak->AI()->DoAction(ACTION_ANUBARAK_INTRO_SUBMERGE);
                 }
 
                 _events.RescheduleEvent(EVENT_SCENE_410, 2s);
@@ -1276,6 +1274,12 @@ private:
         {
             SetSnoboldCarrier(player, apply);
         });
+    }
+
+    // Players become carriers when Gormok arrives, which is when the combat stalker spawns
+    bool AreSnoboldCarriersActive()
+    {
+        return GetBossState(BOSS_NORTHREND_BEASTS) == IN_PROGRESS && GetCreature(DATA_BEASTS_COMBAT_STALKER);
     }
 
     bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
