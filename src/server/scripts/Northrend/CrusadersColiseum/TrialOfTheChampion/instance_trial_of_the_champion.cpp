@@ -633,16 +633,11 @@ public:
                         data = DONE;
                         _instanceProgress = INSTANCE_PROGRESS_CHAMPIONS_DEAD;
                         SetBossState(BOSS_GRAND_CHAMPIONS, DONE);
-                        bool creditCasted = false;
                         for( uint8 i = 0; i < 3; ++i )
                             if (Creature* c = instance->GetCreature(_grandChampionGUID[i]))
                             {
                                 c->GetMotionMaster()->MovePoint(POINT_CHAMPION_LEAVE_ARENA, 747.36f, 670.07f, 411.9f);
-                                if (!creditCasted)
-                                {
-                                    c->CastSpell((Unit*)nullptr, SPELL_GRAND_CHAMPIONS_CREDIT, true);
-                                    creditCasted = true;
-                                }
+                                c->CastSpell((Unit*)nullptr, SPELL_GRAND_CHAMPIONS_CREDIT, true);
                             }
                         if (Creature* announcer = GetCreature(DATA_ANNOUNCER))
                         {
