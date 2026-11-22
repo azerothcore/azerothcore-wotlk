@@ -15495,14 +15495,14 @@ void Unit::_ExitVehicle(Position const* exitPosition)
                     pos = vehicleBase->GetPosition();
             }
             else if (seatAddon->ExitParameter == VehicleExitParameters::VehicleExitParamDest)
-            {
                 pos.Relocate({ seatAddon->ExitParameterX, seatAddon->ExitParameterY, seatAddon->ExitParameterZ, seatAddon->ExitParameterO });
-
-                float floorZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
-                if (pos.GetPositionZ() < floorZ)
-                    pos.m_positionZ = floorZ + 0.1f;
-            }
         }
+
+        // The vehicle can stand slightly under the floor (Pilgrim's Bounty chairs share their table's spawn Z, some
+        // tables spawn a few tenths under the ground); an exit spline ending there drops the passenger through it
+        float floorZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+        if (pos.GetPositionZ() < floorZ)
+            pos.m_positionZ = floorZ + 0.1f;
     }
 
     AddUnitState(UNIT_STATE_MOVE);
