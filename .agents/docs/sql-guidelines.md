@@ -69,3 +69,5 @@ can't apply.
   (53, 60, 69, 103, 113, 204, 207, 232, 233, `RANDOM_MOVE`) → `systems/movement.md`
 - `spell_script_names` → `systems/spells.md`
 - `waypoint_data` → `systems/waypoints.md`
+- Porting rows from TrinityCore/cMaNGOS/tbc-db, or deleting `smart_scripts`/clearing `AIName` for a C++ script →
+  `systems/ports-and-rewrites.md`
