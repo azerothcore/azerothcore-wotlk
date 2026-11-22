@@ -18,6 +18,7 @@ const (
 	spellHittinYa               = uint32(66073)
 	spellAuraStateVulnerable    = uint32(68402)
 	spellAuraStateRaidEncounter = uint32(68403)
+	spellSpecial2DummyCooldown  = uint32(66061)
 
 	// UNIT_FIELD_AURASTATE (OBJECT_END + 0x37); aura state n is bit n-1.
 	unitFieldAuraState        = uint16(0x3D)
@@ -27,6 +28,8 @@ const (
 	// Uber Spell Controller ticks every 45s; the special starts on the AI update after the tick.
 	specialPeriod = 45 * time.Second
 	specialSlack  = 1500 * time.Millisecond
+	// The other twin's 66061 is cast in the same AI update as the vortex start.
+	specialCooldownWindow = time.Second
 )
 
 // Uber Spell Controller on every difficulty (SpellDifficulty 470).
@@ -81,18 +84,20 @@ func waitUnitAuraAny(bot *e2eharness.ScenarioBot, guid uint64, spells []uint32, 
 //     starts the next vortex or Twin's Pact.
 //   - Aura State Raid Encounter (68403) on Fjola and Aura State Vulnerable (68402) on Eydis, cast on
 //     engage, raise aura states 22 and 19.
+//   - Creature Special 2 Dummy Cooldown (66061), cast by the twin not casting a vortex as it starts,
+//     never on a pact. Its category cooldown locks that twin's Touch of Light/Darkness, which stays
+//     server-side and is not asserted.
 //
-// AC sends no SMSG_SPELL_START/GO for spells with SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING (the controller,
-// the aura-state spells and Creature Special 2 Dummy Cooldown 66061), so those are judged by the auras
-// they leave, and 66061, which leaves none, is not asserted. Temp twins stay REACT_PASSIVE (only the
-// encounter intro makes them aggressive), so they never melee and the 66072 mark is not asserted either.
+// Temp twins stay REACT_PASSIVE (only the encounter intro makes them aggressive), so they never melee
+// and the 66072 mark is not asserted.
 //
 // Drive: temp twins are spawned on the bot and pulled with `.damage`; the bot stays in god mode until
 // it has seen both a vortex and a pact (at most three specials).
 // Oracle: a Hittin' Ya SMSG_SPELL_GO from each twin after it spawns and the aura on both before the
-// pull; the controller aura on Fjola, 68403 and aura state 22 on Fjola, 68402 and aura state 19 on
-// Eydis after the pull, none of them before; every special starting a whole number of 45s periods
-// after the controller aura appeared.
+// pull; SMSG_SPELL_GO and the aura for the controller and 68403 (with aura state 22) from Fjola and
+// for 68402 (with aura state 19) from Eydis after the pull, none of the auras before; every special
+// starting a whole number of 45s periods after the controller cast; a 66061 SMSG_SPELL_GO from the
+// other twin alone within 1s of each vortex start, and from neither twin around a pact.
 func TestToC_TwinValkyrControlSpells(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{
 		Tags:     []string{"long", "instances"},
@@ -128,20 +133,30 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 		mu.Unlock()
 	})
 	t.Cleanup(unhook)
-	sentGo := func(caster uint64, spell uint32, timeout time.Duration) bool {
+	// goAt returns when the caster's SMSG_SPELL_GO of a matching spell arrived, zero if it never did.
+	goAt := func(caster uint64, match func(uint32) bool, timeout time.Duration) time.Time {
 		for deadline := time.Now().Add(timeout); ; time.Sleep(50 * time.Millisecond) {
 			mu.Lock()
 			for _, c := range casts {
-				if c.isGo && c.caster == caster && c.spell == spell {
+				if c.isGo && c.caster == caster && match(c.spell) {
 					mu.Unlock()
-					return true
+					return c.at
 				}
 			}
 			mu.Unlock()
 			if time.Now().After(deadline) {
-				return false
+				return time.Time{}
 			}
 		}
+	}
+	is := func(id uint32) func(uint32) bool { return func(s uint32) bool { return s == id } }
+	isController := func(s uint32) bool {
+		for _, id := range uberSpellController {
+			if s == id {
+				return true
+			}
+		}
+		return false
 	}
 
 	fjola := spawnTemp(t, bot, npcFjola)
@@ -150,7 +165,7 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 	t.Logf("Fjola guid=0x%X Eydis guid=0x%X", fjola, eydis)
 
 	for _, guid := range []uint64{fjola, eydis} {
-		if !sentGo(guid, spellHittinYa, 5*time.Second) {
+		if goAt(guid, is(spellHittinYa), 5*time.Second).IsZero() {
 			e2eharness.Assertf(t, "%s 0x%X sent no SMSG_SPELL_GO for Val'kyr Twins Hittin' Ya (%d) after spawning", names[guid], guid, spellHittinYa)
 		}
 		if waitUnitAuraAny(bot, guid, []uint32{spellHittinYa}, 5*time.Second).IsZero() {
@@ -178,8 +193,11 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 	bot.WaitUnitCombat(t, fjola, 10*time.Second)
 	bot.WaitUnitCombat(t, eydis, 10*time.Second)
 
-	controllerAt := waitUnitAuraAny(bot, fjola, uberSpellController, 3*time.Second)
+	controllerAt := goAt(fjola, isController, 3*time.Second)
 	if controllerAt.IsZero() {
+		e2eharness.Assertf(t, "Fjola sent no SMSG_SPELL_GO for Uber Spell Controller (66829 or a difficulty variant) within %s of the pull", 3*time.Second)
+	}
+	if waitUnitAuraAny(bot, fjola, uberSpellController, 3*time.Second).IsZero() {
 		e2eharness.Assertf(t, "Fjola has no Uber Spell Controller (66829 or a difficulty variant) within %s of the pull", 3*time.Second)
 	}
 	for _, c := range []struct {
@@ -191,6 +209,9 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 		{fjola, spellAuraStateRaidEncounter, auraStateRaidEncounterBit, 22},
 		{eydis, spellAuraStateVulnerable, auraStateVulnerableBit, 19},
 	} {
+		if goAt(c.guid, is(c.spell), 3*time.Second).IsZero() {
+			e2eharness.Assertf(t, "%s 0x%X sent no SMSG_SPELL_GO for %d on the pull", names[c.guid], c.guid, c.spell)
+		}
 		if waitUnitAuraAny(bot, c.guid, []uint32{c.spell}, 3*time.Second).IsZero() {
 			e2eharness.Assertf(t, "%s 0x%X has no %d after the pull", names[c.guid], c.guid, c.spell)
 		}
@@ -198,7 +219,7 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 			e2eharness.Assertf(t, "%s carries %d but UNIT_FIELD_AURASTATE is 0x%X, without aura state %d", names[c.guid], c.spell, field, c.state)
 		}
 	}
-	t.Logf("after the pull Fjola carries Uber Spell Controller and %d with aura state 22, Eydis %d with aura state 19",
+	t.Logf("after the pull Fjola casts and carries Uber Spell Controller and %d with aura state 22, Eydis %d with aura state 19",
 		spellAuraStateRaidEncounter, spellAuraStateVulnerable)
 
 	type special struct {
@@ -229,8 +250,13 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 		specials, sawVortex, sawPact = collect()
 	}
 	if len(specials) == 0 {
-		e2eharness.Assertf(t, "no vortex or Twin's Pact started within %s of the Uber Spell Controller aura", specialsTimeout)
+		e2eharness.Assertf(t, "no vortex or Twin's Pact started within %s of the Uber Spell Controller cast", specialsTimeout)
 	}
+	// Let the other twin's 66061 arrive after the last special started.
+	time.Sleep(specialCooldownWindow + time.Second)
+	mu.Lock()
+	snapshot := append([]valkyrCast(nil), casts...)
+	mu.Unlock()
 	for i, s := range specials {
 		since := s.at.Sub(controllerAt)
 		tick := time.Duration(int64((since+specialPeriod/2)/specialPeriod)) * specialPeriod
@@ -238,7 +264,27 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 			e2eharness.Assertf(t, "special %d (%s cast %d) started %s after Uber Spell Controller, not on a 45s tick",
 				i+1, names[s.caster], s.spell, since.Round(time.Millisecond))
 		}
-		t.Logf("special %d: %s cast %d at +%s (vortex=%v)", i+1, names[s.caster], s.spell, since.Round(time.Millisecond), s.vortex)
+
+		var cooldownCasters []uint64
+		for _, c := range snapshot {
+			if d := c.at.Sub(s.at); c.isGo && c.spell == spellSpecial2DummyCooldown && d > -specialCooldownWindow && d < specialCooldownWindow {
+				cooldownCasters = append(cooldownCasters, c.caster)
+			}
+		}
+		other := fjola
+		if s.caster == fjola {
+			other = eydis
+		}
+		switch {
+		case s.vortex && (len(cooldownCasters) != 1 || cooldownCasters[0] != other):
+			e2eharness.Assertf(t, "vortex %d by %s at +%s: Creature Special 2 Dummy Cooldown (%d) came from %v; it must come from %s alone",
+				s.spell, names[s.caster], since.Round(time.Millisecond), spellSpecial2DummyCooldown, cooldownCasters, names[other])
+		case !s.vortex && len(cooldownCasters) != 0:
+			e2eharness.Assertf(t, "Twin's Pact %d by %s at +%s came with Creature Special 2 Dummy Cooldown (%d) from %v; pacts lock no Touch",
+				s.spell, names[s.caster], since.Round(time.Millisecond), spellSpecial2DummyCooldown, cooldownCasters)
+		}
+		t.Logf("special %d: %s cast %d at +%s (vortex=%v), 66061 from %d twin(s)",
+			i+1, names[s.caster], s.spell, since.Round(time.Millisecond), s.vortex, len(cooldownCasters))
 	}
 	if !(sawVortex && sawPact) {
 		e2eharness.Assertf(t, "%d specials gave vortex=%v pact=%v; the special rotation must show both within three", len(specials), sawVortex, sawPact)
@@ -246,5 +292,5 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 
 	// Killing them runs their death cleanup, which despawns the orbs Fjola summons once engaged.
 	bot.DamageKill(t, []uint64{fjola, eydis}, 0, 15*time.Second)
-	t.Logf("PASS the twins cast Hittin' Ya after spawning, gain the controller and aura-state spells on engage, and start each special on a controller tick")
+	t.Logf("PASS the twins cast Hittin' Ya after spawning, the controller and aura-state spells on engage, start each special on a controller tick, and the other twin casts 66061 on every vortex only")
 }
