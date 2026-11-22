@@ -18,11 +18,12 @@ the `SMART_EVENT_`/`SMART_ACTION_`/`SMART_TARGET_` prefix; numbers are their ids
   runs:
   - min/max delays where retail varies;
   - each spawn's or summon's own point and path when they differ (a shared offset is fine within about a yard);
-  - run vs walk from the spline flags;
+  - run vs walk from the speed between two sniffed points or by eye, not from flags;
   - a fixed orientation or a face-target action, whichever the sniff shows;
   - the consistent casts and emotes of every participant, not only the main actor's.
-- Rows forcing combat or targeting (Add Threat, Taunt, Start Attacking, ReactState Passive/Aggressive toggles on
-  summons) need a sniff showing them: creatures aggro by detection range and are aggressive by default.
+- Rows forcing combat or targeting (Add Threat, spells like Taunt, ReactState Passive/Aggressive toggles on summons)
+  need a sniff showing them. Start Attacking needs none (it barely shows in sniffs), but retail usually relies on
+  detection range alone (creatures are aggressive by default): add it only when that can't start the fight.
 - Never invent a helper creature (e.g. an invisible stalker with `ADD_AURA`) to fake a spell effect; fix the spell
   itself: its DB data (e.g. spell `conditions`), or a SpellScript or AuraScript when data can't.
 
