@@ -241,7 +241,7 @@ struct boss_flame_leviathan : public BossAI
 
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
     {
-        if (why == EVADE_REASON_BOUNDARY)
+        if (why == EVADE_REASON_BOUNDARY || why == EVADE_REASON_NO_HOSTILES)
             DoCastSelf(SPELL_OVERLOAD, true);
 
         CreatureAI::EnterEvadeMode(why);
