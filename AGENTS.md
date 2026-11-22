@@ -57,7 +57,9 @@ follow each doc's own "Read also" list:
 - Creating or modifying any SQL (`*.sql`) → `.agents/docs/sql-guidelines.md`
 - Any change under `src/server/scripts/**` or `data/sql/updates/pending_db_world/**`, or any `smart_scripts` SQL →
   `.agents/docs/retail-evidence.md`
-- Compiling, configuring or running tests, plan-given commands included → `.agents/docs/build.md`
+- Compiling, configuring or running tests, plan-given commands included; editing CMake files, `deps/**`,
+  `.github/workflows/**`, `.github/actions/**` or `.github/SECURITY.md` → `.agents/docs/build.md`
+- Editing any `*.conf.dist` → `.agents/docs/systems/config.md`
 - Reviewing a changeset or PR, or opening or updating a PR → `.agents/docs/code-review.md`
 - Self-reviewing, or opening or updating a PR → also `.agents/docs/self-review-rules.md`
 - Capturing a lesson or adding/updating agent docs → `.agents/docs/README.md`

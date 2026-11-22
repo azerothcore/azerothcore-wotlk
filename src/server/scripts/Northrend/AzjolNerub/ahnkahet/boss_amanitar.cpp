@@ -16,7 +16,6 @@
  */
 
 #include "CreatureScript.h"
-#include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -40,12 +39,10 @@ enum Creatures
     NPC_POISONOUS_MUSHROOM                  = 30435
 };
 
-enum Events
+enum Actions
 {
-    // Mushroom
-    EVENT_GROW,
-    EVENT_CHECK_PLAYER,
-    EVENT_KILLSELF,
+    // Handled by the mushrooms' SmartAI
+    ACTION_MUSHROOM_SHRINK                  = 2
 };
 
 constexpr uint8 MAX_MUSHROOMS_COUNT = 32;
@@ -95,41 +92,37 @@ struct boss_amanitar : public BossAI
         _mushroomsDeque.clear();
     }
 
-    void JustEngagedWith(Unit* /*attacker*/) override
+    void JustEngagedWith(Unit* who) override
     {
+        BossAI::JustEngagedWith(who);
+
         ScheduleTimedEvent(5s, 9s, [&]{
             DoCastRandomTarget(SPELL_ENTANGLING_ROOTS, 1, 100.0f);
         }, 10s, 15s);
 
-        ScheduleTimedEvent(10s, 14s, [&] {
+        ScheduleTimedEvent(7s, [&] {
             DoCastVictim(SPELL_BASH);
-        }, 15s, 20s);
+        }, 11s, 21s);
 
-        ScheduleTimedEvent(15s, 20s, [&] {
+        ScheduleTimedEvent(14s, [&] {
             DoCastAOE(SPELL_VENOM_BOLT_VOLLEY);
-        }, 15s, 20s);
+        }, 14s, 21s);
 
-        ScheduleTimedEvent(40s, 60s, [&] {
+        ScheduleTimedEvent(58s, 61s, [&] {
             while (!_mushroomsDeque.empty())
             {
                 SummonMushroom(_mushroomsDeque.front());
                 _mushroomsDeque.pop_front();
             }
-        }, 40s, 60s);
+        }, 55s, 61s);
 
-        for (Position pos : MushroomPositions)
+        for (Position const& pos : MushroomPositions)
             SummonMushroom(pos);
 
-        scheduler.Schedule(25s, 32s, [this](TaskContext context) {
+        scheduler.Schedule(24s, 32s, [this](TaskContext context) {
             if (SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_MINI))
             {
-                DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
                 DoCastAOE(SPELL_MINI);
-                scheduler.Schedule(29s, [this](TaskContext)
-                {
-                    DoCastAOE(SPELL_REMOVE_MUSHROOM_POWER, true);
-                });
-
                 context.Repeat(30s, 45s);
             }
             else
@@ -147,13 +140,31 @@ struct boss_amanitar : public BossAI
 
     void SummonedCreatureDespawn(Creature* summon) override
     {
-        _mushroomsDeque.push_back(summon->GetPosition());
+        // Mushrooms leave summons before despawning on evade (clear()) or reset (DespawnAll()), so they are not respawned
+        if (std::find(summons.begin(), summons.end(), summon->GetGUID()) != summons.end())
+            _mushroomsDeque.push_back(summon->GetPosition());
+
         BossAI::SummonedCreatureDespawn(summon);
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        DoCastAOE(SPELL_REMOVE_MUSHROOM_POWER, true);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MINI);
+
+        // Despawn the mushrooms before _Reset() does, so they shrink away first
+        for (ObjectGuid const& guid : summons)
+        {
+            if (Creature* mushroom = ObjectAccessor::GetCreature(*me, guid))
+            {
+                if (mushroom->IsAIEnabled)
+                    mushroom->AI()->DoAction(ACTION_MUSHROOM_SHRINK);
+
+                mushroom->DespawnOrUnsummon(4s);
+            }
+        }
+
+        summons.clear();
         BossAI::EnterEvadeMode(why);
     }
 
@@ -182,8 +193,36 @@ class spell_amanitar_remove_mushroom_power : public AuraScript
     }
 };
 
+// 56648 - Potent Fungus
+class spell_amanitar_potent_fungus : public AuraScript
+{
+    PrepareAuraScript(spell_amanitar_potent_fungus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MINI });
+    }
+
+    // Curing Mini consumes the fungus
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (!target->HasAura(SPELL_MINI))
+            return;
+
+        target->RemoveAurasDueToSpell(SPELL_MINI);
+        SetDuration(0);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_amanitar_potent_fungus::HandleApply, EFFECT_0, SPELL_AURA_MOD_SCALE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_amanitar()
 {
     RegisterAhnKahetCreatureAI(boss_amanitar);
     RegisterSpellScript(spell_amanitar_remove_mushroom_power);
+    RegisterSpellScript(spell_amanitar_potent_fungus);
 }

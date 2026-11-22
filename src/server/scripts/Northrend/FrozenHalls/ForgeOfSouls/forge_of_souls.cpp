@@ -45,10 +45,33 @@ enum Yells
     SAY_SYLVANAS_OUTRO                          = 0
 };
 
-enum FOS_Gossip
+enum Gossips
 {
-    GOSSIP_JAINA_INTRO = 10943,
-    GOSSIP_SYLVANAS_INTRO = 10971
+    GOSSIP_MENU_LEADER                          = 15207,
+    GOSSIP_JAINA_INTRO                          = 10943,
+    GOSSIP_SYLVANAS_INTRO                       = 10971
+};
+
+enum Actions
+{
+    ACTION_START_INTRO                          = 1
+};
+
+enum Events
+{
+    EVENT_INTRO_1                               = 1,
+    EVENT_INTRO_2,
+    EVENT_INTRO_3,
+    EVENT_INTRO_4,
+    EVENT_INTRO_5,
+    EVENT_INTRO_6,
+    EVENT_INTRO_7,
+    EVENT_INTRO_8
+};
+
+enum Spells
+{
+    SPELL_SHIELD_OF_BONES_DAMAGE                = 69642
 };
 
 class npc_fos_leader : public CreatureScript
@@ -56,126 +79,111 @@ class npc_fos_leader : public CreatureScript
 public:
     npc_fos_leader() : CreatureScript("npc_fos_leader") { }
 
-    struct npc_fos_leaderAI: public ScriptedAI
+    struct npc_fos_leaderAI : public ScriptedAI
     {
-        npc_fos_leaderAI(Creature* creature) : ScriptedAI(creature) {}
-
-        EventMap events;
+        npc_fos_leaderAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset() override
         {
             events.Reset();
         }
 
-        void DoAction(int32 a) override
+        void DoAction(int32 action) override
         {
-            if (a == 1)
-                if (me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
-                {
-                    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                    events.Reset();
-                    events.ScheduleEvent(1, 1s);
-                }
+            if (action == ACTION_START_INTRO && me->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+            {
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                events.Reset();
+                events.ScheduleEvent(EVENT_INTRO_1, 1s);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
+
+            bool const isJaina = me->GetEntry() == NPC_JAINA_PART1;
+
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
-                case 1:
-
-                    if (me->GetEntry() == NPC_JAINA_PART1)
+                case EVENT_INTRO_1:
+                    if (isJaina)
                     {
                         Talk(SAY_JAINA_INTRO_1);
-                        events.ScheduleEvent(2, 8s);
+                        events.ScheduleEvent(EVENT_INTRO_2, 8s);
                     }
                     else
                     {
                         Talk(SAY_SYLVANAS_INTRO_1);
-                        events.ScheduleEvent(2, 11s + 500ms);
+                        events.ScheduleEvent(EVENT_INTRO_2, 11s + 500ms);
                     }
                     break;
-                case 2:
-
-                    if (me->GetEntry() == NPC_JAINA_PART1)
+                case EVENT_INTRO_2:
+                    if (isJaina)
                     {
                         Talk(SAY_JAINA_INTRO_2);
-                        events.ScheduleEvent(3, 9s);
+                        events.ScheduleEvent(EVENT_INTRO_3, 9s);
                     }
                     else
                     {
                         Talk(SAY_SYLVANAS_INTRO_2);
-                        events.ScheduleEvent(3, 10s + 500ms);
+                        events.ScheduleEvent(EVENT_INTRO_3, 10s + 500ms);
                     }
                     break;
-                case 3:
-
-                    if (me->GetEntry() == NPC_JAINA_PART1)
+                case EVENT_INTRO_3:
+                    if (isJaina)
                     {
                         Talk(SAY_JAINA_INTRO_3);
-                        events.ScheduleEvent(4, 8s);
+                        events.ScheduleEvent(EVENT_INTRO_4, 8s);
                     }
                     else
                     {
                         Talk(SAY_SYLVANAS_INTRO_3);
-                        events.ScheduleEvent(4, 10s + 500ms);
+                        events.ScheduleEvent(EVENT_INTRO_4, 10s + 500ms);
                     }
                     break;
-                case 4:
-
-                    if (me->GetEntry() == NPC_JAINA_PART1)
+                case EVENT_INTRO_4:
+                    if (isJaina)
                     {
                         Talk(SAY_JAINA_INTRO_4);
-                        events.ScheduleEvent(5, 10s);
+                        events.ScheduleEvent(EVENT_INTRO_5, 10s);
                     }
                     else
                     {
                         Talk(SAY_SYLVANAS_INTRO_4);
-                        events.ScheduleEvent(5, 11s);
+                        events.ScheduleEvent(EVENT_INTRO_5, 11s);
                     }
                     break;
-                case 5:
-
-                    if (me->GetEntry() == NPC_JAINA_PART1)
+                case EVENT_INTRO_5:
+                    if (isJaina)
                     {
                         Talk(SAY_JAINA_INTRO_5);
-                        events.ScheduleEvent(6, 8s);
+                        events.ScheduleEvent(EVENT_INTRO_6, 8s);
                     }
                     else
                     {
                         Talk(SAY_SYLVANAS_INTRO_5);
-                        events.ScheduleEvent(6, 9500ms);
+                        events.ScheduleEvent(EVENT_INTRO_6, 9500ms);
                     }
                     break;
-                case 6:
-
-                    if (me->GetEntry() == NPC_JAINA_PART1)
+                case EVENT_INTRO_6:
+                    if (isJaina)
                     {
                         Talk(SAY_JAINA_INTRO_6);
-                        events.ScheduleEvent(7, 12s);
+                        events.ScheduleEvent(EVENT_INTRO_7, 12s);
                     }
                     else
-                    {
                         Talk(SAY_SYLVANAS_INTRO_6);
-                    }
-                    break;
-                case 7:
 
-                    if (me->GetEntry() == NPC_JAINA_PART1)
-                    {
-                        Talk(SAY_JAINA_INTRO_7);
-                        events.ScheduleEvent(8, 8s);
-                    }
                     break;
-                case 8:
-
-                    if (me->GetEntry() == NPC_JAINA_PART1)
-                    {
-                        Talk(SAY_JAINA_INTRO_8);
-                    }
+                case EVENT_INTRO_7:
+                    Talk(SAY_JAINA_INTRO_7);
+                    events.ScheduleEvent(EVENT_INTRO_8, 8s);
+                    break;
+                case EVENT_INTRO_8:
+                    Talk(SAY_JAINA_INTRO_8);
+                    break;
+                default:
                     break;
             }
 
@@ -199,19 +207,20 @@ public:
                 AddGossipItemFor(player, GOSSIP_SYLVANAS_INTRO, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
-        SendGossipMenuFor(player, 15207, creature->GetGUID());
+        SendGossipMenuFor(player, GOSSIP_MENU_LEADER, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        switch (uiAction)
+        switch (action)
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
+            case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
-                if (creature->AI())
-                    creature->AI()->DoAction(1);
+                creature->AI()->DoAction(ACTION_START_INTRO);
+                break;
+            default:
                 break;
         }
 
@@ -229,7 +238,7 @@ class npc_fos_leader_second : public CreatureScript
 public:
     npc_fos_leader_second() : CreatureScript("npc_fos_leader_second") { }
 
-    struct npc_fos_leader_secondAI: public ScriptedAI
+    struct npc_fos_leader_secondAI : public ScriptedAI
     {
         npc_fos_leader_secondAI(Creature* creature) : ScriptedAI(creature)
         {
@@ -238,13 +247,14 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type == POINT_MOTION_TYPE && id == 1)
+            if (type == POINT_MOTION_TYPE && id == POINT_OUTRO)
             {
                 me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                if (me->GetEntry() == NPC_JAINA_PART1)
+                if (me->GetEntry() == NPC_JAINA_PART2)
                     Talk(SAY_JAINA_OUTRO);
                 else
                     Talk(SAY_SYLVANAS_OUTRO);
+
                 me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
             }
         }
@@ -256,11 +266,6 @@ public:
     }
 };
 
-enum ShieldOfBones
-{
-    SPELL_SHIELD_OF_BONES_DAMAGE = 69642
-};
-
 class spell_shield_of_bones_aura : public AuraScript
 {
     PrepareAuraScript(spell_shield_of_bones_aura);
@@ -270,31 +275,27 @@ class spell_shield_of_bones_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_SHIELD_OF_BONES_DAMAGE });
     }
 
-    int32 amount;
-    bool fired;
-
-    bool Load() override
-    {
-        fired = false;
-        amount = 0;
-        return true;
-    }
-
     void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
     {
-        amount += absorbAmount;
-        if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints + 1)
+        _absorbedAmount += absorbAmount;
+        if (!_fired && _absorbedAmount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints + 1)
+        {
             if (Unit* caster = GetCaster())
             {
-                fired = true;
+                _fired = true;
                 caster->CastSpell(caster, SPELL_SHIELD_OF_BONES_DAMAGE, true);
             }
+        }
     }
 
     void Register() override
     {
         AfterEffectAbsorb += AuraEffectAbsorbFn(spell_shield_of_bones_aura::HandleAfterEffectAbsorb, EFFECT_0);
     }
+
+private:
+    int32 _absorbedAmount = 0;
+    bool _fired = false;
 };
 
 void AddSC_forge_of_souls()

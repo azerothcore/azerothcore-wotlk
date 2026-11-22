@@ -1204,12 +1204,13 @@ void Item::SaveRefundDataToDB()
 
 void Item::DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans)
 {
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
+    stmt->SetData(0, GetGUID().GetCounter());
+
     if (trans)
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
-        stmt->SetData(0, GetGUID().GetCounter());
         (*trans)->Append(stmt);
-    }
+    else
+        CharacterDatabase.Execute(stmt);
 }
 
 void Item::SetNotRefundable(Player* owner, bool changestate /*=true*/, CharacterDatabaseTransaction* trans /*=nullptr*/)

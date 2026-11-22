@@ -22,11 +22,11 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "PassiveAI.h"
 
 enum Texts
 {
@@ -338,7 +338,7 @@ public:
                 me->CastSpell(me, SPELL_ACHIEVEMENT_CHECK, true);
                 me->CastSpell((Unit*)nullptr, SPELL_DREAMWALKERS_RAGE, false);
                 _events.ScheduleEvent(EVENT_DREAM_SLIP, 3500ms);
-                if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
+                if (Creature* lichKing = _instance->GetCreature(DATA_VALITHRIA_LICH_KING))
                     lichKing->AI()->EnterEvadeMode();
             }
             else if (!_over75PercentTalkDone && me->HealthAbovePctHealed(75, heal))
@@ -371,7 +371,7 @@ public:
                         _justDied = true;
                         Talk(SAY_VALITHRIA_DEATH);
                         _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                        if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                        if (Creature* trigger = _instance->GetCreature(DATA_VALITHRIA_TRIGGER))
                             trigger->AI()->DoAction(ACTION_DEATH);
                     }
                 }
@@ -388,10 +388,12 @@ public:
                 me->SetDisplayId(11686);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->DespawnOrUnsummon(4s);
-                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                if (Creature* trigger = _instance->GetCreature(DATA_VALITHRIA_TRIGGER))
                     Unit::Kill(me, trigger);
-                if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
+
+                if (Creature* lichKing = _instance->GetCreature(DATA_VALITHRIA_LICH_KING))
                     lichKing->CastSpell(lichKing, SPELL_SPAWN_CHEST, false);
+
                 _instance->SetData(DATA_WEEKLY_QUEST_ID, 0); // show hidden npc if necessary
             }
         }
@@ -520,9 +522,10 @@ public:
             me->setActive(true);
             DoZoneInCombat();
             instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
-            if (Creature* valithria = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER)))
+            if (Creature* valithria = instance->GetCreature(DATA_VALITHRIA_DREAMWALKER))
                 valithria->AI()->DoAction(ACTION_ENTER_COMBAT);
-            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
+
+            if (Creature* lichKing = instance->GetCreature(DATA_VALITHRIA_LICH_KING))
                 lichKing->AI()->DoAction(ACTION_ENTER_COMBAT);
 
             EntryCheckPredicate pred(NPC_RISEN_ARCHMAGE);
@@ -550,7 +553,7 @@ public:
             {
                 instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, NOT_STARTED);
                 me->m_Events.AddEventAtOffset(new ValithriaDespawner(me), 5s);
-                if (Creature* lichKing = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
+                if (Creature* lichKing = instance->GetCreature(DATA_VALITHRIA_LICH_KING))
                     lichKing->AI()->EnterEvadeMode();
             }
         }
@@ -687,10 +690,10 @@ public:
 
             if (_isInitialArchmage)
             {
-                if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
+                if (Creature* lichKing = _instance->GetCreature(DATA_VALITHRIA_LICH_KING))
                     DoZoneInCombat(lichKing);
 
-                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                if (Creature* trigger = _instance->GetCreature(DATA_VALITHRIA_TRIGGER))
                     DoZoneInCombat(trigger);
             }
         }
@@ -938,7 +941,7 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            if (Creature* valithria = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER)))
+            if (Creature* valithria = _instance->GetCreature(DATA_VALITHRIA_DREAMWALKER))
                 AttackStart(valithria);
         }
 
@@ -948,7 +951,7 @@ public:
                 return;
 
             if (!me->GetVictim())
-                if (Creature* valithria = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER)))
+                if (Creature* valithria = _instance->GetCreature(DATA_VALITHRIA_DREAMWALKER))
                     if (valithria->IsAlive())
                         AttackStart(valithria);
 
