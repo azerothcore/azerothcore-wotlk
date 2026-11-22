@@ -4,6 +4,7 @@ package vehicles_test
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"sync"
@@ -125,9 +126,14 @@ func TestVehicles_ChairExitUnderFloorLandsOnFloor(t *testing.T) {
 	bot.ExitVehicle(t, 12*time.Second)
 
 	r := settledGps(t, bot)
-	t.Logf("chair 0x%X at Z %.2f: exit at (%.2f, %.2f, %.2f), floor %.2f", chair, spot.z, r.x, r.y, r.z, r.floorZ)
-	if r.z < r.floorZ-0.05 {
-		e2eharness.Assertf(t, "exit Z %.2f is %.2f yd under the floor (%.2f)", r.z, r.floorZ-r.z, r.floorZ)
+	t.Logf("chair 0x%X at Z %.2f: exit at (%.2f, %.2f, %.2f), floor %.2f", chair, spot.z, r.x, r.y, r.z, spot.floorZ)
+	// The chair stands where the bot spawned it, so the exit must stay on that spot. The floor measured there
+	// before boarding is the reference: a lookup at the exit point finds nothing once it is 2 yd or more under.
+	if math.Hypot(r.x-spot.x, r.y-spot.y) > 0.1 {
+		e2eharness.Assertf(t, "exit at (%.2f, %.2f) left the chair spot (%.2f, %.2f)", r.x, r.y, spot.x, spot.y)
+	}
+	if r.z < spot.floorZ-0.05 {
+		e2eharness.Assertf(t, "exit Z %.2f is %.2f yd under the floor (%.2f)", r.z, spot.floorZ-r.z, spot.floorZ)
 	}
 	t.Logf("PASS chair exit lands on the floor")
 }
