@@ -565,7 +565,7 @@ public:
     void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
     int32 GetCastTimeRemaining() { return m_timer;}
     bool IsNextMeleeSwingSpell() const;
-    bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
+    bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_IS_TRIGGERED_MASK); };
     bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
     [[nodiscard]] bool IsProcDisabled() const { return HasTriggeredCastFlag(TRIGGERED_DISALLOW_PROC_EVENTS); }
     [[nodiscard]] bool IsFromPreDeathAura() const { return _fromPreDeathAura; }
