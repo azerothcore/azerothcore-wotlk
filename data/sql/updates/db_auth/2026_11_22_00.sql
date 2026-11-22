@@ -1,3 +1,4 @@
+-- DB update 2026_11_16_00 -> 2026_11_22_00
 DELETE FROM `rbac_permissions` WHERE `id` = 54;
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
 (54, 'Summon non-GM players into instances');

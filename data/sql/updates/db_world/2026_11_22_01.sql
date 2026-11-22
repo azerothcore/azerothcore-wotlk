@@ -1,3 +1,4 @@
+-- DB update 2026_11_22_00 -> 2026_11_22_01
 DELETE FROM `command` WHERE `name` IN ('summon', 'groupsummon', 'group summon');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('summon', 2, 'Syntax: .summon [$charactername]\r\n\r\nTeleport the given character to you. Character can be offline, in which case only their saved position is changed. Summoning an online character into an instance requires them to already be bound or grouped to your instance copy, and summoning a non-GM account there requires the "Summon non-GM players into instances" permission.'),

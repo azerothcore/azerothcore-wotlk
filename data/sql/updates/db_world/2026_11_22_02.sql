@@ -1,3 +1,4 @@
+-- DB update 2026_11_22_01 -> 2026_11_22_02
 --
 DELETE FROM `creature_text_option_sets` WHERE `SetID` = 8;
 INSERT INTO `creature_text_option_sets` (`SetID`, `Cooldown`, `TriggerChance`, `PlayerOnly`, `comment`) VALUES
