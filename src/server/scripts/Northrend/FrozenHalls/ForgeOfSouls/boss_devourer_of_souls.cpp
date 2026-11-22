@@ -44,8 +44,6 @@ enum Spells
     SPELL_PHANTOM_BLAST_H               = 70322,
     SPELL_MIRRORED_SOUL                 = 69051,
     SPELL_WELL_OF_SOULS                 = 68820,
-    //SPELL_WELL_OF_SOULS_SUMMON        = 68853,
-    //SPELL_WELL_OF_SOULS_PERIODIC      = 68854,
     SPELL_UNLEASHED_SOULS               = 68939,
 
     SPELL_WAILING_SOULS                 = 68899, // target 1.0,1.0, change model, triggers 68871, cast time 3 secs
@@ -73,24 +71,22 @@ enum ModelIds
     MODEL_DESIRE                      = 30150,
 };
 
-enum Misc
+enum Quests
 {
-    NPC_CRUCIBLE_OF_SOULS               = 37094,
-    NPC_UNLEASHED_SOUL                  = 36595,
     QUEST_TEMPERING_THE_BLADE_A         = 24476,
     QUEST_TEMPERING_THE_BLADE_H         = 24560,
 };
+
+Position const CrucibleOfSoulsPosition = { 5672.29f, 2520.69f, 713.44f, 0.96f };
 
 struct boss_devourer_of_souls : public BossAI
 {
     boss_devourer_of_souls(Creature* creature) : BossAI(creature, DATA_DEVOURER) { }
 
-    bool AchievementCompleted = true;
-
     void Reset() override
     {
         BossAI::Reset();
-        AchievementCompleted = true;
+        _achievementCompleted = true;
         me->SetControlled(false, UNIT_STATE_ROOT);
         me->DisableRotate(false);
         me->SetReactState(REACT_AGGRESSIVE);
@@ -98,8 +94,8 @@ struct boss_devourer_of_souls : public BossAI
 
     uint32 GetData(uint32 id) const override
     {
-        if (id == 1)
-            return AchievementCompleted;
+        if (id == DATA_THREE_FACED)
+            return _achievementCompleted;
 
         return 0;
     }
@@ -122,14 +118,14 @@ struct boss_devourer_of_souls : public BossAI
 
             uint32 questId = player->GetTeamId() == TEAM_ALLIANCE ? QUEST_TEMPERING_THE_BLADE_A : QUEST_TEMPERING_THE_BLADE_H;
             if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
-                me->SummonCreature(NPC_CRUCIBLE_OF_SOULS, 5672.29f, 2520.69f, 713.44f, 0.96f);
+                me->SummonCreature(NPC_CRUCIBLE_OF_SOULS, CrucibleOfSoulsPosition);
         });
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_PHANTOM_BLAST_H)
-            AchievementCompleted = false;
+            _achievementCompleted = false;
         else if (spell->Id == SPELL_WAILING_SOULS_TARGETING)
         {
             me->SetOrientation(me->GetAngle(target));
@@ -156,8 +152,9 @@ struct boss_devourer_of_souls : public BossAI
 
         events.Update(diff);
 
-        if (Spell* s = me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            if (s->m_spellInfo->Id == SPELL_MIRRORED_SOUL)
+        if (Spell* channel = me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+        {
+            if (channel->m_spellInfo->Id == SPELL_MIRRORED_SOUL)
             {
                 switch (events.ExecuteEvent())
                 {
@@ -179,6 +176,7 @@ struct boss_devourer_of_souls : public BossAI
 
                 return;
             }
+        }
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -219,6 +217,8 @@ struct boss_devourer_of_souls : public BossAI
                     me->CastCustomSpell(SPELL_WAILING_SOULS_TARGETING, SPELLVALUE_MAX_TARGETS, 1, target);
                 events.Repeat(80s);
                 events.DelayEventsToMax(20s, 0);
+                break;
+            default:
                 break;
         }
 
@@ -262,11 +262,13 @@ struct boss_devourer_of_souls : public BossAI
             BossAI::JustSummoned(summon);
 
         if (summon->GetEntry() == NPC_UNLEASHED_SOUL)
+        {
             if (Player* player = summon->SelectNearestPlayer(100.0f))
             {
                 summon->AddThreat(player, 100000.0f);
                 summon->AI()->AttackStart(player);
             }
+        }
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -275,6 +277,9 @@ struct boss_devourer_of_souls : public BossAI
         me->DisableRotate(false);
         BossAI::EnterEvadeMode(why);
     }
+
+private:
+    bool _achievementCompleted = true;
 };
 
 class spell_wailing_souls_periodic_aura : public AuraScript
@@ -286,52 +291,49 @@ class spell_wailing_souls_periodic_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_WAILING_SOULS_DMG_N });
     }
 
-    int8 dir = 0;
-
     bool Load() override
     {
-        dir = urand(0, 1) ? 1 : -1;
+        _direction = urand(0, 1) ? 1 : -1;
         return true;
     }
 
     void HandlePeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        if (Unit* target = GetTarget())
+        Unit* target = GetTarget();
+        if (aurEff->GetTickNumber() < 30)
         {
-            if (aurEff->GetTickNumber() < 30)
-            {
-                float diff = (2 * M_PI) / (4 * 30);
-                float newOrientation = target->GetOrientation() + diff * dir;
-                if (newOrientation >= 2 * M_PI)
-                    newOrientation -= 2 * M_PI;
-                else if (newOrientation < 0)
-                    newOrientation += 2 * M_PI;
-                target->UpdateOrientation(newOrientation);
-                target->SetFacingTo(newOrientation);
-                target->CastSpell(target, SPELL_WAILING_SOULS_DMG_N, true);
-            }
-            else if (aurEff->GetTickNumber() == 33)
-            {
-                target->SetControlled(false, UNIT_STATE_ROOT);
-                target->DisableRotate(false);
-                if (target->IsCreature())
-                    target->ToCreature()->SetReactState(REACT_AGGRESSIVE);
-                if (target->GetVictim())
-                {
-                    target->SetGuidValue(UNIT_FIELD_TARGET, target->GetVictim()->GetGUID());
-                    target->GetMotionMaster()->MoveChase(target->GetVictim());
-                }
-            }
-            else if (aurEff->GetTickNumber() >= 34)
-                Remove(AURA_REMOVE_BY_EXPIRE);
+            // Sweeps a quarter circle over the 30 damage ticks
+            float const step = (2.0f * float(M_PI)) / (4 * 30);
+            float newOrientation = Position::NormalizeOrientation(target->GetOrientation() + step * _direction);
+            target->UpdateOrientation(newOrientation);
+            target->SetFacingTo(newOrientation);
+            target->CastSpell(target, SPELL_WAILING_SOULS_DMG_N, true);
         }
+        else if (aurEff->GetTickNumber() == 33)
+        {
+            target->SetControlled(false, UNIT_STATE_ROOT);
+            target->DisableRotate(false);
+            if (target->IsCreature())
+                target->ToCreature()->SetReactState(REACT_AGGRESSIVE);
+
+            if (Unit* victim = target->GetVictim())
+            {
+                target->SetGuidValue(UNIT_FIELD_TARGET, victim->GetGUID());
+                target->GetMotionMaster()->MoveChase(victim);
+            }
+        }
+        else if (aurEff->GetTickNumber() >= 34)
+            Remove(AURA_REMOVE_BY_EXPIRE);
     }
 
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_wailing_souls_periodic_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
+
+private:
+    int8 _direction = 0;
 };
 
 void AddSC_boss_devourer_of_souls()
