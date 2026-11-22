@@ -1128,8 +1128,8 @@ void GameObject::GetFishLoot(Loot* fishLoot, Player* lootOwner, bool junk /*= fa
     {
         fishLoot->FillLoot(fillZone, LootTemplates_Fishing, lootOwner, true, true, lootMode);
 
-        // unlootedCount counts only what lootOwner can loot, quest items included (empty() ignores them):
-        // stop at the first table with such loot, so later tables don't top it up.
+        // unlootedCount includes the quest items lootOwner can loot, which empty() ignores:
+        // stop at the first table with lootable loot, so later tables don't top it up.
         if (!fishLoot->isLooted())
             break;
     }
