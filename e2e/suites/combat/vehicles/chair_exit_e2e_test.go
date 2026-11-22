@@ -19,8 +19,8 @@ import (
 
 const creatureTurkeyChair uint32 = 34812
 
-// Mulgore plains 0.25 yd under the ground. Several Bountiful Tables spawn this far under it (Goldshire's
-// guid 52739 sits 0.26 yd under), and their chairs stand at the table's spawn point.
+// Mulgore plains 0.25 yd under the ground. Chairs on a Bountiful Table keep the table's Z beside it, which
+// puts many of them this far under the ground or more (up to 0.59 yd at Goldshire's guid 52737).
 var sunkenChairSpot = e2eharness.Position3{X: -1374.33, Y: 445.73, Z: 83.99, O: 0, Map: e2eharness.MapKalimdor}
 
 var (
@@ -104,9 +104,10 @@ func settledGps(t *testing.T, bot *e2eharness.ScenarioBot) gpsReading {
 	return gpsReading{}
 }
 
-// Leaving a vehicle sends the passenger to the vehicle's own position. Pilgrim's Bounty chairs stand at
-// their table's spawn point, a little under the ground for several tables, and leaving one dropped the
-// player through the world. The exit must end on the floor.
+// https://github.com/azerothcore/azerothcore-wotlk/pull/28542
+// Leaving a vehicle sends the passenger to the vehicle's own position. Pilgrim's Bounty chairs sit beside
+// their table at the table's Z, often a little under the ground, and leaving one dropped the player
+// through the world. The exit must end on the floor.
 func TestVehicles_ChairExitUnderFloorLandsOnFloor(t *testing.T) {
 	meta.Begin(t, meta.TestMeta{Tags: []string{"short", "combat"}, Runtime: "short", Category: "combat/vehicles"})
 
