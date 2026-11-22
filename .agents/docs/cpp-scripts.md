@@ -33,3 +33,4 @@ Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).
 - `SpellScript`/`AuraScript` → `systems/spells.md`
 - `SetData`/`DoAction` on a creature or gameobject whose `AIName` is `SmartAI`/`SmartGameObjectAI` →
   `systems/smartai.md`
+- Movement code (`GetMotionMaster()->Move*`, `MovePath`, `MovePoint`, `Position` arrays) → `systems/movement.md`
