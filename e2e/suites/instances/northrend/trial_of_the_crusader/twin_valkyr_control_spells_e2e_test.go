@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/azerothcore/AzerothGhost/client"
 	"github.com/azerothcore/AzerothGhost/e2e/e2eharness"
 	"github.com/azerothcore/azerothcore-wotlk/e2e/internal/meta"
 )
@@ -17,9 +18,6 @@ const (
 	spellHittinYa               = uint32(66073)
 	spellAuraStateVulnerable    = uint32(68402)
 	spellAuraStateRaidEncounter = uint32(68403)
-
-	opcodeSpellStart = uint16(0x0131)
-	opcodeSpellGo    = uint16(0x0132)
 
 	// UNIT_FIELD_AURASTATE (OBJECT_END + 0x37); aura state n is bit n-1.
 	unitFieldAuraState        = uint16(0x3D)
@@ -75,6 +73,8 @@ func waitUnitAuraAny(bot *e2eharness.ScenarioBot, guid uint64, spells []uint32, 
 	return time.Time{}
 }
 
+// PR: https://github.com/azerothcore/azerothcore-wotlk/pull/28539
+//
 // Fjola Lightbane and Eydis Darkbane carry their encounter's control spells:
 //   - Val'kyr Twins Hittin' Ya (66073), cast by both once they spawn, marks whoever they melee.
 //   - Uber Spell Controller (66829 and its difficulty variants), cast by Fjola on engage. Each 45s tick
@@ -116,7 +116,7 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 	var mu sync.Mutex
 	var casts []valkyrCast
 	unhook := bot.World.AddPacketHook(func(opcode uint16, data []byte) {
-		if opcode != opcodeSpellStart && opcode != opcodeSpellGo {
+		if opcode != client.SmsgSpellStart && opcode != client.SmsgSpellGo {
 			return
 		}
 		caster, spell, ok := spellGoCaster(data)
@@ -124,7 +124,7 @@ func TestToC_TwinValkyrControlSpells(t *testing.T) {
 			return
 		}
 		mu.Lock()
-		casts = append(casts, valkyrCast{time.Now(), opcode == opcodeSpellGo, caster, spell})
+		casts = append(casts, valkyrCast{time.Now(), opcode == client.SmsgSpellGo, caster, spell})
 		mu.Unlock()
 	})
 	t.Cleanup(unhook)
