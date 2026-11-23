@@ -1,3 +1,4 @@
+-- DB update 2026_11_23_01 -> 2026_11_23_02
 --
 -- Alchemy mastery quests need no introduction quest rewarded
 UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE `ID` IN (10897, 10899, 10902);
