@@ -1,3 +1,4 @@
+-- DB update 2026_11_23_03 -> 2026_11_23_04
 -- The sleeping Gordok Hyenas stand up on aggro and on evade; creature_addon puts them back to sleep once home.
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 134217728 WHERE `entry` = 12418;
 
