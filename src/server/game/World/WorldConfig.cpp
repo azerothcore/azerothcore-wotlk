@@ -268,7 +268,6 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_INSTANCE_IGNORE_LEVEL, "Instance.IgnoreLevel", false);
     SetConfigValue<bool>(CONFIG_INSTANCE_IGNORE_RAID, "Instance.IgnoreRaid", false);
-    SetConfigValue<bool>(CONFIG_INSTANCE_GMSUMMON_PLAYER, "Instance.GMSummonPlayer", false);
     SetConfigValue<bool>(CONFIG_INSTANCE_SHARED_ID, "Instance.SharedNormalHeroicId", true);
 
     SetConfigValue<uint32>(CONFIG_INSTANCE_RESET_TIME_HOUR, "Instance.ResetTimeHour", 4);

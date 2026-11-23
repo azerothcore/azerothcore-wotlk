@@ -40,6 +40,7 @@ public:
         static ChatCommandTable instanceCommandTable =
         {
             { "listbinds",    HandleInstanceListBindsCommand,    rbac::RBAC_PERM_COMMAND_INSTANCE_LISTBINDS,     Console::No },
+            { "bind",         HandleInstanceBindCommand,         rbac::RBAC_PERM_COMMAND_INSTANCE_BIND,          Console::Yes },
             { "unbind",       HandleInstanceUnbindCommand,       rbac::RBAC_PERM_COMMAND_INSTANCE_UNBIND,        Console::Yes },
             { "stats",        HandleInstanceStatsCommand,        rbac::RBAC_PERM_COMMAND_INSTANCE_STATS,         Console::Yes },
             { "savedata",     HandleInstanceSaveDataCommand,     rbac::RBAC_PERM_COMMAND_INSTANCE_SAVEDATA,      Console::No },
@@ -145,6 +146,70 @@ public:
 
         handler->PSendSysMessage("instances unbound: {}", counter);
 
+        return true;
+    }
+
+    // Player last: a number meant as instance id is never read as a character guid
+    static bool HandleInstanceBindCommand(ChatHandler* handler, Optional<uint32> instanceId, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        InstanceSave* save = nullptr;
+        if (instanceId)
+        {
+            save = sInstanceSaveMgr->GetInstanceSave(*instanceId);
+            if (!save)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_INST_BIND_NOT_FOUND, *instanceId);
+                return false;
+            }
+        }
+        else
+        {
+            if (!handler->GetSession())
+            {
+                handler->SendErrorMessage(LANG_CMD_SYNTAX);
+                return false;
+            }
+
+            Map* map = handler->GetSession()->GetPlayer()->GetMap();
+            if (!map->IsDungeon())
+            {
+                handler->SendErrorMessage(LANG_NOT_DUNGEON);
+                return false;
+            }
+
+            save = sInstanceSaveMgr->GetInstanceSave(map->GetInstanceId());
+            if (!save)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_INST_BIND_NOT_FOUND, map->GetInstanceId());
+                return false;
+            }
+        }
+
+        ObjectGuid const guid = target->GetGUID();
+        std::string const nameLink = handler->playerLink(target->GetName());
+        MapEntry const* mapEntry = sMapStore.LookupEntry(save->GetMapId());
+        std::string const mapName = mapEntry ? mapEntry->name[handler->GetSessionDbcLocale()] : "";
+
+        if (InstancePlayerBind const* bind = sInstanceSaveMgr->PlayerGetBoundInstance(guid, save->GetMapId(), save->GetDifficulty()))
+        {
+            handler->SendErrorMessage(LANG_COMMAND_INST_BIND_ALREADY_BOUND, nameLink, bind->save->GetInstanceId(), save->GetMapId(), mapName, uint32(bind->save->GetDifficulty()));
+            return false;
+        }
+
+        // Offline characters without any bind have no container yet
+        sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(guid);
+        sInstanceSaveMgr->PlayerBindToInstance(guid, save, !save->CanReset(), target->GetConnectedPlayer());
+
+        handler->PSendSysMessage(LANG_COMMAND_INST_BIND_SUCCESS, nameLink, save->GetInstanceId(), save->GetMapId(), mapName, uint32(save->GetDifficulty()));
         return true;
     }
 

@@ -2321,12 +2321,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
     });
 
-    // tempfix, make Nether Power not stealable
-    ApplySpellFix({ 66228, 67106, 67107, 67108 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_CANNOT_BE_STOLEN;
-    });
-
     // Trial of the Crusader, Faction Champions, Druid - Tranquality
     ApplySpellFix({ 66086, 67974, 67975, 67976 }, [](SpellInfo* spellInfo)
     {
@@ -2363,6 +2357,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].BasePoints = 10;
         spellInfo->Effects[EFFECT_0].DieSides = 0;
+    });
+
+    // Trial of the Crusader, Twin Valkyr, Clear Val'kyr Essence
+    ApplySpellFix({ 67547 }, [](SpellInfo* spellInfo)
+    {
+        // Light and Dark Essence persist through death, so dead players must be cleared too
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_ALLOW_DEAD_TARGET;
     });
 
     // Trial of the Crusader, Twin Valkyr, Touch of Light/Darkness, Light/Dark Surge
@@ -2534,14 +2535,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
         //spellInfo->EffectTriggerSpell[0] = 0;
-    });
-
-    // Trial of the Crusader, Anub'arak, Summon Scarab
-    ApplySpellFix({ 66339 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(35);
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(25);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
     // Trial of the Crusader, Anub'arak, Achievements: The Traitor King
