@@ -53,7 +53,8 @@ func TestAura_BountifulFeastGrantsWellFed(t *testing.T) {
 
 	// A placed feast outlives its owner's logout for its full 3 minutes and only its owner's party may eat
 	// from it, so a table left by an earlier run on this pad would be picked instead of this bot's own.
-	if leftover := bot.World.FindGameObjectByEntry(feastGameObject, 40); leftover != 0 {
+	// Nearby objects reach the cache only after the teleport is acknowledged, so look for a few seconds.
+	if leftover := e2eharness.TryNearbyGameObjectByEntry(t, bot.World, feastGameObject, 3*time.Second); leftover != 0 {
 		t.Logf("waiting for an earlier run's feast 0x%X to despawn", leftover)
 		deadline := time.Now().Add(190 * time.Second)
 		for bot.World.FindGameObjectByEntry(feastGameObject, 40) != 0 {
