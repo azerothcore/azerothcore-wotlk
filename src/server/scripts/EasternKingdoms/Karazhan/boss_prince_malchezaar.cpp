@@ -51,7 +51,6 @@ enum Spells
 enum creatures
 {
     NPC_NETHERSPITE_INFERNAL    = 17646,
-    NPC_MALCHEZAARS_AXE         = 17650,
     INFERNAL_MODEL_INVISIBLE    = 11686,
     SPELL_INFERNAL_RELAY        = 33814,   // 30835,
     SPELL_INFERNAL_RELAY_ONE    = 30834,
@@ -386,32 +385,10 @@ class spell_malchezaar_enfeeble : public SpellScript
     }
 };
 
-// 30891 - Summon Axes
-class spell_malchezaar_summon_axes : public SpellScript
-{
-    PrepareSpellScript(spell_malchezaar_summon_axes);
-
-    void HandleSummon(SpellEffIndex effIndex)
-    {
-        // Workaround: 30891's summon properties make the axe a guardian, and core guardian stats ignore
-        // creature_template damage (DamageModifier, off-hand), so spawn a plain summon instead.
-        PreventHitDefaultEffect(effIndex);
-
-        if (WorldLocation const* dest = GetHitDest())
-            GetCaster()->SummonCreature(NPC_MALCHEZAARS_AXE, *dest, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-    }
-
-    void Register() override
-    {
-        OnEffectHit += SpellEffectFn(spell_malchezaar_summon_axes::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
-    }
-};
-
 void AddSC_boss_malchezaar()
 {
     RegisterKarazhanCreatureAI(boss_malchezaar);
     RegisterKarazhanCreatureAI(npc_malchezaar_axe);
     RegisterKarazhanCreatureAI(npc_netherspite_infernal);
     RegisterSpellScript(spell_malchezaar_enfeeble);
-    RegisterSpellScript(spell_malchezaar_summon_axes);
 }
