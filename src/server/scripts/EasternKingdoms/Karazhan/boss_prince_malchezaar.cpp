@@ -24,12 +24,12 @@
 
 enum PrinceSay
 {
-    SAY_AGGRO     = 0,
-    SAY_AXE_TOSS1 = 1,
-    SAY_AXE_TOSS2 = 2,
-    SAY_SLAY      = 6,
-    SAY_SUMMON    = 7,
-    SAY_DEATH     = 8,
+    SAY_AGGRO       = 0,
+    SAY_AXE_TOSS1   = 1,
+    SAY_SUMMON_AXES = 5,
+    SAY_SLAY        = 6,
+    SAY_SUMMON      = 7,
+    SAY_DEATH       = 8,
 };
 
 enum Spells
@@ -42,6 +42,7 @@ enum Spells
     SPELL_SUNDER_ARMOR     = 30901,
     SPELL_THRASH_AURA      = 12787,
     SPELL_EQUIP_AXES       = 30857,
+    SPELL_SUMMON_AXES      = 30891,
     SPELL_AMPLIFY_DAMAGE   = 39095,
     SPELL_CLEAVE           = 30131,
     SPELL_HELLFIRE         = 30859,
@@ -118,12 +119,12 @@ struct boss_malchezaar : public BossAI
         });
 
         ScheduleHealthCheckEvent(30, [&] {
+            me->InterruptNonMeleeSpells(false);
             me->RemoveAurasDueToSpell(SPELL_THRASH_AURA);
-            Talk(SAY_AXE_TOSS2);
+            DoCastSelf(SPELL_SUMMON_AXES);
+            Talk(SAY_SUMMON_AXES);
             _phase = PHASE_THREE;
             clearweapons();
-
-            me->SummonCreature(NPC_MALCHEZAARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
 
             scheduler.Schedule(20s, 30s, [this](TaskContext context)
             {
@@ -323,11 +324,6 @@ struct npc_malchezaar_axe : public ScriptedAI
         creature->SetCanDualWield(true);
     }
 
-    void Initialize()
-    {
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-    }
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
@@ -390,10 +386,32 @@ class spell_malchezaar_enfeeble : public SpellScript
     }
 };
 
+// 30891 - Summon Axes
+class spell_malchezaar_summon_axes : public SpellScript
+{
+    PrepareSpellScript(spell_malchezaar_summon_axes);
+
+    void HandleSummon(SpellEffIndex effIndex)
+    {
+        // Workaround: 30891's summon properties make the axe a guardian, and core guardian stats ignore
+        // creature_template damage (DamageModifier, off-hand), so spawn a plain summon instead.
+        PreventHitDefaultEffect(effIndex);
+
+        if (WorldLocation const* dest = GetHitDest())
+            GetCaster()->SummonCreature(NPC_MALCHEZAARS_AXE, *dest, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_malchezaar_summon_axes::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
+    }
+};
+
 void AddSC_boss_malchezaar()
 {
     RegisterKarazhanCreatureAI(boss_malchezaar);
     RegisterKarazhanCreatureAI(npc_malchezaar_axe);
     RegisterKarazhanCreatureAI(npc_netherspite_infernal);
     RegisterSpellScript(spell_malchezaar_enfeeble);
+    RegisterSpellScript(spell_malchezaar_summon_axes);
 }
