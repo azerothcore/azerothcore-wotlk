@@ -105,3 +105,4 @@ Reviewer conventions, not linted; apply them to new or changed code only, never 
   …) under `modules/` → `systems/creature-ai.md`
 - `src/server/game/AI/SmartScripts/**` → `systems/smartai.md`
 - An `InstanceScript`/`InstanceMapScript` under `modules/` → `systems/instance-scripts.md`
+- Porting C++ from TrinityCore/cMaNGOS → `systems/ports-and-rewrites.md`
