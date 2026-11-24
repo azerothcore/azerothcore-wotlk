@@ -295,23 +295,9 @@ struct boss_archimonde : public BossAI
         }, 5s);
         ScheduleTimedEvent(5s, [&]
         {
-            bool noPlayersInRange = true;
-            if (Map* map = me->GetMap())
-            {
-                map->DoForAllPlayers([&noPlayersInRange, this](Player* player)
-                {
-                    if (me->IsWithinMeleeRange(player))
-                    {
-                        noPlayersInRange = false;
-                        return false;
-                    }
-                    return true;
-                });
-            }
-            if (noPlayersInRange)
-            {
+            auto inMeleeRange = [this](Unit const* target) { return me->IsWithinMeleeRange(target); };
+            if (!SelectTarget(SelectTargetMethod::Random, 0, inMeleeRange))
                 DoCastRandomTarget(SPELL_FINGER_OF_DEATH);
-            }
         }, 3500ms);
         ScheduleTimedEvent(10min, [&]
         {

@@ -136,8 +136,11 @@ enum DataTypes
     DATA_ORGRIMS_HAMMER             = 42,
     DATA_SAURFANG_CAMP              = 43,
     DATA_SAURFANG_OUTRO_ZEPPELIN    = 44,
+    DATA_SAURFANG_DOOR              = 45,
+    DATA_SAURFANG_TELEPORT          = 46,
+    DATA_SINDRAGOSA_GAUNTLET_NPC    = 47,
+    DATA_PUTRICIDE_TRAP             = 48,
 
-    // pussywizard:
     DATA_BUFF_AVAILABLE             = 251,
     DATA_WEEKLY_QUEST_ID            = 252,
     // NONE                         = 253,
@@ -147,6 +150,15 @@ enum DataTypes
     DATA_SINDRAGOSA_INTRO           = 257,
 
     DATA_BPC_TRASH_DIED             = 300,
+};
+
+enum FrostwingData
+{
+    DATA_MYSTIC_BUFFET_STACK        = 0,
+    DATA_FROSTWYRM_OWNER            = 1,
+    DATA_WHELP_MARKER               = 2,
+    DATA_LINKED_GAMEOBJECT          = 3,
+    DATA_TRAPPED_PLAYER             = 4,
 };
 
 enum PersistentData
@@ -388,6 +400,8 @@ enum CreaturesIds
     // Generic
     NPC_INVISIBLE_STALKER                       = 30298,
     NPC_SPIRE_FROSTWYRM                         = 37230,
+    NPC_SPIRE_GARGOYLE                          = 37544,
+    NPC_SPIRE_MINION                            = 37545,
     NPC_VENGEFUL_FLESHREAPER                    = 37038,
 };
 

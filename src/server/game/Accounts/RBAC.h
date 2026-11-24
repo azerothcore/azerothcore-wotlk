@@ -102,6 +102,7 @@ enum RBACPermissions
     RBAC_PERM_ALLOW_TWO_SIDE_TRADE                           = 51,
     RBAC_PERM_NO_BATTLEGROUND_DESERTER_DEBUFF                = 52,
     RBAC_PERM_CAN_AFK_ON_BATTLEGROUND                        = 53,
+    RBAC_PERM_COMMANDS_SUMMON_PLAYERS_TO_INSTANCE            = 54,
 
     // Roles (Permissions with delegated permissions) use 199 and descending
     RBAC_ROLE_ADMINISTRATOR                                  = 196,
@@ -707,6 +708,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_ACCOUNT_FLAG_ADD                       = 943,
     RBAC_PERM_COMMAND_ACCOUNT_FLAG_REMOVE                    = 944,
     RBAC_PERM_COMMAND_ACCOUNT_INFO                           = 945,
+    RBAC_PERM_COMMAND_INSTANCE_BIND                          = 946,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

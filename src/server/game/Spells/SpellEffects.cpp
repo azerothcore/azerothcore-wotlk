@@ -1974,16 +1974,20 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
 
 void Spell::EffectEnergize(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
-    if (!unitCaster)
-        return;
-
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
         return;
+
     if (!unitTarget->IsAlive())
+        return;
+
+    Unit* unitCaster = GetUnitCasterForEffectHandlers();
+    if (!unitCaster && m_caster->IsGameObject())
+        unitCaster = unitTarget;
+
+    if (!unitCaster)
         return;
 
     if (unitTarget->IsImmunedToAuraPeriodicTick(unitCaster, m_spellInfo))
@@ -2086,16 +2090,20 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
 
 void Spell::EffectEnergizePct(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
-    if (!unitCaster)
-        return;
-
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
         return;
+
     if (!unitTarget->IsAlive())
+        return;
+
+    Unit* unitCaster = GetUnitCasterForEffectHandlers();
+    if (!unitCaster && m_caster->IsGameObject())
+        unitCaster = unitTarget;
+
+    if (!unitCaster)
         return;
 
     if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
@@ -3070,6 +3078,7 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
         }
 
         item_owner->RemoveTradeableItem(itemTarget);
+        itemTarget->SetNotRefundable(item_owner);
         itemTarget->ClearSoulboundTradeable(item_owner);
     }
 }
@@ -3138,6 +3147,7 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     item_owner->ApplyEnchantment(itemTarget, PRISMATIC_ENCHANTMENT_SLOT, true);
 
     item_owner->RemoveTradeableItem(itemTarget);
+    itemTarget->SetNotRefundable(item_owner);
     itemTarget->ClearSoulboundTradeable(item_owner);
 }
 
@@ -3305,6 +3315,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
     }
 
     item_owner->RemoveTradeableItem(itemTarget);
+    itemTarget->SetNotRefundable(item_owner);
     itemTarget->ClearSoulboundTradeable(item_owner);
 }
 

@@ -18,6 +18,7 @@
 #include "TC9GrpcHandler.h"
 #include "Bag.h"
 #include "BattlegroundMgr.h"
+#include "Errors.h"
 #include "Item.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
@@ -52,6 +53,9 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
 
     // Don't forget to delete on "that" side.
     PlayerItem* itemsResult = static_cast<PlayerItem *>(malloc(sizeof(PlayerItem) * itemsFound));
+    if (itemsFound > 0 && !itemsResult)
+        ABORT("Failed to allocate the player items list for the sidecar");
+
     int itemsResultsItr = 0;
     for (int i = 0; i < itemsLen; i++)
     {
@@ -74,6 +78,9 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
 
         // Don't forget to delete on "that" side.
         char *text = (char*)malloc(sizeof(char) * (pItem->GetText().length() + 1));
+        if (!text)
+            ABORT("Failed to allocate the item text for the sidecar");
+
         strcpy(text, pItem->GetText().c_str());
         item.text = text;
 
@@ -141,8 +148,10 @@ RemoveItemsWithGuidsFromPlayerResponse ToCloud9GrpcHandler::RemoveItemsWithGuids
         CharacterDatabase.CommitTransaction(trans);
     }
 
-    // Don't forget to delete on "that" side.
     uint64_t* itemsResult = (uint64_t*)malloc(sizeof(uint64_t) * itemsFound);
+    if (itemsFound > 0 && !itemsResult)
+        ABORT("Failed to allocate the removed items list for the sidecar");
+
     int itemsResultsItr = 0;
     for (int i = 0; i < itemsLen; i++)
     {

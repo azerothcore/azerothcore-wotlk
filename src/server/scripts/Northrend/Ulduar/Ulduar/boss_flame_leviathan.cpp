@@ -52,6 +52,7 @@ enum LeviathanSpells
     SPELL_NAPALM_25                     = 65026,
     SPELL_INVIS_AND_STEALTH_DETECT      = 18950,
     SPELL_TRANSITUS_SHIELD_IMPACT       = 48387,
+    SPELL_OVERLOAD                      = 63618,
 
     // Shutdown spells
     SPELL_SYSTEMS_SHUTDOWN              = 62475,
@@ -67,6 +68,7 @@ enum LeviathanSpells
     SPELL_HODIRS_FURY                   = 62533,
     SPELL_HODIRS_FURY_STUN              = 62297,
     SPELL_FREYA_WARD                    = 62906, // removed spawn effect
+    SPELL_FREYA_WARD_SECOND_SUMMON      = 62947,
     SPELL_MIMIRONS_INFERNO              = 62909,
     SPELL_MIMIRONS_INFERNO_DAMAGE       = 62910,
     SPELL_THORIMS_HAMMER                = 62911,
@@ -109,6 +111,7 @@ enum GosNpcs
     NPC_THORIM_HAMMER                   = 33365,
     NPC_FREYA_WARD_TARGET               = 33366,
     NPC_FREYA_WARD                      = 33367,
+    NPC_WARD_OF_LIFE                    = 34275,
     NPC_MIMIRONS_INFERNO_TARGET         = 33369,
     NPC_MIMIRONS_INFERNO                = 33370,
     NPC_HODIRS_FURY_TARGET              = 33108,
@@ -127,8 +130,8 @@ enum Events
     EVENT_THORIMS_HAMMER                = 9,
     EVENT_SOUND_BEGINNING               = 10,
     EVENT_EJECT_PLAYERS                 = 11,
-    EVENT_CHECK_PLAYERS                 = 12,
     EVENT_LASH                          = 13,
+    EVENT_FREYA_WARD_WAVE               = 14,
 };
 
 enum Texts
@@ -188,6 +191,9 @@ enum Misc
     ACTION_START_BRANN_EVENT            = 3,
     ACTION_DESPAWN_ADDS                 = 4,
     ACTION_DELAY_CANNON                 = 5,
+
+    // sniffed: five per beam per wave
+    FREYA_WARD_LASHERS_PER_WAVE         = 5,
 };
 
 const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
@@ -235,6 +241,9 @@ struct boss_flame_leviathan : public BossAI
 
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
     {
+        if (why == EVADE_REASON_BOUNDARY || why == EVADE_REASON_NO_HOSTILES)
+            DoCastSelf(SPELL_OVERLOAD, true);
+
         CreatureAI::EnterEvadeMode(why);
         instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN_FAIL, 1);
     }
@@ -253,6 +262,29 @@ struct boss_flame_leviathan : public BossAI
     }
 
     void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
+
+    void SummonedCreatureDespawnAll() override
+    {
+        BossAI::SummonedCreatureDespawnAll();
+        DespawnAccessories(vehicle);
+    }
+
+    static void DespawnAccessories(Vehicle* kit)
+    {
+        std::vector<Creature*> accessories;
+        for (auto const& seat : kit->Seats)
+            if (Creature* accessory = ObjectAccessor::GetCreature(*kit->GetBase(), seat.second.Passenger.Guid))
+                accessories.push_back(accessory);
+
+        for (Creature* accessory : accessories)
+        {
+            if (Vehicle* accessoryKit = accessory->GetVehicleKit())
+                DespawnAccessories(accessoryKit);
+
+            accessory->DespawnOrUnsummon();
+        }
+    }
+
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
     void JustDied(Unit*) override;
     void KilledUnit(Unit* who) override;
@@ -324,7 +356,10 @@ struct boss_flame_leviathan : public BossAI
         else
         {
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
+
+            if (!me->IsInEvadeMode())
+                instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
+
             _startTimer = 0;
         }
 
@@ -400,6 +435,12 @@ struct boss_flame_leviathan : public BossAI
             return;
         }
 
+        if (me->IsEngaged() && !IsInCombatWithPlayer())
+        {
+            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+            return;
+        }
+
         if (!UpdateVictim())
             return;
 
@@ -459,13 +500,6 @@ struct boss_flame_leviathan : public BossAI
                         if (Vehicle* seatVehicle = seat->GetVehicleKit())
                             if (Unit* player = seatVehicle->GetPassenger(SEAT_PLAYER))
                                 player->ExitVehicle();
-                return;
-            case EVENT_CHECK_PLAYERS:
-                // Empty vehicles keep the boss in combat
-                if (me->IsInCombat() && !IsInCombatWithPlayer())
-                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-                else
-                    events.Repeat(5s);
                 return;
         }
 
@@ -582,7 +616,6 @@ void boss_flame_leviathan::TurnHealStations(bool _apply)
 
 void boss_flame_leviathan::ScheduleEvents()
 {
-    events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
     events.RescheduleEvent(EVENT_MISSILE, 5s);
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);
@@ -915,36 +948,60 @@ struct npc_freya_ward : public NullCreatureAI
     }
 
     SummonList summons;
-    uint32 _castTimer;
+    bool _summonWardOfLife;
 
     void Reset() override
     {
-        _castTimer = 25000;
         summons.DespawnAll();
+        _summonWardOfLife = false;
         if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
             if (Aura* aur = cr->AddAura(SPELL_FREYA_DUMMY_GREEN, cr))
             {
                 aur->SetMaxDuration(-1);
                 aur->SetDuration(-1);
             }
+
+        // sniffed: first cast +1.6s, landing +5.3s after the ward spawns
+        events.Reset();
+        events.ScheduleEvent(EVENT_FREYA_WARD_WAVE, 1600ms);
     }
 
-    void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+    void JustSummoned(Creature* summon) override
+    {
+        // 62907 always summons it, so a failed roll is undone on landing
+        if (summon->GetEntry() == NPC_WARD_OF_LIFE && !_summonWardOfLife)
+        {
+            summon->DespawnOrUnsummon();
+            return;
+        }
+
+        summons.Summon(summon);
+    }
 
     void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
+    void SummonWave()
+    {
+        Creature* reticle = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true);
+        if (!reticle)
+            return;
+
+        // sniffed: 8 of 48 beams brought one
+        _summonWardOfLife = urand(0, 5) == 0;
+
+        DoCast(reticle, SPELL_FREYA_WARD);
+        for (uint8 i = 0; i < FREYA_WARD_LASHERS_PER_WAVE; ++i)
+            DoCast(reticle, SPELL_FREYA_WARD_SECOND_SUMMON, true);
+    }
+
     void UpdateAI(uint32 diff) override
     {
-        _castTimer += diff;
-        if (_castTimer >= 29 * IN_MILLISECONDS)
+        events.Update(diff);
+        if (events.ExecuteEvent() == EVENT_FREYA_WARD_WAVE)
         {
-            if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
-            {
-                me->CastSpell(cr, SPELL_FREYA_WARD, false);
-                me->CastSpell(cr, 62947 /*SPELL_FREYA_WARD_SECOND_SUMMON*/, false);
-            }
-
-            _castTimer = 0;
+            SummonWave();
+            // sniffed: 32.4s between casts
+            events.Repeat(32400ms);
         }
     }
 
@@ -967,6 +1024,10 @@ struct npc_freya_ward_summon : public ScriptedAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
+        // A failed ward is unsummoned by its summoner before this runs.
+        if (!me->IsInWorld())
+            return;
+
         // Deferred a tick on purpose: Spell::EffectSummonType re-applies the summon spell's own
         // duration (10s for the lashers, 3s for the wards) once the summon call returns, which
         // would overwrite anything this hook sets.

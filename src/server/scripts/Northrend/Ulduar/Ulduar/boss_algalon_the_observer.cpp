@@ -24,8 +24,8 @@
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
@@ -847,7 +847,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 break;
             case EVENT_OUTRO_5:
-                if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannOutroPos[0], TEMPSUMMON_TIMED_DESPAWN, 131500))
+                if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZEBEARD_ALG, BrannOutroPos[0], TEMPSUMMON_TIMED_DESPAWN, 131500))
                     brann->AI()->DoAction(ACTION_OUTRO);
                 break;
             case EVENT_OUTRO_6:
@@ -1197,7 +1197,7 @@ public:
             // Start Algalon event
             me->SetGameObjectFlag(GO_FLAG_IN_USE);
             events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5s);
-            if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
+            if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZEBEARD_ALG, BrannIntroSpawnPos))
                 brann->AI()->DoAction(ACTION_START_INTRO);
 
             if (InstanceScript* instance = me->GetInstanceScript())

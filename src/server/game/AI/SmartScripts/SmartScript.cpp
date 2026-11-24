@@ -4161,6 +4161,14 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     {
                         if (Creature* creature = me->GetMap()->GetCreature(guid))
                         {
+                            // check alive state - 1 alive, 2 dead, 0 both
+                            if (uint32 state = e.target.summonedCreatures.livingState)
+                            {
+                                if (creature->IsAlive() && state == 2)
+                                    continue;
+                                if (!creature->IsAlive() && state == 1)
+                                    continue;
+                            }
                             targets.push_back(creature);
                         }
                     }
