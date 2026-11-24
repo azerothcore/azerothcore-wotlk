@@ -1612,6 +1612,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 1;
     });
 
+    // Prince Malchezaar - Summon Axes
+    ApplySpellFix({ 30891 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
     // Energy Feedback
     ApplySpellFix({ 44335 }, [](SpellInfo* spellInfo)
     {
@@ -2319,12 +2325,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 66532, 66963, 66964, 66965 }, [](SpellInfo* spellInfo)
     {
         spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-    });
-
-    // tempfix, make Nether Power not stealable
-    ApplySpellFix({ 66228, 67106, 67107, 67108 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_CANNOT_BE_STOLEN;
     });
 
     // Trial of the Crusader, Faction Champions, Druid - Tranquality

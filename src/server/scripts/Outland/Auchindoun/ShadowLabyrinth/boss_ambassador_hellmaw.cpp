@@ -54,27 +54,26 @@ struct boss_ambassador_hellmaw : public BossAI
     {
         Reset();
 
-        if (instance->GetPersistentData(TYPE_RITUALISTS) != DONE)
-        {
-            isBanished = true;
-            me->SetImmuneToAll(true);
-
-            me->m_Events.AddEventAtOffset([this]()
-            {
-                DoCastSelf(SPELL_BANISH, true);
-            }, 500ms);
-        }
-        else
-        {
+        if (!isBanished)
             me->GetMotionMaster()->MoveWaypoint(PATH_ID_START, false);
-        }
     }
 
     void Reset() override
     {
         _Reset();
-        isBanished = false;
-        me->SetImmuneToAll(false);
+
+        // Reset() also runs from JustRespawned(), evade and respawn, so the banish must be re-applied here
+        isBanished = instance->GetPersistentData(TYPE_RITUALISTS) != DONE;
+        me->SetImmuneToAll(isBanished);
+
+        if (isBanished)
+        {
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                if (isBanished)
+                    DoCastSelf(SPELL_BANISH, true);
+            }, 500ms);
+        }
     }
 
     void DoAction(int32 param) override

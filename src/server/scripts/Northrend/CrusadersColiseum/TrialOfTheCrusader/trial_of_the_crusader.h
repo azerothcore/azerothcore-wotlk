@@ -94,22 +94,16 @@ enum Progress
 enum Events
 {
     EVENT_CHECK_PLAYERS = 1,
-    EVENT_OPEN_GATE,
-    EVENT_CLOSE_GATE,
 
     EVENT_SCENE_001,
-    EVENT_SCENE_002,
-    EVENT_SCENE_003,
     EVENT_SCENE_004,
     EVENT_SUMMON_GORMOK,
     EVENT_GORMOK_ATTACK,
     EVENT_SCENE_005,
     EVENT_SCENE_005_2,
-    EVENT_SUMMON_DREADSCALE,
     EVENT_SUMMON_ACIDMAW,
     EVENT_ACIDMAW_AND_DREADSCALE_ATTACK,
     EVENT_SCENE_006,
-    EVENT_SUMMON_ICEHOWL,
     EVENT_ICEHOWL_ATTACK,
     EVENT_SCENE_BEASTS_DONE,
     EVENT_NORTHREND_BEASTS_ENRAGE,
@@ -230,6 +224,8 @@ enum NPCs
 
     NPC_LIGHTBANE                                   = 34497,
     NPC_DARKBANE                                    = 34496,
+    NPC_CONCENTRATED_DARK                           = 34628,
+    NPC_CONCENTRATED_LIGHT                          = 34630,
 
     NPC_ANUBARAK                                    = 34564,
     NPC_SCARAB                                      = 34605,
@@ -384,6 +380,8 @@ enum TrialOfTheCrusaderActions
 {
     // Sent by the instance to Gormok, the Twin Val'kyr and Anub'arak on a wipe
     ACTION_DESPAWN_SUMMONS                          = -1,
+    // Sent by the instance to Anub'arak when the floor breaks; respawns after a wipe skip the intro
+    ACTION_ANUBARAK_INTRO_SUBMERGE                  = 1,
 };
 
 enum TrialOfTheCrusaderModels
