@@ -1,3 +1,4 @@
+-- DB update 2026_11_24_01 -> 2026_11_24_02
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 28524 AND `ScriptName` = 'spell_sapphiron_frost_explosion';
 
