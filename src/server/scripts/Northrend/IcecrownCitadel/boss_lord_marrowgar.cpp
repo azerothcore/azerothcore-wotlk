@@ -70,6 +70,16 @@ enum Events
     EVENT_ENRAGE,
 };
 
+enum Actions
+{
+    ACTION_CLEAR_SPIKE_IMMUNITIES = 1,
+};
+
+enum MiscData
+{
+    DATA_SPIKE_IMMUNE = 1,
+};
+
 uint32 const boneSpikeSummonId[3] = {69062, 72669, 72670};
 
 struct BoneStormMoveTargetSelector
@@ -136,15 +146,26 @@ public:
         instance->SetBossState(DATA_LORD_MARROWGAR, IN_PROGRESS);
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    void SetGUID(ObjectGuid const& guid, int32 id) override
     {
-        if (target && (spell->Id == 69055 || spell->Id == 70814)) // Bone Slice (Saber Lash)
-            for (uint8 i = 0; i < 3; ++i)
-                if (!_lastBoneSliceTargets[i])
-                {
-                    _lastBoneSliceTargets[i] = target->GetGUID();
-                    break;
-                }
+        if (id != DATA_SPIKE_IMMUNE)
+            return;
+
+        for (ObjectGuid& immuneGuid : _lastBoneSliceTargets)
+            if (!immuneGuid)
+            {
+                immuneGuid = guid;
+                break;
+            }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action != ACTION_CLEAR_SPIKE_IMMUNITIES)
+            return;
+
+        for (ObjectGuid& immuneGuid : _lastBoneSliceTargets)
+            immuneGuid.Clear();
     }
 
     ObjectGuid GetGUID(int32 id) const override
@@ -258,12 +279,6 @@ public:
 
         if (_boneSlice && !me->GetCurrentSpell(CURRENT_MELEE_SPELL))
             DoCastVictim(SPELL_BONE_SLICE);
-
-        if (_boneSlice && me->isAttackReady() && me->GetVictim() && !me->HasUnitState(UNIT_STATE_CASTING) && me->IsWithinMeleeRange(me->GetVictim()))
-        {
-            for (uint8 i = 0; i < 3; ++i)
-                _lastBoneSliceTargets[i].Clear();
-        }
 
         DoMeleeAttackIfReady();
     }
@@ -630,7 +645,12 @@ class spell_marrowgar_bone_slice : public SpellScript
     bool Load() override
     {
         _targetCount = 0;
-        return true;
+        return GetCaster()->IsCreature() && GetCaster()->ToCreature()->IsAIEnabled;
+    }
+
+    void ClearSpikeImmunities()
+    {
+        GetCaster()->GetAI()->DoAction(ACTION_CLEAR_SPIKE_IMMUNITIES);
     }
 
     void CountTargets(std::list<WorldObject*>& targets)
@@ -640,6 +660,8 @@ class spell_marrowgar_bone_slice : public SpellScript
 
     void SplitDamage()
     {
+        GetCaster()->GetAI()->SetGUID(GetHitUnit()->GetGUID(), DATA_SPIKE_IMMUNE);
+
         if (!_targetCount)
             return; // This spell can miss all targets
 
@@ -648,6 +670,7 @@ class spell_marrowgar_bone_slice : public SpellScript
 
     void Register() override
     {
+        BeforeCast += SpellCastFn(spell_marrowgar_bone_slice::ClearSpikeImmunities);
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_marrowgar_bone_slice::CountTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
         OnHit += SpellHitFn(spell_marrowgar_bone_slice::SplitDamage);
     }
