@@ -18,8 +18,7 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellScriptLoader.h"
+#include "SpellInfo.h"
 #include "naxxramas.h"
 
 enum Yells
@@ -39,10 +38,12 @@ enum Spells
     SPELL_SUMMON_BLIZZARD           = 28560,
     SPELL_LIFE_DRAIN                = 28542,
     SPELL_BERSERK                   = 26662,
+    SPELL_DRAGON_HOVER              = 18430,
 
     // Ice block
     SPELL_ICEBOLT_CAST              = 28526,
     SPELL_ICEBOLT_TRIGGER           = 28522,
+    SPELL_ICEBOLT_IMMUNITY          = 31800,
     SPELL_FROST_MISSILE             = 30101,
     SPELL_FROST_EXPLOSION           = 28524,
 
@@ -120,14 +121,21 @@ public:
         {
             BossAI::Reset();
             if (me->IsVisible())
-            {
                 me->SetReactState(REACT_AGGRESSIVE);
-            }
+
             events.Reset();
             iceboltCount = 0;
             spawnTimer = 0;
             currentTarget.Clear();
             blockList.clear();
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ICEBOLT_IMMUNITY);
+
+            std::list<GameObject*> iceBlocks;
+            me->GetGameObjectListWithEntryInGrid(iceBlocks, GO_ICE_BLOCK, SIZE_OF_GRIDS);
+            for (GameObject* iceBlock : iceBlocks)
+                me->RemoveGameObject(iceBlock, true);
+
+            me->SetHover(false);
             me->SetAnimTier(AnimTier::Fly);
         }
 
@@ -196,22 +204,6 @@ public:
             {
                 me->CastSpell(target, SPELL_ICEBOLT_TRIGGER, true);
             }
-        }
-
-        bool IsValidExplosionTarget(WorldObject* target)
-        {
-            for (ObjectGuid const& guid : blockList)
-            {
-                if (target->GetGUID() == guid)
-                    return false;
-
-                if (Unit* block = ObjectAccessor::GetUnit(*me, guid))
-                {
-                    if (block->IsInBetween(me, target, 2.0f) && block->IsWithinDist(target, 10.0f))
-                        return false;
-                }
-            }
-            return true;
         }
 
         void KilledUnit(Unit* who) override
@@ -300,6 +292,8 @@ public:
                     me->SendMeleeAttackStop(me->GetVictim());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SetDisableGravity(true);
+                    me->SetHover(true);
+                    DoCastSelf(SPELL_DRAGON_HOVER, true);
                     currentTarget.Clear();
                     events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, 3s);
                     iceboltCount = RAID_MODE(2, 3);
@@ -310,6 +304,7 @@ public:
                         {
                             if (Unit* target = ObjectAccessor::GetUnit(*me, currentTarget))
                             {
+                                target->CastSpell(target, SPELL_ICEBOLT_IMMUNITY, true);
                                 me->SummonGameObject(GO_ICE_BLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0);
                             }
                         }
@@ -373,6 +368,7 @@ public:
                             if (Unit* block = ObjectAccessor::GetUnit(*me, *itr))
                             {
                                 block->RemoveAurasDueToSpell(SPELL_ICEBOLT_TRIGGER);
+                                block->RemoveAurasDueToSpell(SPELL_ICEBOLT_IMMUNITY);
                             }
                         }
                     }
@@ -387,6 +383,8 @@ public:
                     return;
                 case EVENT_GROUND:
                     Talk(EMOTE_GROUND_PHASE);
+                    me->RemoveAurasDueToSpell(SPELL_DRAGON_HOVER);
+                    me->SetHover(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetInCombatWithZone();
                     return;
@@ -410,39 +408,7 @@ public:
     };
 };
 
-class spell_sapphiron_frost_explosion : public SpellScript
-{
-    PrepareSpellScript(spell_sapphiron_frost_explosion);
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        Unit* caster = GetCaster();
-        if (!caster || !caster->ToCreature())
-            return;
-
-        std::list<WorldObject*> tmplist;
-        for (auto& target : targets)
-        {
-            if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(target))
-            {
-                tmplist.push_back(target);
-            }
-        }
-        targets.clear();
-        for (auto& itr : tmplist)
-        {
-            targets.push_back(itr);
-        }
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sapphiron_frost_explosion::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-    }
-};
-
 void AddSC_boss_sapphiron()
 {
     new boss_sapphiron();
-    RegisterSpellScript(spell_sapphiron_frost_explosion);
 }
