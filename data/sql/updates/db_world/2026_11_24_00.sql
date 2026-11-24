@@ -1,3 +1,4 @@
+-- DB update 2026_11_23_04 -> 2026_11_24_00
 -- Lesser (19297) and Greater (19296) Darkmoon Prize: one item per opening, current item weights kept
 UPDATE `item_loot_template` SET `GroupId` = 1, `Chance` = 0
 WHERE `Entry` = 19297 AND `Item` IN (1529, 4042, 4074, 4078, 4729, 5009, 6402, 6405, 6413, 6418, 6420, 7429, 7431,
