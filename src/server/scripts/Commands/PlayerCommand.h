@@ -27,6 +27,9 @@ namespace Acore::PlayerCommand
 {
     bool HandleLearnSpellCommand(ChatHandler* handler, Player* targetPlayer, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks);
     bool HandleUnlearnSpellCommand(ChatHandler* handler, Player* targetPlayer, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks);
+
+    // Teleports an online player to the handler's position. Reports why and returns false when they can't be summoned there.
+    bool SummonOnlinePlayer(ChatHandler* handler, Player* target);
 };
 
 #endif // _PLAYER_COMMAND_H

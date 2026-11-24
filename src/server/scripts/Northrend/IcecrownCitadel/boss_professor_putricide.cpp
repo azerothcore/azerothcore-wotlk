@@ -762,7 +762,7 @@ public:
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE))
             {
                 if (!professor->IsInCombat())
                     me->DespawnOrUnsummon(1ms);
@@ -1257,7 +1257,7 @@ class spell_putricide_unbound_plague : public SpellScript
 
         if (!GetHitUnit()->HasAura(plagueId))
         {
-            if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE))
             {
                 if (Aura* oldPlague = GetCaster()->GetAura(plagueId, professor->GetGUID()))
                 {
@@ -1353,7 +1353,7 @@ class spell_putricide_mutation_init : public SpellScript
         if (!instance)
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
-        Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
+        Creature* professor = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE);
         if (!professor)
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
@@ -1441,7 +1441,7 @@ class spell_putricide_mutated_transformation : public SpellScript
         if (!instance)
             return;
 
-        Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
+        Creature* putricide = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE);
         if (!putricide)
             return;
 

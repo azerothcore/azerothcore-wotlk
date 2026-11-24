@@ -291,6 +291,9 @@ bool Quest::IsRaidQuest(Difficulty difficulty) const
             break;
     }
 
+    if (HasFlag(QUEST_FLAGS_RAID))
+        return true;
+
     return false;
 }
 

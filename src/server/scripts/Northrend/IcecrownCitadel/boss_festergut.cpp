@@ -20,13 +20,13 @@
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "SharedDefines.h"
+#include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
 
 enum ScriptTexts
 {
@@ -134,7 +134,7 @@ public:
 
             if (Creature* gasDummy = me->FindNearestCreature(NPC_GAS_DUMMY, 100.0f, true))
                 _gasDummyGUID = gasDummy->GetGUID();
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE))
                 professor->AI()->DoAction(ACTION_FESTERGUT_COMBAT);
         }
 
@@ -142,7 +142,7 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE))
                 professor->AI()->DoAction(ACTION_FESTERGUT_DEATH);
 
             RemoveBlight();
@@ -157,7 +157,7 @@ public:
         void EnterEvadeMode(EvadeReason why) override
         {
             ScriptedAI::EnterEvadeMode(why);
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE))
                 professor->AI()->EnterEvadeMode(why);
         }
 
@@ -241,8 +241,9 @@ public:
                     break;
                 case EVENT_FESTERGUT_GOO:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NonTankTargetSelector(me)))
-                        if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+                        if (Creature* professor = instance->GetCreature(DATA_PROFESSOR_PUTRICIDE))
                             professor->CastSpell(target, SPELL_MALLABLE_GOO_H, true);
+
                     events.ScheduleEvent(EVENT_FESTERGUT_GOO, 15s, 20s);
                 default:
                     break;
@@ -295,7 +296,7 @@ class spell_festergut_pungent_blight : public SpellScript
         caster->ToCreature()->AI()->Talk(EMOTE_PUNGENT_BLIGHT);
 
         if (InstanceScript* inst = caster->GetInstanceScript())
-            if (Creature* professor = ObjectAccessor::GetCreature(*caster, inst->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = inst->GetCreature(DATA_PROFESSOR_PUTRICIDE))
                 professor->AI()->DoAction(ACTION_FESTERGUT_GAS);
     }
 
@@ -336,7 +337,7 @@ class spell_festergut_blighted_spores_aura : public AuraScript
         }
         GetTarget()->CastSpell(GetTarget(), SPELL_INOCULATED, true);
         if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-            if (Creature* festergut = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_FESTERGUT)))
+            if (Creature* festergut = instance->GetCreature(DATA_FESTERGUT))
                 festergut->AI()->SetData(DATA_INOCULATED_STACK, inoculatedStack);
     }
 
@@ -468,7 +469,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (InstanceScript* _instance = me->GetInstanceScript())
-                if (Creature* festergut = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_FESTERGUT)))
+                if (Creature* festergut = _instance->GetCreature(DATA_FESTERGUT))
                     if (festergut->IsAlive())
                         festergut->AI()->Talk(SAY_STINKY_DEAD);
         }
