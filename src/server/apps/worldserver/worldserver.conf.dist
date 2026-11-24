@@ -2036,7 +2036,7 @@ CharactersPerAccount = 50
 #    CharactersPerRealm
 #        Description: Limit number of characters per account on this realm.
 #        Note:        Client cannot display more than 10 characters without being modified.
-#        Range:       1-255
+#        Range:       1-250
 #        Default:     10 - (Client limitation)
 
 CharactersPerRealm = 10
@@ -2044,7 +2044,7 @@ CharactersPerRealm = 10
 #
 #    HeroicCharactersPerRealm
 #        Description: Limit number of heroic class characters per account on this realm.
-#        Range:       1-255
+#        Range:       1-250
 #        Default:     1
 
 HeroicCharactersPerRealm = 1
