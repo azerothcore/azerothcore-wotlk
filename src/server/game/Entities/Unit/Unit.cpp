@@ -9293,12 +9293,12 @@ uint32 Unit::SpellCriticalHealingBonus(Unit const* caster, SpellInfo const* spel
     return damage;
 }
 
-float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype, bool includeHealingDonePct)
+float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype)
 {
     // For totems get healing bonus from owner (statue isn't totem in fact)
     if (IsCreature() && IsTotem())
         if (Unit* owner = GetOwner())
-            return owner->SpellPctHealingModsDone(victim, spellProto, damagetype, includeHealingDonePct);
+            return owner->SpellPctHealingModsDone(victim, spellProto, damagetype);
 
     // Some spells don't benefit from done mods
     if (spellProto->HasAttribute(SPELL_ATTR3_IGNORE_CASTER_MODIFIERS))
@@ -9315,8 +9315,7 @@ float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, D
     float DoneTotalMod = 1.0f;
 
     // Healing done percent
-    if (includeHealingDonePct)
-        DoneTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+    DoneTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
 
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
