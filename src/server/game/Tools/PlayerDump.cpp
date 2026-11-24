@@ -764,7 +764,7 @@ inline void FixNULLfields(std::string& line)
 DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::string name, ObjectGuid::LowType guid)
 {
     uint32 charcount = AccountMgr::GetCharactersCount(account);
-    if (charcount >= 10)
+    if (charcount >= sWorld->getIntConfig(CONFIG_CHARACTERS_PER_REALM))
         return DUMP_TOO_MANY_CHARS;
 
     std::string newguid, chraccount;
