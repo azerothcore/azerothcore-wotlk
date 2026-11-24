@@ -38,7 +38,6 @@ enum Spells
     SPELL_SUMMON_BLIZZARD           = 28560,
     SPELL_LIFE_DRAIN                = 28542,
     SPELL_BERSERK                   = 26662,
-    SPELL_DRAGON_HOVER              = 18430,
 
     // Ice block
     SPELL_ICEBOLT_CAST              = 28526,
@@ -46,6 +45,7 @@ enum Spells
     SPELL_ICEBOLT_IMMUNITY          = 31800,
     SPELL_FROST_MISSILE             = 30101,
     SPELL_FROST_EXPLOSION           = 28524,
+    SPELL_FROST_BREATH_ANTICHEAT    = 29318,
 
     // Visuals
     SPELL_SAPPHIRON_DIES            = 29357
@@ -71,10 +71,9 @@ enum Events
     EVENT_FLIGHT_ICEBOLT            = 8,
     EVENT_FLIGHT_BREATH             = 9,
     EVENT_FLIGHT_SPELL_EXPLOSION    = 10,
-    EVENT_FLIGHT_START_LAND         = 11,
-    EVENT_LAND                      = 12,
-    EVENT_GROUND                    = 13,
-    EVENT_HUNDRED_CLUB              = 14
+    EVENT_LAND                      = 11,
+    EVENT_GROUND                    = 12,
+    EVENT_HUNDRED_CLUB              = 13
 };
 
 class boss_sapphiron : public CreatureScript
@@ -135,7 +134,6 @@ public:
             for (GameObject* iceBlock : iceBlocks)
                 me->RemoveGameObject(iceBlock, true);
 
-            me->SetHover(false);
             me->SetAnimTier(AnimTier::Fly);
         }
 
@@ -292,8 +290,6 @@ public:
                     me->SendMeleeAttackStop(me->GetVictim());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SetDisableGravity(true);
-                    me->SetHover(true);
-                    DoCastSelf(SPELL_DRAGON_HOVER, true);
                     currentTarget.Clear();
                     events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, 3s);
                     iceboltCount = RAID_MODE(2, 3);
@@ -358,9 +354,7 @@ public:
                     return;
                 case EVENT_FLIGHT_SPELL_EXPLOSION:
                     me->CastSpell(me, SPELL_FROST_EXPLOSION, true);
-                    events.ScheduleEvent(EVENT_FLIGHT_START_LAND, 3s);
-                    return;
-                case EVENT_FLIGHT_START_LAND:
+                    DoCastAOE(SPELL_FROST_BREATH_ANTICHEAT, true);
                     if (!blockList.empty())
                     {
                         for (GuidList::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
@@ -374,7 +368,7 @@ public:
                     }
                     blockList.clear();
                     me->RemoveAllGameObjects();
-                    events.ScheduleEvent(EVENT_LAND, 1s);
+                    events.ScheduleEvent(EVENT_LAND, 3250ms);
                     return;
                 case EVENT_LAND:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
@@ -383,8 +377,6 @@ public:
                     return;
                 case EVENT_GROUND:
                     Talk(EMOTE_GROUND_PHASE);
-                    me->RemoveAurasDueToSpell(SPELL_DRAGON_HOVER);
-                    me->SetHover(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetInCombatWithZone();
                     return;
