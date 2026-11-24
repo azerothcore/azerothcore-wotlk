@@ -1615,7 +1615,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Prince Malchezaar - Summon Axes
     ApplySpellFix({ 30891 }, [](SpellInfo* spellInfo)
     {
-        // plain summon, as a guardian the axe would lose its creature_template damage
         spellInfo->Effects[EFFECT_0].MiscValueB = 64;
     });
 
