@@ -2780,11 +2780,22 @@ ItemDelete.Method = 0
 
 #
 #    ItemDelete.Vendor
-#        Description: Saving items into database when the player sells items to vendor
+#        Description: Saving items into database when the player sells items to vendor.
+#                     Requires ItemDelete.Method = 1. ItemDelete.Quality and ItemDelete.ItemLevel also apply.
 #        Default:     0 (disabled)
 #                     1 (enabled)
 
 ItemDelete.Vendor = 0
+
+#
+#    ItemDelete.Disenchant
+#        Description: Saving items into database when the player disenchants them, along with
+#                     the materials looted from them.
+#                     Requires ItemDelete.Method = 1. ItemDelete.Quality and ItemDelete.ItemLevel also apply.
+#        Default:     0 (disabled)
+#                     1 (enabled)
+
+ItemDelete.Disenchant = 0
 
 #
 #    ItemDelete.Quality
@@ -3317,14 +3328,6 @@ Group.RandomRollMaximum = 1000000
 
 ###################################################################################################
 # INSTANCE
-#
-#    Instance.GMSummonPlayer
-#        Description: Allow GM to summon players or only other GM accounts inside instances.
-#        Default:     0 - (Disabled, Only GM accounts can be summoned by GM)
-#                     1 - (Enabled, GM and Player accounts can be summoned by GM)
-
-Instance.GMSummonPlayer = 0
-
 #
 #    Instance.IgnoreLevel
 #        Description: Ignore level requirement when entering instances.

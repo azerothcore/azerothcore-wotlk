@@ -24,44 +24,53 @@
 
 #define TrialOfTheChampionScriptName "instance_trial_of_the_champion"
 
-enum eData
+enum DataTypes
 {
     BOSS_GRAND_CHAMPIONS                            = 0,
     BOSS_ARGENT_CHALLENGE                           = 1,
     BOSS_BLACK_KNIGHT                               = 2,
     MAX_ENCOUNTER                                   = 3,
-    DATA_INSTANCE_PROGRESS                          = 4,
 
+    DATA_INSTANCE_PROGRESS                          = 4,
     DATA_ANNOUNCER                                  = 5,
-    DATA_ANNOUNCER_GOSSIP_SELECT,
-    DATA_GRAND_CHAMPION_REACHED_DEST,
-    DATA_MOUNT_DIED,
-    DATA_REACHED_NEW_MOUNT,
-    DATA_GRAND_CHAMPION_PICKED_NEW_VEHICLE,
-    DATA_GRAND_CHAMPION_DIED,
-    DATA_ARGENT_SOLDIER_DEFEATED,
-    DATA_SKELETAL_GRYPHON_LANDED,
-    DATA_TEAMID_IN_INSTANCE,
-    DATA_PALETRESS,
-    DATA_MEMORY_ENTRY,
-    DATA_ACHIEV_IVE_HAD_WORSE,
+    DATA_ANNOUNCER_GOSSIP_SELECT                    = 6,
+    DATA_GRAND_CHAMPION_REACHED_DEST                = 7,
+    DATA_MOUNT_DIED                                 = 8,
+    DATA_REACHED_NEW_MOUNT                          = 9,
+    DATA_GRAND_CHAMPION_DIED                        = 10,
+    DATA_ARGENT_SOLDIER_DEFEATED                    = 11,
+    DATA_SKELETAL_GRYPHON_LANDED                    = 12,
+    DATA_TEAMID_IN_INSTANCE                         = 13,
+    DATA_PALETRESS                                  = 14,
+    DATA_MEMORY_ENTRY                               = 15,
+    DATA_ACHIEVEMENT_IVE_HAD_WORSE                  = 16,
+
+    DATA_TIRION                                     = 17,
+    DATA_BLACK_KNIGHT                               = 18,
+    DATA_BLACK_KNIGHT_VEHICLE                       = 19,
 };
 
-enum eProgress
+enum DataTypesObjects
+{
+    DATA_MAIN_GATE                                  = 0,
+    DATA_ENTER_GATE                                 = 1,
+};
+
+enum Progress
 {
     INSTANCE_PROGRESS_INITIAL = 0,
-    INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST,
-    INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_1,
-    INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_2,
-    INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_3,
-    INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED,
-    INSTANCE_PROGRESS_CHAMPIONS_DEAD,
-    INSTANCE_PROGRESS_ARGENT_SOLDIERS_DIED,
-    INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED,
-    INSTANCE_PROGRESS_FINISHED,
+    INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST = 1,
+    INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_1 = 2,
+    INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_2 = 3,
+    INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_3 = 4,
+    INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED = 5,
+    INSTANCE_PROGRESS_CHAMPIONS_DEAD = 6,
+    INSTANCE_PROGRESS_ARGENT_SOLDIERS_DIED = 7,
+    INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED = 8,
+    INSTANCE_PROGRESS_FINISHED = 9,
 };
 
-enum eEvents
+enum Events
 {
     EVENT_NULL = 0,
     EVENT_CHECK_PLAYERS,
@@ -101,7 +110,7 @@ enum eEvents
     EVENT_BLACK_KNIGHT_ATTACK,
 };
 
-enum eNpcs
+enum CreatureIds
 {
     // Horde Champions
     NPC_MOKRA                                       = 35572,
@@ -137,16 +146,48 @@ enum eNpcs
     NPC_ARGENT_LIGHTWIELDER                         = 35309,
     NPC_ARGENT_MONK                                 = 35305,
     NPC_PRIESTESS                                   = 35307,
+    NPC_FOUNTAIN_OF_LIGHT                           = 35311,
 
     NPC_BLACK_KNIGHT                                = 35451,
+    NPC_RISEN_CHAMPION                              = 35590,
+
+    // Argent Challenge memories, one of them is summoned at random
+    NPC_MEMORY_HOGGER                               = 34942,
+    NPC_MEMORY_VANCLEEF                             = 35028,
+    NPC_MEMORY_MUTANUS                              = 35029,
+    NPC_MEMORY_HEROD                                = 35030,
+    NPC_MEMORY_LUCIFRON                             = 35031,
+    NPC_MEMORY_THUNDERAAN                           = 35032,
+    NPC_MEMORY_CHROMAGGUS                           = 35033,
+    NPC_MEMORY_HAKKAR                               = 35034,
+    NPC_MEMORY_VEKNILASH                            = 35036,
+    NPC_MEMORY_KALITHRESH                           = 35037,
+    NPC_MEMORY_MALCHEZAAR                           = 35038,
+    NPC_MEMORY_GRUUL                                = 35039,
+    NPC_MEMORY_VASHJ                                = 35040,
+    NPC_MEMORY_ARCHIMONDE                           = 35041,
+    NPC_MEMORY_ILLIDAN                              = 35042,
+    NPC_MEMORY_DELRISSA                             = 35043,
+    NPC_MEMORY_ENTROPIUS                            = 35044,
+    NPC_MEMORY_INGVAR                               = 35045,
+    NPC_MEMORY_CYANIGOSA                            = 35046,
+    NPC_MEMORY_ECK                                  = 35047,
+    NPC_MEMORY_ONYXIA                               = 35048,
+    NPC_MEMORY_HEIGAN                               = 35049,
+    NPC_MEMORY_IGNIS                                = 35050,
+    NPC_MEMORY_VEZAX                                = 35051,
+    NPC_MEMORY_ALGALON                              = 35052,
 
     NPC_JAEREN                                      = 35004, // Horde
     NPC_ARELAS                                      = 35005, // Alliance
     NPC_RISEN_JAEREN                                = 35545,
     NPC_RISEN_ARELAS                                = 35564,
-    NPC_TIRION                                      = 33628, // Possibly wrong npc here, 34996 had already populated creature_text (from ToC25) that matches. Needs a sniff to confirm.
+    // Possibly wrong npc here, 34996 had already populated creature_text
+    // (from ToC25) that matches. Needs a sniff to confirm.
+    NPC_TIRION                                      = 33628,
 
-    /// @todo: Argent Raid Spectator - FX - Missing spawns for Toc5 (map 650), ToC25 probably matches positions, needs a sniff to confirm.
+    /// @todo: Argent Raid Spectator - FX - Missing spawns for Toc5 (map 650), ToC25 probably matches
+    /// positions, needs a sniff to confirm.
     // Horde
     NPC_SPECTATOR_HORDE                             = 34883,
     NPC_SPECTATOR_BELF                              = 34904,
@@ -164,7 +205,7 @@ enum eNpcs
     NPC_SPECTATOR_DRAENEI                           = 34908,
 };
 
-enum eGameObjects
+enum GameObjectIds
 {
     GO_MAIN_GATE                                    = 195647,
     GO_SOUTH_PORTCULLIS                             = 195649,
@@ -181,7 +222,7 @@ enum eGameObjects
     GO_PALETRESS_LOOT_H                             = 195324,
 };
 
-enum eVehicles
+enum VehicleIds
 {
     VEHICLE_ARGENT_WARHORSE                         = 35644,
     VEHICLE_ARGENT_BATTLEWORG                       = 36558,
@@ -189,10 +230,13 @@ enum eVehicles
     VEHICLE_BLACK_KNIGHT                            = 35491,
 };
 
-enum eTexts
+enum Texts
 {
     // Spectators
     SAY_SPECTATOR_CHEER                             = 0,
+
+    // Grand Champions
+    SAY_TRAMPLED                                    = 0,
 
     // Announcers: Alliance Announcer - Arelas Brightstar && Horde Announcer - Jaeren Sunsworn
     SAY_EADRIC_INTRO_ANNOUNCER                      = 0,
@@ -211,17 +255,18 @@ enum eTexts
     SAY_EADRIC_EMOTE_RADIANCE                       = 2,
     SAY_EADRIC_EMOTE_HAMMER_RIGHTEOUS               = 3,
     SAY_EADRIC_HAMMER_RIGHTEOUS                     = 4,
-    SAY_EADRIC_KILL_PLAYER                          = 5, // "You! You need more practice." && "Nay, nay, and I say yet again nay! Not good enough."
+    // "You! You need more practice." && "Nay, nay, and I say yet again nay! Not good enough."
+    SAY_EADRIC_KILL_PLAYER                          = 5,
     SAY_EADRIC_DEFEATED                             = 6,
 
     // Confessor Paletress
-    SAY_PALETRESS_INTRO_1                            = 0,
-    SAY_PALETRESS_INTRO_2                            = 1,
-    SAY_PALETRESS_AGGRO                              = 2,
-    SAY_PALETRESS_MEMORY_SUMMON                      = 3,
-    SAY_PALETRESS_MEMORY_DEATH                       = 4,
-    SAY_PALETRESS_KILL_PLAYER                        = 5, // "Take your rest. "&& "Be at ease."
-    SAY_PALETRESS_DEFEATED                           = 6,
+    SAY_PALETRESS_INTRO_1                           = 0,
+    SAY_PALETRESS_INTRO_2                           = 1,
+    SAY_PALETRESS_AGGRO                             = 2,
+    SAY_PALETRESS_MEMORY_SUMMON                     = 3,
+    SAY_PALETRESS_MEMORY_DEATH                      = 4,
+    SAY_PALETRESS_KILL_PLAYER                       = 5, // "Take your rest. "&& "Be at ease."
+    SAY_PALETRESS_DEFEATED                          = 6,
 
     // Tirion
     TEXT_WELCOME                                    = 21,
@@ -244,10 +289,47 @@ enum eTexts
     SAY_BK_DEATH                                    = 7,
 };
 
+enum ArgentChallengeActions
+{
+    ACTION_MEMORY_DIED                              = 1,
+    ACTION_DESPAWN_MEMORY                           = 2,
+};
+
+enum GrandChampionActions
+{
+    ACTION_DISMOUNT                                 = 1, // the champion leaves its mount for good
+    ACTION_ENABLE_CHAMPION_ABILITIES                = 2, // the champion fights on foot with its class abilities
+};
+
+enum GrandChampionPoints
+{
+    POINT_CHAMPION_MOVE_MIDDLE                      = 4, // the mounted champions walk to the middle of the arena
+    POINT_CHAMPION_MOVE_SIDE                        = 5, // the unmounted champions spread out to the sides
+    POINT_CHAMPION_NEW_MOUNT                        = 7, // the champion walks to the mount it picks up
+    POINT_CHAMPION_LEAVE_ARENA                      = 9, // the defeated champions walk out before despawning
+};
+
+enum BlackKnightActions
+{
+    ACTION_START_ENCOUNTER                          = 1, // the Black Knight starts his roleplay and his abilities
+    ACTION_RESUME_ESCORT                            = 1, // the Skeletal Gryphon resumes its paused landing run
+    ACTION_DESPAWN_SUMMONS                          = 2, // cleanup: the Black Knight drops the raised ghouls
+};
+
+enum SharedSpells
+{
+    SPELL_TRAMPLE_AURA                              = 67865, // also cast by the instance on the mounted champions
+    SPELL_GRAND_CHAMPIONS_CREDIT                    = 68572, // credit marker, cast once when the champions are defeated
+    // Death's Respite, applied to the announcer during the Black Knight scene
+    SPELL_DEATH_RESPITE_ANNOUNCER                   = 68306,
+};
+
 template <class AI, class T>
 inline AI* GetTrialOfTheChampionAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TrialOfTheChampionScriptName);
 }
+
+#define RegisterTrialOfTheChampionCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTrialOfTheChampionAI)
 
 #endif

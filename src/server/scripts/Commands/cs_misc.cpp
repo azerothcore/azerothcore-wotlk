@@ -41,6 +41,7 @@
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
+#include "PlayerCommand.h"
 #include "PoolMgr.h"
 #include "RBAC.h"
 #include "Realm.h"
@@ -109,7 +110,6 @@ public:
             { "unaura",            HandleUnAuraCommand,            rbac::RBAC_PERM_COMMAND_UNAURA,            Console::No  },
             { "appear",            HandleAppearCommand,            rbac::RBAC_PERM_COMMAND_APPEAR,            Console::No  },
             { "summon",            HandleSummonCommand,            rbac::RBAC_PERM_COMMAND_SUMMON,            Console::No  },
-            { "groupsummon",       HandleGroupSummonCommand,       rbac::RBAC_PERM_COMMAND_GROUP_SUMMON,      Console::No  },
             { "commands",          HandleCommandsCommand,          rbac::RBAC_PERM_COMMAND_COMMANDS,          Console::Yes },
             { "die",               HandleDieCommand,               rbac::RBAC_PERM_COMMAND_DIE,               Console::No  },
             { "revive",            HandleReviveCommand,            rbac::RBAC_PERM_COMMAND_REVIVE,            Console::Yes },
@@ -951,80 +951,13 @@ public:
 
         if (target->IsConnected())
         {
-            auto targetPlayer = target->GetConnectedPlayer();
-
-            // check online security
-            if (handler->HasLowerSecurity(targetPlayer))
+            if (_player->GetMap()->IsBattlegroundOrArena())
             {
+                handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_BG);
                 return false;
             }
 
-            if (targetPlayer->IsBeingTeleported())
-            {
-                handler->SendErrorMessage(LANG_IS_TELEPORTED, nameLink);
-                return false;
-            }
-
-            Map* map = handler->GetSession()->GetPlayer()->GetMap();
-
-            if (map->IsBattlegroundOrArena())
-            {
-                handler->SendErrorMessage("Can't summon to a battleground!");
-                return false;
-            }
-            else if (map->IsDungeon())
-            {
-                // Allow GM to summon players or only other GM accounts inside instances.
-                if (!sWorld->getBoolConfig(CONFIG_INSTANCE_GMSUMMON_PLAYER))
-                {
-                    // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
-                    if (!targetPlayer->GetSession()->GetSecurity())
-                    {
-                        handler->SendErrorMessage("Only GMs can be summoned to an instance!");
-                        return false;
-                    }
-                }
-
-                Map* destMap = targetPlayer->GetMap();
-
-                if (destMap->Instanceable() && destMap->GetInstanceId() != map->GetInstanceId())
-                {
-                    sInstanceSaveMgr->PlayerUnbindInstance(target->GetGUID(), map->GetInstanceId(), targetPlayer->GetDungeonDifficulty(), true, targetPlayer);
-                }
-
-                // we are in an instance, and can only summon players in our group with us as leader
-                if (!handler->GetSession()->GetPlayer()->GetGroup() || !targetPlayer->GetGroup() ||
-                        (targetPlayer->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()) ||
-                        (handler->GetSession()->GetPlayer()->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()))
-                    // the last check is a bit excessive, but let it be, just in case
-                {
-                    handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_INST, nameLink);
-                    return false;
-                }
-            }
-
-            handler->PSendSysMessage(LANG_SUMMONING, nameLink, "");
-            if (handler->needReportToTarget(targetPlayer))
-            {
-                ChatHandler(targetPlayer->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->playerLink(_player->GetName()));
-            }
-
-            // stop flight if need
-            if (targetPlayer->IsInFlight())
-            {
-                targetPlayer->GetMotionMaster()->MovementExpired();
-                targetPlayer->CleanupAfterTaxiFlight();
-            }
-            // save only in non-flight case
-            else
-            {
-                targetPlayer->SaveRecallPosition();
-            }
-
-            // before GM
-            float x, y, z;
-            handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, targetPlayer->GetObjectSize());
-            targetPlayer->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, targetPlayer->GetOrientation(), 0, handler->GetSession()->GetPlayer());
+            return Acore::PlayerCommand::SummonOnlinePlayer(handler, target->GetConnectedPlayer());
         }
         else
         {
@@ -1044,112 +977,6 @@ public:
                                      handler->GetSession()->GetPlayer()->GetOrientation(),
                                      handler->GetSession()->GetPlayer()->GetZoneId(),
                                      target->GetGUID());
-        }
-
-        return true;
-    }
-
-    // Summon group of player
-    static bool HandleGroupSummonCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
-    {
-        if (!target)
-        {
-            target = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
-
-        if (!target || !target->IsConnected())
-        {
-            return false;
-        }
-
-        // check online security
-        if (handler->HasLowerSecurity(target->GetConnectedPlayer()))
-        {
-            return false;
-        }
-
-        auto targetPlayer = target->GetConnectedPlayer();
-
-        Group* group = targetPlayer->GetGroup();
-
-        std::string nameLink = handler->playerLink(target->GetName());
-
-        if (!group)
-        {
-            handler->SendErrorMessage(LANG_NOT_IN_GROUP, nameLink);
-            return false;
-        }
-
-        Map* gmMap = handler->GetSession()->GetPlayer()->GetMap();
-        bool toInstance = gmMap->Instanceable();
-
-        // we are in instance, and can summon only player in our group with us as lead
-        if (toInstance && (
-                    !handler->GetSession()->GetPlayer()->GetGroup() || (group->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID()) ||
-                    (handler->GetSession()->GetPlayer()->GetGroup()->GetLeaderGUID() != handler->GetSession()->GetPlayer()->GetGUID())))
-            // the last check is a bit excessive, but let it be, just in case
-        {
-            handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_INST);
-            return false;
-        }
-
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            Player* player = itr->GetSource();
-
-            if (!player || player == handler->GetSession()->GetPlayer() || !player->GetSession())
-            {
-                continue;
-            }
-
-            // check online security
-            if (handler->HasLowerSecurity(player))
-            {
-                return false;
-            }
-
-            std::string plNameLink = handler->GetNameLink(player);
-
-            if (player->IsBeingTeleported())
-            {
-                handler->SendErrorMessage(LANG_IS_TELEPORTED, plNameLink);
-                return false;
-            }
-
-            if (toInstance)
-            {
-                Map* playerMap = player->GetMap();
-
-                if (playerMap->Instanceable() && playerMap->GetInstanceId() != gmMap->GetInstanceId())
-                {
-                    // cannot summon from instance to instance
-                    handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_INST, plNameLink);
-                    return false;
-                }
-            }
-
-            handler->PSendSysMessage(LANG_SUMMONING, plNameLink, "");
-            if (handler->needReportToTarget(player))
-            {
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink());
-            }
-
-            // stop flight if need
-            if (player->IsInFlight())
-            {
-                player->GetMotionMaster()->MovementExpired();
-                player->CleanupAfterTaxiFlight();
-            }
-            // save only in non-flight case
-            else
-            {
-                player->SaveRecallPosition();
-            }
-
-            // before GM
-            float x, y, z;
-            handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, player->GetObjectSize());
-            player->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, player->GetOrientation(), 0, handler->GetSession()->GetPlayer());
         }
 
         return true;

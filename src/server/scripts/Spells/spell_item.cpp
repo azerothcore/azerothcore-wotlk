@@ -1218,33 +1218,39 @@ class spell_item_trauma : public AuraScript
     }
 };
 
+enum BloodReserve
+{
+    SPELL_BLOOD_RESERVE_HEAL = 64569
+};
+
 class spell_item_blood_draining_enchant : public AuraScript
 {
     PrepareAuraScript(spell_item_blood_draining_enchant);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_RESERVE_HEAL });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* target = eventInfo.GetActionTarget();
+        return target && target->HealthBelowPct(35);
+    }
+
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        if (!eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo() || (eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
-        {
-            return;
-        }
-
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/))
-        {
-            int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-            eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-            eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
-        }
-
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
-        int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-        eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-        eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
+        Unit* target = eventInfo.GetActionTarget();
+        SpellInfo const* healInfo = sSpellMgr->AssertSpellInfo(SPELL_BLOOD_RESERVE_HEAL);
+        int32 basepoints = healInfo->Effects[EFFECT_0].CalcValue() * GetStackAmount();
+        target->CastCustomSpell(SPELL_BLOOD_RESERVE_HEAL, SPELLVALUE_BASE_POINT0, basepoints, target, true);
+        target->RemoveAurasDueToSpell(GetId());
     }
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_item_blood_draining_enchant::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_item_blood_draining_enchant::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
@@ -1642,7 +1648,7 @@ class spell_item_valanyr_hammer_of_ancient_kings : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
+        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetEffectiveHeal() > 0;
     }
 
     void Register() override

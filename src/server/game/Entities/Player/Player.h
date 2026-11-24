@@ -2189,12 +2189,6 @@ public:
     void SetHonorPoints(uint32 value);
     void SetArenaPoints(uint32 value);
 
-    // duel health and mana reset methods
-    void SaveHealthBeforeDuel()     { healthBeforeDuel = GetHealth(); }
-    void SaveManaBeforeDuel()       { manaBeforeDuel = GetPower(POWER_MANA); }
-    void RestoreHealthAfterDuel()   { SetHealth(healthBeforeDuel); }
-    void RestoreManaAfterDuel()     { SetPower(POWER_MANA, manaBeforeDuel); }
-
     //End of PvP System
 
     [[nodiscard]] inline SpellCooldowns GetSpellCooldowns() const { return m_spellCooldowns; }
@@ -2242,6 +2236,7 @@ public:
     void CastAllObtainSpells();
     void ApplyItemObtainSpells(Item* item, bool apply);
     void UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot);
+    void RemoveOrphanedItemObtainSpells();
 
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
@@ -2386,6 +2381,7 @@ public:
     {
         m_lastFallTime = time;
         m_lastFallZ = z;
+        m_lastFallFromClient = false;
     }
     void HandleFall(MovementInfo const& movementInfo);
 
@@ -2688,6 +2684,11 @@ public:
 
     uint32 GetPendingFlightChange() const { return _pendingFlightChangeCounter; }
     void SetPendingFlightChange(uint32 counter) { _pendingFlightChangeCounter = counter; }
+
+    [[nodiscard]] Optional<bool> GetPendingCanFlyResync() const { return _pendingCanFlyResync; }
+    void SetPendingCanFlyResync(bool enable) { _pendingCanFlyResync = enable; }
+    void ClearPendingCanFlyResync() { _pendingCanFlyResync.reset(); }
+    void ResyncCanFlyToClient();
 
     void SetMapChangeOrderCounter() { _mapChangeOrderCounter = GetSession()->GetOrderCounter(); }
     uint32 GetMapChangeOrderCounter() { return _mapChangeOrderCounter; }
@@ -3024,6 +3025,7 @@ private:
 
     uint32 m_lastFallTime;
     float  m_lastFallZ;
+    bool   m_lastFallFromClient;
 
     int32 m_MirrorTimer[MAX_TIMERS];
     uint8 m_MirrorTimerFlags;
@@ -3061,10 +3063,6 @@ private:
 
     uint32 _activeCheats;
 
-    // duel health and mana reset attributes
-    uint32 healthBeforeDuel;
-    uint32 manaBeforeDuel;
-
     bool m_isInstantFlightOn;
 
     uint32 m_flightSpellActivated;
@@ -3081,6 +3079,7 @@ private:
 
     bool _expectingChangeTransport;
     uint32 _pendingFlightChangeCounter;
+    Optional<bool> _pendingCanFlyResync = { };
     uint32 _mapChangeOrderCounter;
 };
 

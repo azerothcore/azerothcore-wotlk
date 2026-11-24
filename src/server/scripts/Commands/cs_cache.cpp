@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CharacterCache.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Group.h"
 #include "Language.h"
 #include "MailMgr.h"
+#include "ObjectAccessor.h"
 #include "Player.h"
 #include "RBAC.h"
 
@@ -34,9 +36,9 @@ public:
     {
         static ChatCommandTable cacheCommandTable =
         {
-            { "info",      HandleCacheInfoCommand,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes    },
+            { "info",      HandleCacheInfoCommand,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "delete",    HandleCacheDeleteCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "refresh",   HandleCacheRefreshCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes    }
+            { "refresh",   HandleCacheRefreshCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes }
         };
 
         static ChatCommandTable commandTable =
@@ -49,9 +51,7 @@ public:
     static bool HandleCacheInfoCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
         if (!player)
-        {
             player = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
 
         if (!player)
         {
@@ -71,16 +71,13 @@ public:
             cache->Class, cache->Race, cache->Sex, cache->Level, cache->MailCount, cache->GuildId, cache->GroupGuid.ToString(),
             cache->ArenaTeamId[ARENA_SLOT_2v2], cache->ArenaTeamId[ARENA_SLOT_3v3], cache->ArenaTeamId[ARENA_SLOT_5v5]);
 
-        handler->SetSentErrorMessage(false);
         return true;
     }
 
     static bool HandleCacheDeleteCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
         if (!player)
-        {
             player = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
 
         if (!player)
         {
@@ -90,16 +87,13 @@ public:
 
         sCharacterCache->DeleteCharacterCacheEntry(player->GetGUID(), player->GetName());
         handler->PSendSysMessage(LANG_COMMAND_CACHE_DELETE, player->GetName(), player->GetGUID().ToString());
-        handler->SetSentErrorMessage(false);
         return true;
     }
 
     static bool HandleCacheRefreshCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
         if (!player)
-        {
             player = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
 
         if (!player)
         {
@@ -109,33 +103,25 @@ public:
 
         if (player->IsConnected())
         {
-            if (Player* cPlayer = ObjectAccessor::FindConnectedPlayer(player->GetGUID()))
+            if (Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID()))
             {
-                if (sCharacterCache->HasCharacterCacheEntry(cPlayer->GetGUID()))
-                {
-                    sCharacterCache->UpdateCharacterData(cPlayer->GetGUID(), cPlayer->GetName(), cPlayer->getGender(), cPlayer->getRace());
-                }
+                if (sCharacterCache->HasCharacterCacheEntry(target->GetGUID()))
+                    sCharacterCache->UpdateCharacterData(target->GetGUID(), target->GetName(), target->getGender(), target->getRace());
                 else
-                {
-                    sCharacterCache->AddCharacterCacheEntry(cPlayer->GetGUID(), cPlayer->GetSession()->GetAccountId(), cPlayer->GetName(),
-                        cPlayer->getGender(), cPlayer->getRace(), cPlayer->getClass(), cPlayer->GetLevel());
-                }
+                    sCharacterCache->AddCharacterCacheEntry(target->GetGUID(), target->GetSession()->GetAccountId(), target->GetName(),
+                        target->getGender(), target->getRace(), target->getClass(), target->GetLevel());
 
-                sCharacterCache->UpdateCharacterAccountId(cPlayer->GetGUID(), cPlayer->GetSession()->GetAccountId());
-                sCharacterCache->UpdateCharacterGuildId(cPlayer->GetGUID(), cPlayer->GetGuildId());
-                sMailMgr->RecountMailCount(cPlayer->GetGUID().GetCounter());
-                sCharacterCache->UpdateCharacterArenaTeamId(cPlayer->GetGUID(), ARENA_SLOT_2v2, cPlayer->GetArenaTeamId(ARENA_SLOT_2v2));
-                sCharacterCache->UpdateCharacterArenaTeamId(cPlayer->GetGUID(), ARENA_SLOT_3v3, cPlayer->GetArenaTeamId(ARENA_SLOT_3v3));
-                sCharacterCache->UpdateCharacterArenaTeamId(cPlayer->GetGUID(), ARENA_SLOT_5v5, cPlayer->GetArenaTeamId(ARENA_SLOT_5v5));
+                sCharacterCache->UpdateCharacterAccountId(target->GetGUID(), target->GetSession()->GetAccountId());
+                sCharacterCache->UpdateCharacterGuildId(target->GetGUID(), target->GetGuildId());
+                sMailMgr->RecountMailCount(target->GetGUID().GetCounter());
+                sCharacterCache->UpdateCharacterArenaTeamId(target->GetGUID(), ARENA_SLOT_2v2, target->GetArenaTeamId(ARENA_SLOT_2v2));
+                sCharacterCache->UpdateCharacterArenaTeamId(target->GetGUID(), ARENA_SLOT_3v3, target->GetArenaTeamId(ARENA_SLOT_3v3));
+                sCharacterCache->UpdateCharacterArenaTeamId(target->GetGUID(), ARENA_SLOT_5v5, target->GetArenaTeamId(ARENA_SLOT_5v5));
 
-                if (Group* group = cPlayer->GetGroup())
-                {
-                    sCharacterCache->UpdateCharacterGroup(cPlayer->GetGUID(), group->GetGUID());
-                }
+                if (Group* group = target->GetGroup())
+                    sCharacterCache->UpdateCharacterGroup(target->GetGUID(), group->GetGUID());
                 else
-                {
-                    sCharacterCache->ClearCharacterGroup(cPlayer->GetGUID());
-                }
+                    sCharacterCache->ClearCharacterGroup(target->GetGUID());
             }
         }
         else
@@ -144,7 +130,6 @@ public:
         }
 
         handler->PSendSysMessage(LANG_COMMAND_CACHE_REFRESH, player->GetName(), player->GetGUID().ToString());
-        handler->SetSentErrorMessage(false);
         return true;
     }
 };

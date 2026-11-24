@@ -46,7 +46,7 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
-    float GetNativeObjectScale() const override;
+    // GetNativeObjectScale() is not overridden: the client already applies the CreatureFamily scale.
     void SetDisplayId(uint32 modelId, std::optional<float> displayScale = {}) override;
 
     PetType getPetType() const { return m_petType; }
@@ -99,7 +99,6 @@ public:
 
     void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive = false);
     void ClearCastWhenWillAvailable();
-    void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
 
     void _SaveSpellCooldowns(CharacterDatabaseTransaction trans);
     void _SaveAuras(CharacterDatabaseTransaction trans);

@@ -18,12 +18,12 @@
 #ifndef DEF_PIT_OF_SARON_H
 #define DEF_PIT_OF_SARON_H
 
-#include "Chat.h"
 #include "CreatureAIImpl.h"
+#include "Position.h"
 
-#define DataHeader "POS"
+constexpr char const* DataHeader = "POS";
 
-#define PitOfSaronScriptName "instance_pit_of_saron"
+constexpr char const* PitOfSaronScriptName = "instance_pit_of_saron";
 
 enum DataTypes
 {
@@ -88,6 +88,7 @@ enum CreatureIds
     NPC_CHAMPION_3_HORDE                        = 37588,
     NPC_CHAMPION_1_ALLIANCE                     = 37496,
     NPC_CHAMPION_2_ALLIANCE                     = 37497,
+    NPC_CORRUPTED_CHAMPION                      = 36796,
 
     NPC_HORDE_SLAVE_1                           = 36770,
     NPC_HORDE_SLAVE_2                           = 36771,
@@ -125,9 +126,10 @@ enum GameObjectIds
 {
     GO_HOR_PORTCULLIS                           = 201848,
     GO_ICE_WALL                                 = 201885,
+    GO_FIRE_FIELD                               = 203005,
 };
 
-enum eSpells
+enum InstanceSpells
 {
     SPELL_NECROLYTE_CHANNELING                  = 30540,
     SPELL_KRICK_KILL_CREDIT                     = 71308,
@@ -137,16 +139,54 @@ enum eSpells
     SPELL_TELEPORT_SYLVANAS_VISUAL              = 70638,
     SPELL_TELEPORT_SYLVANAS                     = 70639,
     SPELL_SINDRAGOSA_FROST_BOMB_POS             = 70521,
+    SPELL_ACHIEVEMENT_CHECK_DONT_LOOK_UP        = 72845,
+    SPELL_STRANGULATING                         = 69413,
+    SPELL_NECROMANTIC_POWER                     = 69753,
 };
 
-#define PATH_BEGIN_VALUE 3000200
+enum Achievements
+{
+    CRITERIA_DOESNT_GO_TO_ELEVEN                = 12993,
+};
+
+enum SharedActions
+{
+    // npc_pos_martin_or_gorkun_second
+    ACTION_DESPAWN_SUMMONS                      = 1,
+    ACTION_START_OUTRO                          = 2,
+    ACTION_FROST_BOMB_KILL                      = 3,
+
+    // boss_tyrannus
+    ACTION_START_TYRANNUS_FIGHT                 = 1,
+};
+
+enum Paths
+{
+    PATH_BEGIN_VALUE                            = 3000200,
+    PATH_TYRANNUS_KRICK_OUTRO                   = PATH_BEGIN_VALUE + 10,
+    PATH_LEADER_KRICK_OUTRO                     = PATH_BEGIN_VALUE + 11,
+    PATH_JAINA_OUTRO                            = PATH_BEGIN_VALUE + 16,
+    PATH_SYLVANAS_OUTRO                         = PATH_BEGIN_VALUE + 17,
+    PATH_RIMEFANG_TYRANNUS_FIGHT                = PATH_BEGIN_VALUE + 18,
+};
+
+// Movement ids handled by npc_pos_tyrannus_events
+enum TyrannusEventPoints
+{
+    POINT_TYRANNUS_INTRO_END                    = 0,
+    POINT_TYRANNUS_KRICK_OUTRO_END              = 1,
+    POINT_TYRANNUS_WAIT_1                       = 2,
+    POINT_TYRANNUS_WAIT_2                       = 3,
+    POINT_TYRANNUS_WAIT_3                       = 4,
+    POINT_TYRANNUS_TAKEOFF                      = 10,
+};
 
 /************
 *** INTRO:
 ************/
 
 // Tyrannus speaker - NPC_TYRANNUS_EVENT
-enum eIntroTexts // Before Cave
+enum IntroTexts // Before Cave
 {
     SAY_TYRANNUS_INTRO_1                        = 4,
     SAY_JAINA_INTRO_1                           = 2,
@@ -163,18 +203,18 @@ enum eIntroTexts // Before Cave
     SAY_SYLVANAS_INTRO_4                        = 13,
 };
 
-const Position PortalPos = {424.46f, 212.16f, 528.8f, 0.0f};
-const Position LeaderIntroPos = {440.788f, 213.76f, 528.711f, 0.0f};
-const Position NecrolytePos1 = {506.304f, 211.78f, 528.71f, M_PI};
-const Position NecrolytePos2 = {506.127f, 231.46f, 528.71f, M_PI};
+Position const PortalPos = {424.46f, 212.16f, 528.8f, 0.0f};
+Position const LeaderIntroPos = {440.788f, 213.76f, 528.711f, 0.0f};
+Position const NecrolytePos1 = {506.304f, 211.78f, 528.71f, M_PI};
+Position const NecrolytePos2 = {506.127f, 231.46f, 528.71f, M_PI};
 
 struct ChampionPosition
 {
-    uint32 entry[2];
-    Position endPosition;
+    uint32 Entry[2];
+    Position EndPosition;
 };
 
-const ChampionPosition introPositions[] =
+ChampionPosition const IntroPositions[] =
 {
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 452.884f, 209.141f, 528.84f, 0.0f } },
     { { NPC_CHAMPION_1_ALLIANCE, NPC_CHAMPION_1_HORDE }, { 450.541f, 212.28f, 528.84f, 0.0f } },
@@ -204,21 +244,21 @@ const ChampionPosition introPositions[] =
 *** FIRST BOSS SCENE:
 ************/
 
-enum eFBSTexts
+enum FBSTexts
 {
     SAY_GENERAL_GARFROST                        = 21,
     SAY_TYRANNUS_GARFROST                       = 0,
 };
 
-const Position FBSSpawnPos = {695.685f, -118.825f, 513.877f, 3 * M_PI / 2};
+Position const FBSSpawnPos = {695.685f, -118.825f, 513.877f, 3 * M_PI / 2};
 
 struct FBSPosition
 {
-    uint32 entry;
-    uint32 pathId;
+    uint32 Entry;
+    uint32 PathId;
 };
 
-const FBSPosition FBSData[] =
+FBSPosition const FBSData[] =
 {
     { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE + 0 },
     { NPC_HORDE_SLAVE_1, PATH_BEGIN_VALUE + 1 },
@@ -236,12 +276,12 @@ const FBSPosition FBSData[] =
 *** SECOND BOSS SCENE:
 ************/
 
-const Position KrickCenterPos = {836.65f, 115.08f, 510.0f, 0.0f};
-const Position SBSTyrannusStartPos = {781.127f, 265.825f, 552.31f, 0.0f};
-const Position SBSLeaderStartPos = {772.716f, 111.517f, 510.81f, 0.0f};
-const Position SBSLeaderEndPos = {823.2f, -4.4497f, 509.49f, 0.86f};
+Position const KrickCenterPos = {836.65f, 115.08f, 510.0f, 0.0f};
+Position const SBSTyrannusStartPos = {781.127f, 265.825f, 552.31f, 0.0f};
+Position const SBSLeaderStartPos = {772.716f, 111.517f, 510.81f, 0.0f};
+Position const SBSLeaderEndPos = {823.2f, -4.4497f, 509.49f, 0.86f};
 
-enum eSBSTexts // Ick outro
+enum SBSTexts // Ick outro
 {
     SAY_OUTRO_KRICK_1                           = 6,
     SAY_JAINA_KRICK_1                           = 0,
@@ -261,11 +301,11 @@ enum eSBSTexts // Ick outro
 *** PRE_TYRANNUS SCENES (WAVES OF TRASH):
 ************/
 
-const Position PTSTyrannusWaitPos1 = {923.45f, 82.65f, 582.44f, 3.59f};
-const Position PTSTyrannusWaitPos2 = {907.27f, -53.86f, 617.31f, 1.69f};
-const Position PTSTyrannusWaitPos3 = {1117.93f, -125.16f, 760.34f, 0.10f};
+Position const PTSTyrannusWaitPos1 = {923.45f, 82.65f, 582.44f, 3.59f};
+Position const PTSTyrannusWaitPos2 = {907.27f, -53.86f, 617.31f, 1.69f};
+Position const PTSTyrannusWaitPos3 = {1117.93f, -125.16f, 760.34f, 0.10f};
 
-enum ePTSTexts
+enum PTSTexts
 {
     SAY_TYRANNUS_AMBUSH_1                       = 2, // NPC_TYRANNUS_EVENT
     SAY_TYRANNUS_AMBUSH_2                       = 3, // NPC_TYRANNUS_EVENT
@@ -276,22 +316,23 @@ enum ePTSTexts
 *** TYRANNUS SCENE:
 ************/
 
-const Position TSSpawnPos = {1069.49f, 88.99f, 631.5f, 2.0f};
-const Position TSMidPos = {1051.475f, 126.56f, 628.157f, 2.02f};
-const float TSHeight = 628.157f;
-const Position TSLeaderSpawnPos = {1064.3761f, 99.10f, 631.0f, 2.1f};
-const Position TSCenterPos = {990.48f, 165.37f, 628.157f, 5.7f};
-const Position TSDistCheckPos = {1009.29f, 163.15f, 628.157f, 0.0f};
-const Position TSSindragosaPos1 = {919.10f, 249.83f, 556.34f, 5.49f};
-const Position TSSindragosaPos2 = {948.39f, 215.47f, 653.71f, 5.51f};
+Position const TSSpawnPos = {1069.49f, 88.99f, 631.5f, 2.0f};
+Position const TSMidPos = {1051.475f, 126.56f, 628.157f, 2.02f};
+constexpr float TSHeight = 628.157f;
+Position const TSLeaderSpawnPos = {1064.3761f, 99.10f, 631.0f, 2.1f};
+Position const TSCenterPos = {990.48f, 165.37f, 628.157f, 5.7f};
+Position const TSDistCheckPos = {1009.29f, 163.15f, 628.157f, 0.0f};
+Position const TSSindragosaPos1 = {919.10f, 249.83f, 556.34f, 5.49f};
+Position const TSSindragosaPos2 = {948.39f, 215.47f, 653.71f, 5.51f};
 
 struct TSPosition
 {
-    uint32 entry;
-    float x, y;
+    uint32 Entry;
+    float X;
+    float Y;
 };
 
-const TSPosition TSData[] =
+TSPosition const TSData[] =
 {
     { NPC_FREED_SLAVE_3_HORDE, 1047.8f, 126.01f },
     { NPC_FREED_SLAVE_3_HORDE, 1049.21f, 127.10f },
@@ -312,7 +353,7 @@ const TSPosition TSData[] =
     { 0, 0.0f, 0.0f }
 };
 
-enum eTSTexts
+enum TSTexts
 {
     SAY_BOSS_TYRANNUS_INTRO_1                   = 0,
     SAY_GENERAL_HORDE_TRASH                     = 51,
@@ -335,4 +376,4 @@ inline AI* GetPitOfSaronAI(T* obj)
     return GetInstanceAI<AI>(obj, PitOfSaronScriptName);
 }
 
-#endif
+#endif // DEF_PIT_OF_SARON_H

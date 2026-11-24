@@ -861,12 +861,12 @@ class spell_dk_pet_scaling : public AuraScript
         if (aurEff->GetAuraType() != SPELL_AURA_MELEE_SLOW)
             return;
 
+        if (GetUnitOwner()->IsPet())
+            return;
+
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_MELEE_RANGED_HASTE, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MELEE_SLOW, true, SPELL_BLOCK_TYPE_POSITIVE);
-
-        if (GetUnitOwner()->IsPet())
-            return;
 
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_STAT, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
@@ -1921,6 +1921,15 @@ class spell_dk_pestilence : public SpellScript
         });
     }
 
+    // Aura::RefreshTimersWithMods() keeps the percentage done mods and crit chance stored at
+    // application, so only the attack power part of the amount is recomputed here.
+    void RefreshDisease(Aura* disease)
+    {
+        disease->RefreshTimersWithMods();
+        if (AuraEffect* periodic = disease->GetEffect(EFFECT_0))
+            periodic->ChangeAmount(periodic->CalculateAmount(GetCaster()), false);
+    }
+
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
@@ -1945,16 +1954,17 @@ class spell_dk_pestilence : public SpellScript
         {
             // Blood Plague
             if (Aura* disease = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                disease->RefreshDuration();
+                RefreshDisease(disease);
 
             // Frost Fever
             if (Aura* disease = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
             {
-                disease->RefreshDuration();
+                RefreshDisease(disease);
                 if (Aura const* talons = caster->GetAuraOfRankedSpell(SPELL_DK_ICY_TALONS_TALENT_R1))
                     caster->CastSpell(caster, talons->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
             }
 
+            // Ebon Plague / Crypt Fever only carry damage taken multipliers, nothing to recalculate
             if (Aura* disease = target->GetAuraOfRankedSpell(SPELL_DK_EBON_PLAGUE_R1, caster->GetGUID()))
                 disease->RefreshDuration();
             else if (Aura* disease = target->GetAuraOfRankedSpell(SPELL_DK_CRYPT_FEVER_R1, caster->GetGUID()))

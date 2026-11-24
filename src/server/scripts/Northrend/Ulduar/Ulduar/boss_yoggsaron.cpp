@@ -296,6 +296,8 @@ enum Misc
     DATA_GET_SARA_PHASE                 = 3,
     DATA_GET_DRIVE_ME_CRAZY             = 4,
     DATA_YOGG_SARON_HEALTH              = 5,
+
+    LOOT_MODE_REFORGED_HAMMER = 32
 };
 
 struct LocationsXY
@@ -1090,34 +1092,58 @@ struct boss_yoggsaron_guardian_of_ys : public ScriptedAI
 {
     boss_yoggsaron_guardian_of_ys(Creature* creature) : ScriptedAI(creature) { }
 
-    uint32 _spellTimer;
-
     void Reset() override
     {
-        _spellTimer = 0;
+        scheduler.CancelAll();
+        _dying = false;
         me->SetInCombatWithZone();
+
+        ScheduleTimedEvent(8s, [this]
+        {
+            if (!_dying && me->GetVictim())
+                DoCastSelf(SPELL_DARK_VOLLEY);
+        }, 8s);
     }
 
-    void JustDied(Unit*) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
+        if (_dying)
+        {
+            damage = 0;
+            return;
+        }
+
+        if (damage < me->GetHealth())
+            return;
+
+        damage = me->GetHealth() - 1;
+        _dying = true;
+        me->InterruptNonMeleeSpells(false);
         DoCastAOE(SPELL_SHADOW_NOVA, true);
+
+        ScheduleUniqueTimedEvent(100ms, [this]()
+        {
+            me->KillSelf();
+        }, 1);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
         DoCastAOE(SPELL_SHADOW_NOVA_SARA, true);
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
-            return;
+        scheduler.Update(diff);
 
-        _spellTimer += diff;
-        if (_spellTimer > 8000)
-        {
-            me->CastSpell(me, SPELL_DARK_VOLLEY, false);
-            _spellTimer = 0;
-        }
+        if (_dying || !UpdateVictim())
+            return;
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    bool _dying = false;
 };
 
 struct boss_yoggsaron : public ScriptedAI
@@ -1189,6 +1215,9 @@ struct boss_yoggsaron : public ScriptedAI
         {
             me->KillSelf();
         }, 500ms);
+
+        if (me->HasAura(SPELL_IN_THE_MAWS_OF_THE_OLD_GOD))
+            me->AddLootMode(LOOT_MODE_REFORGED_HAMMER);
     }
 
     void JustDied(Unit*  /*who*/) override
@@ -1282,12 +1311,6 @@ struct boss_yoggsaron : public ScriptedAI
     {
         if (param == DATA_YOGG_SARON_HEALTH)
             me->SetHealth(me->GetMaxHealth() * value / 100.0f);
-    }
-
-    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
-    {
-        if (spellInfo->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
-            me->AddLootMode(32);
     }
 
     void UpdateAI(uint32 diff) override
@@ -2397,12 +2420,24 @@ class spell_yogg_saron_diminish_power_aura : public AuraScript
 {
     PrepareAuraScript(spell_yogg_saron_diminish_power_aura);
 
+    static bool IsJudgementDamageSpell(SpellInfo const* spellInfo)
+    {
+        return spellInfo &&
+            spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN &&
+            (spellInfo->SpellFamilyFlags[0] & 0x800000);
+    }
+
     // Serverside proc (no triggered spell in DBC): taken melee hits and melee
     // abilities break the Diminish Power channel. Sniffed: only the active
     // channel breaks, the initial 1.5s cast is not interruptible by damage
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage() || IsJudgementDamageSpell(eventInfo.GetSpellInfo()))
+            return;
+
         if (Spell* spell = GetTarget()->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             if (spell->getState() == SPELL_STATE_CASTING)
                 GetTarget()->InterruptSpell(CURRENT_CHANNELED_SPELL);

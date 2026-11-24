@@ -167,6 +167,8 @@ void Player::Update(uint32 p_time)
             // orientation can be stale; never fail swing range or facing against the vehicle
             // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
             bool const victimIsVehicleBase = GetVehicleBase() == victim;
+            // A unit riding this player sits on their back (Gormok's Snobold Vassals), so it is never in front of them
+            bool const victimRidesMe = victim->GetVehicleBase() == this;
 
             bool mainHandSwung = false;
 
@@ -182,7 +184,7 @@ void Player::Update(uint32 p_time)
                     }
                 }
                 // 120 degrees of radiant range, if player is not in boundary radius
-                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (victimRidesMe || (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim)))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 2) // send single time (client auto repeat)
@@ -211,7 +213,7 @@ void Player::Update(uint32 p_time)
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
-                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (victimRidesMe || (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim)))
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
@@ -2239,9 +2241,19 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type,
 void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo,
                                          uint16              opcode)
 {
+    // A knockback restarts the client fall timer but keeps the fall start, so the timer no longer bounds the fall
+    if (opcode == CMSG_MOVE_KNOCK_BACK_ACK)
+    {
+        m_lastFallFromClient = false;
+        return;
+    }
+
     if (m_lastFallTime >= minfo.fallTime ||
         m_lastFallZ <= minfo.pos.GetPositionZ() || opcode == MSG_MOVE_FALL_LAND)
+    {
         SetFallInformation(minfo.fallTime, minfo.pos.GetPositionZ());
+        m_lastFallFromClient = true;
+    }
 }
 
 void Player::UpdateSpecCount(uint8 count)

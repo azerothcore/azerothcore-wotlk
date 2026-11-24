@@ -149,6 +149,24 @@ void ThreatReference::UpdateTauntState(TauntState state)
     else
         HeapNotifyIncreased();
 
+    // a taunting victim is never suppressed; re-check suppression when the taunt starts or ends
+    // after the swap, state holds the previous taunt state
+    bool const wasTaunting = state >= TAUNT_STATE_TAUNT;
+    if (wasTaunting != IsTaunting())
+    {
+        bool const shouldBeSuppressed = ShouldBeSuppressed();
+        if (IsSuppressed() && !shouldBeSuppressed)
+        {
+            _online = ONLINE_STATE_ONLINE;
+            HeapNotifyIncreased();
+        }
+        else if (IsOnline() && shouldBeSuppressed)
+        {
+            _online = ONLINE_STATE_SUPPRESSED;
+            HeapNotifyDecreased();
+        }
+    }
+
     _mgr._needClientUpdate = true;
 }
 
@@ -528,7 +546,14 @@ void ThreatManager::MatchUnitThreatToHighestThreat(Unit* target)
             highest = a;
     }
 
-    AddThreat(target, highest->GetThreat() - GetThreat(target, true), nullptr, true, true);
+    float const threatDiff = highest->GetThreat() - GetThreat(target, true);
+    AddThreat(target, threatDiff, nullptr, true, true);
+
+    // a suppressed reference ignores AddThreat, but a taunt still matches the highest threat
+    if (threatDiff > 0.0f && !target->GetVehicleBase())
+        if (ThreatReference* ref = Acore::Containers::MapGetValuePtr(_myThreatListEntries, target->GetGUID()))
+            if (ref->IsSuppressed())
+                ref->AddThreat(threatDiff);
 }
 
 void ThreatManager::TauntUpdate()

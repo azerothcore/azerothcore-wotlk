@@ -29,10 +29,9 @@ enum BossIds
     DATA_KALECGOS                           = 0,
     DATA_BRUTALLUS                          = 1,
     DATA_FELMYST                            = 2,
-    DATA_FELMYST_DOORS                      = 3,
-    DATA_EREDAR_TWINS                       = 4,
-    DATA_MURU                               = 5,
-    DATA_KILJAEDEN                          = 6,
+    DATA_EREDAR_TWINS                       = 3,
+    DATA_MURU                               = 4,
+    DATA_KILJAEDEN                          = 5,
     MAX_ENCOUNTERS
 };
 
@@ -50,6 +49,13 @@ enum DataTypes
     DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3     = 16,
     DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 17,
     DATA_ICEBARRIER                         = 18,
+    DATA_FIRE_BARRIER                       = 19
+};
+
+enum SWPPersistentData
+{
+    PERSISTENT_DATA_FIRE_BARRIER,
+    PERSISTENT_DATA_COUNT
 };
 
 enum CreatureIds
@@ -63,6 +69,7 @@ enum CreatureIds
     NPC_FELMYST                             = 25038,
     NPC_DEMONIC_VAPOR_TRAIL                 = 25267,
     NPC_UNYIELDING_DEAD                     = 25268,
+    NPC_KALECGOS_FELMYST                    = 24844, // Same as Magister's Terrace
 
     NPC_GRAND_WARLOCK_ALYTHESS              = 25166,
     NPC_LADY_SACROLASH                      = 25165,
@@ -106,6 +113,14 @@ enum SpellIds
 {
     SPELL_SUMMON_FELBLAZE                    = 45069 // Felblaze? Summons Felmyst
 };
+
+enum SWPPoints
+{
+    POINT_KALECGOS_FELMYST                   = 1 // Kalecgos's SmartAI flies on to open the fire barrier
+};
+
+Position const KalecgosFelmystSpawnPos = { 1573.1461f, 755.20245f, 99.524956f, 3.595378f };
+Position const KalecgosFelmystLandPos  = { 1474.2347f, 624.0703f, 29.32589f };
 
 template <class AI, class T>
 inline AI* GetSunwellPlateauAI(T* obj)

@@ -4,6 +4,9 @@
 #       uploads binaries; this workflow is called with artifact_run_id, scope=full.
 #   Dispatch: compile via linux-build, or nopch-build -f scope=smoke|full.
 #
+#   scope=full with packages=./... runs as three shards, each on its own realm
+#   (see Run go e2e). Any other scope or package list runs as one job.
+#
 # Triggers: workflow_call (from nopch-build) | workflow_dispatch
 
 name: e2e-live
@@ -85,7 +88,7 @@ env:
 
 jobs:
   e2e:
-    name: e2e (native / ${{ inputs.scope || 'full' }})
+    name: e2e (native / ${{ inputs.scope || 'full' }} / ${{ matrix.shard }})
     # github.repository is the base repo on pull_request, so fork PRs still run here.
     # This only skips the job inside a fork's own CI.
     if: github.repository == 'azerothcore/azerothcore-wotlk'
@@ -96,6 +99,11 @@ jobs:
     runs-on: ${{ inputs.artifact_run_id != '' && 'ubuntu-24.04' || vars.E2E_RUNS_ON || 'ubuntu-24.04' }}
     # Real ceiling. go test -timeout is per package (full default 60m).
     timeout-minutes: 90
+    strategy:
+      # A failure in one shard should not hide the results of the others.
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON((inputs.scope || 'full') == 'full' && (inputs.packages || './...') == './...' && '["ulduar","raids","rest"]' || '["all"]') }}
     steps:
       - name: Free disk
         run: |
@@ -247,6 +255,10 @@ jobs:
             echo "AC_WARDEN_ENABLED=0"
             echo "AC_BEEP_AT_START=0"
             echo "AC_REALMS_STATE_UPDATE_DELAY=1"
+            # suites/items/recovery drives destroy, sell and disenchant recording
+            echo "AC_ITEM_DELETE_METHOD=1"
+            echo "AC_ITEM_DELETE_VENDOR=1"
+            echo "AC_ITEM_DELETE_DISENCHANT=1"
             echo "E2E_AUTH_ADDR=127.0.0.1:3724"
             echo "E2E_AUTH_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_auth"
             echo "E2E_CHAR_DSN=acore:acore@tcp(127.0.0.1:3306)/acore_characters"
@@ -341,6 +353,7 @@ jobs:
           E2E_P: ${{ inputs.package_parallel || '1' }}
           E2E_PACKAGES: ${{ inputs.packages || './...' }}
           E2E_TAGS_FILTER: ${{ inputs.tags_filter || '' }}
+          E2E_SHARD: ${{ matrix.shard }}
         run: |
           set -euo pipefail
           count="${E2E_COUNT}"
@@ -393,8 +406,37 @@ jobs:
             if [[ -n "${E2E_TAGS_FILTER}" ]]; then
               export E2E_TAGS="${E2E_TAGS_FILTER}"
             fi
-            # shellcheck disable=SC2086
-            run_go_test ${packages_raw}
+            # Shards are balanced by measured package runtime (~13m each). Packages
+            # not named here run in "rest", so new suites need no change.
+            ulduar=(./suites/instances/northrend/ulduar)
+            raids=(
+              ./suites/instances/northrend/trial_of_the_crusader
+              ./suites/instances/trial_of_the_crusader
+              ./suites/instances/classic/onyxias_lair
+              ./suites/social/loot
+            )
+            case "${E2E_SHARD}" in
+              all)
+                # shellcheck disable=SC2086
+                run_go_test ${packages_raw}
+                ;;
+              ulduar)
+                run_go_test "${ulduar[@]}"
+                ;;
+              raids)
+                run_go_test "${raids[@]}"
+                ;;
+              rest)
+                claimed="$(go list -tags=e2e "${ulduar[@]}" "${raids[@]}")"
+                mapfile -t rest < <(go list -tags=e2e ./... | grep -vxF -f <(printf '%s\n' "${claimed}"))
+                (( ${#rest[@]} > 0 )) || { echo '::error::no packages left for shard rest'; exit 1; }
+                run_go_test "${rest[@]}"
+                ;;
+              *)
+                echo "unknown shard: ${E2E_SHARD}"
+                exit 1
+                ;;
+            esac
           fi
 
       - name: Stop servers
@@ -426,7 +468,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-server-logs
+          name: e2e-server-logs-${{ matrix.shard }}
           path: |
             ${{ runner.temp }}/worldserver.log
             ${{ runner.temp }}/authserver.log

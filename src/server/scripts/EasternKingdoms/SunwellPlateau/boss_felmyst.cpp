@@ -81,14 +81,11 @@ enum Misc
     POINT_AIR_BREATH_START2     = 8,
     POINT_MISC                  = 9,
 
-    POINT_KALECGOS              = 1,
-
     GROUP_START_INTRO           = 0,
     GROUP_BREATH                = 1,
     GROUP_TAKEOFF               = 2,
 
     NPC_FOG_TRIGGER             = 23472,
-    NPC_KALECGOS_FELMYST        = 24844, // Same as Magister's Terrace
     NPC_WORLD_TRIGGER_RIGHT     = 25358
 };
 
@@ -203,8 +200,9 @@ struct boss_felmyst : public BossAI
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
 
         // Summon Kalecgos (human form of kalecgos fight)
-        if (Creature* kalec = me->SummonCreature(NPC_KALECGOS_FELMYST, 1573.1461f, 755.20245f, 99.524956f, 3.595378f))
-            kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS, 1474.2347f, 624.0703f, 29.32589f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
+        if (Creature* kalec = me->SummonCreature(NPC_KALECGOS_FELMYST, KalecgosFelmystSpawnPos))
+            kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS_FELMYST, KalecgosFelmystLandPos,
+                                                FORCED_MOVEMENT_NONE, 0.f, false, true);
     }
 
     void ScheduleGroundAbilities()
@@ -535,8 +533,9 @@ class spell_felmyst_open_brutallus_back_doors : public SpellScript
 
     void HandleAfterCast()
     {
-        GetCaster()->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, NOT_STARTED);
-        GetCaster()->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, DONE);
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
+        instance->StorePersistentData(PERSISTENT_DATA_FIRE_BARRIER, DONE);
+        instance->HandleGameObject(DATA_FIRE_BARRIER, true);
     }
 
     void Register() override
