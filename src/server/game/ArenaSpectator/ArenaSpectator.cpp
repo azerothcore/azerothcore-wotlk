@@ -267,7 +267,7 @@ void ArenaSpectator::HandleResetCommand(Player* player)
         for (SpellCooldowns::const_iterator itrc = sc.begin(); itrc != sc.end(); ++itrc)
             if (itrc->second.sendToSpectator && itrc->second.maxduration >= SPECTATOR_COOLDOWN_MIN * IN_MILLISECONDS && itrc->second.maxduration <= SPECTATOR_COOLDOWN_MAX * IN_MILLISECONDS)
                 if (uint32 cd = (getMSTimeDiff(getMSTime(), itrc->second.end) / 1000))
-                    SendCommand_Cooldown(player, itr->first, "ACD", itrc->first, cd, itrc->second.maxduration / 1000);
+                    SendCommand_Cooldown(player, itr->first, "ACD", itrc->first.spellId, cd, itrc->second.maxduration / 1000);
 
         // send all visible "AUR"
         Unit::VisibleAuraMap const* visibleAuras = plr->GetVisibleAuras();
