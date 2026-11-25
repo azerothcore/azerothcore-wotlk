@@ -1757,29 +1757,24 @@ class spell_gen_obsidian_armor : public AuraScript
     }
 };
 
-enum ParachuteSpells
-{
-    SPELL_PARACHUTE         = 45472,
-    SPELL_PARACHUTE_BUFF    = 44795,
-};
-
-// 45472 - Parachute
+// 45472, 61242 - Parachute
 class spell_gen_parachute : public AuraScript
 {
     PrepareAuraScript(spell_gen_parachute);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    bool Validate(SpellInfo const* spellInfo) override
     {
-        return ValidateSpellInfo({ SPELL_PARACHUTE, SPELL_PARACHUTE_BUFF });
+        return ValidateSpellInfo({ static_cast<uint32>(spellInfo->Effects[EFFECT_0].CalcValue()) });
     }
 
-    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
         if (Player* target = GetTarget()->ToPlayer())
             if (target->IsFalling())
             {
-                target->RemoveAurasDueToSpell(SPELL_PARACHUTE);
-                target->CastSpell(target, SPELL_PARACHUTE_BUFF, true);
+                uint32 const parachuteSpellId = aurEff->GetAmount();
+                Remove();
+                target->CastSpell(target, parachuteSpellId, true);
             }
     }
 
