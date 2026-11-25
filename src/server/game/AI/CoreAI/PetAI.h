@@ -49,6 +49,7 @@ public:
     explicit PetAI(Creature* c);
 
     void UpdateAI(uint32) override;
+    void DoAction(int32 action) override;
     static int32 Permissible(Creature const* creature);
 
     void KilledUnit(Unit* /*victim*/) override;
@@ -83,6 +84,7 @@ private:
     GuidSet m_AllySet;
     uint32 m_updateAlliesTimer;
     float combatRange;
+    bool _emerging = false;
 
     Unit* SelectNextTarget(bool allowAutoSelect) const;
     void HandleReturnMovement();
