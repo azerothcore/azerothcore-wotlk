@@ -98,11 +98,11 @@ public:
                         }
                     }
 
-                    if (!stoned && (bf->IsWarTime() || bf->GetTimer() <= 10 * MINUTE * IN_MILLISECONDS))
+                    if (bf->IsWarTime() || bf->GetTimer() <= 10 * MINUTE * IN_MILLISECONDS)
                     {
                         for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                             if (Creature* cr = instance->GetCreature(bossGUIDs[i]))
-                                if (!cr->IsInCombat())
+                                if (!cr->IsInCombat() && !cr->HasAura(SPELL_STONED_AURA))
                                 {
                                     cr->RemoveAllAuras();
                                     if (Aura* aur = cr->AddAura(SPELL_STONED_AURA, cr))
