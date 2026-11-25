@@ -435,8 +435,10 @@ class spell_razuvious_force_obedience_aura : public AuraScript
 
     void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (!GetTarget()->IsCharmed())
-            GetTarget()->RemoveAurasDueToSpell(SPELL_OBEDIENCE_CHAINS);
+        std::list<Creature*> understudies;
+        GetTarget()->GetCreatureListWithEntryInGrid(understudies, NPC_DEATH_KNIGHT_UNDERSTUDY, 100.0f);
+        for (Creature* understudy : understudies)
+            understudy->RemoveAurasDueToSpell(SPELL_OBEDIENCE_CHAINS);
     }
 
     void Register() override
