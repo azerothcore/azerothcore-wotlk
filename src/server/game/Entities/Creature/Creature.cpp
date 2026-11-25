@@ -2762,7 +2762,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         return true;
 
     if (isWorldBoss())
-        dist = std::min<float>(GetMap()->GetVisibilityRange(), SIZE_OF_GRID_CELL * 2) + GetCombatReach() + victim->GetCombatReach();
+        dist = std::max<float>(dist, std::min<float>(GetMap()->GetVisibilityRange(), SIZE_OF_GRID_CELL * 2) + GetCombatReach() + victim->GetCombatReach());
 
     float x, y, z;
     x = y = z = 0.0f;
