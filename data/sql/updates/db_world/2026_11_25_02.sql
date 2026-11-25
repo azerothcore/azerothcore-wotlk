@@ -1,3 +1,4 @@
+-- DB update 2026_11_25_01 -> 2026_11_25_02
 --
 DELETE FROM `disables` WHERE `sourceType` = 0 AND `entry` = 28524;
 INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, `comment`) VALUES
