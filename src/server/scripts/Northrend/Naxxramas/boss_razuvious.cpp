@@ -17,8 +17,10 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
-#include "naxxramas.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "naxxramas.h"
 
 enum Says
 {
@@ -37,7 +39,8 @@ enum Spells
     SPELL_DISRUPTING_SHOUT          = 55543,
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
-    SPELL_TAUNT                     = 29060
+    SPELL_TAUNT                     = 29060,
+    SPELL_OBEDIENCE_CHAINS          = 55520
 };
 
 enum Events
@@ -51,6 +54,7 @@ enum NPCs
 {
     NPC_DEATH_KNIGHT_UNDERSTUDY     = 16803,
     NPC_TARGET_DUMMY                = 16211,
+    NPC_OBEDIENCE_CRYSTAL           = 29912,
 };
 
 enum Actions
@@ -366,6 +370,14 @@ public:
             }
         }
 
+        void OnCharmed(bool apply) override
+        {
+            if (apply && !me->IsEngaged())
+                JustEngagedWith(nullptr);
+
+            ScriptedAI::OnCharmed(apply);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             scheduler.Update(diff);
@@ -381,8 +393,62 @@ public:
     };
 };
 
+class spell_razuvious_force_obedience : public SpellScript
+{
+    PrepareSpellScript(spell_razuvious_force_obedience);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([](WorldObject* target) { return target->ToUnit()->IsCharmed(); });
+        if (targets.size() <= 1)
+            return;
+
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        targets.resize(1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_razuvious_force_obedience::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
+    }
+};
+
+class spell_razuvious_force_obedience_aura : public AuraScript
+{
+    PrepareAuraScript(spell_razuvious_force_obedience_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_OBEDIENCE_CHAINS });
+    }
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (!caster || target->GetCharmerGUID() != caster->GetGUID())
+            return;
+
+        if (Creature* crystal = caster->FindNearestCreature(NPC_OBEDIENCE_CRYSTAL, GetSpellInfo()->GetMaxRange()))
+            crystal->CastSpell(target, SPELL_OBEDIENCE_CHAINS, true);
+    }
+
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (!GetTarget()->IsCharmed())
+            GetTarget()->RemoveAurasDueToSpell(SPELL_OBEDIENCE_CHAINS);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_razuvious_force_obedience_aura::AfterApply, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_razuvious_force_obedience_aura::AfterRemove, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_razuvious()
 {
     new boss_razuvious();
     new boss_razuvious_minion();
+    RegisterSpellAndAuraScriptPair(spell_razuvious_force_obedience, spell_razuvious_force_obedience_aura);
 }
