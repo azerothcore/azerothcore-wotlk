@@ -133,7 +133,7 @@ static uint32 AddEntrySets[4][2] =
 enum Misc
 {
     MAX_ADD_COUNT               = 4,
-    ADDITIONAL_CLASS_SPRIEST    = 11,
+    ADDITIONAL_CLASS_SPRIEST    = 12,
     AURA_SHADOW_FORM            = 15473,
     GROUP_CLASS_ABILITY         = 1,
     GROUP_DRAIN_POWER           = 2

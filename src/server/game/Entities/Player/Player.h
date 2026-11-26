@@ -889,6 +889,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS           = 36,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS                    = 37,
     PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES = 38,
+    PLAYER_LOGIN_QUERY_LOAD_PET_AUTOCAST                 = 39,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1226,6 +1227,8 @@ public:
     PetStable* GetPetStable() { return m_petStable.get(); }
     PetStable& GetOrInitPetStable();
     [[nodiscard]] PetStable const* GetPetStable() const { return m_petStable.get(); }
+
+    PetAutocastPreferences& GetPetAutocastPreferences() { return _petAutocastPreferences; }
 
     [[nodiscard]] Pet* GetPet() const;
     Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration = 0ms, uint32 healthPct = 0);
@@ -2189,12 +2192,6 @@ public:
     void SetHonorPoints(uint32 value);
     void SetArenaPoints(uint32 value);
 
-    // duel health and mana reset methods
-    void SaveHealthBeforeDuel()     { healthBeforeDuel = GetHealth(); }
-    void SaveManaBeforeDuel()       { manaBeforeDuel = GetPower(POWER_MANA); }
-    void RestoreHealthAfterDuel()   { SetHealth(healthBeforeDuel); }
-    void RestoreManaAfterDuel()     { SetPower(POWER_MANA, manaBeforeDuel); }
-
     //End of PvP System
 
     [[nodiscard]] inline SpellCooldowns GetSpellCooldowns() const { return m_spellCooldowns; }
@@ -2242,6 +2239,7 @@ public:
     void CastAllObtainSpells();
     void ApplyItemObtainSpells(Item* item, bool apply);
     void UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot);
+    void RemoveOrphanedItemObtainSpells();
 
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
@@ -3051,6 +3049,8 @@ private:
 
     std::unique_ptr<PetStable> m_petStable;
 
+    PetAutocastPreferences _petAutocastPreferences;
+
     // Temporary removed pet cache
     uint32 m_temporaryUnsummonedPetNumber;
     uint32 m_oldpetspell;
@@ -3067,10 +3067,6 @@ private:
     uint32 _pendingBindTimer;
 
     uint32 _activeCheats;
-
-    // duel health and mana reset attributes
-    uint32 healthBeforeDuel;
-    uint32 manaBeforeDuel;
 
     bool m_isInstantFlightOn;
 
