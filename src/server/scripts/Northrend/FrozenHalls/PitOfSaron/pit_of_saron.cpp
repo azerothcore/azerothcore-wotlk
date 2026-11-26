@@ -17,9 +17,7 @@
 
 #include "pit_of_saron.h"
 #include "AreaTriggerScript.h"
-#include "CreatureGroups.h"
 #include "CreatureScript.h"
-#include "MapMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -28,45 +26,163 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
+enum Spells
+{
+    SPELL_RAISE_DEAD                    = 69350,
+    SPELL_EMPOWERED_BLIZZARD_AURA       = 70132,
+    SPELL_EMPOWERED_BLIZZARD            = 70131,
+    SPELL_SHRIEK_OF_THE_HIGHBORNE       = 59514,
+    SPELL_MULTI_SHOT                    = 70513,
+    SPELL_ICE_LANCE_VOLLEY              = 70464,
+    SPELL_NECROLYTE_SHADOW_BOLT         = 69577,
+    SPELL_CONVERSION_BEAM               = 69578,
+    SPELL_SUMMON_UNDEAD                 = 69516,
+    SPELL_ICICLE                        = 69426,
+    SPELL_ICICLE_DUMMY                  = 69428,
+    SPELL_ICE_SHARDS                    = 69425,
+    SPELL_ICE_SHARDS_H                  = 70827,
+    SPELL_BLIGHT                        = 69604,
+};
+
+enum Texts
+{
+    SAY_SLAVE_FREED                     = 0,
+};
+
+enum Models
+{
+    MODEL_INVISIBLE                     = 11686,
+};
+
+enum Actions
+{
+    ACTION_SUMMON_SINDRAGOSA            = 1,    // npc_pos_leader_second
+    ACTION_REMOVE_INVINCIBILITY         = 1337, // npc_pos_deathwhisper_necrolyte
+};
+
+enum Events
+{
+    // npc_pos_leader
+    EVENT_INTRO_SUMMON_CHAMPIONS = 1,
+    EVENT_INTRO_TYRANNUS_1,
+    EVENT_INTRO_TYRANNUS_2,
+    EVENT_INTRO_CHAMPIONS_ATTACK,
+    EVENT_INTRO_LEADER_1,
+    EVENT_INTRO_TYRANNUS_3,
+    EVENT_INTRO_STRANGULATE,
+    EVENT_INTRO_NECROMANTIC_POWER,
+    EVENT_INTRO_KILL_CHAMPIONS,
+    EVENT_INTRO_LEADER_2,
+    EVENT_INTRO_RAISE_DEAD,
+    EVENT_INTRO_CORRUPT_CHAMPIONS,
+    EVENT_INTRO_CORRUPTED_ATTACK,
+    EVENT_INTRO_LEADER_SPELL,
+    EVENT_INTRO_TYRANNUS_LEAVE,
+    EVENT_INTRO_LEADER_3,
+    EVENT_INTRO_LEADER_4,
+
+    // npc_pos_deathwhisper_necrolyte
+    EVENT_NECROLYTE_SHADOW_BOLT,
+    EVENT_NECROLYTE_CONVERSION_BEAM,
+
+    // npc_pos_after_first_boss
+    EVENT_FBS_SUMMON_SLAVES,
+    EVENT_FBS_TYRANNUS,
+    EVENT_FBS_GENERAL,
+
+    // npc_pos_tyrannus_events
+    EVENT_TYRANNUS_MOVE_WAIT_1,
+    EVENT_TYRANNUS_FACE_WAIT_1,
+    EVENT_TYRANNUS_MOVE_WAIT_2,
+    EVENT_TYRANNUS_FACE_WAIT_2,
+    EVENT_TYRANNUS_TAKEOFF,
+    EVENT_TYRANNUS_MOVE_WAIT_3,
+    EVENT_AMBUSH_1_SUMMON_DEATHBRINGERS,
+    EVENT_AMBUSH_1_DEATHBRINGER_1_ARRIVED,
+    EVENT_AMBUSH_1_DEATHBRINGER_2_ARRIVED,
+    EVENT_AMBUSH_1_SUMMON_WAVE_1,
+    EVENT_AMBUSH_1_SUMMON_WAVE_2,
+    EVENT_AMBUSH_1_ACTIVATE_DEATHBRINGER_1,
+    EVENT_AMBUSH_1_ACTIVATE_DEATHBRINGER_2,
+    EVENT_AMBUSH_2_SUMMON,
+
+    // npc_pos_martin_or_gorkun_second
+    EVENT_GENERAL_SUMMON_SLAVES,
+    EVENT_GENERAL_TRASH_TALK,
+    EVENT_GENERAL_TYRANNUS_INTRO,
+    EVENT_GENERAL_START_FIGHT,
+    EVENT_GENERAL_OUTRO,
+    EVENT_GENERAL_SUMMON_FALLEN_WARRIOR,
+
+    // npc_pos_leader_second
+    EVENT_LEADER_OUTRO_SUMMON_SINDRAGOSA,
+    EVENT_LEADER_OUTRO_GENERAL_2,
+    EVENT_LEADER_OUTRO_LEADER_1,
+    EVENT_LEADER_OUTRO_TELEPORT,
+    EVENT_LEADER_OUTRO_FROST_BOMB,
+    EVENT_LEADER_OUTRO_SINDRAGOSA_LEAVE,
+    EVENT_LEADER_OUTRO_SINDRAGOSA_HIDE,
+    EVENT_LEADER_OUTRO_LEADER_MOVE,
+    EVENT_LEADER_OUTRO_FROST_BOMB_KILL,
+};
+
+enum MovePoints
+{
+    POINT_NECROLYTE_POSITION            = 1,
+    POINT_FBS_GARFROST                  = 1,
+    POINT_GENERAL_CENTER                = 2,
+
+    // Waypoint ids of the PATH_JAINA_OUTRO and PATH_SYLVANAS_OUTRO paths
+    POINT_LEADER_OUTRO_2                = 1,
+    POINT_JAINA_OUTRO_3                 = 2,
+    POINT_OPEN_PORTCULLIS               = 7,
+};
+
+// SetData types and values sent to npc_pos_tyrannus_events by areatrigger and trash smart_scripts
+enum TyrannusEventDataTypes
+{
+    DATA_AREATRIGGER                    = 1,
+    DATA_TRASH_KILLED                   = 2,
+};
+
+enum TyrannusEventDataValues
+{
+    AREATRIGGER_AMBUSH_1                = 1,
+    AREATRIGGER_AMBUSH_2                = 2,
+    AREATRIGGER_TUNNEL                  = 3,
+
+    TRASH_KILLED                        = 1,
+};
+
 class npc_pos_leader : public CreatureScript
 {
 public:
     npc_pos_leader() : CreatureScript("npc_pos_leader") { }
 
-    struct npc_pos_leaderAI: public NullCreatureAI
+    struct npc_pos_leaderAI : public NullCreatureAI
     {
-        npc_pos_leaderAI(Creature* creature) : NullCreatureAI(creature), summons(me)
+        npc_pos_leaderAI(Creature* creature) : NullCreatureAI(creature), _summons(me)
         {
-            pInstance = me->GetInstanceScript();
+            _instance = me->GetInstanceScript();
         }
-
-        EventMap events;
-        SummonList summons;
-        InstanceScript* pInstance;
-        uint8 counter;
 
         void Reset() override
         {
-            counter = 0;
+            _counter = 0;
             events.Reset();
-            summons.DespawnAll();
+            _summons.DespawnAll();
             me->SetVisible(true);
 
-            if (pInstance)
-                switch (pInstance->GetData(DATA_INSTANCE_PROGRESS))
-                {
-                    case INSTANCE_PROGRESS_NONE:
-                        me->SetVisible(false);
-                        break;
-                }
+            if (_instance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE)
+                me->SetVisible(false);
         }
 
-        void SetData(uint32 type, uint32  /*val*/) override
+        void SetData(uint32 type, uint32 /*data*/) override
         {
-            if (type == DATA_START_INTRO && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE && counter == 0 && !me->IsVisible())
+            if (type == DATA_START_INTRO && _instance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE && _counter == 0 && !me->IsVisible())
             {
                 me->setActive(true);
-                events.RescheduleEvent(1, 0ms);
+                events.RescheduleEvent(EVENT_INTRO_SUMMON_CHAMPIONS, 0ms);
             }
         }
 
@@ -75,283 +191,251 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
-                case 1:
+                case EVENT_INTRO_SUMMON_CHAMPIONS:
                     {
-                        if (counter == 0)
+                        if (_counter == 0)
                         {
                             me->SetVisible(true);
                             me->GetMotionMaster()->MovePoint(1, LeaderIntroPos);
                         }
 
-                        uint8 idx = 0;
-                        if (pInstance)
-                            idx = (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE ? 0 : 1);
-                        if (introPositions[counter].entry[idx] != 0)
+                        uint8 idx = _instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE ? 0 : 1;
+                        if (IntroPositions[_counter].Entry[idx] != 0)
                         {
-                            if (Creature* summon = me->SummonCreature(introPositions[counter].entry[idx], PortalPos))
+                            if (Creature* summon = me->SummonCreature(IntroPositions[_counter].Entry[idx], PortalPos))
                             {
                                 summon->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 summon->SetSpeed(MOVE_RUN, 0.8f);
-                                summon->GetMotionMaster()->MovePoint(1, introPositions[counter].endPosition);
-                                summon->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                                summon->GetMotionMaster()->MovePoint(1, IntroPositions[_counter].EndPosition);
+                                summon->SetEmoteState(EMOTE_STATE_READY1H);
                             }
 
-                            ++counter;
+                            ++_counter;
                             events.Repeat(150ms);
                         }
                         else
-                        {
-                            events.RescheduleEvent(2, 2500ms);
-                        }
+                            events.RescheduleEvent(EVENT_INTRO_TYRANNUS_1, 2500ms);
                     }
                     break;
-                case 2:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                        {
-                            c->setActive(true);
-                            c->AI()->Talk(SAY_TYRANNUS_INTRO_1);
-                        }
-
-                    events.RescheduleEvent(3, 7s);
-                    break;
-                case 3:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->AI()->Talk(SAY_TYRANNUS_INTRO_2);
-
-                    events.RescheduleEvent(4, 14s);
-                    break;
-                case 4:
-                    if (pInstance)
+                case EVENT_INTRO_TYRANNUS_1:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                     {
-                        Creature* n1 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_1_GUID));
-                        Creature* n2 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_2_GUID));
-                        if (n1 && n2)
-                        {
-                            if (!n1->IsInCombat() && n1->IsAlive())
-                            {
-                                n1->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                                n1->GetMotionMaster()->MovePoint(1, NecrolytePos1);
-                                n1->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-                            }
-                            if (!n2->IsInCombat() && n2->IsAlive())
-                            {
-                                n2->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                                n2->GetMotionMaster()->MovePoint(1, NecrolytePos2);
-                                n2->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-                            }
-                            /// @todo This spell check is invalid
-                            //                            if (SPELL_NECROLYTE_CHANNELING)
-                            //                            {
-                            n1->RemoveAura(SPELL_NECROLYTE_CHANNELING);
-                            n2->RemoveAura(SPELL_NECROLYTE_CHANNELING);
-                            //                            }
+                        tyrannus->setActive(true);
+                        tyrannus->AI()->Talk(SAY_TYRANNUS_INTRO_1);
+                    }
 
-                            for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                                if (Creature* c = pInstance->instance->GetCreature(*itr))
+                    events.RescheduleEvent(EVENT_INTRO_TYRANNUS_2, 7s);
+                    break;
+                case EVENT_INTRO_TYRANNUS_2:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->AI()->Talk(SAY_TYRANNUS_INTRO_2);
+
+                    events.RescheduleEvent(EVENT_INTRO_CHAMPIONS_ATTACK, 14s);
+                    break;
+                case EVENT_INTRO_CHAMPIONS_ATTACK:
+                    {
+                        Creature* necrolyte1 = _instance->instance->GetCreature(_instance->GetGuidData(DATA_NECROLYTE_1_GUID));
+                        Creature* necrolyte2 = _instance->instance->GetCreature(_instance->GetGuidData(DATA_NECROLYTE_2_GUID));
+                        if (necrolyte1 && necrolyte2)
+                        {
+                            if (!necrolyte1->IsInCombat() && necrolyte1->IsAlive())
+                            {
+                                necrolyte1->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                necrolyte1->GetMotionMaster()->MovePoint(POINT_NECROLYTE_POSITION, NecrolytePos1);
+                                necrolyte1->SetEmoteState(EMOTE_STATE_READY1H);
+                            }
+                            if (!necrolyte2->IsInCombat() && necrolyte2->IsAlive())
+                            {
+                                necrolyte2->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                necrolyte2->GetMotionMaster()->MovePoint(POINT_NECROLYTE_POSITION, NecrolytePos2);
+                                necrolyte2->SetEmoteState(EMOTE_STATE_READY1H);
+                            }
+                            necrolyte1->RemoveAura(SPELL_NECROLYTE_CHANNELING);
+                            necrolyte2->RemoveAura(SPELL_NECROLYTE_CHANNELING);
+
+                            for (ObjectGuid const& guid : _summons)
+                                if (Creature* champion = _instance->instance->GetCreature(guid))
                                 {
-                                    if (c->GetPositionX() < 440.0f)
+                                    if (champion->GetPositionX() < 440.0f)
                                         continue;
-                                    if (c->GetPositionY() > 215.0f)
-                                        c->GetMotionMaster()->MoveChase(n2, 0.0f, rand_norm() * 2 * M_PI);
+                                    if (champion->GetPositionY() > 215.0f)
+                                        champion->GetMotionMaster()->MoveChase(necrolyte2, 0.0f, rand_norm() * 2 * M_PI);
                                     else
-                                        c->GetMotionMaster()->MoveChase(n1, 0.0f, rand_norm() * 2 * M_PI);
+                                        champion->GetMotionMaster()->MoveChase(necrolyte1, 0.0f, rand_norm() * 2 * M_PI);
                                 }
                         }
                     }
 
-                    events.RescheduleEvent(5, 1ms);
+                    events.RescheduleEvent(EVENT_INTRO_LEADER_1, 1ms);
                     break;
-                case 5:
+                case EVENT_INTRO_LEADER_1:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_1 : SAY_SYLVANAS_INTRO_1);
 
-                    events.RescheduleEvent(6, 1s);
+                    events.RescheduleEvent(EVENT_INTRO_TYRANNUS_3, 1s);
                     break;
-                case 6:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->AI()->Talk(SAY_TYRANNUS_INTRO_3);
+                case EVENT_INTRO_TYRANNUS_3:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->AI()->Talk(SAY_TYRANNUS_INTRO_3);
 
-                    events.RescheduleEvent(7, 5s);
+                    events.RescheduleEvent(EVENT_INTRO_STRANGULATE, 5s);
                     break;
-                case 7: /// @todo: (Initial RP, when zoning in the instance) is not complete.
-                    if (pInstance)
-                    {
-                        if (Creature* n1 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_1_GUID)))
-                            n1->AI()->DoAction(1337); // remove invincibility
-                        if (Creature* n2 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_NECROLYTE_2_GUID)))
-                            n2->AI()->DoAction(1337); // remove invincibility
+                case EVENT_INTRO_STRANGULATE: /// @todo: (Initial RP, when zoning in the instance) is not complete.
+                    if (Creature* necrolyte1 = _instance->instance->GetCreature(_instance->GetGuidData(DATA_NECROLYTE_1_GUID)))
+                        necrolyte1->AI()->DoAction(ACTION_REMOVE_INVINCIBILITY);
+                    if (Creature* necrolyte2 = _instance->instance->GetCreature(_instance->GetGuidData(DATA_NECROLYTE_2_GUID)))
+                        necrolyte2->AI()->DoAction(ACTION_REMOVE_INVINCIBILITY);
 
-                        for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* c = pInstance->instance->GetCreature(*itr))
-                            {
-                                if (c->GetPositionX() < 450.0f)
-                                    continue;
-                                c->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                                c->GetMotionMaster()->Clear(false);
-                                c->GetMotionMaster()->MoveIdle();
-                                c->StopMoving();
-                                c->CastSpell(c, 69413, true);
-                                c->SetCanFly(true);
-                                c->SetDisableGravity(true);
-                                c->SendMovementFlagUpdate();
-                                float dist = rand_norm() * 2.0f;
-                                float angle = rand_norm() * 2 * M_PI;
-                                c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX() + dist * cos(angle), c->GetPositionY() + dist * std::sin(angle), c->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
-                            }
-                    }
+                    for (ObjectGuid const& guid : _summons)
+                        if (Creature* champion = _instance->instance->GetCreature(guid))
+                        {
+                            if (champion->GetPositionX() < 450.0f)
+                                continue;
+                            champion->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+                            champion->GetMotionMaster()->Clear(false);
+                            champion->GetMotionMaster()->MoveIdle();
+                            champion->StopMoving();
+                            champion->CastSpell(champion, SPELL_STRANGULATING, true);
+                            champion->SetCanFly(true);
+                            champion->SetDisableGravity(true);
+                            champion->SendMovementFlagUpdate();
+                            float dist = rand_norm() * 2.0f;
+                            float angle = rand_norm() * 2 * M_PI;
+                            champion->GetMotionMaster()->MoveTakeoff(0, champion->GetPositionX() + dist * std::cos(angle), champion->GetPositionY() + dist * std::sin(angle), champion->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
+                        }
 
-                    events.RescheduleEvent(8, 7s);
+                    events.RescheduleEvent(EVENT_INTRO_NECROMANTIC_POWER, 7s);
                     break;
-                case 8:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->CastSpell(c, 69753, false);
+                case EVENT_INTRO_NECROMANTIC_POWER:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->CastSpell(tyrannus, SPELL_NECROMANTIC_POWER, false);
 
-                    events.RescheduleEvent(9, 400ms);
+                    events.RescheduleEvent(EVENT_INTRO_KILL_CHAMPIONS, 400ms);
                     break;
-                case 9:
-                    if (pInstance)
-                        for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* c = pInstance->instance->GetCreature(*itr))
-                            {
-                                if (c->GetPositionX() < 450.0f)
-                                    continue;
-                                Unit::Kill(c, c);
-                                c->RemoveAllAuras();
-                                c->GetMotionMaster()->MoveFall(0, true);
-                            }
+                case EVENT_INTRO_KILL_CHAMPIONS:
+                    for (ObjectGuid const& guid : _summons)
+                        if (Creature* champion = _instance->instance->GetCreature(guid))
+                        {
+                            if (champion->GetPositionX() < 450.0f)
+                                continue;
+                            Unit::Kill(champion, champion);
+                            champion->RemoveAllAuras();
+                            champion->GetMotionMaster()->MoveFall(0, true);
+                        }
 
-                    events.RescheduleEvent(10, 1s);
+                    events.RescheduleEvent(EVENT_INTRO_LEADER_2, 1s);
                     break;
-                case 10:
+                case EVENT_INTRO_LEADER_2:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_2);
 
-                    events.RescheduleEvent(11, 1s);
+                    events.RescheduleEvent(EVENT_INTRO_RAISE_DEAD, 1s);
                     break;
-                case 11:
-                    if (pInstance)
-                        for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* c = pInstance->instance->GetCreature(*itr))
-                            {
-                                if (c->GetPositionX() < 450.0f)
-                                    continue;
-                                c->SetCanFly(false);
-                                c->SetDisableGravity(false);
-                                c->SendMovementFlagUpdate();
-                                c->CastSpell(c, 69350, true);
-                            }
-
-                    events.RescheduleEvent(12, 2s);
-                    break;
-                case 12:
-                    if (pInstance)
-                    {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->AI()->Talk(SAY_TYRANNUS_INTRO_4);
-
-                        for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* c = pInstance->instance->GetCreature(*itr))
-                            {
-                                if (c->GetPositionX() < 450.0f)
-                                    continue;
-                                c->SetHomePosition(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());
-                                c->Respawn(true);
-                                c->UpdateEntry(36796, 0, false);
-                                c->SetFacingTo(M_PI);
-                                c->SetReactState(REACT_PASSIVE);
-                            }
-                    }
-
-                    events.RescheduleEvent(13, 3s);
-                    break;
-                case 13:
-                    if (pInstance)
-                    {
-                        for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* c = pInstance->instance->GetCreature(*itr))
-                            {
-                                if (c->GetPositionX() < 450.0f)
-                                    continue;
-                                c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                                float dist = rand_norm();
-                                float angle = rand_norm() * 2 * M_PI;
-                                c->SetSpeed(MOVE_RUN, 0.8f);
-                                c->SetInCombatWithZone();
-                                c->GetMotionMaster()->MoveChase(me, dist, angle);
-                                c->SetHomePosition(me->GetPositionX() + dist * cos(angle), me->GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0.0f);
-                            }
-                    }
-
-                    events.RescheduleEvent(14, 2s);
-                    break;
-                case 14:
-                    if (pInstance)
-                    {
-                        if (me->GetEntry() == NPC_JAINA_PART1)
+                case EVENT_INTRO_RAISE_DEAD:
+                    for (ObjectGuid const& guid : _summons)
+                        if (Creature* champion = _instance->instance->GetCreature(guid))
                         {
-                            Talk(SAY_JAINA_INTRO_3);
-                            me->CastSpell(me, 70132, false);
+                            if (champion->GetPositionX() < 450.0f)
+                                continue;
+                            champion->SetCanFly(false);
+                            champion->SetDisableGravity(false);
+                            champion->SendMovementFlagUpdate();
+                            champion->CastSpell(champion, SPELL_RAISE_DEAD, true);
                         }
-                        else
-                        {
-                            me->CastSpell(me, 59514, false);
-                            for (uint8 i = 0; i < 2; ++i)
-                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
-                                    c->CastSpell(c, 70513, false);
-                        }
-                    }
 
-                    events.RescheduleEvent(15, 2s);
+                    events.RescheduleEvent(EVENT_INTRO_CORRUPT_CHAMPIONS, 2s);
                     break;
-                case 15:
-                    if (pInstance)
+                case EVENT_INTRO_CORRUPT_CHAMPIONS:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->AI()->Talk(SAY_TYRANNUS_INTRO_4);
+
+                    for (ObjectGuid const& guid : _summons)
+                        if (Creature* champion = _instance->instance->GetCreature(guid))
+                        {
+                            if (champion->GetPositionX() < 450.0f)
+                                continue;
+                            champion->SetHomePosition(champion->GetPositionX(), champion->GetPositionY(), champion->GetPositionZ(), champion->GetOrientation());
+                            champion->Respawn(true);
+                            champion->UpdateEntry(NPC_CORRUPTED_CHAMPION, 0, false);
+                            champion->SetFacingTo(M_PI);
+                            champion->SetReactState(REACT_PASSIVE);
+                        }
+
+                    events.RescheduleEvent(EVENT_INTRO_CORRUPTED_ATTACK, 3s);
+                    break;
+                case EVENT_INTRO_CORRUPTED_ATTACK:
+                    for (ObjectGuid const& guid : _summons)
+                        if (Creature* champion = _instance->instance->GetCreature(guid))
+                        {
+                            if (champion->GetPositionX() < 450.0f)
+                                continue;
+                            champion->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            float dist = rand_norm();
+                            float angle = rand_norm() * 2 * M_PI;
+                            champion->SetSpeed(MOVE_RUN, 0.8f);
+                            champion->SetInCombatWithZone();
+                            champion->GetMotionMaster()->MoveChase(me, dist, angle);
+                            champion->SetHomePosition(me->GetPositionX() + dist * std::cos(angle), me->GetPositionY() + dist * std::sin(angle), me->GetPositionZ(), 0.0f);
+                        }
+
+                    events.RescheduleEvent(EVENT_INTRO_LEADER_SPELL, 2s);
+                    break;
+                case EVENT_INTRO_LEADER_SPELL:
+                    if (me->GetEntry() == NPC_JAINA_PART1)
                     {
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->GetMotionMaster()->MovePoint(0, SBSTyrannusStartPos);
-
-                        if (me->GetEntry() == NPC_JAINA_PART1)
-                        {
-                            for (uint8 i = 0; i < 2; ++i)
-                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
-                                    c->CastSpell(c, 70464, false);
-                        }
+                        Talk(SAY_JAINA_INTRO_3);
+                        me->CastSpell(me, SPELL_EMPOWERED_BLIZZARD_AURA, false);
+                    }
+                    else
+                    {
+                        me->CastSpell(me, SPELL_SHRIEK_OF_THE_HIGHBORNE, false);
+                        for (uint8 i = 0; i < 2; ++i)
+                            if (Creature* guard = _instance->instance->GetCreature(_instance->GetGuidData(DATA_GUARD_1_GUID + i)))
+                                guard->CastSpell(guard, SPELL_MULTI_SHOT, false);
                     }
 
-                    events.RescheduleEvent(16, 3s);
+                    events.RescheduleEvent(EVENT_INTRO_TYRANNUS_LEAVE, 2s);
                     break;
-                case 16:
-                    Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_4 : SAY_SYLVANAS_INTRO_3);
-                    if (pInstance)
+                case EVENT_INTRO_TYRANNUS_LEAVE:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
+                        tyrannus->GetMotionMaster()->MovePoint(POINT_TYRANNUS_INTRO_END, SBSTyrannusStartPos);
+
+                    if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         for (uint8 i = 0; i < 2; ++i)
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GUARD_1_GUID + i)))
-                                c->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-
-                        for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* c = pInstance->instance->GetCreature(*itr))
-                            {
-                                if (c->IsAlive())
-                                {
-                                    if (c->GetEntry() == NPC_KALIRA || c->GetEntry() == NPC_ELANDRA || c->GetEntry() == NPC_LORALEN || c->GetEntry() == NPC_KORELN)
-                                        continue;
-
-                                    Unit::Kill(c, c, false);
-                                }
-                                c->DespawnOrUnsummon(10s);
-                            }
-                        pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_INTRO);
+                            if (Creature* guard = _instance->instance->GetCreature(_instance->GetGuidData(DATA_GUARD_1_GUID + i)))
+                                guard->CastSpell(guard, SPELL_ICE_LANCE_VOLLEY, false);
                     }
 
-                    events.RescheduleEvent(17, 5s);
+                    events.RescheduleEvent(EVENT_INTRO_LEADER_3, 3s);
                     break;
-                case 17:
+                case EVENT_INTRO_LEADER_3:
+                    Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_4 : SAY_SYLVANAS_INTRO_3);
+
+                    for (uint8 i = 0; i < 2; ++i)
+                        if (Creature* guard = _instance->instance->GetCreature(_instance->GetGuidData(DATA_GUARD_1_GUID + i)))
+                            guard->ClearEmoteState();
+
+                    for (ObjectGuid const& guid : _summons)
+                        if (Creature* summon = _instance->instance->GetCreature(guid))
+                        {
+                            if (summon->IsAlive())
+                            {
+                                if (summon->GetEntry() == NPC_KALIRA || summon->GetEntry() == NPC_ELANDRA || summon->GetEntry() == NPC_LORALEN || summon->GetEntry() == NPC_KORELN)
+                                    continue;
+
+                                Unit::Kill(summon, summon, false);
+                            }
+                            summon->DespawnOrUnsummon(10s);
+                        }
+                    _instance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_INTRO);
+
+                    events.RescheduleEvent(EVENT_INTRO_LEADER_4, 5s);
+                    break;
+                case EVENT_INTRO_LEADER_4:
                     me->setActive(false);
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_5 : SAY_SYLVANAS_INTRO_4);
 
+                    break;
+                default:
                     break;
             }
 
@@ -361,18 +445,23 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* s) override
+        void JustSummoned(Creature* summon) override
         {
-            summons.Summon(s);
+            _summons.Summon(summon);
         }
 
-        void SummonedCreatureDespawn(Creature* s) override
+        void SummonedCreatureDespawn(Creature* summon) override
         {
-            summons.Despawn(s);
+            _summons.Despawn(summon);
         }
 
-        void AttackStart(Unit*  /*who*/) override {}
-        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void AttackStart(Unit* /*who*/) override {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
+
+    private:
+        SummonList _summons;
+        InstanceScript* _instance;
+        uint8 _counter;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -386,17 +475,13 @@ class npc_pos_deathwhisper_necrolyte : public CreatureScript
 public:
     npc_pos_deathwhisper_necrolyte() : CreatureScript("npc_pos_deathwhisper_necrolyte") { }
 
-    struct npc_pos_deathwhisper_necrolyteAI: public ScriptedAI
+    struct npc_pos_deathwhisper_necrolyteAI : public ScriptedAI
     {
         npc_pos_deathwhisper_necrolyteAI(Creature* creature) : ScriptedAI(creature)
         {
-            pInstance = me->GetInstanceScript();
-            isInvincible = false;
+            _instance = me->GetInstanceScript();
+            _isInvincible = false;
         }
-
-        EventMap events;
-        InstanceScript* pInstance;
-        bool isInvincible;
 
         void Reset() override
         {
@@ -405,58 +490,50 @@ public:
 
         void InitializeAI() override
         {
-            if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE)
+            if (_instance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE)
             {
                 if ((me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 192.0f && me->GetPositionY() < 206.0f) ||
                         (me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 240.0f && me->GetPositionY() < 254.0f))
                 {
-                    isInvincible = true;
+                    _isInvincible = true;
 
-                    /// @todo This spell check is invalid
-                    //                    if (SPELL_NECROLYTE_CHANNELING)
                     me->CastSpell(me, SPELL_NECROLYTE_CHANNELING, false);
 
                     if (me->GetPositionY() < 206.0f)
-                    {
-                        pInstance->SetGuidData(DATA_NECROLYTE_1_GUID, me->GetGUID());
-                    }
+                        _instance->SetGuidData(DATA_NECROLYTE_1_GUID, me->GetGUID());
                     else
-                    {
-                        pInstance->SetGuidData(DATA_NECROLYTE_2_GUID, me->GetGUID());
-                    }
+                        _instance->SetGuidData(DATA_NECROLYTE_2_GUID, me->GetGUID());
                 }
             }
         }
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type == POINT_MOTION_TYPE && id == 1)
+            if (type == POINT_MOTION_TYPE && id == POINT_NECROLYTE_POSITION)
                 me->SetFacingTo(M_PI);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            /// @todo This spell check is invalid
-            //            if (SPELL_NECROLYTE_CHANNELING)
             me->RemoveAura(SPELL_NECROLYTE_CHANNELING);
             events.Reset();
-            events.RescheduleEvent(1, 0ms);
-            events.RescheduleEvent(2, 5s, 9s);
+            events.RescheduleEvent(EVENT_NECROLYTE_SHADOW_BOLT, 0ms);
+            events.RescheduleEvent(EVENT_NECROLYTE_CONVERSION_BEAM, 5s, 9s);
 
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
-                c->AI()->SetData(DATA_START_INTRO, 0);
+            if (Creature* leader = _instance->instance->GetCreature(_instance->GetGuidData(DATA_LEADER_FIRST_GUID)))
+                leader->AI()->SetData(DATA_START_INTRO, 0);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (isInvincible && damage >= me->GetHealth())
+            if (_isInvincible && damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
         }
 
-        void DoAction(int32 a) override
+        void DoAction(int32 action) override
         {
-            if (a == 1337)
-                isInvincible = false;
+            if (action == ACTION_REMOVE_INVINCIBILITY)
+                _isInvincible = false;
         }
 
         void UpdateAI(uint32 diff) override
@@ -471,23 +548,27 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
-                case 1: // Shadow Bolt
-                    me->CastSpell(me->GetVictim(), 69577, false);
+                case EVENT_NECROLYTE_SHADOW_BOLT:
+                    DoCastVictim(SPELL_NECROLYTE_SHADOW_BOLT);
                     events.Repeat(4s);
                     break;
-                case 2: // Conversion Beam
+                case EVENT_NECROLYTE_CONVERSION_BEAM:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
-                        me->CastSpell(target, 69578, false);
+                        DoCast(target, SPELL_CONVERSION_BEAM);
                     events.Repeat(20s, 25s);
+                    break;
+                default:
                     break;
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
+
+    private:
+        InstanceScript* _instance;
+        bool _isInvincible;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -501,16 +582,13 @@ class npc_pos_after_first_boss : public CreatureScript
 public:
     npc_pos_after_first_boss() : CreatureScript("npc_pos_after_first_boss") { }
 
-    struct npc_pos_after_first_bossAI: public NullCreatureAI
+    struct npc_pos_after_first_bossAI : public NullCreatureAI
     {
         npc_pos_after_first_bossAI(Creature* creature) : NullCreatureAI(creature)
         {
-            pInstance = me->GetInstanceScript();
-            me->GetMotionMaster()->MovePoint(1, 695.03f, -149.86f, 527.89f);
+            _instance = me->GetInstanceScript();
+            me->GetMotionMaster()->MovePoint(POINT_FBS_GARFROST, 695.03f, -149.86f, 527.89f);
         }
-
-        EventMap events;
-        InstanceScript* pInstance;
 
         void Reset() override
         {
@@ -519,14 +597,8 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type != POINT_MOTION_TYPE)
-                return;
-            switch (id)
-            {
-                case 1:
-                    events.RescheduleEvent(id, 0ms);
-                    break;
-            }
+            if (type == POINT_MOTION_TYPE && id == POINT_FBS_GARFROST)
+                events.RescheduleEvent(EVENT_FBS_SUMMON_SLAVES, 0ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -534,41 +606,43 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
-                case 1:
+                case EVENT_FBS_SUMMON_SLAVES:
                     {
-                        if (pInstance)
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_GARFROST_GUID)))
-                            {
-                                float angle = c->GetAngle(me);
-                                float x = c->GetPositionX() + cos(angle) * 12.0f;
-                                float y = c->GetPositionY() + std::sin(angle) * 12.0f;
-                                me->GetMotionMaster()->MovePoint(2, x, y, c->GetPositionZ());
-                            }
+                        if (Creature* garfrost = _instance->instance->GetCreature(_instance->GetGuidData(DATA_GARFROST_GUID)))
+                        {
+                            float angle = garfrost->GetAngle(me);
+                            float x = garfrost->GetPositionX() + std::cos(angle) * 12.0f;
+                            float y = garfrost->GetPositionY() + std::sin(angle) * 12.0f;
+                            me->GetMotionMaster()->MovePoint(2, x, y, garfrost->GetPositionZ());
+                        }
 
                         uint8 i = 0;
-                        while (FBSData[i].entry)
+                        while (FBSData[i].Entry)
                         {
-                            if (Creature* c = me->SummonCreature(FBSData[i].entry, 688.69f + i * 1.8f, FBSSpawnPos.GetPositionY() + (float)irand(-2, 2), FBSSpawnPos.GetPositionZ(), 3 * M_PI / 2))
-                                c->GetMotionMaster()->MoveWaypoint(FBSData[i].pathId, false);
+                            if (Creature* slave = me->SummonCreature(FBSData[i].Entry, 688.69f + i * 1.8f, FBSSpawnPos.GetPositionY() + (float)irand(-2, 2), FBSSpawnPos.GetPositionZ(), 3 * M_PI / 2))
+                                slave->GetMotionMaster()->MoveWaypoint(FBSData[i].PathId, false);
                             ++i;
                         }
-                        events.RescheduleEvent(2, 3s);
+                        events.RescheduleEvent(EVENT_FBS_TYRANNUS, 3s);
                         break;
                     }
-                case 2:
-                    if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 10.0f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1))
-                        c->AI()->Talk(SAY_TYRANNUS_GARFROST);
+                case EVENT_FBS_TYRANNUS:
+                    if (Creature* voice = me->SummonCreature(NPC_TYRANNUS_VOICE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 10.0f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1))
+                        voice->AI()->Talk(SAY_TYRANNUS_GARFROST);
 
-                    events.RescheduleEvent(3, 4s);
+                    events.RescheduleEvent(EVENT_FBS_GENERAL, 4s);
                     break;
-                case 3:
+                case EVENT_FBS_GENERAL:
                     Talk(SAY_GENERAL_GARFROST);
 
                     break;
+                default:
+                    break;
             }
         }
+
+    private:
+        InstanceScript* _instance;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -582,18 +656,13 @@ class npc_pos_tyrannus_events : public CreatureScript
 public:
     npc_pos_tyrannus_events() : CreatureScript("npc_pos_tyrannus_events") { }
 
-    struct npc_pos_tyrannus_eventsAI: public NullCreatureAI
+    struct npc_pos_tyrannus_eventsAI : public NullCreatureAI
     {
         npc_pos_tyrannus_eventsAI(Creature* creature) : NullCreatureAI(creature)
         {
-            pInstance = me->GetInstanceScript();
-            killsLeft = 0;
+            _instance = me->GetInstanceScript();
+            _killsLeft = 0;
         }
-
-        InstanceScript* pInstance;
-        EventMap events;
-        uint32 killsLeft;
-        ObjectGuid deathbringerGUID[2];
 
         void MovementInform(uint32 type, uint32 id) override
         {
@@ -601,69 +670,72 @@ public:
             {
                 switch (id)
                 {
-                    case 0:
+                    case POINT_TYRANNUS_INTRO_END:
                         me->setActive(false);
                         break;
-                    case 1:
-                        events.ScheduleEvent(1, 0ms);
+                    case POINT_TYRANNUS_KRICK_OUTRO_END:
+                        events.ScheduleEvent(EVENT_TYRANNUS_MOVE_WAIT_1, 0ms);
                         break;
-                    case 2:
-                        events.ScheduleEvent(2, 0ms);
+                    case POINT_TYRANNUS_WAIT_1:
+                        events.ScheduleEvent(EVENT_TYRANNUS_FACE_WAIT_1, 0ms);
                         break;
-                    case 3:
-                        events.ScheduleEvent(4, 0ms);
+                    case POINT_TYRANNUS_WAIT_2:
+                        events.ScheduleEvent(EVENT_TYRANNUS_FACE_WAIT_2, 0ms);
+                        break;
+                    default:
                         break;
                 }
             }
-            else if (type == EFFECT_MOTION_TYPE && id == 10)
-                events.ScheduleEvent(6, 0ms);
+            else if (type == EFFECT_MOTION_TYPE && id == POINT_TYRANNUS_TAKEOFF)
+                events.ScheduleEvent(EVENT_TYRANNUS_MOVE_WAIT_3, 0ms);
         }
 
-        void SetData(uint32 type, uint32 id) override
+        void SetData(uint32 type, uint32 data) override
         {
-            if (!me->IsAlive() || pInstance->GetData(DATA_GARFROST) != DONE || pInstance->GetData(DATA_ICK) != DONE)
+            if (!me->IsAlive() || _instance->GetData(DATA_GARFROST) != DONE || _instance->GetData(DATA_ICK) != DONE)
                 return;
-            if (type == 2)
+            if (type == DATA_TRASH_KILLED)
             {
-                if (id == 1)
-                    if (killsLeft) --killsLeft;
+                if (data == TRASH_KILLED && _killsLeft)
+                    --_killsLeft;
                 return;
             }
-            if (type != 1)
+            if (type != DATA_AREATRIGGER)
                 return;
-            switch (id)
+            switch (data)
             {
-                case 1:
-                    if (pInstance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_FINISHED_KRICK_SCENE)
+                case AREATRIGGER_AMBUSH_1:
+                    if (_instance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_FINISHED_KRICK_SCENE)
                         return;
                     if (me->GetExactDist(&PTSTyrannusWaitPos1) > 3.0f)
                         return;
-                    pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_1);
+                    _instance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_1);
                     Talk(SAY_TYRANNUS_AMBUSH_1);
-                    killsLeft = 10;
-                    events.ScheduleEvent(30, 0ms);
-                    events.ScheduleEvent(3, 25s);
+                    _killsLeft = 10;
+                    events.ScheduleEvent(EVENT_AMBUSH_1_SUMMON_DEATHBRINGERS, 0ms);
+                    events.ScheduleEvent(EVENT_TYRANNUS_MOVE_WAIT_2, 25s);
                     break;
-                case 2:
-                    if (pInstance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_AFTER_WARN_1)
+                case AREATRIGGER_AMBUSH_2:
+                    if (_instance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_AFTER_WARN_1)
                         return;
-                    if (killsLeft != 0)
+                    if (_killsLeft != 0)
                         return;
-                    pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_2);
+                    _instance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_WARN_2);
                     Talk(SAY_TYRANNUS_AMBUSH_2);
-                    killsLeft = (Difficulty(me->GetMap()->GetSpawnMode()) == DUNGEON_DIFFICULTY_HEROIC ? 12 : 6);
-                    events.ScheduleEvent(60, 0ms);
-                    events.ScheduleEvent(5, 20s);
+                    _killsLeft = me->GetMap()->IsHeroic() ? 12 : 6;
+                    events.ScheduleEvent(EVENT_AMBUSH_2_SUMMON, 0ms);
+                    events.ScheduleEvent(EVENT_TYRANNUS_TAKEOFF, 20s);
                     break;
+                case AREATRIGGER_TUNNEL:
+                    if (_instance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_AFTER_WARN_2)
+                        return;
+                    if (_killsLeft != 0)
+                        return;
+                    _instance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_TUNNEL_WARN);
+                    if (Creature* voice = me->SummonCreature(NPC_TYRANNUS_VOICE, 950.16f, -102.17f, 594.90f - 10.0f, 5.43f, TEMPSUMMON_TIMED_DESPAWN, 1))
+                        voice->AI()->Talk(SAY_TYRANNUS_TRAP_TUNNEL);
                     break;
-                case 3:
-                    if (pInstance->GetData(DATA_INSTANCE_PROGRESS) != INSTANCE_PROGRESS_AFTER_WARN_2)
-                        return;
-                    if (killsLeft != 0)
-                        return;
-                    pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_AFTER_TUNNEL_WARN);
-                    if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, 950.16f, -102.17f, 594.90f - 10.0f, 5.43f, TEMPSUMMON_TIMED_DESPAWN, 1))
-                        c->AI()->Talk(SAY_TYRANNUS_TRAP_TUNNEL);
+                default:
                     break;
             }
         }
@@ -673,149 +745,156 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case 1:
-                    me->GetMotionMaster()->MovePoint(2, PTSTyrannusWaitPos1, FORCED_MOVEMENT_NONE, 0.f, false);
+                case EVENT_TYRANNUS_MOVE_WAIT_1:
+                    me->GetMotionMaster()->MovePoint(POINT_TYRANNUS_WAIT_1, PTSTyrannusWaitPos1, FORCED_MOVEMENT_NONE, 0.f, false);
                     break;
-                case 2:
+                case EVENT_TYRANNUS_FACE_WAIT_1:
                     me->SetFacingTo(PTSTyrannusWaitPos1.GetOrientation());
                     me->setActive(false);
                     break;
-                case 3:
-                    me->GetMotionMaster()->MovePoint(3, PTSTyrannusWaitPos2, FORCED_MOVEMENT_NONE, 0.f, false);
+                case EVENT_TYRANNUS_MOVE_WAIT_2:
+                    me->GetMotionMaster()->MovePoint(POINT_TYRANNUS_WAIT_2, PTSTyrannusWaitPos2, FORCED_MOVEMENT_NONE, 0.f, false);
                     break;
-                case 4:
+                case EVENT_TYRANNUS_FACE_WAIT_2:
                     me->SetFacingTo(PTSTyrannusWaitPos2.GetOrientation());
                     break;
-                case 5:
-                    me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX() + 2.0f * cos(me->GetOrientation()), me->GetPositionY() + 2.0f * std::sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
+                case EVENT_TYRANNUS_TAKEOFF:
+                    me->GetMotionMaster()->MoveTakeoff(POINT_TYRANNUS_TAKEOFF, me->GetPositionX() + 2.0f * std::cos(me->GetOrientation()), me->GetPositionY() + 2.0f * std::sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
                     break;
-                case 6:
-                    me->GetMotionMaster()->MovePoint(4, PTSTyrannusWaitPos3, FORCED_MOVEMENT_NONE, 0.f, false);
+                case EVENT_TYRANNUS_MOVE_WAIT_3:
+                    me->GetMotionMaster()->MovePoint(POINT_TYRANNUS_WAIT_3, PTSTyrannusWaitPos3, FORCED_MOVEMENT_NONE, 0.f, false);
                     break;
-                case 30:
+                case EVENT_AMBUSH_1_SUMMON_DEATHBRINGERS:
                     {
                         Movement::PointsArray path;
                         path.push_back(G3D::Vector3(950.61f, 50.91f, 567.85f));
                         path.push_back(G3D::Vector3(946.48f, 73.25f, 565.89f));
                         path.push_back(G3D::Vector3(934.87f, 78.56f, 563.97f));
                         path.push_back(G3D::Vector3(915.10f, 75.31f, 553.81f));
-                        if (Creature* c = me->SummonCreature(NPC_YMIRJAR_DEATHBRINGER, 950.61f, 50.91f, 567.85f, 1.82f))
+                        if (Creature* deathbringer = me->SummonCreature(NPC_YMIRJAR_DEATHBRINGER, 950.61f, 50.91f, 567.85f, 1.82f))
                         {
-                            deathbringerGUID[0] = c->GetGUID();
-                            c->SetReactState(REACT_PASSIVE);
-                            c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            c->SetHomePosition(915.10f, 75.31f, 553.81f, 3.75f);
-                            c->SetWalk(false);
-                            c->GetMotionMaster()->MoveSplinePath(&path);
+                            _deathbringerGUID[0] = deathbringer->GetGUID();
+                            deathbringer->SetReactState(REACT_PASSIVE);
+                            deathbringer->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                            deathbringer->SetHomePosition(915.10f, 75.31f, 553.81f, 3.75f);
+                            deathbringer->SetWalk(false);
+                            deathbringer->GetMotionMaster()->MoveSplinePath(&path);
                         }
-                        if (Creature* c = me->SummonCreature(NPC_YMIRJAR_DEATHBRINGER, 949.05f, 61.18f, 566.60f, 1.73f))
+                        if (Creature* deathbringer = me->SummonCreature(NPC_YMIRJAR_DEATHBRINGER, 949.05f, 61.18f, 566.60f, 1.73f))
                         {
-                            deathbringerGUID[1] = c->GetGUID();
-                            c->SetReactState(REACT_PASSIVE);
-                            c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                            c->SetHomePosition(883.15f, 54.6254f, 528.5f, 3.75f);
-                            c->SetWalk(false);
+                            _deathbringerGUID[1] = deathbringer->GetGUID();
+                            deathbringer->SetReactState(REACT_PASSIVE);
+                            deathbringer->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                            deathbringer->SetHomePosition(883.15f, 54.6254f, 528.5f, 3.75f);
+                            deathbringer->SetWalk(false);
                             path.push_back(G3D::Vector3(883.15f, 54.6254f, 528.5f));
-                            c->GetMotionMaster()->MoveSplinePath(&path);
+                            deathbringer->GetMotionMaster()->MoveSplinePath(&path);
                         }
-                        events.ScheduleEvent(31, 500ms);
-                        events.ScheduleEvent(32, 500ms);
+                        events.ScheduleEvent(EVENT_AMBUSH_1_DEATHBRINGER_1_ARRIVED, 500ms);
+                        events.ScheduleEvent(EVENT_AMBUSH_1_DEATHBRINGER_2_ARRIVED, 500ms);
                     }
                     break;
-                case 31:
-                    if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[0]))
-                        if (c->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
+                case EVENT_AMBUSH_1_DEATHBRINGER_1_ARRIVED:
+                    if (Creature* deathbringer = _instance->instance->GetCreature(_deathbringerGUID[0]))
+                        if (deathbringer->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
                         {
-                            c->CastSpell(c, 69516, false);
-                            events.ScheduleEvent(33, 3s);
+                            deathbringer->CastSpell(deathbringer, SPELL_SUMMON_UNDEAD, false);
+                            events.ScheduleEvent(EVENT_AMBUSH_1_SUMMON_WAVE_1, 3s);
                             break;
                         }
-                    events.ScheduleEvent(31, 500ms);
+                    events.ScheduleEvent(EVENT_AMBUSH_1_DEATHBRINGER_1_ARRIVED, 500ms);
                     break;
-                case 32:
-                    if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[1]))
-                        if (c->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
+                case EVENT_AMBUSH_1_DEATHBRINGER_2_ARRIVED:
+                    if (Creature* deathbringer = _instance->instance->GetCreature(_deathbringerGUID[1]))
+                        if (deathbringer->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
                         {
-                            c->CastSpell(c, 69516, false);
-                            events.ScheduleEvent(34, 3s);
+                            deathbringer->CastSpell(deathbringer, SPELL_SUMMON_UNDEAD, false);
+                            events.ScheduleEvent(EVENT_AMBUSH_1_SUMMON_WAVE_2, 3s);
                             break;
                         }
-                    events.ScheduleEvent(32, 500ms);
+                    events.ScheduleEvent(EVENT_AMBUSH_1_DEATHBRINGER_2_ARRIVED, 500ms);
                     break;
-                case 33:
+                case EVENT_AMBUSH_1_SUMMON_WAVE_1:
                     me->SummonCreature(NPC_YMIRJAR_WRATHBRINGER, 919.733f, 89.0972f, 558.959f, 3.85718f);
                     me->SummonCreature(NPC_YMIRJAR_WRATHBRINGER, 911.936f, 63.3542f, 547.698f, 3.735f);
                     me->SummonCreature(NPC_YMIRJAR_FLAMEBEARER, 909.356f, 83.1684f, 551.717f, 3.57792f);
                     me->SummonCreature(NPC_YMIRJAR_FLAMEBEARER, 920.946f, 69.1667f, 557.594f, 3.1765f);
-                    events.ScheduleEvent(35, 3500ms);
+                    events.ScheduleEvent(EVENT_AMBUSH_1_ACTIVATE_DEATHBRINGER_1, 3500ms);
                     break;
-                case 34:
+                case EVENT_AMBUSH_1_SUMMON_WAVE_2:
                     me->SummonCreature(NPC_YMIRJAR_WRATHBRINGER, 879.464f, 41.1997f, 521.394f, 3.735f);
                     me->SummonCreature(NPC_YMIRJAR_WRATHBRINGER, 885.715f, 65.5156f, 533.631f, 3.85718f);
                     me->SummonCreature(NPC_YMIRJAR_FLAMEBEARER, 876.884f, 61.0139f, 527.715f, 3.57792f);
                     me->SummonCreature(NPC_YMIRJAR_FLAMEBEARER, 889.49f, 45.2865f, 527.233f, 3.97935f);
-                    events.ScheduleEvent(36, 3500ms);
+                    events.ScheduleEvent(EVENT_AMBUSH_1_ACTIVATE_DEATHBRINGER_2, 3500ms);
                     break;
-                case 35:
-                    if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[0]))
+                case EVENT_AMBUSH_1_ACTIVATE_DEATHBRINGER_1:
+                    if (Creature* deathbringer = _instance->instance->GetCreature(_deathbringerGUID[0]))
                     {
-                        c->SetReactState(REACT_AGGRESSIVE);
-                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        deathbringer->SetReactState(REACT_AGGRESSIVE);
+                        deathbringer->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
-                case 36:
-                    if (Creature* c = pInstance->instance->GetCreature(deathbringerGUID[1]))
+                case EVENT_AMBUSH_1_ACTIVATE_DEATHBRINGER_2:
+                    if (Creature* deathbringer = _instance->instance->GetCreature(_deathbringerGUID[1]))
                     {
-                        c->SetReactState(REACT_AGGRESSIVE);
-                        c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        deathbringer->SetReactState(REACT_AGGRESSIVE);
+                        deathbringer->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
-                case 60:
+                case EVENT_AMBUSH_2_SUMMON:
                     {
-                        Position startPos[6] = { {927.11f, -72.60f, 592.2f, 1.52f}, {922.92f, -72.64f, 592.3f, 1.52f}, {930.46f, -72.57f, 592.1f, 1.52f}, {934.52f, -72.52f, 592.1f, 1.52f}, {934.57f, -77.66f, 592.20f, 1.52f}, {927.15f, -77.07f, 592.20f, 1.52f} };
-                        Position endPos = {926.10f, -46.63f, 591.2f, 1.52f};
+                        Position const startPos[6] = { {927.11f, -72.60f, 592.2f, 1.52f}, {922.92f, -72.64f, 592.3f, 1.52f}, {930.46f, -72.57f, 592.1f, 1.52f}, {934.52f, -72.52f, 592.1f, 1.52f}, {934.57f, -77.66f, 592.20f, 1.52f}, {927.15f, -77.07f, 592.20f, 1.52f} };
+                        Position const endPos = {926.10f, -46.63f, 591.2f, 1.52f};
                         for (uint8 i = 0; i < 6; ++i)
-                            if (Creature* s = me->SummonCreature(i < 4 ? NPC_FALLEN_WARRIOR : NPC_WRATHBONE_COLDWRAITH, startPos[i]))
+                            if (Creature* summon = me->SummonCreature(i < 4 ? NPC_FALLEN_WARRIOR : NPC_WRATHBONE_COLDWRAITH, startPos[i]))
                             {
-                                s->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                summon->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                                 Position finalPos = endPos;
-                                s->MovePosition(finalPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.52f));
+                                summon->MovePosition(finalPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.52f));
 
                                 Movement::PointsArray path;
-                                path.push_back(G3D::Vector3(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ()));
+                                path.push_back(G3D::Vector3(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ()));
                                 path.push_back(G3D::Vector3(finalPos.GetPositionX(), finalPos.GetPositionY(), finalPos.GetPositionZ()));
 
-                                s->SetHomePosition(finalPos);
-                                s->GetMotionMaster()->MoveSplinePath(&path);
+                                summon->SetHomePosition(finalPos);
+                                summon->GetMotionMaster()->MoveSplinePath(&path);
                             }
 
-                        if (Difficulty(me->GetMap()->GetSpawnMode()) == DUNGEON_DIFFICULTY_HEROIC)
+                        if (me->GetMap()->IsHeroic())
                         {
-                            Position startPos[6] = { {925.485f, -65.67f, 592.5f, 1.4f}, {921.77f, -65.10f, 592.5f, 1.4f}, {929.19f, -66.24f, 592.5f, 1.4f}, {932.46f, -66.74f, 592.5f, 1.4f}, {924.66f, -71.03f, 592.5f, 1.4f}, {928.81f, -71.66f, 592.5f, 1.4f} };
-                            Position middlePos = {928.43f, -29.31f, 589.0f, 1.4f};
-                            Position endPos = {937.8f, 21.20f, 574.6f, 1.4f};
+                            Position const heroicStartPos[6] = { {925.485f, -65.67f, 592.5f, 1.4f}, {921.77f, -65.10f, 592.5f, 1.4f}, {929.19f, -66.24f, 592.5f, 1.4f}, {932.46f, -66.74f, 592.5f, 1.4f}, {924.66f, -71.03f, 592.5f, 1.4f}, {928.81f, -71.66f, 592.5f, 1.4f} };
+                            Position const heroicMiddlePos = {928.43f, -29.31f, 589.0f, 1.4f};
+                            Position const heroicEndPos = {937.8f, 21.20f, 574.6f, 1.4f};
                             for (uint8 i = 0; i < 6; ++i)
-                                if (Creature* s = me->SummonCreature(i < 4 ? NPC_FALLEN_WARRIOR : NPC_WRATHBONE_COLDWRAITH, startPos[i]))
+                                if (Creature* summon = me->SummonCreature(i < 4 ? NPC_FALLEN_WARRIOR : NPC_WRATHBONE_COLDWRAITH, heroicStartPos[i]))
                                 {
-                                    s->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                                    Position midPos = middlePos;
-                                    Position finalPos = endPos;
-                                    s->MovePosition(midPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.4f));
-                                    s->MovePosition(finalPos, startPos[i].GetExactDist(&startPos[0]), Position::NormalizeOrientation(startPos[i].GetAngle(&startPos[0]) + 1.4f));
+                                    summon->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                    Position midPos = heroicMiddlePos;
+                                    Position finalPos = heroicEndPos;
+                                    summon->MovePosition(midPos, heroicStartPos[i].GetExactDist(&heroicStartPos[0]), Position::NormalizeOrientation(heroicStartPos[i].GetAngle(&heroicStartPos[0]) + 1.4f));
+                                    summon->MovePosition(finalPos, heroicStartPos[i].GetExactDist(&heroicStartPos[0]), Position::NormalizeOrientation(heroicStartPos[i].GetAngle(&heroicStartPos[0]) + 1.4f));
 
                                     Movement::PointsArray path;
-                                    path.push_back(G3D::Vector3(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ()));
+                                    path.push_back(G3D::Vector3(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ()));
                                     path.push_back(G3D::Vector3(midPos.GetPositionX(), midPos.GetPositionY(), midPos.GetPositionZ()));
                                     path.push_back(G3D::Vector3(finalPos.GetPositionX(), finalPos.GetPositionY(), finalPos.GetPositionZ()));
 
-                                    s->SetHomePosition(finalPos);
-                                    s->GetMotionMaster()->MoveSplinePath(&path);
+                                    summon->SetHomePosition(finalPos);
+                                    summon->GetMotionMaster()->MoveSplinePath(&path);
                                 }
                         }
                     }
                     break;
+                default:
+                    break;
             }
         }
+
+    private:
+        InstanceScript* _instance;
+        uint32 _killsLeft;
+        ObjectGuid _deathbringerGUID[2];
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -829,30 +908,27 @@ class npc_pos_icicle_trigger : public CreatureScript
 public:
     npc_pos_icicle_trigger() : CreatureScript("npc_pos_icicle_trigger") { }
 
-    struct npc_pos_icicle_triggerAI: public NullCreatureAI
+    struct npc_pos_icicle_triggerAI : public NullCreatureAI
     {
         npc_pos_icicle_triggerAI(Creature* creature) : NullCreatureAI(creature)
         {
-            pInstance = me->GetInstanceScript();
-            timer = urand(0, 16000);
-        }
+            _instance = me->GetInstanceScript();
 
-        InstanceScript* pInstance;
-        uint16 timer;
+            scheduler.Schedule(0ms, 16s, [this](TaskContext context)
+            {
+                if (_instance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_AFTER_TUNNEL_WARN)
+                    me->CastSpell(me, SPELL_TUNNEL_ICICLE, false);
+                context.Repeat(16s, 24s);
+            });
+        }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!pInstance)
-                return;
-            if (timer <= diff)
-            {
-                if (pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_AFTER_TUNNEL_WARN)
-                    me->CastSpell(me, SPELL_TUNNEL_ICICLE, false);
-                timer = urand(16000, 24000);
-            }
-            else
-                timer -= diff;
+            scheduler.Update(diff);
         }
+
+    private:
+        InstanceScript* _instance;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -866,44 +942,37 @@ class npc_pos_collapsing_icicle : public CreatureScript
 public:
     npc_pos_collapsing_icicle() : CreatureScript("npc_pos_collapsing_icicle") { }
 
-    struct npc_pos_collapsing_icicleAI: public NullCreatureAI
+    struct npc_pos_collapsing_icicleAI : public NullCreatureAI
     {
         npc_pos_collapsing_icicleAI(Creature* creature) : NullCreatureAI(creature)
         {
-            pInstance = me->GetInstanceScript();
-            timer1 = 2500;
-            timer2 = 7000;
-        }
+            _instance = me->GetInstanceScript();
 
-        InstanceScript* pInstance;
-        uint16 timer1;
-        uint16 timer2;
+            scheduler.Schedule(2500ms, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_ICICLE_DUMMY);
+                DoCastSelf(SPELL_ICICLE, true);
+                context.Repeat(60s);
+            }).Schedule(7s, [this](TaskContext context)
+            {
+                me->SetDisplayId(MODEL_INVISIBLE);
+                context.Repeat(60s);
+            });
+        }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if (target && spell && target->IsPlayer() && spell->Id == 70827 && pInstance)
-                pInstance->SetData(DATA_ACHIEV_DONT_LOOK_UP, 0);
+            if (target && spell && target->IsPlayer() && spell->Id == SPELL_ICE_SHARDS_H)
+                _instance->SetData(DATA_ACHIEV_DONT_LOOK_UP, 0);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (timer1 <= diff)
-            {
-                me->CastSpell(me, 69428, false);
-                me->CastSpell(me, 69426, true);
-                timer1 = 60000;
-            }
-            else
-                timer1 -= diff;
-
-            if (timer2 <= diff)
-            {
-                me->SetDisplayId(11686);
-                timer2 = 60000;
-            }
-            else
-                timer2 -= diff;
+            scheduler.Update(diff);
         }
+
+    private:
+        InstanceScript* _instance;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -917,96 +986,79 @@ class npc_pos_martin_or_gorkun_second : public CreatureScript
 public:
     npc_pos_martin_or_gorkun_second() : CreatureScript("npc_pos_martin_or_gorkun_second") { }
 
-    struct npc_pos_martin_or_gorkun_secondAI: public NullCreatureAI
+    struct npc_pos_martin_or_gorkun_secondAI : public NullCreatureAI
     {
-        npc_pos_martin_or_gorkun_secondAI(Creature* creature) : NullCreatureAI(creature), summons(me)
+        npc_pos_martin_or_gorkun_secondAI(Creature* creature) : NullCreatureAI(creature), _summons(me)
         {
-            pInstance = me->GetInstanceScript();
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-            i = 0;
+            _instance = me->GetInstanceScript();
+            me->SetEmoteState(EMOTE_STATE_READY1H);
+            _summonIndex = 0;
             events.Reset();
-            events.RescheduleEvent(1, 500ms);
-            events.RescheduleEvent(2, 15s);
+            events.RescheduleEvent(EVENT_GENERAL_SUMMON_SLAVES, 500ms);
+            events.RescheduleEvent(EVENT_GENERAL_TRASH_TALK, 15s);
 
-            if (pInstance)
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
+            if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_GUID)))
+            {
+                tyrannus->AI()->Talk(SAY_BOSS_TYRANNUS_INTRO_1);
+                tyrannus->SetImmuneToPC(false);
+                tyrannus->SetReactState(REACT_AGGRESSIVE);
+                if (Player* player = tyrannus->SelectNearestPlayer(100.0f))
                 {
-                    c->AI()->Talk(SAY_BOSS_TYRANNUS_INTRO_1);
-                    c->SetImmuneToPC(false);
-                    c->SetReactState(REACT_AGGRESSIVE);
-                    //c->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                    if (Player* plr = c->SelectNearestPlayer(100.0f))
-                    {
-                        c->AI()->AttackStart(plr);
-                        DoZoneInCombat(c);
-                    }
+                    tyrannus->AI()->AttackStart(player);
+                    DoZoneInCombat(tyrannus);
                 }
+            }
         }
-
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-        uint8 i;
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type == POINT_MOTION_TYPE && id == 2)
-            {
-                events.RescheduleEvent(5, 1s);
-            }
+            if (type == POINT_MOTION_TYPE && id == POINT_GENERAL_CENTER)
+                events.RescheduleEvent(EVENT_GENERAL_OUTRO, 1s);
         }
 
-        void DoAction(int32 p) override
+        void DoAction(int32 action) override
         {
-            if (p == 1)
-                summons.DespawnAll();
-            else if (p == 2)
+            if (action == ACTION_DESPAWN_SUMMONS)
+                _summons.DespawnAll();
+            else if (action == ACTION_START_OUTRO)
             {
                 events.Reset();
-                summons.DespawnEntry(NPC_FALLEN_WARRIOR);
+                _summons.DespawnEntry(NPC_FALLEN_WARRIOR);
 
-                if (!pInstance)
-                    return;
+                me->ClearEmoteState();
+                me->GetMotionMaster()->MovePoint(POINT_GENERAL_CENTER, TSCenterPos);
 
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                me->GetMotionMaster()->MovePoint(2, TSCenterPos);
-
-                TSSpawnPos.GetAngle(&TSMidPos);
-
-                for (ObjectGuid const& guid : summons)
-                    if (Creature* c = pInstance->instance->GetCreature(guid))
+                for (ObjectGuid const& guid : _summons)
+                    if (Creature* slave = _instance->instance->GetCreature(guid))
                     {
-                        float hx, hy, hz, ho;
-                        c->GetHomePosition(hx, hy, hz, ho);
-                        c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CHEER);
-                        float ang = frand(1.92f, 2.36f);
+                        slave->SetEmoteState(EMOTE_ONESHOT_CHEER);
+                        float angle = frand(1.92f, 2.36f);
                         float dist = urand(50, 85);
-                        c->GetMotionMaster()->MovePoint(0, TSSpawnPos.GetPositionX() + cos(ang)*dist, TSSpawnPos.GetPositionY() + std::sin(ang)*dist, 628.2f);
+                        slave->GetMotionMaster()->MovePoint(0, TSSpawnPos.GetPositionX() + std::cos(angle) * dist, TSSpawnPos.GetPositionY() + std::sin(angle) * dist, 628.2f);
                     }
             }
-            else if (p == 3)
+            else if (action == ACTION_FROST_BOMB_KILL)
             {
-                if (pInstance)
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
-                    {
-                        for (ObjectGuid const& guid : summons)
-                            if (Creature* s = pInstance->instance->GetCreature(guid))
-                                if (s->IsAlive())
-                                    Unit::Kill(c, s);
-                        if (me->IsAlive())
-                            Unit::Kill(c, me);
-                    }
+                if (Creature* sindragosa = _instance->instance->GetCreature(_instance->GetGuidData(DATA_SINDRAGOSA_GUID)))
+                {
+                    for (ObjectGuid const& guid : _summons)
+                        if (Creature* summon = _instance->instance->GetCreature(guid))
+                            if (summon->IsAlive())
+                                Unit::Kill(sindragosa, summon);
+                    if (me->IsAlive())
+                        Unit::Kill(sindragosa, me);
+                }
             }
         }
 
-        void JustSummoned(Creature* s) override
+        void JustSummoned(Creature* summon) override
         {
-            summons.Summon(s);
+            _summons.Summon(summon);
         }
 
-        void SummonedCreatureDespawn(Creature* s) override
+        void SummonedCreatureDespawn(Creature* summon) override
         {
-            summons.Despawn(s);
+            _summons.Despawn(summon);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1015,74 +1067,71 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
-                case 1:
-                    if (TSData[i].entry)
+                case EVENT_GENERAL_SUMMON_SLAVES:
+                    if (TSData[_summonIndex].Entry)
                     {
-                        if (Creature* c = me->SummonCreature(TSData[i].entry, TSSpawnPos))
+                        if (Creature* slave = me->SummonCreature(TSData[_summonIndex].Entry, TSSpawnPos))
                         {
-                            c->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-                            c->GetMotionMaster()->MovePoint(0, TSData[i].x, TSData[i].y, TSHeight);
+                            slave->SetEmoteState(EMOTE_STATE_READY1H);
+                            slave->GetMotionMaster()->MovePoint(0, TSData[_summonIndex].X, TSData[_summonIndex].Y, TSHeight);
                         }
-                        ++i;
-                        events.ScheduleEvent(1, 150ms);
+                        ++_summonIndex;
+                        events.ScheduleEvent(EVENT_GENERAL_SUMMON_SLAVES, 150ms);
                     }
                     break;
-                case 2:
+                case EVENT_GENERAL_TRASH_TALK:
                     Talk(me->GetEntry() == NPC_MARTIN_VICTUS_2 ? SAY_GENERAL_ALLIANCE_TRASH : SAY_GENERAL_HORDE_TRASH);
-                    events.RescheduleEvent(3, 8s);
+                    events.RescheduleEvent(EVENT_GENERAL_TYRANNUS_INTRO, 8s);
                     break;
-                case 3:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
-                            c->AI()->Talk(SAY_BOSS_TYRANNUS_INTRO_2);
+                case EVENT_GENERAL_TYRANNUS_INTRO:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_GUID)))
+                        tyrannus->AI()->Talk(SAY_BOSS_TYRANNUS_INTRO_2);
 
                     me->SetFacingTo(5.26f);
                     me->SetOrientation(5.26f);
                     me->SetHomePosition(*me);
-                    for (ObjectGuid const& guid : summons)
-                        if (Creature* c = pInstance->instance->GetCreature(guid))
+                    for (ObjectGuid const& guid : _summons)
+                        if (Creature* slave = _instance->instance->GetCreature(guid))
                         {
-                            c->SetFacingTo(5.26f);
-                            c->SetOrientation(5.26f);
-                            c->SetHomePosition(*c);
+                            slave->SetFacingTo(5.26f);
+                            slave->SetOrientation(5.26f);
+                            slave->SetHomePosition(*slave);
                         }
-                    events.RescheduleEvent(10, 15s);
+                    events.RescheduleEvent(EVENT_GENERAL_SUMMON_FALLEN_WARRIOR, 15s);
 
-                    events.RescheduleEvent(4, 15s);
+                    events.RescheduleEvent(EVENT_GENERAL_START_FIGHT, 15s);
                     break;
-                case 4:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_GUID)))
-                            c->AI()->DoAction(1);
+                case EVENT_GENERAL_START_FIGHT:
+                    if (Creature* tyrannus = _instance->instance->GetCreature(_instance->GetGuidData(DATA_TYRANNUS_GUID)))
+                        tyrannus->AI()->DoAction(ACTION_START_TYRANNUS_FIGHT);
                     break;
-                case 5:
+                case EVENT_GENERAL_OUTRO:
                     me->SetFacingTo(TSCenterPos.GetOrientation());
                     Talk(me->GetEntry() == NPC_MARTIN_VICTUS_2 ? SAY_GENERAL_ALLIANCE_OUTRO_1 : SAY_GENERAL_HORDE_OUTRO_1);
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_SECOND_GUID)))
-                            c->AI()->DoAction(1);
+                    if (Creature* leader = _instance->instance->GetCreature(_instance->GetGuidData(DATA_LEADER_SECOND_GUID)))
+                        leader->AI()->DoAction(ACTION_SUMMON_SINDRAGOSA);
                     break;
-                case 10:
-                    if (summons.GetEntryCount(NPC_FALLEN_WARRIOR) < 3)
-                        if (Creature* c = me->SummonCreature(NPC_FALLEN_WARRIOR, 1060.95f, 102.79f, 630.2f, 2.01f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                case EVENT_GENERAL_SUMMON_FALLEN_WARRIOR:
+                    if (_summons.GetEntryCount(NPC_FALLEN_WARRIOR) < 3)
+                        if (Creature* warrior = me->SummonCreature(NPC_FALLEN_WARRIOR, 1060.95f, 102.79f, 630.2f, 2.01f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                         {
                             float offset = frand(0.0f, 10.0f);
-                            c->GetMotionMaster()->MovePoint(0, 1047.0f + offset, 118.0f + offset, 628.2f);
-                            c->SetHomePosition(*me);
-                            for (ObjectGuid const& guid : summons)
-                                if (Creature* s = pInstance->instance->GetCreature(guid))
+                            warrior->GetMotionMaster()->MovePoint(0, 1047.0f + offset, 118.0f + offset, 628.2f);
+                            warrior->SetHomePosition(*me);
+                            for (ObjectGuid const& guid : _summons)
+                                if (Creature* summon = _instance->instance->GetCreature(guid))
                                 {
-                                    if (s->GetEntry() == NPC_FALLEN_WARRIOR)
+                                    if (summon->GetEntry() == NPC_FALLEN_WARRIOR)
                                         continue;
-                                    c->SetInCombatWith(s);
-                                    s->SetInCombatWith(c);
-                                    c->AddThreat(s, 0.0f);
-                                    s->AddThreat(c, 0.0f);
+                                    warrior->SetInCombatWith(summon);
+                                    summon->SetInCombatWith(warrior);
+                                    warrior->AddThreat(summon, 0.0f);
+                                    summon->AddThreat(warrior, 0.0f);
                                 }
                         }
-                    events.RescheduleEvent(10, 3s);
+                    events.RescheduleEvent(EVENT_GENERAL_SUMMON_FALLEN_WARRIOR, 3s);
+                    break;
+                default:
                     break;
             }
 
@@ -1091,6 +1140,11 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        InstanceScript* _instance;
+        SummonList _summons;
+        uint8 _summonIndex;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1104,14 +1158,14 @@ class npc_pos_freed_slave : public CreatureScript
 public:
     npc_pos_freed_slave() : CreatureScript("npc_pos_freed_slave") { }
 
-    struct npc_pos_freed_slaveAI: public SmartAI
+    struct npc_pos_freed_slaveAI : public SmartAI
     {
         npc_pos_freed_slaveAI(Creature* creature) : SmartAI(creature)
         {
             me->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             // immune to falling icicles
-            me->ApplySpellImmune(0, IMMUNITY_ID, 69425, true);
-            me->ApplySpellImmune(0, IMMUNITY_ID, 70827, true);
+            me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_ICE_SHARDS, true);
+            me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_ICE_SHARDS_H, true);
         }
 
         bool CanAIAttack(Unit const* who) const override
@@ -1119,7 +1173,7 @@ public:
             return who->GetEntry() == NPC_FALLEN_WARRIOR;
         }
 
-        void EnterEvadeMode(EvadeReason /* why */) override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             if (!me->IsAlive() || me->IsInEvadeMode())
                 return;
@@ -1145,41 +1199,30 @@ class npc_pos_leader_second : public CreatureScript
 public:
     npc_pos_leader_second() : CreatureScript("npc_pos_leader_second") { }
 
-    struct npc_pos_leader_secondAI: public NullCreatureAI
+    struct npc_pos_leader_secondAI : public NullCreatureAI
     {
         npc_pos_leader_secondAI(Creature* creature) : NullCreatureAI(creature)
         {
-            pInstance = me->GetInstanceScript();
-            barrierGUID.Clear();
-            events.Reset();
+            _instance = me->GetInstanceScript();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
 
-            if (pInstance)
+            if (Creature* rimefang = _instance->instance->GetCreature(_instance->GetGuidData(DATA_RIMEFANG_GUID)))
             {
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
-                {
-                    c->RemoveAllAuras();
-                    c->GetMotionMaster()->Clear();
-                    c->GetMotionMaster()->MoveIdle();
-                    c->SetVisible(false);
-                }
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
-                {
-                    c->AI()->DoAction(2);
-                }
+                rimefang->RemoveAllAuras();
+                rimefang->GetMotionMaster()->Clear();
+                rimefang->GetMotionMaster()->MoveIdle();
+                rimefang->SetVisible(false);
             }
+            if (Creature* general = _instance->instance->GetCreature(_instance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
+                general->AI()->DoAction(ACTION_START_OUTRO);
         }
 
-        InstanceScript* pInstance;
-        EventMap events;
-        ObjectGuid barrierGUID;
-
-        void DoAction(int32 p) override
+        void DoAction(int32 action) override
         {
-            if (p == 1)
+            if (action == ACTION_SUMMON_SINDRAGOSA)
             {
-                events.RescheduleEvent(1, me->GetEntry() == NPC_JAINA_PART2 ? 15s + 500ms : 18s);
-                events.RescheduleEvent(2, me->GetEntry() == NPC_JAINA_PART2 ? 16s + 500ms : 19s);
+                events.RescheduleEvent(EVENT_LEADER_OUTRO_SUMMON_SINDRAGOSA, me->GetEntry() == NPC_JAINA_PART2 ? 15s + 500ms : 18s);
+                events.RescheduleEvent(EVENT_LEADER_OUTRO_GENERAL_2, me->GetEntry() == NPC_JAINA_PART2 ? 16s + 500ms : 19s);
             }
         }
 
@@ -1189,7 +1232,7 @@ public:
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist = urand(1, 4);
-                target->ToPlayer()->NearTeleportTo(me->GetPositionX() + cos(angle)*dist, me->GetPositionY() + std::sin(angle)*dist, me->GetPositionZ(), me->GetOrientation());
+                target->ToPlayer()->NearTeleportTo(me->GetPositionX() + std::cos(angle) * dist, me->GetPositionY() + std::sin(angle) * dist, me->GetPositionZ(), me->GetOrientation());
             }
         }
 
@@ -1200,19 +1243,19 @@ public:
 
             switch (id)
             {
-                case 1:
+                case POINT_LEADER_OUTRO_2:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_2 : SAY_SYLVANAS_OUTRO_2);
                     break;
-                case 2:
+                case POINT_JAINA_OUTRO_3:
                     if (me->GetEntry() == NPC_JAINA_PART2)
-                    {
                         Talk(SAY_JAINA_OUTRO_3);
-                    }
                     break;
-                case 7:
+                case POINT_OPEN_PORTCULLIS:
                     me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                    if (GameObject* g = me->FindNearestGameObject(GO_HOR_PORTCULLIS, 50.0f))
-                        g->SetGoState(GO_STATE_ACTIVE);
+                    if (GameObject* portcullis = me->FindNearestGameObject(GO_HOR_PORTCULLIS, 50.0f))
+                        portcullis->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                default:
                     break;
             }
         }
@@ -1223,87 +1266,81 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
-                case 1:
-                    if (pInstance)
-                        if (Creature* c = me->SummonCreature(NPC_SINDRAGOSA, TSSindragosaPos1))
-                        {
-                            c->SetCanFly(true);
-                            c->SetDisableGravity(true);
-                            c->GetMotionMaster()->MovePoint(0, TSSindragosaPos2);
-                        }
+                case EVENT_LEADER_OUTRO_SUMMON_SINDRAGOSA:
+                    if (Creature* sindragosa = me->SummonCreature(NPC_SINDRAGOSA, TSSindragosaPos1))
+                    {
+                        sindragosa->SetCanFly(true);
+                        sindragosa->SetDisableGravity(true);
+                        sindragosa->GetMotionMaster()->MovePoint(0, TSSindragosaPos2);
+                    }
 
                     break;
-                case 2:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
-                            c->AI()->Talk(SAY_GENERAL_OUTRO_2);
+                case EVENT_LEADER_OUTRO_GENERAL_2:
+                    if (Creature* general = _instance->instance->GetCreature(_instance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
+                        general->AI()->Talk(SAY_GENERAL_OUTRO_2);
 
-                    events.RescheduleEvent(3, me->GetEntry() == NPC_JAINA_PART2 ? 7s : 8s);
+                    events.RescheduleEvent(EVENT_LEADER_OUTRO_LEADER_1, me->GetEntry() == NPC_JAINA_PART2 ? 7s : 8s);
                     break;
-                case 3:
+                case EVENT_LEADER_OUTRO_LEADER_1:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_1 : SAY_SYLVANAS_OUTRO_1);
-                    me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA_VISUAL : SPELL_TELEPORT_SYLVANAS_VISUAL, true);
+                    DoCastSelf(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA_VISUAL : SPELL_TELEPORT_SYLVANAS_VISUAL, true);
 
-                    events.RescheduleEvent(4, 2s);
+                    events.RescheduleEvent(EVENT_LEADER_OUTRO_TELEPORT, 2s);
                     break;
-                case 4:
-                    me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA : SPELL_TELEPORT_SYLVANAS, true);
-                    if (GameObject* barrier = me->SummonGameObject(203005, 1055.49f, 115.03f, 628.15f, 2.08f, 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
-                        barrierGUID = barrier->GetGUID();
+                case EVENT_LEADER_OUTRO_TELEPORT:
+                    DoCastSelf(me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA : SPELL_TELEPORT_SYLVANAS, true);
+                    if (GameObject* barrier = me->SummonGameObject(GO_FIRE_FIELD, 1055.49f, 115.03f, 628.15f, 2.08f, 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
+                        _barrierGUID = barrier->GetGUID();
 
-                    events.RescheduleEvent(5, 1500ms);
+                    events.RescheduleEvent(EVENT_LEADER_OUTRO_FROST_BOMB, 1500ms);
                     break;
-                case 5:
-                    if (pInstance)
-                        if (Creature* x = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
-                        {
-                            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
-                                c->CastSpell(x->GetPositionX(), x->GetPositionY(), x->GetPositionZ(), SPELL_SINDRAGOSA_FROST_BOMB_POS, true);
-                        }
+                case EVENT_LEADER_OUTRO_FROST_BOMB:
+                    if (Creature* general = _instance->instance->GetCreature(_instance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
+                    {
+                        if (Creature* sindragosa = _instance->instance->GetCreature(_instance->GetGuidData(DATA_SINDRAGOSA_GUID)))
+                            sindragosa->CastSpell(general->GetPositionX(), general->GetPositionY(), general->GetPositionZ(), SPELL_SINDRAGOSA_FROST_BOMB_POS, true);
+                    }
 
-                    events.RescheduleEvent(6, 5s);
-                    events.RescheduleEvent(10, 2s);
+                    events.RescheduleEvent(EVENT_LEADER_OUTRO_SINDRAGOSA_LEAVE, 5s);
+                    events.RescheduleEvent(EVENT_LEADER_OUTRO_FROST_BOMB_KILL, 2s);
                     break;
-                case 6:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
-                            c->GetMotionMaster()->MovePoint(0, TSSindragosaPos1);
+                case EVENT_LEADER_OUTRO_SINDRAGOSA_LEAVE:
+                    if (Creature* sindragosa = _instance->instance->GetCreature(_instance->GetGuidData(DATA_SINDRAGOSA_GUID)))
+                        sindragosa->GetMotionMaster()->MovePoint(0, TSSindragosaPos1);
 
-                    events.RescheduleEvent(7, 4500ms);
+                    events.RescheduleEvent(EVENT_LEADER_OUTRO_SINDRAGOSA_HIDE, 4500ms);
                     break;
-                case 7:
-                    if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
-                            c->SetVisible(false);
-                    if (GameObject* barrier = pInstance->instance->GetGameObject(barrierGUID))
+                case EVENT_LEADER_OUTRO_SINDRAGOSA_HIDE:
+                    if (Creature* sindragosa = _instance->instance->GetCreature(_instance->GetGuidData(DATA_SINDRAGOSA_GUID)))
+                        sindragosa->SetVisible(false);
+                    if (GameObject* barrier = _instance->instance->GetGameObject(_barrierGUID))
                         barrier->Delete();
-                    barrierGUID.Clear();
+                    _barrierGUID.Clear();
 
-                    events.RescheduleEvent(8, 2s);
+                    events.RescheduleEvent(EVENT_LEADER_OUTRO_LEADER_MOVE, 2s);
                     break;
-                case 8:
-                    me->GetMotionMaster()->MoveWaypoint(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE + 16 : PATH_BEGIN_VALUE + 17, false);
+                case EVENT_LEADER_OUTRO_LEADER_MOVE:
+                    me->GetMotionMaster()->MoveWaypoint(me->GetEntry() == NPC_JAINA_PART2 ? PATH_JAINA_OUTRO : PATH_SYLVANAS_OUTRO, false);
                     break;
-                case 10:
-                    if (Creature* x = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
-                        x->AI()->DoAction(3);
+                case EVENT_LEADER_OUTRO_FROST_BOMB_KILL:
+                    if (Creature* general = _instance->instance->GetCreature(_instance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
+                        general->AI()->DoAction(ACTION_FROST_BOMB_KILL);
 
+                    break;
+                default:
                     break;
             }
         }
+
+    private:
+        InstanceScript* _instance;
+        ObjectGuid _barrierGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return GetPitOfSaronAI<npc_pos_leader_secondAI>(creature);
     }
-};
-
-enum EmpoweredBlizzard
-{
-    SPELL_EMPOWERED_BLIZZARD = 70131
 };
 
 class spell_pos_empowered_blizzard_aura : public AuraScript
@@ -1315,7 +1352,7 @@ class spell_pos_empowered_blizzard_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_EMPOWERED_BLIZZARD });
     }
 
-    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
         PreventDefaultAction();
         if (Unit* caster = GetCaster())
@@ -1328,7 +1365,7 @@ class spell_pos_empowered_blizzard_aura : public AuraScript
     }
 };
 
-const Position slaveFreePos[4] =
+Position const SlaveFreePos[4] =
 {
     {699.82f, -82.68f, 512.6f, 0.0f},
     {643.51f, 79.20f, 511.57f, 0.0f},
@@ -1344,10 +1381,10 @@ public:
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         uint32 pointId = 0;
-        float minDist = _owner.GetExactDist2dSq(&slaveFreePos[pointId]);
+        float minDist = _owner.GetExactDist2dSq(&SlaveFreePos[pointId]);
         for (uint32 i = 1; i < 4; ++i)
         {
-            float dist = _owner.GetExactDist2dSq(&slaveFreePos[i]);
+            float dist = _owner.GetExactDist2dSq(&SlaveFreePos[i]);
             if (dist < minDist)
             {
                 minDist = dist;
@@ -1355,7 +1392,7 @@ public:
             }
         }
         if (minDist < 200.0f * 200.0f)
-            _owner.GetMotionMaster()->MovePoint(0, slaveFreePos[pointId], FORCED_MOVEMENT_NONE, 0.f, true, false);
+            _owner.GetMotionMaster()->MovePoint(0, SlaveFreePos[pointId], FORCED_MOVEMENT_NONE, 0.f, true, false);
         return true;
     }
 
@@ -1373,17 +1410,17 @@ class spell_pos_slave_trigger_closest : public SpellScript
             if (target->GetUInt32Value(UNIT_NPC_EMOTESTATE)) // prevent using multiple times
             {
                 if (Unit* caster = GetCaster())
-                    if (Player* p = caster->ToPlayer())
+                    if (Player* player = caster->ToPlayer())
                     {
-                        p->RewardPlayerAndGroupAtEvent(36764, caster); // alliance
-                        p->RewardPlayerAndGroupAtEvent(36770, caster); // horde
+                        player->RewardPlayerAndGroupAtEvent(NPC_ALLIANCE_SLAVE_1, caster);
+                        player->RewardPlayerAndGroupAtEvent(NPC_HORDE_SLAVE_1, caster);
 
-                        target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                        if (Creature* c = target->ToCreature())
+                        target->ClearEmoteState();
+                        if (Creature* slave = target->ToCreature())
                         {
-                            c->DespawnOrUnsummon(7s);
-                            c->AI()->Talk(0, p);
-                            c->m_Events.AddEventAtOffset(new SlaveRunEvent(*c), 3s);
+                            slave->DespawnOrUnsummon(7s);
+                            slave->AI()->Talk(SAY_SLAVE_FREED, player);
+                            slave->m_Events.AddEventAtOffset(new SlaveRunEvent(*slave), 3s);
                         }
                     }
             }
@@ -1422,14 +1459,14 @@ class spell_pos_blight_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 69604 });
+        return ValidateSpellInfo({ SPELL_BLIGHT });
     }
 
     void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
         if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
             if (Unit* target = GetTarget())
-                target->CastSpell(target, 69604, true);
+                target->CastSpell(target, SPELL_BLIGHT, true);
     }
 
     void Register() override
@@ -1466,19 +1503,19 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
-        InstanceScript* inst = player->GetInstanceScript();
-        if (!inst)
+        InstanceScript* instance = player->GetInstanceScript();
+        if (!instance)
             return false;
 
-        if (inst->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_AFTER_TUNNEL_WARN)
+        if (instance->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_AFTER_TUNNEL_WARN)
             return false;
 
-        if (inst->GetData(DATA_GARFROST) == DONE && inst->GetData(DATA_ICK) == DONE && inst->GetData(DATA_TYRANNUS) != DONE && !inst->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID))
+        if (instance->GetData(DATA_GARFROST) == DONE && instance->GetData(DATA_ICK) == DONE && instance->GetData(DATA_TYRANNUS) != DONE && !instance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID))
         {
-            if (Creature* c = inst->instance->SummonCreature(NPC_GORKUN_IRONSKULL_2, TSSpawnPos))
-                c->GetMotionMaster()->MovePoint(0, TSMidPos);
+            if (Creature* general = instance->instance->SummonCreature(NPC_GORKUN_IRONSKULL_2, TSSpawnPos))
+                general->GetMotionMaster()->MovePoint(0, TSMidPos);
 
-            inst->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_TYRANNUS_INTRO);
+            instance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_TYRANNUS_INTRO);
         }
 
         return false;

@@ -5910,6 +5910,11 @@ class spell_gen_vampiric_touch : public AuraScript
     }
 };
 
+enum PetrifiedBarkSpells
+{
+    SPELL_PETRIFIED_BARK_DAMAGE = 62379
+};
+
 // 62337, 62933 - Petrified Bark (Freya)
 class spell_gen_petrified_bark : public AuraScript
 {
@@ -5917,10 +5922,10 @@ class spell_gen_petrified_bark : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 62379 });
+        return ValidateSpellInfo({ SPELL_PETRIFIED_BARK_DAMAGE });
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
@@ -5932,7 +5937,7 @@ class spell_gen_petrified_bark : public AuraScript
             return;
 
         int32 damage = damageInfo->GetDamage();
-        victim->CastCustomSpell(GetTarget(), 62379, &damage, nullptr, nullptr, true);
+        victim->CastCustomSpell(victim, SPELL_PETRIFIED_BARK_DAMAGE, &damage, nullptr, nullptr, true, nullptr, aurEff, GetTarget()->GetGUID());
     }
 
     void Register() override

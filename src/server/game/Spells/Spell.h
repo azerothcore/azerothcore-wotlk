@@ -565,7 +565,7 @@ public:
     void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
     int32 GetCastTimeRemaining() { return m_timer;}
     bool IsNextMeleeSwingSpell() const;
-    bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
+    bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_IS_TRIGGERED_MASK); };
     bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
     [[nodiscard]] bool IsProcDisabled() const { return HasTriggeredCastFlag(TRIGGERED_DISALLOW_PROC_EVENTS); }
     [[nodiscard]] bool IsFromPreDeathAura() const { return _fromPreDeathAura; }
@@ -611,6 +611,11 @@ public:
     // xinef: moved to public
     void LoadScripts();
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
+
+    // number of units hit by the given effect - only meaningful once targets have been fully selected
+    [[nodiscard]] int32 GetUnitTargetCountForEffect(SpellEffIndex effect) const;
+    // position of the unit in the list of units hit by the given effect, -1 when it is not part of that list
+    [[nodiscard]] int32 GetUnitTargetIndexForEffect(ObjectGuid const& target, SpellEffIndex effect) const;
 
     [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
     [[nodiscard]] SpellInfo const* GetTriggeredByAuraSpellInfo() const { return m_triggeredByAuraSpell.spellInfo; }

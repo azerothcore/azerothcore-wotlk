@@ -5088,12 +5088,36 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, U
             // Cast duration to unsigned to prevent permanent aura's such as Righteous Fury being permanently added to caster
             uint32 dur = std::min(2u * MINUTE * IN_MILLISECONDS, uint32(aura->GetDuration()));
 
-            if (Aura* oldAura = stealer->GetAura(aura->GetId(), aura->GetCasterGUID()))
+            // Stolen copies are cast by the stealer, so this also finds its own cast of the spell. Only add a stack or
+            // charge to it: refreshing a non-stacking own cast (Ice Barrier, Arcane Intellect) would re-fill or shorten it
+            Aura* oldAura = nullptr;
+            if (stealCharge || aura->GetSpellInfo()->StackAmount > 1)
+                oldAura = stealer->GetAura(aura->GetId(), stealer->GetGUID());
+
+            if (oldAura)
             {
                 if (stealCharge)
                     oldAura->ModCharges(1);
                 else
+                {
+                    uint8 const oldStackAmount = oldAura->GetStackAmount();
+                    int32 oldAmount[MAX_SPELL_EFFECTS] = { };
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                        if (AuraEffect* aurEff = oldAura->GetEffect(i))
+                            oldAmount[i] = aurEff->GetAmount();
+
                     oldAura->ModStackAmount(1);
+
+                    // The stack change recalculated amounts and max duration with the stealer as caster, keep the
+                    // original caster's ones like a newly stolen copy does
+                    bool const stacked = oldAura->GetStackAmount() > oldStackAmount;
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                        if (AuraEffect* aurEff = oldAura->GetEffect(i))
+                            aurEff->ChangeAmount(oldAmount[i] + (stacked ? damage[i] : 0));
+
+                    oldAura->SetMaxDuration(aura->GetMaxDuration());
+                }
+
                 oldAura->SetDuration(int32(dur));
             }
             else
@@ -9269,12 +9293,12 @@ uint32 Unit::SpellCriticalHealingBonus(Unit const* caster, SpellInfo const* spel
     return damage;
 }
 
-float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype, bool includeHealingDonePct)
+float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype)
 {
     // For totems get healing bonus from owner (statue isn't totem in fact)
     if (IsCreature() && IsTotem())
         if (Unit* owner = GetOwner())
-            return owner->SpellPctHealingModsDone(victim, spellProto, damagetype, includeHealingDonePct);
+            return owner->SpellPctHealingModsDone(victim, spellProto, damagetype);
 
     // Some spells don't benefit from done mods
     if (spellProto->HasAttribute(SPELL_ATTR3_IGNORE_CASTER_MODIFIERS))
@@ -9291,8 +9315,7 @@ float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, D
     float DoneTotalMod = 1.0f;
 
     // Healing done percent
-    if (includeHealingDonePct)
-        DoneTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+    DoneTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
 
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
@@ -9433,7 +9456,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     {
         // No bonus healing for SPELL_DAMAGE_CLASS_NONE class spells by default
         if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE)
-            return healamount;
+            return uint32(std::max(healamount * DoneTotalMod, 0.0f));
     }
 
     // Default calculation
@@ -15478,14 +15501,14 @@ void Unit::_ExitVehicle(Position const* exitPosition)
                     pos = vehicleBase->GetPosition();
             }
             else if (seatAddon->ExitParameter == VehicleExitParameters::VehicleExitParamDest)
-            {
                 pos.Relocate({ seatAddon->ExitParameterX, seatAddon->ExitParameterY, seatAddon->ExitParameterZ, seatAddon->ExitParameterO });
-
-                float floorZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
-                if (pos.GetPositionZ() < floorZ)
-                    pos.m_positionZ = floorZ + 0.1f;
-            }
         }
+
+        // The vehicle can stand slightly under the floor (Pilgrim's Bounty chairs share their table's spawn Z, some
+        // tables spawn a few tenths under the ground); an exit spline ending there drops the passenger through it
+        float floorZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+        if (pos.GetPositionZ() < floorZ)
+            pos.m_positionZ = floorZ + 0.1f;
     }
 
     AddUnitState(UNIT_STATE_MOVE);
@@ -15502,6 +15525,18 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!vehicleInfo || vehicleInfo->m_ID != 341)
     {
         Movement::MoveSplineInit init(this);
+
+        // A corpse leaving a flying vehicle has to drop to the ground instead of hanging at the seat's height
+        if (player && !IsAlive())
+        {
+            float groundZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, MAX_FALL_DISTANCE);
+            if (groundZ > INVALID_HEIGHT && pos.GetPositionZ() > groundZ)
+            {
+                pos.m_positionZ = groundZ;
+                init.SetFall();
+            }
+        }
+
         init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
         init.SetFacing(vehicleBase->GetOrientation());
         init.SetTransportExit();

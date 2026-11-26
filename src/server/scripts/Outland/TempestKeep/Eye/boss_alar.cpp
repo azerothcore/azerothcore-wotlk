@@ -259,9 +259,7 @@ struct boss_alar : public BossAI
             scheduler.DelayAll(15s);
         }, 57s);
 
-        me->m_Events.AddEventAtOffset([&] {
-            DoCastSelf(SPELL_BERSERK, true);
-        }, 10min);
+        ScheduleEnrageTimer(SPELL_BERSERK, 10min);
 
         ScheduleMainSpellAttack(0s);
     }

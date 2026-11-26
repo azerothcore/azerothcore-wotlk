@@ -24,12 +24,12 @@
 
 enum PrinceSay
 {
-    SAY_AGGRO     = 0,
-    SAY_AXE_TOSS1 = 1,
-    SAY_AXE_TOSS2 = 2,
-    SAY_SLAY      = 6,
-    SAY_SUMMON    = 7,
-    SAY_DEATH     = 8,
+    SAY_AGGRO       = 0,
+    SAY_AXE_TOSS1   = 1,
+    SAY_SUMMON_AXES = 5,
+    SAY_SLAY        = 6,
+    SAY_SUMMON      = 7,
+    SAY_DEATH       = 8,
 };
 
 enum Spells
@@ -42,6 +42,7 @@ enum Spells
     SPELL_SUNDER_ARMOR     = 30901,
     SPELL_THRASH_AURA      = 12787,
     SPELL_EQUIP_AXES       = 30857,
+    SPELL_SUMMON_AXES      = 30891,
     SPELL_AMPLIFY_DAMAGE   = 39095,
     SPELL_CLEAVE           = 30131,
     SPELL_HELLFIRE         = 30859,
@@ -50,7 +51,6 @@ enum Spells
 enum creatures
 {
     NPC_NETHERSPITE_INFERNAL    = 17646,
-    NPC_MALCHEZAARS_AXE         = 17650,
     INFERNAL_MODEL_INVISIBLE    = 11686,
     SPELL_INFERNAL_RELAY        = 33814,   // 30835,
     SPELL_INFERNAL_RELAY_ONE    = 30834,
@@ -118,12 +118,12 @@ struct boss_malchezaar : public BossAI
         });
 
         ScheduleHealthCheckEvent(30, [&] {
+            me->InterruptNonMeleeSpells(false);
             me->RemoveAurasDueToSpell(SPELL_THRASH_AURA);
-            Talk(SAY_AXE_TOSS2);
+            DoCastSelf(SPELL_SUMMON_AXES);
+            Talk(SAY_SUMMON_AXES);
             _phase = PHASE_THREE;
             clearweapons();
-
-            me->SummonCreature(NPC_MALCHEZAARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
 
             scheduler.Schedule(20s, 30s, [this](TaskContext context)
             {
@@ -321,11 +321,6 @@ struct npc_malchezaar_axe : public ScriptedAI
     npc_malchezaar_axe(Creature* creature) : ScriptedAI(creature)
     {
         creature->SetCanDualWield(true);
-    }
-
-    void Initialize()
-    {
-        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
