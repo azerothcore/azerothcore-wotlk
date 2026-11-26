@@ -58,6 +58,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
         _despawning = false;
         _initialSelection = true;
+        _followCommand = false;
         _targetGUID.Clear();
     }
 
@@ -137,6 +138,9 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 
     void AttackStart(Unit* who) override
     {
+        if (_followCommand)
+            return;
+
         RemoveTargetAura();
         _targetGUID = who->GetGUID();
         me->AddAura(SPELL_DK_SUMMON_GARGOYLE_1, who);
@@ -150,12 +154,18 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 
         if (command == COMMAND_FOLLOW)
         {
+            _followCommand = true;
+            RemoveTargetAura();
             me->InterruptNonMeleeSpells(false);
             me->AttackStop();
-            MySelectNextTarget();
+            if (Unit* owner = me->GetOwner())
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
         }
         else if (command == COMMAND_ATTACK && target && target != me->GetVictim())
+        {
+            _followCommand = false;
             SetGazeOn(target);
+        }
     }
 
     void RemoveTargetAura()
@@ -221,6 +231,9 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         if (_despawnTimer > 4000)
         {
             _despawnTimer -= diff;
+            if (_followCommand)
+                return;
+
             _decisionTimer -= diff;
             if (!UpdateVictimWithGaze())
             {
@@ -283,6 +296,7 @@ private:
     int32 _decisionTimer;
     bool _despawning;
     bool _initialSelection;
+    bool _followCommand;
 };
 
 struct npc_pet_dk_ghoul : public CombatAI
@@ -362,6 +376,14 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
         return AggressorAI::CanAIAttack(target);
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (_followCommand)
+            return;
+
+        AggressorAI::AttackStart(who);
+    }
+
     // Owner started attacking a target — engage immediately.
     // We bypass OnOwnerCombatInteraction because CanStartAttack -> CanAIAttack
     // may reject the target before combat refs are established.
@@ -386,16 +408,23 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
     {
         if (command == COMMAND_FOLLOW)
         {
+            _followCommand = true;
             me->AttackStop();
             if (Unit* owner = me->GetOwner())
                 me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
         }
         else if (command == COMMAND_ATTACK && target && me->IsValidAttackTarget(target))
+        {
+            _followCommand = false;
             AttackStart(target);
+        }
     }
 
     void UpdateAI(uint32 /*diff*/) override
     {
+        if (_followCommand)
+            return;
+
         if (!UpdateVictim())
         {
             // Re-engage if we still have a valid victim but lost engagement
@@ -413,6 +442,9 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    bool _followCommand = false;
 };
 
 struct npc_pet_dk_dancing_rune_weapon : public NullCreatureAI

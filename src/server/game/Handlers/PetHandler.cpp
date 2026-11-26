@@ -117,7 +117,7 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
             {
                 (*itr)->InterruptNonMeleeSpells(false);
             }
-            else if ((*itr)->IsCreature() && (*itr)->IsAlive() && flag == ACT_COMMAND && (spellId == COMMAND_FOLLOW || spellId == COMMAND_ATTACK))
+            else if ((*itr)->IsCreature() && (*itr)->IsAlive() && flag == ACT_COMMAND && (spellId == COMMAND_FOLLOW || (spellId == COMMAND_ATTACK && !_player->HasPacifyAura())))
                 otherControlled.push_back((*itr)->ToCreature());
         }
 
