@@ -1998,7 +1998,9 @@ void Creature::setDeathState(DeathState state, bool despawn)
             m_formation->FormationReset(true, false);
 
         bool const inWater = (GetLiquidData().Status & MAP_LIQUID_STATUS_IN_CONTACT) != 0;
-        bool const mayFall = !despawn && !inWater && !GetTransport() && !GetVehicle();
+        // A creature still rooted here (template or script root) cannot fall; its corpse stays where it died.
+        bool const mayFall = !despawn && !inWater && !GetTransport() && !GetVehicle()
+            && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT);
         bool needsFalling = mayFall && IsFlying();
         if (mayFall && !needsFalling)
         {
