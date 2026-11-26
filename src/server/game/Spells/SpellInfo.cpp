@@ -2066,7 +2066,10 @@ AuraStateType SpellInfo::LoadAuraState() const
     {
         case 71465: // Divine Surge
         case 50241: // Oculus, Drake spell Evasive Maneuvers
+        case 68403: // Aura State Raid Encounter
             return AURA_STATE_UNKNOWN22;
+        case 68402: // Aura State Vulnerable
+            return AURA_STATE_UNKNOWN19;
         case 9991:  // Touch of Zanzil
         case 35331: // Black Blood
         case 9806:  // Phantom Strike

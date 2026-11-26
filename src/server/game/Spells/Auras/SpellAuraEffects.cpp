@@ -587,7 +587,7 @@ void AuraEffect::CalculatePeriodicData()
     if (GetBase()->GetType() == UNIT_AURA_TYPE && GetCaster())
     {
         if (m_spellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL))
-            m_pctMods = GetCaster()->SpellPctHealingModsDone(GetBase()->GetUnitOwner(), GetSpellInfo(), DOT, false);
+            m_pctMods = GetCaster()->SpellPctHealingModsDone(GetBase()->GetUnitOwner(), GetSpellInfo(), DOT);
         else if (m_spellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || m_spellInfo->HasAura(SPELL_AURA_PERIODIC_LEECH))
             m_pctMods = GetCaster()->SpellPctDamageModsDone(GetBase()->GetUnitOwner(), GetSpellInfo(), DOT);
     }
@@ -6664,9 +6664,6 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     {
         if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
             damage = caster->SpellHealingBonusDone(target, GetSpellInfo(), damage, DOT, GetEffIndex(), 0.0f, GetBase()->GetStackAmount());
-
-        if (caster && GetBase()->GetType() == UNIT_AURA_TYPE)
-            damage = int32(float(damage) * caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT));
 
         damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
     }

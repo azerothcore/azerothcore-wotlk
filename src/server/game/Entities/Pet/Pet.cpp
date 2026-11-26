@@ -2521,3 +2521,126 @@ std::string Pet::GetDebugInfo() const
         << "PetNumber: " << m_charmInfo->GetPetNumber();
     return sstr.str();
 }
+
+void PetAutocastPreferences::Load(PreparedQueryResult result)
+{
+    _states.clear();
+
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 entry = fields[0].Get<uint32>();
+        uint32 spell = fields[1].Get<uint32>();
+        bool autocast = fields[2].Get<uint8>() != 0;
+
+        _states.push_back({ entry, spell, autocast });
+    } while (result->NextRow());
+}
+
+void PetAutocastPreferences::Set(ObjectGuid::LowType ownerGuid, uint32 entry, uint32 spell, bool autocast)
+{
+    auto it = std::find_if(_states.begin(), _states.end(), [entry, spell](PetAutocastState const& state)
+    {
+        return state.Entry == entry && state.Spell == spell;
+    });
+
+    if (it == _states.end())
+        _states.push_back({ entry, spell, autocast });
+    else if (it->Autocast == autocast)
+        return;                                             // already stored, so spare the write
+    else
+        it->Autocast = autocast;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PET_AUTOCAST);
+    stmt->SetData(0, ownerGuid);
+    stmt->SetData(1, entry);
+    stmt->SetData(2, spell);
+    stmt->SetData(3, uint8(autocast ? 1 : 0));
+    CharacterDatabase.Execute(stmt);
+}
+
+bool SummonSavesPetAutocast(Unit const* summon)
+{
+    // a guardian keeps the SummonProperties row it was created with
+    if (TempSummon const* tempSummon = summon->ToTempSummon())
+        if (tempSummon->m_Properties)
+            return (tempSummon->m_Properties->Flags & SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST) != 0;
+
+    // a Pet is built with no properties: fall back to the summon spell it records
+    SpellInfo const* summonSpell = sSpellMgr->GetSpellInfo(summon->GetUInt32Value(UNIT_CREATED_BY_SPELL));
+    if (!summonSpell)
+        return false;
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        SpellEffectInfo const& effect = summonSpell->Effects[i];
+        if (!effect.IsEffect(SPELL_EFFECT_SUMMON) && !effect.IsEffect(SPELL_EFFECT_SUMMON_PET))
+            continue;
+
+        SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(effect.MiscValueB));
+        if (properties && (properties->Flags & SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST))
+            return true;
+    }
+
+    return false;
+}
+
+void ApplySavedPetAutocast(Player* owner, Unit* summon)
+{
+    if (!owner || !summon || !SummonSavesPetAutocast(summon))
+        return;
+
+    std::vector<PetAutocastState> const& states = owner->GetPetAutocastPreferences().GetStates();
+    CharmInfo* charmInfo = summon->GetCharmInfo();
+    if (states.empty() || !charmInfo)
+        return;
+
+    for (PetAutocastState const& state : states)
+    {
+        if (state.Entry != summon->GetEntry())
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(state.Spell);
+        if (!spellInfo)
+            continue;
+
+        if (Pet* pet = summon->ToPet())
+            pet->ToggleAutocast(spellInfo, state.Autocast);                 // keeps m_autospells and m_spells in sync
+        else
+            charmInfo->ToggleCreatureAutocast(spellInfo, state.Autocast);   // drives the guardian's autocast
+
+        charmInfo->SetSpellAutocast(spellInfo, state.Autocast);             // the action bar the client displays
+    }
+}
+
+void SavePetAutocast(Player* owner, Unit* summon)
+{
+    if (!owner || !summon || !SummonSavesPetAutocast(summon))
+        return;
+
+    // a Pet keeps its state in pet_spell.active, which its own row already saves
+    if (summon->ToPet())
+        return;
+
+    CharmInfo* charmInfo = summon->GetCharmInfo();
+    if (!charmInfo)
+        return;
+
+    for (uint8 i = 0; i < MAX_SPELL_CHARM; ++i)
+    {
+        CharmSpellInfo const* charmSpell = charmInfo->GetCharmSpell(i);
+        uint32 spellId = charmSpell->GetAction();
+        if (!spellId)
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (!spellInfo || !spellInfo->IsAutocastable())
+            continue;
+
+        owner->GetPetAutocastPreferences().Set(owner->GetGUID().GetCounter(), summon->GetEntry(), spellId,
+                                               charmSpell->GetType() == ACT_ENABLED);
+    }
+}
