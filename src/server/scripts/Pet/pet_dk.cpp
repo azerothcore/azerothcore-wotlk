@@ -143,6 +143,21 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         ScriptedAI::AttackStartCaster(who, 40);
     }
 
+    void OwnerCommandedPet(CommandStates command, Unit* target) override
+    {
+        if (_despawning)
+            return;
+
+        if (command == COMMAND_FOLLOW)
+        {
+            me->InterruptNonMeleeSpells(false);
+            me->AttackStop();
+            MySelectNextTarget();
+        }
+        else if (command == COMMAND_ATTACK && target && target != me->GetVictim())
+            SetGazeOn(target);
+    }
+
     void RemoveTargetAura()
     {
         if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))

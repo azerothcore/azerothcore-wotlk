@@ -106,6 +106,7 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     {
         //If a pet is dismissed, m_Controlled will change
         std::vector<Unit*> controlled;
+        std::vector<Creature*> otherControlled;
         for (Unit::ControlSet::iterator itr = GetPlayer()->m_Controlled.begin(); itr != GetPlayer()->m_Controlled.end(); ++itr)
         {
             // xinef: allow to dissmis dead pets
@@ -116,11 +117,18 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
             {
                 (*itr)->InterruptNonMeleeSpells(false);
             }
+            else if ((*itr)->IsCreature() && (*itr)->IsAlive() && flag == ACT_COMMAND && (spellId == COMMAND_FOLLOW || spellId == COMMAND_ATTACK))
+                otherControlled.push_back((*itr)->ToCreature());
         }
 
         for (Unit* pet : controlled)
             if (pet && pet->IsInWorld() && pet->GetMap() == _player->GetMap())
                 HandlePetActionHelper(pet, guid1, spellId, flag, guid2);
+
+        Unit* target = ObjectAccessor::GetUnit(*_player, guid2);
+        for (Creature* creature : otherControlled)
+            if (creature->IsInWorld() && creature->GetMap() == _player->GetMap() && creature->IsAIEnabled)
+                creature->AI()->OwnerCommandedPet(CommandStates(spellId), target);
     }
 }
 
