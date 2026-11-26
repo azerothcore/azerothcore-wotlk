@@ -620,7 +620,7 @@ struct boss_thorim : public BossAI
         else if (spellInfo->Id == SPELL_TELEPORT)
         {
             me->DespawnOrUnsummon();
-            instance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+            instance->SetData(DATA_KEEPER_TELEPORTED, DONE);
         }
     }
 

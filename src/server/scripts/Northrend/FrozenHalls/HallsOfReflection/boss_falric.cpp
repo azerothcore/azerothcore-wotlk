@@ -71,7 +71,7 @@ struct boss_falric : public BossAI
 
     void DoAction(int32 action) override
     {
-        if (action == 1)
+        if (action == ACTION_WAVE_ENGAGE)
         {
             Talk(SAY_AGGRO);
             _startingFight = true;

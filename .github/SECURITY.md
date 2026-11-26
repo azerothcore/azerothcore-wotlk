@@ -30,8 +30,8 @@ We support the following versions of dependencies.
 
 | macOS |       Status       |     Recommended      |
 | :---- | :----------------: | :------------------: |
-| 14    | :white_check_mark: | :large_blue_diamond: |
-| 12 ≤  |    :red_circle:    |                      |
+| 15    | :white_check_mark: | :large_blue_diamond: |
+| 14 ≤  |    :red_circle:    |                      |
 
 | Windows       |       Status       |     Recommended      |
 | :------------ | :----------------: | :------------------: |

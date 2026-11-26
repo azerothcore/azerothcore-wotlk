@@ -982,6 +982,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutoc
         petsSet = _player->m_Controlled;
 
     // Xinef: loop all pets with same entry (fixes partial state change for feral spirits)
+    bool savedAutocast = false;
     for (Unit* pet : petsSet)
     {
         if (checkPet->GetEntry() == packet.PetGUID.GetEntry() && pet->GetEntry() != packet.PetGUID.GetEntry())
@@ -1005,7 +1006,15 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutoc
             charmInfo->ToggleCreatureAutocast(spellInfo, packet.AutocastEnabled);
 
         charmInfo->SetSpellAutocast(spellInfo, packet.AutocastEnabled);
+
+        if (SummonSavesPetAutocast(pet))
+            savedAutocast = true;
     }
+
+    // one row covers the whole group, as every pet in petsSet shares checkPet's entry
+    if (savedAutocast)
+        _player->GetPetAutocastPreferences().Set(_player->GetGUID().GetCounter(), checkPet->GetEntry(), spellInfo->Id,
+                                                 packet.AutocastEnabled);
 }
 
 void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)

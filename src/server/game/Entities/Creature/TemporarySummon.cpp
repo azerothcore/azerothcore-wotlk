@@ -382,7 +382,12 @@ void Minion::RemoveFromWorld()
         return;
 
     if (Unit* owner = GetOwner())
+    {
+        // the autocast state the player chose has to outlive the summon, so record it while it still exists
+        SavePetAutocast(owner->ToPlayer(), this);
+
         owner->SetMinion(this, false);
+    }
 
     TempSummon::RemoveFromWorld();
 }
@@ -440,7 +445,10 @@ void Guardian::InitStats(uint32 duration)
         InitStatsForLevel(m_owner->GetLevel());
 
         if (m_owner->IsPlayer() && HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
+        {
             m_charmInfo->InitCharmCreateSpells();
+            ApplySavedPetAutocast(m_owner->ToPlayer(), this);
+        }
     }
 
     SetReactState(REACT_AGGRESSIVE);

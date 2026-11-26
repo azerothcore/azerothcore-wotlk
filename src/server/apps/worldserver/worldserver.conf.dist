@@ -3328,14 +3328,6 @@ Group.RandomRollMaximum = 1000000
 ###################################################################################################
 # INSTANCE
 #
-#    Instance.GMSummonPlayer
-#        Description: Allow GM to summon players or only other GM accounts inside instances.
-#        Default:     0 - (Disabled, Only GM accounts can be summoned by GM)
-#                     1 - (Enabled, GM and Player accounts can be summoned by GM)
-
-Instance.GMSummonPlayer = 0
-
-#
 #    Instance.IgnoreLevel
 #        Description: Ignore level requirement when entering instances.
 #        Default:     0 - (Disabled)

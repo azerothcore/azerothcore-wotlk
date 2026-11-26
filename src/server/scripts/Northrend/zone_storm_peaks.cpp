@@ -1395,6 +1395,42 @@ class spell_q13048_time_period : public SpellScript
     }
 };
 
+// Quest The Warm-Up (12996)
+// Right-clicking a target while driving sends the pet attack command, which sets the victim through
+// AttackStart. VehicleAI has no melee, so deliver the swings here.
+struct npc_warbear_matriarch : public VehicleAI
+{
+    explicit npc_warbear_matriarch(Creature* creature) : VehicleAI(creature) { }
+
+    void AttackStart(Unit* victim) override
+    {
+        // no MoveChase, movement stays with the driver
+        if (victim)
+            me->Attack(victim, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        VehicleAI::UpdateAI(diff);
+
+        Unit* victim = me->GetVictim();
+        if (!victim)
+            return;
+
+        if (!me->GetCharmer() || !me->IsValidAttackTarget(victim))
+        {
+            me->AttackStop();
+            return;
+        }
+
+        // driven vehicles don't auto-face, so gate swings like player melee does
+        if (!me->IsWithinBoundaryRadius(victim) && !me->HasInArc(2 * float(M_PI) / 3, victim))
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
@@ -1424,4 +1460,5 @@ void AddSC_storm_peaks()
     RegisterSpellScript(spell_q13010_jokkum_summon);
     RegisterSpellScript(spell_riding_jokkum);
     RegisterSpellScript(spell_q13048_time_period);
+    RegisterCreatureAI(npc_warbear_matriarch);
 }
