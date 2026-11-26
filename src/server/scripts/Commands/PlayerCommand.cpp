@@ -16,10 +16,16 @@
  */
 
 #include "PlayerCommand.h"
+#include "Group.h"
+#include "InstanceSaveMgr.h"
 #include "Language.h"
+#include "Map.h"
+#include "MotionMaster.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "WorldSession.h"
 
 bool Acore::PlayerCommand::HandleLearnSpellCommand(ChatHandler* handler, Player* targetPlayer, SpellInfo const* spell, Optional<EXACT_SEQUENCE("all")> allRanks)
 {
@@ -86,5 +92,62 @@ bool Acore::PlayerCommand::HandleUnlearnSpellCommand(ChatHandler* handler, Playe
         target->SendTalentsInfoData(false);
     }
 
+    return true;
+}
+
+bool Acore::PlayerCommand::SummonOnlinePlayer(ChatHandler* handler, Player* target)
+{
+    Player* summoner = handler->GetPlayer();
+    std::string const nameLink = handler->GetNameLink(target);
+
+    if (handler->HasLowerSecurity(target))
+        return false;
+
+    if (target->IsBeingTeleported())
+    {
+        handler->SendErrorMessage(LANG_IS_TELEPORTED, nameLink);
+        return false;
+    }
+
+    Map* map = summoner->GetMap();
+    if (map->IsDungeon())
+    {
+        if (target->GetSession()->GetSecurity() == SEC_PLAYER && !handler->GetSession()->HasPermission(rbac::RBAC_PERM_COMMANDS_SUMMON_PLAYERS_TO_INSTANCE))
+        {
+            handler->SendErrorMessage(LANG_CANNOT_SUMMON_PLAYER_TO_INST, nameLink);
+            return false;
+        }
+
+        // Leaving the battleground or battlefield drops this raid before the teleport picks the instance copy,
+        // so the bind check below would read the wrong leader
+        if (Group* group = target->GetGroup(); group && (group->isBGGroup() || group->isBFGroup()))
+        {
+            handler->SendErrorMessage(LANG_CANNOT_SUMMON_BG_RAID_TO_INST, nameLink);
+            return false;
+        }
+
+        // The teleport picks the instance copy from the target's own bind or their group leader's bind, never from the summoner.
+        if (sInstanceSaveMgr->PlayerGetDestinationInstanceId(target, map->GetId(), target->GetDifficulty(map->IsRaid())) != map->GetInstanceId())
+        {
+            handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_INST, nameLink);
+            return false;
+        }
+    }
+
+    handler->PSendSysMessage(LANG_SUMMONING, nameLink, "");
+    if (handler->needReportToTarget(target))
+        ChatHandler(target->GetSession()).PSendSysMessage(LANG_SUMMONED_BY, handler->GetNameLink());
+
+    if (target->IsInFlight())
+    {
+        target->GetMotionMaster()->MovementExpired();
+        target->CleanupAfterTaxiFlight();
+    }
+    else
+        target->SaveRecallPosition();
+
+    float x, y, z;
+    summoner->GetClosePoint(x, y, z, target->GetObjectSize());
+    target->TeleportTo(summoner->GetMapId(), x, y, z, target->GetOrientation(), 0, summoner);
     return true;
 }

@@ -38,9 +38,11 @@ enum Spells
     SPELL_OVERLORDS_BRAND_DAMAGE        = 69189,
     SPELL_FORCEFUL_SMASH                = 69155,
     SPELL_UNHOLY_POWER                  = 69167,
-    RIMEFANG_SPELL_ICY_BLAST            = 69232,
+    SPELL_RIMEFANG_ICY_BLAST            = 69232,
     SPELL_MARK_OF_RIMEFANG              = 69275,
-    RIMEFANG_SPELL_HOARFROST            = 69246,
+    SPELL_RIMEFANG_HOARFROST            = 69246,
+    SPELL_RIDE_VEHICLE_HARDCODED        = 46598,
+    SPELL_FULL_HEAL                     = 43979,
 };
 
 enum Events
@@ -48,7 +50,7 @@ enum Events
     EVENT_SPELL_FORCEFUL_SMASH = 1,
     EVENT_SPELL_UNHOLY_POWER,
     EVENT_SPELL_OVERLORDS_BRAND,
-    EVENT_RIMEFANG_SPELL_ICY_BLAST,
+    EVENT_RIMEFANG_ICY_BLAST,
     EVENT_SPELL_MARK_OF_RIMEFANG,
 };
 
@@ -61,54 +63,46 @@ public:
     {
         boss_tyrannusAI(Creature* creature) : ScriptedAI(creature)
         {
-            pInstance = me->GetInstanceScript();
+            _instance = me->GetInstanceScript();
             me->SetReactState(REACT_PASSIVE);
-            if (Creature* rimefang = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
-            {
+            if (Creature* rimefang = _instance->instance->GetCreature(_instance->GetGuidData(DATA_RIMEFANG_GUID)))
                 rimefang->SetCanFly(true);
-            }
         }
-
-        InstanceScript* pInstance;
-        EventMap events;
 
         void Reset() override
         {
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
-            pInstance->SetData(DATA_TYRANNUS, NOT_STARTED);
+            _instance->SetData(DATA_TYRANNUS, NOT_STARTED);
         }
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            if (!pInstance)
-                return;
-
-            if (Creature* creature = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
+            if (Creature* general = _instance->instance->GetCreature(_instance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
             {
-                creature->AI()->DoAction(1);
-                creature->DespawnOrUnsummon();
-                pInstance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
+                general->AI()->DoAction(ACTION_DESPAWN_SUMMONS);
+                general->DespawnOrUnsummon();
+                _instance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
             }
 
             // Tyrannus is temporarily spawned as Rimefang's rider. If he evades, despawn Rimefang.
             // Tyrannus will be respawned once Rimefang respawns.
-            if (Creature* rimefang = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
+            if (Creature* rimefang = _instance->instance->GetCreature(_instance->GetGuidData(DATA_RIMEFANG_GUID)))
                 rimefang->DespawnOnEvade();
 
             me->DespawnOrUnsummon();
         }
 
-        void DoAction(int32 param) override
+        void DoAction(int32 action) override
         {
-            if (param == 1)
+            if (action == ACTION_START_TYRANNUS_FIGHT)
             {
-                Position exitPos = {1023.46f, 159.12f, 628.2f, 5.23f};
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
+                Position const exitPos = {1023.46f, 159.12f, 628.2f, 5.23f};
+                if (Creature* rimefang = _instance->instance->GetCreature(_instance->GetGuidData(DATA_RIMEFANG_GUID)))
                 {
-                    c->RemoveAura(46598);
-                    c->GetMotionMaster()->Clear();
-                    c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 18, true);
+                    rimefang->RemoveAura(SPELL_RIDE_VEHICLE_HARDCODED);
+                    rimefang->GetMotionMaster()->Clear();
+                    rimefang->GetMotionMaster()->MoveWaypoint(PATH_RIMEFANG_TYRANNUS_FIGHT, true);
                 }
                 me->SetHomePosition(exitPos);
                 me->GetMotionMaster()->MoveJump(exitPos, 10.0f, 2.0f);
@@ -118,12 +112,12 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
                 DoZoneInCombat();
-                me->CastSpell(me, 43979, true);
+                DoCastSelf(SPELL_FULL_HEAL, true);
                 Talk(SAY_AGGRO);
                 events.Reset();
                 events.RescheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, 14s, 16s);
                 events.RescheduleEvent(EVENT_SPELL_OVERLORDS_BRAND, 4s, 6s);
-                events.RescheduleEvent(EVENT_RIMEFANG_SPELL_ICY_BLAST, 5s);
+                events.RescheduleEvent(EVENT_RIMEFANG_ICY_BLAST, 5s);
                 events.RescheduleEvent(EVENT_SPELL_MARK_OF_RIMEFANG, 25s);
             }
         }
@@ -152,12 +146,10 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case 0:
-                    break;
                 case EVENT_SPELL_FORCEFUL_SMASH:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
-                        me->CastSpell(me->GetVictim(), SPELL_FORCEFUL_SMASH, false);
+                        DoCastVictim(SPELL_FORCEFUL_SMASH);
 
                         events.RescheduleEvent(EVENT_SPELL_UNHOLY_POWER, 1s);
                         break;
@@ -167,31 +159,33 @@ public:
                 case EVENT_SPELL_UNHOLY_POWER:
                     Talk(SAY_DARK_MIGHT);
                     Talk(EMOTE_DARK_MIGHT);
-                    me->CastSpell(me, SPELL_UNHOLY_POWER, false);
+                    DoCastSelf(SPELL_UNHOLY_POWER);
 
                     events.ScheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, 40s, 48s);
                     break;
                 case EVENT_SPELL_OVERLORDS_BRAND:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 95.0f, true))
-                        me->CastSpell(target, SPELL_OVERLORDS_BRAND, false);
+                        DoCast(target, SPELL_OVERLORDS_BRAND);
                     events.Repeat(11s, 12s);
                     break;
-                case EVENT_RIMEFANG_SPELL_ICY_BLAST:
+                case EVENT_RIMEFANG_ICY_BLAST:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 190.0f, true))
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
-                            c->CastSpell(target, RIMEFANG_SPELL_ICY_BLAST, false);
+                        if (Creature* rimefang = _instance->instance->GetCreature(_instance->GetGuidData(DATA_RIMEFANG_GUID)))
+                            rimefang->CastSpell(target, SPELL_RIMEFANG_ICY_BLAST, false);
                     events.Repeat(5s);
                     break;
                 case EVENT_SPELL_MARK_OF_RIMEFANG:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 190.0f, true))
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
+                        if (Creature* rimefang = _instance->instance->GetCreature(_instance->GetGuidData(DATA_RIMEFANG_GUID)))
                         {
                             Talk(SAY_MARK);
                             Talk(EMOTE_MARK, target);
-                            c->CastSpell(target, RIMEFANG_SPELL_HOARFROST, false);
+                            rimefang->CastSpell(target, SPELL_RIMEFANG_HOARFROST, false);
                         }
                     events.Repeat(25s);
-                    events.RescheduleEvent(EVENT_RIMEFANG_SPELL_ICY_BLAST, 10s);
+                    events.RescheduleEvent(EVENT_RIMEFANG_ICY_BLAST, 10s);
+                    break;
+                default:
                     break;
             }
 
@@ -201,8 +195,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(DATA_TYRANNUS, DONE);
+            _instance->SetData(DATA_TYRANNUS, DONE);
             if (me->IsSummon())
                 me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
         }
@@ -230,6 +223,9 @@ public:
                     return true;
             }
         }
+
+    private:
+        InstanceScript* _instance;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

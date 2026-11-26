@@ -630,6 +630,12 @@ enum JormungarEvents
     EVENT_SPELL_SLIME_POOL,
 };
 
+enum JormungarActions
+{
+    ACTION_PARTNER_SUBMERGED = 1,
+    ACTION_PARTNER_DIED,
+};
+
 struct boss_jormungarAI : public ScriptedAI
 {
     boss_jormungarAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -656,13 +662,17 @@ struct boss_jormungarAI : public ScriptedAI
     {
         switch (param)
         {
-            case -1:
+            case ACTION_PARTNER_SUBMERGED:
                 if (!Submerged)
                     events.RescheduleEvent(EVENT_SUBMERGE, 1500ms);
                 break;
-            case -2:
-                me->CastSpell(me, SPELL_ENRAGE, true);
-                Talk(EMOTE_ENRAGE);
+            case ACTION_PARTNER_DIED:
+                // Scheduler, not events: submerging and emerging reset the EventMap
+                scheduler.Schedule(2200ms, [this](TaskContext /*context*/)
+                {
+                    DoCastSelf(SPELL_ENRAGE, true);
+                    Talk(EMOTE_ENRAGE);
+                });
                 break;
         }
     }
@@ -733,6 +743,7 @@ struct boss_jormungarAI : public ScriptedAI
         if (!UpdateVictim())
             return;
 
+        scheduler.Update(diff);
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -761,7 +772,7 @@ struct boss_jormungarAI : public ScriptedAI
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if (pInstance)
                         if (Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(_TYPE_OTHER)))
-                            c->AI()->DoAction(-1);
+                            c->AI()->DoAction(ACTION_PARTNER_SUBMERGED);
 
                     events.Reset();
                     events.RescheduleEvent(EVENT_SUBMERGED, bIsStationary ? 2s : 750ms);
@@ -844,7 +855,7 @@ struct boss_jormungarAI : public ScriptedAI
         {
             if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(_TYPE_OTHER)))
                 if (c->IsAlive())
-                    c->AI()->DoAction(-2);
+                    c->AI()->DoAction(ACTION_PARTNER_DIED);
             pInstance->SetData(TYPE_JORMUNGAR, DONE);
         }
     }
@@ -852,6 +863,7 @@ struct boss_jormungarAI : public ScriptedAI
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
         events.Reset();
+        scheduler.CancelAll();
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         if (pInstance)
             pInstance->SetData(TYPE_FAILED, 1);

@@ -19,8 +19,11 @@
 #include "CommandScript.h"
 #include "GroupMgr.h"
 #include "Language.h"
+#include "Map.h"
 #include "Player.h"
+#include "PlayerCommand.h"
 #include "RBAC.h"
+#include <vector>
 
 using namespace Acore::ChatCommands;
 
@@ -39,7 +42,8 @@ public:
             { "disband", HandleGroupDisbandCommand, rbac::RBAC_PERM_COMMAND_GROUP_DISBAND, Console::No },
             { "revive",  HandleGroupReviveCommand,  rbac::RBAC_PERM_COMMAND_GROUP_REVIVE,  Console::No },
             { "leader",  HandleGroupLeaderCommand,  rbac::RBAC_PERM_COMMAND_GROUP_LEADER,  Console::No },
-            { "invites", HandleGroupInvitesCommand, rbac::RBAC_PERM_COMMAND_GROUP_INVITES, Console::No }
+            { "invites", HandleGroupInvitesCommand, rbac::RBAC_PERM_COMMAND_GROUP_INVITES, Console::No },
+            { "summon",  HandleGroupSummonCommand,  rbac::RBAC_PERM_COMMAND_GROUP_SUMMON,  Console::No }
         };
 
         static ChatCommandTable commandTable =
@@ -290,6 +294,59 @@ public:
                 target->SaveToDB(false, false);
             }
         }
+
+        return true;
+    }
+
+    static bool HandleGroupSummonCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target || !target->IsConnected())
+            return false;
+
+        Player* targetPlayer = target->GetConnectedPlayer();
+
+        // check online security
+        if (handler->HasLowerSecurity(targetPlayer))
+            return false;
+
+        // Inside a battleground or battlefield GetGroup() is its raid; the player's own party, if any, is the original group
+        Group* group = targetPlayer->GetOriginalGroup();
+        if (!group)
+        {
+            group = targetPlayer->GetGroup();
+            if (group && (group->isBGGroup() || group->isBFGroup()))
+                group = nullptr;
+        }
+
+        if (!group)
+        {
+            handler->SendErrorMessage(LANG_NOT_IN_GROUP, handler->GetNameLink(targetPlayer));
+            return false;
+        }
+
+        Player* summoner = handler->GetPlayer();
+        if (summoner->GetMap()->IsBattlegroundOrArena())
+        {
+            handler->SendErrorMessage(LANG_CANNOT_SUMMON_TO_BG);
+            return false;
+        }
+
+        // Teleporting a member out of a battleground unlinks their reference from this list, so collect first
+        std::vector<Player*> members;
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* player = itr->GetSource();
+            if (!player || player == summoner || !player->GetSession())
+                continue;
+
+            members.push_back(player);
+        }
+
+        for (Player* member : members)
+            Acore::PlayerCommand::SummonOnlinePlayer(handler, member);
 
         return true;
     }
