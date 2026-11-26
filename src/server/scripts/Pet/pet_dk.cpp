@@ -382,6 +382,18 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
             AttackStart(attacker);
     }
 
+    void OwnerCommandedPet(CommandStates command, Unit* target) override
+    {
+        if (command == COMMAND_FOLLOW)
+        {
+            me->AttackStop();
+            if (Unit* owner = me->GetOwner())
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+        }
+        else if (command == COMMAND_ATTACK && target && me->IsValidAttackTarget(target))
+            AttackStart(target);
+    }
+
     void UpdateAI(uint32 /*diff*/) override
     {
         if (!UpdateVictim())
