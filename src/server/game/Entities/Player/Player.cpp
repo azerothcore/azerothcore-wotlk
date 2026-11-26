@@ -19,10 +19,10 @@
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AreaDefines.h"
+#include "ArenaSeasonMgr.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
-#include "ArenaSeasonMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
@@ -30,10 +30,10 @@
 #include "BattlegroundAV.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
-#include "CharmInfo.h"
 #include "Channel.h"
 #include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
+#include "CharmInfo.h"
 #include "Chat.h"
 #include "CombatLogPackets.h"
 #include "Common.h"
@@ -3678,7 +3678,8 @@ bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)
 void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
 {
     // remove cooldowns on spells that have < 10 min CD
-    GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
+    SpellHistory::Clock::time_point const longCooldownEnd = GameTime::GetSystemTime() + 10min;
+    GetSpellHistory()->ResetCooldowns([longCooldownEnd](SpellHistory::CooldownStorageType::iterator itr) -> bool
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
         if (!spellInfo)
@@ -3689,6 +3690,10 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
 
         // cooldowns on hold start when their aura or summon ends
         if (itr->second.OnHold)
+            return false;
+
+        // script cooldowns carry no DBC or item durations, judge them by the time left
+        if (itr->second.CooldownEnd >= longCooldownEnd)
             return false;
 
         int32 cooldown = -1;

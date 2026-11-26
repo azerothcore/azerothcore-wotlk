@@ -470,9 +470,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     else
                         spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);
 
-                    if (!pet->GetSpellHistory()->HasCooldown(spellId))
-                        if (pet->ToPet())
-                            pet->ToPet()->GetSpellHistory()->ResetCooldown(spellId, true);
+                    if (!pet->GetSpellHistory()->HasCooldown(spellId) && pet->ToPet())
+                        GetPlayer()->SendClearCooldown(spellId, pet);
 
                     spell->finish(false);
                     delete spell;

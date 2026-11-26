@@ -17,8 +17,8 @@
 
 #include "SpellHistory.h"
 #include "ArenaSpectator.h"
-#include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "Item.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -575,12 +575,6 @@ bool SpellHistory::HasItemCooldown(uint32 spellId, uint32 itemId) const
     return itr != _spellCooldowns.end() && itr->second.ItemId == itemId && itr->second.CooldownEnd > GameTime::GetSystemTime();
 }
 
-bool SpellHistory::HasCooldownOnHold(uint32 spellId) const
-{
-    auto itr = _spellCooldowns.find(spellId);
-    return itr != _spellCooldowns.end() && itr->second.OnHold;
-}
-
 uint32 SpellHistory::GetRemainingCooldown(SpellInfo const* spellInfo) const
 {
     Clock::time_point end;
@@ -831,7 +825,9 @@ void SpellHistory::RestoreCooldownStateAfterDuel()
         // add all profession CDs created while in duel (if any)
         for (auto itr = _spellCooldowns.begin(); itr != _spellCooldowns.end(); ++itr)
         {
-            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            if (!spellInfo)
+                continue;
 
             if (spellInfo->RecoveryTime > 10 * MINUTE * IN_MILLISECONDS ||
                 spellInfo->CategoryRecoveryTime > 10 * MINUTE * IN_MILLISECONDS)

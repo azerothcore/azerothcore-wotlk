@@ -18,7 +18,6 @@
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "GameObject.h"
-#include "karazhan.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
@@ -28,6 +27,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
+#include "karazhan.h"
 
 enum Texts
 {

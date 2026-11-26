@@ -114,7 +114,6 @@ public:
     [[nodiscard]] bool HasCooldown(uint32 spellId, uint32 itemId = 0, bool ignoreCategoryCooldown = false) const;
     // True only when the spell's own cooldown was started by a use of this item
     [[nodiscard]] bool HasItemCooldown(uint32 spellId, uint32 itemId) const;
-    [[nodiscard]] bool HasCooldownOnHold(uint32 spellId) const;
     [[nodiscard]] uint32 GetRemainingCooldown(SpellInfo const* spellInfo) const;
     [[nodiscard]] uint32 GetRemainingCooldown(uint32 spellId) const;
 
