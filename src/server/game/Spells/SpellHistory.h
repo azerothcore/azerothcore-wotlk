@@ -49,7 +49,8 @@ public:
     };
 
     typedef std::unordered_map<uint32 /*spellId*/, CooldownEntry> CooldownStorageType;
-    typedef std::unordered_map<uint32 /*categoryId*/, CooldownEntry*> CategoryCooldownStorageType;
+    // Keyed by CategoryKey: unrelated spells share category ids across spell families and between item and spell sources
+    typedef std::unordered_map<uint64 /*CategoryKey*/, CooldownEntry*> CategoryCooldownStorageType;
     typedef std::unordered_map<uint32 /*categoryId*/, Clock::time_point> GlobalCooldownStorageType;
 
     explicit SpellHistory(Unit* owner) : _owner(owner), _schoolLockouts() { }
@@ -139,9 +140,13 @@ private:
     Player* GetPlayerOwner() const;
     void SendClearCooldowns(std::vector<int32> const& cooldowns) const;
     void SendCreatureCooldowns(SpellInfo const* spellInfo, uint32 categoryId) const;
+    [[nodiscard]] CooldownEntry const* GetBlockingCategoryCooldown(SpellInfo const* spellInfo, uint32 itemId) const;
+    static uint64 CategoryKey(uint32 categoryId, uint32 spellId, uint32 itemId);
+    void LinkCategoryCooldown(CooldownEntry& entry);
+    void UnlinkCategoryCooldown(CooldownEntry const& entry);
     CooldownStorageType::iterator EraseCooldown(CooldownStorageType::iterator itr)
     {
-        _categoryCooldowns.erase(itr->second.CategoryId);
+        UnlinkCategoryCooldown(itr->second);
         return _spellCooldowns.erase(itr);
     }
 

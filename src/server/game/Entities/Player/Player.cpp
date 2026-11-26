@@ -7543,7 +7543,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
             continue;
         }
 
-        if (GetSpellHistory()->HasCooldown(spellInfo->Id))
+        if (GetSpellHistory()->HasCooldown(spellInfo->Id, item->GetEntry()))
         {
             // Notify client so it can clean up the pending spell cast.
             // Without this the client orphans the cast and blocks auto-attack.
@@ -7594,7 +7594,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
                 continue;
             }
 
-            if (GetSpellHistory()->HasCooldown(spellInfo->Id))
+            if (GetSpellHistory()->HasCooldown(spellInfo->Id, item->GetEntry()))
             {
                 Spell::SendCastResult(ToPlayer(), spellInfo, cast_count,
                     SPELL_FAILED_NOT_READY);

@@ -1125,7 +1125,13 @@ public:
                 return false;
             }
 
-            target->GetSpellHistory()->ResetCooldown(spell.value()->Id, true);
+            // A shared category cooldown is held by whichever spell started it
+            uint32 const spellId = spell.value()->Id;
+            uint32 const category = spell.value()->GetCategory();
+            target->GetSpellHistory()->ResetCooldowns([spellId, category](SpellHistory::CooldownStorageType::iterator itr) -> bool
+            {
+                return itr->first == spellId || (category && itr->second.CategoryId == category);
+            }, true);
             handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spell.value()->Id, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink);
         }
         return true;

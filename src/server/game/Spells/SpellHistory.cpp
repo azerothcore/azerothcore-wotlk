@@ -106,9 +106,9 @@ void SpellHistory::LoadFromDB(PreparedQueryResult cooldownsResult)
             CooldownEntry cooldown;
             if (StatementInfo::ReadCooldown(cooldownsResult->Fetch(), &spellId, &cooldown))
             {
-                _spellCooldowns[spellId] = cooldown;
-                if (cooldown.CategoryId)
-                    _categoryCooldowns[cooldown.CategoryId] = &_spellCooldowns[spellId];
+                CooldownEntry& entry = _spellCooldowns[spellId];
+                entry = cooldown;
+                LinkCategoryCooldown(entry);
             }
         } while (cooldownsResult->NextRow());
     }
@@ -228,17 +228,10 @@ void SpellHistory::WritePacket<Pet>(WorldPacket& packet) const
             continue;
         }
 
+        // The own recovery outlasting the category one is sent too, as in WritePacket<Player>
         std::chrono::milliseconds categoryDuration = std::chrono::duration_cast<std::chrono::milliseconds>(spellCooldown.second.CategoryEnd - now);
-        if (categoryDuration.count() > 0)
-        {
-            packet << uint32(0);
-            packet << uint32(categoryDuration.count());
-        }
-        else
-        {
-            packet << uint32(cooldownDuration.count());
-            packet << uint32(0);
-        }
+        packet << uint32(cooldownDuration > categoryDuration ? cooldownDuration.count() : 0);
+        packet << uint32(categoryDuration.count() > 0 ? categoryDuration.count() : 0);
     }
 }
 
@@ -420,7 +413,7 @@ void SpellHistory::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId /
         uint32 category = spellInfo->GetCategory();
         GetCooldownDurations(spellInfo, itemId, nullptr, &category, nullptr);
 
-        auto categoryItr = _categoryCooldowns.find(category);
+        auto categoryItr = _categoryCooldowns.find(CategoryKey(category, spellInfo->Id, itemId));
         if (categoryItr != _categoryCooldowns.end() && categoryItr->second->SpellId != spellInfo->Id)
         {
             WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
@@ -446,6 +439,8 @@ void SpellHistory::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId /
 void SpellHistory::AddCooldown(uint32 spellId, uint32 itemId, Clock::time_point cooldownEnd, uint32 categoryId, Clock::time_point categoryEnd, bool onHold /*= false*/)
 {
     CooldownEntry& cooldownEntry = _spellCooldowns[spellId];
+    UnlinkCategoryCooldown(cooldownEntry);
+
     cooldownEntry.SpellId = spellId;
     cooldownEntry.CooldownEnd = cooldownEnd;
     cooldownEntry.ItemId = itemId;
@@ -454,8 +449,7 @@ void SpellHistory::AddCooldown(uint32 spellId, uint32 itemId, Clock::time_point 
     cooldownEntry.OnHold = onHold;
     cooldownEntry.SpectatorDuration = 0;
 
-    if (categoryId)
-        _categoryCooldowns[categoryId] = &cooldownEntry;
+    LinkCategoryCooldown(cooldownEntry);
 }
 
 void SpellHistory::AnnounceToSpectators(uint32 spellId, uint32 durationMs)
@@ -540,23 +534,44 @@ bool SpellHistory::HasCooldown(SpellInfo const* spellInfo, uint32 itemId /*= 0*/
     if (ignoreCategoryCooldown)
         return false;
 
+    CooldownEntry const* categoryEntry = GetBlockingCategoryCooldown(spellInfo, itemId);
+    return categoryEntry && categoryEntry->CategoryEnd > now;
+}
+
+SpellHistory::CooldownEntry const* SpellHistory::GetBlockingCategoryCooldown(SpellInfo const* spellInfo, uint32 itemId) const
+{
     uint32 category = 0;
     GetCooldownDurations(spellInfo, itemId, nullptr, &category, nullptr);
     if (!category)
-        return false;
+        return nullptr;
 
-    auto categoryItr = _categoryCooldowns.find(category);
-    if (categoryItr == _categoryCooldowns.end() || categoryItr->second->CategoryEnd <= now)
-        return false;
+    auto categoryItr = _categoryCooldowns.find(CategoryKey(category, spellInfo->Id, itemId));
+    return categoryItr != _categoryCooldowns.end() ? categoryItr->second : nullptr;
+}
 
-    // Item and spell categories share ids, and unrelated spells share categories across spell families
-    // (Flamestrike rank 1 and engineering explosives): only same-source, same-family spells block each other
-    CooldownEntry const* categoryEntry = categoryItr->second;
-    if ((categoryEntry->ItemId != 0) != (itemId != 0))
-        return false;
+uint64 SpellHistory::CategoryKey(uint32 categoryId, uint32 spellId, uint32 itemId)
+{
+    // Only spells of the same source (item or spell) and spell family block each other
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    uint32 familyName = spellInfo ? spellInfo->SpellFamilyName : 0;
+    return (uint64(categoryId) << 32) | (uint64(itemId != 0) << 31) | familyName;
+}
 
-    SpellInfo const* categorySpellInfo = sSpellMgr->GetSpellInfo(categoryEntry->SpellId);
-    return categorySpellInfo && categorySpellInfo->SpellFamilyName == spellInfo->SpellFamilyName;
+void SpellHistory::LinkCategoryCooldown(CooldownEntry& entry)
+{
+    if (entry.CategoryId)
+        _categoryCooldowns[CategoryKey(entry.CategoryId, entry.SpellId, entry.ItemId)] = &entry;
+}
+
+void SpellHistory::UnlinkCategoryCooldown(CooldownEntry const& entry)
+{
+    if (!entry.CategoryId)
+        return;
+
+    // Another spell may hold the category by now
+    auto categoryItr = _categoryCooldowns.find(CategoryKey(entry.CategoryId, entry.SpellId, entry.ItemId));
+    if (categoryItr != _categoryCooldowns.end() && categoryItr->second == &entry)
+        _categoryCooldowns.erase(categoryItr);
 }
 
 bool SpellHistory::HasCooldown(uint32 spellId, uint32 itemId /*= 0*/, bool ignoreCategoryCooldown /*= false*/) const
@@ -581,14 +596,10 @@ uint32 SpellHistory::GetRemainingCooldown(SpellInfo const* spellInfo) const
     auto itr = _spellCooldowns.find(spellInfo->Id);
     if (itr != _spellCooldowns.end())
         end = itr->second.CooldownEnd;
+    else if (CooldownEntry const* categoryEntry = GetBlockingCategoryCooldown(spellInfo, 0))
+        end = categoryEntry->CategoryEnd;
     else
-    {
-        auto catItr = _categoryCooldowns.find(spellInfo->GetCategory());
-        if (catItr == _categoryCooldowns.end())
-            return 0;
-
-        end = catItr->second->CategoryEnd;
-    }
+        return 0;
 
     Clock::time_point now = GameTime::GetSystemTime();
     if (end < now)
@@ -837,8 +848,16 @@ void SpellHistory::RestoreCooldownStateAfterDuel()
         // check for spell with onHold active before and during the duel
         for (auto itr = _spellCooldownsBeforeDuel.begin(); itr != _spellCooldownsBeforeDuel.end(); ++itr)
         {
-            if (!itr->second.OnHold && !_spellCooldowns[itr->first].OnHold)
-                _spellCooldowns[itr->first] = _spellCooldownsBeforeDuel[itr->first];
+            if (itr->second.OnHold)
+                continue;
+
+            CooldownEntry& entry = _spellCooldowns[itr->first];
+            if (entry.OnHold)
+                continue;
+
+            UnlinkCategoryCooldown(entry);
+            entry = itr->second;
+            LinkCategoryCooldown(entry);
         }
 
         // update the client: restore old cooldowns
