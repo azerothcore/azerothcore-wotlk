@@ -47,6 +47,7 @@
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
 #include "Transport.h"
@@ -1113,7 +1114,7 @@ public:
 
         if (!spell)
         {
-            target->RemoveAllSpellCooldown();
+            target->GetSpellHistory()->ResetAllCooldowns();
             handler->PSendSysMessage(LANG_REMOVEALL_COOLDOWN, nameLink);
         }
         else
@@ -1124,7 +1125,7 @@ public:
                 return false;
             }
 
-            target->RemoveSpellCooldown(spell.value()->Id, true);
+            target->GetSpellHistory()->ResetCooldown(spell.value()->Id, true);
             handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spell.value()->Id, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink);
         }
         return true;

@@ -34,6 +34,7 @@
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "Unit.h"
 #include "Util.h"
@@ -1450,14 +1451,14 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
         if (spellId)
         {
             if (player)
-                player->RemoveSpellCooldown(spellId);
+                player->GetSpellHistory()->ResetCooldown(spellId);
             target->CastSpell(target, spellId, true, nullptr, this, target->GetGUID());
         }
 
         if (spellId2)
         {
             if (player)
-                player->RemoveSpellCooldown(spellId2);
+                player->GetSpellHistory()->ResetCooldown(spellId2);
             target->CastSpell(target, spellId2, true, nullptr, this, target->GetGUID());
         }
 

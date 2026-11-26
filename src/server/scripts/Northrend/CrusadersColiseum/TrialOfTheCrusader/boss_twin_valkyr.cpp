@@ -19,6 +19,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -355,7 +356,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 {
                     uint32 const touchId = me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH;
                     // Creature Special 2 Dummy Cooldown shares the Touch spell category
-                    if (uint32 cooldown = me->GetSpellCooldown(touchId))
+                    if (uint32 cooldown = me->GetSpellHistory()->GetRemainingCooldown(touchId))
                     {
                         events.Repeat(Milliseconds(cooldown));
                         break;
@@ -914,7 +915,7 @@ class spell_valkyr_special_2_dummy_cooldown : public SpellScript
     // Creature casts start no cooldowns on their own; this one's category cooldown locks Touch of Light/Darkness
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        GetCaster()->AddSpellCooldown(GetSpellInfo()->Id, 0, 0);
+        GetCaster()->GetSpellHistory()->StartCooldown(GetSpellInfo(), 0);
     }
 
     void Register() override

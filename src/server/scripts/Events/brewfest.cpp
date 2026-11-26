@@ -31,6 +31,7 @@
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
@@ -102,7 +103,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
                 player->DestroyItemCount(ITEM_PORTABLE_BREWFEST_KEG, 1, true);
 
                 // Additional Work
-                uint32 spellCooldown = player->GetSpellCooldownDelay(SPELL_COOLDOWN_CHECKER) / IN_MILLISECONDS;
+                uint32 spellCooldown = player->GetSpellHistory()->GetRemainingCooldown(SPELL_COOLDOWN_CHECKER) / IN_MILLISECONDS;
                 if (spellCooldown > (HOUR * 18 - 900)) // max aproximated time - 12 minutes
                 {
                     if (Aura* aur = player->GetAura(SPELL_RAM_AURA))
@@ -124,7 +125,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
         if (uiSender == GOSSIP_NEIL || uiSender == GOSSIP_RAY)
         {
             player->CastSpell(player, SPELL_COOLDOWN_CHECKER, true);
-            player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18 * HOUR * IN_MILLISECONDS);
+            player->GetSpellHistory()->AddCooldown(SPELL_COOLDOWN_CHECKER, 0, 18h);
         }
 
         if (uiAction != 4)

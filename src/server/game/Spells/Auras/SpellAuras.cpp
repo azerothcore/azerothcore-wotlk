@@ -28,6 +28,7 @@
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Unit.h"
@@ -457,16 +458,7 @@ void Aura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication* auraApp)
 
     // set infinity cooldown state for spells
     if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid && caster)
-    {
-        if (caster->IsPlayer())
-        {
-            caster->ToPlayer()->AddSpellAndCategoryCooldowns(m_spellInfo, 0, nullptr, true);
-        }
-        else
-        {
-            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, infinityCooldownDelay);
-        }
-    }
+        caster->GetSpellHistory()->StartCooldown(m_spellInfo, 0, nullptr, true);
 }
 
 void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraApp)
@@ -492,41 +484,9 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
     m_removedApplications.push_back(auraApp);
 
     // reset cooldown state for spells
+    // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
     if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid && caster)
-    {
-        if (caster->IsPlayer())
-        {
-            // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
-            caster->ToPlayer()->SendCooldownEvent(GetSpellInfo());
-        }
-        else
-        {
-            Creature* creatureCaster = caster->ToCreature();
-            // Drop the infinite cooldown set on apply, a longer running cooldown would otherwise be kept
-            creatureCaster->RemoveSpellCooldown(m_spellInfo->Id, false);
-            creatureCaster->AddSpellCooldown(m_spellInfo->Id, 0, 0);
-
-            if (Unit* owner = caster->GetCharmerOrOwner())
-            {
-                if (Player* playerOwner = owner->ToPlayer())
-                {
-                    WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
-                    data << uint32(m_spellInfo->Id);
-                    data << caster->GetGUID();
-                    playerOwner->SendDirectMessage(&data);
-                }
-            }
-        }
-    }
-
-    if (caster && caster->IsPlayer())
-    {
-        if (GetSpellInfo()->IsCooldownStartedOnEvent() && !m_castItemGuid)
-        {
-            // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
-            caster->ToPlayer()->SendCooldownEvent(GetSpellInfo());
-        }
-    }
+        caster->GetSpellHistory()->SendCooldownEvent(GetSpellInfo());
 }
 
 // removes aura from all targets
@@ -1437,7 +1397,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                     case 60970: // Heroic Fury (remove Intercept cooldown)
                         if (target->IsPlayer())
-                            target->ToPlayer()->RemoveSpellCooldown(20252, true);
+                            target->ToPlayer()->GetSpellHistory()->ResetCooldown(20252, true);
                         break;
                 }
                 break;
@@ -1779,15 +1739,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // check cooldown
                         if (caster->IsPlayer())
                         {
-                            if (caster->ToPlayer()->HasSpellCooldown(aura->GetId()))
+                            if (caster->GetSpellHistory()->HasCooldown(aura->GetId()))
                             {
                                 // This additional check is needed to add a minimal delay before cooldown in in effect
                                 // to allow all bubbles broken by a single damage source proc mana return
-                                if (caster->ToPlayer()->GetSpellCooldownDelay(aura->GetId()) <= 11500)
+                                if (caster->GetSpellHistory()->GetRemainingCooldown(aura->GetSpellInfo()) <= 11500)
                                     break;
                             }
                             else    // and add if needed
-                                caster->ToPlayer()->AddSpellCooldown(aura->GetId(), 0, 12 * IN_MILLISECONDS);
+                                caster->GetSpellHistory()->AddCooldown(aura->GetId(), 0, 12s);
                         }
 
                         // effect on caster
@@ -1847,10 +1807,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Glyph of Guardian Spirit
                         if (AuraEffect* aurEff = player->GetAuraEffect(63231, 0))
                         {
-                            if (!player->HasSpellCooldown(47788))
+                            if (!player->GetSpellHistory()->HasCooldown(47788))
                                 break;
 
-                            player->AddSpellCooldown(GetSpellInfo()->Id, 0, aurEff->GetAmount()*IN_MILLISECONDS);
+                            player->GetSpellHistory()->AddCooldown(GetSpellInfo()->Id, 0, std::chrono::seconds(aurEff->GetAmount()));
 
                             WorldPacket data(SMSG_MODIFY_COOLDOWN, 4 + 8 + 4);
                             data << uint32(GetId());                  // Spell ID

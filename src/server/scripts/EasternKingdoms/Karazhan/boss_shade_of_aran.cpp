@@ -18,15 +18,16 @@
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "GameObject.h"
+#include "karazhan.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
-#include "karazhan.h"
-#include "SpellMgr.h"
 
 enum Texts
 {
@@ -312,7 +313,7 @@ struct boss_shade_of_aran : public BossAI
         {
             if (!_drinking)
             {
-                me->ClearProhibitedSpellTimers();
+                me->GetSpellHistory()->ResetSchoolLockouts();
 
                 DoCastSelf(SPELL_BLINK_CENTER, true);
 

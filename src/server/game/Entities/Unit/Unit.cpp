@@ -43,9 +43,9 @@
 #include "Group.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "MovementGenerator.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
-#include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
@@ -61,6 +61,7 @@
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
@@ -451,6 +452,8 @@ Unit::Unit() : WorldObject(),
     _isCombatDisallowed = false;
 
     _lastExtraAttackSpell = 0;
+
+    _spellHistory = new SpellHistory(this);
 }
 
 ////////////////////////////////////////////////////////////
@@ -478,6 +481,7 @@ Unit::~Unit()
     delete i_motionMaster;
     delete m_charmInfo;
     delete movespline;
+    delete _spellHistory;
 
     ASSERT(!m_duringRemoveFromWorld);
     ASSERT(!m_attacking);
@@ -546,6 +550,7 @@ void Unit::Update(uint32 p_time)
     }
 
     _UpdateSpells( p_time );
+    _spellHistory->Update();
 
     // update combat timer only for players and pets (only pets with PetAI)
     if (IsInCombat() && (IsPlayer() || ((IsPet() || HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN)) && IsControlledByPlayer())))
@@ -6394,7 +6399,7 @@ void Unit::AddGameObject(GameObject* gameObj)
         // Need disable spell use for owner
         if (createBySpell && createBySpell->IsCooldownStartedOnEvent())
             // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existing cases)
-            ToPlayer()->AddSpellAndCategoryCooldowns(createBySpell, 0, nullptr, true);
+            GetSpellHistory()->StartCooldown(createBySpell, 0, nullptr, true);
     }
 }
 
@@ -6425,7 +6430,7 @@ void Unit::RemoveGameObject(GameObject* gameObj, bool del)
             // Need activate spell use for owner
             if (createBySpell && createBySpell->IsCooldownStartedOnEvent())
                 // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existing cases)
-                ToPlayer()->SendCooldownEvent(createBySpell);
+                GetSpellHistory()->SendCooldownEvent(createBySpell);
         }
     }
 
@@ -7689,7 +7694,7 @@ void Unit::SetMinion(Minion* minion, bool apply)
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(minion->GetUInt32Value(UNIT_CREATED_BY_SPELL));
 
             if (spellInfo && spellInfo->IsCooldownStartedOnEvent())
-                ToPlayer()->AddSpellAndCategoryCooldowns(spellInfo, 0, nullptr, true);
+                GetSpellHistory()->StartCooldown(spellInfo, 0, nullptr, true);
         }
     }
     else
@@ -7733,7 +7738,7 @@ void Unit::SetMinion(Minion* minion, bool apply)
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(minion->GetUInt32Value(UNIT_CREATED_BY_SPELL));
             // Remove infinity cooldown
             if (spellInfo && spellInfo->IsCooldownStartedOnEvent())
-                ToPlayer()->SendCooldownEvent(spellInfo);
+                GetSpellHistory()->SendCooldownEvent(spellInfo);
 
             // xinef: clear spell book
             if (m_Controlled.empty())

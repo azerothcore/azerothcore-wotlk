@@ -17,6 +17,7 @@
 
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -661,7 +662,7 @@ class spell_warr_sweeping_strikes : public AuraScript
                     return false;
                 case SPELL_WARRIOR_WHIRLWIND_MAIN:
                 {
-                    if (actor->HasSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1))
+                    if (actor->GetSpellHistory()->HasCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1))
                         return false;
 
                     break;
@@ -698,7 +699,7 @@ class spell_warr_sweeping_strikes : public AuraScript
             else
             {
                 if (spellInfo && spellInfo->Id == SPELL_WARRIOR_WHIRLWIND_MAIN)
-                    eventInfo.GetActor()->AddSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, 0, 500);
+                    eventInfo.GetActor()->GetSpellHistory()->AddCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, 0, 500ms);
 
                 auto damage = static_cast<int32>(damageInfo->GetUnmitigatedDamage());
                 GetTarget()->CastCustomSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1,
@@ -836,7 +837,7 @@ class spell_warr_vigilance_trigger : public SpellScript
 
         // Remove Taunt cooldown
         if (Player* target = GetHitPlayer())
-            target->RemoveSpellCooldown(SPELL_WARRIOR_TAUNT, true);
+            target->GetSpellHistory()->ResetCooldown(SPELL_WARRIOR_TAUNT, true);
     }
 
     void Register() override
@@ -1167,9 +1168,12 @@ class spell_warr_sword_and_board : public AuraScript
 
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
-        Unit* caster = GetTarget();
-        if (caster->IsPlayer())
-            caster->ToPlayer()->RemoveCategoryCooldown(1209); // Shield Slam category
+        // Shield Slam category
+        GetTarget()->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            return itr->second.CategoryId == 1209 || (spellInfo && spellInfo->GetCategory() == 1209);
+        }, true);
     }
 
     void Register() override

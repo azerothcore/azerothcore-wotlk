@@ -24,6 +24,7 @@
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -2686,11 +2687,11 @@ class spell_yogg_saron_protective_gaze_aura : public AuraScript
     void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
         Unit* target = GetTarget();
-        if (dmgInfo.GetDamage() < target->GetHealth() || !GetCaster() || GetCaster()->ToCreature()->HasSpellCooldown(SPELL_HODIR_FLASH_FREEZE))
+        if (dmgInfo.GetDamage() < target->GetHealth() || !GetCaster() || GetCaster()->ToCreature()->GetSpellHistory()->HasCooldown(SPELL_HODIR_FLASH_FREEZE))
             return;
 
         target->CastSpell(target, SPELL_HODIR_FLASH_FREEZE, true);
-        GetCaster()->AddSpellCooldown(SPELL_HODIR_FLASH_FREEZE, 0, 0);
+        GetCaster()->GetSpellHistory()->StartCooldown(sSpellMgr->AssertSpellInfo(SPELL_HODIR_FLASH_FREEZE), 0);
         absorbAmount = dmgInfo.GetDamage();
     }
 

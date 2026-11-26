@@ -24,6 +24,7 @@
 #include "ScriptedCreature.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -3548,7 +3549,7 @@ class spell_item_rocket_boots : public SpellScript
         if (Battleground* bg = caster->GetBattleground())
             bg->EventPlayerDroppedFlag(caster);
 
-        caster->RemoveSpellCooldown(SPELL_ROCKET_BOOTS_PROC);
+        caster->GetSpellHistory()->ResetCooldown(SPELL_ROCKET_BOOTS_PROC);
         caster->CastSpell(caster, SPELL_ROCKET_BOOTS_PROC, true, nullptr);
     }
 
@@ -3742,7 +3743,11 @@ class spell_item_refocus : public SpellScript
         if (!caster || !caster->IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY))
             return;
 
-        caster->RemoveCategoryCooldown(SPELL_CATEGORY_AIMED_MULTI);
+        caster->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            return itr->second.CategoryId == SPELL_CATEGORY_AIMED_MULTI || (spellInfo && spellInfo->GetCategory() == SPELL_CATEGORY_AIMED_MULTI);
+        }, true);
     }
 
     void Register() override

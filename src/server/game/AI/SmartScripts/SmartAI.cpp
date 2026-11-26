@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
@@ -1401,7 +1402,7 @@ void SmartAI::DistancingEnded()
 
 bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
 {
-    if (me->IsSpellProhibited(spellInfo->GetSchoolMask()))
+    if (me->GetSpellHistory()->IsSchoolLocked(spellInfo->GetSchoolMask()))
         return true;
 
     if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
