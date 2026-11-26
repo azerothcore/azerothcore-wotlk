@@ -410,19 +410,17 @@ void SpellHistory::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId /
     // Send activate cooldown timer (possible 0) at client side
     if (Player* player = GetPlayerOwner())
     {
-        uint32 category = spellInfo->GetCategory();
-        GetCooldownDurations(spellInfo, itemId, nullptr, &category, nullptr);
-
-        auto categoryItr = _categoryCooldowns.find(CategoryKey(category, spellInfo->Id, itemId));
-        if (categoryItr != _categoryCooldowns.end() && categoryItr->second->SpellId != spellInfo->Id)
+        CooldownEntry const* categoryEntry = GetBlockingCategoryCooldown(spellInfo, itemId);
+        if (categoryEntry && categoryEntry->SpellId != spellInfo->Id)
         {
+            uint32 const categorySpellId = categoryEntry->SpellId;
             WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
-            data << uint32(categoryItr->second->SpellId);
+            data << uint32(categorySpellId);
             data << _owner->GetGUID();
             player->SendDirectMessage(&data);
 
             if (startCooldown)
-                StartCooldown(sSpellMgr->AssertSpellInfo(categoryItr->second->SpellId), itemId, spell);
+                StartCooldown(sSpellMgr->AssertSpellInfo(categorySpellId), itemId, spell);
         }
 
         WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
@@ -590,13 +588,13 @@ bool SpellHistory::HasItemCooldown(uint32 spellId, uint32 itemId) const
     return itr != _spellCooldowns.end() && itr->second.ItemId == itemId && itr->second.CooldownEnd > GameTime::GetSystemTime();
 }
 
-uint32 SpellHistory::GetRemainingCooldown(SpellInfo const* spellInfo) const
+uint32 SpellHistory::GetRemainingCooldown(SpellInfo const* spellInfo, uint32 itemId /*= 0*/) const
 {
     Clock::time_point end;
     auto itr = _spellCooldowns.find(spellInfo->Id);
     if (itr != _spellCooldowns.end())
         end = itr->second.CooldownEnd;
-    else if (CooldownEntry const* categoryEntry = GetBlockingCategoryCooldown(spellInfo, 0))
+    else if (CooldownEntry const* categoryEntry = GetBlockingCategoryCooldown(spellInfo, itemId))
         end = categoryEntry->CategoryEnd;
     else
         return 0;

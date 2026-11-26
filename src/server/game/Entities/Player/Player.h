@@ -1066,9 +1066,10 @@ struct PendingSpellCastRequest
     WorldPacket requestPacket;
     bool isItem = false;
     bool cancelInProgress = false;
+    uint32 ItemEntry = 0;
 
-    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false)
-        : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel) {}
+    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false, uint32 itemEntry = 0)
+        : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel), ItemEntry(itemEntry) {}
 };
 
 class Player : public Unit, public GridObject<Player>
@@ -2671,9 +2672,9 @@ protected:
 public:
     std::deque<PendingSpellCastRequest> SpellQueue;
     PendingSpellCastRequest const* GetCastRequest(uint32 category) const;
-    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
+    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, uint32 itemEntry = 0);
     void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
-    bool CanRequestSpellCast(SpellInfo const* spellInfo);
+    bool CanRequestSpellCast(SpellInfo const* spellInfo, uint32 itemEntry = 0);
 
 protected:
     Unit* SelectCharmedAIGroupTarget(float distance) const;

@@ -2374,12 +2374,12 @@ uint32 Player::GetSpellQueueWindow() const
     return sWorld->getIntConfig(CONFIG_SPELL_QUEUE_WINDOW);
 }
 
-bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
+bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, uint32 itemEntry /*= 0*/)
 {
     if (GetSpellHistory()->HasGlobalCooldown(spellInfo))
         return false;
 
-    if (GetSpellHistory()->GetRemainingCooldown(spellInfo) > GetSpellQueueWindow())
+    if (GetSpellHistory()->GetRemainingCooldown(spellInfo, itemEntry) > GetSpellQueueWindow())
         return false;
 
     for (CurrentSpellTypes spellSlot : {CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL})
@@ -2400,7 +2400,7 @@ PendingSpellCastRequest const* Player::GetCastRequest(uint32 category) const
     return nullptr;
 }
 
-bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
+bool Player::CanRequestSpellCast(SpellInfo const* spellInfo, uint32 itemEntry /*= 0*/)
 {
     if (!sWorld->getBoolConfig(CONFIG_SPELL_QUEUE_ENABLED))
         return false;
@@ -2412,7 +2412,7 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
     if (GetSpellHistory()->GetRemainingGlobalCooldown(spellInfo) > GetSpellQueueWindow())
         return false;
 
-    if (GetSpellHistory()->GetRemainingCooldown(spellInfo) > GetSpellQueueWindow())
+    if (GetSpellHistory()->GetRemainingCooldown(spellInfo, itemEntry) > GetSpellQueueWindow())
         return false;
 
     // If there is an existing cast that will last longer than the allowable
@@ -2451,7 +2451,7 @@ void Player::ProcessSpellQueue()
             SpellQueue.clear();
             break;
         }
-        if (CanExecutePendingSpellCastRequest(spellInfo))
+        if (CanExecutePendingSpellCastRequest(spellInfo, request.ItemEntry))
         {
             ExecuteOrCancelSpellCastRequest(&request);
 
