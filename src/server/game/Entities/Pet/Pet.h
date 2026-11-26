@@ -19,6 +19,7 @@
 #define AZEROTHCORE_PET_H
 
 #include "CharmInfo.h"
+#include "DatabaseEnvFwd.h"
 #include "PetDefines.h"
 #include "TemporarySummon.h"
 
@@ -36,6 +37,16 @@ typedef std::unordered_map<uint32, PetSpell> PetSpellMap;
 typedef std::vector<uint32> AutoSpellList;
 
 class Player;
+
+/// True when the summon's SummonProperties row carries SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST.
+bool SummonSavesPetAutocast(Unit const* summon);
+
+/// Overwrites the summon's default autocast state with the one its owner last chose.
+void ApplySavedPetAutocast(Player* owner, Unit* summon);
+
+/// Records the autocast state the summon currently has, so the next summon of the same creature restores it.
+/// Called before the summon leaves the world: the state the player chose has to outlive the summon itself.
+void SavePetAutocast(Player* owner, Unit* summon);
 
 class Pet : public Guardian
 {
