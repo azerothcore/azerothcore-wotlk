@@ -658,6 +658,8 @@ struct npc_anubarak_spike : public ScriptedAI
                 target->RemoveAura(SPELL_MARK);
             _targetGUID.Clear();
             RemoveSpeedAuras();
+            me->GetMotionMaster()->Clear();
+            me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
             events.Reset();
             events.RescheduleEvent(EVENT_SPIKE_RESUME, 4s);
@@ -688,6 +690,8 @@ struct npc_anubarak_spike : public ScriptedAI
                 target->RemoveAura(SPELL_MARK);
         _targetGUID.Clear();
         me->AttackStop();
+        me->GetMotionMaster()->Clear();
+        me->StopMoving();
         me->GetMotionMaster()->MoveIdle();
         DoZoneInCombat();
         if (!next)
