@@ -953,6 +953,8 @@ class spell_mage_summon_water_elemental : public SpellScript
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(31707);
                 pet->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, true);
                 pet->GetCharmInfo()->SetSpellAutocast(spellInfo, true);
+                // the forced state above is the default the elemental always arrives with; a remembered off wins
+                ApplySavedPetAutocast(caster->ToPlayer(), pet);
                 caster->ToPlayer()->CharmSpellInitialize();
             }
     }

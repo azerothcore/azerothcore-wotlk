@@ -734,7 +734,7 @@ class spell_blood_queen_frenzied_bloodthirst_aura : public AuraScript
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-            if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+            if (Creature* bloodQueen = instance->GetCreature(DATA_BLOOD_QUEEN_LANA_THEL))
                 bloodQueen->AI()->Talk(EMOTE_BLOODTHIRST, GetTarget());
     }
 
@@ -743,7 +743,7 @@ class spell_blood_queen_frenzied_bloodthirst_aura : public AuraScript
         Unit* target = GetTarget();
         if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+                if (Creature* bloodQueen = instance->GetCreature(DATA_BLOOD_QUEEN_LANA_THEL))
                     if (bloodQueen->IsAlive() && bloodQueen->IsInCombat())
                     {
                         // this needs to be done BEFORE charm aura or we hit an assert in Unit::SetCharmedBy
@@ -851,7 +851,7 @@ class spell_blood_queen_vampiric_bite : public SpellScript
         }
 
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-            if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+            if (Creature* bloodQueen = instance->GetCreature(DATA_BLOOD_QUEEN_LANA_THEL))
                 bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
     }
 

@@ -1587,7 +1587,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_PLAYER_WITH_AURA               = 201,  // spellId, negation, MaxDist, MinDist, set target.o to a number to random resize the list
     SMART_TARGET_RANDOM_POINT                   = 202,  // range, amount (for summoning creature), self als middle (0/1) else use xyz
     SMART_TARGET_ROLE_SELECTION                 = 203,  // Range Max, TargetMask (Tanks (1), Healer (2) Damage (4)), resize list
-    SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry
+    SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry, livingState (0 - both, 1 - alive, 2 - dead)
     SMART_TARGET_INSTANCE_STORAGE               = 205,  // Instance data index, Type (creature (1), gameobject (2))
     SMART_TARGET_FORMATION                      = 206,  // Type (0: members only, 1: leader only, 2: all), CreatureEntry (0: any), ExcludeSelf (0/1)
     SMART_TARGET_SHARED_OWNER_ENTITIES          = 207,  // Type (creature (1), gameobject (2)), Entry (0: any), MaxDist (0: visibility range)
@@ -1753,6 +1753,7 @@ struct SmartTarget
         struct
         {
             uint32 entry;
+            uint32 livingState;
         } summonedCreatures;
 
         struct

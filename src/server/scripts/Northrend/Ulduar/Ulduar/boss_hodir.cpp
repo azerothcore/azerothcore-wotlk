@@ -18,11 +18,13 @@
 #include "AchievementCriteriaScript.h"
 #include "AreaDefines.h"
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
@@ -260,7 +262,7 @@ struct boss_hodir : public BossAI
     // respawning: the point at which a Rare Cache shattered on that attempt comes back too.
     void JustRespawned() override
     {
-        instance->SetData(TYPE_HODIR_HM_RESET, 0);
+        instance->SetData(DATA_HODIR_HM_RESET, 0);
     }
 
     void JustEngagedWith(Unit*  /*who*/) override
@@ -460,7 +462,7 @@ struct boss_hodir : public BossAI
         if (spellInfo->Id == SPELL_TELEPORT)
         {
             me->DespawnOrUnsummon();
-            instance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+            instance->SetData(DATA_KEEPER_TELEPORTED, DONE);
         }
     }
 
