@@ -91,19 +91,6 @@ struct boss_the_lurker_below : public BossAI
         me->DespawnOrUnsummon(2s);
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
-    {
-        if (damage >= me->GetHealth())
-        {
-            // Liquid state around his area is working awkwardly and doesn't consider him to be swimming
-            // Therefore he falls to the bottom of the lake when he dies, because he is "flying" in his pool
-            // Removing this prevents him from dropping to the bottom of the lake
-            // There is also a visual issue currently causing him to drop to the bottom of the lake but his body not update clientside
-            // So it looks as if he was floating but he has in fact dropped to the bottom of the lake, and thus becomes unlootable
-            me->SetDisableGravity(false);
-        }
-    }
-
     void DoAction(int32 action) override
     {
         if (action == ACTION_START_EVENT)
