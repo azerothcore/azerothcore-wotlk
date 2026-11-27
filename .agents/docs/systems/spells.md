@@ -22,6 +22,9 @@ change to it:
 - Drop one guid from a target list with `targets.remove_if(Acore::ObjectGUIDCheck(guid, true))`.
 - A random summon point landing inside geometry: an `OnDestinationTargetSelect` Z-fix taking the height from above
   (`GetMapHeight(x, y, casterZ + margin)`), not pathfinding retries (e.g. `spell_xt002_recharge_robot`).
+- A spell that selects its own unit (implicit target such as `TARGET_UNIT_NEARBY_ENTRY`, narrowed by
+  `conditions`) needs no explicit target: `Spell::InitExplicitTargets` drops a unit target when
+  `GetExplicitTargetMask()` carries no unit flag, so `DoCast(unit, spell)` behaves as `DoCastSelf(spell)`.
 
 ## Summons
 
