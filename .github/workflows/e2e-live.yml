@@ -394,8 +394,10 @@ jobs:
             timeout="30m"
           fi
 
+          # Copy kept for the "Summarize failed tests" step; pipefail keeps go test's exit code.
           run_go_test() {
-            go test -tags=e2e -count="${count}" -timeout="${timeout}" -parallel="${parallel}" -p "${p}" -v "$@"
+            go test -tags=e2e -count="${count}" -timeout="${timeout}" -parallel="${parallel}" -p "${p}" -v "$@" 2>&1 \
+              | tee -a "${RUNNER_TEMP}/go-test.log"
           }
 
           if [[ "${scope}" == "smoke" ]]; then
@@ -438,6 +440,30 @@ jobs:
                 ;;
             esac
           fi
+
+      # Lists failures on the run summary page so they don't have to be found in the -v log.
+      - name: Summarize failed tests
+        if: failure()
+        env:
+          E2E_SHARD: ${{ matrix.shard }}
+        run: |
+          log="${RUNNER_TEMP}/go-test.log"
+          [[ -f "${log}" ]] || exit 0
+          fails="$(grep -E '^\s*--- FAIL: |^FAIL\s|^panic: ' "${log}" || true)"
+          [[ -n "${fails}" ]] || exit 0
+          echo "${fails}"
+          {
+            echo "### Failed e2e tests (${E2E_SHARD})"
+            echo '```'
+            echo "${fails}"
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
+          # One annotation per leaf test: a parent whose subtest failed is skipped.
+          grep -oE '^\s*--- FAIL: \S+' "${log}" | sed -E 's/^\s*--- FAIL: //' | sort -u \
+            | awk '{ n[NR] = $0 } END { for (i = 1; i <= NR; i++) { leaf = 1
+                for (j = 1; j <= NR; j++) if (index(n[j], n[i] "/") == 1) { leaf = 0; break }
+                if (leaf) print n[i] } }' \
+            | while read -r t; do echo "::error title=e2e failed (${E2E_SHARD})::${t}"; done
 
       - name: Stop servers
         if: always()
