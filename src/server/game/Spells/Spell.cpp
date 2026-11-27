@@ -674,7 +674,7 @@ Spell::Spell(WorldObject* caster, SpellInfo const* info, TriggerCastFlags trigge
     m_spellState = SPELL_STATE_NULL;
     _triggeredCastFlags = triggerFlags;
     if (info->HasAttribute(SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING))
-        _triggeredCastFlags = TriggerCastFlags(uint32(_triggeredCastFlags) | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY);
+        _triggeredCastFlags = TriggerCastFlags(uint32(_triggeredCastFlags) | TRIGGERED_IGNORE_CAST_IN_PROGRESS);
 
     m_CastItem = nullptr;
 
@@ -3798,9 +3798,16 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         cast(true);
     else
     {
+        //item: first cast may destroy item and second cast causes crash
+        // xinef: removed !m_spellInfo->StartRecoveryTime
+        // second los check failed in events
+        // xinef: removed itemguid check, currently there is no such item in database
+        bool willCastDirectly = !m_casttime && /*!m_castItemGUID &&*/ GetCurrentContainer() == CURRENT_GENERIC_SPELL;
+
         // stealth must be removed at cast starting (at show channel bar)
         // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
-        if (unitCaster && !HasTriggeredCastFlag(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
+        // and spells cast alongside a cast in progress
+        if (unitCaster && !HasTriggeredCastFlag(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && !HasTriggeredCastFlag(TRIGGERED_IGNORE_CAST_IN_PROGRESS) && m_spellInfo->IsBreakingStealth())
         {
             // Farsight spells exception
             uint32 exceptSpellId = 0;
@@ -3813,7 +3820,9 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             unitCaster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK, exceptSpellId, m_spellInfo->Id == 75);
         }
 
-        if (unitCaster)
+        // An instant spell ignoring the cast in progress must not take that cast's container,
+        // SetCurrentCastedSpell would interrupt it
+        if (unitCaster && (!willCastDirectly || !HasTriggeredCastFlag(TRIGGERED_IGNORE_CAST_IN_PROGRESS)))
             unitCaster->SetCurrentCastedSpell(this);
         SendSpellStart();
 
@@ -3836,11 +3845,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             }
         }
 
-        //item: first cast may destroy item and second cast causes crash
-        // xinef: removed !m_spellInfo->StartRecoveryTime
-        // second los check failed in events
-        // xinef: removed itemguid check, currently there is no such item in database
-        if (!m_casttime && /*!m_castItemGUID &&*/ GetCurrentContainer() == CURRENT_GENERIC_SPELL)
+        if (willCastDirectly)
             cast(true);
 
         if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_GCD))
