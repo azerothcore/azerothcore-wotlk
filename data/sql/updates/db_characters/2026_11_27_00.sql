@@ -1,3 +1,4 @@
+-- DB update 2026_11_26_00 -> 2026_11_27_00
 --
 UPDATE `character_spell_cooldown` SET `category` = 0 WHERE `category` IS NULL;
 ALTER TABLE `character_spell_cooldown`
