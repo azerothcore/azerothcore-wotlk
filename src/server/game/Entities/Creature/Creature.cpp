@@ -1997,7 +1997,17 @@ void Creature::setDeathState(DeathState state, bool despawn)
         if (m_formation && m_formation->GetLeader() == this)
             m_formation->FormationReset(true, false);
 
-        bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
+        bool const inWater = (GetLiquidData().Status & MAP_LIQUID_STATUS_IN_CONTACT) != 0;
+        // A creature still rooted here (template or script root) cannot fall; its corpse stays where it died.
+        bool const mayFall = !despawn && !inWater && !GetTransport() && !GetVehicle()
+            && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        bool needsFalling = mayFall && IsFlying();
+        if (mayFall && !needsFalling)
+        {
+            float const floorZ = GetFloorZ();
+            needsFalling = floorZ > INVALID_HEIGHT
+                && G3D::fuzzyGt(GetPositionZ(), floorZ + GROUND_HEIGHT_TOLERANCE);
+        }
         SetHover(false);
         SetDisableGravity(false);
 

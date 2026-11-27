@@ -1612,6 +1612,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 1;
     });
 
+    // Prince Malchezaar - Summon Axes
+    ApplySpellFix({ 30891 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
     // Energy Feedback
     ApplySpellFix({ 44335 }, [](SpellInfo* spellInfo)
     {
