@@ -21,6 +21,7 @@
 #include "Pet.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -503,10 +504,10 @@ class spell_hun_chimera_shot : public SpellScript
                     {
                         if (caster->ToPlayer()) // Scorpid Sting - Add 1 minute cooldown
                         {
-                            if (caster->ToPlayer()->HasSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID))
+                            if (caster->ToPlayer()->GetSpellHistory()->HasCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID))
                                 break;
 
-                            caster->ToPlayer()->AddSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID, 0, 60000);
+                            caster->ToPlayer()->GetSpellHistory()->AddCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID, 0, 1min);
                         }
 
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_SCORPID;
@@ -681,35 +682,18 @@ class spell_hun_readiness : public SpellScript
         // immediately finishes the cooldown on your other Hunter abilities except Bestial Wrath
 
         // force removal of the disarm cooldown
-        caster->RemoveSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID);
+        caster->GetSpellHistory()->ResetCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID);
 
-        SpellCooldowns& cooldowns = caster->GetSpellCooldownMap();
-
-        std::set<std::pair<uint32, bool>> spellsToRemove;
-        std::set<uint32> categoriesToRemove;
-
-        for (auto const& [spellId, cooldown] : cooldowns)
+        caster->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            if (spellInfo
-            && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
-            && spellInfo->Id != SPELL_HUNTER_READINESS
-            && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
-            && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU)
-            {
-                if (spellInfo->RecoveryTime > 0)
-                    spellsToRemove.insert(std::make_pair(spellInfo->Id, cooldown.needSendToClient));
-
-                if (spellInfo->CategoryRecoveryTime > 0)
-                    categoriesToRemove.insert(spellInfo->GetCategory());
-            }
-        }
-
-        // we can't remove spell cooldowns while iterating.
-        for (auto const& [spellId, sendToClient] : spellsToRemove)
-            caster->RemoveSpellCooldown(spellId, sendToClient);
-        for (auto const& category : categoriesToRemove)
-            caster->RemoveCategoryCooldown(category);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            return spellInfo
+                && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
+                && spellInfo->Id != SPELL_HUNTER_READINESS
+                && spellInfo->Id != SPELL_HUNTER_BESTIAL_WRATH
+                && spellInfo->Id != SPELL_DRAENEI_GIFT_OF_THE_NAARU
+                && (spellInfo->RecoveryTime > 0 || spellInfo->CategoryRecoveryTime > 0);
+        }, true);
     }
 
     void Register() override
