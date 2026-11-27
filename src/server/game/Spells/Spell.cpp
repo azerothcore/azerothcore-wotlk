@@ -4537,6 +4537,9 @@ void Spell::SendSpellCooldown()
     {
         if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD))
         {
+            if (unitCaster->GetCharmInfo())
+                unitCaster->GetSpellHistory()->HandleCooldowns(m_spellInfo, m_CastItem, this);
+
             // xinef: this adds cooldowns to vehicle spells which misses them client-side (when we overwrote dbc info in eg.)
             if (m_spellInfo->RequireCooldownInfo())
                 if (Player* player = unitCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
