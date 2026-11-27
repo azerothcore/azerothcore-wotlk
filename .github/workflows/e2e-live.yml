@@ -448,22 +448,47 @@ jobs:
           E2E_SHARD: ${{ matrix.shard }}
         run: |
           log="${RUNNER_TEMP}/go-test.log"
+          fails="${RUNNER_TEMP}/go-test-fails.log"
           [[ -f "${log}" ]] || exit 0
-          fails="$(grep -E '^\s*--- FAIL: |^FAIL\s|^panic: ' "${log}" || true)"
-          [[ -n "${fails}" ]] || exit 0
-          echo "${fails}"
+          # One annotation per failed leaf test (a parent whose subtest failed is skipped). A timeout
+          # prints no "--- FAIL:" line, so hung tests are taken from its "running tests:" list. A failed
+          # package with no test to name (goroutine panic, build error) is annotated itself.
+          awk -v shard="${E2E_SHARD}" -v out="${fails}" '
+            function annotate(msg) {
+              gsub(/%/, "%25", msg); gsub(/\t/, " ", msg)
+              printf "::error title=e2e failed (%s)::%s\n", shard, msg
+            }
+            function flush(pkg,   i, j, leaf, named) {
+              named = 0
+              for (i = 1; i <= nn; i++) {
+                leaf = 1
+                for (j = 1; j <= nn; j++) if (index(names[j], names[i] "/") == 1) { leaf = 0; break }
+                if (leaf && !(names[i] in seen)) { seen[names[i]] = 1; annotate(names[i]); named = 1 }
+              }
+              if (!named && pkg != "") annotate(pkg (panicmsg != "" ? " - " panicmsg : ""))
+              nn = 0; panicmsg = ""; timedout = 0; split("", seen)
+            }
+            /^[ \t]*--- FAIL: / {
+              print > out; n = $0; sub(/^[ \t]*--- FAIL: /, "", n); sub(/ .*/, "", n); names[++nn] = n; next
+            }
+            /^panic: / { print > out; panicmsg = $0; timedout = ($0 ~ /^panic: test timed out/); next }
+            timedout && /^\trunning tests:/ { print > out; next }
+            timedout && /^\t\t/ {
+              print > out; n = $0; sub(/^\t\t/, "", n); sub(/ \([^)]*\)$/, "", n); names[++nn] = n; next
+            }
+            timedout && /^$/ { timedout = 0; next }
+            /^FAIL[ \t]/ { print > out; flush($0); next }
+            /^(ok|\?)[ \t]/ { nn = 0; panicmsg = ""; timedout = 0; split("", seen) }
+            END { flush("") }
+          ' "${log}"
+          [[ -s "${fails}" ]] || exit 0
+          cat "${fails}"
           {
             echo "### Failed e2e tests (${E2E_SHARD})"
             echo '```'
-            echo "${fails}"
+            cat "${fails}"
             echo '```'
           } >> "${GITHUB_STEP_SUMMARY}"
-          # One annotation per leaf test: a parent whose subtest failed is skipped.
-          grep -oE '^\s*--- FAIL: \S+' "${log}" | sed -E 's/^\s*--- FAIL: //' | sort -u \
-            | awk '{ n[NR] = $0 } END { for (i = 1; i <= NR; i++) { leaf = 1
-                for (j = 1; j <= NR; j++) if (index(n[j], n[i] "/") == 1) { leaf = 0; break }
-                if (leaf) print n[i] } }' \
-            | while read -r t; do echo "::error title=e2e failed (${E2E_SHARD})::${t}"; done
 
       - name: Stop servers
         if: always()
