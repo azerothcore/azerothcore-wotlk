@@ -122,20 +122,10 @@ void CharmInfo::InitCharmCreateSpells()
         {
             _charmspells[i].SetActionAndType(spellId, ACT_DISABLED);
 
-            ActiveStates newstate = ACT_PASSIVE;
+            ActiveStates newstate = spellInfo->IsAutocastable() ? ACT_ENABLED : ACT_PASSIVE;
 
-            if (!spellInfo->IsAutocastable())
-                newstate = ACT_PASSIVE;
-            else
-            {
-                if (spellInfo->NeedsExplicitUnitTarget())
-                {
-                    newstate = ACT_ENABLED;
-                    ToggleCreatureAutocast(spellInfo, true);
-                }
-                else
-                    newstate = ACT_DISABLED;
-            }
+            if (newstate == ACT_ENABLED)
+                ToggleCreatureAutocast(spellInfo, true);
 
             AddSpellToActionBar(spellInfo, newstate);
         }

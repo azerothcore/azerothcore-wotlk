@@ -4344,6 +4344,10 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
 
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_AUTOCAST);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME_BY_OWNER);
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
@@ -4665,6 +4669,10 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
 void Player::KillPlayer()
 {
+    // Death only releases a vehicle we control (via the charm), so a dead passenger would keep its seat
+    // and the client would never offer to release the spirit
+    ExitVehicle();
+
     if (IsFlying() && !GetTransport())
         GetMotionMaster()->MoveFall();
 

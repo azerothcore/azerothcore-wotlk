@@ -889,6 +889,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS           = 36,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS                    = 37,
     PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES = 38,
+    PLAYER_LOGIN_QUERY_LOAD_PET_AUTOCAST                 = 39,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1226,6 +1227,8 @@ public:
     PetStable* GetPetStable() { return m_petStable.get(); }
     PetStable& GetOrInitPetStable();
     [[nodiscard]] PetStable const* GetPetStable() const { return m_petStable.get(); }
+
+    PetAutocastPreferences& GetPetAutocastPreferences() { return _petAutocastPreferences; }
 
     [[nodiscard]] Pet* GetPet() const;
     Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration = 0ms, uint32 healthPct = 0);
@@ -3045,6 +3048,8 @@ private:
     bool m_canKnockback;
 
     std::unique_ptr<PetStable> m_petStable;
+
+    PetAutocastPreferences _petAutocastPreferences;
 
     // Temporary removed pet cache
     uint32 m_temporaryUnsummonedPetNumber;
