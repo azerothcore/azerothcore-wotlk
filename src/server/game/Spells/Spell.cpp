@@ -2473,6 +2473,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     targetInfo.alive      = target->IsAlive();
     targetInfo.damage     = 0;
     targetInfo.damageBeforeTakenMods = 0;
+    targetInfo.procHitMask = 0;
     targetInfo.crit       = false;
     targetInfo.scaleAura  = false;
     if (m_auraScaleMask && targetInfo.effectMask == m_auraScaleMask && m_caster != target)
@@ -2899,7 +2900,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
             if (canEffectTrigger)
             {
-                uint32 hitMask = m_procEx | healInfo.GetHitMask();
+                uint32 hitMask = m_procEx | healInfo.GetHitMask() | target->procHitMask;
                 Unit::ProcSkillsAndAuras(caster, unitTarget, procAttacker, procVictim, hitMask, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
                     m_triggeredByAuraSpell.effectIndex, this, nullptr, &healInfo);
             }
@@ -2989,7 +2990,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
                 if (canEffectTrigger)
                 {
                     DamageInfo dmgInfo(damageInfo, SPELL_DIRECT_DAMAGE, m_attackType, missInfo);
-                    uint32 hitMask = m_procEx | dmgInfo.GetHitMask();
+                    uint32 hitMask = m_procEx | dmgInfo.GetHitMask() | target->procHitMask;
                     Unit::ProcSkillsAndAuras(caster, unitTarget, procAttacker, procVictim, hitMask, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
                         m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
 
@@ -3010,7 +3011,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             if (canEffectTrigger)
             {
                 DamageInfo dmgInfo(damageInfo, NODAMAGE, m_attackType, missInfo);
-                uint32 hitMask = m_procEx | dmgInfo.GetHitMask();
+                uint32 hitMask = m_procEx | dmgInfo.GetHitMask() | target->procHitMask;
                 Unit::ProcSkillsAndAuras(caster, unitTarget, procAttacker, procVictim, hitMask, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
                     m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
 
