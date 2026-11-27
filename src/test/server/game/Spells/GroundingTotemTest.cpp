@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DBCStores.h"
 #include "GameObject.h"
 #include "IntegrationTestFixture.h"
 #include "MovementGenerator.h"
@@ -84,6 +85,9 @@ TEST(GroundingTotemTest, SpellIgnoringImmunitiesCannotBeRedirected)
 
 namespace
 {
+constexpr uint32 TEST_TOTEM_DISPLAY_ID = 90004;
+constexpr uint32 TEST_TOTEM_MODEL_ID = 90004;
+
 enum GroundingTotemSpells : uint32
 {
     SPELL_FREEZING_TRAP_EFFECT = 14309,
@@ -93,6 +97,29 @@ enum GroundingTotemSpells : uint32
 class GroundingTotemTargetTest : public IntegrationTestFixture
 {
 protected:
+    static void SetUpTestSuite()
+    {
+        // The totem's death handler needs model data for its terrain collision check.
+        auto* modelData = new CreatureModelDataEntry{};
+        modelData->Id = TEST_TOTEM_MODEL_ID;
+        modelData->Scale = 1.0f;
+        modelData->CollisionWidth = 1.0f;
+        modelData->CollisionHeight = 2.0f;
+        sCreatureModelDataStore.SetEntry(TEST_TOTEM_MODEL_ID, modelData);
+
+        auto* displayInfo = new CreatureDisplayInfoEntry{};
+        displayInfo->Displayid = TEST_TOTEM_DISPLAY_ID;
+        displayInfo->ModelId = TEST_TOTEM_MODEL_ID;
+        displayInfo->scale = 1.0f;
+        sCreatureDisplayInfoStore.SetEntry(TEST_TOTEM_DISPLAY_ID, displayInfo);
+    }
+
+    static void TearDownTestSuite()
+    {
+        sCreatureDisplayInfoStore.SetEntry(TEST_TOTEM_DISPLAY_ID, nullptr);
+        sCreatureModelDataStore.SetEntry(TEST_TOTEM_MODEL_ID, nullptr);
+    }
+
     void SetUp() override
     {
         IntegrationTestFixture::SetUp();
@@ -104,6 +131,7 @@ protected:
         _hunter = CreateTestCreature(1, 99001, TEST_FACTION_HOSTILE_TO_MONSTERS);
         _shaman = CreateTestCreature(2, 99002, TEST_FACTION_HOSTILE_TO_ALL);
         _groundingTotem = CreateTestCreature(3, 5925, TEST_FACTION_HOSTILE_TO_ALL);
+        _groundingTotem->SetNativeDisplayId(TEST_TOTEM_DISPLAY_ID);
         _groundingTotem->AddUnitTypeMask(UNIT_MASK_TOTEM);
         for (Creature* creature : {_hunter, _shaman, _groundingTotem})
             GetTestMap()->GetObjectsStore().Insert<Creature>(creature->GetGUID(), creature);
