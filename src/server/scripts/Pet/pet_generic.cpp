@@ -24,6 +24,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include <unordered_map>
@@ -184,14 +185,14 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
                     _state = ARGENT_PONY_STATE_ENCH;
 
                     aura = (player->GetTeamId(true) == TEAM_ALLIANCE ? SPELL_AURA_TIRED_S : SPELL_AURA_TIRED_G);
-                    duration = player->GetSpellCooldownDelay(aura);
+                    duration = player->GetSpellHistory()->GetRemainingCooldown(aura);
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
 
                     for (uint8 i = 0; i < 3; ++i)
                     {
                         if (player->GetTeamId(true) == TEAM_ALLIANCE)
                         {
-                            if (uint32 cooldown = player->GetSpellCooldownDelay(SPELL_AURA_POSTMAN_S + i))
+                            if (uint32 cooldown = player->GetSpellHistory()->GetRemainingCooldown(SPELL_AURA_POSTMAN_S + i))
                             {
                                 duration = cooldown;
                                 aura = SPELL_AURA_POSTMAN_S + i;
@@ -202,7 +203,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
                         }
                         else
                         {
-                            if (uint32 cooldown = player->GetSpellCooldownDelay(SPELL_AURA_BANK_G + i))
+                            if (uint32 cooldown = player->GetSpellHistory()->GetRemainingCooldown(SPELL_AURA_BANK_G + i))
                             {
                                 duration = cooldown * IN_MILLISECONDS;
                                 aura = SPELL_AURA_BANK_G + i;
@@ -333,8 +334,8 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
         if (spellId && !creature->HasAura(spellId))
         {
             creature->CastSpell(creature, spellId, true);
-            player->AddSpellCooldown(spellId, 0, 3 * MINUTE * IN_MILLISECONDS);
-            player->AddSpellCooldown(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S, 0, 3 * MINUTE * IN_MILLISECONDS + 4 * HOUR * IN_MILLISECONDS);
+            player->GetSpellHistory()->AddCooldown(spellId, 0, 3min);
+            player->GetSpellHistory()->AddCooldown(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S, 0, 3min + 4h);
             creature->DespawnOrUnsummon(180s);
         }
         return true;

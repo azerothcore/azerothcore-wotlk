@@ -23,6 +23,7 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Common.h"
+#include "DBCStores.h"
 #include "GameGraveyard.h"
 #include "GameObject.h"
 #include "GameTime.h"
@@ -47,11 +48,13 @@
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
 #include "Transport.h"
 #include "WeatherMgr.h"
 #include "WorldSessionMgr.h"
+#include <unordered_set>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1113,7 +1116,7 @@ public:
 
         if (!spell)
         {
-            target->RemoveAllSpellCooldown();
+            target->GetSpellHistory()->ResetAllCooldowns();
             handler->PSendSysMessage(LANG_REMOVEALL_COOLDOWN, nameLink);
         }
         else
@@ -1124,7 +1127,60 @@ public:
                 return false;
             }
 
-            target->RemoveSpellCooldown(spell.value()->Id, true);
+            // A shared category cooldown is held by whichever same-family spell started it. Cast as a spell, the
+            // spell checks its Spell.dbc category; cast from an item, the category GetCooldownDurations picks for
+            // that item, which is the Spell.dbc one for an item enchantment's use spell
+            uint32 const spellId = spell.value()->Id;
+            uint32 const spellCategory = spell.value()->GetCategory();
+            uint32 const familyName = spell.value()->SpellFamilyName;
+            std::unordered_set<uint32> itemCategories;
+            for (auto const& [itemEntry, itemTemplate] : *sObjectMgr->GetItemTemplateStore())
+            {
+                for (_Spell const& itemSpell : itemTemplate.Spells)
+                {
+                    if (uint32(itemSpell.SpellId) != spellId)
+                        continue;
+
+                    uint32 itemCategory = 0;
+                    SpellHistory::GetCooldownDurations(spell.value(), itemEntry, nullptr, &itemCategory, nullptr);
+                    if (itemCategory)
+                        itemCategories.insert(itemCategory);
+
+                    break;
+                }
+            }
+
+            if (spellCategory)
+            {
+                for (uint32 enchantId = 0; enchantId < sSpellItemEnchantmentStore.GetNumRows(); ++enchantId)
+                {
+                    SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
+                    if (!enchant)
+                        continue;
+
+                    for (uint8 effect = 0; effect < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++effect)
+                        if (enchant->type[effect] == ITEM_ENCHANTMENT_TYPE_USE_SPELL && enchant->spellid[effect] == spellId)
+                            itemCategories.insert(spellCategory);
+                }
+            }
+
+            SpellHistory::Clock::time_point const now = GameTime::GetSystemTime();
+            target->GetSpellHistory()->ResetCooldowns([spellId, spellCategory, familyName, &itemCategories, now](SpellHistory::CooldownStorageType::iterator itr) -> bool
+            {
+                if (itr->first == spellId)
+                    return true;
+
+                // A holder whose category hold ended keeps its own, longer cooldown
+                if (!itr->second.CategoryId || itr->second.CategoryEnd <= now)
+                    return false;
+
+                bool const blocksSpell = itr->second.ItemId ? itemCategories.contains(itr->second.CategoryId) : itr->second.CategoryId == spellCategory;
+                if (!blocksSpell)
+                    return false;
+
+                SpellInfo const* holderInfo = sSpellMgr->GetSpellInfo(itr->first);
+                return holderInfo && holderInfo->SpellFamilyName == familyName;
+            }, true);
             handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spell.value()->Id, target == handler->GetSession()->GetPlayer() ? handler->GetAcoreString(LANG_YOU) : nameLink);
         }
         return true;

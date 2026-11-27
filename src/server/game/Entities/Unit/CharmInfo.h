@@ -32,7 +32,6 @@
 #define UNIT_ACTION_BUTTON_TYPE(X)   ((uint32(X) & 0xFF000000) >> 24)
 #define MAKE_UNIT_ACTION_BUTTON(A, T) (uint32(A) | (uint32(T) << 24))
 
-class GlobalCooldownMgr;
 class SpellInfo;
 class Unit;
 class WorldPacket;
@@ -64,31 +63,6 @@ enum ActiveStates : uint8
     ACT_COMMAND  = 0x07,                                    // 0x01 | 0x02 | 0x04
     ACT_REACTION = 0x06,                                    // 0x02 | 0x04
     ACT_DECIDE   = 0x00                                     // custom
-};
-
-struct GlobalCooldown
-{
-    explicit GlobalCooldown(uint32 _dur = 0, uint32 _time = 0) : duration(_dur), cast_time(_time) {}
-
-    uint32 duration;
-    uint32 cast_time;
-};
-
-typedef std::unordered_map<uint32 /*category*/, GlobalCooldown> GlobalCooldownList;
-
-class GlobalCooldownMgr                                     // Shared by Player and CharmInfo
-{
-public:
-    GlobalCooldownMgr() = default;
-
-public:
-    bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
-    uint32 GetGlobalCooldown(SpellInfo const* spellInfo) const;
-    void AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd);
-    void CancelGlobalCooldown(SpellInfo const* spellInfo);
-
-private:
-    GlobalCooldownList m_GlobalCooldowns;
 };
 
 struct UnitActionBarEntry
@@ -157,8 +131,6 @@ public:
 
     CharmSpellInfo* GetCharmSpell(uint8 index) { return &(_charmspells[index]); }
 
-    GlobalCooldownMgr& GetGlobalCooldownMgr() { return _GlobalCooldownMgr; }
-
     void SetIsCommandAttack(bool val);
     bool IsCommandAttack();
     void SetIsCommandFollow(bool val);
@@ -203,8 +175,6 @@ private:
     float _stayX;
     float _stayY;
     float _stayZ;
-
-    GlobalCooldownMgr _GlobalCooldownMgr;
 };
 
 #endif // _CHARMINFO_H

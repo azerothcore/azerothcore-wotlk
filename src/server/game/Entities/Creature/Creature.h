@@ -162,15 +162,6 @@ public:
     [[nodiscard]] SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType /*attackType*/ = BASE_ATTACK, uint8 /*damageIndex*/ = 0) const override { return m_meleeDamageSchoolMask; }
     void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
 
-    void _AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time);
-    void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
-    [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
-    [[nodiscard]] uint32 GetSpellCooldown(uint32 spell_id) const;
-    void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
-    void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
-    [[nodiscard]] bool IsSpellProhibited(SpellSchoolMask idSchoolMask) const;
-    void ClearProhibitedSpellTimers();
-
     [[nodiscard]] bool HasSpell(uint32 spellID) const override;
 
     void UpdateMovementFlags();
@@ -253,8 +244,6 @@ public:
     SpellInfo const* reachWithSpellCure(Unit* victim);
 
     uint32 m_spells[MAX_CREATURE_SPELLS];
-    CreatureSpellCooldowns m_CreatureSpellCooldowns;
-    uint32 m_ProhibitSchoolTime[7];
 
     bool CanStartAttack(Unit const* u, bool force = false) const;
     float GetAggroRange(Unit const* target) const;

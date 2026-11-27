@@ -20,6 +20,7 @@
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -1256,7 +1257,7 @@ class spell_dru_berserk : public SpellScript
 
             // reset dire bear maul cd
             for (auto& i : DireMaul)
-                caster->ToPlayer()->RemoveSpellCooldown(i, true);
+                caster->ToPlayer()->GetSpellHistory()->ResetCooldown(i, true);
         }
     }
 
@@ -1429,14 +1430,14 @@ class spell_dru_leader_of_the_pack : public AuraScript
             return;
 
         // 6 second internal cooldown
-        if (target->IsPlayer() && target->ToPlayer()->HasSpellCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL))
+        if (target->IsPlayer() && target->ToPlayer()->GetSpellHistory()->HasCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL))
             return;
 
         int32 bp = target->CountPctFromMaxHealth(healAmount);
         target->CastCustomSpell(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
 
         if (target->IsPlayer())
-            target->ToPlayer()->AddSpellCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, 0, 6 * IN_MILLISECONDS);
+            target->ToPlayer()->GetSpellHistory()->AddCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, 0, 6s);
 
         // Improved Leader of the Pack - mana regen (only for self-cast aura)
         if (aurEff->GetCasterGUID() == target->GetGUID())

@@ -19,6 +19,7 @@
 #include "PetDefines.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -541,7 +542,7 @@ class spell_dk_wandering_plague_aura : public AuraScript
         if (!roll_chance_f(eventInfo.GetActor()->GetUnitCriticalChance(BASE_ATTACK, eventInfo.GetActionTarget())))
             return false;
 
-        return !eventInfo.GetActor()->HasSpellCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER);
+        return !eventInfo.GetActor()->GetSpellHistory()->HasCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER);
     }
 
     // xinef: prevent default proc with castItem passed, which applies 30 sec cooldown to procing of the aura
@@ -553,7 +554,7 @@ class spell_dk_wandering_plague_aura : public AuraScript
         if (!aurEff)
             return;
 
-        eventInfo.GetActor()->AddSpellCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER, 0, 1000);
+        eventInfo.GetActor()->GetSpellHistory()->AddCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER, 0, 1s);
         eventInfo.GetActor()->CastCustomSpell(SPELL_DK_WANDERING_PLAGUE_TRIGGER, SPELLVALUE_BASE_POINT0,
             CalculatePct<int32, int32>(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()),
             eventInfo.GetActionTarget(), TriggerCastFlags(TRIGGERED_FULL_MASK | TRIGGERED_DONT_ENTER_COMBAT));
@@ -1350,9 +1351,8 @@ class spell_dk_corpse_explosion : public SpellScript
         {
             if (unitTarget->IsAlive())  // Living ghoul as a target
             {
-                unitTarget->ToCreature()->m_CreatureSpellCooldowns.clear();
-                if (CharmInfo* charmInfo = unitTarget->GetCharmInfo())
-                    charmInfo->GetGlobalCooldownMgr().CancelGlobalCooldown(sSpellMgr->GetSpellInfo(SPELL_DK_GHOUL_EXPLODE));
+                unitTarget->GetSpellHistory()->ResetAllCooldowns();
+                unitTarget->GetSpellHistory()->CancelGlobalCooldown(sSpellMgr->AssertSpellInfo(SPELL_DK_GHOUL_EXPLODE));
 
                 unitTarget->StopMoving();
                 unitTarget->CastSpell(unitTarget, SPELL_DK_GHOUL_EXPLODE, false);
@@ -2189,7 +2189,7 @@ class spell_dk_raise_dead : public SpellScript
         targets.SetDst(*GetHitUnit());
 
         GetCaster()->CastSpell(targets, spellInfo, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCaster()->GetGUID());
-        GetCaster()->ToPlayer()->RemoveSpellCooldown(GetSpellInfo()->Id, true);
+        GetCaster()->ToPlayer()->GetSpellHistory()->ResetCooldown(GetSpellInfo()->Id, true);
     }
 
     void Register() override
@@ -2752,7 +2752,7 @@ class spell_dk_rime : public AuraScript
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_DK_HOWLING_BLAST_R1);
         while (spellInfo)
         {
-            player->RemoveSpellCooldown(spellInfo->Id, true);
+            player->GetSpellHistory()->ResetCooldown(spellInfo->Id, true);
             spellInfo = spellInfo->GetNextRankSpell();
         }
     }
@@ -2906,7 +2906,7 @@ class spell_dk_glyph_of_death_grip : public AuraScript
     {
         PreventDefaultAction();
         if (Player* player = eventInfo.GetActor()->ToPlayer())
-            player->RemoveSpellCooldown(SPELL_DK_DEATH_GRIP_INITIAL, true);
+            player->GetSpellHistory()->ResetCooldown(SPELL_DK_DEATH_GRIP_INITIAL, true);
     }
 
     void Register() override

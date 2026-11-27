@@ -111,11 +111,9 @@ public:
     void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive = false);
     void ClearCastWhenWillAvailable();
 
-    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans);
     void _SaveAuras(CharacterDatabaseTransaction trans);
     void _SaveSpells(CharacterDatabaseTransaction trans);
 
-    void _LoadSpellCooldowns(PreparedQueryResult result);
     void _LoadAuras(PreparedQueryResult result, uint32 timediff);
     void _LoadSpells(PreparedQueryResult result);
 
