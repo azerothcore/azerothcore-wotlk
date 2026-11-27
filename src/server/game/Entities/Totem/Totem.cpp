@@ -20,6 +20,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "TotemPackets.h"
@@ -162,7 +163,7 @@ void Totem::UnSummon(Milliseconds msTime)
             player->SendAutoRepeatCancel(this);
 
             if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
-                player->SendCooldownEvent(spell, 0, nullptr, false);
+                player->GetSpellHistory()->SendCooldownEvent(spell, 0, nullptr, false);
 
             if (Group* group = player->GetGroup())
             {

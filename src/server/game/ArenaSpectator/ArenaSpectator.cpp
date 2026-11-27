@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AreaDefines.h"
 #include "ArenaSpectator.h"
+#include "AreaDefines.h"
 #include "BattlegroundMgr.h"
 #include "LFGMgr.h"
 #include "Map.h"
@@ -24,6 +24,7 @@
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "World.h"
 
 bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name)
@@ -263,11 +264,11 @@ void ArenaSpectator::HandleResetCommand(Player* player)
         // "SPE" not here (only possible to send starting a new cast)
 
         // send all "CD"
-        SpellCooldowns const& sc = plr->GetSpellCooldownMap();
-        for (SpellCooldowns::const_iterator itrc = sc.begin(); itrc != sc.end(); ++itrc)
-            if (itrc->second.sendToSpectator && itrc->second.maxduration >= SPECTATOR_COOLDOWN_MIN * IN_MILLISECONDS && itrc->second.maxduration <= SPECTATOR_COOLDOWN_MAX * IN_MILLISECONDS)
-                if (uint32 cd = (getMSTimeDiff(getMSTime(), itrc->second.end) / 1000))
-                    SendCommand_Cooldown(player, itr->first, "ACD", itrc->first, cd, itrc->second.maxduration / 1000);
+        SpellHistory::Clock::time_point now = GameTime::GetSystemTime();
+        for (auto const& [spellId, cooldown] : plr->GetSpellHistory()->GetSpellCooldowns())
+            if (cooldown.SpectatorDuration && cooldown.CooldownEnd > now)
+                if (uint32 cd = uint32(std::chrono::duration_cast<std::chrono::seconds>(cooldown.CooldownEnd - now).count()))
+                    SendCommand_Cooldown(player, itr->first, "ACD", spellId, cd, cooldown.SpectatorDuration / IN_MILLISECONDS);
 
         // send all visible "AUR"
         Unit::VisibleAuraMap const* visibleAuras = plr->GetVisibleAuras();

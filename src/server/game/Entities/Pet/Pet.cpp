@@ -32,6 +32,7 @@
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "Unit.h"
 #include "Util.h"
@@ -434,7 +435,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         {
             _LoadSpells(holder.GetPreparedResult(PetLoadQueryHolder::SPELLS));
             InitTalentForLevel(); // re-init to check talent count
-            _LoadSpellCooldowns(holder.GetPreparedResult(PetLoadQueryHolder::COOLDOWNS));
+            GetSpellHistory()->LoadFromDB<Pet>(holder.GetPreparedResult(PetLoadQueryHolder::COOLDOWNS));
             LearnPetPassives();
             InitLevelupSpellsForLevel();
             if (GetMap()->IsBattleArena())
@@ -552,7 +553,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         RemoveAllAuras();
 
     _SaveSpells(trans);
-    _SaveSpellCooldowns(trans);
+    GetSpellHistory()->SaveToDB<Pet>(trans);
     CharacterDatabase.CommitTransaction(trans);
 
     // current/stable/not_in_slot
@@ -837,7 +838,7 @@ void Pet::CastPendingSpell()
     if (!IsWithinLOSInMap(tempSpellTarget) || GetDistance(tempSpellTarget) >= maxRange)
         return;
 
-    if (charmInfo->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo) || HasSpellCooldown(tempSpell))
+    if (GetSpellHistory()->HasGlobalCooldown(spellInfo) || GetSpellHistory()->HasCooldown(tempSpell))
         return;
 
     StopMoving();
@@ -850,7 +851,7 @@ void Pet::CastPendingSpell()
     charmInfo->SetIsReturning(false);
     charmInfo->SaveStayPosition(true);
 
-    AddSpellCooldown(tempSpell, 0, spellInfo->IsCooldownStartedOnEvent() ? infinityCooldownDelay : 0);
+    GetSpellHistory()->StartCooldown(spellInfo, 0, nullptr, spellInfo->IsCooldownStartedOnEvent());
 
     CastSpell(tempSpellTarget, tempSpell, false);
     m_tempspell = 0;
@@ -1504,84 +1505,6 @@ uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemlevel) const
     // -15 or less
     else
         return 0;                                           //food too low level
-}
-
-void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
-{
-    m_CreatureSpellCooldowns.clear();
-
-    if (result)
-    {
-        time_t curTime = GameTime::GetGameTime().count();
-
-        PacketCooldowns cooldowns;
-        WorldPacket data;
-
-        do
-        {
-            Field* fields = result->Fetch();
-
-            uint32 spell_id = fields[0].Get<uint32>();
-            uint16 category = fields[1].Get<uint16>();
-            time_t db_time  = time_t(fields[2].Get<uint32>());
-
-            if (!sSpellMgr->GetSpellInfo(spell_id))
-            {
-                LOG_ERROR("entities.pet", "Pet {} have unknown spell {} in `pet_spell_cooldown`, skipping.", m_charmInfo->GetPetNumber(), spell_id);
-                continue;
-            }
-
-            // skip outdated cooldown
-            if (db_time <= curTime)
-                continue;
-
-            uint32 cooldown = (db_time - curTime) * IN_MILLISECONDS;
-            cooldowns[spell_id] = cooldown;
-            _AddCreatureSpellCooldown(spell_id, category, cooldown);
-
-            LOG_DEBUG("entities.pet", "Pet (Number: {}) spell {} cooldown loaded ({} secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time - curTime));
-        } while (result->NextRow());
-
-        if (!cooldowns.empty() && GetOwner())
-        {
-            BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, cooldowns);
-            GetOwner()->SendDirectMessage(&data);
-        }
-    }
-}
-
-void Pet::_SaveSpellCooldowns(CharacterDatabaseTransaction trans)
-{
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_COOLDOWNS);
-    stmt->SetData(0, m_charmInfo->GetPetNumber());
-    trans->Append(stmt);
-
-    time_t curTime = GameTime::GetGameTime().count();
-    uint32 curMSTime = GameTime::GetGameTimeMS().count();
-    uint32 infTime   = curMSTime + infinityCooldownDelayCheck;
-
-    // remove oudated and save active
-    CreatureSpellCooldowns::iterator itr, itr2;
-    for (itr = m_CreatureSpellCooldowns.begin(); itr != m_CreatureSpellCooldowns.end();)
-    {
-        itr2 = itr;
-        ++itr;
-
-        if (itr2->second.end <= curMSTime + 1000)
-        {
-            m_CreatureSpellCooldowns.erase(itr2);
-        }
-        else if (itr2->second.end <= infTime)
-        {
-            uint32 cooldown = ((itr2->second.end - curMSTime) / IN_MILLISECONDS) + curTime;
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);
-            stmt->SetData(0, m_charmInfo->GetPetNumber());
-            stmt->SetData(1, itr2->first);
-            stmt->SetData(2, itr2->second.category);
-            stmt->SetData(3, cooldown);
-            trans->Append(stmt);
-        }
-    }
 }
 
 void Pet::_LoadSpells(PreparedQueryResult result)
@@ -2520,4 +2443,127 @@ std::string Pet::GetDebugInfo() const
         << "PetType: " << std::to_string(getPetType()) << " "
         << "PetNumber: " << m_charmInfo->GetPetNumber();
     return sstr.str();
+}
+
+void PetAutocastPreferences::Load(PreparedQueryResult result)
+{
+    _states.clear();
+
+    if (!result)
+        return;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 entry = fields[0].Get<uint32>();
+        uint32 spell = fields[1].Get<uint32>();
+        bool autocast = fields[2].Get<uint8>() != 0;
+
+        _states.push_back({ entry, spell, autocast });
+    } while (result->NextRow());
+}
+
+void PetAutocastPreferences::Set(ObjectGuid::LowType ownerGuid, uint32 entry, uint32 spell, bool autocast)
+{
+    auto it = std::find_if(_states.begin(), _states.end(), [entry, spell](PetAutocastState const& state)
+    {
+        return state.Entry == entry && state.Spell == spell;
+    });
+
+    if (it == _states.end())
+        _states.push_back({ entry, spell, autocast });
+    else if (it->Autocast == autocast)
+        return;                                             // already stored, so spare the write
+    else
+        it->Autocast = autocast;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PET_AUTOCAST);
+    stmt->SetData(0, ownerGuid);
+    stmt->SetData(1, entry);
+    stmt->SetData(2, spell);
+    stmt->SetData(3, uint8(autocast ? 1 : 0));
+    CharacterDatabase.Execute(stmt);
+}
+
+bool SummonSavesPetAutocast(Unit const* summon)
+{
+    // a guardian keeps the SummonProperties row it was created with
+    if (TempSummon const* tempSummon = summon->ToTempSummon())
+        if (tempSummon->m_Properties)
+            return (tempSummon->m_Properties->Flags & SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST) != 0;
+
+    // a Pet is built with no properties: fall back to the summon spell it records
+    SpellInfo const* summonSpell = sSpellMgr->GetSpellInfo(summon->GetUInt32Value(UNIT_CREATED_BY_SPELL));
+    if (!summonSpell)
+        return false;
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        SpellEffectInfo const& effect = summonSpell->Effects[i];
+        if (!effect.IsEffect(SPELL_EFFECT_SUMMON) && !effect.IsEffect(SPELL_EFFECT_SUMMON_PET))
+            continue;
+
+        SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(effect.MiscValueB));
+        if (properties && (properties->Flags & SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST))
+            return true;
+    }
+
+    return false;
+}
+
+void ApplySavedPetAutocast(Player* owner, Unit* summon)
+{
+    if (!owner || !summon || !SummonSavesPetAutocast(summon))
+        return;
+
+    std::vector<PetAutocastState> const& states = owner->GetPetAutocastPreferences().GetStates();
+    CharmInfo* charmInfo = summon->GetCharmInfo();
+    if (states.empty() || !charmInfo)
+        return;
+
+    for (PetAutocastState const& state : states)
+    {
+        if (state.Entry != summon->GetEntry())
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(state.Spell);
+        if (!spellInfo)
+            continue;
+
+        if (Pet* pet = summon->ToPet())
+            pet->ToggleAutocast(spellInfo, state.Autocast);                 // keeps m_autospells and m_spells in sync
+        else
+            charmInfo->ToggleCreatureAutocast(spellInfo, state.Autocast);   // drives the guardian's autocast
+
+        charmInfo->SetSpellAutocast(spellInfo, state.Autocast);             // the action bar the client displays
+    }
+}
+
+void SavePetAutocast(Player* owner, Unit* summon)
+{
+    if (!owner || !summon || !SummonSavesPetAutocast(summon))
+        return;
+
+    // a Pet keeps its state in pet_spell.active, which its own row already saves
+    if (summon->ToPet())
+        return;
+
+    CharmInfo* charmInfo = summon->GetCharmInfo();
+    if (!charmInfo)
+        return;
+
+    for (uint8 i = 0; i < MAX_SPELL_CHARM; ++i)
+    {
+        CharmSpellInfo const* charmSpell = charmInfo->GetCharmSpell(i);
+        uint32 spellId = charmSpell->GetAction();
+        if (!spellId)
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (!spellInfo || !spellInfo->IsAutocastable())
+            continue;
+
+        owner->GetPetAutocastPreferences().Set(owner->GetGUID().GetCounter(), summon->GetEntry(), spellId,
+                                               charmSpell->GetType() == ACT_ENABLED);
+    }
 }

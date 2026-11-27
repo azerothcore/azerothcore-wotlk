@@ -30,6 +30,7 @@
 #include "ReputationMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Unit.h"
@@ -256,7 +257,7 @@ class spell_the_flag_of_ownership : public SpellScript
 
         if (!haveTarget)
         {
-            caster->ToPlayer()->RemoveSpellCooldown(GetSpellInfo()->Id, true);
+            caster->ToPlayer()->GetSpellHistory()->ResetCooldown(GetSpellInfo()->Id, true);
             Spell::SendCastResult(caster->ToPlayer(), GetSpellInfo(), 0, SPELL_FAILED_BAD_TARGETS);
         }
     }
@@ -2086,7 +2087,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
         Player* player = GetCaster()->ToPlayer();
         // This is only needed because spells cast from spell_linked_spell are triggered by default
         // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
-        player->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
+        player->GetSpellHistory()->StartCooldown(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
 
         if (player->GetTeamId(true) == TEAM_HORDE)
         {
@@ -2207,8 +2208,8 @@ class spell_gen_divine_storm_cd_reset : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
-        if (caster->HasSpellCooldown(SPELL_DIVINE_STORM))
-            caster->RemoveSpellCooldown(SPELL_DIVINE_STORM, true);
+        if (caster->GetSpellHistory()->HasCooldown(SPELL_DIVINE_STORM))
+            caster->GetSpellHistory()->ResetCooldown(SPELL_DIVINE_STORM, true);
     }
 
     void Register() override
@@ -5662,7 +5663,7 @@ class spell_gen_cooldown_all : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Player* player = GetHitPlayer())
-            player->RemoveAllSpellCooldown();
+            player->GetSpellHistory()->ResetAllCooldowns();
     }
 
     void Register() override

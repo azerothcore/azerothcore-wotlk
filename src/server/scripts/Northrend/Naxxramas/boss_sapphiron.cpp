@@ -19,6 +19,8 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum Yells
@@ -400,7 +402,33 @@ public:
     };
 };
 
+class spell_sapphiron_frost_explosion : public SpellScript
+{
+    PrepareSpellScript(spell_sapphiron_frost_explosion);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        float x, y, z;
+        GetExplTargetDest()->GetPosition(x, y, z);
+        targets.remove_if([caster, x, y, z](WorldObject* target) -> bool
+        {
+            Unit* unit = target->ToUnit();
+            if (unit && unit->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && unit->IsWithinMeleeRange(caster))
+                return false;
+
+            return !target->IsWithinLOS(x, y, z, VMAP::ModelIgnoreFlags::M2);
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sapphiron_frost_explosion::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_sapphiron()
 {
     new boss_sapphiron();
+    RegisterSpellScript(spell_sapphiron_frost_explosion);
 }
