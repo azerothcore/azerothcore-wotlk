@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -133,6 +134,8 @@ enum Misc
 
     // Movement points
     POINT_LANDING                               = 1,
+    POINT_LANDING_APPROACH                      = 2,
+    POINT_TAKEOFF                               = 3,
 
     // Lava directions
     LAVA_LEFT_SIDE                              = 0,
@@ -145,6 +148,7 @@ enum Misc
     MAX_AREA_TRIGGER_COUNT                      = 2,
     MAX_CYCLONE_COUNT                           = 5,
     MAX_TENEBORN_EGGS_SUMMONS                   = 6,
+    MAX_PATROL_POINTS                           = 8,
 };
 
 enum Events
@@ -157,7 +161,6 @@ enum Events
     EVENT_MINIBOSS_SPAWN_HELPERS                = 5,
     EVENT_MINIBOSS_RESPOND                      = 6,
     EVENT_DRAGON_START_PATROL                   = 7,
-    EVENT_DRAGON_PATROL_WAYPOINT                = 8,
 
     // Sartharion abilities
     EVENT_SARTHARION_CAST_CLEAVE                = 10,
@@ -225,7 +228,7 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
 };
 
 // Patrol waypoints for Vesperon (circular patrol above Sartharion)
-const Position VesperonPatrolPath[8] =
+const Position VesperonPatrolPath[MAX_PATROL_POINTS] =
 {
     { 3296.785f, 555.0555f, 87.29027f, 0.0f },
     { 3266.8242f, 575.95245f, 89.76242f, 0.0f },
@@ -238,7 +241,7 @@ const Position VesperonPatrolPath[8] =
 };
 
 // Patrol waypoints for Tenebron (circular patrol above Sartharion)
-const Position TenebronPatrolPath[8] =
+const Position TenebronPatrolPath[MAX_PATROL_POINTS] =
 {
     { 3232.0261f, 569.16376f, 97.53158f, 0.0f },
     { 3203.6875f, 548.84595f, 98.50729f, 0.0f },
@@ -251,7 +254,7 @@ const Position TenebronPatrolPath[8] =
 };
 
 // Patrol waypoints for Shadron (circular patrol above Sartharion)
-const Position ShadronPatrolPath[8] =
+const Position ShadronPatrolPath[MAX_PATROL_POINTS] =
 {
     { 3196.095f, 548.7049f, 115.83286f, 0.0f },
     { 3224.809f, 573.8922f, 116.08303f, 0.0f },
@@ -262,6 +265,17 @@ const Position ShadronPatrolPath[8] =
     { 3223.111f, 488.90338f, 110.53484f, 0.0f },
     { 3197.9263f, 511.4375f, 113.22937f, 0.0f },
 };
+
+static Position const* GetDragonPatrolPath(uint32 entry)
+{
+    switch (entry)
+    {
+        case NPC_TENEBRON: return TenebronPatrolPath;
+        case NPC_SHADRON:  return ShadronPatrolPath;
+        case NPC_VESPERON: return VesperonPatrolPath;
+        default:           return TenebronPatrolPath;
+    }
+}
 
 float const FlameTsunamiLeftOffsets[MAX_LEFT_LAVA_TSUNAMIS] =
 {
@@ -280,11 +294,18 @@ const Position bigIslandMiddlePos = { 3242.822754f, 477.279816f, 57.430473f };
 
 const uint32 dragons[MAX_DRAGONS] = { DATA_TENEBRON, DATA_VESPERON, DATA_SHADRON };
 
-const Position dragonLandingPos[MAX_DRAGONS] ={
-    {3249.75f, 566.95184f, 59.424007f, 0}, // Tenebron
-    {3230.4963f, 533.0001f, 59.5598f, 0}, // Shadron
-    {3269.7134f, 532.7908f, 59.51278f, 0} // Vesperon
- };
+constexpr float TAKEOFF_RISE            = 2.0f;
+constexpr float TRANSITION_SPEED        = 10.0f;
+constexpr float GLIDE_SPEED             = 15.0f;
+constexpr float LANDING_APPROACH_HEIGHT = 1.0f;
+constexpr float PATROL_SPEED            = 11.2f;
+
+const Position dragonLandingPos[MAX_DRAGONS] =
+{
+    { 3249.7559f, 566.95306f, 58.562714f, 0.0f }, // Tenebron
+    { 3230.4905f, 532.9682f, 58.595776f, 0.0f },  // Shadron
+    { 3269.7075f, 532.8013f, 58.56343f, 0.0f }    // Vesperon
+};
 
 static Position const& GetDragonLandingPos(uint32 entry)
 {
@@ -295,6 +316,13 @@ static Position const& GetDragonLandingPos(uint32 entry)
         case NPC_VESPERON: return dragonLandingPos[2];
         default:           return dragonLandingPos[0];
     }
+}
+
+static Position GetDragonLandingApproachPos(uint32 entry)
+{
+    Position pos = GetDragonLandingPos(entry);
+    pos.m_positionZ += LANDING_APPROACH_HEIGHT;
+    return pos;
 }
 
 /////////////////////////////
@@ -690,7 +718,7 @@ private:
 
 struct boss_sartharion_dragonAI : public BossAI
 {
-    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false), currentPatrolPoint(0) { }
+    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false) { }
 
     void Reset() override
     {
@@ -702,7 +730,6 @@ struct boss_sartharion_dragonAI : public BossAI
         me->SetImmuneToNPC(false);
         me->SetSpeed(MOVE_FLIGHT, 1.0f);
         me->SetDisableGravity(false);
-        me->SetHover(true);
         me->ResetLootMode();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         portalGUID.Clear();
@@ -715,6 +742,8 @@ struct boss_sartharion_dragonAI : public BossAI
         if (param == ACTION_CALL_DRAGON && !isCalledBySartharion)
         {
             isCalledBySartharion = true;
+            // The capture stops the patrol at the call and glides only when the drake answers, ~4.4 s later.
+            me->StopMoving();
             extraEvents.RescheduleEvent(EVENT_MINIDRAKE_SPEECH, 4s);
         }
         else if (param == ACTION_START_PATROL)
@@ -732,20 +761,35 @@ struct boss_sartharion_dragonAI : public BossAI
 
     void MovementInform(uint32 type, uint32 pointId) final
     {
-        if (type == POINT_MOTION_TYPE && pointId == POINT_LANDING)
+        if (type != POINT_MOTION_TYPE)
+            return;
+
+        switch (pointId)
         {
-            // Dragon has landed - set ground flags
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetDisableGravity(false);
-            me->SetHover(false);
-            me->SetAnimTier(AnimTier::Ground);
-            me->SetImmuneToNPC(false);
-            me->SetInCombatWithZone();
-        }
-        else if (type == POINT_MOTION_TYPE && pointId >= 100 && pointId < 200)
-        {
-            // Patrol waypoint reached - schedule next waypoint
-            extraEvents.ScheduleEvent(EVENT_DRAGON_PATROL_WAYPOINT, 100ms);
+            case POINT_LANDING_APPROACH:
+            {
+                // 1.0 yd straight down; the anim-tier hint is what plays the fly-to-ground animation.
+                me->GetMotionMaster()->MovePoint(POINT_LANDING, GetDragonLandingPos(me->GetEntry()),
+                    FORCED_MOVEMENT_NONE, TRANSITION_SPEED, false, true, AnimTier::Ground);
+                break;
+            }
+            case POINT_LANDING:
+            {
+                // Dragon has landed - set ground flags
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetDisableGravity(false);
+                me->SetImmuneToNPC(false);
+                me->SetInCombatWithZone();
+                break;
+            }
+            case POINT_TAKEOFF:
+            {
+                // The rise is what plays the ground-to-fly animation, so the loop starts only once it has finished.
+                StartPatrolLoop();
+                break;
+            }
+            default:
+                break;
         }
     }
 
@@ -924,61 +968,42 @@ struct boss_sartharion_dragonAI : public BossAI
     {
         if (eventId == EVENT_MINIDRAKE_SPEECH)
         {
-            // Dragon speaks and starts flying to landing position
+            // Dragon speaks and glides to its landing position
             Talk(SAY_DRAKE_RESPOND);
-            me->GetMotionMaster()->Clear();
-            extraEvents.CancelEvent(EVENT_DRAGON_PATROL_WAYPOINT);
             me->SetDisableGravity(true);
-            me->SetHover(true);
-            me->SetAnimTier(AnimTier::Fly);
-            me->SetSpeed(MOVE_FLIGHT, 3.0f);
-            me->GetMotionMaster()->MovePoint(POINT_LANDING, GetDragonLandingPos(me->GetEntry()));
+            me->GetMotionMaster()->MovePoint(POINT_LANDING_APPROACH, GetDragonLandingApproachPos(me->GetEntry()),
+                FORCED_MOVEMENT_NONE, GLIDE_SPEED, false, true);
         }
         else if (eventId == EVENT_DRAGON_START_PATROL)
         {
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisableGravity(true);
-            me->SetHover(true);
-            me->SetAnimTier(AnimTier::Fly);
-            currentPatrolPoint = 0;
 
-            // Start patrol using custom waypoint system
-            extraEvents.ScheduleEvent(EVENT_DRAGON_PATROL_WAYPOINT, 100ms);
+            // 2.0 yd straight up from the spawn point; the flying anim tier is what plays the takeoff.
+            Position takeoffPos = me->GetPosition();
+            takeoffPos.m_positionZ += TAKEOFF_RISE;
+            takeoffPos.SetOrientation(0.0f);
+            me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, takeoffPos, FORCED_MOVEMENT_NONE, TRANSITION_SPEED,
+                false, true, AnimTier::Fly);
         }
-        else if (eventId == EVENT_DRAGON_PATROL_WAYPOINT)
-        {
-            // Only continue patrol if not in combat and still selectable flag is set
-            if (!me->IsInCombat() && me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-            {
-                // Ensure flying flags are maintained
-                me->SetDisableGravity(true);
-                me->SetHover(true);
-                me->SetAnimTier(AnimTier::Fly);
+    }
 
-                // Get the appropriate patrol path based on creature entry
-                Position const* patrolPath = nullptr;
-                switch (me->GetEntry())
-                {
-                    case NPC_VESPERON:
-                        patrolPath = VesperonPatrolPath;
-                        break;
-                    case NPC_TENEBRON:
-                        patrolPath = TenebronPatrolPath;
-                        break;
-                    case NPC_SHADRON:
-                        patrolPath = ShadronPatrolPath;
-                        break;
-                    default:
-                        return;
-                }
+private:
+    void StartPatrolLoop()
+    {
+        Position const* patrolPath = GetDragonPatrolPath(me->GetEntry());
 
-                // Move to next patrol point (use pointId 100+ to identify patrol points)
-                me->GetMotionMaster()->MovePoint(100 + currentPatrolPoint, patrolPath[currentPatrolPoint]);
+        // One cyclic spline, as sniffed: the drake's position above the takeoff point is the leg into the loop and is
+        // dropped once the first lap is done, as the capture shows.
+        Movement::MoveSplineInit init(me);
+        init.Path().push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+        for (uint8 i = 0; i < MAX_PATROL_POINTS; ++i)
+            init.Path().push_back(patrolPath[i]);
 
-                // Cycle to next waypoint
-                currentPatrolPoint = (currentPatrolPoint + 1) % 8;
-            }
-        }
+        init.SetFly();
+        init.SetCyclic();
+        init.SetVelocity(PATROL_SPEED);
+        init.Launch();
     }
 
 protected:
@@ -996,7 +1021,6 @@ protected:
     EventMap extraEvents;
     ObjectGuid portalGUID;
     bool isCalledBySartharion;
-    uint8 currentPatrolPoint;
 };
 
 /////////////////////////////
