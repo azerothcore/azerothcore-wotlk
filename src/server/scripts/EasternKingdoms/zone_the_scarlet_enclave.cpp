@@ -15,26 +15,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameObjectScript.h"
 #include "MoveSplineInit.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "PathGenerator.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "ObjectAccessor.h"
-#include "SpellAuras.h"
-#include <limits>
 #include "WaypointMgr.h"
 #include "WorldStateDefines.h"
+#include <limits>
 
 /*######
  ## Quest: Death Comes From High
@@ -2766,7 +2767,7 @@ class spell_chapter5_return_to_capital : public SpellScript
         if (!spellId || !creature || !player || player->IsGameMaster() || !player->IsAlive() || !creature->IsAlive() || creature->IsInCombat())
             return;
 
-        if (creature->HasSpellCooldown(spellId))
+        if (creature->GetSpellHistory()->HasCooldown(spellId))
             return;
 
         if (creature->GetEntry() == NPC_SW_GUARD || creature->GetEntry() == NPC_ROYAL_GUARD || creature->GetEntry() == NPC_CITY_PATROLLER || creature->GetEntry() == NPC_OG_GUARD || creature->GetEntry() == NPC_KOR_ELITE)
@@ -2804,7 +2805,7 @@ class spell_chapter5_return_to_capital : public SpellScript
             }
         */
 
-        creature->AddSpellCooldown(spellId, 0, 30000);
+        creature->GetSpellHistory()->AddCooldown(spellId, 0, 30s);
     }
 
     void Register() override

@@ -22,9 +22,9 @@
 #include "CellImpl.h"
 #include "Channel.h"
 #include "CharacterCache.h"
-#include "DatabaseEnv.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "DatabaseEnv.h"
 #include "GridNotifiersImpl.h"
 #include "GuildMgr.h"
 #include "ItemTemplate.h"
@@ -40,6 +40,7 @@
 #include "RBAC.h"
 #include "RaceMgr.h"
 #include "ScriptMgr.h"
+#include "SpellHistory.h"
 #include "Transport.h"
 #include "Warden.h"
 #include <algorithm>
@@ -812,10 +813,10 @@ public:
         else if (!sItemStore.LookupEntry(*item_id))
             return false;
 
-        if (end_time < player->GetSpellCooldownDelay(spell_id))
-            player->RemoveSpellCooldown(spell_id, true);
+        if (end_time < player->GetSpellHistory()->GetRemainingCooldown(spell_id))
+            player->GetSpellHistory()->ResetCooldown(spell_id, true);
 
-        player->AddSpellCooldown(spell_id, *item_id, end_time, true, false);
+        player->GetSpellHistory()->AddCooldown(spell_id, *item_id, std::chrono::milliseconds(end_time));
 
         WorldPacket data;
         player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spell_id, end_time);
