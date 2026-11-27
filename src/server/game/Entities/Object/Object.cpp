@@ -2250,7 +2250,7 @@ void WorldObject::AddObjectToRemoveList()
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, bool visibleBySummonerOnly /*= false*/)
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, bool visibleBySummonerOnly /*= false*/, Vehicle* boardOn /*= nullptr*/, int8 boardSeat /*= -1*/)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
@@ -2342,11 +2342,19 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 
     summon->SetVisibleBySummonerOnly(visibleBySummonerOnly);
 
+    // Before AddToMap: the create block it builds is what seats the passenger without a boarding animation.
+    if (boardOn)
+        summon->EnterVehicleBeforeCreate(boardOn, boardSeat);
+
     bool summonerHasTransport = summoner && summoner->GetTransport();
     bool summonerIsVehicle = summoner && summoner->IsUnit() && summoner->ToUnit()->IsVehicle();
     bool checkTransport = summon->GetOwnerGUID().IsPlayer() || (summonerHasTransport && !summonerIsVehicle);
     if (!AddToMap(summon->ToCreature(), checkTransport))
     {
+        // Release the seat again, so the vehicle keeps no passenger that never made it.
+        if (boardOn)
+            summon->_ExitVehicle();
+
         delete summon;
         return nullptr;
     }
@@ -2392,7 +2400,7 @@ void Map::SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list /*= nu
                 list->push_back(go);
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly)
+TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly, Vehicle* boardOn, int8 boardSeat)
 {
     if (!x && !y && !z)
     {
@@ -2401,7 +2409,7 @@ TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, fl
     }
     Position pos;
     pos.Relocate(x, y, z, ang);
-    return SummonCreature(id, pos, spwtype, despwtime, 0, properties, visibleBySummonerOnly);
+    return SummonCreature(id, pos, spwtype, despwtime, 0, properties, visibleBySummonerOnly, boardOn, boardSeat);
 }
 
 GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport)
@@ -2457,11 +2465,11 @@ void WorldObject::ClearZoneScript()
     m_zoneScript = nullptr;
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType spwtype, uint32 duration, uint32  /*vehId*/, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly /*= false*/) const
+TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType spwtype, uint32 duration, uint32  /*vehId*/, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly /*= false*/, Vehicle* boardOn /*= nullptr*/, int8 boardSeat /*= -1*/) const
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, (WorldObject*)this, 0, 0, visibleBySummonerOnly))
+        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, (WorldObject*)this, 0, 0, visibleBySummonerOnly, boardOn, boardSeat))
         {
             summon->SetTempSummonType(spwtype);
             return summon;

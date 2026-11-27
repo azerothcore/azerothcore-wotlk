@@ -31,13 +31,17 @@ public:
     void Uninstall();
     void Reset(bool evading = false);
     void InstallAllAccessories(bool evading);
+    void DetachAccessories();
+    void RestoreAccessories();
     void ApplyAllImmunities();
-    void InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 type, uint32 summonTime);   //! May be called from scripts
+    // createSeated creates the passenger already on its seat, without the boarding animation.
+    void InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 type, uint32 summonTime, bool createSeated = false);   //! May be called from scripts
 
     Unit* GetBase() const { return _me; }
     VehicleEntry const* GetVehicleInfo() const { return _vehicleInfo; }
     uint32 GetCreatureEntry() const { return _creatureEntry; }
     bool IsBoardableByPlayers() const { return _boardableByPlayers; }
+    [[nodiscard]] bool HasDetachedAccessories() const { return _accessoriesDetached; }
     // On a player base, false hides the board cursor and makes CMSG_PLAYER_VEHICLE_ENTER fail
     void SetBoardableByPlayers(bool boardable);
 
@@ -47,7 +51,8 @@ public:
     VehicleSeatAddon const* GetSeatAddonForSeatOfPassenger(Unit const* passenger) const;
     uint8 GetAvailableSeatCount() const;
 
-    bool AddPassenger(Unit* passenger, int8 seatId = -1);
+    // createdSeated seats without a spline: the passenger's create block already carried the seat.
+    bool AddPassenger(Unit* passenger, int8 seatId = -1, bool createdSeated = false);
     void EjectPassenger(Unit* passenger, Unit* controller);
     void RemovePassenger(Unit* passenger);
     void RelocatePassengers();
@@ -77,6 +82,7 @@ private:
     };
 
     void InitMovementInfoForBase();
+    void AnnounceAsVehicle();
 
     /// This method transforms supplied transport offsets into global coordinates
     void CalculatePassengerPosition(float& x, float& y, float& z, float* o /*= nullptr*/) const override
@@ -100,6 +106,8 @@ private:
     uint32 _creatureEntry;         // Can be different than me->GetBase()->GetEntry() in case of players
     Status _status;
     bool _accessoriesInstalled;
+    std::vector<VehicleAccessory> _detachedAccessories;  // accessory rows the base carried out of the world
+    bool _accessoriesDetached;
     bool _boardableByPlayers;
 };
 

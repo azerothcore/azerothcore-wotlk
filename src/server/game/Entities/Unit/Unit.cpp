@@ -460,6 +460,10 @@ Unit::Unit() : WorldObject(),
 // Methods of class Unit
 Unit::~Unit()
 {
+    // A player base keeps its kit through RemoveFromWorld(), so a unit destroyed without it would leak it.
+    if (m_vehicleKit)
+        RemoveVehicleKit();
+
     // Detach any AbstractFollowers still targeting this unit (e.g. a summoned pet/guardian/totem's
     // FollowMovementGenerator) before it is destroyed. RemoveAllFollowers() is otherwise only called
     // from RemoveFromWorld(), itself skipped entirely if this unit was already out of world -- so a
@@ -12253,8 +12257,14 @@ void Unit::RemoveFromWorld()
         if (IsAIEnabled)
             GetAI()->OnDespawn();
 
+        // A player base keeps its kit (and passengers) across the map change; a creature base keeps the teardown.
         if (IsVehicle())
-            RemoveVehicleKit();
+        {
+            if (IsPlayer() && GetVehicleKit())
+                GetVehicleKit()->DetachAccessories();
+            else
+                RemoveVehicleKit();
+        }
 
         RemoveCharmAuras();
         RemoveBindSightAuras();
@@ -15328,6 +15338,18 @@ void Unit::EnterVehicle(Unit* base, int8 seatId)
 void Unit::EnterVehicleUnattackable(Unit* base, int8 seatId)
 {
     CastCustomSpell(67830, SPELLVALUE_BASE_POINT0, seatId + 1, base, true);
+}
+
+void Unit::EnterVehicleBeforeCreate(Vehicle* vehicle, int8 seatId)
+{
+    // AddPassenger claims the seat before it bails out for a base outside the world.
+    if (!vehicle || m_vehicle || !vehicle->GetBase()->IsInWorld())
+        return;
+
+    m_vehicle = vehicle;
+
+    if (!vehicle->AddPassenger(this, seatId, true))
+        m_vehicle = nullptr;
 }
 
 void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* aurApp)

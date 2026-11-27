@@ -21,11 +21,13 @@
 #include "Log.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
+#include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
+#include "WorldPacket.h"
 #include <algorithm>
 
 enum PowerDisplayIds
@@ -35,7 +37,7 @@ enum PowerDisplayIds
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE),
-    _accessoriesInstalled(false), _boardableByPlayers(true)
+    _accessoriesInstalled(false), _accessoriesDetached(false), _boardableByPlayers(true)
 {
     for (uint32 i = 0; i < MAX_VEHICLE_SEATS; ++i)
     {
@@ -120,6 +122,56 @@ void Vehicle::InstallAllAccessories(bool evading)
             InstallAccessory(itr->AccessoryEntry, itr->SeatId, itr->IsMinion, itr->SummonedType, itr->SummonTime);
 }
 
+void Vehicle::DetachAccessories()
+{
+    _detachedAccessories.clear();
+    // Set even without a recorded row: Reset() uses it to re-announce a vehicle whose seats are all empty.
+    _accessoriesDetached = true;
+
+    std::vector<TempSummon*> summons;
+    if (VehicleAccessoryList const* accessories = sObjectMgr->GetVehicleAccessoryList(this))
+        for (VehicleAccessory const& accessory : *accessories)
+        {
+            Unit* passenger = GetPassenger(accessory.SeatId);
+            if (!passenger || !passenger->IsCreature() || passenger->GetEntry() != accessory.AccessoryEntry)
+                continue;
+
+            _detachedAccessories.push_back(accessory);
+            if (TempSummon* summon = passenger->ToTempSummon())
+                summons.push_back(summon);
+        }
+
+    // Clear the seats first: the aura unapply ejects every passenger and clears its m_vehicle.
+    RemoveAllPassengers();
+
+    for (TempSummon* summon : summons)
+        summon->UnSummon();
+}
+
+void Vehicle::RestoreAccessories()
+{
+    if (!_accessoriesDetached)
+        return;
+
+    std::vector<VehicleAccessory> accessories;
+    accessories.swap(_detachedAccessories);
+    _accessoriesDetached = false;
+
+    // Only the seated rows are restored, and they are created already sitting there.
+    for (VehicleAccessory const& accessory : accessories)
+        InstallAccessory(accessory.AccessoryEntry, accessory.SeatId, accessory.IsMinion,
+            accessory.SummonedType, accessory.SummonTime, /*createSeated=*/ true);
+}
+
+// The announcement Unit::Mount sends: the client discarded its world on the map change.
+void Vehicle::AnnounceAsVehicle()
+{
+    WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, _me->GetPackGUID().size() + 4);
+    data << _me->GetPackGUID();
+    data << uint32(_vehicleInfo->m_ID);
+    _me->SendMessageToSet(&data, true);
+}
+
 void Vehicle::Uninstall()
 {
     /// @Prevent recursive uninstall call. (Bad script in OnUninstall/OnRemovePassenger/PassengerBoarded hook.)
@@ -147,6 +199,12 @@ void Vehicle::Reset(bool evading /*= false*/)
     {
         if (_usableSeatNum && _boardableByPlayers)
             _me->SetNpcFlag(UNIT_NPC_FLAG_PLAYER_VEHICLE);
+
+        if (_accessoriesDetached)
+        {
+            AnnounceAsVehicle();
+            RestoreAccessories();
+        }
     }
     else
     {
@@ -309,7 +367,7 @@ int8 Vehicle::GetNextEmptySeat(int8 seatId, bool next) const
     return seat->first;
 }
 
-void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 type, uint32 summonTime)
+void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 type, uint32 summonTime, bool createSeated)
 {
     /// @Prevent adding accessories when vehicle is uninstalling. (Bad script in OnUninstall/OnRemovePassenger/PassengerBoarded hook.)
     if (_status == STATUS_UNINSTALLING)
@@ -337,7 +395,11 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
             passenger->ExitVehicle(); // this should not happen
     }
 
-    if (TempSummon* accessory = _me->SummonCreature(entry, *_me, TempSummonType(type), summonTime))
+    TempSummon* accessory = createSeated
+        ? _me->SummonCreature(entry, *_me, TempSummonType(type), summonTime, 0, nullptr, false, this, seatId)
+        : _me->SummonCreature(entry, *_me, TempSummonType(type), summonTime);
+
+    if (accessory)
     {
         if (minion)
         {
@@ -356,7 +418,7 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
     }
 }
 
-bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
+bool Vehicle::AddPassenger(Unit* unit, int8 seatId, bool createdSeated)
 {
     /// @Prevent adding passengers when vehicle is uninstalling. (Bad script in OnUninstall/OnRemovePassenger/PassengerBoarded hook.)
     if (_status == STATUS_UNINSTALLING)
@@ -462,23 +524,27 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         unit->SetControlled(true, UNIT_STATE_ROOT);             // SMSG_FORCE_ROOT - In some cases we send SMSG_SPLINE_MOVE_ROOT here (for creatures)
         if (unit->IsPlayer())
             unit->ToPlayer()->SetExpectingChangeTransport(true);
-        // also adds MOVEMENTFLAG_ROOT
-        Movement::MoveSplineInit init(unit);
-        init.DisableTransportPathTransformations();
-        init.MoveTo(x, y, z, false, true);
-        // Xinef: did not found anything unique in dbc, maybe missed something
-        if (veSeat->m_ID == 3566 || veSeat->m_ID == 3567 || veSeat->m_ID == 3568 || veSeat->m_ID == 3570)
-        {
-            CalculatePassengerPosition(x, y, z, &o);
-            init.SetFacing(_me->GetAngle(x, y));
-        }
-        else
-        {
-            init.SetFacing(o);
-        }
 
-        init.SetTransportEnter();
-        init.Launch();
+        if (!createdSeated)
+        {
+            // also adds MOVEMENTFLAG_ROOT
+            Movement::MoveSplineInit init(unit);
+            init.DisableTransportPathTransformations();
+            init.MoveTo(x, y, z, false, true);
+            // Xinef: did not found anything unique in dbc, maybe missed something
+            if (veSeat->m_ID == 3566 || veSeat->m_ID == 3567 || veSeat->m_ID == 3568 || veSeat->m_ID == 3570)
+            {
+                CalculatePassengerPosition(x, y, z, &o);
+                init.SetFacing(_me->GetAngle(x, y));
+            }
+            else
+            {
+                init.SetFacing(o);
+            }
+
+            init.SetTransportEnter();
+            init.Launch();
+        }
 
         // Put the vehicle in combat with anything that was threatening the passenger; the threat itself stays on the passenger
         for (auto const& [guid, threatRef] : unit->GetThreatMgr().GetThreatenedByMeList())
