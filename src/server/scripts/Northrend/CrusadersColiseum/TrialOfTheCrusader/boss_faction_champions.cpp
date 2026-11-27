@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellHistory.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
@@ -148,12 +149,12 @@ struct boss_faction_championsAI : public ScriptedAI
         {
             if (!IsHeroic())
                 return true;
-            if (me->HasSpellCooldown(SPELL_PVP_TRINKET))
+            if (me->GetSpellHistory()->HasCooldown(SPELL_PVP_TRINKET))
                 return true;
             else
             {
                 me->CastSpell(me, SPELL_PVP_TRINKET, false);
-                me->AddSpellCooldown(SPELL_PVP_TRINKET, 0, 0);
+                me->GetSpellHistory()->StartCooldown(sSpellMgr->AssertSpellInfo(SPELL_PVP_TRINKET), 0);
             }
         }
         return false;

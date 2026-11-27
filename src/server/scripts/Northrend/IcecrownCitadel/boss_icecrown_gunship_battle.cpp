@@ -23,14 +23,15 @@
 #include "GameTime.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "PassiveAI.h"
+#include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "Vehicle.h"
 #include "icecrown_citadel.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -1494,10 +1495,10 @@ void TriggerBurningPitch(Creature* c)
 {
     InstanceScript* i = c->GetInstanceScript();
     uint32 spellId = i->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_A : SPELL_BURNING_PITCH_H;
-    if (!c->HasSpellCooldown(spellId))
+    if (!c->GetSpellHistory()->HasCooldown(spellId))
     {
         c->CastSpell((Unit*)nullptr, spellId, false);
-        c->_AddCreatureSpellCooldown(spellId, 0, urand(3000, 4000));
+        c->GetSpellHistory()->AddCooldown(spellId, 0, std::chrono::milliseconds(urand(3000, 4000)));
     }
 }
 
@@ -1959,11 +1960,11 @@ public:
                 return;
 
             uint32 spellId = me->GetEntry() == NPC_SKYBREAKER_MORTAR_SOLDIER ? SPELL_ROCKET_ARTILLERY_A : SPELL_ROCKET_ARTILLERY_H;
-            if (me->HasSpellCooldown(spellId))
+            if (me->GetSpellHistory()->HasCooldown(spellId))
                 return;
 
             me->CastSpell((Unit*)nullptr, spellId, true);
-            me->_AddCreatureSpellCooldown(spellId, 0, 9000);
+            me->GetSpellHistory()->AddCooldown(spellId, 0, 9s);
         }
 
         bool CanAIAttack(Unit const*  /*target*/) const override

@@ -20,6 +20,7 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -190,12 +191,12 @@ class spell_rog_cheat_death : public AuraScript
     void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
         Player* target = GetTarget()->ToPlayer();
-        if (dmgInfo.GetDamage() < target->GetHealth() || target->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) || !roll_chance_i(absorbChance))
+        if (dmgInfo.GetDamage() < target->GetHealth() || target->GetSpellHistory()->HasCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) || !roll_chance_i(absorbChance))
             return;
 
         target->CastSpell(target, SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, true);
         target->CastSpell(target, SPELL_ROGUE_CHEATING_DEATH, true);
-        target->AddSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, MINUTE * IN_MILLISECONDS);
+        target->GetSpellHistory()->AddCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, 1min);
 
         uint32 health10 = target->CountPctFromMaxHealth(10);
 
@@ -470,41 +471,23 @@ class spell_rog_preparation : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        Player* caster = GetCaster()->ToPlayer();
+        Unit* caster = GetCaster();
         //immediately finishes the cooldown on certain Rogue abilities
-
         bool hasGlyph = caster->HasAura(SPELL_ROGUE_GLYPH_OF_PREPARATION);
-        PlayerSpellMap const& spellMap = caster->GetSpellMap();
-        for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
+        caster->GetSpellHistory()->ResetCooldowns([hasGlyph](SpellHistory::CooldownStorageType::iterator itr) -> bool
         {
-            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
-            if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-            {
-                if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep
-                        spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT)           // Vanish, Evasion, Sprint
-                {
-                    SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
-                    if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
-                        caster->RemoveSpellCooldown(spellInfo->Id, true);
-                    else
-                        caster->RemoveSpellCooldown(spellInfo->Id, false);
-                }
-                else if (hasGlyph)
-                {
-                    if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_DISMANTLE ||         // Dismantle
-                            spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_KICK ||               // Kick
-                            (spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_BLADE_FLURRY &&     // Blade Flurry
-                                spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_BLADE_FLURRY))
-                    {
-                        SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
-                        if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
-                            caster->RemoveSpellCooldown(spellInfo->Id, true);
-                        else
-                            caster->RemoveSpellCooldown(spellInfo->Id, false);
-                    }
-                }
-            }
-        }
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            if (!spellInfo || spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE)
+                return false;
+
+            return (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||  // Cold Blood, Shadowstep
+                spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT) ||       // Vanish, Evasion, Sprint
+                (hasGlyph &&
+                (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_DISMANTLE ||            // Dismantle
+                spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_KICK ||                   // Kick
+                (spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_BLADE_FLURRY &&          // Blade Flurry
+                spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_BLADE_FLURRY)));
+        }, true);
     }
 
     void Register() override
@@ -772,8 +755,8 @@ class spell_rog_vanish : public SpellScript
             if (!GetCaster()->HasAura(SPELL_STEALTH))
             {
                 // Remove stealth cooldown if needed.
-                if (GetCaster()->IsPlayer() && GetCaster()->HasSpellCooldown(SPELL_STEALTH))
-                    GetCaster()->ToPlayer()->RemoveSpellCooldown(SPELL_STEALTH);
+                if (GetCaster()->IsPlayer() && GetCaster()->GetSpellHistory()->HasCooldown(SPELL_STEALTH))
+                    GetCaster()->ToPlayer()->GetSpellHistory()->ResetCooldown(SPELL_STEALTH);
 
                 GetCaster()->CastSpell(GetCaster(), SPELL_STEALTH, true);
             }

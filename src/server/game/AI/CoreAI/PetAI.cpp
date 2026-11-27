@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
@@ -254,11 +255,11 @@ void PetAI::UpdateAI(uint32 diff)
             if (!spellInfo)
                 continue;
 
-            if (me->GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
+            if (me->GetSpellHistory()->HasGlobalCooldown(spellInfo))
                 continue;
 
             // check spell cooldown, this should be checked in CheckCast...
-            if (me->HasSpellCooldown(spellInfo->Id))
+            if (me->GetSpellHistory()->HasCooldown(spellInfo->Id))
                 continue;
 
             if (spellInfo->IsPositive())

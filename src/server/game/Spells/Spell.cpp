@@ -19,8 +19,8 @@
 #include "ArenaSpectator.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
-#include "CharmInfo.h"
 #include "CellImpl.h"
+#include "CharmInfo.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DisableMgr.h"
@@ -41,6 +41,7 @@
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -51,8 +52,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include <cmath>
 #include <G3D/g3dmath.h>
+#include <cmath>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -3352,7 +3353,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 // xinef: apply relic cooldown, imo best place to add this
                 if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
                     if (unitCaster)
-                        unitCaster->AddSpellCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), duration);
+                        unitCaster->GetSpellHistory()->AddCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), std::chrono::milliseconds(duration));
 
                 m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
                 m_spellAura->_RegisterForTargets();
@@ -3891,7 +3892,7 @@ void Spell::cancel(bool bySelf)
                             unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
                 if (unitCaster && unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
-                    unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                    unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
 
                 SendChannelUpdate(0);
                 SendInterrupted(SPELL_FAILED_INTERRUPTED);
@@ -3929,7 +3930,7 @@ void Spell::cancel(bool bySelf)
             {
                 unitCaster->RemoveGameObject(gameObject, true);
                 if (gameObject->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL && unitCaster->IsPlayer())
-                    unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                    unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
             }
         }
     }
@@ -4255,7 +4256,7 @@ void Spell::_cast(bool skipCheck)
 
     if (unitCaster && unitCaster->IsPlayer())
         if (unitCaster->ToPlayer()->GetCommandStatus(CHEAT_COOLDOWN))
-            unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
 
     sScriptMgr->OnSpellCast(this, unitCaster, m_spellInfo, skipCheck);
 
@@ -4480,7 +4481,7 @@ void Spell::_handle_finish_phase()
                     // Xinef: Properly clear infinite cooldowns in some cases
                     if (ihit->targetGUID == unitCaster->GetGUID() && ihit->missCondition != SPELL_MISS_NONE)
                         if (unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
-                            unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo);
+                            unitCaster->ToPlayer()->GetSpellHistory()->SendCooldownEvent(m_spellInfo);
                 }
     }
 
@@ -4536,8 +4537,8 @@ void Spell::SendSpellCooldown()
     {
         if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD))
         {
-            if (unitCaster->GetCharmInfo() && !m_spellInfo->IsCooldownStartedOnEvent())
-                unitCaster->AddSpellCooldown(m_spellInfo->Id, 0, 0);
+            if (unitCaster->GetCharmInfo())
+                unitCaster->GetSpellHistory()->HandleCooldowns(m_spellInfo, m_CastItem, this);
 
             // xinef: this adds cooldowns to vehicle spells which misses them client-side (when we overwrote dbc info in eg.)
             if (m_spellInfo->RequireCooldownInfo())
@@ -4554,25 +4555,7 @@ void Spell::SendSpellCooldown()
         return;
     }
 
-    Player* _player = unitCaster->ToPlayer();
-
-    // mana/health/etc potions, disabled by client (until combat out as declarate)
-    if (m_CastItem && (m_CastItem->IsPotion() || m_spellInfo->IsCooldownStartedOnEvent()))
-    {
-        // need in some way provided data for Spell::finish SendCooldownEvent
-        _player->SetLastPotionId(m_CastItem->GetEntry());
-        return;
-    }
-
-    // have infinity cooldown but set at aura apply
-    // do not set cooldown for triggered spells (needed by reincarnation)
-    if (m_spellInfo->IsCooldownStartedOnEvent()
-        || m_spellInfo->IsPassive()
-        || (HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && !m_CastItem)
-        || HasTriggeredCastFlag(TRIGGERED_IGNORE_EFFECTS))
-        return;
-
-    _player->AddSpellAndCategoryCooldowns(m_spellInfo, m_CastItem ? m_CastItem->GetEntry() : 0, this);
+    unitCaster->GetSpellHistory()->HandleCooldowns(m_spellInfo, m_CastItem, this);
 }
 
 void Spell::update(uint32 difftime)
@@ -4702,7 +4685,7 @@ void Spell::finish(bool ok)
     if (ok)
     {
         if (unitCaster->IsPlayer() && m_spellInfo->IsChanneled() && m_spellInfo->IsCooldownStartedOnEvent())
-            unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
     }
     else
     {
@@ -4713,7 +4696,7 @@ void Spell::finish(bool ok)
 
             // Xinef: Reset cooldown event in case of fail cast
             if (m_spellInfo->IsCooldownStartedOnEvent())
-                unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo, 0, 0, false);
+                unitCaster->ToPlayer()->GetSpellHistory()->SendCooldownEvent(m_spellInfo, 0, nullptr, false);
         }
 
         return;
@@ -5929,7 +5912,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_CASTER_AURASTATE) && unitCaster->ToPlayer()->HasPlayerFlag(PLAYER_ALLOW_ONLY_ABILITY) && !IsNextMeleeSwingSpell())
                 return SPELL_FAILED_SPELL_IN_PROGRESS;
 
-            if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && unitCaster->ToPlayer()->HasSpellCooldown(m_spellInfo->Id))
+            if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && !unitCaster->GetSpellHistory()->IsReady(m_spellInfo, m_CastItem ? m_CastItem->GetEntry() : 0))
             {
                 if (m_triggeredByAuraSpell)
                     return SPELL_FAILED_DONT_REPORT;
@@ -5941,7 +5924,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (unitCaster->ToPlayer()->GetLastPotionId() && m_CastItem && (m_CastItem->IsPotion() || m_spellInfo->IsCooldownStartedOnEvent()))
                 return SPELL_FAILED_NOT_READY;
         }
-        else if (!IsTriggered() && unitCaster && unitCaster->IsCreature() && unitCaster->ToCreature()->IsSpellProhibited(m_spellInfo->GetSchoolMask()))
+        else if (!IsTriggered() && unitCaster && unitCaster->IsCreature() && unitCaster->GetSpellHistory()->IsSchoolLocked(m_spellInfo->GetSchoolMask()))
             return SPELL_FAILED_NOT_READY;
     }
 
@@ -7123,7 +7106,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
     // xinef: check relic cooldown
     if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
-        if (unitCaster && unitCaster->HasSpellCooldown(SPELL_RELIC_COOLDOWN) && !unitCaster->HasSpellItemCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry()))
+        if (unitCaster && unitCaster->GetSpellHistory()->HasCooldown(SPELL_RELIC_COOLDOWN) && !unitCaster->GetSpellHistory()->HasItemCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry()))
             return SPELL_FAILED_NOT_READY;
 
     // all ok
@@ -7156,12 +7139,12 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
     // cooldown
     if (Creature const* creatureCaster = unitCaster->ToCreature())
-        if (creatureCaster->HasSpellCooldown(m_spellInfo->Id))
+        if (creatureCaster->GetSpellHistory()->HasCooldown(m_spellInfo->Id))
             return SPELL_FAILED_NOT_READY;
 
     // Check if spell is affected by GCD
     if (m_spellInfo->StartRecoveryCategory > 0)
-        if (unitCaster->GetCharmInfo() && unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo))
+        if (unitCaster->GetCharmInfo() && unitCaster->GetSpellHistory()->HasGlobalCooldown(m_spellInfo))
             return SPELL_FAILED_NOT_READY;
 
     return CheckCast(true);
@@ -9285,12 +9268,10 @@ bool Spell::HasGlobalCooldown() const
         return false;
 
     // Only player or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        return unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo);
-    else if (unitCaster->IsPlayer())
-        return unitCaster->ToPlayer()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo);
-    else
+    if (!unitCaster->GetCharmInfo() && !unitCaster->IsPlayer())
         return false;
+
+    return unitCaster->GetSpellHistory()->HasGlobalCooldown(m_spellInfo);
 }
 
 void Spell::TriggerGlobalCooldown()
@@ -9336,10 +9317,8 @@ void Spell::TriggerGlobalCooldown()
     }
 
     // Only players or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().AddGlobalCooldown(m_spellInfo, gcd);
-    else if (unitCaster->IsPlayer())
-        unitCaster->ToPlayer()->GetGlobalCooldownMgr().AddGlobalCooldown(m_spellInfo, gcd);
+    if (unitCaster->GetCharmInfo() || unitCaster->IsPlayer())
+        unitCaster->GetSpellHistory()->AddGlobalCooldown(m_spellInfo, gcd);
 }
 
 void Spell::CancelGlobalCooldown()
@@ -9356,10 +9335,8 @@ void Spell::CancelGlobalCooldown()
         return;
 
     // Only players or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
-    else if (unitCaster->IsPlayer())
-        unitCaster->ToPlayer()->GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
+    if (unitCaster->GetCharmInfo() || unitCaster->IsPlayer())
+        unitCaster->GetSpellHistory()->CancelGlobalCooldown(m_spellInfo);
 }
 
 void Spell::OnSpellLaunch()
