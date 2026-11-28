@@ -84,6 +84,8 @@ services:
       - ${DOCKER_VOL_LOGS:-./env/dist/logs}:/azerothcore/env/dist/logs:delegated
       # client data
       - ${DOCKER_VOL_DATA:-ac-client-data}:/azerothcore/env/dist/data/:ro
+      # mount modules dir so core can load them
+      - ${DOCKER_VOL_MODULES:-./modules}:/azerothcore/modules:ro
     depends_on:
       ac-database:
         condition: service_healthy
