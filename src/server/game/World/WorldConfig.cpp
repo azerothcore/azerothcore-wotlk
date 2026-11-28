@@ -134,7 +134,7 @@ void WorldConfig::BuildConfigCache()
     // Controls all npc movespeed rate.
     SetConfigValue<float>(RATE_MOVESPEED_NPC, "Rate.MoveSpeed.NPC", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
 
-    SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0.5f);
+    SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0.5f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 1.0f; }, ">= 0 && <= 1");
 
     SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_DEATH, "DurabilityLoss.OnDeath", 10.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 100.0f; }, ">= 0 && <= 100");
 
@@ -268,7 +268,6 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_INSTANCE_IGNORE_LEVEL, "Instance.IgnoreLevel", false);
     SetConfigValue<bool>(CONFIG_INSTANCE_IGNORE_RAID, "Instance.IgnoreRaid", false);
-    SetConfigValue<bool>(CONFIG_INSTANCE_GMSUMMON_PLAYER, "Instance.GMSummonPlayer", false);
     SetConfigValue<bool>(CONFIG_INSTANCE_SHARED_ID, "Instance.SharedNormalHeroicId", true);
 
     SetConfigValue<uint32>(CONFIG_INSTANCE_RESET_TIME_HOUR, "Instance.ResetTimeHour", 4);
@@ -506,6 +505,7 @@ void WorldConfig::BuildConfigCache()
     ///- Load the ItemDelete related config options
     SetConfigValue<bool>(CONFIG_ITEMDELETE_METHOD, "ItemDelete.Method", 0);
     SetConfigValue<bool>(CONFIG_ITEMDELETE_VENDOR, "ItemDelete.Vendor", 0);
+    SetConfigValue<bool>(CONFIG_ITEMDELETE_DISENCHANT, "ItemDelete.Disenchant", 0);
     SetConfigValue<uint32>(CONFIG_ITEMDELETE_QUALITY, "ItemDelete.Quality", 3);
     SetConfigValue<uint32>(CONFIG_ITEMDELETE_ITEM_LEVEL, "ItemDelete.ItemLevel", 80);
     SetConfigValue<uint32>(CONFIG_ITEMDELETE_KEEP_DAYS, "ItemDelete.KeepDays", 0);

@@ -28,6 +28,7 @@
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Unit.h"
@@ -360,7 +361,7 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
 Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID /*= ObjectGuid::Empty*/) :
     m_spellInfo(spellproto), m_casterGuid(casterGUID ? casterGUID : (caster ? caster->GetGUID() : ObjectGuid::Empty)),
     m_castItemGuid(itemGUID ? itemGUID : castItem ? castItem->GetGUID() : ObjectGuid::Empty), m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(GameTime::GetGameTime().count()),
-    m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
+    m_refreshTime(GameTime::GetGameTimeMS()), m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
     m_casterLevel(caster ? caster->GetLevel() : m_spellInfo->SpellLevel), m_procCharges(0), m_stackAmount(1),
     m_isRemoved(false), m_isSingleTarget(false), m_isUsingCharges(false), m_triggeredByAuraSpellInfo(nullptr)
 {
@@ -429,6 +430,12 @@ Unit* Aura::GetCaster() const
     return ObjectAccessor::GetUnit(*GetOwner(), GetCasterGUID());
 }
 
+bool Aura::HasCasterDiedSinceApply(Unit const* caster) const
+{
+    // auras on the caster itself that survive its death are passives or death persistent, never left behind
+    return caster && caster != GetOwner() && caster->GetLastDeathTime() >= m_refreshTime;
+}
+
 AuraObjectType Aura::GetType() const
 {
     if (!m_owner)
@@ -451,16 +458,7 @@ void Aura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication* auraApp)
 
     // set infinity cooldown state for spells
     if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid && caster)
-    {
-        if (caster->IsPlayer())
-        {
-            caster->ToPlayer()->AddSpellAndCategoryCooldowns(m_spellInfo, 0, nullptr, true);
-        }
-        else
-        {
-            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, infinityCooldownDelay);
-        }
-    }
+        caster->GetSpellHistory()->StartCooldown(m_spellInfo, 0, nullptr, true);
 }
 
 void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraApp)
@@ -486,38 +484,9 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
     m_removedApplications.push_back(auraApp);
 
     // reset cooldown state for spells
+    // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
     if (m_spellInfo->IsCooldownStartedOnEvent() && !m_castItemGuid && caster)
-    {
-        if (caster->IsPlayer())
-        {
-            // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
-            caster->ToPlayer()->SendCooldownEvent(GetSpellInfo());
-        }
-        else
-        {
-            caster->ToCreature()->AddSpellCooldown(m_spellInfo->Id, 0, 0);
-
-            if (Unit* owner = caster->GetCharmerOrOwner())
-            {
-                if (Player* playerOwner = owner->ToPlayer())
-                {
-                    WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
-                    data << uint32(m_spellInfo->Id);
-                    data << caster->GetGUID();
-                    playerOwner->SendDirectMessage(&data);
-                }
-            }
-        }
-    }
-
-    if (caster && caster->IsPlayer())
-    {
-        if (GetSpellInfo()->IsCooldownStartedOnEvent() && !m_castItemGuid)
-        {
-            // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existed cases)
-            caster->ToPlayer()->SendCooldownEvent(GetSpellInfo());
-        }
-    }
+        caster->GetSpellHistory()->SendCooldownEvent(GetSpellInfo());
 }
 
 // removes aura from all targets
@@ -926,6 +895,8 @@ void Aura::RefreshDuration(bool withMods)
     if (!caster)
         return;
 
+    m_refreshTime = GameTime::GetGameTimeMS();
+
     if (withMods && caster)
     {
         int32 duration = m_spellInfo->GetMaxDuration();
@@ -1036,11 +1007,20 @@ bool Aura::ModCharges(int32 num, AuraRemoveMode removeMode)
 
 void Aura::SetStackAmount(uint8 stackAmount)
 {
+    uint8 const oldStackAmount = m_stackAmount;
     m_stackAmount = stackAmount;
     Unit* caster = GetCaster();
 
     if (!caster)
+    {
+        // can't recalc without the caster (its bonuses would be lost), so scale the current amount instead
+        if (oldStackAmount && oldStackAmount != stackAmount)
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                if (HasEffect(i))
+                    m_effects[i]->ChangeAmount(
+                        int32(int64(m_effects[i]->GetAmount()) * stackAmount / oldStackAmount), false, false);
         return;
+    }
 
     std::list<AuraApplication*> applications;
     GetApplicationList(applications);
@@ -1417,7 +1397,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                     case 60970: // Heroic Fury (remove Intercept cooldown)
                         if (target->IsPlayer())
-                            target->ToPlayer()->RemoveSpellCooldown(20252, true);
+                            target->ToPlayer()->GetSpellHistory()->ResetCooldown(20252, true);
                         break;
                 }
                 break;
@@ -1759,15 +1739,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // check cooldown
                         if (caster->IsPlayer())
                         {
-                            if (caster->ToPlayer()->HasSpellCooldown(aura->GetId()))
+                            if (caster->GetSpellHistory()->HasCooldown(aura->GetId()))
                             {
                                 // This additional check is needed to add a minimal delay before cooldown in in effect
                                 // to allow all bubbles broken by a single damage source proc mana return
-                                if (caster->ToPlayer()->GetSpellCooldownDelay(aura->GetId()) <= 11500)
+                                if (caster->GetSpellHistory()->GetRemainingCooldown(aura->GetSpellInfo()) <= 11500)
                                     break;
                             }
                             else    // and add if needed
-                                caster->ToPlayer()->AddSpellCooldown(aura->GetId(), 0, 12 * IN_MILLISECONDS);
+                                caster->GetSpellHistory()->AddCooldown(aura->GetId(), 0, 12s);
                         }
 
                         // effect on caster
@@ -1827,10 +1807,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Glyph of Guardian Spirit
                         if (AuraEffect* aurEff = player->GetAuraEffect(63231, 0))
                         {
-                            if (!player->HasSpellCooldown(47788))
+                            if (!player->GetSpellHistory()->HasCooldown(47788))
                                 break;
 
-                            player->AddSpellCooldown(GetSpellInfo()->Id, 0, aurEff->GetAmount()*IN_MILLISECONDS);
+                            player->GetSpellHistory()->AddCooldown(GetSpellInfo()->Id, 0, std::chrono::seconds(aurEff->GetAmount()));
 
                             WorldPacket data(SMSG_MODIFY_COOLDOWN, 4 + 8 + 4);
                             data << uint32(GetId());                  // Spell ID
@@ -2761,22 +2741,6 @@ bool Aura::CallScriptCheckEffectProcHandlers(AuraEffect const* aurEff, AuraAppli
         for (; effItr != effEndItr; ++effItr)
             if (effItr->IsEffectAffected(m_spellInfo, aurEff->GetEffIndex()))
                 result &= effItr->Call(*scritr, aurEff, eventInfo);
-
-        (*scritr)->_FinishScriptCall();
-    }
-
-    return result;
-}
-
-bool Aura::CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-{
-    bool result = isTriggeredAtSpellProcEvent;
-    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
-    {
-        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_AFTER_CHECK_PROC, aurApp);
-        std::list<AuraScript::AfterCheckProcHandler>::iterator hookItrEnd = (*scritr)->DoAfterCheckProc.end(), hookItr = (*scritr)->DoAfterCheckProc.begin();
-        for (; hookItr != hookItrEnd; ++hookItr)
-            result &= hookItr->Call(*scritr, eventInfo, isTriggeredAtSpellProcEvent);
 
         (*scritr)->_FinishScriptCall();
     }

@@ -51,6 +51,7 @@
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
 #include "Totem.h"
@@ -974,7 +975,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
     // Remove spell cooldown (not category) if spell triggering spell with cooldown and same category
     if (unitCaster && unitCaster->IsPlayer() && spellInfo->CategoryRecoveryTime && m_spellInfo->GetCategory() == spellInfo->GetCategory())
     {
-        unitCaster->ToPlayer()->RemoveSpellCooldown(spellInfo->Id);
+        unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(spellInfo->Id);
     }
 
     // original caster guid only for GO cast
@@ -1033,7 +1034,7 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
     // Remove spell cooldown (not category) if spell triggering spell with cooldown and same category
     if (unitCaster && unitCaster->IsPlayer() && spellInfo->CategoryRecoveryTime && m_spellInfo->GetCategory() == spellInfo->GetCategory())
     {
-        unitCaster->ToPlayer()->RemoveSpellCooldown(spellInfo->Id);
+        unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(spellInfo->Id);
     }
 
     // original caster guid only for GO cast
@@ -1974,16 +1975,20 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
 
 void Spell::EffectEnergize(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
-    if (!unitCaster)
-        return;
-
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
         return;
+
     if (!unitTarget->IsAlive())
+        return;
+
+    Unit* unitCaster = GetUnitCasterForEffectHandlers();
+    if (!unitCaster && m_caster->IsGameObject())
+        unitCaster = unitTarget;
+
+    if (!unitCaster)
         return;
 
     if (unitTarget->IsImmunedToAuraPeriodicTick(unitCaster, m_spellInfo))
@@ -2086,16 +2091,20 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
 
 void Spell::EffectEnergizePct(SpellEffIndex effIndex)
 {
-    Unit* unitCaster = GetUnitCasterForEffectHandlers();
-    if (!unitCaster)
-        return;
-
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
     if (!unitTarget)
         return;
+
     if (!unitTarget->IsAlive())
+        return;
+
+    Unit* unitCaster = GetUnitCasterForEffectHandlers();
+    if (!unitCaster && m_caster->IsGameObject())
+        unitCaster = unitTarget;
+
+    if (!unitCaster)
         return;
 
     if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
@@ -3070,6 +3079,7 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
         }
 
         item_owner->RemoveTradeableItem(itemTarget);
+        itemTarget->SetNotRefundable(item_owner);
         itemTarget->ClearSoulboundTradeable(item_owner);
     }
 }
@@ -3138,6 +3148,7 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     item_owner->ApplyEnchantment(itemTarget, PRISMATIC_ENCHANTMENT_SLOT, true);
 
     item_owner->RemoveTradeableItem(itemTarget);
+    itemTarget->SetNotRefundable(item_owner);
     itemTarget->ClearSoulboundTradeable(item_owner);
 }
 
@@ -3305,6 +3316,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
     }
 
     item_owner->RemoveTradeableItem(itemTarget);
+    itemTarget->SetNotRefundable(item_owner);
     itemTarget->ClearSoulboundTradeable(item_owner);
 }
 
@@ -3423,12 +3435,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
 
             OldSummon->SetHealth(OldSummon->GetMaxHealth());
             OldSummon->SetPower(OldSummon->getPowerType(), OldSummon->GetMaxPower(OldSummon->getPowerType()));
-            // notify player
-            for (CreatureSpellCooldowns::const_iterator itr = OldSummon->m_CreatureSpellCooldowns.begin(); itr != OldSummon->m_CreatureSpellCooldowns.end(); ++itr)
-                owner->SendClearCooldown(itr->first, OldSummon);
-
-            // actually clear cooldowns
-            OldSummon->m_CreatureSpellCooldowns.clear();
+            OldSummon->GetSpellHistory()->ResetAllCooldowns();
             Unit::AuraApplicationMap& myAuras = OldSummon->GetAppliedAuras();
             for (Unit::AuraApplicationMap::iterator i = myAuras.begin(); i != myAuras.end();)
             {
@@ -3466,7 +3473,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     // Reset cooldowns
     if (!owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
     {
-        pet->m_CreatureSpellCooldowns.clear();
+        pet->GetSpellHistory()->ResetAllCooldowns();
         owner->PetSpellInitialize();
     }
 
@@ -3961,7 +3968,7 @@ void Spell::EffectInterruptCast(SpellEffIndex effIndex)
                 if (m_originalCaster)
                 {
                     int32 duration = m_originalCaster->ModSpellDuration(m_spellInfo, unitTarget, m_originalCaster->CalcSpellDuration(m_spellInfo), false, 1 << effIndex);
-                    unitTarget->ProhibitSpellSchool(curSpellInfo->GetSchoolMask(), duration/*spellInfo->GetDuration()*/);
+                    unitTarget->GetSpellHistory()->LockSpellSchool(curSpellInfo->GetSchoolMask(), duration/*spellInfo->GetDuration()*/);
                 }
                 ExecuteLogEffectInterruptCast(effIndex, unitTarget, curSpellInfo->Id);
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
@@ -4404,7 +4411,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
 
     // xinef: no hearthstone in bag or on cooldown
     Item* hearthStone = target->GetItemByEntry(6948);
-    if (!hearthStone || target->HasSpellCooldown(8690))
+    if (!hearthStone || target->GetSpellHistory()->HasCooldown(8690))
     {
         float o = rand_norm() * 2 * M_PI;
         Position pos = *target;
@@ -5702,8 +5709,12 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(name_id) ? new StaticTransport() : new GameObject();
 
-    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), unitCaster->GetOrientation());
-    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, unitCaster->GetPhaseMask(), fx, fy, fz, unitCaster->GetOrientation(), rotation, 100, GO_STATE_READY))
+    // A summoned gameobject faces the way its actual caster faces: a ritual object casting on its owner's behalf
+    // keeps its own orientation.
+    float orientation = m_caster->GetOrientation();
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), orientation);
+    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, unitCaster->GetPhaseMask(),
+        fx, fy, fz, orientation, rotation, 100, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -6579,7 +6590,7 @@ void Spell::EffectCastButtons(SpellEffIndex effIndex)
         if (!spellInfo)
             continue;
 
-        if (!p_caster->HasSpell(spell_id) || p_caster->HasSpellCooldown(spell_id))
+        if (!p_caster->HasSpell(spell_id) || p_caster->GetSpellHistory()->HasCooldown(spell_id))
             continue;
 
         if (!spellInfo->HasAttribute(SPELL_ATTR7_CAN_BE_MULTI_CAST))

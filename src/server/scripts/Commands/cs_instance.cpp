@@ -18,6 +18,7 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "DBCStores.h"
+#include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
@@ -39,7 +40,8 @@ public:
         static ChatCommandTable instanceCommandTable =
         {
             { "listbinds",    HandleInstanceListBindsCommand,    rbac::RBAC_PERM_COMMAND_INSTANCE_LISTBINDS,     Console::No },
-            { "unbind",       HandleInstanceUnbindCommand,       rbac::RBAC_PERM_COMMAND_INSTANCE_UNBIND,        Console::No },
+            { "bind",         HandleInstanceBindCommand,         rbac::RBAC_PERM_COMMAND_INSTANCE_BIND,          Console::Yes },
+            { "unbind",       HandleInstanceUnbindCommand,       rbac::RBAC_PERM_COMMAND_INSTANCE_UNBIND,        Console::Yes },
             { "stats",        HandleInstanceStatsCommand,        rbac::RBAC_PERM_COMMAND_INSTANCE_STATS,         Console::Yes },
             { "savedata",     HandleInstanceSaveDataCommand,     rbac::RBAC_PERM_COMMAND_INSTANCE_SAVEDATA,      Console::No },
             { "setbossstate", HandleInstanceSetBossStateCommand, rbac::RBAC_PERM_COMMAND_INSTANCE_SET_BOSS_STATE, Console::Yes },
@@ -81,11 +83,34 @@ public:
         return true;
     }
 
-    static bool HandleInstanceUnbindCommand(ChatHandler* handler, Variant<uint16, EXACT_SEQUENCE("all")> mapArg, Optional<uint8> difficultyArg)
+    // Player last, difficulty uint32: a number meant as map or difficulty is never read as a character guid
+    static bool HandleInstanceUnbindCommand(ChatHandler* handler, Variant<uint16, EXACT_SEQUENCE("all")> mapArg,
+        Optional<uint32> difficultyArg, Optional<PlayerIdentifier> target)
     {
-        Player* player = handler->getSelectedPlayer();
-        if (!player)
-            player = handler->GetSession()->GetPlayer();
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        Player* player = target->GetConnectedPlayer();
+        ObjectGuid const guid = target->GetGUID();
+
+        // Keep the bind of the map the character is on, or logged out on
+        uint32 currentMapId = 0;
+        if (player)
+            currentMapId = player->GetMapId();
+        else
+        {
+            CharacterDatabasePreparedStatement* stmt =
+                CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION_XYZ);
+            stmt->SetData(0, guid.GetCounter());
+            if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+                currentMapId = (*result)[0].Get<uint16>();
+        }
 
         uint16 counter = 0;
         uint16 mapId = 0;
@@ -99,17 +124,18 @@ public:
 
         for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
         {
-            BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUID(), Difficulty(i));
+            BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(guid, Difficulty(i));
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
             {
                 InstanceSave const* save = itr->second.save;
-                if (itr->first != player->GetMapId() && (!mapId || mapId == itr->first) && (!difficultyArg || difficultyArg == save->GetDifficulty()))
+                if (itr->first != currentMapId && (!mapId || mapId == itr->first)
+                    && (!difficultyArg || *difficultyArg == uint32(save->GetDifficulty())))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
                     uint32 ttr = (resetTime >= GameTime::GetGameTime().count() ? resetTime - GameTime::GetGameTime().count() : 0);
                     std::string timeleft = secsToTimeString(ttr);
                     handler->PSendSysMessage("unbinding map: {}, inst: {}, perm: {}, diff: {}, canReset: {}, TTR: {}{}", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft, (itr->second.extended ? " (extended)" : ""));
-                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player);
+                    sInstanceSaveMgr->PlayerUnbindInstance(guid, itr->first, Difficulty(i), true, player);
                     itr = m_boundInstances.begin();
                     counter++;
                 }
@@ -120,6 +146,70 @@ public:
 
         handler->PSendSysMessage("instances unbound: {}", counter);
 
+        return true;
+    }
+
+    // Player last: a number meant as instance id is never read as a character guid
+    static bool HandleInstanceBindCommand(ChatHandler* handler, Optional<uint32> instanceId, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        InstanceSave* save = nullptr;
+        if (instanceId)
+        {
+            save = sInstanceSaveMgr->GetInstanceSave(*instanceId);
+            if (!save)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_INST_BIND_NOT_FOUND, *instanceId);
+                return false;
+            }
+        }
+        else
+        {
+            if (!handler->GetSession())
+            {
+                handler->SendErrorMessage(LANG_CMD_SYNTAX);
+                return false;
+            }
+
+            Map* map = handler->GetSession()->GetPlayer()->GetMap();
+            if (!map->IsDungeon())
+            {
+                handler->SendErrorMessage(LANG_NOT_DUNGEON);
+                return false;
+            }
+
+            save = sInstanceSaveMgr->GetInstanceSave(map->GetInstanceId());
+            if (!save)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_INST_BIND_NOT_FOUND, map->GetInstanceId());
+                return false;
+            }
+        }
+
+        ObjectGuid const guid = target->GetGUID();
+        std::string const nameLink = handler->playerLink(target->GetName());
+        MapEntry const* mapEntry = sMapStore.LookupEntry(save->GetMapId());
+        std::string const mapName = mapEntry ? mapEntry->name[handler->GetSessionDbcLocale()] : "";
+
+        if (InstancePlayerBind const* bind = sInstanceSaveMgr->PlayerGetBoundInstance(guid, save->GetMapId(), save->GetDifficulty()))
+        {
+            handler->SendErrorMessage(LANG_COMMAND_INST_BIND_ALREADY_BOUND, nameLink, bind->save->GetInstanceId(), save->GetMapId(), mapName, uint32(bind->save->GetDifficulty()));
+            return false;
+        }
+
+        // Offline characters without any bind have no container yet
+        sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(guid);
+        sInstanceSaveMgr->PlayerBindToInstance(guid, save, !save->CanReset(), target->GetConnectedPlayer());
+
+        handler->PSendSysMessage(LANG_COMMAND_INST_BIND_SUCCESS, nameLink, save->GetInstanceId(), save->GetMapId(), mapName, uint32(save->GetDifficulty()));
         return true;
     }
 

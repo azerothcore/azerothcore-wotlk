@@ -17,10 +17,10 @@
 
 #include "CharmInfo.h"
 #include "Creature.h"
-#include "GameTime.h"
 #include "Map.h"
-#include "SpellInfo.h"
 #include "Player.h"
+#include "SpellHistory.h"
+#include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
@@ -122,20 +122,10 @@ void CharmInfo::InitCharmCreateSpells()
         {
             _charmspells[i].SetActionAndType(spellId, ACT_DISABLED);
 
-            ActiveStates newstate = ACT_PASSIVE;
+            ActiveStates newstate = spellInfo->IsAutocastable() ? ACT_ENABLED : ACT_PASSIVE;
 
-            if (!spellInfo->IsAutocastable())
-                newstate = ACT_PASSIVE;
-            else
-            {
-                if (spellInfo->NeedsExplicitUnitTarget())
-                {
-                    newstate = ACT_ENABLED;
-                    ToggleCreatureAutocast(spellInfo, true);
-                }
-                else
-                    newstate = ACT_DISABLED;
-            }
+            if (newstate == ACT_ENABLED)
+                ToggleCreatureAutocast(spellInfo, true);
 
             AddSpellToActionBar(spellInfo, newstate);
         }
@@ -189,7 +179,8 @@ bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates new
                     // Processing this packet needs to be delayed
                     _unit->m_Events.AddEventAtOffset([creature, spell_id]()
                     {
-                        if (uint32 cooldown = creature->GetSpellCooldown(spell_id))
+                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+                        if (uint32 cooldown = spellInfo ? creature->GetSpellHistory()->GetRemainingCooldown(spellInfo) : 0)
                         {
                             WorldPacket data;
                             creature->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spell_id, cooldown);
@@ -390,38 +381,4 @@ void CharmInfo::SetIsReturning(bool val)
 bool CharmInfo::IsReturning()
 {
     return _isReturning;
-}
-
-////////////////////////////////////////////////////////////
-// Methods of class GlobalCooldownMgr
-bool GlobalCooldownMgr::HasGlobalCooldown(SpellInfo const* spellInfo) const
-{
-    GlobalCooldownList::const_iterator itr = m_GlobalCooldowns.find(spellInfo->StartRecoveryCategory);
-    return itr != m_GlobalCooldowns.end() && itr->second.duration && getMSTimeDiff(itr->second.cast_time, GameTime::GetGameTimeMS().count()) < itr->second.duration;
-}
-
-uint32 GlobalCooldownMgr::GetGlobalCooldown(SpellInfo const* spellInfo) const
-{
-    if (!spellInfo)
-        return 0;
-
-    auto itr = m_GlobalCooldowns.find(spellInfo->StartRecoveryCategory);
-    if (itr == m_GlobalCooldowns.end() || itr->second.duration == 0)
-        return 0;
-
-    uint32 start = itr->second.cast_time;
-    uint32 delay = itr->second.duration;
-    uint32 now = getMSTime();
-
-    return (start + delay > now) ? (start + delay) - now : 0;
-}
-
-void GlobalCooldownMgr::AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd)
-{
-    m_GlobalCooldowns[spellInfo->StartRecoveryCategory] = GlobalCooldown(gcd, GameTime::GetGameTimeMS().count());
-}
-
-void GlobalCooldownMgr::CancelGlobalCooldown(SpellInfo const* spellInfo)
-{
-    m_GlobalCooldowns[spellInfo->StartRecoveryCategory].duration = 0;
 }

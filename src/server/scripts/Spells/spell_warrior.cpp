@@ -17,6 +17,7 @@
 
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -48,6 +49,8 @@ enum WarriorSpells
     SPELL_WARRIOR_LAST_STAND_TRIGGERED              = 12976,
     SPELL_WARRIOR_RETALIATION_DAMAGE                = 20240,
     SPELL_WARRIOR_SLAM                              = 50783,
+    SPELL_WARRIOR_SUDDEN_DEATH                      = 52437,
+    SPELL_WARRIOR_SUDDEN_DEATH_R1                   = 29723,
     SPELL_WARRIOR_SUNDER_ARMOR                      = 58567,
     SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1   = 12723,
     SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2   = 26654,
@@ -75,7 +78,6 @@ enum WarriorSpells
 
 enum WarriorSpellIcons
 {
-    WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989,
     WARRIOR_ICON_ID_SECOND_WIND                     = 1697
 };
 
@@ -384,7 +386,12 @@ class spell_warr_execute : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_WARRIOR_EXECUTE, SPELL_WARRIOR_GLYPH_OF_EXECUTION });
+        return ValidateSpellInfo({
+            SPELL_WARRIOR_EXECUTE,
+            SPELL_WARRIOR_GLYPH_OF_EXECUTION,
+            SPELL_WARRIOR_SUDDEN_DEATH,
+            SPELL_WARRIOR_SUDDEN_DEATH_R1
+        });
     }
 
     void SendMiss(SpellMissInfo missInfo)
@@ -410,12 +417,14 @@ class spell_warr_execute : public SpellScript
             int32 rageUsed = std::min<int32>(300 - spellInfo->CalcPowerCost(caster, SpellSchoolMask(spellInfo->SchoolMask)), caster->GetPower(POWER_RAGE));
             int32 newRage = std::max<int32>(0, caster->GetPower(POWER_RAGE) - rageUsed);
 
-            // Sudden Death rage save
-            if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_GENERIC, WARRIOR_ICON_ID_SUDDEN_DEATH, EFFECT_0))
-            {
-                int32 ragesave = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue() * 10;
-                newRage = std::max(newRage, ragesave);
-            }
+            // Sudden Death rage retention applies only while its proc buff is up, not merely because
+            // the talent is learned
+            if (caster->HasAura(SPELL_WARRIOR_SUDDEN_DEATH))
+                if (Aura* suddenDeath = caster->GetAuraOfRankedSpell(SPELL_WARRIOR_SUDDEN_DEATH_R1))
+                {
+                    int32 ragesave = suddenDeath->GetSpellInfo()->Effects[EFFECT_1].CalcValue() * 10;
+                    newRage = std::max(newRage, ragesave);
+                }
 
             caster->SetPower(POWER_RAGE, uint32(newRage));
             // Glyph of Execution bonus
@@ -653,7 +662,7 @@ class spell_warr_sweeping_strikes : public AuraScript
                     return false;
                 case SPELL_WARRIOR_WHIRLWIND_MAIN:
                 {
-                    if (actor->HasSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1))
+                    if (actor->GetSpellHistory()->HasCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1))
                         return false;
 
                     break;
@@ -690,7 +699,7 @@ class spell_warr_sweeping_strikes : public AuraScript
             else
             {
                 if (spellInfo && spellInfo->Id == SPELL_WARRIOR_WHIRLWIND_MAIN)
-                    eventInfo.GetActor()->AddSpellCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, 0, 500);
+                    eventInfo.GetActor()->GetSpellHistory()->AddCooldown(SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1, 0, 500ms);
 
                 auto damage = static_cast<int32>(damageInfo->GetUnmitigatedDamage());
                 GetTarget()->CastCustomSpell(procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1,
@@ -828,7 +837,7 @@ class spell_warr_vigilance_trigger : public SpellScript
 
         // Remove Taunt cooldown
         if (Player* target = GetHitPlayer())
-            target->RemoveSpellCooldown(SPELL_WARRIOR_TAUNT, true);
+            target->GetSpellHistory()->ResetCooldown(SPELL_WARRIOR_TAUNT, true);
     }
 
     void Register() override
@@ -987,26 +996,6 @@ class spell_warr_heroic_strike : public SpellScript
     }
 };
 
-class spell_war_sudden_death_aura : public AuraScript
-{   PrepareAuraScript(spell_war_sudden_death_aura);
-
-    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-    {
-        // Check PROC_SPELL_PHASE_FINISH only for Execute
-        if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_FINISH)
-            return isTriggeredAtSpellProcEvent;
-        if (Spell const* procSpell = eventInfo.GetProcSpell())
-            if (procSpell->GetSpellInfo()->GetFirstRankSpell()->Id == SPELL_WARRIOR_EXECUTE_R1)
-                return isTriggeredAtSpellProcEvent;
-        return false;
-    }
-
-    void Register() override
-    {
-        DoAfterCheckProc += AuraAfterCheckProcFn(spell_war_sudden_death_aura::AfterCheckProc);
-    }
-};
-
 // Second Wind - triggers health regen when stunned or immobilized
 class spell_warr_second_wind : public AuraScript
 {
@@ -1150,6 +1139,28 @@ class spell_warr_extra_proc : public AuraScript
     }
 };
 
+// -12281, -29723 - Sword Specialization and Sudden Death
+// Both `spell_proc` rows admit any melee-class spell; only abilities that require a main-hand
+// weapon may actually proc them. White auto-attacks carry no triggering spell and always pass.
+class spell_warr_weapon_required_proc : public AuraScript
+{
+    PrepareAuraScript(spell_warr_weapon_required_proc);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return true;
+
+        return procSpell->HasAttribute(SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warr_weapon_required_proc::CheckProc);
+    }
+};
+
 // Sword and Board proc - remove Shield Slam cooldown
 class spell_warr_sword_and_board : public AuraScript
 {
@@ -1157,9 +1168,12 @@ class spell_warr_sword_and_board : public AuraScript
 
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
-        Unit* caster = GetTarget();
-        if (caster->IsPlayer())
-            caster->ToPlayer()->RemoveCategoryCooldown(1209); // Shield Slam category
+        // Shield Slam category
+        GetTarget()->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            return itr->second.CategoryId == 1209 || (spellInfo && spellInfo->GetCategory() == 1209);
+        }, true);
     }
 
     void Register() override
@@ -1265,10 +1279,10 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_warriors_wrath);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
     RegisterSpellScript(spell_warr_heroic_strike);
-    RegisterSpellScript(spell_war_sudden_death_aura);
     RegisterSpellScript(spell_warr_second_wind);
     RegisterSpellScript(spell_warr_deep_wounds_aura);
     RegisterSpellScript(spell_warr_extra_proc);
+    RegisterSpellScript(spell_warr_weapon_required_proc);
     RegisterSpellScript(spell_warr_sword_and_board);
     RegisterSpellScript(spell_warr_glyph_of_blocking);
     RegisterSpellScript(spell_warr_item_t10_prot_4p_bonus);

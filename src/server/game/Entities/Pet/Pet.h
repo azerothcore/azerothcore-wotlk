@@ -19,6 +19,7 @@
 #define AZEROTHCORE_PET_H
 
 #include "CharmInfo.h"
+#include "DatabaseEnvFwd.h"
 #include "PetDefines.h"
 #include "TemporarySummon.h"
 
@@ -37,6 +38,16 @@ typedef std::vector<uint32> AutoSpellList;
 
 class Player;
 
+/// True when the summon's SummonProperties row carries SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST.
+bool SummonSavesPetAutocast(Unit const* summon);
+
+/// Overwrites the summon's default autocast state with the one its owner last chose.
+void ApplySavedPetAutocast(Player* owner, Unit* summon);
+
+/// Records the autocast state the summon currently has, so the next summon of the same creature restores it.
+/// Called before the summon leaves the world: the state the player chose has to outlive the summon itself.
+void SavePetAutocast(Player* owner, Unit* summon);
+
 class Pet : public Guardian
 {
 public:
@@ -46,8 +57,8 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
-    float GetNativeObjectScale() const override;
-    void SetDisplayId(uint32 modelId, float displayScale = 1.f) override;
+    // GetNativeObjectScale() is not overridden: the client already applies the CreatureFamily scale.
+    void SetDisplayId(uint32 modelId, std::optional<float> displayScale = {}) override;
 
     PetType getPetType() const { return m_petType; }
     void setPetType(PetType type) { m_petType = type; }
@@ -99,13 +110,10 @@ public:
 
     void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive = false);
     void ClearCastWhenWillAvailable();
-    void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
 
-    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans);
     void _SaveAuras(CharacterDatabaseTransaction trans);
     void _SaveSpells(CharacterDatabaseTransaction trans);
 
-    void _LoadSpellCooldowns(PreparedQueryResult result);
     void _LoadAuras(PreparedQueryResult result, uint32 timediff);
     void _LoadSpells(PreparedQueryResult result);
 

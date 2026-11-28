@@ -19,6 +19,7 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -182,9 +183,9 @@ struct boss_zuljin : public BossAI
             }, 26s, 30s);
 
             ScheduleTimedEvent(1s, [&] {
-                if (!me->HasSpellCooldown(SPELL_OVERPOWER) && me->GetVictim() && me->GetComboPoints())
+                if (!me->GetSpellHistory()->HasCooldown(SPELL_OVERPOWER) && me->GetVictim() && me->GetComboPoints())
                     if (DoCastVictim(SPELL_OVERPOWER) == SPELL_CAST_OK)
-                        me->AddSpellCooldown(SPELL_OVERPOWER, 0, 5000);
+                        me->GetSpellHistory()->AddCooldown(SPELL_OVERPOWER, 0, 5s);
             }, 1s);
         });
 

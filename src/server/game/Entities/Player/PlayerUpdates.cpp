@@ -33,6 +33,7 @@
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
@@ -167,6 +168,10 @@ void Player::Update(uint32 p_time)
             // orientation can be stale; never fail swing range or facing against the vehicle
             // carrying them (e.g. Yogg-Saron's Constrictor Tentacle grab).
             bool const victimIsVehicleBase = GetVehicleBase() == victim;
+            // A unit riding this player sits on their back (Gormok's Snobold Vassals), so it is never in front of them
+            bool const victimRidesMe = victim->GetVehicleBase() == this;
+
+            bool mainHandSwung = false;
 
             if (isAttackReady(BASE_ATTACK))
             {
@@ -180,7 +185,7 @@ void Player::Update(uint32 p_time)
                     }
                 }
                 // 120 degrees of radiant range, if player is not in boundary radius
-                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (victimRidesMe || (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim)))
                 {
                     setAttackTimer(BASE_ATTACK, 100);
                     if (m_swingErrorMsg != 2) // send single time (client auto repeat)
@@ -193,34 +198,26 @@ void Player::Update(uint32 p_time)
                 {
                     m_swingErrorMsg = 0; // reset swing error state
 
-                    // prevent base and off attack in same time, delay attack at
-                    // 0.2 sec
-                    if (HasOffhandWeaponForAttack())
-                        if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
-                            setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
-
                     // do attack
                     AttackerStateUpdate(victim, BASE_ATTACK);
                     resetAttackTimer(BASE_ATTACK);
 
                     // Blizzlike: Reset ranged swing timer when performing melee attack
                     resetAttackTimer(RANGED_ATTACK);
+
+                    mainHandSwung = true;
                 }
             }
 
-            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
+            // The client draws one swing animation per frame, so let the main hand swing alone
+            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK) && !mainHandSwung)
             {
                 if (!victimIsVehicleBase && !IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
-                else if (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim))
+                else if (victimRidesMe || (!victimIsVehicleBase && !IsWithinBoundaryRadius(victim) && !HasInArc(2 * float(M_PI) / 3, victim)))
                     setAttackTimer(BASE_ATTACK, 100);
                 else
                 {
-                    // prevent base and off attack in same time, delay attack at
-                    // 0.2 sec
-                    if (getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
-                        setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
-
                     // do attack
                     AttackerStateUpdate(victim, OFF_ATTACK);
                     resetAttackTimer(OFF_ATTACK);
@@ -1600,7 +1597,7 @@ void Player::UpdatePotionCooldown(Spell* spell)
                     proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
                     if (SpellInfo const* spellInfo =
                             sSpellMgr->GetSpellInfo(proto->Spells[idx].SpellId))
-                        SendCooldownEvent(spellInfo, GetLastPotionId());
+                        GetSpellHistory()->SendCooldownEvent(spellInfo, GetLastPotionId());
     }
     // from spell cases (m_lastPotionId set in Spell::SendSpellCooldown)
     else
@@ -1608,7 +1605,7 @@ void Player::UpdatePotionCooldown(Spell* spell)
         if (spell->IsIgnoringCooldowns())
             return;
 
-        SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
+        GetSpellHistory()->SendCooldownEvent(spell->m_spellInfo, m_lastPotionId, spell);
     }
 
     SetLastPotionId(0);
@@ -2091,15 +2088,15 @@ void Player::UpdateCharmedAI()
                 if (urand(0, 1))
                 {
                     if (m_charmAISpells[SPELL_T_STUN] &&
-                        !HasSpellCooldown(m_charmAISpells[SPELL_T_STUN]))
+                        !GetSpellHistory()->HasCooldown(m_charmAISpells[SPELL_T_STUN]))
                         CastSpell(target, m_charmAISpells[SPELL_T_STUN], false);
                     else if (m_charmAISpells[SPELL_ROOT_OR_FEAR] &&
-                             !HasSpellCooldown(
+                             !GetSpellHistory()->HasCooldown(
                                  m_charmAISpells[SPELL_ROOT_OR_FEAR]))
                         CastSpell(target, m_charmAISpells[SPELL_ROOT_OR_FEAR],
                                   false);
                     else if (m_charmAISpells[SPELL_IMMUNITY] &&
-                             !HasSpellCooldown(m_charmAISpells[SPELL_IMMUNITY]))
+                             !GetSpellHistory()->HasCooldown(m_charmAISpells[SPELL_IMMUNITY]))
                         CastSpell(this, m_charmAISpells[SPELL_IMMUNITY], true);
                 }
                 else
@@ -2108,7 +2105,7 @@ void Player::UpdateCharmedAI()
                     {
                     case 0:
                         if (m_charmAISpells[SPELL_INSTANT_DAMAGE + rnd] &&
-                            !HasSpellCooldown(
+                            !GetSpellHistory()->HasCooldown(
                                 m_charmAISpells[SPELL_INSTANT_DAMAGE + rnd]))
                             CastSpell(
                                 target,
@@ -2117,7 +2114,7 @@ void Player::UpdateCharmedAI()
                         break;
                     case 1:
                         if (m_charmAISpells[SPELL_DOT_DAMAGE] &&
-                            !HasSpellCooldown(
+                            !GetSpellHistory()->HasCooldown(
                                 m_charmAISpells[SPELL_DOT_DAMAGE]))
                             CastSpell(target, m_charmAISpells[SPELL_DOT_DAMAGE],
                                       false);
@@ -2131,7 +2128,7 @@ void Player::UpdateCharmedAI()
                 {
                 case 0:
                     if (m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd] &&
-                        !HasSpellCooldown(
+                        !GetSpellHistory()->HasCooldown(
                             m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd]))
                         CastSpell(target,
                                   m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd],
@@ -2139,7 +2136,7 @@ void Player::UpdateCharmedAI()
                     break;
                 case 1:
                     if (m_charmAISpells[SPELL_INSTANT_DAMAGE + rnd] &&
-                        !HasSpellCooldown(
+                        !GetSpellHistory()->HasCooldown(
                             m_charmAISpells[SPELL_INSTANT_DAMAGE + rnd]))
                         CastSpell(target,
                                   m_charmAISpells[SPELL_INSTANT_DAMAGE + rnd],
@@ -2147,7 +2144,7 @@ void Player::UpdateCharmedAI()
                     break;
                 case 2:
                     if (m_charmAISpells[SPELL_DOT_DAMAGE] &&
-                        !HasSpellCooldown(m_charmAISpells[SPELL_DOT_DAMAGE]))
+                        !GetSpellHistory()->HasCooldown(m_charmAISpells[SPELL_DOT_DAMAGE]))
                         CastSpell(target, m_charmAISpells[SPELL_DOT_DAMAGE],
                                   false);
                     break;
@@ -2160,10 +2157,10 @@ void Player::UpdateCharmedAI()
             {
                 GetMotionMaster()->MoveChase(target, 2.0f);
                 if (m_charmAISpells[SPELL_T_CHARGE] &&
-                    !HasSpellCooldown(m_charmAISpells[SPELL_T_CHARGE]))
+                    !GetSpellHistory()->HasCooldown(m_charmAISpells[SPELL_T_CHARGE]))
                     CastSpell(target, m_charmAISpells[SPELL_T_CHARGE], false);
                 else if (m_charmAISpells[SPELL_FAST_RUN] &&
-                         !HasSpellCooldown(m_charmAISpells[SPELL_FAST_RUN]))
+                         !GetSpellHistory()->HasCooldown(m_charmAISpells[SPELL_FAST_RUN]))
                     CastSpell(this, m_charmAISpells[SPELL_FAST_RUN], false);
             }
 
@@ -2174,7 +2171,7 @@ void Player::UpdateCharmedAI()
             {
             case 0:
                 if (m_charmAISpells[SPELL_INSTANT_DAMAGE + rnd] &&
-                    !HasSpellCooldown(
+                    !GetSpellHistory()->HasCooldown(
                         m_charmAISpells[SPELL_INSTANT_DAMAGE + rnd]))
                     CastSpell(target,
                               m_charmAISpells[SPELL_INSTANT_DAMAGE + rnd],
@@ -2182,14 +2179,14 @@ void Player::UpdateCharmedAI()
                 break;
             case 1:
                 if (m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd] &&
-                    !HasSpellCooldown(
+                    !GetSpellHistory()->HasCooldown(
                         m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd]))
                     CastSpell(target, m_charmAISpells[SPELL_HIGH_DAMAGE1 + rnd],
                               false);
                 break;
             case 2:
                 if (m_charmAISpells[SPELL_DOT_DAMAGE] &&
-                    !HasSpellCooldown(m_charmAISpells[SPELL_DOT_DAMAGE]))
+                    !GetSpellHistory()->HasCooldown(m_charmAISpells[SPELL_DOT_DAMAGE]))
                     CastSpell(target, m_charmAISpells[SPELL_DOT_DAMAGE], false);
                 break;
             }
@@ -2245,9 +2242,19 @@ void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type,
 void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo,
                                          uint16              opcode)
 {
+    // A knockback restarts the client fall timer but keeps the fall start, so the timer no longer bounds the fall
+    if (opcode == CMSG_MOVE_KNOCK_BACK_ACK)
+    {
+        m_lastFallFromClient = false;
+        return;
+    }
+
     if (m_lastFallTime >= minfo.fallTime ||
         m_lastFallZ <= minfo.pos.GetPositionZ() || opcode == MSG_MOVE_FALL_LAND)
+    {
         SetFallInformation(minfo.fallTime, minfo.pos.GetPositionZ());
+        m_lastFallFromClient = true;
+    }
 }
 
 void Player::UpdateSpecCount(uint8 count)
@@ -2367,12 +2374,12 @@ uint32 Player::GetSpellQueueWindow() const
     return sWorld->getIntConfig(CONFIG_SPELL_QUEUE_WINDOW);
 }
 
-bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
+bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, uint32 itemEntry /*= 0*/)
 {
-    if (GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
+    if (GetSpellHistory()->HasGlobalCooldown(spellInfo))
         return false;
 
-    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
+    if (GetSpellHistory()->GetRemainingCooldown(spellInfo, itemEntry) > GetSpellQueueWindow())
         return false;
 
     for (CurrentSpellTypes spellSlot : {CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL})
@@ -2393,7 +2400,7 @@ PendingSpellCastRequest const* Player::GetCastRequest(uint32 category) const
     return nullptr;
 }
 
-bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
+bool Player::CanRequestSpellCast(SpellInfo const* spellInfo, uint32 itemEntry /*= 0*/)
 {
     if (!sWorld->getBoolConfig(CONFIG_SPELL_QUEUE_ENABLED))
         return false;
@@ -2402,10 +2409,10 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
     if (GetCastRequest(spellInfo->GetCategory()))
         return false;
 
-    if (GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo) > GetSpellQueueWindow())
+    if (GetSpellHistory()->GetRemainingGlobalCooldown(spellInfo) > GetSpellQueueWindow())
         return false;
 
-    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
+    if (GetSpellHistory()->GetRemainingCooldown(spellInfo, itemEntry) > GetSpellQueueWindow())
         return false;
 
     // If there is an existing cast that will last longer than the allowable
@@ -2444,7 +2451,7 @@ void Player::ProcessSpellQueue()
             SpellQueue.clear();
             break;
         }
-        if (CanExecutePendingSpellCastRequest(spellInfo))
+        if (CanExecutePendingSpellCastRequest(spellInfo, request.ItemEntry))
         {
             ExecuteOrCancelSpellCastRequest(&request);
 

@@ -21,12 +21,12 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -141,15 +141,6 @@ enum Events
 
     // event groups
     EVENT_GROUP_LAND_PHASE          = 1,
-};
-
-enum FrostwingData
-{
-    DATA_MYSTIC_BUFFET_STACK    = 0,
-    DATA_FROSTWYRM_OWNER        = 1,
-    DATA_WHELP_MARKER           = 2,
-    DATA_LINKED_GAMEOBJECT      = 3,
-    DATA_TRAPPED_PLAYER         = 4,
 };
 
 enum MovementPoints
@@ -1539,16 +1530,16 @@ public:
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             if (!instance->GetData(DATA_SPINESTALKER))
-                if (Creature* spinestalker = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SPINESTALKER)))
+                if (Creature* spinestalker = instance->GetCreature(DATA_SPINESTALKER))
                     spinestalker->AI()->DoAction(ACTION_START_FROSTWYRM);
 
             if (!instance->GetData(DATA_RIMEFANG))
-                if (Creature* rimefang = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_RIMEFANG)))
+                if (Creature* rimefang = instance->GetCreature(DATA_RIMEFANG))
                     rimefang->AI()->DoAction(ACTION_START_FROSTWYRM);
 
             if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && instance->GetBossState(DATA_SINDRAGOSA) != IN_PROGRESS)
             {
-                if (Creature* sindragosa = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SINDRAGOSA)))
+                if (Creature* sindragosa = instance->GetCreature(DATA_SINDRAGOSA))
                     sindragosa->AI()->DoAction(ACTION_START_FROSTWYRM);
             }
         }

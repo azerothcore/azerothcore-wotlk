@@ -209,6 +209,10 @@ bool LoginQueryHolder::Initialize()
     stmt->SetData(0, rawGUID);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS, stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AUTOCAST);
+    stmt->SetData(0, rawGUID);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_PET_AUTOCAST, stmt);
+
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ACHIEVEMENT_OFFLINE_UPDATES);
     stmt->SetData(0, rawGUID);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES, stmt);
@@ -2259,6 +2263,10 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                     };
 
                     uint32 nodeId = itr.first;
+                    // TaxiPath.dbc has a path from node 0, which has no bit in the mask
+                    if (!nodeId || nodeId > TaxiMaskSize * 32)
+                        continue;
+
                     uint8 field = (uint8)((nodeId - 1) / 32);
                     uint32 submask = 1 << ((nodeId - 1) % 32);
 
@@ -2303,7 +2311,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                         continue;
                     }
 
-                    LFGDungeonEntry const* lfgDungeon = GetZoneLFGDungeonEntry(zone->area_name[GetSessionDbLocaleIndex()], GetSessionDbLocaleIndex());
+                    LocaleConstant dbcLocale = GetSessionDbcLocale();
+                    LFGDungeonEntry const* lfgDungeon = GetZoneLFGDungeonEntry(zone->area_name[dbcLocale], dbcLocale);
                     if (!lfgDungeon)
                     {
                         FillTaxiMask(field, 0);

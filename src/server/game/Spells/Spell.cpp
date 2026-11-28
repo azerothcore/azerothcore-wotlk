@@ -19,8 +19,8 @@
 #include "ArenaSpectator.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
-#include "CharmInfo.h"
 #include "CellImpl.h"
+#include "CharmInfo.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DisableMgr.h"
@@ -41,6 +41,7 @@
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -51,8 +52,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include <cmath>
 #include <G3D/g3dmath.h>
+#include <cmath>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -674,7 +675,7 @@ Spell::Spell(WorldObject* caster, SpellInfo const* info, TriggerCastFlags trigge
     m_spellState = SPELL_STATE_NULL;
     _triggeredCastFlags = triggerFlags;
     if (info->HasAttribute(SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING))
-        _triggeredCastFlags = TriggerCastFlags(uint32(_triggeredCastFlags) | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY);
+        _triggeredCastFlags = TriggerCastFlags(uint32(_triggeredCastFlags) | TRIGGERED_IGNORE_CAST_IN_PROGRESS);
 
     m_CastItem = nullptr;
 
@@ -2392,6 +2393,31 @@ void Spell::CleanupTargetList()
     m_delayTrajectory = 0;
 }
 
+int32 Spell::GetUnitTargetCountForEffect(SpellEffIndex effect) const
+{
+    return static_cast<int32>(std::count_if(m_UniqueTargetInfo.begin(), m_UniqueTargetInfo.end(), [effect](TargetInfo const& targetInfo)
+    {
+        return targetInfo.missCondition == SPELL_MISS_NONE && targetInfo.effectMask & (1 << effect);
+    }));
+}
+
+int32 Spell::GetUnitTargetIndexForEffect(ObjectGuid const& target, SpellEffIndex effect) const
+{
+    int32 index = 0;
+    for (TargetInfo const& targetInfo : m_UniqueTargetInfo)
+    {
+        if (targetInfo.missCondition == SPELL_MISS_NONE && targetInfo.effectMask & (1 << effect))
+        {
+            if (targetInfo.targetGUID == target)
+                return index;
+
+            ++index;
+        }
+    }
+
+    return -1;
+}
+
 void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*= true*/, bool implicit /*= true*/)
 {
     Unit* unitCaster = m_caster->ToUnit();
@@ -2405,7 +2431,8 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     if (checkIfValid)
     {
-        SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit);
+        SpellCastResult res = m_spellInfo->CheckTarget(m_caster, target, implicit,
+            m_triggeredByAuraSpell ? m_originalCaster : nullptr);
         if (res != SPELL_CAST_OK)
             return;
     }
@@ -2690,7 +2717,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     m_spellAura = nullptr; // Set aura to null for every target-make sure that pointer is not used for unit without aura applied
 
-    if (m_originalCaster && missInfo != SPELL_MISS_EVADE && !m_originalCaster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) && (m_spellInfo->HasInitialAggro() || effectUnit->IsEngaged()))
+    if (m_originalCaster && missInfo != SPELL_MISS_EVADE && !HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT) &&
+        !m_originalCaster->IsFriendlyTo(effectUnit) &&
+        (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) &&
+        (m_spellInfo->HasInitialAggro() || effectUnit->IsEngaged()))
         effectUnit->SetInCombatWith(m_originalCaster);
 
     PrepareScriptHitHandlers();
@@ -2881,6 +2911,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             // Fill base damage struct (unitTarget - is real spell target)
             SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
+            damageInfo.skipCombat = IsFromPreDeathAura();
 
             // Check damage immunity
             if (unitTarget->IsImmunedToDamage(caster, m_spellInfo))
@@ -3035,7 +3066,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         if (missInfo != SPELL_MISS_EVADE && !unitCaster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
         {
-            if (!m_triggeredByAuraSpell.spellInfo || m_damage || (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo))))
+            if (!HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT) &&
+                (!m_triggeredByAuraSpell.spellInfo || m_damage ||
+                    (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell
+                        == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo)))))
                 unitCaster->AtTargetAttacked(effectUnit, !(m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT) || m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS)));
 
             // Spells that don't initiate combat shouldn't affect stand state (e.g. Premeditation, Storm Giant/Felreaver Passive)
@@ -3319,7 +3353,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 // xinef: apply relic cooldown, imo best place to add this
                 if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
                     if (unitCaster)
-                        unitCaster->AddSpellCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), duration);
+                        unitCaster->GetSpellHistory()->AddCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), std::chrono::milliseconds(duration));
 
                 m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
                 m_spellAura->_RegisterForTargets();
@@ -3602,7 +3636,19 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     if (triggeredByAura)
     {
         m_triggeredByAuraSpell.Init(triggeredByAura);
+
+        // e.g. Seed of Corruption detonating on an enemy after its warlock died and got resurrected
+        if (triggeredByAura->GetCasterGUID() == m_originalCasterGUID &&
+            triggeredByAura->GetBase()->HasCasterDiedSinceApply(m_originalCaster))
+            _fromPreDeathAura = true;
     }
+
+    // e.g. Darkmoon Card: Death proccing off a bleed tick the druid applied before dying
+    if (m_originalCaster && m_originalCaster->IsInPreDeathAuraTick())
+        _fromPreDeathAura = true;
+
+    if (_fromPreDeathAura)
+        _triggeredCastFlags = TriggerCastFlags(_triggeredCastFlags | TRIGGERED_DONT_ENTER_COMBAT);
 
     // create and add update event for this spell
     _spellEvent = new SpellEvent(this);
@@ -3753,9 +3799,16 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         cast(true);
     else
     {
+        //item: first cast may destroy item and second cast causes crash
+        // xinef: removed !m_spellInfo->StartRecoveryTime
+        // second los check failed in events
+        // xinef: removed itemguid check, currently there is no such item in database
+        bool willCastDirectly = !m_casttime && /*!m_castItemGUID &&*/ GetCurrentContainer() == CURRENT_GENERIC_SPELL;
+
         // stealth must be removed at cast starting (at show channel bar)
         // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
-        if (unitCaster && !HasTriggeredCastFlag(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
+        // and spells cast alongside a cast in progress
+        if (unitCaster && !HasTriggeredCastFlag(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && !HasTriggeredCastFlag(TRIGGERED_IGNORE_CAST_IN_PROGRESS) && m_spellInfo->IsBreakingStealth())
         {
             // Farsight spells exception
             uint32 exceptSpellId = 0;
@@ -3768,7 +3821,9 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             unitCaster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK, exceptSpellId, m_spellInfo->Id == 75);
         }
 
-        if (unitCaster)
+        // An instant spell ignoring the cast in progress must not take that cast's container,
+        // SetCurrentCastedSpell would interrupt it
+        if (unitCaster && (!willCastDirectly || !HasTriggeredCastFlag(TRIGGERED_IGNORE_CAST_IN_PROGRESS)))
             unitCaster->SetCurrentCastedSpell(this);
         SendSpellStart();
 
@@ -3791,11 +3846,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             }
         }
 
-        //item: first cast may destroy item and second cast causes crash
-        // xinef: removed !m_spellInfo->StartRecoveryTime
-        // second los check failed in events
-        // xinef: removed itemguid check, currently there is no such item in database
-        if (!m_casttime && /*!m_castItemGUID &&*/ GetCurrentContainer() == CURRENT_GENERIC_SPELL)
+        if (willCastDirectly)
             cast(true);
 
         if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_GCD))
@@ -3841,7 +3892,7 @@ void Spell::cancel(bool bySelf)
                             unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
                 if (unitCaster && unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
-                    unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                    unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
 
                 SendChannelUpdate(0);
                 SendInterrupted(SPELL_FAILED_INTERRUPTED);
@@ -3879,7 +3930,7 @@ void Spell::cancel(bool bySelf)
             {
                 unitCaster->RemoveGameObject(gameObject, true);
                 if (gameObject->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL && unitCaster->IsPlayer())
-                    unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                    unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
             }
         }
     }
@@ -3948,7 +3999,8 @@ void Spell::_cast(bool skipCheck)
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only
         // This prevents spells such as Hunter's Mark from triggering pet attack
         // xinef: take into account SPELL_ATTR3_SUPPRESS_TARGET_PROCS
-        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS))
+        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE &&
+            !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS) && !IsFromPreDeathAura())
             if (!playerCaster->m_Controlled.empty())
                 for (Unit::ControlSet::iterator itr = playerCaster->m_Controlled.begin(); itr != playerCaster->m_Controlled.end(); ++itr)
                     if (Unit* pet = *itr)
@@ -4204,7 +4256,7 @@ void Spell::_cast(bool skipCheck)
 
     if (unitCaster && unitCaster->IsPlayer())
         if (unitCaster->ToPlayer()->GetCommandStatus(CHEAT_COOLDOWN))
-            unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
 
     sScriptMgr->OnSpellCast(this, unitCaster, m_spellInfo, skipCheck);
 
@@ -4429,7 +4481,7 @@ void Spell::_handle_finish_phase()
                     // Xinef: Properly clear infinite cooldowns in some cases
                     if (ihit->targetGUID == unitCaster->GetGUID() && ihit->missCondition != SPELL_MISS_NONE)
                         if (unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
-                            unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo);
+                            unitCaster->ToPlayer()->GetSpellHistory()->SendCooldownEvent(m_spellInfo);
                 }
     }
 
@@ -4485,8 +4537,8 @@ void Spell::SendSpellCooldown()
     {
         if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD))
         {
-            // xinef: this should be added here
-            //unitCaster->AddSpellCooldown(m_spellInfo->Id, 0, 0);
+            if (unitCaster->GetCharmInfo())
+                unitCaster->GetSpellHistory()->HandleCooldowns(m_spellInfo, m_CastItem, this);
 
             // xinef: this adds cooldowns to vehicle spells which misses them client-side (when we overwrote dbc info in eg.)
             if (m_spellInfo->RequireCooldownInfo())
@@ -4503,25 +4555,7 @@ void Spell::SendSpellCooldown()
         return;
     }
 
-    Player* _player = unitCaster->ToPlayer();
-
-    // mana/health/etc potions, disabled by client (until combat out as declarate)
-    if (m_CastItem && (m_CastItem->IsPotion() || m_spellInfo->IsCooldownStartedOnEvent()))
-    {
-        // need in some way provided data for Spell::finish SendCooldownEvent
-        _player->SetLastPotionId(m_CastItem->GetEntry());
-        return;
-    }
-
-    // have infinity cooldown but set at aura apply
-    // do not set cooldown for triggered spells (needed by reincarnation)
-    if (m_spellInfo->IsCooldownStartedOnEvent()
-        || m_spellInfo->IsPassive()
-        || (HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && !m_CastItem)
-        || HasTriggeredCastFlag(TRIGGERED_IGNORE_EFFECTS))
-        return;
-
-    _player->AddSpellAndCategoryCooldowns(m_spellInfo, m_CastItem ? m_CastItem->GetEntry() : 0, this);
+    unitCaster->GetSpellHistory()->HandleCooldowns(m_spellInfo, m_CastItem, this);
 }
 
 void Spell::update(uint32 difftime)
@@ -4651,7 +4685,7 @@ void Spell::finish(bool ok)
     if (ok)
     {
         if (unitCaster->IsPlayer() && m_spellInfo->IsChanneled() && m_spellInfo->IsCooldownStartedOnEvent())
-            unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
     }
     else
     {
@@ -4662,7 +4696,7 @@ void Spell::finish(bool ok)
 
             // Xinef: Reset cooldown event in case of fail cast
             if (m_spellInfo->IsCooldownStartedOnEvent())
-                unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo, 0, 0, false);
+                unitCaster->ToPlayer()->GetSpellHistory()->SendCooldownEvent(m_spellInfo, 0, nullptr, false);
         }
 
         return;
@@ -5816,6 +5850,8 @@ void Spell::HandleThreatSpells()
         {
             if (!target->CanHaveThreatList())
                 continue;
+            if (IsFromPreDeathAura() && !target->IsEngagedBy(unitCaster))
+                continue;
             target->GetThreatMgr().AddThreat(unitCaster, threatToAdd, m_spellInfo, true);
         }
     }
@@ -5876,7 +5912,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_CASTER_AURASTATE) && unitCaster->ToPlayer()->HasPlayerFlag(PLAYER_ALLOW_ONLY_ABILITY) && !IsNextMeleeSwingSpell())
                 return SPELL_FAILED_SPELL_IN_PROGRESS;
 
-            if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && unitCaster->ToPlayer()->HasSpellCooldown(m_spellInfo->Id))
+            if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && !unitCaster->GetSpellHistory()->IsReady(m_spellInfo, m_CastItem ? m_CastItem->GetEntry() : 0))
             {
                 if (m_triggeredByAuraSpell)
                     return SPELL_FAILED_DONT_REPORT;
@@ -5888,7 +5924,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (unitCaster->ToPlayer()->GetLastPotionId() && m_CastItem && (m_CastItem->IsPotion() || m_spellInfo->IsCooldownStartedOnEvent()))
                 return SPELL_FAILED_NOT_READY;
         }
-        else if (!IsTriggered() && unitCaster && unitCaster->IsCreature() && unitCaster->ToCreature()->IsSpellProhibited(m_spellInfo->GetSchoolMask()))
+        else if (!IsTriggered() && unitCaster && unitCaster->IsCreature() && unitCaster->GetSpellHistory()->IsSchoolLocked(m_spellInfo->GetSchoolMask()))
             return SPELL_FAILED_NOT_READY;
     }
 
@@ -6086,7 +6122,8 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
     if (Unit* target = m_targets.GetUnitTarget())
     {
-        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false);
+        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false,
+            m_triggeredByAuraSpell ? m_originalCaster : nullptr);
         if (castResult != SPELL_CAST_OK)
             return castResult;
 
@@ -6099,6 +6136,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             // Target must be facing you
             if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), unitCaster))
                 return SPELL_FAILED_NOT_INFRONT;
+
+            // A unit riding a player sits on their back (Gormok's Snobold Vassals), out of reach of their targeted harmful spells
+            if (unitCaster && unitCaster->IsPlayer() && target->GetVehicleBase() == unitCaster && !m_spellInfo->IsPositive())
+                return SPELL_FAILED_BAD_TARGETS;
 
             // Ignore LOS for gameobject casts: one has no collision height, so the ray would start on its floor
             // position, which the floor under a player standing on it can block. CheckEffectTarget still checks
@@ -7065,7 +7106,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
     // xinef: check relic cooldown
     if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
-        if (unitCaster && unitCaster->HasSpellCooldown(SPELL_RELIC_COOLDOWN) && !unitCaster->HasSpellItemCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry()))
+        if (unitCaster && unitCaster->GetSpellHistory()->HasCooldown(SPELL_RELIC_COOLDOWN) && !unitCaster->GetSpellHistory()->HasItemCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry()))
             return SPELL_FAILED_NOT_READY;
 
     // all ok
@@ -7098,12 +7139,12 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
     // cooldown
     if (Creature const* creatureCaster = unitCaster->ToCreature())
-        if (creatureCaster->HasSpellCooldown(m_spellInfo->Id))
+        if (creatureCaster->GetSpellHistory()->HasCooldown(m_spellInfo->Id))
             return SPELL_FAILED_NOT_READY;
 
     // Check if spell is affected by GCD
     if (m_spellInfo->StartRecoveryCategory > 0)
-        if (unitCaster->GetCharmInfo() && unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo))
+        if (unitCaster->GetCharmInfo() && unitCaster->GetSpellHistory()->HasGlobalCooldown(m_spellInfo))
             return SPELL_FAILED_NOT_READY;
 
     return CheckCast(true);
@@ -8722,7 +8763,8 @@ void Spell::HandleLaunchPhase()
             }
         }
 
-        if (m_originalCaster && target.missCondition != SPELL_MISS_EVADE)
+        if (m_originalCaster && target.missCondition != SPELL_MISS_EVADE &&
+            !HasTriggeredCastFlag(TRIGGERED_DONT_ENTER_COMBAT))
         {
             Unit* targetUnit = m_caster->GetGUID() == target.targetGUID ? unitCaster : ObjectAccessor::GetUnit(*m_caster, target.targetGUID);
             if (targetUnit && !m_originalCaster->IsFriendlyTo(targetUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)) && (m_spellInfo->HasInitialAggro() || targetUnit->IsEngaged()))
@@ -8764,7 +8806,7 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
                 // Xinef: Area Auras, AoE Targetting spells AND Chain Target spells (cleave etc.)
                 if (m_spellInfo->Effects[i].IsAreaAuraEffect() || m_spellInfo->Effects[i].IsTargetingArea() || (m_spellInfo->Effects[i].ChainTarget > 1 && m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MAGIC))
                 {
-                    bool npcCaster = (unitCaster && !unitCaster->IsControlledByPlayer()) || GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE);
+                    bool npcCaster = (m_originalCaster && !m_originalCaster->IsControlledByPlayer()) || GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE);
                     m_damage = unit->CalculateAOEDamageReduction(m_damage, m_spellInfo->SchoolMask, npcCaster);
                     if (unitCaster && unitCaster->IsPlayer())
                     {
@@ -9295,12 +9337,10 @@ bool Spell::HasGlobalCooldown() const
         return false;
 
     // Only player or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        return unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo);
-    else if (unitCaster->IsPlayer())
-        return unitCaster->ToPlayer()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo);
-    else
+    if (!unitCaster->GetCharmInfo() && !unitCaster->IsPlayer())
         return false;
+
+    return unitCaster->GetSpellHistory()->HasGlobalCooldown(m_spellInfo);
 }
 
 void Spell::TriggerGlobalCooldown()
@@ -9346,10 +9386,8 @@ void Spell::TriggerGlobalCooldown()
     }
 
     // Only players or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().AddGlobalCooldown(m_spellInfo, gcd);
-    else if (unitCaster->IsPlayer())
-        unitCaster->ToPlayer()->GetGlobalCooldownMgr().AddGlobalCooldown(m_spellInfo, gcd);
+    if (unitCaster->GetCharmInfo() || unitCaster->IsPlayer())
+        unitCaster->GetSpellHistory()->AddGlobalCooldown(m_spellInfo, gcd);
 }
 
 void Spell::CancelGlobalCooldown()
@@ -9366,10 +9404,8 @@ void Spell::CancelGlobalCooldown()
         return;
 
     // Only players or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
-    else if (unitCaster->IsPlayer())
-        unitCaster->ToPlayer()->GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
+    if (unitCaster->GetCharmInfo() || unitCaster->IsPlayer())
+        unitCaster->GetSpellHistory()->CancelGlobalCooldown(m_spellInfo);
 }
 
 void Spell::OnSpellLaunch()
@@ -9553,8 +9589,9 @@ namespace Acore
                         effectiveRange += unitTarget->GetCombatReach();
 
                 // override the range check for entry area targets
+                // players stay 3d, retail never hits them in 2d
                 float dist = target->GetExactDist(_position);
-                if (_targetSelectionType == TARGET_CHECK_ENTRY)
+                if (_targetSelectionType == TARGET_CHECK_ENTRY && !target->IsPlayer())
                     dist = target->GetExactDist2d(_position);
                 if (dist > effectiveRange)
                     return false;

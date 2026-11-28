@@ -20,8 +20,8 @@
 
 #include "ArenaTeam.h"
 #include "Battleground.h"
-#include "CharmInfo.h"
 #include "CharacterCache.h"
+#include "CharmInfo.h"
 #include "CinematicMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnvFwd.h"
@@ -196,17 +196,6 @@ typedef std::unordered_set<SpellModifier*> SpellModContainer;
 
 typedef GuidList WhisperListContainer;
 
-struct SpellCooldown
-{
-    uint32 end;
-    uint16 category;
-    uint32 itemid;
-    uint32 maxduration;
-    bool sendToSpectator: 1;
-    bool needSendToClient: 1;
-};
-
-typedef std::map<uint32, SpellCooldown> SpellCooldowns;
 typedef std::unordered_map<uint32 /*instanceId*/, time_t/*releaseTime*/> InstanceTimeMap;
 
 enum ActionButtonUpdateState
@@ -889,6 +878,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS           = 36,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS                    = 37,
     PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES = 38,
+    PLAYER_LOGIN_QUERY_LOAD_PET_AUTOCAST                 = 39,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1077,9 +1067,10 @@ struct PendingSpellCastRequest
     WorldPacket requestPacket;
     bool isItem = false;
     bool cancelInProgress = false;
+    uint32 ItemEntry = 0;
 
-    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false)
-        : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel) {}
+    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false, uint32 itemEntry = 0)
+        : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel), ItemEntry(itemEntry) {}
 };
 
 class Player : public Unit, public GridObject<Player>
@@ -1226,6 +1217,8 @@ public:
     PetStable* GetPetStable() { return m_petStable.get(); }
     PetStable& GetOrInitPetStable();
     [[nodiscard]] PetStable const* GetPetStable() const { return m_petStable.get(); }
+
+    PetAutocastPreferences& GetPetAutocastPreferences() { return _petAutocastPreferences; }
 
     [[nodiscard]] Pet* GetPet() const;
     Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration = 0ms, uint32 healthPct = 0);
@@ -1800,9 +1793,6 @@ public:
     [[nodiscard]] PlayerSpellMap const& GetSpellMap() const { return m_spells; }
     PlayerSpellMap&       GetSpellMap()       { return m_spells; }
 
-    [[nodiscard]] SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
-    SpellCooldowns&       GetSpellCooldownMap()       { return m_spellCooldowns; }
-
     SkillStatusMap const& GetSkillStatusMap() const { return mSkillStatus; }
     SkillStatusMap& GetSkillStatusMap() { return mSkillStatus; }
 
@@ -1818,25 +1808,9 @@ public:
     [[nodiscard]] static bool HasSpellModApplied(SpellModifier* mod, Spell* spell);
     void SetSpellModTakingSpell(Spell* spell, bool apply);
 
-    [[nodiscard]] bool HasSpellCooldown(uint32 spell_id) const override;
-    [[nodiscard]] bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const override;
-    [[nodiscard]] uint32 GetSpellCooldownDelay(uint32 spell_id) const;
-    void AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
-    void AddSpellCooldown(uint32 spell_id, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false) override;
-    void _AddSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);
-    void ModifySpellCooldown(uint32 spellId, int32 cooldown);
-    void SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId = 0, Spell* spell = nullptr, bool setCooldown = true);
-    void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs) override;
-    void RemoveSpellCooldown(uint32 spell_id, bool update = false);
     void SendClearCooldown(uint32 spell_id, Unit* target);
 
-    GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
-
-    void RemoveCategoryCooldown(uint32 cat);
     void RemoveArenaSpellCooldowns(bool removeActivePetCooldowns = false);
-    void RemoveAllSpellCooldown();
-    void _LoadSpellCooldowns(PreparedQueryResult result);
-    void _SaveSpellCooldowns(CharacterDatabaseTransaction trans, bool logout);
     uint32 GetLastPotionId() { return m_lastPotionId; }
     void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
     void UpdatePotionCooldown(Spell* spell = nullptr);
@@ -2189,15 +2163,7 @@ public:
     void SetHonorPoints(uint32 value);
     void SetArenaPoints(uint32 value);
 
-    // duel health and mana reset methods
-    void SaveHealthBeforeDuel()     { healthBeforeDuel = GetHealth(); }
-    void SaveManaBeforeDuel()       { manaBeforeDuel = GetPower(POWER_MANA); }
-    void RestoreHealthAfterDuel()   { SetHealth(healthBeforeDuel); }
-    void RestoreManaAfterDuel()     { SetPower(POWER_MANA, manaBeforeDuel); }
-
     //End of PvP System
-
-    [[nodiscard]] inline SpellCooldowns GetSpellCooldowns() const { return m_spellCooldowns; }
 
     void SetDrunkValue(uint8 newDrunkValue, uint32 itemId = 0);
     [[nodiscard]] uint8 GetDrunkValue() const { return GetByteValue(PLAYER_BYTES_3, 1); }
@@ -2242,6 +2208,7 @@ public:
     void CastAllObtainSpells();
     void ApplyItemObtainSpells(Item* item, bool apply);
     void UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot);
+    void RemoveOrphanedItemObtainSpells();
 
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
@@ -2386,6 +2353,7 @@ public:
     {
         m_lastFallTime = time;
         m_lastFallZ = z;
+        m_lastFallFromClient = false;
     }
     void HandleFall(MovementInfo const& movementInfo);
 
@@ -2689,6 +2657,11 @@ public:
     uint32 GetPendingFlightChange() const { return _pendingFlightChangeCounter; }
     void SetPendingFlightChange(uint32 counter) { _pendingFlightChangeCounter = counter; }
 
+    [[nodiscard]] Optional<bool> GetPendingCanFlyResync() const { return _pendingCanFlyResync; }
+    void SetPendingCanFlyResync(bool enable) { _pendingCanFlyResync = enable; }
+    void ClearPendingCanFlyResync() { _pendingCanFlyResync.reset(); }
+    void ResyncCanFlyToClient();
+
     void SetMapChangeOrderCounter() { _mapChangeOrderCounter = GetSession()->GetOrderCounter(); }
     uint32 GetMapChangeOrderCounter() { return _mapChangeOrderCounter; }
 
@@ -2702,9 +2675,9 @@ protected:
 public:
     std::deque<PendingSpellCastRequest> SpellQueue;
     PendingSpellCastRequest const* GetCastRequest(uint32 category) const;
-    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
+    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, uint32 itemEntry = 0);
     void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
-    bool CanRequestSpellCast(SpellInfo const* spellInfo);
+    bool CanRequestSpellCast(SpellInfo const* spellInfo, uint32 itemEntry = 0);
 
 protected:
     Unit* SelectCharmedAIGroupTarget(float distance) const;
@@ -2875,8 +2848,6 @@ protected:
     PlayerTalentMap m_talents;
     uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use
 
-    GlobalCooldownMgr m_GlobalCooldownMgr;
-
     uint8 m_activeSpec;
     uint8 m_specsCount;
 
@@ -3024,6 +2995,7 @@ private:
 
     uint32 m_lastFallTime;
     float  m_lastFallZ;
+    bool   m_lastFallFromClient;
 
     int32 m_MirrorTimer[MAX_TIMERS];
     uint8 m_MirrorTimerFlags;
@@ -3044,14 +3016,14 @@ private:
 
     std::unique_ptr<PetStable> m_petStable;
 
+    PetAutocastPreferences _petAutocastPreferences;
+
     // Temporary removed pet cache
     uint32 m_temporaryUnsummonedPetNumber;
     uint32 m_oldpetspell;
 
     AchievementMgr* m_achievementMgr;
     ReputationMgr*  m_reputationMgr;
-
-    SpellCooldowns m_spellCooldowns;
 
     uint32 m_ChampioningFaction;
 
@@ -3060,10 +3032,6 @@ private:
     uint32 _pendingBindTimer;
 
     uint32 _activeCheats;
-
-    // duel health and mana reset attributes
-    uint32 healthBeforeDuel;
-    uint32 manaBeforeDuel;
 
     bool m_isInstantFlightOn;
 
@@ -3081,6 +3049,7 @@ private:
 
     bool _expectingChangeTransport;
     uint32 _pendingFlightChangeCounter;
+    Optional<bool> _pendingCanFlyResync = { };
     uint32 _mapChangeOrderCounter;
 };
 

@@ -19,6 +19,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -616,14 +617,14 @@ class spell_sha_earth_shield : public AuraScript
 
     bool CheckProc(ProcEventInfo&  /*eventInfo*/)
     {
-        return !GetTarget()->HasSpellCooldown(SPELL_SHAMAN_EARTH_SHIELD_HEAL);
+        return !GetTarget()->GetSpellHistory()->HasCooldown(SPELL_SHAMAN_EARTH_SHIELD_HEAL);
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo&  /*eventInfo*/)
     {
         PreventDefaultAction();
         GetTarget()->CastCustomSpell(SPELL_SHAMAN_EARTH_SHIELD_HEAL, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
-        GetTarget()->AddSpellCooldown(SPELL_SHAMAN_EARTH_SHIELD_HEAL, 0, 3500);
+        GetTarget()->GetSpellHistory()->AddCooldown(SPELL_SHAMAN_EARTH_SHIELD_HEAL, 0, 3500ms);
     }
 
     void Register() override
@@ -1021,7 +1022,7 @@ class spell_sha_item_t10_elemental_2p_bonus : public AuraScript
     {
         PreventDefaultAction();
         if (Player* target = GetTarget()->ToPlayer())
-            target->ModifySpellCooldown(SPELL_SHAMAN_ELEMENTAL_MASTERY, -aurEff->GetAmount());
+            target->GetSpellHistory()->ModifyCooldown(SPELL_SHAMAN_ELEMENTAL_MASTERY, -aurEff->GetAmount());
     }
 
     void Register() override

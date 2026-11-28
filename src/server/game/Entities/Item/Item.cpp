@@ -362,14 +362,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
 
                 stmt->SetData(++index, GetUInt32Value(ITEM_FIELD_FLAGS));
 
-                std::ostringstream ssEnchants;
-                for (uint8 i = 0; i < MAX_ENCHANTMENT_SLOT; ++i)
-                {
-                    ssEnchants << GetEnchantmentId(EnchantmentSlot(i)) << ' ';
-                    ssEnchants << GetEnchantmentDuration(EnchantmentSlot(i)) << ' ';
-                    ssEnchants << GetEnchantmentCharges(EnchantmentSlot(i)) << ' ';
-                }
-                stmt->SetData(++index, ssEnchants.str());
+                stmt->SetData(++index, GetEnchantmentsString());
 
                 stmt->SetData (++index, GetItemRandomPropertyId());
                 stmt->SetData(++index, GetUInt32Value(ITEM_FIELD_DURABILITY));
@@ -918,6 +911,18 @@ bool Item::IsFitToSpellRequirements(SpellInfo const* spellInfo) const
     return true;
 }
 
+std::string Item::GetEnchantmentsString() const
+{
+    std::ostringstream ssEnchants;
+    for (uint8 i = 0; i < MAX_ENCHANTMENT_SLOT; ++i)
+    {
+        ssEnchants << GetEnchantmentId(EnchantmentSlot(i)) << ' ';
+        ssEnchants << GetEnchantmentDuration(EnchantmentSlot(i)) << ' ';
+        ssEnchants << GetEnchantmentCharges(EnchantmentSlot(i)) << ' ';
+    }
+    return ssEnchants.str();
+}
+
 void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, ObjectGuid caster /*= ObjectGuid::Empty*/)
 {
     // Better lost small time at check in comparison lost time at item save to DB.
@@ -1199,12 +1204,13 @@ void Item::SaveRefundDataToDB()
 
 void Item::DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans)
 {
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
+    stmt->SetData(0, GetGUID().GetCounter());
+
     if (trans)
-    {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
-        stmt->SetData(0, GetGUID().GetCounter());
         (*trans)->Append(stmt);
-    }
+    else
+        CharacterDatabase.Execute(stmt);
 }
 
 void Item::SetNotRefundable(Player* owner, bool changestate /*=true*/, CharacterDatabaseTransaction* trans /*=nullptr*/)

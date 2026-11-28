@@ -544,6 +544,22 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask[2] = 0x8000000;
     });
 
+    // Retribution Aura - damage shield hits cannot miss
+    ApplySpellFix({
+        7294,   // Retribution Aura (Rank 1)
+        10298,  // Retribution Aura (Rank 2)
+        10299,  // Retribution Aura (Rank 3)
+        10300,  // Retribution Aura (Rank 4)
+        10301,  // Retribution Aura (Rank 5)
+        27150,  // Retribution Aura (Rank 6)
+        54043,  // Retribution Aura (Rank 7)
+        8990,   // Retribution Aura (NPC)
+        13008   // Retribution Aura (NPC)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_NO_ATTACK_MISS;
+    });
+
     // Seal of Light trigger
     ApplySpellFix({ 20167 }, [](SpellInfo* spellInfo)
     {
@@ -1596,6 +1612,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 1;
     });
 
+    // Prince Malchezaar - Summon Axes
+    ApplySpellFix({ 30891 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
     // Energy Feedback
     ApplySpellFix({ 44335 }, [](SpellInfo* spellInfo)
     {
@@ -2305,12 +2327,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
     });
 
-    // tempfix, make Nether Power not stealable
-    ApplySpellFix({ 66228, 67106, 67107, 67108 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_CANNOT_BE_STOLEN;
-    });
-
     // Trial of the Crusader, Faction Champions, Druid - Tranquality
     ApplySpellFix({ 66086, 67974, 67975, 67976 }, [](SpellInfo* spellInfo)
     {
@@ -2347,6 +2363,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].BasePoints = 10;
         spellInfo->Effects[EFFECT_0].DieSides = 0;
+    });
+
+    // Trial of the Crusader, Twin Valkyr, Clear Val'kyr Essence
+    ApplySpellFix({ 67547 }, [](SpellInfo* spellInfo)
+    {
+        // Light and Dark Essence persist through death, so dead players must be cleared too
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_ALLOW_DEAD_TARGET;
     });
 
     // Trial of the Crusader, Twin Valkyr, Touch of Light/Darkness, Light/Dark Surge
@@ -2494,13 +2517,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ExcludeTargetAuraSpell = 67178;
     });
 
-    // Trial of the Crusader, Twin Valkyr, Twin's Pact
-    ApplySpellFix({ 65875, 67303, 67304, 67305, 65876, 67306, 67307, 67308 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_1].Effect = 0;
-        spellInfo->Effects[EFFECT_2].Effect = 0;
-    });
-
     // Trial of the Crusader, Anub'arak, Emerge
     ApplySpellFix({ 65982 }, [](SpellInfo* spellInfo)
     {
@@ -2525,14 +2541,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
         //spellInfo->EffectTriggerSpell[0] = 0;
-    });
-
-    // Trial of the Crusader, Anub'arak, Summon Scarab
-    ApplySpellFix({ 66339 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(35);
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(25);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
     // Trial of the Crusader, Anub'arak, Achievements: The Traitor King
@@ -4731,13 +4739,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
-    // Conjure Refreshment Table (Rank 1, Rank 2)
-    ApplySpellFix({ 43985, 58661 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_FRONT);
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
-    });
-
     ApplySpellFix({
         698, // Ritual of Summoning (portal for clicking)
         61993 // Ritual of Summoning (summons the closet)
@@ -4847,14 +4848,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
     });
 
-    ApplySpellFix({
-        45662, // Encapsulate
-        45642  // Fire Bloom
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
-    });
-
     // Torch (Death Knights near the Chapel)
     ApplySpellFix({ 52953 }, [](SpellInfo* spellInfo)
         {
@@ -4882,21 +4875,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_UNK;
-    });
-
-    // Life Tap
-    ApplySpellFix({ 1454 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
-    });
-
-    // Life Tap
-    ApplySpellFix({ 1455, 1456, 11687, 11688, 11689, 27222, 57946 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
-        spellInfo->MaxLevel = 16;
-        spellInfo->BaseLevel = 6;
-        spellInfo->SpellLevel = 6;
     });
 
     // Explosive Sheep
@@ -5253,6 +5231,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->SpellLevel = 10;
+    });
+
+    // Diminish Power
+    ApplySpellFix({ 64145 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+    });
+
+    // Oil of Immolation
+    ApplySpellFix({ 11350 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyName = SPELLFAMILY_POTION;
+        spellInfo->CategoryEntry = sSpellCategoryStore.LookupEntry(79);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

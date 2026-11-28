@@ -19,6 +19,7 @@
 #include "PetDefines.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -541,7 +542,7 @@ class spell_dk_wandering_plague_aura : public AuraScript
         if (!roll_chance_f(eventInfo.GetActor()->GetUnitCriticalChance(BASE_ATTACK, eventInfo.GetActionTarget())))
             return false;
 
-        return !eventInfo.GetActor()->HasSpellCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER);
+        return !eventInfo.GetActor()->GetSpellHistory()->HasCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER);
     }
 
     // xinef: prevent default proc with castItem passed, which applies 30 sec cooldown to procing of the aura
@@ -553,8 +554,10 @@ class spell_dk_wandering_plague_aura : public AuraScript
         if (!aurEff)
             return;
 
-        eventInfo.GetActor()->AddSpellCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER, 0, 1000);
-        eventInfo.GetActor()->CastCustomSpell(SPELL_DK_WANDERING_PLAGUE_TRIGGER, SPELLVALUE_BASE_POINT0, CalculatePct<int32, int32>(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()), eventInfo.GetActionTarget(), TRIGGERED_FULL_MASK);
+        eventInfo.GetActor()->GetSpellHistory()->AddCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER, 0, 1s);
+        eventInfo.GetActor()->CastCustomSpell(SPELL_DK_WANDERING_PLAGUE_TRIGGER, SPELLVALUE_BASE_POINT0,
+            CalculatePct<int32, int32>(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()),
+            eventInfo.GetActionTarget(), TriggerCastFlags(TRIGGERED_FULL_MASK | TRIGGERED_DONT_ENTER_COMBAT));
     }
 
     void Register() override
@@ -859,12 +862,12 @@ class spell_dk_pet_scaling : public AuraScript
         if (aurEff->GetAuraType() != SPELL_AURA_MELEE_SLOW)
             return;
 
+        if (GetUnitOwner()->IsPet())
+            return;
+
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_MELEE_RANGED_HASTE, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MELEE_SLOW, true, SPELL_BLOCK_TYPE_POSITIVE);
-
-        if (GetUnitOwner()->IsPet())
-            return;
 
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_STAT, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
@@ -1348,9 +1351,8 @@ class spell_dk_corpse_explosion : public SpellScript
         {
             if (unitTarget->IsAlive())  // Living ghoul as a target
             {
-                unitTarget->ToCreature()->m_CreatureSpellCooldowns.clear();
-                if (CharmInfo* charmInfo = unitTarget->GetCharmInfo())
-                    charmInfo->GetGlobalCooldownMgr().CancelGlobalCooldown(sSpellMgr->GetSpellInfo(SPELL_DK_GHOUL_EXPLODE));
+                unitTarget->GetSpellHistory()->ResetAllCooldowns();
+                unitTarget->GetSpellHistory()->CancelGlobalCooldown(sSpellMgr->AssertSpellInfo(SPELL_DK_GHOUL_EXPLODE));
 
                 unitTarget->StopMoving();
                 unitTarget->CastSpell(unitTarget, SPELL_DK_GHOUL_EXPLODE, false);
@@ -1919,6 +1921,15 @@ class spell_dk_pestilence : public SpellScript
         });
     }
 
+    // Aura::RefreshTimersWithMods() keeps the percentage done mods and crit chance stored at
+    // application, so only the attack power part of the amount is recomputed here.
+    void RefreshDisease(Aura* disease)
+    {
+        disease->RefreshTimersWithMods();
+        if (AuraEffect* periodic = disease->GetEffect(EFFECT_0))
+            periodic->ChangeAmount(periodic->CalculateAmount(GetCaster()), false);
+    }
+
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
@@ -1943,16 +1954,17 @@ class spell_dk_pestilence : public SpellScript
         {
             // Blood Plague
             if (Aura* disease = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                disease->RefreshDuration();
+                RefreshDisease(disease);
 
             // Frost Fever
             if (Aura* disease = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
             {
-                disease->RefreshDuration();
+                RefreshDisease(disease);
                 if (Aura const* talons = caster->GetAuraOfRankedSpell(SPELL_DK_ICY_TALONS_TALENT_R1))
                     caster->CastSpell(caster, talons->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
             }
 
+            // Ebon Plague / Crypt Fever only carry damage taken multipliers, nothing to recalculate
             if (Aura* disease = target->GetAuraOfRankedSpell(SPELL_DK_EBON_PLAGUE_R1, caster->GetGUID()))
                 disease->RefreshDuration();
             else if (Aura* disease = target->GetAuraOfRankedSpell(SPELL_DK_CRYPT_FEVER_R1, caster->GetGUID()))
@@ -2177,7 +2189,7 @@ class spell_dk_raise_dead : public SpellScript
         targets.SetDst(*GetHitUnit());
 
         GetCaster()->CastSpell(targets, spellInfo, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCaster()->GetGUID());
-        GetCaster()->ToPlayer()->RemoveSpellCooldown(GetSpellInfo()->Id, true);
+        GetCaster()->ToPlayer()->GetSpellHistory()->ResetCooldown(GetSpellInfo()->Id, true);
     }
 
     void Register() override
@@ -2740,7 +2752,7 @@ class spell_dk_rime : public AuraScript
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_DK_HOWLING_BLAST_R1);
         while (spellInfo)
         {
-            player->RemoveSpellCooldown(spellInfo->Id, true);
+            player->GetSpellHistory()->ResetCooldown(spellInfo->Id, true);
             spellInfo = spellInfo->GetNextRankSpell();
         }
     }
@@ -2894,7 +2906,7 @@ class spell_dk_glyph_of_death_grip : public AuraScript
     {
         PreventDefaultAction();
         if (Player* player = eventInfo.GetActor()->ToPlayer())
-            player->RemoveSpellCooldown(SPELL_DK_DEATH_GRIP_INITIAL, true);
+            player->GetSpellHistory()->ResetCooldown(SPELL_DK_DEATH_GRIP_INITIAL, true);
     }
 
     void Register() override

@@ -24,6 +24,7 @@
 #include "ScriptedCreature.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -188,6 +189,15 @@ enum Heartpierce
     SPELL_INVIGORATION_RAGE_HERO    = 71886,
     SPELL_INVIGORATION_ENERGY_HERO  = 71887,
     SPELL_INVIGORATION_MANA_HERO    = 71888
+};
+
+enum MeteoricInspiration
+{
+    SPELL_PENANCE_R1_HEAL_CHANNEL           = 47757,
+    SPELL_PENANCE_R1_DAMAGE_CHANNEL         = 47758,
+    SPELL_BEACON_OF_LIGHT_HOLY_LIGHT        = 53652,
+    SPELL_BEACON_OF_LIGHT_FLASH_OF_LIGHT    = 53653,
+    SPELL_BEACON_OF_LIGHT_HOLY_SHOCK        = 53654
 };
 
 enum MarkOfConquest
@@ -1209,33 +1219,39 @@ class spell_item_trauma : public AuraScript
     }
 };
 
+enum BloodReserve
+{
+    SPELL_BLOOD_RESERVE_HEAL = 64569
+};
+
 class spell_item_blood_draining_enchant : public AuraScript
 {
     PrepareAuraScript(spell_item_blood_draining_enchant);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_RESERVE_HEAL });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* target = eventInfo.GetActionTarget();
+        return target && target->HealthBelowPct(35);
+    }
+
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        if (!eventInfo.GetActionTarget() || !eventInfo.GetDamageInfo() || (eventInfo.GetActionTarget()->GetHealth() - eventInfo.GetDamageInfo()->GetDamage()) >= eventInfo.GetActionTarget()->CountPctFromMaxHealth(35))
-        {
-            return;
-        }
-
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/))
-        {
-            int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-            eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-            eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
-        }
-
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
-        int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
-        eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-        eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
+        Unit* target = eventInfo.GetActionTarget();
+        SpellInfo const* healInfo = sSpellMgr->AssertSpellInfo(SPELL_BLOOD_RESERVE_HEAL);
+        int32 basepoints = healInfo->Effects[EFFECT_0].CalcValue() * GetStackAmount();
+        target->CastCustomSpell(SPELL_BLOOD_RESERVE_HEAL, SPELLVALUE_BASE_POINT0, basepoints, target, true);
+        target->RemoveAurasDueToSpell(GetId());
     }
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_item_blood_draining_enchant::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_item_blood_draining_enchant::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
@@ -1633,7 +1649,7 @@ class spell_item_valanyr_hammer_of_ancient_kings : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
+        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetEffectiveHeal() > 0;
     }
 
     void Register() override
@@ -3533,7 +3549,7 @@ class spell_item_rocket_boots : public SpellScript
         if (Battleground* bg = caster->GetBattleground())
             bg->EventPlayerDroppedFlag(caster);
 
-        caster->RemoveSpellCooldown(SPELL_ROCKET_BOOTS_PROC);
+        caster->GetSpellHistory()->ResetCooldown(SPELL_ROCKET_BOOTS_PROC);
         caster->CastSpell(caster, SPELL_ROCKET_BOOTS_PROC, true, nullptr);
     }
 
@@ -3727,7 +3743,11 @@ class spell_item_refocus : public SpellScript
         if (!caster || !caster->IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY))
             return;
 
-        caster->RemoveCategoryCooldown(SPELL_CATEGORY_AIMED_MULTI);
+        caster->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            return itr->second.CategoryId == SPELL_CATEGORY_AIMED_MULTI || (spellInfo && spellInfo->GetCategory() == SPELL_CATEGORY_AIMED_MULTI);
+        }, true);
     }
 
     void Register() override
@@ -6071,6 +6091,75 @@ class spell_item_living_root_of_the_wildheart : public AuraScript
     }
 };
 
+// 64999 - Meteoric Inspiration
+class spell_item_meteoric_inspiration : public AuraScript
+{
+    PrepareAuraScript(spell_item_meteoric_inspiration);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_PENANCE_R1_HEAL_CHANNEL,
+            SPELL_PENANCE_R1_DAMAGE_CHANNEL,
+            SPELL_BEACON_OF_LIGHT_HOLY_LIGHT,
+            SPELL_BEACON_OF_LIGHT_FLASH_OF_LIGHT,
+            SPELL_BEACON_OF_LIGHT_HOLY_SHOCK
+        });
+    }
+
+    static bool HasManaCost(SpellInfo const* spellInfo)
+    {
+        return spellInfo->PowerType == POWER_MANA && (spellInfo->ManaCost || spellInfo->ManaCostPercentage);
+    }
+
+    // Penance channels cost no mana and nothing links them back to the 47540 cast
+    static bool IsPenanceChannel(SpellInfo const* spellInfo)
+    {
+        return spellInfo->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PENANCE_R1_HEAL_CHANNEL)) ||
+            spellInfo->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PENANCE_R1_DAMAGE_CHANNEL));
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Spell const* spell = eventInfo.GetProcSpell();
+        if (!spell)
+            return false;
+
+        SpellInfo const* spellInfo = spell->GetSpellInfo();
+
+        // totems cast by Call of the Elements are triggered
+        if (!spell->IsTriggered() || spellInfo->HasAttribute(SPELL_ATTR7_CAN_BE_MULTI_CAST))
+            return HasManaCost(spellInfo);
+
+        if (!spellInfo->HasAttribute(SPELL_ATTR3_NOT_A_PROC))
+            return false;
+
+        switch (spellInfo->Id)
+        {
+            case SPELL_BEACON_OF_LIGHT_HOLY_LIGHT:
+            case SPELL_BEACON_OF_LIGHT_FLASH_OF_LIGHT:
+            case SPELL_BEACON_OF_LIGHT_HOLY_SHOCK:
+            {
+                // copy is cast inside the source heal's hit, so the generic slot still holds that heal.
+                // 53654 also copies Lay on Hands, so the copy's id alone can't tell
+                Spell const* origin = eventInfo.GetActor()->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+                return origin && HasManaCost(origin->GetSpellInfo());
+            }
+            default:
+                break;
+        }
+
+        SpellInfo const* channel = spell->GetTriggeredByAuraSpellInfo();
+        return channel && channel->IsChanneled() && (HasManaCost(channel) || IsPenanceChannel(channel));
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_item_meteoric_inspiration::CheckProc);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -6251,4 +6340,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_purified_shard_of_the_scale);
     RegisterSpellScript(spell_item_shiny_shard_of_the_scale);
     RegisterSpellScript(spell_item_living_root_of_the_wildheart);
+    RegisterSpellScript(spell_item_meteoric_inspiration);
 }

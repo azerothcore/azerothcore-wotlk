@@ -18,6 +18,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -494,22 +495,13 @@ class spell_mage_cold_snap : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        Player* caster = GetCaster()->ToPlayer();
         // immediately finishes the cooldown on Frost spells
-
-        PlayerSpellMap const& spellMap = caster->GetSpellMap();
-        for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
+        GetCaster()->GetSpellHistory()->ResetCooldowns([](SpellHistory::CooldownStorageType::iterator itr) -> bool
         {
-            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
-            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
-            {
-                SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
-                if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
-                    caster->RemoveSpellCooldown(spellInfo->Id, true);
-                else
-                    caster->RemoveSpellCooldown(spellInfo->Id, false);
-            }
-        }
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            return spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) &&
+                spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0;
+        }, true);
     }
 
     void Register() override
@@ -750,7 +742,8 @@ class spell_mage_ignite : public AuraScript
         int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
 
         // Xinef: implement ignite bug
-        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_MAGE_IGNITE, SPELL_AURA_PERIODIC_DAMAGE, amount);
+        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_MAGE_IGNITE,
+            SPELL_AURA_PERIODIC_DAMAGE, amount, EFFECT_0, TRIGGERED_DONT_ENTER_COMBAT);
         //GetTarget()->CastCustomSpell(SPELL_MAGE_IGNITE, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, nullptr, aurEff);
     }
 
@@ -780,7 +773,8 @@ class spell_mage_living_bomb : public AuraScript
             return;
 
         if (Unit* caster = GetCaster())
-            caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()), true, nullptr, aurEff);
+            caster->CastSpell(GetTarget(), uint32(aurEff->GetAmount()),
+                TriggerCastFlags(TRIGGERED_FULL_MASK | TRIGGERED_DONT_ENTER_COMBAT), nullptr, aurEff);
     }
 
     void Register() override
@@ -947,10 +941,12 @@ class spell_mage_summon_water_elemental : public SpellScript
         if (Creature* pet = ObjectAccessor::GetCreature(*caster, caster->GetPetGUID()))
             if (pet->GetCharmInfo() && caster->ToPlayer())
             {
-                pet->m_CreatureSpellCooldowns.clear();
+                pet->GetSpellHistory()->ResetAllCooldowns();
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(31707);
                 pet->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, true);
                 pet->GetCharmInfo()->SetSpellAutocast(spellInfo, true);
+                // the forced state above is the default the elemental always arrives with; a remembered off wins
+                ApplySavedPetAutocast(caster->ToPlayer(), pet);
                 caster->ToPlayer()->CharmSpellInitialize();
             }
     }
@@ -1202,7 +1198,7 @@ class spell_mage_glyph_of_ice_block : public AuraScript
             if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
                 (spellInfo->SpellFamilyFlags[0] & 0x00000040))
             {
-                player->RemoveSpellCooldown(spellInfo->Id, true);
+                player->GetSpellHistory()->ResetCooldown(spellInfo->Id, true);
             }
         }
     }

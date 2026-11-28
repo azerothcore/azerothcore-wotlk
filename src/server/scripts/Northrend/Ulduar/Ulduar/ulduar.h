@@ -19,7 +19,7 @@
 #define DEF_ULDUAR_H
 
 #include "CreatureAIImpl.h"
-#include "GridNotifiers.h"
+#include "Position.h"
 
 #define DataHeader "UU"
 
@@ -47,11 +47,9 @@ enum UlduarBossIds
 
 enum UlduarData
 {
-    // Non-boss encounter data
-    TYPE_WATCHERS                           = 14,
-    TYPE_HODIR_HM_FAIL                      = 15,
-    TYPE_WINTER_CACHE                       = 16,
-    TYPE_HODIR_HM_RESET                     = 17,
+    // Hodir hard mode
+    DATA_HODIR_HM_FAIL                      = 15,
+    DATA_HODIR_HM_RESET                     = 17,
 
     // Assembly of Iron
     DATA_STEELBREAKER                       = 20,
@@ -64,7 +62,6 @@ enum UlduarData
     DATA_LIGHTNING_WALL2                    = 102,
     DATA_REPAIR_STATION1                    = 103,
     DATA_REPAIR_STATION2                    = 104,
-    DATA_UNBROKEN_ACHIEVEMENT               = 105,
     DATA_LEVIATHAN_DOORS                    = 106,
     DATA_LEVIATHAN_VEHICLES_USABLE          = 107,
 
@@ -114,8 +111,6 @@ enum UlduarData
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
-    DATA_QUICK_SHAVE                        = 701,
-    DATA_IRON_DWARF_MEDIUM_RARE             = 702,
 
     // Tram
     DATA_CALL_TRAM                          = 710,
@@ -127,7 +122,7 @@ enum UlduarData
 
     // Yogg-Saron
     DATA_SARA                               = 760,
-    DATA_BRAIN_OF_YOGG_SARON               = 761,
+    DATA_BRAIN_OF_YOGG_SARON                = 761,
     DATA_YOGG_SARON_DOORS                   = 762,
     DATA_VOICE_OF_YOGG_SARON                = 763,
 
@@ -144,9 +139,7 @@ enum UlduarData
 
     // Mage Barrier
     DATA_MAGE_BARRIER                       = 800,
-    DATA_BRANN_MEMOTESAY                    = 801,
     DATA_BRANN_EASY_MODE                    = 802,
-    DATA_BRANN_BASE_CAMP                    = 803,
 
     // Observation Ring Keepers
     DATA_FREYA_GOSSIP                       = 810,
@@ -156,6 +149,9 @@ enum UlduarData
 
     // Flame Leviathan outro
     DATA_BRANN_FORMATION_GROUNDS            = 814,
+
+    // Freya, Hodir, Mimiron, Thorim
+    DATA_KEEPER_TELEPORTED                  = 815,
 };
 
 enum UlduarNPCs
@@ -226,7 +222,6 @@ enum UlduarNPCs
     NPC_VEHICLE_CHOPPER                     = 33062,
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
-    NPC_BRANN_BASE_CAMP                     = 33579,
     NPC_STEELFORGED_DEFENDER                = 33236,
     NPC_ULDUAR_COLOSSUS                     = 33237,
     NPC_IRONWORK_CANNON                     = 33264,
@@ -240,7 +235,7 @@ enum UlduarNPCs
     NPC_EXPEDITION_ENGINEER_FORMATION       = 34145,
 
     // Algalon the Observer
-    NPC_BRANN_BRONZBEARD_ALG                = 34064,
+    NPC_BRANN_BRONZEBEARD_ALG               = 34064,
     NPC_AZEROTH                             = 34246,
     NPC_LIVING_CONSTELLATION                = 33052,
     NPC_ALGALON_STALKER                     = 33086,
@@ -251,6 +246,9 @@ enum UlduarNPCs
     NPC_ALGALON_STALKER_ASTEROID_TARGET_01  = 33104,
     NPC_ALGALON_STALKER_ASTEROID_TARGET_02  = 33105,
     NPC_UNLEASHED_DARK_MATTER               = 34097,
+
+    // Ancient Gate
+    NPC_ANCIENT_GATE_WORLD_TRIGGER          = 22515,
 };
 
 enum UlduarGameObjects
@@ -270,6 +268,21 @@ enum UlduarGameObjects
     GO_MIMIRON_CHEST_HERO_HARD              = 194958,
     GO_ALGALON_CHEST                        = 194821,
     GO_ALGALON_CHEST_HERO                   = 194822,
+    GO_FREYA_CHEST_3_ELDERS                 = 194324,
+    GO_FREYA_CHEST_3_ELDERS_HERO            = 194325,
+    GO_FREYA_CHEST_2_ELDERS                 = 194326,
+    GO_FREYA_CHEST_2_ELDERS_HERO            = 194327,
+    GO_FREYA_CHEST_1_ELDER                  = 194328,
+    GO_FREYA_CHEST_1_ELDER_HERO             = 194329,
+    GO_FREYA_CHEST                          = 194330,
+    GO_FREYA_CHEST_HERO                     = 194331,
+
+    // Herbs cleared for the lockout once Freya is defeated
+    GO_ADDERS_TONGUE                        = 191019,
+    GO_FROST_LOTUS                          = 190176,
+    GO_LICHBLOOM                            = 190171,
+    GO_TALANDRAS_ROSE                       = 190170,
+    GO_GOLDCLOVER                           = 189973,
 
     // Flame Leviathan
     GO_REPAIR_STATION_TRAP                  = 194262,
@@ -345,34 +358,38 @@ enum UlduarGameObjects
     GO_DOODAD_UL_UNIVERSEFLOOR_02           = 194716,
     GO_DOODAD_UL_UNIVERSEGLOBE01            = 194148,
     GO_DOODAD_UL_ULDUAR_TRAPDOOR_03         = 194253,
-    GO_GIFT_OF_THE_OBSERVER_10              = 194821,
-    GO_GIFT_OF_THE_OBSERVER_25              = 194822,
 };
 
 enum UlduarPersistentData
 {
     PERSISTENT_DATA_WATCHERS_MASK           = 0,
     PERSISTENT_DATA_CONSPEEDATORY,
-    PERSISTENT_DATA_UNBROKEN,
+    PERSISTENT_DATA_UNBROKEN_FAIL,
     PERSISTENT_DATA_ALGALON_TIMER,
     PERSISTENT_DATA_C_OF_ULDUAR_MASK,
     PERSISTENT_DATA_MAGE_BARRIER,
     PERSISTENT_DATA_ALGALON_FIRST_PULL,
     // Set when Brann's action list unlocks the salvaged vehicles, they stay boardable for the rest of the lockout
     PERSISTENT_DATA_LEVIATHAN_VEHICLES_USABLE,
+    PERSISTENT_DATA_ALGALON_DEADLINE,
     MAX_PERSISTENT_DATA
 };
 
-enum UlduarMisc
+enum UlduarLeviathanVehiclePositions
 {
-    // Flame Leviathan
     VEHICLE_POS_START                       = 0,
     VEHICLE_POS_LEVIATHAN                   = 1,
     VEHICLE_POS_NONE                        = 2,
+};
 
+enum UlduarMageBarrierStates
+{
     // Stored in PERSISTENT_DATA_MAGE_BARRIER by Brann's intro script once the Kirin Tor drop the shield
     MAGE_BARRIER_LOWERED                    = 3,
+};
 
+enum UlduarSummonGroups
+{
     // creature_summon_groups entries for the post-Leviathan outro
     SUMMON_GROUP_LEVIATHAN_OUTRO            = 0, // Brann + crew in formation (reload; also the march destinations)
     SUMMON_GROUP_LEVIATHAN_OUTRO_MARCH      = 1, // crew at the gate, runs into formation (kill)
@@ -384,63 +401,118 @@ enum UlduarMisc
 
     // gameobject_summon_groups: the Dalaran portal behind the formation
     GO_SUMMON_GROUP_LEVIATHAN_PORTAL        = 1,
+};
 
+enum UlduarPaths
+{
     // waypoint_data paths: Brann's walk from the machine to his spot, Rhydian's walk to Brann's side,
     // and the flying machine's approach arc over the grounds
     PATH_BRANN_FORMATION_GROUNDS            = 341190,
     PATH_RHYDIAN_TO_BRANN                   = 336960,
     PATH_FLYING_MACHINE_APPROACH            = 341200,
 
+    // Six column routes per crew entry, PATH_* + 1 to PATH_* + 6
+    PATH_EXPEDITION_MERCENARY_MARCH         = 3414400,
+    PATH_EXPEDITION_ENGINEER_MARCH          = 3414500,
+};
+
+enum UlduarSpells
+{
     // Gossip Keepers, Kirin Tor Mages: teleport-in flash
     SPELL_SIMPLE_TELEPORT_VISUAL            = 12980,
 
     // Kirin Tor Battle-Mages sustaining the Dalaran portal
     SPELL_ARCANE_CHANNELING                 = 39550,
 
+    // Algalon the Observer, Freya, Hodir, Mimiron, Thorim, Gossip Keepers
+    SPELL_TELEPORT                          = 62940,
+
+    // Achievement credit spell, not in the client DBC
+    SPELL_DWARFAGEDDON                      = 65387,
+};
+
+enum UlduarGameEvents
+{
+    EVENT_TOWER_OF_LIFE_DESTROYED           = 21030,
     EVENT_TOWER_OF_STORM_DESTROYED          = 21031,
     EVENT_TOWER_OF_FROST_DESTROYED          = 21032,
     EVENT_TOWER_OF_FLAMES_DESTROYED         = 21033,
-    EVENT_TOWER_OF_LIFE_DESTROYED           = 21030,
 
     // Sent by Shatter Chest (62502), triggered by Hodir's hard mode timer missile (62501)
     EVENT_HODIR_SHATTER_CHEST               = 20907,
+};
 
-    ACTION_LEVIATHAN_REFRESH_TOWERS         = -1,
-    ACTION_TOWER_OF_STORM_DESTROYED         = 1,
-    ACTION_TOWER_OF_FROST_DESTROYED         = 2,
-    ACTION_TOWER_OF_FLAMES_DESTROYED        = 3,
-    ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
-
+enum UlduarInstanceEvents
+{
     EVENT_UPDATE_ALGALON_TIMER              = 1,
     EVENT_RESUMMON_ALGALON                  = 2,
+};
+
+enum UlduarActions
+{
+    // Algalon the Observer
     ACTION_FEEDS_ON_TEARS_FAILED            = 0,
     ACTION_INIT_ALGALON                     = 1,
     ACTION_DESPAWN_ALGALON                  = 2,
     ACTION_START_INTRO                      = 3,
 
+    // Yogg-Saron
+    ACTION_SARA_UPDATE_SUMMON_KEEPERS       = 4,
+};
+
+enum UlduarAlgalonTimerStates
+{
     TIMER_ALGALON_DEFEATED                  = 300,
     TIMER_ALGALON_TO_SUMMON                 = 200,
     TIMER_ALGALON_SUMMONED                  = 100,
+    TIMER_ALGALON_MINUTES                   = 60,
+};
 
-    // Algalon the Observer, Freya, Hodir, Mimiron, Thorim, Gossip Keepers
-    SPELL_TELEPORT                          = 62940,
-
-    // Freya, Hodir, Mimiron, Thorim
-    EVENT_KEEPER_TELEPORTED                 = 62941,
-
-    // Ancient Gate
-    NPC_ANCIENT_GATE_WORLD_TRIGGER          = 22515,
+enum UlduarTexts
+{
+    // Ancient Gate world trigger
     EMOTE_ANCIENT_GATE_UNLOCKED             = 19,
+};
 
-    // Yogg-Saron
-    ACTION_SARA_UPDATE_SUMMON_KEEPERS       = 4,
+enum UlduarKeepers
+{
     KEEPER_FREYA                            = 0,
     KEEPER_HODIR                            = 1,
     KEEPER_MIMIRON                          = 2,
     KEEPER_THORIM                           = 3,
+};
 
-    // Achievement
-    SPELL_DWARFAGEDDON                      = 65387, // not exists in dbc
+enum UlduarAchievementData
+{
+    ACHIEV_CON_SPEED_ATORY_START_EVENT      = 21597,
+
+    // Champion of Ulduar (10 player) / Conqueror of Ulduar (25 player): a boss killed without a raid member dying
+    ACHIEV_CRITERIA_CHAMPION_LEVIATHAN      = 10042,
+    ACHIEV_CRITERIA_CONQUEROR_LEVIATHAN     = 10352,
+    ACHIEV_CRITERIA_CHAMPION_IGNIS          = 10342,
+    ACHIEV_CRITERIA_CONQUEROR_IGNIS         = 10355,
+    ACHIEV_CRITERIA_CHAMPION_RAZORSCALE     = 10340,
+    ACHIEV_CRITERIA_CONQUEROR_RAZORSCALE    = 10353,
+    ACHIEV_CRITERIA_CHAMPION_XT002          = 10341,
+    ACHIEV_CRITERIA_CONQUEROR_XT002         = 10354,
+    ACHIEV_CRITERIA_CHAMPION_ASSEMBLY       = 10598,
+    ACHIEV_CRITERIA_CONQUEROR_ASSEMBLY      = 10599,
+    ACHIEV_CRITERIA_CHAMPION_KOLOGARN       = 10348,
+    ACHIEV_CRITERIA_CONQUEROR_KOLOGARN      = 10357,
+    ACHIEV_CRITERIA_CHAMPION_AURIAYA        = 10351,
+    ACHIEV_CRITERIA_CONQUEROR_AURIAYA       = 10363,
+    ACHIEV_CRITERIA_CHAMPION_HODIR          = 10439,
+    ACHIEV_CRITERIA_CONQUEROR_HODIR         = 10719,
+    ACHIEV_CRITERIA_CHAMPION_THORIM         = 10403,
+    ACHIEV_CRITERIA_CONQUEROR_THORIM        = 10404,
+    ACHIEV_CRITERIA_CHAMPION_FREYA          = 10582,
+    ACHIEV_CRITERIA_CONQUEROR_FREYA         = 10583,
+    ACHIEV_CRITERIA_CHAMPION_MIMIRON        = 10347,
+    ACHIEV_CRITERIA_CONQUEROR_MIMIRON       = 10361,
+    ACHIEV_CRITERIA_CHAMPION_VEZAX          = 10349,
+    ACHIEV_CRITERIA_CONQUEROR_VEZAX         = 10362,
+    ACHIEV_CRITERIA_CHAMPION_YOGGSARON      = 10350,
+    ACHIEV_CRITERIA_CONQUEROR_YOGGSARON     = 10364,
 };
 
 Position const AlgalonSummonPos = {1632.531f, -304.8516f, 450.1123f, 1.530165f};
@@ -454,4 +526,4 @@ inline AI* GetUlduarAI(T* obj)
 
 #define RegisterUlduarCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetUlduarAI)
 
-#endif
+#endif // DEF_ULDUAR_H

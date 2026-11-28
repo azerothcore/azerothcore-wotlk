@@ -30,6 +30,7 @@
 #include "ReputationMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Unit.h"
@@ -256,7 +257,7 @@ class spell_the_flag_of_ownership : public SpellScript
 
         if (!haveTarget)
         {
-            caster->ToPlayer()->RemoveSpellCooldown(GetSpellInfo()->Id, true);
+            caster->ToPlayer()->GetSpellHistory()->ResetCooldown(GetSpellInfo()->Id, true);
             Spell::SendCastResult(caster->ToPlayer(), GetSpellInfo(), 0, SPELL_FAILED_BAD_TARGETS);
         }
     }
@@ -2091,7 +2092,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
         Player* player = GetCaster()->ToPlayer();
         // This is only needed because spells cast from spell_linked_spell are triggered by default
         // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
-        player->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
+        player->GetSpellHistory()->StartCooldown(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
 
         if (player->GetTeamId(true) == TEAM_HORDE)
         {
@@ -2212,8 +2213,8 @@ class spell_gen_divine_storm_cd_reset : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
-        if (caster->HasSpellCooldown(SPELL_DIVINE_STORM))
-            caster->RemoveSpellCooldown(SPELL_DIVINE_STORM, true);
+        if (caster->GetSpellHistory()->HasCooldown(SPELL_DIVINE_STORM))
+            caster->GetSpellHistory()->ResetCooldown(SPELL_DIVINE_STORM, true);
     }
 
     void Register() override
@@ -5667,7 +5668,7 @@ class spell_gen_cooldown_all : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Player* player = GetHitPlayer())
-            player->RemoveAllSpellCooldown();
+            player->GetSpellHistory()->ResetAllCooldowns();
     }
 
     void Register() override
@@ -5910,6 +5911,11 @@ class spell_gen_vampiric_touch : public AuraScript
     }
 };
 
+enum PetrifiedBarkSpells
+{
+    SPELL_PETRIFIED_BARK_DAMAGE = 62379
+};
+
 // 62337, 62933 - Petrified Bark (Freya)
 class spell_gen_petrified_bark : public AuraScript
 {
@@ -5917,10 +5923,10 @@ class spell_gen_petrified_bark : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 62379 });
+        return ValidateSpellInfo({ SPELL_PETRIFIED_BARK_DAMAGE });
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
@@ -5932,7 +5938,7 @@ class spell_gen_petrified_bark : public AuraScript
             return;
 
         int32 damage = damageInfo->GetDamage();
-        victim->CastCustomSpell(GetTarget(), 62379, &damage, nullptr, nullptr, true);
+        victim->CastCustomSpell(victim, SPELL_PETRIFIED_BARK_DAMAGE, &damage, nullptr, nullptr, true, nullptr, aurEff, GetTarget()->GetGUID());
     }
 
     void Register() override
@@ -6227,6 +6233,27 @@ class spell_gen_submerge_visual : public AuraScript
     }
 };
 
+// 59556 - Daze Immunity Cancel
+class spell_gen_cancel_aura : public SpellScript
+{
+    PrepareSpellScript(spell_gen_cancel_aura);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->Effects[EFFECT_0].CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_cancel_aura::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -6417,4 +6444,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_black_bow_of_the_betrayer);
     RegisterSpellScript(spell_gen_filter_party_level_80);
     RegisterSpellScript(spell_gen_submerge_visual);
+    RegisterSpellScript(spell_gen_cancel_aura);
 }

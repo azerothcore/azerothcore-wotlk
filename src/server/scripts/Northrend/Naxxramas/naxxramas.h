@@ -18,11 +18,13 @@
 #ifndef DEF_NAXXRAMAS_H
 #define DEF_NAXXRAMAS_H
 
+#include "CreatureAIImpl.h"
+
 #define DataHeader "NAX"
 
 #define NaxxramasScriptName "instance_naxxramas"
 
-enum NaxxramasEncouter
+enum NaxxramasEncounter
 {
     BOSS_PATCHWERK                  = 0,
     BOSS_GROBBULUS                  = 1,
@@ -188,7 +190,7 @@ enum NaxxramasCreatureId
     NPC_LICH_KING                   = 16980
 };
 
-enum NaxxramasAchievemmentCriteria
+enum NaxxramasAchievementCriteria
 {
     ACHIEV_CRITERIA_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER_10_PLAYER = 7600,  // And They Would All Go Down Together (10 player)
     ACHIEV_CRITERIA_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER_25_PLAYER = 7601,  // And They Would All Go Down Together (25 player)
@@ -199,8 +201,8 @@ enum NaxxramasAchievemmentCriteria
     ACHIEV_CRITERIA_MOMMA_SAID_KNOCK_YOU_OUT_10_PLAYER            = 7265,  // Momma Said Knock You Out (10 player)
     ACHIEV_CRITERIA_MOMMA_SAID_KNOCK_YOU_OUT_25_PLAYER            = 7549,  // Momma Said Knock You Out (25 player)
 
-    ACHIEV_CRITERIA_SHOKING_10_PLAYER                             = 7604,  // Shocking! (10 player)
-    ACHIEV_CRITERIA_SHOKING_25_PLAYER                             = 7605,  // Shocking! (25 player)
+    ACHIEV_CRITERIA_SHOCKING_10_PLAYER                            = 7604,  // Shocking! (10 player)
+    ACHIEV_CRITERIA_SHOCKING_25_PLAYER                            = 7605,  // Shocking! (25 player)
 
     ACHIEV_CRITERIA_SPORE_LOSER_10_PLAYER                         = 7612,  // Spore Loser (10 player)
     ACHIEV_CRITERIA_SPORE_LOSER_25_PLAYER                         = 7613,  // Spore Loser (25 player)
@@ -214,20 +216,20 @@ enum NaxxramasAchievemmentCriteria
     ACHIEV_CRITERIA_THE_HUNDRED_CLUB_10_PLAYER                    = 7567,  // The Hundred Club (10 player)
     ACHIEV_CRITERIA_THE_HUNDRED_CLUB_25_PLAYER                    = 7568,  // The Hundred Club (25 player)
 
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_ANUB_10_PLAYER              = 7146,  // The Dedicated Few (25 player) - Anub'Rekhan
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_FAERLINA_10_PLAYER          = 7147,  // The Dedicated Few (25 player) - Grand Widow Faerlina
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_MAEXXNA_10_PLAYER           = 7148,  // The Dedicated Few (25 player) - Maexxna
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_PATCHWERK_10_PLAYER         = 7149,  // The Dedicated Few (25 player) - Patchwerk
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_GROBBULUS_10_PLAYER         = 7150,  // The Dedicated Few (25 player) - Grobbulus
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_GLUTH_10_PLAYER             = 7151,  // The Dedicated Few (25 player) - Gluth
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_THADDIUS_10_PLAYER          = 7152,  // The Dedicated Few (25 player) - Thaddius
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_NOTH_10_PLAYER              = 7153,  // The Dedicated Few (25 player) - Noth the Plaguebringer
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_HEIGAN_10_PLAYER            = 7154,  // The Dedicated Few (25 player) - Heigan the Unclean
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_LOATHEB_10_PLAYER           = 7155,  // The Dedicated Few (25 player) - Loatheb
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_RAZUVIOUS_10_PLAYER         = 7156,  // The Dedicated Few (25 player) - Instructor Razuvious
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_GOTHIK_10_PLAYER            = 7157,  // The Dedicated Few (25 player) - Gothik the Harvester
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_SAPPHIRON_10_PLAYER         = 7158,  // The Dedicated Few (25 player) - Sapphiron
-    ACHIEV_CRITERIA_THE_DEDICATED_FEW_KELTHUZAD_10_PLAYER         = 6802,  // The Dedicated Few (25 player) - Kel'Thuzad
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_ANUB_10_PLAYER              = 7146,  // The Dedicated Few (10 player) - Anub'Rekhan
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_FAERLINA_10_PLAYER          = 7147,  // The Dedicated Few (10 player) - Grand Widow Faerlina
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_MAEXXNA_10_PLAYER           = 7148,  // The Dedicated Few (10 player) - Maexxna
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_PATCHWERK_10_PLAYER         = 7149,  // The Dedicated Few (10 player) - Patchwerk
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_GROBBULUS_10_PLAYER         = 7150,  // The Dedicated Few (10 player) - Grobbulus
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_GLUTH_10_PLAYER             = 7151,  // The Dedicated Few (10 player) - Gluth
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_THADDIUS_10_PLAYER          = 7152,  // The Dedicated Few (10 player) - Thaddius
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_NOTH_10_PLAYER              = 7153,  // The Dedicated Few (10 player) - Noth the Plaguebringer
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_HEIGAN_10_PLAYER            = 7154,  // The Dedicated Few (10 player) - Heigan the Unclean
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_LOATHEB_10_PLAYER           = 7155,  // The Dedicated Few (10 player) - Loatheb
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_RAZUVIOUS_10_PLAYER         = 7156,  // The Dedicated Few (10 player) - Instructor Razuvious
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_GOTHIK_10_PLAYER            = 7157,  // The Dedicated Few (10 player) - Gothik the Harvester
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_SAPPHIRON_10_PLAYER         = 7158,  // The Dedicated Few (10 player) - Sapphiron
+    ACHIEV_CRITERIA_THE_DEDICATED_FEW_KELTHUZAD_10_PLAYER         = 6802,  // The Dedicated Few (10 player) - Kel'Thuzad
 
     ACHIEV_CRITERIA_THE_DEDICATED_FEW_ANUB_25_PLAYER              = 7159,  // The Dedicated Few (25 player) - Anub'Rekhan
     ACHIEV_CRITERIA_THE_DEDICATED_FEW_FAERLINA_25_PLAYER          = 7160,  // The Dedicated Few (25 player) - Grand Widow Faerlina
@@ -298,18 +300,25 @@ enum NaxxramasEvent
     EVENT_KELTHUZAD_LICH_KING_TALK6           = 19
 };
 
-enum NaxxramasMisc
+enum NaxxramasSpells
 {
     SPELL_ERUPTION                  = 29371,
     SPELL_EXPLODE                   = 28433,
-    SPELL_THE_FOUR_HORSEMAN_CREDIT  = 59450,
+    SPELL_THE_FOUR_HORSEMAN_CREDIT  = 59450
+};
 
-    ACTION_SAPPHIRON_BIRTH          = 1,
+enum NaxxramasActions
+{
+    ACTION_SAPPHIRON_BIRTH          = 1
+};
 
-    // Background screams in instance if Thaddius still alive, four of them from 8873 to 8876
+enum NaxxramasSounds
+{
+    // Background screams while Thaddius is alive, consecutive ids from 8873
     SOUND_SCREAM                    = 8873
 };
 
+static constexpr uint8 ThaddiusScreamSoundCount   = 4;
 static constexpr uint8 HeiganEruptSectionCount    = 4;
 static constexpr uint8 HorsemanCount              = 4;
 static constexpr uint8 AbominationKillCountReq    = 18;
