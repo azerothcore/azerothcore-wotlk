@@ -398,11 +398,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                 if (result == SPELL_CAST_OK)
                 {
-                    if (!spellInfo->IsCooldownStartedOnEvent())
-                    {
-                        pet->GetSpellHistory()->StartCooldown(spellInfo, 0);
-                    }
-
                     unit_target = spell->m_targets.GetUnitTarget();
 
                     //10% chance to play special pet attack talk, else growl
@@ -1076,7 +1071,6 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     {
         if (Creature* creature = caster->ToCreature())
         {
-            creature->GetSpellHistory()->StartCooldown(spell->m_spellInfo, 0);
             if (Pet* pet = creature->ToPet())
             {
                 // 10% chance to play special pet attack talk, else growl
