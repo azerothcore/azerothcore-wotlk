@@ -92,6 +92,18 @@ enum MiscData
     SPELL_STONED    = 10255
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_COREN_DIREBREW, DATA_COREN },
+    { 0,                  0          }
+};
+
+ObjectData const summonData[] =
+{
+    { NPC_DIREBREW_MINION, DATA_COREN },
+    { 0,                   0          }
+};
+
 class RestoreAttack : public BasicEvent
 {
 public:
@@ -120,6 +132,8 @@ struct instance_blackrock_depths : public InstanceScript
     instance_blackrock_depths(Map* map) : InstanceScript(map)
     {
         SetHeaders(DataHeader);
+        LoadObjectData(creatureData, nullptr);
+        LoadSummonData(summonData);
     }
 
     uint32 encounter[MAX_ENCOUNTER];
@@ -131,7 +145,6 @@ struct instance_blackrock_depths : public InstanceScript
     ObjectGuid MoiraGUID;
     ObjectGuid PriestessGUID;
     ObjectGuid IronhandGUID[6];
-    ObjectGuid CorenGUID;
 
     ObjectGuid GoArena1GUID;
     ObjectGuid GoArena2GUID;
@@ -254,6 +267,8 @@ struct instance_blackrock_depths : public InstanceScript
 
     void OnCreatureCreate(Creature* creature) override
     {
+        InstanceScript::OnCreatureCreate(creature);
+
         switch (creature->GetEntry())
         {
             case NPC_EMPEROR:
@@ -264,9 +279,6 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case NPC_MOIRA:
                 MoiraGUID = creature->GetGUID();
-                break;
-            case NPC_COREN_DIREBREW:
-                CorenGUID = creature->GetGUID();
                 break;
             case NPC_ANGERREL:
                 TombBossGUIDs[0] = creature->GetGUID();
@@ -836,8 +848,6 @@ struct instance_blackrock_depths : public InstanceScript
                 return PhalanxGUID;
             case DATA_MOIRA:
                 return MoiraGUID;
-            case DATA_COREN:
-                return CorenGUID;
             case DATA_ARENA1:
                 return GoArena1GUID;
             case DATA_ARENA2:
@@ -870,7 +880,7 @@ struct instance_blackrock_depths : public InstanceScript
             }
         }
 
-        return ObjectGuid::Empty;
+        return InstanceScript::GetGuidData(data);
     }
 
     std::string GetSaveData() override

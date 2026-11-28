@@ -1461,7 +1461,6 @@ enum DirebrewMisc
     GOSSIP_OPTION_APOLOGIZE             = 1,
     DATA_TARGET_GUID                    = 1,
     MAX_ANTAGONISTS                     = 3,
-    DATA_COREN                          = 33,
     GO_MACHINE_SUMMONER                 = 188508
 };
 
@@ -1745,28 +1744,6 @@ private:
     TaskScheduler _scheduler;
 };
 
-struct npc_direbrew_minion : public ScriptedAI
-{
-    npc_direbrew_minion(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
-
-    void Reset() override
-    {
-        me->SetFaction(FACTION_GOBLIN_DARK_IRON_BAR_PATRON);
-        DoZoneInCombat();
-    }
-
-    void IsSummonedBy(WorldObject* /*summoner*/) override
-    {
-        if (Creature* coren = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_COREN)))
-        {
-            coren->AI()->JustSummoned(me);
-        }
-    }
-
-private:
-    InstanceScript* _instance;
-};
-
 struct npc_direbrew_antagonist : public ScriptedAI
 {
     npc_direbrew_antagonist(Creature* creature) : ScriptedAI(creature) {}
@@ -2031,7 +2008,6 @@ void AddSC_event_brewfest_scripts()
     // Coren Direbrew
     RegisterCreatureAI(npc_coren_direbrew);
     RegisterCreatureAI(npc_coren_direbrew_sisters);
-    RegisterCreatureAI(npc_direbrew_minion);
     RegisterCreatureAI(npc_direbrew_antagonist);
     new go_direbrew_mole_machine();
     RegisterSpellScript(spell_direbrew_summon_mole_machine_target_picker);
