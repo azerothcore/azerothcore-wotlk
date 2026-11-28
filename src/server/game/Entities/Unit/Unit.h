@@ -18,9 +18,9 @@
 #ifndef __UNIT_H
 #define __UNIT_H
 
+#include "CombatManager.h"
 #include "EnumFlag.h"
 #include "EventProcessor.h"
-#include "CombatManager.h"
 #include "ItemTemplate.h"
 #include "MotionMaster.h"
 #include "Object.h"
@@ -45,8 +45,6 @@
 #define MAX_AGGRO_RADIUS 45.0f  // yards
 
 static constexpr uint32 MAX_CREATURE_SPELLS = 8;
-static constexpr uint32 infinityCooldownDelay = 0x9A7EC800; // used for set "infinity cooldowns" for spells and check, MONTH*IN_MILLISECONDS
-static constexpr uint32 infinityCooldownDelayCheck = 0x4D3F6400; // MONTH*IN_MILLISECONDS/2;
 
 struct CharmInfo;
 struct FactionTemplateEntry;
@@ -58,6 +56,7 @@ class UnitAura;
 class AuraEffect;
 class Creature;
 class Spell;
+class SpellHistory;
 class SpellInfo;
 class DynamicObject;
 class GameObject;
@@ -1349,14 +1348,8 @@ public:
     /*********************************************************/
     /***          METHODS RELATED TO COOLDOWNS             ***/
     /*********************************************************/
-    [[nodiscard]] virtual bool HasSpellCooldown(uint32 /*spell_id*/) const { return false; }
-    [[nodiscard]] virtual bool HasSpellItemCooldown(uint32 /*spell_id*/, uint32 /*itemid*/) const { return false; }
-    virtual void AddSpellCooldown(uint32 /*spell_id*/, uint32 /*itemid*/, uint32 /*end_time*/, bool needSendToClient = false, bool forceSendToSpectator = false)
-    {
-        // workaround for unused parameters
-        (void)needSendToClient;
-        (void)forceSendToSpectator;
-    }
+    SpellHistory* GetSpellHistory() { return _spellHistory; }
+    [[nodiscard]] SpellHistory const* GetSpellHistory() const { return _spellHistory; }
 
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown);
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns const& cooldowns);
@@ -1598,7 +1591,6 @@ public:
 
     [[nodiscard]] bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
     void SetCurrentCastedSpell(Spell* pSpell);
-    virtual void ProhibitSpellSchool(SpellSchoolMask /*idSchoolMask*/, uint32 /*unTimeMs*/) { }
 
     void SetInstantCast(bool set) { _instantCast = set; }
     [[nodiscard]] bool CanInstantCast() const { return _instantCast; }
@@ -1636,7 +1628,7 @@ public:
     int32 HealBySpell(HealInfo& healInfo, bool critical = false);
 
     int32 SpellBaseHealingBonusDone(SpellSchoolMask schoolMask);
-    float SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype, bool includeHealingDonePct = true);
+    float SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype);
     uint32 SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, uint8 effIndex, float TotalMod = 0.0f, uint32 stack = 1);
     uint32 SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, uint32 stack = 1);
     static uint32 SpellCriticalHealingBonus(Unit const* caster, SpellInfo const* spellProto, uint32 damage, Unit const* victim);
@@ -1952,6 +1944,8 @@ public:
 
     void EnterVehicle(Unit* base, int8 seatId = -1);
     void EnterVehicleUnattackable(Unit* base, int8 seatId = -1);
+    // Seats a passenger before it enters a map, so its create block already carries the seat.
+    void EnterVehicleBeforeCreate(Vehicle* vehicle, int8 seatId);
     void ExitVehicle(Position const* exitPosition = nullptr);
     void ChangeSeat(int8 seatId, bool next = true);
 
@@ -2277,6 +2271,8 @@ private:
     std::unordered_map<ObjectGuid /*guid*/, uint32 /*count*/> extraAttacksTargets;
     ObjectGuid _lastDamagedTargetGuid;
     std::optional<float> _displayScale; ///< scale passed with the current display, empty = native scale
+
+    SpellHistory* _spellHistory;
 
     typedef std::unordered_map<uint64 /*visibleFlag(uint32) + updateType(uint8)*/, BuildValuesCachedBuffer>  ValuesUpdateCache;
     ValuesUpdateCache _valuesUpdateCache;

@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Common.h"
 #include "CharmInfo.h"
+#include "Common.h"
 #include "CreatureAI.h"
 #include "DisableMgr.h"
 #include "GameTime.h"
@@ -29,6 +29,7 @@
 #include "PetPackets.h"
 #include "Player.h"
 #include "Spell.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Util.h"
@@ -397,11 +398,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                 if (result == SPELL_CAST_OK)
                 {
-                    if (!spellInfo->IsCooldownStartedOnEvent())
-                    {
-                        pet->ToCreature()->AddSpellCooldown(spellId, 0, 0);
-                    }
-
                     unit_target = spell->m_targets.GetUnitTarget();
 
                     //10% chance to play special pet attack talk, else growl
@@ -469,9 +465,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     else
                         spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);
 
-                    if (!pet->HasSpellCooldown(spellId))
-                        if (pet->ToPet())
-                            pet->ToPet()->RemoveSpellCooldown(spellId, true);
+                    if (!pet->GetSpellHistory()->HasCooldown(spellId) && pet->ToPet())
+                        GetPlayer()->SendClearCooldown(spellId, pet);
 
                     spell->finish(false);
                     delete spell;
@@ -591,7 +586,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             spell->SendPetCastResult(result);
                     }
 
-                    if (!pet->ToCreature()->HasSpellCooldown(spellId))
+                    if (!pet->ToCreature()->GetSpellHistory()->HasCooldown(spellId))
                         GetPlayer()->SendClearCooldown(spellId, pet);
 
                     spell->finish(false);
@@ -982,6 +977,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutoc
         petsSet = _player->m_Controlled;
 
     // Xinef: loop all pets with same entry (fixes partial state change for feral spirits)
+    bool savedAutocast = false;
     for (Unit* pet : petsSet)
     {
         if (checkPet->GetEntry() == packet.PetGUID.GetEntry() && pet->GetEntry() != packet.PetGUID.GetEntry())
@@ -1005,7 +1001,15 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutoc
             charmInfo->ToggleCreatureAutocast(spellInfo, packet.AutocastEnabled);
 
         charmInfo->SetSpellAutocast(spellInfo, packet.AutocastEnabled);
+
+        if (SummonSavesPetAutocast(pet))
+            savedAutocast = true;
     }
+
+    // one row covers the whole group, as every pet in petsSet shares checkPet's entry
+    if (savedAutocast)
+        _player->GetPetAutocastPreferences().Set(_player->GetGUID().GetCounter(), checkPet->GetEntry(), spellInfo->Id,
+                                                 packet.AutocastEnabled);
 }
 
 void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
@@ -1067,7 +1071,6 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     {
         if (Creature* creature = caster->ToCreature())
         {
-            creature->AddSpellCooldown(spellId, 0, 0);
             if (Pet* pet = creature->ToPet())
             {
                 // 10% chance to play special pet attack talk, else growl
@@ -1088,12 +1091,12 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 
         if (caster->IsPlayer())
         {
-            if (!caster->ToPlayer()->HasSpellCooldown(spellId))
+            if (!caster->ToPlayer()->GetSpellHistory()->HasCooldown(spellId))
                 GetPlayer()->SendClearCooldown(spellId, caster);
         }
         else
         {
-            if (!caster->ToCreature()->HasSpellCooldown(spellId))
+            if (!caster->ToCreature()->GetSpellHistory()->HasCooldown(spellId))
                 GetPlayer()->SendClearCooldown(spellId, caster);
 
             // reset specific flags in case of spell fail. AI will reset other flags

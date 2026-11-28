@@ -19,8 +19,8 @@
 #include "ArenaSpectator.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
-#include "CharmInfo.h"
 #include "CellImpl.h"
+#include "CharmInfo.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DisableMgr.h"
@@ -41,6 +41,7 @@
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
@@ -51,8 +52,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include <cmath>
 #include <G3D/g3dmath.h>
+#include <cmath>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -674,7 +675,7 @@ Spell::Spell(WorldObject* caster, SpellInfo const* info, TriggerCastFlags trigge
     m_spellState = SPELL_STATE_NULL;
     _triggeredCastFlags = triggerFlags;
     if (info->HasAttribute(SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING))
-        _triggeredCastFlags = TriggerCastFlags(uint32(_triggeredCastFlags) | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY);
+        _triggeredCastFlags = TriggerCastFlags(uint32(_triggeredCastFlags) | TRIGGERED_IGNORE_CAST_IN_PROGRESS);
 
     m_CastItem = nullptr;
 
@@ -3352,7 +3353,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 // xinef: apply relic cooldown, imo best place to add this
                 if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
                     if (unitCaster)
-                        unitCaster->AddSpellCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), duration);
+                        unitCaster->GetSpellHistory()->AddCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry(), std::chrono::milliseconds(duration));
 
                 m_spellAura->SetTriggeredByAuraSpellInfo(m_triggeredByAuraSpell.spellInfo);
                 m_spellAura->_RegisterForTargets();
@@ -3798,9 +3799,16 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         cast(true);
     else
     {
+        //item: first cast may destroy item and second cast causes crash
+        // xinef: removed !m_spellInfo->StartRecoveryTime
+        // second los check failed in events
+        // xinef: removed itemguid check, currently there is no such item in database
+        bool willCastDirectly = !m_casttime && /*!m_castItemGUID &&*/ GetCurrentContainer() == CURRENT_GENERIC_SPELL;
+
         // stealth must be removed at cast starting (at show channel bar)
         // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
-        if (unitCaster && !HasTriggeredCastFlag(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth())
+        // and spells cast alongside a cast in progress
+        if (unitCaster && !HasTriggeredCastFlag(TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && !HasTriggeredCastFlag(TRIGGERED_IGNORE_CAST_IN_PROGRESS) && m_spellInfo->IsBreakingStealth())
         {
             // Farsight spells exception
             uint32 exceptSpellId = 0;
@@ -3813,7 +3821,9 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             unitCaster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK, exceptSpellId, m_spellInfo->Id == 75);
         }
 
-        if (unitCaster)
+        // An instant spell ignoring the cast in progress must not take that cast's container,
+        // SetCurrentCastedSpell would interrupt it
+        if (unitCaster && (!willCastDirectly || !HasTriggeredCastFlag(TRIGGERED_IGNORE_CAST_IN_PROGRESS)))
             unitCaster->SetCurrentCastedSpell(this);
         SendSpellStart();
 
@@ -3836,11 +3846,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
             }
         }
 
-        //item: first cast may destroy item and second cast causes crash
-        // xinef: removed !m_spellInfo->StartRecoveryTime
-        // second los check failed in events
-        // xinef: removed itemguid check, currently there is no such item in database
-        if (!m_casttime && /*!m_castItemGUID &&*/ GetCurrentContainer() == CURRENT_GENERIC_SPELL)
+        if (willCastDirectly)
             cast(true);
 
         if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_GCD))
@@ -3886,7 +3892,7 @@ void Spell::cancel(bool bySelf)
                             unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
                 if (unitCaster && unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
-                    unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                    unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
 
                 SendChannelUpdate(0);
                 SendInterrupted(SPELL_FAILED_INTERRUPTED);
@@ -3924,7 +3930,7 @@ void Spell::cancel(bool bySelf)
             {
                 unitCaster->RemoveGameObject(gameObject, true);
                 if (gameObject->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL && unitCaster->IsPlayer())
-                    unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                    unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
             }
         }
     }
@@ -4250,7 +4256,7 @@ void Spell::_cast(bool skipCheck)
 
     if (unitCaster && unitCaster->IsPlayer())
         if (unitCaster->ToPlayer()->GetCommandStatus(CHEAT_COOLDOWN))
-            unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
 
     sScriptMgr->OnSpellCast(this, unitCaster, m_spellInfo, skipCheck);
 
@@ -4475,7 +4481,7 @@ void Spell::_handle_finish_phase()
                     // Xinef: Properly clear infinite cooldowns in some cases
                     if (ihit->targetGUID == unitCaster->GetGUID() && ihit->missCondition != SPELL_MISS_NONE)
                         if (unitCaster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
-                            unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo);
+                            unitCaster->ToPlayer()->GetSpellHistory()->SendCooldownEvent(m_spellInfo);
                 }
     }
 
@@ -4531,8 +4537,8 @@ void Spell::SendSpellCooldown()
     {
         if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD))
         {
-            // xinef: this should be added here
-            //unitCaster->AddSpellCooldown(m_spellInfo->Id, 0, 0);
+            if (unitCaster->GetCharmInfo())
+                unitCaster->GetSpellHistory()->HandleCooldowns(m_spellInfo, m_CastItem, this);
 
             // xinef: this adds cooldowns to vehicle spells which misses them client-side (when we overwrote dbc info in eg.)
             if (m_spellInfo->RequireCooldownInfo())
@@ -4549,25 +4555,7 @@ void Spell::SendSpellCooldown()
         return;
     }
 
-    Player* _player = unitCaster->ToPlayer();
-
-    // mana/health/etc potions, disabled by client (until combat out as declarate)
-    if (m_CastItem && (m_CastItem->IsPotion() || m_spellInfo->IsCooldownStartedOnEvent()))
-    {
-        // need in some way provided data for Spell::finish SendCooldownEvent
-        _player->SetLastPotionId(m_CastItem->GetEntry());
-        return;
-    }
-
-    // have infinity cooldown but set at aura apply
-    // do not set cooldown for triggered spells (needed by reincarnation)
-    if (m_spellInfo->IsCooldownStartedOnEvent()
-        || m_spellInfo->IsPassive()
-        || (HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && !m_CastItem)
-        || HasTriggeredCastFlag(TRIGGERED_IGNORE_EFFECTS))
-        return;
-
-    _player->AddSpellAndCategoryCooldowns(m_spellInfo, m_CastItem ? m_CastItem->GetEntry() : 0, this);
+    unitCaster->GetSpellHistory()->HandleCooldowns(m_spellInfo, m_CastItem, this);
 }
 
 void Spell::update(uint32 difftime)
@@ -4697,7 +4685,7 @@ void Spell::finish(bool ok)
     if (ok)
     {
         if (unitCaster->IsPlayer() && m_spellInfo->IsChanneled() && m_spellInfo->IsCooldownStartedOnEvent())
-            unitCaster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            unitCaster->ToPlayer()->GetSpellHistory()->ResetCooldown(m_spellInfo->Id, true);
     }
     else
     {
@@ -4708,7 +4696,7 @@ void Spell::finish(bool ok)
 
             // Xinef: Reset cooldown event in case of fail cast
             if (m_spellInfo->IsCooldownStartedOnEvent())
-                unitCaster->ToPlayer()->SendCooldownEvent(m_spellInfo, 0, 0, false);
+                unitCaster->ToPlayer()->GetSpellHistory()->SendCooldownEvent(m_spellInfo, 0, nullptr, false);
         }
 
         return;
@@ -5924,7 +5912,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_CASTER_AURASTATE) && unitCaster->ToPlayer()->HasPlayerFlag(PLAYER_ALLOW_ONLY_ABILITY) && !IsNextMeleeSwingSpell())
                 return SPELL_FAILED_SPELL_IN_PROGRESS;
 
-            if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && unitCaster->ToPlayer()->HasSpellCooldown(m_spellInfo->Id))
+            if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD) && !unitCaster->GetSpellHistory()->IsReady(m_spellInfo, m_CastItem ? m_CastItem->GetEntry() : 0))
             {
                 if (m_triggeredByAuraSpell)
                     return SPELL_FAILED_DONT_REPORT;
@@ -5936,7 +5924,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
             if (unitCaster->ToPlayer()->GetLastPotionId() && m_CastItem && (m_CastItem->IsPotion() || m_spellInfo->IsCooldownStartedOnEvent()))
                 return SPELL_FAILED_NOT_READY;
         }
-        else if (!IsTriggered() && unitCaster && unitCaster->IsCreature() && unitCaster->ToCreature()->IsSpellProhibited(m_spellInfo->GetSchoolMask()))
+        else if (!IsTriggered() && unitCaster && unitCaster->IsCreature() && unitCaster->GetSpellHistory()->IsSchoolLocked(m_spellInfo->GetSchoolMask()))
             return SPELL_FAILED_NOT_READY;
     }
 
@@ -7118,7 +7106,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
     // xinef: check relic cooldown
     if (m_CastItem && m_CastItem->GetTemplate()->InventoryType == INVTYPE_RELIC && m_triggeredByAuraSpell)
-        if (unitCaster && unitCaster->HasSpellCooldown(SPELL_RELIC_COOLDOWN) && !unitCaster->HasSpellItemCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry()))
+        if (unitCaster && unitCaster->GetSpellHistory()->HasCooldown(SPELL_RELIC_COOLDOWN) && !unitCaster->GetSpellHistory()->HasItemCooldown(SPELL_RELIC_COOLDOWN, m_CastItem->GetEntry()))
             return SPELL_FAILED_NOT_READY;
 
     // all ok
@@ -7151,12 +7139,12 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
     // cooldown
     if (Creature const* creatureCaster = unitCaster->ToCreature())
-        if (creatureCaster->HasSpellCooldown(m_spellInfo->Id))
+        if (creatureCaster->GetSpellHistory()->HasCooldown(m_spellInfo->Id))
             return SPELL_FAILED_NOT_READY;
 
     // Check if spell is affected by GCD
     if (m_spellInfo->StartRecoveryCategory > 0)
-        if (unitCaster->GetCharmInfo() && unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo))
+        if (unitCaster->GetCharmInfo() && unitCaster->GetSpellHistory()->HasGlobalCooldown(m_spellInfo))
             return SPELL_FAILED_NOT_READY;
 
     return CheckCast(true);
@@ -7325,6 +7313,11 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
 bool Spell::CanAutoCast(Unit* target)
 {
     ObjectGuid targetguid = target->GetGUID();
+    bool const dealsDirectDamage = m_spellInfo->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE) ||
+        m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_DAMAGE) ||
+        m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL) ||
+        m_spellInfo->HasEffect(SPELL_EFFECT_NORMALIZED_WEAPON_DMG) ||
+        m_spellInfo->HasEffect(SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
 
     for (SpellEffectInfo const& spellEffectInfo : m_spellInfo->GetEffects())
     {
@@ -7336,7 +7329,19 @@ bool Spell::CanAutoCast(Unit* target)
         for (Unit::AuraEffectList::const_iterator auraIt = auras.begin(); auraIt != auras.end(); ++auraIt)
         {
             if (GetSpellInfo()->Id == (*auraIt)->GetSpellInfo()->Id)
+            {
+                // Direct-damage attacks (e.g. Acid Spit, Sting, Monstrous Bite) deal primary damage
+                // on each hit and should not be prevented from autocasting by their own debuff.
+                if (dealsDirectDamage)
+                    continue;
+
+                // Stacking auras should continue to be cast until maximum stacks are reached
+                if (GetSpellInfo()->StackAmount > 1 &&
+                    (*auraIt)->GetBase()->GetStackAmount() < GetSpellInfo()->StackAmount)
+                    continue;
+
                 return false;
+            }
 
             switch (sSpellMgr->CheckSpellGroupStackRules(GetSpellInfo(), (*auraIt)->GetSpellInfo()))
             {
@@ -7346,12 +7351,63 @@ bool Spell::CanAutoCast(Unit* target)
                     if (GetCaster() == (*auraIt)->GetCaster())
                         return false;
                     break;
-                case SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT: // this one has further checks, but i don't think they're necessary for autocast logic
+                case SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT:
                 case SPELL_GROUP_STACK_RULE_EXCLUSIVE_HIGHEST:
-                    if (abs(spellEffectInfo.BasePoints) <= abs((*auraIt)->GetAmount()))
+                    // A stronger aura must not prevent the spell's direct damage.
+                    if (!dealsDirectDamage && abs(spellEffectInfo.BasePoints) <= abs((*auraIt)->GetAmount()))
                         return false;
                     break;
                 case SPELL_GROUP_STACK_RULE_DEFAULT:
+                default:
+                    break;
+            }
+        }
+    }
+
+    // Special autocast conditions for pet abilities
+    if (Unit* unitCaster = m_caster->ToUnit())
+    {
+        if (unitCaster->IsPet() || unitCaster->HasUnitTypeMask(UNIT_MASK_MINION))
+        {
+            uint32 const firstRankSpellId = m_spellInfo->GetFirstRankSpell()->Id;
+            switch (firstRankSpellId)
+            {
+                case 26064: // Shell Shield (Turtle) - only at or below 50% health
+                case 53426: // Lick Your Wounds - only at or below 50% health
+                    if (unitCaster->GetHealthPct() > 50.0f)
+                        return false;
+                    break;
+                case 50318: // Serenity Dust (Moth) - only at or below 75% health
+                    if (unitCaster->GetHealthPct() > 75.0f)
+                        return false;
+                    break;
+                case 53480: // Roar of Sacrifice - target must be in combat and at or below 30% health
+                    if (!target->IsInCombat() || target->GetHealthPct() > 30.0f)
+                        return false;
+                    break;
+                case 53517: // Roar of Recovery - target must have mana and be at or below 20% mana
+                    if (target->getPowerType() != POWER_MANA || target->GetPowerPct(POWER_MANA) > 20.0f)
+                        return false;
+                    break;
+                case 1742:
+                    // Cower - redesigned in 3.3.0+ to a defensive CD with 50% speed penalty; does not autocast
+                    return false;
+                case 23145: // Dive
+                case 23146: // Dive (Rank 1 alternative)
+                case 61684: // Dash
+                {
+                    // Only autocast to chase target if outside melee range
+                    Unit const* chaseTarget = unitCaster->GetVictim();
+                    if (!chaseTarget)
+                        chaseTarget = unitCaster->getAttackerForHelper();
+                    if (!chaseTarget)
+                        if (Unit const* owner = unitCaster->GetCharmerOrOwner())
+                            chaseTarget = owner->getAttackerForHelper();
+
+                    if (!chaseTarget || unitCaster->IsWithinMeleeRange(chaseTarget))
+                        return false;
+                    break;
+                }
                 default:
                     break;
             }
@@ -7364,7 +7420,8 @@ bool Spell::CanAutoCast(Unit* target)
     {
         SelectSpellTargets();
         //check if among target units, our WANTED target is as well (->only self cast spells return false)
-        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin();
+             ihit != m_UniqueTargetInfo.end(); ++ihit)
             if (ihit->targetGUID == targetguid)
                 return true;
     }
@@ -9280,12 +9337,10 @@ bool Spell::HasGlobalCooldown() const
         return false;
 
     // Only player or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        return unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo);
-    else if (unitCaster->IsPlayer())
-        return unitCaster->ToPlayer()->GetGlobalCooldownMgr().HasGlobalCooldown(m_spellInfo);
-    else
+    if (!unitCaster->GetCharmInfo() && !unitCaster->IsPlayer())
         return false;
+
+    return unitCaster->GetSpellHistory()->HasGlobalCooldown(m_spellInfo);
 }
 
 void Spell::TriggerGlobalCooldown()
@@ -9331,10 +9386,8 @@ void Spell::TriggerGlobalCooldown()
     }
 
     // Only players or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().AddGlobalCooldown(m_spellInfo, gcd);
-    else if (unitCaster->IsPlayer())
-        unitCaster->ToPlayer()->GetGlobalCooldownMgr().AddGlobalCooldown(m_spellInfo, gcd);
+    if (unitCaster->GetCharmInfo() || unitCaster->IsPlayer())
+        unitCaster->GetSpellHistory()->AddGlobalCooldown(m_spellInfo, gcd);
 }
 
 void Spell::CancelGlobalCooldown()
@@ -9351,10 +9404,8 @@ void Spell::CancelGlobalCooldown()
         return;
 
     // Only players or controlled units have global cooldown
-    if (unitCaster->GetCharmInfo())
-        unitCaster->GetCharmInfo()->GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
-    else if (unitCaster->IsPlayer())
-        unitCaster->ToPlayer()->GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
+    if (unitCaster->GetCharmInfo() || unitCaster->IsPlayer())
+        unitCaster->GetSpellHistory()->CancelGlobalCooldown(m_spellInfo);
 }
 
 void Spell::OnSpellLaunch()

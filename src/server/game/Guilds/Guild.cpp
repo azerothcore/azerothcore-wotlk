@@ -1446,7 +1446,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
     if (!player)
         return;
 
-    Member const* member = GetMember(player->GetGUID());
+    Member* member = GetMember(player->GetGUID());
     if (!member)
         return;
 
@@ -1467,7 +1467,13 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
 
     _CreateNewBankTab();
     _BroadcastEvent(GE_BANK_TAB_PURCHASED);
+
+    // SendPermissions() unsubscribes from bank updates, meant for a /reload. The buyer's client keeps its bank state,
+    // so it would miss every change until it opens the bank again, like an item deposited into the new tab.
+    bool const receivesBankUpdates = member->ShouldReceiveBankPartialUpdatePackets();
     SendPermissions(session); /// Hack to force client to update permissions
+    if (receivesBankUpdates)
+        member->SubscribeToGuildBankUpdatePackets();
 }
 
 void Guild::HandleInviteMember(WorldSession* session, std::string const& name)

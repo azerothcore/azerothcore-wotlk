@@ -1,0 +1,167 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef SpellHistory_h__
+#define SpellHistory_h__
+
+#include "DatabaseEnvFwd.h"
+#include "GameTime.h"
+#include "SharedDefines.h"
+#include <unordered_map>
+#include <vector>
+
+class Item;
+class Pet;
+class Player;
+class Spell;
+class SpellInfo;
+class Unit;
+class WorldPacket;
+
+class AC_GAME_API SpellHistory
+{
+public:
+    typedef std::chrono::system_clock Clock;
+
+    struct CooldownEntry
+    {
+        uint32 SpellId = 0;
+        Clock::time_point CooldownEnd;
+        uint32 ItemId = 0;
+        uint32 CategoryId = 0;
+        Clock::time_point CategoryEnd;
+        bool OnHold = false;
+        uint32 SpectatorDuration = 0; // cooldown length announced to arena spectators, 0 when not announced
+    };
+
+    typedef std::unordered_map<uint32 /*spellId*/, CooldownEntry> CooldownStorageType;
+    // Keyed by CategoryKey: unrelated spells share category ids across spell families and between item and spell sources
+    typedef std::unordered_map<uint64 /*CategoryKey*/, CooldownEntry*> CategoryCooldownStorageType;
+    typedef std::unordered_map<uint32 /*categoryId*/, Clock::time_point> GlobalCooldownStorageType;
+
+    explicit SpellHistory(Unit* owner) : _owner(owner), _schoolLockouts() { }
+
+    template<class OwnerType>
+    void LoadFromDB(PreparedQueryResult cooldownsResult);
+
+    template<class OwnerType>
+    void SaveToDB(CharacterDatabaseTransaction trans);
+
+    void Update();
+
+    void HandleCooldowns(SpellInfo const* spellInfo, Item const* item, Spell* spell = nullptr);
+    void HandleCooldowns(SpellInfo const* spellInfo, uint32 itemID, Spell* spell = nullptr);
+    [[nodiscard]] bool IsReady(SpellInfo const* spellInfo, uint32 itemId = 0, bool ignoreCategoryCooldown = false) const;
+
+    // Writes the cooldown list of SMSG_INITIAL_SPELLS (Player) or of the pet/vehicle spell bar (Pet)
+    template<class OwnerType>
+    void WritePacket(WorldPacket& packet) const;
+
+    // Cooldowns
+    static Clock::duration const InfinityCooldownDelay;  // used for set "infinity cooldowns" for spells and check
+
+    void StartCooldown(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool onHold = false);
+    void SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId = 0, Spell* spell = nullptr, bool startCooldown = true);
+
+    template<class Type, class Period>
+    void AddCooldown(uint32 spellId, uint32 itemId, std::chrono::duration<Type, Period> cooldownDuration)
+    {
+        Clock::time_point now = GameTime::GetSystemTime();
+        AddCooldown(spellId, itemId, now + std::chrono::duration_cast<Clock::duration>(cooldownDuration), 0, now);
+    }
+
+    void AddCooldown(uint32 spellId, uint32 itemId, Clock::time_point cooldownEnd, uint32 categoryId, Clock::time_point categoryEnd, bool onHold = false);
+    // Announces a player's cooldown to arena spectators when its length is in the range they track
+    void AnnounceToSpectators(uint32 spellId, uint32 durationMs);
+    void ModifyCooldown(uint32 spellId, int32 cooldownModMs);
+    void ResetCooldown(uint32 spellId, bool update = false);
+    void ResetCooldown(CooldownStorageType::iterator& itr, bool update = false);
+    template<typename Predicate>
+    void ResetCooldowns(Predicate predicate, bool update = false)
+    {
+        std::vector<int32> resetCooldowns;
+        resetCooldowns.reserve(_spellCooldowns.size());
+        for (auto itr = _spellCooldowns.begin(); itr != _spellCooldowns.end();)
+        {
+            if (predicate(itr))
+            {
+                resetCooldowns.push_back(itr->first);
+                ResetCooldown(itr, false);
+            }
+            else
+                ++itr;
+        }
+
+        if (update && !resetCooldowns.empty())
+            SendClearCooldowns(resetCooldowns);
+    }
+
+    void ResetAllCooldowns();
+    [[nodiscard]] bool HasCooldown(SpellInfo const* spellInfo, uint32 itemId = 0, bool ignoreCategoryCooldown = false) const;
+    [[nodiscard]] bool HasCooldown(uint32 spellId, uint32 itemId = 0, bool ignoreCategoryCooldown = false) const;
+    // True only when the spell's own cooldown was started by a use of this item
+    [[nodiscard]] bool HasItemCooldown(uint32 spellId, uint32 itemId) const;
+    [[nodiscard]] uint32 GetRemainingCooldown(SpellInfo const* spellInfo, uint32 itemId = 0) const;
+    [[nodiscard]] uint32 GetRemainingCooldown(uint32 spellId) const;
+
+    // School lockouts
+    void LockSpellSchool(SpellSchoolMask schoolMask, uint32 lockoutTime);
+    [[nodiscard]] bool IsSchoolLocked(SpellSchoolMask schoolMask) const;
+    void ResetSchoolLockouts();
+
+    // Global cooldown
+    [[nodiscard]] bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
+    [[nodiscard]] uint32 GetRemainingGlobalCooldown(SpellInfo const* spellInfo) const;
+    void AddGlobalCooldown(SpellInfo const* spellInfo, uint32 duration);
+    void CancelGlobalCooldown(SpellInfo const* spellInfo);
+
+    static void GetCooldownDurations(SpellInfo const* spellInfo, uint32 itemId, int32* cooldown, uint32* categoryId, int32* categoryCooldown);
+
+    [[nodiscard]] CooldownStorageType const& GetSpellCooldowns() const { return _spellCooldowns; }
+    [[nodiscard]] CooldownStorageType::size_type GetCooldownsSizeForPacket() const { return _spellCooldowns.size(); }
+    void SaveCooldownStateBeforeDuel();
+    void RestoreCooldownStateAfterDuel();
+
+private:
+    Player* GetPlayerOwner() const;
+    void SendClearCooldowns(std::vector<int32> const& cooldowns) const;
+    void SendCreatureCooldowns(SpellInfo const* spellInfo, uint32 categoryId) const;
+    [[nodiscard]] CooldownEntry const* GetBlockingCategoryCooldown(SpellInfo const* spellInfo, uint32 itemId) const;
+    static uint64 CategoryKey(uint32 categoryId, uint32 spellId, uint32 itemId);
+    void LinkCategoryCooldown(CooldownEntry& entry);
+    void UnlinkCategoryCooldown(CooldownEntry const& entry);
+    CooldownStorageType::iterator EraseCooldown(CooldownStorageType::iterator itr)
+    {
+        UnlinkCategoryCooldown(itr->second);
+        return _spellCooldowns.erase(itr);
+    }
+
+    Unit* _owner;
+    CooldownStorageType _spellCooldowns;
+    CooldownStorageType _spellCooldownsBeforeDuel;
+    CategoryCooldownStorageType _categoryCooldowns;
+    Clock::time_point _schoolLockouts[MAX_SPELL_SCHOOL];
+    GlobalCooldownStorageType _globalCooldowns;
+
+    template<class T>
+    struct PersistenceHelper { };
+};
+
+template<> AC_GAME_API void SpellHistory::WritePacket<Pet>(WorldPacket& packet) const;
+template<> AC_GAME_API void SpellHistory::WritePacket<Player>(WorldPacket& packet) const;
+
+#endif // SpellHistory_h__

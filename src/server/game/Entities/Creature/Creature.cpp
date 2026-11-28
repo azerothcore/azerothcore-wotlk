@@ -22,7 +22,6 @@
 #include "CreatureAI.h"
 #include "CreatureAISelector.h"
 #include "CreatureGroups.h"
-#include "MoveSpline.h"
 #include "DatabaseEnv.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
@@ -32,6 +31,7 @@
 #include "GroupMgr.h"
 #include "Log.h"
 #include "LootMgr.h"
+#include "MoveSpline.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
@@ -41,6 +41,7 @@
 #include "ScriptedGossip.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
 #include "Transport.h"
@@ -276,11 +277,6 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
 
     for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
         m_spells[i] = 0;
-
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
-        m_ProhibitSchoolTime[i] = 0;
-
-    m_CreatureSpellCooldowns.clear();
 
     DisableReputationReward = false;
     DisableLootReward = false;
@@ -1997,7 +1993,17 @@ void Creature::setDeathState(DeathState state, bool despawn)
         if (m_formation && m_formation->GetLeader() == this)
             m_formation->FormationReset(true, false);
 
-        bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
+        bool const inWater = (GetLiquidData().Status & MAP_LIQUID_STATUS_IN_CONTACT) != 0;
+        // A creature still rooted here (template or script root) cannot fall; its corpse stays where it died.
+        bool const mayFall = !despawn && !inWater && !GetTransport() && !GetVehicle()
+            && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        bool needsFalling = mayFall && IsFlying();
+        if (mayFall && !needsFalling)
+        {
+            float const floorZ = GetFloorZ();
+            needsFalling = floorZ > INVALID_HEIGHT
+                && G3D::fuzzyGt(GetPositionZ(), floorZ + GROUND_HEIGHT_TOLERANCE);
+        }
         SetHover(false);
         SetDisableGravity(false);
 
@@ -2967,146 +2973,6 @@ bool Creature::IsEngaged() const
     return false;
 }
 
-void Creature::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
-{
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
-    {
-        if (idSchoolMask & (1 << i))
-        {
-            m_ProhibitSchoolTime[i] = GameTime::GetGameTimeMS().count() + unTimeMs;
-        }
-    }
-}
-
-bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
-{
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
-    {
-        if (idSchoolMask & (1 << i))
-        {
-            if (m_ProhibitSchoolTime[i] >= GameTime::GetGameTimeMS().count())
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-void Creature::ClearProhibitedSpellTimers()
-{
-    for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
-    {
-        m_ProhibitSchoolTime[i] = 0;
-    }
-}
-
-void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uint32 end_time)
-{
-    CreatureSpellCooldown spellCooldown;
-    spellCooldown.category = categoryId;
-    spellCooldown.end = GameTime::GetGameTimeMS().count() + end_time;
-    m_CreatureSpellCooldowns[spell_id] = std::move(spellCooldown);
-}
-
-void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool /*needSendToClient*/, bool /*forceSendToSpectator*/)
-{
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
-    if (!spellInfo)
-        return;
-
-    // used in proc system, otherwise normal creature cooldown
-    if (end_time)
-    {
-        _AddCreatureSpellCooldown(spellInfo->Id, 0, end_time);
-        return;
-    }
-
-    uint32 spellcooldown = spellInfo->RecoveryTime;
-    uint32 categoryId = spellInfo->GetCategory();
-    uint32 categorycooldown = categoryId ? spellInfo->CategoryRecoveryTime : 0;
-    if (Player* modOwner = GetSpellModOwner())
-    {
-        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, spellcooldown);
-        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, categorycooldown);
-    }
-
-    SpellCategoryStore::const_iterator i_scstore = sSpellsByCategoryStore.find(categoryId);
-    bool const hasCategoryCooldown = categorycooldown && i_scstore != sSpellsByCategoryStore.end();
-    if (hasCategoryCooldown)
-    {
-        for (auto const& [itemBased, categorySpellId] : i_scstore->second)
-        {
-            // A longer cooldown still running on a category spell is never shortened
-            if (GetSpellCooldown(categorySpellId) > categorycooldown)
-                continue;
-
-            _AddCreatureSpellCooldown(categorySpellId, categoryId, categorycooldown);
-        }
-    }
-
-    // The cast spell keeps its own recovery time when it outlasts the category cooldown
-    if (spellcooldown > categorycooldown)
-        _AddCreatureSpellCooldown(spellInfo->Id, 0, spellcooldown);
-
-    // The controlling player only learns creature cooldowns from us, category spells included
-    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
-    if (!player)
-        return;
-
-    PacketCooldowns cooldowns;
-    if (hasCategoryCooldown)
-    {
-        for (auto const& [itemBased, categorySpellId] : i_scstore->second)
-        {
-            if (HasSpell(categorySpellId))
-                cooldowns[categorySpellId] = GetSpellCooldown(categorySpellId);
-        }
-    }
-
-    if (uint32 remaining = GetSpellCooldown(spellInfo->Id))
-        cooldowns[spellInfo->Id] = remaining;
-
-    if (cooldowns.empty())
-        return;
-
-    WorldPacket data;
-    BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, cooldowns);
-    player->SendDirectMessage(&data);
-}
-
-uint32 Creature::GetSpellCooldown(uint32 spell_id) const
-{
-    CreatureSpellCooldowns::const_iterator itr = m_CreatureSpellCooldowns.find(spell_id);
-    if (itr == m_CreatureSpellCooldowns.end())
-        return 0;
-
-    return itr->second.end > GameTime::GetGameTimeMS().count() ? itr->second.end - GameTime::GetGameTimeMS().count() : 0;
-}
-
-bool Creature::HasSpellCooldown(uint32 spell_id) const
-{
-    CreatureSpellCooldowns::const_iterator itr = m_CreatureSpellCooldowns.find(spell_id);
-    return (itr != m_CreatureSpellCooldowns.end() && itr->second.end > GameTime::GetGameTimeMS().count());
-}
-
-void Creature::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
-{
-    m_CreatureSpellCooldowns.erase(spell_id);
-
-    if (update)
-    {
-        if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
-        {
-            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
-            data << uint32(spell_id);
-            data << GetGUID();
-            playerOwner->SendDirectMessage(&data);
-        }
-    }
-}
-
 bool Creature::HasSpell(uint32 spellID) const
 {
     uint8 i;
@@ -3956,7 +3822,7 @@ bool Creature::CanCastSpell(uint32 spellID) const
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
     int32 currentPower = GetPower(getPowerType());
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsSpellProhibited(spellInfo->GetSchoolMask()))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || GetSpellHistory()->IsSchoolLocked(spellInfo->GetSchoolMask()))
     {
         return false;
     }

@@ -19,6 +19,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellHistory.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -103,6 +104,12 @@ enum ValkyrSpells
     SPELL_INSTAKILL_DARK_VALKYR  = 68400,
     SPELL_INSTAKILL_LIGHT_VALKYR = 68401,
 
+    SPELL_HITTIN_YA                  = 66073,
+    SPELL_UBER_SPELL_CONTROLLER      = 66829,
+    SPELL_AURA_STATE_VULNERABLE      = 68402,
+    SPELL_AURA_STATE_RAID_ENCOUNTER  = 68403,
+    SPELL_SPECIAL_2_DUMMY_COOLDOWN   = 66061,
+
     SPELL_BULLET_CONTROLLER_PERIODIC     = 66149,
     SPELL_BULLET_CONTROLLER_SUMMON_LIGHT = 66152,
     SPELL_BULLET_CONTROLLER_SUMMON_DARK  = 66153,
@@ -134,6 +141,8 @@ enum ValkyrActions
 {
     // Twin's Pact: the sister of the casting twin gains Power of the Twins
     ACTION_TWIN_POWER = 1,
+    // Uber Spell Controller tick on Fjola: start the next vortex or pact
+    ACTION_SPECIAL,
 };
 
 struct boss_twin_valkyrAI : public ScriptedAI
@@ -157,11 +166,10 @@ struct boss_twin_valkyrAI : public ScriptedAI
             // special events here
             events.RescheduleEvent(EVENT_BERSERK, IsHeroic() ? 6min : 8min);
             events.RescheduleEvent(EVENT_BULLET_BURST, 24s);
-            events.RescheduleEvent(EVENT_SPECIAL, 45s);
         }
         events.RescheduleEvent(EVENT_SPELL_SPIKE, 11s, 16s);
         if (IsHeroic())
-            events.RescheduleEvent(EVENT_SPELL_TOUCH, 16s, 1);
+            events.RescheduleEvent(EVENT_SPELL_TOUCH, 16s);
 
         me->SetCanFly(true);
         me->SetDisableGravity(true);
@@ -192,6 +200,9 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 DoCastSelf(me->GetEntry() == NPC_LIGHTBANE ? SPELL_TWIN_POWER_LIGHT : SPELL_TWIN_POWER_DARK, true);
                 events.RescheduleEvent(EVENT_REMOVE_DUAL_WIELD, 15s);
                 break;
+            case ACTION_SPECIAL:
+                events.ScheduleEvent(EVENT_SPECIAL, 0ms);
+                break;
             default:
                 break;
         }
@@ -205,6 +216,15 @@ struct boss_twin_valkyrAI : public ScriptedAI
     static void ApplyTwinEmpathy(Creature* caster, Creature* sister)
     {
         caster->AddAura(caster->GetEntry() == NPC_LIGHTBANE ? SPELL_TWIN_EMPATHY_DARK : SPELL_TWIN_EMPATHY_LIGHT, sister);
+    }
+
+    void Reset() override
+    {
+        // Reset runs before the spawn reaches any client; cast on the first update so the cast is seen
+        scheduler.Schedule(0ms, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_HITTIN_YA);
+        });
     }
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
@@ -237,10 +257,12 @@ struct boss_twin_valkyrAI : public ScriptedAI
         }
 
         Talk(SAY_AGGRO);
+        DoCastSelf(me->GetEntry() == NPC_LIGHTBANE ? SPELL_AURA_STATE_RAID_ENCOUNTER : SPELL_AURA_STATE_VULNERABLE);
         me->CastSpell(me, me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_SURGE : SPELL_DARK_SURGE, true);
 
         if (me->GetEntry() == NPC_LIGHTBANE)
         {
+            DoCastSelf(SPELL_UBER_SPELL_CONTROLLER);
             if (pInstance)
                 pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21853);
 
@@ -285,6 +307,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
 
@@ -330,6 +354,14 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 break;
             case EVENT_SPELL_TOUCH:
                 {
+                    uint32 const touchId = me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH;
+                    // Creature Special 2 Dummy Cooldown shares the Touch spell category
+                    if (uint32 cooldown = me->GetSpellHistory()->GetRemainingCooldown(touchId))
+                    {
+                        events.Repeat(Milliseconds(cooldown));
+                        break;
+                    }
+
                     uint32 essenceId = 0;
                     switch (me->GetEntry())
                     {
@@ -369,12 +401,6 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             break;
                     }
 
-                    /*
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, essenceId))
-                        me->CastSpell(target, me->GetEntry()==NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
-                    events.Repeat(45s,50s);
-                    */
-
                     GuidVector tList;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
                     if (pList.getSize())
@@ -388,7 +414,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                         if (!tList.empty())
                             if (Player* target = ObjectAccessor::GetPlayer(*me, tList[urand(0, tList.size() - 1)]))
                             {
-                                me->CastSpell(target, me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
+                                DoCast(target, touchId);
                                 events.Repeat(45s);
                                 break;
                             }
@@ -404,16 +430,21 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     SpecialMask |= (1 << s);
                     switch (s)
                     {
+                        // The twin not casting the vortex locks her Touch for 15s
                         case 0: // light vortex
                             me->CastSpell((Unit*)nullptr, SPELL_LIGHT_VORTEX, false);
                             Talk(EMOTE_VORTEX);
                             Talk(SAY_LIGHT);
                             if (Creature* twin = GetSister())
+                            {
+                                twin->CastSpell(twin, SPELL_SPECIAL_2_DUMMY_COOLDOWN, false);
                                 twin->AI()->Talk(SAY_LIGHT);
+                            }
                             break;
                         case 1: // dark vortex
                             if (Creature* twin = GetSister())
                             {
+                                DoCastSelf(SPELL_SPECIAL_2_DUMMY_COOLDOWN);
                                 twin->CastSpell((Unit*)nullptr, SPELL_DARK_VORTEX, false);
                                 twin->AI()->Talk(EMOTE_VORTEX);
                                 twin->AI()->Talk(SAY_NIGHT);
@@ -445,8 +476,6 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     }
                     if ((SpecialMask & 0xF) == 0xF )
                         SpecialMask = 0;
-                    events.Repeat(45s);
-                    events.DelayEventsToMax(15s, 1); // no touch of light/darkness during special abilities!
                 }
                 break;
             case EVENT_REMOVE_DUAL_WIELD:
@@ -520,7 +549,6 @@ public:
     {
         boss_eydisAI(Creature* pCreature) : boss_twin_valkyrAI(pCreature)
         {
-            me->SetFlag(UNIT_FIELD_AURASTATE, 1 << (19 - 1));
             SetEquipmentSlots(false, EQUIP_MAIN_2, EQUIP_OFFHAND_2, EQUIP_RANGED_2);
             if (Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_1]))
                 boss_twin_valkyrAI::JustSummoned(c);
@@ -546,7 +574,6 @@ public:
     {
         boss_fjolaAI(Creature* pCreature) : boss_twin_valkyrAI(pCreature)
         {
-            me->SetFlag(UNIT_FIELD_AURASTATE, 1 << (22 - 1));
             SetEquipmentSlots(false, EQUIP_MAIN_1, EQUIP_OFFHAND_1, EQUIP_RANGED_1);
             if (Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_1]))
                 boss_twin_valkyrAI::JustSummoned(c);
@@ -863,6 +890,40 @@ class spell_valkyr_clear_auras : public SpellScript
     }
 };
 
+// 66829, 67315, 67316, 67317 - Uber Spell Controller
+class spell_valkyr_uber_spell_controller : public AuraScript
+{
+    PrepareAuraScript(spell_valkyr_uber_spell_controller);
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        if (Creature* valkyr = GetTarget()->ToCreature())
+            valkyr->AI()->DoAction(ACTION_SPECIAL);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_uber_spell_controller::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+// 66061 - Creature Special 2 Dummy Cooldown
+class spell_valkyr_special_2_dummy_cooldown : public SpellScript
+{
+    PrepareSpellScript(spell_valkyr_special_2_dummy_cooldown);
+
+    // Creature casts start no cooldowns on their own; this one's category cooldown locks Touch of Light/Darkness
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->GetSpellHistory()->StartCooldown(GetSpellInfo(), 0);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_valkyr_special_2_dummy_cooldown::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_twin_valkyr()
 {
     new boss_fjola();
@@ -874,4 +935,6 @@ void AddSC_boss_twin_valkyr()
     RegisterSpellScript(spell_valkyr_bullet_controller);
     RegisterSpellScript(spell_valkyr_bullet_summon_trigger);
     RegisterSpellScript(spell_valkyr_clear_auras);
+    RegisterSpellScript(spell_valkyr_uber_spell_controller);
+    RegisterSpellScript(spell_valkyr_special_2_dummy_cooldown);
 }

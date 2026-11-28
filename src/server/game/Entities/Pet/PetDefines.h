@@ -18,12 +18,14 @@
 #ifndef AZEROTHCORE_PET_DEFINES_H
 #define AZEROTHCORE_PET_DEFINES_H
 
+#include "DatabaseEnvFwd.h"
 #include "Define.h"
+#include "ObjectGuid.h"
 #include "Optional.h"
 #include <array>
+#include <numbers>
 #include <string>
 #include <vector>
-#include <numbers>
 
 enum ReactStates : uint8;
 
@@ -241,6 +243,32 @@ public:
     {
         return UnslottedPets.size() == 1 && UnslottedPets[0].Type == HUNTER_PET ? &UnslottedPets[0] : nullptr;
     }
+};
+
+/// The autocast on/off state a player set on one spell of one temporary pet.
+struct PetAutocastState
+{
+    uint32 Entry;
+    uint32 Spell;
+    bool Autocast;
+};
+
+/// The autocast on/off state a player set on a temporary pet, kept per character so the next summon restores it.
+/// Only pets whose SummonProperties row carries SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST are stored
+class PetAutocastPreferences
+{
+public:
+    /// Fills the store from the character's rows, or clears it when there are none.
+    void Load(PreparedQueryResult result);
+
+    /// Remembers the state and writes it back to the characters database.
+    void Set(ObjectGuid::LowType ownerGuid, uint32 entry, uint32 spell, bool autocast);
+
+    /// Every state remembered for the character, in no particular order: one character owns a handful of them.
+    [[nodiscard]] std::vector<PetAutocastState> const& GetStates() const { return _states; }
+
+private:
+    std::vector<PetAutocastState> _states;
 };
 
 #endif

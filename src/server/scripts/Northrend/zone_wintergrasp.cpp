@@ -77,7 +77,12 @@ enum CreatureIds
 
     NPC_WINTERGRASP_CONTROL_ARMS        = 27852,
 
-    NPC_WORLD_TRIGGER_LARGE_AOI_NOT_IMMUNE_PC_NPC = 23742,
+    NPC_WORLD_TRIGGER_LARGE_AOI_NOT_IMMUNE_PC_NPC = 23472,
+};
+
+enum GameObjectIds
+{
+    GO_WINTERGRASP_DEFENDERS_PORTAL     = 190763,
 };
 
 enum QuestIds
@@ -1045,6 +1050,27 @@ class spell_wintergrasp_portal : public SpellScript
     }
 };
 
+// 54643 - Teleport
+// The destination belongs to the Defender's Portal used, not to the trigger nearest to where the player stands.
+class spell_wintergrasp_defender_teleport_trigger : public SpellScript
+{
+    PrepareSpellScript(spell_wintergrasp_defender_teleport_trigger);
+
+    void SetDest(WorldObject*& target)
+    {
+        // 10 yd covers the portal use range; 50 yd covers the farthest portal-to-trigger distance (~40 yd)
+        if (GameObject* portal = GetCaster()->FindNearestGameObject(GO_WINTERGRASP_DEFENDERS_PORTAL, 10.0f))
+            if (Creature* trigger = portal->FindNearestCreature(NPC_WORLD_TRIGGER_LARGE_AOI_NOT_IMMUNE_PC_NPC, 50.0f))
+                target = trigger;
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_wintergrasp_defender_teleport_trigger::SetDest,
+                                                          EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
+    }
+};
+
 // 36444 - Wintergrasp Water
 class spell_wintergrasp_water : public SpellScript
 {
@@ -1194,6 +1220,7 @@ void AddSC_wintergrasp()
     RegisterSpellScript(spell_wintergrasp_create_vehicle);
     RegisterSpellScript(spell_wintergrasp_rp_gg);
     RegisterSpellScript(spell_wintergrasp_portal);
+    RegisterSpellScript(spell_wintergrasp_defender_teleport_trigger);
     RegisterSpellScript(spell_wintergrasp_water);
     RegisterSpellScript(spell_wintergrasp_hide_small_elementals_aura);
     RegisterSpellScript(spell_wg_reduce_damage_by_distance);

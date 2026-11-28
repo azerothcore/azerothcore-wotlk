@@ -279,6 +279,10 @@ bool Map::AddPlayerToMap(Player* player)
 
     player->UpdateObjectVisibility(false);
 
+    // A player base keeps its vehicle kit across the map change; re-seat the passengers it was carrying.
+    if (Vehicle* vehicle = player->GetVehicleKit())
+        vehicle->Reset();
+
     if (player->IsAlive())
         ConvertCorpseToBones(player->GetGUID());
 
