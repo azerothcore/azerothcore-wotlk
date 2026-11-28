@@ -19,6 +19,7 @@
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "Containers.h"
 #include "DisableMgr.h"
 #include "DynamicTree.h"
 #include "GameTime.h"
@@ -2646,6 +2647,154 @@ bool Map::IsSpawnGroupActive(uint32 groupId) const
     return toggled != defaultActive; // XOR: toggled flips the default
 }
 
+namespace
+{
+    uint32 GetOwnSpawnEntry(SpawnData const* data)
+    {
+        return data->type == SPAWN_TYPE_CREATURE
+            ? static_cast<CreatureData const*>(data)->id
+            : static_cast<GameObjectData const*>(data)->id;
+    }
+
+    // Follows cMaNGOS SpawnGroup::GetEligibleEntry: entries below their minimum first, then the chanced
+    // entries, then the rest at equal odds. counts is what the group's members hold so far; 0 = no pick
+    uint32 PickSpawnGroupEntry(std::vector<SpawnGroupEntryLimit> const& limits,
+        std::unordered_map<uint32, uint32>& counts)
+    {
+        std::vector<uint32> candidates;
+        for (SpawnGroupEntryLimit const& limit : limits)
+            if (counts[limit.entry] < limit.minCount)
+                candidates.push_back(limit.entry);
+
+        if (candidates.empty())
+        {
+            float roll = frand(0.0f, 100.0f);
+            for (SpawnGroupEntryLimit const& limit : limits)
+            {
+                if (limit.maxCount && counts[limit.entry] >= limit.maxCount)
+                    continue;
+
+                if (limit.chance <= 0.0f)
+                {
+                    candidates.push_back(limit.entry);
+                    continue;
+                }
+
+                if (roll < limit.chance)
+                {
+                    ++counts[limit.entry];
+                    return limit.entry;
+                }
+
+                roll -= limit.chance;
+            }
+        }
+
+        if (candidates.empty())
+            return 0;
+
+        uint32 entry = Acore::Containers::SelectRandomContainerElement(candidates);
+        ++counts[entry];
+        return entry;
+    }
+}
+
+void Map::RollSpawnGroup(uint32 groupId, SpawnObjectType type, SpawnGroupRollData const& roll)
+{
+    std::unordered_map<ObjectGuid::LowType, uint32>& chosen = _spawnGroupChosenEntries[type];
+
+    std::vector<SpawnData const*> members;
+    auto range = sObjectMgr->GetSpawnDataForGroup(groupId);
+    for (auto itr = range.first; itr != range.second; ++itr)
+    {
+        SpawnData const* member = itr->second;
+        if (member->type != type)
+            continue;
+
+        // Not on this difficulty, or its spawn chance failed: it stays down and takes no entry
+        if (!(member->spawnMask & (1 << GetSpawnMode())) ||
+            (member->spawnGroupChance > 0.0f && !roll_chance_f(member->spawnGroupChance)))
+            chosen[member->spawnId] = 0;
+        else
+            members.push_back(member);
+    }
+
+    // Random order, so the minimums don't always land on the same spawn points
+    Acore::Containers::RandomShuffle(members);
+
+    std::unordered_map<uint32, uint32> counts;
+    for (SpawnData const* member : members)
+    {
+        // A group that sets entries keeps a member down when it has none left to give, as cMaNGOS does.
+        // A group with member chances only leaves the entry to the spawn itself
+        if (roll.entries.empty())
+            chosen[member->spawnId] = sObjectMgr->ChooseSpawnEntry(type, member->spawnId, GetOwnSpawnEntry(member));
+        else
+            chosen[member->spawnId] = PickSpawnGroupEntry(roll.entries, counts);
+    }
+}
+
+uint32 Map::ChooseSpawnEntry(SpawnData const* data, ObjectGuid::LowType spawnId, uint32 ownEntry)
+{
+    SpawnGroupRollData const* roll = sObjectMgr->GetSpawnGroupRollData(data->spawnGroupId, data->type);
+    if (!roll)
+        return sObjectMgr->ChooseSpawnEntry(data->type, spawnId, ownEntry);
+
+    std::unordered_map<ObjectGuid::LowType, uint32>& chosen = _spawnGroupChosenEntries[data->type];
+    auto itr = chosen.find(spawnId);
+    if (itr == chosen.end())
+    {
+        // First member to spawn on this map: the whole group is rolled at once
+        RollSpawnGroup(data->spawnGroupId, data->type, *roll);
+        itr = chosen.find(spawnId);
+        if (itr == chosen.end())
+            return ownEntry;
+    }
+
+    // Down for lack of an entry: another member may have left one open since
+    if (!itr->second)
+        RerollSpawnGroupEntry(data, spawnId);
+
+    return itr->second;
+}
+
+void Map::RerollSpawnGroupEntry(SpawnData const* data, ObjectGuid::LowType spawnId)
+{
+    SpawnGroupRollData const* roll = sObjectMgr->GetSpawnGroupRollData(data->spawnGroupId, data->type);
+    if (!roll)
+        return;
+
+    // Nothing to redo before the group's first roll
+    std::unordered_map<ObjectGuid::LowType, uint32>& chosen = _spawnGroupChosenEntries[data->type];
+    auto own = chosen.find(spawnId);
+    if (own == chosen.end())
+        return;
+
+    // A member that is down stays down, unless all that kept it down was the group having no entry left
+    if (!own->second && (roll->entries.empty() || data->spawnGroupChance > 0.0f ||
+        !(data->spawnMask & (1 << GetSpawnMode()))))
+        return;
+
+    // One member at a time: the others keep their entry and only leave open what they don't hold
+    std::unordered_map<uint32, uint32> counts;
+    auto range = sObjectMgr->GetSpawnDataForGroup(data->spawnGroupId);
+    for (auto itr = range.first; itr != range.second; ++itr)
+    {
+        SpawnData const* member = itr->second;
+        if (member->type != data->type || member->spawnId == spawnId)
+            continue;
+
+        auto held = chosen.find(member->spawnId);
+        if (held != chosen.end() && held->second)
+            ++counts[held->second];
+    }
+
+    if (roll->entries.empty())
+        own->second = sObjectMgr->ChooseSpawnEntry(data->type, spawnId, GetOwnSpawnEntry(data));
+    else
+        own->second = PickSpawnGroupEntry(roll->entries, counts);
+}
+
 bool Map::SpawnGroupSpawn(uint32 groupId, bool ignoreRespawn /*= false*/, bool force /*= false*/)
 {
     SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(groupId);
@@ -2904,6 +3053,8 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
     // reads it back and loads as DEAD instead of ALIVE
     RemoveCreatureRespawnTime(spawnId);
 
+    RerollSpawnGroupEntry(data, spawnId);
+
     Creature* creature = new Creature();
     if (!creature->LoadCreatureFromDB(spawnId, this, true, true))
         delete creature;
@@ -2958,6 +3109,8 @@ void Map::ProcessGameObjectRespawn(ObjectGuid::LowType spawnId)
     // Remove respawn time BEFORE LoadFromDB, otherwise the GO
     // reads it back and loads as despawned
     RemoveGORespawnTime(spawnId);
+
+    RerollSpawnGroupEntry(data, spawnId);
 
     GameObject* gameobject = new GameObject();
     if (!gameobject->LoadGameObjectFromDB(spawnId, this, true))

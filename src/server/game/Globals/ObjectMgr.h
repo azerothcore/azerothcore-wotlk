@@ -36,6 +36,7 @@
 #include "TemporarySummon.h"
 #include "Trainer.h"
 #include "VehicleDefines.h"
+#include <array>
 #include <functional>
 #include <limits>
 #include <map>
@@ -511,6 +512,7 @@ typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContai
 typedef std::unordered_map<ObjectGuid::LowType, GameObjectData> GameObjectDataContainer;
 typedef std::unordered_map<uint32, SpawnGroupTemplateData> SpawnGroupDataContainer;
 typedef std::multimap<uint32, SpawnData const*> SpawnGroupLinkContainer;
+typedef std::unordered_map<ObjectGuid::LowType, SpawnEntryList> SpawnEntryContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<GameObjectSummonData> > GameObjectSummonDataContainer;
 typedef std::unordered_map<uint32, CreatureLocale> CreatureLocaleContainer;
@@ -1048,6 +1050,7 @@ public:
     void LoadGameObjectSummons();
     void LoadSpawnGroupTemplates();
     void LoadSpawnGroups();
+    void LoadSpawnEntries();
     void LoadCreatures();
     void LoadCreatureSparring();
     void LoadLinkedRespawn();
@@ -1277,6 +1280,31 @@ public:
             return &itr->second;
     }
     [[nodiscard]] SpawnData const* GetSpawnData(SpawnObjectType type, ObjectGuid::LowType spawnId) const;
+
+    /// Entries the spawn point can spawn as, or nullptr when it only ever spawns its own `id`
+    [[nodiscard]] SpawnEntryList const* GetSpawnEntries(SpawnObjectType type, ObjectGuid::LowType spawnId) const
+    {
+        auto itr = _spawnEntryStore[type].find(spawnId);
+        return itr != _spawnEntryStore[type].end() ? &itr->second : nullptr;
+    }
+    /// Rolls the entry the spawn point spawns as; defaultEntry is the spawn's own `id`
+    [[nodiscard]] uint32 ChooseSpawnEntry(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 defaultEntry) const;
+    /// What the spawn group rolls for its members of that type, or nullptr when it rolls nothing.
+    /// The roll itself is per map: see Map::ChooseSpawnEntry()
+    [[nodiscard]] SpawnGroupRollData const* GetSpawnGroupRollData(uint32 groupId, SpawnObjectType type) const
+    {
+        auto itr = _spawnGroupRollStore.find(groupId);
+        if (itr == _spawnGroupRollStore.end())
+            return nullptr;
+
+        SpawnGroupRollData const& roll = itr->second[type];
+        return roll.entries.empty() && !roll.hasChancedMembers ? nullptr : &roll;
+    }
+    /// Whether the spawn can come back as another entry (or not at all) when it respawns
+    [[nodiscard]] bool RollsSpawnEntry(SpawnData const* data, ObjectGuid::LowType spawnId) const
+    {
+        return GetSpawnEntries(data->type, spawnId) || GetSpawnGroupRollData(data->spawnGroupId, data->type);
+    }
 
     [[nodiscard]] SpawnGroupTemplateData const* GetSpawnGroupData(uint32 groupId) const
     {
@@ -1674,6 +1702,20 @@ private:
     GameObjectDataContainer _gameObjectDataStore;
     SpawnGroupDataContainer _spawnGroupDataStore;
     SpawnGroupLinkContainer _spawnGroupMapStore;
+    std::array<SpawnEntryContainer, SPAWN_TYPE_MAX> _spawnEntryStore;
+    std::unordered_map<uint32, std::array<SpawnGroupRollData, SPAWN_TYPE_MAX>> _spawnGroupRollStore;
+    void LoadSpawnGroupEntries();
+    [[nodiscard]] bool IsCreatureDifficultyEntry(uint32 entry) const
+    {
+        for (auto const& entries : _difficultyEntries)
+            if (entries.count(entry))
+                return true;
+
+        return false;
+    }
+    /// Loads one type's spawn entries, for a single spawn when spawnId is given; returns the row count
+    uint32 LoadSpawnEntriesOfType(SpawnObjectType type, ObjectGuid::LowType spawnId = 0);
+    [[nodiscard]] bool IsValidSpawnEntry(SpawnObjectType type, ObjectGuid::LowType spawnId, uint32 entry);
     GameObjectLocaleContainer _gameObjectLocaleStore;
     GameObjectTemplateContainer _gameObjectTemplateStore;
     GameObjectTemplateAddonContainer _gameObjectTemplateAddonStore;

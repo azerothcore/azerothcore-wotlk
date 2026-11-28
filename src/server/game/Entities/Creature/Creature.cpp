@@ -1735,7 +1735,9 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         || !groupData || (groupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE);
 
     // Add to world
-    uint32 entry = GetRandomId(data->id, data->id2, data->id3);
+    uint32 entry = map->ChooseSpawnEntry(data, spawnId, data->id);
+    if (!entry) // its spawn group left this spawn point out
+        return false;
 
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, entry, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
@@ -1865,7 +1867,7 @@ void Creature::DeleteFromDB()
     stmt->SetData(0, m_spawnId);
     trans->Append(stmt);
 
-    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_MULTISPAWN);
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_SPAWN_ENTRY);
     stmt->SetData(0, m_spawnId);
     trans->Append(stmt);
 
@@ -2090,10 +2092,14 @@ void Creature::Respawn(bool force)
                 {
                     GetMap()->RemoveCreatureRespawnTime(m_spawnId);
                     CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
-                    // Respawn check if spawn has 2 entries
-                    if (data->id2)
+                    // Roll again when the spawn point or its spawn group has a list of entries
+                    if (sObjectMgr->RollsSpawnEntry(data, m_spawnId))
                     {
-                        uint32 entry = GetRandomId(data->id, data->id2, data->id3);
+                        GetMap()->RerollSpawnGroupEntry(data, m_spawnId);
+                        uint32 entry = GetMap()->ChooseSpawnEntry(data, m_spawnId, data->id);
+                        if (!entry)
+                            entry = GetEntry();
+
                         UpdateEntry(entry, data, true);  // Select Random Entry
                         m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
                         LoadEquipment(data->equipmentId);                                                     // Reload Equipment
@@ -3676,36 +3682,6 @@ bool Creature::CanPeriodicallyCallForAssistance() const
         return false;
 
     return true;
-}
-
-uint32 Creature::GetRandomId(uint32 id1, uint32 id2, uint32 id3)
-{
-    uint32 id = id1;
-    uint8 ids = 0;
-
-    if (id2)
-    {
-        ++ids;
-        if (id3) ++ids;
-    }
-
-    if (ids)
-    {
-        uint8 idNumber = urand(0, ids);
-        switch (idNumber)
-        {
-            case 0:
-                id = id1;
-                break;
-            case 1:
-                id = id2;
-                break;
-            case 2:
-                id = id3;
-                break;
-        }
-    }
-    return id;
 }
 
 void Creature::SetPickPocketLootTime()
