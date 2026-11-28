@@ -1801,7 +1801,24 @@ void Spell::SelectImplicitTargetDestTargets(SpellEffIndex effIndex, SpellImplici
 
             if (targetType.GetTarget() == TARGET_DEST_TARGET_BACK)
             {
-                dist += target->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
+                // Land behind the model's edge, not inside the model
+                float offset = target->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
+
+                // A caster moved there stays within melee range of very large models (e.g. Killing Spree on Supremus);
+                // the cap never pulls it below the spell radius or into the target's combat reach, where stealth is
+                // always detected
+                uint32 const effect = m_spellInfo->Effects[effIndex].Effect;
+                Unit const* unitCaster = m_caster->ToUnit();
+                Unit const* targetUnit = target->ToUnit();
+                if ((effect == SPELL_EFFECT_TELEPORT_UNITS || effect == SPELL_EFFECT_JUMP_DEST)
+                    && unitCaster && targetUnit)
+                {
+                    float const maxDist = std::max(unitCaster->GetMeleeRange(targetUnit) - MIN_MELEE_REACH,
+                                                   targetUnit->GetCombatReach() + CONTACT_DISTANCE);
+                    offset = std::min(offset, std::max(0.0f, maxDist - dist));
+                }
+
+                dist += offset;
             }
 
             Position pos = dest._position;
