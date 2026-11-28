@@ -394,8 +394,10 @@ jobs:
             timeout="30m"
           fi
 
+          # Copy kept for the "Summarize failed tests" step; pipefail keeps go test's exit code.
           run_go_test() {
-            go test -tags=e2e -count="${count}" -timeout="${timeout}" -parallel="${parallel}" -p "${p}" -v "$@"
+            go test -tags=e2e -count="${count}" -timeout="${timeout}" -parallel="${parallel}" -p "${p}" -v "$@" 2>&1 \
+              | tee -a "${RUNNER_TEMP}/go-test.log"
           }
 
           if [[ "${scope}" == "smoke" ]]; then
@@ -438,6 +440,55 @@ jobs:
                 ;;
             esac
           fi
+
+      # Lists failures on the run summary page so they don't have to be found in the -v log.
+      - name: Summarize failed tests
+        if: failure()
+        env:
+          E2E_SHARD: ${{ matrix.shard }}
+        run: |
+          log="${RUNNER_TEMP}/go-test.log"
+          fails="${RUNNER_TEMP}/go-test-fails.log"
+          [[ -f "${log}" ]] || exit 0
+          # One annotation per failed leaf test (a parent whose subtest failed is skipped). A timeout
+          # prints no "--- FAIL:" line, so hung tests are taken from its "running tests:" list. A failed
+          # package with no test to name (goroutine panic, build error) is annotated itself.
+          awk -v shard="${E2E_SHARD}" -v out="${fails}" '
+            function annotate(msg) {
+              gsub(/%/, "%25", msg); gsub(/\t/, " ", msg)
+              printf "::error title=e2e failed (%s)::%s\n", shard, msg
+            }
+            function flush(pkg,   i, j, leaf, named) {
+              named = 0
+              for (i = 1; i <= nn; i++) {
+                leaf = 1
+                for (j = 1; j <= nn; j++) if (index(names[j], names[i] "/") == 1) { leaf = 0; break }
+                if (leaf && !(names[i] in seen)) { seen[names[i]] = 1; annotate(names[i]); named = 1 }
+              }
+              if (!named && pkg != "") annotate(pkg (panicmsg != "" ? " - " panicmsg : ""))
+              nn = 0; panicmsg = ""; timedout = 0; split("", seen)
+            }
+            /^[ \t]*--- FAIL: / {
+              print > out; n = $0; sub(/^[ \t]*--- FAIL: /, "", n); sub(/ .*/, "", n); names[++nn] = n; next
+            }
+            /^panic: / { print > out; panicmsg = $0; timedout = ($0 ~ /^panic: test timed out/); next }
+            timedout && /^\trunning tests:/ { print > out; next }
+            timedout && /^\t\t/ {
+              print > out; n = $0; sub(/^\t\t/, "", n); sub(/ \([^)]*\)$/, "", n); names[++nn] = n; next
+            }
+            timedout && /^$/ { timedout = 0; next }
+            /^FAIL[ \t]/ { print > out; flush($0); next }
+            /^(ok|\?)[ \t]/ { nn = 0; panicmsg = ""; timedout = 0; split("", seen) }
+            END { flush("") }
+          ' "${log}"
+          [[ -s "${fails}" ]] || exit 0
+          cat "${fails}"
+          {
+            echo "### Failed e2e tests (${E2E_SHARD})"
+            echo '```'
+            cat "${fails}"
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Stop servers
         if: always()
